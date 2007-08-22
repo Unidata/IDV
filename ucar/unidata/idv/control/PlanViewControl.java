@@ -72,8 +72,8 @@ import javax.swing.event.*;
 
 
 /**
- * Class to handle all kinds of PlanViews.
- * A plan view is a horizontal cross section.
+ * Class to handle all kinds of PlanViews.  A plan view is a 
+ * horizontal slice at a level.
  *
  * @author Unidata Development Team
  * @version $Revision: 1.185 $
