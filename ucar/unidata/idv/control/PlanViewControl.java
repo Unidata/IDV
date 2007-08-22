@@ -71,11 +71,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 
-
 /**
- * Methods for all kinds of plan views.
- * Controls are a JFrame with buttons used for control of
- * one plan view of one parameter in the display.
+ * Class to handle all kinds of PlanViews.
  * A plan view is a horizontal cross section.
  *
  * @author Unidata Development Team
