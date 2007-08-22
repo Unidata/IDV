@@ -1,0 +1,158 @@
+{Drawing Control}
+
+{
+<meta name="jhid" value="idv.controls.drawingcontrol">
+
+The drawing control is a drawing editor that supports
+polygons, lines, shapes and text. It behaves like other two-dimensional
+drawing editors - you can choose the tool to use (e.g., move, create graphic,
+etc.), apply the tool in the main 3D window, select graphic objects, etc.
+<p>
+<b>A caveat:</b> drawing and selecting in 3D is at times tricky. Sometimes
+it is best to be in the main overhead view.
+
+
+<p>
+The user interface consists of 3 tabs. The first allows for the user to set
+the drawing mode:
+[ht::cimg images/DrawingControlGui1.gif]
+
+The second sets the drawing style:
+[ht::cimg images/DrawingControlGui2.gif]
+
+And the third lists all of the graphical elements:
+[ht::cimg images/DrawingControlGui3.gif]
+Double clicking on an element will show its properties editor through which you can
+change its color, line width, position, etc.
+
+[ht::cimg images/DrawingControlProperties.gif {Shape Properties}]
+
+
+Note: The drawing control will only respond to events (e.g., mouse drag to draw) when its window
+is being show. For example, if it is not visible in the dashboard tab then no drawing
+will take place.
+<p>
+The distance and area of a shape will be shown when it is being drawn, in the Shapes list
+and in the shape properties. You can change the distance unit through the 
+[ug::menu  Edit {Change Display Unit...}] menu.
+
+}
+
+
+
+{
+{Mode} 
+
+{
+There are three editing modes, select, move and reshape: 
+<ul>
+<li> <img src="images/pointer.gif"> Allows you to select one or more drawing objects. 
+To select multiples press the control key. The selected objects will be shown with
+small blue rectangles. Once selected you can bring up the object's property editor
+by pressing Control-P. You can also delete the selected objects by pressing Control-X.
+You can select all of the objects by pressing Control-A.
+<p>
+<b>A caveat:</b> Some objects can only be selected by clicking on or near certain points.
+Rectangles and diamonds click near the upper left or lower right. For text click near the beginning
+of the text string for left justified text, near the center for center justified text or near the
+end for right justified text.
+
+<li> <img src="images/Move16.gif"> Allows you to move an object.
+
+<li> <img src="images/Reshape16.gif"> Allows you to move one of the points that define the location of an object.
+</ul>
+}
+}
+
+{
+{Enabled} 
+{
+This checkbox allows you to disable/enable drawing. For example, if you wanted to manipulate
+other elements in the display (e.g., probe point, cross section, other drawing controls),
+you can disable the drawing control so that it does not respond to any mouse events in the
+main display.
+}
+}
+
+{
+{Shapes} 
+{
+The shape buttons allow you to create:
+<ul>
+<li> <img src="images/SmoothPoly16.gif">  Click and drag in the main display to create a smooth polygon.
+<li> <img src="images/Poly16.gif">  Click and drag in the main display to create a straight line polygon.
+Press the space bar to add joint points.
+<li> <img src="images/Line16.gif">, <img src="images/Rectangle16.gif">, <img src="images/Diamond16.gif">  Click and drag in the main display to create the shape.
+<li> <img src="images/Text16.gif"> Click in the main display and type to enter text. When done entering text hit
+
+<li> <img src="images/WayPoint16.gif"> Click in the main display to create a waypoint - text and a shape.
+
+
+<li> <img src="images/Image16.gif"> Click in the main display to create an image. 
+Select an image file from the  file chooser.
+Note: drawing with the image is a bit flaky. The [ug::button Full Lat/Lon] button controls
+how the corners of the image are positioned.
+
+<li> Fronts - The drawing control also supports draing a number of front and high/low symbols.
+The icon buttons allow you to draw 5 different front types. However, there are 20+ front types
+to choose from in the Properties dialog for the shape.
+
+</ul>
+}
+}
+
+{
+{Location} 
+{
+The drawing control allows you to draw in four different coordinate systems:
+<ul>
+<li> Lat/Lon/Alt - The points of the shapes are defined by Latitude/Longitude/Altitude. When you reproject
+the display the shape will also be reprojected.
+<li> Lat/Lon - Like Lat/Lon/Alt but the z position is fixed using the Z Position slider.
+<li> X/Y/Z - Draw in the 3D box coordinate space. Re-projections will no effect the shape.
+<li> X/Y - Like X/Y/Z but the z position is fixed.
+</ul>
+
+For now the [ug::button Full Lat/Lon] is not fully implemented.
+}
+}
+
+{{Z Position} 
+{Allows you to define what is the fixed Z position.}
+}
+
+
+{
+{Time} 
+{
+If you have the [ug::button Draw in current time] checkbox turned on then  the graphic shapes that
+that you are drawing will only be shown in the current animation time
+in the 3D view. This facility allows you to, for example,  annotate features
+through time by drawing on the feature, stepping the time animation, and then
+drawing in the next time.
+To see all of the objects irrespective of their display times select the [ug::button Show all] checkbox.
+<p>
+A graphic can be shown in more than one times using  the property editor. Select the object and
+press Control-P to bring up the property editor.
+Select the times to be displayed in in the [ug::button Times] list (Shift-click or Control-click to
+select multiples) and press [ug::button Apply] or [ug::button Ok].
+}
+}
+
+
+
+
+{{Color, Line Width, etc.} 
+{These widgets allow you to define the color, line width, font, and text justification.}
+}
+
+{{Edit Menu} 
+{There is a &quot;Remove All&quot; entry in the edit menu that removes  all graphic objects from the display.}
+}
+
+{{File Menu} {
+Under the file menu you can choose  to  export the objects in the drawing control. 
+This creates a simple xml file  (a .xgrf file suffix) that defines the objects and 
+that can be re-imported.
+}}
+

@@ -1,0 +1,283 @@
+<html><head> 
+  <title>ISL Images and Movies</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+
+
+The [isl::tag image] and [isl::tag movie] tag are the ones used to create images and 
+movies. Both of these tags can contain subtags that allow you to manipulate 
+the  image or images.
+
+[isl::tagdef image {Generate and manipulate images} -attrs {file+ {image file, e.g., gif, png or jpg} quality {image quality, 0.0-1.0} view {view name or names to match} display {display id} what {what part of the display control should be captured} }]
+The [isl::tag image] tag   allows you to capture an image from a main display or from the GUI of a display control.
+
+<p>
+
+The [isl::attr file] attribute defines the image file.
+For image formats that support it you can also specify a [isl::attr quality] attribute
+that can range from close to 0.0(worst) to 1.0 (best and default).
+
+<p>
+
+<a name="view"></a>
+The [isl::attr view] attribute allows you to specify a name of a view it use.
+This can also be a regular expression pattern to use to match on multiple views.
+If there are multiple views in existence and there is no [isl::attr view] attribute specified
+or if there multiple views resulting from a [isl::attr view] name attribute you should use
+the [isl::property  viewindex] and [isl::property viewname] in your filenames, etc.,
+The [isl::property  viewindex] property is the number of the view, e.g., the first view
+we capture has [isl::property  viewindex] of 0, the second [isl::property  viewindex] = 1, etc.
+
+<p>
+
+The [isl::attr display] attribute allows you to specify a display control to use to capture. For its use
+see <a href="DataAndDisplays.html#displayattr">here</a>. The [isl::attr what] attribute allows you to specify
+what part of the display control gui should be captured. For now the IDV only supports what=&quot;chart&quot;
+to capture the time series chart of the station model and data probe displays.
+
+
+[isl::tagdef movie {Create a Quicktime movie, animated GIF or Google Earth KMZ file} -attrs {file {movie file} view {view name or names to match} imagedir {The directory to place the images.} imagetemplate {The file name template to use} imagesuffix {Should be jpg if generating a QuickTime movie but can be gif or png as well}}]
+The [isl::tag movie] tag allows you to capture a time animation as a Quicktime movie or
+as an animated gif.
+<p>
+
+The [isl::attr view] attribute is the same as in the [isl::tag image] tag.
+<p>
+If the [isl::attr file] ends with <i>.mov</i> then a Quicktime movie is
+created. If the [isl::attr file] ends with <i>.gif</i> then an animated gif is created.
+If the [isl::attr file] ends with <i>.kmz</i> then a Google Earth KMZ file is created
+each being time stamped.
+Note: The [isl::attr file] attribute can be a comma separated list of files, e.g.:
+[isl::xml {
+<movie file="test.mov,test.kmz,test.gif"/>
+}]
+This allows you to capture mutiple types of movie products in one call.
+
+
+<p>
+If no [isl::attr file] attribute is specified then this just generates the images, not the movie.
+For example, you can not specify the file name but do specify the [isl::attr imagedir] and
+this will generate the images and place them in the imagedir for later processing.
+<p>
+The [isl::attr imagetemplate] is a template filename that can contain text and three different macros, e.g.:
+<pre>
+imagetemplate="image_%time%"    Include the animation time formatted in the default format
+imagetemplate="image_%count%"   Include which image
+imagetemplate="image_%count%_%time:any date format%"  Include animation time in any date format. e.g.:
+imagetemplate="image_%count%_%time:yyyyMMddHHmm%"
+</pre>
+
+The generic date format can contain a specification that is used by the Java 
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/java/text/SimpleDateFormat.html">SimpleDateFormat</a>
+and is described in <a href="BasicTags.html#simpledateformat">Basic Tags</a>.
+
+
+
+<a name="imagesmanipulation"></a>
+<div class="pagesubtitle">Images Manipulation</div>
+There are a set of tags that can be contained by both the [isl::tagref image] and
+[isl::tagref movie] tags that support processing of the image. Most of these tags work
+on the initial image and act as a filter pipeline. For example, the ISL:
+[isl::xml {
+<image file="test.png">
+    <clip north="40" south="30" east="-80" west="-90"/>
+    <matte bottom="150"/>
+</image>
+}]
+Will generate an image from the main display. It will then clip the image
+at the given lat/lon bounding box and then add a matte with spacing of 150 pixels
+at the bottom of the image. It will then write out the image to the file test.png.
+<p>
+You can modify this behavior in a variety of ways. For example, the ISL:
+[isl::xml {
+<image file="test.png">
+    <clip north="40" south="30" east="-80" west="-90" copy="true" file="clippedimage.gif"/>
+    <matte bottom="150"/>
+</image>
+}]
+will clip the original image but not alter it (the copy=&quot;true&quot;) and then will write
+out the clipped image to the given file. The original image will be passed to the [isl::tag matte]
+tag which will matte it. 
+<p>
+The image manipulation tags can be nested. e.g. the ISL:
+[isl::xml {
+<image file="test.png">
+    <clip north="40" south="30" east="-80" west="-90" copy="true" file="clippedimage.gif">
+        <matte bottom="150"/>
+        <write file="somefile.jpg"/>
+        <transparent color="black"/>
+    </clip>
+    <matte bottom="150"/>
+</image>
+}]
+
+Will clip a copy of the image, matte the copy, write out the matted image as somefile.jpg,
+set the color black to be transparent and then write it out as clippedimage.gif.
+The original image is then matted and written out as test.png.
+
+
+[isl::tagdef clip {Clip an image} -attrs {north {latitude} south {latitude} east longitude west longitude top {pixels or %} bottom {pixels or %} left {pixels or %} right {pixels or %}  display {The id of a display which we use its data's map projection to clip with}} ]
+
+The [isl::tag clip] tag allows you to clip the image. The clipping can either be defined
+in lat/lon  coordinates, with x/y image coordinates or from the projection used from a display. 
+The image coordinates can be specified as percentages.
+
+[isl::xml {
+Clip in image space:
+<clip top="10" bottom="0" left="10%" right="0"/>
+
+Clip in lat/lon space:
+<clip north="40" south="30" east="-80" west="-90"/>
+}]
+
+If there is a [isl::attr display] attribute defined then we get the lat/lon bounds of its data to clip with.
+Use the display control Properties dialog to set the id that you reference in the ISL.
+[isl::xml {
+Clip using a display id:
+<clip display="displayid"/>
+}]
+
+
+
+[isl::tagdef matte {Matte an image} -attrs {background {color name or r,g,b} top {pixel spacing} bottom {pixel spacing} left {pixel spacing} right {pixel spacing} space {pixel spacing} hspace {pixel spacing} vspace {pixel spacing}}]
+The [isl::tag matte] tag allows you to add a space around any of the sides of an image.
+e.g:
+[isl::xml {
+<matte top="100" bottom="20"/>
+}]
+You can also simply specify a [isl::attr space], [isl::attr hspace] (horizontal space),
+or [isl::attr vspace] (vertical space) attributes:
+[isl::xml {
+<matte space="10"/>
+
+<matte hspace="20"/>
+
+<matte vspace="20"/>
+}]
+
+
+
+You can also specify a background color. The color can be a named color
+or a comma separated list of red/green/blue values:
+[isl::xml {
+<matte top="100"  background="black"/>
+or:
+<matte top="100"  background="red,green,blue values"/>
+}]
+
+
+
+[isl::tagdef overlay {Annotate an image with text or a logo} -attrs {image {file or url to image} text {text to draw} place {rectangle point on base image} anchor {rectangle point on overlay} fontsize {font size for text} fontface {font face for text} color {color for text}}]
+The [isl::tag overlay] tag allows you to add an icon or text as an image overlay.
+You can either specify and image or text.
+The [isl::attr place] and [isl::attr anchor] tags specify the location of the overlay.
+They take the form: &quot;rectpoint,offsetx,offsety&quot;
+Where rectpoint is a point on a rectangle:
+<pre>
+   UL    UM    UR
+   ML    MM    MR
+   LL    LM    LR
+   Where U=upper,M=middle,L=lower
+   R=right,L=left
+</pre>
+The offsetx and offsety are optional.
+The idea is you define a point on the base image, e.g., the upper left corner (&quot;ul&quot;).
+Then you define an anchor point on the overlay that will be placed at the place point.
+So for example, if you wanted the upper left corner of the image overlay to be drawn
+10 pixels right and 20 pixels below the upper left corner of the base image then you
+would do:
+<pre>
+   place="UL,10,20" anchor="UL"
+</pre> 
+If you wanted some text overlay to be placed so that its bottom center was in the
+middle of the image, 30 pixels from the bottom of the image you do:
+<pre>
+   place="LM,0,-30" anchor="LM"
+</pre> 
+
+If you wanted some  overlay to be placed so that its upper right was placed at the center
+of the image you do:
+<pre>
+   place="M" anchor="UR"
+</pre> 
+
+
+
+[isl::tagdef resize {Resize an image} -attrs {width {pixels or percent} height {pixels or percent}}]
+The [isl::tag resize] tag allows you to resize an image. You specify either a width or
+a height:
+[isl::xml {
+<resize width="200"/>
+
+<resize height="150"/>
+}]
+The width or height can also be a percentage:
+[isl::xml {
+<resize width="50%"/>
+
+<resize height="10%"/>
+}]
+
+
+
+
+[isl::tagdef thumbnail  {Generate a thumbnail of an image} -attrs {file {image file name} width {pixels or percent} height {pixels or percent}}]
+The [isl::tag thumbnail] tag is just like the resize tag except that it will also write out the
+image. e.g:
+[isl::xml {
+<thumbnail width="50%" file="thumbnail.png"/>
+}]
+
+
+[isl::tagdef write {Write out an image} -attrs {file+ {file to write to}}]
+The [isl::tag write] tag allows you to write out an intermediate image file at any time.
+[isl::xml {
+    <write file="somefile.png"/>
+}]
+
+
+[isl::tagdef colorbar {Add a color bar to an image} -attrs {width {bar width} height {bar height} orientation {tick mark  location, 'right', 'left', 'bottom', 'top'} tickmarks {number of tick marks} interval {interval value} values {comma separated list of values} place {rectangle location} {anchor rectangle location} showlines {'true' or 'false', draw tick lines} linecolor {line color} }]
+The [isl::tag colorbar] tag allows you to add a color bar from  the color tables in the display controls.
+Currently, it does not do a perfect job when there are more than one color tables present.
+<p>
+The [isl::attr orientation] attribute specifies where the tick marks are drawn, e.g., to the left, right, top
+or bottom of the color bar. This also implicitly specifies the horizontal (top, bottom) 
+or vertical (right, left) orientation of the color bar. Note, placing a vertical color bar 
+is a bit tricky.
+<p>
+You can specify how ticks are drawn. You can give a number of tickmarks, a value interval or
+a specific list of values.
+<p>
+The location of the color bar is defined using the anchor and place points as described for
+the  [isl::tagref overlay] tag.
+
+
+[isl::tagdef transparent {Set transparency on an image} -attrs {color+ {color to set to transparent}}]
+The [isl::tag transparent] tag allows you to set a particular color in an image to be transparent.
+[isl::xml {
+<transparent color="black"/>
+or:
+<transparent color="red,green,blue"/>
+}]
+
+
+
+[isl::tagdef split {Split an image into sub-images} -attrs {file+ {base file name} columns {number of columns} rows {number of rows} }]
+The [isl::tag split] tag splits up an image  by a given number of rows and columns.
+The file attribute should contain properties for each image: ${row}, ${column}  and ${count}.
+
+
+
+
+
+ 
+
+
+
+
+
+
+</body>

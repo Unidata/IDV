@@ -1,0 +1,95 @@
+
+<html>
+<head>
+<title>Surface Point Observation Displays</title>
+</head>
+
+<body>
+
+<div class="overview">
+The IDV  surface point observation display makes weather station plots.
+</div>
+
+
+If necessary, select surface data sources and times as described in
+(see [ht::popup "SurfaceDataLoading.html" "Loading Surface Data"]).
+
+<ol class="step">
+
+<li>If you do not have a Surface Plot created then create one from the Field Selector.
+
+<li>Zoom in and see more stations</li>
+  <ul class="substep">
+    <li> Zoom and pan as needed to fill the display with Colorado.
+    As you zoom in you will see more stations appear in the plot.
+
+    <li>This display's control window appeared when the display was
+    made.  You can control the density of the stations plotted using
+    the [ht::button {Plot Density}] slider.
+
+    <li>To see all stations, click on the
+    [ht::command Declutter] checkbox to toggle it off. 
+
+    <li>In the control window, use the 
+    [ht::command Station Model] selector box to 
+    change station model from METAR to Temperature. 
+    Later in the workshop you learn how to change and create station models.
+    (See the 
+ [ht::popup "../../resources/stationmodel/index.html" "Station Model Editor"]).
+  </ul>
+</li>
+
+
+<li> Changing Z position.
+<ul>
+<li> Rotate the view to see that the stations are displayed at their actual altitude.
+<li> For the [ht::button Vertical Position] select [ht::button Fixed position]  on the [ht::dialog Point Data Plot Control]
+to display the stations at a fixed level.
+</ul>
+
+
+
+
+<!--
+<li> Let's see where there is bad weather using the filter mechanism.
+<ul>
+<li> Select the [ht::command Filters] tab on the [ht::dialog Point Data Plot Control].
+<li> In the first row under [ht::command Property] select [ht::param T].
+<li> Select &quot;&lt;&quot;.
+<li> Under [ht::command Value] enter &quot;40\[F\]&quot;. The &quot;\[F\]&quot; is an optional unit.
+<li> In the second row under [ht::command Property] select [ht::param SPD] - wind speed.
+<li> Select &quot;&gt;&quot;.
+<li> Under [ht::command Value] enter &quot;20\[MPH\]&quot;. 
+<li>  Press the [ht::button Apply Filters] button.
+<li> Click on one of the stations to see the full listing in the [ht::command Data Readout] tab.
+</ul>
+-->
+
+
+
+<li> We're going to find out where its hot and humid.
+<ul>
+<li> Select the [ht::command Filters] tab on the [ht::dialog Point Data Plot Control].
+<li> In the first row under [ht::command Property] select [ht::param T].
+<li> Select &quot;&gt;&quot;.
+<li> Under [ht::command Value] enter &quot;80\[F\]&quot;. The &quot;\[F\]&quot; is an optional unit.
+<li> In the second row under [ht::command Property] select [ht::param TD] - dewpoint temperature
+<li> Select &quot;&gt;&quot;.
+<li> Under [ht::command Value] enter &quot;70\[F\]&quot;. 
+<li>  Press the [ht::button Apply Filters] button.
+<li> Click on one of the stations to see the full listing in the [ht::command Data Readout] tab.
+</ul>
+
+
+
+
+<li>Remove All Displays</li>
+  <ul class="substep">
+    <li>[ht::clearDisplays]
+  </ul>
+</li>
+
+</ol>
+
+</body>
+</html>

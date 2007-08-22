@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<skin>
+  <ui>
+    <panel layout="border">
+      <component idref="top" place="North"/>
+      <component idref="middle" place="Center"/>
+      <component idref="bottom" place="South"/>
+      <component idref="left" place="West"/>
+      <component idref="right" place="East"/>
+    </panel>
+  </ui>
+  <components>
+      <label
+         id="top"
+         text="Top Label"/>
+      <label
+         id="middle"
+         text="Middle Label"/>
+      <label
+         id="bottom"
+         text="Bottom Label"/>
+      <label
+         id="left"
+         text="Left Label"/>
+      <label
+         id="right"
+         text="Right Label"/>
+  </components>
+</skin>

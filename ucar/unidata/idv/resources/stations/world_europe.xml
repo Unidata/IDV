@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="Europe" category="World locations">
+<stn name="Abkhazia " lat="43:00:N" lon="41:00:E"/>
+<stn name="Adygey " lat="44:30:N" lon="40:10:E"/>
+<stn name="Aegean Islands" lat="38:00:N" lon="25:00:E"/>
+<stn name="Ajaccio " lat="41:55:N" lon="8:44:E"/>
+<stn name="Ajaria " lat="41:45:N" lon="42:10:E"/>
+<stn name="Aland Islands" lat="60:15:N" lon="20:00:E"/>
+<stn name="Alderney " lat="49:43:N" lon="2:12:W"/>
+<stn name="Alexandretta " lat="36:34:N" lon="36:08:E"/>
+<stn name="Alhucemas, Penon de " lat="35:13:N" lon="3:53:W"/>
+<stn name="Alsace " lat="48:30:N" lon="7:20:E"/>
+<stn name="Amsterdam " lat="52:23:N" lon="4:54:E"/>
+<stn name="Amur River" lat="52:56:N" lon="141:10:E"/>
+<stn name="Anatolia " lat="39:00:N" lon="35:00:E"/>
+<stn name="Andorra la Vella " lat="42:30:N" lon="1:30:E"/>
+<stn name="Andros " lat="37:45:N" lon="24:42:E"/>
+<stn name="Ankara " lat="39:56:N" lon="32:52:E"/>
+<stn name="Antwerp " lat="51:13:N" lon="4:25:E"/>
+<stn name="Argun River" lat="53:20:N" lon="121:28:E"/>
+<stn name="Athens " lat="37:59:N" lon="23:44:E"/>
+<stn name="Azarbaycan " lat="40:30:N" lon="47:30:E"/>
+<stn name="Azerbaidzhan " lat="40:30:N" lon="47:30:E"/>
+<stn name="Azores " lat="38:30:N" lon="28:00:W"/>
+<stn name="Baku " lat="40:23:N" lon="49:51:E"/>
+<stn name="Balearic Islands" lat="39:30:N" lon="3:00:E"/>
+<stn name="Balkan Peninsula" lat="42:00:N" lon="23:00:E"/>
+<stn name="Balkan Peninsula" lat="42:00:N" lon="23:00:E"/>
+<stn name="Balkan Peninsula" lat="42:00:N" lon="23:00:E"/>
+<stn name="Balkan Peninsula" lat="42:00:N" lon="23:00:E"/>
+<stn name="Balkan Peninsula" lat="42:00:N" lon="23:00:E"/>
+<stn name="Balkan Peninsula" lat="42:00:N" lon="23:00:E"/>
+<stn name="Balkan Peninsula" lat="42:00:N" lon="23:00:E"/>
+<stn name="Balkan Peninsula" lat="42:00:N" lon="23:00:E"/>
+<stn name="Balkan Peninsula" lat="42:00:N" lon="23:00:E"/>
+<stn name="Balkan Peninsula" lat="42:00:N" lon="23:00:E"/>
+<stn name="Banat " lat="45:30:N" lon="21:00:E"/>
+<stn name="Banat " lat="45:30:N" lon="21:00:E"/>
+<stn name="Banat " lat="45:30:N" lon="21:00:E"/>
+<stn name="Basque Provinces" lat="43:00:N" lon="2:30:W"/>
+<stn name="Bastia " lat="42:42:N" lon="9:27:E"/>
+<stn name="Bavaria " lat="48:30:N" lon="11:30:E"/>
+<stn name="Belgie " lat="50:50:N" lon="4:00:E"/>
+<stn name="Belgique " lat="50:50:N" lon="4:00:E"/>
+<stn name="Belgrade " lat="44:50:N" lon="20:30:E"/>
+<stn name="Belorussia " lat="53:00:N" lon="28:00:E"/>
+<stn name="Bering Island" lat="55:00:N" lon="166:30:E"/>
+<stn name="Berlin " lat="52:31:N" lon="13:24:E"/>
+<stn name="Berlin, East " lat="52:30:N" lon="13:33:E"/>
+<stn name="Berlin, West " lat="52:30:N" lon="13:20:E"/>
+<stn name="Bern " lat="46:57:N" lon="7:26:E"/>
+<stn name="Bessarabia " lat="47:00:N" lon="28:30:E"/>
+<stn name="Bessarabia " lat="47:00:N" lon="28:30:E"/>
+<stn name="Bessarabia " lat="47:00:N" lon="28:30:E"/>
+<stn name="Big Diomede Island" lat="65:46:N" lon="169:06:W"/>
+<stn name="Bilbao " lat="43:15:N" lon="2:58:W"/>
+<stn name="Bishop Rock" lat="49:52:N" lon="6:27:W"/>
+<stn name="Bjornoya " lat="74:26:N" lon="19:05:E"/>
+<stn name="Black Forest " lat="48:00:N" lon="8:15:E"/>
+<stn name="Bohemia " lat="50:00:N" lon="14:30:E"/>
+<stn name="Bonn " lat="50:44:N" lon="7:05:E"/>
+<stn name="Bordeaux " lat="44:50:N" lon="0:34:W"/>
+<stn name="Bornholm " lat="55:10:N" lon="15:00:E"/>
+<stn name="Bosna i Hercegovina " lat="44:00:N" lon="18:00:E"/>
+<stn name="Bosnia " lat="44:00:N" lon="18:00:E"/>
+<stn name="Bratislava " lat="48:09:N" lon="17:07:E"/>
+<stn name="Brussels " lat="50:50:N" lon="4:20:E"/>
+<stn name="Bucharest " lat="44:26:N" lon="26:06:E"/>
+<stn name="Budapest " lat="47:30:N" lon="19:05:E"/>
+<stn name="Bukovina " lat="48:00:N" lon="26:00:E"/>
+<stn name="Bukovina " lat="48:00:N" lon="26:00:E"/>
+<stn name="Byelarus " lat="53:00:N" lon="28:00:E"/>
+<stn name="Byelorussia " lat="53:00:N" lon="28:00:E"/>
+<stn name="Canary Islands" lat="28:00:N" lon="15:30:W"/>
+<stn name="Carpatho-Ukraine " lat="48:22:N" lon="23:32:E"/>
+<stn name="Catalonia " lat="42:00:N" lon="2:00:E"/>
+<stn name="Caucasus " lat="42:00:N" lon="45:00:E"/>
+<stn name="Ceska Republika " lat="49:45:N" lon="15:30:E"/>
+<stn name="Ceskoslovensko " lat="49:00:N" lon="17:30:E"/>
+<stn name="Ceskoslovensko " lat="49:00:N" lon="17:30:E"/>
+<stn name="Ceuta " lat="35:53:N" lon="5:19:W"/>
+<stn name="Chafarinas, Islas " lat="35:12:N" lon="2:26:W"/>
+<stn name="Channel Islands" lat="49:20:N" lon="2:20:W"/>
+<stn name="Channel Islands" lat="49:20:N" lon="2:20:W"/>
+<stn name="Chechnya " lat="43:15:N" lon="45:40:E"/>
+<stn name="Chisinau " lat="47:00:N" lon="28:50:E"/>
+<stn name="Cilicia " lat="36:50:N" lon="34:30:E"/>
+<stn name="Citta del Vaticano " lat="41:54:N" lon="12:27:E"/>
+<stn name="Commander Islands " lat="55:00:N" lon="167:00:E"/>
+<stn name="Confederatio Helvetica " lat="47:00:N" lon="8:00:E"/>
+<stn name="Constantinople " lat="41:01:N" lon="28:58:E"/>
+<stn name="Copenhagen " lat="55:40:N" lon="12:35:E"/>
+<stn name="Corfu " lat="39:40:N" lon="19:45:E"/>
+<stn name="Corinth " lat="37:56:N" lon="22:56:E"/>
+<stn name="Corsica  " lat="42:00:N" lon="9:00:E"/>
+<stn name="Crete " lat="35:15:N" lon="24:45:E"/>
+<stn name="Crimea " lat="45:00:N" lon="34:00:E"/>
+<stn name="Crimean Peninsula" lat="45:00:N" lon="34:00:E"/>
+<stn name="Cyclades " lat="37:00:N" lon="25:10:E"/>
+<stn name="Czechoslovakia " lat="49:00:N" lon="18:00:E"/>
+<stn name="Czechoslovakia " lat="49:00:N" lon="18:00:E"/>
+<stn name="Dagestan " lat="43:00:N" lon="47:00:E"/>
+<stn name="Dalmatia " lat="43:00:N" lon="17:00:E"/>
+<stn name="Danmark " lat="56:00:N" lon="10:00:E"/>
+<stn name="Danzig " lat="54:23:N" lon="18:40:E"/>
+<stn name="Deutschland " lat="51:00:N" lon="9:00:E"/>
+<stn name="Diomede Islands" lat="65:47:N" lon="169:00:W"/>
+<stn name="Dnieper " lat="46:30:N" lon="32:18:E"/>
+<stn name="Dnieper " lat="46:30:N" lon="32:18:E"/>
+<stn name="Dnieper " lat="46:30:N" lon="32:18:E"/>
+<stn name="Dniester " lat="46:18:N" lon="30:17:E"/>
+<stn name="Dniester " lat="46:18:N" lon="30:17:E"/>
+<stn name="Dobruja " lat="43:30:N" lon="28:00:E"/>
+<stn name="Dobruja " lat="43:30:N" lon="28:00:E"/>
+<stn name="Dodecanese " lat="36:00:N" lon="27:05:E"/>
+<stn name="Donets Basin" lat="48:15:N" lon="38:30:E"/>
+<stn name="Donets Basin" lat="48:15:N" lon="38:30:E"/>
+<stn name="Douglas " lat="54:09:N" lon="4:28:W"/>
+<stn name="Dublin " lat="53:20:N" lon="6:15:W"/>
+<stn name="East Frisian Islands" lat="53:44:N" lon="7:25:E"/>
+<stn name="East Germany " lat="52:00:N" lon="13:00:E"/>
+<stn name="Eesti " lat="59:00:N" lon="26:00:E"/>
+<stn name="Eire " lat="53:00:N" lon="8:00:W"/>
+<stn name="Elba " lat="42:46:N" lon="10:17:E"/>
+<stn name="Ellada " lat="39:00:N" lon="22:00:E"/>
+<stn name="Ellas " lat="39:00:N" lon="22:00:E"/>
+<stn name="England " lat="52:30:N" lon="1:30:W"/>
+<stn name="Eolie, Isole " lat="38:30:N" lon="15:00:E"/>
+<stn name="Epirus, Northern " lat="40:00:N" lon="20:30:E"/>
+<stn name="Epirus, Northern " lat="40:00:N" lon="20:30:E"/>
+<stn name="Espana" lat="40:00:N" lon="4:00:W"/>
+<stn name="Etorofu " lat="44:55:N" lon="147:40:E"/>
+<stn name="Former Soviet Union " lat="" lon=""/>
+<stn name="Former Soviet Union " lat="" lon=""/>
+<stn name="Former Soviet Union " lat="" lon=""/>
+<stn name="Former Soviet Union " lat="" lon=""/>
+<stn name="Former Soviet Union " lat="" lon=""/>
+<stn name="Former Soviet Union " lat="" lon=""/>
+<stn name="Former Soviet Union " lat="" lon=""/>
+<stn name="Former Soviet Union " lat="" lon=""/>
+<stn name="Former Soviet Union " lat="" lon=""/>
+<stn name="Former Soviet Union " lat="" lon=""/>
+<stn name="Foroyar " lat="62:00:N" lon="7:00:W"/>
+<stn name="Franz Josef Land " lat="81:00:N" lon="55:00:E"/>
+<stn name="Frisian Islands" lat="53:35:N" lon="6:40:E"/>
+<stn name="Frisian Islands" lat="53:35:N" lon="6:40:E"/>
+<stn name="Frisian Islands" lat="53:35:N" lon="6:40:E"/>
+<stn name="Fyn " lat="55:20:N" lon="10:25:E"/>
+<stn name="Galicia " lat="49:30:N" lon="23:00:E"/>
+<stn name="Galicia " lat="42:45:N" lon="8:10:E"/>
+<stn name="Galicia " lat="49:30:N" lon="23:00:E"/>
+<stn name="Gdansk " lat="54:23:N" lon="18:40:E"/>
+<stn name="Geneva " lat="46:12:N" lon="6:10:E"/>
+<stn name="Genoa " lat="44:25:N" lon="8:57:E"/>
+<stn name="German Democratic Republic " lat="52:00:N" lon="13:00:E"/>
+<stn name="Germany, Federal Republic of" lat="51:00:N" lon="9:00:E"/>
+<stn name="Gibraltar " lat="36:11:N" lon="5:22:W"/>
+<stn name="Goteborg " lat="57:43:N" lon="11:58:E"/>
+<stn name="Gotland " lat="57:30:N" lon="18:33:E"/>
+<stn name="Great Britain " lat="54:00:N" lon="2:00:W"/>
+<stn name="Habomai Islands" lat="43:30:N" lon="146:10:E"/>
+<stn name="Hague, The " lat="52:05:N" lon="4:18:E"/>
+<stn name="Hatay " lat="36:30:N" lon="36:15:E"/>
+<stn name="Hayastan " lat="40:00:N" lon="45:00:E"/>
+<stn name="Helsinki " lat="60:10:N" lon="24:58:E"/>
+<stn name="Herzegovina " lat="44:00:N" lon="18:00:E"/>
+<stn name="Hiiumaa " lat="58:50:N" lon="22:30:E"/>
+<stn name="Holland " lat="52:30:N" lon="5:45:E"/>
+<stn name="Hrvatska " lat="45:10:N" lon="15:30:E"/>
+<stn name="Iberian Peninsula" lat="40:00:N" lon="5:00:W"/>
+<stn name="Iberian Peninsula" lat="40:00:N" lon="5:00:W"/>
+<stn name="Ingushetia " lat="43:15:N" lon="45:00:E"/>
+<stn name="Inner Hebrides " lat="56:30:N" lon="6:20:W"/>
+<stn name="Ionian Islands" lat="38:30:N" lon="20:30:E"/>
+<stn name="Iron Gate " lat="44:41:N" lon="22:31:E"/>
+<stn name="Iron Gate " lat="44:41:N" lon="22:31:E"/>
+<stn name="Iskenderun " lat="36:34:N" lon="36:08:E"/>
+<stn name="Island " lat="65:00:N" lon="18:00:W"/>
+<stn name="Istanbul " lat="41:01:N" lon="28:58:E"/>
+<stn name="Istrian Peninsula" lat="45:00:N" lon="14:00:E"/>
+<stn name="Istrian Peninsula" lat="45:00:N" lon="14:00:E"/>
+<stn name="Italia " lat="42:50:N" lon="12:50:E"/>
+<stn name="Iturup " lat="44:55:N" lon="147:40:E"/>
+<stn name="Izmir " lat="38:25:N" lon="27:10:E"/>
+<stn name="Jugoslavia, Jugoslavija " lat="43:00:N" lon="21:00:E"/>
+<stn name="Jugoslavia, Jugoslavija " lat="43:00:N" lon="21:00:E"/>
+<stn name="Jugoslavia, Jugoslavija " lat="43:00:N" lon="21:00:E"/>
+<stn name="Jugoslavia, Jugoslavija " lat="43:00:N" lon="21:00:E"/>
+<stn name="Jugoslavia, Jugoslavija " lat="43:00:N" lon="21:00:E"/>
+<stn name="Jutland " lat="56:00:N" lon="9:15:E"/>
+<stn name="Kabardino-Balkaria " lat="43:30:N" lon="43:30:E"/>
+<stn name="Kaliningrad " lat="54:30:N" lon="21:00:E"/>
+<stn name="Kamchatka Peninsula " lat="56:00:N" lon="160:00:E"/>
+<stn name="Karachevo-Cherkessia " lat="43:40:N" lon="41:50:E"/>
+<stn name="Karafuto " lat="50:00:N" lon="143:00:E"/>
+<stn name="Karelia " lat="63:15:N" lon="30:48:E"/>
+<stn name="Karelia " lat="63:15:N" lon="30:48:E"/>
+<stn name="Karelian Isthmus" lat="60:25:N" lon="30:00:E"/>
+<stn name="Khabarovsk " lat="48:27:N" lon="135:06:E"/>
+<stn name="Khanka, Lake" lat="45:00:N" lon="132:24:E"/>
+<stn name="Khios " lat="38:22:N" lon="26:04:E"/>
+<stn name="Kibris " lat="35:00:N" lon="33:00:E"/>
+<stn name="Kiev " lat="50:26:N" lon="30:31:E"/>
+<stn name="Kipros " lat="35:00:N" lon="33:00:E"/>
+<stn name="Kola Peninsula " lat="67:20:N" lon="37:00:E"/>
+<stn name="Kosovo " lat="42:30:N" lon="21:00:E"/>
+<stn name="Kunashiri " lat="44:20:N" lon="146:00:E"/>
+<stn name="Kuril Islands" lat="46:10:N" lon="152:00:E"/>
+<stn name="Kuznetsk Basin" lat="54:00:N" lon="86:00:E"/>
+<stn name="Las Palmas " lat="28:06:N" lon="15:24:W"/>
+<stn name="Latvija " lat="57:00:N" lon="25:00:E"/>
+<stn name="Lemnos " lat="39:54:N" lon="25:21:E"/>
+<stn name="Lesvos " lat="39:15:N" lon="26:15:E"/>
+<stn name="Lietuva " lat="56:00:N" lon="24:00:E"/>
+<stn name="Lisbon " lat="38:43:N" lon="9:08:W"/>
+<stn name="Ljubljana " lat="46:03:N" lon="14:31:E"/>
+<stn name="London " lat="51:30:N" lon="0:10:W"/>
+<stn name="Longyearbyen " lat="78:13:N" lon="15:33:E"/>
+<stn name="Lorraine " lat="48:42:N" lon="6:11:E"/>
+<stn name="Luxembourg " lat="49:45:N" lon="6:10:E"/>
+<stn name="Lyakhov Islands" lat="73:45:N" lon="138:00:E"/>
+<stn name="Macedonia" lat="41:50:N" lon="22:00:E"/>
+<stn name="Maddalena, Isola" lat="41:13:N" lon="09:24:E"/>
+<stn name="Madeira Islands" lat="32:40:N" lon="16:45:W"/>
+<stn name="Madrid " lat="40:24:N" lon="3:41:W"/>
+<stn name="Magyarorszag " lat="47:00:N" lon="20:00:E"/>
+<stn name="Majorca Island " lat="39:30:N" lon="3:00:E"/>
+<stn name="Makedonija " lat="41:50:N" lon="22:00:E"/>
+<stn name="Mallorca, Isla de " lat="39:30:N" lon="3:00:E"/>
+<stn name="Malmady " lat="50:26:N" lon="6:02:E"/>
+<stn name="Melilla " lat="35:19:N" lon="2:58:W"/>
+<stn name="Memel " lat="55:43:N" lon="21:30:E"/>
+<stn name="Mingrelia " lat="42:30:N" lon="41:52:E"/>
+<stn name="Minorca Island " lat="40:00:N" lon="4:00:E"/>
+<stn name="Minsk " lat="53:54:N" lon="27:34:E"/>
+<stn name="Moldavia " lat="47:00:N" lon="29:00:E"/>
+<stn name="Moldavia " lat="47:00:N" lon="29:00:E"/>
+<stn name="Monaco " lat="43:44:N" lon="7:25:E"/>
+<stn name="Montenegro " lat="42:30:N" lon="19:00:E"/>
+<stn name="Moravia " lat="49:30:N" lon="17:00:E"/>
+<stn name="Moravian Gate " lat="49:35:N" lon="17:50:E"/>
+<stn name="Moscow " lat="55:45:N" lon="37:35:E"/>
+<stn name="Nagorno-Karabakh " lat="40:00:N" lon="46:40:E"/>
+<stn name="Naxcivan " lat="39:20:N" lon="45:20:E"/>
+<stn name="Naxos " lat="37:05:N" lon="25:30:E"/>
+<stn name="Nederland " lat="52:30:N" lon="5:45:E"/>
+<stn name="New Siberian Islands" lat="75:00:N" lon="142:00:E"/>
+<stn name="Nicosia " lat="35:10:N" lon="33:22:E"/>
+<stn name="Norge " lat="62:00:N" lon="10:00:E"/>
+<stn name="Norman Isles " lat="49:20:N" lon="2:20:W"/>
+<stn name="Norman Isles " lat="49:20:N" lon="2:20:W"/>
+<stn name="North Frisian Islands" lat="54:50:N" lon="8:12:E"/>
+<stn name="North Frisian Islands" lat="54:50:N" lon="8:12:E"/>
+<stn name="North Ossetia " lat="43:00:N" lon="44:10:E"/>
+<stn name="Northern Cyprus " lat="35:15:N" lon="33:44:E"/>
+<stn name="Northern Epirus " lat="40:00:N" lon="20:30:E"/>
+<stn name="Northern Epirus " lat="40:00:N" lon="20:30:E"/>
+<stn name="Northern Ireland" lat="54:40:N" lon="6:45:W"/>
+<stn name="Novaya Zemlya " lat="74:00:N" lon="57:00:E"/>
+<stn name="Oesterreich " lat="47:20:N" lon="13:20:E"/>
+<stn name="Oland " lat="56:45:N" lon="16:40:E"/>
+<stn name="Orkney Islands" lat="59:00:N" lon="3:00:W"/>
+<stn name="Oslo " lat="59:55:N" lon="10:45:E"/>
+<stn name="Outer Hebrides " lat="57:45:N" lon="7:00:W"/>
+<stn name="Palermo " lat="38:07:N" lon="13:21:E"/>
+<stn name="Pantelleria, Isola di " lat="36:47:N" lon="12:00:E"/>
+<stn name="Paris " lat="48:52:N" lon="2:20:E"/>
+<stn name="Pelagian Islands " lat="35:40:N" lon="12:40:E"/>
+<stn name="Peloponnese " lat="37:30:N" lon="22:25:E"/>
+<stn name="Polska " lat="52:00:N" lon="20:00:E"/>
+<stn name="Pomerania " lat="53:40:N" lon="15:35:E"/>
+<stn name="Pomerania " lat="53:40:N" lon="15:35:E"/>
+<stn name="Poznan " lat="52:25:N" lon="16:55:E"/>
+<stn name="Prague " lat="40:55:N" lon="21:00:E"/>
+<stn name="Prevlaka peninsula" lat="42:24:N" lon="18:31:E"/>
+<stn name="Prussia " lat="53:00:N" lon="14:00:E"/>
+<stn name="Prussia " lat="53:00:N" lon="14:00:E"/>
+<stn name="Prussia " lat="53:00:N" lon="14:00:E"/>
+<stn name="Republique Francaise " lat="46:00:N" lon="2:00:E"/>
+<stn name="Reykjavik " lat="64:8:N" lon="21:56:W"/>
+<stn name="Rhodes " lat="36:10:N" lon="28:00:E"/>
+<stn name="Riga " lat="56:57:N" lon="24:06:E"/>
+<stn name="Rockall " lat="57:35:N" lon="13:48:W"/>
+<stn name="Rome " lat="41:54:N" lon="12:29:E"/>
+<stn name="Rossiya " lat="60:00:N" lon="100:00:E"/>
+<stn name="Rumelia " lat="42:00:N" lon="22:30:E"/>
+<stn name="Rumelia " lat="42:00:N" lon="22:30:E"/>
+<stn name="Rumelia " lat="42:00:N" lon="22:30:E"/>
+<stn name="Ruthenia " lat="48:22:N" lon="23:32:E"/>
+<stn name="Saar " lat="49:25:N" lon="7:00:E"/>
+<stn name="Saaremaa " lat="58:25:N" lon="22:30:E"/>
+<stn name="Saint Helier " lat="49:12:N" lon="2:07:W"/>
+<stn name="Saint Peter Port " lat="49:27:N" lon="2:32:W"/>
+<stn name="Saint Petersburg " lat="59:55:N" lon="30:15:E"/>
+<stn name="Sakartvelo " lat="42:00:N" lon="43:30:E"/>
+<stn name="Sakhalin Island " lat="51:00:N" lon="143:00:E"/>
+<stn name="Salzburg " lat="47:48:N" lon="13:02:E"/>
+<stn name="Samos " lat="37:48:N" lon="26:44:E"/>
+<stn name="San Marino " lat="43:56:N" lon="12:25:E"/>
+<stn name="Sandzak " lat="43:05:N" lon="19:45:E"/>
+<stn name="Santa Sede " lat="41:54:N" lon="12:27:E"/>
+<stn name="Sarajevo " lat="43:52:N" lon="18:25:E"/>
+<stn name="Sardinia " lat="40:00:N" lon="9:00:E"/>
+<stn name="Sark " lat="49:26:N" lon="2:21:W"/>
+<stn name="Saxony " lat="51:00:N" lon="13:00:E"/>
+<stn name="Schleswig-Holstein " lat="54:31:N" lon="9:33:E"/>
+<stn name="Schweiz " lat="47:00:N" lon="8:00:E"/>
+<stn name="Scotland " lat="57:00:N" lon="4:00:W"/>
+<stn name="Severnaya Zemlya " lat="79:30:N" lon="98:00:E"/>
+<stn name="Shetland Islands" lat="60:30:N" lon="1:30:W"/>
+<stn name="Shikotan " lat="43:47:N" lon="146:45:E"/>
+<stn name="Shqiperia " lat="41:00:N" lon="20:00:E"/>
+<stn name="Siberia " lat="60:00:N" lon="100:00:E"/>
+<stn name="Sicily " lat="37:30:N" lon="14:00:E"/>
+<stn name="Silesia " lat="51:00:N" lon="17:00:E"/>
+<stn name="Silesia " lat="51:00:N" lon="17:00:E"/>
+<stn name="Silesia " lat="51:00:N" lon="17:00:E"/>
+<stn name="Sjaelland " lat="55:30:N" lon="12:00:E"/>
+<stn name="Skopje " lat="41:59:N" lon="21:26:E"/>
+<stn name="Slavonia " lat="45:27:N" lon="18:00:E"/>
+<stn name="Slovenija " lat="46:00:N" lon="15:00:E"/>
+<stn name="Slovensko " lat="48:40:N" lon="19:30:E"/>
+<stn name="Smyrna " lat="38:25:N" lon="27:10:E"/>
+<stn name="Sofia " lat="42:41:N" lon="23:19:E"/>
+<stn name="South Ossetia " lat="42:20:N" lon="44:00:E"/>
+<stn name="South Tyrol " lat="46:30:N" lon="10:30:E"/>
+<stn name="Soviet Union " lat="" lon=""/>
+<stn name="Soviet Union " lat="" lon=""/>
+<stn name="Soviet Union " lat="" lon=""/>
+<stn name="Soviet Union " lat="" lon=""/>
+<stn name="Soviet Union " lat="" lon=""/>
+<stn name="Soviet Union " lat="" lon=""/>
+<stn name="Soviet Union " lat="" lon=""/>
+<stn name="Soviet Union " lat="" lon=""/>
+<stn name="Soviet Union " lat="" lon=""/>
+<stn name="Soviet Union " lat="" lon=""/>
+<stn name="Spanish North Africa " lat="35:15:N" lon="4:00:W"/>
+<stn name="Spitsbergen " lat="78:00:N" lon="20:00:E"/>
+<stn name="Srbija-Crna Gora " lat="44:00:N" lon="21:00:E"/>
+<stn name="Stockholm " lat="59:20:N" lon="18:03:E"/>
+<stn name="Stuttgart " lat="48:46:N" lon="9:11:E"/>
+<stn name="Suisse " lat="47:00:N" lon="8:00:E"/>
+<stn name="Suomi " lat="64:00:N" lon="26:00:E"/>
+<stn name="Surtsey " lat="63:17:N" lon="20:40:W"/>
+<stn name="Sverdlovsk " lat="56:50:N" lon="60:39:E"/>
+<stn name="Sverige " lat="62:00:N" lon="15:00:E"/>
+<stn name="Svizzera " lat="47:00:N" lon="8:00:E"/>
+<stn name="T'bilisi " lat="41:43:N" lon="44:49:E"/>
+<stn name="Tallinn " lat="59:25:N" lon="24:45:E"/>
+<stn name="Tannu-Tuva " lat="51:25:N" lon="94:45:E"/>
+<stn name="Taymyr Peninsula " lat="76:00:N" lon="104:00:E"/>
+<stn name="Thuringia " lat="51:00:N" lon="11:00:E"/>
+<stn name="Tirana " lat="41:20:N" lon="19:50:E"/>
+<stn name="Tirol " lat="47:00:N" lon="11:00:E"/>
+<stn name="Tirol " lat="47:00:N" lon="11:00:E"/>
+<stn name="Torshavn " lat="62:01:N" lon="6:46:W"/>
+<stn name="Transcarpathia " lat="48:22:N" lon="23:32:E"/>
+<stn name="Transylvania " lat="46:30:N" lon="24:00:E"/>
+<stn name="Turin " lat="45:04:N" lon="7:40:E"/>
+<stn name="Turkiye " lat="39:00:N" lon="35:00:E"/>
+<stn name="Tuscany " lat="43:25:N" lon="11:00:E"/>
+<stn name="Tyrol, South " lat="46:30:N" lon="10:30:E"/>
+<stn name="Ukrayina " lat="49:00:N" lon="32:00:E"/>
+<stn name="Ulster " lat="54:35:N" lon="7:00:W"/>
+<stn name="Ulster " lat="54:35:N" lon="7:00:W"/>
+<stn name="Union of Soviet Socialist Republics or USSR " lat="" lon=""/>
+<stn name="Union of Soviet Socialist Republics or USSR " lat="" lon=""/>
+<stn name="Union of Soviet Socialist Republics or USSR " lat="" lon=""/>
+<stn name="Union of Soviet Socialist Republics or USSR " lat="" lon=""/>
+<stn name="Union of Soviet Socialist Republics or USSR " lat="" lon=""/>
+<stn name="Union of Soviet Socialist Republics or USSR " lat="" lon=""/>
+<stn name="Union of Soviet Socialist Republics or USSR " lat="" lon=""/>
+<stn name="Union of Soviet Socialist Republics or USSR " lat="" lon=""/>
+<stn name="Union of Soviet Socialist Republics or USSR " lat="" lon=""/>
+<stn name="Union of Soviet Socialist Republics or USSR " lat="" lon=""/>
+<stn name="Ural Mountains" lat="60:00:N" lon="60:00:E"/>
+<stn name="Ussuri River" lat="48:28:N" lon="135:02:E"/>
+<stn name="Vaduz " lat="47:09:N" lon="9:31:E"/>
+<stn name="Valletta " lat="35:54:N" lon="14:31:E"/>
+<stn name="Vatican City " lat="41:54:N" lon="12:27:E"/>
+<stn name="Velez de la Gomera, Penon de " lat="35:11:N" lon="4:18:W"/>
+<stn name="Vienna " lat="48:12:N" lon="16:22:E"/>
+<stn name="Vilnius " lat="54:41:N" lon="25:19:E"/>
+<stn name="Vladivostok " lat="43:10:N" lon="131:56:E"/>
+<stn name="Vojvodina " lat="45:35:N" lon="20:00:E"/>
+<stn name="Vrangelya, Ostrov " lat="71:14:N" lon="179:36:W"/>
+<stn name="Walachia " lat="44:45:N" lon="26:05:E"/>
+<stn name="Wales " lat="52:30:N" lon="3:30:W"/>
+<stn name="Warsaw " lat="52:15:N" lon="21:00:E"/>
+<stn name="West Frisian Islands" lat="53:26:N" lon="5:30:E"/>
+<stn name="West Germany " lat="53:22:N" lon="5:20:E"/>
+<stn name="West Siberian Plain" lat="60:00:N" lon="75:00:E"/>
+<stn name="Wrangel Island " lat="71:14:N" lon="179:36:W"/>
+<stn name="Yekaterinburg " lat="56:50:N" lon="60:39:E"/>
+<stn name="Yerevan " lat="40:11:N" lon="44:30:E"/>
+<stn name="Yugoslavia" lat="43:00:N" lon="21:00:E"/>
+<stn name="Yugoslavia, Kingdom of" lat="43:00:N" lon="19:00:E"/>
+<stn name="Yugoslavia, Kingdom of" lat="43:00:N" lon="19:00:E"/>
+<stn name="Yugoslavia, Kingdom of" lat="43:00:N" lon="19:00:E"/>
+<stn name="Yugoslavia, Kingdom of" lat="43:00:N" lon="19:00:E"/>
+<stn name="Yugoslavia, Kingdom of" lat="43:00:N" lon="19:00:E"/>
+<stn name="Yugoslavia, Socialist Federal Republic" lat="43:00:N" lon="19:00:E"/>
+<stn name="Yugoslavia, Socialist Federal Republic" lat="43:00:N" lon="19:00:E"/>
+<stn name="Yugoslavia, Socialist Federal Republic" lat="43:00:N" lon="19:00:E"/>
+<stn name="Yugoslavia, Socialist Federal Republic" lat="43:00:N" lon="19:00:E"/>
+<stn name="Yugoslavia, Socialist Federal Republic" lat="43:00:N" lon="19:00:E"/>
+<stn name="Zagreb " lat="45:48:N" lon="15:58:E"/>
+<stn name="Zurich " lat="47:23:N" lon="8:32:E"/>
+</stationtable>

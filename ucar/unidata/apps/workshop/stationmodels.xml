@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object class="java.util.ArrayList">
+    <method name="add">
+        <object class="ucar.unidata.ui.symbol.StationModel">
+            <property name="Name">
+                <string><![CDATA[Point]]></string>
+            </property>
+            <property name="List">
+                <object class="java.util.ArrayList">
+                    <method name="add">
+                        <object class="ucar.unidata.ui.symbol.ShapeSymbol">
+                            <property name="Shape">
+                                <string><![CDATA[PLUS]]></string>
+                            </property>
+                            <property name="ShapeType">
+                                <string><![CDATA[line]]></string>
+                            </property>
+                            <property name="ParamIds">
+                                <array class="string" length="0"/>
+                            </property>
+                            <property name="ParamDescs">
+                                <array class="string" length="0"/>
+                            </property>
+                            <property name="Foreground">
+                                <object class="java.awt.Color">
+                                    <constructor>
+                                        <int>255</int>
+                                        <int>0</int>
+                                        <int>255</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="Id">
+                                <string><![CDATA[ID-1121117242421-0]]></string>
+                            </property>
+                            <property name="Filled">
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="BeingCreated">
+                                <boolean>false</boolean>
+                            </property>
+                            <field name="bounds">
+                                <object class="java.awt.Rectangle">
+                                    <constructor>
+                                        <int>-10</int>
+                                        <int>-10</int>
+                                        <int>20</int>
+                                        <int>20</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                            <field name="underline">
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url">
+                                <null/>
+                            </field>
+                            <field name="baseline">
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                        </object>
+                    </method>
+                </object>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.ui.symbol.StationModel">
+            <property name="Name">
+                <string><![CDATA[Earthquake]]></string>
+            </property>
+            <property name="List">
+                <object class="java.util.ArrayList">
+                    <method name="add">
+                        <object class="ucar.unidata.ui.symbol.ShapeSymbol">
+                            <property name="Shape">
+                                <string><![CDATA[FILLED_SPHERE]]></string>
+                            </property>
+                            <property name="ShapeType">
+                                <string><![CDATA[line]]></string>
+                            </property>
+                            <property name="ColorTable">
+                                <object class="ucar.unidata.util.ColorTable">
+                                    <property name="Name">
+                                        <string><![CDATA[Inverse Gray shade]]></string>
+                                    </property>
+                                    <property name="Id">
+                                        <string><![CDATA[INVERSE GRAY SHADE]]></string>
+                                    </property>
+                                    <property name="Table">
+                                        <array class="[F" length="3">
+                                            <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAP4AAAD+AAAA/fv8AP339/z98/P4/e/v9P3r6/D95
++fs/ePj6P3f3+T929vg/dfX3P3T09j9z8/U/cvL0P3Hx8z9w8PI/b+/xP27u8D9t7e8/bOzuP2vr
+7T9q6uw/aenrP2jo6j9n5+k/ZuboP2Xl5z9k5OY/Y+PlP2Li5D9h4eM/YODiP1/f4T9e3uA/Xd3f
+P1zc3j9b290/WtrcP1nZ2z9Y2No/V9fZP1bW2D9V1dc/VNTWP1PT1T9S0tQ/UdHTP1DQ0j9Pz9E/
+Ts7QP03Nzz9MzM4/S8vNP0rKzD9Jycs/SMjKP0fHyT9Gxsg/RcXHP0TExj9Dw8U/QsLEP0HBwz9A
+wMI/P7/APz6+vz89vb4/PLy9Pzu7vD86urs/Obm6Pzi4uT83t7g/Nra3PzW1tj80tLU/M7O0PzKy
+sz8xsbI/MLCxPy+vsD8urq8/La2uPyysrT8rq6w/KqqrPympqj8oqKk/J6eoPyampz8lpaY/JKSl
+PyOjpD8ioqM/IaGiPyCgoT8fn6A/Hp6fPx2dnj8cnJ0/G5ucPxqamz8ZmZo/GJiZPxeXmD8Wlpc/
+FZWWPxSUlT8Tk5Q/EpKTPxGRkj8QkJE/D4+QPw6Ojz8NjY4/DIyNPwuLjD8Kios/CYmKPwiIiT8H
+h4g/BoaHPwWFhj8EhIU/A4OEPwKCgz8BgYI/AICBPv7/AD78/P4++vr8Pvj4+j729vg+9PT2PvLy
+9D7w8PI+7u7wPuzs7j7q6uw+6OjqPubm6D7k5OY+4uLkPuDg4j7e3uA+3NzePtra3D7Y2No+1tbY
+PtTU1j7S0tQ+0NDSPs7O0D7MzM4+ysrMPsjIyj7Gxsg+xMTGPsLCxD7AwMI+vr6/Pry8vT66urs+
+uLi5Pra2tz60tLU+srKzPrCwsT6urq8+rKytPqqqqz6oqKk+pqanPqSkpT6ioqM+oKChPp6enz6c
+nJ0+mpqbPpiYmT6Wlpc+lJSVPpKSkz6QkJE+jo6PPoyMjT6Kios+iIiJPoaGhz6EhIU+goKDPoCA
+gT58/P4+ePj6PnT09j5w8PI+bOzuPmjo6j5k5OY+YODiPlzc3j5Y2No+VNTWPlDQ0j5MzM4+SMjK
+PkTExj5AwMI+PLy9Pji4uT40tLU+MLCxPiysrT4oqKk+JKSlPiCgoT4cnJ0+GJiZPhSUlT4QkJE+
+DIyNPgiIiT4EhIU+AICBPfj4+j3w8PI96OjqPeDg4j3Y2No90NDSPcjIyj3AwMI9uLi5PbCwsT2o
+qKk9oKChPZiYmT2QkJE9iIiJPYCAgT1w8PI9YODiPVDQ0j1AwMI9MLCxPSCgoT0QkJE9AICBPODg
+4jzAwMI8oKChPICAgTxAwMI8AICBO4CAgQ==</parray>
+                                            <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAP4AAAD+AAAA/fv8AP339/z98/P4/e/v9P3r6/D95
++fs/ePj6P3f3+T929vg/dfX3P3T09j9z8/U/cvL0P3Hx8z9w8PI/b+/xP27u8D9t7e8/bOzuP2vr
+7T9q6uw/aenrP2jo6j9n5+k/ZuboP2Xl5z9k5OY/Y+PlP2Li5D9h4eM/YODiP1/f4T9e3uA/Xd3f
+P1zc3j9b290/WtrcP1nZ2z9Y2No/V9fZP1bW2D9V1dc/VNTWP1PT1T9S0tQ/UdHTP1DQ0j9Pz9E/
+Ts7QP03Nzz9MzM4/S8vNP0rKzD9Jycs/SMjKP0fHyT9Gxsg/RcXHP0TExj9Dw8U/QsLEP0HBwz9A
+wMI/P7/APz6+vz89vb4/PLy9Pzu7vD86urs/Obm6Pzi4uT83t7g/Nra3PzW1tj80tLU/M7O0PzKy
+sz8xsbI/MLCxPy+vsD8urq8/La2uPyysrT8rq6w/KqqrPympqj8oqKk/J6eoPyampz8lpaY/JKSl
+PyOjpD8ioqM/IaGiPyCgoT8fn6A/Hp6fPx2dnj8cnJ0/G5ucPxqamz8ZmZo/GJiZPxeXmD8Wlpc/
+FZWWPxSUlT8Tk5Q/EpKTPxGRkj8QkJE/D4+QPw6Ojz8NjY4/DIyNPwuLjD8Kios/CYmKPwiIiT8H
+h4g/BoaHPwWFhj8EhIU/A4OEPwKCgz8BgYI/AICBPv7/AD78/P4++vr8Pvj4+j729vg+9PT2PvLy
+9D7w8PI+7u7wPuzs7j7q6uw+6OjqPubm6D7k5OY+4uLkPuDg4j7e3uA+3NzePtra3D7Y2No+1tbY
+PtTU1j7S0tQ+0NDSPs7O0D7MzM4+ysrMPsjIyj7Gxsg+xMTGPsLCxD7AwMI+vr6/Pry8vT66urs+
+uLi5Pra2tz60tLU+srKzPrCwsT6urq8+rKytPqqqqz6oqKk+pqanPqSkpT6ioqM+oKChPp6enz6c
+nJ0+mpqbPpiYmT6Wlpc+lJSVPpKSkz6QkJE+jo6PPoyMjT6Kios+iIiJPoaGhz6EhIU+goKDPoCA
+gT58/P4+ePj6PnT09j5w8PI+bOzuPmjo6j5k5OY+YODiPlzc3j5Y2No+VNTWPlDQ0j5MzM4+SMjK
+PkTExj5AwMI+PLy9Pji4uT40tLU+MLCxPiysrT4oqKk+JKSlPiCgoT4cnJ0+GJiZPhSUlT4QkJE+
+DIyNPgiIiT4EhIU+AICBPfj4+j3w8PI96OjqPeDg4j3Y2No90NDSPcjIyj3AwMI9uLi5PbCwsT2o
+qKk9oKChPZiYmT2QkJE9iIiJPYCAgT1w8PI9YODiPVDQ0j1AwMI9MLCxPSCgoT0QkJE9AICBPODg
+4jzAwMI8oKChPICAgTxAwMI8AICBO4CAgQ==</parray>
+                                            <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAP4AAAD+AAAA/fv8AP339/z98/P4/e/v9P3r6/D95
++fs/ePj6P3f3+T929vg/dfX3P3T09j9z8/U/cvL0P3Hx8z9w8PI/b+/xP27u8D9t7e8/bOzuP2vr
+7T9q6uw/aenrP2jo6j9n5+k/ZuboP2Xl5z9k5OY/Y+PlP2Li5D9h4eM/YODiP1/f4T9e3uA/Xd3f
+P1zc3j9b290/WtrcP1nZ2z9Y2No/V9fZP1bW2D9V1dc/VNTWP1PT1T9S0tQ/UdHTP1DQ0j9Pz9E/
+Ts7QP03Nzz9MzM4/S8vNP0rKzD9Jycs/SMjKP0fHyT9Gxsg/RcXHP0TExj9Dw8U/QsLEP0HBwz9A
+wMI/P7/APz6+vz89vb4/PLy9Pzu7vD86urs/Obm6Pzi4uT83t7g/Nra3PzW1tj80tLU/M7O0PzKy
+sz8xsbI/MLCxPy+vsD8urq8/La2uPyysrT8rq6w/KqqrPympqj8oqKk/J6eoPyampz8lpaY/JKSl
+PyOjpD8ioqM/IaGiPyCgoT8fn6A/Hp6fPx2dnj8cnJ0/G5ucPxqamz8ZmZo/GJiZPxeXmD8Wlpc/
+FZWWPxSUlT8Tk5Q/EpKTPxGRkj8QkJE/D4+QPw6Ojz8NjY4/DIyNPwuLjD8Kios/CYmKPwiIiT8H
+h4g/BoaHPwWFhj8EhIU/A4OEPwKCgz8BgYI/AICBPv7/AD78/P4++vr8Pvj4+j729vg+9PT2PvLy
+9D7w8PI+7u7wPuzs7j7q6uw+6OjqPubm6D7k5OY+4uLkPuDg4j7e3uA+3NzePtra3D7Y2No+1tbY
+PtTU1j7S0tQ+0NDSPs7O0D7MzM4+ysrMPsjIyj7Gxsg+xMTGPsLCxD7AwMI+vr6/Pry8vT66urs+
+uLi5Pra2tz60tLU+srKzPrCwsT6urq8+rKytPqqqqz6oqKk+pqanPqSkpT6ioqM+oKChPp6enz6c
+nJ0+mpqbPpiYmT6Wlpc+lJSVPpKSkz6QkJE+jo6PPoyMjT6Kios+iIiJPoaGhz6EhIU+goKDPoCA
+gT58/P4+ePj6PnT09j5w8PI+bOzuPmjo6j5k5OY+YODiPlzc3j5Y2No+VNTWPlDQ0j5MzM4+SMjK
+PkTExj5AwMI+PLy9Pji4uT40tLU+MLCxPiysrT4oqKk+JKSlPiCgoT4cnJ0+GJiZPhSUlT4QkJE+
+DIyNPgiIiT4EhIU+AICBPfj4+j3w8PI96OjqPeDg4j3Y2No90NDSPcjIyj3AwMI9uLi5PbCwsT2o
+qKk9oKChPZiYmT2QkJE9iIiJPYCAgT1w8PI9YODiPVDQ0j1AwMI9MLCxPSCgoT0QkJE9AICBPODg
+4jzAwMI8oKChPICAgTxAwMI8AICBO4CAgQ==</parray>
+                                        </array>
+                                    </property>
+                                </object>
+                            </property>
+                            <property name="ParamIds">
+                                <array class="string" length="0"/>
+                            </property>
+                            <property name="ParamDescs">
+                                <array class="string" length="0"/>
+                            </property>
+                            <property name="ColorTableParam">
+                                <string><![CDATA[alt]]></string>
+                            </property>
+                            <property name="ColorTableRange">
+                                <object class="ucar.unidata.util.Range">
+                                    <property name="Min">
+                                        <double>-99000.0</double>
+                                    </property>
+                                    <property name="Max">
+                                        <double>0.0</double>
+                                    </property>
+                                </object>
+                            </property>
+                            <property name="ScaleRange">
+                                <object class="ucar.unidata.util.Range">
+                                    <property name="Min">
+                                        <double>0.5</double>
+                                    </property>
+                                    <property name="Max">
+                                        <double>1.5</double>
+                                    </property>
+                                </object>
+                            </property>
+                            <property name="ScaleDataRange">
+                                <object class="ucar.unidata.util.Range">
+                                    <property name="Min">
+                                        <double>4.0</double>
+                                    </property>
+                                    <property name="Max">
+                                        <double>8.2</double>
+                                    </property>
+                                </object>
+                            </property>
+                            <property name="ScaleParam">
+                                <string><![CDATA[var]]></string>
+                            </property>
+                            <property name="Foreground">
+                                <object class="java.awt.Color" id="id14">
+                                    <constructor>
+                                        <int>255</int>
+                                        <int>0</int>
+                                        <int>255</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="Id">
+                                <string><![CDATA[ID-1121117847916-0]]></string>
+                            </property>
+                            <property name="Filled">
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="BeingCreated">
+                                <boolean>false</boolean>
+                            </property>
+                            <field name="bounds">
+                                <object class="java.awt.Rectangle">
+                                    <constructor>
+                                        <int>-9</int>
+                                        <int>-10</int>
+                                        <int>19</int>
+                                        <int>19</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                            <field name="underline">
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url">
+                                <null/>
+                            </field>
+                            <field name="baseline">
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                        </object>
+                    </method>
+                </object>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.ui.symbol.StationModel">
+            <property name="Name">
+                <string><![CDATA[Airplane]]></string>
+            </property>
+            <property name="List">
+                <object class="java.util.ArrayList">
+                    <method name="add">
+                        <object class="ucar.unidata.ui.symbol.ShapeSymbol">
+                            <property name="Shape">
+                                <string><![CDATA[AIRPLANE]]></string>
+                            </property>
+                            <property name="ShapeType">
+                                <string><![CDATA[line]]></string>
+                            </property>
+                            <property name="Scale">
+                                <double>1.5</double>
+                            </property>
+                            <property name="ParamIds">
+                                <array class="string" length="0"/>
+                            </property>
+                            <property name="ParamDescs">
+                                <array class="string" length="0"/>
+                            </property>
+                            <property name="RotateParam">
+                                <string><![CDATA[Direction]]></string>
+                            </property>
+                            <property name="Foreground">
+                                <object idref="id14"/>
+                            </property>
+                            <property name="Id">
+                                <string><![CDATA[ID-1121117847916-1]]></string>
+                            </property>
+                            <property name="Filled">
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="BeingCreated">
+                                <boolean>false</boolean>
+                            </property>
+                            <field name="bounds">
+                                <object class="java.awt.Rectangle">
+                                    <constructor>
+                                        <int>-10</int>
+                                        <int>-10</int>
+                                        <int>20</int>
+                                        <int>20</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                            <field name="underline">
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url">
+                                <null/>
+                            </field>
+                            <field name="baseline">
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                        </object>
+                    </method>
+                </object>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.ui.symbol.StationModel">
+            <property name="Name">
+                <string><![CDATA[TrackDewpoint]]></string>
+            </property>
+            <property name="List">
+                <object class="java.util.ArrayList">
+                    <method name="add">
+                        <object class="ucar.unidata.ui.symbol.ValueSymbol">
+                            <property name="DoubleValue">
+                                <double>123.0</double>
+                            </property>
+                            <property name="Value">
+                                <string><![CDATA[123]]></string>
+                            </property>
+                            <property name="ParamIds">
+                                <array class="string" length="1">
+                                    <string><![CDATA[DPT]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs">
+                                <array class="string" length="1">
+                                    <string><![CDATA[Parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="Foreground">
+                                <object class="java.awt.Color">
+                                    <constructor>
+                                        <int>255</int>
+                                        <int>0</int>
+                                        <int>255</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="Id">
+                                <string><![CDATA[ID-1121786069416-0]]></string>
+                            </property>
+                            <property name="Filled">
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Stretchy">
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="BeingCreated">
+                                <boolean>false</boolean>
+                            </property>
+                            <field name="bounds">
+                                <object class="java.awt.Rectangle">
+                                    <constructor>
+                                        <int>-12</int>
+                                        <int>-8</int>
+                                        <int>24</int>
+                                        <int>15</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                            <field name="underline">
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url">
+                                <null/>
+                            </field>
+                            <field name="baseline">
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                        </object>
+                    </method>
+                </object>
+            </property>
+        </object>
+    </method>
+</object>

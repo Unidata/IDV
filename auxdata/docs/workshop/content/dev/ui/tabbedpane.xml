@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<tabbedpane>
+  <label
+     fontsize="36"
+     text="Tab 1 contents"
+     title="Tab 1"/>
+  <label
+     fontsize="36"
+     text="Tab 2 contents"
+     title="Tab 2"/>
+  <label
+     fontsize="36"
+     text="Tab 3 contents"
+     title="Tab 3"/>
+</tabbedpane>

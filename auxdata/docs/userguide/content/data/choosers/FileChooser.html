@@ -1,0 +1,40 @@
+<html><head>
+  <title>Choose Data on Disk</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+<body>
+
+
+The  [ug::chooser Files] chooser allows you to select data from  your file system.
+
+[ht::cimg images/FileChooser.gif {File Chooser}]
+
+To select files:
+<ol>
+<li> Navigate to the directory that contains  the files you are interested in.
+The  [ug::menu {Look In}] menu allows you to select directories or you can
+double-click on directory names.  You can use the
+[ug::menu {Directory History}] widget <img src="images/HistoryList16.gif"> to 
+navigate to frequently used directories.  This list contains the 
+last 15 directories that data was loaded from.  
+
+<li> Select a file or files. Multiple files can be selected using 
+Control-Click or Shift-Click.
+
+<li> Optionally, specify the type of  data the file contains.
+Normally the IDV figures out what kind of data is in a file by
+the filename itself. You can override this 
+using the [ug::menu {Data Source Type}] menu.
+
+<li> The [ug::button Update] button causes a rescan of the current directory. 
+Use this to update the file chooser if the files have changed.
+
+<li> When done, load the selected file  with the [ug::button Add Source] button.
+
+<li> The data file selected appears in the 
+<a href="../FieldSelector.html">Field Selector</a>  window. 
+
+</ol>
+</body>
+</html>

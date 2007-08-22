@@ -1,0 +1,62 @@
+<html><head> 
+  <title>IDV Scripting</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+[source  isl/isl.tcl]
+
+
+The IDV can be scripted to create and manipulate images and movies.
+The scripting is accomplished using Jython or through an XML file: 
+<i>IDV Scripting Language</i> (ISL). The ISL file can be opened from a running
+IDV or one can be passed to the IDV as a command line argument:
+<pre>
+runIDV capture.isl
+</pre>
+
+A Jython script can be invoked as a command line argument:
+<pre>
+runIDV -isefile capture.py
+</pre>
+
+You can also run the IDV in interactive mode  using an ISL script to
+set up the state of the IDV (e.g., loading data, displays, etc.)
+with the <i>-islinteractive</i>  argument:
+<pre>
+runIDV capture.isl -islinteractive
+</pre>
+
+
+The  the IDV can  run in &quot;offscreen&quot; mode (see <a
+href="/BasicTags.html#isl">more</a>) with an ISL or with Jython.  The
+user interface won't be shown. However, the IDV still needs to be run
+with an active window system (e.g., X, MS Windows) for it to run.  If
+running under a Linux/Unix machine and you don't have an X server
+running you need to run the IDV under the X virtual frame buffer:
+<i>xvfb</i>.
+
+<p>
+
+The usual mode of use of the ISL is to load in an <a
+href="../Bundles.html">IDV bundle</a> which defines the data and
+displays that you want captured. In Jython, this is a call to the
+<i>loadBundle()</i> method.  As  a convenience, when you go to save a
+bundle (e.g., using  the [ug::mmenu File {Save As}] menu), you can
+specify a <i>.isl</i> file suffix. When you do this the IDV will write
+out both the bundle file and an example ISL file.  It will first
+prompt you for some basic ISL information: [ht::cimg images/SaveAs.jpg {Save As ISL Dialog}]
+
+You can, for example, include the text of the bundle file directly
+within the ISL file (so you only have one file to deal with). You can
+also specify how many iterations of the loop to do and whether  to
+create an image and/or a movie.  When using Jython, you would simply
+use the feature of the Jython language to accomplish list.
+
+<p>
+In the rest of this section we will cover:
+
+
+
+</body>

@@ -1,0 +1,96 @@
+<title>Editing Parameter Display Defaults</title>
+
+[ht::desc In this section we will cover how to define new default display      information for your data.]
+
+<div class="overview">
+In the previous section we covered how to create new color tables. We saw that
+for a [ht::param temperature] field there were certain default values for the
+color table and range that is used. In this section we will discuss how to
+change
+this default behavior using the [ht::dialog Parameter Defaults Editor].
+</div>
+
+<ol class="step">
+  
+  <li>If you haven't done so already load in some example data and create a
+      display of [ht::param temperature].</li>
+  
+  <ul class="substep">
+    
+    <li>[ht::loadBasicGrid]</li>
+    
+    <li>[ht::createBasicDisplay -display {Color-Shaded Plan View}]</li>
+    
+    <li>Note that the color table used is the [ht::ct Temperature] color table
+        and that the range is -90 to 45.</li>
+  </ul>
+  
+
+  <li>Open up the [ht::dialog Parameter Defaults Editor]  by selecting the
+      [ht::menu Tools {Parameter Defaults Editor}] menu item.</li>
+  
+  <li>There should be two tabs shown: [ht::command User Defaults]
+      and [ht::command System Defaults]. The first tab shows the
+      user editable parameter defaults. The second  tab shows the system
+      defaults.</li>
+  
+  <li>Click on the [ht::command System Defaults] tab.</li>
+  
+  <li>The first column shows the parameter name pattern that is used to match
+      the
+      parameter.
+      [ht::popup Patterns.html "More about patterns."]</li>
+  
+  <li>Change the default color table and range for [ht::param temperature]
+      parameters.
+      
+  <ul class="substep">
+    
+    <li>Scroll down to the row that holds the [ht::param temp] parameter.</li>
+    
+    <li>Right click on this row and select
+        [ht::menu {Copy Row to Users   Defaults}].
+        
+    <li>You should now see the [ht::param temp] row in the
+        [ht::command   User Defaults] tab and Parameter Defaults dialog shown.
+
+    <li>Change the default color  table by selecting the
+        [ht::menu {Color Tables}   Workshop Comfort] menu item.
+        
+    <li>Change the range to  -45 and 45.
+        
+    <li>Save your changes by clicking the [ht::button OK] button.</li>
+  </ul>
+  
+  <li>Test out this change.</li>
+  
+  <ul class="substep">
+    
+    <li>Remove your displays by selecting the
+        [ht::menu Edit {Remove All Displays}]
+        menu item.</li>
+        
+    <li>[ht::createBasicDisplay -display {Color-Shaded Plan View}]</li>
+    
+    <li>You should see the new [ht::ct Comfort] color table and range being
+        used.</li>
+  </ul>
+  
+
+  <li> What about setting defaults for new parameters?
+
+  <ul>
+     <li> Create a Color-Filled Contour Plan View using the 
+[ht::param relative humidity at fixed height above ground].
+     <li> Bring up the Contour Properties Editor for the display and change the interval to 10  press [ht::button OK].
+     <li> Change the range to be 0-100     
+     <li> Change the Color Table to the [ht::menu Basic {Relative himidity}]
+     <li> From the display's  [ht::menu File] menu choose [ht::menu File Save {Save as Parameter Defaults}]
+     <li> The Parameter Defaults dialog is shown. Press [ht::button OK].
+     <li> Remove displays and recreate the above display. All should be better now.
+  </ul>
+
+</ol>
+
+
+

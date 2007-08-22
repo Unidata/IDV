@@ -1,0 +1,181 @@
+<html><head>
+  <title> Layout Model Editor</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+The Layout Model Editor composes the layout and style used to plot
+data on a map from observations at
+discrete points (e.g., weather observations). 
+
+<p>
+
+The Layout Model Editor is used to edit existing models or to create
+new models.  The Editor is opened  with the 
+[ug::menu Tools {Layout Model Editor}] menu.
+
+[ht::cimg images/StationModelEditor.gif {Layout Model Editor}]
+
+
+To see any model, use the [ug::menu {Layout Models}] menu. 
+The models that the user has edited or created
+will have "(local)" after the name.
+
+<p>
+
+The display shows a horizontal line and a vertical line through the
+observation location. These axis lines give a reference point.
+A station model consists of a set of shapes which 
+are added  by clicking on an item in the left
+column  and then clicking where you want to place it (relative to the
+observation center point or location point). It will appear with a
+surrounding outline box and 8 control points you can drag to resize
+the item. When a shape is created its property dialog is shown (described below).
+
+<p>
+
+Shapes can be moved by dragging with the mouse.
+Click on any item with the right mouse button to see a pop-up menu of 
+choices to control its appearance. You can delete an item, set its
+color, or change font sizes, view its properties, etc.
+
+<p>
+
+
+Each item has a single red "Alignment point" that is used for to locate
+the actual displays with respect to the center point of the observation.
+So, for example, say you want a text label (whose actual width in the
+main display depends on the data it is showing) to be aligned so that
+its upper right corner is at the latitude of the observation and a little right.
+You would set the shape's alignment point to be &quot;NW&quot;
+and then position the shape so that the Y of the alignment point  is
+on the X-axis and the X of the point is a bit right of center.
+
+<p>
+The [ug::menu Center] menu in the popup-menu allows you to center the alignment
+point vertically and horizontally.
+
+<p>
+
+You can also align a collection of shapes.
+First select the shapes (shift-click).
+Then select one of the six alignment icons under the top menu bar; the left most
+icon means align all the selected items under a horizontal line.
+
+<p>
+
+
+
+
+
+To save a station model  you have composed, use the
+[ug::menu File {Save}] or [ug::menu File {Save As...}] 
+menu items.  When you save a station model any point data displays
+that are using it will be updated. To remove a model, use the 
+[ug::menu File Remove]
+menu item. You cannot remove a model supplied with the IDV, but you can
+remove local models.
+
+<p>
+
+
+You use the [ug::menu Properties] choice in the pop-up menu
+to show the properties dialog window for that shape. The properties
+dialog is made up of a number of tabs. 
+
+<p>
+Note: The [ug::button Apply] and [ug::button OK] buttons applies the properties
+to the shape in the editor. The [ug::button OK] and [ug::button Cancel] buttons
+closes this dialog. The [ug::button Save] button does and apply and also saves
+the station model as a whole (just like doing [ug::menu File Save]). 
+When the station model is saved then any displays that are using it are updated.
+The [ug::button Save] button allows you to see what your changes to the properties
+will look  like in the main display.
+
+
+<ul>
+<li> Display:
+[ht::cimg images/StationModelPropertiesDisplay.gif {Properties Dialog - Display}]
+
+This tab allows you to  assign which observation variable is associated with that item.
+Numerical values should appear in a "Value" item, text in a "Text"
+item, etc. You can also set units and the display format.
+<p>
+
+Parameter identifiers within a station model can hold embedded Jython code.
+This allows you to do operations on the values and provide more extensive formatting.
+Any parameter that begins with &quot;=&quot; is treated as a Jython
+expression. For example, you can enter:<pre>
+=T-TD
+</pre>
+to calculate the dewpoint depression.
+You can format the text that is shown. For example you can enter:
+<pre>
+='TD:'+str(T-TD)
+</pre>
+This will result in the calculation of T-TD, a conversion  of that result to
+a string which is then concatenated to the string 'TD:'.
+If you want to format the result of the numeric calculation using the format
+specifier from the properties dialog simply enter:
+<pre>
+='TD:'+format(T-TD)
+</pre>
+
+
+<p>&nbsp;
+
+<li> Color By:
+[ht::cimg images/StationModelPropertiesColorBy.gif {Properties Dialog - Color By}]
+This tab allows you to specify a parameter that is used to color the shape.
+You can specify a data range (and a corresponding unit for the data range, e.g.,
+celsius). This data range is used as the end point ranges for the specified
+color table. 
+<p>
+For example, in the above image the Temperature parameter has been specified
+with data range -90-45 celsius.
+For each display the IDV will find the Temperature value (e.g., 15 celsius), convert it,
+if necessary to the specified unit, find its where is lays within the range and use
+the corresponding color from the color table.
+
+<p>&nbsp;
+
+<li> Color From:
+[ht::cimg images/StationModelPropertiesColorFrom.gif {Properties Dialog - Color From}]
+This allows you to specify parameter, a set of (regular expression) patterns and a corresponding color.
+If the text value of the parameter matches one of the patterns then the given color is used
+to color the shape. For example, if your point data had a &quot;fruit&quot; field in it 
+(e.g., fruit=banana, apple, tangerine) you could define different colors for different
+values of fruit.
+<p>
+To get more lines press the [ug::button Apply] button.
+
+
+
+
+<p>&nbsp;
+<li> Scale Size By:
+[ht::cimg images/StationModelPropertiesScaleBy.gif {Properties Dialog - Scale Size By}]
+This allows you to specify a parameter to scale the shape by. It works similarly to the
+Color By facility described above. You specify a parameter, a data range (with a unit if desired),
+and a scale factor range. For each point display the IDV will find the value of the parameter,
+determine where that value lies within the data range and find the corresponding
+scaling from the scale factor range.
+
+
+<p>&nbsp;
+
+<li> Rotate By:
+[ht::cimg images/StationModelPropertiesRotateBy.gif {Properties Dialog - Rotate By}]
+This works like the scale and color by facilities. Specify a parameter, data range and
+rotation range. Note, the rotation is about the Z axis in X/Y/Z space. It is not
+a rotation in Lat/Lon space.
+
+
+</ul>
+
+
+
+</body>
+
+

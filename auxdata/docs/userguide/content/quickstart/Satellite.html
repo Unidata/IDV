@@ -1,0 +1,90 @@
+<html><head>
+  <title>An Animation Loop of Satellite Imagery</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+
+This section describes how to make plots from satellite imagery:
+[ht::cimg  images/SatelliteImage.gif]
+
+
+The set of steps include:
+<%childlist%>
+
+
+ 
+<subhead id="chooser" intoc="false">Choosing Satellite Imagery from a Remote Server</subhead>
+
+
+In the Dashboard window select the <a href="../data/choosers/index.html">Data Chooser</a> tab.
+From here select the Images tab to view the <a href="../data/choosers/ImageChooser.html">Image Chooser</a>:
+
+[ht::cimg ../data/choosers/images/ImageChooser.gif]
+
+
+<ol>
+
+[ug::step "Choose an ADDE [ug::menu Server] and a [ug::menu Dataset] to use:" ../data/choosers/images/ImageStep1.gif {The IDV comes pre-configured with a list of ADDE servers and data sets or you can enter
+your own. See  <a href="DataSources.html">Available data</a> for a description
+of these pre-defined data sets.}]
+
+[ug::step "Press [ug::button Connect] to query the server for available image types:" ../data/choosers/images/ImageStep2.gif]
+
+[ug::step "Select the [ug::menu {Image Data Type}] to use:" ../data/choosers/images/ImageStep3.gif {e.g., &quot;GOES East 0.65 um Visible&quot;}]
+
+[ug::step {Either, choose a relative set of times steps (e.g., Last 5 times):} ../data/choosers/images/ImageStep4.gif]
+
+[ug::step {Or, choose a set of absolute times (e.g., 12Z, 1Z):} ../data/choosers/images/ImageStep5.gif {
+When choosing 
+absolute times for the first time the IDV needs to query the ADDE server 
+for the times. This may take some time.  To select more than one time 
+use Control-Click or Shift-Click. 
+}]
+
+
+[ug::step {Optionally override the image selection properties
+(e.g., image size, location, etc.) See <a href="../data/choosers/ImageChooser.html">here</a> for more details.}]
+
+
+
+
+[ug::step {Either, choose a relative set of times steps (e.g., Last 5 times):} ]
+
+
+[ug::step "When done, load the selected image data with the [ug::button Add Source] button." ../data/choosers/images/ImageStep6.gif \
+"If the [ug::button Create display] button is selected then an image display will automatically be created"]
+
+
+</ol>
+
+
+<subhead id="id" intoc="false">Creating the Display</subhead>
+
+The image data source that you selected will be shown in the
+<a href="../data/FieldSelector.html">Field Selector window</a>.
+
+[ht::cimg images/ImageSelector.gif]
+
+If you checked off the [ug::button Create display] button or if you want to create another satellite display
+click &quot;Image Sequence&quot; in the <b>Fields</b> panel
+and click on &quot;Image Display&quot; in the <b>Displays panel</b>.  
+Image display is the display type used for satellite 
+and Level III radar images in almost all cases.
+Click on <b>Create Display</b> to create the display.
+
+<p>
+
+The IDV reads the image data and makes the display.  An image
+control box appears, which shows how many images are loading.
+To control time animation use the 
+<a href="../ui/Animation.html#animation">Time Animation Widget</a>.
+
+
+<div class="pagesubtitle">Example</div>
+[ug::jnlp satellite.jnlp]
+
+
+</body>
+</html>

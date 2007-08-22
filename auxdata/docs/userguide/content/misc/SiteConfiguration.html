@@ -1,0 +1,188 @@
+[ug::head {Site Configuration}]
+
+
+<%nochildlist%>
+
+You can customize the IDV  for yourself and your site in a variety of ways.
+The IDV is configured through a set of resource files. These are typically e<b>X</b>tensible <b>M</b>arkup <b>L</b>anguage (XML) files 
+that define things such as:
+<ul>
+<li> Color tables
+<li> The data chooser user interface
+<li> The derived quantities and formulas
+<li> Jython libraries
+<li> Display defaults for parameters
+<li> Parameter aliases
+<li> Help tips
+<li> Projections
+<li> Available data sources
+<li> Available displays
+<li> Where the favorite bundles are
+<li> Maps
+<li> Station models
+</ul>
+
+Most of these files (with the exception of the chooser UI,
+help tips, data sources, displays and favorite bundle locations)
+are created through facilities provided by the IDV (e.g., color table editor,
+formula editor, etc.)
+<p>
+
+By default the IDV looks in three places for the 
+resources it uses to configure itself:
+<ul>
+<li> <i>User path</i>. This is the ~user/.metapps/&lt;Application name&gt; directory that gets
+created for each user. Note: the &quot;Application name&quot; is usually &quot;DefaultIdv&quot;
+
+<li> <i>Site path</i>. This is the file directory or URL directory that can be defined
+as a command line argument, -sitepath, or through the  user preferences 
+dialog. 
+
+<li> <i>System path</i>. This is a directory, /ucar/unidata/idv/resources,
+in the system Java jar files.
+
+</ul>
+
+When the IDV first starts up it reads the system
+properties file: [ht::popup idv.properties idv.properties].
+This defines  some basic information (e.g., title, splash icon,
+ADDE servers, etc.) as well as defining where to find other properties
+files. By default it looks for idv.properties files under the site path
+and the user path:
+<pre>
+idv.properties = %SITEPATH%/idv.properties;%USERPATH%/idv.properties;
+</pre>
+
+You can also specify one or more properties files as command line arguments:
+<pre>
+-properties your_properties_file
+</pre>
+
+
+The IDV processes these properties files in order, with properties defined
+in later files overriding those defined previously.
+
+<p>
+
+Once the properties have been processed the IDV initializes its resources
+by reading in one or more resource definition files. We call these
+files &quot;RBI&quot; files - (<b>R</b>esource <b>B</b>undle for the <b>I</b>DV).
+These are XML files, the locations of which are
+defined by the <i>idv.resourcefiles</i> property:
+<pre>
+idv.resourcefiles=%USERPATH%/idv.rbi;%SITEPATH%/idv.rbi;%IDVPATH%/idv.rbi
+</pre>
+
+When you first run the IDV, the application, as a thoughtful convenience,
+writes out an example RBI file into your local .metapps/DefaultIdv
+directory. This example file has documentation that describes how to 
+add in new resources.
+
+<p>
+These RBI files define the location of different
+collections of resources. For example, from the system RBI file, idv.rbi, we
+have the entry that defines where the IDV can find the XML files that 
+define the color tables:
+<pre>
+  &lt;resources name="idv.resource.colortables"&gt;
+    &lt;resource location="%USERPATH%/colortables.xml"/&gt;
+    &lt;resource location="%SITEPATH%/colortables.xml"/&gt;
+    &lt;resource location="%IDVPATH%/colortables.xml"/&gt;
+  &lt;/resources&gt;
+</pre>
+
+This says to look for colortables in the user path, sitepath and IDV system
+path.  The IDV uses the first entry in this list as the file path to write
+out color tables that are created using the color table editor.
+<p>
+Note: as a further complexity, errr, convenience, if there is a property
+defined in the properties file which is the resource name than the IDV just uses
+the value of the property (it treats it as a semi-colon delimited list of paths)
+as the resources and ignores the resources in the RBI file.
+So, for example, if you had a property:
+
+<pre>
+idv.resource.colortables=%USERPATH%/colortables.xml;http://yourwebsite.edu/specialtables.xml
+</pre>
+then the IDV would only load in these colortables.
+  
+<p>
+Using the RBI file, what are the set of steps you need to take to configure
+your site to use a set of special color tables that you have created. What you 
+would do is bring up the IDV. Create the color tables. They would get saved off in
+your local .metapps/DefaultIdv directory in the file colortables.xml (as defined by 
+the resource paths  defined in the default RBI).
+You could simply copy that file to an area on your web site or on 
+a shared file system that is pointed to by the IDV sitepath. 
+Now, your users simply need  to define the sitepath and they  will
+naturally pick up the color tables you have created.
+
+<p>
+Most site configuration can be accomplished through the default 
+user/site/system resource locations. However, you can modify 
+the RBI file  to include other resources.
+For example, you could add in an entry:
+<pre>
+ &lt;resource location="http://yourwebsite.edu/specialcolortables.xml"/&gt;
+</pre>
+to make available some special color tables at a particular
+URL.
+
+<subhead id="resources" intoc="false">Resource</subhead>
+Here is the list of the resource identifiers, description and file pattern (for use with 
+plugins) of the different resources the IDV uses.
+
+<table>
+<tr><td><b>Resource Identifier</b></td><td><b>Description</b></td><td><b>File Pattern</b></td></tr>
+<tr><td>idv.resource.colortables</td><td>Color tables used in the application</td><td>colortables\.xml$</td></tr>
+<tr><td>idv.resource.projections</td><td>Map projections</td><td>projections\.xml$</td></tr>
+<tr><td>idv.resource.transects</td><td>Map transects</td><td>transects\.xml$</td></tr>
+<tr><td>idv.resource.messages</td><td>Message catalog</td><td>messages\.properties$</td></tr>
+<tr><td>idv.resource.grib1lookuptables</td><td>Grib 1 Lookup tables</td><td>grib1lookuptable\.lst$</td></tr>
+<tr><td>idv.resource.grib2lookuptables</td><td>Grib 2 Lookup tables</td><td>grib2lookuptable\.lst$</td></tr>
+<tr><td>idv.resource.jython</td><td>Jython libraries</td><td>\.py$</td></tr>
+<tr><td>idv.resource.stationmodels</td><td>Station models</td><td>stationmodels\.xml$</td></tr>
+<tr><td>idv.resource.imagedefaults</td><td>ADDE Image Defaults</td><td>imagedefaults\.xml$</td></tr>
+<tr><td>idv.resource.backgroundwms</td><td>Background WMS images</td><td>backgroundwms\.xml$</td></tr>
+<tr><td>idv.resource.imagesets</td><td>Image Sets</td><td>imagesets\.xml$</td></tr>
+<tr><td>idv.resource.autodisplays</td><td>Automatic display creation</td><td>autodisplays\.xml$</td></tr>
+<tr><td>idv.resource.skin</td><td>UI Skin</td><td>skin\.xml$</td></tr>
+<tr><td>idv.resource.toolbar</td><td>Tool bar</td><td>toolbar\.xml$</td></tr>
+<tr><td>idv.resource.actions</td><td>Actions</td><td>actions\.xml$</td></tr>
+<tr><td>idv.resource.stationsymbols</td><td>Station model symbols</td><td>stationsymbols\.xml$</td></tr>
+<tr><td>idv.resource.colorpairs</td><td>Color pairs</td><td>no pattern</td></tr>
+<tr><td>idv.resource.bundlexml</td><td>Bundle xml</td><td>no pattern</td></tr>
+<tr><td>idv.resource.aliases</td><td>Data aliases</td><td>aliases\.xml$</td></tr>
+<tr><td>idv.resource.datasource</td><td>Specification of the data sources</td><td>datasource\.xml$</td></tr>
+<tr><td>idv.resource.derived</td><td>Derived quantities</td><td>derived\.xml$</td></tr>
+<tr><td>idv.resource.choosers</td><td>The definition of the user interface for data choosers</td><td>choosers\.xml$</td></tr>
+<tr><td>idv.resource.bundles</td><td>Default bundles that are evaluated at start up</td><td>no pattern</td></tr>
+<tr><td>idv.resource.controls</td><td>Display controls</td><td>controls\.xml$</td></tr>
+<tr><td>idv.resource.helptips</td><td>Help tips shown in the help tips dialog</td><td>helptips\.xml$</td></tr>
+<tr><td>idv.resource.locations</td><td>Fixed station locations</td><td>locations\.xml$</td></tr>
+<tr><td>idv.resource.maps</td><td>Maps for the displays</td><td>maps\.xml$</td></tr>
+<tr><td>idv.resource.menubar</td><td>Commands in the menu bar</td><td>(defaultmenu\.xml$|menubar\.xml$)</td></tr>
+<tr><td>idv.resource.paramdefaults</td><td>Display defaults for data</td><td>paramdefaults\.xml$</td></tr>
+<tr><td>idv.resource.paramgroups</td><td>Parameter groups</td><td>paramgroups\.xml$</td></tr>
+<tr><td>idv.resource.userchooser</td><td>End user constructed data choosers</td><td>no pattern</td></tr>
+<tr><td>idv.resource.preferences</td><td>User preferences</td><td>no pattern</td></tr>
+<tr><td>idv.resource.plugins</td><td>Plugins</td><td>no pattern</td></tr>
+<tr><td>idv.resource.prototypes</td><td>Prototypes</td><td>no pattern</td></tr>
+</table>
+<p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[ug::foot]

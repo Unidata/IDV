@@ -1,0 +1,108 @@
+
+<html>
+<head>
+<title>Level II Sweep Displays in 2D and 3D</title>
+</head>
+
+<body>
+
+<div class="overview">
+<p>Sweep displays 
+simulate conventional PPI radar plots of a single sweep of a map view, and
+also plot sweeps in the upper atmosphere,
+</p>
+</div>
+
+<p>
+
+If necessary, select Level II data and times as described in
+[ht::popup "LoadingLevelIIData.html" "Accessing WSR-88D Level II Radar Data"].
+
+<p>
+
+<ol class="step">
+
+<li>Select the [ht::param Reflectivity] field and create a     
+   [ht::display {Radar Sweep View in 2D}] display.  A display of 
+   the Level II sweep at the lowest tilt appears in the main window.  </li>
+
+
+<li>Move to a new tilt angle in the volume scan; and put up 
+counties map. </li>
+  <ul class="substep">
+    <li>In the display's control window use the [ht::command Elevation Angles]
+     selector to choose another tilt angle. 
+    <li>Zoom in to see the display character is that of the radar's native 
+    coordinate system, with wedge-shaped bins showing the
+    radar range-azimuth coordinates.
+    <li>[ht::mapChange] Put on a map of U.S. Counties in green.
+  </ul>
+</li>
+
+<li>Add [ht::display Radar Range Rings]</li>
+  <ul class="substep">
+    <li>Restore the initial display overhead view
+     with the key combination Ctrl-r.
+    <li>Select the [ht::menu Displays Special {Range Rings}] menu
+    from the <code class="command">Main Menu Bar</code>.
+    A set of range rings will appear, centered on the radar station.
+    <li>Use the control widgets to change the spacing and color of the rings, 
+    the azimuth lines, visibility, and the labels. 
+  </ul>
+</li>
+
+<div class="cimg"><img src="images/LevelIIPPI2D.gif"></div>
+
+<li>Change the parameter (radar data moment) in the display.</li>
+  <ul class="substep">
+    <li>In the control window [ht::display 2D Sweep View], select the 
+    <code class="menu">Edit-&gt;Change Parameter</code> menu item.
+    <li>In the [ht::dialog Choose Parameter] panel, open the data source 
+    of interest by clicking on the tab. 
+    <li>Click on the parameter 
+    [ht::param Radial Velocity], and 
+    click the [ht::button OK] button.
+    <li>The display is recreated with the new parameter's data.
+    <li>Switch the parameter back to [ht::param Reflectivity].
+  </ul>
+</li>
+
+
+<li>3D Sweep display</li>
+  <ul class="substep">
+  <li>Add in a [ht::display {Radar Sweep View in 3D}] 
+  of [ht::param Reflectivity].</li>
+
+  <li> The 3D display of the Level II sweep at the 
+  lowest tilt appears in the main window:
+
+  <p>
+  <div class="cimg"><img src="images/LevelIIPPI3D.gif"></div>
+  <p>
+
+  <li>Make sure both [ht::display Radar Sweep View in 2D] 
+  and the [ht::display Radar Sweep View in 3D]
+    have the same  [ht::command Sweep angle].</li>
+
+    <li>Rotate and zoom in as needed to see the character of the 
+    3D display, and compare the two displays of the same data.
+    <li>If you have time switch the 3D sweep to a high tilt angle.
+    The top of the wireframe box is at 16 km. Judge the maximum height
+    of returned signals. About how far it is from the radar station?
+    </ul>
+</li>
+
+<li>Remove all displays. </li>
+
+<li>Display the reflectivity as a Constant Altitude PPI (CAPPI).
+Select the [ht::param Reflectivity] field and create a     
+   [ht::display CAPPI] display.</li>
+
+<p>A CAPPI display of the reflectivity will appear in the main window.
+
+</ol>
+
+
+</body>
+</html>
+

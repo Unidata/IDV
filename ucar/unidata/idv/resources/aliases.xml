@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<aliases>
+<!--
+A list of aliases. Each alias tag holds a name (which is the canonical name)
+and a comma separated list of aliases of the canonical name.
+The label is used  (if defined) for  the AliasEditor gui.
+ -->
+  <alias
+     name="TEMP"
+     label="Temperature"
+     aliases="T,t,Temperature,temperature,tdry,T_tenths,air_temperature,T,T22"/>
+  <alias
+     name="RH"
+     label="Relative humidity"
+     aliases="rh,RH,Relative_humidity,relHumidity"/>
+  <alias
+     name="DEWPOINT"
+     label="Dewpoint"
+     aliases="dewpoint,Dewpoint,DEWPOINT,dp,dp_0,dp_1,TD_tenths,TD,dpdk,dew_point_temperature,Dew_point_temperature"/>
+  <alias
+      name="PRESSURE"
+     label="Pressure"
+     aliases="p,P,SLP, PRE, seaLevelPress, seaLevelPressure, pres,pressure,Pressure,P_msl,Pm_msl,Psl_et,psl,air_pressure_at_sea_level,MSLP_Eta_Reduction,Mean_sea_level_pressure_ETA_model,PSFC,Pressure_reduced_to_MSL,Mean_sea_level_pressure"/>
+  <alias
+     name="ALTIMETER"
+     label="Altimeter Setting"
+     aliases="PSL, altimeter,hectoPascal_ALTIM"/>
+  <alias
+     name="SPEED"
+     label="Wind Speed"
+     aliases="spd, SPD, wspd, windSpd, windSpeed, windspeed, winds,wind_speed,Wind_speed"/>
+  <alias
+     name="DIR"
+     label="Wind Direction"
+     aliases="dir,DIR, wdir,windDir,deg,wind_from_direction,Wind_direction_from_which_blowing"/>
+  <alias
+     name="GUST"
+     label="Wind Gust"
+     aliases="GUST, windGust,wind_gust"/>
+  <alias
+     name="VIS"
+     label="Visibility"
+     aliases="VIS,visibility,visibility_in_air_surface"/>
+  <alias
+     name="WX"
+     label="WMO Weather Code"
+     aliases="WXC1, WXpresent,weather"/>
+  <alias
+     name="WXS"
+     label="Text Weather Code"
+     aliases="WX1"/>
+  <alias
+     name="CC"
+     label="WMO Cloud Coverage Code"
+     aliases="OctsSkyObscured,CA,cloudCover,CC1,CC2,CC3,CC4"/>
+  <alias
+     name="PTNDCODE"
+     label="WMO Pressure Tendency Code"
+     aliases="PC,char_Ptend"/>
+  <alias
+     name="PTND"
+     label="Pressure Tendency Amount"
+     aliases="PT,Ptend,pressChange3Hour"/>
+  <alias
+     name="ID"
+     label="IACO Station ID"
+     aliases="stn_name,ID,stnName,Identifier,id,station_id,stationId"/>
+  <alias
+     name="IDN"
+     label="Station ID"
+     aliases="IDN, wmoId, numericWMOid,wmo_id"/>
+  <alias
+     name="U"
+     label="U component of wind"
+     aliases="u,U,GridRelative_u,u_sfc,u_wind,WesterlyWind,U_component_of_wind,U_component_of_wind_height_above_ground,Wind_Velocity_U_Component,U-component_of_wind,U_velocity,u_wind_height_above_ground"/>
+  <alias
+     name="V"
+     label="V component of wind"
+     aliases="v,V,GridRelative_v,v_sfc,v_wind,SoutherlyWind,V_component_of_wind,V_component_of_wind_height_above_ground,Wind_Velocity_V_Component,V-component_of_wind,V_velocity,v_wind_height_above_ground"/>
+  <alias
+     name="W"
+     label="W component of wind"
+     aliases="w,W,w_sfc,w_wind,VerticalWindComponent,Wind_Velocity_W_Component,VW,WI"/>
+  <alias
+     name="UREL"
+     label="Grid Relative U component of wind"
+     aliases="GridRelative_u,GridRelative_u_fhg,U10"/>
+  <alias
+     name="VREL"
+     label="Grid Relative V component of wind"
+     aliases="GridRelative_v,GridRelative_v_fhg,V10"/>
+  <alias
+     name="Z"
+     label="Z"
+     aliases="z,Z,Geopotential_height,Geopotential"/>
+  <alias
+     name="ALTITUDE"
+     label="Altitude"
+     aliases="Z_sfc, Altitude, altitude, Elevation, elevation, topo, Geopotential_height_surface,HGT"/>
+  <alias
+     name="LOWCLOUD"
+     label="Low Cloud Type"
+     aliases="Cloud_low"/>
+  <alias
+     name="MIDCLOUD"
+     label="Mid Cloud Type"
+     aliases="Cloud_medium"/>
+  <alias
+     name="HICLOUD"
+     label="High Cloud Type"
+     aliases="Cloud_high"/>
+  <alias
+     name="ICING"
+     label="Icing Type"
+     aliases="icing"/>
+  <alias
+     name="TURBULENCE"
+     label="Turbulence Type"
+     aliases="turb"/>
+  <alias
+     name="LIGHTNING"
+     label="Lightning"
+     aliases="SGNL"/>
+  <alias
+     name="SST"
+     label="Sea Surface Temperature"
+     aliases="SST,sst"/>
+  <alias
+     name="ABSVOR"
+     label="Absolute Vorticity"
+     aliases="Absolute_Vorticity,absvor,absvort,Absolute_vorticity"/>
+  <alias
+     name="HEADING"
+     label="True Heading Angle"
+     aliases="THDG,hthead,Heading,Direction"/>
+  <alias
+     name="PITCH"
+     label="Pitch Angle"
+     aliases="PITCH,hpitch"/>
+  <alias
+     name="ROLL"
+     label="ROLL Angle"
+     aliases="ROLL,hroll"/>
+</aliases>

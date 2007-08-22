@@ -1,0 +1,34 @@
+IDV Copyright:
+
+Copyright 1997-2007 Unidata Program Center/University Corporation
+for Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
+support-idv@unidata.ucar.edu.
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation; either version 2.1 of the License, or
+(at your option) any later version.
+
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+License for more details.
+
+A copy of the GNU Lesser General Public License is available in the
+root directory of the IDV distribution or write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+Other Copyrights/Licenses:
+
+This product includes software developed by:
+
+    * The University of Wisconsin-Madison 
+         (VisAD) (http://www.ssec.wisc.edu/~billh/visad.html).
+    * The Apache Software Foundation (http://www.apache.org/).
+    * The Jython project (http://www.jython.org)
+    * The JDOM project (http://www.jdom.org)
+    * The ImageJ project (http://rsb.info.nih.gov/ij/) 
+    * The JJ2000 project (http://jpeg2000.epfl.ch/)
+
+Please read the different LICENSE files present in the root directory
+of the IDV distribution for restrictions on those packages.

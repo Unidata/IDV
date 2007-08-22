@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<derived_parameters>
+<!--
+This file defines the default system derived quantities and
+end user formulas. Each formula is defined with a derived tag.
+The attributes:
+     isenduser="false"
+     isdefault="true" 
+
+are used to determine whether a formula shows up as and end user formula
+and whether the formula is used to automatically create default derived fields
+for a loaded data source.
+
+The categories tag defines the data categories that are used for the formula.
+
+The idea behind default products is that the IDV looks at the data choices
+of a data source. It then sees if any of the derived formulas here match 
+the actual data choices. It uses information in the operands tag to do the
+matching.
+
+For example, the dewpoint  field is created when we see a data source with
+a TEMP and an RH field:
+      <params   p1="TEMP"  p2="RH"/>
+
+The p1, p2, p3, etc, fields are bound to  the D1, D2, D3, etc., parameters
+in the  actual formula. e.g.:
+     formula="DerivedGridFactory.createDewpoint (D1, D2)">
+
+
+-->
+
+
+<!-- 
+The class tags allow you to define the full class name of the classes
+you use for methods. This enables you to just use ClassName.methodName 
+for the method attrbiutes of the derived data descriptors.
+Though you can use the full path in the method attributes as well.
+ -->
+  <class name="ucar.unidata.data.grid.DerivedGridFactory"/>
+
+<!--
+The name attribute in the category tags can be regular "-" separated categories 
+or it can be a special "inherited" category (denoted with name="inherit"). 
+We get the inherited data categories
+from the children of the DerivedDataChoice. This list of categories
+is inserted in place in the list of categories defined here.
+
+if you just have:
+    <categories>
+      <category value="inherit" />
+    </categories>
+we will take all of the data categories from all of the children
+of the DerivedDataChoice.
+
+You can also have a childidx and categoryidx tag to select which DataChoice
+child and/or which DataCategory to use.
+
+e.g.:
+    <categories>
+      <category value="inherit" childidx="1"/>
+    </categories>
+Will use all of the DataCategories of the second DataChoice child.
+
+    <categories>
+      <category value="inherit" categoryidx="0"/>
+    </categories>
+Will use the first DataCategory from all of the DataChoice children.
+
+    <categories>
+      <category value="inherit" categoryidx="1" childidx="2"/>
+    </categories>
+Will use the second category from the third child.
+
+etc.
+
+
+Remember you can have any number of category and inherit tags:
+So for example we might have:
+    <categories>
+      <category value="Some name" />
+      <category value="inherit"/>
+      <category value="Some other category name" />
+    </categories>
+
+The result would be (in xml):
+    <categories>
+      <category value="Some name" />
+      the inherited categories
+      <category value="Some other category name" />
+    </categories>
+
+
+
+We also use categories to allow for further refinement of the operand criteria
+in the "<operands>"  tags. You can have a categories="semi-colon delimited list of categories"
+in both the operands tag and the paramgroup and params sub-tags. Any categories definition
+in the sub-tags overrides any defined in the operands tag.
+e.g:
+<operands categories="GRID-2D-*;GRID-3D-*;"> ...
+or
+<operands>
+    <paramgroup  categories="GRID-2D-*;GRID-3D-*;">
+</operands>
+
+or
+<operands>
+    <params  categories="GRID-2D-*;GRID-3D-*;">
+</operands>
+
+ -->
+
+
+  <derived
+     id="windspeed"
+     description="Windspeed (from %N1% &amp; %N2%)"
+     label="Windspeed"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.createWindSpeed (D1, D2)">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"/>
+    </categories>
+    <operands categories="GRID-2D-*;GRID-3D-*;">
+      <paramgroup name="u_and_v"/>
+    </operands>
+  </derived>
+
+<!-- createWindVectors does NOT compute wind from true NORTH:  -->
+<!-- only as angle from plus y in grid local  -->
+<!--  -->
+  <derived
+     id="flowvectors"
+     description="Flow Vectors (from %N1% &amp; %N2%)"
+     label="Flow Vectors"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.createFlowVectors (D1, D2)">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"
+         categoryidx="0"/>
+      <category value="flowvector"/>
+    </categories>
+    <operands categories="GRID-2D-*;GRID-3D-*;">
+      <paramgroup name="u_and_v"/>
+    </operands>
+  </derived>
+  <derived
+     id="flowvectors3d"
+     description="3D Flow Vectors (from %N1% &amp; %N2% &amp; %N3%)"
+     label="3D Flow Vectors"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.createFlowVectors(D1, D2, D3)">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"
+         categoryidx="0"/>
+      <category value="flowvector3d"/>
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <paramgroup name="u_v_w"/>
+    </operands>
+  </derived>
+  <derived
+     id="truewindvectors"
+     description="True Wind vectors (from %N1% &amp; %N2%)"
+     label="True Wind vectors"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.createTrueWindVectors (D1, D2)">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"
+         categoryidx="0"/>
+      <category value="flowvector"/>
+    </categories>
+    <operands categories="GRID-2D-*;GRID-3D-*;">
+      <paramgroup name="GridRelative_uv"/>
+    </operands>
+  </derived>
+  <derived
+     id="dewpoint"
+     description="Dewpoint (from %N1% &amp; %N2%)"
+     label="Dewpoint"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.createDewpoint (D1, D2)">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"/>
+    </categories>
+    <operands categories="GRID-2D-*;GRID-3D-*;">
+      <params
+         p1="TEMP"
+         p2="RH"/>
+    </operands>
+  </derived>
+  <derived
+     id="mixingratio"
+     description="Mixing ratio (from %N1% &amp; %N2%)"
+     label="Mixing ratio"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.createMixingRatio (D1, D2)">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"/>
+    </categories>
+    <operands categories="GRID-2D-*;GRID-3D-*;">
+      <params
+         p1="TEMP"
+         p2="RH"/>
+    </operands>
+  </derived>
+  <derived
+     id="dpdk"
+     description="Dewpoint Depression (from %N1% &amp; %N2%)"
+     label="Dewpoint Depression"
+     isdefault="true" 
+     isenduser="false"
+     formula="(D1-D2)">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"/>
+    </categories>
+    <operands>
+      <params
+         p1="TEMP"
+         p2="DEWPOINT"/>
+    </operands>
+  </derived>
+  <derived
+     id="thetae"
+     description="Equiv. Potential Temperature (from %N1% &amp; %N2%)"
+     label="Equivalent Potential Temperature"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.createEquivalentPotentialTemperature (D1, D2)">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"/>
+    </categories>
+    <operands categories="GRID-2D-*;GRID-3D-*;">
+      <params
+         p1="TEMP"
+         p2="RH"/>
+    </operands>
+  </derived>
+  <derived
+     id="thickness_1000_500"
+     description="1000-500 hPa Thickness"
+     label="1000-500 hPa Thickness"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.createLayerDifference (D1, 500, 1000)">
+    <categories>
+      <category
+         value="2D grid-Derived"
+         display="true"/>
+      <category value="GRID-2D-*"/>
+    </categories>
+    <operands>
+      <params
+         p1="Z"
+         categories="GRID-3D-*;"/>
+    </operands>
+  </derived>
+  <derived
+     id="Anythickness"
+     description="Thickness"
+     label="Thickness"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.createLayerDifference (D1, D2, D3)">
+    <categories>
+      <category
+         value="2D grid-Derived"
+         display="true"/>
+      <category value="GRID-2D-*"/>
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <params
+         p1="Z"
+         p2="user:Top"
+         p3="user:Bottom"/>
+    </operands>
+  </derived>
+  <derived
+     id="sounding_nowind"
+     description="Sounding Data (%N1% &amp; %N2% only)"
+     label="Sounding Data"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.combineGrids (D1, D2)">
+    <categories>
+      <category
+         value="inherit"
+         childidx="0"
+         append="Derived"
+         categoryidx="0"/>
+      <category value="GRID_SOUNDING"/>
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <params
+         p1="TEMP"
+         p2="DEWPOINT"/>
+    </operands>
+  </derived>
+  <derived
+     id="sounding_wind"
+     description="Sounding Data (with true winds)"
+     label="Sounding Data"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.combineGrids ( DerivedGridFactory.combineGrids (D1, D2), DerivedGridFactory.combineGrids (D3, D4))">
+    <categories>
+      <category
+         value="inherit"
+         childidx="0"
+         append="Derived"
+         categoryidx="0"/>
+      <category value="GRID_SOUNDING"/>
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <params
+         p1="TEMP"
+         p2="DEWPOINT"
+         p3="U"
+         p4="V"/>
+    </operands>
+  </derived>
+  <derived
+     id="sounding_truewind"
+     description="Sounding Data (with winds)"
+     label="Sounding Data"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.combineGrids ( DerivedGridFactory.combineGrids (D1, D2), DerivedGridFactory.createTrueWindVectors (D3, D4))">
+    <categories>
+      <category
+         value="inherit"
+         childidx="0"
+         append="Derived"
+         categoryidx="0"/>
+      <category value="GRID_SOUNDING"/>
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <params
+         p1="TEMP"
+         p2="DEWPOINT"
+         p3="UREL"
+         p4="VREL"/>
+    </operands>
+  </derived>
+  <derived
+     id="theta"
+     description="Potential Temperature (from %N1%)"
+     label="Potential Temperature"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.createPotentialTemperature (D1)">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"/>
+    </categories>
+    <operands categories="GRID-2D-*;GRID-3D-*;">
+      <params p1="TEMP"/>
+    </operands>
+  </derived>
+  <derived
+     id="thetaP"
+     description="Potential Temperature (from %N1% &amp; %N2%)"
+     label="Potential Temperature"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.createPotentialTemperature (D1, D2)">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"/>
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <paramgroup name="temp_and_pressure"/>
+    </operands>
+  </derived>
+  <derived
+     id="horizontaldivergence"
+     description="Horizontal Divergence (from %N1% &amp; %N2%)"
+     label="Horizontal Divergence"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.createHorizontalDivergence (D1,D2)">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"/>
+    </categories>
+    <operands categories="GRID-2D-*;GRID-3D-*;">
+      <paramgroup name="u_and_v"/>
+    </operands>
+  </derived>
+  <derived
+     id="relvort"
+     description="Relative Vorticity (from %N1% &amp; %N2%)"
+     label="Relative Vorticity ..."
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.createRelativeVorticity (D1, D2)">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"/>
+    </categories>
+    <operands categories="GRID-2D-*;GRID-3D-*;">
+      <paramgroup name="u_and_v"/>
+    </operands>
+  </derived>
+  <derived
+     id="absvort"
+     description="Absolute Vorticity (from %N1% &amp; %N2%)"
+     label="Absolute Vorticity"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.createAbsoluteVorticity (D1, D2)">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"/>
+    </categories>
+    <operands categories="GRID-2D-*;GRID-3D-*;">
+      <paramgroup name="u_and_v"/>
+    </operands>
+  </derived>
+  <derived
+     id="IPV"
+     description="Isentropic Potential Vorticity (from %N1% &amp; %N2%)"
+     label="Isentropic Potential Vorticity"
+     isdefault="true" 
+     isenduser="false"
+     formula="DerivedGridFactory.createIPV (D1, D2)">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"/>
+    </categories>
+    <operands categories="GRID-2D-*;GRID-3D-*;">
+      <params
+         p1="TEMP"
+         p2="absvort"/>
+    </operands>
+  </derived>
+  <derived
+     id="advection"
+     description="Horizontal Advection (from %N1% &amp; %N2%)"
+     label="Horizontal Advection"
+     isenduser="true"
+     isdefault="true"
+     formula="DerivedGridFactory.createHorizontalAdvection(scalar_parameter, D1[label=U Component], D2[label=V Component])">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"/>
+      <category value="GRID-2D-*"/>
+      <category value="GRID-3D-*"/>
+      <category display="true" value="System"/>
+    </categories>
+    <operands categories="GRID-2D-*;GRID-3D-*;">
+      <paramgroup name="u_and_v"/>
+    </operands>
+  </derived>
+  <derived
+     id="fluxdivergence"
+     description="Horizontal Flux Divergence (from %N1% &amp; %N2%)"
+     label="Horizontal Flux Divergence"
+     isenduser="true"
+     isdefault="true"
+     formula="DerivedGridFactory.createHorizontalFluxDivergence(scalar_parameter, D1[label=U Component], D2[label=V Component])">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"/>
+      <category value="GRID-2D-*"/>
+      <category value="GRID-3D-*"/>
+      <category display="true" value="System"/>
+    </categories>
+    <operands categories="GRID-2D-*;GRID-3D-*;">
+      <paramgroup name="u_and_v"/>
+    </operands>
+  </derived>
+</derived_parameters>

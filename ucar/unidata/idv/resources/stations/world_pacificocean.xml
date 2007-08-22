@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="Pacific Ocean" category="World locations">
+<stn name="Adamstown " lat="25:04:S" lon="130:05:W"/>
+<stn name="Admiralty Islands" lat="2:10:S" lon="147:00:E"/>
+<stn name="Agana " lat="13:28:N" lon="144:45:E"/>
+<stn name="Alaska, Gulf of" lat="58:00:N" lon="145:00:W"/>
+<stn name="Alofi " lat="19:01:S" lon="169:55:W"/>
+<stn name="Amami Strait" lat="28:40:N" lon="129:30:E"/>
+<stn name="Amurskiy Liman " lat="53:00:N" lon="141:30:E"/>
+<stn name="Anadyrskiy Zaliv " lat="64:00:N" lon="177:00:E"/>
+<stn name="Antipodes Islands" lat="49:41:S" lon="178:43:E"/>
+<stn name="Apia " lat="13:50:S" lon="171:45W"/>
+<stn name="Arafura Sea" lat="9:00:S" lon="133:00:E"/>
+<stn name="Aru Sea" lat="6:15:S" lon="135:00:E"/>
+<stn name="Asuncion Island" lat="19:40:N" lon="145:24:E"/>
+<stn name="Auckland Islands" lat="51:00:S" lon="166:30:E"/>
+<stn name="Australes, Iles " lat="23:20:S" lon="151:00:W"/>
+<stn name="Avarua " lat="21:12:S" lon="159:46:W"/>
+<stn name="Babuyan Channel" lat="18:44:N" lon="121:40:E"/>
+<stn name="Balabac Strait" lat="7:35:N" lon="117:00:E"/>
+<stn name="Balintang Channel" lat="19:49:N" lon="121:40:E"/>
+<stn name="Banaba " lat="0:52:S" lon="169:35:E"/>
+<stn name="Banda Sea" lat="5:00:S" lon="128:00:E"/>
+<stn name="Banks Island" lat="10:12:S" lon="142:16:E"/>
+<stn name="Banks Islands " lat="14:00:S" lon="167:30:E"/>
+<stn name="Bashi Channel" lat="22:00:N" lon="121:00:E"/>
+<stn name="Basilan Strait" lat="6:49:N" lon="122:05:E"/>
+<stn name="Bass Strait" lat="39:20:S" lon="145:30:E"/>
+<stn name="Belau " lat="7:30:N" lon="134:30:E"/>
+<stn name="Belep Islands " lat="19:45:S" lon="163:40:E"/>
+<stn name="Berau, Gulf of" lat="2:30:S" lon="132:30:E"/>
+<stn name="Bering Sea" lat="60:00:N" lon="175:00:W"/>
+<stn name="Bering Strait" lat="65:30:N" lon="169:00:W"/>
+<stn name="Bikini Atoll" lat="11:35:N" lon="165:23:E"/>
+<stn name="Bismarck Archipelago " lat="5:00:S" lon="150:00:E"/>
+<stn name="Bismarck Sea" lat="4:00:S" lon="148:00:E"/>
+<stn name="Bo Hai " lat="38:00:N" lon="120:00:E"/>
+<stn name="Bora-Bora " lat="16:30:S" lon="151:45:W"/>
+<stn name="Bougainville " lat="6:00:S" lon="155:00:E"/>
+<stn name="Bougainville Strait" lat="6:40:S" lon="156:10:E"/>
+<stn name="Bounty Islands" lat="47:43:S" lon="174:00:E"/>
+<stn name="Brisbane " lat="27:28:S" lon="153:02:E"/>
+<stn name="Bristol Bay" lat="57:00:N" lon="160:00:W"/>
+<stn name="British Solomon Islands " lat="8:00:S" lon="159:00:E"/>
+<stn name="California, Gulf of" lat="28:00:N" lon="112:00:W"/>
+<stn name="Campbell Island" lat="52:33:S" lon="169:09:E"/>
+<stn name="Canberra " lat="35:17:S" lon="149:08:E"/>
+<stn name="Canton Island " lat="2:49:S" lon="171:40:W"/>
+<stn name="Caroline Islands" lat="7:30:N" lon="148:00:E"/>
+<stn name="Caroline Islands" lat="7:30:N" lon="148:00:E"/>
+<stn name="Carpentaria, Gulf of" lat="14:00:S" lon="139:00:E"/>
+<stn name="Cato Island" lat="23:15:S" lon="155:32:E"/>
+<stn name="Celebes Sea" lat="3:00:N" lon="122:00:E"/>
+<stn name="Ceram  Sea" lat="2:30:S" lon="129:30:E"/>
+<stn name="Challenger Deep " lat="11:22:N" lon="142:36:E"/>
+<stn name="Chatham Islands" lat="44:00:S" lon="176:30:W"/>
+<stn name="Cheju Strait" lat="34:00:N" lon="126:30:E"/>
+<stn name="Chesterfield Islands " lat="19:52:S" lon="158:15:E"/>
+<stn name="Choiseul " lat="7:05:S" lon="121:00:E"/>
+<stn name="Christmas Island " lat="10:25:S" lon="105:39:E"/>
+<stn name="Christmas Island " lat="1:52:N" lon="157:20:W"/>
+<stn name="Chuuk Islands " lat="7:25:N" lon="151:47:W"/>
+<stn name="Cook Strait" lat="41:15:S" lon="174:30:E"/>
+<stn name="Coral Sea" lat="15:00:S" lon="150:00:E"/>
+<stn name="D'Entrecasteaux Islands" lat="9:30:S" lon="150:40:E"/>
+<stn name="East China Sea" lat="30:00:N" lon="126:00:E"/>
+<stn name="East Korea Strait " lat="34:00:N" lon="129:00:E"/>
+<stn name="Eastern Channel " lat="34:00:N" lon="129:00:E"/>
+<stn name="Eastern Samoa " lat="14:20:S" lon="170:00:W"/>
+<stn name="Ellice Islands" lat="8:00:S" lon="178:00:E"/>
+<stn name="Enderbury Island" lat="3:08:S" lon="171:05:W"/>
+<stn name="Enewetak Atoll " lat="11:30:N" lon="162:15:E"/>
+<stn name="Flores Sea" lat="7:40:S" lon="119:45:E"/>
+<stn name="Fongafale " lat="8:30:S" lon="179:12:E"/>
+<stn name="Friendly Islands" lat="20:00:S" lon="175:00:W"/>
+<stn name="Funafuti " lat="8:30:S" lon="179:12:E"/>
+<stn name="Futuna Islands " lat="14:19:S" lon="178:05:W"/>
+<stn name="Gambier Islands " lat="23:09:S" lon="134:58:W"/>
+<stn name="Gaspar Strait" lat="3:00:S" lon="107:00:E"/>
+<stn name="Gilbert Islands" lat="1:25:N" lon="173:00:E"/>
+<stn name="Green Islands" lat="4:30:S" lon="154:10:E"/>
+<stn name="Guadalcanal " lat="9:32:S" lon="160:12:E"/>
+<stn name="Ha'apai Group " lat="19:42:S" lon="174:29:W"/>
+<stn name="Hagatna " lat="13:28:N" lon="144:45:E"/>
+<stn name="Halmahera Sea" lat="0:30:S" lon="129:00:E"/>
+<stn name="Harvey Islands " lat="21:14:S" lon="159:46:W"/>
+<stn name="Honiara " lat="9:26:S" lon="159:57:E"/>
+<stn name="Horne, Iles de " lat="14:19:S" lon="178:05:W"/>
+<stn name="Hunter Island" lat="22:24:S" lon="172:06:E"/>
+<stn name="Hunter Island" lat="22:24:S" lon="172:06:E"/>
+<stn name="Japan, Sea of" lat="40:00:N" lon="135:00:E"/>
+<stn name="Java Sea" lat="5:00:S" lon="110:00:E"/>
+<stn name="Joseph Bonaparte Gulf" lat="14:00:S" lon="128:45:E"/>
+<stn name="Juan de Fuca, Strait of" lat="48:18:N" lon="124:00:W"/>
+<stn name="Kanton Island" lat="2:49:S" lon="171:40:W"/>
+<stn name="Karimata Strait" lat="2:05:S" lon="108:40:E"/>
+<stn name="Kauai Channel" lat="21:45:N" lon="158:50:W"/>
+<stn name="Kermadec Islands" lat="29:50:S" lon="178:15:W"/>
+<stn name="Kingston " lat="29:03:S" lon="167:58:E"/>
+<stn name="Kiritimati " lat="1:52:N" lon="157:20:W"/>
+<stn name="Kolonia " lat="6:58:N" lon="158:13:E"/>
+<stn name="Korea Bay" lat="39:00:N" lon="124:00:E"/>
+<stn name="Korea Strait" lat="34:00:N" lon="129:00:E"/>
+<stn name="Koror " lat="7:20:N" lon="134:29:E"/>
+<stn name="Kosrae " lat="5:20:N" lon="163:00:E"/>
+<stn name="Kwajalein Atoll" lat="9:05:N" lon="167:20:E"/>
+<stn name="La Perouse Strait" lat="45:45:N" lon="142:00:E"/>
+<stn name="Lau Group " lat="18:20:S" lon="178:30:E"/>
+<stn name="Liaodong Wan " lat="40:30:N" lon="121:20:E"/>
+<stn name="Line Islands" lat="0:05:N" lon="157:00:W"/>
+<stn name="Line Islands" lat="0:05:N" lon="157:00:W"/>
+<stn name="Line Islands" lat="0:05:N" lon="157:00:W"/>
+<stn name="Line Islands" lat="0:05:N" lon="157:00:W"/>
+<stn name="Lord Howe Island" lat="31:30:S" lon="159:00:E"/>
+<stn name="Louisiade Archipelago" lat="11:00:S" lon="153:00:E"/>
+<stn name="Loyalty Islands " lat="21:00:S" lon="167:00:E"/>
+<stn name="Luzon Strait" lat="20:30:N" lon="121:00:E"/>
+<stn name="Macquarie Island" lat="54:36:S" lon="158:54:E"/>
+<stn name="Majuro " lat="7:05:N" lon="171:08:E"/>
+<stn name="Makassar Strait" lat="2:00:S" lon="117:30:E"/>
+<stn name="Malay Archipelago" lat="2:30:N" lon="120:00:E"/>
+<stn name="Manipa Strait" lat="3:20:S" lon="127:23:E"/>
+<stn name="Manua Islands" lat="14:13:S" lon="169:35:W"/>
+<stn name="Mariana Islands" lat="16:00:N" lon="145:30:E"/>
+<stn name="Mariana Islands" lat="16:00:N" lon="145:30:E"/>
+<stn name="Marquesas Islands " lat="9:00:S" lon="139:30:W"/>
+<stn name="Mata-Utu " lat="13:57:S" lon="171:56:W"/>
+<stn name="Matthew Island" lat="22:20:S" lon="171:20:E"/>
+<stn name="Matthew Island" lat="22:20:S" lon="171:20:E"/>
+<stn name="Mindanao Sea" lat="9:15:N" lon="124:30:E"/>
+<stn name="Mindoro Strait" lat="12:20:N" lon="120:40:E"/>
+<stn name="Molucca Sea" lat="2:00:N" lon="127:00:E"/>
+<stn name="Mortlock Islands " lat="5:30:N" lon="153:40:E"/>
+<stn name="Natuna Sea" lat="3:30:N" lon="108:00:E"/>
+<stn name="New Britain " lat="6:00:S" lon="150:00:E"/>
+<stn name="New Guinea " lat="5:00:S" lon="140:00:E"/>
+<stn name="New Hebrides " lat="16:00:S" lon="167:00:E"/>
+<stn name="New Ireland " lat="3:20:N" lon="152:00:E"/>
+<stn name="Nomoi Islands " lat="5:30:N" lon="153:40:E"/>
+<stn name="North Island" lat="39:00:S" lon="176:00:E"/>
+<stn name="North Pacific Ocean" lat="30:00:N" lon="165:00:W"/>
+<stn name="Noumea " lat="22:16:S" lon="166:27:E"/>
+<stn name="Nouvelle-Caledonie " lat="21:30:S" lon="165:30:E"/>
+<stn name="Nouvelles Hebrides " lat="16:00:S" lon="167:00:E"/>
+<stn name="Nuku'alofa " lat="21:08:S" lon="175:12:W"/>
+<stn name="Ocean Island " lat="0:52:S" lon="169:35:E"/>
+<stn name="Okhotsk, Sea of" lat="53:00:N" lon="150:00:E"/>
+<stn name="Ombai Strait" lat="8:30:S" lon="125:00:E"/>
+<stn name="Osumi Strait " lat="31:00:N" lon="131:00:E"/>
+<stn name="Pacific Islands, Trust Territory of the" lat="10:00:N" lon="155:00:E"/>
+<stn name="Pacific Islands, Trust Territory of the" lat="10:00:N" lon="155:00:E"/>
+<stn name="Pacific Islands, Trust Territory of the" lat="10:00:N" lon="155:00:E"/>
+<stn name="Pacific Islands, Trust Territory of the" lat="10:00:N" lon="155:00:E"/>
+<stn name="Pagan " lat="18:08:N" lon="145:47:E"/>
+<stn name="Pago Pago " lat="14:16:S" lon="170:42:W"/>
+<stn name="Palikir " lat="6:55:N" lon="158:08:E"/>
+<stn name="Panama, Gulf of" lat="8:00:N" lon="79:30:W"/>
+<stn name="Papeete " lat="17:32:S" lon="149:34:W"/>
+<stn name="Passion, Ile de la " lat="10:17:N" lon="109:13:W"/>
+<stn name="Peleliu " lat="7:01:N" lon="134:15:E"/>
+<stn name="Perouse Strait, La" lat="44:45:N" lon="142:00:E"/>
+<stn name="Philip Island" lat="29:08:S" lon="167:57:E"/>
+<stn name="Philippine Sea" lat="20:00:N" lon="134:00:E"/>
+<stn name="Phoenix Islands" lat="3:30:S" lon="172:00:W"/>
+<stn name="Pleasant Island" lat="0:32:S" lon="166:55:E"/>
+<stn name="Polynesie Francaise " lat="15:00:S" lon="140:00:W"/>
+<stn name="Ponape " lat="6:55:N" lon="158:15:E"/>
+<stn name="Port Moresby " lat="9:30:S" lon="147:10:E"/>
+<stn name="Port-Vila " lat="17:44:S" lon="168:19:E"/>
+<stn name="Pukapuka Atoll" lat="10:53:S" lon="165:49:W"/>
+<stn name="Ralik Chain " lat="8:00:N" lon="167:00:E"/>
+<stn name="Ratak Chain " lat="9:00:N" lon="171:00:E"/>
+<stn name="Rota " lat="14:10:N" lon="145:12:E"/>
+<stn name="Rotuma " lat="12:30:S" lon="177:05:E"/>
+<stn name="Saipan " lat="15:12:N" lon="145:45:E"/>
+<stn name="Samoa Islands" lat="14:00:S" lon="171:00:W"/>
+<stn name="Samoa Islands" lat="14:00:S" lon="171:00:W"/>
+<stn name="San Bernardino Strait" lat="12:32:N" lon="124:10:E"/>
+<stn name="Santa Cruz Islands" lat="11:00:S" lon="166:15:E"/>
+<stn name="Sapudi Strait" lat="7:05:S" lon="114:10:E"/>
+<stn name="Savage Island " lat="19:02:S" lon="169:52:W"/>
+<stn name="Savu Sea" lat="9:30:S" lon="122:00:E"/>
+<stn name="Senyavin Islands" lat="6:55:N" lon="158:00:E"/>
+<stn name="Sibutu Passage" lat="4:50:N" lon="119:35:E"/>
+<stn name="Singapore Strait" lat="1:15:N" lon="104:00:E"/>
+<stn name="Society Islands " lat="17:00:S" lon="150:00:W"/>
+<stn name="Solomon Islands, northern" lat="6:00:S" lon="155:00:E"/>
+<stn name="Solomon Islands, southern" lat="8:00:S" lon="159:00:E"/>
+<stn name="Solomon Sea" lat="8:00:S" lon="153:00:E"/>
+<stn name="South China Sea" lat="10:00:N" lon="113:00:E"/>
+<stn name="South Island" lat="43:00:S" lon="171:00:E"/>
+<stn name="South Pacific Ocean" lat="30:00:S" lon="130:00:W"/>
+<stn name="Sulawesi Sea" lat="3:00:N" lon="122:00:E"/>
+<stn name="Sulu Sea" lat="8:00:N" lon="120:00:E"/>
+<stn name="Sumba Strait" lat="9:10:S" lon="120:00:E"/>
+<stn name="Surigao Strait" lat="10:15:N" lon="125:23:E"/>
+<stn name="Suva " lat="18:08:S" lon="178:25:E"/>
+<stn name="Swains Island" lat="11:03:S" lon="171:15:W"/>
+<stn name="Tahiti " lat="17:37:S" lon="149:27:W"/>
+<stn name="Taiwan Strait" lat="24:00:N" lon="119:00:E"/>
+<stn name="Tarawa " lat="1:25:N" lon="173:00:E"/>
+<stn name="Tartary, Gulf of" lat="50:00:N" lon="141:00:E"/>
+<stn name="Tasman Sea" lat="4:30:S" lon="168:00:E"/>
+<stn name="Tasmania " lat="43:00:S" lon="147:00:E"/>
+<stn name="Tatar Strait" lat="50:00:N" lon="141:00:E"/>
+<stn name="Teluk Bone " lat="4:00:S" lon="120:45:E"/>
+<stn name="Teluk Tomini " lat="0:30:S" lon="121:00:E"/>
+<stn name="Thailand, Gulf of" lat="10:00:N" lon="101:00:E"/>
+<stn name="Timor Sea" lat="11:00:S" lon="128:00:E"/>
+<stn name="Tinian " lat="15:00:N" lon="145:38:E"/>
+<stn name="Tonkin, Gulf of" lat="20:00:N" lon="108:00:E"/>
+<stn name="Torres Strait" lat="10:25:S" lon="142:10:E"/>
+<stn name="Trobriand Islands" lat="8:38:S" lon="151:04:E"/>
+<stn name="Truk Islands " lat="7:25:N" lon="151:47:E"/>
+<stn name="Tsugaru Strait" lat="41:35:N" lon="141:00:E"/>
+<stn name="Tuamotu Islands " lat="19:00:S" lon="142:00:W"/>
+<stn name="Tubuai Islands " lat="23:00:S" lon="150:00:W"/>
+<stn name="Tutuila " lat="14:18:S" lon="170:42:W"/>
+<stn name="Unimak Pass " lat="54:20:N" lon="164:50:W"/>
+<stn name="Van Diemen Strait " lat="31:00:N" lon="131:00:E"/>
+<stn name="Verde Island Passage" lat="13:34:N" lon="120:51:E"/>
+<stn name="Viti Levu " lat="18:00:S" lon="178:00:E"/>
+<stn name="Vostok Island" lat="10:06:S" lon="152:23:W"/>
+<stn name="Wake Atoll" lat="19:17:N" lon="166:36:E"/>
+<stn name="Wallis Islands" lat="13:17:S" lon="176:10:W"/>
+<stn name="Wellington " lat="41:28:S" lon="174:51:E"/>
+<stn name="West Korea Strait " lat="34:40:N" lon="129:00:E"/>
+<stn name="Western Channel " lat="34:40:N" lon="129:00:E"/>
+<stn name="Western Samoa " lat="13:35:S" lon="172:20:W"/>
+<stn name="Wetar Strait" lat="8:20:S" lon="126:30:E"/>
+<stn name="Yap Islands" lat="9:30:N" lon="138:00:E"/>
+<stn name="Yaren " lat="0:32:S" lon="166:55:E"/>
+<stn name="Yellow Sea" lat="36:00:N" lon="123:00:E"/>
+<stn name="Zakhalinskiy Zaliv " lat="54:00:N" lon="142:00:E"/>
+<stn name="Zaliv Shelikhova " lat="60:00:N" lon="157:30:E"/>
+</stationtable>

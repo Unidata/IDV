@@ -1,0 +1,91 @@
+<html><head>
+  <title>An Animation Loop of NWS WSR-88D Level III Radar Imagery</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+<body>
+
+
+
+This section describes how to make a display using Level III radar data. 
+
+
+[ht::cimg images/Level3Display.gif]
+
+
+The steps include:
+<%childlist%>
+
+
+<subhead id="choosing" intoc="false">Choosing Radar Image Data from  a Remote Server</subhead>
+
+In the Dashboard window select the <a href="../data/choosers/index.html">Data Chooser</a> tab.
+From here select the Radar tab to view the <a href="../data/choosers/RadarChooser.html">Level III Radar Chooser</a>:
+
+
+[ht::cimg ../data/choosers/images/Level3Chooser.gif]
+
+<ol>
+
+[ug::step "Choose an ADDE [ug::menu Server] and a [ug::menu Dataset] to use:" ../data/choosers/images/RadarStep1.gif {
+Try <b>Server:</b> adde.ucar.edu and <b>Dataset:</b> RTNEXRAD.
+}]
+
+[ug::step "Press [ug::button Connect] to query the server for available radars types:" ../data/choosers/images/RadarStep2.gif]
+
+[ug::step "The map shows radar station locations and IDs. Select one by clicking on it." ../data/choosers/images/RadarStep3.gif {
+The <b>Declutter</b> check box allows you to show all stations (not
+checked), or only a limited number of stations that do not overlap
+each other (checked). You will need to zoom in to see all the stations
+without overlaps.
+}]
+
+[ug::step "For the <b>Radar Data Type</b> of data from this radar, select a radar
+product, such as <B>Base Reflectivity Tilt 1</b>, from the pull-down
+menu." ../data/choosers/images/RadarStep4.gif]
+
+
+[ug::step {Either, choose a relative set of times steps (e.g., Last 5 times):} ../data/choosers/images/ImageStep4.gif]
+
+[ug::step {Or, choose a set of absolute times:} ../data/choosers/images/ImageStep5.gif {
+When choosing 
+absolute times for the first time the IDV needs to query the ADDE server 
+for the times. This may take some time.  To select more than one time 
+use Control-Click or Shift-Click. 
+}]
+
+
+[ug::step "When done, load the selected radar data with the [ug::button Add Source] button." ../data/choosers/images/ImageStep6.gif \
+"If the [ug::button Create display] button is selected then a radar display will automatically be created"]
+
+
+
+</ol>
+
+
+ 
+<subhead id="display" intoc="false">Selecting the Radar display to be made</subhead>
+
+
+The radar data source that you selected will be shown in the
+<a href="../data/FieldSelector.html">Field Selector window</a>.
+
+[ht::cimg images/RadarSelector.gif]
+
+If you checked off the [ug::button Create display] button or if you want to create another radar display
+click &quot;Image Sequence&quot; in the <b>Field</b> panel and 
+click on &quot;Image display&quot; in the <b>Displays</b> panel.
+Make the display by clicking on <b>Create Display</b>.  
+
+<p>
+You can add 
+<a href="../controls/misc/RadarGridControl.html">Radar Range Rings</a>
+to the display.
+To control time animation use the 
+<a href="../ui/Animation.html#animation">Time Animation Widget</a>.
+
+<div class="pagesubtitle">Example</div>
+[ug::jnlp radar.jnlp]
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+
+<h2><center>Sample HTML Forms UI</center></h2>
+
+<form action="idv:idv.createDisplay ( 'http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/casestudies/idvtest/grids/20020628%time%_%model%.nc','%param%','%display%','DefaultView=main;')">
+<!-- main table -->
+<table width="100%">
+<tr valign="top"><td>
+
+<!-- left column -->
+<table cellspacing="0" cellpadding="0">
+<tr valign="top"><td>
+<b>NCEP Model:</b><p>
+
+<select name="model">
+<option value="ruc">RUC</option>
+<option value="avn-x">AVN, global</option>
+<option value="eta">Eta</option>
+</select>
+</td>
+</tr>
+
+<tr valign="top">
+<td>
+<b>Model Run:</b><p>
+<input type="radio" name="time" value="00" checked> 00 UTC</input><p>
+<input type="radio" name="time" value="12">12 UTC</input><p>
+</td>
+</tr>
+</table>
+</td>
+
+<!-- middle column -->
+<td align="left">
+<b>Parameter:</b><p>
+<input type="radio" name="param" value="T" checked> Temperature</input><p>
+<input type="radio" name="param" value="RH">Relative humidity</input><p>
+<input type="radio" name="param" value="Windspeed">Wind Speed</input><p>
+<input type="radio" name="param" value="abs">Absolute Vorticity</input>
+</td>
+
+<!-- right column -->
+<td align="left">
+<b>Display Type:</b><p> 
+<input type="radio" name="display" value="planviewcontour" checked>Plan view contours</input><p>
+<input type="radio" name="display" value="planviewcolor" >Plan view color-filled contours</input><p>
+<input type="radio" name="display" value="contourxs">Contour cross-section</input><p>
+<input type="radio" name="display" value="surface">3D Isosurface</input>
+
+</td> </tr>
+
+<tr><td>&nbsp;<p><input type="submit" value="Create display"></td></tr>
+</table>
+
+</form>

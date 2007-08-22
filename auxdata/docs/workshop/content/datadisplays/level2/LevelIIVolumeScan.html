@@ -1,0 +1,72 @@
+
+<html>
+<head>
+<title>Level II Volume Scan Display</title>
+</head>
+
+<body>
+
+<div class="overview">
+<p>This IDV display shows all sweeps and individual bins 
+in a WSR-88D volume scan, 
+at their  true positions in the atmosphere.
+</p>
+</div>
+
+<p>
+
+If necessary, select Level II data and times as described in
+[ht::popup "LoadingLevelIIData.html" "Accessing WSR-88D Level II Radar Data"].
+
+<p>
+
+<ol class="step">
+
+<li>[ht::clearDisplays]
+
+<li>Select one of the times for this dataset.
+  <ul class="substep">
+    <li>[ht::editDataSourceProperties [ht::dataset {Level II Radar Data (DVN)}]]
+    <li>From the [ht::tab Times] tab, 
+        select [ht::param {1998-06-29 21:29:59Z}] time.</li>
+    <li>Click the [ht::button OK] button.
+    </li>
+  </ul>
+</li>
+
+<li>In the [ht::dialog Field Selector] window create a 
+     [ht::display Volume Scan (all sweeps)] display using 
+     the [ht::param Reflectivity] field.</li>
+
+
+<li>See the display in 3D.</li>
+  <ul class="substep">
+    <li>The 3D display of all sweeps appears in the  main  window. 
+
+  <p>
+  <div class="cimg"><img src="images/LevelIIVolumeScan.gif"></div>
+  <p>
+
+  In this display each bin value is represented by a 
+  single pixel colored by value. 
+  Since the sweeps are not solid images there is a degree of transparency.
+
+    <li>Rotate to see the display in 3D.
+    Zoom in to see individual data point values in single
+    beams.
+    <li>Check the box next to the [ht::command {Visible Range}] label
+    in the control and then click the [ht::command Change] button
+    to change the range of data that is visible.  Set the range to
+    be from <b>30</b> to <b>50</b>.
+    <li>The resulting plot will show only the pixels where the  
+    values are between 30 and 50 dBz.
+  </ul>
+</li>
+
+<p>
+
+
+</ol>
+
+</body>
+</html>

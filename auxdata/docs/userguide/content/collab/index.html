@@ -1,0 +1,72 @@
+<html><head>
+  <title> Collaboration Facility</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+The IDV provides a real-time, multi-user collaboration facility. This   
+facility supports a variety of styles of interaction including ad-hoc   
+peer-to-peer and multiple clients/one server.                           
+
+<p>
+
+To begin a collaborative session with another user bring up             
+the collaboration control user interface through the 
+[ug::menu Collaboration {Show Window}] menu. You will see:                                
+
+[ht::cimg images/Connect.gif]
+
+The user interface allows you to:
+
+<%childlist%>
+
+
+<subhead id="connect">Create and Listen for Connections</subhead>
+
+The first thing you need to do is either connect to another IDV running 
+on another machine or to start up a server on your IDV to accept        
+connections from other users. To start up a server simply press the     
+[ht::command {Start server}] button. This starts up a server that        
+will listen for incoming requests for connections. When another user    
+tries to connect to your IDV a dialog window will be shown that asks    
+whether you want to accept the connection. Clicking on the 
+[ht::command Accept new connections without asking] checkbox will 
+have the IDV automatically accept connections.                                       
+
+<p>
+You can connect to other users by entering their machine hostname into the given
+text field and clicking on the [ht::command {Connect to:}] button.
+
+
+
+<subhead id="clients">Viewing and Controlling Connections</subhead>
+
+The [ht::command Clients] tab shows the list of other users who you are 
+currently connected to. This tab also allows you to choose whether your 
+IDV should send its changes to others, whether to receive changes from  
+others and whether to relay changes from one of the IDVs that you are   
+connected to on to other connected IDVs. In the [ht::command Clients] list 
+you can also have finer granularity over who shares what.               
+
+
+[ht::cimg images/Clients.gif {Clients Window}]
+
+<subhead id="chat">Text Chat</subhead>
+
+The collaboration facility also supports text chat among connected      
+users. This interface is under the [ht::command Chat] tab. 
+[ht::cimg images/Chat.gif {Chat Window}] 
+Simply type in the message in the given  
+text field and click on the [ht::command Send] button.                  
+
+<subhead id="log">Log Display</subhead>
+
+The [ht::command Log] tab shows a log of the activities of a
+collaborative session.
+
+[ht::cimg images/Log.gif {Log Window}]
+
+
+</html>
+</body>

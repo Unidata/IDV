@@ -1,0 +1,79 @@
+
+[ug::head {Plugin Creator}]
+
+The Plugin Creator, accessed through 
+the [ug::menu Tools {Plugin Creator}] menu,
+allows you to create new plugins.
+<p>
+
+Note: This is a new facility within the IDV and is a work in progress.
+Some things, like reading in a plugin, have yet to be implemented.
+
+<p>
+A plugin is a Java JAR file that contains a set of resource
+files. These resource files can include things like the color tables
+you have created, projections, layout models, formulas, etc.
+The plugin manager supports both adding in a whole file (e.g.,
+all of the color tables you have created)
+as well as adding in individual resource objects (e.g., a specific 
+color table you have created). 
+<p>
+For a fuller explanation of the resources and how things fit together
+please refer to the 
+<a href="../../workshop/advanced/SiteInstallation.html">workshop section</a>.
+<p>
+
+<div class="pagesubtitle">Adding Resources</div>
+
+To add in a file use the [ug::menu File {Add File}] menu.
+The file dialog will come up listing the contents of
+your local .metapps directory. This is where all of the various resources
+that are created are stored. For example, if you wanted to include all 
+of your color tables then add the colortables.xml file.
+<p>
+You can also add indiviual resources 
+through the [ug::menu File {Add Resource}] menus.
+You can also add  resources through the various resource editors 
+(e.g., Jython Editor, Parameter Defaults,Parameter Aliases).
+Typically this facility is available through the editor's
+[ug::menu File] menu.
+
+
+<div class="pagesubtitle">Resources List</div>
+Each file or resource that is added into the Plugin Creator is listed
+under the Resource tab: 
+
+[ht::cimg images/PluginCreatorResources.gif  {Plugin Creator - Resource List}] 
+
+You can delete the selected resource in the list with the trash can  button
+or the delete key.
+
+<div class="pagesubtitle">Excludes</div>
+The excludes tab allows you to exclude system default resources.
+For example, in the below screen shot we are excluding color tables
+and projections. When the plugin that is defined here is loaded into
+the IDV the excludes will result in only the color tables and
+projections that are defined in this plugin to be used.
+
+[ht::cimg images/PluginCreatorExcludes.gif  {Plugin Creator - Exclude List}] 
+
+
+<div class="pagesubtitle">Properties</div>
+The Properties tab allows you to overwrite different properties the
+IDV uses. This listing is broken  up into three categories:
+User Interface, Data and Miscellaneous. 
+
+[ht::cimg images/PluginCreatorProperties.gif  {Plugin Creator - Properties}] 
+
+
+<div class="pagesubtitle">Writing the Plugin</div>
+To write the plugin simply click on the Write Plugin button. If you 
+have not specified a plugin file name (i.e., a .jar file) you will be prompted.
+If you also want to install the plugin to your local IDV plugins area
+select the Install checkbox. Note: You will need to restart the IDV
+for any installed plugins to take effect.
+
+
+[ug::foot]
+
+

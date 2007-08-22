@@ -1,0 +1,276 @@
+<html><head>
+  <title>Data Formats and Sources</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+
+
+<body>
+
+The IDV can read a variety of data formats either from local files or
+remote data servers (e.g., HTTP, TDS, ADDE)<a href="#servers">(1)</a>.  
+This page contains information about some data sources that work with the IDV.
+
+<p>
+
+To connect the IDV to data sources, 
+see  <a href="choosers/index.html">Choosing Data Sources</a>.
+<p>
+
+<%childlist%>
+
+<subhead id="formats" intoc="false">Supported Data Types and Formats</subhead>
+
+<table width="100%" border=1>
+
+<!-- <TR><TD COLSPAN=3><HR></TD></TR> -->
+
+<TR>
+<TH ALIGN=LEFT><b>Data Type</b></TH>
+<TH ALIGN=LEFT><b>Description</b></TH>
+<TH ALIGN=LEFT><b>Supported Formats</b></TH>
+<TH ALIGN=LEFT><b>Access method</b></TH>
+
+<!-- <TR><TD COLSPAN=3><HR></TD></TR> -->
+
+</tr>
+
+<!-- 4 columns :
+short simple name of data type
+description
+supported formats
+Access method
+-->
+
+<tr>
+<td>Gridded data</td>
+<td>Numerical weather prediction models, climate analysis,
+gridded oceanographic datasets, NCEP/NCAR Reanalysis</td>
+<td>
+<table>
+<tr valign="top"><td>- netCDF(<a href="#netcdf">2</a>)</td></tr>
+<tr valign="center"><td>- GRIB (1&amp;2)</td></tr>
+<tr valign="bottom"><td>- Vis5D</td></tr>
+</table>
+</td>
+
+<td>
+<table>
+<tr valign="top"><td>- local files, HTTP, TDS servers</td></tr>
+<tr valign="bottom"><td>- local files</td></tr>
+<tr valign="bottom"><td>- local files, HTTP</td></tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td>Satellite imagery</td>
+<td>Geostationary satellite imagery, MODIS, derived satellite
+products</td>
+<td>
+<table>
+<tr valign="top"><td>- ADDE (<a href="#adde">3</a>)</td></tr>
+<tr valign="bottom"><td>- McIDAS AREA</td></tr>
+</table>
+</td>
+
+<td>
+<table>
+<tr valign="top"><td>- ADDE servers</td></tr>
+<tr valign="bottom"><td>- local files, ADDE servers</td></tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td>Radar data</td>
+<td>NEXRAD Level II and Level III radar data</td>
+<td>
+<table>
+<tr valign="top"><td>- Level II</td></tr>
+<tr valign="bottom"><td>- Level III</td></tr>
+</table>
+</td>
+
+<td>
+<table>
+<tr valign="top"><td>- local files or TDS (bzip2 compressed or uncompressed</td></tr>
+
+<tr valign="bottom"><td>- ADDE servers, local files or TDS (radial products only)</td></tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td>Point observations</td>
+<td>Surface observations (METAR and SYNOP)</td>
+<td>
+<table>
+<tr valign="top"><td>- ADDE</td></tr>
+<tr valign="bottom"><td>- netCDF(Unidata, AWIPS/MADIS formats)</td></tr>
+</table>
+</td>
+
+<td>
+<table>
+<tr valign="top"><td>- ADDE servers</td></tr>
+<tr valign="bottom"><td>- local files, HTTP</td></tr>
+</table>
+</td>
+</tr>
+
+
+<tr>
+<td>RAOBs</td>
+<td>Global balloon soundings</td>
+<td>
+<table>
+<tr valign="top"><td>- ADDE</td></tr>
+<tr valign="bottom"><td>- netCDF(Unidata, AWIPS/MADIS formats)</td></tr>
+</table>
+</td>
+
+<td>
+<table>
+<tr valign="top"><td>- ADDE</td></tr>
+<tr valign="bottom"><td>- local files</td></tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td>Profiler</td>
+<td>NOAA Profiler Network winds</td>
+<td>ADDE</td>
+<td>ADDE servers</td>
+</tr>
+
+<tr>
+<td>GIS data</td>
+<td>Data typically used in Geographic Information
+Systems (GIS)
+<td>
+
+<table>
+<tr valign="top"><td>- ESRI Shapefile</td></tr>
+<tr valign="center"><td>- USGS DEM</td></tr>
+<tr valign="bottom"><td>- GeoTIFF (limited support)</td></tr>
+</table>
+</td>
+
+<td>
+<table>
+<tr valign="top"><td>- local files, HTTP</td></tr>
+<tr valign="center"><td>- local files</td></tr>
+<tr valign="bottom"><td>- local files</td></tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td>QuickTime</td>
+<td>QuickTime movies (without extensions)</td>
+<td>QuickTime</td>
+<td>Local files, HTTP</td>
+</tr>
+
+
+</table>
+
+<p>
+
+<subhead id="servers" intoc="false">Remote Data Servers</subhead>
+
+Extensive meteorological and oceanographic data is available from
+remote data servers for use in research and education.  Some of these
+data have restrictions on their use, see <a href=
+"http://www.unidata.ucar.edu/data/data_usage.html#data">
+here</a> for that information.
+
+<a name="adde">
+<div class="pagesubtitle">Abstract Data Distribution Environment (ADDE)</div>
+</a>
+
+The Unidata community maintains a set of cooperating ADDE servers
+which serve up real-time and archived atmospheric datasets for use 
+in IDV and McIDAS.   Most of the data choosers in the IDV use
+ADDE as the access method (satellite imagery, Level III radar,
+surface, profiler and RAOB).  The ADDE choosers are pre-configured 
+with a list of these cooperating servers.  You can use any of these
+to access the near-realtime data available to the Unidata community.
+For more information on accessing data on ADDE servers, see 
+the <a href="choosers/index.html">Choosing Data Sources</a> section.<p>
+
+Image data sets include:
+<ul>
+
+<b>RTIMAGES</b>: GOES East and West images in native view, not
+remapped.  Also some global Mollweide images, and an Antarctic
+composite.
+
+<BR><b>GINIEAST</b>: GOES East images, remapped to conic, Mercator
+(cylindrical equidistant), or polar projections
+channel 1.
+
+<BR><b>GINIWEST</b>:GOES West images, remapped to conic, Mercator
+(cylindrical equidistant), or polar projections
+channel 2.
+
+<BR><b>GINICOMP</b>: GINIEAST AND GINIWEST composited
+<BR><b>CIMSS</b>: products derived from one or more channels, made by
+CIMSS, SSEC.
+
+<BR><b>NEXRCOMP</b>: composites of NEXRAD imagery (1km (14 megs per
+image), 6km, 10 km radar coded message, 1-hour precip total, storm
+total precip)
+</ul>
+
+<p>
+You can configure defaults for particular images by creating
+a custom defaults file.  For more information, see 
+<a href="../misc/ImageDefaults.html">Configuring Image Defaults</a>.
+
+<p>
+
+<div class="pagesubtitle">THREDDS Data Server (TDS)/OPeNDAP</div>
+
+The IDV can access gridded data (netCDF/GRIB) and NEXRAD radar 
+data stored on a THREDDS Data Server (TDS) through the OPeNDAP 
+(formerly called DODS) protocol.
+See 
+<a href="choosers/CatalogChooser.html">Choosing a Cataloged Data Source from a Remote Server</a> 
+for more information.
+</p>
+
+<div class="pagesubtitle">HTTP</div>
+
+Many of the data sources listed in the table above can read files
+directly from web servers (e.g. Apache) through the HTTP protocol.  
+In most cases, the server must support the HTTP 1.1 protocol and 
+be configured to set the "Content-Length" and "Accept-Ranges: bytes" 
+headers. See the
+See <a href="choosers/UrlChooser.html">Choose a URL</a> for more information.
+
+<subhead id="netcdf" intoc="false">netCDF files</subhead>
+
+The Network Common Data Form ( 
+<a href="http://www.unidata.ucar.edu/software/netcdf">netCDF</a>)
+provides a common data access method for Unidata applications. This
+format can be used to store a variety of data types that encompass
+single-point observations, time series, regular grids, and satellite and
+radar images. The mere use of netCDF by itself is not sufficient to make
+data &quot;self-describing&quot; and meaningful to the IDV.<P>
+
+Generally, the IDV requires that datasets in netCDF format use <a
+href="http://www.unidata.ucar.edu/packages/netcdf/conventions.html">meta
+data conventions</a> to be able to fully understand and
+geolocate the dataset. These conventions provide documented <a
+href="http://www.unidata.ucar.edu/packages/netcdf/BestPractices.html">
+&quot;best practices&quot;</a>. The whole point of using netCDF is
+to insure your data is complete and self-describing, and can be used
+by others. Using conventions helps ensure this. We recommend you use
+CF, COARDS, or NUWG conventions for netCDF data files for the IDV, and
+be sure to follow the best practices noted above.<P>
+
+</body>
+

@@ -1,0 +1,147 @@
+<html><head>
+  <title>Time Animation</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+
+<body>
+
+
+<%childlist%>
+
+
+<subhead intoc="false" id="animation">Time Animation Widget</subhead>
+
+
+Each IDV display area or 
+View Manager (a view window and controls) has a set of time animation
+controls above the view window.
+
+[ht::cimg  ../controls/images/AnimationControls.gif]
+
+The Time Animation Widget controls looping of displays through time.
+A series of small green boxes is displayed representing each frame of the animation.
+The box corresponding to the current time is colored blue. Click on a box to 
+select a different time. Right click on a box to disable that frame in the animation.
+Disabled boxes will be colored red.
+The time of the data is displayed in the labeled pull-down list and in
+the entries of the pull down list on the left. The toolbar of button
+icons, on the right, control time animation.
+Reading from left to right, the icons on the Time Animation Widget
+do the following:
+
+<ul>
+<li> Show the first frame, and stop looping if looping is on.
+<li> Step Back one frame.
+<li> Toggle looping on or off. 
+<li> Step Forward one frame.
+<li> Show the last frame, and stop looping if looping is on.
+<li> Show the Time Animation Properties dialog box.
+</ul>
+
+<subhead intoc="false" id="animationprop">Time Animation Properties Dialog</subhead>
+
+
+Click on the <img src="images/Information16.gif" alt="i"> in the
+animation controls to see the Time Animation Properties Dialog box.
+This dialog has two tabs. 
+
+
+[ht::cimg images/AnimationProperties1.gif]
+
+By pressing [ug::button Apply] or [ug::button OK] you will set the properties
+in the Animation Widget. If you have the [ug::button Save As Default] button
+checked then the properties will be saved off and used every time a new Animation
+Widget is created. For example, you may find that you are always setting the
+dwell rate to a particular value. You can save that state off as the default
+state for all Animation Widgets that are subsequently created, both in the current
+run of the IDV and in future runs.
+
+<subhead intoc="false" id="animationsettings">Settings Tab</subhead>
+
+
+The first tab allows you to change the values that
+control looping.  
+<p>
+
+The <b>Dwell</b> controls how fast the animation occurs.
+Click on the slider icon: <img src="images/Slider16.gif"> to change the values.
+Values are seconds/frame.
+
+<ul>
+<li><b>Forward</b> controls speed of looping forward.
+<li><b>Backward</b> controls speed of looping backwards.
+<li><b>First</b> how long first frame is seen.
+<li><b>Last</b>  how long last frame is seen.
+</ul>
+
+
+
+Select the looping style with the [ug::menu Direction] menu.
+<ul>
+<li><b>Forward</b>  Loop forward in time
+<li><b>Backward</b> Loop backward in time
+<li><b>Rocking </b> Looping alternates between forward and backward directions.
+</ul>
+
+Share the time animation in a display with the animation in other displays with the
+[ug::button Share Times] button. 
+See <a href="../collab/Sharing.html">here</a> for more information.
+
+
+<p>
+Check [ug::button Boxes Visible] to show the boxes in the Time Animation Widget.
+The time boxes allow you  to configure which frames will be disabled in the Time Animation Widget.
+This behaves the same as the boxes in the main widget.
+
+<p>
+  
+You can also set the behavior for when the set of times available changes
+with the [ug::menu Reset To] menu. The options are the Start Time, End Time, or No Change.
+
+
+<subhead intoc="false" id="animationset">Define Animation Times Tab</subhead>
+The second tab allows you to define a custom animation time set.
+
+[ht::cimg images/AnimationProperties2.gif]
+
+By default, the times used in the animation time set are all of the times
+from the data that is being displayed. However, you can define your own 
+time set by selecting the [ug::button Define your own list of times] button. 
+
+<p>
+You define how to determine the start time, end time and a 
+time interval. The time interval is used to create the set of time steps (inclusive) between the start and
+end times.  
+The start time and end time modes are determined  one of four  ways:
+
+<ul>
+<li> [ug::button Use First/Last Time from Data] This takes the time from the data that is being
+displayed.
+<li> [ug::button Current Time (Now)] This automatically updates the animation time set
+to use the current clock time. This is useful for animation of real time  data. If you select
+this option you can then define how often the animation set is updated with the
+[ug::button Refresh Rate] field. The [ug::button Round To] field allows you to specify
+a rounding factor.
+<li> [ug::button Fixed] This mode allows to you to specify a fixed date/time.
+<li> [ug::button Relative to End/Start time] This mode uses the other time
+as the base time. For example, you could set the end time to be the Current Time. And
+set the start time to be relative to the end time minus 1 hour (using the start time
+offset field). Note: you cannot have  start and end times both be relative to one another.
+</ul>
+
+Once you select the start and end time modes you can define an offset which is added (or subtracted)
+to the base time.  To change the offset select the 
+<img src="../images/edit.gif"> button. When you do this the [ug::button Offset Dialog] will be shown:
+[ht::cimg images/OffsetDialog.gif]
+This allows you to define a time offset by entering days, hours and minutes. Note, you can also
+specify a sign, &quot;-&quot; or  &quot;+&quot;.
+
+
+<p>
+By pressing apply you can apply the changes that you have made. This is also a good way to
+see if there are any errors. For example, the end time cannot be less than the start time.
+
+
+</body>
+</html>

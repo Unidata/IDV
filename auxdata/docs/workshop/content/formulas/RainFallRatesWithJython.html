@@ -1,0 +1,181 @@
+<html>
+<head>
+<title>Doing More with Jython</title>
+</head>
+
+<body>
+
+
+[ht::desc More about Jython in the IDV: rainfall rate estimated from Level III radar imagery]
+
+<h3>Radar Reflectivity and Rainfall Rates</h3>
+
+<p>
+created by Charlie Murphy, Kean University, Union, New Jersey
+
+<P>
+
+The Marshall-Palmer distribution is the basis for a relationship
+  between radar reflectivity Z and the rainfall rate R. For more information 
+  about the Marshall-Palmer distribution refer to
+  [ht::popup "http://www.roc.noaa.gov/ops/z2r_osf5.asp" "http://www.roc.noaa.gov/ops/z2r_osf5.asp"]. The empirical relationship 
+  estimating reflectivity from rainfall rate is 
+  dBZ=aR**b,
+where a and b are constants depending upon precipitation regime 
+(units of Z in mm**6/m**3 and R in mm/hr) .
+We will now create and apply a Jython function to covert a 
+WSR-88D Level III radar
+  reflectivity image into a gridded estimate of rainfall rates,
+and make contour plots of the results.
+
+<p>
+
+Inverting the Marshall-Palmer relationship, 
+we obtain for a rainfall rate estimate
+
+<ul><pre>R= ( (10**(dBZ/10))/a )**(1/b)</pre></ul>
+
+<ol class="step">
+
+<li>Setup</li>
+  <ul class="substep">
+    <li>[ht::clearDisplaysAndData]
+    <li>Make sure the menu item
+    <code class="menu">Maps-&gt;Reset projection with new data</code> 
+    is checked on.
+    </ul>
+</li>
+
+<li>Load the data</li>
+  <ul class="substep">
+  <li>Load the bundle file: </li>
+
+<pre>
+  <%workshop.sitepath%>/radar-setup.xidv 
+</pre>
+
+   Use the [ht::command URL:] entry box in the 
+   [ht::dialog Data Source Chooser].  [ht::cutAndPasteTip]
+   This bundle points to some of the Bow Echo Case study 
+   level III radar data for DVN  for 6/29/98. 
+   The bundle automatically finds the data, 
+   downloads 4 time steps, and makes a display of
+   reflectivity. This should take less than 30 seconds.
+  <li>Zoom in and 
+  look at the image to get an idea of the radar reflectivity for 
+  this case.</li>
+  </ul>
+
+
+<li>View the Jython Method</li>
+  <ul class="substep">
+
+  <li>Now we will use a Jython method to convert dBZ into rainfall 
+  rate estimates. Click the main menu item
+  <code class="menu">Edit-&gt;Formulas-&gt;Jython library</code>  
+  from the main menu bar to get the editor window. 
+<li>Click on the tab [ht::command .../default.py].  (This assumes you
+are running the IDV with the workshop site path. If not, enter the
+method below by hand.)
+<li>You should see this method:
+
+    <ul><pre>
+#
+# function dBz2R to calculate rainfall rate from dBz reflectivity
+#
+def dBz2R(dBz, a=200, b=1.6):
+      a = float(a)
+      b = float(b)
+      # a Z to R relation, where a and b are 
+      # Marshall-Palmer constants. Results in in/hr.
+      c=10.**(dBz/10.)
+      d=c/a
+      r=d**(1.0/b)
+      r=0.039*r
+      return r
+</pre></ul>
+  The terms <b>a=200, b=1.6</b> supply default values for the 
+  two constants a and b in the formula, which depend on rainfall regime.
+  </ul>
+</li>
+
+<li>Create a Formula using the Method dBz2R</li>
+  <ul class="substep">
+
+  <li>To implement this method you need to create a new formula 
+  to call it (for more see 
+[ht::popup "SimpleFormulas.html" "IDV Formulas"]).
+  Use the menu choice [ht::command Edit->Formulas->Create Formula].
+  <li>The formula expression is simply  
+  <ul><pre><b>dBz2R(dbz)</b></pre></ul>
+  Give the new formula a 
+  Name (such as "ZtoR"), a Description (such as "Z to R calculation")
+  and the Group "workshop".
+  For <code class="command">Displays to Use</code>, click off the
+  <code class="command">Use all displays</code> and click on 
+  [ht::display Contour Plan View] and 
+  [ht::display Color Shaded Plan View].  Enter the formula in the
+  <code class="command">Formula</code> box.
+  (Note this does not have the <b>a=200, b=1.6</b> arguments; Jython will
+  use the values inside the method definition).
+  </ul>
+</li>
+
+<li>Now you can invoke the formula to convert the radar 
+  reflectivity image to rainfall rates in mm/hr. 
+  <ul class="substep">
+  <li>Click on the formula name, select [ht::display Contour Plan View] for
+  your display type, and click on [ht::command Create Display].
+
+  <li>In the [ht::dialog Field Selector] click on Image Sequence
+  and click on [ht::command OK].
+  <li>This calculation may take a minute or more for all times.
+  </ul>
+</li>
+
+<li>Examine the display of rainfall rates  in mm/hr.
+Start time animation and you will see the contours over the radar image. 
+
+<li>Now create a rainfall rate color shaded image
+   to help you see the rainfall rates
+  corresponding to the colors from the color table. Select your formula and 
+  [ht::display Color Shaded Plan View] 
+  for the display type, pick the same radar data object
+  as you did for the Contour Plan View. 
+  Note that there is no time delay for this display - the results
+  of the computation are cached and used again.
+  <li>To help visualize the rainfall rate 
+  apply a different color table to your rainfall 
+  rate image by choosing in the control window 
+  <code class="menu">Color Table -&gt;Radar-&gt;ATD-&gt;Reflectivity</code>
+  <li>Compare the contours to the rainfall rate image, and zoom in
+  to get a closer view of the values of the 
+  rainfall rates from the contour labels.
+  You can click on the legend for either the contours or the color shaded
+  image to turn them on and off for better viewing.
+  </ul>
+</li>
+
+<li>Parameterizing the Arguments to the Method</li>
+  <ul class="substep">
+  <li>There are two "constants" in the Z-R calculation which 
+  are not constant but which 
+  depend on the precipitation regime, a and b.  You can have them
+  specified by the user at run time rather than using fixed values.
+  <li>In the formula definition change the formula to
+<pre>
+    dBz2R(dBz, user_a, user_b)
+</pre>
+  The [ht::qt user_] part of these operands 
+  is special and denotes to the IDV numeric
+  or string operands that are to be provided by the user through a prompt.
+  <li>When you run the formula you will be asked for values for a and b,
+  as well as for dBz. Use a somewhat less than 200 and b somewhat
+  less than 1.6 to see larger values in the result.</li>
+</ul>
+</li>
+
+</ol>
+
+</body>
+</html>

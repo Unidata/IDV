@@ -1,0 +1,254 @@
+
+[ug::head {Jython Methods}]
+
+
+First read about <a href="Formulas.html">IDV Formulas</a>.
+
+<p>
+
+IDV analysis calculations 
+use the Jython computer language. 
+Jython  is  the Python language, implemented in Java. 
+The Jython user sees regular Python and no Java. You do not need
+to know Java to use Jython. Jython and Python have a simple syntax 
+but this is a powerful computer language
+that can do most everything FORTRAN, C++, and Java can do.
+
+<p>
+
+Jython (Python) is designed to be easy and intuitive, as far as possible. 
+Jython is as easy to write as FORTRAN, and easier than Java or C++. 
+If you have existing FORTRAN code, conversion may be 
+straightforward, with line by line revisions.
+In IDV  you can use any normal built-in Python (Jython)
+operator, such as +, -, / *, and 
+** for power, or numeric functions, such as abs, round, pow, or sqrt.
+
+<p>
+
+The IDV uses Jython for computations for three reasons. One is that 
+Jython can call Java code so there can be full integration between
+Jython methods and internal code in the IDV (you can see examples in
+the Jython library described below). 
+Another reason is that the IDV uses VisAD software
+to store and manage data, and VisAD software is written in Java. 
+VisAD code also 
+can be called directly by Jython. To work with data in the IDV you
+ use VisAD. And finally, because Jython is as easy
+to use as any computer language, and you can do simple things simply.
+
+<p>
+
+You do not need to study Jython/Python to use VisAD formulas.
+To learn more about Jython and Python, we recommend these books
+<ul>
+<i>The Quick Python Book</i> by Daryl Harms, Manning. 
+<br><i>Jython for Java Programmers</i> by Robert Bill, New Riders.
+<br><i>Python Essential Reference 2nd edition</i> by David Beazley, New Riders.
+<br><i>Python Developers Handbook</i> by Andre Lessa, Sams Publishing.
+</ul>
+and  web sites:
+<br> 
+<a href="http://www.python.org">http://www.python.org</a>, 
+<BR>
+<a href="http://www.jython.org">http://www.jython.org</a>,
+<BR>
+<a href="http://www.ssec.wisc.edu/~tomw/visadtutor/">Using Python with VisAD</a> (
+http://www.ssec.wisc.edu/~tomw/visadtutor/ ).
+
+<br>Refer to one of these books or web sites for how to write Jython.
+
+<div class="pagesubtitle">VisAD  and the IDV</div>
+
+The IDV uses and supports 
+<a href="http://www.ssec.wisc.edu/~billh/visad.html"><b>VisAD</b></a>,
+a Java library to provide display and analysis code for
+multi-dimensional data. All data objects used by the IDV are actually,
+invisibly to the user, stored in VisAD data objects, which carry with
+them information about units, errors, navigation or coordinate systems
+and transformations, and other metadata.
+
+<p>
+
+VisAD includes a package of code,
+visad.python.JPythonMethods, to allow Jython calls to operate
+on VisAD data objects, such as 3D grids.  
+<p>
+
+You may use the IDV and its computation features without knowing
+anything about VisAD. 
+However to do more you will want to see the documents for 
+visad.python.JPythonMethods at
+<b>http://www.ssec.wisc.edu/~dglo/visad/ </b>.
+In your web browser, in the upper left box in this page, scroll down
+to visad.python and click on it. In the lower left box click on
+JPythonMethods.
+
+
+<div class="pagesubtitle">Different data sources and automatic navigation</div>
+
+The IDV does a lot of computational help for you. 
+An IDV formula or Jython method can be applied, without alteration,
+to a single value, to data from a vertical sounding or a balloon
+track, or to different 2D or 3D grids. All you need is one line of code.
+
+<P>
+
+You can write a simple formula such as (CT*1.8 + 32.0) - dewptF 
+and the IDV
+automatically applies the calculation to every element in large 3D
+grids referred to as CT and dewptF. No loops over grid points are needed;
+and you don't even need to know anything about how the grid is 
+defined, mapped on the Earth, 
+or the data format.  You can even use different sources for the
+individual parameters, for example, CT can come from an Eta model output 
+grid and dewptF from your own local weather model. The two grids need hot have
+the same grid point locations nor the same areal coverage. The results
+are computed in the area of overlap, on the grid points locations of the
+first grid. Interpolation is automatically applied where needed.
+
+
+<div class="pagesubtitle">Defining your own Library of Jython Methods</div>
+
+The IDV knows how to run Jython, and can use special
+Jython methods to operate on VisAD data objects. But you can't type much
+in the single entry line in the IDV formula editor.
+
+<p>
+
+The IDV allows you to write your own methods, in Jython, of any
+length. Then you can call these methods in an IDV formula. Here is an
+example how to do it.
+
+<p>
+
+From the main menu bar, 
+select the [ug::menu Edit Formulas {Jython Library}] menu item.
+This brings up the brings up the  Jython Library Editor:
+
+[ht::cimg images/JythonLibraryEditor.gif]
+
+
+The Jython Library window has two or more panes selected by tabs at the
+top. "resources/default.py" is the user library of 
+Jython methods you have created in this editor
+pane and saved. "DefaultIdv/default.py" is Jython methods supplied with the
+IDV that you can call in your methods or formulas. You cannot edit these IDV
+methods, but you can use the source code to see how things are
+done, and your formulas and methods can call the methods in the IDV 
+method library.
+
+<p>
+
+The user pane is an editor window 
+that uses simple mouse actions to move the insertion point and 
+mark areas for cut and paste. Drag the mouse to highlight; use the
+delete or backspace key to remove highlighted text.
+
+<p>
+
+The simple wind chill method in the figure 
+below illustrates some basics of writing
+a Jython method.  A Jython method starts with the word <b>def</b>. 
+The first line
+includes
+the method name and argument list, and <b>ends with a
+colon ":"</b>. 
+Method names are, by convention, descriptive with each first
+letter
+of a word in upper case, except the first letter is lower case. 
+Underscores are not used. Using this convention means others can use
+your code with less trouble. Do not omit the final colon or it will
+not be correct Jython.
+
+<p>
+
+Documentation, which is optional but highly
+recommended, is enclosed in sets of triple quotes beginning in the
+first line
+after "def." with first line setting the indent level for the
+method.   Comment lines begin with #, located anywhere.
+
+<p>
+
+Code blocks correspond to the same level of indentation, such as
+the code block in these methods. Indentation in a 
+method can be any number of spaces but all must the the
+same or the code will not execute. There is no extra end-of-line
+character. There  is no declaration of new variables, you simply use them
+when needed and the type of data is deduced by Jython from the context.
+
+<p>
+
+Indentation must be correct in a Python program or it will not
+run, or it will fail to run correctly. 
+How many spaces you use for a code block indent is
+up to you, but must be one or more.
+
+<p>
+
+The Jython Library Editor automatically imports the methods in 
+visad.python.JPythonMethods. You can use them simply by typing the
+method names in your methods.
+
+<p>
+
+Click on <b>Save</b>. The code you entered is checked
+for valid Jython syntax;  If there is an
+error, a pop-up window will appear with the message <b>An exception has
+occurred writing in Jython library</b>. The actual error will also be
+printed in the console window running the IDV. Correct the error and
+try to save again. The usual cause for errors is typing mistakes,
+irregular code indents, or missing colons where needed.
+<b>OK</b> saves the library and exits the editor window.
+
+<p>
+
+In this example the arguments and results could be single values, 
+multidimensional arrays, or any other data object supported by the IDV
+and VisAD, depending on the type of the incoming data.
+
+<p>
+
+This simple method is so short it would have been easier to
+simply type it as a one line formula.  There is no limit on on long your
+methods can be. And any method  can be called by
+other methods in the library, or by any formula, so commonly used code
+should be put in the Jython library. It is easier to
+add a new Jython method than to write an IDV formula. Put the
+complexity in methods and keep the formulas simple.
+
+<div class="pagesubtitle">Using Jython Methods in Formulas</div>
+
+When writing your formulas you can use any method you created in
+your Jython library.  Simply type the method name in the formula, with
+appropriate dummy arguments, if any. For example a formula might be
+the text "convertCToF(atemp)".  Selecting the formula for display,
+you merely need then to select which parameter from a data source to 
+use for "atemp" for that display.
+
+<p>
+
+You can cut and paste from the Jython Library Editor to the 
+formula editor. Keeping the Jython Library Editor open while creating
+formulas is handy.
+
+<p>
+
+Check out the methods in the IDV Jython library to see if they
+are of use to you. These methods also show some examples of calling
+IDV internal code.
+
+
+<div class="pagesubtitle">The Complete IDV Analysis Facility</div>
+
+
+With the Formula editor, Jython methods of any length composed in
+the Jython Library Editor, and the ability to call 
+Jython methods in formulas, you can create very complex data analysis
+expressions.
+
+
+[ug::foot]
+
+

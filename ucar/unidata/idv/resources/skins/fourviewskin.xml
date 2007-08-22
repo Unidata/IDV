@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skin>
+<!-- 
+See: /auxdata/docs/developer/contents/XmlUi.html
+    -->
+  <properties>
+    <property
+       name="view.size"
+       value="150:150"/>
+    <property
+       name="icon.wait.wait"
+       value="/ucar/unidata/idv/images/wait.gif"/>
+  </properties>
+  <ui>
+    <panel layout="border">
+      <idv.menubar place="North"/>
+      <panel
+         place="Center"
+         layout="border">
+        <panel
+           layout="flow"
+           place="North">
+          <idv.toolbar
+             id="idv.toolbar"
+             place="West"/>
+          <panel
+             id="idv.favoritesbar"
+             place="North"/>
+        </panel>
+        <panel
+           layout="grid"
+           cols="2"
+           place="Center">
+          <idv.view
+             class="${view_class}"
+             viewid="viewleft%version%"
+             id="viewleft"
+             properties="clickToFocus=true;shareViews=true;showControlLegend=false;size=%view.size%;shareGroup=view%versionuid%;"/>
+          <idv.view
+             class="${view_class}"
+             viewid="viewright%version%"
+             id="viewright"
+             properties="clickToFocus=true;showToolBars=false;shareViews=true;showControlLegend=false;size=%view.size%;shareGroup=view%versionuid%;"/>
+          <idv.view
+             class="${view_class}"
+             viewid="viewleft2%version%"
+             id="viewleft2"
+             properties="clickToFocus=true;shareViews=true;showControlLegend=false;size=%view.size%;shareGroup=view%versionuid%;"/>
+          <idv.view
+             class="${view_class}"
+             viewid="viewright2%version%"
+             id="viewright2"
+             properties="clickToFocus=true;showToolBars=false;shareViews=true;showControlLegend=false;size=%view.size%;shareGroup=view%versionuid%;"/>
+        </panel>
+      </panel>
+      <idv.statusbar place="South"  id="bottom_bar"/>
+    </panel>
+  </ui>
+  <styles>
+    <style
+       class="iconbtn"
+       space="2"
+       mouse_enter="ui.setText(idv.messagelabel,prop:tooltip);ui.setBorder(this,etched);"
+       mouse_exit="ui.setText(idv.messagelabel,);ui.setBorder(this,button);"/>
+    <style
+       class="textbtn"
+       space="2"
+       mouse_enter="ui.setText(idv.messagelabel,prop:tooltip)"
+       mouse_exit="ui.setText(idv.messagelabel,)"/>
+  </styles>
+  <components/>
+</skin>

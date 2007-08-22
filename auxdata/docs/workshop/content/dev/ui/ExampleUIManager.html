@@ -1,0 +1,144 @@
+
+[ug::head {Example UI Manager}]
+
+We're going to look at how to extend the Example user interfaces.
+
+<ul>
+<li> From a terminal window cd to the example apps directory:<br>
+[ht::cmdline {cd <%workshop.installdir%>/ucar/unidata/apps/example}]
+
+<li> View the idv.rbi file: 
+[ht::cmdline {less idv.rbi}]
+
+and note the skin entry:
+
+[ug::xml {
+  <!--The different user interfaces available  -->
+  <resources name="idv.resource.skin">
+    <resource
+       location="/ucar/unidata/apps/example/resources/skin.xml"
+       label="Example&gt;Example UI">
+     <property name="view_class" value="ucar.unidata.idv.MapViewManager"/>
+    </resource>
+  </resources>
+
+}]
+
+
+<li> We're going to change the example skin.
+<ul>
+<li> cd into the <i>resources</i> directory and bring up the skin.xml in an editor.
+<li> We're going to add a label above the view. Change the following xml:
+[ug::xml {
+           <idv.view place="Center" class="${view_class}"/>
+}]
+
+To:
+
+[ug::xml {
+        <panel layout="border" place="Center">
+           <label text="Example Skin" fontsize="24" place="North"/>
+           <idv.view place="Center" class="${view_class}"/>
+        </panel>
+}]
+
+<li> Test this real quickly with the XmlUi:
+
+[ht::cmdline {java ucar.unidata.ui.XmlUi skin.xml}]
+
+
+<li> If it is correct then run the example idv:
+[ht::cmdline {java ucar.unidata.apps.example.ExampleIdv}]
+
+
+</ul>
+
+<li> Note  that this skin is not the default. 
+<ul>
+<li> Go up a level to the <i>example</i> directory.
+<li> Edit the <i>idv.rbi</i> file and add the property line to the skin entry:
+[ug::xml {<property name="default" value="true"/>}]
+
+e.g.:
+[ug::xml {
+    <resource
+       location="/ucar/unidata/apps/example/resources/skin.xml"
+       label="Example&gt;Example UI">
+     <property name="view_class" value="ucar.unidata.idv.MapViewManager"/>
+     <property name="default" value="true"/>
+    </resource>
+}]
+</ul>
+
+<li> Save the idv.rbi file and run the ExampleIdv again.
+
+<li> Note that there are still the system skins available.
+<ul>
+<li> Go back to the example idv.rbi file and add a loadmore=&quot;false&quot; to the resources tag:
+[ug::xml {<resources name="idv.resource.skin" loadmore="false">}]
+
+<li> Run the ExampleIdv again. Note that there is only the example skin.
+
+
+</ul>
+
+
+<li> Now, one more thing. Lets write a little Java code. 
+<ul>
+<li> Go to the example skin.rbi and change the label tag you added to
+be <i>example.label</i>:
+[ug::xml {<example.label text="Example Skin" place="North"/>}]
+
+<li> Bring up the ExampleUIManager.java in an editor.
+
+
+<li> Look for the <i>doMakeIdvXmlUi</i> method. Notice we create our own IdvXmlUi
+object. So far it does nothing.
+
+<li> Lets add some code that can handle this tag. e.g.:
+<pre>
+public Component createComponent(Element node, String id) {
+    String tagName = node.getTagName();
+    if(tagName.equals("example.label")) {
+        JLabel label = new JLabel(XmlUtil.getAttribute(node, XmlUi.ATTR_TEXT));
+        label.setForeground(Color.red);
+        return label;
+     }
+     return super.createComponent(node, id);
+}
+</pre>
+
+<li> Compile and run the ExampleIdv
+
+
+</ul>
+
+
+<li> Clean up our changes. Remove the loadmore=&quot;false&quot; attribute 
+and the <i>default</i> property from the idv.rbi
+
+<li> One more thing, let's look at the ExampleUIManager again and see how we can skip this whole
+skin thing if needed.
+<ul>
+<li> Look at the method:
+<pre>
+    public IdvWindow createNewWindow(List viewManagers, boolean notifyCollab,
+                                     String title, String skinPath,
+                                     Element skinRoot) {...}
+</pre>
+
+<li> This method is responsible for creating the GUI windows in the IDV.
+<li> Note the code in there that allows us to skip or not skip the skins:
+<pre>
+        if(!testNewWindow)  {
+            return super.createNewWindow(viewManagers, notifyCollab,title, skinPath, skinRoot);
+        }
+</pre>
+
+</ul>
+
+
+</ul>
+
+
+

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<controls>
+
+  <control
+     id="siegedrawingcontrol"
+     categories="GRID-2D-*;GRID-3D-*"
+     class="ucar.unidata.apps.lead.siege.SiegeDrawingControl"
+     description="Siege control"
+     canstandalone="true"
+     label="Siege Control"
+     displaycategory="General"
+     properties="displayName=Siege Control;windowVisible=true;">
+     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+
+</controls>

@@ -1,0 +1,81 @@
+<title>Using the New Color Table</title>
+
+
+
+<meta name="description" content="Time to use the new color table.">
+
+<div class="overview">
+Now we are going to use the new color table that we created in
+the previous section.
+</div>
+
+<ol class="step">
+  
+  <li> First, load in some data and an example display from the 
+[ht::menu Displays {Favorite Bundles} {Workshop} {Color table exercise}] menu.
+  
+  <li>Note the color table that is used. By default this display uses the
+      [ht::ct   Temperature] color table for
+      the [ht::param temperature] field.</li>
+  
+  <li>Change the color table for this display to the new color table,
+      [ht::ct   Comfort]  by
+      clicking on the [ht::button Color Table] button to popup the Color Table
+      menu.</li>
+  
+  <li>Change the range.</li>
+  
+  <ul>
+    
+    <li>Note  the range that is being used is -90.0 to 45.0. This is the default
+        range for
+        [ht::param temperature] data. However, our [ht::ct Comfort] color table was 
+         set
+        up to
+        use -45 to 45 as a range.</li>
+    
+    <li>Change the range through the color table menu by clicking on
+    the &quot;Comfort&quot; color table. You can also 
+    click on the legend's color bar or through the
+    display control's [ht::menu Edit {Color Table} {Change Range...}] menu.  
+    Enter the values  -45, 45 and click the [ht::button OK] button.</li>
+  </ul>
+  
+  <li> You can quickly change the entire color table for this display.
+  <ul>
+  <li> Click on the &quot;Comfort&quot; color table to show the popup.
+  <li> Select [ht::command Dimmer].
+  <li> Select [ht::command Brighter].
+  <li> You can also change transparency.
+  </ul>
+
+  <li>Bring up the [ht::dialog Color Table Editor] by clicking on the color bar
+      in the control window.</li>
+  
+  <ul>
+    
+    <li>Changes to this color table are automatically applied to the display 
+     unless
+        the [ht::button Auto update]
+        checkbox is unchecked.</li>
+    
+    <li>Let's make our [ht::qt comfort] zone be semi-transparent.
+        
+    <ul>
+      
+      <li>Select 80% transparency.
+          
+      <li>Right click on the breakpoint at 15 and select
+          [ht::menu {Set Colors}   {Transparency Right}].
+          
+      <li>Click  the [ht::button Apply] button if [ht::button Auto update] is 
+       turned
+          off.
+        </ul>
+        
+        
+      </ul>
+    </ol>
+    
+    
+

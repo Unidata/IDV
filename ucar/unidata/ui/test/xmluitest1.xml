@@ -1,0 +1,19 @@
+<skin>
+  <ui>
+    <splitpane orientation="v" continuous="false">
+      <panel layout="grid" bgcolor="blue">
+        <label text="Top label"/>
+      </panel>
+      <panel layout="border">
+        <label text="Just a test" place="North"/>
+        <panel layout="gridbag" colwidths="0,1" cols="2" place="Center">
+          <label text="hello world"/>
+          <button label="Push me"/>
+          <label text="hello world again"/>
+          <button label="Push me again"/>
+        </panel>
+      </panel>
+    </splitpane>
+  </ui>
+
+</skin>

@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<derived_parameters>
+  <derived
+     description="One value colored by another"
+     formula="combineFields(Data_field, Color_field)"
+     id="coloredByAnother"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="System"/>
+      <category
+         display="false"
+         value="display:isosurface"/>
+      <category
+         display="false"
+         value="display:planviewcontour"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="Make flow vectors from grid relative u and v data"
+     formula="makeTrueVector(u, v)"
+     id="trueFlowVectors"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="System"/>
+      <category value="display:planviewflow"/>
+      <category value="display:streamlines"/>
+      <category value="display:windbarbplan"/>
+      <category value="display:flowxs"/>
+      <category value="display:windbarbxs"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="Make flow vectors from u and v data"
+     formula="makeVector(u, v)"
+     id="flowVectors"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="System"/>
+      <category
+         display="false"
+         value="*-flowvector-*;display:planviewflow"/>
+      <category
+         display="false"
+         value="*-flowvector-*;display:streamlines"/>
+      <category
+         display="false"
+         value="*-flowvector-*;display:windbarbplan"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="Make flow vectors from u, v, and w data"
+     formula="makeFlowField(u, v, w)"
+     id="flowVectors3D"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="System"/>
+      <category
+         display="false"
+         value="*-flowvector3d-*;display:planviewflow3d"/>
+      <category
+         display="false"
+         value="*-flowvector3d-*;display:flowxs3d"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="Simple difference a-b"
+     formula="a - b"
+     id="simpleDifference"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="System"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="Simple time difference in one parameter"
+     formula="getNthTimeGrid(field, Time_1[isuser=true,default=1]) - getNthTimeGrid(field, Time_2[isuser=true,default=0])"
+     id="simpleTimeDiff"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="System"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="Find latitude of grid points"
+     formula="extractLatitudeFromNWPGrid(fieldimpl)"
+     id="latitudeGrid"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="System"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="Speed from 2 components"
+     formula="sqrt(x*x + y*y)"
+     id="speed"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="System"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="Layer Difference"
+     formula="layerDiff(Field, user_Top_of_Layer[default=500], user_Bottom_of_Layer[default=1000])"
+     id="layerDifference"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="System"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="Slice at Level"
+     formula="getSliceAtLevel (Field, user_Level)"
+     id="slice3Dto2D"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category value="GRID-2D-*"/>
+      <category
+         display="true"
+         value="System"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="Any Field"
+     formula="field"
+     id="parameterWrapper"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="System"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="Negate A Field"
+     formula="-field"
+     id="negateField"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="System"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="3D Map"
+     formula="make3DMap(MapData, Topography[categories=param:ALTITUDE;param:Elevation])"
+     id="3Dmap"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="System"/>
+      <category value="display:topography"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     id="navImage"
+     description="Geolocate an Image"
+     formula="makeNavigatedImage(image, Upper_Left_Lat[isuser=true,default=90], Upper_Left_Lon[isuser=true,default=-180], Lower_Right_Lat[isuser=true,default=-90], Lower_Right_Lon[isuser=true,default=180])"
+     isenduser="true"
+     isdefault="false">
+    <categories>
+      <category
+         display="true"
+         value="System"/>
+      <category
+         display="false"
+         value="display:imagecontrol"/>
+      <category
+         display="false"
+         value="display:imagecontroloverz"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="Wind Shear Vectors"
+     formula="windShearVector(u, v, top[isuser=true,default=500], bottom[isuser=true,default=850])"
+     id="Wind Shear Vector"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="System"/>
+      <category value="display:flowxs"/>
+      <category value="display:windbarbplan"/>
+      <category value="display:streamlines"/>
+      <category value="display:planviewflow"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="Layer Wind Shear"
+     formula="windShear(u, v, z, top[isuser=true,default=500], bottom[isuser=true,default=850])"
+     id="wind shear"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="System"/>
+      <category value="display:planviewcontour"/>
+      <category value="display:planviewcolor"/>
+      <category value="display:planviewcontourfilled"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="Slice at Altitude"
+     formula="getSliceAtAltitude (Field, user_Altitude, user_Unit[default=m])"
+     id="altitudeSlice"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="System"/>
+      <category value="GRID-2D-*"/>
+      <!--
+      <category value="display:planviewcontour"/>
+      <category value="display:planviewcontourfilled"/>
+      <category value="display:planviewcolor"/>
+      -->
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+     description="Resample grid"
+     formula="resampleGrid(grid, gridwithNewDomain)"
+     id="resampled grid"
+     isdefault="false"
+     isenduser="true">
+    <categories>
+      <category value="GRID-2D-*"/>
+      <category value="GRID-3D-*"/>
+      <category
+         display="true"
+         value="System"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived id="Image over topography" 
+           description="Image over topography" 
+           formula="image" 
+           isenduser="true" 
+           isdefault="false">
+    <categories>
+      <!--
+      <category value="RGBIMAGE"/>
+      -->
+      <category value="System" display="true"/>
+      <category value="display:imagecontroloverz"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Three Color (RGB) Image" formula="combineRGB(red, green, blue)" id="threeColorImage" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="System"/>
+      <category value="display:imagecontrol"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived id="Change Unit" description="Change Unit" formula="newUnit(field, name[isuser=true], unitSpec[isuser=true])" isenduser="true" isdefault="false">
+    <categories>
+      <category display="true" value="System"/>
+    </categories>
+    <operands/>
+  </derived>
+</derived_parameters>

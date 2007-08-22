@@ -1,0 +1,42 @@
+<html><head>
+  <title>Transect Views</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+
+<body>
+The Transect View is a 2-Dimensional display that shows
+data along a transect line.  This type of
+view can be created through the [ug::menu File New {View Window}] menu.
+
+[ht::cimg images/TransectViewManager1.gif -caption {Transect View}] 
+
+
+
+The left vertical axis shows altitude in meters, the right axis shows
+pressure levels.  The horizontal axis shows distance along the transect.
+You can zoom and pan in this display with the normal key and mouse 
+combinations.
+<p>
+The transect line  that is being used in this view can be displayed or changed
+through the [ug::menu Transects Edit] menu. This creates a 
+<a href="../controls/misc/TransectDrawingControl.html">Transect Drawing Control</a>
+that is shown in another Map View.
+The Transect Drawing Control allows you to create or modify transect lines.
+Note, when you change a transect line the Transect View is automatically
+changed.
+You can also select any of the pre-defined or user created transects
+from the [ug::menu Transects] menu as well.
+<p>
+
+In the [ug::button Transects] tab of the [ug::button Properties] 
+dialog for the Transect View (from [ug::menu View Properties])
+you can define a maximum distance to show. Normally, data that
+lies with the bounding lines that are orthogonal to the transect
+line is shown in this display. The max distance gives a display radius. 
+Data that lies past this max distance is not displayed.
+
+
+
+</body>
+</html>

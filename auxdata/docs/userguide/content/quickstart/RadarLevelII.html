@@ -1,0 +1,151 @@
+<html><head>
+  <title>Level II Radar</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+
+This section describes how to  create displays from 
+WSR-88D Level II data.  The set of steps include:
+
+<%childlist%>
+
+
+<subhead id="accessing" intoc="false">Accessing WSR-88D Level II Radar Data</subhead>
+
+The Level II data is supplied as volume-scan files,                     
+each file having all data from one WSR-88D radar                        
+for all sweeps for one &quot;time&quot;. Unidata                        
+Community sites can receive Level II data using the <a                  
+href="http://www.unidata.ucar.edu/software/ldm/index.html">      
+Unidata Local Data Manager (LDM)</a>. Archived Level II data is         
+available from the <a href="http://www.ncdc.noaa.gov/"> National        
+Climatic Data Center (NCDC)</a> (data from NCDC must be un-tarred).
+
+<p>
+The files should be stored on your file system with each station's files 
+in a directory (folder) whose directory name is the station 
+4-character ID (e.g., KTLX for Oklahoma City).  In many cases the data
+files do not have any location information in them and the IDV uses the
+directory name as a first guess at the station location.  Otherwise,
+use the [ug::label Radar Location] widget to specify the location.
+
+<subhead id="chooser" intoc="false">Choosing Level II Radar Data</subhead>
+
+In the <a href="../data/choosers/index.html">Data Source Chooser</a>
+window click on the <b>Radar</b> tab and then the 
+<b>Level II</b> tab.
+
+[ht::cimg ../data/choosers/images/Level2Chooser.gif]
+
+Use the file chooser to find the directory which holds the data you     
+want to display. Click on a file name you desire (multiple files can be 
+selected with the <i>Shift</i> or <i>Control</i> keys) or select
+the latest <b>N</b> files. When you have   
+selected all files you need, click the <b>Add Source</b> button.  
+
+<subhead id="displays1" intoc="false">Making Level II Radar Displays</subhead>
+
+The data source is shown in the 
+<a href="../data/FieldSelector.html">Field Selector window</a>. 
+Level II     
+data has three moments or data types: Reflectivity, RadialVelocity,    
+and SpectrumWidth. The IDV has several kinds of displays for Level II  
+data. Any of the moments can be shown with any of the displays. Here we 
+will use examples showing reflectivity. Clicking on the "Reflectivity"  
+entry in the <b>Field</b> panel will show the list of available         
+displays in the <b>Displays</b> panel.                                  
+
+[ht::cimg images/Level2Selector.gif]
+
+<subhead id="2displays" intoc="false">2D Displays of Individual Sweeps</subhead>
+
+[ht::cimg images/LevelIIPPI2D.gif {Level-II 3D Display}]
+
+Select the <b>Radar Sweep View in 2D</b> in the <b>Displays</b> panel and    
+click on <b>Create Display</b>. <b>Radar Sweep View in 2D</b> plots the      
+data as an colored image on the base of the 3D display area. This       
+mimics conventional PPI plots on a map. 
+
+<p>
+
+The 
+<a href="../controls/level2/RadarSweepControl.html">Radar Sweep Control</a> 
+allows you to change which sweep elevation you want         
+to see. You can add range rings with the [ug::menu Displays {Add        
+Range Rings}] menu item. You can modify the range rings with the        
+<a href="../controls/misc/RadarGridControl.html">Radar Range Rings      
+control</a>.                                                            
+
+
+
+<subhead id="3ddisplays" intoc="false">3D Displays of Individual Sweeps</subhead>
+
+[ht::cimg images/LevelIIPPI3D.gif {Level-II 3D Display}]
+
+Select the <b>Radar Sweep View in 3D</b> entry in the <b>Displays</b> panel. 
+<b>Radar Sweep View in 3D</b> plots the data as an colored image, with the   
+data plotted in 3D space at the elevation where the sweep occurred. You 
+can <a href="../ui/Navigation.html">rotate</a> the display to see the   
+three dimensional nature.                                               
+
+<p> 
+
+You can use this display to merge radar data display with upper         
+air data such as the IDV plots of NOAA Profiler data. Since             
+the Earth is projected onto a flat surface in this display,             
+the sweep has a shape very close to a rotated parabola. The <a          
+href="../controls/level2/SweepControl.html">Radar Sweep Control</a>     
+allows you to change which sweep elevation to display.                  
+
+
+<subhead id="rhi" intoc="false">Pseudo-RHI Displays in 2D and 3D</subhead>
+
+[ht::tblimg  {images/LevelIIRhi2D.gif {Level-II 2D RHI}} {images/LevelIIRhi3D.gif {Level-II 3D RHI}}]
+
+Select <b>RHI</b> in the <b>Displays</b> panel and press <b>Create Display</b>.
+<b>RHI</b> plots the data as an colored vertical cross section at the true 
+elevations of the beams in 3D space (bottom illustration). This pseudo-RHI is 
+constructed from several horizontal sweeps of the radar. You may have to rotate 
+the display to see the RHI in 3D. 
+
+<p> 
+
+The beam width is indicated by the vertical extent of each colored 
+vertical stripe, corresponding to a bin beam bin sample. Beam overlap is clear. 
+Position of the RHI in azimuth can be adjusted by dragging the little box 
+on the end of the selector line above the RHI. 
+
+<p>
+
+The 2D plot of pseudo-RHI (top illustration) is shown in the <a         
+href="../controls/level2/RhiControl.html">RHI Control</a>. That control 
+also has an auto-rotate feature. The RHI displays have time animation.  
+
+
+<subhead id="allsweeps" intoc="false">All Sweeps in 3D</subhead>
+
+[ht::cimg images/LevelIIVolumeScan.gif {Level-II Volume Scan}]
+
+Select "Reflectivity" in the <b>Field</b> panel and select <b>Volume    
+Scan (all sweeps)</b> in the <b>Displays</b> panel. <b>Volume Scan (all 
+sweeps)</b> plots the data as 3D field of points colored by value. Each 
+point is a bin value; all sweeps and bins are shown.                    
+
+<subhead id="isosurface" intoc="false">Radar Isosurfaces in 3D</subhead>
+
+Select "Reflectivity" in the <b>Field</b> panel and select              
+<b>Radar Isosurface</b> in the <b>Displays</b> panel. An isosurface
+is a 3D analog of a contour line. It shows the location of all data     
+with a single data value. Interpolation is used between sweep altitudes 
+in the IDV isosurface plot of Level II data. All data in a volume       
+scan is used. The example shown is the 50 dBZ isosurface from a line    
+of thunderstorms crossing Oklahoma at 1330Z 11 Sept 2003. Vertical      
+exaggeration is 13 to 1.                                                
+
+[ht::cimg images/LevelIIIsosurface.gif {Level-II Isosurface}]
+
+
+</body>
+</html>

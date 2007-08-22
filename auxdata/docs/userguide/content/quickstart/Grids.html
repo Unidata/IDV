@@ -1,0 +1,158 @@
+<html><head>
+  <title>Plots from Gridded Data</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+This section describes how to make plots from gridded data sets.
+The set of steps involve:
+<%childlist%>
+ 
+
+
+<subhead id="connecting" intoc="false">Connecting to a Data Source on a Remote Server</subhead>
+
+
+In the <a href="../data/choosers/index.html">Data Chooser</a> select the
+<b>Catalogs</b> tab.   
+
+[ht::cimg ../data/choosers/images/CatalogChooser.gif]
+
+Choose one of the remote <b>Catalogs:</b> 
+such as  <b>http://www.unidata.ucar.edu/georesources/idvcatalog.xml</b>
+for Unidata's catalog of near real-time model output.
+
+<p>
+
+A tree view of the catalog will be displayed. Open one, such
+as the &quot;NCEP NAM 80km CONUS model data (real and near time)&quot;, 
+by clicking on one of the tab icons 
+(<img src=../data/images/TreeTagClosed.gif alt="icon">).
+
+<p>
+
+The list of this model's run times appears. Click on one time to select
+it, and then click on the <b>Add Source</b> button. You have selected
+this model run's output to be accessible by the IDV. 
+
+<subhead id="selecting" intoc="false">Selecting the display to be
+made</subhead>
+
+
+The gridded data source that you selected will be shown in the
+<a href="../data/FieldSelector.html">Field Selector window</a>.
+In the <b>Fields</b> panel are folders of data categorized as 2D and 3D fields.
+Click on the 2D grid tab (<img src=../data/images/TreeTagClosed.gif alt="icon">)
+to expand that category list. A list of all 2D grid
+parameters in the data source appears. 
+When one of the fields is selected the list of applicable displays will be
+shown. For a complete list of example displays, see 
+<a href="../examples/index.html">Example Displays</a>.
+
+<p> Try creating a Contour Plan View by selecting that display
+in the list and clicking on the <b>Create Display</b> button.
+The display will be created and shown in the main window. The
+display's legend should also be shown. You can bring up the <a
+href="../controls/PlanViewControl.html">control window</a> by right
+clicking on the name in the legend and selecting 
+[ug::menu {Control Window}] from the popup menu.
+
+[ht::cimg images/SLPContours.gif]
+
+<subhead id="3dplot" intoc="false">To make a plot of 3D data</subhead>
+
+Click on the 3D grid tab to expand that category. A list of all 3D grid
+parameters appears. To make a plot, first  click on a
+parameter name such as "Geopotential height at isobaric levels."
+
+<p>
+Display types suitable for this parameter are listed in then
+<b>Displays</b> panel.
+Select Contour Plan View and click on the 
+[ht::command Create Display] button.
+
+
+<p>
+The initial plot is at the lowest  level in the data grid, such as 
+1000 millibar in this example. To shift the level to other levels:
+<ul>
+<li>Right click on the legend (such as "T Contour Plan
+View Level 1000") to get a pop-up menu.
+<li>Click on [ug::menu {Control Window}]
+to bring up this display's Control window
+
+<li>In the Control window
+click on the <b>Levels:</b> box to bring up the pop-up menu of
+native grid levels in the data
+<li>select the desired level, such as 500, from the list.
+</ul>
+The plot will move to 500 millibars. 
+
+<p>
+To zoom, rotate or pan this 3D
+display, see <a href="../ui/Navigation.html">Zoom, Rotate, and
+Pan</a>. Rotate the display by dragging with the right mouse button.
+(you see that the 500 millibar contours are above the surface).
+The key combination Ctrl-R will restore the display to the original
+overhead view.
+
+ 
+<p>
+To toggle on the time animation loop, use the Run/Stop 
+icon in the animation control. Read more about 
+<a href="../ui/Animation.html#animation">Time Animation Widget</a>.
+
+<p>
+To remove an existing
+display, use the [ug::menu File {Remove Display}] menu of the
+display's control window or the popup menu.
+
+<subhead id="subset" intoc="false">Subsetting Times</subhead>
+
+The IDV automatically loads data for all data times selected in the data
+selection step, and loads them as displays for an animation
+loop. Creating several displays may take time. If you only need
+to see one data time, it is better to only create displays for that time.
+
+
+<p>
+
+To make time selections that apply to all data in one data
+source,  double click on the data source name in the left panel
+of the Field Selector window to bring up the 
+<a href="../data/DataSourceProperties.html">Data Source Properties</a> editor.  Click on the [ug::tab Times] tab to subset the times.
+
+[ht::cimg ../data/images/DataSourceTimes.gif]
+
+Initially all times are selected for display by the IDV - indicated by
+the times in this window being grayed out and the box "Use All" being
+checked. To limit the selection to fewer times than all times, first
+check off the box "Use All." Then select the times you want to use by
+clicking on the times (note: you can select multiple times with the
+<i>Shift</i> and <i>Control</i> keys).
+
+<p>
+
+To make time selections for one field, use the <b>Times</b> selector in
+the lower right panel of the Field Selector, under the <b>Displays</b> 
+panel, after you select the field, and before you create the display.  
+This will override the default times for the data source.
+
+<subhead id="spatialsubset" intoc="false">Spatial Subsetting</subhead>
+You can also spatially subset the grid using the 
+[ug::tab Spatial Subset] tab of the Data Source Properties or
+the Field Selector.  This works similar to the times subsetting where
+you can set the property for all fields in the Data Source or 
+override the default for a particular field.
+<p>
+For more information on time and spatial subsetting, see the
+<a href="../data/DataSourceProperties.html">Data Source Properties</a>
+page of this User's Guide.
+
+
+
+
+
+</body>
+</html>

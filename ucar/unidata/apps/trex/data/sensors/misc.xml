@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="Misc. Sites">
+<station name="Gps" lat="36.298" lon="-119.789"/>
+<station name="Innsbruck car" lat="36.718" lon="-118.139"/>
+<station name="Mglass" lat="36.774" lon="-119.724"/>
+<station name="NCAR DBS" lat="36.77793333" lon="-118.2485167"/>
+<station name="Yale radar" lat="36.773" lon="-118.338"/>
+<station name="Yale video 1" lat="36.674" lon="-118.099"/>
+<station name="Yale video 2" lat="36.67745958" lon="-118.0459268"/>
+<station name="USAF Thermosonde" lat="36.43889" lon="-118.90361"/>
+</stationtable>

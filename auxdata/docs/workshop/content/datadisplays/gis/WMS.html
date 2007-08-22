@@ -1,0 +1,100 @@
+<html>
+<head>
+<title>Web Map Servers</title>
+</head>
+
+<body>
+
+
+<div class="overview">
+The IDV provides access to Web Map Servers (WMS).
+</div>
+
+<ol class="step">
+<li> Start fresh by clearing all displays and data [ht::refresh]
+and going to a CONUS projection.
+
+<li> [ht::backgroundImage]
+
+<li> The WMS display allows you to save off the displayed image
+in either IDV's ximg format or Google Earth's kml/kmz format.
+<ul>
+<li> From the WMS display's [ht::menu File Save] menu choose 
+[ht::menu {Save As Image XML/KML File...}].
+<li> Enter [ht::filename bluemarble.ximg].
+<li> Now, from the Files data source chooser press [ht::button Update]
+and select [ht::filename bluemarble.ximg].
+<li> Create a 3 Color (RGB) Image.
+<li> Toggle visibility of the displays.
+<li> Remove this display.
+</ul>
+
+
+
+<li> Let's look at a Topographic map.
+<ul>
+<li> Change the Layer in the WMS display to Topographic Map
+
+<li> Note that all we get is a white background. This is because the 
+size of the view is too large and the WMS we are accessing just returns
+a white image.
+
+
+<li> Zoom in over Colorado [ht::zoom]. 
+
+<li> Note that the WMS Control automatically fetches a new image when the view changes.
+This can be turned off with the [ht::button Auto-Reload] button.
+
+<li> Keep zooming. What happens? The screen went blank. This is because we
+just zoomed through the surface of the earth.
+
+<li> We can fix this by changing the projection. Choose the
+[ht::menu Projections Set {Use Displayed Area}] menu item.
+
+
+</ul>
+
+
+<li> Let's find out how far it is to walk to the cafeteria in FL2
+
+
+<ul>
+<li> Change the [ht::command Layer] to [ht::command Urban Area]
+<li> First we need to find our building. [ht::menu View] menu on the
+display control window select [ht::menu {Go to Address}].
+Note: you can also do this from the [ht::menu Projections] menu in
+the main view window.
+
+<li> Enter our building's address:
+<pre>
+3300 Mitchell Lane, Boulder, CO
+</pre>
+
+<li> Press [ht::button OK]
+
+<li> We should now be looking at FL4. Move the display so FL4 
+(control key/right mouse drag) is in the lower left.
+
+<li> Add a [ht::display Range and Bearing] control with the 
+[ht::menu Displays Special {Range and Bearing}] menu.
+
+<li> Move the endpoints to figure the distance.
+
+<li> Lets see how many furlongs it is.
+<ul>
+<li> From the [ht::display Range and Bearing] [ht::menu Edit] menu  select [ht::menu {Change Display Unit...}].
+<li> Enter &quot;furlongs&quot; and press [ht::button OK].
+</ul>
+
+
+</ul>
+
+<li> Now, go try to find your home. The [ht::command Go to Address]
+dialog can take addresses, zip codes, city/state names or lat/lon points. Mousing over the [ht::button Address] field will show a tooltip
+with the different formats available.
+
+
+</ol>
+
+</body>
+</html>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+  <action
+     id="example.helloworld"
+     image="/ucar/unidata/apps/example/resources/HelloWorld.gif"
+     description="Call hello world"
+     action="jython:idv.helloWorld();"/>
+</actions>

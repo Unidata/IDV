@@ -1,0 +1,7 @@
+idv.title = Unidata Workshop IDV
+
+##Semicolon delimited list of urls pointing to thredds catalogs
+idv.cataloglist= /ucar/unidata/apps/workshop/workshopCatalog.xml;http://www.unidata.ucar.edu/georesources/idvcatalog.xml
+
+## default projection
+idv.projection.default=World

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skin>
+  <ui>
+    <panel
+       layout="border"
+       bgcolor="red">
+      <idv.menubar place="North"/>
+      <panel
+         layout="border"
+         place="Center">
+        <panel
+           layout="flow"
+           place="North">
+          <idv.toolbar
+             id="idv.toolbar"
+             place="West"/>
+          <panel
+             id="idv.favoritesbar"
+             place="North"/>
+        </panel>
+        <panel
+           bgcolor="blue"
+           layout="grid"
+           cols="3"
+           place="Center">
+          <idv.view
+             viewid="viewleft%version%"
+             id="viewleft"
+             properties="clickToFocus=true;shareViews=true;showEarthNavPanel=false;showControlLegend=false;size=300:400;shareGroup=view%versionuid%;useGlobeDisplay=true;initialMapResources=/auxdata/maps/globemaps.xml;"/>
+          <idv.view
+             viewid="viewcenter%version%"
+             id="viewcenter"
+             properties="clickToFocus=true;showToolBars=false;shareViews=true;showEarthNavPanel=false;showControlLegend=false;size=300:400;shareGroup=view%versionuid%;useGlobeDisplay=true;initialMapResources=/auxdata/maps/globemaps.xml;"/>
+          <idv.view
+             viewid="viewright%version%"
+             id="viewright"
+             properties="clickToFocus=true;showToolBars=false;shareViews=true;showEarthNavPanel=false;showControlLegend=false;size=300:400;shareGroup=view%versionuid%;useGlobeDisplay=true;initialMapResources=/auxdata/maps/globemaps.xml;"/>
+        </panel>
+      </panel>
+      <component idref="bottom_bar"/>
+    </panel>
+  </ui>
+  <styles>
+    <style
+       class="iconbtn"
+       space="2"
+       mouse_enter="ui.setText(idv.messagelabel,prop:tooltip);ui.setBorder(this,etched);"
+       mouse_exit="ui.setText(idv.messagelabel,);ui.setBorder(this,button);"/>
+    <style
+       class="textbtn"
+       space="2"
+       mouse_enter="ui.setText(idv.messagelabel,prop:tooltip)"
+       mouse_exit="ui.setText(idv.messagelabel,)"/>
+  </styles>
+  <components>
+      <idv.statusbar place="South"  id="bottom_bar"/>
+  </components>
+  <properties>
+    <property
+       name="icon.wait.wait"
+       value="/ucar/unidata/idv/images/wait.gif"/>
+  </properties>
+</skin>

@@ -1,0 +1,40 @@
+
+<datasetChoice 
+	actiontemplate="http://unidata.ucar.edu/data?value=%choice1%&amp;fruit=%choice2%&amp;checked=%choice3%">
+    <field name="choice1" label="Test 1:" type="text" value="" />
+
+    <field name="choice2" label="Fruit:"  type="radio" value="bananas">
+      <choice name="Apples"   value="apples" />
+      <choice name="Bananas"  value="bananas" />
+      <choice name="Oranges"  value="oranges" />
+    </field>
+
+    <field name="choice3" label="Checked:" type="boolean" value="true" />
+
+
+  <field name="times" label="Enter times:" type="list" rows="4" >
+       <choice name="Latest" value="latest" />
+       <choice name="Last hour" value="1hour" />
+       <choice name="Last 6 hours" value="6hour" />
+       <choice name="Last 12 hours" value="12hour" />
+       <choice name="Last day" value="1day" />
+       <choice name="Last 2 days" value="2day" />
+       <choice name="Last 3 days" value="3day" />
+       <choice name="All" value="all"  />
+  </field>
+
+
+  <field name="imagetype" label="Image type:" type="menu" >
+       <choice name="1 hour surface rainfall" value="rainfall" />
+       <choice name="248 nm base reflectivity" value="reflectivity" />
+       <choice name="Composite Reflectivity" value="composite" />
+
+  </field>
+
+  <field name="text1" label="Enter some text:" type="text" />
+  <field name="text2" label="Enter some more text:" type="text" rows="4" />
+
+
+
+</datasetChoice>
+

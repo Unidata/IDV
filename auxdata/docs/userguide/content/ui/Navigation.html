@@ -1,0 +1,184 @@
+<html><head>
+  <title>Zooming, Panning and Rotating</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+<meta name="jhid" value="idv.ui.mouseandkeyboard">
+<%nochildlist%>
+
+There are several methods to zoom, pan, and rotate in the IDV. You
+can use the mouse, the arrow keys, a rubber band box, or the Zoom/Pan
+Toolbar. To reset to the initial base viewpoint use the key combination
+Control-r.
+
+<p>
+
+<i>Note: You need to click in the view window when using key combinations.</i>
+<p>
+
+<i>Note: If you are using an Apple Mac with a single button mouse, see  <a href="#mac">below</a></i>.
+
+<table width="100%" border="1" cellpadding="0" cellspacing="0">
+<tr><td width="33%"><b><center>Zooming</center></b></td>
+<td width="33%"><b><center>Panning</center></b></td>
+<td width="33%"><b><center>Rotating</center></b></td></tr>
+
+<tr><td colspan="3" align="center"><b>Mouse</b></td></tr>
+
+<tr valign="top"><td>
+<b>Shift-Left Mouse Drag:</b>
+Select a region region by pressing the <b>Shift</b> key and dragging 
+the left mouse button (MB1).
+<br>
+<b>Shift-Right Mouse Drag:</b>
+Hold <b>Shift</b> key and drag the right mouse button (MB3). 
+Moving up zooms in,  moving down zooms out.
+</td>
+
+
+<td>
+<b>Control-Right Mouse Drag:</b>
+Hold <b>Control</b> key and drag right mouse to pan.
+</td>
+
+<td>
+<b>Right Mouse Drag:</b>  Drag right mouse to rotate.
+</td>
+</tr>
+
+
+<tr><td colspan="3" align="center"><b>Scroll Wheel</b></td></tr>
+<tr valign="top">
+
+<td>
+<b>Scroll Wheel-Up:</b> Zoom out.
+<br>
+<b>Scroll Wheel-Down:</b> Zoom in.
+</td>
+
+<td>
+&nbsp;
+</td>
+
+<td>
+<b>Control-Scroll Wheel-Up/Down:</b> Rotate clockwise/counter clockwise.
+<br>
+<b>Shift-Scroll Wheel-Up/Down:</b>  Rotate forward/backward clockwise.
+</td>
+</tr>
+
+
+<tr><td colspan="3" align="center"><b>Arrow keys</b></td></tr>
+
+
+<tr valign="top"><td>
+<b>Shift-Up Arrow:</b> Zoom in.
+<br>
+<b>Shift-Down Arrow:</b> Zoom out.
+</td>
+
+
+<td>
+<b>Control-Up arrow:</b> Pan down.
+<br>
+<b>Control-Down arrow:</b> Pan up.
+<br>
+<b>Control-Right arrow:</b> Pan left.
+<br>
+<b>Control-Left arrow:</b> Pan right.
+</td>
+
+<td>
+<b>Left/Right Arrow:</b> Rotate around vertical axis.
+<br>
+<b>Up/Down Arrow:</b> Rotate around horizontal axis.
+<br>
+<b>Shift-Left/Right Arrow:</b> Rotate clockwise/counter clockwise.
+</td>
+</tr>
+
+</table>
+<p>
+
+<subhead id="mac" intoc="false">Apple Mac One Button Mouse Controls</subhead>
+Mouse controls are a bit more challenging if you are running the 
+IDV on a Mac with a single mouse button. The typical left mouse button 
+(MB1) functions are done with a click of the button.  
+Right mouse options (MB3) are simulated using the <b>Option</b> 
+key with a mouse click.  Use the following:<p>
+<ul> 
+<li>Option + click to rotate<br>
+<li>Shift + Option + click to zoom
+</ul>
+
+There is no replacement for the mouse panning actions on the Mac.  Use
+the keyboard arrow functions or the Viewpoint toolbar instead.
+
+
+
+
+
+<subhead intoc="false" id="viewpoint">The Viewpoint Toolbar</subhead>
+
+[ht::cimg images/ViewPointButtons.gif]
+
+The Viewpoint Toolbar allows you to quickly switch the point of view to any of six
+choices, including from overhead (the same as you see in a new display),
+from below, and from north, east, south or west.  The buttons show
+the side of the point of view looking into the 3D display volume.
+Click on any of the buttons to change the point of view. The top
+button for overhead is also useful if the display is in a confusing state and
+you want to get oriented.
+
+<p>
+
+The other three buttons allow you to switch perspective between converging to infinity
+and not converging, define your own viewpoint settings, and set the vertical limits.
+
+<p>
+
+You can "tear away" the toolbar and place it elsewhere on your
+screen as a tiny window by dragging with the right mouse button on the
+textured area
+above the toolbar. Clicking on the x on the toolbar will then restore
+the toolbar to its original location.
+
+<p>
+
+You can specify  any viewpoint exactly from any angle in 3D you like
+using the [ug::menu View Viewpoint {Viewpoint Dialog}] menu choice.
+
+
+
+<subhead intoc="false" id="navigation">The Zoom/Pan Toolbar</subhead>
+
+[ht::cimg images/NavButtons.gif]
+
+The Zoom/Pan  Toolbar allows you to zoom and pan. 
+Clicking on the "plus" icon zooms in,
+centered on the center of the display. Clicking on the "minus" icon zooms out,
+centered on the center of the display. Clicking on the "house" icon
+restores the initial point of view of this projection 
+(overhead, centered on center of the 
+map projection in use). Clicking on one of the arrow buttons moves
+the point of view in the direction of the button; the display moves in the
+opposite direction. If you click on the up button, the map and display
+move down.
+
+<p>
+
+You can "tear away" the toolbar and place it elsewhere on your
+screen as a tiny window by dragging with the right mouse button on the
+textured area
+above the toolbar. Clicking on the x on the toolbar will then restore
+the toolbar to its original location.
+
+
+<subhead intoc="false" id="undoredo">The Viewpoint Undo/Redo Buttons</subhead>
+
+[ht::cimg images/UndoRedoButtons.gif]
+
+The Undo and Redo buttons allow you to undo or redo viewpoint changes.
+
+</body>
+</html>

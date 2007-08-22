@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="North America" category="World locations">
+<stn name="Acapulco " lat="16:51:N" lon="99:55:W"/>
+<stn name="Admiralty Island" lat="57:44:N" lon="134:20:W"/>
+<stn name="Alaska " lat="65:00:N" lon="153:00:W"/>
+<stn name="Aleutian Islands" lat="52:00:N" lon="176:00:W"/>
+<stn name="Alexander Archipelago " lat="57:00:N" lon="134:00:W"/>
+<stn name="Attu Island" lat="52:55:N" lon="172:57:E"/>
+<stn name="Axel Heiberg Island" lat="79:30:N" lon="90:00:W"/>
+<stn name="Baffin Island" lat="68:00:N" lon="70:00:W"/>
+<stn name="Banks Island" lat="75:15:N" lon="121:30:W"/>
+<stn name="Belize City" lat="17:30:N" lon="88:12:W"/>
+<stn name="Belmopan " lat="17:15:N" lon="88:46:W"/>
+<stn name="British Honduras " lat="17:15:N" lon="88:45:W"/>
+<stn name="Canal Zone " lat="9:00:N" lon="79:45:W"/>
+<stn name="Cancun " lat="21:10:N" lon="86:50:W"/>
+<stn name="Coco, Isla del " lat="5:32:N" lon="87:04:W"/>
+<stn name="Corn Islands " lat="12:15:N" lon="83:00:W"/>
+<stn name="Cozumel " lat="20:30:N" lon="86:55:W"/>
+<stn name="Devon Island" lat="76:00:N" lon="87:00:W"/>
+<stn name="Diomede Islands" lat="65:47:N" lon="169:00:W"/>
+<stn name="Ellef Ringnes Island" lat="78:00:N" lon="103:00:W"/>
+<stn name="Ellesmere Island" lat="81:00:N" lon="80:00:W"/>
+<stn name="Godthab " lat="64:11:N" lon="51:44:W"/>
+<stn name="Guadalupe, Isla de " lat="29:11:N" lon="118:17:W"/>
+<stn name="Guatemala " lat="14:38:N" lon="90:31:W"/>
+<stn name="Hamilton " lat="32:17:N" lon="64:46:W"/>
+<stn name="Hawaii " lat="19:45:N" lon="155:45:W"/>
+<stn name="Hawaiian Islands" lat="21:00:N" lon="157:45:W"/>
+<stn name="Hispaniola " lat="18:45:N" lon="71:00:W"/>
+<stn name="Kalaallit Nunaat " lat="72:00:N" lon="40:00:W"/>
+<stn name="Kodiak Island" lat="57:49:N" lon="152:23:W"/>
+<stn name="Labrador " lat="54:00:N" lon="62:00:W"/>
+<stn name="Maiz, Islas del " lat="12:15:N" lon="83:00:W"/>
+<stn name="Managua " lat="12:09:N" lon="86:17:W"/>
+<stn name="Mazatlan " lat="23:13:N" lon="106:25:W"/>
+<stn name="Mexico City " lat="19:24:N" lon="99:09:W"/>
+<stn name="Monterrey " lat="25:40:N" lon="100:19:W"/>
+<stn name="Montreal " lat="45:31:N" lon="73:34:W"/>
+<stn name="Newfoundland " lat="52:00:N" lon="56:00:W"/>
+<stn name="Northwest Territories " lat="64:05:N" lon="117:10:W"/>
+<stn name="Nunavut " lat="72:00:N" lon="90:00:W"/>
+<stn name="Nuuk " lat="64:11:N" lon="51:44:W"/>
+<stn name="Oahu " lat="21:30:N" lon="158:00:W"/>
+<stn name="Ocean Island " lat="28:25:N" lon="178:20:W"/>
+<stn name="Oranjestad " lat="12:33:N" lon="70:06:W"/>
+<stn name="Ottawa " lat="45:25:N" lon="75:40:W"/>
+<stn name="Panama " lat="8:58:N" lon="79:32:W"/>
+<stn name="Panama Canal" lat="9:00:N" lon="79:45:W"/>
+<stn name="Pribilof Islands" lat="57:00:N" lon="170:00:W"/>
+<stn name="Prince Edward Island" lat="46:20:N" lon="63:20:W"/>
+<stn name="Prince Patrick Island" lat="76:30:N" lon="119:00:W"/>
+<stn name="Quebec " lat="52:00:N" lon="72:00:W"/>
+<stn name="Queen Charlotte Islands" lat="53:00:N" lon="132:00:W"/>
+<stn name="Queen Elizabeth Islands" lat="78:00:N" lon="95:00:W"/>
+<stn name="Republica Dominicana " lat="19:00:N" lon="70:40:W"/>
+<stn name="Revillagigedo Island" lat="55:35:N" lon="131:06:W"/>
+<stn name="Revillagigedo Islands" lat="19:00:N" lon="112:45:W"/>
+<stn name="Road Town " lat="18:27:N" lon="64:37:W"/>
+<stn name="Sable Island" lat="43:55:N" lon="59:50:W"/>
+<stn name="Saint Helens, Mount " lat="46:15:N" lon="122:12:W"/>
+<stn name="Saint John " lat="45:16:N" lon="66:04:W"/>
+<stn name="Saint Lawrence Island" lat="49:30:N" lon="67:00:W"/>
+<stn name="Saint Paul Island" lat="47:12:N" lon="60:09:W"/>
+<stn name="Saint Paul Island" lat="57:11:N" lon="170:16:W"/>
+<stn name="Saint-Pierre " lat="46:46:N" lon="56:11:W"/>
+<stn name="San Jose " lat="9:56:N" lon="84:05:W"/>
+<stn name="San Juan " lat="18:28:N" lon="66:07:W"/>
+<stn name="San Salvador " lat="13:42:N" lon="89:12:W"/>
+<stn name="Santo Domingo " lat="18:28:N" lon="69:54:W"/>
+<stn name="Somers Islands " lat="32:20:N" lon="64:45:W"/>
+<stn name="St Johns " lat="47:34:N" lon="52:43:W"/>
+<stn name="Tegucigalpa " lat="14:06:N" lon="87:13:W"/>
+<stn name="Vancouver Island" lat="49:45:N" lon="126:00:W"/>
+<stn name="Victoria " lat="71:00:N" lon="110:00:W"/>
+<stn name="Washington, DC " lat="38:53:N" lon="77:02:W"/>
+<stn name="Yucatan Peninsula" lat="19:30:N" lon="89:00:W"/>
+</stationtable>

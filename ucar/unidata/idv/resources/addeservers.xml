@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<servers>
+<!--
+Each server tag has a name and an optional description.
+
+Each server tag can contain any number of group tags or type tags.
+For top-level group tags they need to have a type attribute (e.g.,
+one of image, radar, grid, point, etc.) They can either have a comma
+separated names attribute or a single name attribute. For the case with a single
+name attribute there can also be a description.
+
+You can also group a number of group tags under a type tag. where the type tag
+has a name attribute. In this case the group tags do not need the type attribute (
+they essentially get it from their container type tag.
+-->
+
+  <server name="adde.ucar.edu" active="true">
+    <group
+       names="RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO"
+       type="image"/>
+    <group
+       names="RTNEXRAD"
+       type="radar"/>
+  </server>
+  <server name="adde.cise-nsf.gov">
+    <group
+       names="RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINCOMP,NEXRCOMP,TOPO"
+       type="image"/>
+    <group
+       names="RTGRIDS"
+       type="grid"/>
+    <group
+       names="RTNEXRAD"
+       type="radar"/>
+  </server>
+  <server name="stratus.al.noaa.gov">
+    <group
+       names="RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINCOMP,TOPO"
+       type="image"/>
+    <group
+       names="RTGRIDS"
+       type="grid"/>
+    <group
+       names="RTNEXRAD"
+       type="radar"/>
+  </server>
+
+  <server name="weather2.admin.niu.edu">
+    <group
+       names="GINICOMP,GINIEAST,GINIWEST"
+       type="image"/>
+  </server>
+  <server name="weather3.admin.niu.edu">
+    <group
+       names="RTIMAGES,NEXRCOMP,TOPO"
+       type="image"/>
+    <group
+       names="RTNEXRAD"
+       type="radar"/>
+  </server>
+  <server name="twister.millersville.edu"/>
+  <server name="pscwx.plymouth.edu"/>
+  <server name="papagayo.unl.edu"/>
+  <server name="io.sca.uqam.ca">
+    <group
+       names="ME7"
+       type="image"/>
+  </server>
+  <server name="unidata2.ssec.wisc.edu">
+    <group
+       names="GOESEAST,EAST,WEST"
+       type="image"/>
+  </server>
+  <server name="goessouth.unidata.ucar.edu">
+    <group
+       names="SOUTH"
+       type="image"/>
+  </server>
+  <server name="nanuk.eosdis.nasa.gov">
+    <group
+       names="NANUK"
+       type="image"/>
+  </server>
+  <server name="gp16.ssd.nesdis.noaa.gov">
+    <group
+       names="PUB"
+       type="image"/>
+  </server>
+</servers>

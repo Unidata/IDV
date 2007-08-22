@@ -1,0 +1,57 @@
+
+<!-- 
+
+The format  of the xml is:
+<choosers>
+     entries*
+</choosers>
+
+Where entries can be:
+<chooser chooser_attributes />
+
+<tabbedpane>
+    entries*
+</tabbedpane>
+
+<panel layout="vbox:hbox:border">
+   entries*
+</panel>
+
+<label text="label test" />
+
+
+
+All entries can have a title attribute. If defined and
+if the entry is part of a tabbed pane (the default top level 
+container is a tabbed pane) this is the title of the tab.
+
+If the container of the entry is a panel and the layout of the panel
+is border then a quadrant attribute can be specified:
+quadrant="North|South|East|West|Center"
+to determine the placement.
+
+
+The  chooser_attributes are:
+
+class="..."  required. IdvChooser class. e.g., ucar.unidata.idv.chooser.FileChooser
+
+id="..." can be used to uniquely identify a chooser. So for example,
+if you had more than one url choosers each one can have an id. Any preference
+values are saved using this id.
+
+Attributes
+for FileChooser: 
+	path="default file system path" 
+	filters="semi colon delimited list of file patterns. See unidata.util.PatternFileFilter"
+
+for UrlChooser:
+	url_label="the label to be used in front of the text field"
+
+-->
+
+
+<choosers>
+    <chooser title="GetAreaGUI"     class="ucar.unidata.idv.chooser.McidasImageChooser" />
+    <chooser title="Other Image data"      class="ucar.unidata.idv.chooser.ImageChooser" />
+    <chooser title="Radar data"      class="ucar.unidata.idv.chooser.RadarChooser" />
+</choosers>

@@ -1,0 +1,13 @@
+*.class
+*.jar
+*.log
+*.sav
+*.save
+*.t
+*.tmp
+*.tpr
+*.vf*
+.cvsignore
+macros.make
+rules.make
+together.properties

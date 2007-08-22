@@ -1,0 +1,48 @@
+<html><head>
+  <title>Text Point Data Format</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+<body>
+The IDV supports reading in point observation data in a text comma separated
+value (CSV) file format.
+The files need two extra lines at the top that defines for the IDV the
+fields that are within the file and the types of the fields.
+The only other requirement is that there must be a Latitude, Longitude and Time field in the data.
+
+<pre>
+(index) -> (Time,Latitude,Longitude,Altitude,PSL,GUS,SPD,DIR,TD,T)
+Time\[fmt="yyyy-MM-dd HH:mm:ss"\],Latitude\[unit="deg"\],Longitude\[unit="degrees west"\],Altitude\[unit="m"\],PSL\[unit="hPa"\],GUS\[unit="m.s-1"\],SPD\[unit="m/s"\],DIR\[uni
+t="deg"\],TD\[unit="celsius"\],T\[unit="celsius"\]
+2007-01-07 16:00:00Z,32.9,117.1,145.0,1026.1,NaN,0.0,0.0,-2.8,12.8
+2007-01-07 16:00:00Z,48.3,92.5,341.0,1003.7,NaN,1.5,170.0,-2.0,-0.99
+2007-01-07 16:00:00Z,36.8,98.7,449.0,1024.0,12.4,9.8,330.0,-3.0,3.0
+2007-01-07 16:00:00Z,44.3,121.2,938.0,1030.1,NaN,2.1,110.0,-3.3,-1.7
+</pre>
+
+
+If you have text fields (i.e., non-numeric data) in your observation just do this:
+<pre>
+(index) -> (Time,Latitude,Longitude,Altitude,ST(Text),T)
+Time\[fmt="yyyy-MM-dd HH:mm:ss z"\],Latitude\[unit="deg"\],Longitude\[unit="degrees west"\],Altitude\[unit="m"\],ST(Text),T\[unit="celsius"\]
+2007-02-16 11:00:00 MST,32.9,117.1,145.0,CA  ,20.6
+</pre>
+
+Here we have a ST field (State from metars). Its field name is defined as &quot;ST(Text)&quot; and
+its entry in the second line is the same.
+<p>
+
+If you have time fields that span multiple columns, you can use the
+<code>colspan</code> keyword:
+<pre>
+(index) -> (IDN, Latitude, Longitude, Time, WDIR, WSPD, GST)
+IDN, Latitude\[unit="deg"\], Longitude\[unit="deg"\], Time\[fmt="yyyy MM dd HH mm" colspan="5"\], WDIR\[unit="deg" miss="MM"\], WSPD\[unit="m/s" miss="MM"\], GST\[unit="m/s" miss="MM"\]
+41001 34.68 -72.66 2007 07 17 20 50 210 4.0 6.0
+41004 32.5 -79.09 2007 07 17 20 50 210 6.0 MM
+41008 31.4 -80.87 2007 07 17 21 50 170 7.0 8.0
+</pre>
+
+<p>
+
+</body>
+</html>

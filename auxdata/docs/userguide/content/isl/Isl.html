@@ -1,0 +1,121 @@
+<html><head> 
+  <title>ISL Overview</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+[
+source isl/isl.tcl
+]
+A note: in this documentation required attributes are shown in <b>bold</b>.
+
+<div class="pagesubtitle">ISL and XML</div>
+Before we start a couple of comments about writing
+the ISL. ISL files are written in XML and they need to be 
+syntactically correct. A couple of reminders:
+<ul>
+
+<li> XML is fully nested. There is only one <i>root</i> tag and all
+other tags are descendants of the root.
+
+<li> All tags have to be closed. Either do:
+[isl::xml {<sometag/>}] or 
+[isl::xml {
+<sometag>
+    <i>contained tags</i>
+</sometag>}]
+
+<li> If you want to include special characters like
+'&lt;', '&gt;' and '&quot;' you need to  escape them with:
+'&amp;lt;', '&amp;gt;', '&amp;quot;'.
+
+<li> You can comment out sections of XML with '&lt;!--' ... '--&gt;'. e.g:
+[isl::xml {
+   ...
+   <!-- 
+      <sometag/>
+   -->
+}]
+
+</ul>
+
+
+
+The ISL file starts with a [isl::tagref isl] tag:
+[isl::xml {
+<isl debug="true">
+...
+ISL tags
+...
+</isl>
+}]
+If there is a debug=&quot;true&quot; in the [isl::tag isl]
+tag then the IDV will print out processing messages.
+<p>
+
+Here is a simple isl file:
+
+[isl::importxml capture1.isl]
+
+You can run this by going:<pre>
+runIDV capture1.isl
+</pre>
+or through the [ug::menu File Open] menu from a running IDV.
+<p>
+
+Notice when you run this from the  command line that no image is created. 
+That is because there
+are no view windows. We can load in a bundle before we capture the image.
+Note, if you run this isl file you should have a <i>test.xidv</i> bundle file
+around.
+
+[isl::importxml capture2.isl]
+
+<i>A caveat:</i> Right now the IDV does not gracefully 
+handle when you have a bundle that has more than one 
+view window.
+<p>
+
+The [isl::tagref pause] tag has the IDV wait until all displays
+have been created. The [isl::tagref bundle] tag loads in the specified bundle.
+Note, this file is relative to the directory where the IDV  is running.
+You can provide an absolute path or even a URL as a file:
+[isl::xml {
+  <bundle file="/some/path/test.xidv"/>
+  <bundle file="http://www.somesite.edu/test.xidv"/>
+}
+]
+
+The file for the output image is also relative to where the IDV is running.
+The type of image that is created is determined by the file suffix.
+The IDV can generate <i>gif</i>, <i>jpg</i> and <i>png</i>. You can have multiple
+[isl::tagref image] tags:
+
+[isl::importxml multi.isl]
+
+
+The [isl::tag isl] tag can have a loop and a sleep argument. The sleep
+argument is the number of seconds to sleep after each iteration of the loop.
+[isl::importxml loop.isl]
+This  will loop through the set of commands 100 times. After each iteration of the loop
+the IDV will sleep for 10 minutes (600 seconds).
+<p>
+Note: the above loop example will keep writing out to the  same image file. 
+We can use the  macro expansion facility, described here: [isl::tagref property],
+to change the file name every loop iteration:
+[isl::importxml loop2.isl]
+This will write out the images test0.png, test1.png, test2.png, etc.
+
+
+<p>
+One can use [isl::tagref group] tags to hold a set of children tags.
+There can be any level of nesting. The [isl::tag group] tag can also
+hold a [isl::attr loop] and [isl::attr sleep ] attribute
+[isl::importxml nested.isl]
+
+
+
+
+
+</body>

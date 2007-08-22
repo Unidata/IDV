@@ -1,0 +1,82 @@
+
+<html>
+<head>
+<title>Profiler Time-Height Displays</title>
+</head>
+
+<body>
+
+<div class="overview">
+<p>
+The Profiler Time/Height display shows profiler 
+winds at all levels above one station, 
+for one or more times. This is the conventional display of profiler data.
+</p>
+</div>
+
+<p>
+
+Winds are shown with the meteorological wind barb symbol. 
+The location of the barb on the plot shows wind observation time, and 
+height above mean sea level; the barb's orientation gives 
+wind direction in a map view sense (up is north; right is east).
+
+<P>
+
+If necessary, select Profiler data and times as described in
+[ht::popup "ProfilerDataLoading.html" "Loading Profiler Data"].
+
+<p>
+
+<ol class="step">
+
+
+<li>In the [ht::dialog Field Selector] window create a 
+     [ht::display Time/Height Display] using 
+     the [ht::param Profiler winds] field.</li>
+
+<p> The Profiler Time-Height display and control appears in a new window. 
+
+[ht::cimg images/TimeHeight.gif]
+
+<li>Working with the Profiler Time-Height Display</li>
+  <ul class="substep">
+    <li>Enlarge the display by dragging the edges of the 
+    window border with the mouse. 
+     <li>Use the [ht::command Windbarb size] box to enlarge the wind barbs
+    size to 7.
+    <li>Use the [ht::command Vertical interval] 
+    entry box to change the vertical separation 
+    between wind barbs to 500 meters.
+    <!--
+    <li>Zoom in on the display graph by holding down the Shift key 
+    and dragging the mouse pointer up while pressing the left mouse button; 
+    drag down to zoom out. 
+    <li>Pan the graph by holding down the Ctrl key and 
+    dragging the mouse pointer in any direction while pressing the 
+    left mouse button.
+    <li>Sample the time and height values on the plot by dragging 
+    the middle mouse button over the plot.
+    -->
+    <li>Click on the [ht::button Color Table] 
+    button to get a menu of named color tables 
+    supplied in the IDV. Change color table to <B>Basic->Bright 38</b>.
+    <li>The [ht::command Stations] 
+    box appears with a list of all stations selected. 
+    Use it to switch between stations displayed. View all the stations' plots.
+    <li>The checkbox [ht::command Latest data on left] 
+    is used to change the ordering of 
+    times displayed on the x axis.
+     </ul>
+</li>
+
+<li>Remove All Displays</li>
+  <ul class="substep">
+    <li>[ht::clearDisplays]
+  </ul>
+</li>
+
+</ol>
+
+</body>
+</html>

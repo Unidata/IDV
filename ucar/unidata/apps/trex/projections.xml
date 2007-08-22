@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object class="java.util.ArrayList">
+    <method name="add">
+        <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+            <property name="CenterLon">
+                <double>-118.12744822769602</double>
+            </property>
+            <property name="Name">
+                <string><![CDATA[TREX>Sierras]]></string>
+            </property>
+            <property name="DefaultMapArea">
+                <object class="ucar.unidata.geoloc.ProjectionRect">
+                    <constructor>
+                        <double>-119.94377369920952</double>
+                        <double>35.774865431783596</double>
+                        <double>-116.31112275618254</double>
+                        <double>39.40751637481058</double>
+                    </constructor>
+                </object>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+            <property name="CenterLon">
+                <double>-118.16854516736059</double>
+            </property>
+            <property name="Name">
+                <string><![CDATA[TREX>Bishop]]></string>
+            </property>
+            <property name="DefaultMapArea">
+                <object class="ucar.unidata.geoloc.ProjectionRect">
+                    <constructor>
+                        <double>-118.74128114511355</double>
+                        <double>36.51742790360062</double>
+                        <double>-117.59580918960764</double>
+                        <double>37.68431054986365</double>
+                    </constructor>
+                </object>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+            <property name="CenterLon">
+                <double>-118.23998412952646</double>
+            </property>
+            <property name="Name">
+                <string><![CDATA[TREX>Independence]]></string>
+            </property>
+            <property name="DefaultMapArea">
+                <object class="ucar.unidata.geoloc.ProjectionRect">
+                    <constructor>
+                        <double>-118.84975275741213</double>
+                        <double>36.14516165364072</double>
+                        <double>-117.63021550164079</double>
+                        <double>37.53099944428998</double>
+                    </constructor>
+                </object>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+            <property name="CenterLon">
+                <double>-117.21206272778699</double>
+            </property>
+            <property name="Name">
+                <string><![CDATA[TREX>Inyo County]]></string>
+            </property>
+            <property name="DefaultMapArea">
+                <object class="ucar.unidata.geoloc.ProjectionRect">
+                    <constructor>
+                        <double>-118.9969857099104</double>
+                        <double>35.49541997863035</double>
+                        <double>-115.42713974566355</double>
+                        <double>37.73825513941372</double>
+                    </constructor>
+                </object>
+            </property>
+        </object>
+    </method>
+</object>

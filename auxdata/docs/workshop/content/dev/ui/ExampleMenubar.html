@@ -1,0 +1,109 @@
+
+[ug::head {Example Menu Bar}]
+
+We're going to look at how to extend the menu bar.
+
+<ul>
+
+<li> In the <i><%workshop.installdir%>/ucar/unidata/apps/example/resources</i> directory
+copy the file defaultmenu.xml up a level to the <i>example</i> directory.
+
+<li> Bring the defaultmenu.xml file into an editor.
+
+
+<li> Run the ExampleIdv. Note the new menu entry. For kicks, select 
+[ht::menu Example {Show resources}]. This shows all of the resources
+loaded into the ExampleIdv.
+
+<li> Let's add in a Hello World menu item.
+
+<ul>
+<li> Add in the following  under the &quot;Example&quot; menu tag.
+
+[ug::xml {
+    <menuitem
+       action="jython:idv.helloWorld();"
+       label="Hello World"/>
+}]
+
+
+<li> Run ExampleIdv. Select [ht::menu {Example} {Hello World}]
+
+<li> We get an error. We need to add the helloWorld method to ExampleIdv:
+<pre>
+  public void helloWorld() {
+      System.err.println("Hello World");
+  }
+</pre>
+
+The method needs to be public.
+
+<li> Compile and run again.
+
+</ul>
+
+<li> Note that we now have code embedded in our menubar xml file. This might not be good practice.
+We'll use the &quot;actions&quot;resource to define an action.
+
+
+<ul>
+<li> Copy the file resources/actions.xml to the example directory.
+<li> This defines an action called &quot;example.helloworld&quot;:
+[ug::xml {
+  <action
+     id="example.helloworld"
+     image="/ucar/unidata/apps/example/resources/HelloWorld.gif"
+     description="Call hello world"
+     action="jython:idv.helloWorld();"/>
+}]
+
+<li> Add the following into the defaultmenu.xml. Note the &quot;action:&quot; prefix.
+[ug::xml {
+    <menuitem
+       action="action:example.helloworld"
+       label="Hello World from action"/>
+    <separator/>
+}]
+<li> Run ExampleIdv.
+<li> The example.helloworld action is now also available in the toolbar.
+Bring up the User Preferences 
+
+</ul>
+
+<li> So, this added our own menu into the menu bar. How do we not use any of the system menus?
+<ul>
+<li> Bring up the idv.rbi and change 
+[ug::xml {
+  <resources name="idv.resource.menubar">
+  </resources>
+}]
+
+To:
+[ug::xml {
+  <resources name="idv.resource.menubar" loadmore="false">
+    <resource
+       location="/ucar/unidata/apps/example/defaultmenu.xml"/>
+  </resources>
+}]
+
+The loadmore tells the IDV not to use the system resources.
+
+<li> Run the ExampleIdv.
+
+<li> Remove the above entries from the example idv.rbi file.
+
+</ul>
+
+<li> Now, lets look at the default system menubar in <%workshop.installdir%>/ucar/unidata/idv/resources/defaultmenu.xml
+
+<ul>
+<li> Note the &quot;id=&quot; attributes. The IDV uses these ids to know where to  dynamically
+add in different menus, e.g., available windows, display lists, data, etc.
+
+
+</ul>
+
+</ul>
+
+
+

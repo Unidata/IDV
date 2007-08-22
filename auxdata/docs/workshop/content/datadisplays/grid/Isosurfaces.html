@@ -1,0 +1,154 @@
+<html>
+<head>
+<title>Isosurfaces of Gridded Data </title>
+</head>
+
+<body>
+
+
+<div class="overview">
+While plan views of 3D fields are useful, the three dimensionality
+of the atmosphere can be displayed in the IDV using isosurfaces.
+An isosurface represents a 3-D surface that connects points with the same
+value.  On one side of the surface, values are greater than the
+surface value; on the other side, values are less than the surface
+value.
+</div>
+
+<ol class="step">
+
+<li>Create an isosurface of wind speed showing areas of winds 40 m/s
+or greater.
+
+  <ul class="substep">
+    <li>If you have not already done so, use the 
+        [ht::menu Edit {Remove All Displays}] menu to remove the displays
+        created in the previous exercise.  Set the viewpoint to the
+        top.
+
+    <li>In the [ht::dialog Field Selector]'s [ht::command Data Sources] 
+        panel, select the [ht::dataset  NCEP Model Data ETA data source]
+        that you loaded at the start of this section.</li>
+
+    <li>In the [ht::command Fields] panel, expand 
+        the [ht::param 3D grid] tab. 
+        Scroll down to the [ht::param Derived] tab to see 
+        a list of derived quantities. Select the 
+        [ht::param {Windspeed (from GridRelative_u &amp; GridRelative_v)}] 
+        field.
+
+    <li>In the [ht::command Displays] panel, 
+        expand the [ht::param 3D Surface] tab and select 
+        [ht::display Isosurface], then
+        click the [ht::button Create Display] button.</li>
+
+    <li>Set the isosurface to display where winds of 40 m/s or greater
+        exist. From the control window for this display, you can change
+        the isosurface value either by typing a 
+        new value in the [ht::command Isosurface Value] entry box 
+        or by using the [ht::command Isosurface Value] slider widget
+        ([ht::img %dotpath%images/Slider16.gif {slider widget}])
+        to the right of the entry box. Change the isosurface value to
+        <b>40 m/s</b>.</li>
+
+    <li>Start the animation.</li>
+
+    <li>Rotate the display to see the wind speed pods from various angles.</li>
+
+    <li>Stop the animation and return the display back to the first
+        time in the sequence and the view to the top.</li>
+
+    <li>Remove the display from the main window by clicking on 
+        the remove icon ([ht::img %dotpath%/images/Remove16.gif])
+        or by selecting the control's [ht::menu File {Remove Display}] 
+        menu.</li>
+        
+  </ul>
+</li>
+
+<li>You can also create isosurfaces of one variable that is colored
+by another variable.  In this step, you will load in an isosurface
+of wind speed again, but this time you will have it colored
+by geopotential height.
+
+  <ul class="substep">
+    <li>In the [ht::command Fields] panel, expand the 
+        [ht::param 3D grid] tab. 
+        Scroll down to the [ht::param Derived] tab to see 
+        a list of derived quantities. Select the 
+        [ht::param {Windspeed (from GridRelative_u &amp; GridRelative_v)}] 
+        field.
+    <li>In the [ht::command Displays] panel, 
+        expand the [ht::param 3D Surface] tab and select 
+        [ht::display Isosurface colored by another parameter]
+        then click the [ht::button Create Display] button.
+        (you may have to scroll the [ht::command Displays] 
+        pane to find the display selection)</li>
+    <li>After you click the [ht::button Create Display] 
+        button, a dialog will pop up to allow you to select the
+        [ht::param Other parameter].  From the dialog, 
+        expand the [ht::param 3D grid]
+        node and select the [ht::param geopotential height] 
+        field and click the [ht::button OK] button.</li>
+    <li>Adjust the wind speed value to <b>40 m/s</b>.</li>
+    <li>Start the animation.</li>
+    <li>Rotate the display to see the wind speed pods from various angles.</li>
+
+[ht::cimg images/IsoByAnother.gif]
+
+    <li>Stop the animation and return the display back to the first
+        time in the sequence and the view to the top.</li>
+  </ul>
+</li>
+
+
+<li>You can modify the colors the display through the menus 
+in the control window or legend.
+
+  <ul class="substep">
+    <li>You can use a different color table to show the variation of
+        windspeed with altitude.  Click on the [ht::button default] 
+        button next to the [ht::command Color table] label in the 
+        control window to bring up a list of pre-defined 
+        color tables.  Select the [ht::menu Basic] menu
+        and choose the [ht::menu Bright38] menu item
+        to change to that color table.  In a later exercise, you will
+        learn how to create and modify your own color tables.</li>
+
+    <li>Rotate the display so you are looking at the view from the
+        south.  On the first time-step, the pod of 40 m/s winds bulges
+        down into the blues of the color table.  Place your cursor
+        at the bottom of this bulge and note the Altitude readout
+        at the bottom of the main window.  It should read about
+        5000 m.</li>
+
+    <li>Now move your cursor over the color bar in the legend to the
+        point where the color at the bottom of the bulge is.  Notice
+        that the readout on the color bar is about 5000 m as well.</li>
+
+<!--
+    <li>Change the units of display from m/s to kts.  In the control
+        panel for this display, or by right clicking on the legend, 
+        select the [ht::menu Edit {Change Display Unit...}] menu.  Type in 
+        &quot;kt&quot; in the [ht::command New unit:]
+        entry box and click the [ht::button OK]
+        button.  Although the display did not change, the labels
+        in the legend and the control window changed to show the
+        values in units of knots.
+
+    <li>Adjust the wind speed isosurface value to <b>90 kts</b>.</li>
+-->
+
+    <li>Start the animation.</li>
+
+    <li>Rotate the display to see the wind speed pods from various angles.</li>
+
+    <li>Stop the animation and return the display back to the first
+        time in the sequence.</li>
+  </ul>
+</li>
+
+</ol>
+
+</body>
+</html>

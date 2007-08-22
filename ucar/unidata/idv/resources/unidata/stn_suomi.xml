@@ -1,0 +1,227 @@
+<stationtable name="suomi sites">
+<station idn="" id="OSU" name="Ohio State University" lat="41:41:24" lon="-83:28:12" elev="0"/>
+<station idn="" id="KEUN" name="Kean University" lat="40:40:12" lon="-74:15:00" elev="0"/>
+<station idn="" id="UOH" name="UNIVERSITY OF HAWAII" lat="21:18:00" lon="-157:44:24" elev="0"/>
+<station idn="" id="UOW" name="Uniersity of Wyoming" lat="41:18:36" lon="-105:36:00" elev="0"/>
+<station idn="" id="UNME" name="universidad Metropolitana" lat="18:25:12" lon="-66:07:48" elev="0"/>
+<station idn="" id="UOBIOEP" name="University of Bremen, Institute of Environmental Physics" lat="53:06:00" lon="--8:48:00" elev="0"/>
+<station idn="" id="ISU" name="Indiana State University" lat="39:25:47" lon="-87:25:47" elev="0"/>
+<station idn="" id="DOGSASB" name="Department of Geoscience, SUNY at Stony Brook" lat="40:56:24" lon="-73:06:35" elev="0"/>
+<station idn="" id="NCU" name="National Central University" lat="24:58:12" lon="--121:11:23" elev="0"/>
+<station idn="" id="VAUN" name="Valparaiso University" lat="41:28:12" lon="-87:04:11" elev="0"/>
+<station idn="" id="CGA" name="CNRS Geosciences Azur" lat="43:37:12" lon="--7:03:35" elev="0"/>
+<station idn="" id="UOAIH" name="University of Alabama in Huntsville" lat="34:43:47" lon="-86:39:00" elev="0"/>
+<station idn="" id="UON" name="University of Nebraska-Lincoln" lat="40:49:47" lon="-96:41:24" elev="0"/>
+<station idn="" id="UOWAM" name="University of Wisconsin at Milwaukee" lat="43:06:00" lon="-87:54:00" elev="0"/>
+<station idn="" id="URS" name="USDA-Ag. Research Service" lat="40:26:23" lon="-81:49:12" elev="0"/>
+<station idn="" id="UOPRM" name="University of Puerto Rico, Mayaguez" lat="18:13:48" lon="-67:09:00" elev="0"/>
+<station idn="" id="USD" name="USDA-ARS" lat="41:59:24" lon="-93:40:47" elev="0"/>
+<station idn="" id="SIOO" name="Scripps Institution of Oceanography" lat="32:55:12" lon="-117:15:36" elev="0"/>
+<station idn="" id="CFERAIM" name="center for earthquake research and information/U Memphis" lat="35:10:11" lon="-89:58:12" elev="0"/>
+<station idn="" id="UOOSS" name="University of Oklahoma/ARM SGP Site" lat="36:50:24" lon="-96:25:47" elev="0"/>
+<station idn="" id="UOOSS" name="University of Oklahoma/ARM SGP Site" lat="37:50:24" lon="-97:01:12" elev="0"/>
+<station idn="" id="RDA" name="RDAAC-IRIS" lat="62:01:47" lon="--129:40:47" elev="0"/>
+<station idn="" id="NMT" name="New Mexico Tech" lat="34:01:47" lon="-106:54:00" elev="0"/>
+<station idn="" id="UOOSS" name="University of Oklahoma/ARM SGP Site" lat="36:52:47" lon="-98:17:23" elev="0"/>
+<station idn="" id="MCUN" name="McGill University" lat="45:30:00" lon="-73:36:00" elev="0"/>
+<station idn="" id="UNME" name="UNIVERSIDAD METROPOLITANA" lat="18:20:23" lon="-66:01:12" elev="0"/>
+<station idn="" id="RDA" name="RDAAC-IRIS" lat="47:01:47" lon="--142:43:12" elev="0"/>
+<station idn="" id="UONDRWIC" name="University of North Dakota Regional Weather Information Cen" lat="47:55:47" lon="-97:12:00" elev="0"/>
+<station idn="" id="UOOSS" name="University of Oklahoma/ARM SGP Site" lat="38:06:35" lon="-97:30:36" elev="0"/>
+<station idn="" id="WHOI" name="Woods Hole Oceanographic Institution" lat="41:31:12" lon="-70:37:47" elev="0"/>
+<station idn="" id="UOOSS" name="University of Oklahoma/ARM SGP Site" lat="38:12:00" lon="-95:36:00" elev="0"/>
+<station idn="" id="MPL-SIOO" name="Marine Physical Lab - Scripps Institution of Oceanography" lat="18:54:35" lon="-154:55:12" elev="0"/>
+<station idn="" id="UOI" name="University of Idaho" lat="43:42:35" lon="-116:39:00" elev="0"/>
+<station idn="" id="UOM" name="University of Montana" lat="46:57:00" lon="-114:06:35" elev="0"/>
+<station idn="" id="CFERAIM" name="center for earthquake research and information/U Memphis" lat="34:48:35" lon="-92:16:12" elev="0"/>
+<station idn="" id="FDIIDEDM" name="Facultad de Ingenieria. Instituto de Ensayo de Materiales" lat="-34:54:00" lon="-56:12:00" elev="0"/>
+<station idn="" id="UW-" name="UW-Madison" lat="43:03:00" lon="-89:24:36" elev="0"/>
+<station idn="" id="UOOSS" name="University of Oklahoma/ARM SGP Site" lat="36:25:47" lon="-98:16:47" elev="0"/>
+<station idn="" id="TUOTAA" name="The University of Texas at Austin" lat="32:44:24" lon="-97:06:00" elev="0"/>
+<station idn="" id="ODU" name="Old Dominion University" lat="37:00:00" lon="-76:06:35" elev="0"/>
+<station idn="" id="NGSFC" name="NASA Goddard Space Flight Center" lat="58:15:00" lon="-152:16:47" elev="0"/>
+<station idn="" id="FIFAER" name="Fraunhofer Institute for Atmospheric Environmental Research" lat="47:25:12" lon="--10:58:47" elev="0"/>
+<station idn="" id="PSC" name="PLYMOUTH STATE COLLEGE" lat="43:47:24" lon="-71:42:00" elev="0"/>
+<station idn="" id="UOTVI" name="University of the Virgin Islands" lat="18:18:00" lon="-64:57:00" elev="0"/>
+<station idn="" id="TUOTAA" name="The University of Texas at Austin" lat="33:35:24" lon="-101:24:36" elev="0"/>
+<station idn="" id="EDC" name="EROS Data Center" lat="43:43:47" lon="-96:36:35" elev="0"/>
+<station idn="" id="URS" name="USDA-Agricultural Research Service" lat="33:46:12" lon="-83:43:47" elev="0"/>
+<station idn="" id="UOTAEP" name="University of Texas at El Paso" lat="31:49:12" lon="-106:30:36" elev="0"/>
+<station idn="" id="CFERAIM" name="center for earthquake research and information/U Memphis" lat="37:51:00" lon="-90:29:23" elev="0"/>
+<station idn="" id="UARS" name="USDA, Agricultural Research Service" lat="34:52:12" lon="-98:34:12" elev="0"/>
+<station idn="" id="UOI" name="University of Idaho" lat="43:42:35" lon="-116:39:00" elev="0"/>
+<station idn="" id="SNU" name="Seoul National University" lat="37:27:36" lon="--126:57:00" elev="0"/>
+<station idn="" id="UNIR" name="UNAVCO/ IRIS" lat="-1:36:00" lon="--13:54:00" elev="0"/>
+<station idn="" id="MPL-SIOO" name="Marine Physical Lab - Scripps Institution of Oceanography" lat="32:48:00" lon="-121:00:00" elev="0"/>
+<station idn="" id="UOW" name="University of Washington" lat="47:39:00" lon="-122:19:47" elev="0"/>
+<station idn="" id="COUN" name="Cornell University" lat="42:27:00" lon="-76:28:12" elev="0"/>
+<station idn="" id="AROB" name="arecibo observatory" lat="18:19:47" lon="-66:43:12" elev="0"/>
+<station idn="" id="CSU" name="Colorado State University" lat="40:33:35" lon="-105:04:48" elev="0"/>
+<station idn="" id="CAOMS" name="Chinese Academy of Meteorological Sciences" lat="38:32:24" lon="--117:09:36" elev="0"/>
+<station idn="" id="TUOG" name="The University of Georgia" lat="33:18:00" lon="-84:18:00" elev="0"/>
+<station idn="" id="IDGU" name="Instituto de Geofisica, UNAM" lat="19:18:36" lon="-99:09:36" elev="0"/>
+<station idn="" id="CFERAIM" name="center for earthquake research and information/U Memphis" lat="35:23:23" lon="-87:58:12" elev="0"/>
+<station idn="" id="SDSOMAT" name="South Dakota School of Mines and Technology" lat="44:04:48" lon="-103:14:23" elev="0"/>
+<station idn="" id="IOGU" name="Inst. of  Geophysics, UNAM" lat="20:42:00" lon="-100:27:00" elev="0"/>
+<station idn="" id="UOM" name="Univ of maine" lat="44:55:12" lon="-68:40:47" elev="0"/>
+<station idn="" id="MDFUOPBM" name="Meteorology Department, Federal University of Para, Bel m," lat="-1:28:12" lon="-48:27:00" elev="0"/>
+<station idn="" id="SCSU" name="St. Cloud State University" lat="45:33:35" lon="-94:10:11" elev="0"/>
+<station idn="" id="UOW" name="University of Washington" lat="47:38:24" lon="-122:19:12" elev="0"/>
+<station idn="" id="UOM" name="University of Missouri-Columbia" lat="39:00:00" lon="-92:17:23" elev="0"/>
+<station idn="" id="LEUN" name="Lehigh University" lat="40:44:24" lon="-75:18:36" elev="0"/>
+<station idn="" id="PUUN" name="Purdue University" lat="40:25:47" lon="-86:57:35" elev="0"/>
+<station idn="" id="CFERAIM" name="center for earthquake research and information/U Memphis" lat="36:22:12" lon="-90:10:48" elev="0"/>
+<station idn="" id="ITDS" name="Instituto Tecnologico de Sonora" lat="27:21:36" lon="-109:54:35" elev="0"/>
+<station idn="" id="UOCACS" name="University of Colorado at Colorado Springs" lat="38:54:00" lon="-104:46:12" elev="0"/>
+<station idn="" id="RDA" name="RDAAC-IRIS" lat="71:37:47" lon="--128:52:12" elev="0"/>
+<station idn="" id="CWU" name="Central Washington University" lat="47:01:12" lon="-120:31:12" elev="0"/>
+<station idn="" id="IGSU" name="Inst. Geol. Sciences/Victoria Univ." lat="-41:43:47" lon="--171:34:12" elev="0"/>
+<station idn="" id="UOOSS" name="University of Oklahoma/ARM SGP Site" lat="35:33:35" lon="-96:59:24" elev="0"/>
+<station idn="" id="UOA" name="University of Arizona" lat="32:19:12" lon="-111:00:00" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="41:37:12" lon="-82:45:35" elev="0"/>
+<station idn="" id="TUOTAA" name="The University of Texas at Austin" lat="27:43:12" lon="-97:23:23" elev="0"/>
+<station idn="" id="UOH" name="University Of Houston" lat="29:43:12" lon="-95:19:47" elev="0"/>
+<station idn="" id="CFERAIM" name="center for earthquake research and information/U Memphis" lat="36:14:23" lon="-89:03:35" elev="0"/>
+<station idn="" id="SLU" name="Saint Louis University" lat="38:37:47" lon="-90:13:48" elev="0"/>
+<station idn="" id="TPSU" name="The Pennsylvania State University" lat="40:49:12" lon="-77:55:12" elev="0"/>
+<station idn="" id="RDA" name="RDAAC-IRIS" lat="53:04:11" lon="--158:36:00" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="45:15:36" lon="-81:40:12" elev="0"/>
+<station idn="" id="TJHUAPL" name="The Johns Hopkins University Applied Physics Laboratory" lat="39:09:36" lon="-76:54:00" elev="0"/>
+<station idn="" id="UOOSS" name="University of Oklahoma/ARM SGP Site" lat="37:57:00" lon="-98:19:47" elev="0"/>
+<station idn="" id="TAU" name="Texas A&amp;M University" lat="30:42:35" lon="-96:22:12" elev="0"/>
+<station idn="" id="WHOI" name="Woods Hole Oceanographic Institution" lat="41:31:47" lon="-70:38:24" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="45:15:36" lon="-81:40:12" elev="0"/>
+<station idn="" id="UOCD" name="University of California, Davis" lat="38:32:24" lon="-121:45:00" elev="0"/>
+<station idn="" id="SJSU" name="San Jose State University" lat="37:20:23" lon="-121:51:35" elev="0"/>
+<station idn="" id="UOG" name="University of georgia" lat="33:57:00" lon="-83:22:12" elev="0"/>
+<station idn="" id="IEEC" name="IEEC" lat="41:23:23" lon="--2:06:35" elev="0"/>
+<station idn="" id="UOI" name="University of Idaho" lat="42:54:35" lon="-112:25:12" elev="0"/>
+<station idn="" id="IGSU" name="Inst. Geol. Sciences/Victoria Univ" lat="-39:30:00" lon="--174:15:00" elev="0"/>
+<station idn="" id="MUOP" name="Millersville University of Pennsylvania" lat="40:00:00" lon="-76:21:36" elev="0"/>
+<station idn="" id="IMCO" name="Imperial College" lat="51:30:00" lon="-0:50:24" elev="0"/>
+<station idn="" id="FCT" name="FCT/UNESP" lat="-21:06:00" lon="--47:54:00" elev="0"/>
+<station idn="" id="RDA" name="RDAAC-IRIS" lat="68:04:48" lon="--166:26:23" elev="0"/>
+<station idn="" id="UOTAD" name="University of Texas at Dallas" lat="32:59:24" lon="-96:46:12" elev="0"/>
+<station idn="" id="UOI" name="University of Illinois" lat="40:06:00" lon="-88:13:11" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="45:58:12" lon="-85:52:12" elev="0"/>
+<station idn="" id="LSC" name="Lyndon State College" lat="44:33:00" lon="-72:00:36" elev="0"/>
+<station idn="" id="IDGU" name="Instituto de Geofisica, UNAM" lat="20:49:12" lon="-103:40:12" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="43:57:00" lon="-86:26:23" elev="0"/>
+<station idn="" id="UOW" name="University of Washington" lat="47:39:35" lon="-122:18:36" elev="0"/>
+<station idn="" id="DUUN" name="Duke University" lat="36:00:00" lon="-78:54:00" elev="0"/>
+<station idn="" id="WHCO" name="Wheaton College" lat="41:58:12" lon="-71:10:48" elev="0"/>
+<station idn="" id="PEUN" name="Peking University" lat="39:59:24" lon="--116:18:36" elev="0"/>
+<station idn="" id="RPI" name="rensselaer Polytechnic Institute" lat="42:43:47" lon="-73:40:12" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="41:45:00" lon="-81:16:47" elev="0"/>
+<station idn="" id="NGSFC" name="NASA Goddard Space Flight Center" lat="39:00:00" lon="-77:00:00" elev="0"/>
+<station idn="" id="UOC" name="University of Connecticut" lat="41:48:35" lon="-72:16:12" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="45:15:36" lon="-81:40:12" elev="0"/>
+<station idn="" id="UOK" name="Uinversity of Kansas" lat="39:48:35" lon="-96:20:23" elev="0"/>
+<station idn="" id="UWMA" name="UW Madison" lat="45:47:24" lon="-89:05:24" elev="0"/>
+<station idn="" id="UOK" name="University of Kansas" lat="39:48:35" lon="-96:20:23" elev="0"/>
+<station idn="" id="OSU" name="Oregon State University" lat="44:39:35" lon="-123:09:36" elev="0"/>
+<station idn="" id="UON" name="University of Nebraska-Lincoln" lat="65:57:00" lon="-50:37:47" elev="0"/>
+<station idn="" id="UADS" name="Universidad Autonoma de Sinaloa" lat="25:45:35" lon="-107:46:12" elev="0"/>
+<station idn="" id="LEWU" name="LW Experimetal Watershed, USDA,ARS" lat="34:42:00" lon="-98:55:47" elev="0"/>
+<station idn="" id="FIFAER" name="Fraunhofer Institute for Atmospheric Environmental Research" lat="47:28:12" lon="--11:03:35" elev="0"/>
+<station idn="" id="UOOSS" name="University of Oklahoma/ARM SGP Site" lat="35:15:00" lon="-96:44:24" elev="0"/>
+<station idn="" id="CSUMB" name="California State University Monterey Bay" lat="36:40:12" lon="-121:46:12" elev="0"/>
+<station idn="" id="UOC" name="University of Charleston" lat="32:48:35" lon="-79:56:24" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="42:52:47" lon="-78:53:24" elev="0"/>
+<station idn="" id="MOUN" name="Monash University" lat="-37:46:47" lon="--144:58:12" elev="0"/>
+<station idn="" id="JSU" name="Jackson State University" lat="32:18:36" lon="-90:12:36" elev="0"/>
+<station idn="" id="PSU" name="Portland State University" lat="45:33:00" lon="-122:42:00" elev="0"/>
+<station idn="" id="MSU" name="Mississippi State University" lat="33:22:12" lon="-88:57:00" elev="0"/>
+<station idn="" id="UOH" name="University of Helsinki" lat="60:10:48" lon="--24:56:24" elev="0"/>
+<station idn="" id="UOC-C" name="University of Colorado - CIRES" lat="-12:24:00" lon="--130:54:00" elev="0"/>
+<station idn="" id="TAUC" name="Texas A&amp;M University-Corpus Christi" lat="27:42:35" lon="-97:21:00" elev="0"/>
+<station idn="" id="LEO" name="Lamont-Doherty Earth Observatory" lat="41:00:00" lon="-73:54:35" elev="0"/>
+<station idn="" id="UOC" name="University of Connecticut" lat="41:11:23" lon="-72:03:00" elev="0"/>
+<station idn="" id="UOSPB" name="University of Sao Paulo, Brazil" lat="-23:39:00" lon="-46:37:12" elev="0"/>
+<station idn="" id="CFERAIM" name="center for earthquake research and information/U. Memphis" lat="36:28:12" lon="-89:21:00" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="44:07:48" lon="-76:20:23" elev="0"/>
+<station idn="" id="WHOI" name="Woods Hole Oceanographic Institution" lat="41:33:00" lon="-70:39:35" elev="0"/>
+<station idn="" id="GRCG" name="GKSS Research Center Geesthacht" lat="53:24:36" lon="--10:25:12" elev="0"/>
+<station idn="" id="UOCB" name="University of California, Berkeley" lat="37:55:12" lon="-122:09:00" elev="0"/>
+<station idn="" id="DOGSNU" name="Department of Geological Sciences, Northwestern University" lat="42:07:48" lon="-87:42:35" elev="0"/>
+<station idn="" id="IOGU" name="Inst. of  Geophysics, UNAM" lat="19:01:47" lon="-98:19:12" elev="0"/>
+<station idn="" id="MIOT" name="Massachusetts Institute of Technology" lat="42:36:35" lon="-71:29:23" elev="0"/>
+<station idn="" id="UOOSS" name="University of Oklahoma/ARM SGP Site" lat="37:19:47" lon="-99:18:00" elev="0"/>
+<station idn="" id="WMU" name="Western Michigan University" lat="43:10:48" lon="-86:33:35" elev="0"/>
+<station idn="" id="UOPRMC" name="University of Puerto Rico Mayaguez Campus" lat="18:15:36" lon="-67:08:23" elev="0"/>
+<station idn="" id="UOM" name="University of Minnesota" lat="48:11:23" lon="-95:04:48" elev="0"/>
+<station idn="" id="UOA" name="University of Arizona" lat="32:20:23" lon="-110:53:24" elev="0"/>
+<station idn="" id="UOU" name="University of Utah" lat="40:46:12" lon="-111:51:35" elev="0"/>
+<station idn="" id="TAC(" name="The Aerospace Corp (FFRDC)" lat="35:07:48" lon="-119:16:12" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="46:29:23" lon="-84:37:47" elev="0"/>
+<station idn="" id="RDA" name="RDAAC-IRIS" lat="59:34:47" lon="--150:46:12" elev="0"/>
+<station idn="" id="UOF" name="University of Florida" lat="29:45:00" lon="-82:25:47" elev="0"/>
+<station idn="" id="GH&amp;A" name="GW Hannaway &amp; Associates" lat="41:00:36" lon="-106:24:36" elev="0"/>
+<station idn="" id="FSU" name="Florida State University" lat="30:26:23" lon="-84:16:12" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="27:32:24" lon="-93:21:00" elev="0"/>
+<station idn="" id="UOMBC" name="University of Maryland Baltimore County" lat="39:15:36" lon="-76:42:35" elev="0"/>
+<station idn="" id="MANS" name="Meteorological and Navigational Society" lat="46:01:47" lon="--17:07:11" elev="0"/>
+<station idn="" id="NWRCU" name="Northwest Watershed Research Center, USDA-ARS" lat="47:12:36" lon="-116:45:00" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="43:00:00" lon="-87:53:24" elev="0"/>
+<station idn="" id="UOOSS" name="University of Oklahoma/ARM SGP Site" lat="37:07:48" lon="-97:16:12" elev="0"/>
+<station idn="" id="UNSL" name="USDA-ARS National Sedimentation Laboratory" lat="34:22:47" lon="-89:51:35" elev="0"/>
+<station idn="" id="UOOSS" name="University of Oklahoma/ARM SGP Site" lat="38:06:35" lon="-97:30:36" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="43:16:12" lon="-77:37:47" elev="0"/>
+<station idn="" id="GVSU" name="Grand Valley State University" lat="42:58:12" lon="-85:54:35" elev="0"/>
+<station idn="" id="FIOT" name="Florida Institute of Technology" lat="27:57:35" lon="-80:35:24" elev="0"/>
+<station idn="" id="WHOI" name="Woods Hole Oceanographic Institution" lat="41:31:12" lon="-70:37:47" elev="0"/>
+<station idn="" id="USU" name="Utah State University" lat="41:50:24" lon="-111:46:12" elev="0"/>
+<station idn="" id="UOI" name="University of Idaho" lat="46:46:47" lon="-116:59:24" elev="0"/>
+<station idn="" id="TUOTAA" name="The University of Texas at Austin" lat="30:22:12" lon="-97:42:35" elev="0"/>
+<station idn="" id="UOC" name="University of Colorado" lat="39:57:35" lon="-105:30:36" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="45:20:23" lon="-80:02:24" elev="0"/>
+<station idn="" id="JSU" name="Jackson State University" lat="32:19:12" lon="-90:13:11" elev="0"/>
+<station idn="" id="GIUOA" name="Geophysical Institute, Univ. of Alaska" lat="71:18:00" lon="-156:38:24" elev="0"/>
+<station idn="" id="UOOSS" name="University of Oklahoma/ARM SGP Site" lat="36:36:35" lon="-97:29:23" elev="0"/>
+<station idn="" id="AEFF" name="Alaska Experimental Forecast Facility" lat="61:12:00" lon="-149:49:47" elev="0"/>
+<station idn="" id="UOC" name="University of Calgary" lat="51:00:00" lon="-114:00:00" elev="0"/>
+<station idn="" id="UOM" name="University of Miami/RSMAS" lat="25:43:47" lon="-80:10:11" elev="0"/>
+<station idn="" id="UAA" name="University at Albany" lat="42:40:12" lon="-73:49:47" elev="0"/>
+<station idn="" id="GIU" name="Geophysical Institute, UAF" lat="64:52:12" lon="-147:51:35" elev="0"/>
+<station idn="" id="USWRC" name="USDA-ARS, Southwest Watershed Reserch Center" lat="31:48:35" lon="-109:37:12" elev="0"/>
+<station idn="" id="ISU" name="Iowa State University" lat="42:02:24" lon="-93:38:24" elev="0"/>
+<station idn="" id="DRI-UON" name="Desert Research Institute - University of Nevada-Reno" lat="39:37:47" lon="-119:48:00" elev="0"/>
+<station idn="" id="SO,AOS" name="Shanghai Observatory ,China academy of science" lat="31:12:00" lon="--121:12:00" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="47:45:00" lon="-90:20:23" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="40:00:00" lon="-83:01:12" elev="0"/>
+<station idn="" id="UOOSS" name="University of Oklahoma/ARM SGP Site" lat="35:37:12" lon="-96:04:11" elev="0"/>
+<station idn="" id="UOOSS" name="University of Oklahoma/ARM SGP Site" lat="37:22:47" lon="-96:10:48" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="43:38:24" lon="-79:22:47" elev="0"/>
+<station idn="" id="ICGU" name="ITESM Campus Guadalajara University" lat="19:09:00" lon="-104:13:11" elev="0"/>
+<station idn="" id="FCT" name="FCT/UNESP" lat="-0:13:30" lon="-49:06:00" elev="0"/>
+<station idn="" id="RDA" name="RDAAC-IRIS" lat="56:25:47" lon="--58:33:35" elev="0"/>
+<station idn="" id="UONB" name="Univ of New Brunswick" lat="45:57:00" lon="-66:39:00" elev="0"/>
+<station idn="" id="UOT" name="UNIVERSITY OF TECHNOLOGY" lat="18:00:36" lon="--283:06:00" elev="0"/>
+<station idn="" id="NMIOMAT" name="New Mexico Institute of Mining and Technology" lat="-77:31:47" lon="--167:04:48" elev="0"/>
+<station idn="" id="CSUMB" name="California State University Monterey Bay" lat="36:41:24" lon="-121:45:00" elev="0"/>
+<station idn="" id="NSFC" name="NASA/Goddard Space Flight Center" lat="39:44:24" lon="-77:49:47" elev="0"/>
+<station idn="" id="UON" name="University of Nottingham" lat="52:56:24" lon="-1:11:23" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="43:51:00" lon="-82:38:24" elev="0"/>
+<station idn="" id="MHO" name="MIT Haystack Observatory" lat="42:38:24" lon="-71:29:23" elev="0"/>
+<station idn="" id="ITU" name="Istanbul Technical University" lat="41:06:00" lon="--29:06:00" elev="0"/>
+<station idn="" id="UOOSS" name="University of Oklahoma/ARM SGP Site" lat="34:52:47" lon="-98:12:00" elev="0"/>
+<station idn="" id="TUOTLEC" name="The University of Toledo: Lake Erie Center" lat="41:40:47" lon="-83:24:00" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="43:20:23" lon="-79:22:47" elev="0"/>
+<station idn="" id="TUOTAA" name="The University of Texas at Austin" lat="31:28:12" lon="-100:24:36" elev="0"/>
+<station idn="" id="CFERAIM" name="center for earthquake research and information/U Memphis" lat="40:45:35" lon="-89:42:00" elev="0"/>
+<station idn="" id="URS" name="USDA-Agricultural Res. Service" lat="31:29:23" lon="-83:34:47" elev="0"/>
+<station idn="" id="UOOSS" name="University of Oklahoma/ARM SGP Site" lat="38:12:00" lon="-99:18:36" elev="0"/>
+<station idn="" id="NAS" name="NASA/GSFC" lat="40:25:47" lon="-80:16:12" elev="0"/>
+<station idn="" id="UON" name="University of Nebraska" lat="41:08:23" lon="-96:28:12" elev="0"/>
+<station idn="" id="UONCAA" name="University of North Carolina at Asheville" lat="35:38:24" lon="-82:33:35" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="43:38:24" lon="-79:22:47" elev="0"/>
+<station idn="" id="BHO" name="Blue Hill Observatory" lat="42:12:00" lon="-71:06:00" elev="0"/>
+<station idn="" id="UONI" name="University of Northern Iowa" lat="42:31:12" lon="-92:27:36" elev="0"/>
+<station idn="" id="IOEIS" name="Institute of Environment in Sonora" lat="29:18:00" lon="-110:54:00" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="48:49:47" lon="-85:31:12" elev="0"/>
+<station idn="" id="UOM" name="University of Michigan" lat="42:18:36" lon="-83:43:12" elev="0"/>
+<station idn="" id="UOO" name="University of Oklahoma" lat="35:12:00" lon="-97:27:36" elev="0"/>
+<station idn="" id="LANL" name="Los Alamos National Laboratory" lat="35:53:24" lon="-106:17:23" elev="0"/>
+<station idn="" id="TUOTAD" name="The University of Texas at Dallas" lat="32:48:35" lon="-96:45:00" elev="0"/>
+</stationtable>
+

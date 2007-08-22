@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="Rico" >
+<stn name="Spol    " lat="17:36.44:N" lon="61:49.456:W"/>
+<stn name="PAM/GAUS" lat="17:33.047:N" lon="61:44.259:W"/>
+<stn name="Antigua " lat="17:03:N" lon="61:48:W"/>
+<stn name="Barbuda " lat="17:38:N" lon="61:48:W"/>
+
+</stationtable>

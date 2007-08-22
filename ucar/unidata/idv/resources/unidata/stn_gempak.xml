@@ -1,0 +1,110 @@
+<stationtable name="gempak sites">
+<station idn="" id="AFIOT" name="Air Force Institute of Technology" lat="38:48:57" lon="-104:42:39" elev="0"/>
+<station idn="" id="ASU" name="Arizona State University" lat="33:24:53" lon="-111:54:31" elev="0"/>
+<station idn="" id="BSC" name="Bridgewater State College" lat="42:01:00" lon="-71:02:00" elev="0"/>
+<station idn="" id="CCSU-NB" name="Central Connecticut State University - New Britain" lat="41:35:00" lon="-71:45:00" elev="0"/>
+<station idn="" id="CMU" name="Central Michigan University" lat="43:37:00" lon="-84:44:00" elev="0"/>
+<station idn="" id="CSU" name="Colorado State University" lat="40:27:00" lon="-105:01:00" elev="0"/>
+<station idn="" id="COUN" name="Cornell University" lat="42:29:00" lon="-76:27:00" elev="0"/>
+<station idn="" id="CRUN" name="Creighton University" lat="41:07:00" lon="-95:54:00" elev="0"/>
+<station idn="" id="DCO" name="DuPage, College of" lat="41:36:15" lon="-88:05:05" elev="0"/>
+<station idn="" id="ENSDLESH" name="Ecole Normale Supérieure de Lettres et Sciences Humaines" lat="45:43:00" lon="--4:57:00" elev="0"/>
+<station idn="" id="EMRI" name="Embry Riddle" lat="29:11:00" lon="-81:03:00" elev="0"/>
+<station idn="" id="FUOSA" name="Flinders University of South Australia" lat="-34:55:00" lon="--138:37:00" elev="0"/>
+<station idn="" id="FIOT" name="Florida Institute of Technology" lat="28:06:00" lon="-80:38:00" elev="0"/>
+<station idn="" id="FSU" name="Florida State University" lat="30:23:00" lon="-84:21:00" elev="0"/>
+<station idn="" id="GIOT" name="Georgia Institute of Technology" lat="33:38:00" lon="-84:26:00" elev="0"/>
+<station idn="" id="IST" name="Instituto Superior Tecnico" lat="38:46:00" lon="-9:08:00" elev="0"/>
+<station idn="" id="JSU" name="Jackson State University" lat="32:19:00" lon="-90:05:00" elev="0"/>
+<station idn="" id="KECO" name="Kean College" lat="40:40:57" lon="-74:10:10" elev="0"/>
+<station idn="" id="LSU" name="Louisiana State University" lat="30:32:00" lon="-91:09:00" elev="0"/>
+<station idn="" id="LSC" name="Lyndon State College" lat="44:30:00" lon="-72:02:00" elev="0"/>
+<station idn="" id="MIOT" name="Massachusettes Institute of Technology" lat="42:22:00" lon="-71:00:00" elev="0"/>
+<station idn="" id="MCUN" name="McGill University" lat="45:28:00" lon="-73:45:00" elev="0"/>
+<station idn="" id="MSCAD" name="Metro State College at Denver" lat="39:33:50" lon="-104:50:54" elev="0"/>
+<station idn="" id="MTU" name="Michigan Technological University" lat="44:21:00" lon="-84:41:00" elev="0"/>
+<station idn="" id="MIUN" name="Millersville University" lat="40:07:13" lon="-76:17:40" elev="0"/>
+<station idn="" id="MSU-MS" name="Mississippi State University - Mississippi State" lat="32:20:00" lon="-88:45:00" elev="0"/>
+<station idn="" id="NSBF(NM" name="National Scientific Balloon Facility (U. New Mexico)" lat="31:44:00" lon="-95:42:00" elev="0"/>
+<station idn="" id="NPGS" name="Naval Post Graduate School" lat="36:35:26" lon="-121:50:51" elev="0"/>
+<station idn="" id="NCSU" name="North Carolina State University" lat="35:52:00" lon="-78:47:00" elev="0"/>
+<station idn="" id="NOCO" name="Northland College" lat="46:32:59" lon="-90:55:06" elev="0"/>
+<station idn="" id="OSU" name="Ohio State University" lat="40:00:00" lon="-82:59:00" elev="0"/>
+<station idn="" id="PSU" name="Pennsylvania State University" lat="40:49:00" lon="-77:53:00" elev="0"/>
+<station idn="" id="PSC" name="Plymouth State College" lat="43:37:38" lon="-72:18:21" elev="0"/>
+<station idn="" id="PRUN" name="Princeton University" lat="40:19:00" lon="-74:43:00" elev="0"/>
+<station idn="" id="RUUN" name="Rutgers University" lat="40:06:22" lon="-74:37:21" elev="0"/>
+<station idn="" id="SFSU" name="San Francisco State University" lat="37:37:11" lon="-122:21:53" elev="0"/>
+<station idn="" id="SJSU" name="San Jose State University" lat="37:21:33" lon="-121:55:27" elev="0"/>
+<station idn="" id="SDSOMAT" name="South Dakota School of Mines and Technology" lat="44:03:00" lon="-103:03:00" elev="0"/>
+<station idn="" id="SIUC" name="Southern Illinois University, Carbondale" lat="37:42:00" lon="-89:13:00" elev="0"/>
+<station idn="" id="SLU" name="St. Louis University" lat="38:45:00" lon="-90:22:00" elev="0"/>
+<station idn="" id="STUN" name="Stanford University" lat="37:27:00" lon="-122:09:00" elev="0"/>
+<station idn="" id="SUONAA" name="State University of NY at Albany" lat="42:44:48" lon="-73:47:56" elev="0"/>
+<station idn="" id="SUONAB" name="State University of NY at Brockport" lat="43:07:00" lon="-77:40:00" elev="0"/>
+<station idn="" id="SUONAO" name="State University of NY at Oswego" lat="43:28:00" lon="-76:31:00" elev="0"/>
+<station idn="" id="SUONASB" name="State University of NY at Stony Brook" lat="40:44:19" lon="-73:34:25" elev="0"/>
+<station idn="" id="TAU" name="Texas A&amp;M university" lat="30:34:56" lon="-96:21:42" elev="0"/>
+<station idn="" id="TTU" name="Texax Tech University" lat="33:40:00" lon="-101:49:00" elev="0"/>
+<station idn="" id="UOAAH" name="University of Alabama at Huntsville" lat="34:38:37" lon="-86:47:08" elev="0"/>
+<station idn="" id="UOA" name="University of Alaska" lat="64:30:00" lon="-147:01:00" elev="0"/>
+<station idn="" id="UOA" name="University of Arizona" lat="32:07:00" lon="-110:57:00" elev="0"/>
+<station idn="" id="UOCAB" name="University of California at Berkeley" lat="37:51:00" lon="-122:15:00" elev="0"/>
+<station idn="" id="UOCASD" name="University of California at San Diego" lat="32:44:00" lon="-117:11:00" elev="0"/>
+<station idn="" id="UOCA" name="University of California-Los Angeles" lat="33:57:00" lon="-118:24:00" elev="0"/>
+<station idn="" id="UOCR" name="University of Costa Rica" lat="10:00:00" lon="-83:03:00" elev="0"/>
+<station idn="" id="UOD" name="University of Delaware" lat="38:49:00" lon="-75:18:00" elev="0"/>
+<station idn="" id="UOEA" name="University of East Anglia" lat="52:38:00" lon="--1:18:00" elev="0"/>
+<station idn="" id="UOG" name="University of Georgia" lat="33:57:00" lon="-83:20:00" elev="0"/>
+<station idn="" id="UOH" name="University of Hawaii-Manoa" lat="21:20:00" lon="-157:56:00" elev="0"/>
+<station idn="" id="UOI" name="University of Illinois-Urbana" lat="40:05:00" lon="-88:12:00" elev="0"/>
+<station idn="" id="UOI" name="University of Iowa" lat="41:39:00" lon="-91:36:00" elev="0"/>
+<station idn="" id="UOK" name="University of Kansas" lat="38:57:00" lon="-95:13:00" elev="0"/>
+<station idn="" id="UOK" name="University of Kentucky" lat="38:02:00" lon="-84:36:00" elev="0"/>
+<station idn="" id="UOL" name="University of Louisiana/Monroe" lat="32:31:00" lon="-92:02:00" elev="0"/>
+<station idn="" id="UOM" name="University of Maryland" lat="38:48:00" lon="-76:53:00" elev="0"/>
+<station idn="" id="UOMAL" name="University of Massachusettes at Lowell" lat="42:30:00" lon="-71:15:00" elev="0"/>
+<station idn="" id="UOM" name="University of Miami" lat="25:47:26" lon="-80:18:59" elev="0"/>
+<station idn="" id="UOM" name="University of Missouri" lat="38:56:00" lon="-92:22:00" elev="0"/>
+<station idn="" id="UON" name="University of Nebraska-Lincoln" lat="40:49:52" lon="-96:45:52" elev="0"/>
+<station idn="" id="UOM" name="University of Montana" lat="46:50:00" lon="-114:07:00" elev="0"/>
+<station idn="" id="UNCA" name="UNCA" lat="35:26:00" lon="-82:33:00" elev="0"/>
+<station idn="" id="UOND" name="University of North Dakota" lat="47:57:00" lon="-97:11:00" elev="0"/>
+<station idn="" id="UONI" name="University of Northern Iowa" lat="41:53:00" lon="-91:43:00" elev="0"/>
+<station idn="" id="UOO" name="University of Oklahoma" lat="35:13:00" lon="-97:27:00" elev="0"/>
+<station idn="" id="UOO" name="University of Oregon" lat="44:07:00" lon="-123:13:00" elev="0"/>
+<station idn="" id="UDQAM" name="University du Quebec a Montreal" lat="46:48:00" lon="-71:23:00" elev="0"/>
+<station idn="" id="UORI" name="University of Rhode Island" lat="41:36:00" lon="-71:25:00" elev="0"/>
+<station idn="" id="UOU" name="University of Utah" lat="41:26:00" lon="-112:45:00" elev="0"/>
+<station idn="" id="UOW" name="University of Washington" lat="47:26:41" lon="-122:18:49" elev="0"/>
+<station idn="" id="UOW" name="University of Wisconsin" lat="43:08:00" lon="-89:20:00" elev="0"/>
+<station idn="" id="UOWAM" name="University of Wisconsin at Milwaukee" lat="42:58:00" lon="-88:33:00" elev="0"/>
+<station idn="" id="UOW" name="University of Wyoming" lat="41:18:43" lon="-105:40:30" elev="0"/>
+<station idn="" id="USU" name="Utah State University" lat="41:50:00" lon="-111:53:00" elev="0"/>
+<station idn="" id="WCU" name="West Chester University" lat="39:58:00" lon="-75:33:00" elev="0"/>
+<station idn="" id="SIEMN" name="servizio idrografico e mareografico nazionale" lat="41:47:00" lon="--12:35:00" elev="0"/>
+<station idn="" id="UONH" name="University of New Hampshire" lat="43:05:00" lon="-70:49:00" elev="0"/>
+<station idn="" id="EPRI" name="Electric Power Research Institute" lat="37:27:00" lon="-122:09:00" elev="0"/>
+<station idn="" id="TWN-T" name="The Weather Network - Toronto?" lat="43:40:00" lon="-79:23:00" elev="0"/>
+<station idn="" id="NSSL" name="National Severe Storms Laboratory" lat="35:09:00" lon="-97:28:00" elev="0"/>
+<station idn="" id="FAAC" name="FAA Academy" lat="38:50:54" lon="-77:02:03" elev="0"/>
+<station idn="" id="NOAA" name="NOAA" lat="38:50:54" lon="-77:02:03" elev="0"/>
+<station idn="" id="NOF" name="NOAA OAR FSL" lat="40:00:00" lon="-105:15:48" elev="0"/>
+<station idn="" id="NNN" name="NOAA NESDIS NCDC" lat="35:26:00" lon="-82:33:00" elev="0"/>
+<station idn="" id="PDI" name="Planetary Data Incorporated" lat="33:38:00" lon="-84:26:00" elev="0"/>
+<station idn="" id="WDT" name="Weather Decision Technologies" lat="35:09:00" lon="-97:28:00" elev="0"/>
+<station idn="" id="DOCOOIG" name="Department of Commerce Office of Insp. General/Audits" lat="38:50:54" lon="-77:02:03" elev="0"/>
+<station idn="" id="CRA" name="Colorado Research Associates" lat="40:00:00" lon="-105:15:48" elev="0"/>
+<station idn="" id="IFGCR" name="Institute for Global Change Research" lat="-23:30:00" lon="-46:37:00" elev="0"/>
+<station idn="" id="NWS-PRC" name="National Weather Service - Pacific Region CMC" lat="47:27:00" lon="-122:18:00" elev="0"/>
+<station idn="" id="NWS" name="National Weather Service" lat="38:50:54" lon="-77:02:03" elev="0"/>
+<station idn="" id="AWIN" name="AWIS, Inc." lat="32:36:00" lon="-85:30:00" elev="0"/>
+<station idn="" id="ENCA" name="Environment Canada" lat="45:19:00" lon="-75:40:00" elev="0"/>
+<station idn="" id="L-LPLMELMA" name="La.M.M.A. - Laboratorio per la Meteorologia e la Modellistica Ambientale" lat="43:00:00" lon="--11:00:00" elev="0"/>
+<station idn="" id="FHIOY" name="Federal Hydrometeorological Institute of Yugoslavia" lat="44:48:00" lon="--20:28:00" elev="0"/>
+<station idn="" id="MCNC" name="MCNC NCSC" lat="35:52:00" lon="-78:47:00" elev="0"/>
+<station idn="" id="IBM" name="IBM" lat="43:07:00" lon="-77:40:00" elev="0"/>
+<station idn="" id="ALGE" name="Alpine Geophysics" lat="39:55:00" lon="-105:07:00" elev="0"/>
+<station idn="" id="IS-B?" name="INPE SERE - Brasilia ?" lat="-15:52:00" lon="-47:56:00" elev="0"/>
+</stationtable>
+

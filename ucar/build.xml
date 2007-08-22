@@ -1,0 +1,678 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- In Ant all file paths are relative to the basedir.  Since this
+build.xml file is in ucar the basedir is "..", the parent directory of
+ucar.  (Unless overwritten by a calling ant process or by a command line
+argument -Dfoo=bar) -->
+
+
+<project basedir=".." default="all" name="IDV">
+
+    <target name="init">
+
+       <tstamp>
+         <format property="date" pattern="yyyy-MM-dd HH:mm z" timezone="UTC"/>
+       </tstamp>
+
+        <!-- The directory  that contains the source trees (from cvs) -->
+        <property name="srcdir" value="${basedir}"/>
+
+
+       <!-- Read in the version from the properties file -->
+       <property file="${srcdir}/ucar/unidata/idv/resources/version.properties"/>
+       <property name="idv.version" value="${idv.version.major}.${idv.version.minor}${idv.version.revision}"/>
+
+
+        <!-- Where the .class files (and other files for the jars) go -->
+        <property name="compiledir" value="${srcdir}"/>
+        <mkdir dir="${compiledir}"/>
+
+
+        <!-- Where to put the jar files -->
+        <property name="jars_dest" value="${basedir}/lib"/>
+        <mkdir dir="${jars_dest}"/>
+
+        <!-- Where to put the plugin jar files -->
+        <property name="aux_plugins" value="${basedir}/auxdata/plugins"/>
+        <mkdir dir="${aux_plugins}"/>
+
+        <!-- Where to put the generated docs (e.g., javadoc, userguide, etc.) -->
+        <property name="docs_dest" value="${basedir}/docs"/>
+        <mkdir dir="${docs_dest}"/>
+
+
+        <property name="htmldoc" value="/usr/share/htmldoc/htmldoc/htmldoc"/>
+        <property name="docs_srchtml_dest" value="${docs_dest}/srchtml" />
+        <mkdir dir="${docs_srchtml_dest}"/>
+
+        <property name="docs_javadoc_dest" value="${docs_dest}/javadoc" />
+        <mkdir dir="${docs_javadoc_dest}"/>
+
+        <property name="docs_generate_script" value="${srcdir}/auxdata/docs/build/generate.tcl" />
+        <property name="docs_userguide_dest" value="${docs_dest}/userguide"/>
+        <property name="docs_workshop_dest" value="${docs_dest}/workshop"/>
+        <property name="docs_devworkshop_dest" value="${docs_dest}/devworkshop"/>
+        <property name="docs_developer_dest" value="${docs_dest}/developer"/>
+
+<!-- Have this here so we have some blank value of this property
+       for those doc gen tasks  that don't se this argument -->
+
+        <property name="docgen_extra_arg" value=""/> 
+        <property name="docgen_target" value="../processed"/> 
+
+
+        <!-- Location of 3-rd party jarfiles -->
+        <property name="libsdir" value="${jars_dest}"/>
+
+        <!-- The Ant build uses its own classpath -->
+ 
+
+        <property name="tmpjardir" value="${libsdir}/tmpjardir" />
+
+
+
+        <property name="classpath" value="${libsdir}/javaproj.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/nc2.2.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar;${libsdir}/j2h.jar;"/>
+
+
+
+        <!-- You can concatenate the calling process' classpath to the end (the
+        default) or use "ignore" to just use the classpath defined here. -->
+<!--        <property name="build.sysclasspath" value="last"/> -->
+        <property name="build.sysclasspath"    value="ignore" />
+
+        <!-- javac flags -->
+        <property name="failonerror" value="true"/>
+        <property name="fork" value="true"/>
+        <property name="maxmemory" value="128m"/>
+
+        <!-- Source verions -->
+        <property name="srcversion" value="1.5"/>
+
+    </target>
+
+
+    <target name="jarthejars" depends="init">
+        <antcall target="external.jar"/>
+        <antcall target="nc2.2.jar"/>
+    </target>
+
+
+    <target name="external.jar" depends="init">
+        <mkdir dir="${tmpjardir}"/>
+        <delete includeemptydirs="true">
+            <fileset dir="${tmpjardir}" includes="**/*"/>
+        </delete>
+
+        <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/jmf.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/jcalendar.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/jai_codec.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/ij.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/jh.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/geotransform.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/jfreechart.jar" dest="${tmpjardir}"/>
+<!--
+        <unjar src="${libsdir}/itext.jar" dest="${tmpjardir}"/>
+-->
+        <unjar src="${libsdir}/jcommon.jar" dest="${tmpjardir}"/>
+
+        <unjar src="${libsdir}/commons-net-1.4.1.jar" dest="${tmpjardir}"/>
+        <jar 
+            basedir="${tmpjardir}"
+            compress="true"
+            jarfile="${libsdir}/external.jar">
+              <include name="**"/>
+        </jar>
+
+        <delete dir="${tmpjardir}"/>
+
+    </target>
+
+    <target name="test">
+         <echo message="Test running test. Classpath=${classpath}" />
+         <java classname="ucar.unidata.idv.test.RunTest"
+               classpath="${classpath}"
+               memoryMaximumSize="256m"
+               failonerror="true"
+               fork="true"
+               >
+         </java>
+    </target>
+
+    <target name="all" depends="justjars,javadoc" >
+        <antcall target="clean"/>
+    </target>
+
+
+    <target name="justjars" depends="idvjar, auxdatajar, plugins" >
+    </target>
+
+    <target name="plugins" depends="simplejar, workshopjar" >
+    </target>
+
+
+    <target name="simplejar" depends="init" >
+        <ant antfile="${srcdir}/ucar/unidata/apps/simple/build.xml" target="jar" />
+    </target>
+
+    <target name="workshopjar" depends="init" >
+        <ant antfile="${srcdir}/ucar/unidata/apps/workshop/build.xml" target="jar" />
+    </target>
+
+
+    <target name="auxdatajar" depends="init,docs_userguide_forjar">
+        <!-- Build the userguide index -->
+        <antcall target="jhindex"/>
+
+       <!-- Jar em up -->
+        <jar 
+            basedir="${srcdir}"
+            compress="true"
+            jarfile="${jars_dest}/auxdata.jar">
+              <include name="auxdata/jython/libs/**"/>
+              <include name="auxdata/maps/**"/>
+              <include name="auxdata/ui/**"/>
+              <include name="auxdata/docs/userguide/**"/>
+              <exclude name="auxdata/docs/userguide/content/**"/>
+              <exclude name="auxdata/ui/colortables/**"/>
+              <exclude name="auxdata/plugins/**"/>
+           </jar>
+    </target>
+
+
+    <target name="jhindex" depends="init">
+        <exec output="dummyfile"
+            executable="/upc/share/jh/javahelp/bin/jhindexer"
+            failifexecutionfails="false"
+            dir="${srcdir}/auxdata/docs/userguide">
+            <arg line="/opt/jdk/bin/java -logfile jh.out processed"/>
+<!--
+            <env key="PATH" value="/bin:/usr/bin"/>
+-->
+            <!-- <env key="LAX_DEBUG" value="true"/> -->
+        </exec>
+    </target>
+
+
+
+    <target name="idvjar" depends="init">
+        <antcall target="clean"/>
+        <antcall target="jaridv"/>
+    </target>
+
+
+    <target name="jaridv" depends="init">
+        <antcall target="idv"/>
+        <copy overwrite="true" file="ucar/unidata/idv/resources/version.properties" tofile="ucar/unidata/idv/resources/build.properties">
+            <filterset>
+                <filter token="DATE" value="${date}"/>
+            </filterset>
+        </copy>
+
+        <antcall target="jarmf"> 
+            <param name="jarfile" value="idv"/> 
+            <param 
+                name="excludes"
+                value="ucar/unidata/apps/**,ucar/unidata/idv/resources/unidata/**,ucar/nc2/**,ucar/ma2/**,ucar/util/prefs/**,ucar/unidata/idv/release/**,ucar/unidata/io/**,ucar/unidata/geolo/**"
+
+            /> 
+        </antcall>
+    </target>
+
+    <target name="idv" depends="init">
+        <javac
+            classpath="${classpath}"
+            debug="true"
+            source="${srcversion}"
+            deprecation="false" 
+            destdir="${compiledir}"
+            failonerror="${failonerror}" 
+            srcdir="${srcdir}"
+            fork="${fork}"
+            memoryMaximumSize="${maxmemory}"
+        >
+<!--
+            <compilerarg value="-Xlint:-serial" compiler="javac1.5"/>
+-->
+            <include name="ucar/unidata/idv/**"/>
+            <include name="ucar/unidata/data/**"/>
+            <include name="ucar/unidata/util/**"/>
+<!--
+            <include name="ucar/unidata/geoloc/**"/>
+-->
+            <include name="ucar/unidata/ui/symbol/**"/>
+            <include name="ucar/unidata/apps/**"/>
+            <exclude name="ucar/unidata/io/**"/>
+            <exclude name="ucar/unidata/apps/lead/**"/>
+            <exclude name="ucar/util/prefs/**"/>
+            <exclude name="ucar/nc2/**"/>
+            <exclude name="ucar/ma2/**"/>
+            <exclude name="ucar/grib/**"/>
+        </javac>
+    </target>
+
+
+    <target name="docs" depends="init,docs_userguide_forweb,docs_workshop,docs_devworkshop,docs_developer">
+<!--
+        <antcall target="javadoc"/>
+-->
+
+<!--
+TODO: Do we really want the full source base htmlized. It ends up being huge!
+        <antcall target="srchtml"/>
+-->
+
+
+<!-- Copy the config.php file over -->
+        <copy overwrite="true"  todir="${docs_dest}">
+             <fileset file="auxdata/docs/build/config.php"/>
+        </copy>
+
+
+        <copy overwrite="true"  todir="${docs_userguide_dest}">
+             <fileset file="auxdata/docs/userguide/processed/**"/>
+        </copy>
+
+        <copy overwrite="true"  todir="${docs_workshop_dest}">
+             <fileset file="auxdata/docs/workshop/processed/**"/>
+        </copy>
+
+        <copy overwrite="true"  todir="${docs_devworkshop_dest}">
+             <fileset file="auxdata/docs/workshop/devprocessed/**"/>
+        </copy>
+
+        <copy overwrite="true"  todir="${docs_developer_dest}">
+             <fileset file="auxdata/docs/developer/processed/**"/>
+        </copy>
+    </target>
+
+
+    <target name="docs_gen" depends="init">
+      <echo message="Generating docs: ${docgen_dir}"/>
+
+      <echo message="dir1=${srcdir}/auxdata/docs/${docgen_dir}"/>
+
+      <exec failifexecutionfails="false"
+            dir="${srcdir}/auxdata/docs/${docgen_dir}" 
+            executable="/usr/bin/tclsh" os="Linux" >
+        <arg line="${docs_generate_script} -noverbose -target ${docgen_target} ${docgen_extra_arg} "/>
+      </exec>
+
+      <exec failifexecutionfails="false"
+            dir="${srcdir}/auxdata/docs/${docgen_dir}" 
+            executable="/opt/bin/tclsh" os="SunOS" >
+        <arg line="${docs_generate_script} -noverbose -target ${docgen_target} ${docgen_extra_arg} "/>
+      </exec>
+
+
+      <exec failifexecutionfails="false"
+            dir="${srcdir}/auxdata/docs/${docgen_dir}" 
+            executable="c:/Tcl/bin/tclsh" os="Windows XP" >
+        <arg line="${docs_generate_script} -noverbose -target ${docgen_target} ${docgen_extra_arg} "/>
+      </exec>
+
+    </target>
+
+
+
+    <target name="docs_userguide_forweb" depends="init">
+        <antcall target="docs_gen"> 
+            <param name="docgen_dir" value="userguide/content"/> 
+        </antcall>
+    </target>
+
+
+    <target name="docs_pdf" depends="init">
+        <antcall target="docs_userguide_forpdf"/> 
+        <exec output="dummyfile"
+              executable="${htmldoc}"
+              failifexecutionfails="false"
+              os="Linux"
+              dir="${srcdir}/auxdata/docs/userguide/processed">
+              <arg line="-f userguide.pdf --book --footer ./. --header .t. --headfootsize 16  userguide.html"/>
+        </exec>
+        <copy overwrite="true"  todir="${docs_dest}/userguide">
+            <fileset file="${srcdir}/auxdata/docs/userguide/processed/userguide.pdf"/>
+        </copy>
+
+        <antcall target="docs_workshop_forpdf"/> 
+        <exec output="dummyfile"
+              executable="${htmldoc}"
+              failifexecutionfails="false"
+              os="Linux"
+              dir="${srcdir}/auxdata/docs/workshop/processed">
+              <arg line="-f workshop.pdf --book --footer ./. --header .t. --headfootsize 16  workshop.html"/>
+        </exec>
+        <antcall target="docs_devworkshop_forpdf"/> 
+        <exec output="dummyfile"
+              executable="${htmldoc}"
+              failifexecutionfails="false"
+              os="Linux"
+              dir="${srcdir}/auxdata/docs/workshop/devprocessed">
+              <arg line="-f devworkshop.pdf --book --footer ./. --header .t. --headfootsize 16  workshop.html"/>
+        </exec>
+        <copy overwrite="true"  todir="${docs_dest}/workshop">
+            <fileset file="${srcdir}/auxdata/docs/workshop/processed/workshop.pdf"/>
+        </copy>
+        <copy overwrite="true"  todir="${docs_dest}/devworkshop">
+            <fileset file="${srcdir}/auxdata/docs/workshop/devprocessed/devworkshop.pdf"/>
+        </copy>
+    </target>
+
+
+    <target name="docs_userguide_forpdf" depends="init">
+        <antcall target="docs_gen"> 
+            <param name="docgen_dir" value="userguide/content"/> 
+            <param name="docgen_extra_arg" value="-clean -doall"/> 
+        </antcall>
+    </target>
+
+
+    <target name="docs_workshop_forpdf" depends="init">
+        <antcall target="docs_gen"> 
+            <param name="docgen_dir" value="workshop/content"/> 
+            <param name="docgen_extra_arg" value="-clean -doall"/> 
+        </antcall>
+    </target>
+
+
+    <target name="docs_devworkshop_forpdf" depends="init">
+        <antcall target="docs_gen"> 
+            <param name="docgen_dir" value="workshop/content"/> 
+            <param name="docgen_target" value="../devprocessed"/> 
+            <param name="docgen_extra_arg" value="-clean -doall -fordev"/> 
+        </antcall>
+    </target>
+
+
+    <target name="docs_userguide_forjar" depends="init">
+        <antcall target="docs_gen"> 
+            <param name="docgen_dir" value="userguide/content"/> 
+            <param name="docgen_extra_arg" value="-clean -forjavahelp"/> 
+        </antcall>
+    </target>
+
+
+    <target name="docs_workshop" depends="init">
+        <antcall target="docs_gen"> 
+            <param name="docgen_dir" value="workshop/content"/> 
+        </antcall>
+    </target>
+
+
+    <target name="docs_devworkshop" depends="init">
+        <antcall target="docs_gen"> 
+            <param name="docgen_dir" value="workshop/content"/> 
+            <param name="docgen_target" value="../devprocessed"/> 
+            <param name="docgen_extra_arg" value="-clean -fordev"/> 
+        </antcall>
+    </target>
+
+
+    <target name="docs_developer" depends="init">
+        <antcall target="docs_gen"> 
+            <param name="docgen_dir" value="developer/content"/> 
+        </antcall>
+    </target>
+
+
+
+    <target name="javadoc" depends="init">
+        <javadoc
+            Author="true"
+            Doctitle="Unidata IDV API v${idv.version}"
+            Use="true"
+            Version="true"
+            Windowtitle="Unidata IDV API v${idv.version}"
+            classpath="${classpath}:/upc/share/junit/junit.jar"
+            destdir="${docs_javadoc_dest}"
+            maxmemory="256m"
+            sourcepath="${srcdir}"
+                 >
+            <link href="http://www.ssec.wisc.edu/~dglo/visad"/>
+            <link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
+            <package name="ucar.unidata.beans"/>
+            <package name="ucar.unidata.collab"/>
+            <package name="ucar.unidata.data.*"/>
+<!--
+            <package name="ucar.unidata.geoloc.*"/>
+-->
+            <package name="ucar.unidata.gis.*"/>
+            <package name="ucar.unidata.idv.*"/>
+            <package name="ucar.unidata.metdata"/>
+            <package name="ucar.unidata.ui.*"/>
+            <package name="ucar.unidata.util"/>
+            <package name="ucar.unidata.view.*"/>
+            <package name="ucar.unidata.xml.*"/>
+            <package name="ucar.units.*"/>
+            <package name="ucar.visad"/>
+            <package name="ucar.visad.display"/>
+            <package name="ucar.visad.functiontypes"/>
+            <package name="ucar.visad.quantities"/>
+            <!-- Exclude the packages that are broken -->
+            <excludepackage name="ucar.ma2"/>
+            <excludepackage name="ucar.multiarray"/>
+            <excludepackage name="ucar.nc2"/>
+            <excludepackage name="ucar/units"/>
+            <excludepackage name="ucar.unidata.io"/>
+            <excludepackage name="ucar.netcdf"/>
+            <excludepackage name="ucar/unidata/idv/test"/>
+            <excludepackage name="ucar/unidata/view/windprofile"/>
+            <excludepackage name="ucar/unidata/view/sounding/test"/>
+            <excludepackage name="ucar/unidata/xml/test"/>
+            <excludepackage name="ucar/unidata/grid"/>
+            <excludepackage name="ucar.visad.physics"/>
+        </javadoc>
+    </target>
+
+    <target name="doclint" depends="init" >
+        <javadoc
+            doclet="com.jollem.doclint.DocLint"
+            docletpath="${libsdir}/doclint.jar"
+            maxmemory="128m"
+            sourcepath="${srcdir}"
+        >
+            <package name="ucar.multiarray"/>
+            <package name="ucar.netcdf"/>
+            <package name="ucar.unidata.beans"/>
+            <package name="ucar.unidata.data.*"/>
+            <package name="ucar.unidata.geoloc.*"/>
+            <package name="ucar.unidata.io"/>
+            <package name="ucar.unidata.gis.*"/>
+            <package name="ucar.unidata.idv.*"/>
+            <package name="ucar.unidata.metdata"/>
+            <package name="ucar.unidata.text"/>
+            <package name="ucar.unidata.ui.*"/>
+            <package name="ucar.unidata.units.*"/>
+            <package name="ucar.unidata.util"/>
+            <package name="ucar.unidata.view.*"/>
+            <package name="ucar.units.*"/>
+            <package name="ucar.visad"/>
+            <package name="ucar.visad.display"/>
+            <package name="ucar.visad.functiontypes"/>
+            <package name="ucar.visad.quantities"/>
+            <!-- Exclude the packages that are broken -->
+            <excludepackage name="ucar.ma2"/>
+            <excludepackage name="ucar.nc2"/>
+            <excludepackage name="ucar.nc2.dods"/>
+            <excludepackage name="ucar.nc2.dataset"/>
+            <excludepackage name="ucar/unidata/grid"/>
+            <excludepackage name="ucar/unidata/view/sounding/test"/>
+        </javadoc>
+    </target>
+
+    <target name="doclint2" depends="init" >
+        <javadoc
+            doclet="com.jollem.doclint.DocLint"
+            docletpath="${libsdir}/doclint.jar"
+            maxmemory="128m"
+            sourcepath="${srcdir}"
+        >
+            <package name="ucar.unidata.idv.*"/>
+        </javadoc>
+    </target>
+
+    <target name="doclintfile" depends="init" >
+        <javadoc
+            doclet="com.jollem.doclint.DocLint"
+            docletpath="${libsdir}/doclint.jar"
+            maxmemory="128m"
+            sourcepath="${srcdir}"
+        >
+            <fileset dir="ucar/unidata/util">
+                <include name="GuiUtils.java"/>
+            </fileset>
+        </javadoc>
+    </target>
+
+
+    <target name="srchtml" depends="init">
+        <taskdef name="java2html" classname="com.java2html.Java2HTMLTask"/>
+        <java2html title="IDV Source" 
+                simple="no"
+                tabsize="4"
+                marginsize="2"
+                header="true"
+                footer="false"
+                destination="${docs_srchtml_dest}">
+                <fileset dir="ucar">
+                    <include name="**/*.java"/>
+                </fileset>
+         <javadoc localRef="${docs_javadoc_dest}" />
+        </java2html>
+    </target>
+
+
+    <target name="jar" depends="init">
+        <antcall target="copyauxfiles"/>
+        <jar 
+            basedir="${compiledir}"
+            compress="true"
+            jarfile="${jars_dest}/${jarfile}.jar"
+        >
+            <include name="ucar/**/*.class"/>
+            <include name="ucar/**/*.properties"/>
+            <include name="ucar/**/*.xml"/>
+
+            <include name="ucar/**/*.rbi"/>
+            <include name="ucar/**/*.html"/>
+            <include name="ucar/**/*.txt"/>
+            <include name="ucar/**/*.py"/>
+            <include name="ucar/**/*.jnlp"/>
+            <include name="ucar/**/*.defaults"/>
+            <include name="ucar/**/*.gif"/>
+            <include name="ucar/**/*.jpg"/>
+            <include name="ucar/**/*.jpeg"/>
+            <include name="ucar/**/README*"/>
+            <include name="ucar/**/VERSION*"/>
+            <include name="ucar/**/INSTALL*"/>
+        </jar>
+    </target>
+
+
+    <target name="srcjar" depends="init">
+        <jar 
+            basedir="${compiledir}"
+            compress="true"
+            jarfile="idv_src_${idv.version}.jar"
+        >
+            <include name="ucar/**"/>
+            <exclude name="ucar/**/CVS/**"/>
+            <exclude name="ucar/**/*.class"/>
+            <exclude name="ucar/**/*.map"/>
+            <exclude name="ucar/**/*.jar"/>            
+            <exclude name="ucar/**/*.ascii"/>            
+            <exclude name="ucar/**/*.tml"/>            
+            <exclude name="ucar/**/*.bak"/>            
+            <exclude name="ucar/**/*.zip"/>            
+            <exclude name="ucar/**/*.shp"/>            
+            <exclude name="ucar/**/*.nc"/>            
+            <exclude name="ucar/unidata/apps/demo/**"/>
+            <exclude name="ucar/unidata/apps/imageviewer/**"/>
+            <exclude name="ucar/unidata/apps/geon/**"/>
+            <exclude name="ucar/unidata/apps/lead/**"/>
+            <exclude name="ucar/unidata/apps/rico/**"/>
+            <exclude name="ucar/unidata/apps/trex/**"/>
+            <exclude name="ucar/unidata/gridviewer/**/*.*"/>
+            <exclude name="ucar/unidata/grid/**"/>
+            <exclude name="ucar/unidata/idv/release/**"/>
+            <exclude name="ucar/unidata/view/sounding/test/**"/>
+
+        </jar>
+    </target>
+
+    <target name="jarmf" depends="init">
+        <antcall target="copyauxfiles"/>
+        <jar
+            basedir="${compiledir}"
+            compress="true"
+            jarfile="${jars_dest}/${jarfile}.jar"
+            excludes="${excludes}"
+        >
+           <manifest>
+              <attribute name="Implementation-Title" value="Unidata's Integrated Data Viewer (IDV)"/>
+              <attribute name="Implementation-Version" value="${idv.version}"/>
+              <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
+              <attribute name="Main-class" value="ucar.unidata.idv.DefaultIdv"/>
+              <attribute name="Class-Path" value="auxdata.jar local-visad.jar visad.jar jython.jar external.jar nc2.2.jar"/>
+            </manifest> 
+            <include name="ucar/**/*.class"/>
+            <include name="ucar/**/*.properties"/>
+            <include name="ucar/**/*.xml"/>
+            <include name="ucar/**/*.html"/>
+            <include name="ucar/**/*.rbi"/>
+            <include name="ucar/**/*.defaults"/>
+            <include name="ucar/**/*.txt"/>
+            <include name="ucar/**/*.py"/>
+            <include name="ucar/**/*.jnlp"/>
+            <include name="ucar/**/*.gif"/>
+            <include name="ucar/**/*.jpg"/>                  
+            <include name="ucar/**/*.png"/>                  
+            <include name="ucar/**/*.jpeg"/>
+            <include name="ucar/unidata/idv/isl/**/*.isl"/>
+            <include name="ucar/unidata/idv/isl/**/*.kml"/>
+            <include name="ucar/**/README*"/>
+            <include name="ucar/**/VERSION*"/>
+            <include name="ucar/**/INSTALL*"/>
+        </jar>
+    </target>
+
+<!-- TODO: What do we want zipped up here? -->
+    <target name="ziphelp" depends="init">
+        <zip
+            zipfile="${jars_dest}/idv_help.zip"
+            compress="true">
+            <fileset
+               dir="${compiledir}/${userguide_path}/processed"
+               includes="**"
+               excludes="CVS/**" />
+        </zip>
+    </target>
+
+    <target name="copyauxfiles" depends="init">
+         <copy overwrite="true"  todir="${compiledir}">
+             <fileset dir="${srcdir}">
+                  <include name="ucar/**/*.properties"/>
+                  <include name="ucar/**/*.xml"/>
+                  <include name="ucar/**/*.rbi"/>
+                  <include name="ucar/**/*.defaults"/>
+                  <include name="ucar/**/*.txt"/>
+                  <include name="ucar/**/*.py"/>
+                  <include name="ucar/**/*.jnlp"/>
+                  <include name="ucar/**/*.gif"/>
+                  <include name="ucar/**/*.jpg"/>
+                  <include name="ucar/**/*.jpeg"/>
+                  <include name="ucar/**/README*"/>
+                  <include name="ucar/**/VERSION*"/>
+                  <include name="ucar/**/INSTALL*"/>
+             </fileset>
+         </copy>
+    </target>
+
+    <target name="clean" depends="init" >
+        <delete>
+            <fileset dir="${compiledir}/ucar" includes="**/*.class"/>
+        </delete>
+    </target>
+
+</project>

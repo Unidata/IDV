@@ -1,0 +1,113 @@
+<html><head>
+  <title> Image and Movie Capture</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+
+You can capture the main 3D view as an image,
+a QuickTime movie or an animated GIF.
+
+
+<%childlist%>
+
+[ht::subhead jpegcapture {Saving Images} {intoc="false"}]
+
+You can save a display as an image. Select the 
+[ug::menu View  Capture {Image...}] menu item.  
+A file dialog will
+popup where you can enter a file name for the image file. The IDV
+supports JPEG, PNG and GIF formats.
+From this File Dialog you can also specify the image quality (only 
+used for JPEG's and what to capture.
+<p>
+Note: when capturing a image the screen cannot be obscured.
+<p>
+The IDV can also write out an image and the corresponding
+Google Earth KML or KMZ file. For this to be correct the
+projection must be a Lat/Lon geographic projection (i.e.,  rectilinear)
+and in an overhead view.  The simplest way to get a correct projection
+is to select the [ug::menu Projections {Set Current View as Projection}]
+menu item. If you specify a .kml file the IDV will generate
+an image with the same file prefix and the kml file that refers
+to the image. If you specify a .kmz file the IDV this file
+(which is a zip format) will contain the image and the kml file.
+
+
+[ht::subhead printcapture {Print Current View} {intoc="false"}]
+
+You can send any display to a printer. Select the
+[ug::menu View  Capture {Print...}] menu item.
+A <b>Print</b> dialog will popup where you can configure and print an image.
+
+[ht::subhead moviecapture {Save QuickTime Movies} {intoc="false"}]
+
+You can save any sequence of displays as a QuickTime movie. 
+Select the [ug::menu View  Capture {QuickTime Movie...}] menu item
+to bring up  the &quot;Image capture&quot;  window:
+
+[ht::cimg images/VMImageCapturePopup.gif]
+
+To make a QuickTime movie or animated GIF
+there are three steps: capturing the frames, previewing the
+frames, and creating the movie.
+
+<p>
+
+
+To capture frames, in the <b>Capture</b> section of the "Image capture"  window, do one of the following three choices:
+<ul>
+<li>click on the <b>Capture one image</b> button to make a single frame of the current
+IDV display. Then you change the display to exactly what you want
+in the next frame, capture that new image, and continue through the movie.
+
+<li> Click  on <b>Capture animation</b> to automatically capture all frames in a 
+display time sequence which you can animate with the usual IDV 
+<a href="../ui/Animation.html">Time Animation
+Controls</a>. Check <b>Reset to start time</b> to ensure that you 
+capture the entire animation sequence. The
+QuickTime animation capture starts on the first frame visible in the
+IDV and goes to the end. So you can use this to capture part of a sequence.
+
+
+<li> Click on <b>Capture automatically</b>
+to start taking snapshots of frames from the IDV
+display while you make changes, such as while you change the viewpoint
+by zooming, rotation, and panning, and combinations
+of all three.
+To stop the automatic snapshots, click on the button again (which now says Stop). 
+You can set the automatic snapshot sampling rate with the 
+[ug::button  Rate] field.
+</ul>
+
+You can combine these different methods of capture. The list of frames is additive.
+
+<p>
+
+If you want to save the individual intermediate files that are used to 
+create the movie, select [ug::button Save files to] button and specify a directory and 
+file name format. Otherwise, the intermediate files will be saved in a temporary
+directory and will be removed.
+
+<p>
+
+You can [ug::button Preview] the movie and remove individual frames 
+or [ug::button Delete All] the frames. 
+<p>
+
+
+When done capturing frames select the [ug::button Save movie] button
+to specify the Quicktime movie file (.mov) or the animated GIF file (.gif). 
+
+
+[ht::subhead  movieplayback {Play QuickTime Movies} {intoc="false"}]
+
+The IDV supports displaying certain types of Quicktime movies (including
+the ones the IDV generates). Just load in the Quicktime movie from
+the File Data Chooser.
+
+
+</body>
+
+

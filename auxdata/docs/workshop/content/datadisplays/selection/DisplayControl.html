@@ -1,0 +1,316 @@
+
+<html>
+<head>
+<title>Using the Display Controls</title>
+</head>
+
+<body>
+
+<div class="overview">
+Each display has a <b>display control</b> associated with it.  
+A [ht::dialog {Display Control Window}] is a panel or window
+with menus, buttons, sliders, and other widgets to control a display.
+When a display is first created its <b>display control</b> is added 
+to the [ht::dialog Dashboard] or pops up in a separate window depending
+on your configuration.  The control also has a legend shown in the 
+[ht::display View Window]'s legend panel.
+</div>
+
+<div class="pagesubtitle">The Display Control Window</div>
+
+The control window is used to change the properties of the display.
+Each display type may have a different set of widgets in the
+control window.  For our dewpoint display, the control looks
+like this:
+
+[ht::cimg images/DisplayControlWindow.gif] 
+
+The functionality of each display control will be covered in
+subsequent exercises so we won't go over them here.
+
+<div class="pagesubtitle">Display Control Menus</div>
+
+In addition to the widgets, each display control has a set of 
+menus associated with it that allow you to change the behavior of 
+the control, change some of the display characteristics, or get 
+help on using the control.  
+
+<p>The menus can be accessed from the menu bar in the control
+window:
+
+[ht::cimg images/DisplayControlMenu.gif] 
+
+<p>or by right clicking on the legend label:
+
+[ht::cimg images/LegendMenu.gif] 
+
+Let's briefly look at what is in each of these.
+
+<p><b>File Menu</b><p>
+
+The <code class="menu">File</code> menu allows to remove, save or reload
+the this control.  Each display control may have a different
+set of entries under this menu, depending on the type of data
+being displayed.
+
+[ht::cimg images/DCFileMenu.gif] 
+
+Some common choices are:
+
+<ul class="step">
+
+[menuDesc {Remove Display} { Use this item to
+      remove the display from the [ht::display View Window].  
+      You can also remove the display by clicking on the
+      trash can icon ([ht::img %dotpath%images/Remove16.gif {trash can}]) in
+      the side legend or at the bottom of the control in
+      the [ht::dialog Dashboard].
+}]
+
+[menuDesc [ht::menu Save {Save Data in Cache...}] { 
+This menu item allows you to save the currently loaded field 
+in a data cache.  This is useful for saving the results of a 
+complicated formula for future displays or even for use in 
+another formula.
+}]
+
+[menuDesc [ht::menu Save {Save as Parameter Defaults}] { 
+Allows you to save current properties (e.g., 
+color table, contour information, display unit) of this parameter 
+as the default for other displays of this parameter.
+}]
+
+[menuDesc [ht::menu Save {Save Display as Favorite...}] { 
+Allows you to save this display as a special template that can be
+applied to other parameters of a similar type. 
+}]
+
+[menuDesc [ht::menu Save {Save Display as Bundle...}] { 
+This menu item allows you to save the display as a bundle that 
+you can then associate with a new data source.
+}]
+
+[menuDesc {Reload Data} { 
+This menu item allows you to reload the data in the control.  It
+is useful if the underlying data source has changed.
+}]
+
+</ul>
+
+
+<p><b>Edit Menu</b><p>
+
+The <code class="menu">Edit</code> menu allows you to edit some of
+the properties of the display.  Each display control may have a different
+set of entries (or none) under this menu, depending on the type of data
+being displayed.
+
+[ht::cimg images/DCEditMenu.gif] 
+
+Some common choices are:
+
+<ul>
+
+[menuDesc {Levels} { For displays that have a multiple vertical levels,
+this menu allows you to select a particular level.
+}]
+
+[menuDesc {Color Table} { For displays that have a color table this
+menu allows you to edit the color table, change the range, choose a new
+color table, etc.
+}]
+
+[menuDesc {Change Parameter...} { Some displays allow you to change the
+data parameter that is being used
+}]
+
+[menuDesc {Change Display Unit...} { Some displays allow you to change
+the unit that is used in the display, e.g., changing temperature plots
+in Kelvin to Celsius.
+}]
+
+[menuDesc [ht::menu Sharing {Sharing On}] { 
+Use this checkbox menu item to share some of the properties 
+of this display with similar display types in the same share group.
+}]
+
+[menuDesc {Properties} { 
+Use this menu to bring up the [ht::dialog {Display Control Properties}]
+editor.
+}]
+
+</ul>
+
+<p><b>Display Control Properties</b><p>
+
+[ht::cimg images/DCProperties.gif]
+
+The [ht::dialog {Display Control Properties}] dialog allows you to change 
+some of the features of the display and how the control works:
+
+<ul>
+
+[menuDesc {Display Category} { You can change the display category for this
+control.  You can select from existing categories, or type
+in a new one.  The display category, is used to group displays 
+within the side legend.
+}]
+
+[menuDesc {Legend Label} { You can change the label that describes
+this display and is shown in the legend. You can add in plain text
+or insert some pre-defined <i>macros</i> using the [ht::button Add Macro]
+button.  You can also use this button to save the configuration
+for other displays of this type.
+}]
+
+[menuDesc {Extra Legend Labels} { You can add extra labels to the legend
+by entering them here.
+}]
+
+[menuDesc {Display Label} { You can change the formatting of the
+label in the main display similar to changing the Legend Label.
+}]
+</ul>
+<p>
+
+You can use the checkboxes in the dialog to change other properties.
+Some common choices are:
+
+<ul>
+
+[menuDesc {Lock Visibility Toggle} { This locks/unlocks the
+toggling of visibility for this display. [ht::visibility].
+}]
+
+[menuDesc {Use Fast Rendering} { This option will render data
+without checking for projection seams.  It increases the rendering
+speed at the expense of accuracy.
+}]
+
+[menuDesc {Remove on Remove All} {
+This checkbox lets you control when a display is removed if 
+the user selects Remove All Displays. For example, the default 
+map display has this turned off.
+}]
+
+[menuDesc {Show in Display List} {
+This checkbox lets you control whether a display is shown in the
+display list.
+}]
+
+[menuDesc {Use Times in Animation} { 
+If this display has times associated with it, this option
+tells the IDV whether they should be used in setting the
+animation steps.
+}]
+
+[menuDesc {Show Note Text} { 
+Use this item to show a note entry box where 
+you can make annotations for this display:
+
+[ht::cimg images/DCNote.gif] 
+}]
+
+</ul>
+<p>
+Try these changes:
+
+<ol class="step">
+
+  <li><b>Change the display's category</b> -  Bring up the
+      [ht::dialog Display Control Properties] dialog. Change the category 
+      to &quot;Derived Parameters&quot; and
+      then click the [ht::button OK] button. </li> 
+
+  <li><b>Change the name of the display</b> - Right click on the name and select
+      the [ht::menu Edit {Properties}] menu.  In the text field, 
+      type &quot;My cool dewpoint display&quot; then click the
+      [ht::button OK] button.  Try different
+       combinations of the macros to see their effect.</li>
+
+  <li><b>Change the display label</b> -  Bring up the
+      [ht::dialog Display Control Properties] dialog. Highlight and delete
+      the [ht::param {%displayname%}] macro in the
+      Display Label field.  Click the [ht::button {Add Macro}]
+      button and select the [ht::menu Level] macro.  Click
+      the [ht::button OK] button and see the change in the display.</li>
+
+  <li><b>Add a color scale</b> -  Bring up the
+      [ht::dialog Display Control Properties] dialog. Select the 
+      [ht::tab {Color Scale}]
+      tab in the dialog.  Check the [ht::command Visible] checkbox,
+      set the [ht::command Position] to [ht::menu Left], and set
+      the [ht::command {Label Color}] to white, then click
+      the [ht::button OK] button and see the change in the display.</li>
+</ol>
+
+<p><b>View Menu</b><p>
+
+The <code class="menu">View</code> menu allows you to change the
+way the view works.  Each display control may have a different
+set of entries under this menu, depending on the type of data
+being displayed.
+
+[ht::cimg images/DCViewMenu.gif] 
+
+Some of the things you can do with this menu are:
+
+<ul class="step">
+
+[menuDesc {Visible} { 
+Use this checkbox menu item to toggle the visibility of the 
+display in the <code class="dialog">View Window</code>.
+}]
+
+[menuDesc {Use Times in Animation} { 
+If this display has times associated with it, this option
+tells the IDV whether they should be used in setting the
+animation steps.
+}]
+
+[menuDesc {Bring to Front} { 
+This will reorder the displays to put this in the foreground
+of other displays at the same vertical level.  It is useful
+when displays have transparent color tables.
+}]
+
+[menuDesc {Use Data Projection} { 
+This menu item sets the projection in the currently active
+view window to that of the data used by this control.
+}]
+
+[menuDesc {Dock in/Undock from Dashboard} { 
+This menu item allows you to dock or undock the display control
+window in/from the [ht::dialog Dashboard].
+}]
+
+</ul>
+
+<p><b>Help Menu</b><p>
+
+The <code class="menu">Help</code> menu allows you to get more
+information on using the control and what data is being displayed.
+
+[ht::cimg images/DCHelpMenu.gif] 
+
+With this menu you can:
+
+<ul class="step">
+
+[menuDesc {Details...} { 
+Use this menu item to get more detail on the parameter being displayed:
+
+[ht::cimg images/Details.gif] 
+}]
+
+[menuDesc {User's Guide} { 
+Use this menu item to access the IDV User's Guide section 
+pertaining to the particular display control.
+}]
+
+</ul>
+
+Now let's look at using the display control legends.
+
+</body>
+</html>

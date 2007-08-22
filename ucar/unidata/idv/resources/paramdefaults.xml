@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<params>
+<!-- 
+table is color table name; see for example colortables.xml and 
+color table editor displays 
+name is in lower case only
+range values are in units of display units or whatever units     
+derived parameter computations come up with unless otherwise
+specified  -->
+  <param
+     name="temp"
+     table="Temperature"
+     range_min="-90.0"
+     range_max="45.0"
+     ci_interval="5"
+     ci_base="0"
+     unit="celsius"/>
+  <param
+     name="rh"
+     table="Relative humidity"
+     range_min="0.0"
+     range_max="100.0"
+     ci_base="0.0"
+     ci_interval="10.0"
+     unit="%"/>
+  <param
+     name="dewpoint"
+     table="Temperature"
+     range_min="-90.0"
+     range_max="45.0"
+     unit="celsius"
+     ci_interval="5"
+     ci_base="0"/>
+  <param
+     name="pressure"
+     table="PressureMSL"
+     range_min="952.0"
+     range_max="1052.0"
+     ci_interval="4.0"
+     ci_base="1000.0"
+     unit="hPa"/>
+  <param
+     name="u"
+     table="Wind comps"
+     range_min="-50.0"
+     range_max="50.0"
+     unit="m/s"/>
+  <param
+     name="v"
+     table="Wind comps"
+     range_min="-50.0"
+     range_max="50.0"
+     unit="m/s"/>
+  <param
+     name="w"
+     table="Inverse VisAD"
+     range_min="-8.0"
+     range_max="8.0"
+     unit="m/s"/>
+  <param
+     name="windspeed"
+     table="Windspeed"
+     range_min="0.0"
+     range_max="80.0"
+     ci_base="0.0"
+     ci_interval="10.0"
+     unit="m/s"/>
+  <param
+     name="speed"
+     table="Windspeed"
+     range_min="0.0"
+     range_max="80.0"
+     ci_base="0.0"
+     ci_interval="10.0"
+     unit="m/s"/>
+  <param
+     name="z"
+     table="default"
+     range_min="0.0"
+     range_max="16000.0"
+     ci_interval="60.0"
+     ci_base="0.0"
+     ci_min="0.0"
+     ci_max="22000.0"
+     unit="gpm"/>
+  <param
+     name="altitude"
+     table="Topographic"
+     range_min="0.0"
+     range_max="4000.0"
+     ci_interval="500"
+     unit="m"/>
+  <param
+     name="sst"
+     table="default"
+     range_min="0.0"
+     range_max="32.0"
+     unit="celsius"
+     ci_interval="5.0"
+     ci_base="0.0"
+     ci_min="0.0"
+     ci_max="45.0"
+     ci_width="1"/>
+  <param
+     name="absvor"
+     table="VisAD"
+     unit="1.0E-5 s-1"
+     ci_interval="10.0"
+     ci_base="0.0"
+     ci_width="1"/>
+  <param
+     name=".*n0r.*"
+     table="Base Reflectivity (24) transparent"
+     range_min="-30.0"
+     range_max="80.0"/>
+  <param
+     name=".*base.*"
+     table="Base Reflectivity (transparent)"
+     range_min="0.0"
+     range_max="80"/>
+  <param
+     name="7.*echo.*"
+     table="Base Reflectivity (transparent)"
+     range_min="0.0"
+     range_max="80"/>
+  <param
+     name=".*rcm.*"
+     table="Base Reflectivity (transparent)"
+     range_min="0.0"
+     range_max="80"/>
+  <param
+     name=".*image.*"
+     table="Gray scale"
+     range_min="0.0"
+     range_max="255.0"/>
+  <param
+     name=".*ir/topo.*"
+     table="TOPO/Sat Composite"
+     range_min="0.0"
+     range_max="255.0"/>
+  <param
+     name=".*mdr/topo.*"
+     table="TOPO/MDR Composite"
+     range_min="0.0"
+     range_max="255.0"/>
+  <param
+     name=".*radial.vel.*"
+     range_max="80.0"
+     range_min="-100.0"
+     table="Radial Velocity"
+     unit="kt"/>
+  <param
+     name=".*velocity.*"
+     range_max="80.0"
+     range_min="-100.0"
+     table="Radial Velocity"
+     unit="kt"/>
+  <param
+     name=".*radialvelocity.*"
+     range_max="80.0"
+     range_min="-100.0"
+     table="Radial Velocity"
+     unit="kt"/>
+  <param
+     name=".*mean.vel.*"
+     range_max="80.0"
+     range_min="-100.0"
+     table="Radial Velocity"
+     unit="kt"/>
+  <param
+     name="reflect.*"
+     range_max="80.0"
+     range_min="0.0"
+     table="DbZ(NWS)"/>
+  <param
+     name="spectrum.width.*"
+     range_max="8.0"
+     range_min="0.0"
+     table="Radial Velocity"/>
+  <param
+     name=".*tops.*"
+     table="Echo Tops"
+     range_min="0.0"
+     range_max="255.0"/>
+  <param
+     name=".*vil.*"
+     table="VIL"
+     range_min="0.0"
+     range_max="255.0"/>
+  <param
+     name=".*rainfall.*"
+     ci_base="0.0"
+     ci_interval=".25"
+     ci_max="10.0"
+     ci_min="0.25"
+     range_max="10.0"
+     range_min="-1.0"
+     table="Radar Precip"
+     unit="in"/>
+  <param
+     name=".*rain.*"
+     ci_base="0.0"
+     ci_interval=".25"
+     ci_max="10.0"
+     ci_min="0.25"
+     range_max="10.0"
+     range_min="-1.0"
+     table="Radar Precip"
+     unit="in"/>
+  <param
+     name=".*vis/topo.*"
+     table="TOPO/Sat Composite"
+     range_min="0.0"
+     range_max="255.0"/>
+  <param
+     name="^band.*"
+     table="Gray scale"
+     range_min="0.0"
+     range_max="255.0"/>
+  <param
+     name="_band.*brit"
+     table="Gray scale"
+     range_min="0.0"
+     range_max="255.0"/>
+  <param
+     name="^cin.*"
+     range_min="-2000.0"
+     range_max="0.0"
+     ci_interval="100"/>
+  <param
+     name="dbz"
+     table="DbZ"
+     range_min="-9.0"
+     range_max="59.0"/>
+  <param
+     name="dz"
+     table="ATD-Reflectivity"
+     range_min="-10.0"
+     range_max="60.0"/>
+  <param
+     name="elevation"
+     table="Topographic"
+     range_min="0.0"
+     range_max="4000.0"
+     unit="m"/>
+  <param
+     name="^li$"
+     table="DbZ"
+     range_min="-15.0"
+     range_max="15.0"
+     ci_interval="-2"
+     ci_base="0"/>
+  <param
+     name="p_sfc"
+     range_min="700.0"
+     range_max="1048.0"
+     ci_interval="4.0"
+     ci_base="1000.0"
+     unit="hPa"/>
+  <param
+     name="^p_trop.*"
+     range_min="70.0"
+     range_max="500.0"
+     unit="hPa"/>
+  <param
+     name="p_frzlvl"
+     range_min="450.0"
+     range_max="1048.0"
+     unit="hPa"/>
+  <param
+     name="p_range_maxwind"
+     range_min="50.0"
+     range_max="400.0"
+     unit="hPa"/>
+  <param
+     name="pr_water_a"
+     range_min="0.0"
+     range_max="100.0"
+     unit="mm"/>
+  <param
+     name="^precip.*"
+     table="Precip"
+     range_min="0.0"
+     range_max="50.0"
+     ci_base="0"
+     ci_min="0.25"
+     ci_interval="2.5"
+     unit="kg.m-2"/>
+  <param
+     name="^.*_precipitation"
+     table="Precip"
+     range_min="0.0"
+     range_max="50.0"
+     ci_base="0"
+     ci_min="0.25"
+     ci_interval="2.5"
+     unit="kg.m-2"/>
+  <param
+     name="theta"
+     table="Temperature"
+     range_min="250.0"
+     range_max="420.0"
+     unit="K"/>
+  <param
+     name="^theta_trop.*"
+     table="Temperature"
+     range_min="250.0"
+     range_max="420.0"
+     unit="K"/>
+  <param
+     name="^theta.*"
+     table="Temperature"
+     range_min="250.0"
+     range_max="420.0"
+     unit="K"/>
+  <param
+     name="ve"
+     table="ATD-Velocity"
+     range_min="-50.0"
+     range_max="50.0"
+     unit="m/s"/>
+  <param
+     name="horizontaldivergence"
+     range_min="-10"
+     range_max="10"
+     ci_interval="2.0"
+     ci_base="0"
+     unit="1E-6 s-1"/>
+  <param
+     name="ipv"
+     range_min="-1.0"
+     range_max="10.0"
+     unit="1.0E-6 K.s-1.kg-1.m2"/>
+  <param
+     name="relvort"
+     range_min="-100"
+     range_max="200"
+     unit="1E-6 s-1"/>
+  <param
+     name="z_frzlvl"
+     range_min="0.0"
+     range_max="10000.0"
+     ci_interval="500.0"
+     unit="m"/>
+  <param
+     name="thickness_.*"
+     ci_interval="60.0"
+     ci_base="5400"
+     range_min="4000"
+     range_max="6000"
+     unit="gpm"/>
+  <param
+     name="p_maxwind"
+     ci_interval="500"
+     unit="hPa"/>
+  <param
+     name="cape"
+     range_min="0.0"
+     range_max="8000.0"
+     ci_interval="1000"
+     unit="Joules"/>
+  <param
+     name="zdr"
+     table="DbZ"
+     range_min="-20.0"
+     range_max="20.0"/>
+  <param
+     name="albedo"
+     table="Gray scale"/>
+  <param
+     name=".*n1p.*"
+     table="Radar Precip"
+     ci_base="0.0"
+     ci_interval="2.0"
+     ci_max="20.0"
+     ci_min="0.0"
+     range_max="12.0"
+     range_min="0.0"
+     unit="inches"/>
+  <param
+     name=".*ntp.*"
+     table="Radar Precip"
+     ci_base="0.0"
+     ci_interval="2.0"
+     ci_max="20.0"
+     ci_min="0.0"
+     range_max="20.0"
+     range_min="0.0"
+     unit="inches"/>
+</params>

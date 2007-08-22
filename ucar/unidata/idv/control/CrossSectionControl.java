@@ -1,0 +1,1645 @@
+/*
+ * $Id: CrossSectionControl.java,v 1.173 2007/08/10 17:20:05 jeffmc Exp $
+ *
+ * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
+ * support@unidata.ucar.edu.
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
+
+package ucar.unidata.idv.control;
+
+
+import ucar.unidata.collab.Sharable;
+
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.gis.Transect;
+import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.geoloc.Bearing;
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.idv.ControlContext;
+
+import ucar.unidata.idv.CrossSectionViewManager;
+import ucar.unidata.idv.DisplayConventions;
+import ucar.unidata.idv.MapViewManager;
+import ucar.unidata.idv.TransectViewManager;
+import ucar.unidata.idv.ViewDescriptor;
+import ucar.unidata.idv.ViewManager;
+
+import ucar.unidata.util.Coord;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.Range;
+import ucar.unidata.util.ThreeDSize;
+
+import ucar.unidata.view.geoloc.NavigatedDisplay;
+
+
+
+import ucar.visad.display.AnimationInfo;
+import ucar.visad.display.CrossSectionSelector;
+
+import ucar.visad.display.DisplayableData;
+import ucar.visad.display.GridDisplayable;
+import ucar.visad.display.SelectorDisplayable;
+import ucar.visad.display.XSDisplay;
+
+import ucar.visad.quantities.*;  // for AirPressure CoordinateSystem
+
+
+import visad.*;
+
+
+import visad.data.units.Parser;
+
+import visad.georef.EarthLocation;
+import visad.georef.EarthLocationTuple;
+import visad.georef.LatLonPoint;
+import visad.georef.MapProjection;
+
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.event.*;
+
+import java.beans.PropertyChangeEvent;
+
+import java.beans.PropertyChangeListener;
+
+import java.rmi.RemoteException;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+
+import javax.swing.*;
+import javax.swing.event.*;
+
+
+
+/**
+ * TODO: We need to be able to persist/unpersist the ViewManager
+ * so its state is saved.
+ *
+ * Class to make one vertical cross section display
+ * and its contents and controls.
+ * Also makes a JFrame with buttons used for control of
+ * the vertical cross section of one parameter in another display.
+ * Also includes contents of a CrossSectionViewManager, a local small
+ * vertical cross section display in its own window in this control frame.
+ *
+ * @author IDV development team
+ * @version $Revision: 1.173 $
+ */
+
+public abstract class CrossSectionControl extends GridDisplayControl {
+
+    /**
+     * Identifier for sharing cross-section position
+     */
+    public static final String SHARE_XSLINE = SHARE_TRANSECT;
+
+    /** Displayable for depicting cross section in the control window */
+    protected DisplayableData vcsDisplay;
+
+    /** Displayable for depicting cross section in the main window */
+    protected DisplayableData xsDisplay;
+
+    /** the cross section selector */
+    protected CrossSectionSelector csSelector;
+
+    /** the control window's view manager */
+    protected CrossSectionViewManager crossSectionView;
+
+    /** The cross section view gui */
+    private Container viewContents;
+
+    /** Should we automatically scale the axis to the line range */
+    private boolean autoScaleYAxis = true;
+
+    /** should we even allow autoscaling */
+    private boolean allowAutoScale = true;
+
+    /** foreground color */
+    private Color foreground;
+
+    /** background color */
+    private Color background;
+
+    /** Keep around to reset zoom/pan */
+    private double[] displayMatrix;
+
+    /** animation info for the crossSectionView */
+    private AnimationInfo animationInfo = new AnimationInfo();
+
+    /** transform to altitude */
+    protected CoordinateSystem coordTrans;
+
+    /** Do we updat the cross section when we are in a transectview and the transect changes */
+    private boolean autoUpdate = true;
+
+    /** X and Y size */
+    protected int sizeX, sizeY;
+
+    /** flag for 3D display */
+    protected boolean displayIs3D = false;
+
+    /** flag for 3D data */
+    protected boolean dataIs3D = false;
+
+    /** starting coordinate for the cross section selector */
+    protected Coord startCoord;
+
+    /** ending coordinate for the cross section selector */
+    protected Coord endCoord;
+
+    /** Keep around for the label macros */
+    private String positionText;
+
+    /** starting location in earth coordinates */
+    protected EarthLocation startLocation;
+
+    /** ending location in earth coordinates */
+    protected EarthLocation endLocation;
+
+    /** working lat/lon point for calculations */
+    private LatLonPointImpl workLLP = new LatLonPointImpl();
+
+    /** working lat/lon point for calculations */
+    private LatLonPointImpl startLLP = new LatLonPointImpl();
+
+    /** working bearing for calculations */
+    private Bearing workBearing = new Bearing();
+
+    /** label for showing cross section location */
+    private JLabel locationLabel;
+
+    /** animation mode */
+    private String ANIMATE_TOP_BOTTOM = "Top to Bottom";
+
+    /** animation mode */
+    private String ANIMATE_BOTTOM_TOP = "Bottom to Top";
+
+    /** animation mode */
+    private String ANIMATE_LEFT_RIGHT = "Left to Right";
+
+    /** animation mode */
+    private String ANIMATE_RIGHT_LEFT = "Right to Left";
+
+    /** Last trasnect we sampled on */
+    private Transect lastTransect;
+
+
+    /**
+     * Default constructor.  Sets the appropriate attribute flags.
+     */
+    public CrossSectionControl() {
+        setAttributeFlags(FLAG_COLOR | FLAG_DATACONTROL | FLAG_DISPLAYUNIT);
+    }
+
+    /**
+     * Create the <code>DisplayableData</code> that will be used
+     * to depict the data in the main display.
+     * @return  depictor for data in main display
+     * @throws VisADException  unable to create depictor
+     * @throws RemoteException  unable to create depictor (shouldn't happen)
+     */
+    protected abstract DisplayableData createXSDisplay()
+     throws VisADException, RemoteException;
+
+    /**
+     * Create the <code>DisplayableData</code> that will be used
+     * to depict the data in the control's display.
+     * @return  depictor for data in main display
+     * @throws VisADException  unable to create depictor
+     * @throws RemoteException  unable to create depictor (shouldn't happen)
+     */
+    protected abstract DisplayableData createVCSDisplay()
+     throws VisADException, RemoteException;
+
+    /**
+     * Get the <code>GridDisplayable</code> used for setting the
+     * data.
+     * @return data's <code>GridDisplayable</code>
+     */
+    public GridDisplayable getGridDisplayable() {
+        return (GridDisplayable) xsDisplay;
+    }
+
+    /**
+     * Get the <code>DisplayableData</code> used for depicting
+     * data in the control's display.
+     * @return control's display depictor
+     */
+    public DisplayableData getVerticalCSDisplay() {
+        return vcsDisplay;
+    }
+
+    /**
+     * Get the <code>DisplayableData</code> used for depicting
+     * data in the main display.
+     * @return main display depictor
+     */
+    public DisplayableData getXSDisplay() {
+        return xsDisplay;
+    }
+
+    /**
+     * Get the selector used to position the cross section.
+     * @return this controls selector
+     */
+    public CrossSectionSelector getCrossSectionSelector() {
+        return csSelector;
+    }
+
+    /**
+     * Add in the menu for the XS view
+     *
+     * @param menus list of menus
+     * @param forMenuBar is it for the menu bar or for the popup
+     */
+    protected void getExtraMenus(List menus, boolean forMenuBar) {
+        super.getExtraMenus(menus, forMenuBar);
+        if (forMenuBar) {
+            JMenu xsMenu = crossSectionView.makeViewMenu();
+            xsMenu.setText("Cross Section");
+            menus.add(xsMenu);
+        }
+    }
+
+    /**
+     * Called by the {@link ucar.unidata.idv.IntegratedDataViewer} to
+     * initialize after this control has been unpersisted
+     *
+     * @param vc The context in which this control exists
+     * @param properties Properties that may hold things
+     * @param preSelectedDataChoices set of preselected data choices
+     */
+    public void initAfterUnPersistence(ControlContext vc,
+                                       Hashtable properties,
+                                       List preSelectedDataChoices) {
+
+        //Before 2.2 we had the zPosition set to -1 but did not use it
+        //Now we use it for the cross section selector position so need to fix it
+        if (version < 2.2) {
+            if (getZPosition() == -1) {
+                try {
+                    setZPosition(.95);
+                } catch (Exception exc) {
+                    logException("Setting z position", exc);
+                }
+            }
+        }
+        super.initAfterUnPersistence(vc, properties, preSelectedDataChoices);
+    }
+
+
+
+    /**
+     * Get the view manager for the control window.
+     * @return  control window's view manager
+     */
+    protected CrossSectionViewManager getCrossSectionViewManager() {
+        return crossSectionView;
+    }
+
+    /**
+     * Initialize the control using the data choice
+     *
+     * @param dataChoice   choice specifying the data
+     * @return  true if successful
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
+     */
+    public boolean init(DataChoice dataChoice)
+            throws VisADException, RemoteException {
+
+        //Are we in 3d?
+        displayIs3D = isDisplay3D();
+
+
+
+        xsDisplay   = createXSDisplay();
+        vcsDisplay  = createVCSDisplay();
+
+        //Now set the data (which uses the displayables  above).
+        if ( !setData(dataChoice)) {
+            return false;
+        }
+
+
+        vcsDisplay.setVisible(true);
+        if (crossSectionView != null) {
+            //If the ViewManaget is non-null it means we have been unpersisted.
+            //If so, we initialie the VM with the IDV
+            crossSectionView.initAfterUnPersistence(getIdv());
+        } else {
+            //We are new (or are unpersisted from an old bundle)
+            //Create the new ViewManager
+            crossSectionView = new CrossSectionViewManager(getViewContext(),
+                    new ViewDescriptor("CrossSectionView"),
+                    "showControlLegend=false;", animationInfo);
+            crossSectionView.setIsShared(false);
+            crossSectionView.setAniReadout(false);
+            //This will only be non-null if we have been unpersisted from an old
+            //(prior to the persistence of the ViewManager) bundle
+            if (displayMatrix != null) {
+                XSDisplay xsDisplay = crossSectionView.getXSDisplay();
+                xsDisplay.setProjectionMatrix(displayMatrix);
+            }
+        }
+
+
+        addViewManager(crossSectionView);
+        //crossSectionView.getMaster ().addDisplayable (vcsDisplay);
+        if (haveMultipleFields()) {
+            addDisplayable(vcsDisplay, crossSectionView,
+                           FLAG_COLORTABLE | FLAG_COLORUNIT);
+        } else {
+            addDisplayable(vcsDisplay, crossSectionView);
+        }
+
+
+        if (displayIs3D) {
+            if (haveMultipleFields()) {
+                //If we have multiple fields then we want both the 
+                //color unit and the display unit
+                addDisplayable(xsDisplay, FLAG_COLORTABLE | FLAG_COLORUNIT);
+            } else {
+                addDisplayable(xsDisplay);
+            }
+        }
+
+        ViewManager vm = getViewManager();
+        createCrossSectionSelector();
+        //Now create the selector (which needs the state from the setData call)
+        if (vm instanceof MapViewManager) {
+            csSelector.setPointSize(getDisplayScale());
+            csSelector.setAutoSize(true);
+            addDisplayable(csSelector, getSelectorAttributeFlags());
+        } else if (vm instanceof TransectViewManager) {
+            xsDisplay.setAdjustFlow(false);
+            setUseFastRendering(true);
+        }
+        loadDataFromLine();
+        return true;
+    }
+
+
+
+
+    /**
+     * Return the attribute flags to apply to the cross section selector.
+     * This allows derived classes to set their own, e.g., use z position.
+     *
+     * @return Flags to use
+     */
+    protected int getSelectorAttributeFlags() {
+        return FLAG_COLOR | FLAG_ZPOSITION;
+    }
+
+    /**
+     * Get the projection of the data.
+     * @return data projection or null
+     */
+    public MapProjection getDataProjection() {
+
+        MapProjection mp = null;
+        if (getGridDataInstance() != null) {
+            FieldImpl data = getGridDataInstance().getGrid(false);
+            if (data != null) {
+                try {
+                    mp = GridUtil.getNavigation(
+                        getGridDataInstance().getGrid(false));
+                } catch (Exception e) {
+                    mp = null;
+                }
+            }
+        }
+        return mp;
+    }
+
+    /**
+     * Called after all initialization is finished. This sets the end points
+     * of the csSelector to the correct position and adds this as a property
+     * change listener to the csSelector.
+     */
+    public void initDone() {
+        super.initDone();
+        try {
+            //If we have a startCoord/endCoord (i.e., from persistence) 
+            //then pass in false
+            //to getXYPosition so we don't convert to display coords.
+
+            RealTuple start = (startCoord != null)
+                              ? getXYPosition(startCoord.getX(),
+                                  startCoord.getY(), 0.0, false)
+                              : getXYPosition(sizeX / 10.0, sizeY / 2.0, 0.0,
+                                  true);
+
+            //: getXYPosition(-1.0, 0, 0.0, false);
+            RealTuple end = (endCoord != null)
+                            ? getXYPosition(endCoord.getX(), endCoord.getY(),
+                                            0.0, false)
+                            : getXYPosition((sizeX - sizeX / 10.0),
+                                            sizeY / 2.0, 0.0, true);
+            //: getXYPosition(1.0, 0, 0.0, false);
+
+            csSelector.setPosition(start, end);
+            //Now load the data
+            reScale();
+            loadDataFromLine();
+            updateViewParameters();
+        } catch (Exception e) {
+            logException("Initializing the csSelector", e);
+        }
+        // when user moves position of the Selector line, call crossSectionChanged
+        csSelector.addPropertyChangeListener(this);
+    }
+
+
+    /**
+     * Add any macro name/label pairs
+     *
+     * @param names List of macro names
+     * @param labels List of macro labels
+     */
+    protected void getMacroNames(List names, List labels) {
+        super.getMacroNames(names, labels);
+        names.addAll(Misc.newList(MACRO_POSITION));
+        labels.addAll(Misc.newList("Cross Section Position"));
+    }
+
+    /**
+     * Add any macro name/value pairs.
+     *
+     *
+     * @param template The template to use
+     * @param patterns The macro names
+     * @param values The macro values
+     */
+    protected void addLabelMacros(String template, List patterns,
+                                  List values) {
+        super.addLabelMacros(template, patterns, values);
+        patterns.add(MACRO_POSITION);
+        values.add(positionText);
+    }
+
+
+
+    /**
+     * Handle property change
+     *
+     * @param evt The event
+     */
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(
+                SelectorDisplayable.PROPERTY_POSITION)) {
+            crossSectionChanged();
+        } else {
+            super.propertyChange(evt);
+        }
+    }
+
+
+    /**
+     * Remove the cross section view component from the gui to fix the funny lock up problem on linux
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public void doRemove() throws RemoteException, VisADException {
+        if (viewContents != null) {
+            Container parent = viewContents.getParent();
+            if (parent != null) {
+                parent.remove(viewContents);
+            }
+            viewContents = null;
+        }
+        super.doRemove();
+    }
+
+
+
+    /**
+     * Called by doMakeWindow in DisplayControlImpl, which then calls its
+     * doMakeMainButtonPanel(), which makes more buttons.
+     *
+     * @return container of contents
+     */
+    public Container doMakeContents() {
+        try {
+            JTabbedPane tab = new MyTabbedPane();
+            tab.add("Display", GuiUtils.inset(getDisplayTabComponent(), 5));
+            tab.add("Settings",
+                    GuiUtils.inset(GuiUtils.top(doMakeWidgetComponent()), 5));
+            //Set this here so we don't get odd crud on the screen
+            //When the MyTabbedPane goes to paint itself the first time it
+            //will set the tab back to 0
+            tab.setSelectedIndex(1);
+            GuiUtils.handleHeavyWeightComponentsInTabs(tab);
+            return tab;
+        } catch (Exception exc) {
+            logException("doMakeContents", exc);
+        }
+        return null;
+    }
+
+
+    /**
+     * Get edit menu item
+     *
+     * @param items list of items to add to
+     * @param forMenuBar for the menu bar
+     */
+    protected void getEditMenuItems(List items, boolean forMenuBar) {
+        if (isInTransectView()) {
+            items.add(GuiUtils.makeCheckboxMenuItem("Auto-Update", this,
+                    "autoUpdate", null));
+        }
+        super.getEditMenuItems(items, forMenuBar);
+    }
+
+
+
+    /**
+     * Create the component that goes into the 'Display' tab
+     *
+     * @return Display tab component
+     */
+    protected JComponent getDisplayTabComponent() {
+        locationLabel = new JLabel(
+            "From:                     To:                        ");
+        JComponent locationComp = GuiUtils.label("Location: ", locationLabel);
+
+        viewContents = crossSectionView.getContents();
+        //If foreground is not null  then this implies we have been unpersisted
+        //We do this here because the CrossSectionViewManager sets the default black on white
+        //colors in its init method which might nor be called until we ask for its contents
+        if (foreground != null) {
+            crossSectionView.setColors(foreground, background);
+        }
+
+
+        crossSectionView.setContentsBorder(null);
+        return GuiUtils.centerBottom(viewContents,
+                                     GuiUtils.left(locationComp));
+    }
+
+
+    /**
+     * Get the control widgets specific to this control
+     *
+     * @param controlWidgets   list of widgets to add to.
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
+     */
+    public void getControlWidgets(List controlWidgets)
+            throws VisADException, RemoteException {
+        /*        locationLabel = new JLabel("From:            To:      ");
+        controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.rLabel("Location:"),
+                                             GuiUtils.left(locationLabel)));
+        */
+        super.getControlWidgets(controlWidgets);
+        if (getAllowAutoScale()) {
+            JCheckBox autoscaleCbx = GuiUtils.makeCheckbox("", this,
+                                         "autoScaleYAxis");
+            controlWidgets.add(new WrapperWidget(this,
+                    GuiUtils.rLabel("Autoscale Y-Axis:"),
+                    GuiUtils.left(autoscaleCbx)));
+        }
+        /* TODO: make this work
+        controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.rLabel("Animate Line"),
+                                             getXSectAniControlWidget()));
+                                             */
+    }
+
+    /*
+     * TODO: make this work
+     * Create a widget for animating the cross sections.
+     * private Component getXSectAniControlWidget() {
+     *   ArrayList list = new ArrayList(4);
+     *   list.add(ANIMATE_TOP_BOTTOM);
+     *   list.add(ANIMATE_BOTTOM_TOP);
+     *   list.add(ANIMATE_LEFT_RIGHT);
+     *   list.add(ANIMATE_RIGHT_LEFT);
+     *   JRadioButton[] buttons = GuiUtils.makeRadioButtons(list,
+     *       list.getIndex(getAnimationDirection()), this,
+     *       setAnimationDirection);
+     *
+     * }
+     */
+
+    /**
+     * Called when the user asked for a new kind of parameter to be displayed
+     * in a pre-existing display of this class, with other kind of data
+     * already displayed there.
+     * Reset new parameter choice's data into the displayables.
+     * Do over everything necessary to load in a new kind of data.
+     *
+     * @param dataChoice     specification of the data
+     * @return  true if successful
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
+     */
+    protected boolean setData(DataChoice dataChoice)
+            throws VisADException, RemoteException {
+        if ( !super.setData(dataChoice)) {
+            return false;
+        }
+        dataIs3D = getGridDataInstance().is3D();
+
+        if (dataIs3D) {
+            sizeX      = getGridDataInstance().getSizeX();
+            sizeY      = getGridDataInstance().getSizeY();
+            coordTrans = getGridDataInstance().getThreeDCoordTrans();
+        } else {
+            GriddedSet domainSet =
+                (GriddedSet) getGridDataInstance().getSpatialDomain();
+            sizeX      = domainSet.getLengths()[0];
+            sizeY      = domainSet.getLengths()[1];
+            coordTrans = domainSet.getCoordinateSystem();
+        }
+
+        if (xsDisplay == null) {
+            xsDisplay  = createXSDisplay();
+            vcsDisplay = createVCSDisplay();
+        }
+        getGridDisplayable().setColoredByAnother(haveMultipleFields());
+        if (getVerticalCSDisplay() instanceof GridDisplayable) {
+            ((GridDisplayable) getVerticalCSDisplay()).setColoredByAnother(
+                haveMultipleFields());
+        }
+
+        if (isTopography(getRawDataUnit()) && !dataIs3D) {
+            addTopographyMap();
+        }
+
+        if (getHaveInitialized()) {
+            loadDataFromLine();
+        }
+
+        // change the displayed units if different from actual
+        Unit newUnit = getDisplayUnit();
+        if ((newUnit != null) && !newUnit.equals(getRawDataUnit())
+                && Unit.canConvert(newUnit, getRawDataUnit())) {
+            xsDisplay.setDisplayUnit(newUnit);
+            vcsDisplay.setDisplayUnit(newUnit);
+        }
+
+        if (getHaveInitialized()) {
+            updateViewParameters();
+        }
+
+        return true;
+    }
+
+    /**
+     * This method is used to update anything that needs to be updated
+     * in the CrossSectionViewManager.  Subclasses should override this
+     * if they need to do anything special.
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
+     */
+    protected void updateViewParameters()
+            throws VisADException, RemoteException {
+        CrossSectionViewManager vm = getCrossSectionViewManager();
+        if (vm != null) {
+            vm.setDisplayTitle(
+                "of " + getGridDataInstance().getDataChoice().toString());
+        }
+    }
+
+
+    /**
+     * Set the starting coordinate of the cross section selector.
+     * Used by XML persistence.
+     * @param c  starting coordinate
+     */
+    public void setStartCoord(Coord c) {
+        startCoord = c;
+    }
+
+    /**
+     * Get the starting coordinate of the cross section selector.
+     * Used by XML persistence.
+     * @return starting coordinate
+     */
+    public Coord getStartCoord() {
+        return startCoord;
+    }
+
+    /**
+     * Set the ending coordinate of the cross section selector.
+     * Used by XML persistence.
+     * @param c  ending coordinate
+     */
+    public void setEndCoord(Coord c) {
+        endCoord = c;
+    }
+
+    /**
+     * Get the ending coordinate of the cross section selector.
+     * Used by XML persistence.
+     * @return ending  coordinate
+     */
+    public Coord getEndCoord() {
+        return endCoord;
+    }
+
+
+
+    /**
+     * Make a Selector line which shows and controls where cross section is
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
+     */
+    protected void createCrossSectionSelector()
+            throws VisADException, RemoteException {
+
+        // make the initial selector position across the middle of the grid from
+        // side to side; 1/10 of the width in from each end.
+        // (converts grid indices to VisAD internal coordinates)
+        // z level at origin of grid
+
+
+        csSelector = new CrossSectionSelector();
+        // move z level of line to near top of VisAD display box
+        //csSelector.setZValue(.95f);
+
+    }  // end createCrossSectionSelector
+
+
+
+
+
+    /**
+     * Convert three ints of grid index values to VisAD RealTuple of
+     * VisAD internal coordinates.  If convert is true then the x/y/z
+     * needs to be converted to display coordinates.
+     *
+     * @param x     grid index x value.
+     * @param y     grid index y value.
+     * @param z     grid index z value.
+     * @param convert  flag (true) to convert to display coords
+     * @return the XY position
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
+     */
+    private RealTuple getXYPosition(double x, double y, double z,
+                                    boolean convert)
+            throws VisADException, RemoteException {
+        Coord to = (convert)
+                   ? convertToDisplay(new Coord(x, y, z))
+                   : new Coord(x, y, z);
+
+
+        RealTuple xyTuple =
+            new RealTuple(RealTupleType.SpatialCartesian2DTuple,
+                          new double[] { to.getX(),
+                                         to.getY() });
+        return xyTuple;
+    }
+
+
+    /**
+     * Convert a Coord (x, y, z) in grid index values
+     * to a Coord in VisAD internal values; -1.0 to 1.0 in VisAD box.
+     * Goes via intermediate lat,long,altitude position.
+     *
+     * @param from a Coord (x, y, z) in grid index values.
+     * @return  converted coordinates
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
+     */
+    public Coord convertToDisplay(Coord from)
+            throws VisADException, RemoteException {
+
+        SampledSet domain =
+            GridUtil.getSpatialDomain(getGridDataInstance().getGrid());
+        boolean   latfirst     = GridUtil.isLatLonOrder(domain);
+        float[][] domainCoords = domain.getSamples(false);
+
+
+        int       lonindex     = (latfirst)
+                                 ? 1
+                                 : 0;
+        int       latindex     = 1 - lonindex;
+
+        /*
+        // set proper indices for lon and lat
+        int latindex, lonindex;
+
+        if (latfirst) {
+            latindex = 0;
+            lonindex = 1;
+        } else {
+            lonindex = 0;
+            latindex = 1;
+        }
+        */
+
+        int elem = from.getIntX()
+                   + (from.getIntY() + from.getIntZ() * sizeY) * sizeX;
+
+        // Convert grid position to reference
+        double[][] llarr = (dataIs3D)
+                           ? new double[][] {
+            { domainCoords[0][elem] }, { domainCoords[1][elem] },
+            { domainCoords[2][elem] }
+        }
+                           : new double[][] {
+            { domainCoords[0][elem] }, { domainCoords[1][elem] }
+        };
+
+
+        if (coordTrans != null) {
+            llarr = coordTrans.toReference(llarr, domain.getSetUnits());
+        } else {
+            Unit[] toUnits = (dataIs3D)
+                             ? new Unit[] { CommonUnit.degree,
+                                            CommonUnit.degree,
+                                            CommonUnit.meter }
+                             : new Unit[] { CommonUnit.degree,
+                                            CommonUnit.degree };
+            llarr = Unit.convertTuple(llarr, domain.getSetUnits(), toUnits,
+                                      false);
+        }
+
+        double lat = llarr[latindex][0];
+        double lon = llarr[lonindex][0];
+
+        double alt = (dataIs3D)
+                     ? llarr[2][0]
+                     : 0;
+
+        //check to make sure that longitude is normalized to the range of the data.
+
+        float low = domain.getLow()[lonindex];
+        float hi  = domain.getHi()[lonindex];
+
+        //TODO: Is this right??
+        Unit[] units = domain.getSetUnits();
+        if (coordTrans == null) {
+            try {
+                low = (float) units[lonindex].toThat(low, CommonUnit.degree);
+                hi  = (float) units[lonindex].toThat(hi, CommonUnit.degree);
+            } catch (Exception exc) {
+                System.err.println("Caught error:" + exc);
+            }
+
+            while ((float) lon < low && (float) lon < hi) {
+                lon += 360;
+            }
+
+
+            while ((float) lon > hi && (float) lon > low) {
+                lon -= 360;
+            }
+        }
+
+
+        // Convert to VisAD internal positions; -1.0 to 1.0 in VisAD box
+        RealTuple visadTup = earthToBoxTuple(new EarthLocationTuple(lat, lon,
+                                 alt));
+        return new Coord(((Real) visadTup.getComponent(0)).getValue(),
+                         ((Real) visadTup.getComponent(1)).getValue(),
+                         ((Real) visadTup.getComponent(2)).getValue());
+    }
+
+
+    /**
+     * Called when shared data is received.
+     *
+     * @param from      object sharing data
+     * @param dataId    type of data being shared
+     * @param data      the sharable data
+     */
+    public void receiveShareData(Sharable from, Object dataId,
+                                 Object[] data) {
+        //        System.out.println(this + "got share data");
+        if (dataId.equals(SHARE_XSLINE)) {
+            if (csSelector == null) {
+                return;
+            }
+            try {
+                //We don't need to loadData here because changing the
+                //cs selector will fire a property change event
+                csSelector.setPosition((RealTuple) data[0],
+                                       (RealTuple) data[1]);
+            } catch (Exception e) {
+                logException("Error in receiveShareData: " + dataId, e);
+            }
+            return;
+        }
+        super.receiveShareData(from, dataId, data);
+    }
+
+
+    /**
+     * Load or reload data for a cross section.
+     */
+    public void crossSectionChanged() {
+        try {
+            loadDataFromLine();
+            updateLegendLabel();
+            CrossSectionSelector cs = getCrossSectionSelector();
+            doShare(SHARE_XSLINE, new Object[] { cs.getStartPoint(),
+                    cs.getEndPoint() });
+        } catch (Exception exc) {
+            logException("Error in crossSectionChanged ", exc);
+        }
+    }
+
+    /**
+     * Respond to a change in the display's projection.  In this case
+     * we resample at the new location.
+     */
+    public void projectionChanged() {
+        super.projectionChanged();
+        //      System.err.println ("projection changed");
+        try {
+            loadDataFromLine();
+        } catch (Exception exc) {
+            logException("projectionChanged", exc);
+        }
+    }
+
+    /**
+     * Noop for the ControlListener interface
+     */
+    public void viewpointChanged() {
+        super.viewpointChanged();
+        //      System.err.println ("viewpoint changed");
+        if (autoUpdate && isInTransectView()) {
+            loadDataFromTransect();
+        }
+    }
+
+    /**
+     * Sample along the transect line from the TransectViewManager we are in
+     */
+    private void loadDataFromTransect() {
+        try {
+            ViewManager vm    = getViewManager();
+            Transect transect = ((TransectViewManager) vm).getAxisTransect();
+            if (Misc.equals(transect, lastTransect)) {
+                return;
+            } else {
+                loadDataFromLine();
+            }
+        } catch (Exception exc) {
+            logException("Loading data from transect", exc);
+        }
+
+
+    }
+
+
+
+    /**
+     * A hook to allow derived classes to tell us to add this
+     * as a control listener
+     *
+     * @return Add as control listener
+     */
+
+    protected boolean shouldAddControlListener() {
+        return true;
+    }
+
+
+
+    /**
+     * Method called when a transect  changes.
+     */
+    public void transectChanged() {
+        super.transectChanged();
+        //      System.err.println ("transect changed");
+        try {
+            loadDataFromLine();
+        } catch (Exception exc) {
+            logException("projectionChanged", exc);
+        }
+    }
+
+
+
+    /**
+     * Get the line coordinates as an array of EarthLocations
+     *
+     * @return the  locations
+     *
+     * @throws RemoteException Java RMI Exception
+     * @throws VisADException Problem creating EarthLocations
+     */
+    protected EarthLocation[] getLineCoords()
+            throws VisADException, RemoteException {
+        if (isInTransectView()) {
+            ViewManager vm    = getViewManager();
+            Transect transect = ((TransectViewManager) vm).getAxisTransect();
+            lastTransect = transect;
+            List            points = transect.getPoints();
+            LatLonPointImpl llp0   = (LatLonPointImpl) points.get(0);
+            LatLonPointImpl llp1   = (LatLonPointImpl) points.get(1);
+            EarthLocation el0 = makeEarthLocation(llp0.getLatitude(),
+                                    llp0.getLongitude(), 0.0);
+            EarthLocation el1 = makeEarthLocation(llp1.getLatitude(),
+                                    llp1.getLongitude(), 0.0);
+            return new EarthLocation[] { el0, el1 };
+        }
+
+        if (csSelector != null) {
+            RealTuple start = csSelector.getStartPoint();
+            RealTuple end   = csSelector.getEndPoint();
+            double    x1    = ((Real) start.getComponent(0)).getValue();
+            double    y1    = ((Real) start.getComponent(1)).getValue();
+            double    x2    = ((Real) end.getComponent(0)).getValue();
+            double    y2    = ((Real) end.getComponent(1)).getValue();
+            startCoord = new Coord(x1, y1, 0.0);
+            endCoord   = new Coord(x2, y2, 0.0);
+            return new EarthLocation[] { boxToEarth(new double[] { x1, y1,
+                    0.0 }), boxToEarth(new double[] { x2, y2, 0.0 }) };
+        }
+        return null;
+    }
+
+
+    /**
+     * Create and loads a 2D FieldImpl from the existing getGridDataInstance()
+     * at the position indicated by the controlling Selector line end points;
+     *
+     * @throws VisADException   VisAD failure.
+     * @throws RemoteException  Java RMI failure.
+     */
+    protected void loadDataFromLine() throws VisADException, RemoteException {
+        if ( !getHaveInitialized()) {
+            return;
+        }
+
+        EarthLocation[] elArray = getLineCoords();
+        startLocation = elArray[0];
+        endLocation   = elArray[1];
+        LatLonPoint latlon1 = startLocation.getLatLonPoint();
+        LatLonPoint latlon2 = endLocation.getLatLonPoint();
+        FieldImpl slice = getGridDataInstance().sliceAlongLatLonLine(latlon1,
+                              latlon2);
+        loadData(slice);
+    }
+
+
+    /**
+     * Load the external display and the local display
+     * with this data of a vertical cross section.
+     *
+     * @param fieldImpl   the data for the depiction
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
+     */
+    protected void loadData(FieldImpl fieldImpl)
+            throws VisADException, RemoteException {
+        //if (GridUtil.isAllMissing(fieldImpl)) return;
+        FieldImpl twoDData = make2DData(fieldImpl);
+        if (twoDData == null) {
+            return;
+        }
+        getGridDisplayable().loadData(fieldImpl);
+        ((GridDisplayable) vcsDisplay).loadData(twoDData);
+
+        // rescale display so data fits inside the display
+        reScale();
+        updateLocationLabel();
+    }
+
+    /**
+     * Call to reScale the display.  Does the right thing depending
+     * on the value of autoScaleYAxis.
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException VisAD error
+     */
+    protected void reScale() throws VisADException, RemoteException {
+        if (getAutoScaleYAxis()) {
+            crossSectionView.getXSDisplay().autoScaleYAxis();
+        } else {
+            setYAxisRange(crossSectionView.getXSDisplay(), null);
+        }
+        crossSectionView.getXSDisplay().reScale();
+    }
+
+    /**
+     * Methods to do the things that need to be done when the data range
+     * changes.
+     *
+     * @param display   the display to modify
+     * @param range     Range of values in units of Y Axis.  May be null
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
+     */
+    protected void setYAxisRange(XSDisplay display, Range range)
+            throws VisADException, RemoteException {
+
+        if (range == null) {
+            NavigatedDisplay mapDisplay = getNavigatedDisplay();
+            if (mapDisplay == null) {
+                return;
+            }
+            double[] vals = mapDisplay.getVerticalRange();
+            range = new Range(vals[0], vals[1]);
+            display.setYDisplayUnit(mapDisplay.getVerticalRangeUnit());
+        }
+        display.setYRange(range.getMin(), range.getMax());
+    }
+
+    /**
+     * Make a FieldImpl suitable for the plain 2D vert cross section display;
+     * of form (time -> ((x,z) -> parm)).  New x axis positions are in
+     * distance along cross section from one end (origin) in km:
+     * <pre>
+     * Assumptions:
+     *   - incoming xsectSequence has a lat/lon/alt reference or is
+     *     lat/lon/alt   (lat/lon order doesn't matter).
+     *   - that the grid will be regular and manifold dimension is one
+     *     less than grid dimension (i.e., 3D grid on 2D manifold or
+     *     2D grid on 1D manifold)
+     * </pre>
+     *
+     * @param xsectSequence  cross section sequence or grid
+     *
+     * @return  new FieldImpl in the form specified above.
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
+     */
+    protected FieldImpl make2DData(FieldImpl xsectSequence)
+            throws VisADException, RemoteException {
+
+        // from the input Field of fome (time->((a,b,c) -> parm)
+        // get the (a,b,c) part
+        GriddedSet domainSet =
+            (GriddedSet) GridUtil.getSpatialDomain(xsectSequence);
+
+        int[] lengths = domainSet.getLengths();
+
+        //        System.err.println("length:" + lengths.length);
+        if ((lengths.length == 0) || (dataIs3D && (lengths.length < 2))) {
+            return null;
+        }
+        int sizeX = lengths[0];
+        int sizeZ = dataIs3D
+                    ? lengths[1]
+                    : 1;
+
+        // get its coordinate tranform
+        CoordinateSystem transform = domainSet.getCoordinateSystem();
+        int              lonIndex  = GridUtil.isLatLonOrder(domainSet)
+                                     ? 1
+                                     : 0;
+        int              latIndex  = 1 - lonIndex;
+
+        // get the array of the a,b,c values
+        float[][] transformed = domainSet.getSamples(true);
+
+        // make a new parallel array of positions in units of ;
+        // this in used only to get the height positions in .
+
+        // need to do this to make sure we get data in degrees
+        transformed = dataIs3D
+                      ? CoordinateSystem.transformCoordinates((lonIndex == 0)
+                ? RealTupleType.SpatialEarth3DTuple
+                : RealTupleType
+                    .LatitudeLongitudeAltitude, (CoordinateSystem) null,
+                        new Unit[] { CommonUnit.degree,
+                                     CommonUnit.degree,
+                                     CommonUnit
+                                         .meter }, (ErrorEstimate[]) null,
+                                             ((SetType) domainSet.getType())
+                                                 .getDomain(), transform,
+                                                     domainSet.getSetUnits(),
+                                                         (ErrorEstimate[]) null,
+                                                             transformed,
+                                                                 false)
+                      : CoordinateSystem.transformCoordinates((lonIndex == 0)
+                ? RealTupleType.SpatialEarth2DTuple
+                : RealTupleType
+                    .LatitudeLongitudeTuple, (CoordinateSystem) null,
+                                             new Unit[] { CommonUnit.degree,
+                CommonUnit.degree }, (ErrorEstimate[]) null,
+                                     ((SetType) domainSet.getType())
+                                         .getDomain(), transform,
+                                             domainSet.getSetUnits(),
+                                             (ErrorEstimate[]) null,
+                                             transformed, false);
+
+        float[] xVals = createXFromLatLon(new float[][] {
+            transformed[0], transformed[1]
+        }, sizeX, lonIndex);
+
+        // declare an array to hold the (distance,height) positions
+        // of points in the 2D display
+        float[][] plane = new float[2][domainSet.getLength()];
+
+        int       index = 0;
+        for (int i = 0; i < sizeZ; i++) {
+            for (int j = 0; j < sizeX; j++) {
+                plane[0][index] = xVals[j];
+                plane[1][index] = dataIs3D
+                                  ? transformed[2][index]
+                                  : 0;
+                index++;
+            }
+        }
+
+        RealTupleType xzRTT = new RealTupleType(RealType.XAxis,
+                                  RealType.Altitude);
+
+        Gridded2DSet vcsG2DS = (dataIs3D)
+                               ? new Gridded2DSet(xzRTT, plane, sizeX, sizeZ,
+                                   (CoordinateSystem) null, (Unit[]) null,
+                                   (ErrorEstimate[]) null, false, false)
+                               : new Gridded2DSet(xzRTT, plane, sizeX);
+
+        return GridUtil.setSpatialDomain(xsectSequence, vcsG2DS);
+    }
+
+    /**
+     * Get the label for the Z position slider.
+     * @return  label
+     */
+    protected String getZPositionSliderLabel() {
+        return "Selector Position:";
+    }
+
+
+    /**
+     * Set the AnimationInfo property.
+     *
+     * @param value The new value for AnimationInfo
+     */
+    public void setAnimationInfo(AnimationInfo value) {
+        animationInfo = value;
+    }
+
+    /**
+     * Get the AnimationInfo property.
+     *
+     * @return The AnimationInfo
+     */
+    public AnimationInfo getAnimationInfo() {
+        if (crossSectionView != null) {
+            return crossSectionView.getAnimationInfo();
+        }
+        return animationInfo;
+    }
+
+    /**
+     * From an array of latitudes and longitudes, calculate an
+     * array of distance (in km) that corresponds to the distance
+     * from the first point to the numNeeded point.  NB: In this implementation,
+     * the distance from the origin is calculated as the sum of the
+     * distances between each point in between.
+     *
+     * @param latlon   array of lat lon values in degrees (order doesn't matter)
+     * @param numNeeded  number of distances to calculate
+     * @param lonIndex   which of the indices in latlon is longitude
+     *
+     * @return array of distances each lat/lon point is from the
+     *         origin.
+     */
+    protected float[] createXFromLatLon(float[][] latlon, int numNeeded,
+                                        int lonIndex) {
+
+        int   latIndex = 1 - lonIndex;
+        float startLon = latlon[lonIndex][0];
+        float startLat = latlon[latIndex][0];
+        startLLP.set(startLat, startLon);
+
+        // test to see if units are geographic degrees
+
+        float   initXVal = 0.0f,
+                bigDelta = 0.0f;
+        boolean hitJump  = false;
+
+        // declare an array to hold the (distance,height) positions
+        // of points in the 2D display
+        float[] xVals   = new float[numNeeded];
+
+        float   prevLon = startLon;
+        for (int i = 1; i < numNeeded; i++) {
+
+            float lon = latlon[lonIndex][i];
+            float lat = latlon[latIndex][i];
+
+            // All the following up, to plane[0][i] = (float)...,
+            // handles jumps in xval from one grid edge to another, a seam
+            // in the global displays
+            // look for jump across seam just occured
+            // -- a sudden increase in xval
+            // not really sure this works
+            bigDelta = (lon - prevLon);
+            if (bigDelta > 180.0) {
+                hitJump = true;
+                lon     = lon - 360;
+            }
+            workLLP.set(lat, lon);
+
+            xVals[i] = xVals[i - 1]
+                       + (float) Bearing.calculateBearing(startLLP, workLLP,
+                           workBearing).getDistance();
+
+            //System.out.println("                        xVal "+xVals[i]);
+
+            startLLP.set(workLLP);
+
+            prevLon = lon;
+        }
+        return xVals;
+    }
+
+    /**
+     * Wrapper around {@link #addTopographyMap(int)} to allow subclasses
+     * to set their own index.
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
+     */
+    protected void addTopographyMap() throws VisADException, RemoteException {
+        addTopographyMap(0);
+    }
+
+    /**
+     * Called when a change in position occurs
+     */
+    protected void updateLocationLabel() {
+        if (locationLabel == null) {
+            return;
+        }
+        StringBuffer buf = new StringBuffer();
+        buf.append(getDisplayConventions().formatEarthLocation(startLocation,
+                false));
+        buf.append("  to  ");
+        buf.append(getDisplayConventions().formatEarthLocation(endLocation,
+                false));
+        locationLabel.setText(positionText = buf.toString());
+    }
+
+    /**
+     * Set the AutoScale property.
+     *
+     * @param value The new value for AutoScale
+     */
+    public void setAllowAutoScale(boolean value) {
+        allowAutoScale = value;
+        if ( !allowAutoScale) {
+            autoScaleYAxis = false;
+        }
+    }
+
+    /**
+     * Get the AutoScale property.
+     *
+     * @return The AutoScale
+     */
+    public boolean getAllowAutoScale() {
+        return allowAutoScale;
+    }
+
+
+    /**
+     * Set the AutoScale property.
+     *
+     * @param value The new value for AutoScale
+     */
+    public void setAutoScaleYAxis(boolean value) {
+        autoScaleYAxis = value;
+        try {
+            loadDataFromLine();
+        } catch (Exception exc) {
+            logException("Loading data from line", exc);
+        }
+    }
+
+    /**
+     * Get the AutoScale property.
+     *
+     * @return The AutoScale
+     */
+    public boolean getAutoScaleYAxis() {
+        return autoScaleYAxis;
+    }
+
+
+
+    /**
+     * Check to see if the unit is convertible with meter or gpm
+     *
+     * @param u  Unit to check
+     *
+     * @return true if convertible with meter or gpm
+     *
+     * @throws VisADException Unit Exception
+     */
+    private boolean isTopography(Unit u) throws VisADException {
+        if (u == null) {
+            return false;
+        }
+        return Unit.canConvert(u, CommonUnit.meter)
+               || Unit.canConvert(
+                   u, GeopotentialAltitude.getGeopotentialMeter());
+    }
+
+
+    /**
+     * Set the AutoUpdate property.
+     *
+     * @param value The new value for AutoUpdate
+     */
+    public void setAutoUpdate(boolean value) {
+        autoUpdate = value;
+    }
+
+    /**
+     * Get the AutoUpdate property.
+     *
+     * @return The AutoUpdate
+     */
+    public boolean getAutoUpdate() {
+        return autoUpdate;
+    }
+
+    /**
+     * Class MyTabbedPane handles the visad component in a tab
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.173 $
+     */
+    private class MyTabbedPane extends JTabbedPane implements ChangeListener {
+
+        /** Have we been painted */
+        boolean painted = false;
+
+        /**
+         * ctor
+         */
+        public MyTabbedPane() {
+            addChangeListener(this);
+        }
+
+        /**
+         *
+         * Handle when the tab has changed. When we move to tab 1 then hide the heavy
+         * component. Show it on change to tab 0.
+         *
+         * @param e The event
+         */
+        public void stateChanged(ChangeEvent e) {
+            if ( !getActive() || !getHaveInitialized()) {
+                return;
+            }
+            if ((crossSectionView == null)
+                    || (crossSectionView.getContents() == null)) {
+                return;
+            }
+            if (getSelectedIndex() == 0) {
+                crossSectionView.getContents().setVisible(true);
+            } else {
+                crossSectionView.getContents().setVisible(false);
+            }
+        }
+
+
+        /**
+         * The first time we paint toggle the selected index. This seems to get rid of
+         * screen crud
+         *
+         * @param g graphics
+         */
+        public void paint(java.awt.Graphics g) {
+            if ( !painted) {
+                painted = true;
+                setSelectedIndex(1);
+                setSelectedIndex(0);
+                repaint();
+            }
+            super.paint(g);
+        }
+    }
+
+
+
+    /**
+     *  Set the CrossSectionView property.
+     *
+     *  @param value The new value for CrossSectionView
+     */
+    public void setCrossSectionView(CrossSectionViewManager value) {
+        crossSectionView = value;
+    }
+
+    /**
+     *  Get the CrossSectionView property.
+     *
+     *  @return The CrossSectionView
+     */
+    public CrossSectionViewManager getCrossSectionView() {
+        return crossSectionView;
+    }
+
+
+
+    /**
+     * Set the foreground color
+     *
+     * @param color    new color
+     * @deprecated Keep this around for old bundles
+     */
+    public void setForeground(Color color) {
+        this.foreground = color;
+    }
+
+
+    /**
+     * Set the background color
+     *
+     * @param color   new color
+     * @deprecated Keep this around for old bundles
+     */
+    public void setBackground(Color color) {
+        this.background = color;
+    }
+
+
+
+    /**
+     *  Set the DisplayMatrix property.
+     *  @param value The new value for DisplayMatrix
+     * @deprecated Keep this around for old bundles
+     */
+    public void setDisplayMatrix(double[] value) {
+        displayMatrix = value;
+    }
+
+
+    /**
+     * Can this display control write out data.
+     * @return true if it can
+     */
+    public boolean canExportData() {
+        return true;
+    }
+
+    /**
+     * Get the DisplayedData
+     * @return the data or null
+     *
+     * @throws RemoteException problem reading remote data
+     * @throws VisADException  problem gettting data
+     */
+    protected Data getDisplayedData() throws VisADException, RemoteException {
+        if ((xsDisplay == null) || (xsDisplay.getData() == null)) {
+            return null;
+        }
+        return xsDisplay.getData();
+    }
+
+
+    /**
+     * Get the initial Z position
+     *
+     * @return the position in Z space
+     */
+    protected double getInitialZPosition() {
+        return .95;
+    }
+
+}
+

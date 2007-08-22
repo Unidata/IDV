@@ -1,0 +1,63 @@
+<html>
+<head>
+<title>Working with Large Grids</title>
+</head>
+
+<body>
+
+
+<div class="overview">
+<p> Displaying high resolution grids in the IDV can be memory
+intensive.  If you are reading from a remote server, you also
+have to deal with the latency of reading the grids across the
+internet.  There are several strategies you can use to reduce
+the amount of memory used by the IDV.
+</p>
+</div>
+
+<ol class="step">
+
+<li>First, let's load in a high resolution grid.
+
+  <ul class="substep">
+    <li>If you have not already done so, use the 
+        [ht::menu Edit {Remove All Displays}] menu to remove the displays
+        created in the previous exercise.</li>
+    <li>In the [ht::tab Catalog] data chooser, select the
+        [ht::menu {Main IDV Catalog} {Model Data} {Additional IDD Model Data} {North American Model} {CONUS 12 km} {latest.xml}] dataset.  
+  </ul>
+
+<li>Now, let's subset the grid.
+    <ul>
+
+    <li>[ht::editDataSourceProperties [ht::dataset {Latest CONUS 12 km}]]
+    <li>You can subset the grid by time and/or by coverage.
+        <ul>
+        <li>Click on the [ht::tab Times] tab.  Uncheck the
+           [ht::command Use All] box.  Right click on the panel
+           and select the [ht::menu {Select every third one}] menu option.</li>
+        <li>Click on the [ht::tab Spatial Subset] tab.  You can spatially
+            subset the grid by stride (e.g. every nth point) and/or by
+            region.  Set the [ht::command X Stride] to 
+            [ht::param Every third point].  Notice that the 
+            [ht::command Y Stride] is linked to the [ht::command X Stride].
+        <li>Optionally, keep the stride at [ht::param All points] and
+            select a sub-region on the map.
+        </ul>
+    </li>
+    <li>In the [ht::dialog Field Selector], select the
+        [ht::param {3D grid-&gt;Temperature @ pressure}] field and
+        the [ht::display Contour Plan View] display.</li>
+    <li>Since we are displaying a single level, you can further reduce
+    the grid by selecting a level instead of the entire grid.  
+    In the [ht::tab Level] tab of the [ht::command Data Subset] panel, 
+    select the [ht::param 50000 Pa] (500 millibar) level.
+    <li>Click the [ht::button Create Display] button.
+    </ul>
+<li>For more information on performance tuning, see the
+<a href="[ht::ug::url {/misc/PerformanceTuning.html}]">Performance Tuning</a> 
+section of the IDV User's Guide.</li>
+</ol>
+
+</body>
+</html>

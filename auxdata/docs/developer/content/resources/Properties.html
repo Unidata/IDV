@@ -1,0 +1,27 @@
+[header {Property files}]
+
+Much of the functionality  of the IDV is defined through its
+property file (or files) and a set of xml based resource files.
+The starting point is the property file (of which we have an example:
+<a href=../example.properties> example.properties</a>.
+
+<p>
+The IDV will first process its own default properties file. It will then 
+process each of the ones defined on the command line. In this way 
+any subsequent properties override previous  properties.
+
+<p>
+Another way to define your own application properties is to overwrite the
+method:<pre>
+public void initPropertyFiles (List files) {
+   files.add ("/ucar/unidata/apps/example/example.properties");
+}
+</pre>
+in your application class (e.g., ExampleIdv).
+
+
+<p>
+The property file allows you to specify some basic user interface
+properties (e.g.,title). However, the most important aspect  is the
+ability to specify a set of resources, <a href=resources.html> describe here</a>.
+

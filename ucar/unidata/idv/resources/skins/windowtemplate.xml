@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<skin mainwindow="false">
+  <ui>
+     <panel layout="border">
+        <panel layout="inset" place="Center" space="5">
+            ${contents}
+        </panel>
+        <panel layout="wrap" place="South">
+            <button label="Close" action="action:ui.closewindow"/>
+        </panel>
+     </panel>
+  </ui>
+</skin>

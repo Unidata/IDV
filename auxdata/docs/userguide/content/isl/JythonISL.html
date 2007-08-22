@@ -1,0 +1,103 @@
+<html><head> 
+  <title>Scripting with Jython</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+<div class="pagesubtitle">Jython and ISL</div>
+The IDV also supports writing scripts in Jython.  This means that
+you can create a Jython script that includes calls to special
+methods (defined below), and also does "normal" Jython things.
+
+<p>
+<b>Please Note: Some of the APIs described below will likely change 
+in the coming months!</b>
+<p>
+To start with, here is an <a href="example.py">example Python script</a>. 
+<p>
+Scripting in Jython allows for flexibility and a more
+&quot;programming&quot; flavor for IDV scripting, though you can still
+do much of the functionality using Jython that you can do using ISL.
+The benefit of the ISL is that it is more declarative and requires
+(hopefully) less knowledge of programming.
+<p>
+To run the IDV with a Jython script, do:
+<pre>
+runIDV -islfile your-script.py
+</pre>
+<p>
+Below, each of the available methods in the Jython 
+scripting interface will be described.
+
+<ul>
+
+<li> <b>setOffScreen(value)</b>
+<br>
+If you want to do your rendering in the "background", then
+the <i>value</i> should be set to 1 (true).  If you want
+the window(s) to pop-up, set the <i>value</i> to 0 (false).
+<p>
+<li> <b>setDebug(value)</b>
+<br>
+To enable some debug during your development, set the <i>value</i>
+to 1 (true).
+
+<p>
+<li><b>loadBundle(filename, data_files)</b>
+<br>
+Loads a bundle with the given <i>filename</i>.  You may
+also provide a dictionary of <i>datasource:file</i> items
+similar to the ISL [isl::tagref setfiles].
+
+<p>
+<li><b>pause()</b>
+<br>
+Pause until all displays have been created.  This is useful
+between <i>loadBundle()</i> and <i>writeImage()</i> for example.
+
+<p>
+<li><b> writeImage(filename, parameters, quality) </b>
+<br>
+Write out an image file.  The <i>filename</i> should have the
+file extension of the type of image file you want to write (.jpg,
+.gif, .png).  
+<p>
+The <i>parameters</i> variable is a string
+that contains any parameter information (see the 
+<a href="ImagesAndMovies.html#imagesmanipulation"> ISL description of parameters)</a>
+It is in the form:
+<pre>
+"clip north=40; matte background=green top=20; resize height=300 width=300"
+</pre>
+<p>
+The <i> quality</i> value is 1.0 for the best, down to 0.0 for,
+well, no quality at all...
+
+<p>
+<li> <b> writeMovie(filename, parameters) </b>
+Write out the display as a movie.  The <i>filename</i> should have the
+file extension of the type of image file you want to write (.mov)
+<p>
+The <i>parameters</i> variable is a string
+that contains any parameter information (see the 
+<a href="ImagesAndMovies.html#imagesmanipulation"> ISL description of parameters)</a>
+It is in the form:
+<pre>
+"clip north=40; matte background=green top=20; resize height=300 width=300"
+</pre>
+
+<li> An alternative way to get an Image, manipulate it and then
+save it:
+<ul>
+<li> <b> getImage() </b>
+<li> <b> resizeImage(image, width, height) </b>
+<li> <b> matteImage(image, color, top, bottom, left, right) </b>
+<li> <b> df = findDisplayControl(id) </b> then "dc.getImage()"
+<li> <b> writeImageToFile(image, filename) </b>
+
+</ul>
+
+</ul>
+
+
+</body>

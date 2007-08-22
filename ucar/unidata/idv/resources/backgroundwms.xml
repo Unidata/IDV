@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<backgroundwms>
+  <wms
+     server="http://wms.jpl.nasa.gov/wms.cgi"
+     layer="modis"
+     title="Blue Marble"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="90,-180,-90,180"/>
+
+
+  <wms
+     server="http://terraserver-usa.com/ogcmap.ashx"
+     layer="DRG"
+     title="Topographic Map"
+     srs="EPSG:4326"
+     format="image/jpeg"
+     version="1.1.1"
+     bbox="71.0,-168.0, 17.0,-65.0"/>
+  <wms
+     server="http://terraserver-usa.com/ogcmap.ashx"
+     layer="DOQ"
+     title="Digital Ortho-Quad"
+     srs="EPSG:4326"
+     format="image/jpeg"
+     version="1.1.1"
+     bbox="71.0,-168.0, 17.0,-65.0"/>
+  <wms
+     server="http://terraserver-usa.com/ogcmap.ashx"
+     layer="UrbanArea"
+     title="Urban Area"
+     srs="EPSG:4326"
+     format="image/jpeg"
+     version="1.1.1"
+     bbox="71.0,-168.0, 17.0,-65.0"/>
+  <wms
+     server="http://ims.cr.usgs.gov:80/servlet/com.esri.wms.Esrimap/USGS_WMS_NED"
+     layer="US_NED_Shaded_Relief"
+     title="Shaded Relief"
+     srs="EPSG:4326"
+     format="image/jpeg"
+     version="1.1.1"
+     bbox="49.99997399808, -125.0, 23.99999999808, -65.99561456"/>
+</backgroundwms>

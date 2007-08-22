@@ -1,0 +1,226 @@
+<html>
+<head>
+  <title>Building the IDV from Source</title>
+</head>
+
+
+<body>
+
+<div class="overview">
+Developers can download the source files for the IDV and 
+build it from scratch.
+</div>
+
+<p>
+
+Before building the IDV you need to first install 
+Java and Java 3D on your system.  You need to use the
+Java SDK, because the Java RunTime Environment (JRE) does
+not contain the Java compiler (javac).  You need to use a version 
+of Java 1.5 (preferably the latest version).  You can use either 
+the Java 3D SDK or JRE, version 1.3.x.  
+
+<p>
+
+You will also need to install <b>Ant</b> <a
+href="http://ant.apache.org/">(http://ant.apache.org/)</a>
+on your machine. Ant is similar to make - instead of a
+<code class="filename">Makefile</code>, Ant uses a <code
+class="filename">build.xml</code> file.  Be sure to follow
+the instructions for installing Ant, especially those for
+setting up environment variables.
+
+
+<p>
+
+
+<ifndef flag_developerworkshop>
+Download the IDV source files from the Unidata Web Site
+(under <code class="menu">Downloads-&gt;IDV-&gt;Source</code>):
+
+<ol class="step">
+  <li>Open the IDV Downloads page in a new window by clicking
+      <a href="http://www.unidata.ucar.edu/downloads/idv/latest/index.jsp" target="downloadPage">here</a>.</li>
+  <li>To download the IDV source, you must be registered as a Unidata user.
+      If you have already registered, log in using your user name
+      and password.  If you have not registered or you have forgotten
+      your password, follow the instructions on the login sidebar.</li>
+  <li>Under &quot;IDV <%idv.version%> Documentation and Source Code&quot;, click on the 
+<a href="http://www.unidata.ucar.edu/downloads/idv/latest/ftp/idv_src_<%idv.version%>.jar">
+IDV <%idv.version%> Source Code</a> link  to start the download.  You will be prompted for a location
+      to save the file to.  Save it your home directory.
+
+  <li>You will also need the set of ancillary libraries (VisAD, netCDF, etc) 
+      that the IDV uses contained in the zip file:
+<a href="http://www.unidata.ucar.edu/downloads/idv/latest/ftp/idv_jars_<%idv.version%>.zip">
+IDV <%idv.version%> Jar Files</a>.
+      Save this to your home directory.</li>
+  <li>After the download is complete, close the extra browser window. </li>
+
+</ol>
+</ifndef>
+
+
+
+<ifdef flag_developerworkshop>
+Download the nightly build IDV source files from the Unidata Web Site:
+
+<ol class="step">
+  <li>Open the IDV nightly builds page in a new window by clicking
+      <a href="http://www.unidata.ucar.edu/software/idv/release/nightly/index.html" target="downloadPage">here</a>.</li>
+  <li>Under &quot;Jars, etc:&quot;, click on the 
+<a href="http://www.unidata.ucar.edu/software/idv/release/nightly/idv_src_<%idv.version%>.jar">
+IDV Source</a> link  to start the download.  You will be prompted for a location
+      to save the file to.  Save it your home directory.
+
+  <li>You will also need the set of ancillary libraries (VisAD, netCDF, etc) 
+      that the IDV uses contained in the zip file:
+<a href="http://www.unidata.ucar.edu/software/idv/release/nightly/idv_jars_<%idv.version%>.zip">
+IDV <%idv.version%> Jar Files</a>.
+      Save this to your home directory.</li>
+
+
+  <li> And one more jar file to save to your home directory:
+    <a href="http://www.unidata.ucar.edu/software/idv/auxdataforworkshop.jar">auxdataforworkshop.jar</a>
+
+  <li>After the download is complete, close the extra browser window. </li>
+
+
+
+</ol>
+
+
+</ifdef>
+
+<p>
+
+You are now ready to install the IDV source.</li>
+
+<ol class="step">
+  <li>Open a terminal window.</li>
+
+  <li>Change to your home directory or the directory to which you 
+      downloaded the source and binary files
+      (if you are not already there). </li>
+
+
+  <li>unJAR the source file. 
+    [ht::cmdline {jar&nbsp;&nbsp;xvf&nbsp;&nbsp;idv_src_<%idv.version%>.jar}]
+    This will create a "metapps" directory underneath the install
+    directory (where you unJAR'ed the file).</p>
+  </li>
+
+  <li>Next, you need to create a <code class="filename">lib</code>
+      directory as a peer of the <code class="filename">ucar</code> 
+      directory under <code class="filename">metapps</code> 
+      that holds the ancillary JAR files from the 
+      <code class="filename">IDV Binary distribution</code>
+      that are needed to build the classes.  The structure will 
+      look like this:
+
+<pre>
+metapps
+     |
+     +----ucar
+     |
+     +----lib (holds the ancillary jar files).
+</pre>
+
+  </li>
+
+
+  <li>Change to the <code class="filename">lib</code>
+      (if you are not already there). 
+      [ht::cmdline {cd&nbsp;&nbsp;<%workshop.homedir%>/metapps/lib}]
+  </li>
+
+
+  <li>Unzip the file you downloaded into this directory.
+[ht::cmdline {unzip&nbsp;&nbsp;../../idv_jars_<%idv.version%>.zip}]
+  </li>
+
+<ifdef flag_developerworkshop>
+<li> Change directory to metapps and unjar the auxdataforworkshop.jar:
+<br>
+[ht::cmdline {jar -xvf ~/auxdataforworkshop.jar}]
+Normally, this isn't needed for building the IDV but we'll use this  later
+in the plugins section.
+</ifdef>
+
+
+</ol>
+
+
+<ifndef flag_developerworkshop>
+Now you should be able to build the IDV from scratch.
+
+<ol class="step">
+
+  <li>Change to the <code class="filename">ucar</code> directory.
+      [ht::cmdline {cd&nbsp;&nbsp;<%workshop.homedir%>/metapps/ucar}]
+  </li>
+
+  <li>Execute the ant command to build 
+      <code class="filename">idv.jar</code>.
+      [ht::cmdline {ant&nbsp;&nbsp;clean idv}]
+    This removes all Java class files (there will be none
+    the first time), re-builds them and creates 
+    the <code class="filename">idv.jar</code> file, copying 
+    it to the lib directory.<p>
+
+  </li><p>
+
+  <li> To run the IDV using your build:<p>
+  
+    <ul class="substep">
+    
+      <li>Change to the <code class="filename">lib</code> directory
+          [ht::cmdline {cd&nbsp;&nbsp;../lib}]
+      </li>
+
+      <li>then run:
+          [ht::cmdline {java&nbsp;&nbsp;-Xmx512m&nbsp;&nbsp;-jar idv.jar}]
+      </li>
+    </ul>
+
+  </li>
+
+</ol>
+</ifndef>
+ 
+<ifdef flag_foo>
+<antbuild>
+Now you should be able to build the IDV from scratch.
+
+<ol class="step">
+
+  <li>Change to the <code class="filename">ucar</code> directory.
+      [ht::cmdline {cd&nbsp;&nbsp;/home/idvdev/metapps/ucar}]
+  </li>
+
+  <li>Execute the ant command to build 
+      <code class="filename">clean idv</code>.
+      [ht::cmdline {ant&nbsp;&nbsp;idvjar}]
+    This removes all Java class files (there will be none
+    the first time), re-builds them.
+
+  </li><p>
+
+  <li> To run the IDV using your build use:<p>
+  
+          [ht::cmdline {java&nbsp;&nbsp;-Xmx1024m&nbsp;&nbsp;ucar.unidata.idv.DefaultIdv}]
+
+  </li>
+  <li> For the purposes of this workshop, we've created an alias so you
+  can just type:
+          [ht::cmdline {idv}]
+  </li>
+  <li> List out the CLASSPATH we have set up for you:
+          [ht::cmdline {set | grep CLASSPATH}]
+
+</ol>
+</antbuild>
+</ifdef>
+ 
+</body>
+</html>

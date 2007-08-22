@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<panel
+   bgcolor="white"
+   layout="inset"
+   space="20">
+  <panel
+     cols="3"
+     colwidths="0,1,0"
+     layout="gridbag"
+     rowheights="1,0">
+    <label text="Row 1 height is stretchy"/>
+    <panel bgcolor="red"/>
+    <panel bgcolor="green"/>
+    <panel bgcolor="blue"/>
+    <label text="Middle column width is stretchy"/>
+    <panel bgcolor="black"/>
+  </panel>
+</panel>

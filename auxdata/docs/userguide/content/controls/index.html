@@ -1,0 +1,367 @@
+<html><head>
+  <title>Overview</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+
+<%nochildlist%>
+
+A Display Control is the interface through which a display can be managed.
+A display is usually shown in a view though they can be stand-alone.
+
+
+<subhead id="legends">Display Legends</subhead>
+
+The legend in a View lists the set of Display Controls within that view. 
+In the image below, the  legend has been floated from the main view window into its
+own window. This is done with the [ug::button Float Window] button.
+
+[ht::cimg images/SideLegend.gif {Side Legend}]
+
+<p>
+The  legend  shows each display under the 
+&quot;display  category&quot; of that
+display. For example,  the legend in the above image  shows the categories
+&quot;Maps&quot;, &quot;Plan Views&quot;, &quot;Probes&quot;, 
+&quot;3D Surface&quot;  and &quot;Imagery&quot;. 
+The display category may be changed (see below). This is useful
+for grouping and controlling the visibility of a group of displays.
+
+<p>
+The legend label shows the parameter or field name, the display type,
+and sometimes other information such as the level of a plan view or
+value of an isosurface. The label may be changed by a user using items
+under the [ug::menu Edit {Properties}] menu item (described below).
+Clicking on the highlighted part of the label will bring up the displays
+control window. Right clicking will bring up the displays control menu.
+
+<p>
+The category display within the legend can be toggled to show or
+hide the displays under that category with the 
+[ug::button Toggle Category] button. The details of a 
+display can also be toggled with the
+[ug::button Toggle Details] button. The visibility of the displays under
+a category (i.e., the graphical display within the main view window)
+can be changed with the [ug::button Category Visibility Checkbox]. The
+visibility of an individual display can be changed with the 
+[ug::button Display Visibility Checkbox]
+
+<p>
+The [ug::button Remove] button allows you to quickly remove a display.
+The [ug::button Visibility Toggle Lock] allows you to &quot;lock&quot;
+the current visibility of the display and not change it while doing the
+<a href="#visibility">visibility cycling</a>.
+
+<p>
+Detailed information about a display may also be shown in the legend.
+For example, for those displays that use a color table, the color
+bar will also be shown in the legend. Moving the mouse over the color bar
+shows intermediate values. Click on the color bar to get a <a
+href="../tools/ColorTableEditor.html">Color Table Editor</a> with the
+color table for that display.
+
+
+
+
+
+
+<subhead id="menus">Menus</subhead>
+All display control windows share a common set of
+<b>File, Edit, View</b>, and <b>Help</B> menu items, 
+shown in the menu bar. Different controls may also
+have custom items in these menus as well.
+<p>
+
+The [ug::menu File] menu has these common choices:
+
+<ul>
+[ug::menuDesc {Remove Display} { Remove the display.}]
+
+
+[ug::menuDesc {Save} { A variety of ways of saving the state of the display.}]
+
+
+<ul>
+[ug::menuDesc {Save Data in Cache} {This allows you to save the current
+data of the display in a Cache Data Source as a new Field. 
+You will be prompted for the name of the field. You can use this
+in a variety of ways:
+<ul> 
+<li> After calculating a complex formula, selecting operands for the formula,
+etc.,  to create the data in a display you can save off the formula and 
+the data that was calculated. Then you can create new displays from that
+formula without having  to reselect the operands and recalculate the
+final data.
+<li> In a Web Map Server (WMS) display this allows you to capture the image
+and then make use of it in formulas and in other displays. For example,
+you can drape the image over topography.
+</ul>
+}]
+
+
+
+[ug::menuDesc {Save As Parameter Defaults} { 
+Allows you to save the current display state for the 
+parameter as the default for that parameter in the future.
+See the <a href="../tools/ParameterDefaultsEditor.html">
+Parameter Defaults Editor</a> page for more information.
+}]
+
+
+[ug::menuDesc {Save Display as Favorite} { 
+Allows you to save the current display state (without the data)
+as a Favorite Display.
+}]
+
+[ug::menuDesc {Save Display as Bundle } { 
+Allows you to save the current application state as a bundle or Web
+Start <a href="../Bundles.html#jnlp">JNLP</a> file.
+}]
+
+
+
+</ul>
+
+[ug::menuDesc {Reload Data} {Reload the data for this display.}]
+
+[ug::menuDesc {Close Window} { If the Display Control is shown in its own window
+this is used to close the control window.  It normally doesn't remove the control (unless a preference has been set).}]
+
+</ul>
+
+The [ug::menu Edit] menu has these common choices:
+
+<ul>
+
+[ug::menuDesc {Color Table} { For displays that have a color table this
+menu allows you to edit the color table, change the range, choose a new
+color table, etc.
+}]
+
+[ug::menuDesc {Selector Color, et. al.} {
+Some displays (e.g., data probe) use a  single color in the display (e.g.,
+for showing the selector point or line). Use this menu to set the color.
+}]
+
+[ug::menuDesc {Change Parameter} { Some displays allow you to change the
+data parameter that is being used.
+}]
+
+[ug::menuDesc {Change Display Unit} {Some displays allow you to change
+the unit that is used in the display, e.g., changing temperature plots
+in Kelvin to Celsius.
+}]
+
+
+[ug::menuDesc {Change Contours} {Displays with contours allow you to change
+the unit that is used in the display.
+}]
+
+
+[ug::menuDesc {Use Times in Animation} { For displays that have a time
+associated with them, you can select whether the times are used
+to calculate the animation steps.
+}]
+
+[ug::menuDesc {Sharing} {This sub-menu allows you
+to turn on/off sharing and to set the &quot;share group&quot;. 
+When sharing is turned on certain state is shared among displays of the 
+same type that are in the same share group.  The share group can be
+an arbitrary name.
+<p>
+For example, the location of a vertical cross section, the color table,
+location of a probe point, etc., can all be shared.
+}]
+
+
+
+[ug::menuDesc {Properties} {The <a href="#properties">Properties</a>
+dialog allows you to change
+the display label, the display category, the id and the color scale
+properties for this display.
+}]
+
+
+
+
+
+
+</ul>
+
+The [ug::menu View] menu has these common choices:
+
+<ul>
+[ug::menuDesc {Visible} { check box allows you to toggle visibility.
+}]
+
+
+[ug::menuDesc {To Front} { If this display is showing at the same level
+in 3D as another (e.g., satellite and radar images in the same display),
+you can use this menu to select which display is on top.
+}]
+
+
+
+[ug::menuDesc {Display List Color} { Allows you to set the 
+color of the label for this control in the display list.
+}]
+
+
+
+[ug::menuDesc {Use Data Projection} { This will change the projection used in 
+the view to the native projection of the display.
+}]
+
+
+
+</ul>
+
+The [ug::menu Help] menu has these common choices:
+
+<ul>
+[ug::menuDesc {Details} { Selecting this item brings up a window that
+shows detailed information about the display and any associated
+data.
+}]
+
+[ug::menuDesc {User's Guide} { Bring up the user guide entry for the
+particular display.
+}]
+
+</ul>
+
+
+<subhead id="properties">Properties Dialog</subhead>
+The Properties dialog is brought up with the
+[ug::menu Edit Properties] menu:
+
+[ht::cimg images/ControlProperties.gif {Display Control Properties}]
+
+The [ug::button {Display Category}] field is arbitrary text and is 
+used to organize
+the legend.  The &quot;&lt;&lt;&quot; button shows a list of all of the
+current display categories and allows you to easily set this field.
+
+<p>
+The [ug::button Legend Label] field is the label used in the legend of
+this display control. It can contain arbitrary text as well
+as a set of &quot;macros&quot;. The macros can be added
+to the label with the [ug::menu {Add Macro}] button:
+<ul>
+<li> [ug::menu {Short Name}] This is the short name of the parameter being displayed.
+<li> [ug::menu {Long Name}] This is the long name of the parameter being displayed.
+<li> [ug::menu {Data Source Name}] This is the  name of the data source that produced
+the parameter being displayed.
+
+<li> [ug::menu {Display Name}] The name of the display.
+<li> [ug::menu {Timestamp}] The time of the data that is currently being displayed using the default time format preference.
+You can also use a macro of the form %time:&lt;time pattern&gt;% to
+set a specific time format other than the default.  &lt;time pattern&gt;
+follows the same rules defined in the 
+<a href="../tools/Preferences.html">User Preferences</a> section.  For example,
+%time:HHz&nbsp;EEE&nbsp;dd&nbsp;MMM&nbsp;yyyy% would give something like
+<b>12GMT&nbsp;Fri&nbsp;16&nbsp;Feb&nbsp;2007</b>.
+<li> [ug::menu {...}] And other values depending on the display.
+
+</ul>
+<p>
+
+The [ug::button {Extra Legend Labels}] field acts like the Legend Label field (e.g., with macros).
+<p>
+
+The [ug::button {Display Label}] field acts like the Legend Label field
+to define the text label that is shown in the display list.
+<p>
+
+The [ug::button {Category}] field is arbitrary text and is used to organize
+the legend.  The &quot;&lt;&lt;&quot; button shows a list of all of the
+current display categories and allows you to easily set this field.
+
+<p>
+The [ug::button Id] field is used to define an ID for this display. The ID is
+used for accessing particular displays from the <a href="../isl/index.html">
+IDV Scripting Language</a>.
+
+<p>
+There may be a variety of check boxes:
+<ul>
+<li> [ug::button Show In Display List]
+Allows you to toggle the visibility of the label in the view window.
+Note that you must enable showing the list of display labels
+that are toggled on using the [ug::menu View Properties] dialog
+of the view window, or by setting the global property for
+all display through the <a href="../tools/Preferences.html">User
+Preferences</a> dialog.
+
+<li> [ug::button Loc Visibility Toggle] Locks/unlocks 
+<a href="#visibility">visibility toggling</a>.
+
+
+<li> [ug::button Show Note Text] 
+Arbitrary text notes can be added to a
+display. This checkbox menu item shows or hides the text field 
+that allows you to edit the notes.
+
+
+
+<li> [ug::button {Use Fast Rendering}] 
+When this is checked on, the IDV will
+not try to account for projection seams.  This will cause displays to
+be rendered faster at the expense of accuracy.
+
+
+</ul>
+
+
+
+<p>
+
+There may be other tabs shown, depending on the display. For example,
+the [ug::tab Color Scale] tab allows you to configure where the color scale
+bar is shown. The [ug::tab Spatial Subset] tab allows you to define
+further spatial subsetting of the data.
+
+
+<subhead id="visibility">Display Visibility</subhead>
+
+<ul>
+  <li>In the  legend the 
+      [ht::command {Display Visibility}] checkbox to the left
+      of the label can be used to toggle the visibility of that display.
+      <p>
+
+
+  <li>The function keys <code class="command">F1, F2, F3</code><b>*</b> can
+      be used to cycle visibility as follows:
+
+      <ul>
+
+        <li>The [ht::command {F1}] key cycles visibility through 
+            all non-locked displays, showing one at a time.</li>
+
+        <li>The [ht::command {F2}] turns on all non-locked 
+            displays.</li>
+
+        <li>The [ht::command {F3}] turns on all non-locked 
+            displays.</li>
+
+      </ul>
+      <b>*</b><i>On a Mac laptop, you may need to press the "Fn" key along
+      with the particular function key</i>.
+
+   </li>
+
+  <li>The padlock icon <img src="images/unlock.gif"> on the right side of the 
+      [ht::command {legend bar}] is used to block the effects of the visibility toggling described
+      above.  When locked the visibility of a display is not affected by the toggling.
+
+   <li>Use the [ug::menu View Visible] checkbox
+       menu item in each display control's menu.</li>
+
+</ul>
+
+
+</body>
+</html>

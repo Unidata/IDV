@@ -1,0 +1,45 @@
+
+<title>Creating a Weather Text Data Chooser</title>
+
+
+<div class="overview">
+Let's see how we can access weather text bulletins from an ADDE server.
+</div>
+
+<ol>
+<li>Start the Example IDV
+<li>From the Dashboard, select the [ht::command {Data Chooser}] tab.
+<li>Select the [ht::command URLs] Chooser.  The IDV can use 
+the ADDE URL syntax to access weather text on a remote server.
+<li>Paste the following URL into the
+text box:
+<pre>
+adde://adde.ucar.edu/wxtext?apro=zfp&amp;astn=mkx&amp;day=2007154
+</pre>
+and click the [ht::command {Add Source}] button.
+<li>In this case, the IDV handles the URL as an input stream and
+by default displays it in the TextDisplayControl.  However, having to 
+type in an obscure URL syntax is not the ultimate User Interface. 
+<li>Exit the IDV.
+</ol>
+Let's create a chooser that allows the user to select from some
+predefined products.
+<ol>
+<li> cd  to <i><%workshop.installdir%>/ucar/unidata/apps/example</i>
+<li>Open <code>WxTextChooser.java</code> in an editor and lets look what's
+there.
+<li>Exit the editor and compile the class
+<li>Copy chooser.xml from the <i>resources</i> directory to the current 
+directory.  
+[ht::cmdline {cp resources/chooser.xml .}]
+<li>
+Open the file in an editor and look at what's defined.
+<li>Exit the editor.
+<li>Start the IDV.
+<li>From the Dashboard, select the [ht::command {Data Chooser}] tab.  
+Notice that our chooser is there.  Select a server, product and station 
+and click the [ht::command {Add Source}] button.  Try this with different
+products.  If you know some  codes and station ids, try them as well.
+<li>Now let's look at having a custom Data Source to handle our
+data.
+</ol>

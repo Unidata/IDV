@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE catalog SYSTEM "http://www.unidata.ucar.edu/projects/THREDDS/xml/InvCatalog.0.4.dtd">
+<catalog xmlns:xlink="http://www.w3.org/1999/xlink" name="Unidata IDD Server" version="0.4">
+  <server ID="motherlode" type="DODS" base="http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/" />
+  <action name="Show data tree" url="jython:idv.createDataTreeWindow();"/>
+  <action name="Radar chooser" url="/ucar/unidata/idv/chooser/radarchooser.xml"/>
+  <action name="Catalog6" url="/ucar/unidata/idv/chooser/catalog6.xml"/>
+  <collection name="NCEP AVN-Q" dataType="GRID" serverID="motherlode">
+    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/AVN-Q.xml" />
+    <dataset name="2002-09-15 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091506_avn-q.nc" />
+    <dataset name="2002-09-15 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091500_avn-q.nc" />
+    <dataset name="2002-09-14 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091418_avn-q.nc" />
+    <dataset name="2002-09-14 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091412_avn-q.nc" />
+    <dataset name="2002-09-14 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091406_avn-q.nc" />
+    <dataset name="2002-09-14 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091400_avn-q.nc" />
+    <dataset name="2002-09-13 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091318_avn-q.nc" />
+    <dataset name="2002-09-13 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091312_avn-q.nc" />
+    <dataset name="2002-09-13 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091306_avn-q.nc" />
+    <dataset name="2002-09-13 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091300_avn-q.nc" />
+    <dataset name="2002-09-12 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091218_avn-q.nc" />
+    <dataset name="2002-09-12 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091212_avn-q.nc" />
+    <dataset name="2002-09-12 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091206_avn-q.nc" />
+    <dataset name="2002-09-12 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091200_avn-q.nc" />
+    <dataset name="2002-09-11 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091118_avn-q.nc" />
+    <dataset name="2002-09-11 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091112_avn-q.nc" />
+    <dataset name="2002-09-11 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091106_avn-q.nc" />
+    <dataset name="2002-09-11 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091100_avn-q.nc" />
+    <dataset name="2002-09-10 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091018_avn-q.nc" />
+    <dataset name="2002-09-10 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091012_avn-q.nc" />
+    <dataset name="2002-09-10 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091006_avn-q.nc" />
+    <dataset name="2002-09-10 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091000_avn-q.nc" />
+    <dataset name="2002-09-09 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090918_avn-q.nc" />
+    <dataset name="2002-09-09 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090912_avn-q.nc" />
+    <dataset name="2002-09-09 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090906_avn-q.nc" />
+    <dataset name="2002-09-09 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090900_avn-q.nc" />
+    <dataset name="2002-09-08 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090818_avn-q.nc" />
+    <dataset name="2002-09-08 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090812_avn-q.nc" />
+  </collection>
+  <collection name="NCEP AVN-X" dataType="GRID" serverID="motherlode">
+    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/AVN-X.xml" />
+    <dataset name="2002-09-15 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091506_avn-x.nc" />
+    <dataset name="2002-09-15 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091500_avn-x.nc" />
+    <dataset name="2002-09-14 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091418_avn-x.nc" />
+    <dataset name="2002-09-14 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091412_avn-x.nc" />
+    <dataset name="2002-09-14 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091406_avn-x.nc" />
+    <dataset name="2002-09-14 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091400_avn-x.nc" />
+    <dataset name="2002-09-13 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091318_avn-x.nc" />
+    <dataset name="2002-09-13 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091312_avn-x.nc" />
+    <dataset name="2002-09-13 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091306_avn-x.nc" />
+    <dataset name="2002-09-13 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091300_avn-x.nc" />
+    <dataset name="2002-09-12 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091218_avn-x.nc" />
+    <dataset name="2002-09-12 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091212_avn-x.nc" />
+    <dataset name="2002-09-12 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091206_avn-x.nc" />
+    <dataset name="2002-09-12 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091200_avn-x.nc" />
+    <dataset name="2002-09-11 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091118_avn-x.nc" />
+    <dataset name="2002-09-11 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091112_avn-x.nc" />
+    <dataset name="2002-09-11 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091106_avn-x.nc" />
+    <dataset name="2002-09-11 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091100_avn-x.nc" />
+    <dataset name="2002-09-10 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091018_avn-x.nc" />
+    <dataset name="2002-09-10 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091012_avn-x.nc" />
+    <dataset name="2002-09-10 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091006_avn-x.nc" />
+    <dataset name="2002-09-10 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091000_avn-x.nc" />
+    <dataset name="2002-09-09 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090918_avn-x.nc" />
+    <dataset name="2002-09-09 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090912_avn-x.nc" />
+    <dataset name="2002-09-09 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090906_avn-x.nc" />
+    <dataset name="2002-09-09 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090900_avn-x.nc" />
+    <dataset name="2002-09-08 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090818_avn-x.nc" />
+    <dataset name="2002-09-08 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090812_avn-x.nc" />
+  </collection>
+  <collection name="NCEP RUC" dataType="GRID" serverID="motherlode">
+    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/RUC.xml" />
+    <dataset name="2002-09-15 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091512_ruc.nc" />
+    <dataset name="2002-09-15 11:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091511_ruc.nc" />
+    <dataset name="2002-09-15 10:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091510_ruc.nc" />
+    <dataset name="2002-09-15 09:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091509_ruc.nc" />
+    <dataset name="2002-09-15 08:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091508_ruc.nc" />
+    <dataset name="2002-09-15 07:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091507_ruc.nc" />
+    <dataset name="2002-09-15 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091506_ruc.nc" />
+    <dataset name="2002-09-15 05:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091505_ruc.nc" />
+    <dataset name="2002-09-15 04:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091504_ruc.nc" />
+    <dataset name="2002-09-15 03:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091503_ruc.nc" />
+    <dataset name="2002-09-15 02:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091502_ruc.nc" />
+    <dataset name="2002-09-15 01:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091501_ruc.nc" />
+    <dataset name="2002-09-15 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091500_ruc.nc" />
+    <dataset name="2002-09-14 23:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091423_ruc.nc" />
+    <dataset name="2002-09-14 22:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091422_ruc.nc" />
+    <dataset name="2002-09-14 21:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091421_ruc.nc" />
+    <dataset name="2002-09-14 20:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091420_ruc.nc" />
+    <dataset name="2002-09-14 19:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091419_ruc.nc" />
+    <dataset name="2002-09-14 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091418_ruc.nc" />
+    <dataset name="2002-09-14 17:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091417_ruc.nc" />
+    <dataset name="2002-09-14 16:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091416_ruc.nc" />
+    <dataset name="2002-09-14 15:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091415_ruc.nc" />
+    <dataset name="2002-09-14 14:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091414_ruc.nc" />
+    <dataset name="2002-09-14 13:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091413_ruc.nc" />
+    <dataset name="2002-09-14 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091412_ruc.nc" />
+    <dataset name="2002-09-14 11:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091411_ruc.nc" />
+    <dataset name="2002-09-14 10:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091410_ruc.nc" />
+    <dataset name="2002-09-14 09:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091409_ruc.nc" />
+    <dataset name="2002-09-14 08:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091408_ruc.nc" />
+    <dataset name="2002-09-14 07:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091407_ruc.nc" />
+    <dataset name="2002-09-14 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091406_ruc.nc" />
+    <dataset name="2002-09-14 05:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091405_ruc.nc" />
+    <dataset name="2002-09-14 04:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091404_ruc.nc" />
+    <dataset name="2002-09-14 03:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091403_ruc.nc" />
+    <dataset name="2002-09-14 02:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091402_ruc.nc" />
+    <dataset name="2002-09-14 01:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091401_ruc.nc" />
+    <dataset name="2002-09-14 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091400_ruc.nc" />
+    <dataset name="2002-09-13 23:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091323_ruc.nc" />
+    <dataset name="2002-09-13 22:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091322_ruc.nc" />
+    <dataset name="2002-09-13 21:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091321_ruc.nc" />
+    <dataset name="2002-09-13 20:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091320_ruc.nc" />
+    <dataset name="2002-09-13 19:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091319_ruc.nc" />
+    <dataset name="2002-09-13 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091318_ruc.nc" />
+    <dataset name="2002-09-13 17:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091317_ruc.nc" />
+    <dataset name="2002-09-13 16:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091316_ruc.nc" />
+    <dataset name="2002-09-13 15:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091315_ruc.nc" />
+    <dataset name="2002-09-13 14:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091314_ruc.nc" />
+    <dataset name="2002-09-13 13:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091313_ruc.nc" />
+    <dataset name="2002-09-13 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091312_ruc.nc" />
+    <dataset name="2002-09-13 11:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091311_ruc.nc" />
+    <dataset name="2002-09-13 10:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091310_ruc.nc" />
+    <dataset name="2002-09-13 09:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091309_ruc.nc" />
+    <dataset name="2002-09-13 08:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091308_ruc.nc" />
+    <dataset name="2002-09-13 07:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091307_ruc.nc" />
+    <dataset name="2002-09-13 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091306_ruc.nc" />
+    <dataset name="2002-09-13 05:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091305_ruc.nc" />
+    <dataset name="2002-09-13 04:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091304_ruc.nc" />
+    <dataset name="2002-09-13 03:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091303_ruc.nc" />
+    <dataset name="2002-09-13 02:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091302_ruc.nc" />
+    <dataset name="2002-09-13 01:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091301_ruc.nc" />
+    <dataset name="2002-09-13 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091300_ruc.nc" />
+    <dataset name="2002-09-12 23:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091223_ruc.nc" />
+    <dataset name="2002-09-12 22:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091222_ruc.nc" />
+    <dataset name="2002-09-12 21:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091221_ruc.nc" />
+    <dataset name="2002-09-12 20:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091220_ruc.nc" />
+    <dataset name="2002-09-12 19:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091219_ruc.nc" />
+    <dataset name="2002-09-12 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091218_ruc.nc" />
+    <dataset name="2002-09-12 17:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091217_ruc.nc" />
+    <dataset name="2002-09-12 16:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091216_ruc.nc" />
+    <dataset name="2002-09-12 15:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091215_ruc.nc" />
+    <dataset name="2002-09-12 14:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091214_ruc.nc" />
+    <dataset name="2002-09-12 13:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091213_ruc.nc" />
+    <dataset name="2002-09-12 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091212_ruc.nc" />
+    <dataset name="2002-09-12 11:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091211_ruc.nc" />
+    <dataset name="2002-09-12 10:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091210_ruc.nc" />
+    <dataset name="2002-09-12 09:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091209_ruc.nc" />
+    <dataset name="2002-09-12 08:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091208_ruc.nc" />
+    <dataset name="2002-09-12 07:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091207_ruc.nc" />
+    <dataset name="2002-09-12 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091206_ruc.nc" />
+    <dataset name="2002-09-12 05:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091205_ruc.nc" />
+    <dataset name="2002-09-12 04:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091204_ruc.nc" />
+    <dataset name="2002-09-12 03:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091203_ruc.nc" />
+    <dataset name="2002-09-12 02:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091202_ruc.nc" />
+    <dataset name="2002-09-12 01:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091201_ruc.nc" />
+    <dataset name="2002-09-12 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091200_ruc.nc" />
+    <dataset name="2002-09-11 23:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091123_ruc.nc" />
+    <dataset name="2002-09-11 22:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091122_ruc.nc" />
+    <dataset name="2002-09-11 21:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091121_ruc.nc" />
+    <dataset name="2002-09-11 20:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091120_ruc.nc" />
+    <dataset name="2002-09-11 19:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091119_ruc.nc" />
+    <dataset name="2002-09-11 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091118_ruc.nc" />
+    <dataset name="2002-09-11 17:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091117_ruc.nc" />
+    <dataset name="2002-09-11 16:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091116_ruc.nc" />
+    <dataset name="2002-09-11 15:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091115_ruc.nc" />
+    <dataset name="2002-09-11 14:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091114_ruc.nc" />
+    <dataset name="2002-09-11 13:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091113_ruc.nc" />
+    <dataset name="2002-09-11 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091112_ruc.nc" />
+    <dataset name="2002-09-11 11:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091111_ruc.nc" />
+    <dataset name="2002-09-11 10:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091110_ruc.nc" />
+    <dataset name="2002-09-11 09:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091109_ruc.nc" />
+    <dataset name="2002-09-11 08:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091108_ruc.nc" />
+    <dataset name="2002-09-11 07:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091107_ruc.nc" />
+    <dataset name="2002-09-11 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091106_ruc.nc" />
+    <dataset name="2002-09-11 05:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091105_ruc.nc" />
+    <dataset name="2002-09-11 04:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091104_ruc.nc" />
+    <dataset name="2002-09-11 03:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091103_ruc.nc" />
+    <dataset name="2002-09-11 02:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091102_ruc.nc" />
+    <dataset name="2002-09-11 01:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091101_ruc.nc" />
+    <dataset name="2002-09-11 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091100_ruc.nc" />
+    <dataset name="2002-09-10 23:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091023_ruc.nc" />
+    <dataset name="2002-09-10 22:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091022_ruc.nc" />
+    <dataset name="2002-09-10 21:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091021_ruc.nc" />
+    <dataset name="2002-09-10 20:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091020_ruc.nc" />
+    <dataset name="2002-09-10 19:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091019_ruc.nc" />
+    <dataset name="2002-09-10 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091018_ruc.nc" />
+    <dataset name="2002-09-10 17:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091017_ruc.nc" />
+    <dataset name="2002-09-10 16:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091016_ruc.nc" />
+    <dataset name="2002-09-10 15:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091015_ruc.nc" />
+    <dataset name="2002-09-10 14:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091014_ruc.nc" />
+    <dataset name="2002-09-10 13:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091013_ruc.nc" />
+    <dataset name="2002-09-10 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091012_ruc.nc" />
+    <dataset name="2002-09-10 11:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091011_ruc.nc" />
+    <dataset name="2002-09-10 10:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091010_ruc.nc" />
+    <dataset name="2002-09-10 09:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091009_ruc.nc" />
+    <dataset name="2002-09-10 08:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091008_ruc.nc" />
+    <dataset name="2002-09-10 07:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091007_ruc.nc" />
+    <dataset name="2002-09-10 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091006_ruc.nc" />
+    <dataset name="2002-09-10 05:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091005_ruc.nc" />
+    <dataset name="2002-09-10 04:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091004_ruc.nc" />
+    <dataset name="2002-09-10 03:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091003_ruc.nc" />
+    <dataset name="2002-09-10 02:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091002_ruc.nc" />
+    <dataset name="2002-09-10 01:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091001_ruc.nc" />
+    <dataset name="2002-09-10 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091000_ruc.nc" />
+    <dataset name="2002-09-09 23:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090923_ruc.nc" />
+    <dataset name="2002-09-09 22:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090922_ruc.nc" />
+    <dataset name="2002-09-09 21:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090921_ruc.nc" />
+    <dataset name="2002-09-09 20:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090920_ruc.nc" />
+    <dataset name="2002-09-09 19:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090919_ruc.nc" />
+    <dataset name="2002-09-09 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090918_ruc.nc" />
+    <dataset name="2002-09-09 17:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090917_ruc.nc" />
+    <dataset name="2002-09-09 16:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090916_ruc.nc" />
+    <dataset name="2002-09-09 15:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090915_ruc.nc" />
+    <dataset name="2002-09-09 14:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090914_ruc.nc" />
+    <dataset name="2002-09-09 13:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090913_ruc.nc" />
+    <dataset name="2002-09-09 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090912_ruc.nc" />
+    <dataset name="2002-09-09 11:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090911_ruc.nc" />
+    <dataset name="2002-09-09 10:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090910_ruc.nc" />
+    <dataset name="2002-09-09 09:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090909_ruc.nc" />
+    <dataset name="2002-09-09 08:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090908_ruc.nc" />
+    <dataset name="2002-09-09 07:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090907_ruc.nc" />
+    <dataset name="2002-09-09 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090906_ruc.nc" />
+    <dataset name="2002-09-09 05:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090905_ruc.nc" />
+    <dataset name="2002-09-09 04:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090904_ruc.nc" />
+    <dataset name="2002-09-09 03:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090903_ruc.nc" />
+    <dataset name="2002-09-09 02:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090902_ruc.nc" />
+    <dataset name="2002-09-09 01:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090901_ruc.nc" />
+    <dataset name="2002-09-09 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090900_ruc.nc" />
+    <dataset name="2002-09-08 23:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090823_ruc.nc" />
+    <dataset name="2002-09-08 22:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090822_ruc.nc" />
+    <dataset name="2002-09-08 21:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090821_ruc.nc" />
+    <dataset name="2002-09-08 20:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090820_ruc.nc" />
+    <dataset name="2002-09-08 19:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090819_ruc.nc" />
+    <dataset name="2002-09-08 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090818_ruc.nc" />
+    <dataset name="2002-09-08 17:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090817_ruc.nc" />
+    <dataset name="2002-09-08 16:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090816_ruc.nc" />
+    <dataset name="2002-09-08 15:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090815_ruc.nc" />
+    <dataset name="2002-09-08 14:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090814_ruc.nc" />
+    <dataset name="2002-09-08 13:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090813_ruc.nc" />
+    <dataset name="2002-09-08 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090812_ruc.nc" />
+  </collection>
+  <collection name="NCEP NGM-Q" dataType="GRID" serverID="motherlode">
+    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/NGM-Q.xml" />
+    <dataset name="2002-09-15 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091500_ngm-q.nc" />
+    <dataset name="2002-09-14 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091412_ngm-q.nc" />
+    <dataset name="2002-09-14 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091400_ngm-q.nc" />
+    <dataset name="2002-09-13 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091312_ngm-q.nc" />
+    <dataset name="2002-09-13 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091300_ngm-q.nc" />
+    <dataset name="2002-09-12 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091212_ngm-q.nc" />
+    <dataset name="2002-09-12 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091200_ngm-q.nc" />
+    <dataset name="2002-09-11 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091112_ngm-q.nc" />
+    <dataset name="2002-09-11 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091100_ngm-q.nc" />
+    <dataset name="2002-09-10 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091012_ngm-q.nc" />
+    <dataset name="2002-09-10 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091000_ngm-q.nc" />
+    <dataset name="2002-09-09 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090912_ngm-q.nc" />
+    <dataset name="2002-09-09 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090900_ngm-q.nc" />
+    <dataset name="2002-09-08 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090812_ngm-q.nc" />
+  </collection>
+  <collection name="NCEP Eta" dataType="GRID" serverID="motherlode">
+    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/ETA.xml" />
+    <dataset name="2002-09-15 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091500_eta.nc" />
+    <dataset name="2002-09-14 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091412_eta.nc" />
+    <dataset name="2002-09-14 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091400_eta.nc" />
+    <dataset name="2002-09-13 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091312_eta.nc" />
+    <dataset name="2002-09-13 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091300_eta.nc" />
+    <dataset name="2002-09-12 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091212_eta.nc" />
+    <dataset name="2002-09-12 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091200_eta.nc" />
+    <dataset name="2002-09-11 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091112_eta.nc" />
+    <dataset name="2002-09-11 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091100_eta.nc" />
+    <dataset name="2002-09-10 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091012_eta.nc" />
+    <dataset name="2002-09-10 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091000_eta.nc" />
+    <dataset name="2002-09-09 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090912_eta.nc" />
+    <dataset name="2002-09-09 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090900_eta.nc" />
+    <dataset name="2002-09-08 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090812_eta.nc" />
+  </collection>
+  <collection name="NCEP MRF-A" dataType="GRID" serverID="motherlode">
+    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/MRF-A.xml" />
+    <dataset name="2002-09-15 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091500_mrf-a.nc" />
+    <dataset name="2002-09-14 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091400_mrf-a.nc" />
+    <dataset name="2002-09-13 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091300_mrf-a.nc" />
+    <dataset name="2002-09-12 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091200_mrf-a.nc" />
+    <dataset name="2002-09-11 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091100_mrf-a.nc" />
+    <dataset name="2002-09-10 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091000_mrf-a.nc" />
+    <dataset name="2002-09-09 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090900_mrf-a.nc" />
+  </collection>
+  <collection name="NCEP MRF-E" dataType="GRID" serverID="motherlode">
+    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/MRF-E.xml" />
+    <dataset name="2002-09-15 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091500_mrf-e.nc" />
+    <dataset name="2002-09-14 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091400_mrf-e.nc" />
+    <dataset name="2002-09-13 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091300_mrf-e.nc" />
+    <dataset name="2002-09-12 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091200_mrf-e.nc" />
+    <dataset name="2002-09-11 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091100_mrf-e.nc" />
+    <dataset name="2002-09-10 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091000_mrf-e.nc" />
+    <dataset name="2002-09-09 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090900_mrf-e.nc" />
+  </collection>
+  <collection name="NCEP Ocean" dataType="GRID" serverID="motherlode">
+    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/Ocean.xml" />
+    <dataset name="2002-09-15 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091500_ocean.nc" />
+    <dataset name="2002-09-14 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091412_ocean.nc" />
+    <dataset name="2002-09-14 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091400_ocean.nc" />
+    <dataset name="2002-09-13 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091312_ocean.nc" />
+    <dataset name="2002-09-13 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091300_ocean.nc" />
+    <dataset name="2002-09-12 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091212_ocean.nc" />
+    <dataset name="2002-09-12 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091200_ocean.nc" />
+    <dataset name="2002-09-11 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091112_ocean.nc" />
+    <dataset name="2002-09-11 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091100_ocean.nc" />
+    <dataset name="2002-09-10 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091012_ocean.nc" />
+    <dataset name="2002-09-10 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091000_ocean.nc" />
+    <dataset name="2002-09-09 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090912_ocean.nc" />
+    <dataset name="2002-09-09 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090900_ocean.nc" />
+    <dataset name="2002-09-08 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090812_ocean.nc" />
+  </collection>
+  <collection name="NCEP SST-A" dataType="GRID" serverID="motherlode">
+    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/SST-A.xml" />
+    <dataset name="2002-09-14 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091400_sst-a.nc" />
+    <dataset name="2002-09-13 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091300_sst-a.nc" />
+    <dataset name="2002-09-12 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091200_sst-a.nc" />
+    <dataset name="2002-09-11 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091100_sst-a.nc" />
+    <dataset name="2002-09-10 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091000_sst-a.nc" />
+    <dataset name="2002-09-09 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090900_sst-a.nc" />
+    <dataset name="2002-09-08 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090800_sst-a.nc" />
+  </collection>
+  <collection name="NCEP SST-T" dataType="GRID" serverID="motherlode">
+    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/SST-T.xml" />
+    <dataset name="2002-09-14 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091400_sst-t.nc" />
+    <dataset name="2002-09-13 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091300_sst-t.nc" />
+    <dataset name="2002-09-12 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091200_sst-t.nc" />
+    <dataset name="2002-09-11 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091100_sst-t.nc" />
+    <dataset name="2002-09-10 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091000_sst-t.nc" />
+    <dataset name="2002-09-09 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090900_sst-t.nc" />
+    <dataset name="2002-09-08 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090800_sst-t.nc" />
+  </collection>
+  <collection name="NCEP ECMF" dataType="GRID" serverID="motherlode">
+    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/ECMF.xml" />
+    <dataset name="2002-09-14 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091412_ecmf.nc" />
+    <dataset name="2002-09-13 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091312_ecmf.nc" />
+    <dataset name="2002-09-12 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091212_ecmf.nc" />
+    <dataset name="2002-09-11 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091112_ecmf.nc" />
+    <dataset name="2002-09-10 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091012_ecmf.nc" />
+    <dataset name="2002-09-09 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090912_ecmf.nc" />
+    <dataset name="2002-09-08 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090812_ecmf.nc" />
+  </collection>
+</catalog>
+

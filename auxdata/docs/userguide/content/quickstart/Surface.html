@@ -1,0 +1,66 @@
+<html><head>
+  <title>Surface Observations - METAR and Synoptic Plots</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+<body>
+
+
+ 
+This section describes how to  create station model displays:
+ 
+[ht::cimg ../controls/images/StationModelControlDisplay.gif]
+
+The set of steps include:
+
+<%childlist%>
+
+
+
+<subhead id="selecting" intoc="false">Selecting Surface Observations from a Remote Server</subhead>
+
+In the <a href="../data/choosers/index.html">Data Chooser</a> select the 
+<b>Point</b> tab.   
+
+[ht::cimg ../data/choosers/images/PointChooser.gif]
+
+In the <b>Server:</b> entry box, use the pull down list to select
+a remote server with METAR data, such as <b>adde.ucar.edu</b>. You can also
+type a different server name into the entry box.
+In the <b>Data type:</b> selection box you choose between Surface
+(METAR) Data and Synoptic data.
+Click on <b>Connect</b> to find data on the remote server.
+You can choose either the latest <b>N</b> times or select
+specific time.  Select the times you would like to view (note: multiple times
+may be selected with the <i>Shift</i> and <i>Control</i> keys).
+The <b>Station Model</b> selector allows you to select the preferred
+plot type for this data.  For this exercise, use the <b>METAR</b>
+station model type.  Click on <b>Add Source</b> when you have made 
+your selection.
+
+
+<subhead id="display" intoc="false">Making the display</subhead>
+
+The surface observation data will be shown in  the
+<a href="../data/FieldSelector.html">Field Selector window</a>.
+
+[ht::cimg images/PointSelector.gif]
+
+Select "Point Data" in the <b>Field</b> panel and select "Point Data
+Plot" in the <b>Displays</b> panel.
+Make the display by clicking on <b>Create Display</b> button on the bottom
+of the Field Selector window.
+
+<p>
+
+To declutter the display, and to 
+change how the display elements at each station are selected and arranged, 
+use the   
+<a href="../controls/StationModelControl.html">Station Model Control</a>
+and the 
+<a href="../tools/StationModelEditor.html">Station Model Editor</a>.
+
+
+
+</body>
+</html>

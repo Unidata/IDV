@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="Middle East" category="World locations">
+<stn name="Abu Dhabi " lat="24:28:N" lon="54:22:E"/>
+<stn name="Abu Musa " lat="25:52:N" lon="55:03:E"/>
+<stn name="Aden " lat="12:46:N" lon="45:01:E"/>
+<stn name="Afghanestan " lat="33:00:N" lon="65:00:E"/>
+<stn name="Al Arabiyah as Suudiyah " lat="25:00:N" lon="45:00:E"/>
+<stn name="Al Bahrayn " lat="26:00:N" lon="50:33:E"/>
+<stn name="Al Imarat al Arabiyah al Muttahidah " lat="24:00:N" lon="54:00:E"/>
+<stn name="Al Iraq " lat="33:00:N" lon="44:00:E"/>
+<stn name="Al Kuwayt " lat="29:30:N" lon="45:45:E"/>
+<stn name="Al Urdun " lat="31:00:N" lon="36:00:E"/>
+<stn name="Al Yaman " lat="15:00:N" lon="48:00:E"/>
+<stn name="Amman " lat="31:57:N" lon="35:56:E"/>
+<stn name="Aqaba, Gulf of" lat="29:00:N" lon="34:30:E"/>
+<stn name="Arab, Shatt al " lat="29:57:N" lon="48:34:E"/>
+<stn name="Arab, Shatt al " lat="29:57:N" lon="48:34:E"/>
+<stn name="Azad Kashmir " lat="34:30:N" lon="74:00:E"/>
+<stn name="Baghdad " lat="33:21:N" lon="44:25:E"/>
+<stn name="Balochistan " lat="28:00:N" lon="63:00:E"/>
+<stn name="Beirut " lat="33:53:N" lon="35:30:E"/>
+<stn name="Bekaa Valley" lat="34:00:N" lon="36:05:E"/>
+<stn name="Bubiyan " lat="29:47:N" lon="48:10:E"/>
+<stn name="Damascus " lat="33:30:N" lon="36:18:E"/>
+<stn name="Dead Sea" lat="32:30:N" lon="35:30:E"/>
+<stn name="Dead Sea" lat="32:30:N" lon="35:30:E"/>
+<stn name="Dead Sea" lat="32:30:N" lon="35:30:E"/>
+<stn name="Dhofar " lat="17:00:N" lon="54:10:E"/>
+<stn name="Doha " lat="25:17:N" lon="51:32:E"/>
+<stn name="Dubai " lat="25:18:N" lon="55:18:E"/>
+<stn name="Galilee " lat="32:54:N" lon="35:20:E"/>
+<stn name="Golan Heights " lat="33:00:N" lon="35:45:E"/>
+<stn name="Hadhramaut " lat="15:00:N" lon="50:00:E"/>
+<stn name="Haifa " lat="32:50:N" lon="35:00:E"/>
+<stn name="Hawar " lat="25:40:N" lon="50:47:E"/>
+<stn name="Hejaz " lat="24:30:N" lon="38:30:E"/>
+<stn name="Islamabad " lat="33:42:N" lon="73:10:E"/>
+<stn name="Ittihad al-Imarat al-Arabiyah " lat="24:00:N" lon="54:00:E"/>
+<stn name="Jammu and Kashmir " lat="34:00:N" lon="76:00:E"/>
+<stn name="Jerusalem " lat="31:47:N" lon="35:14:E"/>
+<stn name="Jerusalem " lat="31:47:N" lon="35:14:E"/>
+<stn name="Jiddah " lat="21:30:N" lon="39:12:E"/>
+<stn name="Jubal, Strait of" lat="27:40:N" lon="33:55:E"/>
+<stn name="Judaea " lat="31:35:N" lon="35:00:E"/>
+<stn name="Judaea " lat="31:35:N" lon="35:00:E"/>
+<stn name="Kabul " lat="34:31:N" lon="69:12:E"/>
+<stn name="Kamaran " lat="15:21:N" lon="42:34:E"/>
+<stn name="Kashmir " lat="34:00:N" lon="76:00:E"/>
+<stn name="Khuriya Muriya Islands " lat="17:30:N" lon="56:00:E"/>
+<stn name="Khyber Pass" lat="34:05:N" lon="71:10:E"/>
+<stn name="Khyber Pass" lat="34:05:N" lon="71:10:E"/>
+<stn name="Kuwait " lat="29:20:N" lon="47:59:E"/>
+<stn name="Latakia " lat="36:00:N" lon="35:50:E"/>
+<stn name="Liban " lat="33:50:N" lon="36:50:E"/>
+<stn name="Lubnan " lat="33:50:N" lon="36:50:E"/>
+<stn name="Manama " lat="26:13:N" lon="50:35:E"/>
+<stn name="Mecca " lat="21:27:N" lon="39:49:E"/>
+<stn name="Mesopotamia " lat="33:00:N" lon="44:00:E"/>
+<stn name="Musandam Peninsula" lat="26:18:N" lon="56:24:E"/>
+<stn name="Musandam Peninsula" lat="26:18:N" lon="56:24:E"/>
+<stn name="Muscat " lat="23:37:N" lon="58:35:E"/>
+<stn name="Muscat and Oman " lat="21:00:N" lon="57:00:E"/>
+<stn name="Negev " lat="30:30:N" lon="34:55:E"/>
+<stn name="Nejd " lat="24:05:N" lon="45:15:E"/>
+<stn name="North Yemen " lat="15:00:N" lon="44:00:E"/>
+<stn name="Palestine " lat="32:00:N" lon="35:15:E"/>
+<stn name="Palestine " lat="32:00:N" lon="35:15:E"/>
+<stn name="Pashtunistan " lat="32:00:N" lon="69:00:E"/>
+<stn name="Pashtunistan " lat="32:00:N" lon="69:00:E"/>
+<stn name="Perim " lat="12:39:N" lon="43:25:E"/>
+<stn name="Persia " lat="32:00:N" lon="53:00:E"/>
+<stn name="Punjab " lat="30:50:N" lon="73:30:E"/>
+<stn name="Qita Ghazzah " lat="31:25:N" lon="34:20:E"/>
+<stn name="Red Sea" lat="20:00:N" lon="38:00:E"/>
+<stn name="Riyadh " lat="24:38:N" lon="46:43:E"/>
+<stn name="Rub al Khali " lat="19:30:N" lon="49:00:E"/>
+<stn name="Samaria " lat="32:15:N" lon="35:10:E"/>
+<stn name="Sanaa " lat="15:21:N" lon="44:12:E"/>
+<stn name="Scopus, Mount" lat="31:48:N" lon="35:14:E"/>
+<stn name="Scopus, Mount" lat="31:48:N" lon="35:14:E"/>
+<stn name="Socotra " lat="12:30:N" lon="54:00:E"/>
+<stn name="South Yemen" lat="14:00:N" lon="48:00:E"/>
+<stn name="Suez, Gulf of" lat="28:10:N" lon="33:27:E"/>
+<stn name="Suriyah " lat="35:00:N" lon="38:00:E"/>
+<stn name="Tehran " lat="35:40:N" lon="51:26:E"/>
+<stn name="Tel Aviv " lat="32:05:N" lon="34:48:E"/>
+<stn name="Tiberias, Lake" lat="32:48:N" lon="35:35:E"/>
+<stn name="Tiran, Strait of" lat="28:00:N" lon="34:27:E"/>
+<stn name="Transjordan " lat="31:00:N" lon="36:00:E"/>
+<stn name="Tripoli " lat="34:26:N" lon="35:51:E"/>
+<stn name="Trucial Coast " lat="24:00:N" lon="54:00:E"/>
+<stn name="Trucial Oman " lat="24:00:N" lon="54:00:E"/>
+<stn name="Trucial States " lat="24:00:N" lon="54:00:E"/>
+<stn name="Tunb al Kubra " lat="26:14:N" lon="55:19:E"/>
+<stn name="Tunb as Sughra " lat="26:14:N" lon="55:09:E"/>
+<stn name="Uman " lat="21:00:N" lon="57:00:E"/>
+<stn name="United Arab Republic or UAR " lat="" lon=""/>
+<stn name="Urdunn " lat="31:00:N" lon="36:00:E"/>
+<stn name="Vakhan " lat="37:00:N" lon="73:00:E"/>
+<stn name="West Pakistan " lat="30:00:N" lon="70:00:E"/>
+<stn name="Yemen Arab Republic" lat="15:00:N" lon="44:00:E"/>
+<stn name="Yemen, People's Democratic Republic of" lat="14:00:N" lon="46:00:E"/>
+<stn name="Yisrael " lat="31:30:N" lon="34:45:E"/>
+<stn name="Zion, Mount " lat="31:46:N" lon="35:14:E"/>
+<stn name="Zion, Mount " lat="31:46:N" lon="35:14:E"/>
+</stationtable>

@@ -1,0 +1,84 @@
+
+<title>IDV Property and Resource  Files </title>
+
+<div class="overview">
+Where does the IDV look for configuration information.
+</div>
+
+<ul>
+
+  <li>At its heart, the IDV is configured by one or more properties files and a set
+      of other [ht::filename resource] files.  By default the IDV looks in
+      3 different places: 
+      <ul>
+      <li> System resource path - in the java jar files.
+      <li> Site path - defined at the command line or through user preferences.
+      <li> User path - e.g., <%workshop.homedir%>/.metapps/DefaultIdv
+      </ul>
+      
+  <li> The property files define:
+      <ul>
+      <li> The  application name.</li>
+      <li> What remote data servers are available.</li>
+      <li> What data catalogs to  use.</li>
+      <li> Where to find the resource description files.</li>
+      <li> Etc.</li>
+      </ul>
+
+    <li>The workshop is using an [ht::popup idv.properties.txt idv.properties]
+        file that contains:</li>
+<pre>
+
+idv.title = Unidata Workshop IDV
+
+##Semicolon delimited list of urls pointing to thredds catalogs
+idv.cataloglist= /ucar/unidata/apps/workshop/workshopCatalog.xml;http://www.unidata.ucar.edu/georesources/idvcatalog.xml
+
+## default projection
+idv.projection.default=World
+
+
+</pre>
+
+    <li>We are configuring  the list of ADDE servers
+        and their image and radar descriptors,
+        and the [ht::filename workshopCatalog] file for the gridded data
+        chooser.</li>
+  
+
+   <li> The default start up process is as follows:
+        <ul>
+          <li> Process the default system property file.
+          <li> Process any command line properties files.
+          <li> Look in the properties loaded so far to get and process a list of other property files. These are:
+          <ul> 
+            <li>&lt;Site path&gt;/idv.properties</li>
+            <li> &lt;User path&gt;/idv.properties</li>
+          </ul>
+          <li> Look for the <i>idv.resourcefiles</i> property. This defines where to find the
+               resource description files. e.g.:
+<pre>%USERPATH%/idv.rbi;%SITEPATH%/idv.rbi;%IDVPATH%/idv.rbi</pre>
+          <li> Load in plugins (more on this later).
+        </ul>
+
+
+  <li> The resource file is where the real work of configuration is defined. These 
+are XML files that specify where to find:
+      <ul> 
+      <li> Jython libraries.</li>
+      <li> Color tables.</li>
+      <li> Projections.</li>
+      <li> Etc.</li>
+      </ul>
+
+  <li> As a convenience, the IDV places an example resource file in your local directory:
+         [ht::popup idv.rbi.txt idv.rbi]
+  </li>
+  
+  </ul>
+
+
+
+</ol>
+
+

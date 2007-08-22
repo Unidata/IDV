@@ -1,0 +1,83 @@
+<title>Basic  Preferences</title>
+
+
+<div class="overview">
+In this section we will briefly cover how to change user preferences.
+</div>
+
+<ol class="step">
+  <li>Select the [ht::menu Edit  {Preferences}] menu
+      item to bring up the [ht::dialog User Preferences] window.
+      This window consists of seven tabs.</li>
+  
+  <li>Select the [ht::command General] tab.</li>
+  <ul class="substep">
+      <li>The [ht::command Show Dashboard on Start] and 
+          [ht::command Show Help Tip Dialog] checkboxes allow you to 
+          control what windows are shown automatically.</li>
+      
+      <li>The [ht::command When Opening a Bundle] section allows you to control
+      the behavior of the IDV when a bundle is opened.
+
+      <li> [ht::command Show Windows When They Are Created] controls if 
+          the display windows are shown or not when they are not docked
+          in the Dashboard.
+
+      <li>As we will discuss later, the [ht::command Resource Sitepath] is one 
+          way to specify where to look for application resources. 
+	  The command line argument:<br>
+          [ht::filename   -sitepath]<br>
+          is saved as a user preference.</li>
+      
+      </ul>
+
+<li> Go to the [ht::command Formats and Data] tab.
+
+<ul>
+  <li> Try changing the [ht::command Date Format] and click 
+       [ht::command Apply].  Notice that the format of the times
+       in the [ht::command Time Animation Widget] and
+       [ht::command Display List] changes to the new format.
+
+  <li> Change [ht::command Latitude/Longitude] format to a higher precision, 
+       e.g.  &quot;##0.00000&quot; and click [ht::command Apply].  Move
+       the cursor around in the view window and notice the precision of
+       the  values in the [ht::command Cursor Readout].
+
+  <li> The [ht::command Probe Format] is an html template for displaying 
+        data probe results. Try mousing over the text field to show a 
+        tooltip that describes the format.
+
+  <li> The [ht::command Distance Unit] is used for controls and
+       readouts that use distances. 
+
+  <li> [ht::command Sampling Mode] is used in the displays to determine  
+       how grids are sampled.</li>
+      
+  <li> Tune performance and memory use with the [ht::command Caching], 
+       [ht::command Max Image Size] and [ht::command Grid Cache Threshold].
+
+</ul>
+
+    <li>Select the [ht::command View] tab. These are preferences used 
+        in the map display to determine clipping, wireframe display, 
+        background color, etc.</li>
+    
+    <ul class="substep">
+      <li> Check the  [ht::command Show Display List] option.
+      <li> Uncheck the [ht::command Show Times in View] option.
+      <li> Set the [ht::command Display List] font to 
+           URW Gothic, 14 point.  
+      <li>Change the [ht::command Display List] color to white.
+      <li>Press [ht::button Apply].  
+    </ul>
+    
+    <li>Select the [ht::command Navigation] tab. This allows 
+        you to define different mouse and key bindings. 
+
+    <li>Select the [ht::command Toolbar] tab. This allows you top 
+        define what toolbar icons are shown on the toolbar.  This is not
+        applied until you restart the IDV.
+</ol>
+
+

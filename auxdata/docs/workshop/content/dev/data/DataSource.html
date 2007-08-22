@@ -1,0 +1,188 @@
+[ht::head {Overview of Data Sources}]
+
+
+The [dg::class ucar.unidata.data.DataSource] interface 
+defines the  api through which 
+all data sources are accessed. There is a base class 
+[dg::class ucar.unidata.data.DataSourceImpl]
+that provides a set of base services. There are a variety of
+DataSource implementations:
+
+<ul>
+  <li>[dg::className ucar.unidata.data.DataSourceImpl]
+  <ul>
+    <li>[dg::className ucar.unidata.data.grid.GridDataSource]
+    <ul>
+      <li>[dg::className ucar.unidata.data.grid.GeoGridDataSource]
+      <ul>
+        <li>[dg::className ucar.unidata.data.grid.DodsGeoGridDataSource]
+      </ul>
+      <li>[dg::className ucar.unidata.data.grid.Vis5DDataSource]
+    </ul>
+    <li>[dg::className ucar.unidata.data.imagery.ImageDataSource]
+    <ul>
+      <li>[dg::className ucar.unidata.data.imagery.AddeImageDataSource], 	      <br>[dg::className ucar.unidata.data.imagery.McIDASImageDataSource]
+    </ul>
+    <li>[dg::className ucar.unidata.data.point.PointDataSource]
+        <ul>
+        <li>[dg::className ucar.unidata.data.point.AddePointDataSource], 
+        <br>[dg::className ucar.unidata.data.point.NetcdfMetarDataSource], 
+        </ul>
+    <li>[dg::className ucar.unidata.data.sounding.RaobDataSource], 
+    <li>[dg::className ucar.unidata.data.sounding.TrackDataSource],
+	    <li>[dg::className ucar.unidata.data.text.TextDataSource], 
+	        <br>[dg::className ucar.unidata.data.text.AddeTextDataSource]
+  </ul>
+</ul>
+
+
+
+<H2>Creating Data Sources</H2>
+The IDV uses the [dg::class ucar.unidata.data.DataManager] class to create and 
+manage the set of DataSource-s.
+This singleton object can be accessed by the 
+[dg::method IntegratedDataView.getDataManager] method.
+
+<p>
+The DataManager knows nothing about the specific DataSource classes. 
+Rather, the set of available DataSource-s is  defined within  the 
+<a href="datasource.xml.txt">datasource.xml</a> resource file.
+<p>
+This file has the form:
+[ht::pre {
+<datasource 
+       id="EXAMPLE.DATA" 
+       factory="ucar.unidata.apps.example.ExampleDataSource" 
+       patterns="\.txt$,\.html$"
+       label="Example data source"/>
+   ...
+}]
+The DataManager parses the XML and creates a set of 
+[dg::class ucar.unidata.data.DataSourceDescriptor]
+objects which hold this information.
+<p>
+The <i>patterns</i> attribute is a  set of 
+comma separated regular expression patterns 
+used to determine if this data source is applicable for a given file or url.
+For example, from the main IDV 
+[dg::class ucar/unidata/idv/resources/datasource.xml] file we have the
+entry for the GeoGridDataSource:
+
+[ht::pre {<datasource id="FILE.NETCDF" 
+               factory="ucar.unidata.data.grid.GeoGridDataSource" 
+               patterns=".nc$,.cdf$"
+               label="Netcdf files">
+}]
+
+
+This data source type is applicable to anything that ends with .nc of .cdf
+(The \$ used in the patterns represents the end of line character
+in a regular expression.). 
+The patterns are also used to instantiate a set of PatternFileFilters
+used when choosing files from the file system.
+<p>
+
+The factory attribute in the  XML 
+is the name of the class that implements ucar.unidata.data.DataSourceFactory.
+This is the class that is instantiated for a particular data source. The DataManager
+then asks this class to <code>getDataSource</code>. We do this so we could
+separate out the class that creates a DataSource form the actual DataSource.
+In practice however, the DataSourceImpl class implements this interface
+by simply returning itself. i.e., the factory that is created is the actual
+DataSource.
+
+<p>
+The important DataManager methods include:
+[ht::codep DataSource createDataSource (String dataName)]
+
+Here dataName is typically either a url or a file. The DataManager find the data source
+entry that which contains a pattern that matches the given dataName. It then 
+turns around and calls createDataSource, as described below, passing in the dataName,
+dataType (i.e., the id from the XML), and an empty properties table.
+
+[ht::codep DataSource createDataSource (Object dataName, String dataType, Hashtable properties)]
+
+This method can get called directly by data choosers and the IDV. Here dataName
+can be anything (a url, a filename, a complex data structure). The argument dataType
+is an <i>id</i> within the datasource.xml file. The properties table
+allows one to pass in extra information when creating a DataSource.
+<p>
+The DataManager first sees if a DataSource with the given dataName object
+already exists in its list of created DataSource-s. If it does exists
+then that previously created DataSource is returned. 
+If not, the DataManager looks up the DataSourceFactory class to 
+instantiate from 
+datasource.xml. The DataManager then tries to find and call a constructor
+on this factory class with the following signature:
+
+[ht::codep (DataSourceDescriptor.class, dataName.getClass(), Hashtable.class);]
+
+
+<h2>ExampleDataSource.java</h2>
+So, you're probably wondering how you can create your own DataSource.
+There is an example implementation in this package: 
+<a href="<%workshop.exampleDir%>/ExampleDataSource.java>ExampleDataSource.java"</a>.
+
+This class derives from DataSourceImpl and needs
+to implement  just 3 methods: 
+<ol>
+<li><b>the constructor</b>
+<li><b>doMakeDataChoices</b>
+<li><b>getDataInner.</b>
+</ol>
+<p>
+
+This class also has to be registered with the IDV so that when some 
+file or other data source on a network has been selected the IDV 
+knows what DataSource to create. You do this by adding an entry 
+into a <a href="datasource.xml.txt">datasource.xml</a>:
+[ht::pre {
+<datasource id="EXAMPLE.DATA" 
+            factory="ucar.unidata.apps.example.ExampleDataSource" 
+            patterns="\.txt$,\.html$"
+            label="Example data"/>
+}]
+
+This could be the core IDV resource file 
+(located in [dg::class ucar/unidata/idv/resources/datasource.xml])
+or in a different file that is included as a resource in your 
+application (like the example 
+[dg::class ucar/unidata/apps/example/datasource.xml]).
+
+
+<p>
+<h3>Creating DataChoice-s</h3>
+The DirectDataChoice's ctor signature looks like:
+<pre>
+DirectDataChoice (DataSource dataSource, 
+                  Object id,  
+                  String name, 
+                  String description, 
+                  List categories,  
+                  DataSelection dataSelection);
+</pre>
+Where:<br>
+dataSource is this object.
+<br>
+id can be anything, a field name, a data structure that identifies some data, etc.
+<br>
+The name is the short name and the description is the long description used.
+<br>
+categories  is a list  of ucar.unidata.data.DataCategory objects that represent the
+categories of data that this DataChoice represents.  
+<br>
+The dataSelection (which can be null) allows you to define a set of times for this DataChoice.
+<p>
+So you can do: <pre>
+Object someIdForField1 = "field1";
+List categories = DataCategory.parseCategories ("2D grid;GRID-2D-TIME;");
+DataChoice dc = 
+  new DirectDataChoice (this, 
+                        someIdForField1, 
+                        "Field 1", 
+                        "Some desc", categories, 
+                         null);
+addDataChoice (dc);
+</pre>
+
+

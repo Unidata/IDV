@@ -1,0 +1,104 @@
+<title>IDV Source Tree</title>
+
+<div class="overview">An overview of the major packages of the IDV</div>
+
+
+[
+namespace eval dg {}
+
+proc dg::package {pkg {desc ""}} {
+    if {$desc!=""} {
+    set desc " -- $desc"
+    }
+    return "<li>  $pkg $desc <ul>"
+}
+
+proc dg::package2 {pkg {desc ""}} {
+    if {$desc!=""} {
+    set desc " -- $desc"
+    }
+    return "<li> $pkg $desc"
+}
+
+proc dg::closePackage {args} {
+   return "</ul>"
+}
+
+]
+
+
+<ul>
+
+[dg::package ucar.unidata.idv {Holds the main application framework.}]
+
+
+[dg::package2 ucar.unidata.idv.ui {Holds user interface related classes.}]
+
+
+[dg::package2 ucar.unidata.idv.collab {
+Handles multi-user collaboration.}]
+
+<!--
+[dg::package ucar.unidata.idv.release { 
+Holds the html, jnlp and image files used for 
+releasing the IDV via Webstart. }]
+
+[dg::package2 ucar.unidata.idv.release.webstart {
+JNLP files, etc.}]
+
+[dg::package2 ucar.unidata.idv.release.installer {
+InstallAnywhere installer files.}]
+
+[dg::closePackage ucar.unidata.idv.release]
+-->
+
+
+[dg::package ucar.unidata.idv.control {Holds the set of concrete DisplayControl classes.}]
+
+[dg::package2 ucar.unidata.idv.control.chart {Holds the set of classes to support chart displays.}]
+
+[dg::package2 ucar.unidata.idv.control.drawing {Wrappers for glyphs used in the DrawingControl}]
+
+[dg::closePackage idv.control]
+
+
+[dg::package2 ucar.unidata.idv.resources {
+Holds a variety of resources that instantiate an application. 
+}]
+
+[dg::package2 ucar.unidata.idv.chooser {
+Contains the data chooser implementations. 
+}]
+[dg::closePackage idv]
+
+
+[dg::package2  ucar.unidata.util {Holds a set of utilities.}]
+[dg::package  ucar.unidata.ui {Holds various user interface facilities.}]
+[dg::package2 ucar.unidata.ui.colortable {Color table editor}]
+[dg::package2 ucar.unidata.ui.drawing {Generic drawing editor framework}]
+[dg::package2 ucar.unidata.ui.symbol {Our station (layout) model editor}]
+[dg::package2 ucar.unidata.ui.imagery {Image chooser classes}]
+[dg::package2 ucar.unidata.ui.point {Adde Point data choosers}]
+[dg::closePackage ui]
+[dg::package2  ucar.unidata.xml {Contains a variety of classes related to xml.}]
+
+[dg::package2 ucar.unidata.collab {Interfaces and base classes for sharing state.}]
+
+
+[dg::package ucar.visad {Unidata specific code that deals directly with Visad.}]
+[dg::package2 ucar.visad.display {Contains DisplayMaster/Displayable.}]
+[dg::closePackage visad]
+
+
+[dg::package  ucar.unidata.data { 
+Holds classes that know how to access and/or read in
+data sources (e.g., netCdf files, adde servers, etc.)}]
+
+[dg::package2 ucar.unidata.data.grid {Deals with grid oriented data.}]
+[dg::package2 ucar.unidata.data.gis {Deals with GIS oriented data.}]
+[dg::package2 ucar.unidata.data.imagery {Deals with image oriented data.}]
+[dg::package2 ucar.unidata.data.point {Deals with point oriented data.}]
+[dg::package2 ucar.unidata.data.text {Deals with text oriented data.}]
+[dg::closePackage data]
+
+</ul>

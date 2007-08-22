@@ -1,0 +1,926 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<object class="java.util.Hashtable" >
+    <method name="put" >
+        <string><![CDATA[datasources]]></string>
+        <object class="java.util.ArrayList" >
+            <method name="add" >
+                <object class="ucar.unidata.data.imagery.AddeImageDataSource"  id="id21" >
+                    <property name="ImageList" >
+                        <object class="java.util.ArrayList"  id="id4" >
+                            <method name="add" >
+                                <object class="ucar.unidata.data.imagery.AddeImageDescriptor"  id="id7" >
+                                    <property name="Source" >
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?group=CCS039R&descr=BREF1&id=DVN&DAY=1998-06-29&TIME=21:00:00 21:00:00 I &mag=1&size=460 460&unit=ECHO&proj=0&user=idv&version=1]]></string>
+                                    </property>
+                                    <property name="Directory" >
+                                        <object class="edu.wisc.ssec.mcidas.AreaDirectory" >
+                                            <constructor>
+                                                <parray class="int"  length="64" >17,4,7,98180,210000,1,1,0,460,460,1,1,1,1,0,1234,98180,210027,1,0,1146506784,19,1,16,1113682789,542270822,1818457120,808334640,541345095,541289573,1634869313,1769087008,0,1004,256,0,0,0,0,0,0,0,0,0,0,98180,210027,0,0,0,0,1313167442,1380013856,0,0,0,0,0,0,768,236,0,768,31</parray>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="IsRelative" >
+                                        <boolean>false</boolean>
+                                    </property>
+                                    <property name="RelativeIndex" >
+                                        <int>-1</int>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add" >
+                                <object class="ucar.unidata.data.imagery.AddeImageDescriptor"  id="id10" >
+                                    <property name="Source" >
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?group=CCS039R&descr=BREF1&id=DVN&DAY=1998-06-29&TIME=21:06:00 21:06:00 I &mag=1&size=460 460&unit=ECHO&proj=0&user=idv&version=1]]></string>
+                                    </property>
+                                    <property name="Directory" >
+                                        <object class="edu.wisc.ssec.mcidas.AreaDirectory" >
+                                            <constructor>
+                                                <parray class="int"  length="64" >18,4,7,98180,210600,1,1,0,460,460,1,1,1,1,0,1234,98180,210621,1,0,1146506784,19,1,16,1113682789,542270822,1818457120,808334640,541345095,541289573,1634869313,1769087008,0,1004,256,0,0,0,0,0,0,0,0,0,0,98180,210621,0,0,0,0,1313167442,1380013856,0,0,0,0,0,0,768,236,0,768,31</parray>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="IsRelative" >
+                                        <boolean>false</boolean>
+                                    </property>
+                                    <property name="RelativeIndex" >
+                                        <int>-1</int>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add" >
+                                <object class="ucar.unidata.data.imagery.AddeImageDescriptor"  id="id13" >
+                                    <property name="Source" >
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?group=CCS039R&descr=BREF1&id=DVN&DAY=1998-06-29&TIME=21:12:00 21:12:00 I &mag=1&size=460 460&unit=ECHO&proj=0&user=idv&version=1]]></string>
+                                    </property>
+                                    <property name="Directory" >
+                                        <object class="edu.wisc.ssec.mcidas.AreaDirectory" >
+                                            <constructor>
+                                                <parray class="int"  length="64" >19,4,7,98180,211200,1,1,0,460,460,1,1,1,1,0,1234,98180,211216,1,0,1146506784,19,1,16,1113682789,542270822,1818457120,808334640,541345095,541289573,1634869313,1769087008,0,1004,256,0,0,0,0,0,0,0,0,0,0,98180,211216,0,0,0,0,1313167442,1380013856,0,0,0,0,0,0,768,236,0,768,31</parray>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="IsRelative" >
+                                        <boolean>false</boolean>
+                                    </property>
+                                    <property name="RelativeIndex" >
+                                        <int>-1</int>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add" >
+                                <object class="ucar.unidata.data.imagery.AddeImageDescriptor"  id="id16" >
+                                    <property name="Source" >
+                                        <string><![CDATA[adde://adde.ucar.edu/imagedata?group=CCS039R&descr=BREF1&id=DVN&DAY=1998-06-29&TIME=21:18:00 21:18:00 I &mag=1&size=460 460&unit=ECHO&proj=0&user=idv&version=1]]></string>
+                                    </property>
+                                    <property name="Directory" >
+                                        <object class="edu.wisc.ssec.mcidas.AreaDirectory" >
+                                            <constructor>
+                                                <parray class="int"  length="64" >20,4,7,98180,211800,1,1,0,460,460,1,1,1,1,0,1234,98180,211808,1,0,1146506784,19,1,16,1113682789,542270822,1818457120,808334640,541345095,541289573,1634869313,1769087008,0,1004,256,0,0,0,0,0,0,0,0,0,0,98180,211808,0,0,0,0,1313167442,1380013856,0,0,0,0,0,0,768,236,0,768,31</parray>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="IsRelative" >
+                                        <boolean>false</boolean>
+                                    </property>
+                                    <property name="RelativeIndex" >
+                                        <int>-1</int>
+                                    </property>
+                                </object>
+                            </method>
+                        </object>
+                    </property>
+                    <property name="Name" >
+                        <string><![CDATA[DVN (Base Reflectivity Tilt 1)]]></string>
+                    </property>
+                    <property name="Properties" >
+                        <object class="java.util.Hashtable" />
+                    </property>
+                    <property name="Description" >
+                        <string><![CDATA[Adde Image Data Source]]></string>
+                    </property>
+                    <property name="Alias" >
+                        <string stringvalue="" />
+                    </property>
+                    <property name="DateTimeSelection" >
+                        <null class="java.util.List" />
+                    </property>
+                    <property name="DataSelection" >
+                        <object class="ucar.unidata.data.DataSelection" >
+                            <property name="Times" >
+                                <null class="java.util.List" />
+                            </property>
+                            <property name="TimesMode" >
+                                <int>1</int>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="Descriptor" >
+                        <object class="ucar.unidata.data.DataSourceDescriptor" >
+                            <property name="Properties" >
+                                <object class="java.util.Hashtable" />
+                            </property>
+                            <property name="DataManager" >
+                                <object idref="datamanager" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[adde.image]]></string>
+                            </property>
+                            <property name="Label" >
+                                <string stringvalue="" />
+                            </property>
+                            <property name="DoesMultiples" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="FileSelection" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Patterns" >
+                                <string><![CDATA[adde://.*/imagedata(/|\?).*$]]></string>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="Directory" >
+                        <string null="true" />
+                    </property>
+                    <property name="TemplateName" >
+                        <string null="true" />
+                    </property>
+                    <property name="UniqueId" >
+                        <string><![CDATA[sharable_1086377447436_0.9636183247869731_1]]></string>
+                    </property>
+                    <property name="Sharing" >
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="ShareGroup" >
+                        <string><![CDATA[All]]></string>
+                    </property>
+                </object>
+            </method>
+        </object>
+    </method>
+    <method name="put" >
+        <string><![CDATA[version]]></string>
+        <string><![CDATA[1.1b3]]></string>
+    </method>
+    <method name="put" >
+        <string><![CDATA[mischashtable]]></string>
+        <object class="java.util.Hashtable" >
+            <method name="put" >
+                <string><![CDATA[dataholderbounds]]></string>
+                <object class="java.util.Hashtable" >
+                    <method name="put" >
+                        <string><![CDATA[ucar.unidata.idv.ui.DataSelector]]></string>
+                        <object class="java.awt.Rectangle" >
+                            <constructor>
+                                <int>0</int>
+                                <int>0</int>
+                                <int>701</int>
+                                <int>446</int>
+                            </constructor>
+                        </object>
+                    </method>
+                </object>
+            </method>
+        </object>
+    </method>
+    <method name="put" >
+        <string><![CDATA[viewmanagers]]></string>
+        <object class="java.util.ArrayList" >
+            <method name="add" >
+                <object class="ucar.unidata.idv.MapViewManager" >
+                    <property name="VerticalRangeUnit" >
+                        <object class="visad.BaseUnit" >
+                            <string><![CDATA[m]]></string>
+                        </object>
+                    </property>
+                    <property name="VerticalRange" >
+                        <parray class="double"  length="2" >0.0,16000.0</parray>
+                    </property>
+                    <property name="MapState" >
+                        <string encode="base64" ><![CDATA[PG1hcHMgcG9zaXRpb249Ii0wLjk5IiA+CiAgPGxhdGl0dWRlIGNvbG9yPSItMTAwNDAxMTYiICBs
+aW5lc3R5bGU9IjEiICBsaW5ld2lkdGg9IjEuMCIgIG1heHZhbHVlPSI5MCIgIG1pbnZhbHVlPSIt
+OTAiICBzcGFjaW5nPSIxNS4wIiAgdmlzaWJsZT0iZmFsc2UiIC8+CiAgPGxvbmdpdHVkZSBjb2xv
+cj0iLTEwMDQwMTE2IiAgbGluZXN0eWxlPSIxIiAgbGluZXdpZHRoPSIxLjAiICBtYXh2YWx1ZT0i
+MTgwIiAgbWludmFsdWU9Ii0xODAiICBzcGFjaW5nPSIxNS4wIiAgdmlzaWJsZT0iZmFsc2UiIC8+
+CiAgPG1hcCBjb2xvcj0iLTE2NzI0OTkyIiAgZGVzY3JpcHRpb249IldvcmxkIENvYXN0bGluZXMi
+ICBsaW5lc3R5bGU9IjAiICBsaW5ld2lkdGg9IjEuMCIgIHNvdXJjZT0iL2F1eGRhdGEvbWFwcy9P
+VVRMU1VQVyIgIHZpc2libGU9ImZhbHNlIiAvPgogIDxtYXAgY29sb3I9Ii02NTUzNiIgIGRlc2Ny
+aXB0aW9uPSJXb3JsZCBQb2xpdGljYWwgQm91bmRhcmllcyIgIGxpbmVzdHlsZT0iMyIgIGxpbmV3
+aWR0aD0iMS4wIiAgc291cmNlPSIvYXV4ZGF0YS9tYXBzL09VVExIUE9MIiAgdmlzaWJsZT0iZmFs
+c2UiIC8+CiAgPG1hcCBjb2xvcj0iLTE2Nzc2OTYxIiAgZGVzY3JpcHRpb249IldvcmxkIENvdW50
+cnkgT3V0bGluZXMiICBsaW5lc3R5bGU9IjAiICBsaW5ld2lkdGg9IjEuMCIgIHNvdXJjZT0iL2F1
+eGRhdGEvbWFwcy9Db3VudHJpZXMuemlwIiAgdmlzaWJsZT0idHJ1ZSIgLz4KICA8bWFwIGNvbG9y
+PSItMTY3NzY5NjEiICBkZXNjcmlwdGlvbj0iTm9ydGggJmFtcDsgQ2VudHJhbCBBbWVyaWNhIiAg
+bGluZXN0eWxlPSIwIiAgbGluZXdpZHRoPSIxLjAiICBzb3VyY2U9Ii9hdXhkYXRhL21hcHMvT1VU
+TFVTQU0iICB2aXNpYmxlPSJ0cnVlIiAvPgogIDxtYXAgY29sb3I9Ii0xNjc3Njk2MSIgIGRlc2Ny
+aXB0aW9uPSJIaS1SZXMgVVMiICBsaW5lc3R5bGU9IjAiICBsaW5ld2lkdGg9IjEuMCIgIHNvdXJj
+ZT0iL2F1eGRhdGEvbWFwcy9PVVRMU1VQVSIgIHZpc2libGU9ImZhbHNlIiAvPgogIDxtYXAgY29s
+b3I9Ii02NTUzNiIgIGRlc2NyaXB0aW9uPSJVLlMuIENvdW50eSBPdXRsaW5lcyIgIGxpbmVzdHls
+ZT0iMCIgIGxpbmV3aWR0aD0iMS4wIiAgc291cmNlPSIvYXV4ZGF0YS9tYXBzL09VVExDTlRZIiAg
+dmlzaWJsZT0iZmFsc2UiIC8+CiAgPG1hcCBjb2xvcj0iLTE2NzExNjgxIiAgZGVzY3JpcHRpb249
+IlVTIEludGVyc3RhdGUgSGlnaHdheXMiICBsaW5lc3R5bGU9IjAiICBsaW5ld2lkdGg9IjEuMCIg
+IHNvdXJjZT0iL2F1eGRhdGEvbWFwcy9PVVRVU0lOVCIgIHZpc2libGU9ImZhbHNlIiAvPgo8L21h
+cHM+Cg==
+]]></string>
+                    </property>
+                    <property name="DisplayMatrix" >
+                        <parray class="double"  length="16" >0.5,0.0,0.0,0.0,0.0,0.5,0.0,0.0,0.0,0.0,0.2,0.0,0.0,0.0,0.0,1.0</parray>
+                    </property>
+                    <property name="MainProjection" >
+                        <object class="visad.data.mcidas.AREACoordinateSystem" >
+                            <constructor>
+                                <parray class="int"  length="64" >-17,4,7,98180,210000,1,1,0,460,460,4,1,1,1,0,1234,98180,210027,1,0,1146506784,19,1,16,1113682789,542270822,1818457120,808334640,541345095,541289573,1634869313,1769087008,0,1004,256,0,0,0,0,0,0,0,0,0,0,98180,210027,0,0,0,0,1313167442,1162037327,0,0,0,0,1684167200,1,768,236,0,768,0</parray>
+                                <parray class="int"  length="128" >1380009042,230,230,413636,903448,1000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</parray>
+                            </constructor>
+                        </object>
+                    </property>
+                    <property name="MainProjectionName" >
+                        <string><![CDATA[Image (RADR) Projection from: Image Display]]></string>
+                    </property>
+                    <property name="UseGlobeDisplay" >
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="AutoRotate" >
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="PerspectiveView" >
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="Clipping" >
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="ShowMap" >
+                        <boolean>true</boolean>
+                    </property>
+                    <property name="ShowElevation" >
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="UseProjectionFromData" >
+                        <boolean>true</boolean>
+                    </property>
+                    <property name="BgColor" >
+                        <boolean>true</boolean>
+                    </property>
+                    <property name="Wireframe" >
+                        <boolean>true</boolean>
+                    </property>
+                    <property name="ShowCursor" >
+                        <boolean>true</boolean>
+                    </property>
+                    <property name="AniReadout" >
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="ShareViews" >
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="UniqueId" >
+                        <string><![CDATA[MAIN3D]]></string>
+                    </property>
+                    <property name="WindowBounds" >
+                        <object class="java.awt.Rectangle" >
+                            <constructor>
+                                <int>167</int>
+                                <int>38</int>
+                                <int>636</int>
+                                <int>566</int>
+                            </constructor>
+                        </object>
+                    </property>
+                    <property name="AnimationStringVisible" >
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="HasWindow" >
+                        <boolean>true</boolean>
+                    </property>
+                    <property name="AnimationInfo" >
+                        <object class="ucar.visad.display.AnimationInfo" >
+                            <property name="StartDwell" >
+                                <float>0.5</float>
+                            </property>
+                            <property name="EndDwell" >
+                                <float>1.2</float>
+                            </property>
+                            <property name="FwdSpeed" >
+                                <float>0.5</float>
+                            </property>
+                            <property name="BackSpeed" >
+                                <float>0.5</float>
+                            </property>
+                            <property name="Direction" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Shared" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Rocking" >
+                                <boolean>false</boolean>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="ViewDescriptor" >
+                        <object class="ucar.unidata.idv.ViewDescriptor" >
+                            <property name="Name" >
+                                <string><![CDATA[MAIN3D]]></string>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="Sharing" >
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="ShareGroup" >
+                        <string><![CDATA[All]]></string>
+                    </property>
+                </object>
+            </method>
+        </object>
+    </method>
+    <method name="put" >
+        <string><![CDATA[displaycontrols]]></string>
+        <object class="java.util.ArrayList" >
+            <method name="add" >
+                <object class="ucar.unidata.idv.control.ImageSequenceControl" >
+                    <property name="SkipValue" >
+                        <int>0</int>
+                    </property>
+                    <property name="DisplayName" >
+                        <string><![CDATA[Image Display]]></string>
+                    </property>
+                    <property name="CanDoRemoveAll" >
+                        <boolean>true</boolean>
+                    </property>
+                    <property name="Categories" >
+                        <object class="java.util.ArrayList" >
+                            <method name="add" >
+                                <object class="ucar.unidata.data.DataCategory" >
+                                    <property name="Name" >
+                                        <string><![CDATA[IMAGE]]></string>
+                                    </property>
+                                    <property name="Child" >
+                                        <object class="ucar.unidata.data.DataCategory" >
+                                            <property name="Name" >
+                                                <string><![CDATA[2D]]></string>
+                                            </property>
+                                            <property name="Child" >
+                                                <object class="ucar.unidata.data.DataCategory" >
+                                                    <property name="Name" >
+                                                        <string><![CDATA[*]]></string>
+                                                    </property>
+                                                    <property name="Child" >
+                                                        <null class="ucar.unidata.data.DataCategory" />
+                                                    </property>
+                                                    <property name="ForDisplay" >
+                                                        <boolean>true</boolean>
+                                                    </property>
+                                                    <property name="CategoryIndex" >
+                                                        <int>-1</int>
+                                                    </property>
+                                                    <property name="ChildIndex" >
+                                                        <int>-1</int>
+                                                    </property>
+                                                    <property name="Append" >
+                                                        <string null="true" />
+                                                    </property>
+                                                </object>
+                                            </property>
+                                            <property name="ForDisplay" >
+                                                <boolean>true</boolean>
+                                            </property>
+                                            <property name="CategoryIndex" >
+                                                <int>-1</int>
+                                            </property>
+                                            <property name="ChildIndex" >
+                                                <int>-1</int>
+                                            </property>
+                                            <property name="Append" >
+                                                <string null="true" />
+                                            </property>
+                                        </object>
+                                    </property>
+                                    <property name="ForDisplay" >
+                                        <boolean>true</boolean>
+                                    </property>
+                                    <property name="CategoryIndex" >
+                                        <int>-1</int>
+                                    </property>
+                                    <property name="ChildIndex" >
+                                        <int>-1</int>
+                                    </property>
+                                    <property name="Append" >
+                                        <string null="true" />
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add" >
+                                <object class="ucar.unidata.data.DataCategory" >
+                                    <property name="Name" >
+                                        <string><![CDATA[display:imagesequence]]></string>
+                                    </property>
+                                    <property name="Child" >
+                                        <null class="ucar.unidata.data.DataCategory" />
+                                    </property>
+                                    <property name="ForDisplay" >
+                                        <boolean>false</boolean>
+                                    </property>
+                                    <property name="CategoryIndex" >
+                                        <int>-1</int>
+                                    </property>
+                                    <property name="ChildIndex" >
+                                        <int>-1</int>
+                                    </property>
+                                    <property name="Append" >
+                                        <string null="true" />
+                                    </property>
+                                </object>
+                            </method>
+                        </object>
+                    </property>
+                    <property name="ColorTable" >
+                        <object class="ucar.unidata.util.ColorTable" >
+                            <property name="Name" >
+                                <string><![CDATA[Base Reflectivity]]></string>
+                            </property>
+                            <property name="Description" >
+                                <string null="true" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[BASE REFLECTIVITY]]></string>
+                            </property>
+                            <property name="Category" >
+                                <string><![CDATA[Radar]]></string>
+                            </property>
+                            <property name="Table" >
+                                <array class="[F"  length="3" >
+                                    <parray class="float"  length="256" >0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.39215687,0.39215687,0.39215687,0.39215687,0.39215687,0.39215687,0.39215687,0.39215687,0.39215687,0.39215687,0.39215687,0.39215687,0.39215687,0.39215687,0.39215687,0.39215687,0.28235295,0.28235295,0.28235295,0.28235295,0.28235295,0.28235295,0.28235295,0.28235295,0.28235295,0.28235295,0.28235295,0.28235295,0.28235295,0.28235295,0.28235295,0.28235295,0.17254902,0.17254902,0.17254902,0.17254902,0.17254902,0.17254902,0.17254902,0.17254902,0.17254902,0.17254902,0.17254902,0.17254902,0.17254902,0.17254902,0.17254902,0.17254902,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.6901961,0.6901961,0.6901961,0.6901961,0.6901961,0.6901961,0.6901961,0.6901961,0.6901961,0.6901961,0.6901961,0.6901961,0.6901961,0.6901961,0.6901961,0.6901961,0.7921569,0.7921569,0.7921569,0.7921569,0.7921569,0.7921569,0.7921569,0.7921569,0.7921569,0.7921569,0.7921569,0.7921569,0.7921569,0.7921569,0.7921569,0.7921569,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+                                    <parray class="float"  length="256" >0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.72156864,0.72156864,0.72156864,0.72156864,0.72156864,0.72156864,0.72156864,0.72156864,0.72156864,0.72156864,0.72156864,0.72156864,0.72156864,0.72156864,0.72156864,0.72156864,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.40784314,0.40784314,0.40784314,0.40784314,0.40784314,0.40784314,0.40784314,0.40784314,0.40784314,0.40784314,0.40784314,0.40784314,0.40784314,0.40784314,0.40784314,0.40784314,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.7529412,0.7529412,0.7529412,0.7529412,0.7529412,0.7529412,0.7529412,0.7529412,0.7529412,0.7529412,0.7529412,0.7529412,0.7529412,0.7529412,0.7529412,0.7529412,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608</parray>
+                                    <parray class="float"  length="256" >0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.9411765,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.5647059,0.3137255,0.3137255,0.3137255,0.3137255,0.3137255,0.3137255,0.3137255,0.3137255,0.3137255,0.3137255,0.3137255,0.3137255,0.3137255,0.3137255,0.3137255,0.3137255,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.2509804,0.1882353,0.1882353,0.1882353,0.1882353,0.1882353,0.1882353,0.1882353,0.1882353,0.1882353,0.1882353,0.1882353,0.1882353,0.1882353,0.1882353,0.1882353,0.1882353,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.0627451,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.1254902,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.5019608,0.627451,0.627451,0.627451,0.627451,0.627451,0.627451,0.627451,0.627451,0.627451,0.627451,0.627451,0.627451,0.627451,0.627451,0.627451,0.627451,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314,0.8784314</parray>
+                                </array>
+                            </property>
+                            <property name="Range" >
+                                <null class="ucar.unidata.util.Range" />
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Breakpoints" >
+                                <null class="java.util.ArrayList" />
+                            </property>
+                        </object>
+                    </property>
+                    <property name="Color" >
+                        <null class="java.awt.Color" />
+                    </property>
+                    <property name="Range" >
+                        <object class="ucar.unidata.util.Range" >
+                            <property name="Min" >
+                                <double>0.0</double>
+                            </property>
+                            <property name="Max" >
+                                <double>80.0</double>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="DisplayCategory" >
+                        <string null="true" />
+                    </property>
+                    <property name="DataSelection" >
+                        <object class="ucar.unidata.data.DataSelection" >
+                            <property name="Times" >
+                                <null class="java.util.List" />
+                            </property>
+                            <property name="TimesMode" >
+                                <int>1</int>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="DisplayUnitName" >
+                        <string null="true" />
+                    </property>
+                    <property name="DisplayVisibility" >
+                        <boolean>true</boolean>
+                    </property>
+                    <property name="ShowNoteText" >
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="NoteText" >
+                        <string null="true" />
+                    </property>
+                    <property name="InitDataChoices" >
+                        <object class="java.util.ArrayList" >
+                            <method name="add" >
+                                <object class="ucar.unidata.data.CompositeDataChoice" >
+                                    <property name="DataChoices" >
+                                        <object class="java.util.ArrayList" >
+                                            <method name="add" >
+                                                <object class="ucar.unidata.data.DirectDataChoice" >
+                                                    <property name="DataSource" >
+                                                        <object idref="id21" />
+                                                    </property>
+                                                    <property name="Name" >
+                                                        <string><![CDATA[DVN (Base Reflectivity Tilt 1)]]></string>
+                                                    </property>
+                                                    <property name="Parent" >
+                                                        <null class="ucar.unidata.data.DataChoice" />
+                                                    </property>
+                                                    <property name="Properties" >
+                                                        <null class="java.util.Hashtable" />
+                                                    </property>
+                                                    <property name="Description" >
+                                                        <string><![CDATA[1998-06-29 21:00:00Z]]></string>
+                                                    </property>
+                                                    <property name="Id" >
+                                                        <object idref="id7" />
+                                                    </property>
+                                                    <property name="Categories" >
+                                                        <object class="java.util.ArrayList" >
+                                                            <method name="add" >
+                                                                <object class="ucar.unidata.data.DataCategory"  id="id47" >
+                                                                    <property name="Name" >
+                                                                        <string><![CDATA[IMAGE]]></string>
+                                                                    </property>
+                                                                    <property name="Child" >
+                                                                        <object class="ucar.unidata.data.DataCategory" >
+                                                                            <property name="Name" >
+                                                                                <string><![CDATA[2D]]></string>
+                                                                            </property>
+                                                                            <property name="Child" >
+                                                                                <null class="ucar.unidata.data.DataCategory" />
+                                                                            </property>
+                                                                            <property name="ForDisplay" >
+                                                                                <boolean>true</boolean>
+                                                                            </property>
+                                                                            <property name="CategoryIndex" >
+                                                                                <int>-1</int>
+                                                                            </property>
+                                                                            <property name="ChildIndex" >
+                                                                                <int>-1</int>
+                                                                            </property>
+                                                                            <property name="Append" >
+                                                                                <string null="true" />
+                                                                            </property>
+                                                                        </object>
+                                                                    </property>
+                                                                    <property name="ForDisplay" >
+                                                                        <boolean>false</boolean>
+                                                                    </property>
+                                                                    <property name="CategoryIndex" >
+                                                                        <int>-1</int>
+                                                                    </property>
+                                                                    <property name="ChildIndex" >
+                                                                        <int>-1</int>
+                                                                    </property>
+                                                                    <property name="Append" >
+                                                                        <string null="true" />
+                                                                    </property>
+                                                                </object>
+                                                            </method>
+                                                            <method name="add" >
+                                                                <object class="ucar.unidata.data.DataCategory" >
+                                                                    <property name="Name" >
+                                                                        <string><![CDATA[param:DVN (Base Reflectivity Tilt 1)]]></string>
+                                                                    </property>
+                                                                    <property name="Child" >
+                                                                        <null class="ucar.unidata.data.DataCategory" />
+                                                                    </property>
+                                                                    <property name="ForDisplay" >
+                                                                        <boolean>false</boolean>
+                                                                    </property>
+                                                                    <property name="CategoryIndex" >
+                                                                        <int>-1</int>
+                                                                    </property>
+                                                                    <property name="ChildIndex" >
+                                                                        <int>-1</int>
+                                                                    </property>
+                                                                    <property name="Append" >
+                                                                        <string null="true" />
+                                                                    </property>
+                                                                </object>
+                                                            </method>
+                                                        </object>
+                                                    </property>
+                                                </object>
+                                            </method>
+                                            <method name="add" >
+                                                <object class="ucar.unidata.data.DirectDataChoice" >
+                                                    <property name="DataSource" >
+                                                        <object idref="id21" />
+                                                    </property>
+                                                    <property name="Name" >
+                                                        <string><![CDATA[DVN (Base Reflectivity Tilt 1)]]></string>
+                                                    </property>
+                                                    <property name="Parent" >
+                                                        <null class="ucar.unidata.data.DataChoice" />
+                                                    </property>
+                                                    <property name="Properties" >
+                                                        <null class="java.util.Hashtable" />
+                                                    </property>
+                                                    <property name="Description" >
+                                                        <string><![CDATA[1998-06-29 21:06:00Z]]></string>
+                                                    </property>
+                                                    <property name="Id" >
+                                                        <object idref="id10" />
+                                                    </property>
+                                                    <property name="Categories" >
+                                                        <object class="java.util.ArrayList" >
+                                                            <method name="add" >
+                                                                <object idref="id47" />
+                                                            </method>
+                                                            <method name="add" >
+                                                                <object class="ucar.unidata.data.DataCategory" >
+                                                                    <property name="Name" >
+                                                                        <string><![CDATA[param:DVN (Base Reflectivity Tilt 1)]]></string>
+                                                                    </property>
+                                                                    <property name="Child" >
+                                                                        <null class="ucar.unidata.data.DataCategory" />
+                                                                    </property>
+                                                                    <property name="ForDisplay" >
+                                                                        <boolean>false</boolean>
+                                                                    </property>
+                                                                    <property name="CategoryIndex" >
+                                                                        <int>-1</int>
+                                                                    </property>
+                                                                    <property name="ChildIndex" >
+                                                                        <int>-1</int>
+                                                                    </property>
+                                                                    <property name="Append" >
+                                                                        <string null="true" />
+                                                                    </property>
+                                                                </object>
+                                                            </method>
+                                                        </object>
+                                                    </property>
+                                                </object>
+                                            </method>
+                                            <method name="add" >
+                                                <object class="ucar.unidata.data.DirectDataChoice" >
+                                                    <property name="DataSource" >
+                                                        <object idref="id21" />
+                                                    </property>
+                                                    <property name="Name" >
+                                                        <string><![CDATA[DVN (Base Reflectivity Tilt 1)]]></string>
+                                                    </property>
+                                                    <property name="Parent" >
+                                                        <null class="ucar.unidata.data.DataChoice" />
+                                                    </property>
+                                                    <property name="Properties" >
+                                                        <null class="java.util.Hashtable" />
+                                                    </property>
+                                                    <property name="Description" >
+                                                        <string><![CDATA[1998-06-29 21:12:00Z]]></string>
+                                                    </property>
+                                                    <property name="Id" >
+                                                        <object idref="id13" />
+                                                    </property>
+                                                    <property name="Categories" >
+                                                        <object class="java.util.ArrayList" >
+                                                            <method name="add" >
+                                                                <object idref="id47" />
+                                                            </method>
+                                                            <method name="add" >
+                                                                <object class="ucar.unidata.data.DataCategory" >
+                                                                    <property name="Name" >
+                                                                        <string><![CDATA[param:DVN (Base Reflectivity Tilt 1)]]></string>
+                                                                    </property>
+                                                                    <property name="Child" >
+                                                                        <null class="ucar.unidata.data.DataCategory" />
+                                                                    </property>
+                                                                    <property name="ForDisplay" >
+                                                                        <boolean>false</boolean>
+                                                                    </property>
+                                                                    <property name="CategoryIndex" >
+                                                                        <int>-1</int>
+                                                                    </property>
+                                                                    <property name="ChildIndex" >
+                                                                        <int>-1</int>
+                                                                    </property>
+                                                                    <property name="Append" >
+                                                                        <string null="true" />
+                                                                    </property>
+                                                                </object>
+                                                            </method>
+                                                        </object>
+                                                    </property>
+                                                </object>
+                                            </method>
+                                            <method name="add" >
+                                                <object class="ucar.unidata.data.DirectDataChoice" >
+                                                    <property name="DataSource" >
+                                                        <object idref="id21" />
+                                                    </property>
+                                                    <property name="Name" >
+                                                        <string><![CDATA[DVN (Base Reflectivity Tilt 1)]]></string>
+                                                    </property>
+                                                    <property name="Parent" >
+                                                        <null class="ucar.unidata.data.DataChoice" />
+                                                    </property>
+                                                    <property name="Properties" >
+                                                        <null class="java.util.Hashtable" />
+                                                    </property>
+                                                    <property name="Description" >
+                                                        <string><![CDATA[1998-06-29 21:18:00Z]]></string>
+                                                    </property>
+                                                    <property name="Id" >
+                                                        <object idref="id16" />
+                                                    </property>
+                                                    <property name="Categories" >
+                                                        <object class="java.util.ArrayList" >
+                                                            <method name="add" >
+                                                                <object idref="id47" />
+                                                            </method>
+                                                            <method name="add" >
+                                                                <object class="ucar.unidata.data.DataCategory" >
+                                                                    <property name="Name" >
+                                                                        <string><![CDATA[param:DVN (Base Reflectivity Tilt 1)]]></string>
+                                                                    </property>
+                                                                    <property name="Child" >
+                                                                        <null class="ucar.unidata.data.DataCategory" />
+                                                                    </property>
+                                                                    <property name="ForDisplay" >
+                                                                        <boolean>false</boolean>
+                                                                    </property>
+                                                                    <property name="CategoryIndex" >
+                                                                        <int>-1</int>
+                                                                    </property>
+                                                                    <property name="ChildIndex" >
+                                                                        <int>-1</int>
+                                                                    </property>
+                                                                    <property name="Append" >
+                                                                        <string null="true" />
+                                                                    </property>
+                                                                </object>
+                                                            </method>
+                                                        </object>
+                                                    </property>
+                                                </object>
+                                            </method>
+                                        </object>
+                                    </property>
+                                    <property name="DataSource" >
+                                        <object idref="id21" />
+                                    </property>
+                                    <property name="Name" >
+                                        <string><![CDATA[DVN (Base Reflectivity Tilt 1)]]></string>
+                                    </property>
+                                    <property name="Parent" >
+                                        <null class="ucar.unidata.data.DataChoice" />
+                                    </property>
+                                    <property name="Properties" >
+                                        <null class="java.util.Hashtable" />
+                                    </property>
+                                    <property name="Description" >
+                                        <string><![CDATA[Image Sequence]]></string>
+                                    </property>
+                                    <property name="Id" >
+                                        <object idref="id4" />
+                                    </property>
+                                    <property name="Categories" >
+                                        <object class="java.util.ArrayList" >
+                                            <method name="add" >
+                                                <object class="ucar.unidata.data.DataCategory" >
+                                                    <property name="Name" >
+                                                        <string><![CDATA[IMAGE]]></string>
+                                                    </property>
+                                                    <property name="Child" >
+                                                        <object class="ucar.unidata.data.DataCategory" >
+                                                            <property name="Name" >
+                                                                <string><![CDATA[2D]]></string>
+                                                            </property>
+                                                            <property name="Child" >
+                                                                <object class="ucar.unidata.data.DataCategory" >
+                                                                    <property name="Name" >
+                                                                        <string><![CDATA[TIME]]></string>
+                                                                    </property>
+                                                                    <property name="Child" >
+                                                                        <null class="ucar.unidata.data.DataCategory" />
+                                                                    </property>
+                                                                    <property name="ForDisplay" >
+                                                                        <boolean>true</boolean>
+                                                                    </property>
+                                                                    <property name="CategoryIndex" >
+                                                                        <int>-1</int>
+                                                                    </property>
+                                                                    <property name="ChildIndex" >
+                                                                        <int>-1</int>
+                                                                    </property>
+                                                                    <property name="Append" >
+                                                                        <string null="true" />
+                                                                    </property>
+                                                                </object>
+                                                            </property>
+                                                            <property name="ForDisplay" >
+                                                                <boolean>true</boolean>
+                                                            </property>
+                                                            <property name="CategoryIndex" >
+                                                                <int>-1</int>
+                                                            </property>
+                                                            <property name="ChildIndex" >
+                                                                <int>-1</int>
+                                                            </property>
+                                                            <property name="Append" >
+                                                                <string null="true" />
+                                                            </property>
+                                                        </object>
+                                                    </property>
+                                                    <property name="ForDisplay" >
+                                                        <boolean>false</boolean>
+                                                    </property>
+                                                    <property name="CategoryIndex" >
+                                                        <int>-1</int>
+                                                    </property>
+                                                    <property name="ChildIndex" >
+                                                        <int>-1</int>
+                                                    </property>
+                                                    <property name="Append" >
+                                                        <string null="true" />
+                                                    </property>
+                                                </object>
+                                            </method>
+                                            <method name="add" >
+                                                <object class="ucar.unidata.data.DataCategory" >
+                                                    <property name="Name" >
+                                                        <string><![CDATA[param:DVN (Base Reflectivity Tilt 1)]]></string>
+                                                    </property>
+                                                    <property name="Child" >
+                                                        <null class="ucar.unidata.data.DataCategory" />
+                                                    </property>
+                                                    <property name="ForDisplay" >
+                                                        <boolean>false</boolean>
+                                                    </property>
+                                                    <property name="CategoryIndex" >
+                                                        <int>-1</int>
+                                                    </property>
+                                                    <property name="ChildIndex" >
+                                                        <int>-1</int>
+                                                    </property>
+                                                    <property name="Append" >
+                                                        <string null="true" />
+                                                    </property>
+                                                </object>
+                                            </method>
+                                        </object>
+                                    </property>
+                                </object>
+                            </method>
+                        </object>
+                    </property>
+                    <property name="DisplayId" >
+                        <string><![CDATA[imagesequence]]></string>
+                    </property>
+                    <property name="Viewer" >
+                        <object idref="idv" />
+                    </property>
+                    <property name="MakeWindow" >
+                        <boolean>true</boolean>
+                    </property>
+                    <property name="WindowSize" >
+                        <object class="java.awt.Dimension" >
+                            <constructor>
+                                <int>423</int>
+                                <int>169</int>
+                            </constructor>
+                        </object>
+                    </property>
+                    <property name="WindowX" >
+                        <int>50</int>
+                    </property>
+                    <property name="WindowY" >
+                        <int>100</int>
+                    </property>
+                    <property name="WindowVisible" >
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="DefaultView" >
+                        <string><![CDATA[MAIN3D]]></string>
+                    </property>
+                    <property name="ColorUnitName" >
+                        <string null="true" />
+                    </property>
+                    <property name="LockVisibilityToggle" >
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="OkToFireEvents" >
+                        <boolean>true</boolean>
+                    </property>
+                    <property name="ContourInfo" >
+                        <null class="ucar.unidata.util.ContourInfo" />
+                    </property>
+                    <property name="DefaultSamplingMode" >
+                        <string><![CDATA[Weighted Average]]></string>
+                    </property>
+                    <property name="ColorScaleVisible" >
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="UniqueId" >
+                        <string><![CDATA[sharable_1086377447436_0.9636183247869731_2]]></string>
+                    </property>
+                    <property name="Sharing" >
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="ShareGroup" >
+                        <string><![CDATA[DisplayControl]]></string>
+                    </property>
+                </object>
+            </method>
+        </object>
+    </method>
+</object>

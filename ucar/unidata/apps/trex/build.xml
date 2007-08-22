@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- In Ant all file paths are relative to the basedir.  Since this
+build.xml file is in ucar the basedir is "..", the parent directory of
+ucar.  (Unless overwritten by a calling ant process or by a command line
+argument -Dfoo=bar) -->
+
+
+<project basedir="../../../../" default="plugin" name="TrexIdv">
+
+    <import file="../../../build.xml"/>
+
+    <target name="trex" depends="init">
+        <javac
+            classpath="${classpath}"
+            debug="true"
+            source="${srcversion}"
+            deprecation="false" 
+            destdir="${compiledir}"
+            failonerror="${failonerror}" 
+            nowarn="true"
+            srcdir="${srcdir}"
+        >
+        <include name="ucar/unidata/apps/trex/**"/>
+        </javac>
+    </target>
+
+
+    <target name="trexjar" depends="trex">
+        <jar 
+            basedir="${srcdir}"
+            compress="true"
+            update="false"
+            jarfile="${jars_dest}/trex.jar"
+            manifest="${srcdir}/ucar/unidata/apps/trex/trex.manifest">
+            <include name="ucar/unidata/apps/trex/**"/>
+            <include name="ucar/unidata/apps/trex/sensors/*.xml"/>
+            <exclude name="ucar/unidata/apps/trex/scratch/**"/>
+            <exclude name="ucar/unidata/apps/trex/sensors/**"/>
+            <exclude name="ucar/unidata/apps/trex/data/sensors/*.shp"/>
+            <exclude name="ucar/unidata/apps/trex/**/*.shx"/>
+            <exclude name="ucar/unidata/apps/trex/**/*.dbf"/>
+            <exclude name="ucar/unidata/apps/trex/**/*.java"/>
+            <exclude name="ucar/unidata/apps/trex/*.bin"/>
+            <exclude name="ucar/unidata/apps/trex/*.jar"/>
+            <exclude name="ucar/unidata/apps/trex/*.zip"/>
+            <exclude name="ucar/unidata/apps/trex/*.exe"/>
+        </jar>
+    </target>
+
+    <target name="plugin" depends="trexjar">
+        <copy overwrite="true"  todir="${user.home}/.metapps/DefaultIdv/plugins">
+             <fileset file="lib/trex.jar"/>
+        </copy>
+    </target>
+
+
+</project>

@@ -1,0 +1,73 @@
+<title>Using Favorite Bundles</title>
+
+
+
+
+[ht::desc In this section we will cover how to save the state of the IDV as a  favorite bundle.]
+
+
+
+<div class="overview">
+In this section we will cover how to save the state of the IDV as a
+favorite <a name="bundle" class="index">bundle</a>. A favorite bundle is a normal IDV
+bundle that is saved in a location that the application manages.
+</div>
+
+<ol class="step">
+  
+  <li> First, if you don't have any displays or data then load in a data source and create a display.
+      
+  <li> Save this state as a favorite.
+  <ul>
+    <li> Select the [ht::menu File {Save As Favorite...}] menu from the main menu bar.</li>
+        
+    <li> Enter: &quot;Toolbar&gt;Workshop&quot; in the category field. The &quot;&gt;&quot; defines
+         sub-categories.</li>
+
+    <li> Enter: &quot;Test&quot; for the name.</li>
+    <li> Press [ht::button OK].
+  </ul>
+  
+  <li>View this favorite.
+  <ul class="subsubstep">
+    <li>Remove all displays and data.</li>
+    <li> Load in the favorite by selecting the [ht::menu {Displays} {Favorite&nbsp;Bundles} Toolbar Workshop Test] menu item.</li>
+  </ul>
+
+  <li> Edit the favorites</li>
+  <ul class="subsubstep">
+    <li> Create 3 or 4 other  favorites: e.g., Category=&quot;General&quot; and Name=&quot;Some name 1&quot;, &quot;Some name 2&quot;, etc.
+    <li> Open the favorites editor with [ht::menu {Displays} {Favorite&nbsp;Bundles} Manage].
+    <li> Right click on the favorite to show a popup menu. 
+    <li> Select [ht::menu Delete].
+    <li> Drag and drop them to change their categories.
+  </ul>
+
+
+
+<ifndef flag_developerworkshop>
+  <li> Take a closer look at some of the default system favorites</li>
+  <ul class="subsubstep">
+     <li> Open the [ht::menu Displays {Favorite Bundles} Ocean {El Nino/La Nina Comparison}]
+     <li> This shows temperature cross sections of the Pacific Ocean for normal, El Nino and La Nina years.</li>
+     <li> Move the cross section in the main view. See how each of the three cross sections are linked. </li>
+     <li> Note: This bundle changed the vertical  scale of the main window. To continue with the exercises, 
+        either create a new    window (using: [ht::menu File New {View Window}]), 
+        reset the vertical scale  (using [ht::menu View Viewpoint {Vertical Scale}]),
+        or exit and restart the IDV.
+  </ul>
+</ifndef>
+
+
+<ifdef flag_developerworkshop>
+  <li> Let's look at this on the file system</li>
+  <ul class="subsubstep">
+     <li> From a terminal window cd ~/.metapps/DefaultIdv/bundles/Toolbar/Workshop
+     <li> You should see your Test.xidv bundle file
+  </ul>
+</ifdef>
+
+</ol>
+
+
+

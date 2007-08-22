@@ -1,0 +1,158 @@
+<html>
+<head>
+<title>Starting the IDV for the first time</title>
+</head>
+
+<body>
+
+<div class="overview">
+Once the IDV has been installed, you can start it from the command line.
+</div>
+
+<div class="pagetitle">Starting the IDV using 
+the <code class="filename">runIDV</code> script. </div>
+
+<ol class="step">
+
+  <li>Open a terminal window (if you do not have one open already)
+      and change to the directory where the IDV was installed.
+      (e.g., <code class="filename"><%workshop.homedir%>/IDV_<%idv.version%></code>)
+    <p><ul>
+      <code class="command">cd&nbsp;&nbsp;<%workshop.homedir%>/IDV_<%idv.version%></code>
+    </ul></p>
+  </li>
+
+  <li>Print out the <code class="filename">runIDV</code> script. 
+    <p><ul>
+      <code class="command">cat&nbsp;&nbsp;runIDV</code>
+    </ul></p>
+    <p>You should see a printout that starts like this:
+    <pre>
+#!/bin/sh
+
+dirname=`dirname $0`
+command="java -Xmx512m -Didv.enableStereo=false -jar idv.jar $*"
+    </pre>
+and then some code to find the version of java to use.
+
+    <p>The script sets up the environment for the IDV to run.  
+
+     <details title="runIDV script environment">
+    <pre>
+java -Xmx512m -jar idv.jar $*
+    </pre>
+     <ul>
+       <li><code class="command">java</code> -
+           creates the Java Virtual Machine</li>
+       <li> <code class="command">-Xmx512m</code> - 
+           sets the maximum memory used by Java to 512 Mb</li>
+       <li> <code class="command">-Didv.enableStereo=false</code> - 
+           disables stereo viewing.  Set this to true to enable</li>
+       <li> <code class="command">-jar idv.jar</code> -
+            executes the main class specified in 
+            <code class="filename">idv.jar</code></li>
+       <li><code class="command">$*</code> - allows the user to 
+           pass in command line arguments. 
+      </ul>
+      </details>
+
+  </li>
+  <li>The IDV has many command line arguments which can be passed
+      to the <code class="filename">runIDV</code> script.  To get
+      a listing, run the following command:
+    <p><ul>
+      <code class="command">./runIDV -help</code>
+    </ul></p>
+    <p>You should see a printout like this:
+    <pre>
+        -help  <i>(this message)</i>
+        -properties  &lt;property file&gt;
+        -installplugin  &lt;plugin jar file to install&gt;
+        -plugin  &lt;plugin jar file, directory, url for this run&gt;
+        -noplugins  Don't load plugins
+        -cleardefault  <i>(Clear the default bundle)</i>
+        -nodefault  <i>(Don't read in the default bundle file)</i>
+        -default  &lt;.xidv file&gt;
+        -bundle  &lt;bundle file or url&gt;
+        -oneinstanceport  &lt;port number&gt;<i>
+                 (Check if another version of the IDV is running. If so pass command line 
+                  arguments to it and shutdown)</i>
+        -nooneinstance  <i>(Don't do the one instance port)</i>
+        -nopref  <i>(Don't read in the user preferences)</i>
+        -userpath  &lt;user directory to use&gt;
+        -sitepath  &lt;url path to find site resources&gt;
+        -nogui  <i>(Don't show the main window gui)</i>
+        -data  &lt;data source&gt; <i>(Load the data source)</i>
+        -display  &lt;parameter&gt; &lt;display&gt;
+        -islinteractive  &lt;run the isl file in interactive mode
+        scriptfile.isl  <i>(Run the IDV script in batch mode)</i>
+        -image  &lt;image file name&gt; <i>(create a jpeg image and then exit)</i>
+        -movie  &lt;movie file name&gt; <i>(create a quicktime movie and then exit)</i>
+        -imageserver  &lt;port number or .properties file&gt; <i>
+                   (run the IDV in image generation server mode. Support http requests on the given port)</i>
+        -Dpropertyname=value  <i>(Define the property value)</i>
+        -catalog  &lt;url to a chooser catalog&gt;
+        -connect  &lt;collaboration hostname to connect to&gt;
+        -server  <i>(Should the IDV run in collaboration server mode)</i>
+        -port  &lt;Port number collaboration server should listen on&gt;
+        -chooser  <i>(show the data chooser on start up)</i> 
+        -printjnlp  <i>(Print out any embedded bundles from jnlp files)</i>
+        -setfiles  &lt;datasource pattern&gt; &lt;semi-colon delimited list of files&gt; <i>
+                     (Use the list of files for the bundled datasource)</i>
+        -currenttime  &lt;dttm&gt; <i>(Override current time for ISL processing)</i>
+        -listresources  &lt;list out the resource types
+        -debug  <i>(Turn on debug print)</i>
+        -debugmessages  <i>(Turn on language pack debug)</i>
+        -recordmessages  &lt;Language pack file to write missing entries to&gt;
+        -trace  <i>(Print out trace messages)</i>
+        -traceonly  &lt;trace pattern&gt; <i>(Print out trace messages that match the pattern)</i>
+    </pre>
+  </li>
+  <li>For this workshop, we are going to only use the 
+      <code class="command">-installplugin</code> argument to load some
+      workshop specific configuration files from a plugin.  (You will
+      learn more about plugins later in the workshop).<p>
+      To start the IDV for the workshop the first time, 
+      type [ht::cutAndPasteTip]:
+
+      <p><ul>
+      <code class="command">./runIDV&nbsp;&nbsp;-installplugin&nbsp;<%idv.website%>/plugins/workshop.jar</code>
+      </ul></p>
+
+      <p>While the IDV is starting, you will see the following splash
+      screen:
+         [ht::cimg images/SplashScreen.gif alt="IDV Splash Screen" title="IDV Splash Screen"]
+   </li>
+
+   <li>When the IDV starts for the first time, you will see 3 windows:
+     <ul class="substep">
+
+       <li><code class="dialog">IDV Help Tips</code> window.  An optional
+         window with tips on using the IDV.<p>
+         [ht::cimg images/HelpTips.gif alt="Help Tips Window" title="Help Tips Window"]
+
+       For now, close the <code class="dialog">IDV Help Tips</code> window
+       by clicking the <code class="button">Close</code> button.  We'll
+       look at this in a later exercise.  </li><p>
+
+       <li><code class="dialog">Dashboard</code> window.  Used for
+         selecting data to analyze and visualize.</li>
+         [ht::cimg images/Dashboard.gif alt="Dashboard" title="Dashboard"]
+       <li><code class="dialog">Unidata Workshop IDV</code> window.  This
+         is the main window for displaying data visualizations.</li>
+         [ht::cimg images/MainWindowGUI.gif alt="Main IDV Window" title="Main IDV Window"]
+
+       Notice that the <code class="dialog">Dashboard</code> and
+       <code class="dialog">Unidata Workshop IDV</code> windows have 
+       identical menu bars.  This allows you to control the IDV from
+       either window.
+     </ul>
+   </li>
+
+
+   <li>Now we are ready to explore the user interface.</li>
+
+</ol>
+
+</body>
+</html>

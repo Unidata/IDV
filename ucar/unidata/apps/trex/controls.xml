@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<controls>
+
+  <control
+     id="trackcontrol"
+     categories="trace"
+     class="ucar.unidata.idv.control.TrackControl"
+     description="Track Colored By Parameter"
+     canstandalone="false"
+     label="Track Colored By Parameter"
+     displaycategory="Trajectory"
+     properties="displayName=Track Control;windowVisible=false;nameFromUser=%datasourcename%"/>
+
+  <control
+     id="stationmodelcontrol"
+     categories="POINT;StationPlot;PointPlot"
+     class="ucar.unidata.idv.control.StationModelControl"
+     description="Point Data Plot"
+     canstandalone="false"
+     label="Point Data Plot"
+     displaycategory="Point Data"
+     properties="displayName=Point Data Plot Control;windowVisible=false;nameFromUser=%datasourcename% Points">
+    </control>
+
+
+
+</controls>

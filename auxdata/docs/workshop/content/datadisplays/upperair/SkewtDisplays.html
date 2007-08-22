@@ -1,0 +1,131 @@
+<html>
+<head>
+<title>Sounding Displays</title>
+</head>
+
+<body>
+
+<div class="overview">
+<p>
+Upper Air RAOB sounding data can be accessed and displayed in the IDV as 
+skew-T log-p, Stuve or Emagram displays, with a table of
+aerological values.  More than one station and more than one sounding 
+at each station can be loaded at once.
+</div>
+
+<p>
+
+<ol class="step">
+
+<li>Open the RAOB Data Source Chooser and Select a Time</li>
+  <ul class="substep">
+    <li> [ht::openDataSourceChooser] 
+    <li>In the [ht::dialog Data Source Chooser] click on the 
+    [ht::command RAOB] tab. 
+    <li>Click on the [ht::command {Soundings: Remote}] tab. </li>
+    <li>In the 
+    [ht::command Server:] entry box, select the remote ADDE server 
+    [ht::command adde.ucar.edu].  
+    [ht::command Group:] entry box, select [ht::command RTPTSRC].  Make
+    sure the [ht::command {00 &amp; 12Z only}] box is checked
+    <li>Click on [ht::button Connect].
+    <li>The IDV will connect to the ADDE server at adde.ucar.edu and
+    download metadata about available RAOB data. Data times you can get 
+    from this server are listed in the box [ht::command Available Times:].
+    <li>Select the 00 and 12 times for today.</li>
+  </ul>
+</li>
+
+
+<li>Zooming and Decluttering the Selector, and Selecting Stations</li>
+  <ul class="substep">
+    <li>The map only shows a few stations, so you need to zoom in 
+    and  declutter. [ht::mapSelector] 
+     More stations will appear when you zoom in and declutter. 
+     Find station 72201 (Key West) southwest of Miami, Florida. 
+     <li>Click on that station. It will turn red, 
+    and it will be listed with the data times in the 
+    [ht::command Selected Soundings:] box.
+    <li>Select another station, 72214, north of 72201, by holding down the
+    Ctrl key and clicking on 72214. Both stations now should be red.
+
+              [ht::cimg images/RaobChooser.gif]
+
+    <li>Four entries should be in the [ht::command Selected Soundings:] box.
+    Click the [ht::button Add Source] 
+    button at the bottom of the selector window. 
+  </ul>
+</li>
+
+</OL>
+
+<p>
+
+You should see the label [ht::command RAOB data: adde.ucar.edu] in the
+[ht::command Data Sources] panel in the [ht::dialog Field Selector]. 
+If the [ht::command Create display] checkbox was selected in the
+chooser, the data will be read from the server and a 
+[ht::display Skew-T] display will be created.  If not then
+create it:
+
+<ul class="step">
+
+    <li>In the [ht::dialog Field Selector] window create a 
+     [ht::display RAOB Skew-T] display using 
+     the [ht::param RAOB Data] field.</li>
+</ul>
+<p>
+
+The skew-T plot appears in its own control window in the
+[ht::dialog Dashboard], with the data 
+from the first station and time plotted.
+Skew-T plots of RAOB data have a station selector box
+labeled [ht::command Soundings].   Undock the 
+[ht::display Skew-T] control from the Dashboard with the
+[ht::menu View {Undock from Dashboard}] menu.
+
+<p>
+<div class="cimg"> <img src="images/SkewtPlot.gif"></div>
+<p>
+
+<li>Using the Skew-T Control</li>
+  <ul class="substep">
+       <li>The skew-T plot, wind barb staff, and  associated aerological 
+       table are all in the control window. 
+    <LI>Move the mouse pointer over the skew-T Plot and see the values
+    on the plot listed in the table.
+    <li>Use the [ht::command Soundings] selector box to 
+    change station and time selection. 
+    <li>Use the [ht::menu Customize {Display Types} Stuve] menu item
+    to change the display to a Stuve.
+    <li>Show the idealized parcel path by checking the 
+    [ht::button {Parcel Path}] checkbox.  Change the 
+    <code class="command">Parcel mode:</code> to the
+    [ht::param {At Cursor Pressure}] option.  Click in the
+    display with the middle mouse button to show the parcel
+    path from that pressure.
+    <li>Modify the sounding by clicking and dragging on the temperature
+    profile.  Change the 
+    <code class="command">Parcel mode:</code> to the
+    [ht::param {At Cursor (Press,Temp)}] option.  Click in the
+    display with the middle mouse button to show the parcel
+    from new locations on the modified sounding.  For more information,
+    see 
+    [ht::popup "UsingSoundingDisplays.html" "Using the IDV Sounding Displays"]
+    <li>Reset the profile with the [ht::menu Edit {Reset Sounding}]
+    menu.
+  </ul>
+</li>
+
+<P>
+
+<li>Remove All Displays and Data</li>
+  <ul class="substep">
+    <li>[ht::clearDisplaysAndData]
+  </ul>
+</li>
+
+</OL>
+
+</body>
+</html>

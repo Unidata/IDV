@@ -1,0 +1,41 @@
+<html><head>
+  <title>Choose  NEXRAD Level II Radar Data</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+<body>
+
+
+The  [ug::chooser Level II] chooser allows you to choose
+Level II data from your file system.
+
+
+[ht::cimg images/Level2Chooser.gif {Level II Radar Chooser}]
+
+
+To select Level II data:
+<ol>
+
+<li> Navigate to the desired directory. This chooser works like the
+<a href="FileChooser.html">Files</a> chooser described above.
+
+<li> Select one or more Level II data files. Use Control-Click or Shift-Click
+to select multiple files. Each file represents a full volume scan at a particular time.
+
+<li> Alternatively, use the [ug::button {Use Relative Times}] button
+to select the latest <b>N</b> files in the directory.   You can optionally
+use the [ug::button File Pattern] field to specify the pattern for 
+files to look for.
+
+<li> Provide a radar station  name. 
+For some Level II data, the IDV  requires you to provide the radar location.
+The IDV  will try to guess at the location based on the directory name but 
+you can specify the location using the [ug::menu {Radar Location}] menu.
+
+<li> When done, load the selected radar data with the [ug::button Add Source] button.
+
+
+</ol>
+
+</body>
+</html>

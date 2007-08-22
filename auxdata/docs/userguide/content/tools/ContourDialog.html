@@ -1,0 +1,59 @@
+<html><head>
+  <title>Contour Properties Editor</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+
+The <b>Contour Properties Editor</b> is invoked from any 
+contour display control with the <b>Contour: Set</b> button.
+
+[ht::cimg images/ContourDialog.gif]
+
+
+Use the items in this window to set contouring properties.
+
+<p><B>Contour Interval</B> determines the spacing 
+(difference in value) between contours. 
+
+
+<p><B>Base contour</B>  
+is the value on which all contours are based. All contours will be
+integer multiples of the contour interval from the base value. For
+example, with a base value of 0 and a contour interval of 3 contours
+would be created at ..-6, -3, 0, 3, 6... A base of 1 with that interval
+would create contours at ..-5, -2, 1, 4, 7... The base value need not
+be the lowest contour level on a plot, or inside the range of values
+plotted; it is only a computational reference point. The base contour
+value is also used for controlling which lines are dashed.
+
+<p>
+
+<B>Minimum value</B> is a limit 
+below which no contour lines are shown. The minimum may be larger than
+the base value, so that the base value may never appear on a plot.
+
+<p><B>Maximum value</B>
+is an upper limit above which no contour lines are shown. The minimum
+and maximum values need not match contour line values; they are only
+limits.
+
+<p><B>Line width</B>
+sets the line width (in pixels) of the contour lines and labels.
+
+<p>
+
+You can toggle the labels by clicking the <B>Labels</B> check box.
+
+<p>
+
+If <B>Dash</B> is checked, values less than the base value are dashed.
+If base is set higher than maximum value, then all lines are dashed.
+
+<p>
+
+Click on <B>OK</B> to set the values you want and close this window. 
+Click <b>Apply</b> to set the values but leave this window open.
+
+</body>

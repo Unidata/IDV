@@ -1,0 +1,48 @@
+
+{Map  Control}
+
+{
+Maps in the IDV are shown using the Map display control. There are  two ways this 
+control is used: as  the default  background maps and as a user created map display.
+The control window is composed of two tabs. The first lists the set of
+available maps:
+
+[ht::cimg images/MapDisplayControlGui1.gif]
+
+The second allows the user to control the display of the latitude/longitude lines
+and control the Z level of the maps:
+[ht::cimg images/MapDisplayControlGui2.gif]
+
+
+New maps may be added through the [ug::menu Edit] menu. You can choose to add any of the predefined
+maps available to the IDV or you can select a map file (e.g., a shape file)  from the
+file system.
+<p>
+The  [ug::menu Edit {Save  as the Default Map Preference}] menu item  allows you to save the current
+set of maps in a display as the default maps. When a new view window is created the maps that
+are saved as the default are used as the background maps.
+}
+
+
+{{Maps} {
+This list shows the set of currently loaded maps. In this list you can remove a map, change
+its visibility, line width, style and color. The [ug::button Fast Rendering] button, when on,
+can save on rendering time by not checking for projection seam crossings. Note: some maps
+will display incorrectly when fast rendering is turned on.
+}}
+
+
+{ {Latitude/Longitude lines} {
+These controls allow you to display latitude and longitude lines. You can set the visibility,
+spacing, line width, line style and color.
+}}
+
+
+{ {Map position} {
+This slider  allows you to  set the vertical position of the maps.
+}}
+
+
+
+
+

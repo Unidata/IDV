@@ -1,0 +1,161 @@
+<html><head>
+  <title>Image XML Files</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+<body>
+
+The Image Xml file format (.ximg) allows one to define collections  of
+geolocated images (and also shapefiles).
+
+The simplest file can define one geolocated image:
+
+[ug::xml {
+  <image url="sboulder.jpeg"
+       name="South Boulder-aerial photo"
+       ullat="39.98890" ullon="-105.22782"
+       lrlat="39.98755" lrlon="-105.22548"/>
+}]
+
+The [ug::attr url] attribute  can be an absolute or relative url or file path.
+The [ug::attr ullat], [ug::attr ullon], [ug::attr lrlat] and [ug::attr lrlon] 
+attributes are the upper left
+and lower right lat/lon of the image.
+It is assumed that the image is in a geographic (i.e., rectilinear, lat/lon) projection.
+<p>
+
+<div class="pagesubtitle">Collections</div>
+
+
+You can also define a collection of images:
+[ug::xml {
+<collection name="Boulder Images">
+  <image url="sboulder.jpeg"
+       name="South Boulder-aerial photo"
+       ullat="39.98890" ullon="-105.22782"
+       lrlat="39.98755" lrlon="-105.22548"/>
+
+  <image url="bouldertopo.jpeg"
+       ullat="40.06654" ullon="-105.34710"
+       lrlat="39.98040" lrlon="-105.19676"
+       name="Boulder topo"/>
+
+  <image url="bigtopo.jpeg"
+       ullat="40.22807" ullon="-106.66437"
+       lrlat="39.54718" lrlon="-105.45623"
+       name="Mountains topo"/>
+</collection>
+}]
+
+Collections can contain other collections:
+[ug::xml {
+<collection name="My Images">
+    <collection name="Madison Images">
+        <image url="madison_aerial.jpeg"
+              ullat="43.09444" ullon="-89.52626"
+              lrlat="43.01143" lrlon="-89.36579"
+              name="Madison aerial"/>
+
+        <image url="madison_topo.jpeg"
+               ullat="43.09444" ullon="-89.52626"
+               lrlat="43.01143" lrlon="-89.36579"
+               name="Madison topo"/>
+    </collection>
+    <collection name="Boulder Images">
+       <image url="sboulder.jpeg"
+              name="South Boulder-aerial photo"
+              ullat="39.98890" ullon="-105.22782"
+              lrlat="39.98755" lrlon="-105.22548"/>
+     </collection>
+</collection>
+
+}]
+
+
+There is also a [ug::tag shape] tag for defining shape files:
+[ug::xml {
+<collection name="Shapes">
+   <shape url="boulder_roads.zip" name="Boulder roads"/>
+   <shape url="boulder_rivers.zip" name="Boulder rivers"/>
+</collection>
+}]
+
+
+<div class="pagesubtitle">Grouping</div>
+The [ug::tag group] tag allows you to group a set of images in time or space:
+
+[ug::xml {
+<group name="group of images"
+       format="yyyyMMddhhmm"
+       ullat="39.991856"
+       ullon="-105.226944"
+       lrlat="39.989426"
+       lrlon="-105.222656">
+       <image
+           date="200610011000"
+           url="sketch.jpg"/>
+       <image
+           url="map.jpg"
+           date="200610011100"/>
+</group>
+}]
+
+The [ug::attr format] attribute defines the date/time format of the 
+[ug::attr date] attributes.
+The location attributes (ullat,ullon, etc.) can be defined both in the 
+[ug::tag group]
+tag as well as in each individual [ug::tag image] tag.
+<p>
+If there are no [ug::attr date] attributes 
+then the group of images are aggregated together,
+each potentially covering a different area.
+
+<div class="pagesubtitle">Images in 3D Space</div>
+One is not limited to just specifying the positions of the upper left and lower right corners
+of the image. There is support for defining the latitude and longitude
+for any of the four corners of the image:
+
+[ug::xml {
+  <image url="image.jpeg"
+       name="Image"
+       ullat="40" ullon="-100"
+       lllat="30" lllon="-100"
+       urlat="50" urlon="-90"
+       lrlat="30" lrlon="-90"
+      />
+}]
+
+One can also specify the altitude of any of the points. The unit specification is not required
+and will default to meters.
+
+[ug::xml {
+  <image url="image.jpeg"
+       name="Image"
+       ullat="40" ullon="-100" ulalt="20000[feet]"
+       lllat="30" lllon="-100" llalt="0[feet]"
+       urlat="50" urlon="-90"  uralt="5000[feet]"
+       lrlat="30" lrlon="-90"  lralt="0[feet]"
+      />
+}]
+
+
+The IDV will try to fill in defaults. So, for example, if you wanted to have an image be
+a vertical cross section you could do:
+[ug::xml {
+  <image url="topo.jpg"
+       name="Image"
+       ullat="40" ullon="-100" 
+       urlat="50" urlon="-90"  
+       ulalt="20000[feet]"    
+       llalt="0[feet]"/>
+}]
+
+Here, we define the lat/lon of the upper left and upper right of the image. We define
+the altitude of the upper left and lower left corners of the image. The altitude
+of the upper right corner defaults to that of the upper left and the
+altitude of the lower right defaults to the lower left altitude.
+
+
+
+</body>
+</html>

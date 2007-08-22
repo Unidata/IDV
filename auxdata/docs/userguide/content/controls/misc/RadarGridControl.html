@@ -1,0 +1,86 @@
+{Range Rings}
+
+{
+
+<meta name="jhid" value="idv.controls.radargridcontrol">
+
+The Range Rings control show a set of concentric circles
+labeled by distance from the central point, with radial 
+lines, useful for judging distance and angle from a geographic location.
+Range Rings are often used with radar imagery.
+The control window is composed of two tabs. The first allows
+the user to specify the location of the range rings:
+
+[ht::cimg images/RadarGridControlGui1.gif]
+
+The second tab allows the user to control how the rings are displayed:
+
+[ht::cimg images/RadarGridControlGui2.gif]
+
+
+
+The Range Rings are oriented with local north-south on the displayed    
+map projection. In some cases the eastward radial line may not be       
+horizontal. 
+
+
+<p>
+You display Range Rings from the main menu with the 
+[ug::menu Displays Special {Range Rings} ] menu. The Range Rings 
+will appear centered on the map projection. You can move them by        
+resetting the latitude-longitude or station as described below.         
+
+The IDV can display several radar images at once, and range rings can   
+be displayed for each one. You may display as many range rings at one   
+time as you like, centered anywhere, not just radar locations.          
+
+}
+
+
+{{Location} {
+
+
+The position of the center of the rings is shown in the text fields
+[ht::command {Center latitude} ] and [ht::command {Center longitude} ]
+
+To re-center the rings, you can select a radar station by name from the 
+pull-down list, or you give new lat/lon values by entering values in a     
+text field and pressing return. Note: west longitudes are negative. 
+
+}}
+
+{{Position at click} {When this check box is selected the range rings will be
+centered where you click in the main display}}
+
+{[ug::vertical {Range Rings}]}
+
+
+
+
+{{Visibility} {
+You can toggle the visibility of the range rings, labels, and radials   
+on and off with the [ht::command Visible ] checkboxes. To toggle the     
+entire radar grid at once, use [ug::menu View Visible ] checkbox menu. 
+}}       
+
+{{Spacing} {
+You can change the ring spacing, the label spacing, and the azimuth     
+interval of the radials, using the control window. The values appear in 
+the text fields under <code class="menu">Spacing</code>. You can give   
+new values two ways: enter a new value in the text field by clicking in 
+the field, entering the new value, and pressing Enter, or click on the  
+pull-down arrow on the right side of the text field to see a list of    
+common values.
+}}                                                        
+
+{{Color} {
+You can change the color of the lines and labels with the 
+[ht::command Color] pull-down lists.
+}}
+
+{{Line Width} {
+You can change the width of the lines and labels with the 
+[ht::command  {Line Width} ] pull-down lists. 
+}}
+
+

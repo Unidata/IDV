@@ -1,0 +1,85 @@
+<html>
+<head>
+<title>Using the Time Animation Widget</title>
+</head>
+
+<body>
+
+<div class="overview">
+The [ht::popup TimeAnimationWidget.html {time animation widget}] in the 
+IDV can be used to control the properties of a time loop.
+</div>
+
+<div class="cimg"><img src="images/AnimationWidget.gif" ></div>
+
+<ol class="step">
+
+  <li>Click on the dropdown box on the left side of the widget to 
+      see the list of times that are in this display.  It will
+      look something like this.</li>
+
+<div class="cimg"><img src="images/AnimationTimes.gif" ></div>
+
+  <li>Select the third time in the list to view the visualization for
+      that time step.</li>
+
+  <li>Loop through the entire animation by clicking the
+      <img src="images/Play16.gif"> button on the animation widget.</li>
+
+  <li>Stop the animation by clicking the
+      <img src="images/Pause16.gif"> button.</li>
+
+  <li>Return to the first time step by clicking the 
+      <img src="images/Rewind16.gif"> button.</li>
+
+  <li>Step forward through the animation one step at a time by 
+      repeatedly clicking the <img src="images/StepForward16.gif"> button.</li>
+
+  <li>Step backward through the animation one step at a time by 
+      repeatedly clicking the <img src="images/StepBack16.gif"> button.</li>
+
+  <li>Go to the last time step by clicking the 
+      <img src="images/FastForward16.gif"> button.</li>
+
+  <li>The row of boxes at the top of the widget 
+      <img src="images/AnimationBoxes.gif"> is a visual indicator
+      of the current position in the animation sequence.  
+      Click on a box to go to that point in the sequence.</li>
+
+  <li>You can also use the boxes to skip particular timesteps.  If you
+      right click (MB3) on a box, it will turn red indicating that
+      that step will be skipped.  Right click on a box and then 
+      start the animation to see that the timestep is skipped.</li>
+
+  <li>Open the <code class="dialog">Time Animation Properties</code> editor
+      by clicking the <img src="images/Information16.gif"> button.
+
+<div class="cimg"><img src="images/AnimationProperties.gif" ></div>
+
+    <ul class="substep">
+      <li>Change <code class="command">Direction</code> to rock back and 
+          forth by selecting the [ht::command Rocking] option from
+          the dropdown list and then click the [ht::button Apply]
+          button.</li>
+
+      <li>Start the animation.  When the loop reaches the last time step,
+          the animation steps backward.  When it reaches the first time,
+          it goes forward again.</li>
+
+      <li>Set the <code class="command">First dwell</code>
+          to be the same value as the <code class="command">Last dwell</code>,
+          and then click the <code class="button">Apply</code> button to
+          see the effect.</li>
+
+      <li>Set the [ht::command Direction] back to [ht::command Forward].
+
+    </ul>
+  </li>
+</ol>
+
+You can also define your own time animation under the 
+[ht::tab Define Animation Times] tab.  We'll look at that in
+a later exercise.
+
+</body>
+</html>

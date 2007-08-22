@@ -1,0 +1,53 @@
+<plugins>
+
+<!-- Customized IDVs -->
+<plugin name="Workshop IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/workshop.jar" description="Workshop specific configuration" category="Customized IDVs"/>
+<plugin name="Simple IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/simpleidv.jar" description="A simpler user interface for the IDV" category="Customized IDVs"/>
+<plugin name="GEON IDV" url="http://geon.unavco.org/unavco/geonidv_plugin/geonidv.jar" description="UNAVCO's IDV plugin for supporting Geophysicical data sets" category="Customized IDVs"/>
+<plugin name="T-Rex IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/trex.jar" description="Configuration for the Terrain Induced Rotor Experiment (T-Rex) Field Project" category="Customized IDVs"/>
+
+
+<!-- Displays -->
+<plugin name="User Interface Skins" url="http://www.unidata.ucar.edu/software/idv/plugins/skins.jar" description="Adds a number of different window configurations" category="Displays"/>
+<plugin name="Miscellaneous Controls" url="http://www.unidata.ucar.edu/software/idv/plugins/misccontrols.jar" description="Adds a couple of extra display controls" category="Displays"/>
+<plugin name="VGEE" url="http://www.unidata.ucar.edu/software/idv/plugins/vgee.jar" description="A set of animation displays from the VGEE project" category="Displays"/>
+
+
+<!-- Color Tables -->
+<plugin name="CIMSS Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/cimssenh.jar" description="Color tables for CIMSS Satellite products" category="Color Tables"/>
+<plugin name="GEMPAK Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/gempak.jar" description="Color tables from GEMPAK" category="Color Tables"/>
+<plugin name="NCL Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/ncl.jar" description="Color tables from NCL" category="Color Tables"/>
+<plugin name="McIDAS Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/mcidas.jar" description="Color tables from McIDAS" category="Color Tables"/>
+<plugin name="Panoply Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/panoply.jar" description="Color tables from the Panoply application" category="Color Tables"/>
+
+<!-- Maps -->
+
+<plugin  version="2.2"  name="U.S. Highways and Roads" description="Map" size="4201747" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/usroads.jar" category="Maps"/>
+<plugin  version="2.2" name="U.S. Rivers and Lakes" description="Map" size="5427910" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/lakes.jar" category="Maps"/>
+<plugin  version="2.2" name="Marine Zones" description="Map" size="6271681" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/nwsmarinezones.jar" category="Maps"/>
+<plugin  version="2.2" name="Gempak Weather" description="Map" size="3887944" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/gempak_basic.jar" category="Maps"/>
+<plugin  version="2.2" name="River Forecast Basins" description="Map" size="8033935" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/gempak_basins.jar" category="Maps"/>
+<plugin version="2.2" name="Climate Zones" description="Map" size="1029967" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/gempak_maps.jar" category="Maps"/>
+<plugin  version="2.2" name="Offshore Forecast Areas" description="Map" size="494557" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/gempak_forecast.jar" category="Maps"/>
+<plugin  version="2.2"  name="Pacific and Atlantic Products" description="Map" size="12409" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/gempak_intl.jar" category="Maps"/>
+<plugin name="European Maps" description="Map" size="381433" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/europemaps.jar" category="Maps"/>
+<plugin version="2.2" name="China Maps" description="Map" size="3883648" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/chinamaps.jar" category="Maps"/>
+
+<!-- Misc -->
+<plugin name="Collaboration Menu" url="http://www.unidata.ucar.edu/software/idv/plugins/collaboration.jar" description="Adds the Collaboration menu" category="Miscellaneous"/>
+<plugin name="Test Menu" url="http://www.unidata.ucar.edu/software/idv/plugins/testmenu.jar" description="Adds the Test menu for debugging" category="Miscellaneous"/>
+<plugin name="Jython Dev. Control" url="http://www.unidata.ucar.edu/software/idv/plugins/jythoncontrol.jar" description="Contains the Jython Display Control for developers" category="Miscellaneous"/>
+<plugin version="2.3" name="Experimental Remote Level II Chooser" url="http://www.unidata.ucar.edu/software/idv/plugins/tdslevel2choosers.xml" description="Experimental chooser for Nexrad Level II data from a THREDDS Data Server" category="Miscellaneous"/>
+
+
+<!--
+<plugin version="2.2"  category="Language Packs" name="French Language Pack" description="Contains French translations"  url="http://www.unidata.ucar.edu/software/idv/plugins/language/fr.pack"/>
+<plugin version="2.2"  category="Language Packs" name="German Language Pack" description="Contains German translations"  url="http://www.unidata.ucar.edu/software/idv/plugins/language/de.pack"/>
+<plugin version="2.2"  category="Language Packs" name="Spanish Language Pack" description="Contains Spansish translations"  url="http://www.unidata.ucar.edu/software/idv/plugins/language/es.pack"/>
+<plugin version="2.2"  category="Language Packs" name="Portugese Language Pack" description="Contains Portugese translations"  url="http://www.unidata.ucar.edu/software/idv/plugins/language/pt.pack"/>
+<plugin version="2.2"  category="Language Packs" name="Chinese Language Pack" description="Contains Chinese translations"  url="http://www.unidata.ucar.edu/software/idv/plugins/language/zh.pack"/>
+-->
+
+
+
+</plugins>

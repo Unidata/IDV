@@ -1,0 +1,57 @@
+<html>
+<head>
+<title>Loading Gridded Data</title>
+</head>
+
+<body>
+
+<div class="overview">
+Gridded data can be accessed in the IDV from a remote server or from
+local files.  For the exercises in this section, we will use 
+<a name="eta" class="index">ETA model</a> output from the COMET Case 
+Study on Bow Echoes (39) from June 29, 1998.
+</div>
+
+<ol class="step">
+
+<li>[ht::clearDisplaysAndData]</li>
+
+<li>Load in the 12 Z ETA model run from June 29, 1998.
+  <ul class="substep">
+    <li>Open the <code class="dialog">Data Source Chooser</code> window.</li>
+    <li>Click on the <code class="command">Catalogs</code> tab.</li>
+    <li>From the catalog selector drop-down, select the IDV workshop
+    catalog:
+      <ul>
+      <p>
+    <b><%workshop.sitepath%>/workshopCatalog.xml</b>
+      <p>
+      </ul>
+    If it is not in the list, type it into the selector area and press
+    the <code class="command">Update</code> button. [ht::cutAndPasteTip]
+    <p>
+    A tree view of the data catalog will be displayed in the window below
+    the selector.</li>
+    <li>Expand the <code class="param">Data for Comet Case Study 039</code> 
+        tab, and then the <code class="param">NCEP Model Data</code> tab.</li>
+    <li>Select the <code command="dataset">ETA 1998-06-29 12:00 GMT</code>
+        entry, and then press
+        the <code class="command">Add Source</code> button.</li>
+    <div class="cimg"><img src="images/GridSelector.gif"></div>
+  </ul>
+</li>
+
+<li>Select a subset of valid times for this dataset.
+  <ul class="substep">
+    <li>[ht::editDataSourceProperties [ht::dataset {NCEP Model Data ETA 1998-06-29 12:00 GMT}]]
+    <li>From the [ht::tab Times] tab, 
+        select the times between 12Z on the 29th to 12Z on the 30th.</li>
+    <li>Click the [ht::button OK] button.
+    </li>
+  </ul>
+</li>
+
+</ol>
+
+</body>
+</html>

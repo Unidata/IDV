@@ -1,0 +1,102 @@
+<html>
+<head>
+<title>Using the Display Legends</title>
+</head>
+
+<body>
+
+<div class="pagesubtitle">The Display Legend</div>
+
+When a display is created, an entry for it is added into the legend
+panel.  There are two types of legends, side and bottom, that you can use to 
+show the displays that are in a view.  You can define which type of legend 
+should be used.  The side legend, shown below, is the default legend style.
+
+[ht::cimg images/SideLegend.gif] 
+
+Main features of the side legend are:
+
+<ul>
+
+  <li><b>Display Categories</b> Each display has a Display Category 
+      <img src="images/SideLegendCategory.gif"> that allows
+      grouping of similar displays.  The category can be changed as
+      we saw in the previous exercise.  Each category label includes a
+      toggle button for collapsing <img src="images/CategoryOpen.gif"> or
+      expanding <img src="images/CategoryClosed.gif"> the category details
+      as well as a visibility checkbox 
+      <img src="images/VisibilityCheckbox.gif"> for toggling the
+      visibility of all displays in this category.
+
+  <li><b>Display Legends</b> Each display has it's own legend
+
+             [ht::cimg images/SideLegendDisplay.gif] 
+
+      consisting of the following parts:
+
+      <ul>
+  
+      <li>A label for each display <img src="images/SideLegendLabel.gif">
+          The label includes:
+          <ul> 
+          <li>A toggle button for collapsing 
+              <img src="images/CategoryOpen.gif"> or expanding 
+              <img src="images/CategoryClosed.gif"> the display details
+          <li>A visibility checkbox <img src="images/VisibilityCheckbox.gif"> 
+              for toggling the visibility of this display,
+          <li>The name of the display <img src="images/SideLegendName.gif">.
+              Left clicking on this will bring up the the 
+              display's control window.  Right clicking will bring up the 
+              control menu.  The name of the display can be changed through
+              labels through the [ht::dialog Display Control Properties]
+              editor ([ht::menu Edit Properties]).
+          <li>A visibility toggle lock <img src="images/lock.gif"> which
+              locks/unlocks the toggling of visibility for this display.
+              [ht::visibility]</li>
+          <li>A remove button [ht::img %dotpath%images/Remove16.gif] for 
+              removing the display from the view window.
+          </ul>
+      <li>Extra descriptive information about the display.
+          <img src="images/SideLegendExtra.gif"> This may include
+          the full name of the parameter and ancillary information
+          like the vertical level.  You can add your own extra legend
+          labels through the [ht::dialog Display Control Properties]
+          editor ([ht::menu Edit Properties]).
+      <li>Color bar <img src="images/SideLegendColorBar.gif"> (optional) -
+          for colored displays, shows the color table being used and
+          the range that the colors span. Right clicking on the
+          color bar brings up a menu for changing the color table.</li>
+    
+       </ul>
+   </li>
+</ul>
+
+Things you can do with the side legend:
+
+<ol class="step">
+
+  <li><i>Toggle visibility</i> - Uncheck the visibility toggle 
+      checkbox to make the display invisible. Click again to set 
+      it visible.</li>
+
+  <li><i>Change the color table</i> - Right click on the legend color 
+      bar to bring up the color bar menu.
+      
+      <ul class="substep">
+        <li>From the menu, select the [ht::menu Solid Yellow]
+            menu item.</li>
+      </ul>
+
+  <li><i>Show the Display Control Window</i> - 
+      Right click on the display label to bring up the
+      display control menus. These menus are the same as those
+      accessible through the control window.  Select the
+      [ht::menu {Control Window}] menu item to bring the
+      control window to the foreground. </li>
+
+</ol>
+
+Now let's look at using the time animation widget.
+
+</body>
+</html>

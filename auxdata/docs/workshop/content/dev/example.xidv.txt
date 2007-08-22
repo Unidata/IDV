@@ -1,0 +1,1794 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<object class="java.util.Hashtable">
+    <method name="put">
+        <string><![CDATA[datasources]]></string>
+        <object class="java.util.ArrayList">
+            <method name="add">
+                <object class="ucar.unidata.data.point.AddePointDataSource" id="id11">
+                    <property name="Sources">
+                        <object class="java.util.ArrayList">
+                            <method name="add">
+                                <string><![CDATA[adde://adde.ucar.edu/pointdata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=RTPTSRC&descr=SFCHOURLY&select='%relative%;type 0;%latlonbox%'&num=all&pos=ALL]]></string>
+                            </method>
+                        </object>
+                    </property>
+                    <property name="Name">
+                        <string><![CDATA[Surface (METAR) Data]]></string>
+                    </property>
+                    <property name="Descriptor">
+                        <object class="ucar.unidata.data.DataSourceDescriptor">
+                            <property name="Properties">
+                                <object class="java.util.Hashtable"/>
+                            </property>
+                            <property name="Id">
+                                <string><![CDATA[adde.point]]></string>
+                            </property>
+                            <property name="DataManager">
+                                <object idref="datamanager"/>
+                            </property>
+                            <property name="Label">
+                                <string><![CDATA[Point data from an ADDE server]]></string>
+                            </property>
+                            <property name="Patterns">
+                                <string><![CDATA[adde://.*/pointdata/.*$,.*\.apt]]></string>
+                            </property>
+                            <property name="FileSelection">
+                                <boolean>true</boolean>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="Properties">
+                        <object class="java.util.Hashtable">
+                            <method name="put">
+                                <string><![CDATA[number of relative times]]></string>
+                                <parray class="int" length="1">0</parray>
+                            </method>
+                            <method name="put">
+                                <string><![CDATA[data name]]></string>
+                                <string><![CDATA[Point Data]]></string>
+                            </method>
+                            <method name="put">
+                                <string><![CDATA[name]]></string>
+                                <string><![CDATA[Surface (METAR) Data]]></string>
+                            </method>
+                            <method name="put">
+                                <string><![CDATA[prop.stationmodelname]]></string>
+                                <string><![CDATA[METAR]]></string>
+                            </method>
+                            <method name="put">
+                                <string><![CDATA[idv.data.autocreatedisplay]]></string>
+                                <string><![CDATA[stationmodelcontrol]]></string>
+                            </method>
+                            <method name="put">
+                                <string><![CDATA[relative time increment]]></string>
+                                <java.lang.Float>1.0</java.lang.Float>
+                            </method>
+                        </object>
+                    </property>
+                    <property name="Description">
+                        <string><![CDATA[Surface (METAR) Data]]></string>
+                    </property>
+                    <property name="DataSelection">
+                        <object class="ucar.unidata.data.DataSelection">
+                            <property name="GeoSelection">
+                                <object class="ucar.unidata.data.GeoSelection"/>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="PollingInfo">
+                        <object class="ucar.unidata.util.PollingInfo">
+                            <property name="ForFiles">
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="FilePattern">
+                                <string><![CDATA[adde://.*/pointdata/.*$,.*\.apt]]></string>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="UniqueId">
+                        <string><![CDATA[sharable_1179850657941_0_7017549157458263_10]]></string>
+                    </property>
+                </object>
+            </method>
+        </object>
+    </method>
+    <method name="put">
+        <string><![CDATA[version]]></string>
+        <string><![CDATA[2.2b1]]></string>
+    </method>
+    <method name="put">
+        <string><![CDATA[windows]]></string>
+        <object class="java.util.ArrayList">
+            <method name="add">
+                <object class="ucar.unidata.idv.ui.WindowInfo">
+                    <property name="ViewManagers">
+                        <object class="java.util.ArrayList">
+                            <method name="add">
+                                <object class="ucar.unidata.idv.MapViewManager" id="id15">
+                                    <property name="MainProjection">
+                                        <object class="visad.georef.TrivialMapProjection">
+                                            <constructor>
+                                                <object class="visad.RealTupleType">
+                                                    <constructor>
+                                                        <array class="visad.RealType" length="2">
+                                                            <object class="visad.data.netcdf.Quantity">
+                                                                <object class="java.util.ArrayList">
+                                                                    <method name="add">
+                                                                        <string><![CDATA[Longitude]]></string>
+                                                                    </method>
+                                                                    <method name="add">
+                                                                        <object class="visad.ScaledUnit" id="id17" name="deg">
+                                                                            <string><![CDATA[0.017453292519943295 rad]]></string>
+                                                                        </object>
+                                                                    </method>
+                                                                    <method name="add">
+                                                                        <null/>
+                                                                    </method>
+                                                                    <method name="add">
+                                                                        <java.lang.Integer>0</java.lang.Integer>
+                                                                    </method>
+                                                                </object>
+                                                            </object>
+                                                            <object class="visad.data.netcdf.Quantity">
+                                                                <object class="java.util.ArrayList">
+                                                                    <method name="add">
+                                                                        <string><![CDATA[Latitude]]></string>
+                                                                    </method>
+                                                                    <method name="add">
+                                                                        <object idref="id17"/>
+                                                                    </method>
+                                                                    <method name="add">
+                                                                        <null/>
+                                                                    </method>
+                                                                    <method name="add">
+                                                                        <java.lang.Integer>0</java.lang.Integer>
+                                                                    </method>
+                                                                </object>
+                                                            </object>
+                                                        </array>
+                                                        <null class="visad.CoordinateSystem"/>
+                                                        <null class="visad.Set"/>
+                                                    </constructor>
+                                                </object>
+                                                <object class="java.awt.geom.Rectangle2D$Float">
+                                                    <constructor>
+                                                        <float>-177.3666</float>
+                                                        <float>-90.0</float>
+                                                        <float>355.9332</float>
+                                                        <float>180.0</float>
+                                                    </constructor>
+                                                </object>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="MainProjectionName">
+                                        <string><![CDATA[TrivialMapProjection from: Point Data Plot Control]]></string>
+                                    </property>
+                                    <property name="VerticalRangeUnit">
+                                        <object class="visad.BaseUnit" name="m">
+                                            <string><![CDATA[m]]></string>
+                                        </object>
+                                    </property>
+                                    <property name="VerticalRange">
+                                        <parray class="double" length="2">0.0,16000.0</parray>
+                                    </property>
+                                    <property name="Idv">
+                                        <object idref="idv"/>
+                                    </property>
+                                    <property name="Background">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>0</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Foreground">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>255</int>
+                                                <int>255</int>
+                                                <int>255</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="UniqueId">
+                                        <string><![CDATA[view_1179850657941_0_7017549157458263_6]]></string>
+                                    </property>
+                                    <property name="DisplayListColor">
+                                        <null class="java.awt.Color"/>
+                                    </property>
+                                    <property name="AnimationInfo">
+                                        <object class="ucar.visad.display.AnimationInfo">
+                                            <property name="AnimationSetInfo">
+                                                <object class="ucar.visad.display.AnimationSetInfo"/>
+                                            </property>
+                                        </object>
+                                    </property>
+                                    <property name="DisplayListFont">
+                                        <object class="java.awt.Font">
+                                            <constructor>
+                                                <string><![CDATA[Default]]></string>
+                                                <int>0</int>
+                                                <int>12</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="ViewDescriptor">
+                                        <object class="ucar.unidata.idv.ViewDescriptor" id="id30">
+                                            <property name="Name">
+                                                <string><![CDATA[view_1179850657941_0_7017549157458263_6]]></string>
+                                            </property>
+                                        </object>
+                                    </property>
+                                    <property name="Aliases">
+                                        <object class="java.util.ArrayList">
+                                            <method name="add">
+                                                <object idref="id30"/>
+                                            </method>
+                                        </object>
+                                    </property>
+                                    <property name="AnimationStringVisible">
+                                        <boolean>true</boolean>
+                                    </property>
+                                    <property name="BooleanPropertiesForPersistence">
+                                        <object class="java.util.Hashtable">
+                                            <method name="put">
+                                                <string><![CDATA[View.ShowCursor]]></string>
+                                                <java.lang.Boolean>true</java.lang.Boolean>
+                                            </method>
+                                            <method name="put">
+                                                <string><![CDATA[View.WaitVisible]]></string>
+                                                <java.lang.Boolean>true</java.lang.Boolean>
+                                            </method>
+                                            <method name="put">
+                                                <string><![CDATA[View.AniReadout]]></string>
+                                                <java.lang.Boolean>true</java.lang.Boolean>
+                                            </method>
+                                            <method name="put">
+                                                <string><![CDATA[View.ShowEarthNavPanel]]></string>
+                                                <java.lang.Boolean>false</java.lang.Boolean>
+                                            </method>
+                                            <method name="put">
+                                                <string><![CDATA[View.Wireframe]]></string>
+                                                <java.lang.Boolean>true</java.lang.Boolean>
+                                            </method>
+                                            <method name="put">
+                                                <string><![CDATA[View.ShareViews]]></string>
+                                                <java.lang.Boolean>false</java.lang.Boolean>
+                                            </method>
+                                            <method name="put">
+                                                <string><![CDATA[View.PerspectiveView]]></string>
+                                                <java.lang.Boolean>false</java.lang.Boolean>
+                                            </method>
+                                            <method name="put">
+                                                <string><![CDATA[View.3Dclip]]></string>
+                                                <java.lang.Boolean>false</java.lang.Boolean>
+                                            </method>
+                                            <method name="put">
+                                                <string><![CDATA[View.AutoRotate]]></string>
+                                                <java.lang.Boolean>false</java.lang.Boolean>
+                                            </method>
+                                            <method name="put">
+                                                <string><![CDATA[View.UseFromData]]></string>
+                                                <java.lang.Boolean>true</java.lang.Boolean>
+                                            </method>
+                                            <method name="put">
+                                                <string><![CDATA[View.ShowScales]]></string>
+                                                <java.lang.Boolean>false</java.lang.Boolean>
+                                            </method>
+                                            <method name="put">
+                                                <string><![CDATA[View.ShowDisplayList]]></string>
+                                                <java.lang.Boolean>true</java.lang.Boolean>
+                                            </method>
+                                        </object>
+                                    </property>
+                                    <property name="HasWindow">
+                                        <boolean>true</boolean>
+                                    </property>
+                                    <property name="SideDividerLocation">
+                                        <int>639</int>
+                                    </property>
+                                    <property name="SideLegend">
+                                        <object class="ucar.unidata.idv.ui.SideLegend">
+                                            <property name="CategoryToPanelOpen">
+                                                <object class="java.util.Hashtable">
+                                                    <method name="put">
+                                                        <string><![CDATA[Point Data]]></string>
+                                                        <java.lang.Boolean>true</java.lang.Boolean>
+                                                    </method>
+                                                    <method name="put">
+                                                        <string><![CDATA[Maps]]></string>
+                                                        <java.lang.Boolean>true</java.lang.Boolean>
+                                                    </method>
+                                                </object>
+                                            </property>
+                                        </object>
+                                    </property>
+                                    <property name="DisplayBounds">
+                                        <object class="java.awt.Rectangle">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>0</int>
+                                                <int>630</int>
+                                                <int>462</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="DisplayMatrix">
+                                        <parray class="double" length="16">1.1843677130889896,0.0,0.0,0.0,0.0,0.5989500000000002,0.0,0.0,0.0,0.0,0.23958000000000007,0.0,0.0,0.0,0.0,1.0</parray>
+                                    </property>
+                                    <property name="AniReadout">
+                                        <boolean>true</boolean>
+                                    </property>
+                                </object>
+                            </method>
+                        </object>
+                    </property>
+                    <property name="Bounds">
+                        <object class="java.awt.Rectangle">
+                            <constructor>
+                                <int>79</int>
+                                <int>92</int>
+                                <int>897</int>
+                                <int>603</int>
+                            </constructor>
+                        </object>
+                    </property>
+                    <property name="Title">
+                        <string><![CDATA[Unidata IDV - Map Display - One Pane]]></string>
+                    </property>
+                    <property name="SkinPath">
+                        <string><![CDATA[/ucar/unidata/idv/resources/skins/skin.xml]]></string>
+                    </property>
+                    <property name="IsAMainWindow">
+                        <boolean>true</boolean>
+                    </property>
+                </object>
+            </method>
+        </object>
+    </method>
+    <method name="put">
+        <string><![CDATA[viewmanagers]]></string>
+        <object class="java.util.ArrayList">
+            <method name="add">
+                <object idref="id15"/>
+            </method>
+        </object>
+    </method>
+    <method name="put">
+        <string><![CDATA[displaycontrols]]></string>
+        <object class="java.util.ArrayList">
+            <method name="add">
+                <object class="ucar.unidata.idv.control.MapDisplayControl">
+                    <property name="InitialMap">
+                        <string><![CDATA[/auxdata/maps/OUTLSUPW]]></string>
+                    </property>
+                    <property name="InitialMapDescription">
+                        <string><![CDATA[World Coastlines]]></string>
+                    </property>
+                    <property name="MapStates">
+                        <object class="java.util.ArrayList">
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[US zones, NWS]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/gempak_maps_dir/aschiznus.nws]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Climate Zones]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[US CPC Climate Zones]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/gempak_maps_dir/asctpczus.cpc]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Climate Zones]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[US Palmer Climate Zones]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/gempak_maps_dir/asctppzus.cpc]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Climate Zones]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Austria]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/europemaps_dir/austria.shp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Europe]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Belgium]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/europemaps_dir/belgium.shp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Europe]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Czech]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/europemaps_dir/czech.shp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Europe]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Denmark]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/europemaps_dir/denmark.shp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Europe]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Finland]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/europemaps_dir/finland.shp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Europe]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[France]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/europemaps_dir/france.shp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Europe]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Germany]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/europemaps_dir/germany.shp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Europe]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Hungary]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/europemaps_dir/hungary.shp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Europe]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Italy]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/europemaps_dir/italy.shp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Europe]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Norway]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/europemaps_dir/norway.shp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Europe]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Portugal]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/europemaps_dir/portugal.shp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Europe]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Provinces]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/europemaps_dir/provinces.shp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Europe]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Spain]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/europemaps_dir/spain.shp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Europe]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Sweden]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/europemaps_dir/sweden.shp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Europe]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Switzerland]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/europemaps_dir/switzerland.shp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Europe]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[UK]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/europemaps_dir/uk.shp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Europe]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[East Pacific Products]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/gempak_intl_dir/ascmefbpe.ncp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Pacific and Atlantic Products]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[North Pacific Products]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/gempak_intl_dir/ascmefbpn.ncp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Pacific and Atlantic Products]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[North Atlantic Products]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/gempak_intl_dir/ascmefban.ncp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Pacific and Atlantic Products]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Pacific Surface Products]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/gempak_intl_dir/ascmefbps.ncp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Pacific and Atlantic Products]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Pacific SFC Anal Part 1]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/gempak_intl_dir/ascmefbp1.ncp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Pacific and Atlantic Products]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Pacific SFC Anal Part 2]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/gempak_intl_dir/ascmefbp2.ncp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Pacific and Atlantic Products]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Atlantic SFC Anal Part 1]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/gempak_intl_dir/ascmefba1.ncp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Pacific and Atlantic Products]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Atlantic SFC Anal Part 2]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/gempak_intl_dir/ascmefba2.ncp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Pacific and Atlantic Products]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[High Seas Forecast Areas]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/gempak_forecast_dir/ascmehsuo.ncp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Offshore Forecast Areas]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Regional Sea Fcst Areas]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/gempak_forecast_dir/ascmereuo.ncp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Offshore Forecast Areas]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Offshore Forecast Areas]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/gempak_forecast_dir/aschiosuo.nws]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Offshore Forecast Areas]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Offshore Forecast OPC]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/gempak_forecast_dir/aschimouo.nws]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Offshore Forecast Areas]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[North America Fcst Bnds]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/gempak_forecast_dir/ascmefbna.ncp]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Category">
+                                        <string><![CDATA[Offshore Forecast Areas]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[World Coastlines]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/auxdata/maps/OUTLSUPW]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>204</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="Visible">
+                                        <boolean>true</boolean>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[World Political Boundaries]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/auxdata/maps/OUTLHPOL]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>255</int>
+                                                <int>0</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="LineStyle">
+                                        <int>3</int>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[World Country Outlines]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/auxdata/maps/Countries.zip]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>0</int>
+                                                <int>255</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[North & Central America]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/auxdata/maps/OUTLUSAM]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>0</int>
+                                                <int>255</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[Hi-Res US]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/auxdata/maps/OUTLSUPU]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>0</int>
+                                                <int>255</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[U.S. County Outlines]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/auxdata/maps/OUTLCNTY]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>255</int>
+                                                <int>0</int>
+                                                <int>0</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                    <property name="FastRendering">
+                                        <boolean>true</boolean>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.MapDisplayControl$MapState">
+                                    <property name="Description">
+                                        <string><![CDATA[US Interstate Highways]]></string>
+                                    </property>
+                                    <property name="Source">
+                                        <string><![CDATA[/auxdata/maps/OUTUSINT]]></string>
+                                    </property>
+                                    <property name="Color">
+                                        <object class="java.awt.Color">
+                                            <constructor>
+                                                <int>0</int>
+                                                <int>255</int>
+                                                <int>255</int>
+                                            </constructor>
+                                        </object>
+                                    </property>
+                                </object>
+                            </method>
+                        </object>
+                    </property>
+                    <property name="LatState">
+                        <object class="ucar.unidata.idv.control.MapDisplayControl$LatLonState">
+                            <property name="Color">
+                                <object class="java.awt.Color" id="id120">
+                                    <constructor>
+                                        <int>128</int>
+                                        <int>128</int>
+                                        <int>128</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="MaxValue">
+                                <float>90.0</float>
+                            </property>
+                            <property name="MinValue">
+                                <float>-90.0</float>
+                            </property>
+                            <property name="Visible">
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="LineWidth">
+                                <float>1.0</float>
+                            </property>
+                            <property name="LineStyle">
+                                <int>1</int>
+                            </property>
+                            <property name="Spacing">
+                                <float>15.0</float>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="LonState">
+                        <object class="ucar.unidata.idv.control.MapDisplayControl$LatLonState">
+                            <property name="Color">
+                                <object idref="id120"/>
+                            </property>
+                            <property name="MaxValue">
+                                <float>180.0</float>
+                            </property>
+                            <property name="MinValue">
+                                <float>-180.0</float>
+                            </property>
+                            <property name="Visible">
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="LineWidth">
+                                <float>1.0</float>
+                            </property>
+                            <property name="LineStyle">
+                                <int>1</int>
+                            </property>
+                            <property name="Spacing">
+                                <float>15.0</float>
+                            </property>
+                            <property name="IsLatitude">
+                                <boolean>false</boolean>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="IsDefaultMap">
+                        <boolean>true</boolean>
+                    </property>
+                    <property name="DisplayName">
+                        <string><![CDATA[Default Background Maps]]></string>
+                    </property>
+                    <property name="CanDoRemoveAll">
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="DataChoices">
+                        <object class="java.util.ArrayList" id="id122"/>
+                    </property>
+                    <property name="Categories">
+                        <object class="java.util.ArrayList">
+                            <method name="add">
+                                <object class="ucar.unidata.data.DataCategory">
+                                    <property name="Name">
+                                        <string><![CDATA[MAP]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.data.DataCategory">
+                                    <property name="Name">
+                                        <string><![CDATA[display:mapdisplay]]></string>
+                                    </property>
+                                    <property name="ForDisplay">
+                                        <boolean>false</boolean>
+                                    </property>
+                                </object>
+                            </method>
+                        </object>
+                    </property>
+                    <property name="DisplayCategory">
+                        <string><![CDATA[Maps]]></string>
+                    </property>
+                    <property name="DisplayId">
+                        <string><![CDATA[mapdisplay]]></string>
+                    </property>
+                    <property name="InitDataChoices">
+                        <object idref="id122"/>
+                    </property>
+                    <property name="Viewer">
+                        <object idref="idv"/>
+                    </property>
+                    <property name="MakeWindow">
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="MainPanelSize">
+                        <object class="java.awt.Dimension">
+                            <constructor>
+                                <int>594</int>
+                                <int>233</int>
+                            </constructor>
+                        </object>
+                    </property>
+                    <property name="DefaultView">
+                        <string><![CDATA[view_1179850657941_0_7017549157458263_6]]></string>
+                    </property>
+                    <property name="ColorScaleInfo">
+                        <object class="ucar.visad.display.ColorScaleInfo">
+                            <property name="Name">
+                                <string null="true"/>
+                            </property>
+                            <property name="LabelColor">
+                                <object class="java.awt.Color">
+                                    <constructor>
+                                        <int>192</int>
+                                        <int>192</int>
+                                        <int>192</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="ZPosition">
+                        <double>-1.0</double>
+                    </property>
+                    <property name="ViewManagerClassNames">
+                        <string><![CDATA[ucar.unidata.idv.MapViewManager]]></string>
+                    </property>
+                    <property name="DisplayListTemplate">
+                        <string><![CDATA[%displayname%]]></string>
+                    </property>
+                    <property name="LegendLabelTemplate">
+                        <string><![CDATA[%displayname%]]></string>
+                    </property>
+                    <property name="UniqueId">
+                        <string><![CDATA[sharable_1179859956959_0_4849744125202762_16]]></string>
+                    </property>
+                </object>
+            </method>
+            <method name="add">
+                <object class="ucar.unidata.idv.control.StationModelControl" id="id129">
+                    <property name="StationModelName">
+                        <string><![CDATA[METAR2]]></string>
+                    </property>
+                    <property name="TimeSeries">
+                        <object class="ucar.unidata.idv.control.chart.TimeSeriesChart" id="id130">
+                            <property name="ShowAnimationTime">
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Control">
+                                <object idref="id129"/>
+                            </property>
+                            <property name="ChartHolders">
+                                <object class="java.util.ArrayList">
+                                    <method name="add">
+                                        <object class="ucar.unidata.idv.control.chart.ChartHolder">
+                                            <property name="Name">
+                                                <string><![CDATA[Station Model]]></string>
+                                            </property>
+                                            <property name="PreferredSize">
+                                                <object class="java.awt.Dimension">
+                                                    <constructor>
+                                                        <int>300</int>
+                                                        <int>200</int>
+                                                    </constructor>
+                                                </object>
+                                            </property>
+                                            <property name="DomainLineState">
+                                                <object class="ucar.unidata.idv.control.chart.LineState"/>
+                                            </property>
+                                            <property name="RangeLineState">
+                                                <object class="ucar.unidata.idv.control.chart.LineState"/>
+                                            </property>
+                                            <property name="ChartManager">
+                                                <object idref="id130"/>
+                                            </property>
+                                        </object>
+                                    </method>
+                                </object>
+                            </property>
+                            <property name="ShowThumb">
+                                <boolean>true</boolean>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="TheStationModel">
+                        <object class="ucar.unidata.ui.symbol.StationModel">
+                            <property name="Name">
+                                <string><![CDATA[METAR2]]></string>
+                            </property>
+                            <property name="List">
+                                <object class="java.util.ArrayList">
+                                    <method name="add">
+                                        <object class="ucar.unidata.ui.symbol.MappedShapeSymbol">
+                                            <property name="ShapeMappings">
+                                                <object class="java.util.ArrayList">
+                                                    <method name="add">
+                                                        <object class="ucar.unidata.ui.symbol.ShapeMap">
+                                                            <property name="Shape">
+                                                                <string><![CDATA[PIN]]></string>
+                                                            </property>
+                                                            <property name="Pattern">
+                                                                <string><![CDATA[0,10]]></string>
+                                                            </property>
+                                                        </object>
+                                                    </method>
+                                                    <method name="add">
+                                                        <object class="ucar.unidata.ui.symbol.ShapeMap">
+                                                            <property name="Shape">
+                                                                <string><![CDATA[SQUARE]]></string>
+                                                            </property>
+                                                            <property name="Pattern">
+                                                                <string><![CDATA[10,20]]></string>
+                                                            </property>
+                                                        </object>
+                                                    </method>
+                                                    <method name="add">
+                                                        <object class="ucar.unidata.ui.symbol.ShapeMap">
+                                                            <property name="Shape">
+                                                                <string><![CDATA[CROSS]]></string>
+                                                            </property>
+                                                            <property name="Pattern">
+                                                                <string><![CDATA[20,30]]></string>
+                                                            </property>
+                                                        </object>
+                                                    </method>
+                                                    <method name="add">
+                                                        <object class="ucar.unidata.ui.symbol.ShapeMap">
+                                                            <property name="Shape">
+                                                                <string><![CDATA[TRIANGLE]]></string>
+                                                            </property>
+                                                            <property name="Pattern">
+                                                                <string><![CDATA[30,300]]></string>
+                                                            </property>
+                                                        </object>
+                                                    </method>
+                                                    <method name="add">
+                                                        <object class="ucar.unidata.ui.symbol.ShapeMap">
+                                                            <property name="Shape">
+                                                                <string><![CDATA[FILLED_TRIANGLE]]></string>
+                                                            </property>
+                                                            <property name="Pattern">
+                                                                <string><![CDATA[-100,0]]></string>
+                                                            </property>
+                                                        </object>
+                                                    </method>
+                                                </object>
+                                            </property>
+                                            <property name="Shape">
+                                                <string><![CDATA[SQUARE]]></string>
+                                            </property>
+                                            <property name="ShapeType">
+                                                <string><![CDATA[line]]></string>
+                                            </property>
+                                            <property name="ParamIds">
+                                                <array class="string" length="1">
+                                                    <string><![CDATA[TEMP]]></string>
+                                                </array>
+                                            </property>
+                                            <property name="ParamDescs">
+                                                <array class="string" length="1">
+                                                    <string><![CDATA[Parameter]]></string>
+                                                </array>
+                                            </property>
+                                            <property name="RotateXInfo">
+                                                <object class="ucar.unidata.ui.symbol.RotateInfo"/>
+                                            </property>
+                                            <property name="RotateYInfo">
+                                                <object class="ucar.unidata.ui.symbol.RotateInfo">
+                                                    <property name="Type">
+                                                        <int>1</int>
+                                                    </property>
+                                                </object>
+                                            </property>
+                                            <property name="RotateZInfo">
+                                                <object class="ucar.unidata.ui.symbol.RotateInfo">
+                                                    <property name="Type">
+                                                        <int>2</int>
+                                                    </property>
+                                                </object>
+                                            </property>
+                                            <property name="ColorMappings">
+                                                <object class="java.util.ArrayList"/>
+                                            </property>
+                                            <property name="DisplayUnitName">
+                                                <string><![CDATA[Celsius]]></string>
+                                            </property>
+                                            <property name="Id">
+                                                <string><![CDATA[ID-1179850668843-0]]></string>
+                                            </property>
+                                            <property name="Foreground">
+                                                <object class="java.awt.Color">
+                                                    <constructor>
+                                                        <int>255</int>
+                                                        <int>0</int>
+                                                        <int>255</int>
+                                                    </constructor>
+                                                </object>
+                                            </property>
+                                            <property name="Filled">
+                                                <boolean>true</boolean>
+                                            </property>
+                                            <property name="BeingCreated">
+                                                <boolean>false</boolean>
+                                            </property>
+                                            <field name="bounds">
+                                                <object class="java.awt.Rectangle">
+                                                    <constructor>
+                                                        <int>-21</int>
+                                                        <int>-22</int>
+                                                        <int>40</int>
+                                                        <int>40</int>
+                                                    </constructor>
+                                                </object>
+                                            </field>
+                                            <field name="underline">
+                                                <java.lang.Boolean>false</java.lang.Boolean>
+                                            </field>
+                                            <field name="url">
+                                                <null/>
+                                            </field>
+                                            <field name="baseline">
+                                                <java.lang.Integer>0</java.lang.Integer>
+                                            </field>
+                                        </object>
+                                    </method>
+                                </object>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="ChartParams">
+                        <object class="java.util.ArrayList">
+                            <method name="add">
+                                <object class="ucar.unidata.idv.control.chart.PointParam">
+                                    <property name="LineState">
+                                        <object class="ucar.unidata.idv.control.chart.LineState">
+                                            <property name="Name">
+                                                <string><![CDATA[T]]></string>
+                                            </property>
+                                            <property name="Color">
+                                                <object class="java.awt.Color">
+                                                    <constructor>
+                                                        <int>255</int>
+                                                        <int>0</int>
+                                                        <int>0</int>
+                                                    </constructor>
+                                                </object>
+                                            </property>
+                                            <property name="ChartName">
+                                                <string><![CDATA[Station Model]]></string>
+                                            </property>
+                                        </object>
+                                    </property>
+                                </object>
+                            </method>
+                        </object>
+                    </property>
+                    <property name="DisplayName">
+                        <string><![CDATA[Point Data Plot Control]]></string>
+                    </property>
+                    <property name="Version">
+                        <double>1.3</double>
+                    </property>
+                    <property name="DataChoices">
+                        <object class="java.util.ArrayList" id="id155">
+                            <method name="add">
+                                <object class="ucar.unidata.data.DirectDataChoice">
+                                    <property name="DataSource">
+                                        <object idref="id11"/>
+                                    </property>
+                                    <property name="Name">
+                                        <string><![CDATA[Surface (METAR) Data]]></string>
+                                    </property>
+                                    <property name="Properties">
+                                        <object class="java.util.Hashtable">
+                                            <method name="put">
+                                                <string><![CDATA[prop.icon]]></string>
+                                                <string><![CDATA[/auxdata/ui/icons/Placemark16.gif]]></string>
+                                            </method>
+                                            <method name="put">
+                                                <string><![CDATA[prop.stationmodelname]]></string>
+                                                <string><![CDATA[METAR]]></string>
+                                            </method>
+                                        </object>
+                                    </property>
+                                    <property name="Id">
+                                        <string><![CDATA[adde://adde.ucar.edu/pointdata?compress=gzip&port=112&debug=false&version=1&user=idv&proj=0&group=RTPTSRC&descr=SFCHOURLY&select='%relative%;type 0;%latlonbox%'&num=all&pos=ALL]]></string>
+                                    </property>
+                                    <property name="Description">
+                                        <string><![CDATA[Point Data]]></string>
+                                    </property>
+                                    <property name="FixedRequestProperties">
+                                        <object class="java.util.Hashtable">
+                                            <method name="put">
+                                                <string><![CDATA[prop.requester]]></string>
+                                                <object idref="id129"/>
+                                            </method>
+                                        </object>
+                                    </property>
+                                    <property name="Categories">
+                                        <object class="java.util.ArrayList">
+                                            <method name="add">
+                                                <object class="ucar.unidata.data.DataCategory" id="id160">
+                                                    <property name="Name">
+                                                        <string><![CDATA[POINT]]></string>
+                                                    </property>
+                                                    <property name="ForDisplay">
+                                                        <boolean>false</boolean>
+                                                    </property>
+                                                </object>
+                                            </method>
+                                            <method name="add">
+                                                <object class="ucar.unidata.data.DataCategory" id="id161">
+                                                    <property name="Name">
+                                                        <string><![CDATA[PointPlot]]></string>
+                                                    </property>
+                                                    <property name="ForDisplay">
+                                                        <boolean>false</boolean>
+                                                    </property>
+                                                </object>
+                                            </method>
+                                            <method name="add">
+                                                <object class="ucar.unidata.data.DataCategory" id="id162">
+                                                    <property name="Name">
+                                                        <string><![CDATA[param:Surface (METAR) Data]]></string>
+                                                    </property>
+                                                    <property name="ForDisplay">
+                                                        <boolean>false</boolean>
+                                                    </property>
+                                                </object>
+                                            </method>
+                                        </object>
+                                    </property>
+                                    <property name="DataCategories">
+                                        <object class="java.util.ArrayList">
+                                            <method name="add">
+                                                <object idref="id160"/>
+                                            </method>
+                                            <method name="add">
+                                                <object idref="id161"/>
+                                            </method>
+                                            <method name="add">
+                                                <object idref="id162"/>
+                                            </method>
+                                        </object>
+                                    </property>
+                                </object>
+                            </method>
+                        </object>
+                    </property>
+                    <property name="Categories">
+                        <object class="java.util.ArrayList">
+                            <method name="add">
+                                <object class="ucar.unidata.data.DataCategory">
+                                    <property name="Name">
+                                        <string><![CDATA[POINT]]></string>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.data.DataCategory">
+                                    <property name="Name">
+                                        <string><![CDATA[StationPlot]]></string>
+                                    </property>
+                                    <property name="ForDisplay">
+                                        <boolean>false</boolean>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.data.DataCategory">
+                                    <property name="Name">
+                                        <string><![CDATA[PointPlot]]></string>
+                                    </property>
+                                    <property name="ForDisplay">
+                                        <boolean>false</boolean>
+                                    </property>
+                                </object>
+                            </method>
+                            <method name="add">
+                                <object class="ucar.unidata.data.DataCategory">
+                                    <property name="Name">
+                                        <string><![CDATA[display:stationmodelcontrol]]></string>
+                                    </property>
+                                    <property name="ForDisplay">
+                                        <boolean>false</boolean>
+                                    </property>
+                                </object>
+                            </method>
+                        </object>
+                    </property>
+                    <property name="DisplayCategory">
+                        <string><![CDATA[Point Data]]></string>
+                    </property>
+                    <property name="DisplayId">
+                        <string><![CDATA[stationmodelcontrol]]></string>
+                    </property>
+                    <property name="InitDataChoices">
+                        <object idref="id155"/>
+                    </property>
+                    <property name="Viewer">
+                        <object idref="idv"/>
+                    </property>
+                    <property name="MakeWindow">
+                        <boolean>false</boolean>
+                    </property>
+                    <property name="MainPanelSize">
+                        <object class="java.awt.Dimension">
+                            <constructor>
+                                <int>594</int>
+                                <int>354</int>
+                            </constructor>
+                        </object>
+                    </property>
+                    <property name="DefaultView">
+                        <string><![CDATA[view_1179850657941_0_7017549157458263_6]]></string>
+                    </property>
+                    <property name="DisplayListColor">
+                        <object class="java.awt.Color">
+                            <constructor>
+                                <int>255</int>
+                                <int>0</int>
+                                <int>0</int>
+                            </constructor>
+                        </object>
+                    </property>
+                    <property name="ColorScaleInfo">
+                        <object class="ucar.visad.display.ColorScaleInfo">
+                            <property name="Name">
+                                <string><![CDATA[Surface (METAR) Data]]></string>
+                            </property>
+                            <property name="LabelColor">
+                                <object class="java.awt.Color">
+                                    <constructor>
+                                        <int>192</int>
+                                        <int>192</int>
+                                        <int>192</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="HadDataChoices">
+                        <boolean>true</boolean>
+                    </property>
+                    <property name="ZPosition">
+                        <double>-1.0</double>
+                    </property>
+                    <property name="DisplayListTemplate">
+                        <string><![CDATA[%shortname% - %displayname% %timestamp%]]></string>
+                    </property>
+                    <property name="LegendLabelTemplate">
+                        <string><![CDATA[%shortname% - %displayname%]]></string>
+                    </property>
+                    <property name="UniqueId">
+                        <string><![CDATA[sharable_1179850657941_0_7017549157458263_19]]></string>
+                    </property>
+                </object>
+            </method>
+        </object>
+    </method>
+</object>

@@ -1,0 +1,70 @@
+<html>
+<head>
+<title>Locations</title>
+</head>
+
+<body>
+
+
+<div class="overview">
+The IDV provides  a large location database.
+</div>
+
+<ol class="step">
+
+<li> Clear all data and displays.
+
+<li> First, turn on the states map and change projection to Colorado.
+<ul>
+<li> Bring up the control window for the  [ht::display Background Maps]
+<li> Select [ht::qt Hi-Res US] and close the window.
+<li> Change projection  to the Colorado projection with the
+[ht::menu Projections Set US States West Colorado] menu item.
+</ul>
+
+<li> We're going to look at Colorado summits.
+<ul>
+<li> Select [ht::dataset Summits] from the 
+[ht::menu Displays Locations {State locations} C Colorado {Land features}] menu.
+<li> The [ht::display Location] display control either shows
+locations with a label/shape or with a station model. 
+Select the [ht::button Station Model] button and, if not selected,
+select the [ht::command Location] station model by pressing
+the [ht::button Change] button.
+<li> Turn off decluttering.
+<li> Things are really cluttered. Let's use a different
+station model. Select the [ht::command Point] station model.
+</ul>
+
+<li> Let's only look at summits greater than 14000 feet.
+<ul>
+<li> First, lets find out what properties these locations have. Click on 
+a point to see the properties in the [ht::command Locations] tab. 
+
+<li> Select the [ht::command Filters] tab.
+<li> Under property select [ht::param elev]
+<li> Select &quot;&gt;&quot;
+<li> Enter 14000 for the value.
+<li> Press [ht::button Apply Filters]
+<li> Now, switch back to the [ht::command Location] station model.
+</ul>
+
+
+<li> Let's look at some volcanoes
+<ul>
+<li> Clear all data and displays and select
+<li> Select [ht::menu Displays Locations Earth Volcanos]
+<li> Float the Locations display control window
+with the menu [ht::menu View {Undock From Dashboard}].
+<li> Under the [ht::command Display:] [ht::command Predefined:] change [ht::command Id:] to &quot;Name&quot;
+<li> Select the [ht::button Locations] tab to see a list of locations.
+<li> Click on a row to view different volcanos. Shift-click to zoom in. Control-click to zoom out.
+<li> Add the real-time USGS earthquake list with [ht::menu Displays Locations Earth Earthquakes].
+</ul>
+
+</ol>
+
+
+
+</body>
+</html>

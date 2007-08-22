@@ -1,0 +1,44 @@
+<html>
+<head>
+<title>WorldWind Locations</title>
+</head>
+
+<body>
+
+
+<div class="overview">
+NASA'S WorldWind program comes with a tiled location database that allows for
+progressive disclosure of locations as you zoom in. The IDV makes use
+of this database.
+</div>
+
+<ol class="step">
+
+<li> Start fresh by clearing all displays and data [ht::refresh] and go
+to a CONUS projection ([ht::menu Projections Set US CONUS] menu item).
+
+<li> Create the [ht::display WorldWind] display control
+from the [ht::menu Displays Special {WorldWind Locations}] menu item. 
+
+<li> This is just like the [ht::display Location ] display control except it progressively discloses more detailed locations
+as you zoom.
+
+<li> Zoom into Colorado and watch how the display changes.
+
+<li> Zoom into Boulder. Remember, if things go blank you just zoomed
+past the surface of the Earth. Use the [ht::menu Projections Set {Use Displayed Area}] menu item to reset the projection.
+
+<li> Add a [ht::display Background Image] and change the layer
+to [ht::param Urban Area]. 
+
+<li> Keep zooming. 
+
+<li> Remove the [ht::display Background Image] display control.
+
+<li> Change projections to some other part of the world  and see what is listed. 
+
+
+</ol>
+
+</body>
+</html>

@@ -1,0 +1,205 @@
+<html>
+<head>
+<title>Jython Methods</title>
+</head>
+
+<body>
+
+[ht::desc How to Create and Use Jython-based Computations]
+
+
+
+You have seen how to compute wind speed from u and v wind components,
+using the [ht::popup "../formulas/SimpleFormulas.html" "Formulas"]
+facility. IDV formulas are actually code in the Jython language. If your
+calculations require more than a one-line mathematical expression you
+can create Jython methods to make calculations then you can call these
+methods in a formula. Here is an example of computing wind speed with a
+four-line method.
+
+
+<ol class="step">
+
+<li>Invoking the Jython Library and Editor</li>
+  <ul class="substep">
+    <li>
+    Click on the main menu item 
+    [ht::menu Edit Formulas {Jython Library}]
+    to bring up the  [ht::dialog Jython Libraries] Editor
+  </ul>
+</li>
+
+
+
+<p>The Jython Library window has two or more panes selected by the tabs
+at the top. Only the &quot;User's Library&quot is editable; the others
+came from the site path and system defaults.</p>
+
+<popup label="How to Edit in the Jython Library">
+The user library pane is an editor window you can type in. It
+uses simple mouse actions to move the insertion point and 
+mark areas for cut and paste. Drag the mouse to highlight; use the
+delete or backspace key
+to remove highlighted text, and middle mouse button to paste.
+</popup>
+
+and for more info see 
+
+
+<details link="How to write a Jython Method">
+<p>
+ A Jython method starts with the word <b>def</b>. The first line
+includes the method name and argument list, and <b>ends with a
+colon</b>. Method names are, by convention, descriptive with each first
+letter of a word in upper case, except the first letter in the method name
+is always lower case.  Using this convention means others can use
+your code with less trouble. Do not omit the final colon 
+on this line.
+<p>
+Method documentation, which is optional but highly
+recommended, is enclosed in sets of triple quotes beginning in the
+first line
+after "def." with first line setting the indent level for the
+method.   Regular comment lines begin with #, and can be located anywhere.
+<p>
+Code blocks correspond to the same level of indentation, such as
+the code block in these methods. There is no extra end-of-line
+character. There  is no declaration of new variables, you simply use variables
+as needed and the type of data is deduced by Jython from the context.
+<p>
+Indentation must be the same in Jython code blocks or it will not
+run, or fail to run correctly. 
+How many spaces you use for a code block indent is
+up to you, but must be one or more spaces.
+<p>
+Jython syntax is checked when you save the file. If there is an
+error, a pop-up window will appear with the message <b>An exception has
+occurred writing in Jython library</b>. The actual error will also be
+printed in the console window running the IDV. Correct the error and
+try to save again.
+<p>
+Common Jython errors include irregular indentation, and omitting the colon from
+the end of for, if, and def statements.
+<p>
+Note that you can cut and paste from the Jython Library Editor to the 
+formula editor. Keeping the Jython Library Editor open while creating
+formulas is handy.
+</details>
+
+and 
+
+<details link="Jython Methods and the IDV">
+<p>
+In any Jython method in the IDV
+  the operands and results can be used for single values, 
+multidimensional arrays, or any other data object supported by the IDV
+and VisAD, depending on the type of the incoming data.
+<p>
+The example simple method is so short it would have been easier to
+simply type it as one line formula. But any method  can be called by
+other methods in the library, or by formulas. There is no limit on how long your
+methods can be.
+<p>
+Your personal Jython library is stored in a file named 
+[ht::filename default.py] in your home
+directory or in a directory under the home directory, 
+usually in [ht::filename ~/.metapps/DefaultIdv/default.py]
+on UNIX systems.
+This one file keeps all your Jython methods.
+<p>The Jython Library Editor automatically imports the methods in 
+visad.python.JPythonMethods. You can use them simply by typing the
+method names in your methods.
+<p>
+Check out the methods in the system Jython library to see if they
+are of use to you. These methods also show some examples of calling
+IDV internal code.
+</details>
+
+<P>
+
+<li>Defining your own Jython Method</li>
+  <ul class="substep">
+    <LI>In the  [ht::dialog Jython libraries] Editor, click on the tab
+    [ht::command User's Library]
+    <li>Create a new Jython method called windSpeed(u,v).
+    Jython methods have a first line beginning with "def" and 
+    ending with the colon ":". The code block composing the method must 
+    be indented at least one space. Indentation must be the same for 
+    all line in a code block, except continued comment lines which
+    are set off with triple quotes.
+    Your code block will be something like:
+
+<ul><pre> 
+def  windSpeed(u,v):
+     """  compute wind speed from u and v
+          wind components """
+     usqd= u*u
+     vsqd= v*v
+     ws = sqrt(usqd + vsqd)
+     return ws
+</pre></ul>
+    
+   <li>Click on [ht::button Save] to check for correct Jython syntax
+   and save the method; 
+   you will get an 
+   error message if the syntax is not correct. 
+   If it is complete, your method is saved.
+   <li>Use the [ht::menu File Close] menu to exit the editor.
+ </ul>
+</li>
+
+
+<li>Use the Method in a Formula</li>
+  <ul class="substep">
+    <LI>Leave up your previous display made with formulas, and 
+    the same data source.
+
+    <li> From the main menu, click on 
+    [ht::menu Edit Formulas {Create Formula}].
+    The [ht::dialog Formula Editor] window appears. 
+
+    <li>Enter the [ht::command Name] [ht::param jythonWS].
+
+    <li>
+    Enter the method for the formula definition in the 
+    [ht::command Formula] entry field, simply
+    [ht::command windSpeed(u,v)].
+
+
+    <li> Open the [ht::command Advanced] panel by clicking on the down arrow.
+
+    <li>Enter the [ht::command Description] 
+    &quot;jython wind speed&quot;.
+
+    <li>For 
+    [ht::command Group] select [ht::param Workshop] from the 
+    drop down list.
+
+    <li>In the 
+    [ht::command Displays] section, click on 
+    [ht::command Use selected] and then the [ht::command All off]
+    radio button.  Then select [ht::command Contour Plan View] and 
+    [ht::command Contour Vertical Cross Section] in the list.
+
+    <li>Click on [ht::button Add Formula]. 
+
+    <li>An item  [ht::param jython wind speed] 
+    should appear in the 
+    [ht::dialog Field Selector] window's [ht::command Fields] panel, under
+    the [ht::param Workshop] category.
+
+    <li>Use the formula to  make a contour display
+    of wind speed using the same u and v wind components 
+    from the previous exercise.
+
+    <li>Check to see if the results appear reasonable.
+
+ </ul>
+</li>
+
+
+</ol>
+
+
+</body>
+</html>

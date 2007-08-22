@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="Indian Ocean" category="World locations">
+<stn name="Aden, Gulf of" lat="12:30:N" lon="48:00:E"/>
+<stn name="Amsterdam Island " lat="37:52:S" lon="77:32:E"/>
+<stn name="Andaman Sea" lat="10:00:N" lon="95:00:E"/>
+<stn name="Arabian Sea" lat="15:00:N" lon="65:00:E"/>
+<stn name="Bab el Mandeb " lat="12:40:N" lon="43:20:E"/>
+<stn name="Bali Sea" lat="7:45:S" lon="115:30:E"/>
+<stn name="Bengal, Bay of" lat="15:00:N" lon="90:00:E"/>
+<stn name="Chagos Archipelago " lat="6:00:S" lon="71:30:E"/>
+<stn name="Cocos Islands" lat="12:30:S" lon="96:50:E"/>
+<stn name="Crozet Islands " lat="46:30:S" lon="51:00:E"/>
+<stn name="Desolation Islands " lat="49:30:S" lon="69:30:E"/>
+<stn name="Diego Garcia " lat="7:20:S" lon="72:25:E"/>
+<stn name="Great Australian Bight" lat="35:00:S" lon="130:00:E"/>
+<stn name="Great Channel" lat="6:25:N" lon="94:20:E"/>
+<stn name="Heard Island" lat="53:06:S" lon="73:30:E"/>
+<stn name="Hormuz, Strait of" lat="26:34:N" lon="56:15:E"/>
+<stn name="Keeling Islands" lat="12:30:S" lon="96:50:E"/>
+<stn name="Kerguelen, Iles " lat="49:30:S" lon="69:30:E"/>
+<stn name="Laccadive Sea" lat="7:00:N" lon="76:00:E"/>
+<stn name="Lombok Strait" lat="8:30:S" lon="115:50:E"/>
+<stn name="Malacca, Strait of" lat="2:30:N" lon="101:20:E"/>
+<stn name="Mannar, Gulf of" lat="8:30:N" lon="79:00:E"/>
+<stn name="McDonald Islands" lat="53:06:S" lon="73:30:E"/>
+<stn name="Mozambique Channel" lat="19:00:S" lon="41:00:E"/>
+<stn name="Oil Islands " lat="6:00:S" lon="71:30:E"/>
+<stn name="Oman, Gulf of" lat="24:30:N" lon="58:30:E"/>
+<stn name="Palk Strait" lat="10:00:N" lon="79:45:E"/>
+<stn name="Persian Gulf" lat="27:00:N" lon="51:00:E"/>
+<stn name="Saint Paul Island " lat="38:43:S" lon="77:29:E"/>
+<stn name="Shag Island" lat="53:00:S" lon="72:30:E"/>
+<stn name="Sunda Strait" lat="6:00:S" lon="105:45:E"/>
+<stn name="Terres Australes et Antarctiques Francaises " lat="43:00:S" lon="67:00:E"/>
+<stn name="West Island " lat="12:10:S" lon="96:55:E"/>
+</stationtable>

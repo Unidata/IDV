@@ -1,0 +1,164 @@
+<html><head>
+  <title>Known Problems</title>
+  <link rel="stylesheet" type="text/css" href="idv.css" title="Style">
+</head>                  
+
+
+<body>
+
+
+<div class="pagesubtitle">Version <%idv.version%>; <%release.date%></div>
+
+To find help for the IDV, or to report problems with the IDV, 
+please see the User's Guide page
+<a href="Support.html">Support from Unidata</a>.
+
+
+<faq qlabel="Problem:" alabel="Description:" cat="Bugs and problems">
+
+<faqitem cat="General"></faqitem>
+
+<faqitem q="Message in console about &quot;In paintImmediately null graphics&quot;">
+You may see a message like:
+<pre>
+java.lang.NullPointerException
+	 at javax.swing.JComponent._paintImmediately(JComponent.java:4845)
+	 at javax.swing.JComponent.paintImmediately(JComponent.java:4666)
+	 at javax.swing.RepaintManager.paintDirtyRegions(RepaintManager.java:451)
+	 at javax.swing.SystemEventQueueUtilities$ComponentWorkRequest.run(SystemEventQueueUtilities.java:114)
+	 at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:209)
+	 at java.awt.EventQueue.dispatchEvent(EventQueue.java:461)
+	 at java.awt.EventDispatchThread.pumpOneEventForHierarchy(EventDispatchThread.java:242)
+	 at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:163)
+	 at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:157)
+	 at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:149)
+	 at java.awt.EventDispatchThread.run(EventDispatchThread.java:110)
+ In paintImmediately null graphics
+</pre>
+in the console window from which you started the IDV.  This is a harmless
+message from deep inside Java and can be ignored. 
+</faqitem>
+
+<faqitem cat="Displays"></faqitem>
+
+<faqitem q="Incorrect data display" id="dataprojection">
+Sometimes data depictions display incorrectly or not at all when 
+re-projected from native data projections.  They should always
+display correctly in their naive projections.  Before you display the 
+data, choose the [ug::menu Projections {Auto-Set Projection}] menu.
+Alternatively, you can try turning on Fast Rendering for the display
+which does not account for projection seams.
+</faqitem>
+
+<faqitem q="Irregular animation loop" id="irregular_animation">
+An animation loop of two or more displays may not advance the
+individual displays at exactly the same time in each step, creating a
+staggered or irregular loop, on some systems. Use the individual time 
+step buttons to step through the frames, one at a time, 
+to avoid the irregular loading.</faqitem>
+
+<faqitem q="Time label in menu is not in sync with an animation loop."
+id="timesync">
+Use the on-display time label
+turned on with the [ug::menu  View {Show times in display}] menu.
+</faqitem>
+
+<faqitem q="Multiple vector displays" id="multivector">
+If you have multiple vector displays and you change the size,
+color, or streamline options in the control, changes may be applied
+to the other displays as well.
+</faqitem>
+
+<faqitem q="Vector size changes" id="vectorsizechanges">
+The first time you change the color on a vector plan view
+display, the size of the vectors/barbs may shrink.
+</faqitem>
+
+<faqitem q="Contours over topography do not show up." id="contour_over_topo">
+If you display a 2D field as contours draped over topography, the
+contours may not show up.  There may be two reasons for this:
+<ol>
+<li>You are using the Direct-X version of Java 3D on Windows which
+does not support the polygon offset feature.  Try the OpenGL version
+instead.
+<li>On some systems, the ordering of the displays can affect the 
+visibility.  Until the IDV support layering, try adding the 
+contours after the topography field.
+</ol>
+</faqitem>
+
+<faqitem q="Changing the line width on maps, curves, etc has no effect." id="linewidth">
+If you are using the Direct-X version of Java 3D on Windows, 
+changing line width has no effect.  Direct-X does not support setting
+the line width features.  Try using the OpenGL version instead.
+</faqitem>
+
+<faqitem q="For a color shaded display, changing the display unit does not
+give the correct image colors." id="color_unit">
+If you change the display unit for a color shaded display, the color
+table range values will look correct, but the display will not be
+correct.  Set the display unit again and it will update correctly.
+</faqitem>
+
+<faqitem q="Setting a display transparent has no effect" id="transparency">
+Using transparency in a color display may give unexpected results.
+In general, only the last thing added can be fully transparent.
+If you have a display that is transparent, then add in a new display,
+you may not see it.  The problem is caused by the lack of ordering
+in Java 3D.   You can use the display control's View-&gt;Bring to Front
+menu to remove and re-add the display that you want to be transparent 
+so it is last.
+</faqitem>
+
+
+<faqitem q="Scale factor from StationModelControl is not applied 
+when zooming" id="station_model_scale">
+If you change the scale factor in the StationModelControl, it does
+not get applied when you zoom in or out.
+</faqitem>
+
+<faqitem q="Projection lost for dimensionless vertical coordinates" id="cf_projection">
+If you have a grid which uses a dimensionless CF vertical coordinate 
+convention, the original projection information is lost when you try
+to display it.  This is a result of keeping a relationship between
+the dimensionless coordinate and the corresponding height values.
+</faqitem>
+
+<faqitem q="Color scale disappears in perspective view" id="perspective_scale">
+If you have the map display in a perspective view, a background image
+that extends beyond the box boundaries will hide any color scales in
+the display.  Two workarounds are: 1) use parallel view
+(uncheck [ug::menu View Viewpoint {Perspective View}]) or 2) clip
+the view at the box ([ug::menu View Show {Clip View At Box}]).
+</faqitem>
+
+<faqitem cat="Data/Derived quantities/Formulas/Jython"></faqitem>
+
+<faqitem q="Staggered grids in CF or WRF conventions unsupported or
+give incorrect results for slices and derived paramters" id="stagger">
+Staggered grids create some problems for the IDV and associated
+displays.  Derived quantities do not work well (if at all).   If
+possible, write your data out on unstaggered grids.
+</faqitem>
+
+<faqitem q="Derived quantities involving derivatives do not
+work correctly" id="derivatives">
+Any derived quantity that involves a derivative (e.g., divergence,
+vorticity) and is produced from a grid with a lat/lon domain 
+will give incorrect results or not work.</faqitem>
+
+<faqitem cat="Choosers"></faqitem>
+
+<faqitem q="Image chooser selector box looks disabled" id="disabled_chooser">
+In some instances, an override selector box in the advanced 
+section of the default image chooser will appear disabled 
+(i.e., grayed out) even when its checkbox is checked.
+Even though it appears disabled, you can still use the selector
+box to make choices. If you want it to appear enabled, uncheck 
+then check the checkbox again.
+</faqitem>
+
+</faq>
+
+</body>
+</html>

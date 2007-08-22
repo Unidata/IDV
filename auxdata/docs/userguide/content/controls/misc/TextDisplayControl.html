@@ -1,0 +1,105 @@
+<html><head>
+  <title>HTML and the IDV</title>
+  <link rel="stylesheet" type="text/css" href="../../idv.css" title="Style">
+</head>
+
+ 
+<body>
+
+<meta name="jhid" value="idv.controls.textdisplay">
+
+
+
+<div class="pagetitle">HTML and the IDV</div>
+
+The IDV includes an HTML viewer that displays  HTML pages.
+Furthermore, the  HTML viewer supports  fully interactive, 3D 
+displays in HTML pages using special tags.
+
+
+[ht::cimg  images/TextDisplayControlGui.gif]
+
+At the bottom of the IDV HTML viewer there are icon arrows to go back
+and forward, a reload icon, and a URL entry
+box. You can enter any URL there and see that page.
+
+<p>
+
+To see the above page enter the URL:
+<p>
+&nbsp;&nbsp;&nbsp;&nbsp;http://www.unidata.ucar.edu/software/idv/examples/html/isosurfaces.html
+<p>
+in the <a href="../../data/choosers/UrlChooser.html">URL Chooser</a>.
+This will load the given URL and automatically create an HTML display.
+This URL:
+<p>&nbsp;&nbsp;&nbsp;&nbsp;http://www.unidata.ucar.edu/software/idv/examples/html/index.html<p>
+has a list of demonstration pages and pointers to more in depth documentation
+for the embedded tags.
+<p>
+The HTML viewer handles certain special tags that are used to create 
+3D displays and drive the  IDV.
+These special tags are only applicable
+to HTML being shown in the IDV. When viewing this HTML in a browser
+the special tags will be ignored.
+
+<p>
+The following (abbreviated) HTML, from the above example, shows the use of some of the special
+tags:
+
+
+[ht::pre {
+<html>
+<head>
+<title>IDV Isosurfaces </title>
+</head>
+<body>
+... misc html ...
+<form 
+action="idv:idv.createDisplay ('http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/casestudies/idvtest/grids/%datetime%_%nwpmodel%.nc', 'windspeed', 'isosurface', 'DefaultView=view1;')">
+<br>
+<b>Date and Time:</b>
+<select name="datetime">
+<option value="2002062800">28 Jun 2002 12Z</option><option value="2002062812">28 Jun 2002 00Z</option>
+</select>
+<b>NCEP Model:</b>
+<select name="nwpmodel">
+<option value="ruc">RUC</option><option value="avn-x">AVN, global</option><option value="eta">Eta</option>
+</select>
+<input type="submit" value="Create wind speed surface">
+</form>
+<view id="view1">
+
+... misc html ...
+</body>
+</html>
+}]
+
+
+The two important things to note here are the <b>view</b> tag and the
+form action.
+<p>
+
+The view tag defines a fully functional, 3 dimensional  view. The <i>id</i>
+attribute of the view tag defines the name of this view. 
+
+<p>
+The form is a regular html form except that it holds a special action which is a command
+to the IDV to create a display. The first argument to the createDisplay command is the source
+of data, the second argument is the name of the parameter within the data set, 
+the third argument is type of display to make and the fourth argument is
+the properties to pass to the display (e.g., the identifier of the view to put the
+display in). 
+
+<p>
+The values defined by the input fields are substituted into the form action using &quot;%&quot;
+delimited input field names.
+
+<p>
+For more information about html in the IDV
+see:<p>
+<a href="http://www.unidata.ucar.edu/software/idv/examples/html/index.html">
+http://www.unidata.ucar.edu/software/idv/examples/html/index.html</a>.
+
+
+</body>
+

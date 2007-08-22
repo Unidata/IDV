@@ -1,0 +1,400 @@
+<?xml version="1.0"   encoding="ISO-8859-1"?>
+<datasources>
+  <datasource
+     id="DODS.GRID,OPENDAP.GRID"
+     factory="ucar.unidata.data.grid.DodsGeoGridDataSource"
+     patterns="http://.*/dods/.*$,dods://.*$,http://.*/dodsC/.*$"
+     label="Grids from an OPeNDAP server">
+    <property
+       name="icon"
+       value="/auxdata/ui/icons/3D.gif"/>
+  </datasource>
+  <datasource
+     id="DODS,OPENDAP"
+     factory="ucar.unidata.data.grid.DodsGeoGridDataSource"
+     patterns="http://.*/dods/.*$,dods://.*$"
+     label="Data from an OPeNDAP server">
+    <property
+       name="icon"
+       value="/auxdata/ui/icons/3D.gif"/>
+  </datasource>
+  <datasource
+     id="ADDE.IMAGE"
+     factory="ucar.unidata.data.imagery.AddeImageDataSource"
+     patterns="adde://.*/imagedata(/|\?).*$"
+     doesmultiples="true"
+     label="Images from an ADDE server"/>
+  <datasource
+     id="RAOB"
+     factory="ucar.unidata.data.sounding.RaobDataSource"/>
+  <datasource
+     id="ADDE.POINT"
+     factory="ucar.unidata.data.point.AddePointDataSource"
+     patterns="adde://.*/pointdata/.*$,.*\.apt"
+     fileselection="true"
+     label="Point data from an ADDE server"/>
+  <datasource
+     id="ADDE.PROFILER"
+     factory="ucar.unidata.data.profiler.AddeProfilerDataSource"
+     patterns="adde://.*/pointdata/.*$"
+     label="Wind Profiler Data"/>
+<!--
+   <datasource id="ADDE.RADAR" factory="ucar.unidata.data.imagery.AddeImageDataSource" />
+ -->
+  <datasource
+     id="FILE.TRACK"
+     factory="ucar.unidata.data.sounding.TrackDataSource"
+     patterns="c130.*\.nc,p3.*.nc$,P3.*\.nc$,.*WMI_Lear.*\.nc$,\.c1\.nc$"
+     fileselection="true"
+     doesmultiples="true"
+     label="Track files"/>
+
+  <datasource
+     id="FILE.SONDE"
+     factory="ucar.unidata.data.sounding.SondeDataSource"
+     patterns="GLASS.*\.nc$,class.*\.nc$,sgp.*cdf$,SGP.*cdf$,sgp.*nc$,.*QCcdf,.*QC\.nc$$"
+     fileselection="true"
+     doesmultiples="true"
+     label="Upsonde/Dropsonde files"/>
+
+  <datasource
+     id="NetCDF.POINT"
+     factory="ucar.unidata.data.point.NetcdfPointDataSource"
+     patterns="_metar\.nc$,.*metar.*\.nc$,.*_syn\.nc$,.*_buoy\.nc$,.*_sounder_.*\.nc$,Surface_METAR.*\.nc$"
+     doesmultiples="true"
+     fileselection="true"
+     label="netCDF Point Data files"/>
+
+  <datasource
+     id="NetCDF.Grid,HTTPServer.Grid,File.Grid"
+     factory="ucar.unidata.data.grid.GeoGridDataSource"
+     patterns="\.nc$,\.cdf$,.*netCDF.*,\.ncml$,\.wmo$,\.WMO$,\.grb$,\.grib$,\.gr2,\.grib1$,\.grib2$"
+     fileselection="true"
+     doesmultiples="false"
+     label="Grid files (netCDF/GRIB/OPeNDAP)">
+    <property
+       name="icon"
+       value="/auxdata/ui/icons/3D.gif"/>
+  </datasource>
+
+  <datasource
+     id="aggregated.NetCDF.Grid"
+     factory="ucar.unidata.data.grid.GeoGridDataSource"
+     xxxpatterns="If we use any patterns here is will screw up adding multiple grid files as separate data sources"
+     fileselection="true"
+     doesmultiples="true"
+     label="Aggregated GRIB files">
+    <property
+       name="icon"
+       value="/auxdata/ui/icons/3D.gif"/>
+  </datasource>
+
+
+
+
+  <datasource
+     id="FILE.NETCDF"
+     factory="ucar.unidata.data.grid.GeoGridDataSource"
+     patterns="\.nc$,\.cdf$,.*netCDF.*,\.ncml$,\.wmo$,\.WMO$,\.grb$,\.grib$,\.gr2,\.grib1$,\.grib2$"
+     label="netCDF files">
+    <property
+       name="icon"
+       value="/auxdata/ui/icons/3D.gif"/>
+  </datasource>
+
+  <datasource
+     id="FILE.RADAR"
+     patterns="swp\..*_$,.*dorade.*,Level3.*\.nids$,6500.*$,7000.*$,.*NEXRAD.*$,.*\.raw$"
+     fileselection="true"
+     doesmultiples="true"
+     factory="ucar.unidata.data.radar.CDMRadarDataSource"
+     label="NEXRAD Radar files"></datasource>
+
+  <datasource
+     id="OPENDAP.Radial"
+     patterns="swp\..*_$,.*dorade.*,Level3.*\.nids$,.*6500KHGX.*$,.*NEXRAD.*$,.*\.raw$"
+     fileselection="false"
+     doesmultiples="true"
+     factory="ucar.unidata.data.radar.CDMRadarDataSource"
+     label="OPeNDAP Radar files"></datasource> 
+
+  <datasource
+     id="FILE.DORADERADAR"
+     patterns="swp\..*_$,.*dorade.*"
+     fileselection="true"
+     doesmultiples="true"
+     factory="ucar.unidata.data.radar.DoradeDataSource"
+     label="DORADE Radar files"></datasource>
+
+  <datasource
+     id="WMS"
+     factory="ucar.unidata.data.gis.WmsDataSource"
+     label="WMS image data">
+     patterns="\.wms$/>
+    <property
+       name="default_display"
+       value="wmscontrol"/>
+  </datasource>
+
+  <datasource
+     id="KML"
+     factory="ucar.unidata.data.gis.KmlDataSource"
+     fileselection="true"
+     label="Google Earth Files KML/KMZ"
+     patterns="\.kml$,\.kmz$,\.KML$,\.KMZ$,bbs\.keyhole\.com.*download.php"/>
+
+  <datasource
+     id="ISER"
+     factory="ucar.unidata.data.SerializedDataSource"
+     fileselection="true"
+     label="IDV Serialized Data"
+     patterns="\.iser$,\.ISER$"/>
+
+  <datasource
+     id="FILE.VIS5D"
+     factory="ucar.unidata.data.grid.Vis5DDataSource"
+     patterns="\.v5d$,\.TOPO$,\.vis5d,v5d\..*"
+     fileselection="true"
+     label="Vis5D files"/>
+
+  <datasource
+     id="FILE.AREAFILE"
+     factory="ucar.unidata.data.imagery.McIDASImageDataSource"
+     patterns=".*AREA....$,.*\.gempak\.images\.sat.*,.*goes8.*,.*\.area$,.*Mcidas_MSG.*"
+     doesmultiples="true"
+     fileselection="true"
+     label="McIDAS AREA files"></datasource>
+
+  <datasource
+     id="FILE.SHAPEFILE"
+     patterns="\.shp$,\.zip$"
+     fileselection="true"
+     factory="ucar.unidata.data.gis.ShapeFileDataSource"
+     label="Shape files">
+    <property
+       name="default_display"
+       value="shapefilecontrol"/>
+  </datasource>
+
+  <datasource
+     id="FILE.IMAGE"
+     factory="ucar.unidata.data.VisadDataSource"
+     patterns="\.jpg$,\.gif$,\.jpeg$,\.png$"
+     fileselection="true"
+     label="Image files (gif, jpg, png)"/>
+
+  <datasource
+     id="FILE.DEM"
+     patterns="\.dem$,\.asc$"
+     fileselection="true"
+     factory="ucar.unidata.data.gis.DemDataSource"
+     label="DEM files"/>
+
+  <datasource
+     id="FILE.TEXT"
+     factory="ucar.unidata.data.text.TextDataSource"
+     patterns="\.htm$,\.html$,\.txt$,\.text$,\.php$,\/$"
+     fileselection="true"
+     label="Text or HTML files">
+    <property
+       name="show_in_tree"
+       value="false"/>
+    <property
+       name="default_display"
+       value="textdisplay"/>
+  </datasource>
+
+  <datasource
+     id="FILE.POINTTEXT"
+     factory="ucar.unidata.data.point.TextPointDataSource"
+     patterns="\.csv$,\.tsv$,\.txt$"
+     fileselection="true"
+     label="Text Point Data files"/>
+
+  <datasource
+     id="FILE.LOCATION"
+     factory="ucar.unidata.data.text.TextDataSource"
+     patterns="\.wwp$"
+     fileselection="true"
+     label="Locations">
+    <property
+       name="show_in_tree"
+       value="false"/>
+    <property
+       name="default_display"
+       value="locationcontrol"/>
+  </datasource>
+
+  <datasource
+     id="FILE.IMAGEMOVIE"
+     factory="ucar.unidata.data.text.TextDataSource"
+     patterns="\.xml$$"
+     fileselection="true"
+     label="Image Movie Index">
+    <property
+       name="categories"
+       value="imagemovieindex"/>
+<!--
+    <property
+       name="show_in_tree"
+       value="false"/>
+    <property
+       name="default_display"
+       value="imagemoviecontrol"/>
+-->
+  </datasource>
+
+
+  <datasource
+     id="FILE.DRAWING"
+     factory="ucar.unidata.data.text.DrawingDataSource"
+     patterns="\.xgrf$"
+     fileselection="true"
+     label="Drawing files">
+    <property
+       name="show_in_tree"
+       value="false"/>
+    <property
+       name="default_display"
+       value="curvecontrol"/>
+  </datasource>
+
+  <datasource
+     id="FILE.IMAGEXML"
+     factory="ucar.unidata.data.imagery.ImageXmlDataSource"
+     patterns="\.ximg$"
+     fileselection="true"
+     label="Image XML files"></datasource>
+  <datasource
+     id="MOVIE"
+     factory="ucar.unidata.data.text.MovieDataSource"
+     patterns="\.mov$"
+     fileselection="true"
+     label="Movies">
+    <property
+       name="show_in_tree"
+       value="false"/>
+    <property
+       name="default_display"
+       value="moviedisplay"/>
+  </datasource>
+
+  <datasource
+     id="FILE.TIFF"
+     factory="ucar.unidata.data.gis.GeotiffDataSource"
+     patterns="\.tif$,\.tiff$"
+     fileselection="true"
+     label="TIFF files"/>
+
+  <datasource
+     id="CACHED"
+     factory="ucar.unidata.data.CacheDataSource"
+     label="Cached data source"/>
+
+  <datasource
+     id="FILE.AUDIO"
+     factory="ucar.unidata.data.text.TextDataSource"
+     patterns="\.au$,\.rmf$,\.mid$,\.wav$,\.aif$,\.aiff$"
+     fileselection="true"
+     label="Audio File">
+    <property
+       name="show_in_tree"
+       value="false"/>
+    <property
+       name="default_display"
+       value="audiodisplay"/>
+  </datasource>
+
+  <datasource
+     id="FILE.CHATLOG"
+     factory="ucar.unidata.data.text.TextDataSource"
+     patterns="\.txt$$"
+     fileselection="true"
+     label="Chat Log file">
+<!--
+    <property
+       name="show_in_tree"
+       value="false"/>
+-->
+    <property
+       name="default_display"
+       value="chatlogdisplay"/>
+  </datasource>
+
+  <datasource
+     id="FILE.ADDETEXT"
+     factory="ucar.unidata.data.text.AddeTextDataSource"
+     patterns="^adde://.*text.*"
+     fileselection="false"
+     label="Adde Text">
+<!--
+    <property
+       name="show_in_tree"
+       value="false"/>
+-->
+    <property
+       name="default_display"
+       value="textdisplay"/>
+  </datasource>
+
+  <datasource
+     id="TEXT.FRONT"
+     factory="ucar.unidata.data.text.FrontDataSource"
+     doesmultiples="true"
+     patterns="adde://.*/wxtext(/|\?).*$,\.front$,\.fcst$" 
+     fileselection="true"
+     label="Front Bulletins">
+
+<!--
+    <property
+       name="show_in_tree"
+       value="false"/>
+-->
+    <property
+       name="default_display"
+       value="frontdrawingcontrol"/>
+  </datasource>
+
+<!--  These are historical for bundles, not presented to user -->
+  <datasource
+     id="NetCDF.SWEEP"
+     factory="ucar.unidata.data.radar.NetcdfRadarDataSource"
+     patterns="ncswp.*\.nc$"
+     fileselection="true"
+     doesmultiples="true"
+     label="netCDF Radar Sweep files"/>
+
+  <datasource
+     id="NetCDF.METAR"
+     factory="ucar.unidata.data.point.NetcdfMetarDataSource"
+     patterns="_metar\.nc$,.*metar.*\.nc$,.*_syn\.nc,.*_buoy\.nc$,Surface_METAR_.*\.nc$"
+     fileselection="false"
+     doesmultiples="true"
+     label="netCDF METAR/Synoptic files"/>
+  <datasource
+     id="FILE.PROFILER"
+     factory="ucar.unidata.data.profiler.EOLProfilerDataSource"
+     patterns="mapr.*,prof.*\.nc$,prof.*\.cdf$,rass.*\.nc$"
+     fileselection="false"
+     doesmultiples="false"
+     label="EOL netCDF Profiler files"/>
+
+  <datasource
+     id="FILE.LEVEL2RADAR"
+     patterns=".*6500KHGX.*$,.*NEXRAD.*$,.*\.raw$"
+     fileselection="false"
+     doesmultiples="true"
+     factory="ucar.unidata.data.radar.Level2RadarDataSource"
+     label="Level II Radar files"></datasource>
+
+<!-- This needs to be last  -->
+  <datasource
+     id="FILE.ANY"
+     factory="ucar.unidata.data.VisadDataSource"
+     patterns="no pattern here "
+     fileselection="true"
+     label="I'm Still Feeling Lucky"/>
+
+
+
+</datasources>

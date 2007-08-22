@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object class="java.util.ArrayList">
+    <method name="add">
+        <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+            <property name="CenterLon">
+                <double>-61.69629931485656</double>
+            </property>
+            <property name="Name">
+                <string><![CDATA[AntiguaAndBarbuda]]></string>
+            </property>
+            <property name="DefaultMapArea">
+                <object class="ucar.unidata.geoloc.ProjectionRect">
+                    <constructor>
+                        <double>-62.399804625699446</double>
+                        <double>16.886503157795374</double>
+                        <double>-60.99279400401368</double>
+                        <double>18.293513779481135</double>
+                    </constructor>
+                </object>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+            <property name="CenterLon">
+                <double>-61.771258761707536</double>
+            </property>
+            <property name="Name">
+                <string><![CDATA[Antigua]]></string>
+            </property>
+            <property name="DefaultMapArea">
+                <object class="ucar.unidata.geoloc.ProjectionRect">
+                    <constructor>
+                        <double>-62.031397687787546</double>
+                        <double>16.81523037536256</double>
+                        <double>-61.51111983562755</double>
+                        <double>17.33550822752256</double>
+                    </constructor>
+                </object>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+            <property name="CenterLon">
+                <double>-61.764326479134716</double>
+            </property>
+            <property name="Name">
+                <string><![CDATA[Barbuda]]></string>
+            </property>
+            <property name="DefaultMapArea">
+                <object class="ucar.unidata.geoloc.ProjectionRect">
+                    <constructor>
+                        <double>-62.081963844894716</double>
+                        <double>17.317828024565742</double>
+                        <double>-61.44668911337472</double>
+                        <double>17.953102756085745</double>
+                    </constructor>
+                </object>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.geoloc.projection.LatLonProjection">
+            <property name="CenterLon">
+                <double>-61.72872855551998</double>
+            </property>
+            <property name="Name">
+                <string><![CDATA[Caribbean]]></string>
+            </property>
+            <property name="DefaultMapArea">
+                <object class="ucar.unidata.geoloc.ProjectionRect">
+                    <constructor>
+                        <double>-65.87551383551998</double>
+                        <double>12.354168545279983</double>
+                        <double>-57.58194327551998</double>
+                        <double>20.64773910527999</double>
+                    </constructor>
+                </object>
+            </property>
+        </object>
+    </method>
+</object>

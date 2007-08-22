@@ -1,0 +1,65 @@
+<title>The Default Bundle</title>
+
+
+<div class="overview">
+You can create a default IDV state and save it off using the bundle  facility.
+</div>
+
+<ol class="step">
+  
+    
+    <li>By default the IDV imports a [ht::filename Default] bundle when it
+        starts up.</li>
+    
+    <li>Open up a new view window with the
+        [ht::menu File New {View Window}]
+        menu item.</li>
+    
+    <li>Change its state.</li>
+    
+    <ul class="subsubstep">
+      
+      <li>Change its perspective.</li>
+      
+      <li>Select a different projection with the [ht::menu  Projections Set]
+          menu.</li>
+    </ul>
+    
+    <li>Save the current state as the default bundle  by selecting the
+        [ht::menu   File {Default Bundle} {Save}]
+        menu item from the main menu bar.
+
+</li>
+    
+    <li>This file is saved in the user's
+        <a name="metappsdir" class="index" word="User's local application
+        resource
+        directory"></a>
+        local resource directory: <br>
+        <code class="filename">&lt;home directory&gt;/.metapps/DefaultIdv</code>
+        <br>
+        (e.g., <a target="_LISTING" href="<%workshop.homedir%>/.metapps/DefaultIdv"><%workshop.homedir%>/.metapps/DefaultIdv</a>)
+        as [ht::filename default.xidv].</li>
+    
+    <li>Exit the IDV and restart it. You should see the previously saved
+        state.</li>
+    
+    <li> Remove all data and displays.
+
+    <li> Select the [ht::menu File {Default Bundle} Open] menu item
+    or the <img src="../images/Refresh16.gif"> button from the toolbar to reload the
+    bundle.
+
+
+    <li>Delete the default bundle with the
+        [ht::menu File {Default Bundle} {Remove}]
+        menu item from the main menu bar.</li>
+    
+    <li>Exit the IDV and restart it. You should see
+        the previously saved state defined in your user preferences.</li>
+    </li>
+
+</ol>
+
+
+

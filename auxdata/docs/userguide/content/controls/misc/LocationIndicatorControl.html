@@ -1,0 +1,73 @@
+{Location Indicator Control}
+
+{
+<meta name="jhid" value="idv.controls.locationindicatorcontrol">
+
+The location indicator control displays a configurable axis in the main
+3D display and (optionally) a bearing point. The user interface is 
+composed of three tabs. The first displays the position  of the origin and
+the bearing point. 
+
+[ht::cimg images/LocationIndicatorControlGui1.gif {Location Indicator Location Tab}]
+
+The second allows for the configuration of
+display options.
+[ht::cimg images/LocationIndicatorControlGui2.gif {Location Indicator Display Tab}]
+
+The second allows for the orienting the display based on the location.
+[ht::cimg images/LocationIndicatorControlGui3.gif {Location Indicator Orient Tab}]
+
+
+To change the origin click and drag in the main display. To  show and/or change
+the bearing point do a control-drag in the main display. The x/y/z locations
+of the bearing point are shown on the origin axis as tick marks and, optionally,
+as longitude/latitude/altitude readouts.
+
+
+
+
+}
+
+
+{
+{Location Tab} 
+
+{
+The Location tab shows the location of the origin point, the bearing point
+and the 3 tick axis points. You can set the value of the origin or
+bearing point directly by entering the value in the appropriate text field
+and pressing return.
+}
+}
+
+
+{
+{Display Tab} 
+{
+The display tab allows you to configure the display. You can:
+<ul>
+<li> Constrain along which axis  points are moved with the [ug::button Move] checkboxes.
+<li> Constrain the movement to be within the main 3D bounding box.
+<li> Disable the dragging of points with the [ug::button Enabled] checkbox.
+<li> Turn on/off the visibility of labels.
+<li> Turn on the display of a solid plane along any of the axis with the
+[ug::button Solid] checkboxes. You can also change the color and the transparency of
+the plane.
+<li> Show or hide the bearing lines. These are dashed  lines from the respective axis
+to the bearing point.
+<li> Turn on/off the display of the bearing point with the [ug::button Show point] checkbox.
+<li> Expand/contract the length of the origin axis.
+<li> Set the line width, color, etc.
+</ul>
+}
+}
+
+
+
+
+{{Orient Tab} 
+{
+You can center the display at the origin or at the point of the location indicator.
+More to come.
+}
+}

@@ -1,0 +1,176 @@
+#!/bin/bash
+#set -x
+
+export JAVA_HOME=/opt/jdk
+export ANT_HOME=/upc/share/jakarta-ant
+export PATH=$JAVA_HOME/bin:$ANT_HOME/bin:/usr/bin:/opt/bin:/bin
+export CVSROOT=/upc/share/CVS
+export ANT_OPTS=-Xmx256m
+export CLASSPATH=
+
+errmsg()
+{
+    echo 1>&2 $prog: "$@"
+}
+
+usage()
+{
+    errmsg "Usage: $prog [build|installers|nightly|release|ftp]"
+    exit 1
+}
+
+build()
+{
+    (
+        status=1
+        ant -version
+        java -version
+        if cd /upc/share/metapps; then
+	    newdir=build$(date '+%Y%m%dT%H%M')
+	    if test -d $newdir; then
+		echo 1>&2 "Directory \"$newdir\" exists!"
+	    else
+		umask 02
+		if mkdir $newdir; then
+		    cvs update build/build.xml
+		    if ant -Dbasedir=`pwd`/$newdir \
+			    -buildfile build/build.xml; then
+			olddir=$(ls -l runtime | awk '{print $NF}')
+                        if test $olddir != $newdir; then
+                            rm -rf $olddir || echo 1>&2 \
+                                "Couldn't remove old directory $olddir"
+                        fi
+			rm runtime
+			if ln -s $newdir runtime; then
+			    if (cd lib && ln -f ../runtime/lib/*.jar .); then
+				echo "IDV package built"
+				status=0
+			    else
+				echo 1>&2 "Couldn't hard-link jarfiles"
+			    fi
+			else
+			    echo 1>&2 "Couldn't throw runtime switch"
+			fi
+		    else
+			echo 1>&2 "Couldn't build IDV package"
+		    fi
+		    if test $status != 0; then
+			rm -rf $newdir
+		    fi
+		else
+		    echo 1>&2 "Couldn't make directory $newdir"
+		fi
+	    fi
+        else
+            echo 1>&2 "Couldn't change to metapps directory"
+        fi
+        return $status
+    )
+}
+
+ftp()
+{
+    (
+        status=1
+        if cd /upc/share/metapps; then
+	    umask 02
+	    if ant -Dbasedir=`pwd` -buildfile build/build.xml ftp; then
+		echo "IDV FTP done"
+		status=0
+	    else
+		echo 1>&2 "Couldn't do IDV FTP stuff"
+	    fi
+        fi
+        return $status
+    )
+}
+
+nightly()
+{
+    (
+        status=1
+        if (build); then
+          if (installers); then
+            if cd /upc/share/metapps; then
+	      umask 02
+	      if ant -Dbasedir=`pwd` -buildfile build/build.xml nightly_release; then
+	        echo "IDV release done"
+	        status=0
+    	      else
+	        echo 1>&2 "Couldn't do IDV release stuff"
+	      fi
+            fi
+          fi
+        fi
+        return $status
+    )
+}
+
+release()
+{
+    (
+        status=1
+        if (build); then
+          if (installers); then
+            if cd /upc/share/metapps; then
+	      umask 02
+	      if ant -Dbasedir=`pwd` -buildfile build/build.xml release; then
+	        echo "IDV release done"
+	        status=0
+    	      else
+	        echo 1>&2 "Couldn't do IDV release stuff"
+	      fi
+            fi
+          fi
+        fi
+        return $status
+    )
+}
+
+installers()
+{
+    (
+        status=1
+        if cd /upc/share/metapps; then
+	    umask 02
+	    if ant -Dbasedir=`pwd` -buildfile build/build.xml installers; then
+		echo "IDV installers built"
+		status=0
+	    else
+		echo 1>&2 "Couldn't build IDV installers"
+	    fi
+        fi
+        return $status
+    )
+}
+
+prog=`basename $0`
+case $# in
+    0)
+        action=usage
+        ;;
+    *)
+        action=$1; shift
+        ;;
+esac
+
+case "$action" in
+    b|bu|bui|buil|build)
+        build "$@"
+        ;;
+    i|in|ins|inst|insta|instal|install|installe|installer|installers)
+        installers "$@"
+        ;;
+    f|ft|ftp)
+        ftp "$@"
+        ;;
+    n|ni|nig|nigh|night|nightl|nightly)
+        nightly "$@"
+        ;;
+    r|re|rel|rele|relea|releas|release)
+        release "$@"
+        ;;
+    *)
+        usage
+        ;;
+esac

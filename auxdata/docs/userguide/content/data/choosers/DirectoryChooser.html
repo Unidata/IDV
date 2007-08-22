@@ -1,0 +1,49 @@
+<html><head>
+  <title>Poll on files in a Directory</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+<body>
+
+
+
+The [ug::chooser Directory] chooser allows you to select files
+in a directory by time.  You can select the most recent <b>N</b>
+files or select all files updated in a specific time period.
+
+
+[ht::cimg images/DirectoryChooser.gif {Directory Chooser}]
+
+To select data from a directory you:
+<ol>
+<li> Specify the type of  data the file contains.
+Normally the IDV figures out what kind of data is in a file by
+the filename itself. You can override this 
+using the [ug::menu {Data Source Type}] menu.
+
+<li> Select the directory you want to poll on.
+
+<li> Type in a name for the dataset that you want to show in the
+<a href="FieldSelector.html">Field Selector</a>.
+
+<li> Optionally, set the pattern for the files you want to poll on.
+Use the check box to set whether you want to poll on hidden files.
+You can verify the files that will be scanned using the pattern
+by pressing the [ug::button Verify] button. 
+
+<li> Choose the number of files you want to search for.  You 
+can select an absolute number of files or you can select the
+files that have been updated in a certain time period.
+
+<li> If you want to have the files and associated displays 
+automatically update, set the [ug::label Polling] information
+and the update frequency.
+
+<li> When done, load the selected data  with the 
+[ug::button Add Source] button.
+
+</ol>
+
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+
+[ug::head {Plugins}]
+
+<%nochildlist%>
+
+IDV plugins are a way to add to or modify the functionality
+of the IDV. Plugins can range from adding new resources (e.g.,
+color tables, layout models, maps) to changing the entire application.
+Plugins are typically Java JAR archive files that can contain
+a set of IDV resources and Java code. They are kept in
+a special directory on disk and are loaded at run time.
+
+
+<div class="pagesubtitle">Plugin Command Line Arguments</div>
+You can load a plugin (one time only) with the:<pre>
+-plugin &lt;plugin file or URL&gt;</pre>
+command line argument.
+
+<p>
+You can install  a plugin with the:<pre>
+-installplugin &lt;plugin file or URL&gt;</pre>
+command line argument.
+<p>
+You can start the IDV without any plugins with the:<pre>
+-noplugins</pre>
+command line argument.
+
+
+<div class="pagesubtitle">Plugin Manager</div>
+
+The Plugin Manager, accessed through 
+the [ug::menu Tools {Plugin Manager}] menu,
+allows you to list, install and manage plugins. 
+[ht::cimg images/PluginManager.gif  {Plugin Manager}]
+<p>
+
+A list of the installed and available plugins is shown.
+The available plugins are those the the IDV development
+team makes available through. One can install plugins
+that are not in this list through the 
+[ug::menu File {Install Plugin from File}] and 
+[ug::menu File {Install Plugin from URL}] menu items.
+When you install a plugin you will need to restart the
+IDV for the plugin to take effect.
+
+<p>
+For installed plugins the Manager allows you to delete and
+reinstall the plugin. <b>Note: When you delete a plugin
+it is only deleted when you exit the IDV.</b>
+
+<p>
+The small binocular icon allows you to list the files that
+the plugin contains. This brings up the Plugin List dialog:
+[ht::cimg images/PluginList.gif  {Plugin List}] 
+You can  view the contents of a file and/or extract a file through
+this dialog.
+
+
+
+[ug::foot]
+
+

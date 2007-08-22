@@ -1,0 +1,99 @@
+
+<title>Initialization and Properties</title>
+
+
+<div class="overview">
+</div>
+
+The IDV starts up with the following sequence:
+
+
+<ol>
+<li>
+The starting point (e.g., main) of the IDV  is
+an application specific class derived
+from  ucar.unidata.idv.IntegratedDataViewer, e.g., 
+ucar.unidata.apps.example.ExampleIdv.
+
+
+
+<li> When the IDV starts up  a singleton instance of this  
+main class is created and the IntegratedDataViewer.init method is called.
+<pre>
+    public static void main(String\[\] args) throws Exception {
+        LogUtil.configure();
+        ExampleIdv idv = new ExampleIdv(args);
+    }
+</pre>
+
+<li>
+The application is configured by first defining an initial set of
+property files in the code. <pre>
+        //Put the default property file in the list before we parse args 
+        getArgsManager().propertyFiles.add(
+            "/ucar/unidata/idv/resources/idv.properties");
+        initPropertyFiles(getArgsManager().propertyFiles);
+</pre>
+
+The initPropertyFiles method is called to allow subclasses to modify the list.
+e.g., from ExampleIdv:
+<pre>
+    public void initPropertyFiles(List files) {
+        /*
+          files.clear();
+          files.add("/ucar/unidata/apps/example/example.properties");
+        */
+    }
+</pre>
+
+
+
+<li> The command line arguments are parsed by the ArgsManager.
+
+<li> The class, StateManager, is used to initialize the state. 
+<ul>
+<li> Any property files on the command line are added to the list.
+<li> All of the properties are merged together. 
+<li> A second pass is done loading any any property files
+that were defined by the <i>idv.properties</i> property.
+<li> Then any  <i>-Dname=value</i> command line arguments are added
+to the properties.
+</ul>
+
+
+<li> Default system properties file.
+<ul> 
+<li> Let's look at the default system properties file: <a href="idv.properties.txt" target="extra">idv.properties</a>. 
+<li> Note: the &quot;.proplabel&quot;, &quot;.propdesc&quot;, etc., are used in the Plugin Creator.
+<li> The <i>idv.properties</i> property defines the other properties files to use:<pre>
+idv.properties = %APPPATH%/idv.properties;%SITEPATH%/idv.properties;%USERPATH%/idv.properties;
+</pre>
+<li> The macros <i>%APPPATH%</i>, <i>%SITEPATH%</i>, <i>%USERPATH%</i> and <i>%IDVPATH%</i> are defined as:
+<pre>
+##  %USERPATH%   The file system path of the user's .metapps/application directory
+##  %SITEPATH%   If defined (usually by the -sitepath argument) the directory path 
+##               or url of where to find site resources
+##  %IDVPATH%    The internal (to the jars) /ucar/unidata/idv/resources  path
+##  %APPPATH%    The value of the idv.resourcepath property or the package of the IDV class
+</pre>
+
+</ul>
+
+
+<li> Let's go change the example idv.properties file.
+<ol>
+<li> cd to <i><%workshop.installdir%>/ucar/unidata/apps/example/resources</i>
+<li> Copy the file: idv.properties up one level to
+ucar/unidata/apps/example. This is the APPPATH.
+<li> Run the Example Idv (runExample.sh)
+</ol>
+
+
+</ol>
+
+
+<%nochildlist%>
+
+
+
+

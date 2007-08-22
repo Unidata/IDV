@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<panel
+   layout="flow"
+   margin="4"
+   vspace="0"
+   hspace="2"
+   i:space="2"
+   i:width="5">
+  <button action="action:show.dashboard"/>
+  <button action="action:new.displaywindow"/>
+  <filler/>
+  <button action="action:bundle.open"/>
+  <button action="action:bundle.save"/>
+  <button action="action:bundle.favorite.save"/>
+  <button action="action:bundle.favorite.manage"/>
+  <filler/>
+  <button action="action:help.introduction"/>
+  <button action="action:help.showhelptips"/>
+  <button action="action:help.showsupportform"/>
+  <filler/>
+  <button action="action:edit.removedisplays"/>
+  <button action="action:edit.removedisplaysanddata"/>
+  <filler/>
+  <button action="action:display.curvedrawer"/>
+  <button action="action:display.backgroundimage"/>
+  <filler/>
+  <button action="action:idv.stopload"/>
+  <button action="action:exit"/>
+</panel>

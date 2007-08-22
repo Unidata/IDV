@@ -1,0 +1,101 @@
+[ug::head {Performance Tuning}]
+
+<body>
+<div class="overview">
+If you are running into issues with memory consumption or slow response
+of the IDV, there are several things you can do.
+</div>
+
+
+The amount of memory used by the IDV will depend on the size of
+the datasets you use and the types of displays.  Datasets
+rendered as 2D depictions (plan views - contours or color shaded
+displays) use much less memory than 3D displays (isosurfaces,
+cross sections).  Large datasets (images, dense grids) will
+use much more memory.<p>  
+
+There are several features in the IDV that allow you to more efficiently
+view large datasets:
+
+<%childlist%>
+
+<subhead id="subset" xintoc="false" desc="Subsetting the data before
+display reduces the memory and display time">Temporal/Spatial Subset of Data</subhead>
+
+Some data sources allow you to subset the data temporally and spatially.
+You can set these properties for all fields in a dataset through the
+[ht::menu Properties] menu of the data source (double click on the
+Data Source in the [ht::command {Field Selector}]) or you can set
+these for individual field using the tabs in the lower right corner
+of the [ht::command {Field Selector}].  For more information, see
+the <a href="../data/DataSourceProperties.html">Data Source Properties</a>
+section of the IDV User's Guide.
+
+<subhead id="heap" xintoc="false" desc="Change the amount of
+memory allocated to the IDV">Memory allocation</subhead>
+
+By default, the IDV startup script (runIDV) allocates 512 megabytes of
+maximum memory for Java. This is usually the optimum amount for a Windows
+system with 1 gigabyte of physical memory (RAM).  Windows takes up half of
+that anyway and once Windows has to start swapping, performance severely
+degrades. On a Linux system, you can probably get away with 700m for
+1 Gb of memory as it does a much better job of swapping. All this also
+depends on what else you are running on the machine and how much memory
+those applications use. <p>
+
+If your system has more than 1 Gb of memory, increasing the amount
+available to the IDV can improve performance for displaying large
+datasets. You can change the runIDV script to increase the amount
+of memory. In that script, change the -Xmx512m to some higher number
+(e.g. -Xmx1024m). The number is the number of bytes, the trailing m is
+a multiplier (m=mega). Do not use the maximum amount of memory on your
+machine as some is needed for the operating system itself. If the system
+has to use swap memory, performance will degrade as well.  For a system
+with 2 Gb of physical memory, you can probably allocate 1.5 Gb to the IDV.
+If you have less than 1 Gb of RAM, you should start the IDV with about
+1/2 of the total memory (e.g., if your system has only 512 megabytes of
+RAM, you should use -Xmx256m).<p>
+
+
+<subhead id="cache" xintoc="false" desc="Data caching uses more
+memory">Data Caching</subhead>
+
+By default, the IDV caches the data used for a display in memory.
+If a field is used more than once for several displays, caching
+the data prevents an additional reading from of the data from
+disk or a remote server.  If you are only displaying/using a
+field (i.e. not using it for multiple displays or calculations), 
+you can keep the IDV from caching it in memory.   You can
+turn off data caching by unchecking the [ht::command {Cache data in memory}]
+checkbox on the [ht::command {Data &amp; Formats}] tab of
+the user preferences (accessible from the [ht::menu Edit Preferences] menu).
+
+<subhead id="maxsize" xintoc="false" desc="Reducing the maximum
+size of a display can reduce the memory used">Maximum grid/image size</subhead>
+
+You can also set the maximum size of a grid or image that will be displayed. 
+This will allow you to download a large image or grid, but it will be 
+re-sampled before displaying if it is larger than the maximum size you 
+have asked for. You can set the maximum image/grid size under
+the [ht::command {Data &amp; Formats}] tab of
+the user preferences (accessible from the [ht::menu Edit Preferences] menu).
+
+<subhead id="fastrender" xintoc="false" desc="Fast rendering reduces memory
+and time at the expense of accuracy">Fast Rendering</subhead>
+
+By default, the IDV will try to adjust the data renderings to account
+for projection seams. This is computationally intensive in some cases
+and slows down the display of data. When you set your preference to
+"Use Fast Rendering" (under the [ht::command General] tab of the user
+preferences ([ht::menu Edit Preferences] menu)), the IDV will not try
+to account for the projection seams. If you are displaying data in
+its native projection, this will result in faster rendering of the
+data depiction. However, if you have several displays of data, each
+from a different data source and on a different projection, you may see
+anomalies in the displays (spurious lines, portions of images). At that
+point, you can turn off fast rendering for a particular display using the
+[ht::menu Edit Properties] menu of the Display Control for that display,
+or set your system preference back to not use fast rendering.
+
+</body>
+</html>

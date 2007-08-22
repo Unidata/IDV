@@ -1,0 +1,112 @@
+
+{Point Data Plot}
+
+{
+The Point Data Plot Control shows a set of observations using 
+a station model. The control window consists of three tabs. The first
+tab allows you to control basics of the display:
+
+[ht::cimg images/StationModelControlGui1.gif]
+
+The second tab provides a time series chart and a data readout table of a selected station.
+To use this simply click on a station in the main display.
+Use the [ug::button Select Fields] button to show a dialog
+that allows you to select what fields are displayed in the table.
+Double click or right click on a table row to add it to the time
+series chart.
+See <a href="Chart.html">here</a> for more information about customizing the chart.
+
+The [ug::menu File {Save} {Save Plot Preferences}] menu item allows you to save the current
+set of selected fields and their chart line  properties as the default
+to use for all future point data plots.
+
+The [ug::menu View {Show Raw Data}] menu  controls whether
+the data in the table is formatted or show as raw data.
+The [ug::menu File {Export Table}] menu item allows you to export
+the table as a comma separated value (CSV) file.
+[ht::cimg images/StationModelControlGui2.gif]
+
+The third tab allows you to specify a set of visibility filters.
+See below for  further discussion on this.
+
+
+}
+
+{{Declutter} {Click on the [ht::command Declutter] checkbox to see all locations or 
+stations. The display otherwise shows only selected stations that do
+not overlap. When decluttering is turned on then, as you navigate through the
+display (e.g., through zooming) then the decluttering will be  progressively
+applied. The small &quot;lock&quot; icon allows you to lock the stations that
+are currently being displayed and not have their display changed when
+navigating.
+}}
+
+{{Show All Times at Once} {
+This allows you to show all the times of different o
+}}
+
+
+{{Plot Density} {
+This slider allows you to change how dense the display of stations is when decluttering.
+}}
+
+{{Only Show  Every} {
+This field allows you to  sub-set the data that is being displayed  by only showing
+every N minutes. For normal observation data (e.g., station data) this field is not
+needed. However, for observation data that contains many times (e.g., airplane track data)
+you can use this field to subset the times.
+<p>
+Note:  If you are displaying point data that has a large number of times
+you will be prompted whether you want to view all of the times. If Yes then
+this is automatically set.
+<p>
+For most of the point data sources you can specify a time binning through
+the data source properties.
+}}
+
+{{Layout Model} {
+The [ht::command {Layout model}], 
+the choice of data and layout design for data display at each
+station,  in use is named. Click on [ht::command Change] to select other
+previously-defined station models, either provided by the IDV or defined by users.
+
+
+You can change the station model (plot layout), and
+create new station models, with the
+<a href="../tools/StationModelEditor.html">Layout Model Editor</a>
+}}
+
+
+{{Scale} {
+You can scale up or down the size of the displayed elements with this field.
+}}
+
+{{Vertical Position} {
+You can choose to display the locations at their altitude (if there is one)
+or you can override this and specifically define the vertical position.
+}}
+
+
+{{Filters} {
+<a name="filters"></a>
+The Point Data Plot Control provides the ability to define a set of filters 
+to show or hide particular observations based  on the values they hold.
+
+[ht::cimg images/StationModelControlFilters.gif] 
+
+The above image shows the tab with which you define filters.
+This image shows two filter expressions, one that states the 
+<i>T</i> field needs to be greater that 70 F, the other
+states that the <i>SPD</i> value needs to be greater than
+10.  The unit of the value you enter (e.g., F) is defined with:<pre>
+\\\[unit_name\\\]
+</pre>
+If you do not provide a unit then the comparison is done using the native unit
+of the observation value.
+<p>
+You can define any number of expressions, define whether they all should
+be matched or any should be matched, and disable and enable the filter.
+<p>
+You can also disable the filters and specify whether all filters
+need to match or ay of the filters need to match.
+}}

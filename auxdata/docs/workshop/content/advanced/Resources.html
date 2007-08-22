@@ -1,0 +1,61 @@
+
+<title>Resources</title>
+
+
+<div class="overview">
+So, how do you put all of this together?
+</div>
+
+<ol class="step">
+    
+    <li>Remember all of those resources we created in earlier exercises? They
+        are saved off  in the user's
+        <a name="metappsdir" class="index" word="User's local application
+        resource
+        directory"></a>
+        local resource directory:
+        [ht::popup file:<%workshop.homedir%>/.metapps/DefaultIdv [ht::filename    <%workshop.homedir%>/.metapps/DefaultIdv]].</li>
+    
+    <li>The files include:</li>
+    
+    <ul class="subsubstep">
+      
+      <li>[ht::filename aliases.xml] - The data aliases.</li>
+      
+      <li>[ht::filename default.xidv] - The default bundle.</li>
+      
+      <li>[ht::filename main.xml] - User preferences.</li>
+      
+      <li>[ht::filename paramdefaults.xml] - Parameter defaults.</li>
+      
+      <li>[ht::filename projections.xml] - Projections.</li>
+    </ul>
+    
+    <li>The IDV looks in the user's resource directory, the site path   
+and the system path for these resources. 
+
+    <li> View the available resources 
+    <ul>
+        <li> From the command line run the IDV with the argument <i>-listresources</i>
+    </ul>
+
+
+<li> To share these resources   
+across a site one just needs to copy these files to an accessible
+web site or directory. Then point the IDV to that path with the <i>-sitepath</i>
+command line argument. Try running the IDV with:
+<pre>
+idv -userpath ~/othermetapps -noplugins -listresources -sitepath http://www.unidata.ucar.edu/software/idv/workshop 
+</pre>
+
+<li> Note: when running with the -sitepath argument that value is persistent. Bring up the Preferences
+and remove the sitepath entry.
+
+<li> Exit the IDV.
+
+
+    <li> Ahh, you might say: &quot;what about these plugins I keep hearing about?&quot;
+</ol>
+
+
+

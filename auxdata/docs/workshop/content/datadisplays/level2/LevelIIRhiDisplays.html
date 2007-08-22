@@ -1,0 +1,83 @@
+<html>
+<head>
+<title>Level II RHI Displays</title>
+</head>
+
+<body>
+
+<div class="overview">
+<p>
+The IDV makes a pseudo-RHI display from Level II data. The display
+is presented  in a conventional 2D plot, and in a 3D display at 
+the correct position in the atmosphere.
+</div>
+
+The pseudo-RHI display is constructed from the several 
+azimuthal sweeps available in the WSR-88D Level II output files.
+
+<p>
+
+If necessary, select Level II data and times as described in
+[ht::popup "LoadingLevelIIData.html" "Accessing WSR-88D Level II Radar Data"].
+
+<p>
+
+<ol class="step">
+
+<li>[ht::clearDisplays]
+
+<li>In the [ht::dialog Field Selector] window create a [ht::display RHI]
+    display using the [ht::param Reflectivity] field.</li>
+<p> 
+
+The RHI control window appears in the [ht::dialog Dashboard]. 
+The RHI display appears inside the RHI control window as a 2D plot. 
+
+[ht::cimg  images/LevelIIRhi2D.gif]
+
+
+<li>The RHI also appears in the main 3D view window.
+    View the RHI in 3D, and change the azimuth.</li>
+  <ul class="substep">
+   <li>Rotate, pan, and zoom  the 3D display as needed to see the
+    RHI in 3D.
+    <popup label="More about RHI displays">
+    Note the center and vertical 
+    width of the beams making up the "RHI" are in their
+    actual locations in the atmosphere. You can show any 
+    Level II 3D radar display in 
+    the IDV with other upper air data, such as NOAA Profiler Network winds.
+    The initial vertical exaggeration in the IDV is about 13:1.
+    </popups>
+    <li>Change the azimuth by dragging with the left mouse button on 
+    the small square box at the outer end of the selector line above the RHI.
+    <li>If desired, restore the initial overhead 
+    viewpoint with the key combination Ctrl-r.</li>
+    [ht::cimg  images/LevelIIRhi3D.gif]
+  </ul>
+</li>
+
+
+<li>Working with the 2D RHI display</li>
+  <ul class="substep">
+    <li>Pan the 2D display with a right mouse button drag, 
+    and zoom the display by dragging the right mouse button forward
+    and backward with the Shift key pressed.
+    <li>You can get the distance-height coordinate 
+    at any point on the 2D plot with the middle mouse button.
+    <li>You can get the data value for a color by placing the mouse cursor 
+    anywhere on the color bar.
+    <li>You can auto-rotate the RHI in both displays by clicking on the
+    [ht::button Autorotate RHI] button. 
+    Click Autorotate on and watch both 2D and 3D displays.
+    <li>Make a 3D sweep display for the same data,
+    and watch the RHI move across the sweep.</li>
+    <li>Click off [ht::button Autorotate RHI].</li>
+  </ul>
+</li>
+
+</ol>
+
+
+</body>
+</html>

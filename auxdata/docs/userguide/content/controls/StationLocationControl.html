@@ -1,0 +1,91 @@
+{Location Control}
+
+{
+The IDV provides a collection of locations. These may
+be NEXRAD stations, states, counties, geographical features,
+countries, etc. The Location Control is used to display
+these locations.
+The list of locations is accessed through the 
+[ug::menu Displays Locations ...] menu.
+<p>
+
+
+The user interface consists of four tabs. The first allows the user
+to control the display.  
+
+
+[ht::cimg images/StationLocationControlGui.gif]
+
+The second tab shows two sub-tabs that list all the locations and
+the currently displayed locations.  At the bottom is shown the details
+of any locations that have been clicked on in the main display
+(turned off with the [ug::button Listen for clicks] button)
+or have been selected in the lists.  You can
+Shift-Click and Control-Click on a location in the list
+to center and zoom in/out in the main display. Turn off this behavior
+with the [ug::button Center on Selected] check box. 
+
+[ht::cimg images/StationLocationControlGui2.gif]
+
+The [ug::tab Data Sets]  tab lists all of the location  
+files that are being displayed. 
+You can add new locations with the [ug::menu Edit {Add Locations}] menu.
+You can remove a set of locations by selecting the location entry in the
+list and pressing the &quot;delete&quot; key.
+
+<p>
+
+The [ug::tab Filters]  tab allows you  to filter what locations are being
+shown based on their internal attributes. There is more information
+about the filter mechanism in the documentation for
+the <a href="StationModelControl.html">Point Data Plot Control</a>.
+
+}
+
+
+
+
+
+
+{{Declutter} {
+Click off the [ht::command Declutter] checkbox to see all locations.
+The display otherwise shows only selected locations that do
+not overlap.  As you zoom or pan in the display different locations
+will be shown. When decluttering is turned on you can change the density level
+of the locations. The small &quot;lock&quot; button allows you to
+fix the currently displayed/decluttered locations. Using the lock button
+allows you to zoom or pan without changing what locations are displayed.
+}}
+
+
+{{Display} {
+The display of the locations can be done through a fixed
+specification of a symbol and/or and identifier as well
+as by using one of the station models available.
+<p>
+Use the options in the [ht::command Identifier] panel to control
+what station information is displayed.  Use the [ht::command Visible]
+checkbox to toggle the visibility of the identifier in the
+plot.
+Use the options in the [ht::command Symbol] panel to control
+what marker symbol is displayed.  Clicking an item will
+immediately change the display.  Use the [ht::command Visible]
+checkbox to toggle the visibility of the symbol in the
+plot.
+<p>
+When you select the [ht::command Layout Model] radio button
+the station model facility is used to display the location.
+You can edit and/or create new station models. 
+The predefined &quot;Location&quot; station model is a good one to
+use for display and as a basis to create your own.
+}}
+
+
+{{Vertical Position} {
+You can choose to display the locations at their altitude (if there is one)
+or you can override this and specifically define the vertical position.
+}}
+
+
+
+

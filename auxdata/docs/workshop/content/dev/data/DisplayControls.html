@@ -1,0 +1,88 @@
+
+[ht::head {Overview of Display Controls}]
+
+
+The [dg::class ucar.unidata.idv.DisplayControl] interface defines
+the API through which all data are displayed. There is a base class
+[dg::class ucar.unidata.idv.control.DisplayControlImpl] that provides a
+set of base services. A DisplayControl generally has a data depiction
+and a control window for modifying or interacting with the display.
+There are a variety of DisplayControl implementations:
+
+<ul>
+  <li>[dg::className ucar.unidata.idv.control.DisplayControlImpl]
+  <ul>
+    <li>[dg::className ucar.unidata.idv.control.GridDisplayControl]
+    <ul>
+      <li>[dg::className ucar.unidata.idv.control.PlanViewControl]
+      <ul>
+        <li>[dg::className ucar.unidata.idv.control.ColorPlanViewControl]
+        <li>[dg::className ucar.unidata.idv.control.ContourPlanViewControl]
+        <li>[dg::className ucar.unidata.idv.control.FlowPlanViewControl]
+      </ul>
+      <li>[dg::className ucar.unidata.idv.control.CrossSectionControl]
+      <ul>
+        <li>[dg::className ucar.unidata.idv.control.ColorCrossSectionControl]
+        <li>[dg::className ucar.unidata.idv.control.ContourCrossSectionControl]
+        <li>[dg::className ucar.unidata.idv.control.FlowCrossSectionControl]
+      </ul>
+      <li>[dg::className ucar.unidata.idv.control.ProbeControl]
+      <li>[dg::className ucar.unidata.idv.control.VerticalProfileControl]
+    </ul>
+    <li>[dg::className ucar.unidata.idv.control.BaseImageControl]
+    <ul>
+      <li>[dg::className ucar.unidata.idv.control.ImageSequenceControl], 	      <br>[dg::className ucar.unidata.idv.control.ImageControl]
+    </ul>
+    <li>[dg::className ucar.unidata.idv.control.AerologicalDisplayControl] 
+    <li>[dg::className ucar.unidata.idv.control.MapDisplayControl] 
+  </ul>
+</ul>
+
+
+
+<H2>Creating Display Controls</H2>
+The IDV uses the [dg::class ucar.unidata.idv.ControlDescriptor] class to create 
+set of DisplayControls-s.  The set of available DisplayControls-s 
+is  defined within  the 
+<a href="controls.xml.txt">controls.xml</a> resource file.
+<p>
+This file has the form:
+[ht::pre {
+  <control
+     id="wxtextdisplay"
+     categories="wxtext"
+     class="ucar.unidata.apps.example.WxTextDisplayControl"
+     description="Weather Text Display"
+     label="Weather Text Display"
+     displaycategory="General"
+     properties="windowVisible=true; displayName=Weather Text Display;"/>
+}]
+
+The ControlDescriptor class parses the XML and creates a set of 
+[dg::class ucar.unidata.idv.ControlDescriptor] objects which 
+hold this information.
+
+<p>
+<ul>
+<li>The <i>id</i> attribute is a name that can be used to identify
+this control for command line and scripting arguments.
+<li>The <i>categories</i> attribute lists the DataCategory-s that
+this control is valid for.
+<li>The <i>class</i> attribute gives the class name of the DisplayControl
+<li>The <i>description</i> attribute is used for descriptions.
+<li>The <i>label</i> attribute is used for labels.
+<li>The <i>displaycategory</i> attribute is used for categorizing in legends.
+<li>The <i>properties</i> attribute is used for passing in String and boolean
+properties to the control.
+</ul>
+
+
+So, you're probably wondering how you can create your own DisplayControl.
+You need to make a subclass of DisplayControlImpl and override the
+following methods:
+
+<ol>
+<li><b>the no arg constructor</b> - for persistence
+<li><b>doMakeContents</b>  - make the GUI
+<li><b>init(DataChoice)</b>  - sets up the initialization.
+</ol>

@@ -1,0 +1,45 @@
+
+<object class="visad.ScalarMap" >
+    <constructor>
+        <object class="visad.RealType" >
+            <object class="java.util.ArrayList" >
+                <method name="add" >
+                    <string><![CDATA[Time]]></string>
+                </method>
+                <method name="add" >
+                    <object class="visad.OffsetUnit" >
+                        <string><![CDATA[s since 1970-01-01 00:00:00.000 UTC]]></string>
+                    </object>
+                </method>
+                <method name="add" >
+                    <null/>
+                </method>
+                <method name="add" >
+                    <java.lang.Integer>0</java.lang.Integer>
+                </method>
+            </object>
+        </object>
+        <object class="visad.DisplayRealType" >
+            <object class="java.util.ArrayList" >
+                <method name="add" >
+                    <string><![CDATA[DisplayAnimation]]></string>
+                </method>
+                <method name="add" >
+                    <java.lang.Boolean>true</java.lang.Boolean>
+                </method>
+                <method name="add" >
+                    <java.lang.Double>-Infinity</java.lang.Double>
+                </method>
+                <method name="add" >
+                    <java.lang.Double>Infinity</java.lang.Double>
+                </method>
+                <method name="add" >
+                    <java.lang.Double>0.0</java.lang.Double>
+                </method>
+                <method name="add" >
+                    <null/>
+                </method>
+            </object>
+        </object>
+    </constructor>
+</object>

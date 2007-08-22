@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="Arctic Ocean" category="World locations">
+<stn name="Baffin Bay" lat="73:00:N" lon="66:00:W"/>
+<stn name="Barents Sea" lat="74:00:N" lon="36:00:E"/>
+<stn name="Beaufort Sea" lat="73:00:N" lon="140:00:W"/>
+<stn name="Chukchi Sea" lat="69:00:N" lon="171:00:W"/>
+<stn name="East Siberian Sea" lat="74:00:N" lon="166:00:E"/>
+<stn name="Greenland Sea" lat="79:00:N" lon="5:00:W"/>
+<stn name="Hudson Bay" lat="60:00:N" lon="86:00:W"/>
+<stn name="Hudson Strait" lat="62:00:N" lon="71:00:W"/>
+<stn name="Iceland Sea" lat="68:00:N" lon="20:00:W"/>
+<stn name="James Bay" lat="54:00:N" lon="80:00:W"/>
+<stn name="Kane Basin " lat="79:30:N" lon="68:00:W"/>
+<stn name="Kara Sea" lat="76:00:N" lon="80:00:E"/>
+<stn name="Laptev Sea" lat="76:00:N" lon="126:00:E"/>
+<stn name="Lincoln Sea" lat="83:00:N" lon="56:00:W"/>
+<stn name="North Greenland Sea" lat="78:00:N" lon="5:00:W"/>
+<stn name="Northwest Passages" lat="74:40:N" lon="100:00:W"/>
+<stn name="White Sea" lat="65:30:N" lon="38:00:E"/>
+</stationtable>

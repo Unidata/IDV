@@ -1,0 +1,64 @@
+<html>
+<body>
+
+The data package.  
+
+
+<h2>DataCategory</h2>
+
+A DataCategory object is really a hierarchy of objects, each identified with a String 
+component. There are two flavors. The first  is a "display" category. These are used to 
+create the DataChoice DataTree and menus in the IDV. The second use of the DataCategory 
+is to match up a DataChoice with the  DisplayControls that are applicable to it.
+<p>
+There are some utility methods that allow you to create a DataCategory from a
+"-" separated String definition.   For example:
+<br><code>DataCategory category = DataCategory.parseCategory ("2D grid", true);</code><br>
+Will give a DataCategory with the single component "2D grid". The true
+says to make the DataCategory be a display category.
+<p>
+Alternatively:
+<br><code>DataCategory.parseCategory ("GRID-2D-TIME;", false);</code><br>
+will create a non-display DataCategory that can be used by DisplayControl-s
+that need gridded, 2 dimensional data with time.
+<p>
+Another utility method takes a String of ";" delimited DataCategory specifications
+and returns a List:
+<br><code>List 2dcategories =  DataCategory.parseCategories ("2D grid;GRID-2D-TIME;");</code></br>
+Or
+<br><code>List 3dcategories =  DataCategory.parseCategories ("3D grid;GRID-3D-TIME;");</code><br>
+Here by default the first category parsed (e.g., "2D grid" and "3D grid") will
+be the display categories.
+<p>
+
+So the {@link ucar.unidata.data.DataChoice} objects, which represent data available from a {@link ucar.unidata.data.DataSource},
+hold a list of categories that define the flavor of data. The {@link ucar.unidata.idv.DisplayControl}-s,
+(well really the {@link ucar.unidata.idv.ControlDescriptor}-s) hold  a list of
+categories which define the flavors of data they are applicable to. The categories that
+a DisplayControl has can contain regular expression patterns.
+<p>
+
+To see what display controls are applicable to what categories look at the file:
+<br><code>/ucar/unidata/idv/resources.controls.xml</code>
+<p>
+There you will see entries like:
+<pre>    categories="*-2D-*;*-3D-*"</pre> 
+
+This says that the given DisplayControl is applicable to anything that has 2D or 3D
+in any of its category components.
+
+<p>
+
+The TextDisplayControl has categories:
+
+<pre>   categories="text;html" </pre>
+which says it is applicable to any category of "text" or "html"
+
+<p>
+The image sequence control has a single category:
+<pre>   categories="IMAGE-2D-TIME" </pre>
+
+Which says it will only match data that has the exact category 2d, images with time.
+
+</body>
+</html>

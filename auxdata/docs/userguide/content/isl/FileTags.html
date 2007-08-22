@@ -1,0 +1,68 @@
+`<html><head> 
+  <title>File ISL Tags</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+
+The ISL supports a variety of file manipulation functions.
+
+
+[isl::tagdef fileset {Specify a set of files for use with other tags} -attrs {dir {directory to look at} pattern {regular expression pattern to match files} file {the single file to select}}]
+The [isl::tag fileset] tag does not execute anything. Rather, it is used by other tags 
+to specify a group of files.
+[isl::xml {
+<fileset dir="the directory to look at" pattern="file pattern to match"/>
+Or:
+<fileset file="somefile"/>
+}] 
+
+
+[isl::tagdef mkdir {Make a directory} -attrs {file+ {The directory to create}}]
+The [isl::tag mkdir] tag creates a directory specified by the [isl::attr file] attribute:
+[isl::xml {
+<mkdir  file="somedirectory"/>
+}]
+There is no error if the directory already exists.
+
+
+[isl::tagdef rename {Rename a file} -attrs {from+ {The file to rename} to+ {The new file name}}]
+The [isl::tag rename] tag allows you to rename a file:
+[isl::xml {
+<rename  from"somefile" to="newfile"/>
+}]
+
+
+
+[isl::tagdef delete {Delete a file}]
+The [isl::tag delete] tag deletes a set of files:
+[isl::xml {
+<delete>
+    <fileset dir="/some/directory" pattern="*.png"/>
+    <fileset name="somefile"/>
+</delete>
+}]
+
+[isl::tagdef move {Move a file}]
+The [isl::tag move] tag moves a set of files to a destination directory.
+[isl::xml {
+<move dir="destination directory">
+    <fileset dir="/some/directory" pattern="*.png"/>
+    <fileset name="somefile"/>
+</move>
+}]
+
+[isl::tagdef copy {Copy a file}]
+The [isl::tag copy] tag copies a set of files to a destination directory.
+[isl::xml {
+<copy dir="destination directory">
+    <fileset dir="/some/directory" pattern="*.png"/>
+    <fileset name="somefile"/>
+</copy>
+}]
+
+
+
+
+</body>

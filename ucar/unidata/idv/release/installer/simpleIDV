@@ -1,0 +1,24 @@
+#!/bin/sh
+
+dirname=`dirname $0`
+command="java -Xmx512m -Didv.enableStereo=false -jar idv.jar -plugin simpleidv.jar $*"
+
+if test -f jre/bin/java; then
+##We are in the installer directory
+    ./jre/bin/${command}
+else
+##Try using the dirname of this script
+    if test -f ${dirname}/jre/bin/java; then
+       pushd ${dirname} > /dev/null
+       ./jre/bin/${command}
+       popd > /dev/null
+    else 
+       if test  ${JAVA_HOME}; then
+##Try using JAVA_HOME
+          ${JAVA_HOME}/bin/${command}
+       else 
+##Try just using java
+          ${command}
+      fi
+    fi
+fi

@@ -1,0 +1,103 @@
+<body>
+
+This package provides a set of Xml  related classes.
+
+	
+<h2>XmlEncoder</h2>
+
+The XmlEncoder class supports the serialization/de-serialization of
+objects to/from xml.  It uses reflection on the object
+to write out an object tag and a set of property or method
+tags to recreate the object. For primitive types (e.g., int, double)
+and Strings it writes out special tags: &lt;int&gt;5&lt;/int&gt;
+<p>
+Running this class (i.e., java ucar.unidata.xml.XmlEncoder) 
+standalone will run a test. Providing any command line argument
+will result in the test xml being printed out to stderr.
+<p>
+You can use the toXml and toObject methods to do serialization.
+<p>
+For example, the result of: <code><pre>
+String s = "just a test";
+XmlEncoder encoder = new XmlEncoder ();
+String xml = encoder.toXml (s);
+</pre></code>
+Will be an xml string: <pre>
+&lt;string&gt;just a test&lt;/string&gt;</pre>
+Now,  calling:
+<code><pre>
+Object result = encoder.toObject (xml);
+</pre></code>
+Will result in the  String "just a test"
+<p>
+For the class: <code><pre>public class Test {
+   public Test () {}
+   public int getX () {...}
+   public void setX (int x) {...}
+}</pre></code>
+The result xml file will be:<pre>
+&lt;object class="Test"&gt;
+   &lt;property name="x"&gt;
+      &lt;int&gt;...&lt;/int&gt;
+   &lt;/property&gt;
+&lt;/object&gt;</pre>
+
+We do special handling for List and Hashtable.
+In these cases we write out a set of <i>method</i>
+tags. e.g. for an ArrayList  of Strings we do:
+<pre>
+&lt;object class="java.util.ArrayList"&gt;
+   &lt;method name="add"&gt;
+       &lt;string&gt;Foo&lt;/string&gt;
+    &lt;/method&gt;
+   &lt;method name="add"&gt;
+      &lt;string&gt;Bar&lt;/string&gt;
+    &lt;/method&gt;
+&lt;/object&gt;
+</pre>
+First, the new object (i.e., the ArrayList) is created. Then for each contained method
+tag the method is looked up (via reflection), the object (or objects) contained by the 
+method tag are instantiated and the method is invoked on the initial object with the newly created
+object arguments.
+
+
+
+<p><b>XmlPersistable </b><br>
+If the object implements XmlPersistable the encoder will defer
+to it both when persisting the object and when re-instantiating the
+object. See Test2.java for an example.
+
+<p><b>XmlDelegate</b><br>
+Second, you can define an XmlDelegate object that handles objects
+of a certain class: See Test.java for an example.
+<code><pre>encoder.addDelegateForClass (theClassToHandle, theXmlDelegate);</pre></code>
+
+<p><b>Object factory</b><br>
+Normally the encoding results in a set of nested object
+tags that contain method and property tags. You can also
+write out a factory tag that specifies a factory class, which implements
+XmlObjectFactory. e.g:
+<pre>&lt;factory class="Test2Factory"&gt;
+     ...anything here
+&lt;/factory&gt
+</pre>
+In this case the factory is instantiated but the actual object used
+is a result of:
+<code><pre>Object = factory.getObject (encoder, xml Element);</pre></code>
+
+<p><b>Constructor tags</b><br>
+Normally, the encoder instantiates an object through reflection
+using the "bean" (i.e., parameter-less) constructor. For  objects that do not
+have the bean constructor this presents a problem. To resolve this
+a constructor tag is looked for under the object tag. If found the correct
+construcor is found for the given class (using the types of the sub-components
+of the constructor tag. e.g., for Test2 we do:
+<pre>
+       &lt;object class="ucar.unidata.xml.Test2"&gt;
+            &lt;constructor&gt;
+              &lt;int&gt;myX&lt;/int&gt;
+            &lt;/constructor&gt;
+       &lt;/object&gt;
+</pre>
+
+</body>

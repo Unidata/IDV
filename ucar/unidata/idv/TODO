@@ -1,0 +1,323 @@
+Bugs:
+
+
+UI Issues:
+
+- parm name in data probe for level III is not good
+
+- y axis label in time series of level III says "image display"
+
+- include sweep angle in Level II time series labels
+
+- Mark color tables as not visible
+
+- Allow user to set date format
+
+
+
+New Development:
+
+  Datasources/Data selection:
+
+    - Create a mapping of server names to human readable locations
+      (ie adde.ucar.edu -> NCAR Community Data Portal) for ADDE choosers.
+
+    - Better breakdown between ADDE servers and the data they serve
+      up.
+      
+    - Shuffle ADDE servers to balance the load
+      
+    - AWIPS grids do not use correct Unit specs.  Need a mechanism
+      for users to create a list of units vs. correct names. Use
+      alias mechanism?
+    
+    - I load up Level II data and the times are: 15:54:30, 16:04:16
+      I then load in level III data and the times are a bit off:
+      15:54:00,16:04:00 I assume this is just a side effect of the processing
+      but it throws off doing image comparisons.  Problem is that
+      ADDE images round off to :00 seconds.
+    
+    - data source sniffer/netCDF file sniffer
+    
+    - ATD radar, sounding and aircraft data from DODS server
+    
+    - when adding in multiple files, if an error occurs, accumulate
+      the errors and continue loading in all valid datasources.
+    
+    - Full support for GeoTIFF
+    
+    - support for multibanded images
+    
+    - support for isentropic coordinates
+    
+    - add access to historical point data
+    
+    - read and display lightning data from ADDE servers
+    
+    - read and display hurricane position data
+
+    - read and display frontal positions.
+
+    - read GeoTIFF from WCS server.
+    
+    - tropopause pressure colored by trop temp as topography
+
+    - Support for GEMPAK data (grid, point) from local file and/or
+      ADDE server.
+
+    - read in GEMPAK maps
+
+    - read WRF data
+
+    - decode/plot watch/warning boxes.  Maybe use GEMPAK files since gempak
+      already has the decoder?
+
+  DisplayControls:
+
+    - change default orientation of cross section selector to N/S instead
+      of E/W?
+
+    - Color bar in display for displays with COLORTABLE attribute.
+
+    - In-display labels for better output.
+
+    - lat/long labels in MapDisplayControl
+
+    - Lagrangian display control for plotting values (hurricane
+      positions, etc) at points through time.
+
+    - Allow local sharing of all properties between controls.  Use case:
+      I load in cross sections of el Nino, la Nina, normal temperature.
+      The color table, the range and the contour info all need to be
+      shared so I don't have to go through the same motions for each
+      one.   Along with this, it might be better to to allow broadcast
+      properties - i.e., set up one the way you like it, turn on
+      sharing and then broadcast from the first.  The current share
+      system only reponds to changes.
+    
+    - RHI - Do we want to allow the user to change the scale of the XS
+      display? I know you can zoom to get better details of the data but you
+      also zoom in the scale and get huge scale labels.
+    
+    - "Levels" in plan view display control are in units mb when using
+      entry box; but shift to meters (with 11 decimal points) if you use the
+      in-display selector point. Ought to be consistent and use one unit
+      or the other. At least the meters ought to be formatted to 4 places
+      precision.
+    
+    - Add ability to add more parameters to a Data cross section display; 
+      consider overlay or stacking separate data cross section graphs 
+      vertically with same space axis.  ditto for time series plot, 
+      profile display, cross sections.
+          
+    - Better window handling. Do we want an example idv that shows the
+      display controls together in a control window? (instead of in individual
+      windows). Alternatives to the legend
+    
+    - customizable readouts
+    
+    - keep DisplayControls with displays "on top".
+    
+    - For display controls whose gui is embedded in the html when we 
+      do a Show properties from the legend we get an empty window. 
+      We probably need to not have the properties entry in the menu.
+    
+    - clean up RangeAndBearingControl code.  Lots of convolutions on
+      setting enpoints.
+    
+
+    - clean up Profiler chooser/Display controls code.  Lots of convolutions.
+    
+
+    SkewT-
+      - allow changing of color of points in SkewT control
+      - support modification of contours (spacing, etc) in display
+      - rubber band box for display.
+
+    - allow users to change the vertical range of the display controls like
+      cross sections, profiles, time/height, etc.
+      
+
+  ViewManagers:
+
+    - some click- key combination to recenter display under click
+    
+
+  Formulas:
+
+    - Allow user to do spatial derivatives
+
+    - add vector operations, and differential calculus operators del dot,
+      and del cross and others as needed.
+
+    - permit use of position coordinates altitude, pressure, latitude
+      and longitude as parameters in formulas, for expressions like dT/dp.
+
+    - add wrappers for GridUtil and DerivedGridFactory methods
+
+    - allow categorization of Jython library procdures
+
+  Radar data/displays:
+
+    - Level II data reading needs to be profiled for efficiency, reduce 
+      memory usage for Level II data.
+    
+    - need a dis/az indication for data probe and time series on radar plots
+    
+    - New radar features:
+       - add cursor readout of position as distance and azimuth from the
+         center to the probe control (and I suppose the time series control)
+       - run WATADS locally and see what we are missing
+       - provide a VAD display
+
+       - provide a list of county maps (one for each radar) so don't have to 
+         plot all US counties; plotting counties he says is essential.
+         AWIPS may have such map files in shapefiles already, per office.
+	jeffmc: we need a mapping from nexrad site to county name
+	and provide a catalog that gets the county map from conan. 
+	
+      
+    - We might investigate algorithms commonly used to merge adjacent radars
+      into a mosaic.
+          
+    - get and toggle individual beams in the RHI
+
+    - use data to get angles, not VCP hardcoded values
+    
+    - add a unit combobox for the RadarGridControl items
+
+  Resource Editors:
+
+    Color Table Editor:
+      - an alternate topographic color table with the same colors but
+        progressively darker towards low values of elevation would show details
+        well (more contrast).
+
+    Jython Editor:
+      - The jython editor has a set of tabs for each resource. Only     
+        the resource in the first tab is editable though there may be     
+        other resources in the list that are editable (e.g., if you       
+        have other libraries in your user directory). These should be     
+        editable. In general the "editable resource" functionality in the 
+        ResourceCollection is a hack. I simply use the first resource in  
+        the list as the editable one. I really should have a call like:   
+        ResourceCollection.isEditable (int resourceIndex);                
+
+    Alias Editor:
+      - Allow aliases to use regular expressions
+    
+  Misc:
+
+    - Need an "undo" option from the Edit menu in case you accidently 
+      remove the wrong control from the long list of controls.
+    
+    - Implement a scheduler (suggestion by Tom W):
+    
+      The problem: how to implement a 'scheduler' to perform async activities
+          
+      The solution: provide an interface that can be called from Jython, that
+      looks something like:
+      
+      public void putToDisplay(String name, Data data, ? display_format, ?
+      display_number)
+      
+      Where display_format indicates one of the optional formats, and
+      display_number is just that -- some way to put this into a new or
+      existing display.
+      
+      [Of course we then would want to provide a way of removing a Data item
+      from the display, right? And probably a few more, related things...this
+      could go to "control everything" but I think we need to keep it reined
+      in...]
+      
+      Why would I ever suggest such a thing? Well, first off we need some
+      way to do "scheduled" tasks, right? I'd like to see this happen first
+      through Python, of course. Besides, if we had a method like this,
+      we could extend the usability beyond the GUI in a wide variety of
+      directions. Heck one could even make a Command Line Interface ...
+      seriously, though, since I don't know the control flow of the IDV at
+      all, is this a really, really tough one...or a piece of cake?
+      
+    - allow layering of data.  
+    
+    - 2D data is always placed at the bottom of the box and if the 
+      box vertical range is below ground, it's confusing.  
+    
+    - UTM coordinate system - can we convert from one zone to another?
+    
+    - Performance issues-
+      - make sure data isn't be rendered unnecessarily
+      - make sure VisAD controls aren't doing unnecessary work (i.e.
+        changing controls twice).
+    
+    - investigate VisAD resolution switching code
+    
+    - Better animation control - when to update, user ability to
+      set time steps.  
+    
+    - Persist the time step in an animation loop?
+    
+    - objective analysis of point values
+    
+    - bug, feature and support tracking system.
+    
+    - rework projection manager dialog.  Enhancements might include:
+       - using OGC names
+       - allow user to specify bounds of lat/lon projection
+       - allow user to define bounding box for any projection through
+         the UI.
+
+    - allow user to change the lighting of displays.
+
+    - tracers/trajectories (ala Vis5D)
+
+Documentation:
+
+UserGuide:
+
+- list of approved unit names for users to refer to
+
+- improve web site
+  - framework for examples with images/bundles
+  - tips
+
+- a page on allowable operators in the formula editor.  Also maybe
+  some more on allowable Jython operators.
+
+- Enhance section on local customization covering the various resources.
+
+
+Workshop:
+
+- Color table workshop page (6.1) needs a new screendump.  Label
+  is not italicized in existing one.
+
+- popup menu on Color Table breakpoint needs new image.  (shows
+  the popup for the table, not a breakpoint)
+
+
+Programmer's Ref:
+
+- update/expand programmer's guide.
+
+
+Misc:
+
+- need more new help tip dialogs
+
+- add javadoc to all classes/methods.
+
+
+
+
+Collabortion:
+- Collaboration in workshop did not work for all connecting to one
+  with no relay changes.
+
+- Collaboration chat should have user/machine name.  In a classroom
+  setting, typically all clients will have the same user name.
+
+- Handle local datasets in the collaboration environment.
+
+- allow groups of users in collaboration mode.
+

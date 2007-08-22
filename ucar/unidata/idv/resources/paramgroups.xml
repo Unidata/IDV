@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<paramgroups>
+<!--
+  Each paramgroup tag can contain any number of params tag.
+  The params tag may have any number of param names 
+  defined, p1, p2, ..., pn. The params tag can also have a 
+  label (which is not being used at the moment).
+ -->
+  <paramgroup name="u_and_v">
+    <params
+       p1="U"
+       p2="V"/>
+    <params
+       p1="u_fhg"
+       p2="v_fhg"/>
+    <params
+       p1="eU"
+       p2="eV"
+       label="El nino winds"/>
+    <params
+       p1="lU"
+       p2="lV"
+       label="La Nina Wind vectors"/>
+    <params
+       p1="nU"
+       p2="nV"
+       label="Normal Year Wind vectors"/>
+  </paramgroup>
+  <paramgroup name="u_v_w">
+    <params
+       p1="U"
+       p2="V"
+       p3="W"/>
+    <params
+       p1="u"
+       p2="v"
+       p3="w"/>
+  </paramgroup>
+  <paramgroup name="temp_and_pressure">
+    <params
+       p1="TEMP"
+       p2="PRESSURE"/>
+  </paramgroup>
+  <paramgroup name="GridRelative_uv">
+    <params
+       p1="UREL"
+       p2="VREL"/>
+    <params
+       p1="GridRelative_u"
+       p2="GridRelative_v"/>
+    <params
+       p1="GridRelative_u_fhg"
+       p2="GridRelative_v_fhg"/>
+  </paramgroup>
+</paramgroups>

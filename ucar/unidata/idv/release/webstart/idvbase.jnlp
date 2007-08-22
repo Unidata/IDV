@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<jnlp spec="1.0+" codebase="@IDV_CODEBASE@"> 
+   <information> 
+      <title>IDV base files</title> 
+      <vendor>Unidata</vendor> 
+      <offline-allowed/>
+   </information> 
+   <resources> 
+        <jar href="IDV/auxdata.jar"/>
+        <jar href="IDV/external.jar"/>
+        <jar href="IDV/jython.jar"/>
+        <jar href="IDV/local-visad.jar"/>
+        <jar href="IDV/visad.jar"/>
+        <jar href="IDV/nc2.2.jar"/>
+        <extension name="Java3D" href="java3D/java3D.jnlp"/>
+   </resources> 
+   <component-desc>
+   </component-desc> 
+   <security>
+       <all-permissions/>
+   </security>
+</jnlp> 

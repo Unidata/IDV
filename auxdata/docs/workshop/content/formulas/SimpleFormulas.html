@@ -1,0 +1,252 @@
+<html>
+<head>
+<title>Basics of IDV Formulas</title>
+</head>
+
+<body>
+
+<p>
+
+[ht::desc How to Create and Use IDV Formulas]
+
+<p>
+
+Formulas in the IDV are one-line mathematical expressions
+to derive new values from data available. 
+<!--
+Different data sources can be used in one formula,
+and interpolation and remapping are done automatically when necessary.
+-->
+
+<P>
+
+The IDV comes with some Formulas. Here is an example of using one.
+
+<p>
+
+<ol class="step">
+<li>Using an IDV System Formula</li>
+  <ul class="substep">
+    <LI>[ht::loadEtaGrid]
+    <li>Load in the 
+    [ht::filename ETA 1998-06-29 12:00] data source, so we have 
+    two output times from the Eta model, 12 hours apart.
+    <li>In the [ht::dialog Field Selector], select
+    [ht::param Formulas] in the
+    [ht::command Data Sources] panel. Click on the 
+    [ht::param System] tag in the [ht::command Fields] panel
+    <li>Right-click on [ht::param Simple difference a-b],
+    then click on [ht::command Edit Formula] in the popup menu.
+    The [ht::dialog Formula Editor] appears.
+    (For more see 
+    <details link="Formula Editor"> 
+     The [ht::command Name] 
+     is a short name used for the legend labels on displays.  
+    <P>
+    Enter the mathematical formula definition 
+    after [ht::command Formula]. 
+    <P>
+    IDV uses the Jython language for formulas.
+    Jython supports such common mathematical operators as
+    +, -, *, /, and ** (for exponentiation). 
+    Rules of precedence apply, for example, 1.5*T*W**2 is 
+    the same as (1.5*T) * (W**2).
+    <P>
+    The variable names in the formula definition are arbitrary place 
+    holders. Do not use 
+    names with  spaces such as "wind speed." Start each variable name 
+    with a letter.
+    <p>
+    The advanced section allows you to define a lengthier description, a group
+    and what displays to use.
+    <p>The [ht::command Description]  appears in the 
+    [ht::dialog Field Selector] window. If nothing is entered here, 
+    the formula name (above) is reused for a description.
+    <p>A  
+    [ht::command Group] will create a new  
+    (and optional) group in the 
+    [ht::dialog Field Selector] window under [ht::command Formulas]. 
+    It can be any normal text including spaces, numbers, and punctuation 
+    characters, such as "moisture parameters" or 
+    "two level profiler difference, English units."  
+    You do not need to enter a group. 
+    <p>In the 
+    [ht::command Displays] section, either accept the default 
+    [ht::command Use all], or select the [ht::command Use selected]  
+    button and click off the displays that this formula's result will 
+    not support.  For example, a field of wind vectors does not need 
+    to have a display choice of Isosurface. 
+    </details>).
+    <li>Click [ht::command Cancel] in the [ht::dialog Formula Editor].
+ </ul>
+</li>
+
+<li>Requesting the Formula to be Computed and Displayed</li>
+  <ul class="substep">   
+    <li> In the
+    [ht::dialog Displays] panel expand the Plan Views tab and click on 
+    [ht::display Contour Plan View], then click on 
+    [ht::button Create Display].
+    <li>A [ht::dialog Field Selector] 
+    window appears that allows you to select which actual 
+    parameters from a data source or sources you want to use 
+    for each variable in the formula. 
+    You can select parameters from more than one data source 
+    for use in this single formula. 
+    <li>In the [ht::dialog Field Selector]
+    window:<br>
+    For the &quot;a&quot; operand choose:<br>
+    [ht::dataset {Eta 1998-06-29 12:00 -&gt; 2D Grid -&gt; mean sea level pressure (Eta model reduction)}]
+    <p>
+    For the &quot;b&quot; operand  choose:<br>
+    [ht::dataset {Eta 1998-06-29 00:00 -&gt; 2D Grid -&gt; mean sea level pressure (Eta model reduction)}]
+
+    <li>Click on [ht::button OK]. 
+
+    <li>Grids of twelve hour MSL pressure difference values 
+    are computed using the formula,  and the result shown in the 
+    main view window. 
+
+    <li>Look at the contours and see if the values are reasonable. 
+    (What are the units?). 
+  </ul>
+</li>
+
+<p>
+You can make your own formulas. Your formulas are saved so you can build a 
+library of your own derived quantities, using data you have.
+<p>
+
+<li>Creating a new formula for wind speed from u and v wind components</li>
+  <ul class="substep">
+    <li>Remove all displays.
+    <LI>
+    From the main menu, click on 
+    <code class="menu">Edit-&gt;Formulas-&gt;Create Formula</code>.
+    The [ht::dialog Formula Editor] window appears. 
+    <li>Enter the [ht::command Name] [ht::param windspeed] 
+    (one word - no space).
+
+    <li>
+    Enter the mathematical formula definition in the 
+    [ht::command Formula] entry field. The formula is 
+    <ul><pre>sqrt(u**2 + v**2)</pre></ul>
+
+
+    <li> Open the [ht::command Advanced] panel.</li>
+
+    <li>Enter the [ht::command Description] 
+    [ht::param wind speed from u and v].
+
+    <li>For  [ht::command Group] enter [ht::param Workshop].
+
+    <li>In the [ht::command Displays] section, click the
+    [ht::command Use selected] radio button, then click
+    the [ht::button All off] button.
+    <li>Expand the [ht::command Plan Views] category and
+    check the [ht::display Contour Plan View] option.  Also, expand
+    the [ht::command 3D Surface] category and check the
+    [ht::display Isosurface]  option.
+
+    <li>Click on [ht::button Add Formula]. 
+
+    <li>A new item [ht::param wind speed from u and v] 
+    should appear in the 
+    [ht::dialog Field Selector] window's [ht::command Fields] panel, under
+    [ht::param Workshop].
+  </ul>
+</li>
+
+
+<li>Sub-setting times in the data source</li>
+  <ul class="substep"> 
+   <li>To save computation time, set  the 
+[ht::dataset 12:00 Z  Eta] data source to use the first three times, 
+   with the [ht::display Field Selector] window.
+   (see
+    [ht::popup "../datadisplays/selection/FieldSelector.html#timeselection" "Selecting Times"]).
+  </ul>
+</li>
+
+
+
+<li>Requesting the new Formula to be Computed and Displayed</li>
+  <ul class="substep">   
+    <li>Click the
+    [ht::param wind speed from u and v] item in the 
+    [ht::dialog Fields] panel  under the [ht::param Workshop] group.
+    <li> In the
+    [ht::dialog Displays] panel click on 
+    [ht::display Contour Plan View], then click on 
+    [ht::button Create Display].
+    <li>In the [ht::dialog Field Selector] window: <br>
+     For the &quot;u&quot; operand choose:<br>
+     [ht::dataset {Eta 1998-06-29 12:00 -&gt; 3D Grid -&gt; u component of wind}]
+     <p>
+     For  the &quot;v&quot; operand choose:<br>
+     [ht::dataset {Eta 1998-06-29 12:00 -&gt; 3D Grid -&gt; v component of wind}]
+    <li>Click on [ht::button OK]. 
+    <li>Grids of wind speed are computed using the formula,  
+    and the display is made. All three 
+    data times selected for the data source are used.
+    <li>Look at the contours and see if the speed values are reasonable. 
+    Go on to the next step to examine the wind speed in more detail.
+  </ul>
+</li>
+
+
+<li>Compare to the IDV's derived wind speed</li>
+  <ul class="substep">   
+
+    <li>Use the [ht::command Levels] selector to change the wind display
+    level to 250 hPa.
+
+    <li>From the 
+    [ht::dataset Eta 1998-06-29 12:00] choose the parameter 
+    [ht::param 3D Grid -> Derived -> Windspeed (from Gridrelative_u and Gridrelative_v)]
+
+    <p>Make a Contour Plan View of this wind speed automatically
+    derived by the IDV.
+
+    <li>Change its level to 250 hPa. 
+
+    <li>Toggle between the two displays to check for differences.
+
+
+ </ul>
+</li>
+
+<li>Extra - Calculate a difference between the system derived
+wind speed and the wind speed from your local formula using the
+simple difference formula.  What would you expect the result
+to be?
+
+<popup label="Answer">
+<ul>
+<li>Use the [ht::menu File {Save Data in Cache}] menu in the 
+control for the [ht::param {Windspeed from u and v}] display
+to save the data to the cache.  When the dialog pops up, 
+enter [ht::command windspeed (formula)].</li>
+<li>Use the [ht::menu File {Save Data in Cache}] menu in the 
+control for the 
+[ht::param {Windspeed (from GridRelative_u &amp; GridRelative_v)}] display
+to save the data to the cache.  When the dialog pops up, 
+enter [ht::command windspeed (system)].</li>
+<li>In the [ht::dialog Field Selector] window, click on 
+the [ht::param Formulas] data source and select the
+[ht::param {System -&gt; Simple difference a-b}] field
+and the [ht::display {Contour Plan View}] display, then
+click the [ht::command Create Display] button.</li>
+<li>From the [ht::dialog {Field Selector}] window that
+pops up, select one of the cached windspeeds for a and the
+other for b, then click [ht::command OK]</li>
+<li>The fields will be differenced and nothing will display
+because they have the same values.</li>
+</ul>
+</popup>
+</li>
+
+</ol>
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<menubar label="Commands">
+  <menu label="Example Menu">
+    <menuitem label="Some menu item"/>
+    <menuitem label="Some other menu item"/>
+    <separator/>
+    <menuitem label="And the last menu item"/>
+    <separator/>
+    <menu label="Sub menu">
+      <menuitem label="Item"/>
+    </menu>
+  </menu>
+  <menu label="Another menu">
+    <menuitem
+       action="foo"
+       label="Another menu"/>
+  </menu>
+</menubar>

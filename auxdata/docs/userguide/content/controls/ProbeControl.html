@@ -1,0 +1,129 @@
+{Data Probe/Time Series}
+
+{
+The data probe shows a time series chart of
+one or more fields at a 
+single location.  It also shows a tabular readout
+of the value at the current animation time step.
+
+In the image below we have a Probe Control showing three parameters:
+T, RH and windspeed. Their values at the current animation time step
+are shown in the table  and their time series are shown.
+Note, the T and RH fields are shown in one chart and the
+windspeed is shown in another chart. You can have any number of fields
+and any number of charts. 
+You can configure the layout of the charts, the chart properties
+and the line properties for each parameter. See <a href="Chart.html">here</a>
+for more information.
+
+
+[ht::cimg images/ProbeControlGui.gif]
+
+A small colored square Selector Point
+in the main IDV display shows where the probe is located.
+You can drag the probe point over the map in the main display.
+You can change the probe point vertically as well.
+
+
+
+The table shows the  parameters with  their values, the level
+at which the value is sampled, and the type of sampling.
+The location of the probe is shown, in latitude, longitude, and altitude.  
+When surface data is probed the height of the probe point does not matter.
+
+
+You can add new parameters a number of ways:
+<ul>
+<li> Right click on the table  and select [ht::menu {Add Parameter...}]
+<li> Through the  [ug::menu Edit {Add Parameter...}] menu.
+<li> Through the  [ug::menu View Parameters {Add Parameter...}] menu.
+</ul>
+
+
+Each parameter has a set of actions that can be applied:
+
+<ul>
+<li> [ug::menu {Copy}]. Copy the selected parameter. This allows
+you view the same parameter value at different locations or
+with different sampling methods.
+<li> [ug::menu {Chart Properties}]. Allows you to change how the parameter is displayed in the chart. 
+See <a href="Chart.html">here</a>
+<li> [ug::menu {Change Unit}]. You can change the display unit for the selected parameter.
+<li> [ug::menu {Set Sound...}]. You can define a sound type and range for the parameter. As the probe is moved around
+or the time animation is run a sound is applied based on the value.
+<li> [ug::menu {Remove}]. Remove the selected parameter.
+<li> [ug::menu {Displays}]. You can directly create  new display using the selected parameter.
+</ul>
+
+These parameter actions can be accessed  by right clicking on the parameter row in the table
+or through the [ug::menu View Parameters] menu.
+
+
+
+}
+
+{{Other Menu Items} {
+<ul> 
+<li> [ug::menu File Save {Export Current Time as CSV}]
+and
+[ug::menu File Save {Export All  Times as CSV}] allows you to export the current time step's
+data or all times as a comma separated file (CSV).
+
+<li> Selecting the [ug::menu Edit {Change Display Format}] allows you to change
+how the data is displayed in the table. This template is html with
+macros that get replaced with the display value, unit, raw value and raw data unit.
+
+<li> [ug::menu Edit {Add Parameter...}] Add a new parameter to the list.
+
+
+<li> The [ug::menu View Probe Position] menu allows you to
+reset the probe position and  fix  the x, y or z axis of movement.
+Resetting the probe position is useful when the probe point
+gets lost in the displays.
+
+<li> The [ug::menu View Probe Size] menu allows you to
+increase and decrease the probe size.
+
+
+<li> The [ug::menu View Probe {Probe Shape}] menu allows you to
+change the shape of the probe.
+
+
+
+</ul>
+}}
+
+
+
+
+{{Location} {
+These fields display the location of the probe and allow the user
+to directly set the location. Enter a latitude, longitude or altitude
+and press return.
+}}
+
+
+{{Levels} {
+The [ht::command Level] column in the table shows the height of the sample
+point. Click in the level value box, and you can reset the level
+for that parameter to other altitude values 
+(in the native data set) with a selector list
+of levels that pops up. The level "Probe's" is whatever level the probe happens
+to be at, which may not be a native level of the data.
+Note that once you set the level to a level not at the probe point, the
+probe point no longer shows where the sample is from. The probe does 
+have the same latitude and longitude as the data shown, but not the altitude.
+}}
+
+
+{{Sampling} {
+Probe values can be  interpolated from neighboring grid values, 
+since the probe position almost never coincides exactly with the location
+ of a data point. The [ht::command Sampling] column shows if this interpolation is
+used. "Weighed average" uses interpolation of nearby data points; 
+"Nearest neighbor" gives the exact value of the datum in the grid cell where
+the probe is located .Click in the sampling column box, and you can 
+set the sampling method for that parameter.}}
+
+
+

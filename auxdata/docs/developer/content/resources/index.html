@@ -1,0 +1,85 @@
+[header {Configuration}]
+
+
+[ht::cimg ../uml/Resources.gif]
+
+
+<h3>Macros and Resource Paths</h3>
+
+The IDV has a general way of dealing  with paths to property files, resource files, etc.
+First, a path can be one of:
+<ul>
+<li> A file path (e.g., /home/jeffmc/.metapps/DefaultIdv/colortables.xml)
+<li> A url (e.g., http://www.unidata.ucar.edu/content/software/IDV/resources/colortables.xml)
+<li> A Java resource path (e.g., /ucar/unidata/idv/resources/colortables.xml)
+</ul>
+
+It also makes use of a macro facility to take some generic path  that contains a macro and,
+expanding the macro, use the expanded path as the actual resource path.
+The  available macros are:
+
+<table>
+<tr><td>
+%USERPATH%
+</td><td>
+The file system path of the user's .metapps/application directory
+</td></tr>
+
+<tr><td>
+%SITEPATH%
+</td><td>
+If defined (usually by the -sitepath argument) the directory path 
+or url of where to find site resources
+</td></tr>
+
+<tr><td>
+%IDVPATH%
+</td><td>
+The internal (to the jars) /ucar/unidata/idv/resources  path
+</td></tr>
+
+<tr><td>
+%APPPATH%
+</td><td>
+This is normally the java resource path of the package of the 
+instantiated  idv  object. For the example idv application it would be:
+/ucar/unidata/apps/example
+</td></tr>
+
+</table>
+
+
+So for example, the above example paths may actually be defined as:
+
+<ul>
+<li> <i>/home/jeffmc/.metapps/DefaultIdv/colortables.xml</i>
+<br>
+is  actually  defined as:<br>
+<i>%USERPATH%/colortables.xml</i>
+<br>
+where %USERPATH% is:<br>
+<i>/home/jeffmc/.metapps/DefaultIdv</i>
+
+<li> 
+<i>http://www.unidata.ucar.edu/content/software/IDV/resources/colortables.xml</i>
+<br>
+might be defined as:<br>
+<i>%SITEPATH%/colortables.xml</i>
+<br>
+where %SITEPATH% is:<br>
+<i>http://www.unidata.ucar.edu/content/software/IDV/resources</i>
+
+<li> 
+<i>/ucar/unidata/idv/resources/colortables.xml</i>
+<br>
+ is really:
+<br>
+<i>%IDVPATH%/colortables.xml</i>
+<br>
+Where: %IDVPATH% is:
+<br>
+<i>/ucar/unidata/idv/resources
+
+</ul>
+
+

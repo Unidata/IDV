@@ -1,0 +1,65 @@
+<title>Image Capture</title>
+
+
+
+<div class="overview">
+In this section we will cover how to capture images within the IDV.
+</div>
+
+<ol class="step">
+  
+
+  <li>If you have nothing displayed then load in the bundle that we previously created.</li>
+  <ul class="substep">
+    <li>Select the [ht::menu File Open] menu item. In the [ht::dialog File Dialog]
+        choose [ht::filename workshop.xidv] from your home directory.</li>
+  </ul>
+  
+  <li>Select the [ht::menu View Capture {Image...}] menu item from
+      the map view's   menu bar. The [ht::dialog File Dialog] will popup.</li>
+  
+  <li>The IDV requires that the window you are capturing an image in is not
+      obscured. Move any other windows  out of the way.</li>
+  
+  <li>You can save an image as a jpg, gif or png. [ht::save workshop.jpg]</li>
+  
+  <li> Let's capture the whole window. This time from the File Dialog enter
+[ht::filename wholewindow.png] and select the [ht::button Whole Window] button on the left. 
+
+  <li>The IDV treats image  files as yet another data source. Load
+      in the newly created images by:</li>
+  
+  <ul>
+    
+    <li>[ht::openDataSourceChooser]</li>
+    
+    <li>Go to the [ht::command Files] tab.</li>
+    
+    <li>Make sure you are in your home directory.</li>
+    <li>Select [ht::filename workshop.jpg] and [ht::filename wholewindow.png] with a control-click</li>
+  </ul>
+  
+  <li>Since images are not geo-located we can only display
+      the  image in the [ht::display Omni Control]. Create this display.</li>
+
+  <li> Now, let's save off this image as a Google Earth kmz file.
+  <ul>
+      <li> When we capture an image for Google Earth we have to make sure we are using a Lat/Lon projection
+      in an overhead view.
+      <li> The easiest way to do that is to select the [ht::menu Projections Set {Use Displayed Area}] menu.
+      <li> Select the [ht::menu View Capture {JPEG...}] menu item and enter [ht::filename workshop.kmz]. 
+      <li> A reminder is shown about the Lat/Lon projection.
+      <li> From a terminal window bring up Google Earth and Open this kmz file.
+  </ul>
+
+ <li> The IDV can also read in Google Earth kml/kmz files.
+ <ul> 
+    <li> From the IDV Data Source Chooser select the [ht::filename workshop.kmz] file.
+    <li> From the field selector create an Image display.
+ </ul>
+
+
+</ol>
+
+
+

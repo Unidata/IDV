@@ -1,0 +1,148 @@
+<title>Using VisAD Data in the IDV</title>
+
+<div class="overview">
+The IDV uses VisAD [dg::class visad.Data] objects to model the different
+types of data.</div><p>
+
+The VisAD data model was designed to support virtually any numerical
+data. Rather than providing a variety of specific data structures like
+images, grids and tables, the VisAD data model defines a set of classes
+that can be used to build any hierarchical numerical data structures.
+All these objects are defined in subclasses of [dg::class visad.Data]
+and can be compared and manipulated without converting from one form
+to another. This page is not meant to be a comprehensive overview
+of the VisAD data model, but rather to show what [dg::class Data]
+objects are used in the IDV. However, let's look at a good description
+<a href="http://www.ssec.wisc.edu/~billh/guide.html#3."
+target="datapage">here</a>.
+
+<p>
+For more detailed information on the VisAD Data model, see:
+
+<ul>
+<li>Ugo Taddei's <b><a href="http://www.ssec.wisc.edu/~billh/tutorial/index.html"> VisAD Tutorial</a></b>.
+<li><a href="http://www.ssec.wisc.edu/~tomw/visadtutor/visaddata.html">
+The VisAD Data Model Tutorial</a>
+<li><a href="http://www.ssec.wisc.edu/~billh/guide.html#3">
+The VisAD Developer's Guide (Data section)</a>
+</ul>
+
+
+<h2>Getting data into the IDV</h2>
+The <b>getData()</b> method of the [dg::class DataSource] class
+returns a VisAD [dg::class Data] object.   This generalization allows
+us to easily create new DataSources without having to cast the return
+to a specific form.  The basic task of a developer creating a new
+DataSource is to transform the raw data into one of the known VisAD
+Data forms that the IDV uses.
+
+<h3>Grids</h3>
+The IDV models grids as [dg::class visad.FieldImpl] objects.  A
+grid can take the form of:
+
+<PRE>
+  (x,y) -> (parm)
+  (x,y) -> (parm1, ..., parmN)
+  (x,y,z) -> (parm)
+  (x,y,z) -> (parm1, ..., parmN)
+  (t -> (x,y) -> (parm))
+  (t -> (x,y) -> (parm1, ..., parmN))
+  (t -> (x,y,z) -> (parm))
+  (t -> (x,y,z) -> (parm1, ..., parmN))
+  (t -> (index -> (x,y) -> (parm)))
+  (t -> (index -> (x,y) -> (parm1, ..., parmN)))
+  (t -> (index -> (x,y,z) -> (parm)))
+  (t -> (index -> (x,y,z) -> (parm1, ..., parmN)))
+</PRE>
+
+In general, t is a time variable, but it might also be just an index.
+The [dg::class ucar.unidata.data.grid.GridUtil] class provides a
+set of utilities for slicing, dicing and querying data that fits 
+into these forms.
+
+<h3>Images (satellite, radar)</h3>
+Just like grids, images are modelled as [dg::className FieldImpl-s] 
+and generally have the form of:
+<PRE>
+  (x,y) -> (parm)
+  (x,y) -> (parm1, ..., parmN)
+  (t -> (x,y) -> (parm))
+  (t -> (x,y) -> (parm1, ..., parmN))
+</PRE>
+
+<h3>RGB Images (GIF, JPEG, PNG)</h3>
+These are also modelled as [dg::className FieldImpl-s], but have 3 
+or 4 components:
+<PRE>
+  (x,y) -> (red, green, blue)
+  (x,y) -> (red, green, blue, alpha)
+  (t -> (x,y) -> (red, green, blue))
+  (t -> (x,y) -> (red, green, blue, alpha))
+</PRE>
+
+<h3>Point Data</h3>
+Point data (METAR, earthquake, lightning) are modelled using the
+[dg::class ucar.unidata.data.point.PointOb] structure which
+has the methods:
+
+<pre>
+    /**
+     * Get the location (lat/lon/alt) of the observation.
+     * @return georeference location
+     */
+    public EarthLocation getEarthLocation();
+
+    /**
+     * Get the time of the observation.
+     * @return  time the observation was taken
+     */
+    public DateTime getDateTime();
+
+    /**
+     * Get the data associated with this observation.
+     * @return observed data for this location and time.
+     */
+    public Data getData();
+</pre>
+In the IDV, we use the [dg::class ucar.unidata.data.point.PointObTuple]
+to implement this interface as a [dg::class visad.Tuple].
+
+<h3>Text</h3>
+Text data is modelled using the [dg::class visad.Text] object which
+is basically a wrapper for a String.
+
+<h3>Map Lines</h3>
+Map lines are a set of lat/lon and possibly alt points defined by a VisAD
+[dg::class visad.Gridded*DSet] where * is usually 2, but can be 
+3 if altitude is present.  It has a 1D manifold in either case.
+
+(Latitude, Longitude)
+(Latitude, Longitude, Altitude)
+
+<h3>Miscellaeous</h3>
+Most other data in the IDV is modelled using some form of 
+[dg::className FieldImpl] structure.  For example, aircraft
+tracks have the form:
+
+<pre>
+  (t -> (x,y,z) -> (parm))
+</pre>
+but wouldn't be thought of as a grid or image.  However, using
+such a structure allows us to easily compare the values along an
+aircraft track with colocated points in a grid.
+
+<h3>Geolocation</h3>
+
+Some data (e.g., Point Data) include the necessary information to
+geolocate data (Latitude, Longitude, Altitude).  Other data 
+(grids, images) may have their spatial extents defined in native
+coordinates (line/element, row/column).  The IDV uses the 
+[dg::class visad.CoordinateSystem] class to provide the necessary 
+transforms for geolocation.  These provide on-the-fly coordinate
+transforms.
+
+<h3>Time</h3>
+The IDV uses the [dg::class visad.DateTime] class for time animation.
+DateTime describes time values in seconds since some point.  It provides
+methods for formatting the values to timestamps and creating sets
+from arrays of [dg::className DateTime] objects.

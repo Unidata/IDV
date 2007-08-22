@@ -1,0 +1,88 @@
+<title>Creating and Using Bundles</title>
+
+
+
+
+[ht::desc In this section we will cover how to save the state of the IDV in a           [ht::qt bundle] file.]
+
+
+
+<div class="overview">
+In this section we will cover how to save the state of the IDV in a
+<a name="bundle" class="index">bundle</a>
+file. Bundles  are xml files that hold all of the application state of the IDV:
+data sources, displays, windows and view state.
+
+</div>
+
+<ol class="step">
+  
+  <li>First, clear all existing data and displays.
+  <li> Load in a data source and create a display.
+      
+  <ul>
+    
+
+    <li>[ht::loadBasicGrid]</li>
+    
+    <li>[ht::createBasicDisplay -display {Color-Shaded Plan View}]</li>
+
+    <li>Rotate the display in the main window and reposition the
+        control window and the main window.</li>
+  </ul>
+  
+  <li>Save this state off as the [ht::filename workshop.xidv] bundle file.</li>
+  
+  <ul>
+    
+    <li>Select the [ht::menu File {Save As...}] menu from the main menu bar.
+        
+    <li> Under the &quot;What should be saved&quot; leave everything checked.</li>
+
+    <li> Under the &quot;Jython library&quot; select &quot;None&quot;.</li>
+
+
+    <li>[ht::save workshop.xidv]</li>
+  </ul>
+  
+  <li>You can use a bundle in a variety of ways:</li>
+  
+  <ul>
+    
+    <li>Open a bundle while running.</li>
+    
+    <ul class="subsubstep">
+      
+      <li>Remove all displays and data.  Reposition the main window.</li>
+
+      <li>Select the  [ht::menu File Open]  menu item.</li>
+      
+      <li>Select the [ht::filename workshop.xidv] file.</li>
+      
+      <li> You will be prompted  whether you want to remove the current data and displays. Press [ht::button OK].
+
+      <li>You should see the state  that was saved in the bundle.</li>
+
+    </ul>
+    
+    
+    <li>You can also provide the bundle file as a command line argument when
+               starting the IDV, e.g.:
+<pre>
+./runIDV <%workshop.homedir%>/workshop.xidv
+</pre>
+
+</li>
+      </ul>
+
+<ifdef flag_developerworkshop>
+
+<li> Let's go look at this bundle file.
+
+</ifdef>
+
+
+</ol>
+
+
+

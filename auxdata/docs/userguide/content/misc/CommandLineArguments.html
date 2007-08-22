@@ -1,0 +1,62 @@
+[ug::head {Command Line Arguments}]
+
+There are a number of command line arguments for the IDV.
+To view them provide the argument: -help:
+<pre>
+idv -help
+        -help  (this message)
+        -properties  &lt;property file&gt;
+        -installplugin  &lt;plugin jar file to install&gt;
+        -plugin  &lt;plugin jar file, directory, url for this run&gt;
+        -noplugins  Don't load plugins
+        -cleardefault  (Clear the default bundle)
+        -nodefault  (Don't read in the default bundle file)
+        -default  &lt;.xidv file&gt;
+        -bundle  &lt;bundle file or url&gt;
+        -oneinstanceport  &lt;port number&gt; (Check if another version of the IDV is running. If so pass command line arguments to it and shutdown)
+        -nopref  (Don't read in the user preferences)
+        -userpath  &lt;user directory to use&gt;
+        -sitepath  &lt;url path to find site resources&gt;
+        -nogui  (Don't show the main window gui)
+        -data  &lt;data source&gt; (Load the data source)
+        -display  &lt;parameter&gt; &lt;display&gt;
+        -islinteractive  &lt;run the isl file in interactive mode
+        scriptfile.isl  (Run the IDV script in batch mode)
+        -image  &lt;image file name&gt; (create a jpeg image and then exit)
+        -movie  &lt;movie file name&gt; (create a quicktime movie and then exit)
+        -imageserver  &lt;port number or .properties file&gt; (run the IDV in image generation server mode. Support http requests on the given port)
+        -Dpropertyname=value  (Define the property value)
+        -catalog  &lt;url to a chooser catalog&gt;
+        -connect  &lt;collaboration hostname to connect to&gt;
+        -server  (Should the IDV run in collaboration server mode)
+        -port  &lt;Port number collaboration server should listen on&gt;
+        -chooser  (show the data chooser on start up) 
+        -printjnlp  (Print out any embedded bundles from jnlp files)
+        -setfiles  &lt;datasource pattern&gt; &lt;semi-colon delimited list of files&gt; (Use the list of files for the bundled datasource)
+        -currenttime  &lt;dttm&gt; (Override current time for ISL processing)
+        -listresources  &lt;list out the resource types
+        -debug  (Turn on debug print)
+        -debugmessages  (Turn on language pack debug)
+        -recordmessages  &lt;Language pack file to write missing entries to&gt;
+        -trace  (Print out trace messages)
+        -traceonly  &lt;trace pattern&gt; (Print out trace messages that match the pattern)
+</pre>
+
+<%nochildlist%>
+
+
+<subhead id="datatype" intoc="false">Specifying data source type</subhead>
+If you load in a data source from the command line using the -data argument
+the idv tries to figure out what type of data it is by looking for patterns
+in  the file or url you specify. If it cannot determine
+the type the IDV will prompt the user for the type.
+<p>
+You can add in a &quot;type:&quot; prefix to the argument that will specify the type with:
+<pre>
+idv -data type:somedatatype:the_file_or_url_to_the_data
+</pre>
+
+The different values for the &quot;somedatatype&quot; are listed in <a href="../isl/datasources.txt">here</a>.
+
+[ug::foot]
+

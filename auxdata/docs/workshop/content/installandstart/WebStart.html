@@ -1,0 +1,70 @@
+<html>
+<head>
+<title>Starting the IDV with Java Web Start</title>
+</head>
+
+<body>
+
+<div class="overview">
+You can also start the IDV through the Java Web Start program.
+</div>
+
+<a name="webstart">
+<div class="pagesubtitle">Using Java Web Start</div>
+
+</a>
+
+<a href="http://java.sun.com/products/javawebstart/"> Java Web Start</a>
+is an application-deployment technology from Sun Microsystems that downloads
+all necessary software for an application and then starts the application
+with a single click in your Web browser.
+
+<p>
+
+One advantage of Web Start is that it will install the program
+on the first download and will automatically check
+for updates and retrieve new versions on subsequent start-ups. 
+Web Start has the disadvantage that you have to first install
+Java (which includes the Web Start distribution).
+
+<p>
+
+<ol class="step">
+
+  <li>For this workshop, you can launch the workshop 
+     version of the IDV through Web Start from:
+<p>
+<ul>
+<a href="<%idv.website%>/webstart/IDV/workshopIdv.jnlp">
+<b><%idv.website%>/webstart/IDV/workshopIdv.jnlp</b>
+</a>
+</ul>
+  <p>
+  The Java Network Launching Protocol (JNLP) file at that location 
+  specifies the location for the files to download.  It also includes
+  the <code class="command">installplugin</code> specification that we used
+  earlier.
+  </li>
+
+  <li>After downloading the files, the IDV is automatically launched.
+      You will be asked to accept a certificate of authenticity.
+      Accept this and the IDV will start up.</li>
+
+  <li>Notice that this IDV looks the same as the one you started from
+      the command line.  In fact, it uses the same preferences that
+      were used by the command line version, so starting either way
+      should give the same results.</li>
+
+  <li>This was just a demonstration, so you can exit the IDV in preparation
+      for the next section.  For the rest of the workshop, we'll use
+      the command line version.</li>
+</ol>
+
+<p>
+
+For more about use of Web Start with the IDV see the 
+<a HREF="%urlroot%/docs/userguide/Faq.html" target="userguide">IDV FAQ</a>.  </p>
+
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<choosers>
+<!-- 
+Experimental chooser for Level II radar from a THREDDS server
+-->
+  <panel
+     title="TDS Radar"
+     category="Sat &amp; Radar"
+     layout="border"
+     tabtooltip="For accessing Level-II radar data"
+     mnemonic="R">
+     <chooser
+       id="chooser.dqcradar"
+          title="Level II - Remote (Experimental)"
+          menutitle="TDS Level II Radar"
+          helppath="idv.data.choosers.radarchooser"
+          class="ucar.unidata.idv.chooser.DqcRadarChooser"/>
+  </panel>
+</choosers>

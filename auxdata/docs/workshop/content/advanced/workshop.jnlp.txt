@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?> 
+     <!-- JNLP File for Integrated Data Viewer --> 
+     <jnlp 
+        spec="1.0+" 
+        codebase = "http://www.unidata.ucar.edu/content/software/idv/1_2/webstart" href="http://www.unidata.ucar.edu/content/software/IDV/1_2/data/workshopIdv.jnlp"> 
+       <information> 
+         <title>Integrated Data Viewer for Unidata Training Workshops </title> 
+         <vendor>Unidata</vendor> 
+         <homepage href="http://www.unidata.ucar.edu/content/software/IDV/1_2/index.html"/> 
+         <description>2005 Workshop IDV</description> 
+         <description kind="short">Version of the IDV for the IDV Training Workshop
+        </description> 
+        <icon href="IDV/idv.gif"/> 
+        <offline-allowed/> 
+       </information> 
+       <resources> 
+         <j2se version="1.4" max-heap-size="512m" /> 
+           <jar href="IDV/idv.jar"/>
+           <extension name="IDV Base" href="IDV/idvbase.jnlp"/>
+       </resources>
+       <resources os="Linux"> 
+           <property name="j3d.sharedctx" value="false"/>
+       </resources>
+       <application-desc main-class="ucar.unidata.idv.DefaultIdv"> 
+            <argument>-plugin</argument>
+            <argument>http://www.unidata.ucar.edu/content/software/IDV/1_2/data/myplugin.jar</argument>
+<!-- here is the command line argument to start the IDV with a  bundle file read remotely from a URL  -->
+    <!--     
+    <argument>http://www.unidata.ucar.edu/content/software/IDV/1_2/data/example.xidv</argument>
+    --!>
+        </application>
+       <security>
+           <all-permissions/>
+       </security>
+
+     </jnlp> 

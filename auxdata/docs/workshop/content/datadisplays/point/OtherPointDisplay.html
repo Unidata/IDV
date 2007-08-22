@@ -1,0 +1,69 @@
+<html>
+<head>
+<title>More Point Displays</title>
+</head>
+
+<body>
+
+<div class="overview">
+
+</div>
+
+Leave the earthquake point data source and list display.
+
+<p>
+
+<ol class="step">
+    <li>Create a [ht::display Point Data Plot] display
+    <ul>
+    <li>In the [ht::command Fields] panel select [ht::param Point Data].
+    <li>In the [ht::command Displays]  select [ht::display Point Data Plot] and press
+    [ht::button Create Display]
+    </ul>
+
+    <li>  If the [ht::command Earthquake] station model is not selected for display then
+    select it with the [ht::button Change] button. This station model scales by the
+    [ht::param var] field and colors by [ht::param Altitude].
+
+    <li> Turn on the bounding box if it is not on with the [ht::menu View {Show Wireframe Box}] menu.
+    <li> Tilt the view to be looking from the south.  Note the map is at the bottom of the box and
+    the earthquake symbols are below that.
+    <li> Change the vertical scale of the display.
+    <ul>
+    <li> Find the altitude (depth) range of the data from the Observation List Display
+    created in the prior exercise.
+    <li> Select the [ht::menu View Viewpoint {Vertical Scale}] menu.
+    <li> Enter the min value found in the Observation List display.
+    <li> Enter 0 for the max value.
+    <li> Press [ht::button Apply]
+    <li> Note the map is now at the bottom. Raise the map by bringing up the
+    [ht::display Background Maps] display control  window, select the [ht::command Display]
+    tab and use the [ht::command Map Position] slider, close the window.
+    <li> If happy with the vertical scale press [ht::button OK] button.
+    </ul>
+
+    <li> Note the gray scale on the default background is difficult to see. Change the background color.
+    <ul>
+     <li> Select the [ht::menu View Color {Set Colors}] menu item.
+     <li> Press the [ht::button Set] button in the background row.
+     <li> Choose an appropriate color (e.g., light blue) and press [ht::button OK]
+     <li> Press the [ht::button Apply] button. If things look ok press [ht::button OK]
+    </ul>
+    
+    <li> Figure out what depth range contains most of the earthquakes.
+    <ul>
+    <li> Rotate to a southern view. You may need to disable [ht::command Declutter].
+    <li> Add a [ht::display Location Indicator] display with the [ht::menu Displays Special {Location Indicator}] menu.
+    <li> Move the origin point with the left mouse button.
+    <li> Move the bearing point with a control-key/left mouse button.
+    <li> Look at the altitude readouts.
+    <li> Go to the [ht::command Display] tab and turn on
+    [ht::command Solid:X] and [ht::command Solid:Y] checkboxes.
+    <li> Rotate the display and drag the origin point up and down.
+    <li> Change the [ht::command Transparency] to 50%
+    </ul>
+
+</ol>
+
+</body>
+</html>

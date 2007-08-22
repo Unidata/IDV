@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- In Ant all file paths are relative to the basedir.  Since this
+build.xml file is in ucar the basedir is "..", the parent directory of
+ucar.  (Unless overwritten by a calling ant process or by a command line
+argument -Dfoo=bar) -->
+
+
+<project basedir="../../../../../" default="plugin" name="SiegeIdv">
+
+    <import file="../../../../build.xml"/>
+
+    <target name="siege" depends="init">
+        <javac
+            classpath="${classpath}"
+            debug="true"
+            source="${srcversion}"
+            deprecation="false" 
+            destdir="${compiledir}"
+            failonerror="${failonerror}" 
+            nowarn="true"
+            srcdir="${srcdir}"
+        >
+        <include name="ucar/unidata/apps/lead/siege/**"/>
+        </javac>
+    </target>
+
+
+    <target name="siegejar" depends="siege">
+        <jar 
+            basedir="${srcdir}"
+            compress="true"
+            update="false"
+            jarfile="${jars_dest}/siege.jar">
+            <include name="ucar/unidata/apps/lead/siege/*.class"/>
+            <include name="ucar/unidata/apps/lead/siege/*.xml"/>
+        </jar>
+    </target>
+
+    <target name="plugin" depends="siegejar">
+        <copy overwrite="true"  todir="${user.home}/.metapps/DefaultIdv/plugins">
+             <fileset file="lib/siege.jar"/>
+        </copy>
+    </target>
+
+
+</project>

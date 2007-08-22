@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="Southern Ocean" category="World locations">
+<stn name="Amundsen Sea" lat="72:30:S" lon="112:00:W"/>
+<stn name="Bellingshausen Sea" lat="71:00:S" lon="85:00:W"/>
+<stn name="Drake Passage" lat="60:00:S" lon="60:00:W"/>
+<stn name="Ross Sea" lat="76:00:S" lon="175:00:W"/>
+<stn name="Scotia Sea" lat="56:00:S" lon="40:00:W"/>
+<stn name="Weddell Sea" lat="72:00:S" lon="45:00:W"/>
+</stationtable>

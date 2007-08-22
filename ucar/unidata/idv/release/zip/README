@@ -1,0 +1,44 @@
+This ZIP file contains a set of Java Archive (JAR) files
+that are required to run the Integrated Data Viewer (IDV)
+programs. It should contain the following files:
+
+    idv.jar               - the IDV classes
+    auxdata.jar           - supporting data files (maps, icons)
+    external.jar          - external packages (e.g. JDOM, JAI, IJ, JH, JMF, etc)
+    jython.jar            - Jython
+    local-visad.jar       - UPC mods to VisAD not yet in visad.jar
+    visad.jar             - VisAD
+    nc2.2.jar             - netcdf 2.2 library
+
+There is also an example JNLP file (localjars.jnlp) which allows
+you to stage the JARS above as a WebStart distribution.  To use
+this:
+
+1) Unpack all the JARs into a directory under your web server.  
+
+2) Edit (and alternatively rename) the localjars.jnlp file and 
+   change the path for your local server. If you will be running
+   this on machines with 512 Mb or more, you can bump up the 
+   max-heap-size parameter to "384m" or "512m" for better performance:
+
+         <j2se version="1.4" max-heap-size="512m" /> 
+
+3) Configure your Web server so that all files with the .jnlp file 
+   extension are set to the application/x-java-jnlp-file MIME type.
+   Each Web server has a specific way in which to add MIME types. For 
+   example, for the Apache Web server you must add the following line 
+   to the .mime.types configuration file:
+
+   application/x-java-jnlp-file JNLP
+
+   Check the documentation for the specifics of your Web server.
+
+4) Create a web page with a link to the JNLP file and users should 
+   be able to launch the IDV using that link.
+
+5) This does not include Java and Java 3D so each client will have
+to have that installed locally.
+
+For more information see:
+
+http://java.sun.com/products/javawebstart/docs/developersguide.html#website

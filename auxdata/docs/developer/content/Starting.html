@@ -1,0 +1,28 @@
+[header {Starting the IDV/Using JNLP files}]
+
+
+The end user typically brings up an IDV application 
+through  Webstart using a jnlp file. We have an example
+jnlp file here: <a href=example.jnlp>example.jnlp</a>. (Of course
+if you click on this link and have Webstart installed you will launch
+the ExampleIdv application).
+
+<p>
+The jnlp file contains
+references to a server repository of java jar files,
+a reference to the main application class and a set of 
+command line arguments to pass to the application. 
+The example.jnlp file has a single command line argument:
+
+<pre>-properties /ucar/unidata/apps/example/example.properties</pre>
+
+which is used to overwrite and/or add properties to the IDV application.
+This particular property file is stored internally in the jar file, 
+however, it can also be a url (or  a reference to your local file system).
+For further information about command line arguments see 
+<a href=commandline.html> commandline.html</a>.
+
+<p>
+As mentioned above you do not necessarily need to create your own
+application class. You can configure the behavior of the IDV through property
+and resource files.

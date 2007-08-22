@@ -1,0 +1,88 @@
+<html>
+<head>
+<title>Loading NOAA Profiler Network Data</title>
+</head>
+
+<body>
+
+<div class="overview">
+<P>
+NOAA Profiler Network data can be accessed in the IDV from
+ADDE servers. You can load and display several stations and times at once.
+</div>
+
+<p>
+
+<ol class="step">
+
+<li>Setup for Profiler displays</li>
+  <ul class="substep">
+    <li>[ht::clearDisplaysAndData].
+    <li>Uncheck the [ht::menu Projections {Auto-set Projection}]
+        menu option.
+    <li>Set the projection to Kansas ([ht::menu Projections Set Kansas] menu).
+
+    </ul>
+</li>
+
+<li>Open the Data Source Chooser for NOAA Profiler Network Data</li>
+  <ul class="substep">
+    <li> [ht::openDataSourceChooser] 
+    <li> In the [ht::dialog Data Source Chooser]
+    click on the [ht::command Profiler] tab to see the pane for 
+    access to NOAA National Profiler Network data on ADDE servers.
+    <li>The map shows Profiler station names.
+    Zoom in to see all stations in Oklahoma and Kansas. 
+    [ht::mapSelector]
+
+     <li>Select the four stations  Hillsboro, Haviland, Neodesha,
+     and Lamont, one at a time, by holding the Ctrl key down while
+     clicking on the station name.
+     You can put one or more stations in any IDV Profiler display. 
+
+     <details link="More about selecting and deselecting stations.">
+     You can de-select stations with Ctrl-click too. 
+     You can select a group of stations by a rubber band box.
+     Hold the Shift key down, then left click and drag the mouse.
+     This only selects stations shown on the map; make sure decluttering 
+     is turned off to get all stations in a region.
+     </details>
+     
+     <li>
+     In the 
+     [ht::command Server]  box, use the pull down list to select 
+     a remote ADDE server with Profiler data. Select adde.ucar.edu.
+     <li>Select [ht::command Hourly]
+     in the [ht::command Data Interval] box. You can choose from Hourly, 
+     30 minute, 12 minutes, or 6 minute. This sets the time intervals 
+     in the display. 
+     <li>
+     Click on [ht::command Connect]. A list of times will appear; 
+     the most recent 12 times are pre-selected. 
+     <li>Select the most recent 6 times available. 
+     (Shift-click on the sixth time up from the bottom.)
+     <li>Click on [ht::command Add Source] to connect the 
+     IDV to the data for this Profiler data request.
+  </ul>
+</li>
+
+<!--
+<p>
+<center><img src="/images/ProfilerChooser.gif"></center>
+<p>
+-->
+
+<p>
+
+The label  
+[ht::command Profiler Hourly - 4 stations]
+appears in the 
+[ht::command Data sources] panel in the 
+[ht::dialog Field Selector], and 
+[ht::param Profiler winds] appears in the
+[ht::dialog Fields] panel. 
+</ol>
+
+
+</body>
+</html>

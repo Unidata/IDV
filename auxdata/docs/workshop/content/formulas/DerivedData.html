@@ -1,0 +1,118 @@
+[ht::head {Derived Data and Formulas}]
+
+The IDV uses the Formula infrastructure to also automatically create derived
+products from loaded data sources.  These derived products show up
+in the list of Fields under a "Derived" tab.
+<p>
+<ol class="step">
+<li>Let's look at the Horizontal Advection formula</li>
+  <ul class="substep">
+    <li>From the [ht::menu Edit Formulas {Edit Formulas} System]
+        menu, select the
+        [ht::param {Horizontal Advection (from %N1% &amp; %N2%)}] 
+        item.</li>
+    <li>The formula looks like:
+        <pre>
+        DerivedGridFactory.createHorizontalAdvection\(scalar_parameter, D1\[label=U Component\], D2\[label=V Component\]\)
+        </pre>
+        The [ht::param D1 and D2] fields can be automatically bound to 
+        specific parameters and 
+        [ht::param scalar_parameter] is a field that the user 
+        will be prompted for.
+     <li>In the [ht::command Description], the [ht::param {%N1% and %N2%}]
+         fields correspond to the names of the bound parameters in the
+         order listed in the formula (not the number after the <b>D</b>]
+     <li>Select the [ht::tab Derived] tab.
+     <li>This formula is used as both an end user formula and  as a way
+         to automatically create derived quantities.  It uses predefined
+         parameter group called [ht::param u_and_v] to find variables in
+         a dataset that can be used to fill in for the 
+         [ht::param D1 and D2] parameters.  
+     <li>Click the [ht::button Cancel] button to close the window.
+     <li>Select the [ht::datasource Formulas] Data Source.
+     <li>Select the 
+        [ht::param {System-&gt;Horizontal Advection (from %N1% &amp; %N2%)}] 
+        field, select [ht::display {Contour Plan View}] display and
+        click [ht::button Create Display].  Notice how the formula
+        relates to the dialog that pops up.</li>
+     <li>Click the [ht::button Cancel] button to close the window.
+     </ul>
+
+<li>Display Temperature Advection from the derived formula list</li>
+  <ul class="substep">
+    <li>[ht::loadEtaGrid]
+    <li>Expand the [ht::menu {3D grid} {Derived}] tab in the 
+        [ht::command Fields] panel of the [ht::command Field Selector]
+        and select the 
+        [ht::param {Horizontal Advection (from GridRelative_u &amp; GridRelative_v)}]
+        field.  Hold the mouse over the label to look at the
+        tooltip which shows the formula for this field.  Notice that
+        the [ht::param {%N1% and %N2%}] parameters in the formula description
+        have been filled in.
+
+    <li>Select the [ht::display {Contour Plan View}] display and
+        click [ht::button {Create Display}].
+
+    <li>When prompted for the [ht::param scalar parameter], select
+        the [ht::param {3D  grid-&gt;temperature}] field and click
+        [ht::button OK].
+   </ul>
+</li>
+<li>Now, let's create a system formula for Temperature advection that will
+show up when a grid is loaded.</li>
+  <ul class="substep">
+    <li>Select the [ht::datasource Formulas] Data Source.
+    <li>Right click on the 
+        [ht::param {System-&gt;Horizontal Advection (from %N1% &amp; %N2%)}] 
+        field and select  [ht::menu {Copy Formula}].
+    <ul class="substep">
+        <li>Change the [ht::command Name] to [ht::param tadv].
+        <li>Change the [ht::command Formula] to 
+        [ht::param {DerivedGridFactory.createHorizontalAdvection(D1, D2, D3)}].
+        <li>Change the [ht::command Description] to 
+        [ht::param {Temperature Advection (from %N1%, %N2% &amp; %N3%)}].
+        <li>Change the [ht::command Group] to 
+           [ht::param {Custom Derived}].
+        <li>Select the [ht::command Derived] tab.  
+        <li>Clear out the [ht::param u_and_v] under Parameter Groups.
+        <li> Look at the list of available groups. We could use the group created in the prior exercise using the [ht::dialog Parameter Groups Editor] but for now we will enter the parameter names to match on directly.
+        <li>In the [ht::command Parameters] input area, right click and
+            select the Temperature, U component and V components
+            (one at a time) from the [ht::menu Aliases {Group #1}]
+            menu available from the <img src="images/DownDown.gif"> button 
+	    or type [ht::param TEMP,U,V].
+        <li>Click the [ht::button Change Formula] button.  The 
+            [ht::datasource Formulas] data source now has a
+            [ht::param My Derived] category in the 
+            [ht::command Fields] panel.
+    </ul>
+    </li>
+    <li>Right click on the [ht::datasource NCEP Model Data] data source
+        and select [ht::menu Reload Data] to refresh the list of 
+        parameters.  Derived data selections are only created when
+        the Data Source is loaded or reloaded.</li>
+    <li>Select the [ht::param {My Derived-&gt;Temperature Advection (from T, GridRelative_u &amp; GridRelative_v)}] parameter and the  
+        [ht::display {Contour Plan View}] display and then click
+        the [ht::button Create Display] button.</li>
+    <li>Compare the two displays.
+    <li>Remove the displays, but not the data.
+    <li>From the [ht::datasource Formulas] data source, right click
+        on the 
+        [ht::param {My Derived-&gt;Temperature Advection (from %N1%, %N2% &amp; %N3%)}]
+        field and select [ht::menu Edit Formula].</li>
+    <li>Remove the [ht::command Group] for the formula  and click
+        [ht::button  Change Formula].
+    <li>Reload the [ht::datasource  NCEP Model Data ETA] datasource.
+    <li>Where did the derived formula go this time?
+    <li>Use the [ht::chooser Files] chooser to load in the 
+        [ht::filename sample_eta_grid.nc] file.
+    <li>Does this have a temperature advection field?
+  </ul>
+</li>
+
+
+<li>Let's just look at the [ht::filename derived.xml] file in:<p>
+<i><%workshop.homedir%>/.metapps/DefaultIdv</i><p>
+
+to see what the formula looks like.
+</ol>

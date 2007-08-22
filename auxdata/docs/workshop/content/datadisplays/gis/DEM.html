@@ -1,0 +1,115 @@
+<html>
+<head>
+<title>DEM Displays</title>
+</head>
+
+<body>
+
+
+<div class="overview">
+The IDV supports elevation data from models, USGS DEM format
+and ESRI's ArcInfo ASCII grid format.
+
+</div>
+
+<ol class="step">
+
+    <li> [ht::clearDisplaysAndData]
+
+    <li> Load some DEM data.
+    <ul>
+    <li> [ht::openDataSourceChooser] 
+    <li>In the [ht::dialog Data Source Chooser] click on the 
+    [ht::command Files] tab. 
+    <li> Go to the point data directory:     [ht::filename <%workshop.datadir%>/gis/].
+    <li> Select [ht::filename dem.grd]
+    <li> Under the [ht::command Data Source Type] pulldown menu, select &quot;DEM Files&quot;
+    <li> Press [ht::button Add Source]
+    </ul>
+
+
+    <li> Create a display
+    <ul>
+    <li> Select [ht::display Color-Shaded Plan View] in the [ht::command Displays] section
+    of the [ht::dialog Field Selector] and press the [ht::button  Create Display] button.
+    </ul>
+    <li> Where are we?
+
+    <ul>
+    <li> To find out create a Background Image 
+    ([ht::menu Displays {Maps and Backgrounds} {Add Background Image}] or
+    with the <img src="%dotpath%/images/Earth16.gif"> toolbar button). Select the &quot;Topographic Map&quot; layer.
+
+    <li> Humm, now what, we can't see the DEM image.
+
+    <li> The background image is blocking the DEM display. Unfortunately
+    we can change the Z-level of the background but it is already at
+    the lowest level so change the vertical position of the  DEM display.
+    </ul>
+
+    <li> Ok, so now we see that this DEM data set is to the west of Denver.
+
+    <li> Note that the DEM display is flat, it is just a plan view. Doesn't the IDV do 3D???
+
+    <ul>
+     <li> Yes it does. 
+     <li> Remove the DEM display and select the  Elevation field for the DEM data in the [ht::command Field Selector].
+     <li> Under    [ht::command 3D Surface] in the [ht::command Displays] area select [ht::display Topography] and
+     create the display.
+
+     <li> Try changing the [ht::command Display Mode] to points. It looks better
+     if you turn off the visibility of the Topographic map.
+
+    </ul>
+
+     <li> Now, lets try to combine the Topographic map with the DEM data. i.e., lets drape a map image
+     over the DEM.
+
+     <ul>
+     <li> First, a tricky part: we want to somehow capture the background image
+     over the spatial domain  of the DEM data set. 
+     <ul>
+     <li> Zoom in to the DEM image.
+     <li> In the [ht::menu File Save] menu of the
+     [ht::display Background Image] display control select
+     [ht::menu {Save Data in Cache...}].
+     <li> Leave the name as is and press [ht::button OK]
+     <li> Now, we have a snapshot of the Topographic map in the
+     [ht::dialog Field Selector]
+     </ul>
+
+     <li> Remove the [ht::display Topography] and 
+     [ht::display Background Image] displays.
+     <li> In the      [ht::dialog Field Selector] select [ht::dataset Formulas]
+     and in the [ht::command Fields] list, under [ht::param System]  select
+     [ht::param Image over topography].
+     <li> In the [ht::command Displays] list, under [ht::display Imagery] select 
+     [ht::display 3 Color (RGB) Image over topography] and press [ht::button Create Display]
+     <li> A new [ht::dialog Field Selector] will popup. Select [ht::param Elevation]
+     and press [ht::button OK].
+     <li> Another [ht::dialog Field Selector] will be shown for the image field.
+     Select [ht::param Topographic map] under [ht::dataset Cached data].
+
+     <li> The Topographic map should now be shown draped over the topography.
+ 
+     </ul>
+
+     <li> Try changing the vertical scale to 5000-14000 feet ([ht::menu View {Viewpoint} {Vertical Scale}] menu item).
+      
+      <li> Lets just highlight the areas that are above 4000 meters.
+      <ul>
+      <li> Add a [ht::display Location Indicator] display with the 
+      [ht::menu Displays Special {Location Indicator}] menu item.
+      <li> In the [ht::command Altitude] field for the origin enter 4000 and hit return.
+      <li> Under the [ht::command Display] tab turn off the [ht::command Visibility]
+      for the X, Y and Z axis. Turn on the [ht::button Solid] checkbox for X.
+      Set the [ht::command Transparency ] to 20%.
+      <li> What are the names of these peaks?
+      </ul>
+
+
+
+</ol>
+
+</body>
+</html>

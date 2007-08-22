@@ -1,0 +1,75 @@
+
+<title>Plugin Creator</title>
+
+
+<div class="overview">
+We're going to look at how to create IDV plugins. 
+</div>
+
+<ol class="step">
+    <li> Bring up the Plugin Creator with the [ht::menu Tools {Plugin Creator}] menu.
+    <li> Add in all of the resources you've created.
+    <ul>
+        <li> Go to the [ht::menu File {Add File}] menu.
+        <li> This shows the [ht::filename <%workshop.homedir%>/.metapps/DefaultIdv] directory. 
+        <li> Shift-click or control-click to add the resource files, e.g., [ht::filename stationmodels.xml], 
+[ht::filename colortables.xml],
+[ht::filename derived.xml], etc.
+    </ul>
+    <li> Add some items to the menu bar
+    <ul>
+      <li> Bring up the [ht::command Toolbar] tab in the user preferences ([ht::menu Edit Preferences]). 
+      <li> Select some items on
+      the right and do [ht::button Export to Menu Plugin]. Enter some menu name.
+    </ul>
+    <li> Go to the [ht::command Excludes] and select a number of system resources to exclude. e.g., Color Tables, Station Models, etc.
+    <li> View the [ht::command Properties] tab, scroll down and change [ht::command IDV Title] to something else.
+    <li> Click on [ht::button Write Plugin] and enter [ht::filename myplugin.jar] in the file browser.
+    <li> Let's see the results.
+    <ul>
+    <li> Shutdown  the IDV. 
+    <li> Bring up a terminal window and do:<pre>
+runIdv -userpath ~/othermetapps -plugin /home/idv/myplugin.jar
+</pre>
+This brings up the IDV with a different local user resource directory.
+
+    <li> View some of the resources (e.g., Color Table Editor, Station Model Editor)
+    <li> Exit the IDV
+    <li> From a terminal window view the contents of the plugin:
+<pre>
+jar -tvf myplugin.jar
+</pre>
+
+</ul>
+<li> Lets create another plugin that is something that might be used in a classroom setting
+
+<ul>
+    <li> Add a page for the quicklinks. Bring up a text editor and create a descriptive html page.
+    You can include links to IDV bundles in this html. Paste this into the file:
+[ug::xml {
+<a href="http://www.unidata.ucar.edu/content/software/idv/data/marsquad.xidv"> Load Mars bundle</a>
+<p>
+<a href="http://www.unidata.ucar.edu/content/software/idv/data/davenportradar.xidv"> Load Davenport radar example</a>
+<p>
+<a href="action:new.displaywindow">New Window</a>
+<p>
+<a href="action:bundle.save">Save Bundle</a>
+<p>
+<a href="action:exit">Exit the IDV</a>
+}]
+                 <li> Save this file as [ht::filename workshop.qhtml]
+		 <li> From the Plugin Creator [ht::menu File {Add File}] menu select this qhtml file.
+                 <li> <b>Note: If we were running the version of the IDV that I fixed this morning
+		 clicking on the above links in the Quicklinks would actually work</b>
+       <li> Add in some of the favorite bundles you've created.
+       <ul>
+           <li> From the Favorites Manager select multiple favorite bundles (Control-Click).
+           <li> Choose [ht::menu File {Export to Plugin}]
+        </ul>    
+        <li> Write out the  plugin, selecting the [ht::button Install] checkbox. 
+        <li> Exit and restart the IDV
+    </ul>    
+</ol>
+
+
+

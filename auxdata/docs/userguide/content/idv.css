@@ -1,0 +1,225 @@
+
+body {background-color: #FFFFFF;
+      margin: 5;
+      font-size: 12pt;
+      font-family: SansSerif, Arial, Helvetica, sans-serif}       
+
+
+
+
+
+.xmlcomment {
+
+
+     background-color: lightgray;
+}
+
+.xmlcdata {
+     background-color: #6495ed;
+}
+
+
+.xmlattr {
+   font-weight: bold;
+}
+
+.cimg {
+    text-align:center;
+    margin-top: 20;
+    margin-bottom: 40;
+}
+
+
+
+
+
+
+
+A.faq-category-link {
+    text-decoration: none;
+    color: #8080C0;
+}
+
+A.faq-category-link:hover {
+    text-decoration: underline;
+}
+
+A.faq-question-link {
+    text-decoration: none;
+    color: black;
+}
+
+A.faq-question-link:hover {
+    text-decoration: underline;
+}
+
+.faq-category-title {
+    margin-top:10px;
+    color: #8080C0;
+    font-size: 16pt;
+    font-weight: bold;
+}
+
+
+.faq-bottom {
+        margin-top:20px;
+}
+
+.faq-bottom .faq-question {
+   font-weight:bold;
+   margin-top:5px;
+}
+
+.faq-category {
+        margin-left:20px;
+}
+
+
+
+
+/*Since applying styles to span tags does not seem to work we use <code class="command">*/
+
+code.command {
+         font-size: 12pt;
+         font-family: SansSerif, Arial, Helvetica, sans-serif;       
+         font-weight: bold;
+}
+
+code.menu {
+         font-size: 12pt;
+         font-family: SansSerif, Arial, Helvetica, sans-serif;       
+         font-weight: bold;
+}
+
+
+.pagetitle {
+    font-size: 18pt;
+    font-weight: bold;
+    color: #8080C0;
+    margin-top: 5;
+    margin-bottom: 5;
+}
+
+.pagesubtitle {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #8080C0;
+    margin-top: 10;
+    margin-bottom: 5;
+}
+
+
+
+
+.preferencegroup {
+    margin-left: 20;
+}
+
+
+.preferencegrouptitle {
+    border-bottom: solid thin;
+    margin-top: 10;
+    margin-bottom: 2;
+    font-size: 12pt;
+    font-weight: bold;
+    color: #8080C0;
+}
+
+.pagesubsubtitle {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #8080C0;
+    margin-top: 5;
+    margin-bottom: 5;
+}
+
+
+
+p   {
+     font-size: 12pt;
+     font-family: SansSerif, Arial, Helvetica, sans-serif;       
+     margin-top: 10;
+     margin-bottom: 0;
+}
+
+p.code {
+        font-family: Monospaced;
+	margin-left: 22;
+       }
+
+
+.childlist-level {
+    font-weigt:bold;
+    font-size: 14pt;
+    color: #8080C0;
+    margin-top: 10;
+    margin-bottom: 5;
+}
+
+.childlist {
+    margin: 10;
+    margin-left: 30;
+}
+
+
+
+p.indent1  {margin-left: 3}
+
+p.indent2  {margin-left: 12}
+
+p.indent3  {margin-left: 32}
+
+p.note {margin-top: -19;
+	margin-left: 22}
+
+p.table {font-size: 12pt;
+     font-family: SansSerif, Arial, Helvetica, sans-serif;
+     margin-top:0;
+     margin-bottom: 0}
+
+blockquote.menu {margin-left: 18;
+		margin-top: 10}
+
+center {margin-top: 10}
+
+
+[border] {border: solid thin;
+       border-color: silver}
+
+table {border: none;
+       border-color: white;
+       margin-top: 5;
+       margin-bottom: 5}
+
+td {font-size: 12pt;
+    font-family: SansSerif, Arial, Helvetica, sans-serif;
+    padding-left: 1;
+    padding-right: 1;
+    padding-top: 1;
+    padding-bottom: 1} 
+
+
+th {padding-left: 1;
+    padding-right: 1;
+    padding-top: 1;
+    padding-bottom: 1}
+
+
+small {font-size: x-small}
+
+dl.see_also {margin-left: 0;
+    margin-top: 10;
+    margin-bottom: 10}
+
+a.nounderline {text-decoration: none }
+
+pre {  font-family: Monospaced, "Courier New", Courier, mono; xxxfont-size: x-small}
+
+code {  font-family: Monospaced, "Courier New", Courier, mono; xxxfont-size: x-small}
+
+
+.menudesc {
+    margin: 0;
+    margin-left: 0;
+    margin-bottom: 10;
+}

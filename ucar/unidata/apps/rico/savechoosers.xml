@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<choosers>
+  <panel
+     title="RICO-SPOL"
+     layout="border">
+    <label
+       text="SPOL:"
+       class="toplabel"/>
+    <chooser
+       place="Center"
+       id="chooser.polling.spol"
+       datasourceid="FILE.DORADERADAR"
+       title="SPOL Data"
+       showinmenu="true"
+       class="ucar.unidata.idv.chooser.PollingFileChooser"
+       directory="/data/raidzone/rico/spol"
+       filepattern="swp\..*\_$"
+       mostrecent="10"
+       loadlabel="Load SPOL Data"/>
+  </panel>
+  <panel
+     layout="border"
+     title="RICO-Tracks">
+    <panel
+       place="North"
+       layout="gridbag"
+       cols="1"
+       title="RICO-Tracks">
+      <chooser
+         border="titled"
+         border_title="C130"
+         tagclass="ricochooser"
+         id="chooser.polling.c130"
+         datasourceid="FILE.TRACK"
+         title="C130 Tracks"
+         showinmenu="true"
+         class="ucar.unidata.idv.chooser.PollingFileChooser"
+         directory="/data/raidzone/rico/c130"
+         filepattern=".*\.nc"/>
+      <chooser
+         border="titled"
+         border_title="UW King Air"
+         tagclass="ricochooser"
+         id="chooser.polling.kingair"
+         title="UW King Air"
+         datasourceid="FILE.TRACK"
+         showinmenu="true"
+         class="ucar.unidata.idv.chooser.PollingFileChooser"
+         directory="/data/raidzone/rico/uw_kingair"
+         filepattern=".*\.nc"/>
+    </panel>
+  </panel>
+  <panel
+     layout="border"
+     title="RICO-Sondes">
+    <panel
+       place="North"
+       layout="gridbag"
+       cols="1"
+       title="RICO-Sondes">
+      <chooser
+         border="titled"
+         border_title="Upsonde"
+         tagclass="ricochooser"
+         id="chooser.polling.upsonde"
+         datasourceid="FILE.SONDE"
+         showinmenu="true"
+         class="ucar.unidata.idv.chooser.PollingFileChooser"
+         directory="/data/raidzone/GAUS"
+         showpoll="false"
+         filepattern=".*\.nc"/>
+    </panel>
+  </panel>
+
+
+  <panel
+     layout="border"
+     title="RICO-Satellite">
+    <panel
+       place="North"
+       layout="gridbag"
+       cols="1">
+      <chooser
+         id="chooser.polling.sat1km"
+         tagclass="ricochooser"
+         border="titled"
+         border_title="1km Visible"
+         datasourceid="FILE.AREAFILE"
+         title="1km Visible Satellite"
+         showinmenu="true"
+         class="ucar.unidata.idv.chooser.PollingFileChooser"
+         directory="/data/raidzone/ldm/images/sat/GOES-12/1km/VIS"
+         filepattern=".*vis_.*$"
+         mostrecent="5"
+         loadlabel="Load Visible Satellite Imagery"/>
+      <chooser
+         border="titled"
+         border_title="4km IR"
+         tagclass="ricochooser"
+         id="chooser.polling.sat4kmir"
+         datasourceid="FILE.AREAFILE"
+         title="4km IR Satellite"
+         showinmenu="true"
+         class="ucar.unidata.idv.chooser.PollingFileChooser"
+         directory="/data/raidzone/ldm/images/sat/GOES-12/4km/IR"
+         mostrecent="5"
+         filepattern=".*ir_.*$"
+         loadlabel="Load IR Satellite Imagery"/>
+      <chooser
+         border="titled"
+         border_title="4km Water Vapor"
+         tagclass="ricochooser"
+         id="chooser.polling.sat4kmwv"
+         datasourceid="FILE.AREAFILE"
+         title="4km Water Vapor Satellite"
+         showinmenu="true"
+         class="ucar.unidata.idv.chooser.PollingFileChooser"
+         directory="/data/raidzone/ldm/images/sat/GOES-12/4km/WV"
+         mostrecent="5"
+         filepattern=".*wv_.*$"
+         loadlabel="Load Water Vapor Satellite Imagery"/>
+    </panel>
+  </panel>
+  <panel
+     title="RICO-Files"
+     layout="border"
+     tabTooltip="For accessing local files"
+     mnemonic="C">
+    <chooser
+       id="chooser.file"
+       title="Files"
+       menutitle="From the File System"
+       showpolling="true"
+       showinmenu="true"
+       helppath="idv.data.choosers.file"
+       class="ucar.unidata.idv.chooser.FileChooser"
+       path="/data/raidzone/rico"
+       filters=".*\.xidv:IDV files (*.xidv);"/>
+  </panel>
+  <tabbedpane title="Other Data">
+    <panel
+       title="URLs"
+       layout="border"
+       tabTooltip="For accessing URLs"
+       mnemonic="C">
+      <chooser
+         id="chooser.url"
+         title="URLS"
+         menutitle="From a Web Server"
+         helppath="idv.data.choosers.url"
+         class="ucar.unidata.idv.chooser.UrlChooser"
+         anchor="nw"/>
+    </panel>
+    <panel
+       title="Catalogs"
+       layout="border"
+       tabTooltip="For accessing remote gridded data"
+       mnemonic="C">
+      <chooser
+         id="chooser.xml"
+         title="Catalogs"
+         menutitle="From a Catalog"
+         helppath="idv.data.choosers.catalog"
+         class="ucar.unidata.idv.chooser.XmlChooser"/>
+    </panel>
+    <panel
+       title="Images"
+       layout="border"
+       tabtooltip="For accessing satellite imagery"
+       mnemonic="I">
+      <chooser
+         id="chooser.image"
+         title="Imagery"
+         menutitle="Satellite Imagery"
+         helppath="idv.data.choosers.image"
+         class="ucar.unidata.idv.chooser.ImageChooser"/>
+    </panel>
+    <panel
+       title="Radar"
+       layout="border"
+       tabtooltip="For accessing Level-II and Level-III radar data">
+      <tabbedpane place="Center">
+        <chooser
+           id="chooser.radar.level3"
+           title="Level III"
+           menutitle="Level III Radar"
+           helppath="idv.data.choosers.radar_level3"
+           class="ucar.unidata.idv.chooser.RadarChooser"/>
+        <chooser
+           id="chooser.radar.level2"
+           title="Level II"
+           menutitle="Level II Radar"
+           helppath="idv.data.choosers.radar_level2"
+           class="ucar.unidata.idv.chooser.Level2RadarChooser"/>
+      </tabbedpane>
+    </panel>
+    <panel
+       title="Point"
+       layout="border"
+       tabtooltip="For accessing surface observations"
+       mnemonic="P">
+      <chooser
+         id="chooser.point"
+         title="Point"
+         menutitle="Observation Data"
+         helppath="idv.data.choosers.point"
+         class="ucar.unidata.idv.chooser.PointChooser"/>
+    </panel>
+    <panel
+       title="RAOB"
+       layout="border"
+       tabtooltip="For accessing RAOB data"
+       mnemonic="B">
+      <tabbedpane place="Center">
+        <chooser
+           id="chooser.raob.remote"
+           title="Soundings: Remote"
+           menutitle="Sounding Data-Remote"
+           helppath="idv.data.choosers.raob"
+           class="ucar.unidata.idv.chooser.RaobChooser"
+           showserver="true"/>
+        <chooser
+           id="chooser.raob.file"
+           title="Soundings: Local"
+           menutitle="Sounding Data-Local"
+           helppath="idv.data.choosers.raob"
+           class="ucar.unidata.idv.chooser.RaobChooser"
+           showserver="false"/>
+        <chooser
+           id="chooser.raob.singlelevel"
+           title="Single Level"
+           menutitle="Sounding Data-Single Level"
+           helppath="idv.data.choosers.raob_singlelevel"
+           class="ucar.unidata.idv.chooser.RaobPointChooser"
+           showserver="true"/>
+      </tabbedpane>
+    </panel>
+    <panel
+       title="Profiler"
+       layout="border"
+       tabtooltip="For accessing profiler data"
+       mnemonic="O">
+      <chooser
+         id="chooser.profiler"
+         title="Profiler Winds"
+         menutitle="Profiler Winds"
+         helppath="idv.data.choosers.profiler"
+         class="ucar.unidata.idv.chooser.ProfilerChooser"/>
+    </panel>
+  </tabbedpane>
+  <styles>
+<!-- Define the style for the labels       -->
+    <style
+       class="toplabel"
+       margin="8,30,4,0"
+       fontsize="+1"
+       place="North"
+       align="left"
+       fontface="Dialog"
+       fontstyle="PLAIN"/>
+    <style
+       class="ricochooser"
+       margin="10,10,10,10"/>
+  </styles>
+<!--
+    <chooser title="ADDE Images"      class="ucar.unidata.idv.chooser.McidasImageChooser" />
+      -->
+</choosers>

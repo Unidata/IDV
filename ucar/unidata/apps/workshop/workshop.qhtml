@@ -1,0 +1,20 @@
+<html>
+<head>
+<tabtitle>Workshop IDV</tabtitle>
+</head>
+
+<body>
+<h1 align="center">Welcome to the Unidata Workshop IDV</h1>
+
+If you are reading this page in the IDV, it means you installed
+the IDV Workshop plugin.  This version of the IDV has been customized 
+to provide access to some resources necessary for the 
+<b>Unidata Training Workshop</b> materials.
+<p>
+
+When you have finished the workshop, you can remove the plugin
+using the <b>Tools-&gt;Plugin Manager</b> menu.
+</body>
+
+</html>
+

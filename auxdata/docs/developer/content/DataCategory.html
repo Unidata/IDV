@@ -1,0 +1,88 @@
+[header {Data categories}]
+
+
+This represents a hierarchical category of string names 
+and is used to categorize  different flavors of data within
+DataChoice objects and for determining what displays are applicable
+to what data. A DataCategory object really represents a 
+node in a list of DataCategory objects that define the hierarchy.
+For example, the string FOO-BAR-ZOO
+is represented by three DataCategory objects:
+
+<pre>
+ +-----+     +-----+     +-----+
+ | FOO |-->  | BAR | --> | ZOO |
+ +-----+     +-----+     +-----+
+ </pre>
+
+There are static utility methods for parsing a string category name
+into a chain of objects. Likewise there are methods for parsing
+a String of semi-colon delimited category strings  into a Collection
+of DataCategory chains.
+
+<p>
+Category names can also hold regular expressions,e.g., "*", "+" and "."
+that gives us alot of flexibility in creating categories that match a variety
+of flavors of data.
+
+
+
+
+
+
+<p>
+The categories  field is a semi-colon (";") delimited set of
+data category strings. Each data category specification
+is a dash ("-") delimited set of category components. So a data category
+can be viewed  as a hierarchy or path of components. 
+For example, you could have a  categories entry:
+<pre>textdisplay.categories = text;html</pre>
+
+
+This says that the <code>textdisplay</code> DisplayControl is applicable
+to any data which has data category of <code>text</code> or <code>html</code>.
+Now lets suppose we know there is data available that is html but has a more
+complex categorization, perhaps html that is weather related e.g.:
+<pre>html.weather</pre>
+
+In this case we might have a specialized display control that knows how 
+to deal with these <code>html-weather</code> categorized data. In this case 
+we would have a data category like:
+<pre>special_html_display.categories= html-weather</pre>
+
+This special category would only be applicable to the special "html-weather" data.
+However, this data is still "html" like data and we would also want the <code>textdisplay</code>
+DisplayControl to be able to display this data. To do this we can take advantage
+of the regular  expression capability of data categories. Each component of a data
+category can also be a regular expression. So we could change the category
+of the <code>textdisplay</code> to be:
+
+<pre>textdisplay.categories = *-text-*;*-html-*</pre> 
+
+This states that the  <code>textdisplay</code> is applicable to any data 
+that has a category that contains "text" as a component.  This can be read
+as: 0 or more (arbitrary) components followed by a "text" component followed by 0 or more 
+(arbitrary)  components.
+
+<br>
+
+Another example:
+<pre>2D-TIME-*</pre>
+is read as any category  that  begins with the components "2D" and "TIME" and ends
+with 0 or more components.
+
+<br>
+We can also use the "+" to represent 1 or more and the "." to represent one, e.g.:
+<pre>
+2D-TIME-+ (2D-TIME followed by one or more components)
+2D-TIME-. (2D-TIME followed by one component)
+2D-TIME-.-FOO (2D-TIME followed by one component followed by FOO)
+</pre>
+
+One could also use richer regular expressions here but it has not been thouroughly tested
+(and needed) yet. Note: currently a string representation of a category is parsed
+(in <a href=../data/DataCategory.html>DataCategory</a>) using a StringTokenizer,
+breaking on "-". So if you use a regular expression that contains a "-" (e.g., \[A-Z]+),
+this will break. Sometime in the future we'll tokenize smarter to allow for
+escapes, e.g.: \[A\-Z]+.
+<p>

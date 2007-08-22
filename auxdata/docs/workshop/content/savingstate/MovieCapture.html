@@ -1,0 +1,109 @@
+<title>Movie Capture</title>
+
+
+<div class="overview">
+In this section we will cover how to create QuickTime movies, animated gifs and Goole Earth files
+within the IDV.
+</div>
+
+<ol class="step">
+  
+  <li>First, load in some data with multiple time steps and create a
+      display.</li>
+  
+  <ul class="substep">
+    
+    <li>Remove any data and displays. [ht::refresh]</li>
+    
+    <li>[ht::loadEtaGrid]</li>
+    
+    <li>[ht::createBasicDisplay]</li>
+   
+  </ul>
+  
+  <li>Save this state off as the [ht::qt movie] bundle.</li>
+  <ul class="substep">
+    <li> Select the [ht::menu File {Save As...}] menu item.</li>
+    <li>Make sure you are in your home directory and enter [ht::filename movie.xidv].</li>
+  </ul>
+
+  <li>Open the [ht::dialog Movie Capture] window by
+      selecting the [ht::menu View Capture {Movie}] menu item
+      from the map view's   menu bar.</li>
+  
+  <li>For now the IDV requires that the window you are capturing an image in is
+      not obscured.   Move any other windows  out of the way.</li>
+  
+  <li>A movie is simply a sequence of frames. There are three ways to capture
+      this sequence.</li>
+  
+  <li>You can capture one frame with the [ht::button Capture one image]
+      button.</li>
+  
+  <ul class="subsubstep">
+    
+    <li>Try 3 or 4 cycles of capturing one image and moving the viewpoint.</li>
+    
+    <li>You should see the [ht::command Frames] panel become enabled and the
+        number  of frames listed.</li>
+    
+    <li>Bring up the [ht::dialog Movie Preview] window by clicking the
+        [ht::button   Preview] button.</li>
+    
+    <li>In the [ht::dialog Movie Preview] window you can step forward, backward
+        and play the movie as well as delete individual frames.</li>
+  </ul>
+  
+  <li>Start fresh by clicking the [ht::button Delete all] button in the main
+      [ht::dialog Movie Capture] window.</li>
+  
+
+
+
+
+  <li>Now, let's capture an entire animation by clicking the
+      [ht::button Capture   animation] button.</li>
+  
+  <li>When the animation is complete the [ht::dialog File Dialog] will automatically
+be shown. [ht::save workshop.mov]</li>
+  
+
+  <li>The [ht::button Capture automatically] button allows
+      you to capture a single frame every <i>N</i> seconds.</li>
+      <ul class="substep">
+         <li>Click the [ht::button Capture automatically] button to start the capture.</li>
+         <li>Turn on animation.</li>
+         <li>Navigate around the 3D view. Zooming in, etc.</li>
+         <li>Click the [ht::button Stop] button and then click [ht::button Preview].</li>
+         <li>The [ht::dialog Preview] window allows you to view, play and delete the frames
+         that make up a movie.
+      </ul>
+  
+  <li>The IDV treats QuickTime movies as yet another data source. Load in
+      and view the newly created movie by:</li>
+  
+  <ul>
+    
+    <li>[ht::openDataSourceChooser]</li>
+    
+    <li>Go to the [ht::command Files] tab.</li>
+    
+    <li>Select [ht::filename workshop.mov].</li>
+    
+
+    <li> For Quicktime movies the data source is not shown and the  [ht::display Movie Display Control] will automatically be created.</li>
+  </ul>
+  
+  <li> You can also save the movie as a Google Earth kmz file.
+  <ul>
+     <li> Press the [ht::button Delete All] button.
+     <li> Capture the animation with the [ht::button Capture   animation] button.
+     <li> When done, choose [ht::filename movie.kmz] as the file.
+     <li> Bring this file up in Google Earth.
+  </ul>
+  
+</ul>
+</ol>
+
+
+

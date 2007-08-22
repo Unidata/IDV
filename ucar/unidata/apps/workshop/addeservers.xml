@@ -1,0 +1,6 @@
+<servers>
+  <server active="true" description="adde.ucar.edu" name="adde.ucar.edu">
+    <group active="true" description="CCS039" names="CCS039" type="image"/>
+    <group active="true" description="CCS039R" names="CCS039R" type="radar"/>
+  </server>
+</servers>

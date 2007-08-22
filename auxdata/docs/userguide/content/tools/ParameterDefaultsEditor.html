@@ -1,0 +1,54 @@
+<html><head> 
+  <title>Parameter Defaults Editor</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+
+The Parameter Defaults Editor is  opened through the
+<a href="../ui/Menus.html#tools">Tools menu</a>
+with 
+[ug::menu Tools  {Parameter Defaults Editor}]
+and allows for the specification 
+of default color tables, ranges, units, and contouring values
+for different parameters.
+
+[ht::cimg images/ParamDefaultsEditor.gif {Parameter Defaults Editor}]
+
+This feature lets you preset conventional color and contouring choices, 
+and lets you override system defaults. 
+
+
+<p>
+
+There are two sets of defaults: user defaults in the tab <b>User        
+defaults</b>, and system defaults supplied with the IDV in the          
+<b>System defaults</b> tab. Look at the system defaults for examples.   
+These are general common parameter names, such as u for the eastward    
+wind component, and special names we have encountered that our users    
+may also use, such as p_msl for mean sea level pressure. 
+
+
+<p>
+
+The system settings cannot be edited by the user, but right clicking a row    
+allows you to copy a parameter to  the     
+"user defined" table. When you do this the Parameter Defaults Properties window
+allows you to define what properties you want to define:
+
+[ht::cimg images/ParamDefaultsProperties.gif {Parameter Defaults Properties}]
+
+Simply check or uncheck the [ug::button Defined] buttons and define the
+settings as desired.
+From the user defined table you can also right click on a row to add a new row,
+edit the settings for the row or delete the row.
+
+<p>
+
+
+The parameter names are given in regular expression syntax to help
+match with actual data names. Plain text is matched exactly. The string dot 
+star, &quot;.*&quot;, means "any text here." The ^ means "begin with 
+the following text exactly."
+

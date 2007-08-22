@@ -1,0 +1,228 @@
+<html>
+<head>
+<title>The View and Projections Menus</title>
+</head>
+
+<body>
+
+<div class="overview">
+In addition to the main menu bar, each <code class="dialog">
+View Window</code> has another menu with options for controlling
+just that view.  In this section, we will explore some of the features of the
+<code class="menu">View</code> and <code class="menu">Projections</code>
+menus associated with each <code class="dialog">View Window</code>.
+</div>
+
+<div class="pagesubtitle">The View Menu</div>
+
+Each <code class="dialog">View Window</code> also has a <b>View</b>
+menu that lets you change the point of view, capture the state of
+the display, and make other changes in the overall view.
+
+<div class="cimg"><img src="images/ViewMenu.gif" ></div>
+
+
+First let's look at the Properties dialog for the View Window:
+
+<ol class="step">
+ 
+  <li>Open the [ht::dialog View Window Properties] dialog with the
+      [ht::menu View Properties] menu.
+
+      [ht::cimg images/ViewManagerProperties.gif]
+
+  <li>Uncheck the [ht::command {Show Wireframe Box}] item 
+      to turn off the 3D box in the display then click the
+      [ht::button Apply] button.  Check it
+      again to turn the box back on and click the
+      [ht::button Apply] button.</li>
+
+  <li>Uncheck the [ht::command {Show Cursor Readout}] item 
+      to turn off the lat/lon/alt readout at the bottom of the
+      <code class="dialog">View Window</code> and click the 
+      [ht::button Apply] button.</li>
+
+  <li>Uncheck the [ht::command {Clip View At Box}] menu item 
+      to turn off clipping of the map lines and other displays at
+      the 3D box and click [ht::button Apply]. Check it again to 
+      turn on clipping.</li>
+
+  <li>Check the [ht::command {Show Times In Display}] item 
+      to turn on the time label in the view window.  Uncheck
+      the [ht::command {Show Display List}] item and
+      click [ht::button Apply]. The Display List is no longer
+      shown, but the time label is now shown.  Note that the
+      time is also shown as part of the Display List for each
+      of the displays and in the [ht::command Time Animation Widget].
+  </li>
+
+  <li>Change the foreground and background colors by clicking
+      the [ht::button Set] buttons and selecting a new color.
+      After making your selection, click [ht::button Apply].
+
+</ol>
+
+The default settings for each of these can be set through the
+User Preferences which will be covered later in the workshop.
+<p>
+
+<a name="other"></a>
+<div class="pagesubtitle">Other View Menus</div>
+
+Some of the properties that we just changed can also be set through 
+other [ht::menu View] menus.
+
+<ol>
+
+    <li>Select the [ht::menu View Show] menu to see which of
+        the items we changed above are available.  Use some
+        of these to change your display.</li>
+
+    <li> Select the [ht::menu View Color] menu to change the
+      foreground and background colors of the display.  You 
+      can select one of the pre-defined foreground/background
+      color pairs, or create your own.  Select one of the 
+      predefined options to change the display colors.  Select
+      [ht::menu View Color {White on black}] menu to return to
+      the system default.</li>
+
+    <li> Select the [ht::menu View {Full Screen}] menu to expand
+    the view to the full screen.  Click the X to return to normal
+    screen mode.</li>
+    
+</ol>
+
+<a name="viewpoint"></a>
+<div class="pagesubtitle">The View-&gt;Viewpoint Menu</div>
+
+<p>
+Another useful menu item is the <code class="menu">Viewpoint</code> menu.  
+This menu can be used to control which side of the 3D box you are looking at.  
+
+<div class="cimg"><img src="images/ViewPointMenu.gif" ></div>
+
+<ol class="step">
+
+  <li>The five top menu items, <code class="menu">Top</code> 
+      through <code class="menu">West</code> instantly reset the 
+      point of view to one of the orthogonal directions.  The menu 
+      icons show which side of the box will be displayed.  Note that 
+      <code class="menu">Top</code> is the same as the reset 
+      command <b>Ctrl-r</b> which we used earlier.  </li>
+      
+   <li>Select the <code class="menu">South</code> menu then
+       rotate the box with the keyboard or mouse to see the orientation.</li>
+
+   <li>Reset the view to the top.</li>
+
+   <li>The <code class="menu">Perspective View</code> item toggles
+       between a parallel (unchecked) and perspective (checked)
+       view.  Check the box and see what effect it has.</li>
+
+   <li>The <code class="command">Viewpoint toolbar</code>:
+
+<div class="cimg"><img src="images/ViewpointToolbar.gif" ></div>
+
+       provides the same functionality as the menu items described
+       above.
+
+</ol>
+
+<p><b>Other Viewpoint menu items</b>
+
+<p><b>Viewpoint Dialog...</b> displays a dialog box for you to enter the 
+azimuth and tilt of a desired point of view. 
+
+<p><b>Vertical Scale...</b>displays a dialog box to set the linear vertical
+scaling between the top and bottom the wireframe box.  The default
+is 0 to 16 km.  This can also be changed through the 
+[ht::command Vertical Scale] tab of the [ht::dialog View Window Properties]
+dialog.
+
+<a NAME="projections">
+<div class="pagesubtitle">The Projections Menu</div>
+
+The <code class="dialog">View Window</code>'s [ht::menu Projections] menu 
+let you change and define the map projection.
+
+<div class="cimg"><img src="images/ProjectionsMenu.gif" ></div>
+
+
+<div><b>Changing Map Projections</b></div>
+
+<p>Map projections define the region of the earth that you are viewing.
+The IDV is configured with a set of pre-defined map projections.
+In a later exercise, you will learn how to create your own.  In
+this exercise, we will learn how to change projections using the
+system set.
+
+<div class="cimg"><img src="images/MapsProjections.gif" ></div>
+
+<ol class="step">
+
+  <li>Select the [ht::menu Projections Predefined US CONUS] menu item
+      to switch to the continental US projection.</li>
+
+  <li>Choose another projection from the 
+      [ht::menu Maps Projections Predefined] menu</li>
+
+</ol>
+
+<p>The [ht::menu Projections {From Displays}] menu has a list of projections
+from the data of any displays.  </p>
+
+<p>The [ht::menu Projections History] menu has a list of recently
+used projections.  </p>
+
+<p>The [ht::menu Projections {New/Edit..}] menu item is used
+to bring up the <code class="dialog">Projection Manager</code>
+which is used to define projections.  You will use this in a 
+later exercise to define your own projections.</p>
+
+<p>
+
+<b>Other Projections Menu Items</b>
+
+<ul class="step">
+
+  <li>The [ht::menu {Auto-set Projection}] menu
+  item allows you to control whether the display projection is changed
+  when you load in new data.</li>
+
+  <li>The [ht::menu {Share Views}] menu item allows you to share
+      the maps and projections between different
+      <code class="dialog">View Windows</code>.
+
+    <ol class="substep">
+
+      <li>Select the [ht::menu File New {View Window} {Map Display} {One Pane}] menu item
+          to bring up a new <code class="dialog">View Window</code>.</li>
+
+      <li>Rotate the view in each display.
+
+      <li>Use the [ht::menu Projections Set] menu in each
+          <code class="dialog">View Window</code> to change the
+          projections to be different in each display.</li>
+
+      <li>Check the [ht::menu Projections {Share Views}] item in 
+          each <code class="dialog">View Window</code>.</li>
+
+      <li>Rotate the view in one display.  Notice how it affects
+          the other.</li>
+
+      <li>Change the projection in one of the displays.  The same projection
+          will be applied to the other display.</li>
+
+      <li>Close the second <code class="dialog">View Window</code>
+          by clicking the <b>X</b> in the upper right corner of the
+          window.</li>
+    </ol>
+  </li>
+
+</ul>
+
+<p>
+
+
+</body>
+</html>

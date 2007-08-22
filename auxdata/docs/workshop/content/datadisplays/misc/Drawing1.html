@@ -1,0 +1,119 @@
+<html>
+<head>
+<title>Drawing Control</title>
+</head>
+
+<body>
+
+
+<div class="overview">
+The IDV provides a 3D drawing tool.
+</div>
+
+<ol class="step">
+
+<li> First, start fresh [ht::refresh] and go to a [ht::param CONUS] projection.
+
+<li> Create a [ht::display Drawing Control] with either the
+[ht::menu Displays Special {Drawing Control}] menu item or with the
+<img src="images/Pencil16.gif"> toolbar button.
+
+<li> When the   [ht::display Drawing Control]  first comes up it is in 
+polygon drawing mode.  Note the <img src="images/SmoothPoly16.gif"> button.
+
+<li> Draw some shapes 
+<ul>
+
+<li> In the main display click and drag  to draw.
+<li> Select the <img src="images/Poly16.gif"> image to draw a straight line polygon. Click and drag in the main display. Press the &quot;space&quot; key to
+add a polygon point.
+<li> Select  the <img src="images/Rectangle16.gif"> button to draw a rectangle.
+Click and drag in the main display.
+<li> Go to smooth polygon   mode with the <img src="images/SmoothPoly16.gif"> button.
+<li> Tilt the display and draw some more shapes. Note how you are drawing in 3D.
+<li> Go back to the overhead view (Control-R).
+</ul>
+
+
+<li> Go into move mode by pressing the  the <img src="images/Move16.gif"> button. Move some of the shapes.
+Note:  You have to select on the corners for squares, at the start for text, etc.
+
+
+<li> Select and delete the shapes.
+<ul>
+<li> Select the <img src="images/Pointer.gif"> button to go into selection mode.
+<li> Click on one of the shapes to select it. You should see small blue highlight rectangles.
+<li> Press Control-X to cut the shapes.
+<li> You can select multiple shapes by pressing the control key when you click on them.
+<li> You can select all of the shapes by pressing Control-A
+<li> Delete them by pressing Control-X
+</ul>
+
+<li> Change the properties of a shape.
+<ul>
+<li> Add a  new text shape.
+<li> Select it with the mouse or with a Control-A. 
+Note: to select text you need to click at the beginning of the text.
+<li> Press Control-P to bring up the properties dialog.
+<li> Change some of the properties and press [ht::button OK]
+</ul>
+
+
+<li> Creating text shapes
+<ul>
+<li> 
+<li> Select the <img src="images/Text16.gif"> button and click in the main display to add text. 
+<li> In the dialog box add in some html. e.g.:
+<pre>
+&lt;h2&gt;Some example text&lt;/h2&gt;
+&lt;a href="http://www.unidata.ucar.edu"&gt;Click here&lt;/a&gt;
+</pre>
+<li> The HTML is shown in the preview window.
+<li> Press &quot;OK&quot; when you are done.
+<li> Try clicking on the link.
+</ul>
+
+
+<li> Add a Quicktime movie.
+<ul>
+   <li> Select the movie reel icon: <img src="images/Movie.gif">
+   <li> Click in the display. In the File dialog select <%workshop.datadir%>/misc/storm.mov
+   <li> Note: Not all movie encodings can be displayed in the IDV.
+</ul>
+
+
+<li> Drawing in coordinate systems.
+<ul>
+<li> There are 4 coordinate system you can draw in: Lat/Lon/Alt, Lat/Lon (with fixed Altitude), X/Y/Z, X/Y (with fixed Z).
+<li> Draw some shapes.
+<li> Change the projection to a world projection ([ht::menu Projections Set World] menu item) and note how
+the shapes are reprojected.
+<li> Select X/Y from the [ht::command Location] menu.
+<li> Now draw some more shapes.
+<li> Change the projection to back to CONUS ([ht::menu Projections Set US CONUS] menu item) and note what
+shapes get reprojected.
+</ul>
+
+
+
+<li> Export/Import
+<ul>
+<li> You can export and import drawings with the [ht::menu File Export] and
+[ht::menu File Import] menu items. 
+<li> Try exporting your drawing to the file [ht::filename workshop.xgrf].
+<li> The xgrf file can be loaded as a data source or imported into an already existing
+[ht::display Drawing Control]. Let's try loading it as a data source.
+<li> Remove the existing [ht::display Drawing Control]
+<li> In the [ht::dialog Data Source Chooser] go the  [ht::command Files] tab and select
+the [ht::filename workshop.xgrf] file.
+<li> You should see a new [ht::display Drawing Control] created with what you exported.
+</ul>
+
+
+
+
+
+</ol>
+
+</body>
+</html>

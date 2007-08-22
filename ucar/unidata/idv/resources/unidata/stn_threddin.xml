@@ -1,0 +1,11 @@
+<stationtable name="threddin sites">
+<station idn="" id="UDQAM" name="University du Quebec a Montreal" lat="46:48:00" lon="-71:23:00" elev="0"/>
+<station idn="" id="IMDTDA" name="Instituto Mexicano de Tecnologna del Agua" lat="26:30:00" lon="-107:30:00" elev="0"/>
+<station idn="" id="CLPM" name="CICESE La Paz, Mexico" lat="24:16:00" lon="-110:25:00" elev="0"/>
+<station idn="" id="UOPR" name="University of Puerto Rico" lat="18:16:00" lon="-67:09:00" elev="0"/>
+<station idn="" id="UOCRSJCR" name="University of Costa Rica, San Juan, Costa Rica" lat="9:57:00" lon="-84:09:00" elev="0"/>
+<station idn="" id="UFDPBB" name="Universidade Federal do Para, Belem, Brazil" lat="-1:27:00" lon="-48:28:00" elev="0"/>
+<station idn="" id="URDJB" name="UFRJ, Rio de Janerio, Brazil" lat="-22:54:00" lon="-43:10:00" elev="0"/>
+<station idn="" id="UBAR" name="UBA Argentina" lat="-34:35:00" lon="-58:29:00" elev="0"/>
+</stationtable>
+

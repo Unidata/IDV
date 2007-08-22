@@ -1,0 +1,160 @@
+<title>Layout (nee Station) Model Editor</title>
+<meta name="description"
+content="The Layout Model Editor allows you to view, change and create
+templates for displaying point data."/>
+
+
+The [ht::index {} smed {Layout Model Editor}]
+Layout Model Editor allows you to view, change and create
+<glossary definition="A layout model is a collection of graphic symbols,
+positioned with respect to a central point, and each representing a
+particular value in a point observation data set.">
+Layout Models</glossary>.
+
+<ol class="step">
+  
+   <li> First, load in the layout model example from the [ht::menu Toolbar {Workshop} {Station model exercise}] menu.
+
+
+  <li> Open up the [ht::dialog Layout Model Editor] with the
+  edit layout model button: [ht::img %dotpath%/images/edit.gif] 
+  in the display control
+  window or from the [ht::menu Tools {Layout Models}]  menu.
+
+  
+  <li>You should see something like this:</li>
+  [ht::cimg Overview.gif]
+  
+  <li>The [ht::dialog Layout Model Editor] consists of:</li>
+  
+  <ul>
+    
+    <li>A drawing canvas.</li>
+    
+    <li>A list of symbols.</li>
+    
+    <ul>
+      
+      <li>[ht::command Select] Is an editing command. Puts the editor into
+          select  mode.</li>
+      
+      <li>[ht::command Text] Displays text. Used for station identifiers,
+          text results from Jython, etc.</li>
+      
+      <li>[ht::command Value] Displays a numeric value. Lets you specify  a
+          display unit and a format.</li>
+      
+
+      <li>[ht::command Label] Shows  a fixed text label.
+
+      <li>[ht::command Shape] Shows  a shape.
+      <li>[ht::command Mapped Shape] Maps a value to a shape.
+
+      <li>[ht::command Windbarb] Shows wind direction and speed.</li>
+      
+      <li>[ht::command Cloud coverage], [ht::command Present weather],
+          [ht::command   Low cloud], etc.
+          These symbols are used to map a value into a predefined range of 
+           display
+          symbols.</li>
+    </ul>
+    
+    <li>An alignment toolbar.</li>
+    
+    <li>[ht::menu File], [ht::menu Edit], [ht::menu View],  [ht::menu {Layout Models}] and  [ht::menu Help] menus.</li>
+  </ul>
+  
+
+
+  <li> Let's go look at the [ht::filename METAR] layout model.
+  <ul>
+  <li> Right click on the symbol in the upper left that represents temperature and select
+  [ht::menu Properties]
+  <li> Change some of the properties (e.g., scale, background color, format) and click [ht::button Apply]. 
+  <li>  The [ht::button Apply] and [ht::button OK] buttons save your changes to the layout model in the editor.
+
+  <li>  The [ht::button Save] button saves the changes plus writes out the layout model and updates the display.
+   
+  <li> Close the dialog and use the [ht::menu File Remove] menu to get rid of your local changes. Re-select the [ht::filename METAR]
+  layout model with the [ht::menu {Layout Models}] menu.
+
+  <li> Try moving some the position of the symbols around. To apply the change to the display
+  use the  [ht::menu File Save] menu item.
+  <li> Look at the [ht::filename Earthquake] layout model. View the properties for the symbol.
+  </ul>
+
+
+
+  <li>Create a new Layout Model, called &quot;Workshop&quot;.
+      
+  <ul class="substep">
+    
+    <li>Select the [ht::menu File New] menu item.
+        
+    <li>In the dialog box enter  the name of the new layout model,
+        [ht::qt Workshop].</li>
+    
+    <li>Click the [ht::command OK] button.</li>
+  </ul>
+  
+  <li>Add a symbol.</li>
+  
+  <ul class="substep">
+    
+    <li>Select the [ht::command Text] symbol in the symbol list.</li>
+    
+    <li>Click in the center of the drawing canvas.</li>
+    
+    <li>In the [ht::dialog Properties] dialog you can select what parameter from
+        the data
+        set is used and other display information.</li>
+    
+    <ul class="subsubstep">
+      
+      <li>The value in the [ht::command Parameter] field should be
+          [ht::qt IDN], the WMO   Station ID.
+          
+      <li>Select <i>Courier</i> in the [ht::menu  Font] menu.</li>
+      
+      <li>Select an 11 point font in the [ht::menu  Size] menu.</li>
+      
+      <li>Click the [ht::button OK] button.</li>
+    </ul>
+    
+    
+  </ul>
+  
+  <li>Position the symbol.</li>
+  
+  <ul class="substep">
+    
+    <li>Click and drag the symbol to the center of the screen.</li>
+    
+    <li>Note the red dot on the symbol. This is the <i>Alignment point</i>. It
+        determines the point on the bounding box of the symbol that is used 
+	to align the symbol with the center point of the display 
+	coordinate space.</li>
+    
+    <li>Right click on the symbol to bring up the [ht::menu {Symbol Menu}]</li>
+    
+    <li>Select the [ht::menu {Alignment Point} NW] menu item. This should change
+        the red dot
+        on the symbol to the upper left corner.</li>
+    
+    <li>Right click on the symbol again, but this time select the
+        [ht::menu Center   Center] menu item.
+        This aligns the symbol's alignment point to the center of the display
+        space.</li>
+  </ul>
+  
+  <li>Save this layout model with the [ht::menu File Save] menu item.</li>
+  
+  <li>Close the window by selecting the [ht::menu File Close] menu item.</li>
+  
+  <li>Back to the [ht::display Point Data Display], choose the [ht::filename Workshop] layout model.
+  Humm, why isn't anything displayed?</li>
+  </ul>
+</ol>
+
+
+

@@ -1,0 +1,249 @@
+
+<html><head>
+  <title>Doing More</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+
+
+
+This example shows several ways wind data can be
+displayed, focusing on jet stream levels over North America.
+
+<p>
+
+In the bottom of the Field Selector window click on 
+<code class="command">Add new data source</code>,
+or from the main menu select 
+[ug::menu Data {New data source}]. 
+In the Data Chooser  window that
+
+
+
+<div class="pagesubtitle">Connecting to Gridded Data Source on a Remote Server</div>
+<p>
+In the bottom of the Field Selector window click on 
+<code class="command">Add new data source</code>,
+or from the main menu select 
+<code class="menu">Data-&gt;New data source</code>. 
+In the Data Source Chooser window that opens, 
+click on the <b>Gridded data</b> tab.
+Choose Catalogs:  http://motherlode.ucar.edu/dods/catalog.xml
+and click on <b>Reconnect</b>.
+
+<p>
+
+The box below should fill in, in about 2 to 60 seconds, 
+with a list of some 10 categories of NWP model output. 
+Open one, such
+as NCEP RUC or NCEP Eta, by clicking on the file folder icon.
+
+<p>
+
+The list of available times of model output appears. Click on one
+to select it (such as "2003-08-30 12:00:00 GMT"), and then click on 
+ the <b>Load data</b> button at bottom. You have connected this 
+data source to  the IDV. You have not yet loaded any
+wind data to the IDV from the remote server. Loading data
+occurs only when a display is made.
+
+<p>
+
+<div class="pagesubtitle">Selecting the display to be made</div>
+
+<p>
+
+After  about 2 to 60 seconds 
+the Data Source Chooser window goes away and the name of the data
+source you connected to 
+appears in the <b>Data sources:</b> panel, probably highlighted.
+
+<p>
+
+In the <b>Fields</b> panel, click on the <b>3D Grid</b> file 
+folder icon, or click once on the tiny
+round icon to the far left. A list of all 3D 
+parameters in the model output appears. Click on the round icon next
+to "Derived." We will work with derived parameters
+<b>Wind vectors</b> and <b>Windspeed</b>.
+
+<p>"Derived" indicates that these
+parameters are computed by the IDV from other data in the data source,
+in this case, from u and v wind components.
+Wind vectors and speed are termed "derived parameters" -- parameters which the IDV
+computes from u and v wind component scalar data.  Nothing is computed
+until a display is requested.  
+Then the 3D grids  of u and v for one or more times 
+are read in, and the wind speed and direction computed, before
+any display is made. 
+</p>
+
+
+<div class="pagesubtitle">To make contour plot of wind speed</div>
+
+<p>
+
+In the <b>Displays</b> panel click on <b>Contour Plan View</b>. 
+There is  a pause while over million wind speed values
+are computed (from Eta AWIPS 211 grids), and then the displays are made.
+
+<p>
+
+
+The initial plot shows wind speed at the lowest model level (1000
+mb).  To shift the level to jet stream levels:
+<ul>
+<li>Right click on the legend title ("windspeed Contour Plan View")
+<li>Click on <b>Control window</b> to bring up this display's Control window
+<li>in the Control window, 
+click on the <b>Levels:</b> box to bring up the pop-up menu of
+native grid levels in the data
+<li>slide the slider bar on the right edge if necessary, to see the
+value 250.0; then click on 250.0 which is 250 millibars.
+</ul>
+The plot will move to 250 millibars. To zoom, rotate or pan this 3D
+display, see <a href="../ui/Navigation.html">Zoom, Rotate, and
+Pan</a>. Rotate the display by dragging the right mouse button
+to see the contours are above the surface (map level).
+The key combination Ctrl-r will restore the display to the original
+overhead view.
+
+<p>
+
+To toggle on the animation loop, click
+in the third little box from the left end of the animation controls in the
+upper right of the view window. Read more about 
+<a href="../ui/Animation.html">Time Animation
+Controls</a>.
+
+You can toggle visibility of the plot by clicking on the title of
+the <a href="../controls/index.html#legends">Legend</a> "wind speed
+Contour Plan View 1000.0"
+under the display.
+
+
+
+<div class="pagesubtitle">To Display Wind Speed Vectors</div>
+
+Click on <b>Field</b> "Wind vectors (from u and v)."  
+In the <b>Displays</b> panel click on <b>Vector Plan View</b>. 
+There is a pause while wind vectors are computed from u and v, and
+while the display is made.
+
+
+<p>
+
+The initial plot is at the lowest model level (1000.0 mb). 
+To shift the level to jet stream levels, follow 
+instructions above.
+
+<p>
+
+The vectors will now appear with the color-filled contours. They may
+be too dense.
+To see fewer vectors, drag the <b>Skip interval:</b> slider in the
+control window to 2.   If you put up displays of wind vectors as just described,
+and also "Color-filled Contour Plan View" of wind speed, both at 250
+mb, your  display should look something like this:
+
+[ht::cimg ../examples/images/WindVectors.gif]
+
+<div class="pagesubtitle">To Display Wind Streamlines</div>
+
+To see wind streamlines, in the Vector Plan View display's Control
+window, click on the 
+<b>Show streamlines</b> check box. <b>To see the most accurate stream
+lines, make sure the "Skip interval:" slider is on zero, meaning
+do not skip any data points when computing streamlines.</b>
+</p>
+<br>
+
+<div class="pagesubtitle">To Display Wind Barbs</div>
+
+<p>
+
+To see meteorological wind barbs,  
+click on parameter (field) "Wind vectors."  
+Click on <b>Wind Barb Plan View</b> in the Displays panel.
+There is a pause while wind direction is computed from u and v, and
+while the display is made. As usual there is a control window
+available from the legend.
+
+</p>
+
+<div class="pagesubtitle">To Display a Wind Speed Isosurface</div>
+
+<p>
+
+Click on parameter "Windspeed"  
+Click on display type 
+"Isosurface."
+There is a pause while wind speed is computed from u and v, and
+while the display is made.  The isosurface is the most time-demanding
+of all display types.
+
+<p>
+
+Here is an oblique view of wind speed as an isosurface of 50 m/s, and
+streamlines at 300 mb.  The wind data used here is the
+same as in the preceding figure; only the display types differ.
+You can toggle off any other displays that may be in the way, by
+clicking on their legend labels.
+Try rotation (see <a href="../ui/Navigation.html">Zoom, Rotate, and
+Pan</a>) and time animation.
+
+[ht::cimg ../examples/images/IsosurfaceExample.gif]
+
+The initial surface has a value of the median wind speed in the 3D
+grids of u and v. 
+To change the value:
+<ul>
+<li>Right click on the legend title ("windspeed 3D Isosurface")
+<li>Click on <b>Control window</b> to bring up this display's Control window
+<li>Slide the slider bar on the <b>Isosurface value:</b> slider to
+some speed value you choose.
+</ul>
+
+The surface is re-computed for the new value, which may take
+some time 10 time steps.
+
+<div class="pagesubtitle">To Display a Vertical Cross Section of Wind Speed</div>
+
+Click on parameter "Windspeed"  
+Click on display type 
+"Contour Vertical Cross Section."
+There is no pause since the wind speed has already been computed; derived grids 
+are in case of future reuse.
+<p>
+
+Try rotation (see <a href="../ui/Navigation.html">Zoom, Rotate, and
+Pan</a>) to see the cross section in the 3D display. 
+Or drag the right mouse button to rotate.
+You can move the
+cross section by dragging on the colored squares at the top corners
+and middle of the
+cross section with the right mouse button.
+
+<p>
+
+The cross section is also in the 
+ <a href="../controls/CrossSectionControl.html">Vertical Cross Section Control </a>
+To see this control:
+<ul>
+<li>Right click on the legend title ("windspeed Contour Cross Section")
+<li>Click on <b>Control window</b> to bring up this display's Control window
+</ul>
+
+<p>
+
+Other display types that are useful for wind speed (but not wind
+vectors or barbs) include:
+
+<ul>
+<li><a href="../controls/ProfileControl.html">Vertical Profile</a>
+<li><a href="../controls/ProbeControl.html">Data Probe</a>
+<li><a href="../controls/TimeHeightControl.html">Time-Height Display</a>
+</ul>
+
+
+</body></html>

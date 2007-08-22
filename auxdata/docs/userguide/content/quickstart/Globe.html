@@ -1,0 +1,102 @@
+<html><head>
+  <title>Globe Display</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+<body>
+
+
+The illustration below shows an IDV Globe Display of
+GFS numerical weather prediction model output of 
+mean sea level pressure (as color-shaded image and contour lines)
+and 50 m/s wind speed isosurfaces showing the jet streams. 
+
+[ht::cimg ../examples/images/GlobeDisplay.gif {Globe Display}]
+
+In the Globe Display version of the IDV, the displays and maps are projected
+onto a spherical globe. The globe can be rotated by hand or automatically,
+along with the usual zooming and time animation of displays on the globe.<p>
+
+To create a Globe View window, use the
+[ug::menu File New {View Windows} {Globe Display} {One Pane}]
+menu.
+
+This section describes how to make plots of global satellite imagery on the
+Globe display.
+
+The set of steps include:
+
+<%childlist%>
+
+
+ 
+<subhead id="chooser" intoc="false">Choosing Global Satellite Imagery </subhead>
+
+After starting the Globe version of the IDV, open the 
+<a href="../data/choosers/index.html">Data Source Chooser</a>
+and click on the <b>Images</b> tab.<p>
+
+<ul>
+<li>Connect to one of the servers listed using [ht::command RTIMAGES]
+dataset.</li><p>
+
+<li>From the [ht::command {Image Data Type}] selector, choose the
+<b>Mollweide IR/TOPO Composite</b> type.</li><p>
+
+<li>Click the [ht::command {Add Source}] button to load the data source.</li>
+</ul>
+
+<subhead id="display" intoc="false">Displaying the data</subhead>
+
+Once the data source has been selected, from the Field Selector 
+you can create the display by doing the following:
+
+<ul>
+<li>Select the &quot;Mollweide IR/TOPO Composite&quot; data source in the 
+[ht::command {Data Sources}] panel.</li><p>
+<li>Select the &quot;Image Sequence&quot; field in the 
+[ht::command {Fields}] panel.</li><p>
+<li>Select &quot;Image Display&quot; in the 
+[ht::command {Displays}] panel.</li><p>
+<li>Click the [ht::command {Create Display}] button to create
+the display.</li>
+</ul>
+
+<subhead id="navigate" intoc="false">Using the display</subhead>
+
+When the data are displayed, the default view will be from the 
+North pole.  You can move the display using the standard IDV
+<a href=../ui/Navigation.html>zoom, pan and rotate</a> functions.
+For this exercise try the following:
+
+<ul>
+<li>Use the [ht::command {Viewpoint toolbar}] or the
+[ug::menu View Viewpoint] menu to rotate to the 
+West view.</li><p>
+<li>Start the image animation using the 
+<a href="../ui/Animation.html#animation">Animation Widget</a>.</li><p>
+<li>The Globe display has an extra 
+[ug::menu View {Auto-rotate}] menu.  Check this on to spin the
+globe along the vertical axis.</li>
+</ul>
+
+Any suitable data with navigation information (latitude, longitude, and
+altitude) that the IDV can handle can be plotted on the globe
+display.  Review the section on 
+<a href="Grids.html">Plots from Gridded Data</a>.
+
+
+
+<p>
+<b>Notes:</b><p>
+
+Vertical probes and vertical cross sections do not work in
+this version of the globe display, though you can plot
+data above the surface in isosurfaces, as illustrated by the jet
+stream cores shown above.
+
+<p>
+
+ 
+</body>
+</html>

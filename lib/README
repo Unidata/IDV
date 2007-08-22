@@ -1,0 +1,52 @@
+
+******************************************************************
+nc2.2.jar - This contains all of the netcdf related jar files.
+and is built by the ant script in ../ucar
+
+Go to that directory and run 
+    ant   nc2.2.jar
+
+This will make a tmpjardir directory here, unpack all of the 
+netcdf related jars:
+   jdom.jar
+   netcdf-2.2.jar
+   jpeg2000.jar
+   grib.jar
+   commons-codec.jar
+   commons-httpclient.jar
+   commons-logging.jar
+   bzip2.jar
+
+And then make the nc2.2.jar.
+
+
+
+******************************************************************
+external.jar - This contains a bunch of other external jar files.
+
+It is built just like nc2.2.jar with the ant target "external.jar"
+      extra.jar
+      jmf.jar
+      jai_codec.jar
+      ij.jar
+      jh.jar
+      geotransform.jar
+      jfreechart.jar
+      jcommon.jar
+
+
+******************************************************************
+local-visad.jar
+This is a JAR file containing VisAD classes that were modified
+by the Unidata Program Center.  It should be placed ahead of
+visad.jar in any CLASSPATH specification.
+
+
+******************************************************************
+visad.jar - This is the jar file we get from Wisconsin
+
+
+
+
+
+

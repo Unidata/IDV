@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<symbols>
+
+   <symbol class="ucar.unidata.ui.symbol.TextSymbol" 
+            name="Text"
+            icon="/ucar/unidata/ui/symbol/images/text.gif" 
+	    attrs="paramid=IDN"
+   />
+   <symbol class="ucar.unidata.ui.symbol.ValueSymbol" 
+           name="Value"
+	   icon="/ucar/unidata/ui/symbol/images/value.gif"
+           attrs=""
+    />
+
+   <symbol class="ucar.unidata.ui.symbol.LabelSymbol" 
+           name="Label"
+	   icon="/ucar/unidata/ui/symbol/images/label.gif"
+           attrs=""
+    />
+
+   <symbol class="ucar.unidata.ui.symbol.ShapeSymbol" 
+            xxxpoints="-1.0,-1.0,0.0,1.0,-1.0,0.0,0.0,1.0,0.0"
+	    xxxshapetype="triangle"
+            name="Shape"
+            icon="/auxdata/ui/icons/Shape16.gif" 
+            stretchy="true"
+	    attrs=""
+   />
+
+   <symbol class="ucar.unidata.ui.symbol.MappedShapeSymbol" 
+            name="Mapped Shape"
+            icon="/auxdata/ui/icons/MultiShape16.gif" 
+            stretchy="true"
+	    attrs=""
+   />
+
+
+    <symbol class="ucar.unidata.ui.symbol.WindBarbSymbol"
+            name="Windbarb"
+            icon="/ucar/unidata/ui/symbol/images/windbarb.gif"
+            attrs=""
+    /> 
+    <symbol class="ucar.unidata.ui.symbol.WeatherSymbol" 
+            name="Cloud coverage"
+            icon="/ucar/unidata/ui/symbol/images/cloudcoverage.gif"
+            attrs="symboltype=cloudcoverage;paramid=CC"
+    />
+    <symbol class="ucar.unidata.ui.symbol.WeatherSymbol" 
+            name="Present weather"
+            icon="/ucar/unidata/ui/symbol/images/presentweather.gif"
+            attrs="symboltype=presentweather;paramid=WX"
+    />
+    <symbol class="ucar.unidata.ui.symbol.WeatherSymbol" 
+            name="Low cloud"
+            icon="/ucar/unidata/ui/symbol/images/lowcloud.gif"
+            attrs="symboltype=lowcloud;paramid=LOWCLOUD"
+    />
+    <symbol class="ucar.unidata.ui.symbol.WeatherSymbol" 
+            name="Mid cloud"
+            icon="/ucar/unidata/ui/symbol/images/midcloud.gif"
+            attrs="symboltype=midcloud;paramid=MIDCLOUD"
+    />
+    <symbol class="ucar.unidata.ui.symbol.WeatherSymbol" 
+            name="High cloud"
+            icon="/ucar/unidata/ui/symbol/images/highcloud.gif"
+            attrs="symboltype=highcloud;paramid=HICLOUD"
+    />
+   <symbol class="ucar.unidata.ui.symbol.WeatherSymbol" 
+           name="Pressure tendency"
+           icon="/ucar/unidata/ui/symbol/images/pressuretendency.gif"
+           attrs="symboltype=pressuretendency;paramid=PTNDCODE"
+   />
+   <symbol class="ucar.unidata.ui.symbol.WeatherSymbol" 
+           name="Icing"
+           icon="/ucar/unidata/ui/symbol/images/icing.gif"
+           attrs="symboltype=icing;paramid=ICING"
+   />
+   <symbol class="ucar.unidata.ui.symbol.WeatherSymbol" 
+           name="Turbulence"
+           icon="/ucar/unidata/ui/symbol/images/turbulence.gif"
+           attrs="symboltype=turbulence;paramid=TURBULENCE"
+   />
+  <symbol class="ucar.unidata.ui.symbol.WeatherSymbol" 
+	  name="Lightning"
+          icon="/ucar/unidata/ui/symbol/images/lightning.gif"
+          attrs="symboltype=lightning;paramid=LIGHTNING"
+   />
+
+</symbols>

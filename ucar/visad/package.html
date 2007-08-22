@@ -1,0 +1,57 @@
+<BODY>
+
+<p>
+Provides support for hiding some of the complexity of the VisAD package.
+</p>
+
+<p>
+For the MetApps project, the most relevant top-level classes are probably
+<em>DisplayMaster</em> and <em>Displayable</em>.  Here's a simple schematic
+of how they might be used (bold text is more important):
+
+<PRE>
+    import javax.swing.*;
+    <B>import ucar.visad.*;</B>
+    import visad.*;
+
+    <B>public class MyDisplay
+        extends DisplayMaster</B>
+    {
+        <B>public MyDisplay()</B>
+        {
+            <B>super(new DisplayImplJ2D("MyDisplay"));</B>
+	    ...
+	    <B>addScalarMap(new ScalarMap(commonScalarType1, commonDisplayType1));</B>
+	    ...
+        }
+
+        public static void main(String[] args)
+        {<B>
+            MyDisplay myDisplay = new MyDisplay();
+            myDisplay.addDisplayable(new MyDisplayable(...));
+            myDisplay.addDisplayable(new MyDisplayable(...));</B>
+            ...
+            JFrame    jframe = new JFrame("My Display");
+            <B>jframe.getContentPane().add(myDisplay.getComponent());</B>
+            <B>myDisplay.draw();</B>
+            jframe.pack();
+            jframe.setVisible(true);
+        }
+    }
+
+    <B>public class MyDisplayable
+        extends Displayable</B>
+    { ... }
+</PRE>
+
+The above example creates a <EM>DisplayMaster</EM> from a VisAD 
+<EM>LocalDisplay</EM>, adds the <EM>ScalarMap</EM>s that are common to 
+the <EM>Displayable</EM> that it will display (typically spatial ScalarMap-s),
+adds some <EM>Displayable</EM>s of subclass
+<EM>MyDisplayable</EM>, and then renders the <EM>Displayable</EM>s.
+This illustrates the fundamental relationship between <EM>DisplayMaster</EM> 
+and <EM>Displayable</EM>: a <EM>DisplayMaster</EM> manages the display of one or
+more <EM>Displayable</EM>s.
+</P>
+
+</BODY>

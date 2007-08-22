@@ -1,0 +1,218 @@
+<html><head>
+  <title>Bundles</title>
+  <link rel="stylesheet" type="text/css" href="idv.css" title="Style">
+</head>
+
+<body>
+
+
+Bundles let you save a quick "snapshot" of the IDV, including data      
+sources, maps, data displays. Bundles are small information files       
+that specify the state of the IDV. They are a kind of configuration     
+file. They include information about what data sources are in use, and  
+which parameters from the data sources are displayed, and how they are  
+displayed.                                                              
+
+<%nochildlist%>
+
+
+<p>
+The purpose of bundles is for you to save a particular IDV setup and    
+display. A bundle can be used for your own reference at a later time.   
+Others using the IDV can use bundles you made to see data the same      
+way you did.
+
+
+<p>
+To make a new bundle file select the [ug::mmenu File {Save As}] menu.    
+A pop-up window will let you set a new file location and name:
+[ht::cimg images/FileDialog.gif {Bundle File Dialog}]
+The customary IDV bundle filename extension is       
+<b>.xidv</b>; if you do not enter a file extension, .xidv will be       
+appended. You may use any other file extension you like.                
+
+<p>
+Note: For bundle files to work the data must be available in exactly    
+the same way you made connection to it when you made the bundle file.   
+Others who use your bundles must have access to the same file system or 
+to the same remote or local data servers you use, so that file paths or 
+URLs to the data are exactly the same.                                  
+
+<p>
+The file dialog has a set of buttons on the right that allow you to 
+save off (or not save off) different components of the IDV state.
+<ul>
+<li>
+The [ug::button Views] button is related to the windows and views.
+<li> Checking  off the [ug::button Displays] button will not include any
+of the created displays. 
+
+<li> The [ug::button Data Sources] button allows for you to not include any
+of the data sources. When reading in a bundle that had been saved
+without data sources and with displays  the IDV will prompt the user for
+the data to be used. For example, you can create  a set of displays
+of a gridded data set (e.g., Temperature, Relative Humidity, etc.)
+This state can be saved off without the data sources. When you load this 
+bundle back in again the IDV will prompt the user for the required data
+fields. This allows you to essentially save off a display template
+that can be used for different data sets.
+
+<li>
+The [ug::button Jython] menu allows you to save off in different
+ways the Jython code you may have in your library. Say for example
+you have written some custom Jython code that implements a Formula.
+You have a display that uses the results of that computation.
+To include your local Jython code just select [ug::button All Jython]
+or [ug::button Selected Jython]. When loading in a bundle that has had 
+Jython code saved with it the user will be prompted for what to do
+with the Jython.
+
+<li>
+<a name="relative"></a>
+One can save a bundle with data paths that are relative to where
+the bundle is loaded from by checking 
+the [ug::button Save with relative paths] checkbox. The IDV
+will change the file based data sources to point to the directory
+where the bundle is loaded from. For example, you can use this
+to save a bundle that references model files on disk. Copy the bundle
+and the model files over to a thumb drive or CD. Then when you load 
+the bundle the files are relative to the bundle path.
+
+<li>
+The [ug::button Enable user to change data] button, when checked, will
+configure the bundle so that when it is loaded the user will be able
+to change the file paths or URLS that point to data sets.
+
+
+</ul>
+
+
+
+<subhead id="open" intoc="false">Opening a Bundle</subhead>
+
+Use the [ug::mmenu File Open] menu to open a bundle. 
+When loading in a new bundle you will be prompted whether the   
+current displays and data should be removed. You can also start up
+the IDV with a bundle file or URL in the command line.                            
+
+
+<subhead id="jnlp" intoc="false">JNLP Bundles</subhead>
+You can also save a bundle inside a &quot;jnlp file&quot; that can be   
+used to start the IDV with the bundle. Use a filename extension of      
+&quot;.jnlp&quot; in place of .xidv. This file, when used as a link on  
+a regular web page, allows IDV users to start the IDV with Web Start on 
+their system with your bundle. Click on the link to your jnlp file. The 
+IDV will start with the bundle you saved in the .jnlp file.             
+
+
+
+
+<subhead id="default" intoc="false">The Default Bundle</subhead>
+Select the [ug::mmenu File {Default Bundle} Save] menu to create a       
+bundle that is read whenever you start the IDV. This will provide a     
+standard starting configuration. You can set up the geographic area,    
+map projection, and maps you prefer, for example.                       
+
+
+
+<subhead id="favorites" intoc="false">Favorite Bundles</subhead>
+Favorite bundles are just normal bundles that are categorized and
+saved  off in a particular location on disk and serve as a
+convenience to the user. This allows the user to organize their
+favorites by category and readily load them in.
+
+<p>
+Favorite bundles come in 3 forms: as regular bundles, as display templates
+and as favorite data sources. Each of these types of favorites can be
+accessed through the [ug::mmenu Displays] menu as well as through
+the <a href="ui/Dashboard.html#quicklinks"> Dashboard</a>.
+
+<p>
+A regular favorite bundle can be created through the [ug::mmenu File {Save As Favorite...}]
+[ug::mmenu Displays {Favorite Bundles} {Save As Favorite...}] menus.
+The &quot;Save As Favorite&quot; dialog is shown:
+ 
+[ht::cimg images/SaveAsFavorite.gif {Save As Favorite Dialog}]
+
+A favorite bundle has a category which can be entered in the  [ug::button Category] field.
+Categories can be hierarchical, using a &quot;&gt;&quot; as separator. For example:
+&quot;Toolbar&gt;Weather&quot;
+The &quot;Toolbar&quot; category is special. These will result in links in the toolbar.
+After specifying a category specify a Name for the favorite bundle.
+<p>
+
+The Display Templates favorites are created through the [ug::menu File {Save Display as Favorite}]
+menu. This allows you to create a display as you like (e.g., a Contour Plan View at a certain level
+with certain settings), save it off and recreate it later. Display Templates for displays that
+showed data will show up in the Displays component of the Field Selector. 
+<p>
+Data Source favorites are created through the Data Source popup menu in the Field Selector.
+<p>
+Each of these types of favorites can be with the Favorites Manager:
+
+[ht::cimg images/FavoritesManager.gif {Favorites Manager}]
+
+This is brought up through the Quicklinks in the Dashboard or through the
+[ug::mmenu Displays {Favorites Bundles}  {Manage...}],
+[ug::mmenu Displays {Display Templates}  {Manage...}] and
+[ug::mmenu Displays {Data Sources}  {Manage...}]
+menus.
+The Favorites Manager allows you to reorganize the categories and  favorites
+by drag-and-drop. You can also right click on a favorite or a category
+to delete it, export, etc.
+
+
+
+
+<subhead id="zidv" intoc="false">Data in Bundles</subhead>
+
+The IDV  supports a  bundle format: .zidv (or zipped idv).
+This is a zip file that contains a regular bundle (xidv) and a set 
+of data files. When the user does a &quot;Save As...&quot; and specifies
+a .zidv file extension the IDV prompts the user to select the data sources
+that should be written into the zip file. On opening a zidv file
+the IDV needs to unzip the data files so it prompts the user 
+as to where to place the files - a tmp directory or a user selected
+directory (this is a preference as well).
+<p>
+This doesn't seem like such a big deal in and of itself but...
+We also have implemented a &quot;Make Remote Data Local&quot; facility.
+We can now, for most of the remote data types, move the data
+from the server to the local disk. We support the ADDE types: satellite, 
+radar, point, sounding and forecast fronts. We also have preliminary
+support for grids on remote servers (see below).
+<p>
+This is used in two ways. First, the user can right click on
+a data source in the Field Selector and select &quot;Make Data Local&quot; 
+for remote data sources. The IDV prompts for a file directory
+and a file prefix (we default to use the name of the data source).
+The remote data is then copied over. For multiple files we use:
+&lt;directory&gt;&lt;prefix&gt;&lt;file count&gt;.&lt;suffix&gt;. The data source object
+within the IDV is then changed to point to the new file paths.
+<p>
+The second way this is used is when you save off a zidv file.
+The user is prompted for both the local data sources to be saved
+off as well as for the remote data sources. For the remote ones
+the IDV automatically copies the files over  and zips them up.
+<p>
+Grids: We have preliminary support for grids. This relies on some
+extra service information in the catalogs which, right at this moment,
+is not included in the regular IDV gridded data catalog but is included
+for model data under the &quot;File_Access&quot; dataset in the main motherlode
+catalog:
+http://motherlode.ucar.edu:8080/thredds/catalog.xml
+<p>
+When saving gridded data the user is prompted for the fields to save
+and the geo-spatial subset is used to subset the grids. We do not
+yet (though will soon) support sub-setting on times and grid 
+stride/decimation.
+
+
+
+
+
+
+</body>
+
+
+

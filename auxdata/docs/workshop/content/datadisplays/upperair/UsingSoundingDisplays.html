@@ -1,0 +1,143 @@
+
+<html>
+<head>
+<title>Using the IDV Sounding Display </title>
+</head>
+
+<body>
+
+<div class="overview">
+<p>
+Using the IDV Sounding Display 
+</p>
+</div>
+
+<p>
+
+The temperature and dew-point traces can be modified via the cursor.
+Press the left button on the first data-point to be modified and drag
+it horizontally along an isobar to the desired position, then move the
+pointer diagonally along an isotherm to keep the data-point at the
+desired position and to pick-up the next data-point. Repeat until done
+and then release the mouse button.
+
+<p>
+
+The check box labeled [ht::command Parcel mode] selects the origin of
+the path of a parcel of air lifted pseudo-adiabatically from the initial
+point to the top of the diagram. Check [ht::command Parcel path] to
+display the path of a lifted parcel.
+
+<p>
+
+The initial conditions of the pseudo-adiabatically lifted air-parcel
+  (i.e. the parcel's pressure, temperature, and moisture content at
+  the start of the pseudo-adiabatic lifting) are determined from the
+  environmental sounding (i.e. the temperature and dew-point profiles)
+  according to the mode indicated by [ht::command Parcel mode].  The modal
+  choices are 
+  <b>Bottom of Sounding</b>, 
+  <b>Below Cursor</b>, 
+  <b>At Cursor Pressure</b>, and 
+  <b>At Cursor (Press, Temp)</b>.
+  <p>
+  In <b>Bottom of Sounding</b> mode, the initial conditions of the
+  parcel are determined from the temperature and
+  dew-point at the lowest (i.e. highest pressure) data-point of the
+  environmental profiles.
+  <p>
+  In <b>Below Cursor</b> mode, the initial conditions
+  of the parcel are determined from the temperature and dew-point
+  profiles by computing the pressure-weighted mean potential temperature
+  and water-vapor mixing-ratio of the atmosphere that lies below the
+  cursor when the middle mouse button is pressed.
+  Thus, pressing the middle button 
+  at 950 hPa for a sounding that starts at 1000 hPa will effectively
+  mix the lower 50 hPa of the atmosphere and lift the resulting parcel
+  starting at 975 hPa.
+  <p>
+  In <b>At Cursor Pressure</b> mode,
+  the initial pressure, in-situ temperature, and moisture content of the parcel
+  are taken from the the temperature and dew-point profiles at the pressure of
+  the cursor when the middle mouse button is pressed.
+  <p>
+  In <b>At Cursor (Press, Temp)</b> mode,
+  the initial pressure and in-situ temperature of the parcel equal
+  the pressure and temperature values under the cursor 
+  when the middle mouse button is pressed.  The initial
+  moisture content is determined from the dew-point profile at the
+  initial pressure.
+
+<p>
+
+The computed path of a lifted parcel is automatically updated when
+  appropriate. In 
+  <b>Below Cursor</b>, 
+  <b>At Cursor Pressure</b>, and 
+  <b>At Cursor (press, temp)</b> modes, the
+  path will update as the cursor is dragged.  In all modes, the path
+  will update whenever the profiles change.
+
+<p>
+
+The check box labeled [ht::command Virtual Temperature] controls whether
+or not the virtual temperatures of the environmental profile and
+pseudo-adiabatically lifted air-parcel are displayed.
+
+<p>
+
+The check box labeled [ht::command Spatial Loci] controls whether or not
+the location of the sounding data is displayed in the main, 3-D window.
+For aircraft data, the track of the aircraft will be displayed; for RAOB
+data, the locations of the stations will be displayed; and for gridded
+data, the grid points will be displayed.
+
+<p>
+
+The table to the left of the sounding diagram contains aerological
+  parameters determined from the atmospheric sounding displayed in the
+  diagram.  The following abbreviations are used:
+  <dl>
+    <dt>LCL</dt>
+    <dd>
+      Lifting Condensation Level: the level at which a
+      pseudo-adiabatically lifted air-parcel becomes saturated with
+      water-vapor.
+    </dd>
+    <dt>LFC</dt>
+    <dd>
+      Level of Free Convection: the level at which the virtual
+      temperature of a pseudo-adiabatically lifted air-parcel changes
+      from being less than the environment's virtual temperature to
+      being greater than the environment's.
+    </dd>
+    <dt>LNB</dt>
+    <dd>
+      Level of Neutral Buoyancy: the level above the LFC at which the
+      virtual temperature of a pseudo-adiabatically lifted air-parcel
+      equals the environment's virtual temperature.
+    </dd>
+    <dt>CAPE</dt>
+    <dd>
+      Convective Available Potential Energy: the area between the
+      virtual temperature trace of the pseudo-adiabatically lifted
+      air-parcel and the virtual temperature trace of the environment
+      from the LFC to the LNB in which the parcel's virtual temperature
+      is greater than the environment's (positive CAPE connotes
+      convective development).
+    </dd>
+    <dt>CIN</dt>
+    <dd>
+      Convective Inhibition: the negative of the area between the
+      virtual temperature trace of the pseudo-adiabatically lifted
+      air-parcel and the virtual temperature trace of the environment
+      from the parcel's initial conditions to the LFC in which the
+      parcel's virtual temperature is less than the environment's
+      (negative CIN connotes initial positive work to lift the parcel).
+    </dd>
+  </dl>
+
+</p>
+
+</body>
+</html>

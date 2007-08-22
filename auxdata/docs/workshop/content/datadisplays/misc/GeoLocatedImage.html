@@ -1,0 +1,73 @@
+<html>
+<head>
+<title>Using Images in the IDV</title>
+</head>
+
+<body>
+
+
+<div class="overview">
+The IDV can display  non-geolocated images and geolocate them.
+</div>
+
+<ol class="step">
+
+<li> First, start fresh [ht::refresh]
+
+    <li> Load an image.
+    <ul>
+    <li> [ht::openDataSourceChooser] 
+    <li> In the [ht::dialog Data Source Chooser] click on the 
+    [ht::command URLs] tab. 
+    <li> Enter the URL:<pre>
+http://www.unidata.ucar.edu/software/idv/data/image.gif
+</pre>
+    <li> Press [ht::button Add Source]
+    <li> The IDV  will take some time to load this because it defaults
+to the VisAD data source.
+    </ul>
+
+
+<li> Let's look at this image.
+<ul>
+<li> You should have the image loaded in the [ht::dialog Field Selector]
+Note the funny field name. This is the VisAD <i>math type</i> of the data.
+
+<li> Create an  [ht::display Omni Control] display to see the image. 
+
+<li> Click on the [ht::button Mappings] button.
+
+<li> Let's play around with some of these mappings.
+
+</ul>
+
+    <li> Now we're going to look at the moon. 
+    <ul>
+    <li> In the [ht::dialog Data Source Chooser] click on the 
+    [ht::command URLs] tab and enter the URL:<pre>
+http://www.unidata.ucar.edu/software/idv/data/moon.gif
+</pre>
+
+<li> Let's   geolocate the image.
+<ul>
+<li> In  the [ht::command Data Sources] in the [ht::dialog Field Selector] window select  [ht::param Formulas]
+<li> Under [ht::command Fields] open the [ht::param System] tab. Select
+[ht::param Geolocate an Image].
+<li> Under [ht::command Displays] select [ht::display 3 Color (RGB) Image]
+and create the display.
+<li> In the popup enter: 90,-180,-90,180 and press [ht::button OK]
+<li> Now, select the funny [ht::param (ImageElement,ImageLine)...] field.
+
+</ul>
+<li> Now, a flat moon picture isn't very exciting. Let's create a Globe display
+window with the [ht::menu File New {View Window} {Globe Display} {One Pane}]
+menu item.
+<li> Create the moon image as described above.
+
+
+</ul>
+
+</ol>
+
+</body>
+</html>

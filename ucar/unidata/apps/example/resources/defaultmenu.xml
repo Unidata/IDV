@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<menubar label="Commands">
+  <menu
+     id="test"
+     label="Example">
+    <menuitem
+       action="jython:idv.helloWorld();"
+       label="Hello World"/>
+    <menuitem
+       action="action:example.helloworld"
+       label="Hello World from action"/>
+    <separator/>
+    <menuitem
+       action="jython:idv.getResourceManager().showHtmlView();"
+       label="Show resources"/>
+  </menu>
+</menubar>
+

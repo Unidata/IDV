@@ -1,0 +1,54 @@
+
+<html>
+<head>
+<title>Using the Data Source Chooser</title>
+</head>
+
+<body>
+
+<div class="overview">
+The Data Source Chooser is used to load data sets into the IDV.
+</div>
+
+<div class="pagesubtitle">Data Source Chooser Window</div>
+
+The Data Source Chooser has tabs for selecting the different 
+<a href="[ht::ug::url /data/DataSources.html]">types</a>
+of data that the IDV can display.  Let's examine the features of
+this pane.
+
+
+<ol class="step">
+
+  <li>[ht::startIDV]</li>
+
+  <li>[ht::openDataSourceChooser]</li>
+  
+  <li>There is a tab for loading in each of the types of data that
+      the IDV supports.  Click through each of the tabs to 
+      see what is there.  We will examine each tab in more 
+      detail in the subsequent exercises.</li>
+
+  <li>For the purposes of this section, we will load in a 
+      netCDF file of Eta model data from disk.  
+      Click on the [ht::command Files] tab.</li>
+
+  <li>Use the <code class="chooser">File selector</code> chooser 
+      to navigate to the <code class="filename"><%workshop.datadir%>/grids</code>
+      directory.  
+      
+[ht::cimg images/DataSourceChooser.gif]
+
+  <li>Select the <code class="filename">sample_eta_grid.nc</code>
+      file and click the <code class="button">Add Source</code> button.</li>
+
+  <li>At this point, the IDV reads in enough metadata from the 
+      data source to populate the fields in the 
+      [ht::command Field Selector].</li>
+
+  <li>Now, we'll look at the [ht::command Field Selector].
+
+</ol>
+
+</body>
+</html>

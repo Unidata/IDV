@@ -1,0 +1,85 @@
+
+[ug::head {Timeline}]
+
+
+The IDV makes use of a timeline widget in a variety of areas.
+The timeline allows you to see the temporal distribution of
+a set of times and easily select them. There can also be 
+a date selection mechanism (see below) that allows you to select 
+based on a range, interval, etc.
+<p>
+
+
+[ht::cimg images/Timeline1.gif  {Chooser Timeline}]
+
+
+The View Managers use the timeline to show the animation time set
+and the times of the different displays. Here, the timeline is used for
+informational purposes and is not used to select times. This can be shown
+through the [ug::menu View {Animation Timeline}] menu. The gray timeline
+represents non-visible displays. Double clicking in a timeline sets the
+animation step to that time.
+
+[ht::cimg images/Timeline2.gif  {Animation Times}]
+
+
+
+<div class="pagesubtitle">Timeline Navgation</div>
+
+The timeline supports a variety of navigation mechanisms:
+
+<table width="100%">
+<tr valign="top"><td width="40%"><b>Event</b></td><td><b>Action</b></td></tr>
+
+<tr valign="top"><td>Left Mouse Drag</td><td>Change visible range or date selection range. </td></tr>
+
+
+<tr valign="top"><td>Left/Right Arrow</td>
+<td>Change visible range. <br>
+Use Control-Key to change date selection.<br>
+Use Shift-Key to use larger increment.</td></tr>
+
+<tr valign="top"><td> Up/Down Arrow</td><td>
+Zoom in/out visible range. <br>
+Use Control-Key to change date selection.<br>
+Use Shift-Key to use larger increment.</td></tr>
+
+
+
+<tr valign="top"><td>Mouse Click; Control-Click; Shift-Click</td><td>Select individual times, multiple times  or a range of times</td></tr>
+
+<tr valign="top"><td>Shift-Drag</td><td>When not showing the date selection mechanism you can choose a range of times with shift-drag</td></tr>
+
+<tr valign="top"><td>Right Mouse Click</td>
+<td>This brings up a popup menu that allows you to show the properties dialog, 
+go to particular current date ranges, set the interval, range, skip factor and count of
+the date selection.
+</td></tr>
+</table>
+
+
+<div class="pagesubtitle">Date Selection</div>
+The date selection is defined by:
+<ul>
+<li> <b>Start/End</b> date: These define the range to look within.
+<li> <b>Interval</b>: If defined, this allows you to select dates every N time units. For example,
+you can set the interval to be one hour. The times that are selected are the ones closest to
+the one hour interval ticks.
+<li> <b>Before/After Range</b>: These are displayed by the little gray triangles in the timeline.
+By default, the ranges that we use are one half the size of the interval. However, you can set the range
+both before and after the interval tick. So for example, if you want to just consider times within 15 minutes 
+before the interval but nothing after the interval set the Before Range to be 15 minutes and the After Range to
+be 0 minutes.
+<li> <b>Count</b>: You can specify a max number of times that will be selected. Only the most recent N times
+will be selected. 
+<li> <b>Skip Factor</b>: This says to skip every N'th time that would be selected. For example, the date selection first 
+considers the interval/ranges (if defined), then it applies the skip (e.g., only every 3rd time), then
+it looks at the max count.
+</ul>
+
+These can be accessed by right-clicking in the timeline to show a popup menu.
+The menu allows you explicitly define these settings through a Properties dialog
+or (much more easy) set them directly with sub-menu choices.
+
+</body>
+

@@ -1,0 +1,47 @@
+<html><head>
+  <title>Choose NEXRAD Level III Radar Data</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+<body>
+
+
+The [ug::chooser Radar] chooser contains two sub-tabs that allow you to choose
+NEXRAD Level III data on remote ADDE servers or NEXRAD Level II data from your file system.
+
+
+[ht::cimg images/Level3Chooser.gif {Level III Radar Chooser}]
+
+The [ug::chooser Level III] chooser  works similarly to the Image chooser described above:
+<ol>
+
+[ug::step "Choose an ADDE [ug::menu Server] and a [ug::menu Dataset] to use:" images/RadarStep1.gif]
+
+[ug::step "Press [ug::button Connect]:" images/RadarStep2.gif {This causes  the IDV to query 
+the server for available radar types and stations.}]
+
+[ug::step {Select a station using the map:} {images/RadarStep3.gif} ]
+
+[ug::step {Select a radar type:} images/RadarStep4.gif {Once a station and a radar type has been selected the ADDE server will be queried
+as to the available times.
+Optionally, you can override the default data type that is returned.
+}]
+
+
+[ug::step {Or, choose a set of absolute times (e.g., 12Z, 1Z):} images/ImageStep5.gif {
+When choosing 
+absolute times for the first time the IDV needs to query the ADDE server 
+for the times.  Times can be selected in the list or the time line
+(use control/click or shift/click in the list to select multiple times).
+See the <a href="../../tools/Timeline.html">Timeline section</a> for details on its use.
+}]
+
+
+[ug::step "When done, load the selected radar data with the [ug::button Add Source] button."]
+
+</ol>
+
+
+
+</body>
+</html>

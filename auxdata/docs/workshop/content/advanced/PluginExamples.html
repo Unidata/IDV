@@ -1,0 +1,37 @@
+
+<title>Plugin Examples</title>
+
+
+<div class="overview">
+We don't have to use the Plugin Creator. Plugins are just jar files or even
+stand alone resource files that the IDV loads into its resource lists.
+Let's look at some example plugins.
+</div>
+
+<ul>
+<li> cd to the plugins directory and make a tmp directory to unjar some plugins into: 
+[ht::cmdline {
+cd auxdata/plugins<br>
+mkdir tmp<br>
+cd tmp<br>
+jar -xvf ../gempak.jar
+}]
+
+<li> Look at the gempak.rbi file. We have this here to name and categorize the color tables.
+
+<li> We have no examples but plugin jar files can also contain class files.
+It turns out that if you include a class file in a plugin of a class that
+is derived from one of the manager classes the IDV will automatically use that
+class as the manager, obviating the need to have a custom  doMakeManger method.
+e.g., ExampleUIManager.
+
+
+<li> Let's discuss the trade-offs between building a McIDAS-V as a stand alone application 
+or releasing it as a plugin.
+
+
+</ul>
+
+
+
+

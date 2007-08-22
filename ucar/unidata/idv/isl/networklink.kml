@@ -1,0 +1,8 @@
+   <NetworkLink>
+      <name>${label}</name>
+      <visibility>0</visibility>
+      <description>&lt;a href=&quot;http://www.unidata.ucar.edu/cgi-bin/idv/getbundle.jnlp?bundleurl=${wwwroot}/${bundle}&quot;&gt;Run in the IDV&lt;/a&gt; (Needs Java Webstart)</description>
+      <Url>
+        <href>${wwwroot}/${id}.kmz</href>
+      </Url>
+</NetworkLink>

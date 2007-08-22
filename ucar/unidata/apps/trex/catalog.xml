@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0" xmlns:xlink="http://www.w3.org/1999/xlink" name="TREX Catalog">
+<dataset name="TREX Catalog">
+<catalogRef xlink:title="EOL WMS"
+xlink:href="http://mapserver.eol.ucar.edu/cgi-bin/mapserv?map=/export/web/mapserver/data/trex/demo.map&amp;version=1.1.1&amp;service=wms&amp;request=GetCapabilities"/>
+
+</dataset>
+</catalog>
+

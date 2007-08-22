@@ -1,0 +1,52 @@
+
+{WebCam  Control}
+
+{
+<meta name="jhid" value="idv.controls.imagemoviecontrol">
+
+The WebCam control provides an interface to view collections of
+webcam imagery from around the United States. This imagery is 
+collected and made available through the Unidata web site. 
+<p>
+<b>
+Note: Since this imagery comes from sites around the internet
+at times some webcams may fail or not be available.
+</b>
+
+<p>
+The user interface is composed of two tabs. 
+The second tab lists all available image sets and allows you to choose
+which one to view:
+[ht::cimg images/ImageMovieControlGui2.gif]
+We have categorized the available image sets based on region. You can select
+the desired image set in either the tree view on the left or the map view
+on the right. The map view can be zoomed, panned and decluttered. 
+<p>
+When you have selected the desired image set simply press the
+[ht::command Load Image Set] button or double click  on the selection.
+
+
+
+
+Once you have selected an image set it will be displayed in the
+first tab:
+[ht::cimg images/ImageMovieControlGui1.gif]
+
+The  menu in the upper right lists the times available.  The animation
+control in the upper left allows you to animate the images.
+<p>
+The [ht::command Animation Mode] allows you to synchronize the
+image set animation with the animation in the main display.
+You can have the animation in the control drive the
+animation in the main display by choosing 
+[ht::command To Main Display] or vice-versa by choosing
+[ht::command From Main Display].
+}
+
+
+
+
+{{Import New Files} {
+You can import the Image Set XML file through the [ug::menu File {Import Image Set From File...}]
+and [ug::menu File {Import Image Set From URL...}] menu items. For the format see <a href="../../data/ImageMovie.html">here</a>.
+}}

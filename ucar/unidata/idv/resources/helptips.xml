@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+
+<helptips icon="/ucar/unidata/idv/images/logo.gif" title="IDV Help Tips" >
+
+<!--
+The helptip tag can hold an (optional) title attribute and some message text.
+
+The message text can be specified as an attribute:
+<helptip message="some html, don't forget to use &lt; and &gt; for
+less-than and greater-than." />
+
+Or as text within the helptip tag:
+<helptip>
+You can also put in hrefs that call out to the idv, e.g.:
+&lt;a href=jython:idv.showChooser();>Try it&lt;/a>
+</helptip>
+
+Or as CDATA text within the helptip tag:
+<helptip>
+<![CDATA[
+Inside the CDATA tag allows you to not have to
+escape special html characters so you
+can put in  hrefs that call out to the idv, e.g.:
+<a href="jython:idv.showChooser();">Try it</a>
+]]></helptip>
+
+-->
+
+
+
+<helptip title="Getting Started" category="Misc."><![CDATA[
+The <a href="help:idv.introduction">User's Guide</a> 
+contains a <a href="help:idv.quickstart">Getting Started</a> section.
+<p>
+You can load one of the sample displays
+in the <b>Displays-&gt;Favorite Bundles</b> menu or select here:
+<ul>
+<li> <a href="jython:idv.doOpen('http://www.unidata.ucar.edu/content/software/idv/resources/bundles/samples/grid.xidv');">Grid Display</a>
+<li> <a href="jython:idv.doOpen('http://www.unidata.ucar.edu/content/software/idv/resources/bundles/samples/radar.xidv');">Radar Display</a>
+<li> <a href="jython:idv.doOpen('http://www.unidata.ucar.edu/content/software/idv/resources/bundles/samples/satellite.xidv');">Satellite Display</a>
+]]>
+</helptip>
+
+
+<helptip title="Displaying Data" category="Data"><![CDATA[
+In the IDV, the process of analyzing and visualizing data takes 
+the following steps:
+
+   <ol>
+   <li><a href="help:idv.data.choosers">Choosing a Data Source.</a>
+   <li><a href="help:idv.data.fieldselector.fields">Selecting the parameter</a> or diagnostic formula to use for the display.
+   <li><a href="help:idv.examples">Selecting the type of display</a> (and optionally selecting a range of times).
+   <li><a href="help:idv.data.fieldselector.displays">Creating the display</a>. 
+   </ol>
+]]></helptip>
+
+
+
+<helptip title="Choosing Data" category="Data"><![CDATA[
+You can load in  different sources of data through the 
+<a href="action:new.datachooser">Data-&gt;New Data Source...</a>
+menu. 
+]]></helptip>
+
+
+<helptip title="Creating Displays" category="Data">
+<![CDATA[
+The Field Selector Window shows all of the loaded data sources and
+allows you to create new displays from the fields.
+View this window <a href="action:show.dataselector">here</a>.
+]]></helptip>
+
+
+<helptip title="Zooming, Panning, and Rotating" category="Views"><![CDATA[
+You can zoom pan and rotate the display using the mouse and the keyboard. 
+See <a href="help:idv.ui.navigation"> Zooming, Panning, and Rotating</a>.
+]]></helptip>
+
+
+<helptip title="Animation" category="Views"><![CDATA[
+You have control over time animation with the 
+<a href="help:idv.ui.animation"> Time Animation Control</a>.
+]]></helptip>
+
+
+
+<helptip title="Error Message Log" category="Misc."><![CDATA[
+If you have errors that need to be reported you can
+view the error message log from the
+<a href="jython:idv.showConsole ();">Help->Show Console</a> menu command.
+]]></helptip>
+
+
+
+
+<helptip title="Saving State" category="Miscellaneous"><![CDATA[
+You can save off the current state of the application
+(i.e., data, displays and settings) 
+with the
+<a href="jython:idv.doSaveAs ();">File->Save As...</a>
+menu command. Read more about bundles in 
+the <a href="help:idv.bundles">User's Guide</a>.
+]]></helptip>
+
+
+<helptip title="Initial State" category="Preferences"><![CDATA[
+You can save the state of the IDV in a default bundle that will
+be used when you start the IDV.
+Read more about the "default bundle" in the <a href="help:idv.bundles">
+User's Guide</a>. 
+]]></helptip>
+
+
+<helptip title="Formulas" category="Preferences"><![CDATA[
+You can make computations using any data you can display in the IDV,
+using the IDV formula facility. Create formulas with the 
+<a href="jython:idv.getJythonManager().showFormulaDialog ();">Formula Editor</a>. See also 
+<a href="help:idv.tools.formulas">User's Guide</a> section about IDV formulas.
+]]></helptip>
+
+<helptip title="Editing Color Tables" category="Tools"><![CDATA[
+You can create and edit color tables with the IDV Color Table
+Editor. Read about the <a href="help:idv.tools.colortableeditor">
+Color Table Editor</a> 
+and then invoke it with the 
+<a href="jython:idv.showColorTableEditor ();">
+Tools-&gt;Color Table Editor</a> menu command.
+]]></helptip>
+
+
+<helptip title="User Preferences" category="Preferences"><![CDATA[
+You can change application preferences with the
+<a href="jython:idv.showPreferenceManager ();">Edit-&gt;Preferences</a> 
+menu command. 
+Read the <a href="help:idv.tools.preferences">User's Guide</a>
+section on this topic. 
+]]></helptip>
+
+
+
+<helptip title="Maps and Projections" category="Views"><![CDATA[
+You can add or change the set of 
+<a href="jython:idv.doMakeControl('mapdisplay');">background maps</a> and 
+<a href="jython:idv.getVMManager().showProjectionManager();">projections</a> of maps.
+Read the <a href="help:idv.tools.projectionmanager">User's Guide</a>
+section about this topic.
+]]></helptip>
+
+
+
+
+<helptip title="Satellite Data" category="Data"><![CDATA[
+The IDV can use all the satellite data sets listed in 
+<a href="help:idv.data.datasources"> Available Data</a>.
+]]></helptip>
+
+
+
+<helptip title="Toggling Visibility" category="Displays"><![CDATA[
+You can toggle visibility of displays in  several ways. See 
+<a href="help:idv.controls.visibility">Toggling Visibility</a>.
+]]></helptip>
+
+
+<helptip title="Range and Bearing" category="Displays"><![CDATA[
+You can find distance and direction between two points on the 
+earth's surface with the 
+<a href="jython:idv.doMakeControl('rangeandbearing');"> 
+Range and Bearing tool</a>. 
+]]></helptip>
+
+<helptip title="Text Notes" category="Displays"><![CDATA[
+You can attach descriptive text to any IDV display, and save it 
+so others can see it, with 
+<a href="jython:idv.doMakeControl('notecontrol');">Text Notes</a>. 
+]]></helptip>
+
+
+
+<helptip title="Radar Range Rings" category="Displays"><![CDATA[
+You can add range rings and azimuth lines to any
+radar display, or over any point on the map, with the 
+<a href="jython:idv.doMakeControl('rangerings');">Radar Range Rings</a>. 
+]]></helptip>
+
+
+
+<helptip title="Jython in the IDV" category="Advanced"><![CDATA[
+You can write subroutines in Jython and use them
+to make computations on data with the 
+<a href="jython:idv.getJythonManager ().showJythonEditor();">Edit-&gt;Forumlas-&gt;Jython Library</a>
+ menu command. Read about Jythons methods in the <a href="help:idv.tools.jython">User's Guide</a>. 
+]]></helptip>
+
+
+
+
+</helptips>
+
+
+
+
+
+

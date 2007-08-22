@@ -1,0 +1,1277 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<imagedefaults>
+  <default
+     pattern="*"
+     user="idv"
+     proj="0"
+     compress="gzip"
+     port="112"/>
+  <default
+     pattern="AMRC/COMPOSITE"
+     key="LATLON"
+     loc="-90 0"
+     size="1024 1024"
+     mag="-2 -2"/>
+  <default
+     pattern="AMRC/FORECAST"
+     key="LATLON"
+     loc="-90 0"
+     mag="1 1"/>
+  <default
+     pattern="AMRC/DMSP"
+     key="LATLON"
+     loc="-90 0"
+     mag="1 1"/>
+  <default
+     pattern="AMRC/NOAA12"
+     key="LATLON"
+     loc="-90 0"
+     mag="1 1"/>
+  <default
+     pattern="AMRC/NOAA14"
+     key="LATLON"
+     loc="-90 0"
+     mag="1 1"/>
+  <default
+     pattern="AMRC/NOAA15"
+     key="LATLON"
+     loc="-90 0"
+     mag="1 1"/>
+  <default
+     pattern="AMRC/NOAA16"
+     key="LATLON"
+     loc="-90 0"
+     mag="1 1"/>
+  <default
+     pattern="AMRC/WVCOMP"
+     key="LATLON"
+     loc="-90 0"
+     size="1024 1024"
+     mag="-2 -2"/>
+  <default
+     pattern="CIMSS/CAPE"
+     key="LATLON"
+     loc="35 -100"
+     mag="1 1"
+     unit="CAPE"/>
+  <default
+     pattern="CIMSS/CTP"
+     key="LATLON"
+     loc="35 -100"
+     mag="1 1"
+     unit="CTOP"/>
+  <default
+     pattern="CIMSS/LI"
+     key="LATLON"
+     loc="35 -100"
+     mag="1 1"
+     unit="LIXG"/>
+  <default
+     pattern="CIMSS/OZONE"
+     key="LATLON"
+     loc="35 -100"
+     mag="2 2"
+     unit="OZON"/>
+  <default
+     pattern="CIMSS/PW"
+     key="LATLON"
+     loc="35 -100"
+     mag="1 1"
+     unit="PWVG"/>
+  <default
+     pattern="CIMSS/SST"
+     key="LATLON"
+     loc="35 -85"
+     size="360 800"
+     mag="-2 -2"
+     unit="BRIT"/>
+  <default
+     pattern="GINICOMP/GSN8KVIS"
+     key="LINELE"
+     place="CENTER"
+     loc="504 768"
+     size="504 768"
+     mag="-2 -2"/>
+  <default
+     pattern="GINICOMP/GSN8K39"
+     key="LINELE"
+     place="CENTER"
+     loc="504 768"
+     size="504 768"
+     mag="-2 -2"/>
+  <default
+     pattern="GINICOMP/GSN8KWV"
+     key="LINELE"
+     place="CENTER"
+     loc="504 768"
+     size="504 768"
+     mag="-2 -2"/>
+  <default
+     pattern="GINICOMP/GSN8KIR"
+     key="LINELE"
+     place="CENTER"
+     loc="504 768"
+     size="504 768"
+     mag="-2 -2"/>
+  <default
+     pattern="GINICOMP/GSN8K12"
+     key="LINELE"
+     place="CENTER"
+     loc="504 768"
+     size="504 768"
+     mag="-2 -2"/>
+  <default
+     pattern="GINICOMP/GNC24KVIS"
+     key="LINELE"
+     place="CENTER"
+     loc="256 512"
+     mag="1 1"/>
+  <default
+     pattern="GINICOMP/GNC24K39"
+     key="LINELE"
+     place="CENTER"
+     loc="256 512"
+     mag="1 1"/>
+  <default
+     pattern="GINICOMP/GNC24KWV"
+     key="LINELE"
+     place="CENTER"
+     loc="256 512"
+     mag="1 1"/>
+  <default
+     pattern="GINICOMP/GNC24KIR"
+     key="LINELE"
+     place="CENTER"
+     loc="256 512"
+     mag="1 1"/>
+  <default
+     pattern="GINICOMP/GNC24K12"
+     key="LINELE"
+     place="CENTER"
+     loc="256 512"
+     mag="1 1"/>
+  <default
+     pattern="GINIEAST/GE1KVIS"
+     key="LINELE"
+     place="CENTER"
+     size="854 854"
+     loc="2560 2560"
+     mag="-6 -6"/>
+  <default
+     pattern="GINIEAST/GE4K39"
+     key="LINELE"
+     place="CENTER"
+     size="640 640"
+     loc="640 640"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIEAST/GE8KWV"
+     key="LINELE"
+     place="CENTER"
+     size="640 640"
+     loc="320 320"
+     mag="1 1"/>
+  <default
+     pattern="GINIEAST/GE4KIR"
+     key="LINELE"
+     place="CENTER"
+     size="640 640"
+     loc="640 640"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIEAST/GE4K12"
+     key="LINELE"
+     place="CENTER"
+     size="640 640"
+     loc="640 640"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIEAST/GNC24K12"
+     key="LINELE"
+     place="CENTER"
+     size="512 1000"
+     loc="256 512"
+     mag="1 1"/>
+  <default
+     pattern="GINIEAST/GNC24K39"
+     key="LINELE"
+     place="CENTER"
+     size="512 1000"
+     loc="256 512"
+     mag="1 1"/>
+  <default
+     pattern="GINIEAST/GNC24KIR"
+     key="LINELE"
+     place="512 1000"
+     loc="256 512"
+     mag="1 1"
+     xxxxplace="CENTER"/>
+  <default
+     pattern="GINIEAST/GNC24KVIS"
+     key="LINELE"
+     place="CENTER"
+     size="512 1000"
+     loc="256 512"
+     mag="1 1"/>
+  <default
+     pattern="GINIEAST/GNC24KWV"
+     key="LINELE"
+     place="CENTER"
+     size="512 1000"
+     loc="256 512"
+     mag="1 1"/>
+  <default
+     pattern="GINIEAST/GMC24KVIS"
+     key="LINELE"
+     place="CENTER"
+     size="512 512"
+     loc="512 512"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIEAST/GMC24KWV"
+     key="LINELE"
+     place="CENTER"
+     size="512 512"
+     loc="512 512"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIEAST/GMC24KIR"
+     key="LINELE"
+     place="CENTER"
+     size="512 512"
+     loc="512 512"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIEAST/GPN8KVIS"
+     key="LINELE"
+     place="CENTER"
+     size="874 1000"
+     loc="437 506"
+     mag="1 1"/>
+  <default
+     pattern="GINIEAST/GPN8KWV"
+     key="LINELE"
+     place="CENTER"
+     size="874 1000"
+     loc="437 506"
+     mag="1 1"/>
+  <default
+     pattern="GINIEAST/GPN8KIR"
+     key="LINELE"
+     place="CENTER"
+     size="874 1000"
+     loc="437 506"
+     mag="1 1"/>
+  <default
+     pattern="GINIEAST/GPR1KVIS"
+     key="LINELE"
+     place="CENTER"
+     size="640 640"
+     loc="960 960"
+     mag="-3 -3"/>
+  <default
+     pattern="GINIEAST/GPR4K39"
+     key="LINELE"
+     place="CENTER"
+     size="480 480"
+     loc="240 240"
+     mag="1 1"/>
+  <default
+     pattern="GINIEAST/GPR8KWV"
+     key="LINELE"
+     place="CENTER"
+     size="240 240"
+     loc="120 120"
+     mag="1 1"/>
+  <default
+     pattern="GINIEAST/GPR4KIR"
+     key="LINELE"
+     place="CENTER"
+     size="480 480"
+     loc="240 240"
+     mag="1 1"/>
+  <default
+     pattern="GINIEAST/GPR4K12"
+     key="LINELE"
+     place="CENTER"
+     size="480 480"
+     loc="240 240"
+     mag="1 1"/>
+  <default
+     pattern="GINIEAST/GSN8KVIS"
+     key="LINELE"
+     place="CENTER"
+     size="504 768"
+     loc="504 768"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIEAST/GSN8K39"
+     key="LINELE"
+     place="CENTER"
+     size="504 768"
+     loc="504 768"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIEAST/GSN8KWV"
+     key="LINELE"
+     place="CENTER"
+     size="504 768"
+     loc="504 768"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIEAST/GSN8KIR"
+     key="LINELE"
+     place="CENTER"
+     size="504 768"
+     loc="504 768"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIEAST/GSN8K12"
+     key="LINELE"
+     place="CENTER"
+     size="504 768"
+     loc="504 768"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIEAST/GSN8KCTP"
+     key="LATLON"
+     place="CENTER"
+     size="76 200"
+     loc="38 -100"
+     mag="1 1"/>
+  <default
+     pattern="GINIEAST/GSN8KLI"
+     key="LATLON"
+     place="CENTER"
+     size="76 200"
+     loc="38 -100"
+     mag="1 1"/>
+  <default
+     pattern="GINIEAST/GSN8KPW"
+     key="LATLON"
+     place="CENTER"
+     size="76 200"
+     loc="38 -100"
+     mag="1 1"/>
+  <default
+     pattern="GINIEAST/GSN8KSFCT"
+     key="LATLON"
+     place="CENTER"
+     size="76 200"
+     loc="38 -100"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GW1KVIS"
+     key="LINELE"
+     place="CENTER"
+     size="854 854"
+     loc="2560 2200"
+     mag="-6 -6"/>
+  <default
+     pattern="GINIWEST/GW4K39"
+     key="LINELE"
+     place="CENTER"
+     size="640 550"
+     loc="640 550"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIWEST/GW8KWV"
+     key="LINELE"
+     place="CENTER"
+     size="640 550"
+     loc="320 275"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GW4KIR"
+     key="LINELE"
+     place="CENTER"
+     size="640 550"
+     loc="640 550"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIWEST/GW4K12"
+     key="LINELE"
+     place="CENTER"
+     size="640 550"
+     loc="640 550"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIWEST/GSN8KVIS"
+     key="LINELE"
+     place="CENTER"
+     size="504 768"
+     loc="504 768"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIWEST/GSN8K39"
+     key="LINELE"
+     place="CENTER"
+     size="504 768"
+     loc="504 768"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIWEST/GSN8KWV"
+     key="LINELE"
+     place="CENTER"
+     size="504 768"
+     loc="504 768"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIWEST/GSN8KIR"
+     key="LINELE"
+     place="CENTER"
+     size="504 768"
+     loc="504 768"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIWEST/GSN8K12"
+     key="LINELE"
+     place="CENTER"
+     size="504 768"
+     loc="504 768"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIWEST/GSN8KCTP"
+     key="LATLON"
+     size="64 200"
+     loc="38 -100"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GSN8KLI"
+     key="LATLON"
+     size="64 200"
+     loc="38 -100"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GSN8KPW"
+     key="LATLON"
+     size="64 200"
+     loc="38 -100"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GSN8KSFCT"
+     key="LATLON"
+     size="64 200"
+     loc="38 -100"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GMC24KVIS"
+     key="LINELE"
+     place="CENTER"
+     size="512 512"
+     loc="512 512"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIWEST/GMC24KWV"
+     key="LINELE"
+     place="CENTER"
+     size="512 512"
+     loc="512 512"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIWEST/GMC24KIR"
+     key="LINELE"
+     place="CENTER"
+     size="512 512"
+     loc="512 512"
+     mag="-2 -2"/>
+  <default
+     pattern="GINIWEST/GNC24KVIS"
+     key="LINELE"
+     place="CENTER"
+     size="512 1000"
+     loc="256 512"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GNC24K39"
+     key="LINELE"
+     place="CENTER"
+     size="512 1000"
+     loc="256 512"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GNC24KWV"
+     key="LINELE"
+     place="CENTER"
+     size="512 1000"
+     loc="256 512"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GNC24KIR"
+     key="LINELE"
+     place="CENTER"
+     size="512 1000"
+     loc="256 512"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GNC24K12"
+     key="LINELE"
+     place="CENTER"
+     size="512 1000"
+     loc="256 512"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GAN8KVIS"
+     key="LINELE"
+     place="CENTER"
+     size="874 1000"
+     loc="437 506"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GAN8KWV"
+     key="LINELE"
+     place="CENTER"
+     size="874 1000"
+     loc="437 506"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GAN8KIR"
+     key="LINELE"
+     place="CENTER"
+     size="874 1000"
+     loc="437 506"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GAR2KVIS"
+     key="LINELE"
+     place="CENTER"
+     size="544 754"
+     loc="816 1132"
+     mag="-3 -3"/>
+  <default
+     pattern="GINIWEST/GAR8K39"
+     key="LINELE"
+     place="CENTER"
+     size="408 576"
+     loc="204 288"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GAR16KWV"
+     key="LINELE"
+     place="CENTER"
+     size="204 288"
+     loc="102 144"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GAR8KIR"
+     key="LINELE"
+     place="CENTER"
+     size="408 576"
+     loc="204 288"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GAR8K12"
+     key="LINELE"
+     place="CENTER"
+     size="408 576"
+     loc="204 288"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GHN14KVIS"
+     key="LATLON"
+     place="CENTER"
+     size="40 314"
+     loc="20 -157"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GHN14KWV"
+     key="LATLON"
+     place="CENTER"
+     size="40 314"
+     loc="20 -157"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GHN14KIR"
+     key="LATLON"
+     place="CENTER"
+     size="40 314"
+     loc="20 -157"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GHR1KVIS"
+     key="LINELE"
+     place="CENTER"
+     size="682 746"
+     loc="1040 1120"
+     mag="-3 -3"/>
+  <default
+     pattern="GINIWEST/GHR4K39"
+     key="LINELE"
+     place="CENTER"
+     size="520 560"
+     loc="260 280"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GHR8KWV"
+     key="LINELE"
+     place="CENTER"
+     size="260 280"
+     loc="130 140"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GHR4KIR"
+     key="LINELE"
+     place="CENTER"
+     size="520 560"
+     loc="260 280"
+     mag="1 1"/>
+  <default
+     pattern="GINIWEST/GHR4K12"
+     key="LINELE"
+     place="CENTER"
+     size="520 560"
+     loc="260 280"
+     mag="1 1"/>
+  <default
+     pattern="ME7/IR1"
+     key="LATLON"
+     loc="0 0"
+     mag="-4 -4"/>
+  <default
+     pattern="ME7/IR2"
+     key="LATLON"
+     loc="0 0"
+     mag="-4 -4"/>
+  <default
+     pattern="ME7/VIS"
+     key="LATLON"
+     loc="0 0"
+     mag="-4 -4"/>
+<!-- The default for RTIMAGES is LINEELE and CENTER  -->
+<!-- Note: Need to make sure that all of these either use the default
+(LINEELE and CENTER) or have the value set 
+Note: we can use place="default", etc., to use the default
+ -->
+  <default
+     pattern="RTIMAGES/*"
+     key="LINELE"
+     place="CENTER"/>
+  <default
+     pattern="RTIMAGES/GE-VIS"
+     size="700 864"
+     loc="700 864"
+     mag="-2 -2"/>
+  <default
+     pattern="RTIMAGES/GE-WV"
+     size="700 864"
+     loc="700 864"
+     mag="-2 -2"/>
+  <default
+     pattern="RTIMAGES/GE-39"
+     size="700 864"
+     loc="700 864"
+     mag="-2 -2"/>
+  <default
+     pattern="RTIMAGES/GE-CO2"
+     size="700 864"
+     loc="700 864"
+     mag="-2 -2"/>
+  <default
+     pattern="RTIMAGES/GE-IR"
+     size="700 864"
+     loc="700 864"
+     mag="-2 -2"/>
+  <default
+     pattern="RTIMAGES/GW-VIS"
+     size="700 864"
+     loc="700 870"
+     mag="-2 -2"/>
+  <default
+     pattern="RTIMAGES/GW-WV"
+     size="700 864"
+     loc="700 870"
+     mag="-2 -2"/>
+  <default
+     pattern="RTIMAGES/GW-39"
+     size="700 864"
+     loc="700 870"
+     mag="-2 -2"/>
+  <default
+     pattern="RTIMAGES/GW-12"
+     size="700 864"
+     loc="700 870"
+     mag="-2 -2"/>
+  <default
+     pattern="RTIMAGES/GW-IR"
+     size="700 864"
+     loc="700 870"
+     mag="-2 -2"/>
+  <default
+     pattern="RTIMAGES/GEW-VIS"
+     size="592 1000"
+     loc="296 602"
+     mag="1 1"/>
+  <default
+     pattern="RTIMAGES/GEW-WV"
+     size="592 1000"
+     loc="296 602"
+     mag="1 1"/>
+  <default
+     pattern="RTIMAGES/GEW-IR"
+     size="592 1000"
+     loc="296 602"
+     mag="1 1"/>
+  <default
+     pattern="RTIMAGES/MOLL-IR"
+     loc="175 320"
+     mag="1 1"/>
+  <default
+     pattern="RTIMAGES/MOLL-WV"
+     loc="175 320"
+     mag="1 1"/>
+  <default
+     pattern="RTIMAGES/MDR"
+     loc="175 320"
+     mag="1 1"/>
+  <default
+     pattern="RTIMAGES/EDFLOATER-I"
+     size="700 864"
+     loc="350 432"
+     mag="1 1"/>
+  <default
+     pattern="RTIMAGES/EDFLOATER-II"
+     size="700 864"
+     loc="350 432"
+     mag="1 1"/>
+  <default
+     pattern="RTIMAGES/ANTARCTIC"
+     key="LATLON"
+     loc="-90 0"
+     mag="1 1"
+     place="default"/>
+  <default
+     pattern="RTIMAGES/GE-VISTOPO"
+     loc="350 432"
+     mag="1 1"/>
+  <default
+     pattern="RTIMAGES/GE-IRTOPO"
+     loc="350 432"
+     mag="1 1"/>
+  <default
+     pattern="RTIMAGES/GW-VISTOPO"
+     loc="333 422"
+     mag="1 1"/>
+  <default
+     pattern="RTIMAGES/GW-IRTOPO"
+     loc="333 422"
+     mag="1 1"/>
+  <default
+     pattern="RTIMAGES/GEW-VISTOPO"
+     size="592 1000"
+     loc="296 602"
+     mag="1 1"/>
+  <default
+     pattern="RTIMAGES/GEW-IRTOPO"
+     size="592 1000"
+     loc="296 602"
+     mag="1 1"/>
+  <default
+     pattern="RTIMAGES/MDRTOPO"
+     loc="240 320"
+     mag="1 1"/>
+  <default
+     pattern="RTIMAGES/MOLL-IRTOPO"
+     key="LATLON"
+     loc="0 0"
+     size="350 640"
+     mag="-2 -2"
+     place="default"/>
+  <default
+     pattern="RTIMAGES/RESFLOATER"
+     loc="175 320"
+     mag="1 1"/>
+  <default
+     pattern="*/2KM"
+     key="LINELE"
+     size="460 730"
+     loc="918 1830"
+     mag="-4 -4"
+     unit="ECHO"/>
+  <default
+     pattern="*/8KM"
+     key="LINELE"
+     size="460 730"
+     loc="240 384"
+     mag="1 1"
+     unit="ECHO"/>
+  <default
+     pattern="TOPO/CONF"
+     key="LINELE"
+     place="CENTER"
+     size="500 750"
+     loc="500 750"
+     mag="-2 -2"/>
+  <default
+     pattern="TOPO/GLOB"
+     key="LINELE"
+     place="CENTER"
+     loc="1080 2160"
+     size="440 864"
+     mag="-5 -5"/>
+  <default
+     pattern="TOPO/GOES8"
+     key="LINELE"
+     place="CENTER"
+     loc="350 432"
+     mag="1 1"/>
+  <default
+     pattern="TOPO/GOES9"
+     key="LINELE"
+     place="CENTER"
+     loc="333 422"
+     mag="1 1"/>
+  <default
+     pattern="TOPO/MERC"
+     key="LINELE"
+     place="CENTER"
+     size="500 750"
+     loc="500 750"
+     mag="-2 -2"/>
+  <default
+     pattern="TOPO/MDR"
+     key="LINELE"
+     place="CENTER"
+     loc="240 320"
+     mag="1 1"/>
+  <default
+     pattern="TOPO/MOLL"
+     key="LATLON"
+     loc="0 0"
+     size="350 640"
+     mag="-2 -2"/>
+  <default
+     pattern="TOPO/NPOLE"
+     key="LATLON"
+     loc="90 -105"
+     size="500 500"
+     mag="-2 -2"/>
+  <default
+     pattern="TOPO/QUAD"
+     key="LINELE"
+     place="CENTER"
+     loc="296 602"
+     mag="1 1"/>
+  <default
+     pattern="TOPO/SPOLE"
+     key="LATLON"
+     loc="-90 0"
+     size="500 500"
+     mag="-2 -2"/>
+  <default
+     pattern="TOPO/WHEMI"
+     key="LINELE"
+     place="CENTER"
+     size="616 626"
+     loc="616 626"
+     mag="-2 -2"/>
+  <default
+     pattern="BLIZZARD/G7-IR-4K"
+     key="LATLON"
+     enh="IMAGE"
+     place="CENTER"
+     size="668 802"
+     loc="38:50:54  -77:02:03"
+     mag="-2 -2"/>
+  <default
+     pattern="BLIZZARD/G7-VIS-4K"
+     key="LATLON"
+     enh="IMAGE"
+     place="CENTER"
+     size="668 802"
+     loc="38:50:54  -77:02:03"
+     mag="-2 -2"/>
+  <default
+     pattern="BLIZZARD/M3-IR"
+     key="LATLON"
+     enh="IMAGE"
+     place="CENTER"
+     size="512 614"
+     loc="38:50:54  -77:02:03"
+     mag="-2 -2"/>
+  <default
+     pattern="BLIZZARD/M3-VIS"
+     key="LATLON"
+     enh="IMAGE"
+     place="CENTER"
+     size="512 614"
+     loc="38:50:54  -77:02:03"
+     mag="-2 -2"/>
+  <default
+     pattern="BLIZZARD/G7-VIS-FD"
+     key="LATLON"
+     enh="IMAGE"
+     place="CENTER"
+     size="799 956"
+     loc="38:50:54  -77:02:03"
+     mag="1 1"/>
+  <default
+     pattern="BLIZZARD/G7-VIS-1K"
+     key="LATLON"
+     enh="IMAGE"
+     place="CENTER"
+     size="507 1252"
+     loc="38:50:54  -77:02:03"
+     mag="-5 -5"/>
+  <default
+     pattern="NEXRCOMP/10KRCM-NAT"
+     key="LINELE"
+     enh="MDR"
+     place="CENTER"
+     size="600 800"
+     loc="180 230"
+     mag="2 2"
+     unit="VIP"/>
+  <default
+     pattern="NEXRCOMP/6KN0R-NAT"
+     key="LINELE"
+     enh="BREF24"
+     place="CENTER"
+     size="500 800"
+     loc="250 400"
+     mag="1 1"
+     unit="ECHO"/>
+  <default
+     pattern="NEXRCOMP/1KN0R-NAT"
+     key="LINELE"
+     enh="BREF24"
+     place="CENTER"
+     size="700 900"
+     loc="1500 2368"
+     mag="-5 -5"
+     unit="ECHO"/>
+  <default
+     pattern="NEXRCOMP/1KN0R-FLT"
+     key="LINELE"
+     enh="BREF24"
+     place="CENTER"
+     size="500 720"
+     loc="250 360"
+     mag="1 1"
+     unit="ECHO"/>
+  <default
+     pattern="NEXRCOMP/2KN1P-NAT"
+     key="LINELE"
+     enh="RAIN"
+     place="CENTER"
+     size="500 787"
+     loc="750 1184"
+     mag="-3 -3"
+     unit="RAIN"/>
+  <default
+     pattern="NEXRCOMP/4KNTP-NAT"
+     key="LINELE"
+     enh="RAIN"
+     place="CENTER"
+     size="375 592"
+     loc="375 592"
+     mag="-2 -2"
+     unit="RAIN"/>
+  <default
+     pattern="IDVIMG1/GE1KVIS"
+     key="LATLON"
+     place="CENTER"
+     size="800 800"
+     loc="35 -92"
+     mag="1 1"/>
+  <default
+     pattern="IDVIMG1/GE-VIS"
+     key="LINELE"
+     place="CENTER"
+     size="700 864"
+     loc="700 864"
+     mag="-2 -2"/>
+  <default
+     pattern="BREF1"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="ECHO"/>
+  <default
+     pattern="BREF2"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="ECHO"/>
+  <default
+     pattern="BREF3"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="ECHO"/>
+  <default
+     pattern="BREF4"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="ECHO"/>
+  <default
+     pattern="BREF7"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="ECHO"/>
+  <default
+     pattern="BREF10"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="ECHO"/>
+  <default
+     pattern="PRE1"
+     key="LINELE"
+     loc="160 161"
+     mag="2 2"
+     unit="RAIN"/>
+  <default
+     pattern="PRE3"
+     key="LINELE"
+     loc="160 161"
+     mag="2 2"
+     unit="RAIN"/>
+  <default
+     pattern="PRET"
+     key="LINELE"
+     loc="160 161"
+     mag="2 2"
+     unit="RAIN"/>
+  <default
+     pattern="VEL1"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="VEL"/>
+  <default
+     pattern="VEL2"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="VEL"/>
+  <default
+     pattern="VEL3"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="VEL"/>
+  <default
+     pattern="VEL4"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="VEL"/>
+  <default
+     pattern="VIL"
+     key="LINELE"
+     loc="58 58"
+     mag="3 3"
+     unit="H2O"/>
+  <default
+     pattern="SRM1"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="SRMV"/>
+  <default
+     pattern="SRM2"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="SRMV"/>
+  <default
+     pattern="SRM3"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="SRMV"/>
+  <default
+     pattern="CCS034/G84KVIS"
+     key="LINELE"
+     place="CENTER"
+     size="700 864"
+     loc="700 864"
+     mag="-2 -2"/>
+  <default
+     pattern="CCS034/G84KIR"
+     key="LINELE"
+     place="CENTER"
+     size="700 864"
+     loc="700 864"
+     mag="-2 -2"/>
+  <default
+     pattern="CCS034/G88KWV"
+     key="LINELE"
+     place="CENTER"
+     size="700 864"
+     loc="350 432"
+     mag="1 1"/>
+  <default
+     pattern="CCS034/G84KEDFLT"
+     key="LINELE"
+     place="CENTER"
+     size="700 864"
+     loc="350 432"
+     mag="1 1"/>
+  <default
+     pattern="CCS039/G81KVIS"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"/>
+  <default
+     pattern="CCS039/NOWRAD"
+     key="LATLON"
+     place="CENTER"
+     size="600 600"
+     loc="40 -90"
+     mag="1 1"/>
+  <default
+     pattern="N0R"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="ECHO"/>
+  <default
+     pattern="N1R"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="ECHO"/>
+  <default
+     pattern="N2R"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="ECHO"/>
+  <default
+     pattern="N3R"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="ECHO"/>
+  <default
+     pattern="N0Z"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="ECHO"/>
+  <default
+     pattern="NCR"
+     key="LINELE"
+     loc="232 232"
+     mag="2 2"
+     unit="ECHO"/>
+  <default
+     pattern="N0L"
+     key="LINELE"
+     loc="58 58"
+     mag="3 3"
+     unit="ECHO"/>
+  <default
+     pattern="N1L"
+     key="LINELE"
+     loc="58 58"
+     mag="3 3"
+     unit="ECHO"/>
+  <default
+     pattern="N2L"
+     key="LINELE"
+     loc="58 58"
+     mag="3 3"
+     unit="ECHO"/>
+  <default
+     pattern="NET"
+     key="LINELE"
+     loc="58 58"
+     mag="3 3"
+     unit="TOPS"/>
+  <default
+     pattern="NVL"
+     key="LINELE"
+     loc="58 58"
+     mag="3 3"
+     unit="H2O"/>
+  <default
+     pattern="N1P"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="RAIN"/>
+  <default
+     pattern="N3P"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="RAIN"/>
+  <default
+     pattern="NTP"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="RAIN"/>
+  <default
+     pattern="N0V"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="VEL"/>
+  <default
+     pattern="N1V"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="VEL"/>
+  <default
+     pattern="N2V"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="VEL"/>
+  <default
+     pattern="N3V"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="VEL"/>
+  <default
+     pattern="N0S"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="SRMV"/>
+  <default
+     pattern="N1S"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="SRMV"/>
+  <default
+     pattern="N2S"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="SRMV"/>
+  <default
+     pattern="N3S"
+     key="LINELE"
+     place="ULEFT"
+     loc="0 0"
+     size="ALL"
+     unit="SRMV"/>
+  <default
+     pattern="nanuk.eosdis.nasa.gov:NANUK"
+     compress="none"
+     port="500"/>
+</imagedefaults>

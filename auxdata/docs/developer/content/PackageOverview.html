@@ -1,0 +1,461 @@
+[header {Package Overview}]
+
+<div class="overview">An overview of the important packages and classes of the IDV</div>
+<p>
+
+
+[
+set ::html ""
+set ::packages [list]
+namespace eval dg {}
+proc dg::myPackage {pkg {desc ""}} {
+    lappend ::packages $pkg $desc 1
+    append ::html "<a name=\"$pkg\"></a><li> [dg::package $pkg] <ul>"
+    return ""
+}
+proc dg::myPackage2 {pkg {desc ""}} {
+   lappend ::packages $pkg $desc 1
+   append ::html "<a name=\"$pkg\"></a><li> [dg::package $pkg] <ul> </ul>"
+   return ""
+}
+proc dg::closePackage {args} {
+   append ::html "</ul>"
+   return ""
+}
+proc dg::myClass {class {desc ""}} {
+   append ::html "<li> [dg::className $class]<br>$desc"
+   return ""
+}
+proc dg::myDone {} {
+   set retValue ""    
+   foreach  {pkg desc showLink} $::packages {
+       if {$showLink} {
+              append retValue "<a href=\"#$pkg\">$pkg</a><br> $desc<p>"
+       } else {
+              append retValue "$pkg <br> $desc<p>"
+       }
+   }
+   return "$retValue\n$::html"
+}
+]
+
+[dg::myPackage ucar.unidata.idv {Holds the main application framework.}]
+
+[dg::myClass ucar.unidata.idv.IntegratedDataViewer { 
+The central  class within  the IDV framework.}]
+
+[dg::myClass ucar.unidata.idv.IdvResourceManager { 
+Manages reading in and processing the resources that configure the IDV.
+}]
+
+[dg::myClass ucar.unidata.idv.IdvBase { 
+Abstract base class of IntegratedDataViewer. Provides getters 
+and factory methods for the managers and editors.
+}]
+
+[dg::myClass ucar.unidata.idv.IdvConstants { 
+Interface to hold variuous constants.
+}]
+
+[dg::myClass ucar.unidata.idv.JythonManager {
+All things jython.
+}]
+
+[dg::myClass ucar.unidata.idv.ArgsManager { 
+Processes command line arguments.
+}]
+
+[dg::myClass ucar.unidata.idv.StateManager { 
+Processes the property files.
+}]
+
+[dg::myClass ucar.unidata.idv.IdvPersistenceManager { 
+Manages reading/writing bundles.
+}]
+
+[dg::myClass ucar.unidata.idv.IdvPersistenceManager { 
+Manages reading/writing bundles.
+}]
+
+
+[dg::myClass ucar.unidata.idv.DisplayConventions {
+Provides a variety of static methods that give information on how data should be displayed.
+e.g., contour information, color tables, default ranges,  units for display, etc.}]
+
+[dg::myClass  ucar.unidata.idv.DisplayControl "
+An interface that defines objects that can create a display.
+The only implementation  (so far) is 
+[dg::class ucar.unidata.idv.control.DisplayControlImpl]."]
+
+[dg::myClass  ucar.unidata.idv.ControlContext {
+This interface, implemented by the IntegratedDataViewer, is passed
+to a DisplayControl to provide the DisplayControl certain services. 
+We have tried to use Java interfaces in particular points with the system, not to support
+adding different implementations (though that can be done), but rather to keep ourselves
+honest and disciplined about what accesses what, to be able to draw firm lines
+around the different components of the framework.}]
+
+
+[dg::myClass  ucar.unidata.idv.ControlDescriptor {  
+This holds the information contained within controls.xml file
+and provides the ability to instantiate a DisplayControl.}]
+
+[dg::myClass  ucar.unidata.idv.ViewManager {
+Is the main display component. }]
+
+
+ 
+[dg::myClass ucar.unidata.idv.MapViewManager {
+The view class for the main 3D views.}]  
+
+[dg::myClass ucar.unidata.idv.CrossSectionViewManager {
+The view class for 2D cross sections.}]
+
+
+
+[dg::myClass  ucar.unidata.idv.ViewContext {
+An interface, implemented by the IDV, that the ViewManager-s use to 
+provide themselves context.}]
+
+[dg::myClass  ucar.unidata.idv.ViewDescriptor {  
+Contains static names of ViewManagers used by the DisplayControls
+to find ViewManagers. }]
+
+
+[dg::myClass  ucar.unidata.idv.DisplayInfo {
+Used to hold references to a  DisplayControl, a Displayable and 
+the ViewManager in which the Displayable is displayed.}]
+
+[dg::myClass  ucar.unidata.idv.IdvObjectStore]
+
+
+[dg::myPackage ucar.unidata.idv.ui {Holds user interface related classes.}]
+[dg::myClass ucar.unidata.idv.ui.IdvUIManager {
+The main coordinating class for UI things. Has facilities to
+create the main window GUI, etc.}]
+
+[dg::myClass  ucar.unidata.idv.ui.DataControlDialog {
+A dialog box that allows the user to select  times for a DataSource.
+It is also used to show times and DisplayControl-s for a DataChoice.}]
+
+
+[dg::myClass ucar.unidata.idv.ui.IdvWindow {
+This is the window class that is used for all of the IDV
+main GUI windows. }]
+
+
+[dg::myClass  ucar.unidata.idv.ParamDefaultsEditor {
+A gui that allows the user to add and edit different defaults
+for parameter/field names, e.g,, color table, ranges, contour info, 
+display units, etc. }]
+
+[dg::myClass ucar.unidata.idv.ui.DataSourceHolder {
+An abstract class for things that hold and display data sources.}]
+
+[dg::myClass ucar.unidata.idv.ui.AliasEditor {
+Used to manage and edit the data aliases.}]
+
+[dg::myClass ucar.unidata.idv.ui.AutoDisplayEditor {
+Used to edit the autodisplay information, i.e.,  the information
+used to automatically create a display when certain data is loaded
+in.}]
+
+[dg::myClass ucar.unidata.idv.ui.DataControlDialog]
+
+
+[dg::myClass ucar.unidata.idv.ui.DataSelector {
+This is the  main data selector window that shows
+the data sources, data choices and displays.}]
+
+[dg::myClass ucar.unidata.idv.ui.DataTreeDialog]
+
+
+[dg::myClass ucar.unidata.idv.ui.FormulaDialog {
+This is used to create or edit an end-user formula.}]
+
+[dg::myClass ucar.unidata.idv.ui.BundleTree {
+This is used to do the  &quot;Manage Favorites&quot;.}]
+
+[dg::myClass ucar.unidata.idv.ui.DataTree {
+This class, derived from JTree, is used to show the data choices
+from a data source in a tree view. It is used by the DataSelector
+and the DataTreeDialog.}]
+
+[dg::myClass ucar.unidata.idv.ui.DataTreeNode {
+A JTree tree node  used in the DataTree.}]
+
+[dg::myClass ucar.unidata.idv.ui.IdvSplash {
+The initial splash screen shown on startup.}]
+
+
+
+[dg::myClass ucar.unidata.idv.ui.IdvXmlUi {
+This class, derived from ucar.unidata.ui.XmlUi,
+that is used to process the xml user interface skins that
+can be used to create the default IDV main window GUI.}]
+
+[dg::myClass ucar.unidata.idv.ui.ImageSequenceGrabber {
+This is the dialog, used in conjunction with the ViewManager,
+that captures  scenes from the ViewManager and creates  a Quicktime
+movie.}]
+
+[dg::myClass ucar.unidata.idv.ui.LoadBundleDialog {
+The dialog that is shown when a bundle is being loaded.
+Displays the &quot;Loading display 1 of 4&quot; and
+cancel button.}]
+
+[dg::myClass ucar.unidata.idv.ui.ParamDefaultsEditor {
+This manages the parameter defaults, e.g., default color table,
+display unit, contouring information, etc.}]
+
+[dg::myClass ucar.unidata.idv.ui.ParamInfo {
+Used by the param defaults editor to hold the parameter 
+default information which is read in from the paramdefaults xml
+resource.}]
+
+
+[dg::myClass ucar.unidata.idv.ui.ToolbarEditor {
+This is used in the preference manager to show and edit the toolbar.}]
+
+
+[dg::myClass ucar.unidata.idv.ui.IdvLegend]
+[dg::myClass ucar.unidata.idv.ui.BottomLegend]
+[dg::myClass ucar.unidata.idv.ui.SideLegend]
+[dg::myClass ucar.unidata.idv.ui.LegendPanel]
+
+[dg::closePackage idv.ui]
+
+[dg::myPackage ucar.unidata.idv.collab {
+Handles multi-user collaboration.}]
+
+[dg::myClass ucar.unidata.idv.collab.CollabManager {
+Coordinates the multi-user collaboration.}]
+
+[dg::closePackage idv.collab]
+
+[dg::myPackage ucar.unidata.idv.release { 
+Holds the html, jnlp and image files used for 
+releasing the IDV via Webstart. 
+See <a href="Starting.html">Starting.html</a> 
+for more information.</a>}]
+[dg::myPackage ucar.unidata.idv.release.webstart {
+JNLP files, etc.}]
+
+[dg::myPackage ucar.unidata.idv.release.installer {
+InstallAnywhere installer files.}]
+
+[dg::closePackage idv.release]
+
+
+[dg::myPackage ucar.unidata.idv.control {Holds the set of concrete DisplayControl classes.}]
+
+[dg::myClass ucar.unidata.idv.control.DisplayControlImpl {
+The base  class for all of the display controls.
+}]
+
+[dg::myClass ucar.unidata.idv.control.GridDisplayControl {
+The base  class for  grid oriented  display controls.
+}]
+
+[dg::myClass ucar.unidata.idv.control.ObsDisplayControl {
+The base  class for display controls that use observation data.
+}]
+
+
+[dg::closePackage idv.control]
+
+
+[dg::myPackage2 ucar.unidata.idv.resources {
+Holds a variety of resources that instantiate an application. 
+See <a href="resources/index.html">here</a> for more information.</a>
+}]
+
+[dg::myPackage ucar.unidata.idv.chooser {
+Contains the data chooser implementations. 
+See <a href="Choosers.html">Chooser.html</a> for more information.}]
+
+[dg::myClass  ucar.unidata.idv.chooser.IdvChooserManager {
+Creates and manages the overall data chooser	window. 
+This class is instantiated with  an XmlResourceCollection (defined by the IDV property
+<span class="property">application.resource.choosers </span> that contains a set of
+chooser xml documents which the manager uses to construct the overall ui. 
+The chooser documents support a limited UI layout capability (e.g., panels, tabbed panes, labels)
+and the specification of a set of IdvChooser classes that provide the actual chooser UIs.}]
+
+[dg::myClass  ucar.unidata.idv.chooser.IdvChooser {
+An abstract class that provides basic services for the different data choosers.}]
+
+[dg::closePackage idv.chooser]
+
+[dg::closePackage idv]
+    
+[dg::myPackage  ucar.unidata.util {Holds a set of utilities.}]
+[dg::myClass  ucar.unidata.util.GuiUtils {Utilities for doing gui layout, etc.}]
+[dg::myClass  ucar.unidata.util.LogUtil {Utilities for error messages and logging.}]
+[dg::myClass  ucar.unidata.util.Misc {Catch all - provides string parsing, string replacement, matching,
+properties file utils, etc. }]
+[dg::myClass ucar.unidata.util.ColorTable {Color table data structure}]
+
+[dg::closePackage util]
+
+[dg::myPackage  ucar.unidata.ui {Holds various user interface facilities.}]
+
+[dg::myPackage ucar.unidata.ui.colortable {Color table editor}]
+
+[dg::myClass ucar.unidata.ui.colortable.ColorTableManager {
+Reads in and manages the color table resources.
+}]
+
+[dg::myClass ucar.unidata.ui.colortable.ColorTableCanvas {
+Does most of the work of editing the color tables.
+}]
+
+[dg::closePackage colortable]
+
+
+[dg::myPackage2 ucar.unidata.ui.drawing {Generic drawing editor framework}]
+[dg::myPackage2 ucar.unidata.ui.symbol {Our station model editor}]
+
+[dg::myClass  ucar.unidata.ui.XmlUi "
+Create UIs from an xml format. See <a href=\"XmlUi.html\">here</a> for more information.
+"]
+[dg::myClass  ucar.unidata.ui.XmlTree {Provides for a JTree display of an xml dom.}]
+
+[dg::myClass  ucar.unidata.ui.AddeChooser {
+Abstract base class for all of the ADDE oriented choosers.}]
+
+
+
+[dg::closePackage ui]
+
+
+[dg::myPackage  ucar.unidata.xml {Contains a variety of classes related to xml.}]
+
+[dg::myClass  ucar.unidata.xml.XmlUtil {
+A collection of utilities for creating and accessing xml doms.}]
+
+[dg::myClass  ucar.unidata.xml.XmlEncoder {
+Used to encode and decode collections of objects to/from xml.}]
+
+[dg::myClass  ucar.unidata.xml.XmlObjectStore {Used to hold user preferences.}]
+
+[dg::closePackage xml]
+
+[dg::myPackage ucar.unidata.collab {
+The IDV provides a "sharable data" framework. The idea is that sharable
+objects of certain "types" or "groups" can share data amongst themselves.}]
+
+[dg::myClass  ucar.unidata.collab.Sharable {
+An interface for objects to implement that need to share state amongst themselves.}]
+
+[dg::myClass  ucar.unidata.collab.SharableImpl {
+An implementation of the Sharable interface.}]
+
+[dg::myClass  ucar.unidata.collab.SharableManager {
+This manages a  collection of groups of
+Sharable objects and  distributes changes amongst the members of a group.
+}]
+[dg::closePackage sharable]
+
+
+[dg::myPackage ucar.visad.display {Unidata specific code that deals directly with Visad.}]
+
+[dg::myClass  ucar.visad.display.DisplayMaster {}]
+
+[dg::myClass  ucar.visad.display.Displayable {}] 
+
+[dg::closePackage visad.display]
+
+
+[dg::myPackage  ucar.unidata.data { 
+Holds classes that know how to access and/or read in
+data sources (e.g., netCdf files, adde servers, etc.)}]
+
+[dg::myClass  ucar.unidata.data.DataManager]
+[dg::myClass  ucar.unidata.data.DataSource { 
+An interface that represents a source of data. The most important method
+to the IDV is the getDataChoices method, which returns a list of DataChoice
+objects which represents the different choices of data (e.g., parameters, images, 
+etc.) held by this DataSource. 	 }]
+
+[dg::myClass  ucar.unidata.data.DataSourceImpl {
+An abstract implementation of the DataSource interface. Currently used as
+the base class for all of our concrete DataSource  classes. It has as attributes
+the name and  description of the DataSource. It also holds the 
+DataContext (described below) and manages the list of DataChoice-s.}]
+
+
+[dg::myClass  ucar.unidata.data.DataChoice {
+This is an abstract class that represents a particular piece of data
+within a DataSource. It has a getData method that returns the visad.Data object
+that it represents. }]
+
+[dg::myClass  ucar.unidata.data.DirectDataChoice {
+This class, derived from DataChoice, is the DataChoice created directly by a
+DataSource. Its implementation of getData simply turns around and calls DataSource.getData();
+}]
+
+
+[dg::myClass  ucar.unidata.data.DerivedDataChoice { 
+A DerivedDataChoice holds a set of "child" DataChoice-s, each
+representing an operand for a expression or a method call (e.g., computeDewpoint()).
+The expression or method is defined as a String of jython code. This class then
+will gather its actual operands (from getData calls on its children DataChoice-s),
+set the values of them within the Jython interpreter and then evaluate its expression.
+}]
+
+
+
+[dg::myClass  ucar.unidata.data.DerivedDataDescriptor  {
+This class holds the information the defines a DerivedDataChoice defined
+in the derived.xml file. It provides methods to instantiate a new 
+DerivedDataChoice and to automatically create a list of default DerivedDataChoice-s
+from an original list of actual DataChoices (e.g., automatically adding in a Dewpoint
+data choice based on an incoming temperature and relative humidity field.
+}]
+
+[dg::myClass  ucar.unidata.data.DataCategory {  
+This class is used to categorize DataChoice-s 
+and to describe what  DisplayControls are applicable to what data.
+See <A href="DataCategory.html">DataCategory.html</a> for more detail.
+}]
+
+[dg::myClass  ucar.unidata.data.DataContext {  
+An interface (which the 
+IDV implements). It is meant to represent an object in the context of 
+which a DataSource is used. It has methods for loading in new data sources,
+asking the user to choose data choices, etc.}]
+
+[dg::myClass ucar.unidata.data.DataInstance { 
+Used by the DisplayControl classes
+to hold a DataChoice, the visad.Data retrieved from the DataChoice.getData call,
+and other ancillary state. They also provide certain services for manipulating the
+data.}]
+
+[dg::myClass   ucar.unidata.data.DataSourceFactory {
+An interface that is used by the DataManager to instantiate
+a DataSource. The class defined in the datasource.xml file is instantiated and cast
+as a DataSourceFactory. This interface provides a single method: getDataSource.
+Typically the DataSourceFactory that is instantiated is actually the actual DataSource
+for the particular data. The DataSourceImpl class implements the getDataSource
+method by simply returning this.
+We have this DataSourceFactory so that if we need the ability to sniff at the actual
+data (e.g., a netcdf file  may have one of many different DataSource classes that handle it)
+the factory can sniff and return the appropriate  DataSource.
+}]
+
+[dg::myPackage ucar.unidata.data.grid {Deals with grid oriented data.}]
+[dg::myClass ucar.unidata.data.grid.GeoGridDataSource {
+Handles basic gridded NetCDF and OpenDAP data sources.
+}]
+[dg::myClass ucar.unidata.data.grid.GridUtil {
+Provides grid oriented data utilities for slicing, dicing, etc.}]
+[dg::myDone]
+
+[dg::myPackage2 ucar.unidata.data.text {Deals with text oriented data.}]
+
+[dg::myPackage2 ucar.unidata.data.imagery {Deals with image oriented data.}]
+
+[dg::closePackage]
+
+[dg::myDone]

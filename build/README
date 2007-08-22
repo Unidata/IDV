@@ -1,0 +1,215 @@
+
+***********************************************************************
+The release environment
+
+On conan all release oriented dirs and files point through the 
+symbolic link:
+/content/software/IDV/current
+
+So we have(in an abbreviated way):                            
+/content/software/IDV/data  --> current/data
+/content/software/IDV/docs  --> current/docs
+/content/software/IDV/webstart/IDV  --> current/webstart/IDV
+/content/software/IDV/webstart/VGEE/vgee.jar  --> current/webstart/VGEE/vgee.jar
+/content/software/IDV/index.html  --> current/index.html
+
+
+To make a release, e.g. 1_2b2, make a directory of that name:
+/content/software/IDV/1_2b2
+
+Copy an old version of the data (i.e., from a prior release) directory 
+into the release directory (This needs to change in the future. Perhaps have 
+a single top level data dir).
+
+Copy an old version of the resources directory into the release directory. Since we 
+just moved resources to the top level I don't think  we have to do this but
+just to be safe for now.
+
+Update the index.html page (see below).
+
+Copy the generated docs directory to the release directory (see below).
+
+Copy the generated webstart directory to the release directory (see below).
+
+
+***********************************************************************
+Changing the index.html page
+
+The index.html page is really defined in:
+/content/software/IDV/index.tml
+To make the html page simply do:
+tclsh /web/website/bin/genPackage.tcl index.tml
+This generates the index.html and, because of the above symbolic
+link structure, copies the html file into current/index.html
+
+
+***********************************************************************
+Creating the documentation release
+
+The build process creates a docs directory at:
+/ucp/share/metapps/docs
+
+You  need to build the userguide.pdf and workshop.pdf files.
+To do this you need to be on harpo (which has the htmldoc executable)
+and run:
+ant docs_pdf
+from /upc/share/metapps/ucar
+This will generate the userguide.pdf and workshop.pdf and place them in the
+docs directory.
+
+
+Once this is done just scp the docs directory over to conan:
+scp -r /upc/share/metapps/docs conan:/content/software/IDV/<release dir>
+
+
+***********************************************************************
+Creating the webstart release
+
+From the build directory:
+cd /upc/share/metapps/build
+run:
+ant jnlp
+
+This creates the webstart release in:
+/upc/share/metapps/webstart
+
+You might want to delete that directory first to remove any extraneous files.
+
+To release this scp it over to conan to:
+/content/software/IDV/<release dir>
+
+
+
+
+
+
+
+***********************************************************************
+Making installers
+
+We use a tcl script to modfy the install anywhere iap_xml file,
+run the install maker and move and rename the installer files.
+This script is in ucar/unidata//idv/release/installer/makeia.tcl
+It has a hard coded version in it that should be changed.
+
+To run this script from the build environment just do:
+
+cd /upc/share/metapps/ucar/unidata/idv/release/installer
+tclsh makeia.tcl
+
+Select "Open Existing Project"
+Make sure you select the iap_xml file (use the "Open Other" button):
+/upc/share/metapps/installers/scratch/generated_idv_1_2_b2.iap_xml
+
+Keep clicking next. When asked to specify the main class just say no.
+
+After building the first set of installers the script runs through the
+above to build the other windows installer.
+
+The installers  will be copied into:
+/upc/share/metapps/installers/idv_<version>_<platform>.<bin,jar,exe>
+
+
+
+
+***********************************************************************
+Moving files to ftp
+The installers and src/docs jars, etc., get scp'd to
+/web/ftp/pub/idv/untested on conan.
+
+On laraine doing a:
+metapps ftp
+will generate a set of jar and zip files of the source, etc.
+in /upc/share/metapps/ftp.  You can then scp them over to 
+/web/ftp/pub/idv/untested on conan.
+
+scp -r /upc/share/metapps/ftp conan:/web/ftp/pub/idv/untested
+
+After making the installers they too need to be scp'ed to 
+/web/ftp/pub/idv/untested on conan
+and then to 
+/web/ftp/pub/idv/<release> on conan
+
+After everything has been tested, the installers and src/docs jars, etc
+need to be copied to:
+/web/ftp/pub/idv/<release>
+
+
+***********************************************************************
+Running the test suite
+
+Of course, running the tests should come first but  it comes last in the README
+due to its length.
+
+The cliff notes version of this section, i.e., to run the full 
+test suite on the results of the build simply:
+cd /upc/share/metapps/lib
+tclsh /upc/share/metapps/test/runtest.tcl 
+
+And look at:
+/upc/share/metapps/lib/results.html
+ 
+It is probably best to do this on harpo since the original archive images
+are generated on harpo. This should minimize false differences.
+
+
+The longer version:
+
+The set of test archives are in:
+/upc/share/metapps/test/archives
+Each archive has a directory there, e.g., dem, elnino, eta1, etc.
+The script:
+/upc/share/metapps/test/runtest.tcl
+runs the set of tests. You can give it the full directory name of a 
+test archive to run just one test:
+tclsh /upc/share/metapps/test/runtest.tcl /upc/share/metapps/test/archives/eta1
+or as a short hand:
+tclsh /upc/share/metapps/test/runtest.tcl eta1
+
+If no archive directories  are given on the command line it will run through
+all of the archives in /upc/share/metapps/test/archives
+
+The version of the idv that is used depends on where you are when you 
+run the test. If there is an idv.jar in the current working directory
+then the script will run:
+java -jar idv.jar
+else it will run from the classpath:
+java ucar.unidata.idv.DefaultIdv
+
+
+The script will iterate through the test archives. For each on it will run
+the idv in test mode and tell the idv to write to the <archive name>_results
+directory. The script will then compare the generated images in the
+original archive with the generated images in the _results directory.
+The script produces 3 output files in the working directory:
+   
+        results.html  resultsLeft.html  resultsRight.html
+
+Results is a frame set that contains resultsLeft.html and resultsRight.html
+Any stderr output is shown in resultsRight.html in red.
+resultsLeft.html  highlights the images that differ. 
+Note: We just do a "diff image1 image2" on the images. So
+it is always the case that we pick up differences between some of the 
+images.
+
+
+To create a test archive enable the "Test" menu. There should be 
+a "Write Test Archive" entry. Select that and you will be prompted
+for an archive name, an optional text description and the directory
+to place the archive in. Select /upc/share/metapps/test/archives.
+
+
+***********************************************************************
+Tagging the CVS repository:
+
+After the release of a version, you should tag the CVS release
+in case changes are needed later.  To tag the CVS repository,
+run:
+
+cvs rtag -b <IDV_version> metapps
+
+where <IDV_version> is the version (no periods, e.g., IDV_1_3b1).
+
+
+
+

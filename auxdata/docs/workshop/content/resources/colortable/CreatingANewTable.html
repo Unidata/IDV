@@ -1,0 +1,124 @@
+<title>Creating a New Color Table</title>
+
+[ht::desc In this section we will create a color table to use within the IDV.]
+
+<div class="overview">
+In this section we will create a color table to use within the IDV.
+This example color table is intended to represent a comfort range of
+temperatures.
+
+<ol class="step">
+  
+  <li>Open up the Color Table Editor from the
+      [ht::menu Tools {Color Table Editor}] menu if it is not already
+      open.</li>
+  
+  <li>Select the [ht::ct default] color table if it is not already displayed.
+      <popup label="">Select the [ht::menu {Color Tables} Basic default] menu
+      item.</popup></li>
+  
+  <li>Rename this color table by selecting the [ht::menu File {Save As...}] menu
+      and entering the name [ht::qt Comfort].</li>
+  
+  <li>You should now have the same looking color table but with a new name
+      displayed. We will create
+      a new category, [ht::qt Workshop] for this color table.
+      <popup label="More on categories">Color table categories have no actual
+      semantic import. They are just a simple way
+      to organize a (potentially) long list of color tables.</popup></li>
+  
+  <ul class="substep">
+    
+    <li>Click in the [ht::command Category] box and type [ht::qt Workshop]
+        and press return.</li>
+    
+    <li>Now save this new color table by selecting the [ht::menu File Save] menu
+        item.</li>
+    
+    <li>Verify that you indeed  have a new category by selecting the
+        [ht::menu   {Color Tables}] menu.</li>
+    You should     see:
+    [ht::cimg images/WorkshopCategory.gif]
+    Note: The label is [ht::qt Comfort (local)] The [ht::qt (local)] denotes 
+     that
+    this color table
+    is one that you have created, not a system provided color table.
+  </ul>
+  
+  <li>Now, note the Range values <i>0.0 - 100.0</i>.
+      <div class="popup" label="(More about ranges...)">The range values in the 
+       Color
+      Table Editor are there for convenience purposes only.
+      They allow you to see at what areas in the color table certain values would 
+       be
+      shown in actual use.</div>
+      We are going to set these to an example range for temperature in Celsius.</li>
+  
+  <ul class="substep">
+    
+    <li>Type in <i>-45</i> in the first box and press return.</li>
+    
+    <li>Type in <i>45</i> in the second box and press return.</li>
+    
+    <li>You should see the new range values displayed below the color box.</li>
+  </ul>
+  
+  <li>Add breakpoints at the 0 value (freezing),  15 (comfortable), and 25
+      (hot).</li>
+  
+  <ul class="substep">
+    
+    <li>Right click on the  color bar to bring up the
+        [ht::menu {Color Bar   Menu}]:</li>
+    [ht::cimg images/AddBreakpointMenu.gif]
+    
+    <li>Select [ht::menu {Add Breakpoint} Here]</li>
+    
+    <li>You should see a color bar with a new breakpoint in the middle:</li>
+    [ht::cimg images/FirstZeroBreakpoint.gif]
+    
+    <li>Click and drag the breakpoint to the 0 value.  If you cannot get to 
+     exactly
+        0 then use
+        either the right/left arrow keys or right mouse click on the breakpoint 
+         and
+        select the [ht::menu {Change Breakpoint}]
+        menu item and enter  the desired  value.</li>
+    
+    <li>An alternative method would be to add a breakpoint at a particular value 
+     is
+        to  select  the
+        [ht::menu {Add Breakpoint} {At Data Point}]
+        menu item and enter the value 0.</li>
+    
+    <li>Repeat the above steps for the values 15 and 25.</li>
+    
+    <li>Your color bar should look like:</li>
+    [ht::cimg images/ThreeBreakpoints.gif]
+  </ul>
+  
+  <li>Now, let's come up with an interesting color scheme.</li>
+  
+  <ul>
+    
+    <li>Click on the [ht::button Fill Edit Mode] button.</li>
+    
+    <li>Select the center breakpoint (i.e., the [ht::qt 0] value point) by clicking on it.</li>
+    
+    <li>Set the color under this break point to white by using the color
+        chooser.</li>
+    
+    <li>Right click on the center breakpoint and select the
+        [ht::menu {Set Colors} {Interpolate Left}] menu item.</li>
+    
+    <li>How the rest of the Comfort color table is colored is an exercise left 
+     to
+        the reader.</li>
+  </ul>
+  
+  <li>Once you are done you should save this color table by selecting the
+      [ht::menu File Save] menu item.</li>
+</ol>
+
+
+

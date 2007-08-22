@@ -1,0 +1,588 @@
+<html><head> 
+  <title>Menu Bar</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+
+<body>
+
+
+There are two sets of menus - the main menu bar shown
+at the top of the main window and 
+subsidiary [ug::menu View] and [ug::menu Projections] menus 
+that are associated with the 3D display. 
+
+<%childlist%>
+
+
+
+
+<subhead intoc="false"id="file">File Menu</subhead>
+
+
+<ul>
+ 
+[ug::menuDesc New {This sub-menu allows you to create new windows.}]
+<ul>
+ 
+[ug::menuDesc {View Window} {Allows you to create new view windows.}]
+
+[ug::menuDesc {Data Source} { 
+Allows you to open the <a href="../data/choosers/index.html">Data Source Chooser</a> 
+window.
+}]
+ 
+[ if {0}   {
+[ug::menuDesc {Field Selector Window} {Creates a new <a href="../data/FieldSelector.html">Field Selector Window</a>.}]
+
+[ug::menuDesc  Views { 
+This menu  lists any saved views and will create a new
+view window with the state of the saved view.
+A saved view includes projections  and viewpoints, but no data display. 
+You save a view with the 
+[ug::menu View {Saved View} {Save View State}] menu. 
+You can remove a saved view with
+[ug::menu Edit {Delete Saved Views}] menu.
+}]
+}]
+
+</ul>
+
+
+
+[ug::menuDesc {Open...} { 
+Allows you to select a previously created 
+<a href="../Bundles.html">bundle</a> to load in 
+from your file system.
+}]
+
+
+[ug::menuDesc {Save As...} {
+Allows you to save the current application state as a bundle or Web
+Start <a href="../Bundles.html#jnlp">JNLP</a> file.
+}]
+
+
+ 
+[ug::menuDesc {Save As Favorite...} { 
+Will save the state off as a specially located and named favorite. This
+allows you to easily create a set of favorite bundles and readily access
+them through the [ug::menu Displays {Favorite Bundles}] menu.
+}]
+
+
+[if {0} {
+[ug::menuDesc {Event Capture} {Show the <a href="../tools/EventCapture.html">Event Capture</a> window.
+}]
+}]
+
+
+[ug::menuDesc {Default Bundle} {
+This menu allows you to
+manage the &quot;default bundle&quot;, the bundle that is loaded
+every time the IDV starts up. See <a href="../Bundles.html">here</a>
+for more information about bundles.
+}]
+
+<ul>
+
+[ug::menuDesc Save {Save the current application state as the default bundle.}]
+
+[ug::menuDesc Remove {Delete the default bundle.}]
+
+
+[ug::menuDesc Open {Load in the default bundle.}]
+</ul>
+
+
+[ug::menuDesc History {This menu lists the  recently accessed data sources and allows you to easily load them.}]
+
+
+[ug::menuDesc Exit {Exits the application.}]
+
+</ul>
+
+
+<subhead intoc="false"id="edit">Edit Menu</subhead>
+
+<ul>
+
+<a name="removeall"></a>
+
+[ug::menuDesc {Remove All Displays} {Remove all displays.}]
+
+
+[ug::menuDesc {Remove All Data Sources} {Remove all loaded data sources. The displays are unaffected.}]
+
+
+[ug::menuDesc {Remove All Displays and Data} {Removes all displays and loaded data sources.}]
+
+
+[ug::menuDesc Formulas {This menu contains items related to end user formulas.}]
+
+<ul>
+
+
+[ug::menuDesc {Create Formula} {Show the <a href="../tools/Formulas.html">Formula dialog window</a>
+to create a new formula. 
+}]
+
+
+[ug::menuDesc {Jython library} {Show the <a href="../tools/Jython.html">Jython library editor</a>.}]
+
+[ug::menuDesc {Import} {Import a formula from a file.}]
+
+[ug::menuDesc {Export} {Export a formula to a file.}]
+
+[ug::menuDesc {Edit Formulas} {Edit a previously defined formula.}]
+
+</ul>
+
+
+
+
+[ug::menuDesc {Delete Saved Views} { 
+This menu allows you to remove the named saved views 
+(created with the [ug::menu Views {Saved Views} {Save View State}] menu).
+}]
+
+[ug::menuDesc {Preferences} {Show the <a href="../tools/Preferences.html">User Preferences window</a>.}]
+
+
+
+</ul>
+
+
+<subhead intoc="false"id="displays">Displays Menu</subhead>
+The displays menu contains facilities to create new displays and lists the
+currently created displays.
+
+
+<ul>
+
+[ug::menuDesc {Favorite Bundles} { 
+<a href="../Bundles.html">Bundles</a> hold application state. 
+Favorite bundles are just normal bundles that are categorized and
+saved  off in a particular location on disk and serve as a
+convenience to the user. This allows the user organize their
+favorites by category and readily load them in.
+}]
+
+<ul>
+
+[ug::menuDesc {Save As Favorite} { 
+Save the current IDV state as a favorite bundle. This will show
+a dialog that prompts you for a category and bundle name.
+}]
+
+[ug::menuDesc Manage {This shows the list of favorites that you have 
+created and allows you to manage the categories and remove
+favorite bundles.
+}]
+
+
+[ug::menuDesc {Rest of Menu List} { 
+The rest of this menu holds menu items for the favorite bundles, categorized by the
+favorites category.
+}]
+
+
+</ul>
+
+[ug::menuDesc {Display Templates} {Provides ability to access and manage the saved display templates}]
+
+
+[ug::menuDesc {Maps and Backgrounds} { 
+This menu provides facilities for  creating new 
+<a href="../controls/MapDisplayControl.html">map displays</a> or background image.
+Note, once a map display is created you can add new individual maps to that particular display.
+}]
+
+<ul>
+
+[ug::menuDesc {Add Your Own Map} {Select a shape file or McIDAS map file from the local disk.}]
+
+[ug::menuDesc {Add Default Maps} { 
+The default map is the map display (the set of actual maps, 
+their color, line width, etc.) that is automatically created in each view window.
+You can define what is the default map through an instance of a 
+<a href="../controls/MapDisplayControl.html">map display control</a>. This menu item
+creates a new map display control with the default map state.
+}]
+
+[ug::menuDesc {Add System Map} { 
+The IDV comes pre-configured with a set of base system
+maps. This menu allows you to create new map displays using these system maps. 
+}]
+
+[ug::menuDesc {Add Background Image} {Select a background image for the display using
+the <a href="../controls/misc/WMSControl.html">Background Image Control</a>.}]
+
+</ul>
+
+[ug::menuDesc {Locations} {
+This menu lists a variety of point location plots that can be created:
+NEXRAD sites, state names, state locations, etc.
+It will create a 
+<a href="../controls/StationLocationControl.html">Location
+Control</a> with the chosen location information.
+}]
+
+[ug::menuDesc {Special} {This menu lists allows you to create  displays that do not require data.}]
+
+<ul>
+[ug::menuDesc {Range Rings} { 
+Create a radar range ring display.  Radar range rings are a set of
+concentric rings centered on a point, and radial lines, used to show
+distance and bearing from the center. The initial position is at the
+center of the view's current projection.
+For more information see <a href="../controls/misc/RadarGridControl.html">Range Rings</a>. 
+You do not need to use radar data to see this measuring device.
+}]
+
+[ug::menuDesc {Range and Bearing} {
+Creates a display to show the range and bearing between any two points. The
+initial position is near the center of the current entire map area. If
+you are zoomed in, the range and bearing line may be off screen. For
+more see <a href="../controls/misc/RangeAndBearingControl.html">Range and
+Bearing Line</a>.
+}]
+
+[ug::menuDesc {Text note} { 
+Creates a simple text message box. This note can be saved for later
+use, or sent to other users of the IDV so they can see the same display
+with your notations. 
+See <a href="../controls/misc/NoteControl.html">Text Notes</a>.
+}]
+
+[ug::menuDesc {Drawing Control} {Create a drawing tool that allows you to annotate IDV displays.}]
+
+[ug::menuDesc {Transect Drawing Control} {Create a drawing tool that allows you to create transects for the <a href="TransectViewManager.html">Transect View</a>}]
+
+[ug::menuDesc {Location Indicator} {
+Creates a location indicator cross-hair on the display.
+See the <a href="../controls/misc/LocationIndicatorControl.html">Location Indicator Control</a>.
+}]
+
+[ug::menuDesc {WebCam Display} {
+Creates a display of available WebCam sites. See the 
+<a href="../controls/misc/ImageMovieControl.html">WebCam Control</a>.
+}]
+
+[if {0} {
+[ug::menuDesc {Audio Display} {
+Play or record audio files using the <a href="../controls/misc/AudioControl.html">Audio Control</a>.
+}]
+}]
+
+[ug::menuDesc {WorldWind Locations} {
+Add locations from the WorldWind database. See the 
+<a href="../controls/StationLocationControl.html">Location Control</a>
+}]
+
+</ul>
+
+
+[ug::menuDesc {Current View} {
+This is essentially the [ug::menu View] and [ug::menu Projections] menu
+of the  currently active view window.}]
+
+
+[ug::menuDesc {Current Displays} {
+If displays have been added to the IDV, they are shown at the bottom
+of the Displays menu. Selecting one of these items brings up that
+displays control window.
+}]
+
+</ul>
+
+
+<subhead intoc="false"id="data">Data Menu</subhead>
+
+This menu allows you to load in a <b>New Data Source</b> from the 
+<a href="../data/choosers/index.html">Data Source Chooser</a>.
+It also lists all of the currently loaded formulas and data sources 
+and provides options to select fields and edit properties.
+
+<ul>
+[ug::menuDesc {New Data Source} {Provides ability to access the individual
+[ht::command Data Source Chooser]-s from the sub menus.}]
+
+[ug::menuDesc {Favorite Data Sources} {Provides ability to access and manage the saved favorite data sources}]
+
+[ug::menuDesc {Formulas} {Provides ability to access formulas}]
+
+</ul>
+
+[
+if {0} {
+<subhead intoc="false"id="collaboration">Collaboration</subhead>
+
+}]
+
+<subhead intoc="false" id="tools">Tools Menu</subhead>
+
+This menu allows you to configure and edit different IDV resources.
+
+<ul>
+
+
+
+
+[ug::menuDesc {Color Table Editor} { 
+Show  the  <a href="../tools/ColorTableEditor.html">Color Table Editor</a>,
+which allows you to view, create and modify color tables.
+}]
+
+[ug::menuDesc {Station Model Editor} { 
+Show  the  <a href="../tools/StationModelEditor.html">Station Model Editor</a>,
+which allows you to view, create and modify station models for plotting
+point data.
+}]
+
+[ug::menuDesc {Projections Manager} {
+Show the <a href="../tools/ProjectionManager.html">Projection Manager</a>, which 
+allows you to choose, edit and save map projections for use in Unidata applications.
+}]
+
+
+[ug::menuDesc {Parameter Alias Editor} { 
+Show the <a href="../tools/AliasEditor.html">Parameter Alias Editor</a>,
+which allows you to define aliases for parameters in data sets that the
+IDV does not know about.
+}]
+
+
+
+[ug::menuDesc {Parameter Defaults Editor} { 
+Show the <a href="../tools/ParameterDefaultsEditor.html">Parameter Defaults Editor</a>,
+which allows  you to define the default  display conventions
+(e.g., color tables, ranges, etc.)
+for parameters.
+}]
+
+[ug::menuDesc {Parameter Groups Editor} { 
+Show the <a href="../tools/ParameterGroupsEditor.html">Parameter Groups Editor</a>,
+which allows  you to define the groups of parameters for use in 
+<a href="../tools/DerivedData.html">derived data</a> formulas.
+}]
+
+
+[ug::menuDesc {Plugin Manager} {
+<a name="pluginmanager"></a>
+This menu allows you to manage the IDV  <a href="../misc/Plugins.html">plugins</a>.}]
+
+[ug::menuDesc {Plugin Creator} {
+<a name="plugincreator"></a>
+This menu allows you to <a href="../misc/PluginCreator.html">create plugins</a>.}]
+
+</ul>
+
+
+
+
+
+[if {0} {
+ <subhead id="collaboration">Collaboration</subhead>
+This menu manages the collaboration facility.
+See <a href="../collab/index.html">here</a> for more information.
+}]
+
+
+<subhead intoc="false"id="help">Help Menu</subhead>
+The [ug::menu Help] menu allows you to view this user's guide,
+show error messages, etc.
+
+<ul>
+[ug::menuDesc {User's Guide} {Go to the top-level user guide page}]
+
+[ug::menuDesc {Getting Started} {A quick overview of the IDV}]
+
+[ug::menuDesc {Zooming, Panning and Rotating} {Describes how to navigate in the view windows.}] 
+
+[ug::menuDesc {Show Console} {Shows a console window which has the error messages and other text output from the IDV.}]
+
+[ug::menuDesc {Show Help Tips} {Shows the help tips window.}]
+
+[ug::menuDesc {Support Request Form} {Shows a form that allows you to post support requests to the Unidata Program Center.}]
+
+[ug::menuDesc {Release notes} {Displays the release notes for this version of the IDV.}]
+[ug::menuDesc {About} {Gives information about this version of the IDV.}]
+
+</ul>
+
+
+<subhead intoc="false"id="viewmenu">View Menu</subhead>
+
+Each display or View Manager has a [ug::menu View] and
+[ug::menu Projections] menu.
+
+
+The [ug::menu View] menu lists the displays shown in this
+window, change the point of view, capture images and movies,
+and make some other changes in the overall view.
+<ul>
+
+[ug::menuDesc Displays { 
+This menu deals with the displays  that are shown in this particular view,
+which are shown at the bottom of the menu.
+}]
+
+
+<ul>
+
+[ug::menuDesc {Legend} { 
+Show the display legend in their own window.
+}]
+
+[ug::menuDesc {Remove All Displays} {Remove the displays shown in this view.}]
+
+[ug::menuDesc {Visibility Animation} {
+Cycle through the visibility of each display,
+showing one at a time. 
+Click the check box "on" to start animation, check off to
+stop. You can  increase or decrease the speed with the provided
+Faster and Slower choices. Note this is 
+<i>not</i> a time animation loop; it loops
+through the visibility of the displays present in this view window.
+}]
+
+
+</ul>
+
+
+
+[ug::menuDesc Capture { 
+You can capture the current view as a
+JPEG image, send it to a printer, or capture a QuickTime movie.
+See <a href="../tools/ImageCaptures.html">here</a> for more information.
+}]
+
+
+[ug::menuDesc {Show} {Different Flags}]
+
+
+[ug::menuDesc Viewpoint { 
+This menu allows you to  change the point of view.
+}]
+
+<ul>
+
+[ug::menuDesc {Top View through West} {
+These 5 items  reset the point of view to one of the orthogonal directions. 
+}]
+
+[ug::menuDesc {Perspective View} {
+Provides an alternate 3D view of the display. The default is a parallel projection.
+}]
+
+[ug::menuDesc {Viewpoint Dialog} {
+This shows a dialog box for you to enter the 
+azimuth and tilt of a desired point of view. Azimuth is from North,
+clockwise to 360 degrees. Tilt is degrees down from overhead, vertical.
+A top view has tilt of 0. Oblique views from the
+southeast have azimuth 135, and a tilt of about 45 degrees. A view
+from the &quot;east&quot; has an azimuth of 90, tilt 90.
+}]
+
+[ug::menuDesc {Vertical Scale} { 
+This shows  a dialog box to set the vertical
+scaling between the top and bottom of the wire frame box.  The
+scale is linear.  You can specify the units for the max and min
+values.  Units must be convertible with meters (e.g., km, ft, fathoms, 
+etc)
+}]
+
+</ul>
+
+
+[ug::menuDesc {Color} { 
+Change the background and foreground colors
+of the view (not the map lines) to predefined colors or set
+your own. When setting your own colors you can also save off the chosen color
+pair as a named predefined color pair which will appear in the list.
+}]
+
+
+
+[ug::menuDesc {Saved State} {
+This menu allows you to save the current view state
+(e.g., projection, colors, viewpoint) and to load previously saved view states 
+into the current view window.
+}]
+
+
+[ug::menuDesc {Full Screen} { 
+Show the current view in full screen mode.
+}]
+
+[ug::menuDesc {Animation Timeline} { 
+Show the <a href="../tools/Timeline.html">Animation Timeline</a>
+}]
+
+[ug::menuDesc {Properties} { 
+Show the properties dialog for the view. Allows you to set aspect ratio, vertical
+scale, flags, color, etc.
+}]
+
+</ul>
+
+
+
+<subhead intoc="false"id="projectionmenu">Projections Menu</subhead>
+
+
+
+The [ug::menu Projections] menu lets you change
+the map projection in the 3 dimensional display.
+
+<ul>
+
+[ug::menuDesc Predefined { 
+Contains the list of pre-defined projections you
+can choose from, including both system-supplied and your own projections.}]
+
+[ug::menuDesc {From Displays} { 
+Lists the native data projections of any displays being show.}]
+
+[ug::menuDesc History { 
+Contains the projections that have been used for
+this view. It allows you to easily go back to prior projections.}]
+
+[ug::menuDesc {New/Edit} { 
+Show the <a href="../tools/ProjectionManager.html">Projection Manager</a> dialog to
+view, create and edit projections.}]
+
+[ug::menuDesc {Use Displayed Area} {
+Resets the projection to that of the current zoom level.
+}]
+
+[ug::menuDesc {Go to Address} {
+Change the projection to a given address, zip code, city, etc.
+[ht::cimg images/Address.gif]
+The formats include:<pre>
+12345 oak street, my town, my state
+my town, my state
+80303 (zip code)
+latitude longitude
+\"ip\" for the location of this computer
+</pre>
+}]
+
+
+
+[ug::menuDesc {Auto-Set Projection} { 
+Toggles the behavior of automatically setting the projection to the 
+projection of the most recent display that has been added.}]
+
+[ug::menuDesc {Share Views} { 
+Control whether <a href="../collab/Sharing.html">Sharing</a> is turned on or off for this view.
+If sharing is turned on then view point and projection  changes are shared
+with any other views that also have sharing turned on.}]
+
+</ul>
+
+
+
+</body>
+</html>

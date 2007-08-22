@@ -1,0 +1,117 @@
+<html><head>
+  <title>Location XML Files</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+<body>
+
+
+
+The IDV supports a variety of location text file formats. 
+All of these formats can be loaded through the File Chooser.
+Select the &quot;Location&quot; data type.
+
+<%childlist%>
+
+<subhead intoc="false" id="xml">Locations XML</subhead>
+The main one format the IDV  uses is a custom locations xml format. This format still
+has some nomenclature from when it was atmospheric science related (e.g. &quot;stations&quot;).
+A simple example:
+[ug::xml {
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<stationtable name="Example">
+    <station name="station 1"  lat="65:02:06" lon="-147:30:06" elev="790"/>
+    <station name="station 2"  lat="40.3" lon="-107.5" elev="10"/>
+    ...
+</stationtable>
+}]
+
+The [ug::attr lat] and [ug::attr lon] attributes can be of the form:
+<pre>
+    +/-  ddd:mm, ddd:mm:, ddd:mm:ss, ddd::ss, ddd.fffff ===>   \[+/-] ddd.fffff
+    +/-  ddd, ddd:, ddd::                               ===>   \[+/-] ddd
+    +/-  :mm, :mm:, :mm:ss, ::ss, .fffff                ===>   \[+/-] .fffff
+    +/-  :, ::                                          ===>       0.0
+    Any of the above with N,S,E,W appended
+</pre>
+
+
+The [ug::attr elev] attribute is optional. By default it is in meters. You can override this
+default with an [ug::attr elevunit] in the stationtable tag. e.g.:
+[ug::xml {
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<stationtable name="Example" elevunit="feet">
+  <station name="station 1"  lat="65:02:06" lon="-147:30:06" elev="5340"/>
+...
+}]
+
+
+
+The  [ug::tag station] tags can have an [ug::attr id] attribute as well:
+[ug::xml {
+<station  id="APD" name="Fairbanks/Pedro Dome"  
+          lat="65:02:06" lon="-147:30:06" elev="790"/>
+}]
+
+The  [ug::tag station] tags can also have any other  attributes:
+
+[ug::xml {
+<station  id="APD" name="Fairbanks/Pedro Dome" 
+          st="AK" co="US" 
+          lat="65:02:06" lon="-147:30:06" elev="790"/>
+<station id="FTG" name="Denver/Boulder" 
+         st="CO" co="US" 
+         lat="39:47:12" lon="-104:32:45" elev="1675"/>
+}]
+
+
+These can be displayed by the station model used in the 
+<a href="../controls/StationLocationControl.html">Location Display Control</a>.
+
+
+<subhead intoc="false" id="csv">CSV Format</subhead>
+Location data can be defined in a CSV (Comma Separated Value) format.
+The first line is a comma separated list of column names. There must be
+columns that are latitude and longitude. These are denoted with 
+(case insensitive):
+<pre>
+latitude
+lat
+longitude
+lon
+long
+</pre>
+
+Altitude is given by the column names:
+<pre>
+alt 
+altitude
+</pre>
+
+The altitude value, if defined, is by default in meters.
+You can optionally specify a unit with the suffix: &quot;\[unit name\]&quot; (see example).
+<p>
+
+The first column that is found that is not one of the location columns
+is taken to be the name of the location.
+<p>
+Example:
+<pre>
+Name,Latitude,Longitude,Altitude,State
+Boulder,40,-107,5430\[feet\],CO
+Miami,30,-95,0\[feet\],FL
+...
+</pre>
+
+
+
+<subhead intoc="false" id="georss">GeoRSS Format</subhead>
+The IDV can also read GeoRSS formats. This is a geocoded RSS feed. An
+example is the USGS earthquake feed:<br>
+http://earthquake.usgs.gov/eqcenter/recenteqsww/catalogs/eqs7day-M2.5.xml
+
+
+
+
+</body>
+</html>

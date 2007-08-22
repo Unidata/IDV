@@ -1,0 +1,15 @@
+<evizcatalog>
+
+<type name="Models">
+   <data name="ETA" file="/data/eta.nc"/>
+   <data name="RUC" file="/data/ruc.nc"/>
+   <data name="GFS" file="/data/gfs.nc"/>
+</type>
+
+
+<type name="Imagery">
+
+</type>
+
+
+</evizcatalog>

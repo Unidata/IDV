@@ -1,0 +1,221 @@
+<title>IDV HTML Pages and Lab Materials</title>
+
+
+
+<div class="overview">
+The IDV includes an HTML viewer that lets you see HTML pages, including fully
+interactive IDV displays in special HTML pages
+</div>
+
+<p>
+
+This HTML viewer can
+
+<ul>
+  
+  <li>include fully interactive, 3D, IDV displays,
+      with full controls, just like in the IDV.</li>
+  
+  <li>control the main IDV displays, with special IDV-HTML "tags."</li>
+  
+  <li>load  IDV Bundle Files from web sites.</li>
+</ul>
+
+<p>
+
+<!--
+Further information on using HTML in the IDV can be found in
+the IDV User's Guide in
+[ht::popup          "%urlroot%/docs/userguide/controls/TextDisplayControl.html" "HTML and the IDV"].
+-->
+
+
+For the workshop we will demonstrate a simple example.
+
+<ol class="step">
+  
+  <li>Load the example HTML file.</li>
+  
+  <ul>
+    
+    <li>Cut and paste the URL:
+<pre>
+   %urlroot%/docs/workshop/advanced/WindSpeedTutorial.html
+</pre>
+        into the [ht::command URL] field in the
+        [ht::dialog Data Source Chooser].</li>
+    
+    <li>When this html file is loaded the IDV automatically creates
+        an [ht::display HTML Display Control].</li>
+  </ul>
+  
+  <li>Note the map view embedded in the HTML. This is a fully  functional 3D
+      component. It is specified in the HTML code in the web page
+      you just downloaded.</li>
+  
+
+<li>Make an IDV Display in the HTML page</li>
+  
+  <ul>
+  <li>Click on the [ht::button Create U display (plan view)] button
+  in the web page. This
+      creates a [ht::display Contour Plan View] and places it into the
+      embedded map  view.
+      <LI>Click on the legend to get the display control.
+      <LIL>Use the [ht::command Levels:] entry box to set the level
+      to 250 hPa.
+      <LI>Rotate and zoom as needed to see the interactive 3D character of
+      this display.
+
+      </li>
+</ul>
+
+  
+  <li>The  HTML that made this display looks like:</li>
+<pre>
+    &lt;b&gt;&lt;font color="green" size="+1"&gt;&lt;center&gt;
+    How U and V Components Of Wind Combine&lt;br&gt;
+    To Make the Wind Speed.&lt;/center&gt;&lt;/font&gt;&lt;/b&gt;
+    
+    &lt;b&gt;The view window:&lt;/b&gt;    &lt;br&gt;
+    &lt;view id="view1" props="size=300:300;"&gt;
+    &lt;p&gt;
+
+    &lt;form action="idv:idv.createDisplay ('http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/casestudies/idvtest/grids/%datetime%_%nwpmodel%.nc', 'u', 'planviewcontour', 'DefaultView=view1;')"&gt;
+    
+    Date and Time:
+    &lt;select name="datetime"&gt;
+    &lt;option value="2002062800"&gt;28 Jun 2002 12Z&lt;/option&gt;
+    &lt;option value="2002062812"&gt;28 Jun 2002 00Z&lt;/option&gt;
+    &lt;/select&gt;
+    
+    NCEP Model:
+    &lt;select name="nwpmodel"&gt;
+    &lt;option value="ruc"&gt;RUC&lt;/option&gt;
+    &lt;option value="avn-x"&gt;AVN, global&lt;/option&gt;
+    &lt;option value="eta"&gt;Eta&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;p&gt;
+    
+    &lt;input type="submit" value="Create U display (plan view)"&gt;
+    &lt;/form&gt;
+</pre>
+  
+  <li>The HTML contains:</li>
+  
+  <ul class="substep">
+    
+    <li>The &lt;view&gt; tag defines the 3D map view with the name
+        [ht::qt   view1].</li>
+    
+    <li>The display creation is defined in the  &lt;form&gt; tag.
+        The form action:
+<pre>
+    action="idv:idv.createDisplay('http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/model/%datetime%_%nwpmodel%.nc',
+                                  'u', 'planviewcontour', 'DefaultView=view1;') "
+</pre>
+        is a call to the IDV and creates a display with
+        data from the remote data server given, the parameter named
+        [ht::param   u],
+        display type plan view with contour lines, and puts it in the 3D view
+        named [ht::qt view1].</li>
+    
+    <ul class="subsubstep">
+      
+      <li>The exact parameter names you have to find in the original data source
+          file.</li>
+      
+      <li>The name [ht::qt planviewcontour] is the internal identifying name for
+          [ht::display Contour Plan View] displays.
+          <popup label="See  here for a list of other display names">
+          The recognized key words for types of IDV displays are:
+          
+      <ul>
+        surface<br> profile<br>  probe<br> contourxs<br> colorxs<br>
+        planviewflow<br>
+        planviewcontour<br> planviewcolor<br> flowxs<br> skewt<br>
+        timeheight<br>
+        imagesequence<br> textdisplay<br> timeseries<br> streamlines<br>
+        windbarbplan<br>
+        omni<br>radargrid.
+      </ul>
+      
+      </popup>
+      
+      <li>The action includes two virtual variables to substitute for text,
+          %datetime% and %nwpmodel%.  These are determined by the select pull
+          down boxes. Enclose virtual variable names in pairs of [ht::qt %]
+          symbols.</li>
+    </ul>
+    
+    
+  </ul>
+</ol>
+
+
+<!--
+<p>
+
+You can hard-code a complete action command with no options,
+making it automatically effective with no user choices required.
+You must have a
+&lt;input type="submit" value="Create display"&gt; button
+to create the display.
+
+<p>
+The next HTML code block
+automatically makes a Skew-T in an IDV HTML page. Try this
+code. It gets some data from a remote
+netCDF file. Remember line returns cause a single HTML line to fail, so
+remove the line returns in this text.
+
+<pre>
+&lt;display
+data="http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods
+/casestudies/july18_2002/grids/2002071812_ruc.nc"
+param="skewt" display="skewt">
+&gt;
+</pre>
+
+<p>
+
+Here are other ideas to try; this loads a data source from a remote
+server, and creates a temperature contour plot from a
+different local file
+on your disk.
+You will have to modify directories to work with your local
+environment.
+<P>
+<pre>
+
+&lt;a href="idv:datamanager.createDataSource
+('http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/casestudies
+/july18_2002/grids/2002071812_ruc.nc');"&gt;
+Load OPeNDAP data source &lt;/a&gt;
+&lt;p&gt;
+&lt;a href="idv:idv.createDisplay ('/home/ldm/data/avn.nc',
+'T', 'planviewcontour', '')"&gt;
+Add contour to main view
+&lt;/a&gt;
+&lt;p&gt;
+&lt;a href="idv:idv.showMultiChooser ();"&gt; Select data &lt;/a&gt;
+</PRE>
+
+-->
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

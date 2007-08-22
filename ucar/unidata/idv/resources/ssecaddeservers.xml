@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<servers>
+
+  <server name="128.104.110.92">
+    <group type="image" names="HOURLY"/>
+  </server>
+
+  <server name="WESTS.SSEC.WISC.EDU">
+    <group type="image" names="WESTS"/>
+  </server>
+
+  <server name="INDOEX.SSEC.WISC.EDU">
+    <group type="image" names="INDOEX,IND3HR,IND6HR"/>
+  </server>
+  <server name="128.104.110.164">
+    <group type="image" names="DAILY"/>
+    <group type="image" names="COMP"/>
+  </server>
+  <server name="GILMORE.SSEC.WISC.EDU">
+    <group type="image" names="GILMORE"/>
+  </server>
+  <server name="GOESPAC.SSEC.WISC.EDU">
+    <group type="image" names="GOESPAC"/>
+  </server>
+  <server name="EASTL.SSEC.WISC.EDU">
+    <group type="image" names="EASTL"/>
+  </server>
+  <server name="NOAAPORT.SSEC.WISC.EDU">
+    <group type="image" names="NEXRAD"/>
+  </server>
+  <server name="MSG.SSEC.WISC.EDU">
+    <group type="image" names="MSG3HR"/>
+    <group type="image" names="MSG6HR"/>
+    <group type="image" names="MSG"/>
+  </server>
+  <server name="EASTS.SSEC.WISC.EDU">
+    <group type="image" names="EASTS"/>
+    <group type="image" names="WESTL"/>
+    <group type="image" names="WALLOPS"/>
+  </server>
+</servers>

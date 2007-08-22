@@ -1,0 +1,383 @@
+<html><head>
+  <title>User Preferences</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+
+You use preferences to save standard settings of the IDV, such as the map
+projection to show when the IDV starts.
+The Preferences Dialog  is  opened through the
+<a href="../ui/Menus.html#edit">Edit menu</a>
+with [ug::menu Edit  {Preferences}].
+
+<p>
+Note: Some of these preferences only take effect the next time
+you run the IDV or when you create a new view window.
+The preferences also may be overwritten when you use bundles.
+See <a href="../Bundles.html">here</a> for more information about 
+the bundle facility.
+
+[ug::prefGroup {General Preferences}]
+
+[ht::cimg images/preferences/General.gif {General Preferences}]
+
+Click on Cancel if you wish to exit preferences setting, Ok to
+accept the changed preferences and close this window, and Apply to
+accept the preferences and keep this window open.
+
+
+[ug::prefSubGroup {General}]
+
+[ug::preference {Show Help Tip Dialog On Start} ]
+Should the  help tip window be shown at start up.
+
+[ug::preference {Confirm Before Exiting}]
+Ask user to confirm before the application exits.
+
+[ug::preference {Show Dashboard On Start}]
+Should the dashboard window be shown when the IDV starts.
+
+[ug::preference {Show field selector}]
+Should the  separate field selector window be shown at start up.
+
+
+
+[ug::prefSubGroup {Dock in Dashboard}]
+What components should be shown in the tabs of the dashboard window.
+
+
+
+
+
+[ug::prefSubGroup {When Opening a Bundle}]
+
+[ug::preference {Prompt user to remove displays and data}]
+Allows you to control if the prompt dialog is shown before a bundle is opened.
+
+[ug::preference {Remove all displays and data sources}]
+Allows you to specify
+that before a bundle is loaded  should all the existing data and displays be removed.
+
+
+
+[ug::prefSubGroup {Display Controls}]
+
+[ug::preference {Show windows when they are created}]
+Specifies that when a display is
+created its control window is automatically shown.
+
+[ug::preference {Use Fast Rendering}]
+Should the displays always use fast rendering. This allows for faster display rendering
+at the risk of incorrect displays (e.g., when display lines cross projection seams).
+
+[ug::preference {Auto-select data when loading a template}]
+A display can be saved as a template without data. When it is created should the IDV
+attempt to automatically select the appropriate data fields.
+
+
+
+[ug::prefSubGroup {When Display Control is Closed}]
+
+
+[ug::preference {Remove the display}]
+Specifies that when a display's window
+is closed then the display itself is removed.
+
+[ug::preference {Remove standalone displays}]
+When the window is closed for a stand alone display (i.e., one that does
+not have a display component in a main view window. e.g., html display)
+should the display be removed.
+
+
+[ug::prefSubGroup {Other}]
+
+[ug::preference {Resource Sitepath}]
+Allows you to define where the 
+IDV looks for additional resources. Use this when you want to
+have a set of resources shared by a group of users. See
+the <a href="../SiteConfiguration.html"> Site Configuration</a>
+documentation for more details.
+
+
+[ug::preference {Look and  Feel}]
+Define the Java look and feel to use. This will take effect when you next run the IDV.
+
+
+
+
+
+[ug::prefGroup Formats and Data]
+
+[ht::cimg images/preferences/FormatsAndData.gif {Formats and Data Preferences}]
+
+[ug::preference {Date Format}]
+This allows you to define how the IDV displays dates. 
+The date format string  uses the following symbols. Note, these symbols can
+be repeated to give different results. For example:
+<pre>
+&quot;MMMM&quot; gives full month name
+&quot;MMM&quot; gives short month name
+&quot;MM&quot; gives  2 digit month number
+&quot;M&quot; gives  1 or 2 digit month number
+</pre>
+
+<table>
+<tr><td>Symbol</td><td>Description</td><td>Example</td></tr>
+<tr><td>G  </td><td>	Era designator 	</td><td>  	AD</td></tr>
+<tr><td>y </td><td>	Year 	</td><td> 	1996; 96</td></tr>
+<tr><td>M </td><td>	Month in year 	</td><td> 	July; Jul; 07</td></tr>
+<tr><td>w </td><td>	Week in year 	</td><td> 	27</td></tr>
+<tr><td>W </td><td>	Week in month 	</td><td> 	2</td></tr>
+<tr><td>D </td><td>	Day in year 	</td><td> 	189</td></tr>
+<tr><td>d </td><td>	Day in month 	</td><td> 	10</td></tr>
+<tr><td>F </td><td>	Day of week in month 	</td><td> 	2</td></tr>
+<tr><td>E </td><td>	Day in week 	</td><td> 	Tuesday; Tue</td></tr>
+<tr><td>a </td><td>	Am/pm marker 	</td><td> 	PM</td></tr>
+<tr><td>H </td><td>	Hour in day (0-23) 	</td><td> 	0</td></tr>
+<tr><td>k </td><td>	Hour in day (1-24) 	</td><td> 	24</td></tr>
+<tr><td>K </td><td>	Hour in am/pm (0-11) 	</td><td> 	0</td></tr>
+<tr><td>h </td><td>	Hour in am/pm (1-12) 	</td><td> 	12</td></tr>
+<tr><td>m </td><td>	Minute in hour 	</td><td> 	30</td></tr>
+<tr><td>s </td><td>	Second in minute 	</td><td> 	55</td></tr>
+<tr><td>S </td><td>	Millisecond 	</td><td> 	978</td></tr>
+<tr><td>z </td><td>	Time zone 	</td><td>Pacific Standard Time; PST; GMT-08:00</td></tr>
+<tr><td>Z </td><td>	RFC 822 Time zone 	</td><td>-0800</td></tr>
+</table>
+
+
+
+
+[ug::preference {Time Zone}]
+Choose the time zone to display time with.
+
+
+
+[ug::preference {Lat/Lon Format} {latlonformat}]
+Format used when showing lat/lon. This is a normal decimal format that can 
+contain the symbols:
+<table>
+ <tr><td>0<tr><td>Digit</td></tr>  
+ <tr><td>#</td><td>Digit, zero shows as absent</td></tr>  
+ <tr><td>.</td><td>Decimal separator or monetary decimal separator</td></tr>  
+ <tr><td>-</td><td>Minus sign</td></tr>  
+ <tr><td>,</td><td>Grouping separator</td></tr>  
+ <tr><td>E</td><td>Separates mantissa and exponent in scientific notation.</td></tr>  
+ <tr><td>;</td><td>Subpattern boundary Separates positive and negative subpatterns</td></tr>    
+</table>
+
+
+
+
+[ug::preference {Probe format}]
+This defines an html template that is used to display data readouts in
+the data probe display. This html template can contain macros that are replaced
+with the probed values.
+Macros are:
+<br>%value% Formatted value
+<br>%unit% Display unit
+<br>%rawvalue% Unformatted value
+<br>%rawunit% Original unit
+
+
+
+[ug::preference {Distance Unit}] 
+When displaying distances (e.g., in the Range and Bearing Control) this is the default unit that is used.
+
+
+
+[ug::preference {Sampling Mode}]
+You can specify  the type of sampling you want for the various data probes.  Choose between a weighted average sampling or nearest neighbor.
+
+[ug::preference {Pressure to Height}]
+You can specify  the type of algorithm you want to use for converting from pressure coordinates to height.  See the <a href="../Faq.html#pressure_to_height">FAQ</a> for more information on this option.
+
+
+
+[ug::preference  {Cache Data in Memory}]
+The IDV normally tries to cache data that it loads in memory. You can turn this behavior off with a preference.
+
+[ug::preference  {Disk Cache Size}]
+The IDV will cache some data sets to disk to eliminate network latency.  Specify the maximum amount of disk size with this preference.
+
+
+[ug::preference {Max Image Size}]
+This field allows you to set a maximum image size (in pixels) that is to be displayed.
+When this preference is set the image display will adjust the Pixel Sampling to
+reduce the image to less than the preferred value. This allows for the initial
+display of large images without causing  memory issues.
+
+
+[ug::preference {Grid Threshold}]
+This field allows you to set a size limit for holding grids in memory.
+Grids larger than this size will be cached to disk instead of held
+in memory during the IDV session.  This allows loading large grids and
+long loops of grids without a major performance hit.
+
+
+[ug::prefGroup View]
+
+[ht::cimg images/preferences/MainDisplay.gif {View Preferences}]
+
+
+The <b>View</b> tab allows you to set preferences related to the
+main 3D map view window.
+
+
+[ug::prefSubGroup Legends]
+[ug::preference {Show Side Legend}]
+Do you  prefer the side display  legend.
+
+[ug::preference {Show Bottom Legend}]
+Do you  prefer the bottom display  legend.
+
+[ug::preference {Show Animation Boxes}]
+Do you  prefer seeing the animation boxes in the time animation control.
+
+[ug::preference {Show Overview Map}]
+A 3D display can have a small overview map shown under the legend.
+Note: This is kind of flaky.
+
+
+[ug::prefSubGroup Display]
+
+[ug::preference {Show Wireframe Box}]
+Toggles the  visibility of a 3D wireframe box around the data. This box 
+helps provide orientation in 3D views.
+
+
+[ug::preference {Show Cursor Readout}]
+Display a label of latitude,
+longitude, and altitude of the cursor position over the display, shown
+in the lower border of the view window.
+
+
+[ug::preference {Clip View At Box}]
+Allows you to elide from view 
+all display elements outside the wireframe box. This is helpful to 
+remove map lines outside the area of data.
+
+
+[ug::preference {Show Display List}]
+Should a listing of the titles and times of the display controls be shown in the
+main view window.
+
+
+[ug::preference {Show Times In Display}]
+Turn on the label, shown inside the main display, 
+that shows the current animation time.
+
+[ug::preference {Show Map Display Scales}]
+Show a vertical scale in the map displays.
+
+
+[ug::preference {Show TransectDisplay Scales}]
+Show a vertical scale in the transect displays.
+
+[ug::preference {Show &quot;Please Wait&quot; Message}]
+Display the &quot;Please Wait&quot; message in the display.
+
+
+[ug::preference {Reset Projection With New Data}]
+When checked will cause each new
+display made in the IDV to snap the whole view window to the native projection of the
+data. This can be undesirable if you are overlaying several kinds of
+some of which have differing projections.
+
+
+
+[ug::preference {Use 3D View}]
+Allows you to override the default 3D behavior of the IDV and use
+a 2D View for Map Views.
+
+
+</div>
+
+
+[ug::prefSubGroup Toolbars]
+[ug::preference {Show Earth Navigation Panel}]
+Show a graphical navigation panel. 
+
+
+[ug::preference {Show Viewpoint Toolbar}] 
+Enable the <a href="../ui/Navigation.html#viewpoint">Viewpoint toolbar</a>.
+
+[ug::preference {Show Zoom/Pan Toolbar}] 
+Enable the <a href="../ui/Navigation.html#navigation">Zoom/Pan toolbar</a>.
+
+
+[ug::prefSubGroup {Color Scheme}]
+You can specify the 
+default foreground/background colors. The foreground  color is applied to
+the bounding box lines and the time readout. The color of the  maps
+is controlled by the individual 
+<a href="../controls/MapDisplayControl.html">map control</a>.
+
+
+
+
+[ug::prefGroup Navigation]
+
+You can change how the IDV interprets mouse and keyboard events for navigating in 
+3D space. 
+For each combination of mouse button and control/shift keys  you can select an action.
+
+
+[ht::cimg images/preferences/Mouse.gif {Mouse Event Preferences}]
+
+
+
+There are a number of navigation functions (e.g., rotate) that can be triggered
+by a key press. The Keyboard preference tab allows you to define the key and
+any modifier (i.e., control, shift):
+
+[ht::cimg images/preferences/Keyboard.gif {Keyboard Event Preferences}]
+
+
+
+[ug::prefGroup {Toolbar}]
+
+[ht::cimg images/preferences/Toolbar.gif {Toolbar Preferences}]
+Allows you to define what action/icons are displayed in the toolbar. The list on the
+left shows all of the available actions. The list on the right
+shows the actions which make up the toolbar. You can add/remove actions
+to/from the toolbar list. The [ug::button Add space] button adds a space
+between toolbar entries. The [ug::button Reload Original] resets the toolbar
+list to the one before any changes have been made.
+The [ug::button Reload System] button resets  the toolbar list to
+the original one defined in the system.
+
+
+
+[ug::prefGroup Available Choosers]
+
+[ht::cimg images/preferences/Choosers.gif {Chooser Preferences}]
+
+
+The <b>Available Choosers</b> tab  allows you to define what types of data 
+choosers to use. This is a way to simplify the data chooser window,
+only showing those tabs that you want to use.
+You can either select
+to  &quot;Use all choosers&quot; or
+&quot;Use selected choosers&quot;
+and select individual choosers to use.
+
+[ug::prefGroup Available Displays]
+
+[ht::cimg images/preferences/Displays.gif {Display Preferences}]
+
+
+The <b>Available Displays</b> tab allows you to specify  what types of displays to 
+fuse. You can either select to 
+&quot;Use all displays&quot; 
+or
+&quot;Use selected displays&quot;.
+The list of displays is hierarchical. You can turn on or off
+the user of all displays, specific groupings or individual
+displays. 
+
+
+</body>
+
+

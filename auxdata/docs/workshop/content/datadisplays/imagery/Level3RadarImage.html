@@ -1,0 +1,127 @@
+<html>
+<head>
+<title>Level III Radar Image Displays</title>
+</head>
+
+<body>
+
+<div class="overview">
+Real-time Level III radar data is available from the network
+of ADDE servers in the Unidata community.  At present, the IDV
+can only read Level III data from these servers.
+</div>
+
+<p>In this exercise we'll display the Level III radar images
+for the super cell area that we loaded in the previous exercise.
+
+<ol class="step">
+  <li>Open a new [ht::dialog View Window] 
+      by selecting the 
+      [ht::menu File New {View Window} {Map Display} {One Pane}] menu.
+      By default, the IDV will load data into the currently 
+      selected [ht::dialog View Window].
+      Minimize the other window with the satellite image in it for now.
+  </li>
+
+  <li>[ht::openDataSourceChooser]. 
+      Click on the [ht::command Radar] tab,
+      then the [ht::command Level III] tab.</li>
+
+  <li>We'll load in Level III Data from the Bow Echo Case Study.
+      In the [ht::command Server:] selector, choose
+      [ht::param adde.ucar.edu].  
+      In the [ht::command Dataset:] selector, choose
+      [ht::param CCS039R].  If either of these is
+      not in the list, just type them in.  When you have made 
+      your selections, click the [ht::button Connect]
+      button.</li>
+
+  <li>The IDV connects to the specified server and retrieves 
+      the types of radar data available in the dataset and the
+      stations for which those data are available.  On the station
+      map, you will see <b>DVN</b> which is Davenport, Iowa.  Click
+      on this label to select it.
+
+  <li>Using the [ht::command Radar Data Type:] selector, choose
+      the [ht::param Base Reflectivity Tilt 1] type.</li>
+
+  <li>For this exercise, we want to select a subset of all available times, 
+      so click on the [ht::command Absolute times] radio 
+      button.  With this option selected, the server is queried for a set of
+      available times for that type and these are listed in the
+      [ht::command Times:] panel. Select
+      the 11 images from [ht::param 1998-06-29 21:00:00Z]
+      through [ht::param 1998-06-29 21:59:00Z].
+      Be sure the [ht::command Data Type:]
+      is set to [ht::param Reflectivity].  Make sure
+      the [ht::command Create display] option is checked, and then
+      click the [ht::command Add Source] button.</li>
+
+<!--
+  <li>In the [ht::dialog Field Selector] window, 
+      you should see [ht::dataset {DVN (Base Reflectivity Tilt 1)}] 
+      dataset selected in the [ht::command Data Sources]
+      panel, the [ht::param Image Sequence] field 
+      selected in the [ht::command Fields] panel,
+      and <code class="display">Image Display] selected
+      in the [ht::command Displays] panel, and
+      the [ht::command Use Default] checkbox
+      is selected in the [ht::command Times] 
+      panel.  If not, select them, then click the 
+      [ht::command Create Display] button.</li>
+
+  <li>Once all the images are loaded, minimize the control window.</li>
+-->
+
+  <li>[ht::mapChange]  Turn on the 
+      [ht::command North & Central America] maps.
+      the [ht::command US Interstate Highways] maps.
+      Make sure all other maps are off.  When you are finished,
+      go back to the [ht::display View Window].</li>
+
+  <li>Use the [ht::menu Displays Locations US {U.S. Cities}] menu to
+      overlay some place names. Change the display to show
+      the locations using a custom layout by using
+      the display control's [ht::command Layout Model]
+      radio button in the control.
+
+  <li>Overlay a radar range ring grid using the
+      [ht::menu Displays Special {Range Rings}] menu.</li>
+
+  [ht::cimg images/Level3Dvn.gif]
+
+  <li>Start the animation.  In this loop, you will see the bow echo
+      move through the area.  Restore the other view window from
+      its minimized state.  Notice that as the radar image loops
+      through its steps, the corresponding satellite image is
+      show in the other window. By default, animation steps are
+      shared between views.</li>
+
+  <li>Stop the animation in the radar loop window.  Now start the
+      animation in the satellite image display.  Notice this time,
+      that the satellite display controls the images that are shown
+      in the radar display.</li>
+
+  <li>Open the [ht::dialog Time Animation Properties] dialog
+      in the satellite view window.
+      <popup label="">
+      Click the information icon in the [ht::command {Time Animation Widget}]
+      toolbar.
+      </popup>
+      Change the [ht::command Share Times] option to [ht::command None]
+      and click the [ht::command OK] button.
+      </li>
+   
+   <li>Now start the animation in the satellite display and notice that
+       the two views animate independently.</li>
+
+   <li>Stop the animation in both windows.</li>
+
+   <li>Close the window you were viewing the satellite data in by
+       clicking the [ht::button X] in the upper
+       right corner of the window.</li>
+
+</ol>
+
+</body>
+</html>

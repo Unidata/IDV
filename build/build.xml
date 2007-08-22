@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!-- 
+To do a jnlp/jar release you do:
+
+ant release
+or:
+ant stable_release
+or:
+ant alpha_release
+or:
+ant nightly_release
+
+
+By default the base directory of the build is relative to where
+this build.xml file is (even if you are running ant from some other
+directory), thus the ".." implies the base directory is the parent
+directory of this libs directory.  This can be overridden at the command
+line using: and -Dbasedir=/some/other/dir 
+-->
+
+<project basedir=".." default="all" name="IDV">
+
+    <target name="init">
+    <tstamp>
+      <format property="start.time" pattern="yyyy-MM-dd HH:mm z" timezone="UTC"/>
+    </tstamp>
+
+        <!-- srcdir is where we check out cvs code -->
+        <property name="srcdir"  value="${basedir}" />
+        <property name="installerdir"  value="${basedir}/installers" />
+        <mkdir dir="${installerdir}" />
+        <property name="install4jdir"  value="/upc/share/install4j" />
+        <property name="makedir"  value="mkdir -p -m 775 " />
+
+
+       <!-- Read in the version from the properties file if it exists -->
+       <property name="versionfile" value="${srcdir}/ucar/unidata/idv/resources/version.properties"/>
+       <property file="${versionfile}"/>
+       <available file="${versionfile}" property="idv.version" value="${idv.version.major}.${idv.version.minor}${idv.version.revision}"/>
+       <available file="${versionfile}" property="idv.version.under" value="${idv.version.major}_${idv.version.minor}${idv.version.revision}"/>
+       <available file="${versionfile}" property="idv.version.space" value="${idv.version.major}.${idv.version.minor} ${idv.version.revision}"/>
+
+
+        <!-- libsdir is the cvs lib module -->
+        <property name="libsdir"   value="${basedir}/lib" />
+
+        <!-- Where to put the jar files -->
+        <property name="jardir" value="${libsdir}"/>
+
+        <property name="ftpdir" value="ftp" />
+
+        <property name="ploogindir" value="auxdata/plugins" />
+
+        <property name="tmpbuilddir" value="${srcdir}/tmpbuilddir"/>
+
+        <mkdir dir="${srcdir}" />
+        <mkdir dir="${libsdir}"/>
+        <mkdir dir="${tmpbuilddir}"/>
+
+        <property name="release_src_dir"   value="${srcdir}/ucar/unidata/idv/release" />
+
+        <property name="webstart_root" value="webstart"/>
+        <property name="webstart_jar_dir" value="webstart/IDV"/>
+        <mkdir dir="webstart"/>
+        <mkdir dir="webstart/IDV"/>
+
+        <property name="webstart_url_root" value="http://www.unidata.ucar.edu"/>
+        <property name="idv_release_path" value="/software/idv/release"/>
+        <property name="idv_download_path" value="/downloads/idv"/>
+
+
+
+
+<!-- Where we get the non jar files that we want to include in the webstart release -->
+        <property name="webstart_src_dir" value="${release_src_dir}/webstart" />
+
+<!-- Where we get the non jar files that we want to include in the zip release -->
+        <property name="zip_src_dir" value="${release_src_dir}/zip" />
+
+<!-- Where we get the installer config files for the release -->
+        <property name="installer_src_dir" value="${release_src_dir}/installer" />
+
+        <property name="sign_keystore" value="/upc/share/metapps/.keystore"/>
+        <property name="sign_password" value="poohbear"/>
+
+        <taskdef name="install4j"
+               classname="com.install4j.Install4JTask"
+               classpath="${install4jdir}/bin/ant.jar"/>
+        <taskdef name="svn" classname="org.tigris.subversion.svnant.SvnTask"/>
+    </target>
+               
+    <target name="all" depends="init">
+        <echo
+            message="Building at ${start.time}. Build dir: ${basedir}" />
+        <echo message="Checking out source tree." />
+        <antcall target="cvsco" /> 
+        <!--
+        <antcall target="cvsco" /> 
+        -->
+        <echo message="FTPing visad." />
+        <antcall target="visad" /> 
+        <echo message="Building ucar packages." />
+        <ant antfile="${srcdir}/ucar/build.xml" target="all" />
+    </target>
+ 
+    <target name="quick" depends="init">
+        <echo
+            message="Building at ${start.time}. Build dir: ${basedir}" />
+        <echo message="Checking out source tree." />
+        <antcall target="cvsco" /> 
+        <!--
+        <antcall target="cvsco" /> 
+        -->
+        <echo message="FTPing visad." />
+        <antcall target="visad" /> 
+        <echo message="Building ucar packages." />
+        <ant antfile="${srcdir}/ucar/build.xml" target="justjars" />
+        <!-- <antcall target="webstart_jars" /> -->
+    </target>
+
+
+    <target name="ftp" depends="init">
+        <antcall target="zipdir" />
+        <antcall target="scpftp" />
+    </target>
+
+
+    <target name="ftpdir" depends="init">
+        <mkdir dir="${ftpdir}"/>
+        <delete>
+            <fileset dir="${ftpdir}" includes="**/*"/>
+        </delete>
+        <antcall target="zipjars" />
+        <jar
+            jarfile="${ftpdir}/idv_src_${idv.version}.jar"
+            compress="true"
+            basedir="${srcdir}/.."
+        >
+            <include name="metapps/ucar/**"/>
+            <exclude name="metapps/**/CVS/**"/>
+            <exclude name="metapps/ucar/**/*.class"/>
+            <exclude name="metapps/ucar/**/*.map"/>
+            <exclude name="metapps/ucar/**/*.jar"/>            
+            <exclude name="metapps/ucar/**/*.ascii"/>            
+            <exclude name="metapps/ucar/**/*.tml"/>            
+            <exclude name="metapps/ucar/**/*.bak"/>            
+            <exclude name="metapps/ucar/**/*.zip"/>            
+            <exclude name="metapps/ucar/**/*.shp"/>            
+            <exclude name="metapps/ucar/**/*.nc"/>            
+            <exclude name="metapps/ucar/unidata/apps/demo/**"/>
+            <exclude name="metapps/ucar/unidata/apps/imageviewer/**"/>
+            <exclude name="metapps/ucar/unidata/apps/geon/**"/>
+            <exclude name="metapps/ucar/unidata/apps/lead/**"/>
+            <exclude name="metapps/ucar/unidata/apps/rico/**"/>
+            <exclude name="metapps/ucar/unidata/apps/trex/**"/>
+            <exclude name="metapps/ucar/unidata/gridviewer/**/*.*"/>
+            <exclude name="metapps/ucar/unidata/grid/**"/>
+            <exclude name="metapps/ucar/unidata/view/sounding/test/**"/>
+        </jar>
+        <antcall target="zipdocs" />
+    </target>
+
+
+    <target name="install_plugins" depends="init">
+        <sshexec host="conan"
+            username="${user.name}"
+            keyfile="${user.home}/.ssh/id_dsa"
+            passphrase=""
+            command="${makedir} /content/software/idv/plugins"
+        />
+        <scp
+            todir="${user.name}@conan:/content/software/idv/plugins"
+            keyfile="${user.home}/.ssh/id_dsa"
+            passphrase=""
+        >
+            <fileset  dir="${ploogindir}" includes="*.jar,*.xml"/>
+            <fileset  dir="${libsdir}" includes="workshop.jar,simple.jar"/>
+        </scp>
+    </target>
+
+
+
+
+    <target name="scpftp" depends="init">
+        <scp
+            todir="${user.name}@ftp:/home/ftp/pub/idv/untested"
+            keyfile="${user.home}/.ssh/id_dsa"
+            passphrase=""
+        >
+            <fileset  dir="${ftpdir}" includes="*.jar,*.zip"/>
+        </scp>
+    </target>
+
+    <target name="cvsco" depends="init">
+        <cvs package="metapps" dest="${srcdir}" quiet="true" error="dummyfile" output="dummyfile"/>
+    </target>
+
+
+    <target name="svnco" depends="init">
+        <svn>
+        <checkout url="svn://zero/idv/trunk" destPath="${srcdir}"/>
+        </svn>
+    </target>
+
+    <target name="visad" depends="init">
+        <ftp action="get" 
+             server="ftp.ssec.wisc.edu"
+             password="idv@unidata.ucar.edu"       
+             userid="anonymous"
+             remotedir="/pub/visad-2.0"              
+             depends="yes" 
+             passive="yes" 
+             skipFailedTransfers="true" 
+         >
+            <fileset  dir="${libsdir}" includes="visad.jar"/>
+        </ftp>
+
+        <exec executable="cvs" dir="${libsdir}">
+            <arg line="commit -m metapps_build_snapshot visad.jar"/>
+        </exec>
+    </target>
+
+
+    <target name="release" depends="init">
+        <property name="release_dir"          value="${idv.version.under}"/>
+        <property name="release_path"         value="/software/idv/${release_dir}"/>
+        <property name="release_name"         value="${release_dir}"/>
+
+
+       <antcall target="snapshot_release">
+           <param name="snapshot_dir" value="${release_dir}"/>
+           <param name="snapshot_path" value="${release_path}"/>
+           <param name="snapshot_name" value="${release_name}"/>
+           <param name="snapshot_download_path" value="${idv_download_path}/${release_dir}"/>
+           <param name="snapshot_webstart_path" value="/software/idv/current"/>
+           <param name="snapshot_title" value="IDV ${idv.version.space} release&lt;p&gt;Built: ${start.time}"/>
+       </antcall>
+    </target>
+
+
+    <target name="stable_release" depends="init">
+        <property name="stable_dir"          value="idv_${idv.version}"/>
+        <property name="stable_path"         value="${idv_release_path}/${release_dir}"/>
+        <property name="stable_name"         value="stable"/>
+
+
+       <antcall target="snapshot_release">
+           <param name="snapshot_dir" value="${stable_dir}"/>
+           <param name="snapshot_path" value="${stable_path}"/>
+           <param name="snapshot_name" value="${stable_name}"/>
+           <param name="snapshot_download_path" value="${idv_download_path}/${stable_name}"/>
+           <param name="snapshot_webstart_path" value="${idv_release_path}/${stable_name}"/>
+           <param name="snapshot_title" value="Latest IDV ${idv.version.space} stable release&lt;p&gt;Built: ${start.time}"/>
+       </antcall>
+    </target>
+
+
+
+    <target name="alpha_release" depends="init">
+        <property name="alpha_dir"          value="alpha_idv_${idv.version}"/>
+        <property name="alpha_path"         value="${idv_release_path}/${alpha_dir}"/>
+        <property name="alpha_name"         value="alpha"/>
+
+
+       <antcall target="snapshot_release">
+           <param name="snapshot_dir" value="${alpha_dir}"/>
+           <param name="snapshot_path" value="${alpha_path}"/>
+           <param name="snapshot_name" value="${alpha_name}"/>
+           <param name="snapshot_download_path" value="${idv_download_path}/${alpha_name}"/>
+           <param name="snapshot_webstart_path" value="${idv_release_path}/${alpha_name}"/>
+           <param name="snapshot_title" value="Latest IDV ${idv.version.space} alpha release&lt;p&gt;Built: ${start.time}"/>
+       </antcall>
+    </target>
+
+
+
+    <target name="nightly_release" depends="init">
+        <property name="nightly_dir"          value="nightly_idv_${idv.version}"/>
+        <property name="nightly_path"         value="${idv_release_path}/${nightly_dir}"/>
+        <property name="nightly_name"         value="nightly"/>
+
+
+       <antcall target="snapshot_release">
+           <param name="snapshot_dir" value="${nightly_dir}"/>
+           <param name="snapshot_path" value="${nightly_path}"/>
+           <param name="snapshot_name" value="${nightly_name}"/>
+           <param name="snapshot_download_path" value="${idv_download_path}/${nightly_name}"/>
+           <param name="snapshot_webstart_path" value="${idv_release_path}/${nightly_name}"/>
+           <param name="snapshot_title" value="Latest IDV ${idv.version.space} nightly release&lt;p&gt;Built: ${start.time}"/>
+       </antcall>
+    </target>
+
+
+
+    <target name="test_release" depends="init">
+        <property name="test_dir"          value="test_idv_${idv.version}"/>
+        <property name="test_path"         value="${idv_release_path}/${test_dir}"/>
+        <property name="test_name"         value="test"/>
+
+
+       <antcall target="snapshot_release">
+           <param name="snapshot_dir" value="${test_dir}"/>
+           <param name="snapshot_path" value="${test_path}"/>
+           <param name="snapshot_name" value="${test_name}"/>
+           <param name="snapshot_webstart_path" value="${idv_release_path}/${test_name}"/>
+            <parm name="snapshot_download_path" value="${idv_download_path}/${test_name}"/>
+           <param name="snapshot_title" value="Latest IDV ${idv.version.space} test release&lt;p&gt;Built: ${start.time}"/>
+       </antcall>
+    </target>
+
+
+
+
+    <target name="snapshot_release" depends="init">
+
+        <property name="ftp_path" value="${snapshot_download_path}/ftp"/>
+        <echo message="Making conan directory: ${snapshot_path}"/>
+        <exec executable="ssh">
+            <arg line="conan ${makedir} /content${snapshot_path};"/>
+        </exec>       
+        <exec executable="ssh">
+            <arg line="conan ${makedir} /content${snapshot_path}/docs;"/>
+        </exec>       
+        <exec executable="ssh">
+            <arg line="conan ${makedir} /content${snapshot_path}/docs/userguide;"/>
+        </exec>       
+        <exec executable="ssh">
+            <arg line="conan ${makedir} /content${snapshot_path}/docs/workshop;"/>
+        </exec>       
+        <exec executable="ssh">
+            <arg line="conan ${makedir} /content${snapshot_path}/docs/devworkshop;"/>
+        </exec>       
+
+        <scp
+            todir="${user.name}@conan:/content${snapshot_path}/docs"
+            keyfile="${user.home}/.ssh/id_dsa"
+            passphrase=""
+            file="auxdata/docs/.htaccess"/>
+
+        <echo message="Making webstart directory: ${snapshot_path}/webstart"/>
+        <exec executable="ssh">
+            <arg line="conan ${makedir} /content${snapshot_path}/webstart;"/>
+        </exec>       
+        <exec executable="ssh">
+            <arg line="conan ${makedir} /content${snapshot_path}/webstart/IDV;"/>
+        </exec>       
+
+        <exec executable="ssh">
+            <arg line="conan cd /content${snapshot_path}/webstart;if !(-e java3D) ln -s /content/software/idv/webstart/java3D java3D"/>
+        </exec>       
+
+
+       <antcall target="webstart_release">
+          <param  name="webstart_target" value="${snapshot_path}/webstart"/>
+          <param  name="codebase_path" value="${snapshot_webstart_path}/webstart"/>
+       </antcall>
+
+        <echo message="Making download directory: /content${snapshot_download_path}"/>
+        <exec executable="ssh">
+            <arg line="conan cd /home/ftp/pub/idv; ${makedir} ${snapshot_dir};"/>
+        </exec>       
+        <exec executable="ssh">
+            <arg line="conan ${makedir} /content${snapshot_download_path};"/>
+        </exec>       
+        <exec executable="ssh">
+            <arg line="conan cd /content${snapshot_download_path};if !(-e idv) ln -s /web/ftp/pub/idv idv;if (-e ftp) rm ftp;ln -s idv/${snapshot_dir} ftp"/>
+        </exec>       
+
+
+        <echo message="Copying installers to downloads directory"/>
+
+        <scp
+            todir="${user.name}@conan:/content/${ftp_path}"
+            keyfile="${user.home}/.ssh/id_dsa"
+            passphrase="">
+            <fileset  dir="installers" includes="**/idv_${idv.version.under}_**"/>
+        </scp>
+
+
+        <echo message="Copying index.html file: /content${snapshot_path}"/>
+
+        <copy overwrite="true" file="ucar/unidata/idv/release/installer/index.html" todir="webstart">
+            <filterset>
+                <filter token="IDV_VERSION" value="${idv.version}"/>
+                <filter token="IDV_VERSION_DOT" value="${idv.version}"/>
+                <filter token="IDV_VERSION_UNDER" value="${idv.version.under}"/>
+                <filter token="IDV_VERSION_SPACE" value="${idv.version.space}"/>
+                <filter token="IDV_TITLE" value="${snapshot_title}"/>
+                <filter token="IDV_NAME" value="${snapshot_name}"/>
+            </filterset>
+        </copy>
+
+        <scp
+            todir="${user.name}@conan:/content${snapshot_path}"
+            keyfile="${user.home}/.ssh/id_dsa"
+            passphrase=""
+            file="webstart/index.html"/>
+
+
+        <echo message="Copying toc.xml file: ${snapshot_download_path}"/>
+        <copy overwrite="true" file="ucar/unidata/idv/release/installer/toc.xml" todir="${ftpdir}">
+            <filterset>
+                <filter token="IDV_VERSION" value="${idv.version}"/>
+                <filter token="IDV_VERSION_DOT" value="${idv.version}"/>
+                <filter token="IDV_VERSION_UNDER" value="${idv.version.under}"/>
+                <filter token="IDV_VERSION_SPACE" value="${idv.version.space}"/>
+                <filter token="IDV_TITLE" value="${snapshot_title}"/>
+                <filter token="IDV_NAME" value="${snapshot_name}"/>
+                <filter token="DOC_PATH" value="${snapshot_path}"/>
+            </filterset>
+        </copy>
+
+
+        <scp
+            todir="${user.name}@conan:/content${snapshot_download_path}"
+            keyfile="${user.home}/.ssh/id_dsa"
+            passphrase=""
+            file="${ftpdir}/toc.xml"/>
+
+
+
+        <echo message="Making docs, jars zip, etc."/>
+        <antcall target="ftpdir"/>
+        <scp
+            todir="${user.name}@conan:/content${ftp_path}"
+            keyfile="${user.home}/.ssh/id_dsa"
+            passphrase=""
+        >
+            <fileset  dir="${ftpdir}" includes="*.jar,*.zip"/>
+        </scp>
+
+
+
+        <exec dir="docs" executable="scp">
+             <arg line = "-r userguide conan:/content${snapshot_path}/docs"/>
+        </exec>
+
+        <exec dir="docs" executable="scp">
+             <arg line = "-r workshop conan:/content${snapshot_path}/docs"/>
+        </exec>
+
+        <exec dir="docs" executable="scp">
+             <arg line = "-r devworkshop conan:/content${snapshot_path}/docs"/>
+        </exec>
+
+        <exec executable="ssh">
+            <arg line="conan cd /content${snapshot_path}; if !(-e plugins) ln -s /content/software/idv/plugins plugins"/>
+        </exec>       
+
+        <exec executable="ssh">
+            <arg line="conan cd /content${snapshot_path}; if !(-e resources) ln -s /content/software/idv/resources resources"/>
+        </exec>       
+
+        <echo message="Flipping links: ln -s ${snapshot_dir} ${snapshot_name}"/>
+        <exec executable="ssh">
+            <arg line="conan cd /content${idv_release_path}; rm -f ${snapshot_name};  ln -s ${snapshot_dir} ${snapshot_name}"/>
+        </exec>       
+
+        <exec executable="ssh">
+            <arg line="conan cd /home/ftp/pub/idv; rm -f ${snapshot_name};  ln -s ${snapshot_dir} ${snapshot_name}"/>
+        </exec>       
+
+        <echo message="Setting mode g+w"/>
+        <exec executable="ssh">
+            <arg line="conan cd /content${idv_release_path} ; chmod -R g+w ${snapshot_dir}"/>
+        </exec>       
+
+
+    </target>
+
+
+
+
+
+
+    <target name="webstart_release" depends="init">
+
+<!-- Sign and copy the jars over -->
+        <antcall target="webstart_jars"/>
+
+<!-- Copy the jnlp and html files over -->
+        <copy overwrite="true" todir="${webstart_jar_dir}">
+            <fileset
+                dir="${webstart_src_dir}"
+                includes="*.jnlp,*.html" />
+            <filterset>
+                <filter token="IDV_CODEBASE" value="${webstart_url_root}${codebase_path}/"/>
+            </filterset>
+        </copy>
+
+        <copy overwrite="true"  todir="${webstart_jar_dir}">
+            <fileset
+                dir="${webstart_src_dir}"
+                includes="*.gif" />
+        </copy>
+
+        <echo message="scp'ing jar files to: /content${webstart_target}/IDV"/>
+<!--
+        <scp
+            todir="${user.name}@conan:/content${webstart_target}/IDV"
+            keyfile="${user.home}/.ssh/id_dsa"
+            passphrase=""
+        >
+            <fileset  dir="${webstart_jar_dir}" includes="*.jar,*.jnlp,*.html"/>
+        </scp>
+-->
+        <exec dir="${webstart_root}" executable="scp" failonerror="true">
+             <arg line="-p -r IDV conan:/content${webstart_target}"/>
+        </exec>
+
+
+
+    </target>
+
+
+    <target name="webstart_jars" depends="init">
+
+        <antcall target="copyandsign">
+            <param name="file" value="idv.jar"/>
+            <param name="todir" value="${webstart_jar_dir}"/>
+        </antcall>
+
+        <antcall target="copyandsign">
+            <param name="file" value="auxdata.jar"/>
+            <param name="todir" value="${webstart_jar_dir}"/>
+        </antcall>
+
+
+        <antcall target="copyandsign">
+            <param name="file" value="nc2.2.jar"/>
+            <param name="todir" value="${webstart_jar_dir}"/>
+        </antcall>
+
+        <antcall target="copyandsign">
+            <param name="file" value="external.jar"/>
+            <param name="todir" value="${webstart_jar_dir}"/>
+        </antcall>
+
+        <antcall target="copyandsign">
+            <param name="file" value="jython.jar"/>
+            <param name="todir" value="${webstart_jar_dir}"/>
+        </antcall>
+
+        <antcall target="copyandsign">
+            <param name="file" value="local-visad.jar"/>
+            <param name="todir" value="${webstart_jar_dir}"/>
+        </antcall>
+
+        <antcall target="copyandsign">
+            <param name="file" value="visad.jar"/>
+            <param name="todir" value="${webstart_jar_dir}"/>
+        </antcall>
+
+        <antcall target="copyandsign">
+            <param name="file" value="simpleidv.jar"/>
+            <param name="todir" value="${webstart_jar_dir}"/>
+        </antcall>
+    </target>
+
+    <target name="copy">
+        <copy overwrite="true"  file="${jardir}/${file}" tofile="${todir}/${file}"/>
+    </target>
+
+    <target name="copyandsign">
+        <uptodate property="${file}_uptodate" targetfile="${todir}/${file}">
+            <srcfiles dir="${jardir}" includes="${file}"/>
+        </uptodate>
+        <antcall target="copyandsign2">
+           <param name="from" value="${jardir}/${file}"/>
+           <param name="to" value="${todir}/${file}"/>
+        </antcall>
+    </target>
+
+    <target name="copyandsign2" unless="${file}_uptodate">
+        <copy overwrite="true"  file="${from}" tofile="${to}"/>
+        <signjar alias="idv" jar="${to}"
+            keystore="${sign_keystore}" storepass="${sign_password}"/>
+    </target>
+
+
+
+
+    <target name="zipjars" depends="init">
+        <zip
+            zipfile="${ftpdir}/idv_jars_${idv.version}.zip"
+            compress="true">
+            <fileset
+               dir="${zip_src_dir}"
+               includes="README,localjars.jnlp,idv.gif" />
+            <fileset
+               dir="${libsdir}"
+               includes="auxdata.jar \
+                         external.jar \
+                         local-visad.jar \
+                         visad.jar \
+                         idv.jar \
+                         nc2.2.jar \
+                         simpleidv.jar \
+                         jython.jar" />
+        </zip>
+    </target>
+
+    <target name="zipdocs" depends="init">
+<!-- TODO: What do we want zipped here? -->
+        <ant antfile="${srcdir}/ucar/build.xml" target="docs" />
+        <zip
+            zipfile="${ftpdir}/idv_userguide_${idv.version}.zip"
+            compress="true">
+            <fileset
+               dir="${basedir}/docs/userguide/"
+               includes="**"
+               excludes="CVS/**" />
+        </zip>
+        <jar
+            jarfile="${ftpdir}/idv_javadoc_${idv.version}.jar"
+            basedir="${basedir}/.."
+            includes="metapps/docs/javadoc/**"
+        />
+    </target>
+
+    <target name="installers" depends="init">
+       <copy file="${installer_src_dir}/idv.install4j" tofile="${installerdir}/idv.install4j.${idv.version}" overwrite="true"/>
+      <install4j 
+          projectfile="${installerdir}/idv.install4j.${idv.version}"
+          release="${idv.version}"
+          destination="${installerdir}"
+      >
+          <variable name="SRCDIR" value="${basedir}"/>
+      </install4j>
+      <checksum>
+        <fileset dir="${installerdir}">
+            <include name="idv_${idv.version.under}_*.sh"/>
+            <include name="idv_${idv.version.under}_*.exe"/>
+            <include name="idv_${idv.version.under}_*.dmg"/>
+        </fileset>
+      </checksum>
+
+    </target>
+
+</project>

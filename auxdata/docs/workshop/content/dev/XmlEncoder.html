@@ -1,0 +1,154 @@
+
+<title>IDV Persistence with XmlEncoder</title>
+
+
+<div class="overview">
+The IDV provides a Java object persistence mechanism.
+</div>
+
+The persistence mechanism is used to save bundles, colortables, station models, etc.
+The persistence is done with the  ucar.unidata.xml.XmlEncoder class.
+The IDV creates the XmlEncoder with the:<pre>
+    protected XmlEncoder getEncoder(boolean forRead) {...}
+</pre>
+method.  If you extend the IntegratedDataViewer class you could override this method
+to initialize the XmlEncoder differently.
+<p>
+If you create new classes that will be persisted there are some conventions your class needs
+to follow.
+<p>
+
+See an example bundle file here: <a href="example.xidv.txt" target="otherwindow">example.xidv</a>
+
+
+
+<ul>
+
+<li> A public parameterless constructor - the &quot;bean&quot; constructor.
+<li> Any attributes that are to be saved have public setters/getters of the form:<pre>
+public void set&lt;Parameter Name&gt;(type param)
+public type get&lt;Parameter Name&gt;()
+</pre>
+
+<li> The XmlEncoder will look at and encode non-static public members so its a good idea not to have any.
+
+<li> The parameter types can be most anything, primitive, arrays, lists, hashtables or an object of a class
+that is also persistable. While public static inner classes are handled, non-static inner classes will no be persistable.
+
+
+<li> If an object is not persistable the XmlEncoder prints a warning and tries to degrade gracefully.
+
+<li> Once we make a release of the IDV we try very (very, very) hard to always have new changes to classes be backwards
+compatible with any encoded version of the class. Bundles that were written 4 years can still (for the most part) be read
+back into the IDV.
+
+<li> Though we have a mechanism to handle class package and name changes we try not to do this. If a public set method
+is removed (or the type is changed) the encoder flags that as a warning. If you want to remove or change an attribute
+you need to keep around the old set method and handle the value appropriately.
+
+</ul>
+
+<h2>XmlDelegate</h2>
+For classes that cannot follow the above conventions one can define a XmlDelegate
+for the class that handles the persistence for objects of that class.
+
+<pre>
+public interface XmlDelegate {
+    /**
+     *  Create the xml element for the given object.
+     *
+     *  @param encoder The XmlEncoder that is calling this method.
+     *  @param object The Object to encode.
+     *  @return The xml element that defines the given object.
+     */
+    public Element createElement(XmlEncoder encoder, Object object);
+
+    /**
+     *  Create the Object defined by the given xml element.
+     *  @param encoder The XmlEncoder that is calling this method.
+     *  @param element The xml that defines the object.
+     *  @return The Object defined by the xml.
+     */
+    public Object createObject(XmlEncoder encoder, Element element);
+}
+</pre>
+
+Most of the uses of this interface are derived from the XmlDelegateImpl which provides
+a default createObject method. The delegates overwrite createElement typically by putting
+on a <i>constructor</i> tag. For example, here we have a delegate that handles the
+persistence of Color objects:
+<pre>
+XmlDelegate xmlDelegate =  new XmlDelegateImpl() {
+         public Element createElement(XmlEncoder e, Object o) {
+             Color color = (Color) o;
+             List args = Misc.newList(new Integer(color.getRed()),
+                                      new Integer(color.getGreen()),
+                                      new Integer(color.getBlue()));
+             List types = Misc.newList(Integer.TYPE, Integer.TYPE,
+                                          Integer.TYPE);
+             return e.createObjectConstructorElement(o, args, types);
+         }
+    });
+</pre>
+
+The utility method <pre>
+XmlEncoder.createObjectConstructorElement(Object o, List args, List types);</pre>
+creates a <i>constructor</i> tag e.g.:
+[ug::xml {
+           <object class="java.awt.Color">
+               <constructor>
+                  <int>0</int>
+                  <int>0</int>
+                  <int>0</int>
+               </constructor>
+          </object>
+}]
+
+
+
+To add a delegate to an XmlEncoder call:
+<pre>
+XmlEncoder.addDelegateForClass(Class theClass, XmlDelegate xmlDelegate);
+</pre>
+The XmlEncoder that the IDV uses is initialized with its own  addDefaultDelegates()
+and with the ucar.visad.VisADPersistence.init(XmlEncoder encoder) method.
+<p>
+Right now there is now way to add delegates through a plugin. 
+
+
+
+
+
+
+<h2>XmlPersistable</h2>
+A class can also implement the interface XmlPersistable and handle its own persistence:
+<pre>
+public interface XmlPersistable {
+    /**
+     *  Create the xml representation of the object.
+     *
+     *  @param encoder The encoder.
+     *  @return The xml representation.
+     */
+    public Element createElement(XmlEncoder encoder);
+
+
+    /**
+     *  Initialize this object from the given xml element.
+     *  @param encoder The encoder.
+     *  @param element The xml element representing this object.
+     *  @return Return  true if it is ok to do the default processing for this node.
+     */
+    public boolean initFromXml(XmlEncoder encoder, Element element);
+}
+</pre>
+
+In this case it still needs a parameter-less constructor but it will handle its own persistence.
+
+
+
+
+
+
+
+

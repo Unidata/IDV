@@ -1,0 +1,91 @@
+<stationtable name="mcidas sites">
+<station idn="" id="UOS" name="University of Saskatchewan" lat="52:10:00" lon="-106:41:00" elev="0"/>
+<station idn="" id="IMDTDA" name="Instituto Mexicano de Tecnologna del Agua" lat="26:30:00" lon="-107:30:00" elev="0"/>
+<station idn="" id="UFDPBB" name="Universidade Federal do Para, Belem, Brazil" lat="-1:23:00" lon="-48:29:00" elev="0"/>
+<station idn="" id="CTAIB" name="Centro Técnico Aeroespacial, IAE Brazil" lat="-23:37:00" lon="-45:23:00" elev="0"/>
+<station idn="" id="URDJB" name="UFRJ, Rio de Janerio, Brazil" lat="-22:55:00" lon="-43:10:00" elev="0"/>
+<station idn="" id="UBAR" name="UBA Argentina" lat="-34:00:00" lon="-56:00:00" elev="0"/>
+<station idn="" id="ABOM" name="Australian Bureau of Meteorology" lat="-37:49:00" lon="--144:58:00" elev="0"/>
+<station idn="" id="MCAN" name="McMurdo, Antarctica" lat="-77:51:00" lon="--166:40:00" elev="0"/>
+<station idn="" id="ASU" name="Arizona State University" lat="33:24:53" lon="-111:54:31" elev="0"/>
+<station idn="" id="CSL" name="Cal State LA" lat="34:25:00" lon="-119:11:00" elev="0"/>
+<station idn="" id="CCNY" name="CCNY" lat="40:47:00" lon="-73:58:00" elev="0"/>
+<station idn="" id="COC" name="College of Charleston" lat="32:53:56" lon="-80:02:26" elev="0"/>
+<station idn="" id="COD" name="College of DuPage" lat="41:36:15" lon="-88:05:05" elev="0"/>
+<station idn="" id="CSU" name="Colorado State University" lat="40:27:00" lon="-105:01:00" elev="0"/>
+<station idn="" id="COR" name="Cornell" lat="42:29:00" lon="-76:27:00" elev="0"/>
+<station idn="" id="CRE" name="Creighton" lat="41:07:00" lon="-95:54:00" elev="0"/>
+<station idn="" id="CU/" name="CU/CIRES" lat="40:00:00" lon="-105:15:48" elev="0"/>
+<station idn="" id="DEUN" name="Denver University" lat="39:33:50" lon="-104:50:54" elev="0"/>
+<station idn="" id="ERU" name="Embry Riddle University" lat="29:11:00" lon="-81:03:00" elev="0"/>
+<station idn="" id="FRANCE" name="France" lat="48:44:00" lon="--2:24:00" elev="0"/>
+<station idn="" id="HAR" name="Harvard" lat="41:57:00" lon="-71:08:00" elev="0"/>
+<station idn="" id="IOST" name="Iowa State" lat="42:02:00" lon="-93:40:00" elev="0"/>
+<station idn="" id="JAPAN" name="Japan" lat="35:33:00" lon="--139:47:00" elev="0"/>
+<station idn="" id="KEUN" name="Kean University" lat="40:40:57" lon="-74:10:10" elev="0"/>
+<station idn="" id="LSU" name="LSU" lat="30:32:00" lon="-91:09:00" elev="0"/>
+<station idn="" id="LSC" name="Lyndon State College" lat="44:30:00" lon="-72:02:00" elev="0"/>
+<station idn="" id="MSU" name="Mankato State University" lat="44:13:00" lon="-93:55:00" elev="0"/>
+<station idn="" id="MUOP" name="Millersville University of Pennsylvania" lat="40:07:13" lon="-76:17:40" elev="0"/>
+<station idn="" id="MSU" name="Minnesota State University" lat="44:13:00" lon="-93:55:00" elev="0"/>
+<station idn="" id="MOCO" name="Moravian College" lat="40:39:00" lon="-75:26:00" elev="0"/>
+<station idn="" id="NAS" name="NASA/LARC" lat="37:05:00" lon="-76:21:00" elev="0"/>
+<station idn="" id="NPS" name="Naval Postgraduate School" lat="36:35:26" lon="-121:50:51" elev="0"/>
+<station idn="" id="NMS" name="NMSU/NSBF" lat="31:44:00" lon="-95:42:00" elev="0"/>
+<station idn="" id="NOAA" name="NOAA" lat="38:51:00" lon="-77:07:00" elev="0"/>
+<station idn="" id="NCSU" name="North Carolina State University" lat="35:52:00" lon="-78:47:00" elev="0"/>
+<station idn="" id="NOIL" name="Northern Illinois" lat="41:54:00" lon="-88:42:00" elev="0"/>
+<station idn="" id="NSF" name="NSF" lat="38:50:54" lon="-77:02:03" elev="0"/>
+<station idn="" id="OHST" name="Ohio State" lat="40:00:00" lon="-82:59:00" elev="0"/>
+<station idn="" id="PSU" name="Penn State University" lat="40:49:00" lon="-77:53:00" elev="0"/>
+<station idn="" id="PSC" name="Plymouth State College" lat="43:37:38" lon="-72:18:21" elev="0"/>
+<station idn="" id="SJSU" name="San Jose State University" lat="37:21:33" lon="-121:55:27" elev="0"/>
+<station idn="" id="SMS" name="Southwest Missouri State" lat="37:14:00" lon="-93:23:00" elev="0"/>
+<station idn="" id="SMS" name="Spanish Meteorological Service" lat="40:27:00" lon="-3:43:00" elev="0"/>
+<station idn="" id="SCS" name="St. Cloud State" lat="45:33:00" lon="-94:03:00" elev="0"/>
+<station idn="" id="SUAL" name="SUNY Albany" lat="42:44:48" lon="-73:47:56" elev="0"/>
+<station idn="" id="SUNA" name="SUNY Nassau" lat="40:47:38" lon="-73:06:06" elev="0"/>
+<station idn="" id="SUOS" name="SUNY Oswego" lat="43:28:00" lon="-76:31:00" elev="0"/>
+<station idn="" id="TASC" name="TASC" lat="38:51:30" lon="-77:03:54" elev="0"/>
+<station idn="" id="UCAR" name="UCAR" lat="40:00:00" lon="-105:15:48" elev="0"/>
+<station idn="" id="UCDA" name="UC Davis" lat="38:03:00" lon="-122:16:00" elev="0"/>
+<station idn="" id="UNKI" name="United Kingdom" lat="51:30:00" lon="-0:30:00" elev="0"/>
+<station idn="" id="UNWE" name="Universal Weather" lat="29:38:15" lon="-95:16:57" elev="0"/>
+<station idn="" id="UTDL" name="Universidade Tecnica de Lisboa/Portugal" lat="38:46:00" lon="-9:08:00" elev="0"/>
+<station idn="" id="UDQAM" name="University du Quebec a Montreal" lat="46:48:00" lon="-71:23:00" elev="0"/>
+<station idn="" id="UOA" name="University of Alabama-Huntsville" lat="34:38:37" lon="-86:47:08" elev="0"/>
+<station idn="" id="UOA" name="University of Arizona" lat="32:07:00" lon="-110:57:00" elev="0"/>
+<station idn="" id="UOB" name="University of Bangkok" lat="13:42:00" lon="--100:34:00" elev="0"/>
+<station idn="" id="UOCR" name="University of Costa Rica" lat="10:00:00" lon="-83:03:00" elev="0"/>
+<station idn="" id="UOD" name="University of Delaware" lat="38:49:00" lon="-75:18:00" elev="0"/>
+<station idn="" id="UOG" name="University of Georgia" lat="33:57:00" lon="-83:20:00" elev="0"/>
+<station idn="" id="UOH" name="University of Hawaii" lat="21:20:00" lon="-157:56:00" elev="0"/>
+<station idn="" id="UOI" name="University of Illinois" lat="40:05:00" lon="-88:12:00" elev="0"/>
+<station idn="" id="UOI" name="University of Iowa" lat="41:39:00" lon="-91:36:00" elev="0"/>
+<station idn="" id="UOK" name="University of Kansas" lat="38:57:00" lon="-95:13:00" elev="0"/>
+<station idn="" id="UOK" name="University of Kentucky" lat="38:02:00" lon="-84:36:00" elev="0"/>
+<station idn="" id="UOL" name="University of Louisiana/Monroe" lat="32:31:00" lon="-92:02:00" elev="0"/>
+<station idn="" id="UOM" name="University of Maryland" lat="38:48:00" lon="-76:53:00" elev="0"/>
+<station idn="" id="UOM" name="University of Miami" lat="25:47:26" lon="-80:18:59" elev="0"/>
+<station idn="" id="UOM" name="University of Missouri" lat="38:56:00" lon="-92:22:00" elev="0"/>
+<station idn="" id="UON" name="University of Nebraska-Lincoln" lat="40:49:52" lon="-96:45:52" elev="0"/>
+<station idn="" id="UON" name="University of Nevada-Reno/DRI" lat="39:45:00" lon="-119:28:00" elev="0"/>
+<station idn="" id="UOND" name="University of North Dakota" lat="47:57:00" lon="-97:11:00" elev="0"/>
+<station idn="" id="UONI" name="University of Northern Iowa" lat="41:53:00" lon="-91:43:00" elev="0"/>
+<station idn="" id="UOO" name="University of Oklahoma" lat="35:13:00" lon="-97:27:00" elev="0"/>
+<station idn="" id="UOSF" name="University of South Florida" lat="27:42:20" lon="-82:24:06" elev="0"/>
+<station idn="" id="UOV" name="University of Virginia" lat="38:08:00" lon="-78:27:00" elev="0"/>
+<station idn="" id="UOW" name="University of Washington" lat="47:26:41" lon="-122:18:49" elev="0"/>
+<station idn="" id="UOW" name="University of Wyoming" lat="41:18:43" lon="-105:40:30" elev="0"/>
+<station idn="" id="USU" name="Utah State University" lat="41:50:00" lon="-111:53:00" elev="0"/>
+<station idn="" id="VAL" name="Valparaiso" lat="41:27:11" lon="-86:59:53" elev="0"/>
+<station idn="" id="WCU" name="West Chester University" lat="39:58:00" lon="-75:33:00" elev="0"/>
+<station idn="" id="UOPR" name="University of Puerto Rico" lat="18:16:00" lon="-67:09:00" elev="0"/>
+<station idn="" id="UOTWI" name="University of the West Indies" lat="17:56:00" lon="-76:47:00" elev="0"/>
+<station idn="" id="OSU" name="Oregon State University" lat="44:31:00" lon="-123:16:00" elev="0"/>
+<station idn="" id="UOK(C" name="University of Kathmandu (via CCNY)" lat="27:42:00" lon="--85:22:00" elev="0"/>
+<station idn="" id="A-KC" name="AWC - Kansas City" lat="39:07:00" lon="-94:36:00" elev="0"/>
+<station idn="" id="TEA&amp;" name="Texas A&amp;M" lat="30:34:56" lon="-96:21:42" elev="0"/>
+<station idn="" id="UNCA" name="UNCA" lat="35:26:00" lon="-82:33:00" elev="0"/>
+</stationtable>
+

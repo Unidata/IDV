@@ -1,0 +1,138 @@
+<html>
+<head>
+<title>Doing More With Formulas</title>
+</head>
+
+<body>
+
+<div class="overview">
+<p>
+A formula for wind chill, and more details about formula names, 
+categories, and variable names
+</p>
+</div>
+
+<P>
+
+First review  
+[ht::popup "SimpleFormulas.html" "Basics of IDV Formulas"].
+
+<p>
+
+<ol class="step">
+
+<li>A Formula for the JAG-TI Wind Chill</li>
+  <ul class="substep">
+    <li>Create an IDV formula named [ht::param wind chill] with the expression
+
+   <ul><pre>13.12 + 0.6215*T - 11.37*WS**0.16 + 0.3965*T*WS**0.16</pre></ul>
+    
+    <LI>T is for air temperature and WS for wind speed. 
+    Choose data for the calculation using
+    data from the case study model output. Use "temperature" and
+    "Derived -> Windspeed (from Grid relative u and v)" from the 3D grids.
+    <li>Make a [ht::display Contour Plan View] display.
+    <LI>Check the contour values to see the results.
+    <li>We did not consider units. The temperature data is in Kelvins, 
+    and the wind speed is in m/s. The formula expects data
+    in  Celsius and kilometers 
+    per hour. So we have to put unit conversion into the formula. 
+    Use (T-273.15) for temperature and 3.6*WS for windspeed. 
+    <li>Edit the formula and saved the changed formula.
+    The revised formula is 
+
+    <ul><pre>13.12 + 0.6215*(T-273.15) - 11.37*(WS*3.6)**0.16  + 0.3965*(T-273.15)*(WS*3.6)**0.16</pre></ul>
+
+    <li>The formula is checked for valid Jython syntax when you save it.
+    If you made a typing mistake a pop-up box appears with "The formula 
+    contains a Jython syntax error." Correct the formula and save again.
+    <li>Display the new computation.
+  </ul>
+</li>
+
+<P>
+
+Here is a wind chill contour plot:
+
+<p>
+<div class="cimg"><img src="images/WindChill.gif"></div>
+<p>
+
+</ol>
+
+<div class="pagesubtitle"> 
+More Details about Formula Names, Categories, and Variable Names</div>
+
+<P>
+
+<!--
+  If the formula name matches a name in the main menu 
+[ht::menu Tools {Parameter Default Editor}], then
+color tables and other settings may be automatically assigned, which
+may or may not be desirable for you. For example, if you create a
+formula named T its displays would get the color tables associated
+with air temperature. The name, with spaces replaced by _, can be used
+as a "method name" in other formulas. To be a Jython method name, the
+name cannot begin with a number, nor have hyphens, but it may have
+underscores.
+-->
+
+The [ht::command Description] is listed in the 
+[ht::dialog {Field Selector}]'s [ht::command Fields] panel.
+If you leave the [ht::command Description] field empty, the name
+of the formula will be used as the description.  
+
+<P>
+
+[ht::command Group] is a way of categorizing your formulas and
+is optional.
+If the [ht::command Group] does not already exist, it is added when
+you save the new formula. If the [ht::command Group] already exists,
+the new formula will appear under that group's tab in the 
+[ht::dialog {Field Selector}]'s [ht::command Fields] panel. If you 
+leave the [ht::command Group] empty, the formula appears in the 
+list directly. 
+
+<P>
+
+The variable names in the formula definition, such as dpt, are dummy
+names, and in principle can be anything, such as "a" or "var2".
+It is best to use variable names that suggest the parameter data
+they represent so that later in the parameter selection step you
+remember what the variables should represent. Use names like Temp500m,
+RelHum_surf, absvort, sst_jan, or whatever makes sense to you. If
+you use a variable names like V1 and V2, then later when the formula
+requests which real parameter name goes with which dummy variable name
+you may be puzzled.
+
+<P>
+
+Once you have defined a formula, it is saved and will appear in future
+runs of your IDV. It is saved in your personal copy of the derived.xml
+file, which usually is in the file 
+[ht::filename ~/.metapps/DefaultIdv/derived.xml]
+on UNIX systems. 
+
+<P>
+
+Holding the mouse pointer stationary over the formula name in the       
+[ht::dialog Field Selector]'s [ht::dialog Fields] panel will cause a    
+tooltip box to appear showing the formula name and the mathematical formula.                   
+
+<P>
+
+Formulas are preserved by the IDV. Next time you start the IDV you will see
+formulas you created before. You can build up a library of your own formulas.
+
+<P>
+
+To remove a formula, click on 
+[ht::command Remove formula] in the [ht::dialog Field Selector]'s
+formula pull down menu. 
+This does not remove a display of calculations made with a formula, it removes
+the formula itself from the 
+[ht::dialog Field Selector] window. Usually you leave formulas
+in place until you are sure you will not use them again.
+
+</body>
+</html>

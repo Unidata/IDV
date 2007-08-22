@@ -1,0 +1,136 @@
+<title>Using Jython in  Layout Models</title>
+<meta name="description"
+content="This section describes how Jython is used to do mathematic operations
+and display formatting."/>
+
+
+Parameter identifiers within a layout model can hold embedded Jython code.
+This allows you
+to do operations on the values and provide more extensive formatting.
+
+<ol class="step">
+  
+  <li>Start fresh. [ht::refresh]
+
+  <li>Open up the [ht::dialog Layout Model Editor] by selecting the
+      [ht::menu Tools {Layout Model Editor}]  menu item.
+      
+  <li>Create a new Layout Model, called &quot;Workshop2&quot;.
+      
+  <ul class="substep">
+    
+    <li>Select the [ht::menu File New] menu item.</li>
+        
+    <li>In the dialog box enter  the name of the new Layout model,
+        [ht::qt   Workshop2].</li>
+        
+    <li>Click the [ht::command OK] button.</li>
+  </ul>
+      
+  <li>Add a [ht::symbol Value]  symbol into the center of the display.</li>
+  <ul class="substep">
+    <li> In the [ht::dialog Properties] window type in [ht::param T] in the 
+[ht::command Parameter] field.</li>
+    <li>Click the [ht::button Save] button.</li>
+  </ul>
+      
+
+<li>[ht::loadPointData]
+</li>
+
+<li>[ht::createStationPlot]
+</li>
+
+      
+<li>In the [ht::dialog Point Data Plot]  display control window make sure the layout
+      model  used is the new [ht::qt Workshop2].</li>
+      
+  <ul>
+    <li>If it isn't click on the [ht::button Change] button and select
+        [ht::qt   Workshop2] from the menu.</li>
+ </ul>
+
+
+  <li>Back to the [ht::dialog Layout Model Editor],  change the parameter
+of the value symbol to be a calculation of dewpoint depression.</li>
+      
+  <ul class="substep">
+    <li>Right click on the value symbol to bring up the [ht::dialog Properties] window.
+    <li>In the [ht::command Parameter] field type in:
+        <p><code>=T-TD</code><p>
+        
+    <li>Any Parameter that begins with [ht::qt =] is treated as a Jython
+        expression.</li>
+        
+    <li>Click [ht::button OK]</li>
+    <li>Save the [ht::filename Workshop2] layout model with the [ht::menu File Save] menu item.</li>
+    <li>You should see the [ht::display Point Data Plot] display change.</li>
+ </ul>
+      
+
+
+
+
+  <li>Now, let's add some formatting.</li>
+  <ul class="substep">
+
+    <li> We want something that looks like &quot; TD: &lt;the value&gt;&quot;
+
+    <li>Bring up the [ht::dialog Properties] dialog for the   value symbol.</li>
+        
+    <li>In the Parameter field type in:
+        [ht::codeBlock ='TD:'+(T-TD)]
+        This is Jython that returns the string 'TD:' concatenated (with the 
+        [ht::qt   +])	the value of [ht::param T-TD].
+
+
+    <li>Click [ht::button Save]. Whoops, what went wrong? Look at the [ht::button  Details] section.
+
+    <li> This is a Jython error. We are trying to convert a double into a string value.
+
+    <li>In the Parameter field change the line to:
+        [ht::codeBlock ='TD:'+str(T-TD)]
+	This changes the double value to a string.
+
+        
+    <li>Click [ht::button OK] and then save the changes by selecting [ht::menu File   Save].</li>
+    <li>You should see the [ht::display Point Data Plot] display change.</li>
+
+    <li>Notice, though, that some of the values are rather long. This is because, normally,
+    numeric values are formatted (e.g., stripping off extra decimals). However, because
+    we are creating a string in Jython there is no formatting occurring.</li>
+
+    <li>To format repeat the steps above but enter:
+         [ht::codeBlock ='TD:'+format(T-TD)]
+         This formats the result of (T-TD) using the format descriptor for the symbol.</li>
+  </ul>
+      
+  <li>So, we are starting to get a bit cluttered with the embedded Jython. We can use the Jython
+      editor to define a function that is callable by the value symbol.</li>
+      <ul>
+      <li>Open the Jython library editor with the [ht::menu Edit Formulas {Jython Library}] 
+          menu from the main menu bar.</li>
+      <li>Type in:
+<pre>
+def showdpd(t,dewpoint):
+        dpd = t-dewpoint
+        return 'TD:'+format(dpd)
+</pre>
+
+
+</li>
+
+<li> Save this Jython with the [ht::menu File Save] menu.
+
+<li>In the [ht::dialog Layout Model Editor] 
+repeat the steps above for the parameter of the value symbol but enter:
+[ht::codeBlock =showdpd(T,TD)]
+</li>
+
+   <li>Click [ht::button Save].
+    <li>You should now see the new values in the [ht::display Point Data Plot] display.</li>
+      </ul>
+</ol>
+
+
+

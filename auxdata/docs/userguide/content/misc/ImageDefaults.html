@@ -1,0 +1,105 @@
+<html><head>
+  <title>Configuring Image Defaults</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+
+<body>
+The defaults for the advanced settings of the Image Chooser 
+is set for particular images through a configuration file.
+You can override the system defaults by creating your own
+configuration file and placing it in the user directory or sitepath
+See the section on <a href="SiteConfiguration.html">
+Site Configuration</a> for more information on the location
+of these directories.
+
+The configuration file (imagedefaults.xml) has the following 
+format:
+
+<pre>
+&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
+&lt;imagedefaults&gt;
+  &lt;default
+     pattern=""
+     key=""
+     place=""
+     loc=""
+     unit=""
+     user=""
+     band=""
+     proj=""/&gt;
+&lt;/imagedefaults&gt;
+</pre>
+
+The attributes that can be overridden are:
+
+<table>
+<tr><td><b>pattern</b></td><td>dataset identifier (format: <b>host:group/desc</b>)</td></tr>
+<tr><td><b>key</b></td><td>type of location (LINELE or LATLON)</td></tr>
+<tr><td><b>place</b></td><td>placement (ULEFT or CENTER)</td></tr>
+<tr><td><b>loc</b></td><td>location of placement (line ele or lat lon)</td></tr>
+<tr><td><b>size</b></td><td>resulting image size (lines eles)</td></tr>
+<tr><td><b>mag</b></td><td>magnification factor (lmag emag)</td></tr>
+<tr><td><b>unit</b></td><td>default calibration unit</td></tr>
+<tr><td><b>band</b></td><td>band number</td></tr>
+<tr><td><b>proj</b></td><td>project number</td></tr>
+<tr><td><b>user</b></td><td>user id (case sensitive)</td></tr>
+<tr><td><b>debug</b></td><td>(true to print lots of debug information)</td></tr>
+</table>
+
+Except for pattern, key and debug, the IDV uses the same keywords/syntax as McIDAS
+(longitudes are entered as degrees east, however).
+The entries are hierarchical, so if you specify some defaults for
+the server, they apply to all datasets on that server unless overridden
+for specific datasets.<p> 
+
+Here are a few examples:
+
+<pre>
+&lt;imagedefaults&gt;
+
+    &lt;default pattern="*" debug="true"/&gt;
+
+    &lt;default
+        pattern="adde.ucar.edu:RTIMAGES/GE-IR"
+        key="LATLON"
+        place="CENTER"
+        loc="40 -90"
+        unit="BRIT"
+        user="foo"
+        proj="9999"/&gt;
+
+    &lt;default
+        pattern="EUM_AD/M8"
+        loc="46 10"
+        band="9"
+        unit="TEMP"
+        size="512 512"/&gt;
+
+    &lt;default
+        pattern="CIMSS/CTP"
+        key="LATLON"
+        loc="35 -100"
+        mag="1 1"
+        unit="CTOP"/&gt;
+
+    &lt;default
+        pattern="GINICOMP/GSN8KVIS"
+        key="LINELE"
+        place="CENTER"
+        loc="504 768"
+        size="504 768"
+        mag="-2 -2"/&gt;
+
+    &lt;default
+        pattern="CCS039/G81KVIS"
+        key="LINELE"
+        place="ULEFT"
+        loc="0 0"
+        size="ALL"/&gt;
+
+&lt;/imagedefaults&gt;
+
+</pre>
+</body>
+</html>

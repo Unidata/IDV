@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<imagedefaults>
+<!--
+  <default name="*" debug="true"/>
+-->
+  <default
+     name="GINIWEST/GW1KVIS"
+     size="700 700"
+     key="LATLON"
+     place="CENTER"
+     loc="36.8 -118"
+     mag="1 1"/>
+  <default
+     name="GINIWEST/GW4K39"
+     size="300 300"
+     key="LATLON"
+     place="CENTER"
+     loc="36.8 -118"
+     mag="1 1"/>
+  <default
+     name="GINIWEST/GW8KWV"
+     size="300 300"
+     key="LATLON"
+     place="CENTER"
+     loc="36.8 -118"
+     mag="1 1"/>
+  <default
+     name="GINIWEST/GW4KIR"
+     size="300 300"
+     key="LATLON"
+     place="CENTER"
+     loc="36.8 -118"
+     mag="1 1"/>
+  <default
+     name="GINIWEST/GW4K12"
+     size="300 300"
+     key="LATLON"
+     place="CENTER"
+     loc="36.8 -118"
+     mag="1 1"/>
+  <default
+     name="RTIMAGES/GW-IR"
+     size="300 300"
+     key="LATLON"
+     place="CENTER"
+     loc="36.8 -118"
+     mag="1 1"/>
+  <default
+     name="RTIMAGES/GW-WV"
+     size="300 300"
+     key="LATLON"
+     place="CENTER"
+     loc="36.8 -118"
+     mag="1 1"/>
+</imagedefaults>

@@ -1,0 +1,120 @@
+<html>
+<head>
+<title>Loading WSR-88D Level II Radar Data</title>
+</head>
+
+<body>
+
+<p>
+
+<div class="overview">
+<p>
+Level II data is accessed in the IDV from files on your 
+local disk, each file having data from one WSR-88D radar 
+for all sweeps (tilt) for one time. 
+</div>
+
+<P>
+<details link="Read more about Receiving and Storing Level II Data">
+<P>
+The Level II data is supplied as volume-scan files, each file having all
+data from one WSR-88D radar for all sweeps for one &quot;time&quot;.
+Unidata Community sites can receive Level II data using the 
+<a href="http://www.unidata.ucar.edu/content/software/ldm/index.html">
+Unidata Local Data Manager (LDM)</a>. Archived Level II data is
+available from the <a href="http://www.ncdc.noaa.gov/"> National
+Climatic Data Center (NCDC)</a> (data from NCDC must be un-tarred and
+optionally, uncompressed for better performance).
+
+<p> The files should be stored on your file system with each station's
+files in a directory (folder) whose directory name is the station
+4-character ID (e.g., KDVN for Davenport, Iowa). In many cases the data
+files do not have any location information in them and the IDV uses the
+directory name as a first guess at the station location. If you are
+working with data files where the directory name is not the station id,
+there is a way to specify the station in the IDV. </details>
+
+
+<P>
+
+For the exercises in this section, we will use Level II data 
+corresponding to the same times as the Level III data we used from
+the Bow Echo Case study in in the workshop dataset.  See 
+[ht::popup ../../installandstart/LocalData.html "Installing local datasets"]
+for more information if you need to install these data.</p>
+
+<ol class="step">
+
+<li>Setup for Level II displays</li>
+  <ul class="substep">
+    <li>[ht::clearDisplaysAndData]
+    <li>Make sure the menu item
+    [ht::menu Projections {Auto-set Projection}] option is checked on.
+    <li> Show the 3D wireframe box by toggling on the main menu item
+    [ht::menu View Show {Wireframe Box}]</code>.
+    </ul>
+</li>
+
+<li>Open the Level II Data Source Chooser</li>
+  <ul class="substep">
+    <li> [ht::openDataSourceChooser] 
+    <li>
+    In the [ht::dialog Data Source Chooser]
+    click on the [ht::tab Radar] tab. 
+    Then click on the [ht::tab Level II]
+    tab to see the Level II radar data chooser panel. 
+    <li>Use the directory (folder) selector to find the radar 
+        station data you want. 
+        <ul class="substep">
+        <li>Go to the directory where the data are stored (e.g., 
+        [ht::filename <%workshop.datadir%>/level2/]).
+        <li>Go to the directory with the name of the station id, KDVN.
+        <li>Select all the files. [ht::listSelect]
+        <li>Click the [ht::button {Add Source}] button. 
+        </ul>
+    </li>
+  </ul>
+</li>
+
+</ol>
+
+<div class="cimg"><img src="images/LevelII.gif"></div>
+
+The data source  [ht::dataset Level II Radar (TLX)]
+appears in the [ht::command Data Sources] list in 
+the [ht::dialog Field Selector]. 
+
+<p>
+
+<div class="cimg"><img src="images/LevelIIDataSource.gif"></div>
+
+<p>
+
+Lets look at some of the properties of this dataset.
+
+<p>
+<li>[ht::editDataSourceProperties [ht::dataset {Level II Radar Data (DVN)}]]
+
+<div class="cimg"><img src="images/LevelIIProperties.gif"></div>
+
+
+    <ul class="substep">
+      <li>If you are looking at realtime data, you can set up the file
+          polling information here to automatically reload new data  as
+          it becomes available.
+      <li>If the volume scans do not contain station information and
+          you did not set the station information in the chooser, you
+          can change the location using the widget in the properties 
+          dialog.
+      <li>Subset the times and choose the last five times from
+           1998-06-29 21:35:57Z to 1998-06-29 21:59:36Z and click
+           [ht::button OK].
+    </ul>
+</ul>
+
+Level II data has three [ht::command Fields] (radar data moments or data types).  
+The IDV has several display types for Level II data. Any of  
+the moments can be shown with any of the displays.  For the following
+exercises, we will use Reflectivity.
+</body>
+</html>

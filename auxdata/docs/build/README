@@ -1,0 +1,353 @@
+
+The generate.tcl script is used to preprocess a collection of html
+files and generate a set of integrated, navigable pages.
+It can create  index, glossarys, faqs,  html popups, etc.
+
+The script is driven by index files called main.index. These
+files define the html files you want processed and their 
+hierarchical organization. A page can be a "parent" of other pages.
+These parent pages can have their list of children embedded within them.
+
+The  style and structure of a processed page is driven by html templates.
+By default the script will look for a template called Template.html
+(more later).
+
+
+------------------------------
+Html and directory structure
+------------------------------
+
+To see how this all works lets look at an example
+For example, assume you have a docs directory:
+
+docs
+  |
+  +----- lib.tcl (optional tcl lib that is sourced)
+  |
+  +----- main.index 
+  |
+  +----- index.html
+  |
+  +----- image.gif
+  |
+  +-----subdir1
+          |
+          +--------main.index
+          |
+          +--------index.html
+          |
+          +--------content1.html
+          |
+          +--------content2.html
+          |
+          +--------images
+                     |
+                     +---- image2.gif
+
+
+
+The docs/main.index file would contains:
+index.html
+>subdir1
+
+The docs/subdir1/main.index file contains:
+
+index.html
+>content1.html
+>content2.html
+
+
+When you run the script from the docs directory:
+
+    tclsh /upc/share/metapps/html/generate.tcl -verbose
+
+(Note: do a:
+tclsh /upc/share/metapps/html/generate.tcl -help
+to get a listing of the command line arguments)
+
+the script will process each page, generating table of contents, etc. 
+By default it will create a mirror directory tree called processed, 
+as a peer of the docs tree. To override this use:
+
+    tclsh /upc/share/metapps/html/generate.tcl -verbose -target /some/other/directory
+
+All gif and jpg files in the directories the script looks at will be copied.
+Also, all images subdirs and their subdirs wil be recursively copied.
+The script will also copy over any style sheets (*.css) that are in your docs directory
+and automatically insert the links to the style sheets in the generated html.
+
+
+
+------------------------------
+  Index files
+------------------------------
+
+Each line in an index file can begin with a greater than sign (">").
+to  define the hierarchical organization. For example,  you can have
+in a index file:
+
+Top.html
+>Sub1.html
+>>Sub1_1.html
+>>Sub1_2.html
+>Sub2.html
+
+
+Each line can also be a set of comma separated files:
+Top.html
+>Sub1.html,Sub2.html,...
+
+Each file can also be a glob style regular expression:
+Top.html
+>Sub*.html
+
+
+It can also be another index file:
+Top.html
+>another.index
+
+
+Or an index file in a subdirectory:
+Top.html
+>subdir/main.index
+
+
+If a line in an index file is a directory then we append the index file name to it
+and recurse, e.g.:
+Top.html
+>subdir
+
+is equivalent to:
+
+Top.html
+>subdir/main.index
+
+
+
+
+You can comment out a line in an index file with "#". e.g.:
+
+content1.html
+content2.html
+#content3.html
+...
+
+
+
+You can define "virtual" pages with the "title:" prefix. e.g.:
+
+title:Page name:Optional page text
+>sub1.html
+>sub2.html
+
+will generate a page called title_page_name.html that contains the
+page text and is the parent of sub1.html and sub2.html
+
+
+
+You can define linked pages with the "link:" prefix. e.g.:
+SomePage.html
+>link:SomePage.html#some_a_name:Title to use
+>link:SomePage.html#some_other_a_name:Another title to use
+
+This  results  in SomePage.html being processed normally. There are entries
+placed in the generated table of contents for the two  subpages.
+
+
+
+You can specify that a file is copied, but not pre-processed, in the index file
+by prepending a "-":
+
+content1.html
+-filetobecopied.html
+...
+
+
+
+
+
+------------------------------
+Titles and page descriptions
+------------------------------
+
+Each index.html and content.html html files should have, at a minimum, a title
+tag. They  can also contain  a description. The description can be specified in 
+a variety of forms:
+
+   Using meta tags:
+     <title>Some title</title> 
+     <meta name="description" content="Some description">
+
+   Using a div with class=overview
+     <title>Some title</title> 
+     <div class="overview">Some description</div>
+
+
+
+The description is used when the list of children in a parent page
+is generated. This is on by default but can be controlled with the
+-childoverview/-nochildoverview
+command line arguments or with the call:
+gen::setIncludeChildOverview 0
+
+
+
+------------------------------
+Running
+------------------------------
+
+To run the script  you need to be in the top level directory of
+your docs tree. Simply run:
+tclsh /upc/share/metapps/html/generate.tcl
+
+By default this will create a directory next to docs called generated.
+You can override this through command line arguments. Do a:
+
+
+
+------------------------------
+New tags
+------------------------------
+
+Popup tag:
+The script supports generating popup web pages. 
+<popup label="The link label">The content of the popup page</popup>
+
+This will result in a link  "The link label" that pops up a generated page that holds
+"The content of the popup page"
+
+
+
+Note tag:
+<note>some text that is not included in the generated html when running generate.tcl -finalversion (which
+is the default).</note>
+To include note text call
+generate.tcl -nofinalversion
+
+
+Faqs:
+You can automatically generate faqs:
+<faq>
+   <faqitem q="Some question">The answer</faqitem>
+   <faqitem q="Another question">Another  answer</faqitem>
+</faq>
+
+
+These can also be categorized:
+<faq>
+   <faqitem cat="Some category"</faqitem>
+   <faqitem q="Some question">The answer</faqitem>
+   <faqitem q="Another question">Another  answer</faqitem>
+
+   <faqitem cat="Some other category"</faqitem>
+   <faqitem q="More question">More  answer</faqitem>
+</faq>
+
+
+
+Subhead tag:
+You can define sub header sections using the subhead tag:
+<subhead id="some_id">Title of subhead</subhead>
+
+This generates:
+<a nmae="some_id"></a>
+<div class="pagesubtitle"> PAGE_LEVEL_LABEL Title  of subhead</div>
+
+This will also add the subhead as  a "linked" child of the page.
+This will include the subhead  in the table of contents. You can turn  this
+off with:
+<subhead id="some_id" intoc="false">Title of subhead</subhead>
+
+
+Glossary tag:
+You can define a glossary in a variety of formats.
+In you html you can use a glossary tag:
+
+<glossary definition="some definiton">some word</glossary>
+Will add "some word" into your glossary and make a link to it.
+
+<glossary word="some word" definition="some definiton">some variant form of some word</glossary>
+Will add "some word" into your glossary and make a link to it.
+
+Without the definition you can just have a link into the glossary:
+<glossary>some word</glossary>
+<glossary word="some word">some variant form of some word</glossary>
+
+You can also have a glossary.tcl file in your docs directory that allows you to predefine the
+definitions. eg.:
+more glossary.tcl
+
+glossary {UPC} {Unidata Program Center}
+glossary {IDV} {The Integrated Data Viewer}
+glossary {Isosurface} {A type of display that shows a 3D surface for a given value}
+glossary {Plan view} {A type of display that shows a horizontal surface.}
+
+
+Definining an index:
+An index is simple to do. Just use an anchor tag with class="index":
+<a name="..." class="index">some text</a>
+
+
+
+
+
+
+
+------------------------------
+Page Templates
+------------------------------
+The actual html is generated using a set of page templates. There are 2 default ones:
+/upc/share/metapps/html/Template.html
+/upc/share/metapps/html/GeneralTemplate.html
+
+The Template.html is used for  content pages.
+The GeneralTemplate.html is used for table of contents, main index, glossary, etc.
+
+To change the look simply copy these templates into your docs directory (or into
+a docs/templates directory). The templates hold macros, e.g., %title%, that are replaced
+with the appropriate html text.
+
+
+------------------------------
+Embedding tcl in your documents 
+------------------------------
+You can embed tcl code in your html to aid in formatting, etc. This is useful if you 
+find yourself doing the same thing over and over again. Enable this with the -tcleval 
+command line  argument:
+tclsh generate.tcl -tcleval
+
+In your html just bracket the tcl calls with "[" & "]":
+
+here is some html [ht::test somestring] and some more html
+
+This treats ht::test as a tcl procedure, passing in the string "somestring"
+
+Now ht::test can be defined in a lib.tcl file in your top level docs directory:
+
+lib.tcl:
+ 
+proc ht::test {s} {
+        return "Some html adornments $s and some more adornments"
+}
+
+
+Look in generate.tcl for some predefined examples.
+
+Note: If you enable tcl evaluation any use of a square bracket is considered tcl code.
+To turn this off you need to escape the square  bracket:
+
+Here is some html, and oh look I am using a \[ bracket.
+
+
+If you want this to always be enabled you can call the enable function in your lib.tcl:
+
+#Turn on tcl evaluation
+gen::setDoTclEvaluation 1
+
+
+
+
+
+
+
+

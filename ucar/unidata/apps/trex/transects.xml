@@ -1,0 +1,5 @@
+<transects>
+  <transect name="Transect A" starttext="A" endtext="A'" points="36.95387649536133,-120.18016052246094,36.74245834350586,-117.14848327636719"/>
+  <transect name="Transect B" starttext="A" endtext="B'" points="36.30099105834961,-119.8968276977539,37.10416030883789,-117.28036499023438"/>
+  <transect name="Transect C" starttext="C" endtext="C'"  points="35.77375793457031,-119.3597412109375,37.190391540527344,-117.78296661376953"/>
+</transects>

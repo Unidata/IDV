@@ -1,0 +1,76 @@
+
+<html>
+<head>
+<title>Doing More with Level II Data Displays</title>
+</head>
+
+<body>
+
+<div class="overview">
+<p>
+Learn to do more with Level II Data Displays
+</p>
+</div>
+
+<p>
+
+<ol class="step">
+
+<li>Access realtime level II data from the file system from the 
+Level II Data Source Chooser</li>
+  <ul class="substep">
+    <li> [ht::openDataSourceChooser] 
+    <li>
+    In the [ht::dialog Data Source Chooser]
+    click on the [ht::tab Radar] tab. 
+    Then click on the [ht::tab Level II]
+    tab to see the Level II radar data chooser panel. 
+    <li>From the [ht::command Relative Times] selector, select the
+    [ht::command Use Most Recent 5 files].
+    <li>Use the directory (folder) selector to find the radar 
+        station data you want. 
+        <ul class="substep">
+        <li>Go to the directory where the data are stored (e.g., 
+        [ht::filename /data/gempak/nexrad/craft]).
+        <li>Pick a station that has weather today.
+        <li>Click the [ht::button {Add Source}] button. 
+        </ul>
+    </li>
+    <li>[ht::editDataSourceProperties]
+    <li>In the [ht::command Polling] section, check the [ht::command Active]
+        option and set the [ht::command Check every] box to 5 minutes, then
+        click [ht::button OK].</li>
+    <li>Select the [ht::param Reflectivity] field and the
+        [ht::display Radar Sweep View in 2D] display, then click
+        [ht::button Create Display].</li>
+    <li>Wait for 5 minutes and see that the display reloads with
+        new data.
+  </ul>
+
+<li>Multiple Radars</li>
+  <ul class="substep">
+    <li>Load Level II data for three or four times from three adjacent stations 
+    which have some detectable signals over the combined area.
+    <li> Make 2D sweeps plots from all stations. Experiment to see if the
+    order you display data from stations makes a difference.
+    <li>Display the same data with 3D sweeps and rotate the view window
+     to see intersecting sweeps.
+  </ul>
+</li>
+
+<li>Multiple Data Sources</li>
+  <ul class="substep">
+    <li>Select a satellite data source that covers a region of the
+    US that includes radars with echos.
+    <li>Overlay the satellite image with Level II radar data.
+  </ul>
+</li>
+
+</ol>
+
+
+<p>
+
+</body>
+</html>
+

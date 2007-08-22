@@ -1,0 +1,18 @@
+
+To make the system colortables.xml you run the ColorTableManager, passing
+as command line arguments the extra.xml and workshop.xml  file:
+java ucar.unidata.ui.colortable.ColorTableManager extra.xml
+
+This  will create the programmatically created color tables and then merge in
+the ones given on the command line.
+
+The extra.xml holds the two transparent colortables from the workshop and
+the pressure msl.
+
+
+If you create some new color tables and want to include them you can merge them into
+the extra.xml by going:
+java ucar.unidata.ui.colortable.ColorTableManager -merge extra.xml yourcolortable.xml
+
+
+

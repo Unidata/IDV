@@ -1,0 +1,102 @@
+<html><head>
+  <title>Profiler Winds</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+<body>
+
+
+
+This section describes how to make plots from 
+the NOAA National Profiler Network.
+The set of steps involve:
+<%childlist%>
+
+
+<subhead id="connecting" intoc="false">Connect to NOAA National Profiler Network data</subhead>
+
+
+In the <a href="../data/choosers/ProfilerChooser.html">Data Chooser</a> select the
+<b>Profiler</b> tab.   
+
+[ht::cimg ../data/choosers/images/ProfilerChooser.gif]
+
+
+In the <b>Server:</b> selection box, use the pull down list to select
+a remote ADDE server with Profiler data, such as <b>adde.ucar.edu</b>.
+In the [ht::command Data interval] selection box you can choose from 
+Hourly, 30 minute, 12 minute, or 6 minute. The Profiler data has
+a 6 minute interval; this selection lets you determine what time step
+will be used in your IDV displays.
+Click on [ht::command Connect].
+Some times first appear selected - highlighted. Check individual times on
+or off with control-click. Select end times and times of a range
+with shift-click.
+
+
+<p>
+
+Select a station by clicking on it on the map. Select a group of stations by 
+dragging the mouse cursor with the shift key to make a 
+rubber band box, or do shift-click to select more than one station.
+The map shows Profiler station names.
+
+<p>
+
+To see more stations check the [ht::command Declutter] box off, 
+The [ht::command Declutter] check box allows you to show all stations (not
+checked), or only a limited number of stations that 
+do not overlap each other (checked).
+More stations appear as you zoom in. 
+You may need to zoom in to see all the stations clearly separated.
+The icons below the map allow you to zoom and pan.
+
+<p>
+
+Once you have selected one or more stations and a set of times,
+click the [ht::command Add Source] button at bottom. You have selected 
+this data to be accessible by the IDV. (You have not yet downloaded any
+profiler data to the IDV. Loading data occurs only when a display is made.)
+
+
+<subhead id="display" intoc="false">
+Making the Profiler displays</subhead>
+
+A label like &quot;Profiler Hourly - 3 stations&quot;
+appears in the <b>Data sources</b> panel in 
+<a href="../data/FieldSelector.html">Field Selector window</a>.
+
+[ht::cimg images/ProfilerDSMenu.gif]
+
+The "Profiler winds" item in the
+<b>Fields</b> panel allows you to make any of the Profiler displays
+for all the stations selected.  You can use the individual station 
+fields to make a display only for that station.
+
+<p>
+
+Click on "Time-Height Display" in the <b>Displays</b> panel, to choose
+this type of display. Then make the display by clicking on <b>Create
+Display</b> in the bottom of the Field Selector window.
+
+<p>
+
+The time/height plot of Profiler data at this station or stations is
+made. The colored globe in the lower right corner of the main IDV window
+indicates that processing and making displays is in progress.
+
+<p>
+
+Similarly you can choose the Station Plot Profiler display (a mapped
+plan view of profiler winds at any single level above sea level) , or
+the 3D View of Profiler data which shows winds at all levels and at all
+stations selected.
+
+
+<subhead id="others" intoc="false">Additional Profiler Displays</subhead>
+For examples of  the Profiler displays, and how to control them, see 
+<a href="../controls/profiler/index.html">Profiler Controls</a>.
+
+ 
+</body>
+</html>

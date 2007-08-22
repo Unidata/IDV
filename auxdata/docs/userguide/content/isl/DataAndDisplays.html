@@ -1,0 +1,183 @@
+<html><head> 
+  <title>ISL Data and Displays</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+[isl::tagdef bundle {Load a bundle} -attrs {file+ {bundle file or url} width {view window width} height  {view window height} times {List of times to use} clear {default is true. remove all existing displays and data} wait {default is true. wait until all displays have been rendered.} }]
+The [isl::tag bundle] tag lets you load in a new bundle and takes the form:
+[isl::xml {
+<bundle file="some_bundle_file.xidv"/>
+}]
+By default it will remove all currently loaded data and displays.
+If you want to not clear out the data and displays then add a clear=&quot;false&quot;
+attribute:
+[isl::xml {
+<bundle file="some_bundle_file.xidv" clear="false"/>
+}]
+
+
+<p>
+The [isl::attr wait] attribute, if true (the default), will essentially do a pause,
+waiting until all displays have been rendered.
+<p>
+
+The [isl::attr times] attribute allows you to override the set of time indices
+that are used in the data sources in the bundle. Note: this overrides the
+times for all data sources in the bundle.
+<p>
+The value is a comma separated list of time specifiers where the specifier
+can be a single time, a time range or a time range with a step.
+The time indices are 0 based, e.g., the first time index is 0.
+The time range is of the form &quot;firsttime:lasttime&quot;.
+To specify a step do: &quot;firsttime:lasttime:step&quot;
+<p>
+For example, we have:
+<pre>
+   times="0"                    -- Just use the first time
+   times="2"                    -- Just use the third time
+   times="0,1,2"                -- Just use the first 3 times
+   times="0:10"                 -- 0 through 10
+   times="0:10:2"               -- 0,2,4,6,8,10
+   times="0:10:2, 20:30"        -- 0,2,4,6,8,10 20-30
+   times="1,2,3,5:11:2,20,30"   -- 1,2 3, 5,7,9,11, 20, 30 
+</pre>
+
+
+[isl::tagdef setfiles {Override the files or urls used in a bundle} -attrs {datasource+ {identifier of the data source} file {new file or url path}}]
+
+
+
+ The bundle tag can contain any number of &quot;setfiles&quot; tags.
+ Each of these setfiles tags has a datasource attribute which is used
+ to find the data source in the bundle by name. There is also a file
+ attribute which defines a file to use for that data source.
+<p>
+ e.g.:
+
+[isl::xml {
+<isl debug="true" offscreen="false">
+    <bundle file="test.xidv">
+         <setfiles datasource=".*" file="/upc/share/testdata/grid/netcdf/nuwg/ruc.nc"/>
+     </bundle>
+     <image file="test.png"/>
+</isl>
+}]
+
+The bundle above only has one data source. The:
+<pre>datasource=".*" </pre>
+identifies
+the data source by name. In this case it is a regular expression that matches
+anything. If you had multiple data sources you can change their name before
+you save the bundle (right click on the data source in the field selector and
+got to the Properties dialog.) You can then use these names to match. e.g.:
+
+[isl::xml {
+<isl debug="true" offscreen="false">
+    <bundle file="test.xidv">
+        <setfiles datasource="datasource1" file="file for first data source"/>
+        <setfiles datasource="datasource2" file="file for 2nd data source"/>
+    </bundle>
+    <image file="test.png"/>
+</isl>
+}]
+
+
+
+If you have a data source with multiple files (e.g., radar) you can use an embedded [isl::tagref fileset] tag:
+
+[isl::xml {
+<setfiles datasource="datasource1">
+    <fileset file="some file"/>
+    <fileset file="some other file"/>
+     ...
+</setfiles>
+}]
+
+
+
+[isl::tagdef datasource {Create a data source} -attrs {url+ {url or file name to load} type {data source type}}]
+The [isl::tag datasource] tag lets you create a new data source and takes the form.
+The [isl::attr url] attribute is required and specifies the file or url to load.
+The [isl::attr type] attribute is optional and defines the data source type
+from the datasources.xml file in the source release. 
+For a text listing see <a href="datasources.txt">datasources.txt</a>.
+For now you can only specify a data source that takes
+a single url (or filename). This will change in the future.
+
+[isl::importxml datasource.isl]
+
+
+[isl::tagdef display {Create a display} -attrs {type+ {display type} param {parameter name}}]
+The [isl::tag display] tag lets you create a display and can exist on its own:
+
+[isl::xml {
+<display type="somedisplaytype" param="some_parameter"/>
+}]
+
+or as a child tag of the [isl::tagref datasource] tag:
+[isl::importxml display.isl]
+
+
+The [isl::attr type] attribute is one of the display control types defined in the controls.xml file 
+from the source release and is required.  For a text listing see <a href="controls.txt">controls.txt</a>.
+<p>
+The [isl::attr param] attribute is not required. If specified it is the name of a parameter in either
+the containing [isl::tag datasource] tag or in one of the currently loaded data sources.
+The [isl::tag display]  tag will evolve in time to provide a richer set of facilities for setting values
+on the display.
+
+
+[isl::tagdef removedisplays {Remove all displays} -attrs {display  {display id to remove}}]
+This removes all current displays. If there is the [isl::attr display] attribute set
+then it removes that display. (<a href="#displayattr">See below</a>). 
+
+[isl::xml {
+<removedisplays/>
+}]
+
+
+[isl::tagdef removeall {Remove all data and displays} -attrs {} ]
+Remove all current data and displays.
+
+[isl::xml {
+<removeall/>
+}]
+
+[isl::tagdef reload {Reload all loaded data} ]
+The [isl::tag reload] tag tells all of the loaded data sources to reload, resulting
+in updated displays.
+[isl::xml {
+<reload/>
+}]
+
+
+[isl::tagdef center {Center a display at a lat/lon, or from a display control} -attrs {lat latitude lon longitude north latitude south latitude east longitude west longitude display {display id to center at} useprojection {Use the projection from the display}}]
+The [isl::tag center] tag comes in a number of  forms, depending on the attributes:
+[isl::importxml center.isl]
+
+<a name="displayattr"></a>
+Using the [isl::attr display] attribute specifies a display control to use.
+This can take two forms. First, you can specify a simple text pattern
+that we try to match on the displays id. The id can be set from the display
+controls property dialog.
+<pre>
+display="some name"
+</pre>
+The second  method is to specify a class name or partial class name:
+<pre>
+display="class:ucar.unidata.idv.TrackControl"
+or:
+display="TrackControl"
+</pre>
+
+
+ 
+
+
+
+
+
+
+</body>

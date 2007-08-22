@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<choosers>
+  <chooser
+     id="wx.text"
+     title="Weather Text"
+     menutitle="Weather Text Products"
+     showinmenu="true"
+     helppath="idv.data.choosers.wxtextchooser"
+     class="ucar.unidata.apps.example.WxTextChooser"
+     showpolling="false"
+     filepattern="adde://.*/wxtext"
+  />
+</choosers>

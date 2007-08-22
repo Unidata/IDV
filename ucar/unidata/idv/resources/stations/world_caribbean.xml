@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="Caribbean" category="World locations">
+<stn name="Andros Island" lat="24:26:N" lon="77:57:W"/>
+<stn name="Antigua " lat="17:03:N" lon="61:48:W"/>
+<stn name="Barbuda " lat="17:38:N" lon="61:48:W"/>
+<stn name="Basse-Terre " lat="16:00:N" lon="61:44:W"/>
+<stn name="Basseterre " lat="17:18:N" lon="62:43:W"/>
+<stn name="Bonaire " lat="12:10:N" lon="68:15:W"/>
+<stn name="Bridgetown " lat="13:06:N" lon="59:37:W"/>
+<stn name="Caicos Islands" lat="21:56:N" lon="71:58:W"/>
+<stn name="Castries " lat="14:01:N" lon="61:00:W"/>
+<stn name="Charlotte Amalie " lat="18:21:N" lon="64:56:W"/>
+<stn name="Curacao" lat="12:10:N" lon="69:00:W"/>
+<stn name="Danish West Indies " lat="18:20:N" lon="64:50:W"/>
+<stn name="Dutch Antilles " lat="12:10:N" lon="68:30:W"/>
+<stn name="Dutch West Indies " lat="12:10:N" lon="68:30:W"/>
+<stn name="Fort-de-France " lat="14:36:N" lon="61:05:W"/>
+<stn name="French West Indies " lat="16:30:N" lon="62:00:W"/>
+<stn name="French West Indies " lat="16:30:N" lon="62:00:W"/>
+<stn name="George Town " lat="19:20:N" lon="81:23:W"/>
+<stn name="George Town " lat="23:30:N" lon="75:46:W"/>
+<stn name="Grand Bahama " lat="26:40:N" lon="78:35:W"/>
+<stn name="Grand Cayman " lat="19:20:N" lon="81:20:W"/>
+<stn name="Grand Turk " lat="21:28:N" lon="71:08:W"/>
+<stn name="Great Inagua " lat="21:00:N" lon="73:20:W"/>
+<stn name="Grenadines, Northern " lat="13:15:N" lon="61:12:W"/>
+<stn name="Grenadines, Southern " lat="12:07:N" lon="61:40:W"/>
+<stn name="Guantanamo Bay " lat="20:00:N" lon="75:08:W"/>
+<stn name="Havana " lat="23:08:N" lon="82:22:W"/>
+<stn name="Hispaniola " lat="18:45:N" lon="71:00:W"/>
+<stn name="Juventud, Isla de la " lat="21:40:N" lon="82:50:W"/>
+<stn name="Kingston " lat="18:00:N" lon="76:48:W"/>
+<stn name="Kingstown " lat="13:09:N" lon="61:14:W"/>
+<stn name="Nassau " lat="25:05:N" lon="77:21:W"/>
+<stn name="Nederlandse Antillen " lat="12:15:N" lon="68:45:W"/>
+<stn name="Nevis " lat="17:09:N" lon="62:35:W"/>
+<stn name="Northern Grenadines " lat="12:45:N" lon="61:15:W"/>
+<stn name="Pines, Isle of " lat="21:40:N" lon="82:50:W"/>
+<stn name="Plymouth " lat="16:44:N" lon="62:14:W"/>
+<stn name="Port-au-Prince " lat="18:32:N" lon="72:20:W"/>
+<stn name="Port-of-Spain " lat="10:39:N" lon="61:31:W"/>
+<stn name="Redonda " lat="16:55:N" lon="62:19:W"/>
+<stn name="Roseau " lat="15:18:N" lon="61:24:W"/>
+<stn name="Saba " lat="17:38:N" lon="63:10:W"/>
+<stn name="Saint Barthelemy " lat="17:55:N" lon="62:52:W"/>
+<stn name="Saint Christopher " lat="17:20:N" lon="62:45:W"/>
+<stn name="Saint Christopher and Nevis" lat="17:20:N" lon="62:45:W"/>
+<stn name="Saint Eustatius " lat="17:30:N" lon="63:00:W"/>
+<stn name="Saint George's " lat="12:03:N" lon="61:45:W"/>
+<stn name="Saint John's " lat="17:06:N" lon="61:51:W"/>
+<stn name="Saint Thomas " lat="18:21:N" lon="64:55:W"/>
+<stn name="Saint-Martin " lat="18:04:N" lon="63:04:W"/>
+<stn name="Sint Eustatius " lat="17:29:N" lon="62:58:W"/>
+<stn name="Sint Maarten " lat="18:04:N" lon="63:04:W"/>
+<stn name="Southern Grenadines " lat="12:20:N" lon="61:30:W"/>
+<stn name="Tobago " lat="11:15:N" lon="60:40:W"/>
+<stn name="Trinidad " lat="10:22:N" lon="61:15:W"/>
+<stn name="Valley, The " lat="18:13:N" lon="63:04:W"/>
+<stn name="Willemstad " lat="12:06:N" lon="68:56:W"/>
+<stn name="Youth, Isle of " lat="21:40:N" lon="82:50:W"/>
+</stationtable>

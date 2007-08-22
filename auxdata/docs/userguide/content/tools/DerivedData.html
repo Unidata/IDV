@@ -1,0 +1,83 @@
+<html><head>
+  <title>Derived Data</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+The IDV uses the formula mechanism to automatically create 
+"derived" quantities based on the fields in a particular
+data source.  When the data source is read in, the list
+of derived quantities is evaluated  against the list of
+variables in the  data.   Users can define their  own
+derived quantities by:
+
+<ul>
+<li> Defining an IDV formula by name, description, and 
+mathematical formula.
+<li> Using special operators (D1, D2, ... DN) for the variable
+names.
+<li> Specifying the binding  between the special operators and
+the parameters names or system aliases.
+<li>Saving the formula and loading or reloading a data source.
+</ul>
+
+See the <a href="Formulas.html">Formulas</a> section for an overview of 
+creating IDV formulas.
+<P>
+
+Create a formula select the [ug::menu Edit Formulas {Create Formula}] 
+menu item. This brings  up the <b>Formula Editor</b> dialog box
+used to define a formula:
+
+[ht::cimg images/formula/AddDerived1.gif]
+
+The minimal information you need to provide is the name
+of the formula and the actual formula.
+<p>
+
+You can use the [ht::command Derived]
+tab in the [ht::command Formula Editor] to set the bindings between
+formula parameters and fields/aliases.    You need to check
+the [ht::command {Create derived quantities}] checkbox  to enable
+this as a system formula.
+<P>
+
+[ht::cimg images/formula/AddDerived2.gif]
+
+
+The parameters to be bound are denoted by operands D1, D2, D3, etc in the
+formula itself.  If you need user input, you can use other field
+names and the users will be prompted to supply those fields.
+<P>
+
+You can define the bindings for the operands using parameter groups or
+by specifying the parameters to use. Right clicking in the 
+[ht::command Parameter] input field will pop up a menu that 
+allows you to select system parameter aliases or parameters from 
+fields loaded into the IDV already. 
+<P>
+
+Categories specify the types of data that are allowed in this
+formula.  For example, if your derived formula is valid only
+for 3D Grids, you can select that category from the popup
+list.   Access the list by right clicking in the Categories
+input fields.
+<p>
+You can define specific output categories if the type of
+the data that the formula creates is different from the
+categories that the input operands require.  In general, 
+the output categories will be the same as the input categories.
+For more information on data categories, see the
+<a href="Formulas.html">Formulas</a> section.
+
+<p>
+To save the formula, click on <b>Add formula</b>. 
+A new entry appears in the Fields panel of the Field Selector.
+If you want to apply the formula to an existing data source, you
+need to reload that data source.  Right click on the name of the
+data source in the [ht::command Data Sources] section of the 
+[ht::command Field Selector] and select [ht::menu {Reload Data}]. 
+
+</body>
+

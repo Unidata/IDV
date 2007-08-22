@@ -1,0 +1,46 @@
+<html><head>
+  <title>Choose Point Observation Data</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+<body>
+
+
+The  [ug::chooser Point] chooser allows you to choose
+global hourly surface weather  station observations (METAR), and  Synoptic data
+from remote ADDE servers.
+[ht::cimg images/PointChooser.gif {Point Data Chooser}]
+
+
+To select Point data:
+<ol>
+<li> Specify an ADDE server and  data type and press connect.
+This chooser works similarly to the  Image chooser described above.
+Once connected to a server the list of available
+times will be shown. 
+
+<li> Choose a relative set of times steps (e.g., Last 5 times).
+When choosing relative times you can set the time increment to use, e.g., 
+Using &quot;3 most recent&quot; times with a &quot;3&quot;hour time
+increment would result in the most recent time, one 3 from 3 hours
+ago and one from 6 hours ago.
+
+
+<li> Or, choose a set of absolute times (e.g., 12Z, 1Z); When choosing 
+absolute times for the first time the IDV needs to query the ADDE server 
+for the times. This may take some time.  
+Times can be selected in the list or the time line
+(use control/click or shift/click in the list to select multiple times).
+See the <a href="../../tools/Timeline.html">Timeline section</a> for details on its use.
+
+
+<li> Optionally, select the station model you want to use
+when displaying this data as a point data plot.
+
+<li> When done, load the selected point data with the [ug::button Add Source] button.
+
+</ol>
+
+
+</body>
+</html>

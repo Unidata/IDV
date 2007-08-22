@@ -1,0 +1,101 @@
+
+<title>Event Capture and Playback</title>
+
+
+
+
+[ht::desc The IDV supports the capture and replay  of a variety of user interface events.]
+
+<div class="overview">
+The IDV supports the capture and replay  of certain user
+interface events, including loading data sources,
+creating and manipulating display controls,
+and changing viewpoints, maps and projections.
+</div>
+
+<ul class="step">
+  
+  <li>First, clear any displays and data. [ht::refresh]</li>
+  
+  <li>Open the [ht::dialog Capture] window by selecting
+      the [ht::menu File {Event Capture}] menu item from the main menu bar.</li>
+  
+  <li>We are going to capture the loading of a data source and the
+      creation of a display.</li>
+  
+  <ul class="substep">
+    
+    <li>Click the [ht::button Start event capture] button to start the
+        capture.</li>
+    
+    <li>[ht::loadBasicGrid]</li>
+    
+    <li>[ht::createBasicDisplay -display {Color-Shaded Plan View}]</li>
+    
+    <li>If it isn't open,  open the  control window for the
+        newly created display control.</li>
+    
+    <li>Select a new level in the [ht::command Level] list.</li>
+    
+    <li>In the main map view move around the 3D space.</li>
+    
+    <li>Change the projection in the main map view by selecting
+        the  [ht::menu Projections Set World] menu item.</li>
+  </ul>
+  
+  <li>Now save this set of events off into a capture file.</li>
+  
+  <ul class="substep">
+    
+    <li>Click the [ht::button Stop Capture] button.
+    <li> Click on the [ht::button Write Captured Events] button to bring up the
+        [ht::dialog Save] dialog.</li>
+    <li>[ht::save workshop.cpt]</li>
+  </ul>
+  
+  <li>Now we are going to replay this capture.</li>
+  
+  <ul class="substep">
+    
+    <li>First, we need to start fresh. [ht::refresh]</li>
+    
+    <li>Load in the file [ht::filename workshop.cpt]
+        by clicking the [ht::button Load Captured Events] button
+        in the [ht::dialog Capture] window.</li>
+    
+    <li>Single step through some of the first events with the step button:
+        [ht::img images/StepForward24.gif].</li>
+    
+    <li>Start the replay by clicking the play button:
+        [ht::img images/Play24.gif].</li>
+    
+    <li>You should see the events that you just did
+        replay in the same speed at which you first did them.</li>
+    
+    <li>Change the  playback speed to [ht::qt 2X] by selecting the button in:
+        [ht::cimg images/CaptureGuiSpeed.gif]</li>
+    
+    <li>Select the [ht::button Skip long delays] checkbox. This allows you
+        to skip over any intervals between events that are greater
+        than one second.</li>
+    
+    <li>If it hasn't run through already press the stop button:
+        [ht::img images/Stop24.gif].</li>
+    
+    <li>Rewind back to the beginning  with the restart button:
+        [ht::img images/Rewind24.gif].</li>
+    
+    <li>Remove the data and displays. [ht::refresh]</li>
+    
+    <li>Change the  playback speed to [ht::qt 10X] and press the
+        [ht::button   Play]   button.</li>
+    
+    <li>When the playback has stopped clear the data and 
+        displays. [ht::refresh]</li>
+  </ul>
+  
+  
+</ul>
+
+
+

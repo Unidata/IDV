@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skin>
+  <ui>
+    <panel layout="border">
+      <idv.menubar place="North"/>
+      <panel
+         place="Center"
+         layout="border">
+        <panel
+           layout="flow"
+           place="North">
+          <idv.toolbar
+             id="idv.toolbar"
+             place="West"/>
+          <panel
+             id="idv.favoritesbar"
+             place="North"/>
+        </panel>
+        <panel
+           layout="border"
+           place="Center">
+          <panel
+             layout="flow"
+             place="North"
+             hspace="4"
+             vspace="4"
+             i:group="viewButtons"
+             i:keypress="Right:ui.group.next(viewButtons);Left:ui.group.prev(viewButtons)"
+             i:actiontemplate="ui.flip(viewholder,%value%);jython:idv.getIdvUIManager().resetLastActiveViewManager();ui.focus(this);">
+            <label text="View:"/>
+            <radio
+               label="View 1"
+               value="view1"
+               default="true"/>
+            <radio
+               label="View 2"
+               value="view2"/>
+            <radio
+               label="View 3"
+               value="view3"/>
+            <radio
+               label="View 4"
+               value="view4"/>
+            <radio
+               label="View 5"
+               value="view5"/>
+          </panel>
+          <cardpanel
+             place="Center"
+             id="viewholder">
+            <idv.view
+               place="Center"
+               id="view1"/>
+            <idv.view
+               place="Center"
+               id="view2"/>
+            <idv.view
+               place="Center"
+               id="view3"/>
+            <idv.view
+               place="Center"
+               id="view4"/>
+            <idv.view
+               place="Center"
+               id="view5"/>
+          </cardpanel>
+        </panel>
+      </panel>
+      <idv.statusbar place="South"  id="bottom_bar"/>
+    </panel>
+  </ui>
+  <styles>
+    <style
+       class="iconbtn"
+       space="2"
+       mouse_enter="ui.setText(idv.messagelabel,prop:tooltip);ui.setBorder(this,etched);"
+       mouse_exit="ui.setText(idv.messagelabel,);ui.setBorder(this,button);"/>
+    <style
+       class="textbtn"
+       space="2"
+       mouse_enter="ui.setText(idv.messagelabel,prop:tooltip)"
+       mouse_exit="ui.setText(idv.messagelabel,)"/>
+  </styles>
+  <components/>
+  <properties>
+    <property
+       name="icon.wait.wait"
+       value="/ucar/unidata/idv/images/wait.gif"/>
+  </properties>
+</skin>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<skin>
+  <ui>
+    <panel
+       layout="inset"
+       space="10">
+      <panel layout="border">
+        <panel
+           layout="flow"
+           place="North">
+          <button
+             class="button1"
+             label="Button 1"/>
+          <button
+             class="button1"
+             label="Button 2"/>
+          <button
+             class="button1"
+             label="Button 3"/>
+        </panel>
+        <label
+           class="labelstyle"
+           id="messagelabel"
+           place="Center"
+           text="label"/>
+
+<!-- You can also have a parent container with "i:..." attributes.
+Children inherit those values  -->
+        <panel
+           i:fgcolor="blue"
+           layout="flow"
+           place="South">
+          <button label="Button 1"/>
+          <button label="Button 2"/>
+          <button label="Button 3"/>
+        </panel>
+      </panel>
+    </panel>
+  </ui>
+  <styles>
+    <style
+       border="button"
+       class="button1"
+       fgcolor="red"
+       mouse_enter="ui.setBorder(this,etched);"
+       mouse_exit="ui.setBorder(this,button);"
+       space="2"/>
+    <style
+       class="labelstyle"
+       fgcolor="green"
+       fontsize="24"
+       space="2"/>
+  </styles>
+</skin>

@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtable name="US Weather Stations">
+<station  id="PABL"  name="Buckland, Buckland Airport"  st="AK"  lat="65:58:56N"  lon="161:09:07W"  co="US" />
+<station  id="PABR"  name="Barrow, Wiley Post-Will Rogers Memorial Airport"  st="AK"  lat="71:17:07N"  lon="156:45:57W"  co="US" />
+<station  id="PAWI"  name="Wainwright, Wainwright Airport"  st="AK"  lat="70:38N"  lon="159:51W"  co="US" />
+<station  id="POLI"  name="Oliktok Distant Early Warning "  st="AK"  lat="70:30N"  lon="149:53W"  co="US" />
+<station  id="PABA"  name="Barter Island, Barter Island LRRS Airport"  st="AK"  lat="70:08:02N"  lon="143:34:37W"  co="US" />
+<station  id="PALU"  name="Cape Lisburne, Cape Lisburne LRRS Airport"  st="AK"  lat="68:53N"  lon="166:06W"  co="US" />
+<station  id="----"  name="Wales"  st=""  lat="65:37N"  lon="168:03W"  co="US" />
+<station  id="PATC"  name="Tin City Airways Facilities Sector"  st="AK"  lat="65:34N"  lon="167:55W"  co="US" />
+<station  id="PAPC"  name="Port Clarence, Port Clarence Coast Guard Station"  st="AK"  lat="65:15N"  lon="166:51W"  co="US" />
+<station  id="PPIZ"  name="Point Lay, Point Lay LRRS Airport"  st="AK"  lat="69:43N"  lon="163:00W"  co="US" />
+<station  id="PAOT"  name="Kotzebue, Ralph Wien Memorial Airport"  st="AK"  lat="66:53:04N"  lon="162:35:54W"  co="US" />
+<station  id="PAUM"  name="Umiat"  st="AK"  lat="69:22N"  lon="152:08W"  co="US" />
+<station  id="PAFM"  name="Ambler, Ambler Airport"  st="AK"  lat="67:06N"  lon="157:51W"  co="US" />
+<station  id="PAIM"  name="Utopia Creek, Indian Mountain LRRS Airport"  st="AK"  lat="66:59N"  lon="153:42W"  co="US" />
+<station  id="PABT"  name="Bettles, Bettles Airport"  st="AK"  lat="66:55N"  lon="151:31W"  co="US" />
+<station  id="PATA"  name="Tanana, Calhoun Memorial Airport"  st="AK"  lat="65:10N"  lon="152:06W"  co="US" />
+<station  id="PFYU"  name="Fort Yukon, Fort Yukon Airport"  st="AK"  lat="66:34N"  lon="145:16W"  co="US" />
+<station  id="PAOM"  name="Nome, Nome Airport"  st="AK"  lat="64:30:43N"  lon="165:26:42W"  co="US" />
+<station  id="PAGM"  name="Gambell, Gambell Airport"  st="AK"  lat="63:46N"  lon="171:44W"  co="US" />
+<station  id="PAUN"  name="Unalakleet"  st="AK"  lat="63:53N"  lon="160:48W"  co="US" />
+<station  id="PACZ"  name="Cape Romanzof, Cape Romanzof LRRS Airport"  st="AK"  lat="61:47N"  lon="166:02W"  co="US" />
+<station  id="----"  name="Nunivak"  st=""  lat="60:00N"  lon="166:00W"  co="US" />
+<station  id="PABE"  name="Bethel, Bethel Airport"  st="AK"  lat="60:46:47N"  lon="161:50:16W"  co="US" />
+<station  id="PAGA"  name="Galena, Edward G. Pitka Sr. Airport"  st="AK"  lat="64:44N"  lon="156:56W"  co="US" />
+<station  id="PAMC"  name="McGrath, McGrath Airport"  st="AK"  lat="62:58N"  lon="155:37W"  co="US" />
+<station  id="PANI"  name="Aniak, Aniak Airport"  st="AK"  lat="61:34:53N"  lon="159:32:34W"  co="US" />
+<station  id="PASV"  name="Sparrevohn Airways Facilities Sector"  st="AK"  lat="61:06N"  lon="155:34W"  co="US" />
+<station  id="PAMH"  name="Minchumina, Minchumina Airport"  st="AK"  lat="63:52:50N"  lon="152:18:02W"  co="US" />
+<station  id="----"  name="Farewell / Intermediate Field"  st=""  lat="63:30N"  lon="153:53W"  co="US" />
+<station  id="PAPT"  name="Puntilla"  st="AK"  lat="62:06N"  lon="152:45W"  co="US" />
+<station  id="PATK"  name="Talkeetna, Talkeetna Airport"  st="AK"  lat="62:19:14N"  lon="150:05:37W"  co="US" />
+<station  id="PASW"  name="Skwentna"  st="AK"  lat="61:58N"  lon="151:11W"  co="US" />
+<station  id="PAEN"  name="Kenai, Kenai Municipal Airport"  st="AK"  lat="60:34:23N"  lon="151:14:42W"  co="US" />
+<station  id="PANN"  name="Nenana, Nenana Municipal Airport"  st="AK"  lat="64:33N"  lon="149:05W"  co="US" />
+<station  id="PAFA"  name="Fairbanks, Fairbanks International Airport"  st="AK"  lat="64:48:14N"  lon="147:52:34W"  co="US" />
+<station  id="----"  name="Summit"  st=""  lat="63:20N"  lon="149:08W"  co="US" />
+<station  id="PAEI"  name="Fairbanks, Eielson Air Force Base"  st="AK"  lat="64:39N"  lon="147:06W"  co="US" />
+<station  id="----"  name="Fort Greely, Ak"  st=""  lat="63:58N"  lon="145:42W"  co="US" />
+<station  id="PABI"  name="Delta Junction/Ft Greely, Allen Army Airfield"  st="AK"  lat="64:00N"  lon="145:44W"  co="US" />
+<station  id="PAFR"  name="Ft. Richardson / Bryant U. S. Army Heliport, Ak"  st="AK"  lat="61:16N"  lon="149:39W"  co="US" />
+<station  id="PAGK"  name="Gulkana, Gulkana Airport"  st="AK"  lat="62:09N"  lon="145:27W"  co="US" />
+<station  id="PAED"  name="Anchorage, Elmendorf Air Force Base"  st="AK"  lat="61:15:11N"  lon="149:47:38W"  co="US" />
+<station  id="PANC"  name="Anchorage, Ted Stevens Anchorage International Airport"  st="AK"  lat="61:10:28N"  lon="149:59:46W"  co="US" />
+<station  id="PAAQ"  name="Palmer, Palmer Municipal Airport"  st="AK"  lat="61:36N"  lon="149:05W"  co="US" />
+<station  id="----"  name="Valdez"  st="AK"  lat="61:08N"  lon="146:21W"  co="US" />
+<station  id="PAWD"  name="Seward"  st="AK"  lat="60:07N"  lon="149:27W"  co="US" />
+<station  id="----"  name="Cape Hinchinbrook"  st=""  lat="60:14N"  lon="146:39W"  co="US" />
+<station  id="PAOR"  name="Northway, Northway Airport"  st="AK"  lat="62:57:40N"  lon="141:55:44W"  co="US" />
+<station  id="PACV"  name="Cordova, Merle K (Mudhole) Smith Airport"  st="AK"  lat="60:29:30N"  lon="145:28:40W"  co="US" />
+<station  id="PACY"  name="Yakataga"  st="AK"  lat="60:05N"  lon="142:30W"  co="US" />
+<station  id="PAEH"  name="Cape Newenham, Cape Newenham LRRS Airport"  st="AK"  lat="58:39N"  lon="162:04W"  co="US" />
+<station  id="PASN"  name="St. Paul Island, St. Paul Island Airport"  st="AK"  lat="57:10N"  lon="170:13W"  co="US" />
+<station  id="PACD"  name="Cold Bay, Cold Bay Airport"  st="AK"  lat="55:13:15N"  lon="162:43:40W"  co="US" />
+<station  id="PADL"  name="Dillingham, Dillingham Airport"  st="AK"  lat="59:03N"  lon="158:31W"  co="US" />
+<station  id="PAKN"  name="King Salmon, King Salmon Airport"  st="AK"  lat="58:40:36N"  lon="156:38:57W"  co="US" />
+<station  id="PAPH"  name="Port Heiden, Port Heiden Airport"  st="AK"  lat="56:57N"  lon="158:38W"  co="US" />
+<station  id="PAIL"  name="Iliamna, Iliamna Airport"  st="AK"  lat="59:45N"  lon="154:54W"  co="US" />
+<station  id="PAHD"  name="Homer / Municipal"  st="AK"  lat="59:38N"  lon="151:30W"  co="US" />
+<station  id="PAMD"  name="Middleton Island, Middleton Island Airport"  st="AK"  lat="59:26N"  lon="146:18W"  co="US" />
+<station  id="PADQ"  name="Kodiak, Kodiak Airport"  st="AK"  lat="57:45N"  lon="152:30W"  co="US" />
+<station  id="PACP"  name="Cape Saint Elias"  st="AK"  lat="59:48N"  lon="144:36W"  co="US" />
+<station  id="PAYA"  name="Yakutat"  st="AK"  lat="59:31N"  lon="139:40W"  co="US" />
+<station  id="PAGY"  name="Skagway"  st="AK"  lat="59:28N"  lon="135:18W"  co="US" />
+<station  id="PAQT"  name="Nuiqsut, Nuiqsut Airport"  st="AK"  lat="70:12:36N"  lon="151:00:20W"  co="US" />
+<station  id="PAGS"  name="Gustavus, Gustavus Airport"  st="AK"  lat="58:25N"  lon="135:42W"  co="US" />
+<station  id="PASI"  name="Sitka, Sitka Airport"  st="AK"  lat="57:02:53N"  lon="135:21:53W"  co="US" />
+<station  id="PAJN"  name="Juneau, Juneau International Airport"  st="AK"  lat="58:21:17N"  lon="134:34:34W"  co="US" />
+<station  id="PAGN"  name="Angoon"  st="AK"  lat="57:30N"  lon="134:35W"  co="US" />
+<station  id="----"  name="Five Finger Light"  st=""  lat="57:16N"  lon="133:37W"  co="US" />
+<station  id="PAPG"  name="Petersburg"  st="AK"  lat="56:49N"  lon="132:58W"  co="US" />
+<station  id="PAWG"  name="Wrangell"  st="AK"  lat="56:29N"  lon="132:22W"  co="US" />
+<station  id="----"  name="Cape Decision Automatic Meteorological Observing System "  st="AK"  lat="56:00N"  lon="134:08W"  co="US" />
+<station  id="PAKW"  name="Klawock, Klawock Airport"  st="AK"  lat="55:35N"  lon="133:05W"  co="US" />
+<station  id="PAKT"  name="Ketchikan, Ketchikan International Airport"  st="AK"  lat="55:21:20N"  lon="131:42:49W"  co="US" />
+<station  id="PANT"  name="Annette, Annette Island Airport"  st="AK"  lat="55:02:32N"  lon="131:34:20W"  co="US" />
+<station  id="----"  name="Attu"  st=""  lat="52:50N"  lon="173:11E"  co="US" />
+<station  id="PASY"  name="Shemya, Eareckson As"  st="AK"  lat="52:43:00N"  lon="174:07:00E"  co="US" />
+<station  id="PADK"  name="Adak Island, Adak Airport"  st="AK"  lat="51:52:40N"  lon="176:38:45W"  co="US" />
+<station  id="PAKO"  name="Nikolski"  st="AK"  lat="52:57N"  lon="168:51W"  co="US" />
+<station  id="PADU"  name="Unalaska, Unalaska Airport"  st="AK"  lat="53:54N"  lon="166:32W"  co="US" />
+<station  id="KEYW"  name="Key West, Key West International Airport"  st="FL"  lat="24:33:13N"  lon="081:45:13W"  co="US" />
+<station  id="KMIA"  name="Miami, Miami International Airport"  st="FL"  lat="25:47:26N"  lon="080:18:59W"  co="US" />
+<station  id="KPBI"  name="West Palm Beach, Palm Beach International Airport"  st="FL"  lat="26:41:05N"  lon="080:05:58W"  co="US" />
+<station  id="KMLB"  name="Melbourne, Melbourne International Airport"  st="FL"  lat="28:06:10N"  lon="080:38:45W"  co="US" />
+<station  id="KMCO"  name="Orlando, Orlando International Airport"  st="FL"  lat="28:25:02N"  lon="081:19:30W"  co="US" />
+<station  id="KJAX"  name="Jacksonville, Jacksonville International Airport"  st="FL"  lat="30:29:40N"  lon="081:41:36W"  co="US" />
+<station  id="KSAV"  name="Savannah, Savannah International Airport"  st="GA"  lat="32:07:08N"  lon="081:12:08W"  co="US" />
+<station  id="KCHS"  name="Charleston, Charleston Air Force Base"  st="SC"  lat="32:53:56N"  lon="080:02:26W"  co="US" />
+<station  id="KLHW"  name="Ft. Stewart"  st="GA"  lat="31:53N"  lon="081:34W"  co="US" />
+<station  id="KTBW"  name="Tampa Bay Area"  st="FL"  lat="27:42N"  lon="082:24W"  co="US" />
+<station  id="KTPA"  name="Tampa, Tampa International Airport"  st="FL"  lat="27:57:41N"  lon="082:32:25W"  co="US" />
+<station  id="KCTY"  name="Cross City, Cross City Airport"  st="FL"  lat="29:33:00N"  lon="083:06:19W"  co="US" />
+<station  id="KAYS"  name="Waycross / Ware County, Ga"  st="GA"  lat="31:15N"  lon="082:24W"  co="US" />
+<station  id="KTLH"  name="Tallahassee, Tallahassee Regional Airport"  st="FL"  lat="30:23:35N"  lon="084:21:12W"  co="US" />
+<station  id="----"  name="Peachtree City, Ga."  st="GA"  lat="33:22N"  lon="084:34W"  co="US" />
+<station  id="KABY"  name="Albany, Southwest Georgia Regional Airport"  st="GA"  lat="31:32:08N"  lon="084:11:40W"  co="US" />
+<station  id="KMCN"  name="Macon, Middle Georgia Regional Airport"  st="GA"  lat="32:41:16N"  lon="083:39:16W"  co="US" />
+<station  id="KAGS"  name="Augusta, Bush Field"  st="GA"  lat="33:21:52N"  lon="081:57:48W"  co="US" />
+<station  id="KATL"  name="Atlanta, Hartsfield Atlanta International Airport"  st="GA"  lat="33:37:47N"  lon="084:26:32W"  co="US" />
+<station  id="KAQQ"  name="Apalachicola, Apalachicola"  st="FL"  lat="29:43:37N"  lon="085:01:29W"  co="US" />
+<station  id="KVPS"  name="Valparaiso / Eglin Air Force Base"  st="FL"  lat="30:29N"  lon="086:31W"  co="US" />
+<station  id="KMOB"  name="Mobile, Mobile Regional Airport"  st="AL"  lat="30:41:18N"  lon="088:14:44W"  co="US" />
+<station  id="----"  name="Cape San Blas, Fl."  st=""  lat="29:41N"  lon="085:22W"  co="US" />
+<station  id="KLSF"  name="Fort Benning"  st="GA"  lat="32:20N"  lon="084:50W"  co="US" />
+<station  id="KMGM"  name="Montgomery, Dannelly Field"  st="AL"  lat="32:18:01N"  lon="086:24:22W"  co="US" />
+<station  id="KMGE"  name="Marietta / Dobbins Air Force Base"  st="GA"  lat="33:55N"  lon="084:31W"  co="US" />
+<station  id="KBHM"  name="Birmingham, Birmingham International Airport"  st="AL"  lat="33:33:56N"  lon="086:44:42W"  co="US" />
+<station  id="KCKL"  name="Centreville"  st="AL"  lat="32:54N"  lon="087:15W"  co="US" />
+<station  id="----"  name="Shelby Country Airport, Al."  st="AL"  lat="33:10N"  lon="086:46W"  co="US" />
+<station  id="KMSY"  name="New Orleans, New Orleans International Airport"  st="LA"  lat="29:59:34N"  lon="090:15:03W"  co="US" />
+<station  id="KBVE"  name="Boothville"  st="LA"  lat="29:20N"  lon="089:24W"  co="US" />
+<station  id="KLIX"  name="Slidell"  st="LA"  lat="30:20N"  lon="089:49W"  co="US" />
+<station  id="KMEI"  name="Meridian, Key Field"  st="MS"  lat="32:20:17N"  lon="088:44:52W"  co="US" />
+<station  id="KJAN"  name="Jackson, Jackson International Airport"  st="MS"  lat="32:19:11N"  lon="090:04:39W"  co="US" />
+<station  id="KPOE"  name="Fort Polk"  st="LA"  lat="31:02N"  lon="093:02W"  co="US" />
+<station  id="KLCH"  name="Lake Charles, Lake Charles Regional Airport"  st="LA"  lat="30:07:34N"  lon="093:13:24W"  co="US" />
+<station  id="KBPT"  name="Beaumont / Port Arthur, Southeast Texas Regional Airport"  st="TX"  lat="29:57:03N"  lon="094:01:15W"  co="US" />
+<station  id="KGLS"  name="Galveston, Scholes Field"  st="TX"  lat="29:16:13N"  lon="094:51:51W"  co="US" />
+<station  id="KIAH"  name="Houston, Houston Intercontinental Airport"  st="TX"  lat="29:59:33N"  lon="095:21:50W"  co="US" />
+<station  id="KGGG"  name="Longview, Gregg County Airport"  st="TX"  lat="32:23:26N"  lon="094:42:50W"  co="US" />
+<station  id="KSHV"  name="Shreveport, Shreveport Regional Airport"  st="LA"  lat="32:26:49N"  lon="093:49:27W"  co="US" />
+<station  id="KFWD"  name="Fort Worth"  st="TX"  lat="32:50N"  lon="097:18W"  co="US" />
+<station  id="KBRO"  name="Brownsville, Brownsville / South Padre Island International Airport"  st="TX"  lat="25:54:51N"  lon="097:25:23W"  co="US" />
+<station  id="KCRP"  name="Corpus Christi, Corpus Christi International Airport"  st="TX"  lat="27:46:23N"  lon="097:30:46W"  co="US" />
+<station  id="KLRD"  name="Laredo International Airport"  st="TX"  lat="27:33N"  lon="099:28W"  co="US" />
+<station  id="KSAT"  name="San Antonio, San Antonio International Airport"  st="TX"  lat="29:31:58N"  lon="098:27:49W"  co="US" />
+<station  id="KATT"  name="Austin City, Austin Camp Mabry"  st="TX"  lat="30:19N"  lon="097:46W"  co="US" />
+<station  id="KVCT"  name="Victoria, Victoria Regional Airport"  st="TX"  lat="28:51:45N"  lon="096:55:47W"  co="US" />
+<station  id="KACT"  name="Waco, Waco Regional Airport"  st="TX"  lat="31:37:02N"  lon="097:13:40W"  co="US" />
+<station  id="KHLR"  name="Fort Hood"  st="TX"  lat="31:06N"  lon="097:20W"  co="US" />
+<station  id="KDFW"  name="Dallas / Fort Worth, Dallas / Fort Worth International Airport"  st="TX"  lat="32:53:49N"  lon="097:01:19W"  co="US" />
+<station  id="KSEP"  name="Stephenville, Clark Field Municipal Airport"  st="TX"  lat="32:13N"  lon="098:11W"  co="US" />
+<station  id="KDRT"  name="Del Rio, Del Rio International Airport"  st="TX"  lat="29:22:29N"  lon="100:55:25W"  co="US" />
+<station  id="KGDP"  name="Pine Springs, Guadalupe Mountains National Park"  st="TX"  lat="31:49:52N"  lon="104:48:32W"  co="US" />
+<station  id="KSJT"  name="San Angelo, Mathis Field"  st="TX"  lat="31:21:05N"  lon="100:29:38W"  co="US" />
+<station  id="KMRF"  name="Marfa"  st="TX"  lat="30:22N"  lon="104:01W"  co="US" />
+<station  id="KMAF"  name="Midland, Midland International Airport"  st="TX"  lat="31:56:52N"  lon="102:12:31W"  co="US" />
+<station  id="KABI"  name="Abilene, Abilene Regional Airport"  st="TX"  lat="32:24:37N"  lon="099:40:54W"  co="US" />
+<station  id="KLBB"  name="Lubbock, Lubbock International Airport"  st="TX"  lat="33:40:03N"  lon="101:49:17W"  co="US" />
+<station  id="KROW"  name="Roswell, Roswell Industrial Air Center Airport"  st="NM"  lat="33:18:29N"  lon="104:30:28W"  co="US" />
+<station  id="K2C2"  name="White Sands"  st="NM"  lat="32:23N"  lon="106:29W"  co="US" />
+<station  id="KELP"  name="El Paso, El Paso International Airport"  st="TX"  lat="31:48:40N"  lon="106:22:33W"  co="US" />
+<station  id="KTCS"  name="Truth Or Consequences, Truth Or Consequences Municipal Airport"  st="NM"  lat="33:14:12N"  lon="107:16:05W"  co="US" />
+<station  id="KSVC"  name="Silver City / Grant"  st="NM"  lat="32:38N"  lon="108:09W"  co="US" />
+<station  id="KFHU"  name="Fort Huachuca"  st="AZ"  lat="31:35N"  lon="110:20W"  co="US" />
+<station  id="KTUS"  name="Tucson, Tucson International Airport"  st="AZ"  lat="32:07:53N"  lon="110:57:19W"  co="US" />
+<station  id="KRQE"  name="Window Rock, Window Rock Airport"  st="AZ"  lat="35:39N"  lon="109:04W"  co="US" />
+<station  id="KPHX"  name="Phoenix, Phoenix Sky Harbor International Airport"  st="AZ"  lat="33:26:03N"  lon="112:03:04W"  co="US" />
+<station  id="KYUM"  name="Yuma / Yuma International"  st="AZ"  lat="32:39N"  lon="114:36W"  co="US" />
+<station  id="KNJK"  name="El Centro, Naval Air Facility"  st="CA"  lat="32:49:30N"  lon="115:39:38W"  co="US" />
+<station  id="KRIV"  name="Riverside / March Air Force Base"  st="CA"  lat="33:54N"  lon="117:15W"  co="US" />
+<station  id="KBUR"  name="Burbank, Burbank-Glendale-Pasadena Airport"  st="CA"  lat="34:11:59N"  lon="118:21:53W"  co="US" />
+<station  id="KMWS"  name="Mount Wilson"  st="CA"  lat="34:14N"  lon="118:04W"  co="US" />
+<station  id="KSAN"  name="San Diego, San Diego International-Lindbergh Field"  st="CA"  lat="32:44:01N"  lon="117:10:59W"  co="US" />
+<station  id="KNSI"  name="San Nicholas Island"  st="CA"  lat="33:14:05N"  lon="119:27:10W"  co="US" />
+<station  id="KAVX"  name="Avalon, Catalina Airport"  st="CA"  lat="33:24:18N"  lon="118:24:57W"  co="US" />
+<station  id="KNKX"  name="San Diego, Miramar MCAS/Mitscher Field Airport"  st="CA"  lat="32:52:06N"  lon="117:08:33W"  co="US" />
+<station  id="KLAX"  name="Los Angeles, Los Angeles International Airport"  st="CA"  lat="33:56:17N"  lon="118:23:20W"  co="US" />
+<station  id="KLGB"  name="Long Beach, Long Beach Airport"  st="CA"  lat="33:48:42N"  lon="118:08:47W"  co="US" />
+<station  id="KPOB"  name="Pope Air Force Base"  st="NC"  lat="35:10N"  lon="079:02W"  co="US" />
+<station  id="KHAT"  name="Cape Hatteras"  st="NC"  lat="35:16N"  lon="075:33W"  co="US" />
+<station  id="KMHX"  name="Newport"  st="NC"  lat="34:47N"  lon="076:53W"  co="US" />
+<station  id="KRDU"  name="Raleigh / Durham, Raleigh-Durham International Airport"  st="NC"  lat="35:52:14N"  lon="078:47:11W"  co="US" />
+<station  id="KORF"  name="Norfolk, Norfolk International Airport"  st="VA"  lat="36:54:13N"  lon="076:11:31W"  co="US" />
+<station  id="KNKT"  name="Cherry Point, Marine Corps Air Station"  st="NC"  lat="34:53:52N"  lon="076:52:51W"  co="US" />
+<station  id="KCAE"  name="Columbia, Columbia Metropolitan Airport"  st="SC"  lat="33:56:31N"  lon="081:07:05W"  co="US" />
+<station  id="KAHN"  name="Athens, Athens Airport"  st="GA"  lat="33:57:03N"  lon="083:19:41W"  co="US" />
+<station  id="KGSP"  name="Greer, Greenville-Spartanburg Airport"  st="SC"  lat="34:53:02N"  lon="082:13:15W"  co="US" />
+<station  id="KCLT"  name="Charlotte, Charlotte / Douglas International Airport"  st="NC"  lat="35:12:48N"  lon="080:56:55W"  co="US" />
+<station  id="KAVL"  name="Asheville, Asheville Regional Airport"  st="NC"  lat="35:25:55N"  lon="082:32:15W"  co="US" />
+<station  id="KGSO"  name="Greensboro, Piedmont Triad International Airport"  st="NC"  lat="36:05:51N"  lon="079:56:37W"  co="US" />
+<station  id="----"  name="Blacksburg, Va."  st="VA"  lat="37:12N"  lon="080:25W"  co="US" />
+<station  id="KRMG"  name="Rome, R. B. Russell Airport"  st="GA"  lat="34:20:52N"  lon="085:09:40W"  co="US" />
+<station  id="KHSV"  name="Huntsville, Huntsville International / Jones Field"  st="AL"  lat="34:38:37N"  lon="086:47:08W"  co="US" />
+<station  id="KCHA"  name="Chattanooga, Lovell Field"  st="TN"  lat="35:02:00N"  lon="085:12:00W"  co="US" />
+<station  id="KTYS"  name="Knoxville, McGhee Tyson Airport"  st="TN"  lat="35:49:05N"  lon="083:59:09W"  co="US" />
+<station  id="KBNA"  name="Nashville, Nashville International Airport"  st="TN"  lat="36:07:08N"  lon="086:41:21W"  co="US" />
+<station  id="KTUP"  name="Tupelo, Tupelo Regional Airport"  st="MS"  lat="34:16:05N"  lon="088:46:12W"  co="US" />
+<station  id="KMEM"  name="Memphis, Memphis International Airport"  st="TN"  lat="35:03:40N"  lon="089:59:06W"  co="US" />
+<station  id="KLZK"  name="North Little Rock, North Little Rock Airport"  st="AR"  lat="34:50N"  lon="092:15W"  co="US" />
+<station  id="----"  name="Page, Ok."  st=""  lat="34:41N"  lon="094:37W"  co="US" />
+<station  id="KRUE"  name="Russellville, Russellville Regional Airport"  st="AR"  lat="35:15:32N"  lon="093:05:36W"  co="US" />
+<station  id="KFSM"  name="Fort Smith, Fort Smith Regional Airport"  st="AR"  lat="35:20:01N"  lon="094:21:54W"  co="US" />
+<station  id="----"  name="West Plains, Mo"  st="MO"  lat="36:44N"  lon="091:51W"  co="US" />
+<station  id="----"  name="Monette Mo."  st=""  lat="36:53N"  lon="093:54W"  co="US" />
+<station  id="KSPS"  name="Wichita Falls, Sheppard Air Force Base"  st="TX"  lat="33:58:43N"  lon="098:29:34W"  co="US" />
+<station  id="KLTS"  name="Altus Air Force Base"  st="OK"  lat="34:39N"  lon="099:16W"  co="US" />
+<station  id="KOKC"  name="Oklahoma City, Will Rogers World Airport"  st="OK"  lat="35:23:19N"  lon="097:36:01W"  co="US" />
+<station  id="KTIK"  name="Tinker Air Force Base"  st="OK"  lat="35:25N"  lon="097:23W"  co="US" />
+<station  id="KFSI"  name="Fort Sill"  st="OK"  lat="34:36N"  lon="098:24W"  co="US" />
+<station  id="KTUL"  name="Tulsa, Tulsa International Airport"  st="OK"  lat="36:11:51N"  lon="095:53:11W"  co="US" />
+<station  id="KOUN"  name="Norman / Max Westheimer"  st="OK"  lat="35:13N"  lon="097:27W"  co="US" />
+<station  id="KCAO"  name="Clayton, Clayton Municipal Airpark"  st="NM"  lat="36:26:54N"  lon="103:09:11W"  co="US" />
+<station  id="KONM"  name="Socorro Municipal"  st="NM"  lat="34:01N"  lon="106:54W"  co="US" />
+<station  id="KAMA"  name="Amarillo, Amarillo International Airport"  st="TX"  lat="35:13:12N"  lon="101:43:02W"  co="US" />
+<station  id="KEPZ"  name="Santa Teresa"  st="NM"  lat="31:52N"  lon="106:42W"  co="US" />
+<station  id="KABQ"  name="Albuquerque, Albuquerque International Airport"  st="NM"  lat="35:02:30N"  lon="106:36:53W"  co="US" />
+<station  id="KIGM"  name="Kingman, Kingman Airport"  st="AZ"  lat="35:15:28N"  lon="113:55:59W"  co="US" />
+<station  id="KPGA"  name="Page, Page Municipal Airport"  st="AZ"  lat="36:55:14N"  lon="111:26:53W"  co="US" />
+<station  id="KINW"  name="Winslow, Winslow Municipal Airport"  st="AZ"  lat="35:01:41N"  lon="110:43:15W"  co="US" />
+<station  id="----"  name="Flagstaff, Az."  st="AZ"  lat="35:14N"  lon="111:49W"  co="US" />
+<station  id="KEDW"  name="Edwards Air Force Base"  st="CA"  lat="34:55N"  lon="117:54W"  co="US" />
+<station  id="KPMD"  name="Palmdale, Palmdale Production Flight Plant"  st="CA"  lat="34:37:47N"  lon="118:04:53W"  co="US" />
+<station  id="KSDB"  name="Sandberg"  st="CA"  lat="34:44:37N"  lon="118:43:28W"  co="US" />
+<station  id="KBFL"  name="Bakersfield, Meadows Field Airport"  st="CA"  lat="35:26:01N"  lon="119:03:24W"  co="US" />
+<station  id="KLAS"  name="Las Vegas, McCarran International Airport"  st="NV"  lat="36:04:44N"  lon="115:09:19W"  co="US" />
+<station  id="KDRA"  name="Mercury, Desert Rock Airport"  st="NV"  lat="36:37:14N"  lon="116:01:40W"  co="US" />
+<station  id="KFAT"  name="Fresno, Fresno Air Terminal"  st="CA"  lat="36:46:48N"  lon="119:43:10W"  co="US" />
+<station  id="K87Q"  name="Point Piedras Blanca"  st="CA"  lat="35:39:56N"  lon="121:17:05W"  co="US" />
+<station  id="KNTD"  name="Point Mugu, Naval Air Warfare Center"  st="CA"  lat="34:07:26N"  lon="119:07:18W"  co="US" />
+<station  id="KVBG"  name="Vandenberg Air Force Base"  st="CA"  lat="34:45N"  lon="120:34W"  co="US" />
+<station  id="KSMX"  name="Santa Maria, Santa Maria Public Airport"  st="CA"  lat="34:53:58N"  lon="120:26:55W"  co="US" />
+<station  id="KRIC"  name="Richmond, Richmond International Airport"  st="VA"  lat="37:30:40N"  lon="077:19:24W"  co="US" />
+<station  id="KWAL"  name="Wallops Island, Wallops Flight Facility Airport"  st="VA"  lat="37:56:26N"  lon="075:27:47W"  co="US" />
+<station  id="KIAD"  name="Washington DC, Washington-Dulles International Airport"  st="VA"  lat="38:56:05N"  lon="077:26:51W"  co="US" />
+<station  id="KNHK"  name="Patuxent River, Naval Air Station"  st="MD"  lat="38:16:43N"  lon="076:24:50W"  co="US" />
+<station  id="KDCA"  name="Washington DC, Reagan National Airport"  st="VA"  lat="38:50:54N"  lon="077:02:03W"  co="US" />
+<station  id="KBWI"  name="Baltimore, Baltimore-Washington International Airport"  st="MD"  lat="39:10:00N"  lon="076:41:00W"  co="US" />
+<station  id="KACY"  name="Atlantic City, Atlantic City International Airport"  st="NJ"  lat="39:27:53N"  lon="074:35:12W"  co="US" />
+<station  id="KPHL"  name="Philadelphia, Philadelphia International Airport"  st="PA"  lat="39:52:06N"  lon="075:13:52W"  co="US" />
+<station  id="KNEL"  name="Lakehurst Naval Air Station"  st="NJ"  lat="40:02N"  lon="074:19W"  co="US" />
+<station  id="KLYH"  name="Lynchburg, Lynchburg Regional Airport"  st="VA"  lat="37:19:15N"  lon="079:12:24W"  co="US" />
+<station  id="KROA"  name="Roanoke, Roanoke Regional Airport"  st="VA"  lat="37:19:01N"  lon="079:58:27W"  co="US" />
+<station  id="KBKW"  name="Beckley, Raleigh County Memorial Airport"  st="WV"  lat="37:47:42N"  lon="081:07:29W"  co="US" />
+<station  id="KCRW"  name="Charleston, Yeager Airport"  st="WV"  lat="38:22:46N"  lon="081:35:29W"  co="US" />
+<station  id="KEKN"  name="Elkins, Elkins-Randolph County-Jennings Randolph Field"  st="WV"  lat="38:53:07N"  lon="079:51:10W"  co="US" />
+<station  id="KCVG"  name="Covington / Cincinnati, Cincinnati / Northern Kentucky International Airport"  st="KY"  lat="39:02:35N"  lon="084:40:18W"  co="US" />
+<station  id="KLEX"  name="Lexington, Blue Grass Airport"  st="KY"  lat="38:02:27N"  lon="084:36:21W"  co="US" />
+<station  id="KSDF"  name="Louisville, Standiford Field"  st="KY"  lat="38:10:38N"  lon="085:43:47W"  co="US" />
+<station  id="KFTK"  name="Fort Knox"  st="KY"  lat="37:54N"  lon="085:58W"  co="US" />
+<station  id="KHTS"  name="Huntington, Tri-State Airport"  st="WV"  lat="38:21:54N"  lon="082:33:18W"  co="US" />
+<station  id="----"  name="Wilmington, Oh."  st="OH"  lat="39:25N"  lon="083:49W"  co="US" />
+<station  id="KCMH"  name="Columbus, Port Columbus International Airport"  st="OH"  lat="39:59:42N"  lon="082:52:35W"  co="US" />
+<station  id="KDAY"  name="Dayton, Cox Dayton International Airport"  st="OH"  lat="39:54:22N"  lon="084:13:07W"  co="US" />
+<station  id="KEVV"  name="Evansville, Evansville Regional Airport"  st="IN"  lat="38:02:35N"  lon="087:31:13W"  co="US" />
+<station  id="KSLO"  name="Salem, Salem-Leckrone Airport"  st="IL"  lat="38:38:34N"  lon="088:57:51W"  co="US" />
+<station  id="KSTL"  name="St. Louis, Lambert-St. Louis International Airport"  st="MO"  lat="38:45:09N"  lon="090:22:25W"  co="US" />
+<station  id="KPAH"  name="Paducah, Barkley Regional Airport"  st="KY"  lat="37:03:23N"  lon="088:46:26W"  co="US" />
+<station  id="KIND"  name="Indianapolis, Indianapolis International Airport"  st="IN"  lat="39:43:30N"  lon="086:16:55W"  co="US" />
+<station  id="KSGF"  name="Springfield, Springfield Regional Airport"  st="MO"  lat="37:14:23N"  lon="093:23:23W"  co="US" />
+<station  id="KCOU"  name="Columbia, Columbia Regional Airport"  st="MO"  lat="38:49:01N"  lon="092:13:06W"  co="US" />
+<station  id="KMCI"  name="Kansas City, Kansas City International Airport"  st="MO"  lat="39:17:50N"  lon="094:43:50W"  co="US" />
+<station  id="KSTJ"  name="St. Joseph, Rosecrans Memorial Airport"  st="MO"  lat="39:46:05N"  lon="094:54:33W"  co="US" />
+<station  id="KICT"  name="Wichita, Wichita Mid-Continent Airport"  st="KS"  lat="37:38:50N"  lon="097:25:46W"  co="US" />
+<station  id="KDDC"  name="Dodge City, Dodge City Regional Airport"  st="KS"  lat="37:46:22N"  lon="099:58:11W"  co="US" />
+<station  id="KP28"  name="Medicine Lodge, Medicine Lodge"  st="KS"  lat="37:17:02N"  lon="098:33:10W"  co="US" />
+<station  id="KFRI"  name="Fort Riley"  st="KS"  lat="39:06N"  lon="096:46W"  co="US" />
+<station  id="KTOP"  name="Topeka, Philip Billard Municipal Airport"  st="KS"  lat="39:04:21N"  lon="095:37:33W"  co="US" />
+<station  id="KCNK"  name="Concordia, Blosser Municipal Airport"  st="KS"  lat="39:33:05N"  lon="097:39:02W"  co="US" />
+<station  id="K1K5"  name="Elkhart / Elkhart-Morton County Airport"  st="KS"  lat="37:00N"  lon="101:53W"  co="US" />
+<station  id="KALS"  name="Alamosa, San Luis Valley Regional Airport"  st="CO"  lat="37:26:20N"  lon="105:51:41W"  co="US" />
+<station  id="KPUB"  name="Pueblo, Pueblo Memorial Airport"  st="CO"  lat="38:17:24N"  lon="104:29:54W"  co="US" />
+<station  id="KGLD"  name="Goodland, Renner Field"  st="KS"  lat="39:22:03N"  lon="101:41:35W"  co="US" />
+<station  id="KCOS"  name="Colorado Springs, City Of Colorado Springs Municipal Airport"  st="CO"  lat="38:48:57N"  lon="104:42:39W"  co="US" />
+<station  id="KFCS"  name="Fort Carson"  st="CO"  lat="38:42N"  lon="104:46W"  co="US" />
+<station  id="KDNR"  name="Denver / Stapleton International, Co."  st="CO"  lat="39:47N"  lon="104:52W"  co="US" />
+<station  id="KPUC"  name="Price, Carbon County Airport"  st="UT"  lat="39:36:33N"  lon="110:45:17W"  co="US" />
+<station  id="KGJT"  name="Grand Junction, Walker Field"  st="CO"  lat="39:08:02N"  lon="108:32:19W"  co="US" />
+<station  id="KBIH"  name="Bishop, Bishop Airport"  st="CA"  lat="37:22:16N"  lon="118:21:29W"  co="US" />
+<station  id="KMER"  name="Merced / Castle Air Force Base"  st="CA"  lat="37:22N"  lon="120:34W"  co="US" />
+<station  id="KSAC"  name="Sacramento, Sacramento Executive Airport"  st="CA"  lat="38:30:25N"  lon="121:29:42W"  co="US" />
+<station  id="KELY"  name="Ely, Ely Airport"  st="NV"  lat="39:17:42N"  lon="114:50:43W"  co="US" />
+<station  id="KP38"  name="Caliente"  st="NV"  lat="37:36:44N"  lon="114:31:35W"  co="US" />
+<station  id="KRNO"  name="Reno, Reno Tahoe International Airport"  st="NV"  lat="39:29:02N"  lon="119:46:16W"  co="US" />
+<station  id="----"  name="Reno, Nv."  st="NV"  lat="39:34N"  lon="119:48W"  co="US" />
+<station  id="----"  name="Monterey / Naf, Ca."  st="CA"  lat="36:36N"  lon="121:51W"  co="US" />
+<station  id="KSCK"  name="Stockton, Stockton Metropolitan Airport"  st="CA"  lat="37:53:23N"  lon="121:13:25W"  co="US" />
+<station  id="KOAK"  name="Oakland, Metro Oakland International Airport"  st="CA"  lat="37:43:10N"  lon="122:14:07W"  co="US" />
+<station  id="KSFO"  name="San Francisco, San Francisco International Airport"  st="CA"  lat="37:37:11N"  lon="122:21:53W"  co="US" />
+<station  id="K50Q"  name="Farallon Island"  st="CA"  lat="37:42N"  lon="123:00W"  co="US" />
+<station  id="----"  name="Upton, Ny."  st="NY"  lat="40:52N"  lon="072:52W"  co="US" />
+<station  id="KEWR"  name="Newark, Newark International Airport"  st="NJ"  lat="40:40:57N"  lon="074:10:10W"  co="US" />
+<station  id="KLGA"  name="New York, La Guardia Airport"  st="NY"  lat="40:46:45N"  lon="073:52:48W"  co="US" />
+<station  id="KBDR"  name="Bridgeport, Sikorsky Memorial Airport"  st="CT"  lat="41:09:30N"  lon="073:07:44W"  co="US" />
+<station  id="KFMH"  name="Otis Air National Guard Base"  st="MA"  lat="41:39N"  lon="070:31W"  co="US" />
+<station  id="KPVD"  name="Providence, Theodore Francis Green State Airport"  st="RI"  lat="41:43:26N"  lon="071:25:41W"  co="US" />
+<station  id="KBDL"  name="Windsor Locks, Bradley International Airport"  st="CT"  lat="41:56:17N"  lon="072:40:57W"  co="US" />
+<station  id="KBOS"  name="Boston, Logan International Airport"  st="MA"  lat="42:21:38N"  lon="071:00:38W"  co="US" />
+<station  id="KAVP"  name="Wilkes-Barre - Scranton, Wilkes-Barre / Scranton International Airport"  st="PA"  lat="41:20:20N"  lon="075:43:36W"  co="US" />
+<station  id="KIPT"  name="Williamsport, Williamsport Regional Airport"  st="PA"  lat="41:14:30N"  lon="076:55:15W"  co="US" />
+<station  id="KBGM"  name="Binghamton, Binghamton Regional Airport"  st="NY"  lat="42:12:28N"  lon="075:58:53W"  co="US" />
+<station  id="KABE"  name="Allentown, Lehigh Valley International Airport"  st="PA"  lat="40:39:03N"  lon="075:26:57W"  co="US" />
+<station  id="KALB"  name="Albany, Albany County Airport"  st="NY"  lat="42:44:48N"  lon="073:47:56W"  co="US" />
+<station  id="KSYR"  name="Syracuse, Syracuse Hancock International Airport"  st="NY"  lat="43:06:33N"  lon="076:06:12W"  co="US" />
+<station  id="KPIT"  name="Pittsburgh, Pittsburgh International Airport"  st="PA"  lat="40:30:14N"  lon="080:15:59W"  co="US" />
+<station  id="KCAK"  name="Akron, Akron-Canton Regional Airport"  st="OH"  lat="40:55:05N"  lon="081:26:33W"  co="US" />
+<station  id="----"  name="Dansville / Municipal, Ny."  st=""  lat="42:34N"  lon="077:43W"  co="US" />
+<station  id="KCLE"  name="Cleveland, Cleveland-Hopkins International Airport"  st="OH"  lat="41:24:18N"  lon="081:51:10W"  co="US" />
+<station  id="KYNG"  name="Youngstown, Youngstown-Warren Regional Airport"  st="OH"  lat="41:15:16N"  lon="080:40:26W"  co="US" />
+<station  id="KERI"  name="Erie, Erie International Airport"  st="PA"  lat="42:04:48N"  lon="080:10:57W"  co="US" />
+<station  id="KBUF"  name="Buffalo, Greater Buffalo International Airport"  st="NY"  lat="42:56:27N"  lon="078:44:09W"  co="US" />
+<station  id="KROC"  name="Rochester, Greater Rochester International Airport"  st="NY"  lat="43:07:00N"  lon="077:40:36W"  co="US" />
+<station  id="KORD"  name="Chicago, Chicago-O'Hare International Airport"  st="IL"  lat="41:58:47N"  lon="087:54:16W"  co="US" />
+<station  id="----"  name="Rantoul / Chanute Air Force Base, Il."  st=""  lat="40:18N"  lon="088:09W"  co="US" />
+<station  id="KPIA"  name="Peoria, Greater Peoria Regional Airport"  st="IL"  lat="40:40:03N"  lon="089:41:02W"  co="US" />
+<station  id="KFWA"  name="Fort Wayne, Fort Wayne International Airport"  st="IN"  lat="40:58:42N"  lon="085:11:43W"  co="US" />
+<station  id="KMDW"  name="Chicago, Chicago Midway Airport"  st="IL"  lat="41:47:03N"  lon="087:45:19W"  co="US" />
+<station  id="KSBN"  name="South Bend, South Bend Regional Airport"  st="IN"  lat="41:42:32N"  lon="086:19:07W"  co="US" />
+<station  id="KTOL"  name="Toledo, Toledo Express Airport"  st="OH"  lat="41:35:19N"  lon="083:48:05W"  co="US" />
+<station  id="KDTW"  name="Detroit, Detroit Metropolitan Wayne County Airport"  st="MI"  lat="42:13:53N"  lon="083:19:51W"  co="US" />
+<station  id="KLAN"  name="Lansing, Capital City Airport"  st="MI"  lat="42:46:49N"  lon="084:34:44W"  co="US" />
+<station  id="KP35"  name="Spickard"  st="MO"  lat="40:15N"  lon="093:43W"  co="US" />
+<station  id="KRFD"  name="Rockford, Greater Rockford Airport"  st="IL"  lat="42:11:34N"  lon="089:05:36W"  co="US" />
+<station  id="KMLI"  name="Moline, Quad-City Airport"  st="IL"  lat="41:27:05N"  lon="090:30:53W"  co="US" />
+<station  id="KDSM"  name="Des Moines, Des Moines International Airport"  st="IA"  lat="41:32:16N"  lon="093:39:58W"  co="US" />
+<station  id="KDBQ"  name="Dubuque, Dubuque Regional Airport"  st="IA"  lat="42:23:52N"  lon="090:42:13W"  co="US" />
+<station  id="KALO"  name="Waterloo, Waterloo Municipal Airport"  st="IA"  lat="42:33:16N"  lon="092:24:04W"  co="US" />
+<station  id="KFOD"  name="Fort Dodge"  st="IA"  lat="42:33N"  lon="094:11W"  co="US" />
+<station  id="KOMA"  name="Omaha, Eppley Airfield"  st="NE"  lat="41:18:37N"  lon="095:53:57W"  co="US" />
+<station  id="KLNK"  name="Lincoln, Lincoln Municipal Airport"  st="NE"  lat="40:49:52N"  lon="096:45:52W"  co="US" />
+<station  id="KGRI"  name="Grand Island, Central Nebraska Regional Airport"  st="NE"  lat="40:57:30N"  lon="098:18:45W"  co="US" />
+<station  id="----"  name="Omaha, Ne."  st=""  lat="41:22N"  lon="096:01W"  co="US" />
+<station  id="KOFF"  name="Omaha / Offutt Air Force Base"  st="NE"  lat="41:07N"  lon="095:54W"  co="US" />
+<station  id="KOFK"  name="Norfolk, Stefan Memorial Airport"  st="NE"  lat="41:58:50N"  lon="097:26:13W"  co="US" />
+<station  id="KSUX"  name="Sioux City, Sioux Gateway Airport"  st="IA"  lat="42:24:09N"  lon="096:23:04W"  co="US" />
+<station  id="KOAX"  name="Valley"  st="NE"  lat="41:19N"  lon="096:22W"  co="US" />
+<station  id="KSNY"  name="Sidney, Sidney Municipal Airport"  st="NE"  lat="41:05:58N"  lon="102:59:08W"  co="US" />
+<station  id="KLBF"  name="North Platte, North Platte Regional Airport"  st="NE"  lat="41:07:19N"  lon="100:40:06W"  co="US" />
+<station  id="KCYS"  name="Cheyenne, Cheyenne Airport"  st="WY"  lat="41:09:28N"  lon="104:48:25W"  co="US" />
+<station  id="KDEN"  name="Denver, Denver International Airport"  st="CO"  lat="39:49:58N"  lon="104:39:27W"  co="US" />
+<station  id="KBFF"  name="Scottsbluff, Heilig Field"  st="NE"  lat="41:52:01N"  lon="103:35:09W"  co="US" />
+<station  id="KVTN"  name="Valentine, Miller Field"  st="NE"  lat="42:51:31N"  lon="100:33:05W"  co="US" />
+<station  id="KDGW"  name="Douglas, Converse County Airport"  st="WY"  lat="42:47:39N"  lon="105:22:55W"  co="US" />
+<station  id="KCPR"  name="Casper, Natrona County International Airport"  st="WY"  lat="42:53:51N"  lon="106:28:23W"  co="US" />
+<station  id="KCAG"  name="Craig, Craig-Moffat Airport"  st="CO"  lat="40:29:36N"  lon="107:31:25W"  co="US" />
+<station  id="KSLC"  name="Salt Lake City, Salt Lake City International Airport"  st="UT"  lat="40:46:41N"  lon="111:58:10W"  co="US" />
+<station  id="KRKS"  name="Rock Springs, Rock Springs-Sweetwater County Airport"  st="WY"  lat="41:35:39N"  lon="109:03:55W"  co="US" />
+<station  id="KOGD"  name="Ogden, Ogden-Hinckley Airport"  st="UT"  lat="41:11:37N"  lon="112:00:59W"  co="US" />
+<station  id="KLND"  name="Lander"  st="WY"  lat="42:48:53N"  lon="108:43:41W"  co="US" />
+<station  id="KPIH"  name="Pocatello, Pocatello Regional Airport"  st="ID"  lat="42:55:13N"  lon="112:34:16W"  co="US" />
+<station  id="KENV"  name="Wendover / Air Force Auxillary Field"  st="UT"  lat="40:44N"  lon="114:02W"  co="US" />
+<station  id="----"  name="Elko, Nv."  st="NV"  lat="40:52N"  lon="115:44W"  co="US" />
+<station  id="KWMC"  name="Winnemucca, Winnemucca Municipal Airport"  st="NV"  lat="40:54:07N"  lon="117:48:26W"  co="US" />
+<station  id="KO64"  name="Fort Bragg"  st="CA"  lat="39:24N"  lon="123:49W"  co="US" />
+<station  id="KRBL"  name="Red Bluff, Red Bluff Municipal Airport"  st="CA"  lat="40:09:02N"  lon="122:15:08W"  co="US" />
+<station  id="KRDD"  name="Redding, Redding Municipal Airport"  st="CA"  lat="40:30:54N"  lon="122:17:48W"  co="US" />
+<station  id="KEKA"  name="Eureka"  st="CA"  lat="40:48N"  lon="124:10W"  co="US" />
+<station  id="KMFR"  name="Medford, Rogue Valley International Airport"  st="OR"  lat="42:22:52N"  lon="122:52:20W"  co="US" />
+<station  id="----"  name="Franconia, Nh"  st=""  lat="44:13N"  lon="071:45W"  co="US" />
+<station  id="KCON"  name="Concord, Concord Municipal Airport"  st="NH"  lat="43:11:43N"  lon="071:30:04W"  co="US" />
+<station  id="KPWM"  name="Portland, Portland International Jetport"  st="ME"  lat="43:38:32N"  lon="070:18:16W"  co="US" />
+<station  id="KEPO"  name="Eastport"  st="ME"  lat="44:55N"  lon="067:00W"  co="US" />
+<station  id="K9B2"  name="Newport"  st="VT"  lat="44:56N"  lon="072:12W"  co="US" />
+<station  id="KMWN"  name="Mount Washington"  st="NH"  lat="44:16N"  lon="071:18W"  co="US" />
+<station  id="K1V4"  name="Saint Johnsbury"  st="VT"  lat="44:25:10N"  lon="072:01:10W"  co="US" />
+<station  id="KBML"  name="Berlin, Berlin Municipal Airport"  st="NH"  lat="44:34:34N"  lon="071:10:43W"  co="US" />
+<station  id="KBTV"  name="Burlington, Burlington International Airport"  st="VT"  lat="44:28:05N"  lon="073:09:01W"  co="US" />
+<station  id="KRUM"  name="Rumford"  st="ME"  lat="44:32N"  lon="070:32W"  co="US" />
+<station  id="----"  name="White Lake, Mi."  st="MI"  lat="42:42N"  lon="083:28W"  co="US" />
+<station  id="----"  name="Gaylord, Mi."  st="MI"  lat="44:55N"  lon="084:43W"  co="US" />
+<station  id="KGRR"  name="Grand Rapids, Gerald R. Ford International Airport"  st="MI"  lat="42:52:51N"  lon="085:31:22W"  co="US" />
+<station  id="KMKG"  name="Muskegon, Muskegon County Airport"  st="MI"  lat="43:10:16N"  lon="086:14:12W"  co="US" />
+<station  id="KFNT"  name="Flint, Bishop International Airport"  st="MI"  lat="42:58:00N"  lon="083:44:58W"  co="US" />
+<station  id="KHTL"  name="Houghton Lake, Roscommon County Airport"  st="MI"  lat="44:21:04N"  lon="084:40:27W"  co="US" />
+<station  id="KAPN"  name="Alpena, Alpena County Regional Airport"  st="MI"  lat="45:04:18N"  lon="083:33:52W"  co="US" />
+<station  id="KMKE"  name="Milwaukee, General Mitchell International Airport"  st="WI"  lat="42:57:18N"  lon="087:54:16W"  co="US" />
+<station  id="KMSN"  name="Madison, Dane County Regional-Truax Field"  st="WI"  lat="43:08:26N"  lon="089:20:43W"  co="US" />
+<station  id="KLSE"  name="La Crosse, La Crosse Municipal Airport"  st="WI"  lat="43:52:46N"  lon="091:15:24W"  co="US" />
+<station  id="KRST"  name="Rochester, Rochester International Airport"  st="MN"  lat="43:54:15N"  lon="092:29:30W"  co="US" />
+<station  id="KGRB"  name="Green Bay, Austin Straubel International Airport"  st="WI"  lat="44:28:46N"  lon="088:08:12W"  co="US" />
+<station  id="KESC"  name="Escanaba"  st="MI"  lat="45:45N"  lon="087:02W"  co="US" />
+<station  id="----"  name="Chanhaussen, Mn."  st="MN"  lat="44:51N"  lon="093:34W"  co="US" />
+<station  id="KFSD"  name="Sioux Falls, Foss Field"  st="SD"  lat="43:34:37N"  lon="096:45:13W"  co="US" />
+<station  id="----"  name="Pickstown, Sd."  st="SD"  lat="43:04N"  lon="098:32W"  co="US" />
+<station  id="K9V9"  name="Chamberlain, Chamberlain Municipal Airport"  st="SD"  lat="43:46:00N"  lon="099:19:06W"  co="US" />
+<station  id="KHON"  name="Huron, Huron Regional Airport"  st="SD"  lat="44:23:17N"  lon="098:13:42W"  co="US" />
+<station  id="KSFD"  name="Winner, Bob Wiley Field Airport"  st="SD"  lat="43:23:26N"  lon="099:50:33W"  co="US" />
+<station  id="KMSP"  name="Minneapolis, Minneapolis-St. Paul International Airport"  st="MN"  lat="44:52:59N"  lon="093:13:44W"  co="US" />
+<station  id="KABR"  name="Aberdeen, Aberdeen Regional Airport"  st="SD"  lat="45:26:36N"  lon="098:24:47W"  co="US" />
+<station  id="----"  name="Redig, Sd."  st=""  lat="45:16N"  lon="103:32W"  co="US" />
+<station  id="KRAP"  name="Rapid City, Rapid City Regional Airport"  st="SD"  lat="44:02:44N"  lon="103:03:14W"  co="US" />
+<station  id="KGCC"  name="Gillette, Gillette-Campbell County Airport"  st="WY"  lat="44:20:22N"  lon="105:32:31W"  co="US" />
+<station  id="KSHR"  name="Sheridan, Sheridan County Airport"  st="WY"  lat="44:46:10N"  lon="106:58:08W"  co="US" />
+<station  id="KCOD"  name="Cody"  st="WY"  lat="44:31N"  lon="109:01W"  co="US" />
+<station  id="KBPI"  name="Big Piney, Big Piney-Marbleton Airport"  st="WY"  lat="42:34:44N"  lon="110:06:11W"  co="US" />
+<station  id="KRIW"  name="Riverton, Riverton Regional Airport"  st="WY"  lat="43:03:43N"  lon="108:26:47W"  co="US" />
+<station  id="KBIL"  name="Billings, Billings Logan International Airport"  st="MT"  lat="45:48:25N"  lon="108:32:32W"  co="US" />
+<station  id="KBOI"  name="Boise, Boise Air Terminal"  st="ID"  lat="43:34:00N"  lon="116:14:26W"  co="US" />
+<station  id="KBNO"  name="Burns, Burns Municipal Airport"  st="OR"  lat="43:35:42N"  lon="118:57:23W"  co="US" />
+<station  id="KPDT"  name="Pendleton, Eastern Oregon Regional At Pendleton Airport"  st="OR"  lat="45:41:54N"  lon="118:50:03W"  co="US" />
+<station  id="KEUG"  name="Eugene, Mahlon Sweet Field"  st="OR"  lat="44:08:00N"  lon="123:12:52W"  co="US" />
+<station  id="KSLE"  name="Salem, McNary Field"  st="OR"  lat="44:54:28N"  lon="122:59:42W"  co="US" />
+<station  id="KPDX"  name="Portland, Portland International Airport"  st="OR"  lat="45:35:27N"  lon="122:36:01W"  co="US" />
+<station  id="KCAR"  name="Caribou, Caribou Municipal Airport"  st="ME"  lat="46:52:02N"  lon="068:00:48W"  co="US" />
+<station  id="KPQI"  name="Presque Isle"  st="ME"  lat="46:41N"  lon="068:03W"  co="US" />
+<station  id="KANJ"  name="Sault Ste. Marie"  st="MI"  lat="46:28:46N"  lon="084:21:26W"  co="US" />
+<station  id="KPKF"  name="Park Falls"  st="WI"  lat="45:56N"  lon="090:27W"  co="US" />
+<station  id="KMQT"  name="Marquette"  st="MI"  lat="46:32N"  lon="087:33W"  co="US" />
+<station  id="KCMX"  name="Hancock, Houghton County Memorial Airport"  st="MI"  lat="47:10:06N"  lon="088:29:20W"  co="US" />
+<station  id="KDLH"  name="Duluth, Duluth International Airport"  st="MN"  lat="46:50:34N"  lon="092:13:34W"  co="US" />
+<station  id="KINL"  name="International Falls, Falls International Airport"  st="MN"  lat="48:33:43N"  lon="093:23:52W"  co="US" />
+<station  id="KP39"  name="Pequot Lake"  st="MN"  lat="46:36N"  lon="094:19W"  co="US" />
+<station  id="KFAR"  name="Fargo, Hector International Airport"  st="ND"  lat="46:55:31N"  lon="096:48:40W"  co="US" />
+<station  id="KBJI"  name="Bemidji"  st="MN"  lat="47:30N"  lon="094:56W"  co="US" />
+<station  id="KD45"  name="Warroad"  st="MN"  lat="48:56N"  lon="095:21W"  co="US" />
+<station  id="KP11"  name="Devils Lake"  st="ND"  lat="48:06N"  lon="098:52W"  co="US" />
+<station  id="KBIS"  name="Bismarck, Bismarck Municipal Airport"  st="ND"  lat="46:46:57N"  lon="100:45:26W"  co="US" />
+<station  id="KP24"  name="Roseglen"  st="ND"  lat="47:45N"  lon="101:50W"  co="US" />
+<station  id="KISN"  name="Williston, Sloulin Field International Airport"  st="ND"  lat="48:10:26N"  lon="103:38:12W"  co="US" />
+<station  id="KGGW"  name="Glasgow, Glasgow International Airport"  st="MT"  lat="48:12:50N"  lon="106:37:17W"  co="US" />
+<station  id="KHLN"  name="Helena, Helena Regional Airport"  st="MT"  lat="46:36:20N"  lon="111:57:49W"  co="US" />
+<station  id="KMSO"  name="Missoula, Missoula International Airport"  st="MT"  lat="46:55:15N"  lon="114:05:33W"  co="US" />
+<station  id="KGTF"  name="Great Falls, Great Falls International Airport"  st="MT"  lat="47:28:24N"  lon="111:22:56W"  co="US" />
+<station  id="----"  name="Great Falls, Mt."  st="MT"  lat="47:28N"  lon="111:23W"  co="US" />
+<station  id="KHVR"  name="Havre, Havre City-County Airport"  st="MT"  lat="48:32:34N"  lon="109:45:48W"  co="US" />
+<station  id="KFCA"  name="Kalispell, Glacier Park International Airport"  st="MT"  lat="48:18:15N"  lon="114:15:49W"  co="US" />
+<station  id="KYKM"  name="Yakima, Yakima Air Terminal"  st="WA"  lat="46:33:51N"  lon="120:32:01W"  co="US" />
+<station  id="KLWS"  name="Lewiston, Lewiston-Nez Perce County Airport"  st="ID"  lat="46:22:29N"  lon="117:00:52W"  co="US" />
+<station  id="KHMS"  name="Hanford"  st="WA"  lat="46:34N"  lon="119:36W"  co="US" />
+<station  id="KGEG"  name="Spokane, Spokane International Airport"  st="WA"  lat="47:37:17N"  lon="117:31:40W"  co="US" />
+<station  id="----"  name="Spokane, Wa."  st="WA"  lat="47:41N"  lon="117:38W"  co="US" />
+<station  id="----"  name="Walla Walla, Wa"  st=""  lat="46:02N"  lon="118:20W"  co="US" />
+<station  id="KAST"  name="Astoria, Astoria Regional Airport"  st="OR"  lat="46:09:25N"  lon="123:52:57W"  co="US" />
+<station  id="KOLM"  name="Olympia, Olympia Airport"  st="WA"  lat="46:58:24N"  lon="122:54:12W"  co="US" />
+<station  id="KSEA"  name="Seattle, Seattle-Tacoma International Airport"  st="WA"  lat="47:26:41N"  lon="122:18:49W"  co="US" />
+<station  id="KUIL"  name="Quillayute, Quillayute State Airport"  st="WA"  lat="47:56:15N"  lon="124:33:18W"  co="US" />
+<station  id="----"  name="Redstone Arsenal, Al."  st="AL"  lat="34:36N"  lon="086:38W"  co="US" />
+<station  id="----"  name="Aberdeen Proving Grounds, Md."  st="MD"  lat="39:30N"  lon="076:34W"  co="US" />
+<station  id="KDPG"  name="Dugway Proving Grounds"  st="UT"  lat="40:10N"  lon="112:56W"  co="US" />
+<station  id="----"  name="Yuma Proving Grounds Az."  st=""  lat="32:30N"  lon="114:00W"  co="US" />
+<station  id="KNOW"  name="Port Angeles Coast Guard Air Station"  st="WA"  lat="48:08N"  lon="123:24W"  co="US" />
+<station  id="KTCM"  name="Tacoma / McChord Air Force Base"  st="WA"  lat="47:09N"  lon="122:29W"  co="US" />
+<station  id="KGRF"  name="Fort Lewis / Gray U. S. Army Airfield"  st="WA"  lat="47:07N"  lon="122:33W"  co="US" />
+<station  id="KMLS"  name="Miles City, Frank Wiley Field Airport"  st="MT"  lat="46:25:41N"  lon="105:53:11W"  co="US" />
+<station  id="----"  name="Wood Lake, Mn."  st=""  lat="44:40N"  lon="095:27W"  co="US" />
+<station  id="----"  name="Blue River, Wi."  st=""  lat="43:13N"  lon="090:32W"  co="US" />
+<station  id="K3RN"  name="Graying Air Force Range"  st="MI"  lat="44:50N"  lon="084:33W"  co="US" />
+<station  id="KGTB"  name="Fort Drum / Wheeler-Sack U. S. Army Airfield"  st="NY"  lat="44:03N"  lon="075:44W"  co="US" />
+<station  id="----"  name="Gray, Me."  st="ME"  lat="43:54N"  lon="070:15W"  co="US" />
+<station  id="KNHZ"  name="Brunswick, Naval Air Station"  st="ME"  lat="43:54:01N"  lon="069:56:06W"  co="US" />
+<station  id="----"  name="Portland, Me."  st=""  lat="43:32N"  lon="070:06W"  co="US" />
+<station  id="----"  name="Saylor Creek Gunneryrange, Id."  st=""  lat="42:32N"  lon="115:42W"  co="US" />
+<station  id="KU67"  name="Roosevelt"  st="UT"  lat="40:18N"  lon="109:59W"  co="US" />
+<station  id="----"  name="Craig, County"  st=""  lat="40:30N"  lon="107:31W"  co="US" />
+<station  id="----"  name="Medicine Bow, Wy."  st=""  lat="41:54N"  lon="106:11W"  co="US" />
+<station  id="----"  name="Mccook, Ne."  st=""  lat="40:05N"  lon="100:39W"  co="US" />
+<station  id="----"  name="Merriman, Ne."  st=""  lat="42:54N"  lon="101:42W"  co="US" />
+<station  id="----"  name="Fairbury, Ne."  st=""  lat="40:06N"  lon="097:20W"  co="US" />
+<station  id="----"  name="Neligh, Ne."  st=""  lat="42:12N"  lon="097:48W"  co="US" />
+<station  id="----"  name="Slater, Ia."  st=""  lat="41:54N"  lon="093:42W"  co="US" />
+<station  id="----"  name="Davenport, Ia."  st="IA"  lat="41:37N"  lon="090:35W"  co="US" />
+<station  id="KMMO"  name="Marseilles Island"  st="IL"  lat="41:22N"  lon="088:41W"  co="US" />
+<station  id="----"  name="Dunne Crib Il."  st=""  lat="41:47N"  lon="087:32W"  co="US" />
+<station  id="----"  name="Wolcott, In."  st=""  lat="40:49N"  lon="087:03W"  co="US" />
+<station  id="----"  name="Jefferson Proving Ground Madison, In."  st=""  lat="38:50N"  lon="085:25W"  co="US" />
+<station  id="----"  name="Verona, Ny. Af "  st=""  lat="43:08N"  lon="075:36W"  co="US" />
+<station  id="----"  name="Wilmington, Vt."  st=""  lat="42:53N"  lon="072:53W"  co="US" />
+<station  id="----"  name="West Dover, Vt."  st=""  lat="42:56N"  lon="072:52W"  co="US" />
+<station  id="KJFK"  name="New York, Kennedy International Airport"  st="NY"  lat="40:38:19N"  lon="073:45:44W"  co="US" />
+<station  id="KBED"  name="Bedford, Hanscom Field"  st="MA"  lat="42:28:06N"  lon="071:17:40W"  co="US" />
+<station  id="KCEF"  name="Chicopee Falls / Westover Air Force Base"  st="MA"  lat="42:12N"  lon="072:32W"  co="US" />
+<station  id="----"  name="Blue Hill Obs. Ma."  st=""  lat="42:13N"  lon="071:07W"  co="US" />
+<station  id="KCHH"  name="Chatham"  st="MA"  lat="41:40N"  lon="069:58W"  co="US" />
+<station  id="----"  name="Sheridan, Ca"  st=""  lat="39:00N"  lon="121:20W"  co="US" />
+<station  id="----"  name="Freshpond, Ca"  st=""  lat="38:45N"  lon="120:31W"  co="US" />
+<station  id="----"  name="Pilar Point Airways Facilities Sector, Ca."  st="CA"  lat="37:30N"  lon="122:30W"  co="US" />
+<station  id="KNGZ"  name="Alameda Naval Air Station"  st="CA"  lat="37:47N"  lon="122:19W"  co="US" />
+<station  id="KNUQ"  name="Mountain View, Moffett Field"  st="CA"  lat="37:24:21N"  lon="122:02:53W"  co="US" />
+<station  id="KSUU"  name="Fairfield / Travis Air Force Base"  st="CA"  lat="38:16N"  lon="121:57W"  co="US" />
+<station  id="----"  name="Durango, County"  st=""  lat="37:12N"  lon="107:49W"  co="US" />
+<station  id="----"  name="Granada, Co."  st=""  lat="37:46N"  lon="102:11W"  co="US" />
+<station  id="KAFF"  name="Air Force Academy"  st="CO"  lat="38:58N"  lon="104:49W"  co="US" />
+<station  id="----"  name="Limon, County"  st=""  lat="39:11N"  lon="103:42W"  co="US" />
+<station  id="----"  name="Platteville, Co."  st=""  lat="40:11N"  lon="104:43W"  co="US" />
+<station  id="----"  name="Haviland, Ks."  st=""  lat="37:39N"  lon="099:05W"  co="US" />
+<station  id="----"  name="Neodesha, Ks."  st=""  lat="37:22N"  lon="095:38W"  co="US" />
+<station  id="KPTT"  name="Pratt Municipal"  st="KS"  lat="37:42N"  lon="098:45W"  co="US" />
+<station  id="----"  name="Smokey Hill Gunnery Range, Ks."  st=""  lat="38:39N"  lon="097:48W"  co="US" />
+<station  id="----"  name="Hillsboro, Ks."  st=""  lat="38:19N"  lon="097:18W"  co="US" />
+<station  id="----"  name="Conway, Mo."  st=""  lat="37:31N"  lon="092:42W"  co="US" />
+<station  id="----"  name="Lathrop, Mo."  st=""  lat="39:35N"  lon="094:11W"  co="US" />
+<station  id="----"  name="Winchester, Il."  st=""  lat="39:39N"  lon="090:29W"  co="US" />
+<station  id="----"  name="Lincoln, Il."  st="IL"  lat="40:09N"  lon="089:20W"  co="US" />
+<station  id="KFFO"  name="Dayton / Wright-Patterson Air Force Base"  st="OH"  lat="39:50N"  lon="084:03W"  co="US" />
+<station  id="----"  name="Chesapeake, Va."  st=""  lat="36:54N"  lon="075:43W"  co="US" />
+<station  id="KN78"  name="Barnegat Coast Guard Station"  st="NJ"  lat="39:46N"  lon="074:06W"  co="US" />
+<station  id="KADW"  name="Camp Springs / Andrews Air Force Base"  st="MD"  lat="38:49N"  lon="076:51W"  co="US" />
+<station  id="KW30"  name="Ocean City"  st="MD"  lat="38:20N"  lon="075:05W"  co="US" />
+<station  id="KLFI"  name="Langley Air Force Base"  st="VA"  lat="37:05N"  lon="076:21W"  co="US" />
+<station  id="----"  name="Vandenberg Air Force Base, Ca."  st=""  lat="34:47N"  lon="120:32W"  co="US" />
+<station  id="----"  name="South Vandenberg Afbca."  st="CA"  lat="34:39N"  lon="120:34W"  co="US" />
+<station  id="KBYS"  name="Fort Irwin/Barstow, Bicycle Lake Army Airfield"  st="CA"  lat="35:17N"  lon="116:37W"  co="US" />
+<station  id="KNID"  name="China Lake, Naval Air Facility"  st="CA"  lat="35:41:11N"  lon="117:41:24W"  co="US" />
+<station  id="KINS"  name="Indian Springs Gunnery Range"  st="NV"  lat="36:32N"  lon="115:54W"  co="US" />
+<station  id="K4CB"  name="Cuddleback Gunnery Range"  st="CA"  lat="35:16N"  lon="117:26W"  co="US" />
+<station  id="K4SU"  name="Superior Valley Gunnery Range"  st="CA"  lat="36:20N"  lon="117:06W"  co="US" />
+<station  id="----"  name="White Sands, Nm."  st=""  lat="32:24N"  lon="106:20W"  co="US" />
+<station  id="----"  name="Stallion U. S. Army Airfield, Nm"  st="NM"  lat="33:49N"  lon="106:40W"  co="US" />
+<station  id="----"  name="White Sands Missile Range Site No. 32, Nm"  st="NM"  lat="33:10N"  lon="106:29W"  co="US" />
+<station  id="----"  name="Aztec, Nm."  st="NM"  lat="36:50N"  lon="107:54W"  co="US" />
+<station  id="K4MR"  name="Melrose Gunnery Range"  st="NM"  lat="34:18N"  lon="103:48W"  co="US" />
+<station  id="----"  name="Vici, Ok."  st=""  lat="36:04N"  lon="099:13W"  co="US" />
+<station  id="KWWR"  name="Woodward, West Woodward Airport"  st="OK"  lat="36:26:12N"  lon="099:31:16W"  co="US" />
+<station  id="KH92"  name="Hominy Municipal"  st="OK"  lat="36:26N"  lon="096:23W"  co="US" />
+<station  id="KF10"  name="Henryetta Municipal"  st="OK"  lat="35:24N"  lon="096:01W"  co="US" />
+<station  id="KF30"  name="Sulphur Municipal"  st="OK"  lat="34:31N"  lon="096:59W"  co="US" />
+<station  id="----"  name="Lamont, Ok."  st=""  lat="36:41N"  lon="097:28W"  co="US" />
+<station  id="----"  name="Haskell, Ok."  st=""  lat="35:48N"  lon="095:47W"  co="US" />
+<station  id="----"  name="Purcell, Ok."  st=""  lat="34:59N"  lon="097:31W"  co="US" />
+<station  id="----"  name="Bloomfield, Mo."  st=""  lat="36:53N"  lon="089:58W"  co="US" />
+<station  id="KHOP"  name="Fort Campbell U. S. Army Airfield"  st="KY"  lat="36:40N"  lon="087:30W"  co="US" />
+<station  id="KFBG"  name="Fort Bragg / Simmons Army Airfield"  st="NC"  lat="35:08N"  lon="078:56W"  co="US" />
+<station  id="K2DP"  name="Dare County Gunnery Range"  st="NC"  lat="35:40N"  lon="075:54W"  co="US" />
+<station  id="K44W"  name="Diamond Shoals Coast Guard Station"  st="NC"  lat="35:09N"  lon="075:18W"  co="US" />
+<station  id="----"  name="Frying Pan Shoals, Nc."  st=""  lat="33:29N"  lon="077:35W"  co="US" />
+<station  id="KNLC"  name="Lemoore, Naval Air Station"  st="CA"  lat="36:18:13N"  lon="119:56:17W"  co="US" />
+<station  id="----"  name="Salton Sea, Ca. Airways Facilities Sector "  st="CA"  lat="33:13N"  lon="115:52W"  co="US" />
+<station  id="KGBN"  name="Gila Bend U. S. Army Airfield"  st="AZ"  lat="32:26N"  lon="112:41W"  co="US" />
+<station  id="KP07"  name="Sanderson"  st="TX"  lat="30:10N"  lon="102:25W"  co="US" />
+<station  id="----"  name="Tucumcari, Nm."  st=""  lat="35:05N"  lon="103:37W"  co="US" />
+<station  id="KHMN"  name="Holloman Air Force Base"  st="NM"  lat="32:51N"  lon="106:06W"  co="US" />
+<station  id="KE28"  name="Northrup Landing Strip"  st="NM"  lat="33:54N"  lon="106:24W"  co="US" />
+<station  id="----"  name="White Sands Missile Range Site No. 39"  st="NM"  lat="32:38N"  lon="106:24W"  co="US" />
+<station  id="----"  name="Jayton, Tx."  st=""  lat="33:01N"  lon="100:59W"  co="US" />
+<station  id="KJCT"  name="Junction, Kimble County Airport"  st="TX"  lat="30:30:39N"  lon="099:45:59W"  co="US" />
+<station  id="----"  name="Palestine, Tx."  st=""  lat="31:47N"  lon="095:43W"  co="US" />
+<station  id="----"  name="Dequeen, Ar."  st=""  lat="34:07N"  lon="094:17W"  co="US" />
+<station  id="----"  name="Winnfield, La."  st=""  lat="31:54N"  lon="092:47W"  co="US" />
+<station  id="KAEX"  name="Alexandria, Alexandria International Airport"  st="LA"  lat="31:20:05N"  lon="092:33:31W"  co="US" />
+<station  id="K01R"  name="Claiborne Range, Airways Facilities Sector "  st="LA"  lat="31:08N"  lon="092:34W"  co="US" />
+<station  id="----"  name="Okolona, Ms."  st=""  lat="34:05N"  lon="088:52W"  co="US" />
+<station  id="KPAM"  name="Tyndall Air Force Base"  st="FL"  lat="30:04N"  lon="085:35W"  co="US" />
+<station  id="KHRT"  name="Hurlburt Field"  st="FL"  lat="30:25N"  lon="086:41W"  co="US" />
+<station  id="----"  name="Eglin Air Force Base Range No. 52, Fl."  st="FL"  lat="30:34N"  lon="086:19W"  co="US" />
+<station  id="----"  name="Fort Stewart Reservation, Ga"  st="GA"  lat="31:54N"  lon="081:38W"  co="US" />
+<station  id="KVAD"  name="Moody Air Force Base"  st="GA"  lat="30:58N"  lon="083:12W"  co="US" />
+<station  id="KMCF"  name="Macdill Air Force Base, Fl."  st="FL"  lat="27:51N"  lon="082:30W"  co="US" />
+<station  id="KSSC"  name="Shaw Air Force Base"  st="SC"  lat="33:58N"  lon="080:29W"  co="US" />
+<station  id="KMYR"  name="Myrtle Beach Air Force Base"  st="SC"  lat="33:41N"  lon="078:56W"  co="US" />
+<station  id="K2PJ"  name="Poinsett Range, Sumpter"  st="SC"  lat="33:51N"  lon="080:29W"  co="US" />
+<station  id="KXMR"  name="Cape Kennedy"  st="FL"  lat="28:28N"  lon="080:33W"  co="US" />
+<station  id="KCOF"  name="Cocoa / Patrick Air Force Base"  st="FL"  lat="28:14N"  lon="080:36W"  co="US" />
+<station  id="KAGR"  name="Avon Park Gunnery Range"  st="FL"  lat="27:39N"  lon="081:20W"  co="US" />
+<station  id="TJBQ"  name="Aquadilla, Rafael Hernandez Airport"  st="PR"  lat="18:30N"  lon="067:08W"  co="US" />
+<station  id="TJNR"  name="Roosevelt Roads, Roosevelt Roads Naval Station, Ofstie Field"  st="PR"  lat="18:15:19N"  lon="065:38:36W"  co="US" />
+<station  id="----"  name="Navy Operated Automatic Meteorological Observing System "  st=""  lat="77:31S"  lon="023:44W"  co="US" />
+<station  id="----"  name="Henry"  st=""  lat="89:00S"  lon="000:18W"  co="US" />
+<station  id="----"  name="Navy Operated Automatic Meteorological Observing System "  st=""  lat="75:55S"  lon="083:55W"  co="US" />
+<station  id="----"  name="University Wi Id 8932"  st=""  lat="81:30S"  lon="003:44E"  co="US" />
+<station  id="----"  name="Minna Bluff"  st=""  lat="78:33S"  lon="166:42E"  co="US" />
+<station  id="----"  name="Linda"  st=""  lat="78:30S"  lon="168:21E"  co="US" />
+<station  id="----"  name="Sandra"  st=""  lat="74:29S"  lon="160:29E"  co="US" />
+<station  id="----"  name="Navy Operated Automatic Meteorological Observing System "  st=""  lat="74:42S"  lon="161:34E"  co="US" />
+<station  id="----"  name="Gill"  st=""  lat="80:02S"  lon="178:38W"  co="US" />
+<station  id="PMDY"  name="Sand Island, Henderson Field Airport"  st="HI"  lat="28:13N"  lon="177:22W"  co="US" />
+<station  id="----"  name="Princeville Kauai"  st="HI"  lat="22:13N"  lon="159:27W"  co="US" />
+<station  id="PHBK"  name="Kekaha, Pacific Missile Test Facility Barking Sands"  st="HI"  lat="22:02:11N"  lon="159:47:11W"  co="US" />
+<station  id="----"  name="Port Allen Airport"  st="HI"  lat="21:54N"  lon="159:36W"  co="US" />
+<station  id="PHLI"  name="Lihue, Lihue Airport"  st="HI"  lat="21:59:02N"  lon="159:20:28W"  co="US" />
+<station  id="----"  name="Makahuena Pt / Kauai"  st="HI"  lat="21:52N"  lon="159:27W"  co="US" />
+<station  id="----"  name="Kapaa / Kauiai"  st="HI"  lat="22:04N"  lon="159:24W"  co="US" />
+<station  id="PHHI"  name="Wheeler Air Force Base / Oahu"  st="HI"  lat="21:29N"  lon="158:02W"  co="US" />
+<station  id="PHNG"  name="Kaneohe, Marine Corps Air Station"  st="HI"  lat="21:27:14N"  lon="157:45:56W"  co="US" />
+<station  id="PHJR"  name="Oahu, Kalaeloa Airport"  st="HI"  lat="21:18:30N"  lon="158:04:05W"  co="US" />
+<station  id="PHNL"  name="Honolulu, Honolulu International Airport"  st="HI"  lat="21:19:39N"  lon="157:56:35W"  co="US" />
+<station  id="PHMK"  name="Kaunakakai, Molokai Airport"  st="HI"  lat="21:09N"  lon="157:06W"  co="US" />
+<station  id="PHOG"  name="Kahului, Kahului Airport"  st="HI"  lat="20:53:33N"  lon="156:26:13W"  co="US" />
+<station  id="PGUM"  name="Agana, Guam International Airport"  st="GU"  lat="13:29N"  lon="144:48E"  co="US" />
+<station  id="PGAC"  name="Guam, Mariana Island"  st="GU"  lat="13:55N"  lon="144:50E"  co="US" />
+<station  id="PGUA"  name="Andersen, Mariana Is, Andersen Air Force Base"  st="GU"  lat="13:35N"  lon="144:56E"  co="US" />
+<station  id="PGRO"  name="Rota Island, N. Mariana Is, Rota International Airport"  st="GU"  lat="14:11N"  lon="145:15E"  co="US" />
+<station  id="PGSN"  name="Saipan Island, Saipan International Airport"  st="Northern Mariana Islands"  lat="15:07N"  lon="145:44E"  co="US" />
+<station  id="PGWT"  name="Tinian Island, N. Mariana Is, West Tinian Airport"  st="GU"  lat="14:59N"  lon="145:37E"  co="US" />
+<station  id="PWAK"  name="Wake Island, Wake Island Army Airfield Airport"  st="GU"  lat="19:17N"  lon="166:39E"  co="US" />
+<station  id="----"  name="Kona / Hawaii Island"  st="HI"  lat="19:39N"  lon="156:00W"  co="US" />
+<station  id="PHTO"  name="Hilo, Hilo International Airport"  st="HI"  lat="19:43:20N"  lon="155:03:21W"  co="US" />
+<station  id="PHWH"  name="South Kona / Hawaii"  st="HI"  lat="19:06N"  lon="155:45W"  co="US" />
+<station  id="----"  name="South Point"  st="HI"  lat="19:00N"  lon="155:40W"  co="US" />
+</stationtable>
+

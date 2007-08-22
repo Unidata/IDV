@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<controls>
+  <control
+     id="wxtextdisplay"
+     categories="wxtext"
+     class="ucar.unidata.apps.example.WxTextDisplayControl"
+     description="Weather Text Display"
+     label="Weather Text Display"
+     displaycategory="General"
+     properties="windowVisible=true; displayName=Weather Text Display;"/>
+</controls>
+

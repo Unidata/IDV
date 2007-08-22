@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menus label="Commands">
+  <menu
+     label="File"
+     id="file"
+     mnemonic="F">
+    <menu
+       label="New"
+       mnemonic="N">
+      <menu
+         id="file.new.display"
+         label="Display Window"/>
+    </menu>
+    <separator/>
+    <menuitem
+       label="Open..."
+       action="action:bundle.open"
+       mnemonic="O"/>
+    <separator/>
+    <menuitem
+       label="Save As..."
+       action="action:bundle.save"
+       mnemonic="S"/>
+    <menuitem
+       label="Save As Favorite..."
+       action="action:bundle.favorite.save"
+       mnemonic="F"/>
+    <separator/>
+    <menu
+       label="History"
+       id="menu.history"
+       mnemonic="H"/>
+    <separator/>
+    <menuitem
+       label="Exit"
+       action="action:exit"
+       mnemonic="X"/>
+  </menu>
+  <menu
+     label="Edit"
+     mnemonic="E">
+    <menuitem
+       label="Remove All Displays and Data"
+       action="action:edit.removedisplaysanddata"
+       mnemonic="A"/>
+    <separator/>
+    <menu label="Formulas">
+      <menuitem
+         label="Create Formula"
+         action="action:edit.formula.create"
+         mnemonic="C"/>
+      <menuitem
+         label="Jython Library"
+         action="action:edit.jython"
+         mnemonic="J"/>
+    </menu>
+    <separator/>
+    <menuitem
+       label="Preferences"
+       action="action:edit.preferences"
+       tooltip="Configure User Preferences"
+       mnemonic="U"/>
+  </menu>
+  <menu
+     id="displays"
+     label="Displays"
+     mnemonic="D"></menu>
+  <menu
+     id="data"
+     label="Data"
+     mnemonic="A">
+    <menu
+       label="New Data Source"
+       id="data.newdata"/>
+    <separator/>
+  </menu>
+  <menu
+     label="Tools"
+     id="menu.tools"
+     mnemonic="T">
+     <menuitem
+         label="Color Table Editor"
+         action="action:edit.colortables"
+         mnemonic="C"
+         tooltip="Create and Edit Color Tables"/>
+      <menuitem
+         label="Station Model Editor"
+         action="action:edit.stationmodels"
+         tooltip="Define Layout Templates for Station and Point Data"
+         mnemonic="S"/>
+      <menuitem
+         label="Projections Manager"
+         tooltip="Create and Change Projections"
+         action="action:edit.projections"
+        />
+      <menuitem
+         label="Parameter Alias Editor"
+         tooltip="Define Aliases for Data Fields"
+         action="action:edit.paramaliases"
+         mnemonic="P"/>
+      <menuitem
+         label="Parameter Defaults Editor"
+         action="action:edit.paramdefaults"
+         tooltip="Define Default Display Features for Data Fields"
+         mnemonic="D"/>
+      <separator/>
+      <menuitem
+         label="Plugin Manager"
+         action="action:plugins.manage"/>
+   </menu>
+   <menu
+     label="Help"
+     mnemonic="H">
+     <menuitem
+       label="User's Guide"
+       action="help:idv.index"
+       mnemonic="U"/>
+     <menuitem
+       label="Getting Started"
+       action="help:idv.quickstart"
+       mnemonic="G"/>
+     <menuitem
+       label="Zooming, Panning and Rotating"
+       action="help:idv.ui.navigation"
+       mnemonic="Z"/>
+     <separator/>
+     <menuitem
+       label="Show Console"
+       action="action:help.showconsole"
+       mnemonic="C"/>
+     <menuitem
+       label="Show Help Tips"
+       action="action:help.showhelptips"
+       mnemonic="T"/>
+     <menuitem
+       label="Support Request Form..."
+       action="action:help.showsupportform"
+       mnemonic="F"/>
+     <separator/>
+     <menuitem
+       label="Release Notes"
+       action="help:idv.releasenotes"
+       mnemonic="R"/>
+     <menuitem
+       label="About..."
+       action="action:help.showabout"
+       mnemonic="A"/>
+   </menu>
+</menus>

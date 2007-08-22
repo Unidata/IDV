@@ -1,0 +1,49 @@
+<html>
+<head>
+<title>Trajectory Display</title>
+</head>
+
+<body>
+
+
+<div class="overview">
+The IDV can display a variety of flavors of trajectory data - aircraft tracks, ships,  buoys, etc.
+</div>
+
+<p>
+
+
+
+<ol class="step">
+
+    <li> [ht::clearDisplaysAndData]
+
+    <li> Load some aircraft track data.
+    <ul>
+    <li> [ht::openDataSourceChooser] 
+    <li>In the [ht::dialog Data Source Chooser] click on the 
+    [ht::command Files] tab. 
+    <li> Go to the point data directory:     [ht::filename <%workshop.datadir%>/trajectory/].
+    <li> Select [ht::filename track.nc]
+    <li> Under the [ht::command Data Source Type] pulldown menu, select &quot;Track files&quot;
+    <li> Press [ht::button Add Source]
+    </ul>
+
+    <li>Create the display
+    <ul>
+    <li>In the [ht::command Fields] panel open the [ht::param Track] node and select [ht::param Dew/Frost Point Temperature].
+    <li>In the [ht::command Displays]  select [ht::display Track Colored By Parameter] and press
+    [ht::button Create Display]
+    </ul>
+
+
+    <li> Add a background image to see where this track is with the 
+         [ht::menu Displays {Maps and Backgrounds} {Add Background Image}] menu item.
+    
+
+    <li>  Leave the data source and display as is.
+
+</ol>
+
+</body>
+</html>

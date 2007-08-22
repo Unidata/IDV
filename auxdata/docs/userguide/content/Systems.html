@@ -1,0 +1,140 @@
+<html><head>
+ <title>System Requirements</title>
+ <link rel="stylesheet" type="text/css" href="idv.css" title="Style">
+</head>
+<body>
+
+
+
+The IDV should run on any platform that fully supports <b>Java
+2</b> and <b>Java 3D</b> and has been tested on <b>Windows, Linux,
+Solaris/SPARC, Mac OS-X</b>.  AIX and IRIX support the requirements in
+certain configurations.</p>
+
+<p> For reasonable performance, it is recommended that an Intel system
+running IDV have at least a <b>1.2 GHz processor and 1 GB memory
+(RAM)</b>. Performance will be even better with faster processors and
+more memory. Detailed requirements are listed below.</p>
+
+<%childlist%>
+
+<subhead id="os" intoc="false">Operating Systems and Java Versions</subhead>
+
+The IDV runs on any platform that supports:
+<ul>
+<li><b>Java 2</b> version 1.5 or higher (non-beta versions only) <b>AND</b>
+<li><b>Java 3D</b> version 1.3.1 or later.  
+</ul>
+<p>
+
+The IDV is known to run on the following operating systems:<p>
+
+<table border="1">
+<tr><th>OS</th><th>Version</th></tr>
+<tr><td><b>Windows</b></td><td>2000, XP, Vista<sup><b>(1)</b></sup></td></tr>
+<tr><td><b>Linux</b></td><td> Fedora Core 4, 5, 6 <sup><b>(2)</b></sup></td></tr>
+<tr><td><b>Mac OS-X</b></td><td> 10.3.1 or later<sup><b>(3)</b></sup></td></tr>
+<tr><td><b>Solaris/SPARC</b></td><td>Solaris 9+<sup><b>(4)</b></sup></td></tr>
+<tr><td><b>Solaris/x86</b></td><td>Solaris 10 (Intel)<sup><b><b>(5)</b></sup></td></tr>
+</table>
+<p>
+  
+If other platforms fully support Java 2 (version 1.5+) and 
+Java 3D (version 1.3.1 or higher) (e.g. AIX, IRIX) , they should 
+also work.
+
+<p>
+
+Your graphics system must support 3D; make sure you have the latest
+video driver for your graphics card. This is included in the Windows
+operating system. On Linux the driver must support GLX, an X windows
+system extension to OpenGL programs.
+
+<p>
+<b>NOTES:</b>
+<p>
+
+<b><sup>(1)</sup></b>You must have 
+Direct-X version 8.0 or higher installed on your Windows system if 
+you use the Direct-X version of Java 3D.
+<br>
+
+<b><sup>(2)</sup></b>The version of the Mesa library that comes with
+RedHat Linux may be incompatible with Java 3D packaged with the IDV. 
+If you experience X server crashes when exiting the IDV,
+you will need to build and install Mesa from source
+available at <a href="http://www.mesa3d.org">
+http://www.mesa3d.org</a>.
+
+<br>
+
+<b><sup>(3)</sup></b>Java 3D must be installed for Mac OS-X.  For version 10.4 and
+higher, it comes with the system.  For previous versions, you can download
+it <a href="http://www.apple.com/downloads/macosx/apple/java3dandjavaadvancedimagingupdate.html">here</a>.
+
+<br>
+
+<b><sup>(4)</sup></b>OpenGL must be installed for Java 3D to run on Solaris/SPARC.
+<br>
+
+<b><sup>(5)</sup></b>For Solaris/x86 you must have Java 1.5 and Java 3D 1.4.0 (or later) 
+installed (comes with the IDV installer, or you can install yourself) and a
+compatible video card.  For more information, see:<p>
+
+https://java3d.dev.java.net/binary-builds.html
+<br>
+
+<subhead id="disk" intoc="false">Disk Space</subhead>
+
+Using Web Start, you will need about 35 megabytes of disk space for
+the IDV-related JAR files downloaded. Additional space will be needed
+for the installation of Java, Java 3D, and Web Start, which must be
+installed on your system to run the IDV with Web Start.
+
+<p>
+
+Using installer files, you will need about 50 MB disk space for the
+installer file, which will uncompress into about twice that size. These
+include Java and Java3D.
+
+
+<subhead id="memory" intoc="false">System Memory and Processor Speed</subhead>
+
+The IDV can be demanding of hardware speed and memory depending on the
+size of the datasets you wish to work with. It is recommended that
+the system have a <b>minimum</b> of 512 MB of RAM free for IDV use.
+Performance is significantly better with 1 GB RAM or more.
+
+<p>
+
+Recommended processor speed will vary by platform, but an Intel Pentium
+CPU with 1.2 GHz is about the minimum you would need for reasonable
+performance. You can run on a system as slow as 500 MHZ or even less,
+but response will be correspondingly reduced. In general, the faster
+the processor, and the more memory your system has, the better IDV
+performance will be.
+
+<subhead id="video" intoc="false">Graphics Cards</subhead>
+The IDV works on systems with graphics cards that support OpenGL (all
+systems) and Direct-X (version 8.0+, Windows only).  In most cases,
+you should make sure you have the latest video driver for your system.
+Even if the system is brand new, the video driver may be old.
+<p>
+The IDV also works on systems with stereo video cards.  See the
+<a href="Faq.html">FAQ</a> on video card for more information.
+
+<subhead id="network" intoc="false">Internet Connection for Downloading the IDV, and for Data Sources</subhead>
+
+You will have to download some 35 MB of IDV software initially if you
+use the Web Start installation, or some 55 MB if you use installer
+files which provide Java and Java3D.
+
+<p>
+
+The IDV is designed to access data on remote servers on the
+Internet, as well as from local files. Downloading data from remote
+servers benefits from a fast connection to the Internet, since many data
+fields are large. 
+
+</body>
+</html>

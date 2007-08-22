@@ -1,0 +1,18 @@
+
+The file messages.pack contains the current list of text messages used in the IDV. You
+can add to that by hand or, better yet, run the IDV in record messages mode:
+idv -recordmessages messages.pack
+
+Since messages.pack exists the IDV will prompt you whether you want to load the initial 
+messages in message.pack. Say Yes.
+
+Now, go about opening menus, bringing up windows, etc. Whatever you need to trigger the IDV
+to see new text messages in the GUI. When seen the IDV will write them out to messages.pack.
+
+Now to translate just run:
+source translateall.sh
+
+This runs through a set of languages, calling translate.tcl (which uses Google) to build the
+individual language packs.
+
+To record ne 

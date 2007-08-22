@@ -1,0 +1,2032 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<object class="java.util.ArrayList" >
+    <method name="add" >
+        <object class="ucar.unidata.ui.symbol.StationModel" >
+            <property name="Name" >
+                <string><![CDATA[METAR]]></string>
+            </property>
+            <property name="List" >
+                <object class="java.util.ArrayList" >
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.WeatherSymbol" >
+                            <property name="Foreground" >
+                                <object class="java.awt.Color"  id="id5" >
+                                    <constructor>
+                                        <int>255</int>
+                                        <int>0</int>
+                                        <int>255</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038334515283-0]]></string>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[CC]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[MM]]></string>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="SymbolType" >
+                                <int>0</int>
+                            </property>
+                            <property name="Code" >
+                                <int>0</int>
+                            </property>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle"  id="id7" >
+                                    <constructor>
+                                        <int>-10</int>
+                                        <int>-10</int>
+                                        <int>20</int>
+                                        <int>20</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.ValueSymbol" >
+                            <property name="Foreground" >
+                                <object class="java.awt.Color"  id="id9" >
+                                    <constructor>
+                                        <int>254</int>
+                                        <int>0</int>
+                                        <int>0</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038334515283-1]]></string>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[TEMP]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Value parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[LR]]></string>
+                            </property>
+                            <property name="Value" >
+                                <string><![CDATA[123]]></string>
+                            </property>
+                            <property name="DisplayUnitName" >
+                                <string><![CDATA[Fahrenheit]]></string>
+                            </property>
+                            <property name="NumberFormatString" >
+                                <string><![CDATA[####]]></string>
+                            </property>
+                            <property name="DoubleValue" >
+                                <double>123.1</double>
+                            </property>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>-31</int>
+                                        <int>-37</int>
+                                        <int>21</int>
+                                        <int>16</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.ValueSymbol" >
+                            <property name="Foreground" >
+                                <object class="java.awt.Color"  id="id12" >
+                                    <constructor>
+                                        <int>0</int>
+                                        <int>255</int>
+                                        <int>0</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038334515283-2]]></string>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[DEWPOINT]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Value parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[UR]]></string>
+                            </property>
+                            <property name="Value" >
+                                <string><![CDATA[54]]></string>
+                            </property>
+                            <property name="DisplayUnitName" >
+                                <string><![CDATA[Fahrenheit]]></string>
+                            </property>
+                            <property name="NumberFormatString" >
+                                <string><![CDATA[####]]></string>
+                            </property>
+                            <property name="DoubleValue" >
+                                <double>54.0</double>
+                            </property>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>-24</int>
+                                        <int>16</int>
+                                        <int>14</int>
+                                        <int>16</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.ValueSymbol" >
+                            <property name="Foreground" >
+                                <object idref="id5" />
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038334515283-3]]></string>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[PRESSURE]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Value parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[LL]]></string>
+                            </property>
+                            <property name="Value" >
+                                <string><![CDATA[1024.5]]></string>
+                            </property>
+                            <property name="DisplayUnitName" >
+                                <string><![CDATA[Millibars]]></string>
+                            </property>
+                            <property name="NumberFormatString" >
+                                <string><![CDATA[###0.0]]></string>
+                            </property>
+                            <property name="DoubleValue" >
+                                <double>1024.46</double>
+                            </property>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>15</int>
+                                        <int>-37</int>
+                                        <int>38</int>
+                                        <int>16</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.TextSymbol" >
+                            <property name="Foreground" >
+                                <object class="java.awt.Color" >
+                                    <constructor>
+                                        <int>254</int>
+                                        <int>0</int>
+                                        <int>255</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038886400195-0]]></string>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[ID]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[UM]]></string>
+                            </property>
+                            <property name="Value" >
+                                <string><![CDATA[stn_id]]></string>
+                            </property>
+                            <property name="DisplayUnitName" >
+                                <string null="true" />
+                            </property>
+                            <property name="NumberFormatString" >
+                                <string><![CDATA[###0.#]]></string>
+                            </property>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>-17</int>
+                                        <int>38</int>
+                                        <int>34</int>
+                                        <int>16</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.WindBarbSymbol" >
+                            <property name="Foreground" >
+                                <object class="java.awt.Color"  id="id20" >
+                                    <constructor>
+                                        <int>166</int>
+                                        <int>166</int>
+                                        <int>166</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038887200005-0]]></string>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="2" >
+                                    <string><![CDATA[SPEED]]></string>
+                                    <string><![CDATA[DIR]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="2" >
+                                    <string><![CDATA[U or windspeed parameter]]></string>
+                                    <string><![CDATA[V or direction parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[MM]]></string>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="WindSpeed" >
+                                <double>65.0</double>
+                            </property>
+                            <property name="WindDirection" >
+                                <double>135.0</double>
+                            </property>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>-13</int>
+                                        <int>-13</int>
+                                        <int>26</int>
+                                        <int>26</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                        </object>
+                    </method>
+                </object>
+            </property>
+        </object>
+    </method>
+    <method name="add" >
+        <object class="ucar.unidata.ui.symbol.StationModel" >
+            <property name="Name" >
+                <string><![CDATA[SYNOP]]></string>
+            </property>
+            <property name="List" >
+                <object class="java.util.ArrayList" >
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.WeatherSymbol" >
+                            <property name="Foreground" >
+                                <object idref="id5" />
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038334515283-0]]></string>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[CC]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[MM]]></string>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="SymbolType" >
+                                <int>0</int>
+                            </property>
+                            <property name="Code" >
+                                <int>0</int>
+                            </property>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                            <field name="bounds" >
+                                <object idref="id7" />
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.ValueSymbol" >
+                            <property name="Foreground" >
+                                <object idref="id9" />
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038334515283-1]]></string>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[TEMP]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Value parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[LR]]></string>
+                            </property>
+                            <property name="Value" >
+                                <string><![CDATA[123]]></string>
+                            </property>
+                            <property name="DisplayUnitName" >
+                                <string><![CDATA[Fahrenheit]]></string>
+                            </property>
+                            <property name="NumberFormatString" >
+                                <string><![CDATA[####]]></string>
+                            </property>
+                            <property name="DoubleValue" >
+                                <double>123.1</double>
+                            </property>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>-29</int>
+                                        <int>-33</int>
+                                        <int>21</int>
+                                        <int>16</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.ValueSymbol" >
+                            <property name="Foreground" >
+                                <object idref="id12" />
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038334515283-2]]></string>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[DEWPOINT]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Value parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[UR]]></string>
+                            </property>
+                            <property name="Value" >
+                                <string><![CDATA[54]]></string>
+                            </property>
+                            <property name="DisplayUnitName" >
+                                <string><![CDATA[Fahrenheit]]></string>
+                            </property>
+                            <property name="NumberFormatString" >
+                                <string><![CDATA[####]]></string>
+                            </property>
+                            <property name="DoubleValue" >
+                                <double>54.0</double>
+                            </property>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>-22</int>
+                                        <int>15</int>
+                                        <int>14</int>
+                                        <int>16</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.ValueSymbol" >
+                            <property name="Foreground" >
+                                <object idref="id5" />
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038334515283-3]]></string>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[PRESSURE]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Value parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[LL]]></string>
+                            </property>
+                            <property name="Value" >
+                                <string><![CDATA[1024.5]]></string>
+                            </property>
+                            <property name="DisplayUnitName" >
+                                <string><![CDATA[Millibars]]></string>
+                            </property>
+                            <property name="NumberFormatString" >
+                                <string><![CDATA[###0.0]]></string>
+                            </property>
+                            <property name="DoubleValue" >
+                                <double>1024.46</double>
+                            </property>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>12</int>
+                                        <int>-33</int>
+                                        <int>38</int>
+                                        <int>16</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.WindBarbSymbol" >
+                            <property name="Foreground" >
+                                <object idref="id20" />
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038887200005-0]]></string>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="2" >
+                                    <string><![CDATA[SPEED]]></string>
+                                    <string><![CDATA[DIR]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="2" >
+                                    <string><![CDATA[U or windspeed parameter]]></string>
+                                    <string><![CDATA[V or direction parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[MM]]></string>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="WindSpeed" >
+                                <double>65.0</double>
+                            </property>
+                            <property name="WindDirection" >
+                                <double>135.0</double>
+                            </property>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>-15</int>
+                                        <int>-15</int>
+                                        <int>30</int>
+                                        <int>30</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.ValueSymbol" >
+                            <property name="Foreground" >
+                                <object idref="id5" />
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038944613076-0]]></string>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[IDN]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[UM]]></string>
+                            </property>
+                            <property name="Value" >
+                                <string><![CDATA[72469]]></string>
+                            </property>
+                            <property name="DisplayUnitName" >
+                                <string null="true" />
+                            </property>
+                            <property name="NumberFormatString" >
+                                <string><![CDATA[###0.#]]></string>
+                            </property>
+                            <property name="DoubleValue" >
+                                <double>72469.0</double>
+                            </property>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>-18</int>
+                                        <int>39</int>
+                                        <int>35</int>
+                                        <int>16</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.WeatherSymbol" >
+                            <property name="Foreground" >
+                                <object idref="id5" />
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038944613076-1]]></string>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[PTNDCODE]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[ML]]></string>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="SymbolType" >
+                                <int>5</int>
+                            </property>
+                            <property name="Code" >
+                                <int>0</int>
+                            </property>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>15</int>
+                                        <int>-9</int>
+                                        <int>18</int>
+                                        <int>18</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.ValueSymbol" >
+                            <property name="Foreground" >
+                                <object idref="id5" />
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038944613076-2]]></string>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[PTND]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[ML]]></string>
+                            </property>
+                            <property name="Value" >
+                                <string><![CDATA[.10]]></string>
+                            </property>
+                            <property name="DisplayUnitName" >
+                                <string><![CDATA[Millibars]]></string>
+                            </property>
+                            <property name="NumberFormatString" >
+                                <string><![CDATA[####.00]]></string>
+                            </property>
+                            <property name="DoubleValue" >
+                                <double>0.1</double>
+                            </property>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>38</int>
+                                        <int>-8</int>
+                                        <int>17</int>
+                                        <int>16</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.ValueSymbol" >
+                            <property name="Foreground" >
+                                <object idref="id5" />
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038944613076-3]]></string>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[VIS]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[MR]]></string>
+                            </property>
+                            <property name="Value" >
+                                <string><![CDATA[10]]></string>
+                            </property>
+                            <property name="DisplayUnitName" >
+                                <string><![CDATA[miles]]></string>
+                            </property>
+                            <property name="NumberFormatString" >
+                                <string><![CDATA[###0.#]]></string>
+                            </property>
+                            <property name="DoubleValue" >
+                                <double>10.0</double>
+                            </property>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>-59</int>
+                                        <int>-8</int>
+                                        <int>14</int>
+                                        <int>16</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.WeatherSymbol" >
+                            <property name="Foreground" >
+                                <object class="java.awt.Color" >
+                                    <constructor>
+                                        <int>255</int>
+                                        <int>255</int>
+                                        <int>0</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038944613076-4]]></string>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[WX]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[MM]]></string>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="SymbolType" >
+                                <int>1</int>
+                            </property>
+                            <property name="Code" >
+                                <int>0</int>
+                            </property>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>-35</int>
+                                        <int>-7</int>
+                                        <int>20</int>
+                                        <int>20</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                        </object>
+                    </method>
+                </object>
+            </property>
+        </object>
+    </method>
+    <method name="add" >
+        <object class="ucar.unidata.ui.symbol.StationModel" >
+            <property name="Name" >
+                <string><![CDATA[Temperature]]></string>
+            </property>
+            <property name="List" >
+                <object class="java.util.ArrayList" >
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.ValueSymbol" >
+                            <property name="Foreground" >
+                                <object idref="id9" />
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038887200005-1]]></string>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[TEMP]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[MM]]></string>
+                            </property>
+                            <property name="Value" >
+                                <string><![CDATA[123]]></string>
+                            </property>
+                            <property name="DisplayUnitName" >
+                                <string><![CDATA[Fahrenheit]]></string>
+                            </property>
+                            <property name="NumberFormatString" >
+                                <string><![CDATA[###0]]></string>
+                            </property>
+                            <property name="DoubleValue" >
+                                <double>123.0</double>
+                            </property>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>-15</int>
+                                        <int>-12</int>
+                                        <int>30</int>
+                                        <int>23</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                        </object>
+                    </method>
+                </object>
+            </property>
+        </object>
+    </method>
+    <method name="add" >
+        <object class="ucar.unidata.ui.symbol.StationModel" >
+            <property name="Name" >
+                <string><![CDATA[Upper Air]]></string>
+            </property>
+            <property name="List" >
+                <object class="java.util.ArrayList" >
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.ValueSymbol" >
+                            <property name="DoubleValue" >
+                                <double>123.1</double>
+                            </property>
+                            <property name="Value" >
+                                <string><![CDATA[123]]></string>
+                            </property>
+                            <property name="Font" >
+                                <null class="java.awt.Font" />
+                            </property>
+                            <property name="DisplayUnitName" >
+                                <string><![CDATA[Celsius]]></string>
+                            </property>
+                            <property name="NumberFormatString" >
+                                <string><![CDATA[####]]></string>
+                            </property>
+                            <property name="FontSize" >
+                                <int>12</int>
+                            </property>
+                            <property name="CurrFontNo" >
+                                <int>4</int>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[LR]]></string>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[TEMP]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Value parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038334515283-1]]></string>
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Foreground" >
+                                <object class="java.awt.Color" >
+                                    <constructor>
+                                        <int>254</int>
+                                        <int>0</int>
+                                        <int>0</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>-31</int>
+                                        <int>-37</int>
+                                        <int>21</int>
+                                        <int>16</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.ValueSymbol" >
+                            <property name="DoubleValue" >
+                                <double>54.0</double>
+                            </property>
+                            <property name="Value" >
+                                <string><![CDATA[54]]></string>
+                            </property>
+                            <property name="Font" >
+                                <null class="java.awt.Font" />
+                            </property>
+                            <property name="DisplayUnitName" >
+                                <string><![CDATA[Celsius]]></string>
+                            </property>
+                            <property name="NumberFormatString" >
+                                <string><![CDATA[####]]></string>
+                            </property>
+                            <property name="FontSize" >
+                                <int>12</int>
+                            </property>
+                            <property name="CurrFontNo" >
+                                <int>4</int>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[UR]]></string>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[DEWPOINT]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Value parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038334515283-2]]></string>
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Foreground" >
+                                <object class="java.awt.Color" >
+                                    <constructor>
+                                        <int>0</int>
+                                        <int>255</int>
+                                        <int>0</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>-24</int>
+                                        <int>16</int>
+                                        <int>14</int>
+                                        <int>16</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.ValueSymbol" >
+                            <property name="DoubleValue" >
+                                <double>569.0</double>
+                            </property>
+                            <property name="Value" >
+                                <string><![CDATA[569]]></string>
+                            </property>
+                            <property name="Font" >
+                                <null class="java.awt.Font" />
+                            </property>
+                            <property name="DisplayUnitName" >
+                                <string><![CDATA[decameters]]></string>
+                            </property>
+                            <property name="NumberFormatString" >
+                                <string><![CDATA[###0]]></string>
+                            </property>
+                            <property name="FontSize" >
+                                <int>12</int>
+                            </property>
+                            <property name="CurrFontNo" >
+                                <int>4</int>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[LL]]></string>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Z]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Value parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038334515283-3]]></string>
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Foreground" >
+                                <object class="java.awt.Color" >
+                                    <constructor>
+                                        <int>255</int>
+                                        <int>0</int>
+                                        <int>255</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>15</int>
+                                        <int>-37</int>
+                                        <int>21</int>
+                                        <int>16</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.TextSymbol" >
+                            <property name="Value" >
+                                <string><![CDATA[stn_id]]></string>
+                            </property>
+                            <property name="Font" >
+                                <null class="java.awt.Font" />
+                            </property>
+                            <property name="DisplayUnitName" >
+                                <string null="true" />
+                            </property>
+                            <property name="NumberFormatString" >
+                                <string><![CDATA[###0.#]]></string>
+                            </property>
+                            <property name="FontSize" >
+                                <int>12</int>
+                            </property>
+                            <property name="CurrFontNo" >
+                                <int>4</int>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[UM]]></string>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[IDN]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="1" >
+                                    <string><![CDATA[Parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1038886400195-0]]></string>
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Foreground" >
+                                <object class="java.awt.Color" >
+                                    <constructor>
+                                        <int>254</int>
+                                        <int>0</int>
+                                        <int>255</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Stretchy" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>-17</int>
+                                        <int>38</int>
+                                        <int>34</int>
+                                        <int>16</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add" >
+                        <object class="ucar.unidata.ui.symbol.WindBarbSymbol" >
+                            <property name="Stretchy" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="WindSpeed" >
+                                <double>65.0</double>
+                            </property>
+                            <property name="WindDirection" >
+                                <double>300.0</double>
+                            </property>
+                            <property name="Active" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="RectPoint" >
+                                <string><![CDATA[MM]]></string>
+                            </property>
+                            <property name="ParamIds" >
+                                <array class="string"  length="2" >
+                                    <string><![CDATA[SPEED]]></string>
+                                    <string><![CDATA[DIR]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs" >
+                                <array class="string"  length="2" >
+                                    <string><![CDATA[U or windspeed parameter]]></string>
+                                    <string><![CDATA[V or direction parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="Missing" >
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="Id" >
+                                <string><![CDATA[ID-1068505360451-2]]></string>
+                            </property>
+                            <property name="Background" >
+                                <null class="java.awt.Color" />
+                            </property>
+                            <property name="Foreground" >
+                                <object class="java.awt.Color" >
+                                    <constructor>
+                                        <int>255</int>
+                                        <int>0</int>
+                                        <int>255</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="LineWidth" >
+                                <int>1</int>
+                            </property>
+                            <property name="Filled" >
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="BeingCreated" >
+                                <boolean>false</boolean>
+                            </property>
+                            <field name="bounds" >
+                                <object class="java.awt.Rectangle" >
+                                    <constructor>
+                                        <int>-10</int>
+                                        <int>-10</int>
+                                        <int>20</int>
+                                        <int>20</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                            <field name="underline" >
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url" >
+                                <null/>
+                            </field>
+                            <field name="baseline" >
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                        </object>
+                    </method>
+                </object>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.ui.symbol.StationModel">
+            <property name="Name">
+                <string><![CDATA[Location]]></string>
+            </property>
+            <property name="List">
+                <object class="java.util.ArrayList">
+                    <method name="add">
+                        <object class="ucar.unidata.ui.symbol.TextSymbol">
+                            <property name="Value">
+                                <string><![CDATA[LOCATION]]></string>
+                            </property>
+                            <property name="Font">
+                                <object class="java.awt.Font">
+                                    <constructor>
+                                        <string><![CDATA[sansserif.bold]]></string>
+                                        <int>0</int>
+                                        <int>12</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="Scale">
+                                <double>0.8</double>
+                            </property>
+                            <property name="RectPoint">
+                                <string><![CDATA[UL]]></string>
+                            </property>
+                            <property name="ParamIds">
+                                <array class="string" length="1">
+                                    <string><![CDATA[ID]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs">
+                                <array class="string" length="1">
+                                    <string><![CDATA[Parameter]]></string>
+                                </array>
+                            </property>
+                            <property name="Background">
+                                <object class="java.awt.Color">
+                                    <constructor>
+                                        <int>153</int>
+                                        <int>153</int>
+                                        <int>153</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="Foreground">
+                                <object class="java.awt.Color">
+                                    <constructor>
+                                        <int>0</int>
+                                        <int>255</int>
+                                        <int>255</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="Id">
+                                <string><![CDATA[ID-1108399097352-0]]></string>
+                            </property>
+                            <property name="Filled">
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="Stretchy">
+                                <boolean>false</boolean>
+                            </property>
+                            <property name="BeingCreated">
+                                <boolean>false</boolean>
+                            </property>
+                            <field name="bounds">
+                                <object class="java.awt.Rectangle">
+                                    <constructor>
+                                        <int>6</int>
+                                        <int>6</int>
+                                        <int>66</int>
+                                        <int>15</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                            <field name="underline">
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url">
+                                <null/>
+                            </field>
+                            <field name="baseline">
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add">
+                        <object class="ucar.unidata.ui.symbol.ShapeSymbol">
+                            <property name="Shape">
+                                <string><![CDATA[PLUS]]></string>
+                            </property>
+                            <property name="ShapeType">
+                                <string><![CDATA[line]]></string>
+                            </property>
+                            <property name="ParamIds">
+                                <array class="string" length="0"/>
+                            </property>
+                            <property name="ParamDescs">
+                                <array class="string" length="0"/>
+                            </property>
+                            <property name="Foreground">
+                                <object class="java.awt.Color">
+                                    <constructor>
+                                        <int>255</int>
+                                        <int>0</int>
+                                        <int>255</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="Id">
+                                <string><![CDATA[ID-1108399097352-1]]></string>
+                            </property>
+                            <property name="Filled">
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="BeingCreated">
+                                <boolean>false</boolean>
+                            </property>
+                            <field name="bounds">
+                                <object class="java.awt.Rectangle">
+                                    <constructor>
+                                        <int>-10</int>
+                                        <int>-9</int>
+                                        <int>20</int>
+                                        <int>20</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                            <field name="underline">
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url">
+                                <null/>
+                            </field>
+                            <field name="baseline">
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                        </object>
+                    </method>
+                </object>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.ui.symbol.StationModel">
+            <property name="Name">
+                <string><![CDATA[C130]]></string>
+            </property>
+            <property name="List">
+                <object class="java.util.ArrayList">
+                    <method name="add">
+                        <object class="ucar.unidata.ui.symbol.ShapeSymbol">
+                            <property name="Shape">
+                                <string><![CDATA[AIRPLANE3D]]></string>
+                            </property>
+                            <property name="ShapeType">
+                                <string><![CDATA[line]]></string>
+                            </property>
+                            <property name="Scale">
+                                <double>1.3</double>
+                            </property>
+                            <property name="ParamIds">
+                                <array class="string" length="0"/>
+                            </property>
+                            <property name="ParamDescs">
+                                <array class="string" length="0"/>
+                            </property>
+                            <property name="RotateParam">
+                                <string><![CDATA[HEADING]]></string>
+                            </property>
+                            <property name="Foreground">
+                                <object class="java.awt.Color" id="id5">
+                                    <constructor>
+                                        <int>255</int>
+                                        <int>0</int>
+                                        <int>255</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="Id">
+                                <string><![CDATA[ID-1123780574289-0]]></string>
+                            </property>
+                            <property name="Filled">
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="BeingCreated">
+                                <boolean>false</boolean>
+                            </property>
+                            <field name="bounds">
+                                <object class="java.awt.Rectangle">
+                                    <constructor>
+                                        <int>-10</int>
+                                        <int>-10</int>
+                                        <int>20</int>
+                                        <int>20</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                            <field name="underline">
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url">
+                                <null/>
+                            </field>
+                            <field name="baseline">
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add">
+                        <object class="ucar.unidata.ui.symbol.LabelSymbol">
+                            <property name="ParamIds">
+                                <array class="string" length="1">
+                                    <string><![CDATA[C130]]></string>
+                                </array>
+                            </property>
+                            <property name="Value">
+                                <string><![CDATA[C130]]></string>
+                            </property>
+                            <property name="Font">
+                                <object class="java.awt.Font">
+                                    <constructor>
+                                        <string><![CDATA[dialog.bold]]></string>
+                                        <int>0</int>
+                                        <int>14</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="FontSize">
+                                <int>14</int>
+                            </property>
+                            <property name="CurrFontNo">
+                                <int>6</int>
+                            </property>
+                            <property name="Scale">
+                                <double>1.3</double>
+                            </property>
+                            <property name="ParamDescs">
+                                <array class="string" length="1">
+                                    <string><![CDATA[label]]></string>
+                                </array>
+                            </property>
+                            <property name="Foreground">
+                                <object idref="id5"/>
+                            </property>
+                            <property name="Id">
+                                <string><![CDATA[ID-1123780574289-1]]></string>
+                            </property>
+                            <property name="Filled">
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="BeingCreated">
+                                <boolean>false</boolean>
+                            </property>
+                            <field name="bounds">
+                                <object class="java.awt.Rectangle">
+                                    <constructor>
+                                        <int>-15</int>
+                                        <int>-36</int>
+                                        <int>34</int>
+                                        <int>19</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                            <field name="underline">
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url">
+                                <null/>
+                            </field>
+                            <field name="baseline">
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                        </object>
+                    </method>
+                </object>
+            </property>
+        </object>
+    </method>
+</object>

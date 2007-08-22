@@ -1,0 +1,76 @@
+<html><head>
+  <title>Image Movie Files</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+<body>
+The IDV can display a sequence of time-stamped images as an animation.
+This is most commonly used with the 
+<a href="../controls/misc/ImageMovieControl.html">Web-Cam Display Control</a>.
+<p>
+One can write their own xml file and display the images withing the IDV
+using this xml format.
+<p>
+There are really two xml formats used. The first defines a set of [ug::tag imagesets]:
+
+[ug::xml {
+<imagesets base="http://www.unidata.ucar.edu/georesources/webcams/images" name="IDV Webcams">
+    <group name="Rockies">
+        <imageset name="Boulder, CO"  
+                  index="boulder_co/index.xml"  
+                  lat="40.0" lon="-105.27"/>
+        <imageset name="Denver, CO"  
+                  index="denver_co/index.xml"  
+                  lat="39.75" lon="-105"/>
+    </group>
+    <group name="National Parks">
+        <imageset name="Theodore Roosevelt National Park, ND"  
+                  index="theodorerooseveltnationalpark_nd/index.xml"  
+                  lat="46.94889" lon="-103.43306"/>
+        <imageset name="Big Bend National Park,TX"  
+                  index="bigbendnationalpark_tx/index.xml"  
+                  lat="29.25" lon="-103.25"/>
+        <imageset name="Olympic National Park"  
+                  index="olympicnationalpark/index.xml"  
+                  lat="48.26667" lon="-124.675"/>
+    </group>
+    ...
+</imagesets>
+}]
+
+
+This is a &quot;table of contents&quot;. The [ug::attr base] attribute, if defined, is used
+as a url base to prepend to  the urls defined by the [ug::attr index] attributes.
+This file can be imported by the <a href="../controls/misc/ImageMovieControl.html">Web-Cam Display Control</a>.
+The [ug::attr  lat] and [ug::attr lon] attributes are optional and are used to locate
+the source of the movie on a map for the user to select.
+<p>
+Each of the [ug::attr index ] attributes refers to an [ug::tag images] xml file of the form:
+[ug::xml {
+<images base="http://www.unidata.ucar.edu/georesources/webcams/images/boulder_co" 
+        name="Boulder, CO" 
+        group="Rockies" 
+        format="yyyyMMddHHmmz" desc="From: http://9news.com">
+    <image time="200607251446GMT" file="image_200607251446GMT.jpeg"/>
+    <image time="200607251430GMT" file="image_200607251430GMT.jpeg"/>
+    <image time="200607251414GMT" file="image_200607251414GMT.jpeg"/>
+    <image time="200607251357GMT" file="image_200607251357GMT.jpeg"/>
+    <image time="200607251344GMT" file="image_200607251344GMT.jpeg"/>
+    ...
+</images>
+}]
+
+The [ug::tag images] tag  defines a [ug::attr base] attribute (optional, used to prepend to any image urls),
+a [ug::attr name], a (optional) [ug::attr group] and a date [ug::attr  format] and a description ([ug::attr desc]).
+Each [ug::tag  image] tag has a [ug::attr time] in the format specified in the [ug::tag images]
+tag and a [ug::attr file] attribute which refers to some image. This may be an absolute or relative
+url or file path.
+<p>
+
+
+This file can also be directly imported by the 
+<a href="../controls/misc/ImageMovieControl.html">Web-Cam Display Control</a>.
+
+
+</body>
+</html>

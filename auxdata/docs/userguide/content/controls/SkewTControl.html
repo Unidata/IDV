@@ -1,0 +1,230 @@
+{Skew-T Display}
+
+
+{
+
+The meteorological Skew-T display is available  for:
+<ul>
+
+<li>RAOBs (balloon soundings)
+
+<li>numerical weather prediction model output with
+temperature and humidity. The dew-point temperature is computed by
+internal code from temperature and relative humidity grids.
+
+<li>from a local file that contains aircraft track data. 
+</ul>
+
+
+
+[ht::cimg images/GridSkewTControlGui.gif {The Grid Skew-T Control}]
+
+
+The IDV Skew-T display includes a table
+of related aerological parameters, and appears in a
+separate window.
+
+<p>
+
+To connect the IDV to data used to make a Skew-T diagram see
+  <a href="../data/choosers/RaobChooser.html">Choosing a RAOB
+    Data Source from a Remote Server</a> and 
+  <a href="../data/choosers/CatalogChooser.html">Choosing a
+    Gridded Data Source from a Remote Server</a>.
+
+<p>
+
+A label at the top of the Skew-T window shows
+  the latitude-longitude position of the sounding.
+RAOB station location is shown on the main IDV display as a 
+small colored square. When displaying Skew-T plots made from gridded model output,
+  the position of the sounding is shown in the main 3D view window by
+  a  solid-color selector point and vertical line. 
+  You can move this model-output-based Skew-T position over the map by
+  dragging the selector point with the left
+  button.
+
+<p>
+
+When displaying RAOBs (balloon soundings)
+  the choice among several soundings to display is made by the pull down
+  list labeled <b>Soundings</b>. Each entry has both station id number
+  and time of sounding.
+
+<p>
+
+When displaying a Skew-T diagram made from
+  gridded numerical weather model output, there is a pull-down
+  selector menu of the
+  model output valid times in the upper right corner.
+
+<p>
+
+The animation control buttons are available in either case:
+
+[ht::cimg images/AnimButtons.gif]
+
+See more about the animation control in 
+<a href="../ui/Animation.html">Animation Control</a>.
+
+<p>
+
+To increase precision using the the Skew-T diagram, enlarge the
+window by dragging on the edges.
+You can zoom  the Skew-T diagram by holding down the Shift key
+and dragging  the right button upwards; drag downwards to zoom out.  You can pan the
+diagram by dragging the mouse pointer in
+any direction while pressing the right mouse button.
+
+<p>
+
+The temperature and dew-point traces can be modified via the cursor.
+Because the coordinate system of a Skew-T diagram is skewed, however,
+a sawtooth-like pattern must be used.  Press 
+the left      button on the first data-point to be modified and drag it
+horizontally along an isobar to the desired position, then move the
+pointer diagonally along an isotherm to keep the data-point at the
+desired position and to pick-up the next data-point.  Repeat until
+done and then release the mouse button.
+
+<p>
+
+The check box labeled <b>Parcel mode</b> selects the origin of the
+  path of a parcel of air lifted pseudo-adiabatically from the initial
+  point to the top of the diagram.  Check <b>Parcel path</b>
+  to display the path of a lifted parcel.
+
+<p>
+
+The initial conditions of the pseudo-adiabatically lifted air-parcel
+  (i.e. the parcel's pressure, temperature, and moisture content at
+  the start of the pseudoadiabatic lifting) are determined from the
+  environmental sounding (i.e. the temperature and dew-point profiles)
+  according to the mode indicated by <b>Parcel mode</b> check.  The modal
+  choices are <b>Bottom of Sounding</b>, <b>Below Cursor</b>, 
+  <b>At Cursor Pressure</b>, and <b>At Cursor (Press, Temp)</b>.
+  In <b>Bottom of Sounding</b> mode, the initial conditions of the
+  parcel are determined from the temperature and
+  dew-point at the lowest (i.e. highest pressure) data-point of the
+  environmental profiles.
+  In <b>Below Cursor</b> mode, the initial conditions
+  of the parcel are determined from the temperature and dew-point
+  profiles by computing the pressure-weighted mean potential temperature
+  and water-vapor mixing-ratio of the atmosphere that lies below the
+  cursor when the middle mouse button is pressed.
+  Thus, pressing the middle button 
+  at 950 hPa for a sounding that starts at 1000 hPa will effectively
+  mix the lower 50 hPa of the atmosphere and lift the resulting parcel
+  starting at 975 hPa.
+  In <b>At Cursor Pressure</b> mode,
+  the initial pressure, in-situ temperature, and moisture content of the parcel
+  are taken from the the temperature and dew-point profiles at the pressure of
+  the cursor when the middle mouse button is pressed.
+  In <b>At Cursor (Press, Temp)</b> mode,
+  the initial pressure and in-situ temperature of the parcel equal
+  the pressure and temperature values under the cursor when the middle mouse button
+  is pressed.  The initial
+  moisture content is determined from the dew-point profile at the
+  initial pressure.
+
+<p>
+
+The computed path of a lifted parcel is automatically updated when
+  appropriate.
+  In both <b>Below Cursor</b>, <b>At Cursor Pressure</b>, and <b>At Cursor
+  (press, temp)</b> modes, the
+  path will update as the cursor is dragged.  In all modes, the path
+  will update whenever the profiles change.
+
+<p>
+
+The check box labeled <b>Virtual Temperature</b> controls whether
+  or not the virtual temperatures of the environmental profile and
+  pseudo-adiabatically lifted air-parcel are displayed.
+
+<p>
+
+The check box labeled <b>Spatial Loci</b> controls whether or not the location
+  of the sounding data is displayed in the main, 3-D window.  For aircraft
+  data, the track of the aircraft will be displayed; for RAOB data, the 
+  locations of the stations will be displayed; and for gridded data, the grid
+  points will be displayed.
+
+<p>
+
+The table to the left of the Skew-T diagram contains aerological
+  parameters determined from the atmospheric sounding displayed in the
+  diagram.  The following abbreviations are used:
+  <dl>
+    <dt>LCL</dt>
+    <dd>
+      Lifting Condensation Level: the level at which a
+      pseudo-adiabatically lifted air-parcel becomes saturated with
+      water-vapor.
+    </dd>
+    <dt>LFC</dt>
+    <dd>
+      Level of Free Convection: the level at which the virtual
+      temperature of a pseudo-adiabatically lifted air-parcel changes
+      from being less than the environment's virtual temperature to
+      being greater than the environment's.
+    </dd>
+    <dt>LNB</dt>
+    <dd>
+      Level of Neutral Buoyancy: the level above the LFC at which the
+      virtual temperature of a pseudo-adiabatically lifted air-parcel
+      equals the environment's virtual temperature.
+    </dd>
+    <dt>CAPE</dt>
+    <dd>
+      Convective Available Potential Energy: the area between the
+      virtual temperature trace of the pseudo-adiabatically lifted
+      air-parcel and the virtual temperature trace of the environment
+      from the LFC to the LNB in which the parcel's virtual temperature
+      is greater than the environment's (positive CAPE connotes
+      convective development).
+    </dd>
+    <dt>CIN</dt>
+    <dd>
+      Convective Inhibition: the negative of the area between the
+      virtual temperature trace of the pseudo-adiabatically lifted
+      air-parcel and the virtual temperature trace of the environment
+      from the parcel's initial conditions to the LFC in which the
+      parcel's virtual temperature is less than the environment's
+      (negative CIN connotes initial positive work to lift the parcel).
+    </dd>
+  </dl>
+
+<p>
+
+The aerological table also shows values from any position on the
+diagram, in the section "Background." Move the mouse cursor over the
+table to the position desired.
+
+<p>
+
+<div class="pagesubtitle">Raob Skew-T Control</div>
+
+[ht::cimg ../quickstart/images/SkewT.gif {The Raob Skew-T Control}]
+
+
+The above image shows the Raob Skew-T Control which displays Raob data
+from balloon soundings launched at stations 
+(See <a href="../data/choosers/RaobChooser.html">Choosing RAOB Data</a>).
+
+<p>
+
+The <code class="command">Soundings</code> 
+menu allows you to select which sounding (station)
+to display. 
+
+<p>
+
+Click on the <b>Stations</b> check-box in the lower right corner
+to toggle visibility of the
+RAOB station location mark in the main view window.
+
+
+</body>
+}
+

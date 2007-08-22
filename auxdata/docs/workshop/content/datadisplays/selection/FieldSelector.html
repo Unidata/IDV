@@ -1,0 +1,217 @@
+
+<html>
+<head>
+<title>Using the Field Selector</title>
+</head>
+
+<body>
+
+<div class="overview">
+The Field Selector is used to select data sources, parameters,
+data times, and types of displays to use for creating visualizations.
+</div>
+
+<div class="pagesubtitle">Field Selector</div>
+
+<p>The [ht::tab Field Selector] consists of 4
+panels:
+
+<ul class="step">
+
+  <li>[ht::command Data Sources] - used for selecting
+      data sources that are currently loaded into the IDV. 
+      [ht::dataset Formulas] is a particular
+      data source for applying formulas to other data sources.</li>
+
+  <li>[ht::command Fields] - displays the list of
+      data choices (parameters, formulas) for the selected data source.</li>
+
+  <li>[ht::command Displays] - holds the list of
+      display types applicable to the selected field.</li>
+
+  <li>[ht::command Data Subset] - depending on the type of data,
+      this panel displays the list of times, levels and spatial subsetting
+      associated with the selected data choice.</li>
+
+</ul>
+
+[ht::cimg images/FieldSelectorWindow.gif] 
+
+<div class="pagesubtitle">Data Sources</div>
+
+When the IDV reads in a data source, most of the time it only reads
+enough metadata to be able to create a list of [ht::param data choices]. 
+Some of the datasets may be quite large and this allows
+you to only read those portions that you need instead of the entire
+dataset.
+
+<div class="pagesubtitle">Data Choices (Fields)</div>
+
+When a data source is loaded, a set of [ht::param data choices] 
+are created from the metadata. This allows you to select
+a subset of the dataset.
+
+<ol class="step">
+
+  <li>Select the [ht::dataset sample_eta_grid.nc]
+      data source in the [ht::command Data Sources]
+      panel of the [ht::tab Field Selector]
+      window.</li>
+
+  <li>In the [ht::command Fields] panel, you will
+      see two tabs - [ht::param 3D grid] and 
+      [ht::param 2D grid] indicating that this dataset has
+      both 2D and 3D fields in it.</li>
+
+  <li>Click on the little tab to the left of the 
+      [ht::param 3D grid] field to expand that tab.
+      The list contains those 3D fields from the dataset
+      that the IDV can display.</li>
+
+  <li>Select the [ht::param temperature] field.  When
+      you select a field, the [ht::command Displays]
+      and [ht::command Data Subset] panels are populated with
+      entries applicable to that field.
+
+</ol>
+
+<p><b>Derived Choices</b><p>
+
+When a data source creates the list of data choices from the parameters
+in a dataset, it also uses a library of pre-defined derived quantities
+to create a list of choices for fields that can be calculated from the
+fields in the dataset.
+
+<ul class="step">
+
+  <li>Scroll the list down until you see the [ht::param Derived] 
+      tab.  Expand this tab.</li>
+
+  <li>In the expanded list, select [ht::param {Dewpoint (from T &amp; RH)}]. 
+      This dataset does not have
+      a dewpoint field in it, but it does have temperature (T) and
+      relative humidity (RH) which can be used to calculate dewpoint.
+  </li>
+
+</ul>
+
+<div class="pagesubtitle">Displays</div>
+
+When each data choice is created, the metadata for that choice
+is used to determine which displays are applicable to that field.
+
+<ol class="step">
+
+   <li>Look at the list of available display types for your
+       Dewpoint selection in the [ht::command Displays]
+       panel.</li>
+
+   <li>Select the [ht::param {Flow Vectors (from GridRelative_u &amp; GridRelative_v)}]
+       field and notice that the list of displays changes.</li>
+
+   <li>Select the [ht::param {Sounding Data (T &amp; dewpoint only)}]
+       field and notice that you get another list of displays.</li>
+
+   <li>Select [ht::param {Dewpoint (from T &amp; RH)}]
+       again.</li>
+
+   <li>In the [ht::command Displays] panel, select
+       <code class="display">Contour Plan View] so we can
+       create a horizontal slice of the data and display it as
+       contours.</li>
+
+</ol>
+
+<div class="pagesubtitle">Data Subsetting</div>
+
+The [ht::command Data Subset] panel allows you to temporally and
+spatially subset the data you've chosen.   For this exercise, we
+will look at subsetting by time and level.
+
+<p><b>Times</b><p>
+
+Each data choice may or may not have times associated with it
+which are displayed in the [ht::command Times]
+panel. If there is a set of times, you can select all or just a subset
+of times to be displayed.  There are two ways you can select
+a subset of times.
+
+<ul class="step">
+
+  <li>You can set the time subset for all parameters in the dataset.
+
+    <ol class="substep">
+      <li>Double click (or right click and select the 
+          [ht::menu Properties] menu) on the dataset name in the 
+          [ht::command Data Sources] panel to bring up the 
+          [ht::dialog Data Source Properties] editor.</li>
+
+      <li>This dataset has ten time steps. In the 
+          [ht::tab Times] tab,
+          uncheck the [ht::command Use All]
+          checkbox.  You can now select the subset of times.  Select
+          the first five (5) times in the list
+          ([ht::param 2002-01-17 12:00:00Z]
+           to [ht::param 2002-01-18 12:00:00Z]). 
+          [ht::listSelect]</li>
+
+      <li>Click the [ht::button OK] button to apply
+          this change and close the window.
+
+      <li>Notice that the change is reflected in the 
+          [ht::tab Times] tab of the [ht::command Data Subset] panel
+          when you select [ht::param Dewpoint] this time.</li>
+
+    </ol>
+  </li>
+
+  <li>You can set the time subset for a single parameter 
+      in the [ht::tab Times] tab.
+
+    <ol class="substep">
+
+      <li>In the [ht::tab Times] tab of the [ht::command Data Subset]
+          panel, uncheck the [ht::command Use Default]
+          checkbox.
+      <li>In the list of times in that panel, 
+          select the last five (5) times in the list
+          ([ht::param 2002-01-18 18:00:00Z] 
+          to [ht::param 2002-01-20 00:00:00Z]).</li>
+    </ol>
+     
+  </li>
+
+</ul>
+
+<p><b>Levels</b><p>
+
+Each data choice may or may not have levels associated with it
+which are displayed in the [ht::tab Level] tab of the
+[ht::command Data Subset] panel.  If you do not select a
+level, the entire volume is read in.
+
+<ul class="step">
+
+  <li>You can set the level subset for a single parameter 
+      in the [ht::tab Level] panel.
+
+    <ol class="substep">
+
+      <li>In the [ht::tab Level] tab, select the 
+          [ht::param {850 hectopascal}] level.
+    </ol>
+     
+  </li>
+
+</ul>
+
+When you are finished making all your selections, click the
+<code class="button">Create Display</code> button to apply them
+and create the display.  The subset of data you selected will
+be read from the data source and displayed in the currently active
+<code class="dialog">View Window</code>.
+
+[ht::cimg images/MainWindowTD.gif] 
+
+</body>
+</html>

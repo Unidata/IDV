@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<params>
+  <param name="vr" table="ATD-Velocity" range_min="-28.0" range_max="28.0"/>
+  <param name="dm" table="ATD-Wild" range_min="-123.0" range_max="-57.0"/>
+  <param name="dbz" table="ATD-Wild" range_min="-15.0" range_max="65.0"/>
+  <param name="z_hh_k" table="ATD-Wild" range_min="-15.0" range_max="65.0"/>
+</params>

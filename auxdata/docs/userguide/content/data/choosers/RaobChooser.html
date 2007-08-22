@@ -1,0 +1,78 @@
+<html><head>
+  <title>Choose  RAOB Data (atmospheric balloon sounding)</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+
+<body>
+
+
+You can access RAOB data either from remote ADDE servers 
+(using the [ug::chooser Soundings: Remote] chooser, pictured below) or
+from local files (using  the [ug::chooser Soundings: Local] chooser).
+The only difference between these two choosers is specifying
+the source of data. You either select an ADDE server and press
+[ug::button Connect] or you select a file containing RAOB data.
+
+[ht::cimg images/RaobServerChooser.gif {RAOB Chooser}]
+
+
+
+To select RAOB data you:
+<ol>
+<li> Choose the server or the local file. The list of times will be 
+displayed. In this chooser you select particular stations at particular
+times.
+
+<li> Select a set of dates and times that you want to use.
+To select more than one time use Control-Click or Shift-Click.
+
+<li> Select one or more stations for the given time using the map.
+See <a href="#stationmap">below</a> for more information on
+how to use the station map.
+
+<li> Once selected the station/time combination will be shown in the
+<b>Selected Stations</b>.
+
+<li> When done, load the selected RAOB data with the [ug::button Add Source] button.
+
+
+</ol>
+
+
+
+
+<div class="pagesubtitle">Choose  Single Level RAOB Data</div>
+
+RAOB data can also be selected (from an ADDE server) as a single level.
+This data can then be displayed as a station model.
+
+[ht::cimg images/RaobSingleLevelChooser.gif {Single Level RAOB Chooser}]
+
+To select single level RAOB data you:
+<ol>
+<li> Select an ADDE server and data type and press [ug::button Connect].
+
+<li> Either, choose a relative set of times steps (e.g., Last 5 times).
+
+<li> Or, choose a set of absolute times (e.g., 12Z, 1Z); When choosing 
+absolute times for the first time the IDV needs to query the ADDE server 
+for the times. This may take some time.  
+Times can be selected in the list or the time line
+(use control/click or shift/click in the list to select multiple times).
+See the <a href="../../tools/Timeline.html">Timeline section</a> for details on its use.
+
+
+<li> Select the level you want to view.
+
+<li> Optionally select the station model to be used for displaying this data.
+
+<li> When done, load the selected RAOB  data  with the [ug::button Add Source] button.
+
+
+</ol>
+
+
+
+
+</body>
+</html>

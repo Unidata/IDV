@@ -1,0 +1,58 @@
+<html>
+<head>
+<title>Trajectory Point Display</title>
+</head>
+
+<body>
+
+
+<div class="overview">
+Trajectory data can be displayed as individual point observations.
+</div>
+
+<ol class="step">
+
+<li> If you do not have track data loaded see <a href="Tracks.html">Trajectory Display</a>.
+
+<li>For performance reasons we want to subset the point data.
+<ul>
+<li> Right click on the [ht::dataset track.nc] entry in the [ht::command Data Sources] section.
+<li> Select [ht::menu {Subset Point Data}]
+<li> Select all fields under [ht::command Current Fields] by clicking in the list and
+pressing Control-A.
+<li> Remove all selected fields by pressing [ht::button Remove]
+<li> Select the fields of interest. e.g., [ht::param Altitude] down to [ht::param Dew/Frost Point Temperature]
+with successive Control-clicks or Shift-Clicks.
+<li> Press [ht::button Add]
+<li> Press [ht::button OK]
+</ul>
+
+
+
+<li> Create the [ht::display Point Data Plot] display.
+<ul>
+<li>In the [ht::command Fields] panel select the [ht::param Point Data] field.
+<li>In the [ht::command Displays]  select [ht::display Point Data Plot] and press
+    [ht::button Create Display]
+<li> When the IDV asks  if you  want to see all of the times select [ht::button No].
+<li> Change the [ht::command Station Model] used to be [ht::command Airplane]
+</ul>
+
+
+<li> Change the track time display
+<ul>
+<li> Bring up the display control window for the [ht::display Track] display.
+<li> Press Time Mode [ht::button Change]  button.
+<li> For End Time choose [ht::button From Animation Time]
+<li> For Start Time choose [ht::button Relative to End Time]
+<li> Change the Offset for the start time to be -30 minutes.
+</ul>
+
+
+<li> Turn on animation. 
+
+<li> For the point display change the [ht::command Station Model] used to be [ht::command TrackDewpoint]
+</ol>
+
+</body>
+</html>

@@ -1,0 +1,106 @@
+Proposed Structure for supporting station (point) observations 
+(Metars, synops, raobs).
+
+/**
+ * Abstraction for a point observation (values at a lat, lon, time)
+ * would handle the most generic thing like a lightning flash
+ */
+public interface Observation extends Data
+{
+    public LatLonPoint getLocation(); //(or should this be get EarthLocation to
+                                      // include elevation where that could be
+                                      // missing if not supplied)
+    public DateTime getTime();
+    public Data getData();
+}
+
+/**
+ * Abstraction (interface) for Station observations
+ */
+public interface StationObIface extends Observation
+{
+    public NamedLocation getStation();
+    public EarthLocation getEarthLocation(); // convenience - would call
+                                             // NamedLocation.getEarthLocation()
+}
+
+/**
+ * Implementation of StationOb as a Tuple
+ */
+public class StationOb extends Tuple implements StationObIface
+{
+   // structure would be (NamedLocation, DateTime, Data)
+}
+
+/**
+ * Abstraction (interface) for a static database of VisAD objects 
+ * representing a set of Observations
+ */
+public interface ObservationDB extends Data
+{
+    public Observation getObservation(LatLonPoint location); // retrieves first
+    public Observation getObservation(LatLonPoint location, DateTime time);
+
+    public ObservationDB getObservations(LatLonPoint location);
+    public ObservationDB getObservations(DateTime time);
+    public ObservationDB getObservations(LinearLatLonSet bounds);
+
+    // these could possibly return DateTime[] instead of Gridded1DSetIface
+    public Gridded1DSetIface getTimes();  
+    public Gridded1DSetIface getTimes(LatLonPoint location);  
+
+}
+
+public interface StationObDB extends ObservationDB
+{
+    public StationOb getStationOb(NamedLocation station); // retrieves first
+    public StationOb getStationOb(NamedLocation station, DateTime time);
+    public StationObDB getStationObs(LatLonPoint location);
+    public StationObDB getStationObs(DateTime time);
+
+    public Gridded1DSetIface getTimes(NamedLocation station);
+    public StationObDB getStationObs(LinearLatLonSet bounds);
+    public Field getTimeSeries(NamedLocation station);
+    public StationTable getStations();
+    public StationTable getStations(DateTime time);
+
+    // other possible methods (maybe in impl, but not iface
+    public StationObDB getStationObs(DateTime startTime, DateTime endTime);
+    public StationObDB getStationObs(NamedLocation station, 
+                                     DateTime startTime, DateTime endTime);
+}
+
+/**
+ * Implementation of ObservationDB as a FieldImpl
+ */
+public class ObservationDBImpl extends FieldImpl implements ObservationDB
+{
+   // Structure would be index -> Observation
+}
+
+/**
+ * Implementation of StationObDB as a FieldImpl
+ */
+public class StationObDBImpl extends FieldImpl implements StationObDB
+{
+   // Structure would be index -> StationOb
+}
+
+/**
+ * Interface - abstraction for read-only table of fixed stations
+ */
+public interface StationTable extends Data
+{
+    public NamedLocation getStation(Text identifier);
+    public NamedLocation getStation(String name);  // convenience
+    public StationTable getStations(LinearLatLonSet bounds);
+    public int size();  // get number of stations
+}
+
+/**
+ * Implementation as a Field
+ */
+public class StationTableImpl extends FieldImpl implements StationTable
+{
+  // Structure would be index -> NamedLocations
+}

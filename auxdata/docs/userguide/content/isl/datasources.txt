@@ -1,0 +1,41 @@
+dods.grid    Grids from an OPeNDAP server
+opendap.grid    Grids from an OPeNDAP server
+dods    Data from an OPeNDAP server
+opendap    Data from an OPeNDAP server
+adde.image    Images from an ADDE server
+raob    
+adde.point    Point data from an ADDE server
+adde.profiler    Wind Profiler Data
+file.track    Track files
+file.sonde    Upsonde/Dropsonde files
+netcdf.point    netCDF Point Data files
+netcdf.grid    Grid files (netCDF/GRIB/OPeNDAP)
+file.netcdf    netCDF files
+file.radar    NEXRAD Radar files
+opendap.radial    OPeNDAP Radar files
+file.doraderadar    DORADE Radar files
+wms    WMS image data
+kml    Google Earth Files KML/KMZ
+file.vis5d    Vis5D files
+file.areafile    McIDAS AREA files
+file.shapefile    Shape files
+file.image    Image files (gif, jpg, png)
+file.dem    DEM files
+file.text    Text or HTML files
+file.pointtext    Text Point Data files
+file.location    Locations
+file.imagemovie    Image Movie Index
+text.front    Front Bulletins
+file.drawing    Drawing files
+file.imagexml    Image XML files
+movie    Movies
+file.tiff    TIFF files
+cached    Cached data source
+file.audio    Audio File
+file.chatlog    Chat Log file
+file.addetext    Adde Text
+netcdf.sweep    netCDF Radar Sweep files
+netcdf.metar    netCDF METAR/Synoptic files
+file.profiler    EOL netCDF Profiler files
+file.level2radar    Level II Radar files
+file.any    I'm Still Feeling Lucky

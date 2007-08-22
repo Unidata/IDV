@@ -1,0 +1,40 @@
+
+<maps>
+
+  <map
+       source="/ucar/unidata/apps/trex/data/ca_nv_counties.xml"
+       description="California &amp; Nevada Counties"
+       visible="true"
+       color="0x00CC00"
+       linewidth="1.0"
+       linestyle="0"
+       />
+
+  <map
+       source="/ucar/unidata/apps/trex/data/wilderness.xml"
+       description="Wilderness Areas"
+       visible="false"
+       color="0xCC0000"
+       linewidth="1.0"
+       linestyle="0"
+       />
+
+  <map
+       source="/ucar/unidata/apps/trex/data/federallands.xml"
+       description="Federal Lands"
+       visible="false"
+       color="0xCC0000"
+       linewidth="1.0"
+       linestyle="0"
+       />
+
+
+  <map
+       source="/ucar/unidata/apps/trex/data/inyoroads.shp"
+       description="Inyo County Roads"
+       visible="false"
+       color="0x00CC00"
+       linewidth="1.0"
+       linestyle="0"
+       />
+</maps>

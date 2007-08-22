@@ -1,0 +1,240 @@
+<html><head>
+  <title>Formulas</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+The IDV provides techniques to make computations with
+data sources, and display the results.
+The simplest technique is using IDV "formulas" which are named one-line
+mathematical expressions.
+The steps for computing and displaying an IDV formula are 
+
+<ul>
+<li> Defining an IDV formula by name, description, and 
+mathematical formula.
+<li> Saving the formula.
+<li> Selecting what kind of display to use.
+<li> Selecting exactly which particular data you want to
+use in the formula-based computation.
+</ul>
+
+You can make formulas more powerful by writing methods
+(subroutines) in the Jython computer language, which is described in
+<a href="Jython.html">Jython Methods</a>.
+
+<p>
+
+When you define an IDV formula, it is saved and will appear in
+future runs of your IDV. 
+<P>
+
+To create a formula select the [ug::menu Edit Formulas {Create Formula}] 
+menu item. This brings  up the <b>Formula Editor</b> dialog box
+used to define a formula:
+
+[ht::cimg images/formula/AddFormula.gif]
+
+The minimal information you need to provide is the name
+of the formula and the actual formula.
+<p>
+
+If the formula name matches a name in the main Edit Menu 
+<a href="../ui/Menus.html#edit"><b>Parameter defaults</b></a>, then
+color tables and other settings may be automatically assigned, which
+may or may not be desirable for you. For example, if you choose a
+formula named T its displays would get the color tables associated with 
+temperature.
+
+<p>
+
+In the formula itself you can use common 
+mathematical operators much as +, -, * for multiply, / for divide, 
+and ** for power. Other Jython operations such as sqrt(a), max(b), pow(a,b), 
+and sin(c) are available. In the 
+<a href="Jython.html">Jython Methods</a>
+section of the User Guide
+you will see how to write complete complete multi-line functions or 
+methods in Jython  that you can call in one-line formulas.
+
+
+<p>
+
+The variable 
+names in the formula definition, such as &quot;NIR&quot; in the figure above,  
+are  operands and do <i>not</i> need to 
+exactly match any particular parameter name in any data source; the 
+association is made later, in the parameter selection step.
+<p>
+
+Do not use spaces in formula variable names, such
+as "wind speed." The formula is an expression in the
+Jython language.  Start each variable name with a letter.
+
+<p>
+
+
+It is best to use variable names that suggest the parameter data
+they represent, so that later you can easily remember
+what the variables should represent. Use names like Temp500m, RelHum_surf,
+absvort, sst_jan, density, or whatever makes sense to you. 
+If you use a variable names like V1 and V2, then later
+when the formula requests which real parameter name goes with 
+which variable name you may be puzzled which is which.
+<p>
+Variable names can have extra &quot;syntactic sugar&quot; attached to
+them that the IDV uses for a variety of purposes. The &quot;sugar&quot;
+consists of a set of name/value pairs contained 
+in brackets (&quot;\[...\]&quot;) after the variable name.
+<p>
+For example, normally variables are used to select and define data choices.
+You can also have variables that are simple text input from a user. For 
+example, evaluating the following expression:
+<pre>
+   someProcedure(someValue\[isuser=true\])
+</pre>
+will result in a dialog box being shown to allow  for the user to enter
+a text value (e.g., a number) for the variable <i>someValue</i>.
+
+<p>
+
+You can provide default values with:
+<pre>
+   someProcedure(someValue\[isuser=true,default=some default\])
+</pre>
+
+You can specify the types of data that can be selected for a variable
+with the <i>categories</i> name.  e.g.:
+<pre>
+   someProcedure(someDataValue\[categories=param:ALTITUDE\])
+</pre>
+
+If you want multiple data categories separate them with a &quot;;&quot;:
+<pre>
+   someProcedure(someDataValue\[categories=param:ALTITUDE;param:elevation\])
+</pre>
+
+If you only want to select 3D grids do:
+<pre>
+   someProcedure(someDataValue\[categories=GRID-3D-*\])
+</pre>
+
+If you only want to select 3D or 2D grids do:
+<pre>
+   someProcedure(someDataValue\[categories=GRID-3D-*;GRID-2D-*"\])
+</pre>
+
+
+You can also specify a regular expression pattern that is used
+to pre-select the first data choice  whose description
+matches the pattern.
+<pre>
+   someProcedure(someValue\[pattern=some_pattern\])
+</pre>
+
+
+
+<p>
+In the advanced section you can enter a description of the formula,
+its group or category and you can  define what types of displays 
+are applicable  for the given formula (the default is to be able to 
+use all displays).
+
+<p>
+The group is used to display the formula in the 
+Field Selector window and  can be any alphanumeric 
+text including spaces, numbers, and punctuation characters.
+Hyphens (&quot;-&quot;) define sub-categories.
+
+
+<p>
+To save the formula, click on <b>Add formula</b>. 
+A new entry appears in the selector panel. By right clicking on the formula
+entry in the Field Selector window you can edit the formula.
+To remove a formula, click on <b>Remove Formula</b> in the pull
+down menu.
+
+
+<div class="pagesubtitle">Different data sources and automatic navigation</div>
+
+The IDV hides much of the computational complexity. You
+can write a simple formula such as (CT*1.8 + 32.0) - dewptF and the IDV will
+automatically apply the calculation to every element in large 3D
+grids referred to as CT and dewptF. No loops over grid points are needed;
+and you don't even need to know anything about how the grid is 
+defined, mapped on the Earth, 
+or the data format.  You can even use different sources for the
+individual parameters, for example, CT can come from an Eta model output 
+grid and dewptF from your own local weather model. The two grids need hot have
+the same grid point locations nor the same areal coverage. The results
+are computed in the area of overlap, on the grid points locations of the
+first grid. Interpolation is automatically applied where needed.
+
+
+<div class="pagesubtitle">Creating a Display with a Formula</div>
+
+Using a formula as the data when creating a display is just
+like using any other data. You select the formula entry
+in the Field Selector window, the list of applicable displays
+will be shown and you create the display.
+<p>
+When you create a display the IDV needs to know what actual 
+data should be bound to the operands within your formula.
+A Field Selector window will appear that allows you
+to select the actual data for each operand.
+You can select parameters from more than one data source for 
+use in a single formula,
+for example, you can pick the same parameter from data sources of
+different times to compute a time difference in the parameter.
+
+[ht::cimg images/formula/FormulaParameterSelect.gif]
+
+
+Open the data source to see the names of 
+parameters available. Click on the parameter needed for each
+variable. Then click on <b>OK</b>. The 
+result of the formula is computed, for
+every data point in the source, and the
+result shown in the view window.
+
+
+<!--
+<div class="pagesubtitle">Wind Chill Example</div>
+
+Here is an example of a formula using the new (2001) JAG-TI wind chill formula.
+
+[ht::cimg images/formula/WindchillFormula.gif]
+
+Whoa!  That's no good. A temperature of 340 Kelvin is too
+hot. What went wrong?  We forgot about units. The temperature data is in
+Kelvins, and the wind speed is in m/s. The formula needs Celsius and
+kilometers per hour. So we have to build unit conversion into the
+formula. Use (T-273.15) for temperature and 3.6*WS for windspeed.
+Here is the result:
+
+[ht::cimg images/formula/Windchill2.gif]
+
+That's OK now. The IDV took about a minute to compute and display this wind
+chill formula
+for the full 3D Eta 211 grids of temperature, u and v,  for 10 time
+steps (1,148,550 data points).
+
+<p>
+
+For a further example, the air temperature was subtracted from the
+computed wind chill.  Two displays of this data, "apparent temperature 
+change due to wind chill" are shown below: contours
+and a colored image. Wind vectors were also displayed. Your students 
+can look for connections between wind chill depression below
+temperature and wind speed. It is also  useful to plot contoured  air
+temperature, and toggle among the displays to help understand the relationships.
+
+[ht::cimg images/formula/Windchill3.gif]
+
+-->
+
+
+</body>
+
+

@@ -1,0 +1,240 @@
+<html><head> 
+  <title>Basic ISL Tags</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+
+[isl::tagdef isl {Top level ISL tag} -attrs {debug {'true' or 'false'} offscreen {'true' or 'false'} loop {integer loop count} sleep {seconds to sleep}}]
+The [isl::tag isl] tag is the top level tag. It acts just like the 
+[isl::tagref group] tag but it can also hold a [isl::attr debug] attribute which results in 
+status messages being printed out.
+The [isl::attr offscreen] attribute allows you to turn off off screen rendering (the default is 
+to do offscreen rendering).
+
+
+[isl::tagdef group {Group a set of tags. Possibly loop.} -attrs {loop {integer loop count} sleep {seconds to sleep after each loop iteration}}]
+The [isl::tag group] tag holds a arbitrary number of children tags.
+
+
+
+[isl::tagdef property {Define a property} -attrs {name+ {property name} value {property value} fromfile {filename to read contents from} global {true/false}}]
+You can define properties with the [isl::tag property] tag.
+Any subsequent tag may have these property values substituted by using:<pre>
+${propertyname}
+</pre>
+ e.g.:
+[isl::xml {
+   <property name="basedir" value="/some/directory"/>
+   <property name="fromfile" fromfile="${islpath}/template.txt"/>
+   <property name="imagetype" value="png"/>
+   <image file="${basedir}/theimage.${imagetype}"/>
+}]
+
+
+The state within an ISL is stack based - i.e., if you are in a group tag or calling
+a  procedure  (see below) the properties that are defined there are local to that group or
+procedure call. When you leave that group or procedure call any properties that are
+defined are removed. However, you can specify global=&quot;true&quot; in the property tag
+and this will cause the property to be defined globally.
+<p>
+
+
+There are a set of predefined properties that can be used. 
+As described above, if you are in a loop the property <i>${loopindex}</i> will be set
+to the loop index. e.g.:
+[isl::xml {
+<isl loop="1000" sleep="3600">
+   <bundle file="test${loopindex}.xidv"/>
+</isl>
+}]
+
+
+
+<a name="simpledateformat"></a>
+The set of date and time values for the current time are also available.
+The property names are those defined for the Java 
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/java/text/SimpleDateFormat.html">
+SimpleDateFormat</a> class. 
+<p>
+If you preface any of these properties with &quot;anim:&quot; then the current animation time (if defined)
+is used. e.g.:<pre>
+${anim:yyyy}
+</pre>
+
+
+<p>
+The time properties are:
+<blockquote>
+<table>
+<tr><td>${yyyy}</td><td>  Year</td></tr>
+<tr><td>${yy}</td><td> Last 2 yar digits</td></tr>
+<tr><td>${M}</td><td> month number </td></tr>
+<tr><td>${MM}</td><td> two character month number </td></tr>
+<tr><td>${MMM}</td><td>  Short month name</td></tr>
+<tr><td>${MMMMM}</td><td>  Full month name</td></tr>
+<tr><td>${D}</td><td> Day in year</td></tr>
+<tr><td>${d}</td><td> Day in month</td></tr>
+<tr><td>${dd}</td><td> two character day in month</td></tr>
+<tr><td>${EEE}</td><td> Day name </td></tr>
+<tr><td>${H}</td><td> 0 based hour in day (24 hour)</td></tr>
+<tr><td>${HH}</td><td>   0 based two character hour in day (24 hour)</td></tr>
+<tr><td>${k}</td><td> 1 based hour in day (24 hour)</td></tr>
+<tr><td>${kk}</td><td> 1 based two character hour in day (24 hour)</td></tr>
+<tr><td>${K}</td><td> Hour in am/pm (12 hour)</td></tr>
+<tr><td>${KK}</td><td> two character hour in am/pm</td></tr>
+<tr><td>${a}</td><td>  am/pm</td></tr>
+<tr><td>${mm}</td><td> two character  minute in hour</td></tr>
+<tr><td>${s}</td><td> second in minute</td></tr>
+<tr><td>${ss}</td><td> two character second in minute</td></tr>
+<tr><td>${S}</td><td>  Millisecond</td></tr>
+<tr><td>${Z}</td><td> Timezone</td></tr>
+<tr><td>${G}</td><td> Era designator</td></tr>
+</table>
+</blockquote>
+
+
+[isl::tagdef append {Append to a property} -attrs {name+ {property name} value {property value} fromfile {filename to read contents from}}]
+This is just like the [isl::tag property] tag but it appends the value.
+
+
+[isl::tagdef echo {Print a message} -attrs {message+ {text to print out}}]
+The [isl::tag echo] tag allows you to print out a message.
+Here, for example, we are printing out the loop index and the date/time:
+[isl::importxml echo.isl]
+
+
+
+[isl::tagdef import {Import another isl file} -attrs {file+ {isl file}}]
+The [isl::tag import] tag allows you to import another ISL file. For example,
+using the [isl::tag import] tag here:
+[isl::importxml import.isl]
+
+Where systemdefs.isl has:
+[isl::importxml systemdefs.isl]
+
+
+Will result in something like:
+[isl::xml {
+<isl>
+    ...
+    <group>
+        <property name="prop1" value="somevalue"/>
+        <property name="prop2" value="somevalue"/>
+    </group>
+    ...
+</isl>
+}]
+ 
+You could use the import, for example, as a way of having common
+property definitions (e.g., location of data, images, etc.) shared
+by a set of ISL files.
+
+
+
+[isl::tagdef procedure {Define an isl procedure} -attrs {name+ {procedure name}}]
+The [isl::tag procedure] tag allows you to define a &quot;procedure&quot; that can be called
+with the [isl::tagref call] tag.
+
+
+[isl::tagdef call {Call an isl procedure} -attrs {name+ {procedure name to call}}]
+The [isl::tag call] tag allows you to call a procedure. The attributes
+within the call tag are set as properties and can be referenced
+within the procedure tags. For example, here we have a procedure 
+called &quot;makeImage&quot; It is called two times,  passing in 
+values for [isl::attr bundlefile] and [isl::attr imagefile].
+As noted, you can also drop the <i>call</i> tag and use the procedure
+name as the tag name.
+
+[isl::importxml procedure.isl]
+
+
+
+[isl::tagdef jython {Evaluate some Jython} -attrs {code {inline jython code to evaluate} file {jython file to evaluate}}]
+The [isl::tag jython] tag allows you to evaluate jython. The Jython is
+specified both in line as well as file based:
+[isl::importxml jython.isl]
+
+This Jython is evaluated by an interpreter that has all of the
+normal IDV Jython libraries. The global variable &quot;idv&quot;
+points to the IntegratedDataView.
+The global variable &quot;ig&quot; points to the instance of the ImageGenerator
+class that is running the ISL.
+<p>
+All attribute values can also be prefixed with &quot;jython:&quot;. This allows you
+to write a snippet of jython code that will return an attribute value:
+[isl::importxml jythoninattr.isl]
+
+
+
+
+[isl::tagdef stop {Stop all processing}]
+The [isl::tag stop] tag allows you to processing the ISL file and exit:
+[isl::xml {
+<stop/>
+}]
+
+
+[isl::tagdef pause {Pause for some time} -attrs {seconds {number of seconds to pause} minutes {number of minutes to pause} hours {number of hours to pause} every {number of hours past midnight}}]
+The [isl::tag pause] tag can have a number of attributes:
+<table>
+<tr><td>[isl::xml {<pause/>}]</td><td> No arguments will pause until all displays have been created.</td>
+<tr><td>[isl::xml {<pause seconds="10"/>}]</td><td>  Pause for 10 seconds.</td></tr>
+<tr><td>[isl::xml {<pause minutes="5.5"/>}]</td><td>  Pause for 5.5 minutes.</td></tr>
+<tr><td>[isl::xml {<pause hours="12.5"/>}]</td><td>  Pause for 12.5 hours.</td></tr>
+<tr><td>[isl::xml {<pause every="1"/>}]</td><td>  Pause until  the next hour. 
+The 'every' attribute means every N hours after midnight.</td></tr>
+<tr><td>[isl::xml {<pause every=".5"/>}]</td><td>  Pause until  the next hour or half hour. </td></tr>
+<tr><td>[isl::xml {<pause every="0.25"/>}]</td><td>  Pause until the next 15 minute time. e.g., on 
+the hour, quarter after, half past, etc.</td></tr>
+</table>
+
+
+
+[isl::tagdef foreach {For each loop} -attrs {value1 {comma separated values} ... {...} valuen {comma separated values}}]
+The [isl::tag foreach] tag allows you to iterate across a set of comma separated values.
+[isl::xml {
+<foreach fruit="apple,orange,banana" color="red,green,blue" ... valueN="...">
+    ...
+    Any ISL tags.  The property references ${fruit}, ${color}, etc., will be replaced
+    the values above. e.g., First time in the loop ${fruit} will be replaced with 'apple',
+    ${color} with 'red', etc.
+    ...
+</foreach>
+}]
+For example, here we are generating three different image types:
+[isl::importxml foreach.isl]
+
+
+
+[isl::tagdef exec {Execute a shell command} -attrs {command+ {some shell command to exec}}]
+The [isl::tag exec] tag allows you to execute external programs.
+For example, if you were generating images on one machine and then need to
+scp them to your web server you could do:
+[isl::importxml exec.isl]
+
+
+[isl::tagdef if {An if statement} -attrs {expr {jython expression to evaluate}} ]
+The [isl::tag if] tag allows you to have decision structures in your ISL.
+The form is:
+[isl::xml {
+<if expr="some jython expression">
+    <then>
+        ... The then block ...
+    </then>
+    <else>
+        ... The optional else block ... 
+    </else>
+</if>
+}]
+
+For example, say you only wanted to generate a particular image when the hour 
+of the day is after 12 noon. One could just go:
+[isl::importxml if.isl]
+
+
+
+
+
+</body>

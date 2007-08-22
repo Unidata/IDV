@@ -1,0 +1,116 @@
+<html>
+<head>
+<title>Doing More with Jython</title>
+<meta name="author" content="Dr. William Fingerhut"></head>
+</head>
+
+
+<body>
+
+[ht::desc More about Jython in the IDV: Calculating temperature anomalies]
+
+(Courtesy of Dr. William Fingerhut, Lyndon State College, VT.  For
+full details, see 
+<a href="http://apollo.lsc.vsc.edu/~fingerhutb/UserWshop2004/W2004_IDV_LabF.html" target="billsLab">
+http://apollo.lsc.vsc.edu/~fingerhutb/UserWshop2004/W2004_IDV_LabF.html</a>
+
+<p>
+A vertical cross section of temperature does not show as much structure
+as possible because the vertical temperature gradient is much larger
+than the horizontal temperature gradient. One way to solve this problem
+is to subtract the U. S. Standard Atmosphere from the temperature field,
+and create a vertical cross section of temperature anomaly.
+
+<p>
+This exercise will show how Jython can be used in the IDV for 
+complex calculations like this.
+
+<ol class="step">
+<li>[ht::loadBasicGrid]</li>
+<li>Create a [ht::display {Contour Vertical Cross Section}] of 
+the [ht::param {3D grid-&gt;temperature}] field</li>
+<li>Move the cross section line in the main display to a North/South
+orientation by dragging the endpoints.</li>
+
+<li>View the Jython procedure for calculating temperature anomaly</li>
+  <ul>
+  <li>Bring up the Jython library editor with the 
+      [ht::menu Edit Formulas {Jython Library}] menu item.</li>
+  <li>Click on the [ht::command {..workshop/default.py}] tab
+       which is the Jython library loaded from the plugin.  You should see:
+<pre>
+def tempAnom(t):
+    """ temperature anomaly from U.S. Standard Atmosphere """
+    # get pressure levels of temperature grids
+    p=extractPressureFromNWPGrid(t)
+    # calculate temperature for a constant lapse rate (6.5 C/km) atmosphere
+    tstd=288.15*(p/1013.25)**(287.05*.0065/9.806)
+    # change temperature in stratosphere to isothermal (216.65 K)
+    for i in range(len(p)):
+      if p\[i\] &lt; 225.0: 
+        tstd\[i\]=216.65
+    # calculate the temperature anomaly
+    tanom=t-tstd
+    return tanom
+</pre>
+<p>
+If it is not there, paste this formula into your locally editable
+library and click the [ht::button Save] button.
+
+</ul>
+
+<li>Create a Formula to call the tempAnom procedure</li>
+   <ul>
+   <li>Select the [ht::menu Edit Formulas {Create Formula}] menu item.</li>
+   <li>In the Formula Editor enter the following information:</li>
+   <ul>
+        <li><code class="command">Name:</code> anomaly of temperature</li>
+        <li><code class="command">Formula:</code> tempAnom(temperature)</li>
+        <li><code class="command">Group:</code> Workshop</li>
+   </ul>
+   <li>Click the [ht::command Add Formula] button.</li>
+   </ul>
+
+
+<li> Create the Display</li>
+<ul>
+   <li>Select the <code class="datasource">Formulas</code> data source 
+       in the <code class="dialog">Field Selector</code>.
+   <li>Choose the [ht::param {anomaly of temperature}] formula under the 
+       Workshop tab in the [ht::command Fields] panel.
+   <li>In the [ht::command Displays] pane select 
+   <code class="display">Contour Vertical Cross Section</code></li>
+   <li>Click the [ht::button  Create Display] button</li>
+   <li>When prompted for a temperature field, select it from the
+       sample RUC data and click the [ht::command OK] button</li>
+</ul>
+</li>
+
+<li>Share the cross section locations
+    <ul class="substep">
+    <li>In the [ht::menu Edit Sharing] menu of each display control, check
+    the [ht::menu {Sharing On}] item.</li>
+    <li>Position the control windows and the main display so you can
+    view all three at once.</li>
+    <li>Move the north/south line for the temperature cross section
+    slightly to align the two transects.</li>
+    <li>Compare the two displays.  A vertical cross section of 
+    temperature anomaly can discern:
+
+        <ul>
+        <li> the vertical level of temperature anomalies,
+        <li> the horizontal location of large horizontal 
+             temperature gradients, and
+        <li> the anomaly reversal across the tropopause.
+        </ul>
+    </li>
+    </ul>
+</li>
+
+<li>Try this exercise with real-time model data.
+
+</ol>
+
+
+</body>
+</html>

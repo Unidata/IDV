@@ -1,0 +1,162 @@
+<title>Introduction to the Color Table Editor</title>
+
+
+[ht::ug::top /tools/ColorTableEditor.html]
+
+
+
+
+
+[ht::overview {The  <a name="editor" class="index">color table editor</a>
+allows you to view, modify and create
+<glossary word="Color table">color  tables</glossary>.}
+]
+
+
+
+
+<ol class="step">
+  
+  <li>Open up the Color Table Editor from the
+      [ht::menu Tools {Color Table Editor}] menu.</li>
+  
+  <li>You should see something like this (well, plus a Brightness field):</li>
+  [ht::cimg images/Overview.jpeg -popup 1]
+
+  The Color Table Editor consists of:
+  
+  <ul class="substep">
+    
+    <li>A set of command menus: [ht::menu File],
+        [ht::menu {Color Tables}] and  [ht::menu Help].</li>
+    
+    <li>A color bar which shows the currently selected color table.</li>
+    
+    <li>A set of [ht::index breakpoints] that allow you to manipulate the color
+        bar.
+        <popup label="(More about breakpoints)">
+        Breakpoints are a color table editing convenience.
+        You can add breakpoints to a color table, move them and remove them.
+        You change the color in   the color table directly by moving a 
+         breakpoint
+        or
+        by filling and/or interpolating between two breakpoints.
+        </popup></li>
+    
+    <li>A color chooser which allows you to select a color.</li>
+    
+    <li>A set of edit mode items.</li>
+    
+    <li>History  buttons that allow you to undo and redo changes.</li>
+  </ul>
+  
+  <li>First, we want to select a color table.</li>
+  
+  <ul class="substep">
+    
+    <li>Select the [ht::menu {Color Tables}] menu:</li>
+    [ht::cimg images/Bright38Menu.gif]
+    
+    <li>Select [ht::menu Basic Bright38].</li>
+  </ul>
+  
+  <li>We don't want to change this particular color table so let's make a copy 
+      of it by saving the currently viewed color table under a new name.</li>
+  
+  <ul class="substep">
+    
+    <li>Select the [ht::menu File {Save As...}] menu item.</li>
+    
+    <li>Enter the name for the new color table: [ht::qt test1].</li>
+  </ul>
+  
+  <li>Now we'll play around a little changing the  colors through direct
+      manipulation of the breakpoints.</li>
+  
+  <ul class="substep">
+    
+    <li>Click the [ht::button Fill] edit mode button. You can select a color to
+        fill with from
+        the Color Chooser at the bottom of the window.</li>
+    
+    <li>Click on the breakpoint on the left and drag it around.</li>
+    
+    <li>Try changing colors in the color chooser.</li>
+
+    
+    <li>Click the [ht::button Interpolate] edit mode button and drag a 
+     breakpoint
+        around.</li>
+    
+    <li>Click the [ht::button Brightness] edit mode button and change the 
+brightness to 50%. Drag a breakpoint around.
+
+    <li>Click the [ht::button Transparency] edit mode button, select 50%
+        transparency
+        from [ht::button Transparency] menu and drag a breakpoint around.</li>
+    
+    <li>Click on the [ht::button History] back and forward arrows to undo/redo 
+     any
+        changes you make.</li>
+    
+    <li>Click the [ht::button +] and [ht::button -] signs below the color
+        bar to change the number of color slots in the color table.</li>
+  </ul>
+  
+  <li>Let's start fresh.</li>
+  
+  <ul class="substep">
+    
+    <li>Select the [ht::menu File Remove] menu item. This deletes the currently
+        viewed color table.</li>
+    
+    <li>You should be viewing the initial color table.</li>
+    
+    <li>Select the [ht::menu File {Save As...}] menu item
+        and enter  the name for a new color table:  [ht::qt test1].</li>
+    
+    <li>Set the edit mode to [ht::command None]</li>
+
+    <li>Now we'll change the colors through the [ht::menu Breakpoint] menu.</li>
+    
+    <ul>
+      
+      <li>Add a new breakpoint.</li>
+      
+      <ul>
+        
+        <li>Right click in the middle of the color bar to bring up the
+            [ht::menu   Breakpoint] menu:</li>
+        [ht::cimg images/AddBreakpointMenu.gif]
+        
+        <li>Select [ht::menu {Add Breakpoint} Here].</li>
+        
+        <li>You should have a color bar that looks something like:</li>
+        [ht::cimg images/NewBreakpoint.gif]
+      </ul>
+      
+      <li>Right click on the new breakpoint and we will get a different
+          menu:</li>
+      [ht::cimg images/SetColorsMenu.gif]
+      
+      <li>Select [ht::menu {Interpolate Right}].</li>
+      
+      <li>Select [ht::menu {Fill Left}].</li>
+      
+      <li>etc.</li>
+    </ul>
+    
+    
+  </ul>
+  
+  <li>Let's get back to the beginning.</li>
+  
+  <ul class="substep">
+    
+    <li>Select the [ht::menu File Remove] menu item. This deletes the currently
+        viewed color table.</li>
+  </ul>
+</ol>
+
+
+

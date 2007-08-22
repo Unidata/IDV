@@ -1,0 +1,78 @@
+<html>
+<head>
+<title>Generating Images</title>
+</head>
+<body>
+[ht::ug::top /isl/ImagesAndMovies.html]
+
+
+<div class="overview">
+Load in a bundle and generate a screen shot.
+</div>
+
+<ol class="step">
+
+<li> First of all we need an example display. Load in some model data and create some display. 
+<li> As we'll see later make sure you are in a Lat/Lon projection in an overhead view. Select
+[ht::menu Projections {Use Displayed Area}]
+
+<li> Save this off as [ht::filename isl.xidv] in  the isl directory.
+
+<li> Run this file:
+[gen::isl image1.isl]
+
+<li> Now, change directory  to the home directory (cd) and run:
+<pre>
+idv isl/image1.isl
+</pre>
+
+<li> What happened? 
+
+<li> The bundle reference in the isl was relative to where you run the idv from. We'll use the <i>islpath</i> property:
+[gen::isl image2.isl]
+
+
+<li> Note, no images were created. Only the bundle was loaded. To create an image we'll use the [gen::islTag image] tag:
+[gen::isl image3.isl]
+
+
+<li> The  [gen::islTag movie] tag lets us create a time-loop movie or animated gif.
+[gen::isl image4.isl]
+
+<li> The IDV gives you an easy way to save off a basic ISL file.
+Run the IDV with the above bundles. Select [ht::menu File {Save As...}] and
+choose the isl directory and enter [ht::filename image.isl].
+
+<li> At the ISL Properties dialog:
+<ol>
+<li> Turn off Offscreen.
+<li> Turn off Image
+<li> Turn on Movie and enter [ht::filename image.kmz].
+<li> Press OK. This saves a bundle (image.xidv) and an ISL file. 
+</ol>
+
+<li> The ISL file should look like this:
+
+[gen::isl image.isl]
+
+<li> If we enter a [ht::filename kmz] suffix for the movie the IDV will generate a Google Earth kmz file of the
+animation loop.
+
+<li> Now, we'll show you an easier way to do all of this.
+<ul>
+<li> Bring up the IDV again and load the above bundle.
+<li> Now, do a [ht::menu File {Save As}] and this time call it 
+[ht::filename idv.isl]. 
+<li>  Select [ht::button Generate a Movie] and  press [ht::button OK].
+<li> Lets look at this file.
+<li> Now, save the bundle as idv2.isl and this time select
+[ht::command Include Bundle Inline] and  press [ht::button OK].
+<li> Look at the result. 
+</ul>
+
+
+</ol>
+
+
+</body>
+</html>

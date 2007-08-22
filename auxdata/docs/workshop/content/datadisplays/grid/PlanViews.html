@@ -1,0 +1,96 @@
+<html>
+<head>
+<title>Plan Views of Gridded Data </title>
+</head>
+
+<body>
+
+
+<div class="overview">
+<p> Plan views are horizontal displays of two dimensional data.
+These data can be true 2D fields (e.g., sea level pressure)
+or a slice of a 3D dataset at a constant pressure or height
+(e.g., 500 hPa heights).  The IDV can display these plan views 
+as contours, color filled contours, or color shaded displays.</p>
+</div>
+
+<ol class="step">
+
+<li>First, let's create a display of contours of sea level pressure.
+
+  <ul class="substep">
+    <li>In the [ht::dialog Field Selector]'s 
+        [ht::command Data Sources] panel, select
+        the [ht::dataset NCEP Model Data ETA data source] 
+        that you loaded in during the previous exercise.</li>
+    <li>In the [ht::command Fields] panel, 
+        expand the [ht::param 2D grid] tab. Select the
+        [ht::param mean sea level pressure (ETA model reduction)]
+        field.</li>
+    <li>In the [ht::command Displays] panel, select 
+        [ht::display Contour Plan View] then click
+        the [ht::command Create Display] button.  The
+        data will be read from the remote server and displayed in the main
+        map window of the IDV.</li>
+    <li>From the control window for this display, you can change
+        the contour interval.  Click the [ht::button Set]
+        button next to the <b>Contour:</b> label to open the 
+        [ht::dialog Contour Properties Editor].  In the
+        editor, change the contour interval to 
+        <b>2</b> and click the [ht::button OK] button.</li>
+        
+  </ul>
+</li>
+
+<li>Now, let's add a display of color-filled contours of precipitation.
+
+  <ul class="substep">
+    <li>In the [ht::dialog Field Selector]'s
+        [ht::command Fields] panel, select the 
+        [ht::param {total precipitation over accumulation interval}]
+        field.</li>
+    <li>In the [ht::command Displays] panel of the 
+        [ht::dialog Field Selector], select 
+        [ht::display Color-Filled Contour Plan View] and 
+        then click the [ht::button Create Display] button.</li>
+    <li>Since this is a display of precip over an accumulation interval,
+        there will be no display for the first time period of the
+        model.  To see the display for subsequent times, start the
+        animation.</li>
+    <li>Stop the animation and return the display back to the first
+        time in the sequence.</li>
+  </ul>
+</li>
+
+[ht::cimg images/SlpAndPrecip.gif]
+
+<li>Overlay contours of 500 hPa geopotential height on the same display.
+
+  <ul class="substep">
+    <li>In the [ht::command Fields] panel, expand 
+        the [ht::param 3D grid] tab. 
+        Select the [ht::param geopotential height] field.</li>
+    <li>In the [ht::command Displays] panel, select 
+        [ht::display Contour Plan View] then click
+        the [ht::button Create Display] button.</li>
+    <li>In the [ht::command Data Subset] panel, select 
+        [ht::tab Level] tab and select the [ht::param 500 hectopascal] level
+        then click the [ht::button Create Display] button.</li>
+    <li>Start the animation.</li>
+    <li>From the control window for this display, change the level 
+        to 250 hectopascals using [ht::command Levels] selector.
+        </li>
+    <li>Rotate the display to see that the level you selected is displayed
+        above the surface parameters. [ht::zoom]
+    <li>Try other levels and notice how the pattern and position changes.</li>
+    <li>Stop the animation and return the display back to the first
+        time in the sequence and reset to the overhead view.</li>
+  </ul>
+
+</li>
+
+</ol>
+
+</body>
+</html>
+

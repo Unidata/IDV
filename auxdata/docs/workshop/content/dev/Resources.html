@@ -1,0 +1,74 @@
+
+<title>Resources</title>
+
+
+<div class="overview">
+</div>
+
+<ul>
+<li> The IDV  knows very little about everything. All of the things that
+make up an application are defined by a set of resources. This includes:
+<ul>
+<li> The user interface skins, menu bar, toolbar.
+<li> The data choosers, what data sources are available, formulas and derived quantities.
+<li> What displays are available and the  the display resources: color tables, station models, display conventions, etc.
+<li> ...
+</ul>
+
+<li> The resources are defined at startup time by the <i>idv.resourcefiles</i> property. This 
+points to a list of &quot;rbi&quot; files:
+<pre>idv.resourcefiles=%USERPATH%/idv.rbi;%SITEPATH%/idv.rbi;%APPPATH%/idv.rbi;%IDVPATH%/idv.rbi</pre>
+
+<li> By default the IDV looks in the USERPATH, SITEPATH, APPPATH and the IDVPATH for the RBI files and loads them in 
+that order.
+
+<li> Let's go look at the system idv.rbi file in ucar/unidata/idv/resources/idv.rbi
+<ul>
+<li> The RBI is made up of a number of resources tags, each one defines where the IDV can find the
+resources files for that particular resource. e.g., by default the xml files that define the
+color tables are found in:
+[ug::xml {
+  <resources name="idv.resource.colortables">
+    <resource location="%USERPATH%/colortables.xml"/>
+    <resource location="%SITEPATH%/colortables.xml"/>
+    <resource location="%APPPATH%/colortables.xml"/>
+    <resource location="%IDVPATH%/colortables.xml"/>
+  </resources>
+}]
+
+<li> The resource locations can point to different things, not just xml files. It just so happens
+that most of the resource files are defined using xml.
+
+</ul>
+
+<li> In a later section we'll see how to control what resources get loaded when using the &quot;loadmore=false&quot; attribute.
+
+<li> Let's look at the resources in more detail.
+<ul>
+<li> Run the ExampleIdv  with the argument -listresources to see the list of resources and which
+ones exist.
+<li> The X'ed red ones are those that don't exist. The green ones exist.
+<li> The pattern is used for recognizing resources in a plugin.
+<li> Note, the paths can be a Java resource, a file or a url. The IDV handles all of these transparently.
+<li> Let's create a couple of things - a new color table, a new station model and a new formula.
+<li> Shut down and restart with -listresources again.
+</ul>
+
+<li> Let's look at the local IDV storage directory.
+<ul>
+<li> cd to  ~/.metapps/DefaultIdv 
+<li> This directory holds everything created by the user in the ExampleIdv. Its name comes from
+idv.store.name property.
+<li> Note, there should be  colortables.xml, stationmodels.xml and derived.xml files  there. These hold the resources
+you created previously.
+<li> These can be used in a site path or within a plugin.
+</ul>
+
+</ul>
+
+
+<%nochildlist%>
+
+
+
+

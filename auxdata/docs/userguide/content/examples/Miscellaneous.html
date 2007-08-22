@@ -1,0 +1,111 @@
+<html><head>
+  <title>Miscellaneous Display Types</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>                  
+<body>
+
+
+<%childlist%>
+
+
+
+<subhead id="globedisplay">Globe Display</subhead>
+
+ 
+[ht::cimg images/GlobeDisplay.gif {The Globe display}]
+
+The illustration shows a IDV globe display of
+the earth, with AVN numerical weather prediction model output of 
+mean sea level pressure (as color-shaded image and contour lines)
+and 50 m/s wind speed isosurfaces showing the jet streams. The
+upper vertical scale is set to 32,000.
+
+<p>
+
+
+For more about this display and how to make it, see
+<a href="../quickstart/Globe.html">Getting Started: Globe Display</a>. 
+
+<subhead id="multipanel">Multi-Panel Display</subhead>
+
+You can create multi-panel map and globe displays through
+the [ug::menu File New {View Windows}] menu.  Below
+is an example of a two panel display comparing visible
+and IR satellite imagery.
+
+[ht::cimg images/MultiPanelDisplay.gif {Two Panel Map Display}]
+
+<subhead id="omnidisplay">Omni Display</subhead>
+ 
+The Omni display is a VisAD Spread Sheet, loaded with the 
+  parameter selected and its coordinates and units. The Spread Sheet is
+  used to create a display where you have complete control over which
+  coordinates are the axes, how it is colored, and so on.
+  See more in the 
+  <a href="../controls/misc/OmniControl.html">Omni Control</a>.
+
+<p>
+
+For use of the Spread Sheet, see the VisAD 
+Spread Sheet document at <a href="http://www.ssec.wisc.edu/~curtis/ss.html">
+http://www.ssec.wisc.edu/~curtis/ss.html</a>.
+
+[ht::cimg images/OmniControl.gif {}]
+ 
+
+
+<subhead id="htmldisplay">HTML Viewer</subhead>
+ 
+
+
+The IDV has a window to display any HTML page. Any normal HTML page can
+be presented, including ones accessed over the Internet, such as 
+http://www.unidata.ucar.edu/.
+For the use of the IDV, special HTML tags are available to control the
+IDV, including connecting to data sources and making displays. 
+You can compose an HTML page with named links to make pre-defined
+displays from specified data. These can be used for class and lab exercises,
+scientific reports, or even as simple user interfaces for special
+purposes.
+For example, you could make an HTML page, which when displayed using
+the 
+IDV, offered a list of pre-defined common displays used by pilots at
+an airport. Without knowing how to use the IDV the pilots could see
+the weather information they need by simply clicking on items in the
+HTML page. Similarly a field project can use the IDV with an HTML page
+to view incoming data by single clicks on choices.
+
+<p>
+
+You can also add fully interactive IDV displays right inside
+an HTML page.  Special "IDV" tags in the HTML page 
+create IDV displays inside the HTML page, with all the
+usual IDV display controls available.
+
+<p>
+
+Use of IDV displays inside an HTML document lets you create lab exercises,
+tutorials, and scientific reports which include text, access to data
+of any complexity or size, and fully interactive IDV displays.  Your
+readers can see the data you describe, and examine it themselves with
+full interactivity,
+when the HTML document is viewed with the IDV.
+
+<p>
+
+Since such HTML documents are not very large, they can be emailed
+or made available for others to use online. Teachers can share HTML
+files that drive the IDV for classroom use, reports, or simple user interfaces.
+
+<p>
+
+For more about creating and using IDV HTML pages, see
+<a href="../controls/misc/TextDisplayControl.html">HTML and the IDV</a>.
+
+
+[ht::cimg ../controls/misc/images/TextDisplayControlGui.gif]
+
+
+</body>
+
+

@@ -1,0 +1,609 @@
+<html><head>
+  <title> FAQ</title>
+  <link rel="stylesheet" type="text/css" href="idv.css" title="Style">
+</head>
+
+
+<body>
+
+
+<faq>
+
+<faqitem cat="General"></faqitem>
+
+<faqitem q="What is the IDV?" name="top" id="whatis">
+
+The Integrated Data Viewer (IDV) is a framework for
+visualizing and analyzing geoscience data.   The IDV release includes a 
+Java&#153;-based software library, and applications made from that software. 
+It uses the <a href="http://www.ssec.wisc.edu/~billh/visad.html">VisAD</a>
+library for data and display models as well as other Java utility
+packages.  It was developed at the Unidata Program Center (UPC), part of the
+University Corporation for Atmospheric Research, Boulder, Colorado, which
+is funded by the National Science Foundation.  The software is
+freely available under the terms of the GNU Lesser General Public License.
+
+<p>
+
+The IDV brings together the ability to display 
+and work with satellite imagery, gridded data (primarily from model output), 
+and surface, upper air, and radar data within a unified interface. 
+The IDV "reference application" provides many of the standard 
+2-D data displays that other Unidata packages (e.g. GEMPAK and McIDAS) 
+provide. It also provides 3-D views of the atmosphere and allows users 
+to interactively slice, dice, and probe the data to create cross-sections, 
+profiles, animations and value read-outs of multi-dimensional data sets.
+Computation and display of built-in and user-supplied formula-based 
+derived quantities is supported as well.
+It includes an integrated HTML interface that can be used to create
+HTML based users interfaces to drive the displays, or to embed IDV 
+displays and controls directly in an HTML document.  
+
+</faqitem>
+
+<faqitem q="Is the IDV still under development?" id="idvfuture">
+
+Development of the IDV is ongoing at the UPC and as it
+progresses new features will be added and any problems/bugs will
+be fixed. The development will be driven by the needs of the
+community of users. Suggestions, comments and collaboration are welcomed
+and encouraged.  The goal is to provide new and innovative ways
+of displaying and analyzing data, as well as provide the common
+displays that many users have come to expect.
+
+</faqitem>
+
+<faqitem q="I'm submitting a paper for publication and want to include a citation for the IDV.  What reference should I use?" id="paperref">
+
+The following can be used as a citation:
+<pre>
+Murray, D., J. McWhirter, S. Wier, S. Emmerson, 2003: The Integrated 
+    Data Viewer: a Web-enabled application for scientific analysis and 
+    visualization. Preprints, 19th Intl Conf. on IIPS for Meteorology, 
+    Oceanography and Hydrology.
+</pre>
+
+</faqitem>
+
+
+<faqitem cat="Downloading and Starting with Web Start">
+
+</faqitem>
+
+<faqitem q="I couldn't download the IDV. Is the server down?" id="download">
+Usually an inability to download the IDV and 
+other Unidata software is due to a failure by your system to correctly
+identify itself to our server.  
+<p>
+
+Both our server and the system trying to download Unidata software 
+have a "name" (domain name or host name or server name) and an IP address.
+For example the address 128.117.140.62 is the same as the server with
+name  unidata.ucar.edu.
+
+<p>
+
+As a security measure many servers only reply to requests from systems
+whose address can be matched to a name using "reverse lookup " -
+turning the numbers into a name.
+
+<p>
+
+"Forward lookups" find the IP address of any given host name. The
+reverse action is resolving IP addresses into host names. If our server
+cannot resolve the requesting system IP address into a name, no software
+will be sent to the requesting IP address.  If you are having problems
+downloading the IDV from our server, check with your local system 
+administrator to make sure that your machine has reverse lookup enabled.
+If not, download the IDV from a system that does.
+
+</faqitem>
+
+<faqitem q="When I first run IDV through Web Start, it asks me to accept a certificate? What should I do?" id="certificate">
+When you first download IDV through Web Start, you will see a message
+like:
+<pre>
+This <b>application</b> is requesting unrestricted access to your local 
+machine and network.
+
+Do you want to install and run: <b>Integrated Data Viewer </b>
+Signed and distributed by: <b>University Corporation for Atmospheric Research </b>
+Publisher authenticity verified by: <b>Thawte Premium Server CA</b>
+
+Caution: <b>University Corporation for Atmospheric Research</b> asserts 
+that this content is safe. You should only install and run this application 
+if you trust <b>University Corporation for Atmospheric Research</b> to make 
+this assertion.
+</pre>
+
+If you trust Unidata to make safe software, click the [ht::command Start]
+button
+
+</faqitem>
+
+<faqitem q="How can I get updates through Web Start?" id="updates">
+When starting the IDV using Web Start, the latest version of all
+IDV code is found at the Unidata server, and it is automatically 
+downloaded and installed if it is newer than the version you have on 
+your system. 
+</faqitem>
+
+<faqitem q="What is &quot;there is no disk in drive A&quot; message in Web Start?" id="nodisk">
+Sometimes starting a program  on a Windows system with Web Start will
+produce a dialog box that says "There is no disk in drive A." Normally
+clicking the continue button will cause the program to start properly.
+</faqitem>
+
+<faqitem q="How do I use the Web Start Applications Manager?" id="wsmanager">
+If you run the IDV from Web Start, for more control of the IDV, 
+use the Web Start Application Manager. You can launch it by clicking
+<a href="http://www.unidata.ucar.edu/software/idv/webstart/IDV/player.jnlp">
+here</a>. Alternatively, go to 
+http://java.sun.com/products/javawebstart/demos.html, and
+find the Web Start "Application Manager" on that page. Start the
+"Application Manager" by clicking on the "Launch" button.
+<p>
+
+In the Application Manager you will see the 
+IDV, if you do this after you have installed the IDV with Web Start.
+
+<p>
+
+You can use the Application Manager to start the IDV without going
+to the Unidata web page Web Start link, and to remove an old IDV to
+force a complete new IDV download next time you start the IDV with the
+Unidata web page 
+http://www.unidata.ucar.edu/projects/metapps/webstart/IDV/ .
+
+<p>
+
+If your Web Start IDV installation seems broken, remove it with the
+Application Manager and reload from the IDV Web Start Link. When you
+run the Application Manager it will have a panel showing "Integrated Data
+Viewer" with an icon. Click to select and it will highlight; it may already be
+selected. Use the 
+[ug::menu Application {Remove Application}] menu. The IDV item will
+go away. Reload the IDV from the Unidata web site.
+
+<p>
+
+You can see what Java version the IDV is using. Use the Application
+Manager's [ug::menu File Preferences  Java] menu and look at "Product version."
+</faqitem>
+
+<faqitem q="How can I show the Java console when running with Web Start?" id="wsconsole">
+When you start the IDV using Web Start, you don't have a console window
+opened by default.  You can enable the Java console through the Web 
+Start Applications Manager.  Bring up the Web Start Manager 
+(Java Application Cache Viewer) as described <a href="#wsmanager">above</a>.  
+Use the [ug::menu Edit Preferences] menu to bring up the Preferences dialog.  
+Click on the Advanced Tab and expand the Java Console item in the tree.  Select
+the "Show Console" option and then click the OK button.  The next time
+you start the IDV with Web Start, you will get a console that will log
+messages.  Messages are also logged to the IDV console.  See the
+item <a href="#console">below</a> for information on using this feature.
+</faqitem>
+
+<faqitem q="Can I serve up JNLP bundles from my own web server?" id="ownws">
+You can save a bundle as a JNLP file by using a .jnlp extension
+in the [ug::mmenu File {Save As...}] menu dialog.  Once you have the
+file, you can place it on your web server and create a web page
+that points to it. Your web server must identify this as a JNLP file, 
+so if it doesn't already support this, you'll need to configure your 
+Web server so that all files with the .jnlp file extension are set to the 
+application/x-java-jnlp-file MIME type.  Each Web server has a specific 
+way in which to add MIME types. For example, for the Apache Web 
+server you must add the following line to the .mime.types configuration file:
+
+<pre>
+application/x-java-jnlp-file JNLP
+</pre>
+
+Check the documentation for the specifics of your Web server.
+</faqitem>
+
+<faqitem cat="Using the IDV"></faqitem>
+
+
+<faqitem q="How can I tell if the IDV is busy doing something?" id="busy">
+The lower right corner of the main IDV view window shows a box with
+progress bars IDV is busy making a display or doing anything.   In
+the status bar at the bottom, messages will appear when the IDV is reading
+data from a server or disk.  Also, while the displays are being created,
+there is usually a "please wait" notice in the lower left corner
+of the main display. 
+</faqitem>
+
+<faqitem q="How can I save a display?" id="savedisplay">
+
+You can save images of displays as JPEG or PNG files or animations
+as Quick Time movies or animated GIF's.
+See <a href="tools/ImageCaptures.html">Image Captures</a>.
+
+<p>
+
+You can save particular IDV state with all displays, including data     
+sources, displays, maps, map projection, view point, and color tables,  
+by saving a "bundle" file with the 
+[ug::mmenu File {Save As...}] menu, and naming a file. 
+See <a 
+href="Bundles.html">Saving State with Bundles</a>. A bundle file lets   
+you reset the IDV to exactly the same state as before. The file can     
+be emailed to others to recreate your IDV display, provided they have   
+access to the same data source.                                         
+
+<p>
+
+Using the favorite <a href="Bundles.html">bundles</a>
+ with [ug::menu File {Save As Favorite...}] menu you can
+save and use several configurations which are retrieved with the 
+[ug::menu Displays {Favorites}] menu.   
+</faqitem>
+
+<faqitem q="How can I change the start-up settings?" id="changestart">
+
+You can customize many of the IDV properties through 
+[ug::mmenu Edit Preferences] menu.  The preference
+manager allows you to configure the many features of the IDV.<p>
+
+You can also create a default IDV state and save it off using the 
+bundle facility.  This allows you to override the preferences and
+also include datasets and displays to load when the IDV starts.
+To save a default bundle, use the 
+[ug::mmenu File {Default Bundle} {Save}] menu.
+See <a href="Bundles.html">Saving State with Bundles</a>.
+</faqitem>
+
+<faqitem q="How can I change the amount of memory available to the IDV?" id="memory">
+By default, the IDV startup script (runIDV) allocates 512 megabytes     
+of maximum memory for Java. If your system has more than 1 gigabyte     
+of memory, increasing the amount of memory available to the IDV can     
+improve performance for displaying large datasets. You can change the   
+runIDV script to increase the amount of memory. In that script, change  
+the <b>-Xmx512m</b> to some higher number (e.g. <b>-Xmx1024m</b>). The  
+number is the number of bytes, the trailing <b>m</b> is a multiplier    
+(m=mega). Do not use the maximum amount of memory on your machine as    
+some is needed for the operating system itself. If the system has to    
+use swap memory, performance will degrade as well.                      
+</faqitem>
+
+<faqitem q="How can I change the size of the IDV window?" id="windowsize">
+You can save particular IDV set-up including map, projection, 
+With the IDV running, move and re-size the display and data source
+windows to the arrangement you like. Save the 
+"default bundle" with the 
+[ug::mmenu File {Default Bundle} Save] menu. 
+When you next start the IDV the same arrangement will appear. 
+</faqitem>
+
+<faqitem q="How can I reset the map projections?" id="projections">
+
+When new data is displayed, the map projection will be automatically    
+switched to match the native projection of the data. You can control    
+this with the 
+[ug::menu Projections {Auto-Set Projection}] menu check-box. 
+You may not want this, especially when you have   
+set up a view of a particular area which will be lost when new data is  
+loaded. Check it off if you don't want it.                              
+
+<P>
+You can switch an existing display to its native data set projection
+using the display control's [ug::menu View {Use Data Projection}] menu.
+</faqitem>
+
+<faqitem q="How can I set the default projection?" id="defaultprojection">
+
+You can select a default map projection with the Projection Manager
+which is accessed from the [ug::menu Projections {New/Edit}] menu.
+Select one of the items in the <b>Default</b> pull down list. The 
+default projection is overridden by a projection saved in the 
+<a href="Bundles.html">default bundle</a>, and by resetting the map projection
+with new data if enabled. As a result, you may never see the
+default map projection. Make sure your default bundle has the default
+projection, and you have the menu item 
+[ug::menu Projections {Auto-Set Projection}] menu checked off.
+Choosing a default map projection is not necessary for good use of the IDV
+and you can ignore it if you like. It is often simpler to use default bundles.
+</faqitem>
+
+<faqitem q="How can I change the color table range?" id="colorrange">
+
+Many displays have a color table controlling the colors of data values. 
+A color table has a range of minimum and maximum data values. You       
+can change the range for a display by right clicking on the color bar
+in the display's legend and selecting the [ug::menu {Change Range...}]
+menu from the popup menu.  For more information on controlling the
+color table, see the <a href="tools/ColorTableEditor.html">Color
+Table Editor</a> documentation.</faqitem>                                        
+<faqitem q="How can stop the IDV from asking if I really want to exit?" id="noaskexit">
+You can change many features of the IDV though the User Preferences
+dialog.  Use the [ug::mmenu Edit Preferences]
+menu to bring up the dialog.  On the <code class="command">General</code> tab,
+uncheck the &quot;Confirm Before Exiting&quot; box to stop the
+IDV from asking if you want to exit.
+</faqitem>                                        
+
+<faqitem q="When I set a color table transparent, why doesn't it show up that way?" id="transparency">
+Using transparency in a color display may give unexpected results.
+In general, only the last thing added can be fully transparent.
+If you have a display that is transparent, then add in a new display,
+you may not see it.  The problem is caused by the lack of ordering
+in Java 3D.   You can use the display control's View-&gt;Bring to Front
+menu to remove and re-add the display that you want to be transparent 
+so it is last.
+</faqitem>
+
+
+<faqitem cat="Data"></faqitem>
+
+<faqitem q="What is Fast Rendering and when should I use it?" id="fastrender">
+By default, the IDV will try to adjust the data renderings to account
+for projection seams.  This is computationally intensive in some 
+cases and slows down the display of data.  When you set your preference
+to &quot;Use Fast Rendering&quot;, the IDV will not try to account
+for the projection seams.  If you are displaying data in its
+native projection, this will result in faster rendering of the data
+depiction.  However, if you have several displays of data, each
+from a different data source and on a different projection, you may
+see anomalies in the displays (spurious lines, portions of images).
+At that point, you can turn off fast rendering for a particular display
+using the Edit-&gt;Properties menu of the Display Control for that
+display, or set your system preference back to not use fast rendering.
+</faqitem>
+
+<faqitem q="What is the difference between true wind vectors and regular wind vectors?" id="truewind">
+Some gridded data is produced with the wind components being
+relative to the model grid instead of the earth.  The true wind vectors 
+are rotated from the grid projection to actual (true) wind direction.  
+For non-projected (i.e., lat/lon grids), grid relative is the same as true.
+</faqitem>
+
+<faqitem q="What is the difference between the Standard Atmosphere 
+and Vis5D pressure to height conversion?" id="pressure_to_height">
+The IDV displays pressure surfaces by converting the pressure
+to a height in some reference system.  There are two reference
+systems that come standard with the IDV - the U.S. Standard Atmosphere
+and Vis5D.  The U.S. Standard Atmosphere only computes has conversions
+for pressures up to about 80 km.  The Vis5D coordinate system uses a
+logarithmic conversion:
+<pre>
+      P = 1012.5 * e^( H / -7.2 )        (^ denotes exponentiation)
+      H = -7.2 * Ln( P / 1012.5 )        (Ln denotes natural log)
+</pre>
+so can be used for heights above 80 km.  
+</faqitem>
+
+<faqitem q="Can I view Level III Radar data in the IDV?" id="level3">
+The IDV can load Level III radar products through the 
+<b>Radar-&gt;Level III</b> chooser which connects to an ADDE
+server.  Starting with the 2.0 release, the IDV can read
+some Level III products from local disk or a THREDDS Data Server (TDS).
+At present, this is limited to radial products only.
+</faqitem>
+
+<faqitem q="Can I view Level II Radar data in the IDV?" id="level2">
+
+The IDV can be used to create displays of WSR-88D Archive Level II
+radar data.  The Level II data is supplied as volume-scan files,                each file having all data from one WSR-88D radar                        
+for all sweeps for one &quot;time&quot;. Unidata                        
+Community sites can receive Level II data using the <a                  
+href="http://www.unidata.ucar.edu/software/ldm/index.html">      
+Unidata Local Data Manager (LDM)</a>. Archived Level II data is         
+available from the <a href="http://www.ncdc.noaa.gov/"> National        
+Climatic Data Center (NCDC)</a>.<p>
+
+The files should be stored on your file system with each station's files 
+in a directory (folder) whose directory name is the station 
+4-character ID (e.g., KTLX for Oklahoma City).  In some cases the data
+files do not have any location information in them and the IDV uses the
+directory name as a first guess at the station location.   
+</faqitem>
+
+<faqitem q="Why do I get an error when I try to load radar
+data that I downloaded from NCDC?">
+
+There are few common problems that can cause this:
+
+<ol>
+
+<li><b>The files are in a compressed tar file</b> - 
+Typically, when you download Level II data from NCDC, the files
+are in a compressed TAR file which holds the individual volume scans.
+You need to extract the volumes from the TAR file with utilities 
+like tar, gunzip, WinZip into a directory as described in the 
+previous FAQ item. </li>
+
+<li><b>You are using the Files chooser</b>
+You should load the radar data using the Level II data
+chooser in the Data Source Chooser, not the Files chooser.
+In some cases, the files do not have any location information in
+them.  The Level II data chooser allows you to associated a station
+location with the data file, using the directory name as a first
+guess.</li>
+
+<li><b>You are trying to load Level III raster products</b>
+The IDV only handles the Level III data that is stored in
+radial format (Base Reflectivity, Storm Relative Velocity,
+Base Velocity, 1 and 3 hour precipitation, Echo Tops).
+</li>
+
+</ol>
+</faqitem>
+
+<faqitem q="When I try to read in my GRIB data, why do I get an
+ucar.grib.NotSupportedException?" id="gribtables">
+For the IDV to read in GRIB data, it needs access to lookup
+tables for decoding the information in the data.  The IDV comes
+pre-configured with most of the commonly used tables from NCEP,
+FNMOC, etc, but some GRIB data from regional centers may use
+tables other than the defaults.  If the IDV does not have 
+the necessary table, you will get the NotSupportedException.
+You can add in new tables by following the instructions in the 
+User's Guide section on
+<a href="data/GribTables.html">Adding in new GRIB tables</a>.
+</faqitem>
+
+<faqitem q="How are grids resampled in the IDV?" id="resample">
+The IDV uses two methods for resampling data - weighted
+average and nearest neighbor.  These are the default sampling
+mode for VisAD which the IDV is based on.  For any grid,
+the samples are organized in a topology, which may be
+triangles (Irregular2D), squares (Gridded2D), tetrahedra
+(Irregular3D) or cubes (Gridded3D). For target points
+the system finds which topology element contains the
+target. For nearest neighbor, it gets the values at the
+vertex of that containing topology element closest to the
+target point. For weighted average, its computes a
+weighted average of all vertices of that containing
+topology element, where the weights are bilinear in
+2-D and trilinear in 3-D. (source: Bill Hibbard, SSEC)
+
+</faqitem>
+
+<faqitem cat="Video Cards"></faqitem>
+
+<faqitem q="Do I need a special video card to run the IDV?" id="videocard">
+Your video card must support OpenGL (or Direct-X if you are
+using the Direct-X version of Java 3D).  If you experience
+problems with IDV displays (sets of triangles, spurious lines,
+weird looking displays), make sure your video driver is up to date.  
+See your system's documentation for how to check that.
+</faqitem>
+
+<faqitem q="The display goes grey or gets corrupted when I resize my
+IDV display. What's wrong?" id="badvideo">
+ATI cards do not always play nicely with the OpenGL version of
+Java 3D under Windows.  If you experience problems with corrupted 
+displays (sets of triangles, spurious lines, weird looking displays)
+and have an ATI card and are running Windows, try the following:<p>
+<ul>
+<li>Right click on the Windows Desktop and select Properties from the
+pop-up menu.
+<li>From the Settings tab, make sure the color quality is 16 bit.  
+<li>Click the Advanced button and select the OpenGL tab.  Depending 
+    on your card, either click the button for Force 16 bit buffer 
+    (or something like that) or click on the Compatibility settings 
+    button and click the "Force 16 bit" radio button.
+<li>Click the OK buttons to exit the Display Properties dialog.
+<li>Try the IDV again and see if it works better
+<li>If not, try using the Direct-X installer instead of the OpenGL 
+    installer.
+</ul>
+</faqitem>
+
+<faqitem q="I'm having problems with the OpenGL verion under Windows.
+How can I run the Direct-X version Java 3D?" id="d3d">
+If you are using the version of Java 3D distributed with the IDV
+(1.3.2), you can switch between the OpenGL and Direct-X versions
+of Java 3D with a command line switch.  
+If you are using runIDV.bat to start the IDV, edit that file and
+uncomment the appropriate line.  If you have your own script
+for  starting the IDV, add in the <b>-Dj3d.rend=d3d</b> option 
+to your start line (before -jar or class name).  
+</faqitem>
+
+<faqitem q="Does the IDV support 3D Stereo?" id="stereo">
+
+The Java 3D library which the IDV uses supports stereo on properly
+configured stereo devices. We have added   
+the necessary code to allow stereo to work in certain configurations.
+At present, the Unidata Program Center does not have access to a stereo 
+system like a GeoWall, so our experience testing with these systems 
+is limited.  You will need to modify the runIDV script to change the 
+<code class="command">-Didv.enableStereo=false</code> to be 
+<code class="command">-Didv.enableStereo=true</code> before 
+starting the IDV.  
+If your runIDV script does not have the
+<code class="command">-Didv.enableStereo=false</code>
+argument in it then  change:
+<pre>
+command="java -Xmx512m -jar idv.jar $*"
+</pre>
+to:
+<pre>
+command="java -Xmx512m -Didv.enableStereo=true -jar idv.jar $*"
+</pre>
+<p>
+After doing this, if you bring up the IDV on a 
+stereo device and it does not appear to be in stereo, use the 
+<a href="ui/Navigation.html#viewpoint"> Viewpoint Toolbar</a> 
+to set the display to a perspective view.
+</faqitem>
+
+<faqitem q="My stereo display only seems to use one eye of the glasses.  How 
+do I fix this?" id="one-eye">
+
+Some stereo cards do not keep a separate Z-buffer per eye.  If you 
+are experiencing problems, try changing the line in the runIDV script to:
+
+<pre>
+command="java -Xmx512m -Didv.enableStereo=true -Dj3d.sharedstereozbuffer=true -jar idv.jar $*"
+</pre>
+
+</faqitem>
+
+<faqitem cat="Potential Problems"></faqitem>
+
+<faqitem q="How do I connect to remote servers through my firewall?" id="firewall">
+If you have a firewall and you try to get data from the remote
+servers (image, radar, point, upper air and profiler data), you may get error
+messages such as "Error opening connection ... Operation timed out" 
+or "No Data Available."  For these servers to send data, your
+firewall software must allow connections on ports 112 (ADDE) and 8080
+(THREDDS Data Server).
+</faqitem>
+
+<faqitem q="I get an error that starts something like &quot;Unexpected Signal : 11 occurred at PC=0x6F79CE1&quot; when starting the IDV under Linux.  What does this mean?" id="dri">
+If the error message also includes a line that is looking for a 
+Library with &quot;dri&quot; in it's name
+(e.g.: Library=/usr/X11R6/lib/modules/dri/i915_dri.so), it means
+that you are trying to load the DRI library in your X server which
+is not compatible with Java 3D.  You need to comment out the line:
+<p>
+<ul>
+        Load  &quot;dri&quot;
+</ul>
+<p>
+in your X server configuration file (xorg.conf or XF86Config).
+</faqitem>
+
+<faqitem cat="Reporting Problems"></faqitem>
+
+<faqitem q="What kind of support does Unidata provide for the
+IDV?" id="support">
+Unidata provides support to the entire community of IDV users
+through software updates, documentation, discussion email lists,
+and searchable support archives.
+Unidata provides direct support for the IDV 
+to institutions offering college-level courses for credit, and to
+non-profit institutions with education or research missions.  
+For more information, see the Unidata Support web page:<p>
+<a href="http://www.unidata.ucar.edu/support/index.html">
+http://www.unidata.ucar.edu/support/index.html</a>
+</faqitem>
+<p>
+
+<faqitem q="How do I report problems?" id="reportprobs">
+First, check this FAQ and the list of <a href="Bugs.html">Known Problems</a>
+to make sure this is a problem that has not yet been reported.
+
+<p>
+
+If you experience unexpected behavior from the IDV other than
+the <a href="Bugs.html">known problems</a>, please let us know. 
+See the <a href="Support.html#info">Reporting Errors to Unidata Support</a>
+section of the manual for the procedures on how to do this.
+</faqitem>
+
+
+<faqitem q="How do I open the Error Logs Console?" id="console">
+Open a console to show error logs with the [ug::mmenu Help {Show Console}] menu.
+</faqitem>
+
+</faq>
+
+
+
+</body>
+
+

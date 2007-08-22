@@ -1,0 +1,53 @@
+<html>
+<head>
+<title>ISL - KMZ Generation</title>
+</head>
+<body>
+[ht::ug::top /isl/index.html]
+
+<div class="overview">
+An in-depth look at an ISL that is used to generate Google Earth KMZ products.
+This uses the [gen::islTag import], [gen::islTag procedure], [gen::islTag call]  and [gen::islTag output]  
+tags.
+</div>
+
+
+<ol>
+
+<li> To start make an [ht::filename example] directory.
+<li> Right click on the two links below and save the files
+to the [ht::filename example] directory.
+<br>
+<a href="generate.isl">generate.isl</a>
+<br>
+<a href="example.isl">example.isl</a>
+
+<li> You will need  to create 2 bundles in the [ht::filename example]
+directory:<br> 
+[ht::filename goeseast.jnlp] <br>  
+[ht::filename goeseastir.jnlp]
+
+
+<li> To run this:
+<pre>
+idv /home/idv/example/example.isl
+</pre>
+
+</ol>
+
+<hr>
+
+
+<p>
+Here is the list of bundles:
+[gen::isl example.isl]
+
+<p>
+
+Here is the main isl file:
+[gen::isl generate.isl]
+
+
+
+</body>
+</html>

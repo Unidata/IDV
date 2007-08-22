@@ -1,0 +1,80 @@
+<html><head>
+  <title>Cross Sections</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>                  
+<body>
+
+
+<div class="pagesubtitle">Vertical Cross Sections</div>
+
+[ht::cimg images/VcsContours.gif {
+Contour Vertical Cross Section of Relative Humidity,
+showing both main view window and Control window.}]
+
+[ht::cimg images/VcsFilled.gif {
+Color-Filled Contours Vertical Cross Section of Relative Humidity,
+in Control window.}]
+
+[ht::cimg  images/VcsShaded.gif {
+Color-Shaded Vertical Cross Section of Relative Humidity,
+showing both main view window and Control window.}]
+ 
+
+The three figures above show the same data and same cross section position
+in three different kinds of 
+vertical cross section displays.
+
+IDV vertical cross sections are  
+displayed in both  the main 3D  display and
+in the Vertical Cross Section  Control window, with either 
+contour lines or as a colored image. 
+
+<p>
+
+Note in the above figure that "shaded" displays in cross sections 
+and other IDV displays can be used to show data values in grid cells by color.
+
+<p>
+
+Contour lines may be colored by value to
+coordinate with other displays, or to help distinguish them from
+other lines in the window. A cross-section can be moved to any location by dragging the end points.   Interpolation is used to estimate the
+  data values in the cross-section from the gridded data values which
+  do not lie on the actual cross section plane. 
+
+<p>
+
+To learn how to make a display, see
+<a href="../quickstart/Grids.html">Getting Started: Plots from Gridded Data</a> 
+and
+<a href="../data/FieldSelector.html">the Data Selector Window</a>.
+  You can control the display appearance with the associated
+  <a href="../controls/CrossSectionControl.html">
+Vertical Cross Section Control</a>.
+You can make more than one vertical cross-section, for one or more
+  parameters, and by moving the end positions create a single cross-section
+  of several segments at different azimuths.
+ 
+
+
+
+
+
+
+
+<div class="pagesubtitle">Data Transect Display</div>
+ 
+The Data Transect is a display of values from a 2D (x-y or lat-lon to value) 
+data field along a line across the field.
+Select "Data Transect" for 
+Display type for any 2D data of this kind, such as model
+output in 2D grids, and DEM data. You can move the transect line in the main 
+IDV display by dragging with the left mouse button.
+ 
+
+[ht::cimg images/DataTransect.gif]
+
+
+</body>
+
+

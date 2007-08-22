@@ -1,0 +1,56 @@
+
+Make a set of pre-defined projections
+
+See what it takes to have a real-time and a non-real-time
+trex plugin jar.
+
+Any more map shape files than inyoroads.shp
+
+Station model editor - string pattern -> shape
+
+Special choosers like in RICO?
+
+Change sounding data source  to support directory/pattern based specification
+of the files.
+
+What display controls need to be changed to behave differently in the context
+of the new XSVM
+
+Contour vertical XS - cannot add in its own XS selector. Needs to get XS change events
+from the XSVM
+
+Figure out how to handle the new type of VM in the VMManager. Do some controls
+only show up in one type of VM?
+
+
+
+Data
+-----------
+Catalog data on a http server?
+
+Latest directory - We should have a "latest" or "today" symbolic directory link 
+that points to the current actual directory. This way we can create bundles for the 
+real-time data.
+
+
+Aircract netcdf file - We are assuming that  all of the aircraft track data for one 
+flight will be in one netcdf format.  Assuming RAF netcdf format.
+How many fields will there be in the real-time Hiaper track data. All or a subset.
+
+
+Will we be getting satellite images from the LDM and putting them on disk.
+Will we need to do handle real-time satellite imagery by polling and reloading
+the data. If so, ImageDataSource needs some work to handle this.
+
+
+
+
+
+
+
+
+
+
+
+
+

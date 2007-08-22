@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?> 
+     <!-- JNLP File for local serving of Integrated Data Viewer --> 
+     <jnlp 
+        spec="1.0+" 
+<!--  Edit the next line to change to your local distribution -->
+        codebase = "http://my.web.server/idv_jars_location" href="localjars.jnlp"> 
+       <information> 
+         <title>Integrated Data Viewer </title> 
+         <vendor>Unidata</vendor> 
+         <homepage href="http://www.unidata.ucar.edu/content/software/IDV/index.html"/> 
+         <description>Integrated Data Viewer (IDV)</description> 
+         <description kind="short">View geolocated scientific datasets. 
+        </description> 
+        <icon href="idv.gif"/> 
+        <offline-allowed/> 
+       </information> 
+       <resources> 
+         <j2se version="1.4+" max-heap-size="512m" /> 
+           <jar href="idv.jar"/>
+           <jar href="auxdata.jar"/>
+           <jar href="external.jar"/>
+           <jar href="jython.jar"/>
+           <jar href="local-visad.jar"/>
+           <jar href="visad.jar"/>
+           <jar href="nc2.2.jar"/>
+       </resources>
+       <resources os="Linux"> 
+           <property name="j3d.sharedctx" value="false"/>
+       </resources>
+       <application-desc main-class="ucar.unidata.idv.DefaultIdv"/> 
+       <security>
+           <all-permissions/>
+       </security>
+
+     </jnlp> 

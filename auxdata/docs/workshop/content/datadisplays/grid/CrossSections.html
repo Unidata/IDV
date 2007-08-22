@@ -1,0 +1,110 @@
+<html>
+<head>
+<title>Cross Sections of Gridded Data </title>
+</head>
+
+<body>
+
+
+<div class="overview">
+Cross sections of data can be useful to show the variation of
+a field along a transect.  In the IDV, a cross section display 
+consists of a selector line and display in the main window, 
+and a 2D display of the cross section in the control window.</li>
+</div>
+
+<ol class="step">
+
+<li>First, we'll create a vertical cross section of contours of wind speed
+and compare it to the isosurface made in the previous exercise.  
+
+  <ul class="substep">
+    <li>In the [ht::dialog Field Selector]'s
+        [ht::command Data Sources] panel, select
+        the [ht::dataset ETA data source]
+        that you loaded at the start of this section.</li>
+    <li>In the [ht::command Fields] panel, expand the 
+        [ht::param 3D grid] tab. 
+        Scroll down to the [ht::param Derived] 
+        tab to see a list of derived quantities. Select the 
+        [ht::param {Windspeed (from GridRelative_u &amp; GridRelative_v)}]
+        field.
+    <li>In the [ht::command Displays] panel, expand the
+        Cross Sections tab and select 
+        [ht::display Contour Vertical Cross Section] then 
+        click the [ht::button Create Display] button.
+        You could also create a color-filled contour or color shaded
+        vertical cross section, but for the purposes of this exercise,
+        we will use the contour cross section.
+    <li>Move the cross section selector so it cuts perpendicularly across
+        the wind speed core (N-S line through Iowa from Duluth, MN to 
+        New Orleans, LA).  You can move the line by clicking and dragging
+        the end selector point on the selector line.</li>
+    <li>Rotate the main display to the western view.  Zoom in to get
+        a better view of the contours.  Note that the 40 m/s contour
+        intersects the outer boundary of the isosurface.
+<!--
+        The contours in the
+        cross section are in <b>m/s</b>, but in the previous exercise, 
+        we changed the isosurface unit to <b>kt</b>.  Change the
+        contours to be in the same unit as the isosurface. Note when
+        you do this, the 90 knot contour line intersects the outer
+        boundary of the isosurface.</li>
+-->
+    <li>Bring up the [ht::dialog Contour Properties Editor]
+        from the [ht::tab Settings] tab of the control
+        window.  Change the contour interval to 10, set the base to 50 and turn 
+        on dashing.  Then click the [ht::button OK] button.  
+        The display changes so the contours are every 10 knots and contour lines
+        below the base (50) are dashed.</li>
+    <li>Start the animation. Note the southward progression of the
+        jet core.</li>
+    <li>Stop the animation and return the display back to the first
+        time in the sequence and the view to the top.</li>
+    <li>Remove the isosurface display from the main window.
+        Do not remove the cross section display. </li>
+        
+  </ul>
+</li>
+
+<li>You can also create cross sections of 2D parameters that will show
+their variation along a transect.  In this step, you will load in a plan
+view of sea level pressure and then a data transect of that field.
+
+  <ul class="substep">
+    <li>In the [ht::command Fields] panel, expand the 
+        [ht::param 2D grid] tab. 
+        Select the [ht::param {mean sea level pressure (ETA model reduction)}] 
+        field.</li>
+    <li>In the [ht::command Displays] panel, select 
+        [ht::display Color-Shaded Plan View].  Then, hold the 
+        [ht::command Ctrl] key down and click on
+        [ht::display Data Transect] to select both. Click
+        the [ht::button Create Display] button.</li>
+    <li>You should see a color shaded display of sea level pressure
+        and a new selector line for the data transect.  Move the
+        data transect selector so it spans from high pressure (reds)
+        to low pressure (blues).  Note how the display in the 
+        control window changes as you move it around.</li>
+    <li>You can share the position of cross section selectors between
+        two different displays.  In each of the control windows,
+        (or by right clicking on the legend for each display)
+        select the [ht::menu Edit Sharing] menu and check
+        the [ht::menu Sharing On] checkbox.  In the main
+        view window, drag one end of the vertical cross section 
+        selector slightly.  The selector for the data transect will
+        snap to the same position as the vertical cross section line.
+    <li>Start the animation.  Is there any relation to the position
+        of the jet core and the sea level pressure?</li>
+    <li>Stop the animation and return the display back to the first
+        time in the sequence and the view to the top.</li>
+    <li>Use the [ht::menu Edit {Remove All Displays}] menu or the
+        eraser icon in the toolbar [ht::img %dotpath%images/Erase16.gif] 
+        to remove the displays created in this exercise.</li>
+  </ul>
+</li>
+
+</ol>
+
+</body>
+</html>

@@ -1,0 +1,363 @@
+<html><head>
+  <title> Color Table Editor</title>
+  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+</head>
+<body>
+
+
+<%childlist%>
+
+
+[ht::cimg images/colortable/Main.jpeg]
+  
+
+<subhead intoc="false" id="intro">Introduction</subhead>
+
+
+The Color Table Editor supports editing existing color tables
+and creating new ones.
+A color table is an ordered collection of colors
+that is used to color a display according to a range of data values. 
+
+
+<subhead intoc="false" id="starting">Starting the Color Table Editor</subhead>
+
+The Color Table Editor can be used stand-alone by
+selecting the  [ug::menu Tools {Color Table Editor}]  menu item from the main
+menu bar.
+It can also be used or in conjunction with a particular display
+by clicking on the display's color bar in the <a href="../controls/index.html#legends">legend</a>, 
+or through the display's <a href="../controls/index.html#menus">edit menu</a>.
+When used in conjunction with a particular display the changes you make to the
+color table are applied to the display as you make them. 
+To turn this off use the [ug::button Auto Update] check box in the lower right
+corner of the window.
+
+<p>
+
+The Color Table Editor starts with a color table loaded in it. If
+you are working with a data display, the color table in the editor is
+the same as in the display.
+If you want to use or edit a different color table, use the 
+[ug::menu {Color Tables}] menu to select from  the categorized list of color tables:
+
+[ht::cimg images/ColorTablesMenu.gif]
+
+
+Color tables are grouped into categories, as illustrated. 
+The illustration shows the color tables for the "Basic" category.
+Click on a category and then on a color table to select.
+
+<p>
+
+To switch to the newly selected color table for a
+display on screen, click on <b>OK</b> in the bottom of the Color Table Editor, and the 
+editor will close, or click on <b>Apply</b> to keep the editor in use.
+If [ug::button Auto Update] is checked the change takes place without further action by 
+you, as soon as you select a new color table.
+
+
+<subhead intoc="false" id="legend">Color Legend and Setting Colors</subhead>
+
+[ht::cimg images/colortable/Legend.gif]
+
+
+The color table is shown in the bar of color across the
+window, the color legend.  How many colors are in the
+table is shown in a label in the lower center, such as "210 colors."  
+You can reduce or increase the number of colors by clicking on the
+<b>-/+</b> choices near the left and right ends of the
+legend. New colors are added or removed 
+at each end of the legend with the same color as the end color.
+
+<p>
+
+Under the color legend is a black and white checker board to help show
+the degree of transparency. Most color tables have zero transparency and
+the checker board is not visible.
+
+<p>
+
+The <b>History</b> undo/redo buttons in the upper left allow you to 
+step forward and backward through the  changes you have made.
+
+<p>
+
+The spectrum of colors spans a range of data values. The values are shown 
+at the ends of the color legends. You can change the max and min of the 
+range 
+with the <b>Range:</b> pair of dialog boxes on the right. Enter
+the minimum and maximum values of the range you need, and click
+Apply or Ok, or press the Enter key.
+If the Color Table Editor is being used in conjunction with a display
+then when you change the range that range is applied to the display as well.
+
+
+<p>
+
+The editor uses &quot;breakpoints&quot; indicated along the top of the 
+color legend bar with little triangles and a number. Clicking
+on a break point makes it active. The number on an active breakpoint is 
+in <b>bold</b> characters.  There is only one active
+breakpoint at a time. Making a new breakpoint makes the new breakpoint active.
+<p>
+Breakpoints are used for a number of things: showing the data value at a point
+along the color table and changing the colors (fill, interpolation or transparency)
+directly below the breakpoint by dragging the breakpoint and changing
+colors through a popup menu.
+
+<p>
+
+The values on the breakpoints are determined by the position of the
+breakpoint along the legend, proportional to the min and max of the
+Range. Changing the minimum and maximum of the Range 
+changes the break point values.
+
+<p>
+
+You can move the active breakpoint several ways:
+<ul>
+<li> Drag on it with the mouse pointer;
+<li> Move in small increments with the right or left arrow keys. (If there
+is no response, first mouse click on the breakpoint.)
+<li> Move in bigger steps with the shift-arrow keys.
+<li> Right-click on the breakpoint and use the pop-up menu 
+item  [ug::menu {Change Breakpoint}] .
+</ul>
+
+
+<p>
+
+To change colors by directly moving a breakpoint select the type
+of change you want with the [ug::button Edit mode] buttons:
+<ul>
+<li> [ug::button Fill]. When you drag
+a breakpoint it will fill the color table with the currently chosen
+color in the color chooser.  Note: no matter  what the edit mode
+is when you change colors in the color chooser that color will be applied
+to the active breakpoint.
+<li> [ug::button Interpolate]. Apply  a linear interpolation 
+from where you started dragging the breakpoint to the color value of 
+where the breakpoint is currently  at while dragging. 
+<li> [ug::button Transparency]. Apply the given transparency
+value (in the editable pull down menu) to the color table where
+you are dragging the breakpoint.
+</ul>
+
+<p>
+
+
+You can also change colors and manipulate breakpoints 
+using a right mouse click popup menu on a breakpoint:
+
+[ht::cimg images/colortable/BreakpointsChoice.gif]
+
+
+The choices are:
+<ul>
+<li> [ug::menu {Remove Breakpoint}]. <br>  
+Remove the active breakpoint.
+<li> [ug::menu {Change Breakpoint}]. <br>  
+Set the breakpoint value.
+<li> [ug::menu {Add Breakpoint} Here]. <br> 
+Add a new breakpoint where you clicked  on the legend.
+
+<li> [ug::menu {Add Breakpoint} {At Data Point}]. <br> 
+Add a new breakpoint at a data value. You will be given a dialog box to enter the value in.
+
+<li> [ug::menu {Add Breakpoint}  {At Beginning}]. <br>
+Add a new breakpoint on the left end.
+
+<li> [ug::menu {Add Breakpoint} {At End}]. <br> 
+Add a new breakpoint on right end.
+
+<li> [ug::menu {Set Colors} { Interpolate Left}]. <br>
+Starting with the color at the active
+breakpoint, interpolate colors to the left up to the next breakpoint.
+
+<li> [ug::menu {Set Colors} {Interpolate Right}]. <br>
+Starting with the color at the active
+breakpoint, interpolate colors to the right up to the next breakpoint.
+
+<li> [ug::menu {Set Colors}  {Fill Left}]. <br>
+Starting with the color at the active
+breakpoint, fill colors to the left up to the next breakpoint with
+that single color.
+
+<li> [ug::menu {Set Colors} {Fill Right}]. <br> 
+Starting with the color at the active
+breakpoint, fill colors to the right up to the next breakpoint with
+that single color.
+
+<li> [ug::menu {Set Colors} {Transparency Left}]. <br> 
+All color table values from the active 
+breakpoint to the next breakpoint to the left
+are set with the transparency value.
+
+<li> [ug::menu {Set Colors} {Transparency Right}]. <br> 
+All color table values from the active
+breakpoint to the next breakpoint to the right
+get the transparency value.
+</ul>
+
+
+
+
+<subhead intoc="false" id="saveCT">Saving, Importing and Exporting</subhead>
+
+You can modify an existing color table, or edit an existing color
+table and save it with a new name to make a new color table. Any new
+or modified color table can be saved for future use.
+
+<p>
+
+To save a new or modified color table simply select the
+the [ug::menu File Save]  menu item or [ug::button Save] button.
+To save a modified color table as a new color table, select
+[ug::menu File {Save As}]  and enter the new name in the dialog box that
+appears. This new color table will now be permanently saved in your
+local collection of color tables.
+
+
+<p>
+
+To save a color table as a file which can be shared with others in
+their IDV, select  the  [ug::menu File Export] menu item.
+A file dialog will appear that will
+allow you to save the color table as an XML-format file. We suggest
+you use a file extension of <b>.xidvct</b>. 
+
+<p>
+
+To use a color table as a file which has been supplied to 
+you by another IDV user, select the  [ug::menu File Import] menu item. 
+A file dialog will appear that will
+allow you to find the color table as an XML-format file. 
+
+
+
+
+<subhead intoc="false" id="chooser">Color Chooser</subhead>
+
+
+[ht::cimg images/colorchooser/ColorChooser.gif {The Color Chooser, HSB panel}]
+
+
+The Color Chooser, in the lower half of the 
+Color Table Editor window, allows you to select any possible color.
+
+<p>
+
+There are two tabs on the chooser, <b>HSB</b> and <b>RGB</b>, 
+each with its own control panels. The
+RGB panel shows a window that lets you 
+specify any color by slider bars for R, G, and B values. R, G, and B are
+red-green-blue
+settings that control the intensity of the color guns in a CRT. 
+The only color sample of an RGB value 
+is the color of the active breakpoint in the legend, which can be 
+pretty small and hard to see clearly.  Also, RGB values are not intuitive
+ -- to get yellow you mix equal amounts of red and green in RGB.
+We recommend you use the HSB chooser panel unless you have specific RGB
+values to set.
+
+<h4>The HSB Chooser</h4>
+
+<p>
+
+The HSB chooser allows you to control color by hue, saturation, and
+brightness, thereby making any color.
+With the HSB panel and tab shown, click on one of 
+the circles marked <b>H</b>, <b>S </b>, or
+<b>B</b> for the corresponding control for hue, saturation, or
+brightness.
+
+<p>
+
+Hue is the term indicating a pure color selection from the
+spectrum. Saturation is an indication of how much white is added to
+the hue. 100% saturation is pure hue with no white. 
+Brightness is an indication of how much black is added to
+the hue. 100% brightness has no black and maximum
+brilliancy, but can be any saturation from the hue to pure white.
+0% brightness is solid black.
+
+<p>
+
+Some "colors" are not found in the spectrum and are a mixture of a
+hue and black or white or both black and white. For example, brown is 
+red-orange and some black. 
+Grays are any hue with low saturation and some degree of brightness from black
+to white -- basically a mixture of white and black.
+
+<p>
+
+You need only use one of
+the controls for H, S, or B to make any color.  It's merely a matter
+of which one is easiest for you.  Often the <b>H</b> control is
+the easiest and most intuitive to use. We often think first in terms
+of colors (hues),
+and next in terms of how pale or dark a color of that hue we want.
+The <b>H</b> control works that way. <b>You can select any possible
+color with the HSB color chooser in the H setting.</b>
+
+<p>
+
+All this is easier to understand while using the HSB panel, with
+<b>H clicked on</b>:
+
+[ht::cimg images/colorchooser/Hue.gif {The HSB Hue chooser, set on green with high S and high B}]
+
+
+
+The slider bar chooses the pure hue. Once you have chosen
+a hue, clicking or dragging the mouse
+on the square color display chooses degrees of saturation and
+brightness -- how much white or black is added in --
+for that hue. Using the HSB Hue display you can 
+make any color after a little practice.
+
+<p>
+
+Note that the right edge of every hue chooser is a gray scale,
+and the bottom is pure black.
+
+<p>
+
+The <b>Saturation Chooser (S)</b> has a slider bar with the full range
+of saturation (how much white is added to the color): 
+
+
+[ht::cimg images/colorchooser/Saturation.gif {The HSB Saturation chooser set on the same green}]
+
+
+Select hue and brightness by dragging the mouse over the colored
+square.The bottom is always solid black. If you want true shades 
+of colors -- pure hue with only black and no white -- use the S
+control with the slider at the top. There are no grays or
+pale colors in this case.
+
+<p>
+
+The <b>Brightness Chooser (B)</b> has a slider bar with the full range
+of brightness (how much black is added to the color): 
+
+[ht::cimg images/colorchooser/Brightness.gif {The HSB Brightness chooser set on the same green}]
+
+
+Select hue and saturation by dragging the mouse over the colored
+square.The bottom is always pale gray going to white. If you want to use
+colors
+that are all at full
+brightness, use the B control with the slider at the top. Note
+that colors such as brown are not available in this setting, and there
+are no dark colors.
+
+<p>
+
+All controls in the HSB panel show the RGB values for any color selected, in
+case
+you need to know the RGB values for another use.
+
+</body>
+</html>

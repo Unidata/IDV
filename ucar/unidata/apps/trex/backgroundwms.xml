@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<backgroundwms>
+  <wms
+     server="http://mapserver.eol.ucar.edu/cgi-bin/mapserv?map=/export/web/mapserver/data/trex/demo.map"
+     layer="aero"
+     title="FAA Map"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="54.1816,-146.184,17.0923,-89.8161"/>
+
+
+  <wms
+     server="http://mapserver.eol.ucar.edu/cgi-bin/mapserv?map=/export/web/mapserver/data/trex/demo.map"
+     layer="fedlands"
+     title="Federal Lands"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     legendurl="http://mapserver.eol.ucar.edu/cgi-bin/mapserv?map=/export/web/mapserver/data/trex/demo.map&amp;version=1.1.1&amp;service=WMS&amp;request=GetLegendGraphic&amp;layer=fedlands&amp;format=image/png"
+     bbox="71.3407,-179.133,17.6747,179.788"/>
+
+
+<!--
+  <wms
+     server="http://mapserver.eol.ucar.edu/cgi-bin/mapserv?map=/export/web/mapserver/data/trex/demo.map"
+     layer="dem"
+     title="10 meter DEM"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.1.1"
+     bbox="54.1816,-146.184,17.0923,-89.8161"/>
+-->
+
+
+
+
+
+</backgroundwms>

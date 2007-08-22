@@ -1,0 +1,116 @@
+<html>
+<head>
+<title>Probing Gridded Data </title>
+</head>
+
+<body>
+
+
+<div class="overview">
+<p> The IDV has a variety of data probes that can be used with
+gridded data.  Probes include value readouts, vertical profiles,
+model soundings, time/height cross sections and time series
+displays.</p>
+</div>
+
+
+<p>
+Let's create a data probe to read out various parameters 
+at different levels.<p>
+
+  <ul class="step">
+    <li>If you have not already done so, use the 
+        [ht::menu Edit {Remove All Displays}] menu to remove the displays
+        created in the previous exercise.</li>
+    <li>In the [ht::command Fields] panel, expand 
+        the [ht::param 2D grid] tab. 
+        Select the [ht::param {mean sea level pressure (ETA model reduction)}] 
+        field.</li>
+    <li>In the [ht::command Displays] panel, select 
+        [ht::display Color-Shaded Plan View].  Expand the
+        [ht::display Probes] tab, then, hold the 
+        [ht::command Ctrl] key down and click on
+        [ht::display Data Probe/Time Series] to select both. Click
+        the [ht::button Create Display] button.
+        Once the displays are created, you can minimize the
+        control window for the color shaded display.</li>
+    <li>Drag the selector point around in the main window and notice how
+        the readout changes.</li>
+    <li>Now, let's look at the difference between <i>Nearest Neighbor</i> and
+        <i>Weighted Average</i> sampling techniques.
+      <ul class="subsubstep">
+        <li>Use the rubber band zooming feature (Shift+Mouse drag) on the
+            main view window to zoom in over the central United
+            States (centered on Kansas).  The blocky pattern you
+            see shows the outline of each grid cell.</li>
+        <li>Bring up the Control Window for the color shaded display
+            and click the [ht::command Shade Colors]
+            check box.  Notice how the pattern changes.  Return to the
+            blocky pattern by unchecking the 
+            [ht::command Shade Colors] checkbox.</li>
+        <li>From the Probe Control window, right click on the 
+            [ht::param Psl_et] line and select 
+            the [ht::menu {Parameter: Psl_et} Copy] menu.</li>
+            You will now have two entries for this field in
+            the Probe control.</li>
+        <li>Change one of the entries to sample using 
+            <i>Weighted Average</i> by clicking in the table row under
+            the [ht::command Sampling] column and 
+            selecting that option from the dropdown list.</li>
+        <li>Now move the probe around.  Notice how the values in the
+            two rows differ as you move from grid cell to grid cell
+            in the display.  <i>Nearest Neighbor</i> sampling will
+            list out the value at the grid point.  <i>Weighted Average</i>
+            sampling will list out a weighted average of the values
+            at surrounding grid points.</li>
+      </ul>
+    </li>
+    <li>Now, let's add in a 3D field to the list and sample that at
+        different levels.
+      <ul class="subsubstep">
+        <li>First, return the main display to its unzoomed position.</li>
+        <li>Right click on any row in the table and select the 
+            [ht::menu Add parameter...] menu.</li>
+        <li>From the [ht::command Field Selector],
+            expand the  [ht::param 3D Grid] tab and select the
+             [ht::param temperature]
+            field. Click the [ht::button OK]
+            button.  You will now see an entry for <b>T</b> in the
+            table in the Probe control window that lists the
+            [ht::command Level] as <i>Probe's</i>.  It will also be
+            added to the chart.</li>
+        <li>Move the probe to the north and you will see that in general
+            temperature decreases at the probe's altitude.  Move it to 
+            the south and you will see that in general temperature 
+            increases.</li>
+        <li>Now rotate the display to a south view.  Drag the probe up
+            and down and notice how temperature changes with altitude
+            in the atmosphere.</li>
+        <li>Now, let's move the temperature to it's own chart.  Right click
+            on the temperature line in the table and select
+            the [ht::menu {Parameter T} {Line Properties}] menu 
+            select the same menu from the contrl's [ht::menu View Parameters]
+            menu.  
+        <li>In the [ht::button Chart Name] box, type in <b>Temperature</b>.
+            In the [ht::button Min] box, type in <b>-60</b> and for
+            [ht::button Max], type in <b>30</b> and click OK.
+        <li>Now add two more rows of Temperature to the table by copying
+            the current temperature field.</li>
+        <li>Change the  [ht::command Level] of one of 
+            the temperature fields
+            to be <i>850</i> hPa by clicking in the box for that row under
+            the  [ht::command Level] column and selecting 
+            that level from the list.  Change the  [ht::command Level] 
+            of another of the temperature fields to be <i>500</i> hPa.</li>
+        <li>Now move the probe around and you will get a readout of
+            each of the fields at the specified levels.</li>
+        <li>Start the animation to see how the field values change
+            with time.</li>
+        <li>Stop the animation and remove all displays.</li>
+      </ul>
+    </li>
+        
+  </ul>
+<p>
+</body>
+</html>

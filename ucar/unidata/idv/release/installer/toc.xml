@@ -1,0 +1,124 @@
+<!DOCTYPE toc SYSTEM "/content/downloads/toc.dtd">
+<toc title="IDV Download and Installation">
+  <property name="%version%" value="@IDV_VERSION@" />
+  <property name="%_version%" value="@IDV_VERSION_UNDER@" />
+  <property name="%doc_path%" value="@DOC_PATH@" />
+
+<description>
+<![CDATA[<p>@IDV_TITLE@]]>
+</description>
+
+
+<category title="IDV %version% Installers">
+    <description>
+    Install4j installers for supported platforms.  See the
+    <![CDATA[<a href="%doc_path%/docs/userguide/Starting.html" target="_newwindow">
+    Downloading and Running the IDV</a>]]> section of the User's 
+    Guide for more information.
+    </description>
+
+   <file url="ftp/idv_%_version%_windows_installer.exe" name="IDV %version% Installer for Windows 2000/XP">
+        <description>
+        Installer for IDV under Windows 2000/XP.
+        <![CDATA[<a href="ftp/idv_%_version%_windows_installer.exe.MD5">MD5</a>]]>
+        </description>
+   </file>
+   <file url="ftp/idv_%_version%_windows_vista_installer.exe" name="IDV %version% Installer for Windows Vista">
+        <description>
+        Installer for IDV under Windows Vista.
+        <![CDATA[<a href="ftp/idv_%_version%_windows_vista_installer.exe.MD5">MD5</a>]]>
+        </description>
+   </file>
+   <file url="ftp/idv_%_version%_linux-i386_installer.sh" name="IDV %version% Installer for Linux/x86">
+        <description>
+        Installer for IDV under Linux/x86.
+        <![CDATA[<a href="ftp/idv_%_version%_linux-i386_installer.sh.MD5">MD5</a>]]>
+        </description>
+   </file>
+   <file url="ftp/idv_%_version%_linux-i386_j3d1_5_1_installer.sh" name="IDV %version% Installer for Linux/x86 with Java 3D 1.5.1">
+        <description>
+        Installer for IDV under Linux/x86 with Java 3D 1.5.1.  May have some graphics card compatibility issues. 
+        <![CDATA[<a href="ftp/idv_%_version%_linux-i386_j3d1_5_1_installer.sh.MD5">MD5</a>]]>
+        </description>
+   </file>
+   <file url="ftp/idv_%_version%_macos_installer.dmg" name="IDV %version% Installer for Max OS-X">
+        <description>
+        Installer for Mac OS-X.  Separate Java 3D 
+        installation needed for Mac OS-X version 10.3.X. See the
+        <![CDATA[<a href="%doc_path%/docs/userguide/Systems.html" 
+        target="_newwindow">
+        System Requirements</a>]]> section of the User's Guide for
+        more information.
+        <![CDATA[<a href="ftp/idv_%_version%_macos_installer.dmg.MD5">MD5</a>]]>
+        </description>
+   </file>
+   <file url="ftp/idv_%_version%_solaris-sparc_installer.sh" name="IDV %version% Installer for Solaris/SPARC">
+        <description>
+        Installer for IDV under Solaris/SPARC
+        <![CDATA[<a href="ftp/idv_%_version%_solaris-sparc_installer.sh.MD5">MD5</a>]]>
+        </description>
+   </file>
+   <file url="ftp/idv_%_version%_solaris-x86_intel_installer.sh" name="IDV %version% Installer for Solaris/x86 (Intel)">
+        <description>
+        Installer for IDV under Solaris/x86
+        <![CDATA[<a href="ftp/idv_%_version%_solaris-x86_intel_installer.sh.MD5">MD5</a>]]>
+        </description>
+   </file>
+   <file url="ftp/idv_%_version%_unix_nojre_installer.sh" name="IDV %version% Java Installer">
+        <description>
+        Generic installer for IDV for systems with their
+        own Java and Java 3D.
+        <![CDATA[<a href="ftp/idv_%_version%_unix_nojre_installer.sh.MD5">MD5</a>]]>
+        </description>
+   </file>
+</category>
+
+<category title="IDV %version% Code, Source and Documentation">
+
+   <file url="ftp/idv_jars_%version%.zip" name="IDV %version% JAR Files">
+      <description>Zip file of all Java Archive (JAR) files necessary to 
+                   run the IDV applications. See README.idv_jars included 
+                   in the ZIP file for more information.
+       <![CDATA[<a href="ftp/idv_jars_%version%.zip.MD5">MD5</a>]]>
+       </description>
+   </file>
+
+   <file url="ftp/idv_src_%version%.jar" name="IDV %version% Source Code">
+       <description>JAR file containing the IDV source code for the 
+       %version% release.   See the
+       <![CDATA[<a href="%doc_path%/docs/userguide/misc/SourceBuild.html" target="_newwindow">
+        Building the IDV from Source</a>]]> section of the User's 
+        Guide for more information.
+        <![CDATA[<a href="ftp/idv_src_%version%.jar.MD5">MD5</a>]]>
+       </description>
+   </file>
+
+   <file url="ftp/idv_userguide_%version%.zip" name="IDV %version% User Guide">
+    <description>
+    Zip file of the IDV User's Guide.  Available on-line
+    <![CDATA[<a href="%doc_path%/docs/userguide/" target="_newwindow">
+    here</a>]]>.
+    <![CDATA[<a href="ftp/idv_userguide_%version%.zip.MD5">MD5</a>]]>
+    </description>
+   </file>
+
+   <file url="ftp/idv_javadoc_%version%.jar" name="IDV %version% Javadocs">
+      <description>JAR file containing the javadoc for the %version% release.  
+      Available on-line 
+      <![CDATA[<a href="%doc_path%/docs/javadoc" target="_newwindow">
+      here.</a>]]>
+      <![CDATA[<a href="ftp/idv_javadoc_%version%.jar.MD5">MD5</a>]]>
+      </description>
+   </file>
+
+</category>
+
+<category title="IDV %version% Sample Data">
+   <file url="idv/sample_data/workshopdata.zip" name="IDV Training Workshop Dataset">
+      <description>Zip file of the local datasets needed for the some sections of the <![CDATA[<a href="%doc_path%/docs/workshop/index.html" target="_newwindow">IDV Training Workshop</a>]]>.  See the section on <![CDATA[<a href="%doc_path%/docs/workshop/installandstart/LocalData.html" target="_newwindow">Installing Local Datasets</a>]]> for more information.
+      <![CDATA[<a href="idv/sample_data/workshopdata.zip.MD5">MD5</a>]]>
+      </description>
+   </file>
+</category>
+
+</toc>

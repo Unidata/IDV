@@ -1,0 +1,24 @@
+
+<params>    
+    <param name=".*base.*"  table="Base Reflectivity" 
+	   ci_interval="50.0"
+	   ci_base="25.0"
+           ci_min="0.0"
+           ci_max="100.0"
+	   />
+    <param name=".*image.*"  table="Gray scale"  range_min="0.0"  range_max="255.0" />
+    <param name=".*ir/topo.*"  table="TOPO/Sat Composite"  range_min="0.0"  range_max="255.0" />
+    <param name=".*mdr/topo.*"  table="TOPO/MDR Composite"  range_min="0.0"  range_max="255.0" />
+    <param name=".*radial.*"  table="Radial Velocity" />
+    <param name=".*tops.*"  table="Echo Tops"  range_min="0.0"  range_max="255.0" />
+    <param name=".*vil.*"  table="VIL"  range_min="0.0"  range_max="255.0" />
+    <param name=".*vis/topo.*"  table="TOPO/Sat Composite"  range_min="0.0"  range_max="255.0" />
+    <param name="^band.*"  table="Gray scale"  range_min="0.0"  range_max="255.0" />
+    <param name="^base.*"  range_min="0.0"  range_max="255.0" />
+    <param name="cape"  range_min="0.0"  range_max="8000.0" />
+    <param name="dbz"  table="DbZ"  range_min="-9.0"  range_max="59.0" />
+    <param name="dz"  table="ATD-Reflectivity"    range_min="-10.0"  range_max="60.0" />
+    <param name="elevation"  table="Topographic"  range_min="0.0"  range_max="3500.0" />
+    <param name="zdr"  table="DbZ"  range_min="-20.0"  range_max="20.0" />
+    <param name="albedo"  table="Gray scale" />
+</params>

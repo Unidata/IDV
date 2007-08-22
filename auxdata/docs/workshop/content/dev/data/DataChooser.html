@@ -1,0 +1,40 @@
+
+<title>Overview of Data Choosers</title>
+
+
+<div class="overview">
+Data Choosers allow users to select data of a particular type/format
+an bring them into the IDV.  The <code>ucar.unidata.idv.chooser</code>
+package holds the core choosers.  
+</div>
+<p>
+
+Some of the IDV choosers are:
+<ul>
+<li><b>FileChooser</b>  - for selecting files
+<li><b>PollingFileChooser</b> - chooser that supports polling files in a directory
+<li><b>ImageChooser</b> - IDV ADDE Image chooser
+<li><b>Level2RadarChooser</b> - NEXRAD Level II files
+<li><b>RadarChooser</b> - ADDE Level III Radar Chooser
+<li><b>PointChooser</b> - ADDE Point obs chooser
+<ul>
+  <li><b>RaobPointChooser</b> - subclass for ADDE Upper Air point data
+  <li><b>LightningChooser</b> - subclass for ADDE Lightning data
+</ul>
+<li><b>ProfilerChooser</b> - ADDE Profiler chooser
+<li><b>RaobChooser</b> - Upper Air Sounding Chooser
+<li><b>XmlChooser</b> - chooser for XML documents like THREDDS catalog and WMS servers
+<li><b>UrlChooser</b> - chooser for data residing at URL's
+</ul>
+
+Choosers generally extend from the IdvChooser class and need to 
+implement the following methods:
+
+<ul>
+<li><b>doMakeContents()</b>  - makes the UI
+<li><b>doLoadInThread()</b>  - handles the adding of the data
+</ul>
+
+Once a chooser class is created, it can be added to the IDV by
+creating a choosers.xml file.  Let's look at the sample 
+<a href="choosers.xml.txt">here</a>.

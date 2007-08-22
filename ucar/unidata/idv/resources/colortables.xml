@@ -1,0 +1,2359 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<object class="java.util.ArrayList">
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[default]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[DEFAULT]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAACHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAA9tu/UPjbv1D6JM98+tu/UPuSryT8JM98/IBHZPzbv1D9Nzc4/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAACHAAAAADw0evQ8tHr0PQdcNj00evQ9YZmxPYdcNj2d
+65Y9tHr0PcsKUj3hmbE9+CkPPgdcNj4So+Y+HeuWPikzRT40evQ+P8KjPksKUj5WUgE+YZmxPmzh
+YD54KQ8+gbhfPodcNj6NAA4+kqPmPphHvj6d65Y+o49tPqkzRT6u1xw+tHr0ProezD6/wqM+xWZ6
+PssKUj7Qrik+1lIBPtv12j7hmbE+5z2JPuzhYD7yhTc++CkPPv3M5z8BuF8/BIpLPwdcNj8KLiI/
+DQAOPw/R+j8So+Y/FXXSPxhHvj8bGak/HeuWPyC9gj8jj20/JmFZPykzRT8sBTA/LtccPzGpCD80
+evQ/N0zgPzoezD888Lc/P8KjP0KUjz9FZno/SDhmP0sKUj9N3D4/UK4pP1OAFT9WUgE/WSPtP1v1
+2j9ex8Y/YZmxP2RrnT9nPYk/ag90P2zhYD9vs0w/coU3P3VXIz94KQ8/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP3h4eD9w8PE/
+aWlpP2Hh4j9aWlo/UtLTP0tLSz9Dw8Q/PDw8PzS0tT8tLS0/JaWmPx4eHj8Wlpc/Dw8PPweHiD8A
+AAA+8PDxPuHh4j7S0tM+w8PEPrS0tT6lpaY+lpaXPoeHiD5w8PE+UtLTPjS0tT4Wlpc98PDx</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAACHP3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96
++vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6
++z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7
+P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/
+evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96
++vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6
++z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/gAAAP0yMjT8ZGRk+y0tL
+PkjIyQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Blues]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[BLUES]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAeP4AAAD93LCM/blhHP2WEaj9csI0/U9ywP0sI1D9C
+NPc/OWEaPzCNPj8nuWE/HuWEPxYRqD8NPcs/BGnuPvcsJD7lhGo+09ywPsI0+D6wjT4+nuWEPo09
+zD53LCQ+U9ywPjCNPD4NPcw909ywPY09yD0NPdAAAAAA</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAeP4AAAD93LCM/blhHP2WEaj9csI0/U9ywP0sI1D9C
+NPc/OWEaPzCNPj8nuWE/HuWEPxYRqD8NPcs/BGnuPvcsJD7lhGo+09ywPsI0+D6wjT4+nuWEPo09
+zD53LCQ+U9ywPjCNPD4NPcw909ywPY09yD0NPdAAAAAA</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAeP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Bright38]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[BRIGHT38]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAmP38AAD89AAA/JgAAPwcAAD7gAAA+pAAAPmwAAD3o
+AAA7gAAAO4AAADuAAAA7gAAAO4AAAAAAAAAAAAAAAAAAADuAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAPiwAAD6yAAA+/gAAPyUAAD9EAAA/YwAAP38AAD9/AAA/fwAAP38AAD9/AAA/fwAA
+P38AAD9/AAA=</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAmAAAAADuAAAA7gAAAO4AAADuAAAA7gAAAO4AAADuA
+AAA8QAAAPggAAD5kAAA+ngAAPwwAAD8qAAA/UQAAP2gAAD9/AAA/fwAAP38AAD9/AAA/fwAAP38A
+AD9/AAA/fwAAP38AAD9/AAA/fwAAP38AAD9/AAA/fwAAP3QAAD9IAAA/KAAAPwoAAD7WAAA+igAA
+PfgAAAAAAAA=</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAmP2IAAD9/AAA/fwAAP38AAD9/AAA/fwAAP38AAD9/
+AAA/fwAAP38AAD9/AAA/fwAAP38AAD9/AAA/fwAAP38AAD9oAAA/SQAAPyoAAD8MAAA+3AAAPqAA
+AD4gAAAAAAAAAAAAAAAAAAAAAAAAAAAAADuAAAA7gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAA=</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Precip]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[PRECIP]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABkP4AAADzXlDY9V5Q2PaGvKD3XlDY+BryiPiGvKD48
+oa8+V5Q2PnKGvT6GvKI+lDXlPqGvKD6vKGw+vKGvPsoa8z7XlDY+5Q15PvKGvT8AAAA/AAAAPwGe
+yT8DPZI/BNxbPwZ7JD8IGe0/Cbi1PwtXfj8M9kc/DpUQPxAz2T8R0qI/E3FrPxUQND8Wrv0/GE3G
+Pxnsjz8bi1g/HSogPx7I6T8gZ7I/IgZ7PyOlRD8lRA0/JuLWPyiBnz8qIGg/K78wPy1d+j8u/MI/
+MJuLPzI6VD8z2R0/NXfmPzcWrz84tXg/OlRBPzvzCj89kdM/PzCcP0DPZD9Cbi4/RAz2P0Wrvz9H
+Sog/SOlRP0qIGj9MJuM/TcWsP09kdD9RAz4/UqIGP1RA0D9V35g/V35hP1kdKj9au/M/XFq8P135
+hT9fmE4/YTcWP2LV4D9kdKg/ZhNyP2eyOj9pUQM/au/MP2yOlT9uLV4/b8wnP3Fq8D9zCbg/dKiC
+P3ZHSj935hQ/eYTcP3sjpj98wm4/fmE3P4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABkP4AAAD1XlDY915Q2PiGvKD5XlDY+hryiPqGvKD68
+oa8+15Q2PvKGvT8GvKI/FDXlPyGvKD8vKGw/PKGvP0oa8z9XlDY/ZQ15P3KGvT+AAAA/gAAAP34O
+Qj98HIQ/eirGP3g5CD92R0o/dFWNP3Jjzz9wchE/boBTP2yOlT9qnNc/aKsZP2a5Wz9kx50/YtXg
+P2DkIj9e8mQ/XQCmP1sO6D9ZHSo/VytsP1U5rj9TR/A/UVYyP09kdD9NcrY/S4D5P0mPOz9HnX0/
+Rau/P0O6AT9ByEM/P9aGPz3kyD878wo/OgFMPzgPjj82HdA/NCwSPzI6VD8wSJY/LlbYPyxlGj8q
+c1w/KIGePyaP4D8kniI/IqxlPyC6pz8eyOk/HNcrPxrlbT8Y868/FwHyPxUQND8THnY/ESy4Pw86
++j8NSTw/C1d+PwllwD8HdAI/BYJEPwOQhj8Bnsk+/1oWPvt2mj73kx4+86+iPu/MJj7r6Ko+6AUu
+PuQhsj7gPjY+3Fq6Pth3Pj7Uk8Q+0LBIPszMzA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABkP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/ZmZmP1/r
+Qj9ZcB8/UvT7P0x51z9F/rQ/P4OQPzkIbD8yjUk/LBIlPyWXAj8fG94/GKC6PxIllj8LqnM/BS9Q
+Pv1oVz7wchA+43vJPtaFgT7Jjzo+vJjyPq+irD6irGQ+lbYePoi/1j53kxw+XaaQPkO6AD4pzXA+
+D+DkPevoqD24D4g9hDZwPSC6oDxkIYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Relative humidity]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[RELATIVE HUMIDITY]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAUP4AAAD9lDXk/ShryPy8obD8UNeU+8oa8PryhsD6G
+vKI+Ia8oPVeUMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAUP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD95Q14/a8obP15Q2D9Q15Q/Q15RPzXlDT8oa8o/GvKHPw15Qz8AAAA=</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAD1XlEA+Ia8oPoa8oD68obA+8oa8PxQ15j8vKGw/ShryP2UNej+AAAA=</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Temperature]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[TEMPERATURE]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAACHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAA9tu/UPjbv1D6JM98+tu/UPuSryT8JM98/IBHZPzbv1D9Nzc4/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAACHAAAAADw0evQ8tHr0PQdcNj00evQ9YZmxPYdcNj2d
+65Y9tHr0PcsKUj3hmbE9+CkPPgdcNj4So+Y+HeuWPikzRT40evQ+P8KjPksKUj5WUgE+YZmxPmzh
+YD54KQ8+gbhfPodcNj6NAA4+kqPmPphHvj6d65Y+o49tPqkzRT6u1xw+tHr0ProezD6/wqM+xWZ6
+PssKUj7Qrik+1lIBPtv12j7hmbE+5z2JPuzhYD7yhTc++CkPPv3M5z8BuF8/BIpLPwdcNj8KLiI/
+DQAOPw/R+j8So+Y/FXXSPxhHvj8bGak/HeuWPyC9gj8jj20/JmFZPykzRT8sBTA/LtccPzGpCD80
+evQ/N0zgPzoezD888Lc/P8KjP0KUjz9FZno/SDhmP0sKUj9N3D4/UK4pP1OAFT9WUgE/WSPtP1v1
+2j9ex8Y/YZmxP2RrnT9nPYk/ag90P2zhYD9vs0w/coU3P3VXIz94KQ8/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP3h4eD9w8PE/
+aWlpP2Hh4j9aWlo/UtLTP0tLSz9Dw8Q/PDw8PzS0tT8tLS0/JaWmPx4eHj8Wlpc/Dw8PPweHiD8A
+AAA+8PDxPuHh4j7S0tM+w8PEPrS0tT6lpaY+lpaXPoeHiD5w8PE+UtLTPjS0tT4Wlpc98PDx</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAACHP3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96
++vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6
++z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7
+P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/
+evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96
++vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6
++z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/gAAAP0yMjT8ZGRk+y0tL
+PkjIyQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[VisAD]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[VISAD]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAeAAAAAD0NPcs9jT3LPdPcsT4NPcs+MI0+PlPcsT53
+LCM+jT3LPp7lhD6wjT4+wjT3PtPcsT7lhGo+9ywjPwRp7j8NPcs/FhGoPx7lhD8nuWE/MI0+Pzlh
+Gj9CNPc/SwjUP1PcsT9csI0/ZYRqP25YRz93LCM/gAAA</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAeAAAAAD2NPcs+DT3LPlPcsT6NPcs+sI0+PtPcsT73
+LCM/DT3LPx7lhD8wjT4/QjT3P1PcsT9lhGo/dywjP3csJD9lhGo/U9ywP0I0+D8wjT4/HuWEPw09
+zD73LCQ+09ywPrCNPD6NPcw+U9ywPg09yD2NPdAAAAAA</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAeP4AAAD93LCM/blhHP2WEaj9csI0/U9ywP0sI1D9C
+NPc/OWEaPzCNPj8nuWE/HuWEPxYRqD8NPcs/BGnuPvcsJD7lhGo+09ywPsI0+D6wjT4+nuWEPo09
+zD53LCQ+U9ywPjCNPD4NPcw909ywPY09yD0NPdAAAAAA</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Inverse VisAD]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[INVERSE VISAD]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAeP4AAAD93LCM/blhHP2WEaj9csI0/U9ywP0sI1D9C
+NPc/OWEaPzCNPj8nuWE/HuWEPxYRqD8NPcs/BGnuPvcsJD7lhGo+09ywPsI0+D6wjT4+nuWEPo09
+zD53LCQ+U9ywPjCNPD4NPcw909ywPY09yD0NPdAAAAAA</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAeAAAAAD2NPcs+DT3LPlPcsT6NPcs+sI0+PtPcsT73
+LCM/DT3LPx7lhD8wjT4/QjT3P1PcsT9lhGo/dywjP3csJD9lhGo/U9ywP0I0+D8wjT4/HuWEPw09
+zD73LCQ+09ywPrCNPD6NPcw+U9ywPg09yD2NPdAAAAAA</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAeAAAAAD0NPcs9jT3LPdPcsT4NPcs+MI0+PlPcsT53
+LCM+jT3LPp7lhD6wjT4+wjT3PtPcsT7lhGo+9ywjPwRp7j8NPcs/FhGoPx7lhD8nuWE/MI0+Pzlh
+Gj9CNPc/SwjUP1PcsT9csI0/ZYRqP25YRz93LCM/gAAA</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Wind comps]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[WIND COMPS]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAUAAAAAD0oAAA9qAAAPfwAAT4oAAA+UgAAPnwAAT6T
+AAA+qAAAPrz//z6CAAA+ggAAPoIAAD6CAAA+ggAAPoIAAD6CAAA+ggAAPoIAAD6CAAA=</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAUAAAAAD3EAAA+RAAAPpMAAT7EAAA+9QAAPxMAAT8r
+gAA/RAAAP1x//z9QlDY/VbyiP1rlDT9gDXk/ZTXlP2peUT9vhr0/dK8oP3nXlD9/AAA=</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAUPzQAAD874AA/Q8AAP0ugAD9TgAA/W2AAP2NAAD9r
+IAA/cwAAP3rgAD90eUM/X2vKP0peUj81UNc/IENePws15D7sUNg+wjXmPpga8j5cAAA=</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Windspeed]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[WINDSPEED]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2kpKU+JKSlPnb2+D6kpKU+zc3O
+Pvb2+D8QEBA/JKSlPzk5OT+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABGAAAAAD1IyMk9yMjJPhaWlz5IyMk+evr7PpaWlz6v
+r7A+yMjJPuHh4j76+vs/CgoKPxaWlz8jIyM/L6+wPzw8PD9IyMk/VVVVP2Hh4j9ubm4/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/eHh4P3Dw8T9paWk/YeHiP1paWj9S0tM/S0tLP0PDxD88PDw/
+NLS1Py0tLT8lpaY/Hh4ePxaWlz8PDw8/B4eIPwAAAD7w8PE+4eHiPtLS0z7Dw8Q+tLS1PqWlpj6W
+lpc+h4eIPnDw8T5S0tM+NLS1PhaWlw==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABGP3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96
++vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/gAAAP2tr
+az9W1tc/QkJCPy2trj8ZGRk/BISFPt/f4D62trc+jY2OAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Gray scale]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[GRAY SCALE]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAADuAgIE8AICBPEDAwjyAgIE8oKChPMDAwjzg
+4OI9AICBPRCQkT0goKE9MLCxPUDAwj1Q0NI9YODiPXDw8j2AgIE9iIiJPZCQkT2YmJk9oKChPaio
+qT2wsLE9uLi5PcDAwj3IyMo90NDSPdjY2j3g4OI96OjqPfDw8j34+Po+AICBPgSEhT4IiIk+DIyN
+PhCQkT4UlJU+GJiZPhycnT4goKE+JKSlPiioqT4srK0+MLCxPjS0tT44uLk+PLy9PkDAwj5ExMY+
+SMjKPkzMzj5Q0NI+VNTWPljY2j5c3N4+YODiPmTk5j5o6Oo+bOzuPnDw8j509PY+ePj6Pnz8/j6A
+gIE+goKDPoSEhT6Ghoc+iIiJPoqKiz6MjI0+jo6PPpCQkT6SkpM+lJSVPpaWlz6YmJk+mpqbPpyc
+nT6enp8+oKChPqKioz6kpKU+pqanPqioqT6qqqs+rKytPq6urz6wsLE+srKzPrS0tT62trc+uLi5
+Prq6uz68vL0+vr6/PsDAwj7CwsQ+xMTGPsbGyD7IyMo+ysrMPszMzj7OztA+0NDSPtLS1D7U1NY+
+1tbYPtjY2j7a2tw+3NzePt7e4D7g4OI+4uLkPuTk5j7m5ug+6OjqPurq7D7s7O4+7u7wPvDw8j7y
+8vQ+9PT2Pvb2+D74+Po++vr8Pvz8/j7+/wA/AICBPwGBgj8CgoM/A4OEPwSEhT8FhYY/BoaHPweH
+iD8IiIk/CYmKPwqKiz8Li4w/DIyNPw2Njj8Ojo8/D4+QPxCQkT8RkZI/EpKTPxOTlD8UlJU/FZWW
+PxaWlz8Xl5g/GJiZPxmZmj8amps/G5ucPxycnT8dnZ4/Hp6fPx+foD8goKE/IaGiPyKioz8jo6Q/
+JKSlPyWlpj8mpqc/J6eoPyioqT8pqao/KqqrPyurrD8srK0/La2uPy6urz8vr7A/MLCxPzGxsj8y
+srM/M7O0PzS0tT81tbY/Nra3Pze3uD84uLk/Obm6Pzq6uz87u7w/PLy9Pz29vj8+vr8/P7/AP0DA
+wj9BwcM/QsLEP0PDxT9ExMY/RcXHP0bGyD9Hx8k/SMjKP0nJyz9Kysw/S8vNP0zMzj9Nzc8/Ts7Q
+P0/P0T9Q0NI/UdHTP1LS1D9T09U/VNTWP1XV1z9W1tg/V9fZP1jY2j9Z2ds/WtrcP1vb3T9c3N4/
+Xd3fP17e4D9f3+E/YODiP2Hh4z9i4uQ/Y+PlP2Tk5j9l5ec/ZuboP2fn6T9o6Oo/aenrP2rq7D9r
+6+0/bOzuP23t7z9u7vA/b+/xP3Dw8j9x8fM/cvL0P3Pz9T909PY/dfX3P3b2+D939/k/ePj6P3n5
++z96+vw/e/v9P3z8/j99/f8/fv8AP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAADuAgIE8AICBPEDAwjyAgIE8oKChPMDAwjzg
+4OI9AICBPRCQkT0goKE9MLCxPUDAwj1Q0NI9YODiPXDw8j2AgIE9iIiJPZCQkT2YmJk9oKChPaio
+qT2wsLE9uLi5PcDAwj3IyMo90NDSPdjY2j3g4OI96OjqPfDw8j34+Po+AICBPgSEhT4IiIk+DIyN
+PhCQkT4UlJU+GJiZPhycnT4goKE+JKSlPiioqT4srK0+MLCxPjS0tT44uLk+PLy9PkDAwj5ExMY+
+SMjKPkzMzj5Q0NI+VNTWPljY2j5c3N4+YODiPmTk5j5o6Oo+bOzuPnDw8j509PY+ePj6Pnz8/j6A
+gIE+goKDPoSEhT6Ghoc+iIiJPoqKiz6MjI0+jo6PPpCQkT6SkpM+lJSVPpaWlz6YmJk+mpqbPpyc
+nT6enp8+oKChPqKioz6kpKU+pqanPqioqT6qqqs+rKytPq6urz6wsLE+srKzPrS0tT62trc+uLi5
+Prq6uz68vL0+vr6/PsDAwj7CwsQ+xMTGPsbGyD7IyMo+ysrMPszMzj7OztA+0NDSPtLS1D7U1NY+
+1tbYPtjY2j7a2tw+3NzePt7e4D7g4OI+4uLkPuTk5j7m5ug+6OjqPurq7D7s7O4+7u7wPvDw8j7y
+8vQ+9PT2Pvb2+D74+Po++vr8Pvz8/j7+/wA/AICBPwGBgj8CgoM/A4OEPwSEhT8FhYY/BoaHPweH
+iD8IiIk/CYmKPwqKiz8Li4w/DIyNPw2Njj8Ojo8/D4+QPxCQkT8RkZI/EpKTPxOTlD8UlJU/FZWW
+PxaWlz8Xl5g/GJiZPxmZmj8amps/G5ucPxycnT8dnZ4/Hp6fPx+foD8goKE/IaGiPyKioz8jo6Q/
+JKSlPyWlpj8mpqc/J6eoPyioqT8pqao/KqqrPyurrD8srK0/La2uPy6urz8vr7A/MLCxPzGxsj8y
+srM/M7O0PzS0tT81tbY/Nra3Pze3uD84uLk/Obm6Pzq6uz87u7w/PLy9Pz29vj8+vr8/P7/AP0DA
+wj9BwcM/QsLEP0PDxT9ExMY/RcXHP0bGyD9Hx8k/SMjKP0nJyz9Kysw/S8vNP0zMzj9Nzc8/Ts7Q
+P0/P0T9Q0NI/UdHTP1LS1D9T09U/VNTWP1XV1z9W1tg/V9fZP1jY2j9Z2ds/WtrcP1vb3T9c3N4/
+Xd3fP17e4D9f3+E/YODiP2Hh4z9i4uQ/Y+PlP2Tk5j9l5ec/ZuboP2fn6T9o6Oo/aenrP2rq7D9r
+6+0/bOzuP23t7z9u7vA/b+/xP3Dw8j9x8fM/cvL0P3Pz9T909PY/dfX3P3b2+D939/k/ePj6P3n5
++z96+vw/e/v9P3z8/j99/f8/fv8AP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAADuAgIE8AICBPEDAwjyAgIE8oKChPMDAwjzg
+4OI9AICBPRCQkT0goKE9MLCxPUDAwj1Q0NI9YODiPXDw8j2AgIE9iIiJPZCQkT2YmJk9oKChPaio
+qT2wsLE9uLi5PcDAwj3IyMo90NDSPdjY2j3g4OI96OjqPfDw8j34+Po+AICBPgSEhT4IiIk+DIyN
+PhCQkT4UlJU+GJiZPhycnT4goKE+JKSlPiioqT4srK0+MLCxPjS0tT44uLk+PLy9PkDAwj5ExMY+
+SMjKPkzMzj5Q0NI+VNTWPljY2j5c3N4+YODiPmTk5j5o6Oo+bOzuPnDw8j509PY+ePj6Pnz8/j6A
+gIE+goKDPoSEhT6Ghoc+iIiJPoqKiz6MjI0+jo6PPpCQkT6SkpM+lJSVPpaWlz6YmJk+mpqbPpyc
+nT6enp8+oKChPqKioz6kpKU+pqanPqioqT6qqqs+rKytPq6urz6wsLE+srKzPrS0tT62trc+uLi5
+Prq6uz68vL0+vr6/PsDAwj7CwsQ+xMTGPsbGyD7IyMo+ysrMPszMzj7OztA+0NDSPtLS1D7U1NY+
+1tbYPtjY2j7a2tw+3NzePt7e4D7g4OI+4uLkPuTk5j7m5ug+6OjqPurq7D7s7O4+7u7wPvDw8j7y
+8vQ+9PT2Pvb2+D74+Po++vr8Pvz8/j7+/wA/AICBPwGBgj8CgoM/A4OEPwSEhT8FhYY/BoaHPweH
+iD8IiIk/CYmKPwqKiz8Li4w/DIyNPw2Njj8Ojo8/D4+QPxCQkT8RkZI/EpKTPxOTlD8UlJU/FZWW
+PxaWlz8Xl5g/GJiZPxmZmj8amps/G5ucPxycnT8dnZ4/Hp6fPx+foD8goKE/IaGiPyKioz8jo6Q/
+JKSlPyWlpj8mpqc/J6eoPyioqT8pqao/KqqrPyurrD8srK0/La2uPy6urz8vr7A/MLCxPzGxsj8y
+srM/M7O0PzS0tT81tbY/Nra3Pze3uD84uLk/Obm6Pzq6uz87u7w/PLy9Pz29vj8+vr8/P7/AP0DA
+wj9BwcM/QsLEP0PDxT9ExMY/RcXHP0bGyD9Hx8k/SMjKP0nJyz9Kysw/S8vNP0zMzj9Nzc8/Ts7Q
+P0/P0T9Q0NI/UdHTP1LS1D9T09U/VNTWP1XV1z9W1tg/V9fZP1jY2j9Z2ds/WtrcP1vb3T9c3N4/
+Xd3fP17e4D9f3+E/YODiP2Hh4z9i4uQ/Y+PlP2Tk5j9l5ec/ZuboP2fn6T9o6Oo/aenrP2rq7D9r
+6+0/bOzuP23t7z9u7vA/b+/xP3Dw8j9x8fM/cvL0P3Pz9T909PY/dfX3P3b2+D939/k/ePj6P3n5
++z96+vw/e/v9P3z8/j99/f8/fv8AP4AAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Inverse Gray shade]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[INVERSE GRAY SHADE]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAP4AAAD+AAAA/fv8AP339/z98/P4/e/v9P3r6/D95
++fs/ePj6P3f3+T929vg/dfX3P3T09j9z8/U/cvL0P3Hx8z9w8PI/b+/xP27u8D9t7e8/bOzuP2vr
+7T9q6uw/aenrP2jo6j9n5+k/ZuboP2Xl5z9k5OY/Y+PlP2Li5D9h4eM/YODiP1/f4T9e3uA/Xd3f
+P1zc3j9b290/WtrcP1nZ2z9Y2No/V9fZP1bW2D9V1dc/VNTWP1PT1T9S0tQ/UdHTP1DQ0j9Pz9E/
+Ts7QP03Nzz9MzM4/S8vNP0rKzD9Jycs/SMjKP0fHyT9Gxsg/RcXHP0TExj9Dw8U/QsLEP0HBwz9A
+wMI/P7/APz6+vz89vb4/PLy9Pzu7vD86urs/Obm6Pzi4uT83t7g/Nra3PzW1tj80tLU/M7O0PzKy
+sz8xsbI/MLCxPy+vsD8urq8/La2uPyysrT8rq6w/KqqrPympqj8oqKk/J6eoPyampz8lpaY/JKSl
+PyOjpD8ioqM/IaGiPyCgoT8fn6A/Hp6fPx2dnj8cnJ0/G5ucPxqamz8ZmZo/GJiZPxeXmD8Wlpc/
+FZWWPxSUlT8Tk5Q/EpKTPxGRkj8QkJE/D4+QPw6Ojz8NjY4/DIyNPwuLjD8Kios/CYmKPwiIiT8H
+h4g/BoaHPwWFhj8EhIU/A4OEPwKCgz8BgYI/AICBPv7/AD78/P4++vr8Pvj4+j729vg+9PT2PvLy
+9D7w8PI+7u7wPuzs7j7q6uw+6OjqPubm6D7k5OY+4uLkPuDg4j7e3uA+3NzePtra3D7Y2No+1tbY
+PtTU1j7S0tQ+0NDSPs7O0D7MzM4+ysrMPsjIyj7Gxsg+xMTGPsLCxD7AwMI+vr6/Pry8vT66urs+
+uLi5Pra2tz60tLU+srKzPrCwsT6urq8+rKytPqqqqz6oqKk+pqanPqSkpT6ioqM+oKChPp6enz6c
+nJ0+mpqbPpiYmT6Wlpc+lJSVPpKSkz6QkJE+jo6PPoyMjT6Kios+iIiJPoaGhz6EhIU+goKDPoCA
+gT58/P4+ePj6PnT09j5w8PI+bOzuPmjo6j5k5OY+YODiPlzc3j5Y2No+VNTWPlDQ0j5MzM4+SMjK
+PkTExj5AwMI+PLy9Pji4uT40tLU+MLCxPiysrT4oqKk+JKSlPiCgoT4cnJ0+GJiZPhSUlT4QkJE+
+DIyNPgiIiT4EhIU+AICBPfj4+j3w8PI96OjqPeDg4j3Y2No90NDSPcjIyj3AwMI9uLi5PbCwsT2o
+qKk9oKChPZiYmT2QkJE9iIiJPYCAgT1w8PI9YODiPVDQ0j1AwMI9MLCxPSCgoT0QkJE9AICBPODg
+4jzAwMI8oKChPICAgTxAwMI8AICBO4CAgQ==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAP4AAAD+AAAA/fv8AP339/z98/P4/e/v9P3r6/D95
++fs/ePj6P3f3+T929vg/dfX3P3T09j9z8/U/cvL0P3Hx8z9w8PI/b+/xP27u8D9t7e8/bOzuP2vr
+7T9q6uw/aenrP2jo6j9n5+k/ZuboP2Xl5z9k5OY/Y+PlP2Li5D9h4eM/YODiP1/f4T9e3uA/Xd3f
+P1zc3j9b290/WtrcP1nZ2z9Y2No/V9fZP1bW2D9V1dc/VNTWP1PT1T9S0tQ/UdHTP1DQ0j9Pz9E/
+Ts7QP03Nzz9MzM4/S8vNP0rKzD9Jycs/SMjKP0fHyT9Gxsg/RcXHP0TExj9Dw8U/QsLEP0HBwz9A
+wMI/P7/APz6+vz89vb4/PLy9Pzu7vD86urs/Obm6Pzi4uT83t7g/Nra3PzW1tj80tLU/M7O0PzKy
+sz8xsbI/MLCxPy+vsD8urq8/La2uPyysrT8rq6w/KqqrPympqj8oqKk/J6eoPyampz8lpaY/JKSl
+PyOjpD8ioqM/IaGiPyCgoT8fn6A/Hp6fPx2dnj8cnJ0/G5ucPxqamz8ZmZo/GJiZPxeXmD8Wlpc/
+FZWWPxSUlT8Tk5Q/EpKTPxGRkj8QkJE/D4+QPw6Ojz8NjY4/DIyNPwuLjD8Kios/CYmKPwiIiT8H
+h4g/BoaHPwWFhj8EhIU/A4OEPwKCgz8BgYI/AICBPv7/AD78/P4++vr8Pvj4+j729vg+9PT2PvLy
+9D7w8PI+7u7wPuzs7j7q6uw+6OjqPubm6D7k5OY+4uLkPuDg4j7e3uA+3NzePtra3D7Y2No+1tbY
+PtTU1j7S0tQ+0NDSPs7O0D7MzM4+ysrMPsjIyj7Gxsg+xMTGPsLCxD7AwMI+vr6/Pry8vT66urs+
+uLi5Pra2tz60tLU+srKzPrCwsT6urq8+rKytPqqqqz6oqKk+pqanPqSkpT6ioqM+oKChPp6enz6c
+nJ0+mpqbPpiYmT6Wlpc+lJSVPpKSkz6QkJE+jo6PPoyMjT6Kios+iIiJPoaGhz6EhIU+goKDPoCA
+gT58/P4+ePj6PnT09j5w8PI+bOzuPmjo6j5k5OY+YODiPlzc3j5Y2No+VNTWPlDQ0j5MzM4+SMjK
+PkTExj5AwMI+PLy9Pji4uT40tLU+MLCxPiysrT4oqKk+JKSlPiCgoT4cnJ0+GJiZPhSUlT4QkJE+
+DIyNPgiIiT4EhIU+AICBPfj4+j3w8PI96OjqPeDg4j3Y2No90NDSPcjIyj3AwMI9uLi5PbCwsT2o
+qKk9oKChPZiYmT2QkJE9iIiJPYCAgT1w8PI9YODiPVDQ0j1AwMI9MLCxPSCgoT0QkJE9AICBPODg
+4jzAwMI8oKChPICAgTxAwMI8AICBO4CAgQ==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAP4AAAD+AAAA/fv8AP339/z98/P4/e/v9P3r6/D95
++fs/ePj6P3f3+T929vg/dfX3P3T09j9z8/U/cvL0P3Hx8z9w8PI/b+/xP27u8D9t7e8/bOzuP2vr
+7T9q6uw/aenrP2jo6j9n5+k/ZuboP2Xl5z9k5OY/Y+PlP2Li5D9h4eM/YODiP1/f4T9e3uA/Xd3f
+P1zc3j9b290/WtrcP1nZ2z9Y2No/V9fZP1bW2D9V1dc/VNTWP1PT1T9S0tQ/UdHTP1DQ0j9Pz9E/
+Ts7QP03Nzz9MzM4/S8vNP0rKzD9Jycs/SMjKP0fHyT9Gxsg/RcXHP0TExj9Dw8U/QsLEP0HBwz9A
+wMI/P7/APz6+vz89vb4/PLy9Pzu7vD86urs/Obm6Pzi4uT83t7g/Nra3PzW1tj80tLU/M7O0PzKy
+sz8xsbI/MLCxPy+vsD8urq8/La2uPyysrT8rq6w/KqqrPympqj8oqKk/J6eoPyampz8lpaY/JKSl
+PyOjpD8ioqM/IaGiPyCgoT8fn6A/Hp6fPx2dnj8cnJ0/G5ucPxqamz8ZmZo/GJiZPxeXmD8Wlpc/
+FZWWPxSUlT8Tk5Q/EpKTPxGRkj8QkJE/D4+QPw6Ojz8NjY4/DIyNPwuLjD8Kios/CYmKPwiIiT8H
+h4g/BoaHPwWFhj8EhIU/A4OEPwKCgz8BgYI/AICBPv7/AD78/P4++vr8Pvj4+j729vg+9PT2PvLy
+9D7w8PI+7u7wPuzs7j7q6uw+6OjqPubm6D7k5OY+4uLkPuDg4j7e3uA+3NzePtra3D7Y2No+1tbY
+PtTU1j7S0tQ+0NDSPs7O0D7MzM4+ysrMPsjIyj7Gxsg+xMTGPsLCxD7AwMI+vr6/Pry8vT66urs+
+uLi5Pra2tz60tLU+srKzPrCwsT6urq8+rKytPqqqqz6oqKk+pqanPqSkpT6ioqM+oKChPp6enz6c
+nJ0+mpqbPpiYmT6Wlpc+lJSVPpKSkz6QkJE+jo6PPoyMjT6Kios+iIiJPoaGhz6EhIU+goKDPoCA
+gT58/P4+ePj6PnT09j5w8PI+bOzuPmjo6j5k5OY+YODiPlzc3j5Y2No+VNTWPlDQ0j5MzM4+SMjK
+PkTExj5AwMI+PLy9Pji4uT40tLU+MLCxPiysrT4oqKk+JKSlPiCgoT4cnJ0+GJiZPhSUlT4QkJE+
+DIyNPgiIiT4EhIU+AICBPfj4+j3w8PI96OjqPeDg4j3Y2No90NDSPcjIyj3AwMI9uLi5PbCwsT2o
+qKk9oKChPZiYmT2QkJE9iIiJPYCAgT1w8PI9YODiPVDQ0j1AwMI9MLCxPSCgoT0QkJE9AICBPODg
+4jzAwMI8oKChPICAgTxAwMI8AICBO4CAgQ==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[DbZ]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Radar]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[DBZ]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float" length="16">0.003921569,0.0,0.003921569,0.003921569,0.003921569,0.003921569,0.16862746,0.6509804,0.8901961,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+                    <parray class="float" length="16">0.22352941,0.54901963,0.81960785,1.0,1.0,1.0,1.0,1.0,1.0,0.7764706,0.65882355,0.5686275,0.50980395,0.41960785,0.32941177,0.02745098</parray>
+                    <parray class="float" length="16">1.0,1.0,1.0,0.9098039,0.67058825,0.30980393,0.0,0.007843138,0.003921569,0.0,0.003921569,0.003921569,0.003921569,0.0,0.0,0.0</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[DbZ(NWS)]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Radar]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[DBZ(NWS)]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float" length="16">0.0,0.0,0.5294118,0.0,0.0,0.19607843,0.13333334,0.93333334,0.93333334,0.93333334,1.0,0.6901961,0.6901961,0.7294118,1.0,1.0</parray>
+                    <parray class="float" length="16">0.0,1.0,0.80784315,0.0,1.0,0.8039216,0.54509807,0.93333334,0.8627451,0.4627451,0.1882353,0.1882353,0.1882353,0.33333334,0.0,1.0</parray>
+                    <parray class="float" length="16">0.0,1.0,0.92156863,1.0,0.0,0.19607843,0.13333334,0.0,0.50980395,0.12941177,0.1882353,0.3764706,0.3764706,0.827451,1.0,1.0</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Light Gray scale]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Satellite]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[LIGHT GRAY SCALE]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAePnrhSD6Ktu4+l/04PqVDgj6yicw+v9AVPs0WXz7a
+XKk+56LzPvTpPT8BF8M/B7roPw5eDT8VATI/G6RXPyJHfD8o6qE/L43GPzYw6z881BA/Q3c1P0oa
+Wj9QvX8/V2CkP14DyT9kpu4/a0oTP3HtOD94kF0/fzOC</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAePnrhSD6Ktu4+l/04PqVDgj6yicw+v9AVPs0WXz7a
+XKk+56LzPvTpPT8BF8M/B7roPw5eDT8VATI/G6RXPyJHfD8o6qE/L43GPzYw6z881BA/Q3c1P0oa
+Wj9QvX8/V2CkP14DyT9kpu4/a0oTP3HtOD94kF0/fzOC</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAePnrhSD6Ktu4+l/04PqVDgj6yicw+v9AVPs0WXz7a
+XKk+56LzPvTpPT8BF8M/B7roPw5eDT8VATI/G6RXPyJHfD8o6qE/L43GPzYw6z881BA/Q3c1P0oa
+Wj9QvX8/V2CkP14DyT9kpu4/a0oTP3HtOD94kF0/fzOC</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[TOPO/Sat Composite]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Satellite]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[TOPO/SAT COMPOSITE]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7gICBPACAgTxAwME8gICBPKCg
+oTzAwME84ODhPQCAgT0QkJE9EJCRPSCgoT0wsLE9QMDBPVDQ0T1g4OE9cPDxPYCAgT2IiIk9kJCR
+PZiYmT2goKE9qKipPbCwsT24uLk9wMDBPcjIyT3Q0NE92NjZPdjY2T3g4OE96OjpPfDw8T34+Pk+
+AICBPgSEhT4IiIk+DIyNPhCQkT4UlJU+GJiZPhycnT4goKE+JKSlPiioqT4srK0+MLCxPjS0tT40
+tLU+OLi5Pjy8vT5AwME+RMTFPkjIyT5MzM0+UNDRPlTU1T5Y2Nk+XNzdPmDg4T5k5OU+aOjpPmzs
+7T5w8PE+dPT1Pnj4+T58/P0+fPz9PoCAgT6CgoM+hISFPoaGhz6IiIk+ioqLPoyMjT6Ojo8+kJCR
+PpKSkz6UlJU+lpaXPpiYmT6amps+nJydPp6enz6goKE+oqKjPqKioz6kpKU+pqanPqioqT6qqqs+
+rKytPq6urz6wsLE+srKzPrS0tT5IyMk+cPDxPoyMjT6goKE+tLS1PsjIyT7c3N0+8PDxPwKCgz8M
+jI0/FpaXPyCgoT8qqqs/NLS1Pz6+vz9IyMk/RcXGP0HBwj8+vr8/Orq7Pze3uD8zs7Q/MLCxPyys
+rT8oqKk/JaWmPyGhoj8enp8/GpqbPxeXmD8Tk5Q/D4+QPwyMjT8IiIk/BYWGPwGBgj78/P0+9PT1
+Pu7u7z7m5uc+3t7fPtjY2T7Q0NE+ysrLPsLCwz68vL0+tLS1PqysrT6mpqc+np6fPpiYmT6QkJE+
+ioqLPoKCgz509PU+aOjpPljY2T5MzM0+PLy9PjCwsT4goKE+IKChPiCgoT4goKE+IKChPiCgoT4g
+oKE+IKChPiCgoT4goKE+IKChPiCgoT4goKE+IKChPiCgoT4goKE+IKChPiCgoT7+/v8/AYGCPwOD
+hD8FhYY/B4eIPwmJij8Li4w/DY2OPw+PkD8RkZI/E5OUPxWVlj8Xl5g/GZmaPxubnD8dnZ4/H5+g
+PyCgoT8ioqM/JKSlPyampz8oqKk/KqqrPyysrT8urq8/MLCxPzKysz80tLU/Nra3Pzi4uT86urs/
+PLy9Pz6+vz9AwME/QsLDP0TExT9Gxsc/SMjJP0rKyz9MzM0/Ts7PP1DQ0T9S0tM/VNTVP1bW1z9Y
+2Nk/WtrbP1zc3T9e3t8/X9/gP2Hh4j9j4+Q/ZeXmP2fn6D9p6eo/a+vsP23t7j9v7/A/cfHyP3Pz
+9D919fY/d/f4P3n5+j97+/w/ff3+P4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7gICBPEDAwTyAgIE8oKChPODg
+4T0AgIE9IKChPTCwsT1AwME9YODhPXDw8T2AgIE9kJCRPZiYmT2oqKk9sLCxPbi4uT3IyMk90NDR
+PdjY2T3o6Ok98PDxPfj4+T4EhIU+CIiJPhCQkT4UlJU+GJiZPiCgoT4kpKU+KKipPjCwsT40tLU+
+PLy9PkDAwT5ExMU+TMzNPlDQ0T5U1NU+XNzdPmDg4T5k5OU+bOztPnDw8T54+Pk+fPz9PoCAgT6E
+hIU+hoaHPoiIiT6MjI0+jo6PPpKSkz6UlJU+lpaXPpqamz6cnJ0+np6fPqKioz6kpKU+pqanPqqq
+qz6srK0+sLCxPrKysz60tLU+uLi5Prq6uz68vL0+wMDBPsLCwz7Gxsc+yMjJPsrKyz7Ozs8+0NDR
+PtLS0z7W1tc+2NjZPtra2z7e3t8+4ODhPuTk5T7m5uc+6OjpPuzs7T7u7u8+8PDxPvT09T729vc+
++vr7Pvz8/T7+/v8/AYGCPwKCgz6YmJk+oqKjPq6urz66urs+xMTFPtDQ0T7a2ts+5ubnPvLy8z78
+/P0/BISFPwqKiz8Pj5A/FZWWPxqamz8goKE/Hp6fPxubnD8YmJk/FJSVPxGRkj8Ojo8/C4uMPweH
+iD8EhIU/AYGCPvz8/T709PU+7u7vPujo6T7i4uM+2trbPtTU1T7Ozs8+yMjJPsDAwT66urs+tLS1
+Pq6urz6mpqc+oKChPpqamz6UlJU+jIyNPoaGhz6AgIE+dPT1PmTk5T5Y2Nk+TMzNPkDAwT4wsLE+
+JKSlPhiYmT4MjI09+Pj5PeDg4T3IyMk9sLCxPZCQkT1w8PE9cPDxPXDw8T1w8PE9cPDxPXDw8T1w
+8PE9cPDxPXDw8T1w8PE9cPDxPXDw8T1w8PE9cPDxPXDw8T1w8PE9cPDxPXDw8T7+/v8/AYGCPwOD
+hD8FhYY/B4eIPwmJij8Li4w/DY2OPw+PkD8RkZI/E5OUPxWVlj8Xl5g/GZmaPxubnD8dnZ4/H5+g
+PyCgoT8ioqM/JKSlPyampz8oqKk/KqqrPyysrT8urq8/MLCxPzKysz80tLU/Nra3Pzi4uT86urs/
+PLy9Pz6+vz9AwME/QsLDP0TExT9Gxsc/SMjJP0rKyz9MzM0/Ts7PP1DQ0T9S0tM/VNTVP1bW1z9Y
+2Nk/WtrbP1zc3T9e3t8/X9/gP2Hh4j9j4+Q/ZeXmP2fn6D9p6eo/a+vsP23t7j9v7/A/cfHyP3Pz
+9D919fY/d/f4P3n5+j97+/w/ff3+P4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD4MjI0+FJSVPhiYmT4goKE+KKipPiys
+rT40tLU+OLi5PkDAwT5IyMk+TMzNPlTU1T5c3N0+YODhPmjo6T5s7O0+dPT1Pnz8/T6AgIE+hISF
+PoiIiT6Kios+jo6PPpKSkz6UlJU+mJiZPpqamz6enp8+oqKjPqSkpT6oqKk+rKytPq6urz6ysrM+
+tLS1Pri4uT68vL0+vr6/PsLCwz7Gxsc+yMjJPszMzT7Q0NE+0tLTPtbW1z7Y2Nk+3NzdPuDg4T7i
+4uM+5ubnPurq6z7s7O0+8PDxPvLy8z729vc++vr7Pvz8/T8AgIE/AoKDPwODhD8FhYY/B4eIPwiI
+iT8Kios/C4uMPw2Njj8Pj5A/EJCRPxKSkz8UlJU/FZWWPxeXmD8YmJk/GpqbPxycnT8dnZ4/H5+g
+PyGhoj8ioqM/JKSlPyampz8np6g/KamqPyqqqz8srK0/Lq6vPy+vsD8xsbI/M7O0PzS0tT82trc/
+N7e4Pzm5uj87u7w/PLy9Pz6+vz3AwME94ODhPfj4+T4MjI0+HJydPiysrT44uLk+SMjJPljY2T5o
+6Ok+dPT1PoKCgz6Kios+kpKTPpiYmT6goKE+np6fPpqamz6YmJk+lJSVPpCQkT6Ojo8+ioqLPoaG
+hz6EhIU+gICBPnj4+T509PU+bOztPmTk5T5c3N0+WNjZPlDQ0T5IyMk+RMTFPjy8vT40tLU+MLCx
+PiioqT4goKE+HJydPhSUlT4MjI0+CIiJPgCAgT3w8PE96OjpPdjY2T3IyMk9wMDBPbCwsT2goKE9
+kJCRPYiIiT1w8PE9UNDRPUDAwT0goKE9AICBPODg4TygoKE8oKChPKCgoTygoKE8oKChPKCgoTyg
+oKE8oKChPKCgoTygoKE8oKChPKCgoTygoKE8oKChPKCgoTygoKE8oKChPKCgoT7+/v8/AYGCPwOD
+hD8FhYY/B4eIPwmJij8Li4w/DY2OPw+PkD8RkZI/E5OUPxWVlj8Xl5g/GZmaPxubnD8dnZ4/H5+g
+PyCgoT8ioqM/JKSlPyampz8oqKk/KqqrPyysrT8urq8/MLCxPzKysz80tLU/Nra3Pzi4uT86urs/
+PLy9Pz6+vz9AwME/QsLDP0TExT9Gxsc/SMjJP0rKyz9MzM0/Ts7PP1DQ0T9S0tM/VNTVP1bW1z9Y
+2Nk/WtrbP1zc3T9e3t8/X9/gP2Hh4j9j4+Q/ZeXmP2fn6D9p6eo/a+vsP23t7j9v7/A/cfHyP3Pz
+9D919fY/d/f4P3n5+j97+/w/ff3+P4AAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Water Vapor (Gray)]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Satellite]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[WATER VAPOR (GRAY)]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8AICBPICAgTzAwME9AICBPSCgoT1Q0NE9cPDxPYiIiT2Y
+mJk9qKipPbi4uT3Q0NE94ODhPfDw8T4AgIE+CIiJPhSUlT4cnJ0+JKSlPiysrT40tLU+PLy9PkjI
+yT5Q0NE+WNjZPmDg4T5o6Ok+dPT1Pnz8/T6CgoM+hoaHPoqKiz6Ojo8+lJSVPpiYmT6cnJ0+oKCh
+PqSkpT6qqqs+rq6vPrKysz62trc+urq7Pr6+vz7ExMU+yMjJPszMzT7Q0NE+1NTVPtjY2T7e3t8+
+4uLjPubm5z7q6us+7u7vPvT09T74+Pk+/Pz9PwCAgT8CgoM/BISFPweHiD8JiYo/C4uMPw2Njj8P
+j5A/EpKTPxSUlT8Wlpc/GJiZPxqamz8cnJ0/H5+gPyGhoj8jo6Q/JaWmPyenqD8qqqs/LKytPy6u
+rz8wsLE/MrKzPzS0tT83t7g/Obm6Pzu7vD89vb4/P7/AP0HBwj9ExMU/RsbHP0jIyT9Kyss/TMzN
+P0/P0D9R0dI/U9PUP1XV1j9X19g/WdnaP1zc3T9e3t8/YODhP2Li4z9k5OU/Z+foP2np6j9r6+w/
+be3uP2/v8D9x8fI/dPT1P3b29z94+Pk/evr7P3z8/T+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8AICBPICAgTzAwME9AICBPSCgoT1Q0NE9cPDxPYiIiT2Y
+mJk9qKipPbi4uT3Q0NE94ODhPfDw8T4AgIE+CIiJPhSUlT4cnJ0+JKSlPiysrT40tLU+PLy9PkjI
+yT5Q0NE+WNjZPmDg4T5o6Ok+dPT1Pnz8/T6CgoM+hoaHPoqKiz6Ojo8+lJSVPpiYmT6cnJ0+oKCh
+PqSkpT6qqqs+rq6vPrKysz62trc+urq7Pr6+vz7ExMU+yMjJPszMzT7Q0NE+1NTVPtjY2T7e3t8+
+4uLjPubm5z7q6us+7u7vPvT09T74+Pk+/Pz9PwCAgT8CgoM/BISFPweHiD8JiYo/C4uMPw2Njj8P
+j5A/EpKTPxSUlT8Wlpc/GJiZPxqamz8cnJ0/H5+gPyGhoj8jo6Q/JaWmPyenqD8qqqs/LKytPy6u
+rz8wsLE/MrKzPzS0tT83t7g/Obm6Pzu7vD89vb4/P7/AP0HBwj9ExMU/RsbHP0jIyT9Kyss/TMzN
+P0/P0D9R0dI/U9PUP1XV1j9X19g/WdnaP1zc3T9e3t8/YODhP2Li4z9k5OU/Z+foP2np6j9r6+w/
+be3uP2/v8D9x8fI/dPT1P3b29z94+Pk/evr7P3z8/T+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8AICBPICAgTzAwME9AICBPSCgoT1Q0NE9cPDxPYiIiT2Y
+mJk9qKipPbi4uT3Q0NE94ODhPfDw8T4AgIE+CIiJPhSUlT4cnJ0+JKSlPiysrT40tLU+PLy9PkjI
+yT5Q0NE+WNjZPmDg4T5o6Ok+dPT1Pnz8/T6CgoM+hoaHPoqKiz6Ojo8+lJSVPpiYmT6cnJ0+oKCh
+PqSkpT6qqqs+rq6vPrKysz62trc+urq7Pr6+vz7ExMU+yMjJPszMzT7Q0NE+1NTVPtjY2T7e3t8+
+4uLjPubm5z7q6us+7u7vPvT09T74+Pk+/Pz9PwCAgT8CgoM/BISFPweHiD8JiYo/C4uMPw2Njj8P
+j5A/EpKTPxSUlT8Wlpc/GJiZPxqamz8cnJ0/H5+gPyGhoj8jo6Q/JaWmPyenqD8qqqs/LKytPy6u
+rz8wsLE/MrKzPzS0tT83t7g/Obm6Pzu7vD89vb4/P7/AP0HBwj9ExMU/RsbHP0jIyT9Kyss/TMzN
+P0/P0D9R0dI/U9PUP1XV1j9X19g/WdnaP1zc3T9e3t8/YODhP2Li4z9k5OU/Z+foP2np6j9r6+w/
+be3uP2/v8D9x8fI/dPT1P3b29z94+Pk/evr7P3z8/T+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Topography/Bathymetry]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Misc.]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[TOPOGRAPHY/BATHYMETRY]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADuAgIE8AICBPACAgTxAwME8gICB
+PKCgoTygoKE8wMDBPODg4T0AgIE9AICBPRCQkT0goKE9MLCxPTCwsT1AwME9UNDRPWDg4T1g4OE9
+cPDxPYCAgT2IiIk9iIiJPZCQkT2YmJk9oKChPaCgoT2oqKk9sLCxPbi4uT24uLk9wMDBPcjIyT3Q
+0NE90NDRPdjY2T3g4OE96OjpPejo6T3w8PE9+Pj5PgCAgT4EhIU+BISFPgiIiT4MjI0+EJCRPhCQ
+kT4UlJU+GJiZPhycnT4cnJ0+IKChPiSkpT4oqKk+KKipPiysrT4wsLE+NLS1PjS0tT44uLk+PLy9
+PkDAwT5AwME+RMTFPkjIyT5MzM0+TMzNPlDQ0T5U1NU+WNjZPljY2T5c3N0+YODhPmTk5T5k5OU+
+aOjpPmzs7T5w8PE+dPT1PnT09T54+Pk+fPz9PoCAgT6AgIE+goKDPoSEhT6Ghoc+hoaHPoiIiT6K
+ios+jIyNPoyMjT6Ojo8+kJCRPpKSkz6SkpM+lJSVPpaWlz6YmJk+mJiZPpqamz6cnJ0+np6fPp6e
+nz6goKE+oqKjPqSkpT6kpKU+pqanPqioqT6qqqs+qqqrPqysrT6urq8+sLCxPrCwsT6ysrM+tLS1
+PiCgoT5AwME+YODhPoCAgT6QkJE+oKChPrCwsT7AwME+0NDRPuDg4T7w8PE/AICBPwiIiT8QkJE/
+GJiZPyCgoT8oqKk/MLCxPzi4uT9AwME/SMjJP0XFxj9CwsM/QMDBPz29vj86urs/OLi5PzW1tj8y
+srM/MLCxPy2trj8qqqs/KKipPyWlpj8ioqM/IKChPx2dnj8amps/GJiZPxWVlj8SkpM/EJCRPw2N
+jj8Kios/CIiJPwWFhj8CgoM/AICBPvr6+z709PU+8PDxPurq6z7m5uc+4ODhPtra2z7W1tc+0NDR
+PsrKyz7Gxsc+wMDBPrq6uz62trc+sLCxPqqqqz6mpqc+oKChPpqamz6Wlpc+kJCRPoqKiz6Ghoc+
+gICBPnT09T5s7O0+YODhPlTU1T5MzM0+QMDBPjS0tT4srK0+IKChPiCgoT5ExMU+aOjpPoaGhz6Y
+mJk+qqqrPry8vT7Ozs8+4ODhPvLy8z8CgoM/C4uMPxSUlT8cnJ0/JaWmPy6urz83t7g/QMDBP0nJ
+yj9S0tM/W9vcP2Tk5T9t7e4/dvb3P4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADuAgIE8AICBPEDAwTyAgIE8oKCh
+PODg4T0AgIE9EJCRPSCgoT0wsLE9QMDBPVDQ0T1g4OE9cPDxPYCAgT2IiIk9mJiZPaCgoT2oqKk9
+sLCxPbi4uT3AwME9yMjJPdDQ0T3Y2Nk94ODhPejo6T34+Pk+AICBPgSEhT4IiIk+DIyNPhCQkT4U
+lJU+GJiZPhycnT4goKE+KKipPiysrT4wsLE+NLS1Pji4uT48vL0+QMDBPkTExT5IyMk+TMzNPlDQ
+0T5Y2Nk+XNzdPmDg4T5k5OU+aOjpPmzs7T5w8PE+dPT1Pnj4+T58/P0+gICBPoSEhT6Ghoc+iIiJ
+PoqKiz6MjI0+jo6PPpCQkT6SkpM+lJSVPpaWlz6YmJk+nJydPp6enz6goKE+oqKjPqSkpT6mpqc+
+qKipPqqqqz6srK0+rq6vPrCwsT60tLU+tra3Pri4uT66urs+vLy9Pr6+vz7AwME+wsLDPsTExT7G
+xsc+ysrLPszMzT7Ozs8+0NDRPtLS0z7U1NU+1tbXPtjY2T7a2ts+3NzdPt7e3z7i4uM+5OTlPubm
+5z7o6Ok+6urrPuzs7T7u7u8+8PDxPvLy8z709PU+9vb3Pvr6+z78/P0+/v7/PwCAgT8BgYI/AoKD
+PoyMjT6Wlpc+np6fPqioqT6wsLE+urq7PsLCwz7MzM0+1NTVPt7e3z7m5uc+8PDxPvj4+T8BgYI/
+BYWGPwqKiz8Ojo8/E5OUPxeXmD8cnJ0/IKChPx6enz8cnJ0/GZmaPxeXmD8UlJU/EpKTPw+PkD8N
+jY4/C4uMPwiIiT8Ghoc/A4OEPwGBgj78/P0++Pj5PvT09T7u7u8+6urrPuTk5T7g4OE+3NzdPtbW
+1z7S0tM+zMzNPsjIyT7CwsM+vr6/Prq6uz60tLU+sLCxPqqqqz6mpqc+oKChPpycnT6YmJk+kpKT
+Po6Ojz6IiIk+hISFPnz8/T509PU+bOztPmDg4T5Y2Nk+TMzNPkTExT48vL0+MLCxPiioqT4cnJ0+
+FJSVPgiIiT4AgIE98PDxPdjY2T3IyMk9sLCxPaCgoT2IiIk9cPDxPXDw8T3IyMk+DIyNPjS0tT5c
+3N0+goKDPpaWlz6qqqs+vr6/PtLS0z7m5uc++vr7PweHiD8RkZI/G5ucPyWlpj8vr7A/Obm6P0PD
+xD9Nzc4/V9fYP2Hh4j9r6+w/dfX2P4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPgyMjT4QkJE+GJiZPhycnT4goKE+KKip
+PiysrT4wsLE+NLS1Pjy8vT5AwME+RMTFPkzMzT5Q0NE+VNTVPlzc3T5g4OE+ZOTlPmjo6T5w8PE+
+dPT1Pnj4+T6AgIE+goKDPoSEhT6IiIk+ioqLPoyMjT6Ojo8+kpKTPpSUlT6Wlpc+mpqbPpycnT6e
+np8+oqKjPqSkpT6mpqc+qKipPqysrT6urq8+sLCxPrS0tT62trc+uLi5Pry8vT6+vr8+wMDBPsTE
+xT7Gxsc+yMjJPsrKyz7Ozs8+0NDRPtLS0z7W1tc+2NjZPtra2z7e3t8+4ODhPuLi4z7k5OU+6Ojp
+Purq6z7s7O0+8PDxPvLy8z709PU++Pj5Pvr6+z78/P0+/v7/PwGBgj8CgoM/A4OEPwWFhj8Ghoc/
+B4eIPwmJij8Kios/C4uMPw2Njj8Ojo8/D4+QPxCQkT8SkpM/E5OUPxSUlT8Wlpc/F5eYPxiYmT8a
+mps/G5ucPxycnT8dnZ4/H5+gPyCgoT8hoaI/I6OkPySkpT8lpaY/J6eoPyioqT8pqao/KqqrPyys
+rT8tra4/Lq6vPzCwsT8xsbI/MrKzPzS0tT81tbY/Nra3Pze3uD85ubo/Orq7Pzu7vD89vb4/Pr6/
+PaCgoT24uLk90NDRPejo6T4AgIE+DIyNPhiYmT4kpKU+MLCxPjy8vT5IyMk+VNTVPmDg4T5s7O0+
+ePj5PoKCgz6IiIk+jo6PPpSUlT6amps+oKChPp6enz6cnJ0+mJiZPpaWlz6UlJU+kpKTPo6Ojz6M
+jI0+ioqLPoiIiT6EhIU+goKDPoCAgT58/P0+dPT1PnDw8T5s7O0+aOjpPmDg4T5c3N0+WNjZPlTU
+1T5MzM0+SMjJPkTExT5AwME+OLi5PjS0tT4wsLE+LKytPiSkpT4goKE+HJydPhiYmT4QkJE+DIyN
+PgiIiT4EhIU9+Pj5PfDw8T3o6Ok94ODhPdDQ0T3IyMk9wMDBPbi4uT2oqKk9oKChPZiYmT2QkJE9
+gICBPXDw8T1g4OE9UNDRPTCwsT0goKE9EJCRPQCAgTzAwME8oKChPKCgoT1w8PE90NDRPhCQkT48
+vL0+ZOTlPoiIiT6cnJ0+sLCxPsbGxz7a2ts+8PDxPwKCgz8MjI0/F5eYPyGhoj8srK0/Nra3P0HB
+wj9Ly8w/VdXWP2Dg4T9q6us/dfX2P4AAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Radar Precip]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Radar]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[RADAR PRECIP]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwCAgT8AgIE/
+AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT7I
+yMk+yMjJPsjIyT7IyMk+yMjJPsjIyT7IyMk+yMjJPsjIyT7IyMk+yMjJPsjIyT7IyMk+yMjJPsjI
+yT7IyMk+kJCRPpCQkT6QkJE+kJCRPpCQkT6QkJE+kJCRPpCQkT6QkJE+kJCRPpCQkT6QkJE+kJCR
+PpCQkT6QkJE+kJCRPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+
+AICBPgCAgT4AgIE+AICBPgCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2A
+gIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCA
+gT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDx
+P3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/
+cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/EJCRPxCQkT8Q
+kJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPzCw
+sT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCx
+PzCwsT9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/
+SsrLP0rKyz9Kyss/ZeXmP2Xl5j9l5eY/ZeXmP2Xl5j9l5eY/ZeXmP2Xl5j9l5eY/ZeXmP2Xl5j9l
+5eY/ZeXmP2Xl5j9l5eY/ZeXmP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw
+8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/EJCRPxCQkT8QkJE/EJCR
+PxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRP2Dg4T9g4OE/
+YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T84
+uLk/OLi5Pzi4uT84uLk/OLi5Pzi4uT84uLk/OLi5Pzi4uT84uLk/OLi5Pzi4uT84uLk/OLi5Pzi4
+uT84uLk/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCR
+PxCQkT8QkJE/EJCRPtDQ0T7Q0NE+0NDRPtDQ0T7Q0NE+0NDRPtDQ0T7Q0NE+0NDRPtDQ0T7Q0NE+
+0NDRPtDQ0T7Q0NE+0NDRPtDQ0T6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6A
+gIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DA
+wT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICB
+PwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT2AgIE9gICBPYCAgT2AgIE9
+gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIEAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPgCA
+gT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICB
+PgCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+
+gICBPoCAgT6AgIE+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7A
+wME+wMDBPsDAwT7AwME+wMDBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCA
+gT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgQ==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw
+8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/EJCRPxCQkT8QkJE/EJCR
+PxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPqCgoT6goKE+
+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6A
+gIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCA
+gT6AgIE+QMDBPkDAwT5AwME+QMDBPkDAwT5AwME+QMDBPkDAwT5AwME+QMDBPkDAwT5AwME+QMDB
+PkDAwT5AwME+QMDBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+
+AICBPgCAgT4AgIE+AICBPgCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2A
+gIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCA
+gT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICB
+PgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+
+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIEAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwCA
+gT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICB
+PwCAgT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/
+IKChPyCgoT8goKE/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9A
+wME/QMDBP0DAwT9AwME/QMDBP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg
+4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4Q==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Visible/Fog]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Satellite]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[VISIBLE/FOG]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAADuAgIEAAAAAPEDAwTzg4OE9IKChPWDg4T2I
+iIk9oKChPcDAwT3Y2Nk98PDxPgiIiT4UlJU+JKSlPjCwsT48vL0+TMzNPljY2T5o6Ok+dPT1PoCA
+gT6IiIk+jo6PPpaWlz6cnJ0+oqKjPqqqqz6wsLE+tra3Pr6+vz7ExMU+zMzNPtLS0z7Y2Nk+4ODh
+Pubm5z7u7u8+9PT1Pvr6+z8BgYI/BISFPweHiD8Li4w/Do6PPxKSkz8VlZY/GJiZPxycnT8fn6A/
+I6OkPyampz8pqao/La2uPzCwsT80tLU/N7e4Pzq6uz8+vr8/QcHCP0TExT9IyMk/S8vMP0/P0D9S
+0tMAAAAAO4CAgTxAwME8gICBPKCgoTzg4OE9AICBPRCQkT0wsLE9QMDBPVDQ0T1w8PE9gICBPYiI
+iT2YmJk9oKChPaioqT24uLk9wMDBPcjIyT3Y2Nk94ODhPfDw8T34+Pk+AICBPgiIiT4MjI0+EJCR
+PhiYmT4cnJ0+IKChPiioqT4srK0+MLCxPji4uT48vL0+QMDBPkjIyT5MzM0+UNDRPljY2T5c3N0+
+YODhPmjo6T5s7O0+cPDxPnj4+T58/P0+gICBPoSEhT6Ghoc+iIiJPoyMjT6Ojo8+kJCRPpSUlT6W
+lpc+mJiZPpycnT6enp8+oqKjPqSkpT6mpqc+qqqrPqysrT6urq8+srKzPrS0tT62trc+urq7Pry8
+vT6+vr8+wsLDPsTExT7Gxsc+ysrLPszMzT7Ozs8+0tLTPtTU1T7W1tc+2trbPtzc3T7e3t8+4uLj
+PuTk5T7m5uc+6urrPuzs7T7u7u8+8vLzPvT09T729vc++vr7Pvz8/T7+/v8/AYGCPwKCgz8EhIU/
+BYWGPwaGhz8IiIk/CYmKPwqKiz8MjI0/DY2OPw6Ojz8QkJE/EZGSPxKSkz8UlJU/FZWWPxaWlz8Y
+mJk/GZmaPxqamz8cnJ0/HZ2ePx6enz8goKE/IaGiPyKioz8kpKU/JaWmPyampz8oqKk/KamqPyqq
+qz8srK0/La2uPy6urz8wsLE/MbGyPzKysz80tLU/NbW2Pze3uD84uLk/Obm6Pzu7vD88vL0/Pb2+
+Pz+/wD9AwME/QcHCP0PDxD9ExMU/RcXGP0fHyD9IyMk/ScnKP0vLzD9MzM0/Tc3OP0/P0D9Q0NE/
+UdHSP1PT1D9U1NU/VdXWP1fX2D9Y2Nk/WdnaP1vb3D9c3N0/Xd3eP1/f4D9g4OE/YeHiP2Pj5D9k
+5OU/ZeXmP2fn6D9o6Ok/aurrP2vr7D9s7O0/bu7vP2/v8D9w8PE/cvLzP3Pz9D909PU/dvb3P3f3
++D94+Pk/evr7P3v7/D98/P0/fv7/P4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAADuAgIEAAAAAPICAgT0AgIE9QMDBPXDw8T2Y
+mJk9uLi5PdjY2T34+Pk+DIyNPhycnT4srK0+OLi5PkjIyT5Y2Nk+aOjpPnj4+T6EhIU+jIyNPpSU
+lT6amps+oqKjPqqqqz6ysrM+urq7PsLCwz7Kyss+0tLTPtjY2T7g4OE+6OjpPvDw8T74+Pk/AICB
+PwSEhT8Hh4g/C4uMPw+PkD8Tk5Q/F5eYPxubnD8fn6A/I6OkPyampz8qqqs/Lq6vPzKysz82trc/
+Orq7Pz6+vz9CwsM/RcXGP0nJyj9Nzc4/UdHSP1XV1j9Z2do/Xd3eP2Hh4j9k5OU/aOjpP2zs7T9w
+8PEAAAAAO4CAgTxAwME8gICBPKCgoTzg4OE9AICBPRCQkT0wsLE9QMDBPVDQ0T1w8PE9gICBPYiI
+iT2YmJk9oKChPaioqT24uLk9wMDBPcjIyT3Y2Nk94ODhPfDw8T34+Pk+AICBPgiIiT4MjI0+EJCR
+PhiYmT4cnJ0+IKChPiioqT4srK0+MLCxPji4uT48vL0+QMDBPkjIyT5MzM0+UNDRPljY2T5c3N0+
+YODhPmjo6T5s7O0+cPDxPnj4+T58/P0+gICBPoSEhT6Ghoc+iIiJPoyMjT6Ojo8+kJCRPpSUlT6W
+lpc+mJiZPpycnT6enp8+oqKjPqSkpT6mpqc+qqqrPqysrT6urq8+srKzPrS0tT62trc+urq7Pry8
+vT6+vr8+wsLDPsTExT7Gxsc+ysrLPszMzT7Ozs8+0tLTPtTU1T7W1tc+2trbPtzc3T7e3t8+4uLj
+PuTk5T7m5uc+6urrPuzs7T7u7u8+8vLzPvT09T729vc++vr7Pvz8/T7+/v8/AYGCPwKCgz8EhIU/
+BYWGPwaGhz8IiIk/CYmKPwqKiz8MjI0/DY2OPw6Ojz8QkJE/EZGSPxKSkz8UlJU/FZWWPxaWlz8Y
+mJk/GZmaPxqamz8cnJ0/HZ2ePx6enz8goKE/IaGiPyKioz8kpKU/JaWmPyampz8oqKk/KamqPyqq
+qz8srK0/La2uPy6urz8wsLE/MbGyPzKysz80tLU/NbW2Pze3uD84uLk/Obm6Pzu7vD88vL0/Pb2+
+Pz+/wD9AwME/QcHCP0PDxD9ExMU/RcXGP0fHyD9IyMk/ScnKP0vLzD9MzM0/Tc3OP0/P0D9Q0NE/
+UdHSP1PT1D9U1NU/VdXWP1fX2D9Y2Nk/WdnaP1vb3D9c3N0/Xd3eP1/f4D9g4OE/YeHiP2Pj5D9k
+5OU/ZeXmP2fn6D9o6Ok/aurrP2vr7D9s7O0/bu7vP2/v8D9w8PE/cvLzP3Pz9D909PU/dvb3P3f3
++D94+Pk/evr7P3v7/D98/P0/fv7/P4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAADuAgIEAAAAAPICAgT0AgIE9QMDBPYCAgT2o
+qKk9yMjJPejo6T4EhIU+FJSVPiSkpT40tLU+RMTFPlTU1T5o6Ok+ePj5PoSEhT6MjI0+lJSVPpyc
+nT6kpKU+rKytPrS0tT6+vr8+xsbHPs7Ozz7W1tc+3t7fPubm5z7u7u8+9vb3PwCAgT8EhIU/CIiJ
+PwyMjT8QkJE/FJSVPxiYmT8cnJ0/IKChPyWlpj8pqao/La2uPzGxsj81tbY/Obm6Pz29vj9BwcI/
+RcXGP0rKyz9Ozs8/UtLTP1bW1z9a2ts/Xt7fP2Li4z9m5uc/aurrP2/v8D9z8/Q/d/f4P3v7/D+A
+AAAAAAAAO4CAgTxAwME8gICBPKCgoTzg4OE9AICBPRCQkT0wsLE9QMDBPVDQ0T1w8PE9gICBPYiI
+iT2YmJk9oKChPaioqT24uLk9wMDBPcjIyT3Y2Nk94ODhPfDw8T34+Pk+AICBPgiIiT4MjI0+EJCR
+PhiYmT4cnJ0+IKChPiioqT4srK0+MLCxPji4uT48vL0+QMDBPkjIyT5MzM0+UNDRPljY2T5c3N0+
+YODhPmjo6T5s7O0+cPDxPnj4+T58/P0+gICBPoSEhT6Ghoc+iIiJPoyMjT6Ojo8+kJCRPpSUlT6W
+lpc+mJiZPpycnT6enp8+oqKjPqSkpT6mpqc+qqqrPqysrT6urq8+srKzPrS0tT62trc+urq7Pry8
+vT6+vr8+wsLDPsTExT7Gxsc+ysrLPszMzT7Ozs8+0tLTPtTU1T7W1tc+2trbPtzc3T7e3t8+4uLj
+PuTk5T7m5uc+6urrPuzs7T7u7u8+8vLzPvT09T729vc++vr7Pvz8/T7+/v8/AYGCPwKCgz8EhIU/
+BYWGPwaGhz8IiIk/CYmKPwqKiz8MjI0/DY2OPw6Ojz8QkJE/EZGSPxKSkz8UlJU/FZWWPxaWlz8Y
+mJk/GZmaPxqamz8cnJ0/HZ2ePx6enz8goKE/IaGiPyKioz8kpKU/JaWmPyampz8oqKk/KamqPyqq
+qz8srK0/La2uPy6urz8wsLE/MbGyPzKysz80tLU/NbW2Pze3uD84uLk/Obm6Pzu7vD88vL0/Pb2+
+Pz+/wD9AwME/QcHCP0PDxD9ExMU/RcXGP0fHyD9IyMk/ScnKP0vLzD9MzM0/Tc3OP0/P0D9Q0NE/
+UdHSP1PT1D9U1NU/VdXWP1fX2D9Y2Nk/WdnaP1vb3D9c3N0/Xd3eP1/f4D9g4OE/YeHiP2Pj5D9k
+5OU/ZeXmP2fn6D9o6Ok/aurrP2vr7D9s7O0/bu7vP2/v8D9w8PE/cvLzP3Pz9D909PU/dvb3P3f3
++D94+Pk/evr7P3v7/D98/P0/fv7/P4AAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Topographic]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Misc.]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[TOPOGRAPHIC]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAPcjIyT2goKE9oKChPd+eXD4PTgw+LszqPk5LyD5t
+yqY+hqTCPoyMjT6O4E4+kTQQPpOH0j6V25Q+mC9VPpqDFz6c1tk+nyqbPqF+XD6j0h4+piXgPqh5
+oj6qzWM+rSElPq905z6xyKk+tBxqPrZwLD64w+4+uxewPr1rcT6/vzM+whL1PsRmtz7Gung+yQ46
+Psth/D7Ntb4+0Al/PtJdQT7UsQM+1wTFPtlYhz7brEg+3gAKPuBTzD7ip44+5PtPPudPET7potM+
+6/aVPu5KVj7wnhg+8vHaPvVFnD73mV0++e0fPvxA4T7+lKM/AHQyPwGeEz8Cx/Q/A/HVPwUbtj8G
+RZc/B293PwiZWD8Jwzk/Cu0aPwwW+z8NQNw/Dmq9Pw+Unj8Qvn4/EehfPxMSQD8UPCE/FWYCPxaP
+4z8XucQ/GOOlPxoNhj8bN2Y/HGFHPx2LKD8etQk/H97qPyEIyz8iMqw/I1yNPySGbT8lpaY/JdyF
+PyYTYz8mSkI/JoEhPya4AD8m7t8/JyW+PydcnT8nk3s/J8paPygBOT8oOBg/KG73Pyil1j8o3LU/
+KROUPylKcj8pgVE/KbgwPynvDz8qJe4/KlzNPyqTrD8qyos/KwFpPys4SD8rbyc/K6YGPyvc5T8s
+E8Q/LEqjPyyBgj8suGA/LO8/Py0mHj8tXP0/LZPcPy3Kuz8uAZo/Ljh4Py5vVz8upjY/Lt0VPy8T
+9D8vStM/L4GyPy+4kT8v728/MCZOPzBdLT8wlAw/MMrrPzEByj8xOKk/MW+IPzGmZj8x3UU/MhQk
+PzJLAz8ygeI/MrjBPzLvoD8zJn4/M11dPzOUPD8zyxs/NAH6PzQ42T80b7g/NKaXPzTddT81FFQ/
+NUszPzWCEj81uPE/Ne/QPzYmrz82XY4/NpRsPzbLSz83Aio/NzkJPzdv6D83psc/N92mPzgUhT84
+S2M/OIJCPzi5IT848AA/OSbfPzldvj85lJ0/Oct7PzoCWj86OTk/OnAYPzqm9z863dY/OxS1PztL
+lD87gnI/O7lRPzvwMD88Jw8/PF3uPzyUzT88y6w/PQKLPz05aT89cEg/PacnPz3eBj8+FOU/PkvE
+Pz6Coz8+uYI/PvBgPz8nPz8/Xh4/P5T9Pz/L3D9AArs/QDmaP0BweD9Ap1c/QN42P0EVFT9BS/Q/
+QYLTP0G5sj9B8JE/QidvP0JeTj9ClS0/QswMP0MC6z9DOco/Q3CpP0OniD9D3mY/RBVFP0RMJD9E
+gwM/RLniP0TwwT9FJ6A/RV5+P0WVXT9FzDw/RgMbP0Y5+j9GcNk/Rqe4P0belz9HFXU/R0xUP0eD
+Mz9HuhI/R/DxP0gn0D9IXq8/SJWOP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAPcjIyT8qqqs/KqqrPy9kGT80HYg/ONb2Pz2QZD9C
+SdM/RwNBP0jIyT9IWwo/R+1LP0d/jT9HEc4/RqQPP0Y2UD9FyJI/RVrTP0TtFD9Ef1U/RBGXP0Oj
+2D9DNhk/QshaP0JanD9B7N0/QX8eP0ERXz9Ao6E/QDXiPz/IIz8/WmQ/PuymPz5+5z8+ESg/PaNp
+Pz01qz88x+w/PFotPzvsbj87frA/OxDxPzqjMj86NXM/Oce1PzlZ9j847Dc/OH54PzgQuj83ovs/
+NzU8PzbHfT82Wb8/NewAPzV+QT81EIM/NKLEPzQ1BT8zx0Y/M1mIPzLryT8yfgo/MhBLPzGijT8x
+NM4/MMcPPzBZUD8v65I/L33TPy8QFD8uolU/LjSXPy3G2D8tWRk/LOtaPyx9nD8sD90/K6IePys0
+Xz8qxqE/KljiPynrIz8pfWQ/KQ+mPyih5z8oNCg/J8ZpPydYqz8m6uw/Jn0tPyYPbj8lpaY/JdyF
+PyYTYz8mSkI/JoEhPya4AD8m7t8/JyW+PydcnT8nk3s/J8paPygBOT8oOBg/KG73Pyil1j8o3LU/
+KROUPylKcj8pgVE/KbgwPynvDz8qJe4/KlzNPyqTrD8qyos/KwFpPys4SD8rbyc/K6YGPyvc5T8s
+E8Q/LEqjPyyBgj8suGA/LO8/Py0mHj8tXP0/LZPcPy3Kuz8uAZo/Ljh4Py5vVz8upjY/Lt0VPy8T
+9D8vStM/L4GyPy+4kT8v728/MCZOPzBdLT8wlAw/MMrrPzEByj8xOKk/MW+IPzGmZj8x3UU/MhQk
+PzJLAz8ygeI/MrjBPzLvoD8zJn4/M11dPzOUPD8zyxs/NAH6PzQ42T80b7g/NKaXPzTddT81FFQ/
+NUszPzWCEj81uPE/Ne/QPzYmrz82XY4/NpRsPzbLSz83Aio/NzkJPzdv6D83psc/N92mPzgUhT84
+S2M/OIJCPzi5IT848AA/OSbfPzldvj85lJ0/Oct7PzoCWj86OTk/OnAYPzqm9z863dY/OxS1PztL
+lD87gnI/O7lRPzvwMD88Jw8/PF3uPzyUzT88y6w/PQKLPz05aT89cEg/PacnPz3eBj8+FOU/PkvE
+Pz6Coz8+uYI/PvBgPz8nPz8/Xh4/P5T9Pz/L3D9AArs/QDmaP0BweD9Ap1c/QN42P0EVFT9BS/Q/
+QYLTP0G5sj9B8JE/QidvP0JeTj9ClS0/QswMP0MC6z9DOco/Q3CpP0OniD9D3mY/RBVFP0RMJD9E
+gwM/RLniP0TwwT9FJ6A/RV5+P0WVXT9FzDw/RgMbP0Y5+j9GcNk/Rqe4P0belz9HFXU/R0xUP0eD
+Mz9HuhI/R/DxP0gn0D9IXq8/SJWOP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAP4AAAD4oqKk+KKipPg4z2j3nfhY9spR4PXtVtT0R
+gng8HrzxAAAAADsDsYo7g7GKO8WKTjwDsYo8JJ3sPEWKTjxmdrE8g7GKPJQnuzyknew8tRQdPMWK
+TjzWAH885naxPPbs4j0DsYo9C+yjPRQnvD0cYtU9JJ3uPSzZBz01FCA9PU85PUWKUj1NxWs9VgCF
+PV47nj1mdrc9brHQPXbs6T1/KAI9g7GOPYfPGj2L7Kc9kAozPZQnwD2YRUw9nGLZPaCAZT2knfI9
+qLt+PazZCz2w9pg9tRQkPbkxsT29Tz09wWzKPcWKVj3Jp+M9zcVvPdHi/D3WAIk92h4VPd47oj3i
+WS495na7PeqURz3usdQ98s9gPfbs7T37Cnk9/ygGPgGiyT4DsY8+BcBUPgfPGj4J3eA+C+ymPg37
+az4QCjE+Ehj3PhQnvT4WNoM+GEVIPhpUDj4cYtQ+HnGaPiCAXz4ijyU+JJ3rPiassT4oqKk+LId+
+PjBmVD40RSo+OCQAPjwC1j4/4aw+Q8CCPkefVz5Lfi0+T10DPlM72T5XGq8+WvmFPl7YWj5itzA+
+ZpYGPmp03D5uU7I+cjKIPnYRXT558DM+fc8JPoDW8D6Cxls+hLXHPoalMj6IlJ4+ioQJPoxzdD6O
+YuA+kFJLPpJBtz6UMSI+liCOPpgP+T6Z/2Q+m+7QPp3eOz6fzac+ob0SPqOsfT6lm+k+p4tUPql6
+wD6rais+rVmXPq9JAj6xOG0+syfZPrUXRD63BrA+uPYbPrrlhz681PI+vsRdPsCzyT7CozQ+xJKg
+PsaCCz7IcXY+ymDiPsxQTT7OP7k+0C8kPtIekD7UDfs+1f1mPtfs0j7Z3D0+28upPt27FD7fqn8+
+4ZnrPuOJVj7leMI+52gtPulXmT7rRwQ+7TZvPu8l2z7xFUY+8wSyPvT0HT7244k++NL0PvrCXz78
+scs+/qE2PwBIUT8BQAY/Aje8PwMvcT8EJyc/BR7dPwYWkz8HDkg/CAX+Pwj9tD8J9Wk/Cu0fPwvk
+1T8M3Is/DdRAPw7L9j8Pw6w/ELthPxGzFz8Sqs0/E6KDPxSaOD8Vke4/FomkPxeBWT8YeQ8/GXDF
+Pxpoej8bYDA/HFfmPx1PnD8eR1E/Hz8HPyA2vT8hLnI/IiYoPyMd3j8kFZQ/JQ1JPyYE/z8m/LU/
+J/RqPyjsID8p49Y/KtuMPyvTQT8syvc/LcKtPy66Yj8vshg/MKnOPzGhhD8ymTk/M5DvPzSIpT81
+gFo/NngQPzdvxj84Z3s/OV8xPzpW5z87Tp0/PEZSPz0+CD8+Nb4/Py1zP0AlKT9BHN8/QhSVP0MM
+Sj9EBAA/RPu2P0Xzaz9G6yE/R+LXP4AAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Black]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Solid]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[BLACK]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float" length="5">0.0,0.0,0.0,0.0,0.0</parray>
+                    <parray class="float" length="5">0.0,0.0,0.0,0.0,0.0</parray>
+                    <parray class="float" length="5">0.0,0.0,0.0,0.0,0.0</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[White]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Solid]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[WHITE]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float" length="5">1.0,1.0,1.0,1.0,1.0</parray>
+                    <parray class="float" length="5">1.0,1.0,1.0,1.0,1.0</parray>
+                    <parray class="float" length="5">1.0,1.0,1.0,1.0,1.0</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Yellow]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Solid]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[YELLOW]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float" length="5">1.0,1.0,1.0,1.0,1.0</parray>
+                    <parray class="float" length="5">1.0,1.0,1.0,1.0,1.0</parray>
+                    <parray class="float" length="5">0.0,0.0,0.0,0.0,0.0</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Cyan]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Solid]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[CYAN]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float" length="5">0.0,0.0,0.0,0.0,0.0</parray>
+                    <parray class="float" length="5">1.0,1.0,1.0,1.0,1.0</parray>
+                    <parray class="float" length="5">1.0,1.0,1.0,1.0,1.0</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Red]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Solid]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[RED]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float" length="5">1.0,1.0,1.0,1.0,1.0</parray>
+                    <parray class="float" length="5">0.0,0.0,0.0,0.0,0.0</parray>
+                    <parray class="float" length="5">0.0,0.0,0.0,0.0,0.0</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Blue]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Solid]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[BLUE]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float" length="5">0.0,0.0,0.0,0.0,0.0</parray>
+                    <parray class="float" length="5">0.0,0.0,0.0,0.0,0.0</parray>
+                    <parray class="float" length="5">1.0,1.0,1.0,1.0,1.0</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Gray]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Solid]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[GRAY]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float" length="5">0.5019608,0.5019608,0.5019608,0.5019608,0.5019608</parray>
+                    <parray class="float" length="5">0.5019608,0.5019608,0.5019608,0.5019608,0.5019608</parray>
+                    <parray class="float" length="5">0.5019608,0.5019608,0.5019608,0.5019608,0.5019608</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Green]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Solid]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[GREEN]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float" length="5">0.0,0.0,0.0,0.0,0.0</parray>
+                    <parray class="float" length="5">1.0,1.0,1.0,1.0,1.0</parray>
+                    <parray class="float" length="5">0.0,0.0,0.0,0.0,0.0</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Magenta]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Solid]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[MAGENTA]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float" length="5">1.0,1.0,1.0,1.0,1.0</parray>
+                    <parray class="float" length="5">0.0,0.0,0.0,0.0,0.0</parray>
+                    <parray class="float" length="5">1.0,1.0,1.0,1.0,1.0</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Orange]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Solid]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[ORANGE]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float" length="5">1.0,1.0,1.0,1.0,1.0</parray>
+                    <parray class="float" length="5">0.78431374,0.78431374,0.78431374,0.78431374,0.78431374</parray>
+                    <parray class="float" length="5">0.0,0.0,0.0,0.0,0.0</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Pink]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Solid]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[PINK]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float" length="5">1.0,1.0,1.0,1.0,1.0</parray>
+                    <parray class="float" length="5">0.6862745,0.6862745,0.6862745,0.6862745,0.6862745</parray>
+                    <parray class="float" length="5">0.6862745,0.6862745,0.6862745,0.6862745,0.6862745</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Base Reflectivity]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Radar]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[BASE REFLECTIVITY]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwCAgT8AgIE/
+AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT7I
+yMk+yMjJPsjIyT7IyMk+yMjJPsjIyT7IyMk+yMjJPsjIyT7IyMk+yMjJPsjIyT7IyMk+yMjJPsjI
+yT7IyMk+kJCRPpCQkT6QkJE+kJCRPpCQkT6QkJE+kJCRPpCQkT6QkJE+kJCRPpCQkT6QkJE+kJCR
+PpCQkT6QkJE+kJCRPjCwsT4wsLE+MLCxPjCwsT4wsLE+MLCxPjCwsT4wsLE+MLCxPjCwsT4wsLE+
+MLCxPjCwsT4wsLE+MLCxPjCwsT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2A
+gIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw
+8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDx
+P3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/
+cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/EJCRPxCQkT8Q
+kJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPzCw
+sT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCx
+PzCwsT9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/
+SsrLP0rKyz9Kyss/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw
+8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/EJCRPxCQkT8QkJE/EJCR
+PxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRP2Dg4T9g4OE/
+YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T84
+uLk/OLi5Pzi4uT84uLk/OLi5Pzi4uT84uLk/OLi5Pzi4uT84uLk/OLi5Pzi4uT84uLk/OLi5Pzi4
+uT84uLk/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCR
+PxCQkT8QkJE/EJCRPtDQ0T7Q0NE+0NDRPtDQ0T7Q0NE+0NDRPtDQ0T7Q0NE+0NDRPtDQ0T7Q0NE+
+0NDRPtDQ0T7Q0NE+0NDRPtDQ0T6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6A
+gIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DA
+wT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICB
+PwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT2AgIE9gICBPYCAgT2AgIE9
+gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIEAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPgCA
+gT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICB
+PgCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+
+gICBPoCAgT6AgIE/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCA
+gT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgQ==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw
+8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/EJCRPxCQkT8QkJE/EJCR
+PxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPqCgoT6goKE+
+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6A
+gIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCA
+gT6AgIE+QMDBPkDAwT5AwME+QMDBPkDAwT5AwME+QMDBPkDAwT5AwME+QMDBPkDAwT5AwME+QMDB
+PkDAwT5AwME+QMDBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+
+AICBPgCAgT4AgIE+AICBPgCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2A
+gIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCA
+gT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICB
+PgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+
+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIEAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwCA
+gT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICB
+PwCAgT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/
+IKChPyCgoT8goKE/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg
+4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4Q==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Base Reflectivity (24)]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Radar]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[BASE REFLECTIVITY (24)]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPsjIyT7I
+yMk+yMjJPsjIyT7IyMk+yMjJPsjIyT7IyMk+yMjJPsjIyT7IyMk+kJCRPpCQkT6QkJE+kJCRPpCQ
+kT6QkJE+kJCRPpCQkT6QkJE+kJCRPpCQkT4wsLE+MLCxPjCwsT4wsLE+MLCxPjCwsT4wsLE+MLCx
+PjCwsT4wsLE+MLCxPjCwsT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9
+gICBP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w
+8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw
+8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCR
+PxCQkT8QkJE/EJCRPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/
+MLCxP0rKyz9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDx
+P3Dw8T9w8PE/cPDxP3Dw8T8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/
+EJCRP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhPzi4uT84
+uLk/OLi5Pzi4uT84uLk/OLi5Pzi4uT84uLk/OLi5Pzi4uT84uLk/EJCRPxCQkT8QkJE/EJCRPxCQ
+kT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT7Q0NE+0NDRPtDQ0T7Q0NE+0NDRPtDQ0T7Q0NE+0NDR
+PtDQ0T7Q0NE+0NDRPtDQ0T6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+
+gICBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/AICBPwCAgT8A
+gIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE9gICBPYCAgT2AgIE9gICBPYCA
+gT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+
+AICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD8AgIE/AICBPwCAgT8AgIE/AICBPwCA
+gT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgQ==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAPACAgTxAwME8oKChPMDAwT0A
+gIE9EJCRPTCwsT1AwME9YODhPXDw8T2IiIk9mJiZPaCgoT2wsLE9uLi5PcjIyT3Q0NE94ODhPejo
+6T34+Pk+AICBPgiIiT4MjI0+FJSVPhycnT4goKE+KKipPiysrT40tLU+OLi5PkDAwT5ExMU+TMzN
+PlDQ0T5Y2Nk+YODhPmTk5T5s7O0+cPDxPnj4+T58/P0+goKDPoSEhT6IiIk+ioqLPo6Ojz6QkJE+
+lJSVPpiYmT6amps+np6fPqCgoT6kpKU+pqanPqqqqz6srK0+sLCxPrKysz62trc+urq7Pry8vT7A
+wME+wsLDPsbGxz7IyMk+zMzNPs7Ozz7S0tM+1NTVPtjY2T7a2ts+3t7fPuLi4z7k5OU+6OjpPurq
+6z7u7u8+8PDxPvT09T729vc++vr7Pvz8/T8AgIE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDx
+P3Dw8T9w8PE/cPDxP3Dw8T8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/
+EJCRPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPoCAgT6A
+gIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+QMDBPkDAwT5AwME+QMDBPkDA
+wT5AwME+QMDBPkDAwT5AwME+QMDBPkDAwT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICB
+PgCAgT4AgIE+AICBPgCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9
+gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE+AICBPgCAgT4A
+gIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCA
+gT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/
+AICBPyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg
+4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4Q==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Composite Reflectivity]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Radar]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[COMPOSITE REFLECTIVITY]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD9ExMU/RMTFP0TExT9ExMU/RMTFP0TE
+xT9ExMU/RMTFP0TExT9ExMU/RMTFP0TExT9ExMU/RMTFP0TExT9ExMU+7OztPuzs7T7s7O0+7Ozt
+Puzs7T7s7O0+7OztPuzs7T7s7O0+7OztPuzs7T7s7O0+7OztPuzs7T7s7O0+7OztP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD9u
+7u8/bu7vP27u7z9u7u8/bu7vP27u7z9u7u8/bu7vP27u7z9u7u8/bu7vP27u7z9u7u8/bu7vP27u
+7z9u7u8/ScnKP0nJyj9Jyco/ScnKP0nJyj9Jyco/ScnKP0nJyj9Jyco/ScnKP0nJyj9Jyco/ScnK
+P0nJyj9Jyco/ScnKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP1DQ0T9Q0NE/UNDRP1DQ0T9Q0NE/UNDR
+P1DQ0T9Q0NE/UNDRP1DQ0T9Q0NE/UNDRP1DQ0T9Q0NE/UNDRP1DQ0T+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/WtrbP1ra2z9a
+2ts/WtrbP1ra2z9a2ts/WtrbP1ra2z9a2ts/WtrbP1ra2z9a2ts/WtrbP1ra2z9a2ts/WtrbPy6u
+rz8urq8/Lq6vPy6urz8urq8/Lq6vPy6urz8urq8/Lq6vPy6urz8urq8/Lq6vPy6urz8urq8/Lq6v
+Py6urwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP2fn6D9n5+g/Z+foP2fn6D9n5+g/Z+foP2fn6D9n5+g/Z+foP2fn
+6D9n5+g/Z+foP2fn6D9n5+g/Z+foP2fn6A==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD9ExMU/RMTFP0TExT9ExMU/RMTFP0TE
+xT9ExMU/RMTFP0TExT9ExMU/RMTFP0TExT9ExMU/RMTFP0TExT9ExMU+7OztPuzs7T7s7O0+7Ozt
+Puzs7T7s7O0+7OztPuzs7T7s7O0+7OztPuzs7T7s7O0+7OztPuzs7T7s7O0+7OztPyqqqz8qqqs/
+KqqrPyqqqz8qqqs/KqqrPyqqqz8qqqs/KqqrPyqqqz8qqqs/KqqrPyqqqz8qqqs/KqqrPyqqqz8M
+jI0/DIyNPwyMjT8MjI0/DIyNPwyMjT8MjI0/DIyNPwyMjT8MjI0/DIyNPwyMjT8MjI0/DIyNPwyM
+jT8MjI0+4ODhPuDg4T7g4OE+4ODhPuDg4T7g4OE+4ODhPuDg4T7g4OE+4ODhPuDg4T7g4OE+4ODh
+PuDg4T7g4OE+4ODhP3v7/D97+/w/e/v8P3v7/D97+/w/e/v8P3v7/D97+/w/e/v8P3v7/D97+/w/
+e/v8P3v7/D97+/w/e/v8P3v7/D87u7w/O7u8Pzu7vD87u7w/O7u8Pzu7vD87u7w/O7u8Pzu7vD87
+u7w/O7u8Pzu7vD87u7w/O7u8Pzu7vD87u7w/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP1DQ0T9Q0NE/UNDRP1DQ0T9Q0NE/UNDR
+P1DQ0T9Q0NE/UNDRP1DQ0T9Q0NE/UNDRP1DQ0T9Q0NE/UNDRP1DQ0T7AwME+wMDBPsDAwT7AwME+
+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7AwMEAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD9ExMU/RMTFP0TExT9ExMU/RMTFP0TE
+xT9ExMU/RMTFP0TExT9ExMU/RMTFP0TExT9ExMU/RMTFP0TExT9ExMU+7OztPuzs7T7s7O0+7Ozt
+Puzs7T7s7O0+7OztPuzs7T7s7O0+7OztPuzs7T7s7O0+7OztPuzs7T7s7O0+7OztPyqqqz8qqqs/
+KqqrPyqqqz8qqqs/KqqrPyqqqz8qqqs/KqqrPyqqqz8qqqs/KqqrPyqqqz8qqqs/KqqrPyqqqz8M
+jI0/DIyNPwyMjT8MjI0/DIyNPwyMjT8MjI0/DIyNPwyMjT8MjI0/DIyNPwyMjT8MjI0/DIyNPwyM
+jT8MjI0+4ODhPuDg4T7g4OE+4ODhPuDg4T7g4OE+4ODhPuDg4T7g4OE+4ODhPuDg4T7g4OE+4ODh
+PuDg4T7g4OE+4ODhPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/
+EJCRPxCQkT8QkJE/EJCRPxCQkQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+4ODhPuDg4T7g4OE+4ODhPuDg4T7g4OE+4ODhPuDg
+4T7g4OE+4ODhPuDg4T7g4OE+4ODhPuDg4T7g4OE+4ODhPsDAwT7AwME+wMDBPsDAwT7AwME+wMDB
+PsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+
+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7AwMEAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Radial Velocity]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Radar]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[RADIAL VELOCITY]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+
+gICBPoCAgT6AgIE+gICBPoCAgT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8w
+sLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCg
+oT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChP0DAwT9AwME/QMDBP0DAwT9AwME/QMDB
+P0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/
+QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9A
+wME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBPyCg
+oT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/IKCh
+PyCgoT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/
+AICBPwCAgT8AgIE+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7A
+wME+wMDBPsDAwT7AwME+wMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DA
+wT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwQ==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+4ODhPuDg4T7g4OE+4ODh
+PuDg4T7g4OE+4ODhPuDg4T7g4OE+4ODhPuDg4T7g4OE+4ODhPuDg4T7g4OE+4ODhP0DAwT9AwME/
+QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT8A
+gIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCA
+gT8AgIE/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDB
+P0DAwT9AwME/QMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+
+wMDBPsDAwT7AwME+wMDBPsDAwT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8w
+sLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCg
+oT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChP0DAwT9AwME/QMDBP0DAwT9AwME/QMDB
+P0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT8YmJk/GJiZPxiYmT8YmJk/
+GJiZPxiYmT8YmJk/GJiZPxiYmT8YmJk/GJiZPxiYmT8YmJk/GJiZPxiYmT8YmJk+4ODhPuDg4T7g
+4OE+4ODhPuDg4T7g4OE+4ODhPuDg4T7g4OE+4ODhPuDg4T7g4OE+4ODhPuDg4T7g4OE+4ODhPmDg
+4T5g4OE+YODhPmDg4T5g4OE+YODhPmDg4T5g4OE+YODhPmDg4T5g4OE+YODhPmDg4T5g4OE+YODh
+PmDg4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCA
+gT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgQ==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD7AwME+wMDBPsDAwT7AwME+wMDBPsDA
+wT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME/IKChPyCgoT8goKE/IKCh
+PyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/IKChP0DAwT9AwME/
+QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwQAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+
+gICBPoCAgT6AgIE+gICBPoCAgT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8w
+sLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCA
+gT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DA
+wT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwQ==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Echo Tops]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Radar]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[ECHO TOPS]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD6AgIE+gICBPoCAgT6AgIE+gICBPoCA
+gT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+KKipPiioqT4oqKk+KKip
+PiioqT4oqKk+KKipPiioqT4oqKk+KKipPiioqT4oqKk+KKipPiioqT4oqKk+KKipPaioqT2oqKk9
+qKipPaioqT2oqKk9qKipPaioqT2oqKk9qKipPaioqT2oqKk9qKipPaioqT2oqKk9qKipPaioqQAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAA+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDB
+PsDAwT7AwME+wMDBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9
+gICBPYCAgT2AgIE9gICBPYCAgT+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg
+4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD9Q0NE/UNDRP1DQ0T9Q0NE/
+UNDRP1DQ0T9Q0NE/UNDRP1DQ0T9Q0NE/UNDRP1DQ0T9Q0NE/UNDRP1DQ0T9Q0NE/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAPwCA
+gT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICB
+PwCAgT+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw
+8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/IKChPyCgoT8goKE/IKCh
+PyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/IKChPqCgoT6goKE+
+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoQAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAA/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDB
+P0DAwT9AwME/QMDBPuDg4T7g4OE+4ODhPuDg4T7g4OE+4ODhPuDg4T7g4OE+4ODhPuDg4T7g4OE+
+4ODhPuDg4T7g4OE+4ODhPuDg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g
+4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCw
+sT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCxPwCAgT8AgIE/AICBPwCAgT8AgIE/AICB
+PwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT6goKE+oKChPqCgoT6goKE+
+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKEAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAA/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9A
+wME/QMDBP0DAwT9AwME/QMDBP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw
+8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/SsrLP0rKyz9Kyss/SsrL
+P0rKyz9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/SsrLPyWlpj8lpaY/
+JaWmPyWlpj8lpaY/JaWmPyWlpj8lpaY/JaWmPyWlpj8lpaY/JaWmPyWlpj8lpaY/JaWmPyWlpj8A
+gIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCA
+gT8AgIE+QMDBPkDAwT5AwME+QMDBPkDAwT5AwME+QMDBPkDAwT5AwME+QMDBPkDAwT5AwME+QMDB
+PkDAwT5AwME+QMDBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9
+gICBPYCAgT2AgIE9gICBPYCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4A
+gIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCA
+gT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICB
+PYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgQAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[VIL]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Radar]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[VIL]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwCAgT8AgIE/
+AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT7I
+yMk+yMjJPsjIyT7IyMk+yMjJPsjIyT7IyMk+yMjJPsjIyT7IyMk+yMjJPsjIyT7IyMk+yMjJPsjI
+yT7IyMk+kJCRPpCQkT6QkJE+kJCRPpCQkT6QkJE+kJCRPpCQkT6QkJE+kJCRPpCQkT6QkJE+kJCR
+PpCQkT6QkJE+kJCRPjCwsT4wsLE+MLCxPjCwsT4wsLE+MLCxPjCwsT4wsLE+MLCxPjCwsT4wsLE+
+MLCxPjCwsT4wsLE+MLCxPjCwsT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2A
+gIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw
+8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDx
+P3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/
+cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/EJCRPxCQkT8Q
+kJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPzCw
+sT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCx
+PzCwsT9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/
+SsrLP0rKyz9Kyss/ZeXmP2Xl5j9l5eY/ZeXmP2Xl5j9l5eY/ZeXmP2Xl5j9l5eY/ZeXmP2Xl5j9l
+5eY/ZeXmP2Xl5j9l5eY/ZeXmP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw
+8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/EJCRPxCQkT8QkJE/EJCR
+PxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRP2Dg4T9g4OE/
+YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T84
+uLk/OLi5Pzi4uT84uLk/OLi5Pzi4uT84uLk/OLi5Pzi4uT84uLk/OLi5Pzi4uT84uLk/OLi5Pzi4
+uT84uLk/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCR
+PxCQkT8QkJE/EJCRPtDQ0T7Q0NE+0NDRPtDQ0T7Q0NE+0NDRPtDQ0T7Q0NE+0NDRPtDQ0T7Q0NE+
+0NDRPtDQ0T7Q0NE+0NDRPtDQ0T6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6A
+gIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DA
+wT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICB
+PwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT2AgIE9gICBPYCAgT2AgIE9
+gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIEAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPgCA
+gT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICB
+PgCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+
+gICBPoCAgT6AgIE+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7AwME+wMDBPsDAwT7A
+wME+wMDBPsDAwT7AwME+wMDBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCA
+gT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgQ==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw
+8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/EJCRPxCQkT8QkJE/EJCR
+PxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPqCgoT6goKE+
+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6A
+gIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCA
+gT6AgIE+QMDBPkDAwT5AwME+QMDBPkDAwT5AwME+QMDBPkDAwT5AwME+QMDBPkDAwT5AwME+QMDB
+PkDAwT5AwME+QMDBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+
+AICBPgCAgT4AgIE+AICBPgCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2A
+gIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCA
+gT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICB
+PgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+
+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIEAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwCA
+gT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICB
+PwCAgT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/
+IKChPyCgoT8goKE/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9A
+wME/QMDBP0DAwT9AwME/QMDBP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg
+4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4Q==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[TOPO/MDR Composite]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Radar]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[TOPO/MDR COMPOSITE]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAADuAgIE8AICBPEDAwTyAgIE8oKChPMDAwTzg
+4OE9AICBPRCQkT0goKE9MLCxPUDAwT1Q0NE9YODhPXDw8T2AgIE9iIiJPZCQkT2YmJk9oKChPaio
+qT2wsLEAAAAAO4CAgTwAgIE8QMDBPICAgTygoKE8wMDBPODg4T0AgIE9EJCRPSCgoT0wsLE9QMDB
+PVDQ0T1g4OE9cPDxPYCAgT2IiIk9kJCRPZiYmT2goKE9qKipPbi4uT3AwME9yMjJPdDQ0T3Y2Nk9
+4ODhPejo6T3w8PE9+Pj5PgCAgT4EhIU+CIiJPgyMjT4QkJE+FJSVPhiYmT4cnJ0+IKChPiSkpT4o
+qKk+LKytPjCwsT40tLU+OLi5Pjy8vT5AwME+RMTFPkjIyT5MzM0+UNDRPlTU1T5Y2Nk+XNzdPmDg
+4T5k5OU+aOjpPmzs7T5w8PE+dPT1Pnj4+T58/P0+gICBPoKCgz6EhIU+iIiJPoqKiz6MjI0+jo6P
+PpCQkT6SkpM+lJSVPpaWlz6YmJk+mpqbPpycnT6enp8+oKChPqKioz6kpKU+pqanPqioqT6qqqs+
+rKytPq6urz6wsLE+srKzPrS0tT5IyMk+cPDxPoyMjT6goKE+tLS1PsjIyT7c3N0+8PDxPwKCgz8M
+jI0/FpaXPyCgoT8qqqs/NLS1Pz6+vz9IyMk/RcXGP0HBwj8+vr8/Orq7Pze3uD8zs7Q/MLCxPyys
+rT8oqKk/JaWmPyGhoj8enp8/GpqbPxeXmD8Tk5Q/D4+QPwyMjT8IiIk/BYWGPwGBgj78/P0+9PT1
+Pu7u7z7m5uc+3t7fPtjY2T7Q0NE+ysrLPsLCwz68vL0+tLS1PqysrT6mpqc+np6fPpiYmT6QkJE+
+ioqLPoKCgz509PU+aOjpPljY2T5MzM0+PLy9PjCwsT4goKE+IKChPiCgoT4goKE+IKChPiCgoT4g
+oKE+IKChPiCgoT4goKE+IKChPiCgoT4goKE+IKChPiCgoT4goKE+IKChPiCgoT4goKEAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAADuAgIE8AICBPEDAwTyAgIE8oKChPMDAwTzg
+4OE9AICBPRCQkT0goKE9MLCxPUDAwT1Q0NE9YODhPXDw8T2AgIE9iIiJPZCQkT2YmJk9oKChPaio
+qT2wsLEAAAAAO4CAgTxAwME8gICBPMDAwTzg4OE9EJCRPSCgoT1AwME9UNDRPXDw8T2AgIE9kJCR
+PZiYmT2oqKk9sLCxPcDAwT3IyMk92NjZPeDg4T3w8PE9+Pj5PgSEhT4IiIk+DIyNPhSUlT4YmJk+
+IKChPiSkpT4srK0+MLCxPji4uT48vL0+RMTFPkjIyT5Q0NE+VNTVPlzc3T5g4OE+aOjpPmzs7T50
+9PU+ePj5PoCAgT6CgoM+hISFPoiIiT6Kios+jo6PPpCQkT6UlJU+lpaXPpqamz6cnJ0+oKChPqKi
+oz6mpqc+qKipPqysrT6urq8+srKzPrS0tT64uLk+urq7Pr6+vz7AwME+xMTFPsbGxz7IyMk+zMzN
+Ps7Ozz7S0tM+1NTVPtjY2T7a2ts+3t7fPuDg4T7k5OU+5ubnPurq6z7s7O0+8PDxPvLy8z729vc+
++Pj5Pvz8/T7+/v8/AYGCPwKCgz6YmJk+oqKjPq6urz66urs+xMTFPtDQ0T7a2ts+5ubnPvLy8z78
+/P0/BISFPwqKiz8Pj5A/FZWWPxqamz8goKE/Hp6fPxubnD8YmJk/FJSVPxGRkj8Ojo8/C4uMPweH
+iD8EhIU/AYGCPvz8/T709PU+7u7vPujo6T7i4uM+2trbPtTU1T7Ozs8+yMjJPsDAwT66urs+tLS1
+Pq6urz6mpqc+oKChPpqamz6UlJU+jIyNPoaGhz6AgIE+dPT1PmTk5T5Y2Nk+TMzNPkDAwT4wsLE+
+JKSlPhiYmT4MjI09+Pj5PeDg4T3IyMk9sLCxPZCQkT1w8PE9cPDxPXDw8T1w8PE9cPDxPXDw8T1w
+8PE9cPDxPXDw8T1w8PE9cPDxPXDw8T1w8PE9cPDxPXDw8T1w8PE9cPDxPXDw8T1w8PE+3NzdPtzc
+3T7c3N0+3NzdPtzc3T7c3N0+3NzdPtzc3T7c3N0/Nra3Pza2tz82trc/Nra3Pza2tz82trc/Nra3
+Pza2tz82trc/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAADuAgIE8AICBPEDAwTyAgIE8oKChPMDAwTzg
+4OE9AICBPRCQkT0goKE9MLCxPUDAwT1Q0NE9YODhPXDw8T2AgIE9iIiJPZCQkT2YmJk9oKChPaio
+qT2wsLE+DIyNPhSUlT4cnJ0+IKChPiioqT4wsLE+OLi5Pjy8vT5ExMU+TMzNPlTU1T5Y2Nk+YODh
+Pmjo6T5w8PE+dPT1Pnz8/T6CgoM+hoaHPoiIiT6MjI0+kJCRPpSUlT6YmJk+mpqbPp6enz6ioqM+
+pqanPqioqT6srK0+sLCxPrS0tT62trc+urq7Pr6+vz7CwsM+xMTFPsjIyT7MzM0+0NDRPtLS0z7W
+1tc+2trbPt7e3z7i4uM+5OTlPujo6T7s7O0+8PDxPvLy8z729vc++vr7Pv7+/z8AgIE/AoKDPwSE
+hT8Ghoc/B4eIPwmJij8Li4w/DY2OPw6Ojz8QkJE/EpKTPxSUlT8VlZY/F5eYPxmZmj8bm5w/HZ2e
+Px6enz8goKE/IqKjPySkpT8lpaY/J6eoPympqj8rq6w/LKytPy6urz8wsLE/MrKzPzOztD81tbY/
+N7e4Pzm5uj86urs/PLy9Pz6+vz3AwME94ODhPfj4+T4MjI0+HJydPiysrT44uLk+SMjJPljY2T5o
+6Ok+dPT1PoKCgz6Kios+kpKTPpiYmT6goKE+np6fPpqamz6YmJk+lJSVPpCQkT6Ojo8+ioqLPoaG
+hz6EhIU+gICBPnj4+T509PU+bOztPmTk5T5c3N0+WNjZPlDQ0T5IyMk+RMTFPjy8vT40tLU+MLCx
+PiioqT4goKE+HJydPhSUlT4MjI0+CIiJPgCAgT3w8PE96OjpPdjY2T3IyMk9wMDBPbCwsT2goKE9
+kJCRPYiIiT1w8PE9UNDRPUDAwT0goKE9AICBPODg4TygoKE8oKChPKCgoTygoKE8oKChPKCgoTyg
+oKE8oKChPKCgoTygoKE8oKChPKCgoTygoKE8oKChPKCgoTygoKE8oKChPKCgoTygoKEAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[MDR Radar]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Radar]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[MDR RADAR]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+3NzdPtzc3T7c3N0+3Nzd
+Ptzc3T7c3N0+3NzdPtzc3T7c3N0+3NzdPtzc3T7c3N0+3NzdPtzc3T7c3N0+3NzdPtzc3T7c3N0+
+3NzdPtzc3T7c3N0+3NzdPtzc3T7c3N0+3NzdPtzc3T7c3N0+3NzdPtzc3T7c3N0+3NzdPtzc3T82
+trc/Nra3Pza2tz82trc/Nra3Pza2tz82trc/Nra3Pza2tz82trc/Nra3Pza2tz82trc/Nra3Pza2
+tz82trc/Nra3Pza2tz82trc/Nra3Pza2tz82trc/Nra3Pza2tz82trc/Nra3Pza2tz82trc/Nra3
+Pza2tz82trc/Nra3P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[ATD-Scook]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Radar>ATD]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[ATD-SCOOK]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAB/P20OVj9l41Q/YAAAP1YEGT9NDlY/QxJvPzocrD8w
+IMU/Jul5PxztkT8T988/CwIMPwEGJT7wIMU+3jU/PsvGqD652yM+p++ePpYEGT6EGJM+ZFodPkCD
+Ej4fvnc9987ZPbAgxT1hR648o9cKPIMSbzxEm6Y8RJumPAMSbzwDEm88AxJvPAMSbzuDEm87gxJv
+O4MSbzuDEm8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAADuDEm88gxJvPP3ztj1987Y91wo9PiwIMT53ztk+peNUPtP3zz8BBiU/GRaHP0fvnj8w
+5WA/MeuFPzLxqj8z988/NgQZPzcKPT85Foc/OuFIPzztkT8++ds/QQYlP0UeuD9H754/TAgxP0/f
+Oz9T988/WBBiP1vnbT9gAAA/ZR64P2j1wz9sCDE/bxqgP3HrhT9z988/dgQZP3cKPT94EGI/eRaH
+P3kWhz95Foc/eRaHP3kWhz95Foc/eBBiP3gQYj94EGI/eBBiP3gQYj95Foc/eRaHP3ocrD96HKw/
+euFIP3rhSD97520/fO2RP3ztkT9987Y/ffO2P33ztj9++ds/fvnbP3752z9++ds/fvnbP3752z9+
++ds/fvnbP3752z9++ds/fvnbP3752w==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAB/PESbpj0PXCk9YUeuPZeNUD3AgxI952yLPggxJz4b
+peM+MCDFPkeuFD5cKPY+b52yPoIMSj6N0vI+mBBiPqPXCj6uFHs+udsjPsYk3T7R64U+3Cj2Pufv
+nj70OVg/AAAAPwXjVD8MCDE/EeuFPxrhSD8jEm8/KPXDPzAgxT82BBk/OuFIP0EGJT9G6Xk/TAgx
+P1HrhT9XCj0/WuFIP13ztj9gAAA/XvnbP1ztkT9aHKw/VP30P0/fOz9J++c/RBiTPz3ztj84EGI/
+MeuFPy0OVj8m6Xk/IxJvPx752z8c7ZE/G+dtPxztkT8d87Y/IQYlPyQYkz8m6Xk/KfvnP0fvnj8l
+Hrg/HvnbPxocrD8U/fQ/D987Pw0OVj8LAgw/CfvnPwn75z8J++c/CwIMPwwIMT8NDlY/DhR7Pw4U
+ez8PGqA/DxqgPw8aoD8P3zs/D987PxDlYD8R64U/EvGqPxT99D8XCj0/GhysPxztkT8gAAA/IxJv
+PyXjVD8o9cM/LAgxPy8aoD8w5WA/MeuFPzLxqj8y8ao/MeuFPzDlYD8uFHs/KwIMPybpeT8jEm8/
+HO2RPxcKPT8Q5WA/CfvnPwMSbz71wo8+5eNUPtYEGT7EGJM+si0OPp++dz6N0vI+d87ZPlP3zz4w
+IMU+EGJOPdcKPT2XjVA9QIMSPIMSbw==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAB/P3AgxT9w5WA/cOVgP3AgxT9vGqA/bhR7P24Uez9t
+DlY/bAgxP2sCDD9p++c/aPXDP2fvnj9m6Xk/ZeNUP2UeuD9kGJM/YxJvP2IMSj9hBiU/XvnbP13z
+tj9c7ZE/W+dtP1rhSD9ZFoc/WBBiP1DlYD9H754/PfO2PzLxqj8n754/HO2RPxHrhT8F41Q+9cKP
+Pt41Pz7IMSc+si0OPpocrD6EGJM+XCj2PjQ5WD4QYk493ztkPbAgxT1987Y9QIMSPP3ztjy8an88
+gxJvPESbpjxEm6Y8o9cKPQ9cKT1987Y93ztkPiwIMT53ztk+peNUPtP3zz8BBiU/GRaHP0fvnj8Z
+Foc/DQ5WPwAAAD7n754+0/fPPsIMSj61wo8+rhR7Pqfvnj6j1wo+n753Pp41Pz6aHKw+k/fPPovG
+qD6EGJM+c7ZGPlwo9j5DlYE+LAgxPhR64T4AAAA91wo9PbAgxT2PXCk9can8PUCDEj0wIMU9H753
+PR++dz0wIMU9YUeuPYcrAj2n75490OVgPffO2T4XjVA+NDlYPlP3zz5ztkY+ij1xPpocrD6l41Q+
+tDlYPrvnbT7EGJM+yDEnPso9cT7IMSc+wgxKPrnbIz6wIMU+o9cKPpYEGT6IMSc+b52yPk/fOz4s
+CDE+DEm6PdcKPT2XjVA9QIMSPIMSbw==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[ATD-Reflectivity]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Radar>ATD]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[ATD-REFLECTIVITY]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABAAAAAAD5w8PE+cPDxAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9AICBPQCAgT3g4OE94ODhPmDg
+4T5g4OE+3NzdPtzc3T8QkJE/EJCRP0jIyT9IyMk/RMTFP0TExT9AwME/QMDBPz+/wD8/v8A/Pr6/
+Pz6+vz9S0tM/UtLTP3r6+z96+vs/fv7/P37+/z9+/v8/fv7/P37+/z9+/v8/fv7/P37+/z9+/v8/
+fv7/P37+/z9+/v8/efn6P3n5+j99/f4/ff3+P0jIyT9IyMk/V9fYP1fX2D9S0tM/UtLTAAAAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABAAAAAAD5w8PE+cPDxPoqKiz6Kios+ysrLPsrKyz8e
+np8/Hp6fPzGxsj8xsbI/Tc3OP03Nzj8/v8A/P7/APx+foD8fn6A+/v7/Pv7+/z6Ojo8+jo6PPkDA
+wT5AwME9UNDRPVDQ0T1AwME9QMDBPXDw8T1w8PE+hoaHPoaGhz7IyMk+yMjJPtDQ0T7Q0NE+2NjZ
+PtjY2T8IiIk/CIiJP0TExT9ExMU/WdnaP1nZ2j96+vs/evr7P13d3j9d3d4/GpqbPxqamz8CgoM/
+AoKDPr6+vz6+vr8+np6fPp6enz5Q0NE+UNDRPurq6z7q6us/N7e4Pze3uD9S0tM/UtLTAAAAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABAAAAAAD5w8PE+cPDxAAAAAAAAAAA9IKChPSCgoT3w
+8PE98PDxPmzs7T5s7O0+6OjpPujo6T8Wlpc/FpaXP07Ozz9Ozs8/W9vcP1vb3D9o6Ok/aOjpP17e
+3z9e3t8/RsbHP0bGxz8urq8/Lq6vPwaGhz8Ghoc/BoaHPwaGhz8Hh4g/B4eIPsrKyz7Kyss+iIiJ
+PoiIiT5s7O0+bOztPkTExT5ExMU+BISFPgSEhTxAwME8QMDBPeDg4T3g4OE+sLCxPrCwsT6AgIE+
+gICBPKCgoTygoKE9AICBPQCAgT3g4OE94ODhPtDQ0T7Q0NE/NbW2PzW1tj9S0tM/UtLTAAAAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[ATD-Velocity]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Radar>ATD]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[ATD-VELOCITY]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABAAAAAAD9+/v8/fv7/P339/j99/f4/ePj5P3j4+T9e
+3t8/Xt7fPzq6uz86urs/L6+wPy+vsD8lpaY/JaWmPwuLjD8Li4w+4uLjPuLi4z6Ojo8+jo6PPZiY
+mT2YmJkAAAAAAAAAAAAAAAAAAAAAPICAgTyAgIE8AICBPACAgT76+vs++vr7P2Li4z9i4uM/Wdna
+P1nZ2j9u7u8/bu7vP3z8/T98/P0/fv7/P37+/z9+/v8/fv7/P37+/z9+/v8/fv7/P37+/z9+/v8/
+fv7/P37+/z9+/v8/fv7/P37+/z9+/v8/fv7/P37+/z9+/v8/fv7/P37+/z+AAAA/gAAAAAAAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7gICBO4CAgT2YmJk9mJiZPlzc
+3T5c3N0+3NzdPtzc3T82trc/Nra3P2jo6T9o6Ok+6OjpPujo6T76+vs++vr7P0HBwj9BwcI/FZWW
+PxWVlj84uLk/OLi5P1ra2z9a2ts/WtrbP1ra2z8xsbI/MbGyPxGRkj8RkZI/A4OEPwODhD7Y2Nk+
+2NjZPrq6uz66urs+rKytPqysrT5c3N0+XNzdPVDQ0T1Q0NEAAAAAAAAAAAAAAAAAAAAAAAAAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABAAAAAAD9+/v8/fv7/P37+/z9+/v8/fv7/P37+/z9+
+/v8/fv7/P37+/z9+/v8/ff3+P339/j98/P0/fPz9P3j4+T94+Pk/cvLzP3Ly8z9s7O0/bOztP2Xl
+5j9l5eY/ZeXmP2Xl5j9k5OU/ZOTlPxiYmT8YmJk+mJiZPpiYmT76+vs++vr7PwWFhj8FhYY+RMTF
+PkTExT34+Pk9+Pj5PZCQkT2QkJE+BISFPgSEhT7IyMk+yMjJPxaWlz8Wlpc/A4OEPwODhD5o6Ok+
+aOjpPODg4Tzg4OEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[ATD-Wild]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Radar>ATD]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[ATD-WILD]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="3">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAZPtzc3T6qqqs/CoqLO4CAgTuAgIE7gICBPICAgTyA
+gIE8gICBPICAgTyAgIE8gICBP0jIyT8np6g/WdnaP4AAAD+AAAA/fv7/P37+/z9+/v8/fv7/P1/f
+4D8Kios/UtLTP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAZPtzc3T6qqqs/CoqLO4CAgT24uLk7gICBPwCAgT9B
+wcI/fPz9Pympqj8EhIU+pqanP0jIyT6QkJE/FZWWPzi4uT+AAAA/Pr6/PwiIiT6urq8+7u7vPqCg
+oQAAAAAAAAAAAAAAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAAZPtzc3T76+vs/MbGyPvr6+z8qqqs/UtLTP4AAAD+A
+AAA9iIiJPYiIiT2IiIk9iIiJP0jIyTxAwME+wMDBPfj4+TxAwME/Pr6/PwiIiT6urq8AAAAAAAAA
+AAAAAAAAAAAAAAAAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Base Reflectivity (transparent)]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Radar]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[Base Reflectivity (transparent)]]></string>
+            </property>
+            <property name="Range">
+                <object class="ucar.unidata.util.Range">
+                    <property name="Max">
+                        <double>80.0</double>
+                    </property>
+                    <field name="min">
+                        <java.lang.Double>0.0</java.lang.Double>
+                    </field>
+                </object>
+            </property>
+            <property name="Breakpoints">
+                <object class="java.util.ArrayList">
+                    <method name="add">
+                        <java.lang.Double>0.06493506493506493</java.lang.Double>
+                    </method>
+                    <method name="add">
+                        <java.lang.Double>1.0</java.lang.Double>
+                    </method>
+                </object>
+            </property>
+            <property name="Table">
+                <array class="[F" length="4">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwCAgT8AgIE/
+AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT7I
+yMk+yMjJPsjIyT7IyMk+yMjJPsjIyT7IyMk+yMjJPsjIyT7IyMk+yMjJPsjIyT7IyMk+yMjJPsjI
+yT7IyMk+kJCRPpCQkT6QkJE+kJCRPpCQkT6QkJE+kJCRPpCQkT6QkJE+kJCRPpCQkT6QkJE+kJCR
+PpCQkT6QkJE+kJCRPjCwsT4wsLE+MLCxPjCwsT4wsLE+MLCxPjCwsT4wsLE+MLCxPjCwsT4wsLE+
+MLCxPjCwsT4wsLE+MLCxPjCwsT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2A
+gIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw
+8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDx
+P3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/
+cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/EJCRPxCQkT8Q
+kJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPzCw
+sT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCx
+PzCwsT9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/
+SsrLP0rKyz9Kyss/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw
+8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/EJCRPxCQkT8QkJE/EJCR
+PxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRP2Dg4T9g4OE/
+YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T84
+uLk/OLi5Pzi4uT84uLk/OLi5Pzi4uT84uLk/OLi5Pzi4uT84uLk/OLi5Pzi4uT84uLk/OLi5Pzi4
+uT84uLk/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCR
+PxCQkT8QkJE/EJCRPtDQ0T7Q0NE+0NDRPtDQ0T7Q0NE+0NDRPtDQ0T7Q0NE+0NDRPtDQ0T7Q0NE+
+0NDRPtDQ0T7Q0NE+0NDRPtDQ0T6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6A
+gIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DA
+wT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICB
+PwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT2AgIE9gICBPYCAgT2AgIE9
+gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIEAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPgCA
+gT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICB
+PgCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+
+gICBPoCAgT6AgIE/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCA
+gT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgQ==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw
+8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/EJCRPxCQkT8QkJE/EJCR
+PxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPqCgoT6goKE+
+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6A
+gIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCA
+gT6AgIE+QMDBPkDAwT5AwME+QMDBPkDAwT5AwME+QMDBPkDAwT5AwME+QMDBPkDAwT5AwME+QMDB
+PkDAwT5AwME+QMDBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+
+AICBPgCAgT4AgIE+AICBPgCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2A
+gIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCA
+gT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICB
+PgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+
+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIEAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwCA
+gT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICB
+PwCAgT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/
+IKChPyCgoT8goKE/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg
+4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4Q==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Base Reflectivity (24) transparent]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Radar]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[Base Reflectivity (24) transparent]]></string>
+            </property>
+            <property name="Range">
+                <object class="ucar.unidata.util.Range">
+                    <property name="Max">
+                        <double>100.0</double>
+                    </property>
+                    <field name="min">
+                        <java.lang.Double>0.0</java.lang.Double>
+                    </field>
+                </object>
+            </property>
+            <property name="Breakpoints">
+                <object class="java.util.ArrayList">
+                    <method name="add">
+                        <java.lang.Double>0.32792207792207795</java.lang.Double>
+                    </method>
+                    <method name="add">
+                        <java.lang.Double>1.0</java.lang.Double>
+                    </method>
+                </object>
+            </property>
+            <property name="Table">
+                <array class="[F" length="4">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPsjIyT7I
+yMk+yMjJPsjIyT7IyMk+yMjJPsjIyT7IyMk+yMjJPsjIyT7IyMk+kJCRPpCQkT6QkJE+kJCRPpCQ
+kT6QkJE+kJCRPpCQkT6QkJE+kJCRPpCQkT4wsLE+MLCxPjCwsT4wsLE+MLCxPjCwsT4wsLE+MLCx
+PjCwsT4wsLE+MLCxPjCwsT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9
+gICBP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w
+8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw
+8T9w8PE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCR
+PxCQkT8QkJE/EJCRPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/MLCxPzCwsT8wsLE/
+MLCxP0rKyz9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/SsrLP0rKyz9Kyss/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDx
+P3Dw8T9w8PE/cPDxP3Dw8T8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/
+EJCRP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4T9g4OE/YODhPzi4uT84
+uLk/OLi5Pzi4uT84uLk/OLi5Pzi4uT84uLk/OLi5Pzi4uT84uLk/EJCRPxCQkT8QkJE/EJCRPxCQ
+kT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT7Q0NE+0NDRPtDQ0T7Q0NE+0NDRPtDQ0T7Q0NE+0NDR
+PtDQ0T7Q0NE+0NDRPtDQ0T6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+
+gICBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/QMDBP0DAwT9AwME/AICBPwCAgT8A
+gIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE9gICBPYCAgT2AgIE9gICBPYCA
+gT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+
+AICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD8AgIE/AICBPwCAgT8AgIE/AICBPwCA
+gT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgQ==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAPACAgTxAwME8oKChPMDAwT0A
+gIE9EJCRPTCwsT1AwME9YODhPXDw8T2IiIk9mJiZPaCgoT2wsLE9uLi5PcjIyT3Q0NE94ODhPejo
+6T34+Pk+AICBPgiIiT4MjI0+FJSVPhycnT4goKE+KKipPiysrT40tLU+OLi5PkDAwT5ExMU+TMzN
+PlDQ0T5Y2Nk+YODhPmTk5T5s7O0+cPDxPnj4+T58/P0+goKDPoSEhT6IiIk+ioqLPo6Ojz6QkJE+
+lJSVPpiYmT6amps+np6fPqCgoT6kpKU+pqanPqqqqz6srK0+sLCxPrKysz62trc+urq7Pry8vT7A
+wME+wsLDPsbGxz7IyMk+zMzNPs7Ozz7S0tM+1NTVPtjY2T7a2ts+3t7fPuLi4z7k5OU+6OjpPurq
+6z7u7u8+8PDxPvT09T729vc++vr7Pvz8/T8AgIE/cPDxP3Dw8T9w8PE/cPDxP3Dw8T9w8PE/cPDx
+P3Dw8T9w8PE/cPDxP3Dw8T8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/EJCRPxCQkT8QkJE/
+EJCRPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPqCgoT6goKE+oKChPoCAgT6A
+gIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+gICBPoCAgT6AgIE+QMDBPkDAwT5AwME+QMDBPkDA
+wT5AwME+QMDBPkDAwT5AwME+QMDBPkDAwT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICB
+PgCAgT4AgIE+AICBPgCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9
+gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE+AICBPgCAgT4A
+gIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgT4AgIE+AICBPgCA
+gT4AgIE+AICBPgCAgT4AgIE+AICBPgCAgQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/AICBPwCAgT8AgIE/
+AICBPyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/IKChPyCgoT8goKE/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg
+4T9g4OE/YODhP2Dg4T9g4OE/YODhP2Dg4Q==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[PressureMSL]]></string>
+            </property>
+            <property name="Description">
+                <string stringvalue=""/>
+            </property>
+            <property name="Range">
+                <object class="ucar.unidata.util.Range">
+                    <property name="Min">
+                        <double>952.0</double>
+                    </property>
+                    <property name="Max">
+                        <double>1052.0</double>
+                    </property>
+                </object>
+            </property>
+            <property name="Breakpoints">
+                <object class="java.util.ArrayList">
+                    <method name="add">
+                        <java.lang.Double>0.0</java.lang.Double>
+                    </method>
+                    <method name="add">
+                        <java.lang.Double>1.0</java.lang.Double>
+                    </method>
+                </object>
+            </property>
+            <property name="Table">
+                <array class="[F" length="4">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAADSP3r6+z9z8/Q/bOztP2Xl5j9e3t8/V9fYP1DQ0T9I
+yMk/QcHCPzq6uz8zs7Q/LKytPyWlpj8enp8/FpaXPw+PkD8IiIk/AYGCPvT09T7m5uc+2NjZPsjI
+yT66urs+rKytPp6enz6QkJE+goKDPmjo6T5IyMk+LKytPhCQkT3o6Ok9sLCxPXDw8T0AgIEAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2279Q+Nu/UPokz3z6279Q+5KvJPwkz
+3z8gEdk/Nu/UP03Nzj+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAA</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAADSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+PDR69Dy0evQ9B1w2PTR69D1hmbE9h1w2PZ3rlj20evQ9ywpSPeGZsT34KQ8+B1w2PhKj5j4d65Y+
+KTNFPjR69D4/wqM+SwpSPlZSAT5hmbE+bOFgPngpDz6BuF8+h1w2Po0ADj6So+Y+mEe+Pp3rlj6j
+j20+qTNFPq7XHD60evQ+uh7MPr/Coz7FZno+ywpSPtCuKT7WUgE+2/XaPuGZsT7nPYk+7OFgPvKF
+Nz74KQ8+/cznPwG4Xz8Eiks/B1w2PwouIj8NAA4/D9H6PxKj5j8VddI/GEe+PxsZqT8d65Y/IL2C
+PyOPbT8mYVk/KTNFPywFMD8u1xw/MakIPzR69D83TOA/Oh7MPzzwtz8/wqM/QpSPP0Vmej9IOGY/
+SwpSP03cPj9Qrik/U4AVP1ZSAT9ZI+0/W/XaP17Hxj9hmbE/ZGudP2c9iT9qD3Q/bOFgP2+zTD9y
+hTc/dVcjP3gpDz+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/eHh4P3Dw8T9paWk/YeHiP1paWj9S0tM/S0tLP0PDxD88PDw/NLS1
+Py0tLT8lpaY/Hh4ePxaWlz8PDw8/B4eIPwAAAD7w8PE+4eHiPtLS0z7Dw8Q+tLS1PqWlpj6Wlpc+
+h4eIPnDw8T5S0tM+NLS1PhaWlz3w8PE98PDxPfDw8T3w8PE98PDxPfDw8T3w8PE98PDxPfDw8T3w
+8PE98PDxPfDw8T3w8PE98PDxPfDw8T3w8PE98PDxPfDw8T3o6Ok94ODhPdjY2T3IyMk9wMDBPbi4
+uT2wsLE9oKChPZiYmT2QkJE9iIiJPXDw8T1g4OE9UNDRPUDAwT0goKE9EJCRPQCAgTzg4OE8oKCh
+PICAgTxAwME8AICB</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAADSP3f3+D939/g/d/f4P3f3+D939/g/d/f4P3f3+D93
+9/g/d/f4P3f3+D939/g/d/f4P3j4+T94+Pk/ePj5P3j4+T94+Pk/ePj5P3j4+T94+Pk/ePj5P3j4
++T94+Pk/ePj5P3n5+j95+fo/efn6P3n5+j95+fo/efn6P3n5+j95+fo/efn6P3n5+j95+fo/evr7
+P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/
+evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96
++vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6
++z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7
+P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/
+evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96+vs/evr7P3r6+z96
++vs/evr7P3r6+z+AAAA/TIyNPxkZGT7LS0s+SMjJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD0goKE9oKChPfDw8T4goKE+SMjJPnDw
+8T6MjI0+oqKjPra2tz7Kyss+3t7fPvLy8z8Dg4Q/DY2OPxeXmD8ioqM/LKytPza2tz9AwME/SsrL
+P1TU1T9e3t8/aOjp</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAADSP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAA</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Name">
+                <string><![CDATA[Topography/Bathymetry-2]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Misc.]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[Topography/Bathymetry-2]]></string>
+            </property>
+            <property name="Range">
+                <object class="ucar.unidata.util.Range">
+                    <property name="Min">
+                        <double>-2750.0</double>
+                    </property>
+                    <property name="Max">
+                        <double>3700.0</double>
+                    </property>
+                </object>
+            </property>
+            <property name="Breakpoints">
+                <object class="java.util.ArrayList">
+                    <method name="add">
+                        <java.lang.Double>0.0</java.lang.Double>
+                    </method>
+                    <method name="add">
+                        <java.lang.Double>0.421875</java.lang.Double>
+                    </method>
+                    <method name="add">
+                        <java.lang.Double>0.42203125</java.lang.Double>
+                    </method>
+                    <method name="add">
+                        <java.lang.Double>0.42203125</java.lang.Double>
+                    </method>
+                    <method name="add">
+                        <java.lang.Double>0.53125</java.lang.Double>
+                    </method>
+                    <method name="add">
+                        <java.lang.Double>0.6010928961748634</java.lang.Double>
+                    </method>
+                    <method name="add">
+                        <java.lang.Double>0.6857923497267759</java.lang.Double>
+                    </method>
+                    <method name="add">
+                        <java.lang.Double>0.8125</java.lang.Double>
+                    </method>
+                    <method name="add">
+                        <java.lang.Double>0.9375</java.lang.Double>
+                    </method>
+                    <method name="add">
+                        <java.lang.Double>1.0</java.lang.Double>
+                    </method>
+                </object>
+            </property>
+            <property name="Table">
+                <array class="[F" length="4">
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAPUDAwT1AwME9QMDBPUDAwT1AwME9QMDBPUDAwT1A
+wME9QMDBPUDAwT1AwME9UNDRPVDQ0T1Q0NE9UNDRPVDQ0T1Q0NE9UNDRPVDQ0T1Q0NE9UNDRPVDQ
+0T1g4OE9YODhPWDg4T1g4OE9YODhPWDg4T1g4OE9YODhPWDg4T1g4OE9YODhPXDw8T1w8PE9cPDx
+PXDw8T1w8PE9cPDxPXDw8T1w8PE9cPDxPXDw8T1w8PE9gICBPYCAgT2AgIE9gICBPYCAgT2AgIE9
+gICBPYCAgT2AgIE9gICBPYCAgT2IiIk9iIiJPYiIiT2IiIk9iIiJPYiIiT2IiIk9iIiJPYiIiT2I
+iIk9iIiJPZCQkT2QkJE9kJCRPZCQkT2QkJE9kJCRPZCQkT2QkJE9kJCRPZCQkT2QkJE9mJiZPZiY
+mT2YmJk9mJiZPZiYmT2YmJk9mJiZPZiYmT2YmJk9mJiZPZiYmT2goKE9oKChPaCgoT2goKE9oKCh
+PaCgoT2goKE9oKChPaCgoT2goKE9oKChPaioqT2oqKk9qKipPaioqT2oqKk9qKipPaioqT2oqKk9
+qKipPaioqTygoKE8wMDBPODg4T0AgIE9IKChPTCwsT1AwME9UNDRPWDg4T2AgIE9iIiJPZCQkT2Y
+mJk9oKChPbCwsT24uLk9wMDBPcjIyT3Q0NE94ODhPejo6T3w8PE9+Pj5PgCAgT4IiIk+DIyNPhCQ
+kT4UlJU+NLS1PljY2T58/P0+kJCRPqKioz60tLU+xsbHPtjY2T7q6us++vr7PwaGhz8Pj5A/GJiZ
+PyGhoj8qqqs/M7O0Pzy8vT88vL0/PLy9Pzy8vT88vL0/PLy9Pzy8vT88vL0/PLy9Pzy8vT88vL0/
+PLy9Pzy8vT88vL0/PLy9Pzy8vT88vL0/PLy9Pzy8vT88vL0/PLy9Pzy8vT88vL0/I6OkPx6enz8Z
+mZo/FZWWPxCQkT8Li4w/BoaHPwGBgj74+Pk+8PDxPubm5z7c3N0+0tLTPsjIyT6+vr8+tra3Pqys
+rT6ioqM+mJiZPo6Ojz6EhIU+ePj5PmTk5T5Q0NE+PLy9PiioqT4UlJU+BISFPeDg4T24uLk9kJCR
+PVDQ0T0AgIE9MLCxPXDw8T2YmJk9uLi5PdDQ0T3w8PE+CIiJPhiYmT4kpKU+NLS1PkTExT5U1NU+
+YODhPnDw8T6AgIE+iIiJPo6Ojz6Wlpc+np6fPqampz6srK0+tLS1Pry8vT7ExMU+ysrLPtLS0z7a
+2ts+4uLjPujo6T7w8PE++Pj5PwCAgT8Hh4g/D4+QPxeXmD8fn6A/J6eoPy+vsD83t7g/P7/AP0fH
+yD9Pz9A/V9fYP1/f4D9n5+g/b+/wP3f3+A==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAPUDAwT1Q0NE9YODhPYCAgT2IiIk9mJiZPaCgoT2o
+qKk9uLi5PcDAwT3Q0NE92NjZPeDg4T3w8PE9+Pj5PgSEhT4IiIk+EJCRPhSUlT4YmJk+IKChPiSk
+pT4srK0+MLCxPjS0tT48vL0+QMDBPkjIyT5MzM0+UNDRPljY2T5c3N0+ZOTlPmjo6T5w8PE+dPT1
+Pnj4+T6AgIE+goKDPoaGhz6IiIk+ioqLPo6Ojz6QkJE+lJSVPpaWlz6YmJk+nJydPp6enz6ioqM+
+pKSlPqioqT6qqqs+rKytPrCwsT6ysrM+tra3Pri4uT66urs+vr6/PsDAwT7ExMU+xsbHPsrKyz7M
+zM0+zs7PPtLS0z7U1NU+2NjZPtra2z7c3N0+4ODhPuLi4z7m5uc+6OjpPurq6z7u7u8+8PDxPvT0
+9T729vc++vr7Pvz8/T7+/v8/AYGCPwKCgz8EhIU/BYWGPwaGhz8IiIk/CYmKPwuLjD8MjI0/DY2O
+Pw+PkD8QkJE/EpKTPxOTlD8VlZY/FpaXPxeXmD8ZmZo/GpqbPxycnT8dnZ4/Hp6fPyCgoT8hoaI/
+I6OkPySkpT9Ozs8/ScnKP0TExT9AwME/O7u8Pza2tz8ysrM/La2uPyioqT8kpKU/H5+gPxqamz8W
+lpc/EZGSPwyMjT8Hh4g/A4OEPvz8/T7y8vM+6urrPuDg4T7W1tc+zs7PPsTExT66urs+srKzPqio
+qT6enp8+pqanPq6urz64uLk+wMDBPsjIyT7S0tM+2trbPuTk5T7s7O0+9PT1Pv7+/z8Dg4Q/CIiJ
+PwyMjT8QkJE/FZWWPxmZmj8amps/G5ucPxycnT8enp8/H5+gPyCgoT8hoaI/I6OkPySkpT8lpaY/
+JqanPyioqT8pqao/KqqrPyurrD8tra4/Lq6vPy+vsD8wsLE/MrKzPzOztD80tLU/Obm6Pza2tz80
+tLU/MrKzPy+vsD8tra4/KqqrPyioqT8mpqc/I6OkPyGhoj8enp8/HJydPxqamz8Xl5g/FZWWPxKS
+kz8QkJE/Do6PPwuLjD8JiYo/BoaHPwSEhT8CgoM+/v7/Pvr6+z709PU+8PDxPuzs7T7m5uc+4uLj
+Ptzc3T7Y2Nk+3NzdPuDg4T7m5uc+6urrPvDw8T709PU++vr7Pv7+/z8CgoM/BISFPweHiD8JiYo/
+C4uMPw6Ojz8QkJE/E5OUPxWVlj8YmJk/GpqbPx2dnj8fn6A/IqKjPySkpT8mpqc/KamqPyurrD8u
+rq8/MLCxPzOztD81tbY/OLi5Pzq6uz8+vr8/QsLDP0bGxz9Ly8w/T8/QP1PT1D9Y2Nk/XNzdP2Dg
+4T9l5eY/aenqP23t7j9y8vM/dvb3P3r6+w==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAPwKCgz8CgoM/A4OEPwSEhT8EhIU/BYWGPwaGhz8H
+h4g/B4eIPwiIiT8JiYo/CYmKPwqKiz8Li4w/DIyNPwyMjT8NjY4/Do6PPw6Ojz8Pj5A/EJCRPxGR
+kj8RkZI/EpKTPxOTlD8Tk5Q/FJSVPxWVlj8Wlpc/FpaXPxeXmD8YmJk/GJiZPxmZmj8amps/G5uc
+PxubnD8cnJ0/HZ2ePx2dnj8enp8/H5+gPyCgoT8goKE/IaGiPyKioz8ioqM/I6OkPySkpT8lpaY/
+JaWmPyampz8np6g/J6eoPyioqT8pqao/KqqrPyqqqz8rq6w/LKytPyysrT8tra4/Lq6vPy+vsD8v
+r7A/MLCxPzGxsj8xsbI/MrKzPzOztD80tLU/NLS1PzW1tj82trc/Nra3Pze3uD84uLk/Obm6Pzm5
+uj86urs/O7u8Pzu7vD88vL0/Pb2+Pz6+vz8+vr8/P7/AP0DAwT9AwME/QcHCP0LCwz9Dw8Q/Q8PE
+P0TExT9FxcY/RcXGP0bGxz9Hx8g/SMjJP0jIyT9Jyco/SsrLP0rKyz9Ly8w/TMzNP03Nzj9Nzc4/
+Ts7PP0/P0DygoKE8oKChPMDAwTzAwME84ODhPODg4T0AgIE9AICBPRCQkT0QkJE9IKChPSCgoT0w
+sLE9MLCxPUDAwT1AwME9UNDRPVDQ0T1g4OE9YODhPXDw8T1w8PE9gICBPYCAgT2IiIk9iIiJPZCQ
+kT2QkJE9qKipPcDAwT3g4OE9+Pj5PgiIiT4YmJk+JKSlPjS0tT5AwME+TMzNPlzc3T5o6Ok+ePj5
+PoKCgz6IiIk+kJCRPpaWlz6Wlpc+lpaXPpaWlz6Wlpc+lpaXPpaWlz6Wlpc+lpaXPpaWlz6Wlpc+
+lpaXPpaWlz6Wlpc+lpaXPpaWlz6Wlpc+lpaXPpaWlz6Wlpc+lpaXPpaWlz6Wlpc+lpaXPpSUlT6S
+kpM+kJCRPpCQkT6Ojo8+jIyNPoqKiz6IiIk+hoaHPoSEhT6EhIU+goKDPoCAgT58/P0+ePj5PnT0
+9T5w8PE+bOztPmzs7T5o6Ok+ZOTlPmDg4T5c3N0+WNjZPlTU1T5U1NU+UNDRPkzMzT5IyMk+RMTF
+PkDAwT48vL0+RMTFPkzMzT5Y2Nk+YODhPmjo6T509PU+fPz9PoSEhT6IiIk+jIyNPpKSkz6Wlpc+
+nJydPqCgoT6kpKU+qqqrPq6urz60tLU+uLi5Pry8vT7CwsM+xsbHPszMzT7Q0NE+1NTVPtra2z7e
+3t8+5OTlPujo6T7s7O0+8vLzPvb29z8Dg4Q/C4uMPxOTlD8cnJ0/JKSlPyysrT80tLU/Pb2+P0XF
+xj9Nzc4/VdXWP17e3z9m5uc/bu7vP3b29w==</parray>
+                    <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAA
+P4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/
+gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+A
+AAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AA
+AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
+                </array>
+            </property>
+        </object>
+    </method>
+</object>
+

@@ -1,0 +1,54 @@
+
+<html>
+<head>
+<title>Subsetting Point Data</title>
+</head>
+
+<body>
+
+<div class="overview">
+You can do time binning and spatial subsetting for point data.
+</div>
+
+
+<ol class="step">
+
+<li> [ht::clearDisplaysAndData]
+
+<li> Load in the file [ht::filename <%workshop.datadir%>/point/madis.nc].
+Make sure you the Data Source type  select &quot;netCDF Point Data files&quot;
+
+
+<li>Create a Point Data Plot. Say Yes to seeing all of the times.
+Notice, the number of times.  Not very workable.
+
+<li> In the display control window enter 5 minutes for the [ht::command Only Show Every] and turn on the
+[ht::command enabled] button.
+
+<li> Note: this isn't time binning. This just skips the obs.
+
+<li> Remove that display.
+
+<li> Now we're going to bin the times.
+
+<ul>
+<li> Bring up the Properties dialog for this madis point data. (Double click or
+right click on the data source entry in the Field Selector).
+<li> Choose a 15 minute [ht::command Bin Size] and press [ht::button OK].
+
+<li> Now, create a point data plot again. 
+
+</ul>
+
+<li> Spatially subset the point data.
+<ul>
+<li> Bring up the Properties dialog for the madis point data. Go to the [ht::command Spatial Subset] tab.
+<li> Zoom in over Colorado and drag a box with the left mouse to select a region.
+<li> Turn on [ht::button Reload Displays] and press [ht::button OK].
+</ul>
+
+
+</ol>
+
+</body>
+</html>

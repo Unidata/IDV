@@ -1,0 +1,89 @@
+<title>More on Editing Parameter Aliases</title>
+
+[ht::desc More on  parameter aliases.]
+
+<ol class="step">
+  
+  <li>The answer is:</li>
+  
+  <ul class="substep">
+    
+    <li>The color table is the [ht::ct default] color table.</li>
+    
+    <li>The range used is the range from the actual data.</li>
+  </ul>
+  
+  <li>The problem is that the IDV does not recognize  that the
+    name of the 
+      [ht::param temperature at fixed height above ground] field as 
+      a  temperature.</li>
+  
+  <li>To solve this problem, the IDV provides a data alias facility.</li>
+  
+  <li>First we need to know the actual parameter name, not its description.
+      
+  <ul class="substep">
+    
+    <li>Select the [ht::menu Help Details] menu item from the
+        [ht::display   Color-Shaded Plan View] display control
+        that was just created.</li>
+    
+    <li>You should see a detailed description of this display, including the
+        data it uses:</li>
+<pre>
+...
+ T_fhg temperature at fixed height above ground from Geogrid data source
+...
+</pre>
+    
+   <li>The parameter name is [ht::param T_fhg].</li>
+  </ul>
+  
+   
+    <li>Open up the [ht::dialog Alias Editor]  from the
+        [ht::menu  {Tools} {Parameter Alias Editor} ] menu.</li>
+    
+  <ul class="substep">
+    <li>You should see 2 tabs: [ht::command User Aliases] and
+        [ht::command System Aliases]</li>
+    
+    <li>The first tab shows the user's editable aliases.
+        The second tab shows the default system aliases.</li>
+    
+    <li>Select the [ht::command System Aliases] tab.</li>
+    
+    <li>Right click on the [ht::param TEMP] row and select
+        [ht::menu {Copy to User   Table}].</li>
+    
+    <li>You should now see this row in the [ht::command User Aliases]
+        tab and the Data Alias dialog should be shown.</li>
+    
+    <li>Scroll down to the bottom of the [ht::command Aliases] list, enter
+        [ht::qt   T_fhg] and click
+        the [ht::button OK] button.</li>
+    
+    <li>Click the [ht::button OK] button in the [ht::dialog Alias Editor]
+        window.</li>
+
+    <li>To edit an existing entry right click or double click on the parameter.
+
+  </ul>
+  
+  <li>Let's see if this works.</li>
+  
+  <ul class="substep">
+    
+    <li>Remove your displays by selecting the
+        [ht::menu Edit {Remove All Displays}]
+        menu item.
+        
+    <li>
+    [ht::createBasicDisplay -display {Color-Shaded Plan View} -param       {temperature at fixed height above ground}]</li>
+    
+    <li>You should see the [ht::ct Comfort] color table and the correct range
+        being used now.</li>
+  </ul>
+</ol>
+
+
+

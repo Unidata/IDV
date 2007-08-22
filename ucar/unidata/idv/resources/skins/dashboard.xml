@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<skin mainwindow="false" windowtitle="Dashboard">
+  <ui>
+    <panel layout="border">
+      <idv.menubar place="North"/>
+      <panel
+         place="Center"
+         layout="border">
+        <panel
+           layout="flow"
+           place="North">
+          <idv.toolbar
+             id="idv.toolbar"
+             place="West"/>
+          <panel
+             id="idv.favoritesbar"
+             place="North"/>
+        </panel>
+        <tabbedpane place="Center">
+        <idv.quicklinks title="Quicklinks" icon="/auxdata/ui/icons/Bookmarks24.gif" usepref="true"/>	
+
+<!--
+	<treepanel title="Quicklinks" icon="/auxdata/ui/icons/Bookmarks24.gif">	
+             <html  title="Welcome" category="Docs" text="Welcome to my page"/>
+             <html title="Overview"  category="Docs" text="This is an overview"/>
+             <html title="Overview1" category="Docs&gt;Subcat1&gt;subcat2" text="This is  overview 1"/>
+             <html title="Overview1" category="Docs&gt;Subcat1&gt;subcat2" text="This is  overview 1"/>
+             <html title="Overview1" category="Docs&gt;Subcat1&gt;subcat2" text="This is  overview 1"/>
+             <html title="Overview2" category="Docs&gt;Subcat1" text="This is overview 2"/>
+             <html title="Overview3" category="Docs" text="This is overview 3"/>
+             <idv.quicklinks.favorites title="Favorites" category="Bundles"/>
+             <idv.quicklinks.datasources title="Data Sources" category="Bundles"/>
+             <idv.quicklinks.displaytemplates title="Display Templates" category="Bundles"/>
+             <idv.quicklinks.history title="History" category="Bundles"/>/>
+             <idv.quicklinks.special title="Special Displays" category="Displays"/>
+             <idv.quicklinks.windows title="Windows" category="Displays"/>
+        </treepanel>
+-->
+
+<!--
+        <idv.choosers  title="Data Choosers" icon="/auxdata/ui/icons/DataChooser24.gif" intabs="false" usepref="true"/>
+-->
+
+        <idv.choosers  title="Data Choosers" icon="/auxdata/ui/icons/DataChooser24.gif" intabs="true" usepref="true"/>
+        <idv.dataselector title="Field Selector" icon="/auxdata/ui/icons/FieldSelector24.gif" id="idv.dataselector" usepref="true"/>
+        <idv.viewpanel title="Displays" icon="/auxdata/ui/icons/Displays24.gif" usepref="true" /> 
+
+<!--
+        <idv.help title="Help" icon="/auxdata/ui/icons/Help24.gif" id="idv.help" helpset="/auxdata/docs/userguide/HelpSet.hs"/>	
+-->
+        </tabbedpane>
+      </panel>
+      <idv.statusbar place="South"/>
+    </panel>
+  </ui>
+  <styles>
+    <style
+       class="iconbtn"
+       space="2"
+       mouse_enter="ui.setText(idv.messagelabel,prop:tooltip);ui.setBorder(this,etched);"
+       mouse_exit="ui.setText(idv.messagelabel,);ui.setBorder(this,button);"/>
+    <style
+       class="textbtn"
+       space="2"
+       mouse_enter="ui.setText(idv.messagelabel,prop:tooltip)"
+       mouse_exit="ui.setText(idv.messagelabel,)"/>
+  </styles>
+  <components/>
+  <properties>
+    <property
+       name="icon.wait.wait"
+       value="/ucar/unidata/idv/images/wait.gif"/>
+  </properties>
+</skin>
