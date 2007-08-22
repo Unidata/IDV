@@ -348,6 +348,9 @@ public class CompositeDisplayable extends Displayable {
      * @return            An Iterator over the children of this composite.
      */
     public Iterator iterator() {
+        if(displayables == null) {
+            return new ArrayList().iterator();
+        }
         return (new ArrayList(displayables)).iterator();
     }
 
