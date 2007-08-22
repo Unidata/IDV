@@ -98,9 +98,6 @@ line using: and -Dbasedir=/some/other/dir
             message="Building at ${start.time}. Build dir: ${basedir}" />
         <echo message="Checking out source tree." />
         <antcall target="svnco" /> 
-        <!--
-        <antcall target="cvsco" /> 
-        -->
         <echo message="FTPing visad." />
         <antcall target="visad" /> 
         <echo message="Building ucar packages." />
@@ -112,9 +109,6 @@ line using: and -Dbasedir=/some/other/dir
             message="Building at ${start.time}. Build dir: ${basedir}" />
         <echo message="Checking out source tree." />
         <antcall target="svnco" /> 
-        <!--
-        <antcall target="cvsco" /> 
-        -->
         <echo message="FTPing visad." />
         <antcall target="visad" /> 
         <echo message="Building ucar packages." />
@@ -219,9 +213,16 @@ line using: and -Dbasedir=/some/other/dir
             <fileset  dir="${libsdir}" includes="visad.jar"/>
         </ftp>
 
+        <!--
         <exec executable="cvs" dir="${libsdir}">
             <arg line="commit -m idv_build_snapshot visad.jar"/>
         </exec>
+        -->
+
+        <svn>
+        <commit file="${libsdir}/visad.jar" message="idv_build_snapshot"/>
+        </svn>
+
     </target>
 
 

@@ -42,12 +42,8 @@ build()
                         fi
 			rm runtime
 			if ln -s $newdir runtime; then
-			    if (cd lib && ln -f ../runtime/lib/*.jar .); then
 				echo "IDV package built"
 				status=0
-			    else
-				echo 1>&2 "Couldn't hard-link jarfiles"
-			    fi
 			else
 			    echo 1>&2 "Couldn't throw runtime switch"
 			fi
