@@ -25,14 +25,14 @@ build()
         status=1
         ant -version
         java -version
-        if cd /upc/share/metapps; then
+        if cd /upc/share/idv; then
 	    newdir=build$(date '+%Y%m%dT%H%M')
 	    if test -d $newdir; then
 		echo 1>&2 "Directory \"$newdir\" exists!"
 	    else
 		umask 02
 		if mkdir $newdir; then
-		    cvs update build/build.xml
+		    svn update build/build.xml
 		    if ant -Dbasedir=`pwd`/$newdir \
 			    -buildfile build/build.xml; then
 			olddir=$(ls -l runtime | awk '{print $NF}')
@@ -62,7 +62,7 @@ build()
 		fi
 	    fi
         else
-            echo 1>&2 "Couldn't change to metapps directory"
+            echo 1>&2 "Couldn't change to idv directory"
         fi
         return $status
     )
@@ -72,7 +72,7 @@ ftp()
 {
     (
         status=1
-        if cd /upc/share/metapps; then
+        if cd /upc/share/idv; then
 	    umask 02
 	    if ant -Dbasedir=`pwd` -buildfile build/build.xml ftp; then
 		echo "IDV FTP done"
@@ -91,7 +91,7 @@ nightly()
         status=1
         if (build); then
           if (installers); then
-            if cd /upc/share/metapps; then
+            if cd /upc/share/idv; then
 	      umask 02
 	      if ant -Dbasedir=`pwd` -buildfile build/build.xml nightly_release; then
 	        echo "IDV release done"
@@ -112,7 +112,7 @@ release()
         status=1
         if (build); then
           if (installers); then
-            if cd /upc/share/metapps; then
+            if cd /upc/share/idv; then
 	      umask 02
 	      if ant -Dbasedir=`pwd` -buildfile build/build.xml release; then
 	        echo "IDV release done"
@@ -131,7 +131,7 @@ installers()
 {
     (
         status=1
-        if cd /upc/share/metapps; then
+        if cd /upc/share/idv; then
 	    umask 02
 	    if ant -Dbasedir=`pwd` -buildfile build/build.xml installers; then
 		echo "IDV installers built"

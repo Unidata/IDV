@@ -56,7 +56,9 @@ line using: and -Dbasedir=/some/other/dir
         <property name="tmpbuilddir" value="${srcdir}/tmpbuilddir"/>
 
         <mkdir dir="${srcdir}" />
+<!--
         <mkdir dir="${libsdir}"/>
+-->
         <mkdir dir="${tmpbuilddir}"/>
 
         <property name="release_src_dir"   value="${srcdir}/ucar/unidata/idv/release" />
@@ -82,7 +84,7 @@ line using: and -Dbasedir=/some/other/dir
 <!-- Where we get the installer config files for the release -->
         <property name="installer_src_dir" value="${release_src_dir}/installer" />
 
-        <property name="sign_keystore" value="/upc/share/metapps/.keystore"/>
+        <property name="sign_keystore" value="/upc/share/idv/.keystore"/>
         <property name="sign_password" value="poohbear"/>
 
         <taskdef name="install4j"
@@ -95,7 +97,7 @@ line using: and -Dbasedir=/some/other/dir
         <echo
             message="Building at ${start.time}. Build dir: ${basedir}" />
         <echo message="Checking out source tree." />
-        <antcall target="cvsco" /> 
+        <antcall target="svnco" /> 
         <!--
         <antcall target="cvsco" /> 
         -->
@@ -109,7 +111,7 @@ line using: and -Dbasedir=/some/other/dir
         <echo
             message="Building at ${start.time}. Build dir: ${basedir}" />
         <echo message="Checking out source tree." />
-        <antcall target="cvsco" /> 
+        <antcall target="svnco" /> 
         <!--
         <antcall target="cvsco" /> 
         -->
@@ -138,26 +140,26 @@ line using: and -Dbasedir=/some/other/dir
             compress="true"
             basedir="${srcdir}/.."
         >
-            <include name="metapps/ucar/**"/>
-            <exclude name="metapps/**/CVS/**"/>
-            <exclude name="metapps/ucar/**/*.class"/>
-            <exclude name="metapps/ucar/**/*.map"/>
-            <exclude name="metapps/ucar/**/*.jar"/>            
-            <exclude name="metapps/ucar/**/*.ascii"/>            
-            <exclude name="metapps/ucar/**/*.tml"/>            
-            <exclude name="metapps/ucar/**/*.bak"/>            
-            <exclude name="metapps/ucar/**/*.zip"/>            
-            <exclude name="metapps/ucar/**/*.shp"/>            
-            <exclude name="metapps/ucar/**/*.nc"/>            
-            <exclude name="metapps/ucar/unidata/apps/demo/**"/>
-            <exclude name="metapps/ucar/unidata/apps/imageviewer/**"/>
-            <exclude name="metapps/ucar/unidata/apps/geon/**"/>
-            <exclude name="metapps/ucar/unidata/apps/lead/**"/>
-            <exclude name="metapps/ucar/unidata/apps/rico/**"/>
-            <exclude name="metapps/ucar/unidata/apps/trex/**"/>
-            <exclude name="metapps/ucar/unidata/gridviewer/**/*.*"/>
-            <exclude name="metapps/ucar/unidata/grid/**"/>
-            <exclude name="metapps/ucar/unidata/view/sounding/test/**"/>
+            <include name="idv/ucar/**"/>
+            <exclude name="idv/**/CVS/**"/>
+            <exclude name="idv/ucar/**/*.class"/>
+            <exclude name="idv/ucar/**/*.map"/>
+            <exclude name="idv/ucar/**/*.jar"/>            
+            <exclude name="idv/ucar/**/*.ascii"/>            
+            <exclude name="idv/ucar/**/*.tml"/>            
+            <exclude name="idv/ucar/**/*.bak"/>            
+            <exclude name="idv/ucar/**/*.zip"/>            
+            <exclude name="idv/ucar/**/*.shp"/>            
+            <exclude name="idv/ucar/**/*.nc"/>            
+            <exclude name="idv/ucar/unidata/apps/demo/**"/>
+            <exclude name="idv/ucar/unidata/apps/imageviewer/**"/>
+            <exclude name="idv/ucar/unidata/apps/geon/**"/>
+            <exclude name="idv/ucar/unidata/apps/lead/**"/>
+            <exclude name="idv/ucar/unidata/apps/rico/**"/>
+            <exclude name="idv/ucar/unidata/apps/trex/**"/>
+            <exclude name="idv/ucar/unidata/gridviewer/**/*.*"/>
+            <exclude name="idv/ucar/unidata/grid/**"/>
+            <exclude name="idv/ucar/unidata/view/sounding/test/**"/>
         </jar>
         <antcall target="zipdocs" />
     </target>
@@ -218,7 +220,7 @@ line using: and -Dbasedir=/some/other/dir
         </ftp>
 
         <exec executable="cvs" dir="${libsdir}">
-            <arg line="commit -m metapps_build_snapshot visad.jar"/>
+            <arg line="commit -m idv_build_snapshot visad.jar"/>
         </exec>
     </target>
 
@@ -616,7 +618,7 @@ line using: and -Dbasedir=/some/other/dir
         <jar
             jarfile="${ftpdir}/idv_javadoc_${idv.version}.jar"
             basedir="${basedir}/.."
-            includes="metapps/docs/javadoc/**"
+            includes="idv/docs/javadoc/**"
         />
     </target>
 
