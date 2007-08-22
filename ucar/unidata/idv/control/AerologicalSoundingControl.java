@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -293,6 +294,8 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             public void setShowDisplayList(boolean v) {
                 super.setShowDisplayList(true);
             }
+
+            public void setColors(Color foreground, Color background) {}
 
         };
 
