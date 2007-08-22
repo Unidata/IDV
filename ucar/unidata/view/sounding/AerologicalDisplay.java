@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.view.sounding;
 
 
@@ -42,6 +43,7 @@ import visad.java3d.*;
 
 
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Event;
@@ -558,11 +560,13 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
             }
         });
         addDisplayable(soundings);
+        setWindColor(getForeground());
         addDisplayable(winds);
         addDisplayable(pseudoAdiabaticTrajectory);
         addDisplayable(box = new Box(coordinateSystem));
         addDisplayable(isobars = new Isobars(coordinateSystem));
         addDisplayable(isotherms = new Isotherms(coordinateSystem));
+        setBackgroundLineColor(getForeground());
         addDisplayable(dryAdiabats = new DryAdiabats(coordinateSystem));
         addDisplayable(saturationAdiabats =
             new SaturationAdiabats(coordinateSystem));
@@ -588,6 +592,7 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
         addDisplayable(upperTemperatureLabels =
             new UpperTemperatureAxisLabels(coordinateSystem,
                                            isotherms.getContourLevels()));
+        setLabelColor(getForeground());
     }
 
     /**
@@ -2436,5 +2441,68 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
     public Sounding getActiveSounding() {
         return soundings.getActiveSounding();
     }
+
+    /**
+     * Sets the "foreground" color of this VisAD display
+     *
+     * @param color  color to use
+     */
+    public void setForeground(Color color) {
+
+        super.setForeground(color);
+        setLabelColor(color);
+        setWindColor(color);
+        setBackgroundLineColor(color);
+    }
+
+
+    /**
+     * Set the label color
+     *
+     * @param color  label color
+     */
+    public void setLabelColor(Color color) {
+
+        try {
+            if (leftPressureLabels != null) {
+                leftPressureLabels.setColor(color);
+                rightPressureLabels.setColor(color);
+                lowerTemperatureLabels.setColor(color);
+                upperTemperatureLabels.setColor(color);
+            }
+        } catch (VisADException ve) {}
+        catch (RemoteException re) {}
+    }
+
+    /**
+     * Set the wind flag color
+     *
+     * @param color  the color 
+     */
+    public void setWindColor(Color color) {
+        try {
+            if (winds != null) {
+                winds.setColor(color);
+            }
+        } catch (VisADException ve) {}
+        catch (RemoteException re) {}
+    }
+
+    /**
+     * Set the background line colors
+     *
+     * @param color the color
+     */
+    public void setBackgroundLineColor(Color color) {
+        try {
+            if (isotherms != null) {
+                box.setColor(color);
+                isobars.setColor(color);
+                isotherms.setColor(color);
+            }
+        } catch (VisADException ve) {}
+        catch (RemoteException re) {}
+    }
+
 }
 
