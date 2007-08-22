@@ -71,7 +71,6 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 
-
 /**
  * Methods for all kinds of plan views.
  * Controls are a JFrame with buttons used for control of
