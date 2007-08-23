@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -170,7 +171,10 @@ public class GeoGridDataSource extends GridDataSource {
 
 
 
+    private  JCheckBox cacheFlatFieldsCbx;
+
     private boolean cacheFlatFields = false;
+
 
     /**
      * Default constructor
@@ -325,6 +329,20 @@ public class GeoGridDataSource extends GridDataSource {
 
 
 
+    public void getPropertiesComponents(List comps) {
+        super.getPropertiesComponents(comps);
+        comps.add(GuiUtils.filler());
+        comps.add(getPropertiesHeader("Caching"));
+        cacheFlatFieldsCbx = new JCheckBox("Always cache to disk", cacheFlatFields);
+        comps.add(GuiUtils.filler());
+        comps.add(cacheFlatFieldsCbx);
+    }
+
+    public boolean applyProperties() {
+        if(!super.applyProperties()) return false;
+        setCacheFlatFields(cacheFlatFieldsCbx.isSelected());
+        return true;
+    }
 
     /**
      * Initialize after we have been created.
