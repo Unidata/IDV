@@ -51,6 +51,8 @@ import java.rmi.RemoteException;
 public class CachedFlatField extends FlatField {
 
 
+    static int id = 0;
+    String myid = ""+(id++);
 
     /** Mutex */
     transient protected Object MUTEX = new Object();
@@ -72,13 +74,14 @@ public class CachedFlatField extends FlatField {
     String filename;
 
     /** The values */
-    private float[][] floats;
-
-    /** Have we ever written the cache */
-    boolean haveWritten = false;
+    private float[][] myFloatValues;
 
     /** The min/max ranges */
     Range[] ranges;
+
+    /** The min/max ranges */
+    Range[] sampleRanges;
+
 
 
     /**
@@ -169,18 +172,37 @@ public class CachedFlatField extends FlatField {
         super(type, domainSet, rangeCoordSys, rangeCoordSysArray, rangeSets,
               units);
         if (copy) {
-            this.floats = that.unpackFloats(copy);
-            init(floats);
+            this.myFloatValues = that.unpackFloats(copy);
+            init(myFloatValues);
         } else {
-            this.floats      = that.floats;
-            this.filename    = that.filename;
-            this.haveWritten = that.haveWritten;
+            this.myFloatValues  = that.myFloatValues;
+            this.filename    = that.getFilename();
             this.ranges      = that.ranges;
             this.shouldCache = that.shouldCache;
             clearMissing();
             checkCache();
         }
     }
+
+    protected boolean haveDataOnDisk() {
+        if(getFilename() == null) return false;
+        return new File(getFilename()).exists();
+    }
+
+
+
+    protected void initClone(CachedFlatField ccf, boolean copy) 
+        throws VisADException {
+        ccf.myid = "clone:" +this.myid;
+        ccf.setSampleRanges(sampleRanges);
+        if (!shouldCache) {
+            //            System.err.println(myid + " reading data to set clone values " + copy);
+            ccf.myFloatValues = unpackFloats(copy);
+        } 
+
+
+    }
+
 
 
     /**
@@ -208,11 +230,19 @@ public class CachedFlatField extends FlatField {
         msg("CachedFlatField.cloneMe");
 
 
-        return new CachedFlatField(this, copy, type, domainSet,
+        CachedFlatField ccf = new CachedFlatField(this, copy, type, domainSet,
                                    rangeCoordSys, rangeCoordSysArray,
                                    rangeSets, units);
+        initClone(ccf, copy);
+        return ccf;
     }
 
+
+
+
+    public void setSampleRanges(Range[] sampleRanges) {
+        this.sampleRanges = sampleRanges;
+    }
 
 
 
@@ -224,34 +254,60 @@ public class CachedFlatField extends FlatField {
      * @throws VisADException  problem getting ranges
      */
     public Range[] getRanges() throws VisADException {
+        return getRanges(false);
+    }
+
+    /**
+     * Get the ranges
+     *
+     * @return ranges
+     *
+     * @throws VisADException  problem getting ranges
+     */
+    public Range[] getRanges(boolean force) throws VisADException {
         //        ucar.unidata.util.Misc.printStack("CachedFlatField.getRanges",5,null);
-        if (ranges == null) {
-            msg("making ranges");
-            float[][] values = unpackFloats(false);
-            if (values == null) {
-                return null;
-            }
-            ranges = new Range[values.length];
-            for (int rangeIdx = 0; rangeIdx < values.length; rangeIdx++) {
-                float   pMin         = Float.POSITIVE_INFINITY;
-                float   pMax         = Float.NEGATIVE_INFINITY;
-                float[] values_range = values[rangeIdx];
-                int     length       = values_range.length;
-                for (int i = 0; i < length; i++) {
-                    float value = values_range[i];
-                    if (pMax < value) {
-                        pMax = value;
-                    }
-                    if (pMin > value) {
-                        pMin = value;
-                    }
-                }
-                ranges[rangeIdx] = new Range(pMin, pMax);
-            }
-            msg("done making ranges");
+        if(force) {
+            sampleRanges = null;
         }
+        if (ranges != null) {
+            return ranges;
+        }
+        if(sampleRanges!=null) {
+            return sampleRanges;
+        }
+        msg("making ranges");
+        return getRanges(unpackFloats(false));
+    }
+
+
+    public Range[] getRanges(float[][]values) throws VisADException {
+        sampleRanges = null;
+        if (values == null) {
+            return null;
+        }
+        ranges = new Range[values.length];
+        for (int rangeIdx = 0; rangeIdx < values.length; rangeIdx++) {
+            float   pMin         = Float.POSITIVE_INFINITY;
+            float   pMax         = Float.NEGATIVE_INFINITY;
+            float[] values_range = values[rangeIdx];
+            int     length       = values_range.length;
+            for (int i = 0; i < length; i++) {
+                float value = values_range[i];
+                if (pMax < value) {
+                    pMax = value;
+                }
+                if (pMin > value) {
+                    pMin = value;
+                }
+            }
+            ranges[rangeIdx] = new Range(pMin, pMax);
+        }
+        msg("done making ranges");
         return ranges;
     }
+
+
+
 
     /**
      * Set where we write to
@@ -283,6 +339,11 @@ public class CachedFlatField extends FlatField {
         init(data, true);
     }
 
+    public void setShouldCache(boolean b) {
+        shouldCache = b;
+
+    }
+
     /**
      * init
      *
@@ -293,17 +354,20 @@ public class CachedFlatField extends FlatField {
      */
     protected void init(float[][] data, boolean andCheckCache)
             throws VisADException {
-        floats = data;
-        clearMissing();
-        String uniqueName = "field_" + System.currentTimeMillis() + "_"
-                            + (cnt++);
-        if (cacheDir != null) {
-            filename = IOUtil.joinDir(cacheDir, uniqueName);
+        myFloatValues = data;
+
+        //Read the ranges when we first have data
+        if(ranges == null) {
+            getRanges(myFloatValues);
         }
+
+        clearMissing();
+        getFilename();
         if (data != null) {
-            shouldCache = data[0].length > cacheThreshold;
-            //Get the ranges while we have the floats
-            //            getRanges();
+            if(!shouldCache) {
+                shouldCache = data[0].length > cacheThreshold;
+            }
+            //            shouldCache = true;
             if (andCheckCache) {
                 checkCache();
             }
@@ -327,7 +391,7 @@ public class CachedFlatField extends FlatField {
      * @param s message to print
      */
     protected void msg(String s) {
-        //        System.err.println(msgcnt+" " + Thread.currentThread()+ " " +s);
+        //        System.err.println(Thread.currentThread()+ " " +s);
     }
 
     /**
@@ -339,11 +403,11 @@ public class CachedFlatField extends FlatField {
      */
     private float[][] readCache() throws VisADException {
         synchronized (MUTEX) {
-            float[][] values = floats;
+            float[][] values = myFloatValues;
             if (values != null) {
                 return values;
             }
-            if ( !haveWritten) {
+            if (!haveDataOnDisk()) {
                 msg(getClass().getName()
                     + " Have not written calling readData");
                 values = readData();
@@ -354,15 +418,16 @@ public class CachedFlatField extends FlatField {
                 init(values, false);
                 return values;
             }
-            if (filename == null) {
+            if ( !haveDataOnDisk()) {
                 return null;
             }
 
             try {
                 //            System.err.println ("*** Reading from file");
-                FileInputStream   istream = new FileInputStream(filename);
+                //                System.err.println(myid + " reading from cache");
+                FileInputStream   istream = new FileInputStream(getFilename());
                 ObjectInputStream ois     = new ObjectInputStream(istream);
-                floats = values = (float[][]) ois.readObject();
+                myFloatValues = values = (float[][]) ois.readObject();
                 ois.close();
             } catch (Exception exc) {
                 exc.printStackTrace();
@@ -382,7 +447,7 @@ public class CachedFlatField extends FlatField {
      */
     public Data getSample(int index) throws VisADException, RemoteException {
         msg("getSample");
-        float[][] values = floats;
+        float[][] values = myFloatValues;
         if (values == null) {
             msg(Thread.currentThread() + " Reading cache");
             values = readCache();
@@ -484,7 +549,7 @@ public class CachedFlatField extends FlatField {
      */
     public float[][] unpackFloats(boolean copy) throws VisADException {
         msg("unpackFloats");
-        float[][] values = floats;
+        float[][] values = myFloatValues;
         if (values == null) {
             msg(Thread.currentThread() + " Reading cache");
             values = readCache();
@@ -517,10 +582,20 @@ public class CachedFlatField extends FlatField {
         if ( !shouldCache) {
             return;
         }
-        if ( !haveWritten) {
+        if ( !haveDataOnDisk()) {
             writeCache();
         }
-        floats = null;
+        myFloatValues = null;
+    }
+
+
+    private String getFilename() {
+        if(filename == null && cacheDir != null) {
+            String uniqueName = "field_" + System.currentTimeMillis() + "_"
+                + (cnt++);
+            filename = IOUtil.joinDir(cacheDir, uniqueName);
+        }
+        return filename;
     }
 
 
@@ -529,18 +604,18 @@ public class CachedFlatField extends FlatField {
      */
     private void writeCache() {
         synchronized (MUTEX) {
-            float[][] values = floats;
-
-            if ((values == null) || (cacheDir == null)) {
+            if(getFilename()==null) return;
+            float[][] values = myFloatValues;
+            if (values == null) {
                 return;
             }
             try {
-                FileOutputStream   ostream = new FileOutputStream(filename);
+                //                System.err.println(myid + " writing to cache");
+                FileOutputStream   ostream = new FileOutputStream(getFilename());
                 ObjectOutputStream p       = new ObjectOutputStream(ostream);
                 p.writeObject(values);
                 p.flush();
                 ostream.close();
-                haveWritten = true;
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }

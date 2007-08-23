@@ -61,6 +61,8 @@ import java.rmi.RemoteException;
  */
 public class GeoGridFlatField extends CachedFlatField {
 
+    private String readLabel="";
+
     /** _more_ */
     private GriddedSet domainSet;
 
@@ -148,9 +150,11 @@ public class GeoGridFlatField extends CachedFlatField {
                                    Unit[] units) throws VisADException {
 
         msg("GeoGridFlatField.cloneMe");
-        return new GeoGridFlatField(this, copy, type, domainSet,
+        CachedFlatField ccf = new GeoGridFlatField(this, copy, type, domainSet,
                                     rangeCoordSys, rangeCoordSysArray,
                                     rangeSets, units);
+        initClone(ccf,copy);
+        return ccf;
     }
 
 
@@ -190,10 +194,14 @@ public class GeoGridFlatField extends CachedFlatField {
         //        Misc.printStack("GeoGridFlatField.readData",15,null);
         Array arr;
         try {
+            System.err.println (myid +" GeoGridFlatField readData");
             msg("readData");
             Trace.call1("GeoGridFlatField.geogrid.readVolumeData");
             synchronized (readLock) {
+                LogUtil.message("CACHED:" + readLabel);
+                ucar.unidata.data.DataSourceImpl.incrOutstandingGetDataCalls();
                 arr = geoGrid.readVolumeData(timeIndex);
+                LogUtil.message("");
             }
             Trace.call2("GeoGridFlatField.geogrid.readVolumeData");
             // 3D grid with one level - slice to 2D grid
@@ -218,6 +226,8 @@ public class GeoGridFlatField extends CachedFlatField {
         } catch (IOException e) {
             LogUtil.logException("getFlatField read got IOException", e);
             return null;
+        } finally {
+            ucar.unidata.data.DataSourceImpl.decrOutstandingGetDataCalls();
         }
 
 
@@ -236,6 +246,9 @@ public class GeoGridFlatField extends CachedFlatField {
     }
 
 
+    public void setReadLabel(String s) {
+        readLabel = s;
+    }
 
 }
 
