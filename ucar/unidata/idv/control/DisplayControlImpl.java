@@ -164,7 +164,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         DisplayListener, PropertyChangeListener, ControlListener,
         Prototypable {
 
-    /** _more_ */
+    /** current version */
     private static final double CURRENT_VERSION = 2.2;
 
     /** version */
@@ -184,7 +184,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** Do we show in the main tabs */
     private boolean showInTabs = true;
 
-    /** _more_ */
+    /** version was set */
     private boolean versionWasSet = false;
 
     /** time labels */
@@ -793,7 +793,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** the skip value */
     private int skipValue = 0;
 
-    /** _more_ */
+    /** initial settings */
     private List initialSettings;
 
     /**
@@ -1974,9 +1974,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
     /**
-     * _more_
+     * Set the initial settings
      *
-     * @param settings _more_
+     * @param settings  the display settings
      */
     public void setInitialSettings(List settings) {
         initialSettings = settings;
@@ -2002,12 +2002,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
     /**
-     * _more_
+     * Apply a display setting to this control
      *
      *
-     * @param displaySetting _more_
+     * @param displaySetting  the settings to apply
      *
-     * @throws Exception _more_
+     * @throws Exception  problem setting settings
      */
     public void applyDisplaySetting(DisplaySetting displaySetting)
             throws Exception {
@@ -2015,11 +2015,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
     /**
-     * _more_
+     * Apply the property values in the list
      *
-     * @param props _more_
+     * @param props  list of property values
      *
-     * @throws Exception _more_
+     * @throws Exception  problem setting property values
      */
     public void applyPropertyValues(List props) throws Exception {
         for (int i = 0; i < props.size(); i++) {
@@ -4655,7 +4655,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @param field The field
      * @param pref If non-null add the "Set as preference" items
-     * @param property _more_
+     * @param property  the property
      *
      * @return The button
      */
@@ -4674,12 +4674,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
     /**
-     * _more_
+     * Show the popup for macros
      *
-     * @param popupBtn _more_
-     * @param field _more_
-     * @param pref _more_
-     * @param property _more_
+     * @param popupBtn   the popup button
+     * @param field      The text field associated with this popup
+     * @param pref       the preference to set
+     * @param property   the property
      */
     private void showMacroPopup(JButton popupBtn, final JTextComponent field,
                                 final String pref, String property) {
@@ -4736,11 +4736,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
     /**
-     * _more_
+     * Find displays based on the key
      *
-     * @param key _more_
+     * @param key  the key
      *
-     * @return _more_
+     * @return  List of  appropriate display
      */
     protected List findDisplays(String key) {
         List displays = getIdv().getDisplayControls();
@@ -4748,12 +4748,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
     /**
-     * _more_
+     * Find displays with the particular key in the list of displays
      *
-     * @param key _more_
-     * @param displays _more_
+     * @param key  key to look for
+     * @param displays  list of displays
      *
-     * @return _more_
+     * @return  the displays for that key
      */
     protected List findDisplays(String key, List displays) {
         List result = new ArrayList();
@@ -4811,10 +4811,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
     /**
-     * _more_
+     * Popup a category menu
      *
-     * @param categoryFld _more_
-     * @param categoryBtn _more_
+     * @param categoryFld the text field
+     * @param categoryBtn the button
      */
     private void popupCategoryMenu(JTextField categoryFld,
                                    JButton categoryBtn) {
@@ -4842,9 +4842,49 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public void showProperties() {
 
-        JTabbedPane jtp   = new JTabbedPane();
-        int         width = 20;
-        List        comps = new ArrayList();
+        JTabbedPane jtp = new JTabbedPane();
+        addPropertiesComponents(jtp);
+
+        ActionListener listener = new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                String cmd = event.getActionCommand();
+                if (cmd.equals(GuiUtils.CMD_OK)
+                        || cmd.equals(GuiUtils.CMD_APPLY)) {
+                    if ( !applyProperties()) {
+                        return;
+                    }
+                }
+                if (cmd.equals(GuiUtils.CMD_OK)
+                        || cmd.equals(GuiUtils.CMD_CANCEL)) {
+                    propertiesDialog.dispose();
+                    propertiesDialog = null;
+                }
+            }
+        };
+        JComponent buttons = GuiUtils.makeApplyOkCancelButtons(listener);
+        contents = GuiUtils.inset(GuiUtils.centerBottom(jtp, buttons), 5);
+        propertiesDialog = GuiUtils.createDialog("Properties -- "
+                + getTitle(), true);
+        propertiesDialog.getContentPane().add(contents);
+        propertiesDialog.pack();
+        Window f = GuiUtils.getWindow(contents);
+        if (f != null) {
+            GuiUtils.showDialogNearSrc(f, propertiesDialog);
+        } else {
+            propertiesDialog.setVisible(true);
+        }
+
+    }
+
+    /**
+     * Add tabs to the properties dialog.
+     *
+     * @param jtp  the JTabbedPane to add to
+     */
+    protected void addPropertiesComponents(JTabbedPane jtp) {
+
+        int  width = 20;
+        List comps = new ArrayList();
 
 
         categoryFld = new JTextField(displayCategory, width);
@@ -4917,23 +4957,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         comps.add(idFld);
         comps.add(new JLabel(" (for scripting)"));
 
-        ActionListener listener = new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                String cmd = event.getActionCommand();
-                if (cmd.equals(GuiUtils.CMD_OK)
-                        || cmd.equals(GuiUtils.CMD_APPLY)) {
-                    if ( !applyProperties()) {
-                        return;
-                    }
-                }
-                if (cmd.equals(GuiUtils.CMD_OK)
-                        || cmd.equals(GuiUtils.CMD_CANCEL)) {
-                    propertiesDialog.dispose();
-                    propertiesDialog = null;
-                }
-            }
-        };
-        JPanel settingsPanel         = getSettingsPanel();
+        JPanel settingsPanel = getSettingsPanel();
         if (settingsPanel != null) {
             comps.add(GuiUtils.filler());
             comps.add(GuiUtils.topLeft(settingsPanel));
@@ -4975,108 +4999,98 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
         }
 
-
-
-
-
-
-
-
-        JComponent buttons = GuiUtils.makeApplyOkCancelButtons(listener);
-        contents = GuiUtils.inset(GuiUtils.centerBottom(jtp, buttons), 5);
-        propertiesDialog = GuiUtils.createDialog("Properties -- "
-                + getTitle(), true);
-        propertiesDialog.getContentPane().add(contents);
-        propertiesDialog.pack();
-        Window f = GuiUtils.getWindow(contents);
-        if (f != null) {
-            GuiUtils.showDialogNearSrc(f, propertiesDialog);
-        } else {
-            propertiesDialog.setVisible(true);
-        }
-
     }
 
+
+
+
+
+
+
     /**
-     * _more_
+     * Add property values for this DisplaySettingsDialog
+     *
+     * @param dsd  the display settings dialog
      */
     protected void addPropertyValues(DisplaySettingsDialog dsd) {
         dsd.addPropertyValue(getDisplayCategory(), "displayCategory",
-                         "Display Category", "Labels");
+                             "Display Category", "Labels");
         dsd.addPropertyValue(getLegendLabelTemplate(), "legendLabelTemplate",
-                         "Legend Label", "Labels");
+                             "Legend Label", "Labels");
         dsd.addPropertyValue(getExtraLabelTemplate(), "extraLabelTemplate",
-                         "Extra Legend Labels", "Labels");
+                             "Extra Legend Labels", "Labels");
         dsd.addPropertyValue(getDisplayListTemplate(), "displayListTemplate",
-                         "Display Label", "Labels");
+                             "Display Label", "Labels");
 
 
 
         ColorTable ct = getColorTable();
         if (ct != null) {
             dsd.addPropertyValue(ct, "colorTable", "Color Table",
-                             SETTINGS_GROUP_DISPLAY);
+                                 SETTINGS_GROUP_DISPLAY);
         }
 
         if (colorRange != null) {
             dsd.addPropertyValue(colorRange, "range", "Range",
-                             SETTINGS_GROUP_DISPLAY);
+                                 SETTINGS_GROUP_DISPLAY);
         }
 
         if (contourInfo != null) {
-            dsd.addPropertyValue(contourInfo, "contourInfo", "Contour Settings",
-                             SETTINGS_GROUP_DISPLAY);
+            dsd.addPropertyValue(contourInfo, "contourInfo",
+                                 "Contour Settings", SETTINGS_GROUP_DISPLAY);
         }
 
         if (colorScaleInfo != null) {
             dsd.addPropertyValue(colorScaleInfo, "sharedColorScaleInfo",
-                             "Color Scale Settings", SETTINGS_GROUP_DISPLAY);
+                                 "Color Scale Settings",
+                                 SETTINGS_GROUP_DISPLAY);
         }
 
 
         if (displayUnit != null) {
             dsd.addPropertyValue(displayUnit, "settingsDisplayUnit",
-                             "Display Unit", SETTINGS_GROUP_DISPLAY);
+                                 "Display Unit", SETTINGS_GROUP_DISPLAY);
         }
 
 
         if (checkFlag(FLAG_LINEWIDTH)) {
             dsd.addPropertyValue(new Integer(lineWidth), "lineWidth",
-                             "Line Width", SETTINGS_GROUP_DISPLAY);
+                                 "Line Width", SETTINGS_GROUP_DISPLAY);
         }
         if (checkFlag(FLAG_SKIPFACTOR)) {
             dsd.addPropertyValue(new Integer(skipValue), "skipValue",
-                             "Skip Value", SETTINGS_GROUP_DISPLAY);
+                                 "Skip Value", SETTINGS_GROUP_DISPLAY);
         }
         if (checkFlag(FLAG_ZPOSITION) && useZPosition()) {
             dsd.addPropertyValue(new Double(getZPosition()), "zPosition",
-                             "Vertical Position", SETTINGS_GROUP_DISPLAY);
+                                 "Vertical Position", SETTINGS_GROUP_DISPLAY);
         }
         if (checkFlag(FLAG_COLOR) && (color != null)) {
             dsd.addPropertyValue(color, "color", getColorWidgetLabel(),
-                             SETTINGS_GROUP_DISPLAY);
+                                 SETTINGS_GROUP_DISPLAY);
         }
 
 
         dsd.addPropertyValue(new Boolean(getDisplayVisibility()),
-                         "displayVisibility", "Visibility",
-                         SETTINGS_GROUP_FLAGS);
+                             "displayVisibility", "Visibility",
+                             SETTINGS_GROUP_FLAGS);
         dsd.addPropertyValue(new Boolean(getLockVisibilityToggle()),
-                         "lockVisibilityToggle", "Lock Visibility Toggle",
-                         SETTINGS_GROUP_FLAGS);
+                             "lockVisibilityToggle",
+                             "Lock Visibility Toggle", SETTINGS_GROUP_FLAGS);
         dsd.addPropertyValue(new Boolean(getShowInDisplayList()),
-                         "showInDisplayList", "Show In Display List",
-                         SETTINGS_GROUP_FLAGS);
+                             "showInDisplayList", "Show In Display List",
+                             SETTINGS_GROUP_FLAGS);
         dsd.addPropertyValue(new Boolean(getUseFastRendering()),
-                         "useFastRendering", "Use Fast Rendering",
-                         SETTINGS_GROUP_FLAGS);
+                             "useFastRendering", "Use Fast Rendering",
+                             SETTINGS_GROUP_FLAGS);
         dsd.addPropertyValue(new Boolean(getUseTimesInAnimation()),
-                         "useTimesInAnimation", "Use Times In Animation",
-                         SETTINGS_GROUP_FLAGS);
-        dsd.addPropertyValue(new Boolean(getCanDoRemoveAll()), "canDoRemoveAll",
-                         "Remove on Remove All", SETTINGS_GROUP_FLAGS);
+                             "useTimesInAnimation", "Use Times In Animation",
+                             SETTINGS_GROUP_FLAGS);
+        dsd.addPropertyValue(new Boolean(getCanDoRemoveAll()),
+                             "canDoRemoveAll", "Remove on Remove All",
+                             SETTINGS_GROUP_FLAGS);
         dsd.addPropertyValue(new Boolean(getShowNoteText()), "showNoteText",
-                         "Show Note Text", SETTINGS_GROUP_FLAGS);
+                             "Show Note Text", SETTINGS_GROUP_FLAGS);
 
 
     }
@@ -5102,11 +5116,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
     /**
-     * _more_
-     *
+     * Show the DisplaySettingsDialog
      */
     public void showDisplaySettingsDialog() {
-        DisplaySettingsDialog displaySettingsDialog = new DisplaySettingsDialog(this);
+        DisplaySettingsDialog displaySettingsDialog =
+            new DisplaySettingsDialog(this);
     }
 
 
@@ -6708,9 +6722,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
     /**
-     * _more_
+     * Set the display unit from the settings
      *
-     * @param newUnit _more_
+     * @param newUnit  the new unit
      */
     public void setSettingsDisplayUnit(Unit newUnit) {
         setNewDisplayUnit(newUnit, true);
@@ -9117,12 +9131,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
     /**
-     * _more_
+     * Set the shared color scale info
      *
-     * @param newInfo _more_
+     * @param newInfo  the new information
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException    remote problem
+     * @throws VisADException     VisAD problem
      */
     public void setSharedColorScaleInfo(ColorScaleInfo newInfo)
             throws VisADException, RemoteException {

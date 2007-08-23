@@ -106,7 +106,7 @@ import javax.swing.border.BevelBorder;
 public abstract class AerologicalSoundingControl extends DisplayControlImpl implements AerologicalDisplayConstants {
 
     /** The view manager for this control */
-    protected SoundingViewManager viewManager;
+    protected SoundingViewManager soundingView;
 
     /**
      * The Skew-T log p display.
@@ -281,14 +281,22 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         aeroDisplay = AerologicalDisplay.getInstance(displayType,
                 getGraphicsConfiguration(true, false));
         hodoDisplay = new Hodograph3DDisplay();
-        viewManager = new SoundingViewManager(getViewContext(), aeroDisplay,
+        if (soundingView != null) {
+            //If the ViewManager is non-null it means we have been unpersisted.
+            //If so, we initialie the VM with the IDV
+            soundingView.setSoundingDisplay(aeroDisplay);
+            soundingView.initAfterUnPersistence(getIdv());
+        } else {
+            soundingView = new SoundingViewManager(
+                getViewContext(), aeroDisplay,
                 new ViewDescriptor("SkewTView"),
                 "showControlLegend=false;wireframe=false;aniReadout=false");
+        }
 
         //TODO: For now don't do this because it screws up the image dumping.
         //If and when we put this back we need to not destroy the
         //VM in our doRemove method
-        addViewManager(viewManager);
+        addViewManager(soundingView);
         // aeroDisplay.setPointMode(true);  // for debugging
         locLabel   = new JLabel(" ", JLabel.LEFT);
         tempProRef = new DataReferenceImpl("TemperatureProfile");
@@ -332,7 +340,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
         parcelPath.setLineWidth(2);
         parcelPath.setColor(java.awt.Color.pink);
-        addDisplayable(parcelPath, viewManager);
+        addDisplayable(parcelPath, soundingView);
 
         parVirtTempPath = new DisplayableDataRef(
             aeroCellNet.getParcelVirtualTemperatureProfileRef());
@@ -340,7 +348,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         parVirtTempPath.setLineWidth(2);
         parVirtTempPath.setLineStyle(GraphicsModeControl.DASH_STYLE);
         parVirtTempPath.setColor(java.awt.Color.pink);
-        addDisplayable(parVirtTempPath, viewManager);
+        addDisplayable(parVirtTempPath, soundingView);
 
         envVirtTempPath = new DisplayableDataRef(
             aeroCellNet.getEnvironmentVirtualTemperatureProfileRef());
@@ -348,7 +356,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         envVirtTempPath.setLineWidth(2);
         envVirtTempPath.setLineStyle(GraphicsModeControl.DASH_STYLE);
         envVirtTempPath.setColor(java.awt.Color.red);
-        addDisplayable(envVirtTempPath, viewManager);
+        addDisplayable(envVirtTempPath, soundingView);
 
         readoutTable = new AerologicalReadoutTable();
 
@@ -669,6 +677,32 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         }
     }
 
+    /**
+     * Add tabs to the properties dialog.
+     *
+     * @param jtp  the JTabbedPane to add to
+     */
+    public void addPropertiesComponents(JTabbedPane jtp) {
+        super.addPropertiesComponents(jtp);
+        if (soundingView != null) {
+            jtp.add("View", soundingView.getPropertiesComponent());
+        }
+    }
+
+    /**
+     * Apply the properties
+     *
+     * @return true if successful
+     */
+    public boolean doApplyProperties() {
+        if ( !super.doApplyProperties()) {
+            return false;
+        }
+        if (soundingView != null) {
+            return soundingView.applyProperties();
+        }
+        return true;
+    }
 
     /**
      * Remove this control. Call the parent  class doRemove and clears
@@ -680,9 +714,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
     public void doRemove() throws VisADException, RemoteException {
         super.doRemove();
         /* Don't need to do this since we have the base class handle the view manager
-        if (viewManager != null) {
-            viewManager.destroy();
-            viewManager = null;
+        if (soundingView != null) {
+            soundingView.destroy();
+            soundingView = null;
         }
         */
         aeroDisplay     = null;
@@ -1149,7 +1183,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
         controlArea.add(GuiUtils.inset(viewOptions, 4));
 
-        //GuiUtils.leftRight(viewManager.getContents (),
+        //GuiUtils.leftRight(soundingView.getContents (),
         //hodoDisplay.getComponent()), controlArea);
 
         JScrollPane sp =
@@ -1159,17 +1193,17 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         sp.setViewportBorder(
             BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-        JSplitPane spl = GuiUtils.hsplit(sp, viewManager.getContents(), .35);
+        JSplitPane spl = GuiUtils.hsplit(sp, soundingView.getContents(), .35);
         /*
         JSplitPane spl =
             GuiUtils
                 .hsplit(sp, GuiUtils
-                    .hsplit(viewManager.getContents(), hodoDisplay
+                    .hsplit(soundingView.getContents(), hodoDisplay
                         .getComponent(), .50), .35);
         */
         spl.setOneTouchExpandable(true);
         Container contents = GuiUtils.topCenterBottom(locLabel,
-        // GuiUtils.hbox(sp, viewManager.getContents(), hodoDisplay.getComponent()),
+        // GuiUtils.hbox(sp, soundingView.getContents(), hodoDisplay.getComponent()),
         spl, controlArea);
 
         return contents;
@@ -1322,7 +1356,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         super.getViewMenuItems(menus, forMenuBar);
 
         if (forMenuBar) {
-            JMenu svMenu = viewManager.makeViewMenu();
+            JMenu svMenu = soundingView.makeViewMenu();
             svMenu.setText("Chart");
             menus.add(svMenu);
         }
@@ -1556,6 +1590,24 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             return "Emagram";
         }
         return displayType;
+    }
+
+    /**
+     *  Set the SoundingView property.
+     *
+     *  @param value The new value for SoundingView
+     */
+    public void setSoundingView(SoundingViewManager value) {
+        soundingView = value;
+    }
+
+    /**
+     *  Get the SoundingView property.
+     *
+     *  @return The SoundingView
+     */
+    public SoundingViewManager getSoundingView() {
+        return soundingView;
     }
 
 }

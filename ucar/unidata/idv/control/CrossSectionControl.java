@@ -348,7 +348,7 @@ public abstract class CrossSectionControl extends GridDisplayControl {
 
         vcsDisplay.setVisible(true);
         if (crossSectionView != null) {
-            //If the ViewManaget is non-null it means we have been unpersisted.
+            //If the ViewManager is non-null it means we have been unpersisted.
             //If so, we initialie the VM with the IDV
             crossSectionView.initAfterUnPersistence(getIdv());
         } else {
