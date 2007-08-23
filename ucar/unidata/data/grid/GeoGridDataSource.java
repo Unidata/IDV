@@ -170,6 +170,7 @@ public class GeoGridDataSource extends GridDataSource {
 
 
 
+    private boolean cacheFlatFields = false;
 
     /**
      * Default constructor
@@ -1582,6 +1583,24 @@ public class GeoGridDataSource extends GridDataSource {
         oldSourceFromBundles = value;
     }
 
+
+/**
+Set the CacheFlatFields property.
+
+@param value The new value for CacheFlatFields
+**/
+public void setCacheFlatFields (boolean value) {
+	cacheFlatFields = value;
+}
+
+/**
+Get the CacheFlatFields property.
+
+@return The CacheFlatFields
+**/
+public boolean getCacheFlatFields () {
+	return cacheFlatFields;
+}
 
 
 }

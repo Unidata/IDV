@@ -130,13 +130,13 @@ public class GeoGridAdapter {
             GeoGridAdapter.class.getName());
 
     /** the associated data source (for caching) */
-    private DataSourceImpl dataSource;
+    private GeoGridDataSource dataSource;
 
     /** extra key for caching */
     private Object extraCacheKey;
 
-    /** Do we read the dat aright away r do we use a GoeGridFlatField */
-    private boolean lazyEvaluation = false;
+    /** Do we read the data right away or do we use a GeoGridFlatField */
+    private boolean lazyEvaluation = true;
 
 
     /** the geogrid to adapt */
@@ -999,7 +999,7 @@ public class GeoGridAdapter {
             .getTimeAxis() != null)
                ? getSequence()
                : (getBaseTime() == null)
-                 ? getFlatField(0)
+                 ? getFlatField(0,"")
                  : makeSequence(null);
     }
 
@@ -1016,13 +1016,13 @@ public class GeoGridAdapter {
      *
      * @throws VisADException  problem creating the FlatField
      */
-    private FlatField getFlatField(int timeIndex) throws VisADException {
+    private CachedFlatField getFlatField(int timeIndex,String readLabel) throws VisADException {
         List cacheKey = Misc.newList(geoGrid.getName(),
                                      new Integer(timeIndex));
         if (extraCacheKey != null) {
             cacheKey.add(extraCacheKey);
         }
-        FlatField retField = (FlatField) dataSource.getCache(cacheKey);
+        CachedFlatField retField = (CachedFlatField) dataSource.getCache(cacheKey);
         if (retField != null) {
             return retField;
         }
@@ -1045,6 +1045,7 @@ public class GeoGridAdapter {
                              paramType);
         if ( !makeGeoGridFlatField) {
             try {
+                LogUtil.message(readLabel);
                 Trace.call1("GeoGridAdapter.geogrid.readVolumeData");
                 arr = geoGrid.readVolumeData(timeIndex);
                 Trace.call2("GeoGridAdapter.geogrid.readVolumeData");
@@ -1091,6 +1092,8 @@ public class GeoGridAdapter {
         } else {
             GeoGridFlatField ggff = new GeoGridFlatField(geoGrid, readLock,
                                         timeIndex, domainSet, ffType);
+            ggff.setShouldCache(dataSource.getCacheFlatFields());
+            ggff.setReadLabel(readLabel);
             retField = ggff;
             //            ggff.unpackFloats(false);
 
@@ -1154,6 +1157,7 @@ public class GeoGridAdapter {
             } else {
                 times = timeIndices;
             }
+            Range[]sampleRanges =null;
             StringBuffer testModeBuffer = null;
             for (int i = 0; i < times.length; i++) {
                 if ( !JobManager.getManager().canContinue(loadId)) {
@@ -1167,7 +1171,7 @@ public class GeoGridAdapter {
                         time = getBaseTime();  // will be null if not found
                         if (time == null) {
                             if (timeAxis == null) {
-                                return getFlatField(0);
+                                return getFlatField(0,"");
                             } else {
                                 // return current time.
                                 // probably not good, but what the hey.
@@ -1180,13 +1184,17 @@ public class GeoGridAdapter {
                     log_.debug("    data time " + time);
 
 
-                    try {
-                        LogUtil.message("Time: " + (i + 1) + "/"
+                    String readLabel = "Time: " + (i + 1) + "/"
                                         + times.length + " " + paramName
-                                        + " From: " + dataSource.toString());
+                        + " From: " + dataSource.toString();
+                    try {
+                        CachedFlatField sample = getFlatField(times[i], readLabel);
+                        if(sampleRanges == null) {
+                            sampleRanges = sample.getRanges(true);
+                        } else {
+                            sample.setSampleRanges(sampleRanges);
+                        }
 
-
-                        FlatField sample = getFlatField(times[i]);
                         if ((sample != null) && !sample.isMissing()) {
                             if (lazyEvaluation) {
                                 //If we are running under lazy evaluation then
@@ -1212,6 +1220,7 @@ public class GeoGridAdapter {
                 }
             }
 
+            System.err.println ("GeoGridAdapter DONE");
             log_.debug("    found " + gridMap.size() + " times");
 
             java.util.Set keySet = gridMap.keySet();
