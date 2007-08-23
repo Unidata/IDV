@@ -25,6 +25,7 @@ package ucar.unidata.idv.control;
 
 
 import ucar.unidata.idv.DisplayConventions;
+import ucar.unidata.idv.SoundingViewManager;
 import ucar.unidata.idv.ViewDescriptor;
 import ucar.unidata.idv.ViewManager;
 
@@ -105,7 +106,7 @@ import javax.swing.border.BevelBorder;
 public abstract class AerologicalSoundingControl extends DisplayControlImpl implements AerologicalDisplayConstants {
 
     /** The view manager for this control */
-    protected ViewManager viewManager;
+    protected SoundingViewManager viewManager;
 
     /**
      * The Skew-T log p display.
@@ -280,24 +281,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         aeroDisplay = AerologicalDisplay.getInstance(displayType,
                 getGraphicsConfiguration(true, false));
         hodoDisplay = new Hodograph3DDisplay();
-        viewManager = new ViewManager(
-            getViewContext(), aeroDisplay, new ViewDescriptor("SkewTView"),
-            "showControlLegend=false;wireframe=false;aniReadout=false") {
-            public boolean animationOk() {
-                return false;
-            }
-
-            public boolean getShowDisplayList() {
-                return true;
-            }
-
-            public void setShowDisplayList(boolean v) {
-                super.setShowDisplayList(true);
-            }
-
-            public void setColors(Color foreground, Color background) {}
-
-        };
+        viewManager = new SoundingViewManager(getViewContext(), aeroDisplay,
+                new ViewDescriptor("SkewTView"),
+                "showControlLegend=false;wireframe=false;aniReadout=false");
 
         //TODO: For now don't do this because it screws up the image dumping.
         //If and when we put this back we need to not destroy the
@@ -681,26 +667,6 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         } catch (Exception e) {
             logException(e);
         }
-    }
-
-
-
-
-    /**
-     * Get specific menu items for the View menu
-     *
-     * @param items items
-     * @param forMenuBar true for menu bar, false for popup
-     */
-    protected void getFileMenuItems(List items, boolean forMenuBar) {
-        super.getFileMenuItems(items, forMenuBar);
-        JMenuItem saveButton = new JMenuItem("Save Image...");
-        saveButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                viewManager.doSaveImageInThread();
-            }
-        });
-        items.add(saveButton);
     }
 
 
@@ -1346,15 +1312,21 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
     }
 
     /**
-     * Add an extra menu for configuration
+     * Add the  relevant view menu items into the list
      *
-     * @param menus      List of extra menus
+     * @param menus List of menu items
      * @param forMenuBar Is this for the menu in the window's menu bar or
      *                   for a popup menu in the legend
      */
-    protected void getExtraMenus(List menus, boolean forMenuBar) {
+    protected void getViewMenuItems(List menus, boolean forMenuBar) {
+        super.getViewMenuItems(menus, forMenuBar);
 
-        super.getExtraMenus(menus, forMenuBar);
+        if (forMenuBar) {
+            JMenu svMenu = viewManager.makeViewMenu();
+            svMenu.setText("Chart");
+            menus.add(svMenu);
+        }
+
         JMenu items = new JMenu("Customize");
         if (forMenuBar) {
             items.setMnemonic(GuiUtils.charToKeyCode("C"));
