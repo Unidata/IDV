@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.idv;
 
 
@@ -171,8 +170,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** For the foreground color */
     public static final String PREF_FGCOLOR = "View.ForegroundColor";
 
-    
-    
+
+
     /** For the display list font */
     public static final String PREF_DISPLAYLISTFONT = "View.DisplayListFont";
 
@@ -221,7 +220,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
     /** For the currently selected panel. */
     public static final String PREF_BORDERCOLOR = "View.BorderHighlightColor";
-    
+
     /** line border */
     private static final Border lineBorder =
         BorderFactory.createLineBorder(Color.gray);
@@ -920,15 +919,25 @@ public class ViewManager extends SharableImpl implements ActionListener,
         };
 
 
-        JComponent  buttons = GuiUtils.makeApplyOkCancelButtons(listener);
-        JTabbedPane tabbedPane       = new JTabbedPane();
-        addPropertiesComponents(tabbedPane);
-        JComponent comp = GuiUtils.inset(GuiUtils.centerBottom(tabbedPane,
-                              buttons), 5);
+        JComponent buttons = GuiUtils.makeApplyOkCancelButtons(listener);
+        JComponent comp =
+            GuiUtils.inset(GuiUtils.centerBottom(getPropertiesComponent(),
+                buttons), 5);
         propertiesDialog.getContentPane().add(comp);
         propertiesDialog.pack();
         GuiUtils.showDialogNearSrc(viewMenu, propertiesDialog);
         //        propertiesDialog.show();
+    }
+
+    /**
+     * Get  the component for setting properties on the  display.
+     *
+     * @return the component
+     */
+    public JComponent getPropertiesComponent() {
+        JTabbedPane tabbedPane = new JTabbedPane();
+        addPropertiesComponents(tabbedPane);
+        return tabbedPane;
     }
 
     /**
@@ -1104,7 +1113,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      *
      * @return true if successful
      */
-    protected boolean applyProperties() {
+    public boolean applyProperties() {
         int width  = 0;
         int height = 0;
         if (fullScreenWidthFld.getText().trim().equals("")
@@ -1428,7 +1437,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             timelineDialog.pack();
             timelineDialog.setLocation(200, 200);
         }
-        timelineDialog.show();
+        timelineDialog.setVisible(true);
         GuiUtils.toFront(timelineDialog);
     }
 
@@ -1846,8 +1855,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                       "", true));
         props.add(new BooleanProperty(PREF_SHAREVIEWS, "Share Views", "",
                                       getSharing()));
-        props.add(new BooleanProperty(PREF_ANIREADOUT,
-                                      "Show Times In View",
+        props.add(new BooleanProperty(PREF_ANIREADOUT, "Show Times In View",
                                       "Toggle animation readout in display",
                                       false));
         props.add(
@@ -3956,6 +3964,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         return master;
     }
 
+
     /**
      * Make the DisplayMaster for this ViewManger. Subclasses should
      * override.
@@ -4819,7 +4828,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         dialog.getContentPane().add(GuiUtils.inset(contents, 5));
         dialog.pack();
         dialog.setLocation(GuiUtils.getLocation(null));
-        dialog.show();
+        dialog.setVisible(true);
     }
 
 
@@ -5069,12 +5078,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
     /**
      * Sets the color used to denote the currently selected panel.
-     * 
+     *
      * @param c The new color for the currently selected panel's border.
      */
     public static void setHighlightBorder(Color c) {
-    	borderHighlightColor = c;
-    	highlightBorder = null;    	
+        borderHighlightColor = c;
+        highlightBorder      = null;
     }
 
     /**
@@ -5220,7 +5229,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         } else {
             fullScreenWindow.setLocation(20, 20);
         }
-        fullScreenWindow.show();
+        fullScreenWindow.setVisible(true);
     }
 
 
@@ -5591,3 +5600,4 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
 }
+

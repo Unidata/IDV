@@ -374,7 +374,7 @@ public abstract class NavigatedViewManager extends ViewManager {
      *
      * @return true if successful
      */
-    protected boolean applyProperties() {
+    public boolean applyProperties() {
         if ( !super.applyProperties()) {
             return false;
         }

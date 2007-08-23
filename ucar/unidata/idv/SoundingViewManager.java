@@ -21,11 +21,11 @@
  */
 
 
-
 package ucar.unidata.idv;
 
 
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.Misc;
 
 import ucar.unidata.view.sounding.AerologicalDisplay;
 
@@ -146,6 +146,16 @@ public class SoundingViewManager extends ViewManager {
         return AerologicalDisplay.getInstance(
             AerologicalDisplay.SKEWT_DISPLAY);
     }
+
+    /**
+     * Set the sounding display
+     *
+     * @param ad  the sounding display
+     */
+    public void setSoundingDisplay(AerologicalDisplay ad) {
+        setDisplayMaster(ad);
+    }
+
 
     /**
      * Don't show the side legend

@@ -389,7 +389,7 @@ public class TransectViewManager extends NavigatedViewManager {
      *
      * @return true if successfule
      */
-    protected boolean applyProperties() {
+    public boolean applyProperties() {
         if ( !super.applyProperties()) {
             return false;
         }
