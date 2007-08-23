@@ -3,7 +3,7 @@
 
 export JAVA_HOME=/opt/jdk
 export ANT_HOME=/upc/share/jakarta-ant
-export PATH=$JAVA_HOME/bin:$ANT_HOME/bin:/usr/bin:/opt/bin:/bin
+export PATH=$JAVA_HOME/bin:$ANT_HOME/bin:/usr/bin:/opt/csw/bin:/opt/bin:/bin
 export CVSROOT=/upc/share/CVS
 export ANT_OPTS=-Xmx256m
 export CLASSPATH=
