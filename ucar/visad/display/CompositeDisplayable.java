@@ -304,6 +304,9 @@ public class CompositeDisplayable extends Displayable {
      */
     protected void destroy() throws RemoteException, VisADException {
         synchronized (MUTEX) {
+            for (Iterator iter = iterator(); iter.hasNext(); ) {
+                ((Displayable) iter.next()).destroy();
+            }
             displayables = null;
         }
         super.destroy();
@@ -337,9 +340,7 @@ public class CompositeDisplayable extends Displayable {
             }
             setScalarMapSet(newSet);
         }
-
         fireListDataIntervalRemoved(index, index);
-
         return displayable;
     }
 
@@ -798,9 +799,6 @@ public class CompositeDisplayable extends Displayable {
      * @throws VisADException _more_
      */
     public void destroyAll() throws RemoteException, VisADException {
-        for (Iterator iter = iterator(); iter.hasNext(); ) {
-            ((Displayable) iter.next()).destroy();
-        }
         destroy();
     }
 

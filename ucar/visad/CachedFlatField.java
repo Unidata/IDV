@@ -412,7 +412,7 @@ public class CachedFlatField extends FlatField {
             try {
                 //            System.err.println ("*** Reading from file");
                 //                System.err.println(myid + " reading from cache");
-                System.err.println(myid + " reading from file cache");
+                //                System.err.println(myid + " reading from file cache");
                 FileInputStream   istream = new FileInputStream(getFilename());
                 ObjectInputStream ois     = new ObjectInputStream(istream);
                 myFloatValues = values = (float[][]) ois.readObject();
@@ -605,7 +605,7 @@ public class CachedFlatField extends FlatField {
                 return;
             }
             try {
-                System.err.println(myid + " writing to file cache " + getFilename());
+                //                System.err.println(myid + " writing to file cache " + getFilename());
                 FileOutputStream   ostream = new FileOutputStream(getFilename());
                 ObjectOutputStream p       = new ObjectOutputStream(ostream);
                 p.writeObject(values);

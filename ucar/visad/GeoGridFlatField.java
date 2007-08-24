@@ -203,7 +203,7 @@ public class GeoGridFlatField extends CachedFlatField {
         //        Misc.printStack("GeoGridFlatField.readData",15,null);
         Array arr;
         try {
-            System.err.println (myid +" GeoGridFlatField readData");
+            //            System.err.println (myid +" GeoGridFlatField readData");
             msg("readData");
             Trace.call1("GeoGridFlatField.geogrid.readVolumeData");
             synchronized (getReadLock()) {

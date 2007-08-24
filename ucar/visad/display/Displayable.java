@@ -520,6 +520,10 @@ public abstract class Displayable {
                 //Trace.call2("addConstantMaps");
             }
         }
+        //        System.err.println ("addConstantMaps " + getClass().getName() + " " + constantMaps.size());
+
+        
+
     }
 
     /**
