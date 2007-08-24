@@ -278,6 +278,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
      */
     boolean init() throws VisADException, RemoteException {
 
+        if (soundingView != null) {
+            displayType = soundingView.getChartType();
+        }
         aeroDisplay = AerologicalDisplay.getInstance(displayType,
                 getGraphicsConfiguration(true, false));
         hodoDisplay = new Hodograph3DDisplay();
@@ -289,8 +292,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         } else {
             soundingView = new SoundingViewManager(
                 getViewContext(), aeroDisplay,
-                new ViewDescriptor("SkewTView"),
-                "showControlLegend=false;wireframe=false;aniReadout=false");
+                new ViewDescriptor("SoundingView"),
+                "showControlLegend=false;wireframe=false;aniReadout=false;chartType="
+                + displayType);
         }
 
         //TODO: For now don't do this because it screws up the image dumping.
@@ -1358,9 +1362,10 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
         if (forMenuBar) {
             JMenu svMenu = soundingView.makeViewMenu();
-            svMenu.setText("Chart");
+            svMenu.setText("Sounding Chart");
             menus.add(svMenu);
         }
+        /*
 
         JMenu items = new JMenu("Customize");
         if (forMenuBar) {
@@ -1430,6 +1435,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         items.add(displayTypes);
 
         menus.add(items);
+        */
     }
 
     /**
@@ -1583,14 +1589,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
      * @return the label
      */
     public static String getTypeLabel(String displayType) {
-        if (displayType.equals(SKEWT_DISPLAY)) {
-            return "Skew T";
-        } else if (displayType.equals(STUVE_DISPLAY)) {
-            return "Stuve";
-        } else if (displayType.equals(EMAGRAM_DISPLAY)) {
-            return "Emagram";
-        }
-        return displayType;
+        return SoundingViewManager.getTypeLabel(displayType);
     }
 
     /**
