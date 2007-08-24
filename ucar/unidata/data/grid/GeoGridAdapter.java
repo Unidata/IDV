@@ -130,6 +130,8 @@ public class GeoGridAdapter {
         ucar.unidata.util.LogUtil.getLogInstance(
             GeoGridAdapter.class.getName());
 
+    public  String cacheFile;
+
     /** the associated data source (for caching) */
     private GeoGridDataSource dataSource;
 
@@ -1017,13 +1019,15 @@ public class GeoGridAdapter {
      * @throws VisADException  problem creating the FlatField
      */
     private CachedFlatField getFlatField(int timeIndex,String readLabel) throws VisADException {
-        List cacheKey = Misc.newList(geoGrid.getName(),
-                                     new Integer(timeIndex));
+        String filename = IOUtil.joinDir(dataSource.getCachePath(),cacheFile+"_t_"+timeIndex+".dat");
+
+        List cacheKey = Misc.newList(filename);
         if (extraCacheKey != null) {
             cacheKey.add(extraCacheKey);
         }
         CachedFlatField retField = (CachedFlatField) dataSource.getCache(cacheKey);
         if (retField != null) {
+            System.err.println ("in cache");
             return retField;
         }
         Trace.call1("GeoGridAdapter.getFlatField:" + paramName + ":time="
@@ -1093,8 +1097,7 @@ public class GeoGridAdapter {
             GeoGridFlatField ggff = new GeoGridFlatField(geoGrid, readLock,
                                         timeIndex, domainSet, ffType);
 
-            if(dataSource.getCacheFlatFields()) {
-                String filename = IOUtil.joinDir(dataSource.getCachePath(),"grid_"+IOUtil.cleanFileName(cacheKey.toString()));
+            if(dataSource.getCacheFlatFields() &&cacheFile!=null) {
                 //                System.err.println ("file:" + filename);
                 ggff.setFilename(filename);
                 ggff.setShouldCache(true);

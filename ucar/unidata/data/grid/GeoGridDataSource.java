@@ -1037,21 +1037,29 @@ public class GeoGridDataSource extends GridDataSource {
         // System.out.println("need volume = " + needVolume);
 
 
+        StringBuffer filename = new StringBuffer("grid_"+paramName);
+
         try {
-            ucar.ma2.Range levelRange = ((fromLevelIndex >= 0)
-                                         && (toLevelIndex >= 0)
-                                         && !needVolume)
-                                        ? new ucar.ma2.Range(fromLevelIndex,
-                                            toLevelIndex)
-                                        : null;
+            ucar.ma2.Range levelRange = null;
+            if(fromLevelIndex >= 0 
+               && toLevelIndex >= 0
+               && !needVolume) {
+                levelRange = new ucar.ma2.Range(fromLevelIndex,  toLevelIndex);
+                filename.append("_r_" +fromLevelIndex+"_"+toLevelIndex);
+            }
+
             if ((geoSelection != null) && geoSelection.getHasValidState()) {
                 //System.err.println("subsetting using:" + geoSelection.getLatLonRect());
                 extraCacheKey = geoSelection;
                 if (levelRange != null) {
                     extraCacheKey = Misc.newList(extraCacheKey, levelRange);
                 }
-
-
+                filename.append("_x_" +  geoSelection.getXStrideToUse());
+                filename.append("_y_" +  geoSelection.getYStrideToUse());
+                filename.append("_z_" +  geoSelection.getZStrideToUse());
+                if(geoSelection.getLatLonRect()!=null) {
+                    filename.append("_rect_" +  geoSelection.getLatLonRect());
+                }
                 geoGrid = geoGrid.subset(null, levelRange,
                                          geoSelection.getLatLonRect(),
                                          geoSelection.getZStrideToUse(),
@@ -1072,6 +1080,7 @@ public class GeoGridDataSource extends GridDataSource {
                                      dataset.getNetcdfDataset(),
                                      extraCacheKey);
 
+        adapter.cacheFile = filename.toString();
         return adapter;
     }
 
