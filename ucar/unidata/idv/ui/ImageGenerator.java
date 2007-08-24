@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -601,9 +602,7 @@ public class ImageGenerator extends IdvManager {
                 return;
             }
         }
-        //        System.err.println ("done");
-        //        cleanup();
-        //        Misc.sleepSeconds(3600);
+
     }
 
 
@@ -961,10 +960,43 @@ public class ImageGenerator extends IdvManager {
         if (message == null) {
             message = applyMacros(XmlUtil.getChildText(node));
         }
-        Runtime.getRuntime().gc();
-        System.out.println(Misc.usedMemory()/1000 + " " +message);
+        System.out.println(message);
         return true;
     }
+
+
+    /**
+     * process the given node
+     *
+     * @param node Node to process
+     *
+     * @return keep going
+     *
+     * @throws Throwable On badness
+     */
+    protected boolean processTagAsktocontinue(Element node) throws Throwable {
+        String message = applyMacros(node, ATTR_MESSAGE, (String) null);
+        if (message == null) {
+            message = applyMacros(XmlUtil.getChildText(node));
+        }
+        return GuiUtils.askOkCancel("ISL", message);
+    }
+
+
+    /**
+     * process the given node
+     *
+     * @param node Node to process
+     *
+     * @return keep going
+     *
+     * @throws Throwable On badness
+     */
+    protected boolean processTagGc(Element node) throws Throwable {
+        Runtime.getRuntime().gc();
+        return true;
+    }
+
 
 
     /**
@@ -1690,22 +1722,23 @@ public class ImageGenerator extends IdvManager {
 
     }
 
+    /**
+     * _more_
+     */
     private void cleanup() {
         getIdv().removeAllDisplays(false);
         getIdv().removeAllDataSources();
         idToDataSource = new Hashtable();
         ucar.unidata.util.CacheManager.clearCache();
-        //            Runtime.getRuntime().gc();
         if (getIdv().getArgsManager().getIsOffScreen()) {
             getIdv().getVMManager().removeAllViewManagers(true);
         }
         getIdv().getIdvUIManager().clearWaitCursor();
 
         double totalMemory   = (double) Runtime.getRuntime().maxMemory();
-        double highWaterMark =
-            (double) Runtime.getRuntime().totalMemory();
-        double freeMemory = (double) Runtime.getRuntime().freeMemory();
-        double usedMemory = (highWaterMark - freeMemory);
+        double highWaterMark = (double) Runtime.getRuntime().totalMemory();
+        double freeMemory    = (double) Runtime.getRuntime().freeMemory();
+        double usedMemory    = (highWaterMark - freeMemory);
         totalMemory   = totalMemory / 1000000.0;
         usedMemory    = usedMemory / 1000000.0;
         highWaterMark = highWaterMark / 1000000.0;
@@ -2689,6 +2722,9 @@ public class ImageGenerator extends IdvManager {
             props.put(DATE_PROPS[i], sdf.format(now));
         }
 
+
+
+        props.put("memory", "" + Misc.usedMemory());
 
         if (s.indexOf("${anim:") >= 0) {
             now = getAnimationTime();
