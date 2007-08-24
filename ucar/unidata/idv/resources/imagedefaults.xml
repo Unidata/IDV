@@ -566,27 +566,26 @@
      size="408 576"
      loc="204 288"
      mag="1 1"/>
+<!--
   <default
      pattern="GINIWEST/GHN14KVIS"
      key="LATLON"
      place="CENTER"
-     size="40 314"
      loc="20 -157"
      mag="1 1"/>
   <default
      pattern="GINIWEST/GHN14KWV"
      key="LATLON"
      place="CENTER"
-     size="40 314"
      loc="20 -157"
      mag="1 1"/>
   <default
      pattern="GINIWEST/GHN14KIR"
      key="LATLON"
      place="CENTER"
-     size="40 314"
      loc="20 -157"
      mag="1 1"/>
+-->
   <default
      pattern="GINIWEST/GHR1KVIS"
      key="LINELE"
