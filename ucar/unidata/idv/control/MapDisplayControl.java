@@ -1519,10 +1519,14 @@ public class MapDisplayControl extends DisplayControlImpl {
      * @throws VisADException _more_
      */
     public void doRemove() throws RemoteException, VisADException {
-        super.doRemove();
-        if (mapsHolder != null) {
-            mapsHolder.destroyAll();
+        List infos = getDisplayInfos();
+        if(infos!=null && infos.size()==0) {
+            theHolder.destroyAll();
         }
+        super.doRemove();
+        theHolder = null;
+        mapsHolder = null;
+        latLonHolder = null;
     }
 
 
