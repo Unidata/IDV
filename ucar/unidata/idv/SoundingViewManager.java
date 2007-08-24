@@ -127,9 +127,9 @@ public class SoundingViewManager extends ViewManager {
         showControlMenu = false;
         super.initializeViewMenu(viewMenu);
         viewMenu.add(makeColorMenu());
-        viewMenu.addSeparator();
-        viewMenu.add(GuiUtils.makeMenuItem("Properties", this,
-                                           "showPropertiesDialog"));
+        //viewMenu.addSeparator();
+        //viewMenu.add(GuiUtils.makeMenuItem("Properties", this,
+        //                                   "showPropertiesDialog"));
     }
 
 

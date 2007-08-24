@@ -684,8 +684,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
      */
     public void addPropertiesComponents(JTabbedPane jtp) {
         super.addPropertiesComponents(jtp);
+
         if (soundingView != null) {
-            jtp.add("View", soundingView.getPropertiesComponent());
+            jtp.add("Sounding Chart", soundingView.getPropertiesComponent());
         }
     }
 
