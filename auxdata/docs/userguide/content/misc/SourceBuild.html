@@ -72,24 +72,24 @@ You are now ready to install the IDV source.</li>
     <p><ul>
       <code class="command">jar&nbsp;&nbsp;xvf&nbsp;&nbsp;idv_src_<%idv.version%>.jar</code>
     </ul><p>
-    This will create a "metapps" directory underneath the install
+    This will create a "idv" directory underneath the install
     directory (where you unJAR'ed the file).</p>
   </li>
 
   <li>Next, you need to create a <code class="filename">lib</code>
       directory as a peer of the <code class="filename">ucar</code> 
-      directory under <code class="filename">metapps</code> 
+      directory under <code class="filename">idv</code> 
       that holds the ancillary JAR files from the 
       <code class="filename">IDV Binary distribution</code>
       that are needed to build the classes.  The structure will 
       look like this:
 
 <pre>
-metapps
-     |
-     +----ucar
-     |
-     +----lib (holds the ancillary jar files).
+idv
+   |
+   +----ucar
+   |
+   +----lib (holds the ancillary jar files).
 </pre>
 
   </li>
@@ -97,7 +97,7 @@ metapps
   <li>Change to the <code class="filename">lib</code>
       (if you are not already there). 
     <p><ul>
-      <code class="command">cd&nbsp;&nbsp;~/metapps/lib</code>
+      <code class="command">cd&nbsp;&nbsp;~/idv/lib</code>
     </ul><p>
   </li>
 
@@ -115,7 +115,7 @@ Now you should be able to build the IDV from scratch.
 
   <li>Change to the <code class="filename">ucar</code> directory.
     <p><ul>
-      <code class="command">cd&nbsp;&nbsp;~/metapps/ucar</code>
+      <code class="command">cd&nbsp;&nbsp;~/idv/ucar</code>
     </ul><p>
   </li>
 

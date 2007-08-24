@@ -106,24 +106,24 @@ You are now ready to install the IDV source.</li>
 
   <li>unJAR the source file. 
     [ht::cmdline {jar&nbsp;&nbsp;xvf&nbsp;&nbsp;idv_src_<%idv.version%>.jar}]
-    This will create a "metapps" directory underneath the install
+    This will create a "idv" directory underneath the install
     directory (where you unJAR'ed the file).</p>
   </li>
 
   <li>Next, you need to create a <code class="filename">lib</code>
       directory as a peer of the <code class="filename">ucar</code> 
-      directory under <code class="filename">metapps</code> 
+      directory under <code class="filename">idv</code> 
       that holds the ancillary JAR files from the 
       <code class="filename">IDV Binary distribution</code>
       that are needed to build the classes.  The structure will 
       look like this:
 
 <pre>
-metapps
-     |
-     +----ucar
-     |
-     +----lib (holds the ancillary jar files).
+idv
+   |
+   +----ucar
+   |
+   +----lib (holds the ancillary jar files).
 </pre>
 
   </li>
@@ -131,7 +131,7 @@ metapps
 
   <li>Change to the <code class="filename">lib</code>
       (if you are not already there). 
-      [ht::cmdline {cd&nbsp;&nbsp;<%workshop.homedir%>/metapps/lib}]
+      [ht::cmdline {cd&nbsp;&nbsp;<%workshop.homedir%>/idv/lib}]
   </li>
 
 
@@ -140,7 +140,7 @@ metapps
   </li>
 
 <ifdef flag_developerworkshop>
-<li> Change directory to metapps and unjar the auxdataforworkshop.jar:
+<li> Change directory to idv and unjar the auxdataforworkshop.jar:
 <br>
 [ht::cmdline {jar -xvf ~/auxdataforworkshop.jar}]
 Normally, this isn't needed for building the IDV but we'll use this  later
@@ -157,7 +157,7 @@ Now you should be able to build the IDV from scratch.
 <ol class="step">
 
   <li>Change to the <code class="filename">ucar</code> directory.
-      [ht::cmdline {cd&nbsp;&nbsp;<%workshop.homedir%>/metapps/ucar}]
+      [ht::cmdline {cd&nbsp;&nbsp;<%workshop.homedir%>/idv/ucar}]
   </li>
 
   <li>Execute the ant command to build 
@@ -195,7 +195,7 @@ Now you should be able to build the IDV from scratch.
 <ol class="step">
 
   <li>Change to the <code class="filename">ucar</code> directory.
-      [ht::cmdline {cd&nbsp;&nbsp;/home/idvdev/metapps/ucar}]
+      [ht::cmdline {cd&nbsp;&nbsp;/home/idvdev/idv/ucar}]
   </li>
 
   <li>Execute the ant command to build 
