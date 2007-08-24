@@ -48,6 +48,8 @@ import ucar.unidata.idv.IdvConstants;
 
 import ucar.unidata.idv.chooser.ThreddsHandler;
 
+import ucar.visad.CachedFlatField;
+
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.GuiUtils;
@@ -176,6 +178,8 @@ public class GeoGridDataSource extends GridDataSource {
     private boolean cacheFlatFields = false;
 
 
+    private String cachePath;
+
     /**
      * Default constructor
      */
@@ -231,6 +235,15 @@ public class GeoGridDataSource extends GridDataSource {
         //Make sure we pass filename up here - as opposed to calling
         //this (new File (filename)) because the new File (filename).getPath () != filename
         super(descriptor, files, "Geogrid data source", properties);
+    }
+
+
+    protected String getCachePath() {
+        if(cachePath == null && CachedFlatField.getCacheDir()!=null) {
+            String uniqueName = "grid_" + Misc.getUniqueId();
+            cachePath  = IOUtil.joinDir(CachedFlatField.getCacheDir(), uniqueName);
+        }
+        return cachePath;
     }
 
 
@@ -422,6 +435,7 @@ public class GeoGridDataSource extends GridDataSource {
      * Clear out the data set
      */
     public void reloadData() {
+        cachePath = null;
         myTimes   = null;
         dataset   = null;
         gcsVsTime = new Hashtable();
@@ -918,7 +932,7 @@ public class GeoGridDataSource extends GridDataSource {
                                 DataSelection givenDataSelection,
                                 Hashtable requestProperties)
             throws VisADException, RemoteException {
-        //        System.err.println ("GeoGridDataSource.getDataInner:" + dataChoice);
+        System.err.println ("\nGeoGridDataSource.getDataInner:" + dataChoice);
         synchronized (readLock) {
             return makeFieldImpl(dataChoice, givenDataSelection,
                                  requestProperties);

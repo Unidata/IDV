@@ -45,6 +45,7 @@ import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
 import ucar.unidata.geoloc.vertical.*;
 
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -1092,6 +1093,10 @@ public class GeoGridAdapter {
         } else {
             GeoGridFlatField ggff = new GeoGridFlatField(geoGrid, readLock,
                                         timeIndex, domainSet, ffType);
+
+            String filename = dataSource.getCachePath()+"_"+IOUtil.cleanFileName(cacheKey.toString());
+            System.err.println ("key:" + IOUtil.cleanFileName(cacheKey.toString()));
+            ggff.setFilename(filename);
             ggff.setShouldCache(dataSource.getCacheFlatFields());
             ggff.setReadLabel(readLabel);
             retField = ggff;
@@ -1220,7 +1225,7 @@ public class GeoGridAdapter {
                 }
             }
 
-            System.err.println ("GeoGridAdapter DONE");
+            //            System.err.println ("GeoGridAdapter DONE");
             log_.debug("    found " + gridMap.size() + " times");
 
             java.util.Set keySet = gridMap.keySet();
