@@ -311,6 +311,11 @@ public class CachedFlatField extends FlatField {
         cacheDir = f;
     }
 
+    public static File getCacheDir() {
+        return cacheDir;
+    }
+
+
     /**
      * Set the size where we start caching
      *
@@ -382,7 +387,7 @@ public class CachedFlatField extends FlatField {
     private float[][] readCache() throws VisADException {
         synchronized (MUTEX) {
             float[][] values = myFloatValues;
-            //DEBUG            System.err.println(myid + " in readCache");
+            //            System.err.println(myid + " in readCache");
             if (values != null) {
                 return values;
             }
@@ -407,7 +412,7 @@ public class CachedFlatField extends FlatField {
             try {
                 //            System.err.println ("*** Reading from file");
                 //                System.err.println(myid + " reading from cache");
-            //DEBUG                System.err.println(myid + " reading from file cache");
+                System.err.println(myid + " reading from file cache");
                 FileInputStream   istream = new FileInputStream(getFilename());
                 ObjectInputStream ois     = new ObjectInputStream(istream);
                 myFloatValues = values = (float[][]) ois.readObject();
@@ -574,6 +579,11 @@ public class CachedFlatField extends FlatField {
     }
 
 
+    public void  setFilename(String f) {
+        filename = f;
+    }
+
+
     private String getFilename() {
         if(filename == null && cacheDir != null) {
             String uniqueName = "field_" + System.currentTimeMillis() + "_"
@@ -595,7 +605,7 @@ public class CachedFlatField extends FlatField {
                 return;
             }
             try {
-            //DEBUG                System.err.println(myid + " writing to file cache " + getFilename());
+                System.err.println(myid + " writing to file cache " + getFilename());
                 FileOutputStream   ostream = new FileOutputStream(getFilename());
                 ObjectOutputStream p       = new ObjectOutputStream(ostream);
                 p.writeObject(values);
