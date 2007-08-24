@@ -153,7 +153,6 @@ public class GeoGridFlatField extends CachedFlatField {
         CachedFlatField ccf = new GeoGridFlatField(this, copy, type, domainSet,
                                     rangeCoordSys, rangeCoordSysArray,
                                     rangeSets, units);
-        initClone(ccf,copy);
         return ccf;
     }
 
@@ -178,12 +177,19 @@ public class GeoGridFlatField extends CachedFlatField {
                             Unit[] units,
                             float[][] floats) throws VisADException {
         super(type, domainSet, rangeCoordSys, rangeSets, units, floats);
-        this.readLock = new Object();
     }
 
 
     /** _more_          */
     public static Object ALLMUTEX = new Object();
+
+
+    private Object getReadLock() {
+        if(readLock == null) {
+            readLock = ALLMUTEX;
+        }
+        return readLock;
+    }
 
     /**
      * Used to provide a hook to derived classes to dynamically read in the data
@@ -191,14 +197,17 @@ public class GeoGridFlatField extends CachedFlatField {
      * @return data
      */
     protected float[][] readData() {
+        if(myParent!=null) {
+            return myParent.readData();
+        }
         //        Misc.printStack("GeoGridFlatField.readData",15,null);
         Array arr;
         try {
-            System.err.println (myid +" GeoGridFlatField readData");
+            //DEBUG            System.err.println (myid +" GeoGridFlatField readData");
             msg("readData");
             Trace.call1("GeoGridFlatField.geogrid.readVolumeData");
-            synchronized (readLock) {
-                LogUtil.message("CACHED:" + readLabel);
+            synchronized (getReadLock()) {
+                LogUtil.message(readLabel);
                 ucar.unidata.data.DataSourceImpl.incrOutstandingGetDataCalls();
                 arr = geoGrid.readVolumeData(timeIndex);
                 LogUtil.message("");

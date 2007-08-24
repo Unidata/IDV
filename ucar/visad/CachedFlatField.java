@@ -22,8 +22,6 @@
 
 
 
-
-
 package ucar.visad;
 
 
@@ -59,6 +57,8 @@ public class CachedFlatField extends FlatField {
 
     /** For uniqueness */
     private static int cnt = 0;
+
+    protected CachedFlatField myParent;
 
     /** Where we write */
     private static File cacheDir;
@@ -171,16 +171,21 @@ public class CachedFlatField extends FlatField {
             throws VisADException {
         super(type, domainSet, rangeCoordSys, rangeCoordSysArray, rangeSets,
               units);
+
+
+        this.myid = "clone:" +that.myid;
         if (copy) {
             this.myFloatValues = that.unpackFloats(copy);
             init(myFloatValues);
         } else {
+            this.myParent = that;
             this.myFloatValues  = that.myFloatValues;
             this.filename    = that.getFilename();
             this.ranges      = that.ranges;
+            this.sampleRanges = that.sampleRanges;
             this.shouldCache = that.shouldCache;
             clearMissing();
-            checkCache();
+            //            checkCache();
         }
     }
 
@@ -191,17 +196,6 @@ public class CachedFlatField extends FlatField {
 
 
 
-    protected void initClone(CachedFlatField ccf, boolean copy) 
-        throws VisADException {
-        ccf.myid = "clone:" +this.myid;
-        ccf.setSampleRanges(sampleRanges);
-        if (!shouldCache) {
-            //            System.err.println(myid + " reading data to set clone values " + copy);
-            ccf.myFloatValues = unpackFloats(copy);
-        } 
-
-
-    }
 
 
 
@@ -233,7 +227,6 @@ public class CachedFlatField extends FlatField {
         CachedFlatField ccf = new CachedFlatField(this, copy, type, domainSet,
                                    rangeCoordSys, rangeCoordSysArray,
                                    rangeSets, units);
-        initClone(ccf, copy);
         return ccf;
     }
 
@@ -328,16 +321,6 @@ public class CachedFlatField extends FlatField {
     }
 
 
-    /**
-     * init
-     *
-     * @param data data
-     *
-     * @throws VisADException  problem initializing field
-     */
-    protected void init(float[][] data) throws VisADException {
-        init(data, true);
-    }
 
     public void setShouldCache(boolean b) {
         shouldCache = b;
@@ -348,11 +331,10 @@ public class CachedFlatField extends FlatField {
      * init
      *
      * @param data data
-     * @param andCheckCache Should we  check the cache
      *
      * @throws VisADException initializing field
      */
-    protected void init(float[][] data, boolean andCheckCache)
+    protected void init(float[][] data) 
             throws VisADException {
         myFloatValues = data;
 
@@ -362,15 +344,11 @@ public class CachedFlatField extends FlatField {
         }
 
         clearMissing();
-        getFilename();
         if (data != null) {
             if(!shouldCache) {
                 shouldCache = data[0].length > cacheThreshold;
             }
-            //            shouldCache = true;
-            if (andCheckCache) {
-                checkCache();
-            }
+            checkCache();
         }
     }
 
@@ -404,9 +382,15 @@ public class CachedFlatField extends FlatField {
     private float[][] readCache() throws VisADException {
         synchronized (MUTEX) {
             float[][] values = myFloatValues;
+            //DEBUG            System.err.println(myid + " in readCache");
             if (values != null) {
                 return values;
             }
+
+            if(myParent!=null) {
+                return myParent.readCache();
+            }
+
             if (!haveDataOnDisk()) {
                 msg(getClass().getName()
                     + " Have not written calling readData");
@@ -415,16 +399,15 @@ public class CachedFlatField extends FlatField {
                     msg("Floats still null after readData");
                     return null;
                 }
-                init(values, false);
+                init(values);
                 return values;
             }
-            if ( !haveDataOnDisk()) {
-                return null;
-            }
+
 
             try {
                 //            System.err.println ("*** Reading from file");
                 //                System.err.println(myid + " reading from cache");
+            //DEBUG                System.err.println(myid + " reading from file cache");
                 FileInputStream   istream = new FileInputStream(getFilename());
                 ObjectInputStream ois     = new ObjectInputStream(istream);
                 myFloatValues = values = (float[][]) ois.readObject();
@@ -550,7 +533,9 @@ public class CachedFlatField extends FlatField {
     public float[][] unpackFloats(boolean copy) throws VisADException {
         msg("unpackFloats");
         float[][] values = myFloatValues;
+            //DEBUG        System.err.println (myid + " in unpackFloats");
         if (values == null) {
+            //DEBUG            System.err.println (myid + " values is null");
             msg(Thread.currentThread() + " Reading cache");
             values = readCache();
             msg(Thread.currentThread() + " done Reading cache");
@@ -582,7 +567,7 @@ public class CachedFlatField extends FlatField {
         if ( !shouldCache) {
             return;
         }
-        if ( !haveDataOnDisk()) {
+        if (!haveDataOnDisk()) {
             writeCache();
         }
         myFloatValues = null;
@@ -610,7 +595,7 @@ public class CachedFlatField extends FlatField {
                 return;
             }
             try {
-                //                System.err.println(myid + " writing to cache");
+            //DEBUG                System.err.println(myid + " writing to file cache " + getFilename());
                 FileOutputStream   ostream = new FileOutputStream(getFilename());
                 ObjectOutputStream p       = new ObjectOutputStream(ostream);
                 p.writeObject(values);
