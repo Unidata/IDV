@@ -139,7 +139,6 @@ public class GeoGridAdapter {
     /** Do we read the data right away or do we use a GeoGridFlatField */
     private boolean lazyEvaluation = true;
 
-
     /** the geogrid to adapt */
     private GeoGrid geoGrid = null;
 
@@ -1094,10 +1093,12 @@ public class GeoGridAdapter {
             GeoGridFlatField ggff = new GeoGridFlatField(geoGrid, readLock,
                                         timeIndex, domainSet, ffType);
 
-            String filename = dataSource.getCachePath()+"_"+IOUtil.cleanFileName(cacheKey.toString());
-            System.err.println ("key:" + IOUtil.cleanFileName(cacheKey.toString()));
-            ggff.setFilename(filename);
-            ggff.setShouldCache(dataSource.getCacheFlatFields());
+            if(dataSource.getCacheFlatFields()) {
+                String filename = IOUtil.joinDir(dataSource.getCachePath(),"grid_"+IOUtil.cleanFileName(cacheKey.toString()));
+                //                System.err.println ("file:" + filename);
+                ggff.setFilename(filename);
+                ggff.setShouldCache(true);
+            }
             ggff.setReadLabel(readLabel);
             retField = ggff;
             //            ggff.unpackFloats(false);
@@ -1196,6 +1197,19 @@ public class GeoGridAdapter {
                         CachedFlatField sample = getFlatField(times[i], readLabel);
                         if(sampleRanges == null) {
                             sampleRanges = sample.getRanges(true);
+                            //Check to see if the sample is valid
+                            if(sampleRanges!=null&& sampleRanges.length>0) {
+                                for(int rangeIdx=0;rangeIdx<sampleRanges.length;rangeIdx++) {
+                                    Range r = sampleRanges[rangeIdx];
+                                    if ( Double.isInfinite(r.getMin())
+                                         || Double.isInfinite(r.getMax())) {
+                                        sampleRanges = null;
+                                        //                                        System.err.println("bad sample range");
+                                        break;
+                                    }
+                                }
+                            }
+
                         } else {
                             sample.setSampleRanges(sampleRanges);
                         }

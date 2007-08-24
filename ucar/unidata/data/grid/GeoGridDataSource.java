@@ -242,6 +242,7 @@ public class GeoGridDataSource extends GridDataSource {
         if(cachePath == null && CachedFlatField.getCacheDir()!=null) {
             String uniqueName = "grid_" + Misc.getUniqueId();
             cachePath  = IOUtil.joinDir(CachedFlatField.getCacheDir(), uniqueName);
+            IOUtil.makeDir(cachePath);
         }
         return cachePath;
     }
@@ -444,8 +445,22 @@ public class GeoGridDataSource extends GridDataSource {
         //        doMakeDataChoices();
         getDataChoices();
         super.reloadData();
+        /**
+           not sure if we want to do this since we might have 
+           cachedflatfields out there that are pointing at the old
+           directory
+           clearFileCache();
+         */
+
     }
 
+
+
+    private void clearFileCache() {
+        if(cachePath!=null) {
+            IOUtil.deleteDirectory(new File(cachePath));
+        }
+    }
 
 
     /**
@@ -453,6 +468,7 @@ public class GeoGridDataSource extends GridDataSource {
      */
     public void doRemove() {
         super.doRemove();
+        clearFileCache();
         dataset   = null;
         gcsVsTime = null;
     }
@@ -932,7 +948,6 @@ public class GeoGridDataSource extends GridDataSource {
                                 DataSelection givenDataSelection,
                                 Hashtable requestProperties)
             throws VisADException, RemoteException {
-        System.err.println ("\nGeoGridDataSource.getDataInner:" + dataChoice);
         synchronized (readLock) {
             return makeFieldImpl(dataChoice, givenDataSelection,
                                  requestProperties);
