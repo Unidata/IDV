@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -27,11 +28,11 @@ import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.grid.GridUtil;
 
 import ucar.unidata.idv.DisplayConventions;
+import ucar.unidata.util.ColorTable;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
-import ucar.unidata.util.ColorTable;
 
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.Grid2DDisplayable;
@@ -54,8 +55,8 @@ public class ImagePlanViewControl extends PlanViewControl {
      * this particular <code>PlanViewControl</code>
      */
     public ImagePlanViewControl() {
-        setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT
-                          | FLAG_ZPOSITION | FLAG_SKIPFACTOR);
+        setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT | FLAG_ZPOSITION
+                          | FLAG_SKIPFACTOR);
     }
 
     /**
@@ -68,10 +69,11 @@ public class ImagePlanViewControl extends PlanViewControl {
      */
     protected DisplayableData createPlanDisplay()
             throws VisADException, RemoteException {
-        Grid2DDisplayable gridDisplay = 
-            new Grid2DDisplayable("ImagePlanViewControl_" + ((datachoice != null)
-                ? datachoice.toString()
-                : ""), true);
+        Grid2DDisplayable gridDisplay =
+            new Grid2DDisplayable("ImagePlanViewControl_"
+                                  + ((datachoice != null)
+                                     ? datachoice.toString()
+                                     : ""), true);
         gridDisplay.setTextureEnable(true);
         /* TODO: Find out why this causes redisplays
         if (BaseImageControl.EMPTY_IMAGE != null) {
@@ -81,6 +83,27 @@ public class ImagePlanViewControl extends PlanViewControl {
         //gridDisplay.setUseRGBTypeForSelect(true);
         addAttributedDisplayable(gridDisplay);
         return gridDisplay;
+    }
+
+    /**
+     * Called to initialize this control from the given dataChoice;
+     * sets levels controls to match data; make data slice at first level;
+     * set display's color table and display units.
+     *
+     * @param dataChoice  choice that describes the data to be loaded.
+     *
+     * @return  true if successful
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    protected boolean setData(DataChoice dataChoice)
+            throws VisADException, RemoteException {
+        boolean result = super.setData(dataChoice);
+        if ( !result) {
+            userMessage("Selected image(s) not available");
+        }
+        return result;
     }
 
     /**
@@ -147,12 +170,6 @@ public class ImagePlanViewControl extends PlanViewControl {
             throws VisADException {
         checkImageSize(slice);
         return super.getSliceForDisplay(slice);
-        /*
-        if (getSkipValue() <= 0) {
-            return slice;
-        }
-        return GridUtil.subset(slice, getSkipValue() + 1);
-        */
     }
 
     /**
@@ -167,3 +184,4 @@ public class ImagePlanViewControl extends PlanViewControl {
     }
 
 }
+

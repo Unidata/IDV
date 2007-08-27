@@ -333,6 +333,9 @@ public abstract class PlanViewControl extends GridDisplayControl {
         Trace.call2("PlanView.initMisc");
 
         boolean result = setData(dataChoice);
+        if (!result) {
+            return false;
+        }
 
         if (shouldShowZSelector()) {
             addDisplayable(zSelector, FLAG_COLOR);
