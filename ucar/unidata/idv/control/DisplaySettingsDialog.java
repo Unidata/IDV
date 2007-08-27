@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -45,11 +46,11 @@ import ucar.unidata.util.PropertyValue;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 
+import ucar.visad.display.ColorScaleInfo;
+
 
 
 import visad.*;
-
-import ucar.visad.display.ColorScaleInfo;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -96,18 +97,28 @@ public class DisplaySettingsDialog {
     /** _more_ */
     private JPanel propertiesHolder;
 
+    /** _more_          */
     private JScrollPane leftSP;
+
+    /** _more_          */
     private JComponent contents;
 
 
-    public DisplaySettingsDialog(IntegratedDataViewer idv, DisplayControlImpl display) {
-        this.idv =idv;
-        displays        = idv.getDisplayControls();
-        if(display == null && displays.size()>0) {
+    /**
+     * _more_
+     *
+     * @param idv _more_
+     * @param display _more_
+     */
+    public DisplaySettingsDialog(IntegratedDataViewer idv,
+                                 DisplayControlImpl display) {
+        this.idv = idv;
+        displays = idv.getDisplayControls();
+        if ((display == null) && (displays.size() > 0)) {
             display = (DisplayControlImpl) displays.get(0);
         }
         contents = doMakeContents();
-        if(display!=null) {
+        if (display != null) {
             setDisplay(display);
         }
         showDialog();
@@ -115,6 +126,11 @@ public class DisplaySettingsDialog {
 
 
 
+    /**
+     * _more_
+     *
+     * @param idv _more_
+     */
     public DisplaySettingsDialog(IntegratedDataViewer idv) {
         this(idv, null);
     }
@@ -130,16 +146,21 @@ public class DisplaySettingsDialog {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param display _more_
+     */
     public void setDisplay(DisplayControlImpl display) {
-        this.display = display;
+        this.display   = display;
         propertyValues = new ArrayList();
         display.addDisplaySettings(this);
-        if(dialog!=null) dialog.setTitle("Display Settings -- "
-                                         + display.getTitle());
+        if (dialog != null) {
+            dialog.setTitle("Display Settings -- " + display.getTitle());
+        }
         updatePropertiesComponent();
         for (int i = 0; i < displays.size(); i++) {
-            DisplayWrapper dw =
-                (DisplayWrapper) displayWrappers.get(i);
+            DisplayWrapper dw = (DisplayWrapper) displayWrappers.get(i);
             if (dw.dci == display) {
                 dw.cbx.setForeground(Color.blue);
                 dw.cbx.setSelected(true);
@@ -173,12 +194,11 @@ public class DisplaySettingsDialog {
      *
      */
     private void showDialog() {
-        Window     f        = GuiUtils.getWindow(display.getContents());
+        Window f = GuiUtils.getWindow(display.getContents());
         dialog = GuiUtils.createDialog(f, "", true);
         LogUtil.registerWindow(dialog);
-        if(display!=null) {
-            dialog.setTitle("Display Settings -- "
-                            + display.getTitle());
+        if (display != null) {
+            dialog.setTitle("Display Settings -- " + display.getTitle());
         }
         dialog.getContentPane().add(contents);
         dialog.pack();
@@ -211,24 +231,27 @@ public class DisplaySettingsDialog {
          * _more_
          *
          * @param dci _more_
+         *
+         * @param display _more_
          */
         public DisplayWrapper(DisplayControlImpl display) {
             this.dci = display;
             cbx      = new JCheckBox(dci.getTitle());
             cbx.setToolTipText("<html>Right click to show popup menu</html>");
             cbx.addMouseListener(new MouseAdapter() {
-                    public void mouseClicked(MouseEvent e) {
-                        if ( !SwingUtilities.isRightMouseButton(e)) {
-                            return;
-                        }
-                        List items = new ArrayList();
-                        items.add(GuiUtils.makeMenuItem("Use properties from this display",
-                                                        DisplaySettingsDialog.this, "setDisplay",
-                                                        dci));
-                        JPopupMenu popup = GuiUtils.makePopupMenu(items);
-                        popup.show(cbx, e.getX(), e.getY());
+                public void mouseClicked(MouseEvent e) {
+                    if ( !SwingUtilities.isRightMouseButton(e)) {
+                        return;
                     }
-                });
+                    List items = new ArrayList();
+                    items.add(
+                        GuiUtils.makeMenuItem(
+                            "Use properties from this display",
+                            DisplaySettingsDialog.this, "setDisplay", dci));
+                    JPopupMenu popup = GuiUtils.makePopupMenu(items);
+                    popup.show(cbx, e.getX(), e.getY());
+                }
+            });
         }
     }
 
@@ -283,10 +306,10 @@ public class DisplaySettingsDialog {
             }
         }
 
-        JComponent displaysComp = GuiUtils.vbox(displayComps);
+        JComponent    displaysComp = GuiUtils.vbox(displayComps);
 
 
-        final JButton selectBtn = new JButton("Display Groups");
+        final JButton selectBtn    = new JButton("Display Groups");
         selectBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 popupDisplayGroupMenu(selectBtn);
@@ -304,8 +327,8 @@ public class DisplaySettingsDialog {
         propertiesHolder = new JPanel(new BorderLayout());
 
         JComponent groupApplyComp = GuiUtils.inset(propertiesHolder, 5);
-        leftSP =
-            GuiUtils.makeScrollPane(GuiUtils.top(groupApplyComp), 350, 300);
+        leftSP = GuiUtils.makeScrollPane(GuiUtils.top(groupApplyComp), 350,
+                                         300);
         JScrollPane rightSP =
             GuiUtils.makeScrollPane(GuiUtils.top(displaysComp), 350, 300);
         leftSP.setPreferredSize(new Dimension(350, 300));
@@ -317,11 +340,12 @@ public class DisplaySettingsDialog {
 
         JComponent applyContents =
             GuiUtils.doLayout(new Component[] {
-                                  GuiUtils.inset(GuiUtils.leftRight(new JLabel("Properties"),
-                                                                    holder[0]),2),
-                GuiUtils.inset(GuiUtils.leftRight(new JLabel("Displays"),selectBtn),2), GuiUtils.inset(leftSP, 2),
-                GuiUtils.inset(rightSP, 2), }, 2, GuiUtils.WT_YY,
-                    GuiUtils.WT_NY);
+                GuiUtils.inset(GuiUtils.leftRight(new JLabel("Properties"),
+                    holder[0]), 2),
+                GuiUtils.inset(GuiUtils.leftRight(new JLabel("Displays"),
+                    selectBtn), 2),
+                GuiUtils.inset(leftSP, 2), GuiUtils.inset(rightSP, 2), }, 2,
+                    GuiUtils.WT_YY, GuiUtils.WT_NY);
 
         applyContents = GuiUtils.centerBottom(applyContents,
                 GuiUtils.wrap(buttons));
@@ -329,8 +353,13 @@ public class DisplaySettingsDialog {
         return applyContents;
     }
 
+    /**
+     * _more_
+     *
+     * @param comp _more_
+     */
     private void popupDisplayGroupMenu(JComponent comp) {
-        final List items        = new ArrayList();
+        final List items = new ArrayList();
         ControlDescriptor cd =
             idv.getControlDescriptor(display.getDisplayId());
 
@@ -427,7 +456,7 @@ public class DisplaySettingsDialog {
         propertiesHolder.validate();
         propertiesHolder.repaint();
         leftSP.validate();
-        leftSP.getViewport().scrollRectToVisible(new Rectangle(0,0,1,1));
+        leftSP.getViewport().scrollRectToVisible(new Rectangle(0, 0, 1, 1));
     }
 
 
@@ -440,7 +469,9 @@ public class DisplaySettingsDialog {
         List displaySettings = idv.getResourceManager().getDisplaySettings();
         List applyItems = makeDisplaySettingsMenuItems(displaySettings, this,
                               "applyDisplaySetting", "");
-        if(applyItems.size()==0) return;
+        if (applyItems.size() == 0) {
+            return;
+        }
         GuiUtils.showPopupMenu(applyItems, holder[0]);
     }
 
@@ -450,12 +481,6 @@ public class DisplaySettingsDialog {
      * _more_
      */
     public void doSave() {
-        String name = DisplaySetting.getNewName(idv, dialog);
-        if (name == null) {
-            return;
-        }
-        DisplaySetting existing =
-            idv.getResourceManager().findDisplaySetting(name);
         List propList = new ArrayList();
         for (int i = 0; i < propertyValues.size(); i++) {
             PropertyValueWrapper prop =
@@ -467,13 +492,7 @@ public class DisplaySettingsDialog {
             propList.add(new PropertyValue(prop.propertyValue));
         }
 
-        if (existing != null) {
-            existing.setPropertyValues(propList);
-            idv.getResourceManager().displaySettingChanged(existing);
-        } else {
-            idv.getResourceManager().addDisplaySetting(
-                new DisplaySetting(name, propList));
-        }
+        DisplaySetting.doSave(idv, dialog, propList, display);
     }
 
 
@@ -683,13 +702,19 @@ public class DisplaySettingsDialog {
             getCheckbox().setSelected(cbxValue);
         }
 
+        /**
+         * _more_
+         *
+         * @param v _more_
+         *
+         * @return _more_
+         */
         private boolean canChange(Object v) {
             return (v instanceof String) || (v instanceof Double)
-                || (v instanceof Integer) || (v instanceof Range)
-                || (v instanceof ContourInfo) || (v instanceof Color)
-                || (v instanceof ColorScaleInfo)
-                || (v instanceof Unit) || (v instanceof Real) ||
-                (v instanceof ColorTable);
+                   || (v instanceof Integer) || (v instanceof Range)
+                   || (v instanceof ContourInfo) || (v instanceof Color)
+                   || (v instanceof ColorScaleInfo) || (v instanceof Unit)
+                   || (v instanceof Real) || (v instanceof ColorTable);
 
         }
 
@@ -765,6 +790,7 @@ public class DisplaySettingsDialog {
          * _more_
          */
         public void changeValue() {
+
             Object value = propertyValue.getValue();
             if (value instanceof Range) {
                 Range      r             = (Range) value;
@@ -786,29 +812,36 @@ public class DisplaySettingsDialog {
                     new Range(Misc.parseNumber(rangeMinField.getText()),
                               Misc.parseNumber(rangeMaxField.getText()));
                 propertyValue.setValue(newRange);
-            } else if (value instanceof  ColorScaleInfo) {
-                ColorScaleInfo csi = new ColorScaleInfo((ColorScaleInfo) value);
+            } else if (value instanceof ColorScaleInfo) {
+                ColorScaleInfo csi =
+                    new ColorScaleInfo((ColorScaleInfo) value);
                 ColorScaleDialog csd = new ColorScaleDialog(null,
-                                                            "Color Scale Properties",
-                                                            csi, true);
-                if(!csd.getOk()) return;
-                propertyValue.setValue(new ColorScaleInfo(csd.getInfo()));                
-                
+                                           "Color Scale Properties", csi,
+                                           true);
+                if ( !csd.getOk()) {
+                    return;
+                }
+                propertyValue.setValue(new ColorScaleInfo(csd.getInfo()));
+
 
             } else if (value instanceof Real) {
                 try {
-                    Real r = (Real) propertyValue.getValue();
-                    String s = ""+r.getValue();
-                    while(true) {
+                    Real   r = (Real) propertyValue.getValue();
+                    String s = "" + r.getValue();
+                    while (true) {
                         try {
-                            s =   GuiUtils.getInput("Enter new value for " + propertyValue.getLabel(), "Value: ",
-                                                    s, r.getUnit()+"");
-                            if(s == null) return;
+                            s = GuiUtils.getInput("Enter new value for "
+                                    + propertyValue.getLabel(), "Value: ", s,
+                                        r.getUnit() + "");
+                            if (s == null) {
+                                return;
+                            }
                             double d = Misc.parseDouble(s);
                             propertyValue.setValue(r.cloneButValue(d));
                             break;
                         } catch (NumberFormatException nfe) {
-                            LogUtil.userErrorMessage("Bad number format: " + s);
+                            LogUtil.userErrorMessage("Bad number format: "
+                                    + s);
                         }
                     }
                 } catch (Exception exc) {
@@ -864,6 +897,7 @@ public class DisplaySettingsDialog {
             cbx.setSelected(true);
             setCheckboxLabel();
             GuiUtils.showWidget(cbx);
+
         }
 
 
@@ -877,19 +911,29 @@ public class DisplaySettingsDialog {
             setCheckboxLabel();
         }
 
+        /**
+         * _more_
+         *
+         * @param v _more_
+         *
+         * @return _more_
+         */
         private String getValueLabel(Object v) {
-            if(v instanceof Color) {
-                Color  c = (Color) v;
-                return c.getRed() +","+c.getGreen() +","+c.getBlue();
+            if (v instanceof Color) {
+                Color c = (Color) v;
+                return c.getRed() + "," + c.getGreen() + "," + c.getBlue();
             }
 
-            if(v instanceof ContourInfo) {
+            if (v instanceof ContourInfo) {
                 ContourInfo ci = (ContourInfo) v;
-                return ci.getInterval()+"/"+ci.getBase() +"/"+ci.getMin() +"/"+ci.getMax();
+                return ci.getInterval() + "/" + ci.getBase() + "/"
+                       + ci.getMin() + "/" + ci.getMax();
             }
-            if(v instanceof ColorScaleInfo) {
+            if (v instanceof ColorScaleInfo) {
                 ColorScaleInfo csi = (ColorScaleInfo) v;
-                return (csi.getIsVisible()?"visible":"not visible") + " " + csi.getPlacement();
+                return (csi.getIsVisible()
+                        ? "visible"
+                        : "not visible") + " " + csi.getPlacement();
             }
 
             return v.toString();

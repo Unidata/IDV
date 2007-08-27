@@ -22,7 +22,11 @@
 
 
 
+
 package ucar.unidata.idv.control;
+
+
+import ucar.unidata.idv.ControlDescriptor;
 
 
 import ucar.unidata.idv.IntegratedDataViewer;
@@ -32,6 +36,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
@@ -54,6 +59,8 @@ public class DisplaySetting {
     /** _more_ */
     private boolean isLocal;
 
+    /** _more_          */
+    private Hashtable applicableToControls;
 
     /**
      * _more_
@@ -71,11 +78,28 @@ public class DisplaySetting {
         this.propertyValues = propertyValues;
     }
 
-    /** _more_          */
+    /**
+     * _more_
+     *
+     * @param cd _more_
+     *
+     * @return _more_
+     */
+    public boolean applicableTo(ControlDescriptor cd) {
+        if ((applicableToControls == null)
+                || (applicableToControls.size() == 0)) {
+            return true;
+        }
+        return applicableToControls.get(cd.getControlId()) != null;
+    }
+
+
+    /** _more_ */
     private static String lastCat;
 
-    /** _more_          */
+    /** _more_ */
     private static String lastName = "";
+
 
     /**
      * _more_
@@ -85,12 +109,80 @@ public class DisplaySetting {
      *
      * @return _more_
      */
-    public static String getNewName(IntegratedDataViewer idv,
-                                    JDialog dialog) {
-        return getNewName(idv, dialog, lastCat, lastName);
+    public boolean changeName(IntegratedDataViewer idv, JDialog dialog) {
+        String name = this.getNameWithoutCategory();
+        String cat  = this.getCategory();
+        Object[] result = DisplaySetting.getNewName(idv, null, cat, name,
+                              null);
+        if (result == null) {
+            return false;
+        }
+
+        String newName = (String) result[0];
+
+        if (newName.equals(this.getName())) {
+            return false;
+        }
+        DisplaySetting existing =
+            idv.getResourceManager().findDisplaySetting(newName);
+        if (existing != null) {
+            idv.getResourceManager().removeDisplaySetting(existing);
+        }
+
+        this.setName(newName);
+        idv.getResourceManager().displaySettingChanged(this);
+        return true;
+
+
     }
 
 
+    /**
+     * _more_
+     *
+     * @param idv _more_
+     * @param dialog _more_
+     * @param propList _more_
+     * @param display _more_
+     */
+    public static void doSave(IntegratedDataViewer idv, JDialog dialog,
+                              List propList, DisplayControlImpl display) {
+
+        ControlDescriptor cd = null;
+        if (display != null) {
+            cd = idv.getControlDescriptor(display.getDisplayId());
+        }
+
+        String lbl = ((cd != null)
+                      ? "Applicable only to displays of type: " + cd
+                      : null);
+        Object[] result = DisplaySetting.getNewName(idv, dialog, lastCat,
+                              lastName, lbl);
+        if (result == null) {
+            return;
+        }
+        boolean only = ((Boolean) result[1]).booleanValue();
+
+        String  name = (String) result[0];
+        DisplaySetting existing =
+            idv.getResourceManager().findDisplaySetting(name);
+
+        if (existing != null) {
+            existing.setPropertyValues(propList);
+            idv.getResourceManager().displaySettingChanged(existing);
+        } else {
+            existing = new DisplaySetting(name, propList);
+            idv.getResourceManager().addDisplaySetting(existing);
+        }
+        if (cd != null) {
+            if (only) {
+                existing.setOnlyApplicableTo(cd);
+            } else {
+                existing.clearOnlyApplicableTo();
+            }
+        }
+
+    }
 
     /**
      * _more_
@@ -99,15 +191,20 @@ public class DisplaySetting {
      * @param dialog _more_
      * @param dfltCategory _more_
      * @param dfltName _more_
+     * @param cbxLabel _more_
      *
      * @return _more_
      */
-    public static String getNewName(IntegratedDataViewer idv, JDialog dialog,
-                                    String dfltCategory, String dfltName) {
+    private static Object[] getNewName(IntegratedDataViewer idv,
+                                       JDialog dialog, String dfltCategory,
+                                       String dfltName, String cbxLabel) {
 
-        Vector categories      = new Vector();
-        List   displaySettings =
-            idv.getResourceManager().getDisplaySettings();
+        JCheckBox cbx        = new JCheckBox((cbxLabel != null)
+                                             ? cbxLabel
+                                             : "");
+
+        Vector    categories = new Vector();
+        List displaySettings = idv.getResourceManager().getDisplaySettings();
         categories.add("");
         for (int i = 0; i < displaySettings.size(); i++) {
             DisplaySetting displaySetting =
@@ -117,6 +214,7 @@ public class DisplaySetting {
                 categories.add(cat);
             }
         }
+
 
         JComboBox catBox = new JComboBox(categories);
         catBox.setEditable(true);
@@ -137,6 +235,9 @@ public class DisplaySetting {
                     5), GuiUtils.hbox(
                         GuiUtils.label(" Category: ", catBox),
                         GuiUtils.label("  Name: ", fld)));
+        if (cbxLabel != null) {
+            contents = GuiUtils.vbox(contents, cbx);
+        }
         String         name     = null;
         DisplaySetting existing = null;
 
@@ -173,7 +274,7 @@ public class DisplaySetting {
                     continue;
                 }
             }
-            return name;
+            return new Object[] { name, new Boolean(cbx.isSelected()) };
         }
 
 
@@ -309,6 +410,43 @@ public class DisplaySetting {
         }
         return name;
     }
+
+    /**
+     * _more_
+     */
+    public void clearOnlyApplicableTo() {
+        applicableToControls = null;
+    }
+
+    /**
+     * _more_
+     *
+     * @param cd _more_
+     */
+    public void setOnlyApplicableTo(ControlDescriptor cd) {
+        applicableToControls = new Hashtable();
+        applicableToControls.put(cd.getControlId(), new Boolean(true));
+    }
+
+
+    /**
+     *  Set the ApplicableToControls property.
+     *
+     *  @param value The new value for ApplicableToControls
+     */
+    public void setApplicableToControls(Hashtable value) {
+        applicableToControls = value;
+    }
+
+    /**
+     *  Get the ApplicableToControls property.
+     *
+     *  @return The ApplicableToControls
+     */
+    public Hashtable getApplicableToControls() {
+        return applicableToControls;
+    }
+
 
 }
 

@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -92,6 +93,9 @@ public class SettingsTree extends DndTree {
     /** Reference to the idv */
     private IntegratedDataViewer idv;
 
+    /** _more_          */
+    private DataControlDialog dialog;
+
     /** _more_ */
     private long lastSettingsTimestamp = -1;
 
@@ -104,6 +108,11 @@ public class SettingsTree extends DndTree {
     /** _more_ */
     private JScrollPane settingsSP;
 
+    /** _more_          */
+    private JCheckBox showAllCbx;
+
+    /** _more_          */
+    private JComponent contents;
 
     /**
      * _more_
@@ -114,6 +123,7 @@ public class SettingsTree extends DndTree {
     public SettingsTree(DataControlDialog dialog,
                         IntegratedDataViewer theIdv) {
         this.idv      = theIdv;
+        this.dialog   = dialog;
         settingsRoot  = new DefaultMutableTreeNode("Settings");
         settingsModel = new DefaultTreeModel(settingsRoot);
         this.setModel(settingsModel);
@@ -166,6 +176,17 @@ public class SettingsTree extends DndTree {
             "<html>Right click to show popu menu;<br>Control-S to save selected to plugin;<br>Delete key to delete selected settings</html>");
         settingsSP = new JScrollPane(this);
 
+
+        showAllCbx = new JCheckBox("Show all", false);
+        showAllCbx.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                lastSettingsTimestamp = -1;
+                updateSettings();
+            }
+        });
+
+        contents = GuiUtils.centerBottom(settingsSP, showAllCbx);
+
         DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer() {
             public Component getTreeCellRendererComponent(JTree theTree,
                     Object value, boolean sel, boolean expanded,
@@ -196,24 +217,9 @@ public class SettingsTree extends DndTree {
      * @param displaySetting _more_
      */
     public void changeName(DisplaySetting displaySetting) {
-        String name    = displaySetting.getNameWithoutCategory();
-        String cat     = displaySetting.getCategory();
-        String newName = DisplaySetting.getNewName(idv, null, cat, name);
-        if (newName == null) {
-            return;
+        if (displaySetting.changeName(idv, null)) {
+            updateSettings();
         }
-        if (newName.equals(displaySetting.getName())) {
-            return;
-        }
-        DisplaySetting existing =
-            idv.getResourceManager().findDisplaySetting(newName);
-        if (existing != null) {
-            idv.getResourceManager().removeDisplaySetting(existing);
-        }
-
-        displaySetting.setName(newName);
-        idv.getResourceManager().displaySettingChanged(displaySetting);
-        updateSettings();
     }
 
 
@@ -233,7 +239,7 @@ public class SettingsTree extends DndTree {
      * @return _more_
      */
     protected JComponent getContents() {
-        return settingsSP;
+        return contents;
     }
 
     /**
@@ -247,17 +253,28 @@ public class SettingsTree extends DndTree {
     }
 
 
+    /** _more_          */
+    ControlDescriptor lastCD;
+
     /**
      * _more_
      *
      */
-    private void updateSettings() {
+    protected void updateSettings() {
         //        System.err.println("updateSettings " +lastSettingsTimestamp+"  " + idv.getResourceManager().getDisplaySettingsTimestamp());
         //Check if we need to update
+        ControlDescriptor cd = dialog.getSelectedControl();
         if (lastSettingsTimestamp
                 == idv.getResourceManager().getDisplaySettingsTimestamp()) {
-            return;
+            if ( !showAllCbx.isSelected()) {
+                if (Misc.equals(lastCD, cd)) {
+                    return;
+                }
+            } else {
+                return;
+            }
         }
+        lastCD = cd;
         lastSettingsTimestamp =
             idv.getResourceManager().getDisplaySettingsTimestamp();
 
@@ -268,6 +285,18 @@ public class SettingsTree extends DndTree {
         settingsRoot.removeAllChildren();
         for (int i = 0; i < settings.size(); i++) {
             DisplaySetting setting = (DisplaySetting) settings.get(i);
+            if ( !showAllCbx.isSelected()) {
+                if (cd != null) {
+                    if ( !setting.applicableTo(cd)) {
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
+            }
+
+
+
             List cats = StringUtil.split(setting.getName(), ">", true, true);
             if (cats.size() == 0) {
                 cats.add("");
@@ -383,7 +412,6 @@ public class SettingsTree extends DndTree {
             (String) ((TwoFacedObject) destNode.getUserObject()).getId();
         String name    = displaySetting.getNameWithoutCategory();
         String newName = DisplaySetting.cleanName(cat + ">" + name);
-
         DisplaySetting existing =
             idv.getResourceManager().findDisplaySetting(newName);
         if ((existing != null) && (existing != displaySetting)) {
@@ -394,7 +422,6 @@ public class SettingsTree extends DndTree {
             }
             idv.getResourceManager().removeDisplaySetting(existing);
         }
-
         displaySetting.setName(newName);
         idv.getResourceManager().displaySettingChanged(displaySetting);
         updateSettings();

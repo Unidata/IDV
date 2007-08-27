@@ -1013,6 +1013,9 @@ public class DataControlDialog implements ActionListener {
         controlTree.addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
                 Object[] cd = getSelectedControls();
+                if(settingsTree!=null) {
+                    settingsTree.updateSettings();
+                }
                 Misc.run(new Runnable() {
                     public void run() {
                         Object[] cd = getSelectedControls();
