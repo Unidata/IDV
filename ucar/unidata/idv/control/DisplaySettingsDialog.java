@@ -49,6 +49,7 @@ import ucar.unidata.util.StringUtil;
 
 import visad.*;
 
+import ucar.visad.display.ColorScaleInfo;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -132,7 +133,7 @@ public class DisplaySettingsDialog {
     public void setDisplay(DisplayControlImpl display) {
         this.display = display;
         propertyValues = new ArrayList();
-        display.addPropertyValues(this);
+        display.addDisplaySettings(this);
         if(dialog!=null) dialog.setTitle("Display Settings -- "
                                          + display.getTitle());
         updatePropertiesComponent();
@@ -682,6 +683,16 @@ public class DisplaySettingsDialog {
             getCheckbox().setSelected(cbxValue);
         }
 
+        private boolean canChange(Object v) {
+            return (v instanceof String) || (v instanceof Double)
+                || (v instanceof Integer) || (v instanceof Range)
+                || (v instanceof ContourInfo) || (v instanceof Color)
+                || (v instanceof ColorScaleInfo)
+                || (v instanceof Unit) || (v instanceof Real) ||
+                (v instanceof ColorTable);
+
+        }
+
 
         /**
          * _more_
@@ -699,14 +710,6 @@ public class DisplaySettingsDialog {
                 return;
             }
 
-            if ((v instanceof String) || (v instanceof Double)
-                    || (v instanceof Integer) || (v instanceof Range)
-                    || (v instanceof ContourInfo) || (v instanceof Color)
-                    || (v instanceof Unit)) {
-                changeValue();
-                return;
-            }
-
             if (v instanceof ColorTable) {
                 List items = new ArrayList();
                 idv.getColorTableManager().makeColorTableMenu(
@@ -718,6 +721,13 @@ public class DisplaySettingsDialog {
                 }, items);
                 GuiUtils.showPopupMenu(items, changeBtn);
             }
+
+
+            if (canChange(v)) {
+                changeValue();
+                return;
+            }
+
 
         }
 
@@ -736,11 +746,7 @@ public class DisplaySettingsDialog {
                 Object v    = propertyValue.getValue();
                 if (propertyValue.getValue() instanceof Boolean) {
                     icon = "/auxdata/ui/icons/Refresh16.gif";
-                } else if ((v instanceof Range) || (v instanceof ColorTable)
-                           || (v instanceof String) || (v instanceof Double)
-                           || (v instanceof Integer) || (v instanceof Float)
-                           || (v instanceof ContourInfo)
-                           || (v instanceof Color) || (v instanceof Unit)) {
+                } else if (canChange(v)) {
                     icon = "/auxdata/ui/icons/Settings16.png";
                 }
                 if (icon == null) {
@@ -780,6 +786,35 @@ public class DisplaySettingsDialog {
                     new Range(Misc.parseNumber(rangeMinField.getText()),
                               Misc.parseNumber(rangeMaxField.getText()));
                 propertyValue.setValue(newRange);
+            } else if (value instanceof  ColorScaleInfo) {
+                ColorScaleInfo csi = new ColorScaleInfo((ColorScaleInfo) value);
+                ColorScaleDialog csd = new ColorScaleDialog(null,
+                                                            "Color Scale Properties",
+                                                            csi, true);
+                if(!csd.getOk()) return;
+                propertyValue.setValue(new ColorScaleInfo(csd.getInfo()));                
+                
+
+            } else if (value instanceof Real) {
+                try {
+                    Real r = (Real) propertyValue.getValue();
+                    String s = ""+r.getValue();
+                    while(true) {
+                        try {
+                            s =   GuiUtils.getInput("Enter new value for " + propertyValue.getLabel(), "Value: ",
+                                                    s, r.getUnit()+"");
+                            if(s == null) return;
+                            double d = Misc.parseDouble(s);
+                            propertyValue.setValue(r.cloneButValue(d));
+                            break;
+                        } catch (NumberFormatException nfe) {
+                            LogUtil.userErrorMessage("Bad number format: " + s);
+                        }
+                    }
+                } catch (Exception exc) {
+                    LogUtil.logException("Setting value", exc);
+                    return;
+                }
             } else if (value instanceof ContourInfo) {
                 ContourInfoDialog cid =
                     new ContourInfoDialog("Change "
@@ -842,12 +877,31 @@ public class DisplaySettingsDialog {
             setCheckboxLabel();
         }
 
+        private String getValueLabel(Object v) {
+            if(v instanceof Color) {
+                Color  c = (Color) v;
+                return c.getRed() +","+c.getGreen() +","+c.getBlue();
+            }
+
+            if(v instanceof ContourInfo) {
+                ContourInfo ci = (ContourInfo) v;
+                return ci.getInterval()+"/"+ci.getBase() +"/"+ci.getMin() +"/"+ci.getMax();
+            }
+            if(v instanceof ColorScaleInfo) {
+                ColorScaleInfo csi = (ColorScaleInfo) v;
+                return (csi.getIsVisible()?"visible":"not visible") + " " + csi.getPlacement();
+            }
+
+            return v.toString();
+        }
+
+
         /**
          * _more_
          */
         public void setCheckboxLabel() {
             Object value  = propertyValue.getValue();
-            String svalue = value.toString();
+            String svalue = getValueLabel(value);
             if (svalue.length() > 20) {
                 svalue = svalue.substring(0, 19) + "...";
             }

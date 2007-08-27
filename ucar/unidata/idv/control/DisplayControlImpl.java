@@ -5012,7 +5012,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @param dsd  the display settings dialog
      */
-    protected void addPropertyValues(DisplaySettingsDialog dsd) {
+    protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         dsd.addPropertyValue(getDisplayCategory(), "displayCategory",
                              "Display Category", "Labels");
         dsd.addPropertyValue(getLegendLabelTemplate(), "legendLabelTemplate",
@@ -5041,7 +5041,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
         if (colorScaleInfo != null) {
-            dsd.addPropertyValue(colorScaleInfo, "sharedColorScaleInfo",
+            dsd.addPropertyValue(colorScaleInfo, "colorScaleInfo",
                                  "Color Scale Settings",
                                  SETTINGS_GROUP_DISPLAY);
         }

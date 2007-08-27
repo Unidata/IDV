@@ -434,8 +434,8 @@ public class TrackControl extends GridDisplayControl {
     }
 
 
-    protected void addPropertyValues(DisplaySettingsDialog dsd) {
-        super.addPropertyValues(dsd);
+    protected void addDisplaySettings(DisplaySettingsDialog dsd) {
+        super.addDisplaySettings(dsd);
         if(getDataTimeRange()!=null) {
             dsd.addPropertyValue(getDataTimeRange(), "dataTimeRange",
                          "Time Mode", "Display");

@@ -108,10 +108,17 @@ public class ColorScaleDialog implements ActionListener {
      */
     public ColorScaleDialog(DisplayControlImpl displayControl, String title,
                             ColorScaleInfo info, boolean showDialog) {
+        ok = false;
         this.displayControl = displayControl;
 
 
         myInfo              = new ColorScaleInfo(info);
+
+        if (showDialog) {
+            dialog = GuiUtils.createDialog((displayControl!=null?displayControl.getWindow():null),
+                                           title, true);
+        }
+
         doMakeContents(showDialog);
         String place = myInfo.getPlacement();
         // account for old bundles
@@ -122,8 +129,6 @@ public class ColorScaleDialog implements ActionListener {
         visibilityCbx.setSelected(myInfo.getIsVisible());
 
         if (showDialog) {
-            this.dialog = GuiUtils.createDialog(displayControl.getWindow(),
-                    title, true);
             dialog.setVisible(true);
         }
 
@@ -165,10 +170,12 @@ public class ColorScaleDialog implements ActionListener {
         myInfo.setIsVisible(visibilityCbx.isSelected());
         myInfo.setLabelFont(fontSelector.getFont());
         try {
-            displayControl.setColorScaleInfo(new ColorScaleInfo(getInfo()));
+            if(displayControl!=null) {
+                displayControl.setColorScaleInfo(new ColorScaleInfo(getInfo()));
+            }
             return true;
         } catch (Exception exc) {
-            displayControl.logException("Setting color scale info", exc);
+            LogUtil.logException("Setting color scale info", exc);
             return false;
         }
     }
@@ -197,7 +204,12 @@ public class ColorScaleDialog implements ActionListener {
                                      }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
         contents = GuiUtils.leftRight(contents, GuiUtils.filler());
         if (showDialog) {
-            JPanel buttons = GuiUtils.makeApplyOkCancelButtons(this);
+            JPanel buttons;
+            if(displayControl!=null) {
+                buttons= GuiUtils.makeApplyOkCancelButtons(this);
+            } else {
+                buttons= GuiUtils.makeOkCancelButtons(this);
+            }
             dialog.getContentPane().add(GuiUtils.centerBottom(contents,
                     buttons));
             GuiUtils.packInCenter(dialog);
@@ -243,7 +255,7 @@ public class ColorScaleDialog implements ActionListener {
      * @return the font or null
      */
     private Font getDisplayListFont() {
-
+        if(displayControl==null) return null;
         Font f    = displayControl.getViewManager().getDisplayListFont();
         int  size = (f == null)
                     ? 12
@@ -253,5 +265,11 @@ public class ColorScaleDialog implements ActionListener {
         }
         return f;
     }
+
+    public boolean getOk() {
+        return ok;
+    }
+
+
 }
 

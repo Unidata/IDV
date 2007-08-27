@@ -184,8 +184,8 @@ public abstract class PlanViewControl extends GridDisplayControl {
     /*
      * _more_
      */
-    protected void addPropertyValues(DisplaySettingsDialog dsd) {
-        super.addPropertyValues(dsd);
+    protected void addDisplaySettings(DisplaySettingsDialog dsd) {
+        super.addDisplaySettings(dsd);
         if(currentLevel!=null) {
             dsd.addPropertyValue(currentLevel, "settingsLevel",
                          "Level", SETTINGS_GROUP_DISPLAY);

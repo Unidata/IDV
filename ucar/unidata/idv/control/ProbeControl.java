@@ -214,6 +214,8 @@ public class ProbeControl extends DisplayControlImpl {
     /** initial probe position */
     private RealTuple initPosition;
 
+    private EarthLocation initLocation;
+
     /** the time data holder */
     private DisplayableData timeData;
 
@@ -316,6 +318,9 @@ public class ProbeControl extends DisplayControlImpl {
         if (initPosition != null) {
             probe.setPosition(initPosition);
         }
+        if(initLocation !=null) {
+            setEarthLocation(initLocation);
+        }
         addDisplayable(probe, FLAG_COLOR);
         setContents(doMakeContents());
         //        probe.setPointSize(pointSize);
@@ -335,7 +340,7 @@ public class ProbeControl extends DisplayControlImpl {
     public void initDone() {
         try {
             super.initDone();
-            if (initPosition == null) {
+            if (initPosition == null && initLocation == null) {
                 double[] screenCenter = getScreenCenter();
                 probe.setPosition(
                     new RealTuple(
@@ -438,21 +443,73 @@ public class ProbeControl extends DisplayControlImpl {
     }
 
 
+    public void setEarthLocation(EarthLocation  el) {
+        try {
+            if(probe == null) {
+                initLocation = el;
+                return;
+            }
+            double[] xyz = earthToBox(el);
+            resetProbePosition(xyz[0], xyz[1], xyz[2]);
+        } catch (Exception exc) {
+            logException("Error setting probe position", exc);
+        }
+    }
+
+
+
+    /**
+     * _more_
+     */
+    protected void addDisplaySettings(DisplaySettingsDialog dsd) {
+        try {
+            dsd.addPropertyValue(new Boolean(getChart().getShowThumb()), "showThumbNail",
+                                 "Show Thumbnail", "Probe");
+
+            dsd.addPropertyValue(getEarthLocationFromWidget(), "earthLocation",
+                                 "Probe Position", "Probe");
+
+            dsd.addPropertyValue(getInfos(), "infos",
+                                 "Probe parameters", "Probe");
+
+        } catch (Exception exc) {
+            logException("Error getting location", exc);
+        }
+        super.addDisplaySettings(dsd);
+    }
+
+
+
+    private EarthLocation getEarthLocationFromWidget() throws VisADException, RemoteException {
+        double   lat = latLonWidget.getLat();
+        double   lon = latLonWidget.getLon();
+        double   alt = latLonWidget.getAlt();
+        return makeEarthLocation(lat, lon, alt);
+    }
+
+    private void updateLatLonWidget(EarthLocation elt) {
+        if(latLonWidget == null) return;
+        LatLonPoint llp = elt.getLatLonPoint();
+        latLonWidget.setLat(
+                            getDisplayConventions().formatLatLon(
+                                                                 llp.getLatitude().getValue()));
+        latLonWidget.setLon(
+                            getDisplayConventions().formatLatLon(
+                                                                 llp.getLongitude().getValue()));
+        latLonWidget.setAlt(
+                            getDisplayConventions().formatAltitude(elt.getAltitude()));
+    }
+
+
     /**
      * Handle the user pressing return
      */
     private void handleLatLonWidgetChange() {
         try {
-            double   lat = latLonWidget.getLat();
-            double   lon = latLonWidget.getLon();
-            double   alt = latLonWidget.getAlt();
-            double[] xyz = earthToBox(makeEarthLocation(lat, lon, alt));
-            resetProbePosition(xyz[0], xyz[1], xyz[2]);
-
+            setEarthLocation(getEarthLocationFromWidget());
         } catch (Exception exc) {
             logException("Error setting lat/lon", exc);
         }
-
     }
 
 
@@ -473,6 +530,7 @@ public class ProbeControl extends DisplayControlImpl {
      */
     public void resetProbePosition(double lat, double lon, double alt) {
         try {
+            if(probe == null) return;
             probe.setPosition(
                 new RealTuple(
                     RealTupleType.SpatialCartesian3DTuple, new double[] { lat,
@@ -1301,6 +1359,9 @@ public class ProbeControl extends DisplayControlImpl {
 
 
 
+
+
+
     /**
      * Show the properties dialog for the chart line
      *
@@ -1573,15 +1634,7 @@ public class ProbeControl extends DisplayControlImpl {
         lastProbeAltitude = elt.getAltitude();
 
         if ((latLonWidget != null) && (llp != null)) {
-            latLonWidget.setLat(
-                getDisplayConventions().formatLatLon(
-                    llp.getLatitude().getValue()));
-            latLonWidget.setLon(
-                getDisplayConventions().formatLatLon(
-                    llp.getLongitude().getValue()));
-            latLonWidget.setAlt(
-                getDisplayConventions().formatAltitude(elt.getAltitude()));
-
+            updateLatLonWidget(elt);
         }
         // set location label
         if ((llp != null) && (locationLabel != null)) {
@@ -1631,7 +1684,6 @@ public class ProbeControl extends DisplayControlImpl {
         if (dataTemplate.equals("")) {
             dataTemplate = "%value%";
         }
-
 
         List choices = getDataChoices();
         for (int i = 0; i < choices.size(); i++) {
@@ -1780,12 +1832,7 @@ public class ProbeControl extends DisplayControlImpl {
             }
         }
         updateLegendLabel();
-
-
-
-
     }
-
 
 
     /**
@@ -2526,8 +2573,8 @@ public class ProbeControl extends DisplayControlImpl {
      *  Get the ShowTableInLegend property.
      *
      *  @return The ShowTableInLegend
-     */
-    public boolean getShowTableInLegend() {
+     */ 
+   public boolean getShowTableInLegend() {
         return showTableInLegend;
     }
 
