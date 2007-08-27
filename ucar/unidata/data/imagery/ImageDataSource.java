@@ -21,14 +21,12 @@
  */
 
 
-
 package ucar.unidata.data.imagery;
 
 
 import edu.wisc.ssec.mcidas.AreaDirectory;
 
 import ucar.unidata.data.*;
-
 
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.FileManager;
@@ -980,11 +978,15 @@ public abstract class ImageDataSource extends DataSourceImpl {
             for (Iterator iter = choices.iterator(); iter.hasNext(); ) {
                 LogUtil.message("Time: " + (cnt++) + "/" + choices.size()
                                 + " From: " + dataChoice.toString());
-                SingleBandedImage image = makeImage(
-                                              (DataChoice) iter.next(),
-                                              new DataSelection(
-                                                  Misc.newList(
-                                                      new Integer(0))));
+                SingleBandedImage image = null;
+                try {
+                    image = makeImage(
+                        (DataChoice) iter.next(),
+                        new DataSelection(Misc.newList(new Integer(0))));
+                } catch (VisADException ve) {  // some error getting data
+                    image = null;
+                    LogUtil.printMessage(ve.toString());
+                }
                 if (image != null) {
                     sequence = sequenceManager.addImageToSequence(image);
                 }
@@ -994,8 +996,13 @@ public abstract class ImageDataSource extends DataSourceImpl {
             for (Iterator iter = descriptors.iterator(); iter.hasNext(); ) {
                 LogUtil.message("Time: " + (cnt++) + "/" + descriptors.size()
                                 + " From: " + dataChoice.toString());
-                SingleBandedImage image =
-                    makeImage((AddeImageDescriptor) iter.next());
+                SingleBandedImage image = null;
+                try {
+                    image = makeImage((AddeImageDescriptor) iter.next());
+                } catch (VisADException ve) {  // some error getting data
+                    image = null;
+                    LogUtil.printMessage(ve.toString());
+                }
                 if (image != null) {
                     sequence = sequenceManager.addImageToSequence(image);
                 }
