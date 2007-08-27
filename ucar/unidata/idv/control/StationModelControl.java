@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -133,8 +134,7 @@ import javax.swing.text.*;
 public class StationModelControl extends ObsDisplayControl {
 
 
-    /** param list preference */
-    public static final String PREF_PARAMLIST = "StationModelControl.params";
+
 
     /** The icon used to show locked legend components */
     protected static ImageIcon lockIcon;
@@ -152,6 +152,8 @@ public class StationModelControl extends ObsDisplayControl {
     /** time series chart */
     private TimeSeriesChart timeSeries;
 
+    /** _more_          */
+    private JComponent plotPanel;
 
 
     /** The table that shows the drill-down info */
@@ -434,7 +436,6 @@ public class StationModelControl extends ObsDisplayControl {
     public void initDone() {
         super.initDone();
         if ( !getWasUnPersisted()) {
-            chartParams = (List) getStore().get(PREF_PARAMLIST);
             if (chartParams == null) {
                 chartParams = new ArrayList();
             }
@@ -2250,31 +2251,33 @@ public class StationModelControl extends ObsDisplayControl {
         changeButton = new JButton(getStationModel().getDisplayName());
         changeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                StationModelManager smm =     getControlContext().getStationModelManager();
-                ObjectListener listener  = new ObjectListener(null) {
-                        public void actionPerformed(ActionEvent ae) {
-                            Misc.run(new Runnable() {
-                                public void run() {
-                                    showWaitCursor();
-                                    try {
-                                        setStationModel(
-                                            (StationModel) theObject);
-                                        changeButton.setText(
-                                            getStationModel().getDisplayName());
-                                        stationLabel.setText(
-                                            getStationModel().getDisplayName());
-                                    } catch (Exception exc) {
-                                        logException(
-                                            "Changing station model", exc);
-                                    }
-                                    showNormalCursor();
+                StationModelManager smm =
+                    getControlContext().getStationModelManager();
+                ObjectListener listener = new ObjectListener(null) {
+                    public void actionPerformed(ActionEvent ae) {
+                        Misc.run(new Runnable() {
+                            public void run() {
+                                showWaitCursor();
+                                try {
+                                    setStationModel((StationModel) theObject);
+                                    changeButton.setText(
+                                        getStationModel().getDisplayName());
+                                    stationLabel.setText(
+                                        getStationModel().getDisplayName());
+                                } catch (Exception exc) {
+                                    logException("Changing station model",
+                                            exc);
                                 }
-                            });
-                        }
-                    };
+                                showNormalCursor();
+                            }
+                        });
+                    }
+                };
 
-                JPopupMenu popup = GuiUtils.makePopupMenu(
-                                                          StationModelCanvas.makeStationModelMenuItems(smm.getStationModels(), listener,smm));
+                JPopupMenu popup =
+                    GuiUtils.makePopupMenu(
+                        StationModelCanvas.makeStationModelMenuItems(
+                            smm.getStationModels(), listener, smm));
                 popup.show(changeButton, changeButton.getSize().width / 2,
                            changeButton.getSize().height);
             }
@@ -2408,10 +2411,10 @@ public class StationModelControl extends ObsDisplayControl {
         //                                           tableScroller, 0.75);
         //        split.setOneTouchExpandable(true);
 
-        JComponent mainPanel =
-            GuiUtils.centerBottom(getChart().getContents(), tableScroller);
+        plotPanel = GuiUtils.centerBottom(getChart().getContents(),
+                                          tableScroller);
         JComponent plotComp =
-            GuiUtils.topCenter(GuiUtils.inset(selectedObLbl, 3), mainPanel);
+            GuiUtils.topCenter(GuiUtils.inset(selectedObLbl, 3), plotPanel);
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.add("Settings", GuiUtils.top(widgets));
         tabbedPane.add("Plot", plotComp);
@@ -2554,14 +2557,68 @@ public class StationModelControl extends ObsDisplayControl {
 
 
 
+
+
     /**
-     * Save the plot preferences
+     * _more_
+     *
+     * @param dsd _more_
      */
-    public void savePlotPreferences() {
-        getStore().put(PREF_PARAMLIST, chartParams);
-        getStore().save();
+    protected void addDisplaySettings(DisplaySettingsDialog dsd) {
+        super.addDisplaySettings(dsd);
+        if ( !isChartEnabled()) {
+            return;
+        }
+        try {
+            TimeSeriesChart clonedTimeSeries =
+                (TimeSeriesChart) getIdv().decodeObject(
+                    getIdv().encodeObject(timeSeries, false));
+            clonedTimeSeries.setControl(null);
+            List tmp = new ArrayList();
+            for (int i = 0; i < chartParams.size(); i++) {
+                PointParam cp = (PointParam) chartParams.get(i);
+                if (cp.getLineState().getVisible()) {
+                    tmp.add(cp);
+                }
+            }
+            String label = StringUtil.join(",", tmp);
+            TwoFacedObject tfo = new TwoFacedObject(label,
+                                     new Object[] { clonedTimeSeries,
+                    tmp });
+            dsd.addPropertyValue(tfo, "chartSettings", "Chart Settings",
+                                 "Display");
+
+        } catch (Exception exc) {
+            logException("Applying chart settings", exc);
+        }
     }
 
+    /**
+     * _more_
+     *
+     * @param tfo _more_
+     */
+    public void setChartSettings(TwoFacedObject tfo) {
+        try {
+            Object[] a = (Object[]) tfo.getId();
+            timeSeries = (TimeSeriesChart) getIdv().decodeObject(
+                getIdv().encodeObject(a[0], false));
+            timeSeries.setControl(this);
+            chartParams = new ArrayList((List) a[1]);
+            if (plotPanel != null) {
+                plotPanel.removeAll();
+                plotPanel.add(BorderLayout.CENTER, getChart().getContents());
+                plotPanel.add(BorderLayout.SOUTH, tableScroller);
+                plotPanel.invalidate();
+                plotPanel.validate();
+                plotPanel.repaint();
+                getChart().getContents().repaint(5);
+                chartChanged();
+            }
+        } catch (Exception exc) {
+            logException("Applying chart settings", exc);
+        }
+    }
 
 
     /**
@@ -2587,8 +2644,6 @@ public class StationModelControl extends ObsDisplayControl {
         if (isChartEnabled()) {
             items.add(GuiUtils.makeMenuItem("Save Chart Image...",
                                             getChart(), "saveImage"));
-            items.add(GuiUtils.makeMenuItem("Save Plot Preferences", this,
-                                            "savePlotPreferences"));
         }
 
         if ((table != null) && (table.getModel().getRowCount() > 0)) {

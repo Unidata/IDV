@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.control.chart;
 
 
@@ -120,7 +121,6 @@ public abstract class ChartManager implements ImageObserver {
 
     /** gui_ */
     protected JComponent contents;
-
 
 
     /** for gui */
