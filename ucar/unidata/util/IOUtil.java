@@ -1582,7 +1582,7 @@ public class IOUtil {
      * @param root Directory to delete
      */
     public static void deleteDirectory(File root) {
-        if (root.isDirectory()) {
+        if (root.exists() && root.isDirectory()) {
             File[] files = root.listFiles();
             for (int i = 0; i < files.length; i++) {
                 deleteDirectory(files[i]);
@@ -1723,6 +1723,41 @@ public class IOUtil {
     }
 
 
+    private static void test1(float[][]f) throws Exception {
+        FileOutputStream   fos = new FileOutputStream("test1.data");
+        ObjectOutputStream p       = new ObjectOutputStream(fos);
+        p.writeObject(f);
+        p.flush();
+        p.close();
+        fos.close();
+    }
+
+
+    private static void test2(float[][]f) throws Exception {
+        FileOutputStream   fos = new FileOutputStream("test2.data");
+        BufferedOutputStream bos = new BufferedOutputStream(fos, 100000);
+        ObjectOutputStream p       = new ObjectOutputStream(bos);
+        p.writeObject(f);
+        p.flush();
+        p.close();
+        fos.close();
+    }
+
+
+    private static void test3(float[][]f) throws Exception {
+        byte []bytes = Misc.serialize(f);
+        IOUtil.writeBytes(new File("file3.data"), bytes);
+    }
+
+
+    private static void test4(float[][]f) throws Exception {
+        byte []bytes = Misc.serialize(f);
+        FileOutputStream   fos = new FileOutputStream("test4.data");
+        BufferedOutputStream bos = new BufferedOutputStream(fos, 100000);
+        bos.write(bytes);
+    }
+
+
     /**
      * test main
      *
@@ -1731,6 +1766,41 @@ public class IOUtil {
      * @throws Exception On badness
      */
     public static void main(String[] args) throws Exception {
+
+        float[][] f= new float[2][1000000];
+
+        
+        for(int i=0;i<5;i++) {
+            System.err.println ("try " + i);
+            long t1 = System.currentTimeMillis();
+            test1(f);
+            long t2= System.currentTimeMillis();
+            test2(f);
+            long t3= System.currentTimeMillis();
+            test3(f);
+            long t4= System.currentTimeMillis();
+            test4(f);
+            long t5= System.currentTimeMillis();
+
+
+            System.err.println ("\tt1:" + (t2-t1));
+            System.err.println ("\tt2:" + (t3-t2));
+            System.err.println ("\tt3:" + (t4-t3));
+            System.err.println ("\tt4:" + (t5-t4));
+
+        }
+
+
+
+
+
+
+
+
+
+        if(true) return;
+
+        /*
 
         //        File ff = new File(args[0]);
         //        System.err.println(ff.lastModified());
@@ -1807,6 +1877,7 @@ public class IOUtil {
         } catch (Exception exc) {
             exc.printStackTrace();
         }
+        */
     }
 
     /**
