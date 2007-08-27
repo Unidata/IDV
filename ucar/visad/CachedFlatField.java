@@ -414,7 +414,8 @@ public class CachedFlatField extends FlatField {
                 //                System.err.println(myid + " reading from cache");
                 //                System.err.println(myid + " reading from file cache");
                 FileInputStream   istream = new FileInputStream(getFilename());
-                ObjectInputStream ois     = new ObjectInputStream(istream);
+                BufferedInputStream bis = new BufferedInputStream(istream, 1000000);
+                ObjectInputStream ois     = new ObjectInputStream(bis);
                 myFloatValues = values = (float[][]) ois.readObject();
                 ois.close();
             } catch (Exception exc) {
@@ -605,12 +606,16 @@ public class CachedFlatField extends FlatField {
                 return;
             }
             try {
+                long t1 = System.currentTimeMillis();
                 //                System.err.println(myid + " writing to file cache " + getFilename());
-                FileOutputStream   ostream = new FileOutputStream(getFilename());
-                ObjectOutputStream p       = new ObjectOutputStream(ostream);
+                FileOutputStream   fos = new FileOutputStream(getFilename());
+                BufferedOutputStream bos = new BufferedOutputStream(fos, 100000);
+                ObjectOutputStream p       = new ObjectOutputStream(bos);
                 p.writeObject(values);
                 p.flush();
-                ostream.close();
+                fos.close();
+                long t2= System.currentTimeMillis();
+                System.err.println ("time:" + (t2-t1));
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
