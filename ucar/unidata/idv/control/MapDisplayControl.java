@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -30,7 +31,6 @@ import org.w3c.dom.Element;
 import ucar.unidata.data.DataChoice;
 
 import ucar.unidata.gis.maps.*;
-
 
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.idv.MapViewManager;
@@ -192,6 +192,12 @@ public class MapDisplayControl extends DisplayControlImpl {
 
     /** flag for slider events */
     private boolean ignoreSliderEvents = false;
+
+    /** static counter */
+    static int cnt = 0;
+
+    /** instance for this instantiation */
+    int mycnt = cnt++;
 
     /**
      * Default Constructor.
@@ -629,23 +635,10 @@ public class MapDisplayControl extends DisplayControlImpl {
      * @return true if a map was selected and added
      */
     protected boolean selectMap() {
-        final JButton colorBtn = new JButton(" ");
-        colorBtn.setContentAreaFilled(false);
-        colorBtn.setToolTipText("Set the line color");
-        colorBtn.setMaximumSize(new Dimension(16, 16));
-        colorBtn.setForeground(Color.black);
-        colorBtn.setBackground(Color.blue);
-        colorBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Color newColor = JColorChooser.showDialog(null,
-                                     "Set Map Color",
-                                     colorBtn.getBackground());
-                if (newColor != null) {
-                    colorBtn.setBackground(newColor);
-                }
-            }
-        });
 
+        final JPanel colorButton = new GuiUtils.ColorSwatch(Color.blue,
+                                       "Set Map Line Color");
+        colorButton.setToolTipText("Set the line color");
 
         final JTextField nameFld = new JTextField("", 20);
         nameFld.setToolTipText("Enter an optional map name");
@@ -685,7 +678,7 @@ public class MapDisplayControl extends DisplayControlImpl {
             JPanel panel = GuiUtils.doLayout(new Component[] {
                 GuiUtils.rLabel("Map file or URL: "), fileLine,
                 GuiUtils.rLabel("Name: "), nameLine,
-                GuiUtils.rLabel("Color: "), GuiUtils.left(colorBtn),
+                GuiUtils.rLabel("Color: "), GuiUtils.left(colorButton),
                 GuiUtils.rLabel("Line style: "), GuiUtils.left(styleBox),
                 GuiUtils.rLabel("Line width: "), GuiUtils.left(widthBox)
             }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
@@ -704,7 +697,7 @@ public class MapDisplayControl extends DisplayControlImpl {
                     IOUtil.getFileTail(IOUtil.stripExtension(filename));
             }
             addMap(new MapState(
-                filename, description, colorBtn.getBackground(),
+                filename, description, colorButton.getBackground(),
                 Float.parseFloat((String) widthBox.getSelectedItem()),
                 styleBox.getSelectedIndex()));
             fillContents();
@@ -735,12 +728,6 @@ public class MapDisplayControl extends DisplayControlImpl {
                 "maps.xml");
     }
 
-
-    /** _more_          */
-    static int cnt = 0;
-
-    /** _more_          */
-    int mycnt = cnt++;
 
     /**
      * Make the UI contents for this control.
@@ -1513,19 +1500,19 @@ public class MapDisplayControl extends DisplayControlImpl {
 
 
     /**
-     * _more_
+     * Clear out any lingering references
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  remote display problem
+     * @throws VisADException   local display problem
      */
     public void doRemove() throws RemoteException, VisADException {
         List infos = getDisplayInfos();
-        if(infos!=null && infos.size()==0) {
+        if ((infos != null) && (infos.size() == 0)) {
             theHolder.destroyAll();
         }
         super.doRemove();
-        theHolder = null;
-        mapsHolder = null;
+        theHolder    = null;
+        mapsHolder   = null;
         latLonHolder = null;
     }
 
