@@ -724,7 +724,6 @@ public class DisplayableData extends Displayable {
                 aniSet             = GridUtil.getTimeSet((FieldImpl) d);
                 cachedAnimationSet = aniSet;
             } else if (d instanceof Gridded1DSet) {
-                System.out.println("have set " + d);
                 aniSet             = (Gridded1DSet) d;
                 cachedAnimationSet = aniSet;
             }
