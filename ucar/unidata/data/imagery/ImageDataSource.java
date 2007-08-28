@@ -1173,23 +1173,38 @@ public abstract class ImageDataSource extends DataSourceImpl {
         if (images != null) {
             for (int i = 0; i < images.size(); i++) {
                 Object o = images.get(i);
-                buf.append("<tr>");
                 if (o instanceof AddeImageDescriptor) {
-                    if (i == 0) {
-                        buf.append(
-                            "<table border=\"1\"><tr><td><b>Location</b></td><td><b>Size (Lines X Elements) </b></td><td><b>Band</b></td></tr>");
-                    }
-                    buf.append("<td>");
-                    buf.append(((AddeImageDescriptor) o).getSource());
-                    buf.append("</td>");
-                    buf.append("<td>");
                     AreaDirectory ad =
                         ((AddeImageDescriptor) o).getDirectory();
+                    if (i == 0) {
+                        buf.append(
+                            "<table border=\"1\" width=\"100%\"><tr valign=\"bottom\"><td><b>Location</b></td><td><b>Date</b></td><td><b>Size (Lines X Elements) </b></td><td><b>Band</b></td></tr>");
+                    }
+                    buf.append("<tr valign=\"top\"><td width=\"300\">");
+                    String path = ((AddeImageDescriptor) o).getSource(); 
+                    if(path.length()>50) {
+                        String tmp = path;                        
+                        path = "";
+                        while(tmp.length()>50) {
+                            if(path.length()>0) {
+                                path = path+"<br>";
+                            }
+                            path = path+tmp.substring(0,49);
+                            tmp = tmp.substring(49);
+                        }
+                        path = path +"<br>"+tmp;
+                    }
+                    buf.append(path);
+                    buf.append("</td>");
+                    buf.append("<td width=\"15%\">");
+                    buf.append("" + ad.getStartTime());
+                    buf.append("</td>");
+                    buf.append("<td width=\"15%\">");
                     buf.append(ad.getLines());
                     buf.append(" X ");
                     buf.append(ad.getElements());
                     buf.append("</td>");
-                    buf.append("<td>");
+                    buf.append("<td width=\"15%\">");
                     buf.append("Band ");
                     buf.append(ad.getBands()[0]);
                     buf.append("</td></tr>");
@@ -1198,7 +1213,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                         buf.append(
                             "<table><tr><td><b>Location</b></td></tr>");
                     }
-                    buf.append("<td>");
+                    buf.append("<tr valign=\"top\"><td>");
                     buf.append(o.toString());
                     buf.append("</td></tr>");
                 }
