@@ -470,6 +470,16 @@ public class IdvUIManager extends IdvManager {
                 WindowConstants.DO_NOTHING_ON_CLOSE);
             MultiFrame.useDesktopPane(desktopPane);
         }
+
+        if (getIdv().getStateManager().getShowDashboardOnStart()) {
+            showBasicWindow(true);
+            //            doMakeBasicWindows();
+        }
+
+
+
+
+
     }
 
 
@@ -814,7 +824,7 @@ public class IdvUIManager extends IdvManager {
 
 
         if (getIdv().getStateManager().getShowDashboardOnStart()) {
-            showBasicWindow(true);
+            //            showBasicWindow(true);
             //            doMakeBasicWindows();
         }
 
