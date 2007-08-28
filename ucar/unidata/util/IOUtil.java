@@ -1723,19 +1723,10 @@ public class IOUtil {
     }
 
 
-    private static void test1(float[][]f) throws Exception {
-        FileOutputStream   fos = new FileOutputStream("test1.data");
-        ObjectOutputStream p       = new ObjectOutputStream(fos);
-        p.writeObject(f);
-        p.flush();
-        p.close();
-        fos.close();
-    }
 
-
-    private static void test2(float[][]f) throws Exception {
+    private static void testWrite(float[][]f, int buffSize) throws Exception {
         FileOutputStream   fos = new FileOutputStream("test2.data");
-        BufferedOutputStream bos = new BufferedOutputStream(fos, 100000);
+        BufferedOutputStream bos = new BufferedOutputStream(fos, buffSize);
         ObjectOutputStream p       = new ObjectOutputStream(bos);
         p.writeObject(f);
         p.flush();
@@ -1744,18 +1735,7 @@ public class IOUtil {
     }
 
 
-    private static void test3(float[][]f) throws Exception {
-        byte []bytes = Misc.serialize(f);
-        IOUtil.writeBytes(new File("file3.data"), bytes);
-    }
 
-
-    private static void test4(float[][]f) throws Exception {
-        byte []bytes = Misc.serialize(f);
-        FileOutputStream   fos = new FileOutputStream("test4.data");
-        BufferedOutputStream bos = new BufferedOutputStream(fos, 100000);
-        bos.write(bytes);
-    }
 
 
     /**
@@ -1770,24 +1750,18 @@ public class IOUtil {
         float[][] f= new float[2][1000000];
 
         
-        for(int i=0;i<5;i++) {
-            System.err.println ("try " + i);
-            long t1 = System.currentTimeMillis();
-            test1(f);
-            long t2= System.currentTimeMillis();
-            test2(f);
-            long t3= System.currentTimeMillis();
-            test3(f);
-            long t4= System.currentTimeMillis();
-            test4(f);
-            long t5= System.currentTimeMillis();
-
-
-            System.err.println ("\tt1:" + (t2-t1));
-            System.err.println ("\tt2:" + (t3-t2));
-            System.err.println ("\tt3:" + (t4-t3));
-            System.err.println ("\tt4:" + (t5-t4));
-
+        for(int bs = 500000;bs>1000;bs-=20000) {
+            long total = 0;
+            for(int i=0;i<10;i++) {
+                long t1 = System.currentTimeMillis();
+                //                readBytes(new FileInputStream("test2.data"));
+                readBytes(new FileInputStream("test2.data"),100000);
+                long t2= System.currentTimeMillis();
+                total+= (t2-t1);
+            }
+            System.err.println ((total/10));
+            if(true) break;
+            System.err.println (bs +" " + (total/5));
         }
 
 
