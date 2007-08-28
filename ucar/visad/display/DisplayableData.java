@@ -22,8 +22,6 @@
 
 
 
-
-
 package ucar.visad.display;
 
 
@@ -526,9 +524,9 @@ public class DisplayableData extends Displayable {
         if ((changeListener != null) && (reference != null)) {
             changeListener.removeReference(reference);
         }
-        renderer = null;
+        renderer       = null;
         changeListener = null;
-        reference = null;
+        reference      = null;
         super.destroy();
     }
 
@@ -724,6 +722,10 @@ public class DisplayableData extends Displayable {
             if ((d instanceof FieldImpl) && aniType.equals(RealType.Time)
                     && GridUtil.isTimeSequence((FieldImpl) d)) {
                 aniSet             = GridUtil.getTimeSet((FieldImpl) d);
+                cachedAnimationSet = aniSet;
+            } else if (d instanceof Gridded1DSet) {
+                System.out.println("have set " + d);
+                aniSet             = (Gridded1DSet) d;
                 cachedAnimationSet = aniSet;
             }
         }
