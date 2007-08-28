@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
@@ -44,11 +45,11 @@ import ucar.unidata.idv.ui.LoadBundleDialog;
 import ucar.unidata.idv.ui.ParamInfo;
 import ucar.unidata.idv.ui.WindowInfo;
 import ucar.unidata.ui.RovingProgress;
+import ucar.unidata.ui.colortable.ColorTableManager;
 import ucar.unidata.ui.symbol.StationModel;
 
 
 import ucar.unidata.util.ColorTable;
-import ucar.unidata.ui.colortable.ColorTableManager;
 
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
@@ -151,6 +152,7 @@ public class PluginManager extends IdvManager {
     /** create plugin jlist */
     private JList createList;
 
+    /** _more_          */
     private JCheckBox mergeCbx = new JCheckBox("Merge Plugin", true);
 
     /** list of files in the create plugin list */
@@ -211,7 +213,10 @@ public class PluginManager extends IdvManager {
     /** Where are the local plugins kept */
     private File localPluginDir;
 
+    /** _more_          */
     private List pluginErrorMessages = new ArrayList();
+
+    /** _more_          */
     private List pluginErrorExceptions = new ArrayList();
 
     /**
@@ -604,6 +609,28 @@ public class PluginManager extends IdvManager {
                 }
             }
             if (bundles.size() > 0) {
+
+                Hashtable seen = new Hashtable();
+                for (int i = 0; i < bundles.size(); i++) {
+                    SavedBundle savedBundle = (SavedBundle) bundles.get(i);
+                    String      urlOrFile   = savedBundle.getUrl();
+                    //See if this is a URL. If it isn't then write the file
+                    try {
+                        new URL(urlOrFile);
+                    } catch (MalformedURLException mue) {
+                        String path = savedBundle.getCategorizedName();
+                        int    cnt  = 0;
+                        //Make sure this file is unique
+                        while (seen.get(path) != null) {
+                            savedBundle.setUniquePrefix("v" + (cnt++) + "_");
+                            path = savedBundle.getCategorizedName();
+                        }
+                        seen.put(path, path);
+                        files.add(new TwoFacedObject(path, urlOrFile));
+                    }
+                }
+
+
                 String bundlesXml =
                     IdvPersistenceManager.getBundleXml(bundles, true);
                 String uid         = "bundles.xml";
@@ -613,16 +640,7 @@ public class PluginManager extends IdvManager {
                 files.add(bundlesFile);
                 for (int i = 0; i < bundles.size(); i++) {
                     SavedBundle savedBundle = (SavedBundle) bundles.get(i);
-                    String urlOrFile = savedBundle.getUrl();
-                    //See if this is a URL. If it isn't then write the file
-                    try {
-                        new URL(urlOrFile);
-                    } catch(MalformedURLException mue) {
-                        files.add(
-                                  new TwoFacedObject(
-                                                     savedBundle.getCategorizedName(),
-                                                     urlOrFile));
-                    }
+                    savedBundle.setUniquePrefix(null);
                 }
             }
 
@@ -639,6 +657,7 @@ public class PluginManager extends IdvManager {
                 return;
             }
 
+            System.err.println("files:" + files);
             IOUtil.writeJarFile(jarFile, files);
             if (autoInstallCbx.isSelected()) {
                 installPlugin(jarFile, true);
@@ -731,8 +750,14 @@ public class PluginManager extends IdvManager {
         addCreateFile(file, null);
     }
 
+    /**
+     * _more_
+     *
+     * @param file _more_
+     * @param label _more_
+     */
     private void addCreateFile(String file, String label) {
-        Wrapper wrapper = new Wrapper(file,label);
+        Wrapper wrapper = new Wrapper(file, label);
         showCreatePlugin();
         if ( !createFileList.contains(wrapper)) {
             createFileList.add(wrapper);
@@ -838,39 +863,58 @@ public class PluginManager extends IdvManager {
      * @param menu the menu
      */
     public void initializeFormulasMenu(JMenu menu) {
-        initializeMenu(menu,
-                       getIdv().getJythonManager().getDescriptors());
+        initializeMenu(menu, getIdv().getJythonManager().getDescriptors());
     }
 
+    /** _more_          */
     JComboBox categoryBox;
+
+    /** _more_          */
     JTextField nameFld = new JTextField(10);
 
 
+    /**
+     * _more_
+     */
     public void loadBundlesFromDisk() {
-        
-        if(categoryBox == null) {
-            categoryBox  = getPersistenceManager().makeCategoryBox();
+
+        if (categoryBox == null) {
+            categoryBox = getPersistenceManager().makeCategoryBox();
         }
 
-        Object selected  =        categoryBox.getSelectedItem();
-        GuiUtils.setListData(categoryBox,getPersistenceManager().getFavoritesCategories());
-        if(selected!=null) 
+        Object selected = categoryBox.getSelectedItem();
+        GuiUtils.setListData(
+            categoryBox, getPersistenceManager().getFavoritesCategories());
+        if (selected != null) {
             categoryBox.setSelectedItem(selected);
-        JComponent accessory = GuiUtils.top(GuiUtils.vbox(new JLabel("Name:"), nameFld,new JLabel("Category:"),categoryBox));
-        String file = FileManager.getReadFileOrURL("Bundle to load into plugin",
-                                                   Misc.newList(FILTER_XIDV,
-                                                                FILTER_JNLP, FILTER_ISL,
-                                                                FILTER_ZIDV), accessory);
-        if(file == null) return;
+        }
+        JComponent accessory =
+            GuiUtils.top(GuiUtils.vbox(new JLabel("Name:"), nameFld,
+                                       new JLabel("Category:"), categoryBox));
+        String file =
+            FileManager.getReadFileOrURL("Bundle to load into plugin",
+                                         Misc.newList(FILTER_XIDV,
+                                             FILTER_JNLP, FILTER_ISL,
+                                             FILTER_ZIDV), accessory);
+        if (file == null) {
+            return;
+        }
         file = file.trim();
-        if(file.length() == 0) return;
+        if (file.length() == 0) {
+            return;
+        }
         String name = nameFld.getText().trim();
-        if(name.length() ==0) {
+        if (name.length() == 0) {
             name = IOUtil.stripExtension(IOUtil.getFileTail(file));
         }
         Object cat = categoryBox.getSelectedItem();
-        if(cat == null) cat = "";
-        SavedBundle savedBundle = new SavedBundle(file, name,IdvPersistenceManager.stringToCategories(cat.toString()));
+        if (cat == null) {
+            cat = "";
+        }
+        SavedBundle savedBundle =
+            new SavedBundle(
+                file, name,
+                IdvPersistenceManager.stringToCategories(cat.toString()));
         addObject(savedBundle);
     }
 
@@ -1205,7 +1249,7 @@ public class PluginManager extends IdvManager {
             fileMenu.add(resourceMenu);
             fileMenu.addSeparator();
             fileMenu.add(GuiUtils.makeMenuItem("Import Plugin", this,
-                                               "importPlugin"));
+                    "importPlugin"));
             fileMenu.addSeparator();
             fileMenu.add(GuiUtils.makeMenuItem("Close", this,
                     "closeCreatePlugin"));
@@ -1355,6 +1399,12 @@ public class PluginManager extends IdvManager {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param message _more_
+     * @param exc _more_
+     */
     private void addError(String message, Throwable exc) {
         pluginErrorExceptions.add(exc);
         pluginErrorMessages.add(message);
@@ -1372,7 +1422,7 @@ public class PluginManager extends IdvManager {
         if ( !getArgsManager().pluginsOk) {
             return;
         }
-        pluginErrorMessages = new ArrayList();
+        pluginErrorMessages   = new ArrayList();
         pluginErrorExceptions = new ArrayList();
 
         File f = new File(path);
@@ -1403,12 +1453,18 @@ public class PluginManager extends IdvManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param path _more_
+     */
     private void checkForErrors(String path) {
-        if(pluginErrorMessages.size()>0) {
+        if (pluginErrorMessages.size() > 0) {
             path = IOUtil.getFileTail(path);
-            LogUtil.printExceptions("<html>Errors have occurred loading plugin:<br><i>" + path +"</i></html>" ,
-                                    pluginErrorMessages,pluginErrorExceptions);
-            pluginErrorMessages = new ArrayList();
+            LogUtil.printExceptions(
+                "<html>Errors have occurred loading plugin:<br><i>" + path
+                + "</i></html>", pluginErrorMessages, pluginErrorExceptions);
+            pluginErrorMessages   = new ArrayList();
             pluginErrorExceptions = new ArrayList();
         }
 
@@ -1527,7 +1583,7 @@ public class PluginManager extends IdvManager {
             Matcher matcher = pattern.matcher(filename);
             //            System.err.println ("file:" + filename + " " + idvResource);
 
-            if(matcher.find())  {
+            if (matcher.find()) {
                 //                System.err.println ("got it");
                 if (topLevel) {
                     addPluginToList(filename);
@@ -1649,107 +1705,128 @@ public class PluginManager extends IdvManager {
     }
 
 
+    /**
+     * _more_
+     */
     public void importPlugin() {
         String filename = FileManager.getReadFile("Open Plugin",
-                                                  Misc.newList(FileManager.FILTER_JAR),
-                                                  GuiUtils.top(mergeCbx));
-        if(filename == null) return;
-        importPlugin(filename,mergeCbx.isSelected());
+                              Misc.newList(FileManager.FILTER_JAR),
+                              GuiUtils.top(mergeCbx));
+        if (filename == null) {
+            return;
+        }
+        importPlugin(filename, mergeCbx.isSelected());
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param filename _more_
+     */
     public void importPlugin(String filename) {
         importPlugin(decode(filename), true);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param filename _more_
+     * @param merge _more_
+     */
     public void importPlugin(String filename, boolean merge) {
         try {
             showCreatePlugin();
-            String dir =
-                IOUtil.joinDir(getStore().getUserTmpDirectory(),
-                               "plugin_" + Misc.getUniqueId());
+            String dir = IOUtil.joinDir(getStore().getUserTmpDirectory(),
+                                        "plugin_" + Misc.getUniqueId());
 
             IOUtil.makeDir(dir);
 
-            if(!merge) {
-                createFileList  = new Vector();
+            if ( !merge) {
+                createFileList = new Vector();
                 createList.setListData(createFileList);
             }
-            
-            if(!filename.toLowerCase().endsWith(".jar")) {
+
+            if ( !filename.toLowerCase().endsWith(".jar")) {
                 installPlugin(filename, true);
                 updatePlugins();
                 return;
             }
-            Pattern bundlesPattern = IdvResourceManager.RSC_BUNDLEXML.getPattern();
-            Pattern ctPattern = IdvResourceManager.RSC_COLORTABLES.getPattern();
+            Pattern bundlesPattern =
+                IdvResourceManager.RSC_BUNDLEXML.getPattern();
+            Pattern ctPattern =
+                IdvResourceManager.RSC_COLORTABLES.getPattern();
 
 
-             String newJarFilePath = IOUtil.joinDir(dir, IOUtil.getFileTail(filename));
+            String newJarFilePath = IOUtil.joinDir(dir,
+                                        IOUtil.getFileTail(filename));
 
-             IOUtil.writeTo(IOUtil.getInputStream(filename,
-                                                  getClass()),
-                            new FileOutputStream(newJarFilePath));
-             JarFile     jarFile  = new JarFile(newJarFilePath);
-             List entries = Misc.toList(jarFile.entries());
-             //First load in the class files
-             List resources = getResourceManager().getResources();
-
-
-             for (int i = 0; i < entries.size(); i++) {
-                 JarEntry entry = (JarEntry) entries.get(i);
-                 if (entry.isDirectory()) {
-                     continue;
-                 }
-                 String name = entry.getName();
-                 //Assume that any bundles are accessed through the bundles.xml file
-
-                 InputStream  is    = jarFile.getInputStream(entry);
-                 String cleanName  = IOUtil.cleanFileName(name);
-                 String tmpFile = IOUtil.joinDir(dir,cleanName);
-                 IOUtil.writeTo(is,new FileOutputStream(tmpFile));
-                 is.close();
-
-                 //Assume any bundle files are defined in a bundles.xml
-                 if(ArgsManager.isXidvFile(name)) {
-                     continue;
-                 }
-                 if(name.toLowerCase().endsWith("manifest.mf")) {
-                     continue;
-                 }
-
-                 if(bundlesPattern.matcher(name).find()) {
-                     Element root   = XmlUtil.getRoot(tmpFile,getClass());
-                     List bundles = SavedBundle.processBundleXml(root,
-                                                                 dir, getResourceManager(),
-                                                                 true);
-                     System.err.println ("bundles:" + bundles);
-                     addObjects(bundles);
-                     continue;
-                 }
-
-                 if(ctPattern.matcher(name).find()) {
-                     ColorTableManager ctm= new ColorTableManager();
-                     ctm.init(new ResourceCollection("tmp",Misc.newList(tmpFile)));
-                     addObjects(ctm.getColorTables());
-                     continue;
-                 }
-
-                 //                System.err.println ("tmp file:" + tmpFile);
-                 String label = IOUtil.getFileTail(name);
-                 for(int resourceIdx=0;resourceIdx<resources.size();resourceIdx++) {
-                     IdvResourceManager.IdvResource idvResource  = (IdvResourceManager.IdvResource)
-                         resources.get(resourceIdx);
-                     if(idvResource.getPattern() == null) continue;
-                     if(idvResource.getPattern().matcher(name).find()) {
-                         label = idvResource.getDescription() +":" + label;
-                     }
-                 }
+            IOUtil.writeTo(IOUtil.getInputStream(filename, getClass()),
+                           new FileOutputStream(newJarFilePath));
+            JarFile jarFile = new JarFile(newJarFilePath);
+            List    entries = Misc.toList(jarFile.entries());
+            //First load in the class files
+            List resources = getResourceManager().getResources();
 
 
-                 addCreateFile(tmpFile,label);
+            for (int i = 0; i < entries.size(); i++) {
+                JarEntry entry = (JarEntry) entries.get(i);
+                if (entry.isDirectory()) {
+                    continue;
+                }
+                String name = entry.getName();
+                //Assume that any bundles are accessed through the bundles.xml file
+
+                InputStream is        = jarFile.getInputStream(entry);
+                String      cleanName = IOUtil.cleanFileName(name);
+                String      tmpFile   = IOUtil.joinDir(dir, cleanName);
+                IOUtil.writeTo(is, new FileOutputStream(tmpFile));
+                is.close();
+
+                //Assume any bundle files are defined in a bundles.xml
+                if (ArgsManager.isXidvFile(name)) {
+                    continue;
+                }
+                if (name.toLowerCase().endsWith("manifest.mf")) {
+                    continue;
+                }
+
+                if (bundlesPattern.matcher(name).find()) {
+                    Element root = XmlUtil.getRoot(tmpFile, getClass());
+                    List bundles = SavedBundle.processBundleXml(root, dir,
+                                       getResourceManager(), true);
+                    System.err.println("bundles:" + bundles);
+                    addObjects(bundles);
+                    continue;
+                }
+
+                if (ctPattern.matcher(name).find()) {
+                    ColorTableManager ctm = new ColorTableManager();
+                    ctm.init(new ResourceCollection("tmp",
+                            Misc.newList(tmpFile)));
+                    addObjects(ctm.getColorTables());
+                    continue;
+                }
+
+                //                System.err.println ("tmp file:" + tmpFile);
+                String label = IOUtil.getFileTail(name);
+                for (int resourceIdx = 0; resourceIdx < resources.size();
+                        resourceIdx++) {
+                    IdvResourceManager.IdvResource idvResource =
+                        (IdvResourceManager.IdvResource) resources.get(
+                            resourceIdx);
+                    if (idvResource.getPattern() == null) {
+                        continue;
+                    }
+                    if (idvResource.getPattern().matcher(name).find()) {
+                        label = idvResource.getDescription() + ":" + label;
+                    }
+                }
+
+
+                addCreateFile(tmpFile, label);
             }
 
         } catch (Throwable exc) {
@@ -1986,16 +2063,16 @@ public class PluginManager extends IdvManager {
     private void makePluginDialog() {
         Component[] availableComps = GuiUtils.getHtmlComponent("", getIdv(),
                                          700, 300);
-        availablePluginEditor = (JEditorPane) availableComps[0];
-        availablePluginScroller         = (JScrollPane) availableComps[1];
+        availablePluginEditor   = (JEditorPane) availableComps[0];
+        availablePluginScroller = (JScrollPane) availableComps[1];
 
         Component[] loadedComps = GuiUtils.getHtmlComponent("", getIdv(),
-                                                            700, 200);
+                                      700, 200);
         loadedPluginEditor = (JEditorPane) loadedComps[0];
 
 
         JComponent contents = GuiUtils.vsplit((JComponent) loadedComps[1],
-                                            (JComponent) availableComps[1],150);
+                                  (JComponent) availableComps[1], 150);
 
         contents.setSize(new Dimension(700, 500));
         JButton closeBtn = GuiUtils.makeButton("Close", this,
@@ -2018,15 +2095,26 @@ public class PluginManager extends IdvManager {
         fileMenu.add(GuiUtils.makeMenuItem("Close", this,
                                            "closePluginDialog"));
 
-        JLabel lbl1 = new JLabel(GuiUtils.getImageIcon("/auxdata/ui/icons/DocumentOpen16.png", getClass()));
-        JLabel lbl2 = new JLabel(GuiUtils.getImageIcon("/auxdata/ui/icons/FindAgain16.gif", getClass()));
-        JComponent bottom = GuiUtils.hbox(new Component[]{new JLabel("Key:  "),lbl1,new JLabel(" Send to Plugin Creator      "),lbl2,new JLabel("View Contents")});
-        bottom = GuiUtils.inset(bottom,4);
-        contents  = GuiUtils.topCenterBottom(menuBar,contents, bottom);
+        JLabel lbl1 = new JLabel(
+                          GuiUtils.getImageIcon(
+                              "/auxdata/ui/icons/DocumentOpen16.png",
+                              getClass()));
+        JLabel lbl2 = new JLabel(
+                          GuiUtils.getImageIcon(
+                              "/auxdata/ui/icons/FindAgain16.gif",
+                              getClass()));
+        JComponent bottom = GuiUtils.hbox(new Component[] {
+                                new JLabel("Key:  "),
+                                lbl1,
+                                new JLabel(" Send to Plugin Creator      "),
+                                lbl2,
+                                new JLabel("View Contents") });
+        bottom   = GuiUtils.inset(bottom, 4);
+        contents = GuiUtils.topCenterBottom(menuBar, contents, bottom);
 
         contents = GuiUtils.centerBottom(
-                                         contents,
-                                         GuiUtils.center(GuiUtils.inset(GuiUtils.wrap(closeBtn), 5)));
+            contents,
+            GuiUtils.center(GuiUtils.inset(GuiUtils.wrap(closeBtn), 5)));
         pluginWindow = GuiUtils.createFrame("Plugin Manager");
 
         pluginWindow.getContentPane().add(contents);
@@ -2119,7 +2207,9 @@ public class PluginManager extends IdvManager {
             firstTime = true;
         }
 
-        StringBuffer loadedBuff     = new StringBuffer("<b>Installed Plugins</b><br><table width=\"100%\" border=\"0\">");
+        StringBuffer loadedBuff =
+            new StringBuffer(
+                "<b>Installed Plugins</b><br><table width=\"100%\" border=\"0\">");
         List      comps       = new ArrayList();
         List      havePlugins = new ArrayList();
         List      pluginComps = new ArrayList();
@@ -2138,17 +2228,19 @@ public class PluginManager extends IdvManager {
             String prefix = "";
             String encodedPath;
             if (plugin.file != null) {
-                encodedPath =  encode(plugin.file.toString());
+                encodedPath = encode(plugin.file.toString());
                 prefix =
                     "&nbsp;<a href=\"jython:idv.getPluginManager().listPlugin('"
                     + encodedPath
                     + "');\"><img src=\"idvresource:/auxdata/ui/icons/FindAgain16.gif\" border=\"0\"></a>";
             } else {
-                encodedPath =  encode(plugin.url.toString());
-                prefix = "&nbsp;";
+                encodedPath = encode(plugin.url.toString());
+                prefix      = "&nbsp;";
             }
 
-            prefix =prefix+  "<a href=\"jython:idv.getPluginManager().importPlugin('"
+            prefix =
+                prefix
+                + "<a href=\"jython:idv.getPluginManager().importPlugin('"
                 + encodedPath
                 + "');\"><img alt='Import Plugin into Plugin Creator' src=\"idvresource:/auxdata/ui/icons/DocumentOpen16.png\" border=\"0\"></a>";
             String sizeString = "";
@@ -2157,10 +2249,10 @@ public class PluginManager extends IdvManager {
                 sizeString = " <b>" + (s / 1000) + "KB</b>";
             }
 
-            catBuff.append("<tr valign=\"top\"><td align=\"right\" width=\"60\">" + prefix
-                           + "</td><td width=\"30%\">" + plugin.name
-                           + "</td><td align=\"right\">" + sizeString
-                           + "</td>");
+            catBuff.append(
+                "<tr valign=\"top\"><td align=\"right\" width=\"60\">"
+                + prefix + "</td><td width=\"30%\">" + plugin.name
+                + "</td><td align=\"right\">" + sizeString + "</td>");
 
             String installHtml =
                 "<a href=\"jython:idv.getPluginManager().installPlugin('"
@@ -2181,9 +2273,11 @@ public class PluginManager extends IdvManager {
                     + plugin.file + "')\">" + "Uninstall"
                     + "</a>&nbsp;&nbsp;" + extra);
                 loadedBuff.append("<tr><td width=\"60\">" + prefix
-                                  + "</td><td>" + plugin.category +"&gt;"+plugin.name +"</td><td>");
+                                  + "</td><td>" + plugin.category + "&gt;"
+                                  + plugin.name + "</td><td>");
 
-                loadedBuff.append("<a href=\"jython:idv.getPluginManager().removePlugin('"
+                loadedBuff.append(
+                    "<a href=\"jython:idv.getPluginManager().removePlugin('"
                     + plugin.file + "')\">" + "Uninstall"
                     + "</a>&nbsp;&nbsp;" + extra);
                 loadedBuff.append("</td></tr>");
@@ -2194,7 +2288,8 @@ public class PluginManager extends IdvManager {
                            + "</td></tr>");
         }
         StringBuffer sb =
-            new StringBuffer("<b>Available Plugins</b><br><table border=\"0\" width=\"100%\">\n");
+            new StringBuffer(
+                "<b>Available Plugins</b><br><table border=\"0\" width=\"100%\">\n");
         for (int i = 0; i < cats.size(); i++) {
             String       category = (String) cats.get(i);
             StringBuffer catBuff  = (StringBuffer) catBuffs.get(category);
@@ -2269,7 +2364,9 @@ public class PluginManager extends IdvManager {
         /** The parent class loader */
         private ClassLoader parent;
 
+        /** _more_          */
         private PluginManager pluginManager;
+
         /**
          * ctor
          *
@@ -2308,7 +2405,8 @@ public class PluginManager extends IdvManager {
                         Class c = loadClassFromJar(entry.getName());
                         IdvBase.addPluginClass(c);
                     } catch (java.lang.LinkageError jlle) {
-                        pluginManager.addError("Error loading plugin class:" + entry.getName(), jlle);
+                        pluginManager.addError("Error loading plugin class:"
+                                + entry.getName(), jlle);
                     }
                 } else {
                     defineResource(entry);
@@ -2709,15 +2807,22 @@ public class PluginManager extends IdvManager {
          * @param obj the object
          */
         public Wrapper(Object obj) {
-            this(obj,null);
+            this(obj, null);
         }
 
+        /**
+         * _more_
+         *
+         * @param obj _more_
+         * @param label _more_
+         */
         public Wrapper(Object obj, String label) {
             this.obj = obj;
-            if(label == null)
+            if (label == null) {
                 setLabel(obj, true);
-            else
+            } else {
                 this.label = label;
+            }
         }
 
         /**

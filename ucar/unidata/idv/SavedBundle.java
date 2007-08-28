@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
@@ -39,6 +40,7 @@ import ucar.unidata.xml.XmlUtil;
 
 
 import java.io.File;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,6 +111,9 @@ public class SavedBundle {
 
     /** Is it a local bundle */
     private boolean local = false;
+
+    /** _more_          */
+    private String uniquePrefix;
 
     /**
      * Create the saved bundle object
@@ -215,9 +220,9 @@ public class SavedBundle {
             ATTR_CATEGORY,
             IdvPersistenceManager.categoriesToString(categories));
         node.setAttribute(ATTR_NAME, name);
-        File f   = new File(url);
+        File    f     = new File(url);
         boolean isUrl = !f.exists();
-        if(isUrl) {
+        if (isUrl) {
             node.setAttribute(ATTR_URL, url);
         } else {
             if (includeCategoryInUrl) {
@@ -238,6 +243,16 @@ public class SavedBundle {
     }
 
 
+
+    /**
+     * _more_
+     *
+     * @param p _more_
+     */
+    protected void setUniquePrefix(String p) {
+        uniquePrefix = p;
+    }
+
     /**
      * Get the name to use with the categories as a prefix
      *
@@ -245,7 +260,10 @@ public class SavedBundle {
      */
     public String getCategorizedName() {
         String catString = StringUtil.join("_", categories);
-        return catString + "_" + IOUtil.getFileTail(url);
+        if (uniquePrefix != null) {
+            catString = uniquePrefix + catString;
+        }
+        return catString + IOUtil.getFileTail(url);
     }
 
     /**
