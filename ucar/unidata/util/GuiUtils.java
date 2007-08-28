@@ -21,14 +21,6 @@
  */
 
 
-
-
-
-
-
-
-
-
 package ucar.unidata.util;
 
 
@@ -37,8 +29,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-
 
 import ucar.unidata.xml.XmlUtil;
 
@@ -49,10 +39,7 @@ import java.awt.geom.*;
 import java.awt.image.*;
 
 
-
 import java.io.*;
-
-import java.io.InputStream;
 
 import java.lang.reflect.*;
 
@@ -63,7 +50,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-
 import java.util.Locale;
 import java.util.Vector;
 
@@ -72,11 +58,7 @@ import javax.imageio.stream.ImageOutputStream;
 
 
 import javax.swing.*;
-
-import javax.swing.JFrame;
 import javax.swing.event.*;
-
-
 import javax.swing.plaf.*;
 import javax.swing.plaf.basic.*;
 import javax.swing.table.*;
@@ -137,7 +119,7 @@ public class GuiUtils {
     /** Used to map named colors to color */
     public static final Color[] COLORS = {
         Color.blue, Color.black, Color.red, Color.gray,
-        Color.lightGray.brighter(), Color.white, Color.green, Color.orange,
+        Color.lightGray, Color.white, Color.green, Color.orange,
         Color.cyan, Color.magenta, Color.pink, Color.yellow
     };
 
