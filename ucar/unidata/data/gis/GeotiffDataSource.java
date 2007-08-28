@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.gis;
 
 
@@ -152,6 +153,22 @@ public class GeotiffDataSource extends FilesDataSource {
                        "Failed to make data choices " + getSource() + " "
                        + exc.getMessage());
         }
+
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getFullDescription() {
+        String desc = super.getFullDescription();
+        if (adapter != null) {
+            desc = desc + "<p><b>Keys:</b> <pre>" + adapter.getKeyString()
+                   + "</pre>";
+        }
+        return desc;
 
     }
 

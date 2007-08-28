@@ -20,13 +20,13 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.gis;
 
 
 import ucar.unidata.geoloc.projection.*;
 import ucar.unidata.gis.epsg.CoordinateOperationMethod;
 import ucar.unidata.gis.epsg.CoordinateOperationParameter;
-
 import ucar.unidata.gis.epsg.Pcs;
 
 
@@ -174,8 +174,29 @@ public class GeotiffAdapter {
      * @throws VisADException           VisAD problem
      */
     private void createData() throws VisADException, IOException {
-        TiffForm form = new TiffForm();
+        //TiffForm form = new TiffForm();
+        LegacyTiffForm form = new LegacyTiffForm();
         field = (FlatField) form.open(filename);
+        Linear2DSet domain = (Linear2DSet) field.getDomainSet();
+        cols = domain.getX().getLength();
+        rows = domain.getY().getLength();
+        getMapProjection();
+        if (projection != null) {
+            //            System.err.println ("got projection:" + projection.getClass().getName() + " " +projection);
+            //            SampledSet  newDomain = new Linear2DSet(domain.getType(), domain.getX(), domain.getY(),width,height, projection);
+            //RealTupleType.SpatialEarth2DTuple
+            RealTupleType rtt =
+                new RealTupleType(((SetType) domain.getType()).getDomain()
+                    .getRealComponents(), projection, null);
+            SampledSet newDomain = new Linear2DSet(rtt,
+                                       new Linear1DSet[] { domain.getX(),
+                    domain.getY() }, null, null, null, false);
+            field =
+                (FlatField) ucar.unidata.data.grid.GridUtil.setSpatialDomain(
+                    field, newDomain);
+
+        }
+
     }
 
     /**
@@ -281,6 +302,7 @@ public class GeotiffAdapter {
             //            System.err.println ("GeoKey:" + GeoKeys.Geokey.getName (geoKeyId) +  " " + toString (value));
             processKey(geoKeyId, value);
         }
+
     }
 
 
@@ -413,15 +435,17 @@ public class GeotiffAdapter {
             return null;
         }
 
+        //        printKeys();
+
         switch (getModelType()) {
 
           case GeoKeys.ModelType.Projected : {
-              projection = getProjectedMapProjection();
+              //Lets not do this now
+              //              projection = getProjectedMapProjection();
               break;
           }
 
           case GeoKeys.ModelType.Geographic : {
-              printKeys();
               projection = getGeographicMapProjection();
               break;
           }
@@ -713,7 +737,7 @@ public class GeotiffAdapter {
         double lon2 = lon1 + (cols - 1) * scaleX;
 
 
-        //        System.err.println ("\t" + cols + "x" + rows +" lat: (" + lat1  + " - " + lat2 + ") lon: (" + lon1 +" - " + lon2 +")  Di:" + scaleX +" Dj:" + scaleY );
+        //        System.err.println ("coord info:" + cols + "x" + rows +" lat: (" + lat1  + " - " + lat2 + ") lon: (" + lon1 +" - " + lon2 +")  Di:" + scaleX +" Dj:" + scaleY );
         return new GRIBCoordinateSystem(0, cols, rows, lat2, lon1, lat1,
                                         lon2, scaleX, scaleY);
     }
@@ -725,23 +749,24 @@ public class GeotiffAdapter {
      *
      * @param name   name of field
      * @param field  field to print
+     * @param sb _more_
      */
-    public static void print(String name, TIFFField field) {
+    public static void print(String name, TIFFField field, StringBuffer sb) {
         if (field == null) {
-            System.err.println(name + ": null field");
+            sb.append(name + ": null field\n");
             return;
         }
         //        System.err.print (name + ": " + GeoKeys.Tiff.getFieldType (field.getType ()) + "  values=");
-        System.err.print(name + "=");
+        sb.append(name + "=");
         int type = field.getType();
         for (int i = 0; i < field.getCount(); i++) {
             switch (type) {
 
               case TIFFField.TIFF_DOUBLE :
                   double v = field.getAsDouble(i);
-                  System.err.print(((i == 0)
-                                    ? ""
-                                    : ",") + v);
+                  sb.append(((i == 0)
+                             ? ""
+                             : ",") + v);
                   break;
 
               case TIFFField.TIFF_ASCII :
@@ -750,7 +775,7 @@ public class GeotiffAdapter {
 
             }
         }
-        System.err.println("");
+        sb.append("");
 
     }
 
@@ -759,15 +784,27 @@ public class GeotiffAdapter {
      * Print the keys for this GeoTIFF
      */
     public void printKeys() {
+        System.err.println(getKeyString());
+    }
 
+
+
+    /**
+     * Print the keys for this GeoTIFF
+     *
+     * @return _more_
+     */
+    public String getKeyString() {
         if (dirField == null) {
-            System.err.println("Not a geotiff");
-            return;
+            return "Not a geotiff";
         }
 
-        System.err.println("");
-        print("\ttie point", tiePointField);
-        print("\tscale", scaleField);
+        StringBuffer sb = new StringBuffer();
+
+        print("\ttie point", tiePointField, sb);
+        sb.append("\n");
+        print("\tscale", scaleField, sb);
+        sb.append("\n");
         //        System.err.println ("");
         for (int tagIdx = 4; tagIdx < dirField.getCount(); tagIdx += 4) {
             long   geoKeyId = dirField.getAsLong(tagIdx);
@@ -777,14 +814,14 @@ public class GeotiffAdapter {
             String keyName  = GeoKeys.Geokey.getName((int) geoKeyId);
             long   value    = 0;
             if (location == 0) {
-                System.err.print("\tgeokey: " + keyName + "(" + geoKeyId
-                                 + ")  = " + offset);
+                sb.append("\tgeokey: " + keyName + "(" + geoKeyId + ")  = "
+                          + offset);
                 value = offset;
             } else {
                 TIFFField subField = dir.getField((int) location);
                 if (subField == null) {
-                    System.err.println("\tgeokey: " + keyName + "("
-                                       + geoKeyId + ")  could not be found");
+                    sb.append("\tgeokey: " + keyName + "(" + geoKeyId
+                              + ")  could not be found\n");
                     continue;
                 }
                 String typeName =
@@ -794,28 +831,29 @@ public class GeotiffAdapter {
                 if (count == 1) {
                     if (subField.getType() == TIFFField.TIFF_ASCII) {}
                     else {
-                        System.err.print(
-                            "\tgeokey: " + keyName + "(" + geoKeyId + ")  = "
-                            + subField.getAsDouble((int) offset));
+                        sb.append("\tgeokey: " + keyName + "(" + geoKeyId
+                                  + ")  = "
+                                  + subField.getAsDouble((int) offset));
                     }
                 } else {
                     print("\tgeokey: " + keyName + "(" + geoKeyId
-                          + ") offset: " + offset, subField);
+                          + ") offset: " + offset, subField, sb);
                 }
                 //                System.err.print ("\tgeokey: " + keyName +"("+geoKeyId + ")  count=" + count);
                 //                print (keyName, subField);
 
             }
             if (geoKeyId == GeoKeys.Geokey.ProjectedCSTypeGeoKey) {
-                System.err.println("  projectedCS:"
-                                   + GeoKeys.EpsgPcs.getName((int) value));
+                sb.append("  projectedCS:"
+                          + GeoKeys.EpsgPcs.getName((int) value) + "\n");
             } else if (geoKeyId == GeoKeys.Geokey.GeographicTypeGeoKey) {
-                System.err.println(" geographic type:"
-                                   + GeoKeys.EpsgGcs.getName((int) value));
+                sb.append(" geographic type:"
+                          + GeoKeys.EpsgGcs.getName((int) value) + "\n");
             } else {
-                System.err.println(" ");
+                sb.append("\n");
             }
         }
+        return sb.toString();
     }
 
 
