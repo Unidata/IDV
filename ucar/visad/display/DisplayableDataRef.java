@@ -20,7 +20,24 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.visad.display;
+
+
+import visad.ActionImpl;
+import visad.ConstantMap;
+import visad.Data;
+import visad.DataReference;
+import visad.DataReferenceImpl;
+import visad.DataRenderer;
+import visad.Display;
+import visad.DisplayImpl;
+import visad.DisplayRenderer;
+import visad.VisADException;
+
+import visad.java2d.DirectManipulationRendererJ2D;
+
+import visad.java3d.DirectManipulationRendererJ3D;
 
 
 
@@ -29,28 +46,6 @@ import java.awt.Color;
 import java.rmi.RemoteException;
 
 import java.util.*;
-
-import visad.ActionImpl;
-
-import visad.ConstantMap;
-
-import visad.Data;
-
-import visad.DataReference;
-
-import visad.DataRenderer;
-
-import visad.Display;
-
-import visad.DisplayImpl;
-
-import visad.DisplayRenderer;
-
-import visad.VisADException;
-
-import visad.java2d.DirectManipulationRendererJ2D;
-
-import visad.java3d.DirectManipulationRendererJ3D;
 
 
 /**
@@ -72,6 +67,22 @@ public class DisplayableDataRef extends Displayable {
 
     /** flag for whether reference has been added to the display or not */
     private boolean refAdded = false;
+
+    /**
+     * Constructs from a {@link visad.DataReference} and a missing data value.
+     * By default, the {@link visad.DataRenderer} will be appropriate for the
+     * dimensionality of the display and will not directly manipulate the data
+     * (but see {@link #setManipulable}).
+     *
+     *
+     * @param name the name of the reference
+     * @throws VisADException       if a VisAD failure occurs.
+     * @throws RemoteException      if a Java RMI failure occurs.
+     */
+    public DisplayableDataRef(String name)
+            throws RemoteException, VisADException {
+        this(new DataReferenceImpl(name));
+    }
 
     /**
      * Constructs from a {@link visad.DataReference} and a missing data value.
@@ -101,6 +112,19 @@ public class DisplayableDataRef extends Displayable {
      */
     public final DataReference getDataReference() {
         return ref;
+    }
+
+
+    /**
+     * Set the data on this reference
+     *
+     * @param d  data to set
+     *
+     * @throws VisADException     VisAD failure.
+     * @throws RemoteException    Java RMI failure.
+     */
+    public void setData(Data d) throws VisADException, RemoteException {
+        ref.setData(d);
     }
 
     /**
@@ -284,8 +308,4 @@ public class DisplayableDataRef extends Displayable {
         return clone;
     }
 }
-
-
-
-
 
