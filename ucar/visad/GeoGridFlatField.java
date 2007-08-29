@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.visad;
 
 
@@ -61,7 +62,8 @@ import java.rmi.RemoteException;
  */
 public class GeoGridFlatField extends CachedFlatField {
 
-    private String readLabel="";
+    /** _more_          */
+    private String readLabel = "";
 
     /** _more_ */
     private GriddedSet domainSet;
@@ -72,7 +74,7 @@ public class GeoGridFlatField extends CachedFlatField {
     /** _more_ */
     private int timeIndex;
 
-    /** _more_          */
+    /** _more_ */
     transient private Object readLock;
 
     /**
@@ -88,8 +90,8 @@ public class GeoGridFlatField extends CachedFlatField {
      * @throws VisADException On badness
      */
     public GeoGridFlatField(GeoGrid geoGrid, Object readLock, int timeIndex,
-                            GriddedSet domainSet,
-                            FunctionType type) throws VisADException {
+                            GriddedSet domainSet, FunctionType type)
+            throws VisADException {
         super(type, domainSet);
         this.readLock  = readLock;
         this.geoGrid   = geoGrid;
@@ -117,8 +119,8 @@ public class GeoGridFlatField extends CachedFlatField {
                             FunctionType type, Set domainSet,
                             CoordinateSystem rangeCoordSys,
                             CoordinateSystem[] rangeCoordSysArray,
-                            Set[] rangeSets,
-                            Unit[] units) throws VisADException {
+                            Set[] rangeSets, Unit[] units)
+            throws VisADException {
         super(that, copy, type, domainSet, rangeCoordSys, rangeCoordSysArray,
               rangeSets, units);
         this.readLock  = that.readLock;
@@ -146,13 +148,13 @@ public class GeoGridFlatField extends CachedFlatField {
                                    Set domainSet,
                                    CoordinateSystem rangeCoordSys,
                                    CoordinateSystem[] rangeCoordSysArray,
-                                   Set[] rangeSets,
-                                   Unit[] units) throws VisADException {
+                                   Set[] rangeSets, Unit[] units)
+            throws VisADException {
 
         msg("GeoGridFlatField.cloneMe");
-        CachedFlatField ccf = new GeoGridFlatField(this, copy, type, domainSet,
-                                    rangeCoordSys, rangeCoordSysArray,
-                                    rangeSets, units);
+        CachedFlatField ccf = new GeoGridFlatField(this, copy, type,
+                                  domainSet, rangeCoordSys,
+                                  rangeCoordSysArray, rangeSets, units);
         return ccf;
     }
 
@@ -174,18 +176,23 @@ public class GeoGridFlatField extends CachedFlatField {
      */
     public GeoGridFlatField(FunctionType type, Set domainSet,
                             CoordinateSystem rangeCoordSys, Set[] rangeSets,
-                            Unit[] units,
-                            float[][] floats) throws VisADException {
+                            Unit[] units, float[][] floats)
+            throws VisADException {
         super(type, domainSet, rangeCoordSys, rangeSets, units, floats);
     }
 
 
-    /** _more_          */
+    /** _more_ */
     public static Object ALLMUTEX = new Object();
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private Object getReadLock() {
-        if(readLock == null) {
+        if (readLock == null) {
             readLock = ALLMUTEX;
         }
         return readLock;
@@ -197,7 +204,7 @@ public class GeoGridFlatField extends CachedFlatField {
      * @return data
      */
     protected float[][] readData() {
-        if(myParent!=null) {
+        if (myParent != null) {
             return myParent.readData();
         }
         //        Misc.printStack("GeoGridFlatField.readData",15,null);
@@ -208,7 +215,8 @@ public class GeoGridFlatField extends CachedFlatField {
             Trace.call1("GeoGridFlatField.geogrid.readVolumeData");
             synchronized (getReadLock()) {
                 LogUtil.message(readLabel);
-                ucar.unidata.data.DataSourceImpl.incrOutstandingGetDataCalls();
+                ucar.unidata.data.DataSourceImpl
+                    .incrOutstandingGetDataCalls();
                 arr = geoGrid.readVolumeData(timeIndex);
                 LogUtil.message("");
             }
@@ -255,6 +263,11 @@ public class GeoGridFlatField extends CachedFlatField {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     */
     public void setReadLabel(String s) {
         readLabel = s;
     }

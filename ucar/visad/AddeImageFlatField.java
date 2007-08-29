@@ -22,10 +22,9 @@
 
 
 
+
 package ucar.visad;
 
-
-import visad.meteorology.SingleBandedImage;
 
 import ucar.ma2.Array;
 import ucar.ma2.Index;
@@ -46,6 +45,9 @@ import ucar.unidata.util.Trace;
 
 import visad.*;
 
+
+import visad.meteorology.SingleBandedImage;
+
 import visad.util.DataUtility;
 
 
@@ -61,16 +63,18 @@ import java.rmi.RemoteException;
  * @author Unidata Development Team
  * @version $Revision: 1.7 $ $Date: 2007/08/08 17:14:56 $
  */
-public class AddeFlatField extends CachedFlatField implements SingleBandedImage {
+public class AddeImageFlatField extends CachedFlatField implements SingleBandedImage {
 
 
 
 
-    private String readLabel="";
+    /** _more_          */
+    private String readLabel = "";
 
     /** _more_ */
     private GriddedSet domainSet;
 
+    /** _more_          */
     private DateTime startTime;
 
     /**
@@ -87,12 +91,12 @@ public class AddeFlatField extends CachedFlatField implements SingleBandedImage 
      *
      * @throws VisADException On badness
      */
-    public AddeFlatField(AddeFlatField that, boolean copy,
-                            FunctionType type, Set domainSet,
-                            CoordinateSystem rangeCoordSys,
-                            CoordinateSystem[] rangeCoordSysArray,
-                            Set[] rangeSets,
-                            Unit[] units) throws VisADException {
+    public AddeImageFlatField(AddeImageFlatField that, boolean copy,
+                              FunctionType type, Set domainSet,
+                              CoordinateSystem rangeCoordSys,
+                              CoordinateSystem[] rangeCoordSysArray,
+                              Set[] rangeSets, Unit[] units)
+            throws VisADException {
         super(that, copy, type, domainSet, rangeCoordSys, rangeCoordSysArray,
               rangeSets, units);
         this.domainSet = that.domainSet;
@@ -117,13 +121,13 @@ public class AddeFlatField extends CachedFlatField implements SingleBandedImage 
                                    Set domainSet,
                                    CoordinateSystem rangeCoordSys,
                                    CoordinateSystem[] rangeCoordSysArray,
-                                   Set[] rangeSets,
-                                   Unit[] units) throws VisADException {
+                                   Set[] rangeSets, Unit[] units)
+            throws VisADException {
 
-        msg("AddeFlatField.cloneMe");
-        CachedFlatField ccf = new AddeFlatField(this, copy, type, domainSet,
-                                    rangeCoordSys, rangeCoordSysArray,
-                                    rangeSets, units);
+        msg("AddeImageFlatField.cloneMe");
+        CachedFlatField ccf = new AddeImageFlatField(this, copy, type,
+                                  domainSet, rangeCoordSys,
+                                  rangeCoordSysArray, rangeSets, units);
         return ccf;
     }
 
@@ -143,26 +147,36 @@ public class AddeFlatField extends CachedFlatField implements SingleBandedImage 
      *
      * @throws VisADException On badness
      */
-    public AddeFlatField(FunctionType type, Set domainSet,
-                            CoordinateSystem rangeCoordSys, Set[] rangeSets,
-                            Unit[] units,
-                            float[][] floats) throws VisADException {
+    public AddeImageFlatField(FunctionType type, Set domainSet,
+                              CoordinateSystem rangeCoordSys,
+                              Set[] rangeSets, Unit[] units, float[][] floats)
+            throws VisADException {
         super(type, domainSet, rangeCoordSys, rangeSets, units, floats);
     }
 
 
-    public static AddeFlatField createFromSingleBandedImage(SingleBandedImage image) throws VisADException, RemoteException {
-        float[][]values =  image.getFloats(false);
+    /**
+     * _more_
+     *
+     * @param image _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static AddeImageFlatField createFromSingleBandedImage(
+            SingleBandedImage image)
+            throws VisADException, RemoteException {
+        float[][] values = image.getFloats(false);
 
-        FlatField ff = (FlatField) image;
+        FlatField ff     = (FlatField) image;
 
-        AddeFlatField aff = new AddeFlatField((FunctionType) image.getType(), 
-                                              image.getDomainSet(),
-                                              //                                        ff.getRangeCoordinateSystem(0)[0],
-                                              null,
-                                              ff.getRangeSets(),
-                                              ff.getRangeUnits()[0], 
-                                              values);
+        AddeImageFlatField aff =
+            new AddeImageFlatField((FunctionType) image.getType(),
+                                   image.getDomainSet(),
+        //                                        ff.getRangeCoordinateSystem(0)[0],
+        null, ff.getRangeSets(), ff.getRangeUnits()[0], values);
         aff.startTime = image.getStartTime();
         //        aff.setShouldCache(true);
         return aff;
@@ -176,16 +190,25 @@ public class AddeFlatField extends CachedFlatField implements SingleBandedImage 
      * @return data
      */
     protected float[][] readData() {
-        System.err.println ("read data");
         return null;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     */
     public void setReadLabel(String s) {
         readLabel = s;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public DateTime getStartTime() {
         return startTime;
     }
@@ -194,7 +217,7 @@ public class AddeFlatField extends CachedFlatField implements SingleBandedImage 
      * Return a descriptive string for this image.
      * @return description
      */
-    public  String getDescription() {
+    public String getDescription() {
         return "image";
     }
 
@@ -204,8 +227,8 @@ public class AddeFlatField extends CachedFlatField implements SingleBandedImage 
      *          Real allows us to associate units and error estimates with
      *          the value
      */
-    public  Real getMinRangeValue() {
-        System.err.println ("getminrangevalue");
+    public Real getMinRangeValue() {
+        System.err.println("getminrangevalue");
         return null;
     }
 
@@ -215,8 +238,8 @@ public class AddeFlatField extends CachedFlatField implements SingleBandedImage 
      *          Real allows us to associate units and error estimates with
      *          the value
      */
-    public    Real getMaxRangeValue(){
-        System.err.println ("getmaxrangevalue");
+    public Real getMaxRangeValue() {
+        System.err.println("getmaxrangevalue");
         return null;
     }
 
@@ -226,8 +249,8 @@ public class AddeFlatField extends CachedFlatField implements SingleBandedImage 
      *
      * @return true if it has navigation, otherwise false
      */
-    public    boolean isNavigated(){
-        System.err.println ("isnavigated");
+    public boolean isNavigated() {
+        System.err.println("isnavigated");
         return true;
     }
 
