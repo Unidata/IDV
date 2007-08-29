@@ -28,7 +28,7 @@ import edu.wisc.ssec.mcidas.AreaDirectory;
 
 import ucar.unidata.data.*;
 
-import ucar.visad.AddeFlatField;
+import ucar.visad.AddeImageFlatField;
 
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.FileManager;
@@ -913,8 +913,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
         try {
             AreaAdapter aa = new AreaAdapter(aid.getSource(), false);  // don't pack
             result = aa.getImage();
-            //            if(doit)            result = AddeFlatField.createFromSingleBandedImage(result);
-            //            doit = !doit;
+            AddeImageFlatField aiff =             AddeImageFlatField.createFromSingleBandedImage(result);
+            result = aiff;
             putCache(source, result);
             return result;
         } catch (java.io.IOException ioe) {
@@ -922,7 +922,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
         }
     }
 
-    //static     boolean doit = true;
 
 
     /**
