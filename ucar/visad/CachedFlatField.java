@@ -278,6 +278,7 @@ public class CachedFlatField extends FlatField {
         if (values == null) {
             return null;
         }
+        System.err.println ("#ranges:" + values.length);
         ranges = new Range[values.length];
         for (int rangeIdx = 0; rangeIdx < values.length; rangeIdx++) {
             float   pMin         = Float.POSITIVE_INFINITY;
@@ -294,6 +295,7 @@ public class CachedFlatField extends FlatField {
                 }
             }
             ranges[rangeIdx] = new Range(pMin, pMax);
+            System.err.println ("range:" + ranges[rangeIdx]);
         }
         msg("done making ranges");
         return ranges;
@@ -374,7 +376,7 @@ public class CachedFlatField extends FlatField {
      * @param s message to print
      */
     protected void msg(String s) {
-        //        System.err.println(Thread.currentThread()+ " " +s);
+        System.err.println(myid+ " " +s);
     }
 
     /**
@@ -411,8 +413,7 @@ public class CachedFlatField extends FlatField {
 
             try {
                 //            System.err.println ("*** Reading from file");
-                //                System.err.println(myid + " reading from cache");
-                //                System.err.println(myid + " reading from file cache");
+                System.err.println(myid + " reading from file cache");
                 FileInputStream   istream = new FileInputStream(getFilename());
                 BufferedInputStream bis = new BufferedInputStream(istream, 1000000);
                 ObjectInputStream ois     = new ObjectInputStream(bis);
@@ -438,19 +439,20 @@ public class CachedFlatField extends FlatField {
         msg("getSample");
         float[][] values = myFloatValues;
         if (values == null) {
-            msg(Thread.currentThread() + " Reading cache");
+            msg(" Reading cache");
             values = readCache();
-            msg(Thread.currentThread() + " done Reading cache");
+            msg(" done Reading cache");
         }
         //        Misc.printStack("CachedFlatField.unpackFloats", 3, null);
         if (values == null) {
-            msg(Thread.currentThread() + "Floats still null");
+            msg("Floats still null");
             return null;
         }
         MathType        Type        = getType();
         ErrorEstimate[] RangeErrors = getRangeErrors();
 
         if (isMissing() || (index < 0) || (index >= getLength())) {
+            msg("is missing");
             return ((FunctionType) Type).getRange().missingData();
         }
         double[][] range = new double[TupleDimension][1];
@@ -542,13 +544,13 @@ public class CachedFlatField extends FlatField {
             //DEBUG        System.err.println (myid + " in unpackFloats");
         if (values == null) {
             //DEBUG            System.err.println (myid + " values is null");
-            msg(Thread.currentThread() + " Reading cache");
+            msg(" Reading cache");
             values = readCache();
-            msg(Thread.currentThread() + " done Reading cache");
+            msg(" done Reading cache");
         }
         //        Misc.printStack("CachedFlatField.unpackFloats", 3, null);
         if (values == null) {
-            msg(Thread.currentThread() + "Floats still null");
+            msg("Floats still null");
             return null;
         }
         float[][] result = null;
@@ -561,7 +563,7 @@ public class CachedFlatField extends FlatField {
             result = values;
         }
         checkCache();
-        msg(Thread.currentThread() + " Done unpackFloats");
+        msg(" Done unpackFloats");
         return result;
     }
 
@@ -607,7 +609,7 @@ public class CachedFlatField extends FlatField {
             }
             try {
                 long t1 = System.currentTimeMillis();
-                //                System.err.println(myid + " writing to file cache " + getFilename());
+                System.err.println(myid + " writing to file cache " + getFilename());
                 FileOutputStream   fos = new FileOutputStream(getFilename());
                 BufferedOutputStream bos = new BufferedOutputStream(fos, 100000);
                 ObjectOutputStream p       = new ObjectOutputStream(bos);
