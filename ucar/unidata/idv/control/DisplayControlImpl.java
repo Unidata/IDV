@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -1647,6 +1648,18 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
     /**
+     * Get the color table to use when applying to displayables
+     *
+     * @return The color table
+     */
+    protected ColorTable getColorTableToApply() {
+        if (colorTable == null) {
+            colorTable = getOldColorTableOrInitialColorTable();
+        }
+        return colorTable;
+    }
+
+    /**
      * If the color table is non-null then apply it to the
      * {@link ucar.visad.display.Displayable}s in the displayables
      * list that are flagged with the FLAG_COLORTABLE
@@ -1658,6 +1671,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (displayables == null) {
             return;
         }
+        ColorTable colorTableToUse = getColorTableToApply();
+        if (colorTableToUse == null) {
+            if (colorScaleInfo != null) {
+                colorScaleInfo.setColorPalette(null);
+                applyColorScaleInfo();
+            }
+            return;
+        }
         float[][] table = null;
         for (int i = 0, n = displayables.size(); i < n; i++) {
             FlaggedDisplayable fd = (FlaggedDisplayable) displayables.get(i);
@@ -1667,13 +1688,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
             //Only create this once
             if (table == null) {
-                if (colorTable == null) {
-                    colorTable = getOldColorTableOrInitialColorTable();
-                    if (colorTable == null) {
-                        return;
-                    }
-                }
-                table = getColorTableForDisplayable(colorTable);
+                table = getColorTableForDisplayable(colorTableToUse);
                 if (colorDimness < 0.1f) {
                     colorDimness = 0.1f;
                 }
@@ -1777,6 +1792,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         activateDisplays();
     }
 
+
+
+
     /**
      * Apply the range it to the
      * {@link ucar.visad.display.Displayable}s in the displayables
@@ -1796,7 +1814,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 continue;
             }
             if (range == null) {
-                range = getRange();
+                range = getRangeToApply();
             }
             if (range == null) {
                 return;
@@ -4873,7 +4891,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         } else {
             propertiesDialog.setVisible(true);
         }
-
     }
 
     /**
@@ -8660,6 +8677,19 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
     /**
+     * Get the range to use to apply to displayables
+     *
+     * @return the range for displayables
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public Range getRangeToApply() throws RemoteException, VisADException {
+        return getRange();
+    }
+
+
+    /**
      * Get the range for the parameter
      *
      * @return range being used
@@ -8807,6 +8837,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             if (colorTable.equalsTable(newColorTable)) {
                 return;
             }
+        }
+        if (newColorTable == null) {
+            this.colorTable = null;
+            return;
         }
         this.colorTable = new ColorTable(newColorTable);
         if ((ctw != null) && (colorTable != null)) {

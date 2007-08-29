@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -152,7 +153,7 @@ public class StationModelControl extends ObsDisplayControl {
     /** time series chart */
     private TimeSeriesChart timeSeries;
 
-    /** _more_          */
+    /** This holds the chart */
     private JComponent plotPanel;
 
 
@@ -325,6 +326,14 @@ public class StationModelControl extends ObsDisplayControl {
 
     /** Have we asked the user to declutter time */
     private boolean askedUserToDeclutterTime = false;
+
+
+    /** The range from the symbol in the layout model    */
+    private Range stationModelRange;
+
+    /** The color table from the symbol in the layout model    */
+    private ColorTable stationModelColorTable;
+
 
 
     /**
@@ -509,9 +518,13 @@ public class StationModelControl extends ObsDisplayControl {
         if (sideLegendExtra == null) {
             return;
         }
+        Range      newRange      = null;
+        ColorTable newColorTable = null;
         try {
             sideLegendExtra.removeAll();
             if (stationModel == null) {
+                stationModelRange      = null;
+                stationModelColorTable = null;
                 return;
             }
             sideLegendExtra.add(GuiUtils.left(new JLabel("Layout model:"
@@ -519,8 +532,14 @@ public class StationModelControl extends ObsDisplayControl {
             for (Iterator iter = stationModel.iterator(); iter.hasNext(); ) {
                 MetSymbol  metSymbol = (MetSymbol) iter.next();
                 ColorTable ct        = metSymbol.getColorTable();
-                String     param     = metSymbol.getColorTableParam();
                 Range      range     = metSymbol.getColorTableRange();
+                if ((ct != null) && (stationModelColorTable == null)
+                        && (range != null)) {
+                    newColorTable = ct;
+                    newRange      = range;
+
+                }
+                String param = metSymbol.getColorTableParam();
                 if ((ct == null) || (param == null)) {
                     continue;
                 }
@@ -537,6 +556,14 @@ public class StationModelControl extends ObsDisplayControl {
                                    GuiUtils.buttonFont.deriveFont(10.0f));
             sideLegendExtra.validate();
             sideLegendExtra.repaint();
+
+            if ( !Misc.equals(newRange, stationModelRange)
+                    || !Misc.equals(newColorTable, stationModelColorTable)) {
+                stationModelRange      = newRange;
+                stationModelColorTable = newColorTable;
+                applyColorTable();
+                applyRange();
+            }
         } catch (Exception exc) {
             logException("Creating color table previews", exc);
         }
@@ -1318,8 +1345,47 @@ public class StationModelControl extends ObsDisplayControl {
             throws VisADException, RemoteException {
         myDisplay = new StationModelDisplayable(getStationModel(),
                 getControlContext().getJythonManager());
-        addDisplayable(myDisplay, FLAG_ZPOSITION | FLAG_LINEWIDTH);
+        addDisplayable(myDisplay,
+                       FLAG_ZPOSITION | FLAG_LINEWIDTH | FLAG_COLORTABLE);
         return myDisplay;
+    }
+
+
+
+    /**
+     * Overwrite base class method to return the color range to use when applying to displayables.
+     * This is  the range from the station model for any symbol that is colored by
+     *
+     * @return Range
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public Range getRangeToApply() throws RemoteException, VisADException {
+        return stationModelRange;
+    }
+
+    /**
+     * Overwrite base class method so we don't have any color table.
+     * This gets called because we turn on the FLAG_COLORTABLE to enable the
+     * color scales but we use the color table from the station model
+     *
+     * @return color table
+     */
+    protected ColorTable getInitialColorTable() {
+        return null;
+    }
+
+
+
+
+    /**
+     * Get the color table to use when applying to displayables
+     *
+     * @return color table from the layout model. May be null.
+     */
+    protected ColorTable getColorTableToApply() {
+        return stationModelColorTable;
     }
 
 
@@ -2557,12 +2623,10 @@ public class StationModelControl extends ObsDisplayControl {
 
 
 
-
-
     /**
-     * _more_
+     * Add properties to the display settings dialog
      *
-     * @param dsd _more_
+     * @param dsd display settings dialog
      */
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         super.addDisplaySettings(dsd);
@@ -2594,9 +2658,9 @@ public class StationModelControl extends ObsDisplayControl {
     }
 
     /**
-     * _more_
+     * recieve the chart display settings
      *
-     * @param tfo _more_
+     * @param tfo Holds the chart to apply
      */
     public void setChartSettings(TwoFacedObject tfo) {
         try {
