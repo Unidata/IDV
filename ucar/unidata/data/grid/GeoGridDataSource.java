@@ -22,6 +22,8 @@
 
 
 
+
+
 package ucar.unidata.data.grid;
 
 
@@ -48,8 +50,6 @@ import ucar.unidata.idv.IdvConstants;
 
 import ucar.unidata.idv.chooser.ThreddsHandler;
 
-import ucar.visad.CachedFlatField;
-
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.GuiUtils;
@@ -64,6 +64,8 @@ import ucar.unidata.util.Trace;
 import ucar.unidata.util.WrapperException;
 
 import ucar.unidata.xml.*;
+
+import ucar.visad.CachedFlatField;
 
 import ucar.visad.Util;
 
@@ -172,14 +174,6 @@ public class GeoGridDataSource extends GridDataSource {
     private int max3D;
 
 
-
-    private  JCheckBox cacheFlatFieldsCbx;
-
-    private boolean cacheFlatFields = false;
-
-
-    private String cachePath;
-
     /**
      * Default constructor
      */
@@ -238,14 +232,6 @@ public class GeoGridDataSource extends GridDataSource {
     }
 
 
-    protected String getCachePath() {
-        if(cachePath == null && CachedFlatField.getCacheDir()!=null) {
-            String uniqueName = "grid_" + Misc.getUniqueId();
-            cachePath  = IOUtil.joinDir(CachedFlatField.getCacheDir(), uniqueName);
-            IOUtil.makeDir(cachePath);
-        }
-        return cachePath;
-    }
 
 
     /**
@@ -343,20 +329,6 @@ public class GeoGridDataSource extends GridDataSource {
 
 
 
-    public void getPropertiesComponents(List comps) {
-        super.getPropertiesComponents(comps);
-        comps.add(GuiUtils.filler());
-        comps.add(getPropertiesHeader("Caching"));
-        cacheFlatFieldsCbx = new JCheckBox("Always cache to disk", cacheFlatFields);
-        comps.add(GuiUtils.filler());
-        comps.add(cacheFlatFieldsCbx);
-    }
-
-    public boolean applyProperties() {
-        if(!super.applyProperties()) return false;
-        setCacheFlatFields(cacheFlatFieldsCbx.isSelected());
-        return true;
-    }
 
     /**
      * Initialize after we have been created.
@@ -436,7 +408,6 @@ public class GeoGridDataSource extends GridDataSource {
      * Clear out the data set
      */
     public void reloadData() {
-        cachePath = null;
         myTimes   = null;
         dataset   = null;
         gcsVsTime = new Hashtable();
@@ -445,22 +416,17 @@ public class GeoGridDataSource extends GridDataSource {
         //        doMakeDataChoices();
         getDataChoices();
         super.reloadData();
+
         /**
-           not sure if we want to do this since we might have 
-           cachedflatfields out there that are pointing at the old
-           directory
-           clearFileCache();
+         *  not sure if we want to do this since we might have
+         *  cachedflatfields out there that are pointing at the old
+         *  directory
+         *  clearFileCache();
          */
 
     }
 
 
-
-    private void clearFileCache() {
-        if(cachePath!=null) {
-            IOUtil.deleteDirectory(new File(cachePath));
-        }
-    }
 
 
     /**
@@ -468,7 +434,6 @@ public class GeoGridDataSource extends GridDataSource {
      */
     public void doRemove() {
         super.doRemove();
-        clearFileCache();
         dataset   = null;
         gcsVsTime = null;
     }
@@ -996,6 +961,17 @@ public class GeoGridDataSource extends GridDataSource {
         return true;
     }
 
+    /**
+     * Can this data source cache its
+     *
+     * @return can cache data to disk
+     */
+    public boolean canCacheDataToDisk() {
+        return true;
+    }
+
+
+
 
     /**
      * Utility to create a new GeoGridAdapter for the given choice and data selection and
@@ -1037,15 +1013,13 @@ public class GeoGridDataSource extends GridDataSource {
         // System.out.println("need volume = " + needVolume);
 
 
-        StringBuffer filename = new StringBuffer("grid_"+paramName);
+        StringBuffer filename = new StringBuffer("grid_" + paramName);
 
         try {
             ucar.ma2.Range levelRange = null;
-            if(fromLevelIndex >= 0 
-               && toLevelIndex >= 0
-               && !needVolume) {
-                levelRange = new ucar.ma2.Range(fromLevelIndex,  toLevelIndex);
-                filename.append("_r_" +fromLevelIndex+"_"+toLevelIndex);
+            if ((fromLevelIndex >= 0) && (toLevelIndex >= 0) && !needVolume) {
+                levelRange = new ucar.ma2.Range(fromLevelIndex, toLevelIndex);
+                filename.append("_r_" + fromLevelIndex + "_" + toLevelIndex);
             }
 
             if ((geoSelection != null) && geoSelection.getHasValidState()) {
@@ -1054,11 +1028,11 @@ public class GeoGridDataSource extends GridDataSource {
                 if (levelRange != null) {
                     extraCacheKey = Misc.newList(extraCacheKey, levelRange);
                 }
-                filename.append("_x_" +  geoSelection.getXStrideToUse());
-                filename.append("_y_" +  geoSelection.getYStrideToUse());
-                filename.append("_z_" +  geoSelection.getZStrideToUse());
-                if(geoSelection.getLatLonRect()!=null) {
-                    filename.append("_rect_" +  geoSelection.getLatLonRect());
+                filename.append("_x_" + geoSelection.getXStrideToUse());
+                filename.append("_y_" + geoSelection.getYStrideToUse());
+                filename.append("_z_" + geoSelection.getZStrideToUse());
+                if (geoSelection.getLatLonRect() != null) {
+                    filename.append("_rect_" + geoSelection.getLatLonRect());
                 }
                 geoGrid = geoGrid.subset(null, levelRange,
                                          geoSelection.getLatLonRect(),
@@ -1639,24 +1613,6 @@ public class GeoGridDataSource extends GridDataSource {
         oldSourceFromBundles = value;
     }
 
-
-/**
-Set the CacheFlatFields property.
-
-@param value The new value for CacheFlatFields
-**/
-public void setCacheFlatFields (boolean value) {
-	cacheFlatFields = value;
-}
-
-/**
-Get the CacheFlatFields property.
-
-@return The CacheFlatFields
-**/
-public boolean getCacheFlatFields () {
-	return cacheFlatFields;
-}
 
 
 }

@@ -21,14 +21,13 @@
  */
 
 
+
 package ucar.unidata.data.imagery;
 
 
 import edu.wisc.ssec.mcidas.AreaDirectory;
 
 import ucar.unidata.data.*;
-
-import ucar.visad.AddeImageFlatField;
 
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.FileManager;
@@ -40,6 +39,8 @@ import ucar.unidata.util.PollingInfo;
 import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.util.TwoFacedObject;
+
+import ucar.visad.AddeImageFlatField;
 
 import visad.*;
 
@@ -216,6 +217,18 @@ public abstract class ImageDataSource extends DataSourceImpl {
         }
         initDataFromPollingInfo();
     }
+
+
+
+    /**
+     * Can this data source cache its
+     *
+     * @return can cache data to disk
+     */
+    public boolean canCacheDataToDisk() {
+        return true;
+    }
+
 
 
 
@@ -913,7 +926,16 @@ public abstract class ImageDataSource extends DataSourceImpl {
         try {
             AreaAdapter aa = new AreaAdapter(aid.getSource(), false);  // don't pack
             result = aa.getImage();
-            AddeImageFlatField aiff =             AddeImageFlatField.createFromSingleBandedImage(result);
+
+            String filename = IOUtil.joinDir(getDataCachePath(),
+                                             "image"+(result.getStartTime()!=null?""+result.getStartTime().getValue():"")
+
+                                             + ".dat");
+
+            AddeImageFlatField aiff =
+                AddeImageFlatField.createFromSingleBandedImage(result,
+                    getCacheDataToDisk(), filename, getCacheClearDelay());
+
             result = aiff;
             putCache(source, result);
             return result;
@@ -1187,18 +1209,18 @@ public abstract class ImageDataSource extends DataSourceImpl {
                             "<table border=\"1\" width=\"100%\"><tr valign=\"bottom\"><td><b>Location</b></td><td><b>Date</b></td><td><b>Size (Lines X Elements) </b></td><td><b>Band</b></td></tr>");
                     }
                     buf.append("<tr valign=\"top\"><td width=\"300\">");
-                    String path = ((AddeImageDescriptor) o).getSource(); 
-                    if(path.length()>50) {
-                        String tmp = path;                        
+                    String path = ((AddeImageDescriptor) o).getSource();
+                    if (path.length() > 50) {
+                        String tmp = path;
                         path = "";
-                        while(tmp.length()>50) {
-                            if(path.length()>0) {
-                                path = path+"<br>";
+                        while (tmp.length() > 50) {
+                            if (path.length() > 0) {
+                                path = path + "<br>";
                             }
-                            path = path+tmp.substring(0,49);
-                            tmp = tmp.substring(49);
+                            path = path + tmp.substring(0, 49);
+                            tmp  = tmp.substring(49);
                         }
-                        path = path +"<br>"+tmp;
+                        path = path + "<br>" + tmp;
                     }
                     buf.append(path);
                     buf.append("</td>");

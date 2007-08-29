@@ -22,6 +22,8 @@
 
 
 
+
+
 package ucar.unidata.data;
 
 
@@ -225,6 +227,22 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
     /** How many get data calls are we currently waiting on */
     private static int outstandingGetDataCalls = 0;
+
+
+    /** _more_ */
+    private JCheckBox cacheDataToDiskCbx;
+
+    /** _more_          */
+    private JTextField cacheClearDelayFld;
+
+    /** _more_ */
+    private boolean cacheDataToDisk = false;
+
+    /** _more_ */
+    private long cacheClearDelay = 0;
+
+    /** _more_ */
+    private String dataCachePath;
 
 
 
@@ -709,6 +727,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         try {
             stopPolling();
         } catch (Exception noop) {}
+        clearFileCache();
         dataChangeListeners = null;
         dataChoices         = null;
     }
@@ -931,11 +950,24 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * they may be holding. Then they should call this method to do the notification.
      */
     public void reloadData() {
-        timesList = null;
+        dataCachePath = null;
+        timesList     = null;
         flushCache();
         notifyDataChange();
         getDataContext().dataSourceChanged(this);
     }
+
+
+    /**
+     * _more_
+     */
+    protected void clearFileCache() {
+        if (dataCachePath != null) {
+            IOUtil.deleteDirectory(new File(dataCachePath));
+        }
+    }
+
+
 
 
     /**
@@ -2209,8 +2241,32 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                             GuiUtils.lLabel(" minutes"))));
             }
         }
+
+
+        if (canCacheDataToDisk()) {
+            comps.add(GuiUtils.filler());
+            comps.add(getPropertiesHeader("Caching"));
+            cacheDataToDiskCbx = new JCheckBox("Always cache to disk",
+                    cacheDataToDisk);
+            comps.add(GuiUtils.filler());
+            comps.add(cacheDataToDiskCbx);
+
+            comps.add(GuiUtils.rLabel("Delay:"));
+            cacheClearDelayFld = new JTextField("" + cacheClearDelay, 6);
+            comps.add(GuiUtils.left(GuiUtils.hbox(cacheClearDelayFld,
+                    new JLabel(" ms"))));
+        }
     }
 
+
+    /**
+     * Can this data source cache its
+     *
+     * @return can cache data to disk
+     */
+    public boolean canCacheDataToDisk() {
+        return false;
+    }
 
 
     /**
@@ -2441,6 +2497,15 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                 startPolling();
             }
         }
+
+        if (cacheDataToDiskCbx != null) {
+            setCacheDataToDisk(cacheDataToDiskCbx.isSelected());
+            setCacheClearDelay(
+                (long) new Double(
+                    cacheClearDelayFld.getText().trim()).doubleValue());
+        }
+
+
 
         return true;
     }
@@ -2894,6 +2959,59 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
+
+    /**
+     * Set the CacheFlatFields property.
+     *
+     * @param value The new value for CacheFlatFields
+     */
+    public void setCacheDataToDisk(boolean value) {
+        cacheDataToDisk = value;
+    }
+
+    /**
+     * Get the CacheFlatFields property.
+     *
+     * @return The CacheFlatFields
+     */
+    public boolean getCacheDataToDisk() {
+        return cacheDataToDisk;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getDataCachePath() {
+        if (dataCachePath == null) {
+            String uniqueName = "data_" + Misc.getUniqueId();
+            dataCachePath =
+                IOUtil.joinDir(getDataContext().getIdv().getDataManager()
+                    .getDataCacheDirectory(), uniqueName);
+            IOUtil.makeDir(dataCachePath);
+        }
+        return dataCachePath;
+    }
+
+
+    /**
+     * Set the CacheClearDelay property.
+     *
+     * @param value The new value for CacheClearDelay
+     */
+    public void setCacheClearDelay(long value) {
+        cacheClearDelay = value;
+    }
+
+    /**
+     * Get the CacheClearDelay property.
+     *
+     * @return The CacheClearDelay
+     */
+    public long getCacheClearDelay() {
+        return cacheClearDelay;
+    }
 
 
 }

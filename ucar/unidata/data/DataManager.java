@@ -266,6 +266,14 @@ public class DataManager {
 
     }
 
+    public String getDataCacheDirectory() {
+        String dataCacheDir =
+            IOUtil.joinDir(
+                dataContext.getObjectStore().getUserTmpDirectory(), "cache/");
+        IOUtil.makeDir(dataCacheDir);
+        return dataCacheDir;
+    }
+
     /**
      * Initialize the resources
      *
@@ -277,12 +285,7 @@ public class DataManager {
                 IdvResourceManager.RSC_DATASOURCE));
 
         loadGribResources(resourceManager);
-        String dataCacheDir =
-            IOUtil.joinDir(
-                dataContext.getObjectStore().getUserTmpDirectory(), "cache/");
-        IOUtil.makeDir(dataCacheDir);
-
-        ucar.visad.CachedFlatField.setCacheDir(new File(dataCacheDir));
+        ucar.visad.CachedFlatField.setCacheDir(new File(getDataCacheDirectory()));
         ucar.visad.CachedFlatField.setCacheThreshold(
             dataContext.getObjectStore().get(
                 IdvConstants.PREF_FIELD_CACHETHRESHOLD, 1000000));

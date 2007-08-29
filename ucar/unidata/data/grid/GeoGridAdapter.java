@@ -21,6 +21,8 @@
  */
 
 
+
+
 package ucar.unidata.data.grid;
 
 
@@ -130,7 +132,8 @@ public class GeoGridAdapter {
         ucar.unidata.util.LogUtil.getLogInstance(
             GeoGridAdapter.class.getName());
 
-    public  String cacheFile;
+    /** _more_ */
+    public String cacheFile;
 
     /** the associated data source (for caching) */
     private GeoGridDataSource dataSource;
@@ -1001,7 +1004,7 @@ public class GeoGridAdapter {
             .getTimeAxis() != null)
                ? getSequence()
                : (getBaseTime() == null)
-                 ? getFlatField(0,"")
+                 ? getFlatField(0, "")
                  : makeSequence(null);
     }
 
@@ -1014,20 +1017,24 @@ public class GeoGridAdapter {
      * cache if possible.
      *
      * @param timeIndex  index into set of times
+     * @param readLabel _more_
      * @return  the data at that time
      *
      * @throws VisADException  problem creating the FlatField
      */
-    private CachedFlatField getFlatField(int timeIndex,String readLabel) throws VisADException {
-        String filename = IOUtil.joinDir(dataSource.getCachePath(),cacheFile+"_t_"+timeIndex+".dat");
-
+    private CachedFlatField getFlatField(int timeIndex, String readLabel)
+            throws VisADException {
+        String filename = IOUtil.joinDir(dataSource.getDataCachePath(),
+                                         cacheFile + "_t_" + timeIndex
+                                         + ".dat");
         List cacheKey = Misc.newList(filename);
         if (extraCacheKey != null) {
             cacheKey.add(extraCacheKey);
         }
-        CachedFlatField retField = (CachedFlatField) dataSource.getCache(cacheKey);
+        CachedFlatField retField =
+            (CachedFlatField) dataSource.getCache(cacheKey);
         if (retField != null) {
-            System.err.println ("in cache");
+            System.err.println("in cache");
             return retField;
         }
         Trace.call1("GeoGridAdapter.getFlatField:" + paramName + ":time="
@@ -1097,17 +1104,16 @@ public class GeoGridAdapter {
             GeoGridFlatField ggff = new GeoGridFlatField(geoGrid, readLock,
                                         timeIndex, domainSet, ffType);
 
-            if(dataSource.getCacheFlatFields() &&cacheFile!=null) {
-                //                System.err.println ("file:" + filename);
-                ggff.setFilename(filename);
+            if (dataSource.getCacheDataToDisk() && (cacheFile != null)) {
+                ggff.setCacheFile(filename);
                 ggff.setShouldCache(true);
+                ggff.setCacheClearDelay(dataSource.getCacheClearDelay());
             }
             ggff.setReadLabel(readLabel);
             retField = ggff;
-            //            ggff.unpackFloats(false);
+            ggff.unpackFloats(false);
 
         }
-
 
         dataSource.putCache(cacheKey, retField);
         Trace.call2("GeoGridAdapter.getFlatField:" + paramName + ":time="
@@ -1166,7 +1172,7 @@ public class GeoGridAdapter {
             } else {
                 times = timeIndices;
             }
-            Range[]sampleRanges =null;
+            Range[]      sampleRanges   = null;
             StringBuffer testModeBuffer = null;
             for (int i = 0; i < times.length; i++) {
                 if ( !JobManager.getManager().canContinue(loadId)) {
@@ -1180,7 +1186,7 @@ public class GeoGridAdapter {
                         time = getBaseTime();  // will be null if not found
                         if (time == null) {
                             if (timeAxis == null) {
-                                return getFlatField(0,"");
+                                return getFlatField(0, "");
                             } else {
                                 // return current time.
                                 // probably not good, but what the hey.
@@ -1194,18 +1200,23 @@ public class GeoGridAdapter {
 
 
                     String readLabel = "Time: " + (i + 1) + "/"
-                                        + times.length + " " + paramName
-                        + " From: " + dataSource.toString();
+                                       + times.length + " " + paramName
+                                       + " From: " + dataSource.toString();
                     try {
-                        CachedFlatField sample = getFlatField(times[i], readLabel);
-                        if(sampleRanges == null) {
+                        CachedFlatField sample = getFlatField(times[i],
+                                                     readLabel);
+                        if (sampleRanges == null) {
                             sampleRanges = sample.getRanges(true);
                             //Check to see if the sample is valid
-                            if(sampleRanges!=null&& sampleRanges.length>0) {
-                                for(int rangeIdx=0;rangeIdx<sampleRanges.length;rangeIdx++) {
+                            if ((sampleRanges != null)
+                                    && (sampleRanges.length > 0)) {
+                                for (int rangeIdx = 0;
+                                        rangeIdx < sampleRanges.length;
+                                        rangeIdx++) {
                                     Range r = sampleRanges[rangeIdx];
-                                    if ( Double.isInfinite(r.getMin())
-                                         || Double.isInfinite(r.getMax())) {
+                                    if (Double.isInfinite(r.getMin())
+                                            || Double.isInfinite(
+                                                r.getMax())) {
                                         sampleRanges = null;
                                         //                                        System.err.println("bad sample range");
                                         break;
