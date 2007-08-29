@@ -265,10 +265,15 @@ public abstract class TrackInfo {
         double[][] newRangeVals = new double[2][vals[0].length];
         double[]   timeVals     = getTimeVals(range);
         newRangeVals[0] = vals[0];
+        RealType timeType = getVarType(RealType.Time, timeUnit, timeVals[0]);
+        RealTupleType rangeType = new RealTupleType(getVarType(varType),timeType);
+        if (!getTimeUnit().equals(timeType.getDefaultUnit())) {
+            Unit tmpUnit = timeType.getDefaultUnit();
+            timeVals = tmpUnit.toThis(timeVals, timeUnit);
+            timeUnit = tmpUnit;
+        }
         newRangeVals[1] = timeVals;
-        RealTupleType rangeType = new RealTupleType(getVarType(varType),
-                                      getVarType(RealType.Time, timeUnit,
-                                          timeVals[0]));
+
         Set[] rangeSets = new Set[2];
         rangeSets[0] = new DoubleSet(new SetType(rangeType.getComponent(0)));
         rangeSets[1] = new DoubleSet(new SetType(rangeType.getComponent(1)));
@@ -525,10 +530,11 @@ public abstract class TrackInfo {
                 Real value = new Real(RealType.Time, sampleValue, unit);
                 double sinceEpoch =
                     value.getValue(CommonUnit.secondsSinceTheEpoch);
-                int decades = (int) (sinceEpoch / (10 * 365 * 24 * 3600));
-                int decade  = 1970 + (decades * 10);
-                Unit timeUnit = Util.parseUnit("seconds since " + decade
+                int years = (int) (sinceEpoch / (365 * 24 * 3600));
+                int year  = 1970 + (years);
+                Unit timeUnit = Util.parseUnit("seconds since " + year
                                     + "-1-1 0:00:00 0:00");
+                System.out.println("new  time unit = " + timeUnit);
                 varType = RealType.getRealType(DataUtil.cleanName(TIME_TYPE
                         + "_" + timeUnit), timeUnit);
             } catch (Exception excp) {

@@ -529,10 +529,12 @@ public class TrackDataSource extends FilesDataSource {
                     ID_POINTTRACE }, getDataChoiceLabel(ID_POINTTRACE),
                                      getDataChoiceLabel(ID_POINTTRACE),
                                      pointCatList, props));
+            /*
             addDataChoice(new DirectDataChoice(this, new String[] { trackName,
                     ID_LASTOB }, getDataChoiceLabel(ID_LASTOB),
                                  getDataChoiceLabel(ID_LASTOB), pointCatList,
                                  props));
+            */
 
         }
 
