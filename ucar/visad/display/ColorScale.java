@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.visad.display;
 
 
@@ -463,10 +464,18 @@ public class ColorScale extends DisplayableData {
      */
     private void setShapesInControl(VisADGeometryArray[] shapes)
             throws VisADException, RemoteException {
-        if ((shapeControl != null) && (shapes != null)
-                && (shapes.length > 0)) {
-            shapeControl.setShapeSet(new Integer1DSet(shapes.length));
-            shapeControl.setShapes(shapes);
+        if ((shapeControl != null) && (shapes != null)) {
+            if (shapes.length > 0) {
+                shapeControl.setShapeSet(new Integer1DSet(shapes.length));
+                shapeControl.setShapes(shapes);
+            } else {
+                VisADLineArray shape = new VisADLineArray();
+                shape.coordinates = new float[] {};
+                shapes            = new VisADGeometryArray[] { shape };
+                shapeControl.setShapeSet(new Integer1DSet(shapes.length));
+                shapeControl.setShapes(shapes);
+
+            }
         }
     }
 
@@ -511,7 +520,7 @@ public class ColorScale extends DisplayableData {
                 shapeVector.add(bar);
             }
         }
-        if (isLabelOn) {
+        if (isLabelOn && (colorPalette != null)) {
             VisADGeometryArray[] labels = createLabels(scaleBounds.width,
                                               scaleBounds.height);
             if (labels != null) {
