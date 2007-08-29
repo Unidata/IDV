@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.visad;
 
 
@@ -62,7 +63,7 @@ import java.rmi.RemoteException;
  */
 public class GeoGridFlatField extends CachedFlatField {
 
-    /** _more_          */
+    /** _more_ */
     private String readLabel = "";
 
     /** _more_ */

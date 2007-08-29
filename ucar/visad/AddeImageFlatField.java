@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.visad;
 
 
@@ -68,13 +69,13 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
 
 
 
-    /** _more_          */
+    /** _more_ */
     private String readLabel = "";
 
     /** _more_ */
     private GriddedSet domainSet;
 
-    /** _more_          */
+    /** _more_ */
     private DateTime startTime;
 
     /**
@@ -159,6 +160,9 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
      * _more_
      *
      * @param image _more_
+     * @param shouldCache _more_
+     * @param cacheFile _more_
+     * @param cacheClearDelay _more_
      *
      * @return _more_
      *
@@ -166,19 +170,20 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
      * @throws VisADException _more_
      */
     public static AddeImageFlatField createFromSingleBandedImage(
-            SingleBandedImage image)
+            SingleBandedImage image, boolean shouldCache, String cacheFile,
+            long cacheClearDelay)
             throws VisADException, RemoteException {
         float[][] values = image.getFloats(false);
-
         FlatField ff     = (FlatField) image;
-
         AddeImageFlatField aff =
             new AddeImageFlatField((FunctionType) image.getType(),
-                                   image.getDomainSet(),
-        //                                        ff.getRangeCoordinateSystem(0)[0],
-        null, ff.getRangeSets(), ff.getRangeUnits()[0], values);
+                                   image.getDomainSet(), null,
+                                   ff.getRangeSets(), ff.getRangeUnits()[0],
+                                   values);
         aff.startTime = image.getStartTime();
-        //        aff.setShouldCache(true);
+        aff.setCacheClearDelay(cacheClearDelay);
+        aff.setCacheFile(cacheFile);
+        aff.setShouldCache(shouldCache);
         return aff;
     }
 
