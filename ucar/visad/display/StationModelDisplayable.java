@@ -399,11 +399,14 @@ public class StationModelDisplayable extends DisplayableData {
      */
     private void setShapesInControl(VisADGeometryArray[] shapes)
             throws VisADException, RemoteException {
-        if ((shapeControl != null) && (shapes != null)
-                && (shapes.length > 0)) {
+        if (shapeControl != null) {
+            if ((shapes == null) || (shapes.length == 0)) {
+                shapes = ShapeUtility.createShape(ShapeUtility.NONE);
+            }
             shapeControl.setShapeSet(new Integer1DSet(shapes.length));
             shapeControl.setShapes(shapes);
         }
+
     }
 
     /**
@@ -998,7 +1001,7 @@ public class StationModelDisplayable extends DisplayableData {
                     String     colorParam = metSymbol.getColorParam();
                     String     ctParam    = metSymbol.getColorTableParam();
                     //                    System.err.println("colorParam:" + colorParam + ": ctParam:" + ctParam+":");
-                    if (colorParam != null && colorParam.length()>0) {
+                    if ((colorParam != null) && (colorParam.length() > 0)) {
                         if (metSymbol.shouldBeColored()) {
                             Data colorData = getComponent(ob, data, tType,
                                                  typeNames, colorParam);
@@ -1034,7 +1037,8 @@ public class StationModelDisplayable extends DisplayableData {
                                 }
                             }
                         }
-                    } else if ((ct == null) || (ctParam == null) || (ctParam.length()==0)) {
+                    } else if ((ct == null) || (ctParam == null)
+                               || (ctParam.length() == 0)) {
                         if (metSymbol.shouldBeColored()) {
                             Color theColor = metSymbol.getForeground();
                             if (theColor != null) {
