@@ -534,7 +534,6 @@ public abstract class TrackInfo {
                 int year  = 1970 + (years);
                 Unit timeUnit = Util.parseUnit("seconds since " + year
                                     + "-1-1 0:00:00 0:00");
-                System.out.println("new  time unit = " + timeUnit);
                 varType = RealType.getRealType(DataUtil.cleanName(TIME_TYPE
                         + "_" + timeUnit), timeUnit);
             } catch (Exception excp) {
