@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="3.2.4">
   <directoryPresets config="/usr/local/jdk1.5.0_11-java3D1.5.1/jre" />
-  <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/upc/share/metapps/installers" mediaFilePattern="%SHORT_NAME%_%VERSION%_%PLATFORM%_installer" compression="6" lzmaCompression="false" keepModificationTimes="false" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="2.3" allPathsRelative="false" backupOnSave="false" autoSave="false" macSignature="????" javaMinVersion="1.5" javaMaxVersion="1.6" allowBetaVM="true">
+  <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/upc/share/idv/installers" mediaFilePattern="%SHORT_NAME%_%VERSION%_%PLATFORM%_installer" compression="6" lzmaCompression="false" keepModificationTimes="false" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="2.4" allPathsRelative="false" backupOnSave="false" autoSave="false" macSignature="????" javaMinVersion="1.5" javaMaxVersion="1.6" allowBetaVM="true">
     <searchSequence>
       <registry />
       <envVar name="JAVA_HOME" />
@@ -10,7 +10,7 @@
     <variables>
       <variable name="INSTALLDIR" value="IDV_%VERSION%" />
       <variable name="NOJRE" value="nojre" />
-      <variable name="SRCDIR" value="/upc/share/metapps" />
+      <variable name="SRCDIR" value="/upc/share/idv" />
     </variables>
   </application>
   <files>
