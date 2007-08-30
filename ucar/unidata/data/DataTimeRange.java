@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -447,6 +448,16 @@ public class DataTimeRange {
 
         lbl += "</html>";
         return lbl;
+    }
+
+    /**
+     * Get a String representation of this object
+     *
+     * @return a String representation of this object
+     */
+    public String toString() {
+        return getLabelText();
+
     }
 
     /**

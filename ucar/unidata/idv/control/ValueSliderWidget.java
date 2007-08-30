@@ -26,12 +26,15 @@ package ucar.unidata.idv.control;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 
+import ucar.unidata.idv.DisplayConventions;
+
 import java.awt.*;
 import java.awt.event.*;
 
 import java.lang.reflect.*;
 
 import java.util.List;
+import java.util.Hashtable;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -79,6 +82,9 @@ public class ValueSliderWidget {
     /** maximum slider value */
     private int sliderMax;
 
+    /** maximum slider value */
+    private float scaleFactor = 1;
+
     /**
      * Create a ValueSliderWidget
      *
@@ -90,11 +96,26 @@ public class ValueSliderWidget {
      */
     public ValueSliderWidget(DisplayControlImpl dc, int min, int max,
                              String property, String label) {
+        this(dc,min, max, property, label, 1.0f);
+    }
+
+    /**
+     * Create a ValueSliderWidget
+     *
+     * @param dc  the display control to use
+     * @param min minimum slider value
+     * @param max maximum slider value
+     * @param property DisplayControl property to set
+     * @param label  label for the widget
+     */
+    public ValueSliderWidget(DisplayControlImpl dc, int min, int max,
+                             String property, String label, float scale) {
         displayControl = dc;
         propertyName   = property;
         labelText      = label;
         sliderMin      = min;
         sliderMax      = max;
+        scaleFactor    = scale;
         init();
     }
 
@@ -131,7 +152,8 @@ public class ValueSliderWidget {
                     int value = valueSlider.getValue();
                     if (valueSlider.getValueIsAdjusting()) {
                         if (valueReadout != null) {
-                            valueReadout.setText(String.valueOf(value));
+                            valueReadout.setText(
+                                getDisplayConventions().format(value/scaleFactor));
                         }
                     } else {
                         handleValueChanged(value);
@@ -156,8 +178,10 @@ public class ValueSliderWidget {
         valueSlider.setSnapToTicks(true);
         valueSlider.setPaintTicks(true);
         valueSlider.setPaintLabels(true);
-
-        valueReadout = new JTextField(String.valueOf(initialValue), 3);
+        if (scaleFactor != 1) {
+             valueSlider.setLabelTable(makeLabelTable());
+        }
+        valueReadout = new JTextField(getDisplayConventions().format(initialValue/scaleFactor), 3);
 
         valueReadout.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -165,14 +189,15 @@ public class ValueSliderWidget {
                     return;
                 }
                 try {
-                    int value =
-                        (int) Misc.parseNumber(valueReadout.getText().trim());
+                    float value =
+                        (float) Misc.parseNumber(valueReadout.getText().trim());
+                    int intValue = (int) (value*scaleFactor);
                     boolean lastIgnore = ignoreUIEvents;
                     ignoreUIEvents = true;
                     if (valueSlider != null) {
-                        valueSlider.setValue(value);
+                        valueSlider.setValue(intValue);
                     }
-                    handleValueChanged(value);
+                    handleValueChanged(intValue);
                     ignoreUIEvents = lastIgnore;
                 } catch (NumberFormatException nfe) {
                     displayControl.userMessage("Incorrect format: "
@@ -216,8 +241,8 @@ public class ValueSliderWidget {
         int value = 0;
         if (getMethod != null) {
             try {
-                value = ((Number) getMethod.invoke(displayControl,
-                        (Object[]) null)).intValue();
+                value = (int) (((Number) getMethod.invoke(displayControl,
+                        (Object[]) null)).floatValue()*scaleFactor);
             } catch (Exception exc2) {
                 displayControl.logException("getInitialValue", exc2);
             }
@@ -228,17 +253,26 @@ public class ValueSliderWidget {
     /**
      * Handle a new value
      *
-     * @param newValue  the new value to handle
+     * @param newValue  the value in slider range
      */
     private void handleValueChanged(int newValue) {
         if (setMethod != null) {
             try {
-                setMethod.invoke(displayControl,
-                                 new Object[] { new Integer(newValue) });
+                String floatString = getDisplayConventions().format(newValue/scaleFactor);
+                   Misc.setProperty(displayControl, setMethod,
+                         floatString, false);
             } catch (Exception exc2) {
                 displayControl.logException("propertyChange", exc2);
             }
         }
+    }
+
+    /**
+     * Get the display conventions
+     * @return the DisplayControl's display conventions.
+     */
+    private DisplayConventions getDisplayConventions() {
+        return displayControl.getDisplayConventions();
     }
 
     /**
@@ -256,5 +290,47 @@ public class ValueSliderWidget {
     public void doRemove() {
         displayControl = null;
     }
-}
 
+    private Hashtable makeLabelTable() {
+        Hashtable labelTable = new Hashtable();
+        float min = sliderMin/scaleFactor;
+        float max = sliderMax/scaleFactor;
+        float increment = valueSlider.getMajorTickSpacing()/scaleFactor;
+        if ((min > max) || (increment > (max - min))) {
+            return labelTable;
+        }
+        float[] values = Misc.computeTicks(max, min, 0, increment);
+        if (values != null) {
+            for (int i = 0; i < values.length; i++) {
+                labelTable.put(new Integer((int) (values[i]*scaleFactor)), new JLabel(getDisplayConventions().format(values[i])));
+            }
+        }
+        return labelTable;
+
+    }
+
+
+    /**
+     * Set the property on the slider
+     * @param value  true to snap slider to ticks
+     */
+    public void setSnapToTicks(boolean value) {
+        valueSlider.setSnapToTicks(value);
+    }
+
+    /**
+     * Set the property on the slider
+     * @param value  true to paint slider ticks
+     */
+    public void setPaintTicks(boolean value) {
+        valueSlider.setPaintTicks(true);
+    }
+
+    /**
+     * Set the property on the slider
+     * @param value  true to paint slider labels
+     */
+    public void setPaintLabels(boolean value) {
+        valueSlider.setPaintLabels(true);
+    }
+}

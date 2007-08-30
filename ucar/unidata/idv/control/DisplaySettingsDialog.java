@@ -711,7 +711,8 @@ public class DisplaySettingsDialog {
          */
         private boolean canChange(Object v) {
             return (v instanceof String) || (v instanceof Double)
-                   || (v instanceof Integer) || (v instanceof Range)
+                   || (v instanceof Integer) || (v instanceof Float)
+                   || (v instanceof Range)
                    || (v instanceof ContourInfo) || (v instanceof Color)
                    || (v instanceof ColorScaleInfo) || (v instanceof Unit)
                    || (v instanceof Real) || (v instanceof ColorTable);

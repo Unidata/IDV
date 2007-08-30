@@ -20,6 +20,10 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
+
+
 package ucar.unidata.idv.control;
 
 
@@ -31,8 +35,12 @@ import ucar.unidata.data.DataInstance;
 
 import ucar.unidata.data.DataTimeRange;
 import ucar.unidata.data.grid.GridDataInstance;
+import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.data.sounding.TrackDataSource;
+
+
+import ucar.unidata.idv.ControlContext;
 import ucar.unidata.ui.drawing.*;
 
 
@@ -41,14 +49,19 @@ import ucar.unidata.util.GuiUtils;
 
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.ShapeUtility;
 
 import ucar.visad.Util;
 import ucar.visad.display.Animation;
+import ucar.visad.display.DisplayableData;
+import ucar.visad.display.DisplayableDataRef;
+import ucar.visad.display.LineDrawing;
 import ucar.visad.display.SelectRangeDisplayable;
 import ucar.visad.display.SelectorPoint;
 import ucar.visad.display.StationModelDisplayable;
@@ -57,6 +70,8 @@ import ucar.visad.display.TrackDisplayable;
 
 
 import visad.*;
+
+import visad.georef.EarthLocationLite;
 
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
@@ -101,16 +116,16 @@ import javax.swing.event.ChangeListener;
 public class TrackControl extends GridDisplayControl {
 
 
-
     /** mutex */
     private final Object DATA_MUTEX = new Object();
 
-
+    /** dummy data */
+    private static final Data DUMMY_DATA = new Real(0);
 
     /** the displayable for the track */
     TrackDisplayable trackDisplay;
 
-    /** the displayable for the track range */
+    /** the displayable for the track data range */
     SelectRangeDisplayable selectRangeDisplay;
 
     /** track width */
@@ -121,6 +136,9 @@ public class TrackControl extends GridDisplayControl {
 
     /** Shows the width */
     private JLabel widthLabel;
+
+    /** widget */
+    private JButton changeButton;
 
     /** Entire track type */
     private static final String CMD_ALL = TrackDataSource.ID_WHOLETRACE;
@@ -140,14 +158,14 @@ public class TrackControl extends GridDisplayControl {
     /** track type */
     private String trackType = CMD_RANGE;
 
-
-
     /** selector point */
     private StationModelDisplayable indicator = null;
 
+    /** time holder */
+    private DisplayableData timesHolder = null;
+
     /** text field for marker text */
     private JTextField markerTextField;
-
 
     /** combobox for maker symbol */
     private JComboBox symbolBox;
@@ -158,12 +176,61 @@ public class TrackControl extends GridDisplayControl {
     /** marker symbol name */
     private String markerSymbol = ShapeUtility.NONE;
 
+    /** layout model */
+    private StationModel layoutModel = null;
 
     /** The last time range we used */
     private Range lastRange;
 
     /** Last position */
-    private EarthLocationTuple lastIndicatorPosition;
+    private EarthLocationLite lastIndicatorPosition;
+
+    /** indicator time */
+    private DateTime lastIndicatorTime;
+
+    /** flag for the marker being visible */
+    private boolean markerVisible = false;
+
+    /** flag for using track times */
+    private boolean useTrackTimes = false;
+
+    /** flag for using time subset enabled */
+    private boolean timeDeclutterEnabled = false;
+
+    /** flag for using time subset enabled */
+    private boolean askedUserToDeclutterTime = false;
+
+    /** number of minutes for time subsetting */
+    private double timeDeclutterMinutes = 1;
+
+    /** The two time declutter components */
+    JComponent[] timeDeclutterComps;
+
+    /** Holds the timeDeclutterMinutes */
+    private JTextField timeDeclutterFld;
+
+    /** checkbox */
+    private JCheckBox timeDeclutterCbx;
+
+    /** ignore changes */
+    private boolean ignoreTimeDeclutterEnabled = false;
+
+    /** The scale the user can enter */
+    private float markerScale = 1.0f;
+
+    /** Time strings */
+    private final static String[] TIMES_TO_USE = { "Nominal Time",
+            "Track Times" };
+
+    //J-
+    // The next 3 fields are deprecated but here for old bundles
+    /** flag for using time subset enabled */
+    private boolean timeSubsetEnabled = false;
+    /** flag for using time subset minutes */
+    private double timeSubsetMinutes = 30;
+    /** Is time relative to track or animation */
+    private boolean useTrackTime = true;
+    //J+
 
 
 
@@ -195,18 +262,23 @@ public class TrackControl extends GridDisplayControl {
             return false;
         }
         trackDisplay = new TrackDisplayable("track" + dataChoice);
-        setTrackWidth(trackWidth);
+        setLineWidth(trackWidth);
         addDisplayable(trackDisplay, getAttributeFlags());
         selectRangeDisplay = new SelectRangeDisplayable();
-        addDisplayable(selectRangeDisplay, FLAG_DISPLAYUNIT);
+        addDisplayable(selectRangeDisplay,
+                       FLAG_DISPLAYUNIT | FLAG_SELECTRANGE);
         getAnimation();
         indicator = new StationModelDisplayable("indicator");
+        indicator.setScale(markerScale);
         indicator.setShouldUseAltitude(true);
         updateIndicator();
         addDisplayable(indicator);
+        timesHolder = new LineDrawing("track_time" + dataChoice);
+        timesHolder.setManipulable(false);
+        timesHolder.setVisible(false);
+        addDisplayable(timesHolder);
         return setData(dataChoice);
     }
-
 
     /**
      * Update the indicator with new shapes
@@ -215,7 +287,9 @@ public class TrackControl extends GridDisplayControl {
         if (indicator != null) {
             try {
                 lastIndicatorPosition = null;
-                indicator.setStationModel(makeStationModel());
+                indicator.setStationModel(getMarkerLayout());
+                indicator.setVisible(getMarkerVisible());
+                setScaleOnMarker();
                 applyTimeRange();
             } catch (Exception exc) {
                 logException("Updating indicator", exc);
@@ -327,13 +401,14 @@ public class TrackControl extends GridDisplayControl {
         GridDataInstance gdi  = getGridDataInstance();
         if ((gdi == null) || !gdi.dataOk()) {
             if (trackDisplay != null) {
-                trackDisplay.setData(new Real(0));
+                trackDisplay.setData(DUMMY_DATA);
                 indicator.setVisible(false);
+                timesHolder.setData(DUMMY_DATA);
             }
             return true;
         }
         if (indicator != null) {
-            indicator.setVisible(true);
+            indicator.setVisible(getMarkerVisible());
         }
         synchronized (gdi) {
             ff = getFlatField();
@@ -344,12 +419,113 @@ public class TrackControl extends GridDisplayControl {
             }
         }
         if ((ff != null) && (grid != null)) {
-            updateSelectRange();
+            updateTimeSelectRange();
             trackDisplay.setTrack(grid);
+            setTrackTimes();
             applyTimeRange();
         }
         return true;
     }
+
+    /**
+     * Set the times on the track
+     *
+     * @throws RemoteException   Java RMI problem
+     * @throws VisADException    VisAD problem
+     */
+    private void setTrackTimes() throws VisADException, RemoteException {
+        if ( !(trackType.equals(CMD_RANGE) || (trackDisplay == null))) {
+            return;
+        }
+        Data d = trackDisplay.getData();
+        if (d.equals(DUMMY_DATA)) {
+            return;
+        }
+        if ( !getUseTrackTimes()) {
+            timesHolder.setData(DUMMY_DATA);
+            return;
+        }
+        FlatField f = (FlatField) ((FieldImpl) d).getSample(0);
+        //System.out.println(f.getType());
+        double[][] samples  = f.getValues(false);
+        int        numTimes = samples[1].length;
+        if ( !getTimeDeclutterEnabled()) {
+            if ( !getAskedUserToDeclutterTime() && (numTimes > 1000)) {
+                setAskedUserToDeclutterTime(true);
+                if ( !GuiUtils.askYesNo("Time Declutter", new JLabel("<html>There are "
+                        + numTimes
+                        + " time steps in the data.<br>Do you want to show them all?"))) {
+                    setTimeDeclutterEnabled(true);
+                }
+            }
+        }
+
+        double[] times = samples[1];
+
+        if (getTimeDeclutterEnabled()) {
+            LogUtil.message("Track display: subsetting times");
+            Trace.call1("declutterTime");
+            times = declutterTime(times);
+            Trace.call2("declutterTime");
+            LogUtil.message("");
+        }
+        Unit[] units = f.getDefaultRangeUnits();
+        Gridded1DDoubleSet timeSet =
+            new Gridded1DDoubleSet(RealTupleType.Time1DTuple, new double[][] {
+            times
+        }, times.length, (CoordinateSystem) null, new Unit[] { units[1] },
+           (ErrorEstimate[]) null, false /*don't copy*/);
+        if (timeSet != null) {
+            timesHolder.setData(timeSet);
+        }
+    }
+
+    /**
+     * Declutter in time.
+     *
+     * @param times the original times
+     *
+     * @return the decluttered times
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    private double[] declutterTime(double[] times)
+            throws VisADException, RemoteException {
+        int numTimes = times.length;
+        int seconds  = (int) (timeDeclutterMinutes * 60);
+        if (seconds == 0) {
+            seconds = 1;
+        }
+        int numNewTimes = (int) (numTimes / seconds);
+        //System.out.println("num/sec/new " + numTimes + "/" + seconds + "/"
+        //                   + numNewTimes);
+
+        // first guess
+        double[] tmpTimes  = new double[numNewTimes];
+        double   firstTime = times[0];
+        tmpTimes[0] = firstTime;
+        int numFound = 0;
+        for (int timeIdx = 0; timeIdx < numTimes; timeIdx++) {
+            if (numFound >= numNewTimes) {
+                break;
+            }
+            if (times[timeIdx] < firstTime + ((numFound + 1) * seconds)) {
+                continue;
+            }
+            tmpTimes[numFound] = times[timeIdx];
+            numFound++;
+        }
+        if (numFound < numNewTimes) {
+            //System.out.println("calculated " + numNewTimes
+            //                   + " new times, found " + numFound);
+            double[] newTimes = new double[numFound];
+            System.arraycopy(tmpTimes, 0, newTimes, 0, numFound);
+            return newTimes;
+        }
+        return tmpTimes;
+    }
+
 
     /**
      * Get the data for this (without time dimension);
@@ -389,6 +565,60 @@ public class TrackControl extends GridDisplayControl {
 
 
     /**
+     * Handle when the time declutering state has changed
+     */
+    protected void timeDeclutterChanged() {
+        try {
+            setTrackTimes();
+        } catch (Exception e) {
+            logException("setTrackTimes", e);
+        }
+    }
+
+
+    /**
+     * Make the gui panel for the time decluttering
+     *
+     * @return The time declutter panel
+     */
+    private JComponent[] getTimeDeclutterComps() {
+        if (timeDeclutterComps != null) {
+            return timeDeclutterComps;
+        }
+        ActionListener timeDeclutterListener = new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                try {
+                    if (ignoreTimeDeclutterEnabled) {
+                        return;
+                    }
+                    timeDeclutterMinutes =
+                        Misc.parseNumber(timeDeclutterFld.getText().trim());
+                    //Only do this when there was a change in the enabled
+                    //or (when the text field had a return pressed event)
+                    //when the value changed and we are enabled
+                    if (timeDeclutterEnabled
+                            != timeDeclutterCbx.isSelected()) {
+                        timeDeclutterEnabled = timeDeclutterCbx.isSelected();
+                        timeDeclutterChanged();
+                    } else if (timeDeclutterEnabled) {
+                        timeDeclutterChanged();
+                    }
+                } catch (NumberFormatException nfe) {
+                    userErrorMessage("Bad number format");
+                }
+            }
+        };
+        timeDeclutterFld = new JTextField(
+            getDisplayConventions().format(getTimeDeclutterMinutes()), 4);
+        timeDeclutterFld.addActionListener(timeDeclutterListener);
+        timeDeclutterCbx = new JCheckBox("", getTimeDeclutterEnabled());
+        timeDeclutterCbx.addActionListener(timeDeclutterListener);
+        return timeDeclutterComps = new JComponent[] { timeDeclutterCbx,
+                timeDeclutterFld };
+    }
+
+
+    /**
      * Add control widgets specific to this control to the list
      *
      * @param controlWidgets   list of control widgets
@@ -402,50 +632,119 @@ public class TrackControl extends GridDisplayControl {
         super.getControlWidgets(controlWidgets);
 
 
-
-        sliderLabel = GuiUtils.rLabel("");
-        updateSliderLabel();
-        controlWidgets.add(new WrapperWidget(this, sliderLabel,
-                                             doMakeWidthSlider()));
-
+        if (trackType.equals(CMD_RANGE)) {
+            controlWidgets.add(new WrapperWidget(this,
+                    GuiUtils.rLabel("Times to Use:"),
+                    doMakeTimeOptionWidget(), null));
+        }
 
         controlWidgets.add(new WrapperWidget(this,
                                              GuiUtils.rLabel("Marker:"),
-                                             doMakeMarkerWidget()));
+                                             makeLayoutModelWidget()));
+
 
         controlWidgets.add(
             new WrapperWidget(
-                this, GuiUtils.rLabel(getColorWidgetLabel() + ":"),
-                GuiUtils.left(
-                    doMakeColorControl(getDisplayConventions().getColor()))));
+                this,
+                GuiUtils.topCenter(
+                    GuiUtils.rLabel(getLineWidthWidgetLabel() + ":"),
+                    GuiUtils.filler()), getLineWidthWidget().getContents(
+                        false)));
+
 
     }
 
+    /**
+     * Make the time option widget
+     *
+     * @return  the time option widget
+     */
+    private Component doMakeTimeOptionWidget() {
+        JComboBox box = new JComboBox(TIMES_TO_USE);
+        box.setSelectedIndex(getUseTrackTimes()
+                             ? 1
+                             : 0);
+        box.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setUseTrackTimes(
+                    ((JComboBox) e.getSource()).getSelectedIndex() == 1);
+            }
+        });
 
+        JComponent[] timeDeclutterComps = getTimeDeclutterComps();
+        JPanel timeDeclutter =
+            GuiUtils.left(GuiUtils.hflow(Misc.newList(new Component[] {
+            box, new JLabel(" Show Every: "), timeDeclutterComps[1],
+            new JLabel(" minutes "), timeDeclutterComps[0],
+            new JLabel("enabled")
+        }), 2, 1));
+        return timeDeclutter;
+
+    }
+
+    /**
+     * Called by the {@link ucar.unidata.idv.IntegratedDataViewer} to
+     * initialize after this control has been unpersisted
+     *
+     * @param vc The context in which this control exists
+     * @param properties Properties that may hold things
+     * @param preSelectedDataChoices set of preselected data choices
+     */
+    public void initAfterUnPersistence(ControlContext vc,
+                                       Hashtable properties,
+                                       List preSelectedDataChoices) {
+        // in version 1.2, there were widgets to do data selection
+        // which have been subsumed by the DataTime widget.
+        if (timeSubsetEnabled) {
+            DataTimeRange dtr = new DataTimeRange();
+            dtr.setEndMode((useTrackTime)
+                           ? dtr.MODE_DATA
+                           : dtr.MODE_ANIMATION);
+            dtr.setStartMode(dtr.MODE_RELATIVE);
+            dtr.setStartOffsetMinutes(-1 * timeSubsetMinutes);
+            setDataTimeRange(dtr);
+        }
+        super.initAfterUnPersistence(vc, properties, preSelectedDataChoices);
+    }
 
 
     /**
-     * Update the slider label with the appropriate text
+     * Add display settings paricular to this control
+     *
+     * @param dsd  the DisplaySettingsDialog
      */
-    private void updateSliderLabel() {
-        sliderLabel.setText(getTrackType().equals(CMD_POINT)
-                            ? "Point Size:"
-                            : "Line Width:");
-    }
-
-
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         super.addDisplaySettings(dsd);
-        if(getDataTimeRange()!=null) {
+        if (getDataTimeRange() != null) {
             dsd.addPropertyValue(getDataTimeRange(), "dataTimeRange",
-                         "Time Mode", "Display");
+                                 "Time Mode", "Display");
         }
+        dsd.addPropertyValue(new Boolean(getUseTrackTimes()),
+                             "useTrackTimes", "Use Track Times",
+                             SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(new Boolean(getTimeDeclutterEnabled()),
+                             "timeDeclutterEnabled", "Subset Times",
+                             SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(new Float(getTimeDeclutterMinutes()),
+                             "timeDeclutterMinutes", "Subset Interval (min)",
+                             SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(getMarkerLayout(), "markerLayout",
+                             "Marker Layout", SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(new Float(markerScale), "markerScale",
+                             "Marker Scale", SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(new Integer(getLineWidth()), "lineWidth",
+                             "Line Width", SETTINGS_GROUP_DISPLAY);
     }
 
 
+    /**
+     * Set the DataTimeRange
+     *
+     * @param range  the DataTimeRange
+     */
     public void setDataTimeRange(DataTimeRange range) {
         super.setDataTimeRange(range);
-        if(getHaveInitialized()) {
+        if (getHaveInitialized()) {
             applyTimeRange();
         }
     }
@@ -472,7 +771,7 @@ public class TrackControl extends GridDisplayControl {
                 }
                 dataTimeUnit = gridDataInstance.getRawUnit(1);
             }
-            Range    r                = getRangeForSelect();
+            Range    r                = getRangeForTimeSelect();
             RealType dataTimeRealType = Util.getRealType(dataTimeUnit);
             Real startReal = new Real(dataTimeRealType, r.getMin(),
                                       dataTimeUnit);
@@ -486,7 +785,7 @@ public class TrackControl extends GridDisplayControl {
                                   ? anime.getAniValue()
                                   : null);
 
-            Real[] startEnd = getDataTimeRange(true).getTimeRange(startReal,
+            Real[] startEnd = getDataTimeRange().getTimeRange(startReal,
                                   endReal, aniValue);
 
 
@@ -518,48 +817,22 @@ public class TrackControl extends GridDisplayControl {
             Real[] llaR = DataUtility.getSample(flatField.getDomainSet(),
                               index).getRealComponents();
             if (llaR != null) {
-                EarthLocationTuple elt = new EarthLocationTuple(llaR[0],
-                                             llaR[1], llaR[2]);
+                EarthLocationLite elt = new EarthLocationLite(llaR[0],
+                                            llaR[1], llaR[2]);
 
                 if ( !Misc.equals(elt, lastIndicatorPosition)) {
+                    lastIndicatorTime = new DateTime(times[index],
+                            dataTimeUnit);
                     lastIndicatorPosition = elt;
                     indicator.setStationData(
                         PointObFactory.makePointObs(elt));
                     doShare(ProbeControl.SHARE_POSITION, elt);
+                    updateDisplayList();
                 }
             }
         } catch (Exception e) {
             logException("applyTimeRange", e);
         }
-    }
-
-
-    /**
-     * Make a radio button for a particular time option
-     *
-     * @param name        label string
-     * @param trackType   associated type
-     * @param selected    true if should be selected
-     *
-     * @return radio button
-     */
-    private JRadioButton makeTrackOptionButton(String name, String trackType,
-            boolean selected) {
-        JRadioButton rb = new JRadioButton(name, selected);
-        rb.setActionCommand(trackType);
-        rb.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    setTrackType(
-                        ((JRadioButton) e.getSource()).getActionCommand());
-                    resetData();
-                    updateSliderLabel();
-                } catch (Exception ex) {
-                    logException("resetData", ex);
-                }
-            }
-        });
-        return rb;
     }
 
 
@@ -577,41 +850,19 @@ public class TrackControl extends GridDisplayControl {
     /**
      * Update the select range for the widget with the data's range
      */
-    private void updateSelectRange() {
+    private void updateTimeSelectRange() {
         try {
-            Range r = getRangeForSelect();
+            Range r = getRangeForTimeSelect();
             if (r == null) {
                 return;
             }
             if (trackDisplay != null) {
                 trackDisplay.setRangeForSelect(r.getMin(), r.getMax());
             }
-            Range d = getColorRangeFromData();
-            if (d == null) {
-                return;
-            }
-            if (selectRangeDisplay != null) {
-                selectRangeDisplay.setRangeForSelect(d.getMin(), d.getMax());
-            }
         } catch (Exception e) {
-            logException("updateSelectRange", e);
+            logException("updateTimeSelectRange", e);
         }
     }
-
-    /**
-     * Set the range of the data to be displayed
-     * @param r range of the data
-     */
-    public void setSelectRange(Range r) {
-        if (selectRangeDisplay != null) {
-            try {
-                selectRangeDisplay.setSelectedRange(r.getMin(), r.getMax());
-            } catch (Exception exc) {
-                logException("setting range real type", exc);
-            }
-        }
-    }
-
 
     /**
      * Get the range for selection.
@@ -621,7 +872,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException remote data error
      * @throws VisADException  VisAD error
      */
-    private Range getRangeForSelect() throws VisADException, RemoteException {
+    private Range getRangeForTimeSelect()
+            throws VisADException, RemoteException {
         Range            range = getRange();
         GridDataInstance gdi   = getGridDataInstance();
         if ((gdi != null) && (gdi.getNumRealTypes() > 1)) {
@@ -647,83 +899,6 @@ public class TrackControl extends GridDisplayControl {
      */
     protected int getColorRangeIndex() {
         return 0;
-    }
-
-    /**
-     * Set the color for the selector. Used by persistence.
-     *
-     * @param c  color to use
-     * @throws RemoteException  some RMI exception occured
-     * @throws VisADException  error setting the color in VisAD
-     */
-    public void setColor(Color c) throws RemoteException, VisADException {
-        super.setColor(c);
-        updateIndicator();
-    }
-
-    /**
-     * Make a slider for setting the track width
-     * @return  slider
-     */
-    private Component doMakeWidthSlider() {
-        widthLabel = GuiUtils.getFixedWidthLabel(StringUtil.padLeft(""
-                + getTrackWidth(), 3));
-
-        ChangeListener listener = new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                JSlider slide = (JSlider) e.getSource();
-                if (slide.getValueIsAdjusting()) {
-                    return;
-                }
-                setTrackWidth(slide.getValue());
-                widthLabel.setText(StringUtil.padLeft("" + getTrackWidth(),
-                        3));
-            }
-        };
-
-        JComponent[] sliderComps = GuiUtils.makeSliderPopup(1, 20,
-                                       getTrackWidth(), listener);
-        JSlider slider = (JSlider) sliderComps[1];
-        slider.setPaintTicks(true);
-        slider.setPaintLabels(true);
-        slider.setToolTipText("Change width of track");
-        slider.setMajorTickSpacing(5);
-        slider.setMinorTickSpacing(1);
-        return GuiUtils.left(GuiUtils.hbox(widthLabel, new JLabel(" "),
-                                           sliderComps[0]));
-    }
-
-    /**
-     * Make a selection widget for markers
-     * @return  the selection widget
-     */
-    private Component doMakeMarkerWidget() {
-        markerTextField = new JTextField(markerText, 10);
-        markerTextField.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                markerText = ((JTextField) ae.getSource()).getText().trim();
-                updateIndicator();
-            }
-        });
-        symbolBox = new JComboBox(ShapeUtility.SHAPES);
-        TwoFacedObject tfo   = new TwoFacedObject(markerSymbol, markerSymbol);
-        int            index = Misc.toList(ShapeUtility.SHAPES).indexOf(tfo);
-        if (index >= 0) {
-            symbolBox.setSelectedIndex(index);
-        } else {
-            symbolBox.setSelectedItem(tfo);
-        }
-        symbolBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                markerSymbol =
-                    (String) ((TwoFacedObject) ((JComboBox) ae.getSource())
-                        .getSelectedItem()).getId();
-                updateIndicator();
-            }
-        });
-        return GuiUtils.left(GuiUtils.hbox(new Component[] {
-            GuiUtils.rLabel("Text: "),
-            markerTextField, GuiUtils.rLabel("  Symbol: "), symbolBox }));
     }
 
     /**
@@ -756,65 +931,125 @@ public class TrackControl extends GridDisplayControl {
      * Set the track width property.  Used by persistence
      *
      * @param width  width for track (pixels)
+     * @deprecated  use #setLineWidth(int)
      */
     public void setTrackWidth(int width) {
+        setLineWidth(width);
+    }
+
+    /**
+     * Set the track width property.  Used by persistence
+     *
+     * @param width  width for track (pixels)
+     * @deprecated  use #setLineWidth(int)
+     */
+    public void setLineWidth(int width) {
+        trackWidth = width;
         try {
+            super.setLineWidth(width);
             if (trackDisplay != null) {
                 trackDisplay.setLineWidth(width);
             }
-            trackWidth = width;
-        } catch (Exception ve) {}
+        } catch (Exception ve) {
+            logException("setting line width", ve);
+        }
+    }
+
+    /**
+     * Get the line width property.
+     *
+     * @return The line width
+     */
+    public int getLineWidth() {
+        return trackWidth;
     }
 
     /**
      * Creates a station model from the supplied parameters.
      * @return
      */
-    private StationModel makeStationModel() {
-        StationModel obView     = new StationModel("TrackLocation");
-        LabelSymbol  textSymbol = new LabelSymbol();
-        textSymbol.setValue(markerText);
+    private StationModel makeLayoutModel() {
+        StationModel layout = null;
+        // check if we are unpersisting from an old bundle.
+        if ( !(markerText.equals("")
+                || markerSymbol.equals(ShapeUtility.NONE))) {
+            layout = new StationModel("TrackLocation");
+            LabelSymbol textSymbol = new LabelSymbol();
+            textSymbol.setValue(markerText);
 
-        ShapeSymbol shapeSymbol = new ShapeSymbol(0, 0);
-        shapeSymbol.setShape(markerSymbol);
+            ShapeSymbol shapeSymbol = new ShapeSymbol(0, 0);
+            shapeSymbol.setShape(markerSymbol);
 
-        if (getColor() != null) {
-            shapeSymbol.setForeground(getColor());
-            textSymbol.setForeground(getColor());
+            if (getColor() != null) {
+                shapeSymbol.setForeground(getColor());
+                textSymbol.setForeground(getColor());
+            } else {
+                shapeSymbol.setForeground(Color.magenta);
+                textSymbol.setForeground(Color.magenta);
+            }
+
+            shapeSymbol.bounds = new java.awt.Rectangle(-15, -15, 30, 30);
+            shapeSymbol.setRectPoint(Glyph.PT_MM);
+
+            boolean showId     = !markerText.equals("");
+            boolean showSymbol = !markerSymbol.equals(ShapeUtility.NONE);
+            if (showId) {
+                layout.addSymbol(textSymbol);
+            }
+            if (showSymbol) {
+                layout.addSymbol(shapeSymbol);
+            }
+            if (showSymbol && showId) {
+                textSymbol.bounds = new java.awt.Rectangle(-11, -31, 72, 24);
+                textSymbol.setRectPoint(Glyph.PT_LM);
+            } else if (showId) {
+                textSymbol.bounds = new java.awt.Rectangle(-11, -8, 72, 24);
+                textSymbol.setRectPoint(Glyph.PT_MM);
+            } else if (showSymbol) {
+                //Same position as above
+            }
+
         } else {
-            shapeSymbol.setForeground(Color.magenta);
-            textSymbol.setForeground(Color.magenta);
+
+            String name = "Location";
+            layout =
+                getControlContext().getStationModelManager().getStationModel(
+                    name);
+            if (layout == null) {
+                LogUtil.userErrorMessage("Unable to find layout model: "
+                                         + name + ". Using default");
+            }
         }
 
-        shapeSymbol.bounds = new java.awt.Rectangle(-15, -15, 30, 30);
-        shapeSymbol.setRectPoint(Glyph.PT_MM);
+        if (layout == null) {
+            layout =
+                getControlContext().getStationModelManager()
+                    .getDefaultStationModel();
+        }
+        return layout;
+    }
 
-        boolean showId     = !markerText.equals("");
-        boolean showSymbol = !markerSymbol.equals(ShapeUtility.NONE);
-        if (showId) {
-            obView.addSymbol(textSymbol);
-        }
-        if (showSymbol) {
-            obView.addSymbol(shapeSymbol);
-        }
-        if (showSymbol && showId) {
-            textSymbol.bounds = new java.awt.Rectangle(-11, -31, 72, 24);
-            textSymbol.setRectPoint(Glyph.PT_LM);
-        } else if (showId) {
-            textSymbol.bounds = new java.awt.Rectangle(-11, -8, 72, 24);
-            textSymbol.setRectPoint(Glyph.PT_MM);
-        } else if (showSymbol) {
-            //Same position as above
-        }
-        return obView;
+    /**
+     * Collect the time animation set from the displayables.
+     * If none found then return null.
+     *
+     * @return Animation set
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    protected Set getDataTimeSet() throws RemoteException, VisADException {
+        return (lastIndicatorTime == null)
+               ? null
+               : DateTime.makeTimeSet(new DateTime[] { lastIndicatorTime });
     }
 
     /**
      * Get the track width property.  Used by persistence
      * @return  width
      */
-    public int getTrackWidth() {
-        return trackWidth;
+    protected int getTrackWidth() {
+        return getLineWidth();
     }
 
     /**
@@ -841,8 +1076,9 @@ public class TrackControl extends GridDisplayControl {
      * @param value The new value for TimeSubsetMinutes
      * @deprecated
      */
-    public void setTimeSubsetMinutes(double value) {}
-
+    public void setTimeSubsetMinutes(double value) {
+        timeSubsetMinutes = value;
+    }
 
 
     /**
@@ -851,49 +1087,326 @@ public class TrackControl extends GridDisplayControl {
      * @deprecated
      * @param value The new value for TimeSubsetEnabled
      */
-    public void setTimeSubsetEnabled(boolean value) {}
+    public void setTimeSubsetEnabled(boolean value) {
+        timeSubsetEnabled = value;
+    }
 
 
     /**
      * Set the useTrackTime property.
      *
-     * @param value The new value for TimeSubsetEnabled
+     * @param value The new value for useTrackTime
      * @deprecated
      */
-    public void setUseTrackTime(boolean value) {}
+    public void setUseTrackTime(boolean value) {
+        useTrackTime = value;
+    }
+
+    /**
+     * Set the useTrackTimes property.
+     *
+     * @param value The new value for useTrackTime
+     * @deprecated
+     */
+    public void setUseTrackTimes(boolean value) {
+        useTrackTimes = value;
+        if (getHaveInitialized()) {
+            try {
+                setTrackTimes();
+            } catch (Exception e) {
+                logException("setTrackTimes", e);
+            }
+        }
+    }
 
 
+    /**
+     * Get the useTrackTime property.
+     *
+     * @return The new value for useTrackTime
+     * @deprecated
+     */
+    public boolean getUseTrackTimes() {
+        return useTrackTimes;
+    }
+
+    /**
+     * Set the TimeDeclutterMinutes property.
+     *
+     * @param value The new value for TimeDeclutterMinutes
+     */
+    public void setTimeDeclutterMinutes(double value) {
+        timeDeclutterMinutes = value;
+    }
+
+    /**
+     * Get the TimeDeclutterMinutes property.
+     *
+     * @return The TimeDeclutterMinutes
+     */
+    public double getTimeDeclutterMinutes() {
+        return timeDeclutterMinutes;
+    }
+
+
+    /**
+     * Set the TimeDeclutterEnabled property.
+     *
+     * @param value The new value for TimeDeclutterEnabled
+     */
+    public void setTimeDeclutterEnabled(boolean value) {
+        timeDeclutterEnabled = value;
+        if ((timeDeclutterCbx != null)
+                && (value != timeDeclutterCbx.isSelected())) {
+            ignoreTimeDeclutterEnabled = true;
+            timeDeclutterCbx.setSelected(value);
+            ignoreTimeDeclutterEnabled = false;
+        }
+    }
+
+    /**
+     * Get the TimeDeclutterEnabled property.
+     *
+     * @return The TimeDeclutterEnabled
+     */
+    public boolean getTimeDeclutterEnabled() {
+        return timeDeclutterEnabled;
+    }
+
+    /**
+     *  Set the AskedUserToDeclutterTime property.
+     *
+     *  @param value The new value for AskedUserToDeclutterTime
+     */
+    public void setAskedUserToDeclutterTime(boolean value) {
+        askedUserToDeclutterTime = value;
+    }
+
+    /**
+     *  Get the AskedUserToDeclutterTime property.
+     *
+     *  @return The AskedUserToDeclutterTime
+     */
+    public boolean getAskedUserToDeclutterTime() {
+        return askedUserToDeclutterTime;
+    }
 
     /**
      * Set the MarkerText property.
      * @param value The new value for MarkerText
+     * @deprecated  now use #setMarkerLayout(StationModel)
      */
     public void setMarkerText(String value) {
-        markerText = value;
+        markerText    = value;
+        markerVisible = true;
     }
 
-    /**
-     * Get the MarkerText property.
-     * @return The MarkerText
-     */
-    public String getMarkerText() {
-        return markerText;
-    }
 
     /**
      * Set the MarkerSymbol property.
      * @param value The new value for MarkerSymbol
+     * @deprecated  now use #setMarkerLayout(StationModel)
      */
     public void setMarkerSymbol(String value) {
-        markerSymbol = value;
+        markerSymbol  = value;
+        markerVisible = true;
     }
 
     /**
-     * Get the MarkerSymbol property.
-     * @return The MarkerSymbol
+     * Set the current station model view.
+     *
+     * @param model  station model layout
      */
-    public String getMarkerSymbol() {
-        return markerSymbol;
+    public void setMarkerLayout(StationModel model) {
+        layoutModel = model;
+        if (getHaveInitialized() && (indicator != null)) {
+            try {
+                indicator.setStationModel(layoutModel);
+            } catch (Exception excp) {
+                logException("setting marker layout", excp);
+            }
+        }
+    }
+
+    /**
+     * Get the current layout model view.
+     *
+     * @return station model layout
+     */
+    public StationModel getMarkerLayout() {
+        if (layoutModel == null) {
+            layoutModel = makeLayoutModel();
+        }
+        return layoutModel;
+    }
+
+    /**
+     * Get the scale the user can enter
+     *
+     * @return The scale
+     */
+    public float getMarkerScale() {
+        return markerScale;
+    }
+
+    /**
+     * Set the scale the user can enter
+     *
+     * @param f The scale
+     */
+    public void setMarkerScale(float f) {
+        markerScale = f;
+        if (indicator != null) {
+            try {
+                setScaleOnMarker();
+            } catch (Exception exc) {
+                logException("Setting scale ", exc);
+            }
+        }
+    }
+
+    /**
+     *  A utility to set the scale on the marker dislayable
+     *
+     *
+     * @throws RemoteException When bad things happen
+     * @throws VisADException When bad things happen
+     */
+    private void setScaleOnMarker() throws RemoteException, VisADException {
+        setScaleOnMarker(getDisplayScale() * markerScale);
+    }
+
+    /**
+     *  A utility to set the scale on the marker dislayable
+     *
+     * @param f The new scale value
+     *
+     * @throws RemoteException When bad things happen
+     * @throws VisADException When bad things happen
+     */
+    private void setScaleOnMarker(float f)
+            throws RemoteException, VisADException {
+        if (indicator != null) {
+            indicator.setScale(f);
+        }
+    }
+
+
+    /**
+     * Popup the station model editor
+     */
+    public void editLayoutModel() {
+        getControlContext().getStationModelManager().show(layoutModel);
+    }
+
+    /**
+     * Set the marker visible
+     *
+     * @param value  true to be visible
+     */
+    public void setMarkerVisible(boolean value) {
+        markerVisible = value;
+        if (getHaveInitialized() && (indicator != null)) {
+            try {
+                indicator.setVisible(markerVisible);
+            } catch (Exception excp) {
+                logException("setting marker visible", excp);
+            }
+        }
+    }
+
+    /**
+     * Get whether the marker is visible
+     *
+     * @return  true if visible
+     */
+    public boolean getMarkerVisible() {
+        return markerVisible;
+    }
+
+    /**
+     * Make the gui widget for setting the layout model
+     *
+     * @return the widget
+     */
+    protected JPanel makeLayoutModelWidget() {
+        final JButton editButton =
+            GuiUtils.getImageButton("/ucar/unidata/idv/images/edit.gif",
+                                    getClass());
+        editButton.setToolTipText("Show the layout model editor");
+        editButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                editLayoutModel();
+            }
+        });
+        editButton.setEnabled(markerVisible);
+
+        StationModel marker = getMarkerLayout();
+
+        changeButton = new JButton(getMarkerLayout().getDisplayName());
+        changeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                StationModelManager smm =
+                    getControlContext().getStationModelManager();
+                ObjectListener listener = new ObjectListener(null) {
+                    public void actionPerformed(ActionEvent ae) {
+                        Misc.run(new Runnable() {
+                            public void run() {
+                                showWaitCursor();
+                                try {
+                                    setMarkerLayout((StationModel) theObject);
+                                    changeButton.setText(
+                                        getMarkerLayout().getDisplayName());
+                                } catch (Exception exc) {
+                                    logException("Changing station model",
+                                            exc);
+                                }
+                                showNormalCursor();
+                            }
+                        });
+                    }
+                };
+
+                JPopupMenu popup =
+                    GuiUtils.makePopupMenu(
+                        StationModelCanvas.makeStationModelMenuItems(
+                            smm.getStationModels(), listener, smm));
+                popup.show(changeButton, changeButton.getSize().width / 2,
+                           changeButton.getSize().height);
+            }
+        });
+        changeButton.setEnabled(markerVisible);
+
+
+        final ValueSliderWidget vsw = new ValueSliderWidget(this, 0, 50,
+                                          "markerScale", "Scale", 10);
+        vsw.setSnapToTicks(false);
+        vsw.setEnabled(markerVisible);
+        final JLabel vswLabel = GuiUtils.rLabel("   Scale: ");
+        vswLabel.setEnabled(markerVisible);
+
+        JCheckBox showMarker = new JCheckBox("", markerVisible);
+        showMarker.setToolTipText("Show the marker");
+        showMarker.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boolean isVisible = ((JCheckBox) e.getSource()).isSelected();
+                setMarkerVisible(isVisible);
+                changeButton.setEnabled(isVisible);
+                editButton.setEnabled(isVisible);
+                vsw.setEnabled(isVisible);
+                vswLabel.setEnabled(isVisible);
+            }
+        });
+        JPanel layoutModelPanel = GuiUtils.hflow(Misc.newList(showMarker,
+                                      changeButton, editButton), 4, 0);
+
+        JPanel layout = GuiUtils.hbox(layoutModelPanel, vswLabel,
+                                      vsw.getContents(false));
+
+
+
+        return layout;
+
     }
 
 

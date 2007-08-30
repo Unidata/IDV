@@ -979,7 +979,22 @@ public class PointObFactory {
      */
     public static PointOb makePointOb(EarthLocation el)
             throws VisADException, RemoteException {
-        return new PointObTuple(el, new DateTime(Double.NaN),
+        return makePointOb(el, null);
+    }
+
+    /**
+     * Make a PointOb from an EarthLocation.  The time and data
+     * are bogus.
+     * @param el  EarthLocation to use
+     * @return PointOb
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException problem getting the data
+     */
+    public static PointOb makePointOb(EarthLocation el, DateTime dt)
+            throws VisADException, RemoteException {
+        if (dt == null) dt = new DateTime(Double.NaN);
+        return new PointObTuple(el, dt,
                                 new RealTuple(new Real[] { new Real(0) }));
     }
 
@@ -994,7 +1009,22 @@ public class PointObFactory {
      */
     public static FieldImpl makePointObs(EarthLocation el)
             throws VisADException, RemoteException {
-        PointOb ob = makePointOb(el);
+        return makePointObs(el, null);
+    }
+
+    /**
+     * Make a FieldImpl of PointOb-s from an EarthLocation.  The time and data
+     * are bogus.
+     * @param el  EarthLocation to use
+     * @param dt  DateTime to use
+     * @return FieldImpl of index-&gt;po
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException problem getting the data
+     */
+    public static FieldImpl makePointObs(EarthLocation el, DateTime dt)
+            throws VisADException, RemoteException {
+        PointOb ob = makePointOb(el, dt);
         return makePointObs(ob);
     }
 

@@ -319,18 +319,18 @@ public class Misc {
 
 
     /**
-     * _more_
+     * Set a property on a "bean"
      *
-     * @param object _more_
-     * @param name _more_
-     * @param objectValue _more_
-     * @param ignoreError _more_
+     * @param object   object to set property on
+     * @param name     name of the property.  object must have set<Name> method.
+     * @param objectValue value of the property
+     * @param ignoreError true to ignore errors
      *
-     * @return _more_
+     * @return true if successful
      *
-     * @throws IllegalAccessException _more_
-     * @throws IllegalArgumentException _more_
-     * @throws InvocationTargetException _more_
+     * @throws IllegalAccessException    security violation
+     * @throws IllegalArgumentException  illegal argument
+     * @throws InvocationTargetException  invocation problem
      */
     public static boolean setProperty(Object object, String name,
                                       Object objectValue, boolean ignoreError)
@@ -346,6 +346,34 @@ public class Misc {
                 System.err.println("could not find method:" + methodName
                                    + ": on class:"
                                    + object.getClass().getName());
+            }
+            return false;
+        }
+        return setProperty(object, method, objectValue, ignoreError);
+    }
+
+    /**
+     * Set a property on a "bean"
+     *
+     * @param object   object to set property on
+     * @param method   method to call
+     * @param objectValue value of the method
+     * @param ignoreError true to ignore errors
+     *
+     * @return true if successful
+     *
+     * @throws IllegalAccessException    security violation
+     * @throws IllegalArgumentException  illegal argument
+     * @throws InvocationTargetException  invocation problem
+     */
+    public static boolean setProperty(Object object, Method method,
+                                      Object objectValue, boolean ignoreError)
+            throws IllegalAccessException, IllegalArgumentException,
+                   InvocationTargetException {
+
+        if (method == null) {
+            if ( !ignoreError) {
+                System.err.println("Method can't be null");
             }
             return false;
         }
