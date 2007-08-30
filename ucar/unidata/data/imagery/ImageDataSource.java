@@ -26,6 +26,8 @@ package ucar.unidata.data.imagery;
 
 
 import edu.wisc.ssec.mcidas.AreaDirectory;
+import edu.wisc.ssec.mcidas.AreaDirectoryList;
+import edu.wisc.ssec.mcidas.AreaFile;
 
 import ucar.unidata.data.*;
 
@@ -924,8 +926,25 @@ public abstract class ImageDataSource extends DataSourceImpl {
         // System.out.println("source = " + aid.getSource());
 
         try {
+            AddeImageInfo aii = aid.getImageInfo();
+            AreaDirectory areaDir=null;
+            try {
+                aii.setRequestType(aii.REQ_IMAGEDIR);
+                AreaDirectoryList adl = new AreaDirectoryList(aii.makeAddeUrl());
+                List dirs = adl.getDirs();
+                if(dirs.size()==1) {
+                    areaDir = (AreaDirectory) dirs.get(0);
+                    //                    System.err.println ("time:" + areaDir.getStartTime());
+                }
+            } catch (Exception exc) {
+                LogUtil.logException("making area file", exc);
+            }
+            aii.setRequestType(aii.REQ_IMAGEDATA);
+
+
             AreaAdapter aa = new AreaAdapter(aid.getSource(), false);  // don't pack
             result = aa.getImage();
+
 
             String filename = IOUtil.joinDir(getDataCachePath(),
                                              "image"+(result.getStartTime()!=null?""+result.getStartTime().getValue():"")
