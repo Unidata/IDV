@@ -189,11 +189,9 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
 
 
         // extract the number of bands (sensors) and make the VisAD type
-        // NB: always zero now
         int band       = 0;
         int bandNums[] = areaDirectory.getBands();
         int numBands = areaDirectory.getNumberOfBands();  // this might be different
-
 
         // create indicies into the data structure for the bands
         int[] bandIndices = new int[numBands];
@@ -222,13 +220,10 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
 
         // If we have calibration units, might as well use them.
         Unit  calUnit  = null;
-        float calScale = 1.0f;
         try {
             calUnit = visad.data.units.Parser.parse(
                 visad.jmet.MetUnits.makeSymbol(
                     areaDirectory.getCalibrationUnitName()));
-
-            calScale = (1.0f / areaDirectory.getCalibrationScaleFactor());
         } catch (Exception e) {
             calUnit = null;
         }
@@ -281,33 +276,30 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
         }
 
 
-        AddeImageFlatField aff = new AddeImageFlatField(image_type,
+        AddeImageFlatField aiff = new AddeImageFlatField(image_type,
                                      domain_set, null, rangeSets, rangeUnits,
                                      null);
-        aff.calScale    = calScale;
-        aff.bandIndices = bandIndices;
-        aff.aii         = aii;
-        cs.aiff         = aff;
-        aff.startTime   = new DateTime(areaDirectory.getStartTime());
-        aff.setCacheClearDelay(cacheClearDelay);
-        aff.setCacheFile(cacheFile);
-        aff.setShouldCache(shouldCache);
-        return aff;
+        aiff.bandIndices = bandIndices;
+        aiff.aii         = aii;
+        cs.aiff         = aiff;
+        aiff.startTime   = new DateTime(areaDirectory.getStartTime());
+        aiff.setCacheClearDelay(cacheClearDelay);
+        aiff.setCacheFile(cacheFile);
+        aiff.setShouldCache(shouldCache);
+        return aiff;
     }
 
 
 
     /** _more_ */
-    AreaFile areaFile;
+    private AreaFile areaFile;
 
     /** _more_ */
-    AddeImageInfo aii;
+    private     AddeImageInfo aii;
 
     /** _more_ */
-    int[] bandIndices;
+    private     int[] bandIndices;
 
-    /** _more_ */
-    float calScale;
 
 
 
@@ -467,10 +459,10 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
             int nEles  = aii.getElements();
             int nLines = aii.getLines();
 
+            float calScale = (1.0f / areaFile.getAreaDirectory().getCalibrationScaleFactor());
             for (int i = 0; i < nLines; i++) {
                 for (int j = 0; j < nEles; j++) {
                     float v = calScale * flt_samples[bandIndices[0]][i][j];
-
                     samples[0][j + (nEles * i)] = v;
                 }
             }

@@ -436,8 +436,8 @@ public class CachedFlatField extends FlatField {
             }
 
             if ( !haveDataOnDisk()) {
-                msg(getClass().getName()
-                    + " Have not written calling readData");
+                //                msg(getClass().getName()
+                //                    + " Have not written calling readData");
                 myFloatValues = values = readData();
                 if (values == null) {
                     msg("Floats still null after readData");
