@@ -2690,7 +2690,9 @@ public class CDMRadarAdapter implements RadarAdapter {
         if (unitName.equalsIgnoreCase("dbZ")) {
             return null;
         }
-
+        if (unitName.equalsIgnoreCase("MetersPerSecond")) {
+            unitName = "m/s";
+        }
         Unit u;
 
         try {
