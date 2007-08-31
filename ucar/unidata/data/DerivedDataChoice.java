@@ -525,7 +525,7 @@ public class DerivedDataChoice extends DataChoice {
                 }
             }
         }
-        setDataCategories(dataCategories);
+        setCategories(dataCategories);
     }
 
 
