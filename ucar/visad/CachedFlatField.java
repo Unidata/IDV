@@ -24,6 +24,8 @@
 
 
 
+
+
 package ucar.visad;
 
 
@@ -88,10 +90,10 @@ public class CachedFlatField extends FlatField {
     /** The min/max ranges */
     Range[] sampleRanges;
 
-    /** _more_          */
+    /** _more_ */
     private long pauseBeforeClearing = 2000;
 
-    /** _more_          */
+    /** _more_ */
     private int accessTimestamp = 0;
 
 
@@ -293,7 +295,7 @@ public class CachedFlatField extends FlatField {
         if (sampleRanges != null) {
             return sampleRanges;
         }
-        msg("making ranges");
+        //        msg("making ranges");
         return getRanges(unpackFloats(false));
     }
 
@@ -329,7 +331,7 @@ public class CachedFlatField extends FlatField {
             }
             ranges[rangeIdx] = new Range(pMin, pMax);
         }
-        msg("done making ranges");
+        //        msg("done making ranges");
         return ranges;
     }
 
@@ -417,7 +419,7 @@ public class CachedFlatField extends FlatField {
      * @param s message to print
      */
     protected void msg(String s) {
-        //        System.err.println(myid+ " " +s);
+        System.err.println(myid + " " + s);
     }
 
     /**
@@ -576,7 +578,7 @@ public class CachedFlatField extends FlatField {
      * @throws VisADException On badness
      */
     public float[][] unpackFloats(boolean copy) throws VisADException {
-        msg("unpackFloats copy=" + copy);
+        //        msg("unpackFloats copy=" + copy);
         float[][] values = getMyValues();
         if (values == null) {
             msg("Floats still null");
@@ -592,22 +594,31 @@ public class CachedFlatField extends FlatField {
             }
         }
         checkCache();
-        msg(" Done unpackFloats");
+        //        msg(" Done unpackFloats");
         return result;
     }
 
 
-  protected float[] unpackFloats( int s_index ) throws VisADException {
-      float[][] values = getMyValues();
-      if (values == null) {
-          return null;
-      }
-      float[] range = new float[values.length];
-      for (int i=0; i<TupleDimension; i++) {
-          range[i] = values[i][s_index];
-      }
-      return range;
-  }
+    /**
+     * _more_
+     *
+     * @param s_index _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    protected float[] unpackFloats(int s_index) throws VisADException {
+        float[][] values = getMyValues();
+        if (values == null) {
+            return null;
+        }
+        float[] range = new float[values.length];
+        for (int i = 0; i < TupleDimension; i++) {
+            range[i] = values[i][s_index];
+        }
+        return range;
+    }
 
 
 
@@ -666,7 +677,7 @@ public class CachedFlatField extends FlatField {
      *
      * @return _more_
      */
-    private String getCacheFile() {
+    protected String getCacheFile() {
         if ((cachefile == null) && (cacheDir != null)) {
             String uniqueName = "field_" + System.currentTimeMillis() + "_"
                                 + (cnt++);
