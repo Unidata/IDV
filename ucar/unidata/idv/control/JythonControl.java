@@ -263,7 +263,7 @@ public class JythonControl extends GridDisplayControl {
         doMakeProbe();
         if (developerMode && (dataCategories == null)
                 && (dataChoice != null)) {
-            List l = dataChoice.getDataCategories();
+            List l = dataChoice.getDataCategories(true);
             if (l != null) {
                 dataCategories = StringUtil.join("\n", l);
             }
