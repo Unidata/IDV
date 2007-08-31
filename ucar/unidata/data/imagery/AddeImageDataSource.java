@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.imagery;
 
 
@@ -142,11 +143,13 @@ public class AddeImageDataSource extends ImageDataSource {
      */
     public String getDataName() {
         String dataName =
-            (String) getProperty(ucar.unidata.idv.chooser.adde.AddeChooser.DATA_NAME_KEY,
-                                 (String) null);
+            (String) getProperty(
+                ucar.unidata.idv.chooser.adde.AddeChooser.DATA_NAME_KEY,
+                (String) null);
         if (dataName == null) {
             dataName = (String) getProperty(
-                ucar.unidata.idv.chooser.adde.AddeChooser.PROP_DATANAME, (String) null);
+                ucar.unidata.idv.chooser.adde.AddeChooser.PROP_DATANAME,
+                (String) null);
         }
 
         if ((dataName == null) || dataName.trim().equals("")) {
