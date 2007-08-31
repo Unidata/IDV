@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.gis;
 
 
@@ -186,18 +187,22 @@ public class GeotiffAdapter {
     /**
      * Make the data
      *
+     *
+     * @param asRGB _more_
+     *
+     * @return _more_
      * @throws IOException              problem opening file
      * @throws VisADException           VisAD problem
      */
-    private FlatField createData(boolean asRGB) throws VisADException, IOException {
+    private FlatField createData(boolean asRGB)
+            throws VisADException, IOException {
         Form form;
-        if(asRGB) {
-            form =  new LegacyTiffForm();
+        if (asRGB) {
+            form = new LegacyTiffForm();
         } else {
             form = new TiffForm();
         }
-        FlatField field = (FlatField) form.open(filename);
-        System.out.println(""+field);
+        FlatField   field  = (FlatField) form.open(filename);
         Linear2DSet domain = (Linear2DSet) field.getDomainSet();
         cols = domain.getX().getLength();
         rows = domain.getY().getLength();
