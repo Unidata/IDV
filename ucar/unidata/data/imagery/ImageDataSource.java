@@ -955,23 +955,31 @@ public abstract class ImageDataSource extends DataSourceImpl {
         }
         AddeImageInfo aii  = aid.getImageInfo();
         Date          date = aii.getStartDate();
-        System.err.println("Positon:" + aii.getDatasetPosition());
-
-
         try {
             AreaDirectory areaDir = null;
             try {
                 if (currentDirs != null) {
-                    areaDir =
-                        currentDirs[Math.abs(aii.getDatasetPosition())][0];
+                    int pos =   Math.abs(aii.getDatasetPosition());
+                    int band = 0;
+                    String bandString  = aii.getBand();
+                    if(bandString!=null && !bandString.equals(aii.ALL)) {
+                        band = new Integer(bandString).intValue();
+                    }
+                    //TODO: even though the band is non-zero we might only get back one band
+                    band = 0;
+                    areaDir =currentDirs[currentDirs.length-pos-1][band];
+                    //System.err.println("pos:" + aii.getDatasetPosition() + " date:" + areaDir.getStartTime() + " " + band);
+                } else {
+                    //If its absolute time then just use the AD from the descriptor
+                    if(aid.getDirectory()!=null && aid.getDirectory().getStartTime()!=null) {
+                        areaDir = aid.getDirectory();
+                    }
                 }
             } catch (Exception exc) {
                 LogUtil.printMessage("error looking up area dir");
                 exc.printStackTrace();
                 return null;
             }
-
-
 
             if (areaDir != null) {
                 String filename = IOUtil.joinDir(getDataCachePath(),
@@ -1004,7 +1012,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     aiff.setSampleRanges(sampleRanges);
                 }
             } else {
-                System.err.println("Failed to read areadir");
+                //                System.err.println("Failed to read areadir");
                 AreaAdapter aa = new AreaAdapter(aid.getSource(), false);
                 result = aa.getImage();
             }
@@ -1075,6 +1083,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 AddeImageDescriptor aid = (AddeImageDescriptor) iter.next();
                 AddeImageInfo       aii = aid.getImageInfo();
                 if (aii.getStartDate() != null) {
+                    biggestPosition = null;
                     break;
                 }
                 if (Math.abs(aii.getDatasetPosition()) > pos) {
@@ -1106,16 +1115,23 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     int idx =
                         Math.abs(aid.getImageInfo().getDatasetPosition());
                     if (idx >= currentDirs.length) {
-                        System.err.println("skipping index:" + idx);
+                        //                        System.err.println("skipping index:" + idx);
                         continue;
                     }
                 }
 
+                String label = "";
+                if(parent!=null) {
+                    label = label+parent.toString() +" ";
+                }   else {
+                    DataCategory displayCategory = dataChoice.getDisplayCategory();
+                    if(displayCategory!=null) {
+                        label = label  + displayCategory +" ";
+                    }
+                }
+                label = label +dataChoice.toString();
                 readLabel = "Time: " + (cnt++) + "/"
-                            + descriptorsToUse.size() + "  "
-                            + ((parent != null)
-                               ? parent.toString() + "  "
-                               : "") + dataChoice.toString();
+                    + descriptorsToUse.size() + "  " + label;
 
                 try {
                     SingleBandedImage image = makeImage(aid);
