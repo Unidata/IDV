@@ -66,6 +66,7 @@ import visad.georef.MapProjection;
 import visad.meteorology.ImageSequence;
 
 import visad.meteorology.ImageSequenceManager;
+import visad.meteorology.SingleBandedImage;
 import visad.meteorology.SingleBandedImageImpl;
 
 import visad.util.BaseRGBMap;
@@ -509,7 +510,7 @@ public class ImageSequenceControl extends BaseImageControl {
                 }
 
 
-                SingleBandedImageImpl image = (SingleBandedImageImpl) theData;
+                SingleBandedImage image = (SingleBandedImage) theData;
 
                 if (displayedCnt == 1) {
                     FunctionType imageType = (FunctionType) image.getType();
@@ -540,7 +541,7 @@ public class ImageSequenceControl extends BaseImageControl {
                 progressBar.setString("Loaded " + displayedCnt + " of "
                                       + numImages + " images");
                 if (displayedCnt == 1) {
-                    checkImageSize(image);
+                    checkImageSize((FieldImpl)image);
                     //Load the dataInstance with some example data because 
                     //when we add the Displayable to the ViewManager it 
                     //will call dataInstance.getData to find out any auto 
