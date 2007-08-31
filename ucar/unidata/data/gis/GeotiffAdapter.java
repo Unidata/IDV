@@ -94,7 +94,9 @@ public class GeotiffAdapter {
     private TIFFField scaleField;
 
     /** the resulting data */
-    private FlatField field;
+    private FlatField gridField;
+
+    private FlatField rgbField;
 
     /** flag for geotiff (otherwise a regular TIFF) */
     private boolean isGeotiff = false;
@@ -136,10 +138,39 @@ public class GeotiffAdapter {
      * @throws VisADException           VisAD problem
      */
     public FlatField getData() throws VisADException, IOException {
-        if (field == null) {
-            createData();
+        return getDataAsRgb();
+    }
+
+    /**
+     * Get the data for this source.
+     *
+     * @return  associated data
+     *
+     * @throws IOException              problem opening file
+     * @throws VisADException           VisAD problem
+     */
+    public FlatField getDataAsRgb() throws VisADException, IOException {
+
+        if (rgbField == null) {
+            rgbField = createData(true);
         }
-        return field;
+        return rgbField;
+    }
+
+
+    /**
+     * Get the data for this source.
+     *
+     * @return  associated data
+     *
+     * @throws IOException              problem opening file
+     * @throws VisADException           VisAD problem
+     */
+    public FlatField getDataAsGrid() throws VisADException, IOException {
+        if (gridField == null) {
+            gridField = createData(false);
+        }
+        return gridField;
     }
 
     /**
@@ -160,9 +191,7 @@ public class GeotiffAdapter {
      * @throws VisADException           VisAD problem
      */
     public boolean getHasProjection() throws VisADException, IOException {
-        if (field == null) {
-            getData();
-        }
+        getDataAsGrid();
         return (projection != null);
     }
 
@@ -173,10 +202,14 @@ public class GeotiffAdapter {
      * @throws IOException              problem opening file
      * @throws VisADException           VisAD problem
      */
-    private void createData() throws VisADException, IOException {
-        //TiffForm form = new TiffForm();
-        LegacyTiffForm form = new LegacyTiffForm();
-        field = (FlatField) form.open(filename);
+    private FlatField createData(boolean asRGB) throws VisADException, IOException {
+        Form form;
+        if(asRGB) {
+            form =  new LegacyTiffForm();
+        } else {
+            form = new TiffForm();
+        }
+        FlatField field = (FlatField) form.open(filename);
         Linear2DSet domain = (Linear2DSet) field.getDomainSet();
         cols = domain.getX().getLength();
         rows = domain.getY().getLength();
@@ -196,7 +229,7 @@ public class GeotiffAdapter {
                     field, newDomain);
 
         }
-
+        return field;
     }
 
     /**

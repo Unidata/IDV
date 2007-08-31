@@ -127,8 +127,8 @@ public class GeotiffDataSource extends FilesDataSource {
     protected void doMakeDataChoices() {
         //Now let's create a data choice for the file 
         String description = getSource();
-        List   categories;
         String desc = IOUtil.getFileTail(getSource());
+        List categories;
         if (adapter == null) {
             openData();
         }
@@ -137,16 +137,24 @@ public class GeotiffDataSource extends FilesDataSource {
         }
         try {
             if (adapter.getHasProjection()) {
-                categories = DataCategory.parseCategories("RGBIMAGE;" + desc,
+                categories = DataCategory.parseCategories("RGBIMAGE",
                         false);
+                addDataChoice(new DirectDataChoice(this, new Object[]{"image"}, desc + " -  3 Color RGB",
+                                                   desc + " -  3 Color RGB", categories,
+                                                   DataChoice.NULL_PROPERTIES));
+                categories = DataCategory.parseCategories("GRID-2D", false);
+                addDataChoice(new DirectDataChoice(this, new Object[]{"grid"}, desc+" -  Grid data",
+                                                   desc+" -  Grid data", categories,
+                                                   DataChoice.NULL_PROPERTIES));
+
             } else {
-                categories = DataCategory.parseCategories("TIFFIMAGE;"
+               categories = DataCategory.parseCategories("TIFFIMAGE;"
                         + desc, false);
+                addDataChoice(new DirectDataChoice(this, "Image", desc,
+                                                   desc, categories,
+                                                   DataChoice.NULL_PROPERTIES));
             }
-            DirectDataChoice main = new DirectDataChoice(this, "Image", desc,
-                                        desc, categories,
-                                        DataChoice.NULL_PROPERTIES);
-            addDataChoice(main);
+
         } catch (Exception exc) {
             exc.printStackTrace();
             setInError(true,
@@ -195,7 +203,22 @@ public class GeotiffDataSource extends FilesDataSource {
                                 Hashtable requestProperties)
             throws VisADException, RemoteException {
         try {
-            return adapter.getData();
+            Object id = dataChoice.getId();
+
+            if(id instanceof String) {
+                //old way
+                return adapter.getData();
+            }
+            Object[]idArray = (Object[]) id;
+            if(idArray[0].equals("grid")) {
+                return adapter.getDataAsGrid();
+            } else {
+                return adapter.getDataAsRgb();
+            }
+
+
+
+
         } catch (java.io.IOException ioe) {
             throw new VisADException("Failed to get tiff data:" + ioe);
         }
