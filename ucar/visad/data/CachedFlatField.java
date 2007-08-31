@@ -449,7 +449,7 @@ public class CachedFlatField extends FlatField {
             }
 
             try {
-                msg("reading from file cache");
+                //                msg("reading from file cache");
                 FileInputStream istream = new FileInputStream(getCacheFile());
                 BufferedInputStream bis = new BufferedInputStream(istream,
                                               1000000);
