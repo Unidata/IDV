@@ -93,16 +93,11 @@ public class GeotiffAdapter {
     /** the scale field */
     private TIFFField scaleField;
 
-    /** the resulting data */
-    private FlatField gridField;
-
-    private FlatField rgbField;
 
     /** flag for geotiff (otherwise a regular TIFF) */
     private boolean isGeotiff = false;
 
-    /** data projection */
-    MapProjection projection = null;
+
 
     /** number of colums (elements) in the image */
     private int cols;
@@ -150,11 +145,7 @@ public class GeotiffAdapter {
      * @throws VisADException           VisAD problem
      */
     public FlatField getDataAsRgb() throws VisADException, IOException {
-
-        if (rgbField == null) {
-            rgbField = createData(true);
-        }
-        return rgbField;
+        return createData(true);
     }
 
 
@@ -167,10 +158,7 @@ public class GeotiffAdapter {
      * @throws VisADException           VisAD problem
      */
     public FlatField getDataAsGrid() throws VisADException, IOException {
-        if (gridField == null) {
-            gridField = createData(false);
-        }
-        return gridField;
+        return createData(false);
     }
 
     /**
@@ -191,8 +179,7 @@ public class GeotiffAdapter {
      * @throws VisADException           VisAD problem
      */
     public boolean getHasProjection() throws VisADException, IOException {
-        getDataAsGrid();
-        return (projection != null);
+        return (getMapProjection() != null);
     }
 
 
@@ -210,10 +197,11 @@ public class GeotiffAdapter {
             form = new TiffForm();
         }
         FlatField field = (FlatField) form.open(filename);
+        System.out.println(""+field);
         Linear2DSet domain = (Linear2DSet) field.getDomainSet();
         cols = domain.getX().getLength();
         rows = domain.getY().getLength();
-        getMapProjection();
+        MapProjection projection = getMapProjection();
         if (projection != null) {
             //            System.err.println ("got projection:" + projection.getClass().getName() + " " +projection);
             //            SampledSet  newDomain = new Linear2DSet(domain.getType(), domain.getX(), domain.getY(),width,height, projection);
@@ -460,10 +448,7 @@ public class GeotiffAdapter {
      */
     private MapProjection getMapProjection()
             throws VisADException, IOException {
-        if (projection != null) {
-            return projection;
-        }
-
+        MapProjection projection = null;
         if ( !isGeotiff) {
             return null;
         }

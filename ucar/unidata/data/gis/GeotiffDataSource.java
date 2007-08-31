@@ -108,7 +108,9 @@ public class GeotiffDataSource extends FilesDataSource {
      */
     private void openData() {
         try {
-            adapter = new GeotiffAdapter(getSource());
+            if(adapter==null) {
+                adapter = new GeotiffAdapter(getSource());
+            }
         } catch (Exception exc) {
             exc.printStackTrace();
             setInError(true,
@@ -129,9 +131,7 @@ public class GeotiffDataSource extends FilesDataSource {
         String description = getSource();
         String desc = IOUtil.getFileTail(getSource());
         List categories;
-        if (adapter == null) {
-            openData();
-        }
+        openData();
         if (adapter == null) {
             return;
         }
@@ -142,7 +142,7 @@ public class GeotiffDataSource extends FilesDataSource {
                 addDataChoice(new DirectDataChoice(this, new Object[]{"image"}, desc + " -  3 Color RGB",
                                                    desc + " -  3 Color RGB", categories,
                                                    DataChoice.NULL_PROPERTIES));
-                categories = DataCategory.parseCategories("GRID-2D", false);
+                categories = DataCategory.parseCategories("IMAGE-2D;GRID-2D", false);
                 addDataChoice(new DirectDataChoice(this, new Object[]{"grid"}, desc+" -  Grid data",
                                                    desc+" -  Grid data", categories,
                                                    DataChoice.NULL_PROPERTIES));
@@ -203,6 +203,10 @@ public class GeotiffDataSource extends FilesDataSource {
                                 Hashtable requestProperties)
             throws VisADException, RemoteException {
         try {
+            openData();
+            if (adapter == null) {
+                return null;
+            }
             Object id = dataChoice.getId();
 
             if(id instanceof String) {
