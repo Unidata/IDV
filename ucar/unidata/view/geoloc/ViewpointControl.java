@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.view.geoloc;
 
 
@@ -34,9 +35,11 @@ import visad.Unit;
 
 import visad.georef.*;
 
+import java.awt.BorderLayout;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.event.*;
 
 
 /**
@@ -71,6 +74,9 @@ public class ViewpointControl implements ActionListener {
 
     /** Action command */
     private static final String CMD_SETVERTICALSCALE = "cmd.setverticalscale";
+
+    /** Action command */
+    private static final String CMD_SETEYEPOSITION = "cmd.seteyeposition";
 
 
     /** Icon for toolbar */
@@ -148,6 +154,9 @@ public class ViewpointControl implements ActionListener {
     /** flag for autorotate view */
     private boolean autoRotate;
 
+    /** flag for autorotate view */
+    private double eyePosition = 0.004;
+
     /** the perspective toggle button */
     private JToggleButton pButton;
 
@@ -159,6 +168,11 @@ public class ViewpointControl implements ActionListener {
 
     /** the perspective menu item */
     private JCheckBoxMenuItem rotateMenu;
+
+    /** the perspective menu item */
+    private JMenuItem eyePositionMenu;
+
+    /** flag for accepting changes from perspective widgets */
 
     /** flag for accepting changes from perspective widgets */
     private boolean okToAcceptChangesFromPerspectiveWidgets = true;
@@ -238,6 +252,8 @@ public class ViewpointControl implements ActionListener {
             double[] range = navDisplay.getVerticalRange();
             Unit     u     = navDisplay.getVerticalRangeUnit();
             changeVerticalScale(new VertScaleInfo(range[0], range[1], u));
+        } else if (cmd.equals(CMD_SETEYEPOSITION)) {
+            changeEyePosition();
         }
     }
 
@@ -434,6 +450,13 @@ public class ViewpointControl implements ActionListener {
             }
         });
 
+        if (navDisplay.getStereoAvailable()) {
+            eyePositionMenu = new JMenuItem("Stereo Controls...");
+            viewMenu.add(eyePositionMenu);
+            eyePositionMenu.setActionCommand(CMD_SETEYEPOSITION);
+            eyePositionMenu.addActionListener(this);
+        }
+
         return viewMenu;
     }
 
@@ -523,6 +546,55 @@ public class ViewpointControl implements ActionListener {
         } catch (Exception exp) {
             System.out.println("  set viewpoint to west view got " + exp);
         }
+    }
+
+    /**
+     * Set the eye position
+     *
+     * @param position the eye position
+     */
+    public void setEyePosition(double position) {
+        eyePosition = position;
+    }
+
+    /**
+     * Get the eye position
+     *
+     * @return the eye position
+     */
+    public double getEyePosition() {
+        return eyePosition;
+    }
+
+    /**
+     * Change the eye position for stereo systems
+     */
+    public void changeEyePosition() {
+
+        final JLabel label = new JLabel(Misc.format(eyePosition));
+        final JSlider slider = new JSlider(0, 1000,
+                                           (int) (eyePosition * 1000));
+        slider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                double value = slider.getValue() / 1000.;
+                label.setText(Misc.format(value));
+                if ( !slider.getValueIsAdjusting()) {
+                    try {
+                        navDisplay.setEyePosition(value);
+                    } catch (Exception exp) {
+                        System.out.println("  set the eye position got "
+                                           + exp);
+                    }
+                    eyePosition = value;
+                }
+            }
+        });
+        JPanel p = new JPanel();
+        p.setLayout(new BorderLayout());
+        p.add(BorderLayout.CENTER, slider);
+        p.add(BorderLayout.EAST, label);
+        GuiUtils.showOkCancelDialog(null, "Set Eye Position", p,
+                                    eyePositionMenu);
     }
 
     /**

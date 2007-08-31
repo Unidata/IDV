@@ -1379,6 +1379,15 @@ abstract public class DisplayMaster {
     }
 
     /**
+     * Set the eye position of each eye for a stereo view. Subclasses that 
+     * support this should override this method
+     *
+     * @param position  x position of each eye (left negative, right positive).
+     */
+    public void setEyePosition(double position) {}
+
+
+    /**
      * Adds a VetoableChangeListener.
      *
      * @param listener          The VetoableChangeListener to add.
@@ -2528,7 +2537,7 @@ abstract public class DisplayMaster {
     private static class Displayables {
 
         /** list of displayables */
-        private final List list;
+        private final List<Displayable> list;
 
         /**
          * Create a set of displayables with the initial size.
@@ -2537,7 +2546,7 @@ abstract public class DisplayMaster {
          *
          */
         public Displayables(int count) {
-            list = Collections.synchronizedList(new ArrayList(count));
+            list = Collections.synchronizedList(new ArrayList<Displayable>(count));
         }
 
 
@@ -2546,7 +2555,7 @@ abstract public class DisplayMaster {
          * @return  iteratore
          */
         public Iterator iterator() {
-            return new ArrayList(list).iterator();
+            return new ArrayList<Displayable>(list).iterator();
         }
 
         /**

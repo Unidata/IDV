@@ -1791,14 +1791,6 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     }
 
     /**
-     * Set the eye position of each eye for a stereo view.
-     *
-     * @param position  x position of each eye (left negative, right positive).
-     */
-    protected void setEyePosition(double position) {}
-
-
-    /**
      * Get the position of the ray at a particular Z value.
      *
      * @param ray    ray to use

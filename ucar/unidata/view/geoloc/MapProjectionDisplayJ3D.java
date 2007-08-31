@@ -500,7 +500,7 @@ public class MapProjectionDisplayJ3D extends MapProjectionDisplay {
      *
      * @param position  x position of each eye (left negative, right positive).
      */
-    protected void setEyePosition(double position) {
+    public void setEyePosition(double position) {
         DisplayRendererJ3D rend =
             (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
         // From Dan Bramer
