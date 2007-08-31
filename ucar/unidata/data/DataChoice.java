@@ -492,11 +492,27 @@ public abstract class DataChoice {
     }
 
     /**
-     * Get the list of DataCategory-s but exclude any that are used for display
+     * Get the list of DataCategory-s. Note: this is now deprecated. The problem is
+     * that we had the getDataCategories and getCategories methods. These would
+     * get used in wrting to a bundle and we'd end up clobbering any display categorie.
      *
-     * @return non-display data categories
+     * @deprecated 
+     * @return data categories
      */
     public List getDataCategories() {
+        return categories;
+    }
+
+    /**
+     * Get the list of DataCategory-s but exclude any that are used for display
+     * if excludeDisplayCategories is true
+     *
+     * @param excludeDisplayCategories if true then only return the data categories that are not
+     * display categories
+     * @return data categories
+     */
+    public List getDataCategories(boolean excludeDisplayCategories) {
+        if(!excludeDisplayCategories) return categories;
         if (categories == null) {
             return null;
         }
@@ -508,19 +524,20 @@ public abstract class DataChoice {
             }
         }
         return l;
+
+
     }
 
+
     /**
-     * Set the list of {@link DataCategory}s that this DataChoice represents.
-     * If categories is null then set the object's categories list to an
-     * empty list.
+     * Note: This does not do anything anymore. It still needs to be around
+     * for old bundles but the list of categories excluded any display categories
+     * and would clobber the main categories list
      *
+     * @deprecated  Does nothing  now.
      * @param categories        The list of data categories.
      */
     public void setDataCategories(List categories) {
-        this.categories = ((categories == null)
-                           ? new ArrayList()
-                           : categories);
     }
 
 
@@ -530,7 +547,9 @@ public abstract class DataChoice {
      * @param categories The list of data categories.
      */
     public void setCategories(List categories) {
-        setDataCategories(categories);
+        this.categories = ((categories == null)
+                           ? new ArrayList()
+                           : categories);
     }
 
 
