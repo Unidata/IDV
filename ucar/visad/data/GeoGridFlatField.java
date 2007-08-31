@@ -22,11 +22,7 @@
 
 
 
-
-
-
-
-package ucar.visad;
+package ucar.visad.data;
 
 
 import ucar.ma2.Array;

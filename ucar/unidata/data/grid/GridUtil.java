@@ -29,7 +29,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
 
-import ucar.visad.CachedFlatField;
+import ucar.visad.data.CachedFlatField;
 import ucar.visad.Util;
 
 import visad.*;

@@ -56,8 +56,8 @@ import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.WrapperException;
 
-import ucar.visad.CachedFlatField;
-import ucar.visad.GeoGridFlatField;
+import ucar.visad.data.CachedFlatField;
+import ucar.visad.data.GeoGridFlatField;
 
 import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.RadarGridCoordinateSystem;

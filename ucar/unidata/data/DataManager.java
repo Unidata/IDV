@@ -36,6 +36,8 @@ import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.idv.PluginManager;
 
+import ucar.visad.data.CachedFlatField;
+
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
@@ -285,8 +287,8 @@ public class DataManager {
                 IdvResourceManager.RSC_DATASOURCE));
 
         loadGribResources(resourceManager);
-        ucar.visad.CachedFlatField.setCacheDir(new File(getDataCacheDirectory()));
-        ucar.visad.CachedFlatField.setCacheThreshold(
+        CachedFlatField.setCacheDir(new File(getDataCacheDirectory()));
+        CachedFlatField.setCacheThreshold(
             dataContext.getObjectStore().get(
                 IdvConstants.PREF_FIELD_CACHETHRESHOLD, 1000000));
 

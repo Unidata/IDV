@@ -65,7 +65,7 @@ import ucar.unidata.util.WrapperException;
 
 import ucar.unidata.xml.*;
 
-import ucar.visad.CachedFlatField;
+import ucar.visad.data.CachedFlatField;
 
 import ucar.visad.Util;
 

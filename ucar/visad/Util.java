@@ -26,6 +26,9 @@
 package ucar.visad;
 
 
+import ucar.visad.data.*;
+
+
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
 

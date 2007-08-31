@@ -46,7 +46,7 @@ import ucar.unidata.data.DataUtil;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.util.*;
-import ucar.visad.CachedFlatField;
+import ucar.visad.data.CachedFlatField;
 import ucar.visad.RadarMapProjection;
 import ucar.visad.Util;
 import visad.*;

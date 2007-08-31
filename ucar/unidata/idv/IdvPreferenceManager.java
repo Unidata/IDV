@@ -380,7 +380,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                                 (((JTextField) widget).getText().trim()));
                 store.put(key, value);
                 if (key.equals(PREF_FIELD_CACHETHRESHOLD)) {
-                    ucar.visad.CachedFlatField.setCacheThreshold(value);
+                    ucar.visad.data.CachedFlatField.setCacheThreshold(value);
                 }
                 continue;
             }

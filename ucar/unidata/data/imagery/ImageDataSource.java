@@ -44,7 +44,7 @@ import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.util.TwoFacedObject;
 
-import ucar.visad.AddeImageFlatField;
+import ucar.visad.data.AddeImageFlatField;
 
 import visad.*;
 
@@ -1083,19 +1083,12 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 }
             }
 
-
-
             if (biggestPosition != null) {
                 biggestPosition.setRequestType(AddeImageInfo.REQ_IMAGEDIR);
-                System.err.println("dir listing:"
-                                   + biggestPosition.makeAddeUrl());
                 AreaDirectoryList adl =
                     new AreaDirectoryList(biggestPosition.makeAddeUrl());
                 biggestPosition.setRequestType(AddeImageInfo.REQ_IMAGEDATA);
                 currentDirs = adl.getSortedDirs();
-                System.err.println(currentDirs.length + " "
-                                   + currentDirs[0].length + "\n"
-                                   + adl.getDirs());
             } else {
                 currentDirs = null;
             }
