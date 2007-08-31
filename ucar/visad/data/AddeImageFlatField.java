@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.visad.data;
 
 
@@ -35,6 +36,8 @@ import ucar.ma2.Index;
 import ucar.nc2.dt.grid.*;
 
 import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.imagery.AddeImageDescriptor;
+
 
 import ucar.unidata.data.imagery.AddeImageInfo;
 import ucar.unidata.util.IOUtil;
@@ -50,6 +53,9 @@ import ucar.unidata.util.Trace;
 import visad.*;
 
 import visad.data.mcidas.AREACoordinateSystem;
+
+
+import visad.data.mcidas.AreaAdapter;
 
 
 import visad.meteorology.SingleBandedImage;
@@ -82,6 +88,21 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
 
     /** _more_ */
     private DateTime startTime;
+
+
+    /** _more_ */
+    private AreaFile areaFile;
+
+
+    /** _more_          */
+    private AddeImageDescriptor aid;
+
+    /** _more_ */
+    private int[] bandIndices;
+
+
+
+
 
     /**
      * copy ctor
@@ -161,7 +182,7 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
     /**
      * _more_
      *
-     * @param aii _more_
+     * @param aid _more_
      * @param areaDirectory _more_
      * @param shouldCache _more_
      * @param cacheFile _more_
@@ -172,7 +193,7 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    public static AddeImageFlatField create(AddeImageInfo aii,
+    public static AddeImageFlatField create(AddeImageDescriptor aid,
                                             AreaDirectory areaDirectory,
                                             boolean shouldCache,
                                             String cacheFile,
@@ -180,8 +201,10 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
             throws VisADException, RemoteException {
 
 
-        int nLines = aii.getLines();
-        int nEles  = aii.getElements();
+
+
+        int nLines = aid.getImageInfo().getLines();
+        int nEles  = aid.getImageInfo().getElements();
 
         // make the VisAD RealTypes for the dimension variables
         RealType line    = RealType.getRealType("ImageLine", null, null);
@@ -219,7 +242,7 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
 
 
         // If we have calibration units, might as well use them.
-        Unit  calUnit  = null;
+        Unit calUnit = null;
         try {
             calUnit = visad.data.units.Parser.parse(
                 visad.jmet.MetUnits.makeSymbol(
@@ -277,28 +300,17 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
 
 
         AddeImageFlatField aiff = new AddeImageFlatField(image_type,
-                                     domain_set, null, rangeSets, rangeUnits,
-                                     null);
+                                      domain_set, null, rangeSets,
+                                      rangeUnits, null);
         aiff.bandIndices = bandIndices;
-        aiff.aii         = aii;
-        cs.aiff         = aiff;
+        aiff.aid         = aid;
+        cs.aiff          = aiff;
         aiff.startTime   = new DateTime(areaDirectory.getStartTime());
         aiff.setCacheClearDelay(cacheClearDelay);
         aiff.setCacheFile(cacheFile);
         aiff.setShouldCache(shouldCache);
         return aiff;
     }
-
-
-
-    /** _more_ */
-    private AreaFile areaFile;
-
-    /** _more_ */
-    private     AddeImageInfo aii;
-
-    /** _more_ */
-    private     int[] bandIndices;
 
 
 
@@ -323,16 +335,16 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
     }
 
 
-    /** _more_          */
+    /** _more_ */
     private int[][] dirNavAux;
 
-    /** _more_          */
+    /** _more_ */
     private int[] nav;
 
-    /** _more_          */
+    /** _more_ */
     private int[] aux;
 
-    /** _more_          */
+    /** _more_ */
     private int[] dir;
 
     /**
@@ -452,20 +464,34 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
             msg("Reading ADDE data  " + readLabel);
             LogUtil.message(readLabel);
             ucar.unidata.data.DataSourceImpl.incrOutstandingGetDataCalls();
-            areaFile = AreaFileFactory.getAreaFileInstance(aii.makeAddeUrl());
-            float[][][] flt_samples = areaFile.getFloatData();
-            float[][] samples =
-                new float[1][aii.getElements() * aii.getLines()];
-            int nEles  = aii.getElements();
-            int nLines = aii.getLines();
 
-            float calScale = (1.0f / areaFile.getAreaDirectory().getCalibrationScaleFactor());
+
+            /*
+            AreaAdapter aa = new AreaAdapter(aid.getImageInfo().makeAddeUrl(), false);
+            visad.meteorology.SingleBandedImage ff = aa.getImage();
+
+
+            float[][]samples = ff.getFloats(false);
+            areaFile = aa.getAreaFile();
+            */
+            areaFile = AreaFileFactory.getAreaFileInstance(
+                aid.getImageInfo().makeAddeUrl());
+            float[][][] flt_samples = areaFile.getFloatData();
+            int         nEles       = aid.getImageInfo().getElements();
+            int         nLines      = aid.getImageInfo().getLines();
+            float[][]   samples     = new float[1][nEles * nLines];
+
+
+            float calScale =
+                (1.0f
+                 / areaFile.getAreaDirectory().getCalibrationScaleFactor());
             for (int i = 0; i < nLines; i++) {
                 for (int j = 0; j < nEles; j++) {
                     float v = calScale * flt_samples[bandIndices[0]][i][j];
                     samples[0][j + (nEles * i)] = v;
                 }
             }
+
             return samples;
         } catch (Exception exc) {
             throw new ucar.unidata.util.WrapperException(exc);
