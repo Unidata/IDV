@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.imagery;
 
 
@@ -30,7 +31,6 @@ import edu.wisc.ssec.mcidas.AreaDirectoryList;
 import edu.wisc.ssec.mcidas.AreaFile;
 
 import ucar.unidata.data.*;
-
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
@@ -38,6 +38,8 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.PollingInfo;
+
+import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.util.TwoFacedObject;
@@ -64,6 +66,8 @@ import java.util.ArrayList;
 
 import java.util.Arrays;
 import java.util.Comparator;
+
+import java.util.Date;
 import java.util.Hashtable;
 
 import java.util.Hashtable;
@@ -776,6 +780,9 @@ public abstract class ImageDataSource extends DataSourceImpl {
     }
 
 
+    /** _more_          */
+    private Range[] sampleRanges = null;
+
     /**
      * Create the actual data represented by the given
      * {@link ucar.unidata.data.DataChoice}.
@@ -798,17 +805,17 @@ public abstract class ImageDataSource extends DataSourceImpl {
                                 DataSelection dataSelection,
                                 Hashtable requestProperties)
             throws VisADException, RemoteException {
+        sampleRanges = null;
         if ((dataChoice instanceof CompositeDataChoice)
                 && !(hasBandInfo(dataChoice))) {
-            return (Data) makeImageSequence(myCompositeDataChoice,
-                                            dataSelection);
+            return makeImageSequence(myCompositeDataChoice, dataSelection);
         } else if (hasBandInfo(dataChoice)) {
             //List descriptors = getDescriptors(dataChoice, dataSelection);
             //if ((descriptors != null) && (descriptors.size() == 1)) {
             //    return (Data) makeImage(
             //        (AddeImageDescriptor) descriptors.get(0));
             //} else {
-            return (Data) makeImageSequence(dataChoice, dataSelection);
+            return makeImageSequence(dataChoice, dataSelection);
             //}
         }
         return (Data) makeImage(dataChoice, dataSelection);
@@ -910,8 +917,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
         if (aid == null) {
             return null;
         }
-        String   source = aid.getSource();
-        DateTime dttm   = aid.getImageTime();
+        DateTime dttm = aid.getImageTime();
         if ((subset != null) && (dttm != null)) {
             List times = getTimesFromDataSelection(subset, dataChoice);
             if ((times != null) && (times.indexOf(dttm) == -1)) {
@@ -919,48 +925,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
             }
         }
 
-        SingleBandedImage result = (SingleBandedImage) getCache(source);
-        if (result != null) {
-            return result;
-        }
-        // System.out.println("source = " + aid.getSource());
+        return makeImage(aid);
 
-        try {
-            AddeImageInfo aii = aid.getImageInfo();
-            AreaDirectory areaDir=null;
-            try {
-                aii.setRequestType(aii.REQ_IMAGEDIR);
-                AreaDirectoryList adl = new AreaDirectoryList(aii.makeAddeUrl());
-                List dirs = adl.getDirs();
-                if(dirs.size()==1) {
-                    areaDir = (AreaDirectory) dirs.get(0);
-                    //                    System.err.println ("time:" + areaDir.getStartTime());
-                }
-            } catch (Exception exc) {
-                LogUtil.logException("making area file", exc);
-            }
-            aii.setRequestType(aii.REQ_IMAGEDATA);
-
-
-            AreaAdapter aa = new AreaAdapter(aid.getSource(), false);  // don't pack
-            result = aa.getImage();
-
-
-            String filename = IOUtil.joinDir(getDataCachePath(),
-                                             "image"+(result.getStartTime()!=null?""+result.getStartTime().getValue():"")
-
-                                             + ".dat");
-
-            AddeImageFlatField aiff =
-                AddeImageFlatField.createFromSingleBandedImage(result,
-                    getCacheDataToDisk(), filename, getCacheClearDelay());
-
-            result = aiff;
-            putCache(source, result);
-            return result;
-        } catch (java.io.IOException ioe) {
-            throw new VisADException("Creating AreaAdapter - " + ioe);
-        }
     }
 
 
@@ -977,26 +943,82 @@ public abstract class ImageDataSource extends DataSourceImpl {
      */
     private SingleBandedImage makeImage(AddeImageDescriptor aid)
             throws VisADException, RemoteException {
-
         if (aid == null) {
             return null;
         }
+
+
         String            source = aid.getSource();
         SingleBandedImage result = (SingleBandedImage) getCache(source);
         if (result != null) {
             return result;
         }
+        AddeImageInfo aii  = aid.getImageInfo();
+        Date          date = aii.getStartDate();
+        System.err.println("Positon:" + aii.getDatasetPosition());
+
 
         try {
-            AreaAdapter aa = new AreaAdapter(aid.getSource(), false);  // don't pack
-            result = aa.getImage();
+            AreaDirectory areaDir = null;
+            try {
+                if (currentDirs != null) {
+                    areaDir =
+                        currentDirs[Math.abs(aii.getDatasetPosition())][0];
+                }
+            } catch (Exception exc) {
+                LogUtil.printMessage("error looking up area dir");
+                exc.printStackTrace();
+                return null;
+            }
+
+
+
+            if (areaDir != null) {
+                String filename = IOUtil.joinDir(getDataCachePath(),
+                                      "image"
+                                      + ((areaDir.getStartTime() != null)
+                                         ? "" + areaDir.getStartTime()
+                                             .getTime()
+                                         : "") + ".dat");
+                AddeImageFlatField aiff = AddeImageFlatField.create(aii,
+                                              areaDir, getCacheDataToDisk(),
+                                              filename, getCacheClearDelay());
+
+
+                aiff.setReadLabel(readLabel);
+                result = aiff;
+                if (sampleRanges == null) {
+                    sampleRanges = aiff.getRanges(true);
+                    if ((sampleRanges != null) && (sampleRanges.length > 0)) {
+                        for (int rangeIdx = 0; rangeIdx < sampleRanges.length;
+                                rangeIdx++) {
+                            Range r = sampleRanges[rangeIdx];
+                            if (Double.isInfinite(r.getMin())
+                                    || Double.isInfinite(r.getMax())) {
+                                sampleRanges = null;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    aiff.setSampleRanges(sampleRanges);
+                }
+            } else {
+                System.err.println("Failed to read areadir");
+                AreaAdapter aa = new AreaAdapter(aid.getSource(), false);
+                result = aa.getImage();
+            }
             putCache(source, result);
             return result;
         } catch (java.io.IOException ioe) {
             throw new VisADException("Creating AreaAdapter - " + ioe);
         }
+
     }
 
+
+    /** _more_          */
+    String readLabel;
 
     /**
      * Create the  image sequence defined by the given dataChoice.
@@ -1011,52 +1033,115 @@ public abstract class ImageDataSource extends DataSourceImpl {
     protected ImageSequence makeImageSequence(DataChoice dataChoice,
             DataSelection subset)
             throws VisADException, RemoteException {
-        if (sequenceManager == null) {
-            sequenceManager = new ImageSequenceManager();
-        }
-        sequenceManager.clearSequence();
-        ImageSequence sequence = null;
-        int           cnt      = 1;
-        if ( !hasBandInfo(dataChoice)) {
-            List choices = (dataChoice instanceof CompositeDataChoice)
-                           ? getChoicesFromSubset(
-                               (CompositeDataChoice) dataChoice, subset)
-                           : Arrays.asList(new DataChoice[] { dataChoice });
-            for (Iterator iter = choices.iterator(); iter.hasNext(); ) {
-                LogUtil.message("Time: " + (cnt++) + "/" + choices.size()
-                                + " From: " + dataChoice.toString());
-                SingleBandedImage image = null;
-                try {
-                    image = makeImage(
-                        (DataChoice) iter.next(),
-                        new DataSelection(Misc.newList(new Integer(0))));
-                } catch (VisADException ve) {  // some error getting data
-                    image = null;
-                    LogUtil.printMessage(ve.toString());
-                }
-                if (image != null) {
-                    sequence = sequenceManager.addImageToSequence(image);
-                }
-            }
-        } else {
-            List descriptors = getDescriptors(dataChoice, subset);
-            for (Iterator iter = descriptors.iterator(); iter.hasNext(); ) {
-                LogUtil.message("Time: " + (cnt++) + "/" + descriptors.size()
-                                + " From: " + dataChoice.toString());
-                SingleBandedImage image = null;
-                try {
-                    image = makeImage((AddeImageDescriptor) iter.next());
-                } catch (VisADException ve) {  // some error getting data
-                    image = null;
-                    LogUtil.printMessage(ve.toString());
-                }
-                if (image != null) {
-                    sequence = sequenceManager.addImageToSequence(image);
+
+        try {
+            List descriptorsToUse = new ArrayList();
+            if (hasBandInfo(dataChoice)) {
+                descriptorsToUse = getDescriptors(dataChoice, subset);
+            } else {
+                List choices = (dataChoice instanceof CompositeDataChoice)
+                               ? getChoicesFromSubset(
+                                   (CompositeDataChoice) dataChoice, subset)
+                               : Arrays.asList(new DataChoice[] {
+                                   dataChoice });
+                for (Iterator iter = choices.iterator(); iter.hasNext(); ) {
+                    DataChoice          subChoice = (DataChoice) iter.next();
+                    AddeImageDescriptor aid =
+                        getDescriptor(subChoice.getId());
+                    if (aid == null) {
+                        continue;
+                    }
+                    DateTime dttm = aid.getImageTime();
+                    if ((subset != null) && (dttm != null)) {
+                        List times = getTimesFromDataSelection(subset,
+                                         dataChoice);
+                        if ((times != null) && (times.indexOf(dttm) == -1)) {
+                            continue;
+                        }
+                    }
+                    descriptorsToUse.add(aid);
                 }
             }
+
+            if (descriptorsToUse.size() == 0) {
+                return null;
+            }
+
+            AddeImageInfo biggestPosition = null;
+            int           pos             = 0;
+            //Find the descriptor with the largets position
+            for (Iterator iter =
+                    descriptorsToUse.iterator(); iter.hasNext(); ) {
+                AddeImageDescriptor aid = (AddeImageDescriptor) iter.next();
+                AddeImageInfo       aii = aid.getImageInfo();
+                if (aii.getStartDate() != null) {
+                    break;
+                }
+                if (Math.abs(aii.getDatasetPosition()) > pos) {
+                    pos             = Math.abs(aii.getDatasetPosition());
+                    biggestPosition = aii;
+                }
+            }
+
+
+
+            if (biggestPosition != null) {
+                biggestPosition.setRequestType(AddeImageInfo.REQ_IMAGEDIR);
+                System.err.println("dir listing:"
+                                   + biggestPosition.makeAddeUrl());
+                AreaDirectoryList adl =
+                    new AreaDirectoryList(biggestPosition.makeAddeUrl());
+                biggestPosition.setRequestType(AddeImageInfo.REQ_IMAGEDATA);
+                currentDirs = adl.getSortedDirs();
+                System.err.println(currentDirs.length + " "
+                                   + currentDirs[0].length + "\n"
+                                   + adl.getDirs());
+            } else {
+                currentDirs = null;
+            }
+            if (sequenceManager == null) {
+                sequenceManager = new ImageSequenceManager();
+            }
+            sequenceManager.clearSequence();
+            ImageSequence sequence = null;
+            int           cnt      = 1;
+            DataChoice    parent   = dataChoice.getParent();
+            for (Iterator iter =
+                    descriptorsToUse.iterator(); iter.hasNext(); ) {
+                AddeImageDescriptor aid = (AddeImageDescriptor) iter.next();
+                if (currentDirs != null) {
+                    int idx =
+                        Math.abs(aid.getImageInfo().getDatasetPosition());
+                    if (idx >= currentDirs.length) {
+                        System.err.println("skipping index:" + idx);
+                        continue;
+                    }
+                }
+
+                readLabel = "Time: " + (cnt++) + "/"
+                            + descriptorsToUse.size() + "  "
+                            + ((parent != null)
+                               ? parent.toString() + "  "
+                               : "") + dataChoice.toString();
+
+                try {
+                    SingleBandedImage image = makeImage(aid);
+                    if (image != null) {
+                        sequence = sequenceManager.addImageToSequence(image);
+                    }
+                } catch (VisADException ve) {
+                    LogUtil.printMessage(ve.toString());
+                }
+            }
+            return sequence;
+        } catch (Exception exc) {
+            throw new ucar.unidata.util.WrapperException(exc);
         }
-        return sequence;
     }
+
+    /** _more_          */
+    AreaDirectory[][] currentDirs;
+
 
     /**
      * Get a list of descriptors from the choice and subset
