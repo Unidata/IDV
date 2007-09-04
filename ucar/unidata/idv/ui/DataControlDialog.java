@@ -83,11 +83,6 @@ import javax.swing.tree.*;
  */
 public class DataControlDialog implements ActionListener {
 
-    /**
-     * A helper attribute so we can call static routines in LogUtil
-     *   without typing the whole class name
-     */
-    public static final LogUtil LU = null;
 
     /** Use this member to log messages (through calls to LogUtil) */
     public static LogUtil.LogCategory log_ =
@@ -299,9 +294,9 @@ public class DataControlDialog implements ActionListener {
         if (this.dataSource != dataSource) {
             return;
         }
-        dataSelectionWidget.setTimes(dataSource.getAllDateTimes(),
-                 dataSource.getDateTimeSelection());
+        dataSelectionWidget.dataSourceChanged(dataSource);
     }
+
 
     /**
      * Return the {@link ucar.unidata.idv.ControlDescriptor} that is currently selected
@@ -914,117 +909,6 @@ public class DataControlDialog implements ActionListener {
         }
     }
 
-
-
-
-    /**
-     * Add the given times in the all/selected list into the
-     * given JList. Configure the allTimeButton  appropriately
-     *
-     *
-     * @param timesList The JList to put the times into.
-     * @param allTimesButton The checkbox that allows the user to select all or some
-     * @param all All the times
-     * @param selected The selected times
-     */
-    public static void setTimes(JList timesList, JCheckBox allTimesButton,
-                                List all, List selected) {
-
-        selected = DataSourceImpl.getDateTimes(selected, all);
-
-        if (DataSourceImpl.holdsIndices(selected)) {
-            selected = Misc.getValuesFromIndices(selected, all);
-        }
-
-        if (all == null) {
-            return;
-        }
-        List sortedAllDateTimes = Misc.sort(new HashSet(all));
-        timesList.setListData(new Vector(sortedAllDateTimes));
-        //      allTimesButton.setVisible (allDateTimes.size()>0);
-        allTimesButton.setEnabled(sortedAllDateTimes.size() > 0);
-        boolean allSelected = false;
-
-
-
-        if ((selected != null) && (selected.size() > 0)) {
-            allSelected = (sortedAllDateTimes.size() == selected.size());
-            for (int i = 0; i < selected.size(); i++) {
-                int idx = sortedAllDateTimes.indexOf(selected.get(i));
-                if (idx >= 0) {
-                    timesList.getSelectionModel().addSelectionInterval(idx,
-                            idx);
-                }
-            }
-        } else {
-            allSelected = true;
-            //      timesList.setSelectionInterval (0, sortedAllDateTimes.size()-1);
-        }
-
-        if (allSelected) {
-            timesList.getSelectionModel().addSelectionInterval(0,
-                    timesList.getModel().getSize() - 1);
-
-        }
-
-
-        //If there are no time selected then turn on the all times checkbox
-        if ((selected == null) || (selected.size() == 0)) {
-            allTimesButton.setSelected(true);
-        }
-
-
-        //Don't automatically toggle the checkbox
-        //OLD
-        timesList.setEnabled( !allTimesButton.isSelected());
-        allTimesButton.setSelected(allSelected);
-    }
-
-    /**
-     * Create the JList, an 'all times button', and a JPanel
-     * to show times.
-     *
-     * @return A triple: JList, all times button and the JPanel that wraps this.
-     */
-    public static JComponent[] makeTimesListAndPanel() {
-        return makeTimesListAndPanel("Use All ");
-    }
-
-
-    /**
-     * Create the JList, an 'all times button', and a JPanel
-     * to show times.
-     *
-     *
-     * @param cbxLabel Label to use for the checkbox. (Use All or Use Default).
-     * @return A triple: JList, all times button and the JPanel that wraps this.
-     */
-    public static JComponent[] makeTimesListAndPanel(String cbxLabel) {
-        final JList timesList = new JList();
-        timesList.setBorder(null);
-        GuiUtils.configureStepSelection(timesList);
-        timesList.setToolTipText("Right click to show selection menu");
-        timesList.setSelectionMode(
-            ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-
-        final JCheckBox allTimesButton = new JCheckBox(cbxLabel, true);
-        allTimesButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                timesList.setEnabled( !allTimesButton.isSelected());
-            }
-        });
-
-        //        JComponent top = GuiUtils.leftRight(new JLabel("Times"),
-        //                                            allTimesButton);
-        JComponent top = GuiUtils.right(allTimesButton);
-
-        //NEW
-        //        JComponent top      = GuiUtils.left(new JLabel("Times"));
-        JComponent scroller = GuiUtils.makeScrollPane(timesList, 300, 100);
-        //      scroller.setBorder(BorderFactory.createMatteBorder(1,2,0,0,Color.gray));
-        return new JComponent[] { timesList, allTimesButton,
-                                  GuiUtils.topCenter(top, scroller) };
-    }
 
 
 

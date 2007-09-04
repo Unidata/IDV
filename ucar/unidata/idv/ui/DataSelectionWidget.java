@@ -106,6 +106,8 @@ public class DataSelectionWidget {
     JComponent selectionTabContainer;
 
 
+    private boolean doSettings = true;
+
     /** _more_ */
     private SettingsTree settingsTree;
 
@@ -146,6 +148,8 @@ public class DataSelectionWidget {
 
 
 
+    private DataSource lastDataSource;
+
 
     /**
      * Constructor  for when we are a part of the {@link DataSelector}
@@ -156,6 +160,11 @@ public class DataSelectionWidget {
      *
      */
     public DataSelectionWidget(IntegratedDataViewer idv) {
+        this(idv,true);
+    }
+
+    public DataSelectionWidget(IntegratedDataViewer idv, boolean doSettings) {
+        this.doSettings = doSettings;
         this.idv = idv;
         getContents();
     }
@@ -174,10 +183,14 @@ public class DataSelectionWidget {
      * @param dataSource The data source that changed
      */
     public void dataSourceChanged(DataSource dataSource) {
-        setTimes(dataSource.getAllDateTimes(),
-                 dataSource.getDateTimeSelection());
+        if(dataSource==null) {
+            setTimes(new ArrayList(),
+                     new ArrayList());
+        } else {
+            setTimes(dataSource.getAllDateTimes(),
+                     dataSource.getDateTimeSelection());
+        }
     }
-
 
 
     /**
@@ -248,6 +261,25 @@ public class DataSelectionWidget {
     }
 
 
+    protected void updateSelectionTab(DataChoice dataChoice) {
+        if(dataChoice == null) {
+            updateSelectionTab(null, dataChoice);
+            return;
+        }
+
+        List sources = new ArrayList();
+        dataChoice.getDataSources(sources);
+        sources = Misc.makeUnique(sources);
+        if(sources.size()==1) {
+            updateSelectionTab((DataSource) sources.get(0), dataChoice);
+        } else {
+            updateSelectionTab(null, dataChoice);
+        }
+    }
+
+
+
+
     /**
      * Update selection panel for data source
      *
@@ -256,6 +288,11 @@ public class DataSelectionWidget {
      */
     protected void updateSelectionTab(DataSource dataSource, DataChoice dc) {
         //        System.err.println("update tab " + dataSource + " " + dc);
+        if(lastDataSource!=dataSource) {
+            dataSourceChanged(dataSource);
+        }
+        lastDataSource = dataSource;
+
         if (selectionTab == null) {
             return;
         }
@@ -432,6 +469,9 @@ public class DataSelectionWidget {
      * _more_
      */
     private void addSettingsComponent() {
+        if(!doSettings) return;
+
+
         List settings = idv.getResourceManager().getDisplaySettings();
         if ((settings == null) || (settings.size() == 0)) {
             return;
@@ -451,20 +491,20 @@ public class DataSelectionWidget {
      * @param dataChoice The DataChoice
      * @return The GUI
      */
-    public JComponent doMakeContents() {
+    private JComponent doMakeContents() {
         timesTab     = getTimesList();
         selectionTab = new JTabbedPane();
         selectionTab.setBorder(null);
         selectionTabContainer = new JPanel(new BorderLayout());
         selectionTabContainer.add(selectionTab);
         selectionContainer = new JPanel(new BorderLayout());
+        selectionContainer.setPreferredSize(new Dimension(200,150));
         Font font = selectionTab.getFont();
         font = font.deriveFont((float) font.getSize() - 2).deriveFont(
             Font.ITALIC).deriveFont(Font.BOLD);
         selectionTab.setFont(font);
         selectionTab.add("Times", timesTab);
-        JComponent selectionPanel = selectionContainer;
-        return selectionPanel;
+        return selectionContainer;
     }
 
 
@@ -539,6 +579,44 @@ public class DataSelectionWidget {
 
 
 
+
+    /**
+     *  Create the GUI for the times list. (i.e., all times button and the
+     *  times JList)
+     *
+     *  @return The GUI for times
+     */
+    public JComponent getTimesList() {
+        if (/*TODO dataSource != null*/ false) {
+            return getTimesList("Use All ");
+        } else {
+            return getTimesList("Use Default ");
+        }
+    }
+
+
+
+
+    /**
+     * Create the GUI for the times list. (i.e., all times button and the
+     * times JList)
+     *
+     * @param cbxLabel Label for times checkbox
+     * @return The GUI for times
+     */
+    public JComponent getTimesList(String cbxLabel) {
+        if (timesListInfo == null) {
+            timesListInfo  = makeTimesListAndPanel(cbxLabel);
+            timesList      = (JList) timesListInfo[0];
+            allTimesButton = (JCheckBox) timesListInfo[1];
+        }
+        return timesListInfo[2];
+    }
+
+
+
+
+
     /**
      * Add the given times in the all/selected list into the
      * given JList. Configure the allTimeButton  appropriately
@@ -549,7 +627,7 @@ public class DataSelectionWidget {
      * @param all All the times
      * @param selected The selected times
      */
-    public static void setTimes(JList timesList, JCheckBox allTimesButton,
+    private static void setTimes(JList timesList, JCheckBox allTimesButton,
                                 List all, List selected) {
 
         selected = DataSourceImpl.getDateTimes(selected, all);
@@ -603,52 +681,6 @@ public class DataSelectionWidget {
     }
 
 
-    /**
-     *  Create the GUI for the times list. (i.e., all times button and the
-     *  times JList)
-     *
-     *  @return The GUI for times
-     */
-    public JComponent getTimesList() {
-        if (/*TODO dataSource != null*/ false) {
-            return getTimesList("Use All ");
-        } else {
-            return getTimesList("Use Default ");
-        }
-    }
-
-
-
-
-    /**
-     * Create the GUI for the times list. (i.e., all times button and the
-     * times JList)
-     *
-     * @param cbxLabel Label for times checkbox
-     * @return The GUI for times
-     */
-    public JComponent getTimesList(String cbxLabel) {
-        if (timesListInfo == null) {
-            timesListInfo  = makeTimesListAndPanel(cbxLabel);
-            timesList      = (JList) timesListInfo[0];
-            allTimesButton = (JCheckBox) timesListInfo[1];
-        }
-        return timesListInfo[2];
-    }
-
-
-
-
-    /**
-     * Create the JList, an 'all times button', and a JPanel
-     * to show times.
-     *
-     * @return A triple: JList, all times button and the JPanel that wraps this.
-     */
-    public static JComponent[] makeTimesListAndPanel() {
-        return makeTimesListAndPanel("Use All ");
-    }
-
 
     /**
      * Create the JList, an 'all times button', and a JPanel
@@ -658,7 +690,7 @@ public class DataSelectionWidget {
      * @param cbxLabel Label to use for the checkbox. (Use All or Use Default).
      * @return A triple: JList, all times button and the JPanel that wraps this.
      */
-    public static JComponent[] makeTimesListAndPanel(String cbxLabel) {
+    private static JComponent[] makeTimesListAndPanel(String cbxLabel) {
         final JList timesList = new JList();
         timesList.setBorder(null);
         GuiUtils.configureStepSelection(timesList);

@@ -107,9 +107,7 @@ public class DataTreeDialog extends JDialog implements ActionListener {
     /** All of the data trees, one per label/param name */
     List dataTrees = new ArrayList();
 
-    /** List of (JList, Use all button) array that show times */
-    List timesLists = new ArrayList();
-
+    List dataSelectionWidgets = new ArrayList();
 
     /** Listener to fire select events off to */
     ActionListener listener;
@@ -356,60 +354,20 @@ public class DataTreeDialog extends JDialog implements ActionListener {
         doMakeWindow(src);
     }
 
-    /**
-     * Return the list of times that were selected to the index'th datatree/times list
-     *
-     * @param index Which times list do we look at
-     *
-     * @return The selected times
-     */
-    private List getSelectedDateTimes(int index) {
-        DataTree   tree       = (DataTree) dataTrees.get(index);
-        DataChoice dataChoice = tree.getSelectedDataChoice();
-        if (dataChoice == null) {
-            return null;
-        }
-        JList timesList = (JList) ((JComponent[]) timesLists.get(index))[0];
-        JCheckBox allTimesButton =
-            (JCheckBox) ((JComponent[]) timesLists.get(index))[1];
-
-        if (allTimesButton == null) {
-            return null;
-        }
-        if (allTimesButton.isSelected()) {
-            return null;
-        }
-        if (timesList == null) {
-            return new ArrayList();
-        }
-        List selected = Misc.toList(timesList.getSelectedValues());
-        return Misc.getIndexList(selected, dataChoice.getAllDateTimes());
-    }
-
 
 
     /**
      * The user has clicked on the index'th data tree. This routine
-     * sets the time in the appropriate times list from the data choice
-     * (if any) the user clicked on.
+     * sets state in the DataSelectionWidget
      *
      * @param index Which data tree was clicked
      */
     private void treeClick(int index) {
         DataTree   tree       = (DataTree) dataTrees.get(index);
         DataChoice dataChoice = tree.getSelectedDataChoice();
-        JList timesList = (JList) ((JComponent[]) timesLists.get(index))[0];
-        JCheckBox allTimesButton =
-            (JCheckBox) ((JComponent[]) timesLists.get(index))[1];
-        if (dataChoice == null) {
-            DataControlDialog.setTimes(timesList, allTimesButton,
-                                       new ArrayList(), new ArrayList());
-        } else {
-            DataControlDialog.setTimes(timesList, allTimesButton,
-                                       dataChoice.getAllDateTimes(),
-                                       dataChoice.getSelectedDateTimes());
-        }
 
+        DataSelectionWidget dsw  = (DataSelectionWidget) dataSelectionWidgets.get(index);
+        dsw.updateSelectionTab(dataChoice);
     }
 
     /**
@@ -454,9 +412,11 @@ public class DataTreeDialog extends JDialog implements ActionListener {
         for (int i = 0; i < labels.size(); i++) {
             JScrollPane scroller =
                 ((DataTree) dataTrees.get(i)).getScroller();
-            JComponent[] timesTriple =
-                DataControlDialog.makeTimesListAndPanel("Use Default ");
-            timesLists.add(timesTriple);
+
+            DataSelectionWidget dsw = new DataSelectionWidget(idv,false);
+            dsw.updateSelectionTab(null);
+            dataSelectionWidgets.add(dsw);
+
             String labelString = StringUtil.replace(labels.get(i).toString(),
                                      "_", " ");
             if (addLabelDecoration) {
@@ -467,8 +427,7 @@ public class DataTreeDialog extends JDialog implements ActionListener {
             scroller.setPreferredSize(new Dimension(250, 300));
             topComponents.add(GuiUtils.topCenter(GuiUtils.inset(label,
                     new Insets(10, 5, 0, 10)), scroller));
-            timesTriple[2].setPreferredSize(new Dimension(250, 150));
-            timeComponents.add(timesTriple[2]);
+            timeComponents.add(dsw.getContents());
         }
         topComponents.addAll(timeComponents);
         GuiUtils.tmpInsets = new Insets(4, 6, 4, 6);
@@ -513,13 +472,8 @@ public class DataTreeDialog extends JDialog implements ActionListener {
         selected = new ArrayList();
         for (int i = 0; i < dataTrees.size(); i++) {
             DataSelection dataSelection = null;
-            List          times         = getSelectedDateTimes(i);
-            if (times == null) {
-                dataSelection = new DataSelection();
-            } else {
-                dataSelection = new DataSelection(times);
-            }
-
+            DataSelectionWidget dsw = (DataSelectionWidget) dataSelectionWidgets.get(i);
+            dataSelection = dsw.createDataSelection(true);
             List selectedFromTree =
                 ((DataTree) dataTrees.get(i)).getSelectedDataChoices();
             selectedFromTree = DataChoice.cloneDataChoices(selectedFromTree);
