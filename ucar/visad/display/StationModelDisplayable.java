@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.visad.display;
 
 
@@ -1476,8 +1477,51 @@ public class StationModelDisplayable extends DisplayableData {
      * @return index or bad index
      */
     private int getIndex(String[] names, String lookingFor) {
+        if (lookingFor.equals("*")) {
+            if(names.length>0)
+                return 0;
+            return PointOb.BAD_INDEX;
+        }
+
+
+        if (lookingFor.startsWith("#")) {
+            int index = new Integer(lookingFor.substring(1)).intValue();
+            if(index<names.length) {
+                return index;
+            }
+            return PointOb.BAD_INDEX;
+            
+        }
+
+
+        boolean not = false;
+        if (lookingFor.startsWith("!")) {
+            lookingFor = lookingFor.substring(1);
+            not        = true;
+        }
+
+        if (StringUtil.containsRegExp(lookingFor)) {
+            for (int i = 0; i < names.length; i++) {
+                if (StringUtil.stringMatch(names[i], lookingFor)) {
+                    if (not) {
+                        continue;
+                    }
+                    return i;
+                } else if (not) {
+                    return i;
+                }
+            }
+        }
+
+
+
         for (int i = 0; i < names.length; i++) {
             if (names[i].equals(lookingFor)) {
+                if (not) {
+                    continue;
+                }
+                return i;
+            } else if (not) {
                 return i;
             }
         }
