@@ -192,7 +192,7 @@
     <categories>
       <category
          display="true"
-         value="System"/>
+         value="System-Maps"/>
       <category value="display:topography"/>
     </categories>
     <operands/>
@@ -310,4 +310,34 @@
     </categories>
     <operands/>
   </derived>
+
+  <derived description="Subset field from map" formula="subsetFromMap(field, map[categories=GIS-SHAPEFILE],inverse=0)" id="subsetFromMap" isdefault="false" isenduser="true">
+    <categories>
+      <category
+         display="true"
+         value="System-Maps"/>
+      <category value="display:planviewcontour"/>
+      <category value="display:planviewcolor"/>
+      <category value="display:planviewcontourfilled"/>
+      <category value="display:imagedisplay"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+
+
+  <derived description="Inverse subset field from map" formula="subsetFromMap(field, map[categories=GIS-SHAPEFILE],inverse=1)" id="inverseSubsetFromMap" isdefault="false" isenduser="true"> 
+    <categories>
+      <category
+         display="true"
+         value="System-Maps"/>
+      <category value="display:planviewcontour"/>
+      <category value="display:planviewcolor"/>
+      <category value="display:planviewcontourfilled"/>
+      <category value="display:imagedisplay"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+
+
+
 </derived_parameters>
