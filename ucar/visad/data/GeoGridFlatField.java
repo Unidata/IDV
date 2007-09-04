@@ -150,7 +150,7 @@ public class GeoGridFlatField extends CachedFlatField {
                                    Set[] rangeSets, Unit[] units)
             throws VisADException {
 
-        msg("GeoGridFlatField.cloneMe");
+        //        msg("GeoGridFlatField.cloneMe");
         CachedFlatField ccf = new GeoGridFlatField(this, copy, type,
                                   domainSet, rangeCoordSys,
                                   rangeCoordSysArray, rangeSets, units);

@@ -235,7 +235,7 @@ public class CachedFlatField extends FlatField {
                                    Set[] rangeSets, Unit[] units)
             throws VisADException {
 
-        msg("CachedFlatField.cloneMe");
+        //        msg("CachedFlatField.cloneMe");
 
 
         CachedFlatField ccf = new CachedFlatField(this, copy, type,
@@ -413,7 +413,7 @@ public class CachedFlatField extends FlatField {
      * @param s message to print
      */
     protected void msg(String s) {
-        System.err.println(myid + " " + s);
+        //        System.err.println(myid + " " + s);
     }
 
     /**
@@ -449,7 +449,7 @@ public class CachedFlatField extends FlatField {
             }
 
             try {
-                //                msg("reading from file cache");
+                msg("reading from file cache");
                 FileInputStream istream = new FileInputStream(getCacheFile());
                 BufferedInputStream bis = new BufferedInputStream(istream,
                                               1000000);
@@ -474,18 +474,18 @@ public class CachedFlatField extends FlatField {
      * @throws RemoteException problem getting data from remote object
      */
     public Data getSample(int index) throws VisADException, RemoteException {
-        msg("getSample");
+        //        msg("getSample");
         float[][] values = getMyValues();
 
         if (values == null) {
-            msg("Floats still null");
+            //            msg("Floats still null");
             return null;
         }
         MathType        Type        = getType();
         ErrorEstimate[] RangeErrors = getRangeErrors();
 
         if (isMissing() || (index < 0) || (index >= getLength())) {
-            msg("is missing");
+            //            msg("is missing");
             return ((FunctionType) Type).getRange().missingData();
         }
         double[][] range = new double[TupleDimension][1];
@@ -575,7 +575,7 @@ public class CachedFlatField extends FlatField {
         //        msg("unpackFloats copy=" + copy);
         float[][] values = getMyValues();
         if (values == null) {
-            msg("Floats still null");
+            msg("unpack floats - values still null");
             return null;
         }
         float[][] result = null;
