@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.data.imagery;
 
 
@@ -780,7 +781,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
     }
 
 
-    /** _more_          */
+    /** _more_ */
     private Range[] sampleRanges = null;
 
     /**
@@ -935,14 +936,17 @@ public abstract class ImageDataSource extends DataSourceImpl {
      * Create the single image defined by the given dataChoice.
      *
      * @param aid AddeImageDescriptor
+     * @param fromSequence _more_
      *
      * @return The data.
      *
      * @throws RemoteException    Java RMI problem
      * @throws VisADException     VisAD problem
      */
-    private SingleBandedImage makeImage(AddeImageDescriptor aid, boolean fromSequence)
+    private SingleBandedImage makeImage(AddeImageDescriptor aid,
+                                        boolean fromSequence)
             throws VisADException, RemoteException {
+
         if (aid == null) {
             return null;
         }
@@ -952,25 +956,40 @@ public abstract class ImageDataSource extends DataSourceImpl {
         if (result != null) {
             return result;
         }
-        AddeImageInfo aii  = aid.getImageInfo();
+        //For now handle non adde urls here
         try {
+            if ( !source.startsWith("adde:")) {
+                AreaAdapter aa = new AreaAdapter(source, false);
+                result = aa.getImage();
+                putCache(source, result);
+                return result;
+            }
+
+            AddeImageInfo aii     = aid.getImageInfo();
+
+
+
             AreaDirectory areaDir = null;
             try {
-                if(getCacheDataToDisk()) {
+                if (getCacheDataToDisk()) {
                     if (currentDirs != null) {
-                        int pos =   Math.abs(aii.getDatasetPosition());
-                        int band = 0;
-                        String bandString  = aii.getBand();
-                        if(bandString!=null && !bandString.equals(aii.ALL)) {
+                        int    pos        =
+                            Math.abs(aii.getDatasetPosition());
+                        int    band       = 0;
+                        String bandString = aii.getBand();
+                        if ((bandString != null)
+                                && !bandString.equals(aii.ALL)) {
                             band = new Integer(bandString).intValue();
                         }
                         //TODO: even though the band is non-zero we might only get back one band
                         band = 0;
-                        areaDir =currentDirs[currentDirs.length-pos-1][band];
+                        areaDir =
+                            currentDirs[currentDirs.length - pos - 1][band];
                         //System.err.println("pos:" + aii.getDatasetPosition() + " date:" + areaDir.getStartTime() + " " + band);
                     } else {
                         //If its absolute time then just use the AD from the descriptor
-                        if (aii.getStartDate()  !=null || aii.getEndDate() !=null) {
+                        if ((aii.getStartDate() != null)
+                                || (aii.getEndDate() != null)) {
                             areaDir = aid.getDirectory();
                             //                            System.err.println("absolute time:" + areaDir.getStartTime());
                             //                            System.err.println(" from aii:" +aii.getStartDate());
@@ -986,13 +1005,14 @@ public abstract class ImageDataSource extends DataSourceImpl {
             }
 
 
-            if(!fromSequence) {
+            if ( !fromSequence) {
                 areaDir = null;
             }
             if (areaDir != null) {
                 int hash = aii.makeAddeUrl().hashCode();
                 String filename = IOUtil.joinDir(getDataCachePath(),
-                                                 "image_" + hash+"_" + aii.getBand()+"_"
+                                      "image_" + hash + "_" + aii.getBand()
+                                      + "_"
                                       + ((areaDir.getStartTime() != null)
                                          ? "" + areaDir.getStartTime()
                                              .getTime()
@@ -1032,10 +1052,11 @@ public abstract class ImageDataSource extends DataSourceImpl {
             throw new VisADException("Creating AreaAdapter - " + ioe);
         }
 
+
     }
 
 
-    /** _more_          */
+    /** _more_ */
     String readLabel;
 
     /**
@@ -1094,11 +1115,16 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 AddeImageDescriptor aid = (AddeImageDescriptor) iter.next();
                 AddeImageInfo       aii = aid.getImageInfo();
 
+                //Are we dealing with area files here?
+                if (aii == null) {
+                    break;
+                }
+
                 //                System.err.println (" aii:" +aii.makeAddeUrl());
                 //                System.err.println (" aid:" + aid.getSource());
-
                 //Check if this is absolute time
-                if (aii.getStartDate()  !=null || aii.getEndDate()!=null) {
+                if ((aii.getStartDate() != null)
+                        || (aii.getEndDate() != null)) {
                     //                    System.err.println("found an absolute time");
                     biggestPosition = null;
                     break;
@@ -1111,7 +1137,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
             //            System.err.println(getCacheDataToDisk() + " " + biggestPosition);
 
-            if (getCacheDataToDisk() && biggestPosition != null) {
+            if (getCacheDataToDisk() && (biggestPosition != null)) {
                 biggestPosition.setRequestType(AddeImageInfo.REQ_IMAGEDIR);
                 AreaDirectoryList adl =
                     new AreaDirectoryList(biggestPosition.makeAddeUrl());
@@ -1142,20 +1168,21 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 }
 
                 String label = "";
-                if(parent!=null) {
-                    label = label+parent.toString() +" ";
-                }   else {
-                    DataCategory displayCategory = dataChoice.getDisplayCategory();
-                    if(displayCategory!=null) {
-                        label = label  + displayCategory +" ";
+                if (parent != null) {
+                    label = label + parent.toString() + " ";
+                } else {
+                    DataCategory displayCategory =
+                        dataChoice.getDisplayCategory();
+                    if (displayCategory != null) {
+                        label = label + displayCategory + " ";
                     }
                 }
-                label = label +dataChoice.toString();
+                label = label + dataChoice.toString();
                 readLabel = "Time: " + (cnt++) + "/"
-                    + descriptorsToUse.size() + "  " + label;
+                            + descriptorsToUse.size() + "  " + label;
 
                 try {
-                    SingleBandedImage image = makeImage(aid,true);
+                    SingleBandedImage image = makeImage(aid, true);
                     if (image != null) {
                         sequence = sequenceManager.addImageToSequence(image);
                     }
@@ -1169,7 +1196,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
         }
     }
 
-    /** _more_          */
+    /** _more_ */
     AreaDirectory[][] currentDirs;
 
 
