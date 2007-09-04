@@ -21,19 +21,23 @@
  */
 
 
+
 package ucar.unidata.data.grid;
 
 
-import visad.DelaunayCustom;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
 
-import ucar.visad.data.CachedFlatField;
 import ucar.visad.Util;
 
+import ucar.visad.data.CachedFlatField;
+
 import visad.*;
+
+
+import visad.DelaunayCustom;
 
 import visad.bom.Radar2DCoordinateSystem;
 import visad.bom.Radar3DCoordinateSystem;
@@ -56,8 +60,9 @@ import java.io.*;
 
 import java.rmi.RemoteException;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -1514,8 +1519,11 @@ public class GridUtil {
     public static FieldImpl setParamType(FieldImpl grid, TupleType newParam,
                                          boolean copy)
             throws VisADException {
+
         FieldImpl newField = null;
-        if (grid == null) return newField;
+        if (grid == null) {
+            return newField;
+        }
         // TODO:  uncomment this
         /*
         if (newParam.equals(getParamType(grid)) && !copy) {
@@ -1612,6 +1620,7 @@ public class GridUtil {
             throw new VisADException("problem setting param type " + re);
         }
         return newField;
+
     }
 
     /**
@@ -3217,16 +3226,26 @@ public class GridUtil {
 
     }
 
-    public static int[][] findIndices(float[][]latlon, UnionSet map) 
+    /**
+     * _more_
+     *
+     * @param latlon _more_
+     * @param map _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public static int[][] findIndices(float[][] latlon, UnionSet map)
             throws VisADException {
-        long t1 = System.currentTimeMillis();
-	SampledSet[] sets  = map.getSets();
-        List[] indexLists= new List[sets.length];
-        List lows = new ArrayList();
-        List highs = new ArrayList();
-        List pts = new ArrayList();
-        for (int j=0;j<sets.length;j++) {
-            Gridded2DSet g = (Gridded2DSet)sets[j];
+        long         t1         = System.currentTimeMillis();
+        SampledSet[] sets       = map.getSets();
+        List[]       indexLists = new List[sets.length];
+        List         lows       = new ArrayList();
+        List         highs      = new ArrayList();
+        List         pts        = new ArrayList();
+        for (int j = 0; j < sets.length; j++) {
+            Gridded2DSet g = (Gridded2DSet) sets[j];
             lows.add(g.getLow());
             highs.add(g.getHi());
             pts.add(g.getSamples(false));
@@ -3234,41 +3253,50 @@ public class GridUtil {
         }
         boolean flipLatLon = false;
 
-        int numPoints = latlon[0].length;
-        for(int i=0;i<numPoints;i++) {
+        int     numPoints  = latlon[0].length;
+
+
+
+
+        for (int i = 0; i < numPoints; i++) {
             float lat = latlon[0][i];
             float lon = latlon[1][i];
-            for (int mapIdx=0;mapIdx<sets.length;mapIdx++) {
-                Gridded2DSet g = (Gridded2DSet)sets[mapIdx];
-                if(i==0 && mapIdx ==0) {
-                    if(g.getType() instanceof RealTupleType) {
-                        RealTupleType rtt=  (RealTupleType) g.getType();
-                        if(!rtt.getComponent(0).equals(RealType.Longitude)) {
+            for (int mapIdx = 0; mapIdx < sets.length; mapIdx++) {
+                Gridded2DSet g = (Gridded2DSet) sets[mapIdx];
+                if ((i == 0) && (mapIdx == 0)) {
+                    if (g.getType() instanceof RealTupleType) {
+                        RealTupleType rtt = (RealTupleType) g.getType();
+                        if ( !rtt.getComponent(0).equals(
+                                RealType.Longitude)) {
                             flipLatLon = true;
                         }
-                    } else if(g.getType() instanceof SetType) {
-                        RealTupleType rtt= ((SetType) g.getType()).getDomain();
-                        if(!rtt.getComponent(0).equals(RealType.Longitude)) {
+                    } else if (g.getType() instanceof SetType) {
+                        RealTupleType rtt =
+                            ((SetType) g.getType()).getDomain();
+                        if ( !rtt.getComponent(0).equals(
+                                RealType.Longitude)) {
                             flipLatLon = true;
                         }
                     }
                 }
-                if(flipLatLon) {
+                if (flipLatLon) {
                     float tmp = lat;
                     lat = lon;
                     lon = tmp;
                 }
-                float[]low = (float[])lows.get(mapIdx);                
-                float[]hi = (float[])highs.get(mapIdx);
-                if(i==0 && mapIdx==0) {
-                    System.err.println ("lon:" + low[1] +" " + hi[1] +
-                                        " lat:" + low[0] +" " +hi[0]);
+                float[] low = (float[]) lows.get(mapIdx);
+                float[] hi  = (float[]) highs.get(mapIdx);
+                if ((lon != lon) || (lat != lat)) {
+                    continue;
                 }
-                if(lon<low[0] || lon>hi[0] ||
-                   lat<low[1] || lat>hi[1]) continue;
-                //                System.err.println ("in box");
-                if(DelaunayCustom.inside((float[][])pts.get(mapIdx),lon,lat)) {
-                    if(indexLists[mapIdx] == null) {
+                if ((lon < low[0]) || (lon > hi[0]) || (lat < low[1])
+                        || (lat > hi[1])) {
+                    continue;
+                }
+                if (DelaunayCustom.inside((float[][]) pts.get(mapIdx), lon,
+                                          lat)) {
+
+                    if (indexLists[mapIdx] == null) {
                         indexLists[mapIdx] = new ArrayList();
                     }
                     //                    System.err.println ("got one");
@@ -3277,23 +3305,44 @@ public class GridUtil {
                 }
             }
         }
-        int[][]indices = new int[sets.length][];
-        for(int mapIdx=0;mapIdx<indexLists.length;mapIdx++) {
-            if(indexLists[mapIdx] == null) {
+        int[][] indices = new int[sets.length][];
+        for (int mapIdx = 0; mapIdx < indexLists.length; mapIdx++) {
+            if (indexLists[mapIdx] == null) {
                 indices[mapIdx] = new int[0];
             } else {
                 indices[mapIdx] = new int[indexLists[mapIdx].size()];
-                for(int ptIdx=0;ptIdx<indexLists[mapIdx].size();ptIdx++) {
-                    indices[mapIdx][ptIdx] = ((Integer)indexLists[mapIdx].get(ptIdx)).intValue();
+                for (int ptIdx = 0; ptIdx < indexLists[mapIdx].size();
+                        ptIdx++) {
+                    indices[mapIdx][ptIdx] =
+                        ((Integer) indexLists[mapIdx].get(ptIdx)).intValue();
                 }
             }
         }
         long t2 = System.currentTimeMillis();
-        System.err.println ("find indices " + (t2-t1));
+        //        System.err.println ("find indices  #pts:" + numPoints+" time:" + (t2-t1)+ "   points:" + cnt1 + " " + cnt2);
         return indices;
 
     }
 
+
+    /**
+     * _more_
+     *
+     * @param rows _more_
+     * @param cols _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
+    public static float[][] makeFloatArray(int rows, int cols, float value) {
+        float[][] values = new float[rows][cols];
+        for (int i = 0; i < values.length; i++) {
+            for (int j = 0; j < values[0].length; j++) {
+                values[i][j] = value;
+            }
+        }
+        return values;
+    }
 
 
 }
