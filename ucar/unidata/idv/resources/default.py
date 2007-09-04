@@ -204,32 +204,10 @@ def make2D(slice):
 
 
 
-
-def subsetFromMap(field,map):
-   import ucar.unidata.data.grid.GridUtil as gu
-   import visad.DelaunayCustom as dc
-   newData = field.clone()
-   for t in range(field.getDomainSet().getLength()):
-        rangeObject = field.getSample(t).clone()
-	domain = rangeObject.getDomainSet()
-	cs = domain.getCoordinateSystem()
-	numPoints =  domain.getLength()
-	samples = domain.getSamples(0)
-	latlon =  cs.toReference(samples)
-	indices = gu.findIndices(latlon, map);
-	sets  = map.getSets()
-	mapRange = xrange(len(sets))
-	values2 = rangeObject.getFloats(1)
-        values = rangeObject.getFloats(0)
-	for j in xrange(len(values[0])):
-		values[0][j] = java.lang.Float.NaN;
-	for mapIdx in mapRange:
-		indexArray = indices[mapIdx]
-		for j in xrange(len(indexArray)):
-			values[0][indexArray[j]] = values2[0][indexArray[j]];			
-        rangeObject.setSamples(values)
-        newData.setSample(t,rangeObject)
-   return newData
+#
+def makeFloatArray(rows,cols,value):
+    import ucar.unidata.data.grid.GridUtil as gu
+    return gu.makeFloatArray(rows,cols,value);
 
 
 def applyToRange(function,data):
@@ -295,3 +273,53 @@ def doit2(r,**args):
 	for i in xrange(len(r[0])):
 		r[0][i] = avg-r[0][i];
 	return r
+
+
+
+
+
+####################################################################################
+#######  Map related utilities
+####################################################################################
+
+
+def  subsetFromMap(field, map, fillValue=java.lang.Float.NaN,inverse=0,latLonCanChangeWithTime=1):
+   import ucar.unidata.data.grid.GridUtil as gu
+   newData = field.clone()
+##Iterate on each time step
+   for t in range(field.getDomainSet().getLength()):
+        rangeObject = field.getSample(t).clone()
+        domain = rangeObject.getDomainSet()
+        numPoints =  domain.getLength()
+        samples = domain.getSamples(0)
+##Find the indices of the lat lons that are inside the maps
+        if(t == 0 or latLonCanChangeWithTime):
+           cs = domain.getCoordinateSystem()
+           if(cs == None):
+              latlon=samples
+           else:
+              latlon =  cs.toReference(samples)
+           indices = gu.findIndices(latlon, map);
+
+##Get the values
+        originalValues = rangeObject.getFloats(0)
+        if(inverse):
+           newValues = originalValues;
+        else:
+           newValues = makeFloatArray(len(originalValues), len(originalValues[0]), fillValue);
+
+##Look at list of indices in each map
+##if we are doing inverse then we set the index to the fill value
+##else we already filled the array and we set the index to the original value
+        for mapIdx in xrange(len(indices)):
+            indexArray = indices[mapIdx]
+            for j in xrange(len(indexArray)):
+               if(inverse):
+                  newValues[0][indexArray[j]] = fillValue
+               else:
+                  newValues[0][indexArray[j]] = originalValues[0][indexArray[j]];
+
+##Set the samples
+        rangeObject.setSamples(newValues)
+        newData.setSample(t,rangeObject)
+   return newData
