@@ -323,6 +323,8 @@ public class ShapefileAdapter {
                 sets = doReadSSF(name, iStream);
             } else if (name.endsWith(".xml")) {
                 sets = doReadXml(name, iStream);
+            } else if (name.endsWith(".xgrf")) {
+                sets = doReadXml(name, iStream);
             } else {
                 try {
                     if (iStream == null) {
@@ -339,6 +341,7 @@ public class ShapefileAdapter {
             exc.printStackTrace();
         }
     }
+
 
 
     /**
@@ -386,12 +389,31 @@ public class ShapefileAdapter {
             for (int i = 0; i < elements.getLength(); i++) {
                 Element child = (Element) elements.item(i);
                 if ( !child.getTagName().equals(TAG_POLYGON)) {
+                    if(true)
+                    continue;
                     throw new IllegalArgumentException("Unknown tag name:"
                                                        + child.getTagName());
                 }
+
                 double[] points =
                     Misc.parseDoubles(XmlUtil.getAttribute(child,
                                                            ATTR_POINTS));
+
+
+                if(XmlUtil.hasAttribute(child,"coordtype")) {
+                    String coord = XmlUtil.getAttribute(child,"coordtype");
+                    if(!coord.startsWith("LATLON")) continue;
+                    if(coord.equals("LATLONALT")) {
+                        double[] tmp  = new double[2*points.length/3];
+                        int tmpCnt = 0;
+                        for (int ptIdx = 0; ptIdx < points.length;ptIdx+=3) {
+                            tmp[tmpCnt++] = points[ptIdx];
+                            tmp[tmpCnt++] = points[ptIdx+1];
+                        }
+                        points = tmp;
+                    }
+                }
+
                 RealTupleType coordMathType =
                     new RealTupleType(RealType.Longitude, RealType.Latitude);
                 float[][] part = new float[2][points.length / 2];
@@ -489,6 +511,7 @@ public class ShapefileAdapter {
                 iStream = IOUtil.getInputStream(name);
             }
             List toks = StringUtil.split(IOUtil.readContents(iStream),  " ", true, true);
+            int xcnt = 0;
             int cnt = 0;
             while(cnt< toks.size()) {
                 int size = Integer.parseInt((String) toks.get(cnt));
@@ -505,6 +528,7 @@ public class ShapefileAdapter {
                     part[1][ptIdx] = (float) points[ptIdx * 2];
                     part[0][ptIdx] = (float) points[ptIdx * 2 + 1];
                 }
+                xcnt++;
                 sets.add(new Gridded2DSet(coordMathType, part,
                                           points.length / 2,
                                           (CoordinateSystem) null,
