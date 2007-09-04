@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -523,8 +524,7 @@ public class DataTree extends DataSourceHolder {
 
             ddd.setDataCategories(Misc.newList(dataCategory));
 
-            dataTree.getIdv().getJythonManager().descriptorChanged(
-                ddd);
+            dataTree.getIdv().getJythonManager().descriptorChanged(ddd);
 
 
         }
@@ -743,8 +743,7 @@ public class DataTree extends DataSourceHolder {
      * @return All expanded paths
      */
     public Hashtable getExpandedPaths() {
-        return GuiUtils.initializeExpandedPathsBeforeChange(tree,
-                                                                       treeRoot);
+        return GuiUtils.initializeExpandedPathsBeforeChange(tree, treeRoot);
     }
 
 
@@ -773,8 +772,14 @@ public class DataTree extends DataSourceHolder {
      * @param nodeToScrollTo Scroll the tree to this node
      */
     private void treeStructureChanged(DataTreeNode nodeToScrollTo) {
-        treeStructureChanged(nodeToScrollTo, null/*getExpandedPaths()*/);
+        treeStructureChanged(nodeToScrollTo, null /*getExpandedPaths()*/);
     }
+
+    /** _more_          */
+    static int cnt = 0;
+
+    /** _more_          */
+    int mycnt = cnt++;
 
     /**
      *  This method tells the  tree that some new node (or nodes)
@@ -806,6 +811,9 @@ public class DataTree extends DataSourceHolder {
         //treeModel.nodeStructureChanged (treeRoot); 
         if (nodeToScrollTo != null) {
             tree.scrollPathToVisible(getPath(nodeToScrollTo));
+            //            if(mycnt==4)
+            //                Misc.printStack("setSelectionPath:"  + getPath(nodeToScrollTo));
+            //            System.err.println(mycnt +" set selection path:" + getPath(nodeToScrollTo));
             tree.setSelectionPath(getPath(nodeToScrollTo));
         }
     }
@@ -897,10 +905,9 @@ public class DataTree extends DataSourceHolder {
      * @param dataSource The data source to add
      */
     public void addDataSource(DataSource dataSource) {
+
         //Get the list of expanded tree paths now.
-        Hashtable paths = getExpandedPaths();
-
-
+        Hashtable    paths          = getExpandedPaths();
 
         DataTreeNode dataSourceNode = getTreeNode(dataSource);
         boolean      newDataSource  = true;
@@ -942,24 +949,19 @@ public class DataTree extends DataSourceHolder {
             parentNode = treeRoot;
         }
 
-        List choices = dataSource.getDataChoices();
+        List         choices                = dataSource.getDataChoices();
+        List         nodesToExpand          = new ArrayList();
+        List         initialSelectedChoices = null;
 
-
-
-
-        List         nodesToExpand = new ArrayList();
-        List initialSelectedChoices = null;
-
-
-        int          cnt           = 0;
-        DataTreeNode lastNode      = null;
-        Hashtable    catToNode     = new Hashtable();
+        int          cnt                    = 0;
+        DataTreeNode lastNode               = null;
+        Hashtable    catToNode              = new Hashtable();
         if (DataManager.isFormulaDataSource(dataSource)) {
             List pairs = new ArrayList();
             for (int i = 0; i < choices.size(); i++) {
                 DataChoice choice = (DataChoice) choices.get(i);
-                String desc = choice.getDescription();
-                if(desc.trim().length() == 0) {
+                String     desc   = choice.getDescription();
+                if (desc.trim().length() == 0) {
                     desc = "no name";
                 }
                 pairs.add(new Object[] { desc, choice });
@@ -992,22 +994,20 @@ public class DataTree extends DataSourceHolder {
             }
             cnt++;
 
-           if (initialSelectedFieldName != null
-                   && choice.toString().equals(initialSelectedFieldName)) {
-               initialSelectedChoices   = Misc.newList(choice);
-               initialSelectedFieldName = null;
-           }
-
+            if ((initialSelectedFieldName != null)
+                    && choice.toString().equals(initialSelectedFieldName)) {
+                initialSelectedChoices   = Misc.newList(choice);
+                initialSelectedFieldName = null;
+            }
 
 
             //Create and initialize the treeNode for this DataChoice
             //            DataTreeNode fieldNode = createTreeNode (choice.toString (), choice);
             String desc = choice.getDescription();
-            if(desc.trim().length()==0) {
+            if (desc.trim().length() == 0) {
                 desc = "no name";
             }
-            DataTreeNode fieldNode = createTreeNode(desc,
-                                         choice);
+            DataTreeNode fieldNode = createTreeNode(desc, choice);
             lastNode = fieldNode;
 
             fieldNode.setIsDerived((choice instanceof DerivedDataChoice));
@@ -1053,7 +1053,9 @@ public class DataTree extends DataSourceHolder {
         //For now rebuild the data object to tree node mapping
         //This is overkill
         rebuildMaps();
-        treeStructureChanged(parentNode);
+        if (cnt != 0) {
+            treeStructureChanged(parentNode);
+        }
 
         for (int i = 0; i < nodesToExpand.size(); i++) {
             DataTreeNode nodeToExpand = (DataTreeNode) nodesToExpand.get(i);
@@ -1080,6 +1082,7 @@ public class DataTree extends DataSourceHolder {
         }
 
         GuiUtils.expandPathsAfterChange(tree, paths, treeRoot);
+
     }
 
 
