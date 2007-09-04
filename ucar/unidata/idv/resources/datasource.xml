@@ -170,7 +170,7 @@
      patterns="\.shp$,\.zip$"
      fileselection="true"
      factory="ucar.unidata.data.gis.ShapeFileDataSource"
-     label="Shape files">
+     label="Map files">
     <property
        name="default_display"
        value="shapefilecontrol"/>
