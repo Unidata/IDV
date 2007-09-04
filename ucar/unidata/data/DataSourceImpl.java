@@ -2252,9 +2252,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             comps.add(cacheDataToDiskCbx);
 
             comps.add(GuiUtils.rLabel("Delay:"));
-            cacheClearDelayFld = new JTextField("" + cacheClearDelay, 6);
+            cacheClearDelayFld = new JTextField("" + (cacheClearDelay/1000), 6);
             comps.add(GuiUtils.left(GuiUtils.hbox(cacheClearDelayFld,
-                    new JLabel(" ms"))));
+                    new JLabel(" seconds"))));
         }
     }
 
@@ -2501,8 +2501,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (cacheDataToDiskCbx != null) {
             setCacheDataToDisk(cacheDataToDiskCbx.isSelected());
             setCacheClearDelay(
-                (long) new Double(
-                    cacheClearDelayFld.getText().trim()).doubleValue());
+                (long)(1000* new Double(
+                    cacheClearDelayFld.getText().trim()).doubleValue()));
         }
 
 
