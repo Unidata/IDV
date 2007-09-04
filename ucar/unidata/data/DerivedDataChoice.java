@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -1277,6 +1278,18 @@ public class DerivedDataChoice extends DataChoice {
                           extraSpaces = "";
                       }
                       extraSpaces += c;
+                  } else if (c == '=') {
+                      //This is a jython parameter value
+                      //Eat up the value of the parameter
+                      for (; i < chars.length; i++) {
+                          c = chars[i];
+                          if ((c == ',') || (c == ' ') || (c == ')')) {
+                              break;
+                          }
+                      }
+                      extraSpaces = null;
+                      current     = null;
+                      state       = STATE_LOOKINGFORTOKEN;
                   } else {
                       //If it is not a proc name then it is an operand
                       if (c != '(') {
