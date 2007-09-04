@@ -201,3 +201,97 @@ def newUnit(field, varname, unitname):
 def make2D(slice):
   from ucar.unidata.data.grid import GridUtil
   return GridUtil.make2DGridFromSlice(slice)
+
+
+
+
+def subsetFromMap(field,map):
+   import ucar.unidata.data.grid.GridUtil as gu
+   import visad.DelaunayCustom as dc
+   newData = field.clone()
+   for t in range(field.getDomainSet().getLength()):
+        rangeObject = field.getSample(t).clone()
+	domain = rangeObject.getDomainSet()
+	cs = domain.getCoordinateSystem()
+	numPoints =  domain.getLength()
+	samples = domain.getSamples(0)
+	latlon =  cs.toReference(samples)
+	indices = gu.findIndices(latlon, map);
+	sets  = map.getSets()
+	mapRange = xrange(len(sets))
+	values2 = rangeObject.getFloats(1)
+        values = rangeObject.getFloats(0)
+	for j in xrange(len(values[0])):
+		values[0][j] = java.lang.Float.NaN;
+	for mapIdx in mapRange:
+		indexArray = indices[mapIdx]
+		for j in xrange(len(indexArray)):
+			values[0][indexArray[j]] = values2[0][indexArray[j]];			
+        rangeObject.setSamples(values)
+        newData.setSample(t,rangeObject)
+   return newData
+
+
+def applyToRange(function,data):
+   import ucar.unidata.data.grid.GridUtil as gu
+   newData = data.clone()
+   f = function +'(rangeValue)'
+   if (gu.isTimeSequence(newData)):
+      for t in range(newData.getDomainSet().getLength()):
+         rangeValue = newData.getSample(t)
+	 result = eval(f)
+         newData.setSample(t,result,0)
+   else:
+      rangeValue = newData;
+      newData = eval(f)
+   return newData
+
+
+def applyToRangeValues(function,data):
+   import ucar.unidata.data.grid.GridUtil as gu
+   newData = data.clone()
+   f = function +'(values,step=step,rangeObject=rangeObject,field=field)'
+   step=0
+   if (gu.isTimeSequence(newData)):
+      for t in range(newData.getDomainSet().getLength()):
+         rangeObject = newData.getSample(t)
+         values = rangeObject.getFloats(0)
+	 values = eval(f)
+         rangeObject.setSamples(values,1)
+         step= step+1;
+   else:
+      rangeObject = newData;
+      values = rangeObject.getFloats(0)
+      values = eval(f)
+      rangeObject.setSamples(values,1)
+   return newData
+
+
+
+def changeRange(d):
+##   return   applyToRange('doit',d);
+   return   applyToRangeValues('doit2',d);
+
+
+def doit(d,**args):
+        r = d.getFloats(0)
+	total = 0
+	for i in xrange(len(r[0])):
+		total= total+r[0][i]
+	avg = total/len(r[0])
+	for i in xrange(len(r[0])):
+		if(r[0][i]<avg):
+			r[0][i] = 0;
+        d.setSamples(r)
+	return d
+
+def doit2(r,**args):
+	keys = args.keys()
+	for kw in keys: print kw, ':', args[kw]
+	total = 0
+	for i in xrange(len(r[0])):
+		total= total+r[0][i]
+	avg = total/len(r[0])
+	for i in xrange(len(r[0])):
+		r[0][i] = avg-r[0][i];
+	return r
