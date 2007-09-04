@@ -93,9 +93,6 @@ public class SettingsTree extends DndTree {
     /** Reference to the idv */
     private IntegratedDataViewer idv;
 
-    /** _more_          */
-    private DataControlDialog dialog;
-
     /** _more_ */
     private long lastSettingsTimestamp = -1;
 
@@ -117,13 +114,10 @@ public class SettingsTree extends DndTree {
     /**
      * _more_
      *
-     * @param dialog _more_
      * @param theIdv _more_
      */
-    public SettingsTree(DataControlDialog dialog,
-                        IntegratedDataViewer theIdv) {
+    public SettingsTree(IntegratedDataViewer theIdv) {
         this.idv      = theIdv;
-        this.dialog   = dialog;
         settingsRoot  = new DefaultMutableTreeNode("Settings");
         settingsModel = new DefaultTreeModel(settingsRoot);
         this.setModel(settingsModel);
@@ -181,7 +175,7 @@ public class SettingsTree extends DndTree {
         showAllCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 lastSettingsTimestamp = -1;
-                updateSettings();
+                updateSettings(lastCD);
             }
         });
 
@@ -207,7 +201,7 @@ public class SettingsTree extends DndTree {
             }
         };
         this.setCellRenderer(renderer);
-        updateSettings();
+        updateSettings(lastCD);
     }
 
 
@@ -218,7 +212,7 @@ public class SettingsTree extends DndTree {
      */
     public void changeName(DisplaySetting displaySetting) {
         if (displaySetting.changeName(idv, null)) {
-            updateSettings();
+            updateSettings(lastCD);
         }
     }
 
@@ -230,7 +224,7 @@ public class SettingsTree extends DndTree {
      */
     public void deleteSettings(List selected) {
         idv.getResourceManager().removeDisplaySettings(selected);
-        updateSettings();
+        updateSettings(lastCD);
     }
 
     /**
@@ -249,7 +243,7 @@ public class SettingsTree extends DndTree {
      */
     public void paint(Graphics g) {
         super.paint(g);
-        updateSettings();
+        updateSettings(lastCD);
     }
 
 
@@ -260,10 +254,9 @@ public class SettingsTree extends DndTree {
      * _more_
      *
      */
-    protected void updateSettings() {
+    protected void updateSettings(ControlDescriptor cd) {
         //        System.err.println("updateSettings " +lastSettingsTimestamp+"  " + idv.getResourceManager().getDisplaySettingsTimestamp());
         //Check if we need to update
-        ControlDescriptor cd = dialog.getSelectedControl();
         if (lastSettingsTimestamp
                 == idv.getResourceManager().getDisplaySettingsTimestamp()) {
             if ( !showAllCbx.isSelected()) {
@@ -424,7 +417,7 @@ public class SettingsTree extends DndTree {
         }
         displaySetting.setName(newName);
         idv.getResourceManager().displaySettingChanged(displaySetting);
-        updateSettings();
+        updateSettings(lastCD);
     }
 
 

@@ -1366,56 +1366,22 @@ public class IdvUIManager extends IdvManager {
     public void processDialog(DataControlDialog dcd) {
         DataChoice dataChoice = dcd.getDataChoice();
         DataSource dataSource = dcd.getDataSource();
-
         if (dataChoice != null) {
             Object[]      selectedControls = dcd.getSelectedControls();
-            DataSelection dataSelection    = null;
-            if (dcd.getUseAllTimes()) {
-                dataSelection = new DataSelection();
-
-                /**
-                 * !!!!! TODO !!!!!
-                 * I commented this out to work on the "@time index" functionality in the formulas.
-                 * What this says is that even though this data selection has no times list still
-                 * use all of the times available in the end data source.
-                 * However, with this in place what happens is the time selection of the child data choice
-                 * that we create for a formula that has the @times is overwritten by this setTimesMode.
-                 * One possible solution would be the DataSelection.merge in the DataChoice.getData
-                 * could only merge times from the higher priority one when there really is a times list.
-                 * !!!!! TODO !!!!!
-                 */
-                //                dataSelection.setTimesMode (dataSelection.TIMESMODE_USETHIS);
-            } else {
-                dataSelection = new DataSelection(dcd.getSelectedDateTimes());
-            }
-            dataSelection.setGeoSelection(dcd.getGeoSelection());
-            Object[] levelRange = dcd.getSelectedLevelRange();
-
             for (int i = 0; i < selectedControls.length; i++) {
-                DataSelection newDataSelection =
-                    new DataSelection(dataSelection);
                 ControlDescriptor cd =
                     (ControlDescriptor) selectedControls[i];
-                if ((levelRange != null) && (levelRange.length > 0)) {
-                    if (cd.doesLevels() || (levelRange.length == 2)) {
-                        if (levelRange.length == 1) {
-                            newDataSelection.setLevel(levelRange[0]);
-                        } else {
-                            newDataSelection.setLevelRange(levelRange[0],
-                                    levelRange[1]);
-                        }
-                    }
-                }
+                DataSelection dataSelection = dcd.getDataSelectionWidget().createDataSelection(cd.doesLevels());
                 Hashtable props = new Hashtable();
-                List settings = dcd.getSelectedSettings();
+                List settings = dcd.getDataSelectionWidget().getSelectedSettings();
                 if(settings!=null && settings.size()>0) {
                     props.put("initialSettings", settings);
                 }
                 getIdv().doMakeControl(Misc.newList(dataChoice), cd, props, 
-                                       newDataSelection);
+                                       dataSelection);
             }
         } else if (dataSource != null) {
-            dataSource.setDateTimeSelection(dcd.getSelectedDateTimes());
+            dataSource.setDateTimeSelection(dcd.getDataSelectionWidget().getSelectedDateTimes());
             dataSourceTimeChanged(dataSource);
         }
     }
@@ -4732,7 +4698,6 @@ public class IdvUIManager extends IdvManager {
      * @return List of {@link ucar.unidata.data.DataChoice}s
      */
     public List selectDataChoices(List operands) {
-
         if (operands.size() == 0) {
             return new ArrayList();
         }

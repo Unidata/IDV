@@ -148,41 +148,7 @@ public class DataControlDialog implements ActionListener {
     /** The wrapper for the display list */
     JComponent displayScroller;
 
-    /** Holds the times list and its select all btn */
-    private JComponent[] timesListInfo;
-
-
-    /** JlIst that shows the times that can be selected */
-    JList timesList;
-
-    /** The times list component */
-    JComponent timesTab;
-
-    /** subset tab. holds times list, geopspatial, etc. */
-    JComponent selectionContainer;
-
-    /** Contains the selection tabbed pane */
-    JComponent selectionTabContainer;
-
-
-    /** _more_ */
-    private SettingsTree settingsTree;
-
-
-    /** The selection tabbed pane */
-    JTabbedPane selectionTab;
-
-    /** Holds the stride */
-    JPanel strideTab;
-
-    /** Holds the area subset */
-    JPanel areaTab;
-
-    /** The chekcbox for selecting "All times" */
-    JCheckBox allTimesButton;
-
-    /** List of all the possible dttms */
-    List allDateTimes;
+    private DataSelectionWidget dataSelectionWidget;
 
     /** The data source */
     DataSource dataSource;
@@ -192,28 +158,6 @@ public class DataControlDialog implements ActionListener {
 
     /** This class can be in its own window or be part of an other gui */
     private boolean inOwnWindow = true;
-
-
-    /** geo selection */
-    private GeoSelectionPanel geoSelectionPanel;
-
-    /** last level selected */
-    private Object lastLevel;
-
-    /** CUrrent list of levels */
-    private List levels;
-
-    /** Shows the levels */
-    private JList levelsList;
-
-    /** Scrolls the levels list */
-    private JScrollPane levelsScroller;
-
-
-    /** Holds the levels list */
-    private JComponent levelsTab;
-
-
 
 
     /**
@@ -355,7 +299,7 @@ public class DataControlDialog implements ActionListener {
         if (this.dataSource != dataSource) {
             return;
         }
-        setTimes(dataSource.getAllDateTimes(),
+        dataSelectionWidget.setTimes(dataSource.getAllDateTimes(),
                  dataSource.getDateTimeSelection());
     }
 
@@ -571,225 +515,6 @@ public class DataControlDialog implements ActionListener {
         setDataChoice(dataChoice);
     }
 
-    /**
-     * Any geo selection
-     *
-     * @return the geoselection or null if none
-     */
-    public GeoSelection getGeoSelection() {
-        if (geoSelectionPanel == null) {
-            return null;
-        }
-        if ( !geoSelectionPanel.getEnabled()) {
-            return null;
-        }
-        return geoSelectionPanel.getGeoSelection();
-    }
-
-
-    /**
-     * Get the min/max level range
-     *
-     * @return min max levels
-     */
-    protected Object[] getSelectedLevelRange() {
-        Object[] NO_LEVELS = new Object[] {};
-        if ((levelsTab == null) || (levelsTab.getParent() == null)) {
-            return NO_LEVELS;
-        }
-
-        int[] selected = levelsList.getSelectedIndices();
-        //None selected or the 'All Levels'
-        if ((selected.length == 0)
-                || ((selected.length == 1) && (selected[0] == 0))) {
-            return NO_LEVELS;
-        }
-        if (selected.length == 1) {
-            lastLevel = levels.get(selected[0] - 1);
-            //            idv.getStore().put("idv.dataselector.level", lastLevel);
-            return new Object[] { lastLevel };
-        }
-        int first = -1;
-        int last  = -1;
-        for (int i = 0; i < selected.length; i++) {
-            if (selected[i] == 0) {
-                continue;
-            }
-            if ((i == 0) || (selected[i] < first)) {
-                first = selected[i];
-            }
-            if ((i == 0) || (selected[i] > last)) {
-                last = selected[i];
-            }
-        }
-        //The 'All Levels'
-        if ((first <= 0) || (last <= 0)) {
-            return NO_LEVELS;
-        }
-
-        return new Object[] { levels.get(first - 1), levels.get(last - 1) };
-    }
-
-
-    /** _more_ */
-    private String currentLbl;
-
-    /**
-     * Update selection panel for data source
-     *
-     * @param dataSource  data source
-     * @param dc  The data choice
-     */
-    private void updateSelectionTab(DataSource dataSource, DataChoice dc) {
-        //        System.err.println("update tab " + dataSource + " " + dc);
-        if (selectionTab == null) {
-            return;
-        }
-        int idx = selectionTab.getSelectedIndex();
-        if (idx >= 0) {
-            currentLbl = selectionTab.getTitleAt(idx);
-        }
-
-        selectionTab.removeAll();
-
-        if (timesList.getModel().getSize() > 0) {
-            selectionTab.add(timesTab, "Times", 0);
-        }
-
-        if (dataSource == null) {
-            if (dc != null) {
-                addSettingsComponent();
-            }
-            checkSelectionTab();
-            return;
-        }
-
-        levels = dc.getAllLevels();
-        if ((levels != null) && (levels.size() > 1)) {
-            if (levelsList == null) {
-                levelsList = new JList();
-                //                lastLevel  = idv.getStore().get("idv.dataselector.level");
-                levelsList.setSelectionMode(
-                    ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-                levelsList.setToolTipText("Shift-Click to select a range");
-                levelsScroller = GuiUtils.makeScrollPane(levelsList, 300,
-                        100);
-                levelsTab = levelsScroller;
-            }
-            Vector tmp = new Vector();
-            tmp.add(new TwoFacedObject("Default", null));
-            for (int i = 0; i < levels.size(); i++) {
-                Object o = levels.get(i);
-                if (o instanceof visad.Real) {
-                    visad.Real r = (visad.Real) levels.get(i);
-                    tmp.add(Util.labeledReal(r, true));
-                } else {
-                    tmp.add(o);
-                }
-            }
-            levelsList.setListData(tmp);
-
-            /*  TODO:  figure out a better  way to have level be sticky
-            if ((lastLevel != null) && levels.contains(lastLevel)) {
-                int idx = levels.indexOf(lastLevel) + 1;  // account for extra
-                levelsList.setSelectedIndex(idx);
-                levelsList.ensureIndexIsVisible(idx);
-            } else {
-                levelsList.setSelectedIndex(0);
-            }
-            */
-            levelsList.setSelectedIndex(0);
-            selectionTab.add(levelsTab, "Level");
-        }
-
-
-        if (dataSource.canDoGeoSelection()) {
-            if (strideTab == null) {
-                strideTab = new JPanel(new BorderLayout());
-            }
-            if (areaTab == null) {
-                areaTab = new JPanel(new BorderLayout());
-            }
-            strideTab.removeAll();
-            areaTab.removeAll();
-            geoSelectionPanel =
-                ((DataSourceImpl) dataSource).doMakeGeoSelectionPanel(false);
-            JComponent strideComponent =
-                geoSelectionPanel.getStrideComponent();
-            JComponent areaComponent = geoSelectionPanel.getAreaComponent();
-            if (areaComponent != null) {
-                areaTab.add(areaComponent);
-                selectionTab.add("Region", areaTab);
-            }
-            if (strideComponent != null) {
-                strideTab.add(strideComponent);
-                selectionTab.add("Stride", strideTab);
-            }
-        }
-
-        addSettingsComponent();
-        checkSelectionTab();
-
-        if (currentLbl != null) {
-            idx = selectionTab.indexOfTab(currentLbl);
-            if (idx >= 0) {
-                selectionTab.setSelectedIndex(idx);
-            }
-        }
-
-    }
-
-    /**
-     * _more_
-     */
-    private void checkSelectionTab() {
-        boolean changed = false;
-        if ((selectionTab.getTabCount() > 0)
-                && (selectionTabContainer.getParent() == null)) {
-            selectionContainer.add(selectionTabContainer);
-            changed = true;
-        } else if ((selectionTab.getTabCount() == 0)
-                   && (selectionTabContainer.getParent() != null)) {
-            selectionContainer.removeAll();
-            changed = true;
-        }
-        if (changed) {
-            selectionContainer.validate();
-            selectionContainer.repaint();
-        }
-    }
-
-
-
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    protected List getSelectedSettings() {
-        if (settingsTree == null) {
-            return null;
-        }
-        return settingsTree.getSelectedSettings();
-    }
-
-
-    /**
-     * _more_
-     */
-    private void addSettingsComponent() {
-        List settings = idv.getResourceManager().getDisplaySettings();
-        if ((settings == null) || (settings.size() == 0)) {
-            return;
-        }
-        if (settingsTree == null) {
-            settingsTree = new SettingsTree(this, idv);
-        }
-        selectionTab.add("Settings", settingsTree.getContents());
-    }
-
 
     /**
      * Set the {@link ucar.unidata.data.DataChoice} we are representing
@@ -800,8 +525,8 @@ public class DataControlDialog implements ActionListener {
         dataChoice = dc;
         if (dataChoice == null) {
             setControlList(new Vector());
-            setTimes(new ArrayList(), new ArrayList());
-            updateSelectionTab(null, null);
+            dataSelectionWidget.setTimes(new ArrayList(), new ArrayList());
+            dataSelectionWidget.updateSelectionTab(null, null);
             return;
         }
         ControlDescriptor selected = getSelectedControl();
@@ -816,7 +541,7 @@ public class DataControlDialog implements ActionListener {
         }
         setSelectedControl(selected);
 
-        if (inOwnWindow) {
+        if (label!=null) {
             label.setText("Choose a display for data: " + dataChoice);
         }
         List sources = new ArrayList();
@@ -830,18 +555,16 @@ public class DataControlDialog implements ActionListener {
             //Now, convert the (possible) indices to actual datetimes
             selectedTimes = DataSourceImpl.getDateTimes(selectedTimes,
                     allTimes);
-            setTimes(selectedTimes, selectedTimes);
+            dataSelectionWidget.setTimes(selectedTimes, selectedTimes);
         } else {
-            setTimes(dataChoice.getAllDateTimes(), selectedTimes);
-        }
-
-
+            dataSelectionWidget.setTimes(dataChoice.getAllDateTimes(), selectedTimes);
+        }        
 
         if (sources.size() == 1) {
             DataSource dataSource = (DataSource) sources.get(0);
-            updateSelectionTab(dataSource, dc);
+            dataSelectionWidget.updateSelectionTab(dataSource, dc);
         } else {
-            updateSelectionTab(null, dc);
+            dataSelectionWidget.updateSelectionTab(null, dc);
         }
 
     }
@@ -873,12 +596,10 @@ public class DataControlDialog implements ActionListener {
      * @return The GUI
      */
     public JComponent doMakeDataSourceDialog(DataSource dataSource) {
-        JComponent timesList = getTimesList();
-        setTimes(dataSource.getAllDateTimes(),
-                 dataSource.getDateTimeSelection());
-
-
-        return timesList;
+        dataSelectionWidget =new DataSelectionWidget(idv);
+        dataSelectionWidget.setTimes(dataSource.getAllDateTimes(),
+                                     dataSource.getDateTimeSelection());
+        return dataSelectionWidget.getContents();
     }
 
 
@@ -987,7 +708,6 @@ public class DataControlDialog implements ActionListener {
      * @return The GUI
      */
     public JComponent doMakeDataChoiceDialog(DataChoice dataChoice) {
-
         controlTree       = new ControlTree();
         CONTROLTREE_MUTEX = controlTree.getTreeLock();
         controlTreeRoot   = new DefaultMutableTreeNode("Displays");
@@ -1013,9 +733,7 @@ public class DataControlDialog implements ActionListener {
         controlTree.addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
                 Object[] cd = getSelectedControls();
-                if(settingsTree!=null) {
-                    settingsTree.updateSettings();
-                }
+                dataSelectionWidget.updateSettings((ControlDescriptor)(cd.length>0?cd[0]:null));
                 Misc.run(new Runnable() {
                     public void run() {
                         Object[] cd = getSelectedControls();
@@ -1073,80 +791,34 @@ public class DataControlDialog implements ActionListener {
             }
         });
 
-
-
         displayScroller = GuiUtils.makeScrollPane(controlTree, 200, 150);
         displayScroller.setBorder(null);
+
+        dataSelectionWidget =new DataSelectionWidget(idv);
+
         if (horizontalOrientation) {
             displayScroller.setPreferredSize(new Dimension(150, 35));
+            contents =  GuiUtils.hsplit(dataSelectionWidget.getContents(),
+                                        displayScroller);
         } else {
             displayScroller.setPreferredSize(new Dimension(200, 150));
+            dataSelectionWidget.getContents().setPreferredSize(new Dimension(200,200));
+            contents  =  GuiUtils.vsplit(displayScroller,
+                                         dataSelectionWidget.getContents(), 150, 0.5);
         }
+
         if (inOwnWindow) {
             contents =
-                GuiUtils.topCenter(label = new JLabel("                 "),
-                                   displayScroller);
-        } else {
-            contents = displayScroller;
-        }
-        allDateTimes = ((dataChoice != null)
-                        ? dataChoice.getAllDateTimes()
-                        : null);
-        timesTab     = getTimesList();
-
-
-        selectionTab = new JTabbedPane();
-        selectionTab.setBorder(null);
-        selectionTabContainer = new JPanel(new BorderLayout());
-        selectionTabContainer.add(selectionTab);
-        selectionContainer = new JPanel(new BorderLayout());
-        //        selectionContainer.setBackground(Color.white);
-        Font font = selectionTab.getFont();
-        font = font.deriveFont((float) font.getSize() - 2).deriveFont(
-            Font.ITALIC).deriveFont(Font.BOLD);
-        selectionTab.setFont(font);
-        selectionTab.add("Times", timesTab);
-        JComponent selectionPanel = selectionContainer;
-
-        if ((dataChoice == null) || (allDateTimes != null)) {
-            JSplitPane splitPane = (horizontalOrientation
-                                    ? GuiUtils.hsplit(selectionPanel,
-                                        contents)
-                                    : GuiUtils.vsplit(contents,
-                                        selectionPanel, 150, 0.5));
-            contents = splitPane;
-        }
+                GuiUtils.topCenter(GuiUtils.inset(label = new JLabel("                 "),5),
+                                   contents);
+        } 
         setDataChoice(dataChoice);
         return contents;
     }
 
 
-    /**
-     * Get the list of all dttms
-     *
-     * @return List of times
-     */
-    public List getAllDateTimes() {
-        return allDateTimes;
-    }
-
-    /**
-     *  Return a list of Integer indices of the selected times.
-     *
-     *  @return List of indices.
-     */
-    public List getSelectedDateTimes() {
-        if (allTimesButton == null) {
-            return null;
-        }
-        if (getUseAllTimes()) {
-            return null;
-        }
-        if (timesList == null) {
-            return new ArrayList();
-        }
-        List selected = Misc.toList(timesList.getSelectedValues());
-        return Misc.getIndexList(selected, allDateTimes);
+    public DataSelectionWidget getDataSelectionWidget () {
+        return dataSelectionWidget;
     }
 
     /**
@@ -1206,8 +878,6 @@ public class DataControlDialog implements ActionListener {
         }
         dispose();
         idv          = null;
-        timesList    = null;
-        allDateTimes = null;
         dataSource   = null;
         dataChoice   = null;
     }
@@ -1242,46 +912,6 @@ public class DataControlDialog implements ActionListener {
         } else if (event.getActionCommand().equals(GuiUtils.CMD_CANCEL)) {
             doClose();
         }
-    }
-
-
-    /**
-     * Did user choose "Use all times"
-     *
-     * @return Is the allTimes checkbox selected or true if checkbox not created
-     */
-    public boolean getUseAllTimes() {
-        //NEW:
-        /*
-        if (timesList.getModel().getSize()
-                == timesList.getSelectedIndices().length) {
-            return true;
-        } else {
-            return false;
-            }*/
-        if (allTimesButton == null) {
-            return true;
-        }
-        return allTimesButton.isSelected();
-    }
-
-
-    /**
-     * Select the times in the times list
-     *
-     * @param all All times
-     * @param selected The selected times
-     */
-    private void setTimes(List all, List selected) {
-        setTimes(timesList, allTimesButton, all, selected);
-        if (all != null) {
-            allDateTimes = new ArrayList(all);
-        }
-        // hack to deal with the selection of the Use All for a datasource
-        allTimesButton.setSelected(allTimesButton.isSelected()
-                                   || (dataChoice != null));
-        //OLD:
-        timesList.setEnabled( !allTimesButton.isSelected());
     }
 
 
@@ -1349,45 +979,6 @@ public class DataControlDialog implements ActionListener {
         timesList.setEnabled( !allTimesButton.isSelected());
         allTimesButton.setSelected(allSelected);
     }
-
-
-
-
-    /**
-     *  Create the GUI for the times list. (i.e., all times button and the
-     *  times JList)
-     *
-     *  @return The GUI for times
-     */
-    public JComponent getTimesList() {
-        if (dataSource != null) {
-            return getTimesList("Use All ");
-        } else {
-            return getTimesList("Use Default ");
-        }
-    }
-
-
-
-
-    /**
-     * Create the GUI for the times list. (i.e., all times button and the
-     * times JList)
-     *
-     * @param cbxLabel Label for times checkbox
-     * @return The GUI for times
-     */
-    public JComponent getTimesList(String cbxLabel) {
-        if (timesListInfo == null) {
-            timesListInfo  = makeTimesListAndPanel(cbxLabel);
-            timesList      = (JList) timesListInfo[0];
-            allTimesButton = (JCheckBox) timesListInfo[1];
-        }
-        return timesListInfo[2];
-    }
-
-
-
 
     /**
      * Create the JList, an 'all times button', and a JPanel

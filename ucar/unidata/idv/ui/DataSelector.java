@@ -709,10 +709,10 @@ public class DataSelector extends DataSourceHolder {
                                         dcd, "doOk");
                 createBtn.setHorizontalAlignment(SwingConstants.LEFT);
                 dcd.addCreateButton(createBtn);
-                dcd.getTimesList().setPreferredSize(new Dimension(DIM_H_X,
+                dcd.getDataSelectionWidget().getTimesList().setPreferredSize(new Dimension(DIM_H_X,
                         DIM_H_Y));
                 right = GuiUtils.hsplit(
-                    dcd.getTimesList(),
+                    dcd.getDataSelectionWidget().getTimesList(),
                     GuiUtils.topCenter(
                         GuiUtils.wrap(GuiUtils.inset(createBtn, 1)),
                         dcd.displayScroller), 0.5);
