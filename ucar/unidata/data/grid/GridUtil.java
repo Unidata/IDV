@@ -22,7 +22,11 @@
 
 
 
+
 package ucar.unidata.data.grid;
+
+
+import ucar.unidata.data.point.PointObTuple;
 
 
 import ucar.unidata.util.LogUtil;
@@ -43,6 +47,7 @@ import visad.bom.Radar2DCoordinateSystem;
 import visad.bom.Radar3DCoordinateSystem;
 
 import visad.georef.EarthLocation;
+import visad.georef.EarthLocationLite;
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
 import visad.georef.LatLonTuple;
@@ -3300,7 +3305,6 @@ public class GridUtil {
 
     }
 
-
     /**
      * _more_
      *
@@ -3320,8 +3324,127 @@ public class GridUtil {
         return values;
     }
 
+    /**
+     * Convert a grid to point obs
+     *
+     * @param grid   grid to convert
+     *
+     * @return Field of point observations for each point
+     *
+     * @throws VisADException  problem getting data
+     */
+    public FieldImpl getGridAsPointObs(FieldImpl grid) throws VisADException {
+        if (grid == null) {
+            return null;
+        }
+        RealType  index    = RealType.getRealType("index");
+        FieldImpl retField = null;
+        try {
+            if (isTimeSequence(grid)) {
+                SampledSet   timeSet      = (SampledSet) getTimeSet(grid);
+                FunctionType retFieldType = null;
+                double[][]   times        = timeSet.getDoubles(false);
+                Unit         timeUnit     = timeSet.getSetUnits()[0];
+                for (int i = 0; i < timeSet.getLength(); i++) {
+                    DateTime dt = new DateTime(times[0][i], timeUnit);
+                    FieldImpl ff =
+                        makePointObs((FlatField) grid.getSample(i), dt);
+                    if (ff == null) {
+                        continue;
+                    }
+                    if (retFieldType == null) {
+                        retFieldType = new FunctionType(timeSet.getType(),
+                                ff.getType());
+                        retField = new FieldImpl(retFieldType, timeSet);
+                    }
+                    retField.setSample(i, ff, false);
+                }
+            } else {
+                retField = makePointObs((FlatField) grid,
+                                        new DateTime(Double.NaN));
+            }
+        } catch (RemoteException re) {}
+        return retField;
+    }
 
+    /**
+     * Make point obs from a single timestep of a grid
+     *
+     * @param timeStep     the grid
+     * @param dt           the timestep for the grid
+     *
+     * @return   a Field of PointObs
+     *
+     * @throws RemoteException   Java RMI problem
+     * @throws VisADException    VisAD problem
+     */
+    private FieldImpl makePointObs(FlatField timeStep, DateTime dt)
+            throws VisADException, RemoteException {
+        if (timeStep == null) {
+            return null;
+        }
+        SampledSet domain    = getSpatialDomain(timeStep);
+        int        numPoints = domain.getLength();
+        Integer1DSet points = new Integer1DSet(RealType.getRealType("index"),
+                                  numPoints);
+        TupleType tt = getParamType(timeStep);
+        TupleType rangeType = new TupleType(new MathType[] {
+                              RealTupleType.LatitudeLongitudeAltitude,
+                              RealType.Time, tt });
+        FieldImpl ff = new FieldImpl(
+                           new FunctionType(
+                               ((SetType) points.getType()).getDomain(),
+                               rangeType), points);
+        float[][]  samples  = timeStep.getFloats(false);
+        float[][]  geoVals  = getEarthLocationPoints((GriddedSet) domain);
+        boolean    isLatLon = isLatLonOrder(domain);
+        int        latIndex = isLatLon
+                              ? 0
+                              : 1;
+        int        lonIndex = isLatLon
+                              ? 1
+                              : 0;
+        boolean    haveAlt  = geoVals.length > 2;
+        for (int i = 0; i < numPoints; i++) {
+            float lat = geoVals[latIndex][i];
+            float lon = geoVals[lonIndex][i];
+            float alt = haveAlt ? geoVals[2][i] : 0;
+            if (lat == lat && lon == lon) {
+                if (!(alt == alt)) alt = 0;
+                EarthLocation el = new EarthLocationLite(lat, lon, alt);
+                // TODO:  make this  more efficient
+                PointObTuple pot = new PointObTuple(el, dt,
+                                       timeStep.getSample(i), rangeType);
+                ff.setSample(i, pot, false, false);
+            }
+        }
+        return ff;
+    }
 
+    /**
+     * Convert the domain to the reference earth located points
+     *
+     * @param domain  the domain set
+     *
+     * @return  the lat/lon/(alt) points
+     *
+     * @throws VisADException  problem converting points
+     */
+    private float[][] getEarthLocationPoints(GriddedSet domain) throws VisADException {
+        CoordinateSystem cs = domain.getCoordinateSystem();
+        if (cs == null) {
+            return domain.getSamples();
+        }
+        RealTupleType refType  = cs.getReference();
+        Unit[]        refUnits = cs.getReferenceUnits();
+        float[][] points = CoordinateSystem.transformCoordinates(refType,
+                               null, refUnits, null,
+                               ((SetType) domain.getType()).getDomain(), cs,
+                               domain.getSetUnits(), domain.getSetErrors(),
+                               domain.getSamples(), false);
+        return points;
+
+    }
 
 
     /**
@@ -3352,9 +3475,4 @@ public class GridUtil {
         }
     }
 
-
-
-
-
 }
-
