@@ -532,6 +532,24 @@ public class CompositeDisplayable extends Displayable {
     }
 
     /**
+     * Set the flags for whether the Displayable displays data
+     * as points.
+     *
+     * @param usePoints  true to display as points
+     *
+     * @throws VisADException     VisAD failure.
+     * @throws RemoteException    Java RMI failure.
+     */
+    public void setPointMode(boolean usePoints)
+            throws VisADException, RemoteException {
+        super.setPointMode(usePoints);
+        for (Iterator iter = iterator(); iter.hasNext(); ) {
+            Displayable displayable = (Displayable) iter.next();
+            displayable.setPointMode(usePoints);
+        }
+    }
+
+    /**
      * Set the z position to given value
      *
      * @param value The value

@@ -100,6 +100,9 @@ public abstract class Displayable {
     /** Should the renders adjust the seam */
     private boolean useFastRendering = false;
 
+    /** Should the renders display as points */
+    private boolean pointMode = false;
+
     /**
      * The name of the VisAD display property.
      */
@@ -272,6 +275,29 @@ public abstract class Displayable {
      */
     public boolean getUseFastRendering() {
         return useFastRendering;
+    }
+
+    /**
+     * Set the flags for whether the Displayable displays data
+     * as points.
+     *
+     * @param usePoints  true to display as points
+     *
+     * @throws VisADException     VisAD failure.
+     * @throws RemoteException    Java RMI failure.
+     */
+    public void setPointMode(boolean usePoints)
+            throws VisADException, RemoteException {
+        pointMode = usePoints;
+    }
+
+    /**
+     * Get whether or not to render data as points
+     *
+     * @return true to display as points
+     */
+    public boolean getPointMode() {
+        return pointMode;
     }
 
 

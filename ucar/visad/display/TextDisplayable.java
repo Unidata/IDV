@@ -21,11 +21,6 @@
  */
 
 
-
-
-
-
-
 package ucar.visad.display;
 
 
@@ -423,9 +418,28 @@ public class TextDisplayable extends LineDrawing {
 
             public void mapChanged(ScalarMapEvent event) {}  // ignore
         });
+        if (textType instanceof RealType) {
+            applyDisplayUnit(textMap, (RealType) textType);
+        }
         replaceScalarMap(oldTextMap, textMap);
         fireScalarMapSetChange();
     }
+
+    /**
+     * Set the units for the displayed range
+     * @param unit Unit for display
+     * @throws VisADException   VisAD failure.
+     * @throws RemoteException  Java RMI failure.
+     */
+    public void setDisplayUnit(Unit unit)
+            throws VisADException, RemoteException {
+        //Make sure this unit is ok
+        if (!(textType instanceof RealType)) return;
+        checkUnit((RealType) textType, unit);
+        super.setDisplayUnit(unit);
+        applyDisplayUnit(textMap, (RealType) textType);
+    }
+
 
     /**
      * Clone this {@link Displayable} so it can go into a different

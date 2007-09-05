@@ -214,6 +214,24 @@ public class DisplayableData extends Displayable {
 
 
     /**
+     * Set the flags for whether the Displayable displays data
+     * as points.
+     *
+     * @param usePoints  true to display as points
+     *
+     * @throws VisADException     VisAD failure.
+     * @throws RemoteException    Java RMI failure.
+     */
+    public void setPointMode(boolean usePoints)
+            throws VisADException, RemoteException {
+        super.setPointMode(usePoints);
+        addConstantMap(new ConstantMap((usePoints
+                                        ? 1
+                                        : -1), Display.PointMode));
+    }
+
+
+    /**
      * Create a new Change listener
      *
      * @param enable   whether the display should be enabled or not
