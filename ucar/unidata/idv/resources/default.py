@@ -211,68 +211,67 @@ def makeFloatArray(rows,cols,value):
 
 
 def applyToRange(function,data):
-   import ucar.unidata.data.grid.GridUtil as gu
-   newData = data.clone()
-   f = function +'(rangeValue)'
-   if (gu.isTimeSequence(newData)):
-      for t in range(newData.getDomainSet().getLength()):
-         rangeValue = newData.getSample(t)
-	 result = eval(f)
-         newData.setSample(t,result,0)
-   else:
-      rangeValue = newData;
-      newData = eval(f)
-   return newData
+    import ucar.unidata.data.grid.GridUtil as gu
+    newData = data.clone()
+    f = function +'(rangeValue)'
+    if (gu.isTimeSequence(newData)):
+        for t in range(newData.getDomainSet().getLength()):
+            rangeValue = newData.getSample(t)
+            result = eval(f)
+            newData.setSample(t,result,0)
+    else:
+        rangeValue = newData
+        newData = eval(f)
+    return newData
 
 
 def applyToRangeValues(function,data):
-   import ucar.unidata.data.grid.GridUtil as gu
-   newData = data.clone()
-   f = function +'(values,step=step,rangeObject=rangeObject,field=field)'
-   step=0
-   if (gu.isTimeSequence(newData)):
-      for t in range(newData.getDomainSet().getLength()):
-         rangeObject = newData.getSample(t)
-         values = rangeObject.getFloats(0)
-	 values = eval(f)
-         rangeObject.setSamples(values,1)
-         step= step+1;
-   else:
-      rangeObject = newData;
-      values = rangeObject.getFloats(0)
-      values = eval(f)
-      rangeObject.setSamples(values,1)
-   return newData
+    import ucar.unidata.data.grid.GridUtil as gu
+    newData = data.clone()
+    f = function +'(values,step=step,rangeObject=rangeObject,field=field)'
+    step=0
+    if (gu.isTimeSequence(newData)):
+        for t in range(newData.getDomainSet().getLength()):
+            rangeObject = newData.getSample(t)
+            values = rangeObject.getFloats(0)
+            values = eval(f)
+            rangeObject.setSamples(values,1)
+            step= step+1
+    else:
+        rangeObject = newData
+        values = rangeObject.getFloats(0)
+        values = eval(f)
+        rangeObject.setSamples(values,1)
+    return newData
 
 
 
 def changeRange(d):
-##   return   applyToRange('doit',d);
-   return   applyToRangeValues('doit2',d);
+##   return   applyToRange('testApplyToRange',d);
+   return   applyToRangeValues('testApplyToRange2',d);
 
 
-def doit(d,**args):
-        r = d.getFloats(0)
-	total = 0
-	for i in xrange(len(r[0])):
-		total= total+r[0][i]
-	avg = total/len(r[0])
-	for i in xrange(len(r[0])):
-		if(r[0][i]<avg):
-			r[0][i] = 0;
-        d.setSamples(r)
-	return d
+def testApplyToRange(d,**args):
+    r = d.getFloats(0)
+    total = 0
+    for i in xrange(len(r[0])):
+        total= total+r[0][i]
+    avg = total/len(r[0])
+    for i in xrange(len(r[0])):
+        if(r[0][i]<avg):
+            r[0][i] = 0;
+    d.setSamples(r)
+    return d
 
-def doit2(r,**args):
-	keys = args.keys()
-	for kw in keys: print kw, ':', args[kw]
-	total = 0
-	for i in xrange(len(r[0])):
-		total= total+r[0][i]
-	avg = total/len(r[0])
-	for i in xrange(len(r[0])):
-		r[0][i] = avg-r[0][i];
-	return r
+def testApplyToRange2(r,**args):
+    keys = args.keys()
+    total = 0
+    for i in xrange(len(r[0])):
+        total= total+r[0][i]
+    avg = total/len(r[0])
+    for i in xrange(len(r[0])):
+        r[0][i] = avg-r[0][i];
+    return r
 
 
 
