@@ -286,19 +286,11 @@ def  subsetFromMap(field, map, fillValue=java.lang.Float.NaN,inverse=0,latLonCan
    import ucar.unidata.data.grid.GridUtil as gu
    newData = field.clone()
 ##Iterate on each time step
-   for t in range(field.getDomainSet().getLength()):
-        rangeObject = field.getSample(t).clone()
-        domain = rangeObject.getDomainSet()
-        numPoints =  domain.getLength()
-        samples = domain.getSamples(0)
+   for timeStep in range(field.getDomainSet().getLength()):
+        rangeObject = field.getSample(timeStep).clone()
 ##Find the indices of the lat lons that are inside the maps
-        if(t == 0 or latLonCanChangeWithTime):
-           cs = domain.getCoordinateSystem()
-           if(cs == None):
-              latlon=samples
-           else:
-              latlon =  cs.toReference(samples)
-           indices = gu.findIndices(latlon, map);
+        if(timeStep == 0 or latLonCanChangeWithTime):
+           indices = gu.findIndices(rangeObject.getDomainSet(), map);
 
 ##Get the values
         originalValues = rangeObject.getFloats(0)
@@ -320,5 +312,46 @@ def  subsetFromMap(field, map, fillValue=java.lang.Float.NaN,inverse=0,latLonCan
 
 ##Set the samples
         rangeObject.setSamples(newValues)
-        newData.setSample(t,rangeObject)
+        newData.setSample(timeStep,rangeObject)
    return newData
+
+
+
+def  averageFromMap(field, map,latLonCanChangeWithTime=1):
+   import ucar.unidata.data.grid.GridUtil as gu
+   newData = field.clone()
+##Iterate on each time step
+   for timeStep in range(field.getDomainSet().getLength()):
+        rangeObject = field.getSample(timeStep).clone()
+##Find the indices of the lat lons that are inside the maps
+        if(timeStep == 0 or latLonCanChangeWithTime):
+            indices = gu.findIndices(rangeObject.getDomainSet(), map);
+
+##Get the values
+        originalValues = rangeObject.getFloats(0)
+        newValues = makeFloatArray(len(originalValues), len(originalValues[0]), java.lang.Float.NaN);
+        totals = {};
+        for mapIdx in xrange(len(indices)):
+            indexArray = indices[mapIdx]
+            total = 0;
+            for j in xrange(len(indexArray)):
+                total=total+ originalValues[0][indexArray[j]];
+            totals.update({mapIdx:total})
+
+        for mapIdx in xrange(len(indices)):
+            indexArray = indices[mapIdx]
+            if(len(indexArray)==0):
+                continue;
+            avg = totals[mapIdx]/len(indexArray)
+            for j in xrange(len(indexArray)):            
+                newValues[0][indexArray[j]] = avg
+##Set the samples
+        rangeObject.setSamples(newValues)
+        newData.setSample(timeStep,rangeObject)
+   return newData
+
+
+
+
+
+
