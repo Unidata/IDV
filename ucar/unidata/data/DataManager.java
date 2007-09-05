@@ -1079,6 +1079,8 @@ public class DataManager {
         DataSource existingDataSource = findDataSource(definingObject,
                                             lookupKey);
         if (existingDataSource != null) {
+            //If we already have one then do a reload on it
+            existingDataSource.reloadData();
             return new DataSourceResults(existingDataSource, definingObject);
         }
 
@@ -1218,6 +1220,11 @@ public class DataManager {
                                     dataSource);
                             dataSourceToDefiningObject.put(dataSource,
                                     lookupKey);
+                        } else if(haveDataSource(dataSource)) {
+                            int idx = dataSources.indexOf(dataSource);
+                            if(idx>=0) {
+                                ((DataSource)dataSources.get(idx)).reloadData();
+                            }
                         }
                     }
                 }
