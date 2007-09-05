@@ -72,7 +72,7 @@ import javax.swing.event.*;
 
 
 /**
- * Class to handle all kinds of PlanViews.  A plan view is a 
+ * Class to handle all kinds of PlanViews.  A plan view is a
  * horizontal slice at a level.
  *
  * @author Unidata Development Team
@@ -181,18 +181,18 @@ public abstract class PlanViewControl extends GridDisplayControl {
     }
 
 
-    /*
-     * _more_
+    /**
+     * Add DisplaySettings appropriate for this display
+     *
+     * @param dsd  the dialog to add to
      */
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         super.addDisplaySettings(dsd);
-        if(currentLevel!=null) {
-            dsd.addPropertyValue(currentLevel, "settingsLevel",
-                         "Level", SETTINGS_GROUP_DISPLAY);
+        if (currentLevel != null) {
+            dsd.addPropertyValue(currentLevel, "settingsLevel", "Level",
+                                 SETTINGS_GROUP_DISPLAY);
         }
     }
-
-
 
 
     /**
@@ -333,7 +333,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
         Trace.call2("PlanView.initMisc");
 
         boolean result = setData(dataChoice);
-        if (!result) {
+        if ( !result) {
             return false;
         }
 
@@ -1143,7 +1143,15 @@ public abstract class PlanViewControl extends GridDisplayControl {
      * @return  true
      */
     protected boolean shouldShowZSelector() {
-        return !getMultipleIsTopography() && haveLevels() && useZPosition();
+        boolean b = !getMultipleIsTopography() && haveLevels()
+                    && useZPosition();
+        try {
+            b = b && ((workingGrid != null)
+                      && GridUtil.isVolume(workingGrid));
+        } catch (Exception e) {
+            b = false;
+        }
+        return b;
     }
 
 
