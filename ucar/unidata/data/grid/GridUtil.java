@@ -21,8 +21,6 @@
  */
 
 
-
-
 package ucar.unidata.data.grid;
 
 
@@ -3333,7 +3331,7 @@ public class GridUtil {
      *
      * @throws VisADException  problem getting data
      */
-    public FieldImpl getGridAsPointObs(FieldImpl grid) throws VisADException {
+    public static FieldImpl getGridAsPointObs(FieldImpl grid) throws VisADException {
         if (grid == null) {
             return null;
         }
@@ -3378,7 +3376,7 @@ public class GridUtil {
      * @throws RemoteException   Java RMI problem
      * @throws VisADException    VisAD problem
      */
-    private FieldImpl makePointObs(FlatField timeStep, DateTime dt)
+    private static FieldImpl makePointObs(FlatField timeStep, DateTime dt)
             throws VisADException, RemoteException {
         if (timeStep == null) {
             return null;
@@ -3430,7 +3428,7 @@ public class GridUtil {
      *
      * @throws VisADException  problem converting points
      */
-    private float[][] getEarthLocationPoints(GriddedSet domain) throws VisADException {
+    private static float[][] getEarthLocationPoints(GriddedSet domain) throws VisADException {
         CoordinateSystem cs = domain.getCoordinateSystem();
         if (cs == null) {
             return domain.getSamples();
