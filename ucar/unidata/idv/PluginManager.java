@@ -1552,7 +1552,14 @@ public class PluginManager extends IdvManager {
      * @throws Exception On badness
      */
     protected void loadPlugin(String filename, String prefix,
-                              boolean topLevel)
+                              boolean topLevel) 
+            throws Exception {
+        loadPlugin(filename, prefix, topLevel,null);
+    }
+
+
+    protected void loadPlugin(String filename, String prefix,
+                              boolean topLevel, String label)
             throws Exception {
         //        System.err.println ("load plugin:" + filename);
         if ( !getArgsManager().pluginsOk) {
@@ -1594,7 +1601,7 @@ public class PluginManager extends IdvManager {
 
                 if ( !rc.contains(filename) && !rc.contains(fullPath)
                         && !rc.contains("/" + filename)) {
-                    rc.addResourceAtStart(fullPath);
+                    rc.addResourceAtStart(fullPath, label);
                 }
                 //System.err.println("rc:" + rc);
                 return;
@@ -1648,8 +1655,7 @@ public class PluginManager extends IdvManager {
 
 
 
-
-
+            String jarLabel = IOUtil.getFileTail(decode(jarFilePath));
             String prefix = jarFilePath + "!/";
             MyClassLoader cl = new MyClassLoader(this, jarFilePath,
                                    getClass().getClassLoader());
@@ -1667,7 +1673,7 @@ public class PluginManager extends IdvManager {
             for (int i = 0; i < entries.size(); i++) {
                 String entry = (String) entries.get(i);
                 if ( !ArgsManager.isRbiFile(entry)) {
-                    loadPlugin(entry, prefix, false);
+                    loadPlugin(entry, prefix, false, "From: " + jarLabel);
                 }
             }
         } catch (Exception exc) {

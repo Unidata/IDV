@@ -371,7 +371,11 @@ public class ResourceCollection {
      * @param resourcePath  the path to the resource
      */
     public void addResourceAtStart(String resourcePath) {
-        Resource resource = new Resource(resourcePath);
+        addResourceAtStart(resourcePath, null);
+    }
+
+    public void addResourceAtStart(String resourcePath, String label) {
+        Resource resource = new Resource(resourcePath,label, null);
         if (resources.size() == 0) {
             resources.add(resource);
         } else {

@@ -354,24 +354,17 @@ public class JythonManager extends IdvManager implements ActionListener {
 
                 //Assume that the first one in the list is the writable resources
                 String text = resources.read(i);
+                String pathDesc =  Msg.msg("Path: ${param1}",
+                                           PluginManager.decode(
+                                                                resources.get(
+                                                                              i).toString()));
+                JComponent tabContents;
                 if ((jythonEditor == null)
                         && resources.isWritableResource(i)) {
                     jythonEditor = new JPythonEditor();
                     textComponents.add(jythonEditor);
                     jythonEditor.setPreferredSize(new Dimension(400, 300));
-                    JLabel label =
-                        new JLabel(
-                            "<html>"
-                            + Msg.msg(
-                                "Path: ${param1}",
-                                PluginManager.decode(
-                                    resources.get(
-                                        i).toString())) + "</html>");
-                    jythonEditorHolder = GuiUtils.center(jythonEditor);
-                    jythonTab.add(
-                        PluginManager.decode(resources.getShortName(i)),
-                        GuiUtils.topCenter(
-                            GuiUtils.inset(label, 4), jythonEditorHolder));
+                    tabContents = jythonEditorHolder = GuiUtils.center(jythonEditor);
                     if (text == null) {
                         text = "#\n#This is the default  editable user's jython library\n";
                     }
@@ -386,20 +379,13 @@ public class JythonManager extends IdvManager implements ActionListener {
                     JTextArea textArea = new JTextArea(text, 20, 50);
                     textComponents.add(textArea);
                     textArea.setEditable(false);
-                    JLabel label = new JLabel(
-                                       "<html>"
-                                       + Msg.msg(
-                                           "Path: ${param1}",
-                                           StringUtil.shorten(
-                                               resources.get(i).toString(),
-                                               80)) + " ("
-                                                   + Msg.msg("non-editable")
-                                                   + ")");
-                    jythonTab.add(resources.getShortName(i),
-                                  GuiUtils.topCenter(GuiUtils.inset(label,
-                                      4), GuiUtils.makeScrollPane(textArea,
-                                          400, 300)));
+                    pathDesc = pathDesc+" (" + Msg.msg("non-editable") +")";
+                    tabContents = GuiUtils.topCenter(GuiUtils.inset(new JLabel("Non-editable"),2),GuiUtils.makeScrollPane(textArea,400, 300));
                 }
+                jythonTab.add(
+                              PluginManager.decode(resources.getShortName(i)),
+                              tabContents);
+                jythonTab.setToolTipTextAt(jythonTab.getTabCount()-1, pathDesc);
             }
             JLabel label = new JLabel("Temporary Jython");
             jythonTab.add(
