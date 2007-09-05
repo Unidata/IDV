@@ -177,6 +177,14 @@
   </datasource>
 
   <datasource
+     id="FILE.MAPFILE"
+     patterns="\.shp$,\.zip$"
+     fileselection="false"
+     factory="ucar.unidata.data.gis.ShapeFileDataSource"
+     label="Map files">
+  </datasource>
+
+  <datasource
      id="FILE.IMAGE"
      factory="ucar.unidata.data.VisadDataSource"
      patterns="\.jpg$,\.gif$,\.jpeg$,\.png$"
