@@ -3197,16 +3197,10 @@ public class GridUtil {
 
 
 
-    public static int[][] findIndices(Set domain, UnionSet map)
+
+    public static int[][] findIndices(GriddedSet domain, UnionSet map)
             throws VisADException {
-        float[][]samples = domain.getSamples(false);
-        float[][]latlon;
-        CoordinateSystem cs =  domain.getCoordinateSystem();
-        if(cs == null)
-            latlon=samples;
-        else
-            latlon =  cs.toReference(samples);
-        return findIndices(latlon, map);
+        return findIndices(getEarthLocationPoints(domain), map);
     }
 
 
@@ -3428,7 +3422,7 @@ public class GridUtil {
      *
      * @throws VisADException  problem converting points
      */
-    private static float[][] getEarthLocationPoints(GriddedSet domain) throws VisADException {
+    public static float[][] getEarthLocationPoints(GriddedSet domain) throws VisADException {
         CoordinateSystem cs = domain.getCoordinateSystem();
         if (cs == null) {
             return domain.getSamples();
