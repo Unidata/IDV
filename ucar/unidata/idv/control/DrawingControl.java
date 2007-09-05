@@ -275,6 +275,9 @@ public class DrawingControl extends DisplayControlImpl {
     /** Do we skip the next time the mouse is released. */
     private boolean skipNextMouseReleased = false;
 
+    /** For exporting file */
+    private JCheckBox loadAsMapData;
+
 
     /**
      * Create a new Drawing Control; set attributes.
@@ -1828,13 +1831,18 @@ public class DrawingControl extends DisplayControlImpl {
         }
     }
 
+
     /**
      * Export a grf file
      */
     private void doExport() {
         try {
+            if(loadAsMapData == null) {
+                loadAsMapData = new JCheckBox("Load as map data",false);
+                loadAsMapData.setToolTipText("Load this xgrf file back in as map data");
+            }
             String filename = FileManager.getWriteFile(FILTER_XGRF,
-                                  SUFFIX_XGRF);
+                                  SUFFIX_XGRF,GuiUtils.top(loadAsMapData));
             if (filename == null) {
                 return;
             }
@@ -1845,6 +1853,9 @@ public class DrawingControl extends DisplayControlImpl {
                 root.appendChild(g.getElement(doc));
             }
             IOUtil.writeFile(filename, XmlUtil.toString(root));
+            if(loadAsMapData.isSelected()) {
+                getIdv().makeOneDataSource(filename, "FILE.MAPFILE", null);
+            }
         } catch (Exception exc) {
             logException("Exporting drawing", exc);
         }
