@@ -246,6 +246,24 @@ public class CachedFlatField extends FlatField {
 
 
 
+    public void setSamples(float[][] values, ErrorEstimate[] errors,
+                           boolean copy) throws VisADException, RemoteException {
+
+        myFloatValues = new float[values.length][];
+        for (int i = 0; i < myFloatValues.length; i++) {
+            if (copy) {
+                myFloatValues[i] = (float[]) values[i].clone();
+            } else {
+                myFloatValues[i] = values[i];
+            }
+        }
+        setRangeErrors(errors);
+        checkCache();
+
+
+    }
+
+
 
     /**
      * _more_
@@ -255,6 +273,7 @@ public class CachedFlatField extends FlatField {
     public void setSampleRanges(Range[] sampleRanges) {
         this.sampleRanges = sampleRanges;
     }
+
 
 
 
