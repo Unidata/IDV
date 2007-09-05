@@ -3194,37 +3194,18 @@ public class GridUtil {
 
 
 
-    /**
-     * test
-     *
-     * @param args args
-     *
-     * @throws Exception On badness
-     */
-    public static void main(String[] args) throws Exception {
-        for (int size = 1; size <= 10; size++) {
-            float[]            test    = new float[size * 1000000];
-
-            long               t1      = System.currentTimeMillis();
-            OutputStream       ostream = new FileOutputStream("test.ser");
-            ObjectOutputStream p       = new ObjectOutputStream(ostream);
-            p.writeObject(test);
-            p.flush();
-            ostream.close();
-            long              t2      = System.currentTimeMillis();
-
-            InputStream       istream = new FileInputStream("test.ser");
-            ObjectInputStream ois     = new ObjectInputStream(istream);
-            float[]           tmp     = (float[]) ois.readObject();
-            long              t3      = System.currentTimeMillis();
-            System.err.println("Length:" + tmp.length + " write: "
-                               + (t2 - t1) + " read:" + (t3 - t2));
-        }
-
-
-
-
+    public static int[][] findIndices(Set domain, UnionSet map)
+            throws VisADException {
+        float[][]samples = domain.getSamples(false);
+        float[][]latlon;
+        CoordinateSystem cs =  domain.getCoordinateSystem();
+        if(cs == null)
+            latlon=samples;
+        else
+            latlon =  cs.toReference(samples);
+        return findIndices(latlon, map);
     }
+
 
     /**
      * _more_
@@ -3338,6 +3319,41 @@ public class GridUtil {
         }
         return values;
     }
+
+
+
+
+
+    /**
+     * test
+     *
+     * @param args args
+     *
+     * @throws Exception On badness
+     */
+    public static void main(String[] args) throws Exception {
+        for (int size = 1; size <= 10; size++) {
+            float[]            test    = new float[size * 1000000];
+
+            long               t1      = System.currentTimeMillis();
+            OutputStream       ostream = new FileOutputStream("test.ser");
+            ObjectOutputStream p       = new ObjectOutputStream(ostream);
+            p.writeObject(test);
+            p.flush();
+            ostream.close();
+            long              t2      = System.currentTimeMillis();
+
+            InputStream       istream = new FileInputStream("test.ser");
+            ObjectInputStream ois     = new ObjectInputStream(istream);
+            float[]           tmp     = (float[]) ois.readObject();
+            long              t3      = System.currentTimeMillis();
+            System.err.println("Length:" + tmp.length + " write: "
+                               + (t2 - t1) + " read:" + (t3 - t2));
+        }
+    }
+
+
+
 
 
 }
