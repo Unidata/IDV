@@ -3252,12 +3252,7 @@ public class GridUtil {
 
         }
         boolean flipLatLon = false;
-
         int     numPoints  = latlon[0].length;
-
-
-
-
         for (int i = 0; i < numPoints; i++) {
             float lat = latlon[0][i];
             float lon = latlon[1][i];
@@ -3289,6 +3284,7 @@ public class GridUtil {
                 if ((lon != lon) || (lat != lat)) {
                     continue;
                 }
+                //System.err.println (flipLatLon + " " +low[0] +" - " + lon + " - " + hi[0] + "       " + low[1]+" - "+lat + " - " + hi[1]);
                 if ((lon < low[0]) || (lon > hi[0]) || (lat < low[1])
                         || (lat > hi[1])) {
                     continue;
@@ -3299,7 +3295,6 @@ public class GridUtil {
                     if (indexLists[mapIdx] == null) {
                         indexLists[mapIdx] = new ArrayList();
                     }
-                    //                    System.err.println ("got one");
                     indexLists[mapIdx].add(new Integer(i));
                     break;
                 }
