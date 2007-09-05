@@ -26,7 +26,6 @@ package ucar.unidata.data.grid;
 
 import ucar.unidata.data.point.PointObTuple;
 
-
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
@@ -37,9 +36,6 @@ import ucar.visad.Util;
 import ucar.visad.data.CachedFlatField;
 
 import visad.*;
-
-
-import visad.DelaunayCustom;
 
 import visad.bom.Radar2DCoordinateSystem;
 import visad.bom.Radar3DCoordinateSystem;
@@ -3198,6 +3194,16 @@ public class GridUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param domain _more_
+     * @param map _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
     public static int[][] findIndices(GriddedSet domain, UnionSet map)
             throws VisADException {
         return findIndices(getEarthLocationPoints(domain), map);
@@ -3325,7 +3331,8 @@ public class GridUtil {
      *
      * @throws VisADException  problem getting data
      */
-    public static FieldImpl getGridAsPointObs(FieldImpl grid) throws VisADException {
+    public static FieldImpl getGridAsPointObs(FieldImpl grid)
+            throws VisADException {
         if (grid == null) {
             return null;
         }
@@ -3345,8 +3352,9 @@ public class GridUtil {
                         continue;
                     }
                     if (retFieldType == null) {
-                        retFieldType = new FunctionType(timeSet.getType(),
-                                ff.getType());
+                        retFieldType = new FunctionType(
+                            ((SetType) timeSet.getType()).getDomain(),
+                            ff.getType());
                         retField = new FieldImpl(retFieldType, timeSet);
                     }
                     retField.setSample(i, ff, false);
@@ -3381,28 +3389,32 @@ public class GridUtil {
                                   numPoints);
         TupleType tt = getParamType(timeStep);
         TupleType rangeType = new TupleType(new MathType[] {
-                              RealTupleType.LatitudeLongitudeAltitude,
-                              RealType.Time, tt });
+                                  RealTupleType.LatitudeLongitudeAltitude,
+                                  RealType.Time, tt });
         FieldImpl ff = new FieldImpl(
                            new FunctionType(
                                ((SetType) points.getType()).getDomain(),
                                rangeType), points);
-        float[][]  samples  = timeStep.getFloats(false);
-        float[][]  geoVals  = getEarthLocationPoints((GriddedSet) domain);
-        boolean    isLatLon = isLatLonOrder(domain);
-        int        latIndex = isLatLon
-                              ? 0
-                              : 1;
-        int        lonIndex = isLatLon
-                              ? 1
-                              : 0;
-        boolean    haveAlt  = geoVals.length > 2;
+        float[][] samples  = timeStep.getFloats(false);
+        float[][] geoVals  = getEarthLocationPoints((GriddedSet) domain);
+        boolean   isLatLon = isLatLonOrder(domain);
+        int       latIndex = isLatLon
+                             ? 0
+                             : 1;
+        int       lonIndex = isLatLon
+                             ? 1
+                             : 0;
+        boolean   haveAlt  = geoVals.length > 2;
         for (int i = 0; i < numPoints; i++) {
             float lat = geoVals[latIndex][i];
             float lon = geoVals[lonIndex][i];
-            float alt = haveAlt ? geoVals[2][i] : 0;
-            if (lat == lat && lon == lon) {
-                if (!(alt == alt)) alt = 0;
+            float alt = haveAlt
+                        ? geoVals[2][i]
+                        : 0;
+            if ((lat == lat) && (lon == lon)) {
+                if ( !(alt == alt)) {
+                    alt = 0;
+                }
                 EarthLocation el = new EarthLocationLite(lat, lon, alt);
                 // TODO:  make this  more efficient
                 PointObTuple pot = new PointObTuple(el, dt,
@@ -3422,7 +3434,8 @@ public class GridUtil {
      *
      * @throws VisADException  problem converting points
      */
-    public static float[][] getEarthLocationPoints(GriddedSet domain) throws VisADException {
+    public static float[][] getEarthLocationPoints(GriddedSet domain)
+            throws VisADException {
         CoordinateSystem cs = domain.getCoordinateSystem();
         if (cs == null) {
             return domain.getSamples();
@@ -3468,3 +3481,4 @@ public class GridUtil {
     }
 
 }
+
