@@ -66,7 +66,6 @@ public class ShapeFileDataSource extends FilesDataSource {
     /** Property id for the dbfile */
     public static final String PROP_DBFILE = "PROP_DBFILE";
 
-
     /** The db file */
     private DbaseFile dbFile;
 
@@ -94,6 +93,13 @@ public class ShapeFileDataSource extends FilesDataSource {
             throws VisADException {
         super(descriptor, source, "Shapefile data source", properties);
         initShapeFileDataSource();
+    }
+
+
+    public void reloadData() {
+        shapefileData = null;
+        dbFile=null;
+        super.reloadData();
     }
 
 
