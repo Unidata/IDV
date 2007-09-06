@@ -280,6 +280,17 @@ public class ShapeFileDataSource extends FilesDataSource {
         }
         int       numFields  = dbFile.getNumFields();
         //        System.err.println("num map lines:" + sets.length);
+        List propertyNames = new ArrayList();
+        for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
+            String fieldName = dbFile.getFieldName(fieldIdx);
+            propertyNames.add(fieldName);
+        }
+
+        for(int i=0;i<sets.length;i++) {
+            MapSet mapSet = (MapSet) sets[i];
+            mapSet.setPropertyNames(propertyNames);
+        }
+
         for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
             String fieldName = dbFile.getFieldName(fieldIdx);
             DbaseData dbData    = dbFile.getField(fieldIdx);
