@@ -103,7 +103,7 @@ public class AddeRaobPointDataChooser extends AddePointDataChooser {
      * @return name of default station model
      */
     public String getDefaultStationModel() {
-        return "upper air";
+        return "observations>upper air";
     }
 
     /**

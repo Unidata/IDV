@@ -20,7 +20,6 @@
  */
 
 
-
 package ucar.unidata.idv.control;
 
 
@@ -46,6 +45,8 @@ import ucar.visad.display.Grid2DDisplayable;
 import ucar.visad.display.GridValueDisplayable;
 import ucar.visad.display.LineDrawing;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import visad.*;
 import visad.RealType;
@@ -95,7 +96,7 @@ public class ValuePlanViewControl extends PlanViewControl {
     private SpatialGrid stationGrid;
 
     /** flag for decluttering */
-    private boolean declutter = false;
+    private boolean declutter = true;
 
     /** decluttering filter factor */
     private float declutterFilter = 1.0f;
@@ -131,6 +132,91 @@ public class ValuePlanViewControl extends PlanViewControl {
      */
     public void initDone() {
         super.initDone();
+        loadDataInThread();
+    }
+
+    /**
+     * Property change method.
+     *
+     * @param evt   event to act on
+     */
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(
+                StationModelManager.PROP_RESOURCECHANGE)) {
+
+            StationModel changedModel = (StationModel) evt.getNewValue();
+            handleChangedStationModel(changedModel);
+        } else if (evt.getPropertyName().equals(
+                StationModelManager.PROP_RESOURCEREMOVE)) {
+            StationModel changedModel = (StationModel) evt.getOldValue();
+            if (layoutModel.getName().equals(changedModel.getName())) {
+                handleStationModelChange();
+            }
+        }
+        super.propertyChange(evt);
+    }
+
+
+    /**
+     * The station model changed
+     *
+     * @param changedModel The changed station model_
+     */
+    protected void handleChangedStationModel(StationModel changedModel) {
+        if (layoutModel.getName().equals(changedModel.getName())) {
+            setLayoutModel(changedModel);
+        }
+
+    }
+
+
+    /**
+     *  The station model changed
+     */
+    private void handleStationModelChange() {
+        StationModel changedModel = null;
+        if (layoutModel != null) {
+            changedModel =
+                getControlContext().getStationModelManager().getStationModel(
+                    layoutModel.getName());
+        }
+        if (changedModel != null) {
+            if (changedModel != layoutModel) {
+                setLayoutModel(changedModel);
+            }
+            return;
+        }
+        setLayoutModel(getControlContext().getStationModelManager()
+            .getDefaultStationModel());
+    }
+
+
+    /**
+     * Listen for DisplayEvents
+     *
+     * @param evt The event
+     */
+    public void handleDisplayChanged(DisplayEvent evt) {
+        try {
+            int        id         = evt.getId();
+            InputEvent inputEvent = evt.getInputEvent();
+            if (id == DisplayEvent.MAPS_CLEARED) {
+                setScaleOnLayout();
+            } else {
+                super.handleDisplayChanged(evt);
+            }
+        } catch (Exception e) {
+            logException("Handling display event changed", e);
+        }
+    }
+
+    /**
+     * Method to call if projection changes. This will reset the
+     * viewScape, bounds and llBounds held by this object and then
+     * load data
+     */
+    public void projectionChanged() {
+        super.projectionChanged();
         loadDataInThread();
     }
 
@@ -425,7 +511,7 @@ public class ValuePlanViewControl extends PlanViewControl {
     private StationModel makeLayoutModel() {
         StationModel layout = null;
 
-        String       name   = "Grid Value";
+        String       name   = "Grids>Grid Value";
         layout = getControlContext().getStationModelManager().getStationModel(
             name);
         if (layout == null) {

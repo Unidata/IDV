@@ -4874,8 +4874,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 }
                 if (cmd.equals(GuiUtils.CMD_OK)
                         || cmd.equals(GuiUtils.CMD_CANCEL)) {
-                    propertiesDialog.dispose();
-                    propertiesDialog = null;
+                    if (propertiesDialog != null) {
+                        propertiesDialog.dispose();
+                        propertiesDialog = null;
+                    }
                 }
             }
         };

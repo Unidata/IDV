@@ -647,7 +647,7 @@ public class AddePointDataChooser extends AddeChooser {
      * @return name of default station model
      */
     public String getDefaultStationModel() {
-        return "metar";
+        return "observations>metar";
     }
 
     /**

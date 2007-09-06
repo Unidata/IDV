@@ -93,6 +93,17 @@ example:
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
   <control
+     id="valuedisplay"
+     categories="GRID-*-*;"
+     class="ucar.unidata.idv.control.ValuePlanViewControl"
+     description="Value Plots"
+     label="Value Plots"
+     icon="/ucar/unidata/idv/images/planview.png"
+     displaycategory="Plan Views"
+     properties="windowVisible=true;">
+     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
+  <control
      id="imagecontrol"
      categories="RGBIMAGE"
      class="ucar.unidata.idv.control.ImageControl"
