@@ -24,6 +24,7 @@ package ucar.visad;
 
 
 
+
 import java.awt.geom.Rectangle2D;
 
 import java.io.*;
@@ -33,9 +34,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import ucar.visad.data.MapSet;
+
 import ucar.unidata.gis.shapefile.DbaseFile;
 import ucar.unidata.gis.GisFeature;
 import ucar.unidata.gis.shapefile.EsriShapefile;
+
+
+
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.StringUtil;
@@ -44,6 +50,8 @@ import ucar.unidata.xml.XmlUtil;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+
 
 import visad.*;
 
@@ -292,7 +300,7 @@ public class ShapefileAdapter {
      * @throws VisADException
      */
     public ShapefileAdapter(EsriShapefile shapefile) throws VisADException {
-        makeSet(doRead(shapefile));
+        mapLines = makeSet(doRead(shapefile));
     }
 
 
@@ -336,7 +344,7 @@ public class ShapefileAdapter {
                 }
                 sets = doRead(new EsriShapefile(iStream, bBox, coarseness));
             }
-            makeSet(sets);
+            mapLines = makeSet(sets);
         } catch (Exception exc) {
             exc.printStackTrace();
         }
@@ -351,19 +359,21 @@ public class ShapefileAdapter {
      *
      * @throws VisADException On badness
      */
-    private void makeSet(List sets) throws VisADException {
+    public static UnionSet makeSet(List sets) throws VisADException {
         if (sets == null) {
-            return;
+            return null;
         }
         SampledSet[] ss = new SampledSet[sets.size()];
         System.arraycopy(sets.toArray(), 0, ss, 0, sets.size());
         if (ss.length > 0) {
-            mapLines = new UnionSet(ss[0].getType(), ss, null, null, null,
+            return new UnionSet(ss[0].getType(), ss, null, null, null,
                                     false);
         } else {
-            mapLines = null;
+            return null;
         }
     }
+
+
 
 
     /**
@@ -399,7 +409,6 @@ public class ShapefileAdapter {
                     Misc.parseDoubles(XmlUtil.getAttribute(child,
                                                            ATTR_POINTS));
 
-
                 if(XmlUtil.hasAttribute(child,"coordtype")) {
                     String coord = XmlUtil.getAttribute(child,"coordtype");
                     if(!coord.startsWith("LATLON")) continue;
@@ -421,12 +430,13 @@ public class ShapefileAdapter {
                     part[1][ptIdx] = (float) points[ptIdx * 2];
                     part[0][ptIdx] = (float) points[ptIdx * 2 + 1];
                 }
-                sets.add(new Gridded2DSet(coordMathType, part,
-                                          points.length / 2,
-                                          (CoordinateSystem) null,
-                                          (Unit[]) null,
-                                          (ErrorEstimate[]) null,
-                                          false /* no copy */));
+                MapSet mapSet = new MapSet(coordMathType, part,
+                                           points.length / 2,
+                                           (CoordinateSystem) null,
+                                           (Unit[]) null,
+                                           (ErrorEstimate[]) null,
+                                           false /* no copy */);
+                sets.add(mapSet);
             }
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -483,7 +493,7 @@ public class ShapefileAdapter {
                 part[1][ptIdx] = (float) points[ptIdx * 2];
                 part[0][ptIdx] = (float) points[ptIdx * 2 + 1];
             }
-            sets.add(new Gridded2DSet(coordMathType, part,
+            sets.add(new MapSet(coordMathType, part,
                                       points.length / 2,
                                       (CoordinateSystem) null,
                                       (Unit[]) null,
@@ -529,7 +539,7 @@ public class ShapefileAdapter {
                     part[0][ptIdx] = (float) points[ptIdx * 2 + 1];
                 }
                 xcnt++;
-                sets.add(new Gridded2DSet(coordMathType, part,
+                sets.add(new MapSet(coordMathType, part,
                                           points.length / 2,
                                           (CoordinateSystem) null,
                                           (Unit[]) null,
