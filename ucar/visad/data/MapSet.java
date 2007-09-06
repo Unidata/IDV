@@ -34,6 +34,7 @@ import visad.util.DataUtility;
 
 
 import java.util.Hashtable;
+import java.util.List;
 
 import java.rmi.RemoteException;
 
@@ -48,6 +49,7 @@ public class MapSet extends Gridded2DSet {
 
     private Hashtable properties;
 
+    private List propertyNames;
 
     /**
      * Create a new CachedFlatField
@@ -64,6 +66,14 @@ public class MapSet extends Gridded2DSet {
         super(type, points,numPoints,cs,units,errors,copy);
     }
 
+
+    public void setPropertyNames(List names) {
+        propertyNames = names;
+    }
+
+    public List getPropertyNames() {
+        return propertyNames;
+    }
 
     public Hashtable getProperties() {
         return properties;
