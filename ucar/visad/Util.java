@@ -23,10 +23,8 @@
 
 
 
+
 package ucar.visad;
-
-
-import ucar.visad.data.*;
 
 
 import ucar.unidata.geoloc.Bearing;
@@ -37,6 +35,9 @@ import ucar.unidata.util.FileManager;
 
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.TwoFacedObject;
+
+
+import ucar.visad.data.*;
 
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.Length;
@@ -3071,5 +3072,50 @@ public final class Util {
         Plain p = new Plain();
         p.save(filename, data, true);
     }
+
+
+
+    /**
+     * _more_
+     *
+     * @param lon1 _more_
+     * @param lon2 _more_
+     * @param length1 _more_
+     * @param lat1 _more_
+     * @param lat2 _more_
+     * @param length2 _more_
+     * @param fill _more_
+     * @param unitString _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static FlatField makeField(float lon1, float lon2, int length1,
+                                      float lat1, float lat2, int length2,
+                                      float fill, String unitString)
+            throws VisADException, RemoteException {
+        Unit unit = parseUnit(unitString);
+        FunctionType type =
+            new FunctionType(RealTupleType.SpatialEarth2DTuple,
+                             getRealType(unit));
+        Linear2DSet domain = new Linear2DSet(type.getDomain(), lon1, lon2,
+                                             length1, lat1, lat2, length2);
+
+        FlatField field = new FlatField(type, domain);
+        float[][] data  = new float[1][length1 * length2];
+        for (int i = 0; i < length1; i++) {
+            for (int j = 0; j < length2; j++) {
+                data[0][i + length1 * j] = fill;
+            }
+        }
+        field.setSamples(data, false);
+        return field;
+
+
+    }
+
+
 }
 
