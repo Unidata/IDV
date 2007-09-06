@@ -44,6 +44,7 @@ gen::defineMacro {<%idv.website%>} ${::workshopDocroot}
 gen::defineMacro {<%workshop.title%>} "$::workshopTitle for version <%idv.version%>"
 
 set ::forDevWorkshop 0
+set ::forRegionalWorkshop 0
 
 proc gen::hook::parseArgs {argv arg i} {
     if {$arg == "-fordev"} {
@@ -51,6 +52,18 @@ proc gen::hook::parseArgs {argv arg i} {
         gen::setIndexFile   dev.index
         set ::workshopTitle {Unidata IDV Developer's Workshop}
         gen::define flag_developerworkshop 
+        return $i
+    }
+    puts "Unknown argument: $arg"
+    gen::usage
+    set i
+}
+
+proc gen::hook::parseArgs {argv arg i} {
+    if {$arg == "-forreg"} {
+        set ::forRegionalWorkshop 1
+        gen::setIndexFile   regional.index
+        set ::workshopTitle {Regional Unidata IDV Workshop}
         return $i
     }
     puts "Unknown argument: $arg"

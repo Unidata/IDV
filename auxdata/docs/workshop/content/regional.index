@@ -1,10 +1,14 @@
 
-index.html
+#index.html
+title:2007 Unidata Regional IDV Training Workshop at OU:This is an abbreviated version of the IDV training workshop intended to give users an overview of IDV capabilities and functionality.
 
 >installandstart/Start.html
 >>installandstart/FirstStart.html
 >>installandstart/basics/index.html
 >>>installandstart/basics/GettingStarted.html
+>>>datadisplays/selection/DisplayControl.html
+>>>datadisplays/selection/Legends.html
+>>>datadisplays/selection/TimeAnimation.html
 >>>installandstart/basics/Navigation.html
 >>>installandstart/basics/MainMenu.html
 >>>installandstart/basics/ViewManagerMenus.html
@@ -12,7 +16,7 @@ index.html
 >>>resources/ProjectionManager.html
 >>>resources/Preferences.html
 >>>installandstart/basics/Exiting.html
->>>installandstart/WebStart.html
++>>>installandstart/WebStart.html
 
 |installandstart/basics/MouseAndKeyboard.html
 |installandstart/basics/MapSelector.html
@@ -24,9 +28,6 @@ index.html
 >>datadisplays/selection/index.html
 >>>datadisplays/selection/DataSourceChooser.html
 >>>datadisplays/selection/FieldSelector.html
->>>datadisplays/selection/DisplayControl.html
->>>datadisplays/selection/Legends.html
->>>datadisplays/selection/TimeAnimation.html
 |datadisplays/selection/TimeAnimationWidget.html
 
 
@@ -36,9 +37,9 @@ index.html
 >>>datadisplays/grid/Isosurfaces.html
 >>>datadisplays/grid/CrossSections.html
 >>>datadisplays/grid/Probes.html
->>>datadisplays/grid/Probes2.html
++>>>datadisplays/grid/Probes2.html
 >>>datadisplays/grid/VectorDisplays.html
->>>datadisplays/grid/LargeGrids.html
++>>>datadisplays/grid/LargeGrids.html
 >>>datadisplays/grid/DoingMoreWithGrids.html
 
 >>datadisplays/imagery/index.html
@@ -87,15 +88,15 @@ index.html
 +>>>datadisplays/upperair/UsingSoundingDisplays.html
 
 
->>title:Transect Views
->>>datadisplays/transect/TransectDisplay.html
->>>datadisplays/transect/TransectDisplay2.html
->>>datadisplays/transect/TransectDisplay3.html
->>>datadisplays/transect/DemInTransect.html
++>>title:Transect Views
++>>>datadisplays/transect/TransectDisplay.html
++>>>datadisplays/transect/TransectDisplay2.html
++>>>datadisplays/transect/TransectDisplay3.html
++>>>datadisplays/transect/DemInTransect.html
 
->>title:Trajectory Data:The IDV supports a variety of aircraft track data and displays.
->>>datadisplays/trajectory/Tracks.html
->>>datadisplays/trajectory/PointDisplay.html
++>>title:Trajectory Data:The IDV supports a variety of aircraft track data and displays.
++>>>datadisplays/trajectory/Tracks.html
++>>>datadisplays/trajectory/PointDisplay.html
 ##>>>datadisplays/trajectory/TracksInTransect.html
 
 
@@ -104,9 +105,9 @@ index.html
 ##>>>datadisplays/gis/WMS2.html
 >>>datadisplays/gis/Shapefile.html
 >>>datadisplays/gis/Locations.html
->>>datadisplays/gis/WorldWind.html
->>>datadisplays/gis/DEM.html
->>>datadisplays/gis/DoingMoreGis.html
++>>>datadisplays/gis/WorldWind.html
++>>>datadisplays/gis/DEM.html
++>>>datadisplays/gis/DoingMoreGis.html
 >>>datadisplays/misc/Drawing1.html
 >>>datadisplays/misc/Drawing2.html
 >>>datadisplays/misc/GeoLocatedImage.html
@@ -182,67 +183,67 @@ index.html
 >>>title: Image Movie Format::[gen::include ../../userguide/content/data/ImageMovie.html]
 >>>title: Performance Tuning::[gen::include ../../userguide/content/misc/PerformanceTuning.html]
 
->installandstart/Install.html
->>installandstart/Download.html
->>installandstart/Installer.html
+>>installandstart/Install.html
+>>>installandstart/Download.html
+>>>installandstart/Installer.html
 
->dev/index.html
-
->>title: Development Environment
->>>advanced/SourceBuild.html
->>>dev/src/Overview.html
->>>dev/src/Lib.html
->>>dev/src/Auxdata.html
->>>title: Building with Ant::[gen::include advanced/SourceBuild.html antbuild]
->>>dev/src/ExampleIdv.html
-
-
->>dev/arch/index.html
->>>dev/arch/CoreIdv.html
->>>dev/arch/Managers.html
->>>dev/arch/MajorComponents.html
->>>dev/arch/Overview.html
-
->>>dev/arch/DataSources.html
->>>dev/arch/DataChoices.html
->>>title:Data Flow::[ht::cimg dev/arch/images/DataFlow.jpg -caption {Data Flow}]
-##>>title: JEFF - TBD - Current Display Controls
-##>>title: JEFF - TBD - Putting it all Together
-
->>title:IDV Startup
->>>dev/InitializationAndProperties.html
--dev/idv.properties.txt
->>>installandstart/CommandLineArguments.html
->>>dev/ExampleArgsManager.html
->>>dev/Resources.html
-
-
->>title:IDV User Interfaces
->>>dev/ui/XmlUi.html
->>>dev/ui/IdvSkins.html
->>>dev/ui/ExampleUIManager.html
->>>dev/ui/ExampleMenubar.html
--dev/ui/*.xml
-
-
->>title: Data Choosers
->>>dev/data/DataChooser.html
--dev/data/choosers.xml.txt
->>>dev/data/WxTextDataChooser.html
-
->>title: Data Sources 
->>>dev/data/DataSource.html
--dev/data/datasource.xml.txt
->>>dev/data/VisADDataModel.html
->>>dev/data/WxTextDataSource.html
-
->>title: Display controls
->>>dev/data/DisplayControls.html
--dev/data/controls.xml.txt
->>>dev/data/VisADDisplayModel.html
->>>dev/data/ExampleDisplayControl.html
-
-
->>title: Miscellaneous
->>>dev/XmlEncoder.html
->>>title: TBD Jython Display Control
+#>dev/index.html
+#
+#>>title: Development Environment
+#>>>advanced/SourceBuild.html
+#>>>dev/src/Overview.html
+#>>>dev/src/Lib.html
+#>>>dev/src/Auxdata.html
+#>>>title: Building with Ant::[gen::include advanced/SourceBuild.html antbuild]
+#>>>dev/src/ExampleIdv.html
+#
+#
+#>>dev/arch/index.html
+#>>>dev/arch/CoreIdv.html
+#>>>dev/arch/Managers.html
+#>>>dev/arch/MajorComponents.html
+#>>>dev/arch/Overview.html
+#
+#>>>dev/arch/DataSources.html
+#>>>dev/arch/DataChoices.html
+#>>>title:Data Flow::[ht::cimg dev/arch/images/DataFlow.jpg -caption {Data Flow}]
+###>>title: JEFF - TBD - Current Display Controls
+###>>title: JEFF - TBD - Putting it all Together
+#
+#>>title:IDV Startup
+#>>>dev/InitializationAndProperties.html
+#-dev/idv.properties.txt
+#>>>installandstart/CommandLineArguments.html
+#>>>dev/ExampleArgsManager.html
+#>>>dev/Resources.html
+#
+#
+#>>title:IDV User Interfaces
+#>>>dev/ui/XmlUi.html
+#>>>dev/ui/IdvSkins.html
+#>>>dev/ui/ExampleUIManager.html
+#>>>dev/ui/ExampleMenubar.html
+#-dev/ui/*.xml
+#
+#
+#>>title: Data Choosers
+#>>>dev/data/DataChooser.html
+#-dev/data/choosers.xml.txt
+#>>>dev/data/WxTextDataChooser.html
+#
+#>>title: Data Sources 
+#>>>dev/data/DataSource.html
+#-dev/data/datasource.xml.txt
+#>>>dev/data/VisADDataModel.html
+#>>>dev/data/WxTextDataSource.html
+#
+#>>title: Display controls
+#>>>dev/data/DisplayControls.html
+#-dev/data/controls.xml.txt
+#>>>dev/data/VisADDisplayModel.html
+#>>>dev/data/ExampleDisplayControl.html
+#
+#
+#>>title: Miscellaneous
+#>>>dev/XmlEncoder.html
+#>>>title: TBD Jython Display Control
