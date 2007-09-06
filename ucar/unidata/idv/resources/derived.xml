@@ -488,7 +488,7 @@ or
          childidx="0"/>
       <category value="GRID-2D-*"/>
       <category value="GRID-3D-*"/>
-      <category display="true" value="System"/>
+      <category display="true" value="Grids"/>
     </categories>
     <operands categories="GRID-2D-*;GRID-3D-*;">
       <paramgroup name="u_and_v"/>
@@ -508,7 +508,7 @@ or
          childidx="0"/>
       <category value="GRID-2D-*"/>
       <category value="GRID-3D-*"/>
-      <category display="true" value="System"/>
+      <category display="true" value="Grids"/>
     </categories>
     <operands categories="GRID-2D-*;GRID-3D-*;">
       <paramgroup name="u_and_v"/>

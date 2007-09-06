@@ -122,3 +122,11 @@ def filterMaps(mapData, propName,operator,value):
 
 	return ShapefileAdapter.makeSet(goodOnes);
 
+
+
+
+def makeFieldFromMapBounds(mapSet, length1, length2, fill, unit):
+    low = mapSet.getLow();
+    hi = mapSet.getHi();
+    return Util.makeField(low[0],hi[0],int(length1),low[1],hi[1],int(length2), float(fill),unit);
+
