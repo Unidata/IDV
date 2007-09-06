@@ -7,20 +7,20 @@
 import ucar.unidata.data.grid.GridUtil as gu
 
 
-def  subsetFromMap(field, map, fillValue=java.lang.Float.NaN,inverse=0,latLonCanChangeWithTime=1):
+def  subsetFromMap(field, mapSets, fillValue=java.lang.Float.NaN,inverse=0):
 ##Iterate on each time step
     if (gu.isTimeSequence(field)):
         newData = field.clone()
         for timeStep in range(field.getDomainSet().getLength()):
-            rangeObject = subsetRangeFromMap(field.getSample(timeStep), timeStep, map, fillValue, inverse); 
+            rangeObject = subsetRangeFromMap(field.getSample(timeStep), timeStep, mapSets, fillValue, inverse); 
             newData.setSample(timeStep,rangeObject)
         return newData
     return subsetRangeFromMap(field, 0, map, fillValue, inverse);    
 
 
-def  subsetRangeFromMap(range, timeStep, map, fillValue=java.lang.Float.NaN,inverse=0):
+def  subsetRangeFromMap(range, timeStep, mapSets, fillValue=java.lang.Float.NaN,inverse=0):
     rangeObject = range.clone()
-    indices = gu.findContainedIndices(rangeObject.getDomainSet(), map);
+    indices = gu.findContainedIndices(rangeObject.getDomainSet(), mapSets);
     originalValues = rangeObject.getFloats(0)
     if(inverse):
         newValues = originalValues;
@@ -42,20 +42,20 @@ def  subsetRangeFromMap(range, timeStep, map, fillValue=java.lang.Float.NaN,inve
 
 
 
-def  averageFromMap(field, map,latLonCanChangeWithTime=1):
+def  averageFromMap(field, mapSets):
     if (gu.isTimeSequence(field)):
         newData = field.clone()
         for timeStep in range(field.getDomainSet().getLength()):
-            rangeObject = averageRangeFromMap(field.getSample(timeStep), timeStep, map);
+            rangeObject = averageRangeFromMap(field.getSample(timeStep), timeStep, mapSets);
             newData.setSample(timeStep,rangeObject)
         return newData
     else:   
-        averageRangeFromMap(field,0, map);        
+        averageRangeFromMap(field,0, mapSets);        
 
 
-def  averageRangeFromMap(range, timeStep, map):
+def  averageRangeFromMap(range, timeStep, mapSets):
     rangeObject = range.clone()
-    indices = gu.findContainedIndices(rangeObject.getDomainSet(), map);
+    indices = gu.findContainedIndices(rangeObject.getDomainSet(), mapSets);
     originalValues = rangeObject.getFloats(0)
     newValues = makeFloatArray(len(originalValues), len(originalValues[0]), java.lang.Float.NaN);
     totals = {};
@@ -79,25 +79,24 @@ def  averageRangeFromMap(range, timeStep, map):
 
 
 
-
 ## Get the named property from the given mapData
-def getMapProperty(mapData, propName):
+def getMapProperty(polygon, propName):
         from ucar.visad.data import MapSet
-	if(isinstance(mapData, MapSet)):
-		return mapData.getProperty(propName);
+	if(isinstance(polygon, MapSet)):
+            return polygon.getProperty(propName);
 	return None;
 
 
 #Return a new set of maps that have the given property value
-def getMapsWithProperty(mapData, propName,value):
-	return filterMaps(mapData, propName, '==', value);
+def getMapsWithProperty(mapSets, propName,value):
+	return filterMaps(mapSets, propName, '==', value);
 
 
-def filterMaps(mapData, propName,operator,value):
+def filterMaps(mapSets, propName,operator,value):
         from ucar.visad import ShapefileAdapter
         from ucar.unidata.util import StringUtil
 	goodOnes = java.util.ArrayList();
-	sets = mapData.getSets();
+	sets = mapSets.getSets();
         for mapIdx in xrange(len(sets)):
 		mapValue =  getMapProperty(sets[mapIdx],propName);
 		if(mapValue == None): 
@@ -125,8 +124,41 @@ def filterMaps(mapData, propName,operator,value):
 
 
 
-def makeFieldFromMapBounds(mapSet, length1, length2, fill, unit):
-    low = mapSet.getLow();
-    hi = mapSet.getHi();
+def makeFieldFromMapBounds(mapSets, length1, length2, fill, unit):
+    low = mapSets.getLow();
+    hi = mapSets.getHi();
     return Util.makeField(low[0],hi[0],int(length1),low[1],hi[1],int(length2), float(fill),unit);
 
+
+
+
+
+def  subsetWithProperty(field, mapSets):
+    if (gu.isTimeSequence(field)):
+        newData = field.clone()
+        for timeStep in range(field.getDomainSet().getLength()):
+            rangeObject = subsetRangeWithProperty(field.getSample(timeStep), mapSets);
+            newData.setSample(timeStep,rangeObject)
+        return newData
+    return subsetRangeWithProperty(field, mapSets);
+
+
+
+def  subsetRangeWithProperty(range, mapSets):
+    rangeObject = range.clone()
+    indices = gu.findContainedIndices(rangeObject.getDomainSet(), mapSets);
+    originalValues = rangeObject.getFloats(0)
+    newValues = makeFloatArray(len(originalValues), len(originalValues[0]), java.lang.Float.NaN);
+    polygons   = mapSets.getSets();
+    for mapIdx in xrange(len(indices)):
+        polygon =polygons[mapIdx]
+        value = getMapProperty(polygon, 'LENGTH');
+        print value
+        indexArray = indices[mapIdx]
+        for j in xrange(len(indexArray)):
+            if(value==None):
+                 newValues[0][indexArray[j]] = originalValues[0][indexArray[j]];
+            else:
+                newValues[0][indexArray[j]] = float(value);
+    rangeObject.setSamples(newValues)
+    return rangeObject;
