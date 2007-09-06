@@ -24,7 +24,6 @@ package ucar.visad;
 
 
 
-
 import java.awt.geom.Rectangle2D;
 
 import java.io.*;
@@ -40,6 +39,7 @@ import ucar.unidata.gis.shapefile.DbaseFile;
 import ucar.unidata.gis.GisFeature;
 import ucar.unidata.gis.shapefile.EsriShapefile;
 
+import ucar.unidata.idv.control.drawing.ShapeGlyph;
 
 
 
@@ -398,16 +398,27 @@ public class ShapefileAdapter {
             NodeList elements = XmlUtil.getElements(root);
             for (int i = 0; i < elements.getLength(); i++) {
                 Element child = (Element) elements.item(i);
-                if ( !child.getTagName().equals(TAG_POLYGON)) {
-                    if(true)
+                if(!XmlUtil.hasAttribute(child, ATTR_POINTS)) {
                     continue;
-                    throw new IllegalArgumentException("Unknown tag name:"
-                                                       + child.getTagName());
                 }
-
                 double[] points =
                     Misc.parseDoubles(XmlUtil.getAttribute(child,
                                                            ATTR_POINTS));
+
+
+                boolean isRect  = false;
+                if (!child.getTagName().equals(TAG_POLYGON)) {
+                    if (child.getTagName().equals(ShapeGlyph.TAG_SHAPE)) {
+                        if(XmlUtil.getAttribute(child, ShapeGlyph.ATTR_SHAPETYPE).toLowerCase().equals("rectangle")) {
+                            isRect = true;
+                        } else {
+                            continue;
+                        }
+                    } else {
+                        continue;
+                    }
+                }
+
 
                 if(XmlUtil.hasAttribute(child,"coordtype")) {
                     String coord = XmlUtil.getAttribute(child,"coordtype");
@@ -430,8 +441,13 @@ public class ShapefileAdapter {
                     part[1][ptIdx] = (float) points[ptIdx * 2];
                     part[0][ptIdx] = (float) points[ptIdx * 2 + 1];
                 }
+
+                if(isRect) {
+                    part = ShapeGlyph.makeRectangle(part);
+                }
+
                 MapSet mapSet = new MapSet(coordMathType, part,
-                                           points.length / 2,
+                                           part[0].length,
                                            (CoordinateSystem) null,
                                            (Unit[]) null,
                                            (ErrorEstimate[]) null,
