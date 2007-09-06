@@ -6,7 +6,6 @@
 ##Define the index file we are using if we aren't using the default (main.index) filename
 gen::setIndexFile   main.index
 
-
 ##Where is the userguide located at
 ##TODO: Set this to point to the right place
 set ::workshopDocroot http://www.unidata.ucar.edu/software/idv/release/nightly
@@ -18,59 +17,38 @@ set ::workshopTitle {Unidata IDV Workshop}
 ##The  home directory of the workshop account. We use this var in the macro and in the ht::save routine
 set ::workshopHome /home/idv
 
-##The  home directory of the workshop account
-gen::defineMacro {<%workshop.homedir%>} $::workshopHome
-
-##The  installed directory of the IDV account
-gen::defineMacro {<%workshop.installdir%>} "$::workshopHome/metapps"
+##The installation directory of the  IDV
+set ::idvInstall /home/idv
 
 ##Where on the filesystem do we find the data files.
 gen::defineMacro {<%workshop.datadir%>} {/data/idv}
 
-##Where on the filesystem do we find the data files.
-set ::workshopexampledir ${::workshopHome}/metapps/ucar/unidata/apps/example
-gen::defineMacro {<%workshop.exampledir%>} $::workshopexampledir
-
 ##We use this for referencing download file names
 gen::defineMacro {<%idv.version%>} {2.3}
 
+##The installed directory of the source
+gen::defineMacro {<%workshop.installdir%>} "$::workshopHome/idv"
+
+##The  home directory of the workshop account
+gen::defineMacro {<%workshop.homedir%>} $::workshopHome
+
+##The  home directory of the workshop account
+gen::defineMacro {<%workshop.idvinstall%>} $::idvInstall
 
 ##The sitepath to use - where to find resources, etc.
 gen::defineMacro {<%workshop.sitepath%>} ${::workshopDocroot}/data
 gen::defineMacro {<%idv.website%>} ${::workshopDocroot}
 
+##The installed directory of the source
+gen::defineMacro {<%workshop.installdir%>} "$::workshopHome/idv"
+
+##Where on the filesystem do we find the data files.
+set ::workshopexampledir ${::workshopHome}/idv/ucar/unidata/apps/example
+gen::defineMacro {<%workshop.exampledir%>} $::workshopexampledir
+
 
 ##Add the page title macro
 gen::defineMacro {<%workshop.title%>} "$::workshopTitle for version <%idv.version%>"
-
-set ::forDevWorkshop 0
-set ::forRegionalWorkshop 0
-
-proc gen::hook::parseArgs {argv arg i} {
-    if {$arg == "-fordev"} {
-        set ::forDevWorkshop 1
-        gen::setIndexFile   dev.index
-        set ::workshopTitle {Unidata IDV Developer's Workshop}
-        gen::define flag_developerworkshop 
-        return $i
-    }
-    puts "Unknown argument: $arg"
-    gen::usage
-    set i
-}
-
-proc gen::hook::parseArgs {argv arg i} {
-    if {$arg == "-forreg"} {
-        set ::forRegionalWorkshop 1
-        gen::setIndexFile   regional.index
-        set ::workshopTitle {Regional Unidata IDV Workshop}
-        return $i
-    }
-    puts "Unknown argument: $arg"
-    gen::usage
-    set i
-}
-
 
 ##Assuming we are in the auxdata/docs/userguide/content directory
 ##read in the version.properties file in
@@ -97,12 +75,49 @@ catch {
 } err
 
 
+set ::forDevWorkshop 0
+set ::forRegionalWorkshop 0
+
+proc gen::hook::parseArgs {argv arg i} {
+    if {$arg == "-fordev"} {
+        set ::forDevWorkshop 1
+        gen::setIndexFile   dev.index
+        set ::workshopTitle {Unidata IDV Developer's Workshop}
+        gen::define flag_developerworkshop 
+        return $i
+    }
+    puts "Unknown argument: $arg"
+    gen::usage
+    set i
+}
+
+proc gen::hook::parseArgs {argv arg i} {
+    if {$arg == "-forreg"} {
+        set ::forRegionalWorkshop 1
+        gen::setIndexFile   regional.index
+        set ::workshopTitle {Regional Unidata IDV Workshop}
+        gen::defineMacro {<%idv.version%>} {2.3}
+        set ::workshopDocroot http://www.unidata.ucar.edu/software/idv/regionalworkshop
+        set ::workshopHome /home/idvclassNN
+        gen::defineMacro {<%workshop.installdir%>} "$::workshopHome/idv"
+        gen::defineMacro {<%workshop.homedir%>} $::workshopHome
+        gen::defineMacro {<%workshop.idvinstall%>} /usr/local
+        gen::defineMacro {<%workshop.datadir%>} {/archive/workshops/unidata/idv}
+        gen::defineMacro {<%workshop.sitepath%>} ${::workshopDocroot}/data
+        gen::defineMacro {<%idv.website%>} ${::workshopDocroot}
+
+        return $i
+    }
+    puts "Unknown argument: $arg"
+    gen::usage
+    set i
+}
+
 
 
 ###############################################################
 ## You probably don't need to change anything below here
 ###############################################################
-
 
 ##When we generate the all.html file what is the filename we use
 gen::setAllFileName "workshop.html"
