@@ -1055,7 +1055,7 @@ proc gen::walkTree {indexFile {parent ""}} {
 
             ##Check for the title>filename syntax
             if {[regexp {^(.*)>(.*)$} $title match title fileName]} {
-                puts "Got filename"
+            #    puts "Got filename: $fileName"
             }
 
 
