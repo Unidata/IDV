@@ -28,6 +28,8 @@ package ucar.unidata.gis;
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
 
+import ucar.visad.data.MapSet;
+
 import visad.CoordinateSystem;
 import visad.ErrorEstimate;
 import visad.Gridded2DSet;
@@ -238,7 +240,7 @@ public abstract class AbstractGisFeature implements GisFeature {
                     part[0][i] = (float) xx[i];
                     part[1][i] = (float) yy[i];
                 }
-                latLonLines[iP++] = new Gridded2DSet(coordMathType, part, np,
+                latLonLines[iP++] = new MapSet(coordMathType, part, np,
                         (CoordinateSystem) null, (Unit[]) null,
                         (ErrorEstimate[]) null, false);  // no copy
             }
