@@ -38,10 +38,12 @@ import ucar.unidata.ui.TableSorter;
 import ucar.unidata.ui.TwoListPanel;
 
 import ucar.unidata.util.FileManager;
+import ucar.unidata.util.Misc;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 
 import ucar.visad.display.LineDrawing;
+import ucar.visad.data.MapSet;
 
 
 
@@ -120,7 +122,6 @@ public class ShapefileControl extends DisplayControlImpl {
     /** The dialog window that shows the field selector panel */
     private JDialog uniqueWindow;
 
-
     /** This is the original, unfiltered data */
     private Data mainData;
 
@@ -132,6 +133,10 @@ public class ShapefileControl extends DisplayControlImpl {
 
     /** The db file. May be null if there was no dbf file */
     private DbaseFile dbFile;
+    private String []fieldNames;
+
+    private MapSet []mapSets;
+    private boolean hasProperties = false;
 
     /** Does each row pass through the filters. */
     boolean[] passTheFilter;
@@ -202,36 +207,11 @@ public class ShapefileControl extends DisplayControlImpl {
     protected Container doMakeContents()
             throws VisADException, RemoteException {
         JComponent mainContents = (JComponent) super.doMakeContents();
-        if (dbFile == null) {
+        if (!hasProperties) {
             return mainContents;
         }
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.add("Display", GuiUtils.topLeft(mainContents));
-
-
-
-        int  numFields = dbFile.getNumFields();
-        List comps     = new ArrayList();
-        for (int i = 0; i < numFields; i++) {
-            DbaseData field = dbFile.getField(i);
-            JLabel    lbl   = new JLabel(dbFile.getFieldName(i));
-            comps.add(lbl);
-            String type;
-            if (field.getType() == DbaseData.TYPE_CHAR) {
-                type = "String";
-            } else if (field.getType() == DbaseData.TYPE_NUMERIC) {
-                type = "Numeric";
-            } else {
-                type = "Boolean";
-            }
-            comps.add(new JLabel(type));
-        }
-        JPanel innerPanel = GuiUtils.doLayout(comps, 2, GuiUtils.WT_NN,
-                                GuiUtils.WT_N);
-        JScrollPane sp = GuiUtils.makeScrollPane(innerPanel, 400, 200);
-        sp.setPreferredSize(new Dimension(450, 200));
-        JPanel attrPanel = GuiUtils.center(sp);
-        //        tabbedPane.add("Attributes", attrPanel);
         tabbedPane.add("Filters", makeFilterGui());
         tabbedPane.add("Table", doMakeTable());
         return tabbedPane;
@@ -362,7 +342,7 @@ public class ShapefileControl extends DisplayControlImpl {
 
         super.getSaveMenuItems(items, forMenuBar);
         List l = new ArrayList();
-        if (dbFile != null) {
+        if (hasProperties) {
             l.add(GuiUtils.makeMenuItem("Export Table...", this,
                                         "exportTable"));
         }
@@ -394,16 +374,15 @@ public class ShapefileControl extends DisplayControlImpl {
         }
         tableCols = new ArrayList();
         colNames  = new ArrayList();
-        int       numFields  = dbFile.getNumFields();
-        int       numRecords = dbFile.getNumRecords();
+        int       numRecords = mapSets.length;
         List      comps      = new ArrayList();
 
         boolean[] unique     = null;
         if (uniqueFields.size() > 0) {
             unique = new boolean[numRecords];
             Arrays.fill(unique, true);
-            for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
-                String fieldName = dbFile.getFieldName(fieldIdx);
+            for (int fieldIdx = 0; fieldIdx < fieldNames.length; fieldIdx++) {
+                String fieldName = fieldNames[fieldIdx];
                 if ( !uniqueFields.contains(fieldName)
                         || ((selectedFields.size() > 0)
                             && !selectedFields.contains(fieldName))) {
@@ -427,8 +406,8 @@ public class ShapefileControl extends DisplayControlImpl {
         }
 
 
-        for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
-            String fieldName = dbFile.getFieldName(fieldIdx);
+        for (int fieldIdx = 0; fieldIdx < fieldNames.length; fieldIdx++) {
+            String fieldName = fieldNames[fieldIdx];
             if ((selectedFields.size() > 0)
                     && !selectedFields.contains(fieldName)) {
                 continue;
@@ -460,11 +439,9 @@ public class ShapefileControl extends DisplayControlImpl {
      */
     private JComponent doMakeTable() {
 
-        int  numFields = dbFile.getNumFields();
         List comps     = new ArrayList();
-
-        for (int i = 0; i < numFields; i++) {
-            allFields.add(dbFile.getFieldName(i));
+        for (int fieldIdx = 0; fieldIdx < fieldNames.length; fieldIdx++) {
+            allFields.add(fieldNames[fieldIdx]);
         }
 
 
@@ -595,10 +572,7 @@ public class ShapefileControl extends DisplayControlImpl {
         }
         try {
             StringBuffer sb      = new StringBuffer("<shapes>\n");
-            SampledSet   theData = (SampledSet) mainData;
-            if (dbFile != null) {
-                theData = applyFilters(theData);
-            }
+            SampledSet   theData = (SampledSet) applyFilters(mainData);
             getShapesXml(theData, sb);
             sb.append("</shapes>\n");
             IOUtil.writeFile(filename, sb.toString());
@@ -616,9 +590,8 @@ public class ShapefileControl extends DisplayControlImpl {
      */
     private JComponent makeFilterGui() {
         List filterNames = new ArrayList();
-        int  numFields   = dbFile.getNumFields();
-        for (int i = 0; i < numFields; i++) {
-            filterNames.add(dbFile.getFieldName(i));
+        for (int fieldIdx = 0; fieldIdx < fieldNames.length; fieldIdx++) {
+            filterNames.add(fieldNames[fieldIdx]);
         }
         filterGui = new PropertyFilter.FilterGui(filters, filterNames,
                 filtersEnabled, matchAll);
@@ -649,6 +622,8 @@ public class ShapefileControl extends DisplayControlImpl {
      * @return Return the new set
      */
     private Data applyFilters(Data data) {
+        if(!hasProperties) return data;
+
         Data d = data;
         if (passTheFilter != null) {
             Arrays.fill(passTheFilter, true);
@@ -763,7 +738,7 @@ public class ShapefileControl extends DisplayControlImpl {
             filtersEnabled = filterGui.getEnabled();
         }
         Data theData = mainData;
-        if (dbFile != null) {
+        if (hasProperties) {
             theData = applyFilters(theData);
             populateTable();
         }
@@ -788,14 +763,29 @@ public class ShapefileControl extends DisplayControlImpl {
             return false;
         }
         mainData = getDataInstance().getData();
+        if(mainData == null) {
+            return false;
+        }
+        mapSets  =null;
+        hasProperties = false;
+        if(mainData instanceof UnionSet) {
+            SampledSet[] sets = ((UnionSet)mainData).getSets();
+            if(sets.length>0 && sets[0] instanceof MapSet) {
+                mapSets = (MapSet[]) Misc.toList(sets).toArray(new MapSet[sets.length]);
+                List names  = mapSets[0].getPropertyNames();
+                if(names!=null && names.size()>0) {
+                    hasProperties = true;
+                    fieldNames = (String[]) names.toArray(new String[names.size()]);
+                    passTheFilter = new boolean[mapSets.length];
+                    Arrays.fill(passTheFilter, true);
+                }
+            }
+        }
+
+
         Hashtable requestProperties = getRequestProperties();
         dbFile = (DbaseFile) requestProperties.get(
             ShapeFileDataSource.PROP_DBFILE);
-        if (dbFile != null) {
-            passTheFilter = new boolean[dbFile.getNumRecords()];
-            Arrays.fill(passTheFilter, true);
-        }
-
         setLineWidth(lineWidth);
         loadData();
         return true;
@@ -991,7 +981,6 @@ public class ShapefileControl extends DisplayControlImpl {
         try {
             SampledSet        projSet = null;
             Rectangle2D.Float rect    = null;
-
             if (mainData instanceof FieldImpl) {
                 FieldImpl fi = (FieldImpl) mainData;
                 if (GridUtil.isSequence(fi)) {
@@ -1011,7 +1000,6 @@ public class ShapefileControl extends DisplayControlImpl {
                         }
                     }
                 }
-
             } else if (mainData instanceof UnionSet) {
                 rect = getBounds(((UnionSet) mainData).getSets());
             } else if (mainData instanceof SampledSet) {
