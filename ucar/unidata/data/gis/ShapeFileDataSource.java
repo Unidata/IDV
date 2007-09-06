@@ -25,7 +25,9 @@ package ucar.unidata.data.gis;
 
 import ucar.unidata.data.*;
 
+import ucar.visad.data.MapSet;
 import ucar.unidata.gis.shapefile.DbaseFile;
+import ucar.unidata.gis.shapefile.DbaseData;
 
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.IOUtil;
@@ -254,6 +256,7 @@ public class ShapeFileDataSource extends FilesDataSource {
                     }
                 }
                 shapefileData = sfa.getData();
+                setProperties(shapefileData, dbFile);
             }
 
             if ((requestProperties != null) && (dbFile != null)) {
@@ -267,6 +270,31 @@ public class ShapeFileDataSource extends FilesDataSource {
     }
 
 
+    private void setProperties(Data shapefileData, DbaseFile dbFile) {
+        if(dbFile==null || shapefileData == null || !(shapefileData instanceof UnionSet)) {
+            return;
+        }
+        SampledSet[] sets       =((UnionSet)shapefileData).getSets();
+        if(sets.length ==0 ||!(sets[0] instanceof MapSet)) {
+            return;
+        }
+        int       numFields  = dbFile.getNumFields();
+        //        System.err.println("num map lines:" + sets.length);
+        for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
+            String fieldName = dbFile.getFieldName(fieldIdx);
+            DbaseData dbData    = dbFile.getField(fieldIdx);
+            List      values = dbData.asList();
+            if(values.size()!=sets.length) {
+                throw new IllegalArgumentException ("DBfile size:" + values.size() + " != number of map lines:" + sets.length);
+            }
+            for(int i=0;i<sets.length;i++) {
+                MapSet mapSet = (MapSet) sets[i];
+                mapSet.setProperty(fieldName, values.get(i));
+            }
+        }
+
+
+    }
 
 
     /**
