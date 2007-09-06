@@ -21,6 +21,9 @@
  */
 
 
+
+
+
 package ucar.unidata.data.grid;
 
 
@@ -3204,9 +3207,10 @@ public class GridUtil {
      *
      * @throws VisADException _more_
      */
-    public static int[][] findIndices(GriddedSet domain, UnionSet map)
+    public static int[][] findContainedIndices(GriddedSet domain,
+            UnionSet map)
             throws VisADException {
-        return findIndices(getEarthLocationPoints(domain), map);
+        return findContainedIndices(getLatLon(domain), map);
     }
 
 
@@ -3220,61 +3224,64 @@ public class GridUtil {
      *
      * @throws VisADException _more_
      */
-    public static int[][] findIndices(float[][] latlon, UnionSet map)
+    public static int[][] findContainedIndices(float[][] latlon, UnionSet map)
             throws VisADException {
-        long         t1         = System.currentTimeMillis();
-        SampledSet[] sets       = map.getSets();
-        List[]       indexLists = new List[sets.length];
-        List         lows       = new ArrayList();
-        List         highs      = new ArrayList();
-        List         pts        = new ArrayList();
+        long         t1          = System.currentTimeMillis();
+        SampledSet[] sets        = map.getSets();
+        List[]       indexLists  = new List[sets.length];
+        List         pts         = new ArrayList();
+        float[]      lonLow      = new float[sets.length];
+        float[]      lonHi       = new float[sets.length];
+        float[]      latLow      = new float[sets.length];
+        float[]      latHi       = new float[sets.length];
+
+        boolean      latLonOrder = isLatLonOrder(map);
         for (int j = 0; j < sets.length; j++) {
-            Gridded2DSet g = (Gridded2DSet) sets[j];
-            lows.add(g.getLow());
-            highs.add(g.getHi());
+            Gridded2DSet g   = (Gridded2DSet) sets[j];
+            float[]      low = g.getLow();
+            float[]      hi  = g.getHi();
+            lonLow[j] = (latLonOrder
+                         ? low[1]
+                         : low[0]);
+            latLow[j] = (latLonOrder
+                         ? low[0]
+                         : low[1]);
+            lonHi[j]  = (latLonOrder
+                         ? hi[1]
+                         : hi[0]);
+            latHi[j]  = (latLonOrder
+                         ? hi[0]
+                         : hi[1]);
             pts.add(g.getSamples(false));
 
         }
-        boolean flipLatLon = false;
-        int     numPoints  = latlon[0].length;
+        int numPoints = latlon[0].length;
+
         for (int i = 0; i < numPoints; i++) {
             float lat = latlon[0][i];
             float lon = latlon[1][i];
+            if ((lon != lon) || (lat != lat)) {
+                continue;
+            }
             for (int mapIdx = 0; mapIdx < sets.length; mapIdx++) {
                 Gridded2DSet g = (Gridded2DSet) sets[mapIdx];
-                if ((i == 0) && (mapIdx == 0)) {
-                    if (g.getType() instanceof RealTupleType) {
-                        RealTupleType rtt = (RealTupleType) g.getType();
-                        if ( !rtt.getComponent(0).equals(
-                                RealType.Longitude)) {
-                            flipLatLon = true;
-                        }
-                    } else if (g.getType() instanceof SetType) {
-                        RealTupleType rtt =
-                            ((SetType) g.getType()).getDomain();
-                        if ( !rtt.getComponent(0).equals(
-                                RealType.Longitude)) {
-                            flipLatLon = true;
-                        }
-                    }
-                }
-                if (flipLatLon) {
-                    float tmp = lat;
-                    lat = lon;
-                    lon = tmp;
-                }
-                float[] low = (float[]) lows.get(mapIdx);
-                float[] hi  = (float[]) highs.get(mapIdx);
-                if ((lon != lon) || (lat != lat)) {
+                /*                if (i < 10) {
+                     System.err.println(latLonOrder + " " + lonLow[mapIdx] + " - "
+                                       + lon + " - " + lonHi[mapIdx] + "       "
+                                       + latLow[mapIdx] + " - " + lat + " - "
+                                       + latHi[mapIdx]);
+                                       }*/
+                if ((lon < lonLow[mapIdx]) || (lon > lonHi[mapIdx])
+                        || (lat < latLow[mapIdx]) || (lat > latHi[mapIdx])) {
                     continue;
                 }
-                //System.err.println (flipLatLon + " " +low[0] +" - " + lon + " - " + hi[0] + "       " + low[1]+" - "+lat + " - " + hi[1]);
-                if ((lon < low[0]) || (lon > hi[0]) || (lat < low[1])
-                        || (lat > hi[1])) {
-                    continue;
-                }
-                if (DelaunayCustom.inside((float[][]) pts.get(mapIdx), lon,
-                                          lat)) {
+
+                if (DelaunayCustom.inside((float[][]) pts.get(mapIdx),
+                                          (latLonOrder
+                                           ? lat
+                                           : lon), (latLonOrder
+                        ? lon
+                        : lat))) {
 
                     if (indexLists[mapIdx] == null) {
                         indexLists[mapIdx] = new ArrayList();
@@ -3290,6 +3297,7 @@ public class GridUtil {
                 indices[mapIdx] = new int[0];
             } else {
                 indices[mapIdx] = new int[indexLists[mapIdx].size()];
+                //                System.err.println("index:" + indices[mapIdx].length);
                 for (int ptIdx = 0; ptIdx < indexLists[mapIdx].size();
                         ptIdx++) {
                     indices[mapIdx][ptIdx] =
@@ -3450,6 +3458,30 @@ public class GridUtil {
         return points;
 
     }
+
+
+    /**
+     * Convert the domain to the reference earth located points. If the domain is not in lat/lon order
+     * then reset the order so that result[0] is the latitudes, result[1] is the longitudes
+     *
+     * @param domain  the domain set
+     *
+     * @return  the lat/lon/(alt) points
+     *
+     * @throws VisADException  problem converting points
+     */
+    public static float[][] getLatLon(GriddedSet domain)
+            throws VisADException {
+        boolean   isLatLon = isLatLonOrder(domain);
+        float[][] values   = getEarthLocationPoints(domain);
+        if ( !isLatLon) {
+            float[] tmp = values[0];
+            values[0] = values[1];
+            values[1] = tmp;
+        }
+        return values;
+    }
+
 
 
     /**
