@@ -352,6 +352,45 @@ def  averageFromMap(field, map,latLonCanChangeWithTime=1):
 
 
 
+## Get the named property from the given mapData
+def getMapProperty(mapData, propName):
+        from ucar.visad.data import MapSet
+	if(isinstance(mapData, MapSet)):
+		return mapData.getProperty(propName);
+	return None;
 
 
+
+
+def getMapsWithProperty(mapData, propName,value):
+	return filterMaps(mapData, propName, '==', value);
+
+def filterMaps(mapData, propName,operator,value):
+        from ucar.visad import ShapefileAdapter
+        from ucar.unidata.util import StringUtil
+	goodOnes = java.util.ArrayList();
+	sets = mapData.getSets();
+        for mapIdx in xrange(len(sets)):
+		mapValue =  getMapProperty(sets[mapIdx],propName);
+		if(mapValue == None): 
+			continue;
+		if(operator== '==' and mapValue == value):
+			goodOnes.add(sets[mapIdx]);		
+		elif(operator== '!=' and mapValue != value):
+			goodOnes.add(sets[mapIdx]);		
+		elif(operator== '<' and mapValue < value):
+			goodOnes.add(sets[mapIdx]);		
+		elif(operator== '<=' and mapValue <= value):
+			goodOnes.add(sets[mapIdx]);		
+		elif(operator== '>' and mapValue > value):
+			goodOnes.add(sets[mapIdx]);		
+		elif(operator== '>=' and mapValue >= value):
+			goodOnes.add(sets[mapIdx]);		
+		elif(operator== 'match' and StringUtil.stringMatch(str(mapValue), value)):
+			goodOnes.add(sets[mapIdx]);		
+		elif(operator== '!match' and not StringUtil.stringMatch(str(mapValue), value)):
+			print "not match: " + mapValue;
+			goodOnes.add(sets[mapIdx]);		
+
+	return ShapefileAdapter.makeSet(goodOnes);
 
