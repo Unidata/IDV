@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control.drawing;
 
 
@@ -326,18 +327,7 @@ public class ShapeGlyph extends LineGlyph {
                                             lineVals[0].length);
             lineDisplayable.setData(theData);
         } else if (shapeType == SHAPE_RECTANGLE) {
-            float[][] pts = new float[3][5];
-            for (int i = 0; i < 3; i++) {
-                pts[i][0] = lineVals[i][0];
-                pts[i][4] = lineVals[i][0];
-                pts[i][2] = lineVals[i][1];
-            }
-            pts[IDX_X][1] = lineVals[IDX_X][1];
-            pts[IDX_Y][1] = lineVals[IDX_Y][0];
-            pts[IDX_Z][1] = lineVals[IDX_Z][0];
-            pts[IDX_X][3] = lineVals[IDX_X][0];
-            pts[IDX_Y][3] = lineVals[IDX_Y][1];
-            pts[IDX_Z][3] = lineVals[IDX_Z][1];
+            float[][] pts = makeRectangle(lineVals);
             setActualPoints(pts);
             Data theData = new Gridded3DSet(mathType, pts, 5);
             lineDisplayable.setData(tryToFill(pts, theData));
@@ -461,6 +451,33 @@ public class ShapeGlyph extends LineGlyph {
 
     }
 
+
+
+    /**
+     * Utility to make a rectangle from 2 points
+     *
+     * @param lineVals The 2 points
+     *
+     * @return 5 points
+     */
+    public static float[][] makeRectangle(float[][] lineVals) {
+        float[][] pts = new float[lineVals.length][5];
+        for (int i = 0; i < lineVals.length; i++) {
+            pts[i][0] = lineVals[i][0];
+            pts[i][4] = lineVals[i][0];
+            pts[i][2] = lineVals[i][1];
+        }
+        pts[IDX_X][1] = lineVals[IDX_X][1];
+        pts[IDX_Y][1] = lineVals[IDX_Y][0];
+        pts[IDX_X][3] = lineVals[IDX_X][0];
+        pts[IDX_Y][3] = lineVals[IDX_Y][1];
+
+        if (lineVals.length > 2) {
+            pts[IDX_Z][1] = lineVals[IDX_Z][0];
+            pts[IDX_Z][3] = lineVals[IDX_Z][1];
+        }
+        return pts;
+    }
 
 
     /**
