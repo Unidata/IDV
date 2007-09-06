@@ -343,6 +343,9 @@
        label="System library"
        location="%IDVPATH%/default.py"/>
     <resource
+       label="System map routines"
+       location="%IDVPATH%/python/maps.py"/>
+    <resource
        label="Library of routines for running jython in scripting mode"
        location="%IDVPATH%/isl.py">
       <property
