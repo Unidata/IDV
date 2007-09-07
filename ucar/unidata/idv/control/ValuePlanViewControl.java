@@ -288,9 +288,7 @@ public class ValuePlanViewControl extends PlanViewControl {
      */
     protected FieldImpl getSliceForDisplay(FieldImpl slice)
             throws VisADException {
-        System.out.println("current slice = " + GridUtil.getSpatialDomain(slice));
         FieldImpl subset      = super.getSliceForDisplay(slice);
-        System.out.println("subset = " + GridUtil.getSpatialDomain(slice));
         FieldImpl stationData = GridUtil.getGridAsPointObs(subset);
         if (declutter) {
             try {
@@ -299,7 +297,6 @@ public class ValuePlanViewControl extends PlanViewControl {
                 logException("getSliceForDisplay: doDeclutter", re);
             }
         }
-        System.out.println("stationData = " +stationData.getType());
         return stationData;
     }
 
