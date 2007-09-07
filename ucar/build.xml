@@ -252,7 +252,7 @@ argument -Dfoo=bar) -->
     </target>
 
 
-    <target name="docs" depends="init,docs_userguide_forweb,docs_workshop,docs_devworkshop,docs_developer">
+    <target name="docs" depends="init,docs_userguide_forweb,docs_workshop,docs_developer">
 <!--
         <antcall target="javadoc"/>
 -->
@@ -275,10 +275,6 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
 
         <copy overwrite="true"  todir="${docs_workshop_dest}">
              <fileset file="auxdata/docs/workshop/processed/**"/>
-        </copy>
-
-        <copy overwrite="true"  todir="${docs_devworkshop_dest}">
-             <fileset file="auxdata/docs/workshop/devprocessed/**"/>
         </copy>
 
         <copy overwrite="true"  todir="${docs_developer_dest}">
@@ -343,19 +339,8 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
               dir="${srcdir}/auxdata/docs/workshop/processed">
               <arg line="-f workshop.pdf --book --footer ./. --header .t. --headfootsize 16  workshop.html"/>
         </exec>
-        <antcall target="docs_devworkshop_forpdf"/> 
-        <exec output="dummyfile"
-              executable="${htmldoc}"
-              failifexecutionfails="false"
-              os="Linux"
-              dir="${srcdir}/auxdata/docs/workshop/devprocessed">
-              <arg line="-f devworkshop.pdf --book --footer ./. --header .t. --headfootsize 16  workshop.html"/>
-        </exec>
         <copy overwrite="true"  todir="${docs_dest}/workshop">
             <fileset file="${srcdir}/auxdata/docs/workshop/processed/workshop.pdf"/>
-        </copy>
-        <copy overwrite="true"  todir="${docs_dest}/devworkshop">
-            <fileset file="${srcdir}/auxdata/docs/workshop/devprocessed/devworkshop.pdf"/>
         </copy>
     </target>
 
