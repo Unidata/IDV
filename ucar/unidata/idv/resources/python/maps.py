@@ -4,12 +4,14 @@
 #######  Map related utilities
 ####################################################################################
 
-import ucar.unidata.data.grid.GridUtil as gu
+import ucar.unidata.data.grid.GridUtil as GridUtil
+import ucar.visad.Util as Util
+import ucar.unidata.util.StringUtil as StringUtil
 
 
 def  subsetFromMap(field, mapSets, fillValue=java.lang.Float.NaN,inverse=0):
 ##Iterate on each time step
-    if (gu.isTimeSequence(field)):
+    if (GridUtil.isTimeSequence(field)):
         newData = field.clone()
         for timeStep in range(field.getDomainSet().getLength()):
             rangeObject = subsetRangeFromMap(field.getSample(timeStep), timeStep, mapSets, fillValue, inverse); 
@@ -20,7 +22,7 @@ def  subsetFromMap(field, mapSets, fillValue=java.lang.Float.NaN,inverse=0):
 
 def  subsetRangeFromMap(range, timeStep, mapSets, fillValue=java.lang.Float.NaN,inverse=0):
     rangeObject = range.clone()
-    indices = gu.findContainedIndices(rangeObject.getDomainSet(), mapSets);
+    indices = GridUtil.findContainedIndices(rangeObject.getDomainSet(), mapSets);
     originalValues = rangeObject.getFloats(0)
     if(inverse):
         newValues = originalValues;
@@ -43,7 +45,7 @@ def  subsetRangeFromMap(range, timeStep, mapSets, fillValue=java.lang.Float.NaN,
 
 
 def  averageFromMap(field, mapSets):
-    if (gu.isTimeSequence(field)):
+    if (GridUtil.isTimeSequence(field)):
         newData = field.clone()
         for timeStep in range(field.getDomainSet().getLength()):
             rangeObject = averageRangeFromMap(field.getSample(timeStep), timeStep, mapSets);
@@ -55,7 +57,7 @@ def  averageFromMap(field, mapSets):
 
 def  averageRangeFromMap(range, timeStep, mapSets):
     rangeObject = range.clone()
-    indices = gu.findContainedIndices(rangeObject.getDomainSet(), mapSets);
+    indices = GridUtil.findContainedIndices(rangeObject.getDomainSet(), mapSets);
     originalValues = rangeObject.getFloats(0)
     newValues = makeFloatArray(len(originalValues), len(originalValues[0]), java.lang.Float.NaN);
     totals = {};
@@ -134,7 +136,7 @@ def makeFieldFromMapBounds(mapSets, length1, length2, fill, unit):
 
 
 def  subsetWithProperty(field, mapSets):
-    if (gu.isTimeSequence(field)):
+    if (GridUtil.isTimeSequence(field)):
         newData = field.clone()
         for timeStep in range(field.getDomainSet().getLength()):
             rangeObject = subsetRangeWithProperty(field.getSample(timeStep), mapSets);
@@ -146,7 +148,7 @@ def  subsetWithProperty(field, mapSets):
 
 def  subsetRangeWithProperty(range, mapSets):
     rangeObject = range.clone()
-    indices = gu.findContainedIndices(rangeObject.getDomainSet(), mapSets);
+    indices = GridUtil.findContainedIndices(rangeObject.getDomainSet(), mapSets);
     originalValues = rangeObject.getFloats(0)
     newValues = makeFloatArray(len(originalValues), len(originalValues[0]), java.lang.Float.NaN);
     polygons   = mapSets.getSets();
