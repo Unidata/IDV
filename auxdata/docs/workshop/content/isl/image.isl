@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<isl loop="1" sleep="3600" offscreen="false" debug="true">
-  <bundle file="${islpath}/image.xidv"/>
-  <pause/>
+<isl debug="true" loop="1" offscreen="false" sleep="3600">
+  <bundle clear="true" file="${islpath}/image.xidv" wait="true"/>
   <movie file="${islpath}/image.kmz"/>
 </isl>

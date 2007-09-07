@@ -1,3 +1,3 @@
 <isl debug="true" offscreen="false">
-     <bundle file="${islpath}/isl.xidv"/>
+     <bundle file="isl.xidv"/>
 </isl>

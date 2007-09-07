@@ -33,8 +33,9 @@ Normally we would just include  the system script
   <import file="/ucar/unidata/idv/isl/generate.isl"/>
 -->
 
+  <import file="/ucar/unidata/idv/isl/generate.isl"/>
 
-  <import file="${islpath}/generate.isl"/>
+<!--  <import file="${islpath}/generate.isl"/> -->
 
 <!--
 The generate_ flags allow you to control what is generated.
@@ -79,15 +80,13 @@ where this isl file is
 The transparency attribute can be "none" but is normally the background color
 of the idv view that is being captured. We make this color transparent.
 
-
 -->
 
 
   <generate
-     id="goeseastir"
-     bundle="${islpath}/goeseastir.jnlp"
-     label="GOES-East IR Satellite"
-     transparency="red"
+     id="example1"
+     bundle="${islpath}/example1.jnlp"
+     label="This is example 1"
      generate_kmz="1"
      generate_mov="1"
      generate_animatedgif="1">
@@ -95,10 +94,9 @@ of the idv view that is being captured. We make this color transparent.
 
 
   <generate
-     id="goeseast"
-     bundle="${islpath}/goeseast.jnlp"
-     label="GOES-East  Satellite"
-     transparency="red"
+     id="example2"
+     bundle="${islpath}/example2.jnlp"
+     label="This is example 2"
      generate_kmz="1"
      generate_mov="1"
      generate_animatedgif="1">
