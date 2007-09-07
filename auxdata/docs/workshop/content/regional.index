@@ -7,13 +7,14 @@ title:2007 Unidata Regional IDV Training Workshop at OU>index.html:This is an ab
 >>installandstart/basics/index.html
 >>>installandstart/basics/GettingStarted.html
 >>>installandstart/basics/Navigation.html
+>>>datadisplays/selection/FieldSelector.html
 >>>datadisplays/selection/DisplayControl.html
 >>>datadisplays/selection/Legends.html
 >>>datadisplays/selection/TimeAnimation.html
 >>>installandstart/basics/MainMenu.html
 >>>installandstart/basics/ViewManagerMenus.html
 >>>installandstart/basics/BackgroundMaps.html
->>>resources/ProjectionManager.html
++>>>resources/ProjectionManager.html
 >>>resources/Preferences.html
 >>>installandstart/basics/Exiting.html
 +>>>installandstart/WebStart.html
@@ -22,15 +23,16 @@ title:2007 Unidata Regional IDV Training Workshop at OU>index.html:This is an ab
 |installandstart/basics/MapSelector.html
 |installandstart/basics/ShortStart.html
 |installandstart/LocalData.html
+|datadisplays/selection/TimeAnimationWidget.html
+
+
+#>datadisplays/index.html
+#>>datadisplays/selection/index.html
+#>>>datadisplays/selection/DataSourceChooser.html
 
 
 >datadisplays/index.html
 >>datadisplays/selection/index.html
->>>datadisplays/selection/DataSourceChooser.html
->>>datadisplays/selection/FieldSelector.html
-|datadisplays/selection/TimeAnimationWidget.html
-
-
 >>datadisplays/grid/index.html
 >>>datadisplays/grid/LoadingGrids.html
 >>>datadisplays/grid/PlanViews.html

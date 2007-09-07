@@ -45,6 +45,18 @@ Some of the datasets may be quite large and this allows
 you to only read those portions that you need instead of the entire
 dataset.
 
+<ol class="step">
+  <li>Right click the [ht::dataset sample_eta_grid.nc]
+      data source in the [ht::command Data Sources]
+      panel of the [ht::tab Field Selector]
+      window and select the [ht::menu {Properties}] menu.</li>
+  <li>Each [ht::dialog {Data Source Properties Dialog}] will 
+      have one or more tabs for setting and viewing the properties
+      of that data source.  Tab through the properties of this
+      data source.</li>
+  <li>Click the [ht::button Cancel] button to close the window</li>
+</ol>
+
 <div class="pagesubtitle">Data Choices (Fields)</div>
 
 When a data source is loaded, a set of [ht::param data choices] 
@@ -146,6 +158,7 @@ a subset of times.
           [ht::command Data Sources] panel to bring up the 
           [ht::dialog Data Source Properties] editor.</li>
 
+<ifndef flag_regionalworkshop>
       <li>This dataset has ten time steps. In the 
           [ht::tab Times] tab,
           uncheck the [ht::command Use All]
@@ -154,6 +167,14 @@ a subset of times.
           ([ht::param 2002-01-17 12:00:00Z]
            to [ht::param 2002-01-18 12:00:00Z]). 
           [ht::listSelect]</li>
+</ifndef>
+
+<ifdef flag_regionalworkshop>
+      <li>This dataset has ten time steps, but the bundle was set
+          to only load in the first 5. In the 
+          [ht::tab Times] tab, check the [ht::command Use All]
+          checkbox to use all the times.</li>
+</ifdef>
 
       <li>Click the [ht::button OK] button to apply
           this change and close the window.
@@ -173,10 +194,18 @@ a subset of times.
       <li>In the [ht::tab Times] tab of the [ht::command Data Subset]
           panel, uncheck the [ht::command Use Default]
           checkbox.
+<ifndef flag_regionalworkshop>
       <li>In the list of times in that panel, 
           select the last five (5) times in the list
           ([ht::param 2002-01-18 18:00:00Z] 
           to [ht::param 2002-01-20 00:00:00Z]).</li>
+<ifndef flag_regionalworkshop>
+<ifdef flag_regionalworkshop>
+      <li>In the list of times in that panel, 
+          select the first five (5) times in the list
+          ([ht::param 2002-01-17 12:00:00Z] 
+          to [ht::param 2002-01-18 12:00:00Z]).</li>
+<ifdef flag_regionalworkshop>
     </ol>
      
   </li>
