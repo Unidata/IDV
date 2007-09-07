@@ -46,9 +46,9 @@ gen::defineMacro {<%workshop.installdir%>} "$::workshopHome/idv"
 set ::workshopexampledir ${::workshopHome}/idv/ucar/unidata/apps/example
 gen::defineMacro {<%workshop.exampledir%>} $::workshopexampledir
 
-
 ##Add the page title macro
 gen::defineMacro {<%workshop.title%>} "$::workshopTitle for version <%idv.version%>"
+
 
 ##Assuming we are in the auxdata/docs/userguide/content directory
 ##read in the version.properties file in
@@ -84,14 +84,9 @@ proc gen::hook::parseArgs {argv arg i} {
         gen::setIndexFile   dev.index
         set ::workshopTitle {Unidata IDV Developer's Workshop}
         gen::define flag_developerworkshop 
+        gen::defineMacro {<%workshop.title%>} "$::workshopTitle for version <%idv.version%>"
         return $i
-    }
-    puts "Unknown argument: $arg"
-    gen::usage
-    set i
-}
-
-proc gen::hook::parseArgs {argv arg i} {
+    }  
     if {$arg == "-forreg"} {
         set ::forRegionalWorkshop 1
         gen::setIndexFile   regional.index
@@ -105,6 +100,7 @@ proc gen::hook::parseArgs {argv arg i} {
         gen::defineMacro {<%workshop.datadir%>} {/archive/workshops/unidata/idv}
         gen::defineMacro {<%workshop.sitepath%>} ${::workshopDocroot}/data
         gen::defineMacro {<%idv.website%>} ${::workshopDocroot}
+gen::defineMacro {<%workshop.title%>} "$::workshopTitle for version <%idv.version%>"
 
         return $i
     }
