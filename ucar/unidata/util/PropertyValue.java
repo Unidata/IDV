@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -30,7 +31,7 @@ import javax.swing.*;
 
 
 /**
- * Class PropertyValue _more_
+ * Class PropertyValue holds a name/value pair along with a category
  *
  *
  * @author IDV Development Team
@@ -38,31 +39,31 @@ import javax.swing.*;
  */
 public class PropertyValue {
 
-    /** _more_          */
+    /** the name. This corresponds to the set<name> setter on an object */
     private String name;
 
-    /** _more_          */
+    /** The human readable label*/
     private String label;
 
-    /** _more_          */
+    /** The value */
     private Object value;
 
-    /** _more_          */
+    /** Category */
     private String category;
 
 
     /**
-     * _more_
+     * ctor
      */
     public PropertyValue() {}
 
     /**
-     * _more_
+     * ctor
      *
-     * @param name _more_
-     * @param label _more_
-     * @param obj _more_
-     * @param category _more_
+     * @param name name
+     * @param label label
+     * @param obj value
+     * @param category category
      */
     public PropertyValue(String name, String label, Object obj,
                          String category) {
@@ -73,8 +74,14 @@ public class PropertyValue {
     }
 
 
+    /**
+     * copy ctor
+     *
+     * @param that that
+     */
     public PropertyValue(PropertyValue that) {
-        this(that.getName(), that.getLabel(), that.getValue(), that.getCategory());
+        this(that.getName(), that.getLabel(), that.getValue(),
+             that.getCategory());
     }
 
 
@@ -118,9 +125,8 @@ public class PropertyValue {
     /**
      *  Set the Value property.
      *
-     *  @param value The new value for Value
      *
-     * @param v _more_
+     * @param v The value
      */
     public void setValue(Object v) {
         value = v;
@@ -154,6 +160,11 @@ public class PropertyValue {
     }
 
 
+    /**
+     * tostring
+     *
+     * @return string 
+     */
     public String toString() {
         return name + " " + label;
     }
