@@ -40,7 +40,10 @@ import ucar.unidata.geoloc.projection.*;
 
 
 
+
+
 import ucar.unidata.idv.ui.DataControlDialog;
+import ucar.unidata.idv.ui.DataSelectionWidget;
 import ucar.unidata.idv.ui.IdvUIManager;
 
 import ucar.unidata.util.CacheManager;
@@ -215,9 +218,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     /** Widget for properties dialog */
     private JTextField nameFld;
 
-
-    /** Widget for properties dialog */
-    private DataControlDialog dcd;
+    /** Used to show the times */
+    private DataSelectionWidget dsw;
 
     /** Has this data source been created from a bundle */
     protected boolean haveBeenUnPersisted = false;
@@ -2309,9 +2311,10 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
         List times = getAllDateTimes();
         if ((times != null) && (times.size() > 0)) {
-            dcd = new DataControlDialog(getDataContext().getIdv(), this,
-                                        false);
-            tabbedPane.add("Times", dcd.getContents());
+            dsw =new DataSelectionWidget(getDataContext().getIdv());
+            dsw.setTimes(getAllDateTimes(),
+                         getDateTimeSelection());
+            tabbedPane.add("Times", dsw.getTimesList("Use All"));
         }
 
         if (canDoGeoSelection()) {
@@ -2475,8 +2478,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         }
 
         setAlias(aliasFld.getText().trim());
-        if (dcd != null) {
-            getDataContext().getIdv().getIdvUIManager().processDialog(dcd);
+        if (dsw != null) {
+            setDateTimeSelection(dsw.getSelectedDateTimes());
+            getDataContext().getIdv().getIdvUIManager().dataSourceTimeChanged(this);
         }
 
         if (geoSelectionPanel != null) {

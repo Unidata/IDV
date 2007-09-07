@@ -48,11 +48,7 @@ import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.Util;
 
-
-
 import visad.VisADException;
-
-
 
 
 import java.awt.*;
@@ -74,9 +70,7 @@ import javax.swing.tree.*;
 
 
 /**
- * This class is a sortof polymorphic dialog/window that manages  selection
- * of times for a datasource, displays/times for a datachoice and (sometime)
- * a window showing a DataTree, list of displays and times.
+ * This class provides a list of the display controls and the data selection dialog
  *
  * @author Jeff McWhirter
  * @version $Revision: 1.98 $
@@ -84,26 +78,17 @@ import javax.swing.tree.*;
 public class DataControlDialog implements ActionListener {
 
 
-    /** Use this member to log messages (through calls to LogUtil) */
-    public static LogUtil.LogCategory log_ =
-        LogUtil.getLogInstance(DataControlDialog.class.getName());
-
-
     /** Reference to the idv */
     private IntegratedDataViewer idv;
 
     /** The JDialog  window object */
     private JDialog dialog;
-    //private JFrame dialog;
-
 
     /** The gui contents */
     JComponent contents;
 
-
     /** Should we layout the display/control lists horizontally */
     private boolean horizontalOrientation = false;
-
 
     /**
      *   We keep a list of the buttons that can be used for creation
@@ -167,37 +152,7 @@ public class DataControlDialog implements ActionListener {
                              boolean horizontalOrientation) {
         this.inOwnWindow           = inOwnWindow;
         this.horizontalOrientation = horizontalOrientation;
-        init(idv, null, null, 50, 50);
-    }
-
-
-
-    /**
-     * Constructor for configuring a  {@link ucar.unidata.data.DataSource}
-     *
-     * @param idv Reference to the IDV
-     * @param dataSource The {@link ucar.unidata.data.DataSource} we are configuring
-     *
-     */
-    public DataControlDialog(IntegratedDataViewer idv,
-                             DataSource dataSource) {
-        this(idv, dataSource, true);
-    }
-
-
-    /**
-     * Constructor for configuring a  {@link ucar.unidata.data.DataSource}
-     *
-     * @param idv Reference to the IDV
-     * @param dataSource The {@link ucar.unidata.data.DataSource} we are configuring
-     * @param inOwnWindow Show in own window
-     *
-     */
-
-    public DataControlDialog(IntegratedDataViewer idv, DataSource dataSource,
-                             boolean inOwnWindow) {
-        this.inOwnWindow = inOwnWindow;
-        init(idv, dataSource, null, 50, 50);
+        init(idv, null, 50, 50);
     }
 
 
@@ -212,35 +167,28 @@ public class DataControlDialog implements ActionListener {
      */
     public DataControlDialog(IntegratedDataViewer idv, DataChoice dataChoice,
                              int x, int y) {
-        init(idv, null, dataChoice, x, y);
+        init(idv,  dataChoice, x, y);
     }
+
 
     /**
      * Initialize the gui. Popup a new Window if required.
      *
      * @param idv The IDV
-     * @param dataSource The {@link DataSource} we are configuring (or null)
      * @param dataChoice The {@link DataChoice} we are configuring (or null)
      * @param windowX X position on the screen to show window
      * @param windowY Y position on the screen to show window
      */
-    private void init(IntegratedDataViewer idv, DataSource dataSource,
+    private void init(IntegratedDataViewer idv, 
                       DataChoice dataChoice, int windowX, int windowY) {
         this.idv        = idv;
-        this.dataSource = dataSource;
         this.dataChoice = dataChoice;
 
-        if (dataSource != null) {
-            contents = doMakeDataSourceDialog(dataSource);
-        } else {
-            contents = doMakeDataChoiceDialog(dataChoice);
-        }
+        contents = doMakeDataChoiceDialog(dataChoice);
         if (inOwnWindow) {
             doMakeWindow(GuiUtils.centerBottom(contents,
                     GuiUtils.makeApplyOkCancelButtons(this)), windowX,
-                        windowY, ((dataSource != null)
-                                  ? "Select Times"
-                                  : "Select Display"));
+                        windowY,  "Select Display");
         }
     }
 
@@ -490,6 +438,7 @@ public class DataControlDialog implements ActionListener {
         }
     }
 
+
     /**
      * Show help for the DisplayControl represented by the selected control descriptor
      */
@@ -584,18 +533,6 @@ public class DataControlDialog implements ActionListener {
     }
 
 
-    /**
-     * Make the GUI for configuring a {@link ucar.unidata.data.DataSource}
-     *
-     * @param dataSource The DataSource
-     * @return The GUI
-     */
-    public JComponent doMakeDataSourceDialog(DataSource dataSource) {
-        dataSelectionWidget =new DataSelectionWidget(idv);
-        dataSelectionWidget.setTimes(dataSource.getAllDateTimes(),
-                                     dataSource.getDateTimeSelection());
-        return dataSelectionWidget.getContents();
-    }
 
 
     /**

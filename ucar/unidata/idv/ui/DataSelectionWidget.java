@@ -97,7 +97,7 @@ public class DataSelectionWidget {
     JList timesList;
 
     /** The times list component */
-    JComponent timesTab;
+    JComponent timesComponent;
 
     /** subset tab. holds times list, geopspatial, etc. */
     JComponent selectionContainer;
@@ -304,7 +304,7 @@ public class DataSelectionWidget {
         selectionTab.removeAll();
 
         if (timesList.getModel().getSize() > 0) {
-            selectionTab.add(timesTab, "Times", 0);
+            selectionTab.add(timesComponent, "Times", 0);
         }
 
         if (dataSource == null) {
@@ -314,6 +314,12 @@ public class DataSelectionWidget {
             checkSelectionTab();
             return;
         }
+
+        if(dc == null) {
+            checkSelectionTab();
+            return;
+        }
+
 
         levels = dc.getAllLevels();
         if ((levels != null) && (levels.size() > 1)) {
@@ -492,7 +498,7 @@ public class DataSelectionWidget {
      * @return The GUI
      */
     private JComponent doMakeContents() {
-        timesTab     = getTimesList();
+        timesComponent     = getTimesList();
         selectionTab = new JTabbedPane();
         selectionTab.setBorder(null);
         selectionTabContainer = new JPanel(new BorderLayout());
@@ -503,7 +509,7 @@ public class DataSelectionWidget {
         font = font.deriveFont((float) font.getSize() - 2).deriveFont(
             Font.ITALIC).deriveFont(Font.BOLD);
         selectionTab.setFont(font);
-        selectionTab.add("Times", timesTab);
+        selectionTab.add("Times", timesComponent);
         return selectionContainer;
     }
 
@@ -564,7 +570,7 @@ public class DataSelectionWidget {
      * @param all All times
      * @param selected The selected times
      */
-    protected void setTimes(List all, List selected) {
+    public void setTimes(List all, List selected) {
         setTimes(timesList, allTimesButton, all, selected);
         if (all != null) {
             allDateTimes = new ArrayList(all);
