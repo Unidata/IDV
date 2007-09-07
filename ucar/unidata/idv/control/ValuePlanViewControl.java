@@ -107,7 +107,7 @@ public class ValuePlanViewControl extends PlanViewControl {
      * this particular <code>PlanViewControl</code>
      */
     public ValuePlanViewControl() {
-        setAttributeFlags(FLAG_DISPLAYUNIT | FLAG_SKIPFACTOR);
+        setAttributeFlags(FLAG_SKIPFACTOR);
     }
 
     /**
@@ -122,6 +122,7 @@ public class ValuePlanViewControl extends PlanViewControl {
     protected DisplayableData createPlanDisplay()
             throws VisADException, RemoteException {
         pointDisplay = new GridValueDisplayable("plan_text_" + paramName);
+        pointDisplay.setStationModel(getLayoutModel());
         addAttributedDisplayable(pointDisplay);
         return pointDisplay;
     }
@@ -231,7 +232,6 @@ public class ValuePlanViewControl extends PlanViewControl {
      */
     public void getControlWidgets(List controlWidgets)
             throws VisADException, RemoteException {
-        super.getControlWidgets(controlWidgets);
 
         JCheckBox toggle = new JCheckBox("", declutter);
         toggle.addActionListener(new ActionListener() {
@@ -247,6 +247,7 @@ public class ValuePlanViewControl extends PlanViewControl {
         controlWidgets.add(new WrapperWidget(this,
                                              GuiUtils.rLabel("Layout:"),
                                              makeLayoutModelWidget()));
+        super.getControlWidgets(controlWidgets);
 
     }
 
@@ -258,7 +259,15 @@ public class ValuePlanViewControl extends PlanViewControl {
             public void run() {
                 showWaitCursor();
                 try {
-                    loadDataAtLevel(currentLevel);
+                    if (getGridDisplayable() != null) {
+                    if (currentSlice == null) {
+                        Real newLevel = currentLevel;
+                        currentLevel = null;
+                        loadDataAtLevel(newLevel);
+                    } else {
+                        getGridDisplayable().loadData(getSliceForDisplay(currentSlice));
+                    }
+                    }
                 } catch (Exception exc) {
                     logException("Loading data", exc);
                 }
@@ -279,7 +288,9 @@ public class ValuePlanViewControl extends PlanViewControl {
      */
     protected FieldImpl getSliceForDisplay(FieldImpl slice)
             throws VisADException {
+        System.out.println("current slice = " + GridUtil.getSpatialDomain(slice));
         FieldImpl subset      = super.getSliceForDisplay(slice);
+        System.out.println("subset = " + GridUtil.getSpatialDomain(slice));
         FieldImpl stationData = GridUtil.getGridAsPointObs(subset);
         if (declutter) {
             try {
@@ -288,6 +299,7 @@ public class ValuePlanViewControl extends PlanViewControl {
                 logException("getSliceForDisplay: doDeclutter", re);
             }
         }
+        System.out.println("stationData = " +stationData.getType());
         return stationData;
     }
 
