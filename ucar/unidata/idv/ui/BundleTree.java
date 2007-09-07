@@ -230,8 +230,9 @@ public class BundleTree extends DndTree {
         });
         loadBundles();
 
-        String title = "Local " + 
-            getPersistenceManager().getBundleTitle(getBundleType())
+        String title =
+            "Local "
+            + getPersistenceManager().getBundleTitle(getBundleType())
             + " Manager";
         Dimension defaultDimension = new Dimension(300, 400);
         JScrollPane sp = GuiUtils.makeScrollPane(this,

@@ -149,13 +149,19 @@ public class IslDialog {
 
         String tail     = IOUtil.getFileTail(islFile);
         String xidvFile = IOUtil.stripExtension(islFile) + ".xidv";
-        boolean hasMultipleViews = persistenceManager.getIdv().getVMManager().getViewManagers().size()>1;
-        
+        boolean hasMultipleViews =
+            persistenceManager.getIdv().getVMManager().getViewManagers()
+                .size() > 1;
 
 
-        String extra = (hasMultipleViews?"_${viewindex}":"");
-        String pngFile  = "${islpath}/"+ IOUtil.stripExtension(tail)+extra + ".png";
-        String movFile  = "${islpath}/"+ IOUtil.stripExtension(tail)+extra + ".mov";
+
+        String extra = (hasMultipleViews
+                        ? "_${viewindex}"
+                        : "");
+        String pngFile = "${islpath}/" + IOUtil.stripExtension(tail) + extra
+                         + ".png";
+        String movFile = "${islpath}/" + IOUtil.stripExtension(tail) + extra
+                         + ".mov";
 
         if (islContents == null) {
             List comps = new ArrayList();
@@ -230,11 +236,9 @@ public class IslDialog {
                                     "${islpath}/"
                                     + IOUtil.getFileTail(xidvFile));
 
-            bundleNode.setAttribute(ImageGenerator.ATTR_WAIT,
-                                    "true");
+            bundleNode.setAttribute(ImageGenerator.ATTR_WAIT, "true");
 
-            bundleNode.setAttribute(ImageGenerator.ATTR_CLEAR,
-                                    "true");
+            bundleNode.setAttribute(ImageGenerator.ATTR_CLEAR, "true");
         }
 
         //        root.appendChild(doc.createElement(ImageGenerator.TAG_PAUSE));

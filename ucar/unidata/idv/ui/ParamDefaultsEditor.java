@@ -40,8 +40,8 @@ import ucar.unidata.data.DataChoice;
 
 import ucar.unidata.idv.*;
 import ucar.unidata.idv.control.DisplayControlImpl;
-import ucar.unidata.ui.colortable.*;
 import ucar.unidata.ui.ParamField;
+import ucar.unidata.ui.colortable.*;
 
 
 
@@ -441,7 +441,7 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
         public boolean editRow(ParamInfo paramInfo, boolean removeOnCancel) {
 
             List       comps   = new ArrayList();
-            ParamField nameFld = new ParamField(null,true);
+            ParamField nameFld = new ParamField(null, true);
             nameFld.setText(paramInfo.getName());
             JPanel topPanel = GuiUtils.hbox(GuiUtils.lLabel("Name:  "),
                                             nameFld);

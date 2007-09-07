@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.ui;
 
 
@@ -128,6 +126,7 @@ public class DataControlDialog implements ActionListener {
     /** The wrapper for the display list */
     JComponent displayScroller;
 
+    /** The data selection widget */
     private DataSelectionWidget dataSelectionWidget;
 
     /** The data source */
@@ -167,7 +166,7 @@ public class DataControlDialog implements ActionListener {
      */
     public DataControlDialog(IntegratedDataViewer idv, DataChoice dataChoice,
                              int x, int y) {
-        init(idv,  dataChoice, x, y);
+        init(idv, dataChoice, x, y);
     }
 
 
@@ -179,16 +178,16 @@ public class DataControlDialog implements ActionListener {
      * @param windowX X position on the screen to show window
      * @param windowY Y position on the screen to show window
      */
-    private void init(IntegratedDataViewer idv, 
-                      DataChoice dataChoice, int windowX, int windowY) {
+    private void init(IntegratedDataViewer idv, DataChoice dataChoice,
+                      int windowX, int windowY) {
         this.idv        = idv;
         this.dataChoice = dataChoice;
 
-        contents = doMakeDataChoiceDialog(dataChoice);
+        contents        = doMakeDataChoiceDialog(dataChoice);
         if (inOwnWindow) {
             doMakeWindow(GuiUtils.centerBottom(contents,
                     GuiUtils.makeApplyOkCancelButtons(this)), windowX,
-                        windowY,  "Select Display");
+                        windowY, "Select Display");
         }
     }
 
@@ -485,7 +484,7 @@ public class DataControlDialog implements ActionListener {
         }
         setSelectedControl(selected);
 
-        if (label!=null) {
+        if (label != null) {
             label.setText("Choose a display for data: " + dataChoice);
         }
         List sources = new ArrayList();
@@ -501,8 +500,9 @@ public class DataControlDialog implements ActionListener {
                     allTimes);
             dataSelectionWidget.setTimes(selectedTimes, selectedTimes);
         } else {
-            dataSelectionWidget.setTimes(dataChoice.getAllDateTimes(), selectedTimes);
-        }        
+            dataSelectionWidget.setTimes(dataChoice.getAllDateTimes(),
+                                         selectedTimes);
+        }
 
         if (sources.size() == 1) {
             DataSource dataSource = (DataSource) sources.get(0);
@@ -640,6 +640,7 @@ public class DataControlDialog implements ActionListener {
      * @return The GUI
      */
     public JComponent doMakeDataChoiceDialog(DataChoice dataChoice) {
+
         controlTree       = new ControlTree();
         CONTROLTREE_MUTEX = controlTree.getTreeLock();
         controlTreeRoot   = new DefaultMutableTreeNode("Displays");
@@ -665,7 +666,10 @@ public class DataControlDialog implements ActionListener {
         controlTree.addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
                 Object[] cd = getSelectedControls();
-                dataSelectionWidget.updateSettings((ControlDescriptor)(cd.length>0?cd[0]:null));
+                dataSelectionWidget.updateSettings(
+                    (ControlDescriptor) ((cd.length > 0)
+                                         ? cd[0]
+                                         : null));
                 Misc.run(new Runnable() {
                     public void run() {
                         Object[] cd = getSelectedControls();
@@ -726,30 +730,38 @@ public class DataControlDialog implements ActionListener {
         displayScroller = GuiUtils.makeScrollPane(controlTree, 200, 150);
         displayScroller.setBorder(null);
 
-        dataSelectionWidget =new DataSelectionWidget(idv);
+        dataSelectionWidget = new DataSelectionWidget(idv);
 
         if (horizontalOrientation) {
             displayScroller.setPreferredSize(new Dimension(150, 35));
-            contents =  GuiUtils.hsplit(dataSelectionWidget.getContents(),
-                                        displayScroller);
+            contents = GuiUtils.hsplit(dataSelectionWidget.getContents(),
+                                       displayScroller);
         } else {
             displayScroller.setPreferredSize(new Dimension(200, 150));
-            dataSelectionWidget.getContents().setPreferredSize(new Dimension(200,200));
-            contents  =  GuiUtils.vsplit(displayScroller,
-                                         dataSelectionWidget.getContents(), 150, 0.5);
+            dataSelectionWidget.getContents().setPreferredSize(
+                new Dimension(200, 200));
+            contents = GuiUtils.vsplit(displayScroller,
+                                       dataSelectionWidget.getContents(),
+                                       150, 0.5);
         }
 
         if (inOwnWindow) {
             contents =
-                GuiUtils.topCenter(GuiUtils.inset(label = new JLabel("                 "),5),
-                                   contents);
-        } 
+                GuiUtils.topCenter(GuiUtils.inset(label =
+                    new JLabel("                 "), 5), contents);
+        }
         setDataChoice(dataChoice);
         return contents;
+
     }
 
 
-    public DataSelectionWidget getDataSelectionWidget () {
+    /**
+     * Get the data selection widget
+     *
+     * @return data selection widget
+     */
+    public DataSelectionWidget getDataSelectionWidget() {
         return dataSelectionWidget;
     }
 
@@ -809,9 +821,9 @@ public class DataControlDialog implements ActionListener {
             dialog.setVisible(false);
         }
         dispose();
-        idv          = null;
-        dataSource   = null;
-        dataChoice   = null;
+        idv        = null;
+        dataSource = null;
+        dataChoice = null;
     }
 
     /**

@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.ui;
 
 
@@ -1562,11 +1560,11 @@ public class ImageGenerator extends IdvManager {
     }
 
     /**
-     * _more_
+     * Find the data source with the given id
      *
-     * @param id _more_
+     * @param id the id we pass to datasource.identifiedByName
      *
-     * @return _more_
+     * @return The data source or null if none found
      */
     private DataSource findDataSource(String id) {
         List       dataSources = getIdv().getDataSources();
@@ -1723,7 +1721,7 @@ public class ImageGenerator extends IdvManager {
     }
 
     /**
-     * _more_
+     * remove data and displays, etc
      */
     private void cleanup() {
         getIdv().removeAllDisplays(false);
@@ -3823,12 +3821,12 @@ public class ImageGenerator extends IdvManager {
     }
 
     /**
-     * _more_
+     * callable by jython to find the data choices that match the given pattern
      *
-     * @param datasource _more_
-     * @param pattern _more_
+     * @param datasource data source
+     * @param pattern pattern to match
      *
-     * @return _more_
+     * @return comma separated list of data choice names
      */
     public String fields(String datasource, String pattern) {
         DataSource dataSource = findDataSource(datasource);

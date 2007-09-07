@@ -1153,8 +1153,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                             displayRateFld)), GuiUtils.filler());
             filename =
                 FileManager.getWriteFile(Misc.newList(FileManager.FILTER_MOV,
-                                                      FileManager.FILTER_AVI,
-                    FileManager.FILTER_ANIMATEDGIF, FileManager.FILTER_KMZ,
+                    FileManager.FILTER_AVI, FileManager.FILTER_ANIMATEDGIF,
+                    FileManager.FILTER_KMZ,
                     FILTER_ANIS), FileManager.SUFFIX_MOV, extra);
         } else {
             filename = movieFileName;
@@ -1311,8 +1311,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             template   = StringUtil.replace(template, "%time%", timeString);
             template   = ucar.visad.UtcDate.applyTimeMacro(template, dttm);
         } catch (Exception exc) {}
-        template   = StringUtil.replace(template, "/", "_");
-        template   = StringUtil.replace(template, "\\", "_");
+        template = StringUtil.replace(template, "/", "_");
+        template = StringUtil.replace(template, "\\", "_");
 
         return template;
     }
@@ -1355,11 +1355,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     private void grabImageAndBlock() {
         synchronized (MUTEX) {
             String filename = getFilePrefix(imageCnt++);
-            String tmp = filename.toLowerCase();
-            if (!(tmp.endsWith(".gif") ||
-                  tmp.endsWith(".png") ||
-                  tmp.endsWith(".jpg") ||
-                  tmp.endsWith(".jpeg"))) {
+            String tmp      = filename.toLowerCase();
+            if ( !(tmp.endsWith(".gif") || tmp.endsWith(".png")
+                    || tmp.endsWith(".jpg") || tmp.endsWith(".jpeg"))) {
                 filename = filename + "." + getFileSuffix();
             }
 
@@ -1541,7 +1539,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                               displayRate, scriptingNode);
 
                 } else if (movieFile.toLowerCase().endsWith(".avi")) {
-                    ImageUtils.writeAvi(images, displayRate, new File(movieFile));
+                    ImageUtils.writeAvi(images, displayRate,
+                                        new File(movieFile));
                 } else {
                     //                    System.err.println("mov:" + movieFile);
                     SecurityManager backup = System.getSecurityManager();

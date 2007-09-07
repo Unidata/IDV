@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.ui;
 
 
@@ -37,6 +36,8 @@ import ucar.unidata.idv.*;
 import ucar.unidata.idv.chooser.IdvChooserManager;
 import ucar.unidata.idv.collab.CollabManager;
 import ucar.unidata.idv.control.DisplayControlImpl;
+
+import ucar.unidata.idv.control.DisplaySettingsDialog;
 import ucar.unidata.idv.control.MapDisplayControl;
 import ucar.unidata.idv.publish.IdvPublisher;
 
@@ -77,8 +78,6 @@ import ucar.unidata.xml.XmlObjectStore;
 import ucar.unidata.xml.XmlPersistable;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
-
-import ucar.unidata.idv.control.DisplaySettingsDialog;
 
 import ucar.visad.VisADPersistence;
 import ucar.visad.display.DisplayMaster;
@@ -1367,21 +1366,25 @@ public class IdvUIManager extends IdvManager {
         DataChoice dataChoice = dcd.getDataChoice();
         DataSource dataSource = dcd.getDataSource();
         if (dataChoice != null) {
-            Object[]      selectedControls = dcd.getSelectedControls();
+            Object[] selectedControls = dcd.getSelectedControls();
             for (int i = 0; i < selectedControls.length; i++) {
                 ControlDescriptor cd =
                     (ControlDescriptor) selectedControls[i];
-                DataSelection dataSelection = dcd.getDataSelectionWidget().createDataSelection(cd.doesLevels());
+                DataSelection dataSelection =
+                    dcd.getDataSelectionWidget().createDataSelection(
+                        cd.doesLevels());
                 Hashtable props = new Hashtable();
-                List settings = dcd.getDataSelectionWidget().getSelectedSettings();
-                if(settings!=null && settings.size()>0) {
+                List settings =
+                    dcd.getDataSelectionWidget().getSelectedSettings();
+                if ((settings != null) && (settings.size() > 0)) {
                     props.put("initialSettings", settings);
                 }
-                getIdv().doMakeControl(Misc.newList(dataChoice), cd, props, 
+                getIdv().doMakeControl(Misc.newList(dataChoice), cd, props,
                                        dataSelection);
             }
         } else if (dataSource != null) {
-            dataSource.setDateTimeSelection(dcd.getDataSelectionWidget().getSelectedDateTimes());
+            dataSource.setDateTimeSelection(
+                dcd.getDataSelectionWidget().getSelectedDateTimes());
             dataSourceTimeChanged(dataSource);
         }
     }
@@ -1776,6 +1779,9 @@ public class IdvUIManager extends IdvManager {
     }
 
 
+    /**
+     * Show the modal display settings dialog
+     */
     public void editDisplaySettings() {
         DisplaySettingsDialog dsd = new DisplaySettingsDialog(getIdv());
     }
@@ -3800,32 +3806,42 @@ public class IdvUIManager extends IdvManager {
     }
 
 
+    /**
+     * Make the toolbar
+     *
+     * @return toolbar
+     */
     protected JComponent doMakeToolbar() {
         Element toolbarRoot = getToolbarRoot();
         if (toolbarRoot == null) {
             return new JPanel();
         }
         IdvXmlUi.processToolbarXml(toolbarRoot, getIdvUIManager());
-        XmlUi xmlui = new XmlUi(toolbarRoot,getIdv());
+        XmlUi      xmlui   = new XmlUi(toolbarRoot, getIdv());
         JComponent toolbar = (JComponent) xmlui.getContents();
         return toolbar;
     }
 
 
 
+    /**
+     * Reload the toolbar xml  resources
+     */
     public void reloadToolbarResources() {
         XmlResourceCollection xrc = getResourceManager().getXmlResources(
-                                                                         getResourceManager().RSC_TOOLBAR);
+                                        getResourceManager().RSC_TOOLBAR);
         xrc.clearCache();
     }
 
 
+    /**
+     * Update the icon toolbar in all windows
+     */
     public void updateIconBar() {
         reloadToolbarResources();
-        List toolbarComps = getWindowGroup(
-                                           IdvWindow.GROUP_TOOLBARS);
-        for(int i=0;i<toolbarComps.size();i++) {
-            JComponent comp = (JComponent)toolbarComps.get(i);
+        List toolbarComps = getWindowGroup(IdvWindow.GROUP_TOOLBARS);
+        for (int i = 0; i < toolbarComps.size(); i++) {
+            JComponent comp    = (JComponent) toolbarComps.get(i);
             JComponent toolbar = doMakeToolbar();
             comp.removeAll();
             comp.add(BorderLayout.CENTER, toolbar);
@@ -4085,7 +4101,7 @@ public class IdvUIManager extends IdvManager {
         List windows = new ArrayList(IdvWindow.getWindows());
         for (int i = 0; i < windows.size(); i++) {
             IdvWindow window = (IdvWindow) windows.get(i);
-            if (window.getSkinPath()!=null &&  !window.hasViewManagers()) {
+            if ((window.getSkinPath() != null) && !window.hasViewManagers()) {
                 //got one
                 window.show();
                 return true;
@@ -4698,6 +4714,7 @@ public class IdvUIManager extends IdvManager {
      * @return List of {@link ucar.unidata.data.DataChoice}s
      */
     public List selectDataChoices(List operands) {
+
         if (operands.size() == 0) {
             return new ArrayList();
         }
@@ -4811,6 +4828,7 @@ public class IdvUIManager extends IdvManager {
             finalChoices.add(choice);
         }
         return finalChoices;
+
     }
 
 

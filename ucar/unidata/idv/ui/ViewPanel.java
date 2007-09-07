@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.ui;
 
 
@@ -305,7 +303,7 @@ public class ViewPanel extends IdvManager {
 
 
     /**
-     * Called when the ViewManager is changed. If we are showing legends in 
+     * Called when the ViewManager is changed. If we are showing legends in
      * a separate window then we update the tab label
      *
      * @param viewManager The ViewManager that was changed
@@ -747,7 +745,7 @@ public class ViewPanel extends IdvManager {
          * @param v buttons shown
          */
         private void setCatOpen(boolean v) {
-            if(viewManager!=null) {
+            if (viewManager != null) {
                 viewManager.putProperty("viewpanel.catgegory.open",
                                         new Boolean(v));
             }
@@ -1052,12 +1050,15 @@ public class ViewPanel extends IdvManager {
         public void viewManagerChanged() {
             viewLabel.setText(getLabel());
             if (viewManager.showHighlight()) {
-            	
-            	headerPanelHighlightBorder = BorderFactory.createCompoundBorder(
-                	BorderFactory.createEmptyBorder(3, 0, 0, 0), BorderFactory
-                		.createMatteBorder(0, 0, 2, 0, getStore()
-                			.get(ViewManager.PREF_BORDERCOLOR, Color.blue)));
-            	
+
+                headerPanelHighlightBorder =
+                    BorderFactory.createCompoundBorder(
+                        BorderFactory.createEmptyBorder(3, 0, 0, 0),
+                        BorderFactory.createMatteBorder(
+                            0, 0, 2, 0,
+                            getStore().get(
+                                ViewManager.PREF_BORDERCOLOR, Color.blue)));
+
                 headerPanel.setBorder(headerPanelHighlightBorder);
             } else {
                 headerPanel.setBorder(headerPanelBorder);
@@ -1220,3 +1221,4 @@ public class ViewPanel extends IdvManager {
 
 
 }
+

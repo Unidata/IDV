@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.ui;
 
 
@@ -775,11 +774,7 @@ public class DataTree extends DataSourceHolder {
         treeStructureChanged(nodeToScrollTo, null /*getExpandedPaths()*/);
     }
 
-    /** _more_          */
-    static int cnt = 0;
 
-    /** _more_          */
-    int mycnt = cnt++;
 
     /**
      *  This method tells the  tree that some new node (or nodes)
@@ -811,9 +806,6 @@ public class DataTree extends DataSourceHolder {
         //treeModel.nodeStructureChanged (treeRoot); 
         if (nodeToScrollTo != null) {
             tree.scrollPathToVisible(getPath(nodeToScrollTo));
-            //            if(mycnt==4)
-            //                Misc.printStack("setSelectionPath:"  + getPath(nodeToScrollTo));
-            //            System.err.println(mycnt +" set selection path:" + getPath(nodeToScrollTo));
             tree.setSelectionPath(getPath(nodeToScrollTo));
         }
     }

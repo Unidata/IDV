@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.ui;
 
 
@@ -37,7 +35,7 @@ import javax.help.*;
  */
 public class IdvHelp extends JHelp {
 
-    /** The HelpSet          */
+    /** The HelpSet */
     HelpSet helpSet;
 
     /**

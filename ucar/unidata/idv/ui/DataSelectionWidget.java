@@ -20,15 +20,13 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.ui;
 
 
 import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataSourceImpl;
-import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DerivedDataChoice;
 import ucar.unidata.data.GeoSelection;
 import ucar.unidata.data.GeoSelectionPanel;
@@ -106,9 +104,10 @@ public class DataSelectionWidget {
     JComponent selectionTabContainer;
 
 
+    /** include the settings tab */
     private boolean doSettings = true;
 
-    /** _more_ */
+    /** The display settings tree */
     private SettingsTree settingsTree;
 
 
@@ -116,16 +115,16 @@ public class DataSelectionWidget {
     private JTabbedPane selectionTab;
 
     /** Holds the stride */
-    private     JPanel strideTab;
+    private JPanel strideTab;
 
     /** Holds the area subset */
-    private     JPanel areaTab;
+    private JPanel areaTab;
 
     /** The chekcbox for selecting "All times" */
-    private     JCheckBox allTimesButton;
+    private JCheckBox allTimesButton;
 
     /** List of all the possible dttms */
-    private     List allDateTimes;
+    private List allDateTimes;
 
     /** geo selection */
     private GeoSelectionPanel geoSelectionPanel;
@@ -146,31 +145,41 @@ public class DataSelectionWidget {
     /** Holds the levels list */
     private JComponent levelsTab;
 
-
-
+    /** Last data source we were displaying for */
     private DataSource lastDataSource;
 
+    /** Keeps track of the tab label so we can reselect that tab when we update */
+    private String currentLbl;
 
     /**
      * Constructor  for when we are a part of the {@link DataSelector}
      *
      * @param idv Reference to the IDV
-     * @param inOwnWindow Should this object be in its own window
-     * @param horizontalOrientation Show display/times hor?
      *
      */
     public DataSelectionWidget(IntegratedDataViewer idv) {
-        this(idv,true);
+        this(idv, true);
     }
 
+    /**
+     * Constructor  for when we are a part of the {@link DataSelector}
+     *
+     * @param idv Reference to the IDV
+     * @param doSettings include the display settings in the tab
+     */
     public DataSelectionWidget(IntegratedDataViewer idv, boolean doSettings) {
         this.doSettings = doSettings;
-        this.idv = idv;
+        this.idv        = idv;
         getContents();
     }
 
+    /**
+     * get the gui contents
+     *
+     * @return gui contents
+     */
     public JComponent getContents() {
-        if(contents == null) {
+        if (contents == null) {
             contents = doMakeContents();
         }
         return contents;
@@ -183,9 +192,8 @@ public class DataSelectionWidget {
      * @param dataSource The data source that changed
      */
     public void dataSourceChanged(DataSource dataSource) {
-        if(dataSource==null) {
-            setTimes(new ArrayList(),
-                     new ArrayList());
+        if (dataSource == null) {
+            setTimes(new ArrayList(), new ArrayList());
         } else {
             setTimes(dataSource.getAllDateTimes(),
                      dataSource.getDateTimeSelection());
@@ -253,16 +261,27 @@ public class DataSelectionWidget {
     }
 
 
-    /** _more_ */
-    private String currentLbl;
 
+
+    /**
+     * Update the display settings
+     *
+     * @param cd new control descriptor
+     */
     protected void updateSettings(ControlDescriptor cd) {
-        if(settingsTree!=null) settingsTree.updateSettings(cd);
+        if (settingsTree != null) {
+            settingsTree.updateSettings(cd);
+        }
     }
 
 
+    /**
+     * Update the tabbed pane
+     *
+     * @param dataChoice new data choice
+     */
     protected void updateSelectionTab(DataChoice dataChoice) {
-        if(dataChoice == null) {
+        if (dataChoice == null) {
             updateSelectionTab(null, dataChoice);
             return;
         }
@@ -270,7 +289,7 @@ public class DataSelectionWidget {
         List sources = new ArrayList();
         dataChoice.getDataSources(sources);
         sources = Misc.makeUnique(sources);
-        if(sources.size()==1) {
+        if (sources.size() == 1) {
             updateSelectionTab((DataSource) sources.get(0), dataChoice);
         } else {
             updateSelectionTab(null, dataChoice);
@@ -287,8 +306,9 @@ public class DataSelectionWidget {
      * @param dc  The data choice
      */
     protected void updateSelectionTab(DataSource dataSource, DataChoice dc) {
+
         //        System.err.println("update tab " + dataSource + " " + dc);
-        if(lastDataSource!=dataSource) {
+        if (lastDataSource != dataSource) {
             dataSourceChanged(dataSource);
         }
         lastDataSource = dataSource;
@@ -315,7 +335,7 @@ public class DataSelectionWidget {
             return;
         }
 
-        if(dc == null) {
+        if (dc == null) {
             checkSelectionTab();
             return;
         }
@@ -395,25 +415,34 @@ public class DataSelectionWidget {
             }
         }
 
+
     }
 
 
+    /**
+     * Create the data selection from everything selected by the user
+     *
+     * @param addLevels include the levels
+     *
+     * @return new data selection
+     */
     public DataSelection createDataSelection(boolean addLevels) {
-        DataSelection dataSelection    = null;
+        DataSelection dataSelection = null;
         if (getUseAllTimes()) {
             dataSelection = new DataSelection();
+
             /**
-                 * !!!!! TODO !!!!!
-                 * I commented this out to work on the "@time index" functionality in the formulas.
-                 * What this says is that even though this data selection has no times list still
-                 * use all of the times available in the end data source.
-                 * However, with this in place what happens is the time selection of the child data choice
-                 * that we create for a formula that has the @times is overwritten by this setTimesMode.
-                 * One possible solution would be the DataSelection.merge in the DataChoice.getData
-                 * could only merge times from the higher priority one when there really is a times list.
-                 * !!!!! TODO !!!!!
-                 */
-                //                dataSelection.setTimesMode (dataSelection.TIMESMODE_USETHIS);
+             *     !!!!! TODO !!!!!
+             *     I commented this out to work on the "@time index" functionality in the formulas.
+             *     What this says is that even though this data selection has no times list still
+             *     use all of the times available in the end data source.
+             *     However, with this in place what happens is the time selection of the child data choice
+             *     that we create for a formula that has the @times is overwritten by this setTimesMode.
+             *     One possible solution would be the DataSelection.merge in the DataChoice.getData
+             *     could only merge times from the higher priority one when there really is a times list.
+             *     !!!!! TODO !!!!!
+             */
+            //                dataSelection.setTimesMode (dataSelection.TIMESMODE_USETHIS);
         } else {
             dataSelection = new DataSelection(getSelectedDateTimes());
         }
@@ -424,8 +453,7 @@ public class DataSelectionWidget {
                 if (levelRange.length == 1) {
                     dataSelection.setLevel(levelRange[0]);
                 } else {
-                    dataSelection.setLevelRange(levelRange[0],
-                                                levelRange[1]);
+                    dataSelection.setLevelRange(levelRange[0], levelRange[1]);
                 }
             }
         }
@@ -435,7 +463,7 @@ public class DataSelectionWidget {
 
 
     /**
-     * _more_
+     * add/remove the tabbed pane from the gui
      */
     private void checkSelectionTab() {
         boolean changed = false;
@@ -459,9 +487,9 @@ public class DataSelectionWidget {
 
 
     /**
-     * _more_
+     * Get list of selected DisplaySettings
      *
-     * @return _more_
+     * @return list of selected DisplaySettings
      */
     protected List getSelectedSettings() {
         if (settingsTree == null) {
@@ -472,11 +500,12 @@ public class DataSelectionWidget {
 
 
     /**
-     * _more_
+     * Put the display settings  component into the tabbed pane
      */
     private void addSettingsComponent() {
-        if(!doSettings) return;
-
+        if ( !doSettings) {
+            return;
+        }
 
         List settings = idv.getResourceManager().getDisplaySettings();
         if ((settings == null) || (settings.size() == 0)) {
@@ -494,17 +523,16 @@ public class DataSelectionWidget {
     /**
      * Make the GUI for configuring a {@link ucar.unidata.data.DataChoice}
      *
-     * @param dataChoice The DataChoice
      * @return The GUI
      */
     private JComponent doMakeContents() {
-        timesComponent     = getTimesList();
-        selectionTab = new JTabbedPane();
+        timesComponent = getTimesList();
+        selectionTab   = new JTabbedPane();
         selectionTab.setBorder(null);
         selectionTabContainer = new JPanel(new BorderLayout());
         selectionTabContainer.add(selectionTab);
         selectionContainer = new JPanel(new BorderLayout());
-        selectionContainer.setPreferredSize(new Dimension(200,150));
+        selectionContainer.setPreferredSize(new Dimension(200, 150));
         Font font = selectionTab.getFont();
         font = font.deriveFont((float) font.getSize() - 2).deriveFont(
             Font.ITALIC).deriveFont(Font.BOLD);
@@ -593,7 +621,7 @@ public class DataSelectionWidget {
      *  @return The GUI for times
      */
     public JComponent getTimesList() {
-        if (/*TODO dataSource != null*/ false) {
+        if ( /*TODO dataSource != null*/false) {
             return getTimesList("Use All ");
         } else {
             return getTimesList("Use Default ");
@@ -634,7 +662,7 @@ public class DataSelectionWidget {
      * @param selected The selected times
      */
     private static void setTimes(JList timesList, JCheckBox allTimesButton,
-                                List all, List selected) {
+                                 List all, List selected) {
 
         selected = DataSourceImpl.getDateTimes(selected, all);
 

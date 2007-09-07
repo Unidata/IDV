@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.ui;
 
 
@@ -57,9 +56,9 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.*;
-import javax.swing.text.JTextComponent;
 import javax.swing.BoxLayout;
 import javax.swing.event.*;
+import javax.swing.text.JTextComponent;
 
 
 
@@ -120,10 +119,10 @@ public class FormulaDialog extends JFrame implements ActionListener {
 
 
 
-    /** _more_          */
+    /** Is this a user's default derived formula */
     private JCheckBox isDefaultCbx;
 
-    /** _more_          */
+    /** Is this formula for an end user */
     private JCheckBox isEndUserCbx;
 
     /** Text field that holds the formula string */
@@ -135,7 +134,7 @@ public class FormulaDialog extends JFrame implements ActionListener {
     /** Text field that holds the description string */
     private JTextField descField;
 
-    /** _more_          */
+    /** gui widget */
     private JTextField operandsCategoriesFld;
 
 
@@ -145,7 +144,8 @@ public class FormulaDialog extends JFrame implements ActionListener {
     /** Holds the group string */
     private JComboBox categoryBox;
 
-    private  JComponent catComp;
+    /** gui widget */
+    private JComponent catComp;
 
     /** Is the advanced panel open */
     private boolean advancedOpen = false;
@@ -155,7 +155,10 @@ public class FormulaDialog extends JFrame implements ActionListener {
      */
     private JRadioButton useAllBtn;
 
+    /** for default derived settings */
     private List needCompList = new ArrayList();
+
+    /** for default derived settings */
     private List catCompList = new ArrayList();
 
 
@@ -179,6 +182,7 @@ public class FormulaDialog extends JFrame implements ActionListener {
     /** The group the formula is in */
     private String category = "";
 
+    /** Are we making a new formula */
     private boolean makingNewOne = false;
 
     /** The ddd we work on */
@@ -187,8 +191,7 @@ public class FormulaDialog extends JFrame implements ActionListener {
     /** Reference to the IDV */
     private IntegratedDataViewer idv;
 
-
-    /** _more_          */
+    /** gui comps */
     List paramGroupComps = new ArrayList();
 
     /**
@@ -219,8 +222,8 @@ public class FormulaDialog extends JFrame implements ActionListener {
         //      super (idv.getFrame (), "Formula editor", false);
         this.idv = idv;
         if (ddd == null) {
-            makingNewOne= true;
-            ddd = new DerivedDataDescriptor(idv);
+            makingNewOne = true;
+            ddd          = new DerivedDataDescriptor(idv);
             ddd.setIsEndUser(true);
         }
         this.ddd        = ddd;
@@ -415,9 +418,9 @@ public class FormulaDialog extends JFrame implements ActionListener {
         //        bottomPanel.setBorder(BorderFactory.createEtchedBorder());
 
 
-        isDefaultCbx =
-            new JCheckBox("Create derived quantities (Note: Use D1, D2, ..., DN as operands in formula) ",
-                          ddd.getIsDefault());
+        isDefaultCbx = new JCheckBox(
+            "Create derived quantities (Note: Use D1, D2, ..., DN as operands in formula) ",
+            ddd.getIsDefault());
         isEndUserCbx = new JCheckBox("For end user", ddd.getIsEndUser());
         isDefaultCbx.setToolTipText(
             "Automatically create derived  quantities for data sources that have fields that match the following");
@@ -462,14 +465,16 @@ public class FormulaDialog extends JFrame implements ActionListener {
 
         //Add in extra
         for (int i = 0; i < 1; i++) {
-            needCompList.add(pgc = new ParamGroupComponent(new DerivedNeed(ddd, null), null));
+            needCompList.add(pgc =
+                new ParamGroupComponent(new DerivedNeed(ddd, null), null));
             needsComps.add(pgc.cbx);
             needsComps.add(pgc.catFld);
         }
 
         //Add in extra
         for (int i = 0; i < 1; i++) {
-            needCompList.add(pc = new ParamComponent(new DerivedNeed(ddd, null)));
+            needCompList.add(pc = new ParamComponent(new DerivedNeed(ddd,
+                    null)));
             pcs.add(pc.paramsFld);
             pcs.add(pc.catFld);
         }
@@ -477,22 +482,25 @@ public class FormulaDialog extends JFrame implements ActionListener {
 
 
         List catComps = new ArrayList();
-        List cats = ddd.getDataCategories();
-        int catCols = 0;
-        for(int i=0;i<cats.size();i++) {
+        List cats     = ddd.getDataCategories();
+        int  catCols  = 0;
+        for (int i = 0; i < cats.size(); i++) {
             DataCategory dataCategory = (DataCategory) cats.get(i);
             catCompList.add(new CatComponent(dataCategory, catComps));
-            if(catCols == 0) catCols = catComps.size()/2;
+            if (catCols == 0) {
+                catCols = catComps.size() / 2;
+            }
         }
 
         catCompList.add(new CatComponent(new DataCategory(false), catComps));
-        if(catCols == 0) catCols = catComps.size()/2;
+        if (catCols == 0) {
+            catCols = catComps.size() / 2;
+        }
         catCompList.add(new CatComponent(new DataCategory(false), catComps));
         catCompList.add(new CatComponent(new DataCategory(false), catComps));
 
         GuiUtils.setHFill();
-        catComp = GuiUtils.doLayout(catComps, catCols,
-                                    GuiUtils.WT_YN,
+        catComp = GuiUtils.doLayout(catComps, catCols, GuiUtils.WT_YN,
                                     GuiUtils.WT_N);
 
         GuiUtils.tmpInsets = new Insets(2, 2, 2, 2);
@@ -506,16 +514,17 @@ public class FormulaDialog extends JFrame implements ActionListener {
 
         JComponent derivedPanel = needsComp;
 
-        catComp  = GuiUtils.vbox(new JLabel("Categorize the new data with:"),
-                                      catComp);
-        JButton popupBtn = GuiUtils.makeButton("Define Output Categories >>", this, "popupCatComp");
-        derivedPanel = GuiUtils.inset(GuiUtils.vbox(new JLabel("Match on fields:"),
-                                                    derivedPanel, 
-                                                    GuiUtils.left(popupBtn)),
-                                      new Insets(0,30,0,0));
+        catComp = GuiUtils.vbox(new JLabel("Categorize the new data with:"),
+                                catComp);
+        JButton popupBtn = GuiUtils.makeButton("Define Output Categories >>",
+                               this, "popupCatComp");
+        derivedPanel = GuiUtils.inset(
+            GuiUtils.vbox(
+                new JLabel("Match on fields:"), derivedPanel,
+                GuiUtils.left(popupBtn)), new Insets(0, 30, 0, 0));
 
         derivedPanel = GuiUtils.top(GuiUtils.vbox(cbxPanel, derivedPanel));
-        
+
 
 
         JTabbedPane advancedTab = new JTabbedPane();
@@ -564,18 +573,21 @@ public class FormulaDialog extends JFrame implements ActionListener {
         //        innerPanel.add(inputPanel);
 
         Component buttons;
-        if (!makingNewOne) {
-            if(!ddd.getIsLocalUsers()) {
+        if ( !makingNewOne) {
+            if ( !ddd.getIsLocalUsers()) {
                 buttons = GuiUtils.makeButtons(this,
-                                               new String[] { "Change Formula",
-                                                              "Cancel", "Help" }, new String[] { CMD_CHANGE,
-                                                                                                 GuiUtils.CMD_CANCEL, GuiUtils.CMD_HELP });
+                        new String[] { "Change Formula",
+                                       "Cancel", "Help" }, new String[] {
+                                           CMD_CHANGE,
+                                           GuiUtils.CMD_CANCEL,
+                                           GuiUtils.CMD_HELP });
             } else {
                 buttons = GuiUtils.makeButtons(this,
-                                               new String[] { "Change Formula", "Remove Formula",
-                                                              "Cancel", "Help" }, new String[] { CMD_CHANGE,
-                                                                                                 GuiUtils.CMD_REMOVE,
-                                                                                                 GuiUtils.CMD_CANCEL, GuiUtils.CMD_HELP });
+                        new String[] { "Change Formula",
+                                       "Remove Formula", "Cancel",
+                                       "Help" }, new String[] { CMD_CHANGE,
+                        GuiUtils.CMD_REMOVE, GuiUtils.CMD_CANCEL,
+                        GuiUtils.CMD_HELP });
             }
         } else {
             buttons = GuiUtils.makeButtons(this, new String[] { "Add Formula",
@@ -586,12 +598,17 @@ public class FormulaDialog extends JFrame implements ActionListener {
     }
 
 
+    /**
+     * Popup the output categories dialog
+     */
     public void popupCatComp() {
-        GuiUtils.makeDialog(this,"Define Output Categories", GuiUtils.inset(catComp,5),null, new String[]{GuiUtils.CMD_OK});
+        GuiUtils.makeDialog(this, "Define Output Categories",
+                            GuiUtils.inset(catComp, 5), null,
+                            new String[] { GuiUtils.CMD_OK });
     }
 
     /**
-     * Class NeedComponent _more_
+     * Class NeedComponent is used for the param needs
      *
      *
      * @author IDV Development Team
@@ -599,16 +616,16 @@ public class FormulaDialog extends JFrame implements ActionListener {
      */
     private abstract class NeedComponent {
 
-        /** _more_          */
+        /** widget */
         JTextField catFld;
 
-        /** _more_          */
+        /** need */
         DerivedNeed need;
 
         /**
-         * _more_
+         * ctor
          *
-         * @param need _more_
+         * @param need need
          */
         public NeedComponent(DerivedNeed need) {
             this.need = need;
@@ -618,6 +635,11 @@ public class FormulaDialog extends JFrame implements ActionListener {
             }
         }
 
+        /**
+         * get the need
+         *
+         * @return the need
+         */
         public abstract DerivedNeed getNeed();
     }
 
@@ -627,10 +649,10 @@ public class FormulaDialog extends JFrame implements ActionListener {
 
 
     /**
-     * _more_
+     * show menu
      *
-     * @param fld _more_
-     * @param e _more_
+     * @param fld field to set
+     * @param e event
      */
     private void showCategoriesPopup(final JTextField fld, MouseEvent e) {
         List cats = DataCategory.getCurrentCategories();
@@ -641,7 +663,7 @@ public class FormulaDialog extends JFrame implements ActionListener {
             JMenuItem    mi  = new JMenuItem(cat);
             mi.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
-                    GuiUtils.appendText(fld,cat,";");
+                    GuiUtils.appendText(fld, cat, ";");
                 }
             });
             items.add(mi);
@@ -661,13 +683,14 @@ public class FormulaDialog extends JFrame implements ActionListener {
 
 
     /**
-     * _more_
+     * Make the categories text field
      *
-     * @return _more_
+     * @return new text field
      */
     private JTextField doMakeCategoriesField() {
-        final JTextField fld = new JTextField("",15);
-        fld.setToolTipText("<html>Semi-colon separated list of data categories<br>Right mouse to add categories</html>");
+        final JTextField fld = new JTextField("", 15);
+        fld.setToolTipText(
+            "<html>Semi-colon separated list of data categories<br>Right mouse to add categories</html>");
         fld.addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
@@ -681,7 +704,7 @@ public class FormulaDialog extends JFrame implements ActionListener {
 
 
     /**
-     * Class ParamGroupComponent _more_
+     * Class ParamGroupComponent
      *
      *
      * @author IDV Development Team
@@ -689,14 +712,14 @@ public class FormulaDialog extends JFrame implements ActionListener {
      */
     private class ParamGroupComponent extends NeedComponent {
 
-        /** _more_          */
+        /** widget */
         JComboBox cbx;
 
         /**
-         * _more_
+         * ctor
          *
-         * @param need _more_
-         * @param group _more_
+         * @param need need
+         * @param group          group
          */
         public ParamGroupComponent(DerivedNeed need, DataGroup group) {
             super(need);
@@ -709,13 +732,19 @@ public class FormulaDialog extends JFrame implements ActionListener {
         }
 
 
-        public  DerivedNeed getNeed() {
+        /**
+         * get the need
+         *
+         * @return the need
+         */
+        public DerivedNeed getNeed() {
             Object o = cbx.getSelectedItem();
-            if(o == null || !(o instanceof DataGroup)) {
+            if ((o == null) || !(o instanceof DataGroup)) {
                 return null;
             }
             DataGroup dataGroup = (DataGroup) o;
-            return new DerivedNeed(ddd, dataGroup.getName(),catFld.getText().trim());
+            return new DerivedNeed(ddd, dataGroup.getName(),
+                                   catFld.getText().trim());
         }
 
 
@@ -724,7 +753,7 @@ public class FormulaDialog extends JFrame implements ActionListener {
 
 
     /**
-     * Class ParamComponent _more_
+     * Class ParamComponent is used for derived quantities
      *
      *
      * @author IDV Development Team
@@ -732,129 +761,177 @@ public class FormulaDialog extends JFrame implements ActionListener {
      */
     private class ParamComponent extends NeedComponent {
 
-        /** _more_          */
+        /** widget */
         ParamField paramsFld;
 
         /**
-         * _more_
+         * ctor
          *
-         * @param need _more_
+         * @param need need
          */
         public ParamComponent(DerivedNeed need) {
             super(need);
-            paramsFld = new ParamField(",",true);
+            paramsFld = new ParamField(",", true);
             if (need.getParamSets().size() > 0) {
                 paramsFld.setText(StringUtil.join(", ",
                         (List) need.getParamSets().get(0)));
             }
         }
 
-        public  DerivedNeed getNeed() {
+        /**
+         * get the need
+         *
+         * @return the need
+         */
+        public DerivedNeed getNeed() {
             String params = paramsFld.getText().trim();
-            if(params.length()==0) {
+            if (params.length() == 0) {
                 return null;
             }
 
-            return new DerivedNeed(ddd, StringUtil.split(params,",",true,true),catFld.getText().trim());
+            return new DerivedNeed(ddd,
+                                   StringUtil.split(params, ",", true, true),
+                                   catFld.getText().trim());
         }
 
     }
 
     /**
-     * Class 
+     * Used to hold categories
      *
      *
      * @author IDV Development Team
      * @version $Revision: 1.64 $
      */
     private class CatComponent {
+
+        /** attribute */
         DataCategory cat;
+
+        /** attribute */
         JTextField appendFld;
+
+        /** attribute */
         JTextField catFld;
-        JRadioButton  catButton;
-        JRadioButton  inheritButton;
+
+        /** attribute */
+        JRadioButton catButton;
+
+        /** attribute */
+        JRadioButton inheritButton;
+
+        /** attribute */
         JComboBox childIndexCbx;
+
+        /** attribute */
         JComboBox catIndexCbx;
+
+        /**
+         * ctor
+         *
+         * @param cat category
+         * @param comps components
+         */
         public CatComponent(DataCategory cat, List comps) {
-            Vector indices = new Vector(Misc.toList(new Object[]{new TwoFacedObject("All",-1),
-                                        new TwoFacedObject("1st",0),
-                                        new TwoFacedObject("2nd",1),
-                                        new TwoFacedObject("3rd",2),
-                                        new TwoFacedObject("4th",3),
-                                        new TwoFacedObject("5th",4)}));
+            Vector indices = new Vector(Misc.toList(new Object[] {
+                new TwoFacedObject("All", -1), new TwoFacedObject("1st", 0),
+                new TwoFacedObject("2nd", 1), new TwoFacedObject("3rd", 2),
+                new TwoFacedObject("4th", 3), new TwoFacedObject("5th", 4)
+            }));
 
 
             childIndexCbx = new JComboBox(indices);
-            TwoFacedObject tfo = TwoFacedObject.findId(new Integer(cat.getChildIndex()),indices);
-            if(tfo!=null)
+            TwoFacedObject tfo =
+                TwoFacedObject.findId(new Integer(cat.getChildIndex()),
+                                      indices);
+            if (tfo != null) {
                 childIndexCbx.setSelectedItem(tfo);
+            }
             catIndexCbx = new JComboBox(indices);
-            tfo = TwoFacedObject.findId(new Integer(cat.getCategoryIndex()),indices);
-            if(tfo!=null)
+            tfo = TwoFacedObject.findId(new Integer(cat.getCategoryIndex()),
+                                        indices);
+            if (tfo != null) {
                 catIndexCbx.setSelectedItem(tfo);
+            }
 
-            String catString  = cat.toString();
-            if(catString.startsWith("display:") || cat.getForDisplay()) return;
-            if(comps.size()==0) {
+            String catString = cat.toString();
+            if (catString.startsWith("display:") || cat.getForDisplay()) {
+                return;
+            }
+            if (comps.size() == 0) {
                 comps.add(GuiUtils.cLabel("Data Category"));
                 comps.add(GuiUtils.cLabel("  Use Data  "));
                 comps.add(GuiUtils.cLabel("  Operand  "));
                 comps.add(GuiUtils.cLabel("  Category  "));
                 comps.add(GuiUtils.cLabel("  Append  "));
             }
-           this.cat = cat;
-           inheritButton = new JRadioButton("",false);
-           catButton = new JRadioButton("",true);
-           GuiUtils.buttonGroup(inheritButton, catButton);
+            this.cat      = cat;
+            inheritButton = new JRadioButton("", false);
+            catButton     = new JRadioButton("", true);
+            GuiUtils.buttonGroup(inheritButton, catButton);
 
-           ActionListener listener;
-           inheritButton.addActionListener(listener = new ActionListener(){
-                   public void actionPerformed(ActionEvent ae) {
-                       checkEnabled();
-                   }
-               });
-           catButton.addActionListener(listener);
-           if(cat == null) cat = new DataCategory();
-           appendFld = new JTextField(cat.getAppend(),10);
-           catFld = doMakeCategoriesField();
-           if(catString.equals("inherit")) {
-               catString = "";
-               inheritButton.setSelected(true);
-           }
-           catFld.setText(catString);
-           comps.add(GuiUtils.leftCenter(catButton,catFld));
-           comps.add(GuiUtils.right(inheritButton));
-           comps.add(childIndexCbx);
-           comps.add(catIndexCbx);
-           comps.add(appendFld);
-           checkEnabled();
+            ActionListener listener;
+            inheritButton.addActionListener(listener = new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    checkEnabled();
+                }
+            });
+            catButton.addActionListener(listener);
+            if (cat == null) {
+                cat = new DataCategory();
+            }
+            appendFld = new JTextField(cat.getAppend(), 10);
+            catFld    = doMakeCategoriesField();
+            if (catString.equals("inherit")) {
+                catString = "";
+                inheritButton.setSelected(true);
+            }
+            catFld.setText(catString);
+            comps.add(GuiUtils.leftCenter(catButton, catFld));
+            comps.add(GuiUtils.right(inheritButton));
+            comps.add(childIndexCbx);
+            comps.add(catIndexCbx);
+            comps.add(appendFld);
+            checkEnabled();
         }
 
+        /**
+         * Get the data category
+         *
+         * @return data category
+         */
         public DataCategory getDataCategory() {
-            if(catFld == null) return null;
-            if(catButton.isSelected()) {
+            if (catFld == null) {
+                return null;
+            }
+            if (catButton.isSelected()) {
                 String catString = catFld.getText().trim();
-                if(catString.length()==0) {
+                if (catString.length() == 0) {
                     return null;
                 }
-                return  DataCategory.parseCategory(catString, false);
+                return DataCategory.parseCategory(catString, false);
             } else {
-                DataCategory cat =  DataCategory.parseCategory("inherit", false);
-                TwoFacedObject tfo = (TwoFacedObject)childIndexCbx.getSelectedItem();
-                cat.setChildIndex(((Integer)tfo.getId()).intValue());
-                tfo = (TwoFacedObject)catIndexCbx.getSelectedItem();
-                cat.setCategoryIndex(((Integer)tfo.getId()).intValue());
+                DataCategory cat = DataCategory.parseCategory("inherit",
+                                       false);
+                TwoFacedObject tfo =
+                    (TwoFacedObject) childIndexCbx.getSelectedItem();
+                cat.setChildIndex(((Integer) tfo.getId()).intValue());
+                tfo = (TwoFacedObject) catIndexCbx.getSelectedItem();
+                cat.setCategoryIndex(((Integer) tfo.getId()).intValue());
                 cat.setAppend(appendFld.getText().trim());
                 return cat;
             }
         }
 
-        private void  checkEnabled() {
+        /**
+         * enable/disable things
+         */
+        private void checkEnabled() {
             boolean enabled = inheritButton.isSelected();
             appendFld.setEnabled(enabled);
             childIndexCbx.setEnabled(enabled);
             catIndexCbx.setEnabled(enabled);
-            catFld.setEnabled(!enabled);
+            catFld.setEnabled( !enabled);
         }
 
     }
@@ -938,7 +1015,9 @@ public class FormulaDialog extends JFrame implements ActionListener {
         }
 
         if (cmd.equals(GuiUtils.CMD_REMOVE)) {
-            if(GuiUtils.askOkCancel("Remove Formula", "Are you sure you want to remove the formula?")) {
+            if (GuiUtils.askOkCancel(
+                    "Remove Formula",
+                    "Are you sure you want to remove the formula?")) {
                 idv.getJythonManager().removeFormula(ddd);
                 closeFormulaDialog();
             }
@@ -985,10 +1064,10 @@ public class FormulaDialog extends JFrame implements ActionListener {
         ddd.setOperandsCategories(operandsCategoriesFld.getText().trim());
 
         List derivedNeeds = new ArrayList();
-        for(int i=0;i<needCompList.size();i++) {
+        for (int i = 0; i < needCompList.size(); i++) {
             NeedComponent needComponent = (NeedComponent) needCompList.get(i);
-            DerivedNeed derivedNeed = needComponent.getNeed();
-            if(derivedNeed!=null) {
+            DerivedNeed   derivedNeed   = needComponent.getNeed();
+            if (derivedNeed != null) {
                 derivedNeeds.add(derivedNeed);
             }
         }
@@ -1074,11 +1153,12 @@ public class FormulaDialog extends JFrame implements ActionListener {
         }
 
 
-        for(int i=0;i<catCompList.size();i++) {
+        for (int i = 0; i < catCompList.size(); i++) {
             CatComponent catComponent = (CatComponent) catCompList.get(i);
-            DataCategory cat = catComponent.getDataCategory();
-            if(cat!=null)
+            DataCategory cat          = catComponent.getDataCategory();
+            if (cat != null) {
                 categories.add(cat);
+            }
         }
 
         ddd.setDataCategories(categories);

@@ -56,8 +56,10 @@ import javax.swing.event.*;
  */
 public class IdvWindow extends MultiFrame {
 
+    /** The chooser components in this window */
     public static final String GROUP_CHOOSERS = "choosers";
 
+    /** The toolbar components in this window */
     public static final String GROUP_TOOLBARS = "toolbars";
 
     /** Keep around default window positions */
@@ -118,10 +120,13 @@ public class IdvWindow extends MultiFrame {
     private boolean isAMainWindow = false;
 
 
+    /** Keep track of the last active window */
     private static IdvWindow lastActiveWindow;
 
-    private String type="";
+    /** Window type */
+    private String type = "";
 
+    /** The groups within this window */
     private Hashtable groups = new Hashtable();
 
     /**
@@ -165,9 +170,9 @@ public class IdvWindow extends MultiFrame {
                 removeWindowListener(wa[0]);
                 lastActiveWindow = null;
             }
-                public void windowActivated(WindowEvent e) {
-                    lastActiveWindow = IdvWindow.this;
-                }
+            public void windowActivated(WindowEvent e) {
+                lastActiveWindow = IdvWindow.this;
+            }
         });
         LogUtil.registerWindow(getWindow());
         if (lastX > 500) {
@@ -180,6 +185,11 @@ public class IdvWindow extends MultiFrame {
     }
 
 
+    /**
+     * Get the current active window
+     *
+     * @return active window
+     */
     public static IdvWindow getActiveWindow() {
         return lastActiveWindow;
 
@@ -576,7 +586,9 @@ public class IdvWindow extends MultiFrame {
      * @param component The component
      */
     public void setComponent(String componentName, Object component) {
-        if(components==null) return;
+        if (components == null) {
+            return;
+        }
         components.put(componentName, component);
     }
 
@@ -591,17 +603,17 @@ public class IdvWindow extends MultiFrame {
      * @param comp The object (ususally a Component) to add to the group
      */
     public void addToGroup(Object groupKey, Object comp) {
-        List comps = (List)    groups.get(groupKey);
-        if(comps == null) {
+        List comps = (List) groups.get(groupKey);
+        if (comps == null) {
             comps = new ArrayList();
-            groups.put(groupKey,comps);
+            groups.put(groupKey, comps);
         }
-        if(!comps.contains(comp)) {
+        if ( !comps.contains(comp)) {
             comps.add(comp);
         }
     }
 
-    /*
+    /**
      * Get the list of objects that are in the group.
      * If none found return null
      *
@@ -609,11 +621,11 @@ public class IdvWindow extends MultiFrame {
      * @return List of objects in group or null
      */
     public List getGroup(Object groupKey) {
-        return  (List)    groups.get(groupKey);
+        return (List) groups.get(groupKey);
     }
 
 
-    /** 
+    /**
      * Get the  list of components held by the xmlui
      * @return components
      */
@@ -633,7 +645,9 @@ public class IdvWindow extends MultiFrame {
      * @return The component
      */
     public Object getComponent(String componentName) {
-        if(components==null) return null;
+        if (components == null) {
+            return null;
+        }
         Object comp = components.get(componentName);
         if ((comp == null) && (xmlUI != null)) {
             comp = xmlUI.getComponent(componentName);
@@ -736,21 +750,21 @@ public class IdvWindow extends MultiFrame {
     }
 
     /**
-       Set the Type property.
-
-       @param value The new value for Type
-    **/
-    public void setType (String value) {
-	type = value;
+     *  Set the Type property.
+     *
+     *  @param value The new value for Type
+     */
+    public void setType(String value) {
+        type = value;
     }
 
     /**
-       Get the Type property.
-
-       @return The Type
-    **/
-    public String getType () {
-	return type;
+     *  Get the Type property.
+     *
+     *  @return The Type
+     */
+    public String getType() {
+        return type;
     }
 
 

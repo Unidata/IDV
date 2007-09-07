@@ -107,6 +107,7 @@ public class DataTreeDialog extends JDialog implements ActionListener {
     /** All of the data trees, one per label/param name */
     List dataTrees = new ArrayList();
 
+    /** List of dataseleciotnwidgets, one per datatree */
     List dataSelectionWidgets = new ArrayList();
 
     /** Listener to fire select events off to */
@@ -121,6 +122,7 @@ public class DataTreeDialog extends JDialog implements ActionListener {
     /** Any DataCatgeory-s to use to filter out the DataChoice-s with */
     List categories;
 
+    /** Patterns to match */
     List patterns;
 
     /** Support multiple selection? */
@@ -161,12 +163,12 @@ public class DataTreeDialog extends JDialog implements ActionListener {
      * @param dataSources List of data sources
      */
     public DataTreeDialog(IntegratedDataViewer idv, JFrame frame,
-                          Component src, List categories, List paramNames, 
-                          List patterns,
-                          boolean multiples, List dataSources) {
+                          Component src, List categories, List paramNames,
+                          List patterns, boolean multiples,
+                          List dataSources) {
 
-        this(idv, frame, src, categories, paramNames, patterns, multiples, dataSources,
-             (List) null);
+        this(idv, frame, src, categories, paramNames, patterns, multiples,
+             dataSources, (List) null);
     }
 
     /**
@@ -199,13 +201,14 @@ public class DataTreeDialog extends JDialog implements ActionListener {
      * @param src  Component to place ourselves near
      * @param categories List of list of {@link ucar.unidata.data.DataCategory}-s
      * @param paramNames List of param names
+     * @param patterns patterns to use to pre-select data choices
      * @param multiples Support multiples
      * @param dataSources List of data sources
      * @param selectedDataChoices list of already selected data choices
      */
     public DataTreeDialog(IntegratedDataViewer idv, JFrame frame,
-                          Component src, List categories, List paramNames, List patterns,
-                          boolean multiples, List dataSources,
+                          Component src, List categories, List paramNames,
+                          List patterns, boolean multiples, List dataSources,
                           List selectedDataChoices) {
 
 
@@ -337,12 +340,15 @@ public class DataTreeDialog extends JDialog implements ActionListener {
             dataTree.setMultipleSelect(multiples);
             if (selectedDataChoices != null) {
                 dataTree.selectChoices(selectedDataChoices);
-            } else if(patterns!=null && i<patterns.size()) {
+            } else if ((patterns != null) && (i < patterns.size())) {
                 String pattern = (String) "pattern:" + patterns.get(i);
-                 for(int dataSourceIdx=0;dataSourceIdx<dataSources.size();dataSourceIdx++) {
-                    DataSource dataSource = (DataSource) dataSources.get(dataSourceIdx);
-                    DataChoice dataChoice = dataSource.findDataChoice(pattern);
-                    if(dataChoice!=null) {
+                for (int dataSourceIdx = 0;
+                        dataSourceIdx < dataSources.size(); dataSourceIdx++) {
+                    DataSource dataSource =
+                        (DataSource) dataSources.get(dataSourceIdx);
+                    DataChoice dataChoice =
+                        dataSource.findDataChoice(pattern);
+                    if (dataChoice != null) {
                         dataTree.selectChoices(Misc.newList(dataChoice));
                         break;
                     }
@@ -364,7 +370,8 @@ public class DataTreeDialog extends JDialog implements ActionListener {
     private void treeClick(int index) {
         DataTree   tree       = (DataTree) dataTrees.get(index);
         DataChoice dataChoice = tree.getSelectedDataChoice();
-        DataSelectionWidget dsw  = (DataSelectionWidget) dataSelectionWidgets.get(index);
+        DataSelectionWidget dsw =
+            (DataSelectionWidget) dataSelectionWidgets.get(index);
         dsw.updateSelectionTab(dataChoice);
     }
 
@@ -411,10 +418,11 @@ public class DataTreeDialog extends JDialog implements ActionListener {
             JScrollPane scroller =
                 ((DataTree) dataTrees.get(i)).getScroller();
 
-            DataSelectionWidget dsw = new DataSelectionWidget(idv,false);
+            DataSelectionWidget dsw = new DataSelectionWidget(idv, false);
             dataSelectionWidgets.add(dsw);
 
-            DataChoice dataChoice = ((DataTree)dataTrees.get(i)).getSelectedDataChoice();
+            DataChoice dataChoice =
+                ((DataTree) dataTrees.get(i)).getSelectedDataChoice();
             dsw.updateSelectionTab(dataChoice);
             String labelString = StringUtil.replace(labels.get(i).toString(),
                                      "_", " ");
@@ -471,7 +479,8 @@ public class DataTreeDialog extends JDialog implements ActionListener {
         selected = new ArrayList();
         for (int i = 0; i < dataTrees.size(); i++) {
             DataSelection dataSelection = null;
-            DataSelectionWidget dsw = (DataSelectionWidget) dataSelectionWidgets.get(i);
+            DataSelectionWidget dsw =
+                (DataSelectionWidget) dataSelectionWidgets.get(i);
             dataSelection = dsw.createDataSelection(true);
             List selectedFromTree =
                 ((DataTree) dataTrees.get(i)).getSelectedDataChoices();

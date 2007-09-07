@@ -34,12 +34,12 @@ import ucar.unidata.idv.chooser.IdvChooserManager;
 import ucar.unidata.ui.FineLineBorder;
 import ucar.unidata.ui.RovingProgress;
 import ucar.unidata.ui.XmlUi;
+import ucar.unidata.util.GuiUtils;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.MemoryMonitor;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
@@ -54,6 +54,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import javax.help.*;
+
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -67,13 +68,14 @@ import javax.swing.border.*;
  * This class  handles the tags &quot;datatree&quot;
  * and &quot;messagelogger&quot;, though in the future
  * it could handle the creation of view managers, legends, etc.
-ew *
+ * ew
  * @author Idv Development Team
  */
 
 public class IdvXmlUi extends XmlUi {
 
-    private static final String ATTR_USEPREF="usepref";
+    /** xml attribute */
+    private static final String ATTR_USEPREF = "usepref";
 
     /** Gets bumped up every time we create a gui */
     private static int version = 0;
@@ -103,7 +105,7 @@ public class IdvXmlUi extends XmlUi {
      * @param root The root of the xml tree that defines the UI
      */
     public IdvXmlUi(IntegratedDataViewer idv, Element root) {
-        super(root,idv);
+        super(root, idv);
         viewManagersToUse = new ArrayList();
         this.idv          = idv;
         properties.put("versionuid", Misc.getUniqueId());
@@ -132,7 +134,7 @@ public class IdvXmlUi extends XmlUi {
         if (window != null) {
             window.setXmlUI(this);
         }
-        this.idv          = idv;
+        this.idv = idv;
         properties.put("versionuid", Misc.getUniqueId());
         properties.put("version", "" + (version++));
     }
@@ -148,7 +150,9 @@ public class IdvXmlUi extends XmlUi {
                                             IdvUIManager uiManager) {
         root.removeAttribute(ATTR_ID);
         NodeList elements = XmlUtil.getElements(root);
-        String iconSize = (String)uiManager.getIdv().getStateManager().getPreferenceOrProperty("idv.ui.iconsize");
+        String iconSize =
+            (String) uiManager.getIdv().getStateManager()
+                .getPreferenceOrProperty("idv.ui.iconsize");
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
             child.removeAttribute(ATTR_ID);
@@ -168,11 +172,13 @@ public class IdvXmlUi extends XmlUi {
                     == null) {
                 String image = uiManager.getActionImage(action);
                 if (image != null) {
-                    if(iconSize!=null) {
-                        if(image.indexOf("16") >=0) {
-                            String tmp = StringUtil.replace(image,"16",iconSize);
-                            if(GuiUtils.getImage(tmp,IdvXmlUi.class, true, true)!=null) {
-                                image  = tmp;
+                    if (iconSize != null) {
+                        if (image.indexOf("16") >= 0) {
+                            String tmp = StringUtil.replace(image, "16",
+                                             iconSize);
+                            if (GuiUtils.getImage(tmp, IdvXmlUi.class, true,
+                                    true) != null) {
+                                image = tmp;
                             } else {
                                 child.setAttribute("imagewidth", iconSize);
                             }
@@ -243,66 +249,71 @@ public class IdvXmlUi extends XmlUi {
      */
     public Component createComponent(Element node, String id) {
 
-        String tagName = node.getTagName();
+        String         tagName = node.getTagName();
 
         QuicklinkPanel editor;
         if (tagName.equals("idv.quicklinks")) {
-            if(XmlUtil.getAttribute(node, ATTR_USEPREF,false)) {
-                if(!idv.getIdvUIManager().embedQuickLinksInDashboard()) return null;
+            if (XmlUtil.getAttribute(node, ATTR_USEPREF, false)) {
+                if ( !idv.getIdvUIManager().embedQuickLinksInDashboard()) {
+                    return null;
+                }
             }
             return QuicklinkPanel.createQuicklinksFromResources(idv);
         }
 
         if (tagName.equals("idv.quicklinks.favorites")) {
-            editor =  new QuicklinkPanel.Bundle(idv,"Favorite Bundles",
-                                                     IdvPersistenceManager.BUNDLES_FAVORITES);
+            editor = new QuicklinkPanel.Bundle(idv, "Favorite Bundles",
+                    IdvPersistenceManager.BUNDLES_FAVORITES);
             editor.doUpdate();
             return editor.getContents();
         }
 
         if (tagName.equals("idv.quicklinks.datasources")) {
-            editor = new QuicklinkPanel.Bundle(idv,"Data Favorites",
-                                                  IdvPersistenceManager.BUNDLES_DATA);
+            editor = new QuicklinkPanel.Bundle(idv, "Data Favorites",
+                    IdvPersistenceManager.BUNDLES_DATA);
             editor.doUpdate();
             return editor.getContents();
         }
 
         if (tagName.equals("idv.quicklinks.displaytemplates")) {
-            editor = new QuicklinkPanel.Bundle(idv,"Display Templates",
-                                                  IdvPersistenceManager.BUNDLES_DISPLAY);
+            editor = new QuicklinkPanel.Bundle(idv, "Display Templates",
+                    IdvPersistenceManager.BUNDLES_DISPLAY);
             editor.doUpdate();
             return editor.getContents();
         }
 
         if (tagName.equals("idv.quicklinks.history")) {
-            editor = new QuicklinkPanel.FileHistory(idv,"History");
+            editor = new QuicklinkPanel.FileHistory(idv, "History");
             editor.doUpdate();
             return editor.getContents();
         }
 
 
         if (tagName.equals("idv.quicklinks.special")) {
-            editor = new QuicklinkPanel.Control(idv,"Special Displays");
+            editor = new QuicklinkPanel.Control(idv, "Special Displays");
             editor.doUpdate();
             return editor.getContents();
         }
 
         if (tagName.equals("idv.quicklinks.windows")) {
-            editor = new QuicklinkPanel.Html(idv,"New Window",
-                                                "Create New Window",
-                                                idv.getIdvUIManager().getSkinHtml());
+            editor =
+                new QuicklinkPanel.Html(idv, "New Window",
+                                        "Create New Window",
+                                        idv.getIdvUIManager().getSkinHtml());
             editor.doUpdate();
             return editor.getContents();
         }
 
         if (tagName.equals(IdvUIManager.COMP_HELP)) {
             try {
-                java.net.URL url = IOUtil.getURL(XmlUtil.getAttribute(node, "helpset","/auxdata/docs/userguide/HelpSet.hs"), 
-                                                 getClass());
+                java.net.URL url =
+                    IOUtil.getURL(XmlUtil.getAttribute(node, "helpset",
+                        "/auxdata/docs/userguide/HelpSet.hs"), getClass());
                 if (url == null) {
                     return null;
                 }
-                return  new IdvHelp(new HelpSet(getClass().getClassLoader(), url));
+                return new IdvHelp(new HelpSet(getClass().getClassLoader(),
+                        url));
             } catch (Exception exc) {
                 LogUtil.logException("Error loading help", exc);
                 return null;
@@ -311,14 +322,23 @@ public class IdvXmlUi extends XmlUi {
 
 
         if (tagName.equals(IdvUIManager.COMP_CHOOSERS)) {
-            if(XmlUtil.getAttribute(node, ATTR_USEPREF,false)) {
-                if(!idv.getIdvUIManager().embedDataChooserInDashboard()) return null;
+            if (XmlUtil.getAttribute(node, ATTR_USEPREF, false)) {
+                if ( !idv.getIdvUIManager().embedDataChooserInDashboard()) {
+                    return null;
+                }
             }
-            boolean inTabs  = XmlUtil.getAttribute(node,"intabs", !idv.getProperty(IdvChooserManager.PROP_CHOOSER_TREEVIEW,false));
+            boolean inTabs = XmlUtil.getAttribute(
+                                 node, "intabs",
+                                 !idv.getProperty(
+                                     IdvChooserManager.PROP_CHOOSER_TREEVIEW,
+                                     false));
             List choosers = new ArrayList();
-            Component comp =  idv.getIdvChooserManager().createChoosers(inTabs, choosers, node);
-            for(int i=0;i<choosers.size();i++) {
-                window.addToGroup(IdvWindow.GROUP_CHOOSERS, (Component)choosers.get(i));
+            Component comp =
+                idv.getIdvChooserManager().createChoosers(inTabs, choosers,
+                    node);
+            for (int i = 0; i < choosers.size(); i++) {
+                window.addToGroup(IdvWindow.GROUP_CHOOSERS,
+                                  (Component) choosers.get(i));
             }
             return comp;
         }
@@ -326,9 +346,10 @@ public class IdvXmlUi extends XmlUi {
 
         if (tagName.equals(IdvUIManager.COMP_CHOOSER)) {
             if (idv.getPreferenceManager().shouldShowChooser(
-                                                             IdvChooserManager.getChooserId(node))) {
-                Component comp =  idv.getIdvChooserManager().createChooser(node);
-                if(comp!=null && window!=null) {
+                    IdvChooserManager.getChooserId(node))) {
+                Component comp =
+                    idv.getIdvChooserManager().createChooser(node);
+                if ((comp != null) && (window != null)) {
                     window.addToGroup(IdvWindow.GROUP_CHOOSERS, comp);
                 }
                 return comp;
@@ -338,8 +359,10 @@ public class IdvXmlUi extends XmlUi {
 
 
         if (tagName.equals(IdvUIManager.COMP_VIEWPANEL)) {
-            if(XmlUtil.getAttribute(node, ATTR_USEPREF,false)) {
-                if(!idv.getIdvUIManager().getShowControlsInTab()) return null;
+            if (XmlUtil.getAttribute(node, ATTR_USEPREF, false)) {
+                if ( !idv.getIdvUIManager().getShowControlsInTab()) {
+                    return null;
+                }
             }
             return idv.getIdvUIManager().getViewPanel().getContents();
         }
@@ -347,7 +370,7 @@ public class IdvXmlUi extends XmlUi {
         if (tagName.equals(IdvUIManager.COMP_TOOLBAR)) {
             JComponent toolbar = idv.getIdvUIManager().doMakeToolbar();
             toolbar = GuiUtils.center(toolbar);
-            if(window!=null) {
+            if (window != null) {
                 window.addToGroup(IdvWindow.GROUP_TOOLBARS, toolbar);
             }
             return toolbar;
@@ -367,12 +390,13 @@ public class IdvXmlUi extends XmlUi {
         }
 
         if (tagName.equals(IdvUIManager.COMP_DATASELECTOR)) {
-            if(XmlUtil.getAttribute(node, ATTR_USEPREF,false)) {
-                if(!idv.getIdvUIManager().embedFieldSelectorInDashboard()) return null;
+            if (XmlUtil.getAttribute(node, ATTR_USEPREF, false)) {
+                if ( !idv.getIdvUIManager().embedFieldSelectorInDashboard()) {
+                    return null;
+                }
             }
-            return idv.getIdvUIManager().createDataSelector(
-                                                            false,
-                                                            false).getContents();
+            return idv.getIdvUIManager().createDataSelector(false,
+                    false).getContents();
         }
 
         if (tagName.equals(IdvUIManager.COMP_PROGRESSBAR)) {
@@ -424,7 +448,8 @@ public class IdvXmlUi extends XmlUi {
             }
 
             ViewManager viewManager = null;
-            if (viewManagersToUse!=null && viewManagersToUse.size() > 0) {
+            if ((viewManagersToUse != null)
+                    && (viewManagersToUse.size() > 0)) {
                 viewManager = (ViewManager) viewManagersToUse.get(0);
                 viewManagersToUse.remove(0);
             }

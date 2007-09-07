@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.ui;
 
 
@@ -81,25 +80,29 @@ import javax.swing.event.*;
  */
 public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkListener {
 
-    /** 
-        A global list of the panels that have been created. We keep this around to do updates
+    /**
+     *   A global list of the panels that have been created. We keep this around to do updates
      */
     private static final List editors = new ArrayList();
 
-    /** The idv          */
-    IntegratedDataViewer idv;
+    /** The idv */
+    private IntegratedDataViewer idv;
 
     /** status label */
-    JLabel label = new JLabel(" ");
+    private JLabel label = new JLabel(" ");
 
     /** maps id to some object for the links */
-    Hashtable map = new Hashtable();
+    private Hashtable map = new Hashtable();
 
     /** am I currently loading */
-    boolean amLoading = false;
+    private boolean amLoading = false;
 
     /** The name */
-    String name;
+    private String name;
+
+    /** unique counter */
+    private int objectCnt = 0;
+
 
     /**
      * ctor
@@ -178,7 +181,7 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
             String resourcePath = (String) rc.get(i);
             if (resourcePath.endsWith(".class")) {
                 Component comp = loadClass(resourcePath, idv);
-                if(comp!=null) {
+                if (comp != null) {
                     tab.add(comp.toString(), comp);
                 }
                 continue;
@@ -261,9 +264,11 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
      *
      * @param path the class's path
      * @param idv the idv
-     * @param tab tab to add
+     *
+     * @return The gui component
      */
-    private static Component loadClass(String path, IntegratedDataViewer idv) {
+    private static Component loadClass(String path,
+                                       IntegratedDataViewer idv) {
         try {
             path = StringUtil.replace(path, ".class", "");
             Class c = Misc.findClass(path);
@@ -278,7 +283,7 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
 
             if (o instanceof Component) {
                 return (Component) o;
-           }
+            }
         } catch (Exception exc) {
             LogUtil.logException("Loading class:" + path, exc);
         }
@@ -289,18 +294,18 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
 
 
     /**
-     * _more_
+     * get the name
      *
-     * @return _more_
+     * @return name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * _more_
+     * get idv
      *
-     * @return _more_
+     * @return idv
      */
     public IntegratedDataViewer getIdv() {
         return idv;
@@ -316,10 +321,10 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
     }
 
     /**
-     * _more_
+     * log error
      *
-     * @param msg _more_
-     * @param exc _more_
+     * @param msg message
+     * @param exc exception
      */
     public void logException(String msg, Exception exc) {
         LogUtil.logException(msg, exc);
@@ -365,9 +370,18 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
         setText(getHtml());
     }
 
-    private int objectCnt = 0;
+
+
+    /**
+     * Register the object
+     *
+     * @param object object_
+     * @param command what to do_
+     *
+     * @return string to put into html
+     */
     protected String registerObject(Object object, String command) {
-        String      id         = "qobject:" + command+":"+(objectCnt++);
+        String id = "qobject:" + command + ":" + (objectCnt++);
         map.put(id, object);
         return id;
     }
@@ -426,26 +440,26 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
      * @param id  the hyperlink ID
      */
     protected void handleHyperLink(String id) {
-        if(id.startsWith("qobject:")) {
+        if (id.startsWith("qobject:")) {
             List tokens = StringUtil.split(id, ":");
             if (tokens.size() != 3) {
                 return;
             }
-            final Object object = map.get(id);
+            final Object object  = map.get(id);
             final String command = (String) tokens.get(1);
             label.setText(" ");
             Misc.run(new Runnable() {
-                    public void run() {
-                        objectClicked(command, object);
-                        label.setText(" ");
-                    }
-                });
+                public void run() {
+                    objectClicked(command, object);
+                    label.setText(" ");
+                }
+            });
             return;
         }
 
 
 
-        if(getIdv().handleAction(id,null)) {
+        if (getIdv().handleAction(id, null)) {
             return;
         }
 
@@ -503,7 +517,7 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
          * ctor
          *
          *
-         * @param idv _more_
+         * @param idv idv
          * @param name name
          * @param type type
          */
@@ -598,7 +612,7 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
             for (int bundleIdx = 0; bundleIdx < bundles.size(); bundleIdx++) {
                 SavedBundle bundle     = (SavedBundle) bundles.get(bundleIdx);
                 List        categories = bundle.getCategories();
-                String id = registerObject(bundle,"bundle");
+                String      id         = registerObject(bundle, "bundle");
                 if (categories.size() > 0) {
                     String catString = StringUtil.join(" &gt; ", categories);
                     StringBuffer catBuffer = (StringBuffer) ht.get(catString);
@@ -608,8 +622,11 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
                         ht.put(catString, catBuffer);
                         cats.add(catString);
                     }
-                    catBuffer.append("<li> <a href=\"" + id + "\"> " + GuiUtils.getLocalName(bundle.toString(),bundle.getLocal(),false)
-                                     + "</a>\n");
+                    catBuffer.append(
+                        "<li> <a href=\"" + id + "\"> "
+                        + GuiUtils.getLocalName(
+                            bundle.toString(), bundle.getLocal(),
+                            false) + "</a>\n");
                 } else {
                     html.append("<li> <a href=\"" + id + "\"> " + bundle
                                 + "</a>\n");
@@ -672,7 +689,7 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
          *  ctor
          *
          *
-         * @param idv _more_
+         * @param idv idv
          * @param name name
          */
         public FileHistory(IntegratedDataViewer idv, String name) {
@@ -702,7 +719,7 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
 
 
                 History history = (History) histories.get(i);
-                String  id      = registerObject(history,"history");
+                String  id      = registerObject(history, "history");
                 if (history instanceof ucar.unidata.idv.FileHistory) {
                     bundleHtml.append(
                         "<li style=\"margin-top:5;\"> <a href=\"" + id
@@ -765,7 +782,7 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
          *  ctor
          *
          *
-         * @param idv _more_
+         * @param idv idv
          * @param name name
          */
         public Control(IntegratedDataViewer idv, String name) {
@@ -794,7 +811,7 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
                     catMap.put(cat, sb);
                     cats.add(cat);
                 }
-                String id = registerObject(cd,"control");
+                String id   = registerObject(cd, "control");
                 String name = cd.getLabel().trim();
                 sb.append(
                     "<li style=\"margin-top:5;margin-left:0\"> <a href=\""
@@ -857,7 +874,7 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
          *  ctor
          *
          *
-         * @param idv _more_
+         * @param idv idv
          * @param name name
          * @param mouseOverString the string for mouseover
          * @param html the html

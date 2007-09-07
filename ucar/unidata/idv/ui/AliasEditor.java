@@ -362,14 +362,15 @@ public class AliasEditor extends IdvManager {
         //Turn the "," into "\n"
         aliases = StringUtil.join("\n",
                                   StringUtil.split(aliases, ",", true, true));
-        JTextField nameFld    = new JTextField(name, 15);
-        JTextField labelFld   = new JTextField(label, 15);
-        final JTextArea  aliasesFld = new JTextArea(aliases, 15, 10);
-        aliasesFld.setToolTipText("<html>Enter parameter name, one per line<br>Right mouse to add current parameters</html>");
+        JTextField      nameFld    = new JTextField(name, 15);
+        JTextField      labelFld   = new JTextField(label, 15);
+        final JTextArea aliasesFld = new JTextArea(aliases, 15, 10);
+        aliasesFld.setToolTipText(
+            "<html>Enter parameter name, one per line<br>Right mouse to add current parameters</html>");
         aliasesFld.addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    IdvUIManager.showParamsPopup(aliasesFld, e,"\n", false);
+                    IdvUIManager.showParamsPopup(aliasesFld, e, "\n", false);
                 }
             }
         });

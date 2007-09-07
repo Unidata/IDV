@@ -525,7 +525,8 @@ public class DataSelector extends DataSourceHolder {
      */
     public static String getNameForDataSource(DataSource ds, int length,
             boolean alwaysDoIt) {
-        return ucar.unidata.data.DataSourceImpl.getNameForDataSource(ds,  length,alwaysDoIt);
+        return ucar.unidata.data.DataSourceImpl.getNameForDataSource(ds,
+                length, alwaysDoIt);
     }
 
 
@@ -709,8 +710,8 @@ public class DataSelector extends DataSourceHolder {
                                         dcd, "doOk");
                 createBtn.setHorizontalAlignment(SwingConstants.LEFT);
                 dcd.addCreateButton(createBtn);
-                dcd.getDataSelectionWidget().getTimesList().setPreferredSize(new Dimension(DIM_H_X,
-                        DIM_H_Y));
+                dcd.getDataSelectionWidget().getTimesList().setPreferredSize(
+                    new Dimension(DIM_H_X, DIM_H_Y));
                 right = GuiUtils.hsplit(
                     dcd.getDataSelectionWidget().getTimesList(),
                     GuiUtils.topCenter(

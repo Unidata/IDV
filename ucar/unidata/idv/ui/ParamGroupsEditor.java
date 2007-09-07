@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.idv.ui;
 
 
@@ -38,8 +35,8 @@ import org.w3c.dom.NodeList;
 
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DerivedDataDescriptor;
 import ucar.unidata.data.DataGroup;
+import ucar.unidata.data.DerivedDataDescriptor;
 
 
 
@@ -135,7 +132,8 @@ public class ParamGroupsEditor extends IdvManager implements ActionListener {
 
 
     /** The list of column headers */
-    private static final String[] columns = { "Parameter Group", "Description", "Params" };
+    private static final String[] columns = { "Parameter Group",
+            "Description", "Params" };
 
 
     /** The set of resources to be displayed */
@@ -233,7 +231,7 @@ public class ParamGroupsEditor extends IdvManager implements ActionListener {
                         return dataGroup.getName();
                     }
                     if (col == 1) {
-                        return dataGroup.getDescription();                        
+                        return dataGroup.getDescription();
                     }
 
                     if (col == 2) {
@@ -355,43 +353,48 @@ public class ParamGroupsEditor extends IdvManager implements ActionListener {
             JTextField nameFld = new JTextField(dataGroup.getName());
             JTextField descFld = new JTextField(dataGroup.getDescription());
             GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
-            JPanel topPanel = GuiUtils.doLayout(new Component[]{
-                                                    GuiUtils.rLabel("Name:"),
-                                                    nameFld,
-                                                    GuiUtils.rLabel("Description:"),
-                                                    descFld},2,GuiUtils.WT_NY,GuiUtils.WT_N);
-            StringBuffer paramSB = new StringBuffer();
-            List paramSets  = dataGroup.getParamSets();
-            for(int i=0;i<paramSets.size();i++) {
+            JPanel topPanel = GuiUtils.doLayout(new Component[] {
+                                  GuiUtils.rLabel("Name:"),
+                                  nameFld, GuiUtils.rLabel("Description:"),
+                                  descFld }, 2, GuiUtils.WT_NY,
+                                             GuiUtils.WT_N);
+            StringBuffer paramSB   = new StringBuffer();
+            List         paramSets = dataGroup.getParamSets();
+            for (int i = 0; i < paramSets.size(); i++) {
                 List params = (List) paramSets.get(i);
                 paramSB.append(StringUtil.join(", ", params));
                 paramSB.append("\n");
             }
             topPanel = GuiUtils.inset(topPanel, 5);
             comps.add(topPanel);
-            final JTextArea  paramsFld = new JTextArea(paramSB.toString(), 15, 10);
+            final JTextArea paramsFld = new JTextArea(paramSB.toString(), 15,
+                                            10);
             paramsFld.addMouseListener(new MouseAdapter() {
-                    public void mouseReleased(MouseEvent e) {
-                        if (SwingUtilities.isRightMouseButton(e)) {
-                            IdvUIManager.showParamsPopup(paramsFld, e,",", true);
-                        }
+                public void mouseReleased(MouseEvent e) {
+                    if (SwingUtilities.isRightMouseButton(e)) {
+                        IdvUIManager.showParamsPopup(paramsFld, e, ",", true);
                     }
-                });
+                }
+            });
 
-            paramsFld.setToolTipText("<html>Enter parameter name<br>Right mouse to add current parameters</html>");
+            paramsFld.setToolTipText(
+                "<html>Enter parameter name<br>Right mouse to add current parameters</html>");
 
             JScrollPane sp =
                 new JScrollPane(
-                                paramsFld, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                    paramsFld,
+                    ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 
-            comps.add(new JLabel("Parameters - One group per line, comma separated"));
+            comps.add(
+                new JLabel(
+                    "Parameters - One group per line, comma separated"));
             comps.add(sp);
 
             GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
-            JComponent contents = GuiUtils.doLayout(comps,1,
-                                      GuiUtils.WT_Y, GuiUtils.WT_NY);
+            JComponent contents = GuiUtils.doLayout(comps, 1, GuiUtils.WT_Y,
+                                      GuiUtils.WT_NY);
 
             contents = GuiUtils.topCenter(topPanel, contents);
             contents = GuiUtils.inset(contents, 5);
@@ -406,13 +409,13 @@ public class ParamGroupsEditor extends IdvManager implements ActionListener {
                 }
                 dataGroup.setName(nameFld.getText().trim());
                 dataGroup.setDescription(descFld.getText().trim());
-                List lines =  StringUtil.split(paramsFld.getText(),
-                                               "\n", true, true);
+                List lines = StringUtil.split(paramsFld.getText(), "\n",
+                                 true, true);
                 List paramList = new ArrayList();
-                for(int i=0;i<lines.size();i++) {
+                for (int i = 0; i < lines.size(); i++) {
                     List toks = StringUtil.split(lines.get(i).toString(),
-                                                 ",", true, true);
-                    if(toks.size()>0) {
+                                    ",", true, true);
+                    if (toks.size() > 0) {
                         paramList.add(toks);
                     }
                 }
@@ -604,7 +607,8 @@ public class ParamGroupsEditor extends IdvManager implements ActionListener {
          */
         protected void removeRow(int row) {
             if ( !GuiUtils.showYesNoDialog(
-                    null, "Are you sure you want to delete this parameter group?",
+                    null,
+                    "Are you sure you want to delete this parameter group?",
                     "Delete Confirmation")) {
                 return;
             }
@@ -667,9 +671,9 @@ public class ParamGroupsEditor extends IdvManager implements ActionListener {
 
 
     /**
-     * _more_
+     * Load the resources
      *
-     * @param resources _more_
+     * @param resources resources
      */
     private void loadResources(XmlResourceCollection resources) {
         for (int i = 0; i < resources.size(); i++) {
@@ -677,7 +681,7 @@ public class ParamGroupsEditor extends IdvManager implements ActionListener {
             boolean isWritable = resources.isWritableResource(i);
             Element root       = resources.getRoot(i);
             if (root != null) {
-                groups = DataGroup.readGroups(root, new Hashtable(),false);
+                groups = DataGroup.readGroups(root, new Hashtable(), false);
             } else {
                 if ( !isWritable) {
                     continue;
@@ -714,7 +718,7 @@ public class ParamGroupsEditor extends IdvManager implements ActionListener {
     public void exportSelectedToPlugin() {
         ParamGroupsTable table    = getCurrentTable();
         List             selected = table.getSelectedDataGroupList();
-        System.err.println ("selected:" + selected);
+        System.err.println("selected:" + selected);
         if (selected.size() == 0) {
             LogUtil.userMessage("No rows selected");
             return;

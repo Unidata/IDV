@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.idv.ui;
 
 
@@ -87,34 +84,37 @@ import javax.swing.tree.*;
 
 public class SettingsTree extends DndTree {
 
-    /** _more_ */
+    /** Icon for settings */
     private static ImageIcon settingsIcon;
 
     /** Reference to the idv */
     private IntegratedDataViewer idv;
 
-    /** _more_ */
+    /** Used to know when to update settings when we repaint */
     private long lastSettingsTimestamp = -1;
 
-    /** _more_ */
+    /** Tree stuff */
     private DefaultMutableTreeNode settingsRoot;
 
-    /** _more_ */
+    /** Tree stuff */
     private DefaultTreeModel settingsModel;
 
-    /** _more_ */
+    /** Contains the jtree */
     private JScrollPane settingsSP;
 
-    /** _more_          */
+    /** SHow all settings */
     private JCheckBox showAllCbx;
 
-    /** _more_          */
+    /** gui */
     private JComponent contents;
 
+    /** The last control descriptor that was used */
+    private ControlDescriptor lastCD;
+
     /**
-     * _more_
+     * ctor
      *
-     * @param theIdv _more_
+     * @param theIdv the idv
      */
     public SettingsTree(IntegratedDataViewer theIdv) {
         this.idv      = theIdv;
@@ -206,9 +206,9 @@ public class SettingsTree extends DndTree {
 
 
     /**
-     * _more_
+     * Change the name of the given display settings
      *
-     * @param displaySetting _more_
+     * @param displaySetting settings to change name
      */
     public void changeName(DisplaySetting displaySetting) {
         if (displaySetting.changeName(idv, null)) {
@@ -218,9 +218,9 @@ public class SettingsTree extends DndTree {
 
 
     /**
-     * _more_
+     * Delete the list of settings
      *
-     * @param selected _more_
+     * @param selected settings to delete
      */
     public void deleteSettings(List selected) {
         idv.getResourceManager().removeDisplaySettings(selected);
@@ -228,18 +228,18 @@ public class SettingsTree extends DndTree {
     }
 
     /**
-     * _more_
+     * get gui
      *
-     * @return _more_
+     * @return gui
      */
     protected JComponent getContents() {
         return contents;
     }
 
     /**
-     * _more_
+     * Override paint so we knwo when to update ourselves
      *
-     * @param g _more_
+     * @param g graphics
      */
     public void paint(Graphics g) {
         super.paint(g);
@@ -247,12 +247,13 @@ public class SettingsTree extends DndTree {
     }
 
 
-    /** _more_          */
-    ControlDescriptor lastCD;
+
 
     /**
-     * _more_
+     * See if we should update the tree
      *
+     *
+     * @param cd The control descriptor to use
      */
     protected void updateSettings(ControlDescriptor cd) {
         //        System.err.println("updateSettings " +lastSettingsTimestamp+"  " + idv.getResourceManager().getDisplaySettingsTimestamp());
@@ -337,9 +338,9 @@ public class SettingsTree extends DndTree {
 
 
     /**
-     * _more_
+     * Get the selected settings
      *
-     * @return _more_
+     * @return selected settings
      */
     protected List getSelectedSettings() {
         TreePath[] paths    = getSelectionPaths();
@@ -359,11 +360,11 @@ public class SettingsTree extends DndTree {
 
 
     /**
-     * _more_
+     * ok to dnd
      *
-     * @param sourceNode _more_
+     * @param sourceNode node
      *
-     * @return _more_
+     * @return ok
      */
     protected boolean okToDrag(DefaultMutableTreeNode sourceNode) {
         if ( !(sourceNode.getUserObject() instanceof TwoFacedObject)) {
@@ -374,12 +375,12 @@ public class SettingsTree extends DndTree {
     }
 
     /**
-     * _more_
+     * ok to dnd
      *
-     * @param sourceNode _more_
-     * @param destNode _more_
+     * @param sourceNode from
+     * @param destNode to
      *
-     * @return _more_
+     * @return ok
      */
     protected boolean okToDrop(DefaultMutableTreeNode sourceNode,
                                DefaultMutableTreeNode destNode) {
@@ -391,10 +392,10 @@ public class SettingsTree extends DndTree {
     }
 
     /**
-     * _more_
+     * drop
      *
-     * @param sourceNode _more_
-     * @param destNode _more_
+     * @param sourceNode from
+     * @param destNode to
      */
     protected void doDrop(DefaultMutableTreeNode sourceNode,
                           DefaultMutableTreeNode destNode) {
