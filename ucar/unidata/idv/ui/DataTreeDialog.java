@@ -347,7 +347,6 @@ public class DataTreeDialog extends JDialog implements ActionListener {
                         break;
                     }
                 }
-
             }
             dataTrees.add(dataTree);
         }
@@ -365,7 +364,6 @@ public class DataTreeDialog extends JDialog implements ActionListener {
     private void treeClick(int index) {
         DataTree   tree       = (DataTree) dataTrees.get(index);
         DataChoice dataChoice = tree.getSelectedDataChoice();
-
         DataSelectionWidget dsw  = (DataSelectionWidget) dataSelectionWidgets.get(index);
         dsw.updateSelectionTab(dataChoice);
     }
@@ -414,9 +412,10 @@ public class DataTreeDialog extends JDialog implements ActionListener {
                 ((DataTree) dataTrees.get(i)).getScroller();
 
             DataSelectionWidget dsw = new DataSelectionWidget(idv,false);
-            dsw.updateSelectionTab(null);
             dataSelectionWidgets.add(dsw);
 
+            DataChoice dataChoice = ((DataTree)dataTrees.get(i)).getSelectedDataChoice();
+            dsw.updateSelectionTab(dataChoice);
             String labelString = StringUtil.replace(labels.get(i).toString(),
                                      "_", " ");
             if (addLabelDecoration) {
