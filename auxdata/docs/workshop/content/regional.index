@@ -6,10 +6,10 @@ title:2007 Unidata Regional IDV Training Workshop at OU>index.html:This is an ab
 >>installandstart/FirstStart.html
 >>installandstart/basics/index.html
 >>>installandstart/basics/GettingStarted.html
+>>>installandstart/basics/Navigation.html
 >>>datadisplays/selection/DisplayControl.html
 >>>datadisplays/selection/Legends.html
 >>>datadisplays/selection/TimeAnimation.html
->>>installandstart/basics/Navigation.html
 >>>installandstart/basics/MainMenu.html
 >>>installandstart/basics/ViewManagerMenus.html
 >>>installandstart/basics/BackgroundMaps.html
@@ -41,6 +41,16 @@ title:2007 Unidata Regional IDV Training Workshop at OU>index.html:This is an ab
 >>>datadisplays/grid/VectorDisplays.html
 +>>>datadisplays/grid/LargeGrids.html
 >>>datadisplays/grid/DoingMoreWithGrids.html
+
+>>formulas/index.html
+>>>formulas/SimpleFormulas.html
+>>>formulas/JythonMethods.html
+>>>formulas/DoingMoreFormulas.html
+>>>formulas/MoreWithJython.html
++>>>formulas/JythonAndVisad.html
+#>>>formulas/RainFallRatesWithJython.html
++>>>formulas/DerivedData.html
+#>>>dev/data/DerivedData.html
 
 >>datadisplays/imagery/index.html
 >>>datadisplays/imagery/Satellite.html
@@ -113,12 +123,12 @@ title:2007 Unidata Regional IDV Training Workshop at OU>index.html:This is an ab
 >>>datadisplays/misc/GeoLocatedImage.html
 
 
->>datadisplays/profiler/index.html
->>>datadisplays/profiler/ProfilerDataLoading.html
->>>datadisplays/profiler/TimeHeightDisplay.html
->>>datadisplays/profiler/StationPlot.html
->>>datadisplays/profiler/ThreeDView.html
->>>datadisplays/profiler/DoingMoreProfiler.html
++>>datadisplays/profiler/index.html
++>>>datadisplays/profiler/ProfilerDataLoading.html
++>>>datadisplays/profiler/TimeHeightDisplay.html
++>>>datadisplays/profiler/StationPlot.html
++>>>datadisplays/profiler/ThreeDView.html
++>>>datadisplays/profiler/DoingMoreProfiler.html
 
 |Conventions.html
 
@@ -131,6 +141,7 @@ title:2007 Unidata Regional IDV Training Workshop at OU>index.html:This is an ab
 #-advanced/WindSpeedTutorial.html
 #>>advanced/Collaboration.html
 
+>>isl/main.index
 
 
 >>resources/colortable/index.html
@@ -143,18 +154,9 @@ title:2007 Unidata Regional IDV Training Workshop at OU>index.html:This is an ab
 >>>resources/parameters/ParameterDefaultsEditor.html
 |resources/parameters/Patterns.html
 >>>resources/parameters/ParameterAliasEditor.html
->>>resources/parameters/ParameterAliasEditor2.html
->>>resources/parameters/ParameterGroupEditor.html
+>>resources/parameters/ParameterAliasEditor2.html
+>>resources/parameters/ParameterGroupEditor.html
 
->>formulas/index.html
->>>formulas/SimpleFormulas.html
->>>formulas/JythonMethods.html
->>>formulas/DoingMoreFormulas.html
->>>formulas/MoreWithJython.html
-+>>>formulas/JythonAndVisad.html
-#>>>formulas/RainFallRatesWithJython.html
->>>formulas/DerivedData.html
-#>>>dev/data/DerivedData.html
 
 >>title:Layout Models:This section will cover how the Layout Model Editor is used to create and modify Layout Models.
 >>>resources/stationmodel/StationModelEditor.html
@@ -162,7 +164,6 @@ title:2007 Unidata Regional IDV Training Workshop at OU>index.html:This is an ab
 >>>resources/stationmodel/JythonInStationModels.html
 
 
->>isl/main.index
 
 
 >>title:Configuring IDV Sites:In this section we will cover how to configure the IDV to share common resources within a site installation.

@@ -92,7 +92,7 @@ proc gen::hook::parseArgs {argv arg i} {
         gen::setIndexFile   regional.index
         set ::workshopTitle {Regional Unidata IDV Workshop}
         gen::defineMacro {<%idv.version%>} {2.3}
-        set ::workshopDocroot http://www.unidata.ucar.edu/software/idv/regionalworkshop
+        set ::workshopDocroot http://www.unidata.ucar.edu/software/idv
         set ::workshopHome /home/idvclassNN
         gen::defineMacro {<%workshop.installdir%>} "$::workshopHome/idv"
         gen::defineMacro {<%workshop.homedir%>} $::workshopHome
