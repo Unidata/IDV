@@ -89,7 +89,7 @@ public abstract class QuicklinkPanel extends JEditorPane implements HyperlinkLis
     private IntegratedDataViewer idv;
 
     /** status label */
-    private JLabel label = new JLabel(" ");
+    JLabel label = new JLabel(" ");
 
     /** maps id to some object for the links */
     private Hashtable map = new Hashtable();
