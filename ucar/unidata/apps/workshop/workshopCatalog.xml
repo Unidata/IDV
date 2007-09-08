@@ -16,6 +16,9 @@ xmlns:xlink="http://www.w3.org/1999/xlink">
         <dataset name="Sample RUC data" urlPath="casestudies/idvtest/grids/small_ruc_grid.nc">
             <serviceName>ncdods</serviceName>
         </dataset>
+        <dataset name="Sample ETA data" urlPath="casestudies/idvtest/grids/sample_eta_grid.nc">
+            <serviceName>ncdods</serviceName>
+        </dataset>
         <dataset name="Sample AVN Global data" urlPath="casestudies/idvtest/grids/2002062812_avn-x.nc" >
             <serviceName>ncdods</serviceName>
         </dataset>
