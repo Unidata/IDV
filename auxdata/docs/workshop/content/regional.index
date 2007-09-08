@@ -51,7 +51,7 @@ title:2007 Unidata Regional IDV Training Workshop at OU>index.html:This is an ab
 >>>formulas/MoreWithJython.html
 +>>>formulas/JythonAndVisad.html
 #>>>formulas/RainFallRatesWithJython.html
-+>>>formulas/DerivedData.html
+>>>formulas/DerivedData.html
 #>>>dev/data/DerivedData.html
 
 >>datadisplays/imagery/index.html
@@ -99,6 +99,17 @@ title:2007 Unidata Regional IDV Training Workshop at OU>index.html:This is an ab
 >>>datadisplays/upperair/DoingMoreUpperAir.html
 +>>>datadisplays/upperair/UsingSoundingDisplays.html
 
+>>title: Drawing Tool
+#>>>datadisplays/gis/WMS.html
+##>>>datadisplays/gis/WMS2.html
+#>>>datadisplays/gis/Shapefile.html
+#>>>datadisplays/gis/Locations.html
+#>>>datadisplays/gis/WorldWind.html
+#>>>datadisplays/gis/DEM.html
+#>>>datadisplays/gis/DoingMoreGis.html
+>>>datadisplays/misc/Drawing1.html
+>>>datadisplays/misc/Drawing2.html
++>>>datadisplays/misc/GeoLocatedImage.html
 
 +>>title:Transect Views
 +>>>datadisplays/transect/TransectDisplay.html
@@ -111,20 +122,6 @@ title:2007 Unidata Regional IDV Training Workshop at OU>index.html:This is an ab
 +>>>datadisplays/trajectory/PointDisplay.html
 ##>>>datadisplays/trajectory/TracksInTransect.html
 
-
->>title:GIS and Miscellaneous Displays:This section covers GIS data (DEM, WMS, Shapefiles) and the drawing tool.
->>>datadisplays/gis/WMS.html
-##>>>datadisplays/gis/WMS2.html
->>>datadisplays/gis/Shapefile.html
->>>datadisplays/gis/Locations.html
-+>>>datadisplays/gis/WorldWind.html
-+>>>datadisplays/gis/DEM.html
-+>>>datadisplays/gis/DoingMoreGis.html
->>>datadisplays/misc/Drawing1.html
->>>datadisplays/misc/Drawing2.html
->>>datadisplays/misc/GeoLocatedImage.html
-
-
 +>>datadisplays/profiler/index.html
 +>>>datadisplays/profiler/ProfilerDataLoading.html
 +>>>datadisplays/profiler/TimeHeightDisplay.html
@@ -136,7 +133,6 @@ title:2007 Unidata Regional IDV Training Workshop at OU>index.html:This is an ab
 
 
 >advanced/index.html
-
 
 
 #>>advanced/HtmlViewer.html
@@ -156,16 +152,14 @@ title:2007 Unidata Regional IDV Training Workshop at OU>index.html:This is an ab
 >>>resources/parameters/ParameterDefaultsEditor.html
 |resources/parameters/Patterns.html
 >>>resources/parameters/ParameterAliasEditor.html
->>resources/parameters/ParameterAliasEditor2.html
->>resources/parameters/ParameterGroupEditor.html
+>>>resources/parameters/ParameterAliasEditor2.html
+>>>resources/parameters/ParameterGroupEditor.html
 
 
 >>title:Layout Models:This section will cover how the Layout Model Editor is used to create and modify Layout Models.
 >>>resources/stationmodel/StationModelEditor.html
 >>>resources/stationmodel/StationModelEditor2.html
 >>>resources/stationmodel/JythonInStationModels.html
-
-
 
 
 >>title:Configuring IDV Sites:In this section we will cover how to configure the IDV to share common resources within a site installation.
@@ -190,63 +184,3 @@ title:2007 Unidata Regional IDV Training Workshop at OU>index.html:This is an ab
 >>>installandstart/Download.html
 >>>installandstart/Installer.html
 
-#>dev/index.html
-#
-#>>title: Development Environment
-#>>>advanced/SourceBuild.html
-#>>>dev/src/Overview.html
-#>>>dev/src/Lib.html
-#>>>dev/src/Auxdata.html
-#>>>title: Building with Ant::[gen::include advanced/SourceBuild.html antbuild]
-#>>>dev/src/ExampleIdv.html
-#
-#
-#>>dev/arch/index.html
-#>>>dev/arch/CoreIdv.html
-#>>>dev/arch/Managers.html
-#>>>dev/arch/MajorComponents.html
-#>>>dev/arch/Overview.html
-#
-#>>>dev/arch/DataSources.html
-#>>>dev/arch/DataChoices.html
-#>>>title:Data Flow::[ht::cimg dev/arch/images/DataFlow.jpg -caption {Data Flow}]
-###>>title: JEFF - TBD - Current Display Controls
-###>>title: JEFF - TBD - Putting it all Together
-#
-#>>title:IDV Startup
-#>>>dev/InitializationAndProperties.html
-#-dev/idv.properties.txt
-#>>>installandstart/CommandLineArguments.html
-#>>>dev/ExampleArgsManager.html
-#>>>dev/Resources.html
-#
-#
-#>>title:IDV User Interfaces
-#>>>dev/ui/XmlUi.html
-#>>>dev/ui/IdvSkins.html
-#>>>dev/ui/ExampleUIManager.html
-#>>>dev/ui/ExampleMenubar.html
-#-dev/ui/*.xml
-#
-#
-#>>title: Data Choosers
-#>>>dev/data/DataChooser.html
-#-dev/data/choosers.xml.txt
-#>>>dev/data/WxTextDataChooser.html
-#
-#>>title: Data Sources 
-#>>>dev/data/DataSource.html
-#-dev/data/datasource.xml.txt
-#>>>dev/data/VisADDataModel.html
-#>>>dev/data/WxTextDataSource.html
-#
-#>>title: Display controls
-#>>>dev/data/DisplayControls.html
-#-dev/data/controls.xml.txt
-#>>>dev/data/VisADDisplayModel.html
-#>>>dev/data/ExampleDisplayControl.html
-#
-#
-#>>title: Miscellaneous
-#>>>dev/XmlEncoder.html
-#>>>title: TBD Jython Display Control
