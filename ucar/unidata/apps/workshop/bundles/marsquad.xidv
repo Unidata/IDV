@@ -6,7 +6,7 @@
             <method name="add">
                 <object class="ucar.unidata.data.VisadDataSource" id="id8">
                     <property name="Name">
-                        <string><![CDATA[http://www.unidata.ucar.edu/content/software/idv/1_2/data/images/MarsMolaReliefColor.gif]]></string>
+                        <string><![CDATA[http://www.unidata.ucar.edu/content/software/idv/data/images/MarsMolaReliefColor.gif]]></string>
                     </property>
                     <property name="Properties">
                         <object class="java.util.Hashtable"/>
@@ -54,7 +54,7 @@
             <method name="add">
                 <object class="ucar.unidata.data.VisadDataSource" id="id12">
                     <property name="Name">
-                        <string><![CDATA[http://www.unidata.ucar.edu/content/software/idv/1_2/data/images/MarsViking.gif]]></string>
+                        <string><![CDATA[http://www.unidata.ucar.edu/content/software/idv/data/images/MarsViking.gif]]></string>
                     </property>
                     <property name="Properties">
                         <object class="java.util.Hashtable"/>
@@ -83,7 +83,7 @@
             <method name="add">
                 <object class="ucar.unidata.data.VisadDataSource" id="id16">
                     <property name="Name">
-                        <string><![CDATA[http://www.unidata.ucar.edu/content/software/idv/1_2/data/images/MarsMolaFreeair.gif]]></string>
+                        <string><![CDATA[http://www.unidata.ucar.edu/content/software/idv/data/images/MarsMolaFreeair.gif]]></string>
                     </property>
                     <property name="Properties">
                         <object class="java.util.Hashtable"/>
@@ -112,7 +112,7 @@
             <method name="add">
                 <object class="ucar.unidata.data.VisadDataSource" id="id20">
                     <property name="Name">
-                        <string><![CDATA[http://www.unidata.ucar.edu/content/software/idv/1_2/data/images/MarsMolaMoho.gif]]></string>
+                        <string><![CDATA[http://www.unidata.ucar.edu/content/software/idv/data/images/MarsMolaMoho.gif]]></string>
                     </property>
                     <property name="Properties">
                         <object class="java.util.Hashtable"/>
