@@ -1034,7 +1034,7 @@ public class GeoGridAdapter {
         CachedFlatField retField =
             (CachedFlatField) dataSource.getCache(cacheKey);
         if (retField != null) {
-            System.err.println("in cache");
+            //            System.err.println("in cache");
             return retField;
         }
         Trace.call1("GeoGridAdapter.getFlatField:" + paramName + ":time="
