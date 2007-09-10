@@ -2210,8 +2210,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (alias != null) {
             aliasFld.setText(alias);
         }
-        comps.add(GuiUtils.rLabel("Alias: "));
-        comps.add(aliasFld);
+        //Don't use the alias field now
+        //        comps.add(GuiUtils.rLabel("Alias: "));
+        //        comps.add(aliasFld);
 
         if (canPoll()) {
             getPollingInfo();
