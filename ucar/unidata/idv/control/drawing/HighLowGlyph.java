@@ -467,5 +467,43 @@ public class HighLowGlyph extends DrawingGlyph {
     }
 
 
+    /**
+       Set the Pressure property.
+
+       @param value The new value for Pressure
+    **/
+    public void setPressure (double value) {
+	pressure = value;
+    }
+
+    /**
+       Get the Pressure property.
+
+       @return The Pressure
+    **/
+    public double getPressure () {
+	return pressure;
+    }
+
+    /**
+       Set the High property.
+
+       @param value The new value for High
+    **/
+    public void setHigh (boolean value) {
+	high = value;
+    }
+
+    /**
+       Get the High property.
+
+       @return The High
+    **/
+    public boolean getHigh () {
+	return high;
+    }
+
+
+
 }
 
