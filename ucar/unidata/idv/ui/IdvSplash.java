@@ -173,7 +173,7 @@ public class IdvSplash extends JWindow {
             }
 
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() > 1) {
+                if (e.getClickCount() > 1 && e.isControlDown()) {
                     ImageIcon beerImage =
                         new ImageIcon(
                             Resource.getImage(
