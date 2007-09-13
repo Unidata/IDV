@@ -402,6 +402,31 @@ public class GridUtil {
         return grid.getDomainSet();
     }
 
+
+    /**
+     * Get the list of DateTime objects from the domain of the given grid
+     *
+     * @param grid  grid to check
+     *
+     * @return list of times or null if no times.
+     *
+     * @throws VisADException   problem determining this
+     */
+    public static List getDateTimeList(FieldImpl grid) 
+        throws VisADException {
+        SampledSet   timeSet      = (SampledSet) getTimeSet(grid);
+        if(timeSet == null) return null;
+        double[][]   times        = timeSet.getDoubles(false);
+        Unit         timeUnit     = timeSet.getSetUnits()[0];
+        List result = new ArrayList();
+        for (int i = 0; i < timeSet.getLength(); i++) {
+            result.add(new DateTime(times[0][i], timeUnit));
+        }
+        return result;
+    }
+
+
+
     /**
      * Check to see if this is a navigated grid (domain can be converted to
      * lat/lon)
