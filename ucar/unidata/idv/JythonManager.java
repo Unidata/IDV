@@ -345,12 +345,15 @@ public class JythonManager extends IdvManager implements ActionListener {
             jythonTab      = new JTabbedPane();
             textComponents = new ArrayList();
             int systemCnt = 1;
+            Hashtable tabs = new Hashtable();
             for (int i = 0; i < resources.size(); i++) {
                 String showInEditor = resources.getProperty("showineditor", i);
                 if(showInEditor!=null && showInEditor.equals("false")) {
                     //                    System.err.println ("skipping:" + resources.get(i));
                     continue;
                 }
+
+
 
                 //Assume that the first one in the list is the writable resources
                 String text = resources.read(i);
@@ -382,10 +385,21 @@ public class JythonManager extends IdvManager implements ActionListener {
                     pathDesc = pathDesc+" (" + Msg.msg("non-editable") +")";
                     tabContents = GuiUtils.topCenter(GuiUtils.inset(new JLabel("Non-editable"),2),GuiUtils.makeScrollPane(textArea,400, 300));
                 }
-                jythonTab.add(
+
+                String category = resources.getProperty("category", i);
+                JTabbedPane theTab = jythonTab;
+                if(category!=null) {
+                    theTab = (JTabbedPane)tabs.get(category);
+                    if(theTab == null) {
+                        theTab = new JTabbedPane();
+                        jythonTab.add(category, theTab);
+                        tabs.put(category, theTab);
+                    }
+                } 
+                theTab.add(
                               PluginManager.decode(resources.getShortName(i)),
                               tabContents);
-                jythonTab.setToolTipTextAt(jythonTab.getTabCount()-1, pathDesc);
+                theTab.setToolTipTextAt(theTab.getTabCount()-1, pathDesc);
             }
             JLabel label = new JLabel("Temporary Jython");
             jythonTab.add(
