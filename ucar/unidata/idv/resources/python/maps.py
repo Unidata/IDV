@@ -7,6 +7,15 @@
 import ucar.unidata.data.grid.GridUtil as GridUtil
 import ucar.visad.Util as Util
 import ucar.unidata.util.StringUtil as StringUtil
+import ucar.unidata.data.grid.DerivedGridFactory as  DerivedGridFactory
+
+
+def make3DMap(map, topo):
+  """Make a 3d map    map -  map line set - topo - topography dataset """
+  b = DerivedGridFactory.create2DTopography(topo, topo)
+  c = b.resample(map)
+  return c
+
 
 
 def  subsetFromMap(field, mapSets, fillValue=java.lang.Float.NaN,inverse=0):
@@ -80,17 +89,16 @@ def  averageRangeFromMap(range, timeStep, mapSets):
 
 
 
-
-## Get the named property from the given mapData
 def getMapProperty(polygon, propName):
+        """Get the named property from the given mapData"""
         from ucar.visad.data import MapSet
 	if(isinstance(polygon, MapSet)):
             return polygon.getProperty(propName);
 	return None;
 
 
-#Return a new set of maps that have the given property value
 def getMapsWithProperty(mapSets, propName,value):
+        """Return a new set of maps that have the given property value"""
 	return filterMaps(mapSets, propName, '==', value);
 
 

@@ -340,11 +340,33 @@
        label="Application library"
        location="%APPPATH%/default.py"/>
     <resource
-       label="System library"
-       location="%IDVPATH%/default.py"/>
+       label="Grid routines"
+       location="%IDVPATH%/python/grid.py">
+      <property
+         name="category"
+         value="System"/>
+    </resource>
     <resource
-       label="System map routines"
-       location="%IDVPATH%/python/maps.py"/>
+       label="Image routines"
+       location="%IDVPATH%/python/image.py">
+      <property
+         name="category"
+         value="System"/>
+    </resource>
+    <resource
+       label="Miscellaneous routines"
+       location="%IDVPATH%/python/misc.py">
+      <property
+         name="category"
+         value="System"/>
+    </resource>
+    <resource
+       label="Map routines"
+       location="%IDVPATH%/python/maps.py">
+      <property
+         name="category"
+         value="System"/>
+    </resource>
     <resource
        label="Library of routines for running jython in scripting mode"
        location="%IDVPATH%/isl.py">
