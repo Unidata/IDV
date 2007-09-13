@@ -204,6 +204,30 @@ def make2D(slice):
 
 
 
+
+#Average the values in each time step
+def averageOverTime(field,makeTimes = 0):
+    import ucar.unidata.data.grid.GridUtil as gu
+    if (gu.isTimeSequence(field)==0):
+        return field;
+    cnt = 0;
+    domainSet = field.getDomainSet()
+    current = None;
+    for t in range(domainSet.getLength()):
+        cnt=cnt+1
+        rangeValue = field.getSample(t)
+        if(current == None):
+            current = rangeValue.clone();
+        else:
+            current = current+rangeValue;
+    if(cnt == 0):
+        return None;
+    current = current/cnt;
+    if(makeTimes):
+        return Util.makeTimeField(current, GridUtil.getDateTimeList(field))
+    return current
+
+
 #
 def makeFloatArray(rows,cols,value):
     import ucar.unidata.data.grid.GridUtil as gu
