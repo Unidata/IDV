@@ -6656,7 +6656,7 @@ public class GuiUtils {
         //J-
         String[] unitGroups = {
             "Date/Time",
-            "yyyy-MM-dd HH:mm:ss;MM/dd/yy HH:mm z;dd.MM.yy HH:mm z;yyyy-MM-dd;EEE, MMM dd yyyy HH:mm z;HH:mm:ss;HH:mm",
+            "yyyy-MM-dd HH:mm:ss;MM/dd/yy HH:mm z;dd.MM.yy HH:mm z;yyyy-MM-dd;EEE, MMM dd yyyy HH:mm z;HH:mm:ss;HH:mm;yyyy-MM-dd'T'HH:mm:ss'Z';yyyy-MM-dd'T'HH:mm:ssz;yyyy-MM-dd'T'HH:mm:ssZ",
             "Geo-spatial",
             "degree;degree_west",
             "Distance",

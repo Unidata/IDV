@@ -162,7 +162,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
     /** Date formats */
     private String[] dateFormats = {
         DEFAULT_DATE_FORMAT, "MM/dd/yy HH:mm z", "dd.MM.yy HH:mm z",
-        "yyyy-MM-dd", "EEE, MMM dd yyyy HH:mm z", "HH:mm:ss", "HH:mm"
+        "yyyy-MM-dd", "EEE, MMM dd yyyy HH:mm z", "HH:mm:ss", "HH:mm",
+        "yyyy-MM-dd'T'HH:mm:ss'Z'", "yyyy-MM-dd'T'HH:mm:ssZ"
     };
 
     /** Manager */
