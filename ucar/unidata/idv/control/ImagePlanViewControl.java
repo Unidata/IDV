@@ -183,5 +183,13 @@ public class ImagePlanViewControl extends PlanViewControl {
         return "Pixel Sampling";
     }
 
-}
+    /**
+     * What label to use for the data projection
+     *
+     * @return label
+     */
+    protected String getDataProjectionLabel() {
+        return "Use Native Image Projection";
+    }
 
+}
