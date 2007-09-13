@@ -2887,7 +2887,15 @@ public final class Util {
         Set       timeSet = makeTimeSet(times);
         for (int i = 0; i < times.size(); i++) {
             if (fi == null) {
-                DateTime dttm = (DateTime) times.get(i);
+                DateTime dttm;
+                Object obj = times.get(i);
+                if(obj instanceof DateTime) {
+                    dttm = (DateTime)  obj;
+                } else if(obj instanceof Date) {
+                    dttm = new DateTime((Date)obj);
+                } else {
+                    throw new IllegalArgumentException("Unknown date type:" + obj);
+                }
                 fi = new FieldImpl(new FunctionType(dttm.getType(),
                         range.getType()), timeSet);
             }
