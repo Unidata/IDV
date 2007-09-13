@@ -690,7 +690,20 @@ public class JythonManager extends IdvManager implements ActionListener {
      */
     private void initBasicInterpreter(PythonInterpreter interpreter) {
         interpreter.exec("import sys");
+        interpreter.exec("import java");
+        interpreter.exec("import sys");
+        interpreter.exec("sys.add_package('visad')");
+        interpreter.exec("sys.add_package('visad.python')");
+        interpreter.exec("sys.add_package('visad.data.units')");
+        interpreter.exec("from visad.python.JPythonMethods import *");
+        interpreter.exec("import ucar.unidata.data.grid.GridUtil as GridUtil");
+        interpreter.exec("import ucar.visad.Util as Util");
+        interpreter.exec("import ucar.unidata.util.StringUtil as StringUtil");
+        interpreter.exec("import ucar.unidata.data.grid.DerivedGridFactory as DerivedGridFactory");
+        interpreter.exec("from visad.FlatField import *");
+        interpreter.exec("from visad.FieldImpl import *");
         interpreter.set("idv", getIdv());
+        interpreter.set("interpreter", interpreter);
         interpreter.set("datamanager", getDataManager());
     }
 

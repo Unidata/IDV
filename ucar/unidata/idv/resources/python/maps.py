@@ -1,13 +1,8 @@
 
-
 ####################################################################################
 #######  Map related utilities
 ####################################################################################
 
-import ucar.unidata.data.grid.GridUtil as GridUtil
-import ucar.visad.Util as Util
-import ucar.unidata.util.StringUtil as StringUtil
-import ucar.unidata.data.grid.DerivedGridFactory as  DerivedGridFactory
 
 
 def make3DMap(map, topo):
