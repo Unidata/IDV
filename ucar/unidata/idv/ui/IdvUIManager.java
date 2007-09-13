@@ -4893,60 +4893,32 @@ public class IdvUIManager extends IdvManager {
     }
 
 
-
-
-
+    /** Just some haiku stuff */
+    private     List haikus;
 
     /** Just some haiku stuff */
-    List haikus;
+    private List haikuActions;
 
     /** Just some haiku stuff */
-    int haikuCnt = 0;
-
-    /** Just some haiku stuff */
-    boolean doingHaiku = false;
-
-    /** Just some haiku stuff */
-    Font[] fonts;
-
-    /** Just some haiku stuff */
-    List haikuUsers;
-
-    /** Just some haiku stuff */
-    List haikuActions;
-
-    /** Just some haiku stuff */
-    JLabel haikuL1;
-
-    /** Just some haiku stuff */
-    JLabel haikuL2;
-
-    /** Just some haiku stuff */
-    JLabel haikuL3;
-
+    private boolean haikuUserOk = true;
 
 
     /**
      * Just some haiku stuff
      */
-    private void runHaiku() {
-        while (doingHaiku) {
-            if (haikuCnt >= haikus.size()) {
-                haikuCnt = 0;
+    private void runHaiku(JLabel[]lbl) {
+        int cnt = 0;
+        while (lbl[0]!=null) {
+            if (cnt >= haikus.size()) {
+                cnt = 0;
             }
-            List haiku = (List) haikus.get(haikuCnt);
-            while (haiku.size() < 3) {
-                haiku.add("");
-            }
-            haikuL1.setText(haiku.get(0).toString());
-            haikuL2.setText(haiku.get(1).toString());
-            haikuL3.setText(haiku.get(2).toString());
-            haikuCnt++;
+            if(lbl[0]==null) break;
+            lbl[0].setText("<html><div style=\"color:white; font-size:50\">" + haikus.get(cnt)+"</div></html>");
+            cnt++;
             try {
                 Misc.sleep(6000);
             } catch (Exception exc) {}
         }
-
     }
 
     /**
@@ -4955,43 +4927,33 @@ public class IdvUIManager extends IdvManager {
     private void doHaiku() {
         if (haikus == null) {
             haikus = new ArrayList();
-            int cnt = 1;
             while (true) {
-                String list = getIdv().getProperty("haiku" + cnt,
+                String list = getIdv().getProperty("haiku" + (haikus.size()+1),
                                   (String) null);
-                cnt++;
                 if (list == null) {
                     break;
                 }
-                haikus.add(StringUtil.split(list, ";", true, true));
+                haikus.add(list);
             }
         }
-        doingHaiku = true;
         final Window f = new Window(getFrame());
-        haikuL1 = new JLabel("  ");
-        haikuL2 = new JLabel("  ");
-        haikuL3 = new JLabel("  ");
-        Font font = new Font("Dialog", Font.BOLD, 50);
-        haikuL1.setFont(font);
-        haikuL2.setFont(font);
-        haikuL3.setFont(font);
+
+        final JLabel[]lbl = { new JLabel("  ")};
         JPanel p = GuiUtils.leftCenter(new JLabel("             "),
                                        GuiUtils.topCenter(null,
-                                           GuiUtils.vbox(haikuL1, haikuL2,
-                                               haikuL3)));
+                                                          lbl[0]));
         GuiUtils.setBackgroundOnTree(p, Color.blue);
-        //   f.getContentPane ().add (p);
         p.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 super.mousePressed(e);
-                doingHaiku = false;
+                lbl[0] = null;
                 f.setVisible(false);
 
             }
         });
         Misc.runInABit(2000, new Runnable() {
             public void run() {
-                runHaiku();
+                runHaiku(lbl);
             }
         });
 
@@ -5004,12 +4966,8 @@ public class IdvUIManager extends IdvManager {
         f.pack();
         f.setLocation(-10, -10);
         f.setVisible(true);
-        //f.toFront();   // this brings the getFrame() frame to the front
     }
 
-
-    /** Just some haiku stuff */
-    boolean haikuUserOk = true;
 
     /**
      * Just some haiku stuff
@@ -5018,34 +4976,33 @@ public class IdvUIManager extends IdvManager {
      * @return some haiku stuff
      */
     public boolean checkHaiku(String action) {
-        if ( !haikuUserOk) {
+        if (haikus == null) {
+            List haikuUsers =
+                StringUtil.split(getIdv().getProperty("haiku.users", ""),
+                                 ";", true, true);
+            haikuActions =
+                StringUtil.split(getIdv().getProperty("haiku.actions",
+                                                      ""), ";", true, true);
+            haikuUserOk =
+                haikuUsers.contains(getStateManager().getUserName());
+        }
+        if (!haikuUserOk) {
             return false;
         }
-        boolean didHaiku = getStore().get("didhaiku", false);
-        if (didHaiku) {
+        haikuUserOk = false;
+        String key = "nohaikus";
+        if(getStateManager().getPreferenceOrProperty(key)!=null) {
+            if(getStateManager().getProperty(key)!=null) {
+                getStore().put(key, true);
+                getStore().save();
+            }
+            haikuUserOk = false;
             return false;
         }
 
-        // didHaiku = false;
-        if ( !didHaiku) {
-            if (haikuUsers == null) {
-                haikuUsers =
-                    StringUtil.split(getIdv().getProperty("haiku.users", ""),
-                                     ";", true, true);
-                haikuActions =
-                    StringUtil.split(getIdv().getProperty("haiku.actions",
-                        ""), ";", true, true);
-            }
-            haikuUserOk =
-                haikuUsers.contains(getStateManager().getUserName());
-            Object actionOk = StringUtil.findMatch(action, haikuActions,
-                                  null);
-            if ((actionOk != null) && haikuUserOk) {
-                getStore().put("didhaiku", true);
-                getStore().save();
-                doHaiku();
-                return true;
-            }
+        if (StringUtil.findMatch(action, haikuActions,null) != null) {
+            doHaiku();
+            return true;
         }
         return false;
     }
