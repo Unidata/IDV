@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -274,6 +275,26 @@ public class DataUtil {
                                      + type);
         }
         return cs;
+    }
+
+
+    /**
+     * Make a float array of the sizes indicated with the value
+     *
+     * @param rows  number of arrays
+     * @param cols  number of values in each row
+     * @param value fill value
+     *
+     * @return  the filled in array
+     */
+    public static float[][] makeFloatArray(int rows, int cols, float value) {
+        float[][] values = new float[rows][cols];
+        for (int i = 0; i < values.length; i++) {
+            for (int j = 0; j < values[0].length; j++) {
+                values[i][j] = value;
+            }
+        }
+        return values;
     }
 
 }

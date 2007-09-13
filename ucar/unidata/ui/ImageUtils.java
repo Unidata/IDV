@@ -665,7 +665,9 @@ public class ImageUtils {
         // Set the compression quality
         ImageWriteParam iwparam = writer.getDefaultWriteParam();
         if (iwparam.canWriteCompressed()) {
+            String[] types = iwparam.getCompressionTypes();
             iwparam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            iwparam.setCompressionType(types[0]); // pick the first type
             iwparam.setCompressionQuality(quality);
         }
 
