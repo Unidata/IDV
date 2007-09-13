@@ -864,17 +864,17 @@ public class FileManager {
     public static final PatternFileFilter FILTER_JPG =
         new PatternFileFilter(".+\\.jpg", "JPEG files (*.jpg)", SUFFIX_JPG);
 
-    /** Filter for JPEG files */
+    /** Filter for Image files */
     public static final PatternFileFilter FILTER_IMAGE =
         new PatternFileFilter(".+\\.jpg|.+\\.gif|.+\\.jpeg|.+\\.png",
                               "Image files (*.jpg,*.gif,*.png)");
 
-    /** Filter for JPEG files */
+    /** Filter for Image files for writing */
     public static final PatternFileFilter FILTER_IMAGEWRITE =
         new PatternFileFilter(".+\\.jpg|.+\\.jpeg|.+\\.png",
                               "Image files (*.jpg,*.png)");
 
-    /** Filter for JPEG files */
+    /** Filter for image or pdf files */
     public static final PatternFileFilter FILTER_IMAGE_OR_PDF =
         new PatternFileFilter(".+\\.jpg|.+\\.jpeg|.+\\.png|\\.pdf",
                               "Image files (*.jpg,*.png) or PDF (*.pdf)");

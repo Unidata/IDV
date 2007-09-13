@@ -4427,7 +4427,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
         SecurityManager backup = System.getSecurityManager();
         System.setSecurityManager(null);
         try {
-            JCheckBox wholeWindowCbx = new JCheckBox("Whole Window", false);
             if (hiBtn == null) {
                 hiBtn  = new JRadioButton("High", true);
                 medBtn = new JRadioButton("Medium", false);
@@ -4455,7 +4454,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                        backgroundTransparentBtn));
 
 
-            List filters = Misc.newList(FileManager.FILTER_IMAGEWRITE);
+            List filters = Misc.newList(FileManager.FILTER_IMAGE);
             GeoLocationInfo bounds = getVisibleGeoBounds();
             if (bounds != null) {
                 filters.add(KmlDataSource.FILTER_KML);

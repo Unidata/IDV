@@ -1200,7 +1200,8 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
 
         tabbedPane.add("Image Sets", GuiUtils.inset(imageSetsPanel, 5));
 
-        if ((pointIndex == -1) && (imageSetUrl != null)) {
+        //if ((pointIndex == -1) && (imageSetUrl != null)) {
+        if (imageSetUrl != null) {  // image set takes precedence
             reloadFiles();
         } else if ((pointIndex >= 0) && (pointIndex < pointNodes.size())) {
             selectImageSet((Element) pointNodes.get(pointIndex));
