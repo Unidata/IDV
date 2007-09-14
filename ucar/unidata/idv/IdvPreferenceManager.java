@@ -854,8 +854,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         JLabel timeLabel = GuiUtils.rLabel("");
         try {
             timeLabel.setText("ex:  " + new DateTime().toString());
-        } catch (visad.VisADException ve) {
-            timeLabel.setText("Can't format date");
+        } catch (Exception ve) {
+            timeLabel.setText("Can't format date: " + ve);
         }
 
         String dateFormat = getStore().get(PREF_DATE_FORMAT,
@@ -897,7 +897,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                     label.setText("ex:  "
                                   + new DateTime().formattedString(format,
                                       tz));
-                } catch (visad.VisADException ve) {
+                } catch (Exception ve) {
                     label.setText("Invalid format or time zone");
                     LogUtil.userMessage("Invalid format or time zone");
                 }
