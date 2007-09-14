@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -364,18 +365,23 @@ public class DataSelectionWidget {
                     tmp.add(o);
                 }
             }
-            levelsList.setListData(tmp);
 
-            /*  TODO:  figure out a better  way to have level be sticky
-            if ((lastLevel != null) && levels.contains(lastLevel)) {
-                int idx = levels.indexOf(lastLevel) + 1;  // account for extra
-                levelsList.setSelectedIndex(idx);
-                levelsList.ensureIndexIsVisible(idx);
-            } else {
+
+            Object[] selectedLevels = levelsList.getSelectedValues();
+            levelsList.setListData(tmp);
+            ListSelectionModel lsm    = levelsList.getSelectionModel();
+            boolean            didone = false;
+            for (int i = 0; i < selectedLevels.length; i++) {
+                int index = tmp.indexOf(selectedLevels[i]);
+                if (index >= 0) {
+                    lsm.addSelectionInterval(index, index);
+                    didone = true;
+                }
+            }
+            if ( !didone) {
                 levelsList.setSelectedIndex(0);
             }
-            */
-            levelsList.setSelectedIndex(0);
+
             selectionTab.add(levelsTab, "Level");
         }
 
@@ -389,12 +395,18 @@ public class DataSelectionWidget {
             }
             strideTab.removeAll();
             areaTab.removeAll();
+            GeoSelectionPanel oldPanel = geoSelectionPanel;
             geoSelectionPanel =
                 ((DataSourceImpl) dataSource).doMakeGeoSelectionPanel(false);
             JComponent strideComponent =
                 geoSelectionPanel.getStrideComponent();
             JComponent areaComponent = geoSelectionPanel.getAreaComponent();
             areaComponent.setPreferredSize(new Dimension(200, 150));
+
+            if (oldPanel != null) {
+                geoSelectionPanel.initWith(oldPanel);
+            }
+
             if (areaComponent != null) {
                 areaTab.add(areaComponent);
                 selectionTab.add("Region", areaTab);

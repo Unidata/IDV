@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -106,7 +107,8 @@ public class DataTreeDialog extends JDialog implements ActionListener {
     /** Liast of dataseleciotnwidgets, one per datatree */
     List dataSelectionWidgets = new ArrayList();
 
-    List multiLists= new ArrayList();
+    /** _more_          */
+    List multiLists = new ArrayList();
 
     //    Vector multiChoices  =new Vector();
 
@@ -120,6 +122,7 @@ public class DataTreeDialog extends JDialog implements ActionListener {
     List categories;
 
 
+    /** _more_          */
     List operands = new ArrayList();
 
 
@@ -128,18 +131,17 @@ public class DataTreeDialog extends JDialog implements ActionListener {
      *
      * @param idv Reference to the IDV
      * @param src  Component to place ourselves near
-     * @param categories List of list of {@link ucar.unidata.data.DataCategory}-s
-     * @param paramNames List of param names
+     * @param operands List of DataOperand-s
      * @param dataSources List of data sources
      * @param selectedDataChoices list of already selected data choices
      */
-    public DataTreeDialog(IntegratedDataViewer idv, 
-                          Component src, List operands, List dataSources,
+    public DataTreeDialog(IntegratedDataViewer idv, Component src,
+                          List operands, List dataSources,
                           List selectedDataChoices) {
 
         super(idv.getIdvUIManager().getFrame(), TITLE, true);
         this.idv         = idv;
-        this.operands = operands;
+        this.operands    = operands;
         this.dataSources = dataSources;
         init(src, selectedDataChoices);
     }
@@ -152,33 +154,32 @@ public class DataTreeDialog extends JDialog implements ActionListener {
      * @param src Component to popup near
      * @param selectedDataChoices Pre-selected data choices
      */
-    private void init(Component src,
-                      List selectedDataChoices) {
+    private void init(Component src, List selectedDataChoices) {
 
         for (int i = 0; i < operands.size(); i++) {
-            final DataOperand operand = (DataOperand) operands.get(i);
-            List   categoryList     = operand.getCategories();
+            final DataOperand operand      = (DataOperand) operands.get(i);
+            List              categoryList = operand.getCategories();
             final DataTree dataTree = new DataTree(idv, dataSources,
-                                          categoryList, operand.getParamName(),
-                                          null);
+                                          categoryList,
+                                          operand.getParamName(), null);
             final int theIndex = i;
             dataTree.getTree().addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent me) {
                     if (me.getClickCount() > 1) {
-                        if(!operand.getMultiple()) {
+                        if ( !operand.getMultiple()) {
                             doOk();
                             return;
                         }
                     }
-                    treeClick(theIndex,me.getClickCount() > 1);
+                    treeClick(theIndex, me.getClickCount() > 1);
                 }
             });
             idv.getIdvUIManager().addDataSourceHolder(dataTree);
-//            dataTree.setMultipleSelect(operand.getMultiple());
+            dataTree.setMultipleSelect(false);
             if (selectedDataChoices != null) {
                 dataTree.selectChoices(selectedDataChoices);
-            } else if (operand.getPattern()!=null) {
-                String pattern = "pattern:"+operand.getPattern();
+            } else if (operand.getPattern() != null) {
+                String pattern = "pattern:" + operand.getPattern();
                 for (int dataSourceIdx = 0;
                         dataSourceIdx < dataSources.size(); dataSourceIdx++) {
                     DataSource dataSource =
@@ -215,25 +216,58 @@ public class DataTreeDialog extends JDialog implements ActionListener {
      * sets state in the DataSelectionWidget
      *
      * @param index Which data tree was clicked
+     * @param doubleClick _more_
      */
     private void treeClick(int index, boolean doubleClick) {
-        DataTree   tree       = (DataTree) dataTrees.get(index);
-        DataChoice dataChoice = tree.getSelectedDataChoice();
-        DataOperand operand = (DataOperand) operands.get(index);
+        DataTree    tree       = (DataTree) dataTrees.get(index);
+        DataChoice  dataChoice = tree.getSelectedDataChoice();
+        DataOperand operand    = (DataOperand) operands.get(index);
         DataSelectionWidget dsw =
             (DataSelectionWidget) dataSelectionWidgets.get(index);
-
-        if(doubleClick) {
-            JList list = (JList) multiLists.get(index);
-            Vector v  = new Vector(GuiUtils.getItems(list));
-            DataChoice newDataChoice = dataChoice.createClone();
-            newDataChoice.setDataSelection(dsw.createDataSelection(true));
-
-            v.add(newDataChoice);
-            list.setListData(v);
-        }
         dsw.updateSelectionTab(dataChoice);
+        if (doubleClick) {
+            addMultiple(new Integer(index));
+        }
     }
+
+
+    /**
+     * _more_
+     *
+     * @param index _more_
+     */
+    private void deleteMultiple(int index) {
+        JList  list    = (JList) multiLists.get(index);
+        Vector v       = new Vector(GuiUtils.getItems(list));
+        Vector newV    = new Vector(v);
+        int[]  indices = list.getSelectedIndices();
+        for (int i = 0; i < indices.length; i++) {
+            newV.remove(v.get(indices[i]));
+        }
+        list.setListData(newV);
+    }
+
+    /**
+     * _more_
+     *
+     * @param index _more_
+     */
+    public void addMultiple(Integer index) {
+        DataTree   tree       = (DataTree) dataTrees.get(index.intValue());
+        DataChoice dataChoice = tree.getSelectedDataChoice();
+        if (dataChoice == null) {
+            return;
+        }
+        DataSelectionWidget dsw =
+            (DataSelectionWidget) dataSelectionWidgets.get(index.intValue());
+        JList      list          = (JList) multiLists.get(index.intValue());
+        Vector     v             = new Vector(GuiUtils.getItems(list));
+        DataChoice newDataChoice = dataChoice.createClone();
+        newDataChoice.setDataSelection(dsw.createDataSelection(true));
+        v.add(newDataChoice);
+        list.setListData(v);
+    }
+
 
     /**
      * Get the list of selected {@link ucar.unidata.data.DataChoice}-s
@@ -251,14 +285,25 @@ public class DataTreeDialog extends JDialog implements ActionListener {
      * @return The GUI
      */
     private Component doMakeContents() {
-        List topComponents  = new ArrayList();
-        List timeComponents = new ArrayList();
+        List topComponents   = new ArrayList();
+        List timeComponents  = new ArrayList();
+        List multiComponents = new ArrayList();
         for (int i = 0; i < operands.size(); i++) {
-            DataOperand operand = (DataOperand) operands.get(i);
-            DataTree dataTree =   (DataTree) dataTrees.get(i);
-            JScrollPane scroller = dataTree.getScroller();
-            JList multiList = new JList();
+            DataOperand operand   = (DataOperand) operands.get(i);
+            DataTree    dataTree  = (DataTree) dataTrees.get(i);
+            JScrollPane scroller  = dataTree.getScroller();
+            final int   index     = i;
+            JList       multiList = new JList();
+            multiList.setToolTipText(
+                "Press the 'Delete' key to delete selected entry");
             multiLists.add(multiList);
+            multiList.addKeyListener(new KeyAdapter() {
+                public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == e.VK_DELETE) {
+                        deleteMultiple(index);
+                    }
+                }
+            });
             DataSelectionWidget dsw = new DataSelectionWidget(idv, false);
             dataSelectionWidgets.add(dsw);
             DataChoice dataChoice =
@@ -266,30 +311,40 @@ public class DataTreeDialog extends JDialog implements ActionListener {
             dsw.updateSelectionTab(dataChoice);
             String labelString = StringUtil.replace(operand.getDescription(),
                                      "_", " ");
-            if(!labelString.startsWith("<html")) {
+            if ( !labelString.startsWith("<html")) {
                 labelString = "<html>Field: <i><b>" + labelString
                               + "</b></i></html>";
             }
             JLabel label = new JLabel(labelString);
             scroller.setPreferredSize(new Dimension(250, 300));
-                                   
-            JComponent treeContents  = scroller;
-            if(operand.getMultiple()) {
-                scroller.setPreferredSize(new Dimension(250, 200));
-                JScrollPane multiScroller = GuiUtils.makeScrollPane(multiList,
-                                                                    250,100);
+
+            JComponent treeContents = scroller;
+            JComponent multiComp;
+            if (operand.getMultiple()) {
+                //                scroller.setPreferredSize(new Dimension(250, 200));
+                JScrollPane multiScroller =
+                    GuiUtils.makeScrollPane(multiList, 250, 100);
                 multiScroller.setPreferredSize(new Dimension(250, 100));
-                treeContents = GuiUtils.vbox(GuiUtils.centerBottom(treeContents, new JLabel("Double-click to select multiples")),multiScroller);
+                JButton multiBtn =
+                    GuiUtils.makeButton("Add selected entry>>", this,
+                                        "addMultiple", new Integer(index));
+                multiComp = GuiUtils.topCenter(GuiUtils.left(multiBtn),
+                        multiScroller);
+                //                treeContents = GuiUtils.vbox((treeContents, multiBtn), multiScroller);
+            } else {
+                multiComp = new JPanel();
             }
+            multiComponents.add(multiComp);
             topComponents.add(GuiUtils.topCenter(GuiUtils.inset(label,
                     new Insets(10, 5, 0, 10)), treeContents));
             timeComponents.add(dsw.getContents());
         }
         topComponents.addAll(timeComponents);
+        topComponents.addAll(multiComponents);
         GuiUtils.tmpInsets = new Insets(4, 6, 4, 6);
         Component trees = GuiUtils.doLayout(topComponents,
-                                            topComponents.size() / 2,
-                                            GuiUtils.WT_Y, GuiUtils.WT_Y);
+                                            topComponents.size() / 3,
+                                            GuiUtils.WT_Y, GuiUtils.WT_YYN);
         JPanel buttons = GuiUtils.makeButtons(this, new String[] {  /* CMD_POPUPDATACHOOSER,*/
             GuiUtils.CMD_OK, GuiUtils.CMD_CANCEL
         });
@@ -326,9 +381,9 @@ public class DataTreeDialog extends JDialog implements ActionListener {
     public void doOk() {
         selected = new ArrayList();
         for (int i = 0; i < dataTrees.size(); i++) {
-            JList list = (JList) multiLists.get(i);
-            Vector v  = new Vector(GuiUtils.getItems(list));
-            if(v.size()>0) {
+            JList  list = (JList) multiLists.get(i);
+            Vector v    = new Vector(GuiUtils.getItems(list));
+            if (v.size() > 0) {
                 selected.add(v);
                 continue;
             }
@@ -336,8 +391,9 @@ public class DataTreeDialog extends JDialog implements ActionListener {
             DataSelectionWidget dsw =
                 (DataSelectionWidget) dataSelectionWidgets.get(i);
             dataSelection = dsw.createDataSelection(true);
-            DataTree dataTree  = (DataTree) dataTrees.get(i);
-            List selectedFromTree = DataChoice.cloneDataChoices(dataTree.getSelectedDataChoices());
+            DataTree dataTree = (DataTree) dataTrees.get(i);
+            List selectedFromTree = DataChoice.cloneDataChoices(
+                                        dataTree.getSelectedDataChoices());
             for (int dataChoiceIdx = 0;
                     dataChoiceIdx < selectedFromTree.size();
                     dataChoiceIdx++) {
