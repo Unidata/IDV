@@ -20,7 +20,21 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.view.geoloc;
+
+
+import ucar.unidata.beans.NonVetoableProperty;
+import ucar.unidata.beans.Property;
+import ucar.unidata.beans.PropertySet;
+import ucar.unidata.geoloc.*;
+import ucar.unidata.geoloc.projection.*;
+
+import ucar.unidata.util.GuiUtils;
+
+import ucar.unidata.view.Renderer;
+import ucar.unidata.view.geoloc.*;
 
 
 
@@ -35,23 +49,12 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 
-import java.util.List;
 import java.util.ArrayList;
+
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
-
-import ucar.unidata.util.GuiUtils;
-
-
-import ucar.unidata.beans.NonVetoableProperty;
-import ucar.unidata.beans.Property;
-import ucar.unidata.beans.PropertySet;
-import ucar.unidata.geoloc.*;
-import ucar.unidata.geoloc.projection.*;
-
-import ucar.unidata.view.Renderer;
-import ucar.unidata.view.geoloc.*;
 
 
 /**
@@ -104,7 +107,14 @@ public class NavigatedMapPanel extends JPanel {
     }
 
 
-    public NavigatedMapPanel(boolean makeNavToolBar, boolean makeMoveToolBar) {
+    /**
+     * ctor
+     *
+     * @param makeNavToolBar make nav tool bar
+     * @param makeMoveToolBar make move tool bar
+     */
+    public NavigatedMapPanel(boolean makeNavToolBar,
+                             boolean makeMoveToolBar) {
         this((List) null, makeNavToolBar, makeMoveToolBar);
     }
 
@@ -137,7 +147,7 @@ public class NavigatedMapPanel extends JPanel {
      * @param makeToolBar Make the nav toolbar
      */
     public NavigatedMapPanel(List defaultMaps, boolean makeToolBar) {
-        this(defaultMaps, makeToolBar,makeToolBar);
+        this(defaultMaps, makeToolBar, makeToolBar);
     }
 
     /**
@@ -147,7 +157,8 @@ public class NavigatedMapPanel extends JPanel {
      * @param makeNavToolBar Make the nav toolbar
      * @param makeMoveToolBar Make the move toolbar
      */
-    public NavigatedMapPanel(List defaultMaps, boolean makeNavToolBar, boolean makeMoveToolBar) {
+    public NavigatedMapPanel(List defaultMaps, boolean makeNavToolBar,
+                             boolean makeMoveToolBar) {
         init(defaultMaps, makeNavToolBar, makeMoveToolBar);
     }
 
@@ -167,9 +178,11 @@ public class NavigatedMapPanel extends JPanel {
      * Initialize with a list of maps
      *
      * @param maps   list of maps
-     * @param makeToolBar Make the nav toolbar
+     * @param makeNavToolBar Make the nav tool bar
+     * @param makeMoveToolBar Make the move tool bar
      */
-    private void init(List maps, boolean makeNavToolBar, boolean makeMoveToolBar) {
+    private void init(List maps, boolean makeNavToolBar,
+                      boolean makeMoveToolBar) {
         if ((maps == null) || (maps.size() == 0)) {
             maps = DEFAULT_MAPS;
             if ((maps == null) || (maps.size() == 0)) {
@@ -200,7 +213,7 @@ public class NavigatedMapPanel extends JPanel {
                                  + boundingBox.getWidth() / 2;
                     LatLonProjection llproj = (LatLonProjection) project;
                     if (llproj.getCenterLon() != wx0) {
-                        llproj.setCenterLon(wx0);     // shift cylinder seam
+                        llproj.setCenterLon(wx0);  // shift cylinder seam
                         wx0 = llproj.getCenterLon();  // normalize wx0 to  [-180,180]
                         applyProjectionToRenderers(project);
                         //                        setProjectionImpl (project);
@@ -217,7 +230,7 @@ public class NavigatedMapPanel extends JPanel {
                 if (e.isPointSelect()) {
                     doPickPoint(e);
                 } else {
-		    System.err.println("dopickregion");
+                    System.err.println("dopickregion");
                     doPickRegion(e);
                 }
             }
@@ -235,11 +248,14 @@ public class NavigatedMapPanel extends JPanel {
         statusPanel.add(positionLabel, BorderLayout.CENTER);
         navigatedPanel.setPositionLabel(positionLabel);
         if (makeNavToolBar || makeMoveToolBar) {
-            JComponent toolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            if(makeNavToolBar)
+            JComponent toolPanel =
+                new JPanel(new FlowLayout(FlowLayout.LEFT));
+            if (makeNavToolBar) {
                 toolPanel.add(navigatedPanel.getNavToolBar());
-            if(makeMoveToolBar)
+            }
+            if (makeMoveToolBar) {
                 toolPanel.add(navigatedPanel.getMoveToolBar());
+            }
             //            toolPanel =  GuiUtils.hbox(navigatedPanel.getNavToolBar(),
             //                                       navigatedPanel.getMoveToolBar());
             add(toolPanel, BorderLayout.SOUTH);
@@ -388,6 +404,15 @@ public class NavigatedMapPanel extends JPanel {
         redraw();
     }
 
+    /**
+     * Get the projection used by the nav panel
+     *
+     * @return projection
+     */
+    public ProjectionImpl getProjectionImpl() {
+        return navigatedPanel.getProjectionImpl();
+    }
+
 
 
     /**
@@ -453,8 +478,4 @@ public class NavigatedMapPanel extends JPanel {
 
 
 }
-
-
-
-
 
