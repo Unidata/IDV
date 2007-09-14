@@ -309,7 +309,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
 
         saveJythonBox = new JComboBox(new Vector(Misc.newList("No Jython",
-                "All Jython", "Selected Jython")));
+                "All Local Jython", "Selected Jython")));
 
         ActionListener jythonListener = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
