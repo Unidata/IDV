@@ -43,15 +43,9 @@ import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.DisplayInfo;
 
 import ucar.unidata.idv.IdvConstants;
-import ucar.unidata.idv.IdvPreferenceManager;
 import ucar.unidata.idv.IntegratedDataViewer;
-import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.idv.ViewContext;
-import ucar.unidata.idv.ViewDescriptor;
-import ucar.unidata.idv.ViewManager;
-import ucar.unidata.idv.ui.DataSelector;
-import ucar.unidata.idv.ui.DataTreeDialog;
-import ucar.unidata.idv.ui.IdvWindow;
+
 
 import ucar.unidata.metdata.NamedStationImpl;
 

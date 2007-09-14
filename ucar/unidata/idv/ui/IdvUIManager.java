@@ -4693,17 +4693,24 @@ public class IdvUIManager extends IdvManager {
         if (dataSourcesForTree.size() == 0) {
             return null;
         }
+        DataOperand dataOperand  = new DataOperand("Please select a data choice:",
+                                                   "Please select a data choice:",
+                                                   descriptor.getCategories(),
+                                                   false);
         DataTreeDialog dataDialog =
-            new DataTreeDialog(getIdv(), getFrame(), null,
-                               Misc.newList(descriptor.getCategories()),
-                               Misc.newList("Please select a data choice:"),
-                               false, dataSourcesForTree);
+            new DataTreeDialog(getIdv(), null,
+                               Misc.newList(dataOperand),
+                               dataSourcesForTree,null);
         List selected = dataDialog.getSelected();
         dataDialog.dispose();
         if ((selected == null) || selected.isEmpty()) {
             return null;
         }
-        return (DataChoice) selected.get(0);
+        List firstList = (List) selected.get(0);
+        if (firstList.isEmpty()) {
+            return null;
+        }
+        return (DataChoice) firstList.get(0);
     }
 
     /**
@@ -4719,9 +4726,8 @@ public class IdvUIManager extends IdvManager {
             return new ArrayList();
         }
         Hashtable choicesWeAlreadyHave = new Hashtable();
-        List      labels               = new ArrayList();
-        List      categories           = new ArrayList();
-        List      patterns             = new ArrayList();
+        List operandsToSelect = new ArrayList();
+
 
         //First go thru the list and see if there are any operands of the 
         //form <data source description>:<param description>
@@ -4773,14 +4779,11 @@ public class IdvUIManager extends IdvManager {
             }
 
             if (choice != null) {
-                choicesWeAlreadyHave.put(operand, choice);
+                choicesWeAlreadyHave.put(operand, Misc.newList(choice));
             } else {
-                patterns.add(operand.getProperty("pattern"));
-                labels.add(operand.getLabel());
-                categories.add(operand.getCategories());
+                operandsToSelect.add(operand);
             }
         }
-
 
         List dataSourcesForTree = getIdv().getAllDataSources();
         if (dataSourcesForTree.size() == 0) {
@@ -4790,22 +4793,16 @@ public class IdvUIManager extends IdvManager {
 
         List selected = new ArrayList();
 
+
         //If we still have unfound choices then popup the dialog
-        if (labels.size() > 0) {
+        if (operandsToSelect.size() > 0) {
             DataTreeDialog dataDialog = new DataTreeDialog(getIdv(),
-                                            getFrame(), null, categories,
-                                            labels, patterns, false,
-                                            dataSourcesForTree);
-
-
+                                                           null, operandsToSelect,
+                                                           dataSourcesForTree,null);
             selected = dataDialog.getSelected();
+            //            System.err.println ("selected = " + selected);
             dataDialog.dispose();
-            if (selected == null) {
-                //System.err.println ("selected null" + labels);
-                return null;
-            }
-            if (selected.size() == 0) {
-                //System.err.println ("selected ==0" + labels);
+            if (selected == null || selected.size() == 0) {
                 return null;
             }
         }
@@ -4818,20 +4815,26 @@ public class IdvUIManager extends IdvManager {
             DataChoice choice =
                 (DataChoice) choicesWeAlreadyHave.get(operand);
             if (choice == null) {
-                choice = (DataChoice) selected.get(selectedIdx);
-                selectedIdx++;
+                List list = (List) selected.get(selectedIdx++);
+                if(list.size()>0) {
+                    choice = (DataChoice) list.get(0);
+                }
             }
             List times = operand.getTimeIndices();
             if (times != null) {
                 choice.setTimeSelection(times);
             }
-            finalChoices.add(choice);
+            if(operand.getMultiple()) {
+                List tmp = new ArrayList();
+                tmp.add(choice);
+                ListDataChoice ldc = new ListDataChoice(tmp);
+                finalChoices.add(ldc);
+            } else {
+                finalChoices.add(choice);
+            }
         }
         return finalChoices;
-
     }
-
-
 
     /**
      * Popup a JTextField containing dialog that allows  the user

@@ -965,13 +965,13 @@ public class DataTree extends DataSourceHolder {
             }
         }
 
+
         for (int i = 0; i < choices.size(); i++) {
             DataChoice choice = (DataChoice) choices.get(i);
             //We can have some DataChoices that are not intended for the user
             if ( !choice.getForUser()) {
                 continue;
             }
-
 
             //If we have a list of DataCategory-ies then check if we are applicable
             //to the categories of the current DataChoice. If not then don't show it.
@@ -986,10 +986,12 @@ public class DataTree extends DataSourceHolder {
             }
             cnt++;
 
-            if ((initialSelectedFieldName != null)
-                    && choice.toString().equals(initialSelectedFieldName)) {
-                initialSelectedChoices   = Misc.newList(choice);
-                initialSelectedFieldName = null;
+            if (initialSelectedFieldName != null) {
+                if(choice.toString().equals(initialSelectedFieldName) ||
+                   choice.getName().equals(initialSelectedFieldName)) {
+                    initialSelectedChoices   = Misc.newList(choice);
+                    initialSelectedFieldName = null;
+                }
             }
 
 

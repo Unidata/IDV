@@ -493,7 +493,7 @@ public class MultiDisplayHolder extends DisplayControlImpl {
                                    List selectedDataChoices,
                                    List categories) {
 
-        List dataSourcesForTree = getControlContext().getAllDataSources();
+        /*        List dataSourcesForTree = getControlContext().getAllDataSources();
         DataTreeDialog dataDialog = new DataTreeDialog(getIdv(), null, null,
                                         categories, titles, multiples,
                                         dataSourcesForTree,
@@ -502,7 +502,9 @@ public class MultiDisplayHolder extends DisplayControlImpl {
 
         List selected = flattenChoices(dataDialog.getSelected());
         dataDialog.dispose();
-        return selected;
+        return selected;*/
+        //TODO:
+        return null;
     }
 
 

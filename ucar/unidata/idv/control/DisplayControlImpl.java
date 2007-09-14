@@ -36,6 +36,7 @@ import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataSourceImpl;
+import ucar.unidata.data.DataOperand;
 
 import ucar.unidata.data.DataTimeRange;
 import ucar.unidata.data.GeoSelection;
@@ -1143,11 +1144,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 }
 
                 if (initDataChoices == null) {
-                    ActionListener listener = new ActionListener() {
-                        public void actionPerformed(ActionEvent event) {
-                            initDataChoices = (List) event.getSource();
-                        }
-                    };
                     String label = "<html>" + "Please select data for: <i>"
                                    + getDisplayName() + "</i>";
                     if ((originalDataChoicesLabel != null)
@@ -1156,11 +1152,17 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                 + originalDataChoicesLabel + "</i>";
                     }
 
-                    new DataTreeDialog(controlContext.getIdv(), listener,
-                                       categories, label,
-                                       originalDataChoicesLabel, false, null,
-                                       dataSources, myDataChoices,
-                                       true /*modal*/);
+                    DataOperand operand = new DataOperand(originalDataChoicesLabel, label,
+                                                          categories,
+                                                          false);
+                    DataTreeDialog dataDialog = 
+                        new DataTreeDialog(getIdv(), null, 
+                                           Misc.newList(operand),
+                                           dataSources, myDataChoices);
+                    List choices  = dataDialog.getSelected();
+                    if(choices !=null && choices.size()>0) {
+                        initDataChoices  = (List) choices.get(0);
+                    }
                 }
                 if (initDataChoices == null) {
                     displayControlFailed();
@@ -6930,43 +6932,30 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     protected void popupDataDialog(final String dialogMessage,
                                    Component from, boolean multiples,
                                    List categories) {
-        final ActionListener listener = new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                final List choices = (List) event.getSource();
-                if (choices.size() > 0) {
-                    Misc.run(new Runnable() {
-                        public void run() {
-                            List theChoices = choices;
-
-                            if (theChoices.get(0) instanceof List) {
-                                List flatChoices = new ArrayList();
-                                for (int i = 0; i < theChoices.size(); i++) {
-                                    flatChoices.addAll(
-                                        (List) theChoices.get(i));
-                                }
-                                theChoices = flatChoices;
-                            }
-
-                            List clonedList =
-                                DataChoice.cloneDataChoices(theChoices);
-                            try {
-                                addNewData(clonedList);
-                            } catch (Exception exc) {
-                                logException("Selecting new data", exc);
-                            }
-
-                        }
-                    });
-                }
-            }
-        };
         if (categories == null) {
             categories = getCategories();
         }
-        new DataTreeDialog(getIdv(), listener, categories, dialogMessage,
-                           multiples, from,
-                           getControlContext().getAllDataSources(),
-                           myDataChoices, true /*modal*/);
+        DataOperand dataOperand  = new DataOperand(dialogMessage, dialogMessage, categories, multiples);
+        DataTreeDialog dataDialog = 
+            new DataTreeDialog(getIdv(),  from, Misc.newList(dataOperand),
+                               getControlContext().getAllDataSources(),
+                               myDataChoices);
+
+        List choices  = dataDialog.getSelected();
+        if(choices ==null || choices.size()==0) {
+            return;
+        }
+        final List clonedList =
+            DataChoice.cloneDataChoices((List)choices.get(0));
+        Misc.run(new Runnable() {
+                public void run() {
+                    try {
+                        addNewData(clonedList);
+                    } catch (Exception exc) {
+                        logException("Selecting new data", exc);
+                    }
+                }});
+
     }
 
 
@@ -7694,7 +7683,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             new JMenuItem(getChangeParameterLabel());
         selectChoices.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                popupDataDialog("Choose Parameter", selectChoices);
+                popupDataDialog("<html>Choose Parameter</html>", selectChoices);
             }
         });
         return selectChoices;

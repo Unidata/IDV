@@ -68,6 +68,9 @@ public class DataOperand {
     /** name of this operand */
     private String name;
 
+    private List categories;
+
+
     /** associated data */
     private Object data;
 
@@ -107,6 +110,38 @@ public class DataOperand {
     }
 
 
+    public DataOperand(String name, String description, List categories,boolean multiple) {
+        this.name = name;
+        putCategories(categories);
+        if(description!=null)
+            putDescription(description);
+        putMultiple(multiple);
+    }
+        
+
+
+
+    public void putDescription(String desc) {
+        properties.put("description",desc);
+    }
+
+
+    public String getDescription() {
+        String desc = (String)properties.get("description");
+        if(desc == null) desc = name;
+        return desc;
+    }
+
+
+    public void putPattern(String desc) {
+        properties.put("pattern",desc);
+    }
+
+
+    public String getPattern() {
+        return  (String)properties.get("pattern");
+    }
+
 
     /**
      * Check to see if the object in question is equal to this.
@@ -142,8 +177,9 @@ public class DataOperand {
     }
 
 
-    public void setCategories(List categories) {
-        properties.put(PROP_CATEGORIES, categories.toString());
+
+    public void putCategories(List categories) {
+        this.categories = categories;
     }
 
 
@@ -153,6 +189,8 @@ public class DataOperand {
      * @return List of data categories or null if none defined
      */
     public List getCategories() {
+        if(categories != null)
+            return categories;
         String catString = (String) properties.get(PROP_CATEGORIES);
         if (catString == null) {
             return null;
@@ -206,11 +244,11 @@ public class DataOperand {
         return (data != null);
     }
 
-    public void setIsMultiple(boolean b) {
+    public void putMultiple(boolean b) {
         properties.put("multiple", ""+b);
     }
 
-    public boolean isMultiple() {
+    public boolean getMultiple() {
         String isMultiple = (String) properties.get("multiple");
         if(isMultiple == null) return false;
         return isMultiple.trim().equals("true");

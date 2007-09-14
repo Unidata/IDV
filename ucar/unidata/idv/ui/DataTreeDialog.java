@@ -24,7 +24,9 @@ package ucar.unidata.idv.ui;
 
 
 import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataOperand;
 import ucar.unidata.data.DataSelection;
+
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataSourceResults;
 import ucar.unidata.data.DerivedDataChoice;
@@ -92,16 +94,9 @@ public class DataTreeDialog extends JDialog implements ActionListener {
     /** The param labels */
     private List paramNames;
 
-
     /** The param names */
     private List fieldNames;
 
-
-    /** Shold we add the italics and the prefix to the label */
-    private boolean addLabelDecoration = true;
-
-    /** The labels to show in the GUI */
-    private List labels = new ArrayList();
 
 
     /** All of the data trees, one per label/param name */
@@ -109,9 +104,6 @@ public class DataTreeDialog extends JDialog implements ActionListener {
 
     /** List of dataseleciotnwidgets, one per datatree */
     List dataSelectionWidgets = new ArrayList();
-
-    /** Listener to fire select events off to */
-    ActionListener listener;
 
     /** List of lists of selected data choices, one per data tree */
     List selected = null;
@@ -122,209 +114,47 @@ public class DataTreeDialog extends JDialog implements ActionListener {
     /** Any DataCatgeory-s to use to filter out the DataChoice-s with */
     List categories;
 
-    /** Patterns to match */
-    List patterns;
 
-    /** Support multiple selection? */
-    boolean multiples = true;
-
+    List operands = new ArrayList();
 
 
     /**
      * Create the dialog
      *
      * @param idv Reference to the IDV
-     * @param frame Parent Frame
      * @param src  Component to place ourselves near
      * @param categories List of list of {@link ucar.unidata.data.DataCategory}-s
      * @param paramNames List of param names
-     * @param multiples Support multiples
-     * @param dataSources List of data sources
-     */
-    public DataTreeDialog(IntegratedDataViewer idv, JFrame frame,
-                          Component src, List categories, List paramNames,
-                          boolean multiples, List dataSources) {
-
-        this(idv, frame, src, categories, paramNames, multiples, dataSources,
-             (List) null);
-    }
-
-
-    /**
-     * Create the dialog
-     *
-     * @param idv Reference to the IDV
-     * @param frame Parent Frame
-     * @param src  Component to place ourselves near
-     * @param categories List of list of {@link ucar.unidata.data.DataCategory}-s
-     * @param paramNames List of param names
-     * @param patterns List of patterns to match the data choices with
-     * @param multiples Support multiples
-     * @param dataSources List of data sources
-     */
-    public DataTreeDialog(IntegratedDataViewer idv, JFrame frame,
-                          Component src, List categories, List paramNames,
-                          List patterns, boolean multiples,
-                          List dataSources) {
-
-        this(idv, frame, src, categories, paramNames, patterns, multiples,
-             dataSources, (List) null);
-    }
-
-    /**
-     * Create the dialog
-     *
-     * @param idv Reference to the IDV
-     * @param frame Parent Frame
-     * @param src  Component to place ourselves near
-     * @param categories List of list of {@link ucar.unidata.data.DataCategory}-s
-     * @param paramNames List of param names
-     * @param multiples Support multiples
      * @param dataSources List of data sources
      * @param selectedDataChoices list of already selected data choices
      */
-    public DataTreeDialog(IntegratedDataViewer idv, JFrame frame,
-                          Component src, List categories, List paramNames,
-                          boolean multiples, List dataSources,
-                          List selectedDataChoices) {
-        this(idv, frame, src, categories, paramNames, null, multiples,
-             dataSources, selectedDataChoices);
-    }
-
-
-
-    /**
-     * Create the dialog
-     *
-     * @param idv Reference to the IDV
-     * @param frame Parent Frame
-     * @param src  Component to place ourselves near
-     * @param categories List of list of {@link ucar.unidata.data.DataCategory}-s
-     * @param paramNames List of param names
-     * @param patterns patterns to use to pre-select data choices
-     * @param multiples Support multiples
-     * @param dataSources List of data sources
-     * @param selectedDataChoices list of already selected data choices
-     */
-    public DataTreeDialog(IntegratedDataViewer idv, JFrame frame,
-                          Component src, List categories, List paramNames,
-                          List patterns, boolean multiples, List dataSources,
+    public DataTreeDialog(IntegratedDataViewer idv, 
+                          Component src, List operands, List dataSources,
                           List selectedDataChoices) {
 
-
-        super(frame, TITLE, true);
+        super(idv.getIdvUIManager().getFrame(), TITLE, true);
         this.idv         = idv;
-        this.paramNames  = paramNames;
+        this.operands = operands;
         this.dataSources = dataSources;
-        this.categories  = categories;
-        this.patterns    = patterns;
-        init(multiples, src, selectedDataChoices);
+        init(src, selectedDataChoices);
     }
 
-
-
-    /**
-     * Create the dialog
-     *
-     * @param idv Reference to the IDV
-     * @param listener Route select events to
-     * @param label The label to use in the GUI
-     * @param src  Component to place ourselves near
-     * @param categories List of {@link ucar.unidata.data.DataCategory}-s
-     * @param multiples Support multiples
-     * @param dataSources List of data sources
-     * @param selectedDataChoices Pre-selected data choices
-     */
-    public DataTreeDialog(IntegratedDataViewer idv, ActionListener listener,
-                          List categories, String label, boolean multiples,
-                          Component src, List dataSources,
-                          List selectedDataChoices) {
-        this(idv, listener, categories, null, multiples, src, dataSources,
-             selectedDataChoices, false);
-    }
-
-    /**
-     * Create the dialog
-     *
-     * @param idv Reference to the IDV
-     * @param listener Route select events to
-     * @param label The label to use in the GUI
-     * @param src  Component to place ourselves near
-     * @param categories List of {@link ucar.unidata.data.DataCategory}-s
-     * @param multiples Support multiples
-     * @param dataSources List of data sources
-     * @param selectedDataChoices Pre-selected data choices
-     * @param modal Should this be a modal dialog
-     */
-    public DataTreeDialog(IntegratedDataViewer idv, ActionListener listener,
-                          List categories, String label, boolean multiples,
-                          Component src, List dataSources,
-                          List selectedDataChoices, boolean modal) {
-
-        this(idv, listener, categories, label, null, multiples, src,
-             dataSources, selectedDataChoices, modal);
-    }
-
-
-
-    /**
-     * Create the dialog
-     *
-     * @param idv Reference to the IDV
-     * @param listener Route select events to
-     * @param label The label to use in the GUI
-     * @param fieldName The name of the field to intially have selected. May be ull.
-     * @param src  Component to place ourselves near
-     * @param categories List of {@link ucar.unidata.data.DataCategory}-s
-     * @param multiples Support multiples
-     * @param dataSources List of data sources
-     * @param selectedDataChoices Pre-selected data choices
-     * @param modal Should this be a modal dialog
-     */
-    public DataTreeDialog(IntegratedDataViewer idv, ActionListener listener,
-                          List categories, String label, String fieldName,
-                          boolean multiples, Component src, List dataSources,
-                          List selectedDataChoices, boolean modal) {
-
-        super(GuiUtils.getFrame(src), TITLE, modal);
-        this.idv = idv;
-        if (categories == null) {
-            this.categories = null;
-        } else {
-            this.categories = Misc.newList(categories);
-        }
-        this.listener      = listener;
-        addLabelDecoration = false;
-        this.paramNames    = Misc.newList(label);
-        this.fieldNames    = Misc.newList(fieldName);
-        this.dataSources   = dataSources;
-        init(multiples, src, selectedDataChoices);
-    }
 
 
     /**
      * Initalize the dialog
      *
-     * @param multiples Supports multiple selection
      * @param src Component to popup near
      * @param selectedDataChoices Pre-selected data choices
      */
-    private void init(boolean multiples, Component src,
+    private void init(Component src,
                       List selectedDataChoices) {
-        this.multiples = multiples;
-        for (int i = 0; i < paramNames.size(); i++) {
-            String paramName = paramNames.get(i).toString();
-            String label     = paramName;
-            labels.add(label);
-            List   categoryList     = ((categories != null)
-                                       ? (List) categories.get(i)
-                                       : null);
-            String initialFieldName = null;
-            if (fieldNames != null) {
-                initialFieldName = (String) fieldNames.get(i);
-            }
-            final DataTree dataTree = new DataTree(idv, dataSources,
-                                          categoryList, initialFieldName,
+
+        for (int i = 0; i < operands.size(); i++) {
+            DataOperand operand = (DataOperand) operands.get(i);
+            List   categoryList     = operand.getCategories();
+            DataTree dataTree = new DataTree(idv, dataSources,
+                                          categoryList, operand.getParamName(),
                                           null);
             final int theIndex = i;
             dataTree.getTree().addMouseListener(new MouseAdapter() {
@@ -337,11 +167,11 @@ public class DataTreeDialog extends JDialog implements ActionListener {
                 }
             });
             idv.getIdvUIManager().addDataSourceHolder(dataTree);
-            dataTree.setMultipleSelect(multiples);
+            dataTree.setMultipleSelect(operand.getMultiple());
             if (selectedDataChoices != null) {
                 dataTree.selectChoices(selectedDataChoices);
-            } else if ((patterns != null) && (i < patterns.size())) {
-                String pattern = (String) "pattern:" + patterns.get(i);
+            } else if (operand.getPattern()!=null) {
+                String pattern = "pattern:"+operand.getPattern();
                 for (int dataSourceIdx = 0;
                         dataSourceIdx < dataSources.size(); dataSourceIdx++) {
                     DataSource dataSource =
@@ -356,9 +186,21 @@ public class DataTreeDialog extends JDialog implements ActionListener {
             }
             dataTrees.add(dataTree);
         }
-        doMakeWindow(src);
+        Component contents = doMakeContents();
+        Container cpane    = getContentPane();
+        cpane.setLayout(new BoxLayout(cpane, BoxLayout.Y_AXIS));
+        cpane.add(contents);
+        //src may be null
+        try {
+            Point     loc  = src.getLocationOnScreen();
+            Dimension size = src.getSize();
+            setLocation(loc.x + size.width, loc.y - 30);
+        } catch (Exception exc) {
+            setLocation(50, 50);
+        }
+        pack();
+        show();
     }
-
 
 
     /**
@@ -384,27 +226,6 @@ public class DataTreeDialog extends JDialog implements ActionListener {
         return selected;
     }
 
-    /**
-     * Create and popup the window
-     *
-     * @param src Where should the window go
-     */
-    private void doMakeWindow(Component src) {
-        Component contents = doMakeContents();
-        Container cpane    = getContentPane();
-        cpane.setLayout(new BoxLayout(cpane, BoxLayout.Y_AXIS));
-        cpane.add(contents);
-        //src may be null
-        try {
-            Point     loc  = src.getLocationOnScreen();
-            Dimension size = src.getSize();
-            setLocation(loc.x + size.width, loc.y - 30);
-        } catch (Exception exc) {
-            setLocation(50, 50);
-        }
-        pack();
-        show();
-    }
 
     /**
      * Make the GUI
@@ -414,19 +235,18 @@ public class DataTreeDialog extends JDialog implements ActionListener {
     private Component doMakeContents() {
         List topComponents  = new ArrayList();
         List timeComponents = new ArrayList();
-        for (int i = 0; i < labels.size(); i++) {
+        for (int i = 0; i < operands.size(); i++) {
+            DataOperand operand = (DataOperand) operands.get(i);
             JScrollPane scroller =
                 ((DataTree) dataTrees.get(i)).getScroller();
-
             DataSelectionWidget dsw = new DataSelectionWidget(idv, false);
             dataSelectionWidgets.add(dsw);
-
             DataChoice dataChoice =
                 ((DataTree) dataTrees.get(i)).getSelectedDataChoice();
             dsw.updateSelectionTab(dataChoice);
-            String labelString = StringUtil.replace(labels.get(i).toString(),
+            String labelString = StringUtil.replace(operand.getDescription(),
                                      "_", " ");
-            if (addLabelDecoration) {
+            if(!labelString.startsWith("<html")) {
                 labelString = "<html>Field: <i><b>" + labelString
                               + "</b></i></html>";
             }
@@ -464,7 +284,6 @@ public class DataTreeDialog extends JDialog implements ActionListener {
      */
     public void dispose() {
         dataTrees   = null;
-        listener    = null;
         selected    = null;
         dataSources = null;
         super.dispose();
@@ -491,24 +310,7 @@ public class DataTreeDialog extends JDialog implements ActionListener {
                 ((DataChoice) selectedFromTree.get(
                     dataChoiceIdx)).setDataSelection(dataSelection);
             }
-            if (multiples) {
-                //If we allow multiple selections then we add the list
-                selected.add(selectedFromTree);
-            } else {
-                //else each list should contain at most one DataChoice
-                if (selectedFromTree.size() == 0) {
-                    //For now if the user did not choose one then we set selected = null
-                    //and break out of the loop
-                    selected = null;
-                    break;
-                }
-                selected.add(selectedFromTree.get(0));
-            }
-        }
-
-        if (listener != null) {
-            listener.actionPerformed(new ActionEvent(selected, 0,
-                    "selected"));
+            selected.add(selectedFromTree);
         }
         doClose();
     }
