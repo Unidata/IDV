@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data;
 
 
@@ -98,9 +99,10 @@ public class ListDataChoice extends DataChoice {
      * their parent. If they do we will need to clone the children here
      * so a DataChoice only has one parent.
      *
-     * @param dataChoices        The list of initial children data choices
-     *                           (the operands).
-     * @param desc               The long description of this choice.
+     * @param id _more_
+     * @param name _more_
+     * @param description _more_
+     * @param categories _more_
      */
     public ListDataChoice(Object id, String name, String description,
                           List categories) {
@@ -111,36 +113,74 @@ public class ListDataChoice extends DataChoice {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param children _more_
+     */
     public ListDataChoice(String name, List children) {
-        super(name,name,name,null);
+        super(name, name, name, null);
         this.childrenChoices = children;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param dataChoices _more_
+     */
     public void setChildrenDataChoices(List dataChoices) {
         this.childrenChoices = dataChoices;
         setDescription(convertLabel(getDescription(), childrenChoices));
     }
 
 
+    /**
+     * _more_
+     *
+     * @param category _more_
+     * @param dataSelection _more_
+     * @param requestProperties _more_
+     *
+     * @return _more_
+     *
+     * @throws DataCancelException _more_
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     protected Data getData(DataCategory category,
-                                    DataSelection dataSelection,
-                                    Hashtable requestProperties)
-        throws VisADException, RemoteException, DataCancelException {
+                           DataSelection dataSelection,
+                           Hashtable requestProperties)
+            throws VisADException, RemoteException, DataCancelException {
         return null;
     }
 
 
-    protected List getDataList(DataCategory category,
-                                    DataSelection dataSelection,
-                                    Hashtable requestProperties)
-        throws VisADException, RemoteException, DataCancelException {
-        List data= new ArrayList();
+    /**
+     * _more_
+     *
+     * @param category _more_
+     * @param dataSelection _more_
+     * @param requestProperties _more_
+     *
+     * @return _more_
+     *
+     * @throws DataCancelException _more_
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    protected Object[] getDataList(DataCategory category,
+                                   DataSelection dataSelection,
+                                   Hashtable requestProperties)
+            throws VisADException, RemoteException, DataCancelException {
+        List data = new ArrayList();
         for (int i = 0; i < childrenChoices.size(); i++) {
             DataChoice child = (DataChoice) childrenChoices.get(i);
-            data.add(child.getData(category, dataSelection, requestProperties));
+            data.add(child.getData(category, dataSelection,
+                                   requestProperties));
         }
-        return data;
+        return data.toArray(new Object[data.size()]);
     }
 
 
@@ -247,8 +287,10 @@ public class ListDataChoice extends DataChoice {
      *
      *  @param src The {@link DataCategory} to look at.
      */
-    protected   void inherit(DataCategory src) {
-        if (src==null) return;
+    protected void inherit(DataCategory src) {
+        if (src == null) {
+            return;
+        }
         List children = childrenChoices;
         //Find the child data choices we are to use (either all of them or the index'th one
         if (src.getChildIndex() >= 0) {
@@ -310,7 +352,7 @@ public class ListDataChoice extends DataChoice {
      *
      * @return The instantiated label.
      */
-    protected  String convertLabel(String label, List dataChoices) {
+    protected String convertLabel(String label, List dataChoices) {
         for (int i = 0; i < dataChoices.size(); i++) {
             DataChoice choice = (DataChoice) dataChoices.get(i);
             label = StringUtil.replace(label, "%N" + (i + 1) + "%",
@@ -410,7 +452,7 @@ public class ListDataChoice extends DataChoice {
      *  For now set this object's data categories to be the union
      *  of the  data categories of its sub-data choices.
      */
-    protected  void findDataCategories() {
+    protected void findDataCategories() {
         List      dataCategories = new ArrayList();
         Hashtable seenCategories = new Hashtable();
         for (int i = 0; i < childrenChoices.size(); i++) {
@@ -513,7 +555,7 @@ public class ListDataChoice extends DataChoice {
      */
     public int hashCode() {
         return super.hashCode() ^ Misc.hashcode(childrenChoices)
-            ^ Misc.hashcode(properties);
+               ^ Misc.hashcode(properties);
     }
 
     /**
@@ -546,8 +588,8 @@ public class ListDataChoice extends DataChoice {
             return false;
         }
         ListDataChoice that = (ListDataChoice) o;
-        return  Misc.equals(properties, that.properties)
-            && Misc.equals(childrenChoices, that.childrenChoices);
+        return Misc.equals(properties, that.properties)
+               && Misc.equals(childrenChoices, that.childrenChoices);
     }
 
 
