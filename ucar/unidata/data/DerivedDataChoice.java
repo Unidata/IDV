@@ -65,7 +65,7 @@ import java.util.StringTokenizer;
  * @author IDV Development Team
  * @version $Revision: 1.118 $
  */
-public class DerivedDataChoice extends DataChoice {
+public class DerivedDataChoice extends ListDataChoice {
 
 
     /**
@@ -87,12 +87,6 @@ public class DerivedDataChoice extends DataChoice {
     private Hashtable userSelectedChoices;
 
 
-    /**
-     * A list of the child DataChoice-s that this composite holds.
-     * Each one represents an operand to the formula, java method,
-     * or jython code,
-     */
-    List childrenChoices;
 
     /**
      *  The java method name. May be null.
@@ -135,7 +129,6 @@ public class DerivedDataChoice extends DataChoice {
     public DerivedDataChoice(DerivedDataChoice other) {
         super(other);
         this.dataContext     = other.dataContext;
-        this.childrenChoices = cloneDataChoices(other.childrenChoices);
         this.methodName      = other.methodName;
         this.code            = other.code;
         this.formula         = other.formula;
@@ -198,7 +191,6 @@ public class DerivedDataChoice extends DataChoice {
         descriptor           = ddd;
         this.dataContext     = dataContext;
         this.properties      = ddd.properties;
-        this.childrenChoices = new ArrayList();
         this.methodName      = ddd.method;
         this.code            = ddd.code;
         this.formula         = ddd.formula;
@@ -254,171 +246,6 @@ public class DerivedDataChoice extends DataChoice {
     }
 
 
-    /**
-     * Return the name of the index'th  child DataChoice.
-     *
-     * @param index       The (0 based) index.
-     * @return The name of the child DataChoice.
-     */
-    public String getIndexedName(int index) {
-        if ((childrenChoices != null) && (index < childrenChoices.size())) {
-            return ((DataChoice) childrenChoices.get(index)).getName();
-        }
-        return super.getName();
-    }
-
-
-    /**
-     * This method runs through the list of {@link  DataCategory}-s. If any
-     * of them are "inherited" categories then we replace the inherited
-     * category with the data categories of the children DataChoice-s.
-     */
-    private void checkCategories() {
-        //We use a tmp list because the calls to inherit in the loop
-        //Can result in the addition of new elements into the categories list
-        List tmpCategories = (List) new ArrayList(categories);
-        for (int i = 0; i < tmpCategories.size(); i++) {
-            DataCategory dataCategory = (DataCategory) tmpCategories.get(i);
-            if ( !dataCategory.isInherited()) {
-                continue;
-            }
-            inherit(dataCategory);
-        }
-    }
-
-    /**
-     * This gets called  after the data choice has been unpersisted
-     *
-     * @param properties Properties
-     */
-    public void initAfterUnPersistence(Hashtable properties) {
-        super.initAfterUnPersistence(properties);
-        for (int i = 0; i < childrenChoices.size(); i++) {
-            ((DataChoice) childrenChoices.get(i)).initAfterUnPersistence(
-                properties);
-        }
-    }
-
-
-
-    /**
-     * Add to the given list all final data choices (i.e.,
-     * the leafs of the datachoice tree)
-     *
-     * @param finalDataChoices The list to add to
-     */
-    public void getFinalDataChoices(List finalDataChoices) {
-        super.getFinalDataChoices(finalDataChoices);
-        for (int i = 0; i < childrenChoices.size(); i++) {
-            ((DataChoice) childrenChoices.get(i)).getFinalDataChoices(
-                finalDataChoices);
-        }
-    }
-
-
-    /**
-     * Add to the given list all the data sources
-     *
-     * @param dataSources List to put data sources into
-     */
-    public void getDataSources(List dataSources) {
-        for (int i = 0; i < childrenChoices.size(); i++) {
-            ((DataChoice) childrenChoices.get(i)).getDataSources(dataSources);
-        }
-
-    }
-
-
-
-    /**
-     * This method determines the type of inheritance defined by the
-     * given DataCategory. It collects the set of categories from the children
-     * DataChoice-s and replaces the given src category with this new set.
-     * The different flavors of of inheritance are:
-     * <ul>
-     *  <li> all -  take the (set) union of all of the categories of all
-     *       of the children
-     *  <li> child index - take all of the categories form a particular child
-     *       DataChoice (e.g., the second child).
-     *  <li> category index - take the index'th data category form each child.
-     *  <li> child & category index - take the index'th category form a
-     *       particular child.
-     * </ul>
-     *
-     *  @param src The {@link DataCategory} to look at.
-     */
-    private void inherit(DataCategory src) {
-        List children = childrenChoices;
-        //Find the child data choices we are to use (either all of them or the index'th one
-        if (src.getChildIndex() >= 0) {
-            children = Misc.newList(childrenChoices.get(src.getChildIndex()));
-        }
-        int categoryIndex = src.getCategoryIndex();
-
-        //Run through each child and grab the appropriate list of categories
-        List newCategories = new ArrayList();
-        for (int childIdx = 0; childIdx < children.size(); childIdx++) {
-            DataChoice child           = (DataChoice) children.get(childIdx);
-            List       childCategories = child.getCategories();
-            //Do we just select the index'th one?
-            if (categoryIndex >= 0) {
-                childCategories =
-                    Misc.newList(childCategories.get(categoryIndex));
-            }
-            //Or do we get all of them
-            for (int i = 0; i < childCategories.size(); i++) {
-                DataCategory childsDataCategory =
-                    (DataCategory) childCategories.get(i);
-                //Make sure to not insert duplicates
-                if ( !newCategories.contains(childsDataCategory)) {
-                    newCategories.add(childsDataCategory);
-                }
-            }
-        }
-
-        //Now insert the new categories into our category list
-        //at the place held by the src category.
-        int srcIndex = categories.indexOf(src);
-        for (int i = 0; i < newCategories.size(); i++) {
-            //If this is the first new category then replace the src
-            DataCategory newCategory = (DataCategory) newCategories.get(i);
-            if (src.getAppend() != null) {
-                newCategory =
-                    DataCategory.parseCategory(newCategory.toString()
-                        + DataCategory.DIVIDER
-                        + src.getAppend(), newCategory.getForDisplay());
-            }
-
-            if (i == 0) {
-                categories.set(srcIndex, newCategory);
-                //Else add it into the list
-            } else {
-                categories.add(srcIndex + 1, newCategory);
-            }
-        }
-    }
-
-
-    /**
-     * Iterate through the children DataChoice-s. For each child n replace
-     * within the given label the macro "%Nn%" with the name of the
-     * child choice. Replace %Dn" with the child's description.
-     *
-     * @param label         The inital (possibly macro containing)  label.
-     * @param dataChoices   The list of child {@link DataChoice}s.
-     *
-     * @return The instantiated label.
-     */
-    private String convertLabel(String label, List dataChoices) {
-        for (int i = 0; i < dataChoices.size(); i++) {
-            DataChoice choice = (DataChoice) dataChoices.get(i);
-            label = StringUtil.replace(label, "%N" + (i + 1) + "%",
-                                       choice.getName());
-            label = StringUtil.replace(label, "%D" + (i + 1) + "%",
-                                       choice.getDescription());
-        }
-        return label;
-    }
 
 
     /**
@@ -444,90 +271,6 @@ public class DerivedDataChoice extends DataChoice {
 
 
 
-    /**
-     * Get the union of all of the children {@link DataChoice}-s levels.
-     *
-     * @return The union of all of the children {@link DataChoice}-s levels.
-     */
-    public List getAllLevels() {
-        List      mine = new ArrayList();
-        Hashtable seen = new Hashtable();
-        for (int i = 0; i < childrenChoices.size(); i++) {
-            DataChoice child = (DataChoice) childrenChoices.get(i);
-            if (child != null) {
-                Misc.addUnique(mine, child.getAllLevels(), seen);
-            }
-        }
-        return mine;
-    }
-
-
-
-
-
-    /**
-     * Get the union of all of the children {@link DataChoice}-s times.
-     *
-     * @return The union of all of the children {@link DataChoice}-s times.
-     */
-    public List getAllDateTimes() {
-        List      mine = new ArrayList();
-        Hashtable seen = new Hashtable();
-        for (int i = 0; i < childrenChoices.size(); i++) {
-            DataChoice child = (DataChoice) childrenChoices.get(i);
-            if (child != null) {
-                Misc.addUnique(mine, child.getAllDateTimes(), seen);
-            }
-        }
-        return mine;
-    }
-
-
-
-
-
-    /**
-     * Get the union of all of the children {@link DataChoice}-s selected times
-     *
-     * @return The union of all of the children {@link DataChoice}-s
-     *         selected times
-     */
-    public List getSelectedDateTimes() {
-        List      mine = new ArrayList();
-        Hashtable seen = new Hashtable();
-        for (int i = 0; i < childrenChoices.size(); i++) {
-            DataChoice child = (DataChoice) childrenChoices.get(i);
-            if (child != null) {
-                Misc.addUnique(mine, child.getSelectedDateTimes(), seen);
-            }
-        }
-        return mine;
-    }
-
-
-
-
-    /**
-     *  For now set this object's data categories to be the union
-     *  of the  data categories of its sub-data choices.
-     */
-    private void findDataCategories() {
-        List      dataCategories = new ArrayList();
-        Hashtable seenCategories = new Hashtable();
-        for (int i = 0; i < childrenChoices.size(); i++) {
-            List subCategories =
-                ((DataChoice) childrenChoices.get(i)).categories;
-            for (int j = 0; j < subCategories.size(); j++) {
-                DataCategory subCategory =
-                    (DataCategory) subCategories.get(i);
-                if (seenCategories.get(subCategory) == null) {
-                    seenCategories.put(subCategory, subCategory);
-                    dataCategories.add(subCategory);
-                }
-            }
-        }
-        setCategories(dataCategories);
-    }
 
 
 
@@ -554,15 +297,6 @@ public class DerivedDataChoice extends DataChoice {
         return op;
     }
 
-    /**
-     * Print a list of the child data choices
-     */
-    private void printChildren() {
-        for (int i = 0; i < childrenChoices.size(); i++) {
-            DataChoice dc = (DataChoice) childrenChoices.get(i);
-            System.err.println("child:" + dc.getClass().getName() + " " + dc);
-        }
-    }
 
 
     /**
@@ -773,8 +507,16 @@ public class DerivedDataChoice extends DataChoice {
                 //Add this data choice to the list of data choices
                 childrenChoices.add(selectedChoice);
                 userSelectedChoices.put(op.getParamName(), selectedChoice);
-                op.setData(selectedChoice.getData(DataCategory.NULL,
-                        dataSelection, requestProperties));
+                //Do an .equals instead of an instanceof because DerivedDataChoice 
+                //derived from ListDataChoice
+                if(selectedChoice.getClass().equals(ListDataChoice.class)) {
+                    ListDataChoice ldc = (ListDataChoice) selectedChoice;
+                    op.setData(ldc.getDataList(DataCategory.NULL,
+                                               dataSelection, requestProperties));
+                } else {
+                    op.setData(selectedChoice.getData(DataCategory.NULL,
+                                                      dataSelection, requestProperties));
+                }
             }
         }
 
@@ -1001,44 +743,6 @@ public class DerivedDataChoice extends DataChoice {
         code = m;
     }
 
-    /**
-     * Get the DataContext. Mostly used for  xml encoding.
-     *
-     * @return The DataContext.
-     */
-    public DataContext getDataContext() {
-        return dataContext;
-    }
-
-
-    /**
-     * Set the DataContext. Mostly used for  xml encoding.
-     *
-     * @param c The new value.
-     */
-    public void setDataContext(DataContext c) {
-        dataContext = c;
-    }
-
-
-
-    /**
-     * Set the child DataChoices. Mostly used for  xml encoding.
-     *
-     * @param l   The list of choices
-     */
-    public void setChoices(List l) {
-        childrenChoices = l;
-    }
-
-    /**
-     * Get the children choices. Mostly used for  xml encoding.
-     *
-     * @return the list of children
-     */
-    public List getChoices() {
-        return childrenChoices;
-    }
 
     /**
      * Set the user selected choices. Mostly used for  xml encoding.
@@ -1079,47 +783,6 @@ public class DerivedDataChoice extends DataChoice {
     }
 
 
-    /**
-     *  Remove any objects created by this choice from the cache.
-     */
-    protected void flushCache() {
-        CacheManager.remove(this);
-    }
-
-    /**
-     *  Add the data change listener. This overwrites the base class method
-     *  to tell each of the children to addDataChangeListener
-     *  (i.e., the composite pattern).
-     *
-     *  @param listener The listener to add.
-     */
-    public void addDataChangeListener(DataChangeListener listener) {
-        for (int i = 0; i < childrenChoices.size(); i++) {
-            DataChoice child = (DataChoice) childrenChoices.get(i);
-            if (child != null) {
-                child.addDataChangeListener(listener);
-            }
-        }
-    }
-
-
-    /**
-     *  Remove the data change listener. This overwrites the base class method
-     *  to tell each of the children to removeDataChangeListener.
-     *  (i.e., the composite pattern).
-     *
-     *  @param listener The listener to remove.
-     */
-    public void removeDataChangeListener(DataChangeListener listener) {
-        flushCache();
-        for (int i = 0; i < childrenChoices.size(); i++) {
-            DataChoice child = (DataChoice) childrenChoices.get(i);
-            if (child != null) {
-                child.removeDataChangeListener(listener);
-            }
-        }
-    }
-
 
     /**
      * Dummy for persistence.
@@ -1134,21 +797,9 @@ public class DerivedDataChoice extends DataChoice {
      *  @return The object's hashcode.
      */
     public int hashCode() {
-        return super.hashCode() ^ Misc.hashcode(childrenChoices)
-               ^ Misc.hashcode(properties)
-               ^ Misc.hashcode(userSelectedChoices);
+        return super.hashCode() ^ Misc.hashcode(userSelectedChoices);
     }
 
-    /**
-     * This just checks for basic equality. Things like id, datasource, etc.
-     *
-     * @param that The object ot check for equality
-     *
-     * @return Is basically equals
-     */
-    public boolean basicallyEquals(DataChoice that) {
-        return equals(that);
-    }
 
 
     /**
@@ -1172,9 +823,7 @@ public class DerivedDataChoice extends DataChoice {
         return Misc.equals(methodName, that.methodName)
                && Misc.equals(formula, that.formula)
                && Misc.equals(code, that.code)
-               && Misc.equals(userSelectedChoices, that.userSelectedChoices)
-               && Misc.equals(properties, that.properties)
-               && Misc.equals(childrenChoices, that.childrenChoices);
+            && Misc.equals(userSelectedChoices, that.userSelectedChoices);
     }
 
 

@@ -86,7 +86,7 @@ public class DataOperand {
     }
 
     /**
-     * Create a new DataOperand with null data
+     * Create a new DataOperand
      *
      * @param name    name for this object
      * @param data    associated data
@@ -105,6 +105,8 @@ public class DataOperand {
             }
         }
     }
+
+
 
     /**
      * Check to see if the object in question is equal to this.
@@ -139,6 +141,10 @@ public class DataOperand {
         return name;
     }
 
+
+    public void setCategories(List categories) {
+        properties.put(PROP_CATEGORIES, categories.toString());
+    }
 
 
     /**
@@ -198,6 +204,16 @@ public class DataOperand {
      */
     public boolean isBound() {
         return (data != null);
+    }
+
+    public void setIsMultiple(boolean b) {
+        properties.put("multiple", ""+b);
+    }
+
+    public boolean isMultiple() {
+        String isMultiple = (String) properties.get("multiple");
+        if(isMultiple == null) return false;
+        return isMultiple.trim().equals("true");
     }
 
     /**
