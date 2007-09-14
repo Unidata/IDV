@@ -577,8 +577,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
         String imgp = "/auxdata/ui/icons/";
 
-        mainDisplayBtn = new JRadioButton("Main Display", true);
-        contentsBtn    = new JRadioButton("Outer Contents", false);
+        mainDisplayBtn = new JRadioButton("View", true);
+        contentsBtn    = new JRadioButton("View & Legend", false);
         fullWindowBtn  = new JRadioButton("Full Window", false);
         GuiUtils.buttonGroup(mainDisplayBtn, fullWindowBtn).add(contentsBtn);
 

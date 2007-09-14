@@ -4436,7 +4436,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 backgroundTransparentBtn.setToolTipText(
                     "Set the background color to be transparent");
                 mainDisplayBtn = new JRadioButton("View", true);
-                contentsBtn    = new JRadioButton("Outer Contents", false);
+                contentsBtn    = new JRadioButton("View & Legend", false);
                 fullWindowBtn  = new JRadioButton("Full Window", false);
                 GuiUtils.buttonGroup(mainDisplayBtn,
                                      fullWindowBtn).add(contentsBtn);
