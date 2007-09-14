@@ -237,8 +237,8 @@ public class DataTreeDialog extends JDialog implements ActionListener {
         List timeComponents = new ArrayList();
         for (int i = 0; i < operands.size(); i++) {
             DataOperand operand = (DataOperand) operands.get(i);
-            JScrollPane scroller =
-                ((DataTree) dataTrees.get(i)).getScroller();
+            DataTree dataTree =   (DataTree) dataTrees.get(i);
+            JScrollPane scroller = dataTree.getScroller();
             DataSelectionWidget dsw = new DataSelectionWidget(idv, false);
             dataSelectionWidgets.add(dsw);
             DataChoice dataChoice =
@@ -252,8 +252,13 @@ public class DataTreeDialog extends JDialog implements ActionListener {
             }
             JLabel label = new JLabel(labelString);
             scroller.setPreferredSize(new Dimension(250, 300));
+                                   
+            JComponent treeContents  = scroller;
+            if(operand.getMultiple()) {
+                treeContents = GuiUtils.centerBottom(treeContents, GuiUtils.right(new JLabel("Control-click to select multiple")));
+            }
             topComponents.add(GuiUtils.topCenter(GuiUtils.inset(label,
-                    new Insets(10, 5, 0, 10)), scroller));
+                    new Insets(10, 5, 0, 10)), treeContents));
             timeComponents.add(dsw.getContents());
         }
         topComponents.addAll(timeComponents);
