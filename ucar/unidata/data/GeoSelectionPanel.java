@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -209,6 +210,40 @@ public class GeoSelectionPanel extends JPanel {
         });
         return box;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param p _more_
+     */
+    public void initWith(GeoSelectionPanel p) {
+        if ((xStrideBox != null) && (p.xStrideBox != null)) {
+            xStrideBox.setSelectedItem(p.xStrideBox.getSelectedItem());
+        }
+        if ((yStrideBox != null) && (p.yStrideBox != null)) {
+            yStrideBox.setSelectedItem(p.yStrideBox.getSelectedItem());
+        }
+
+        if ((zStrideBox != null) && (p.zStrideBox != null)) {
+            zStrideBox.setSelectedItem(p.zStrideBox.getSelectedItem());
+        }
+        if ((lockBtn != null) && (p.lockBtn != null)) {
+            lockBtn.setSelected(p.lockBtn.isSelected());
+        }
+        if ((mapPanel != null) && (p.mapPanel != null)) {
+            if (mapPanel.getProjectionImpl().equals(
+                    p.mapPanel.getProjectionImpl())) {
+                NavigatedPanel np = mapPanel.getNavigatedPanel();
+                np.setSelectedRegion(
+                    p.mapPanel.getNavigatedPanel().getSelectedRegion());
+                mapPanel.repaint();
+            }
+
+        }
+    }
+
+
 
     /**
      * Make the panel for the propeties dialog
@@ -505,6 +540,7 @@ public class GeoSelectionPanel extends JPanel {
                 geoSelection.setBoundingBox(new GeoLocationInfo(llr));
             }
         }
+
 
         return true;
     }
