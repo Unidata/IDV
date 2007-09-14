@@ -47,7 +47,14 @@ import java.util.List;
 public class DataOperand {
 
     /** the categories property */
-    private static final String PROP_CATEGORIES = "categories";
+   private static final String PROP_CATEGORIES = "categories";
+
+    private static final String PROP_MULTIPLE = "multiple";
+
+    private static final String PROP_PATTERN = "pattern";
+
+    private static final String PROP_DESCRIPTION = "description";
+
 
     /** the isuser property */
     private static final String PROP_ISUSER = "isuser";
@@ -122,24 +129,24 @@ public class DataOperand {
 
 
     public void putDescription(String desc) {
-        properties.put("description",desc);
+        properties.put(PROP_DESCRIPTION,desc);
     }
 
 
     public String getDescription() {
-        String desc = (String)properties.get("description");
-        if(desc == null) desc = name;
+        String desc = (String)properties.get(PROP_DESCRIPTION);
+        if(desc == null) return getParamName();
         return desc;
     }
 
 
     public void putPattern(String desc) {
-        properties.put("pattern",desc);
+        properties.put(PROP_PATTERN,desc);
     }
 
 
     public String getPattern() {
-        return  (String)properties.get("pattern");
+        return  (String)properties.get(PROP_PATTERN);
     }
 
 
@@ -245,11 +252,11 @@ public class DataOperand {
     }
 
     public void putMultiple(boolean b) {
-        properties.put("multiple", ""+b);
+        properties.put(PROP_MULTIPLE, ""+b);
     }
 
     public boolean getMultiple() {
-        String isMultiple = (String) properties.get("multiple");
+        String isMultiple = (String) properties.get(PROP_MULTIPLE);
         if(isMultiple == null) return false;
         return isMultiple.trim().equals("true");
     }

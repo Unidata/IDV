@@ -67,12 +67,16 @@ import java.util.StringTokenizer;
  */
 public class DerivedDataChoice extends ListDataChoice {
 
+    /**
+     * Property indicating this is a derived quantity
+     */
+    public static String PROP_FROMDERIVED = "fromderived";
+
 
     /**
      *  Where we might have come from.
      */
     private DerivedDataDescriptor descriptor;
-
 
     /**
      *  Initially null. Will be filled out the first time in the getData call
@@ -85,7 +89,6 @@ public class DerivedDataChoice extends ListDataChoice {
      * during the getData call.
      */
     private Hashtable userSelectedChoices;
-
 
 
     /**
@@ -104,6 +107,8 @@ public class DerivedDataChoice extends ListDataChoice {
     String formula;
 
 
+
+
     /**
      *  This is the context in which this DDC exists within. This interface
      *  (typically instantiated by the IntegratedDataViewer) allows this DDC to
@@ -111,30 +116,27 @@ public class DerivedDataChoice extends ListDataChoice {
      */
     DataContext dataContext;
 
-    /**
-     * Property indicating this is a derived quantity
-     */
-    public static String PROP_FROMDERIVED = "fromderived";
 
     /**
      *  Dummy param-less constructor so we can be recreated thru reflection.
      */
     public DerivedDataChoice() {}
 
+
     /**
-     * The cloning ctor.
+     * The copy ctor.
      *
-     * @param other  The object to instantiate from.
+     * @param that  The object to instantiate from.
      */
-    public DerivedDataChoice(DerivedDataChoice other) {
-        super(other);
-        this.dataContext     = other.dataContext;
-        this.methodName      = other.methodName;
-        this.code            = other.code;
-        this.formula         = other.formula;
-        if (other.userSelectedChoices != null) {
+    public DerivedDataChoice(DerivedDataChoice that) {
+        super(that);
+        this.dataContext     = that.dataContext;
+        this.methodName      = that.methodName;
+        this.code            = that.code;
+        this.formula         = that.formula;
+        if (that.userSelectedChoices != null) {
             userSelectedChoices =
-                (Hashtable) other.userSelectedChoices.clone();
+                (Hashtable) that.userSelectedChoices.clone();
         }
     }
 
@@ -247,7 +249,6 @@ public class DerivedDataChoice extends ListDataChoice {
 
 
 
-
     /**
      * Get the full Description for this DataChoice.
      *
@@ -258,14 +259,9 @@ public class DerivedDataChoice extends ListDataChoice {
         if (formula != null) {
             extra = extra + "<br>Formula: <i>" + formula + "</i><br>";
         }
-        StringBuffer sb = new StringBuffer("Derived quantity: "
-                                           + super.getFullDescription()
-                                           + extra + "<br>from: <ul>");
-        for (int i = 0; i < childrenChoices.size(); i++) {
-            DataChoice child = (DataChoice) childrenChoices.get(i);
-            sb.append("<li>" + child.getFullDescription());
-        }
-        sb.append("</ul>");
+        StringBuffer sb = new StringBuffer("Derived quantity: " +
+                                           extra+
+                                           super.getFullDescription());
         return sb.toString();
     }
 
@@ -482,8 +478,15 @@ public class DerivedDataChoice extends ListDataChoice {
                 if (boundChoice != null) {
                     //Got it from before
                     //                    System.err.println("getData-1:" + boundChoice + " " + op);
-                    Object data = boundChoice.getData(DataCategory.NULL,
+                    Object data;
+                    if(boundChoice.getClass().equals(ListDataChoice.class)) {
+                        ListDataChoice ldc = (ListDataChoice) boundChoice;
+                        data = ldc.getDataList(DataCategory.NULL,
+                                               dataSelection, requestProperties);
+                    } else {
+                        data = boundChoice.getData(DataCategory.NULL,
                                       dataSelection, requestProperties);
+                    }
                     dataChoiceToData.put(boundChoice, data);
                     op.setData(data);
                 } else {
@@ -605,7 +608,6 @@ public class DerivedDataChoice extends ListDataChoice {
 
         //Get the interpreter, synchronize so we don't have conflicts with the
         //operand setting.
-
         PythonInterpreter interp =
             dataContext.getJythonManager().getDerivedDataInterpreter(
                 methodName);
@@ -1010,6 +1012,29 @@ public class DerivedDataChoice extends ListDataChoice {
         }
         return code;
     }
+
+
+    /**
+     * Get the DataContext. Mostly used for  xml encoding.
+     *
+     * @return The DataContext.
+     */
+    public DataContext getDataContext() {
+        return dataContext;
+    }
+
+
+    /**
+     * Set the DataContext. Mostly used for  xml encoding.
+     *
+     * @param c The new value.
+     */
+    public void setDataContext(DataContext c) {
+        dataContext = c;
+    }
+
+
+
 
 
 

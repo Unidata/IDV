@@ -75,13 +75,6 @@ public class ListDataChoice extends DataChoice {
      */
     List childrenChoices;
 
-    /**
-     *  This is the context in which this DDC exists within. This interface
-     *  (typically instantiated by the IntegratedDataViewer) allows this DDC to
-     *  ask for the user to select DataChoice-s, etc.
-     */
-    DataContext dataContext;
-
 
     /**
      *  Dummy param-less constructor so we can be recreated thru reflection.
@@ -105,9 +98,6 @@ public class ListDataChoice extends DataChoice {
      * their parent. If they do we will need to clone the children here
      * so a DataChoice only has one parent.
      *
-     * @param dataContext        The context in which this DataChoice exists
-     *                           (typically the
-     *                           {@link ucar.unidata.idv.IntegratedDataViewer}).
      * @param dataChoices        The list of initial children data choices
      *                           (the operands).
      * @param desc               The long description of this choice.
@@ -115,14 +105,14 @@ public class ListDataChoice extends DataChoice {
     public ListDataChoice(Object id, String name, String description,
                           List categories) {
         super(id, name, description, categories);
-        this.dataContext     = dataContext;
         this.childrenChoices = new ArrayList();
         //        setDescription(convertLabel(getDescription(), childrenChoices));
         //        checkCategories();
     }
 
 
-    public ListDataChoice(List children) {
+    public ListDataChoice(String name, List children) {
+        super(name,name,name,null);
         this.childrenChoices = children;
     }
 
@@ -334,6 +324,25 @@ public class ListDataChoice extends DataChoice {
 
 
 
+
+    /**
+     * Get the full Description for this DataChoice.
+     *
+     * @return  full description
+     */
+    public String getFullDescription() {
+        StringBuffer sb = new StringBuffer(super.getFullDescription()
+                                           + "<br>from: <ul>");
+        for (int i = 0; i < childrenChoices.size(); i++) {
+            DataChoice child = (DataChoice) childrenChoices.get(i);
+            sb.append("<li>" + child.getFullDescription());
+        }
+        sb.append("</ul>");
+        return sb.toString();
+    }
+
+
+
     /**
      * Get the union of all of the children {@link DataChoice}-s levels.
      *
@@ -431,26 +440,6 @@ public class ListDataChoice extends DataChoice {
             System.err.println("child:" + dc.getClass().getName() + " " + dc);
         }
     }
-
-    /**
-     * Get the DataContext. Mostly used for  xml encoding.
-     *
-     * @return The DataContext.
-     */
-    public DataContext getDataContext() {
-        return dataContext;
-    }
-
-
-    /**
-     * Set the DataContext. Mostly used for  xml encoding.
-     *
-     * @param c The new value.
-     */
-    public void setDataContext(DataContext c) {
-        dataContext = c;
-    }
-
 
 
     /**

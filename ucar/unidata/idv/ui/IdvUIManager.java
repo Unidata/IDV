@@ -4812,25 +4812,28 @@ public class IdvUIManager extends IdvManager {
         for (int i = 0; i < operands.size(); i++) {
             DataOperand operand   = (DataOperand) operands.get(i);
             String      paramName = operand.getParamName();
+            List choices;
             DataChoice choice =
                 (DataChoice) choicesWeAlreadyHave.get(operand);
             if (choice == null) {
-                List list = (List) selected.get(selectedIdx++);
-                if(list.size()>0) {
-                    choice = (DataChoice) list.get(0);
-                }
+                choices = (List) selected.get(selectedIdx++);
+            } else {
+                choices = Misc.newList(choice);
+            }
+            if(choices.size() == 0) {
+                throw new IllegalStateException ("No data selected");
             }
             List times = operand.getTimeIndices();
             if (times != null) {
-                choice.setTimeSelection(times);
+                for(int choiceIdx=0;choiceIdx<choices.size();choiceIdx++) {
+                    ((DataChoice)choices.get(choiceIdx)).setTimeSelection(times);
+                }
             }
             if(operand.getMultiple()) {
-                List tmp = new ArrayList();
-                tmp.add(choice);
-                ListDataChoice ldc = new ListDataChoice(tmp);
+                ListDataChoice ldc = new ListDataChoice(paramName,choices);
                 finalChoices.add(ldc);
             } else {
-                finalChoices.add(choice);
+                finalChoices.add(choices.get(0));
             }
         }
         return finalChoices;
