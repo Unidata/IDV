@@ -1,4 +1,4 @@
-
+""" This is the doc for the grid module """
 
 def makeVector(a,b):
   return DerivedGridFactory.createFlowVectors(a,b)
@@ -8,7 +8,7 @@ def makeFlowField(a,b,c):
 
 
 def extractPressureFromNWPGrid(fieldimpl):
-  """get pressure coordinate grid from a VisAD FieldImpl 
+  """Get the pressure coordinate grid from a VisAD FieldImpl 
      (a time series of one or more FlatFields);
      user must be sure input is a suitable FlatField. """
   ff = fieldimpl.getSample(0)
@@ -16,7 +16,7 @@ def extractPressureFromNWPGrid(fieldimpl):
 
 
 def extractLatitudeFromNWPGrid(fieldimpl):
-  """get the latitude coordinate grid from a 3D VisAD FieldImpl 
+  """Get the latitude coordinate grid from a 3D VisAD FieldImpl 
      (a time series of one or more FlatFields);
      user must be sure input is a suitable FlatField. """
   ff = DerivedGridFactory.getLatitudeGrid(fieldimpl)
@@ -26,7 +26,7 @@ def extractLatitudeFromNWPGrid(fieldimpl):
 
 
 def getNthTimeGrid(fieldimpl, Nth):
-  """get Nth grid in time series fieldimpl, a VisAD FieldImpl;
+  """Get the Nth grid in time series fieldimpl, a VisAD FieldImpl;
      user must be sure input is a suitable data field. 
      returns a FlatField. 
      Nth is an integer, >=0, <= max index of grid time series. """
@@ -41,7 +41,7 @@ def getNthTimeGrid(fieldimpl, Nth):
 
 
 def getSliceAtLevel(fieldimpl, level) :
-  """extract a 2D horizontal slice from a 3D grid at "Level."
+  """Extract a 2D horizontal slice from a 3D grid at "Level."
      level is a real number; must be appropriate for the grid.
      param fieldimpl is a VisAD FieldImpl which may have
      one or more time steps.  """
@@ -52,7 +52,7 @@ def getSliceAtLevel(fieldimpl, level) :
 
 
 def getSliceAtAltitude(fieldimpl, alt, unit="m") :
-  """ extract a 2D horizontal slice from a 3D grid at the given altitude
+  """ Extract a 2D horizontal slice from a 3D grid at the given altitude
       level is a real number; if unit is supplied, it must
       be compatible with meters (ft, fathoms, etc)
       param fieldimpl is a VisAD FieldImpl which may have
@@ -70,11 +70,11 @@ def getSliceAtAltitude(fieldimpl, alt, unit="m") :
 
 
 def layerDiff(grid, top, bottom):
-   """ wrapper for calculating layer difference """
+   """ Wrapper for calculating layer difference """
    return createLayerDifference(grid, top, bottom)
 
 def getAltitude(z):
-   """ change units from geopotential meters to meters """
+   """ Change units from geopotential meters to meters """
    import ucar.visad.quantities.GeopotentialAltitude as ga
    import ucar.visad.quantities.Gravity as gr
    zUnit = GridUtil.getParamType(z).getRealComponents()[0].getDefaultUnit()
@@ -84,8 +84,8 @@ def getAltitude(z):
 
 
 def windShear(u, v, z, top, bottom):
-   """ calculate the wind shear between discrete layers
-   shear = sqrt((u(top)-u(bottom))^2 + (v(top)-v(bottom))^2)/zdiff """
+   """ calculate the wind shear between discrete layers<pre>
+   shear = sqrt((u(top)-u(bottom))^2 + (v(top)-v(bottom))^2)/zdiff</pre>"""
    udiff = layerDiff(u, top, bottom)
    vdiff = layerDiff(v, top, bottom)
    zdiff = layerDiff(z, top, bottom)
@@ -131,7 +131,7 @@ def newUnit(field, varname, unitname):
   return GridUtil.setParamType(field, newType,0)
 
 def make2D(slice):
-  """make a 2D slice from a 3D slice """
+  """Make a 2D slice from a 3D slice """
   return GridUtil.make2DGridFromSlice(slice)
 
 
