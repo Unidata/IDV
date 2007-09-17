@@ -361,6 +361,13 @@
          value="System"/>
     </resource>
     <resource
+       label="Shell utilities"
+       location="%IDVPATH%/python/shell.py">
+      <property
+         name="category"
+         value="System"/>
+    </resource>
+    <resource
        label="Miscellaneous routines"
        location="%IDVPATH%/python/misc.py">
       <property
