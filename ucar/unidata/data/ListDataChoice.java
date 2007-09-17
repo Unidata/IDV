@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data;
 
 
@@ -513,6 +514,22 @@ public class ListDataChoice extends DataChoice {
 
 
 
+    /** _more_          */
+    private List listeners = new ArrayList();
+
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     */
+    protected void addDataChangeListeners(DataChoice dataChoice) {
+        for (int i = 0; i < listeners.size(); i++) {
+            dataChoice.addDataChangeListener(
+                (DataChangeListener) listeners.get(i));
+        }
+    }
+
+
     /**
      *  Add the data change listener. This overwrites the base class method
      *  to tell each of the children to addDataChangeListener
@@ -521,6 +538,7 @@ public class ListDataChoice extends DataChoice {
      *  @param listener The listener to add.
      */
     public void addDataChangeListener(DataChangeListener listener) {
+        listeners.add(listener);
         for (int i = 0; i < childrenChoices.size(); i++) {
             DataChoice child = (DataChoice) childrenChoices.get(i);
             if (child != null) {
@@ -539,6 +557,7 @@ public class ListDataChoice extends DataChoice {
      */
     public void removeDataChangeListener(DataChangeListener listener) {
         flushCache();
+        listeners.remove(listener);
         for (int i = 0; i < childrenChoices.size(); i++) {
             DataChoice child = (DataChoice) childrenChoices.get(i);
             if (child != null) {
