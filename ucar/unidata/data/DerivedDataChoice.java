@@ -509,6 +509,8 @@ public class DerivedDataChoice extends ListDataChoice {
                 DataChoice  selectedChoice = (DataChoice) selected.get(i);
                 //Add this data choice to the list of data choices
                 childrenChoices.add(selectedChoice);
+                addDataChangeListeners(selectedChoice);
+
                 userSelectedChoices.put(op.getParamName(), selectedChoice);
                 //Do an .equals instead of an instanceof because DerivedDataChoice 
                 //derived from ListDataChoice
