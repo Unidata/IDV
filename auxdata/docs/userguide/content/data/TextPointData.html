@@ -1,14 +1,24 @@
 <html><head>
-  <title>Text Point Data Format</title>
+  <title>Text (ASCII) Point Data Format</title>
   <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
 </head>
 
 <body>
-The IDV supports reading in point observation data in a text comma separated
-value (CSV) file format.
-The files need two extra lines at the top that defines for the IDV the
-fields that are within the file and the types of the fields.
-The only other requirement is that there must be a Latitude, Longitude and Time field in the data.
+
+If your point (in situ) data is not available in one of the file formats
+that the IDV can handle, but you can dump it into a column-oriented
+ASCII text file, you may still be able to use the IDV displays. The IDV
+supports reading in point observation data in a text comma separated
+value (CSV) file format. The files need two extra lines at the top that
+defines for the IDV the fields that are within the file and the types of
+the fields. The only other requirement is that there must be a latitude,
+longitude and time field in the data.
+
+<h2>Examples:</h2>
+
+<h3>Comma separated numeric values</h3>
+In the simplest form, each line line is an observation at one time
+and one location:
 
 <pre>
 (index) -> (Time,Latitude,Longitude,Altitude,PSL,GUS,SPD,DIR,TD,T)
@@ -20,6 +30,27 @@ t="deg"\],TD\[unit="celsius"\],T\[unit="celsius"\]
 2007-01-07 16:00:00Z,44.3,121.2,938.0,1030.1,NaN,2.1,110.0,-3.3,-1.7
 </pre>
 
+<p>
+
+Note also that the first line's structure is quite rigid -- you
+must have a variable (e.g., <b>index</b>, <b>recNum</b>) that is
+the domain parameter; this should map to the range values. The
+second line defines the formatting and units of the parameters.
+Unit names should be standard international unit specifications
+(udunits compatible). A list of valid names can be found <a
+href="http://www.unidata.ucar.edu/software/udunits/udunits-1/udunits.txt
+">here</a>. (A complete description of
+this format is contained in the VisAD <a
+href="http://www.ssec.wisc.edu/~billh/README.text">README.text</a> file.)
+
+<p>
+
+Also note that you need to set the name of the variable for time as "Time",
+as well as the locations as "Latitude", "Longitude" and "Altitude" (if
+needed). 
+<p>
+
+<h3>Text fields</h3>
 
 If you have text fields (i.e., non-numeric data) in your observation just do this:
 <pre>
@@ -28,10 +59,12 @@ Time\[fmt="yyyy-MM-dd HH:mm:ss z"\],Latitude\[unit="deg"\],Longitude\[unit="degr
 2007-02-16 11:00:00 MST,32.9,117.1,145.0,CA  ,20.6
 </pre>
 
-Here we have a ST field (State from metars). Its field name is defined as &quot;ST(Text)&quot; and
-its entry in the second line is the same.
+Here we have a ST field (State from metars). Its field name is defined
+as &quot;ST(Text)&quot; and its entry in the second line is the same.
+
 <p>
 
+<h3>Time in multiple columns</h3>
 If you have time fields that span multiple columns, you can use the
 <code>colspan</code> keyword:
 <pre>
@@ -43,6 +76,65 @@ IDN, Latitude\[unit="deg"\], Longitude\[unit="deg"\], Time\[fmt="yyyy MM dd HH m
 </pre>
 
 <p>
+<h3>Skipping columns</h3>
+You can use the &quot;skip&quot; parameter if you want to ignore (not read)
+values in your text file that you don't want to use:
+
+<pre>
+(recNum)->(Latitude, Longitude, Altitude, type(Text), time, turb_intensity)
+Time\[fmt=yyyyMMddHH\], obtime, skip, type(Text), skip, skip, Latitude, Longitude\[scale=-1\], Altitude\[unit=ft\], Altitude2\[unit=ft\], turb_intensity, skip
+2004050100 0005    34     C210 1 T  38.82   92.22   7000   7000  0 -9
+2004050100 0004    35     PA32 0 T  35.40   98.62   4000   4000  0 -9
+2004050100 0008    58      A36 0 T  29.18   81.05   5000   5000  2 -9
+</pre>
+
+<p>
+
+<h3>Fixed values for several observations</h3>
+If you have values (like time or location) that are fixed for 
+several observations, you may use this construct:
+
+<pre>
+(index) -> (Longitude,Latitude,Time,ST(Text),SPD,DIR,TD,T)
+Longitude\[unit="degrees west"\],Latitude\[unit="deg"\],Time\[fmt="yyyy-MM-dd HH:mm:ss z"\],ST(Text),SPD\[unit="m/s"\],DIR\[unit="deg"\],TD\[unit="celsius"\],T\[unit="celsius"\]
+
+Longitude=-117.1
+Latitude=32.9
+ST=MSN
+2007-02-20 11:00:00 ST  ,0.0,0.0,8.9,13.3
+2007-02-20 12:00:00 ST  ,0.0,0.0,11.9,15.0
+
+Longitude=-89.4
+Latitude=43.1
+ST=DEN
+2007-02-20 11:00:00 ST  ,1.5,160.0,-7.0,-2.0
+2007-02-20 12:00:00 ST  ,1.5,160.0,-7.0,-2.0
+
+Longitude=-121.2
+Latitude=44.3
+ST=ORD
+2007-02-20 11:00:00 ST  ,10.8,230.0,-1.1,6.7
+</pre>
+
+<h2>Loading into the IDV</h3>
+Finally, after you have created your file, you will want to tailor 
+your IDV display in two ways:
+
+<ol>
+
+<li> Create a Layout (station) model for those variables using the 
+IDV's menu "Tools->Layout Model Editor"
+</ol>
+
+Then, when you run the IDV to read your data:
+<ol>
+<li> Use Data Source Type as "Text Point Data files"
+<li> Use the "Point Data Plot" for the Display
+<li> Select your newly created Layout model
+</ol>
+
+<p>
+
 
 </body>
 </html>
