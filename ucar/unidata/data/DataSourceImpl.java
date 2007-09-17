@@ -979,6 +979,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (dataChangeListeners == null) {
             return;
         }
+        //        System.err.println ("dataChangeListeners:" + dataChangeListeners);
         for (int i = 0; i < dataChangeListeners.size(); i++) {
             ((DataChangeListener) dataChangeListeners.get(i)).dataChanged();
         }
@@ -2989,6 +2990,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @return _more_
      */
     public String getDataCachePath() {
+        if(getDataContext() == null) {
+            return null;
+        }
         if (dataCachePath == null) {
             String uniqueName = "data_" + Misc.getUniqueId();
             dataCachePath =
