@@ -113,6 +113,12 @@
          action="action:edit.jython"
          mnemonic="J"/>
       <menuitem
+         label="Jython Shell"
+         action="action:jython.shell"
+	 />
+
+
+      <menuitem
          label="Import"
          action="action:edit.formula.import"/>
       <menuitem

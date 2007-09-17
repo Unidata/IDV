@@ -94,6 +94,12 @@
      description="Edit display settings"
      action="jython:idv.getIdvUIManager().editDisplaySettings();"/>
   <action
+     id="jython.shell"
+     image="/auxdata/ui/icons/EditFormulas16.gif"
+     description="Show Jython Shell"
+     action="jython:idv.getJythonManager().createShell()"/>
+
+  <action
      id="edit.formula.create"
      image="/auxdata/ui/icons/EditFormulas16.gif"
      description="Create formula"
@@ -105,12 +111,12 @@
      action="jython:idv.getJythonManager().importFormulas()"/>
   <action
      id="edit.formula.export"
-     image="/auxdata/ui/icons/EditFormulas16.gif"
+     image="/auxdata/ui/icons/EditFormulas16.png"
      description="Export formula"
      action="jython:idv.getJythonManager().exportFormulas()"/>
   <action
      id="edit.jython"
-     image="/auxdata/ui/icons/EditJython16.gif"
+     image="/auxdata/ui/icons/EditJython16.png"
      description="Edit Jython library"
      action="jython:idv.getJythonManager().showJythonEditor()"/>
   <action
