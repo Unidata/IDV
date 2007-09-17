@@ -1331,6 +1331,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                                         s.getRadialNumber());
 
         /* Find hash entry with closest Ray */
+        if(r == null) return 999;
         int rd = r.rayIndex;
         closestRay = theClosestHash(s, ray_angle, rd, limit);
 
@@ -2006,7 +2007,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
 
         if (RSL_sweep_list == null) {
-            RSL_sweep_list = new CDMRadarSweepDB[sweepVar.getNumSweeps()];
+            RSL_sweep_list = new CDMRadarSweepDB[numberOfSweeps];
             // now get the hash map for each sweep contain azi as index and ray information.
             for (int b = 0; b < numberOfSweeps; b++) {
                 //   RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(b);
@@ -2162,24 +2163,56 @@ public class CDMRadarAdapter implements RadarAdapter {
         int       numberOfRay    = getRayNumber(sweepVar);
         float[]   azimuths       = new float[numberOfRay];
 
-        float[][] rdata;
+        float[][][] rdata;
         rhiData = new HashMap();
+
+        RadialDatasetSweep.Sweep [] sweep = new RadialDatasetSweep.Sweep[numberOfSweeps];
+        float [][] aziAll = new float[numberOfSweeps][numberOfRay];
+        int [] radialNumber = new int[numberOfSweeps];
+        int [] gateNumber = new int[numberOfSweeps];
+        float [] beamWidth = new float[numberOfSweeps];
+        rdata = new float[numberOfSweeps][][];
+        
+        for(int i = 0; i< numberOfSweeps; i++ ) {
+            RadialDatasetSweep.Sweep sp = sweepVar.getSweep(i);
+            sweep[i] = sp;
+            aziAll[i] = sp.getAzimuth();
+            int rNumber = sp.getRadialNumber();
+            radialNumber[i] = rNumber;
+            int gNumber = sp.getGateNumber();
+            gateNumber[i] = gNumber;
+            beamWidth[i] = sp.getBeamWidth();
+            rdata[i] = new float[rNumber][gNumber];
+            float[] vdata        = sp.readData();
+           // for(int j = 0; j<rNumber; j++) {
+           //     rdata[i][j] = sp.  .readData(j);
+            //}
+            float [][]               _data2       = rdata[i];
+            for (int rayIdx = 0; rayIdx < rNumber; rayIdx++) {
+                float []               __data2       = _data2[rayIdx];
+
+                for (int gateIdx = 0; gateIdx < gNumber; gateIdx++) {
+                        __data2[gateIdx] = vdata[gNumber * rayIdx + gateIdx];
+                }
+
+            }
+        }
 
         for (int r = 0; r < 360; r++) {
             float rhiAz = r;
-            rdata = new float[numberOfSweeps][];
+            float [][] gdata = new float[numberOfSweeps][];
+           //float[][] gdata = null;
             for (int ti = 0; ti < numberOfSweeps; ti++) {
-                RadialDatasetSweep.Sweep sp = sweepVar.getSweep(ti);
-                int                      num_radials    =
-                    sp.getRadialNumber();
-                int                      number_of_bins = sp.getGateNumber();
+                RadialDatasetSweep.Sweep sp = sweep[ti];
+                int                      num_radials    = radialNumber[ti];
+                int                      number_of_bins = gateNumber[ti];
                 float                    lastAzi        = 0.00f;
 
 
                 // get this array from the RadialCoordSys
-                float[] _azimuths = sp.getAzimuth();
-                float   f         = sp.getBeamWidth() / 2;
-                rdata[ti] = new float[number_of_bins];
+                float[] _azimuths = aziAll[ti]; //sp.getAzimuth();
+                float   f         = beamWidth[ti] / 2;
+                gdata[ti] = new float[number_of_bins];
 
                 for (int j = 0; j < numberOfRay; j++) {
                     if (j < num_radials) {
@@ -2201,17 +2234,17 @@ public class CDMRadarAdapter implements RadarAdapter {
 
 
                 if (j < num_radials) {
-                    rdata[ti] = sp.readData(j);
+                    gdata[ti] = rdata[ti][j]; //sp.readData(j);
                 } else {
                     for (int i = 1; i < number_of_bins; i++) {
-                        rdata[ti][i] = Float.NaN;  //360.0f;
+                        gdata[ti][i] = Float.NaN;  //360.0f;
                     }
                 }
 
 
             }
 
-            rhiData.put(Integer.toString(r), rdata);
+            rhiData.put(Integer.toString(r), gdata);
         }
 
         // return rhiData;
