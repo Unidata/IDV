@@ -332,7 +332,14 @@
   <resources name="idv.resource.jython">
     <resource
        label="User's library"
-       location="%USERPATH%/default.py"/>
+       location="%USERPATH%/python/default.py"/>
+
+    <resource
+      location="%USERPATH%/python">
+      <property
+         name="category"
+         value="Local Library"/>
+    </resource>
     <resource
        label="Site library"
        location="%SITEPATH%/default.py"/>
