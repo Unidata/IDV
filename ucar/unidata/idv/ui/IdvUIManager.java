@@ -4725,6 +4725,16 @@ public class IdvUIManager extends IdvManager {
         if (operands.size() == 0) {
             return new ArrayList();
         }
+
+        //Convert if needed
+        if(!(operands.get(0) instanceof DataOperand)) {
+            List tmp = new ArrayList();
+            for (int i = 0; i < operands.size(); i++) {
+                tmp.add(new DataOperand(operands.get(i).toString()));
+            }
+            operands = tmp;
+        }
+
         Hashtable choicesWeAlreadyHave = new Hashtable();
         List operandsToSelect = new ArrayList();
 
