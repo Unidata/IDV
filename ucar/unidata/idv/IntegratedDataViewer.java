@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
@@ -286,7 +287,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
             return;
         }
 
-        if (argsManager.oneInstancePort > 0 && !argsManager.noOneInstance) {
+        if ((argsManager.oneInstancePort > 0) && !argsManager.noOneInstance) {
             checkOneInstance(argsManager.oneInstancePort);
         }
 
@@ -304,10 +305,9 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
 
         //Now, if we didnt have a command line oneinstanceport argument check if we have
         //a property
-        if (argsManager.oneInstancePort <= 0 &&
-            !argsManager.noOneInstance &&
-            getProperty(PROP_ONEINSTANCEPORT,-1)>0) {
-            checkOneInstance(getProperty(PROP_ONEINSTANCEPORT,-1));
+        if ((argsManager.oneInstancePort <= 0) && !argsManager.noOneInstance
+                && (getProperty(PROP_ONEINSTANCEPORT, -1) > 0)) {
+            checkOneInstance(getProperty(PROP_ONEINSTANCEPORT, -1));
         }
 
 
@@ -352,6 +352,8 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
 
     /**
      * Check for one instance
+     *
+     * @param port _more_
      */
     private synchronized void checkOneInstance(final int port) {
         tryingOneInstance = true;
@@ -398,6 +400,8 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      * Try to connect to another idv and, if connected, pass it the command line args
      * and exit.
      *
+     *
+     * @param port _more_
      */
     private synchronized void checkOneInstanceInner(final int port) {
         try {
@@ -411,12 +415,18 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
             if ((result != null) && result.trim().equals("ok")) {
                 System.exit(0);
             }
-            Misc.run(new Runnable(){public void run(){startOneInstanceServer(port);}});
+            Misc.run(new Runnable() {
+                public void run() {
+                    startOneInstanceServer(port);
+                }
+            });
         } catch (Exception exc) {}
     }
 
     /**
      * Start up the one instance server
+     *
+     * @param port _more_
      */
     private void startOneInstanceServer(int port) {
         try {
@@ -922,7 +932,8 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
             if (d == null) {
                 return;
             }
-            saveInCacheInner(clonedDataChoice, d, null, clonedDataChoice.getName());
+            saveInCacheInner(clonedDataChoice, d, null,
+                             clonedDataChoice.getName());
         } catch (DataCancelException exc) {}
         catch (Exception exc) {
             logException("Evaluating data choice", exc);
@@ -944,7 +955,15 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
     }
 
 
-    public void saveInCache(DataChoice dataChoice, Data data, DataSelection dataSelection) {
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     * @param data _more_
+     * @param dataSelection _more_
+     */
+    public void saveInCache(DataChoice dataChoice, Data data,
+                            DataSelection dataSelection) {
         saveInCache(dataChoice, data, dataSelection, dataChoice.getName());
     }
 
@@ -966,9 +985,11 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      *
      * @param dataChoice The data choice to save
      * @param data The data
+     * @param dataSelection _more_
      * @param name The name to use
      */
-    public void saveInCache(DataChoice dataChoice, Data data, DataSelection dataSelection, String name) {
+    public void saveInCache(DataChoice dataChoice, Data data,
+                            DataSelection dataSelection, String name) {
         DataChoice clonedDataChoice = dataChoice.createClone();
         saveInCacheInner(clonedDataChoice, data, dataSelection, name);
     }
@@ -979,10 +1000,11 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      *
      * @param clonedDataChoice The data choice to save
      * @param data The data
+     * @param dataSelection _more_
      * @param name The name to use
      */
-    private void saveInCacheInner(DataChoice clonedDataChoice, Data data, DataSelection dataSelection,
-                                  String name) {
+    private void saveInCacheInner(DataChoice clonedDataChoice, Data data,
+                                  DataSelection dataSelection, String name) {
         try {
             name = GuiUtils.getInput("Please enter a name for this data:",
                                      "Name: ", name);
@@ -1002,7 +1024,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
                 cds = (CacheDataSource) makeOneDataSource("", "CACHED",
                         new Hashtable());
             }
-            cds.addDataChoice(clonedDataChoice, name, data,dataSelection);
+            cds.addDataChoice(clonedDataChoice, name, data, dataSelection);
         } catch (Exception exc) {
             logException("Evaluating data choice", exc);
         }
@@ -1013,11 +1035,19 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
 
 
 
-    public List getDerivedDataChoices(DataSource dataSource, List dataChoices) {
-        List derivedList =
-            DerivedDataDescriptor.getDerivedDataChoices(
-                                                        this, dataChoices,
-                                                        getJythonManager().getDescriptors());
+    /**
+     * _more_
+     *
+     * @param dataSource _more_
+     * @param dataChoices _more_
+     *
+     * @return _more_
+     */
+    public List getDerivedDataChoices(DataSource dataSource,
+                                      List dataChoices) {
+        List derivedList = DerivedDataDescriptor.getDerivedDataChoices(this,
+                               dataChoices,
+                               getJythonManager().getDescriptors());
         return derivedList;
     }
 
@@ -1259,6 +1289,11 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         removeAllDisplays(true);
     }
 
+    /**
+     * _more_
+     *
+     * @param payAttentionToCanDoRemoveAll _more_
+     */
     public void removeAllDisplays(boolean payAttentionToCanDoRemoveAll) {
         try {
             getVMManager().setDisplayMastersInactive();
@@ -1269,7 +1304,8 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
             ignoreRemoveDisplayControl = true;
             for (int i = 0; i < tmp.size(); i++) {
                 DisplayControl dc = (DisplayControl) tmp.get(i);
-                if (!payAttentionToCanDoRemoveAll || dc.getCanDoRemoveAll()) {
+                if ( !payAttentionToCanDoRemoveAll
+                        || dc.getCanDoRemoveAll()) {
                     dc.doRemove();
                     getIdvUIManager().removeDisplayControl(dc);
                 } else {
@@ -2116,6 +2152,24 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param controlName _more_
+     * @param dataChoice _more_
+     *
+     * @return _more_
+     */
+    public DisplayControl doMakeControl(String controlName,
+                                        DataChoice dataChoice) {
+        ControlDescriptor cd = getControlDescriptor(controlName);
+        if (cd != null) {
+            return doMakeControl(Misc.newList(dataChoice), cd);
+        }
+        return null;
+    }
+
+
 
     /**
      * Create the {@link DisplayControl}, identified by the given
@@ -2663,6 +2717,9 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         getIdvUIManager().clearWaitCursor();
     }
 
+    /**
+     * _more_
+     */
     public void closeCurrentWindow() {
         getIdvUIManager().closeCurrentWindow();
     }
@@ -2703,7 +2760,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
 
 
     /**
-     * Get the image from the given isl script. This is called by other 
+     * Get the image from the given isl script. This is called by other
      * code directly and runs the idv in non-interactive mode
      *
      * @param scriptFile The path to the isl script
