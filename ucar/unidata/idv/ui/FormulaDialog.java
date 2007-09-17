@@ -279,6 +279,11 @@ public class FormulaDialog extends JFrame implements ActionListener {
         fieldLabelList.add(new JLabel("Field name"));
         fieldLabelList.add(new JLabel("Identifier"));
 
+        JButton jythonBtn = GuiUtils.makeImageButton("/auxdata/ui/icons/EditJython16.png",idv.getJythonManager(),"showJythonEditor");
+        jythonBtn.setToolTipText("Edit Jython Library");
+        JButton evalBtn = GuiUtils.makeImageButton("/auxdata/ui/icons/Evaluate16.png",this, "evaluate");
+        evalBtn.setToolTipText("Save and Evaluate Formula");
+
         formulaField = new JTextField(formula, 25);
         nameField    = new JTextField(name, 25);
         descField    = new JTextField(description, 25);
@@ -561,7 +566,8 @@ public class FormulaDialog extends JFrame implements ActionListener {
         GuiUtils.tmpInsets = new Insets(4, 4, 0, 4);
         Container topPanel = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Name:"), nameField,
-            GuiUtils.rLabel("       Formula:"), formulaField,
+            GuiUtils.rLabel("       Formula:"), 
+            GuiUtils.centerRight(formulaField,GuiUtils.hbox(evalBtn,jythonBtn)),
             GuiUtils.rLabel("Advanced"), GuiUtils.left(advancedIconBtn)
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
 
@@ -983,6 +989,34 @@ public class FormulaDialog extends JFrame implements ActionListener {
     }
 
 
+    public void evaluate() {
+        Misc.run(this,"evaluateInThread");
+    }
+
+    public void evaluateInThread() {
+        if(!addOrChange()) return;
+        idv.getJythonManager().evaluateDataChoice(ddd.getDataChoice());
+    }
+
+    private boolean addOrChange() {
+        boolean wasNew = false;
+        if (ddd == null) {
+            ddd = new DerivedDataDescriptor(idv);
+            ddd.setIsEndUser(true);
+            wasNew = true;
+        }
+        if ( !setValues(ddd)) {
+            return false;
+        }
+        ddd.setIsLocalUsers(true);
+        if(wasNew)
+            idv.getJythonManager().addFormula(ddd);
+        else
+            idv.getJythonManager().descriptorChanged(ddd);
+        return true;
+    }
+
+
 
     /**
      * Handle the ADD, CHANGE, CANCEL  and HELP commands
@@ -992,25 +1026,14 @@ public class FormulaDialog extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent event) {
         String cmd = event.getActionCommand();
         if (cmd.equals(CMD_ADD)) {
-            if (ddd == null) {
-                ddd = new DerivedDataDescriptor(idv);
-                ddd.setIsEndUser(true);
-            }
-            if ( !setValues(ddd)) {
-                return;
-            }
-            ddd.setIsLocalUsers(true);
-            idv.getJythonManager().addFormula(ddd);
-            closeFormulaDialog();
+            if(addOrChange())
+                closeFormulaDialog();
             return;
         }
+
         if (cmd.equals(CMD_CHANGE)) {
-            if ( !setValues(ddd)) {
-                return;
-            }
-            ddd.setIsLocalUsers(true);
-            idv.getJythonManager().descriptorChanged(ddd);
-            closeFormulaDialog();
+            if(addOrChange())
+                closeFormulaDialog();
             return;
         }
 
