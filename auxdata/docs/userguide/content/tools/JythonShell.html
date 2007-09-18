@@ -1,0 +1,37 @@
+
+[ug::head {Jython Shell}]
+
+
+The Jython Shell is an interactive command line interface to the IDV Jython interpreter.
+
+<h3>Library Commands</h3>
+<ul>
+<li> Select data.
+<pre>data = selectData();</pre>
+Brings up the field selector. Returns a visad.Data object.
+<p>
+
+<li>  Select a data choice. You would want to do this if you want to access its name, etc.
+<pre>dataChoice = selectDataChoice();</pre>
+Brings up the field selector. Returns a DataChoice object. You can access the data with:
+<pre>
+data = dataChoice.getData(None);
+</pre>
+
+
+<p>
+<li>  Create a display.
+<pre>display = createDisplay('some display type', data_or_datachoice);</pre>
+This creates a new display with the given data or data choice. The display type can be inserted through
+the {ht::menu Edit {Insert Display Type}] menu.
+<p>
+Once you have created the display you can remove if with:
+<pre>
+display.doRemove();
+</pre>
+
+</ul>
+
+[ug::foot]
+
+
