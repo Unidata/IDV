@@ -3,7 +3,7 @@
    For use from the Jython shell."""
 
 
-def selectData(name):
+def selectData(name='Select Field'):
     list = java.util.ArrayList();
     list.add(name);
     result = idv.selectDataChoices(list);
@@ -25,14 +25,15 @@ def createDisplay(displayType, data, dataName='Data'):
        	import ucar.unidata.data.DataChoice as DataChoice
 	if(isinstance(data, DataChoice)==0):
              data = DataDataChoice(dataName,data);
-	return idv.doMakeControl(displayType, data);
+        control = idv.doMakeControl(displayType, data);
+        shell.toFront();
+        return control
 
 
-#def selectedData(name):
-#    list = ArrayList();
-#    list.add(name);
-#    result = idv.selectDataChoices(list);
-#    if(result == None) return None;
-#    return result.get(0);
+def showLib():
+    idv.getJythonManager().showJythonEditor()
+
+   
+
 
 
