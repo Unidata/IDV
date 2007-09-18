@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.util;
 
 
@@ -118,9 +119,9 @@ public class GuiUtils {
 
     /** Used to map named colors to color */
     public static final Color[] COLORS = {
-        Color.blue, Color.black, Color.red, Color.gray,
-        Color.lightGray, Color.white, Color.green, Color.orange,
-        Color.cyan, Color.magenta, Color.pink, Color.yellow
+        Color.blue, Color.black, Color.red, Color.gray, Color.lightGray,
+        Color.white, Color.green, Color.orange, Color.cyan, Color.magenta,
+        Color.pink, Color.yellow
     };
 
 
@@ -645,29 +646,33 @@ public class GuiUtils {
                                   int numberOfColumns, double[] weightsX,
                                   double[] weightsY, Hashtable anchors,
                                   Hashtable fills, Insets insets) {
+
         if (parentContainer == null) {
             parentContainer = new JPanel();
         }
 
         //TODO: When we move to 1.6 we need to remove this fix
         //Check if we've blown the size limit for gridbag
-        if(components.length>512) {
+        if (components.length > 512) {
             //Not perfect but...
-            Component[]comps1 = new Component[components.length/2];
-            Component[]comps2 = new Component[components.length/2+1];
-            int cnt = 0;
-            for(int i=0;i<components.length;i++) {
-                if(i<comps1.length)
+            Component[] comps1 = new Component[components.length / 2];
+            Component[] comps2 = new Component[components.length / 2 + 1];
+            int         cnt    = 0;
+            for (int i = 0; i < components.length; i++) {
+                if (i < comps1.length) {
                     comps1[i] = components[i];
-                else 
+                } else {
                     comps2[cnt++] = components[i];
+                }
             }
-            JComponent comp1 = doLayout(null, comps1, numberOfColumns, weightsX, weightsY,
-                                        anchors, fills, insets);
-            JComponent comp2 = doLayout(null, comps2, numberOfColumns, weightsX, weightsY,
-                                        anchors, fills, insets);
+            JComponent comp1 = doLayout(null, comps1, numberOfColumns,
+                                        weightsX, weightsY, anchors, fills,
+                                        insets);
+            JComponent comp2 = doLayout(null, comps2, numberOfColumns,
+                                        weightsX, weightsY, anchors, fills,
+                                        insets);
 
-            return vbox(comp1,comp2);
+            return vbox(comp1, comp2);
         }
 
 
@@ -759,6 +764,7 @@ public class GuiUtils {
             consts.gridwidth = 1;
         }
         return parentContainer;
+
     }
 
 
@@ -2652,6 +2658,21 @@ public class GuiUtils {
                               yes));
 
         return result;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param comp _more_
+     * @param s _more_
+     */
+    public static void insertText(JTextComponent comp, String s) {
+        int    pos = comp.getCaretPosition();
+        String t   = comp.getText();
+        t = t.substring(0, pos) + s + t.substring(pos);
+        comp.setText(t);
+        comp.setCaretPosition(pos + s.length());
     }
 
 
@@ -5358,7 +5379,7 @@ public class GuiUtils {
     public static JMenu makeDynamicMenu(final String name,
                                         final Object object,
                                         String methodName) {
-        return makeDynamicMenu(name,object,methodName,true);
+        return makeDynamicMenu(name, object, methodName, true);
     }
 
 
@@ -5369,6 +5390,7 @@ public class GuiUtils {
      * @param name Menu name
      * @param object Object to call
      * @param methodName method to invoke
+     * @param doRemoveAll _more_
      * @return The menu
      */
     public static JMenu makeDynamicMenu(final String name,
@@ -5384,8 +5406,9 @@ public class GuiUtils {
 
             public void menuSelected(MenuEvent e) {
                 try {
-                    if(doRemoveAll)
+                    if (doRemoveAll) {
                         menu.removeAll();
+                    }
                     theMethod.invoke(object, new Object[] { menu });
                 } catch (Exception exc) {
                     LogUtil.logException("Error in makeDynamicMenu:" + name,
@@ -6703,6 +6726,7 @@ public class GuiUtils {
         return (addHtml?"<html>":"") + n +(local?" &lt;<span style=\"color:blue\">local</span>&gt;":"") +(addHtml?"</html>":"");
     }
 
+
     public static  void appendText(JTextComponent fld, String s, String delimiter) {
         String t = fld.getText();
         while(t.endsWith(" ")) {
@@ -6719,6 +6743,7 @@ public class GuiUtils {
 
 
 }
+
 
 
 
