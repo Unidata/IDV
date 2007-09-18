@@ -1359,6 +1359,11 @@ public class ProbeControl extends DisplayControlImpl {
 
 
 
+    protected void popupDataDialog(final String dialogMessage,
+                                   Component from, boolean multiples,
+                                   List categories) {
+        super.popupDataDialog(dialogMessage,from,true, categories);
+    }
 
 
 
