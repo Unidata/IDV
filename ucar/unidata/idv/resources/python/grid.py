@@ -115,7 +115,7 @@ def horizontalAdvection(param, u, v):
   """ horizontal advection """
   return DerivedGridFactory.createHorizontalAdvection(param,u,v)
 
-def horizontalAdvection(param, u, v):
+def horizontalDivergence(param, u, v):
   """ horizontal flux divergence """
   return DerivedGridFactory.createHorizontalFluxDivergence(param,u,v)
 
@@ -131,13 +131,13 @@ def newUnit(field, varname, unitname):
   return GridUtil.setParamType(field, newType,0)
 
 def make2D(slice):
-  """Make a 2D slice from a 3D slice """
+  """Make a 2D slice from a 3D slice at a single level """
   return GridUtil.make2DGridFromSlice(slice)
 
 
 def averageOverTime(field,makeTimes = 0):
     """Average the values in each time step
-    If makeTimes is true then we return a field mapping all of the times
+    If makeTimes is true (1) then we return a field mapping all of the times
     to the average. Else we just return the average """
     if (GridUtil.isTimeSequence(field)==0):
         return field;
@@ -192,29 +192,19 @@ def applyToRangeValues(function,data):
 
 
 
-def changeRange(d):
-   return   applyToRangeValues('testApplyToRange2',d);
 
-
-def testApplyToRange(d,**args):
-    r = d.getFloats(0)
-    total = 0
-    for i in xrange(len(r[0])):
-        total= total+r[0][i]
-    avg = total/len(r[0])
-    for i in xrange(len(r[0])):
-        if(r[0][i]<avg):
-            r[0][i] = 0;
-    d.setSamples(r)
-    return d
-
-def testApplyToRange2(r,**args):
-    keys = args.keys()
-    total = 0
-    for i in xrange(len(r[0])):
-        total= total+r[0][i]
-    avg = total/len(r[0])
-    for i in xrange(len(r[0])):
-        r[0][i] = avg-r[0][i];
-    return r
+def makeTimeSequence(g):
+  """ Merge a set of single time grids/images into a time sequence """
+  from visad import FunctionType, FieldImpl, Gridded1DDoubleSet, QuickSort
+  from jarray import array
+  domain = getDomainSet(g[0])
+  dt = getDomainType(g[0])
+  v=[getDomain(g[i]).indexToDouble([0,])[0][0] for i in range(len(g))]
+  va = array(v,'d')
+  index = QuickSort.sort(va)
+  ft=FunctionType(dt, getRangeType(g[0]))
+  fld=FieldImpl(ft,Gridded1DDoubleSet.create(dt,va,None,domain.getSetUnits()[0],None))
+  for i in range(len(g)):
+     fld.setSample(i,g[index[i]].getSample(0),0)
+  return fld
 

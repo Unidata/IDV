@@ -1165,11 +1165,11 @@ public class FormulaDialog extends JFrame implements ActionListener {
                     cleanProc);
             } catch (org.python.core.PySyntaxError pse) {
                 LogUtil.userErrorMessage("The formula: " + formula
-                                         + " has a Jython error");
+                                         + " has a Jython error: " +pse);
                 return false;
             } catch (Exception e) {
                 LogUtil.userErrorMessage("The formula: " + formula
-                                         + " has a Jython error");
+                                         + " has a Jython error: " + e);
                 return false;
             }
         }

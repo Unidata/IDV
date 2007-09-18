@@ -388,6 +388,16 @@
          name="showineditor"
          value="false"/>
      </resource>
+    <resource
+       label="Test routines"
+       location="%IDVPATH%/python/test.py">
+      <property
+         name="category"
+         value="System"/>
+      <property
+         name="showineditor"
+         value="false"/>
+     </resource>
   </resources>
 
 <!--We don't use this now. Python libraries     -->
