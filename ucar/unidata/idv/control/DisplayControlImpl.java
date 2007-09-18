@@ -4512,6 +4512,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             items.add(doMakeChangeColorMenu());
         }
 
+        /*
         if (getDisplayInfos().size() > 0) {
             //            items.add(GuiUtils.MENU_SEPARATOR);
             //            items.add(GuiUtils.makeCheckboxMenuItem("Show In Display List",
@@ -4528,6 +4529,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                         "setDisplayListColor", displayListColor)));
             //            }
         }
+        */
 
 
         boolean addedChangeSeparator = false;
@@ -5430,14 +5432,17 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     this, "useTimesInAnimation", null));
         }
 
-        /*
-        if (checkFlag(FLAG_COLORTABLE)) {
-            boolean scaleVisible = getColorScaleInfo().getIsVisible();
-            items.add(GuiUtils.makeCheckboxMenuItem("Show Color Scale", this,
-                    "colorScaleVisible", scaleVisible, null));
+        if (getDisplayInfos().size() > 0) {
+            JMenu dlMenu = new JMenu("Display List");
+            dlMenu.add(GuiUtils.makeCheckboxMenuItem("Show In Display List",
+                                this, "showInDisplayList", null));
+            dlMenu.add(
+                GuiUtils.makeMenu(
+                    "Display List Color",
+                    makeChangeColorMenuItems(
+                        "setDisplayListColor", displayListColor)));
+            items.add(dlMenu);
         }
-        */
-
 
         if (hasMapProjection()) {
             JMenuItem mi = new JMenuItem(getDataProjectionLabel());
@@ -5449,15 +5454,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             items.add(mi);
         }
 
-        //        if (shouldApplyFastRendering()) {
-        //            items.add(GuiUtils.makeCheckboxMenuItem("Use Fast Rendering",
-        //                                                    this, "useFastRendering",
-        //                                                    null));
-        //        }
-
-
     }
-
 
 
 

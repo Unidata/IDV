@@ -1778,7 +1778,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             List controls = getControls();
             for (int i = 0; i < controls.size(); i++) {
                 DisplayControl control = (DisplayControl) controls.get(i);
-                if ( !control.getShowInDisplayList()) {
+                if ( !control.getShowInDisplayList() || !control.getDisplayVisibility()) {
                     continue;
                 }
                 TextDisplayable d =
@@ -3092,6 +3092,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (timelineDialog != null) {
             timelineDialog.repaint();
         }
+        updateDisplayList();
     }
 
 
