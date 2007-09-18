@@ -22,6 +22,8 @@
 
 
 
+
+
 package ucar.unidata.idv.ui;
 
 
@@ -50,10 +52,10 @@ import java.util.Hashtable;
 import java.util.List;
 
 import javax.swing.*;
-import javax.swing.text.*;
 import javax.swing.event.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.text.*;
 
 
 import javax.swing.tree.*;
@@ -69,34 +71,37 @@ import javax.swing.tree.*;
 public class JythonShell {
 
     /** _more_ */
-    private     IntegratedDataViewer idv;
+    private IntegratedDataViewer idv;
 
     /** _more_ */
-    private     PythonInterpreter interp;
+    private PythonInterpreter interp;
 
     /** _more_ */
-    private     JFrame frame;
+    private JFrame frame;
 
     /** _more_ */
-    private     JTextField commandFld;
+    private JTextField commandFld;
 
-    private     JTextArea commandArea;
+    /** _more_ */
+    private JTextArea commandArea;
 
+    /** _more_ */
     private JButton flipBtn;
 
+    /** _more_ */
     private GuiUtils.CardLayoutPanel cardLayoutPanel;
 
     /** _more_ */
-    private     JEditorPane editorPane;
+    private JEditorPane editorPane;
 
     /** _more_ */
-    private     StringBuffer sb = new StringBuffer();
+    private StringBuffer sb = new StringBuffer();
 
     /** _more_ */
-    private     List history = new ArrayList();
+    private List history = new ArrayList();
 
     /** _more_ */
-    private     int historyIdx = -1;
+    private int historyIdx = -1;
 
 
 
@@ -107,36 +112,57 @@ public class JythonShell {
      * @param theIdv _more_
      */
     public JythonShell(IntegratedDataViewer theIdv) {
+
         this.idv   = theIdv;
         editorPane = new JEditorPane();
         editorPane.setEditable(false);
         editorPane.setContentType("text/html");
         createInterpreter();
         JScrollPane scroller = GuiUtils.makeScrollPane(editorPane, 400, 300);
-        scroller.setPreferredSize(new Dimension(400, 300)); 
+        scroller.setPreferredSize(new Dimension(400, 300));
         commandFld = new JTextField();
+        GuiUtils.setFixedWidthFont(commandFld);
         commandFld.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                handleKeyPress(e,commandFld);
-           }
+                handleKeyPress(e, commandFld);
+            }
         });
         commandFld.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 eval();
             }
         });
-        commandArea = new JTextArea("",4,30);
+        commandFld.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    showProcedurePopup(commandFld);
+                }
+            }
+        });
+
+        commandArea = new JTextArea("", 4, 30);
+        GuiUtils.setFixedWidthFont(commandArea);
         commandArea.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                handleKeyPress(e,commandArea);
-           }
+                handleKeyPress(e, commandArea);
+            }
+        });
+        commandArea.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    showProcedurePopup(commandArea);
+                }
+            }
         });
         cardLayoutPanel = new GuiUtils.CardLayoutPanel();
         cardLayoutPanel.addCard(GuiUtils.top(commandFld));
-        cardLayoutPanel.addCard(GuiUtils.makeScrollPane(commandArea, 200, 100));
-        flipBtn = GuiUtils.makeImageButton("/auxdata/ui/icons/DownDown.gif",this,"flipField");
-        JButton    evalBtn  = GuiUtils.makeButton("Evaluate:", this, "eval");
-        JComponent bottom   = GuiUtils.leftCenterRight(GuiUtils.top(evalBtn), cardLayoutPanel,GuiUtils.top(flipBtn));
+        cardLayoutPanel.addCard(GuiUtils.makeScrollPane(commandArea, 200,
+                100));
+        flipBtn = GuiUtils.makeImageButton("/auxdata/ui/icons/DownDown.gif",
+                                           this, "flipField");
+        JButton evalBtn = GuiUtils.makeButton("Evaluate:", this, "eval");
+        JComponent bottom = GuiUtils.leftCenterRight(GuiUtils.top(evalBtn),
+                                cardLayoutPanel, GuiUtils.top(flipBtn));
         JComponent contents = GuiUtils.centerBottom(scroller, bottom);
         contents = GuiUtils.inset(contents, 5);
 
@@ -148,20 +174,21 @@ public class JythonShell {
 
 
         items = new ArrayList();
-        List displayMenuItems = new ArrayList();
+        List      displayMenuItems = new ArrayList();
 
 
-        List cds = idv.getControlDescriptors();
-        Hashtable catMenus = new Hashtable();
+        List      cds              = idv.getControlDescriptors();
+        Hashtable catMenus         = new Hashtable();
         for (int i = 0; i < cds.size(); i++) {
-            ControlDescriptor cd =  (ControlDescriptor) cds.get(i);
+            ControlDescriptor cd = (ControlDescriptor) cds.get(i);
             JMenu catMenu = (JMenu) catMenus.get(cd.getDisplayCategory());
-            if(catMenu == null) {
+            if (catMenu == null) {
                 catMenu = new JMenu(cd.getDisplayCategory());
-                catMenus.put(cd.getDisplayCategory(),catMenu);
+                catMenus.put(cd.getDisplayCategory(), catMenu);
                 displayMenuItems.add(catMenu);
             }
-            catMenu.add(GuiUtils.makeMenuItem(cd.getDescription(),this,"insert", "'"+cd.getControlId()+"'"));
+            catMenu.add(GuiUtils.makeMenuItem(cd.getDescription(), this,
+                    "insert", "'" + cd.getControlId() + "'"));
         }
 
 
@@ -187,35 +214,101 @@ public class JythonShell {
         frame.setLocation(100, 100);
         frame.setVisible(true);
 
+
     }
 
 
+    /**
+     * _more_
+     */
+    public void toFront() {
+        GuiUtils.toFront(frame);
+    }
+
+    /**
+     * _more_
+     */
     public void flipField() {
         cardLayoutPanel.flip();
-        if(getCommandFld() instanceof JTextArea) {
-            flipBtn.setIcon(GuiUtils.getImageIcon("/auxdata/ui/icons/UpUp.gif"));
+        if (getCommandFld() instanceof JTextArea) {
+            flipBtn.setIcon(
+                GuiUtils.getImageIcon("/auxdata/ui/icons/UpUp.gif"));
         } else {
-            flipBtn.setIcon(GuiUtils.getImageIcon("/auxdata/ui/icons/DownDown.gif"));
+            flipBtn.setIcon(
+                GuiUtils.getImageIcon("/auxdata/ui/icons/DownDown.gif"));
         }
 
     }
-    private void handleKeyPress(KeyEvent e,JTextComponent cmdFld) {
+
+    /**
+     * _more_
+     *
+     * @param t _more_
+     */
+    public void appendText(String t) {
+        GuiUtils.insertText(getCommandFld(), t);
+    }
+
+    /**
+     * _more_
+     *
+     * @param cmdFld _more_
+     */
+    public void showProcedurePopup(JTextComponent cmdFld) {
+        String t = cmdFld.getText();
+        /*
+          int pos = cmdFld.getCaretPosition();
+          t = t.substring(0, pos);
+          String tmp = "";
+          for(int i=t.length()-1;i>=0;i--) {
+          char c = t.charAt(i);
+          if(!Character.isJavaIdentifierPart(c)) break;
+          tmp = c+tmp;
+          }
+          t=tmp;
+          if(t.length()==0) {
+          t = null;
+          }
+          //            System.err.println(t);
+          */
+        t = null;
+
+        JPopupMenu popup = GuiUtils.makePopupMenu(
+                               idv.getJythonManager().makeProcedureMenu(
+                                   this, "appendText", t));
+        if (popup != null) {
+            popup.show(cmdFld, 0, (int) cmdFld.getBounds().getHeight());
+        }
+
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param e _more_
+     * @param cmdFld _more_
+     */
+    private void handleKeyPress(KeyEvent e, JTextComponent cmdFld) {
+        if ((e.getKeyCode() == e.VK_M) && e.isControlDown()) {
+            showProcedurePopup(cmdFld);
+            return;
+        }
+
+
         if ((e.getKeyCode() == e.VK_B) && e.isControlDown()) {
             if (cmdFld.getCaretPosition() > 0) {
-                cmdFld.setCaretPosition(
-                                            cmdFld.getCaretPosition() - 1);
+                cmdFld.setCaretPosition(cmdFld.getCaretPosition() - 1);
             }
         }
         if ((e.getKeyCode() == e.VK_F) && e.isControlDown()) {
-            if (cmdFld.getCaretPosition()
-                < cmdFld.getText().length()) {
-                cmdFld.setCaretPosition(
-                                            cmdFld.getCaretPosition() + 1);
+            if (cmdFld.getCaretPosition() < cmdFld.getText().length()) {
+                cmdFld.setCaretPosition(cmdFld.getCaretPosition() + 1);
             }
         }
         if (((e.getKeyCode() == e.VK_UP)
-             || ((e.getKeyCode() == e.VK_P)
-                 && e.isControlDown())) && (history.size() > 0)) {
+                || ((e.getKeyCode() == e.VK_P)
+                    && e.isControlDown())) && (history.size() > 0)) {
             if ((historyIdx < 0) || (historyIdx >= history.size())) {
                 historyIdx = history.size() - 1;
             } else {
@@ -229,8 +322,8 @@ public class JythonShell {
             }
         }
         if (((e.getKeyCode() == e.VK_DOWN)
-             || ((e.getKeyCode() == e.VK_N)
-                 && e.isControlDown())) && (history.size() > 0)) {
+                || ((e.getKeyCode() == e.VK_N)
+                    && e.isControlDown())) && (history.size() > 0)) {
             if ((historyIdx < 0) || (historyIdx >= history.size())) {
                 historyIdx = history.size() - 1;
             } else {
@@ -247,12 +340,17 @@ public class JythonShell {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     */
     public void insert(String s) {
-        String t = getCommandFld().getText();
-        int pos = getCommandFld().getCaretPosition();
-        t = t.substring(0,pos) + s + t.substring(pos);
+        String t   = getCommandFld().getText();
+        int    pos = getCommandFld().getCaretPosition();
+        t = t.substring(0, pos) + s + t.substring(pos);
         getCommandFld().setText(t);
-        getCommandFld().setCaretPosition(pos+s.length());
+        getCommandFld().setCaretPosition(pos + s.length());
     }
 
 
@@ -305,7 +403,7 @@ public class JythonShell {
                 //                    output(new String(b));
             }
             public void write(byte[] b, int off, int len) {
-                output(new String(b, off, len)+"<br>");
+                output(new String(b, off, len) + "<br>");
             }
         };
 
@@ -332,8 +430,15 @@ public class JythonShell {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private JTextComponent getCommandFld() {
-        if(cardLayoutPanel.getVisibleIndex()==0) return commandFld;
+        if (cardLayoutPanel.getVisibleIndex() == 0) {
+            return commandFld;
+        }
         return commandArea;
     }
 
@@ -343,7 +448,7 @@ public class JythonShell {
      */
     public void eval() {
         JTextComponent cmdFld = getCommandFld();
-        String cmd = cmdFld.getText();
+        String         cmd    = cmdFld.getText();
         cmdFld.setText("");
         eval(cmd);
         history.add(cmd);
@@ -359,7 +464,7 @@ public class JythonShell {
         sb.append(m);
         editorPane.setText(sb.toString());
         editorPane.repaint();
-        editorPane.scrollRectToVisible(new Rectangle(0,10000,1,1));
+        editorPane.scrollRectToVisible(new Rectangle(0, 10000, 1, 1));
     }
 
     /**
@@ -378,15 +483,17 @@ public class JythonShell {
      */
     public void evalInThread(String jython) {
         try {
-            String html  = StringUtil.replace(jython.trim(),"\n","<br>");
-            html  = StringUtil.replace(html," ","&nbsp;");
-            html  = StringUtil.replace(html,"\t","&nbsp;&nbsp;&nbsp;&nbsp;");
-            output("<div style=\"background-color:#cccccc;margin-left=0; margin-right=0;margin-bottom:1\">&gt;<i>" + html + "</i></div>");
+            String html = StringUtil.replace(jython.trim(), "\n", "<br>");
+            html = StringUtil.replace(html, " ", "&nbsp;");
+            html = StringUtil.replace(html, "\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
+            output("<div style=\"margin:0; margin-bottom:1; background-color:#cccccc; \">"
+                   + html + "</div>");
             interp.exec(jython);
         } catch (PyException pse) {
-            output("<font color=\"red\">Error: " + pse.toString()+"</font><br>");
+            output("<font color=\"red\">Error: " + pse.toString()
+                   + "</font><br>");
         } catch (Exception exc) {
-            output("<font color=\"red\">Error: " + exc+"</font><br>");
+            output("<font color=\"red\">Error: " + exc + "</font><br>");
         }
     }
 

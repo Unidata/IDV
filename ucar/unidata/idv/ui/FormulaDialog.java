@@ -20,7 +20,13 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.idv.ui;
+
+
+import org.python.core.*;
+import org.python.util.*;
 
 
 import ucar.unidata.data.DataAlias;
@@ -279,15 +285,35 @@ public class FormulaDialog extends JFrame implements ActionListener {
         fieldLabelList.add(new JLabel("Field name"));
         fieldLabelList.add(new JLabel("Identifier"));
 
-        JButton jythonBtn = GuiUtils.makeImageButton("/auxdata/ui/icons/EditJython16.png",idv.getJythonManager(),"showJythonEditor");
+        JButton jythonBtn =
+            GuiUtils.makeImageButton("/auxdata/ui/icons/EditJython16.png",
+                                     idv.getJythonManager(),
+                                     "showJythonEditor");
         jythonBtn.setToolTipText("Edit Jython Library");
-        JButton evalBtn = GuiUtils.makeImageButton("/auxdata/ui/icons/Evaluate16.png",this, "evaluate");
+        JButton evalBtn =
+            GuiUtils.makeImageButton("/auxdata/ui/icons/Evaluate16.png",
+                                     this, "evaluate");
         evalBtn.setToolTipText("Save and Evaluate Formula");
 
         formulaField = new JTextField(formula, 25);
-        nameField    = new JTextField(name, 25);
-        descField    = new JTextField(description, 25);
-        categoryBox  = new JComboBox();
+        formulaField.setToolTipText(
+            "<html>Right-click to add procedures from library</html>");
+        formulaField.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    JPopupMenu popup =
+                        GuiUtils.makePopupMenu(
+                            idv.getJythonManager().makeProcedureMenu(
+                                FormulaDialog.this, "appendText", null));
+                    popup.show(formulaField, e.getX(),
+                               (int) formulaField.getBounds().getHeight());
+                }
+            }
+        });
+
+        nameField   = new JTextField(name, 25);
+        descField   = new JTextField(description, 25);
+        categoryBox = new JComboBox();
         categoryBox.setEditable(true);
         categoryBox.addItem("");
         categoryBox.setToolTipText(
@@ -566,8 +592,9 @@ public class FormulaDialog extends JFrame implements ActionListener {
         GuiUtils.tmpInsets = new Insets(4, 4, 0, 4);
         Container topPanel = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Name:"), nameField,
-            GuiUtils.rLabel("       Formula:"), 
-            GuiUtils.centerRight(formulaField,GuiUtils.hbox(evalBtn,jythonBtn)),
+            GuiUtils.rLabel("       Formula:"),
+            GuiUtils.centerRight(formulaField,
+                                 GuiUtils.hbox(evalBtn, jythonBtn)),
             GuiUtils.rLabel("Advanced"), GuiUtils.left(advancedIconBtn)
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
 
@@ -603,6 +630,18 @@ public class FormulaDialog extends JFrame implements ActionListener {
         return GuiUtils.centerBottom(GuiUtils.inset(innerPanel, 2), buttons);
     }
 
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param t _more_
+     */
+    public void appendText(String t) {
+        GuiUtils.insertText(formulaField, t);
+    }
 
     /**
      * Popup the output categories dialog
@@ -989,15 +1028,28 @@ public class FormulaDialog extends JFrame implements ActionListener {
     }
 
 
+    /**
+     * _more_
+     */
     public void evaluate() {
-        Misc.run(this,"evaluateInThread");
+        Misc.run(this, "evaluateInThread");
     }
 
+    /**
+     * _more_
+     */
     public void evaluateInThread() {
-        if(!addOrChange()) return;
+        if ( !addOrChange()) {
+            return;
+        }
         idv.getJythonManager().evaluateDataChoice(ddd.getDataChoice());
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private boolean addOrChange() {
         boolean wasNew = false;
         if (ddd == null) {
@@ -1009,10 +1061,11 @@ public class FormulaDialog extends JFrame implements ActionListener {
             return false;
         }
         ddd.setIsLocalUsers(true);
-        if(wasNew)
+        if (wasNew) {
             idv.getJythonManager().addFormula(ddd);
-        else
+        } else {
             idv.getJythonManager().descriptorChanged(ddd);
+        }
         return true;
     }
 
@@ -1026,14 +1079,16 @@ public class FormulaDialog extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent event) {
         String cmd = event.getActionCommand();
         if (cmd.equals(CMD_ADD)) {
-            if(addOrChange())
+            if (addOrChange()) {
                 closeFormulaDialog();
+            }
             return;
         }
 
         if (cmd.equals(CMD_CHANGE)) {
-            if(addOrChange())
+            if (addOrChange()) {
                 closeFormulaDialog();
+            }
             return;
         }
 
