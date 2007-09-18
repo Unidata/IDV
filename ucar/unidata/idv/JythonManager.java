@@ -23,6 +23,8 @@
 
 
 
+
+
 package ucar.unidata.idv;
 
 
@@ -132,7 +134,7 @@ public class JythonManager extends IdvManager implements ActionListener {
     /** tabbed pane */
     private JTabbedPane jythonTab;
 
-    /** _more_          */
+    /** _more_ */
     private JTabbedPane editableTab;
 
     /** One text component per tab */
@@ -140,6 +142,9 @@ public class JythonManager extends IdvManager implements ActionListener {
 
     /** Shows the temp jython */
     private JTextArea tmpTextArea = new JTextArea();
+
+    /** _more_ */
+    private LibHolder tmpHolder;
 
 
     /**
@@ -183,7 +188,7 @@ public class JythonManager extends IdvManager implements ActionListener {
     /** The edit process */
     private Process editProcess;
 
-    /** _more_          */
+    /** _more_ */
     private String pythonDir;
 
     /**
@@ -408,6 +413,12 @@ public class JythonManager extends IdvManager implements ActionListener {
                         continue;
                     }
                     seen.put(canonicalPath, canonicalPath);
+                    String label = resources.getLabel(i);
+                    if (label == null) {
+                        label =
+                            IOUtil.getFileTail(PluginManager.decode(path));
+                    }
+
                     String text = IOUtil.readContents(path, (String) null);
                     if ((text != null) && Misc.isHtml(text)) {
                         continue;
@@ -416,7 +427,7 @@ public class JythonManager extends IdvManager implements ActionListener {
                     LibHolder libHolder;
                     if (resources.isWritableResource(i)
                             || (file.exists() && file.canWrite())) {
-                        libHolder = makeEditableLibHolder(path, text);
+                        libHolder = makeEditableLibHolder(label, path, text);
                     } else {
                         //Only add in the non-editable pane if there is a real resource there
                         if (new File(path).isDirectory() || (text == null)) {
@@ -424,6 +435,7 @@ public class JythonManager extends IdvManager implements ActionListener {
                         }
                         JTextArea textArea = new JTextArea(text, 20, 50);
                         textArea.setEditable(false);
+                        textArea.setBackground(new Color(230, 230, 230));
                         JComponent wrapper =
                             GuiUtils.center(GuiUtils.makeScrollPane(textArea,
                                 400, 300));
@@ -431,8 +443,8 @@ public class JythonManager extends IdvManager implements ActionListener {
                             GuiUtils.topCenter(
                                 GuiUtils.inset(
                                     new JLabel("Non-editable"), 2), wrapper);
-                        libHolder = new LibHolder(textArea, path, wrapper,
-                                tabContents);
+                        libHolder = new LibHolder(label, textArea, path,
+                                wrapper, tabContents);
                         pathDesc = pathDesc + " (" + Msg.msg("non-editable")
                                    + ")";
                         libHolders.add(libHolder);
@@ -451,26 +463,21 @@ public class JythonManager extends IdvManager implements ActionListener {
                             tabs.put(category, theTab);
                         }
                     }
-                    String label = resources.getLabel(i);
-                    if (label == null) {
-                        label =
-                            IOUtil.getFileTail(PluginManager.decode(path));
-                    }
                     theTab.add(label, libHolder.outerContents);
                     theTab.setToolTipTextAt(theTab.getTabCount() - 1,
                                             pathDesc);
                 }
             }
             JLabel label = new JLabel("Temporary Jython");
-            JPanel tmpHolder =
+            JPanel tmpPanel =
                 GuiUtils.center(GuiUtils.makeScrollPane(tmpTextArea, 400,
                     300));
             String tmpPath = getIdv().getStore().getTmpFile("tmp.py");
-            libHolders.add(new LibHolder(tmpTextArea, tmpPath, tmpHolder,
-                                         tmpHolder));
+            libHolders.add(tmpHolder = new LibHolder("Temporary",
+                    tmpTextArea, tmpPath, tmpPanel, tmpPanel));
             jythonTab.add("Temporary",
                           GuiUtils.topCenter(GuiUtils.inset(label, 4),
-                                             tmpHolder));
+                                             tmpPanel));
 
 
             JMenuBar menuBar = new JMenuBar();
@@ -492,6 +499,46 @@ public class JythonManager extends IdvManager implements ActionListener {
     /**
      * _more_
      *
+     * @return _more_
+     */
+    public boolean saveOnExit() {
+        List toSave = new ArrayList();
+        for (int i = libHolders.size() - 1; i >= 0; i--) {
+            LibHolder holder = (LibHolder) libHolders.get(i);
+            if ((holder.saveBtn == null) || !holder.isEditable()) {
+                continue;
+            }
+            if (holder.saveBtn.isEnabled()) {
+                toSave.add(holder);
+            }
+        }
+        if (toSave.size() > 0) {
+            int response =
+                GuiUtils.showYesNoCancelDialog(null,
+                    "Do you want to save the modified Jython before exiting?",
+                    "Save Jython");
+            if (response == 2) {
+                return false;
+            }
+            if (response == 0) {
+                for (int i = toSave.size() - 1; i >= 0; i--) {
+                    LibHolder holder = (LibHolder) toSave.get(i);
+                    if ( !writeJythonLib(holder)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     *
+     * @param label _more_
      * @param path _more_
      * @param text _more_
      *
@@ -499,28 +546,39 @@ public class JythonManager extends IdvManager implements ActionListener {
      *
      * @throws VisADException _more_
      */
-    private LibHolder makeEditableLibHolder(String path, String text)
+    private LibHolder makeEditableLibHolder(String label, String path,
+                                            String text)
             throws VisADException {
-        JPythonEditor jythonEditor = new JPythonEditor();
+        final LibHolder[] holderArray  = { null };
+        JPythonEditor     jythonEditor = new JPythonEditor() {
+            public void undoableEditHappened(UndoableEditEvent e) {
+                if (holderArray[0] != null) {
+                    holderArray[0].saveBtn.setEnabled(true);
+                }
+                super.undoableEditHappened(e);
+            }
+        };
         jythonEditor.setPreferredSize(new Dimension(400, 300));
         JComponent wrapper     = GuiUtils.center(jythonEditor);
         JComponent tabContents = GuiUtils.center(wrapper);
-        LibHolder libHolder = new LibHolder(jythonEditor, path, wrapper,
-                                            tabContents);
-        JButton saveBtn = GuiUtils.makeButton("Save", this, "writeJythonLib",
-                              libHolder);
+        LibHolder libHolder = new LibHolder(label, jythonEditor, path,
+                                            wrapper, tabContents);
+        holderArray[0] = libHolder;
+        libHolder.saveBtn = GuiUtils.makeButton("Save", this,
+                "writeJythonLib", libHolder);
         if (mainHolder == null) {
             mainHolder = libHolder;
         }
         libHolders.add(libHolder);
 
-        tabContents.add(BorderLayout.SOUTH, GuiUtils.wrap(saveBtn));
+        tabContents.add(BorderLayout.SOUTH, GuiUtils.wrap(libHolder.saveBtn));
         if (text == null) {
             text = "";
         }
         if (text != null) {
             jythonEditor.setText(text);
         }
+        libHolder.saveBtn.setEnabled(false);
         return libHolder;
     }
 
@@ -549,7 +607,8 @@ public class JythonManager extends IdvManager implements ActionListener {
                 }
                 IOUtil.writeFile(fullName, "");
 
-                LibHolder libHolder = makeEditableLibHolder(fullName, "");
+                LibHolder libHolder = makeEditableLibHolder(name, fullName,
+                                          "");
                 editableTab.add(name, libHolder.outerContents);
                 editableTab.setToolTipTextAt(editableTab.getTabCount() - 1,
                                              fullName);
@@ -560,6 +619,15 @@ public class JythonManager extends IdvManager implements ActionListener {
             logException("An error occurred creating the jython library",
                          exc);
         }
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public List getLibHolders() {
+        return libHolders;
     }
 
 
@@ -702,8 +770,8 @@ public class JythonManager extends IdvManager implements ActionListener {
                     fileTime = file.lastModified();
                     try {
                         String text = IOUtil.readContents(file);
-                        holder.setText(text);
-                        evaluateLibJython(false);
+                        holder.setText(text, false);
+                        evaluateLibJython(false, holder);
                     } catch (Exception exc) {
                         logException(
                             "An error occurred editing jython library", exc);
@@ -917,15 +985,15 @@ public class JythonManager extends IdvManager implements ActionListener {
      * @param jython The jython from the bundle
      */
     public void appendTmpJython(String jython) {
-        String oldJython = tmpTextArea.getText();
+        String oldJython = tmpHolder.getText();
         //Don't add it if we have it.
         if (oldJython.indexOf(jython) >= 0) {
             return;
         }
         String newJython = oldJython + "\n\n## Imported jython from bundle\n"
                            + jython;
-        tmpTextArea.setText(newJython);
-        evaluateLibJython(false);
+        tmpHolder.setText(newJython);
+        evaluateLibJython(false, tmpHolder);
     }
 
 
@@ -944,7 +1012,7 @@ public class JythonManager extends IdvManager implements ActionListener {
         String newJython = oldJython + "\n\n## Imported jython from bundle\n"
                            + jython;
         mainHolder.setText(newJython);
-        writeJythonLib(null);
+        writeJythonLib(mainHolder);
     }
 
     /**
@@ -966,18 +1034,21 @@ public class JythonManager extends IdvManager implements ActionListener {
      *
      * @param forWriting Is this evaluation intended to be for when
      * we write the users jython
+     * @param holderToWrite _more_
      *
      * @return Was this successful
      */
-    private boolean evaluateLibJython(boolean forWriting) {
+    private boolean evaluateLibJython(boolean forWriting,
+                                      LibHolder holderToWrite) {
         boolean ok   = false;
         String  what = "";
         try {
             if (interpreters.size() == 0) {
                 getDerivedDataInterpreter();
             }
-            for (int i = 0; i < libHolders.size(); i++) {
-                LibHolder holder = (LibHolder) libHolders.get(i);
+            List holders = Misc.newList(holderToWrite);
+            for (int i = 0; i < holders.size(); i++) {
+                LibHolder holder = (LibHolder) holders.get(i);
                 if ( !holder.isEditable()) {
                     continue;
                 }
@@ -1023,9 +1094,12 @@ public class JythonManager extends IdvManager implements ActionListener {
      * @return success
      */
     public boolean writeJythonLib(LibHolder holder) {
-        if (evaluateLibJython(true)) {
+        if (evaluateLibJython(true, holder)) {
             try {
                 IOUtil.writeFile(holder.filePath, holder.getText());
+                if (holder.saveBtn != null) {
+                    holder.saveBtn.setEnabled(false);
+                }
                 return true;
             } catch (Throwable exc) {
                 logException("Writing jython library "
@@ -1804,6 +1878,70 @@ public class JythonManager extends IdvManager implements ActionListener {
     /**
      * _more_
      *
+     * @return _more_
+     */
+    public List makeProcedureMenu(Object object, String method,String prefix) {
+        List menuItems = new ArrayList();
+        List holders   = getLibHolders();
+        for (int i = 0; i < holders.size(); i++) {
+            List subItems = new ArrayList();
+            JythonManager.LibHolder libHolder =
+                (JythonManager.LibHolder) holders.get(i);
+            PythonInterpreter interpreter = new PythonInterpreter();
+            interpreter.exec("import sys");
+            interpreter.exec("import java");
+            try {
+                interpreter.exec(libHolder.getText());
+            } catch (Exception exc) {
+                continue;
+            }
+            PyStringMap seq   = (PyStringMap) interpreter.getLocals();
+            PyList      keys  = seq.keys();
+            PyList      items = seq.items();
+            List        funcs = new ArrayList();
+            for (int itemIdx = 0; itemIdx < items.__len__(); itemIdx++) {
+                PyTuple pair = (PyTuple) items.__finditem__(itemIdx);
+                if ( !(pair.__finditem__(1) instanceof PyFunction)) {
+                    continue;
+                }
+                funcs.add(new Object[] { pair.__finditem__(0).toString(),
+                                         pair.__finditem__(1) });
+            }
+
+
+            funcs = Misc.sortTuples(funcs, true);
+
+            for (int itemIdx = 0; itemIdx < funcs.size(); itemIdx++) {
+                Object[]     pair = (Object[]) funcs.get(itemIdx);
+                PyFunction   func = (PyFunction) pair[1];
+                StringBuffer sb   = new StringBuffer();
+                sb.append(func.__name__ + "(");
+                PyTableCode tc = (PyTableCode) func.func_code;
+                for (int argIdx = 0; argIdx < tc.co_argcount; argIdx++) {
+                    if (argIdx > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(tc.co_varnames[argIdx]);
+                }
+                sb.append(")");
+                String s = sb.toString();
+                if(prefix!=null &&!s.startsWith(prefix)) continue;
+                subItems.add(GuiUtils.makeMenuItem(s, object,method, s));
+            }
+            if (subItems.size() > 0) {
+                JMenu menu = GuiUtils.makeMenu(libHolder.getName(), subItems);
+                menuItems.add(menu);
+            }
+        }
+        return menuItems;
+    }
+
+
+
+
+    /**
+     * _more_
+     *
      * @param args _more_
      *
      * @throws Exception _more_
@@ -1876,35 +2014,56 @@ public class JythonManager extends IdvManager implements ActionListener {
      * @author IDV Development Team
      * @version $Revision: 1.3 $
      */
-    private static class LibHolder {
+    public static class LibHolder {
 
         /** _more_          */
+        String label;
+
+        /** _more_ */
         JComponent comp;
 
-        /** _more_          */
+        /** _more_ */
         String filePath;
 
-        /** _more_          */
+        /** _more_ */
         JComponent wrapper;
 
-        /** _more_          */
+        /** _more_ */
         JComponent outerContents;
+
+        /** _more_ */
+        JButton saveBtn;
+
 
         /**
          * _more_
          *
+         *
+         * @param label _more_
          * @param comp _more_
          * @param filePath _more_
          * @param wrapper _more_
          * @param outerContents _more_
          */
-        public LibHolder(JComponent comp, String filePath,
+        public LibHolder(String label, JComponent comp, String filePath,
                          JComponent wrapper, JComponent outerContents) {
+            this.label         = label;
             this.comp          = comp;
             this.filePath      = filePath;
             this.wrapper       = wrapper;
             this.outerContents = outerContents;
         }
+
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String getName() {
+            return label;
+        }
+
 
         /**
          * _more_
@@ -1917,6 +2076,9 @@ public class JythonManager extends IdvManager implements ActionListener {
             }
             if (comp instanceof JPythonEditor) {
                 return true;
+            }
+            if (true) {
+                return false;
             }
             JTextArea textArea = (JTextArea) comp;
             return textArea.isEditable();
@@ -1941,10 +2103,23 @@ public class JythonManager extends IdvManager implements ActionListener {
          * @param text _more_
          */
         public void setText(String text) {
+            setText(text, true);
+        }
+
+        /**
+         * _more_
+         *
+         * @param text _more_
+         * @param andEnable _more_
+         */
+        public void setText(String text, boolean andEnable) {
             if (comp instanceof JPythonEditor) {
                 ((JPythonEditor) comp).setText(text);
             } else {
                 ((JTextArea) comp).setText(text);
+            }
+            if (andEnable && (saveBtn != null)) {
+                saveBtn.setEnabled(true);
             }
         }
 

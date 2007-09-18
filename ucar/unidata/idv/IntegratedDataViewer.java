@@ -2652,6 +2652,12 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         if ( !smm.checkCloseWindow()) {
             return false;
         }
+
+        if(!getJythonManager().saveOnExit()) {
+            return false;
+        }
+
+
         getStore().saveIfNeeded();
         getStore().cleanupTmpFiles();
         getPluginManager().closeResources();
