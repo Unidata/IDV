@@ -1388,7 +1388,15 @@ public class GeoGridDataSource extends GridDataSource {
     private static boolean forceSubset = false;
 
     /** for test */
-    protected static boolean testMode = false;
+    public static boolean testMode = false;
+
+
+    /*
+    public void putCache(Object key, Object value) {
+        if(testMode) return;
+        super.putCache(key,value);
+        }*/
+
 
     /**
      * Test this class by running
@@ -1400,6 +1408,26 @@ public class GeoGridDataSource extends GridDataSource {
      */
     public static void main(String[] args) throws Exception {
 
+        String []urls = {
+            "http://motherlode.ucar.edu:8080/thredds/dodsC/modelsNc/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20070917_1200.nc",
+            "dods://motherlode.ucar.edu:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20070917_1200.grib1"};
+        //                String url = "dods://thredds.cise-nsf.gov:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20070917_1200.grib1";
+        testMode    = true;
+        
+        for(int i=0;i<100;i++) {
+            for(int urlIdx=0;urlIdx<urls.length;urlIdx++) {
+                System.err.println ("Reading data:" + i + " " + urls[urlIdx]);
+                GeoGridDataSource ggds = new GeoGridDataSource(null, urls[urlIdx], null);
+                ggds.doMakeDataChoices();
+                DataChoice dataChoice = ggds.findDataChoice("Temperature");
+                if(dataChoice== null) dataChoice = ggds.findDataChoice("T");
+                //                System.err.println ("" + dataChoice.getProperties());
+                ggds.makeFieldImpl(dataChoice, ggds.getDataSelection(),null);
+            }
+        }
+            
+
+            /*
         GridDataset dataset    = GridDataset.open("elev.nc");
         GeoGrid     geoGrid    = dataset.findGridByName("foo");
         GeoGrid     geoGrid50  = geoGrid.subset(null, null, null, 0, 50, 50);
@@ -1408,7 +1436,7 @@ public class GeoGridDataSource extends GridDataSource {
 
 
         System.exit(0);
-
+            */
 
 
         /**
