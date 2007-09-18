@@ -12,13 +12,14 @@ def makeNavigatedImage (d,ulLat,ulLon,lrLat,lrLon):
   lrLon=float(lrLon)
   domain = d.getDomainSet()
   newDomain = Linear2DSet(RealTupleType.SpatialEarth2DTuple,ulLon,lrLon,domain.getX().getLength(),ulLat,lrLat,domain.getY().getLength())
-  return setSpatialDomain(d, newDomain)
+  return GridUtil.setSpatialDomain(d, newDomain)
+
 
 
 def combineRGB(red, green, blue):
   """ combine 3 images as an RGB image """
-  red=setParamType(red,makeRealType("redimage"), 0)
-  green=setParamType(green,makeRealType("greenimage"), 0)
-  blue=setParamType(blue,makeRealType("blueimage"), 0)
+  red=GridUtil.setParamType(red,makeRealType("redimage"), 0)
+  green=GridUtil.setParamType(green,makeRealType("greenimage"), 0)
+  blue=GridUtil.setParamType(blue,makeRealType("blueimage"), 0)
   return DerivedGridFactory.combineGrids((red,green,blue),1)
 
