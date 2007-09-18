@@ -1790,7 +1790,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 }
             }
             getMaster().addDisplayable(displayListDisplayables);
-            displayListDisplayables.setVisible(true);
+            //displayListDisplayables.setVisible(true);
         } catch (Exception exp) {
             logException("Setting display list", exp);
         }
@@ -4454,8 +4454,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                        backgroundTransparentBtn));
 
 
-            List filters = Misc.newList(FileManager.FILTER_IMAGE);
-            GeoLocationInfo bounds = getVisibleGeoBounds();
+            List            filters = Misc.newList(FileManager.FILTER_IMAGE);
+            GeoLocationInfo bounds  = getVisibleGeoBounds();
             if (bounds != null) {
                 filters.add(KmlDataSource.FILTER_KML);
             }
