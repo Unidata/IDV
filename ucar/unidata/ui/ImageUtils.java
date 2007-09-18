@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.ui;
 
 
@@ -135,9 +136,9 @@ public class ImageUtils {
                 && (w > 0) && (h > 0)) {
             return image.getSubimage(ul[0], ul[1], w, h);
         }
-        System.err.println ("Specified clip width/height:" + w + "/" + h
-          + " outside of image width/height:" + imageWidth
-          + "/" + imageHeight);
+        System.err.println("Specified clip width/height:" + w + "/" + h
+                           + " outside of image width/height:" + imageWidth
+                           + "/" + imageHeight);
         return image;
     }
 
@@ -300,12 +301,12 @@ public class ImageUtils {
 
 
     /**
-     * _more_
+     * Make a color in the image transparent
      *
-     * @param im _more_
-     * @param c _more_
+     * @param im  image
+     * @param c  the color to make transparent
      *
-     * @return _more_
+     * @return  a new image with the color transparent.
      */
     public static BufferedImage makeColorTransparent(Image im, Color c) {
         int[] redRange   = { 0, 0 };
@@ -473,13 +474,13 @@ public class ImageUtils {
     }
 
     /**
-     * _more_
+     * Merge images
      *
-     * @param images _more_
-     * @param space _more_
-     * @param bg _more_
+     * @param images list of images
+     * @param space space between images
+     * @param bg background color
      *
-     * @return _more_
+     * @return  merged image
      */
     public static Image mergeImages(List images, int space, Color bg) {
         if (images.size() == 1) {
@@ -604,12 +605,12 @@ public class ImageUtils {
 
 
     /**
-     * _more_
+     * Convert an image to a new type
      *
-     * @param file _more_
-     * @param newType _more_
+     * @param file  image file
+     * @param newType  new image type
      *
-     * @return _more_
+     * @return name of the new file
      */
     public static String convertImageTo(String file, String newType) {
         try {
@@ -667,8 +668,10 @@ public class ImageUtils {
         if (iwparam.canWriteCompressed()) {
             String[] types = iwparam.getCompressionTypes();
             iwparam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-            iwparam.setCompressionType(types[0]); // pick the first type
-            iwparam.setCompressionQuality(quality);
+            iwparam.setCompressionType(types[0]);  // pick the first type
+            if ( !iwparam.isCompressionLossless()) {
+                iwparam.setCompressionQuality(quality);
+            }
         }
 
         //A hack to make sure we aren't writing out an ARGB image to a jpg
@@ -742,7 +745,7 @@ public class ImageUtils {
     }
 
 
-    /** _more_          */
+    /** debug flag */
     public static boolean debug = false;
 
 
@@ -779,23 +782,37 @@ public class ImageUtils {
         writeImageToFile(image, saveFile);
     }
 
-   public static void writeAvi(java.util.List imageFiles, double frameRateInFPS, File outFile) throws IOException {
-       gov.noaa.ncdc.nexradiv.AVIWriter aviWriter = null;
-       for (int n=0; n<imageFiles.size(); n++) {
-           BufferedImage image = ImageUtils.toBufferedImage(ImageUtils.readImage(imageFiles.get(n).toString()));
-           ImageUtils.waitOnImage(image);
-           if(aviWriter==null) {
-               aviWriter = new        gov.noaa.ncdc.nexradiv.AVIWriter();
-               int width = image.getWidth(null);
-               int height = image.getHeight(null);
-               aviWriter.init(outFile, width, height, imageFiles.size(), frameRateInFPS);
-           }
-           aviWriter.addFrame(image);
-       }
-       if(aviWriter!=null) {
-           aviWriter.close();
-       }
-   }
+    /**
+     * Write an AVI file
+     *
+     * @param imageFiles   list of files
+     * @param frameRateInFPS frame rate
+     * @param outFile  output file 
+     *
+     * @throws IOException problem writing AVI
+     */
+    public static void writeAvi(java.util.List imageFiles,
+                                double frameRateInFPS, File outFile)
+            throws IOException {
+        gov.noaa.ncdc.nexradiv.AVIWriter aviWriter = null;
+        for (int n = 0; n < imageFiles.size(); n++) {
+            BufferedImage image = ImageUtils.toBufferedImage(
+                                      ImageUtils.readImage(
+                                          imageFiles.get(n).toString()));
+            ImageUtils.waitOnImage(image);
+            if (aviWriter == null) {
+                aviWriter = new gov.noaa.ncdc.nexradiv.AVIWriter();
+                int width  = image.getWidth(null);
+                int height = image.getHeight(null);
+                aviWriter.init(outFile, width, height, imageFiles.size(),
+                               frameRateInFPS);
+            }
+            aviWriter.addFrame(image);
+        }
+        if (aviWriter != null) {
+            aviWriter.close();
+        }
+    }
 
 
 
@@ -803,13 +820,13 @@ public class ImageUtils {
 
 
     /**
-     * _more_
+     * Resize an image
      *
-     * @param image _more_
-     * @param width _more_
-     * @param height _more_
+     * @param image  the image
+     * @param width  new width
+     * @param height new height
      *
-     * @return _more_
+     * @return  resized image
      */
     public static Image resize(Image image, int width, int height) {
         return image.getScaledInstance(width, height,
