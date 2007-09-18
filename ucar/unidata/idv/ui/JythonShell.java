@@ -50,6 +50,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import javax.swing.*;
+import javax.swing.text.*;
 import javax.swing.event.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -68,28 +69,35 @@ import javax.swing.tree.*;
 public class JythonShell {
 
     /** _more_ */
-    IntegratedDataViewer idv;
+    private     IntegratedDataViewer idv;
 
     /** _more_ */
-    PythonInterpreter interp;
+    private     PythonInterpreter interp;
 
     /** _more_ */
-    JFrame frame;
+    private     JFrame frame;
 
     /** _more_ */
-    JTextField commandFld;
+    private     JTextField commandFld;
+
+    private     JTextArea commandArea;
+
+    private JButton flipBtn;
+
+    private GuiUtils.CardLayoutPanel cardLayoutPanel;
 
     /** _more_ */
-    JEditorPane editorPane;
+    private     JEditorPane editorPane;
 
     /** _more_ */
-    StringBuffer sb = new StringBuffer();
+    private     StringBuffer sb = new StringBuffer();
 
     /** _more_ */
-    List history = new ArrayList();
+    private     List history = new ArrayList();
 
     /** _more_ */
-    int historyIdx = -1;
+    private     int historyIdx = -1;
+
 
 
 
@@ -105,69 +113,35 @@ public class JythonShell {
         editorPane.setContentType("text/html");
         createInterpreter();
         JScrollPane scroller = GuiUtils.makeScrollPane(editorPane, 400, 300);
-        scroller.setPreferredSize(new Dimension(400, 300));
+        scroller.setPreferredSize(new Dimension(400, 300)); 
         commandFld = new JTextField();
         commandFld.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                if ((e.getKeyCode() == e.VK_B) && e.isControlDown()) {
-                    if (commandFld.getCaretPosition() > 0) {
-                        commandFld.setCaretPosition(
-                            commandFld.getCaretPosition() - 1);
-                    }
-                }
-                if ((e.getKeyCode() == e.VK_F) && e.isControlDown()) {
-                    if (commandFld.getCaretPosition()
-                            < commandFld.getText().length()) {
-                        commandFld.setCaretPosition(
-                            commandFld.getCaretPosition() + 1);
-                    }
-                }
-                if (((e.getKeyCode() == e.VK_UP)
-                        || ((e.getKeyCode() == e.VK_P)
-                            && e.isControlDown())) && (history.size() > 0)) {
-                    if ((historyIdx < 0) || (historyIdx >= history.size())) {
-                        historyIdx = history.size() - 1;
-                    } else {
-                        historyIdx--;
-                        if (historyIdx < 0) {
-                            historyIdx = 0;
-                        }
-                    }
-                    if ((historyIdx >= 0) && (historyIdx < history.size())) {
-                        commandFld.setText((String) history.get(historyIdx));
-                    }
-                }
-                if (((e.getKeyCode() == e.VK_DOWN)
-                        || ((e.getKeyCode() == e.VK_N)
-                            && e.isControlDown())) && (history.size() > 0)) {
-                    if ((historyIdx < 0) || (historyIdx >= history.size())) {
-                        historyIdx = history.size() - 1;
-                    } else {
-                        historyIdx++;
-                        if (historyIdx >= history.size()) {
-                            historyIdx = history.size() - 1;
-                        }
-                    }
-                    if ((historyIdx >= 0) && (historyIdx < history.size())) {
-                        commandFld.setText((String) history.get(historyIdx));
-                    }
-                }
-
-            }
+                handleKeyPress(e,commandFld);
+           }
         });
         commandFld.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 eval();
             }
         });
+        commandArea = new JTextArea("",4,30);
+        commandArea.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                handleKeyPress(e,commandArea);
+           }
+        });
+        cardLayoutPanel = new GuiUtils.CardLayoutPanel();
+        cardLayoutPanel.addCard(GuiUtils.top(commandFld));
+        cardLayoutPanel.addCard(GuiUtils.makeScrollPane(commandArea, 200, 100));
+        flipBtn = GuiUtils.makeImageButton("/auxdata/ui/icons/DownDown.gif",this,"flipField");
         JButton    evalBtn  = GuiUtils.makeButton("Evaluate:", this, "eval");
-        JComponent bottom   = GuiUtils.leftCenter(evalBtn, commandFld);
+        JComponent bottom   = GuiUtils.leftCenterRight(GuiUtils.top(evalBtn), cardLayoutPanel,GuiUtils.top(flipBtn));
         JComponent contents = GuiUtils.centerBottom(scroller, bottom);
         contents = GuiUtils.inset(contents, 5);
 
         JMenuBar menuBar = new JMenuBar();
         List     items   = new ArrayList();
-        items.add(GuiUtils.makeMenuItem("Clear", this, "clear"));
         items.add(GuiUtils.makeMenuItem("Export Commands", this,
                                         "exportHistory"));
         menuBar.add(GuiUtils.makeMenu("File", items));
@@ -191,6 +165,7 @@ public class JythonShell {
         }
 
 
+        items.add(GuiUtils.makeMenuItem("Clear", this, "clear"));
         items.add(GuiUtils.makeMenu("Insert Display Id", displayMenuItems));
         menuBar.add(GuiUtils.makeMenu("Edit", items));
 
@@ -215,14 +190,69 @@ public class JythonShell {
     }
 
 
+    public void flipField() {
+        cardLayoutPanel.flip();
+        if(getCommandFld() instanceof JTextArea) {
+            flipBtn.setIcon(GuiUtils.getImageIcon("/auxdata/ui/icons/UpUp.gif"));
+        } else {
+            flipBtn.setIcon(GuiUtils.getImageIcon("/auxdata/ui/icons/DownDown.gif"));
+        }
+
+    }
+    private void handleKeyPress(KeyEvent e,JTextComponent cmdFld) {
+        if ((e.getKeyCode() == e.VK_B) && e.isControlDown()) {
+            if (cmdFld.getCaretPosition() > 0) {
+                cmdFld.setCaretPosition(
+                                            cmdFld.getCaretPosition() - 1);
+            }
+        }
+        if ((e.getKeyCode() == e.VK_F) && e.isControlDown()) {
+            if (cmdFld.getCaretPosition()
+                < cmdFld.getText().length()) {
+                cmdFld.setCaretPosition(
+                                            cmdFld.getCaretPosition() + 1);
+            }
+        }
+        if (((e.getKeyCode() == e.VK_UP)
+             || ((e.getKeyCode() == e.VK_P)
+                 && e.isControlDown())) && (history.size() > 0)) {
+            if ((historyIdx < 0) || (historyIdx >= history.size())) {
+                historyIdx = history.size() - 1;
+            } else {
+                historyIdx--;
+                if (historyIdx < 0) {
+                    historyIdx = 0;
+                }
+            }
+            if ((historyIdx >= 0) && (historyIdx < history.size())) {
+                cmdFld.setText((String) history.get(historyIdx));
+            }
+        }
+        if (((e.getKeyCode() == e.VK_DOWN)
+             || ((e.getKeyCode() == e.VK_N)
+                 && e.isControlDown())) && (history.size() > 0)) {
+            if ((historyIdx < 0) || (historyIdx >= history.size())) {
+                historyIdx = history.size() - 1;
+            } else {
+                historyIdx++;
+                if (historyIdx >= history.size()) {
+                    historyIdx = history.size() - 1;
+                }
+            }
+            if ((historyIdx >= 0) && (historyIdx < history.size())) {
+                cmdFld.setText((String) history.get(historyIdx));
+            }
+        }
+
+    }
 
 
     public void insert(String s) {
-        String t = commandFld.getText();
-        int pos = commandFld.getCaretPosition();
+        String t = getCommandFld().getText();
+        int pos = getCommandFld().getCaretPosition();
         t = t.substring(0,pos) + s + t.substring(pos);
-        commandFld.setText(t);
-        commandFld.setCaretPosition(pos+s.length());
+        getCommandFld().setText(t);
+        getCommandFld().setCaretPosition(pos+s.length());
     }
 
 
@@ -275,7 +305,7 @@ public class JythonShell {
                 //                    output(new String(b));
             }
             public void write(byte[] b, int off, int len) {
-                output(new String(b, off, len));
+                output(new String(b, off, len)+"<br>");
             }
         };
 
@@ -302,18 +332,20 @@ public class JythonShell {
 
 
 
+    private JTextComponent getCommandFld() {
+        if(cardLayoutPanel.getVisibleIndex()==0) return commandFld;
+        return commandArea;
+    }
+
+
     /**
      * _more_
      */
     public void eval() {
-        String cmd = commandFld.getText();
-        commandFld.setText("");
+        JTextComponent cmdFld = getCommandFld();
+        String cmd = cmdFld.getText();
+        cmdFld.setText("");
         eval(cmd);
-        /*        if ((historyIdx >= 0) && (historyIdx < history.size())) {
-            if (cmd.equals(history.get(historyIdx))) {
-                return;
-            }
-            }*/
         history.add(cmd);
         historyIdx = -1;
     }
@@ -324,10 +356,10 @@ public class JythonShell {
      * @param m _more_
      */
     private void output(String m) {
-        sb.append("<br>\n");
         sb.append(m);
         editorPane.setText(sb.toString());
         editorPane.repaint();
+        editorPane.scrollRectToVisible(new Rectangle(0,10000,1,1));
     }
 
     /**
@@ -346,12 +378,15 @@ public class JythonShell {
      */
     public void evalInThread(String jython) {
         try {
-            output("&gt;<i>" + jython + "</i>");
+            String html  = StringUtil.replace(jython.trim(),"\n","<br>");
+            html  = StringUtil.replace(html," ","&nbsp;");
+            html  = StringUtil.replace(html,"\t","&nbsp;&nbsp;&nbsp;&nbsp;");
+            output("<div style=\"background-color:#cccccc;margin-left=0; margin-right=0;margin-bottom:1\">&gt;<i>" + html + "</i></div>");
             interp.exec(jython);
-        } catch (PySyntaxError pse) {
-            output("Syntax error:<br>" + pse);
+        } catch (PyException pse) {
+            output("<font color=\"red\">Error: " + pse.toString()+"</font><br>");
         } catch (Exception exc) {
-            output("An error occurred:<br>" + exc);
+            output("<font color=\"red\">Error: " + exc+"</font><br>");
         }
     }
 
