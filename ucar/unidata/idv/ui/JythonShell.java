@@ -34,6 +34,8 @@ import ucar.unidata.data.*;
 
 import ucar.unidata.idv.*;
 
+import ucar.unidata.ui.InteractiveShell;
+
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -68,42 +70,13 @@ import javax.swing.tree.*;
  * @author IDV development team
  * @version $Revision: 1.50 $Date: 2007/08/21 12:15:45 $
  */
-public class JythonShell {
+public class JythonShell extends InteractiveShell {
 
     /** _more_ */
     private IntegratedDataViewer idv;
 
     /** _more_ */
     private PythonInterpreter interp;
-
-    /** _more_ */
-    private JFrame frame;
-
-    /** _more_ */
-    private JTextField commandFld;
-
-    /** _more_ */
-    private JTextArea commandArea;
-
-    /** _more_ */
-    private JButton flipBtn;
-
-    /** _more_ */
-    private GuiUtils.CardLayoutPanel cardLayoutPanel;
-
-    /** _more_ */
-    private JEditorPane editorPane;
-
-    /** _more_ */
-    private StringBuffer sb = new StringBuffer();
-
-    /** _more_ */
-    private List history = new ArrayList();
-
-    /** _more_ */
-    private int historyIdx = -1;
-
-
 
 
     /**
@@ -112,142 +85,28 @@ public class JythonShell {
      * @param theIdv _more_
      */
     public JythonShell(IntegratedDataViewer theIdv) {
-
+        super("Jython Shell");
         this.idv   = theIdv;
-        editorPane = new JEditorPane();
-        editorPane.setEditable(false);
-        editorPane.setContentType("text/html");
         createInterpreter();
-        JScrollPane scroller = GuiUtils.makeScrollPane(editorPane, 400, 300);
-        scroller.setPreferredSize(new Dimension(400, 300));
-        commandFld = new JTextField();
-        GuiUtils.setFixedWidthFont(commandFld);
-        commandFld.addKeyListener(new KeyAdapter() {
-            public void keyPressed(KeyEvent e) {
-                handleKeyPress(e, commandFld);
-            }
-        });
-        commandFld.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                eval();
-            }
-        });
-        commandFld.addMouseListener(new MouseAdapter() {
-            public void mouseReleased(MouseEvent e) {
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    showProcedurePopup(commandFld);
-                }
-            }
-        });
-
-        commandArea = new JTextArea("", 4, 30);
-        GuiUtils.setFixedWidthFont(commandArea);
-        commandArea.addKeyListener(new KeyAdapter() {
-            public void keyPressed(KeyEvent e) {
-                handleKeyPress(e, commandArea);
-            }
-        });
-        commandArea.addMouseListener(new MouseAdapter() {
-            public void mouseReleased(MouseEvent e) {
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    showProcedurePopup(commandArea);
-                }
-            }
-        });
-        cardLayoutPanel = new GuiUtils.CardLayoutPanel();
-        cardLayoutPanel.addCard(GuiUtils.top(commandFld));
-        cardLayoutPanel.addCard(GuiUtils.makeScrollPane(commandArea, 200,
-                100));
-        flipBtn = GuiUtils.makeImageButton("/auxdata/ui/icons/DownDown.gif",
-                                           this, "flipField");
-        JButton evalBtn = GuiUtils.makeButton("Evaluate:", this, "eval");
-        JComponent bottom = GuiUtils.leftCenterRight(GuiUtils.top(evalBtn),
-                                cardLayoutPanel, GuiUtils.top(flipBtn));
-        JComponent contents = GuiUtils.centerBottom(scroller, bottom);
-        contents = GuiUtils.inset(contents, 5);
-
-        JMenuBar menuBar = new JMenuBar();
-        List     items   = new ArrayList();
-        items.add(GuiUtils.makeMenuItem("Export Commands", this,
-                                        "exportHistory"));
-        menuBar.add(GuiUtils.makeMenu("File", items));
-
-
-        items = new ArrayList();
-        List      displayMenuItems = new ArrayList();
-
-
-        List      cds              = idv.getControlDescriptors();
-        Hashtable catMenus         = new Hashtable();
-        for (int i = 0; i < cds.size(); i++) {
-            ControlDescriptor cd = (ControlDescriptor) cds.get(i);
-            JMenu catMenu = (JMenu) catMenus.get(cd.getDisplayCategory());
-            if (catMenu == null) {
-                catMenu = new JMenu(cd.getDisplayCategory());
-                catMenus.put(cd.getDisplayCategory(), catMenu);
-                displayMenuItems.add(catMenu);
-            }
-            catMenu.add(GuiUtils.makeMenuItem(cd.getDescription(), this,
-                    "insert", "'" + cd.getControlId() + "'"));
-        }
-
-
-        items.add(GuiUtils.makeMenuItem("Clear", this, "clear"));
-        items.add(GuiUtils.makeMenu("Insert Display Id", displayMenuItems));
-        menuBar.add(GuiUtils.makeMenu("Edit", items));
-
-
-        items = new ArrayList();
-        items.add(GuiUtils.makeMenuItem("Help", this, "showHelp"));
-        menuBar.add(GuiUtils.makeMenu("Help", items));
-
-
-        contents = GuiUtils.topCenter(menuBar, contents);
-        frame    = new JFrame("Jython Shell");
+        //Create the gui
+        init();
+        //When the window closes remove the interpreter
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                idv.getJythonManager().removeInterpreter(interp);
+                if(interp!=null) {
+                    idv.getJythonManager().removeInterpreter(interp);
+                }
             }
         });
-        frame.getContentPane().add(contents);
-        frame.pack();
-        frame.setLocation(100, 100);
-        frame.setVisible(true);
-
-
     }
 
-
-    /**
-     * _more_
-     */
-    public void toFront() {
-        GuiUtils.toFront(frame);
-    }
-
-    /**
-     * _more_
-     */
-    public void flipField() {
-        cardLayoutPanel.flip();
-        if (getCommandFld() instanceof JTextArea) {
-            flipBtn.setIcon(
-                GuiUtils.getImageIcon("/auxdata/ui/icons/UpUp.gif"));
-        } else {
-            flipBtn.setIcon(
-                GuiUtils.getImageIcon("/auxdata/ui/icons/DownDown.gif"));
+    private PythonInterpreter getInterpreter() {
+        if(interp==null) {
+            createInterpreter();
         }
-
+        return interp;
     }
 
-    /**
-     * _more_
-     *
-     * @param t _more_
-     */
-    public void appendText(String t) {
-        GuiUtils.insertText(getCommandFld(), t);
-    }
 
     /**
      * _more_
@@ -289,68 +148,12 @@ public class JythonShell {
      * @param e _more_
      * @param cmdFld _more_
      */
-    private void handleKeyPress(KeyEvent e, JTextComponent cmdFld) {
+    protected void handleKeyPress(KeyEvent e, JTextComponent cmdFld) {
+        super.handleKeyPress(e,cmdFld);
         if ((e.getKeyCode() == e.VK_M) && e.isControlDown()) {
             showProcedurePopup(cmdFld);
             return;
         }
-
-
-        if ((e.getKeyCode() == e.VK_B) && e.isControlDown()) {
-            if (cmdFld.getCaretPosition() > 0) {
-                cmdFld.setCaretPosition(cmdFld.getCaretPosition() - 1);
-            }
-        }
-        if ((e.getKeyCode() == e.VK_F) && e.isControlDown()) {
-            if (cmdFld.getCaretPosition() < cmdFld.getText().length()) {
-                cmdFld.setCaretPosition(cmdFld.getCaretPosition() + 1);
-            }
-        }
-        if (((e.getKeyCode() == e.VK_UP)
-                || ((e.getKeyCode() == e.VK_P)
-                    && e.isControlDown())) && (history.size() > 0)) {
-            if ((historyIdx < 0) || (historyIdx >= history.size())) {
-                historyIdx = history.size() - 1;
-            } else {
-                historyIdx--;
-                if (historyIdx < 0) {
-                    historyIdx = 0;
-                }
-            }
-            if ((historyIdx >= 0) && (historyIdx < history.size())) {
-                cmdFld.setText((String) history.get(historyIdx));
-            }
-        }
-        if (((e.getKeyCode() == e.VK_DOWN)
-                || ((e.getKeyCode() == e.VK_N)
-                    && e.isControlDown())) && (history.size() > 0)) {
-            if ((historyIdx < 0) || (historyIdx >= history.size())) {
-                historyIdx = history.size() - 1;
-            } else {
-                historyIdx++;
-                if (historyIdx >= history.size()) {
-                    historyIdx = history.size() - 1;
-                }
-            }
-            if ((historyIdx >= 0) && (historyIdx < history.size())) {
-                cmdFld.setText((String) history.get(historyIdx));
-            }
-        }
-
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param s _more_
-     */
-    public void insert(String s) {
-        String t   = getCommandFld().getText();
-        int    pos = getCommandFld().getCaretPosition();
-        t = t.substring(0, pos) + s + t.substring(pos);
-        getCommandFld().setText(t);
-        getCommandFld().setCaretPosition(pos + s.length());
     }
 
 
@@ -417,11 +220,8 @@ public class JythonShell {
      */
     public void clear() {
         try {
-            historyIdx = -1;
-            history    = new ArrayList();
-            sb         = new StringBuffer();
+            super.clear();
             createInterpreter();
-            editorPane.setText("");
         } catch (Exception exc) {
             LogUtil.logException(
                 "An error occurred clearing the Jython shell", exc);
@@ -430,65 +230,66 @@ public class JythonShell {
 
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    private JTextComponent getCommandFld() {
-        if (cardLayoutPanel.getVisibleIndex() == 0) {
-            return commandFld;
+    protected JMenuBar doMakeMenuBar() {
+        JMenuBar menuBar  = new JMenuBar();
+        List     items   = new ArrayList();
+        items.add(GuiUtils.makeMenuItem("Export Commands", this,
+                                        "exportHistory"));
+        menuBar.add(GuiUtils.makeMenu("File", items));
+
+
+        items = new ArrayList();
+        List      displayMenuItems = new ArrayList();
+        List      cds              = idv.getControlDescriptors();
+        Hashtable catMenus         = new Hashtable();
+        for (int i = 0; i < cds.size(); i++) {
+            ControlDescriptor cd = (ControlDescriptor) cds.get(i);
+            JMenu catMenu = (JMenu) catMenus.get(cd.getDisplayCategory());
+            if (catMenu == null) {
+                catMenu = new JMenu(cd.getDisplayCategory());
+                catMenus.put(cd.getDisplayCategory(), catMenu);
+                displayMenuItems.add(catMenu);
+            }
+            catMenu.add(GuiUtils.makeMenuItem(cd.getDescription(), this,
+                    "insert", "'" + cd.getControlId() + "'"));
         }
-        return commandArea;
+
+
+        items.add(GuiUtils.makeMenuItem("Clear", this, "clear"));
+        items.add(GuiUtils.makeMenu("Insert Display Id", displayMenuItems));
+        menuBar.add(GuiUtils.makeMenu("Edit", items));
+
+
+        items = new ArrayList();
+        items.add(GuiUtils.makeMenuItem("Help", this, "showHelp"));
+        menuBar.add(GuiUtils.makeMenu("Help", items));
+        return menuBar;
     }
 
 
-    /**
-     * _more_
-     */
-    public void eval() {
-        JTextComponent cmdFld = getCommandFld();
-        String         cmd    = cmdFld.getText();
-        cmdFld.setText("");
-        eval(cmd);
-        history.add(cmd);
-        historyIdx = -1;
+
+    protected void  handleRightMouseClick(JTextComponent commandFld,MouseEvent e) {
+        showProcedurePopup(commandFld);
+    }    
+
+
+    protected String formatCode(String code) {
+        String html = StringUtil.replace(code.trim(), "\n", "<br>");
+        html = StringUtil.replace(html, " ", "&nbsp;");
+        html = StringUtil.replace(html, "\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
+        return html;
     }
 
-    /**
-     * _more_
-     *
-     * @param m _more_
-     */
-    private void output(String m) {
-        sb.append(m);
-        editorPane.setText(sb.toString());
-        editorPane.repaint();
-        editorPane.scrollRectToVisible(new Rectangle(0, 10000, 1, 1));
-    }
-
-    /**
-     * _more_
-     *
-     * @param jython _more_
-     */
-    private void eval(String jython) {
-        Misc.run(this, "evalInThread", jython);
-    }
 
     /**
      * _more_
      *
      * @param jython _more_
      */
-    public void evalInThread(String jython) {
+    public void eval(String jython) {
         try {
-            String html = StringUtil.replace(jython.trim(), "\n", "<br>");
-            html = StringUtil.replace(html, " ", "&nbsp;");
-            html = StringUtil.replace(html, "\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
-            output("<div style=\"margin:0; margin-bottom:1; background-color:#cccccc; \">"
-                   + html + "</div>");
-            interp.exec(jython);
+            super.eval(jython);
+            getInterpreter().exec(jython);
         } catch (PyException pse) {
             output("<font color=\"red\">Error: " + pse.toString()
                    + "</font><br>");
