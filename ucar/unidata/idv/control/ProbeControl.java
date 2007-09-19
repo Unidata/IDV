@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -214,6 +215,7 @@ public class ProbeControl extends DisplayControlImpl {
     /** initial probe position */
     private RealTuple initPosition;
 
+    /** initial location */
     private EarthLocation initLocation;
 
     /** the time data holder */
@@ -318,7 +320,7 @@ public class ProbeControl extends DisplayControlImpl {
         if (initPosition != null) {
             probe.setPosition(initPosition);
         }
-        if(initLocation !=null) {
+        if (initLocation != null) {
             setEarthLocation(initLocation);
         }
         addDisplayable(probe, FLAG_COLOR);
@@ -340,7 +342,7 @@ public class ProbeControl extends DisplayControlImpl {
     public void initDone() {
         try {
             super.initDone();
-            if (initPosition == null && initLocation == null) {
+            if ((initPosition == null) && (initLocation == null)) {
                 double[] screenCenter = getScreenCenter();
                 probe.setPosition(
                     new RealTuple(
@@ -443,9 +445,14 @@ public class ProbeControl extends DisplayControlImpl {
     }
 
 
-    public void setEarthLocation(EarthLocation  el) {
+    /**
+     * Set the earth location
+     *
+     * @param el  the earth location
+     */
+    public void setEarthLocation(EarthLocation el) {
         try {
-            if(probe == null) {
+            if (probe == null) {
                 initLocation = el;
                 return;
             }
@@ -459,18 +466,20 @@ public class ProbeControl extends DisplayControlImpl {
 
 
     /**
-     * _more_
+     * Add display settings for this control
+     *
+     * @param dsd  dialog to add to
      */
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         try {
-            dsd.addPropertyValue(new Boolean(getChart().getShowThumb()), "showThumbNail",
-                                 "Show Thumbnail", "Probe");
+            dsd.addPropertyValue(new Boolean(getChart().getShowThumb()),
+                                 "showThumbNail", "Show Thumbnail", "Probe");
 
-            dsd.addPropertyValue(getEarthLocationFromWidget(), "earthLocation",
-                                 "Probe Position", "Probe");
+            dsd.addPropertyValue(getEarthLocationFromWidget(),
+                                 "earthLocation", "Probe Position", "Probe");
 
-            dsd.addPropertyValue(getInfos(), "infos",
-                                 "Probe parameters", "Probe");
+            dsd.addPropertyValue(getInfos(), "infos", "Probe parameters",
+                                 "Probe");
 
         } catch (Exception exc) {
             logException("Error getting location", exc);
@@ -480,24 +489,40 @@ public class ProbeControl extends DisplayControlImpl {
 
 
 
-    private EarthLocation getEarthLocationFromWidget() throws VisADException, RemoteException {
-        double   lat = latLonWidget.getLat();
-        double   lon = latLonWidget.getLon();
-        double   alt = latLonWidget.getAlt();
+    /**
+     * Get earth location from the lat/lon widget
+     *
+     * @return the earth location
+     *
+     * @throws RemoteException  problem getting remote data
+     * @throws VisADException   problem getting local data
+     */
+    private EarthLocation getEarthLocationFromWidget()
+            throws VisADException, RemoteException {
+        double lat = latLonWidget.getLat();
+        double lon = latLonWidget.getLon();
+        double alt = latLonWidget.getAlt();
         return makeEarthLocation(lat, lon, alt);
     }
 
+    /**
+     * Update the lat/lon widget with the specified earth location
+     *
+     * @param elt the new earth location
+     */
     private void updateLatLonWidget(EarthLocation elt) {
-        if(latLonWidget == null) return;
+        if (latLonWidget == null) {
+            return;
+        }
         LatLonPoint llp = elt.getLatLonPoint();
         latLonWidget.setLat(
-                            getDisplayConventions().formatLatLon(
-                                                                 llp.getLatitude().getValue()));
+            getDisplayConventions().formatLatLon(
+                llp.getLatitude().getValue()));
         latLonWidget.setLon(
-                            getDisplayConventions().formatLatLon(
-                                                                 llp.getLongitude().getValue()));
+            getDisplayConventions().formatLatLon(
+                llp.getLongitude().getValue()));
         latLonWidget.setAlt(
-                            getDisplayConventions().formatAltitude(elt.getAltitude()));
+            getDisplayConventions().formatAltitude(elt.getAltitude()));
     }
 
 
@@ -530,7 +555,9 @@ public class ProbeControl extends DisplayControlImpl {
      */
     public void resetProbePosition(double lat, double lon, double alt) {
         try {
-            if(probe == null) return;
+            if (probe == null) {
+                return;
+            }
             probe.setPosition(
                 new RealTuple(
                     RealTupleType.SpatialCartesian3DTuple, new double[] { lat,
@@ -826,6 +853,25 @@ public class ProbeControl extends DisplayControlImpl {
         }
         return GuiUtils.vbox(parentComp, sideLegendReadout,
                              getChart().getThumb());
+    }
+
+    /**
+     * Append any label information to the list of labels.
+     *
+     * @param labels   in/out list of labels
+     * @param legendType The type of legend, BOTTOM_LEGEND or SIDE_LEGEND
+     */
+    public void getLegendLabels(List labels, int legendType) {
+        super.getLegendLabels(labels, legendType);
+        try {
+            EarthLocationTuple elt = getProbeLocation();
+            if (elt != null) {
+                labels.add(
+                    "Position: "
+                    + getDisplayConventions().formatLatLonShort(
+                        elt.getLatLonPoint()));
+            }
+        } catch (Exception e) {}
     }
 
 
@@ -1359,10 +1405,19 @@ public class ProbeControl extends DisplayControlImpl {
 
 
 
+    /**
+     * Popup the data dialog; override superclass to allow multiple
+     * selections.
+     *
+     * @param dialogMessage the dialog message
+     * @param from   component to latch on to
+     * @param multiples  true to support multiple selections
+     * @param categories  data categories of params to show
+     */
     protected void popupDataDialog(final String dialogMessage,
                                    Component from, boolean multiples,
                                    List categories) {
-        super.popupDataDialog(dialogMessage,from,true, categories);
+        super.popupDataDialog(dialogMessage, from, true, categories);
     }
 
 
@@ -1565,6 +1620,9 @@ public class ProbeControl extends DisplayControlImpl {
      *  This is a wrapper around updatePosition, catching any exceptions.
      */
     private void doMoveProbe() {
+        if ( !getHaveInitialized()) {
+            return;
+        }
         try {
             updatePosition();
         } catch (Exception exc) {
@@ -1644,7 +1702,7 @@ public class ProbeControl extends DisplayControlImpl {
         // set location label
         if ((llp != null) && (locationLabel != null)) {
             locationLabel.setText(positionText =
-                getDisplayConventions().formatEarthLocation(elt, true));
+                getDisplayConventions().formatEarthLocation(elt, false));
 
         }
 
@@ -1839,6 +1897,19 @@ public class ProbeControl extends DisplayControlImpl {
         updateLegendLabel();
     }
 
+
+    /**
+     * This method is called  to update the legend labels when
+     * some state has changed in this control that is reflected in the labels.
+     */
+    protected void updateLegendLabel() {
+        super.updateLegendLabel();
+        // if the display label has the position, we'll update the list also
+        String template = getDisplayListTemplate();
+        if (template.contains(MACRO_POSITION)) {
+            updateDisplayList();
+        }
+    }
 
     /**
      * Create and initialize a new ProbeRowInfo if needed. Return it.
@@ -2571,18 +2642,20 @@ public class ProbeControl extends DisplayControlImpl {
      */
     public void setShowTableInLegend(boolean value) {
         showTableInLegend = value;
-        updateLegendLabel();
+        if (sideLegendReadout != null) {
+            sideLegendReadout.setVisible(value);
+        }
+        doMoveProbe();
     }
 
     /**
      *  Get the ShowTableInLegend property.
      *
      *  @return The ShowTableInLegend
-     */ 
-   public boolean getShowTableInLegend() {
+     */
+    public boolean getShowTableInLegend() {
         return showTableInLegend;
     }
-
 
 }
 

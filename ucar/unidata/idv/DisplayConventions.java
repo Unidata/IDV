@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
@@ -187,6 +188,25 @@ public class DisplayConventions extends IdvManager {
 
 
     /**
+     * Format a LatLonPoint as a lat/lon string.
+     *
+     * @param llp  LatLonPoint to format
+     * @return The formatted lat/lon
+     */
+    public String formatLatLonShort(LatLonPoint llp) {
+        StringBuffer buf = new StringBuffer();
+        try {
+            buf.append(formatLatLon(llp.getLatitude().getValue()));
+            buf.append("/");
+            buf.append(formatLatLon(llp.getLongitude().getValue()));
+        } catch (Exception e) {
+            return "";
+        }
+        return buf.toString();
+    }
+
+
+    /**
      * Format a EarthLocation as a lat/lon/(alt) string.
      *
      * @param el  EarthLocation to format
@@ -196,9 +216,7 @@ public class DisplayConventions extends IdvManager {
         StringBuffer buf = new StringBuffer();
         try {
             LatLonPoint llp = el.getLatLonPoint();
-            buf.append(formatLatLon(llp.getLatitude().getValue()));
-            buf.append("/");
-            buf.append(formatLatLon(llp.getLongitude().getValue()));
+            buf.append(formatLatLonShort(llp));
             buf.append(" ");
             buf.append(formatDistance(el.getAltitude().getValue()));
         } catch (Exception e) {
