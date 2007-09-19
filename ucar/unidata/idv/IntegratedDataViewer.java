@@ -1429,6 +1429,11 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
 
 
 
+    public boolean handleAction(String action) {
+        return handleAction(action, null);
+    }
+
+
     /**
      *  This method  tries to handle the given action. The action may be
      *  a normal gui action (e.g., jython: or help:) or it may be a
