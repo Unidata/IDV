@@ -259,7 +259,7 @@ public class InteractiveShell implements HyperlinkListener {
      *
      * @param t _more_
      */
-    public void appendText(String t) {
+    public void insertText(String t) {
         GuiUtils.insertText(getCommandFld(), t);
     }
 
@@ -396,6 +396,7 @@ public class InteractiveShell implements HyperlinkListener {
                + encoded
                + "\"><img alt=\"Reload\" src=\"idvresource:/auxdata/ui/icons/Refresh16.gif\" border=0></a></td></tr></table></div>");
     }
+
 
     /**
      * _more_
