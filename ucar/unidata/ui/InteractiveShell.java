@@ -89,7 +89,9 @@ public class InteractiveShell implements  HyperlinkListener {
     /** _more_ */
     protected int historyIdx = -1;
 
+    private String title;
 
+    protected JComponent contents;
 
 
     /**
@@ -97,16 +99,23 @@ public class InteractiveShell implements  HyperlinkListener {
      *
      */
     public InteractiveShell(String title) {
-        frame    = new JFrame(title);
+        this.title = title;
     }
 
-    protected void init() {
-        JComponent contents = doMakeContents();
+    protected void makeFrame() {
+        frame    = new JFrame(title);
         frame.getContentPane().add(contents);
         frame.pack();
         frame.setLocation(100, 100);
         frame.setVisible(true);
     }
+
+    protected void init() {
+        contents = doMakeContents();
+        makeFrame();
+    }
+
+
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() != HyperlinkEvent.EventType.ACTIVATED) {
             return;
