@@ -22,19 +22,20 @@
 
 
 
+
 package ucar.unidata.ui;
 
 
 import org.python.core.*;
 import org.python.util.*;
 
-
-import ucar.unidata.xml.XmlUtil;
-
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+
+
+import ucar.unidata.xml.XmlUtil;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -60,7 +61,7 @@ import javax.swing.text.*;
  * @author IDV development team
  * @version $Revision: 1.50 $Date: 2007/08/21 12:15:45 $
  */
-public class InteractiveShell implements  HyperlinkListener {
+public class InteractiveShell implements HyperlinkListener {
 
     /** _more_ */
     protected JFrame frame;
@@ -89,33 +90,48 @@ public class InteractiveShell implements  HyperlinkListener {
     /** _more_ */
     protected int historyIdx = -1;
 
+    /** _more_          */
     private String title;
 
+    /** _more_          */
     protected JComponent contents;
 
 
     /**
      * _more_
      *
+     *
+     * @param title _more_
      */
     public InteractiveShell(String title) {
         this.title = title;
     }
 
+    /**
+     * _more_
+     */
     protected void makeFrame() {
-        frame    = new JFrame(title);
+        frame = new JFrame(title);
         frame.getContentPane().add(contents);
         frame.pack();
         frame.setLocation(100, 100);
         frame.setVisible(true);
     }
 
+    /**
+     * _more_
+     */
     protected void init() {
         contents = doMakeContents();
         makeFrame();
     }
 
 
+    /**
+     * _more_
+     *
+     * @param e _more_
+     */
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() != HyperlinkEvent.EventType.ACTIVATED) {
             return;
@@ -127,10 +143,15 @@ public class InteractiveShell implements  HyperlinkListener {
             url = e.getURL().toString();
         }
         url = new String(XmlUtil.decodeBase64(url));
-        Misc.run(this,"eval",url);
+        Misc.run(this, "eval", url);
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected JComponent doMakeContents() {
         editorPane = new JEditorPane();
         editorPane.setEditable(false);
@@ -153,7 +174,7 @@ public class InteractiveShell implements  HyperlinkListener {
         commandFld.addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    handleRightMouseClick(commandFld,e);
+                    handleRightMouseClick(commandFld, e);
                 }
             }
         });
@@ -169,7 +190,7 @@ public class InteractiveShell implements  HyperlinkListener {
         commandArea.addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    handleRightMouseClick(commandArea,e);
+                    handleRightMouseClick(commandArea, e);
                 }
             }
         });
@@ -185,16 +206,28 @@ public class InteractiveShell implements  HyperlinkListener {
         JComponent contents = GuiUtils.centerBottom(scroller, bottom);
         contents = GuiUtils.inset(contents, 5);
 
-        JMenuBar menuBar =         doMakeMenuBar();
-        if(menuBar!=null) {
+        JMenuBar menuBar = doMakeMenuBar();
+        if (menuBar != null) {
             contents = GuiUtils.topCenter(menuBar, contents);
         }
         return contents;
     }
 
-    protected void  handleRightMouseClick(JTextComponent commandFld,MouseEvent e) {}
+    /**
+     * _more_
+     *
+     * @param commandFld _more_
+     * @param e _more_
+     */
+    protected void handleRightMouseClick(JTextComponent commandFld,
+                                         MouseEvent e) {}
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected JMenuBar doMakeMenuBar() {
         return null;
     }
@@ -334,7 +367,7 @@ public class InteractiveShell implements  HyperlinkListener {
         cmdFld.setText("");
         history.add(cmd);
         historyIdx = -1;
-        Misc.run(this,"eval",cmd);
+        Misc.run(this, "eval", cmd);
     }
 
     /**
@@ -358,9 +391,19 @@ public class InteractiveShell implements  HyperlinkListener {
     public void eval(String code) {
         String encoded = new String(XmlUtil.encodeBase64(code.getBytes()));
         output("<div style=\"margin:0; margin-bottom:1; background-color:#cccccc; \"><table width=\"100%\"><tr><td>"
-               + formatCode(code) + "</td><td align=\"right\" valign=\"top\"><a href=\"" + encoded +"\"><img alt=\"Reload\" src=\"idvresource:/auxdata/ui/icons/Refresh16.gif\" border=0></a></td></tr></table></div>");
+               + formatCode(code)
+               + "</td><td align=\"right\" valign=\"top\"><a href=\""
+               + encoded
+               + "\"><img alt=\"Reload\" src=\"idvresource:/auxdata/ui/icons/Refresh16.gif\" border=0></a></td></tr></table></div>");
     }
 
+    /**
+     * _more_
+     *
+     * @param code _more_
+     *
+     * @return _more_
+     */
     protected String formatCode(String code) {
         return code;
     }
