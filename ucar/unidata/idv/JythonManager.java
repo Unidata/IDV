@@ -601,7 +601,7 @@ public class JythonManager extends IdvManager implements ActionListener {
                                             String text)
             throws VisADException {
         final LibHolder[] holderArray  = { null };
-        JPythonEditor     jythonEditor = new JPythonEditor() {
+        final JPythonEditor     jythonEditor = new JPythonEditor() {
             public void undoableEditHappened(UndoableEditEvent e) {
                 if (holderArray[0] != null) {
                     holderArray[0].saveBtn.setEnabled(true);
@@ -609,6 +609,22 @@ public class JythonManager extends IdvManager implements ActionListener {
                 super.undoableEditHappened(e);
             }
         };
+
+        jythonEditor.getTextComponent().addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    List items = new ArrayList();
+                    items.add(GuiUtils.makeMenu("Insert Procedure Call",
+                                                makeProcedureMenu(jythonEditor, "insertText",null)));
+
+                    items.add(GuiUtils.makeMenu("Insert Idv Action",getIdv().getIdvUIManager().makeActionMenu(jythonEditor,"insertText",true)));
+                   
+                    JPopupMenu popup =  GuiUtils.makePopupMenu(items);
+                    popup.show(jythonEditor, e.getX(),e.getY());
+                }
+            }});
+
+
         jythonEditor.setPreferredSize(new Dimension(400, 300));
         JComponent wrapper     = GuiUtils.center(jythonEditor);
         JComponent tabContents = GuiUtils.center(wrapper);
