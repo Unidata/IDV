@@ -90,6 +90,17 @@ public class JythonShell extends InteractiveShell {
         createInterpreter();
         //Create the gui
         init();
+    }
+
+    /**
+     * This gets called by the base class to make the frame.
+     * If you don't want this to popup then make this method a noop
+     * You can access the GUI contents with the member contents
+     *
+     * @param contents
+     */
+    protected void makeFrame() {
+        super.makeFrame();
         //When the window closes remove the interpreter
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -99,6 +110,8 @@ public class JythonShell extends InteractiveShell {
             }
         });
     }
+
+
 
     private PythonInterpreter getInterpreter() {
         if(interp==null) {
