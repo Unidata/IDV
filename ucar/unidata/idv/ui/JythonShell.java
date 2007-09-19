@@ -22,9 +22,6 @@
 
 
 
-
-
-
 package ucar.unidata.idv.ui;
 
 
@@ -151,15 +148,23 @@ public class JythonShell extends InteractiveShell {
           */
         t = null;
 
-        JPopupMenu popup = GuiUtils.makePopupMenu(
-                               idv.getJythonManager().makeProcedureMenu(
-                                   this, "appendText", t));
+        List items = new ArrayList();
+        items.add(GuiUtils.makeMenu("Insert Display Type", getDisplayMenuItems()));
+        items.add(GuiUtils.makeMenu("Insert Procedure Call",idv.getJythonManager().makeProcedureMenu(
+                                                                                                      this, "insertText", t)));
+
+        items.add(GuiUtils.makeMenu("Insert Idv Action",idv.getIdvUIManager().makeActionMenu(this,"insertText",true)));
+
+        JPopupMenu popup = GuiUtils.makePopupMenu(items);
         if (popup != null) {
             popup.show(cmdFld, 0, (int) cmdFld.getBounds().getHeight());
         }
-
     }
 
+
+    public void insertAction(String action) {
+        insertText("idv.handleAction('action:" + action +"')");
+    }
 
     /**
      * _more_
@@ -263,6 +268,18 @@ public class JythonShell extends InteractiveShell {
 
 
         items = new ArrayList();
+        items.add(GuiUtils.makeMenuItem("Clear", this, "clear"));
+        items.add(GuiUtils.makeMenu("Insert Display Type", getDisplayMenuItems()));
+        menuBar.add(GuiUtils.makeMenu("Edit", items));
+
+        items = new ArrayList();
+        items.add(GuiUtils.makeMenuItem("Help", this, "showHelp"));
+        menuBar.add(GuiUtils.makeMenu("Help", items));
+        return menuBar;
+    }
+
+
+    protected List getDisplayMenuItems() {
         List      displayMenuItems = new ArrayList();
         List      cds              = idv.getControlDescriptors();
         Hashtable catMenus         = new Hashtable();
@@ -277,17 +294,7 @@ public class JythonShell extends InteractiveShell {
             catMenu.add(GuiUtils.makeMenuItem(cd.getDescription(), this,
                     "insert", "'" + cd.getControlId() + "'"));
         }
-
-
-        items.add(GuiUtils.makeMenuItem("Clear", this, "clear"));
-        items.add(GuiUtils.makeMenu("Insert Display Id", displayMenuItems));
-        menuBar.add(GuiUtils.makeMenu("Edit", items));
-
-
-        items = new ArrayList();
-        items.add(GuiUtils.makeMenuItem("Help", this, "showHelp"));
-        menuBar.add(GuiUtils.makeMenu("Help", items));
-        return menuBar;
+        return displayMenuItems;
     }
 
 

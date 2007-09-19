@@ -154,6 +154,8 @@ public class IdvUIManager extends IdvManager {
     /** Xml attribute name for the  description in the actions resource */
     public static final String ATTR_DESCRIPTION = "description";
 
+    public static final String ATTR_GROUP = "group";
+
     /** Xml attribute name for the  action in the actions resource */
     public static final String ATTR_ACTION = "action";
 
@@ -326,6 +328,10 @@ public class IdvUIManager extends IdvManager {
 
     /** Maps aciton id to xml element */
     private Hashtable actionMap;
+
+
+    private List actionGroupList = new ArrayList();
+    private Hashtable actionGroupMap = new Hashtable();
 
     /** List of all action ids */
     private List actionList;
@@ -895,11 +901,42 @@ public class IdvUIManager extends IdvManager {
                                          ATTR_ID);
                 actionMap.put(id, actionNode);
                 actionList.add(id);
+                String group = XmlUtil.getAttribute(actionNode, ATTR_GROUP,"General");
+                List groupList = (List)actionGroupMap.get(group);
+                if(groupList == null) {
+                    groupList = new ArrayList();
+                    actionGroupMap.put(group, groupList);                                        
+                    actionGroupList.add(group);                    
+                }
+                groupList.add(actionNode);
                 //                System.out.println("<li><b>" + id +"</b><br>" + XmlUtil.getAttribute(actionNode, ATTR_DESCRIPTION));
             }
-
         }
     }
+
+
+    public List makeActionMenu(Object object, String method, boolean makeCall) {
+        List items = new ArrayList();
+        for(int groupIdx=0;groupIdx<actionGroupList.size();groupIdx++) {
+            String group = (String) actionGroupList.get(groupIdx);
+            List l = (List) actionGroupMap.get(group);
+            List subItems = new ArrayList();
+            for(int actionIdx=0;actionIdx<l.size();actionIdx++) {
+                Element node = (Element) l.get(actionIdx);
+                String desc = XmlUtil.getAttribute(node,ATTR_DESCRIPTION, (String) null);
+                if(desc!=null) {
+                    String action = XmlUtil.getAttribute(node, ATTR_ID);
+                    if(makeCall) {
+                        action =   "idv.handleAction('action:" + action +"')";
+                    }
+                    subItems.add(GuiUtils.makeMenuItem(desc, object, method,action));
+                }
+            }
+            items.add(GuiUtils.makeMenu(group, subItems));
+        }
+        return items;
+    }
+
 
     /**
      * Is the given id an action. Does it start with action:

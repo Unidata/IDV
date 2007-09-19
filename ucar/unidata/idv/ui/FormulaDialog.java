@@ -301,10 +301,12 @@ public class FormulaDialog extends JFrame implements ActionListener {
         formulaField.addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    JPopupMenu popup =
-                        GuiUtils.makePopupMenu(
-                            idv.getJythonManager().makeProcedureMenu(
-                                FormulaDialog.this, "appendText", null));
+                    List items = new ArrayList();
+                    items.add(GuiUtils.makeMenu("Insert Procedure Call",idv.getJythonManager().makeProcedureMenu(
+                                                                                                                 FormulaDialog.this, "insertText",null)));
+
+                   
+                    JPopupMenu popup =  GuiUtils.makePopupMenu(items);
                     popup.show(formulaField, e.getX(),
                                (int) formulaField.getBounds().getHeight());
                 }
@@ -639,7 +641,7 @@ public class FormulaDialog extends JFrame implements ActionListener {
      *
      * @param t _more_
      */
-    public void appendText(String t) {
+    public void insertText(String t) {
         GuiUtils.insertText(formulaField, t);
     }
 
