@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -86,7 +87,7 @@ public class JythonShell extends InteractiveShell {
      */
     public JythonShell(IntegratedDataViewer theIdv) {
         super("Jython Shell");
-        this.idv   = theIdv;
+        this.idv = theIdv;
         createInterpreter();
         //Create the gui
         init();
@@ -104,7 +105,7 @@ public class JythonShell extends InteractiveShell {
         //When the window closes remove the interpreter
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                if(interp!=null) {
+                if (interp != null) {
                     idv.getJythonManager().removeInterpreter(interp);
                 }
             }
@@ -113,8 +114,13 @@ public class JythonShell extends InteractiveShell {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private PythonInterpreter getInterpreter() {
-        if(interp==null) {
+        if (interp == null) {
             createInterpreter();
         }
         return interp;
@@ -162,7 +168,7 @@ public class JythonShell extends InteractiveShell {
      * @param cmdFld _more_
      */
     protected void handleKeyPress(KeyEvent e, JTextComponent cmdFld) {
-        super.handleKeyPress(e,cmdFld);
+        super.handleKeyPress(e, cmdFld);
         if ((e.getKeyCode() == e.VK_M) && e.isControlDown()) {
             showProcedurePopup(cmdFld);
             return;
@@ -243,8 +249,13 @@ public class JythonShell extends InteractiveShell {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected JMenuBar doMakeMenuBar() {
-        JMenuBar menuBar  = new JMenuBar();
+        JMenuBar menuBar = new JMenuBar();
         List     items   = new ArrayList();
         items.add(GuiUtils.makeMenuItem("Export Commands", this,
                                         "exportHistory"));
@@ -281,11 +292,25 @@ public class JythonShell extends InteractiveShell {
 
 
 
-    protected void  handleRightMouseClick(JTextComponent commandFld,MouseEvent e) {
+    /**
+     * _more_
+     *
+     * @param commandFld _more_
+     * @param e _more_
+     */
+    protected void handleRightMouseClick(JTextComponent commandFld,
+                                         MouseEvent e) {
         showProcedurePopup(commandFld);
-    }    
+    }
 
 
+    /**
+     * _more_
+     *
+     * @param code _more_
+     *
+     * @return _more_
+     */
     protected String formatCode(String code) {
         String html = StringUtil.replace(code.trim(), "\n", "<br>");
         html = StringUtil.replace(html, " ", "&nbsp;");
