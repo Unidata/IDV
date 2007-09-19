@@ -97,6 +97,7 @@ import java.util.Vector;
 
 
 import javax.swing.*;
+import javax.swing.text.*;
 import javax.swing.event.*;
 
 
@@ -613,7 +614,23 @@ public class JythonManager extends IdvManager implements ActionListener {
         jythonEditor.getTextComponent().addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
+                    JTextComponent comp = jythonEditor.getTextComponent();
                     List items = new ArrayList();
+                    String selected = comp.getSelectedText();
+                    if(selected!= null && selected.trim().length()>0) {
+                        selected = selected.trim();
+                        List funcs = findJythonMethods(true, Misc.newList(holderArray[0]));
+                        for(int i=0;i<funcs.size();i++) {
+                            PyFunction func = (PyFunction) funcs.get(i);
+                            if(func.__name__.equals(selected)) {
+                                items.add(GuiUtils.makeMenuItem("Make formula for " + selected,
+                                                                JythonManager.this,
+                                                                "makeFormula", func));
+                                break;
+                            }
+                        }
+
+                    }
                     items.add(GuiUtils.makeMenu("Insert Procedure Call",
                                                 makeProcedureMenu(jythonEditor, "insertText",null)));
 
@@ -623,7 +640,6 @@ public class JythonManager extends IdvManager implements ActionListener {
                     popup.show(jythonEditor, e.getX(),e.getY());
                 }
             }});
-
 
         jythonEditor.setPreferredSize(new Dimension(400, 300));
         JComponent wrapper     = GuiUtils.center(jythonEditor);
@@ -649,6 +665,35 @@ public class JythonManager extends IdvManager implements ActionListener {
         return libHolder;
     }
 
+
+    public void makeFormula(PyFunction func) {
+        String name =   func.__name__;
+        DerivedDataDescriptor ddd = null;
+        for (int dddIdx = 0; dddIdx < descriptors.size(); dddIdx++) {
+            DerivedDataDescriptor tmp =
+                (DerivedDataDescriptor) descriptors.get(dddIdx);
+            if(tmp.getId().equals(name)) {
+                ddd = tmp;
+                break;
+            }
+        }
+
+        if(ddd!=null) {
+            if(!GuiUtils.askOkCancel("Formula Exists", "<html>A formula with the name: " + name + " already exists.</br>Do you want to edit it?</html>")) {
+
+                return;
+            }
+        }
+
+
+        if(ddd==null) {
+            ddd = new DerivedDataDescriptor(getIdv(),
+                                            name,"",
+                                            makeCallString(func, null),
+                                            new ArrayList());
+        }
+        new FormulaDialog(getIdv(), ddd, null, new ArrayList());
+    }
 
     /**
      * _more_
@@ -1966,7 +2011,6 @@ public class JythonManager extends IdvManager implements ActionListener {
                 continue;
             }
             PyStringMap seq   = (PyStringMap) interpreter.getLocals();
-            PyList      keys  = seq.keys();
             PyList      items = seq.items();
             List        funcs = new ArrayList();
             for (int itemIdx = 0; itemIdx < items.__len__(); itemIdx++) {
@@ -2023,8 +2067,12 @@ public class JythonManager extends IdvManager implements ActionListener {
      * @return A list of Object arrays. First element in array is the name of the lib. Second is the list of PyFunction-s
      */
     public List findJythonMethods(boolean justList) {
+        return  findJythonMethods(justList, getLibHolders());
+    }
+
+
+    public List findJythonMethods(boolean justList, List holders) {
         List result = new ArrayList();
-        List holders   = getLibHolders();
         if(holders == null) return result;
         for (int i = 0; i < holders.size(); i++) {
             List subItems = new ArrayList();

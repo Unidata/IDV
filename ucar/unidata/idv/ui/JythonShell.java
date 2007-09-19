@@ -162,6 +162,28 @@ public class JythonShell extends InteractiveShell {
     }
 
 
+    public void listVars() {
+        PyStringMap seq   = (PyStringMap) getInterpreter().getLocals();
+        PyList      items = seq.items();
+        StringBuffer sb = new StringBuffer("Variables:<br>");
+        for (int itemIdx = 0; itemIdx < items.__len__(); itemIdx++) {
+            PyTuple pair = (PyTuple) items.__finditem__(itemIdx);
+            Object obj = pair.__finditem__(1);
+            String name = pair.__finditem__(0).toString();
+            if (obj instanceof PyFunction || 
+                obj instanceof PyReflectedFunction || 
+                obj instanceof PyJavaClass || 
+                obj instanceof PyJavaPackage || 
+                obj instanceof PySystemState || 
+                obj instanceof PyJavaPackage || name.startsWith("__") || name.equals("JyVars")) {
+                continue;
+            }
+            sb.append ("&nbsp;&nbsp;&nbsp;" + name+"<br>");
+        }
+        output(sb.toString());
+    }
+
+
     public void insertAction(String action) {
         insertText("idv.handleAction('action:" + action +"')");
     }
