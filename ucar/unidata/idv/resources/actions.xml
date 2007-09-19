@@ -4,145 +4,175 @@
      id="new.datachooser"
      image="/auxdata/ui/icons/DataChooser16.gif"
      description="Show data chooser window"
+     group="User Interface"
      action="jython:idv.showChooser();"/>
   <action
      id="new.dataselector"
      image="/auxdata/ui/icons/Paste16.gif"
      description="New field selector window"
+     group="User Interface"
      action="jython:idv.createDataSelector();"/>
   <action
      id="show.dataselector"
      image="/auxdata/ui/icons/Paste16.gif"
      description="Show field selector window"
+     group="User Interface"
      action="jython:idv.getIdvUIManager().showOrCreateDataSelector();"/>
   <action
      id="show.dashboard"
      image="/auxdata/ui/icons/Home16.gif"
      description="Show dashboard"
+     group="User Interface"
      action="jython:idv.getIdvUIManager().showDashboard();"/>
   <action
      id="ui.closewindow"
      description="Close Window"
+     group="User Interface"
      action="jython:idv.closeCurrentWindow();"/>
   <action
      id="new.displaywindow"
      image="/auxdata/ui/icons/New16.gif"
      description="New view window"
+     group="User Interface"
      action="jython:idv.getIdvUIManager().createNewWindow ();"/>
   <action
      id="bundle.open"
      image="/auxdata/ui/icons/Open16.gif"
      description="Open a bundle"
+     group="Bundles"
      action="jython:idv.doOpen();"/>
   <action
      id="bundle.save"
      image="/auxdata/ui/icons/Save16.gif"
      description="Save bundle"
+     group="Bundles"
      action="jython:idv.doSaveAs();"/>
   <action
      id="bundle.default.save"
      image="/auxdata/ui/icons/SaveAll16.gif"
      description="Save as default"
+     group="Bundles"
      action="jython:idv.doSaveAsDefault();"/>
   <action
      id="bundle.default.open"
      image="/auxdata/ui/icons/Refresh16.gif"
      description="Reload default bundle"
+     group="Bundles"
      action="jython:idv.doOpenDefault();"/>
   <action
      id="bundle.default.remove"
      description="Delete default bundle"
+     group="Bundles"
      action="jython:idv.doClearDefaults ();"/>
   <action
      id="bundle.favorite.save"
      image="/auxdata/ui/icons/SaveAs16.gif"
      description="Save as favorite bundle"
+     group="Bundles"
      action="jython:idv.getPersistenceManager().doSaveAsFavorite();"/>
   <action
      id="bundle.favorite.manage"
      image="/auxdata/ui/icons/Bookmarks16.gif"
      description="Manage favorites"
+     group="Bundles"
      action="jython:idv.getIdvUIManager().showBundleDialog();"/>
   <action
      id="plugins.install.file"
      image="/auxdata/ui/icons/Open16.gif"
      description="Install a plugin from a file"
+     group="Plugins"
      action="jython:idv.getPluginManager().installPluginFromFile();"/>
   <action
      id="plugins.install.url"
      image="/auxdata/ui/icons/Open16.gif"
      description="Install a plugin from a url"
+     group="Plugins"
      action="jython:idv.getPluginManager().installPluginFromUrl();"/>
   <action
      id="plugins.manage"
      image="/auxdata/ui/icons/Open16.gif"
      description="List plugins"
+     group="Plugins"
      action="jython:idv.getPluginManager().showPluginList();"/>
   <action
      id="plugins.create"
      image="/auxdata/ui/icons/New16.gif"
      description="Create plugin"
+     group="Plugins"
      action="jython:idv.getPluginManager().showCreatePlugin();"/>
   <action
      id="edit.preferences"
      image="/auxdata/ui/icons/EditPreferences16.gif"
      description="Edit user preferences"
+     group="General"
      action="jython:idv.showPreferenceManager();"/>
   <action
      id="edit.displaysettings"
      image="/auxdata/ui/icons/Settings16.png"
      description="Edit display settings"
+     group="General"
      action="jython:idv.getIdvUIManager().editDisplaySettings();"/>
   <action
      id="jython.shell"
      image="/auxdata/ui/icons/EditFormulas16.gif"
      description="Show Jython Shell"
+     group="Jython"
      action="jython:idv.getJythonManager().createShell()"/>
 
   <action
      id="edit.formula.create"
      image="/auxdata/ui/icons/EditFormulas16.gif"
      description="Create formula"
+     group="Jython"
      action="jython:idv.getJythonManager().showFormulaDialog()"/>
   <action
      id="edit.formula.import"
      image="/auxdata/ui/icons/EditFormulas16.gif"
      description="Import formula"
+     group="Jython"
      action="jython:idv.getJythonManager().importFormulas()"/>
   <action
      id="edit.formula.export"
      image="/auxdata/ui/icons/EditFormulas16.png"
      description="Export formula"
+     group="Jython"
      action="jython:idv.getJythonManager().exportFormulas()"/>
   <action
      id="edit.jython"
      image="/auxdata/ui/icons/EditJython16.png"
      description="Edit Jython library"
+     group="Jython"
      action="jython:idv.getJythonManager().showJythonEditor()"/>
   <action
      id="edit.colortables"
      image="/auxdata/ui/icons/EditColorTables16.gif"
      description="Edit color tables"
+     group="Tools"
      action="jython:idv.showColorTableEditor();"/>
   <action
      id="edit.stationmodels"
      description="Edit station models"
+     group="Tools"
      action="jython:idv.showStationModelEditor();"/>
   <action
      id="edit.paramaliases"
      description="Edit parameter aliases"
+     group="Tools"
      action="jython:idv.showAliasEditor ();"/>
   <action
      id="edit.projections"
      description="Edit projections"
+     group="Tools"
      action="jython:idv.showIdvProjectionManager ();"/>
   <action
      id="edit.paramdefaults"
      description="Edit parameter defaults"
+     group="Tools"
      action="jython:idv.showDefaultsEditor ();"/>
   <action
      id="edit.paramgroups"
      description="Edit parameter groups"
+     group="Tools"
      action="jython:idv.showParamGroupsEditor ();"/>
   <action
      id="edit.autodisplays"
@@ -151,41 +181,49 @@
   <action
      id="edit.views.delete"
      description="Delete Saved Views"
+     group="General"
      action="jython:idv.getJythonManager().showFormulaDialog ();"/>
   <action
      id="edit.removedisplays"
      image="/auxdata/ui/icons/Erase16.gif"
      description="Remove all displays"
+     group="Displays and Data"
      action="jython:idv.removeAllDisplays ();"/>
   <action
      id="edit.removedisplaysanddata"
      image="/auxdata/ui/icons/Cut16.gif"
      description="Remove all displays and data"
+     group="Displays and Data"
      action="jython:idv.removeAllDataSources ();idv.removeAllDisplays ();"/>
   <action
      id="view.reloadalldata"
      image="/auxdata/ui/icons/Refresh16.gif"
      description="Reload all data sources"
+     group="Displays and Data"
      action="jython:idv.reloadAllDataSources ();"/>
 
   <action
      id="edit.removedata"
      image="/auxdata/ui/icons/Cut16.gif"
      description="Remove all data sources"
+     group="Displays and Data"
      action="jython:idv.removeAllDataSources ();"/>
   <action
      id="exit"
      image="/auxdata/ui/icons/Cancel16.gif"
+     group="General"
      description="Exit"
      action="jython:idv.quit ();"/>
   <action
      id="idv.stopload"
      image="/auxdata/ui/icons/Exit16.gif"
      description="Stop current loads"
+     group="Displays and Data"
      action="jython:idv.waitLabelClicked();"/>
   <action
      id="capture.all"
      description="Capture All Images"
+     group="General"
      action="jython:idv.getVMManager().captureAll ();"/>
 
   <action
@@ -220,54 +258,65 @@
      id="help.introduction"
      image="/auxdata/ui/icons/Help16.gif"
      description="Show help"
+     group="Help"
      action="help:idv.introduction"/>
   <action
      id="help.showconsole"
      description="Show Console"
+     group="Help"
      action="jython:idv.showConsole ();"/>
   <action
      id="help.showhelptips"
      description="Show Help Tips"
+     group="Help"
      image="/auxdata/ui/icons/TipOfTheDay16.gif"
      action="jython:idv.getIdvUIManager().showHelpTips ();"/>
   <action
      id="help.showsupportform"
      image="/auxdata/ui/icons/SendMail16.gif"
+     group="Help"
      description="Submit support request"
      action="jython:idv.getIdvUIManager().showSupportForm();"/>
   <action
      id="help.showabout"
      image="/auxdata/ui/icons/About16.gif"
+     group="Help"
      description="About..."
      action="jython:idv.getIdvUIManager().about ();"/>
   <action
      id="display.curvedrawer"
      image="/auxdata/ui/icons/Pencil16.gif"
+     group="Special Displays"
      description="Create Drawing Control"
      action="jython:idv.doMakeControl('curvecontrol')"/>
   <action
      id="display.locationindicator"
      image="/auxdata/ui/icons/LocationIndicator16.gif"
+     group="Special Displays"
      description="Create Location Indicator"
      action="jython:idv.doMakeControl('locationindicatorcontrol')"/>
   <action
      id="display.backgroundimage"
      image="/auxdata/ui/icons/Earth16.gif"
+     group="Special Displays"
      description="Create Background Image"
      action="jython:idv.doMakeBackgroundImage()"/>
   <action
      id="display.textnote"
      image="/auxdata/ui/icons/Text16.gif"
+     group="Special Displays"
      description="Create Text Note"
      action="jython:idv.doMakeControl('notecontrol')"/>
   <action
      id="display.rangeandbearing"
      image="/auxdata/ui/icons/RangeAndBearing16.gif"
+     group="Special Displays"
      description="Create Range and Bearing"
      action="jython:idv.doMakeControl('rangeandbearing')"/>
   <action
      id="display.imagemovie"
      image="/auxdata/ui/icons/Movie.gif"
+     group="Special Displays"
      description="Create Image Movie Display"
      action="jython:idv.doMakeControl('imagemoviecontrol')"/>
 
