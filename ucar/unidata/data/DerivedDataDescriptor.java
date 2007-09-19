@@ -258,6 +258,21 @@ public class DerivedDataDescriptor {
      */
     public DerivedDataDescriptor() {}
 
+
+    public DerivedDataDescriptor(DataContext dataContext,
+                                 String id, String desc, String formula,
+                                 List categories) {
+        this.dataContext = dataContext;
+        myNeeds          = new ArrayList();
+        this.categories  = (categories!=null?new ArrayList(categories):new ArrayList());
+        this.id = id;
+        this.description = desc;
+        this.label = desc;
+        this.formula = formula;
+        isEndUser = true;
+    }
+
+
     /**
      * Constructor used for when we create an end-user formula
      *
