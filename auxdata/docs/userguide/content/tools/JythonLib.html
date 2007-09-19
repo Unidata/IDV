@@ -1,0 +1,90 @@
+
+[ug::head {Jython Library Documentation}]
+
+The IDV comes with a number of Jython libraries that provide a range of facilities.
+<h2> Module: grid</h2>
+ This is the doc for the grid module 
+<hr>
+<p><i>applyToRange(function, data):</i><p style="padding:0;margin-left:20;margin-top:0">
+</p><p><i>applyToRangeValues(function, data):</i><p style="padding:0;margin-left:20;margin-top:0">
+</p><p><i>averageOverTime(field, makeTimes):</i><p style="padding:0;margin-left:20;margin-top:0">
+Average the values in each time step
+If makeTimes is true (1) then we return a field mapping all of the times
+to the average. Else we just return the average</p><p><i>combineFields():</i><p style="padding:0;margin-left:20;margin-top:0">
+combine several fields together</p><p><i>extractLatitudeFromNWPGrid(fieldimpl):</i><p style="padding:0;margin-left:20;margin-top:0">
+Get the latitude coordinate grid from a 3D VisAD FieldImpl
+(a time series of one or more FlatFields);
+user must be sure input is a suitable FlatField.</p><p><i>extractPressureFromNWPGrid(fieldimpl):</i><p style="padding:0;margin-left:20;margin-top:0">
+Get the pressure coordinate grid from a VisAD FieldImpl
+(a time series of one or more FlatFields);
+user must be sure input is a suitable FlatField.</p><p><i>getAltitude(z):</i><p style="padding:0;margin-left:20;margin-top:0">
+Change units from geopotential meters to meters</p><p><i>getNthTimeGrid(fieldimpl, Nth):</i><p style="padding:0;margin-left:20;margin-top:0">
+Get the Nth grid in time series fieldimpl, a VisAD FieldImpl;
+user must be sure input is a suitable data field.
+returns a FlatField.
+Nth is an integer, >=0, <= max index of grid time series.</p><p><i>getSliceAtAltitude(fieldimpl, alt, unit):</i><p style="padding:0;margin-left:20;margin-top:0">
+Extract a 2D horizontal slice from a 3D grid at the given altitude
+level is a real number; if unit is supplied, it must
+be compatible with meters (ft, fathoms, etc)
+param fieldimpl is a VisAD FieldImpl which may have
+one or more time steps.</p><p><i>getSliceAtLevel(fieldimpl, level):</i><p style="padding:0;margin-left:20;margin-top:0">
+Extract a 2D horizontal slice from a 3D grid at "Level."
+level is a real number; must be appropriate for the grid.
+param fieldimpl is a VisAD FieldImpl which may have
+one or more time steps.</p><p><i>horizontalAdvection(param, u, v):</i><p style="padding:0;margin-left:20;margin-top:0">
+horizontal advection</p><p><i>horizontalDivergence(param, u, v):</i><p style="padding:0;margin-left:20;margin-top:0">
+horizontal flux divergence</p><p><i>layerDiff(grid, top, bottom):</i><p style="padding:0;margin-left:20;margin-top:0">
+Wrapper for calculating layer difference</p><p><i>make2D(slice):</i><p style="padding:0;margin-left:20;margin-top:0">
+Make a 2D slice from a 3D slice at a single level</p><p><i>makeFlowField(a, b, c):</i><p style="padding:0;margin-left:20;margin-top:0">
+@formulaid theid
+@description the description
+@param a multiple=true
+@group the group</p><p><i>makeTimeSequence(g):</i><p style="padding:0;margin-left:20;margin-top:0">
+Merge a set of single time grids/images into a time sequence</p><p><i>makeTrueVector(u, v):</i><p style="padding:0;margin-left:20;margin-top:0">
+true wind vectors</p><p><i>makeVector(a, b):</i><p style="padding:0;margin-left:20;margin-top:0">
+</p><p><i>newUnit(field, varname, unitname):</i><p style="padding:0;margin-left:20;margin-top:0">
+set the name and unit on a grid</p><p><i>resampleGrid(oldGrid, gridwithNewDomain):</i><p style="padding:0;margin-left:20;margin-top:0">
+display gridded data on a new domain</p><p><i>windShear(u, v, z, top, bottom):</i><p style="padding:0;margin-left:20;margin-top:0">
+calculate the wind shear between discrete layers<pre>
+shear = sqrt((u(top)-u(bottom))^2 + (v(top)-v(bottom))^2)/zdiff</pre></p><p><i>windShearVector(u, v, top, bottom):</i><p style="padding:0;margin-left:20;margin-top:0">
+calculate the u and v layer difference and return as vector</p>
+<h2> Module: image</h2>
+<hr>
+<p><i>combineRGB(red, green, blue):</i><p style="padding:0;margin-left:20;margin-top:0">
+combine 3 images as an RGB image</p><p><i>makeNavigatedImage(d, ulLat, ulLon, lrLat, lrLon):</i><p style="padding:0;margin-left:20;margin-top:0">
+This takes a image data object and a lat/lon bounding box
+and adds a lat/lon domain to the data. Use it in conjunction with a formula:
+makeNavigatedImage(image,user_ulLat,user_ulLon,user_lrLat,user_lrLon)</p>
+<h2> Module: misc</h2>
+<hr>
+<p><i>makeFloatArray(rows, cols, value):</i><p style="padding:0;margin-left:20;margin-top:0">
+A utility to make a 2 dimensional float array filled with the given value</p>
+<h2> Module: maps</h2>
+<hr>
+<p><i>averageFromMap(field, mapSets):</i><p style="padding:0;margin-left:20;margin-top:0">
+</p><p><i>averageRangeFromMap(range, timeStep, mapSets):</i><p style="padding:0;margin-left:20;margin-top:0">
+</p><p><i>filterMaps(mapSets, propName, operator, value):</i><p style="padding:0;margin-left:20;margin-top:0">
+</p><p><i>getMapProperty(polygon, propName):</i><p style="padding:0;margin-left:20;margin-top:0">
+Get the named property from the given mapData</p><p><i>getMapsWithProperty(mapSets, propName, value):</i><p style="padding:0;margin-left:20;margin-top:0">
+Return a new set of maps that have the given property value</p><p><i>make3DMap(map, topo):</i><p style="padding:0;margin-left:20;margin-top:0">
+Make a 3d map    map -  map line set - topo - topography dataset</p><p><i>makeFieldFromMapBounds(mapSets, length1, length2, fill, unit):</i><p style="padding:0;margin-left:20;margin-top:0">
+</p><p><i>subsetFromMap(field, mapSets, fillValue, inverse):</i><p style="padding:0;margin-left:20;margin-top:0">
+</p><p><i>subsetRangeFromMap(range, timeStep, mapSets, fillValue, inverse):</i><p style="padding:0;margin-left:20;margin-top:0">
+</p><p><i>subsetRangeWithProperty(range, mapSets):</i><p style="padding:0;margin-left:20;margin-top:0">
+</p><p><i>subsetWithProperty(field, mapSets):</i><p style="padding:0;margin-left:20;margin-top:0">
+</p>
+<h2> Module: shell</h2>
+A set of utilities for selecting data nad creating displays.
+   For use from the Jython shell.
+<hr>
+<p><i>createDisplay(displayType, data, dataName):</i><p style="padding:0;margin-left:20;margin-top:0">
+</p><p><i>selectData(name):</i><p style="padding:0;margin-left:20;margin-top:0">
+</p><p><i>selectDataChoice(name):</i><p style="padding:0;margin-left:20;margin-top:0">
+</p><p><i>showLib():</i><p style="padding:0;margin-left:20;margin-top:0">
+</p>
+
+
+
+[ug::foot]
+
+
