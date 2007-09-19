@@ -4,6 +4,11 @@ def makeVector(a,b):
   return DerivedGridFactory.createFlowVectors(a,b)
 
 def makeFlowField(a,b,c):
+  """ @formulaid theid    
+      @description the description
+      @param a multiple=true
+      @group the group
+  """
   return DerivedGridFactory.createFlowVectors(a,b,c)
 
 

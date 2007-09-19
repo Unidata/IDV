@@ -282,10 +282,61 @@ public class JythonManager extends IdvManager implements ActionListener {
 
         doMakeContents();
 
+        makeFormulasFromLib();
+
+
         //      PySystemState sys = Py.getSystemState ();
         //      sys.add_package ("visad");
         //      sys.add_package ("visad.python");
 
+    }
+
+
+    private void     makeFormulasFromLib() {
+        List procedures = findJythonMethods(true);
+        for(int i=0;i<procedures.size();i++) {
+            PyFunction func = (PyFunction) procedures.get(i);
+            String doc = func.__doc__.toString().trim();
+            if(doc.equals("None")) continue;
+            List lines = StringUtil.split(doc,"\n",true,true);
+            String formulaId=null;
+            String desc=null;
+            String group = null;
+            Hashtable attrProps=null;
+            for(int lineIdx=0;lineIdx<lines.size();lineIdx++) {
+                String line = (String) lines.get(lineIdx);
+                if(line.startsWith("@formulaid")) {
+                    formulaId = line.substring("@formulaid".length()).trim();
+                } else  if(line.startsWith("@description")) {
+                    desc = line.substring("@description".length()).trim();
+                } else  if(line.startsWith("@group")) {
+                    group = line.substring("@group".length()).trim();
+                } else  if(line.startsWith("@param")) {
+                    line = line.substring("@param".length()).trim();
+                    String[] toks = StringUtil.split(line, " ", 2);
+                    if(attrProps==null) {
+                        attrProps = new Hashtable();
+                    }
+                    attrProps.put(toks[0],"[" +toks[1]+"]");
+                }
+            }
+
+            if(formulaId!=null || desc!=null) {
+                if(formulaId==null) {
+                    formulaId  = func.__name__;
+                }
+                List categories= new ArrayList();
+                if(group!=null) {
+                    categories.add(DataCategory.parseCategory(group,true));
+                }
+                DerivedDataDescriptor ddd = new DerivedDataDescriptor(getIdv(),
+                                                                      formulaId, (desc!=null?desc:func.__name__),
+                                                                      makeCallString(func, attrProps),
+                                                                      categories);
+                
+                descriptorDataSource.addDescriptor(ddd);
+            }
+        }
     }
 
 
@@ -1262,6 +1313,9 @@ public class JythonManager extends IdvManager implements ActionListener {
         } catch (Throwable exc) {
             logException("Initializing user formulas", exc);
         }
+
+
+
     }
 
     /**
@@ -1915,15 +1969,7 @@ public class JythonManager extends IdvManager implements ActionListener {
                 Object[]     pair = (Object[]) funcs.get(itemIdx);
                 PyFunction   func = (PyFunction) pair[1];
                 StringBuffer sb   = new StringBuffer();
-                sb.append(func.__name__ + "(");
-                PyTableCode tc = (PyTableCode) func.func_code;
-                for (int argIdx = 0; argIdx < tc.co_argcount; argIdx++) {
-                    if (argIdx > 0) {
-                        sb.append(", ");
-                    }
-                    sb.append(tc.co_varnames[argIdx]);
-                }
-                sb.append(")");
+                sb.append(makeCallString(func,null));
                 String s = sb.toString();
                 if(prefix!=null &&!s.startsWith(prefix)) continue;
                 subItems.add(GuiUtils.makeMenuItem(s, object,method, s));
@@ -1935,6 +1981,77 @@ public class JythonManager extends IdvManager implements ActionListener {
         }
         return menuItems;
     }
+
+    private String makeCallString(PyFunction func,Hashtable props) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(func.__name__ + "(");
+        PyTableCode tc = (PyTableCode) func.func_code;
+        for (int argIdx = 0; argIdx < tc.co_argcount; argIdx++) {
+            if (argIdx > 0) {
+                sb.append(", ");
+            }
+            String param = tc.co_varnames[argIdx];
+            String attrs = (props!=null?(String)props.get(param):"");
+            if(attrs == null) attrs = "";
+            sb.append(param+attrs);
+        }
+        sb.append(")");
+        return sb.toString();
+
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return A list of Object arrays. First element in array is the name of the lib. Second is the list of PyFunction-s
+     */
+    public List findJythonMethods(boolean justList) {
+        List result = new ArrayList();
+        List holders   = getLibHolders();
+        if(holders == null) return result;
+        for (int i = 0; i < holders.size(); i++) {
+            List subItems = new ArrayList();
+            JythonManager.LibHolder libHolder =
+                (JythonManager.LibHolder) holders.get(i);
+            PythonInterpreter interpreter = new PythonInterpreter();
+            interpreter.exec("import sys");
+            interpreter.exec("import java");
+            try {
+                interpreter.exec(libHolder.getText());
+            } catch (Exception exc) {
+                continue;
+            }
+            PyStringMap seq   = (PyStringMap) interpreter.getLocals();
+            PyList      keys  = seq.keys();
+            PyList      items = seq.items();
+            List        funcs = new ArrayList();
+            for (int itemIdx = 0; itemIdx < items.__len__(); itemIdx++) {
+                PyTuple pair = (PyTuple) items.__finditem__(itemIdx);
+                if ( !(pair.__finditem__(1) instanceof PyFunction)) {
+                    continue;
+                }
+                funcs.add(new Object[] { pair.__finditem__(0).toString(),
+                                         pair.__finditem__(1) });
+            }
+
+            funcs = Misc.sortTuples(funcs, true);
+
+            for (int itemIdx = 0; itemIdx < funcs.size(); itemIdx++) {
+                Object[]     pair = (Object[]) funcs.get(itemIdx);
+                PyFunction   func = (PyFunction) pair[1];
+                subItems.add(func);
+            }
+            if(justList) 
+                result.addAll(subItems);
+            else
+                result.add(new Object[]{libHolder.getName(), subItems});
+        }
+        return result;
+    }
+
+
+
 
 
 
