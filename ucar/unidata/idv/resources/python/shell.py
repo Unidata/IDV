@@ -8,7 +8,9 @@ def selectData(name='Select Field'):
     list.add(name);
     result = idv.selectDataChoices(list);
     if(result == None): 
+        shell.toFront();
 	return None;
+    shell.toFront();
     return result.get(0).getData(None);
 
 def selectDataChoice(name='Select Field'):
@@ -16,7 +18,9 @@ def selectDataChoice(name='Select Field'):
     list.add(name);
     result = idv.selectDataChoices(list);
     if(result == None): 
+        shell.toFront();
 	return None;
+    shell.toFront();
     return result.get(0);
 
 
@@ -33,7 +37,9 @@ def createDisplay(displayType, data, dataName='Data'):
 def showLib():
     idv.getJythonManager().showJythonEditor()
 
-   
+
+def listVars():
+	shell.listVars();
 
 
 
