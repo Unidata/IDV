@@ -270,9 +270,12 @@ public class DataSelectionWidget {
      * @param cd new control descriptor
      */
     protected void updateSettings(ControlDescriptor cd) {
+        if (settingsTree == null) {
+            settingsTree = new SettingsTree(idv);
+        }
         if (settingsTree != null) {
             settingsTree.updateSettings(cd);
-        }
+        } 
     }
 
 

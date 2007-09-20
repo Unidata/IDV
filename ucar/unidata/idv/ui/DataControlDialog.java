@@ -407,6 +407,7 @@ public class DataControlDialog implements ActionListener {
             }
             //Now, clear the selection, hopefully leaving the expanded paths expanded.
             controlTree.clearSelection();
+            checkSettings();
         }
     }
 
@@ -665,11 +666,7 @@ public class DataControlDialog implements ActionListener {
 
         controlTree.addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
-                Object[] cd = getSelectedControls();
-                dataSelectionWidget.updateSettings(
-                    (ControlDescriptor) ((cd.length > 0)
-                                         ? cd[0]
-                                         : null));
+                checkSettings();
                 Misc.run(new Runnable() {
                     public void run() {
                         Object[] cd = getSelectedControls();
@@ -755,6 +752,14 @@ public class DataControlDialog implements ActionListener {
 
     }
 
+
+    private void checkSettings() {
+        Object[] cd = getSelectedControls();
+        dataSelectionWidget.updateSettings(
+                                           (ControlDescriptor) ((cd.length > 0)
+                                                                ? cd[0]
+                                                                : null));
+    }
 
     /**
      * Get the data selection widget
