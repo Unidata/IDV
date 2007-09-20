@@ -70,6 +70,8 @@ import javax.swing.tree.*;
  */
 public class JythonShell extends InteractiveShell {
 
+    public static final String PROP_JYTHON_SHELL_HISTORY = "prop.jython.shell.history";
+
     /** _more_ */
     private IntegratedDataViewer idv;
 
@@ -85,9 +87,25 @@ public class JythonShell extends InteractiveShell {
     public JythonShell(IntegratedDataViewer theIdv) {
         super("Jython Shell");
         this.idv = theIdv;
+        List oldHistory = (List)idv.getStore().get(PROP_JYTHON_SHELL_HISTORY);
+        if(oldHistory!=null) {
+            history = new ArrayList(oldHistory);
+        }
         createInterpreter();
         //Create the gui
         init();
+    }
+
+
+    public void listHistory() {
+        for(int i=0;i<history.size();i++) {
+            super.eval((String) history.get(i));
+        }
+    }
+
+    public void saveHistory() {
+        idv.getStore().put(PROP_JYTHON_SHELL_HISTORY,history);
+        idv.getStore().save();
     }
 
     /**
@@ -149,6 +167,16 @@ public class JythonShell extends InteractiveShell {
         t = null;
 
         List items = new ArrayList();
+        if(history.size()>0) {
+            List historyItems = new ArrayList();
+            for(int i=history.size()-1;i>=0;i--) {
+                historyItems.add(GuiUtils.makeMenuItem(history.get(i).toString(), this,"eval",
+                                                       history.get(i)));
+            }
+            items.add(GuiUtils.makeMenu("History",historyItems));
+                                        
+        }
+
         items.add(GuiUtils.makeMenu("Insert Display Type", getDisplayMenuItems()));
         items.add(GuiUtils.makeMenu("Insert Procedure Call",idv.getJythonManager().makeProcedureMenu(
                                                                                                       this, "insertText", t)));
@@ -286,12 +314,19 @@ public class JythonShell extends InteractiveShell {
         List     items   = new ArrayList();
         items.add(GuiUtils.makeMenuItem("Export Commands", this,
                                         "exportHistory"));
+        items.add(GuiUtils.makeMenuItem("Save History", this,
+                                        "saveHistory"));
+        items.add(GuiUtils.makeMenuItem("List History", this,
+                                        "listHistory"));
+        items.add(GuiUtils.makeMenuItem("List Variables", this,
+                                        "listVars"));
         menuBar.add(GuiUtils.makeMenu("File", items));
 
 
         items = new ArrayList();
-        items.add(GuiUtils.makeMenuItem("Clear", this, "clear"));
-        items.add(GuiUtils.makeMenu("Insert Display Type", getDisplayMenuItems()));
+        items.add(GuiUtils.makeMenuItem("Clear All", this, "clear"));
+        items.add(GuiUtils.makeMenuItem("Clear Output", this, "clearOutput"));
+        //        items.add(GuiUtils.makeMenu("Insert Display Type", getDisplayMenuItems()));
         menuBar.add(GuiUtils.makeMenu("Edit", items));
 
         items = new ArrayList();
