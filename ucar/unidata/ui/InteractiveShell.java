@@ -161,6 +161,7 @@ public class InteractiveShell implements HyperlinkListener {
         scroller.setPreferredSize(new Dimension(400, 300));
         commandFld = new JTextField();
         GuiUtils.setFixedWidthFont(commandFld);
+        GuiUtils.addKeyBindings(commandFld);
         commandFld.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 handleKeyPress(e, commandFld);
@@ -182,6 +183,7 @@ public class InteractiveShell implements HyperlinkListener {
 
         commandArea = new JTextArea("", 4, 30);
         GuiUtils.setFixedWidthFont(commandArea);
+        GuiUtils.addKeyBindings(commandArea);
         commandArea.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 handleKeyPress(e, commandArea);
@@ -271,16 +273,6 @@ public class InteractiveShell implements HyperlinkListener {
      * @param cmdFld _more_
      */
     protected void handleKeyPress(KeyEvent e, JTextComponent cmdFld) {
-        if ((e.getKeyCode() == e.VK_B) && e.isControlDown()) {
-            if (cmdFld.getCaretPosition() > 0) {
-                cmdFld.setCaretPosition(cmdFld.getCaretPosition() - 1);
-            }
-        }
-        if ((e.getKeyCode() == e.VK_F) && e.isControlDown()) {
-            if (cmdFld.getCaretPosition() < cmdFld.getText().length()) {
-                cmdFld.setCaretPosition(cmdFld.getCaretPosition() + 1);
-            }
-        }
         if (((e.getKeyCode() == e.VK_UP)
                 || ((e.getKeyCode() == e.VK_P)
                     && e.isControlDown())) && (history.size() > 0)) {
@@ -337,10 +329,13 @@ public class InteractiveShell implements HyperlinkListener {
     public void clear() {
         historyIdx = -1;
         history    = new ArrayList();
+        clearOutput();
+    }
+
+    public void clearOutput() {
         sb         = new StringBuffer();
         editorPane.setText("");
     }
-
 
 
 
