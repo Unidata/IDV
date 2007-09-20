@@ -43,3 +43,5 @@ def listVars():
 
 
 
+def api(object):
+	return idv.listApi(object);

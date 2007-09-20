@@ -112,6 +112,11 @@ public class DisplaySettingsDialog {
      */
     public DisplaySettingsDialog(IntegratedDataViewer idv,
                                  DisplayControlImpl display) {
+        this(idv,display,true);
+    }
+
+    public DisplaySettingsDialog(IntegratedDataViewer idv,
+                                 DisplayControlImpl display, boolean showDialog) {
         this.idv = idv;
         displays = idv.getDisplayControls();
         if ((display == null) && (displays.size() > 0)) {
@@ -121,7 +126,9 @@ public class DisplaySettingsDialog {
         if (display != null) {
             setDisplay(display);
         }
-        showDialog();
+        if(showDialog) {
+            showDialog();
+        }
     }
 
 
@@ -136,6 +143,8 @@ public class DisplaySettingsDialog {
     }
 
 
+
+
     /**
      * _more_
      *
@@ -143,6 +152,16 @@ public class DisplaySettingsDialog {
      */
     public DisplaySettingsDialog(DisplayControlImpl display) {
         this(display.getIdv(), display);
+    }
+
+    public List getPropertyValues() {
+        List props = new ArrayList();
+        for (int i = 0; i < propertyValues.size(); i++) {
+            PropertyValueWrapper prop =
+                (PropertyValueWrapper) propertyValues.get(i);
+            props.add(prop.propertyValue);
+        }
+        return props;
     }
 
 
@@ -912,34 +931,6 @@ public class DisplaySettingsDialog {
             setCheckboxLabel();
         }
 
-        /**
-         * _more_
-         *
-         * @param v _more_
-         *
-         * @return _more_
-         */
-        private String getValueLabel(Object v) {
-            if (v instanceof Color) {
-                Color c = (Color) v;
-                return c.getRed() + "," + c.getGreen() + "," + c.getBlue();
-            }
-
-            if (v instanceof ContourInfo) {
-                ContourInfo ci = (ContourInfo) v;
-                return ci.getInterval() + "/" + ci.getBase() + "/"
-                       + ci.getMin() + "/" + ci.getMax();
-            }
-            if (v instanceof ColorScaleInfo) {
-                ColorScaleInfo csi = (ColorScaleInfo) v;
-                return (csi.getIsVisible()
-                        ? "visible"
-                        : "not visible") + " " + csi.getPlacement();
-            }
-
-            return v.toString();
-        }
-
 
         /**
          * _more_
@@ -977,6 +968,41 @@ public class DisplaySettingsDialog {
         }
 
     }
+
+
+        /**
+         * _more_
+         *
+         * @param v _more_
+         *
+         * @return _more_
+         */
+    public static String getValueLabel(Object v) {
+        if(v == null) {
+            return "null";
+        }
+            if (v instanceof Color) {
+                Color c = (Color) v;
+                return c.getRed() + "," + c.getGreen() + "," + c.getBlue();
+            }
+
+            if (v instanceof ContourInfo) {
+                ContourInfo ci = (ContourInfo) v;
+                return ci.getInterval() + "/" + ci.getBase() + "/"
+                       + ci.getMin() + "/" + ci.getMax();
+            }
+            if (v instanceof ColorScaleInfo) {
+                ColorScaleInfo csi = (ColorScaleInfo) v;
+                return (csi.getIsVisible()
+                        ? "visible"
+                        : "not visible") + " " + csi.getPlacement();
+            }
+
+            return v.toString();
+        }
+
+
+
 
 }
 

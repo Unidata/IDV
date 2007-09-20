@@ -41,6 +41,10 @@ import ucar.unidata.idv.chooser.IdvChooser;
 import ucar.unidata.idv.chooser.IdvChooserManager;
 import ucar.unidata.idv.collab.*;
 
+import ucar.unidata.util.PropertyValue;
+
+import ucar.unidata.idv.control.DisplaySettingsDialog;
+import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.idv.control.WMSControl;
 import ucar.unidata.idv.control.WMSInfo;
 
@@ -85,6 +89,7 @@ import java.awt.event.*;
 import java.io.*;
 
 import java.net.Socket;
+import java.lang.reflect.*;
 
 import java.net.URL;
 
@@ -2893,6 +2898,35 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         buttonList.add(supportBtn);
 
     }
+
+    public String listApi(Object o) {
+        StringBuffer sb = new StringBuffer();
+
+        if(o instanceof DisplayControl) {
+            DisplaySettingsDialog dsd = new DisplaySettingsDialog(this,(DisplayControlImpl) o, false);
+            List props = dsd.getPropertyValues();
+            for(int i=0;i<props.size();i++) {
+                PropertyValue p = (PropertyValue) props.get(i);
+                Object v = p.getValue();
+                String type ="n/a";
+                if(v!=null) {
+                    type = v.getClass().getName();
+                }
+                sb.append(Misc.getSetterMethod(p.getName()) + "(" + type +")  = " + DisplaySettingsDialog.getValueLabel(v)+ "<br>");
+            }
+            return sb.toString();
+        }
+
+        List methods = XmlEncoder.findPropertyMethods(o.getClass(), false);
+        for(int i=0;i<methods.size();i++) {
+            Method m = (Method) methods.get(i);
+            sb.append(m.getName());
+            sb.append("<br>");
+        }
+        return sb.toString();
+    }
+
+
 
 }
 
