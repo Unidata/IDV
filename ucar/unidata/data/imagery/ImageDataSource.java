@@ -21,9 +21,6 @@
  */
 
 
-
-
-
 package ucar.unidata.data.imagery;
 
 
@@ -584,16 +581,18 @@ public abstract class ImageDataSource extends DataSourceImpl {
                           ? getTwoDTimeSeriesCategories()
                           : getTwoDCategories();
 
+        // This is historical an is not added into the list of choices
+        // for selection by the users.
         myCompositeDataChoice = new CompositeDataChoice(this, imageList,
                 getName(), getDataName(), categories, props);
         myCompositeDataChoice.setUseDataSourceToFindTimes(true);
-        addDataChoice(myCompositeDataChoice);
         doMakeDataChoices(myCompositeDataChoice);
 
         if ((bandInfos != null) && !bandInfos.isEmpty()) {
             List biCategories = (imageList.size() > 1)
                                 ? getBandTimeSeriesCategories()
                                 : getBandCategories();
+            /*
             if (bandInfos.size() == 1) {
                 BandInfo test  = (BandInfo) bandInfos.get(0);
                 List     units = test.getCalibrationUnits();
@@ -602,6 +601,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     return;
                 }
             }
+            */
             for (Iterator<BandInfo> i = bandInfos.iterator(); i.hasNext(); ) {
                 BandInfo bi      = i.next();
                 String   name    = makeBandParam(bi);
@@ -630,6 +630,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     }
                 }
             }
+        } else {
+            addDataChoice(myCompositeDataChoice);
         }
     }
 
@@ -807,8 +809,9 @@ public abstract class ImageDataSource extends DataSourceImpl {
                                 Hashtable requestProperties)
             throws VisADException, RemoteException {
         sampleRanges = null;
-        if ((dataChoice instanceof CompositeDataChoice)
-                && !(hasBandInfo(dataChoice))) {
+        //if ((dataChoice instanceof CompositeDataChoice) 
+        //        && !(hasBandInfo(dataChoice))) {
+        if (dataChoice instanceof CompositeDataChoice) {
             return makeImageSequence(myCompositeDataChoice, dataSelection);
         } else if (hasBandInfo(dataChoice)) {
             //List descriptors = getDescriptors(dataChoice, dataSelection);
@@ -1431,8 +1434,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
         Hashtable cache = CacheManager.findOrCreate(dataCacheKey);
         flushCache();
         //Should be only one here
-        CompositeDataChoice cdc =
-            (CompositeDataChoice) getDataChoices().get(0);
+        CompositeDataChoice cdc = myCompositeDataChoice;
+        //(CompositeDataChoice) getDataChoices().get(0);
         cdc.removeAllDataChoices();
         doMakeDataChoices(cdc);
         for (int i = 0; i < imageList.size(); i++) {
