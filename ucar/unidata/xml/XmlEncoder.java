@@ -1461,7 +1461,11 @@ public class XmlEncoder extends XmlUtil {
      *  @param c The class to look at.
      *  @return The list of property Method-s.
      */
-    public List findPropertyMethods(Class c) {
+    public static List findPropertyMethods(Class c) {
+        return findPropertyMethods(c,true);
+    }
+
+    public static List findPropertyMethods(Class c, boolean returnGetters) {
         Method[]  methods = c.getMethods();
         ArrayList v       = new ArrayList();
         for (int i = 0; i < methods.length; i++) {
@@ -1479,10 +1483,14 @@ public class XmlEncoder extends XmlUtil {
             Method  setter       = null;
             try {
                 setter = c.getMethod("set" + propertyName, setterParams);
+                if(returnGetters)
+                    v.add(getter);
+                else
+                    v.add(setter);
             } catch (NoSuchMethodException nsme) {
                 continue;
             }
-            v.add(getter);
+
         }
         return v;
     }
