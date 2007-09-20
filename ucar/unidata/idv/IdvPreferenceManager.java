@@ -1195,26 +1195,24 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
             JCheckBox askCbx = new JCheckBox("Don't show this window again",
                                              false);
-            JRadioButton removeBtn =
-                new JRadioButton("Remove all displays & data", shouldRemove);
-            JRadioButton leaveBtn =
-                new JRadioButton("Don't remove displays & data",
-                                 !shouldRemove);
-            GuiUtils.buttonGroup(removeBtn, leaveBtn);
 
-            JPanel btnPanel =
-                GuiUtils.hbox(GuiUtils.vbox(removeBtn, leaveBtn),
-                              GuiUtils.top(makeAsPreferenceCbx));
-            btnPanel = GuiUtils.hbox(removeBtn, leaveBtn);
+
+            JCheckBox removeCbx =
+                new JCheckBox("Remove all displays & data", shouldRemove);
+
+
+
+
+            JPanel    btnPanel = GuiUtils.left(removeCbx);
 
             JCheckBox mergeCbx =
                 new JCheckBox("Try to add displays to current windows",
                               shouldMerge);
             JPanel inner =
-                GuiUtils.vbox(
-                    btnPanel, mergeCbx, askCbx,
-                    new JLabel(
-                        "Note: This can be reset in the preferences window "));
+                GuiUtils.vbox(Misc.newList(
+                              btnPanel, mergeCbx, GuiUtils.filler(10,10),askCbx,
+                              new JLabel(
+                                         "Note: This can be reset in the preferences window ")));
 
             inner = GuiUtils.leftCenter(new JLabel("     "), inner);
 
@@ -1238,7 +1236,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                 return new boolean[] { false, false };
             }
 
-            shouldRemove = removeBtn.isSelected();
+            shouldRemove = removeCbx.isSelected();
             shouldMerge  = mergeCbx.isSelected();
             if (makeAsPreferenceCbx.isSelected()) {
                 getStore().put(PREF_OPEN_REMOVE, shouldRemove);
