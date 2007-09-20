@@ -6280,6 +6280,18 @@ public class GuiUtils {
      * @throws Exception on badness
      */
     public static void main(String[] args) throws Exception {
+        JTextField fld = new JTextField("",20);
+        JTextComponent tarea = new JTextArea("",10,10);
+        addKeyBindings(fld);
+        addKeyBindings(tarea);
+        Action[] actions = tarea.getActions();
+        for(int i=0;i<actions.length;i++) {
+            //            System.err.println(actions[i]);
+        }
+        showOkCancelDialog(null, "", vbox(fld,tarea), null);
+        if(true) return;
+
+
         /*        Locale list[] = java.text.DateFormat.getAvailableLocales();
                   for (int i=0;i<list.length;i++) {
                   System.out.println(list[i].toString());
@@ -6737,6 +6749,86 @@ public class GuiUtils {
         }
         t = t + s;
         fld.setText(t);
+    }
+
+
+
+    public static void addKeyBindings(final JTextComponent comp) {
+        //TODO Make this into a KeyMap
+        comp.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if(!e.isControlDown()) {
+                    return;
+                }
+                int pos = comp.getCaretPosition();
+
+                if(e.getKeyCode() == e.VK_B) {
+                    if (comp.getCaretPosition() > 0) {
+                        comp.setCaretPosition(pos - 1);
+                    }
+                    return;
+                }
+                if (e.getKeyCode() == e.VK_F) {
+                    if (comp.getCaretPosition() < comp.getText().length()) {
+                        comp.setCaretPosition(pos + 1);
+                    }
+                    return;
+                }
+                if (e.getKeyCode() == e.VK_E) {
+                    String t = comp.getText();
+                    int endPos = t.indexOf("\n",pos);
+                    if(endPos>=0)
+                        comp.setCaretPosition(endPos);
+                    else
+                        comp.setCaretPosition(t.length());
+                }
+
+                if (e.getKeyCode() == e.VK_O && comp instanceof JTextArea) {
+                    String t = comp.getText();
+                    t = t.substring(0,pos)+ "\n"+t.substring(pos);
+                    comp.setText(t);
+                    comp.setCaretPosition(pos);
+                }
+
+                if (false && comp instanceof  JTextArea && e.getKeyCode() == e.VK_P) {
+                    String t = comp.getText();
+                    char c;
+                    int cnt = 0;
+                    while(--pos>=0 && (c = t.charAt(pos))!='\n') {
+                        cnt++;
+                    }
+                    
+                    comp.setCaretPosition(pos-cnt);                    
+                }
+
+                if (e.getKeyCode() == e.VK_K) {
+                    String t = comp.getText();
+                    if(pos>=t.length()) return;
+                    int endPos = t.indexOf("\n",pos);
+                    if(endPos==pos) {
+                        t = t.substring(0,pos) + t.substring(endPos+1);
+                    } else if(endPos>pos) {
+                        t = t.substring(0,pos) + "\n" +t.substring(endPos+1);
+                    } else {
+                        t = t.substring(0,pos);
+                    }
+                    comp.setText(t);
+                    comp.setCaretPosition(pos);
+                }
+
+                if (e.getKeyCode() == e.VK_D) {
+                    String t = comp.getText();
+                    if(pos>=t.length()) return;
+                    if(pos>0) {
+                        t = t.substring(0,pos)+ t.substring(pos+1);
+                    } else {
+                        t = t.substring(pos+1);
+                    }
+                    comp.setText(t);
+                    if(pos>=0 && pos<t.length())
+                        comp.setCaretPosition(pos);
+                }
+            }});
     }
 
 
