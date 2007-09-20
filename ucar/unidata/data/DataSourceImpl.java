@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.data;
 
 
@@ -234,7 +235,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     /** _more_ */
     private JCheckBox cacheDataToDiskCbx;
 
-    /** _more_          */
+    /** _more_ */
     private JTextField cacheClearDelayFld;
 
     /** _more_ */
@@ -1279,6 +1280,19 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
 
+    /**
+     * _more_
+     */
+    protected void checkForInitAfterUnPersistence() {
+        //Check if we were saved off after we have been removed
+        //The display control can still ahve a link to the data source
+        //And initAfterUnpersistence is never called
+        if (haveBeenUnPersisted && !initAfterUnpersistenceBeenCalled) {
+            initAfterUnpersistence();
+        }
+
+    }
+
 
     /**
      * This will lazily create the actual list of DataChoice-s
@@ -1291,12 +1305,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @return  List of DataChoices
      */
     public List getDataChoices() {
-        //Check if we were saved off after we have been removed
-        //The display control can still ahve a link to the data source
-        //And initAfterUnpersistence is never called
-        if (haveBeenUnPersisted && !initAfterUnpersistenceBeenCalled) {
-            initAfterUnpersistence();
-        }
+        checkForInitAfterUnPersistence();
 
         synchronized (DATACHOICES_MUTEX) {
             if (dataChoices == null) {
@@ -2256,7 +2265,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             comps.add(cacheDataToDiskCbx);
 
             comps.add(GuiUtils.rLabel("Delay:"));
-            cacheClearDelayFld = new JTextField("" + (cacheClearDelay/1000), 6);
+            cacheClearDelayFld = new JTextField(""
+                    + (cacheClearDelay / 1000), 6);
             comps.add(GuiUtils.left(GuiUtils.hbox(cacheClearDelayFld,
                     new JLabel(" seconds"))));
         }
@@ -2313,9 +2323,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
         List times = getAllDateTimes();
         if ((times != null) && (times.size() > 0)) {
-            dsw =new DataSelectionWidget(getDataContext().getIdv());
-            dsw.setTimes(getAllDateTimes(),
-                         getDateTimeSelection());
+            dsw = new DataSelectionWidget(getDataContext().getIdv());
+            dsw.setTimes(getAllDateTimes(), getDateTimeSelection());
             tabbedPane.add("Times", dsw.getTimesList("Use All"));
         }
 
@@ -2482,7 +2491,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         setAlias(aliasFld.getText().trim());
         if (dsw != null) {
             setDateTimeSelection(dsw.getSelectedDateTimes());
-            getDataContext().getIdv().getIdvUIManager().dataSourceTimeChanged(this);
+            getDataContext().getIdv().getIdvUIManager().dataSourceTimeChanged(
+                this);
         }
 
         if (geoSelectionPanel != null) {
@@ -2506,9 +2516,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
         if (cacheDataToDiskCbx != null) {
             setCacheDataToDisk(cacheDataToDiskCbx.isSelected());
-            setCacheClearDelay(
-                (long)(1000* new Double(
-                    cacheClearDelayFld.getText().trim()).doubleValue()));
+            setCacheClearDelay((long) (1000
+                                       * new Double(cacheClearDelayFld
+                                           .getText().trim()).doubleValue()));
         }
 
 
@@ -2990,7 +3000,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @return _more_
      */
     public String getDataCachePath() {
-        if(getDataContext() == null) {
+        if (getDataContext() == null) {
             return null;
         }
         if (dataCachePath == null) {

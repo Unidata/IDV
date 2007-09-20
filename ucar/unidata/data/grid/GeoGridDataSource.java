@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -65,9 +66,9 @@ import ucar.unidata.util.WrapperException;
 
 import ucar.unidata.xml.*;
 
-import ucar.visad.data.CachedFlatField;
-
 import ucar.visad.Util;
+
+import ucar.visad.data.CachedFlatField;
 
 import visad.Data;
 import visad.DataReference;
@@ -234,6 +235,12 @@ public class GeoGridDataSource extends GridDataSource {
 
 
 
+    /** _more_          */
+    private static int cnt = 0;
+
+    /** _more_          */
+    private int mycnt = cnt++;
+
     /**
      * Initialize if being unpersisted.
      */
@@ -378,6 +385,7 @@ public class GeoGridDataSource extends GridDataSource {
     protected void resolvePath() {
         //Do we have a resolver
         String resolverUrl = (String) getProperty(PROP_RESOLVERURL);
+        //        System.err.println(mycnt +" resolvePath");
         if ((resolverUrl != null) && (resolverUrl.length() > 0)) {
             Hashtable properties = getProperties();
             if (properties == null) {
@@ -389,6 +397,7 @@ public class GeoGridDataSource extends GridDataSource {
                 setInError(true);
                 return;
             }
+            //            System.err.println("    got resolved path:" + resolvedUrl);
             sources = Misc.newList(resolvedUrl);
         }
     }
@@ -689,6 +698,7 @@ public class GeoGridDataSource extends GridDataSource {
      * @return new GridDataset
      */
     protected GridDataset doMakeDataSet() {
+        checkForInitAfterUnPersistence();
         String file = getFilePath();
         if (file == null) {
             if (haveBeenUnPersisted) {
@@ -702,6 +712,8 @@ public class GeoGridDataSource extends GridDataSource {
             sources = new ArrayList();
             sources.add(file);
         }
+
+        //        System.err.println(mycnt +" doMakeDataSet:file=" + file + " sources=" + sources);
 
         //Make sythetic data ncml file
         if (sources.size() > 1) {
@@ -737,7 +749,7 @@ public class GeoGridDataSource extends GridDataSource {
 
 
         try {
-            //            System.err.println ("file:" + file);
+            //            System.err.println (mycnt+" GridDataset.open:" + file);
             GridDataset gds = GridDataset.open(file);
             return gds;
         } catch (Exception exc) {
@@ -939,8 +951,7 @@ public class GeoGridDataSource extends GridDataSource {
     public List getAllLevels(DataChoice dataChoice) {
         try {
             GeoGridAdapter geoGridAdapter = makeGeoGridAdapter(dataChoice,
-                                                getDataSelection(), null, -1,
-                                                -1);
+                                                null, null, -1, -1);
             if (geoGridAdapter != null) {
                 return geoGridAdapter.getLevels();
             }
@@ -1408,35 +1419,37 @@ public class GeoGridDataSource extends GridDataSource {
      */
     public static void main(String[] args) throws Exception {
 
-        String []urls = {
-            "http://motherlode.ucar.edu:8080/thredds/dodsC/modelsNc/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20070917_1200.nc",
-            "dods://motherlode.ucar.edu:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20070917_1200.grib1"};
+        String[] urls = { "http://motherlode.ucar.edu:8080/thredds/dodsC/modelsNc/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20070917_1200.nc",
+                          "dods://motherlode.ucar.edu:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20070917_1200.grib1" };
         //                String url = "dods://thredds.cise-nsf.gov:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20070917_1200.grib1";
-        testMode    = true;
-        
-        for(int i=0;i<100;i++) {
-            for(int urlIdx=0;urlIdx<urls.length;urlIdx++) {
-                System.err.println ("Reading data:" + i + " " + urls[urlIdx]);
-                GeoGridDataSource ggds = new GeoGridDataSource(null, urls[urlIdx], null);
+        testMode = true;
+
+        for (int i = 0; i < 100; i++) {
+            for (int urlIdx = 0; urlIdx < urls.length; urlIdx++) {
+                System.err.println("Reading data:" + i + " " + urls[urlIdx]);
+                GeoGridDataSource ggds = new GeoGridDataSource(null,
+                                             urls[urlIdx], null);
                 ggds.doMakeDataChoices();
                 DataChoice dataChoice = ggds.findDataChoice("Temperature");
-                if(dataChoice== null) dataChoice = ggds.findDataChoice("T");
+                if (dataChoice == null) {
+                    dataChoice = ggds.findDataChoice("T");
+                }
                 //                System.err.println ("" + dataChoice.getProperties());
-                ggds.makeFieldImpl(dataChoice, ggds.getDataSelection(),null);
+                ggds.makeFieldImpl(dataChoice, ggds.getDataSelection(), null);
             }
         }
-            
-
-            /*
-        GridDataset dataset    = GridDataset.open("elev.nc");
-        GeoGrid     geoGrid    = dataset.findGridByName("foo");
-        GeoGrid     geoGrid50  = geoGrid.subset(null, null, null, 0, 50, 50);
-        GeoGrid     geoGrid100 = geoGrid.subset(null, null, null, 0, 100,
-                                     100);
 
 
-        System.exit(0);
-            */
+        /*
+    GridDataset dataset    = GridDataset.open("elev.nc");
+    GeoGrid     geoGrid    = dataset.findGridByName("foo");
+    GeoGrid     geoGrid50  = geoGrid.subset(null, null, null, 0, 50, 50);
+    GeoGrid     geoGrid100 = geoGrid.subset(null, null, null, 0, 100,
+                                 100);
+
+
+    System.exit(0);
+        */
 
 
         /**
