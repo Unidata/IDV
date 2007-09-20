@@ -317,6 +317,11 @@ public class Misc {
     }
 
 
+    public static String getSetterMethod(String prop) {
+        return  "set" + prop.substring(0, 1).toUpperCase()
+                            + prop.substring(1);
+    }
+
 
     /**
      * Set a property on a "bean"
