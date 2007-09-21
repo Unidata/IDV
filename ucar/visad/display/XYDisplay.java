@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.visad.display;
 
 
@@ -384,6 +385,40 @@ public class XYDisplay extends DisplayMaster {
     }
 
     /**
+     * Get the units of displayed values on the X axis
+     *
+     * @return  axis units
+     */
+    public Unit getXDisplayUnit() {
+
+        Unit u = null;
+        if (xAxisMap != null) {
+            u = xAxisMap.getOverrideUnit();
+            if (u == null) {
+                u = ((RealType) xAxisMap.getScalar()).getDefaultUnit();
+            }
+        }
+        return u;
+    }
+
+    /**
+     * Get the units of displayed values on the Y axis
+     *
+     * @return  axis units
+     */
+    public Unit getYDisplayUnit() {
+
+        Unit u = null;
+        if (yAxisMap != null) {
+            u = yAxisMap.getOverrideUnit();
+            if (u == null) {
+                u = ((RealType) yAxisMap.getScalar()).getDefaultUnit();
+            }
+        }
+        return u;
+    }
+
+    /**
      * Set the aspect ratio of the axes
      *
      * @param  x  X axis ratio
@@ -395,7 +430,7 @@ public class XYDisplay extends DisplayMaster {
 
             ProjectionControl pc = getDisplay().getProjectionControl();
 
-            pc.setAspectCartesian(new double[]{ x, y });
+            pc.setAspectCartesian(new double[] { x, y });
             //saveProjection();
         } catch (VisADException ve) {
             ;
@@ -475,3 +510,4 @@ public class XYDisplay extends DisplayMaster {
 
 
 }
+
