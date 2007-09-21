@@ -22,9 +22,6 @@
 
 
 
-
-
-
 package ucar.unidata.idv;
 
 
@@ -186,8 +183,8 @@ public class JythonManager extends IdvManager implements ActionListener {
     /** The edit menu item */
     private JMenuItem editFileMenuItem;
 
-    /** The edit process */
-    private Process editProcess;
+
+
 
     /** _more_ */
     private String pythonDir;
@@ -358,7 +355,7 @@ public class JythonManager extends IdvManager implements ActionListener {
         for (int i = 0; i < libHolders.size(); i++) {
             LibHolder holder = (LibHolder) libHolders.get(i);
             try {
-                holder.comp.getLocationOnScreen();
+                holder.outerContents.getLocationOnScreen();
                 return holder;
             } catch (Exception exc) {}
         }
@@ -773,9 +770,9 @@ public class JythonManager extends IdvManager implements ActionListener {
         LibHolder holder = findVisibleComponent();
         fileMenu.add(GuiUtils.makeMenuItem("New Jython Library...", this,
                                            "makeNewLibrary"));
-        if (holder.isEditable()) {
+        if (holder!=null &&  holder.isEditable() && holder.editProcess==null) {
             fileMenu.add(GuiUtils.makeMenuItem("Remove  Library", this,
-                    "removeLibrary", holder));
+                                                   "removeLibrary", holder));
             fileMenu.add(GuiUtils.makeMenuItem("Save", this,
                     "writeJythonLib", holder));
             if (getStateManager().getPreferenceOrProperty(PROP_JYTHON_EDITOR,
@@ -801,10 +798,13 @@ public class JythonManager extends IdvManager implements ActionListener {
      * Gets called when the IDV is quitting. Kills the editor process if there is one
      */
     protected void applicationClosing() {
-        if (editProcess != null) {
-            try {
-                editProcess.destroy();
-            } catch (Exception exc) {}
+        for (int i = libHolders.size() - 1; i >= 0; i--) {
+            LibHolder holder = (LibHolder) libHolders.get(i);
+            if (holder.editProcess != null) {
+                try {
+                    holder.editProcess.destroy();
+                } catch (Exception exc) {}
+            }
         }
     }
 
@@ -812,10 +812,7 @@ public class JythonManager extends IdvManager implements ActionListener {
      * Edit the jython in the external editor
      */
     public void editInExternalEditor() {
-        if (editProcess != null) {
-            return;
-        }
-        Misc.run(this, "editInExternalEditorInner");
+        Misc.run(this, "editInExternalEditorInner",findVisibleComponent());
     }
 
 
@@ -823,10 +820,9 @@ public class JythonManager extends IdvManager implements ActionListener {
     /**
      * Edit the jython in the external editor
      */
-    public void editInExternalEditorInner() {
+    public void editInExternalEditorInner(final LibHolder holder) {
         try {
-            LibHolder holder = findVisibleComponent();
-            if ( !holder.isEditable()) {
+            if(holder ==null || !holder.isEditable() || holder.editProcess!=null) {
                 return;
             }
             if ( !writeJythonLib(holder)) {
@@ -857,26 +853,26 @@ public class JythonManager extends IdvManager implements ActionListener {
             }
             //            System.err.println("toks:" + toks);
             try {
-                editProcess =
+                holder.editProcess =
                     Runtime.getRuntime().exec(Misc.listToStringArray(toks));
             } catch (Exception exc) {
-                editProcess = null;
+                holder.editProcess = null;
                 logException("An error occurred editing jython library", exc);
             }
-            if (editProcess != null) {
+            if (holder.editProcess != null) {
                 Misc.run(new Runnable() {
                     public void run() {
                         try {
-                            editProcess.waitFor();
+                            holder.editProcess.waitFor();
                         } catch (Exception exc) {}
-                        editProcess = null;
+                        holder.editProcess = null;
                     }
                 });
             }
 
 
             //This seems to hang?
-            while (editProcess != null) {
+            while (holder.editProcess != null) {
                 Misc.sleep(1000);
                 if (file.lastModified() != fileTime) {
                     fileTime = file.lastModified();
@@ -2215,6 +2211,7 @@ public class JythonManager extends IdvManager implements ActionListener {
         /** _more_ */
         JButton saveBtn;
 
+        Process editProcess;
 
         /**
          * _more_

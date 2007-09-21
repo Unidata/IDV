@@ -2,6 +2,8 @@
 """A set of utilities for selecting data nad creating displays.
    For use from the Jython shell."""
 
+import ucar.unidata.data.DataChoice as DataChoice
+
 
 def selectData(name='Select Field'):
     list = java.util.ArrayList();
@@ -45,3 +47,10 @@ def listVars():
 
 def api(object):
 	return idv.listApi(object);
+
+def printType(data):
+	if(isinstance(data, DataChoice)==1):
+		shell.output('Parameter:' + str(data))
+		data = data.getData(None);
+	shell.printType(data);
+

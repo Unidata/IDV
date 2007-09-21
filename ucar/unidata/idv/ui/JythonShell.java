@@ -60,6 +60,8 @@ import javax.swing.text.*;
 
 import javax.swing.tree.*;
 
+import visad.*;
+import visad.jmet.DumpType;
 
 
 /**
@@ -77,6 +79,8 @@ public class JythonShell extends InteractiveShell {
 
     /** _more_ */
     private PythonInterpreter interp;
+
+    private  OutputStream   outputStream;
 
 
     /**
@@ -108,6 +112,7 @@ public class JythonShell extends InteractiveShell {
         idv.getStore().save();
     }
 
+ 
     /**
      * This gets called by the base class to make the frame.
      * If you don't want this to popup then make this method a noop
@@ -275,17 +280,22 @@ public class JythonShell extends InteractiveShell {
         }
         interp = idv.getJythonManager().createInterpreter();
         interp.set("shell", this);
-        OutputStream os = new OutputStream() {
+        outputStream = new OutputStream() {
             public void write(int b) {
                 //                    output(new String(b));
             }
             public void write(byte[] b, int off, int len) {
-                output(new String(b, off, len) + "<br>");
+                String s = new String(new String(b, off, len));
+                s = StringUtil.replace(s,"\n","<br>");
+                s = StringUtil.replace(s," ","&nbsp;");
+                s = StringUtil.replace(s,"\t","&nbsp;&nbsp;&nbsp;&nbsp;");
+                output(s);
             }
         };
 
-        interp.setOut(os);
-        interp.setErr(os);
+
+        interp.setOut(outputStream);
+        interp.setErr(outputStream);
     }
 
 
@@ -399,6 +409,24 @@ public class JythonShell extends InteractiveShell {
             output("<font color=\"red\">Error: " + exc + "</font><br>");
         }
     }
+
+
+    public void printType(Data d) {
+        try {
+            startBufferingOutput();
+            MathType t = d.getType();
+            visad.jmet.DumpType.dumpMathType(t,outputStream);
+            output("<hr>DataType analysis...");
+            visad.jmet.DumpType.dumpDataType(d,outputStream);
+        } catch (Exception exc) {
+            LogUtil.logException(
+                "An error occurred printing types", exc);
+        }
+        endBufferingOutput();
+    }
+
+
+
 
 }
 
