@@ -36,6 +36,9 @@ import ucar.visad.display.Grid2DDisplayable;
 import ucar.visad.display.TrackDisplayable;
 import ucar.visad.display.XSDisplay;
 
+import ucar.visad.quantities.CommonUnits;
+import ucar.visad.quantities.Length;
+
 import visad.*;
 
 
@@ -62,6 +65,9 @@ public class DataTransectControl extends CrossSectionControl {
 
     /** The current range of the line */
     private Range lineRange;
+
+    /** The current range of the line */
+    private JLabel rangeLabel;
 
     /** track width */
     int lineWidth = 2;
@@ -235,6 +241,7 @@ public class DataTransectControl extends CrossSectionControl {
             //Find the range of data
             Range[] range = GridUtil.getMinMax(fieldImpl);
             lineRange = range[0];
+            setVerticalAxisRange(lineRange);
         } catch (Exception exc) {}
 
 
@@ -291,7 +298,7 @@ public class DataTransectControl extends CrossSectionControl {
         XSDisplay xsDisplay = getCrossSectionViewManager().getXSDisplay();
         xsDisplay.setYDisplayUnit(getDisplayUnit());
         if ( !getAutoScaleYAxis()) {
-            setYAxisRange(xsDisplay, getRange());
+            setYAxisRange(xsDisplay, getVerticalAxisRange());
         }
     }
 
@@ -304,6 +311,7 @@ public class DataTransectControl extends CrossSectionControl {
      */
     protected void updateViewParameters()
             throws VisADException, RemoteException {
+        System.out.println("update view parameters");
         super.updateViewParameters();
         XSDisplay xsDisplay = getCrossSectionViewManager().getXSDisplay();
         if (getGridDataInstance() != null) {
@@ -329,9 +337,14 @@ public class DataTransectControl extends CrossSectionControl {
     protected void setYAxisRange(XSDisplay display, Range range)
             throws VisADException, RemoteException {
         if (range == null) {
+            range = getVerticalAxisRange();
+        }
+        if (range == null) {
             range = getRange();
         }
-        display.setYRange(range.getMin(), range.getMax());
+        if (range != null) {
+            display.setYRange(range.getMin(), range.getMax());
+        }
         /* TODO: needed?
         if (ctw != null) {
             ctw.setRange(range);
@@ -394,9 +407,12 @@ public class DataTransectControl extends CrossSectionControl {
         };
         //Misc.printArray("2D samples", plane[0]);
 
-        RealTupleType xRTT = new RealTupleType(RealType.XAxis);
+        //RealTupleType xRTT = new RealTupleType(RealType.XAxis);
 
-        Gridded1DSet  csDS = new Gridded1DSet(xRTT, plane, plane[0].length);
+        Gridded1DSet  csDS = new Gridded1DSet(Length.getRealTupleType(), plane, plane[0].length, 
+                                   (CoordinateSystem)null, 
+                                   new Unit[] {CommonUnits.KILOMETER},
+                                   (ErrorEstimate[]) null);
 
         return GridUtil.setSpatialDomain(xsectSequence, csDS);
     }

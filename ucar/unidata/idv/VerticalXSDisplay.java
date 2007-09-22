@@ -32,6 +32,8 @@ import java.awt.*;
 
 import java.rmi.RemoteException;
 
+import ucar.visad.quantities.Length;
+
 
 /**
  * A VisAD display for 2D vertical cross sections of 3D data fields.
@@ -60,7 +62,7 @@ public class VerticalXSDisplay extends XSDisplay {
      * @throws VisADException
      */
     public VerticalXSDisplay() throws VisADException, RemoteException {
-        super("Vertical Cross Section", RealType.XAxis, RealType.Altitude);
+        super("Vertical Cross Section", Length.getRealType(), RealType.Altitude);
         setAxisParams();
     }
 
@@ -74,7 +76,7 @@ public class VerticalXSDisplay extends XSDisplay {
         showAxisScales(true);
         AxisScale xscale = getXAxisScale();
         if (xscale != null) {
-            xscale.setTitle("Distance along transect (km)");
+            setXAxisTitle();
             xscale.setSnapToBox(true);
             xscale.setColor(Color.blue);
             xscale.setAutoComputeTicks(true);
@@ -111,5 +113,23 @@ public class VerticalXSDisplay extends XSDisplay {
         return cursorAltitude;
     }
 
-}
+    /**
+     * Set the units of displayed values on the X axis
+     *
+     * @param  newUnit  units to use
+     */
+    public void setXDisplayUnit(Unit newUnit) {
+        super.setXDisplayUnit(newUnit);
+        setXAxisTitle();
+    }
 
+    /**
+     * Set the title on the XAxis.
+     */
+    public void setXAxisTitle() {
+        AxisScale xscale = getXAxisScale();
+        if (xscale != null) {
+            xscale.setTitle("Distance along transect ("+getXDisplayUnit()+")");
+        }
+    }
+}

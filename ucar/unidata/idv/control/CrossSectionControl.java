@@ -40,6 +40,7 @@ import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.idv.TransectViewManager;
 import ucar.unidata.idv.ViewDescriptor;
 import ucar.unidata.idv.ViewManager;
+import ucar.unidata.idv.VerticalXSDisplay;
 
 import ucar.unidata.util.Coord;
 import ucar.unidata.util.GuiUtils;
@@ -206,6 +207,9 @@ public abstract class CrossSectionControl extends GridDisplayControl {
     /** Last trasnect we sampled on */
     private Transect lastTransect;
 
+    /** range for Y axis */
+    private Range verticalAxisRange = null;
+
 
     /**
      * Default constructor.  Sets the appropriate attribute flags.
@@ -274,7 +278,6 @@ public abstract class CrossSectionControl extends GridDisplayControl {
      *
      * @param menus list of menus
      * @param forMenuBar is it for the menu bar or for the popup
-     */
     protected void getExtraMenus(List menus, boolean forMenuBar) {
         super.getExtraMenus(menus, forMenuBar);
         if (forMenuBar) {
@@ -283,6 +286,7 @@ public abstract class CrossSectionControl extends GridDisplayControl {
             menus.add(xsMenu);
         }
     }
+     */
 
     /**
      * Called by the {@link ucar.unidata.idv.IntegratedDataViewer} to
@@ -362,13 +366,16 @@ public abstract class CrossSectionControl extends GridDisplayControl {
             //This will only be non-null if we have been unpersisted from an old
             //(prior to the persistence of the ViewManager) bundle
             if (displayMatrix != null) {
-                XSDisplay xsDisplay = crossSectionView.getXSDisplay();
-                xsDisplay.setProjectionMatrix(displayMatrix);
+                XSDisplay csvxsDisplay = crossSectionView.getXSDisplay();
+                csvxsDisplay.setProjectionMatrix(displayMatrix);
             }
         }
+        XSDisplay csvxsDisplay = crossSectionView.getXSDisplay();
 
 
         addViewManager(crossSectionView);
+        setYAxisRange(csvxsDisplay, verticalAxisRange);
+        csvxsDisplay.setXDisplayUnit(getDefaultDistanceUnit());
         //crossSectionView.getMaster ().addDisplayable (vcsDisplay);
         if (haveMultipleFields()) {
             addDisplayable(vcsDisplay, crossSectionView,
@@ -538,6 +545,34 @@ public abstract class CrossSectionControl extends GridDisplayControl {
     }
 
 
+    /**
+     * Add tabs to the properties dialog.
+     *
+     * @param jtp  the JTabbedPane to add to
+     */
+    public void addPropertiesComponents(JTabbedPane jtp) {
+        super.addPropertiesComponents(jtp);
+
+        if (crossSectionView != null) {
+            jtp.add("Cross Section", crossSectionView.getPropertiesComponent());
+        }
+    }
+
+    /**
+     * Apply the properties
+     *
+     * @return true if successful
+     */
+    public boolean doApplyProperties() {
+        if ( !super.doApplyProperties()) {
+            return false;
+        }
+        if (crossSectionView != null) {
+            return crossSectionView.applyProperties();
+        }
+        return true;
+    }
+
 
     /**
      * Called by doMakeWindow in DisplayControlImpl, which then calls its
@@ -621,18 +656,36 @@ public abstract class CrossSectionControl extends GridDisplayControl {
                                              GuiUtils.left(locationLabel)));
         */
         super.getControlWidgets(controlWidgets);
-        if (getAllowAutoScale()) {
-            JCheckBox autoscaleCbx = GuiUtils.makeCheckbox("", this,
-                                         "autoScaleYAxis");
-            controlWidgets.add(new WrapperWidget(this,
-                    GuiUtils.rLabel("Autoscale Y-Axis:"),
-                    GuiUtils.left(autoscaleCbx)));
-        }
+        controlWidgets.add(new WrapperWidget(this,
+                    GuiUtils.rLabel("Vertical Scale:"),
+                    GuiUtils.left(doMakeVerticalRangeWidget())));
         /* TODO: make this work
         controlWidgets.add(new WrapperWidget(this,
                                              GuiUtils.rLabel("Animate Line"),
                                              getXSectAniControlWidget()));
                                              */
+    }
+
+    private Component doMakeVerticalRangeWidget() {
+       Range r = getVerticalAxisRange();
+       final JLabel rangeLabel = new JLabel("  Range: " + ((r != null) ? r.toString(): "    "));
+       JButton rdButton = new  JButton("Change");
+       rdButton.addActionListener(new ActionListener() {
+           public void actionPerformed(ActionEvent ae) {
+               RangeDialog rd = new RangeDialog(CrossSectionControl.this, getVerticalAxisRange(),
+                       "Change Vertical Axis Range", "setVerticalAxisRange");
+               rd.showDialog();
+               rangeLabel.setText("  Range: " + getVerticalAxisRange().toString());
+           }
+        });
+        Component c = GuiUtils.hbox(rdButton, rangeLabel);
+        if (getAllowAutoScale()) {
+            JCheckBox autoscaleCbx = GuiUtils.makeCheckbox("Auto-scale?", this,
+                                         "autoScaleYAxis");
+            c = GuiUtils.leftRight(c, autoscaleCbx);
+        }
+       return c;
+
     }
 
     /*
@@ -712,6 +765,7 @@ public abstract class CrossSectionControl extends GridDisplayControl {
         if (getHaveInitialized()) {
             updateViewParameters();
         }
+        setXAxisTitle();
 
         return true;
     }
@@ -1139,6 +1193,15 @@ public abstract class CrossSectionControl extends GridDisplayControl {
     }
 
     /**
+     * Set the title on the XAxis.
+     */
+    private void setXAxisTitle() {
+       if (crossSectionView != null) {
+           ((VerticalXSDisplay)crossSectionView.getXSDisplay()).setXAxisTitle();
+       }
+    }
+          
+    /**
      * Call to reScale the display.  Does the right thing depending
      * on the value of autoScaleYAxis.
      *
@@ -1149,9 +1212,40 @@ public abstract class CrossSectionControl extends GridDisplayControl {
         if (getAutoScaleYAxis()) {
             crossSectionView.getXSDisplay().autoScaleYAxis();
         } else {
-            setYAxisRange(crossSectionView.getXSDisplay(), null);
+            setYAxisRange(crossSectionView.getXSDisplay(), getVerticalAxisRange());
         }
         crossSectionView.getXSDisplay().reScale();
+    }
+
+    /**
+     * Set the range on the Y Axis of the cross section
+     *
+     * @param range     Range of values in units of Y Axis.  May be null
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
+     */
+    public void setVerticalAxisRange(Range range) {
+        verticalAxisRange = range;
+        if (crossSectionView != null) {
+           try {
+             setYAxisRange(crossSectionView.getXSDisplay(), range);
+           } catch (Exception exc) {
+              logException("Setting Y Axis Range: ", exc);
+           }
+        }
+    }
+
+    /**
+     * Get the range on the vertical Axis of the cross section
+     *
+     * @return range of values in units of Y Axis.  May be null
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
+     */
+    public Range getVerticalAxisRange() {
+        return verticalAxisRange;
     }
 
     /**
@@ -1175,6 +1269,7 @@ public abstract class CrossSectionControl extends GridDisplayControl {
             double[] vals = mapDisplay.getVerticalRange();
             range = new Range(vals[0], vals[1]);
             display.setYDisplayUnit(mapDisplay.getVerticalRangeUnit());
+            verticalAxisRange = range;
         }
         display.setYRange(range.getMin(), range.getMax());
     }
@@ -1278,12 +1373,12 @@ public abstract class CrossSectionControl extends GridDisplayControl {
             }
         }
 
-        RealTupleType xzRTT = new RealTupleType(RealType.XAxis,
-                                  RealType.Altitude);
+        RealTupleType xzRTT = new RealTupleType(Length.getRealType(), RealType.Altitude);
 
         Gridded2DSet vcsG2DS = (dataIs3D)
                                ? new Gridded2DSet(xzRTT, plane, sizeX, sizeZ,
-                                   (CoordinateSystem) null, (Unit[]) null,
+                                   (CoordinateSystem) null, 
+                                   new Unit[] {CommonUnits.KILOMETER, CommonUnit.meter },
                                    (ErrorEstimate[]) null, false, false)
                                : new Gridded2DSet(xzRTT, plane, sizeX);
 

@@ -24,24 +24,21 @@ package ucar.unidata.idv;
 
 
 import ucar.unidata.collab.*;
+
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.BooleanProperty;
 
 import ucar.unidata.xml.XmlObjectStore;
-
 
 
 import ucar.visad.display.*;
 
 import visad.*;
-
 import visad.georef.*;
 
 import java.awt.*;
-
 import java.beans.*;
-
 import java.rmi.RemoteException;
-
 import java.text.DecimalFormat;
 
 import java.util.ArrayList;
@@ -220,6 +217,13 @@ public class CrossSectionViewManager extends ViewManager {
         getXSDisplay().setForeground(foreground);
     }
 
+    /**
+     * Some user preferences have changed.
+     */
+    public void applyPreferences() {
+       ((VerticalXSDisplay) getXSDisplay()).setXDisplayUnit(getIdv().getPreferenceManager().getDefaultDistanceUnit());
+    }
+        
 
     /**
      * Get the cross section display that this view manager uses.
@@ -234,20 +238,37 @@ public class CrossSectionViewManager extends ViewManager {
      * Set the clipping  flag
      *
      * @param value The value
-     */
     public void setClipping(boolean value) {
         clipOn = value;
         if (getXSDisplay() != null) {
             getXSDisplay().enableClipping(clipOn);
         }
     }
+     */
 
     /**
      * Get the clipping  flag
      * @return The flag value
-     */
     public boolean getClipping() {
         return clipOn;
+    }
+     */
+
+    /**
+     * Set the  clipping  flag
+     *
+     * @param value The value
+     */
+    public void setClipping(boolean value) {
+        setBp(PREF_CLIP, value);
+    }
+
+    /**
+     * Get  the 3d clipping  flag
+     * @return The flag value
+     */
+    public boolean getClipping() {
+        return getBp(PREF_CLIP);
     }
 
     /**
@@ -306,47 +327,6 @@ public class CrossSectionViewManager extends ViewManager {
         return false;
     }
 
-
-
-    /**
-     * TODO
-     * Display value,
-     * extracted from data in the current working
-     * FlatField of the vertical cross section display.
-     * Evaluate at location given by cursor.
-     * private synchronized void setCSValueLabel () {
-     *   DecimalFormat presFormat = new DecimalFormat ("###.0");
-     *
-     *   try {
-     *       if ((getXSDisplay ().getCursorXValue ()   != null)
-     *        && (getXSDisplay ().getCursorYValue ()   != null)) {
-     *
-     *           // find "location" of cursor in geographic units
-     *           Real      value    = new Real (0.0);
-     *           RealTuple location = new RealTuple (new Real[]{ value,
-     *                                    value });
-     *
-     *
-     *           // using "location" try to get the data value there
-     *           //TODO                value = (Real) csFieldForSample.evaluate (location, Data.WEIGHTED_AVERAGE, Data.NO_ERRORS);
-     *
-     *             // show "value" in the "valueLabel"
-     *             if (value.isMissing ()) {
-     *           valueLabel.setText ("  Outside data area.");
-     *           } else {
-     *           valueLabel.setText (" Value: "+  valueFormat.format (value.getValue (display2DUnit)));
-     *           }
-     *       }
-     *   } catch (Exception e) {
-     *       LogUtil.printException (log_, "setCSValueLabel", e);
-     *   }
-     * }    // end set cs value label
-     *
-     * @return foo
-     */
-
-
-
     /**
      * What type of view is this
      *
@@ -356,6 +336,49 @@ public class CrossSectionViewManager extends ViewManager {
         return "Cross Section";
     }
 
+    /**
+     * The BooleanProperty identified byt he given id has changed.
+     * Apply the change to the display.
+     *
+     * @param id Id of the changed BooleanProperty
+     * @param value Its new value
+     *
+     * @throws Exception problem handeling the change
+     */
+    protected void handleBooleanPropertyChange(String id, boolean value)
+            throws Exception {
+        if (id.equals(PREF_CLIP)) {
+            if (getXSDisplay() != null) {
+                getXSDisplay().enableClipping(value);
+            }
+        } else {
+            super.handleBooleanPropertyChange(id, value);
+        }
+    }
+
+
+    /**
+     * Get the intial BooleanProperty-s
+     *
+     * @param props list to add them to.
+     */
+    protected void getInitialBooleanProperties(List props) {
+        super.getInitialBooleanProperties(props);
+        props.add(new BooleanProperty(PREF_CLIP, "Clip View At Box", "",
+                                      false));
+    }
+
+
+    /**
+     * Create and return the show menu.
+     *
+     * @return The Show menu
+     */
+    protected JMenu makeShowMenu() {
+        JMenu showMenu = super.makeShowMenu();
+        createCBMI(showMenu, PREF_CLIP);
+        return showMenu;
+    }
 
 }
 
