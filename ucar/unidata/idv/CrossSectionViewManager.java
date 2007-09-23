@@ -20,13 +20,14 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
 import ucar.unidata.collab.*;
+import ucar.unidata.util.BooleanProperty;
 
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.BooleanProperty;
 
 import ucar.unidata.xml.XmlObjectStore;
 
@@ -34,11 +35,15 @@ import ucar.unidata.xml.XmlObjectStore;
 import ucar.visad.display.*;
 
 import visad.*;
+
 import visad.georef.*;
 
 import java.awt.*;
+
 import java.beans.*;
+
 import java.rmi.RemoteException;
+
 import java.text.DecimalFormat;
 
 import java.util.ArrayList;
@@ -221,9 +226,11 @@ public class CrossSectionViewManager extends ViewManager {
      * Some user preferences have changed.
      */
     public void applyPreferences() {
-       ((VerticalXSDisplay) getXSDisplay()).setXDisplayUnit(getIdv().getPreferenceManager().getDefaultDistanceUnit());
+        super.applyPreferences();
+        ((VerticalXSDisplay) getXSDisplay()).setXDisplayUnit(
+            getIdv().getPreferenceManager().getDefaultDistanceUnit());
     }
-        
+
 
     /**
      * Get the cross section display that this view manager uses.
@@ -233,26 +240,6 @@ public class CrossSectionViewManager extends ViewManager {
     public XSDisplay getXSDisplay() {
         return (XSDisplay) getMaster();
     }
-
-    /**
-     * Set the clipping  flag
-     *
-     * @param value The value
-    public void setClipping(boolean value) {
-        clipOn = value;
-        if (getXSDisplay() != null) {
-            getXSDisplay().enableClipping(clipOn);
-        }
-    }
-     */
-
-    /**
-     * Get the clipping  flag
-     * @return The flag value
-    public boolean getClipping() {
-        return clipOn;
-    }
-     */
 
     /**
      * Set the  clipping  flag
