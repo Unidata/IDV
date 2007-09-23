@@ -40,6 +40,8 @@ import ucar.unidata.util.Range;
 import ucar.unidata.util.ThreeDSize;
 
 import ucar.visad.Util;
+import ucar.visad.quantities.Length;
+import ucar.visad.quantities.CommonUnits;
 
 
 
@@ -158,6 +160,10 @@ public class ColorRhiControl extends ColorCrossSectionControl {
             getCrossSectionViewManager().setNewDisplayTitle("RHI  Azimuth: "
                     + getDisplayConventions().formatAngle(beamAz));
             // set altitude scale in plot to 0 to 20000 m
+            setVerticalAxisRange(new Range(0,20000));
+            updateAxisLabels();
+
+            /*
             xsDisplay.setYRange(0.0, 20000.0);
             AxisScale yScale = xsDisplay.getYAxisScale();
             yScale.setMajorTickSpacing(4000);
@@ -173,9 +179,10 @@ public class ColorRhiControl extends ColorCrossSectionControl {
             xScale.setMinorTickSpacing(50);
             xScale.setSnapToBox(true);
             xScale.createStandardLabels(400, 0, 0, 100);
-            xScale.setTitle("Distance along ground");  // see below with unit
+            // xScale.setTitle("Distance along ground");  // see below with unit
             xScale.setSnapToBox(true);
             xScale.setGridLinesVisible(true);
+            */
             /*
             // create a mesh for the display
             MapLines grid = new MapLines("Data grid");
@@ -210,13 +217,38 @@ public class ColorRhiControl extends ColorCrossSectionControl {
             if (unitlabel.equalsIgnoreCase("1000.0 m")) {
                 unitlabel = "km";
             }
-            xScale.setTitle("Distance along ground (" + unitlabel + ")");
+            //xScale.setTitle("Distance along ground (" + unitlabel + ")");
             // Do we need this here or is it already done in setData?
             updateCenterPoint();
         } catch (Exception e) {
             logException("Initializing the csSelector", e);
         }
         csSelector.addPropertyChangeListener(this);
+    }
+    
+    private void updateAxisLabels() {
+        try {
+            XSDisplay xsDisplay = crossSectionView.getXSDisplay();
+            AxisScale yScale = xsDisplay.getYAxisScale();
+            yScale.setMajorTickSpacing((int) (getVerticalAxisRange().getMax()/5));
+            yScale.setMinorTickSpacing(yScale.getMajorTickSpacing()/5);
+            yScale.setTitle("Altitude MSL (m)");
+            yScale.setSnapToBox(true);
+            yScale.createStandardLabels(getVerticalAxisRange().getMax(), 0, 0, yScale.getMajorTickSpacing());
+            yScale.setGridLinesVisible(true);
+            // set x axis to cover 0 to 400 km from radar
+            xsDisplay.setXRange(0.0, 400.0);
+            AxisScale xScale = xsDisplay.getXAxisScale();
+            xScale.setMajorTickSpacing(100);
+            xScale.setMinorTickSpacing(50);
+            xScale.setSnapToBox(true);
+            xScale.createStandardLabels(400, 0, 0, 100);
+            // xScale.setTitle("Distance along ground");  // see below with unit
+            xScale.setSnapToBox(true);
+            xScale.setGridLinesVisible(true);
+        } catch (Exception e) {
+            logException("updating axis labels", e);
+        }
     }
 
     /**
@@ -940,7 +972,7 @@ public class ColorRhiControl extends ColorCrossSectionControl {
                 // or + 1000.0f *(-2*R + Math.sqrt(4*R*R + 4*dx*R))/2;// 2nd order
             }
 
-            RealTupleType xzRTT = new RealTupleType(RealType.XAxis,
+            RealTupleType xzRTT = new RealTupleType(Length.getRealType(),
                                       RealType.Altitude);
             int  sizeX = domainSet.getLengths()[0];
             int  sizeZ = domainSet.getLengths()[1];
@@ -949,7 +981,7 @@ public class ColorRhiControl extends ColorCrossSectionControl {
                          : transform.getReferenceUnits()[2];
             Gridded2DSet oneBeamG2DS = new Gridded2DSet(xzRTT, plane, sizeX,
                                            sizeZ, (CoordinateSystem) null,
-                                           new Unit[] { null,
+                                           new Unit[] { CommonUnits.KILOMETER,
                     zUnit }, (ErrorEstimate[]) null);
             RealTupleType oneBeamMT =
                 (RealTupleType) getGridDataInstance().getRangeType();
