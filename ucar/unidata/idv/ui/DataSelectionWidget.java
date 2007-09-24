@@ -345,7 +345,7 @@ public class DataSelectionWidget {
         }
 
 
-        levels = dc.getAllLevels();
+        levels = dc.getAllLevels(new DataSelection(GeoSelection.STRIDE_BASE));
         if ((levels != null) && (levels.size() > 1)) {
             if (levelsList == null) {
                 levelsList = new JList();
