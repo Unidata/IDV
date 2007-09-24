@@ -277,7 +277,7 @@ public class RadarSweepControl extends ColorPlanViewControl {
         if (currentLevel == null) {
             currentLevel = (Real) getDataSelection().getFromLevel();
             if (currentLevel == null) {
-                List levelsList = dataChoice.getAllLevels();
+                List levelsList = dataChoice.getAllLevels(getDataSelection());
                 if ((levelsList != null) && (levelsList.size() > 0)) {
                     currentLevel = (Real) levelsList.get(0);
                 }

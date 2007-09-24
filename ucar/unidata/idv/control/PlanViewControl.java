@@ -422,7 +422,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
     protected boolean setData(DataChoice dataChoice)
             throws VisADException, RemoteException {
         //Now get the list of levels
-        List   levelsList = dataChoice.getAllLevels();
+        List   levelsList = dataChoice.getAllLevels(getDataSelection());
         Real[] levels     = null;
         if ((levelsList != null) && (levelsList.size() > 0)) {
             levels = (Real[]) levelsList.toArray(new Real[levelsList.size()]);
@@ -1081,7 +1081,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
         if (currentLevel == null) {
             currentLevel = (Real) getDataSelection().getFromLevel();
             if (currentLevel == null) {
-                List levelsList = dataChoice.getAllLevels();
+                List levelsList = dataChoice.getAllLevels(getDataSelection());
                 if ((levelsList != null) && (levelsList.size() > 0)) {
                     currentLevel = (Real) levelsList.get(0);
                 }
