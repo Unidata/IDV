@@ -246,6 +246,7 @@ public class JythonManager extends IdvManager implements ActionListener {
         String cacheDir = getStore().getJythonCacheDir();
         ResourceCollection rc = getResourceManager().getResources(
                                     IdvResourceManager.RSC_JYTHONTOCOPY);
+        rc.clearCache();
         try {
             for (int i = 0; i < rc.size(); i++) {
                 String path      = rc.get(i).toString();

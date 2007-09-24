@@ -5,33 +5,56 @@
 import ucar.unidata.data.DataChoice as DataChoice
 
 
-def selectData(name='Select Field'):
-    list = java.util.ArrayList();
-    list.add(name);
-    result = idv.selectDataChoices(list);
+def selectData(name1='Select Field',name2=None,name3=None,name4=None,name5=None):
+    result = selectDataChoice(name1,name2,name3,name4,name5);
     if(result == None): 
-        shell.toFront();
 	return None;
-    shell.toFront();
-    return result.get(0).getData(None);
+    if(isinstance(result, DataChoice)==1):
+	return result.getData(None);
+    dataList = java.util.ArrayList();
+    for i in range(result.size()):
+	dataList.add(result.get(i).getData(None));
+    if(dataList.size()==1):
+	return dataList.get(0);
+    return dataList
 
-def selectDataChoice(name='Select Field'):
+
+def selectDataChoice(name1='Select Field',name2=None,name3=None,name4=None,name5=None):
     list = java.util.ArrayList();
-    list.add(name);
+    list.add(name1);
+    if(name2!=None):
+	list.add(name2);
+    if(name3!=None):
+	list.add(name3);
+    if(name4!=None):
+	list.add(name4);
+    if(name5!=None):
+	list.add(name5);
     result = idv.selectDataChoices(list);
-    if(result == None): 
-        shell.toFront();
-	return None;
     shell.toFront();
-    return result.get(0);
+    if(result == None): 
+	return None;
+    if(result.size()==1):
+	return result.get(0);
+    return result
+
 
 
 def createDisplay(displayType, data, dataName='Data'):
 	import ucar.unidata.data.DataDataChoice as DataDataChoice
        	import ucar.unidata.data.DataChoice as DataChoice
-	if(isinstance(data, DataChoice)==0):
-             data = DataDataChoice(dataName,data);
-        control = idv.doMakeControl(displayType, data);
+	if(isinstance(data, java.util.List)==0):
+		tmp = java.util.ArrayList();		
+		tmp.add(data);
+		data = tmp;
+
+	dataList = java.util.ArrayList();
+	for i in range(data.size()):
+		obj = data.get(i)
+		if(isinstance(obj, DataChoice)==0):
+	             obj = DataDataChoice(dataName+str(i),obj);
+		dataList.add(obj);
+        control = idv.doMakeControl(displayType, dataList);
         shell.toFront();
         return control
 
@@ -40,9 +63,12 @@ def showLib():
     idv.getJythonManager().showJythonEditor()
 
 
+def clear():
+	shell.clear();
+
+
 def listVars():
 	shell.listVars();
-
 
 
 def api(object):

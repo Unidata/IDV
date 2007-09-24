@@ -2172,9 +2172,15 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      */
     public DisplayControl doMakeControl(String controlName,
                                         DataChoice dataChoice) {
+
+        return doMakeControl(controlName, Misc.newList(dataChoice));
+    }
+
+    public DisplayControl doMakeControl(String controlName,
+                                        List dataChoices) {
         ControlDescriptor cd = getControlDescriptor(controlName);
         if (cd != null) {
-            return doMakeControl(Misc.newList(dataChoice), cd);
+            return doMakeControl(dataChoices, cd);
         }
         return null;
     }
