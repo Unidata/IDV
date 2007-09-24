@@ -9574,7 +9574,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
     /**
      * Apply preferences to this control.  Subclasses should override
-     * if needed.  This is a noop in this class.
+     * if needed. 
      */
     public void applyPreferences() {
         updateLegendAndList();

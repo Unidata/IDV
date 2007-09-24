@@ -160,7 +160,9 @@ public class ColorRhiControl extends ColorCrossSectionControl {
             getCrossSectionViewManager().setNewDisplayTitle("RHI  Azimuth: "
                     + getDisplayConventions().formatAngle(beamAz));
             // set altitude scale in plot to 0 to 20000 m
-            setVerticalAxisRange(new Range(0,20000));
+            if (getVerticalAxisRange() == null) {
+                setVerticalAxisRange(new Range(0,20000));
+            }
             updateAxisLabels();
 
             /*
@@ -260,11 +262,11 @@ public class ColorRhiControl extends ColorCrossSectionControl {
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
-     */
     protected void setYAxisRange(XSDisplay display, Range range)
             throws VisADException, RemoteException {
         crossSectionView.getXSDisplay().setYRange(0.0, 20000.0);
     }
+     */
 
     /**
      * Handle property change

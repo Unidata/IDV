@@ -1480,6 +1480,19 @@ public abstract class CrossSectionControl extends GridDisplayControl {
     }
 
     /**
+     * Apply preferences to this control.  Subclasses should override
+     * if needed.  This is a noop in this class.
+     */
+    public void applyPreferences() {
+        super.applyPreferences();
+        if (crossSectionView != null) {
+            ((VerticalXSDisplay) 
+            crossSectionView.getXSDisplay()).setXDisplayUnit(
+            getIdv().getPreferenceManager().getDefaultDistanceUnit());
+        }
+    }
+
+    /**
      * Wrapper around {@link #addTopographyMap(int)} to allow subclasses
      * to set their own index.
      *

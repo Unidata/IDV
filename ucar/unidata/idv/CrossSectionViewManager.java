@@ -160,6 +160,10 @@ public class CrossSectionViewManager extends ViewManager {
      */
     protected void init() throws VisADException, RemoteException {
 
+        if (getHaveInitialized()) {
+            return;
+        }
+        super.init();
         VerticalXSDisplay csDisplay = (VerticalXSDisplay) getMaster();
 
 
@@ -167,8 +171,6 @@ public class CrossSectionViewManager extends ViewManager {
         // and zoom in by a factor of 3.0 from the small default size.
         //csDisplay.setDisplayAspect(new double[] { .65, .65, 1.0} );
         csDisplay.setAspect(1.0, .4);
-        super.init();
-
 
         /* TODO
         // To enable middle button sampling in the "csDisplay,"
@@ -215,12 +217,12 @@ public class CrossSectionViewManager extends ViewManager {
      *
      * @param foreground  foreground color
      * @param background  background color
-     */
     public void setColors(Color foreground, Color background) {
         super.setColors(foreground, background);
-        getXSDisplay().setBackground(background);
-        getXSDisplay().setForeground(foreground);
+        //getXSDisplay().setBackground(background);
+        //getXSDisplay().setForeground(foreground);
     }
+     */
 
     /**
      * Some user preferences have changed.
