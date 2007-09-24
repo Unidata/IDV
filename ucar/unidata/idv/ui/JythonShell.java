@@ -401,6 +401,9 @@ public class JythonShell extends InteractiveShell {
     public void eval(String jython) {
         try {
             super.eval(jython);
+            if(jython.trim().startsWith("? ")) {
+                jython = "print " + jython.trim().substring(2);
+            }
             getInterpreter().exec(jython);
         } catch (PyException pse) {
             output("<font color=\"red\">Error: " + pse.toString()
