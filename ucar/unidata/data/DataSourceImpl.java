@@ -25,6 +25,7 @@
 
 
 
+
 package ucar.unidata.data;
 
 
@@ -1104,6 +1105,31 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         return ((descriptor != null)
                 ? descriptor.getId()
                 : null);
+    }
+
+
+    /**
+     * Automatically create the given display on initialization. This used to be in the IDV
+     * but we moved it here to allow different data sources to do different things.
+     *
+     * @param displayType The display control type id. 
+     * @param dataContext Really, the IDV
+     */
+    public void createAutoDisplay(String displayType,
+                                  DataContext dataContext) {
+        if (displayType != null) {
+            List choices = getDataChoices();
+            for (int cIdx = 0; cIdx < choices.size(); cIdx++) {
+                DataChoice dataChoice = (DataChoice) choices.get(cIdx);
+                dataContext.getIdv().doMakeControl(
+                    dataChoice,
+                    dataContext.getIdv().getControlDescriptor(displayType),
+                    (String) null);
+                //For now break after the first one
+                //so we don't keep adding displays
+                break;
+            }
+        }
     }
 
 

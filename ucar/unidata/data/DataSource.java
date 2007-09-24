@@ -20,6 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.data;
 
 
@@ -530,6 +532,15 @@ public interface DataSource {
     public void clearCachedData();
 
 
+    /**
+     * Automatically create the given display on initialization. This used to be in the IDV
+     * but we moved it here to allow different data sources to do different things.
+     *
+     * @param displayType The display control type id
+     * @param dataContext Really, the IDV
+     */
+    public void createAutoDisplay(String displayType,
+                                  DataContext dataContext);
 
 }
 
