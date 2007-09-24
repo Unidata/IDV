@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv;
 
 
@@ -1778,7 +1779,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
             List controls = getControls();
             for (int i = 0; i < controls.size(); i++) {
                 DisplayControl control = (DisplayControl) controls.get(i);
-                if ( !control.getShowInDisplayList() || !control.getDisplayVisibility()) {
+                if ( !control.getShowInDisplayList()
+                        || !control.getDisplayVisibility()) {
                     continue;
                 }
                 TextDisplayable d =
@@ -1929,7 +1931,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
             BooleanProperty newBp = new BooleanProperty(bp) {
                 public void setValueInner(boolean value) throws Exception {
                     super.setValueInner(value);
-                    handleBooleanPropertyChange(getId(), value);
+                    if (getHaveInitialized()) {
+                        handleBooleanPropertyChange(getId(), value);
+                    }
                 }
             };
             newBp.setDefault(defaultValue);
@@ -4146,11 +4150,23 @@ public class ViewManager extends SharableImpl implements ActionListener,
             lastFrameDoneTime = System.currentTimeMillis();
             //            System.err.println(lastFrameDoneTime+ " FRAME DONE");
         } else if (eventId == DisplayEvent.COMPONENT_RESIZED) {
-            Misc.runInABit(200, this, "updateDisplayList", null);
+            final int myComponentResizeCnt = ++componentResizeCnt;
+            Misc.runInABit(200, new Runnable() {
+                public void run() {
+                    if (myComponentResizeCnt == componentResizeCnt) {
+                        updateDisplayList();
+                    }
+                }
+            });
+
         } else {
             //      System.err.println ("??? id:" + eventId);
         }
     }
+
+    /** _more_          */
+    private int componentResizeCnt = 0;
+
 
     /**
      * Get the last time we've seen a FRAME_DONE event

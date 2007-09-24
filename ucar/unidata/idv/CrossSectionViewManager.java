@@ -336,12 +336,9 @@ public class CrossSectionViewManager extends ViewManager {
      */
     protected void handleBooleanPropertyChange(String id, boolean value)
             throws Exception {
-        
         if (id.equals(PREF_CLIP)) {
-            if(getHaveInitialized()) {
-                if (getXSDisplay() != null) {
-                    getXSDisplay().enableClipping(value);
-                }
+            if (getXSDisplay() != null) {
+                getXSDisplay().enableClipping(value);
             }
         } else {
             super.handleBooleanPropertyChange(id, value);
