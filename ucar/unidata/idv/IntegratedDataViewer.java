@@ -1937,16 +1937,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
                     DataManager.PROP_DEFAULT_DISPLAY);
         }
         if (defaultDisplay != null) {
-            List choices = dataSource.getDataChoices();
-            for (int cIdx = 0; cIdx < choices.size(); cIdx++) {
-                DataChoice dataChoice = (DataChoice) choices.get(cIdx);
-                doMakeControl(dataChoice,
-                              getControlDescriptor(defaultDisplay),
-                              NULL_STRING);
-                //For now break after the first one
-                //so we don't keep adding displays
-                break;
-            }
+            dataSource.createAutoDisplay(defaultDisplay,this);
         }
 
     }
