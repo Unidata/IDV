@@ -95,7 +95,7 @@ public class MapInfo {
     /** Xml attribute for the color property */
     public static final String ATTR_COLOR = "color";
 
-    /** Xml attribute for the color property */
+    /** Xml attribute for the category property */
     public static final String ATTR_CATEGORY = "category";
 
     /** Xml attribute for the  map description property */
@@ -176,6 +176,16 @@ public class MapInfo {
 
 
     /**
+     * Create the MapInfo object with the given MapData list
+     *
+     * @param mapDataList List of MapData
+     */
+    public MapInfo(List mapDataList) {
+        this(mapDataList, null, null, Float.NaN);
+    }
+
+
+    /**
      * Create the MapInfo object with the given MapData list, LatLonData and map position
      *
      * @param mapDataList List of MapData
@@ -186,8 +196,12 @@ public class MapInfo {
     public MapInfo(List mapDataList, LatLonData latData, LatLonData lonData,
                    float mapPosition) {
         this.mapDataList = mapDataList;
-        this.latLonData.add(latData);
-        this.latLonData.add(lonData);
+        if(latData!=null) {
+            this.latLonData.add(latData);
+        }
+        if(lonData!=null) {
+            this.latLonData.add(lonData);
+        }
         this.mapPosition = mapPosition;
     }
 
@@ -319,9 +333,15 @@ public class MapInfo {
      * @return The xml representation of the current state
      */
     public String getXml() {
+        return getXml(true);
+    }
+
+    public String getXml(boolean useFullSourcePath) {
         Document document     = XmlUtil.makeDocument();
         Element  currentState = document.createElement(TAG_MAPS);
-        currentState.setAttribute(ATTR_POSITION, "" + mapPosition);
+        if(mapPosition == mapPosition) {
+            currentState.setAttribute(ATTR_POSITION, "" + mapPosition);
+        }
         try {
             for (int i = 0; i < latLonData.size(); i++) {
                 LatLonData lld = (LatLonData) latLonData.get(i);
@@ -345,10 +365,13 @@ public class MapInfo {
                 MapData mapData    = (MapData) mapDataList.get(i);
                 Element newElement = document.createElement(TAG_MAP);
                 currentState.appendChild(newElement);
+                String source = mapData.getSource();
+                if(!useFullSourcePath) source = "/"+IOUtil.getFileTail(source);
                 XmlUtil.setAttributes(newElement, new String[] {
-                    ATTR_SOURCE, mapData.getSource(), ATTR_COLOR,
-                    "" + mapData.getColor().getRGB(), ATTR_LINEWIDTH,
-                    "" + mapData.getLineWidth(), ATTR_LINESTYLE,
+                    ATTR_SOURCE, source, 
+                    ATTR_CATEGORY, mapData.getCategory(),
+                    ATTR_COLOR, "" + mapData.getColor().getRGB(), 
+                    ATTR_LINEWIDTH, "" + mapData.getLineWidth(), ATTR_LINESTYLE,
                     "" + mapData.getLineStyle(), ATTR_VISIBLE,
                     "" + mapData.getVisible(), ATTR_DESCRIPTION,
                     "" + mapData.getDescription(), ATTR_FASTRENDER,
