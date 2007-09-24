@@ -948,10 +948,12 @@ public class GeoGridDataSource extends GridDataSource {
      * @param dataChoice The data choice we are getting levels for
      * @return  List of all available levels
      */
-    public List getAllLevels(DataChoice dataChoice) {
+    public List getAllLevels(DataChoice dataChoice, DataSelection dataSelection) {
         try {
+            dataSelection = DataSelection.merge(dataSelection,
+                                                getDataSelection());
             GeoGridAdapter geoGridAdapter = makeGeoGridAdapter(dataChoice,
-                                                null, null, -1, -1);
+                                                            dataSelection, null, -1, -1);
             if (geoGridAdapter != null) {
                 return geoGridAdapter.getLevels();
             }
@@ -1118,7 +1120,7 @@ public class GeoGridDataSource extends GridDataSource {
 
 
         long millis    = System.currentTimeMillis();
-        List allLevels = getAllLevels(dataChoice);
+        List allLevels = getAllLevels(dataChoice,new DataSelection(GeoSelection.STRIDE_BASE));
 
         Trace.call1("GeoGridDataSource.makeField");
 

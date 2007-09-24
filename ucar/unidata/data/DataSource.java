@@ -244,6 +244,9 @@ public interface DataSource {
      */
     public List getAllLevels(DataChoice dataChoice);
 
+
+    public List getAllLevels(DataChoice dataChoice, DataSelection dataSelection);
+
     /**
      * Get the list of all times available from this DataSource
      *

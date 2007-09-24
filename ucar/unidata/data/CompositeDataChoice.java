@@ -174,18 +174,21 @@ public class CompositeDataChoice extends DirectDataChoice {
         return dataChoices.size();
     }
 
+
     /**
      * Get all the levels associated with this choice
      *
      * @return  List of levels
      */
-    public List getAllLevels() {
+    public List getAllLevels(DataSelection dataSelection) {
         Hashtable seen = new Hashtable();
         List      mine = new ArrayList();
+        dataSelection =  DataSelection.merge(dataSelection,
+                                             myDataSelection);
         for (int i = 0; i < dataChoices.size(); i++) {
             DataChoice child = (DataChoice) dataChoices.get(i);
             if (child != null) {
-                Misc.addUnique(mine, child.getAllLevels(), seen);
+                Misc.addUnique(mine, child.getAllLevels(dataSelection), seen);
             }
         }
         return mine;

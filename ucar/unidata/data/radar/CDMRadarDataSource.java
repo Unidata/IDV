@@ -30,6 +30,7 @@ import ucar.nc2.thredds.DqcRadarDatasetCollection;
 import ucar.nc2.units.DateUnit;
 
 
+import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.CompositeDataChoice;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSourceDescriptor;
@@ -569,7 +570,10 @@ public class CDMRadarDataSource extends RadarDataSource {
      * @param dataChoice The data choice we are getting levels for
      * @return  List of all available levels
      */
-    public List getAllLevels(DataChoice dataChoice) {
+    public List getAllLevels(DataChoice dataChoice,DataSelection dataSelection) {
+        dataSelection = DataSelection.merge(dataSelection,
+                                            getDataSelection());
+
         List      levels = new ArrayList();
         Hashtable props  = dataChoice.getProperties();
         if ((props == null) || (props.get(PROP_ANGLES) == null)) {

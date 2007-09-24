@@ -343,6 +343,16 @@ public abstract class DataChoice {
      * @return  List of levels
      */
     public List getAllLevels() {
+        return getAllLevels(null);
+    }
+
+
+    /**
+     * Get all the levels associated with this choice
+     *
+     * @return  List of levels
+     */
+    public List getAllLevels(DataSelection dataSelection) {
         return null;
     }
 

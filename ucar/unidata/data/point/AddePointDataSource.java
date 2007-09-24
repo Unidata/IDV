@@ -449,7 +449,7 @@ public class AddePointDataSource extends PointDataSource {
      * @param dataChoice The data choice we are getting levels for
      * @return  List of all available levels
      */
-    public List getAllLevels(DataChoice dataChoice) {
+    public List getAllLevels(DataChoice dataChoice, DataSelection dataSelection) {
         return getLevels();
     }
 

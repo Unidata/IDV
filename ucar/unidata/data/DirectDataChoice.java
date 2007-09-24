@@ -202,8 +202,9 @@ public class DirectDataChoice extends DataChoice {
      *
      * @return  List of levels
      */
-    public List getAllLevels() {
-        return dataSource.getAllLevels(this);
+    public List getAllLevels(DataSelection dataSelection) {
+        return dataSource.getAllLevels(this, DataSelection.merge(dataSelection,
+                                                                 myDataSelection));
     }
 
 

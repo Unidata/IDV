@@ -431,7 +431,10 @@ public class Level2RadarDataSource extends RadarDataSource {
      * @param dataChoice The data choice we are getting levels for
      * @return  List of all available levels
      */
-    public List getAllLevels(DataChoice dataChoice) {
+    public List getAllLevels(DataChoice dataChoice,DataSelection dataSelection) {
+        dataSelection = DataSelection.merge(dataSelection,
+                                            getDataSelection());
+
         List      levels = new ArrayList();
         Hashtable props  = dataChoice.getProperties();
         if ((props == null) || (props.get(PROP_ANGLES) == null)) {

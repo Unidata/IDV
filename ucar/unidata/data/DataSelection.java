@@ -77,6 +77,17 @@ public class DataSelection {
         this((List) null);
     }
 
+
+    public DataSelection(int zStride) {
+        this.geoSelection = new GeoSelection(null, GeoSelection.STRIDE_BASE, GeoSelection.STRIDE_BASE, zStride);
+    }
+
+
+    public DataSelection(int xStride, int yStride, int zStride) {
+        this.geoSelection = new GeoSelection(null, xStride, yStride, zStride);
+    }
+
+
     /**
      * Construct a <code>DataSelection</code>.
      *
@@ -299,7 +310,8 @@ public class DataSelection {
      * @return a string representation of this DataSelection
      */
     public String toString() {
-        return super.toString() + " " + times;
+        //        return super.toString() + " " + times;
+        return "data selection:" + geoSelection;
     }
 
     /**

@@ -1366,6 +1366,11 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @return  List of all available levels
      */
     public List getAllLevels(DataChoice dataChoice) {
+        return getAllLevels(dataChoice, null);
+    }
+
+
+    public List getAllLevels(DataChoice dataChoice, DataSelection dataSelection) {
         return null;
     }
 

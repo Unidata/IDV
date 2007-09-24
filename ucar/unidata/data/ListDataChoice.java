@@ -391,13 +391,15 @@ public class ListDataChoice extends DataChoice {
      *
      * @return The union of all of the children {@link DataChoice}-s levels.
      */
-    public List getAllLevels() {
+    public List getAllLevels(DataSelection dataSelection) {
         List      mine = new ArrayList();
         Hashtable seen = new Hashtable();
+        dataSelection =  DataSelection.merge(dataSelection,
+                                             myDataSelection);
         for (int i = 0; i < childrenChoices.size(); i++) {
             DataChoice child = (DataChoice) childrenChoices.get(i);
             if (child != null) {
-                Misc.addUnique(mine, child.getAllLevels(), seen);
+                Misc.addUnique(mine, child.getAllLevels(dataSelection), seen);
             }
         }
         return mine;
