@@ -32,6 +32,7 @@ import ucar.unidata.data.DataChoice;
 
 import ucar.unidata.gis.maps.*;
 
+import ucar.unidata.idv.PluginManager;
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.idv.MapViewManager;
 
@@ -640,6 +641,9 @@ public class MapDisplayControl extends DisplayControlImpl {
                                        "Set Map Line Color");
         colorButton.setToolTipText("Set the line color");
 
+        final JTextField catFld = new JTextField("Maps", 20);
+        catFld.setToolTipText("Enter a category");
+
         final JTextField nameFld = new JTextField("", 20);
         nameFld.setToolTipText("Enter an optional map name");
         final JTextField fileFld   = new JTextField("", 20);
@@ -678,6 +682,7 @@ public class MapDisplayControl extends DisplayControlImpl {
             JPanel panel = GuiUtils.doLayout(new Component[] {
                 GuiUtils.rLabel("Map file or URL: "), fileLine,
                 GuiUtils.rLabel("Name: "), nameLine,
+                GuiUtils.rLabel("Catgegory: "), catFld,
                 GuiUtils.rLabel("Color: "), GuiUtils.left(colorButton),
                 GuiUtils.rLabel("Line style: "), GuiUtils.left(styleBox),
                 GuiUtils.rLabel("Line width: "), GuiUtils.left(widthBox)
@@ -696,10 +701,12 @@ public class MapDisplayControl extends DisplayControlImpl {
                 description =
                     IOUtil.getFileTail(IOUtil.stripExtension(filename));
             }
-            addMap(new MapState(
+            MapState mapState = new MapState(
                 filename, description, colorButton.getBackground(),
                 Float.parseFloat((String) widthBox.getSelectedItem()),
-                styleBox.getSelectedIndex()));
+                styleBox.getSelectedIndex());
+            mapState.setCategory(catFld.getText().trim());
+            addMap(mapState);
             fillContents();
             break;
         }
@@ -722,10 +729,40 @@ public class MapDisplayControl extends DisplayControlImpl {
      * user's map preference.
      */
     public void saveToPlugin() {
-        String xml = new MapInfo(mapStates, latState, lonState,
-                                 (float) mapPosition).getXml();
-        getControlContext().getIdv().getPluginManager().addText(xml,
-                "maps.xml");
+        JCheckBox onlySelected = new JCheckBox("Only use visible maps", true);
+        JCheckBox includeFiles = new JCheckBox("Include map files in plugin", true);
+        JCheckBox includeSettings = new JCheckBox("Include \"Settings\"", false);
+        JComponent contents = GuiUtils.vbox(onlySelected, includeFiles, includeSettings);
+        contents = GuiUtils.inset(contents,5);
+        if(!GuiUtils.showOkCancelDialog(null, "Create Map Plugin",
+                                        contents,null)) return;
+        PluginManager pluginManager =    getControlContext().getIdv().getPluginManager();
+        MapInfo mapInfo;
+        List states = new ArrayList();
+        for (int i = 0; i < mapStates.size(); i++) {
+            MapState  mapState  = (MapState) mapStates.get(i);
+            if(!onlySelected.isSelected()) {
+                states.add(mapState);
+            }  else if(mapState.getVisible()) {
+                states.add(mapState);                
+            }
+        }
+
+
+        if(includeFiles.isSelected()) {
+            for (int i = 0; i < states.size(); i++) {
+                MapState  mapState  = (MapState) states.get(i);
+                pluginManager.addCreateFile(mapState.getSource());
+            }
+        }
+        if(includeSettings.isSelected()) {
+            mapInfo = new MapInfo(states, latState, lonState,
+                                  (float) mapPosition);
+        } else {
+            mapInfo = new MapInfo(states);
+        }
+        String xml  = mapInfo.getXml(!includeFiles.isSelected());
+        pluginManager.addText(xml, "maps.xml");
     }
 
 
