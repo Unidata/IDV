@@ -80,3 +80,8 @@ def printType(data):
 		data = data.getData(None);
 	shell.printType(data);
 
+
+def makeDataSource(path,type=None):
+	return idv.makeOneDataSource(path, type,None);
+
+

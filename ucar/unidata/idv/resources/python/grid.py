@@ -163,6 +163,7 @@ def averageOverTime(field,makeTimes = 0):
         return Util.makeTimeField(current, GridUtil.getDateTimeList(field))
     return current
 
+
 def applyToRange(function,data):
     newData = data.clone()
     f = function +'(rangeValue)'

@@ -746,7 +746,7 @@ public class PluginManager extends IdvManager {
      *
      * @param file The file
      */
-    private void addCreateFile(String file) {
+    public void addCreateFile(String file) {
         addCreateFile(file, null);
     }
 

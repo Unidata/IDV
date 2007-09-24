@@ -2156,7 +2156,7 @@ public class JythonManager extends IdvManager implements ActionListener {
             for (int itemIdx = 0; itemIdx < funcs.size(); itemIdx++) {
                 Object[]   pair = (Object[]) funcs.get(itemIdx);
                 PyFunction func = (PyFunction) pair[1];
-                sb.append("<p><i>" + func.__name__ + "(");
+                sb.append("<p><a name=\"" + func.__name__ +"\"></a><i>" + func.__name__ + "(");
                 PyTableCode tc = (PyTableCode) func.func_code;
                 for (int argIdx = 0; argIdx < tc.co_argcount; argIdx++) {
                     if (argIdx > 0) {
