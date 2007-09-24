@@ -84,6 +84,8 @@ public class InteractiveShell implements HyperlinkListener {
     /** _more_ */
     protected StringBuffer sb = new StringBuffer();
 
+    private boolean bufferOutput = false;
+
     /** _more_ */
     protected List history = new ArrayList();
 
@@ -95,6 +97,9 @@ public class InteractiveShell implements HyperlinkListener {
 
     /** _more_          */
     protected JComponent contents;
+
+
+
 
 
     /**
@@ -365,17 +370,35 @@ public class InteractiveShell implements HyperlinkListener {
         Misc.run(this, "eval", cmd);
     }
 
+    
+
+    protected void startBufferingOutput() {
+        bufferOutput = true;
+    }
+
+    protected void endBufferingOutput() {
+        bufferOutput = false;
+        updateText();
+    }
+
+    private void updateText() {
+        editorPane.setText(sb.toString());
+        editorPane.repaint();
+        editorPane.scrollRectToVisible(new Rectangle(0, 10000, 1, 1));
+    }
+
     /**
      * _more_
      *
      * @param m _more_
      */
-    protected void output(String m) {
+    public void output(String m) {
         sb.append(m);
-        editorPane.setText(sb.toString());
-        editorPane.repaint();
-        editorPane.scrollRectToVisible(new Rectangle(0, 10000, 1, 1));
+         if(!bufferOutput) {
+            updateText();
+        }
     }
+
 
 
     /**
