@@ -156,7 +156,21 @@ public class TextPointDataSource extends PointDataSource {
      * @throws Exception  problem creating data
      */
     protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
-                                LatLonRect bbox)
+                                LatLonRect bbox) 
+            throws Exception {
+        return makeObs(dataChoice, subset, bbox, null,false);
+    }    
+
+    protected String getSource(DataChoice dataChoice) {
+        Object id = dataChoice.getId();
+        if((id instanceof String) && (id.toString().startsWith("track:"))) {
+            return (String) sources.get(0);
+        }
+        return super.getSource(dataChoice);
+    }
+
+    protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
+                                LatLonRect bbox, String trackParam, boolean sampleIt)
             throws Exception {
         String    source = getSource(dataChoice);
         String    contents = IOUtil.readContents(source, getClass());
@@ -168,7 +182,7 @@ public class TextPointDataSource extends PointDataSource {
             try {
                 ta = new TextAdapter(
                     new ByteArrayInputStream(contents.getBytes()), delimiter,
-                    map, params);
+                    map, params,sampleIt);
             } catch (visad.data.BadFormException bfe) {
                 //Probably don't have the header info
                 //If we already have a map and params then we have problems
@@ -180,11 +194,11 @@ public class TextPointDataSource extends PointDataSource {
                 }
                 ta = new TextAdapter(
                     new ByteArrayInputStream(contents.getBytes()), delimiter,
-                    map, params);
+                    map, params,sampleIt);
             }
             try {
                 Data d = ta.getData();
-                obs = makePointObs(d);
+                obs = makePointObs(d,trackParam);
             } catch (Exception exc) {
                 map    = null;
                 params = null;
@@ -215,9 +229,10 @@ public class TextPointDataSource extends PointDataSource {
             //            System.err.println ("data mem:" + (m2-m1));
             for(int i=0;i<10;i++) {
                 long t2 = System.currentTimeMillis();
-                Data d =  makePointObs(data);
+                Data d =  makePointObs(data,"magnitude");
                 long t3 = System.currentTimeMillis();
                 System.err.println ("time:" +  (t3-t2));
+                if(true) break;
             }
 
             //            System.err.println ("time:" + (t2-t1) + " " + (t3-t2));
@@ -624,6 +639,8 @@ public class TextPointDataSource extends PointDataSource {
         return hashCode;
     }
 
+    List varNames =new ArrayList();
+
     /**
      * Take a field of data and turn it into a field of PointObs.
      * Text file must have lines with lat, lon and values...
@@ -634,8 +651,9 @@ public class TextPointDataSource extends PointDataSource {
      *
      * @throws VisADException   couldn't make the observations
      */
-    private FieldImpl makePointObs(Data input) throws VisADException {
+    private FieldImpl makePointObs(Data input, String trackParam) throws VisADException {
 
+        varNames =new ArrayList();
         long      millis   = System.currentTimeMillis();
         FieldImpl retField = null;
         try {
@@ -716,37 +734,30 @@ public class TextPointDataSource extends PointDataSource {
             Real dfltAlt = new Real(RealType.Altitude, 1);
             Real dfltReal = new Real(1);
 
-            /*
-            List tmpl = new ArrayList();
-            long rm1 =  Misc.gc();
-            for(int i=0;i<100000;i++) {
-                EarthLocation location =
-                    new EarthLocationLite(40,40,1);
-                tmpl.add(location);
-                //                tmpl.add(new Real(RealType.Altitude, 1));
-            }
-            long rm2 =  Misc.gc();
-            System.err.println ("rm:" + (rm2-rm1)/100000);
-            */
-
-
             TupleType         finalTT = null;
             TupleType dataTupleType = null;
             Unit []  dataUnits = null;
-
 
 
             // Check for LAT/LON/ALT
             int latIndex = type.getIndex(RealType.Latitude);
             int lonIndex = type.getIndex(RealType.Longitude);
             int altIndex = type.getIndex(RealType.Altitude);
+
+            int trackParamIndex = -1;
+            if(trackParam!=null) {
+                trackParamIndex = type.getIndex(trackParam);
+                if(trackParamIndex == -1) {
+                    throw new IllegalArgumentException("Can't find track param");
+                }
+            }
+
+
+
             //if (altIndex == -1) altIndex = type.getIndex("elev");
             if ((latIndex == -1) || (lonIndex == -1)) {
                 throw new IllegalArgumentException("can't find lat/lon");
             }
-
-            int[] indicies = new int[] { timeIndex, latIndex, lonIndex,
-                                         altIndex };
 
             int numVars        = type.getDimension();
             int numNotRequired = numVars - ((altIndex != -1)
@@ -784,6 +795,50 @@ public class TextPointDataSource extends PointDataSource {
             }
 
 
+            if(trackParam!=null) {
+                float[]lats = new float[times.size()];
+                float[]lons = new float[times.size()];
+                float[]alts = new float[times.size()];
+                //                float[]alts = (altIndex>=0?new float[times.size()]:null);
+                Unit timeUnit = ((DateTime) times.get(0)).getUnit();
+                Real paramSample = (Real) ((Data[])tuples.get(0))[trackParamIndex];
+                RealType timeType =  RealType.getRealType(DataUtil.cleanName("track_time" +  "_" + timeUnit), timeUnit);
+                RealTupleType rangeType = new RealTupleType(ucar.visad.Util.getRealType(paramSample.getUnit()),timeType);
+                double[][] newRangeVals = new double[2][times.size()];
+                for (int i = 0; i < numObs; i++) {
+                    DateTime dateTime = (DateTime) times.get(i);
+                    Real value = (Real) ((Data[])tuples.get(i))[trackParamIndex];
+                    newRangeVals[0][i] = value.getValue();
+                    newRangeVals[1][i] = dateTime.getValue();
+                    Data [] tupleData = (Data[])tuples.get(i);
+                    //Clear the garbage
+                    tuples.set(i,null);
+                    lats[i] = (float)((Real) tupleData[latIndex]).getValue();
+                    lons[i] = (float)((Real) tupleData[lonIndex]).getValue();
+                    if(altIndex>=0) {
+                        alts[i] = (float)((Real) tupleData[altIndex]).getValue();
+                    } else {
+                        alts[i] = 0f;
+                    }
+                }
+                GriddedSet llaSet = ucar.visad.Util.makeEarthDomainSet(lats, lons, alts);
+                Set[] rangeSets = new Set[2];
+                rangeSets[0] = new DoubleSet(new SetType(rangeType.getComponent(0)));
+                rangeSets[1] = new DoubleSet(new SetType(rangeType.getComponent(1)));
+                FunctionType newType =
+                    new FunctionType(((SetType) llaSet.getType()).getDomain(),
+                                     rangeType);
+                FlatField timeTrack = new FlatField(newType, llaSet,
+                                                    (CoordinateSystem) null,
+                                                    rangeSets,
+                                                    new Unit[] {
+                                                        paramSample.getUnit(),
+                                                        timeUnit });
+                timeTrack.setSamples(newRangeVals, false);
+                return timeTrack;
+            }
+
+
             times = PointObFactory.binTimes(times, getBinRoundTo(),
                                             getBinWidth());
 
@@ -811,6 +866,10 @@ public class TextPointDataSource extends PointDataSource {
                         others[j] = (allReals == true)
                                     ? (Real) tupleData[notReqIndices[j]]
                                     : (Data) tupleData[notReqIndices[j]];
+                        if(i==0 && others[j] instanceof Real) {
+                            Real r = (Real)others[j];
+                            varNames.add(((RealType)r.getType()).getName());
+                        }
                     }
                 } else {
                     others    = new Real[]{dfltReal};
@@ -853,6 +912,52 @@ public class TextPointDataSource extends PointDataSource {
         return retField;
     }
 
+
+
+    public void doMakeDataChoices() {
+        super.doMakeDataChoices();
+        if(getProperty("dataistrajectory",false)) {
+            if(getDataChoices().size()==0) return;
+            try {
+            DataChoice dataChoice = (DataChoice) getDataChoices().get(0);
+            Data sample = makeObs(dataChoice, null, null, null,true);
+            //            System.err.println ("sample:" + sample);
+
+            List cats    = DataCategory.parseCategories("Track"+";trace", true);
+            for(int i=0;i<varNames.size();i++) {
+                String var = (String)varNames.get(i);
+                DataChoice choice = new DirectDataChoice(this, "track:" + var,
+                                                         var,var,
+                                                         cats, (Hashtable)null);
+                addDataChoice(choice);
+            }
+            } catch (Exception exc) {
+                logException("Creating track choices", exc);
+            }
+        }
+    }
+
+
+    protected Data getDataInner(DataChoice dataChoice, DataCategory category,
+                                DataSelection dataSelection,
+                                Hashtable requestProperties)
+            throws VisADException, RemoteException {
+
+        Object id = dataChoice.getId();
+        System.err.println (dataChoice.getId());
+        if((id instanceof String) && (id.toString().startsWith("track:"))) {
+            try {
+                return makeObs((DataChoice) dataChoice,
+                               dataSelection, null,id.toString().substring(6),false);
+            } catch (Exception exc) {
+                logException("Creating obs", exc);
+                return null;
+            }
+        }
+        return super.getDataInner(dataChoice, category, dataSelection, requestProperties);
+    }
+
+
     /**
      * test
      *
@@ -861,15 +966,18 @@ public class TextPointDataSource extends PointDataSource {
      * @throws Exception On badness
      */
     public static void main(String[] args) throws Exception {
+        try {
         for(int i=0;i<1;i++) {
             TextPointDataSource tpds = new TextPointDataSource();
             //            long m1 =  Misc.gc();
-
-
             Data data = tpds.test(args[0]);
 
             //            long m2 =   Misc.gc();
             //            System.err.println ("memory:" + (m2-m1));
+        }
+        } catch (Exception exc) {
+            System.err.println("err:" + exc);
+            exc.printStackTrace();
         }
         if(true) return;
 
@@ -949,6 +1057,8 @@ public class TextPointDataSource extends PointDataSource {
     public List getMetaDataFields() {
         return metaDataFields;
     }
+
+
 
 
 }

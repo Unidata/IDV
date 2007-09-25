@@ -103,7 +103,7 @@ public abstract class TrackInfo {
 
 
     /** lat/lon/altitude set */
-    protected Gridded3DSet llaSet = null;
+    protected GriddedSet llaSet = null;
 
     /** The last range when we create the llaSet */
     protected Range lastSpatialSetRange = null;
@@ -192,13 +192,11 @@ public abstract class TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected Gridded3DSet makeEarthDomainSet(Range range) throws Exception {
-        float[][] values = new float[3][];
-        values[0] = getLatitude(range);
-        values[1] = getLongitude(range);
-        values[2] = getAltitude(range);
-        return new Gridded3DSet(RealTupleType.LatitudeLongitudeAltitude,
-                                values, values[0].length);
+    protected GriddedSet makeEarthDomainSet(Range range) throws Exception {
+        return ucar.visad.Util.makeEarthDomainSet(
+                                                  getLatitude(range),
+                                                  getLongitude(range),
+                                                  getAltitude(range));
     }
 
 
@@ -278,9 +276,7 @@ public abstract class TrackInfo {
         rangeSets[0] = new DoubleSet(new SetType(rangeType.getComponent(0)));
         rangeSets[1] = new DoubleSet(new SetType(rangeType.getComponent(1)));
 
-
-
-        Gridded3DSet llaSet = getSpatialSet(range);
+        GriddedSet llaSet = getSpatialSet(range);
         FunctionType newType =
             new FunctionType(((SetType) llaSet.getType()).getDomain(),
                              rangeType);
@@ -711,7 +707,7 @@ public abstract class TrackInfo {
 
 
     /**
-     * Returns the lat/lon/alt values as a Gridded3DSet with manifold
+     * Returns the lat/lon/alt values as a GriddedSet with manifold
      * dimension 1.
      *
      *
@@ -720,7 +716,7 @@ public abstract class TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected Gridded3DSet getSpatialSet(Range range) throws Exception {
+    protected GriddedSet getSpatialSet(Range range) throws Exception {
         if ((llaSet == null) || (range == null)
                 || (lastSpatialSetRange == null)
                 || !Misc.equals(lastSpatialSetRange, range)) {
@@ -810,7 +806,7 @@ public abstract class TrackInfo {
         Range        range        = getFullRange();
 
         FunctionType addFType     = new FunctionType(RealType.Time, addType);
-        Gridded3DSet llaSet       = getSpatialSet(getFullRange());
+        GriddedSet llaSet         = getSpatialSet(getFullRange());
         Unit[]       llaUnits     = llaSet.getSetUnits();
         Unit         tempUnit     = tempVar.unit;
         Unit         dewpointUnit = dewpointVar.unit;

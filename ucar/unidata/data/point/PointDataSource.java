@@ -427,6 +427,7 @@ public abstract class PointDataSource extends FilesDataSource {
                 if (obs == null) {
                     return null;
                 }
+                if(true) return obs;
                 datas.add(obs);
                 if ((fieldsDescription == null) && (obs != null)) {
                     makeFieldDescription(obs);
