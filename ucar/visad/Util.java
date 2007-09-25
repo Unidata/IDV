@@ -3124,6 +3124,19 @@ public final class Util {
 
     }
 
+    public static GriddedSet makeEarthDomainSet(float[]lats, float[]lons, float[]alts) throws VisADException {
+        float[][] values = new float[alts!=null?3:2][];
+        values[0] = lats;
+        values[1] = lons;
+        if(alts!=null) {
+            values[2] = alts;
+            return new Gridded3DSet(RealTupleType.LatitudeLongitudeAltitude,
+                                    values, values[0].length);
+        } 
+        return new Gridded2DSet(RealTupleType.LatitudeLongitudeTuple,
+                                values, values[0].length);
+    }
+
 
 }
 
