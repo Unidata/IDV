@@ -280,6 +280,12 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     public DataSourceImpl(DataSourceDescriptor descriptor, String name,
                           String description, Hashtable properties) {
         this.properties  = properties;
+        if(this.properties == null) {
+            this.properties = new Hashtable();
+        }
+        if(descriptor!=null && descriptor.getProperties()!=null) {
+            this.properties.putAll(descriptor.getProperties());
+        }
         this.descriptor  = descriptor;
         this.description = description;
         //The title or name properties override the name parameter
