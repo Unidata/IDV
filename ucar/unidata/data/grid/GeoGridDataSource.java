@@ -25,6 +25,7 @@
 
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -233,14 +234,6 @@ public class GeoGridDataSource extends GridDataSource {
     }
 
 
-
-
-    /** _more_          */
-    private static int cnt = 0;
-
-    /** _more_          */
-    private int mycnt = cnt++;
-
     /**
      * Initialize if being unpersisted.
      */
@@ -385,7 +378,6 @@ public class GeoGridDataSource extends GridDataSource {
     protected void resolvePath() {
         //Do we have a resolver
         String resolverUrl = (String) getProperty(PROP_RESOLVERURL);
-        //        System.err.println(mycnt +" resolvePath");
         if ((resolverUrl != null) && (resolverUrl.length() > 0)) {
             Hashtable properties = getProperties();
             if (properties == null) {
@@ -713,7 +705,6 @@ public class GeoGridDataSource extends GridDataSource {
             sources.add(file);
         }
 
-        //        System.err.println(mycnt +" doMakeDataSet:file=" + file + " sources=" + sources);
 
         //Make sythetic data ncml file
         if (sources.size() > 1) {
@@ -749,7 +740,6 @@ public class GeoGridDataSource extends GridDataSource {
 
 
         try {
-            //            System.err.println (mycnt+" GridDataset.open:" + file);
             GridDataset gds = GridDataset.open(file);
             return gds;
         } catch (Exception exc) {
@@ -946,14 +936,16 @@ public class GeoGridDataSource extends GridDataSource {
      *
      *
      * @param dataChoice The data choice we are getting levels for
+     * @param dataSelection _more_
      * @return  List of all available levels
      */
-    public List getAllLevels(DataChoice dataChoice, DataSelection dataSelection) {
+    public List getAllLevels(DataChoice dataChoice,
+                             DataSelection dataSelection) {
         try {
             dataSelection = DataSelection.merge(dataSelection,
-                                                getDataSelection());
+                    getDataSelection());
             GeoGridAdapter geoGridAdapter = makeGeoGridAdapter(dataChoice,
-                                                            dataSelection, null, -1, -1);
+                                                dataSelection, null, -1, -1);
             if (geoGridAdapter != null) {
                 return geoGridAdapter.getLevels();
             }
@@ -1047,6 +1039,12 @@ public class GeoGridDataSource extends GridDataSource {
                 if (geoSelection.getLatLonRect() != null) {
                     filename.append("_rect_" + geoSelection.getLatLonRect());
                 }
+                // Z stride is ignored if
+                if ((levelRange != null) && geoSelection.hasZStride()
+                        && (geoSelection.getZStrideToUse() > 1)) {
+                    levelRange = new ucar.ma2.Range(fromLevelIndex,
+                            toLevelIndex, geoSelection.getZStrideToUse());
+                }
                 geoGrid = geoGrid.subset(null, levelRange,
                                          geoSelection.getLatLonRect(),
                                          geoSelection.getZStrideToUse(),
@@ -1119,8 +1117,10 @@ public class GeoGridDataSource extends GridDataSource {
             throws VisADException, RemoteException {
 
 
-        long millis    = System.currentTimeMillis();
-        List allLevels = getAllLevels(dataChoice,new DataSelection(GeoSelection.STRIDE_BASE));
+        long millis = System.currentTimeMillis();
+        List allLevels =
+            getAllLevels(dataChoice,
+                         new DataSelection(GeoSelection.STRIDE_BASE));
 
         Trace.call1("GeoGridDataSource.makeField");
 
