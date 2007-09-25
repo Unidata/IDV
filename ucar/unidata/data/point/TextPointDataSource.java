@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -115,10 +116,13 @@ public class TextPointDataSource extends PointDataSource {
     List missings = new ArrayList();
 
     /** for the metadata gui */
+    List extras = new ArrayList();
+
+    /** for the metadata gui */
     JComponent metaDataComp;
 
 
-    /** _more_          */
+    /** _more_ */
     private String groupVarName = null;
 
     /**
@@ -350,6 +354,9 @@ public class TextPointDataSource extends PointDataSource {
             comps.add(
                 new GraphPaperLayout.Location(
                     new JLabel("Missing Value"), 3, 0));
+            comps.add(
+                new GraphPaperLayout.Location(
+                    new JLabel("Extra (e.g., colspan)"), 4, 0));
 
             Vector boxNames = new Vector(Misc.newList("", "Time", "Latitude",
                                   "Longitude", "Altitude"));
@@ -362,6 +369,10 @@ public class TextPointDataSource extends PointDataSource {
                 nameBox.setEditable(true);
                 nameBox.setPreferredSize(new Dimension(40, 10));
                 fields.add(nameBox);
+                JTextField extraFld = new JTextField("", 10);
+                extras.add(extraFld);
+                extraFld.setToolTipText(
+                    "<html>Extra attributes, e.g.:<br>colspan=&quot;some column span&quot;<br>Note:Values must be quoted.</html>");
                 JTextField missingFld = new JTextField("", 10);
                 missings.add(missingFld);
                 final JTextField unitFld = new JTextField("", 10);
@@ -384,6 +395,7 @@ public class TextPointDataSource extends PointDataSource {
                 comps.add(
                     new GraphPaperLayout.Location(
                         GuiUtils.inset(nameBox, 2), 1, tokIdx + 1));
+
                 comps.add(
                     new GraphPaperLayout.Location(
                         GuiUtils.inset(
@@ -392,6 +404,9 @@ public class TextPointDataSource extends PointDataSource {
                 comps.add(
                     new GraphPaperLayout.Location(
                         GuiUtils.inset(missingFld, 2), 3, tokIdx + 1));
+                comps.add(
+                    new GraphPaperLayout.Location(
+                        GuiUtils.inset(extraFld, 2), 4, tokIdx + 1));
             }
 
             initFields(metaDataFields);
@@ -499,11 +514,13 @@ public class TextPointDataSource extends PointDataSource {
 
             String unit    = ((JTextField) units.get(i)).getText().trim();
             String missing = ((JTextField) missings.get(i)).getText().trim();
+            String extra   = ((JTextField) extras.get(i)).getText().trim();
             List   fields  = new ArrayList();
             metaDataFields.add(fields);
             fields.add(name);
             fields.add(unit);
             fields.add(missing);
+            fields.add(extra);
         }
         pointMetaDataMap.put(prefname, metaDataFields);
         getDataContext().getIdv().getStore().putEncodedFile(PREF_METADATAMAP,
@@ -573,12 +590,14 @@ public class TextPointDataSource extends PointDataSource {
         int cnt = 0;
         metaDataFields = new ArrayList();
         String delimiter = getDelimiter();
+        int    skip      = 0;
         for (int i = 0; i < fields.size(); i++) {
             String name = ((JComboBox) fields.get(
                               i)).getSelectedItem().toString().trim();
             name = ucar.visad.Util.cleanName(name);
             String unit    = ((JTextField) units.get(i)).getText().trim();
             String missing = ((JTextField) missings.get(i)).getText().trim();
+            String extra   = ((JTextField) extras.get(i)).getText().trim();
             List   fields  = new ArrayList();
             if (name.length() > 0) {
                 if (unit.length() == 0) {
@@ -588,7 +607,14 @@ public class TextPointDataSource extends PointDataSource {
             fields.add(name);
             fields.add(unit);
             fields.add(missing);
+            fields.add(extra);
             metaDataFields.add(fields);
+
+            if (skip > 0) {
+                skip--;
+                continue;
+            }
+
 
             if (name.length() > 0) {
                 if (unit.equals("Text")) {
@@ -623,9 +649,20 @@ public class TextPointDataSource extends PointDataSource {
             if (missing.length() > 0) {
                 params = params + " missing=\"" + missing + "\" ";
             }
+            if (extra.length() > 0) {
+                params = params + " " + extra;
+                String colspan = StringUtil.findPattern(extra,
+                                     "colspan *= *\"([^\"]+)\"");
+                if (colspan != null) {
+                    skip = new Integer(colspan).intValue() - 1;
+                }
+            }
             params = params + "]";
         }
         map = map + ")";
+        //        System.out.println (map);
+        //        System.out.println (params);
+
     }
 
 
@@ -639,12 +676,19 @@ public class TextPointDataSource extends PointDataSource {
         for (int tokIdx = 0; tokIdx < fields.size(); tokIdx++) {
             JComboBox  nameBox    = (JComboBox) fields.get(tokIdx);
             JTextField missingFld = (JTextField) missings.get(tokIdx);
+            JTextField extraFld   = (JTextField) extras.get(tokIdx);
             JTextField unitFld    = (JTextField) units.get(tokIdx);
             if ((fields != null) && (tokIdx < fieldList.size())) {
                 List fields = (List) fieldList.get(tokIdx);
                 nameBox.setSelectedItem((String) fields.get(0));
                 unitFld.setText((String) fields.get(1));
                 missingFld.setText((String) fields.get(2));
+                if (fields.size() >= 4) {
+                    extraFld.setText((String) fields.get(3));
+                } else {
+                    extraFld.setText("");
+                }
+
             }
         }
     }
@@ -675,7 +719,7 @@ public class TextPointDataSource extends PointDataSource {
         return hashCode;
     }
 
-    /** _more_          */
+    /** _more_ */
     List varNames = new ArrayList();
 
     /**
@@ -1018,6 +1062,9 @@ public class TextPointDataSource extends PointDataSource {
                         others[j] = (allReals == true)
                                     ? (Real) tupleData[notReqIndices[j]]
                                     : (Data) tupleData[notReqIndices[j]];
+                        if (i == 0) {
+                            System.err.println("name:" + others[j].getType());
+                        }
                         if ((i == 0) && (others[j] instanceof Real)) {
                             Real r = (Real) others[j];
                             varNames.add(((RealType) r.getType()).getName());
