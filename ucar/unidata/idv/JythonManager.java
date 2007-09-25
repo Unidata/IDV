@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -94,8 +95,8 @@ import java.util.Vector;
 
 
 import javax.swing.*;
-import javax.swing.text.*;
 import javax.swing.event.*;
+import javax.swing.text.*;
 
 
 
@@ -291,48 +292,55 @@ public class JythonManager extends IdvManager implements ActionListener {
     }
 
 
-    private void     makeFormulasFromLib() {
+    /**
+     * _more_
+     */
+    private void makeFormulasFromLib() {
         List procedures = findJythonMethods(true);
-        for(int i=0;i<procedures.size();i++) {
+        for (int i = 0; i < procedures.size(); i++) {
             PyFunction func = (PyFunction) procedures.get(i);
-            String doc = func.__doc__.toString().trim();
-            if(doc.equals("None")) continue;
-            List lines = StringUtil.split(doc,"\n",true,true);
-            String formulaId=null;
-            String desc=null;
-            String group = null;
-            Hashtable attrProps=null;
-            for(int lineIdx=0;lineIdx<lines.size();lineIdx++) {
+            String     doc  = func.__doc__.toString().trim();
+            if (doc.equals("None")) {
+                continue;
+            }
+            List      lines     = StringUtil.split(doc, "\n", true, true);
+            String    formulaId = null;
+            String    desc      = null;
+            String    group     = null;
+            Hashtable attrProps = null;
+            for (int lineIdx = 0; lineIdx < lines.size(); lineIdx++) {
                 String line = (String) lines.get(lineIdx);
-                if(line.startsWith("@formulaid")) {
+                if (line.startsWith("@formulaid")) {
                     formulaId = line.substring("@formulaid".length()).trim();
-                } else  if(line.startsWith("@description")) {
+                } else if (line.startsWith("@description")) {
                     desc = line.substring("@description".length()).trim();
-                } else  if(line.startsWith("@group")) {
+                } else if (line.startsWith("@group")) {
                     group = line.substring("@group".length()).trim();
-                } else  if(line.startsWith("@param")) {
+                } else if (line.startsWith("@param")) {
                     line = line.substring("@param".length()).trim();
                     String[] toks = StringUtil.split(line, " ", 2);
-                    if(attrProps==null) {
+                    if (attrProps == null) {
                         attrProps = new Hashtable();
                     }
-                    attrProps.put(toks[0],"[" +toks[1]+"]");
+                    attrProps.put(toks[0], "[" + toks[1] + "]");
                 }
             }
 
-            if(formulaId!=null || desc!=null) {
-                if(formulaId==null) {
-                    formulaId  = func.__name__;
+            if ((formulaId != null) || (desc != null)) {
+                if (formulaId == null) {
+                    formulaId = func.__name__;
                 }
-                List categories= new ArrayList();
-                if(group!=null) {
-                    categories.add(DataCategory.parseCategory(group,true));
+                List categories = new ArrayList();
+                if (group != null) {
+                    categories.add(DataCategory.parseCategory(group, true));
                 }
-                DerivedDataDescriptor ddd = new DerivedDataDescriptor(getIdv(),
-                                                                      formulaId, (desc!=null?desc:func.__name__),
-                                                                      makeCallString(func, attrProps),
-                                                                      categories);
-                
+                DerivedDataDescriptor ddd =
+                    new DerivedDataDescriptor(getIdv(), formulaId,
+                        ((desc != null)
+                         ? desc
+                         : func.__name__), makeCallString(func, attrProps),
+                                           categories);
+
                 descriptorDataSource.addDescriptor(ddd);
             }
         }
@@ -599,11 +607,12 @@ public class JythonManager extends IdvManager implements ActionListener {
     private LibHolder makeEditableLibHolder(String label, String path,
                                             String text)
             throws VisADException {
-        final LibHolder[] holderArray  = { null };
-        final JPythonEditor     jythonEditor = new JPythonEditor() {
+        final LibHolder[]   holderArray  = { null };
+        final JPythonEditor jythonEditor = new JPythonEditor() {
             public void undoableEditHappened(UndoableEditEvent e) {
                 if (holderArray[0] != null) {
                     holderArray[0].saveBtn.setEnabled(true);
+                    holderArray[0].functions = null;
                 }
                 super.undoableEditHappened(e);
             }
@@ -612,32 +621,42 @@ public class JythonManager extends IdvManager implements ActionListener {
         jythonEditor.getTextComponent().addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    JTextComponent comp = jythonEditor.getTextComponent();
-                    List items = new ArrayList();
-                    String selected = comp.getSelectedText();
-                    if(selected!= null && selected.trim().length()>0) {
+                    JTextComponent comp     = jythonEditor.getTextComponent();
+                    List           items    = new ArrayList();
+                    String         selected = comp.getSelectedText();
+                    if ((selected != null)
+                            && (selected.trim().length() > 0)) {
                         selected = selected.trim();
-                        List funcs = findJythonMethods(true, Misc.newList(holderArray[0]));
-                        for(int i=0;i<funcs.size();i++) {
+                        List funcs = findJythonMethods(true,
+                                         Misc.newList(holderArray[0]));
+                        for (int i = 0; i < funcs.size(); i++) {
                             PyFunction func = (PyFunction) funcs.get(i);
-                            if(func.__name__.equals(selected)) {
-                                items.add(GuiUtils.makeMenuItem("Make formula for " + selected,
-                                                                JythonManager.this,
-                                                                "makeFormula", func));
+                            if (func.__name__.equals(selected)) {
+                                items.add(
+                                    GuiUtils.makeMenuItem(
+                                        "Make formula for " + selected,
+                                        JythonManager.this, "makeFormula",
+                                        func));
                                 break;
                             }
                         }
 
                     }
                     items.add(GuiUtils.makeMenu("Insert Procedure Call",
-                                                makeProcedureMenu(jythonEditor, "insertText",null)));
+                            makeProcedureMenu(jythonEditor, "insertText",
+                                null)));
 
-                    items.add(GuiUtils.makeMenu("Insert Idv Action",getIdv().getIdvUIManager().makeActionMenu(jythonEditor,"insertText",true)));
-                   
-                    JPopupMenu popup =  GuiUtils.makePopupMenu(items);
-                    popup.show(jythonEditor, e.getX(),e.getY());
+                    items.add(
+                        GuiUtils.makeMenu(
+                            "Insert Idv Action",
+                            getIdv().getIdvUIManager().makeActionMenu(
+                                jythonEditor, "insertText", true)));
+
+                    JPopupMenu popup = GuiUtils.makePopupMenu(items);
+                    popup.show(jythonEditor, e.getX(), e.getY());
                 }
-            }});
+            }
+        });
 
         jythonEditor.setPreferredSize(new Dimension(400, 300));
         JComponent wrapper     = GuiUtils.center(jythonEditor);
@@ -664,29 +683,36 @@ public class JythonManager extends IdvManager implements ActionListener {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param func _more_
+     */
     public void makeFormula(PyFunction func) {
-        String name =   func.__name__;
-        DerivedDataDescriptor ddd = null;
+        String                name = func.__name__;
+        DerivedDataDescriptor ddd  = null;
         for (int dddIdx = 0; dddIdx < descriptors.size(); dddIdx++) {
             DerivedDataDescriptor tmp =
                 (DerivedDataDescriptor) descriptors.get(dddIdx);
-            if(tmp.getId().equals(name)) {
+            if (tmp.getId().equals(name)) {
                 ddd = tmp;
                 break;
             }
         }
 
-        if(ddd!=null) {
-            if(!GuiUtils.askOkCancel("Formula Exists", "<html>A formula with the name: " + name + " already exists.</br>Do you want to edit it?</html>")) {
+        if (ddd != null) {
+            if ( !GuiUtils.askOkCancel(
+                    "Formula Exists",
+                    "<html>A formula with the name: " + name
+                    + " already exists.</br>Do you want to edit it?</html>")) {
 
                 return;
             }
         }
 
 
-        if(ddd==null) {
-            ddd = new DerivedDataDescriptor(getIdv(),
-                                            name,"",
+        if (ddd == null) {
+            ddd = new DerivedDataDescriptor(getIdv(), name, "",
                                             makeCallString(func, null),
                                             new ArrayList());
         }
@@ -771,9 +797,10 @@ public class JythonManager extends IdvManager implements ActionListener {
         LibHolder holder = findVisibleComponent();
         fileMenu.add(GuiUtils.makeMenuItem("New Jython Library...", this,
                                            "makeNewLibrary"));
-        if (holder!=null &&  holder.isEditable() && holder.editProcess==null) {
+        if ((holder != null) && holder.isEditable()
+                && (holder.editProcess == null)) {
             fileMenu.add(GuiUtils.makeMenuItem("Remove  Library", this,
-                                                   "removeLibrary", holder));
+                    "removeLibrary", holder));
             fileMenu.add(GuiUtils.makeMenuItem("Save", this,
                     "writeJythonLib", holder));
             if (getStateManager().getPreferenceOrProperty(PROP_JYTHON_EDITOR,
@@ -813,17 +840,20 @@ public class JythonManager extends IdvManager implements ActionListener {
      * Edit the jython in the external editor
      */
     public void editInExternalEditor() {
-        Misc.run(this, "editInExternalEditorInner",findVisibleComponent());
+        Misc.run(this, "editInExternalEditorInner", findVisibleComponent());
     }
 
 
 
     /**
      * Edit the jython in the external editor
+     *
+     * @param holder _more_
      */
     public void editInExternalEditorInner(final LibHolder holder) {
         try {
-            if(holder ==null || !holder.isEditable() || holder.editProcess!=null) {
+            if ((holder == null) || !holder.isEditable()
+                    || (holder.editProcess != null)) {
                 return;
             }
             if ( !writeJythonLib(holder)) {
@@ -1990,56 +2020,71 @@ public class JythonManager extends IdvManager implements ActionListener {
     /**
      * _more_
      *
+     *
+     * @param object _more_
+     * @param method _more_
+     * @param prefix _more_
      * @return _more_
      */
-    public List makeProcedureMenu(Object object, String method,String prefix) {
+    public List makeProcedureMenu(final Object object, final String method,
+                                  final String prefix) {
         List menuItems = new ArrayList();
         List holders   = getLibHolders();
         for (int i = 0; i < holders.size(); i++) {
             List subItems = new ArrayList();
-            JythonManager.LibHolder libHolder =
+            final JythonManager.LibHolder libHolder =
                 (JythonManager.LibHolder) holders.get(i);
-            PythonInterpreter interpreter = new PythonInterpreter();
-            interpreter.exec("import sys");
-            interpreter.exec("import java");
-            try {
-                interpreter.exec(libHolder.getText());
-            } catch (Exception exc) {
-                continue;
-            }
-            PyStringMap seq   = (PyStringMap) interpreter.getLocals();
-            PyList      items = seq.items();
-            List        funcs = new ArrayList();
-            for (int itemIdx = 0; itemIdx < items.__len__(); itemIdx++) {
-                PyTuple pair = (PyTuple) items.__finditem__(itemIdx);
-                if ( !(pair.__finditem__(1) instanceof PyFunction)) {
-                    continue;
+            final JMenu menu = new JMenu(libHolder.getName());
+            menu.addMenuListener(new MenuListener() {
+                public void menuCanceled(MenuEvent e) {}
+
+                public void menuDeselected(MenuEvent e) {}
+
+                public void menuSelected(MenuEvent e) {
+                    List funcs = libHolder.getFunctions();
+                    menu.removeAll();
+                    int cnt = 0;
+                    for (int itemIdx = 0; itemIdx < funcs.size(); itemIdx++) {
+                        Object[]     pair = (Object[]) funcs.get(itemIdx);
+                        PyFunction   func = (PyFunction) pair[1];
+                        StringBuffer sb   = new StringBuffer();
+                        sb.append(makeCallString(func, null));
+                        String s = sb.toString();
+                        if ((prefix != null) && !s.startsWith(prefix)) {
+                            continue;
+                        }
+                        JMenuItem menuItem = GuiUtils.makeMenuItem(s, object,
+                                                 method, s);
+                        if ( !func.__doc__.toString().equals("None")) {
+                            String doc = "<html><pre>"
+                                         + func.__doc__.toString().trim()
+                                         + "</html>";
+                            menuItem.setToolTipText(doc);
+                        }
+
+                        menu.add(menuItem);
+                        cnt++;
+                    }
+                    if (cnt == 0) {
+                        menu.add(new JMenuItem("No procedures"));
+                    }
                 }
-                funcs.add(new Object[] { pair.__finditem__(0).toString(),
-                                         pair.__finditem__(1) });
-            }
+            });
 
-
-            funcs = Misc.sortTuples(funcs, true);
-
-            for (int itemIdx = 0; itemIdx < funcs.size(); itemIdx++) {
-                Object[]     pair = (Object[]) funcs.get(itemIdx);
-                PyFunction   func = (PyFunction) pair[1];
-                StringBuffer sb   = new StringBuffer();
-                sb.append(makeCallString(func,null));
-                String s = sb.toString();
-                if(prefix!=null &&!s.startsWith(prefix)) continue;
-                subItems.add(GuiUtils.makeMenuItem(s, object,method, s));
-            }
-            if (subItems.size() > 0) {
-                JMenu menu = GuiUtils.makeMenu(libHolder.getName(), subItems);
-                menuItems.add(menu);
-            }
+            menuItems.add(menu);
         }
         return menuItems;
     }
 
-    private String makeCallString(PyFunction func,Hashtable props) {
+    /**
+     * _more_
+     *
+     * @param func _more_
+     * @param props _more_
+     *
+     * @return _more_
+     */
+    private String makeCallString(PyFunction func, Hashtable props) {
         StringBuffer sb = new StringBuffer();
         sb.append(func.__name__ + "(");
         PyTableCode tc = (PyTableCode) func.func_code;
@@ -2048,9 +2093,13 @@ public class JythonManager extends IdvManager implements ActionListener {
                 sb.append(", ");
             }
             String param = tc.co_varnames[argIdx];
-            String attrs = (props!=null?(String)props.get(param):"");
-            if(attrs == null) attrs = "";
-            sb.append(param+attrs);
+            String attrs = ((props != null)
+                            ? (String) props.get(param)
+                            : "");
+            if (attrs == null) {
+                attrs = "";
+            }
+            sb.append(param + attrs);
         }
         sb.append(")");
         return sb.toString();
@@ -2061,56 +2110,46 @@ public class JythonManager extends IdvManager implements ActionListener {
     /**
      * _more_
      *
+     *
+     * @param justList _more_
      * @return A list of Object arrays. First element in array is the name of the lib. Second is the list of PyFunction-s
      */
     public List findJythonMethods(boolean justList) {
-        return  findJythonMethods(justList, getLibHolders());
+        return findJythonMethods(justList, getLibHolders());
     }
 
 
+    /**
+     * _more_
+     *
+     * @param justList _more_
+     * @param holders _more_
+     *
+     * @return _more_
+     */
     public List findJythonMethods(boolean justList, List holders) {
         List result = new ArrayList();
-        if(holders == null) return result;
+        if (holders == null) {
+            return result;
+        }
         for (int i = 0; i < holders.size(); i++) {
             List subItems = new ArrayList();
             JythonManager.LibHolder libHolder =
                 (JythonManager.LibHolder) holders.get(i);
-            PythonInterpreter interpreter = new PythonInterpreter();
-            interpreter.exec("import sys");
-            interpreter.exec("import java");
-            try {
-                interpreter.exec(libHolder.getText());
-            } catch (Exception exc) {
-                continue;
-            }
-            PyStringMap seq   = (PyStringMap) interpreter.getLocals();
-            PyList      keys  = seq.keys();
-            PyList      items = seq.items();
-            List        funcs = new ArrayList();
-            for (int itemIdx = 0; itemIdx < items.__len__(); itemIdx++) {
-                PyTuple pair = (PyTuple) items.__finditem__(itemIdx);
-                if ( !(pair.__finditem__(1) instanceof PyFunction)) {
-                    continue;
-                }
-                funcs.add(new Object[] { pair.__finditem__(0).toString(),
-                                         pair.__finditem__(1) });
-            }
-
-            funcs = Misc.sortTuples(funcs, true);
-
+            List funcs = libHolder.getFunctions();
             for (int itemIdx = 0; itemIdx < funcs.size(); itemIdx++) {
-                Object[]     pair = (Object[]) funcs.get(itemIdx);
-                PyFunction   func = (PyFunction) pair[1];
+                Object[]   pair = (Object[]) funcs.get(itemIdx);
+                PyFunction func = (PyFunction) pair[1];
                 subItems.add(func);
             }
-            if(justList) 
+            if (justList) {
                 result.addAll(subItems);
-            else
-                result.add(new Object[]{libHolder.getName(), subItems});
+            } else {
+                result.add(new Object[] { libHolder.getName(), subItems });
+            }
         }
         return result;
     }
-
 
 
 
@@ -2156,7 +2195,8 @@ public class JythonManager extends IdvManager implements ActionListener {
             for (int itemIdx = 0; itemIdx < funcs.size(); itemIdx++) {
                 Object[]   pair = (Object[]) funcs.get(itemIdx);
                 PyFunction func = (PyFunction) pair[1];
-                sb.append("<p><a name=\"" + func.__name__ +"\"></a><i>" + func.__name__ + "(");
+                sb.append("<p><a name=\"" + func.__name__ + "\"></a><i>"
+                          + func.__name__ + "(");
                 PyTableCode tc = (PyTableCode) func.func_code;
                 for (int argIdx = 0; argIdx < tc.co_argcount; argIdx++) {
                     if (argIdx > 0) {
@@ -2195,6 +2235,9 @@ public class JythonManager extends IdvManager implements ActionListener {
     public static class LibHolder {
 
         /** _more_          */
+        List functions;
+
+        /** _more_ */
         String label;
 
         /** _more_ */
@@ -2212,6 +2255,7 @@ public class JythonManager extends IdvManager implements ActionListener {
         /** _more_ */
         JButton saveBtn;
 
+        /** _more_          */
         Process editProcess;
 
         /**
@@ -2241,6 +2285,41 @@ public class JythonManager extends IdvManager implements ActionListener {
          */
         public String getName() {
             return label;
+        }
+
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public List getFunctions() {
+            if (functions == null) {
+                functions = new ArrayList();
+                PythonInterpreter interpreter = new PythonInterpreter();
+                interpreter.exec("import sys");
+                interpreter.exec("import java");
+                try {
+                    interpreter.exec(getText());
+                } catch (Exception exc) {
+                    return functions;
+                }
+
+                PyStringMap seq   = (PyStringMap) interpreter.getLocals();
+                PyList      items = seq.items();
+                for (int itemIdx = 0; itemIdx < items.__len__(); itemIdx++) {
+                    PyTuple pair = (PyTuple) items.__finditem__(itemIdx);
+                    if ( !(pair.__finditem__(1) instanceof PyFunction)) {
+                        continue;
+                    }
+                    functions.add(new Object[] {
+                        pair.__finditem__(0).toString(),
+                        pair.__finditem__(1) });
+                }
+
+                functions = Misc.sortTuples(functions, true);
+            }
+            return functions;
         }
 
 
@@ -2299,6 +2378,7 @@ public class JythonManager extends IdvManager implements ActionListener {
             }
             if (andEnable && (saveBtn != null)) {
                 saveBtn.setEnabled(true);
+                functions = null;
             }
         }
 
