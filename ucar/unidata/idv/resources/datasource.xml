@@ -219,6 +219,18 @@
      fileselection="true"
      label="Text Point Data files"/>
 
+
+  <datasource
+     id="FILE.POINTTRACKTEXT"
+     factory="ucar.unidata.data.point.TextPointDataSource"
+     patterns="\.csv$,\.tsv$,\.txt$"
+     fileselection="true"
+     label="Text Point and Trajectory Data files">
+    <property
+       name="dataistrajectory"
+       value="true"/>
+</datasource>
+
   <datasource
      id="FILE.LOCATION"
      factory="ucar.unidata.data.text.TextDataSource"
