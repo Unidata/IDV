@@ -1754,7 +1754,7 @@ public class StringUtil {
             return null;
         }
         if (matcher.groupCount() > 0) {
-            return matcher.group(0);
+            return matcher.group(1);
         }
         return null;
     }
@@ -1945,11 +1945,11 @@ public class StringUtil {
      * @throws Exception some problem
      */
     public static void main(String[] args) throws Exception {
-        System.err.println(toHexString(java.awt.Color.red));
 
-
-
-
+        String extra = "hello there colspan=\"5\" how are you";
+        String pattern = "colspan *= *\"([^\"]+)\"";
+        String colspan = StringUtil.findPattern(extra,pattern);
+        System.err.println(colspan);
         //        String s = IOUtil.readContents(args[0], "");
         //        System.out.println(stripTags(s));
 
