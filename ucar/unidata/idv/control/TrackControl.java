@@ -32,6 +32,7 @@ import ucar.unidata.collab.SharableImpl;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.DataUtil;
 
 import ucar.unidata.data.DataTimeRange;
 import ucar.unidata.data.grid.GridDataInstance;
@@ -113,7 +114,9 @@ import javax.swing.event.ChangeListener;
  * @version $Revision: 1.69 $
  */
 
-public class TrackControl extends GridDisplayControl {
+public class TrackControl 
+    extends GridDisplayControl {
+    //    extends DisplayControlImpl {
 
 
     /** mutex */
@@ -243,6 +246,15 @@ public class TrackControl extends GridDisplayControl {
     }
 
 
+    private boolean trackDataOk() 
+        throws VisADException, RemoteException {
+        DataInstance dataInstance = getDataInstance();
+        if ((dataInstance == null) || !dataInstance.dataOk()) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Call to help make this kind of Display Control; also calls code to
      * made the Displayable (empty of data thus far).
@@ -257,8 +269,7 @@ public class TrackControl extends GridDisplayControl {
      */
     public boolean init(DataChoice dataChoice)
             throws VisADException, RemoteException {
-        GridDataInstance gridDataInstance = getGridDataInstance();
-        if ((gridDataInstance == null) || !gridDataInstance.dataOk()) {
+        if (!trackDataOk()) {
             return false;
         }
         trackDisplay = new TrackDisplayable("track" + dataChoice);
@@ -398,8 +409,7 @@ public class TrackControl extends GridDisplayControl {
         }
         FlatField        ff   = null;
         FieldImpl        grid = null;
-        GridDataInstance gdi  = getGridDataInstance();
-        if ((gdi == null) || !gdi.dataOk()) {
+        if (!trackDataOk()) {
             if (trackDisplay != null) {
                 trackDisplay.setData(DUMMY_DATA);
                 indicator.setVisible(false);
@@ -407,15 +417,15 @@ public class TrackControl extends GridDisplayControl {
             }
             return true;
         }
+
         if (indicator != null) {
             indicator.setVisible(getMarkerVisible());
         }
+        GridDataInstance gdi  = getGridDataInstance();
         synchronized (gdi) {
             ff = getFlatField();
             if (ff != null) {
-                if (gdi != null) {
-                    grid = getGridDataInstance().getGrid(false);
-                }
+                grid = getGridDataInstance().getGrid(false);
             }
         }
         if ((ff != null) && (grid != null)) {
@@ -527,6 +537,21 @@ public class TrackControl extends GridDisplayControl {
     }
 
 
+
+    /*
+    public GridDataInstance getGridDataInstance() {
+        return (GridDataInstance) getDataInstance();
+    }
+
+    protected DataInstance doMakeDataInstance(DataChoice dataChoice)
+            throws RemoteException, VisADException {
+        return  new GridDataInstance(dataChoice,
+                getDataSelection(), getRequestProperties());
+                }
+    */
+
+
+
     /**
      * Get the data for this (without time dimension);
      *
@@ -536,16 +561,23 @@ public class TrackControl extends GridDisplayControl {
      * @throws VisADException   VisAD Error
      */
     private FlatField getFlatField() throws VisADException, RemoteException {
-        GridDataInstance gdi = getGridDataInstance();
-        if ((gdi == null) || !gdi.dataOk()) {
+        if (!trackDataOk()) {
             return null;
         }
+
+        if(true) {
+            //            System.err.println ("Using new getFlatField");
+            return  DataUtil.getFlatField(getDataInstance().getData());
+        }
+
+        /*
+        GridDataInstance gdi = getGridDataInstance();
         FieldImpl fi = gdi.getGrid(false);
         if (fi != null) {
             return (fi instanceof FlatField)
                    ? (FlatField) fi
                    : (FlatField) fi.getSample(0, false);
-        }
+                   }*/
         return null;
     }
 
@@ -630,7 +662,6 @@ public class TrackControl extends GridDisplayControl {
             throws VisADException, RemoteException {
 
         super.getControlWidgets(controlWidgets);
-
 
         if (trackType.equals(CMD_RANGE)) {
             controlWidgets.add(new WrapperWidget(this,
@@ -755,13 +786,12 @@ public class TrackControl extends GridDisplayControl {
      * changes or there is a new timestep.
      */
     public void applyTimeRange() {
-
         try {
-            DataTimeRange    dataTimeRange    = getDataTimeRange(true);
-            GridDataInstance gridDataInstance = getGridDataInstance();
-            if ((gridDataInstance == null) || !gridDataInstance.dataOk()) {
+            if (!trackDataOk()) {
                 return;
             }
+            DataTimeRange    dataTimeRange    = getDataTimeRange(true);
+            GridDataInstance gridDataInstance = getGridDataInstance();
             FlatField flatField;
             Unit      dataTimeUnit;
             synchronized (gridDataInstance) {
