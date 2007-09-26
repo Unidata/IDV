@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -139,7 +140,7 @@ public class GridUtil {
      */
     public static boolean isConstantSpatialDomain(FieldImpl grid)
             throws VisADException {
-        SampledSet ss      = getSpatialDomain(grid);
+        SampledSet ss      = getSpatialDomain(grid, 0);
         Set        timeSet = getTimeSet(grid);
         if (timeSet != null) {
             for (int i = 1; i < timeSet.getLength(); i++) {
@@ -164,6 +165,24 @@ public class GridUtil {
      */
     public static SampledSet getSpatialDomain(FieldImpl grid)
             throws VisADException {
+        if (isConstantSpatialDomain(grid) || !isSequence(grid)) {
+            return getSpatialDomain(grid, 0);
+        } else {
+            // find first non-missing grid
+            if (isTimeSequence(grid)) {
+                try {
+                    Set timeDomain = grid.getDomainSet();
+                    for (int i = 0; i < timeDomain.getLength(); i++) {
+                        FieldImpl sample = (FieldImpl) grid.getSample(i);
+                        if ( !sample.isMissing()) {
+                            return getSpatialDomain(grid, i);
+                        }
+                    }
+                } catch (RemoteException excp) {
+                    throw new VisADException("RemoteException");
+                }
+            }
+        }
         return getSpatialDomain(grid, 0);
     }
 
@@ -286,30 +305,44 @@ public class GridUtil {
                 for (int i = 0; i < numSteps; i++) {
                     FieldImpl data = (FieldImpl) grid.getSample(i, false);
                     FieldImpl fi;
-                    if (hasInnerSteps) {
-                        Set innerSet = data.getDomainSet();
-                        fi = new FieldImpl(innerFieldType, innerSet);
-                        for (int j = 0; j < innerSet.getLength(); j++) {
-                            FlatField dataFF = (FlatField) data.getSample(j,
-                                                   false);
-                            FlatField ff = new FlatField(rangeFT, newDomain);
-                            ff.setSamples(dataFF.getFloats(copy), false);
-                            fi.setSample(j, ff);
-                        }
+                    if (data.isMissing()) {
+                        fi = data;
                     } else {
-                        fi = new FlatField(rangeFT, newDomain);
-                        ((FlatField) fi).setSamples(
-                            ((FlatField) data).getFloats(copy), false);
+                        if (hasInnerSteps) {
+                            Set innerSet = data.getDomainSet();
+                            fi = new FieldImpl(innerFieldType, innerSet);
+                            for (int j = 0; j < innerSet.getLength(); j++) {
+                                FlatField dataFF =
+                                    (FlatField) data.getSample(j, false);
+                                FlatField ff = null;
+                                if (dataFF.isMissing()) {
+                                    ff = dataFF;
+                                } else {
+                                    ff = new FlatField(rangeFT, newDomain);
+                                    ff.setSamples(dataFF.getFloats(copy),
+                                            false);
+                                }
+                                fi.setSample(j, ff);
+                            }
+                        } else {
+                            fi = new FlatField(rangeFT, newDomain);
+                            ((FlatField) fi).setSamples(
+                                ((FlatField) data).getFloats(copy), false);
+                        }
                     }
                     newFieldImpl.setSample(i, fi);
                 }
             } catch (RemoteException re) {}
         } else {  // single time
-            newFieldImpl = new FlatField(rangeFT, newDomain);
-            try {
-                ((FlatField) newFieldImpl).setSamples(grid.getFloats(copy),
-                        false);
-            } catch (RemoteException re) {}
+            if ( !grid.isMissing()) {
+                newFieldImpl = new FlatField(rangeFT, newDomain);
+                try {
+                    ((FlatField) newFieldImpl).setSamples(
+                        grid.getFloats(copy), false);
+                } catch (RemoteException re) {}
+            } else {
+                newFieldImpl = grid;
+            }
         }
         return newFieldImpl;
     }
@@ -412,13 +445,14 @@ public class GridUtil {
      *
      * @throws VisADException   problem determining this
      */
-    public static List getDateTimeList(FieldImpl grid) 
-        throws VisADException {
-        SampledSet   timeSet      = (SampledSet) getTimeSet(grid);
-        if(timeSet == null) return null;
-        double[][]   times        = timeSet.getDoubles(false);
-        Unit         timeUnit     = timeSet.getSetUnits()[0];
-        List result = new ArrayList();
+    public static List getDateTimeList(FieldImpl grid) throws VisADException {
+        SampledSet timeSet = (SampledSet) getTimeSet(grid);
+        if (timeSet == null) {
+            return null;
+        }
+        double[][] times    = timeSet.getDoubles(false);
+        Unit       timeUnit = timeSet.getSetUnits()[0];
+        List       result   = new ArrayList();
         for (int i = 0; i < timeSet.getLength(); i++) {
             result.add(new DateTime(times[0][i], timeUnit));
         }
@@ -752,7 +786,7 @@ public class GridUtil {
                 Set timeSet = getTimeSet(grid);
                 fi = new FieldImpl((FunctionType) grid.getType(), timeSet);
                 for (int i = 0; i < timeSet.getLength(); i++) {
-                    FieldImpl ff = (FieldImpl) grid.getSample(i);
+                    FieldImpl ff    = (FieldImpl) grid.getSample(i);
                     FieldImpl slice = null;
                     if (ff.isMissing()) {
                         slice = ff;
@@ -999,15 +1033,16 @@ public class GridUtil {
             try {
                 Set timeSet = getTimeSet(grid);
                 for (int i = 0; i < timeSet.getLength(); i++) {
-                    FieldImpl ff = (FieldImpl) grid.getSample(i);
+                    FieldImpl ff    = (FieldImpl) grid.getSample(i);
                     FieldImpl slice = null;
                     if (ff.isMissing()) {
                         slice = ff;
                     } else {
-                        slice = slice(ff, makeSliceFromLevel(
-                                                (GriddedSet) getSpatialDomain(
-                                                    grid,
-                                                    i), level), samplingMode);
+                        slice = slice(
+                            ff,
+                            makeSliceFromLevel(
+                                (GriddedSet) getSpatialDomain(grid, i),
+                                level), samplingMode);
                     }
                     if (i == 0) {
                         fi = new FieldImpl(
@@ -1208,15 +1243,16 @@ public class GridUtil {
             try {
                 Set timeSet = getTimeSet(grid);
                 for (int i = 0; i < timeSet.getLength(); i++) {
-                    FieldImpl ff = (FieldImpl) grid.getSample(i);
+                    FieldImpl ff    = (FieldImpl) grid.getSample(i);
                     FieldImpl slice = null;
                     if (ff.isMissing()) {
                         slice = ff;
                     } else {
-                        slice = slice(ff, makeSliceFromLatLonPoints(
-                                                (GriddedSet) getSpatialDomain(
-                                                    grid, i), start,
-                                                        end), samplingMode);
+                        slice = slice(
+                            ff,
+                            makeSliceFromLatLonPoints(
+                                (GriddedSet) getSpatialDomain(grid, i),
+                                start, end), samplingMode);
                     }
                     if (i == 0) {
                         fi = new FieldImpl(
@@ -2644,7 +2680,7 @@ public class GridUtil {
 
         Trace.call1("GridUtil.resampleGrid");
 
-        SampledSet spatialDomain = GridUtil.getSpatialDomain(grid);
+        SampledSet spatialDomain = getSpatialDomain(grid);
         if ((spatialDomain.getDimension() != subDomain.getDimension())
                 && (spatialDomain.getManifoldDimension()
                     != subDomain.getManifoldDimension())) {
@@ -2864,7 +2900,7 @@ public class GridUtil {
                 "GridUtil.getLevel(): alitude units must be convertible with meters");
         }
         double     levVal    = Double.NaN;
-        SampledSet domainSet = GridUtil.getSpatialDomain(grid);
+        SampledSet domainSet = getSpatialDomain(grid);
         RealType   zType     = getVerticalType(domainSet);
         Unit       zUnit     = getVerticalUnit(domainSet);
         if (Unit.canConvert(zUnit, altitude.getUnit())) {
@@ -2916,7 +2952,7 @@ public class GridUtil {
         if (Unit.canConvert(level.getUnit(), CommonUnit.meter)) {
             altVal = level.getValue(CommonUnit.meter);
         } else {
-            SampledSet domainSet = GridUtil.getSpatialDomain(grid);
+            SampledSet domainSet = getSpatialDomain(grid);
             Unit       zUnit     = getVerticalUnit(domainSet);
             if ( !Unit.canConvert(zUnit, level.getUnit())) {
                 throw new VisADException(
@@ -3234,6 +3270,7 @@ public class GridUtil {
         }
         return buf.toString();
     }
+
     /**
      * Convert a grid to point obs
      *
@@ -3478,8 +3515,8 @@ public class GridUtil {
     }
 
     /**
-     * Convert the domain to the reference earth located points. 
-     * If the domain is not in lat/lon order then reset the order so 
+     * Convert the domain to the reference earth located points.
+     * If the domain is not in lat/lon order then reset the order so
      * that result[0] is the latitudes, result[1] is the longitudes
      *
      * @param domain  the domain set
@@ -3531,3 +3568,4 @@ public class GridUtil {
     }
 
 }
+
