@@ -826,7 +826,7 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         int                      swIdx      = 0;
         RadialDatasetSweep.Sweep sw0        = sweepVar.getSweep(swIdx);
-        int                      numRay     = 360;
+        int                      numRay     = 361;
         int                      numBin     = sw0.getGateNumber();
         int                      numSweep   = sweepVar.getNumSweeps();
         float                    beamWidth  = sw0.getBeamWidth();
@@ -895,8 +895,8 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         Trace.call1("   get cappi value");
         // setting cappi azi value for each ray.
-        float[] az = new float[360];
-        for (int i = 0; i < 360; i++) {
+        float[] az = new float[numRay];
+        for (int i = 0; i < numRay; i++) {
             az[i] = i;
         }
 
@@ -2562,7 +2562,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                                      + 0.5f * range_step;
         float[]   elevations;  //new float[numRadials];
         float[]   azimuths;    //  = new float[numRadials];
-        int       npix   = numRadials * numGates;
+        int       npix   = (numRadials+2) * numGates;    // add two additional rays
         float[][] values = new float[1][npix];
 
         //  for (int azi = 0; azi < numRadials; azi++) {
@@ -2592,11 +2592,23 @@ public class CDMRadarAdapter implements RadarAdapter {
                 values[0][samp] = Float.NaN;
             }
         }
-
-        float[][] domainVals3d = new float[3][numRadials * numGates];
+        // add two additional radials at the begin and the end of each sweep
+        float[][] domainVals3d = new float[3][(numRadials+2 ) * numGates];
         float[][] domainVals2d = new float[2][];
 
         int       l            = 0;
+        // additional radial at the begining
+        int ray0 = 0;
+        float az0 = azimuths[ray0] - 0.5f;
+        if ( az0 < 0) az0 = 0f;
+        for (int cell = 0; cell < numGates; cell++) {
+            int elem = sortedAzs[ray0] * numGates + cell;
+            domainVals3d[0][l] = cell;
+            domainVals3d[1][l] = az0;
+            domainVals3d[2][l] = elevations[sortedAzs[ray0]];
+            values[0][l++]     = rawValues[elem];
+        }
+
         for (int ray = 0; ray < numRadials; ray++) {
             for (int cell = 0; cell < numGates; cell++) {
                 int elem = sortedAzs[ray] * numGates + cell;
@@ -2608,6 +2620,17 @@ public class CDMRadarAdapter implements RadarAdapter {
             }
         }
 
+        // additional radial at the end of the sweep
+        int rayN = numRadials - 1;
+        float azN = azimuths[rayN] + 0.5f;
+        if ( azN > 360) azN = 360f;
+        for (int cell = 0; cell < numGates; cell++) {
+            int elem = sortedAzs[rayN] * numGates + cell;
+            domainVals3d[0][l] = cell;
+            domainVals3d[1][l] = azN;
+            domainVals3d[2][l] = elevations[sortedAzs[rayN]];
+            values[0][l++]     = rawValues[elem];
+        }
         //
         // just ranges and azimuths for 2D
         //
@@ -2627,11 +2650,11 @@ public class CDMRadarAdapter implements RadarAdapter {
                             : radarDomain2d;
         GriddedSet    set = (want3D)
                             ? (GriddedSet) new Gridded3DSet(tt, domainVals3d,
-                                numGates, numRadials,
+                                numGates, numRadials+2,
                                 (CoordinateSystem) null, domUnits3d,
                                 (ErrorEstimate[]) null, false)
                             : (GriddedSet) new Gridded2DSet(tt, domainVals2d,
-                                numGates, numRadials,
+                                numGates, numRadials+2,
                                 tt.getCoordinateSystem(), domUnits2d,
                                 (ErrorEstimate[]) null, false, false);
         FunctionType sweepType = new FunctionType(tt, getMomentType(varName));
