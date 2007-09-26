@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.ui;
 
 
@@ -75,8 +76,10 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
     /** The scroller */
     private JScrollPane treeView;
 
+    /** _more_          */
     private boolean useSplitPane = true;
 
+    /** _more_          */
     private int treeWidth = -1;
 
 
@@ -88,6 +91,12 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
 
     /** The panel */
     private GuiUtils.CardLayoutPanel panel;
+
+    /** _more_          */
+    private JPanel emptyPanel;
+
+    /** _more_          */
+    private Hashtable catComponents = new Hashtable();
 
     /** Maps categories to tree node */
     private Hashtable catToNode = new Hashtable();
@@ -127,12 +136,18 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
      * ctor
      */
     public TreePanel() {
-        this(true,-1);
+        this(true, -1);
     }
 
+    /**
+     * _more_
+     *
+     * @param useSplitPane _more_
+     * @param treeWidth _more_
+     */
     public TreePanel(boolean useSplitPane, int treeWidth) {
         this.useSplitPane = useSplitPane;
-        this.treeWidth = treeWidth;
+        this.treeWidth    = treeWidth;
 
         setLayout(new BorderLayout());
         root      = new DefaultMutableTreeNode("");
@@ -174,20 +189,21 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
         catToNode = new Hashtable();
         treeView  = new JScrollPane(tree);
         //        tree.setBackground(getBackground());
-        if(treeWidth>0) {
-            treeView.setPreferredSize(new Dimension(treeWidth,100));
+        if (treeWidth > 0) {
+            treeView.setPreferredSize(new Dimension(treeWidth, 100));
         }
 
 
         JComponent center;
-        if(useSplitPane) {
-            JSplitPane splitPane = (treeWidth>0?
-                                    GuiUtils.hsplit(treeView, panel, treeWidth):
-                                    GuiUtils.hsplit(treeView, panel, 150));
+        if (useSplitPane) {
+            JSplitPane splitPane = ((treeWidth > 0)
+                                    ? GuiUtils.hsplit(treeView, panel,
+                                        treeWidth)
+                                    : GuiUtils.hsplit(treeView, panel, 150));
             center = splitPane;
             splitPane.setOneTouchExpandable(true);
         } else {
-            center  = GuiUtils.leftCenter(treeView, panel);
+            center = GuiUtils.leftCenter(treeView, panel);
         }
         this.add(BorderLayout.CENTER, center);
 
@@ -207,6 +223,7 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
             return;
         }
 
+
         DefaultMutableTreeNode node =
             (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         if (node == null) {
@@ -215,6 +232,26 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
         if (node.isLeaf()) {
             TwoFacedObject tfo = (TwoFacedObject) node.getUserObject();
             panel.show((Component) tfo.getId());
+        } else {
+            if (emptyPanel == null) {
+                if (emptyPanel == null) {
+                    panel.addCard(emptyPanel =
+                        new JPanel(new BorderLayout()));
+                }
+            }
+            if (node.getUserObject() instanceof TwoFacedObject) {
+                TwoFacedObject tfo = (TwoFacedObject) node.getUserObject();
+                JComponent interior =
+                    (JComponent) catComponents.get(tfo.getId());
+                if (interior != null) {
+                    if ( !panel.contains(interior)) {
+                        panel.addCard(interior);
+                    }
+                    panel.show(interior);
+                    return;
+                }
+            }
+            panel.show(emptyPanel);
         }
     }
 
@@ -244,7 +281,8 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
                 DefaultMutableTreeNode node =
                     (DefaultMutableTreeNode) catToNode.get(catSoFar);
                 if (node == null) {
-                    node = new DefaultMutableTreeNode(cat);
+                    TwoFacedObject catTfo = new TwoFacedObject(cat, catSoFar);
+                    node = new DefaultMutableTreeNode(catTfo);
                     catToNode.put(catSoFar, node);
                     catNode.add(node);
                 }
@@ -254,6 +292,17 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
         }
         panel.addCard(component);
         treeModel.nodeStructureChanged(root);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param cat _more_
+     * @param comp _more_
+     */
+    public void addCategoryComponent(String cat, JComponent comp) {
+        catComponents.put(">" + cat, comp);
     }
 
 

@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.ui;
 
 
@@ -207,6 +208,9 @@ public class XmlUi implements ActionListener, ItemListener {
     /** Category attribute for treepanel */
     public static final String ATTR_CATEGORY = "category";
 
+    /** Used to define that the component is the category component for a tree panel    */
+    public static final String ATTR_CATEGORYCOMPONENT = "categorycomponent";
+
 
     /** xml attribute name */
     public static final String ATTR_ACTIONTEMPLATE = "actiontemplate";
@@ -216,7 +220,7 @@ public class XmlUi implements ActionListener, ItemListener {
 
 
     /** xml attribute name */
-    public static final String ATTR_HPOSITION= "hposition";
+    public static final String ATTR_HPOSITION = "hposition";
 
     /** xml attribute name */
     public static final String ATTR_VPOSITION = "vposition";
@@ -477,7 +481,7 @@ public class XmlUi implements ActionListener, ItemListener {
     public static final String ATTR_TREEWIDTH = "treewidth";
 
     /** xml attribute name */
-    public static final String ATTR_USESPLITPANE= "usesplitpane";
+    public static final String ATTR_USESPLITPANE = "usesplitpane";
 
     /** xml attribute name */
     public static final String ATTR_X = "x";
@@ -614,24 +618,22 @@ public class XmlUi implements ActionListener, ItemListener {
 
 
     /** alignment names */
-    public static final String[] HPOS_NAMES = { "left", "right", "center","leading","trailing" };
+    public static final String[] HPOS_NAMES = { "left", "right", "center",
+            "leading", "trailing" };
 
 
     /** corresponding alignment values */
     public static final int[] HPOS_VALUES = { SwingConstants.LEFT,
-                                              SwingConstants.RIGHT,
-                                              SwingConstants.CENTER,
-                                              SwingConstants.LEADING,
-                                              SwingConstants.TRAILING};
+            SwingConstants.RIGHT, SwingConstants.CENTER,
+            SwingConstants.LEADING, SwingConstants.TRAILING };
 
     /** alignment names */
-        public static final String[] VPOS_NAMES = { "center","top","bottom"};
+    public static final String[] VPOS_NAMES = { "center", "top", "bottom" };
 
 
     /** corresponding alignment values */
     public static final int[] VPOS_VALUES = { SwingConstants.CENTER,
-                                              SwingConstants.TOP,
-                                              SwingConstants.BOTTOM};
+            SwingConstants.TOP, SwingConstants.BOTTOM };
 
 
     /** alignment names */
@@ -2003,22 +2005,26 @@ public class XmlUi implements ActionListener, ItemListener {
         if (selectImage != null) {
             tb.setSelectedIcon(new ImageIcon(selectImage));
         }
-        if(XmlUtil.hasAttribute(node,ATTR_LABEL)) {
-            String label = getAttr(node, ATTR_LABEL,"");
+        if (XmlUtil.hasAttribute(node, ATTR_LABEL)) {
+            String label = getAttr(node, ATTR_LABEL, "");
             tb.setText(label);
-            if(XmlUtil.hasAttribute(node,ATTR_HPOSITION)) {
-                tb.setHorizontalTextPosition(findValue(getAttr(node,ATTR_HPOSITION,""), HPOS_NAMES, HPOS_VALUES, SwingConstants.TRAILING));
+            if (XmlUtil.hasAttribute(node, ATTR_HPOSITION)) {
+                tb.setHorizontalTextPosition(findValue(getAttr(node,
+                        ATTR_HPOSITION, ""), HPOS_NAMES, HPOS_VALUES,
+                                             SwingConstants.TRAILING));
             }
 
-            if(XmlUtil.hasAttribute(node,ATTR_VPOSITION)) {
-                tb.setVerticalTextPosition(findValue(getAttr(node,ATTR_VPOSITION,""), VPOS_NAMES, VPOS_VALUES, SwingConstants.CENTER));
+            if (XmlUtil.hasAttribute(node, ATTR_VPOSITION)) {
+                tb.setVerticalTextPosition(findValue(getAttr(node,
+                        ATTR_VPOSITION, ""), VPOS_NAMES, VPOS_VALUES,
+                                             SwingConstants.CENTER));
             }
 
 
 
         } else {
             tb.setPreferredSize(new Dimension(icon.getIconWidth() + hspace,
-                                              icon.getIconHeight() + vspace));
+                    icon.getIconHeight() + vspace));
 
         }
 
@@ -2126,6 +2132,10 @@ public class XmlUi implements ActionListener, ItemListener {
             for (int i = 0; i < xmlChildren.size(); i++) {
                 Element childElement =
                     getReffedNode((Element) xmlChildren.get(i));
+                if (XmlUtil.getAttribute(childElement,
+                                         ATTR_CATEGORYCOMPONENT, false)) {
+                    continue;
+                }
                 Component childComponent = xmlToUi(childElement);
                 if (childComponent == null) {
                     continue;
@@ -2213,6 +2223,10 @@ public class XmlUi implements ActionListener, ItemListener {
             for (int i = 0; i < xmlChildren.size(); i++) {
                 Element childElement =
                     getReffedNode((Element) xmlChildren.get(i));
+                if (XmlUtil.getAttribute(childElement,
+                                         ATTR_CATEGORYCOMPONENT, false)) {
+                    continue;
+                }
                 Component childComponent = xmlToUi(childElement);
                 if (childComponent == null) {
                     continue;
@@ -2265,6 +2279,10 @@ public class XmlUi implements ActionListener, ItemListener {
             for (int i = 0; i < xmlChildren.size(); i++) {
                 Element childElement =
                     getReffedNode((Element) xmlChildren.get(i));
+                if (XmlUtil.getAttribute(childElement,
+                                         ATTR_CATEGORYCOMPONENT, false)) {
+                    continue;
+                }
                 Component childComponent = xmlToUi(childElement);
                 if (childComponent == null) {
                     continue;
@@ -2279,8 +2297,10 @@ public class XmlUi implements ActionListener, ItemListener {
                 tab.show(firstComp);
             }
         } else if (tag.equals(TAG_TREEPANEL)) {
-            TreePanel treePanel = new TreePanel(getAttr(node,ATTR_USESPLITPANE,false),
-                                                getAttr(node,ATTR_TREEWIDTH,-1));
+            TreePanel treePanel = new TreePanel(getAttr(node,
+                                      ATTR_USESPLITPANE,
+                                      false), getAttr(node, ATTR_TREEWIDTH,
+                                          -1));
             comp = treePanel;
             List xmlChildren = XmlUtil.getListOfElements(node);
 
@@ -2297,8 +2317,14 @@ public class XmlUi implements ActionListener, ItemListener {
                                          (ImageIcon) null);
                 String cat = getAttr(childElement, ATTR_CATEGORY,
                                      (String) null);
-                treePanel.addComponent((JComponent) childComponent, cat,
-                                       label, icon);
+                if (XmlUtil.getAttribute(childElement,
+                                         ATTR_CATEGORYCOMPONENT, false)) {
+                    treePanel.addCategoryComponent(cat,
+                            (JComponent) childComponent);
+                } else {
+                    treePanel.addComponent((JComponent) childComponent, cat,
+                                           label, icon);
+                }
             }
             treePanel.openAll();
 
