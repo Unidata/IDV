@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -6280,16 +6281,18 @@ public class GuiUtils {
      * @throws Exception on badness
      */
     public static void main(String[] args) throws Exception {
-        JTextField fld = new JTextField("",20);
-        JTextComponent tarea = new JTextArea("",10,10);
+        JTextField     fld   = new JTextField("", 20);
+        JTextComponent tarea = new JTextArea("", 10, 10);
         addKeyBindings(fld);
         addKeyBindings(tarea);
         Action[] actions = tarea.getActions();
-        for(int i=0;i<actions.length;i++) {
+        for (int i = 0; i < actions.length; i++) {
             //            System.err.println(actions[i]);
         }
-        showOkCancelDialog(null, "", vbox(fld,tarea), null);
-        if(true) return;
+        showOkCancelDialog(null, "", vbox(fld, tarea), null);
+        if (true) {
+            return;
+        }
 
 
         /*        Locale list[] = java.text.DateFormat.getAvailableLocales();
@@ -6652,6 +6655,18 @@ public class GuiUtils {
         }
 
         /**
+         * _more_
+         *
+         * @param comp _more_
+         *
+         * @return _more_
+         */
+        public boolean contains(Component comp) {
+            return map.get(comp) != null;
+        }
+
+
+        /**
          * Show the component
          *
          * @param comp the component
@@ -6835,6 +6850,7 @@ public class GuiUtils {
 
 
 }
+
 
 
 
