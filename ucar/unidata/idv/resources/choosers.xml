@@ -73,6 +73,12 @@ This file allows you to override the resources that are read in. Add in an entry
 
 The loadmore="false" tells the Idv not to load in any system resources.
   -->
+
+<!--
+If using the tree panel you can define components that are displayed when a category tree node is selected:
+  <label text="label test" category="General" categorycomponent="true"/>
+-->
+
   <chooser
      id="chooser.file"
      title="Files"
