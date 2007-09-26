@@ -297,5 +297,38 @@ public class DataUtil {
         return values;
     }
 
+    public static FlatField getFlatField(Data field) 
+            throws VisADException, RemoteException  {
+        return getFlatField(field, "");
+    }
+
+    public static FlatField getFlatField(Data field, String tab) 
+            throws VisADException, RemoteException  {
+
+        if(field == null) return null;
+        //        System.err.println (tab +"getFlatField:" + field.getType());
+        if(field instanceof FlatField) {
+            //            System.err.println (tab +"got flat field");
+            return (FlatField) field;
+        }
+        if(field instanceof Tuple) {
+            Tuple t = (Tuple) field;
+            for(int i=0;i<t.getLength();i++) {
+                FlatField f = getFlatField(t.getComponent(i), tab+"  ");
+                if(f!=null) {
+                    //                    System.err.println (tab +"returning " + i+"th tuple component");
+                    return f;
+                }
+            }
+        }
+
+        if(!(field instanceof FieldImpl)) {
+            //            System.err.println (tab +"field is a :" + field.getClass().getName());
+            return null;
+        }
+        return getFlatField(((FieldImpl)field).getSample(0,false), tab+"  ");
+    }
+
+
 }
 
