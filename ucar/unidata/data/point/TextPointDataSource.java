@@ -121,7 +121,6 @@ public class TextPointDataSource extends PointDataSource {
     /** for the metadata gui */
     JComponent metaDataComp;
 
-
     /** _more_ */
     private String groupVarName = null;
 
@@ -959,8 +958,7 @@ public class TextPointDataSource extends PointDataSource {
 
 
             if (trackParam != null) {
-                //                String groupVarName = "TECH";
-                if (groupVarName != null) {
+                if (groupVarName != null && groupVarName.length()>0) {
                     int groupParamIndex = -1;
                     for (int typeIdx = 0; typeIdx < type.getDimension();
                             typeIdx++) {
@@ -1116,12 +1114,17 @@ public class TextPointDataSource extends PointDataSource {
 
 
 
+    private boolean isTrajectoryEnabled() {
+        return getProperty("dataistrajectory", false);
+    }
+
+
     /**
      * _more_
      */
     public void doMakeDataChoices() {
         super.doMakeDataChoices();
-        if (getProperty("dataistrajectory", false)) {
+        if (isTrajectoryEnabled()) {
             if (getDataChoices().size() == 0) {
                 return;
             }
@@ -1142,6 +1145,14 @@ public class TextPointDataSource extends PointDataSource {
             } catch (Exception exc) {
                 logException("Creating track choices", exc);
             }
+        }
+    }
+
+
+    public void getPropertiesComponents(List comps) {
+        super.getPropertiesComponents(comps);
+        if (isTrajectoryEnabled()) {
+            
         }
     }
 
