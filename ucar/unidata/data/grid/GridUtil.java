@@ -752,8 +752,14 @@ public class GridUtil {
                 Set timeSet = getTimeSet(grid);
                 fi = new FieldImpl((FunctionType) grid.getType(), timeSet);
                 for (int i = 0; i < timeSet.getLength(); i++) {
-                    fi.setSample(i, subsetGrid((FieldImpl) grid.getSample(i),
-                            skipx, skipy, skipz), false);
+                    FieldImpl ff = (FieldImpl) grid.getSample(i);
+                    FieldImpl slice = null;
+                    if (ff.isMissing()) {
+                        slice = ff;
+                    } else {
+                        slice = subsetGrid(ff, skipx, skipy, skipz);
+                    }
+                    fi.setSample(i, slice, false);
                 }
             } catch (RemoteException re) {}  // won't happen - grids are local
         }
@@ -993,11 +999,16 @@ public class GridUtil {
             try {
                 Set timeSet = getTimeSet(grid);
                 for (int i = 0; i < timeSet.getLength(); i++) {
-                    FieldImpl slice = slice((FieldImpl) grid.getSample(i),
-                                            makeSliceFromLevel(
+                    FieldImpl ff = (FieldImpl) grid.getSample(i);
+                    FieldImpl slice = null;
+                    if (ff.isMissing()) {
+                        slice = ff;
+                    } else {
+                        slice = slice(ff, makeSliceFromLevel(
                                                 (GriddedSet) getSpatialDomain(
                                                     grid,
                                                     i), level), samplingMode);
+                    }
                     if (i == 0) {
                         fi = new FieldImpl(
                             new FunctionType(
@@ -1197,11 +1208,16 @@ public class GridUtil {
             try {
                 Set timeSet = getTimeSet(grid);
                 for (int i = 0; i < timeSet.getLength(); i++) {
-                    FieldImpl slice = slice((FieldImpl) grid.getSample(i),
-                                            makeSliceFromLatLonPoints(
+                    FieldImpl ff = (FieldImpl) grid.getSample(i);
+                    FieldImpl slice = null;
+                    if (ff.isMissing()) {
+                        slice = ff;
+                    } else {
+                        slice = slice(ff, makeSliceFromLatLonPoints(
                                                 (GriddedSet) getSpatialDomain(
                                                     grid, i), start,
                                                         end), samplingMode);
+                    }
                     if (i == 0) {
                         fi = new FieldImpl(
                             new FunctionType(
