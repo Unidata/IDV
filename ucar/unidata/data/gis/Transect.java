@@ -118,6 +118,10 @@ public class Transect {
         this.points = points;
     }
 
+    public Transect(String name, LatLonPoint p1, LatLonPoint p2) {
+        this.name = name;
+        points= Misc.newList(p1,p2);
+    }
 
     /**
      * Process the xml

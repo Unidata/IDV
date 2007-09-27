@@ -3137,6 +3137,16 @@ public final class Util {
                                 values, values[0].length);
     }
 
+    public static ucar.unidata.geoloc.LatLonPoint toLLP(EarthLocation el) {
+        return toLLP(el.getLatLonPoint());
+    }
+
+    public static ucar.unidata.geoloc.LatLonPoint toLLP(visad.georef.LatLonPoint llp) {
+        return new ucar.unidata.geoloc.LatLonPointImpl(llp.getLatitude().getValue(),
+                                                    llp.getLongitude().getValue());
+
+    }
+
 
 }
 

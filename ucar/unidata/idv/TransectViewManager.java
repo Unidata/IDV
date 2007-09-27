@@ -67,6 +67,7 @@ import ucar.unidata.xml.XmlObjectStore;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
+import ucar.visad.Util;
 import ucar.visad.GeoUtils;
 import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.display.*;
@@ -609,6 +610,35 @@ public class TransectViewManager extends NavigatedViewManager {
         if (transects.size() > 0) {
             transectMenu.addSeparator();
         }
+
+        List vms = getIdv().getVMManager().getViewManagers();
+        JMenu viewMenu = null;
+        int cnt = 0;
+        for(int i=0;i<vms.size();i++) {
+            if(!(vms.get(i) instanceof MapViewManager)) continue;
+            MapViewManager mvm =(MapViewManager) vms.get(i);
+            if(viewMenu == null) {
+                viewMenu = new JMenu("From Views");
+                transectMenu.add(viewMenu);
+            }
+            cnt++;
+            String name = mvm.getName();
+            JMenu theMenu = new JMenu((name==null?("View " + cnt):name));
+            viewMenu.add(theMenu);
+            NavigatedDisplay nd = mvm.getMapDisplay();
+            java.awt.Rectangle b = nd.getScreenBounds();
+            double[]pt1,pt2;
+            pt1 = nd.getSpatialCoordinatesFromScreen(0,b.height/2);
+            pt2 = nd.getSpatialCoordinatesFromScreen(b.width,b.height/2);
+            theMenu.add(GuiUtils.makeMenuItem("Horizontal", this, "setTransect",
+                                                   new Transect("",Util.toLLP(nd.getEarthLocation(pt1)), Util.toLLP(nd.getEarthLocation(pt2)))));
+            pt1 = nd.getSpatialCoordinatesFromScreen(b.width/2,0);
+            pt2 = nd.getSpatialCoordinatesFromScreen(b.width/2,b.height);
+            theMenu.add(GuiUtils.makeMenuItem("Vertical", this, "setTransect",
+                                              new Transect("",Util.toLLP(nd.getEarthLocation(pt1)), Util.toLLP(nd.getEarthLocation(pt2)))));
+        }
+
+
         for (int i = 0; i < transects.size(); i++) {
             Transect menuTransect = (Transect) transects.get(i);
             String   prefix       = "";
