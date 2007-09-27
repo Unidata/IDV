@@ -357,7 +357,8 @@
   <derived description="Make a time sequence from single time grids/images" formula="makeTimeSequence(g[multiple=true])" id="mergeTimes" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Miscellaneous"/>
-      <category value="GRID-*-*"/>
+      <category value="GRID-3D-*"/>
+      <category value="GRID-2D-*"/>
       <category value="IMAGE-*-*"/>
     </categories>
     <operands categories=""/>
