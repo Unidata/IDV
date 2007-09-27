@@ -333,8 +333,9 @@ public class ProbeRowInfo {
      * @return String representation
      */
     public String toString() {
-        if(dataInstance ==null)
+        if (dataInstance == null) {
             return "";
+        }
         return "" + dataInstance.getParamName();
     }
 

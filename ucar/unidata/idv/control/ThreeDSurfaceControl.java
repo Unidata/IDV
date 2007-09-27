@@ -797,11 +797,14 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
 
     /**
      * _more_
+     *
+     * @param dsd _more_
      */
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         super.addDisplaySettings(dsd);
-        dsd.addPropertyValue(new Double(getSurfaceValue()), "levelWithRawValue",
-                         "Isosurface Value", SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(new Double(getSurfaceValue()),
+                             "levelWithRawValue", "Isosurface Value",
+                             SETTINGS_GROUP_DISPLAY);
     }
 
 

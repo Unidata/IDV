@@ -39,11 +39,12 @@ import ucar.visad.display.Grid2DDisplayable;
 import visad.*;
 import visad.VisADException;
 
+import java.awt.event.*;
+
 
 import java.rmi.RemoteException;
 
 import java.util.List;
-import java.awt.event.*;
 
 import javax.swing.JCheckBox;
 
@@ -170,3 +171,4 @@ public class ColorPlanViewControl extends PlanViewControl {
     }
 
 }
+

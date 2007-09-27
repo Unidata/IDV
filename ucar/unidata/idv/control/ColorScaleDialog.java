@@ -108,15 +108,16 @@ public class ColorScaleDialog implements ActionListener {
      */
     public ColorScaleDialog(DisplayControlImpl displayControl, String title,
                             ColorScaleInfo info, boolean showDialog) {
-        ok = false;
+        ok                  = false;
         this.displayControl = displayControl;
 
 
         myInfo              = new ColorScaleInfo(info);
 
         if (showDialog) {
-            dialog = GuiUtils.createDialog((displayControl!=null?displayControl.getWindow():null),
-                                           title, true);
+            dialog = GuiUtils.createDialog(((displayControl != null)
+                                            ? displayControl.getWindow()
+                                            : null), title, true);
         }
 
         doMakeContents(showDialog);
@@ -170,8 +171,9 @@ public class ColorScaleDialog implements ActionListener {
         myInfo.setIsVisible(visibilityCbx.isSelected());
         myInfo.setLabelFont(fontSelector.getFont());
         try {
-            if(displayControl!=null) {
-                displayControl.setColorScaleInfo(new ColorScaleInfo(getInfo()));
+            if (displayControl != null) {
+                displayControl.setColorScaleInfo(
+                    new ColorScaleInfo(getInfo()));
             }
             return true;
         } catch (Exception exc) {
@@ -186,7 +188,7 @@ public class ColorScaleDialog implements ActionListener {
      * @param showDialog  true to show the dialog
      */
     private void doMakeContents(boolean showDialog) {
-        placementBox       = new JComboBox(positions);
+        placementBox = new JComboBox(positions);
         colorSwatch = new GuiUtils.ColorSwatch(myInfo.getLabelColor(),
                 "Color Scale Label Color");
         visibilityCbx = new JCheckBox("", myInfo.getIsVisible());
@@ -194,21 +196,21 @@ public class ColorScaleDialog implements ActionListener {
                                         false);
         fontSelector.setFont(myInfo.getLabelFont());
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
-        contents = GuiUtils.doLayout(new Component[] {
+        contents           = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Visible: "), visibilityCbx,
             GuiUtils.rLabel("Position: "),
             GuiUtils.leftRight(placementBox, GuiUtils.filler()),
             GuiUtils.rLabel("Label Font: "), fontSelector.getComponent(),
             GuiUtils.rLabel("Label Color: "),
             GuiUtils.leftRight(colorSwatch.getSetPanel(), GuiUtils.filler())
-                                     }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
+        }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
         contents = GuiUtils.leftRight(contents, GuiUtils.filler());
         if (showDialog) {
             JPanel buttons;
-            if(displayControl!=null) {
-                buttons= GuiUtils.makeApplyOkCancelButtons(this);
+            if (displayControl != null) {
+                buttons = GuiUtils.makeApplyOkCancelButtons(this);
             } else {
-                buttons= GuiUtils.makeOkCancelButtons(this);
+                buttons = GuiUtils.makeOkCancelButtons(this);
             }
             dialog.getContentPane().add(GuiUtils.centerBottom(contents,
                     buttons));
@@ -255,7 +257,9 @@ public class ColorScaleDialog implements ActionListener {
      * @return the font or null
      */
     private Font getDisplayListFont() {
-        if(displayControl==null) return null;
+        if (displayControl == null) {
+            return null;
+        }
         Font f    = displayControl.getViewManager().getDisplayListFont();
         int  size = (f == null)
                     ? 12
@@ -266,6 +270,11 @@ public class ColorScaleDialog implements ActionListener {
         return f;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean getOk() {
         return ok;
     }

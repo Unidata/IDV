@@ -738,12 +738,12 @@ public class StationLocationControl extends StationModelControl {
 
         while (keys.hasMoreElements()) {
             String key = keys.nextElement().toString();
-            if(!haveName && key.toLowerCase().equals("name")) {
+            if ( !haveName && key.toLowerCase().equals("name")) {
                 haveName = true;
             }
             keyList.add(key);
         }
-        if(!haveName) {
+        if ( !haveName) {
             keyList.add(0, "Name");
         }
 

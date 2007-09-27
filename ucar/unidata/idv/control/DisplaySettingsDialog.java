@@ -97,10 +97,10 @@ public class DisplaySettingsDialog {
     /** _more_ */
     private JPanel propertiesHolder;
 
-    /** _more_          */
+    /** _more_ */
     private JScrollPane leftSP;
 
-    /** _more_          */
+    /** _more_ */
     private JComponent contents;
 
 
@@ -112,11 +112,19 @@ public class DisplaySettingsDialog {
      */
     public DisplaySettingsDialog(IntegratedDataViewer idv,
                                  DisplayControlImpl display) {
-        this(idv,display,true);
+        this(idv, display, true);
     }
 
+    /**
+     * _more_
+     *
+     * @param idv _more_
+     * @param display _more_
+     * @param showDialog _more_
+     */
     public DisplaySettingsDialog(IntegratedDataViewer idv,
-                                 DisplayControlImpl display, boolean showDialog) {
+                                 DisplayControlImpl display,
+                                 boolean showDialog) {
         this.idv = idv;
         displays = idv.getDisplayControls();
         if ((display == null) && (displays.size() > 0)) {
@@ -126,7 +134,7 @@ public class DisplaySettingsDialog {
         if (display != null) {
             setDisplay(display);
         }
-        if(showDialog) {
+        if (showDialog) {
             showDialog();
         }
     }
@@ -154,6 +162,11 @@ public class DisplaySettingsDialog {
         this(display.getIdv(), display);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List getPropertyValues() {
         List props = new ArrayList();
         for (int i = 0; i < propertyValues.size(); i++) {
@@ -731,10 +744,10 @@ public class DisplaySettingsDialog {
         private boolean canChange(Object v) {
             return (v instanceof String) || (v instanceof Double)
                    || (v instanceof Integer) || (v instanceof Float)
-                   || (v instanceof Range)
-                   || (v instanceof ContourInfo) || (v instanceof Color)
-                   || (v instanceof ColorScaleInfo) || (v instanceof Unit)
-                   || (v instanceof Real) || (v instanceof ColorTable);
+                   || (v instanceof Range) || (v instanceof ContourInfo)
+                   || (v instanceof Color) || (v instanceof ColorScaleInfo)
+                   || (v instanceof Unit) || (v instanceof Real)
+                   || (v instanceof ColorTable);
 
         }
 
@@ -970,36 +983,36 @@ public class DisplaySettingsDialog {
     }
 
 
-        /**
-         * _more_
-         *
-         * @param v _more_
-         *
-         * @return _more_
-         */
+    /**
+     * _more_
+     *
+     * @param v _more_
+     *
+     * @return _more_
+     */
     public static String getValueLabel(Object v) {
-        if(v == null) {
+        if (v == null) {
             return "null";
         }
-            if (v instanceof Color) {
-                Color c = (Color) v;
-                return c.getRed() + "," + c.getGreen() + "," + c.getBlue();
-            }
-
-            if (v instanceof ContourInfo) {
-                ContourInfo ci = (ContourInfo) v;
-                return ci.getInterval() + "/" + ci.getBase() + "/"
-                       + ci.getMin() + "/" + ci.getMax();
-            }
-            if (v instanceof ColorScaleInfo) {
-                ColorScaleInfo csi = (ColorScaleInfo) v;
-                return (csi.getIsVisible()
-                        ? "visible"
-                        : "not visible") + " " + csi.getPlacement();
-            }
-
-            return v.toString();
+        if (v instanceof Color) {
+            Color c = (Color) v;
+            return c.getRed() + "," + c.getGreen() + "," + c.getBlue();
         }
+
+        if (v instanceof ContourInfo) {
+            ContourInfo ci = (ContourInfo) v;
+            return ci.getInterval() + "/" + ci.getBase() + "/" + ci.getMin()
+                   + "/" + ci.getMax();
+        }
+        if (v instanceof ColorScaleInfo) {
+            ColorScaleInfo csi = (ColorScaleInfo) v;
+            return (csi.getIsVisible()
+                    ? "visible"
+                    : "not visible") + " " + csi.getPlacement();
+        }
+
+        return v.toString();
+    }
 
 
 

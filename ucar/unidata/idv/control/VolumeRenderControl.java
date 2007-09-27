@@ -17,7 +17,6 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 // $Id: VolumeRenderControl.java,v 1.11 2006/12/01 20:16:39 jeffmc Exp $
 
 package ucar.unidata.idv.control;

@@ -1932,3 +1932,4 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
     }
 
 }
+

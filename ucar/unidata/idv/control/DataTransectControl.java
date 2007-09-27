@@ -409,10 +409,11 @@ public class DataTransectControl extends CrossSectionControl {
 
         //RealTupleType xRTT = new RealTupleType(RealType.XAxis);
 
-        Gridded1DSet  csDS = new Gridded1DSet(Length.getRealTupleType(), plane, plane[0].length, 
-                                   (CoordinateSystem)null, 
-                                   new Unit[] {CommonUnits.KILOMETER},
-                                   (ErrorEstimate[]) null);
+        Gridded1DSet csDS =
+            new Gridded1DSet(Length.getRealTupleType(), plane,
+                             plane[0].length, (CoordinateSystem) null,
+                             new Unit[] { CommonUnits.KILOMETER },
+                             (ErrorEstimate[]) null);
 
         return GridUtil.setSpatialDomain(xsectSequence, csDS);
     }

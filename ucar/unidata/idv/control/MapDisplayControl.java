@@ -31,10 +31,10 @@ import org.w3c.dom.Element;
 import ucar.unidata.data.DataChoice;
 
 import ucar.unidata.gis.maps.*;
-
-import ucar.unidata.idv.PluginManager;
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.idv.MapViewManager;
+
+import ucar.unidata.idv.PluginManager;
 
 
 import ucar.unidata.ui.LatLonPanel;
@@ -701,10 +701,11 @@ public class MapDisplayControl extends DisplayControlImpl {
                 description =
                     IOUtil.getFileTail(IOUtil.stripExtension(filename));
             }
-            MapState mapState = new MapState(
-                filename, description, colorButton.getBackground(),
-                Float.parseFloat((String) widthBox.getSelectedItem()),
-                styleBox.getSelectedIndex());
+            MapState mapState =
+                new MapState(
+                    filename, description, colorButton.getBackground(),
+                    Float.parseFloat((String) widthBox.getSelectedItem()),
+                    styleBox.getSelectedIndex());
             mapState.setCategory(catFld.getText().trim());
             addMap(mapState);
             fillContents();
@@ -730,38 +731,44 @@ public class MapDisplayControl extends DisplayControlImpl {
      */
     public void saveToPlugin() {
         JCheckBox onlySelected = new JCheckBox("Only use visible maps", true);
-        JCheckBox includeFiles = new JCheckBox("Include map files in plugin", true);
-        JCheckBox includeSettings = new JCheckBox("Include \"Settings\"", false);
-        JComponent contents = GuiUtils.vbox(onlySelected, includeFiles, includeSettings);
-        contents = GuiUtils.inset(contents,5);
-        if(!GuiUtils.showOkCancelDialog(null, "Create Map Plugin",
-                                        contents,null)) return;
-        PluginManager pluginManager =    getControlContext().getIdv().getPluginManager();
+        JCheckBox includeFiles = new JCheckBox("Include map files in plugin",
+                                     true);
+        JCheckBox includeSettings = new JCheckBox("Include \"Settings\"",
+                                        false);
+        JComponent contents = GuiUtils.vbox(onlySelected, includeFiles,
+                                            includeSettings);
+        contents = GuiUtils.inset(contents, 5);
+        if ( !GuiUtils.showOkCancelDialog(null, "Create Map Plugin",
+                                          contents, null)) {
+            return;
+        }
+        PluginManager pluginManager =
+            getControlContext().getIdv().getPluginManager();
         MapInfo mapInfo;
-        List states = new ArrayList();
+        List    states = new ArrayList();
         for (int i = 0; i < mapStates.size(); i++) {
-            MapState  mapState  = (MapState) mapStates.get(i);
-            if(!onlySelected.isSelected()) {
+            MapState mapState = (MapState) mapStates.get(i);
+            if ( !onlySelected.isSelected()) {
                 states.add(mapState);
-            }  else if(mapState.getVisible()) {
-                states.add(mapState);                
+            } else if (mapState.getVisible()) {
+                states.add(mapState);
             }
         }
 
 
-        if(includeFiles.isSelected()) {
+        if (includeFiles.isSelected()) {
             for (int i = 0; i < states.size(); i++) {
-                MapState  mapState  = (MapState) states.get(i);
+                MapState mapState = (MapState) states.get(i);
                 pluginManager.addCreateFile(mapState.getSource());
             }
         }
-        if(includeSettings.isSelected()) {
+        if (includeSettings.isSelected()) {
             mapInfo = new MapInfo(states, latState, lonState,
                                   (float) mapPosition);
         } else {
             mapInfo = new MapInfo(states);
         }
-        String xml  = mapInfo.getXml(!includeFiles.isSelected());
+        String xml = mapInfo.getXml( !includeFiles.isSelected());
         pluginManager.addText(xml, "maps.xml");
     }
 

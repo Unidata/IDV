@@ -137,6 +137,8 @@ public class ImageSequenceControl extends BaseImageControl {
     /** working sequence */
     private FieldImpl workingSequence;
 
+    /** flag for showing the progress bar */
+    private boolean showProgressBar = true;
 
     /** private unit of data */
     private Unit myUnit;
@@ -173,6 +175,24 @@ public class ImageSequenceControl extends BaseImageControl {
      */
     public boolean init(DataChoice choice)
             throws VisADException, RemoteException {
+        return init(choice, true);
+    }
+
+    /**
+     * Called to make this kind of Display Control; also calls code to
+     * made the Displayable.
+     * This method is called from inside DisplayControlImpl init(several args).
+     *
+     * @param choice the DataChoice of the moment.
+     * @param doLoad  load the data if true
+     *
+     * @return  true if successful
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    protected boolean init(DataChoice choice, boolean doLoad)
+            throws VisADException, RemoteException {
         //Make the window here so it is being displayed to the user
         if ( !setData(choice)) {
             return false;
@@ -204,28 +224,30 @@ public class ImageSequenceControl extends BaseImageControl {
         loadingFromBundle = getIdv().getStateManager().getProperty(
             IdvConstants.PROP_LOADINGXML, false);
 
-        if (true) {
-            showWaitCursor();
-            Misc.run(new Runnable() {
-                public void run() {
-                    try {
-                        loadData();
-                    } catch (Exception exc) {
-                        logException("Loading data", exc);
+        if (doLoad) {
+            if (true) {
+                showWaitCursor();
+                Misc.run(new Runnable() {
+                    public void run() {
+                        try {
+                            loadData();
+                        } catch (Exception exc) {
+                            logException("Loading data", exc);
+                        }
+                        showNormalCursor();
                     }
-                    showNormalCursor();
+                });
+            } else {
+                showWaitCursor();
+                try {
+                    Trace.call1("ImageControl.loadData");
+                    loadData();
+                    Trace.call2("ImageControl.loadData");
+                } catch (Exception exc) {
+                    logException("Loading data", exc);
                 }
-            });
-        } else {
-            showWaitCursor();
-            try {
-                Trace.call1("ImageControl.loadData");
-                loadData();
-                Trace.call2("ImageControl.loadData");
-            } catch (Exception exc) {
-                logException("Loading data", exc);
+                showNormalCursor();
             }
-            showNormalCursor();
         }
 
 
@@ -280,7 +302,9 @@ public class ImageSequenceControl extends BaseImageControl {
         progressBar.setString("Selected images not available");
         progressBar.setStringPainted(true);
         progressPanel = GuiUtils.leftCenter(cancelButton, progressBar);
-        return GuiUtils.topCenter(progressPanel, doMakeWidgetComponent());
+        return getShowProgressBar()
+               ? GuiUtils.topCenter(progressPanel, doMakeWidgetComponent())
+               : doMakeWidgetComponent();
     }
 
     /**
@@ -541,7 +565,7 @@ public class ImageSequenceControl extends BaseImageControl {
                 progressBar.setString("Loaded " + displayedCnt + " of "
                                       + numImages + " images");
                 if (displayedCnt == 1) {
-                    checkImageSize((FieldImpl)image);
+                    checkImageSize((FieldImpl) image);
                     //Load the dataInstance with some example data because 
                     //when we add the Displayable to the ViewManager it 
                     //will call dataInstance.getData to find out any auto 
@@ -627,7 +651,7 @@ public class ImageSequenceControl extends BaseImageControl {
         }
 
         keepRunning = false;
-        if (progressPanel.getParent() != null) {
+        if ((progressPanel.getParent() != null) && getShowProgressBar()) {
             Container parent = progressPanel.getParent();
             parent.remove(progressPanel);
             parent.repaint();
@@ -740,6 +764,22 @@ public class ImageSequenceControl extends BaseImageControl {
     }
 
 
+    /**
+     * Set whether we should show the progress bar or not
+     * @param value true to show the progress bar
+     */
+    public void setShowProgressBar(boolean value) {
+        showProgressBar = value;
+    }
+
+
+    /**
+     * Should we show the progress bar or not
+     * @return true to show the progress bar
+     */
+    public boolean getShowProgressBar() {
+        return showProgressBar;
+    }
 
 }
 

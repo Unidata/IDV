@@ -23,18 +23,20 @@
 package ucar.unidata.idv.control;
 
 
+import ucar.unidata.idv.DisplayConventions;
+
+
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
-
-import ucar.unidata.idv.DisplayConventions;
 
 import java.awt.*;
 import java.awt.event.*;
 
 import java.lang.reflect.*;
 
-import java.util.List;
 import java.util.Hashtable;
+
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -96,7 +98,7 @@ public class ValueSliderWidget {
      */
     public ValueSliderWidget(DisplayControlImpl dc, int min, int max,
                              String property, String label) {
-        this(dc,min, max, property, label, 1.0f);
+        this(dc, min, max, property, label, 1.0f);
     }
 
     /**
@@ -107,6 +109,7 @@ public class ValueSliderWidget {
      * @param max maximum slider value
      * @param property DisplayControl property to set
      * @param label  label for the widget
+     * @param scale _more_
      */
     public ValueSliderWidget(DisplayControlImpl dc, int min, int max,
                              String property, String label, float scale) {
@@ -153,7 +156,8 @@ public class ValueSliderWidget {
                     if (valueSlider.getValueIsAdjusting()) {
                         if (valueReadout != null) {
                             valueReadout.setText(
-                                getDisplayConventions().format(value/scaleFactor));
+                                getDisplayConventions().format(
+                                    value / scaleFactor));
                         }
                     } else {
                         handleValueChanged(value);
@@ -179,9 +183,11 @@ public class ValueSliderWidget {
         valueSlider.setPaintTicks(true);
         valueSlider.setPaintLabels(true);
         if (scaleFactor != 1) {
-             valueSlider.setLabelTable(makeLabelTable());
+            valueSlider.setLabelTable(makeLabelTable());
         }
-        valueReadout = new JTextField(getDisplayConventions().format(initialValue/scaleFactor), 3);
+        valueReadout =
+            new JTextField(getDisplayConventions().format(initialValue
+                / scaleFactor), 3);
 
         valueReadout.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -189,9 +195,9 @@ public class ValueSliderWidget {
                     return;
                 }
                 try {
-                    float value =
-                        (float) Misc.parseNumber(valueReadout.getText().trim());
-                    int intValue = (int) (value*scaleFactor);
+                    float value = (float) Misc.parseNumber(
+                                      valueReadout.getText().trim());
+                    int     intValue   = (int) (value * scaleFactor);
                     boolean lastIgnore = ignoreUIEvents;
                     ignoreUIEvents = true;
                     if (valueSlider != null) {
@@ -242,7 +248,7 @@ public class ValueSliderWidget {
         if (getMethod != null) {
             try {
                 value = (int) (((Number) getMethod.invoke(displayControl,
-                        (Object[]) null)).floatValue()*scaleFactor);
+                        (Object[]) null)).floatValue() * scaleFactor);
             } catch (Exception exc2) {
                 displayControl.logException("getInitialValue", exc2);
             }
@@ -258,9 +264,10 @@ public class ValueSliderWidget {
     private void handleValueChanged(int newValue) {
         if (setMethod != null) {
             try {
-                String floatString = getDisplayConventions().format(newValue/scaleFactor);
-                   Misc.setProperty(displayControl, setMethod,
-                         floatString, false);
+                String floatString = getDisplayConventions().format(newValue
+                                         / scaleFactor);
+                Misc.setProperty(displayControl, setMethod, floatString,
+                                 false);
             } catch (Exception exc2) {
                 displayControl.logException("propertyChange", exc2);
             }
@@ -291,18 +298,26 @@ public class ValueSliderWidget {
         displayControl = null;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private Hashtable makeLabelTable() {
         Hashtable labelTable = new Hashtable();
-        float min = sliderMin/scaleFactor;
-        float max = sliderMax/scaleFactor;
-        float increment = valueSlider.getMajorTickSpacing()/scaleFactor;
+        float     min        = sliderMin / scaleFactor;
+        float     max        = sliderMax / scaleFactor;
+        float     increment  = valueSlider.getMajorTickSpacing()
+                               / scaleFactor;
         if ((min > max) || (increment > (max - min))) {
             return labelTable;
         }
         float[] values = Misc.computeTicks(max, min, 0, increment);
         if (values != null) {
             for (int i = 0; i < values.length; i++) {
-                labelTable.put(new Integer((int) (values[i]*scaleFactor)), new JLabel(getDisplayConventions().format(values[i])));
+                labelTable.put(
+                    new Integer((int) (values[i] * scaleFactor)),
+                    new JLabel(getDisplayConventions().format(values[i])));
             }
         }
         return labelTable;
@@ -334,3 +349,4 @@ public class ValueSliderWidget {
         valueSlider.setPaintLabels(true);
     }
 }
+

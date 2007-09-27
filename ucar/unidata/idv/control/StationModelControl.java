@@ -328,10 +328,10 @@ public class StationModelControl extends ObsDisplayControl {
     private boolean askedUserToDeclutterTime = false;
 
 
-    /** The range from the symbol in the layout model    */
+    /** The range from the symbol in the layout model */
     private Range stationModelRange;
 
-    /** The color table from the symbol in the layout model    */
+    /** The color table from the symbol in the layout model */
     private ColorTable stationModelColorTable;
 
 

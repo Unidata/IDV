@@ -23,6 +23,7 @@
 
 package ucar.unidata.idv.control;
 
+
 import org.w3c.dom.Element;
 
 import ucar.unidata.collab.Sharable;
@@ -5435,7 +5436,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (getDisplayInfos().size() > 0) {
             JMenu dlMenu = new JMenu("Display List");
             dlMenu.add(GuiUtils.makeCheckboxMenuItem("Show In Display List",
-                                this, "showInDisplayList", null));
+                    this, "showInDisplayList", null));
             dlMenu.add(
                 GuiUtils.makeMenu(
                     "Display List Color",
@@ -9574,7 +9575,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
     /**
      * Apply preferences to this control.  Subclasses should override
-     * if needed. 
+     * if needed.
      */
     public void applyPreferences() {
         updateLegendAndList();

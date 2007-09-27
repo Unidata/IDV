@@ -1,4 +1,3 @@
-// $Id: ValuePlanViewControl.java,v 1.25 2003/10/14 17:18:39 dmurray Exp $
 /*
  * Copyright 1997-2001 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
@@ -18,6 +17,8 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
+// $Id: ValuePlanViewControl.java,v 1.25 2003/10/14 17:18:39 dmurray Exp $
 
 
 package ucar.unidata.idv.control;
@@ -45,9 +46,6 @@ import ucar.visad.display.Grid2DDisplayable;
 import ucar.visad.display.GridValueDisplayable;
 import ucar.visad.display.LineDrawing;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import visad.*;
 import visad.RealType;
 import visad.VisADException;
@@ -58,6 +56,9 @@ import java.awt.*;
 import java.awt.Color;
 import java.awt.event.*;
 import java.awt.geom.*;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import java.rmi.RemoteException;
 
@@ -127,7 +128,7 @@ public class ValuePlanViewControl extends PlanViewControl {
         return pointDisplay;
     }
 
-    
+
     /**
      * Init is done
      */
@@ -260,13 +261,14 @@ public class ValuePlanViewControl extends PlanViewControl {
                 showWaitCursor();
                 try {
                     if (getGridDisplayable() != null) {
-                    if (currentSlice == null) {
-                        Real newLevel = currentLevel;
-                        currentLevel = null;
-                        loadDataAtLevel(newLevel);
-                    } else {
-                        getGridDisplayable().loadData(getSliceForDisplay(currentSlice));
-                    }
+                        if (currentSlice == null) {
+                            Real newLevel = currentLevel;
+                            currentLevel = null;
+                            loadDataAtLevel(newLevel);
+                        } else {
+                            getGridDisplayable().loadData(
+                                getSliceForDisplay(currentSlice));
+                        }
                     }
                 } catch (Exception exc) {
                     logException("Loading data", exc);

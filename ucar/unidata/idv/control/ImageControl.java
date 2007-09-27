@@ -196,16 +196,18 @@ public class ImageControl extends BaseImageControl {
 
     /**
      * Apply the skip factor to the image
-    protected void applySkipFactor() {
-        try {
-            if (imageDisplay != null && getGridDataInstance() != null) {
-                FieldImpl fieldImpl = getGridDataInstance().getGrid();
-                imageDisplay.loadData(getWorkingImage(fieldImpl));
-            }
-        } catch (Exception e) {
-            logException("Setting alpha value", e);
-        }
-    }
+     * protected void applySkipFactor() {
+     *   try {
+     *       if (imageDisplay != null && getGridDataInstance() != null) {
+     *           FieldImpl fieldImpl = getGridDataInstance().getGrid();
+     *           imageDisplay.loadData(getWorkingImage(fieldImpl));
+     *       }
+     *   } catch (Exception e) {
+     *       logException("Setting alpha value", e);
+     *   }
+     * }
+     *
+     * @param v _more_
      */
 
 

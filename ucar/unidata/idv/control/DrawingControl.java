@@ -1837,12 +1837,13 @@ public class DrawingControl extends DisplayControlImpl {
      */
     private void doExport() {
         try {
-            if(loadAsMapData == null) {
-                loadAsMapData = new JCheckBox("Load as map data",false);
-                loadAsMapData.setToolTipText("Load this xgrf file back in as map data");
+            if (loadAsMapData == null) {
+                loadAsMapData = new JCheckBox("Load as map data", false);
+                loadAsMapData.setToolTipText(
+                    "Load this xgrf file back in as map data");
             }
             String filename = FileManager.getWriteFile(FILTER_XGRF,
-                                  SUFFIX_XGRF,GuiUtils.top(loadAsMapData));
+                                  SUFFIX_XGRF, GuiUtils.top(loadAsMapData));
             if (filename == null) {
                 return;
             }
@@ -1853,7 +1854,7 @@ public class DrawingControl extends DisplayControlImpl {
                 root.appendChild(g.getElement(doc));
             }
             IOUtil.writeFile(filename, XmlUtil.toString(root));
-            if(loadAsMapData.isSelected()) {
+            if (loadAsMapData.isSelected()) {
                 getIdv().makeOneDataSource(filename, "FILE.MAPFILE", null);
             }
         } catch (Exception exc) {

@@ -59,7 +59,7 @@ public class DisplaySetting {
     /** _more_ */
     private boolean isLocal;
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable applicableToControls;
 
     /**

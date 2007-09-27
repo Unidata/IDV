@@ -311,38 +311,38 @@ public abstract class DisplayControlBase extends SharableImpl {
     public static final String LABEL_NONE = "None";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIND_THIS = "this";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIND_ALL = "all";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIND_CLASS = "class:";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIND_CATEGORY = "category:";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIND_WITHDATA = "withdata";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIND_WITHTHISDATA = "withthisdata";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIND_WITHTHISFIELD = "withthisfield";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIND_SPECIAL = "special";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIND_WITHTHISVIEW = "withthisview";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String SETTINGS_GROUP_DISPLAY = "Display";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SETTINGS_GROUP_FLAGS = "Flags";
 
     /**

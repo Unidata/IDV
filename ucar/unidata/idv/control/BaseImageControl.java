@@ -100,12 +100,14 @@ import javax.swing.event.*;
 public abstract class BaseImageControl extends GridDisplayControl {
 
 
-    /** empty RGB image 
+    /**
+     * empty RGB image
      * @deprecated  use public EMPTY_RGB_IMAGE
      */
     protected static FieldImpl emptyRGBImage = null;
 
-    /** empty sequence 
+    /**
+     * empty sequence
      * @deprecated  use public EMPTY_IMAGE
      */
     protected static FieldImpl emptyImage = null;
@@ -131,10 +133,10 @@ public abstract class BaseImageControl extends GridDisplayControl {
                                  new Real(line) }, null)));
 
             FlatField ff = new FlatField(new FunctionType(domain, band));
-            emptyImage = ff;
+            emptyImage  = ff;
             EMPTY_IMAGE = ff;
             FlatField ffRGB = new FlatField(new FunctionType(domain, rgb));
-            emptyRGBImage = ffRGB;
+            emptyRGBImage   = ffRGB;
             EMPTY_RGB_IMAGE = ffRGB;
         } catch (Exception ex) {
             System.out.println("Couldn't create empty set: " + ex);

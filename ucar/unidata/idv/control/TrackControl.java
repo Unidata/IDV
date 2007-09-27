@@ -32,9 +32,9 @@ import ucar.unidata.collab.SharableImpl;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
-import ucar.unidata.data.DataUtil;
 
 import ucar.unidata.data.DataTimeRange;
+import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
@@ -114,8 +114,8 @@ import javax.swing.event.ChangeListener;
  * @version $Revision: 1.69 $
  */
 
-public class TrackControl 
-    extends GridDisplayControl {
+public class TrackControl extends GridDisplayControl {
+
     //    extends DisplayControlImpl {
 
 
@@ -246,8 +246,15 @@ public class TrackControl
     }
 
 
-    private boolean trackDataOk() 
-        throws VisADException, RemoteException {
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    private boolean trackDataOk() throws VisADException, RemoteException {
         DataInstance dataInstance = getDataInstance();
         if ((dataInstance == null) || !dataInstance.dataOk()) {
             return false;
@@ -269,7 +276,7 @@ public class TrackControl
      */
     public boolean init(DataChoice dataChoice)
             throws VisADException, RemoteException {
-        if (!trackDataOk()) {
+        if ( !trackDataOk()) {
             return false;
         }
         trackDisplay = new TrackDisplayable("track" + dataChoice);
@@ -407,9 +414,9 @@ public class TrackControl
             trackDisplay.setDisplayUnit(newUnit);
             selectRangeDisplay.setDisplayUnit(newUnit);
         }
-        FlatField        ff   = null;
-        FieldImpl        grid = null;
-        if (!trackDataOk()) {
+        FlatField ff   = null;
+        FieldImpl grid = null;
+        if ( !trackDataOk()) {
             if (trackDisplay != null) {
                 trackDisplay.setData(DUMMY_DATA);
                 indicator.setVisible(false);
@@ -421,7 +428,7 @@ public class TrackControl
         if (indicator != null) {
             indicator.setVisible(getMarkerVisible());
         }
-        GridDataInstance gdi  = getGridDataInstance();
+        GridDataInstance gdi = getGridDataInstance();
         synchronized (gdi) {
             ff = getFlatField();
             if (ff != null) {
@@ -561,13 +568,13 @@ public class TrackControl
      * @throws VisADException   VisAD Error
      */
     private FlatField getFlatField() throws VisADException, RemoteException {
-        if (!trackDataOk()) {
+        if ( !trackDataOk()) {
             return null;
         }
 
-        if(true) {
+        if (true) {
             //            System.err.println ("Using new getFlatField");
-            return  DataUtil.getFlatField(getDataInstance().getData());
+            return DataUtil.getFlatField(getDataInstance().getData());
         }
 
         /*
@@ -787,13 +794,13 @@ public class TrackControl
      */
     public void applyTimeRange() {
         try {
-            if (!trackDataOk()) {
+            if ( !trackDataOk()) {
                 return;
             }
             DataTimeRange    dataTimeRange    = getDataTimeRange(true);
             GridDataInstance gridDataInstance = getGridDataInstance();
-            FlatField flatField;
-            Unit      dataTimeUnit;
+            FlatField        flatField;
+            Unit             dataTimeUnit;
             synchronized (gridDataInstance) {
                 flatField = getFlatField();
                 if (flatField == null) {
@@ -1438,6 +1445,7 @@ public class TrackControl
         return layout;
 
     }
+
 
 
 }

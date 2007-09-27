@@ -38,12 +38,13 @@ import ucar.unidata.ui.TableSorter;
 import ucar.unidata.ui.TwoListPanel;
 
 import ucar.unidata.util.FileManager;
-import ucar.unidata.util.Misc;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.Misc;
+
+import ucar.visad.data.MapSet;
 
 import ucar.visad.display.LineDrawing;
-import ucar.visad.data.MapSet;
 
 
 
@@ -133,9 +134,14 @@ public class ShapefileControl extends DisplayControlImpl {
 
     /** The db file. May be null if there was no dbf file */
     private DbaseFile dbFile;
-    private String []fieldNames;
 
-    private MapSet []mapSets;
+    /** _more_          */
+    private String[] fieldNames;
+
+    /** _more_          */
+    private MapSet[] mapSets;
+
+    /** _more_          */
     private boolean hasProperties = false;
 
     /** Does each row pass through the filters. */
@@ -207,7 +213,7 @@ public class ShapefileControl extends DisplayControlImpl {
     protected Container doMakeContents()
             throws VisADException, RemoteException {
         JComponent mainContents = (JComponent) super.doMakeContents();
-        if (!hasProperties) {
+        if ( !hasProperties) {
             return mainContents;
         }
         JTabbedPane tabbedPane = new JTabbedPane();
@@ -439,7 +445,7 @@ public class ShapefileControl extends DisplayControlImpl {
      */
     private JComponent doMakeTable() {
 
-        List comps     = new ArrayList();
+        List comps = new ArrayList();
         for (int fieldIdx = 0; fieldIdx < fieldNames.length; fieldIdx++) {
             allFields.add(fieldNames[fieldIdx]);
         }
@@ -622,7 +628,9 @@ public class ShapefileControl extends DisplayControlImpl {
      * @return Return the new set
      */
     private Data applyFilters(Data data) {
-        if(!hasProperties) return data;
+        if ( !hasProperties) {
+            return data;
+        }
 
         Data d = data;
         if (passTheFilter != null) {
@@ -763,19 +771,21 @@ public class ShapefileControl extends DisplayControlImpl {
             return false;
         }
         mainData = getDataInstance().getData();
-        if(mainData == null) {
+        if (mainData == null) {
             return false;
         }
-        mapSets  =null;
+        mapSets       = null;
         hasProperties = false;
-        if(mainData instanceof UnionSet) {
-            SampledSet[] sets = ((UnionSet)mainData).getSets();
-            if(sets.length>0 && sets[0] instanceof MapSet) {
-                mapSets = (MapSet[]) Misc.toList(sets).toArray(new MapSet[sets.length]);
-                List names  = mapSets[0].getPropertyNames();
-                if(names!=null && names.size()>0) {
+        if (mainData instanceof UnionSet) {
+            SampledSet[] sets = ((UnionSet) mainData).getSets();
+            if ((sets.length > 0) && (sets[0] instanceof MapSet)) {
+                mapSets = (MapSet[]) Misc.toList(sets).toArray(
+                    new MapSet[sets.length]);
+                List names = mapSets[0].getPropertyNames();
+                if ((names != null) && (names.size() > 0)) {
                     hasProperties = true;
-                    fieldNames = (String[]) names.toArray(new String[names.size()]);
+                    fieldNames =
+                        (String[]) names.toArray(new String[names.size()]);
                     passTheFilter = new boolean[mapSets.length];
                     Arrays.fill(passTheFilter, true);
                 }

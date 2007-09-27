@@ -40,8 +40,6 @@ import ucar.unidata.util.Range;
 import ucar.unidata.util.ThreeDSize;
 
 import ucar.visad.Util;
-import ucar.visad.quantities.Length;
-import ucar.visad.quantities.CommonUnits;
 
 
 
@@ -54,6 +52,8 @@ import ucar.visad.display.GridDisplayable;
 import ucar.visad.display.MapLines;
 import ucar.visad.display.SelectorDisplayable;
 import ucar.visad.display.XSDisplay;
+import ucar.visad.quantities.CommonUnits;
+import ucar.visad.quantities.Length;
 
 
 
@@ -161,7 +161,7 @@ public class ColorRhiControl extends ColorCrossSectionControl {
                     + getDisplayConventions().formatAngle(beamAz));
             // set altitude scale in plot to 0 to 20000 m
             if (getVerticalAxisRange() == null) {
-                setVerticalAxisRange(new Range(0,20000));
+                setVerticalAxisRange(new Range(0, 20000));
             }
             updateAxisLabels();
 
@@ -227,16 +227,21 @@ public class ColorRhiControl extends ColorCrossSectionControl {
         }
         csSelector.addPropertyChangeListener(this);
     }
-    
+
+    /**
+     * _more_
+     */
     private void updateAxisLabels() {
         try {
             XSDisplay xsDisplay = crossSectionView.getXSDisplay();
-            AxisScale yScale = xsDisplay.getYAxisScale();
-            yScale.setMajorTickSpacing((int) (getVerticalAxisRange().getMax()/5));
-            yScale.setMinorTickSpacing(yScale.getMajorTickSpacing()/5);
+            AxisScale yScale    = xsDisplay.getYAxisScale();
+            yScale.setMajorTickSpacing((int) (getVerticalAxisRange().getMax()
+                    / 5));
+            yScale.setMinorTickSpacing(yScale.getMajorTickSpacing() / 5);
             yScale.setTitle("Altitude MSL (m)");
             yScale.setSnapToBox(true);
-            yScale.createStandardLabels(getVerticalAxisRange().getMax(), 0, 0, yScale.getMajorTickSpacing());
+            yScale.createStandardLabels(getVerticalAxisRange().getMax(), 0,
+                                        0, yScale.getMajorTickSpacing());
             yScale.setGridLinesVisible(true);
             // set x axis to cover 0 to 400 km from radar
             xsDisplay.setXRange(0.0, 400.0);
@@ -260,12 +265,14 @@ public class ColorRhiControl extends ColorCrossSectionControl {
      * @param display   the display to modify
      * @param range     Range of values in units of Y Axis.  May be null
      *
+     * @param evt _more_
+     *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
-    protected void setYAxisRange(XSDisplay display, Range range)
-            throws VisADException, RemoteException {
-        crossSectionView.getXSDisplay().setYRange(0.0, 20000.0);
-    }
+     * protected void setYAxisRange(XSDisplay display, Range range)
+     *       throws VisADException, RemoteException {
+     *   crossSectionView.getXSDisplay().setYRange(0.0, 20000.0);
+     * }
      */
 
     /**
