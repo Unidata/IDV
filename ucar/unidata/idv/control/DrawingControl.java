@@ -352,13 +352,6 @@ public class DrawingControl extends DisplayControlImpl {
                 processData(data);
             }
         }
-        if (displayOnly) {
-            try {
-                applyZPosition(glyphs);
-            } catch (Exception exc) {
-                logException("Setting z position", exc);
-            }
-        }
         return true;
     }
 

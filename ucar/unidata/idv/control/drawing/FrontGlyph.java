@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control.drawing;
 
 
@@ -101,10 +102,10 @@ public class FrontGlyph extends DrawingGlyph
     /** for changing type */
     private JComboBox typeBox;
 
-    /** for flipping orientation        */
+    /** for flipping orientation */
     private JCheckBox flipItCbx;
 
-    /** for flipping orientation        */
+    /** for flipping orientation */
     private boolean flipIt = false;
 
 
@@ -410,6 +411,16 @@ public class FrontGlyph extends DrawingGlyph
 
 
 
+    /**
+     * Get the default Z position for  the glyph.
+     *
+     * @return _more_
+     */
+    protected float getDefaultZPosition() {
+        return (control == null)
+               ? -.98f
+               : super.getDefaultZPosition();
+    }
 
 
     /**
@@ -420,6 +431,7 @@ public class FrontGlyph extends DrawingGlyph
      */
     public void updateLocation() throws VisADException, RemoteException {
         if (points.size() == 0) {
+            System.out.println("points = 0");
             return;
         }
         float[][] curve = getPointValues();

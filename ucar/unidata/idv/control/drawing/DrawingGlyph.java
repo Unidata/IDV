@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.control.drawing;
 
 
@@ -437,7 +438,9 @@ public abstract class DrawingGlyph {
 
         name          = XmlUtil.getAttribute(node, ATTR_NAME, (String) "");
 
-        zPosition = XmlUtil.getAttribute(node, ATTR_ZPOSITION, (float) 0.0);
+        //zPosition = XmlUtil.getAttribute(node, ATTR_ZPOSITION, (float) 0.0);
+        zPosition = XmlUtil.getAttribute(node, ATTR_ZPOSITION,
+                                         getDefaultZPosition());
         String coordTypeName = XmlUtil.getAttribute(node, ATTR_COORDTYPE,
                                    "LATLONALT");
         coordTypeName = coordTypeName.toUpperCase();
@@ -517,6 +520,17 @@ public abstract class DrawingGlyph {
         return true;
     }
 
+
+    /**
+     * Get the default Z position for  the glyph.
+     *
+     * @return _more_
+     */
+    protected float getDefaultZPosition() {
+        return (control == null)
+               ? 0.f
+               : (float) control.getZPosition();
+    }
 
     /**
      * Is this glyph valid. Some glyph classes get created but are not fully
