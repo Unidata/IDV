@@ -20,6 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.data.text;
 
 
@@ -607,7 +609,6 @@ public class FrontDataSource extends FilesDataSource {
      * @param type Shape type
      * @param toks tokens
      * @param sb _holds xgrf
-     * @param dttm The dttm
      * @param validTime time
      *
      * @throws Exception On badness
@@ -704,8 +705,8 @@ public class FrontDataSource extends FilesDataSource {
                                  ? DrawingGlyph.TAG_HIGH
                                  : DrawingGlyph.TAG_LOW) + " "
                                  + dttms.toString());
-                sb.append(XmlUtil.attrs(DrawingGlyph.ATTR_COORDTYPE, "LATLON",
-                                        DrawingGlyph.ATTR_ZPOSITION, "-1"));
+                sb.append(XmlUtil.attr(DrawingGlyph.ATTR_COORDTYPE,
+                                       "LATLON"));
 
                 sb.append(XmlUtil.attr(HighLowGlyph.ATTR_PRESSURE, pressure));
                 sb.append(XmlUtil.attr(DrawingGlyph.ATTR_POINTS,
@@ -714,8 +715,7 @@ public class FrontDataSource extends FilesDataSource {
             }
         } else {
             StringBuffer attrs = new StringBuffer();
-            attrs.append(XmlUtil.attrs(DrawingGlyph.ATTR_COORDTYPE, "LATLON",
-                                       DrawingGlyph.ATTR_ZPOSITION, "-1"));
+            attrs.append(XmlUtil.attr(DrawingGlyph.ATTR_COORDTYPE, "LATLON"));
             StringBuffer points  = new StringBuffer();
             int          cnt     = 0;
             String       subType = null;
