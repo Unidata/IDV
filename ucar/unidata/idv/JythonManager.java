@@ -1425,7 +1425,6 @@ public class JythonManager extends IdvManager implements ActionListener {
             formulas.add(new TwoFacedObject(label, ddd));
         }
         JList formulaList = new JList(formulas);
-        formulaList.setPreferredSize(new Dimension(200, 300));
         JScrollPane scroller = GuiUtils.makeScrollPane(formulaList, 200, 300);
         JPanel contents =
             GuiUtils.topCenter(
