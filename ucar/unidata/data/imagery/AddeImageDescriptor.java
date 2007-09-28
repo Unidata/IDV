@@ -30,6 +30,7 @@ import edu.wisc.ssec.mcidas.AreaDirectoryList;
 import org.w3c.dom.Element;
 
 import ucar.unidata.data.DataSource;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.WrapperException;
 
@@ -164,11 +165,11 @@ public class AddeImageDescriptor implements Comparable, XmlPersistable,
      * Process the source to create the image directory
      */
     private void processSource() {
-        //Try it as a file first
-        if ((new File(mySource)).exists()) {
+        //Try it as a file first or as a URL
+        if (IOUtil.isHttpProtocol(mySource) || (new File(mySource)).exists()) {
             myDirectory = processSourceAsFile(mySource);
         } else {
-            myDirectory = processSourceAsUrl(mySource);
+            myDirectory = processSourceAsAddeUrl(mySource);
         }
         setTimeFromDirectory();
     }
@@ -204,7 +205,7 @@ public class AddeImageDescriptor implements Comparable, XmlPersistable,
      * @param imageSource   ADDE URL
      * @return  corresponding image metadata
      */
-    private AreaDirectory processSourceAsUrl(String imageSource) {
+    private AreaDirectory processSourceAsAddeUrl(String imageSource) {
         int imageDataIndex = imageSource.indexOf("imagedata?");
         int imageDirIndex  = imageSource.indexOf("imagedir");
         if ((imageDataIndex <= 0) && (imageDirIndex <= 0)) {
