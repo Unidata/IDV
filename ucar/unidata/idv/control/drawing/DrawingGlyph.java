@@ -992,7 +992,7 @@ public abstract class DrawingGlyph {
             return;
         }
         Real currentAnimationTime = animation.getAniValue();
-        if (currentAnimationTime == null) {
+        if (currentAnimationTime == null || currentAnimationTime.isMissing()) {
             setVisible(true);
             return;
         }
