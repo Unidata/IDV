@@ -74,6 +74,9 @@ import java.util.Properties;
  */
 public class ArgsManager extends IdvManager {
 
+    public static final String USAGE_MESSAGE = "Usage: IntegratedDataViewer  <args> <bundle/script files, e.g., .xidv, .zidv, .isl>";
+
+
     /** How many times to try to run the initial runnables */
     public static final int RUNNABLE_MAX_TRIES = 30;
 
@@ -528,13 +531,17 @@ public class ArgsManager extends IdvManager {
         return noGui;
     }
 
+
+
+
     /**
      *  Print out the command line usage message and exit
      *
      * @param err The usage message
      */
     public void usage(String err) {
-        String msg = "Usage: IntegratedDataViewer \n" + getUsageMessage();
+        String msg = USAGE_MESSAGE;
+        msg = msg + "\n" +getUsageMessage();
         LogUtil.userErrorMessage(err + "\n" + msg);
         System.exit(1);
     }
@@ -885,6 +892,7 @@ public class ArgsManager extends IdvManager {
             initParams.add(args[idx++]);
             initDisplays.add(args[idx++]);
         } else if (arg.equals(ARG_HELP)) {
+            System.err.println(USAGE_MESSAGE);
             System.err.println(getUsageMessage());
             System.exit(1);
         } else if (arg.equals(ARG_TESTEVAL)) {
