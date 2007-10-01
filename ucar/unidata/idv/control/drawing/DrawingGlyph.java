@@ -914,6 +914,7 @@ public abstract class DrawingGlyph {
     protected void addDisplayable(Displayable displayable)
             throws VisADException, RemoteException {
         getParent().addDisplayable(displayable);
+        displayable.setUseTimesInAnimation(control.getUseTimesInAnimation());
         if (getColor() != null) {
             setColor(displayable, getColor());
         }

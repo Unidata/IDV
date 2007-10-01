@@ -331,6 +331,7 @@ public class DrawingControl extends DisplayControlImpl {
             setDisplayUnit(getDefaultDistanceUnit());
         }
         displayHolder = new CompositeDisplayable();
+        displayHolder.setUseTimesInAnimation(getUseTimesInAnimation());
         addDisplayable(displayHolder);
 
         List oldGlyphs = glyphs;
@@ -464,6 +465,9 @@ public class DrawingControl extends DisplayControlImpl {
         NodeList elements = XmlUtil.getElements(root);
         setUseTimesInAnimation(XmlUtil.getAttribute(root,
                 ATTR_USETIMESINANIMATION, getUseTimesInAnimation()));
+        if(displayHolder!=null) {
+            displayHolder.setUseTimesInAnimation(getUseTimesInAnimation());
+        }
 
 
         for (int i = 0; i < elements.getLength(); i++) {
@@ -586,8 +590,9 @@ public class DrawingControl extends DisplayControlImpl {
         try {
             //Add the glyphs displayable first so the initFinal can access the
             //DisplayMaster if needed
-            //     System.err.println ("adding displayable");
-            displayHolder.addDisplayable(glyph.getDisplayable());
+            Displayable displayable = glyph.getDisplayable();
+            displayable.setUseTimesInAnimation(getUseTimesInAnimation());
+            displayHolder.addDisplayable(displayable);
             if ( !glyph.initFinal()) {
                 return false;
             }
