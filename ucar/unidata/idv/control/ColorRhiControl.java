@@ -981,8 +981,15 @@ public class ColorRhiControl extends ColorCrossSectionControl {
                 // or + 1000.0f *(-2*R + Math.sqrt(4*R*R + 4*dx*R))/2;// 2nd order
             }
 
-            RealTupleType xzRTT = new RealTupleType(Length.getRealType(),
-                                      RealType.Altitude);
+            RealType xType = null;
+            if (crossSectionView != null) {
+                XSDisplay xs = crossSectionView.getXSDisplay();
+                xType = xs.getXAxisType();
+            } else {
+                xType = Length.getRealType();
+            }
+
+            RealTupleType xzRTT = new RealTupleType(xType, RealType.Altitude);
             int  sizeX = domainSet.getLengths()[0];
             int  sizeZ = domainSet.getLengths()[1];
             Unit zUnit = (transform == null)

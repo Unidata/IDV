@@ -274,25 +274,6 @@ public abstract class CrossSectionControl extends GridDisplayControl {
     }
 
     /**
-     * Add in the menu for the XS view
-     *
-     * @param menus list of menus
-     * @param forMenuBar is it for the menu bar or for the popup
-     * protected void getExtraMenus(List menus, boolean forMenuBar) {
-     *   super.getExtraMenus(menus, forMenuBar);
-     *   if (forMenuBar) {
-     *       JMenu xsMenu = crossSectionView.makeViewMenu();
-     *       xsMenu.setText("Cross Section");
-     *       menus.add(xsMenu);
-     *   }
-     * }
-     *
-     * @param vc _more_
-     * @param properties _more_
-     * @param preSelectedDataChoices _more_
-     */
-
-    /**
      * Called by the {@link ucar.unidata.idv.IntegratedDataViewer} to
      * initialize after this control has been unpersisted
      *
@@ -673,15 +654,20 @@ public abstract class CrossSectionControl extends GridDisplayControl {
     }
 
     /**
-     * _more_
+     * Make the Vertical Range component
      *
-     * @return _more_
+     * @return  the component
      */
     private Component doMakeVerticalRangeWidget() {
         Range        r          = getVerticalAxisRange();
+        if (r == null) {
+            try {
+                 r = getRange();
+            } catch (Exception e) {}
+        }
         final JLabel rangeLabel = new JLabel("  Range: " + ((r != null)
                 ? r.toString()
-                : "    "));
+                : "     "));
         JButton      rdButton   = new JButton("Change");
         rdButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -1201,11 +1187,23 @@ public abstract class CrossSectionControl extends GridDisplayControl {
             return;
         }
         getGridDisplayable().loadData(fieldImpl);
-        ((GridDisplayable) vcsDisplay).loadData(twoDData);
+        load2DData(twoDData);
 
         // rescale display so data fits inside the display
         reScale();
         updateLocationLabel();
+    }
+
+    /**
+     * Load the 2D data into the appropriate display(s)
+     * @param twoDData  cross section slice converted to 2D
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
+     */
+    protected void load2DData(FieldImpl twoDData) 
+            throws VisADException, RemoteException {
+        ((GridDisplayable) vcsDisplay).loadData(twoDData);
     }
 
     /**
@@ -1391,8 +1389,16 @@ public abstract class CrossSectionControl extends GridDisplayControl {
             }
         }
 
-        RealTupleType xzRTT = new RealTupleType(Length.getRealType(),
-                                  RealType.Altitude);
+        RealType xType = null;
+
+        if (crossSectionView != null) {
+            XSDisplay xs = crossSectionView.getXSDisplay();
+            xType = xs.getXAxisType();
+        } else {
+            xType = Length.getRealType();
+        }
+
+        RealTupleType xzRTT = new RealTupleType(xType, RealType.Altitude);
 
         Gridded2DSet vcsG2DS = (dataIs3D)
                                ? new Gridded2DSet(xzRTT, plane, sizeX, sizeZ,

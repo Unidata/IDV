@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -224,34 +225,37 @@ public class DataTransectControl extends CrossSectionControl {
         return true;
     }
 
-
     /**
-     * Load the external display and the local display
-     * with this data of a transect.
+     * Load the 2D data into the appropriate display(s)
+     * @param twoDData  cross section slice converted to 2D
      *
-     * @param fieldImpl    the data as a FieldImpl
-     *
-     * @throws VisADException error loading data
-     * @throws RemoteException error loading data
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
      */
-    protected void loadData(FieldImpl fieldImpl)
+    protected void load2DData(FieldImpl twoDData)
             throws VisADException, RemoteException {
-
+        if (twoDData == null) {
+            return;
+        }
         try {
             //Find the range of data
-            Range[] range = GridUtil.getMinMax(fieldImpl);
+            Range[] range = GridUtil.getMinMax(twoDData);
             lineRange = range[0];
-            setVerticalAxisRange(lineRange);
+            Unit dataUnit = null;
+            if (getGridDataInstance() != null) {
+                dataUnit = getGridDataInstance().getRawUnit(0);
+            }
+            if ( !Misc.equals(displayUnit, dataUnit)) {
+                lineRange = convertRange(lineRange, dataUnit,
+                                         getDisplayUnit());
+            }
+
         } catch (Exception exc) {}
 
-
-
-        getGridDisplayable().loadData(fieldImpl);
-        ((TrackDisplayable) getVerticalCSDisplay()).setTrack(
-            make2DData(fieldImpl));
-        // rescale display so data fits inside the display
-        reScale();
-        updateLocationLabel();
+        if (getVerticalAxisRange() == null) {
+            setVerticalAxisRange(getRange());
+        }
+        ((TrackDisplayable) getVerticalCSDisplay()).setTrack(twoDData);
     }
 
 
@@ -311,7 +315,6 @@ public class DataTransectControl extends CrossSectionControl {
      */
     protected void updateViewParameters()
             throws VisADException, RemoteException {
-        System.out.println("update view parameters");
         super.updateViewParameters();
         XSDisplay xsDisplay = getCrossSectionViewManager().getXSDisplay();
         if (getGridDataInstance() != null) {
@@ -407,10 +410,16 @@ public class DataTransectControl extends CrossSectionControl {
         };
         //Misc.printArray("2D samples", plane[0]);
 
-        //RealTupleType xRTT = new RealTupleType(RealType.XAxis);
+        RealType xType = null;
+        if (crossSectionView != null) {
+            XSDisplay xs = crossSectionView.getXSDisplay();
+            xType = xs.getXAxisType();
+        } else {
+            xType = Length.getRealType();
+        }
 
         Gridded1DSet csDS =
-            new Gridded1DSet(Length.getRealTupleType(), plane,
+            new Gridded1DSet(new RealTupleType(xType), plane,
                              plane[0].length, (CoordinateSystem) null,
                              new Unit[] { CommonUnits.KILOMETER },
                              (ErrorEstimate[]) null);

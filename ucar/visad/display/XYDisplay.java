@@ -239,6 +239,24 @@ public class XYDisplay extends DisplayMaster {
     }
 
     /**
+     * Get the mapping for the XAxis.
+     *
+     * @return RealType for X axis ScalarMap
+     */
+    public RealType getXAxisType() {
+        return xAxisType;
+    }
+
+    /**
+     * Get the mapping for the YAxis.
+     *
+     * @return RealType for Y axis ScalarMap
+     */
+    public RealType getYAxisType() {
+        return yAxisType;
+    }
+
+    /**
      * Change the mapping for both axes
      *
      * @param xType  new RealType for X axis ScalarMap
