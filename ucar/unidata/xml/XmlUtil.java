@@ -1068,12 +1068,16 @@ public abstract class XmlUtil {
      *  @return The ancestor
      */
     public static Element findAncestor(Element child, String tagName) {
-        Element parent = (Element) child.getParentNode();
+        Object parentObj = child.getParentNode();
+        if(!(parentObj instanceof Element)) return null;
+        Element parent = (Element) parentObj;
         while (parent != null) {
             if (parent.getTagName().equals(tagName)) {
                 return parent;
             }
-            parent = (Element) parent.getParentNode();
+            parentObj = parent.getParentNode();
+            if(!(parentObj instanceof Element)) return null;
+            parent = (Element) parentObj;
         }
         return null;
     }
