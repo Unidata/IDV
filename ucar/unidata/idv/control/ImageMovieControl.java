@@ -1405,7 +1405,8 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
                         ? null
                         : XmlUtil.getAttribute(root, ATTR_BASE,
                             (String) null));
-        String url = XmlUtil.getAttribute(node, ATTR_INDEX);
+        String url = XmlUtil.getAttribute(node, ATTR_INDEX, (String) null);
+        if(url == null) return null;
         if (base != null) {
             if ( !base.endsWith("/") && !url.startsWith("/")) {
                 url = base + "/" + url;
