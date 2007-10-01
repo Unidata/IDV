@@ -1946,7 +1946,31 @@ public class ImageGenerator extends IdvManager {
     protected boolean processTagGroup(Element node) throws Throwable {
         pushProperties();
         int  loopTimes = applyMacros(node, ATTR_LOOP, 1);
-        long sleepTime = applyMacros(node, ATTR_SLEEP, 0) * 1000;
+        String sleepString = applyMacros(node, ATTR_SLEEP, (String)null);
+        long sleepTime = 0;
+        if(sleepString!=null) {
+            sleepString = sleepString.trim();
+            long multiplier = 1000;
+            String unit = StringUtil.findPattern(sleepString, "[0-9.]+(.*)$");
+
+            if(unit!=null && unit.trim().length()>0) {
+                sleepString = sleepString.substring(0,sleepString.length()-unit.length());
+                if(unit.equals("s")) {
+                } else if(unit.equals("seconds")) {
+                } else if(unit.equals("minutes")) {
+                    multiplier = 60*1000;
+                } else if(unit.equals("m")) {
+                    multiplier = 60*1000;
+                } else if(unit.equals("hours")) {
+                    multiplier = 60*60*1000;
+                } else if(unit.equals("h")) {
+                    multiplier = 60*60*1000;
+                } else {
+                    return error("Unknown sleep time unit:" +unit);
+                }
+            }
+            sleepTime = (long)(multiplier*new Double(sleepString).doubleValue());
+        }
         for (int i = 0; i < loopTimes; i++) {
             currentLoopIndex = i;
             try {

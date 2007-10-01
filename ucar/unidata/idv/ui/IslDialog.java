@@ -215,9 +215,10 @@ public class IslDialog {
         Document doc  = XmlUtil.makeDocument();
         Element  root = doc.createElement(ImageGenerator.TAG_ISL);
         root.setAttribute(ImageGenerator.ATTR_LOOP, loopFld.getText().trim());
+        double sleepMinutes = new Double(sleepFld.getText().trim()).doubleValue();
         root.setAttribute(
             ImageGenerator.ATTR_SLEEP,
-            "" + (new Integer(sleepFld.getText().trim())).intValue() * 60);
+            "" + (sleepMinutes)+"minutes");
         root.setAttribute(ImageGenerator.ATTR_OFFSCREEN,
                           "" + offscreenCbx.isSelected());
 
