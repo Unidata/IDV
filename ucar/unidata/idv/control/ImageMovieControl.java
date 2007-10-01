@@ -1111,9 +1111,11 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
             stationToElement.put(station, child);
             elementToStation.put(child, station);
         }
-        latLons = (LatLonTuple[]) locs.toArray(new LatLonTuple[locs.size()]);
-        locations.setData(Util.indexedField(latLons, false));
-        stationMap.setStations(stations);
+        if(locs.size()>0) {
+            latLons = (LatLonTuple[]) locs.toArray(new LatLonTuple[locs.size()]);
+            locations.setData(Util.indexedField(latLons, false));
+            stationMap.setStations(stations);
+        }
     }
 
     /**
