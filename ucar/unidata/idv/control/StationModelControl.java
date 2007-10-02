@@ -2508,7 +2508,7 @@ public class StationModelControl extends ObsDisplayControl {
                     pointParam));
             paramMenu.add(GuiUtils.makeMenuItem("To Front",
                     StationModelControl.this, "toFront", pointParam));
-            paramMenu.add(GuiUtils.makeMenuItem("Line Properties",
+            paramMenu.add(GuiUtils.makeMenuItem("Chart Properties",
                     StationModelControl.this, "showLineProperties",
                     pointParam));
         }

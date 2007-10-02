@@ -534,7 +534,7 @@ public class VerticalProfileControl extends LineProbeControl {
         items.add(paramMenu);
 
         VerticalProfileInfo rowInfo = getVPInfo(row);
-        paramMenu.add(GuiUtils.makeMenuItem("Line Properties",
+        paramMenu.add(GuiUtils.makeMenuItem("Chart Properties",
                                             VerticalProfileControl.this,
                                             "showLineProperties", rowInfo));
 

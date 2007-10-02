@@ -1090,7 +1090,7 @@ public class ProbeControl extends DisplayControlImpl {
             }
         });
 
-        paramMenu.add(GuiUtils.makeMenuItem("Line Properties",
+        paramMenu.add(GuiUtils.makeMenuItem("Chart Properties",
                                             ProbeControl.this,
                                             "showLineProperties", rowInfo));
 
