@@ -646,7 +646,9 @@ public class StationLocationControl extends StationModelControl {
 
         readoutText.setText("<html>" + getStationTableDescription()
                             + sb.toString() + "</html>");
+        GuiUtils.scrollToTop(readoutText);
     }
+
 
     /**
      * Assume that any display controls that have a color table widget
@@ -1193,9 +1195,6 @@ public class StationLocationControl extends StationModelControl {
             readoutText, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         readoutComp.add(BorderLayout.CENTER, readoutSP);
-
-        readoutSP.setPreferredSize(new Dimension(200, 300));
-        readoutText.setPreferredSize(new Dimension(200, 300));
         readoutGuiHolder.add(BorderLayout.CENTER, readoutComp);
 
 
@@ -1229,14 +1228,15 @@ public class StationLocationControl extends StationModelControl {
             }
         };
 
-
         JTabbedPane locationTab = GuiUtils.getNestedTabbedPane();
         locationTab.add("All Locations", allLocationsTable.getScroller());
         locationTab.add("Displayed Locations", locationsTable.getScroller());
-        JComponent locationComp = GuiUtils.doLayout(new Component[] {
+        locationTab.setPreferredSize(new Dimension(200,250));
+        readoutContents.setPreferredSize(new Dimension(200,250));
+        JSplitPane locationComp = GuiUtils.vsplit(
                                       locationTab,
-                                      readoutContents }, 1, GuiUtils.WT_Y,
-                                          GuiUtils.WT_Y);
+                                      readoutContents,200,0.5);
+        locationComp.setOneTouchExpandable(true);
         tabbedPane.add("Display", doMakeDisplayPanel());
         tabbedPane.add("Locations", locationComp);
         tabbedPane.add("Data Sets", doMakeStationListPanel());
