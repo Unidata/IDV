@@ -802,14 +802,14 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
               HelpTipDialog.PREF_HELPTIPSHOW },
             { "Confirm Before Exiting", PREF_SHOWQUITCONFIRM },
             { "Show Dashboard On Start", PREF_SHOWDASHBOARD, Boolean.TRUE },
-            { "Dock in Dashboard:", null },
+            /*            { "Dock in Dashboard:", null },
             { "Quick Links", PREF_EMBEDQUICKLINKSINDASHBOARD, Boolean.TRUE },
             { "Data Chooser", PREF_EMBEDDATACHOOSERINDASHBOARD,
               Boolean.TRUE },
             { "Field Selector", PREF_EMBEDFIELDSELECTORINDASHBOARD,
               Boolean.TRUE },
             { "Display Control Windows", PREF_CONTROLSINTABS, Boolean.TRUE },
-            { "Legends", PREF_EMBEDLEGENDINDASHBOARD, Boolean.FALSE }
+            { "Legends", PREF_EMBEDLEGENDINDASHBOARD, Boolean.FALSE }*/
         };
 
         JPanel     panel1 = makePrefPanel(prefs1, widgets, getStore());
@@ -1104,9 +1104,13 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
 
-        JPanel leftPanel = panel1;
-        JPanel rightPanel = GuiUtils.inset(GuiUtils.vbox(panel2, panel3),
+        JPanel rightPanel = panel3;
+        JPanel leftPanel = GuiUtils.inset(GuiUtils.vbox(panel1, panel2),
                                            new Insets(0, 40, 0, 0));
+
+        //        JPanel leftPanel = panel1;
+        //        JPanel rightPanel = GuiUtils.inset(GuiUtils.vbox(panel2, panel3),
+        //                                           new Insets(0, 40, 0, 0));
         List panelComps = Misc.newList(GuiUtils.top(leftPanel),
                                        GuiUtils.top(rightPanel));
         JPanel panels = GuiUtils.doLayout(panelComps, 2, GuiUtils.WT_N,
