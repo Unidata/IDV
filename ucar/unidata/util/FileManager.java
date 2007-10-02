@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -80,8 +81,7 @@ public class FileManager {
         "FileManager.DirectoryHistory";
 
     /** Property in the store for the last dir */
-    public static final String PROP_DIRECTORY =
-        "filemanager.directory";
+    public static final String PROP_DIRECTORY = "filemanager.directory";
 
     /** parent component */
     private Component parent;
@@ -955,8 +955,18 @@ public class FileManager {
         return getDirectory(dfltDir, title, null);
     }
 
-    public static File getDirectory(String dfltDir, String title, JComponent accessory) {
-        if(dfltDir == null && fileStore!=null) {
+    /**
+     * _more_
+     *
+     * @param dfltDir _more_
+     * @param title _more_
+     * @param accessory _more_
+     *
+     * @return _more_
+     */
+    public static File getDirectory(String dfltDir, String title,
+                                    JComponent accessory) {
+        if ((dfltDir == null) && (fileStore != null)) {
             dfltDir = (String) fileStore.get(PROP_DIRECTORY);
         }
 
@@ -965,7 +975,7 @@ public class FileManager {
                                : new javax.swing.JFileChooser();
 
         chooser.setApproveButtonText("Save");
-        if(accessory!=null) {
+        if (accessory != null) {
             chooser.setAccessory(accessory);
         }
 
@@ -989,7 +999,7 @@ public class FileManager {
             return null;
         }
         File file = chooser.getSelectedFile();
-        if(fileStore!=null) {
+        if (fileStore != null) {
             fileStore.put(PROP_DIRECTORY, file.toString());
             fileStore.save();
         }
@@ -1306,52 +1316,71 @@ public class FileManager {
         }
 
 
-        String filename = fileManager.chooseFilename(title,
-                              (buttonText != null)
-                              ? buttonText
-                              : (forWrite
-                                 ?"Save"
-                                 :"Open"),includeUrl);
-        if (filename == null) {
-            return null;
-        }
-
-
-
-        String tail = IOUtil.getFileTail(filename);
-
-        if (tail.indexOf(".") < 0) {
-            //Get the suffix from the file filter if we don't have one
-            FileFilter fileFilter = fileManager.getChooser().getFileFilter();
-            if ((fileFilter != null)
-                    && (fileFilter instanceof PatternFileFilter)) {
-                String filterSuffix =
-                    ((PatternFileFilter) fileFilter).getPreferredSuffix();
-                if (filterSuffix != null) {
-                    suffix = filterSuffix;
-                }
-            }
-            if (suffix != null) {
-                filename = filename + suffix;
-            }
-        }
-
-        File file = new File(filename);
-        if (forWrite && file.exists()) {
-            if (JOptionPane.showConfirmDialog(null,
-                    "File:" + filename
-                    + " exists. Do you want to overwrite?", "File exists",
-                        JOptionPane.YES_NO_OPTION) == 1) {
+        while (true) {
+            String filename = fileManager.chooseFilename(title,
+                                  (buttonText != null)
+                                  ? buttonText
+                                  : (forWrite
+                                     ?"Save"
+                                     :"Open"),includeUrl);
+            if (filename == null) {
                 return null;
             }
-        }
 
-        String dir = file.getParent();
-        if ((fileStore != null) && (dir != null)) {
-            fileStore.put(property, filename);
-            fileStore.save();
+
+
+            String tail = IOUtil.getFileTail(filename);
+
+            if (tail.indexOf(".") < 0) {
+                //Get the suffix from the file filter if we don't have one
+                FileFilter fileFilter =
+                    fileManager.getChooser().getFileFilter();
+                if ((fileFilter != null)
+                        && (fileFilter instanceof PatternFileFilter)) {
+                    String filterSuffix =
+                        ((PatternFileFilter) fileFilter).getPreferredSuffix();
+                    if (filterSuffix != null) {
+                        suffix = filterSuffix;
+                    }
+                }
+                if (suffix != null) {
+                    filename = filename + suffix;
+                }
+            }
+
+            File file = new File(filename);
+            if (forWrite) {
+                boolean isWritable = true;
+                if (file.exists()) {
+                    if (JOptionPane
+                            .showConfirmDialog(null, "File:" + filename
+                                + " exists. Do you want to overwrite?", "File exists", JOptionPane
+                                    .YES_NO_OPTION) == 1) {
+                        return null;
+                    }
+                    isWritable = file.canWrite();
+                } else {
+                    File parent = file.getParentFile();
+                    if (parent != null) {
+                        isWritable = parent.canWrite();
+                    }
+
+                }
+                if ( !isWritable) {
+                    if ( !GuiUtils.askOkCancel("File Selection",
+                            "The chosen file path is not writable. Select again?")) {
+                        return null;
+                    }
+                    continue;
+                }
+            }
+            String dir = file.getParent();
+            if ((fileStore != null) && (dir != null)) {
+                fileStore.put(property, filename);
+                fileStore.save();
+            }
+            return filename;
         }
-        return filename;
     }
 
 
