@@ -638,7 +638,15 @@ public class ImageGenerator extends IdvManager {
 
         Element root = null;
         try {
-            root = XmlUtil.getRoot(islFile, getClass());
+            InputStream is = null;
+            try {
+                is = IOUtil.getInputStream(islFile, getClass());
+            } catch (FileNotFoundException fnfe) {
+            } catch(IOException ioe) {}
+            if(is == null) {
+                return error("Given script file does not exist or could not be read: " + islFile);
+            }
+            root = XmlUtil.getRoot(is);
         } catch (Exception exc) {
             exc.printStackTrace();
             return error("Could not load script file:" + islFile + "\n"
