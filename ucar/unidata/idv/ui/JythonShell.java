@@ -400,6 +400,7 @@ public class JythonShell extends InteractiveShell {
      */
     public void eval(String jython) {
         try {
+            if(jython.trim().length()==0) return;
             super.eval(jython);
             StringBuffer sb = new StringBuffer();
             List lines = StringUtil.split(jython,"\n",false,false);
@@ -415,7 +416,7 @@ public class JythonShell extends InteractiveShell {
                 sb.append (line);
                 sb.append ("\n");
             }
-            System.err.println(sb);
+            //            System.err.println(sb);
             getInterpreter().exec(sb.toString());
         } catch (PyException pse) {
             output("<font color=\"red\">Error: " + pse.toString()
