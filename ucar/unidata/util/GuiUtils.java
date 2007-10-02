@@ -5782,6 +5782,22 @@ public class GuiUtils {
     }
 
     /**
+     * Scroll the given component to the top
+     *
+     * @param editor editor to scroll
+     */
+    public static void scrollToTop(final JEditorPane editor) {
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    try {
+                        editor.scrollRectToVisible(new Rectangle(1, 1, 1, 1));
+                } catch(Exception exc) {}
+                }});
+    }
+
+
+
+    /**
      * Add a mouse listener to all components of a container
      *
      * @param listener  the mouse listener
