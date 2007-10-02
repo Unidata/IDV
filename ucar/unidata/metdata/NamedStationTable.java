@@ -396,6 +396,25 @@ public class NamedStationTable extends StationTableImpl {
                 }
                 continue;
             }
+            if (name.toLowerCase().endsWith(".kml")) {
+                try {
+                    String kml = xrc.read(i);
+                    if (kml != null) {
+                        NamedStationTable table =
+                            new NamedStationTable(title);
+                        table.createStationTableFromKml(kml);
+                        tables.add(table);
+                        table.setType(type);
+                        table.setCategory(category);
+                    }
+                } catch (Exception exc) {
+                    System.err.println("error processing locations file:"
+                                       + name);
+                    exc.printStackTrace();
+                }
+                continue;
+            }
+
             if (name.toLowerCase().endsWith(".tbl")) {
                 try {
                     String tbl = xrc.read(i);
@@ -784,6 +803,39 @@ public class NamedStationTable extends StationTableImpl {
      * }
      */
 
+    public void createStationTableFromKml(String kml) throws Exception {
+        Element root = XmlUtil.getRoot("xml:" +kml,
+                                       NamedStationTable.class);
+        if(root == null) return;
+
+        List nodes = XmlUtil.findDescendants(root,"Placemark");
+        for(int i=0;i<nodes.size();i++) {
+            Element node  = (Element) nodes.get(i);
+            Element coordsNode = XmlUtil.findDescendant(node, "coordinates");
+            if(coordsNode ==null) continue;
+            String coords =  XmlUtil.getChildText(coordsNode);
+            if(coords ==null) continue;
+            String name = XmlUtil.getGrandChildText(node,"name");
+            if(name ==null) continue;
+            List toks = StringUtil.split(coords,",",true,true);
+            if(toks.size()<=1) continue;
+            double lon =
+                Misc.decodeLatLon(toks.get(0).toString());
+            double lat =
+                Misc.decodeLatLon(toks.get(1).toString());
+            double altitude = (toks.size()>=3?Misc.parseDouble(toks.get(2).toString()):0);
+            String desc = XmlUtil.getGrandChildText(node,"description");
+            NamedStationImpl station = new NamedStationImpl(name, name,
+                                           lat, lon, altitude, CommonUnit.meter);
+            this.add(station, true);
+            if(desc!=null) {
+                station.addProperty("description", desc);
+            }
+
+        }
+
+    }
+
 
     /**
      * Create a station table from a csv string
@@ -1019,6 +1071,16 @@ public class NamedStationTable extends StationTableImpl {
                                               IOUtil.getFileTail(filename)));
 
             table.createStationTableFromCsv(IOUtil.readContents(filename,
+                    NamedStationTable.class));
+            return table;
+        }
+
+        if (filename.toLowerCase().endsWith(".kml")) {
+            NamedStationTable table = new NamedStationTable(
+                                          IOUtil.stripExtension(
+                                              IOUtil.getFileTail(filename)));
+
+            table.createStationTableFromKml(IOUtil.readContents(filename,
                     NamedStationTable.class));
             return table;
         }
