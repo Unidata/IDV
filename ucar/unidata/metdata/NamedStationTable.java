@@ -59,6 +59,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.*;
+import java.io.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -71,6 +73,9 @@ import javax.swing.event.*;
  * @version $Revision: 1.46 $ $Date: 2007/06/08 21:10:35 $
  */
 public class NamedStationTable extends StationTableImpl {
+
+    private boolean valid = true;
+
 
     /** type of table */
     private String type;
@@ -356,6 +361,10 @@ public class NamedStationTable extends StationTableImpl {
     }
 
 
+    private static boolean isKml(String filename) {
+        return (filename.toLowerCase().endsWith(".kml") || filename.toLowerCase().endsWith(".kmz"));
+    }
+
     /**
      * Create a list of NamedStationTables from a set of resources
      *
@@ -396,20 +405,16 @@ public class NamedStationTable extends StationTableImpl {
                 }
                 continue;
             }
-            if (name.toLowerCase().endsWith(".kml")) {
+
+            if (isKml(name)) {
                 try {
-                    String kml = xrc.read(i);
-                    if (kml != null) {
-                        NamedStationTable table =
-                            new NamedStationTable(title);
-                        table.createStationTableFromKml(kml);
+                    NamedStationTable table = createStationTableFromFile(xrc.get(i).toString());
+                    if(table!=null && table.valid) {
                         tables.add(table);
                         table.setType(type);
                         table.setCategory(category);
                     }
-                } catch (Exception exc) {
-                    System.err.println("error processing locations file:"
-                                       + name);
+                } catch(Exception exc){
                     exc.printStackTrace();
                 }
                 continue;
@@ -803,7 +808,31 @@ public class NamedStationTable extends StationTableImpl {
      * }
      */
 
-    public void createStationTableFromKml(String kml) throws Exception {
+    public void createStationTableFromKmlFile(String filename) throws Exception {
+        String kml = null;
+        if(filename.toLowerCase().endsWith(".kmz")) {
+            InputStream is = IOUtil.getInputStream(filename);
+            if(is == null) {
+                valid = false;
+                return;
+            }
+            BufferedInputStream bin =   new BufferedInputStream(is);
+            ZipInputStream zin = new ZipInputStream(bin);
+            ZipEntry ze;
+            while ((ze = zin.getNextEntry()) != null) {
+                String name = ze.getName().toLowerCase();
+                if (name.toLowerCase().endsWith(".kml")) {
+                    kml  = new String(IOUtil.readBytes(zin, null, false));
+                    break;
+                }
+            }
+        } else {
+            kml =IOUtil.readContents(filename, NamedStationTable.class);
+        }
+        if(kml == null) {
+            valid = false;
+            return;
+        }
         Element root = XmlUtil.getRoot("xml:" +kml,
                                        NamedStationTable.class);
         if(root == null) return;
@@ -1075,13 +1104,12 @@ public class NamedStationTable extends StationTableImpl {
             return table;
         }
 
-        if (filename.toLowerCase().endsWith(".kml")) {
+        if (isKml(filename)) {
             NamedStationTable table = new NamedStationTable(
                                           IOUtil.stripExtension(
                                               IOUtil.getFileTail(filename)));
 
-            table.createStationTableFromKml(IOUtil.readContents(filename,
-                    NamedStationTable.class));
+            table.createStationTableFromKmlFile(filename);
             return table;
         }
 
@@ -1097,29 +1125,6 @@ public class NamedStationTable extends StationTableImpl {
 
         return createStationTable(XmlUtil.getRoot(filename,
                 NamedStationTable.class));
-
-        /*
-        NamedStationTable table = new NamedStationTable(
-                                      IOUtil.stripExtension(
-                                          IOUtil.getFileTail(filename)));
-
-            /**
-             *
-             * WorldWindReader reader = new WorldWindReader();
-             * List features = reader.readWWP(filename);
-             * System.err.println("features:" + features.size());
-             * for(int i=0;i<features.size();i++) {
-             *   WorldWindReader.Feature feature = (WorldWindReader.Feature)features.get(i);
-             *   NamedStationImpl station = new NamedStationImpl(feature.name,
-             *                                                   feature.name,
-             *                                                   feature.lat,
-             *                                                   feature.lon,
-             *                                                   0.0, CommonUnit.meter);
-             *   table.add(station, true);
-             * }
-             * return table;
-             */
-
     }
 
 
@@ -1210,6 +1215,16 @@ public class NamedStationTable extends StationTableImpl {
                             href = base + href;
                         }
                     }
+                    
+                    if(isKml(href)) {
+                        try {
+                            this.createStationTableFromKmlFile(href);
+                            return super.getMap();
+                        }  catch(Exception exc) {
+                            return null;
+                        }
+                    }
+
                     try {
                         root = XmlUtil.getRoot(href, getClass());
                     } catch (Exception exc) {
