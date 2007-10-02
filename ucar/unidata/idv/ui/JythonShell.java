@@ -416,7 +416,6 @@ public class JythonShell extends InteractiveShell {
                 sb.append (line);
                 sb.append ("\n");
             }
-            //            System.err.println(sb);
             getInterpreter().exec(sb.toString());
         } catch (PyException pse) {
             output("<font color=\"red\">Error: " + pse.toString()
