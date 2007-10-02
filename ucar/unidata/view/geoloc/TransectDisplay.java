@@ -212,6 +212,9 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
     /** the minimum pressure */
     private double pressureMin = 1013.25;
 
+    /** the axis font */
+    private Font axisFont;
+
     /** cache infos */
     List cacheInfos = new ArrayList();
 
@@ -645,6 +648,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
 
             init = true;
         }
+        setFontOnScales();
         setVerticalRange(altitudeMin, altitudeMax);
         setVerticalRangeUnit(verticalRangeUnit);
         makeVerticalScales();
@@ -1695,6 +1699,25 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
      */
     public CoordinateSystem getDisplayCoordinateSystem() {
         return coordinateSystem;
+    }
+
+    /**
+     * Set the fonts for the axis scales
+     * @param f  Font to use
+     */
+    public void setScaleFont(Font f) {
+        axisFont = f;
+        setFontOnScales();
+    }
+
+    /**
+     * update the font scales
+     */
+    private void setFontOnScales() {
+        if (heightScale != null) heightScale.setFont(axisFont);
+        if (pressureScale != null) pressureScale.setFont(axisFont);
+        if (latlonScale != null) latlonScale.setFont(axisFont);
+        if (distanceScale != null) distanceScale.setFont(axisFont);
     }
 
     /**
