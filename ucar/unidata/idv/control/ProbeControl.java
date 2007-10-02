@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -1292,6 +1293,16 @@ public class ProbeControl extends DisplayControlImpl {
         paramsTable = new JTable(tableModel);
 
 
+        paramsTable.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+
+                    removeField(paramsTable.getSelectedRow());
+                }
+            }
+        });
+
+
         paramsTable.addMouseListener(new MouseAdapter() {
 
             public void mousePressed(MouseEvent e) {
@@ -1539,6 +1550,9 @@ public class ProbeControl extends DisplayControlImpl {
      * @param row  row to remove
      */
     private void removeField(int row) {
+        if (row < 0) {
+            return;
+        }
         ProbeRowInfo info = getRowInfo(row);
         DataInstance di   = info.getDataInstance();
         if (di != null) {
