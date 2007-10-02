@@ -63,6 +63,8 @@ import javax.swing.text.*;
  */
 public class InteractiveShell implements HyperlinkListener {
 
+    private static Object MUTEX =  new Object();
+
     /** _more_ */
     protected JFrame frame;
 
@@ -202,6 +204,8 @@ public class InteractiveShell implements HyperlinkListener {
             }
         });
         cardLayoutPanel = new GuiUtils.CardLayoutPanel();
+
+        //        cardLayoutPanel.addCard(GuiUtils.top(GuiUtils.inset(commandFld,2)));
         cardLayoutPanel.addCard(GuiUtils.top(commandFld));
         cardLayoutPanel.addCard(GuiUtils.makeScrollPane(commandArea, 200,
                 100));
@@ -209,8 +213,8 @@ public class InteractiveShell implements HyperlinkListener {
                                            this, "flipField");
         JButton evalBtn = GuiUtils.makeButton("Evaluate:", this, "eval");
         JComponent bottom = GuiUtils.leftCenterRight(GuiUtils.top(evalBtn),
-                                cardLayoutPanel, GuiUtils.top(flipBtn));
-        JComponent contents = GuiUtils.centerBottom(scroller, bottom);
+                                                     GuiUtils.inset(cardLayoutPanel, 2),GuiUtils.top(flipBtn));
+        JComponent contents = GuiUtils.vsplit(scroller, bottom,300);
         contents = GuiUtils.inset(contents, 5);
 
         JMenuBar menuBar = doMakeMenuBar();
@@ -278,7 +282,8 @@ public class InteractiveShell implements HyperlinkListener {
      * @param cmdFld _more_
      */
     protected void handleKeyPress(KeyEvent e, JTextComponent cmdFld) {
-        if (((e.getKeyCode() == e.VK_UP)
+        boolean isArea  = (cmdFld instanceof JTextArea);
+        if (((!isArea&& e.getKeyCode() == e.VK_UP)
                 || ((e.getKeyCode() == e.VK_P)
                     && e.isControlDown())) && (history.size() > 0)) {
             if ((historyIdx < 0) || (historyIdx >= history.size())) {
@@ -293,7 +298,7 @@ public class InteractiveShell implements HyperlinkListener {
                 cmdFld.setText((String) history.get(historyIdx));
             }
         }
-        if (((e.getKeyCode() == e.VK_DOWN)
+        if (((!isArea && e.getKeyCode() == e.VK_DOWN)
                 || ((e.getKeyCode() == e.VK_N)
                     && e.isControlDown())) && (history.size() > 0)) {
             if ((historyIdx < 0) || (historyIdx >= history.size())) {
@@ -380,6 +385,7 @@ public class InteractiveShell implements HyperlinkListener {
         bufferOutput = false;
         updateText();
     }
+
 
     private void updateText() {
         editorPane.setText(sb.toString());
