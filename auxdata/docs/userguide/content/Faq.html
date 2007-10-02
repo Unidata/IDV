@@ -255,16 +255,17 @@ See <a href="Bundles.html">Saving State with Bundles</a>.
 </faqitem>
 
 <faqitem q="How can I change the amount of memory available to the IDV?" id="memory">
-By default, the IDV startup script (runIDV) allocates 512 megabytes     
-of maximum memory for Java. If your system has more than 1 gigabyte     
-of memory, increasing the amount of memory available to the IDV can     
-improve performance for displaying large datasets. You can change the   
-runIDV script to increase the amount of memory. In that script, change  
-the <b>-Xmx512m</b> to some higher number (e.g. <b>-Xmx1024m</b>). The  
-number is the number of bytes, the trailing <b>m</b> is a multiplier    
-(m=mega). Do not use the maximum amount of memory on your machine as    
-some is needed for the operating system itself. If the system has to    
-use swap memory, performance will degrade as well.                      
+By default, the IDV startup script (<b>runIDV</b> (Unix) or             
+<b>runIDV.bat</b> (Windows)) allocates 512 megabytes of maximum memory  
+for Java. If your system has more than 1 gigabyte of memory, increasing 
+the amount of memory available to the IDV can improve performance for   
+displaying large datasets. You can change the runIDV script to increase 
+the amount of memory. In that script, change the <b>-Xmx512m</b> to     
+some higher number (e.g. <b>-Xmx1024m</b>). The number is the number    
+of bytes, the trailing <b>m</b> is a multiplier (m=mega). Do not use    
+the maximum amount of memory on your machine as some is needed for      
+the operating system itself. If the system has to use swap memory,      
+performance will degrade as well.                                       
 </faqitem>
 
 <faqitem q="How can I change the size of the IDV window?" id="windowsize">
