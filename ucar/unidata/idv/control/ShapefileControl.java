@@ -151,6 +151,8 @@ public class ShapefileControl extends DisplayControlImpl {
     /** Holds lists which hold the cell values */
     private List tableCols = new ArrayList();
 
+    private List visibleRows = new ArrayList();
+
     /** The column names in the table */
     private List colNames = new ArrayList();
 
@@ -375,14 +377,14 @@ public class ShapefileControl extends DisplayControlImpl {
      * Fill the table
      */
     private void populateTable() {
-        if (dbModel == null) {
+        if (!hasProperties || dbModel == null) {
             return;
         }
+        visibleRows = new ArrayList();
         tableCols = new ArrayList();
         colNames  = new ArrayList();
         int       numRecords = mapSets.length;
         List      comps      = new ArrayList();
-
         boolean[] unique     = null;
         if (uniqueFields.size() > 0) {
             unique = new boolean[numRecords];
@@ -457,10 +459,7 @@ public class ShapefileControl extends DisplayControlImpl {
             }
 
             public int getRowCount() {
-                if (tableCols.size() > 0) {
-                    return ((List) tableCols.get(0)).size();
-                }
-                return 0;
+                return visibleRows.size();
             }
 
             public int getColumnCount() {
@@ -745,12 +744,8 @@ public class ShapefileControl extends DisplayControlImpl {
             matchAll       = filterGui.getMatchAll();
             filtersEnabled = filterGui.getEnabled();
         }
-        Data theData = mainData;
-        if (hasProperties) {
-            theData = applyFilters(theData);
-            populateTable();
-        }
-
+        Data theData = applyFilters(mainData);
+        populateTable();
         myDisplay.setData(theData);
     }
 

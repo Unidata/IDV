@@ -284,7 +284,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     private CommandManager commandManager;
 
     /** The window for full screen */
-    protected Window fullScreenWindow;
+    protected JFrame fullScreenWindow;
 
     /** We can set the full screen to a specific size for image capture */
     private int fullScreenWidth = 0;
@@ -2699,9 +2699,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
     public void keyWasTyped(KeyEvent keyEvent) {
         char c    = keyEvent.getKeyChar();
         int  code = keyEvent.getKeyCode();
-
-
-        if (keyEvent.getID() == KeyEvent.KEY_PRESSED) {
+        int id = keyEvent.getID();
+        if (id == KeyEvent.KEY_PRESSED) {
             if (keyEvent.isControlDown()) {
                 if (code == KeyEvent.VK_Z) {
                     getCommandManager().move(-1);
@@ -2713,11 +2712,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
 
 
-
-
-        if (keyEvent.getID() != KeyEvent.KEY_RELEASED) {
+        if (id != KeyEvent.KEY_RELEASED) {
             return;
         }
+
 
         if (code == KeyEvent.VK_F1) {
             runVisibilityAnimation = false;
@@ -4082,13 +4080,15 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @throws RemoteException
      * @throws VisADException
      */
+
     public void displayChanged(DisplayEvent de)
             throws VisADException, RemoteException {
+        int        eventId    = de.getId();
+        InputEvent inputEvent = de.getInputEvent();
         if (getIsDestroyed()) {
             return;
         }
-        int        eventId    = de.getId();
-        InputEvent inputEvent = de.getInputEvent();
+
 
         if (getIsShared() && !lastActive) {
             if (eventId == DisplayEvent.MOUSE_PRESSED) {
@@ -4103,11 +4103,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
             if ((inputEvent instanceof KeyEvent)) {
                 KeyEvent keyEvent = (KeyEvent) inputEvent;
                 if ((keyEvent.getKeyCode() == KeyEvent.VK_ESCAPE)) {
-                    Misc.runInABit(500, this, "resetFullScreen", null);
+                    Misc.runInABit(100, this, "resetFullScreen", null);
                 } else if ((keyEvent.getKeyCode() == KeyEvent.VK_F5)) {
-                    if (fullScreenWindow == null) {
-                        Misc.runInABit(500, this, "setFullScreen", null);
-                    }
+                    Misc.runInABit(100, this, "toggleFullScreen", null);
                 }
             }
         } else if (eventId == DisplayEvent.WAIT_ON) {
@@ -5157,6 +5155,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
         return fullScreenWindow != null;
     }
 
+    public void toggleFullScreen() {
+        if(isFullScreen()) {
+            resetFullScreen();
+        } else {
+            setFullScreen();
+        }
+    }
+
     /**
      * Go back to normal screen
      */
@@ -5226,13 +5232,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
                             new JLabel(" ")));
         JPanel contents = GuiUtils.topCenterBottom(top, navComponent, bottom);
 
+        fullScreenWindow = new JFrame();
         if (fixedSize == null) {
-            fullScreenWindow = new Window(getIdvUIManager().getFrame());
-            fullScreenWindow.add(contents);
-        } else {
-            fullScreenWindow = new JFrame();
-            ((JFrame) fullScreenWindow).getContentPane().add(contents);
+            fullScreenWindow.setUndecorated(true);
         }
+        fullScreenWindow.getContentPane().add(contents);
 
 
         if (fixedSize == null) {
@@ -5246,6 +5250,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             fullScreenWindow.setLocation(20, 20);
         }
         fullScreenWindow.setVisible(true);
+        navComponent.requestFocus();
     }
 
 
