@@ -383,8 +383,11 @@ public class InteractiveShell implements HyperlinkListener {
 
     private void updateText() {
         editorPane.setText(sb.toString());
-        editorPane.repaint();
-        editorPane.scrollRectToVisible(new Rectangle(0, 10000, 1, 1));
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    try {
+                        editorPane.scrollRectToVisible(new Rectangle(0, 10000, 1, 1));
+                    } catch(Exception exc) {}}});
     }
 
     /**
