@@ -2429,6 +2429,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
         desc.append(getFullDescription());
         detailsEditor.setText(desc.toString());
+        GuiUtils.scrollToTop(detailsEditor);
 
     }
 
