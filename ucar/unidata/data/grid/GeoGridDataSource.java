@@ -128,6 +128,8 @@ public class GeoGridDataSource extends GridDataSource {
     /** grid size */
     public static final String PROP_GRIDSIZE = "prop.gridsize";
 
+    public static final String PROP_TIMESIZE = "prop.timesize";
+
     /** This is used to synchronize geogrid read access */
     protected final Object readLock = new Object();
 
@@ -640,35 +642,43 @@ public class GeoGridDataSource extends GridDataSource {
             }
             ThreeDSize size =
                 (ThreeDSize) dataChoice.getProperty(PROP_GRIDSIZE);
+            Integer timeSize = (Integer) dataChoice.getProperty(PROP_TIMESIZE);
             if (size != null) {
                 int total = size.getSizeY() * size.getSizeX();
+                StringBuffer theSb = null;
+                String sizeEntry = null;
                 if (size.getSizeZ() > 1) {
                     if (sb3d == null) {
                         sb3d = new StringBuffer();
                     }
-                    total *= size.getSizeZ();
-                    sb3d.append("<tr><td>" + dataChoice.getName()
-                                + "</td><td>" + dataChoice.getDescription()
-                                + "</td><td>" + size.getSizeX() + "x"
-                                + size.getSizeY() + "x" + size.getSizeZ()
-                                + " (" + total + ")");
+                    total*=size.getSizeZ();
+                    theSb = sb3d;
+                    sizeEntry = size.getSizeX() + "x"
+                        + size.getSizeY() + "x" + size.getSizeZ();
                 } else {
                     if (sb2d == null) {
                         sb2d = new StringBuffer();
                     }
-                    sb2d.append("<tr><td>" + dataChoice.getName()
-                                + "</td><td>" + dataChoice.getDescription()
-                                + "</td><td>" + size.getSizeX() + "x"
-                                + size.getSizeY() + " (" + total + ")");
+                    theSb = sb2d;
+                    sizeEntry = size.getSizeX() + "x"
+                        + size.getSizeY();
                 }
-
+                theSb.append("<tr><td>" + dataChoice.getName()
+                             + "</td><td>" + dataChoice.getDescription()
+                             + "</td><td>" + sizeEntry+"</td><td>");
+                if(timeSize!=null) {
+                    total *= timeSize.intValue();
+                    theSb.append(""+timeSize);
+                }
+                theSb.append("</td>");
+                theSb.append("<td>" + total + "</td></tr>");
             }
         }
         StringBuffer sb = null;
         if ((sb2d != null) || (sb3d != null)) {
             sb = new StringBuffer(desc);
             sb.append(
-                "<p><table><tr><td><b>Field</b></td><td><b>Description</b></td><td><b>Dimensions</b></td></tr>\n");
+                "<p><table><tr><td><b>Field</b></td><td><b>Description</b></td><td><b>Dimensions</b></td><td><b>#Times</b></td><td><b>#Points</b></td></tr>\n");
         }
         if (sb2d != null) {
             sb.append(sb2d);
@@ -1337,6 +1347,9 @@ public class GeoGridDataSource extends GridDataSource {
                 }
                 Hashtable props = new Hashtable(twoDProps);
                 props.put(PROP_GRIDSIZE, new ThreeDSize(xLength, yLength));
+                if(geoTimes!=null) {
+                    props.put(PROP_TIMESIZE, new Integer(geoTimes.size()));
+                }
                 choice = new DirectDataChoice(this, parmName, pseudoName,
                         description, (tAxis == null)
                                      ? getTwoDCategories()
@@ -1357,6 +1370,9 @@ public class GeoGridDataSource extends GridDataSource {
                 ThreeDSize size  = new ThreeDSize(xLength, yLength, zLength);
                 Hashtable  props = new Hashtable(threeDProps);
                 props.put(PROP_GRIDSIZE, size);
+                if(geoTimes!=null) {
+                    props.put(PROP_TIMESIZE, new Integer(geoTimes.size()));
+                }
                 choice = new DirectDataChoice(this, parmName, pseudoName,
                         description, (tAxis == null)
                                      ? getThreeDCategories()
