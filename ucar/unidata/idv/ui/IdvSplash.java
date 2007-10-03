@@ -29,6 +29,7 @@ import ucar.unidata.idv.*;
 
 import ucar.unidata.ui.RovingProgress;
 
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -36,6 +37,7 @@ import ucar.unidata.util.Msg;
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.Resource;
 import ucar.unidata.util.StringUtil;
+
 
 
 
@@ -124,6 +126,9 @@ public class IdvSplash extends JWindow {
         dispose();
     }
 
+    boolean playedOnce = false;
+
+
     /**
      *  Create and return (if not in test mode) the splash screen.
      */
@@ -163,7 +168,19 @@ public class IdvSplash extends JWindow {
             public void mouseEntered(MouseEvent e) {
                 if (splashRolloverIcon != null) {
                     ((JLabel) e.getSource()).setIcon(splashRolloverIcon);
+                } /*else*/ if(!playedOnce) {
+                    try {
+                        String audioFile = idv.getStore().getTmpFile("splash.wav");
+                        IOUtil.writeTo(IOUtil.getInputStream("/auxdata/ui/icons/test.gif"), new FileOutputStream(audioFile));
+                        ucar.unidata.ui.AudioPlayer audioPlayer = new ucar.unidata.ui.AudioPlayer();
+                        audioPlayer.setFile(audioFile);
+                        audioPlayer.startPlaying();
+                        playedOnce = true;
+                    } catch(Exception exc) {
+                        //                        exc.printStackTrace();
+                    }
                 }
+
             }
 
             public void mouseExited(MouseEvent e) {
