@@ -1421,12 +1421,17 @@ public class GeoGridDataSource extends GridDataSource {
      */
     public static void main(String[] args) throws Exception {
 
-        String[] urls = { "http://motherlode.ucar.edu:8080/thredds/dodsC/modelsNc/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20070917_1200.nc",
-                          "dods://motherlode.ucar.edu:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20070917_1200.grib1" };
-        //                String url = "dods://thredds.cise-nsf.gov:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20070917_1200.grib1";
+        
+        String leadUrl = "dods://lead.unidata.ucar.edu:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20071002_1200.grib1";
+
+        String mlodeUrl ="dods://motherlode.ucar.edu:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20071002_1200.grib1";
+        String atmUrl =  "dods://thredds.cise-nsf.gov:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20071002_1200.grib1";
+        String url = (args.length==0?leadUrl:(args.length==1?mlodeUrl:atmUrl));
+
+        String[] urls = { url};
         testMode = true;
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10000; i++) {
             for (int urlIdx = 0; urlIdx < urls.length; urlIdx++) {
                 System.err.println("Reading data:" + i + " " + urls[urlIdx]);
                 GeoGridDataSource ggds = new GeoGridDataSource(null,
