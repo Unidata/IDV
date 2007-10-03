@@ -171,7 +171,7 @@ public class IdvSplash extends JWindow {
                 if (splashRolloverIcon != null) {
                     ((JLabel) e.getSource()).setIcon(splashRolloverIcon);
                 }
-                /*else*/if ( !playedOnce) {
+                /*else*/if (false &&  !playedOnce) {
                     Misc.run(new Runnable() {
                         public void run() {
                             try {
