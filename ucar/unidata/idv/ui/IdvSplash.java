@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -28,9 +29,9 @@ import ucar.unidata.idv.*;
 
 
 import ucar.unidata.ui.RovingProgress;
+import ucar.unidata.util.GuiUtils;
 
 import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Msg;
@@ -126,6 +127,7 @@ public class IdvSplash extends JWindow {
         dispose();
     }
 
+    /** _more_          */
     boolean playedOnce = false;
 
 
@@ -168,17 +170,25 @@ public class IdvSplash extends JWindow {
             public void mouseEntered(MouseEvent e) {
                 if (splashRolloverIcon != null) {
                     ((JLabel) e.getSource()).setIcon(splashRolloverIcon);
-                } /*else*/ if(!playedOnce) {
-                    try {
-                        String audioFile = idv.getStore().getTmpFile("splash.wav");
-                        IOUtil.writeTo(IOUtil.getInputStream("/auxdata/ui/icons/test.gif"), new FileOutputStream(audioFile));
-                        ucar.unidata.ui.AudioPlayer audioPlayer = new ucar.unidata.ui.AudioPlayer();
-                        audioPlayer.setFile(audioFile);
-                        audioPlayer.startPlaying();
-                        playedOnce = true;
-                    } catch(Exception exc) {
-                        //                        exc.printStackTrace();
-                    }
+                }
+                /*else*/if ( !playedOnce) {
+                    Misc.run(new Runnable() {
+                        public void run() {
+                            try {
+                                String audioFile =
+                                    idv.getStore().getTmpFile("splash.wav");
+                                IOUtil.writeTo(
+                                    IOUtil.getInputStream(
+                                        "/auxdata/ui/icons/test.gif"), new FileOutputStream(
+                                        audioFile));
+                                ucar.unidata.ui.AudioPlayer audioPlayer =
+                                    new ucar.unidata.ui.AudioPlayer();
+                                audioPlayer.setFile(audioFile);
+                                audioPlayer.startPlaying();
+                                playedOnce = true;
+                            } catch (Exception exc) {}
+                        }
+                    });
                 }
 
             }
@@ -190,7 +200,7 @@ public class IdvSplash extends JWindow {
             }
 
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() > 1 && e.isControlDown()) {
+                if ((e.getClickCount() > 1) && e.isControlDown()) {
                     ImageIcon beerImage =
                         new ImageIcon(
                             Resource.getImage(
