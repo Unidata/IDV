@@ -1,0 +1,96 @@
+
+[ug::head {Display Settings}]
+
+
+<%nochildlist%>
+
+The Display Settings facility allows you to select a set of properties from a display control  (e.g.,
+color table, contouring info, isosurface value, label template, etc.) and apply them to other display
+controls and/or  save them as preferences to be used when creating new display controls.
+<p>
+
+
+The Display Settings dialog, pictured below, can be brought up from a display control's
+[ug::menu Edit {Display Settings...}] menu or from the main
+[ug::menu Edit {Edit Display Settings...}] menu bar menu.
+
+[ht::cimg images/displaysettings/DisplaySettingsDialog.gif {Display Settings Dialog}]
+
+On the right is a list of all of the display controls in the IDV. On the left are the properties 
+of the currently selected display control which is shown highlighted in blue on the right.
+<p>
+The idea is that you can select properties on the left that you want to apply to the selected
+display controls (via the checkboxes) on the right. Many of the properties can be changed 
+by clicking on the <img src="images/displaysettings/Settings16.png"> buttons. 
+
+<p>
+The [ug::menu {Display Groups}] popup menu is a handy way of selecting display controls on the right.  For example,
+you can select All Displays, displays of certain types, displays that have the same data sources, etc.
+
+<subhead id="example" intoc="false">Display Settings Examples</subhead>
+For example, say you have two different data sources loaded with 3 or 4 displays created from each. Normally,
+the legend will list all of the displays based on some display category (e.g., Plan Views). However, you want
+to be able to change their display category so that each group of displays that are from one data source have the
+same category (e.g., "Data source 1", "Data source 2"). What you would do in this case is change the "Display Category" property
+under "Labels" to "Data Source 1".
+
+[ht::cimg images/displaysettings/Example1_1.gif]
+
+Then, you could manually select the displays you want to change but an easier way is to use the
+[ug::menu {Display Groups}] menu  and choose "Displays with data source ...":
+
+[ht::cimg images/displaysettings/Example1_2.gif]
+
+This selects the displays with the data source of the currently selected display (the one highlighted in blue).
+
+<p>
+Once selected you then hit [ug::button Apply]. This will set the "Display Category" property on the selected display controls.
+<p>
+To do the next set of displays right click on one of them in the list on the right and select "Use properties from display".
+This will select this display and reset the properties list on the left. Then when you do the 
+[ug::menu {Display Groups} {Displays with data source}] the displays that share the data source from this new display will be selected.
+
+
+
+
+
+
+
+<p>
+
+
+
+<subhead id="saving"  intoc="false">Saving Display Settings</subhead>
+
+You can save the set of selected settings with the [ug::button Save] button. The Save Settings dialog
+will be shown:
+[ht::cimg images/displaysettings/DisplaySettingsSave.gif {Save Settings Dialog}]
+
+You can enter a category and a name.  The saved settings will be shown under the [ug::menu {Saved Settings}] menu.
+When selected they will be applied to the list of properties  on the left. The [ug::button Applicable only to displays of type] button, will be used when showing the saved settings in the Field Selector (described below). 
+
+<p>
+
+
+
+<subhead id="fieldselector"  intoc="false">Using Display Settings in the Field Selector</subhead>
+The set of saved display settings are also shown in the field selector:
+
+[ht::cimg images/displaysettings/DisplaySettingsInFieldSelector.gif {Display Settings in Field Selector}]
+
+You can select any number of these and, when a new display control is created, these settings will be applied to
+the new display. The [ug::button Show All] check box allows you to list all of the settings, regardless if they were 
+saved off for a particular type of display.
+
+
+
+
+
+
+
+
+
+
+[ug::foot]
+
+
