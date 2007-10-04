@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.ui;
 
 
@@ -208,7 +209,7 @@ public class XmlUi implements ActionListener, ItemListener {
     /** Category attribute for treepanel */
     public static final String ATTR_CATEGORY = "category";
 
-    /** Used to define that the component is the category component for a tree panel    */
+    /** Used to define that the component is the category component for a tree panel */
     public static final String ATTR_CATEGORYCOMPONENT = "categorycomponent";
 
 
@@ -2415,6 +2416,17 @@ public class XmlUi implements ActionListener, ItemListener {
             if ((template != null) && (label != null)) {
                 label = StringUtil.replace(template, "%text%", label);
             }
+
+            if ((label == null) && (image == null)) {
+                label = XmlUtil.getChildText(node);
+                if ((label != null) && (label.trim().length() == 0)) {
+                    label = null;
+                }
+                if (label != null) {
+                    label = label.trim();
+                }
+            }
+
             if ((label == null) && (image == null)) {
                 label = "No label";
             }
@@ -2453,6 +2465,8 @@ public class XmlUi implements ActionListener, ItemListener {
             Component[] comps = GuiUtils.getHtmlComponent(text, linkListener,
                                     getAttr(node, ATTR_WIDTH, 200),
                                     getAttr(node, ATTR_HEIGHT, 200));
+            ((JComponent)comps[0]).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+            setAttrs(comps[0],node);
             comp = comps[1];
 
         } else if (tag.equals(TAG_IMAGE)) {
