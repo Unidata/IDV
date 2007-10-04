@@ -1366,6 +1366,36 @@ public class ImageGenerator extends IdvManager {
         return true;
     }
 
+
+    /**
+     * process the given node
+     *
+     * @param node Node to process
+     *
+     * @return keep going
+     *
+     * @throws Throwable On badness
+     */
+    protected boolean processTagFileset(Element node) throws Throwable {
+        List files = findFiles(Misc.newList(node));
+        pushProperties();
+        for(int i=0;i<files.size();i++) {
+            try {
+                putProperty("file", files.get(i).toString());
+                if ( !processChildren(node)) {
+                    return false;
+                }
+            } catch (MyBreakException be) {
+                break;
+            } catch (MyContinueException ce) {}
+        }
+        popProperties();
+        return true;
+
+    }
+
+
+
     /**
      * process the given node
      *
@@ -2378,7 +2408,7 @@ public class ImageGenerator extends IdvManager {
                     files.add(new File(filename));
                     continue;
                 }
-                File dir = new File(applyMacros(node, ATTR_DIR));
+                File dir = new File(applyMacros(node, ATTR_DIR,"."));
                 String pattern = applyMacros(applyMacros(node, ATTR_PATTERN,
                                      (String) null));
                 File[] allFiles = ((pattern == null)
