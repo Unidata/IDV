@@ -3209,7 +3209,6 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
 
 
-
             for (int i = 0; i < dataSources.size(); i++) {
                 DataSource dataSource = (DataSource) dataSources.get(i);
                 loadDialog.setMessage1("Loading data source " + (i + 1)
@@ -3217,7 +3216,6 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 loadDialog.setMessage2(
                     "(" + DataSelector.getNameForDataSource(dataSource)
                     + ")");
-                dataSource.initAfterUnpersistence();
                 if (localFileMapping != null) {
                     for (int mappingIdx = 0;
                             mappingIdx < localFileMapping.size();
@@ -3233,6 +3231,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                         }
                     }
                 }
+                dataSource.initAfterUnpersistence();
                 if (overrideTimes != null) {
                     dataSource.setDateTimeSelection(overrideTimes);
                 }
