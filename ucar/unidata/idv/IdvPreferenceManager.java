@@ -184,7 +184,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
 
     /** mapping between checkbox and control descriptor */
-    private Hashtable cbxToCdMap;
+    protected Hashtable cbxToCdMap;
 
     /**
      * Create the dialog with the given idv
