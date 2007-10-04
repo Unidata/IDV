@@ -1669,6 +1669,11 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
     }
 
 
+    private boolean isABundle(Object obj) {
+        return (obj instanceof String &&  (ArgsManager.isXidvFile((String)obj)
+                                           || ArgsManager.isZidvFile((String)obj)));
+    }
+
     /**
      *  Create the datasource, identified by the given dataType if non-null,
      *  with the given definingObject and properties.
@@ -1686,6 +1691,33 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
     public boolean makeDataSource(Object definingObject, String dataType,
                                   Hashtable properties, boolean checkAlias,
                                   String displayType) {
+
+
+        //Check for any bundles. Either the definingObject is a string or a list that contains strings
+        List  listOfBundles = new ArrayList();
+        if(isABundle(definingObject)) {
+            listOfBundles = Misc.newList(definingObject);
+            definingObject = null;
+        } else if(definingObject instanceof List) {
+            List tmp = (List) definingObject;
+            definingObject = new ArrayList();
+            for(int i=0;i<tmp.size();i++) {
+                Object obj = tmp.get(i);
+                if(isABundle(obj)) {
+                    listOfBundles.add(obj);
+                } else {
+                    ((List)definingObject).add(obj);
+                }
+            }
+            if(((List)definingObject).size() ==0) definingObject=null;
+        }
+
+        for(int i=0;i<listOfBundles.size();i++) {
+            doOpen((String)listOfBundles.get(i));
+        }
+        if(definingObject==null) return true;
+
+
         DataSourceResults results = createDataSource(definingObject,
                                         dataType, properties, checkAlias);
         getIdvUIManager().showResults(results);
