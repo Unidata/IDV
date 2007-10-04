@@ -10,13 +10,20 @@ The ISL supports a variety of file manipulation functions.
 
 
 [isl::tagdef fileset {Specify a set of files for use with other tags} -attrs {dir {directory to look at} pattern {regular expression pattern to match files} file {the single file to select}}]
-The [isl::tag fileset] tag does not execute anything. Rather, it is used by other tags 
-to specify a group of files.
+The [isl::tag fileset] tag can be used in 2 ways. The first it does not execute anything. 
+Rather, it is used by other tags  to specify a group of files that is used by some other tag.
 [isl::xml {
 <fileset dir="the directory to look at" pattern="file pattern to match"/>
 Or:
 <fileset file="somefile"/>
 }] 
+
+
+The second way is to iterate on a set of files. The contained isl tags are executed with the &quot;file&quot; property being set to each file name.
+In the example below the script iterates on all of the .nc files.
+The file name is printed out  and then the bundle is loaded. The setfiles tag is used to set the file name within the bundle.
+[isl::importxml multiplefiles.isl]
+
 
 
 [isl::tagdef mkdir {Make a directory} -attrs {file+ {The directory to create}}]
