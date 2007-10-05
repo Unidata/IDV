@@ -33,6 +33,7 @@ import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.ui.TableSorter;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 
 import visad.*;
@@ -334,7 +335,7 @@ public class TableChartWrapper extends ChartWrapper {
                     if (showRawData) {
                         dataList.add(new Double(values[i]));
                     } else {
-                        dataList.add(new Double(dc.format(values[i])));
+                        dataList.add(Misc.parseNumber(dc.format(values[i])));
                     }
                     if (showTimes) {
                         timeList.add(new Date((long) timeValues[i]));

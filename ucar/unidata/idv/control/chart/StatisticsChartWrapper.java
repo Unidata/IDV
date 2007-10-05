@@ -272,14 +272,14 @@ public class StatisticsChartWrapper extends ChartWrapper {
                     timeArray[i] = new Date((long) timeValues[i]);
                 }
 
-                stat.min = new Double(dc.format(ranges[0].getMin()));
-                stat.max = new Double(dc.format(ranges[0].getMax()));
+                stat.min = Misc.parseNumber(dc.format(ranges[0].getMin()));
+                stat.max = Misc.parseNumber(dc.format(ranges[0].getMax()));
                 double total = 0;
                 for (int i = 0; i < values.length; i++) {
                     total += values[i];
                 }
                 if (values.length > 0) {
-                    stat.average = new Double(dc.format(total
+                    stat.average = Misc.parseNumber(dc.format(total
                             / values.length));
                 }
 

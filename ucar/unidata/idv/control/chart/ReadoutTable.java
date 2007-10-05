@@ -32,6 +32,7 @@ import ucar.unidata.data.sounding.TrackDataSource;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 
 import visad.*;
@@ -198,7 +199,7 @@ public class ReadoutTable extends ChartWrapper {
                         } else {
                             DisplayConventions dc =
                                 getDisplayControl().getDisplayConventions();
-                            return new Double(dc.format(value));
+                            return Misc.parseNumber(dc.format(value));
                         }
                     }
                 }

@@ -76,6 +76,10 @@ public class Misc {
     /** override current time */
     private static long overrideCurrentTime = -1;
 
+    /** missing string */
+    public static final String MISSING = "missing";
+
+
     /** Default constructor; does nothing */
     public Misc() {}
 
@@ -1739,7 +1743,7 @@ public class Misc {
      */
     public static String format(double value) {
         if (Double.isNaN(value)) {
-            return "missing";
+            return MISSING;
         }
         return getDecimalFormat(value).format(value);
     }
@@ -1775,6 +1779,7 @@ public class Misc {
      */
     public static double parseNumber(String value)
             throws NumberFormatException {
+        if (value.equals(MISSING)) return Double.NaN;
         try {
             return formatter.parse(value).doubleValue();
         } catch (ParseException pe) {
