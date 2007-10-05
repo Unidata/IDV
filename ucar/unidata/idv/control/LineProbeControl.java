@@ -163,6 +163,7 @@ public abstract class LineProbeControl extends GridDisplayControl {
         initPosition = probe.getPosition();
 
         // it is a little colored cube 8 pixels across
+        probe.setColor(probeColor);
         probe.setVisible(true);
         probe.addPropertyChangeListener(this);
         probe.setPointSize(getDisplayScale());
