@@ -163,6 +163,9 @@ public abstract class RGBDisplayable extends DisplayableData {
     /** type for select */
     private boolean useRGBTypeForSelect = false;
 
+    /** type for select */
+    private boolean autoScaleColorRange = false;
+
     /**
      * Constructs from a name for the Displayable and the type of the
      * RGB parameter.
@@ -443,7 +446,7 @@ public abstract class RGBDisplayable extends DisplayableData {
                                      RemoteException {
         lowRange  = low;
         highRange = hi;
-        if ((colorMap != null) && hasRange()) {
+        if ((colorMap != null) && hasRange() && !getAutoScaleColorRange()) {
             colorMap.setRange(low, hi);
         }
     }
@@ -651,7 +654,7 @@ public abstract class RGBDisplayable extends DisplayableData {
 
         applyUnit(colorMap, rgbRealType);
 
-        if (hasRange()) {
+        if (hasRange() && !getAutoScaleColorRange()) {
             colorMap.setRange(lowRange, highRange);
         }
 
@@ -680,7 +683,7 @@ public abstract class RGBDisplayable extends DisplayableData {
             public void mapChanged(
                     ScalarMapEvent event) throws RemoteException,
                         VisADException {
-                if ((event.getId() == event.AUTO_SCALE) && hasRange()) {
+                if ((event.getId() == event.AUTO_SCALE) && hasRange() && !getAutoScaleColorRange()) {
                     colorMap.setRange(lowRange, highRange);
                 }
             }
@@ -792,6 +795,31 @@ public abstract class RGBDisplayable extends DisplayableData {
      */
     public boolean getUseRGBTypeForSelect() {
         return useRGBTypeForSelect;
+    }
+
+    /**
+     * Set whether the color scale should auto scale
+     * @param yesno  true to autoscale
+     */
+    public void setAutoScaleColorRange(boolean yesno) {
+        autoScaleColorRange = yesno;
+        if (colorMap != null)  {
+            if (autoScaleColorRange) {
+                colorMap.resetAutoScale();
+            } else if (hasRange()) {
+                try {
+                colorMap.setRange(lowRange, highRange);
+                } catch (Exception ve) {}
+            }
+        }
+    }
+
+    /**
+     * Set whether the RGB type is used for the select range.
+     * @return true if autoscaling  is on
+     */
+    public boolean getAutoScaleColorRange() {
+        return  autoScaleColorRange;
     }
 
     /**
