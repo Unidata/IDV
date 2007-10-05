@@ -21,11 +21,6 @@
  */
 
 
-
-
-
-
-
 package ucar.unidata.data.grid;
 
 
@@ -33,6 +28,8 @@ import org.w3c.dom.Element;
 
 import ucar.ma2.Array;
 import ucar.ma2.InvalidRangeException;
+
+import ucar.nc2.Attribute;
 
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
@@ -128,6 +125,7 @@ public class GeoGridDataSource extends GridDataSource {
     /** grid size */
     public static final String PROP_GRIDSIZE = "prop.gridsize";
 
+    /** _more_ */
     public static final String PROP_TIMESIZE = "prop.timesize";
 
     /** This is used to synchronize geogrid read access */
@@ -176,6 +174,9 @@ public class GeoGridDataSource extends GridDataSource {
 
     /** Keep track of the max grid size */
     private int max3D;
+
+    /** _more_ */
+    private static String[] categoryAttributes = { "GRIB_param_category" };
 
 
     /**
@@ -642,33 +643,33 @@ public class GeoGridDataSource extends GridDataSource {
             }
             ThreeDSize size =
                 (ThreeDSize) dataChoice.getProperty(PROP_GRIDSIZE);
-            Integer timeSize = (Integer) dataChoice.getProperty(PROP_TIMESIZE);
+            Integer timeSize =
+                (Integer) dataChoice.getProperty(PROP_TIMESIZE);
             if (size != null) {
-                int total = size.getSizeY() * size.getSizeX();
-                StringBuffer theSb = null;
-                String sizeEntry = null;
+                int          total     = size.getSizeY() * size.getSizeX();
+                StringBuffer theSb     = null;
+                String       sizeEntry = null;
                 if (size.getSizeZ() > 1) {
                     if (sb3d == null) {
                         sb3d = new StringBuffer();
                     }
-                    total*=size.getSizeZ();
+                    total *= size.getSizeZ();
                     theSb = sb3d;
-                    sizeEntry = size.getSizeX() + "x"
-                        + size.getSizeY() + "x" + size.getSizeZ();
+                    sizeEntry = size.getSizeX() + "x" + size.getSizeY() + "x"
+                                + size.getSizeZ();
                 } else {
                     if (sb2d == null) {
                         sb2d = new StringBuffer();
                     }
-                    theSb = sb2d;
-                    sizeEntry = size.getSizeX() + "x"
-                        + size.getSizeY();
+                    theSb     = sb2d;
+                    sizeEntry = size.getSizeX() + "x" + size.getSizeY();
                 }
-                theSb.append("<tr><td>" + dataChoice.getName()
-                             + "</td><td>" + dataChoice.getDescription()
-                             + "</td><td>" + sizeEntry+"</td><td>");
-                if(timeSize!=null) {
+                theSb.append("<tr><td>" + dataChoice.getName() + "</td><td>"
+                             + dataChoice.getDescription() + "</td><td>"
+                             + sizeEntry + "</td><td>");
+                if (timeSize != null) {
                     total *= timeSize.intValue();
-                    theSb.append(""+timeSize);
+                    theSb.append("" + timeSize);
                 }
                 theSb.append("</td>");
                 theSb.append("<td>" + total + "</td></tr>");
@@ -1335,6 +1336,9 @@ public class GeoGridDataSource extends GridDataSource {
                 dataSelection = new DataSelection(indexList,
                         DataSelection.TIMESMODE_USETHIS);
             }
+
+            List      categories = null;
+            Hashtable props      = null;
             if ((sizeZ == 0) || (sizeZ == 1)) {
                 //if (sizeZ == 0) {
                 int xLength = cfield.getXDimension().getLength();
@@ -1345,16 +1349,21 @@ public class GeoGridDataSource extends GridDataSource {
                                           + "    #points: "
                                           + (xLength * yLength);
                 }
-                Hashtable props = new Hashtable(twoDProps);
+                props = new Hashtable(twoDProps);
                 props.put(PROP_GRIDSIZE, new ThreeDSize(xLength, yLength));
-                if(geoTimes!=null) {
+                if (geoTimes != null) {
                     props.put(PROP_TIMESIZE, new Integer(geoTimes.size()));
                 }
+                categories = (tAxis == null)
+                             ? getTwoDCategories()
+                             : getTwoDTimeSeriesCategories();
+                /*
                 choice = new DirectDataChoice(this, parmName, pseudoName,
-                        description, (tAxis == null)
+                        description, (taxis == null)
                                      ? getTwoDCategories()
                                      : getTwoDTimeSeriesCategories(), dataSelection,
                                      props);
+                */
 
             } else {  // if (sizeZ > 1)
                 // Have 3D field (we expect); usually sizeZ > 1:
@@ -1367,19 +1376,48 @@ public class GeoGridDataSource extends GridDataSource {
                     max3DY = yLength;
                     max3DZ = zLength;
                 }
-                ThreeDSize size  = new ThreeDSize(xLength, yLength, zLength);
-                Hashtable  props = new Hashtable(threeDProps);
+                ThreeDSize size = new ThreeDSize(xLength, yLength, zLength);
+                props = new Hashtable(threeDProps);
                 props.put(PROP_GRIDSIZE, size);
-                if(geoTimes!=null) {
+                if (geoTimes != null) {
                     props.put(PROP_TIMESIZE, new Integer(geoTimes.size()));
                 }
+                /*
                 choice = new DirectDataChoice(this, parmName, pseudoName,
                         description, (tAxis == null)
                                      ? getThreeDCategories()
                                      : getThreeDTimeSeriesCategories(), dataSelection,
                                      props);
+                */
+                categories = (tAxis == null)
+                             ? getThreeDCategories()
+                             : getThreeDTimeSeriesCategories();
 
             }
+            // see if we have any categorization
+            Attribute attr = null;
+            for (int i = 0; (i < categoryAttributes.length) && (attr == null);
+                    i++) {
+                attr = cfield.findAttributeIgnoreCase(categoryAttributes[i]);
+            }
+            if (attr != null) {
+                String append = attr.getStringValue();
+                if (append != null) {
+                    append = append.replaceAll(DataCategory.DIVIDER, "_");
+                }
+                DataCategory cat = (DataCategory) categories.get(0);
+                cat = cat.copyAndAppend(append);
+                List newCategories = new ArrayList();
+                newCategories.add(cat);
+                for (int i = 1; i < categories.size(); i++) {
+                    newCategories.add(categories.get(i));
+                }
+                categories = newCategories;
+            }
+
+            choice = new DirectDataChoice(this, parmName, pseudoName,
+                                          description, categories,
+                                          dataSelection, props);
         }
         return choice;
     }
@@ -1437,14 +1475,21 @@ public class GeoGridDataSource extends GridDataSource {
      */
     public static void main(String[] args) throws Exception {
 
-        
-        String leadUrl = "dods://lead.unidata.ucar.edu:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20071002_1200.grib1";
 
-        String mlodeUrl ="dods://motherlode.ucar.edu:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20071002_1200.grib1";
-        String atmUrl =  "dods://thredds.cise-nsf.gov:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20071002_1200.grib1";
-        String url = (args.length==0?leadUrl:(args.length==1?mlodeUrl:atmUrl));
+        String leadUrl =
+            "dods://lead.unidata.ucar.edu:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20071002_1200.grib1";
 
-        String[] urls = { url};
+        String mlodeUrl =
+            "dods://motherlode.ucar.edu:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20071002_1200.grib1";
+        String atmUrl =
+            "dods://thredds.cise-nsf.gov:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20071002_1200.grib1";
+        String   url  = ((args.length == 0)
+                         ? leadUrl
+                         : ((args.length == 1)
+                            ? mlodeUrl
+                            : atmUrl));
+
+        String[] urls = { url };
         testMode = true;
 
         for (int i = 0; i < 10000; i++) {

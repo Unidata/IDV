@@ -989,5 +989,17 @@ public class DataCategory {
         return append;
     }
 
+    /**
+     * Append the string to the data category and return a new category.
+     *
+     * @param append category string to append  (may be null)
+     */
+    public DataCategory copyAndAppend(String append) {
+        String newName = this.toString();
+        if (append != null) {
+            newName = newName + DIVIDER + append;
+        }
+        return parseCategory(newName, getForDisplay());
+    }
 }
 
