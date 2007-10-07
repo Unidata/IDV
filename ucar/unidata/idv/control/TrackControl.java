@@ -21,9 +21,6 @@
  */
 
 
-
-
-
 package ucar.unidata.idv.control;
 
 
@@ -468,11 +465,16 @@ public class TrackControl extends GridDisplayControl {
         int        numTimes = samples[1].length;
         if ( !getTimeDeclutterEnabled()) {
             if ( !getAskedUserToDeclutterTime() && (numTimes > 1000)) {
-                setAskedUserToDeclutterTime(true);
-                if ( !GuiUtils.askYesNo("Time Declutter", new JLabel("<html>There are "
-                        + numTimes
-                        + " time steps in the data.<br>Do you want to show them all?"))) {
-                    setTimeDeclutterEnabled(true);
+                int success =
+                    GuiUtils.showYesNoCancelDialog(getWindow(),
+                        "<html>There are " + numTimes
+                        + " time steps in the data.<br>Do you want to show them all?</html>", "Time Declutter");
+                if (success == JOptionPane.CANCEL_OPTION) {
+                    return;
+                } else {
+                    setAskedUserToDeclutterTime(true);
+                    setTimeDeclutterEnabled(success
+                                            == JOptionPane.NO_OPTION);
                 }
             }
         }
