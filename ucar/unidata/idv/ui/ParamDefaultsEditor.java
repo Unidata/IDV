@@ -443,7 +443,7 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
             List       comps   = new ArrayList();
             ParamField nameFld = new ParamField(null, true);
             nameFld.setText(paramInfo.getName());
-            JPanel topPanel = GuiUtils.hbox(GuiUtils.lLabel("Name:  "),
+            JPanel topPanel = GuiUtils.hbox(GuiUtils.lLabel("Parameter:  "),
                                             nameFld);
             topPanel = GuiUtils.inset(topPanel, 5);
 
