@@ -15,8 +15,32 @@ contour display control with the <b>Contour: Set</b> button.
 Use the items in this window to set contouring properties.
 
 <p><B>Contour Interval</B> determines the spacing 
-(difference in value) between contours. 
-
+(difference in value) between contours.   You can specify irregular
+contour intervals by separating them with semi-colons (;).  For example:
+<pre>
+       <b>5400;5460;5800</b>
+</pre>
+whould only show the 5400, 5460 and 5800 contour lines.  
+<p>
+You can also specify different contour intervals for different ranges
+with the following syntax:
+<pre>
+     cint1/min1/max1;cint2/min1/max2;....;cintn/minn/maxn
+</pre>
+For example, for geopotential heights:<p>
+<pre>
+     <b>30/0/4200;60/4200/8600;120/8600/24000</b>
+</pre>
+would draw contours at 30 gpm between 0 and 4200, 60 gpm between
+4200 and 8600 and 120 gpm between 8600 and 24000.
+<p>
+To show a single contour line, specify the contour interval, min
+and max as the same value.
+For example:
+<pre>
+    <b>5400/5400/5400</b> 
+</pre>
+would only show the 5400 line.
 
 <p><B>Base contour</B>  
 is the value on which all contours are based. All contours will be
