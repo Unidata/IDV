@@ -21,9 +21,6 @@
  */
 
 
-
-
-
 package ucar.unidata.idv.control;
 
 
@@ -142,9 +139,6 @@ public class ProbeControl extends DisplayControlImpl {
 
     /** number of columns */
     public static final int NUM_COLS = 5;
-
-    /** location labels */
-    private JLabel locationLabel;
 
     /** The latlon widget */
     private LatLonWidget latLonWidget;
@@ -303,8 +297,7 @@ public class ProbeControl extends DisplayControlImpl {
                                         llListener);
 
 
-        locationLabel = new JLabel("   ");
-        timeLabel     = new JLabel("   ");
+        timeLabel = new JLabel("   ");
         getAnimation(true);
         aniWidget = getAnimationWidget().getContents();
 
@@ -864,17 +857,8 @@ public class ProbeControl extends DisplayControlImpl {
      */
     public void getLegendLabels(List labels, int legendType) {
         super.getLegendLabels(labels, legendType);
-        try {
-            EarthLocationTuple elt = getProbeLocation();
-            if (elt != null) {
-                labels.add(
-                    "Position: "
-                    + getDisplayConventions().formatLatLonShort(
-                        elt.getLatLonPoint()));
-            }
-        } catch (Exception e) {}
+        labels.add(positionText);
     }
-
 
     /**
      * Create a merged time set from the DataChoices.
@@ -1710,14 +1694,12 @@ public class ProbeControl extends DisplayControlImpl {
         LatLonPoint llp = elt.getLatLonPoint();
         lastProbeAltitude = elt.getAltitude();
 
-        if ((latLonWidget != null) && (llp != null)) {
-            updateLatLonWidget(elt);
-        }
-        // set location label
-        if ((llp != null) && (locationLabel != null)) {
-            locationLabel.setText(positionText =
-                getDisplayConventions().formatEarthLocation(elt, false));
-
+        // set location labels
+        if (llp != null) {
+            positionText = getDisplayConventions().formatLatLonPoint(llp);
+            if (latLonWidget != null) {
+                updateLatLonWidget(elt);
+            }
         }
 
         updateTime();

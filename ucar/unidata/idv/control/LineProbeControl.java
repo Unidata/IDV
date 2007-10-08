@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -89,6 +90,9 @@ public abstract class LineProbeControl extends GridDisplayControl {
 
     /** The point size */
     private float pointSize = 1.0f;
+
+    /** Keep around for the label macros */
+    protected String positionText;
 
     /**
      * Default Constructor.
@@ -508,6 +512,58 @@ public abstract class LineProbeControl extends GridDisplayControl {
      */
     public String getMarker() {
         return marker;
+    }
+
+    /**
+     * Add any macro name/label pairs
+     *
+     * @param names List of macro names
+     * @param labels List of macro labels
+     */
+    protected void getMacroNames(List names, List labels) {
+        super.getMacroNames(names, labels);
+        names.addAll(Misc.newList(MACRO_POSITION));
+        labels.addAll(Misc.newList("Probe Position"));
+    }
+
+    /**
+     * Add any macro name/value pairs.
+     *
+     *
+     * @param template template
+     * @param patterns The macro names
+     * @param values The macro values
+     */
+    protected void addLabelMacros(String template, List patterns,
+                                  List values) {
+        super.addLabelMacros(template, patterns, values);
+        patterns.add(MACRO_POSITION);
+        values.add(positionText);
+    }
+
+    /**
+     * This method is called  to update the legend labels when
+     * some state has changed in this control that is reflected in the labels.
+     */
+    protected void updateLegendLabel() {
+        super.updateLegendLabel();
+        // if the display label has the position, we'll update the list also
+        String template = getDisplayListTemplate();
+        if (template.contains(MACRO_POSITION)) {
+            updateDisplayList();
+        }
+    }
+
+
+    /**
+     * Append any label information to the list of labels.
+     *
+     * @param labels   in/out list of labels
+     * @param legendType The type of legend, BOTTOM_LEGEND or SIDE_LEGEND
+     */
+    public void getLegendLabels(List labels, int legendType) {
+        super.getLegendLabels(labels, legendType);
+        labels.add(positionText);
     }
 
 }

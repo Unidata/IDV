@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -36,11 +37,12 @@ import ucar.unidata.idv.TimeHeightViewManager;
 import ucar.unidata.idv.ViewDescriptor;
 import ucar.unidata.idv.ViewManager;
 
+import ucar.unidata.ui.LatLonWidget;
+
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.ThreeDSize;
-
 
 
 import ucar.visad.display.ColorScale;
@@ -106,9 +108,6 @@ public class TimeHeightControl extends LineProbeControl {
     /** Displayable for contours */
     private Contour2DDisplayable contourDisplay;
 
-    /** a label */
-    private JLabel valueLabel;
-
     /** flag for XAxis time orientation */
     private boolean isLatestOnLeft = true;
 
@@ -120,6 +119,9 @@ public class TimeHeightControl extends LineProbeControl {
 
     /** background color */
     private Color background;
+
+    /** The latlon widget */
+    private LatLonWidget latLonWidget;
 
     /** the control window's view manager */
     protected TimeHeightViewManager timeHeightView;
@@ -284,10 +286,8 @@ public class TimeHeightControl extends LineProbeControl {
     protected Container doMakeContents()
             throws VisADException, RemoteException {
 
-        valueLabel = new JLabel(" ", JLabel.LEFT);
-        return GuiUtils.topCenterBottom(valueLabel,
-                                        profileDisplay.getComponent(),
-                                        doMakeWidgetComponent());
+        return GuiUtils.centerBottom(profileDisplay.getComponent(),
+                                     doMakeWidgetComponent());
     }
 
 
@@ -390,13 +390,12 @@ public class TimeHeightControl extends LineProbeControl {
      */
     protected void probePositionChanged(RealTuple position) {
         try {
-            loadProfile(getPosition());
+            loadProfile(position);
         } catch (Exception exc) {
             logException("probePositionChanged", exc);
         }
 
     }
-
 
     /**
      * Given the location of the profile SelectorPoint,
@@ -427,11 +426,20 @@ public class TimeHeightControl extends LineProbeControl {
         }
 
         // set location label, if available.
-        if (valueLabel != null) {
-            valueLabel.setText(
-                getDisplayConventions().formatLatLonPoint(llp));
-        }
+        if (llp != null) {
+            positionText = getDisplayConventions().formatLatLonPoint(llp);
 
+            // set location label, if available.
+            if (latLonWidget != null) {
+                latLonWidget.setLat(
+                    getDisplayConventions().formatLatLon(
+                        llp.getLatitude().getValue()));
+                latLonWidget.setLon(
+                    getDisplayConventions().formatLatLon(
+                        llp.getLongitude().getValue()));
+            }
+            updateLegendLabel();
+        }
     }
 
 
@@ -445,6 +453,15 @@ public class TimeHeightControl extends LineProbeControl {
      */
     public void getControlWidgets(List controlWidgets)
             throws VisADException, RemoteException {
+        ActionListener llListener = new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                handleLatLonWidgetChange();
+            }
+        };
+        latLonWidget = new LatLonWidget("Lat: ", "Lon: ", llListener);
+        controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.rLabel("Position: "),
+                                             latLonWidget));
         super.getControlWidgets(controlWidgets);
 
         // make check box for latest data time on left of x axis
@@ -463,6 +480,22 @@ public class TimeHeightControl extends LineProbeControl {
             new WrapperWidget(
                 this, GuiUtils.rLabel("Latest Data on Left: "),
                 GuiUtils.leftCenter(toggle, GuiUtils.filler())));
+    }
+
+    /**
+     * Handle the user pressing return
+     */
+    private void handleLatLonWidgetChange() {
+        try {
+            double   lat = latLonWidget.getLat();
+            double   lon = latLonWidget.getLon();
+            double[] xyz = earthToBox(makeEarthLocation(lat, lon, 0));
+            setProbePosition(xyz[0], xyz[1]);
+
+        } catch (Exception exc) {
+            logException("Error setting lat/lon", exc);
+        }
+
     }
 
 
@@ -588,25 +621,6 @@ public class TimeHeightControl extends LineProbeControl {
 
 
     /**
-     * Add in the menu for the TimeHeight view
-     *
-     * @param menus list of menus
-     * @param forMenuBar is it for the menu bar or for the popup
-     */
-    protected void getExtraMenus(List menus, boolean forMenuBar) {
-        super.getExtraMenus(menus, forMenuBar);
-        if (forMenuBar) {
-            JMenu xsMenu = timeHeightView.makeViewMenu();
-            xsMenu.setText("Time Height");
-            menus.add(xsMenu);
-        }
-    }
-
-
-
-
-
-    /**
      * Add items to the command menu.
      *
      * @param items  menu to add to.
@@ -614,31 +628,13 @@ public class TimeHeightControl extends LineProbeControl {
      */
     protected void getViewMenuItems(List items, boolean forMenuBar) {
         super.getViewMenuItems(items, forMenuBar);
-        /*
-        JCheckBoxMenuItem clip = new JCheckBoxMenuItem("Clip at Box",
-                                     timeHeightView.getClipping());
-        clip.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                timeHeightView.setClipping(
-                    ((JCheckBoxMenuItem) event.getSource()).isSelected());
-            }
-        });
-        items.add(clip);
-        */
 
         items.add(GuiUtils.MENU_SEPARATOR);
-        final JMenu colorMenu = new JMenu("Display Colors");
-        colorMenu.addMenuListener(new MenuListener() {
-            public void menuCanceled(MenuEvent e) {}
-
-            public void menuDeselected(MenuEvent e) {}
-
-            public void menuSelected(MenuEvent e) {
-                colorMenu.removeAll();
-                getTimeHeightViewManager().initColorMenu(colorMenu);
-            }
-        });
-        items.add(colorMenu);
+        if (forMenuBar) {
+            JMenu xsMenu = timeHeightView.makeViewMenu();
+            xsMenu.setText("Time Height View");
+            items.add(xsMenu);
+        }
     }
 
     /**
@@ -658,6 +654,35 @@ public class TimeHeightControl extends LineProbeControl {
         addDisplayable(colorScale, timeHeightView, FLAG_COLORTABLE);
         colorScales.add(colorScale);
 
+    }
+
+    /**
+     * Add tabs to the properties dialog.
+     *
+     * @param jtp  the JTabbedPane to add to
+     */
+    public void addPropertiesComponents(JTabbedPane jtp) {
+        super.addPropertiesComponents(jtp);
+
+        if (timeHeightView != null) {
+            jtp.add("Time Height View",
+                    timeHeightView.getPropertiesComponent());
+        }
+    }
+
+    /**
+     * Apply the properties
+     *
+     * @return true if successful
+     */
+    public boolean doApplyProperties() {
+        if ( !super.doApplyProperties()) {
+            return false;
+        }
+        if (timeHeightView != null) {
+            return timeHeightView.applyProperties();
+        }
+        return true;
     }
 
     /**

@@ -21,8 +21,6 @@
  */
 
 
-
-
 package ucar.unidata.idv.control;
 
 
@@ -728,14 +726,20 @@ public class VerticalProfileControl extends LineProbeControl {
         getChart().setProfiles(chartInfos);
 
         // set location label, if available.
-        if ((latLonWidget != null) && (llp != null)) {
-            latLonWidget.setLat(
-                getDisplayConventions().formatLatLon(
-                    llp.getLatitude().getValue()));
-            latLonWidget.setLon(
-                getDisplayConventions().formatLatLon(
-                    llp.getLongitude().getValue()));
+        if (llp != null) {
+            positionText = getDisplayConventions().formatLatLonPoint(llp);
+
+            // update lat/lon widget
+            if (latLonWidget != null) {
+                latLonWidget.setLat(
+                    getDisplayConventions().formatLatLon(
+                        llp.getLatitude().getValue()));
+                latLonWidget.setLon(
+                    getDisplayConventions().formatLatLon(
+                        llp.getLongitude().getValue()));
+            }
         }
+        updateLegendLabel();
     }
 
     /**
