@@ -20,28 +20,29 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.visad.display;
 
 
+import ucar.unidata.data.grid.GridUtil;
 
 import ucar.visad.display.*;
 
-import java.rmi.RemoteException;
-
-import java.util.*;
-
 import visad.*;
+
+import visad.bom.ImageRendererJ3D;
+
 import visad.java2d.*;
 
 import visad.java3d.*;
-
-import visad.bom.ImageRendererJ3D;
 
 import visad.meteorology.*;
 
 import visad.util.DataUtility;
 
-import ucar.unidata.data.grid.GridUtil;
+import java.rmi.RemoteException;
+
+import java.util.*;
 
 
 
@@ -52,8 +53,7 @@ import ucar.unidata.data.grid.GridUtil;
  * @author Stuart Wier
  * @version $Revision: 1.33 $
  */
-public class Grid2DDisplayable extends RGBDisplayable
-        implements GridDisplayable {
+public class Grid2DDisplayable extends RGBDisplayable implements GridDisplayable {
 
     /** data */
     private Field field;
@@ -100,9 +100,10 @@ public class Grid2DDisplayable extends RGBDisplayable
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    public Grid2DDisplayable(String name, RealType rgbRealType, float[][] colorPalette, boolean alphaflag)
+    public Grid2DDisplayable(String name, RealType rgbRealType,
+                             float[][] colorPalette, boolean alphaflag)
             throws VisADException, RemoteException {
-        super(name, null, colorPalette, alphaflag);
+        super(name, rgbRealType, colorPalette, alphaflag);
     }
 
     /**
@@ -129,11 +130,11 @@ public class Grid2DDisplayable extends RGBDisplayable
             throws VisADException, RemoteException {
 
         super(that);
-        field = that.field;  // copy the data
-        isTextured = that.isTextured;  
-        isMissingTransparent = that.isMissingTransparent; 
-        useDefault = that.useDefault;
-        setTextureProperties((FieldImpl)field);
+        field                = that.field;  // copy the data
+        isTextured           = that.isTextured;
+        isMissingTransparent = that.isMissingTransparent;
+        useDefault           = that.useDefault;
+        setTextureProperties((FieldImpl) field);
     }
 
     /**
@@ -347,9 +348,9 @@ public class Grid2DDisplayable extends RGBDisplayable
         float dataSize = (float) GridUtil.getSpatialDomain(fi).getLength();
         ConstantMapSet maps = new ConstantMapSet();
         if ((dataSize > THRESHOLD) && !isTextured) {
-            int curvedSize =
-                Math.min(dfltCurvedSize,
-                         Math.max((int) ((THRESHOLD / dataSize) * 10.), 3));
+            int curvedSize = Math.min(dfltCurvedSize,
+                                      Math.max((int) ((THRESHOLD / dataSize)
+                                          * 10.), 3));
             maps.put(makeCurvedSizeMap(curvedSize));
             maps.put(makeTextureMap(true));
 
@@ -370,3 +371,4 @@ public class Grid2DDisplayable extends RGBDisplayable
      */
     public void setColoredByAnother(boolean yesno) {}
 }
+
