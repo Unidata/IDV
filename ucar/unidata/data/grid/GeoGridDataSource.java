@@ -362,12 +362,21 @@ public class GeoGridDataSource extends GridDataSource {
      *
      * @param paths new paths
      */
-    public void xxxxxsetTmpPaths(List paths) {
+    public void setTmpPaths(List paths) {
         //TODO: Figure out what to do here
         String resolverUrl = (String) getProperty(PROP_RESOLVERURL);
-        if ((paths.size() > 0) && (resolverUrl != null)
+        if (((paths != null) && (paths.size() > 0)) && (resolverUrl != null)
                 && (resolverUrl.length() > 0)) {
-            setProperty(PROP_RESOLVERURL, paths.get(0).toString());
+            Hashtable properties = getProperties();
+            if (properties == null) {
+                properties = new Hashtable();
+            }
+            String firstone = paths.get(0).toString();
+            String resolvedUrl = ThreddsHandler.resolveUrl(firstone,
+                                     properties);
+            if (resolvedUrl != null) {
+                setProperty(PROP_RESOLVERURL, firstone);
+            }
             return;
         }
         super.setTmpPaths(paths);
@@ -1152,7 +1161,7 @@ public class GeoGridDataSource extends GridDataSource {
 
         String      paramName = dataChoice.getStringId();
         long        starttime = System.currentTimeMillis();
-        FieldImpl   fieldImpl;
+        FieldImpl   fieldImpl = null;
         GridDataset myDataset = getDataset();
         if (myDataset == null) {
             return null;
@@ -1193,7 +1202,9 @@ public class GeoGridDataSource extends GridDataSource {
 
         Trace.call1("GeoGridDataSource.getSequence");
         Object loadId = JobManager.getManager().startLoad("GeoGrid");
-        fieldImpl = adapter.getSequence(timeIndices, loadId);
+        if (adapter != null) {
+            fieldImpl = adapter.getSequence(timeIndices, loadId);
+        }
 
         if (fieldImpl == null) {
             //            System.err.println ("data selection:" + givenDataSelection);
