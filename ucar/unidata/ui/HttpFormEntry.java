@@ -573,55 +573,27 @@ public class HttpFormEntry {
      */
     public static String[] doPost(List entries, String urlPath) {
         try {
-
-            HttpClient client      = new HttpClient();
-            PostMethod postMethod  = new PostMethod(urlPath);
-            boolean    anyFiles    = false;
-            int        count       = 0;
-            List       goodEntries = new ArrayList();
-            for (int i = 0; i < entries.size(); i++) {
-                HttpFormEntry formEntry = (HttpFormEntry) entries.get(i);
-                if ( !formEntry.okToPost()) {
+            PostMethod postMethod = null;
+            int numTries = 0;
+            while(numTries++<5) {
+                postMethod =  getMethod(entries, urlPath);
+                HttpClient client      = new HttpClient();
+                client.executeMethod(postMethod);
+                if (postMethod.getStatusCode() >= 300 && postMethod.getStatusCode()<=399) {
+                    Header locationHeader = postMethod.getResponseHeader("location");
+                    if (locationHeader == null) {
+                        return new String[] {"Error: No 'location' given on the redirect", null };
+                    }
+                    //Keep trying with the new location
+                    urlPath = locationHeader.getValue();
+                    if(postMethod.getStatusCode() == 301) {
+                        System.err.println("Warning: form post has been permanently moved to:" + urlPath);
+                    }
                     continue;
                 }
-                goodEntries.add(entries.get(i));
-                if (formEntry.type == TYPE_FILE) {
-                    anyFiles = true;
-                }
+                //Done
+                break;
             }
-
-            if (anyFiles) {
-                Part[] parts = new Part[goodEntries.size()];
-                for (int i = 0; i < goodEntries.size(); i++) {
-                    HttpFormEntry formEntry =
-                        (HttpFormEntry) goodEntries.get(i);
-                    if (formEntry.type == TYPE_FILE) {
-                        parts[i] = formEntry.getFilePart();
-                    } else {
-                        //Not sure why but we have seen a couple of times
-                        //the byte value '0' gets into one of these strings
-                        //This causes an error in the StringPart.
-                        String value = formEntry.getValue();
-                        char   with  = new String(" ").charAt(0);
-                        while (value.indexOf(0) >= 0) {
-                            value = value.replace((char) 0, with);
-                        }
-                        parts[i] = new StringPart(formEntry.getName(), value);
-                    }
-                }
-                postMethod.setRequestEntity(new MultipartRequestEntity(parts,
-                        postMethod.getParams()));
-            } else {
-                for (int i = 0; i < goodEntries.size(); i++) {
-                    HttpFormEntry formEntry =
-                        (HttpFormEntry) goodEntries.get(i);
-                    postMethod.addParameter(
-                        new NameValuePair(
-                            formEntry.getName(), formEntry.getValue()));
-                }
-            }
-
-            client.executeMethod(postMethod);
             String result =
                 IOUtil.readContents(postMethod.getResponseBodyAsStream());
             if (postMethod.getStatusCode() >= 300) {
@@ -634,5 +606,59 @@ public class HttpFormEntry {
         }
 
     }
+
+
+    private static PostMethod getMethod(List entries, String urlPath) {
+        PostMethod postMethod  = new PostMethod(urlPath);
+        boolean    anyFiles    = false;
+        int        count       = 0;
+        List       goodEntries = new ArrayList();
+        for (int i = 0; i < entries.size(); i++) {
+            HttpFormEntry formEntry = (HttpFormEntry) entries.get(i);
+            if ( !formEntry.okToPost()) {
+                continue;
+            }
+            goodEntries.add(entries.get(i));
+            if (formEntry.type == TYPE_FILE) {
+                anyFiles = true;
+            }
+        }
+
+            
+        if (anyFiles) {
+            Part[] parts = new Part[goodEntries.size()];
+            for (int i = 0; i < goodEntries.size(); i++) {
+                HttpFormEntry formEntry =
+                    (HttpFormEntry) goodEntries.get(i);
+                if (formEntry.type == TYPE_FILE) {
+                    parts[i] = formEntry.getFilePart();
+                } else {
+                    //Not sure why but we have seen a couple of times
+                    //the byte value '0' gets into one of these strings
+                    //This causes an error in the StringPart.
+                    String value = formEntry.getValue();
+                    char   with  = new String(" ").charAt(0);
+                    while (value.indexOf(0) >= 0) {
+                        value = value.replace((char) 0, with);
+                    }
+                    parts[i] = new StringPart(formEntry.getName(), value);
+                }
+            }
+            postMethod.setRequestEntity(new MultipartRequestEntity(parts,
+                                                                   postMethod.getParams()));
+        } else {
+            for (int i = 0; i < goodEntries.size(); i++) {
+                HttpFormEntry formEntry =
+                    (HttpFormEntry) goodEntries.get(i);
+                postMethod.addParameter(
+                                        new NameValuePair(
+                                                          formEntry.getName(), formEntry.getValue()));
+            }
+        }
+
+        return postMethod;
+    }
+
+
 }
 
