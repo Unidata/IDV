@@ -700,7 +700,7 @@ example:
      description="Text/HTML display"
      label="Text/HTML display"
      displaycategory="General"
-     properties="windowVisible=true; displayName=Text/HTML display; showInTabs=false;"/>
+     properties="windowVisible=true; displayName=Text/HTML display;showInTabs=false;"/>
 
 
   <control
@@ -925,7 +925,7 @@ example:
      description="Image Collection"
      label="Image Collection"
      displaycategory="General"
-     properties="displayName=Image Collection;windowVisible=true;"/>
+     properties="displayName=Image Collection;windowVisible=true;showInTabs=false"/>
 
 
   <control
