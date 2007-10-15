@@ -42,7 +42,7 @@
    <datasource id="ADDE.RADAR" factory="ucar.unidata.data.imagery.AddeImageDataSource" />
  -->
   <datasource
-     id="FILE.TRACK"
+     id="FILE.TRACK,OPENDAP.TRACK,OPENDAP.TRAJECTORY"
      factory="ucar.unidata.data.sounding.TrackDataSource"
      patterns="c130.*\.nc,p3.*.nc$,P3.*\.nc$,.*WMI_Lear.*\.nc$,\.c1\.nc$"
      fileselection="true"
