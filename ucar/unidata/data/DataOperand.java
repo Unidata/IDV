@@ -261,6 +261,14 @@ public class DataOperand {
         return isMultiple.trim().equals("true");
     }
 
+    public boolean isPersistent() {
+        if(Misc.equals(getProperty("persistent"),"false")) {
+            return false;
+        }
+        return true;
+    }
+
+
     /**
      * Is this operand an end user defined value
      *
