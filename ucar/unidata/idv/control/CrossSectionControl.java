@@ -539,7 +539,7 @@ public abstract class CrossSectionControl extends GridDisplayControl {
         super.addPropertiesComponents(jtp);
 
         if (crossSectionView != null) {
-            jtp.add("Cross Section",
+            jtp.add(getCrossSectionViewLabel(),
                     crossSectionView.getPropertiesComponent());
         }
     }
@@ -659,10 +659,10 @@ public abstract class CrossSectionControl extends GridDisplayControl {
      * @return  the component
      */
     private Component doMakeVerticalRangeWidget() {
-        Range        r          = getVerticalAxisRange();
+        Range r = getVerticalAxisRange();
         if (r == null) {
             try {
-                 r = getRange();
+                r = getRange();
             } catch (Exception e) {}
         }
         final JLabel rangeLabel = new JLabel("  Range: " + ((r != null)
@@ -1059,6 +1059,32 @@ public abstract class CrossSectionControl extends GridDisplayControl {
     }
 
     /**
+     * Add the  relevant view menu items into the list
+     *
+     * @param menus List of menu items
+     * @param forMenuBar Is this for the menu in the window's menu bar or
+     *                   for a popup menu in the legend
+     */
+    protected void getViewMenuItems(List menus, boolean forMenuBar) {
+        super.getViewMenuItems(menus, forMenuBar);
+        menus.add(GuiUtils.MENU_SEPARATOR);
+
+        if (forMenuBar) {
+            JMenu csvMenu = crossSectionView.makeViewMenu();
+            csvMenu.setText(getCrossSectionViewLabel());
+            menus.add(csvMenu);
+        }
+    }
+
+    /**
+     * Get the label for the CrossSectionView
+     * @return  return the name of the cross section view
+     */
+    protected String getCrossSectionViewLabel() {
+        return "Cross Section";
+    }
+
+    /**
      * Sample along the transect line from the TransectViewManager we are in
      */
     private void loadDataFromTransect() {
@@ -1201,7 +1227,7 @@ public abstract class CrossSectionControl extends GridDisplayControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */
-    protected void load2DData(FieldImpl twoDData) 
+    protected void load2DData(FieldImpl twoDData)
             throws VisADException, RemoteException {
         ((GridDisplayable) vcsDisplay).loadData(twoDData);
     }
@@ -1237,9 +1263,6 @@ public abstract class CrossSectionControl extends GridDisplayControl {
      * Set the range on the Y Axis of the cross section
      *
      * @param range     Range of values in units of Y Axis.  May be null
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException   VisAD error
      */
     public void setVerticalAxisRange(Range range) {
         verticalAxisRange = range;
@@ -1256,9 +1279,6 @@ public abstract class CrossSectionControl extends GridDisplayControl {
      * Get the range on the vertical Axis of the cross section
      *
      * @return range of values in units of Y Axis.  May be null
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException   VisAD error
      */
     public Range getVerticalAxisRange() {
         return verticalAxisRange;
@@ -1398,14 +1418,14 @@ public abstract class CrossSectionControl extends GridDisplayControl {
             xType = Length.getRealType();
         }
 
-        RealTupleType xzRTT = new RealTupleType(xType, RealType.Altitude);
+        RealTupleType xzRTT   = new RealTupleType(xType, RealType.Altitude);
 
-        Gridded2DSet vcsG2DS = (dataIs3D)
-                               ? new Gridded2DSet(xzRTT, plane, sizeX, sizeZ,
-                                   (CoordinateSystem) null,
-                                   new Unit[] { CommonUnits.KILOMETER,
+        Gridded2DSet  vcsG2DS = (dataIs3D)
+                                ? new Gridded2DSet(xzRTT, plane, sizeX,
+                                    sizeZ, (CoordinateSystem) null,
+                                    new Unit[] { CommonUnits.KILOMETER,
                 CommonUnit.meter }, (ErrorEstimate[]) null, false, false)
-                               : new Gridded2DSet(xzRTT, plane, sizeX);
+                                : new Gridded2DSet(xzRTT, plane, sizeX);
 
         return GridUtil.setSpatialDomain(xsectSequence, vcsG2DS);
     }

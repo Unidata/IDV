@@ -307,6 +307,14 @@ public class DataTransectControl extends CrossSectionControl {
     }
 
     /**
+     * Get the label for the CrossSectionView
+     * @return  return the name of the cross section view
+     */
+    protected String getCrossSectionViewLabel() {
+        return "Data Transect";
+    }
+
+    /**
      * Set the parameters for the view.  Mostly deals with the
      * vertical scale.
      *

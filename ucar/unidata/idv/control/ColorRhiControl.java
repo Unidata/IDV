@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -229,7 +230,7 @@ public class ColorRhiControl extends ColorCrossSectionControl {
     }
 
     /**
-     * _more_
+     * Update the axis labels
      */
     private void updateAxisLabels() {
         try {
@@ -257,23 +258,6 @@ public class ColorRhiControl extends ColorCrossSectionControl {
             logException("updating axis labels", e);
         }
     }
-
-    /**
-     * Methods to do the things that need to be done when the data range
-     * changes.
-     *
-     * @param display   the display to modify
-     * @param range     Range of values in units of Y Axis.  May be null
-     *
-     * @param evt _more_
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException   VisAD error
-     * protected void setYAxisRange(XSDisplay display, Range range)
-     *       throws VisADException, RemoteException {
-     *   crossSectionView.getXSDisplay().setYRange(0.0, 20000.0);
-     * }
-     */
 
     /**
      * Handle property change
@@ -308,6 +292,14 @@ public class ColorRhiControl extends ColorCrossSectionControl {
         }
         updateCenterPoint();
         return true;
+    }
+
+    /**
+     * Get the label for the CrossSectionView
+     * @return  return the name of the cross section view
+     */
+    protected String getCrossSectionViewLabel() {
+        return "RHI";
     }
 
     /**
@@ -990,11 +982,11 @@ public class ColorRhiControl extends ColorCrossSectionControl {
             }
 
             RealTupleType xzRTT = new RealTupleType(xType, RealType.Altitude);
-            int  sizeX = domainSet.getLengths()[0];
-            int  sizeZ = domainSet.getLengths()[1];
-            Unit zUnit = (transform == null)
-                         ? domainSet.getSetUnits()[2]
-                         : transform.getReferenceUnits()[2];
+            int           sizeX = domainSet.getLengths()[0];
+            int           sizeZ = domainSet.getLengths()[1];
+            Unit          zUnit = (transform == null)
+                                  ? domainSet.getSetUnits()[2]
+                                  : transform.getReferenceUnits()[2];
             Gridded2DSet oneBeamG2DS = new Gridded2DSet(xzRTT, plane, sizeX,
                                            sizeZ, (CoordinateSystem) null,
                                            new Unit[] { CommonUnits.KILOMETER,
