@@ -251,7 +251,6 @@ public class ProbeControl extends DisplayControlImpl {
         setAttributeFlags(FLAG_COLOR | FLAG_DATACONTROL);
     }
 
-
     /**
      * Set up new probe.
      *
@@ -354,6 +353,16 @@ public class ProbeControl extends DisplayControlImpl {
         }
     }
 
+    /**
+     * Return the label that is to be used for the color widget
+     * This allows derived classes to override this and provide their
+     * own name,
+     *
+     * @return Label used for the color widget
+     */
+    public String getColorWidgetLabel() {
+        return "Probe Color";
+    }
 
     /**
      * Make the view menu items
@@ -402,6 +411,7 @@ public class ProbeControl extends DisplayControlImpl {
                 "yFixed", null));
         posMenu.add(GuiUtils.makeCheckboxMenuItem("Lock Z Axis", this,
                 "zFixed", null));
+        probeMenu.add(doMakeChangeColorMenu("Color"));
 
         JMenu sizeMenu = new JMenu("Size");
         probeMenu.add(sizeMenu);

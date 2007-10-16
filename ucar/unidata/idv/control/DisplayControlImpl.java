@@ -7505,7 +7505,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @return component with the change color menu items
      */
-    private List makeChangeColorMenuItems() {
+    protected List makeChangeColorMenuItems() {
         return makeChangeColorMenuItems("setColor", color);
     }
 
@@ -7667,8 +7667,20 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return The menu item
      */
     protected JMenu doMakeChangeColorMenu() {
-        return GuiUtils.makeMenu(getColorWidgetLabel(),
-                                 makeChangeColorMenuItems());
+        return doMakeChangeColorMenu(getColorWidgetLabel());
+    }
+
+
+    /**
+     * Utility to make the menu item for changing the color.
+     * @param name  name for the menu
+     *
+     * @return The menu item
+     */
+    protected JMenu doMakeChangeColorMenu(String name) {
+        return GuiUtils.makeMenu(((name != null)
+                                  ? name
+                                  : getColorWidgetLabel()), makeChangeColorMenuItems());
     }
 
 
