@@ -4909,7 +4909,7 @@ public class IdvUIManager extends IdvManager {
         List persistentCbxs = new ArrayList();
         components.add(new JLabel("Property"));
         components.add(new JLabel("Value"));
-        components.add(new JLabel("Persistent"));
+        components.add(new JLabel("Save in Bundle"));
         for (int i = 0; i < userOperands.size(); i++) {
             DataOperand operand       = (DataOperand) userOperands.get(i);
             String      label         = operand.getLabel();
