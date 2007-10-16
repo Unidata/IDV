@@ -4906,6 +4906,10 @@ public class IdvUIManager extends IdvManager {
         }
         List fields     = new ArrayList();
         List components = new ArrayList();
+        List persistentCbxs = new ArrayList();
+        components.add(new JLabel("Property"));
+        components.add(new JLabel("Value"));
+        components.add(new JLabel("Persistent"));
         for (int i = 0; i < userOperands.size(); i++) {
             DataOperand operand       = (DataOperand) userOperands.get(i);
             String      label         = operand.getLabel();
@@ -4914,21 +4918,24 @@ public class IdvUIManager extends IdvManager {
             if (cachedOperand != null) {
                 dflt = cachedOperand;
             }
-
-            JTextField f = new JTextField(8);
+            JCheckBox cbx = new JCheckBox("",operand.isPersistent());
+            persistentCbxs.add(cbx);
+            JTextField f = new JTextField(15);
             fields.add(f);
             if (dflt != null) {
                 f.setText(dflt);
             }
             label = StringUtil.replace(label, "_", " ");
-            components.add(new JLabel(label, SwingConstants.RIGHT));
+            components.add(GuiUtils.rLabel(label));
             components.add(f);
+            components.add(cbx);
         }
-        GuiUtils.tmpColFills = new int[] { GridBagConstraints.HORIZONTAL,
-                                           GridBagConstraints.NONE,
-                                           GridBagConstraints.NONE };
+        //        GuiUtils.tmpColFills = new int[] { GridBagConstraints.HORIZONTAL,
+                                            //                                           GridBagConstraints.NONE,
+                                            //                                           GridBagConstraints.NONE };
+        GuiUtils.tmpInsets = GuiUtils.INSETS_5;
         Component contents = GuiUtils.topCenter(new JLabel(msg),
-                                 GuiUtils.doLayout(components, 2, 6, 2));
+                                                GuiUtils.doLayout(components, 3, GuiUtils.WT_NYN, GuiUtils.WT_N));
         if ( !GuiUtils.showOkCancelDialog(getFrame(), "Select input",
                                           contents, null, fields)) {
             return null;
@@ -4938,8 +4945,9 @@ public class IdvUIManager extends IdvManager {
             DataOperand operand = (DataOperand) userOperands.get(i);
             String      label   = operand.getLabel();
             String      value = ((JTextField) fields.get(i)).getText().trim();
+            JCheckBox cbx = (JCheckBox) persistentCbxs.get(i);
             operandCache.put(label, value);
-            values.add(value);
+            values.add(new UserOperandValue(value, cbx.isSelected()));
         }
         getStore().putEncodedFile("operandcache.xml", operandCache);
         return values;
