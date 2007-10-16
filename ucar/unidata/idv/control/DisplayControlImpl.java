@@ -1188,6 +1188,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             init(getDisplayId(), getCategories(), initDataChoices,
                  getControlContext(), properties, getDataSelection());
             initDataChoices = null;
+        } catch (ucar.unidata.data.DataCancelException dce) {
+            displayControlFailed();
         } catch (Exception exc) {
             logException("Initializing after unpersistence", exc);
         }
