@@ -47,6 +47,8 @@ import java.util.Vector;
  */
 public class UserDataChoice extends DataChoice {
 
+    public boolean persistent = true;
+
     /** logging category */
     static LogUtil.LogCategory log_ =
         LogUtil.getLogInstance(UserDataChoice.class.getName());

@@ -397,10 +397,12 @@ public class DerivedDataChoice extends ListDataChoice {
             for (int i = 0; i < unboundUserOperands.size(); i++) {
                 DataOperand operand =
                     (DataOperand) unboundUserOperands.get(i);
-                Object value = userValues.get(i);
+                UserOperandValue userOperandValue = (UserOperandValue) userValues.get(i);
+                Object value = userOperandValue.getValue();
                 operand.setData(value);
                 UserDataChoice udc =
                     (UserDataChoice) unboundUserChoices.get(i);
+                udc.persistent = userOperandValue.getPersistent();
                 udc.setValue(value);
                 if ( !childrenChoices.contains(udc)) {
                     childrenChoices.add(udc);
@@ -434,6 +436,9 @@ public class DerivedDataChoice extends ListDataChoice {
                 UserDataChoice userChoice = (UserDataChoice) dc;
                 addOperand(alias, userChoice.getValue(), operands,
                            operandsSoFar);
+                if(!userChoice.persistent) {
+                    userChoice.setValue(null);
+                }
             } else {
                 //Here, put the DataChoice in as the  data (sort of as a place holder for later).
                 //                System.err.println ("addOperand ");
