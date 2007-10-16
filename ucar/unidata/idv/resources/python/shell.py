@@ -50,10 +50,13 @@ def createDisplay(displayType, data, dataName='Data'):
 
 	dataList = java.util.ArrayList();
 	for i in range(data.size()):
-		obj = data.get(i)
-		if(isinstance(obj, DataChoice)==0):
-	             obj = DataDataChoice(dataName+str(i),obj);
-		dataList.add(obj);
+            obj = data.get(i)
+            if(isinstance(obj, DataChoice)==0):
+                label = dataName
+                if(data.size()>1):
+                    label = label +str(i)
+                obj = DataDataChoice(label,obj);
+            dataList.add(obj);
         control = idv.doMakeControl(displayType, dataList);
         shell.toFront();
         return control
