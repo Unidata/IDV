@@ -1242,19 +1242,20 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     }
 
                 }
-
             }
             if (found != null) {
                 try {
                     AddeImageDescriptor desc = new AddeImageDescriptor(found);
-
-                    AddeImageInfo aii =
-                        (AddeImageInfo) desc.getImageInfo().clone();
-                    BandInfo bi = (BandInfo) dataChoice.getId();
-                    aii.setBand("" + bi.getBandNumber());
-                    aii.setUnit(bi.getPreferredUnit());
-                    desc.setImageInfo(aii);
-                    desc.setSource(aii.getURLString());
+                    //Sometimes we might have a null imageinfo
+                    if(desc.getImageInfo()!=null) {
+                        AddeImageInfo aii =
+                            (AddeImageInfo) desc.getImageInfo().clone();
+                        BandInfo bi = (BandInfo) dataChoice.getId();
+                        aii.setBand("" + bi.getBandNumber());
+                        aii.setUnit(bi.getPreferredUnit());
+                        desc.setImageInfo(aii);
+                        desc.setSource(aii.getURLString());
+                    }
                     descriptors.add(desc);
                 } catch (CloneNotSupportedException cnse) {}
             }
