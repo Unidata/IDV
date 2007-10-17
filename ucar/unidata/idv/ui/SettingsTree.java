@@ -351,7 +351,8 @@ public class SettingsTree extends DndTree {
         for (int i = 0; i < paths.length; i++) {
             DefaultMutableTreeNode node =
                 (DefaultMutableTreeNode) paths[i].getLastPathComponent();
-            if (node.getUserObject() instanceof TwoFacedObject) {
+            if (node.getUserObject() instanceof TwoFacedObject && ((TwoFacedObject)node.getUserObject()).getId() instanceof DisplaySetting) {
+
                 settings.add(((TwoFacedObject) node.getUserObject()).getId());
             }
         }
