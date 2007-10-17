@@ -52,6 +52,7 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.Resource;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.view.station.StationLocationMap;
@@ -372,7 +373,7 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
             throws VisADException, RemoteException {
         super.init(dataChoice);
 
-
+        
         imageDisplay = new ImageRGBDisplayable("ImageDisplayable");
         ColorTable colorTable = getRGBColorTable();
         imageDisplay.setRangeForColor(0.0, 255.0);
@@ -1125,7 +1126,9 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
      */
     private void doMakeImageSetTree(JTabbedPane tabbedPane) {
         try {
-            if (doImageSetResources) {
+            if(tocFiles!=null) {
+                extraCollections.addAll(StringUtil.split(tocFiles,";",true,true));
+            } else if (doImageSetResources) {
                 XmlResourceCollection xrc =
                     getControlContext().getResourceManager().getXmlResources(
                         IdvResourceManager.RSC_IMAGESETS);
@@ -1232,6 +1235,12 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
             }
         }
         return imageSetsRoot;
+    }
+
+
+    private String tocFiles;
+    public void setTocFiles(String files) {
+        tocFiles = files;
     }
 
 
