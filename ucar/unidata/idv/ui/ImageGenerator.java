@@ -2100,6 +2100,23 @@ public class ImageGenerator extends IdvManager {
 
 
     /**
+     * process the given node
+     *
+     * @param node Node to process
+     *
+     * @return keep going
+     *
+     * @throws Throwable On badness
+     */
+    protected boolean processTagPanel(Element node) throws Throwable {
+        pushProperties();
+        captureMovie(null, node);
+        popProperties();
+        return true;
+    }
+
+
+    /**
      * Parse the xml
      *
      * @param xml the xml
@@ -2767,7 +2784,7 @@ public class ImageGenerator extends IdvManager {
         }
         props.putAll(getAllProperties());
 
-        props.put(PROP_LOOPINDEX, new Integer(currentLoopIndex));
+        putIndex(props, PROP_LOOPINDEX, currentLoopIndex);
         Date now = new Date(Misc.getCurrentTime());
 
 
@@ -2785,7 +2802,6 @@ public class ImageGenerator extends IdvManager {
             SimpleDateFormat sdf = (SimpleDateFormat) DATE_FORMATS.get(i);
             props.put(DATE_PROPS[i], sdf.format(now));
         }
-
 
 
         props.put("memory", "" + Misc.usedMemory());
@@ -2836,6 +2852,21 @@ public class ImageGenerator extends IdvManager {
         } catch (Throwable exc) {
             logException("Capturing image", exc);
         }
+    }
+
+
+    public void putIndex(Hashtable props, String name, int v) {
+        props.put(name, new Integer(v));
+        props.put(name+"_alpha",
+                  getLetter(v).toLowerCase());
+        props.put(name+"_ALPHA",
+                  getLetter(v).toUpperCase());
+        props.put(name+"_ROMAN",
+                  getRoman(v).toUpperCase());
+        props.put(name+"_roman",
+                  getRoman(v).toLowerCase());
+
+
     }
 
 
@@ -3116,7 +3147,7 @@ public class ImageGenerator extends IdvManager {
         pushProperties();
         for (int i = 0; i < viewManagers.size(); i++) {
             ViewManager viewManager = (ViewManager) viewManagers.get(i);
-            getProperties().put(PROP_VIEWINDEX, new Integer(i));
+            putIndex(getProperties(),PROP_VIEWINDEX,i);
             String name = viewManager.getName();
             if (name == null) {
                 name = "view" + i;
@@ -3156,7 +3187,7 @@ public class ImageGenerator extends IdvManager {
      *
      * @return The resized image
      */
-    private BufferedImage resize(BufferedImage image, Element node) {
+    protected Image resize(Image image, Element node) {
         int imageWidth  = image.getWidth(null);
         int imageHeight = image.getHeight(null);
         int width       = -1;
@@ -3171,11 +3202,8 @@ public class ImageGenerator extends IdvManager {
             return image;
         }
 
-        BufferedImage resizedImage =
-            ImageUtils.toBufferedImage(image.getScaledInstance(width, height,
-                Image.SCALE_AREA_AVERAGING), BufferedImage.TYPE_INT_RGB);
-        return resizedImage;
-
+        return image.getScaledInstance(width, height,
+                                       Image.SCALE_AREA_AVERAGING);
     }
 
 
@@ -3284,7 +3312,7 @@ public class ImageGenerator extends IdvManager {
             String        tagName               = child.getTagName();
 
             if (tagName.equals(TAG_RESIZE)) {
-                newImage = resize(image, child);
+                newImage = ImageUtils.toBufferedImage(resize(image, child));
             } else if (tagName.equals(TAG_FILESET)) {
                 //ignore
             } else if (tagName.equals(TAG_OUTPUT)) {
@@ -3623,7 +3651,7 @@ public class ImageGenerator extends IdvManager {
                 }
             } else if (tagName.equals(TAG_THUMBNAIL)) {
                 shouldIterateChildren = false;
-                BufferedImage thumbImage = resize(image, child);
+                BufferedImage thumbImage = ImageUtils.toBufferedImage(resize(image, child));
                 String thumbFile = applyMacros(child, ATTR_FILE,
                                        (String) null);
                 if (thumbFile == null) {
@@ -4043,7 +4071,7 @@ public class ImageGenerator extends IdvManager {
      *
      * @param msg The message
      */
-    private void debug(String msg) {
+    protected void debug(String msg) {
         if (debug) {
             System.out.println(new Date() + ": " + msg);
         }
@@ -4157,6 +4185,27 @@ public class ImageGenerator extends IdvManager {
         f.logout();
         f.disconnect();
     }
+
+    private static String []alphabet = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"};
+    private static String[]roman = {"I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII",
+                            "XVIII","XX","XXI","XXII","XXIII",
+                            "XXIV","XXV","XXVI","XXVII","XXVIII"};
+
+    public String getLetter(int i) {
+        if(i>=0 && i<alphabet.length) 
+            return alphabet[i];
+        //A hack for now
+        return "out of range";
+
+    }
+
+    public String getRoman(int i) {
+        if(i>=0 && i<roman.length) 
+            return roman[i];
+        //A hack for now
+        return "out of range";
+    }
+
 
 
 }

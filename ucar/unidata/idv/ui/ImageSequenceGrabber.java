@@ -500,7 +500,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         this.idv            = idv;
         movieFileName       = filename;
         createMovie(movieFileName, images, null, null, size, displayRate,
-                    null);
+                    scriptingNode);
     }
 
 
@@ -1438,8 +1438,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         props.put(ImageGenerator.PROP_IMAGEPATH, path);
                         props.put(ImageGenerator.PROP_IMAGEFILE,
                                   IOUtil.getFileTail(path));
-                        props.put(ImageGenerator.PROP_IMAGEINDEX,
-                                  new Integer(images.size()));
+                        imageGenerator.putIndex(props, ImageGenerator.PROP_IMAGEINDEX,
+                                                images.size());
                         imageGenerator.processImage(image, path,
                                 scriptingNode, props, viewManager);
                     } catch (Throwable exc) {
@@ -1545,6 +1545,28 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** widget for saving html */
     private static JCheckBox copyCbx;
 
+    private void  createPanel(String file, List images,  Element scriptingNode) {
+        try {
+            imageGenerator.debug("Making image panel:" + file);
+            int width =     imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_WIDTH, 100);
+            int columns=     imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_COLUMNS, 1);
+            int space=     imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_SPACE, 0);
+            Color background=     imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_BACKGROUND, (Color) null);
+            List sizedImages = new ArrayList();
+            for(int i=0;i<images.size();i++) {
+                String imageFile = images.get(i).toString();
+                Image image = ImageUtils.readImage(imageFile);
+                BufferedImage bufferedImage = ImageUtils.toBufferedImage(image);
+                image = imageGenerator.resize(bufferedImage, scriptingNode);
+                sizedImages.add(image);
+            }
+            Image  image = ImageUtils.gridImages(sizedImages, space, background, columns);
+            ImageUtils.writeImageToFile(image,file);
+        } catch (Exception exc) {
+            LogUtil.logException("Writing panel", exc);
+        }
+    }
+
     /**
      * actually create the movie
      *
@@ -1564,10 +1586,19 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         List fileToks = StringUtil.split(commaSeparatedFiles, ",", true,
                                          true);
 
+        boolean doingPanel = false;
+        if(scriptingNode!=null && scriptingNode.getTagName().equals("panel")) {
+            doingPanel = true;
+        }
 
+        System.err.println("doingPanel:" + doingPanel + " " + scriptingNode);
         for (int i = 0; i < fileToks.size(); i++) {
             String movieFile = (String) fileToks.get(i);
             try {
+                if(doingPanel) {
+                    createPanel(movieFile, images,  scriptingNode);
+                    continue;
+                }
                 //                System.err.println("createMovie:" + movieFile);
                 if (movieFile.toLowerCase().endsWith(".gif")) {
                     double rate = 1.0 / displayRate;
