@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.ui;
 
 
@@ -127,7 +126,7 @@ public class IdvSplash extends JWindow {
         dispose();
     }
 
-    /** _more_          */
+    /** done the audio once */
     boolean playedOnce = false;
 
 
@@ -171,7 +170,8 @@ public class IdvSplash extends JWindow {
                 if (splashRolloverIcon != null) {
                     ((JLabel) e.getSource()).setIcon(splashRolloverIcon);
                 }
-                /*else*/if (false &&  !playedOnce) {
+                /*else*/
+                if (false && !playedOnce) {
                     Misc.run(new Runnable() {
                         public void run() {
                             try {

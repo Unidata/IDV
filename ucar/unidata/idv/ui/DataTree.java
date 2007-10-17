@@ -987,8 +987,9 @@ public class DataTree extends DataSourceHolder {
             cnt++;
 
             if (initialSelectedFieldName != null) {
-                if(choice.toString().equals(initialSelectedFieldName) ||
-                   choice.getName().equals(initialSelectedFieldName)) {
+                if (choice.toString().equals(initialSelectedFieldName)
+                        || choice.getName().equals(
+                            initialSelectedFieldName)) {
                     initialSelectedChoices   = Misc.newList(choice);
                     initialSelectedFieldName = null;
                 }

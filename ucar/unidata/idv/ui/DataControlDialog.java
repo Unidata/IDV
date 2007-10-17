@@ -753,12 +753,15 @@ public class DataControlDialog implements ActionListener {
     }
 
 
+    /**
+     * Check settings
+     */
     private void checkSettings() {
         Object[] cd = getSelectedControls();
-        dataSelectionWidget.updateSettings(
-                                           (ControlDescriptor) ((cd.length > 0)
-                                                                ? cd[0]
-                                                                : null));
+        dataSelectionWidget.updateSettings((ControlDescriptor) ((cd.length
+                > 0)
+                ? cd[0]
+                : null));
     }
 
     /**

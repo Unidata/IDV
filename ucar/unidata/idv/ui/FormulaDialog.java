@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.ui;
 
 
@@ -302,11 +300,14 @@ public class FormulaDialog extends JFrame implements ActionListener {
             public void mouseReleased(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
                     List items = new ArrayList();
-                    items.add(GuiUtils.makeMenu("Insert Procedure Call",idv.getJythonManager().makeProcedureMenu(
-                                                                                                                 FormulaDialog.this, "insertText",null)));
+                    items.add(
+                        GuiUtils.makeMenu(
+                            "Insert Procedure Call",
+                            idv.getJythonManager().makeProcedureMenu(
+                                FormulaDialog.this, "insertText", null)));
 
-                   
-                    JPopupMenu popup =  GuiUtils.makePopupMenu(items);
+
+                    JPopupMenu popup = GuiUtils.makePopupMenu(items);
                     popup.show(formulaField, e.getX(),
                                (int) formulaField.getBounds().getHeight());
                 }
@@ -637,9 +638,9 @@ public class FormulaDialog extends JFrame implements ActionListener {
 
 
     /**
-     * _more_
+     * Insert text into the formula field
      *
-     * @param t _more_
+     * @param t text
      */
     public void insertText(String t) {
         GuiUtils.insertText(formulaField, t);
@@ -1031,14 +1032,14 @@ public class FormulaDialog extends JFrame implements ActionListener {
 
 
     /**
-     * _more_
+     * Evaluate the formula
      */
     public void evaluate() {
         Misc.run(this, "evaluateInThread");
     }
 
     /**
-     * _more_
+     * evalue the formula
      */
     public void evaluateInThread() {
         if ( !addOrChange()) {
@@ -1048,9 +1049,9 @@ public class FormulaDialog extends JFrame implements ActionListener {
     }
 
     /**
-     * _more_
+     * Add or change the formula
      *
-     * @return _more_
+     * @return success
      */
     private boolean addOrChange() {
         boolean wasNew = false;
@@ -1167,7 +1168,7 @@ public class FormulaDialog extends JFrame implements ActionListener {
                     cleanProc);
             } catch (org.python.core.PySyntaxError pse) {
                 LogUtil.userErrorMessage("The formula: " + formula
-                                         + " has a Jython error: " +pse);
+                                         + " has a Jython error: " + pse);
                 return false;
             } catch (Exception e) {
                 LogUtil.userErrorMessage("The formula: " + formula

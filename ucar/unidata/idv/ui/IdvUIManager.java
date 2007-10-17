@@ -154,6 +154,7 @@ public class IdvUIManager extends IdvManager {
     /** Xml attribute name for the  description in the actions resource */
     public static final String ATTR_DESCRIPTION = "description";
 
+    /** Xml attribute name for the  group in the actions resource */
     public static final String ATTR_GROUP = "group";
 
     /** Xml attribute name for the  action in the actions resource */
@@ -330,7 +331,10 @@ public class IdvUIManager extends IdvManager {
     private Hashtable actionMap;
 
 
+    /** List of action groups */
     private List actionGroupList = new ArrayList();
+
+    /** action group to list map */
     private Hashtable actionGroupMap = new Hashtable();
 
     /** List of all action ids */
@@ -901,12 +905,13 @@ public class IdvUIManager extends IdvManager {
                                          ATTR_ID);
                 actionMap.put(id, actionNode);
                 actionList.add(id);
-                String group = XmlUtil.getAttribute(actionNode, ATTR_GROUP,"General");
-                List groupList = (List)actionGroupMap.get(group);
-                if(groupList == null) {
+                String group = XmlUtil.getAttribute(actionNode, ATTR_GROUP,
+                                   "General");
+                List groupList = (List) actionGroupMap.get(group);
+                if (groupList == null) {
                     groupList = new ArrayList();
-                    actionGroupMap.put(group, groupList);                                        
-                    actionGroupList.add(group);                    
+                    actionGroupMap.put(group, groupList);
+                    actionGroupList.add(group);
                 }
                 groupList.add(actionNode);
                 //                System.out.println("<li><b>" + id +"</b><br>" + XmlUtil.getAttribute(actionNode, ATTR_DESCRIPTION));
@@ -915,21 +920,34 @@ public class IdvUIManager extends IdvManager {
     }
 
 
-    public List makeActionMenu(Object object, String method, boolean makeCall) {
+    /**
+     * Make the menu of actions
+     *
+     * @param object object to call
+     * @param method method to call
+     * @param makeCall If true we call idv.handleAction
+     *
+     * @return List of menus
+     */
+    public List makeActionMenu(Object object, String method,
+                               boolean makeCall) {
         List items = new ArrayList();
-        for(int groupIdx=0;groupIdx<actionGroupList.size();groupIdx++) {
-            String group = (String) actionGroupList.get(groupIdx);
-            List l = (List) actionGroupMap.get(group);
-            List subItems = new ArrayList();
-            for(int actionIdx=0;actionIdx<l.size();actionIdx++) {
+        for (int groupIdx = 0; groupIdx < actionGroupList.size();
+                groupIdx++) {
+            String group    = (String) actionGroupList.get(groupIdx);
+            List   l        = (List) actionGroupMap.get(group);
+            List   subItems = new ArrayList();
+            for (int actionIdx = 0; actionIdx < l.size(); actionIdx++) {
                 Element node = (Element) l.get(actionIdx);
-                String desc = XmlUtil.getAttribute(node,ATTR_DESCRIPTION, (String) null);
-                if(desc!=null) {
+                String desc = XmlUtil.getAttribute(node, ATTR_DESCRIPTION,
+                                  (String) null);
+                if (desc != null) {
                     String action = XmlUtil.getAttribute(node, ATTR_ID);
-                    if(makeCall) {
-                        action =   "idv.handleAction('action:" + action +"')";
+                    if (makeCall) {
+                        action = "idv.handleAction('action:" + action + "')";
                     }
-                    subItems.add(GuiUtils.makeMenuItem(desc, object, method,action));
+                    subItems.add(GuiUtils.makeMenuItem(desc, object, method,
+                            action));
                 }
             }
             items.add(GuiUtils.makeMenu(group, subItems));
@@ -4730,14 +4748,13 @@ public class IdvUIManager extends IdvManager {
         if (dataSourcesForTree.size() == 0) {
             return null;
         }
-        DataOperand dataOperand  = new DataOperand("Please select a data choice:",
-                                                   "Please select a data choice:",
-                                                   descriptor.getCategories(),
-                                                   false);
-        DataTreeDialog dataDialog =
-            new DataTreeDialog(getIdv(), null,
-                               Misc.newList(dataOperand),
-                               dataSourcesForTree,null);
+        DataOperand dataOperand =
+            new DataOperand("Please select a data choice:",
+                            "Please select a data choice:",
+                            descriptor.getCategories(), false);
+        DataTreeDialog dataDialog = new DataTreeDialog(getIdv(), null,
+                                        Misc.newList(dataOperand),
+                                        dataSourcesForTree, null);
         List selected = dataDialog.getSelected();
         dataDialog.dispose();
         if ((selected == null) || selected.isEmpty()) {
@@ -4764,7 +4781,7 @@ public class IdvUIManager extends IdvManager {
         }
 
         //Convert if needed
-        if(!(operands.get(0) instanceof DataOperand)) {
+        if ( !(operands.get(0) instanceof DataOperand)) {
             List tmp = new ArrayList();
             for (int i = 0; i < operands.size(); i++) {
                 tmp.add(new DataOperand(operands.get(i).toString()));
@@ -4773,7 +4790,7 @@ public class IdvUIManager extends IdvManager {
         }
 
         Hashtable choicesWeAlreadyHave = new Hashtable();
-        List operandsToSelect = new ArrayList();
+        List      operandsToSelect     = new ArrayList();
 
 
         //First go thru the list and see if there are any operands of the 
@@ -4843,13 +4860,13 @@ public class IdvUIManager extends IdvManager {
 
         //If we still have unfound choices then popup the dialog
         if (operandsToSelect.size() > 0) {
-            DataTreeDialog dataDialog = new DataTreeDialog(getIdv(),
-                                                           null, operandsToSelect,
-                                                           dataSourcesForTree,null);
+            DataTreeDialog dataDialog = new DataTreeDialog(getIdv(), null,
+                                            operandsToSelect,
+                                            dataSourcesForTree, null);
             selected = dataDialog.getSelected();
             //            System.err.println ("selected = " + selected);
             dataDialog.dispose();
-            if (selected == null || selected.size() == 0) {
+            if ((selected == null) || (selected.size() == 0)) {
                 return null;
             }
         }
@@ -4859,7 +4876,7 @@ public class IdvUIManager extends IdvManager {
         for (int i = 0; i < operands.size(); i++) {
             DataOperand operand   = (DataOperand) operands.get(i);
             String      paramName = operand.getParamName();
-            List choices;
+            List        choices;
             DataChoice choice =
                 (DataChoice) choicesWeAlreadyHave.get(operand);
             if (choice == null) {
@@ -4867,17 +4884,19 @@ public class IdvUIManager extends IdvManager {
             } else {
                 choices = Misc.newList(choice);
             }
-            if(choices.size() == 0) {
-                throw new IllegalStateException ("No data selected");
+            if (choices.size() == 0) {
+                throw new IllegalStateException("No data selected");
             }
             List times = operand.getTimeIndices();
             if (times != null) {
-                for(int choiceIdx=0;choiceIdx<choices.size();choiceIdx++) {
-                    ((DataChoice)choices.get(choiceIdx)).setTimeSelection(times);
+                for (int choiceIdx = 0; choiceIdx < choices.size();
+                        choiceIdx++) {
+                    ((DataChoice) choices.get(choiceIdx)).setTimeSelection(
+                        times);
                 }
             }
-            if(operand.getMultiple()) {
-                ListDataChoice ldc = new ListDataChoice(paramName,choices);
+            if (operand.getMultiple()) {
+                ListDataChoice ldc = new ListDataChoice(paramName, choices);
                 finalChoices.add(ldc);
             } else {
                 finalChoices.add(choices.get(0));
@@ -4904,8 +4923,8 @@ public class IdvUIManager extends IdvManager {
                 operandCache = new Hashtable();
             }
         }
-        List fields     = new ArrayList();
-        List components = new ArrayList();
+        List fields         = new ArrayList();
+        List components     = new ArrayList();
         List persistentCbxs = new ArrayList();
         components.add(new JLabel("Property"));
         components.add(new JLabel("Value"));
@@ -4918,7 +4937,7 @@ public class IdvUIManager extends IdvManager {
             if (cachedOperand != null) {
                 dflt = cachedOperand;
             }
-            JCheckBox cbx = new JCheckBox("",operand.isPersistent());
+            JCheckBox cbx = new JCheckBox("", operand.isPersistent());
             persistentCbxs.add(cbx);
             JTextField f = new JTextField(15);
             fields.add(f);
@@ -4931,11 +4950,12 @@ public class IdvUIManager extends IdvManager {
             components.add(cbx);
         }
         //        GuiUtils.tmpColFills = new int[] { GridBagConstraints.HORIZONTAL,
-                                            //                                           GridBagConstraints.NONE,
-                                            //                                           GridBagConstraints.NONE };
+        //                                           GridBagConstraints.NONE,
+        //                                           GridBagConstraints.NONE };
         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
         Component contents = GuiUtils.topCenter(new JLabel(msg),
-                                                GuiUtils.doLayout(components, 3, GuiUtils.WT_NYN, GuiUtils.WT_N));
+                                 GuiUtils.doLayout(components, 3,
+                                     GuiUtils.WT_NYN, GuiUtils.WT_N));
         if ( !GuiUtils.showOkCancelDialog(getFrame(), "Select input",
                                           contents, null, fields)) {
             return null;
@@ -4945,7 +4965,7 @@ public class IdvUIManager extends IdvManager {
             DataOperand operand = (DataOperand) userOperands.get(i);
             String      label   = operand.getLabel();
             String      value = ((JTextField) fields.get(i)).getText().trim();
-            JCheckBox cbx = (JCheckBox) persistentCbxs.get(i);
+            JCheckBox   cbx     = (JCheckBox) persistentCbxs.get(i);
             operandCache.put(label, value);
             values.add(new UserOperandValue(value, cbx.isSelected()));
         }
@@ -4955,7 +4975,7 @@ public class IdvUIManager extends IdvManager {
 
 
     /** Just some haiku stuff */
-    private     List haikus;
+    private List haikus;
 
     /** Just some haiku stuff */
     private List haikuActions;
@@ -4966,15 +4986,20 @@ public class IdvUIManager extends IdvManager {
 
     /**
      * Just some haiku stuff
+     *
+     * @param lbl label array
      */
-    private void runHaiku(JLabel[]lbl) {
+    private void runHaiku(JLabel[] lbl) {
         int cnt = 0;
-        while (lbl[0]!=null) {
+        while (lbl[0] != null) {
             if (cnt >= haikus.size()) {
                 cnt = 0;
             }
-            if(lbl[0]==null) break;
-            lbl[0].setText("<html><div style=\"color:white; font-size:50\">" + haikus.get(cnt)+"</div></html>");
+            if (lbl[0] == null) {
+                break;
+            }
+            lbl[0].setText("<html><div style=\"color:white; font-size:50\">"
+                           + haikus.get(cnt) + "</div></html>");
             cnt++;
             try {
                 Misc.sleep(6000);
@@ -4989,20 +5014,19 @@ public class IdvUIManager extends IdvManager {
         if (haikus == null) {
             haikus = new ArrayList();
             while (true) {
-                String list = getIdv().getProperty("haiku" + (haikus.size()+1),
-                                  (String) null);
+                String list = getIdv().getProperty("haiku"
+                                  + (haikus.size() + 1), (String) null);
                 if (list == null) {
                     break;
                 }
                 haikus.add(list);
             }
         }
-        final Window f = new Window(getFrame());
+        final Window   f   = new Window(getFrame());
 
-        final JLabel[]lbl = { new JLabel("  ")};
+        final JLabel[] lbl = { new JLabel("  ") };
         JPanel p = GuiUtils.leftCenter(new JLabel("             "),
-                                       GuiUtils.topCenter(null,
-                                                          lbl[0]));
+                                       GuiUtils.topCenter(null, lbl[0]));
         GuiUtils.setBackgroundOnTree(p, Color.blue);
         p.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
@@ -5042,18 +5066,18 @@ public class IdvUIManager extends IdvManager {
                 StringUtil.split(getIdv().getProperty("haiku.users", ""),
                                  ";", true, true);
             haikuActions =
-                StringUtil.split(getIdv().getProperty("haiku.actions",
-                                                      ""), ";", true, true);
+                StringUtil.split(getIdv().getProperty("haiku.actions", ""),
+                                 ";", true, true);
             haikuUserOk =
                 haikuUsers.contains(getStateManager().getUserName());
         }
-        if (!haikuUserOk) {
+        if ( !haikuUserOk) {
             return false;
         }
         haikuUserOk = false;
         String key = "nohaikus";
-        if(getStateManager().getPreferenceOrProperty(key)!=null) {
-            if(getStateManager().getProperty(key)!=null) {
+        if (getStateManager().getPreferenceOrProperty(key) != null) {
+            if (getStateManager().getProperty(key) != null) {
                 getStore().put(key, true);
                 getStore().save();
             }
@@ -5061,7 +5085,7 @@ public class IdvUIManager extends IdvManager {
             return false;
         }
 
-        if (StringUtil.findMatch(action, haikuActions,null) != null) {
+        if (StringUtil.findMatch(action, haikuActions, null) != null) {
             doHaiku();
             return true;
         }

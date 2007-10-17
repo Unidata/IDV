@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.idv.ui;
 
 
@@ -38,6 +37,10 @@ import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+
+import visad.*;
+
+import visad.jmet.DumpType;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -60,9 +63,6 @@ import javax.swing.text.*;
 
 import javax.swing.tree.*;
 
-import visad.*;
-import visad.jmet.DumpType;
-
 
 /**
  * This class provides  an interactive shell for running JYthon
@@ -72,27 +72,31 @@ import visad.jmet.DumpType;
  */
 public class JythonShell extends InteractiveShell {
 
-    public static final String PROP_JYTHON_SHELL_HISTORY = "prop.jython.shell.history";
+    /** property that holds the history */
+    public static final String PROP_JYTHON_SHELL_HISTORY =
+        "prop.jython.shell.history";
 
-    /** _more_ */
+    /** idv */
     private IntegratedDataViewer idv;
 
-    /** _more_ */
+    /** interp */
     private PythonInterpreter interp;
 
-    private  OutputStream   outputStream;
+    /** output stream for interp */
+    private OutputStream outputStream;
 
 
     /**
-     * _more_
+     * ctor
      *
-     * @param theIdv _more_
+     * @param theIdv idv
      */
     public JythonShell(IntegratedDataViewer theIdv) {
         super("Jython Shell");
         this.idv = theIdv;
-        List oldHistory = (List)idv.getStore().get(PROP_JYTHON_SHELL_HISTORY);
-        if(oldHistory!=null) {
+        List oldHistory =
+            (List) idv.getStore().get(PROP_JYTHON_SHELL_HISTORY);
+        if (oldHistory != null) {
             history = new ArrayList(oldHistory);
         }
         createInterpreter();
@@ -101,24 +105,29 @@ public class JythonShell extends InteractiveShell {
     }
 
 
+    /**
+     *  print the history
+     */
     public void listHistory() {
-        for(int i=0;i<history.size();i++) {
+        for (int i = 0; i < history.size(); i++) {
             super.eval((String) history.get(i));
         }
     }
 
+    /**
+     * write the hostory
+     */
     public void saveHistory() {
-        idv.getStore().put(PROP_JYTHON_SHELL_HISTORY,history);
+        idv.getStore().put(PROP_JYTHON_SHELL_HISTORY, history);
         idv.getStore().save();
     }
 
- 
+
     /**
      * This gets called by the base class to make the frame.
      * If you don't want this to popup then make this method a noop
      * You can access the GUI contents with the member contents
      *
-     * @param contents
      */
     protected void makeFrame() {
         super.makeFrame();
@@ -135,9 +144,9 @@ public class JythonShell extends InteractiveShell {
 
 
     /**
-     * _more_
+     * Get the interp
      *
-     * @return _more_
+     * @return interp
      */
     private PythonInterpreter getInterpreter() {
         if (interp == null) {
@@ -148,9 +157,9 @@ public class JythonShell extends InteractiveShell {
 
 
     /**
-     * _more_
+     * popup menu
      *
-     * @param cmdFld _more_
+     * @param cmdFld field
      */
     public void showProcedurePopup(JTextComponent cmdFld) {
         String t = cmdFld.getText();
@@ -172,21 +181,31 @@ public class JythonShell extends InteractiveShell {
         t = null;
 
         List items = new ArrayList();
-        if(history.size()>0) {
+        if (history.size() > 0) {
             List historyItems = new ArrayList();
-            for(int i=history.size()-1;i>=0;i--) {
-                historyItems.add(GuiUtils.makeMenuItem(history.get(i).toString(), this,"eval",
-                                                       history.get(i)));
+            for (int i = history.size() - 1; i >= 0; i--) {
+                historyItems.add(
+                    GuiUtils.makeMenuItem(
+                        history.get(i).toString(), this, "eval",
+                        history.get(i)));
             }
-            items.add(GuiUtils.makeMenu("History",historyItems));
-                                        
+            items.add(GuiUtils.makeMenu("History", historyItems));
+
         }
 
-        items.add(GuiUtils.makeMenu("Insert Display Type", getDisplayMenuItems()));
-        items.add(GuiUtils.makeMenu("Insert Procedure Call",idv.getJythonManager().makeProcedureMenu(
-                                                                                                      this, "insertText", t)));
+        items.add(GuiUtils.makeMenu("Insert Display Type",
+                                    getDisplayMenuItems()));
+        items.add(
+            GuiUtils.makeMenu(
+                "Insert Procedure Call",
+                idv.getJythonManager().makeProcedureMenu(
+                    this, "insertText", t)));
 
-        items.add(GuiUtils.makeMenu("Insert Idv Action",idv.getIdvUIManager().makeActionMenu(this,"insertText",true)));
+        items.add(
+            GuiUtils.makeMenu(
+                "Insert Idv Action",
+                idv.getIdvUIManager().makeActionMenu(
+                    this, "insertText", true)));
 
         JPopupMenu popup = GuiUtils.makePopupMenu(items);
         if (popup != null) {
@@ -195,37 +214,46 @@ public class JythonShell extends InteractiveShell {
     }
 
 
+    /**
+     * List the variables in the interpreter
+     */
     public void listVars() {
-        PyStringMap seq   = (PyStringMap) getInterpreter().getLocals();
-        PyList      items = seq.items();
-        StringBuffer sb = new StringBuffer("Variables:<br>");
+        PyStringMap  seq   = (PyStringMap) getInterpreter().getLocals();
+        PyList       items = seq.items();
+        StringBuffer sb    = new StringBuffer("Variables:<br>");
         for (int itemIdx = 0; itemIdx < items.__len__(); itemIdx++) {
             PyTuple pair = (PyTuple) items.__finditem__(itemIdx);
-            Object obj = pair.__finditem__(1);
-            String name = pair.__finditem__(0).toString();
-            if (obj instanceof PyFunction || 
-                obj instanceof PyReflectedFunction || 
-                obj instanceof PyJavaClass || 
-                obj instanceof PyJavaPackage || 
-                obj instanceof PySystemState || 
-                obj instanceof PyJavaPackage || name.startsWith("__") || name.equals("JyVars")) {
+            Object  obj  = pair.__finditem__(1);
+            String  name = pair.__finditem__(0).toString();
+            if ((obj instanceof PyFunction)
+                    || (obj instanceof PyReflectedFunction)
+                    || (obj instanceof PyJavaClass)
+                    || (obj instanceof PyJavaPackage)
+                    || (obj instanceof PySystemState)
+                    || (obj instanceof PyJavaPackage)
+                    || name.startsWith("__") || name.equals("JyVars")) {
                 continue;
             }
-            sb.append ("&nbsp;&nbsp;&nbsp;" + name+"<br>");
+            sb.append("&nbsp;&nbsp;&nbsp;" + name + "<br>");
         }
         output(sb.toString());
     }
 
 
+    /**
+     * Add the idv action
+     *
+     * @param action action
+     */
     public void insertAction(String action) {
-        insertText("idv.handleAction('action:" + action +"')");
+        insertText("idv.handleAction('action:" + action + "')");
     }
 
     /**
-     * _more_
+     * handle event
      *
-     * @param e _more_
-     * @param cmdFld _more_
+     * @param e event
+     * @param cmdFld field
      */
     protected void handleKeyPress(KeyEvent e, JTextComponent cmdFld) {
         super.handleKeyPress(e, cmdFld);
@@ -237,14 +265,14 @@ public class JythonShell extends InteractiveShell {
 
 
     /**
-     * _more_
+     * show help
      */
     public void showHelp() {
         idv.getIdvUIManager().showHelp("idv.tools.jythonshell");
     }
 
     /**
-     * _more_
+     * Take all of the commands and write them to the library
      */
     public void exportHistory() {
         if (history.size() == 0) {
@@ -272,7 +300,7 @@ public class JythonShell extends InteractiveShell {
 
 
     /**
-     * _more_
+     * create interp
      */
     private void createInterpreter() {
         if (interp != null) {
@@ -286,9 +314,9 @@ public class JythonShell extends InteractiveShell {
             }
             public void write(byte[] b, int off, int len) {
                 String s = new String(new String(b, off, len));
-                s = StringUtil.replace(s,"\n","<br>");
-                s = StringUtil.replace(s," ","&nbsp;");
-                s = StringUtil.replace(s,"\t","&nbsp;&nbsp;&nbsp;&nbsp;");
+                s = StringUtil.replace(s, "\n", "<br>");
+                s = StringUtil.replace(s, " ", "&nbsp;");
+                s = StringUtil.replace(s, "\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
                 output(s);
             }
         };
@@ -300,7 +328,7 @@ public class JythonShell extends InteractiveShell {
 
 
     /**
-     * _more_
+     * Clear everything, gui and make new interp
      */
     public void clear() {
         try {
@@ -315,21 +343,18 @@ public class JythonShell extends InteractiveShell {
 
 
     /**
-     * _more_
+     * Make menu bar
      *
-     * @return _more_
+     * @return menu bar
      */
     protected JMenuBar doMakeMenuBar() {
         JMenuBar menuBar = new JMenuBar();
         List     items   = new ArrayList();
         items.add(GuiUtils.makeMenuItem("Export Commands", this,
                                         "exportHistory"));
-        items.add(GuiUtils.makeMenuItem("Save History", this,
-                                        "saveHistory"));
-        items.add(GuiUtils.makeMenuItem("List History", this,
-                                        "listHistory"));
-        items.add(GuiUtils.makeMenuItem("List Variables", this,
-                                        "listVars"));
+        items.add(GuiUtils.makeMenuItem("Save History", this, "saveHistory"));
+        items.add(GuiUtils.makeMenuItem("List History", this, "listHistory"));
+        items.add(GuiUtils.makeMenuItem("List Variables", this, "listVars"));
         menuBar.add(GuiUtils.makeMenu("File", items));
 
 
@@ -346,6 +371,11 @@ public class JythonShell extends InteractiveShell {
     }
 
 
+    /**
+     * get menu items
+     *
+     * @return items
+     */
     protected List getDisplayMenuItems() {
         List      displayMenuItems = new ArrayList();
         List      cds              = idv.getControlDescriptors();
@@ -367,10 +397,10 @@ public class JythonShell extends InteractiveShell {
 
 
     /**
-     * _more_
+     * handle event
      *
-     * @param commandFld _more_
-     * @param e _more_
+     * @param commandFld field
+     * @param e event
      */
     protected void handleRightMouseClick(JTextComponent commandFld,
                                          MouseEvent e) {
@@ -379,11 +409,11 @@ public class JythonShell extends InteractiveShell {
 
 
     /**
-     * _more_
+     * Format code to output
      *
-     * @param code _more_
+     * @param code code
      *
-     * @return _more_
+     * @return formatted code
      */
     protected String formatCode(String code) {
         String html = StringUtil.replace(code.trim(), "\n", "<br>");
@@ -394,27 +424,29 @@ public class JythonShell extends InteractiveShell {
 
 
     /**
-     * _more_
+     * eval
      *
-     * @param jython _more_
+     * @param jython jython
      */
     public void eval(String jython) {
         try {
-            if(jython.trim().length()==0) return;
+            if (jython.trim().length() == 0) {
+                return;
+            }
             super.eval(jython);
-            StringBuffer sb = new StringBuffer();
-            List lines = StringUtil.split(jython,"\n",false,false);
-            for(int i=0;i<lines.size();i++) {
-                String line = (String)lines.get(i);
-                if(line.trim().startsWith("?")) {
-                    while(!line.startsWith("?")) {
-                        sb.append(line.substring(0,1));
+            StringBuffer sb    = new StringBuffer();
+            List         lines = StringUtil.split(jython, "\n", false, false);
+            for (int i = 0; i < lines.size(); i++) {
+                String line = (String) lines.get(i);
+                if (line.trim().startsWith("?")) {
+                    while ( !line.startsWith("?")) {
+                        sb.append(line.substring(0, 1));
                         line = line.substring(1);
                     }
                     line = "print " + line.trim().substring(1);
                 }
-                sb.append (line);
-                sb.append ("\n");
+                sb.append(line);
+                sb.append("\n");
             }
             getInterpreter().exec(sb.toString());
         } catch (PyException pse) {
@@ -426,16 +458,20 @@ public class JythonShell extends InteractiveShell {
     }
 
 
+    /**
+     * print type
+     *
+     * @param d data
+     */
     public void printType(Data d) {
         try {
             startBufferingOutput();
             MathType t = d.getType();
-            visad.jmet.DumpType.dumpMathType(t,outputStream);
+            visad.jmet.DumpType.dumpMathType(t, outputStream);
             output("<hr>DataType analysis...");
-            visad.jmet.DumpType.dumpDataType(d,outputStream);
+            visad.jmet.DumpType.dumpDataType(d, outputStream);
         } catch (Exception exc) {
-            LogUtil.logException(
-                "An error occurred printing types", exc);
+            LogUtil.logException("An error occurred printing types", exc);
         }
         endBufferingOutput();
     }

@@ -108,6 +108,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** The default image file template */
     private static String dfltTemplate;
 
+    /** default */
     private static String dfltAltDir;
 
 
@@ -391,6 +392,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** Should use alternate dir */
     private JCheckBox alternateDirCbx;
 
+    /** overwrite */
     private JCheckBox overwriteCbx;
 
     /** Components to enable/disable */
@@ -596,9 +598,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
 
 
-        if(dfltAltDir == null) {
-            dfltAltDir = idv.getStore().get(PROP_IMAGEALTDIR,
-                    "");
+        if (dfltAltDir == null) {
+            dfltAltDir = idv.getStore().get(PROP_IMAGEALTDIR, "");
         }
         alternateDirFld = new JTextField(dfltAltDir, 30);
         JButton alternateDirBtn = new JButton("Select");
@@ -616,7 +617,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             + "java SimpleDateFormat formatting (see google)." + "</html>");
 
 
-        overwriteCbx = new JCheckBox("Overwrite", false);
+        overwriteCbx    = new JCheckBox("Overwrite", false);
         alternateDirCbx = new JCheckBox("Save Files To:", false);
         alternateDirCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -636,8 +637,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
         grabBtn          = makeButton("One Image", CMD_GRAB);
         grabAutoBtn      = makeButton("Automatically", GuiUtils.CMD_START);
-        grabAnimationBtn = makeButton("Time Animation",
-                                         CMD_GRAB_ANIMATION);
+        grabAnimationBtn = makeButton("Time Animation", CMD_GRAB_ANIMATION);
 
 
 
@@ -669,15 +669,14 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                                         new JLabel(" seconds")));
 
 
-        int maxBtnWidth = Math.max(grabAnimationBtn.getPreferredSize().width,
-                                   Math.max(grabBtn.getPreferredSize().width,
-                                            grabAutoBtn.getPreferredSize().width));
+        int maxBtnWidth =
+            Math.max(grabAnimationBtn.getPreferredSize().width,
+                     Math.max(grabBtn.getPreferredSize().width,
+                              grabAutoBtn.getPreferredSize().width));
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
         JPanel capturePanel = GuiUtils.doLayout(new Component[] {
-            grabBtn, GuiUtils.filler(), 
-            grabAnimationBtn,   animationResetCbx, 
-            grabAutoBtn, runPanel,
-            GuiUtils.filler(maxBtnWidth+10,1),
+            grabBtn, GuiUtils.filler(), grabAnimationBtn, animationResetCbx,
+            grabAutoBtn, runPanel, GuiUtils.filler(maxBtnWidth + 10, 1),
             GuiUtils.filler(),
         }, 2, GuiUtils.WT_N, GuiUtils.WT_N);
 
@@ -693,9 +692,12 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 notifiedForTransparent = true;
             }
         });
-        capturePanel = GuiUtils.hbox(GuiUtils.top(capturePanel),
-                                     GuiUtils.top(GuiUtils.inset(GuiUtils.vbox(whatPanel,
-                                                                            backgroundTransparentBtn),new Insets(0,10,0,0))));
+        capturePanel = GuiUtils.hbox(
+            GuiUtils.top(capturePanel),
+            GuiUtils.top(
+                GuiUtils.inset(
+                    GuiUtils.vbox(whatPanel, backgroundTransparentBtn),
+                    new Insets(0, 10, 0, 0))));
 
 
         capturePanel = GuiUtils.inset(GuiUtils.left(capturePanel), 5);
@@ -704,17 +706,15 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         JPanel filePanel = GuiUtils.doLayout(null, new Component[] {
             GuiUtils.rLabel("Image Quality:"),
             GuiUtils.left(GuiUtils.hbox(hiBtn, medBtn, lowBtn)),
-            GuiUtils.filler(),
-            GuiUtils.right(alternateDirCbx), 
+            GuiUtils.filler(), GuiUtils.right(alternateDirCbx),
             //            GuiUtils.filler(),
             //GuiUtils.filler(),
             //            addAltComp(GuiUtils.rLabel("Directory:")), 
-            addAltComp(alternateDirFld),
-            addAltComp(alternateDirBtn),
+            addAltComp(alternateDirFld), addAltComp(alternateDirBtn),
             addAltComp(GuiUtils.rLabel("Filename Template:")),
-            addAltComp(fileTemplateFld),
-            addAltComp(overwriteCbx)
-        }, 3, GuiUtils.WT_NYN, GuiUtils.WT_N,null,null,new Insets(0,5,0,0));
+            addAltComp(fileTemplateFld), addAltComp(overwriteCbx)
+        }, 3, GuiUtils.WT_NYN, GuiUtils.WT_N, null, null,
+           new Insets(0, 5, 0, 0));
 
         filePanel = GuiUtils.inset(filePanel, 5);
         filePanel.setBorder(BorderFactory.createTitledBorder("Image Files"));
@@ -989,10 +989,12 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
     /**
      * Turn off animation based  capture
+     *
+     * @param andWrite write movie
      */
     private void stopAnimationCapture(boolean andWrite) {
         capturingAnim = false;
-        if(andWrite) {
+        if (andWrite) {
             writeMovie();
         }
         //This implies we write the animation and then are done
@@ -1352,7 +1354,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         } else {
             if (alternateDirCbx.isSelected()) {
                 filename = alternateDirFld.getText().trim();
-                if(!Misc.equals(filename, dfltAltDir)) {
+                if ( !Misc.equals(filename, dfltAltDir)) {
                     dfltAltDir = filename;
                     idv.getStore().put(PROP_IMAGEALTDIR, dfltAltDir);
                     idv.getStore().save();
@@ -1380,8 +1382,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * Take a screen snapshot in blocking mode
      */
     private void grabImageAndBlock() {
+
         synchronized (MUTEX) {
-    //            String filename = getFilePrefix(imageCnt++);
+            //            String filename = getFilePrefix(imageCnt++);
             String filename = getFilePrefix(images.size());
             String tmp      = filename.toLowerCase();
             if ( !(tmp.endsWith(".gif") || tmp.endsWith(".png")
@@ -1390,18 +1393,18 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             }
 
             String path = IOUtil.joinDir(getFileDirectory(), filename);
-            if(isInteractive() && 
-               !overwriteCbx.isSelected() &&
-                alternateDirCbx.isSelected() && 
-               new File(path).exists()) {
+            if (isInteractive() && !overwriteCbx.isSelected()
+                    && alternateDirCbx.isSelected()
+                    && new File(path).exists()) {
                 if (JOptionPane
-                    .showConfirmDialog(null, "File:" + path
-                                + " exists. Do you want to overwrite?", "File exists", JOptionPane
-                                    .YES_NO_OPTION) == 1) {
-                        stopCapturingAuto();
-                        stopAnimationCapture(false);
-                        return;
-                    }
+                        .showConfirmDialog(
+                            null, "File:" + path
+                            + " exists. Do you want to overwrite?", "File exists", JOptionPane
+                                .YES_NO_OPTION) == 1) {
+                    stopCapturingAuto();
+                    stopAnimationCapture(false);
+                    return;
+                }
                 overwriteCbx.setSelected(true);
             }
             //            System.err.println ("ImageSequenceGrabber file dir: " +getFileDirectory() +" path: " +  path);
@@ -1484,6 +1487,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             }
             imagesChanged();
         }
+
     }
 
 

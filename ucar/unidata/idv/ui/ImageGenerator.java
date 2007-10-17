@@ -641,10 +641,12 @@ public class ImageGenerator extends IdvManager {
             InputStream is = null;
             try {
                 is = IOUtil.getInputStream(islFile, getClass());
-            } catch (FileNotFoundException fnfe) {
-            } catch(IOException ioe) {}
-            if(is == null) {
-                return error("Given script file does not exist or could not be read: " + islFile);
+            } catch (FileNotFoundException fnfe) {}
+            catch (IOException ioe) {}
+            if (is == null) {
+                return error(
+                    "Given script file does not exist or could not be read: "
+                    + islFile);
             }
             root = XmlUtil.getRoot(is);
         } catch (Exception exc) {
@@ -1379,7 +1381,7 @@ public class ImageGenerator extends IdvManager {
     protected boolean processTagFileset(Element node) throws Throwable {
         List files = findFiles(Misc.newList(node));
         pushProperties();
-        for(int i=0;i<files.size();i++) {
+        for (int i = 0; i < files.size(); i++) {
             try {
                 putProperty("file", files.get(i).toString());
                 if ( !processChildren(node)) {
@@ -1983,31 +1985,33 @@ public class ImageGenerator extends IdvManager {
      */
     protected boolean processTagGroup(Element node) throws Throwable {
         pushProperties();
-        int  loopTimes = applyMacros(node, ATTR_LOOP, 1);
-        String sleepString = applyMacros(node, ATTR_SLEEP, (String)null);
-        long sleepTime = 0;
-        if(sleepString!=null) {
+        int    loopTimes   = applyMacros(node, ATTR_LOOP, 1);
+        String sleepString = applyMacros(node, ATTR_SLEEP, (String) null);
+        long   sleepTime   = 0;
+        if (sleepString != null) {
             sleepString = sleepString.trim();
-            long multiplier = 1000;
+            long   multiplier = 1000;
             String unit = StringUtil.findPattern(sleepString, "[0-9.]+(.*)$");
 
-            if(unit!=null && unit.trim().length()>0) {
-                sleepString = sleepString.substring(0,sleepString.length()-unit.length());
-                if(unit.equals("s")) {
-                } else if(unit.equals("seconds")) {
-                } else if(unit.equals("minutes")) {
-                    multiplier = 60*1000;
-                } else if(unit.equals("m")) {
-                    multiplier = 60*1000;
-                } else if(unit.equals("hours")) {
-                    multiplier = 60*60*1000;
-                } else if(unit.equals("h")) {
-                    multiplier = 60*60*1000;
+            if ((unit != null) && (unit.trim().length() > 0)) {
+                sleepString = sleepString.substring(0,
+                        sleepString.length() - unit.length());
+                if (unit.equals("s")) {}
+                else if (unit.equals("seconds")) {}
+                else if (unit.equals("minutes")) {
+                    multiplier = 60 * 1000;
+                } else if (unit.equals("m")) {
+                    multiplier = 60 * 1000;
+                } else if (unit.equals("hours")) {
+                    multiplier = 60 * 60 * 1000;
+                } else if (unit.equals("h")) {
+                    multiplier = 60 * 60 * 1000;
                 } else {
-                    return error("Unknown sleep time unit:" +unit);
+                    return error("Unknown sleep time unit:" + unit);
                 }
             }
-            sleepTime = (long)(multiplier*new Double(sleepString).doubleValue());
+            sleepTime = (long) (multiplier
+                                * new Double(sleepString).doubleValue());
         }
         for (int i = 0; i < loopTimes; i++) {
             currentLoopIndex = i;
@@ -2408,7 +2412,7 @@ public class ImageGenerator extends IdvManager {
                     files.add(new File(filename));
                     continue;
                 }
-                File dir = new File(applyMacros(node, ATTR_DIR,"."));
+                File dir = new File(applyMacros(node, ATTR_DIR, "."));
                 String pattern = applyMacros(applyMacros(node, ATTR_PATTERN,
                                      (String) null));
                 File[] allFiles = ((pattern == null)

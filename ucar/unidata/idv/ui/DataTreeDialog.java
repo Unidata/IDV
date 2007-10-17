@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.ui;
 
 
@@ -107,7 +106,7 @@ public class DataTreeDialog extends JDialog implements ActionListener {
     /** Liast of dataseleciotnwidgets, one per datatree */
     List dataSelectionWidgets = new ArrayList();
 
-    /** _more_          */
+    /** The JLists that hold the list of selected choices */
     List multiLists = new ArrayList();
 
     //    Vector multiChoices  =new Vector();
@@ -122,7 +121,7 @@ public class DataTreeDialog extends JDialog implements ActionListener {
     List categories;
 
 
-    /** _more_          */
+    /** The operands_ */
     List operands = new ArrayList();
 
 
@@ -216,7 +215,7 @@ public class DataTreeDialog extends JDialog implements ActionListener {
      * sets state in the DataSelectionWidget
      *
      * @param index Which data tree was clicked
-     * @param doubleClick _more_
+     * @param doubleClick user double clicked
      */
     private void treeClick(int index, boolean doubleClick) {
         DataTree    tree       = (DataTree) dataTrees.get(index);
@@ -232,9 +231,9 @@ public class DataTreeDialog extends JDialog implements ActionListener {
 
 
     /**
-     * _more_
+     * Delete the selected items in the given mutli list
      *
-     * @param index _more_
+     * @param index index of list
      */
     private void deleteMultiple(int index) {
         JList  list    = (JList) multiLists.get(index);
@@ -248,9 +247,9 @@ public class DataTreeDialog extends JDialog implements ActionListener {
     }
 
     /**
-     * _more_
+     * Add into the index'th list
      *
-     * @param index _more_
+     * @param index Which list
      */
     public void addMultiple(Integer index) {
         DataTree   tree       = (DataTree) dataTrees.get(index.intValue());
