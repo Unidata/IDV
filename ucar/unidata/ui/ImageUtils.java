@@ -483,32 +483,61 @@ public class ImageUtils {
      * @return  merged image
      */
     public static Image mergeImages(List images, int space, Color bg) {
+        return gridImages(images, space, bg, 1);
+    }
+
+    /**
+     * Merge images
+     *
+     * @param images list of images
+     * @param space space between images
+     * @param bg background color
+     *
+     * @return  merged image
+     */
+    public static Image gridImages(List images, int space, Color bg, int columns) {
         if (images.size() == 1) {
             return (Image) images.get(0);
         }
-        int height = 0;
-        int width  = 0;
+        
+        int maxHeight = 0;
+        int maxWidth  = 0;
+        int rows = (int)(images.size()/(double)columns+1);
+        if(rows == 0) rows = 1;
         for (int i = 0; i < images.size(); i++) {
             Image image = (Image) images.get(i);
-            height += image.getHeight(null);
-            if (i > 0) {
-                height += space;
-            }
-            width = Math.max(width, image.getWidth(null));
+            int imageWidth = image.getWidth(null);
+            int imageHeight = image.getHeight(null);
+            maxHeight = Math.max(maxHeight, imageHeight);
+            maxWidth = Math.max(maxWidth, imageWidth);
         }
 
-        BufferedImage bImage = new BufferedImage(width, height,
+        if(columns>images.size()) {
+            columns = images.size();
+        }
+        
+        BufferedImage bImage = new BufferedImage(maxWidth*columns + (columns-1)*space, 
+                                                 maxHeight*rows + (rows-1)*space,
                                    BufferedImage.TYPE_INT_RGB);
+
         Graphics g = bImage.getGraphics();
+
         if (bg != null) {
             g.setColor(bg);
-            g.fillRect(0, 0, width, height);
+            g.fillRect(0, 0, bImage.getWidth(null), bImage.getHeight(null));
         }
-        height = 0;
+
+
+        int colCnt = 0;
+        int rowCnt = 0;
         for (int i = 0; i < images.size(); i++) {
             Image image = (Image) images.get(i);
-            g.drawImage(image, 0, height, null);
-            height += space + image.getHeight(null);
+            g.drawImage(image, colCnt*(maxWidth+space), rowCnt*(maxHeight+space), null);
+            colCnt++;
+            if(colCnt>=columns) {
+                colCnt=0;
+                rowCnt++;
+            }
         }
         return bImage;
     }
