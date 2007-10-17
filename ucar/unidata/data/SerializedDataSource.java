@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data;
 
 
@@ -61,7 +59,8 @@ import java.util.zip.*;
 
 
 /**
- * DataSource for Shapefiles.
+ * This data source knows how to read in a zip file that contains an index xml file and a set of
+ * serialized visad.Data objects
  *
  * @author IDV development team
  * @version $Revision: 1.2 $ $Date: 2007/08/19 15:54:51 $
@@ -69,22 +68,22 @@ import java.util.zip.*;
 public class SerializedDataSource extends FilesDataSource {
 
 
-    /** _more_          */
+    /** xml thing */
     public static final String TAG_SERIALIZEDDATA = "serializeddata";
 
-    /** _more_          */
+    /** xml thing */
     public static final String TAG_DATA = "data";
 
-    /** _more_          */
+    /** xml thing */
     public static final String ATTR_NAME = "name";
 
-    /** _more_          */
+    /** xml thing */
     public static final String ATTR_FILE = "file";
 
-    /** _more_          */
+    /** xml thing */
     public static final String ATTR_ICON = "icon";
 
-    /** _more_          */
+    /** xml thing */
     public static final String ATTR_CATEGORIES = "categories";
 
     /**
@@ -123,6 +122,9 @@ public class SerializedDataSource extends FilesDataSource {
         loadFile();
     }
 
+    /**
+     * Load in the zip file
+     */
     private void loadFile() {
         try {
             BufferedInputStream bin =
@@ -182,7 +184,7 @@ public class SerializedDataSource extends FilesDataSource {
      * Create the data choices associated with this source.
      */
     protected void doMakeDataChoices() {
-        if(dataChoices.size() == 0) {
+        if (dataChoices.size() == 0) {
             loadFile();
         }
         for (int i = 0; i < dataChoices.size(); i++) {

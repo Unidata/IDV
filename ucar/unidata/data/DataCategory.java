@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data;
 
 
@@ -287,8 +286,13 @@ public class DataCategory {
         this("");
     }
 
+    /**
+     * ctor
+     *
+     * @param forDisplay Is this category a display category
+     */
     public DataCategory(boolean forDisplay) {
-        this("",forDisplay);
+        this("", forDisplay);
     }
 
     /**
@@ -422,10 +426,10 @@ public class DataCategory {
     }
 
 
-    /** Keeps track of all of the data categories         */
+    /** Keeps track of all of the data categories */
     private static List currentCategories = new ArrayList();
 
-    /** Keeps track of all of the data categories         */
+    /** Keeps track of all of the data categories */
     private static Hashtable currentCategoriesMap = new Hashtable();
 
 
@@ -993,6 +997,8 @@ public class DataCategory {
      * Append the string to the data category and return a new category.
      *
      * @param append category string to append  (may be null)
+     *
+     * @return The new data category
      */
     public DataCategory copyAndAppend(String append) {
         String newName = this.toString();

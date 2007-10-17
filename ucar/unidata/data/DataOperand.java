@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data;
 
 
@@ -47,12 +46,15 @@ import java.util.List;
 public class DataOperand {
 
     /** the categories property */
-   private static final String PROP_CATEGORIES = "categories";
+    private static final String PROP_CATEGORIES = "categories";
 
+    /** Can this be multiple data choices */
     private static final String PROP_MULTIPLE = "multiple";
 
+    /** pattern property in operand attributes */
     private static final String PROP_PATTERN = "pattern";
 
+    /** description property in operand attributes */
     private static final String PROP_DESCRIPTION = "description";
 
 
@@ -75,6 +77,7 @@ public class DataOperand {
     /** name of this operand */
     private String name;
 
+    /** Data categories */
     private List categories;
 
 
@@ -117,36 +120,68 @@ public class DataOperand {
     }
 
 
-    public DataOperand(String name, String description, List categories,boolean multiple) {
+    /**
+     * ctor
+     *
+     * @param name name
+     * @param description  description
+     * @param categories  categories
+     * @param multiple supports multiples
+     */
+    public DataOperand(String name, String description, List categories,
+                       boolean multiple) {
         this.name = name;
         putCategories(categories);
-        if(description!=null)
+        if (description != null) {
             putDescription(description);
+        }
         putMultiple(multiple);
     }
-        
 
 
 
+
+    /**
+     * Put the description in the properties
+     *
+     * @param desc description
+     */
     public void putDescription(String desc) {
-        properties.put(PROP_DESCRIPTION,desc);
+        properties.put(PROP_DESCRIPTION, desc);
     }
 
 
+    /**
+     * Get the description from the properties
+     *
+     * @return description
+     */
     public String getDescription() {
-        String desc = (String)properties.get(PROP_DESCRIPTION);
-        if(desc == null) return getParamName();
+        String desc = (String) properties.get(PROP_DESCRIPTION);
+        if (desc == null) {
+            return getParamName();
+        }
         return desc;
     }
 
 
-    public void putPattern(String desc) {
-        properties.put(PROP_PATTERN,desc);
+    /**
+     * Put the pattern into the properties
+     *
+     * @param pattern the pattern
+     */
+    public void putPattern(String pattern) {
+        properties.put(PROP_PATTERN, pattern);
     }
 
 
+    /**
+     * Get the pattern from the properties
+     *
+     * @return the pattern
+     */
     public String getPattern() {
-        return  (String)properties.get(PROP_PATTERN);
+        return (String) properties.get(PROP_PATTERN);
     }
 
 
@@ -185,6 +220,11 @@ public class DataOperand {
 
 
 
+    /**
+     * Set the categories
+     *
+     * @param categories catgegories
+     */
     public void putCategories(List categories) {
         this.categories = categories;
     }
@@ -196,8 +236,9 @@ public class DataOperand {
      * @return List of data categories or null if none defined
      */
     public List getCategories() {
-        if(categories != null)
+        if (categories != null) {
             return categories;
+        }
         String catString = (String) properties.get(PROP_CATEGORIES);
         if (catString == null) {
             return null;
@@ -251,18 +292,35 @@ public class DataOperand {
         return (data != null);
     }
 
+    /**
+     * Put the multiple property
+     *
+     * @param b multiple
+     */
     public void putMultiple(boolean b) {
-        properties.put(PROP_MULTIPLE, ""+b);
+        properties.put(PROP_MULTIPLE, "" + b);
     }
 
+    /**
+     * Get the multiple property
+     *
+     * @return multiple
+     */
     public boolean getMultiple() {
         String isMultiple = (String) properties.get(PROP_MULTIPLE);
-        if(isMultiple == null) return false;
+        if (isMultiple == null) {
+            return false;
+        }
         return isMultiple.trim().equals("true");
     }
 
+    /**
+     * Is this operand persistent
+     *
+     * @return is persistent
+     */
     public boolean isPersistent() {
-        if(Misc.equals(getProperty("persistent"),"false")) {
+        if (Misc.equals(getProperty("persistent"), "false")) {
             return false;
         }
         return true;

@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data;
 
 
@@ -259,17 +257,28 @@ public class DerivedDataDescriptor {
     public DerivedDataDescriptor() {}
 
 
-    public DerivedDataDescriptor(DataContext dataContext,
-                                 String id, String desc, String formula,
+    /**
+     * ctor
+     *
+     * @param dataContext   context for this descriptor
+     * @param id The id
+     * @param desc description
+     * @param formula formula
+     * @param categories List of data categories
+     */
+    public DerivedDataDescriptor(DataContext dataContext, String id,
+                                 String desc, String formula,
                                  List categories) {
         this.dataContext = dataContext;
         myNeeds          = new ArrayList();
-        this.categories  = (categories!=null?new ArrayList(categories):new ArrayList());
-        this.id = id;
+        this.categories  = ((categories != null)
+                            ? new ArrayList(categories)
+                            : new ArrayList());
+        this.id          = id;
         this.description = desc;
-        this.label = desc;
-        this.formula = formula;
-        isEndUser = true;
+        this.label       = desc;
+        this.formula     = formula;
+        isEndUser        = true;
     }
 
 
@@ -395,10 +404,10 @@ public class DerivedDataDescriptor {
      * @param other  other instance to copy.
      */
     public DerivedDataDescriptor(DerivedDataDescriptor other) {
-        this.isEndUser   = other.isEndUser;
+        this.isEndUser    = other.isEndUser;
         this.isLocalUsers = other.isLocalUsers;
-        this.isDefault   = other.isDefault;
-        this.dataContext = other.dataContext;
+        this.isDefault    = other.isDefault;
+        this.dataContext  = other.dataContext;
         if (other.myNeeds != null) {
             this.myNeeds = new ArrayList(other.myNeeds);
         }
@@ -502,9 +511,9 @@ public class DerivedDataDescriptor {
 
 
     /**
-     * _more_
+     * Set the needs list
      *
-     * @param needs _more_
+     * @param needs The needs
      */
     public void setNeeds(List needs) {
         myNeeds = needs;
@@ -945,7 +954,7 @@ public class DerivedDataDescriptor {
      *
      * @param dataContext    data context
      * @param root           root element
-     * @param isLocal _more_
+     * @param isLocal Is this one of the users local formulas
      * @return  list of DerivedDataDescriptors
      */
     public static List readDescriptors(DataContext dataContext, Element root,
@@ -973,9 +982,9 @@ public class DerivedDataDescriptor {
         } else {
             List children = XmlUtil.findChildren(root, TAG_DERIVED);
             for (int i = 0; i < children.size(); i++) {
-                DerivedDataDescriptor ddd = 
+                DerivedDataDescriptor ddd =
                     new DerivedDataDescriptor(dataContext,
-                                              (Element) children.get(i));
+                        (Element) children.get(i));
                 ddd.setIsLocalUsers(isLocal);
                 descriptors.add(ddd);
             }
@@ -1041,7 +1050,7 @@ public class DerivedDataDescriptor {
      * @param dataContext   the data context
      * @param xrc           the resource collection of DDDs
      *
-     * @return _more_
+     * @return List of DerivedDataDescriptors
      */
     public static List init(DataContext dataContext,
                             XmlResourceCollection xrc) {
@@ -1095,7 +1104,7 @@ public class DerivedDataDescriptor {
      *
      * @param context        context (the IDV)
      * @param sourceChoices  choices to search
-     * @param descriptors _more_
+     * @param descriptors The descriptors
      * @return  list of DDCs in sourceChoices
      */
     public static List getDerivedDataChoices(DataContext context,
@@ -1116,7 +1125,7 @@ public class DerivedDataDescriptor {
      *
      * @param context           the context (the IDV)
      * @param sourceChoices     list of choices
-     * @param descriptors _more_
+     * @param descriptors The descriptors
      * @return
      */
     private static List getDerivedDataChoicesInner(DataContext context,

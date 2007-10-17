@@ -20,12 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
-
 package ucar.unidata.data;
 
 
@@ -233,19 +227,19 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     private static int outstandingGetDataCalls = 0;
 
 
-    /** _more_ */
+    /** properties widget */
     private JCheckBox cacheDataToDiskCbx;
 
-    /** _more_ */
+    /** properties widget */
     private JTextField cacheClearDelayFld;
 
-    /** _more_ */
+    /** do we cache data to disk */
     private boolean cacheDataToDisk = false;
 
-    /** _more_ */
+    /** How long do we wait until we clear the cache */
     private long cacheClearDelay = 0;
 
-    /** _more_ */
+    /** Where we cache data */
     private String dataCachePath;
 
 
@@ -279,11 +273,11 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      */
     public DataSourceImpl(DataSourceDescriptor descriptor, String name,
                           String description, Hashtable properties) {
-        this.properties  = properties;
-        if(this.properties == null) {
+        this.properties = properties;
+        if (this.properties == null) {
             this.properties = new Hashtable();
         }
-        if(descriptor!=null && descriptor.getProperties()!=null) {
+        if ((descriptor != null) && (descriptor.getProperties() != null)) {
             this.properties.putAll(descriptor.getProperties());
         }
         this.descriptor  = descriptor;
@@ -969,7 +963,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
-     * _more_
+     * Clear the cache
      */
     protected void clearFileCache() {
         if (dataCachePath != null) {
@@ -1118,7 +1112,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * Automatically create the given display on initialization. This used to be in the IDV
      * but we moved it here to allow different data sources to do different things.
      *
-     * @param displayType The display control type id. 
+     * @param displayType The display control type id.
      * @param dataContext Really, the IDV
      */
     public void createAutoDisplay(String displayType,
@@ -1313,7 +1307,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
-     * _more_
+     * some method to initialize
      */
     protected void checkForInitAfterUnPersistence() {
         //Check if we were saved off after we have been removed
@@ -1376,7 +1370,16 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
-    public List getAllLevels(DataChoice dataChoice, DataSelection dataSelection) {
+    /**
+     * Get all of the levels
+     *
+     * @param dataChoice The data choice to get levels for
+     * @param dataSelection data selection
+     *
+     * @return list of levels.
+     */
+    public List getAllLevels(DataChoice dataChoice,
+                             DataSelection dataSelection) {
         return null;
     }
 
@@ -3033,9 +3036,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
     /**
-     * _more_
+     * Where do we write cached data to
      *
-     * @return _more_
+     * @return cache path
      */
     public String getDataCachePath() {
         if (getDataContext() == null) {

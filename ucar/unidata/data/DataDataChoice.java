@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.data;
 
 
@@ -48,6 +45,7 @@ import java.util.Vector;
 
 /**
  * A data choice that simply holds a reference to a visad.Data object
+ *
  * @author IDV development team
  * @version $Revision: 1.86 $
  */
@@ -80,7 +78,7 @@ public class DataDataChoice extends DataChoice {
      *  Create a new DataChoice.
      *
      *  @param name The short name of this choice.
-     * @param data _more_
+     * @param data The data
      */
     public DataDataChoice(String name, Data data) {
         super(name, name, null, null);
@@ -90,9 +88,9 @@ public class DataDataChoice extends DataChoice {
 
 
     /**
-     * _more_
+     * Clone me
      *
-     * @return _more_
+     * @return my clone
      */
     public DataChoice cloneMe() {
         return new DataDataChoice(this);
@@ -123,9 +121,9 @@ public class DataDataChoice extends DataChoice {
     }
 
     /**
-     * _more_
+     * add listener. This is a noop
      *
-     * @param listener _more_
+     * @param listener listener
      */
     public void addDataChangeListener(DataChangeListener listener) {}
 

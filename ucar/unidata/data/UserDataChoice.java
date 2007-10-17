@@ -47,6 +47,7 @@ import java.util.Vector;
  */
 public class UserDataChoice extends DataChoice {
 
+    /** A hack used by the DerivedDataChoice for when we don't save the user entered choices in a bundle */
     public boolean persistent = true;
 
     /** logging category */

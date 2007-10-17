@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data;
 
 
@@ -36,8 +35,6 @@ import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.idv.PluginManager;
 
-import ucar.visad.data.CachedFlatField;
-
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
@@ -52,6 +49,8 @@ import ucar.unidata.util.WrapperException;
 import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
+
+import ucar.visad.data.CachedFlatField;
 
 
 import visad.*;
@@ -268,6 +267,11 @@ public class DataManager {
 
     }
 
+    /**
+     * Get the data cache dir
+     *
+     * @return data cache dir
+     */
     public String getDataCacheDirectory() {
         String dataCacheDir =
             IOUtil.joinDir(
@@ -1220,10 +1224,11 @@ public class DataManager {
                                     dataSource);
                             dataSourceToDefiningObject.put(dataSource,
                                     lookupKey);
-                        } else if(haveDataSource(dataSource)) {
+                        } else if (haveDataSource(dataSource)) {
                             int idx = dataSources.indexOf(dataSource);
-                            if(idx>=0) {
-                                ((DataSource)dataSources.get(idx)).reloadData();
+                            if (idx >= 0) {
+                                ((DataSource) dataSources.get(
+                                    idx)).reloadData();
                             }
                         }
                     }

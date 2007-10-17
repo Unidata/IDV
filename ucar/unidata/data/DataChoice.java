@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data;
 
 
@@ -55,10 +54,10 @@ import java.util.Vector;
  */
 public abstract class DataChoice {
 
-    /** _more_          */
+    /** Holds all of the data choice names. We use this so different guis can show these names */
     private static Hashtable currentNamesMap = new Hashtable();
 
-    /** _more_          */
+    /** Holds all of the data choice names. We use this so different guis can show these names */
     private static List currentNames = new ArrayList();
 
 
@@ -241,9 +240,9 @@ public abstract class DataChoice {
     }
 
     /**
-     * _more_
+     * Get the list of all data choice names there ever was during the run
      *
-     * @return _more_
+     * @return data choice names
      */
     public static List getCurrentNames() {
         return new ArrayList(currentNames);
@@ -350,6 +349,8 @@ public abstract class DataChoice {
     /**
      * Get all the levels associated with this choice
      *
+     *
+     * @param dataSelection data selection
      * @return  List of levels
      */
     public List getAllLevels(DataSelection dataSelection) {
@@ -506,7 +507,7 @@ public abstract class DataChoice {
      * that we had the getDataCategories and getCategories methods. These would
      * get used in wrting to a bundle and we'd end up clobbering any display categorie.
      *
-     * @deprecated 
+     * @deprecated
      * @return data categories
      */
     public List getDataCategories() {
@@ -522,7 +523,9 @@ public abstract class DataChoice {
      * @return data categories
      */
     public List getDataCategories(boolean excludeDisplayCategories) {
-        if(!excludeDisplayCategories) return categories;
+        if ( !excludeDisplayCategories) {
+            return categories;
+        }
         if (categories == null) {
             return null;
         }
@@ -547,8 +550,7 @@ public abstract class DataChoice {
      * @deprecated  Does nothing  now.
      * @param categories        The list of data categories.
      */
-    public void setDataCategories(List categories) {
-    }
+    public void setDataCategories(List categories) {}
 
 
     /**

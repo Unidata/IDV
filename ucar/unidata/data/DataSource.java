@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data;
 
 
@@ -245,7 +243,16 @@ public interface DataSource {
     public List getAllLevels(DataChoice dataChoice);
 
 
-    public List getAllLevels(DataChoice dataChoice, DataSelection dataSelection);
+    /**
+     * Get all levels for the data choice and selection
+     *
+     * @param dataChoice data choice
+     * @param dataSelection selection
+     *
+     * @return List of levels
+     */
+    public List getAllLevels(DataChoice dataChoice,
+                             DataSelection dataSelection);
 
     /**
      * Get the list of all times available from this DataSource

@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data;
 
 
@@ -297,36 +296,38 @@ public class DataUtil {
         return values;
     }
 
-    public static FlatField getFlatField(Data field) 
-            throws VisADException, RemoteException  {
-        return getFlatField(field, "");
-    }
-
-    public static FlatField getFlatField(Data field, String tab) 
-            throws VisADException, RemoteException  {
-
-        if(field == null) return null;
-        //        System.err.println (tab +"getFlatField:" + field.getType());
-        if(field instanceof FlatField) {
-            //            System.err.println (tab +"got flat field");
+    /**
+     * This method find the flat field somewhere in the given data
+     *
+     * @param field field
+     *
+     * @return a flat field or null
+     *
+     * @throws RemoteException on badness
+     * @throws VisADException on badness
+     */
+    public static FlatField getFlatField(Data field)
+            throws VisADException, RemoteException {
+        if (field == null) {
+            return null;
+        }
+        if (field instanceof FlatField) {
             return (FlatField) field;
         }
-        if(field instanceof Tuple) {
+        if (field instanceof Tuple) {
             Tuple t = (Tuple) field;
-            for(int i=0;i<t.getLength();i++) {
-                FlatField f = getFlatField(t.getComponent(i), tab+"  ");
-                if(f!=null) {
-                    //                    System.err.println (tab +"returning " + i+"th tuple component");
+            for (int i = 0; i < t.getLength(); i++) {
+                FlatField f = getFlatField(t.getComponent(i));
+                if (f != null) {
                     return f;
                 }
             }
         }
 
-        if(!(field instanceof FieldImpl)) {
-            //            System.err.println (tab +"field is a :" + field.getClass().getName());
+        if ( !(field instanceof FieldImpl)) {
             return null;
         }
-        return getFlatField(((FieldImpl)field).getSample(0,false), tab+"  ");
+        return getFlatField(((FieldImpl) field).getSample(0, false));
     }
 
 

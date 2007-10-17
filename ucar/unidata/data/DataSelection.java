@@ -78,11 +78,25 @@ public class DataSelection {
     }
 
 
+    /**
+     * ctor
+     *
+     * @param zStride z stride
+     */
     public DataSelection(int zStride) {
-        this.geoSelection = new GeoSelection(null, GeoSelection.STRIDE_BASE, GeoSelection.STRIDE_BASE, zStride);
+        this.geoSelection = new GeoSelection(null, GeoSelection.STRIDE_BASE,
+                                             GeoSelection.STRIDE_BASE,
+                                             zStride);
     }
 
 
+    /**
+     * ctor
+     *
+     * @param xStride stride
+     * @param yStride stride
+     * @param zStride stride
+     */
     public DataSelection(int xStride, int yStride, int zStride) {
         this.geoSelection = new GeoSelection(null, xStride, yStride, zStride);
     }

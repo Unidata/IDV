@@ -23,6 +23,9 @@
 package ucar.unidata.data;
 
 
+import ucar.unidata.util.TwoFacedObject;
+
+
 import ucar.unidata.xml.XmlEncoder;
 
 
@@ -39,7 +42,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import ucar.unidata.util.TwoFacedObject;
 
 /**
  * A subclass of DataChoice for supporting a leaf choice.  This choice
@@ -137,9 +139,12 @@ public class DirectDataChoice extends DataChoice {
         super(id, name, description, categories, properties);
         //        addCurrentName(name);
 
-  
 
-        addCurrentName(new TwoFacedObject(DataSourceImpl.getNameForDataSource(dataSource,  30,true)+">"+name,name));
+
+        addCurrentName(
+            new TwoFacedObject(
+                DataSourceImpl.getNameForDataSource(dataSource, 30, true)
+                + ">" + name, name));
         this.myDataSelection = dataSelection;
         this.dataSource      = dataSource;
     }
@@ -200,11 +205,14 @@ public class DirectDataChoice extends DataChoice {
     /**
      * Get all the levels associated with this choice
      *
+     *
+     * @param dataSelection data selection
      * @return  List of levels
      */
     public List getAllLevels(DataSelection dataSelection) {
-        return dataSource.getAllLevels(this, DataSelection.merge(dataSelection,
-                                                                 myDataSelection));
+        return dataSource.getAllLevels(this,
+                                       DataSelection.merge(dataSelection,
+                                           myDataSelection));
     }
 
 

@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data;
 
 
@@ -130,10 +129,10 @@ public class DerivedDataChoice extends ListDataChoice {
      */
     public DerivedDataChoice(DerivedDataChoice that) {
         super(that);
-        this.dataContext     = that.dataContext;
-        this.methodName      = that.methodName;
-        this.code            = that.code;
-        this.formula         = that.formula;
+        this.dataContext = that.dataContext;
+        this.methodName  = that.methodName;
+        this.code        = that.code;
+        this.formula     = that.formula;
         if (that.userSelectedChoices != null) {
             userSelectedChoices =
                 (Hashtable) that.userSelectedChoices.clone();
@@ -190,12 +189,12 @@ public class DerivedDataChoice extends ListDataChoice {
     public DerivedDataChoice(DataContext dataContext,
                              DerivedDataDescriptor ddd) {
         super(ddd.id, ddd.getId(), ddd.getDescription(), ddd.categories);
-        descriptor           = ddd;
-        this.dataContext     = dataContext;
-        this.properties      = ddd.properties;
-        this.methodName      = ddd.method;
-        this.code            = ddd.code;
-        this.formula         = ddd.formula;
+        descriptor       = ddd;
+        this.dataContext = dataContext;
+        this.properties  = ddd.properties;
+        this.methodName  = ddd.method;
+        this.code        = ddd.code;
+        this.formula     = ddd.formula;
     }
 
     /**
@@ -259,9 +258,8 @@ public class DerivedDataChoice extends ListDataChoice {
         if (formula != null) {
             extra = extra + "<br>Formula: <i>" + formula + "</i><br>";
         }
-        StringBuffer sb = new StringBuffer("Derived quantity: " +
-                                           extra+
-                                           super.getFullDescription());
+        StringBuffer sb = new StringBuffer("Derived quantity: " + extra
+                                           + super.getFullDescription());
         return sb.toString();
     }
 
@@ -397,7 +395,8 @@ public class DerivedDataChoice extends ListDataChoice {
             for (int i = 0; i < unboundUserOperands.size(); i++) {
                 DataOperand operand =
                     (DataOperand) unboundUserOperands.get(i);
-                UserOperandValue userOperandValue = (UserOperandValue) userValues.get(i);
+                UserOperandValue userOperandValue =
+                    (UserOperandValue) userValues.get(i);
                 Object value = userOperandValue.getValue();
                 operand.setData(value);
                 UserDataChoice udc =
@@ -436,7 +435,7 @@ public class DerivedDataChoice extends ListDataChoice {
                 UserDataChoice userChoice = (UserDataChoice) dc;
                 addOperand(alias, userChoice.getValue(), operands,
                            operandsSoFar);
-                if(!userChoice.persistent) {
+                if ( !userChoice.persistent) {
                     userChoice.setValue(null);
                 }
             } else {
@@ -484,13 +483,13 @@ public class DerivedDataChoice extends ListDataChoice {
                     //Got it from before
                     //                    System.err.println("getData-1:" + boundChoice + " " + op);
                     Object data;
-                    if(boundChoice.getClass().equals(ListDataChoice.class)) {
+                    if (boundChoice.getClass().equals(ListDataChoice.class)) {
                         ListDataChoice ldc = (ListDataChoice) boundChoice;
                         data = ldc.getDataList(DataCategory.NULL,
-                                               dataSelection, requestProperties);
+                                dataSelection, requestProperties);
                     } else {
                         data = boundChoice.getData(DataCategory.NULL,
-                                      dataSelection, requestProperties);
+                                dataSelection, requestProperties);
                     }
                     dataChoiceToData.put(boundChoice, data);
                     op.setData(data);
@@ -519,13 +518,13 @@ public class DerivedDataChoice extends ListDataChoice {
                 userSelectedChoices.put(op.getParamName(), selectedChoice);
                 //Do an .equals instead of an instanceof because DerivedDataChoice 
                 //derived from ListDataChoice
-                if(selectedChoice.getClass().equals(ListDataChoice.class)) {
+                if (selectedChoice.getClass().equals(ListDataChoice.class)) {
                     ListDataChoice ldc = (ListDataChoice) selectedChoice;
                     op.setData(ldc.getDataList(DataCategory.NULL,
-                                               dataSelection, requestProperties));
+                            dataSelection, requestProperties));
                 } else {
                     op.setData(selectedChoice.getData(DataCategory.NULL,
-                                                      dataSelection, requestProperties));
+                            dataSelection, requestProperties));
                 }
             }
         }
@@ -832,7 +831,7 @@ public class DerivedDataChoice extends ListDataChoice {
         return Misc.equals(methodName, that.methodName)
                && Misc.equals(formula, that.formula)
                && Misc.equals(code, that.code)
-            && Misc.equals(userSelectedChoices, that.userSelectedChoices);
+               && Misc.equals(userSelectedChoices, that.userSelectedChoices);
     }
 
 

@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data;
 
 
@@ -213,9 +212,9 @@ public class GeoSelectionPanel extends JPanel {
 
 
     /**
-     * _more_
+     * Initialize this object with the given object
      *
-     * @param p _more_
+     * @param p object to init with
      */
     public void initWith(GeoSelectionPanel p) {
         if ((xStrideBox != null) && (p.xStrideBox != null)) {

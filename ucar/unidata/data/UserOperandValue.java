@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data;
 
 
@@ -35,50 +34,58 @@ package ucar.unidata.data;
  */
 public class UserOperandValue {
 
+    /** The value */
     private Object value;
 
+    /** Is this persistent, i.e., is it saved in a bundle */
     private boolean persistent = true;
 
 
+    /**
+     * ctor
+     *
+     * @param value the value
+     * @param persistent is it persistent
+     */
     public UserOperandValue(Object value, boolean persistent) {
-        this.value = value;
+        this.value      = value;
         this.persistent = persistent;
     }
 
     /**
-       Set the Value property.
-
-       @param value The new value for Value
-    **/
-    public void setValue (Object value) {
-	value = value;
+     *  Set the Value property.
+     *
+     *  @param value The new value for Value
+     */
+    public void setValue(Object value) {
+        value = value;
     }
 
     /**
-       Get the Value property.
-
-       @return The Value
-    **/
-    public Object getValue () {
-	return value;
+     *  Get the Value property.
+     *
+     *  @return The Value
+     */
+    public Object getValue() {
+        return value;
     }
 
     /**
-       Set the Persistent property.
-
-       @param value The new value for Persistent
-    **/
-    public void setPersistent (boolean value) {
-	persistent = value;
+     *  Set the Persistent property.
+     *
+     *  @param value The new value for Persistent
+     */
+    public void setPersistent(boolean value) {
+        persistent = value;
     }
 
     /**
-       Get the Persistent property.
-
-       @return The Persistent
-    **/
-    public boolean getPersistent () {
-	return persistent;
+     *  Get the Persistent property.
+     *
+     *  @return The Persistent
+     */
+    public boolean getPersistent() {
+        return persistent;
     }
 
 

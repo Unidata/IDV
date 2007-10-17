@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.data;
 
 
@@ -70,6 +67,11 @@ import java.util.StringTokenizer;
 public class ListDataChoice extends DataChoice {
 
 
+    /** The DataChangeListener_ */
+    private List listeners = new ArrayList();
+
+
+
     /**
      * A list of the child DataChoice-s that this composite holds.
      * Each one represents an operand to the formula, java method,
@@ -100,10 +102,10 @@ public class ListDataChoice extends DataChoice {
      * their parent. If they do we will need to clone the children here
      * so a DataChoice only has one parent.
      *
-     * @param id _more_
-     * @param name _more_
-     * @param description _more_
-     * @param categories _more_
+     * @param id The id
+     * @param name name
+     * @param description  description
+     * @param categories  categories
      */
     public ListDataChoice(Object id, String name, String description,
                           List categories) {
@@ -115,10 +117,10 @@ public class ListDataChoice extends DataChoice {
 
 
     /**
-     * _more_
+     * ctor
      *
-     * @param name _more_
-     * @param children _more_
+     * @param name name
+     * @param children The children data choices
      */
     public ListDataChoice(String name, List children) {
         super(name, name, name, null);
@@ -127,9 +129,9 @@ public class ListDataChoice extends DataChoice {
 
 
     /**
-     * _more_
+     * set the children
      *
-     * @param dataChoices _more_
+     * @param dataChoices the children
      */
     public void setChildrenDataChoices(List dataChoices) {
         this.childrenChoices = dataChoices;
@@ -138,17 +140,17 @@ public class ListDataChoice extends DataChoice {
 
 
     /**
-     * _more_
+     * Get the data
      *
-     * @param category _more_
-     * @param dataSelection _more_
-     * @param requestProperties _more_
+     * @param category category
+     * @param dataSelection selection
+     * @param requestProperties properties
      *
-     * @return _more_
+     * @return This just returns null.
      *
-     * @throws DataCancelException _more_
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws DataCancelException On badness
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     protected Data getData(DataCategory category,
                            DataSelection dataSelection,
@@ -159,17 +161,17 @@ public class ListDataChoice extends DataChoice {
 
 
     /**
-     * _more_
+     * Get the array of data from the children data choices
      *
-     * @param category _more_
-     * @param dataSelection _more_
-     * @param requestProperties _more_
+     * @param category category
+     * @param dataSelection selection
+     * @param requestProperties properties
      *
-     * @return _more_
+     * @return data from children
      *
-     * @throws DataCancelException _more_
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws DataCancelException On badness
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     protected Object[] getDataList(DataCategory category,
                                    DataSelection dataSelection,
@@ -389,13 +391,14 @@ public class ListDataChoice extends DataChoice {
     /**
      * Get the union of all of the children {@link DataChoice}-s levels.
      *
+     *
+     * @param dataSelection data selection
      * @return The union of all of the children {@link DataChoice}-s levels.
      */
     public List getAllLevels(DataSelection dataSelection) {
         List      mine = new ArrayList();
         Hashtable seen = new Hashtable();
-        dataSelection =  DataSelection.merge(dataSelection,
-                                             myDataSelection);
+        dataSelection = DataSelection.merge(dataSelection, myDataSelection);
         for (int i = 0; i < childrenChoices.size(); i++) {
             DataChoice child = (DataChoice) childrenChoices.get(i);
             if (child != null) {
@@ -516,13 +519,11 @@ public class ListDataChoice extends DataChoice {
 
 
 
-    /** _more_          */
-    private List listeners = new ArrayList();
 
     /**
-     * _more_
+     * Add the data change listeners to the data choice
      *
-     * @param dataChoice _more_
+     * @param dataChoice data choice
      */
     protected void addDataChangeListeners(DataChoice dataChoice) {
         for (int i = 0; i < listeners.size(); i++) {

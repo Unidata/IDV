@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.data;
 
 
@@ -74,6 +71,14 @@ import javax.swing.*;
 
 
 public class CacheDataSource extends DataSourceImpl {
+
+    /** Local cache */
+    private Hashtable cache = new Hashtable();
+
+
+    /** cache tmp dir */
+    private String tmpDir;
+
 
     /** datachoice property */
     public static final String PROP_DATACHOICE = "CacheDataSource.DataChoice";
@@ -296,12 +301,12 @@ public class CacheDataSource extends DataSourceImpl {
     }
 
     /**
-     * _more_
+     * add the data choice
      *
-     * @param dataChoice _more_
-     * @param name _more_
-     * @param data _more_
-     * @param dataSelection _more_
+     * @param dataChoice data choice
+     * @param name name
+     * @param data the data
+     * @param dataSelection data selection
      */
     public void addDataChoice(DataChoice dataChoice, String name, Data data,
                               DataSelection dataSelection) {
@@ -317,11 +322,11 @@ public class CacheDataSource extends DataSourceImpl {
 
 
     /**
-     * _more_
+     * Get the cache key for the given data choice holder
      *
-     * @param holder _more_
+     * @param holder holder
      *
-     * @return _more_
+     * @return cache key
      */
     private Object getCacheKey(DataChoiceHolder holder) {
         return holder.getId();
@@ -329,19 +334,14 @@ public class CacheDataSource extends DataSourceImpl {
     }
 
 
-    /** _more_ */
-    private Hashtable cache = new Hashtable();
 
-
-    /** _more_ */
-    String tmpDir;
 
     /**
-     * _more_
+     * Get the file where we cache the id
      *
-     * @param id _more_
+     * @param id id
      *
-     * @return _more_
+     * @return file
      */
     private File getCachedDataFile(Object id) {
         if (tmpDir == null) {
@@ -351,7 +351,7 @@ public class CacheDataSource extends DataSourceImpl {
     }
 
     /**
-     * _more_
+     * clear the cache
      */
     public void clearCachedData() {
         super.clearCachedData();
@@ -361,11 +361,11 @@ public class CacheDataSource extends DataSourceImpl {
 
 
     /**
-     * _more_
+     * Write to cache
      *
-     * @param progressBar _more_
+     * @param progressBar progress bar
      *
-     * @return _more_
+     * @return The data choice holders that we actually were able to write
      */
     private List writeToCache(JProgressBar progressBar) {
         if (tmpDir == null) {
@@ -418,11 +418,11 @@ public class CacheDataSource extends DataSourceImpl {
 
 
     /**
-     * _more_
+     * Find the data choice holder with the given cache key
      *
-     * @param key _more_
+     * @param key cache key
      *
-     * @return _more_
+     * @return holder
      */
     private DataChoiceHolder findHolder(Object key) {
         for (int holderIdx = 0; holderIdx < holders.size(); holderIdx++) {
@@ -437,10 +437,10 @@ public class CacheDataSource extends DataSourceImpl {
 
 
     /**
-     * _more_
+     * Put the cache
      *
-     * @param key _more_
-     * @param value _more_
+     * @param key key
+     * @param value value
      */
     public void putCache(Object key, Object value) {
         cache.put(key, value);
@@ -602,8 +602,6 @@ public class CacheDataSource extends DataSourceImpl {
 
 
 
-    /** _more_ */
-    static int cnt = 0;
 
     /**
      * Class DataChoiceHolder holds a data chocie and a unique id and a name
@@ -623,7 +621,7 @@ public class CacheDataSource extends DataSourceImpl {
         /** The name */
         String name;
 
-        /** _more_ */
+        /** data selection */
         DataSelection dataSelection;
 
         /**
@@ -636,7 +634,7 @@ public class CacheDataSource extends DataSourceImpl {
          *
          * @param dataChoice the data choice
          * @param name its name
-         * @param dataSelection _more_
+         * @param dataSelection data selection
          */
         public DataChoiceHolder(DataChoice dataChoice, String name,
                                 DataSelection dataSelection) {
