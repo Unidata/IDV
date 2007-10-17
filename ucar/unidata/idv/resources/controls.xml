@@ -927,6 +927,21 @@ example:
      displaycategory="General"
      properties="displayName=Image Collection;windowVisible=true;showInTabs=false"/>
 
+<!--
+Example of how to make an image movie control with a fixed table of contents
+  <control
+     id="pacdeximagemoviecontrol"
+     canstandalone="true"
+     class="ucar.unidata.idv.control.ImageMovieControl"
+     description="Pacdex Catalog Images"
+     label="Pacdex Catalog Images"
+     displaycategory="General"
+     properties="displayName=Pacdex Catalog Images;windowVisible=true;">
+    <property name="tocFiles" value="http://www.unidata.ucar.edu/software/idv/data/pacdex/images/products.xml"/>
+    </control>
+-->
+
+
 
   <control
      id="worldwind"
