@@ -108,6 +108,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** The default image file template */
     private static String dfltTemplate;
 
+    private static String dfltAltDir;
+
 
     /** Filter for HTML files */
     public static final PatternFileFilter FILTER_ANIS =
@@ -166,6 +168,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** Property for the image file template */
     public static final String PROP_IMAGETEMPLATE =
         "imagesequencegrabber.template";
+
+    /** Property for the image file template */
+    public static final String PROP_IMAGEALTDIR =
+        "imagesequencegrabber.altdir";
 
 
     /** igml xml attributes */
@@ -330,14 +336,14 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     JButton previewButton;
 
     /** Turns on automatic capture */
-    JButton grabAutoButton;
+    JButton grabAutoBtn;
 
 
     /** Turns on animation based  capture */
-    JButton grabAnimationButton;
+    JButton grabAnimationBtn;
 
     /** Captures one frame */
-    JButton grabButton;
+    JButton grabBtn;
 
     /** Clear all captured frames */
     JButton clearButton;
@@ -384,6 +390,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
     /** Should use alternate dir */
     private JCheckBox alternateDirCbx;
+
+    private JCheckBox overwriteCbx;
 
     /** Components to enable/disable */
     private List alternateComps = new ArrayList();
@@ -543,7 +551,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      *
      * @return The component
      */
-    private JComponent addAlternateComp(JComponent comp) {
+    private JComponent addAltComp(JComponent comp) {
         alternateComps.add(comp);
         GuiUtils.enableTree(comp, false);
         return comp;
@@ -588,7 +596,11 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
 
 
-        alternateDirFld = new JTextField("", 30);
+        if(dfltAltDir == null) {
+            dfltAltDir = idv.getStore().get(PROP_IMAGEALTDIR,
+                    "");
+        }
+        alternateDirFld = new JTextField(dfltAltDir, 30);
         JButton alternateDirBtn = new JButton("Select");
         GuiUtils.setupDirectoryChooser(alternateDirBtn, alternateDirFld);
 
@@ -602,6 +614,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             + "<b>%time%</b> is the  animation time in the default format<br>"
             + "<b>%time:some time format string%</b> a macro that begins with &quot;time:&quot;,contains a time format string using the:<br>"
             + "java SimpleDateFormat formatting (see google)." + "</html>");
+
+
+        overwriteCbx = new JCheckBox("Overwrite", false);
         alternateDirCbx = new JCheckBox("Save Files To:", false);
         alternateDirCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -619,9 +634,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         GuiUtils.buttonGroup(hiBtn, medBtn).add(lowBtn);
 
 
-        grabButton          = makeButton("One Image", CMD_GRAB);
-        grabAutoButton      = makeButton("Automatically", GuiUtils.CMD_START);
-        grabAnimationButton = makeButton("Time Animation",
+        grabBtn          = makeButton("One Image", CMD_GRAB);
+        grabAutoBtn      = makeButton("Automatically", GuiUtils.CMD_START);
+        grabAnimationBtn = makeButton("Time Animation",
                                          CMD_GRAB_ANIMATION);
 
 
@@ -654,10 +669,16 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                                         new JLabel(" seconds")));
 
 
+        int maxBtnWidth = Math.max(grabAnimationBtn.getPreferredSize().width,
+                                   Math.max(grabBtn.getPreferredSize().width,
+                                            grabAutoBtn.getPreferredSize().width));
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
         JPanel capturePanel = GuiUtils.doLayout(new Component[] {
-            grabButton, GuiUtils.filler(), grabAnimationButton,
-            animationResetCbx, GuiUtils.top(grabAutoButton), runPanel
+            grabBtn, GuiUtils.filler(), 
+            grabAnimationBtn,   animationResetCbx, 
+            grabAutoBtn, runPanel,
+            GuiUtils.filler(maxBtnWidth+10,1),
+            GuiUtils.filler(),
         }, 2, GuiUtils.WT_N, GuiUtils.WT_N);
 
 
@@ -672,29 +693,28 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 notifiedForTransparent = true;
             }
         });
-        capturePanel = GuiUtils.hbox(capturePanel,
-                                     GuiUtils.top(GuiUtils.vbox(whatPanel,
-                                         backgroundTransparentBtn)));
+        capturePanel = GuiUtils.hbox(GuiUtils.top(capturePanel),
+                                     GuiUtils.top(GuiUtils.inset(GuiUtils.vbox(whatPanel,
+                                                                            backgroundTransparentBtn),new Insets(0,10,0,0))));
 
 
         capturePanel = GuiUtils.inset(GuiUtils.left(capturePanel), 5);
         capturePanel.setBorder(BorderFactory.createTitledBorder("Capture"));
-
-
-        JComponent altDirPanel =
-            GuiUtils.centerRight(
-                GuiUtils.wrap(addAlternateComp(alternateDirFld)),
-                addAlternateComp(alternateDirBtn));
-
-        GuiUtils.tmpInsets = new Insets(0, 5, 0, 5);
-        JPanel filePanel = GuiUtils.doLayout(new Component[] {
+        GuiUtils.setHFill();
+        JPanel filePanel = GuiUtils.doLayout(null, new Component[] {
             GuiUtils.rLabel("Image Quality:"),
             GuiUtils.left(GuiUtils.hbox(hiBtn, medBtn, lowBtn)),
-            alternateDirCbx, GuiUtils.filler(),
-            addAlternateComp(GuiUtils.rLabel("Directory:")), altDirPanel,
-            addAlternateComp(GuiUtils.rLabel("Filename Template:")),
-            GuiUtils.left(addAlternateComp(fileTemplateFld))
-        }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
+            GuiUtils.filler(),
+            GuiUtils.right(alternateDirCbx), 
+            //            GuiUtils.filler(),
+            //GuiUtils.filler(),
+            //            addAltComp(GuiUtils.rLabel("Directory:")), 
+            addAltComp(alternateDirFld),
+            addAltComp(alternateDirBtn),
+            addAltComp(GuiUtils.rLabel("Filename Template:")),
+            addAltComp(fileTemplateFld),
+            addAltComp(overwriteCbx)
+        }, 3, GuiUtils.WT_NYN, GuiUtils.WT_N,null,null,new Insets(0,5,0,0));
 
         filePanel = GuiUtils.inset(filePanel, 5);
         filePanel.setBorder(BorderFactory.createTitledBorder("Image Files"));
@@ -827,20 +847,20 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      */
     private void checkEnabled() {
         //      if (capturingAuto || capturingAnim) {
-        //          grabAutoButton.setIcon (stopIcon);
+        //          grabAutoBtn.setIcon (stopIcon);
         //      }
         //      else {
-        //          grabAutoButton.setIcon (startIcon);
+        //          grabAutoBtn.setIcon (startIcon);
         //      }
-        grabAnimationButton.setEnabled( !capturingAuto);
-        grabButton.setEnabled( !capturingAuto && !capturingAnim);
+        grabAnimationBtn.setEnabled( !capturingAuto);
+        grabBtn.setEnabled( !capturingAuto && !capturingAnim);
     }
 
     /**
      * Turn on automatic  capture
      */
     private void startCapturingAuto() {
-        grabAutoButton.setText("Stop");
+        grabAutoBtn.setText("Stop");
         if (capturingAuto) {
             return;
         }
@@ -853,7 +873,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * Turn off automatic  capture
      */
     private void stopCapturingAuto() {
-        grabAutoButton.setText("Automatically");
+        grabAutoBtn.setText("Automatically");
         if ( !capturingAuto) {
             return;
         }
@@ -870,7 +890,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         if (capturingAnim || (anime == null)) {
             return;
         }
-        grabAnimationButton.setText("Stop animation");
+        grabAnimationBtn.setText("Stop animation");
         capturingAnim = true;
         checkEnabled();
         //Run the imageGrab in another thread because visad errors when the getImage
@@ -960,7 +980,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             if ( !keepRunning(timestamp)) {
                 return;
             }
-            stopAnimationCapture();
+            stopAnimationCapture(true);
         } catch (Exception exc) {
             LogUtil.logException("Creating movie", exc);
         }
@@ -970,16 +990,18 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /**
      * Turn off animation based  capture
      */
-    private void stopAnimationCapture() {
+    private void stopAnimationCapture(boolean andWrite) {
         capturingAnim = false;
-        writeMovie();
+        if(andWrite) {
+            writeMovie();
+        }
         //This implies we write the animation and then are done
         if (imageGenerator != null) {
             //            close();
             imageGenerator.doneCapturingMovie();
             //            return;
         }
-        grabAnimationButton.setText("Capture animation");
+        grabAnimationBtn.setText("Time Animation");
         checkEnabled();
     }
 
@@ -1105,7 +1127,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         } else if (cmd.equals(CMD_GRAB_ANIMATION)) {
             synchronized (MUTEX) {
                 if (capturingAnim) {
-                    stopAnimationCapture();
+                    stopAnimationCapture(false);
                 } else {
                     startAnimationCapture();
                 }
@@ -1330,6 +1352,11 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         } else {
             if (alternateDirCbx.isSelected()) {
                 filename = alternateDirFld.getText().trim();
+                if(!Misc.equals(filename, dfltAltDir)) {
+                    dfltAltDir = filename;
+                    idv.getStore().put(PROP_IMAGEALTDIR, dfltAltDir);
+                    idv.getStore().save();
+                }
                 if (filename.length() == 0) {
                     filename = directory;
                     alternateDirFld.setText(directory);
@@ -1354,7 +1381,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      */
     private void grabImageAndBlock() {
         synchronized (MUTEX) {
-            String filename = getFilePrefix(imageCnt++);
+    //            String filename = getFilePrefix(imageCnt++);
+            String filename = getFilePrefix(images.size());
             String tmp      = filename.toLowerCase();
             if ( !(tmp.endsWith(".gif") || tmp.endsWith(".png")
                     || tmp.endsWith(".jpg") || tmp.endsWith(".jpeg"))) {
@@ -1362,6 +1390,20 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             }
 
             String path = IOUtil.joinDir(getFileDirectory(), filename);
+            if(isInteractive() && 
+               !overwriteCbx.isSelected() &&
+                alternateDirCbx.isSelected() && 
+               new File(path).exists()) {
+                if (JOptionPane
+                    .showConfirmDialog(null, "File:" + path
+                                + " exists. Do you want to overwrite?", "File exists", JOptionPane
+                                    .YES_NO_OPTION) == 1) {
+                        stopCapturingAuto();
+                        stopAnimationCapture(false);
+                        return;
+                    }
+                overwriteCbx.setSelected(true);
+            }
             //            System.err.println ("ImageSequenceGrabber file dir: " +getFileDirectory() +" path: " +  path);
             DateTime time = null;
             try {
