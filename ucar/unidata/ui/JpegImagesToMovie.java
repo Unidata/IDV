@@ -293,6 +293,7 @@ public class JpegImagesToMovie implements ControllerListener,
      */
     public static void createMovie(String movieFile, int width, int height,
                                    int frameRate, Vector images) {
+        //        System.err.println ("images:" + images);
         MediaLocator oml;
         if ((oml = JpegImagesToMovie.createMediaLocator(movieFile)) == null) {
             LogUtil.userErrorMessage("Cannot build media locator from: "
@@ -631,12 +632,13 @@ public class JpegImagesToMovie implements ControllerListener,
             }
 
             String imageFile = (String) images.elementAt(nextImage);
+            //            System.err.println ("imageFile: " + imageFile);
 
+            boolean convertedToJpg = false;
             if ( !imageFile.endsWith("jpg") && !imageFile.endsWith("jpeg")) {
                 imageFile = ImageUtils.convertImageTo(imageFile, "jpg");
+                convertedToJpg = true;
             }
-
-
 
             nextImage++;
 
@@ -673,6 +675,9 @@ public class JpegImagesToMovie implements ControllerListener,
 
             // Close the random access file.
             raFile.close();
+            if(convertedToJpg) {
+                new File(imageFile).delete();
+            }
         }
 
         /**
