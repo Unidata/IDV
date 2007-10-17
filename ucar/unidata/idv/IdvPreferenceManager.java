@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv;
 
 
@@ -761,7 +759,9 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         widgets.put(PREF_SITEPATH, sitePathField);
 
         JTextField jythonEditorField =
-            new JTextField(getStateManager().getPreferenceOrProperty(JythonManager.PROP_JYTHON_EDITOR,""), 40);
+            new JTextField(
+                getStateManager().getPreferenceOrProperty(
+                    JythonManager.PROP_JYTHON_EDITOR, ""), 40);
         widgets.put(JythonManager.PROP_JYTHON_EDITOR, jythonEditorField);
 
 
@@ -790,12 +790,12 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
 
         JComponent topPanel = GuiUtils.formLayout(new Component[] {
-                                  GuiUtils.rLabel("Resource Sitepath:"),
-                                  GuiUtils.left(sitePathField),
-                                  GuiUtils.rLabel("External Editor:"),
-                                  GuiUtils.left(GuiUtils.centerRight(jythonEditorField, GuiUtils. makeFileBrowseButton(jythonEditorField))),
-                                  GuiUtils.rLabel("Look & Feel:"),
-                                  GuiUtils.left(lookAndFeelBox) });
+            GuiUtils.rLabel("Resource Sitepath:"),
+            GuiUtils.left(sitePathField), GuiUtils.rLabel("External Editor:"),
+            GuiUtils.left(GuiUtils.centerRight(jythonEditorField,
+                GuiUtils.makeFileBrowseButton(jythonEditorField))),
+            GuiUtils.rLabel("Look & Feel:"), GuiUtils.left(lookAndFeelBox)
+        });
         Object[][] prefs1 = {
             { "General:", null },
             { "Show Help Tip Dialog On Start",
@@ -1106,7 +1106,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
         JPanel rightPanel = panel3;
         JPanel leftPanel = GuiUtils.inset(GuiUtils.vbox(panel1, panel2),
-                                           new Insets(0, 40, 0, 0));
+                                          new Insets(0, 40, 0, 0));
 
         //        JPanel leftPanel = panel1;
         //        JPanel rightPanel = GuiUtils.inset(GuiUtils.vbox(panel2, panel3),
@@ -1201,22 +1201,23 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                                              false);
 
 
-            JCheckBox removeCbx =
-                new JCheckBox("Remove all displays & data", shouldRemove);
+            JCheckBox removeCbx = new JCheckBox("Remove all displays & data",
+                                      shouldRemove);
 
 
 
 
-            JPanel    btnPanel = GuiUtils.left(removeCbx);
+            JPanel btnPanel = GuiUtils.left(removeCbx);
 
             JCheckBox mergeCbx =
                 new JCheckBox("Try to add displays to current windows",
                               shouldMerge);
             JPanel inner =
-                GuiUtils.vbox(Misc.newList(
-                              btnPanel, mergeCbx, GuiUtils.filler(10,10),askCbx,
-                              new JLabel(
-                                         "Note: This can be reset in the preferences window ")));
+                GuiUtils.vbox(
+                    Misc.newList(
+                        btnPanel, mergeCbx, GuiUtils.filler(10, 10), askCbx,
+                        new JLabel(
+                            "Note: This can be reset in the preferences window ")));
 
             inner = GuiUtils.leftCenter(new JLabel("     "), inner);
 

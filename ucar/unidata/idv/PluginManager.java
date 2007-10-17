@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv;
 
 
@@ -152,7 +151,7 @@ public class PluginManager extends IdvManager {
     /** create plugin jlist */
     private JList createList;
 
-    /** _more_          */
+    /** Merge plugins */
     private JCheckBox mergeCbx = new JCheckBox("Merge Plugin", true);
 
     /** list of files in the create plugin list */
@@ -213,11 +212,19 @@ public class PluginManager extends IdvManager {
     /** Where are the local plugins kept */
     private File localPluginDir;
 
-    /** _more_          */
+    /** error msgs */
     private List pluginErrorMessages = new ArrayList();
 
-    /** _more_          */
+    /** exceptions */
     private List pluginErrorExceptions = new ArrayList();
+
+    /** widget */
+    private JComboBox categoryBox;
+
+    /** widget */
+    private JTextField nameFld = new JTextField(10);
+
+
 
     /**
      * ctor
@@ -751,10 +758,10 @@ public class PluginManager extends IdvManager {
     }
 
     /**
-     * _more_
+     * add a file name with the given label to show
      *
-     * @param file _more_
-     * @param label _more_
+     * @param file file
+     * @param label label
      */
     private void addCreateFile(String file, String label) {
         Wrapper wrapper = new Wrapper(file, label);
@@ -866,15 +873,10 @@ public class PluginManager extends IdvManager {
         initializeMenu(menu, getIdv().getJythonManager().getDescriptors());
     }
 
-    /** _more_          */
-    JComboBox categoryBox;
-
-    /** _more_          */
-    JTextField nameFld = new JTextField(10);
 
 
     /**
-     * _more_
+     * Load bundles from disk
      */
     public void loadBundlesFromDisk() {
 
@@ -1400,10 +1402,10 @@ public class PluginManager extends IdvManager {
     }
 
     /**
-     * _more_
+     * add an error
      *
-     * @param message _more_
-     * @param exc _more_
+     * @param message msg
+     * @param exc exception
      */
     private void addError(String message, Throwable exc) {
         pluginErrorExceptions.add(exc);
@@ -1454,9 +1456,9 @@ public class PluginManager extends IdvManager {
 
 
     /**
-     * _more_
+     * Check for errors
      *
-     * @param path _more_
+     * @param path plugin file path
      */
     private void checkForErrors(String path) {
         if (pluginErrorMessages.size() > 0) {
@@ -1552,12 +1554,22 @@ public class PluginManager extends IdvManager {
      * @throws Exception On badness
      */
     protected void loadPlugin(String filename, String prefix,
-                              boolean topLevel) 
+                              boolean topLevel)
             throws Exception {
-        loadPlugin(filename, prefix, topLevel,null);
+        loadPlugin(filename, prefix, topLevel, null);
     }
 
 
+    /**
+     * load plugin
+     *
+     * @param filename plugin file
+     * @param prefix prefix
+     * @param topLevel top level
+     * @param label label
+     *
+     * @throws Exception on badness
+     */
     protected void loadPlugin(String filename, String prefix,
                               boolean topLevel, String label)
             throws Exception {
@@ -1656,7 +1668,7 @@ public class PluginManager extends IdvManager {
 
 
             String jarLabel = IOUtil.getFileTail(decode(jarFilePath));
-            String prefix = jarFilePath + "!/";
+            String prefix   = jarFilePath + "!/";
             MyClassLoader cl = new MyClassLoader(this, jarFilePath,
                                    getClass().getClassLoader());
             pluginClassLoaders.add(cl);
@@ -1712,7 +1724,7 @@ public class PluginManager extends IdvManager {
 
 
     /**
-     * _more_
+     * import plugin from file
      */
     public void importPlugin() {
         String filename = FileManager.getReadFile("Open Plugin",
@@ -1727,9 +1739,9 @@ public class PluginManager extends IdvManager {
 
 
     /**
-     * _more_
+     * import plugin from file
      *
-     * @param filename _more_
+     * @param filename filename
      */
     public void importPlugin(String filename) {
         importPlugin(decode(filename), true);
@@ -1737,10 +1749,10 @@ public class PluginManager extends IdvManager {
 
 
     /**
-     * _more_
+     * import plugin from file
      *
-     * @param filename _more_
-     * @param merge _more_
+     * @param filename filename
+     * @param merge merge
      */
     public void importPlugin(String filename, boolean merge) {
         try {
@@ -2370,7 +2382,7 @@ public class PluginManager extends IdvManager {
         /** The parent class loader */
         private ClassLoader parent;
 
-        /** _more_          */
+        /** the plugin manager */
         private PluginManager pluginManager;
 
         /**
@@ -2817,10 +2829,10 @@ public class PluginManager extends IdvManager {
         }
 
         /**
-         * _more_
+         * ctro
          *
-         * @param obj _more_
-         * @param label _more_
+         * @param obj obj
+         * @param label lbl
          */
         public Wrapper(Object obj, String label) {
             this.obj = obj;

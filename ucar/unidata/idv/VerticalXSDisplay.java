@@ -26,13 +26,13 @@ package ucar.unidata.idv;
 
 import ucar.visad.display.XSDisplay;
 
+import ucar.visad.quantities.Length;
+
 import visad.*;
 
 import java.awt.*;
 
 import java.rmi.RemoteException;
-
-import ucar.visad.quantities.Length;
 
 
 /**
@@ -62,7 +62,8 @@ public class VerticalXSDisplay extends XSDisplay {
      * @throws VisADException
      */
     public VerticalXSDisplay() throws VisADException, RemoteException {
-        super("Vertical Cross Section", Length.getRealType(), RealType.Altitude);
+        super("Vertical Cross Section", Length.getRealType(),
+              RealType.Altitude);
         setAxisParams();
     }
 
@@ -129,7 +130,9 @@ public class VerticalXSDisplay extends XSDisplay {
     public void setXAxisTitle() {
         AxisScale xscale = getXAxisScale();
         if (xscale != null) {
-            xscale.setTitle("Distance along transect ("+getXDisplayUnit()+")");
+            xscale.setTitle("Distance along transect (" + getXDisplayUnit()
+                            + ")");
         }
     }
 }
+

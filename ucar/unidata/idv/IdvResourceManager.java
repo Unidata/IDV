@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.idv;
 
 
@@ -424,13 +421,13 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
     private List locationList;
 
 
-    /** _more_          */
+    /** All display settings_ */
     private List displaySettings;
 
-    /** _more_          */
+    /** Local display settings_ */
     private List localDisplaySettings;
 
-    /** _more_          */
+    /** ts */
     private long displaySettingsTimestamp = 0;
 
     /**
@@ -1652,9 +1649,9 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
 
 
     /**
-     * _more_
+     * Get all display settings
      *
-     * @return _more_
+     * @return display settings
      */
     public List getDisplaySettings() {
         if (displaySettings == null) {
@@ -1707,11 +1704,11 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
     }
 
     /**
-     * _more_
+     * Find display setting by name
      *
-     * @param name _more_
+     * @param name name
      *
-     * @return _more_
+     * @return displaysetting
      */
     public DisplaySetting findDisplaySetting(String name) {
         List displaySettings = getDisplaySettings();
@@ -1727,9 +1724,9 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
 
 
     /**
-     * _more_
+     * handle when a display setting changed
      *
-     * @param displaySetting _more_
+     * @param displaySetting display setting that changed
      */
     public void displaySettingChanged(DisplaySetting displaySetting) {
         if ( !localDisplaySettings.contains(displaySetting)) {
@@ -1741,9 +1738,9 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
 
 
     /**
-     * _more_
+     * Add new display setting
      *
-     * @param displaySetting _more_
+     * @param displaySetting display setting
      */
     public void addDisplaySetting(DisplaySetting displaySetting) {
         displaySetting.setIsLocal(true);
@@ -1753,9 +1750,9 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
     }
 
     /**
-     * _more_
+     * Remove list of display settings
      *
-     * @param list _more_
+     * @param list list
      */
     public void removeDisplaySettings(List list) {
         for (int displaySettingIdx = 0; displaySettingIdx < list.size();
@@ -1769,9 +1766,9 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
     }
 
     /**
-     * _more_
+     * Remove display setting
      *
-     * @param displaySetting _more_
+     * @param displaySetting display setting
      */
     public void removeDisplaySetting(DisplaySetting displaySetting) {
         removeDisplaySettings(Misc.newList(displaySetting));
@@ -1779,7 +1776,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
 
 
     /**
-     * _more_
+     * write
      */
     private void writeDisplaySettings() {
         try {
@@ -1796,9 +1793,9 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
     }
 
     /**
-     * _more_
+     * get timestamp
      *
-     * @return _more_
+     * @return timestamp_
      */
     public long getDisplaySettingsTimestamp() {
         return displaySettingsTimestamp;

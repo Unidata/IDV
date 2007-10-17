@@ -151,9 +151,8 @@ public class VMManager extends IdvManager {
     public void captureAll() {
         List vms = getViewManagers();
 
-        String filename =
-            FileManager.getWriteFile(FileManager.FILTER_IMAGE,
-                                     FileManager.SUFFIX_JPG);
+        String filename = FileManager.getWriteFile(FileManager.FILTER_IMAGE,
+                              FileManager.SUFFIX_JPG);
         if (filename == null) {
             return;
         }

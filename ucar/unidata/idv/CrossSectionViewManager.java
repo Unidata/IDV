@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv;
 
 
@@ -217,11 +216,11 @@ public class CrossSectionViewManager extends ViewManager {
      *
      * @param foreground  foreground color
      * @param background  background color
-    public void setColors(Color foreground, Color background) {
-        super.setColors(foreground, background);
-        //getXSDisplay().setBackground(background);
-        //getXSDisplay().setForeground(foreground);
-    }
+     * public void setColors(Color foreground, Color background) {
+     *   super.setColors(foreground, background);
+     *   //getXSDisplay().setBackground(background);
+     *   //getXSDisplay().setForeground(foreground);
+     * }
      */
 
     /**

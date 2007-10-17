@@ -318,7 +318,7 @@ public interface IdvConstants {
     /** Holds the preference for the default bounds for data source holder windows */
     public static final String PROP_DATAHOLDERBOUNDS = "dataholderbounds";
 
-    /** Holds the preference for the one instance port*/
+    /** Holds the preference for the one instance port */
     public static final String PROP_ONEINSTANCEPORT = "idv.oneinstanceport";
 
     /** look and feel preference */

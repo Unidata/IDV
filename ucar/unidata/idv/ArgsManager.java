@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv;
 
 
@@ -74,7 +73,9 @@ import java.util.Properties;
  */
 public class ArgsManager extends IdvManager {
 
-    public static final String USAGE_MESSAGE = "Usage: IntegratedDataViewer  <args> <bundle/script files, e.g., .xidv, .zidv, .isl>";
+    /** usage message */
+    public static final String USAGE_MESSAGE =
+        "Usage: IntegratedDataViewer  <args> <bundle/script files, e.g., .xidv, .zidv, .isl>";
 
 
     /** How many times to try to run the initial runnables */
@@ -97,6 +98,7 @@ public class ArgsManager extends IdvManager {
     /** The one instance of the idv port */
     int oneInstancePort = -1;
 
+    /** flag for not running in one instance mode */
     boolean noOneInstance = false;
 
     /** This holds the preprocessed version of the command line arguments */
@@ -541,7 +543,7 @@ public class ArgsManager extends IdvManager {
      */
     public void usage(String err) {
         String msg = USAGE_MESSAGE;
-        msg = msg + "\n" +getUsageMessage();
+        msg = msg + "\n" + getUsageMessage();
         LogUtil.userErrorMessage(err + "\n" + msg);
         System.exit(1);
     }

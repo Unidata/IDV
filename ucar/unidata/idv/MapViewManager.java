@@ -50,8 +50,8 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.Trace;
+import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.view.geoloc.*;
 
@@ -182,7 +182,7 @@ public class MapViewManager extends NavigatedViewManager {
     /** Do we reproject when we goto address */
     private JCheckBox addressReprojectCbx;
 
-    /** rotate button    */
+    /** rotate button */
     JToggleButton rotateBtn;
 
     /**
@@ -533,12 +533,13 @@ public class MapViewManager extends NavigatedViewManager {
         final JComponent[] fgComps =
             GuiUtils.makeColorSwatchWidget(getStore().get(PREF_FGCOLOR,
                 getForeground()), "Set Foreground Color");
-        
-        final JComponent[] border = 
-        	GuiUtils.makeColorSwatchWidget(getStore().get(PREF_BORDERCOLOR, 
-        		ViewManager.borderHighlightColor), 
-        		"Set Selected Panel Border Color");
-        
+
+        final JComponent[] border =
+            GuiUtils
+                .makeColorSwatchWidget(getStore()
+                    .get(PREF_BORDERCOLOR, ViewManager
+                        .borderHighlightColor), "Set Selected Panel Border Color");
+
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
         JPanel colorPanel = GuiUtils.left(GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("  Background:"), bgComps[0], bgComps[1],
@@ -588,7 +589,7 @@ public class MapViewManager extends NavigatedViewManager {
                              dlColorWidget.getSwatchColor());
                 checkToolBarVisibility();
                 ViewManager.setHighlightBorder(border[0].getBackground());
-                
+
             }
         };
 
@@ -670,8 +671,8 @@ public class MapViewManager extends NavigatedViewManager {
 
 
         miscContents = GuiUtils.inset(GuiUtils.left(miscContents), 5);
-        preferenceManager.add("View", "View Preferences",
-                              miscManager, miscContents, widgets);
+        preferenceManager.add("View", "View Preferences", miscManager,
+                              miscContents, widgets);
 
 
     }
@@ -1101,20 +1102,21 @@ public class MapViewManager extends NavigatedViewManager {
      */
     private void addProjectionToHistory(MapProjection projection,
                                         String name) {
-        TwoFacedObject tfo = TwoFacedObject.findId(projection,projectionHistory);
-        if(tfo!=null) {
+        TwoFacedObject tfo = TwoFacedObject.findId(projection,
+                                 projectionHistory);
+        if (tfo != null) {
             projectionHistory.remove(tfo);
-            projectionHistory.add(0,tfo);
+            projectionHistory.add(0, tfo);
             return;
 
         }
-        tfo = new TwoFacedObject(name,projection);
-        projectionHistory.add(0,tfo);
+        tfo = new TwoFacedObject(name, projection);
+        projectionHistory.add(0, tfo);
 
 
-        String    label = ((name != null)
-                           ? name
-                           : projection.toString());
+        String label = ((name != null)
+                        ? name
+                        : projection.toString());
     }
 
 
@@ -1683,16 +1685,22 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 
+    /**
+     * Init menu
+     *
+     * @param menu menu
+     */
     public void initializeProjectionHistoryMenu(JMenu menu) {
         menu.removeAll();
-        for(int i=0;i<projectionHistory.size(); i++) {
-            final TwoFacedObject tfo = (TwoFacedObject) projectionHistory.get(i);
-            JMenuItem mi    = new JMenuItem(tfo.toString());
+        for (int i = 0; i < projectionHistory.size(); i++) {
+            final TwoFacedObject tfo =
+                (TwoFacedObject) projectionHistory.get(i);
+            JMenuItem mi = new JMenuItem(tfo.toString());
             mi.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        setMapProjection((MapProjection) tfo.getId(), true);
-                    }
-                });
+                public void actionPerformed(ActionEvent e) {
+                    setMapProjection((MapProjection) tfo.getId(), true);
+                }
+            });
             menu.add(mi);
         }
     }
@@ -1715,7 +1723,9 @@ public class MapViewManager extends NavigatedViewManager {
             projMenu.add(projectionsMenu);
             projMenu.add(displaysMenu);
         }
-        JMenu projectionHistoryMenu = GuiUtils.makeDynamicMenu("History", this,"initializeProjectionHistoryMenu");
+        JMenu projectionHistoryMenu = GuiUtils.makeDynamicMenu("History",
+                                          this,
+                                          "initializeProjectionHistoryMenu");
 
         if ( !getUseGlobeDisplay()) {
             projMenu.add(projectionHistoryMenu);
@@ -1987,3 +1997,4 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 }
+

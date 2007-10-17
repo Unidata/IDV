@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv;
 
 
@@ -595,6 +593,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
     /** instance counter */
     int mycnt = cnt++;
+
+    /** Keeps track of when we update display list when the component resizes_ */
+    private int componentResizeCnt = 0;
+
 
     /**
      *  A parameter-less ctor for the XmlEncoder based decoding.
@@ -2699,7 +2701,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     public void keyWasTyped(KeyEvent keyEvent) {
         char c    = keyEvent.getKeyChar();
         int  code = keyEvent.getKeyCode();
-        int id = keyEvent.getID();
+        int  id   = keyEvent.getID();
         if (id == KeyEvent.KEY_PRESSED) {
             if (keyEvent.isControlDown()) {
                 if (code == KeyEvent.VK_Z) {
@@ -4162,8 +4164,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
     }
 
-    /** _more_          */
-    private int componentResizeCnt = 0;
+
 
 
     /**
@@ -5155,8 +5156,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
         return fullScreenWindow != null;
     }
 
+    /**
+     * Toggle full screen
+     */
     public void toggleFullScreen() {
-        if(isFullScreen()) {
+        if (isFullScreen()) {
             resetFullScreen();
         } else {
             setFullScreen();

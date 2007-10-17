@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv;
 
 
@@ -112,7 +111,7 @@ public class SavedBundle {
     /** Is it a local bundle */
     private boolean local = false;
 
-    /** _more_          */
+    /** prefix_ */
     private String uniquePrefix;
 
     /**
@@ -245,9 +244,9 @@ public class SavedBundle {
 
 
     /**
-     * _more_
+     * set the unique prefix
      *
-     * @param p _more_
+     * @param p prefix
      */
     protected void setUniquePrefix(String p) {
         uniquePrefix = p;

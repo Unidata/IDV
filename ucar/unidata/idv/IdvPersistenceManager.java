@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv;
 
 
@@ -866,8 +865,13 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         flushState(bundleType);
     }
 
+    /**
+     * make category widget
+     *
+     * @return box
+     */
     public JComboBox makeCategoryBox() {
-        JComboBox catBox  = new JComboBox();
+        JComboBox catBox = new JComboBox();
         catBox.setToolTipText(
             "<html>Categories can be entered manually. <br>Use '>' as the category delimiter. e.g.:<br>General > Subcategory</html>");
         catBox.setEditable(true);
@@ -1077,6 +1081,11 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
 
 
+    /**
+     * get categories
+     *
+     * @return categories
+     */
     public List getFavoritesCategories() {
         return getCategories(BUNDLES_FAVORITES,
                              Misc.newList(CAT_GENERAL, CAT_TOOLBAR));

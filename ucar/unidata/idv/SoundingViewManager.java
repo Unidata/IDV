@@ -300,7 +300,6 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
 
     /**
      * Set the background line visibility on the specified  display
-     * @param display to set
      *
      * @param aeroDisplay   display to set
      *

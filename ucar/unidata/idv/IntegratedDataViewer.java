@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv;
 
 
@@ -40,11 +39,9 @@ import ucar.unidata.idv.chooser.IdvChooser;
 
 import ucar.unidata.idv.chooser.IdvChooserManager;
 import ucar.unidata.idv.collab.*;
-
-import ucar.unidata.util.PropertyValue;
+import ucar.unidata.idv.control.DisplayControlImpl;
 
 import ucar.unidata.idv.control.DisplaySettingsDialog;
-import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.idv.control.WMSControl;
 import ucar.unidata.idv.control.WMSInfo;
 
@@ -67,6 +64,8 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Msg;
 import ucar.unidata.util.ObjectPair;
+
+import ucar.unidata.util.PropertyValue;
 import ucar.unidata.util.ResourceCollection;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
@@ -88,8 +87,9 @@ import java.awt.event.*;
 
 import java.io.*;
 
-import java.net.Socket;
 import java.lang.reflect.*;
+
+import java.net.Socket;
 
 import java.net.URL;
 
@@ -358,7 +358,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
     /**
      * Check for one instance
      *
-     * @param port _more_
+     * @param port the port
      */
     private synchronized void checkOneInstance(final int port) {
         tryingOneInstance = true;
@@ -406,7 +406,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      * and exit.
      *
      *
-     * @param port _more_
+     * @param port the port
      */
     private synchronized void checkOneInstanceInner(final int port) {
         try {
@@ -431,7 +431,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
     /**
      * Start up the one instance server
      *
-     * @param port _more_
+     * @param port the port
      */
     private void startOneInstanceServer(int port) {
         try {
@@ -961,11 +961,11 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
 
 
     /**
-     * _more_
+     * Save the given data in the CacheDataSource
      *
-     * @param dataChoice _more_
-     * @param data _more_
-     * @param dataSelection _more_
+     * @param dataChoice data choice
+     * @param data data
+     * @param dataSelection data selection
      */
     public void saveInCache(DataChoice dataChoice, Data data,
                             DataSelection dataSelection) {
@@ -990,7 +990,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      *
      * @param dataChoice The data choice to save
      * @param data The data
-     * @param dataSelection _more_
+     * @param dataSelection data selection
      * @param name The name to use
      */
     public void saveInCache(DataChoice dataChoice, Data data,
@@ -1005,7 +1005,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      *
      * @param clonedDataChoice The data choice to save
      * @param data The data
-     * @param dataSelection _more_
+     * @param dataSelection data selection
      * @param name The name to use
      */
     private void saveInCacheInner(DataChoice clonedDataChoice, Data data,
@@ -1041,12 +1041,12 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
 
 
     /**
-     * _more_
+     * Get the list of derived data choices
      *
-     * @param dataSource _more_
-     * @param dataChoices _more_
+     * @param dataSource data source
+     * @param dataChoices data choices
      *
-     * @return _more_
+     * @return derived data choices
      */
     public List getDerivedDataChoices(DataSource dataSource,
                                       List dataChoices) {
@@ -1295,9 +1295,9 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
     }
 
     /**
-     * _more_
+     * remove all displays
      *
-     * @param payAttentionToCanDoRemoveAll _more_
+     * @param payAttentionToCanDoRemoveAll Remove all
      */
     public void removeAllDisplays(boolean payAttentionToCanDoRemoveAll) {
         try {
@@ -1434,6 +1434,13 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
 
 
 
+    /**
+     * handle action
+     *
+     * @param action action
+     *
+     * @return handled action
+     */
     public boolean handleAction(String action) {
         return handleAction(action, null);
     }
@@ -1669,9 +1676,17 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
     }
 
 
+    /**
+     * Is the given object a file name of a bundle
+     *
+     * @param obj object
+     *
+     * @return is it a bundle
+     */
     private boolean isABundle(Object obj) {
-        return (obj instanceof String &&  (ArgsManager.isXidvFile((String)obj)
-                                           || ArgsManager.isZidvFile((String)obj)));
+        return ((obj instanceof String)
+                && (ArgsManager.isXidvFile((String) obj)
+                    || ArgsManager.isZidvFile((String) obj)));
     }
 
     /**
@@ -1694,28 +1709,32 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
 
 
         //Check for any bundles. Either the definingObject is a string or a list that contains strings
-        List  listOfBundles = new ArrayList();
-        if(isABundle(definingObject)) {
-            listOfBundles = Misc.newList(definingObject);
+        List listOfBundles = new ArrayList();
+        if (isABundle(definingObject)) {
+            listOfBundles  = Misc.newList(definingObject);
             definingObject = null;
-        } else if(definingObject instanceof List) {
+        } else if (definingObject instanceof List) {
             List tmp = (List) definingObject;
             definingObject = new ArrayList();
-            for(int i=0;i<tmp.size();i++) {
+            for (int i = 0; i < tmp.size(); i++) {
                 Object obj = tmp.get(i);
-                if(isABundle(obj)) {
+                if (isABundle(obj)) {
                     listOfBundles.add(obj);
                 } else {
-                    ((List)definingObject).add(obj);
+                    ((List) definingObject).add(obj);
                 }
             }
-            if(((List)definingObject).size() ==0) definingObject=null;
+            if (((List) definingObject).size() == 0) {
+                definingObject = null;
+            }
         }
 
-        for(int i=0;i<listOfBundles.size();i++) {
-            doOpen((String)listOfBundles.get(i));
+        for (int i = 0; i < listOfBundles.size(); i++) {
+            doOpen((String) listOfBundles.get(i));
         }
-        if(definingObject==null) return true;
+        if (definingObject == null) {
+            return true;
+        }
 
 
         DataSourceResults results = createDataSource(definingObject,
@@ -1969,7 +1988,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
                     DataManager.PROP_DEFAULT_DISPLAY);
         }
         if (defaultDisplay != null) {
-            dataSource.createAutoDisplay(defaultDisplay,this);
+            dataSource.createAutoDisplay(defaultDisplay, this);
         }
 
     }
@@ -2186,12 +2205,12 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
 
 
     /**
-     * _more_
+     * make a control
      *
-     * @param controlName _more_
-     * @param dataChoice _more_
+     * @param controlName name of control
+     * @param dataChoice with data choice
      *
-     * @return _more_
+     * @return control
      */
     public DisplayControl doMakeControl(String controlName,
                                         DataChoice dataChoice) {
@@ -2199,6 +2218,14 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         return doMakeControl(controlName, Misc.newList(dataChoice));
     }
 
+    /**
+     * make a control
+     *
+     * @param controlName name of control
+     * @param dataChoices list of data choices
+     *
+     * @return control
+     */
     public DisplayControl doMakeControl(String controlName,
                                         List dataChoices) {
         ControlDescriptor cd = getControlDescriptor(controlName);
@@ -2692,7 +2719,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
             return false;
         }
 
-        if(!getJythonManager().saveOnExit()) {
+        if ( !getJythonManager().saveOnExit()) {
             return false;
         }
 
@@ -2763,7 +2790,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
     }
 
     /**
-     * _more_
+     * close current window
      */
     public void closeCurrentWindow() {
         getIdvUIManager().closeCurrentWindow();
@@ -2928,26 +2955,36 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
 
     }
 
+    /**
+     * Utility to list the public api of the given object
+     *
+     * @param o object
+     *
+     * @return api
+     */
     public String listApi(Object o) {
         StringBuffer sb = new StringBuffer();
 
-        if(o instanceof DisplayControl) {
-            DisplaySettingsDialog dsd = new DisplaySettingsDialog(this,(DisplayControlImpl) o, false);
+        if (o instanceof DisplayControl) {
+            DisplaySettingsDialog dsd = new DisplaySettingsDialog(this,
+                                            (DisplayControlImpl) o, false);
             List props = dsd.getPropertyValues();
-            for(int i=0;i<props.size();i++) {
-                PropertyValue p = (PropertyValue) props.get(i);
-                Object v = p.getValue();
-                String type ="n/a";
-                if(v!=null) {
+            for (int i = 0; i < props.size(); i++) {
+                PropertyValue p    = (PropertyValue) props.get(i);
+                Object        v    = p.getValue();
+                String        type = "n/a";
+                if (v != null) {
                     type = v.getClass().getName();
                 }
-                sb.append(Misc.getSetterMethod(p.getName()) + "(" + type +")  = " + DisplaySettingsDialog.getValueLabel(v)+ "<br>");
+                sb.append(Misc.getSetterMethod(p.getName()) + "(" + type
+                          + ")  = " + DisplaySettingsDialog.getValueLabel(v)
+                          + "<br>");
             }
             return sb.toString();
         }
 
         List methods = XmlEncoder.findPropertyMethods(o.getClass(), false);
-        for(int i=0;i<methods.size();i++) {
+        for (int i = 0; i < methods.size(); i++) {
             Method m = (Method) methods.get(i);
             sb.append(m.getName());
             sb.append("<br>");

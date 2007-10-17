@@ -925,8 +925,10 @@ public class StateManager extends IdvManager {
      */
 
     public String getPreferenceOrProperty(String pref, String dflt) {
-        Object o =  getPreferenceOrProperty(pref);
-        if(o!=null) return o.toString();
+        Object o = getPreferenceOrProperty(pref);
+        if (o != null) {
+            return o.toString();
+        }
         return dflt;
     }
 
