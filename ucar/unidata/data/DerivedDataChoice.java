@@ -238,6 +238,21 @@ public class DerivedDataChoice extends ListDataChoice {
     }
 
     /**
+     * Used when not creating it from a DerivedDataDescriptor.
+     *
+     * @param dataContext        The context in which this DataChoice exists
+     *                           (typically the
+     *                           {@link ucar.unidata.idv.IntegratedDataViewer}).
+     *  @param formula           The formula body used as the operator
+     */
+    public DerivedDataChoice(DataContext dataContext, String formula) {
+        super("", "", "", new ArrayList());
+        this.dataContext = dataContext;
+        this.properties  = new Properties();
+        this.formula     = formula;
+    }
+
+    /**
      * Create a new instance of this object.
      *
      * @return The new instance.
