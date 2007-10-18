@@ -75,6 +75,46 @@ The generic date format can contain a specification that is used by the Java
 and is described in <a href="BasicTags.html#simpledateformat">Basic Tags</a>.
 
 
+<p>
+You can also use any number of  contained [isl::tag fileset] tags to define a custom list of images
+that are used instead of the default images derived from an animation capture.
+
+[isl::xml {
+<movie file="test.mov">
+   <fileset file="image1.png"/>
+   <fileset file="image2.png"/>
+   <fileset file="image3.png"/>
+</movie>
+}]
+
+[isl::tagdef panel {Create a gridded layout of a set of images. This is just like the movie tag and support all of the above attributes} -attrs {file {output image file} movieattributes {All of the movie tag attributes} columns {Number of columns} width {Resize the images to width} space {Spacing between each grid cell}}]
+
+The [isl::tag panel] tag acts just like the [isl::tag movie] tag except that it merges all of the images into one image
+in a panelized or gridded fashion. It is column oriented so you specify the number of columns:
+
+[isl::xml {
+<panel file="test.gif" width="400" columns="2" space="10"/>
+}]
+
+
+
+[isl::tagdef html {Create an image from rendered html} -attrs {file {output image file} fromfile {Optional name of file to read in html}  width {Fixed width of image}}]
+The  [isl::tag html] tag allows you to specify html that is rendered into an image. It acts just like the image tag in that in can contain
+image manipulation commands. The html is either from a file (specified by the fromfile attribute) or contained in
+a CDATA block:
+
+[isl::xml {
+<html file="foo.png">
+   <![CDATA[
+hello there
+<hr>
+This is my test
+]]>
+   <matte bottom="50" background="red"/>
+</html>
+}]
+
+
 
 <a name="imagesmanipulation"></a>
 <div class="pagesubtitle">Images Manipulation</div>
