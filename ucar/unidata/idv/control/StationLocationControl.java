@@ -638,7 +638,6 @@ public class StationLocationControl extends StationModelControl {
                                + "</td></tr>\n");
             }
             entrySB.append("</table>\n");
-
             html = cleanupHtml(description);
             sb.append(html);
             sb.append(entrySB);
@@ -1233,10 +1232,13 @@ public class StationLocationControl extends StationModelControl {
         locationTab.add("Displayed Locations", locationsTable.getScroller());
         locationTab.setPreferredSize(new Dimension(200,250));
         readoutContents.setPreferredSize(new Dimension(200,250));
-        JSplitPane locationComp = GuiUtils.vsplit(
-                                      locationTab,
-                                      readoutContents,200,0.5);
-        locationComp.setOneTouchExpandable(true);
+        //        JSplitPane locationComp = GuiUtils.vsplit(
+        //                                      locationTab,
+        //                                      readoutContents,200,0.5);
+        JComponent locationComp = GuiUtils.doLayout(new Component[]{
+            locationTab,
+            readoutContents},1,GuiUtils.WT_Y, new double[]{1.0,3.0});
+        //        locationComp.setOneTouchExpandable(true);
         tabbedPane.add("Display", doMakeDisplayPanel());
         tabbedPane.add("Locations", locationComp);
         tabbedPane.add("Data Sets", doMakeStationListPanel());
@@ -1548,7 +1550,9 @@ public class StationLocationControl extends StationModelControl {
                 int index = column - 1;
                 if ((index >= 0) && (index < attributes.size())) {
                     Object key = attributes.get(index);
-                    return station.getProperties().get(key);
+                    String s =(String) station.getProperties().get(key);
+                    s =  StringUtil.stripTags(s);
+                    return s;
                 }
             }
             return "";
