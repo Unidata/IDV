@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -38,6 +39,7 @@ import ucar.visad.quantities.AirPressure;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.EquivalentPotentialTemperature;
 import ucar.visad.quantities.GeopotentialAltitude;
+import ucar.visad.quantities.Gravity;
 import ucar.visad.quantities.GridRelativeHorizontalWind;
 import ucar.visad.quantities.Length;
 import ucar.visad.quantities.PotentialTemperature;
@@ -87,10 +89,9 @@ public class DerivedGridFactory {
     /** kilometers/degree (111) */
     private static final Real KM_PER_DEGREE;
 
-    /** logging category */
-    static ucar.unidata.util.LogUtil.LogCategory log_ =
-        ucar.unidata.util.LogUtil.getLogInstance(
-            DerivedGridFactory.class.getName());
+    /** gravity */
+    public static final Real GRAVITY;
+
 
     static {
         try {
@@ -100,6 +101,8 @@ public class DerivedGridFactory {
             Unit kmPerDegree = Util.parseUnit("km/degree");
             KM_PER_DEGREE = new Real(DataUtil.makeRealType("kmPerDegree",
                     kmPerDegree), 111.0, kmPerDegree);
+            GRAVITY = Gravity.newReal();
+
         } catch (Exception ex) {
             throw new ExceptionInInitializerError(ex.toString());
         }
@@ -169,6 +172,65 @@ public class DerivedGridFactory {
                                          false);
         TupleType paramType = GridUtil.getParamType(grid);
         FieldImpl result    = (FieldImpl) first.subtract(second);
+        if (paramType.getDimension() == 1) {
+            RealType rt = (RealType) paramType.getComponent(0);
+            String newName = rt.getName() + "_LDF_" + (int) value1 + "-"
+                             + (int) value2;
+            RealTupleType rtt =
+                new RealTupleType(DataUtil.makeRealType(newName,
+                    rt.getDefaultUnit()));
+            result = GridUtil.setParamType(result, rtt,
+                                           false /* don't copy */);
+        }
+        return result;
+    }
+
+
+    /**
+     * Make the average of 2 levels of a grid
+     *
+     * @param grid grid of data
+     * @param value1 level the first as a String
+     * @param value2 level the second as a String
+     *
+     * @return computed layer difference
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createLayerAverage(FieldImpl grid, String value1,
+            String value2)
+            throws VisADException, RemoteException {
+        return createLayerAverage(grid, Misc.parseNumber(value1),
+                                  Misc.parseNumber(value2));
+    }
+
+
+    /**
+     * Make the average of 2 levels of a grid
+     *
+     * @param grid     grid of data
+     * @param value1   level of first
+     * @param value2   level of second
+     *
+     * @return computed layer difference
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createLayerAverage(FieldImpl grid, double value1,
+            double value2)
+            throws VisADException, RemoteException {
+
+        FieldImpl first =
+            GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value1),
+                                         false);
+        FieldImpl second =
+            GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value2),
+                                         false);
+        TupleType paramType = GridUtil.getParamType(grid);
+        FieldImpl result =
+            (FieldImpl) (first.add(second)).divide(new Real(2));
         if (paramType.getDimension() == 1) {
             RealType rt = (RealType) paramType.getComponent(0);
             String newName = rt.getName() + "_LDF_" + (int) value1 + "-"
@@ -811,40 +873,61 @@ public class DerivedGridFactory {
      */
     public static FieldImpl createWindSpeed(FieldImpl uFI, FieldImpl vFI)
             throws VisADException, RemoteException {
+        return createVectorMagnitude(uFI, vFI, "WindSpeed");
+    }
+
+    /**
+     * Make a FieldImpl the magnitude of the vector components
+     *
+     * @param uFI  grid of U wind component
+     * @param vFI  grid of V wind component
+     *
+     * @return wind speed grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createVectorMagnitude(FieldImpl uFI,
+            FieldImpl vFI)
+            throws VisADException, RemoteException {
+        return createVectorMagnitude(uFI, vFI, "mag");
+    }
+
+
+    /**
+     * Make a FieldImpl the magnitude of the vector components
+     *
+     * @param uFI  grid of U wind component
+     * @param vFI  grid of V wind component
+     * @param name  name of the resulting value
+     *
+     * @return wind speed grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createVectorMagnitude(FieldImpl uFI,
+            FieldImpl vFI, String name)
+            throws VisADException, RemoteException {
 
 
         if ((uFI == null) || (vFI == null)) {
             return null;
         }
-
+        if (name == null) {
+            name = "mag";
+        }
         // Compute the fieldImpl of wind speed scalar values:
         //    first step is squared wind speed:
         FieldImpl wsgridFI =
             (FieldImpl) (uFI.multiply(uFI)).add((vFI.multiply(vFI))).sqrt();
 
         Unit spdUnit   = ((FlatField) uFI.getSample(0)).getRangeUnits()[0][0];
-        RealType spdRT = DataUtil.makeRealType("WindSpeed", spdUnit);
-        /*
-        if (spdRT == null) {  // unit problems
-            spdRT = RealType.getRealType("WindSpeed_" + spdUnit, spdUnit);
-        }
-        */
+        RealType spdRT = DataUtil.makeRealType(name, spdUnit);
 
         // reset name which was scrambled in computations
         return GridUtil.setParamType(wsgridFI, spdRT, false);
-        /*
-        FunctionType wsFT = (FunctionType) wsgridFI.getType();
-        FieldImpl fieldImpl =
-            (FieldImpl) wsgridFI.changeMathType(
-                new FunctionType(
-                    wsFT.getDomain(),
-                    new FunctionType(
-                        ((FunctionType) wsFT.getRange()).getDomain(),
-                        spdRT)));
-
-        return fieldImpl;
-        */
-    }  //  end make wind speed field impl
+    }  //  end create vector mag
 
 
     /**
@@ -1875,27 +1958,91 @@ public class DerivedGridFactory {
             retField = (FlatField) GridUtil.setSpatialDomain(retField,
                     domain);
         }
-        //System.out.println("domain = " + domain);
-        //System.out.println(retField);
         if (var.equals(RealType.Longitude)
                 || var.getName().toLowerCase().startsWith("lon")) {
             FlatField latGrid = (FlatField) createLatitudeGrid(retField);
-            //System.out.println("latGrid:"+latGrid);
-            FlatField latCosGrid = (FlatField) latGrid.cos();
-            //System.out.println("latCosGrid:"+latCosGrid);
-            latCosGrid = (FlatField) latCosGrid.max(new Real(.0015));
-            //System.out.println("latCosMin0Grid" + latCosGrid);
+            // take the cos, but account for 0 at poles.
+            FlatField latCosGrid =
+                (FlatField) latGrid.cos().max(new Real(Math.cos(89)));
             FlatField factor = (FlatField) latCosGrid.multiply(KM_PER_DEGREE);
-            //System.out.println("factor:" + factor);
-            //retField = (FlatField) retField.divide(KM_PER_DEGREE.multiply(latGrid.cos().multiply(KM_PER_DEGREE));
             retField = (FlatField) retField.divide(factor);
-            //System.out.println(retField);
-            //retField = (FlatField) retField.divide(KM_PER_DEGREE.multiply(latGrid.cos().multiply(KM_PER_DEGREE));
         } else if (var.equals(RealType.Latitude)
                    || var.getName().toLowerCase().startsWith("lat")) {
             retField = (FlatField) retField.divide(KM_PER_DEGREE);
         }
         return retField;
+    }
+
+    /**
+     * Is this a vector?
+     * @param grid  grid to check
+     * @return true if there is more than one component
+     *
+     * @throws VisADException _more_
+     */
+    public static boolean isVector(FieldImpl grid) throws VisADException {
+        TupleType tt       = GridUtil.getParamType(grid);
+        boolean   isVector = false;
+        if (tt instanceof EarthVectorType) {
+            isVector = true;
+        } else {
+            isVector = tt.getDimension() > 1;
+        }
+        return isVector;
+    }
+
+    /**
+     * Is this a vector?
+     * @param grid  grid to check
+     * @return true if there is more than one component
+     *
+     * @throws VisADException _more_
+     */
+    public static boolean isScalar(FieldImpl grid) throws VisADException {
+        return !isVector(grid);
+    }
+
+    /**
+     * Get U component of a vector
+     * @param vector  vector quantity
+     * @return u (first) component or null if not a vector
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static FieldImpl getUComponent(FieldImpl vector)
+            throws VisADException, RemoteException {
+        return getComponent(vector, 0);
+    }
+
+    /**
+     * Get V component of a vector
+     * @param vector  vector quantity
+     * @return v (second) component or null if not a vector
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static FieldImpl getVComponent(FieldImpl vector)
+            throws VisADException, RemoteException {
+        return getComponent(vector, 1);
+    }
+
+    /**
+     * Get nth component of a vector
+     * @param vector  vector quantity
+     * @param index _more_
+     * @return nth component or null in index &gt; number of components
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static FieldImpl getComponent(FieldImpl vector, int index)
+            throws VisADException, RemoteException {
+        if ( !isVector(vector)) {
+            return vector;
+        }
+        return GridUtil.getParam(vector, index);
     }
 }
 

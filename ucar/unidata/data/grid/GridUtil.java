@@ -24,6 +24,9 @@
 package ucar.unidata.data.grid;
 
 
+import ucar.unidata.data.DataUtil;
+
+
 import ucar.unidata.data.point.PointObTuple;
 
 import ucar.unidata.util.LogUtil;
@@ -1580,6 +1583,188 @@ public class GridUtil {
             throw new VisADException("problem getting param type " + re);
         }
         return tt;
+    }
+
+    /**
+     * Get the range MathType of the lowest element.  If this is
+     * a sequence, it will be the range type of the individual elements.
+     * If not, it will be the range
+     *
+     * @param grid    grid to check
+     * @param index   parameter index
+     * @return   TupleType of lowest element
+     *
+     * @throws VisADException   unable to get at data types
+     */
+    public static FieldImpl getParam(FieldImpl grid, int index)
+            throws VisADException {
+
+        FieldImpl newField = null;
+        if (grid == null) {
+            return newField;
+        }
+        TupleType tt = getParamType(grid);
+        if (index > tt.getDimension()) {
+            return null;
+        }
+        MathType newParam = tt.getComponent(index);
+
+        try {
+            Data         step1   = null;
+            FunctionType newType = null;
+
+            if (isSequence(grid)) {
+
+                // get sample at first time step
+                try {
+                    step1 = grid.getSample(0);
+                } catch (RemoteException re) {
+                    throw new VisADException("problem setting param type "
+                                             + re);
+                }
+                // if "step1" is NOT yet ANOTHER sequence
+                if ( !isSequence((FieldImpl) step1)) {
+                    Trace.call1("GridUtil.setParam:sequence");
+                    // get "time" domain from "grid"
+                    MathType domRT =
+                        ((FunctionType) grid.getType()).getDomain();
+                    // get "(x,y,z)->param"
+                    FunctionType ffRT =
+                        (FunctionType) ((FunctionType) grid.getType())
+                            .getRange();
+                    // get "(x,y,z)"
+                    MathType ffdomRT = ffRT.getDomain();
+                    // make new "time->(x,y,z) - >NEWparam"
+                    newType = new FunctionType(domRT,
+                            new FunctionType(ffdomRT, newParam));
+
+                    Set timeDomain = grid.getDomainSet();
+                    newField = new FieldImpl(newType, timeDomain);
+                    for (int i = 0; i < timeDomain.getLength(); i++) {
+                        newField.setSample(i, ((FlatField) grid.getSample(i,
+                                false)).extract(index), false);
+                    }
+                    Trace.call2("GridUtil.setParam:sequence");
+                }
+                // if this data is a double 1D sequence, as for the radar RHI
+                // time -> (integer_index -> ((Range, Azimuth, Elevation_Angle) 
+                //                               -> Reflectivity_0))
+                else {
+                    // get "time" domain from "grid"
+                    Trace.call1("GridUtil.setParam:indexsequence");
+                    MathType timedomRT =
+                        ((FunctionType) grid.getType()).getDomain();
+                    // get "integer_index" domain from first time step, step1
+                    MathType indexdomRT =
+                        ((FunctionType) step1.getType()).getDomain();
+                    // get "(x,y,z)->param"
+                    FunctionType ffRT =
+                        (FunctionType) ((FunctionType) step1.getType())
+                            .getRange();
+                    // get "(x,y,z)"
+                    MathType ffdomRT = ffRT.getDomain();
+                    // make new "time->index->(x,y,z) - >NEWparam"
+                    FunctionType paramRange = new FunctionType(ffdomRT,
+                                                  newParam);
+                    FunctionType indexRange = new FunctionType(indexdomRT,
+                                                  paramRange);
+                    newType = new FunctionType(timedomRT, indexRange);
+                    Set timeDomain = grid.getDomainSet();
+                    newField = new FieldImpl(newType, timeDomain);
+                    for (int i = 0; i < timeDomain.getLength(); i++) {
+                        FieldImpl indexField = (FieldImpl) grid.getSample(i,
+                                                   false);
+                        Set indexSet = indexField.getDomainSet();
+                        FieldImpl newIndexField = new FieldImpl(indexRange,
+                                                      indexSet);
+                        for (int j = 0; j < indexSet.getLength(); j++) {
+                            newIndexField.setSample(j,
+                                    ((FlatField) indexField.getSample(j,
+                                        false)).extract(index), false);
+                        }
+                        newField.setSample(i, newIndexField);
+                    }
+                    Trace.call2("GridUtil.setParam:indexsequence");
+                }
+
+            } else {
+                // have "grid" single FlatField; neither time nor index domain
+                //newField = (FieldImpl) Util.clone(grid, newParam, true, copy);
+                newField = (FieldImpl) grid.extract(index);
+            }
+        } catch (RemoteException re) {
+            throw new VisADException("problem setting param type " + re);
+        }
+        return newField;
+
+    }
+
+    /**
+     * Set the range MathType of the lowest element.  If this is
+     * a sequence, it will be the range type of the individual elements.
+     * If not, it will be the range.  Data is replicated.
+     *
+     * @param  grid  grid to change
+     * @param  newName  name of new parameter
+     *
+     * @return   a new FieldImpl with the new parameter type
+     *
+     * @throws VisADException   problem setting new parameter
+     */
+    public static FieldImpl setParamType(FieldImpl grid, String newName)
+            throws VisADException {
+        return setParamType(grid, newName, true);
+    }
+
+    /**
+     * Set the range MathType of the lowest element.  If this is
+     * a sequence, it will be the range type of the individual elements.
+     * If not, it will be the range.  Data is replicated.
+     *
+     * @param  grid  grid to change
+     * @param  newName  name of new parameter
+     * @param  copy  true to make a copy
+     *
+     * @return   a new FieldImpl with the new parameter type
+     *
+     * @throws VisADException   problem setting new parameter
+     */
+    public static FieldImpl setParamType(FieldImpl grid, String newName,
+                                         boolean copy)
+            throws VisADException {
+        return setParamType(grid, new String[] { newName }, copy);
+    }
+
+    /**
+     * Set the range MathType of the lowest element.  If this is
+     * a sequence, it will be the range type of the individual elements.
+     * If not, it will be the range.  Data is replicated.
+     *
+     * @param  grid  grid to change
+     * @param  newNames  names of new parameters
+     * @param  copy  true to make a copy
+     *
+     * @return   a new FieldImpl with the new parameter type
+     *
+     * @throws VisADException   problem setting new parameter
+     */
+    public static FieldImpl setParamType(FieldImpl grid, String[] newNames,
+                                         boolean copy)
+            throws VisADException {
+        TupleType  tt  = getParamType(grid);
+        RealType[] rts = tt.getRealComponents();
+        if (rts.length != newNames.length) {
+            throw new VisADException(
+                "number of names must match number of components");
+        }
+        RealType[] newTypes = new RealType[newNames.length];
+        for (int i = 0; i < newNames.length; i++) {
+            newTypes[i] = DataUtil.makeRealType(newNames[i],
+                    rts[i].getDefaultUnit());
+
+        }
+        RealTupleType newParam = new RealTupleType(newTypes);
+        return setParamType(grid, newParam, copy);
     }
 
     /**
