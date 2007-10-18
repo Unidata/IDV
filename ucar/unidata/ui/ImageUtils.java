@@ -899,6 +899,9 @@ public class ImageUtils {
                                    Color transparentColor, Font font)
             throws Exception {
         JEditorPane editor = getEditor(html, width, transparentColor, font);
+        editor.updateUI();
+        editor.invalidate();
+        editor.validate();
         return getImage(editor, transparentColor);
     }
 
@@ -955,7 +958,6 @@ public class ImageUtils {
         theEditor.setText(html);
         Dimension dim = theEditor.getPreferredSize();
         if ((width > 0) && (width < dim.width)) {
-
             theEditor.setSize(new Dimension(width, 100));
             dim.width = width;
         }
