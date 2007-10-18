@@ -272,15 +272,14 @@ public class DerivedGridFactory {
                 //                  ((FunctionType)rvFF.getType()).getRange());
 
                 // set this time's grid 
-                rvFI.setSample(i, (FlatField) GridUtil.setParamType(rvFF,
-                        rvRT, false), false);
+                rvFI.setSample(i, rvFF, false);
             }
         } else {
             rvFI = (FieldImpl) ddx(vFF).subtract(ddy(uFF));
         }
         Unit     rvUnit = GridUtil.getParamUnits(rvFI)[0];
         RealType rvRT   = DataUtil.makeRealType("relvorticity", rvUnit);
-        return GridUtil.setParamType(rvFI, rvRT);
+        return GridUtil.setParamType(rvFI, rvRT, false);
     }  // end method create Relative Vorticity
 
 
