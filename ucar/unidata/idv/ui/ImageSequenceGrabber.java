@@ -1548,10 +1548,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     private void  createPanel(String file, List images,  Element scriptingNode) {
         try {
             imageGenerator.debug("Making image panel:" + file);
-            int width =     imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_WIDTH, 100);
-            int columns=     imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_COLUMNS, 1);
+            int width =    imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_WIDTH, 100);
+            int columns=   imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_COLUMNS, 1);
             int space=     imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_SPACE, 0);
-            Color background=     imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_BACKGROUND, (Color) null);
+            Color background=  imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_BACKGROUND, (Color) null);
             List sizedImages = new ArrayList();
             for(int i=0;i<images.size();i++) {
                 String imageFile = images.get(i).toString();

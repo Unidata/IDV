@@ -2098,6 +2098,34 @@ public class ImageGenerator extends IdvManager {
         return true;
     }
 
+    /**
+     * process the given node
+     *
+     * @param node Node to process
+     *
+     * @return keep going
+     *
+     * @throws Throwable On badness
+     */
+    protected boolean processTagHtml(Element node) throws Throwable {
+        /*<html file="foo.gif">
+        <![CDATA[Observations>METAR]]>
+        </html>*/
+        String html = null;
+        if(XmlUtil.hasAttribute(node,ATTR_FROMFILE)) {
+            html = IOUtil.readContents(applyMacros(node, ATTR_FROMFILE));
+        } else {
+            html = XmlUtil.getChildText(node);
+        }
+        html = applyMacros(html);
+        int width = XmlUtil.getAttribute(node, ATTR_WIDTH,-1);
+        Image image = ImageUtils.renderHtml(html,width,null,null);
+        image = processImage(ImageUtils.toBufferedImage(image), XmlUtil.getAttribute(node, ATTR_FILE),
+                             node, getAllProperties(), null);
+
+        //        writeImageToFile(image, XmlUtil.getAttribute(node, ATTR_FILE));
+        return true;
+    }
 
     /**
      * process the given node
