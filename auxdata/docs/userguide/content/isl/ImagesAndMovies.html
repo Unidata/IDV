@@ -279,7 +279,18 @@ The [isl::tag write] tag allows you to write out an intermediate image file at a
 }]
 
 
-[isl::tagdef colorbar {Add a color bar to an image} -attrs {width {bar width} height {bar height} orientation {tick mark  location, 'right', 'left', 'bottom', 'top'} tickmarks {number of tick marks} interval {interval value} values {comma separated list of values} place {rectangle location} {anchor rectangle location} showlines {'true' or 'false', draw tick lines} linecolor {line color} }]
+[isl::tagdef colorbar {Add a color bar to an image} -attrs {
+               display {optional id of display to use. If not defined then this will use all colorbars found}
+               width {bar width} 
+               height {bar height} 
+               orientation {tick mark  location, 'right', 'left', 'bottom', 'top'} 
+               tickmarks {number of tick marks} 
+               interval {interval value} 
+               values {comma separated list of values} 
+               place {rectangle location} 
+               anchor {rectangle location} 
+               showlines {'true' or 'false', draw tick lines} 
+               linecolor {line color} }]
 The [isl::tag colorbar] tag allows you to add a color bar from  the color tables in the display controls.
 Currently, it does not do a perfect job when there are more than one color tables present.
 <p>
@@ -293,6 +304,17 @@ a specific list of values.
 <p>
 The location of the color bar is defined using the anchor and place points as described for
 the  [isl::tagref overlay] tag.
+
+<p>
+Here is an example:
+[isl::importxml colorbar.isl]
+
+
+That makes:
+[ht::cimg images/colorbar.png]
+
+
+
 
 
 [isl::tagdef transparent {Set transparency on an image} -attrs {color+ {color to set to transparent}}]
