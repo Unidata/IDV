@@ -20,14 +20,13 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.grid;
 
 
 import ucar.unidata.data.DataUtil;
 
 import ucar.unidata.idv.DisplayConventions;
-
-
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
@@ -80,10 +79,13 @@ import java.rmi.RemoteException;
 public class DerivedGridFactory {
 
     /** EARTH RADIUS */
-    private static final Real EARTH_RADIUS;
+    public static final Real EARTH_RADIUS;
 
     /** EARTH 2 omega */
-    private static final Real EARTH_TWO_OMEGA;
+    public static final Real EARTH_TWO_OMEGA;
+
+    /** kilometers/degree (111) */
+    private static final Real KM_PER_DEGREE;
 
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
@@ -95,6 +97,9 @@ public class DerivedGridFactory {
             EARTH_RADIUS = new Real(Length.getRealType(), 6371000, SI.meter);
             EARTH_TWO_OMEGA = new Real(DataUtil.makeRealType("frequency",
                     SI.second.pow(-1)), 0.00014584, SI.second.pow(-1));
+            Unit kmPerDegree = Util.parseUnit("km/degree");
+            KM_PER_DEGREE = new Real(DataUtil.makeRealType("kmPerDegree",
+                    kmPerDegree), 111.0, kmPerDegree);
         } catch (Exception ex) {
             throw new ExceptionInInitializerError(ex.toString());
         }
@@ -210,8 +215,6 @@ public class DerivedGridFactory {
         FlatField    rvFF        = null;
         FlatField    uFF         = null;
         FlatField    vFF         = null;
-        RealType     xvar        = null;
-        RealType     yvar        = null;
 
         FunctionType rvFFType    = null;
 
@@ -242,33 +245,11 @@ public class DerivedGridFactory {
 
                 //System.out.print("      type of u FF is "+((FunctionType)uFF.getType()));
 
-                // using the first time step,
-                // get the x and y coords of the grid; x,y,level; a "RealType"
-                if (i == 0) {
-                    xvar = (RealType) ((FunctionType) vFF.getType())
-                        .getDomain().getComponent(0);
-                    yvar = (RealType) ((FunctionType) uFF.getType())
-                        .getDomain().getComponent(1);
-                }
-
-                //if (xvar.toString() != "x")
-                //    System.out.print("      xvar = "+xvar+"  yvar = "+yvar);
-                //    System.out.print("      xvar = "+xvar+"  yvar = "+yvar);
-
-                // case of AVN X grids
-                if (xvar.toString().equals("longi")
-                        && yvar.toString().equals("lati")) {
-                    ;
-                }
-                // TODO case where x and y are not in kilometers or meters
-
                 // the derivative of u by y
-                visad.Function uf = uFF.derivative(yvar, Data.NO_ERRORS);
-                dudy = (FlatField) uf;
+                dudy = (FlatField) ddy(uFF);
 
                 // the derivative of v by x
-                visad.Function vf = vFF.derivative(xvar, Data.NO_ERRORS);
-                dvdx = (FlatField) vf;
+                dvdx = (FlatField) ddx(vFF);
 
                 // sum is dvdx - dudy  for final result at this time step
                 rvFF = (FlatField) (dvdx.subtract(dudy));
@@ -277,17 +258,10 @@ public class DerivedGridFactory {
                     // first time through, set up rvFI
 
                     // make the VisAD FunctionType for the rel vort; several steps
-                    Unit rvUnit = rvFF.getRangeUnits()[0][0];
-                    rvRT = DataUtil.makeRealType("relvorticity", rvUnit);
-
-                    rvFFType = new FunctionType(
-                        ((FunctionType) rvFF.getType()).getDomain(),
-                        new RealTupleType(rvRT));
-
                     FunctionType functionType =
                         new FunctionType(
                             ((FunctionType) uFI.getType()).getDomain(),
-                            rvFFType);
+                            rvFF.getType());
 
                     //System.out.println ("       rvFI func type = "+functionType);
 
@@ -298,14 +272,15 @@ public class DerivedGridFactory {
                 //                  ((FunctionType)rvFF.getType()).getRange());
 
                 // set this time's grid 
-                //rvFI.setSample(i, (FlatField) rvFF.changeMathType(rvFFType),
                 rvFI.setSample(i, (FlatField) GridUtil.setParamType(rvFF,
                         rvRT, false), false);
             }
         } else {
-            System.out.println("   not GridUtil.isTimeSequence(temperFI) ");
+            rvFI = (FieldImpl) ddx(vFF).subtract(ddy(uFF));
         }
-        return rvFI;
+        Unit     rvUnit = GridUtil.getParamUnits(rvFI)[0];
+        RealType rvRT   = DataUtil.makeRealType("relvorticity", rvUnit);
+        return GridUtil.setParamType(rvFI, rvRT);
     }  // end method create Relative Vorticity
 
 
@@ -334,125 +309,7 @@ public class DerivedGridFactory {
     public static FieldImpl relativeVorticityFromTrueWind(FieldImpl uFI,
             FieldImpl vFI)
             throws VisADException, RemoteException {
-
-        boolean      UisSequence = (GridUtil.isTimeSequence(uFI));
-        boolean      VisSequence = (GridUtil.isTimeSequence(vFI));
-        FieldImpl    rvFI        = null;
-        FunctionType rvFFType    = null;
-
-        if (UisSequence) {
-
-            // Implementation:  have to take the raw data FieldImpl-s
-            // apart, make rel vort, FlatField by FlatField,
-            // and put all back together again into a new FieldImpl.
-            // So most of the code in this method is manipulating VisAD data objects,
-            // not computations.
-
-            Set timeSet = uFI.getDomainSet();
-
-            // Determine the types latitude and longitude parameters.
-            RealTupleType spatialDomType =
-                (RealTupleType) ((FunctionType) ((FunctionType) uFI.getType())
-                    .getRange()).getDomain();
-            RealType latType = findComponent(spatialDomType, "lat",
-                                             RealType.Latitude);
-            RealType lonType = findComponent(spatialDomType, "lon",
-                                             RealType.Longitude);
-            boolean domIsLatLon = true;
-            if ((latType == null) || (lonType == null)) {
-                domIsLatLon = false;
-                CoordinateSystem cs = spatialDomType.getCoordinateSystem();
-                if (cs == null) {
-                    throw new IllegalArgumentException(
-                        spatialDomType.toString());
-                }
-                RealTupleType spatialDomRefType = cs.getReference();
-                latType = findComponent(spatialDomRefType, "lat",
-                                        RealType.Latitude);
-                lonType = findComponent(spatialDomRefType, "lon",
-                                        RealType.Longitude);
-                if ((latType == null) || (lonType == null)) {
-                    throw new IllegalArgumentException(
-                        spatialDomType.toString());
-                }
-            }
-
-            // resample v grid sequence to domainSet [times] of u grid sequence, 
-            // thereby making sure both u and v have the same time sequence. (?)
-            if ((timeSet.getLength() > 1) && (VisSequence == true)) {
-                vFI = (FieldImpl) vFI.resample(timeSet);
-            }
-
-            FlatField flatField0 = (FlatField) uFI.getSample(0);
-
-            // get 3D grid of latitudes at each grid point
-            FlatField latGrid = createLatitudeGrid(flatField0, latType,
-                                    domIsLatLon);
-
-            // get 3D grid of longitude metric at each grid point
-            FlatField lonMetric =
-                (FlatField) latGrid.cos().divide(EARTH_RADIUS);
-
-            // compute each rel vort FlatField for time steps in turn; 
-            // then load each in FieldImpl
-            RealType rvRT = null;
-            for (int i = 0; i < timeSet.getLength(); i++) {
-
-                //System.out.println("       time step "+i); 
-
-                // get u and v single grids for this time step
-                FlatField uFF = (FlatField) uFI.getSample(i);
-                FlatField vFF = (FlatField) vFI.getSample(i);
-
-                //System.out.print("      type of u FF is "+((FunctionType)uFF.getType()));
-
-                // the derivative of u by y
-                FlatField dudy = (FlatField) uFF.derivative(latType,
-                                     Data.NO_ERRORS).divide(EARTH_RADIUS);
-
-                // the derivative of v by x
-                FlatField dvdx = (FlatField) vFF.derivative(lonType,
-                                     Data.NO_ERRORS).multiply(lonMetric);
-
-                // sum  dvdx - dudy  is the relative vorticity grid at this time step
-                FlatField rvFF = (FlatField) (dvdx.subtract(dudy));
-
-                if (i == 0) {
-                    // first time through, create a new FieldImpl for abs vorticity;
-                    // a FieldImpl is for a sequence of FlatFields (3d grids of doubles)
-                    // in this case a time sequence.
-
-                    // create another VisAD RealType for the data values
-                    // (the one VisAD makesd is different for each grid in the
-                    //  time sequence, so can't be added to a FieldImpl without error).
-                    Unit rvUnit = rvFF.getRangeUnits()[0][0];
-                    rvRT = DataUtil.makeRealType("relvorticity", rvUnit);
-
-                    // create a VisAD FlatField FunctionType for rel vorticity
-                    rvFFType = new FunctionType(
-                        ((FunctionType) rvFF.getType()).getDomain(),
-                        new RealTupleType(rvRT));
-
-                    // create a VisAD FunctionType for the FieldImpl
-                    FunctionType functionType =
-                        new FunctionType(
-                            ((FunctionType) uFI.getType()).getDomain(),
-                            rvFFType);
-
-                    // make the new FieldImpl (empty of data so far)
-                    rvFI = new FieldImpl(functionType, timeSet);
-                }
-
-                // set this time's rv grid in the FieldImpl; switching first the
-                // RealType of grid data values to the new Type
-                //rvFI.setSample(i, (FlatField) rvFF.changeMathType(rvFFType),
-                rvFI.setSample(i, (FlatField) GridUtil.setParamType(rvFF,
-                        rvRT, false), false);
-            }
-        } else {
-            System.out.println("   not GridUtil.isTimeSequence(temperFI) ");
-        }
-        return rvFI;
+        return createRelativeVorticity(uFI, vFI);
     }
 
 
@@ -507,205 +364,14 @@ public class DerivedGridFactory {
             FieldImpl vFI)
             throws VisADException, RemoteException {
 
-        //System.out.println ("    making absolute vorticity...");
+        FieldImpl relVor  = createRelativeVorticity(uFI, vFI);
+        FieldImpl latGrid = getLatitudeGrid(relVor);
+        FieldImpl fc = (FieldImpl) latGrid.sin().multiply(EARTH_TWO_OMEGA);
+        FieldImpl avFI    = (FieldImpl) relVor.add(fc);
+        Unit      avUnit  = GridUtil.getParamUnits(avFI)[0];
+        RealType  avRT    = DataUtil.makeRealType("absvorticity", avUnit);
+        return GridUtil.setParamType(avFI, avRT, false);
 
-        //long starttime = System.currentTimeMillis();
-
-        boolean      UisSequence = (GridUtil.isTimeSequence(uFI));
-        boolean      VisSequence = (GridUtil.isTimeSequence(vFI));
-
-        FieldImpl    avFI        = null;
-
-        FlatField    dvdx        = null;
-        FlatField    dudy        = null;
-        FlatField    rvFF        = null;
-        FlatField    avFF        = null;
-        FlatField    uFF         = null;
-        FlatField    vFF         = null;
-        RealType     xvar        = null;
-        RealType     yvar        = null;
-
-        FunctionType avFFType    = null;
-
-        if (UisSequence) {
-
-            // Implementation:  have to take the raw data FieldImpl-s
-            // apart, make abs vort, FlatField by FlatField,
-            // and put all back together again into a new FieldImpl.
-
-            Set timeSet = uFI.getDomainSet();
-
-            // Determine the types latitude and longitude parameters.
-            RealTupleType spatialDomType =
-                (RealTupleType) ((FunctionType) ((FunctionType) uFI.getType())
-                    .getRange()).getDomain();
-            RealType latType = findComponent(spatialDomType, "lat",
-                                             RealType.Latitude);
-            RealType lonType = findComponent(spatialDomType, "lon",
-                                             RealType.Longitude);
-            boolean domIsLatLon = true;
-            if ((latType == null) || (lonType == null)) {
-                domIsLatLon = false;
-                CoordinateSystem cs = spatialDomType.getCoordinateSystem();
-                if (cs == null) {
-                    throw new IllegalArgumentException(
-                        spatialDomType.toString());
-                }
-                RealTupleType spatialDomRefType = cs.getReference();
-                latType = findComponent(spatialDomRefType, "lat",
-                                        RealType.Latitude);
-                lonType = findComponent(spatialDomRefType, "lon",
-                                        RealType.Longitude);
-                if ((latType == null) || (lonType == null)) {
-                    throw new IllegalArgumentException(
-                        spatialDomType.toString());
-                }
-                //System.out.println("refType: lat= " + latType + " lon = " + lonType);
-            } else {
-                //System.out.println("domType: lat= " + latType + " lon = " + lonType);
-            }
-            log_.debug("domType: lat= " + latType + " lon = " + lonType);
-
-            // resample v grid sequence to domainSet [times]of u grid sequence,
-            // thereby making sure both u and v have the same time sequence.(?)
-            if ((timeSet.getLength() > 1) && (VisSequence == true)) {
-                vFI = (FieldImpl) vFI.resample(timeSet);
-            }
-
-            FlatField flatField0 = (FlatField) uFI.getSample(0);
-
-            // get 3D grid of latitudes at each grid point
-            FlatField latGrid = createLatitudeGrid(flatField0, latType,
-                                    domIsLatLon);
-
-            // get 3D grid of Coriolus parameter at each grid point
-            FlatField fc =
-                (FlatField) latGrid.sin().multiply(EARTH_TWO_OMEGA);
-
-            // get 3D grid of longitude metric at each grid point
-            FlatField lonMetric =
-                (FlatField) latGrid.cos().divide(EARTH_RADIUS);
-
-            // compute each abs vort FlatField for time steps in turn; 
-            // then load each in FieldImpl
-            RealType avRT = null;
-            for (int i = 0; i < timeSet.getLength(); i++) {
-
-                // System.out.println("       time step "+i); 
-
-                // get u and v single grids for this time step
-                uFF = (FlatField) uFI.getSample(i);
-                vFF = (FlatField) vFI.getSample(i);
-
-                //System.out.print
-                //("      type of u FF is "+((FunctionType)uFF.getType()));
-
-
-                // using the first time step,
-                // get the x and y RealTypes  of the coordinates
-                if (i == 0) {
-                    xvar = (RealType) ((FunctionType) vFF.getType())
-                        .getDomain().getComponent(0);
-                    yvar = (RealType) ((FunctionType) uFF.getType())
-                        .getDomain().getComponent(1);
-
-                    log_.debug("xvar = " + xvar + "  yvar = " + yvar);
-                    // case of AVN X grids
-                    /*
-                    if (xvar.toString().equals("lon")
-                            && yvar.toString().equals("lat")) {
-                        System.out.println(
-                            "   x and y are in long-lat values; abs vort values wrong");
-                    }
-                    */
-                    // TODO case where x and y are not in kilometers or meters
-                }
-
-                // the derivative of u by y
-                visad.Function uf = uFF.derivative(yvar, Data.NO_ERRORS);
-                dudy = (FlatField) uf;
-
-                // the derivative of v by x
-                visad.Function vf = vFF.derivative(xvar, Data.NO_ERRORS);
-                dvdx = (FlatField) vf;
-
-                /*
-                // The following gives weird results:
-                // the derivative of u by y
-                dudy = (FlatField)uFF.derivative(
-                    latType, Data.NO_ERRORS).divide(EARTH_RADIUS);
-
-                // the derivative of v by x
-                dvdx = (FlatField)vFF.derivative(
-                    lonType, Data.NO_ERRORS).multiply(lonMetric);
-                */
-
-                // difference  dvdx - dudy  
-                //   is the relative vorticity grid at this time step
-                rvFF = (FlatField) (dvdx.subtract(dudy));
-                log_.debug("rvFF units = " + rvFF.getRangeUnits()[0][0]);
-
-                // System.out.println("rvFF:" + rvFF.getType());
-                // System.out.println("fc:" + fc.getType());
-
-                // add relative vorticity and Coriolus parameters grids
-                // which finally makes the abs vorticity 3d grid 
-                // at this time step;
-                // both must have same units; s^-1 or scaled s^-1 is correct.
-                avFF = (FlatField) (rvFF.add(fc));
-
-                if (i == 0) {
-                    // first time through, create a new FieldImpl 
-                    // for abs vorticity;
-                    // a FieldImpl is for a sequence of FlatFields 
-                    // (3d grids of doubles)
-                    // in this case a time sequence.
-
-                    // create another VisAD RealType for the data values
-                    // (the one VisAD makesd is different for each grid in the
-                    //  time sequence, 
-                    // so can't be added to a FieldImpl without error).
-                    Unit avUnit = avFF.getRangeUnits()[0][0];
-                    avRT = DataUtil.makeRealType("absvorticity", avUnit);
-
-                    // create a VisAD FlatField FunctionType for abs vorticity
-                    avFFType = new FunctionType(
-                        ((FunctionType) avFF.getType()).getDomain(),
-                        new RealTupleType(avRT));
-
-                    // create a VisAD FunctionType for the FieldImpl
-                    FunctionType functionType =
-                        new FunctionType(
-                            ((FunctionType) uFI.getType()).getDomain(),
-                            avFFType);
-
-                    //System.out.println ("   avFI func type = "+functionType);
-
-                    // make the new FieldImpl (empty of data so far)
-                    avFI = new FieldImpl(functionType, timeSet);
-                }
-                //System.out.println ("    av single grid range type = "+
-                //                  ((FunctionType)avFF.getType()).getRange());
-
-                // set this time's av grid in the FieldImpl; 
-                // switching first the
-                // RealType of grid data values to the new Type
-                //avFI.setSample(i, (FlatField) avFF.changeMathType(avFFType),
-                avFI.setSample(i, (FlatField) GridUtil.setParamType(avFF,
-                        avRT, false), false);
-            }
-        } else {
-            System.out.println("   not GridUtil.isTimeSequence(temperFI) ");
-        }
-
-        //long endtime = System.currentTimeMillis();
-        // System.out.println(" computed in " + 
-        // (System.currentTimeMillis() - starttime + " millisecs"));
-
-        //System.out.println("    Done.  abs vorticity unit = "+
-        //                   avFF.getRangeUnits()[0][0]);
-
-        return avFI;
     }  // end method create Absolute Vorticity (FieldImpl uFI, FieldImpl vFI)
 
 
@@ -1261,28 +927,7 @@ public class DerivedGridFactory {
             FlatField vFF)
             throws VisADException, RemoteException {
 
-        FlatField divgrid = null;
-        // set up for  partial derivative of u w.r.t. x:
-        RealTupleType uRTT = ((FunctionType) (uFF.getType())).getDomain();
-        RealType      xRT  = (RealType) uRTT.getComponent(0);
-
-        // set up for  partial derivative of v w.r.t. y:
-        RealTupleType vRTT = ((FunctionType) (vFF.getType())).getDomain();
-        RealType      yRT  = (RealType) vRTT.getComponent(1);
-
-        FlatField udivgrid = (FlatField) (uFF.derivative(xRT,
-                                 Data.NO_ERRORS));
-
-        //System.out.println("     got du / dx");
-
-        FlatField vdivgrid = (FlatField) (vFF.derivative(yRT,
-                                 Data.NO_ERRORS));
-
-        //System.out.println("     got dv / dy");
-
-        divgrid = (FlatField) udivgrid.add(vdivgrid);
-
-        return divgrid;
+        return (FlatField) ddx(uFF).add(ddy(vFF));
     }
 
 
@@ -1397,17 +1042,8 @@ public class DerivedGridFactory {
             FlatField uFF, FlatField vFF)
             throws VisADException, RemoteException {
 
-        FlatField advgrid = null;
-        // set up for  partial derivative of a w.r.t. x:
-        RealTupleType aRTT = ((FunctionType) (aFF.getType())).getDomain();
-        RealType      xRT  = (RealType) aRTT.getComponent(0);
-
-        // set up for  partial derivative of a w.r.t. y:
-        RealType yRT = (RealType) aRTT.getComponent(1);
-
-        advgrid = (FlatField) (aFF.derivative(xRT,
-                Data.NO_ERRORS).multiply(uFF)).add(aFF.derivative(yRT,
-                    Data.NO_ERRORS).multiply(vFF));
+        FlatField advgrid =
+            (FlatField) (ddx(aFF).multiply(uFF)).add(ddy(aFF).multiply(vFF));
 
         return (FlatField) advgrid.negate();
     }
@@ -1869,8 +1505,9 @@ public class DerivedGridFactory {
                 }
 
                 // the derivative of theta by pressure level
-                dthdp = thetaFF.derivative(pressure, Data.NO_ERRORS);
-                dtdp  = (FlatField) dthdp;
+                //dthdp = thetaFF.derivative(pressure, Data.NO_ERRORS);
+                //dtdp  = (FlatField) dthdp;
+                dthdp = partial(thetaFF, pressure);
 
                 // multiply by little g - surface gravity acceleration
                 // a minus sign is conventionally applied here, however it gives 
@@ -1994,6 +1631,85 @@ public class DerivedGridFactory {
         return pressureFF;
     }
 
+    /**
+     * Every geo-located data grid can be used
+     * to make a grid with latitude with the grid values as well
+     *
+     * @param fi         Any geolocated grid
+     *
+     * @return extracted grid of latitudes at the grid points
+     *
+     * @deprecated  use createLatitudeGrid(FieldImpl)
+     * @throws RemoteException
+     * @throws VisADException
+     */
+    public static FieldImpl getLatitudeGrid(FieldImpl fi)
+            throws VisADException, RemoteException {
+        return createLatitudeGrid(fi);
+    }
+
+    /**
+     * Every geo-located data grid can be used
+     * to make a grid with latitude with the grid values as well
+     *
+     * @param fi         Any geolocated grid
+     *
+     * @return extracted grid of latitudes at the grid points
+     *
+     * @throws RemoteException
+     * @throws VisADException
+     */
+    public static FieldImpl createLatitudeGrid(FieldImpl fi)
+            throws VisADException, RemoteException {
+        SampledSet ss = GridUtil.getSpatialDomain(fi);
+        // Determine the types latitude and longitude parameters.
+        RealTupleType spatialDomType = ((SetType) ss.getType()).getDomain();
+        RealType latType = findComponent(spatialDomType, "lat",
+                                         RealType.Latitude);
+        RealType lonType = findComponent(spatialDomType, "lon",
+                                         RealType.Longitude);
+        boolean domIsLatLon = true;
+        if ((latType == null) || (lonType == null)) {
+            domIsLatLon = false;
+            CoordinateSystem cs = spatialDomType.getCoordinateSystem();
+            if (cs == null) {
+                throw new IllegalArgumentException("Not lat/lon domain "
+                        + spatialDomType.toString());
+            }
+            RealTupleType spatialDomRefType = cs.getReference();
+            latType = findComponent(spatialDomRefType, "lat",
+                                    RealType.Latitude);
+            lonType = findComponent(spatialDomRefType, "lon",
+                                    RealType.Longitude);
+            if ((latType == null) || (lonType == null)) {
+                throw new IllegalArgumentException("Not lat/lon domain "
+                        + spatialDomRefType.toString());
+            }
+        }
+        FieldImpl latField = null;
+        if (GridUtil.isTimeSequence(fi)) {
+            Set       timeSet          = fi.getDomainSet();
+            boolean   isConstantDomain = GridUtil.isConstantSpatialDomain(fi);
+            FlatField latFF            = null;
+            for (int i = 0; i < timeSet.getLength(); i++) {
+                if ( !isConstantDomain || (latFF == null)) {
+                    latFF = createLatitudeGrid((FlatField) fi.getSample(i,
+                            false), latType, domIsLatLon);
+                }
+                if (i == 0) {
+                    FunctionType latFIType =
+                        new FunctionType(DataUtility.getDomainType(timeSet),
+                                         (FunctionType) latFF.getType());
+                    latField = new FieldImpl(latFIType, timeSet);
+                }
+                latField.setSample(i, latFF);
+            }
+        } else {
+            latField = createLatitudeGrid((FlatField) fi, latType,
+                                          domIsLatLon);
+        }
+        return latField;
+    }
 
     /**
      * Every geo-located data grid can be used
@@ -2016,7 +1732,7 @@ public class DerivedGridFactory {
             RealType latType, boolean domIsLatLon)
             throws VisADException, RemoteException {
 
-        Gridded3DSet  g3dset = (Gridded3DSet) ff.getDomainSet();
+        SampledSet    g3dset = GridUtil.getSpatialDomain(ff);
         RealTupleType rTT    = ((FunctionType) (ff.getType())).getDomain();
         FunctionType  FT     = new FunctionType(rTT, RealType.Latitude);
         FlatField     latff  = new FlatField(FT, g3dset);
@@ -2040,12 +1756,12 @@ public class DerivedGridFactory {
                 throw new IllegalArgumentException(refType.toString());
             }
 
-            double[][] latlon = cs.toReference(g3dset.getDoubles(),
+            float[][] flatlon = cs.toReference(g3dset.getSamples(),
                                     g3dset.getSetUnits());
 
-            float[][] flatlon = g3dset.doubleToFloat(latlon);
+            //float[][] flatlon = g3dset.doubleToFloat(latlon);
 
-            float[][] lats    = new float[][] {
+            float[][] lats = new float[][] {
                 flatlon[latI]
             };
 
@@ -2060,62 +1776,127 @@ public class DerivedGridFactory {
      * Take the partial derivative with respect to X of the given field.
      * @param grid   grid to parialize
      * @return partialized grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
      */
-    public static FieldImpl ddx(FieldImpl grid) throws VisADException, RemoteException {
-       return partial(grid, 0);
+    public static FieldImpl ddx(FieldImpl grid)
+            throws VisADException, RemoteException {
+        return partial(grid, 0);
     }
 
     /**
      * Take the partial derivative with respect to Y of the given field.
      * @param grid   grid to parialize
      * @return partialized grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
      */
-    public static FieldImpl ddy(FieldImpl grid) throws VisADException, RemoteException {
-       return partial(grid, 1);
+    public static FieldImpl ddy(FieldImpl grid)
+            throws VisADException, RemoteException {
+        return partial(grid, 1);
     }
 
     /**
-     * Take the partial derivative with respect to Y of the given field.
+     * Take the partial derivative with respect variable at the domain index.
      * @param grid   grid to parialize
+     * @param domainIndex  index of variable to use  for derivative
      * @return partialized grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
      */
-    public static FieldImpl partial(FieldImpl grid, int domainIndex) throws VisADException, RemoteException {
-       SampledSet ss = GridUtil.getSpatialDomain(grid);
-       RealType rt = (RealType) ((SetType)ss.getType()).getDomain().getComponent(domainIndex);
-       return partial(grid, rt);
+    public static FieldImpl partial(FieldImpl grid, int domainIndex)
+            throws VisADException, RemoteException {
+        SampledSet ss = GridUtil.getSpatialDomain(grid);
+        RealType rt =
+            (RealType) ((SetType) ss.getType()).getDomain().getComponent(
+                domainIndex);
+        return partial(grid, rt);
     }
 
     /**
      * Take the partial for the spatial domain of a grid.
-     * @param f  FlatField to take the partial of
+     *
+     * @param grid  FlatField to take the partial of
      * @param var  RealType for the partial
+     *
+     * @return  partial derivative
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
      */
-    private static FieldImpl partial(FieldImpl grid, RealType var) throws VisADException, RemoteException {
-        boolean isSequence = GridUtil.isTimeSequence(grid);
-        FieldImpl retField = null;
+    private static FieldImpl partial(FieldImpl grid, RealType var)
+            throws VisADException, RemoteException {
+        boolean   isSequence = GridUtil.isTimeSequence(grid);
+        FieldImpl retField   = null;
         if (isSequence) {
-           Set s = GridUtil.getTimeSet(grid);
-           for (int i = 0; i < s.getLength(); i++) {
-              FlatField f = partial(((FlatField)grid.getSample(i)), var);
-              if (i == 0) {
-                 FunctionType ftype = new FunctionType(((SetType)s.getType()).getDomain(), f.getType());
-                 retField = new FieldImpl(ftype, s);
-              }
-              retField.setSample(i, f, false);
-           }
+            Set s = GridUtil.getTimeSet(grid);
+            for (int i = 0; i < s.getLength(); i++) {
+                FlatField f = partial(((FlatField) grid.getSample(i)), var);
+                if (i == 0) {
+                    FunctionType ftype =
+                        new FunctionType(((SetType) s.getType()).getDomain(),
+                                         f.getType());
+                    retField = new FieldImpl(ftype, s);
+                }
+                retField.setSample(i, f, false);
+            }
         } else {
-           retField = (FlatField) grid.derivative(var, Data.NO_ERRORS);
+            retField = partial(((FlatField) grid), var);
         }
         return retField;
     }
 
     /**
      * Take the partial for the FlatField.
+     *
      * @param f  FlatField to take the partial of
      * @param var  RealType for the partial
+     *
+     * @return the derivative
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
      */
-    private static FlatField partial(FlatField f, RealType var) throws VisADException, RemoteException {
-        return (FlatField) f.derivative(var, Data.NO_ERRORS);
+    private static FlatField partial(FlatField f, RealType var)
+            throws VisADException, RemoteException {
+        FlatField  fToUse       = f;
+        SampledSet domain       = GridUtil.getSpatialDomain(f);
+        boolean    twoDManifold = false;
+        // check for a slice
+        if (domain.getDimension() != domain.getManifoldDimension()) {
+            twoDManifold = true;
+            fToUse = (FlatField) GridUtil.make2DGridFromSlice(fToUse, false);
+        }
+        FlatField retField = (FlatField) fToUse.derivative(var,
+                                 Data.NO_ERRORS);
+        if (twoDManifold) {
+            retField = (FlatField) GridUtil.setSpatialDomain(retField,
+                    domain);
+        }
+        //System.out.println("domain = " + domain);
+        //System.out.println(retField);
+        if (var.equals(RealType.Longitude)
+                || var.getName().toLowerCase().startsWith("lon")) {
+            FlatField latGrid = (FlatField) createLatitudeGrid(retField);
+            //System.out.println("latGrid:"+latGrid);
+            FlatField latCosGrid = (FlatField) latGrid.cos();
+            //System.out.println("latCosGrid:"+latCosGrid);
+            latCosGrid = (FlatField) latCosGrid.max(new Real(.0015));
+            //System.out.println("latCosMin0Grid" + latCosGrid);
+            FlatField factor = (FlatField) latCosGrid.multiply(KM_PER_DEGREE);
+            //System.out.println("factor:" + factor);
+            //retField = (FlatField) retField.divide(KM_PER_DEGREE.multiply(latGrid.cos().multiply(KM_PER_DEGREE));
+            retField = (FlatField) retField.divide(factor);
+            //System.out.println(retField);
+            //retField = (FlatField) retField.divide(KM_PER_DEGREE.multiply(latGrid.cos().multiply(KM_PER_DEGREE));
+        } else if (var.equals(RealType.Latitude)
+                   || var.getName().toLowerCase().startsWith("lat")) {
+            retField = (FlatField) retField.divide(KM_PER_DEGREE);
+        }
+        return retField;
     }
 }
 

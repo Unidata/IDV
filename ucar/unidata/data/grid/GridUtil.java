@@ -21,10 +21,6 @@
  */
 
 
-
-
-
-
 package ucar.unidata.data.grid;
 
 
@@ -1472,6 +1468,63 @@ public class GridUtil {
                                         new Unit[] { setUnits[0],
                 setUnits[1] }, (ErrorEstimate[]) null, true);  // copy samples
         return setSpatialDomain(slice, newDomainSet, copy);
+    }
+
+    /**
+     * Get the range MathType of the lowest element.  If this is
+     * a sequence, it will be the range type of the individual elements.
+     * If not, it will be the range
+     *
+     * @param grid    grid to check
+     * @return   TupleType of lowest element
+     *
+     * @throws VisADException   unable to get at data types
+     */
+    public static Unit[] getParamUnits(FieldImpl grid) throws VisADException {
+        Unit[] units = null;
+        try {
+            if (grid instanceof FlatField) {                  // single time (domain -> range)
+                units = DataUtility.getRangeUnits((FlatField) grid);
+            } else if (isTimeSequence(grid)) {                // (time -> something)
+                Data d = grid.getSample(0);
+                if (d instanceof FlatField) {                 // (domain -> range)
+                    units = DataUtility.getRangeUnits((FlatField) d);
+                } else if (d instanceof FieldImpl) {          // (index -> (something)
+                    if (isSequence((FieldImpl) d)) {
+                        d = ((FieldImpl) d).getSample(0);
+                        if (d instanceof Real) {              // (index -> value)
+                            units = new Unit[] { ((Real) d).getUnit() };
+                        } else if (d instanceof Tuple) {      // index -> (value)
+                            Real[] reals = ((Tuple) d).getRealComponents();
+                            units = new Unit[reals.length];
+                            for (int i = 0; i < reals.length; i++) {
+                                units[i] = reals[i].getUnit();
+                            }
+                        } else if (d instanceof FlatField) {  // index -> (value)
+                            units = DataUtility.getRangeUnits((FlatField) d);
+                        }
+                    } else {                      // index -> value
+                        units = DataUtility.getRangeUnits((FlatField) d);
+                    }
+                }
+            } else if (isSequence(grid)) {        // (index -> something)
+                Data d = grid.getSample(0);
+                if (d instanceof FlatField) {     // (domain -> range)
+                    units = DataUtility.getRangeUnits((FlatField) d);
+                } else if (d instanceof Real) {   // (index -> value)
+                    units = new Unit[] { ((Real) d).getUnit() };
+                } else if (d instanceof Tuple) {  // index -> (value)
+                    Real[] reals = ((Tuple) d).getRealComponents();
+                    units = new Unit[reals.length];
+                    for (int i = 0; i < reals.length; i++) {
+                        units[i] = reals[i].getUnit();
+                    }
+                }
+            }
+        } catch (RemoteException re) {
+            throw new VisADException("problem getting param units " + re);
+        }
+        return units;
     }
 
     /**
