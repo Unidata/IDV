@@ -5,3 +5,7 @@ def makeFloatArray(rows,cols,value):
     return DataUtil.makeFloatArray(rows,cols,value);
 
 
+def idveval(formula):
+  from ucar.unidata.data import DerivedDataChoice
+  ddc = DerivedDataChoice(idv,formula)
+  return ddc.getData(None)

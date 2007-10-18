@@ -514,4 +514,24 @@ or
       <paramgroup name="u_and_v"/>
     </operands>
   </derived>
+  <derived 
+     description="Geostrophic Wind Vectors (from %N1%)" 
+     formula="geo(Z)" 
+     id="geos" 
+     isdefault="true" 
+     isenduser="false">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0"
+         categoryidx="0"/>
+      <category value="flowvector"/>
+    </categories>
+    <operands>
+      <params
+         p1="Z"
+         categories="GRID-3D-*;"/>
+    </operands>
+  </derived>
 </derived_parameters>

@@ -68,6 +68,10 @@ def getSliceAtAltitude(fieldimpl, alt, unit="m") :
 
 
 
+def layerAverage(grid, top, bottom):
+   """ Wrapper for calculating layer average """
+   return createLayerAverage(grid, top, bottom)
+
 def layerDiff(grid, top, bottom):
    """ Wrapper for calculating layer difference """
    return createLayerDifference(grid, top, bottom)
@@ -122,6 +126,8 @@ def combineFields(*a):
   """ combine several fields together """
   return DerivedGridFactory.combineGrids(a)
 
+def newName(field, varname, copy = 0):
+  return GridUtil.setParamType(field, varname, copy)
 
 def newUnit(field, varname, unitname):
   """ set the name and unit on a grid """
