@@ -3153,6 +3153,20 @@ public class ImageGenerator extends IdvManager {
     private void captureImage(String filename, Element scriptingNode)
             throws Throwable {
 
+        //See if we're in test mode
+        if ((scriptingNode != null)
+                && XmlUtil.hasAttribute(scriptingNode, "test")) {
+            BufferedImage tmpImage =
+                new BufferedImage(applyMacros(scriptingNode,ATTR_WIDTH,300),
+                                  applyMacros(scriptingNode,ATTR_HEIGHT,300),
+                                  BufferedImage.TYPE_INT_RGB);
+            String loopFilename = applyMacros(filename);
+            lastImage = processImage((BufferedImage) tmpImage, loopFilename,
+                                     scriptingNode, getAllProperties(), null);
+            return;
+        }
+
+
         if ((scriptingNode != null)
                 && XmlUtil.hasAttribute(scriptingNode, ATTR_DISPLAY)) {
             DisplayControlImpl display = findDisplayControl(scriptingNode);
@@ -3346,29 +3360,20 @@ public class ImageGenerator extends IdvManager {
             } else if (tagName.equals(TAG_OUTPUT)) {
                 processTagOutput(child);
             } else if (tagName.equals(TAG_COLORBAR)) {
-                String className = applyMacros(child, ATTR_CLASS,
-                                       (String) null);
                 boolean showLines = applyMacros(child, ATTR_SHOWLINES, false);
-                Class   displayClass = null;
-                if (className != null) {
-                    try {
-                        displayClass = Misc.findClass(className);
-                    } catch (ClassNotFoundException cnfe1) {
-                        try {
-                            displayClass =
-                                Misc.findClass("ucar.unidata.idv.control."
-                                    + className);
-                        } catch (ClassNotFoundException cnfe2) {}
+
+                List   controls =(viewManager!=null?viewManager.getControls():new ArrayList());
+
+                if(XmlUtil.hasAttribute(child, ATTR_DISPLAY)) {
+                    DisplayControlImpl display = findDisplayControl(child);
+                    if (display == null) {
+                        error("Could not find display:"
+                              + XmlUtil.toString(node));
+                        return null;
                     }
+                    controls = Misc.newList(display);
                 }
 
-                Rectangle imageRect = new Rectangle(0, 0, imageWidth,
-                                          imageHeight);
-                Point pp = ImageUtils.parsePoint(applyMacros(child,
-                               ATTR_PLACE, "ll,10,-10"), imageRect);
-                //int dx = applyMacros(child, ATTR_DX,10);
-                //int dy = applyMacros(child, ATTR_DY,10);
-                List   controls = viewManager.getControls();
                 int    width    = applyMacros(child, ATTR_WIDTH, 150);
                 int    height   = applyMacros(child, ATTR_HEIGHT, 20);
                 int    ticks    = applyMacros(child, ATTR_TICKMARKS, 0);
@@ -3378,13 +3383,26 @@ public class ImageGenerator extends IdvManager {
                 Color c         = applyMacros(child, ATTR_COLOR, Color.black);
 
                 Color lineColor = applyMacros(child, ATTR_LINECOLOR, c);
+
+                Rectangle imageRect = new Rectangle(0, 0, imageWidth,
+                                          imageHeight);
+
+                Point pp = ImageUtils.parsePoint(applyMacros(child,
+                               ATTR_PLACE, "ll,10,-10"), imageRect);
                 Point ap = ImageUtils.parsePoint(applyMacros(child,
                                ATTR_ANCHOR, "ll"), new Rectangle(0, 0, width,
                                    height));
 
-                int baseY = pp.y - ap.y;
+                    boolean showUnit = applyMacros(child, "showunit",
+                                             false);
+                    String orientation = applyMacros(child, ATTR_ORIENTATION,
+                                             VALUE_BOTTOM);
+                    boolean vertical = orientation.equals(VALUE_RIGHT)
+                                       || orientation.equals(VALUE_LEFT);
+                int baseY = pp.y - ap.y+(vertical?0:height);
                 int baseX = pp.x - ap.x;
 
+                
                 for (int i = 0; i < controls.size(); i++) {
                     DisplayControlImpl control =
                         (DisplayControlImpl) controls.get(i);
@@ -3399,11 +3417,6 @@ public class ImageGenerator extends IdvManager {
                         continue;
                     }
                     seenColorTable.put(key, key);
-                    String orientation = applyMacros(child, ATTR_ORIENTATION,
-                                             VALUE_BOTTOM);
-                    boolean vertical = orientation.equals(VALUE_RIGHT)
-                                       || orientation.equals(VALUE_LEFT);
-
                     newImage = ImageUtils.toBufferedImage(image);
                     Graphics g = newImage.getGraphics();
                     ColorPreview preview =
@@ -3445,6 +3458,10 @@ public class ImageGenerator extends IdvManager {
                     setFont(g, child);
                     FontMetrics fm     = g.getFontMetrics();
                     List        values = new ArrayList();
+                    String tickSuffix = "";
+                    if(control.getDisplayUnit()!=null) {
+                        tickSuffix = " "+control.getDisplayUnit();
+                    }
                     if (valuesStr != null) {
                         double[] valueArray = Misc.parseDoubles(valuesStr,
                                                   ",");
@@ -3468,7 +3485,7 @@ public class ImageGenerator extends IdvManager {
                     } else if (interval > 0) {
                         double value = range.getMin();
                         double max   = range.getMax();
-                        while (value < max) {
+                        while (value <= max) {
                             values.add(new Double(value));
                             value += interval;
                         }
@@ -3503,7 +3520,7 @@ public class ImageGenerator extends IdvManager {
                             }
                         }
                         String tickLabel =
-                            getIdv().getDisplayConventions().format(value);
+                            getIdv().getDisplayConventions().format(value)+(showUnit?tickSuffix:"");
                         Rectangle2D rect = fm.getStringBounds(tickLabel, g);
                         g.setColor(lineColor);
                         if (orientation.equals(VALUE_RIGHT)) {
@@ -3586,7 +3603,7 @@ public class ImageGenerator extends IdvManager {
                 int[] ul;
                 int[] lr;
                 if (XmlUtil.hasAttribute(child, ATTR_DISPLAY)) {
-                    System.err.println("Clipping from display");
+                    //                    System.err.println("Clipping from display");
                     DisplayControlImpl dc = findDisplayControl(child);
                     if (dc == null) {
                         throw new IllegalArgumentException(
