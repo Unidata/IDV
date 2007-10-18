@@ -375,6 +375,20 @@
          value="System"/>
     </resource>
     <resource
+       label="Constants"
+       location="%IDVPATH%/python/constants.py">
+      <property
+         name="category"
+         value="System"/>
+    </resource>
+    <resource
+       label="GEMPAK Grid Diagnostics"
+       location="%IDVPATH%/python/gempak.py">
+      <property
+         name="category"
+         value="System"/>
+    </resource>
+    <resource
        label="Map routines"
        location="%IDVPATH%/python/maps.py">
       <property

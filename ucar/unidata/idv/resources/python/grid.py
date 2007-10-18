@@ -20,7 +20,6 @@ def extractLatitudeFromNWPGrid(fieldimpl):
      (a time series of one or more FlatFields);
      user must be sure input is a suitable FlatField. """
   ff = DerivedGridFactory.getLatitudeGrid(fieldimpl)
-  #ff2 = GridUtil.sliceAtLevel(ff, l000.0)
   return ff
 
 
