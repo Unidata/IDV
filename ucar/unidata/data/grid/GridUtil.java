@@ -1586,7 +1586,7 @@ public class GridUtil {
     }
 
     /**
-     * Get the range MathType of the lowest element.  If this is
+     * Extract the range MathType of the lowest element.  If this is
      * a sequence, it will be the range type of the individual elements.
      * If not, it will be the range
      *

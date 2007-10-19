@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -426,7 +427,7 @@ public class DerivedGridFactory {
             throws VisADException, RemoteException {
 
         FieldImpl relVor  = createRelativeVorticity(uFI, vFI);
-        FieldImpl latGrid = getLatitudeGrid(relVor);
+        FieldImpl latGrid = createLatitudeGrid(relVor);
         FieldImpl fc = (FieldImpl) latGrid.sin().multiply(EARTH_TWO_OMEGA);
         FieldImpl avFI    = (FieldImpl) relVor.add(fc);
         Unit      avUnit  = GridUtil.getParamUnits(avFI)[0];
@@ -469,9 +470,29 @@ public class DerivedGridFactory {
     public static FieldImpl createTrueFlowVectors(FieldImpl uGrid,
             FieldImpl vGrid)
             throws VisADException, RemoteException {
-
         FieldImpl uvGrid = createFlowVectors(uGrid, vGrid);
-        long      t1     = System.currentTimeMillis();
+        return createTrueFlowVector(uvGrid);
+    }
+
+    /**
+     * Make a grid of true flow vectors from grid relative u and v
+     * components.
+     *
+     * @param uvGrid vector of uv grids
+     *
+     * @return true flow components
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createTrueFlowVector(FieldImpl uvGrid)
+            throws VisADException, RemoteException {
+
+        if ( !isVector(uvGrid)) {
+            throw new VisADException("Not a vector grid "
+                                     + GridUtil.getParamType(uvGrid));
+        }
+        long t1 = System.currentTimeMillis();
         FieldImpl result =
             (FieldImpl) GridRelativeHorizontalWind.cartesianHorizontalWind(
                 uvGrid);
@@ -496,6 +517,32 @@ public class DerivedGridFactory {
             FieldImpl vGrid)
             throws VisADException, RemoteException {
         return createFlowVectors(uGrid, vGrid);
+    }
+
+    /**
+     * Make a FieldImpl of geostrophic wind.
+     *
+     * @param  paramFI parameter to use (height)
+     *
+     * @return vector of geopotential height
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createGeostrophicWindVector(FieldImpl paramFI)
+            throws VisADException, RemoteException {
+        Unit u = GridUtil.getParamUnits(paramFI)[0];
+        if (u.equals(GeopotentialAltitude.getGeopotentialMeter())) {
+            paramFI = (FieldImpl) paramFI.divide(GRAVITY);
+        }
+        FieldImpl corl = createCoriolisGrid(paramFI);
+        FieldImpl ug   = (FieldImpl) ddy(paramFI).multiply(GRAVITY);
+        ug = (FieldImpl) ug.divide(corl).negate();
+        ug = GridUtil.setParamType(ug, "ugeo");
+        FieldImpl vg = (FieldImpl) ddx(paramFI).multiply(GRAVITY);
+        vg = (FieldImpl) vg.divide(corl);
+        vg = GridUtil.setParamType(vg, "vgeo");
+        return createFlowVectors(ug, vg);
     }
 
     /**
@@ -890,7 +937,28 @@ public class DerivedGridFactory {
     public static FieldImpl createVectorMagnitude(FieldImpl uFI,
             FieldImpl vFI)
             throws VisADException, RemoteException {
-        return createVectorMagnitude(uFI, vFI, "mag");
+        return createVectorMagnitude(uFI, vFI, "vector_mag");
+    }
+
+
+    /**
+     * Make a FieldImpl the magnitude of the vector components
+     *
+     * @param vector  vector of grid of U and V wind component
+     *
+     * @return wind speed grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createVectorMagnitude(FieldImpl vector)
+            throws VisADException, RemoteException {
+        if ( !isVector(vector)) {
+            throw new VisADException("Not a vector grid "
+                                     + GridUtil.getParamType(vector));
+        }
+        return createVectorMagnitude(getUComponent(vector),
+                                     getVComponent(vector), "vector_mag");
     }
 
 
@@ -1715,6 +1783,23 @@ public class DerivedGridFactory {
 
     /**
      * Every geo-located data grid can be used
+     * to make a grid with the coriolis parameter for the grid values as well
+     *
+     * @param input         Any geolocated grid
+     *
+     * @return extracted grid of coriolis factor (2*OMEGA*sin(lat))
+     *         at the grid points
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createCoriolisGrid(FieldImpl input)
+            throws VisADException, RemoteException {
+        return createLatitudeGrid(input, true);
+    }
+
+    /**
+     * Every geo-located data grid can be used
      * to make a grid with latitude with the grid values as well
      *
      * @param fi         Any geolocated grid
@@ -1742,6 +1827,24 @@ public class DerivedGridFactory {
      * @throws VisADException
      */
     public static FieldImpl createLatitudeGrid(FieldImpl fi)
+            throws VisADException, RemoteException {
+        return createLatitudeGrid(fi, false);
+    }
+
+    /**
+     * Every geo-located data grid can be used
+     * to make a grid with latitude with the grid values as well
+     *
+     * @param fi         Any geolocated grid
+     * @param makeCoriolis  true to return a grid of the coriolis factor
+     *
+     * @return extracted grid of latitudes or coriolis at the grid points
+     *
+     * @throws RemoteException
+     * @throws VisADException
+     */
+    private static FieldImpl createLatitudeGrid(FieldImpl fi,
+            boolean makeCoriolis)
             throws VisADException, RemoteException {
         SampledSet ss = GridUtil.getSpatialDomain(fi);
         // Determine the types latitude and longitude parameters.
@@ -1775,8 +1878,9 @@ public class DerivedGridFactory {
             FlatField latFF            = null;
             for (int i = 0; i < timeSet.getLength(); i++) {
                 if ( !isConstantDomain || (latFF == null)) {
-                    latFF = createLatitudeGrid((FlatField) fi.getSample(i,
-                            false), latType, domIsLatLon);
+                    latFF =
+                        createLatitudeBasedGrid((FlatField) fi.getSample(i,
+                            false), latType, domIsLatLon, makeCoriolis);
                 }
                 if (i == 0) {
                     FunctionType latFIType =
@@ -1787,8 +1891,8 @@ public class DerivedGridFactory {
                 latField.setSample(i, latFF);
             }
         } else {
-            latField = createLatitudeGrid((FlatField) fi, latType,
-                                          domIsLatLon);
+            latField = createLatitudeBasedGrid((FlatField) fi, latType,
+                    domIsLatLon, makeCoriolis);
         }
         return latField;
     }
@@ -1805,30 +1909,35 @@ public class DerivedGridFactory {
      *                    the reference {@link visad.RealTupleType} of the
      *                    {@link visad.CoodinateSystem} of the domain.
      *
-     * @return extracted grid of latitudes at the grid points
+     * @param makeCoriolis  true to return a grid of the coriolis factor
+     * @return extracted grid of latitudes or coriolis at the grid points
      *
      * @throws RemoteException
      * @throws VisADException
      */
-    private static FlatField createLatitudeGrid(FlatField ff,
-            RealType latType, boolean domIsLatLon)
+    private static FlatField createLatitudeBasedGrid(FlatField ff,
+            RealType latType, boolean domIsLatLon, boolean makeCoriolis)
             throws VisADException, RemoteException {
 
         SampledSet    g3dset = GridUtil.getSpatialDomain(ff);
         RealTupleType rTT    = ((FunctionType) (ff.getType())).getDomain();
-        FunctionType  FT     = new FunctionType(rTT, RealType.Latitude);
-        FlatField     latff  = new FlatField(FT, g3dset);
+        FunctionType  FT     = null;
+        if (makeCoriolis) {
+            FT = new FunctionType(rTT, (RealType) EARTH_TWO_OMEGA.getType());
+        } else {
+            FT = new FunctionType(rTT, RealType.Latitude);
+        }
+        FlatField latff = new FlatField(FT, g3dset);
 
+        float[]   lats  = null;
         if (domIsLatLon) {
             int latI = rTT.getIndex(latType);
 
             if (latI == -1) {
                 throw new IllegalArgumentException(rTT.toString());
             }
+            lats = (float[]) g3dset.getSamples(false)[latI].clone();
 
-            latff.setSamples(new float[][] {
-                (float[]) g3dset.getSamples()[latI].clone()
-            }, false);
         } else {
             CoordinateSystem cs      = g3dset.getCoordinateSystem();
             RealTupleType    refType = cs.getReference();
@@ -1841,14 +1950,18 @@ public class DerivedGridFactory {
             float[][] flatlon = cs.toReference(g3dset.getSamples(),
                                     g3dset.getSetUnits());
 
-            //float[][] flatlon = g3dset.doubleToFloat(latlon);
-
-            float[][] lats = new float[][] {
-                flatlon[latI]
-            };
-
-            latff.setSamples(lats, false);
+            lats = flatlon[latI];
         }
+        if (makeCoriolis) {
+            double twoOmega = EARTH_TWO_OMEGA.getValue();
+            for (int i = 0; i < lats.length; i++) {
+                lats[i] = (float) (Math.sin(Math.toRadians(lats[i]))
+                                   * twoOmega);
+            }
+        }
+        latff.setSamples(new float[][] {
+            lats
+        }, false);
 
         return latff;
     }
@@ -1978,7 +2091,7 @@ public class DerivedGridFactory {
      * @param grid  grid to check
      * @return true if there is more than one component
      *
-     * @throws VisADException _more_
+     * @throws VisADException   VisAD Error
      */
     public static boolean isVector(FieldImpl grid) throws VisADException {
         TupleType tt       = GridUtil.getParamType(grid);
@@ -1996,7 +2109,7 @@ public class DerivedGridFactory {
      * @param grid  grid to check
      * @return true if there is more than one component
      *
-     * @throws VisADException _more_
+     * @throws VisADException   VisAD Error
      */
     public static boolean isScalar(FieldImpl grid) throws VisADException {
         return !isVector(grid);
@@ -2007,11 +2120,10 @@ public class DerivedGridFactory {
      * @param vector  vector quantity
      * @return u (first) component or null if not a vector
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws VisADException   VisAD Error
      */
     public static FieldImpl getUComponent(FieldImpl vector)
-            throws VisADException, RemoteException {
+            throws VisADException {
         return getComponent(vector, 0);
     }
 
@@ -2020,25 +2132,23 @@ public class DerivedGridFactory {
      * @param vector  vector quantity
      * @return v (second) component or null if not a vector
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws VisADException   VisAD Error
      */
     public static FieldImpl getVComponent(FieldImpl vector)
-            throws VisADException, RemoteException {
+            throws VisADException {
         return getComponent(vector, 1);
     }
 
     /**
      * Get nth component of a vector
      * @param vector  vector quantity
-     * @param index _more_
+     * @param index  index of component
      * @return nth component or null in index &gt; number of components
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws VisADException   VisAD Error
      */
     public static FieldImpl getComponent(FieldImpl vector, int index)
-            throws VisADException, RemoteException {
+            throws VisADException {
         if ( !isVector(vector)) {
             return vector;
         }
