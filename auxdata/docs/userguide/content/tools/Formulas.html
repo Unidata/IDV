@@ -77,32 +77,20 @@ Jython language.  Start each variable name with a letter.
 
 It is best to use variable names that suggest the parameter data
 they represent, so that later you can easily remember
-what the variables should represent. Use names like Temp500m, RelHum_surf,
-absvort, sst_jan, density, or whatever makes sense to you. 
-If you use a variable names like V1 and V2, then later
-when the formula requests which real parameter name goes with 
-which variable name you may be puzzled which is which.
+what the variables should represent. 
 <p>
 Variable names can have extra &quot;syntactic sugar&quot; attached to
 them that the IDV uses for a variety of purposes. The &quot;sugar&quot;
 consists of a set of name/value pairs contained 
 in brackets (&quot;\[...\]&quot;) after the variable name.
 <p>
-For example, normally variables are used to select and define data choices.
-You can also have variables that are simple text input from a user. For 
-example, evaluating the following expression:
-<pre>
-   someProcedure(someValue\[isuser=true\])
-</pre>
-will result in a dialog box being shown to allow  for the user to enter
-a text value (e.g., a number) for the variable <i>someValue</i>.
 
-<p>
-
-You can provide default values with:
+You can specify a label that is shown in the user interface:
 <pre>
-   someProcedure(someValue\[isuser=true,default=some default\])
+   someProcedure(someDataValue\[label=The label to use\])
 </pre>
+
+
 
 You can specify the types of data that can be selected for a variable
 with the <i>categories</i> name.  e.g.:
@@ -131,6 +119,46 @@ to pre-select the first data choice  whose description
 matches the pattern.
 <pre>
    someProcedure(someValue\[pattern=some_pattern\])
+</pre>
+
+
+
+Not only can you specify fields from data source you can also define that certain operands
+are text and other values from the user with the &quot;isuser=true&quot; operand attribute.
+For  example, evaluating the following expression:
+<pre>
+   someProcedure(someValue\[isuser=true\])
+</pre>
+will result in a dialog box being shown to allow  for the user to enter
+a text value (e.g., a number) for the variable <i>someValue</i>.
+
+<p>
+
+You can provide default values with:
+<pre>
+   someProcedure(someValue\[isuser=true,default=some default\])
+</pre>
+
+
+If you wanted to have a multiple line  text area for input you do:
+<pre>
+   someProcedure(someValue\[isuser=true,rows=5\])
+</pre>
+
+You can use the &quot;type&quot; attribute to define other types of input.
+For example, if you wanted to have a checkbox you do:
+<pre>
+   someProcedure(someValue\[isuser=true,type=boolean\])
+</pre>
+
+A menu of choices can be constructed with:
+<pre>
+   someProcedure(someValue\[isuser=true,type=choice,choices=Apples;Bananas;Oranges;\])
+</pre>
+
+A latitude/longitude can be chosen:
+<pre>
+   someProcedure(someValue\[isuser=true,type=location,default=40;-107\])
 </pre>
 
 
