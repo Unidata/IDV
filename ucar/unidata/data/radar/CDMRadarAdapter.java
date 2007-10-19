@@ -1971,7 +1971,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             (RadialDatasetSweep.RadialVariable) rds.getDataVariable(varName);
         int       numberOfSweeps = sweepVar.getNumSweeps();
         int       numberOfRay    = 360;  //getRayNumber(sweepVar);
-
+        rhiData = null;
         FlatField retField;
         double    range_step;
         double    range_to_first_gate;
