@@ -222,6 +222,7 @@ public class FormulaDialog extends JFrame implements ActionListener {
     public FormulaDialog(IntegratedDataViewer idv, DerivedDataDescriptor ddd,
                          Component src, List categories) {
         super("Formula Editor");
+        LogUtil.registerWindow(this);
         //      super (null, "Formula editor", false);
         //      super (idv.getFrame (), "Formula editor", false);
         this.idv = idv;

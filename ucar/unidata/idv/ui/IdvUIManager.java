@@ -23,6 +23,7 @@
 package ucar.unidata.idv.ui;
 
 
+import visad.georef.EarthLocation;
 import org.python.core.*;
 import org.python.util.*;
 
@@ -32,6 +33,8 @@ import ucar.unidata.collab.*;
 import ucar.unidata.data.*;
 import ucar.unidata.gis.maps.*;
 import ucar.unidata.idv.*;
+
+import ucar.unidata.geoloc.LatLonPointImpl;
 
 import ucar.unidata.idv.chooser.IdvChooserManager;
 import ucar.unidata.idv.collab.CollabManager;
@@ -46,6 +49,7 @@ import ucar.unidata.ui.FineLineBorder;
 import ucar.unidata.ui.Help;
 import ucar.unidata.ui.HelpTipDialog;
 import ucar.unidata.ui.HttpFormEntry;
+import ucar.unidata.ui.LatLonWidget;
 import ucar.unidata.ui.MultiFrame;
 import ucar.unidata.ui.RovingProgress;
 import ucar.unidata.ui.XmlUi;
@@ -103,6 +107,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 import java.util.Arrays;
+import java.util.Vector;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -4931,22 +4936,71 @@ public class IdvUIManager extends IdvManager {
         components.add(new JLabel("Save in Bundle"));
         for (int i = 0; i < userOperands.size(); i++) {
             DataOperand operand       = (DataOperand) userOperands.get(i);
+            String fieldType = (String)operand.getProperty("type");
+            if(fieldType == null) {
+                fieldType = "text";
+            }
             String      label         = operand.getLabel();
-            String      dflt          = operand.getUserDefault();
-            String      cachedOperand = (String) operandCache.get(label);
+            Object      dflt          = operand.getUserDefault();
+            Object cacheKey = Misc.newList(label,fieldType);
+            Object      cachedOperand =  operandCache.get(cacheKey);
             if (cachedOperand != null) {
                 dflt = cachedOperand;
             }
             JCheckBox cbx = new JCheckBox("", operand.isPersistent());
             persistentCbxs.add(cbx);
-            JTextField f = new JTextField(15);
-            fields.add(f);
-            if (dflt != null) {
-                f.setText(dflt);
+            JComponent field=null;
+            JComponent fieldComp = null;
+            if(fieldType.equals("text")) {
+                String rowString = (String)operand.getProperty("rows");
+                if(rowString==null) rowString = "1";
+                int rows = new Integer(rowString).intValue();
+                if(rows==1) {
+                    field = new JTextField(dflt!=null?dflt.toString():"",15);
+                } else {
+                    field = new JTextArea(dflt!=null?dflt.toString():"",rows,15);
+                    fieldComp = GuiUtils.makeScrollPane(field,200,100);
+                }
+            } else  if(fieldType.equals("boolean")) {
+                field = new JCheckBox("",(dflt!=null?new Boolean(dflt.toString()).booleanValue():true));
+            } else  if(fieldType.equals("choice")) {
+                String choices = (String)operand.getProperty("choices");                
+                if(choices == null) throw new IllegalArgumentException("No 'choices' attribute defined for operand: " + operand);
+                List l = StringUtil.split(choices,";",true,true);
+                field = new JComboBox(new Vector(l));
+                if(dflt!=null && l.contains(dflt)) {
+                    ((JComboBox)field).setSelectedItem(dflt);
+                }
+            } else  if(fieldType.equals("location")) {
+                List l = StringUtil.split(dflt.toString(),";",true,true);                
+                final LatLonWidget llw = new LatLonWidget();
+                field = llw;
+                if(l.size()==2) {
+                    llw.setLat(Misc.decodeLatLon(l.get(0).toString()));
+                    llw.setLon(Misc.decodeLatLon(l.get(1).toString()));
+                }
+                final JButton centerPopupBtn =
+                    GuiUtils.getImageButton("/auxdata/ui/icons/Map16.gif",
+                                            getClass());
+                centerPopupBtn.setToolTipText("Center on current displays");
+                centerPopupBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        popupCenterMenu(centerPopupBtn,llw);
+                    }
+                });
+                JComponent centerPopup = GuiUtils.inset(centerPopupBtn,
+                                             new Insets(0, 0, 0, 4));
+                fieldComp= GuiUtils.hbox(llw,centerPopup);
+            } else  if(fieldType.equals("area")) {
+                //TODO:
+            } else {
+                throw new IllegalArgumentException("Unknown type: " + fieldType +" for operand: " + operand);
             }
+
+            fields.add(field);
             label = StringUtil.replace(label, "_", " ");
             components.add(GuiUtils.rLabel(label));
-            components.add(f);
+            components.add(fieldComp!=null?fieldComp:field);
             components.add(cbx);
         }
         //        GuiUtils.tmpColFills = new int[] { GridBagConstraints.HORIZONTAL,
@@ -4956,7 +5010,7 @@ public class IdvUIManager extends IdvManager {
         Component contents = GuiUtils.topCenter(new JLabel(msg),
                                  GuiUtils.doLayout(components, 3,
                                      GuiUtils.WT_NYN, GuiUtils.WT_N));
-        if ( !GuiUtils.showOkCancelDialog(getFrame(), "Select input",
+        if ( !GuiUtils.showOkCancelDialog(null, "Select input",
                                           contents, null, fields)) {
             return null;
         }
@@ -4964,9 +5018,32 @@ public class IdvUIManager extends IdvManager {
         for (int i = 0; i < userOperands.size(); i++) {
             DataOperand operand = (DataOperand) userOperands.get(i);
             String      label   = operand.getLabel();
-            String      value = ((JTextField) fields.get(i)).getText().trim();
+            Object field =  fields.get(i);
+            Object     value =null;
+            Object cacheValue = null;
+            if(field instanceof JTextComponent) {
+                value = ((JTextComponent) field).getText().trim();
+            } else  if(field instanceof JCheckBox) {
+                value = new Boolean(((JCheckBox) field).isSelected());
+            } else  if(field instanceof JComboBox) {
+                value = ((JComboBox)field).getSelectedItem();
+            } else  if(field instanceof LatLonWidget) {
+                LatLonWidget llw = (LatLonWidget) field;
+                value = new LatLonPointImpl(llw.getLat(),llw.getLon());
+                cacheValue = llw.getLat()+";"+llw.getLon();
+            } else {
+                throw new IllegalArgumentException("Unknown field type:" + field.getClass().getName());
+            }
+            if(cacheValue == null) {
+                cacheValue = value;
+            }
             JCheckBox   cbx     = (JCheckBox) persistentCbxs.get(i);
-            operandCache.put(label, value);
+            String fieldType = (String)operand.getProperty("type");
+            if(fieldType == null) {
+                fieldType = "text";
+            }
+            Object cacheKey = Misc.newList(label,fieldType);
+            operandCache.put(cacheKey, cacheValue);
             values.add(new UserOperandValue(value, cbx.isSelected()));
         }
         getStore().putEncodedFile("operandcache.xml", operandCache);
@@ -5618,6 +5695,69 @@ public class IdvUIManager extends IdvManager {
         });
         return fld;
     }
+
+    /**
+     * Popup a centering menu
+     *
+     * @param near component to popup near
+     */
+    public void popupCenterMenu(JComponent near, final LatLonWidget latLonWidget) {
+        ActionListener listener = new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                try {
+                    EarthLocation el = (EarthLocation) ae.getSource();
+                    latLonWidget.setLatLon(
+                        Misc.format(el.getLatitude().getValue()),
+                        Misc.format(el.getLongitude().getValue()));
+                } catch (Exception exc) {
+                    logException("Setting center", exc);
+                }
+            }
+        };
+        List menuItems = makeCenterMenus(listener);
+        if (menuItems.size() == 0) {
+            menuItems.add(new JMenuItem("No map displays"));
+        }
+        GuiUtils.showPopupMenu(menuItems, near);
+    }
+
+    /**
+     * Make menus for centering
+     *
+     * @param listener  a listener for the actions
+     *
+     * @return  a list of menus showing the center points of the displays
+     */
+    public List makeCenterMenus(final ActionListener listener) {
+        List menus = new ArrayList();
+        List vms   = getIdv().getVMManager().getViewManagers();
+        try {
+            for (int i = 0; i < vms.size(); i++) {
+                ViewManager vm = (ViewManager) vms.get(i);
+                if ( !(vm instanceof MapViewManager)) {
+                    continue;
+                }
+                MapViewManager      mvm = (MapViewManager) vm;
+                final EarthLocation el  = mvm.getScreenCenter();
+                JMenuItem mi =
+                    new JMenuItem(
+                        getIdv().getDisplayConventions().formatEarthLocation(
+                            el, false));
+                mi.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        listener.actionPerformed(new ActionEvent(el, 1,
+                                "center"));
+                    }
+                });
+
+                menus.add(mi);
+            }
+        } catch (Exception exc) {
+            logException("Making center menu", exc);
+        }
+        return menus;
+    }
+
 
 
 }
