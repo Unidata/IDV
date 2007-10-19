@@ -516,8 +516,8 @@ or
   </derived>
   <derived 
      description="Geostrophic Wind Vectors (from %N1%)" 
-     formula="geo(Z)" 
-     id="geos" 
+     formula="geo(D1)" 
+     id="geostrophic_wind_vector" 
      isdefault="true" 
      isenduser="false">
     <categories>
@@ -527,6 +527,24 @@ or
          childidx="0"
          categoryidx="0"/>
       <category value="flowvector"/>
+    </categories>
+    <operands>
+      <params
+         p1="Z"
+         categories="GRID-3D-*;"/>
+    </operands>
+  </derived>
+  <derived 
+     description="Geostrophic Wind (from %N1%)" 
+     formula="mag(geo(D1))" 
+     id="geostrophic_wind" 
+     isdefault="true" 
+     isenduser="false">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0" />
     </categories>
     <operands>
       <params

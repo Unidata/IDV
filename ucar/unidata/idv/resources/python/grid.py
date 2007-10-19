@@ -16,10 +16,8 @@ def extractPressureFromNWPGrid(fieldimpl):
 
 
 def extractLatitudeFromNWPGrid(fieldimpl):
-  """Get the latitude coordinate grid from a 3D VisAD FieldImpl 
-     (a time series of one or more FlatFields);
-     user must be sure input is a suitable FlatField. """
-  ff = DerivedGridFactory.getLatitudeGrid(fieldimpl)
+  """Get the latitude coordinate grid from a grid """
+  ff = DerivedGridFactory.createLatitudeGrid(fieldimpl)
   return ff
 
 

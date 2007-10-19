@@ -2,6 +2,28 @@
 
 GRAVTY = DerivedGridFactory.GRAVITY
 
+# Math functions
+def atn2(s1,s2):
+  """ Wrapper for atan2 built-in """
+  return atan2(s1,s2)
+
+def add(s1,s2):
+  """ Addition """
+  return s1+s2
+
+def mul(s1,s2):
+  """ Multiply """
+  return s1*s2
+
+def quo(s1,s2):
+  """ Multiply """
+  return s1/s2
+
+def sub(s1,s2):
+  """ Multiply """
+  return s1-s2
+
+# Scalar quantities
 def adv(p,u,v):
   """ Horizontal Advection, negative by convention """
   return -(u*ddx(p) + v*ddy(p))
@@ -16,8 +38,8 @@ def avor(u,v):
   return relv + corl(relv)
 
 def corl(s):
-  """ Coriolis Parameter for all points in a grid """
-  return TWO_OMEGA*sin(latr(s))
+  """ Coriolis Parameter for all points in a grid (TWO_OMEGA*sin(latr)"""
+  return DerivedGridFactory.createCoriolisGrid(s)
 
 def ddx(g):
   """ Take the derivative with respect to the domain's X coordinate """
@@ -37,7 +59,7 @@ def jcbn(s1,s2):
 
 def latr(s):
   """ Latitudue all points in a grid """
-  return DerivedGridFactory.getLatitudeGrid(s)
+  return DerivedGridFactory.createLatitudeGrid(s)
 
 def lav(s,top,bottom):
   """ Layer Average """
@@ -47,9 +69,12 @@ def ldf(s,top,bottom):
   """ Layer Average """
   return layerDiff(s,top,bottom);
 
-def mag(u,v):
+def mag(*a):
   """ Magnitude of a vector """
-  return DerivedGridFactory.createVectorMagnitude(u,v);
+  if (len(a) == 1):
+    return DerivedGridFactory.createVectorMagnitude(a[0]);
+  else: 
+    return DerivedGridFactory.createVectorMagnitude(a[0],a[1]);
 
 def mixr(temp,rh):
   """ Mixing Ratio from Temperature, RH (requires pressure domain) """
@@ -76,6 +101,18 @@ def thte(temp,rh):
       humidity (requires pressure domain) """
   return DerivedGridFactory.createPotentialTemperature(temp,rh)
 
+def un(vector):
+  return DerivedGridFactory.getUComponent(DerivedGridFactory.createTrueFlowVector(vector))
+
+def ur(vector):
+  return DerivedGridFactory.getUComponent(vector)
+
+def vn(vector):
+  return DerivedGridFactory.getVComponent(DerivedGridFactory.createTrueFlowVector(vector))
+
+def vr(vector):
+  return DerivedGridFactory.getVComponent(vector)
+
 def vor(u,v):
   """ Relative Vorticity """
   return ddx(v)-ddy(u)
@@ -83,9 +120,7 @@ def vor(u,v):
 # Vector output
 def geo(z):
   """  geostrophic wind from height """
-  ug = newName(-GRAVTY*ddy(z), "UGEO", 0)
-  vg = newName(GRAVTY*ddx(z), "VGEO", 0)
-  return vecr(ug,vg)
+  return DerivedGridFactory.createGeostrophicWindVector(z)
 
 def grad(s):
   """ Gradient """
