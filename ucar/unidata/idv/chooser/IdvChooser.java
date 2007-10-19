@@ -308,42 +308,6 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     }
 
 
-    /**
-     * Make menus for centering
-     *
-     * @param listener  a listener for the actions
-     *
-     * @return  a list of menus showing the center points of the displays
-     */
-    public List makeCenterMenus(final ActionListener listener) {
-        List menus = new ArrayList();
-        List vms   = idv.getVMManager().getViewManagers();
-        try {
-            for (int i = 0; i < vms.size(); i++) {
-                ViewManager vm = (ViewManager) vms.get(i);
-                if ( !(vm instanceof MapViewManager)) {
-                    continue;
-                }
-                MapViewManager      mvm = (MapViewManager) vm;
-                final EarthLocation el  = mvm.getScreenCenter();
-                JMenuItem mi =
-                    new JMenuItem(
-                        idv.getDisplayConventions().formatEarthLocation(
-                            el, false));
-                mi.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        listener.actionPerformed(new ActionEvent(el, 1,
-                                "center"));
-                    }
-                });
-
-                menus.add(mi);
-            }
-        } catch (Exception exc) {
-            logException("Making center menu", exc);
-        }
-        return menus;
-    }
 
 
     /**

@@ -944,20 +944,22 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 centerElementFld   = new JTextField("", 3);
 
 
-                GuiUtils.tmpInsets = dfltGridSpacing;
+
+
                 final JButton centerPopupBtn =
                     GuiUtils.getImageButton("/auxdata/ui/icons/Map16.gif",
                                             getClass());
                 centerPopupBtn.setToolTipText("Center on current displays");
                 centerPopupBtn.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent ae) {
-                        popupCenterMenu(centerPopupBtn);
+                        getIdv().getIdvUIManager().popupCenterMenu(centerPopupBtn,latLonWidget);
                     }
                 });
                 JComponent centerPopup = GuiUtils.inset(centerPopupBtn,
                                              new Insets(0, 0, 0, 4));
 
 
+                GuiUtils.tmpInsets = dfltGridSpacing;
                 final JPanel latLonPanel = GuiUtils.hbox(new Component[] {
                     centerLatLbl = GuiUtils.rLabel(" Lat:" + dfltLblSpacing),
                     latLonWidget.getLatField(),
@@ -1164,30 +1166,6 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         placeLbl.setText(StringUtil.padRight(s, 12));
     }
 
-    /**
-     * Popup a centering menu
-     *
-     * @param near component to popup near
-     */
-    private void popupCenterMenu(JComponent near) {
-        ActionListener listener = new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                try {
-                    EarthLocation el = (EarthLocation) ae.getSource();
-                    latLonWidget.setLatLon(
-                        Misc.format(el.getLatitude().getValue()),
-                        Misc.format(el.getLongitude().getValue()));
-                } catch (Exception exc) {
-                    logException("Setting center", exc);
-                }
-            }
-        };
-        List menuItems = makeCenterMenus(listener);
-        if (menuItems.size() == 0) {
-            menuItems.add(new JMenuItem("No map displays"));
-        }
-        GuiUtils.showPopupMenu(menuItems, near);
-    }
 
 
     /**
