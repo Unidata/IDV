@@ -53,6 +53,11 @@ def div(u,v):
   """ Horizontal Divergence """
   return ddx(u) + ddy(v)
 
+def dot(v1,v2):
+  """ Dot product of two vectors (u1*u2+v1*v2)"""
+  product = v1*v2
+  return ur(product)+vr(product)
+
 def jcbn(s1,s2):
   """ Jacobian Determinant """
   return ddx(s1)*ddy(s2) - ddy(s1)*ddx(s2)
@@ -118,14 +123,44 @@ def vor(u,v):
   return ddx(v)-ddy(u)
 
 # Vector output
+def age(obs,geo):
+  """  Ageostrophic wind """
+  return obs-geo
+
+def dvdx(v):
+  """ Partial x derivative of a vector
+      DVDX ( V ) = [ DDX (u), DDX (v) ] """
+  return ddx(v)
+
+def dvdy(v):
+  """ Partial x derivative of a vector
+      DVDY ( V ) = [ DDY (u), DDY (v) ] """
+  return ddy(v)
+
 def geo(z):
   """  geostrophic wind from height """
   return DerivedGridFactory.createGeostrophicWindVector(z)
 
 def grad(s):
-  """ Gradient """
+  """ Gradient of a scalar  
+      GRAD ( S ) = [ DDX ( S ), DDY ( S ) ] """
   return vecr(ddx(s),ddy(s))
   
+def inad(v1,v2):
+  """ INAD  Inertial advective wind 
+      INAD ( V1, V2 ) = [ DOT ( V1, GRAD (u2) ),
+                          DOT ( V1, GRAD (v2) ) ] """
+  return vecr(dot(v1,grad(ur(v2))),dot(v1,grad(vr(v2))))
+
+def qvec(s,v):
+  """ QVEC ( S, V ) = [ - ( DOT ( DVDX (V), GRAD (S) ) ),
+                      - ( DOT ( DVDY (V), GRAD (S) ) ) ] 
+                      where S can be any thermal paramenter, usually THTA. """
+  grads = grad(s)
+  qvecu = newName(-dot(dvdx(v),grads),"qvecu")
+  qvecv = newName(-dot(dvdy(v),grads),"qvecv")
+  return vecr(qvecu,qvecv)
+
 def vecr(s1,s2):
   """ Make a vector from two components """
   return makeVector(s1,s2)
