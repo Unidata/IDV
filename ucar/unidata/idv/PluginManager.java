@@ -2532,6 +2532,12 @@ public class PluginManager extends IdvManager {
                             .CoordTransBuilderIF) c.newInstance();
                     ucar.nc2.dataset.CoordTransBuilder.registerTransform(
                         csbi.getTransformName(), c);
+                } else if (ucar.nc2.dt.TypedDatasetFactoryIF.class
+                        .isAssignableFrom(c)) {
+                    ucar.nc2.dt.TypedDatasetFactoryIF tdfi =
+                        (ucar.nc2.dt.TypedDatasetFactoryIF) c.newInstance();
+                    ucar.nc2.dt.TypedDatasetFactory.registerFactory(
+                        tdfi.getScientificDataType(), c);
                 }
 
 
