@@ -392,16 +392,16 @@ public class DerivedDataChoice extends ListDataChoice {
         }
 
         //Now, pull out the list of operands that are used in the jython code
-        List operandsFromCode =
-            DerivedDataChoice.parseOperands(constructedCode, operands,
-                                            operandsSoFar);
+        DerivedDataChoice.parseOperands(constructedCode, operands,
+                                        operandsSoFar);
 
 
         //Now, split the list between user and non-user operands
         //Make sure all user operands are in the data choices list
         List nonUserOperands = new ArrayList();
-        for (int i = 0; i < operandsFromCode.size(); i++) {
-            DataOperand operand = (DataOperand) operandsFromCode.get(i);
+        List tmpList = new ArrayList(operands);    
+        for (int i = 0; i < tmpList.size(); i++) {
+            DataOperand operand = (DataOperand) tmpList.get(i);
             if (operand.isUser()) {
                 UserDataChoice udc = new UserDataChoice(operand.getName(),
                                          operand.getUserDefault());
@@ -409,6 +409,7 @@ public class DerivedDataChoice extends ListDataChoice {
                 if ( !childrenChoices.contains(udc)) {
                     childrenChoices.add(udc);
                 }
+                operands.remove(operand);
             } else {
                 nonUserOperands.add(operand);
             }
@@ -431,12 +432,13 @@ public class DerivedDataChoice extends ListDataChoice {
                 DataOperand operand = new DataOperand(dc.getName(),
                                           ((UserDataChoice) dc).getValue());
                 allUserOperands.add(operand);
-                if ( !operand.isBound()) {
+                if (!operand.isBound()) {
                     unboundUserChoices.add(dc);
                     unboundUserOperands.add(operand);
                 }
             }
         }
+
 
 
         //Find the user values
