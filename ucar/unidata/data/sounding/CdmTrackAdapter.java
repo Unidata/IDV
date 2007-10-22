@@ -20,17 +20,17 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.sounding;
 
 
+import thredds.catalog.DataType;
+
 import ucar.ma2.Array;
 
-import ucar.ma2.DataType;
 import ucar.ma2.Index;
 import ucar.ma2.Index0D;
 import ucar.ma2.Range;
-
-
 import ucar.ma2.StructureData;
 import ucar.ma2.StructureMembers;
 
@@ -38,12 +38,11 @@ import ucar.nc2.VariableSimpleIF;
 import ucar.nc2.dt.TrajectoryObsDataset;
 import ucar.nc2.dt.TrajectoryObsDatatype;
 import ucar.nc2.dt.TypedDataset;
+import ucar.nc2.dt.TypedDatasetFactory;
 
 import ucar.nc2.dt.trajectory.TrajectoryObsDatasetFactory;
 
 import ucar.unidata.data.BadDataException;
-
-
 
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataUtil;
@@ -62,21 +61,12 @@ import ucar.visad.quantities.*;
 
 import visad.*;
 
-import visad.data.netcdf.Plain;
-import visad.data.units.ParseException;
-import visad.data.units.Parser;
-
 import visad.georef.*;
 
 import visad.util.DataUtility;
 
 
-import java.awt.Color;
 import java.awt.event.*;
-
-import java.net.MalformedURLException;
-
-import java.net.URL;
 
 import java.rmi.RemoteException;
 
@@ -84,8 +74,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
-
-import javax.swing.JFrame;
 
 
 /**
@@ -126,8 +114,11 @@ public class CdmTrackAdapter extends TrackAdapter {
             throws Exception {
         super(filename, pointDataFilter, stride, lastNMinutes);
         TrajectoryObsDataset tod = null;
+        StringBuffer         buf = new StringBuffer();
         try {
-            tod = TrajectoryObsDatasetFactory.open(filename);
+            //tod = TrajectoryObsDatasetFactory.open(filename);
+            tod = (TrajectoryObsDataset) TypedDatasetFactory.open(
+                DataType.TRAJECTORY, filename, null, buf);
         } catch (java.io.FileNotFoundException fnfe) {
             throw new BadDataException("Could not open data source:"
                                        + filename);
