@@ -88,7 +88,7 @@ public class DerivedDataChoice extends ListDataChoice {
      * that the user has selected. At first this is null. It is filled out
      * during the getData call.
      */
-    private Hashtable userSelectedChoices;
+    private Hashtable userSelectedChoices = new Hashtable();
 
 
     /**
@@ -164,7 +164,6 @@ public class DerivedDataChoice extends ListDataChoice {
         this.childrenChoices = dataChoices;
         if (childrenChoices != null) {
             //Puts the D1,D2,... into the userSelectedChoices
-            userSelectedChoices = new Hashtable();
             for (int i = 0; i < childrenChoices.size(); i++) {
                 DataChoice dc    = (DataChoice) childrenChoices.get(i);
                 String     alias = "D" + (i + 1);
@@ -299,9 +298,11 @@ public class DerivedDataChoice extends ListDataChoice {
                                           List operands, Hashtable opsSoFar) {
         DataOperand dataOperand = (DataOperand) opsSoFar.get(opName);
         if (dataOperand != null) {
+            if(!dataOperand.isBound()) {
+                dataOperand.setData(data);
+            }
             return dataOperand;
         }
-        //        Misc.printStack("addOperand -  2:" + opName + ":", 5, null);
         dataOperand = new DataOperand(opName, data);
         opsSoFar.put(opName, dataOperand);
         operands.add(dataOperand);
@@ -364,7 +365,6 @@ public class DerivedDataChoice extends ListDataChoice {
         List      operands      = new ArrayList();
         Hashtable operandsSoFar = new Hashtable();
 
-
         //First pull out the operands from the code
         if (methodName != null) {
             StringBuffer paramString = new StringBuffer();
@@ -385,7 +385,6 @@ public class DerivedDataChoice extends ListDataChoice {
             throw new IllegalArgumentException(
                 "DerivedDataChoice: no operation defined");
         }
-
 
         //Now, pull out the list of operands that are used in the jython code
         List operandsFromCode =
@@ -410,9 +409,10 @@ public class DerivedDataChoice extends ListDataChoice {
             }
         }
 
-        /*        System.err.println("formula:" +constructedCode);
-                  System.err.println("userSelectedChoices= " + userSelectedChoices);
-                  System.err.println("children:" + childrenChoices);
+        /* 
+           System.err.println("formula:" +constructedCode);
+           System.err.println("userSelectedChoices= " + userSelectedChoices);
+           System.err.println("children:" + childrenChoices);
         */
 
         //First see if we have any UserDataChoice children (i.e., from 
@@ -460,13 +460,6 @@ public class DerivedDataChoice extends ListDataChoice {
         }
 
 
-        //Create the hashtable (if needed) that will hold the name->DataChoice
-        //mapping for the user selected operands
-        if (userSelectedChoices == null) {
-            userSelectedChoices = new Hashtable();
-        }
-
-
         //Go through any pre-defined operands (the DataChoice children).
         //These can be an UnboundDataChoice (from a need=*param_name in derived.xml),
         //a UserDataChoice (from a need="user:param_name" in derived.xml) or
@@ -489,9 +482,6 @@ public class DerivedDataChoice extends ListDataChoice {
             } else {
                 //Here, put the DataChoice in as the  data (sort of as a place holder for later).
                 //                System.err.println ("addOperand " + opName + " alias = " + alias );
-                if (true) {
-                    continue;
-                }
                 addOperand(opName, dc, operands, operandsSoFar);
                 if (userSelectedChoices.get(alias) == null) {
                     //                    System.err.println ("addOperand-alias " + alias);
@@ -510,6 +500,8 @@ public class DerivedDataChoice extends ListDataChoice {
             //            System.err.println ("addOperand-nonUser ");
             addOperand(operand.getName(), null, operands, operandsSoFar);
         }
+
+
 
 
 
@@ -535,29 +527,16 @@ public class DerivedDataChoice extends ListDataChoice {
                 unboundOperands.add(op);
                 continue;
             }
-            //Got it from before
-            Object data;
-            if (boundChoice.getClass().equals(ListDataChoice.class)) {
-                ListDataChoice ldc = (ListDataChoice) boundChoice;
-                data = ldc.getDataList(DataCategory.NULL, dataSelection,
-                                       requestProperties);
-            } else {
-                System.err.println("getData-1 " + boundChoice);
-                checkLevel(boundChoice, op);
-                data = boundChoice.getData(DataCategory.NULL, dataSelection,
-                                           requestProperties);
-            }
-            dataChoiceToData.put(boundChoice, data);
-            op.setData(data);
+            setData(boundChoice, op, dataChoiceToData, dataSelection, requestProperties);
         }
 
 
-        System.err.println("operands:" + operands);
+        //        System.err.println("operands:" + operands);
 
         //If any of the operands we need are unbound 
         //than ask the DataContext to bind them
         if (unboundOperands.size() > 0) {
-            System.err.println("unbound operands:" + unboundOperands);
+            //            System.err.println("unbound operands:" + unboundOperands);
             List selected = dataContext.selectDataChoices(unboundOperands);
             if (selected == null) {
                 return null;
@@ -572,15 +551,7 @@ public class DerivedDataChoice extends ListDataChoice {
                 userSelectedChoices.put(op.getParamName(), selectedChoice);
                 //Do an .equals instead of an instanceof because DerivedDataChoice 
                 //derived from ListDataChoice
-                if (selectedChoice.getClass().equals(ListDataChoice.class)) {
-                    ListDataChoice ldc = (ListDataChoice) selectedChoice;
-                    op.setData(ldc.getDataList(DataCategory.NULL,
-                            dataSelection, requestProperties));
-                } else {
-                    System.err.println("getData-2 " + selectedChoice);
-                    op.setData(selectedChoice.getData(DataCategory.NULL,
-                            dataSelection, requestProperties));
-                }
+                setData(selectedChoice, op, dataChoiceToData, dataSelection, requestProperties);
             }
         }
 
@@ -589,19 +560,8 @@ public class DerivedDataChoice extends ListDataChoice {
             DataOperand op   = (DataOperand) operands.get(i);
             Object      data = op.getData();
             if (data instanceof DataChoice) {
-                checkLevel((DataChoice) data, op);
-                Object realData = dataChoiceToData.get(data);
-                if (realData == null) {
-                    System.err.println("getData-3:" + data);
-                    realData = ((DataChoice) data).getData(DataCategory.NULL,
-                            dataSelection, requestProperties);
-                    if (realData == null) {
-                        throw new BadDataException("Unable to get data: "
-                                + ((DataChoice) data).getName());
-                    }
-                    dataChoiceToData.put(data, realData);
-                }
-                op.setData(realData);
+                DataChoice dataChoice = (DataChoice) data;
+                setData(dataChoice, op, dataChoiceToData, dataSelection, requestProperties);
             }
         }
 
@@ -609,6 +569,27 @@ public class DerivedDataChoice extends ListDataChoice {
         //Done, return the list of DataOperand-s
         return operands;
     }
+
+
+    private void setData(DataChoice dataChoice, DataOperand dataOperand, Hashtable dataChoiceToData, DataSelection dataSelection, Hashtable requestProperties) 
+            throws VisADException, RemoteException {
+        Object data = dataChoiceToData.get(dataChoice);
+        if(data == null) {
+            if (dataChoice.getClass().equals(ListDataChoice.class)) {
+                ListDataChoice ldc = (ListDataChoice) dataChoice;
+                data = ldc.getDataList(DataCategory.NULL, dataSelection,
+                                       requestProperties);
+            } else {
+                checkLevel(dataChoice, dataOperand);
+                data = dataChoice.getData(DataCategory.NULL, dataSelection,
+                                           requestProperties);
+            }
+            dataChoiceToData.put(dataChoice, data);
+        }
+        dataOperand.setData(data);
+        //        return data;
+    }
+
 
 
     /**
