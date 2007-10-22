@@ -78,6 +78,12 @@ public class DataSelection {
     }
 
 
+    public DataSelection(Object fromLevel, Object toLevel) {
+        this.fromLevel= fromLevel;
+        this.toLevel= toLevel;
+    }
+
+
     /**
      * ctor
      *
