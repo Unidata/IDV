@@ -44,7 +44,7 @@
   <datasource
      id="FILE.TRACK,OPENDAP.TRACK,OPENDAP.TRAJECTORY"
      factory="ucar.unidata.data.sounding.TrackDataSource"
-     patterns="c130.*\.nc,p3.*.nc$,P3.*\.nc$,.*WMI_Lear.*\.nc$,\.c1\.nc$"
+     patterns="c130.*\.nc,p3.*.nc$,P3.*\.nc$,.*WMI_Lear.*\.nc$,\.c1\.nc$,wetPrf_.*_nc$"
      fileselection="true"
      doesmultiples="true"
      label="Track files"/>

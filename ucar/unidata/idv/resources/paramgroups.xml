@@ -36,6 +36,12 @@
        p2="v"
        p3="w"/>
   </paramgroup>
+  <paramgroup name="u_v_z">
+    <params
+       p1="U"
+       p2="V"
+       p3="Z"/>
+  </paramgroup>
   <paramgroup name="temp_and_pressure">
     <params
        p1="TEMP"
