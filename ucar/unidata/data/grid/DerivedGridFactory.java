@@ -21,8 +21,6 @@
  */
 
 
-
-
 package ucar.unidata.data.grid;
 
 
@@ -1655,9 +1653,7 @@ public class DerivedGridFactory {
                 }
 
                 // the derivative of theta by pressure level
-                //dthdp = thetaFF.derivative(pressure, Data.NO_ERRORS);
-                //dtdp  = (FlatField) dthdp;
-                dthdp = partial(thetaFF, pressure);
+                dtdp = (FlatField) partial(thetaFF, pressure);
 
                 // multiply by little g - surface gravity acceleration
                 // a minus sign is conventionally applied here, however it gives 
