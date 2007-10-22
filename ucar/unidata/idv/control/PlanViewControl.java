@@ -421,12 +421,6 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     protected boolean setData(DataChoice dataChoice)
             throws VisADException, RemoteException {
-        //Now get the list of levels
-        List   levelsList = dataChoice.getAllLevels(getDataSelection());
-        Real[] levels     = null;
-        if ((levelsList != null) && (levelsList.size() > 0)) {
-            levels = (Real[]) levelsList.toArray(new Real[levelsList.size()]);
-        }
 
         Trace.call1("PlanView.setData");
         boolean result = super.setData(dataChoice);
@@ -441,14 +435,24 @@ public abstract class PlanViewControl extends GridDisplayControl {
             addTopographyMap();
         }
 
-
         Trace.call1("PlanView.getLevels");
+        //Now get the list of levels
+        List   levelsList = dataChoice.getAllLevels(getDataSelection());
+        Real[] levels     = null;
+        if ((levelsList != null) && (levelsList.size() > 0)) {
+            levels = (Real[]) levelsList.toArray(new Real[levelsList.size()]);
+        }
+
+
         if (levels == null) {
             levels = getGridDataInstance().getLevels();
-            if ((levels != null) && (currentLevel == null)) {
-                currentLevel = levels[0];
-            }
         }
+
+        if ((levels != null) && (levels.length > 0)
+                && (currentLevel == null)) {
+            currentLevel = levels[0];
+        }
+
 
         // If we have already made the plan view gui for some previous 
         // selected parameter, now then set up the levels controls as needed
@@ -879,7 +883,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
                 }
             } else {
                 // only one level?  - can we get here?
-                System.out.println("PlanViewControl: only one level?");
+                //                System.out.println("PlanViewControl: only one level?");
                 currentSlice = workingGrid;
             }
         } else {  // 2D grid or requested slice
@@ -1078,6 +1082,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
     protected DataInstance doMakeDataInstance(DataChoice dataChoice)
             throws RemoteException, VisADException {
 
+        /*
         if (currentLevel == null) {
             currentLevel = (Real) getDataSelection().getFromLevel();
             if (currentLevel == null) {
@@ -1086,7 +1091,8 @@ public abstract class PlanViewControl extends GridDisplayControl {
                     currentLevel = (Real) levelsList.get(0);
                 }
             }
-        }
+            }*/
+
         //Don't set this now
         //        getDataSelection().setLevel(currentLevel);
         return new GridDataInstance(dataChoice, getDataSelection(),
