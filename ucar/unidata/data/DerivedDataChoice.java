@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -296,15 +297,50 @@ public class DerivedDataChoice extends ListDataChoice {
      */
     private static DataOperand addOperand(String opName, Object data,
                                           List operands, Hashtable opsSoFar) {
-        DataOperand op = (DataOperand) opsSoFar.get(opName);
-        if (op != null) {
-            return op;
+        DataOperand dataOperand = (DataOperand) opsSoFar.get(opName);
+        if (dataOperand != null) {
+            return dataOperand;
         }
-        op = new DataOperand(opName, data);
-        opsSoFar.put(opName, op);
-        operands.add(op);
-        return op;
+        Misc.printStack("addOperand -  2:" + opName + ":", 5, null);
+        dataOperand = new DataOperand(opName, data);
+        opsSoFar.put(opName, dataOperand);
+        operands.add(dataOperand);
+        return dataOperand;
     }
+
+
+
+    /**
+     *  Add the given operand op into the list of ops if it has not been
+     *  placed into the seen table and if it is not one of the jython keywords.
+     *
+     *  @param operand      The operand name.
+     *  @param seen    Keeps track of what operands are in the list.
+     *  @param ops     The list of operands.
+     */
+    private static void addOperand(String operand, Hashtable seen, List ops) {
+        if (jythonKeywords == null) {
+            jythonKeywords = new Hashtable();
+            jythonKeywords.put("if", "");
+            jythonKeywords.put("def", "");
+            jythonKeywords.put("for", "");
+            jythonKeywords.put("while", "");
+            //      jythonKeywords.put ("", "");
+        }
+        if (jythonKeywords.get(operand) != null) {
+            return;
+        }
+        DataOperand dataOperand = (DataOperand) seen.get(operand);
+        if (dataOperand != null) {
+            return;
+        }
+        Misc.printStack("addOperand - 1:" + operand + ":", 5, null);
+        dataOperand = new DataOperand(operand);
+        seen.put(operand, dataOperand);
+        ops.add(dataOperand);
+    }
+
+
 
 
 
@@ -353,9 +389,8 @@ public class DerivedDataChoice extends ListDataChoice {
 
         //Now, pull out the list of operands that are used in the jython code
         List operandsFromCode =
-            DerivedDataChoice.parseOperands(constructedCode);
-
-
+            DerivedDataChoice.parseOperands(constructedCode, operands,
+                                            operandsSoFar);
 
 
         //Now, split the list between user and non-user operands
@@ -432,8 +467,6 @@ public class DerivedDataChoice extends ListDataChoice {
         }
 
 
-
-
         //Go through any pre-defined operands (the DataChoice children).
         //These can be an UnboundDataChoice (from a need=*param_name in derived.xml),
         //a UserDataChoice (from a need="user:param_name" in derived.xml) or
@@ -455,7 +488,10 @@ public class DerivedDataChoice extends ListDataChoice {
                 }
             } else {
                 //Here, put the DataChoice in as the  data (sort of as a place holder for later).
-                //                System.err.println ("addOperand ");
+                //                System.err.println ("addOperand " + opName + " alias = " + alias );
+                if (true) {
+                    continue;
+                }
                 addOperand(opName, dc, operands, operandsSoFar);
                 if (userSelectedChoices.get(alias) == null) {
                     //                    System.err.println ("addOperand-alias " + alias);
@@ -484,41 +520,44 @@ public class DerivedDataChoice extends ListDataChoice {
         //        System.err.println("Operands:" + operands);
         for (int i = 0; i < operands.size(); i++) {
             DataOperand op = (DataOperand) operands.get(i);
-            if ( !op.isBound()) {
-                DataChoice boundChoice =
-                    (DataChoice) userSelectedChoices.get(op.getParamName());
-                //For legacy bundles the operand may have been put into the
-                //hashtable with the full name (including "[....]")
-                if (boundChoice == null) {
-                    boundChoice =
-                        (DataChoice) userSelectedChoices.get(op.getName());
-                }
-
-                if (boundChoice != null) {
-                    //Got it from before
-                    //                    System.err.println("getData-1:" + boundChoice + " " + op);
-                    Object data;
-                    if (boundChoice.getClass().equals(ListDataChoice.class)) {
-                        ListDataChoice ldc = (ListDataChoice) boundChoice;
-                        data = ldc.getDataList(DataCategory.NULL,
-                                dataSelection, requestProperties);
-                    } else {
-                        data = boundChoice.getData(DataCategory.NULL,
-                                dataSelection, requestProperties);
-                    }
-                    dataChoiceToData.put(boundChoice, data);
-                    op.setData(data);
-                } else {
-                    //Need to get this one
-                    unboundOperands.add(op);
-                }
+            if (op.isBound()) {
+                continue;
             }
+            DataChoice boundChoice =
+                (DataChoice) userSelectedChoices.get(op.getParamName());
+            //For legacy bundles the operand may have been put into the
+            //hashtable with the full name (including "[....]")
+            if (boundChoice == null) {
+                boundChoice =
+                    (DataChoice) userSelectedChoices.get(op.getName());
+            }
+            if (boundChoice == null) {
+                unboundOperands.add(op);
+                continue;
+            }
+            //Got it from before
+            Object data;
+            if (boundChoice.getClass().equals(ListDataChoice.class)) {
+                ListDataChoice ldc = (ListDataChoice) boundChoice;
+                data = ldc.getDataList(DataCategory.NULL, dataSelection,
+                                       requestProperties);
+            } else {
+                System.err.println("getData-1 " + boundChoice);
+                checkLevel(boundChoice, op);
+                data = boundChoice.getData(DataCategory.NULL, dataSelection,
+                                           requestProperties);
+            }
+            dataChoiceToData.put(boundChoice, data);
+            op.setData(data);
         }
 
+
+        System.err.println("operands:" + operands);
 
         //If any of the operands we need are unbound 
         //than ask the DataContext to bind them
         if (unboundOperands.size() > 0) {
+            System.err.println("unbound operands:" + unboundOperands);
             List selected = dataContext.selectDataChoices(unboundOperands);
             if (selected == null) {
                 return null;
@@ -538,6 +577,7 @@ public class DerivedDataChoice extends ListDataChoice {
                     op.setData(ldc.getDataList(DataCategory.NULL,
                             dataSelection, requestProperties));
                 } else {
+                    System.err.println("getData-2 " + selectedChoice);
                     op.setData(selectedChoice.getData(DataCategory.NULL,
                             dataSelection, requestProperties));
                 }
@@ -549,9 +589,10 @@ public class DerivedDataChoice extends ListDataChoice {
             DataOperand op   = (DataOperand) operands.get(i);
             Object      data = op.getData();
             if (data instanceof DataChoice) {
+                checkLevel((DataChoice) data, op);
                 Object realData = dataChoiceToData.get(data);
                 if (realData == null) {
-                    //                    System.err.println("getData-3:" + data + " op= " + op);
+                    System.err.println("getData-3:" + data);
                     realData = ((DataChoice) data).getData(DataCategory.NULL,
                             dataSelection, requestProperties);
                     if (realData == null) {
@@ -569,6 +610,49 @@ public class DerivedDataChoice extends ListDataChoice {
         return operands;
     }
 
+
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     * @param op _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    private void checkLevel(DataChoice dataChoice, DataOperand op)
+            throws VisADException, RemoteException {
+        DataSelection dataSelection = dataChoice.getDataSelection();
+        //        System.err.println (op +" LEVEL:" + op.getProperty("level"));
+        if ((op.getProperty("level") != null)
+                && ((dataSelection == null)
+                    || (dataSelection.getFromLevel() == null))) {
+            List levels = StringUtil.split(op.getProperty("level"), ":",
+                                           true, true);
+            Object fromLevel = null,
+                   toLevel   = null;
+            if (levels.size() == 0) {
+                throw new IllegalArgumentException("Incorrect levels format:"
+                        + op.getProperty("level") + "  for operand:" + op);
+            }
+            try {
+                fromLevel = ucar.visad.Util.toReal(levels.get(0).toString(),
+                        "(", ")");
+                if (levels.size() >= 2) {
+                    toLevel =
+                        ucar.visad.Util.toReal(levels.get(1).toString(), "(",
+                            ")");
+                }
+                //                System.err.println ("setting levels data selection");
+                dataChoice.setDataSelection(new DataSelection(fromLevel,
+                        ((toLevel != null)
+                         ? toLevel
+                         : fromLevel)));
+            } catch (Exception exc) {
+                throw new VisADException("Error parsing levels:" + exc);
+            }
+        }
+    }
 
     /**
      * Apply the derived operation. If any of the getData of the sub-dataChoices
@@ -617,9 +701,6 @@ public class DerivedDataChoice extends ListDataChoice {
             requestProperties.remove(PROP_FROMDERIVED);
         }
 
-
-
-
         //Did the user cancel the selection of operands
         if (ops == null) {
             throw new DataCancelException();
@@ -663,7 +744,6 @@ public class DerivedDataChoice extends ListDataChoice {
                 //If we do the exec we need to have the contructed code
                 //have a "result=" in it and then we retrieve the
                 //value of "result" from the interpreter
-
 
                 PyObject pyResult     = interp.eval(constructedCode);
                 Object   resultObject = pyResult.__tojava__(visad.Data.class);
@@ -872,13 +952,29 @@ public class DerivedDataChoice extends ListDataChoice {
      * @return List of operands.
      */
     public static List parseOperands(String jythonCode) {
+        Hashtable seen     = new Hashtable();
+        List      operands = new ArrayList();
+        return parseOperands(jythonCode, operands, seen);
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param jythonCode _more_
+     * @param operands _more_
+     * @param seen _more_
+     *
+     * @return _more_
+     */
+    public static List parseOperands(String jythonCode, List operands,
+                                     Hashtable seen) {
 
         //Yank out all whitespace
         //        jythonCode = StringUtil.removeWhitespace(jythonCode);
 
-        List         operands                = new ArrayList();
         StringBuffer current                 = null;
-        Hashtable    seen                    = new Hashtable();
         char[]       chars                   = jythonCode.toCharArray();
 
         final int    STATE_LOOKINGFORTOKEN   = 0;
@@ -986,33 +1082,6 @@ public class DerivedDataChoice extends ListDataChoice {
             addOperand(current.toString(), seen, operands);
         }
         return operands;
-    }
-
-
-    /**
-     *  Add the given operand op into the list of ops if it has not been
-     *  placed into the seen table and if it is not one of the jython keywords.
-     *
-     *  @param op      The operand name.
-     *  @param seen    Keeps track of what operands are in the list.
-     *  @param ops     The list of operands.
-     */
-    private static void addOperand(String op, Hashtable seen, List ops) {
-        if (jythonKeywords == null) {
-            jythonKeywords = new Hashtable();
-            jythonKeywords.put("if", "");
-            jythonKeywords.put("def", "");
-            jythonKeywords.put("for", "");
-            jythonKeywords.put("while", "");
-            //      jythonKeywords.put ("", "");
-        }
-        if (jythonKeywords.get(op) != null) {
-            return;
-        }
-        if ( !Misc.haveSeen(op, seen)) {
-            ops.add(new DataOperand(op));
-        }
-
     }
 
 
