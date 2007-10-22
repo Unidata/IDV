@@ -25,7 +25,6 @@ package ucar.unidata.data;
 
 
 import org.python.core.*;
-
 import org.python.util.*;
 
 import ucar.unidata.idv.JythonManager;
@@ -34,19 +33,12 @@ import ucar.unidata.util.CacheManager;
 
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-
-import ucar.unidata.util.NamedList;
-import ucar.unidata.util.ResourceCollection;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 
 
-
 import visad.*;
 
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 
 import java.rmi.RemoteException;
@@ -55,8 +47,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
-import java.util.StringTokenizer;
-
 
 
 /**
@@ -105,7 +95,6 @@ public class DerivedDataChoice extends ListDataChoice {
      *  The visad formula. May be null.
      */
     String formula;
-
 
 
 
@@ -298,7 +287,7 @@ public class DerivedDataChoice extends ListDataChoice {
                                           List operands, Hashtable opsSoFar) {
         DataOperand dataOperand = (DataOperand) opsSoFar.get(opName);
         if (dataOperand != null) {
-            if(!dataOperand.isBound()) {
+            if ( !dataOperand.isBound()) {
                 dataOperand.setData(data);
             }
             return dataOperand;
@@ -409,7 +398,7 @@ public class DerivedDataChoice extends ListDataChoice {
             }
         }
 
-        /* 
+        /*
            System.err.println("formula:" +constructedCode);
            System.err.println("userSelectedChoices= " + userSelectedChoices);
            System.err.println("children:" + childrenChoices);
@@ -527,7 +516,8 @@ public class DerivedDataChoice extends ListDataChoice {
                 unboundOperands.add(op);
                 continue;
             }
-            setData(boundChoice, op, dataChoiceToData, dataSelection, requestProperties);
+            setData(boundChoice, op, dataChoiceToData, dataSelection,
+                    requestProperties);
         }
 
 
@@ -551,7 +541,8 @@ public class DerivedDataChoice extends ListDataChoice {
                 userSelectedChoices.put(op.getParamName(), selectedChoice);
                 //Do an .equals instead of an instanceof because DerivedDataChoice 
                 //derived from ListDataChoice
-                setData(selectedChoice, op, dataChoiceToData, dataSelection, requestProperties);
+                setData(selectedChoice, op, dataChoiceToData, dataSelection,
+                        requestProperties);
             }
         }
 
@@ -561,7 +552,8 @@ public class DerivedDataChoice extends ListDataChoice {
             Object      data = op.getData();
             if (data instanceof DataChoice) {
                 DataChoice dataChoice = (DataChoice) data;
-                setData(dataChoice, op, dataChoiceToData, dataSelection, requestProperties);
+                setData(dataChoice, op, dataChoiceToData, dataSelection,
+                        requestProperties);
             }
         }
 
@@ -571,10 +563,25 @@ public class DerivedDataChoice extends ListDataChoice {
     }
 
 
-    private void setData(DataChoice dataChoice, DataOperand dataOperand, Hashtable dataChoiceToData, DataSelection dataSelection, Hashtable requestProperties) 
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     * @param dataOperand _more_
+     * @param dataChoiceToData _more_
+     * @param dataSelection _more_
+     * @param requestProperties _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    private void setData(DataChoice dataChoice, DataOperand dataOperand,
+                         Hashtable dataChoiceToData,
+                         DataSelection dataSelection,
+                         Hashtable requestProperties)
             throws VisADException, RemoteException {
         Object data = dataChoiceToData.get(dataChoice);
-        if(data == null) {
+        if (data == null) {
             if (dataChoice.getClass().equals(ListDataChoice.class)) {
                 ListDataChoice ldc = (ListDataChoice) dataChoice;
                 data = ldc.getDataList(DataCategory.NULL, dataSelection,
@@ -582,7 +589,7 @@ public class DerivedDataChoice extends ListDataChoice {
             } else {
                 checkLevel(dataChoice, dataOperand);
                 data = dataChoice.getData(DataCategory.NULL, dataSelection,
-                                           requestProperties);
+                                          requestProperties);
             }
             dataChoiceToData.put(dataChoice, data);
         }
@@ -720,6 +727,7 @@ public class DerivedDataChoice extends ListDataChoice {
             result = (Data) CacheManager.get (this, cacheKey);
             */
 
+            interp.set("derivedDataChoice",this);
             if (result == null) {
                 //Sometime we may want to do an exec here, instead of an eval.
                 //If we do the exec we need to have the contructed code
@@ -748,6 +756,7 @@ public class DerivedDataChoice extends ListDataChoice {
             }
 
             //Now, go thru each arg that we just set and clear it so we don't leak
+            interp.set("derivedDataChoice",null);
             for (int i = 0; i < ops.size(); i++) {
                 DataOperand op = (DataOperand) ops.get(i);
                 interp.set(op.getName(), null);

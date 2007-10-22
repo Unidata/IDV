@@ -215,7 +215,8 @@ public class DataOperand {
      * @return a string representation of this DataOperand
      */
     public String toString() {
-        return name +  " (" + (isBound()?"bound":"unbound")+")";
+        return name;
+        //        return name +  " (" + (isBound()?"bound":"unbound")+")";
     }
 
 
