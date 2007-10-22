@@ -2074,9 +2074,13 @@ public final class Util {
      * @throws Exception  problem with unit spec or parsing.
      */
     public static Real toReal(String value) throws Exception {
+        return toReal(value, "[","]");
+    }
+
+    public static Real toReal(String value, String unitOpener, String unitCloser) throws Exception {
         value = value.trim();
         //Check if there is a unit
-        int idx = value.indexOf("[");
+        int idx = value.indexOf(unitOpener);
         if (idx < 0) {
             idx = value.indexOf(" ");
         }
@@ -2084,7 +2088,7 @@ public final class Util {
             //We have a unit
             String valueString = value.substring(0, idx).trim();
             String unitString  = value.substring(idx).trim();
-            idx = unitString.indexOf("[");
+            idx = unitString.indexOf(unitOpener);
             if (idx >= 0) {
                 unitString = unitString.substring(1);
                 unitString = unitString.substring(0, unitString.length() - 1);
