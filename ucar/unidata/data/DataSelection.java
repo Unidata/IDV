@@ -155,13 +155,15 @@ public class DataSelection {
      * @param that  other DataSelection
      */
     public DataSelection(DataSelection that) {
-        this.times     = Misc.cloneList(that.times);
-        this.timesMode = that.timesMode;
-        if (that.geoSelection != null) {
-            this.geoSelection = new GeoSelection(that.geoSelection);
+        if(that!=null) {
+            this.times     = Misc.cloneList(that.times);
+            this.timesMode = that.timesMode;
+            if (that.geoSelection != null) {
+                this.geoSelection = new GeoSelection(that.geoSelection);
+            }
+            this.fromLevel = that.fromLevel;
+            this.toLevel   = that.toLevel;
         }
-        this.fromLevel = that.fromLevel;
-        this.toLevel   = that.toLevel;
     }
 
 
@@ -330,8 +332,10 @@ public class DataSelection {
      * @return a string representation of this DataSelection
      */
     public String toString() {
-        //        return super.toString() + " " + times;
-        return "data selection:" + geoSelection;
+        return super.toString() + " " + times;
+        //        return "data selection:" + fromLevel;
+        //        return "data selection:" + geoSelection;
+
     }
 
     /**
