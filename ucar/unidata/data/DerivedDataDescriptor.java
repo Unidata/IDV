@@ -576,7 +576,11 @@ public class DerivedDataDescriptor {
      * @return  new DDC
      */
     public DerivedDataChoice getDataChoice() {
-        return new DerivedDataChoice(dataContext, this);
+        DerivedDataChoice ddc =  new DerivedDataChoice(dataContext, this);
+        if(properties!=null) {
+            ddc.setProperties(properties);
+        }
+        return ddc;
     }
 
 
