@@ -43,7 +43,7 @@ def getSliceAtLevel(fieldimpl, level) :
      param fieldimpl is a VisAD FieldImpl which may have
      one or more time steps.  """
   level = float(level)
-  ff = sliceAtLevel(fieldimpl, level)
+  ff = GridUtil.sliceAtLevel(fieldimpl, level)
   return ff
 
 
