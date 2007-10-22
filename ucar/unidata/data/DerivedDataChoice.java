@@ -301,7 +301,7 @@ public class DerivedDataChoice extends ListDataChoice {
         if (dataOperand != null) {
             return dataOperand;
         }
-        Misc.printStack("addOperand -  2:" + opName + ":", 5, null);
+        //        Misc.printStack("addOperand -  2:" + opName + ":", 5, null);
         dataOperand = new DataOperand(opName, data);
         opsSoFar.put(opName, dataOperand);
         operands.add(dataOperand);
@@ -334,7 +334,7 @@ public class DerivedDataChoice extends ListDataChoice {
         if (dataOperand != null) {
             return;
         }
-        Misc.printStack("addOperand - 1:" + operand + ":", 5, null);
+        //        Misc.printStack("addOperand - 1:" + operand + ":", 5, null);
         dataOperand = new DataOperand(operand);
         seen.put(operand, dataOperand);
         ops.add(dataOperand);
