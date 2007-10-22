@@ -436,8 +436,12 @@ public abstract class PlanViewControl extends GridDisplayControl {
         }
 
         Trace.call1("PlanView.getLevels");
-        //Now get the list of levels
-        List   levelsList = dataChoice.getAllLevels(getDataSelection());
+        //Now get the list of levels. We don't want to pass in the level range here since then we won't see
+        //any other levels
+        DataSelection tmpSelection = new DataSelection(getDataSelection());
+        tmpSelection.setFromLevel(null);
+        tmpSelection.setToLevel(null);
+        List   levelsList = dataChoice.getAllLevels(tmpSelection);
         Real[] levels     = null;
         if ((levelsList != null) && (levelsList.size() > 0)) {
             levels = (Real[]) levelsList.toArray(new Real[levelsList.size()]);
@@ -448,6 +452,9 @@ public abstract class PlanViewControl extends GridDisplayControl {
             levels = getGridDataInstance().getLevels();
         }
 
+        if(currentLevel == null) {
+            currentLevel = (Real) getDataSelection().getFromLevel();
+        }
         if ((levels != null) && (levels.length > 0)
                 && (currentLevel == null)) {
             currentLevel = levels[0];
