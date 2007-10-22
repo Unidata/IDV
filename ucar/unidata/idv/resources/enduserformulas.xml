@@ -146,6 +146,7 @@
   <derived
      description="Slice at Level"
      formula="getSliceAtLevel (Field, user_Level)"
+     properties="levels=false"
      id="slice3Dto2D"
      isdefault="false"
      isenduser="true">
@@ -241,6 +242,7 @@
      description="Slice at Altitude"
      formula="getSliceAtAltitude (Field, user_Altitude, user_Unit[default=m])"
      id="altitudeSlice"
+     properties="levels=false"
      isdefault="false"
      isenduser="true">
     <categories>
