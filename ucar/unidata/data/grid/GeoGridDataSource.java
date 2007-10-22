@@ -964,8 +964,24 @@ public class GeoGridDataSource extends GridDataSource {
         try {
             dataSelection = DataSelection.merge(dataSelection,
                     getDataSelection());
+            //            System.err.println("levels:" + dataSelection.getFromLevel());
+            Object fromLevel      = dataSelection.getFromLevel();
+            Object toLevel        = dataSelection.getToLevel();
+            int    fromLevelIndex = -1;
+            int    toLevelIndex   = -1;
+            if ((fromLevel != null) && (toLevel != null)) {
+                List allLevels =
+                    getAllLevels(dataChoice,
+                                 new DataSelection(GeoSelection.STRIDE_BASE));
+
+
+                fromLevelIndex = indexOf(fromLevel, allLevels);
+                toLevelIndex   = indexOf(toLevel, allLevels);
+            }
+
+
             GeoGridAdapter geoGridAdapter = makeGeoGridAdapter(dataChoice,
-                                                dataSelection, null, -1, -1);
+                                                dataSelection, null, fromLevelIndex, toLevelIndex);
             if (geoGridAdapter != null) {
                 return geoGridAdapter.getLevels();
             }
