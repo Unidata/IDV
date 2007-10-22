@@ -270,6 +270,7 @@ or
      label="1000-500 hPa Thickness"
      isdefault="true" 
      isenduser="false"
+     properties="levels=false"
      formula="DerivedGridFactory.createLayerDifference (D1, 500, 1000)">
     <categories>
       <category
@@ -282,6 +283,7 @@ or
          p1="Z"
          categories="GRID-3D-*;"/>
     </operands>
+
   </derived>
   <derived
      id="Anythickness"
@@ -289,6 +291,7 @@ or
      label="Thickness"
      isdefault="true" 
      isenduser="false"
+     properties="levels=false"
      formula="DerivedGridFactory.createLayerDifference (D1, D2, D3)">
     <categories>
       <category
