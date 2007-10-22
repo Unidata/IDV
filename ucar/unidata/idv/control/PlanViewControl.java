@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -203,8 +204,26 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     public void addToRangeMenu(final RangeWidget rw, List items) {
         super.addToRangeMenu(rw, items);
-        if (currentSlice == null) {
+        final Range r = getLevelColorRange();
+        if (r == null) {
             return;
+        }
+        JMenuItem mi = new JMenuItem("From Displayed Data");
+        items.add(mi);
+        mi.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                rw.setRangeDialog(convertColorRange(r));
+            }
+        });
+    }
+
+    /**
+     * Get the range for the current slice.
+     * @return range or null
+     */
+    protected Range getLevelColorRange() {
+        if (currentSlice == null) {
+            return null;
         }
         try {
             //Find the range of data
@@ -217,18 +236,10 @@ public abstract class PlanViewControl extends GridDisplayControl {
             levelColorRange = range[index];
         } catch (Exception exc) {}
         if (levelColorRange == null) {
-            return;
+            return null;
         }
-        JMenuItem mi = new JMenuItem("From Displayed Data");
-        items.add(mi);
-        mi.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                rw.setRangeDialog(convertColorRange(levelColorRange));
-            }
-        });
+        return levelColorRange;
     }
-
-
 
     /**
      * move up/down levels by the delta
@@ -452,7 +463,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
             levels = getGridDataInstance().getLevels();
         }
 
-        if(currentLevel == null) {
+        if (currentLevel == null) {
             currentLevel = (Real) getDataSelection().getFromLevel();
         }
         if ((levels != null) && (levels.length > 0)
@@ -947,10 +958,12 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     protected FieldImpl getSliceForDisplay(FieldImpl slice)
             throws VisADException {
-        if (getSkipValue() <= 0) {
-            return slice;
+        FieldImpl retField = slice;
+        if (getSkipValue() > 0) {
+            retField = GridUtil.subset(slice, getSkipValue() + 1);
         }
-        return GridUtil.subset(slice, getSkipValue() + 1);
+        //System.out.println("slice for " + paramName + " = " + retField);
+        return retField;
     }
 
     /**

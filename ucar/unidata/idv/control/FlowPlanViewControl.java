@@ -21,8 +21,11 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
+
+import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
 
@@ -62,6 +65,14 @@ import javax.swing.event.*;
 public class FlowPlanViewControl extends PlanViewControl {
 
 
+    /** property for sharing flow range */
+    public static final String SHARE_FLOWRANGE =
+        "FlowPlanViewControl.SHARE_FLOWRANGE";
+
+    /** property for sharing flow scale */
+    public static final String SHARE_FLOWSCALE =
+        "FlowPlanViewControl.SHARE_FLOWRANGE";
+
     /** a component to change the barb size */
     ValueSliderWidget barbSizeWidget;
 
@@ -70,6 +81,9 @@ public class FlowPlanViewControl extends PlanViewControl {
 
     /** a component to change the streamline density */
     JComponent densityComponent;
+
+    /** a label listing the range of the data */
+    JLabel flowRangeLabel;
 
     /** the density label */
     private JLabel densityLabel;
@@ -94,6 +108,9 @@ public class FlowPlanViewControl extends PlanViewControl {
 
     /** slider components */
     private JComponent[] widthSliderComps;
+
+    /** Range for flow scale */
+    private Range flowRange;
 
     /**
      * Create a new FlowPlanViewControl; set attribute flags
@@ -188,15 +205,27 @@ public class FlowPlanViewControl extends PlanViewControl {
 
         barbSizeWidget = new ValueSliderWidget(this, 1, 21, "flowScale",
                 getSizeLabel());
-        skipFactorWidget = new ValueSliderWidget(this, 0, 10, "skipValue",
-                getSkipWidgetLabel());
-        JPanel extra = GuiUtils.hbox(barbSizeWidget.getContents(false),
-                                     GuiUtils.filler(),
-                                     skipFactorWidget.getContents(true));
+        JPanel extra = GuiUtils.hbox(GuiUtils.rLabel("Scale:  "),
+                                     barbSizeWidget.getContents(false));
+        if ( !getWindbarbs()) {
+            extra = GuiUtils.hbox(extra,
+                                  GuiUtils.hbox(GuiUtils.filler(),
+                                      doMakeFlowRangeComponent()));
+        }
         controlWidgets.add(
             new WrapperWidget(
                 this, GuiUtils.rLabel("Vector Size: "),
                 GuiUtils.left(extra)));
+
+        skipFactorWidget = new ValueSliderWidget(this, 0, 10, "skipValue",
+                getSkipWidgetLabel());
+        controlWidgets.add(
+            new WrapperWidget(
+                this, GuiUtils.rLabel("Skip: "),
+                GuiUtils.left(
+                    GuiUtils.hbox(
+                        GuiUtils.rLabel("XY:  "),
+                        skipFactorWidget.getContents(false)))));
         if ( !getIsThreeComponents()) {
             JCheckBox toggle = new JCheckBox("Show", isStreamlines);
             densityLabel     = GuiUtils.rLabel("Density: ");
@@ -217,6 +246,12 @@ public class FlowPlanViewControl extends PlanViewControl {
             controlWidgets.add(new WrapperWidget(this, densityLabel,
                     densityComponent));
         }
+        /*
+        if (!getWindbarbs()) {
+            controlWidgets.add(new WrapperWidget(this, GuiUtils.rLabel("Scaling Range: "),
+                    doMakeFlowRangeComponent()));
+        }
+        */
         enableBarbSizeBox();
         super.getControlWidgets(controlWidgets);
     }
@@ -239,6 +274,70 @@ public class FlowPlanViewControl extends PlanViewControl {
         return GuiUtils.doLayout(new Component[] { GuiUtils.rLabel("Low "),
                 densitySlider, GuiUtils.lLabel(" High"),
                 GuiUtils.filler() }, 4, GuiUtils.WT_NYNY, GuiUtils.WT_N);
+    }
+
+    /**
+     * Create the streamline density slider
+     *
+     * @return The panel that shows the streamline density slider
+     */
+    protected JComponent doMakeFlowRangeComponent() {
+
+        setFlowRangeLabel();
+        JButton editButton =
+            GuiUtils.getImageButton("/ucar/unidata/idv/images/edit.gif",
+                                    getClass());
+        editButton.setToolTipText("Range used for scaling the vector size");
+        final RangeDialog rd =
+            new RangeDialog(this, flowRange,
+                            "Set the range of data for sizing vectors",
+                            "setFlowRange");
+        editButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ev) {
+                rd.showDialog();
+                setFlowRangeLabel();
+            }
+        });
+        return GuiUtils.hbox(flowRangeLabel, editButton);
+    }
+
+    /**
+     * Method called by other classes that share the the state.
+     * @param from  other class.
+     * @param dataId  type of sharing
+     * @param data  Array of data being shared.  In this case, the first
+     *              (and only?) object in the array is the level
+     */
+    public void receiveShareData(Sharable from, Object dataId,
+                                 Object[] data) {
+        try {
+            if (dataId.equals(SHARE_FLOWRANGE)) {
+                setFlowRange((Range) data[0]);
+            } else if (dataId.equals(SHARE_FLOWSCALE)) {
+                setFlowScale(((Float) data[0]).floatValue());
+            } else {
+                super.receiveShareData(from, dataId, data);
+            }
+        } catch (Exception exc) {
+            logException("Error processing shared state: " + dataId, exc);
+        }
+    }
+
+    /**
+     * Set the range label
+     */
+    private void setFlowRangeLabel() {
+        if (flowRangeLabel == null) {
+            flowRangeLabel = new JLabel("Range: ", SwingConstants.RIGHT);
+
+        }
+        Range r = getFlowRange();
+        if (r != null) {
+            flowRangeLabel.setText("Range: " + r.formatMin() + " to "
+                                   + r.formatMax());
+        } else {
+            flowRangeLabel.setText("Range: Undefined");
+        }
     }
 
     /**
@@ -385,6 +484,41 @@ public class FlowPlanViewControl extends PlanViewControl {
         if (getGridDisplay() != null) {
             getGridDisplay().setFlowScale(flowScaleValue * scaleFactor);
         }
+        if (getHaveInitialized()) {
+            doShare(SHARE_FLOWRANGE, flowRange);
+        }
+    }
+
+    /**
+     * Get the flow range.
+     * Used by XML persistence
+     *
+     * @return  the flow range for this control
+     */
+    public Range getFlowRange() {
+        return flowRange;
+    }
+
+    /**
+     * Set the flow range.
+     * Used by XML persistence
+     *
+     * @param f   new flow range
+     */
+    public void setFlowRange(Range f) {
+        flowRange = f;
+        if (getHaveInitialized()) {
+            if (getGridDisplay() != null && flowRange != null && !getWindbarbs()) {
+                try {
+                    getGridDisplay().setFlowRange(flowRange.getMin(),
+                            flowRange.getMax());
+                } catch (Exception excp) {
+                    logException("setFlowRange: ", excp);
+                }
+            }
+            setFlowRangeLabel();
+            doShare(SHARE_FLOWRANGE, flowRange);
+        }
     }
 
     /**
@@ -408,6 +542,42 @@ public class FlowPlanViewControl extends PlanViewControl {
         if (getGridDisplay() != null) {
             getGridDisplay().setStreamlineDensity(f);
         }
+    }
+
+    /**
+     *  Return the range attribute of the colorTable  (if non-null)
+     *  else return null;
+     * @return The range from the color table attribute
+     */
+    public Range getColorRangeFromData() {
+        Range r = super.getColorRangeFromData();
+        return makeFlowRange(r);
+    }
+
+    /**
+     * Get the range for the current slice.
+     * @return range or null
+     */
+    protected Range getLevelColorRange() {
+        return makeFlowRange(super.getLevelColorRange());
+    }
+
+    /**
+     * Make a flow range from the given range (max of abs of min and max)
+     *
+     * @param r   range to normalize
+     *
+     * @return  flow type range
+     */
+    private Range makeFlowRange(Range r) {
+        if (haveMultipleFields()) {
+            return r;
+        }
+        if (r == null) {
+            return r;
+        }
+        double max = Math.max(Math.abs(r.getMax()), Math.abs(r.getMin()));
+        return new Range(-max, max);
     }
 
     /**
@@ -447,27 +617,35 @@ public class FlowPlanViewControl extends PlanViewControl {
      * @throws VisADException   VisAD Error
      */
     private void setFlowRange() throws RemoteException, VisADException {
-        if (getGridDisplay() != null) {
-            Range[] ranges = null;
-            Data    data   = getGridDisplay().getData();
-            if (data != null) {
-                ranges = GridUtil.getMinMax((FieldImpl) data);
-                double max      = Double.NEGATIVE_INFINITY;
-                double min      = Double.POSITIVE_INFINITY;
-                int    numComps = getIsThreeComponents()
-                                  ? 3
-                                  : 2;
-                for (int i = 0; i < numComps; i++) {
-                    Range compRange = ranges[i];
-                    max = Math.max(compRange.getMax(), max);
-                    min = Math.min(compRange.getMin(), min);
+        if ((getGridDisplay() != null) && !getWindbarbs()) {
+            if (getFlowRange() == null) {
+                Range[] ranges = null;
+                Data    data   = getGridDisplay().getData();
+                if (data != null) {
+                    ranges = GridUtil.getMinMax((FieldImpl) data);
+                    double max      = Double.NEGATIVE_INFINITY;
+                    double min      = Double.POSITIVE_INFINITY;
+                    int    numComps = getIsThreeComponents()
+                                      ? 3
+                                      : 2;
+                    for (int i = 0; i < numComps; i++) {
+                        Range compRange = ranges[i];
+                        max = Math.max(compRange.getMax(), max);
+                        min = Math.min(compRange.getMin(), min);
+                    }
+                    if ( !Double.isInfinite(max) && !Double.isInfinite(min)) {
+                        max = Math.max(max, -min);
+                        min = -max;
+                    }
+                    // System.out.println("setFlowRange: " + min + " to " + max);
+                    //getGridDisplay().setFlowRange(min,max);
+                    setFlowRange(new Range(min, max));
+                } else {  // gotta set it to something
+                    setFlowRange(new Range(-40, 40));
                 }
-                if ( !Double.isInfinite(max) && !Double.isInfinite(min)) {
-                    max = Math.max(max, -min);
-                    min = -max;
-                }
-                // System.out.println("setFlowRange: " + min + " to " + max);
-                getGridDisplay().setFlowRange(min, max);
+            } else {
+                getGridDisplay().setFlowRange(flowRange.getMin(),
+                        flowRange.getMax());
             }
         }
     }

@@ -2641,6 +2641,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             } else if (dataId.equals(SHARE_VISIBILITY)) {
                 setDisplayVisibility(((Boolean) data[0]).booleanValue(),
                                      false);
+            } else if (dataId.equals(SHARE_SKIPVALUE)) {
+                skipValue = ((Integer) data[0]).intValue();
+                applySkipFactor();
             } else {
                 super.receiveShareData(from, dataId, data);
             }
@@ -10383,6 +10386,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         skipValue = value;
         if (getHaveInitialized()) {
             applySkipFactor();
+            doShare(SHARE_SKIPVALUE, new Integer(skipValue));
         }
     }
 
