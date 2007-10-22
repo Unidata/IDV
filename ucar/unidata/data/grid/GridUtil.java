@@ -1598,6 +1598,23 @@ public class GridUtil {
      */
     public static FieldImpl getParam(FieldImpl grid, int index)
             throws VisADException {
+        return getParam(grid, index, true);
+    }
+
+    /**
+     * Extract the range MathType of the lowest element.  If this is
+     * a sequence, it will be the range type of the individual elements.
+     * If not, it will be the range
+     *
+     * @param grid    grid to check
+     * @param index   parameter index
+     * @param copy    true to make a copy
+     * @return   TupleType of lowest element
+     *
+     * @throws VisADException   unable to get at data types
+     */
+    public static FieldImpl getParam(FieldImpl grid, int index, boolean copy)
+            throws VisADException {
 
         FieldImpl newField = null;
         if (grid == null) {
@@ -1642,7 +1659,7 @@ public class GridUtil {
                     newField = new FieldImpl(newType, timeDomain);
                     for (int i = 0; i < timeDomain.getLength(); i++) {
                         newField.setSample(i, ((FlatField) grid.getSample(i,
-                                false)).extract(index), false);
+                                false)).extract(index, copy), false);
                     }
                     Trace.call2("GridUtil.setParam:sequence");
                 }
@@ -1680,7 +1697,7 @@ public class GridUtil {
                         for (int j = 0; j < indexSet.getLength(); j++) {
                             newIndexField.setSample(j,
                                     ((FlatField) indexField.getSample(j,
-                                        false)).extract(index), false);
+                                        false)).extract(index, copy), false);
                         }
                         newField.setSample(i, newIndexField);
                     }
@@ -1690,7 +1707,8 @@ public class GridUtil {
             } else {
                 // have "grid" single FlatField; neither time nor index domain
                 //newField = (FieldImpl) Util.clone(grid, newParam, true, copy);
-                newField = (FieldImpl) grid.extract(index);
+                newField = (FieldImpl) ((FlatField) grid).extract(index,
+                        copy);
             }
         } catch (RemoteException re) {
             throw new VisADException("problem setting param type " + re);

@@ -2120,35 +2120,63 @@ public class DerivedGridFactory {
      */
     public static FieldImpl getUComponent(FieldImpl vector)
             throws VisADException {
-        return getComponent(vector, 0);
+        return getUComponent(vector, false);
+    }
+
+    /**
+     * Get U component of a vector
+     * @param vector  vector quantity
+     * @param copy    true to copy values
+     * @return u (first) component or null if not a vector
+     *
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl getUComponent(FieldImpl vector, boolean copy)
+            throws VisADException {
+        return getComponent(vector, 0, copy);
     }
 
     /**
      * Get V component of a vector
      * @param vector  vector quantity
-     * @return v (second) component or null if not a vector
+     * @return v (second) component or null if not a vector.  Does not copy
      *
      * @throws VisADException   VisAD Error
      */
     public static FieldImpl getVComponent(FieldImpl vector)
             throws VisADException {
-        return getComponent(vector, 1);
+        return getVComponent(vector, false);
+    }
+
+    /**
+     * Get V component of a vector
+     * @param vector  vector quantity
+     * @param copy    true to copy values
+     * @return v (second) component or null if not a vector.
+     *
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl getVComponent(FieldImpl vector, boolean copy)
+            throws VisADException {
+        return getComponent(vector, 1, copy);
     }
 
     /**
      * Get nth component of a vector
      * @param vector  vector quantity
      * @param index  index of component
+     * @param copy    true to copy values
      * @return nth component or null in index &gt; number of components
      *
      * @throws VisADException   VisAD Error
      */
-    public static FieldImpl getComponent(FieldImpl vector, int index)
+    public static FieldImpl getComponent(FieldImpl vector, int index,
+                                         boolean copy)
             throws VisADException {
         if ( !isVector(vector)) {
             return vector;
         }
-        return GridUtil.getParam(vector, index);
+        return GridUtil.getParam(vector, index, copy);
     }
 }
 
