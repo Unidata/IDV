@@ -400,7 +400,7 @@
        location="%IDVPATH%/isl.py">
       <property
          name="showineditor"
-         value="false"/>
+         value="true"/>
      </resource>
     <resource
        label="Test routines"
