@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
@@ -1045,6 +1046,18 @@ public class JythonManager extends IdvManager implements ActionListener {
      * @param interpreter The interpreter to initialize
      */
     private void initBasicInterpreter(PythonInterpreter interpreter) {
+        doBasicImports(interpreter);
+        interpreter.set("idv", getIdv());
+        interpreter.set("interpreter", interpreter);
+        interpreter.set("datamanager", getDataManager());
+    }
+
+    /**
+     * _more_
+     *
+     * @param interpreter _more_
+     */
+    private static void doBasicImports(PythonInterpreter interpreter) {
         interpreter.exec("import sys");
         interpreter.exec("import java");
         interpreter.exec("sys.add_package('visad')");
@@ -1060,9 +1073,6 @@ public class JythonManager extends IdvManager implements ActionListener {
             "import ucar.unidata.data.grid.DerivedGridFactory as DerivedGridFactory");
         interpreter.exec("from visad.FlatField import *");
         interpreter.exec("from visad.FieldImpl import *");
-        interpreter.set("idv", getIdv());
-        interpreter.set("interpreter", interpreter);
-        interpreter.set("datamanager", getDataManager());
     }
 
 
@@ -2159,11 +2169,9 @@ public class JythonManager extends IdvManager implements ActionListener {
      * @throws Exception on badness
      */
     public static void main(String[] args) throws Exception {
-
         for (int i = 0; i < args.length; i++) {
             PythonInterpreter interpreter = new PythonInterpreter();
-            interpreter.exec("import sys");
-            interpreter.exec("import java");
+            doBasicImports(interpreter);
             String mod = IOUtil.stripExtension(IOUtil.getFileTail(args[i]));
             interpreter.execfile(new java.io.FileInputStream(args[i]), mod);
             PyStringMap  seq    = (PyStringMap) interpreter.getLocals();
