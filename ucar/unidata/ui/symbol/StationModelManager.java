@@ -251,7 +251,18 @@ public class StationModelManager extends ResourceManager {
         if (name == null) {
             return null;
         }
-        return (StationModel) getObject(name);
+        StationModel stationModel  = (StationModel) getObject(name);
+        //Check for old station models
+        if(stationModel == null && name.indexOf(">")<0) {
+            name = ">"+name;
+            for (int i = 0; i < resources.size(); i++) {
+                String modelName  = resources.get(i).toString();
+                if(modelName.endsWith(name)) {
+                    return (StationModel)resources.get(i);
+                }
+            }
+        }
+        return stationModel;
     }
 
     /**
