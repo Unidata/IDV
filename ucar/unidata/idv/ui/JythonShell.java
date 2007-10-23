@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -448,7 +449,33 @@ public class JythonShell extends InteractiveShell {
                 sb.append(line);
                 sb.append("\n");
             }
-            getInterpreter().exec(sb.toString());
+
+            List operands = DerivedDataChoice.parseOperands(sb.toString());
+            List unboundOperands = new ArrayList();
+            for (int i = 0; i < operands.size(); i++) {
+                DataOperand operand = (DataOperand) operands.get(i);
+                PyObject    obj     = interp.get(operand.getParamName());
+                if (obj == null) {
+                    unboundOperands.add(operand);
+                }
+            }
+
+            if (unboundOperands.size() > 0) {
+                List result = idv.selectDataChoices(unboundOperands);
+                if (result == null) {
+                    return;
+                }
+                for (int i = 0; i < result.size(); i++) {
+                    DataOperand operand = (DataOperand) operands.get(i);
+                    Data data =
+                        (Data) ((DataChoice) result.get(i)).getData(null);
+                    interp.set(operand.getParamName(), data);
+                }
+
+            }
+
+            PythonInterpreter interp = getInterpreter();
+            interp.exec(sb.toString());
         } catch (PyException pse) {
             output("<font color=\"red\">Error: " + pse.toString()
                    + "</font><br>");
