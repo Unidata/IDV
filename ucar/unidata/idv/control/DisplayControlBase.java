@@ -268,6 +268,10 @@ public abstract class DisplayControlBase extends SharableImpl {
     public static final String SHARE_CHOICES =
         "DisplayControlImpl.SHARE_CHOICES";
 
+    /** Probe position property */
+    public static final String SHARE_SKIPVALUE =
+        "DisplayControlImpl.SHARE_SKIPVALUE";
+
     /** Bitmask for controls that use contour interval information */
     public static final int FLAG_CONTOUR = 1 << 1;
 
