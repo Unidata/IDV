@@ -643,14 +643,31 @@ public class DerivedGridFactory {
     public static FieldImpl createFlowVectors(FieldImpl uGrid,
             FieldImpl vGrid)
             throws VisADException, RemoteException {
-        FieldImpl uvGrid    = combineGrids(uGrid, vGrid, true /* flatten */);
-        TupleType paramType = GridUtil.getParamType(uvGrid);
-        RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
-                                           CommonUnit.meterPerSecond);
-        RealTupleType earthVectorType = new EarthVectorType(reals[0],
-                                            reals[1]);
+        FieldImpl uvGrid      = combineGrids(uGrid, vGrid,
+                                             true /* flatten */);
+        FieldImpl retGrid     = uvGrid;
+        Unit[]    units       = GridUtil.getParamUnits(uvGrid);
+        boolean   isFlowUnits = true;
+        for (int i = 0; i < units.length; i++) {
+            Unit u = units[i];
+            isFlowUnits = (u == null)
+                          || Unit.canConvert(u, CommonUnit.meterPerSecond);
+            if ( !isFlowUnits) {
+                break;
+            }
+        }
+        if (isFlowUnits) {
+            TupleType paramType = GridUtil.getParamType(uvGrid);
+            RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
+                                   CommonUnit.meterPerSecond);
+            RealTupleType earthVectorType = new EarthVectorType(reals[0],
+                                                reals[1]);
 
-        return GridUtil.setParamType(uvGrid, earthVectorType, false /*copy*/);
+
+            retGrid = GridUtil.setParamType(uvGrid, earthVectorType,
+                                            false /*copy*/);
+        }
+        return retGrid;
     }
 
     /**
