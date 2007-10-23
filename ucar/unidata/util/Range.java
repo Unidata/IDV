@@ -21,13 +21,7 @@
  */
 
 
-
-
 package ucar.unidata.util;
-
-
-
-
 
 
 /**
@@ -37,7 +31,7 @@ package ucar.unidata.util;
  */
 public class Range implements java.io.Serializable {
 
-    /** _more_          */
+    /** name of this range */
     private String name;
 
     /** The range */
@@ -45,7 +39,7 @@ public class Range implements java.io.Serializable {
 
 
     /**
-     * ctor
+     * Default ctor
      *
      */
     public Range() {
@@ -54,7 +48,7 @@ public class Range implements java.io.Serializable {
     }
 
     /**
-     * ctor
+     * Create a range with min, max
      *
      * @param min min
      * @param max max
@@ -66,11 +60,11 @@ public class Range implements java.io.Serializable {
     }
 
     /**
-     * _more_
+     * Create a range with min, max and name
      *
-     * @param min _more_
-     * @param max _more_
-     * @param name _more_
+     * @param min min
+     * @param max max
+     * @param name name
      */
     public Range(double min, double max, String name) {
         this(min, max);
