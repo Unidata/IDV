@@ -366,7 +366,14 @@
     <operands categories=""/>
   </derived>
 
-  <derived description="Define grid diagnostic" formula="idveval(field[isuser=true])" id="gfunc" isdefault="false" isenduser="true">
+  <derived description="Define a grid diagnostic" formula="idveval(gddiag[isuser=true])" id="gddiag" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+
+  <derived description="Define a formula" formula="idveval(formula[isuser=true])" id="formula" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Miscellaneous"/>
     </categories>

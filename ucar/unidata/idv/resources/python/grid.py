@@ -68,11 +68,11 @@ def getSliceAtAltitude(fieldimpl, alt, unit="m") :
 
 def layerAverage(grid, top, bottom):
    """ Wrapper for calculating layer average """
-   return createLayerAverage(grid, top, bottom)
+   return DerivedGridFactory.createLayerAverage(grid, top, bottom)
 
 def layerDiff(grid, top, bottom):
    """ Wrapper for calculating layer difference """
-   return createLayerDifference(grid, top, bottom)
+   return DerivedGridFactory.createLayerDifference(grid, top, bottom)
 
 def getAltitude(z):
    """ Change units from geopotential meters to meters """

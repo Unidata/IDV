@@ -196,11 +196,45 @@ def qvec(S,V):
   qvecv = newName(-dot(dvdy(V),grads),"qvecv")
   return vecr(qvecu,qvecv)
 
+def thrm(S, level1, level2):
+  """ Thermal wind  
+      THRM ( S ) = [ u (GEO(S)) (level1) - u (GEO(S)) (level2),	
+                     v (GEO(S)) (level1) - v (GEO(S)) (level2) ] """
+  return vldf(geo(S),level1,level2)
+
+def vadd(V1,V2):
+  """ add the components of 2 vectors
+      VADD (V1, V2) = [ u1+u2, v1+v2 ] """
+  return add(V1,V2)
+
 def vecr(S1,S2):
   """ Make a vector from two components """
   return makeVector(S1,S2)
 
-def vldf(V,level1, level2):
-  """ calculate the u and v layer difference and return as vector """
-  return windShearVector(ur(V), vr(V), top, bottom)
+def vlav(V,level1,level2):
+  """ calculate the vector layer average 
+      VLDF(V) = [(u(level1) - u(level2))/2,
+                 (v(level1) - v(level2))/2] """
+  return layerAverage(V, level1, level2)
+  
+def vldf(V,level1,level2):
+  """ calculate the vector layer difference 
+      VLDF(V) = [u(level1) - u(level2),
+                 v(level1) - v(level2)] """
+  return layerDiff(V,level1,level2)
+
+def vmul(V1,V2):
+  """ Multiply the components of 2 vectors
+      VMUL (V1, V2) = [ u1*u2, v1*v2 ] """
+  return mul(V1,V2)
+
+def vquo(V1,V2):
+  """ Divide the components of 2 vectors
+      VQUO (V1, V2) = [ u1/u2, v1/v2 ] """
+  return quo(V1,V2)
+
+def vsub(V1,V2):
+  """ subtract the components of 2 vectors
+      VSUB (V1, V2) = [ u1-u2, v1-v2 ] """
+  return sub(V1,V2)
 
