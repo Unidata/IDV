@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.idv.control;
 
 
@@ -62,16 +61,7 @@ import javax.swing.event.*;
  * @author IDV Development Team
  * @version $Revision: 1.65 $
  */
-public class FlowPlanViewControl extends PlanViewControl {
-
-
-    /** property for sharing flow range */
-    public static final String SHARE_FLOWRANGE =
-        "FlowPlanViewControl.SHARE_FLOWRANGE";
-
-    /** property for sharing flow scale */
-    public static final String SHARE_FLOWSCALE =
-        "FlowPlanViewControl.SHARE_FLOWRANGE";
+public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayControl {
 
     /** a component to change the barb size */
     ValueSliderWidget barbSizeWidget;
@@ -204,7 +194,7 @@ public class FlowPlanViewControl extends PlanViewControl {
             throws VisADException, RemoteException {
 
         barbSizeWidget = new ValueSliderWidget(this, 1, 21, "flowScale",
-                getSizeLabel());
+                "Scale: ");
         JPanel extra = GuiUtils.hbox(GuiUtils.rLabel("Scale:  "),
                                      barbSizeWidget.getContents(false));
         if ( !getWindbarbs()) {
@@ -212,10 +202,9 @@ public class FlowPlanViewControl extends PlanViewControl {
                                   GuiUtils.hbox(GuiUtils.filler(),
                                       doMakeFlowRangeComponent()));
         }
-        controlWidgets.add(
-            new WrapperWidget(
-                this, GuiUtils.rLabel("Vector Size: "),
-                GuiUtils.left(extra)));
+        controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.rLabel(getSizeLabel()),
+                                             GuiUtils.left(extra)));
 
         skipFactorWidget = new ValueSliderWidget(this, 0, 10, "skipValue",
                 getSkipWidgetLabel());
@@ -246,12 +235,6 @@ public class FlowPlanViewControl extends PlanViewControl {
             controlWidgets.add(new WrapperWidget(this, densityLabel,
                     densityComponent));
         }
-        /*
-        if (!getWindbarbs()) {
-            controlWidgets.add(new WrapperWidget(this, GuiUtils.rLabel("Scaling Range: "),
-                    doMakeFlowRangeComponent()));
-        }
-        */
         enableBarbSizeBox();
         super.getControlWidgets(controlWidgets);
     }
@@ -378,8 +361,8 @@ public class FlowPlanViewControl extends PlanViewControl {
      */
     private String getSizeLabel() {
         return (isWindBarbs)
-               ? "Barb Size"
-               : "Vector Size";
+               ? "Barb Size: "
+               : "Vector Size: ";
     }
 
     /**
@@ -481,10 +464,10 @@ public class FlowPlanViewControl extends PlanViewControl {
      */
     public void setFlowScale(float f) {
         flowScaleValue = f;
-        if (getGridDisplay() != null) {
-            getGridDisplay().setFlowScale(flowScaleValue * scaleFactor);
-        }
         if (getHaveInitialized()) {
+            if (getGridDisplay() != null) {
+                getGridDisplay().setFlowScale(flowScaleValue * scaleFactor);
+            }
             doShare(SHARE_FLOWRANGE, flowRange);
         }
     }
@@ -508,10 +491,10 @@ public class FlowPlanViewControl extends PlanViewControl {
     public void setFlowRange(Range f) {
         flowRange = f;
         if (getHaveInitialized()) {
-            if (getGridDisplay() != null && flowRange != null && !getWindbarbs()) {
+            if ((getGridDisplay() != null) && (flowRange != null)
+                    && !getWindbarbs()) {
                 try {
-                    getGridDisplay().setFlowRange(flowRange.getMin(),
-                            flowRange.getMax());
+                    getGridDisplay().setFlowRange(flowRange);
                 } catch (Exception excp) {
                     logException("setFlowRange: ", excp);
                 }
@@ -644,8 +627,7 @@ public class FlowPlanViewControl extends PlanViewControl {
                     setFlowRange(new Range(-40, 40));
                 }
             } else {
-                getGridDisplay().setFlowRange(flowRange.getMin(),
-                        flowRange.getMax());
+                getGridDisplay().setFlowRange(flowRange);
             }
         }
     }

@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -60,7 +61,7 @@ import javax.swing.event.*;
  * @author Stu Wier\
  * @version $Revision: 1.6 $
  */
-public class FlowTimeHeightControl extends TimeHeightControl {
+public class FlowTimeHeightControl extends TimeHeightControl implements FlowDisplayControl {
 
 
     /** skip value */
@@ -135,7 +136,6 @@ public class FlowTimeHeightControl extends TimeHeightControl {
      */
     public void initDone() {
         super.initDone();
-        //setSkipValue(skipValue);
         setFlowScale(flowScaleValue);
     }
 
@@ -165,22 +165,6 @@ public class FlowTimeHeightControl extends TimeHeightControl {
 
         controlWidgets.add(
             new WrapperWidget(this, GuiUtils.rLabel("Vector size: "), extra));
-        /*
-        if ( !getIsThreeComponents()) {
-            JCheckBox toggle = new JCheckBox("", isStreamlines);
-            toggle.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    isStreamlines = ((JCheckBox) e.getSource()).isSelected();
-                    ((FlowDisplayable) getDataDisplay()).setStreamlinesEnabled(isStreamlines);
-                    enableBarbSizeBox();
-                }
-            });
-            controlWidgets.add(
-                new WrapperWidget(
-                    this, GuiUtils.rLabel("Show streamlines:"),
-                    GuiUtils.leftCenter(toggle, GuiUtils.filler())));
-        }
-        */
         enableBarbSizeBox();
         super.getControlWidgets(controlWidgets);
     }
@@ -217,27 +201,6 @@ public class FlowTimeHeightControl extends TimeHeightControl {
         }
 
     }
-
-
-    /*
-     * public void setSkipValue(int value) {
-     *   skipValue = value;
-     *   if (getGridDisplay() != null) {
-     *       try {
-     *           setWorkingGrid(
-     *               GridUtil.subset(
-     *                   getGridDataInstance().getGrid(), skipValue + 1));
-     *       } catch (Exception ve) {
-     *           logException("setSkipFactor", ve);
-     *       }
-     *   }
-     * }
-     * Get the skip value
-     * @return  the current skip value
-     * public int getSkipValue() {
-     *   return skipValue;
-     * }
-     */
 
     /**
      * Set the streamline property.

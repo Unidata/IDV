@@ -20,8 +20,11 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
+
+import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
 
@@ -57,7 +60,7 @@ import javax.swing.event.*;
  * @author Unidata Development Team
  * @version $Revision: 1.36 $
  */
-public class FlowCrossSectionControl extends CrossSectionControl {
+public class FlowCrossSectionControl extends CrossSectionControl implements FlowDisplayControl {
 
 
     /** flag for wind barbs */
@@ -71,6 +74,12 @@ public class FlowCrossSectionControl extends CrossSectionControl {
 
     /** flag for 3D flow */
     boolean isThreeComponents = false;
+
+    /** a label listing the range of the data */
+    JLabel flowRangeLabel;
+
+    /** Range for flow scale */
+    private Range flowRange;
 
     /**
      * Create a new FlowCrossSectionControl; set attribute flags
@@ -101,10 +110,39 @@ public class FlowCrossSectionControl extends CrossSectionControl {
      */
     protected void loadData(FieldImpl fieldImpl)
             throws VisADException, RemoteException {
-        if ( !getWindbarbs()) {
+        if ((getFlowRange() == null) && !getWindbarbs()) {
             setFlowRange(fieldImpl);
         }
         super.loadData(fieldImpl);
+    }
+
+    /**
+     * Called to initialize this control from the given dataChoice;
+     * override super class instance to set skip factor before displaying data.
+     *
+     * @param dataChoice  choice that describes the data to be loaded.
+     *
+     * @return  true if successful
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    protected boolean setData(DataChoice dataChoice)
+            throws VisADException, RemoteException {
+        Trace.call1("FlowCrossSection.setData");
+        boolean result = super.setData(dataChoice);
+        if ( !result) {
+            Trace.call2("FlowCrossSection.setData");
+            return false;
+        }
+        //if ( !getWindbarbs()) {
+        if ((getFlowRange() == null) && !getWindbarbs()) {
+            setFlowRange((FieldImpl) null);
+        }
+        setFlowScale(flowScaleValue);
+        //        setSkipValue(skipValue);
+        Trace.call2("FlowCrossSection.setData");
+        return true;
     }
 
     /**
@@ -177,36 +215,56 @@ public class FlowCrossSectionControl extends CrossSectionControl {
      */
     public void getControlWidgets(List controlWidgets)
             throws VisADException, RemoteException {
-        super.getControlWidgets(controlWidgets);
-        JComboBox barbSizeBox = GuiUtils.createValueBox(this, CMD_BARBSIZE,
-                                    (int) flowScaleValue,
-                                    Misc.createIntervalList(0, 10, 1), true);
+        ValueSliderWidget barbSizeWidget = new ValueSliderWidget(this, 1, 21,
+                                               "flowScale", "Scale: ");
+        JPanel extra = GuiUtils.hbox(GuiUtils.rLabel("Scale:  "),
+                                     barbSizeWidget.getContents(false));
+        if ( !getWindbarbs()) {
+            extra = GuiUtils.hbox(extra,
+                                  GuiUtils.hbox(GuiUtils.filler(),
+                                      doMakeFlowRangeComponent()));
+        }
         controlWidgets.add(new WrapperWidget(this,
-                                             GuiUtils.rLabel("Vector size:"),
-                                             GuiUtils.left(barbSizeBox)));
+                                             GuiUtils.rLabel(getSizeLabel()),
+                                             GuiUtils.left(extra)));
+        super.getControlWidgets(controlWidgets);
 
     }
-
 
     /**
-     * Public due to implementation of ActionListener
-     *
-     * @param e   the event to listen to
+     * Get the appropriate size label for this instance.
+     * @return the label
      */
-    public void actionPerformed(ActionEvent e) {
-        String cmd = e.getActionCommand();
-        try {
-            if (cmd.equals(CMD_BARBSIZE)) {
-                setFlowScale(GuiUtils.getBoxValue((JComboBox) e.getSource()));
-            } else {
-                super.actionPerformed(e);
-            }
-        } catch (NumberFormatException nfe) {
-            userErrorMessage("Incorrect number format");
-        }
-
+    private String getSizeLabel() {
+        return (getWindbarbs())
+               ? "Barb Size: "
+               : "Vector Size: ";
     }
 
+    /**
+     * Create the streamline density slider
+     *
+     * @return The panel that shows the streamline density slider
+     */
+    protected JComponent doMakeFlowRangeComponent() {
+
+        setFlowRangeLabel();
+        JButton editButton =
+            GuiUtils.getImageButton("/ucar/unidata/idv/images/edit.gif",
+                                    getClass());
+        editButton.setToolTipText("Range used for scaling the vector size");
+        final RangeDialog rd =
+            new RangeDialog(this, flowRange,
+                            "Set the range of data for sizing vectors",
+                            "setFlowRange");
+        editButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ev) {
+                rd.showDialog();
+                setFlowRangeLabel();
+            }
+        });
+        return GuiUtils.hbox(flowRangeLabel, editButton);
+    }
 
 
     /**
@@ -224,10 +282,13 @@ public class FlowCrossSectionControl extends CrossSectionControl {
      */
     public void setFlowScale(float f) {
         flowScaleValue = f;
-        if (getGridDisplay() != null) {
-            getGridDisplay().setFlowScale(flowScaleValue * scaleFactor);
-            ((FlowDisplayable) getVerticalCSDisplay()).setFlowScale(
-                flowScaleValue * scaleFactor);
+        if (getHaveInitialized()) {
+            if (getGridDisplay() != null) {
+                getGridDisplay().setFlowScale(flowScaleValue * scaleFactor);
+                ((FlowDisplayable) getVerticalCSDisplay()).setFlowScale(
+                    flowScaleValue * scaleFactor);
+            }
+            doShare(SHARE_FLOWRANGE, flowRange);
         }
     }
 
@@ -298,37 +359,147 @@ public class FlowCrossSectionControl extends CrossSectionControl {
     }
 
     /**
+     * Get the flow range.
+     * Used by XML persistence
+     *
+     * @return  the flow range for this control
+     */
+    public Range getFlowRange() {
+        return flowRange;
+    }
+
+    /**
+     * Set the flow range.
+     * Used by XML persistence
+     *
+     * @param f   new flow range
+     */
+    public void setFlowRange(Range f) {
+        flowRange = f;
+        if (getHaveInitialized()) {
+            if ((getGridDisplay() != null) && (flowRange != null)
+                    && !getWindbarbs()) {
+                try {
+                    getGridDisplay().setFlowRange(flowRange);
+                    ((FlowDisplayable) getVerticalCSDisplay()).setFlowRange(
+                        flowRange);
+                } catch (Exception excp) {
+                    logException("setFlowRange: ", excp);
+                }
+            }
+            setFlowRangeLabel();
+            doShare(SHARE_FLOWRANGE, flowRange);
+        }
+    }
+
+    /**
      * Set the range for the flow components
      *
-     * @param field  the field to use for the flow range
+     * @param data  data to use for range (may be null)
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    private void setFlowRange(FieldImpl field)
+    private void setFlowRange(FieldImpl data)
             throws RemoteException, VisADException {
-        Range[] ranges = null;
-        if (field != null) {
-            Trace.call1("setFlowRange");
-            ranges = GridUtil.getMinMax((FieldImpl) field);
-            double max      = Double.NEGATIVE_INFINITY;
-            double min      = Double.POSITIVE_INFINITY;
-            int    numComps = getIsThreeComponents()
-                              ? 3
-                              : 2;
-            for (int i = 0; i < numComps; i++) {
-                Range compRange = ranges[i];
-                max = Math.max(compRange.getMax(), max);
-                min = Math.min(compRange.getMin(), min);
+        if ((getGridDisplay() != null) && !getWindbarbs()) {
+            if (getFlowRange() == null) {
+                Range[] ranges = null;
+                if (data == null) {
+                    data = (FieldImpl) getGridDisplay().getData();
+                }
+                if (data != null) {
+                    ranges = GridUtil.getMinMax((FieldImpl) data);
+                    double max      = Double.NEGATIVE_INFINITY;
+                    double min      = Double.POSITIVE_INFINITY;
+                    int    numComps = getIsThreeComponents()
+                                      ? 3
+                                      : 2;
+                    for (int i = 0; i < numComps; i++) {
+                        Range compRange = ranges[i];
+                        max = Math.max(compRange.getMax(), max);
+                        min = Math.min(compRange.getMin(), min);
+                    }
+                    if ( !Double.isInfinite(max) && !Double.isInfinite(min)) {
+                        max = Math.max(max, -min);
+                        min = -max;
+                    }
+                    // System.out.println("setFlowRange: " + min + " to " + max);
+                    //getGridDisplay().setFlowRange(min,max);
+                    setFlowRange(new Range(min, max));
+                } else {  // gotta set it to something
+                    setFlowRange(new Range(-40, 40));
+                }
+            } else {
+                getGridDisplay().setFlowRange(flowRange.getMin(),
+                        flowRange.getMax());
             }
-            if ( !Double.isInfinite(max) && !Double.isInfinite(min)) {
-                max = Math.max(max, -min);
-                min = -max;
+        }
+    }
+
+    /**
+     *  Return the range attribute of the colorTable  (if non-null)
+     *  else return null;
+     * @return The range from the color table attribute
+     */
+    public Range getColorRangeFromData() {
+        Range r = super.getColorRangeFromData();
+        return makeFlowRange(r);
+    }
+
+    /**
+     * Make a flow range from the given range (max of abs of min and max)
+     *
+     * @param r   range to normalize
+     *
+     * @return  flow type range
+     */
+    private Range makeFlowRange(Range r) {
+        if (haveMultipleFields()) {
+            return r;
+        }
+        if (r == null) {
+            return r;
+        }
+        double max = Math.max(Math.abs(r.getMax()), Math.abs(r.getMin()));
+        return new Range(-max, max);
+    }
+
+    /**
+     * Method called by other classes that share the the state.
+     * @param from  other class.
+     * @param dataId  type of sharing
+     * @param data  Array of data being shared.  In this case, the first
+     *              (and only?) object in the array is the level
+     */
+    public void receiveShareData(Sharable from, Object dataId,
+                                 Object[] data) {
+        try {
+            if (dataId.equals(SHARE_FLOWRANGE)) {
+                setFlowRange((Range) data[0]);
+            } else if (dataId.equals(SHARE_FLOWSCALE)) {
+                setFlowScale(((Float) data[0]).floatValue());
+            } else {
+                super.receiveShareData(from, dataId, data);
             }
-            Trace.call2("setFlowRange", (min + " to " + max));
-            // System.out.println("setFlowRange: " + min + " to " + max);
-            getGridDisplay().setFlowRange(min, max);
-            // TODO: for now, let VisAD auto scale this
-            ((FlowDisplayable) getVerticalCSDisplay()).setFlowRange(min, max);
+        } catch (Exception exc) {
+            logException("Error processing shared state: " + dataId, exc);
+        }
+    }
+
+    /**
+     * Set the range label
+     */
+    private void setFlowRangeLabel() {
+        if (flowRangeLabel == null) {
+            flowRangeLabel = new JLabel("Range: ", SwingConstants.RIGHT);
+
+        }
+        Range r = getFlowRange();
+        if (r != null) {
+            flowRangeLabel.setText("Range: " + r.formatMin() + " to "
+                                   + r.formatMax());
+        } else {
+            flowRangeLabel.setText("Range: Undefined");
         }
     }
 
