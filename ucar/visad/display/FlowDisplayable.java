@@ -32,6 +32,7 @@ import visad.FlowControl;
 import visad.util.DataUtility;
 
 import java.awt.Color;
+import ucar.unidata.util.Range;
 
 
 
@@ -477,6 +478,21 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         }
         setFlowRange(flowMinValue, flowMaxValue);
         setScalarMapSet(maps);
+    }
+
+    /**
+     * Set the range of the flow maps
+     *
+     * @param min min value
+     * @param max max value
+     *
+     * @throws VisADException   VisAD failure.
+     * @throws RemoteException  Java RMI failure.
+     */
+    public void setFlowRange(Range flowRange)
+            throws VisADException, RemoteException {
+        if (flowRange == null) return;
+        setFlowRange(flowRange.getMin(), flowRange.getMax());
     }
 
     /**
