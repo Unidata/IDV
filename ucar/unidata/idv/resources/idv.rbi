@@ -382,8 +382,8 @@
          value="System"/>
     </resource>
     <resource
-       label="GEMPAK Grid Diagnostics"
-       location="%IDVPATH%/python/gempak.py">
+       label="Grid Diagnostics"
+       location="%IDVPATH%/python/griddiag.py">
       <property
          name="category"
          value="System"/>

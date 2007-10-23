@@ -573,4 +573,20 @@ or
       <paramgroup name="u_v_z"/>
     </operands>
   </derived>
+  <derived 
+     description="AGeostrophic Wind (from %N1%, %N2%, and %N3%)" 
+     formula="mag(vecr(D1,D2)-geo(D3))" 
+     id="ageostrophic_wind_vector" 
+     isdefault="true" 
+     isenduser="false">
+    <categories>
+      <category
+         value="inherit"
+         append="Derived"
+         childidx="0" />
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <paramgroup name="u_v_z"/>
+    </operands>
+  </derived>
 </derived_parameters>
