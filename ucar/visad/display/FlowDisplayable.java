@@ -21,10 +21,12 @@
  */
 
 
+
 package ucar.visad.display;
 
 
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.util.Range;
 
 import visad.*;
 import visad.FlowControl;
@@ -32,7 +34,6 @@ import visad.FlowControl;
 import visad.util.DataUtility;
 
 import java.awt.Color;
-import ucar.unidata.util.Range;
 
 
 
@@ -425,7 +426,14 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     : Display.Flow2Radial));
             spdIndex    = 0;
         } else {
-            throw new VisADException("Unknown units for flow types");
+            //throw new VisADException("Unknown units for flow types");
+            flowXMap = new ScalarMap(realTypes[0], (useFlow1
+                    ? Display.Flow1X
+                    : Display.Flow2X));
+            flowYMap = new ScalarMap(realTypes[1], (useFlow1
+                    ? Display.Flow1Y
+                    : Display.Flow2Y));
+            spdIndex = 0;  // color speed by u component
         }
 
         if (get3DFlow()) {
@@ -483,15 +491,16 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     /**
      * Set the range of the flow maps
      *
-     * @param min min value
-     * @param max max value
+     * @param flowRange range for flow maps
      *
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
     public void setFlowRange(Range flowRange)
             throws VisADException, RemoteException {
-        if (flowRange == null) return;
+        if (flowRange == null) {
+            return;
+        }
         setFlowRange(flowRange.getMin(), flowRange.getMax());
     }
 
@@ -581,17 +590,22 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
             int numBase = get3DFlow()
                           ? 3
                           : 2;
-            if ( !coloredByAnother || (rtt.getDimension() == numBase)) {
-                newParamType = new EarthVectorType(rtt.getRealComponents());
-            } else {
-                RealType[] reals  = rtt.getRealComponents();
-                RealType[] extras = new RealType[reals.length - numBase];
-                System.arraycopy(reals, numBase, extras, 0, extras.length);
-                newParamType = new TupleType(new MathType[] { (get3DFlow())
+            try {
+                if ( !coloredByAnother || (rtt.getDimension() == numBase)) {
+                    newParamType =
+                        new EarthVectorType(rtt.getRealComponents());
+                } else {
+                    RealType[] reals  = rtt.getRealComponents();
+                    RealType[] extras = new RealType[reals.length - numBase];
+                    System.arraycopy(reals, numBase, extras, 0,
+                                     extras.length);
+                    newParamType = new TupleType(new MathType[] {
+                        (get3DFlow())
                         ? new EarthVectorType(reals[0], reals[1], reals[2])
                         : new EarthVectorType(reals[0], reals[1]),
                         new RealTupleType(extras) });
-            }
+                }
+            } catch (VisADException ve) {}
         }
         setData((newParamType == null)
                 ? field
