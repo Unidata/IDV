@@ -86,6 +86,7 @@ public class JythonShell extends InteractiveShell {
     /** output stream for interp */
     private OutputStream outputStream;
 
+    private boolean autoSelect = false;
 
     /**
      * ctor
@@ -307,7 +308,13 @@ public class JythonShell extends InteractiveShell {
         if (interp != null) {
             idv.getJythonManager().removeInterpreter(interp);
         }
-        interp = idv.getJythonManager().createInterpreter();
+        try {
+            interp = idv.getJythonManager().createInterpreter();
+        } catch(Exception exc) {
+            LogUtil.logException(
+                "An error occurred creating the interpeter", exc);
+            return;
+        }
         interp.set("shell", this);
         outputStream = new OutputStream() {
             public void write(int b) {
@@ -362,6 +369,7 @@ public class JythonShell extends InteractiveShell {
         items = new ArrayList();
         items.add(GuiUtils.makeMenuItem("Clear All", this, "clear"));
         items.add(GuiUtils.makeMenuItem("Clear Output", this, "clearOutput"));
+        items.add(GuiUtils.makeCheckboxMenuItem("Auto-select Operands",this,"autoSelect",null));
         //        items.add(GuiUtils.makeMenu("Insert Display Type", getDisplayMenuItems()));
         menuBar.add(GuiUtils.makeMenu("Edit", items));
 
@@ -450,31 +458,40 @@ public class JythonShell extends InteractiveShell {
                 sb.append("\n");
             }
 
-            /*
-            List operands = DerivedDataChoice.parseOperands(sb.toString());
-            List unboundOperands = new ArrayList();
-            for (int i = 0; i < operands.size(); i++) {
-                DataOperand operand = (DataOperand) operands.get(i);
-                PyObject    obj     = interp.get(operand.getParamName());
-                if (obj == null) {
-                    unboundOperands.add(operand);
+            if(autoSelect) {
+                String code = sb.toString();
+                int idx;
+                //Strip out any leading assignment
+                while(true) {
+                    idx= code.indexOf("=");
+                    if(idx<0) break;
+                    code = code.substring(idx+1);
                 }
-            }
 
-            if (unboundOperands.size() > 0) {
-                List result = idv.selectDataChoices(unboundOperands);
-                if (result == null) {
-                    return;
-                }
-                for (int i = 0; i < result.size(); i++) {
+                List operands = DerivedDataChoice.parseOperands(code);
+                List unboundOperands = new ArrayList();
+                for (int i = 0; i < operands.size(); i++) {
                     DataOperand operand = (DataOperand) operands.get(i);
-                    Data data =
-                        (Data) ((DataChoice) result.get(i)).getData(null);
-                    interp.set(operand.getParamName(), data);
+                    PyObject    obj     = interp.get(operand.getParamName());
+                    if (obj == null) {
+                        unboundOperands.add(operand);
+                    }
                 }
 
+                if (unboundOperands.size() > 0) {
+                    List result = idv.selectDataChoices(unboundOperands);
+                    if (result == null) {
+                        return;
+                    }
+                    for (int i = 0; i < result.size(); i++) {
+                        DataOperand operand = (DataOperand) operands.get(i);
+                        Data data =
+                            (Data) ((DataChoice) result.get(i)).getData(null);
+                        interp.set(operand.getParamName(), data);
+                    }
+
+                }
             }
-            */
             PythonInterpreter interp = getInterpreter();
             interp.exec(sb.toString());
         } catch (PyException pse) {
@@ -505,6 +522,23 @@ public class JythonShell extends InteractiveShell {
     }
 
 
+/**
+Set the AutoSelect property.
+
+@param value The new value for AutoSelect
+**/
+public void setAutoSelect (boolean value) {
+        autoSelect = value;
+}
+
+/**
+Get the AutoSelect property.
+
+@return The AutoSelect
+**/
+public boolean getAutoSelect () {
+        return autoSelect;
+}
 
 
 }
