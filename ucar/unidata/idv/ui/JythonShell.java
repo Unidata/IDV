@@ -450,6 +450,7 @@ public class JythonShell extends InteractiveShell {
                 sb.append("\n");
             }
 
+            /*
             List operands = DerivedDataChoice.parseOperands(sb.toString());
             List unboundOperands = new ArrayList();
             for (int i = 0; i < operands.size(); i++) {
@@ -473,7 +474,7 @@ public class JythonShell extends InteractiveShell {
                 }
 
             }
-
+            */
             PythonInterpreter interp = getInterpreter();
             interp.exec(sb.toString());
         } catch (PyException pse) {
