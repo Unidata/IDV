@@ -2198,7 +2198,7 @@ public class JythonManager extends IdvManager implements ActionListener {
             for (int itemIdx = 0; itemIdx < funcs.size(); itemIdx++) {
                 Object[]   pair = (Object[]) funcs.get(itemIdx);
                 PyFunction func = (PyFunction) pair[1];
-                sb.append("<p><a name=\"" + func.__name__ + "\"></a><i>"
+                sb.append("<p><a name=\"" + func.__name__ + "\"></a><code class=\"command\">"
                           + func.__name__ + "(");
                 PyTableCode tc = (PyTableCode) func.func_code;
                 for (int argIdx = 0; argIdx < tc.co_argcount; argIdx++) {
@@ -2208,7 +2208,7 @@ public class JythonManager extends IdvManager implements ActionListener {
                     sb.append(tc.co_varnames[argIdx]);
                 }
                 sb.append(
-                    "):</i><p style=\"padding:0;margin-left:20;margin-top:0\">\n");
+                    "):</code><p style=\"padding:0;margin-left:20;margin-top:0\">\n");
                 if ( !func.__doc__.toString().equals("None")) {
                     String doc = func.__doc__.toString().trim();
                     //                    doc = StringUtil.replace(doc,"\n","<br>");
