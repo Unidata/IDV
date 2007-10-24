@@ -5759,6 +5759,25 @@ public class IdvUIManager extends IdvManager {
     }
 
 
+    public List getMapLocations() {
+        try {
+        List centers = new ArrayList();
+        List vms   = getIdv().getVMManager().getViewManagers();
+        for (int i = 0; i < vms.size(); i++) {
+            ViewManager vm = (ViewManager) vms.get(i);
+            if ( !(vm instanceof MapViewManager)) {
+                continue;
+            }
+            MapViewManager      mvm = (MapViewManager) vm;
+            EarthLocation el  = mvm.getScreenCenter(); 
+            centers.add(new LatLonPointImpl(el.getLatitude().getValue(),
+                        el.getLongitude().getValue()));
+        }
+        return centers;
+        } catch(Exception exc) {
+            throw new ucar.unidata.util.WrapperException (exc);
+        }
+    }
 
 }
 
