@@ -3,7 +3,7 @@
 def makeNavigatedImage (d,ulLat,ulLon,lrLat,lrLon):
   """This takes a image data object and a lat/lon bounding box
      and adds a lat/lon domain to the data. Use it in conjunction with a formula:
-     makeNavigatedImage(image,user_ulLat,user_ulLon,user_lrLat,user_lrLon)"""
+  """
   from visad import Linear2DSet 
   from visad import RealTupleType
   ulLat=float(ulLat)

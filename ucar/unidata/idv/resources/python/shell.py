@@ -1,5 +1,5 @@
 
-"""A set of utilities for selecting data nad creating displays.
+"""A set of utilities for selecting data and creating displays.
    For use from the Jython shell."""
 
 import ucar.unidata.data.DataChoice as DataChoice

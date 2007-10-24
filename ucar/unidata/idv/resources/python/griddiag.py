@@ -1,10 +1,11 @@
 """ 
    This is the doc for the Grid Diagnostics module.  These functions
-   are based on the grid diagnostics from the General Meteorological 
-   Package (GEMPAK).
-
+   are based on the grid diagnostics from the GEneral Meteorological 
+   PAcKage (GEMPAK).  Note that the names are case sensitive and some
+   are named slightly different from GEMPAK functions.
+   <P>
    In the following operators, scalar operands are named Si and 
-   vector operands arenamed Vi.  Lowercase u and v refer to the
+   vector operands are named Vi.  Lowercase u and v refer to the
    grid relative components of a vector.
 """
 
@@ -12,229 +13,363 @@ GRAVTY = DerivedGridFactory.GRAVITY
 
 # Math functions
 def atn2(S1,S2):
-  """ Wrapper for atan2 built-in """
+  """ Wrapper for atan2 built-in 
+  <div class=jython>
+      ATN2 (S1, S2) = ATAN ( S1 / S2 )
+  </div>
+  """
   return atan2(S1,S2)
 
 def add(S1,S2):
-  """ Addition """
+  """ Addition 
+  <div class=jython>
+      ADD  (S1, S2) = S1 + S2
+  </div>
+  """
   return S1+S2
 
 def mul(S1,S2):
-  """ Multiply """
+  """ Multiply 
+  <div class=jython>
+      MUL  (S1, S2) = S1 * S2
+  </div>
+  """
   return S1*S2
 
 def quo(S1,S2):
-  """ Multiply """
+  """ Divide 
+  <div class=jython>
+      QUO  (S1, S2) = S1 / S2
+  </div>
+  """
   return S1/S2
 
 def sub(S1,S2):
-  """ Multiply """
+  """ Subtract 
+  <div class=jython>
+      SUB  (S1, S2) = S1 - S2
+  </div>
+  """
   return S1-S2
 
 # Scalar quantities
 def adv(S,V):
   """ Horizontal Advection, negative by convention 
-      ADV ( S, V ) = - ( u * DDX (S) + v * DDY (S) )  """
+  <div class=jython>
+      ADV ( S, V ) = - ( u * DDX (S) + v * DDY (S) )  
+  </div>
+  """
   return -add(mul(ur(V),ddx(S)),mul(vr(V),ddy(S)))
 
 def avg(S1,S2):
-  """ Average of 2 scalars """
+  """ Average of 2 scalars 
+  <div class=jython>
+      AVG  (S1, S2) = ( S1 + S2 ) / 2
+  </div>
+  """
   return quo(add(S1,S2),2);
 
 def avor(V):
-  """ Absolute Vorticity """
+  """ Absolute Vorticity 
+  <div class=jython>
+      AVOR ( V ) = VOR ( V ) + CORL(V)
+  </div>
+  """
   relv = vor(V)
   return add(relv,corl(relv))
 
 def corl(S):
   """ Coriolis Parameter for all points in a grid 
-      CORL = TWO_OMEGA*sin(latr)                  """
+  <div class=jython>
+      CORL = TWO_OMEGA*sin(latr)                  
+  </div>
+  """
   return DerivedGridFactory.createCoriolisGrid(S)
 
 def cros(V1,V2):
   """ Vector cross product magnitude
-      CROS ( V1, V2 ) = u1 * v2 - u2 * v1 """
+  <div class=jython>
+      CROS ( V1, V2 ) = u1 * v2 - u2 * v1 
+  </div>
+  """
   return sub(mul(ur(V1),vr(V2)),mul(ur(V2),vr(V1)))
  
 def ddx(S):
-  """ Take the derivative with respect to the domain's X coordinate """
+  """ Take the derivative with respect to the domain's X coordinate 
+  """
   return DerivedGridFactory.ddx(S);
 
 def ddy(S):
-  """ Take the derivative with respect to the domain's Y coordinate """
+  """ Take the derivative with respect to the domain's Y coordinate 
+  """
   return DerivedGridFactory.ddy(S);
 
 def defr(V):
   """ Total deformation  
-      DEF ( V ) = ( STR (V) ** 2 + SHR (V) ** 2 ) ** .5 """
+  <div class=jython>
+      DEF ( V ) = ( STR (V) ** 2 + SHR (V) ** 2 ) ** .5 
+  </div>
+  """
   return mag(str(V),shr(v))
   
 def div(V):
   """ Horizontal Divergence 
-      DIV ( V ) = DDX ( u ) + DDY ( v ) """
+  <div class=jython>
+      DIV ( V ) = DDX ( u ) + DDY ( v ) 
+  </div>
+  """
   return add(ddx(ur(V)),ddy(vr(V)))
 
 def dot(V1,V2):
   """ Vector dot product
-      DOT ( V1, V2 ) = u1 * u2 + v1 * v2 """
+  <div class=jython>
+      DOT ( V1, V2 ) = u1 * u2 + v1 * v2 
+  </div>
+  """
   product = mul(V1,V2)
   return add(ur(product),vr(product))
 
 def jcbn(S1,S2):
   """ Jacobian Determinant 
-      JCBN ( S1, S2 ) = DDX (S1) * DDY (S2) - DDY (S1) * DDX (S2)"""
+  <div class=jython>
+      JCBN ( S1, S2 ) = DDX (S1) * DDY (S2) - DDY (S1) * DDX (S2)
+  </div>
+  """
   return sub(mul(ddx(S1),ddy(S2)),mul(ddy(S1),ddx(S2)))
 
 def latr(S):
-  """ Latitudue all points in a grid """
+  """ Latitudue all points in a grid 
+  """
   return DerivedGridFactory.createLatitudeGrid(S)
 
 def lap(S):
-  """ Laplacian operator """
+  """ Laplacian operator 
+  <div class=jython>
+      LAP ( S ) = DIV ( GRAD (S) )
+  </div>
+  """
   grads = grad(S)
   return div(ur(grads),vr(grads))
 
-def lav(S,top,bottom):
-  """ Layer Average """
-  return layerAverage(S,top,bottom);
+def lav(S,level1,level2):
+  """ Layer Average 
+  <div class=jython>
+      LAV ( S ) = ( S (level1) + S (level2) ) / 2.
+  </div>
+  """
+  return layerAverage(S,level1,level2);
 
-def ldf(S,top,bottom):
-  """ Layer Average """
-  return layerDiff(S,top,bottom);
+def ldf(S,level1,level2):
+  """ Layer Average 
+  <div class=jython>
+      LDF ( S ) = S (level1) - S (level2)
+  </div>
+  """
+  return layerDiff(S,level1,level2);
 
 def mag(*a):
-  """ Magnitude of a vector """
+  """ Magnitude of a vector 
+  """
   if (len(a) == 1):
     return DerivedGridFactory.createVectorMagnitude(a[0]);
   else: 
     return DerivedGridFactory.createVectorMagnitude(a[0],a[1]);
 
 def mixr(temp,rh):
-  """ Mixing Ratio from Temperature, RH (requires pressure domain) """
+  """ Mixing Ratio from Temperature, RH (requires pressure domain) 
+  """
   return DerivedGridFactory.createMixingRatio(temp,rh)
 
 def sdiv(S,V):
   """ Horizontal Flux Divergence 
-      SDIV ( S, V ) = S * DIV ( V ) + DOT ( V, GRAD ( S ) )"""
+  <div class=jython>
+      SDIV ( S, V ) = S * DIV ( V ) + DOT ( V, GRAD ( S ) )
+  </div>
+  """
   return add(S*(div(V)) , dot(V,grad(S)))
 
 def shr(V):
   """ Shear Deformation 
-      SHR ( V ) = DDX ( v ) + DDY ( u ) """
+  <div class=jython>
+      SHR ( V ) = DDX ( v ) + DDY ( u ) 
+  </div>
+  """
   return add(ddx(vr(V)),ddy(ur(V)))
 
 def str(V):
   """ Stretching Deformation 
-      STR ( V ) = DDX ( u ) - DDY ( v ) """
+  <div class=jython>
+      STR ( V ) = DDX ( u ) - DDY ( v ) 
+  </div>
+  """
   return sub(ddx(ur(V)),ddy(vr(V)))
 
 def thta(temp):
-  """ Potential Temperature from Temperature (requires pressure domain) """
+  """ Potential Temperature from Temperature (requires pressure domain) 
+  """
   return DerivedGridFactory.createPotentialTemperature(temp)
 
 def thte(temp,rh):
   """ Equivalent Potential Temperature from Temperature and Relative
-      humidity (requires pressure domain) """
+      humidity (requires pressure domain) 
+  """
   return DerivedGridFactory.createPotentialTemperature(temp,rh)
 
-def un(vector):
-  """ North relative u component """
-  return ur(DerivedGridFactory.createTrueFlowVector(vector))
+def un(V):
+  """ North relative u component 
+  """
+  return ur(DerivedGridFactory.createTrueFlowVector(V))
 
-def ur(vector):
-  """ Grid relative u component """
-  return DerivedGridFactory.getUComponent(vector)
+def ur(V):
+  """ Grid relative u component 
+  """
+  return DerivedGridFactory.getUComponent(V)
 
-def vn(vector):
-  """ North relative v component """
-  return vr(DerivedGridFactory.createTrueFlowVector(vector))
+def vn(V):
+  """ North relative v component 
+  """
+  return vr(DerivedGridFactory.createTrueFlowVector(V))
 
 def vor(V):
-  """ Relative Vorticity """
+  """ Relative Vorticity 
+  <div class=jython>
+      VOR ( V ) = DDX ( v ) - DDY ( u )
+  </div>
+  """
   return sub(ddx(vr(V)),ddy(ur(V)))
 
-def vr(vector):
-  """ Grid relative v component """
-  return DerivedGridFactory.getVComponent(vector)
+def vr(V):
+  """ Grid relative v component 
+  """
+  return DerivedGridFactory.getVComponent(V)
 
 # Vector output
 def age(obs,geo):
-  """  Ageostrophic wind """
+  """  Ageostrophic wind 
+  <div class=jython>
+      AGE ( S ) = [ u (OBS) - u (GEO(S)), v (OBS) - v (GEO(S)) ]
+  </div>
+  """
   return obs-geo
 
 def dvdx(V):
   """ Partial x derivative of a vector
-      DVDX ( V ) = [ DDX (u), DDX (v) ] """
+  <div class=jython>
+      DVDX ( V ) = [ DDX (u), DDX (v) ] 
+  </div>
+  """
   return ddx(V)
 
 def dvdy(V):
   """ Partial x derivative of a vector
-      DVDY ( V ) = [ DDY (u), DDY (v) ] """
+  <div class=jython>
+      DVDY ( V ) = [ DDY (u), DDY (v) ] 
+  </div>
+  """
   return ddy(V)
 
 def geo(z):
-  """  geostrophic wind from height """
+  """  geostrophic wind from height 
+  <div class=jython>
+      GEO ( S )  = [ - DDY (S) * const / CORL, DDX (S) * const / CORL ]
+  </div>
+  """
   return DerivedGridFactory.createGeostrophicWindVector(z)
 
 def grad(S):
   """ Gradient of a scalar  
-      GRAD ( S ) = [ DDX ( S ), DDY ( S ) ] """
+  <div class=jython>
+      GRAD ( S ) = [ DDX ( S ), DDY ( S ) ] 
+  </div>
+  """
   return vecr(ddx(S),ddy(S))
   
 def inad(V1,V2):
-  """ INAD  Inertial advective wind 
+  """ Inertial advective wind 
+  <div class=jython>
       INAD ( V1, V2 ) = [ DOT ( V1, GRAD (u2) ),
-                          DOT ( V1, GRAD (v2) ) ] """
+                          DOT ( V1, GRAD (v2) ) ] 
+  </div>
+  """
   return vecr(dot(V1,grad(ur(V2))),dot(V1,grad(vr(V2))))
 
 def qvec(S,V):
-  """ QVEC ( S, V ) = [ - ( DOT ( DVDX (V), GRAD (S) ) ),
+  """ Q-vector at a level ( K / m / s )
+  <div class=jython>
+      QVEC ( S, V ) = [ - ( DOT ( DVDX (V), GRAD (S) ) ),
                       - ( DOT ( DVDY (V), GRAD (S) ) ) ] 
-                      where S can be any thermal paramenter, usually THTA. """
+                      where S can be any thermal paramenter, usually THTA. 
+  </div>
+  """
   grads = grad(S)
   qvecu = newName(-dot(dvdx(V),grads),"qvecu")
   qvecv = newName(-dot(dvdy(V),grads),"qvecv")
   return vecr(qvecu,qvecv)
 
 def thrm(S, level1, level2):
-  """ Thermal wind  
+  """ Thermal wind 
+  <div class=jython>
       THRM ( S ) = [ u (GEO(S)) (level1) - u (GEO(S)) (level2),	
-                     v (GEO(S)) (level1) - v (GEO(S)) (level2) ] """
+                     v (GEO(S)) (level1) - v (GEO(S)) (level2) ] 
+  </div>
+  """
   return vldf(geo(S),level1,level2)
 
 def vadd(V1,V2):
   """ add the components of 2 vectors
-      VADD (V1, V2) = [ u1+u2, v1+v2 ] """
+  <div class=jython>
+      VADD (V1, V2) = [ u1+u2, v1+v2 ] 
+  </div>
+  """
   return add(V1,V2)
 
 def vecr(S1,S2):
-  """ Make a vector from two components """
+  """ Make a vector from two components 
+  <div class=jython>
+      VECR ( S1, S2 ) = [ S1, S2 ]
+  </div>
+  """
   return makeVector(S1,S2)
 
 def vlav(V,level1,level2):
   """ calculate the vector layer average 
+  <div class=jython>
       VLDF(V) = [(u(level1) - u(level2))/2,
-                 (v(level1) - v(level2))/2] """
+                 (v(level1) - v(level2))/2] 
+  </div>
+  """
   return layerAverage(V, level1, level2)
   
 def vldf(V,level1,level2):
   """ calculate the vector layer difference 
+  <div class=jython>
       VLDF(V) = [u(level1) - u(level2),
-                 v(level1) - v(level2)] """
+                 v(level1) - v(level2)] 
+  </div>
+  """
   return layerDiff(V,level1,level2)
 
 def vmul(V1,V2):
   """ Multiply the components of 2 vectors
-      VMUL (V1, V2) = [ u1*u2, v1*v2 ] """
+  <div class=jython>
+      VMUL (V1, V2) = [ u1*u2, v1*v2 ] 
+  </div>
+  """
   return mul(V1,V2)
 
 def vquo(V1,V2):
   """ Divide the components of 2 vectors
-      VQUO (V1, V2) = [ u1/u2, v1/v2 ] """
+  <div class=jython>
+      VQUO (V1, V2) = [ u1/u2, v1/v2 ] 
+  </div>
+  """
   return quo(V1,V2)
 
 def vsub(V1,V2):
   """ subtract the components of 2 vectors
-      VSUB (V1, V2) = [ u1-u2, v1-v2 ] """
+  <div class=jython>
+      VSUB (V1, V2) = [ u1-u2, v1-v2 ] 
+  </div>
+  """
   return sub(V1,V2)
 

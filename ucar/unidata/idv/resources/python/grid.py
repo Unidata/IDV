@@ -1,34 +1,47 @@
 """ This is the doc for the grid module """
 
 def makeVector(a,b):
+  """ Make a vector from 2 components
+  <div class=jython>
+      makeVector(a,b) = [a,b]
+  </div>
+  """
   return DerivedGridFactory.createFlowVectors(a,b)
 
 def makeFlowField(a,b,c):
+  """ Make a vector from 3 components
+  <div class=jython>
+      makeVector(a,b) = [a,b,c]
+  </div>
+  """
   return DerivedGridFactory.createFlowVectors(a,b,c)
 
 
 def extractPressureFromNWPGrid(fieldimpl):
-  """Get the pressure coordinate grid from a VisAD FieldImpl 
-     (a time series of one or more FlatFields);
-     user must be sure input is a suitable FlatField. """
+  """Get the pressure coordinate from a time series grid and
+     return a grid of the pressure at all points.  Input
+     grid must have pressure or height (which is converted
+     to pressure in the standard atmosphere).
+     User must be sure input is a suitable FlatField. 
+  """
   ff = fieldimpl.getSample(0)
   return DerivedGridFactory.createPressureGridFromDomain(ff)
 
 
 def extractLatitudeFromNWPGrid(fieldimpl):
-  """Get the latitude coordinate grid from a grid """
+  """Get the latitude coordinate from a grid.  Return a grid
+  of the latitudes at each point.
+  """
   ff = DerivedGridFactory.createLatitudeGrid(fieldimpl)
   return ff
 
 
 
 def getNthTimeGrid(fieldimpl, Nth):
-  """Get the Nth grid in time series fieldimpl, a VisAD FieldImpl;
-     user must be sure input is a suitable data field. 
-     returns a FlatField. 
+  """Get the Nth grid in time series of grids;
+     User must be sure input is a suitable data field. 
+     returns a single time. 
      Nth is an integer, >=0, <= max index of grid time series. """
-  # print causes error : print " get sample N = "+N
-  #dumpTypes(fieldimpl)  #this does print to console ok
   #trap bad values of N
   N = int(Nth)
   if N<0 :
@@ -40,8 +53,7 @@ def getNthTimeGrid(fieldimpl, Nth):
 def getSliceAtLevel(fieldimpl, level) :
   """Extract a 2D horizontal slice from a 3D grid at "Level."
      level is a real number; must be appropriate for the grid.
-     param fieldimpl is a VisAD FieldImpl which may have
-     one or more time steps.  """
+     param fieldimpl is a grid which may have one or more time steps.  """
   level = float(level)
   ff = GridUtil.sliceAtLevel(fieldimpl, level)
   return ff
@@ -49,10 +61,10 @@ def getSliceAtLevel(fieldimpl, level) :
 
 
 def getSliceAtAltitude(fieldimpl, alt, unit="m") :
-  """ Extract a 2D horizontal slice from a 3D grid at the given altitude
+  """ Extract a 2D horizontal slice from a 3D grid at the given altitude;
       level is a real number; if unit is supplied, it must
       be compatible with meters (ft, fathoms, etc)
-      param fieldimpl is a VisAD FieldImpl which may have
+      param fieldimpl is a grid which may have
       one or more time steps.  """
   #import methods from
   from visad import RealType
@@ -85,8 +97,11 @@ def getAltitude(z):
 
 
 def windShear(u, v, z, top, bottom):
-   """ calculate the wind shear between discrete layers<pre>
-   shear = sqrt((u(top)-u(bottom))^2 + (v(top)-v(bottom))^2)/zdiff</pre>"""
+   """ calculate the wind shear between discrete layers
+   <div class=jython>
+   shear = sqrt((u(top)-u(bottom))^2 + (v(top)-v(bottom))^2)/zdiff</pre>
+   </div>
+   """
    udiff = layerDiff(u, top, bottom)
    vdiff = layerDiff(v, top, bottom)
    zdiff = layerDiff(z, top, bottom)
@@ -97,13 +112,15 @@ def windShear(u, v, z, top, bottom):
 
 
 def windShearVector(u, v, top, bottom):
-   """ calculate the u and v layer difference and return as vector """
+   """ calculate the u and v layer difference and return as vector 
+   """
    udiff = layerDiff(u, top, bottom)
    vdiff = layerDiff(v, top, bottom)
    return makeVector(udiff, vdiff)
 
 def resampleGrid(oldGrid, gridwithNewDomain):
-   """ display gridded data on a new domain """
+   """ display gridded data on a new domain 
+   """
    newLocs = GridUtil.getSpatialDomain(gridwithNewDomain)
    return GridUtil.resampleGrid(oldGrid, newLocs)
 
@@ -125,6 +142,7 @@ def combineFields(*a):
   return DerivedGridFactory.combineGrids(a)
 
 def newName(field, varname, copy = 0):
+  """ create a new field with a new parameter name """
   return GridUtil.setParamType(field, varname, copy)
 
 def newUnit(field, varname, unitname):
@@ -163,6 +181,7 @@ def averageOverTime(field,makeTimes = 0):
 
 
 def applyToRange(function,data):
+    """ Apply the function name to each timestep of the data """
     newData = data.clone()
     f = function +'(rangeValue)'
     if (GridUtil.isTimeSequence(newData)):
@@ -177,6 +196,7 @@ def applyToRange(function,data):
 
 
 def applyToRangeValues(function,data):
+    """ Apply the function name to each value in each timestep of the data """
     newData = data.clone()
     f = function +'(values,step=step,rangeObject=rangeObject,field=field)'
     step=0
