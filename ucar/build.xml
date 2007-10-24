@@ -104,13 +104,16 @@ argument -Dfoo=bar) -->
         </delete>
 
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
-        <unjar src="${libsdir}/jmf.jar" dest="${tmpjardir}"/>
-        <unjar src="${libsdir}/jcalendar.jar" dest="${tmpjardir}"/>
-        <unjar src="${libsdir}/jai_codec.jar" dest="${tmpjardir}"/>
-        <unjar src="${libsdir}/ij.jar" dest="${tmpjardir}"/>
-        <unjar src="${libsdir}/jh.jar" dest="${tmpjardir}"/>
-        <unjar src="${libsdir}/geotransform.jar" dest="${tmpjardir}"/>
-        <unjar src="${libsdir}/jfreechart.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/external/jmf.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/external/jcalendar.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/external/jai_codec.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/external/ij.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/external/jh.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/external/geotransform.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/external/jfreechart.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/external/numericalMethods.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/external/sunrisesunset.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/external/Jama-1.0.2.jar" dest="${tmpjardir}"/>
 <!--
         <unjar src="${libsdir}/itext.jar" dest="${tmpjardir}"/>
 -->
