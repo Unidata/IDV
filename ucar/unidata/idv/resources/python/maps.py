@@ -6,7 +6,8 @@
 
 
 def make3DMap(map, topo):
-  """Make a 3d map    map -  map line data - topo - topography dataset """
+  """Make a 3d map. map -  map line data - topo - topography dataset
+  """
   b = DerivedGridFactory.create2DTopography(topo, topo)
   c = b.resample(map)
   return c
@@ -14,7 +15,10 @@ def make3DMap(map, topo):
 
 
 def  subsetFromMap(field, mapSets, fillValue=java.lang.Float.NaN,inverse=0):
-##Iterate on each time step
+    """mapSets defines a set of polygons. This procedure fills the areas in the field that are not
+    enclosed by the polygons with the fill value. If inverse is 1 then it fills the areas that are
+    enclosed
+    """
     if (GridUtil.isTimeSequence(field)):
         newData = field.clone()
         for timeStep in range(field.getDomainSet().getLength()):
@@ -25,6 +29,10 @@ def  subsetFromMap(field, mapSets, fillValue=java.lang.Float.NaN,inverse=0):
 
 
 def  subsetRangeFromMap(range, timeStep, mapSets, fillValue=java.lang.Float.NaN,inverse=0):
+    """mapSets defines a set of polygons. This procedure fills the areas in the field that are not
+    enclosed by the polygons with the fill value. If inverse is 1 then it fills the areas that are
+    enclosed
+    """
     rangeObject = range.clone()
     indices = GridUtil.findContainedIndices(rangeObject.getDomainSet(), mapSets);
     originalValues = rangeObject.getFloats(0)
@@ -49,6 +57,9 @@ def  subsetRangeFromMap(range, timeStep, mapSets, fillValue=java.lang.Float.NaN,
 
 
 def  averageFromMap(field, mapSets):
+    """mapSets defines a set of polygons. This procedure fills the areas in the field are enclosed
+    by each polygon with the average value within that area
+    """
     if (GridUtil.isTimeSequence(field)):
         newData = field.clone()
         for timeStep in range(field.getDomainSet().getLength()):
@@ -60,6 +71,9 @@ def  averageFromMap(field, mapSets):
 
 
 def  averageRangeFromMap(range, timeStep, mapSets):
+    """mapSets defines a set of polygons. This procedure fills the areas in the field are enclosed
+    by each polygon with the average value within that area
+    """
     rangeObject = range.clone()
     indices = GridUtil.findContainedIndices(rangeObject.getDomainSet(), mapSets);
     originalValues = rangeObject.getFloats(0)
@@ -98,6 +112,8 @@ def getMapsWithProperty(mapSets, propName,value):
 
 
 def filterMaps(mapSets, propName,operator,value):
+        """Return a new set of maps whose property propName satisfies the given operator/value.
+        The operators can be ==,!=, <,>,<=,>=, match, !match"""
         from ucar.visad import ShapefileAdapter
         from ucar.unidata.util import StringUtil
 	goodOnes = java.util.ArrayList();
@@ -130,6 +146,8 @@ def filterMaps(mapSets, propName,operator,value):
 
 
 def makeFieldFromMapBounds(mapSets, length1, length2, fill, unit):
+    """Make a field whos lat/lon area is the bounds of the given mapSet. It has length1 points in the x and length2 in the y.
+    Fill it with the fill value and the given unit"""
     low = mapSets.getLow();
     hi = mapSets.getHi();
     return Util.makeField(low[0],hi[0],int(length1),low[1],hi[1],int(length2), float(fill),unit);
@@ -139,6 +157,7 @@ def makeFieldFromMapBounds(mapSets, length1, length2, fill, unit):
 
 
 def  subsetWithProperty(field, mapSets):
+    """test code"""
     if (GridUtil.isTimeSequence(field)):
         newData = field.clone()
         for timeStep in range(field.getDomainSet().getLength()):
@@ -150,6 +169,7 @@ def  subsetWithProperty(field, mapSets):
 
 
 def  subsetRangeWithProperty(range, mapSets):
+    """test code"""
     rangeObject = range.clone()
     indices = GridUtil.findContainedIndices(rangeObject.getDomainSet(), mapSets);
     originalValues = rangeObject.getFloats(0)

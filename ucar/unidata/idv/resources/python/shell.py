@@ -6,6 +6,7 @@ import ucar.unidata.data.DataChoice as DataChoice
 
 
 def selectData(name1='Select Field',name2=None,name3=None,name4=None,name5=None):
+    """Select up to 5 data fields. This returns a List of the actual Data objects """
     result = selectDataChoice(name1,name2,name3,name4,name5);
     if(result == None): 
 	return None;
@@ -20,6 +21,8 @@ def selectData(name1='Select Field',name2=None,name3=None,name4=None,name5=None)
 
 
 def selectDataChoice(name1='Select Field',name2=None,name3=None,name4=None,name5=None):
+    """Select up to 5 data choices. This returns a List of the data choices, not the actual Data
+     To get the data do:   <div class=jython>dataList.get(0).getData(None)</div>"""
     list = java.util.ArrayList();
     list.add(name1);
     if(name2!=None):
@@ -41,6 +44,10 @@ def selectDataChoice(name1='Select Field',name2=None,name3=None,name4=None,name5
 
 
 def createDisplay(displayType, data, dataName='Data'):
+        """create a display of type displayType. Right click in input field to select particular displayType.
+        The data is can be a data object, a datachoice or a list of data or datachoices
+        The dataName is used to name the data, i.e., its the parameter name
+        """
 	import ucar.unidata.data.DataDataChoice as DataDataChoice
        	import ucar.unidata.data.DataChoice as DataChoice
 	if(isinstance(data, java.util.List)==0):
@@ -63,21 +70,22 @@ def createDisplay(displayType, data, dataName='Data'):
 
 
 def showLib():
+    """Bring up the jython library dialog """
     idv.getJythonManager().showJythonEditor()
 
 
 def clear():
+        """Clear the shell """
 	shell.clear();
 
 
 def listVars():
+        """List all of the variables defined in the shell's interpreter """
 	shell.listVars();
 
 
-def api(object):
-	return idv.listApi(object);
-
 def printType(data):
+        """Print out the math type of the given data """
 	if(isinstance(data, DataChoice)==1):
 		shell.output('Parameter:' + str(data))
 		data = data.getData(None);
@@ -85,6 +93,8 @@ def printType(data):
 
 
 def makeDataSource(path,type=None):
+        """Create a datasource from the given file name or url. The optional type parameter
+        is used to specify the type of data"""
 	return idv.makeOneDataSource(path, type,None);
 
 
