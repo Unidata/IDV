@@ -400,6 +400,10 @@ public class TimesChooser extends IdvChooser {
 
 
         timeline = new Timeline(new ArrayList(), 200) {
+                public List getSunriseLocations() {
+                    return getIdv().getIdvUIManager().getMapLocations();
+                }
+
             public void selectedDatesChanged() {
                 if (checkIgnore()) {
                     return;

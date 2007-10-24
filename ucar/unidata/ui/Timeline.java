@@ -30,6 +30,7 @@ package ucar.unidata.ui;
 import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.Misc;
 
 
 
@@ -44,6 +45,11 @@ import java.awt.event.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
+
+import ucar.unidata.geoloc.LatLonPoint;
+import ucar.unidata.geoloc.LatLonPointImpl;
+import org.itc.idv.math.SunriseSunsetCollector;
 
 
 import java.text.DateFormat;
@@ -488,6 +494,8 @@ public class Timeline extends JPanel implements MouseListener,
     /** Is the date selection range automatically changed to match the visible range */
     private boolean sticky = false;
 
+    private List sunriseDates = new ArrayList();
+    private LatLonPoint sunriseLocation;
 
     /** Holds other timelines that we share start/end range with */
     private List timelineGroup;
@@ -1085,6 +1093,8 @@ public class Timeline extends JPanel implements MouseListener,
         items.add(mi = GuiUtils.makeMenuItem("Properties", this,
                                              "showProperties"));
 
+
+
         subItems = new ArrayList();
         long     now = System.currentTimeMillis();
         Calendar cal = Calendar.getInstance(getTimeZone());
@@ -1151,6 +1161,27 @@ public class Timeline extends JPanel implements MouseListener,
                                  new Date(now) }));
             items.add(GuiUtils.makeMenu("Set Date Selection", subItems));
         }
+
+
+        List sunriseLocations = getSunriseLocations();
+        subItems = new ArrayList();
+        subItems.add(GuiUtils.makeMenuItem("Clear Location", this, "clearSunriseLocation"));
+        subItems.add(GuiUtils.makeMenuItem("Set Location", this, "setSunriseLocationFromUser"));
+        if(sunriseLocation!=null && getIsCapableOfSelection()) {
+            subItems.add(GuiUtils.makeMenuItem("Select daytime", this, "selectDaytime"));
+        }
+        if(sunriseLocations!=null && sunriseLocations.size()>0) {
+
+            subItems.add(GuiUtils.MENU_SEPARATOR);
+            for(int j=0;j<sunriseLocations.size();j++) {
+                LatLonPoint llp = (LatLonPoint) sunriseLocations.get(j);
+                subItems.add(GuiUtils.makeMenuItem(Misc.format(llp.getLatitude())+"/" + Misc.format(llp.getLongitude()), this, "setSunriseLocation",llp));
+            }
+        }
+
+
+
+        items.add(GuiUtils.makeMenu("Sunrise/Sunset", subItems));
 
 
 
@@ -1550,12 +1581,101 @@ public class Timeline extends JPanel implements MouseListener,
                 timeline.rangeChanged(this);
             }
         }
+
+
+
+        makeSunriseDates();
+
         mouseHighlighted = null;
         repaint();
     }
 
 
+    List sunriseLocations;
+    public List  getSunriseLocations() {
+        return sunriseLocations;
+    }
 
+    public void  selectDaytime() {
+        if (datedThings == null) {return;}
+        List selected = new ArrayList();
+        List visibleDates = new ArrayList();
+        long start = startDate.getTime();
+        long end   = endDate.getTime();
+        for (int i = 0; i < datedThings.size(); i++) {
+            DatedThing datedThing = (DatedThing) datedThings.get(i);
+            Date       date       = datedThing.getDate();
+            long       time       = date.getTime();
+            if(time>=start && time<= end) {
+                visibleDates.add(datedThing);
+            }
+        }
+        for (int datedThingIdx = 0; datedThingIdx < visibleDates.size(); datedThingIdx++) {
+            DatedThing datedThing = (DatedThing) visibleDates.get(datedThingIdx);
+            Date       date       = datedThing.getDate();
+            long       time       = date.getTime();
+            for(int i=0;i<sunriseDates.size();i+=2) {
+                Date d1 = (Date)sunriseDates.get(i+1);
+                Date d2 = (Date)sunriseDates.get(i);
+                if(time>=d1.getTime() && time<=d2.getTime()) {
+                    selected.add(datedThing);
+                    break;
+                }
+            }
+        }
+
+        setSelected(selected);
+    }
+
+    public void  setSunriseLocationFromUser() {
+        LatLonWidget  llw = (sunriseLocation!=null?new LatLonWidget(sunriseLocation.getLatitude(),
+                                                                    sunriseLocation.getLongitude()):
+                             new LatLonWidget(0,0));
+        if(!GuiUtils.showOkCancelDialog(null,"Sunrise Location",GuiUtils.inset(llw,5),null)) {
+            return;
+        }
+        setSunriseLocation(new LatLonPointImpl(llw.getLat(),llw.getLon()));
+    }
+
+
+
+    public void  setSunriseLocations(List locations) {
+        this.sunriseLocations = locations;
+    }
+
+    public void clearSunriseLocation() {
+        setSunriseLocation(null);
+    }
+
+    public void setSunriseLocation(LatLonPoint llp) {
+        sunriseLocation = llp;
+        makeSunriseDates();
+        repaint();
+    }
+
+    private void makeSunriseDates() {
+        sunriseDates  = new ArrayList();
+        if(sunriseLocation == null) return;
+        try {
+            //Pad them out 24 hours
+            GregorianCalendar gc1 = new  GregorianCalendar();
+            gc1.setTime(new Date(getStartDate().getTime()-DateUtil.hoursToMillis(12)));
+            GregorianCalendar gc2 = new  GregorianCalendar();
+            gc2.setTime(new Date(getEndDate().getTime()+DateUtil.hoursToMillis(12)));
+            List dates = Misc.newList(gc1,gc2);
+            SunriseSunsetCollector  ssc = new SunriseSunsetCollector (dates);
+            List cals = ssc.calculate(sunriseLocation.getLatitude(),sunriseLocation.getLongitude());
+            for(int i=0;i<cals.size();i++) {
+                GregorianCalendar cal = (GregorianCalendar) cals.get(i);
+                sunriseDates.add(cal.getTime());
+            }
+            //            System.err.println("dates:" + sunriseDates);
+        } catch(Exception exc) {
+            exc.printStackTrace();
+        }
+        
+
+    }
 
 
 
@@ -2075,7 +2195,19 @@ public class Timeline extends JPanel implements MouseListener,
      *
      * @param g graphics
      */
-    public void paintBackgroundDecoration(Graphics2D g) {}
+    public void paintBackgroundDecoration(Graphics2D g) {
+        if(sunriseDates.size()>0) {
+            g.setColor(Color.yellow);
+            int height   = (int) getSize().getHeight();
+            for(int i=0;i<sunriseDates.size();i+=2) {
+                Date d1 = (Date)sunriseDates.get(i+1);
+                Date d2 = (Date)sunriseDates.get(i);
+                int x1 = toLocation(d1);
+                int x2 = toLocation(d2);
+                g.fillRect(x1,0,(x2-x1),height);
+            }
+        }
+    }
 
 
     /**
@@ -2107,7 +2239,6 @@ public class Timeline extends JPanel implements MouseListener,
 
         if (doingDragSelect && (dragStartDate != null)
                 && (dragEndDate != null)) {
-
 
             int dx1 = toLocation(dragStartDate);
             int dx2 = toLocation(dragEndDate);

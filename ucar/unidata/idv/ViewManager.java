@@ -1538,6 +1538,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
 
 
+        public List getSunriseLocations() {
+            return getIdv().getIdvUIManager().getMapLocations();
+        }
+
         /**
          * override base class method to use different color
          *
