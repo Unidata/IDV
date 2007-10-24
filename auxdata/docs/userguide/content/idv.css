@@ -147,6 +147,11 @@ p.code {
 	margin-left: 22;
        }
 
+.jython {
+        font-family: Monospaced;
+	margin-left: 22;
+       }
+
 
 .childlist-level {
     font-weigt:bold;
