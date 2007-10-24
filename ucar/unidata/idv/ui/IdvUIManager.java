@@ -20,10 +20,10 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
-import visad.georef.EarthLocation;
 import org.python.core.*;
 import org.python.util.*;
 
@@ -31,10 +31,10 @@ import org.w3c.dom.*;
 
 import ucar.unidata.collab.*;
 import ucar.unidata.data.*;
-import ucar.unidata.gis.maps.*;
-import ucar.unidata.idv.*;
 
 import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.gis.maps.*;
+import ucar.unidata.idv.*;
 
 import ucar.unidata.idv.chooser.IdvChooserManager;
 import ucar.unidata.idv.collab.CollabManager;
@@ -89,6 +89,9 @@ import ucar.visad.display.DisplayMaster;
 import visad.Data;
 import visad.VisADException;
 
+
+import visad.georef.EarthLocation;
+
 import visad.python.*;
 
 
@@ -107,13 +110,13 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 import java.util.Arrays;
-import java.util.Vector;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -4921,6 +4924,7 @@ public class IdvUIManager extends IdvManager {
      * @return List of Strings the user entered or null if they cancelled
      */
     public List selectUserChoices(String msg, List userOperands) {
+
         if (operandCache == null) {
             operandCache =
                 (Hashtable) getStore().getEncodedFile("operandcache.xml");
@@ -4935,47 +4939,60 @@ public class IdvUIManager extends IdvManager {
         components.add(new JLabel("Value"));
         components.add(new JLabel("Save in Bundle"));
         for (int i = 0; i < userOperands.size(); i++) {
-            DataOperand operand       = (DataOperand) userOperands.get(i);
-            String fieldType = (String)operand.getProperty("type");
-            if(fieldType == null) {
+            DataOperand operand   = (DataOperand) userOperands.get(i);
+            String      fieldType = (String) operand.getProperty("type");
+            if (fieldType == null) {
                 fieldType = "text";
             }
-            String      label         = operand.getLabel();
-            Object      dflt          = operand.getUserDefault();
-            Object cacheKey = Misc.newList(label,fieldType);
-            Object      cachedOperand =  operandCache.get(cacheKey);
+            String label         = operand.getLabel();
+            Object dflt          = operand.getUserDefault();
+            Object cacheKey      = Misc.newList(label, fieldType);
+            Object cachedOperand = operandCache.get(cacheKey);
             if (cachedOperand != null) {
                 dflt = cachedOperand;
             }
             JCheckBox cbx = new JCheckBox("", operand.isPersistent());
             persistentCbxs.add(cbx);
-            JComponent field=null;
+            JComponent field     = null;
             JComponent fieldComp = null;
-            if(fieldType.equals("text")) {
-                String rowString = (String)operand.getProperty("rows");
-                if(rowString==null) rowString = "1";
+            if (fieldType.equals("text")) {
+                String rowString = (String) operand.getProperty("rows");
+                if (rowString == null) {
+                    rowString = "1";
+                }
                 int rows = new Integer(rowString).intValue();
-                if(rows==1) {
-                    field = new JTextField(dflt!=null?dflt.toString():"",15);
+                if (rows == 1) {
+                    field = new JTextField((dflt != null)
+                                           ? dflt.toString()
+                                           : "", 15);
                 } else {
-                    field = new JTextArea(dflt!=null?dflt.toString():"",rows,15);
-                    fieldComp = GuiUtils.makeScrollPane(field,200,100);
+                    field     = new JTextArea((dflt != null)
+                            ? dflt.toString()
+                            : "", rows, 15);
+                    fieldComp = GuiUtils.makeScrollPane(field, 200, 100);
                 }
-            } else  if(fieldType.equals("boolean")) {
-                field = new JCheckBox("",(dflt!=null?new Boolean(dflt.toString()).booleanValue():true));
-            } else  if(fieldType.equals("choice")) {
-                String choices = (String)operand.getProperty("choices");                
-                if(choices == null) throw new IllegalArgumentException("No 'choices' attribute defined for operand: " + operand);
-                List l = StringUtil.split(choices,";",true,true);
+            } else if (fieldType.equals("boolean")) {
+                field = new JCheckBox("", ((dflt != null)
+                                           ? new Boolean(
+                                           dflt.toString()).booleanValue()
+                                           : true));
+            } else if (fieldType.equals("choice")) {
+                String choices = (String) operand.getProperty("choices");
+                if (choices == null) {
+                    throw new IllegalArgumentException(
+                        "No 'choices' attribute defined for operand: "
+                        + operand);
+                }
+                List l = StringUtil.split(choices, ";", true, true);
                 field = new JComboBox(new Vector(l));
-                if(dflt!=null && l.contains(dflt)) {
-                    ((JComboBox)field).setSelectedItem(dflt);
+                if ((dflt != null) && l.contains(dflt)) {
+                    ((JComboBox) field).setSelectedItem(dflt);
                 }
-            } else  if(fieldType.equals("location")) {
-                List l = StringUtil.split(dflt.toString(),";",true,true);                
+            } else if (fieldType.equals("location")) {
+                List l = StringUtil.split(dflt.toString(), ";", true, true);
                 final LatLonWidget llw = new LatLonWidget();
                 field = llw;
-                if(l.size()==2) {
+                if (l.size() == 2) {
                     llw.setLat(Misc.decodeLatLon(l.get(0).toString()));
                     llw.setLon(Misc.decodeLatLon(l.get(1).toString()));
                 }
@@ -4985,22 +5002,25 @@ public class IdvUIManager extends IdvManager {
                 centerPopupBtn.setToolTipText("Center on current displays");
                 centerPopupBtn.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent ae) {
-                        popupCenterMenu(centerPopupBtn,llw);
+                        popupCenterMenu(centerPopupBtn, llw);
                     }
                 });
                 JComponent centerPopup = GuiUtils.inset(centerPopupBtn,
                                              new Insets(0, 0, 0, 4));
-                fieldComp= GuiUtils.hbox(llw,centerPopup);
-            } else  if(fieldType.equals("area")) {
+                fieldComp = GuiUtils.hbox(llw, centerPopup);
+            } else if (fieldType.equals("area")) {
                 //TODO:
             } else {
-                throw new IllegalArgumentException("Unknown type: " + fieldType +" for operand: " + operand);
+                throw new IllegalArgumentException("Unknown type: "
+                        + fieldType + " for operand: " + operand);
             }
 
             fields.add(field);
             label = StringUtil.replace(label, "_", " ");
             components.add(GuiUtils.rLabel(label));
-            components.add(fieldComp!=null?fieldComp:field);
+            components.add((fieldComp != null)
+                           ? fieldComp
+                           : field);
             components.add(cbx);
         }
         //        GuiUtils.tmpColFills = new int[] { GridBagConstraints.HORIZONTAL,
@@ -5010,44 +5030,46 @@ public class IdvUIManager extends IdvManager {
         Component contents = GuiUtils.topCenter(new JLabel(msg),
                                  GuiUtils.doLayout(components, 3,
                                      GuiUtils.WT_NYN, GuiUtils.WT_N));
-        if ( !GuiUtils.showOkCancelDialog(null, "Select input",
-                                          contents, null, fields)) {
+        if ( !GuiUtils.showOkCancelDialog(null, "Select input", contents,
+                                          null, fields)) {
             return null;
         }
         List values = new ArrayList();
         for (int i = 0; i < userOperands.size(); i++) {
-            DataOperand operand = (DataOperand) userOperands.get(i);
-            String      label   = operand.getLabel();
-            Object field =  fields.get(i);
-            Object     value =null;
-            Object cacheValue = null;
-            if(field instanceof JTextComponent) {
+            DataOperand operand    = (DataOperand) userOperands.get(i);
+            String      label      = operand.getLabel();
+            Object      field      = fields.get(i);
+            Object      value      = null;
+            Object      cacheValue = null;
+            if (field instanceof JTextComponent) {
                 value = ((JTextComponent) field).getText().trim();
-            } else  if(field instanceof JCheckBox) {
+            } else if (field instanceof JCheckBox) {
                 value = new Boolean(((JCheckBox) field).isSelected());
-            } else  if(field instanceof JComboBox) {
-                value = ((JComboBox)field).getSelectedItem();
-            } else  if(field instanceof LatLonWidget) {
+            } else if (field instanceof JComboBox) {
+                value = ((JComboBox) field).getSelectedItem();
+            } else if (field instanceof LatLonWidget) {
                 LatLonWidget llw = (LatLonWidget) field;
-                value = new LatLonPointImpl(llw.getLat(),llw.getLon());
-                cacheValue = llw.getLat()+";"+llw.getLon();
+                value      = new LatLonPointImpl(llw.getLat(), llw.getLon());
+                cacheValue = llw.getLat() + ";" + llw.getLon();
             } else {
-                throw new IllegalArgumentException("Unknown field type:" + field.getClass().getName());
+                throw new IllegalArgumentException("Unknown field type:"
+                        + field.getClass().getName());
             }
-            if(cacheValue == null) {
+            if (cacheValue == null) {
                 cacheValue = value;
             }
-            JCheckBox   cbx     = (JCheckBox) persistentCbxs.get(i);
-            String fieldType = (String)operand.getProperty("type");
-            if(fieldType == null) {
+            JCheckBox cbx       = (JCheckBox) persistentCbxs.get(i);
+            String    fieldType = (String) operand.getProperty("type");
+            if (fieldType == null) {
                 fieldType = "text";
             }
-            Object cacheKey = Misc.newList(label,fieldType);
+            Object cacheKey = Misc.newList(label, fieldType);
             operandCache.put(cacheKey, cacheValue);
             values.add(new UserOperandValue(value, cbx.isSelected()));
         }
         getStore().putEncodedFile("operandcache.xml", operandCache);
         return values;
+
     }
 
 
@@ -5305,50 +5327,47 @@ public class IdvUIManager extends IdvManager {
         HttpFormEntry orgEntry;
 
         entries.add(nameEntry = new HttpFormEntry(HttpFormEntry.TYPE_INPUT,
-                "form_data[fromName]", "Name:",
+                "fullName", "Name:",
                 getStore().get(PROP_HELP_NAME, (String) null)));
         entries.add(emailEntry = new HttpFormEntry(HttpFormEntry.TYPE_INPUT,
-                "form_data[email]", "Your Email:",
+                "emailAddress", "Your Email:",
                 getStore().get(PROP_HELP_EMAIL, (String) null)));
         entries.add(orgEntry = new HttpFormEntry(HttpFormEntry.TYPE_INPUT,
-                "form_data[organization]", "Organization:",
+                "organization", "Organization:",
                 getStore().get(PROP_HELP_ORG, (String) null)));
-        entries.add(new HttpFormEntry(HttpFormEntry.TYPE_INPUT,
-                                      "form_data[subject]", "Subject:"));
+        entries.add(new HttpFormEntry(HttpFormEntry.TYPE_INPUT, "subject",
+                                      "Subject:"));
 
         entries.add(
             new HttpFormEntry(
                 HttpFormEntry.TYPE_LABEL, "",
                 "<html>Please provide a <i>thorough</i> description of the problem you encountered:</html>"));
         entries.add(descriptionEntry =
-            new HttpFormEntry(HttpFormEntry.TYPE_AREA,
-                              "form_data[description]", "Description:",
-                              description, 5, 30, true));
+            new HttpFormEntry(HttpFormEntry.TYPE_AREA, "description",
+                              "Description:", description, 5, 30, true));
 
+        //        entries.add(new HttpFormEntry(HttpFormEntry.TYPE_FILE,
+        //                                      "attachmentTwo", "Attachment 1:", "",
+        //                                      false));
         entries.add(new HttpFormEntry(HttpFormEntry.TYPE_FILE,
-                                      "form_data[att2]", "Attachment 1:", "",
-                                      false));
-        entries.add(new HttpFormEntry(HttpFormEntry.TYPE_FILE,
-                                      "form_data[att3]", "Attachment 2:", "",
+                                      "attachmentThree", "Attachment:", "",
                                       false));
 
-        entries.add(new HttpFormEntry(HttpFormEntry.TYPE_HIDDEN,
-                                      "form_data[submit]", "", "Send Email"));
+        entries.add(new HttpFormEntry(HttpFormEntry.TYPE_HIDDEN, "submit",
+                                      "", "Send Email"));
         entries.add(
             new HttpFormEntry(
-                HttpFormEntry.TYPE_HIDDEN, "form_data[package]", "",
+                HttpFormEntry.TYPE_HIDDEN, "softwarePackage", "",
                 getStateManager().getProperty(PROP_SUPPORT_PACKAGE, "idv")));
         entries.add(new HttpFormEntry(HttpFormEntry.TYPE_HIDDEN,
-                                      "form_data[p_version]", "",
+                                      "packageVersion", "",
                                       getStateManager().getVersion()
                                       + " build date:"
                                       + getStateManager().getBuildDate()));
-        entries.add(new HttpFormEntry(HttpFormEntry.TYPE_HIDDEN,
-                                      "form_data[opsys]", "",
+        entries.add(new HttpFormEntry(HttpFormEntry.TYPE_HIDDEN, "os", "",
                                       System.getProperty("os.name")));
-        entries.add(new HttpFormEntry(HttpFormEntry.TYPE_HIDDEN,
-                                      "form_data[hardware]", "",
-                                      javaInfo.toString()));
+        entries.add(new HttpFormEntry(HttpFormEntry.TYPE_HIDDEN, "hardware",
+                                      "", javaInfo.toString()));
 
         JLabel topLabel =
             new JLabel("<html>"
@@ -5395,7 +5414,7 @@ public class IdvUIManager extends IdvManager {
                     + "\n\n******************\nStack trace:\n" + stackTrace;
                 entriesToPost.add(
                     new HttpFormEntry(
-                        HttpFormEntry.TYPE_HIDDEN, "form_data[description]",
+                        HttpFormEntry.TYPE_HIDDEN, "description",
                         "Description:", newDescription, 5, 30, true));
             }
 
@@ -5403,13 +5422,13 @@ public class IdvUIManager extends IdvManager {
                 extra.append(getIdv().getPluginManager().getPluginHtml());
                 extra.append(getResourceManager().getHtmlView());
 
-                entriesToPost.add(new HttpFormEntry("form_data[att_one]",
+                entriesToPost.add(new HttpFormEntry("attachmentOne",
                         "extra.html", extra.toString().getBytes()));
 
                 if (includeBundleCbx.isSelected()) {
                     entriesToPost.add(
                         new HttpFormEntry(
-                            "form_data[att_two]", "bundle.xidv",
+                            "attachmentTwo", "bundle.xidv",
                             getIdv().getPersistenceManager().getBundleXml(
                                 true).getBytes()));
                 }
@@ -5417,7 +5436,7 @@ public class IdvUIManager extends IdvManager {
                 String[] results =
                     HttpFormEntry.doPost(
                         entriesToPost,
-                        "http://www.unidata.ucar.edu/support/email_support.php");
+                        "http://www.unidata.ucar.edu/support/requestSupport.jsp");
                 if (results[0] != null) {
                     GuiUtils.showHtmlDialog(
                         results[0], "Support Request Response - Error",
@@ -5425,14 +5444,19 @@ public class IdvUIManager extends IdvManager {
                     continue;
                 }
                 String html = results[1];
-                if (html.toLowerCase().indexOf("your email has been sent")
-                        >= 0) {
+                if ((html.toLowerCase()
+                        .indexOf("your email has been sent") >= 0) || (html
+                        .toLowerCase()
+                        .indexOf("your request has been sent") >= 0)) {
                     LogUtil.userMessage("Your support request has been sent");
                     break;
-                } else if (html.toLowerCase().indexOf("required fields")
-                           >= 0) {
-                    LogUtil.userErrorMessage(
-                        "<html>There was a problem submitting your request. <br>Is your email correct?</html>");
+                    //                } else if (html.toLowerCase().indexOf("required fields")
+                    //                           >= 0) {
+                    //                    LogUtil.userErrorMessage(
+                    //                        "<html>There was a problem submitting your request. <br>Is your email correct?</html>");
+                    //                    GuiUtils.showHtmlDialog(
+                    //                        html, "Unknown Support Request Response",
+                    //                        "Unknown Support Request Response", null, true);
                 } else {
                     GuiUtils.showHtmlDialog(
                         html, "Unknown Support Request Response",
@@ -5700,8 +5724,10 @@ public class IdvUIManager extends IdvManager {
      * Popup a centering menu
      *
      * @param near component to popup near
+     * @param latLonWidget _more_
      */
-    public void popupCenterMenu(JComponent near, final LatLonWidget latLonWidget) {
+    public void popupCenterMenu(JComponent near,
+                                final LatLonWidget latLonWidget) {
         ActionListener listener = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 try {
@@ -5759,23 +5785,28 @@ public class IdvUIManager extends IdvManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List getMapLocations() {
         try {
-        List centers = new ArrayList();
-        List vms   = getIdv().getVMManager().getViewManagers();
-        for (int i = 0; i < vms.size(); i++) {
-            ViewManager vm = (ViewManager) vms.get(i);
-            if ( !(vm instanceof MapViewManager)) {
-                continue;
-            }
-            MapViewManager      mvm = (MapViewManager) vm;
-            EarthLocation el  = mvm.getScreenCenter(); 
-            centers.add(new LatLonPointImpl(el.getLatitude().getValue(),
+            List centers = new ArrayList();
+            List vms     = getIdv().getVMManager().getViewManagers();
+            for (int i = 0; i < vms.size(); i++) {
+                ViewManager vm = (ViewManager) vms.get(i);
+                if ( !(vm instanceof MapViewManager)) {
+                    continue;
+                }
+                MapViewManager mvm = (MapViewManager) vm;
+                EarthLocation  el  = mvm.getScreenCenter();
+                centers.add(new LatLonPointImpl(el.getLatitude().getValue(),
                         el.getLongitude().getValue()));
-        }
-        return centers;
-        } catch(Exception exc) {
-            throw new ucar.unidata.util.WrapperException (exc);
+            }
+            return centers;
+        } catch (Exception exc) {
+            throw new ucar.unidata.util.WrapperException(exc);
         }
     }
 
