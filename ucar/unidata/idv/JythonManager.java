@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv;
 
 
@@ -90,6 +91,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
+
+import java.util.zip.*;
 
 
 import javax.swing.*;
@@ -213,9 +216,49 @@ public class JythonManager extends IdvManager implements ActionListener {
                 logException("Moving  jython lib", exc);
             }
         }
+
+        writeJythonLib();
         initPython();
     }
 
+    /**
+     * _more_
+     */
+    private void writeJythonLib() {
+        try {
+            String pythonLibDir =
+                IOUtil.joinDir(getStore().getJythonCacheDir(), "Lib");
+            double version     = 1.0;
+            String versionFile = IOUtil.joinDir(pythonLibDir, "version.txt");
+            if (new File(pythonLibDir).exists()) {
+                if (new File(versionFile).exists()) {
+                    if (version
+                            <= new Double(IOUtil.readContents(versionFile,
+                                getClass(), "1.0")).doubleValue()) {
+                        return;
+                    }
+                }
+            }
+            IOUtil.makeDir(pythonLibDir);
+            IOUtil.writeFile(versionFile, "" + version);
+            InputStream is = IOUtil.getInputStream("jythonlib.jar",
+                                 getClass());
+            ZipInputStream zin = new ZipInputStream(is);
+            ZipEntry       ze  = null;
+            while ((ze = zin.getNextEntry()) != null) {
+                String entryName = ze.getName();
+                //                System.err.println("writing:" + entryName);
+                String dest = IOUtil.joinDir(pythonLibDir, entryName);
+                if (ze.isDirectory()) {
+                    IOUtil.makeDir(dest);
+                } else {
+                    IOUtil.writeTo(zin, new FileOutputStream(dest));
+                }
+            }
+        } catch (Exception exc) {
+            logException("Making jython lib directory", exc);
+        }
+    }
 
 
 
@@ -2198,8 +2241,9 @@ public class JythonManager extends IdvManager implements ActionListener {
             for (int itemIdx = 0; itemIdx < funcs.size(); itemIdx++) {
                 Object[]   pair = (Object[]) funcs.get(itemIdx);
                 PyFunction func = (PyFunction) pair[1];
-                sb.append("<p><a name=\"" + func.__name__ + "\"></a><code class=\"command\">"
-                          + func.__name__ + "(");
+                sb.append("<p><a name=\"" + func.__name__
+                          + "\"></a><code class=\"command\">" + func.__name__
+                          + "(");
                 PyTableCode tc = (PyTableCode) func.func_code;
                 for (int argIdx = 0; argIdx < tc.co_argcount; argIdx++) {
                     if (argIdx > 0) {
@@ -2212,6 +2256,7 @@ public class JythonManager extends IdvManager implements ActionListener {
                 if ( !func.__doc__.toString().equals("None")) {
                     String doc = func.__doc__.toString().trim();
                     //                    doc = StringUtil.replace(doc,"\n","<br>");
+                    doc = StringUtil.replace(doc, "[", "\\[");
                     List toks = StringUtil.split(doc, "\n", true, true);
                     sb.append(StringUtil.join("\n", toks));
                 }
