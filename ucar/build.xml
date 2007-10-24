@@ -106,6 +106,7 @@ argument -Dfoo=bar) -->
             <fileset dir="${tmpjardir}" includes="**/*"/>
         </delete>
 
+        <copy  file="${libsrc}/jythonlib.jar" todir="${tmpjardir}"/>
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jmf.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jcalendar.jar" dest="${tmpjardir}"/>
