@@ -69,9 +69,8 @@ def getSliceAtAltitude(fieldimpl, alt, unit="m") :
   #import methods from
   from visad import RealType
   from visad import Real
-  import visad.data.units.Parser as parser
   alt = float(alt)
-  unit = parser.parse(str(unit))
+  unit = Util.parseUnit(unit)
   altitude = Real(RealType.Altitude, alt, unit)
   ff = GridUtil.sliceAtLevel(fieldimpl, altitude)
   return ff

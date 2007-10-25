@@ -1,5 +1,5 @@
 
-"""A set of miscellaneou utilities. """
+"""A set of miscellaneous utilities. """
 
 def makeFloatArray(rows,cols,value):
     """ A utility to make a 2 dimensional float array filled 
