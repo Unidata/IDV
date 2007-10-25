@@ -123,6 +123,7 @@ public class InteractiveShell implements HyperlinkListener {
         frame.pack();
         frame.setLocation(100, 100);
         frame.setVisible(true);
+        LogUtil.registerWindow(frame);
     }
 
     /**
