@@ -42,6 +42,8 @@ import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.DisplayInfo;
 
+import ucar.unidata.idv.ui.IdvUIManager;
+
 import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.idv.ViewContext;
@@ -137,23 +139,14 @@ public abstract class DisplayControlBase extends SharableImpl {
 
 
     /** The icon used to show locked legend components */
-    protected static ImageIcon ICON_LOCK;
+    protected static ImageIcon ICON_LOCK  = IdvUIManager.ICON_LOCK;
 
     /** The icon used to show unlocked legend components */
-    protected static ImageIcon ICON_UNLOCK;
+    protected static ImageIcon ICON_UNLOCK = IdvUIManager.ICON_UNLOCK; 
 
 
     /** Icon used to remove displays */
-    public static ImageIcon ICON_REMOVE;
-
-    static {
-        ICON_REMOVE = new ImageIcon(
-            Resource.getImage("/auxdata/ui/icons/Remove16.gif"));
-        ICON_LOCK = new ImageIcon(
-            Resource.getImage("/ucar/unidata/idv/images/lock.gif"));
-        ICON_UNLOCK = new ImageIcon(
-            Resource.getImage("/ucar/unidata/idv/images/unlock.gif"));
-    }
+    public static ImageIcon ICON_REMOVE  = IdvUIManager.ICON_REMOVE;
 
 
 
