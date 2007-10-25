@@ -24,22 +24,28 @@
 
 
 
+
 package ucar.unidata.ui;
 
 
+import org.itc.idv.math.SunriseSunsetCollector;
+
+
+import ucar.unidata.geoloc.LatLonPoint;
+import ucar.unidata.geoloc.LatLonPointImpl;
+
+
 import ucar.unidata.util.DateSelection;
-import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.Misc;
 
 
 
 import ucar.unidata.util.DatedObject;
 import ucar.unidata.util.DatedThing;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 
-
-import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -47,9 +53,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 
-import ucar.unidata.geoloc.LatLonPoint;
-import ucar.unidata.geoloc.LatLonPointImpl;
-import org.itc.idv.math.SunriseSunsetCollector;
+import java.io.*;
 
 
 import java.text.DateFormat;
@@ -58,13 +62,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 
 
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -373,6 +377,7 @@ public class Timeline extends JPanel implements MouseListener,
     /** Does this timeline support selection */
     private boolean isCapableOfSelection = true;
 
+    /** _more_          */
     private boolean justShowSelected = false;
 
     /** are we dragging a selection range */
@@ -494,8 +499,14 @@ public class Timeline extends JPanel implements MouseListener,
     /** Is the date selection range automatically changed to match the visible range */
     private boolean sticky = false;
 
+    /** _more_          */
     private List sunriseDates = new ArrayList();
+
+    /** _more_          */
     private LatLonPoint sunriseLocation;
+
+    /** _more_          */
+    private List sunriseLocations;
 
     /** Holds other timelines that we share start/end range with */
     private List timelineGroup;
@@ -987,6 +998,7 @@ public class Timeline extends JPanel implements MouseListener,
         repaint();
     }
 
+    /** _more_          */
     private Hashtable selectedMap = new Hashtable();
 
     /**
@@ -994,7 +1006,9 @@ public class Timeline extends JPanel implements MouseListener,
      */
     public void selectedDatesChanged() {
         selectedMap = new Hashtable();
-        if(datedThings == null || selected == null) return;
+        if ((datedThings == null) || (selected == null)) {
+            return;
+        }
         for (int i = 0; i < selected.size(); i++) {
             DatedThing datedThing = (DatedThing) selected.get(i);
             selectedMap.put(datedThing, datedThing);
@@ -1165,21 +1179,26 @@ public class Timeline extends JPanel implements MouseListener,
 
         List sunriseLocations = getSunriseLocations();
         subItems = new ArrayList();
-        subItems.add(GuiUtils.makeMenuItem("Clear Location", this, "clearSunriseLocation"));
-        subItems.add(GuiUtils.makeMenuItem("Set Location", this, "setSunriseLocationFromUser"));
-        if(sunriseLocation!=null && getIsCapableOfSelection()) {
-            subItems.add(GuiUtils.makeMenuItem("Select daytime", this, "selectDaytime"));
+        subItems.add(GuiUtils.makeMenuItem("Clear Location", this,
+                                           "clearSunriseLocation"));
+        subItems.add(GuiUtils.makeMenuItem("Set Location", this,
+                                           "setSunriseLocationFromUser"));
+        if ((sunriseLocation != null) && getIsCapableOfSelection()) {
+            subItems.add(GuiUtils.makeMenuItem("Select daytime", this,
+                    "selectDaytime"));
         }
-        if(sunriseLocations!=null && sunriseLocations.size()>0) {
 
+        if ((sunriseLocations != null) && (sunriseLocations.size() > 0)) {
             subItems.add(GuiUtils.MENU_SEPARATOR);
-            for(int j=0;j<sunriseLocations.size();j++) {
-                LatLonPoint llp = (LatLonPoint) sunriseLocations.get(j);
-                subItems.add(GuiUtils.makeMenuItem(Misc.format(llp.getLatitude())+"/" + Misc.format(llp.getLongitude()), this, "setSunriseLocation",llp));
+            for (int locIdx = 0; locIdx < sunriseLocations.size(); locIdx++) {
+                LatLonPoint llp = (LatLonPoint) sunriseLocations.get(locIdx);
+                subItems.add(
+                    GuiUtils.makeMenuItem(
+                        Misc.format(llp.getLatitude()) + "/"
+                        + Misc.format(llp.getLongitude()), this,
+                            "setSunriseLocation", llp));
             }
         }
-
-
 
         items.add(GuiUtils.makeMenu("Sunrise/Sunset", subItems));
 
@@ -1591,33 +1610,45 @@ public class Timeline extends JPanel implements MouseListener,
     }
 
 
-    List sunriseLocations;
-    public List  getSunriseLocations() {
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public List getSunriseLocations() {
         return sunriseLocations;
     }
 
-    public void  selectDaytime() {
-        if (datedThings == null) {return;}
-        List selected = new ArrayList();
+    /**
+     * _more_
+     */
+    public void selectDaytime() {
+        if (datedThings == null) {
+            return;
+        }
+        List selected     = new ArrayList();
         List visibleDates = new ArrayList();
-        long start = startDate.getTime();
-        long end   = endDate.getTime();
+        long start        = startDate.getTime();
+        long end          = endDate.getTime();
         for (int i = 0; i < datedThings.size(); i++) {
             DatedThing datedThing = (DatedThing) datedThings.get(i);
             Date       date       = datedThing.getDate();
             long       time       = date.getTime();
-            if(time>=start && time<= end) {
+            if ((time >= start) && (time <= end)) {
                 visibleDates.add(datedThing);
             }
         }
-        for (int datedThingIdx = 0; datedThingIdx < visibleDates.size(); datedThingIdx++) {
-            DatedThing datedThing = (DatedThing) visibleDates.get(datedThingIdx);
-            Date       date       = datedThing.getDate();
-            long       time       = date.getTime();
-            for(int i=0;i<sunriseDates.size();i+=2) {
-                Date d1 = (Date)sunriseDates.get(i+1);
-                Date d2 = (Date)sunriseDates.get(i);
-                if(time>=d1.getTime() && time<=d2.getTime()) {
+        for (int datedThingIdx = 0; datedThingIdx < visibleDates.size();
+                datedThingIdx++) {
+            DatedThing datedThing =
+                (DatedThing) visibleDates.get(datedThingIdx);
+            Date date = datedThing.getDate();
+            long time = date.getTime();
+            for (int i = 0; i < sunriseDates.size(); i += 2) {
+                Date d1 = (Date) sunriseDates.get(i + 1);
+                Date d2 = (Date) sunriseDates.get(i);
+                if ((time >= d1.getTime()) && (time <= d2.getTime())) {
                     selected.add(datedThing);
                     break;
                 }
@@ -1627,53 +1658,79 @@ public class Timeline extends JPanel implements MouseListener,
         setSelected(selected);
     }
 
-    public void  setSunriseLocationFromUser() {
-        LatLonWidget  llw = (sunriseLocation!=null?new LatLonWidget(sunriseLocation.getLatitude(),
-                                                                    sunriseLocation.getLongitude()):
-                             new LatLonWidget(0,0));
-        if(!GuiUtils.showOkCancelDialog(null,"Sunrise Location",GuiUtils.inset(llw,5),null)) {
+    /**
+     * _more_
+     */
+    public void setSunriseLocationFromUser() {
+        LatLonWidget llw = ((sunriseLocation != null)
+                            ? new LatLonWidget(sunriseLocation.getLatitude(),
+                                sunriseLocation.getLongitude())
+                            : new LatLonWidget(0, 0));
+        if ( !GuiUtils.showOkCancelDialog(null, "Sunrise Location",
+                                          GuiUtils.inset(llw, 5), null)) {
             return;
         }
-        setSunriseLocation(new LatLonPointImpl(llw.getLat(),llw.getLon()));
+        setSunriseLocation(new LatLonPointImpl(llw.getLat(), llw.getLon()));
     }
 
 
 
-    public void  setSunriseLocations(List locations) {
+    /**
+     * _more_
+     *
+     * @param locations _more_
+     */
+    public void setSunriseLocations(List locations) {
         this.sunriseLocations = locations;
     }
 
+    /**
+     * _more_
+     */
     public void clearSunriseLocation() {
         setSunriseLocation(null);
     }
 
+    /**
+     * _more_
+     *
+     * @param llp _more_
+     */
     public void setSunriseLocation(LatLonPoint llp) {
         sunriseLocation = llp;
         makeSunriseDates();
         repaint();
     }
 
+    /**
+     * _more_
+     */
     private void makeSunriseDates() {
-        sunriseDates  = new ArrayList();
-        if(sunriseLocation == null) return;
+        sunriseDates = new ArrayList();
+        if (sunriseLocation == null) {
+            return;
+        }
         try {
             //Pad them out 24 hours
-            GregorianCalendar gc1 = new  GregorianCalendar();
-            gc1.setTime(new Date(getStartDate().getTime()-DateUtil.hoursToMillis(12)));
-            GregorianCalendar gc2 = new  GregorianCalendar();
-            gc2.setTime(new Date(getEndDate().getTime()+DateUtil.hoursToMillis(12)));
-            List dates = Misc.newList(gc1,gc2);
-            SunriseSunsetCollector  ssc = new SunriseSunsetCollector (dates);
-            List cals = ssc.calculate(sunriseLocation.getLatitude(),sunriseLocation.getLongitude());
-            for(int i=0;i<cals.size();i++) {
+            GregorianCalendar gc1 = new GregorianCalendar();
+            gc1.setTime(new Date(getStartDate().getTime()
+                                 - DateUtil.hoursToMillis(48)));
+            GregorianCalendar gc2 = new GregorianCalendar();
+            gc2.setTime(new Date(getEndDate().getTime()
+                                 + DateUtil.hoursToMillis(48)));
+            List                   dates = Misc.newList(gc1, gc2);
+            SunriseSunsetCollector ssc   = new SunriseSunsetCollector(dates);
+            List cals = ssc.calculate(sunriseLocation.getLatitude(),
+                                      sunriseLocation.getLongitude());
+            for (int i = 0; i < cals.size(); i++) {
                 GregorianCalendar cal = (GregorianCalendar) cals.get(i);
                 sunriseDates.add(cal.getTime());
             }
             //            System.err.println("dates:" + sunriseDates);
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             exc.printStackTrace();
         }
-        
+
 
     }
 
@@ -2196,15 +2253,15 @@ public class Timeline extends JPanel implements MouseListener,
      * @param g graphics
      */
     public void paintBackgroundDecoration(Graphics2D g) {
-        if(sunriseDates.size()>0) {
+        if (sunriseDates.size() > 0) {
             g.setColor(Color.yellow);
-            int height   = (int) getSize().getHeight();
-            for(int i=0;i<sunriseDates.size();i+=2) {
-                Date d1 = (Date)sunriseDates.get(i+1);
-                Date d2 = (Date)sunriseDates.get(i);
-                int x1 = toLocation(d1);
-                int x2 = toLocation(d2);
-                g.fillRect(x1,0,(x2-x1),height);
+            int height = (int) getSize().getHeight();
+            for (int i = 0; i < sunriseDates.size(); i += 2) {
+                Date d1 = (Date) sunriseDates.get(i + 1);
+                Date d2 = (Date) sunriseDates.get(i);
+                int  x1 = toLocation(d1);
+                int  x2 = toLocation(d2);
+                g.fillRect(x1, 0, (x2 - x1), height);
             }
         }
     }
@@ -2314,45 +2371,52 @@ public class Timeline extends JPanel implements MouseListener,
 
         Hashtable seenLocations = new Hashtable();
         if (datedThings != null) {
-            for(int selectIdx = 0;selectIdx<2;selectIdx++) {
-            for (int i = 0; i < datedThings.size(); i++) {
-                DatedThing datedThing = (DatedThing) datedThings.get(i);
-                Date       date       = datedThing.getDate();
-                long       time       = date.getTime();
-                if ((time < start) || (time > end)) {
-                    continue;
-                }
-                int location = toLocation(date);
-                boolean isSelected = selectedMap.get(datedThing)!=null;
-                if(isSelected && selectIdx == 0) continue;
-                if(!isSelected && selectIdx ==1) continue;
-                if(justShowSelected && !isSelected) continue;
-
-                //                Object key = new Integer(location);
-                //                if(seenLocations.get(key)!=null) continue;
-                //                seenLocations.put(key,key);
-
-                if (datedThing == mouseHighlighted) {
-                    if (isSelected) {
-                        g.setColor(getColorTimeSelected());
-                        g.fillRect(location - DIM_TIME_WIDTH / 2 - 1,
-                                   baseLine - DIM_TIME_HEIGHT / 2 - 1,
-                                   DIM_TIME_WIDTH + 2, DIM_TIME_HEIGHT + 2);
+            for (int selectIdx = 0; selectIdx < 2; selectIdx++) {
+                for (int i = 0; i < datedThings.size(); i++) {
+                    DatedThing datedThing = (DatedThing) datedThings.get(i);
+                    Date       date       = datedThing.getDate();
+                    long       time       = date.getTime();
+                    if ((time < start) || (time > end)) {
+                        continue;
                     }
-                    g.setColor(COLOR_HIGHLIGHT_DATE);
-                } else {
-                    if (isSelected) {
-                        g.setColor(getColorTimeSelected());
+                    int     location   = toLocation(date);
+                    boolean isSelected = selectedMap.get(datedThing) != null;
+                    if (isSelected && (selectIdx == 0)) {
+                        continue;
+                    }
+                    if ( !isSelected && (selectIdx == 1)) {
+                        continue;
+                    }
+                    if (justShowSelected && !isSelected) {
+                        continue;
+                    }
+
+                    //                Object key = new Integer(location);
+                    //                if(seenLocations.get(key)!=null) continue;
+                    //                seenLocations.put(key,key);
+
+                    if (datedThing == mouseHighlighted) {
+                        if (isSelected) {
+                            g.setColor(getColorTimeSelected());
+                            g.fillRect(location - DIM_TIME_WIDTH / 2 - 1,
+                                       baseLine - DIM_TIME_HEIGHT / 2 - 1,
+                                       DIM_TIME_WIDTH + 2,
+                                       DIM_TIME_HEIGHT + 2);
+                        }
+                        g.setColor(COLOR_HIGHLIGHT_DATE);
                     } else {
-                        g.setColor(getColorTimeUnselected());
+                        if (isSelected) {
+                            g.setColor(getColorTimeSelected());
+                        } else {
+                            g.setColor(getColorTimeUnselected());
+                        }
                     }
+                    g.fillRect(location - DIM_TIME_WIDTH / 2,
+                               baseLine - DIM_TIME_HEIGHT / 2,
+                               DIM_TIME_WIDTH, DIM_TIME_HEIGHT);
+                    //g.fillRect(location - DIM_TIME_WIDTH / 2, baseLine,
+                    //                           DIM_TIME_WIDTH, DIM_TIME_HEIGHT);
                 }
-                g.fillRect(location - DIM_TIME_WIDTH / 2,
-                           baseLine - DIM_TIME_HEIGHT / 2, DIM_TIME_WIDTH,
-                           DIM_TIME_HEIGHT);
-                //g.fillRect(location - DIM_TIME_WIDTH / 2, baseLine,
-                //                           DIM_TIME_WIDTH, DIM_TIME_HEIGHT);
-            }
             }
         }
 
@@ -2778,43 +2842,50 @@ public class Timeline extends JPanel implements MouseListener,
      * main
      *
      * @param args args
+     *
+     * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
+
         boolean useDateSelection = true;
         try {
-                
+
             final List dates = new ArrayList();
-            if(args.length==0) {
-                long now   = System.currentTimeMillis();
+            if (args.length == 0) {
+                long now = System.currentTimeMillis();
                 for (int i = 0; i < 30; i++) {
-                    DatedObject datedObject = new DatedObject(new Date((long) (now
-                                                                               + DateUtil.minutesToMillis(20)
-                                                                               - i * Math.random() * 60 * 60
-                                                                               * 1000)));
+                    DatedObject datedObject =
+                        new DatedObject(new Date((long) (now
+                            + DateUtil.minutesToMillis(20)
+                            - i * Math.random() * 60 * 60 * 1000)));
                     dates.add(datedObject);
                 }
             } else {
                 useDateSelection = false;
                 String fmt = "EEE MMM dd hh:mm:ss yyyy";
                 String file;
-                if(args.length>1) {
-                    fmt = args[0];
-                    file =args[1];
+                if (args.length > 1) {
+                    fmt  = args[0];
+                    file = args[1];
                 } else {
                     file = args[0];
                 }
 
-                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+                BufferedReader reader = new BufferedReader(
+                                            new InputStreamReader(
+                                                new FileInputStream(file)));
                 String line;
                 //[Sat Jul 28 03:14:46 2007] [error] [client 74.6.26.164] Directory index forbidden by rule: /content/software/IDV/release/stable/webstart/
                 SimpleDateFormat dateFormat =
                     new java.text.SimpleDateFormat(fmt);
-                java.text.ParsePosition pp =                     new java.text.ParsePosition(0);
-                while((line=reader.readLine())!=null) {
+                java.text.ParsePosition pp = new java.text.ParsePosition(0);
+                while ((line = reader.readLine()) != null) {
                     int idx1 = line.indexOf("[");
-                    int idx2 = line.indexOf("]",idx1);
-                    if(idx1<0 || idx2<=idx1) continue;
-                    String dateString = line.substring(idx1+1,idx2);
+                    int idx2 = line.indexOf("]", idx1);
+                    if ((idx1 < 0) || (idx2 <= idx1)) {
+                        continue;
+                    }
+                    String dateString = line.substring(idx1 + 1, idx2);
                     //                        Date date = dateFormat.parse(dateString, new ParsePosition(0));
                     pp.setIndex(0);
                     Date date = dateFormat.parse(dateString, pp);
@@ -2822,8 +2893,8 @@ public class Timeline extends JPanel implements MouseListener,
                         //                    System.err.println("date:" + date);
                         dates.add(new DatedObject(date, line));
                     } else {
-                        System.err.println("failed to  parse:"+dateString);
-                        System.err.println("fmt:"+fmt);
+                        System.err.println("failed to  parse:" + dateString);
+                        System.err.println("fmt:" + fmt);
                         return;
                     }
                 }
@@ -2831,14 +2902,15 @@ public class Timeline extends JPanel implements MouseListener,
 
             }
 
-            if(dates.size()==0) {
-                System.err.println ("no dates");
+            if (dates.size() == 0) {
+                System.err.println("no dates");
                 return;
             }
             final Timeline timeline = new Timeline(dates, 400);
             timeline.setUseDateSelection(useDateSelection);
             DateSelection dateSelection =
-                new DateSelection(timeline.getStartDate(), timeline.getEndDate());
+                new DateSelection(timeline.getStartDate(),
+                                  timeline.getEndDate());
 
             dateSelection.setRoundTo(DateUtil.minutesToMillis(15));
             dateSelection.setInterval(DateUtil.minutesToMillis(120));
@@ -2848,70 +2920,85 @@ public class Timeline extends JPanel implements MouseListener,
             //        dateSelection.setIntervalRange(DateUtil.minutesToMillis(30));
 
 
-            final JCheckBox justShowSelectedCbx = new JCheckBox("Just show selected", false);
+            final JCheckBox justShowSelectedCbx =
+                new JCheckBox("Just show selected", false);
             justShowSelectedCbx.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        timeline.justShowSelected = justShowSelectedCbx.isSelected();
-                        timeline.repaint();
-                    }
-                    
-                });
+                public void actionPerformed(ActionEvent ae) {
+                    timeline.justShowSelected =
+                        justShowSelectedCbx.isSelected();
+                    timeline.repaint();
+                }
+
+            });
 
 
             final JButton useSelectedBtn = new JButton("Use selected");
             useSelectedBtn.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        timeline.setDatedThings(timeline.getSelected());
-                    }
-                    
-                });
+                public void actionPerformed(ActionEvent ae) {
+                    timeline.setDatedThings(timeline.getSelected());
+                }
+
+            });
 
 
             final JButton resetBtn = new JButton("Reset");
             resetBtn.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        timeline.setDatedThings(dates);
-                    }
-                });
+                public void actionPerformed(ActionEvent ae) {
+                    timeline.setDatedThings(dates);
+                }
+            });
 
-            final JTextField searchFld  = new JTextField();
+            final JTextField searchFld = new JTextField();
             searchFld.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        List toks = StringUtil.split(searchFld.getText().trim(),",",true,true);
-                        List selected = new ArrayList();
-                        for(int i=0;i<dates.size();i++) {
-                            DatedObject datedObject = (DatedObject) dates.get(i);
-                            boolean ok = true;
-                            for(int tokIdx=0;tokIdx<toks.size();tokIdx++) {
-                                String s = (String) toks.get(tokIdx);
-                                boolean not = s.startsWith("!");
-                                if(not) s = s.substring(0);
-                                boolean contains  = datedObject.getObject().toString().indexOf(s)>=0;
-                                if(not) contains = !contains;
-                                //                                if(i==0) System.err.println ("s:" + s + " " + not);
-                                if(!contains) {
-                                    ok = false;
-                                    break;
-                                }
+                public void actionPerformed(ActionEvent ae) {
+                    List toks = StringUtil.split(searchFld.getText().trim(),
+                                    ",", true, true);
+                    List selected = new ArrayList();
+                    for (int i = 0; i < dates.size(); i++) {
+                        DatedObject datedObject = (DatedObject) dates.get(i);
+                        boolean     ok          = true;
+                        for (int tokIdx = 0; tokIdx < toks.size(); tokIdx++) {
+                            String  s   = (String) toks.get(tokIdx);
+                            boolean not = s.startsWith("!");
+                            if (not) {
+                                s = s.substring(0);
                             }
-                            if(ok)  selected.add(datedObject);
+                            boolean contains =
+                                datedObject.getObject().toString().indexOf(s)
+                                >= 0;
+                            if (not) {
+                                contains = !contains;
+                            }
+                            //                                if(i==0) System.err.println ("s:" + s + " " + not);
+                            if ( !contains) {
+                                ok = false;
+                                break;
+                            }
                         }
-                        timeline.setSelected(selected);
-                    
+                        if (ok) {
+                            selected.add(datedObject);
+                        }
                     }
-                });
-            JComponent bottom = GuiUtils.centerRight(searchFld,GuiUtils.hbox(useSelectedBtn,resetBtn));
+                    timeline.setSelected(selected);
+
+                }
+            });
+            JComponent bottom = GuiUtils.centerRight(searchFld,
+                                    GuiUtils.hbox(useSelectedBtn, resetBtn));
             //            JComponent bottom = searchFld;
-            JDialog dialog = new JDialog((JFrame) null, "Date Selection", true);
-            dialog.getContentPane().add(GuiUtils.centerBottom(timeline.getContents(true),bottom));
+            JDialog dialog = new JDialog((JFrame) null, "Date Selection",
+                                         true);
+            dialog.getContentPane().add(
+                GuiUtils.centerBottom(timeline.getContents(true), bottom));
             dialog.pack();
             dialog.setLocation(new Point(200, 200));
             dialog.show();
 
-        } catch(Throwable thr) {
+        } catch (Throwable thr) {
             thr.printStackTrace();
             return;
         }
+
 
     }
 
