@@ -5,7 +5,8 @@
      user="idv"
      proj="0"
      compress="gzip"
-     port="112"/>
+     port="112"
+     size="1000 1000"/>
   <default
      pattern="AMRC/COMPOSITE"
      key="LATLON"
@@ -1269,6 +1270,76 @@ Note: we can use place="default", etc., to use the default
      loc="0 0"
      size="ALL"
      unit="SRMV"/>
+  <default
+     pattern="EAST/CONUS"
+     key="LATLON"
+     place="CENTER"
+     size="706 850"
+     loc="32 -87"
+     mag="-5 -10"/>
+  <default
+     pattern="EAST/NH"
+     key="LATLON"
+     place="CENTER"
+     size="913 865"
+     loc="22 -71"
+     mag="-8 -16"/>
+  <default
+     pattern="EAST/SH"
+     key="LATLON"
+     place="CENTER"
+     size="913 865"
+     loc="-32 -71"
+     mag="-8 -16"/>
+  <default
+     pattern="EAST/FD"
+     key="LATLON"
+     place="CENTER"
+     size="983 947"
+     loc="0 -72"
+     mag="-11 -22"/>
+  <default
+     pattern="GOESEAST/WH-1KVIS"
+     key="LINELE"
+     place="CENTER"
+     size="1090 692"
+     loc="5200 3464"
+     mag="-10 -10"/>
+  <default
+     pattern="GOESEAST/WH-4KVIS"
+     key="LINELE"
+     place="CENTER"
+     size="908 577"
+     loc="1300 866"
+     mag="-3 -3"/>
+  <default
+     pattern="GOESEAST/WH-4K39"
+     key="LINELE"
+     place="CENTER"
+     size="908 577"
+     loc="1300 866"
+     mag="-3 -3"/>
+  <default
+     pattern="GOESEAST/WH-4KWV"
+     key="LINELE"
+     place="CENTER"
+     size="908 577"
+     loc="1300 866"
+     mag="-3 -3"/>
+  <default
+     pattern="GOESEAST/WH-4KIR"
+     key="LINELE"
+     place="CENTER"
+     size="908 577"
+     loc="1300 866"
+     mag="-3 -3"/>
+  <default
+     pattern="GOESEAST/WH-4KCO2"
+     key="LINELE"
+     place="CENTER"
+     size="908 577"
+     loc="1300 866"
+     mag="-3 -3"/>
   <default
      pattern="nanuk.eosdis.nasa.gov:NANUK"
      compress="none"
