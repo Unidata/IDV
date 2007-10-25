@@ -79,7 +79,9 @@ import javax.swing.table.JTableHeader;
  * @version $Revision: 1.43 $
  */
 
-public class DataTreeDialog extends JDialog implements ActionListener {
+public class DataTreeDialog implements ActionListener {
+
+
 
 
     /** Window title  to use */
@@ -88,6 +90,8 @@ public class DataTreeDialog extends JDialog implements ActionListener {
     /** Used for the button title/command */
     private static final String CMD_POPUPDATACHOOSER = "Add New Data Source";
 
+
+    private JDialog dialog;
 
     /** Reference to the IDV */
     IntegratedDataViewer idv;
@@ -138,7 +142,10 @@ public class DataTreeDialog extends JDialog implements ActionListener {
                           List operands, List dataSources,
                           List selectedDataChoices) {
 
-        super(idv.getIdvUIManager().getFrame(), TITLE, true);
+
+    //        super(idv.getIdvUIManager().getFrame(), TITLE, true);
+        dialog = GuiUtils.createDialog(null,TITLE,true);
+        //        super(LogUtil.getCurrentWindow(), TITLE, true);
         this.idv         = idv;
         this.operands    = operands;
         this.dataSources = dataSources;
@@ -194,19 +201,19 @@ public class DataTreeDialog extends JDialog implements ActionListener {
             dataTrees.add(dataTree);
         }
         Component contents = doMakeContents();
-        Container cpane    = getContentPane();
+        Container cpane    = dialog.getContentPane();
         cpane.setLayout(new BoxLayout(cpane, BoxLayout.Y_AXIS));
         cpane.add(contents);
         //src may be null
         try {
             Point     loc  = src.getLocationOnScreen();
             Dimension size = src.getSize();
-            setLocation(loc.x + size.width, loc.y - 30);
+            dialog.setLocation(loc.x + size.width, loc.y - 30);
         } catch (Exception exc) {
-            setLocation(50, 50);
+            dialog.setLocation(50, 50);
         }
-        pack();
-        show();
+        dialog.pack();
+        dialog.show();
     }
 
 
@@ -358,7 +365,7 @@ public class DataTreeDialog extends JDialog implements ActionListener {
             idv.getIdvUIManager().removeDataSourceHolder(
                 (DataTree) dataTrees.get(i));
         }
-        hide();
+        dialog.hide();
     }
 
 
@@ -369,7 +376,7 @@ public class DataTreeDialog extends JDialog implements ActionListener {
         dataTrees   = null;
         selected    = null;
         dataSources = null;
-        super.dispose();
+        dialog.dispose();
     }
 
 
