@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+Configuration file for netCDF java.  See docs at:
+http://www.unidata.ucar.edu/software/netcdf-java/reference/RuntimeLoading.html
+-->
+<nj22Config>
+<typedDatasetFactory datatype="Trajectory" class="ucar.unidata.data.sounding.CosmicTrajectoryObsDataset"/>
+</nj22Config>
+

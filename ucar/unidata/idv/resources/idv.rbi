@@ -539,4 +539,10 @@
     <resource location="%IDVPATH%/imagesets.xml"/>
     <resource location="http://www.unidata.ucar.edu/georesources/webcams/images/index.xml"/>
   </resources>
+
+  <resources name="idv.resource.njconfig">
+    <resource location="%USERPATH%/njConfig.xml"/>
+    <resource location="%USERHOME%/.unidata/nj22Config.xml"/>
+    <resource location="%IDVPATH%/njConfig.xml"/>
+  </resources>
 </resourcebundle>

@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -424,8 +425,21 @@ public class DataManager {
                 //                System.err.println ("bad:"+ exc);
             }
         }
-
-
+        ResourceCollection njResources =
+            resourceManager.getResources(IdvResourceManager.RSC_NJCONFIG);
+        StringBuffer errlog = new StringBuffer();
+        for (int i = 0; i < njResources.size(); i++) {
+            try {
+                Object r = njResources.get(i);
+                // System.out.println("resource = " + r);
+                InputStream is = IOUtil.getInputStream(r.toString());
+                if (is != null) {
+                    ucar.nc2.util.RuntimeConfigParser.read(is, errlog);
+                }
+            } catch (Exception exc) {
+                // System.err.println ("bad config:"+ exc);
+            }
+        }
 
     }
 

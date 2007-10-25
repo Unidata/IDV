@@ -405,7 +405,9 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
     public static final IdvResource RSC_PROTOTYPES =
         new IdvResource("idv.resource.prototypes", "Prototypes");
 
-
+    /** Points to netcdf-Java config files */
+    public static final IdvResource RSC_NJCONFIG =
+        new IdvResource("idv.resource.njconfig", "NetCDF-Java Config");
 
 
     /** Maps location table full name  to table */
@@ -1247,7 +1249,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      */
     private void initResourceMacros() {
         macroNames = new String[] {
-            "USERPATH", "SITEPATH", "IDVPATH", "DATAPATH", "APPPATH",
+            "USERPATH", "SITEPATH", "IDVPATH", "DATAPATH", "APPPATH", "USERHOME",
             "VERSION", "VERSION.MAJOR", "VERSION.MINOR", "VERSION.REVISION"
         };
 
@@ -1255,6 +1257,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
         macroValues = new String[] {
             getUserPath(), getSitePath(), getIdvResourcePath(),
             getDataResourcePath(), getAppResourcePath(),
+            getUserHome(),
             getStateManager().getVersion(),
             getStateManager().getVersionMajor(),
             getStateManager().getVersionMinor(),
@@ -1343,6 +1346,16 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      */
     public String getIdvResourcePath() {
         return "/ucar/unidata/idv/resources";
+    }
+
+    /**
+     *  Return the path used to substitute the %USERHOME% macro for in the
+     *  resource list properties.
+     *
+     * @return idv path
+     */
+    public String getUserHome() {
+        return Misc.getSystemProperty("user.home", ".");
     }
 
 
