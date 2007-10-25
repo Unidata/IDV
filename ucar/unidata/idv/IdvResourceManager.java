@@ -407,7 +407,9 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
 
     /** Points to netcdf-Java config files */
     public static final IdvResource RSC_NJCONFIG =
-        new IdvResource("idv.resource.njconfig", "NetCDF-Java Config");
+        new IdvResource("idv.resource.njconfig", 
+                         "NetCDF-Java Config",
+                         "nj.*Config\\.xml$");
 
 
     /** Maps location table full name  to table */
