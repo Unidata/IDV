@@ -11,91 +11,36 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 2.2 release.
+The items below reflect changes since the 2.3 release.
 
 <faq qlabel=" " alabel=" ">
 
 <faqitem cat="Display Changes"></faqitem>
 
-<faqitem q="New Image Displays" id="image_displays">
-Two new image displays were added  to this release for
-displaying satellite and NEXRAD  Level III data - Image
-Display and Image Display over Topography. The old
-image display has been renamed to Image Sequence Display
-to reflect its specialty to that type of data. The Image
-Display will eventually replace the Image Sequence Display
-but the latter has been kept in for backward compatibility.
-It will be removed in a subsequent release.
-</faqitem>
-
-<faqitem cat="Chooser Changes"></faqitem>
-<faqitem q="Timeline Selector" id="timeline_selector">
-Several of the ADDE choosers now have a timeline for selecting
-absolute time intervals.  For more information, see the 
-<a  href="tools/TimeLine.html">User's Guide</a>.
-</faqitem>
-
-<faqitem q="Support for Multi-banded Images" id="multiband">
-The Satellite Image Chooser now supports selecting all bands
-and/or all calibration types for multi-banded datasets.  This
-simplifies loading data for formulas that need multiple channels
-of the image spectrum.
-</faqitem>
-
-<faqitem q="Remote Level II Access" id="tdslevel2">
-You can install an experimental chooser for accessing 
-NEXRAD Level II data from a THREDDS server.  Use the
-[ht::menu Tools {Plugin Manager}] menu to install the
-plugin under the [ht::command Miscellaneous] section.
+<faqitem q="Display Settings" id="displaysetting">
+Users can save properties of display controls in favorite
+display settings.  These can be used when displays are
+created or shared between controls.  See the section
+on <a href="tools/DisplaySettings.html">Display Settings</a>
+in the User's Guide.
 </faqitem>
 
 <faqitem cat="Data Changes"></faqitem>
 
-<faqitem q="Paramater Groups Editor" id="paramgroups">
-There is a new editor in the [ht::menu Tools] menu for
-editing the resources which group parameters for use in
-system and user defined formulas.  The
-<a href="tools/ParameterGroupsEditor.html">Parameter Groups Editor</a>
-allows users to define the specification of "paramater groups", 
-named groups of parameter names.  The parameter groups can be
-used the the Formula Editor to define the parameters that the
-formula needs by default.
+<faqitem q="New diagnostic functions" id="griddiag">
+The Jython library has been enhanced with many new 
+functions.  Most of the GEMPAK grid diagnostics have been
+implemented.  For a complete list, see
+<a href="tools/JythonLib.html">Jython Library Functions</a>.
 </faqitem>
-
-<faqitem q="User Defined Derived Quantities" id="derived">
-IDV users can now make their formulas show up as
-automatically derived quantities in loaded data sources.
-For more information, see the <a  href="tools/Derived.html">
-Derived Quantities</a> section of the User's Guide.
-</faqitem>
-
 
 <faqitem cat="Other Changes"></faqitem>
 
-<faqitem q="Animation Timeline" id="ani_timeline">
-Under the [ht::menu View {Animation Timeline}] menu, there 
-is a new feature that allows you show the Time Animation for each
-data in the view in a graphical manner. 
-</faqitem>
-
-<faqitem q="New Installers" id="new_installers">
-There are two new installers available in the IDV Downloads
-page for Windows Vista and newer Linux systems.  The Windows
-<ul>
-<li><b>Linux</b> We have had to support an
-outdated version of Java 3D on Linux due to lagging
-support for the latest OpenGL versions. The new installer
-with the latest Java 3D should work with older OpenGL
-versions, although you'll get a warning when the IDV
-starts up. This new version of Java 3D contains a
-significant performance improvement for point data
-displays. 
-<li><b>Windows Vista</b> The Windows Vista installer can be used 
-on any Windows XP, 2000 or  Vista system, but may give warnings 
-on systems with older graphics hardware.  Like the new Linux
-installer, it contains the performance improvements in the
-latest Java 3D.
-</ul>
+<faqitem q="Jython Shell" id="jshell">
+A new interactive <a href="tools/JythonShell.html">Jython Shell</a>
+can be accessed under the [ht::menu Edit Formulas {Jython Shell}]
+menu.  This shell allows you to interactively write new procedures,
+load in data and create displays.
 </faqitem>
 
 <faqitem cat="Bug Fixes"></faqitem>
