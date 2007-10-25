@@ -35,6 +35,8 @@ import ucar.unidata.data.imagery.BandInfo;
 import ucar.unidata.data.imagery.ImageDataSource;
 import ucar.unidata.data.imagery.ImageDataset;
 
+import ucar.unidata.idv.ui.IdvUIManager;
+
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.idv.chooser.IdvChooser;
 import ucar.unidata.idv.chooser.IdvChooserManager;
@@ -97,8 +99,10 @@ import javax.swing.event.*;
  *
  * @author Don Murray
  */
-public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
-    .imagery.ImageSelector {
+public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.imagery.ImageSelector {
+
+    private static final int PIXEL_THRESHOLD = 10000000;
+
 
     /** monospaced font */
     private Font monoFont = null;
@@ -260,6 +264,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     /** Input for lat/lon center point */
     protected LatLonWidget latLonWidget;
 
+
     /** Widget for the line magnfication in the advanced section */
     JSlider lineMagSlider;
 
@@ -296,6 +301,8 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
 
     /** Widget for the element  center point in the advanced section */
     protected JTextField centerElementFld;
+
+    private JToggleButton lockBtn;
 
     /** Label used for the line center */
     private JLabel centerLineLbl;
@@ -943,11 +950,13 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 centerLineFld      = new JTextField("", 3);
                 centerElementFld   = new JTextField("", 3);
 
-
-
+                lockBtn = GuiUtils.getToggleImageButton(IdvUIManager.ICON_UNLOCK,IdvUIManager.ICON_LOCK,0,0);
+                lockBtn.setContentAreaFilled(false);
+                lockBtn.setSelected(true);
+                lockBtn.setToolTipText("Unlock to automatically change size when changing magnification");
 
                 final JButton centerPopupBtn =
-                    GuiUtils.getImageButton("/auxdata/ui/icons/Map16.gif",
+                    GuiUtils.getImageButton("/auxdata/ui/icons/MapIcon16.png",
                                             getClass());
                 centerPopupBtn.setToolTipText("Center on current displays");
                 centerPopupBtn.addActionListener(new ActionListener() {
@@ -1027,13 +1036,15 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                         //System.out.println(" changelistener: linesToElements = " + linesToElements);
                         elementMagLbl.setText(StringUtil.padLeft("" + value,
                                 4));
-                        if (value > 0) {
-                            numElementsFld.setText(""
-                                    + (int) (baseNumElements * value));
-                        } else {
-                            numElementsFld.setText(""
-                                    + (int) (baseNumElements
-                                             / (double) -value));
+                        if(!lockBtn.isSelected()) {
+                            if (value > 0) {
+                                numElementsFld.setText(""
+                                                       + (int) (baseNumElements * value));
+                            } else {
+                                numElementsFld.setText(""
+                                                       + (int) (baseNumElements
+                                                                / (double) -value));
+                            }
                         }
                     }
                 };
@@ -1123,7 +1134,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 JPanel sizePanel =
                     GuiUtils.left(GuiUtils.doLayout(new Component[] {
                         numLinesFld,
-                        new JLabel(" X "), numElementsFld, new JLabel(" "),
+                        new JLabel(" X "), numElementsFld, lockBtn,/*new JLabel(" "),*/
                         sizeLbl }, 5, GuiUtils.WT_N, GuiUtils.WT_N));
                 addPropComp(PROP_SIZE, propComp = sizePanel);
             }
@@ -1180,11 +1191,13 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         try {
             int value = getLineMagValue();
             lineMagLbl.setText(StringUtil.padLeft("" + value, 4));
-            if (value > 0) {
-                numLinesFld.setText("" + (int) (baseNumLines * value));
-            } else {
-                numLinesFld.setText("" + (int) (baseNumLines
-                        / (double) -value));
+            if(!lockBtn.isSelected()) {
+                if (value > 0) {
+                    numLinesFld.setText("" + (int) (baseNumLines * value));
+                } else {
+                    numLinesFld.setText("" + (int) (baseNumLines
+                                                    / (double) -value));
+                }
             }
 
             if (value == 1) {                     // special case
@@ -1828,32 +1841,37 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             return null;
         }
         List images = new ArrayList();
-        if (getDoRelativeTimes()) {
-            AddeImageDescriptor firstDescriptor =
-                (AddeImageDescriptor) imageDescriptors.get(0);
-            int[] relativeTimesIndices = getRelativeTimeIndices();
-            for (int i = 0; i < relativeTimesIndices.length; i++) {
-                AddeImageDescriptor aid =
-                    new AddeImageDescriptor(relativeTimesIndices[i],
-                                            firstDescriptor);
-                AddeImageInfo aii = makeImageInfo(aid.getDirectory(), true,
-                                        relativeTimesIndices[i]);
-                aid.setImageInfo(aii);
-                aid.setSource(aii.getURLString());
-                images.add(aid);
+        try {
+            if (getDoRelativeTimes()) {
+                AddeImageDescriptor firstDescriptor =
+                    (AddeImageDescriptor) imageDescriptors.get(0);
+                int[] relativeTimesIndices = getRelativeTimeIndices();
+                for (int i = 0; i < relativeTimesIndices.length; i++) {
+                    AddeImageDescriptor aid =
+                        new AddeImageDescriptor(relativeTimesIndices[i],
+                                                firstDescriptor);
+                    AddeImageInfo aii = makeImageInfo(aid.getDirectory(), true,
+                                                      relativeTimesIndices[i]);
+                    aid.setImageInfo(aii);
+                    aid.setSource(aii.getURLString());
+                    images.add(aid);
+                }
+            } else {
+                List selectedTimes = getSelectedAbsoluteTimes();
+                for (int i = 0; i < selectedTimes.size(); i++) {
+                    AddeImageDescriptor aid =
+                        new AddeImageDescriptor(
+                                                (AddeImageDescriptor) selectedTimes.get(i));
+                    AddeImageInfo aii = makeImageInfo(aid.getDirectory(), false,
+                                                      i);
+                    aid.setImageInfo(aii);
+                    aid.setSource(aii.getURLString());
+                    images.add(aid);
+                }
             }
-        } else {
-            List selectedTimes = getSelectedAbsoluteTimes();
-            for (int i = 0; i < selectedTimes.size(); i++) {
-                AddeImageDescriptor aid =
-                    new AddeImageDescriptor(
-                        (AddeImageDescriptor) selectedTimes.get(i));
-                AddeImageInfo aii = makeImageInfo(aid.getDirectory(), false,
-                                        i);
-                aid.setImageInfo(aii);
-                aid.setSource(aii.getURLString());
-                images.add(aid);
-            }
+        } catch(Exception exc) {
+            logException("Error occured",exc);
+            return null;
         }
         return images;
     }
@@ -3171,7 +3189,23 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         }
 
 
-        ImageDataset ids = new ImageDataset(getDatasetName(), getImageList());
+        List imageList = getImageList();
+        if(imageList==null || imageList.size()==0) return;
+
+        //Check for size threshold
+        AddeImageDescriptor aid =(AddeImageDescriptor) imageList.get(0);
+        int lines = aid.getImageInfo().getLines();
+        int elements = aid.getImageInfo().getElements();
+        int numPixels = lines*elements*imageList.size();
+        if(numPixels > PIXEL_THRESHOLD) {
+            double megs = (4*numPixels)/(double)1000000;
+            megs = ((double)((int)megs*100))/100.0;
+            if(!GuiUtils.askOkCancel("Image Size", "<html>You are about to load " + megs + " MB of imagery.<br>Are you sure you want to do this?</html>")) {
+                return;
+            }
+        }
+
+        ImageDataset ids = new ImageDataset(getDatasetName(), imageList);
         // make properties Hashtable to hand the station name
         // to the AddeImageDataSource
         Hashtable ht = new Hashtable();
@@ -3180,6 +3214,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         if ((bandName != null) && !(bandName.equals(ALLBANDS.toString()))) {
             ht.put(DATA_NAME_KEY, bandName);
         }
+
         makeDataSource(ids, "ADDE.IMAGE", ht);
         saveServerState();
     }
