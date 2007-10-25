@@ -139,7 +139,7 @@ public class ThreddsHandler extends XmlHandler {
     public static final String SERVICE_FILE = "FILE";
 
     /** Service type value for the ncserver service */
-    public static final String SERVICE_NETCDF = "NetcdfServer";
+    public static final String SERVICE_NETCDFSUBSET = "NetcdfSubset";
 
     /** Service type value for the wcs service */
     public static final String SERVICE_WCS = "wcs";
@@ -1777,11 +1777,13 @@ public class ThreddsHandler extends XmlHandler {
 
         Element dataServiceNode;
         dataServiceNode = findServiceNodeForDataset(datasetNode,  /*root,*/
-                false, SERVICE_NETCDF);
+                false, SERVICE_NETCDFSUBSET);
         if (dataServiceNode != null) {
             String serviceUrl = getAbsoluteUrl(dataServiceNode, urlPath);
+            //            System.err.println("service:" + serviceUrl);
             if (serviceUrl != null) {
-                properties.put(DataSource.PROP_SERVICE_NCSERVER, serviceUrl);
+                //TODO:                properties.put(DataSource.PROP_SERVICE_NCSUBSETSERVICE, serviceUrl);
+                //                properties.put(DataSource.PROP_SERVICE_NCSERVER, serviceUrl);
             }
         }
 

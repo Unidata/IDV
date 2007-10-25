@@ -1,4 +1,4 @@
-/*
+/**
  * $Id: GeoGridDataSource.java,v 1.179 2007/06/18 22:28:35 dmurray Exp $
  *
  * Copyright  1997-2004 Unidata Program Center/University Corporation for
@@ -458,7 +458,7 @@ public class GeoGridDataSource extends GridDataSource {
      * @return true if this DataSource can save data to local disk?
      */
     public boolean canSaveDataToLocalDisk() {
-        return !isFileBased() && (getProperty(PROP_SERVICE_NCSERVER) != null);
+        return !isFileBased() && (getProperty(PROP_SERVICE_NCSUBSETSERVICE) != null);
     }
 
 
@@ -605,13 +605,13 @@ public class GeoGridDataSource extends GridDataSource {
 
 
 
-        String ncsUrl = (String) getProperty(PROP_SERVICE_NCSERVER);
-        String wcsUrl = (String) getProperty(PROP_SERVICE_WCS);
-        wcsUrl =
-            wcsUrl
-            + "?service=WCS&version=1.1.0&request=GetCoverage&identifier=grid&format=image/netcdf";
+        String ncsUrl = (String) getProperty(PROP_SERVICE_NCSUBSETSERVICE);
+        //        String wcsUrl = (String) getProperty(PROP_SERVICE_WCS);
+        //        wcsUrl =
+        //            wcsUrl
+        //            + "?service=WCS&version=1.1.0&request=GetCoverage&identifier=grid&format=image/netcdf";
         //&BoundingBox=-71,47,-66,51,urn:ogc:def:crs:OGC:2:84
-        System.out.println(wcsUrl);
+        //        System.out.println(wcsUrl);
         ncsUrl = ncsUrl + "?";
         ncsUrl = ncsUrl + ncsAttrs;
 
