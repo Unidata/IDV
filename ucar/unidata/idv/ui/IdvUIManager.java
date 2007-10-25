@@ -134,6 +134,26 @@ import javax.swing.text.JTextComponent;
 public class IdvUIManager extends IdvManager {
 
 
+    public  static ImageIcon ICON_LOCK;
+
+    /** The icon used to show unlocked legend components */
+    public static ImageIcon ICON_UNLOCK;
+
+
+    /** Icon used to remove displays */
+    public static ImageIcon ICON_REMOVE;
+
+    static {
+        ICON_REMOVE = new ImageIcon(
+            Resource.getImage("/auxdata/ui/icons/Remove16.gif"));
+        ICON_LOCK = new ImageIcon(
+            Resource.getImage("/ucar/unidata/idv/images/lock.gif"));
+        ICON_UNLOCK = new ImageIcon(
+            Resource.getImage("/ucar/unidata/idv/images/unlock.gif"));
+    }
+
+
+
     /** property for support form */
     public static final String PROP_SUPPORT_PACKAGE = "idv.support.package";
 
