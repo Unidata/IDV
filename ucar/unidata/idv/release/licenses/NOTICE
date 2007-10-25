@@ -13,6 +13,9 @@ The JJ2000 project (http://jpeg2000.epfl.ch/)
 The JFreeChart project (http://www.jfree.org/jfreechart/index.php)
 The JCommon project (http://www.jfree.org/jcommon/)
 The L2FProd.com Common Components 6.9.1 (http://common.L2FProd.com)
+The jnumeric package (http://jnumerical.sourceforge.net/)
+JAMA: The Java Matrix Package (http://math.nist.gov/javanumerics/jama/)
+JTEM: Java tools for experimental mathematics (http://www-sfb288.math.tu-berlin.de/~jtem/numericalMethods/index.html)
 
-Please read the different LICENSE files present in the root directory of
-this distribution.
+
+Please read the different LICENSE files present in the root directory of this distribution.
