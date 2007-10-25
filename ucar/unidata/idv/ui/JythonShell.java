@@ -458,8 +458,10 @@ public class JythonShell extends InteractiveShell {
                 sb.append("\n");
             }
 
-            if(autoSelect) {
-                String code = sb.toString();
+            String code = sb.toString().trim();
+            if(autoSelect && 
+                              !code.startsWith("import") &&
+                              !code.startsWith("from")) {
                 int idx;
                 //Strip out any leading assignment
                 while(true) {
