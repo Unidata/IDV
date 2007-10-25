@@ -2257,6 +2257,7 @@ public class JythonManager extends IdvManager implements ActionListener {
                     String doc = func.__doc__.toString().trim();
                     //                    doc = StringUtil.replace(doc,"\n","<br>");
                     doc = StringUtil.replace(doc, "[", "\\[");
+                    doc = StringUtil.replace(doc, "]", "\\]");
                     List toks = StringUtil.split(doc, "\n", true, true);
                     sb.append(StringUtil.join("\n", toks));
                 }
