@@ -240,8 +240,7 @@ public class JythonManager extends IdvManager implements ActionListener {
                 }
             }
             IOUtil.makeDir(pythonLibDir);
-            IOUtil.writeFile(versionFile, "" + version);
-            InputStream is = IOUtil.getInputStream("jythonlib.jar",
+            InputStream is = IOUtil.getInputStream("/jythonlib.jar",
                                  getClass());
             ZipInputStream zin = new ZipInputStream(is);
             ZipEntry       ze  = null;
@@ -255,6 +254,8 @@ public class JythonManager extends IdvManager implements ActionListener {
                     IOUtil.writeTo(zin, new FileOutputStream(dest));
                 }
             }
+            //Now, write out the version file
+            IOUtil.writeFile(versionFile, "" + version);
         } catch (Exception exc) {
             logException("Making jython lib directory", exc);
         }
