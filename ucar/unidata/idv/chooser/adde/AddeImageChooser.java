@@ -101,7 +101,7 @@ import javax.swing.event.*;
  */
 public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.imagery.ImageSelector {
 
-    private static final int PIXEL_THRESHOLD = 10000000;
+    private static final int SIZE_THRESHOLD = 30;
 
 
     /** monospaced font */
@@ -3188,21 +3188,46 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
             return;
         }
 
-
         List imageList = getImageList();
         if(imageList==null || imageList.size()==0) return;
 
         //Check for size threshold
+        final int []dim ={0,0};
         AddeImageDescriptor aid =(AddeImageDescriptor) imageList.get(0);
-        int lines = aid.getImageInfo().getLines();
-        int elements = aid.getImageInfo().getElements();
-        int numPixels = lines*elements*imageList.size();
-        if(numPixels > PIXEL_THRESHOLD) {
-            double megs = (4*numPixels)/(double)1000000;
-            megs = ((double)((int)megs*100))/100.0;
-            if(!GuiUtils.askOkCancel("Image Size", "<html>You are about to load " + megs + " MB of imagery.<br>Are you sure you want to do this?</html>")) {
+        dim[0] = aid.getImageInfo().getElements();
+        dim[1] = aid.getImageInfo().getLines();
+        int numPixels = dim[0]*dim[1]*imageList.size();
+        double megs = (4*numPixels)/(double)1000000;
+        if(megs > SIZE_THRESHOLD) {
+            final JLabel sizeLbl =new JLabel("  "+((double)((int)megs*100))/100.0+" MB");
+            final List[]listHolder ={imageList};
+            final JSlider slider = new JSlider(2,(int)megs, (int)megs);
+            ChangeListener sizeListener =
+                new javax.swing.event.ChangeListener() {
+                    public void stateChanged(ChangeEvent evt) {
+                        JSlider slider = (JSlider) evt.getSource();
+                        int pixelsPerImage = 1000000*slider.getValue()/listHolder[0].size()/4;
+                        double aspect = dim[1]/(double)dim[0];
+                        int nx = (int)Math.sqrt(pixelsPerImage/aspect);
+                        int ny = (int)(aspect*nx);
+                        listHolder[0] = getImageList();
+                        numElementsFld.setText(""+nx);
+                        numLinesFld.setText(""+ny);
+                        AddeImageDescriptor aid =(AddeImageDescriptor) listHolder[0].get(0);
+                        dim[0] = aid.getImageInfo().getElements();
+                        dim[1] = aid.getImageInfo().getLines();
+                        int numPixels = dim[0]*dim[1]*listHolder[0].size();
+                        double nmegs = (4*numPixels)/(double)1000000;
+                        sizeLbl.setText("  "+((double)((int)nmegs*100))/100.0+" MB");
+                    }
+                };
+            slider.addChangeListener(sizeListener);
+            JComponent msgContents = GuiUtils.vbox(new JLabel("<html>You are about to load " + megs + " MB of imagery.<br>Are you sure you want to do this?<p><hr><p></html>"),GuiUtils.inset(GuiUtils.leftCenterRight(new JLabel("Change Size: "),GuiUtils.inset(slider,5),sizeLbl),5));
+
+            if(!GuiUtils.askOkCancel("Image Size", msgContents)) {
                 return;
             }
+            imageList = listHolder[0];
         }
 
         ImageDataset ids = new ImageDataset(getDatasetName(), imageList);
