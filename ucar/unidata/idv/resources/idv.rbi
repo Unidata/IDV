@@ -389,6 +389,13 @@
          value="System"/>
     </resource>
     <resource
+       label="Radar Diagnostics"
+       location="%IDVPATH%/python/radar.py">
+      <property
+         name="category"
+         value="System"/>
+    </resource>
+    <resource
        label="Map routines"
        location="%IDVPATH%/python/maps.py">
       <property
@@ -396,8 +403,11 @@
          value="System"/>
     </resource>
     <resource
-       label="Library of routines for running jython in scripting mode"
+       label="ISL"
        location="%IDVPATH%/isl.py">
+      <property
+         name="category"
+         value="System"/>
       <property
          name="showineditor"
          value="true"/>
