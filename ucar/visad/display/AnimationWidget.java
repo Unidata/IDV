@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.visad.display;
 
 
@@ -32,9 +33,6 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Resource;
 
 import ucar.unidata.xml.XmlUtil;
-
-
-
 
 import ucar.visad.display.*;
 
@@ -125,6 +123,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     /** The property for sharing the animation value */
     public static final String SHARE_VALUE = "SHARE_VALUE";
 
+    /** The property for sharing the animation index */
     public static final String SHARE_INDEX = "SHARE_INDEX";
 
     /** shortcut to the static XmlUtil class */
@@ -406,6 +405,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
 
         JComponent contents = GuiUtils.hflow(buttonList, 1, 0);
         boxPanel = new AnimationBoxPanel(this);
+        boxPanel.addKeyListener(listener);
         if ( !getBoxPanelVisible()) {
             boxPanel.setVisible(false);
         }
@@ -441,7 +441,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
             boxPanel.applyProperties(propertiesDialog.boxPanel);
         }
         setProperties(info);
-        if(andShare) {
+        if (andShare) {
             doShare(CMD_PROPS, info);
         }
     }
@@ -649,8 +649,8 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     public void receiveShareData(Sharable from, Object dataId,
                                  Object[] data) {
 
-        
-        
+
+
 
         if (dataId.equals(SHARE_INDEX)) {
             if (anime != null) {
@@ -767,7 +767,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
      */
     protected void shareValue() {
         if (anime.getNumSteps() > 0) {
-            if(animationInfo.getShareIndex()) {
+            if (animationInfo.getShareIndex()) {
                 shareIndex();
             } else {
                 shareValue(anime.getAniValue());
