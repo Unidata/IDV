@@ -142,10 +142,10 @@ public class GeoUtils {
             }
             //Sometimes we get null here. So check the editor
             address = (String) addressBox.getSelectedItem();
-            //      System.err.println ("address:" + address);
+            //            System.err.println ("address:" + address);
             if (address == null) {
                 address = (String) addressBox.getEditor().getItem();
-                //              System.err.println ("***address:" + address);
+                //                System.err.println ("***address:" + address);
             }
             //              GuiUtils.getInput("Please enter the address to go to",
             //                                "Address: ", address, null, bottom);
@@ -158,7 +158,7 @@ public class GeoUtils {
             }
             if ( !GuiUtils.askYesNo(
                     "Address lookup error",
-                    "<html>Could not find the given address.<p>Do you want to continue?</html>")) {
+                    "<html>Could not find the given address.<p>Do you want to try again?</html>")) {
                 return null;
             }
         }
@@ -230,8 +230,6 @@ public class GeoUtils {
                 }
             }
 
-
-
             //Try yahoo
             if (address.equals("ip") || address.equals("ipaddress")
                     || address.equals("mymachine")) {
@@ -282,6 +280,7 @@ public class GeoUtils {
 
 
 
+            /* Don't do these. yahoo seems pretty good
             //Maybe a zip code
             if ((latString == null) || (lonString == null)) {
                 if ((address.length() == 5)
@@ -308,9 +307,6 @@ public class GeoUtils {
             if ((master != null) && (master[0] != timestamp)) {
                 return null;
             }
-
-
-
 
             if ((latString == null) || (lonString == null)) {
                 String url = "http://rpc.geocoder.us/service/rest?address="
@@ -350,7 +346,7 @@ public class GeoUtils {
                     lonString = matcher.group(2);
                 }
             }
-
+            */
 
             if ((latString != null) && (lonString != null)) {
                 double lat = Misc.decodeLatLon(latString.trim());
@@ -364,8 +360,10 @@ public class GeoUtils {
                 addresses.remove(address);
                 addresses.add(0, address);
                 addressMap.put(address, el.getLatLonPoint());
+                while(addresses.size()>20) {
+                    addresses.remove(addresses.size()-1);
+                }
                 return el.getLatLonPoint();
-
             }
         } catch (Exception exc) {
             LogUtil.logException(
@@ -375,6 +373,16 @@ public class GeoUtils {
         return null;
     }
 
+
+    public static List getSavedAddresses() {
+        return addresses;
+    }
+
+
+    public static void setSavedAddresses(List add) {
+        if(add==null) return;
+        addresses = new ArrayList(add);
+    }
 
     /**
      * Initialize the list of addresses in box

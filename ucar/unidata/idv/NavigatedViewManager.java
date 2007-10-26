@@ -402,8 +402,8 @@ public abstract class NavigatedViewManager extends ViewManager {
 
         JComponent backButton    = getCommandManager().getBackButton();
         JComponent forwardButton = getCommandManager().getForwardButton();
-        backButton.setToolTipText("Undo the viewpoint/projection change");
-        forwardButton.setToolTipText("Redo the viewpoint/projection change");
+        backButton.setToolTipText("<html>Undo the viewpoint/projection change<br>Shift-click to go 10 steps back</html>");
+        forwardButton.setToolTipText("<html>Redo the viewpoint/projection change<br>Shift-click to go 10 steps forward</html>");
 
         JToolBar undoToolbar = new JToolBar(JToolBar.VERTICAL);
         undoToolbar.setFloatable(getToolbarsFloatable());

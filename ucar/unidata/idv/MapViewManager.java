@@ -112,6 +112,9 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 public class MapViewManager extends NavigatedViewManager {
 
+    public static final String PREF_ADDRESS_LIST = "view.address.list";
+    public static final String PREF_ADDRESS_REPROJECT = "view.address.reproject";
+
     /** Preference for autorotate in globe mode */
     public static final String PREF_AUTOROTATE = "View.AutoRotate";
 
@@ -180,7 +183,7 @@ public class MapViewManager extends NavigatedViewManager {
     private PipPanel pipPanel;
 
     /** Do we reproject when we goto address */
-    private JCheckBox addressReprojectCbx;
+    private static JCheckBox addressReprojectCbx;
 
     /** rotate button */
     JToggleButton rotateBtn;
@@ -690,14 +693,17 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
-
     /**
      * Popup the address location dialog and translate to the lat/lon.
      */
     private void goToAddressInner() {
         try {
             if (addressReprojectCbx == null) {
-                addressReprojectCbx = new JCheckBox("Reproject", true);
+                addressReprojectCbx = new JCheckBox("Reproject", getStore().get(PREF_ADDRESS_REPROJECT,true));
+                List savedAddresses = (List)getStore().get(PREF_ADDRESS_LIST);
+                if(savedAddresses!=null) {
+                    GeoUtils.setSavedAddresses(savedAddresses);
+                }
             }
             getIdvUIManager().showWaitCursor();
             LatLonPoint llp = GeoUtils.getLocationOfAddress(
@@ -706,6 +712,10 @@ public class MapViewManager extends NavigatedViewManager {
             if (llp == null) {
                 return;
             }
+
+            getStore().put(PREF_ADDRESS_LIST,GeoUtils.getSavedAddresses());
+            getStore().put(PREF_ADDRESS_REPROJECT,addressReprojectCbx.isSelected());
+
 
             float x      = (float) llp.getLongitude().getValue();
             float y      = (float) llp.getLatitude().getValue();
