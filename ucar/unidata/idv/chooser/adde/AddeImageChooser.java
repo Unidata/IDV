@@ -397,10 +397,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
      */
     private double linesToElements = 1.0;
 
-    /**
-     * Only changes in ele slider should change ratio
-     */
-    private boolean recomputeLineEleRatio = true;
+
 
     /**
      * limit of slider
@@ -1011,7 +1008,10 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
                 ChangeListener lineListener =
                     new javax.swing.event.ChangeListener() {
                     public void stateChanged(ChangeEvent evt) {
-                        lineMagSliderChanged(evt);
+                        if (amSettingProperties) {
+                            return;
+                        }
+                        lineMagSliderChanged(!lockBtn.isSelected());
                     }
                 };
                 ChangeListener elementListener = new ChangeListener() {
@@ -1020,32 +1020,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
                         if (amSettingProperties) {
                             return;
                         }
-                        int value = getElementMagValue();
-                        if (recomputeLineEleRatio
-                                && (Math.abs(value) < SLIDER_MAX)) {
-                            int lineMag = getLineMagValue();
-
-                            if (lineMag > value) {
-                                linesToElements = Math.abs(lineMag
-                                        / (double) value);
-                            } else {
-                                linesToElements = Math.abs((double) value
-                                        / lineMag);
-                            }
-                        }
-                        //System.out.println(" changelistener: linesToElements = " + linesToElements);
-                        elementMagLbl.setText(StringUtil.padLeft("" + value,
-                                4));
-                        if(!lockBtn.isSelected()) {
-                            if (value > 0) {
-                                numElementsFld.setText(""
-                                                       + (int) (baseNumElements * value));
-                            } else {
-                                numElementsFld.setText(""
-                                                       + (int) (baseNumElements
-                                                                / (double) -value));
-                            }
-                        }
+                        elementMagSliderChanged(true);
                     }
                 };
                 JComponent[] lineMagComps =
@@ -1179,19 +1154,44 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
 
 
 
+    private void elementMagSliderChanged(boolean recomputeLineEleRatio) {
+        int value = getElementMagValue();
+        if ((Math.abs(value) < SLIDER_MAX)) {
+            int lineMag = getLineMagValue();
+            if (lineMag > value) {
+                linesToElements = Math.abs(lineMag
+                                           / (double) value);
+            } else {
+                linesToElements = Math.abs((double) value
+                                           / lineMag);
+            }
+        }
+        //System.out.println(" changelistener: linesToElements = " + linesToElements);
+        elementMagLbl.setText(StringUtil.padLeft("" + value,
+                                                 4));
+        if(!lockBtn.isSelected()) {
+            if (value > 0) {
+                numElementsFld.setText(""
+                                       + (int) (baseNumElements * value));
+            } else {
+                numElementsFld.setText(""
+                                       + (int) (baseNumElements
+                                                / (double) -value));
+            }
+        }
+    }
+
+
     /**
      * Handle the line mag slider changed event
      *
      * @param evt  the event
      */
-    private void lineMagSliderChanged(ChangeEvent evt) {
-        if (amSettingProperties) {
-            return;
-        }
+    private void lineMagSliderChanged(boolean autoSetSize) {
         try {
             int value = getLineMagValue();
             lineMagLbl.setText(StringUtil.padLeft("" + value, 4));
-            if(!lockBtn.isSelected()) {
+            if(autoSetSize) {
                 if (value > 0) {
                     numLinesFld.setText("" + (int) (baseNumLines * value));
                 } else {
@@ -1217,11 +1217,10 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
             value                 = (value > 0)
                                     ? value - 1
                                     : value + 1;  // since slider is one off
-
-            recomputeLineEleRatio = false;
+            amSettingProperties = true;
             elementMagSlider.setValue(value);
-            recomputeLineEleRatio = true;
-
+            amSettingProperties = false;
+            elementMagSliderChanged(false);
         } catch (Exception exc) {
             logException("Setting line magnification", exc);
         }
@@ -3199,9 +3198,15 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
         int numPixels = dim[0]*dim[1]*imageList.size();
         double megs = (4*numPixels)/(double)1000000;
         if(megs > SIZE_THRESHOLD) {
-            final JLabel sizeLbl =new JLabel("  "+((double)((int)megs*100))/100.0+" MB");
+            final JCheckBox maintainSize = new JCheckBox("Maintain spatial extent",false);
+            final JLabel sizeLbl =new JLabel(StringUtil.padRight("  "+((double)((int)megs*100))/100.0+" MB",14));
+            GuiUtils.setFixedWidthFont(sizeLbl);
             final List[]listHolder ={imageList};
             final JSlider slider = new JSlider(2,(int)megs, (int)megs);
+            slider.setMajorTickSpacing((int)(megs-2)/10);
+            slider.setMinorTickSpacing((int)(megs-2)/10);
+            //            slider.setPaintTicks(true);
+            slider.setSnapToTicks(true);
             ChangeListener sizeListener =
                 new javax.swing.event.ChangeListener() {
                     public void stateChanged(ChangeEvent evt) {
@@ -3210,15 +3215,21 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
                         double aspect = dim[1]/(double)dim[0];
                         int nx = (int)Math.sqrt(pixelsPerImage/aspect);
                         int ny = (int)(aspect*nx);
+                        if(maintainSize.isSelected()) {
+                            //doesn't work
+                            lineMagSlider.setValue(getLineMagValue()-1);
+                            lineMagSliderChanged(true);
+                        } else {
+                            numElementsFld.setText(""+nx);
+                            numLinesFld.setText(""+ny);
+                        }
                         listHolder[0] = getImageList();
-                        numElementsFld.setText(""+nx);
-                        numLinesFld.setText(""+ny);
                         AddeImageDescriptor aid =(AddeImageDescriptor) listHolder[0].get(0);
                         dim[0] = aid.getImageInfo().getElements();
                         dim[1] = aid.getImageInfo().getLines();
                         int numPixels = dim[0]*dim[1]*listHolder[0].size();
                         double nmegs = (4*numPixels)/(double)1000000;
-                        sizeLbl.setText("  "+((double)((int)nmegs*100))/100.0+" MB");
+                        sizeLbl.setText(StringUtil.padRight("  "+((double)((int)nmegs*100))/100.0+" MB",14));
                     }
                 };
             slider.addChangeListener(sizeListener);
