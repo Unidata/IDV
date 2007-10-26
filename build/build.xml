@@ -195,9 +195,14 @@ line using: and -Dbasedir=/some/other/dir
 
 
     <target name="svnco" depends="init">
+        <exec executable="svn">
+            <arg line="--quiet co svn://zero/idv/trunk ${srcdir}" />
+        </exec>
+<!--
         <svn>
         <checkout url="svn://zero/idv/trunk" destPath="${srcdir}"/>
         </svn>
+-->
     </target>
 
     <target name="visad" depends="init">
@@ -219,9 +224,14 @@ line using: and -Dbasedir=/some/other/dir
         </exec>
         -->
 
+        <exec executable="svn" dir="${libsdir}">
+            <arg line="commit -m idv_build_snapshot visad.jar"/>
+        </exec>
+<!--
         <svn>
         <commit file="${libsdir}/visad.jar" message="idv_build_snapshot"/>
         </svn>
+-->
 
     </target>
 
@@ -245,7 +255,7 @@ line using: and -Dbasedir=/some/other/dir
 
     <target name="stable_release" depends="init">
         <property name="stable_dir"          value="idv_${idv.version}"/>
-        <property name="stable_path"         value="${idv_release_path}/${release_dir}"/>
+        <property name="stable_path"         value="${idv_release_path}/${stable_dir}"/>
         <property name="stable_name"         value="stable"/>
 
 
@@ -331,9 +341,6 @@ line using: and -Dbasedir=/some/other/dir
         </exec>       
         <exec executable="ssh">
             <arg line="conan ${makedir} /content${snapshot_path}/docs/workshop;"/>
-        </exec>       
-        <exec executable="ssh">
-            <arg line="conan ${makedir} /content${snapshot_path}/docs/devworkshop;"/>
         </exec>       
 
         <scp
@@ -442,10 +449,6 @@ line using: and -Dbasedir=/some/other/dir
 
         <exec dir="docs" executable="scp">
              <arg line = "-r workshop conan:/content${snapshot_path}/docs"/>
-        </exec>
-
-        <exec dir="docs" executable="scp">
-             <arg line = "-r devworkshop conan:/content${snapshot_path}/docs"/>
         </exec>
 
         <exec executable="ssh">
