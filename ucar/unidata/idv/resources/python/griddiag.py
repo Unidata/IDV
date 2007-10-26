@@ -2,7 +2,8 @@
    This is the doc for the Grid Diagnostics module.  These functions
    are based on the grid diagnostics from the GEneral Meteorological 
    PAcKage (GEMPAK).  Note that the names are case sensitive and some
-   are named slightly different from GEMPAK functions.
+   are named slightly different from GEMPAK functions to avoid conflicts
+   with Jython built-ins (e.g. str).
    <P>
    In the following operators, scalar operands are named Si and 
    vector operands are named Vi.  Lowercase u and v refer to the
@@ -107,10 +108,10 @@ def ddy(S):
 def defr(V):
   """ Total deformation  
   <div class=jython>
-      DEF ( V ) = ( STR (V) ** 2 + SHR (V) ** 2 ) ** .5 
+      DEF ( V ) = ( STRD (V) ** 2 + SHR (V) ** 2 ) ** .5 
   </div>
   """
-  return mag(str(V),shr(v))
+  return mag(strd(V),shr(v))
   
 def div(V):
   """ Horizontal Divergence 
@@ -196,10 +197,10 @@ def shr(V):
   """
   return add(ddx(vr(V)),ddy(ur(V)))
 
-def str(V):
+def strd(V):
   """ Stretching Deformation 
   <div class=jython>
-      STR ( V ) = DDX ( u ) - DDY ( v ) 
+      STRD ( V ) = DDX ( u ) - DDY ( v ) 
   </div>
   """
   return sub(ddx(ur(V)),ddy(vr(V)))
