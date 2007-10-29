@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -5788,11 +5789,12 @@ public class GuiUtils {
      */
     public static void scrollToTop(final JEditorPane editor) {
         SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    try {
-                        editor.scrollRectToVisible(new Rectangle(1, 1, 1, 1));
-                } catch(Exception exc) {}
-                }});
+            public void run() {
+                try {
+                    editor.scrollRectToVisible(new Rectangle(1, 1, 1, 1));
+                } catch (Exception exc) {}
+            }
+        });
     }
 
 
@@ -6549,6 +6551,9 @@ public class GuiUtils {
         /** maps component to key */
         Hashtable map = new Hashtable();
 
+        /** _more_          */
+        Hashtable keyMap = new Hashtable();
+
         /**
          * ctor
          */
@@ -6613,6 +6618,7 @@ public class GuiUtils {
          * @return The component
          */
         public Component add(String layoutKey, Component comp) {
+            keyMap.put(layoutKey, layoutKey);
             map.put(comp, layoutKey);
             return super.add(layoutKey, comp);
         }
@@ -6681,6 +6687,16 @@ public class GuiUtils {
             return map.get(comp) != null;
         }
 
+        /**
+         * _more_
+         *
+         * @param object _more_
+         *
+         * @return _more_
+         */
+        public boolean containsKey(Object object) {
+            return keyMap.get(object) != null;
+        }
 
         /**
          * Show the component
@@ -6706,6 +6722,10 @@ public class GuiUtils {
          */
         public void remove(Component comp) {
             super.remove(comp);
+            Object key = map.get(comp);
+            if (key != null) {
+                keyMap.remove(key);
+            }
             map.remove(comp);
         }
     }
@@ -6866,6 +6886,7 @@ public class GuiUtils {
 
 
 }
+
 
 
 
