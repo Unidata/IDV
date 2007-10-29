@@ -102,6 +102,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import javax.media.j3d.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
@@ -271,6 +272,11 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         LogUtil.setDialogManager(this);
         checkSystem();
         HTTPClient.CookieModule.setCookiePolicyHandler(null);
+        VirtualUniverse.addRenderingErrorListener(new RenderingErrorListener() {
+                public void errorOccurred(RenderingError err) {
+                    LogUtil.userErrorMessage("<html>A Java3D rendering error occurred:<br>"+ err.getErrorMessage() +"<br>" +(err.getDetailMessage()!=null?err.getDetailMessage():""));
+                }
+            });
         super.setIdv(this);
 
         if ( !interactiveMode) {
