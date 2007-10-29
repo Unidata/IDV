@@ -46,6 +46,55 @@
     </resource>
 
     <resource
+       label="Component Group&gt;Tabs"
+       location="%IDVPATH%/skins/componentgroup.xml">
+      <property
+         name="layout"
+         value="tabs"/>
+    </resource>
+    <resource
+       label="Component Group&gt;Tree"
+       location="%IDVPATH%/skins/componentgroup.xml">
+      <property
+         name="layout"
+         value="tree"/>
+    </resource>
+
+    <resource
+       label="Component Group&gt;One column grid"
+       location="%IDVPATH%/skins/componentgroup.xml">
+      <property
+         name="layout"
+         value="gridbag"/>
+      <property
+         name="layout_columns"
+         value="1"/>
+    </resource>
+
+    <resource
+       label="Component Group&gt;Two column grid"
+       location="%IDVPATH%/skins/componentgroup.xml">
+      <property
+         name="layout"
+         value="gridbag"/>
+      <property
+         name="layout_columns"
+         value="2"/>
+    </resource>
+
+    <resource
+       label="Component Group&gt;Three column grid"
+       location="%IDVPATH%/skins/componentgroup.xml">
+      <property
+         name="layout"
+         value="gridbag"/>
+      <property
+         name="layout_columns"
+         value="3"/>
+    </resource>
+
+
+    <resource
        label="Test"
        location="%IDVPATH%/skins/testskin.xml">
       <property
