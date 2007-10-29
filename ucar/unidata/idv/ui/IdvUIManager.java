@@ -3695,6 +3695,11 @@ public class IdvUIManager extends IdvManager {
 
 
 
+    public IdvWindow createNewWindow(List viewManagers, boolean notifyCollab, String title, String skinPath,
+                                     Element root) {
+        return createNewWindow(viewManagers, notifyCollab, title, skinPath, root, true, null);
+    }
+
 
     /**
      * Create a new IdvWindow with the lsit of ViewManager-s and the xml skin.
