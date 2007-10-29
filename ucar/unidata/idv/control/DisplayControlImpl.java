@@ -3633,6 +3633,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
     }
 
+
     /**
      * This is called to inform this display control that its gui has been exported out
      * of some other component (ex: the MultiDisplayControl).
@@ -4339,6 +4340,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         List items = new ArrayList();
         getViewMenuItems(items, true);
         getIdv().getIdvUIManager().addViewMenuItems(this, items);
+        if(componentHolder!=null) {
+            items.add(GuiUtils.makeMenuItem("Undock", componentHolder,
+                                            "undockControl"));
+        }
         GuiUtils.makeMenu(menu, items);
         Msg.translateTree(menu);
     }
@@ -10181,6 +10186,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         return getShowInTabs() && componentHolder==null;
     }
 
+    public boolean canBeDocked() {
+        return  componentHolder==null;
+    }
+
 
     /**
      *  Set the Version property.
@@ -10474,6 +10483,8 @@ Set the ComponentHolder property.
 **/
 public void setComponentHolder (IdvComponentHolder value) {
 	componentHolder = value;
+        if(componentHolder!=null) {
+        }
 }
 
 /**

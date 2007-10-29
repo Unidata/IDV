@@ -100,6 +100,9 @@ public class IdvComponentGroup extends ComponentGroup {
             for (int i = 0; i < displayControls.size(); i++) {
                 DisplayControlImpl dc =
                     (DisplayControlImpl) displayControls.get(i);
+                if(dc.getComponentHolder()!=null && dc.getComponentHolder().getParent()==this) {
+                    continue;
+                }
                 viewItems.add(GuiUtils.makeMenuItem(dc.getLabel(), this,
                         "importDisplayControl", dc));
             }
@@ -124,6 +127,9 @@ public class IdvComponentGroup extends ComponentGroup {
         for (int i = 0; i < displayControls.size(); i++) {
             DisplayControlImpl dc =
                 (DisplayControlImpl) displayControls.get(i);
+            if(dc.getComponentHolder()!=null && dc.getComponentHolder().getParent()==this) {
+                continue;
+            }
             importDisplayControl(dc);
         }
     }
@@ -138,6 +144,7 @@ public class IdvComponentGroup extends ComponentGroup {
         if (dc.getComponentHolder() != null) {
             dc.getComponentHolder().removeDisplayControl(dc);
         }
+        idv.getIdvUIManager().getViewPanel().removeDisplayControl(dc);
         dc.guiImported();
         addComponent(new IdvComponentHolder(idv, dc));
     }

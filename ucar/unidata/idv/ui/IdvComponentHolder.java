@@ -28,6 +28,11 @@ import ucar.unidata.idv.*;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.ui.ComponentHolder;
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.GuiUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 import javax.swing.*;
 
@@ -59,9 +64,12 @@ public class IdvComponentHolder extends ComponentHolder {
         this.idv    = idv;
         this.object = object;
         if (object instanceof DisplayControl) {
-            ((DisplayControlImpl) object).setComponentHolder(this);
+            DisplayControlImpl control = (DisplayControlImpl) object;
+            control.setComponentHolder(this);
+            control.setShowInTabs(false);
+            control.setMakeWindow(false);
+            control.guiImported();
         }
-
     }
 
     /**
@@ -114,6 +122,35 @@ public class IdvComponentHolder extends ComponentHolder {
             doRemove();
         }
     }
+
+
+    public void undockControl() {
+        DisplayControlImpl control = (DisplayControlImpl) object;
+        object = null;
+        control.setComponentHolder(null);
+        control.setShowInTabs(false);
+        control.setMakeWindow(true);
+        control.guiExported();
+        //control.popup(null);
+        doRemove();
+    }
+
+
+    protected List getPopupMenuItems(List items) {
+        if(object instanceof DisplayControl) {
+            items.add(GuiUtils.makeMenuItem("Undock " + getName(), this,
+                                            "undockControl"));
+        }
+
+
+        items.add(GuiUtils.makeMenuItem("Remove " + getName(), this,
+                                        "removeDisplayComponent"));
+
+
+
+        return items;
+    }
+
 
     /**
      * _more_

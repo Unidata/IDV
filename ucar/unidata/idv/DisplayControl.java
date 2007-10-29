@@ -530,6 +530,8 @@ public interface DisplayControl extends Sharable {
 
     public boolean shouldBeDocked();
 
+    public boolean canBeDocked();
+
     /**
      * Set whether to show this control in the main tabs
      *

@@ -208,6 +208,21 @@ public class ComponentGroup extends ComponentHolder {
      */
     protected List getPopupMenuItems(List items) {
         super.getPopupMenuItems(items);
+        List subItems = new ArrayList();
+
+        for (int i = 0; i < displayComponents.size(); i++) {
+            ComponentHolder comp = (ComponentHolder) displayComponents.get(i);
+            List compItems = new ArrayList();
+            comp.getPopupMenuItems(compItems);
+            subItems.add(GuiUtils.makeMenu(comp.getName(), compItems));
+        }
+
+
+        if(subItems.size()>0) {
+            items.add(GuiUtils.makeMenu("Components", subItems));
+        }
+
+
         //        items.add(GuiUtils.makeMenuItem("Remove Group", this,
         //                                        "removeDisplayComponent"));
         //        items.add(GuiUtils.MENU_SEPARATOR);

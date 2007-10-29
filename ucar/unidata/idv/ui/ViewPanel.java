@@ -324,12 +324,13 @@ public class ViewPanel extends IdvManager {
      * @param forceShow If true then show the component in the window no matter what
      */
     private void addControlTab(DisplayControl control, boolean forceShow) {
-        if ( !control.getShowInTabs()) {
+        if (!control.canBeDocked() || !control.shouldBeDocked()) {
             return;
         }
+
         ControlInfo controlInfo = (ControlInfo) controlToInfo.get(control);
         if (controlInfo != null) {
-            System.err.println("Already have it");
+            //            System.err.println("Already have it");
             return;
         }
         //For now cheat a little with the cast
@@ -474,12 +475,14 @@ public class ViewPanel extends IdvManager {
     public void addViewMenuItems(DisplayControl control, List items) {
         items.add(GuiUtils.MENU_SEPARATOR);
 
-        if (!control.shouldBeDocked()) {
-            items.add(GuiUtils.makeMenuItem("Dock in Dashboard", this,
-                                            "dockControl", control));
-        } else {
-            items.add(GuiUtils.makeMenuItem("Undock from Dashboard", this,
-                                            "undockControl", control));
+        if (control.canBeDocked()) {
+            if (!control.shouldBeDocked()) {
+                items.add(GuiUtils.makeMenuItem("Dock in Dashboard", this,
+                                                "dockControl", control));
+            } else {
+                items.add(GuiUtils.makeMenuItem("Undock from Dashboard", this,
+                                                "undockControl", control));
+            }
         }
     }
 
