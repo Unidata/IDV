@@ -470,9 +470,9 @@ public class IdvXmlUi extends XmlUi {
     }
 
     private IdvComponentGroup makeComponentGroup(Element node) {
-        IdvComponentGroup compGroup = new IdvComponentGroup(idv,XmlUtil.getAttribute(node, "name",""));
-        String layout = XmlUtil.getAttribute(node,"layout",(String) null);
-        if(layout!=null) compGroup.setLayout(layout);
+        IdvComponentGroup compGroup = new IdvComponentGroup(idv,"");
+        compGroup.initWith(node);
+
         NodeList elements = XmlUtil.getElements(node);
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);

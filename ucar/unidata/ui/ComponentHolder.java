@@ -48,6 +48,10 @@ import javax.swing.table.*;
 import javax.swing.tree.*;
 
 
+import org.w3c.dom.Element;
+import ucar.unidata.xml.XmlUtil;
+
+
 /**
  *
  *
@@ -143,6 +147,10 @@ public class ComponentHolder extends PropertiedThing {
         this.contents = contents;
     }
 
+
+    public void initWith(Element node) {
+        setName(XmlUtil.getAttribute(node, "name",""));
+    }
 
     /**
      * _more_
@@ -345,6 +353,11 @@ public class ComponentHolder extends PropertiedThing {
     }
 
 
+    public void print(String tab) {
+        System.err.println (tab + this);
+    }
+
+
     /**
      * _more_
      */
@@ -367,6 +380,9 @@ public class ComponentHolder extends PropertiedThing {
      */
     public void setName(String value) {
         name = value;
+        if (displayLabel != null) {
+            displayLabel.setText(name);
+        }
     }
 
     /**
