@@ -231,6 +231,7 @@ public abstract class PropertiedThing  extends SharableImpl
      * @return _more_
      */
     public boolean showProperties(JComponent where, int x, int y) {
+        if(isShowing()) return false;
         String[]   tabs = getPropertyTabs();
         JComponent contents;
         if (tabs.length <= 1) {
@@ -267,6 +268,7 @@ public abstract class PropertiedThing  extends SharableImpl
                 if (cmd.equals(GuiUtils.CMD_OK)
                         || cmd.equals(GuiUtils.CMD_CANCEL)) {
                     propertiesDialog.dispose();
+                    propertiesDialog = null;
                 }
             }
         };
@@ -282,6 +284,7 @@ public abstract class PropertiedThing  extends SharableImpl
                                                  true);
         propertiesDialog.getContentPane().add(GuiUtils.top(contents));
         propertiesDialog.pack();
+
         if (where != null) {
             Point loc = where.getLocationOnScreen();
             loc.x += x;
@@ -305,7 +308,9 @@ public abstract class PropertiedThing  extends SharableImpl
     }
 
 
-
+    public boolean isShowing() {
+        return propertiesDialog!=null;
+    }
 
     /**
      * Apply properties
