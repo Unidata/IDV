@@ -272,11 +272,12 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         LogUtil.setDialogManager(this);
         checkSystem();
         HTTPClient.CookieModule.setCookiePolicyHandler(null);
+        /*
         VirtualUniverse.addRenderingErrorListener(new RenderingErrorListener() {
                 public void errorOccurred(RenderingError err) {
                     LogUtil.userErrorMessage("<html>A Java3D rendering error occurred:<br>"+ err.getErrorMessage() +"<br>" +(err.getDetailMessage()!=null?err.getDetailMessage():""));
                 }
-            });
+            });*/
         super.setIdv(this);
 
         if ( !interactiveMode) {
