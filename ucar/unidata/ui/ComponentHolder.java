@@ -398,7 +398,8 @@ public class ComponentHolder extends PropertiedThing {
         }
         parent = newParent;
         if (parent != null) {
-            parent.addComponent(this);
+            //Don't do this. Anything that calls setParent should also add the component
+            //            parent.addComponent(this);
         }
     }
 

@@ -79,6 +79,8 @@ public class ComponentGroup extends ComponentHolder {
     /** _more_          */
     public static final int LAYOUT_TREE = 6;
 
+    public static final String[]LAYOUT_NAMES = {"Columns", "Grid","Tabs","Hor. Split","Vert. Split", "Graph", "Tree"};
+
     /** type of layout */
     private int layout = LAYOUT_GRID;
 
@@ -229,25 +231,6 @@ public class ComponentGroup extends ComponentHolder {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param src _more_
-     * @param dest _more_
-     * @param on _more_
-     */
-    private void changeParent(ComponentHolder src, ComponentHolder dest,
-                              boolean on) {
-        if (on) {
-            if (dest == this) {
-                return;
-            }
-            if (dest instanceof ComponentGroup) {
-                src.setParent((ComponentGroup) dest);
-            }
-        }
-    }
-
 
     /**
      * Show dialog
@@ -260,16 +243,7 @@ public class ComponentGroup extends ComponentHolder {
         super.getPropertiesComponents(comps, tabIdx);
         if (tabIdx == 1) {
             if (tree == null) {
-                tree = new DndTree() {
-                    protected void doDrop(DefaultMutableTreeNode sourceNode,
-                                          DefaultMutableTreeNode destNode,
-                                          boolean onNode) {
-                        changeParent(
-                            (ComponentHolder) sourceNode.getUserObject(),
-                            (ComponentHolder) destNode.getUserObject(),
-                            onNode);
-                    }
-                };
+                tree = new MyDndTree();
                 treeSP = GuiUtils.makeScrollPane(tree, 300, 400);
                 tree.setToolTipText(
                     "Right click to show menu; Double click to show properties dialog");
@@ -630,16 +604,18 @@ public class ComponentGroup extends ComponentHolder {
      * @param index Where
      */
     public void addComponent(ComponentHolder displayComponent, int index) {
-        if (displayComponents.contains(displayComponent)) {
-            return;
+        boolean wasMine = displayComponents.contains(displayComponent);
+        if(wasMine) {
+            displayComponents.remove(displayComponent);
         }
-
-        if (index >= 0) {
+        if (index >= 0 && index< displayComponents.size()) {
             displayComponents.add(index, displayComponent);
         } else {
             displayComponents.add(displayComponent);
         }
-        displayComponent.setParent(this);
+        if(!wasMine) {
+            displayComponent.setParent(this);
+        }
         redoLayout();
         subtreeChanged();
 
@@ -651,7 +627,9 @@ public class ComponentGroup extends ComponentHolder {
      */
     protected void subtreeChanged() {
         if (tree != null) {
+            Hashtable paths = GuiUtils.initializeExpandedPathsBeforeChange(tree,(DefaultMutableTreeNode)tree.getModel().getRoot());
             tree.setModel(new DefaultTreeModel(makeTree(null)));
+            GuiUtils.expandPathsAfterChange(tree, paths, (DefaultMutableTreeNode)tree.getModel().getRoot());
         }
         if (parent != null) {
             parent.subtreeChanged();
@@ -846,7 +824,7 @@ public class ComponentGroup extends ComponentHolder {
      * @return string
      */
     public String toString() {
-        return "Group: " + getName();
+        return "Group: " + getName() + " (" +LAYOUT_NAMES[layout]+")";
     }
 
 
@@ -989,7 +967,69 @@ public class ComponentGroup extends ComponentHolder {
     }
 
 
+    public static boolean isAncestor(ComponentGroup parent, ComponentHolder descendant) {
+        if(descendant.getParent()==null) return false;
+        if(descendant==parent) return true;
+        return isAncestor(parent, descendant.getParent());
+    }
 
+
+    /**
+     * _more_
+     *
+     * @param src _more_
+     * @param dest _more_
+     * @param on _more_
+     */
+    private void changeParent(ComponentHolder src, ComponentHolder dest,
+                              boolean on) {
+        if (on && dest instanceof ComponentGroup) {
+            if (dest == src) {
+                return;
+            }
+            src.setParent((ComponentGroup)dest);
+            return;
+        }
+
+        ComponentGroup newParent =  dest.getParent();
+        if(newParent == null) return;
+        if(src.getParent()!=null) {
+            src.getParent().removeComponent(src);
+        }
+        //        System.err.println ("source:" + src + " dest:" + dest + " " + on + " index=" +newParent.indexOf(dest));
+        newParent.addComponent(src, newParent.indexOf(dest)+1);
+    }
+
+
+
+    private class MyDndTree extends DndTree {
+        public MyDndTree() {}
+        protected void doDrop(DefaultMutableTreeNode sourceNode,
+                              DefaultMutableTreeNode destNode,
+                              boolean onNode) {
+            changeParent(
+                         (ComponentHolder) sourceNode.getUserObject(),
+                         (ComponentHolder) destNode.getUserObject(),
+                         onNode);
+        }
+        protected boolean okToDrop(DefaultMutableTreeNode sourceNode,
+                                   DefaultMutableTreeNode destNode,
+                                   boolean onNode) {
+                boolean result = okToDropx(sourceNode, destNode, onNode);
+                //                System.err.println ("oktodrop:" + sourceNode + " " + destNode + " " + result);
+                return result;
+            }
+
+        protected boolean okToDropx(DefaultMutableTreeNode sourceNode,
+                                   DefaultMutableTreeNode destNode,
+                                   boolean onNode) {
+           
+            if(!(sourceNode.getUserObject() instanceof ComponentGroup))return true;
+            ComponentGroup srcGroup = (ComponentGroup) sourceNode.getUserObject();
+            return !isAncestor(srcGroup,(ComponentHolder) destNode.getUserObject());
+        }
+
+    }
 
 }
 
