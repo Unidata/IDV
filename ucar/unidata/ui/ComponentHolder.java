@@ -20,7 +20,12 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.ui;
+
+
+import ucar.unidata.collab.PropertiedThing;
+import ucar.unidata.util.GuiUtils;
 
 
 
@@ -33,16 +38,15 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.tree.*;
 import javax.swing.*;
+import javax.swing.border.*;
+
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
-import ucar.unidata.collab.PropertiedThing;
-import ucar.unidata.util.GuiUtils;
+import javax.swing.tree.*;
 
-import javax.swing.border.*;
 
 /**
  *
@@ -50,82 +54,142 @@ import javax.swing.border.*;
  * @author IDV Development Team
  * @version $Revision: 1.13 $
  */
-public class  ComponentHolder extends PropertiedThing {
+public class ComponentHolder extends PropertiedThing {
+
+    /** _more_          */
     public static final int BORDER_NONE = 0;
+
+    /** _more_          */
     public static final int BORDER_TITLE = 1;
+
+    /** _more_          */
     public static final int BORDER_ETCHED = 2;
+
+    /** _more_          */
     public static final int BORDER_LINE = 3;
 
-    public static final int[]BORDERS = {BORDER_NONE, BORDER_TITLE,BORDER_ETCHED,BORDER_LINE};
-    public static final String[]BORDER_NAMES = {"None", "Title","Etched","Line"};
+    /** _more_          */
+    public static final int[] BORDERS = { BORDER_NONE, BORDER_TITLE,
+                                          BORDER_ETCHED, BORDER_LINE };
+
+    /** _more_          */
+    public static final String[] BORDER_NAMES = { "None", "Title", "Etched",
+            "Line" };
 
 
+    /** _more_          */
     private String name;
+
+    /** _more_          */
     private boolean showLabel = false;
-    protected JLabel displayLabel;    
+
+    /** _more_          */
+    protected JLabel displayLabel;
+
+    /** _more_          */
     protected JComponent displayLabelWrapper;
 
 
 
+    /** _more_          */
     private String category;
 
+    /** _more_          */
     protected ComponentGroup parent;
 
+    /** _more_          */
     private JComponent contents;
 
+    /** _more_          */
     private Rectangle layoutRect;
 
+    /** _more_          */
     protected boolean isRemoved = false;
 
+    /** _more_          */
     private int border = BORDER_NONE;
 
+    /** _more_          */
     private JComboBox borderBox;
-    private JCheckBox showLabelCbx;
-    
 
+    /** _more_          */
+    private JCheckBox showLabelCbx;
+
+
+    /**
+     * _more_
+     */
     public ComponentHolder() {}
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     */
     public ComponentHolder(String name) {
         this.name = name;
     }
 
 
-    public ComponentHolder(String name,JComponent contents) {
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param contents _more_
+     */
+    public ComponentHolder(String name, JComponent contents) {
         this(name);
         this.contents = contents;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public JComponent getContents() {
-        if(contents == null) {
-            contents = doMakeContents();
+        if (contents == null) {
+            contents     = doMakeContents();
             displayLabel = new JLabel(getName());
             displayLabel.setToolTipText("Right click to show menu");
             displayLabel.addMouseListener(new MouseAdapter() {
-                    public void mousePressed(MouseEvent e) {
-                        if (!SwingUtilities.isRightMouseButton(e) && e.getClickCount()>1) {
-                            showProperties(displayLabel,0,0);
-                            return;
-                        }
-                        
-                        if (SwingUtilities.isRightMouseButton(e)) {
-                            showPopup(displayLabel, e.getX(), e.getY());
-                        }
+                public void mousePressed(MouseEvent e) {
+                    if ( !SwingUtilities.isRightMouseButton(e)
+                            && (e.getClickCount() > 1)) {
+                        showProperties(displayLabel, 0, 0);
+                        return;
                     }
-                });
-            displayLabelWrapper = GuiUtils.inset(displayLabel,new Insets(0,5,0,0));
+
+                    if (SwingUtilities.isRightMouseButton(e)) {
+                        showPopup(displayLabel, e.getX(), e.getY());
+                    }
+                }
+            });
+            displayLabelWrapper = GuiUtils.inset(displayLabel,
+                    new Insets(0, 5, 0, 0));
             displayLabelWrapper.setVisible(getShowLabel());
-            contents  = GuiUtils.topCenter(displayLabelWrapper, contents);
+            contents = GuiUtils.topCenter(displayLabelWrapper, contents);
             setBorder(contents);
         }
         return contents;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public JComponent doMakeContents() {
         return null;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getTypeName() {
         return "Component";
     }
@@ -151,53 +215,79 @@ public class  ComponentHolder extends PropertiedThing {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param comps _more_
+     * @param tabIdx _more_
+     */
     protected void getPropertiesComponents(List comps, int tabIdx) {
         super.getPropertiesComponents(comps, tabIdx);
-        if(tabIdx==0) {
-            showLabelCbx  = new JCheckBox("Show Label", showLabel);
-            borderBox= GuiUtils.makeComboBox(BORDERS,BORDER_NAMES,border);
+        if (tabIdx == 0) {
+            showLabelCbx = new JCheckBox("Show Label", showLabel);
+            borderBox = GuiUtils.makeComboBox(BORDERS, BORDER_NAMES, border);
             comps.add(GuiUtils.rLabel("Border:"));
-            comps.add(GuiUtils.left(GuiUtils.hbox(borderBox, GuiUtils.filler(20,5),showLabelCbx)));
+            comps.add(GuiUtils.left(GuiUtils.hbox(borderBox,
+                    GuiUtils.filler(20, 5), showLabelCbx)));
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected boolean applyProperties() {
-        boolean result  = super.applyProperties();
+        boolean result = super.applyProperties();
         if ( !result) {
             return false;
         }
-        int newBorder=  GuiUtils.getValueFromBox(borderBox);
-        if(newBorder!=border) {
+        int newBorder = GuiUtils.getValueFromBox(borderBox);
+        if (newBorder != border) {
             border = newBorder;
-            if(contents != null) {
+            if (contents != null) {
                 setBorder(getContents());
             }
         }
-        if(showLabel!=showLabelCbx.isSelected()) {
+        if (showLabel != showLabelCbx.isSelected()) {
             setShowLabel(showLabelCbx.isSelected());
         }
         return true;
     }
 
 
-    protected void  setBorder(JComponent comp) {
+    /**
+     * _more_
+     *
+     * @param comp _more_
+     */
+    protected void setBorder(JComponent comp) {
         Border theBorder = null;
-        if(border == BORDER_TITLE) {
+        if (border == BORDER_TITLE) {
             theBorder = BorderFactory.createTitledBorder(getName());
-        } else if(border == BORDER_LINE) {
-            theBorder = BorderFactory.createLineBorder(Color.black,1);
-        } else if(border == BORDER_ETCHED) {
+        } else if (border == BORDER_LINE) {
+            theBorder = BorderFactory.createLineBorder(Color.black, 1);
+        } else if (border == BORDER_ETCHED) {
             theBorder = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
-        } 
-        if(comp!=null) {
+        }
+        if (comp != null) {
             comp.setBorder(theBorder);
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     *
+     * @return _more_
+     */
     public DefaultMutableTreeNode makeTree(DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode         node = new  DefaultMutableTreeNode(this);
-        if(parent!=null) parent.add(node);
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(this);
+        if (parent != null) {
+            parent.add(node);
+        }
         return node;
     }
 
@@ -216,7 +306,12 @@ public class  ComponentHolder extends PropertiedThing {
 
 
 
-    public boolean getBeingShown () {
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getBeingShown() {
         return true;
     }
 
@@ -240,125 +335,142 @@ public class  ComponentHolder extends PropertiedThing {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
         return getName();
     }
 
 
+    /**
+     * _more_
+     */
     public void doRemove() {
-        if(isRemoved) return;
+        if (isRemoved) {
+            return;
+        }
         isRemoved = true;
-        if(parent!=null)parent.removeComponent(this);
+        if (parent != null) {
+            parent.removeComponent(this);
+        }
         parent = null;
     }
 
 
-/**
-Set the Name property.
-
-@param value The new value for Name
-**/
-public void setName (String value) {
+    /**
+     * Set the Name property.
+     *
+     * @param value The new value for Name
+     */
+    public void setName(String value) {
         name = value;
-}
-
-/**
-Get the Name property.
-
-@return The Name
-**/
-public String getName () {
-    return name;
-}
-
-
-
-/**
-Set the Parent property.
-
-@param value The new value for Parent
-**/
-public void setParent (ComponentGroup newParent) {
-    if(newParent == parent) return;
-    ComponentGroup oldParent = parent;
-    parent = null;
-    if(oldParent!=null) {
-        oldParent.removeComponent(this);
     }
-    parent = newParent;
-    if(parent!=null) {
-        parent.addComponent(this);
+
+    /**
+     * Get the Name property.
+     *
+     * @return The Name
+     */
+    public String getName() {
+        return name;
     }
-}
 
-/**
-Get the Parent property.
 
-@return The Parent
-**/
-public ComponentGroup getParent () {
+
+    /**
+     * Set the Parent property.
+     *
+     * @param value The new value for Parent
+     *
+     * @param newParent _more_
+     */
+    public void setParent(ComponentGroup newParent) {
+        if (newParent == parent) {
+            return;
+        }
+        ComponentGroup oldParent = parent;
+        parent = null;
+        if (oldParent != null) {
+            oldParent.removeComponent(this);
+        }
+        parent = newParent;
+        if (parent != null) {
+            parent.addComponent(this);
+        }
+    }
+
+    /**
+     * Get the Parent property.
+     *
+     * @return The Parent
+     */
+    public ComponentGroup getParent() {
         return parent;
-}
+    }
 
 
-/**
-Set the LayoutRect property.
+    /**
+     * Set the LayoutRect property.
+     *
+     * @param value The new value for LayoutRect
+     */
+    public void setLayoutRect(Rectangle value) {
+        layoutRect = value;
+    }
 
-@param value The new value for LayoutRect
-**/
-public void setLayoutRect (Rectangle value) {
-	layoutRect = value;
-}
+    /**
+     * Get the LayoutRect property.
+     *
+     * @return The LayoutRect
+     */
+    public Rectangle getLayoutRect() {
+        return layoutRect;
+    }
 
-/**
-Get the LayoutRect property.
+    /**
+     * Set the Category property.
+     *
+     * @param value The new value for Category
+     */
+    public void setCategory(String value) {
+        category = value;
+    }
 
-@return The LayoutRect
-**/
-public Rectangle getLayoutRect () {
-	return layoutRect;
-}
-/**
-Set the Category property.
-
-@param value The new value for Category
-**/
-public void setCategory (String value) {
-	category = value;
-}
-
-/**
-Get the Category property.
-
-@return The Category
-**/
-public String getCategory () {
-	return category;
-}
+    /**
+     * Get the Category property.
+     *
+     * @return The Category
+     */
+    public String getCategory() {
+        return category;
+    }
 
 
 
 
-/**
-Set the ShowLabel property.
-
-@param value The new value for ShowLabel
-**/
-public void setShowLabel (boolean value) {
-	showLabel = value;
-        if(displayLabelWrapper!=null) {
+    /**
+     * Set the ShowLabel property.
+     *
+     * @param value The new value for ShowLabel
+     */
+    public void setShowLabel(boolean value) {
+        showLabel = value;
+        if (displayLabelWrapper != null) {
             displayLabelWrapper.setVisible(getShowLabel());
         }
-}
+    }
 
-/**
-Get the ShowLabel property.
-
-@return The ShowLabel
-**/
-public boolean getShowLabel () {
-	return showLabel;
-}
+    /**
+     * Get the ShowLabel property.
+     *
+     * @return The ShowLabel
+     */
+    public boolean getShowLabel() {
+        return showLabel;
+    }
 
 }
 

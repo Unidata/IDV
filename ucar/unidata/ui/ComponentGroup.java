@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.ui;
 
 
@@ -36,11 +37,12 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.tree.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
+
+import javax.swing.tree.*;
 
 
 
@@ -71,8 +73,10 @@ public class ComponentGroup extends ComponentHolder {
     /** type of layout */
     public static final int LAYOUT_VSPLIT = 4;
 
+    /** _more_          */
     public static final int LAYOUT_GRAPH = 5;
 
+    /** _more_          */
     public static final int LAYOUT_TREE = 6;
 
     /** type of layout */
@@ -148,8 +152,11 @@ public class ComponentGroup extends ComponentHolder {
     private boolean displayOrderChanged;
 
 
-    private  JTree tree;
-    private  JScrollPane treeSP;
+    /** _more_          */
+    private JTree tree;
+
+    /** _more_          */
+    private JScrollPane treeSP;
 
 
     /**
@@ -184,9 +191,10 @@ public class ComponentGroup extends ComponentHolder {
      * @return gui contents
      */
     public JComponent doMakeContents() {
-        tabbedPane = new JTabbedPane();
-        container  = new JPanel(new GridLayout(numRows, numColumns, 5, 5));
-        outerContainer  = GuiUtils.center(container);
+        tabbedPane     = new JTabbedPane();
+        container      = new JPanel(new GridLayout(numRows, numColumns, 5,
+                5));
+        outerContainer = GuiUtils.center(container);
         redoLayout();
         return outerContainer;
     }
@@ -211,16 +219,31 @@ public class ComponentGroup extends ComponentHolder {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String[] getPropertyTabs() {
-        return new String[]{ "Properties" ,"Tree View"};
+        return new String[] { "Properties", "Tree View" };
     }
 
 
-    private void changeParent(ComponentHolder src,  ComponentHolder dest,  boolean on) {
-        if(on) {
-            if(dest == this) return;
-            if(dest instanceof ComponentGroup) {
-                src.setParent((ComponentGroup)dest);
+    /**
+     * _more_
+     *
+     * @param src _more_
+     * @param dest _more_
+     * @param on _more_
+     */
+    private void changeParent(ComponentHolder src, ComponentHolder dest,
+                              boolean on) {
+        if (on) {
+            if (dest == this) {
+                return;
+            }
+            if (dest instanceof ComponentGroup) {
+                src.setParent((ComponentGroup) dest);
             }
         }
     }
@@ -235,33 +258,46 @@ public class ComponentGroup extends ComponentHolder {
     protected void getPropertiesComponents(List comps, int tabIdx) {
 
         super.getPropertiesComponents(comps, tabIdx);
-        if(tabIdx==1) {
-            if(tree==null) {
+        if (tabIdx == 1) {
+            if (tree == null) {
                 tree = new DndTree() {
-                        protected void doDrop(DefaultMutableTreeNode sourceNode,
-                                              DefaultMutableTreeNode destNode, boolean onNode) {
-                            changeParent((ComponentHolder)sourceNode.getUserObject(), (ComponentHolder)destNode.getUserObject(),onNode);
+                    protected void doDrop(DefaultMutableTreeNode sourceNode,
+                                          DefaultMutableTreeNode destNode,
+                                          boolean onNode) {
+                        changeParent(
+                            (ComponentHolder) sourceNode.getUserObject(),
+                            (ComponentHolder) destNode.getUserObject(),
+                            onNode);
+                    }
+                };
+                treeSP = GuiUtils.makeScrollPane(tree, 300, 400);
+                tree.setToolTipText(
+                    "Right click to show menu; Double click to show properties dialog");
+                tree.addMouseListener(new MouseAdapter() {
+                    public void mouseClicked(MouseEvent event) {
+                        TreePath path = tree.getPathForLocation(event.getX(),
+                                            event.getY());
+                        if (path == null) {
+                            return;
                         }
-                    };
-                treeSP = GuiUtils.makeScrollPane(tree,300,400);
-            tree.setToolTipText("Right click to show menu; Double click to show properties dialog");
-            tree.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent event) {
-                TreePath path = tree.getPathForLocation(event.getX(), event.getY());
-                if (path == null) {return;}
-                Object last = path.getLastPathComponent();
-                if (last == null) {return;}
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) last;
-                ComponentHolder comp = (ComponentHolder) node.getUserObject();
+                        Object last = path.getLastPathComponent();
+                        if (last == null) {
+                            return;
+                        }
+                        DefaultMutableTreeNode node =
+                            (DefaultMutableTreeNode) last;
+                        ComponentHolder comp =
+                            (ComponentHolder) node.getUserObject();
 
-                if (SwingUtilities.isRightMouseButton(event)) {
-                    comp.showPopup(treeSP, event.getX(), event.getY());
-                    return;
-                }
-                if(event.getClickCount()>1) {
-                    comp.showProperties(tree,0,0);
-                }
-            }
+                        if (SwingUtilities.isRightMouseButton(event)) {
+                            comp.showPopup(treeSP, event.getX(),
+                                           event.getY());
+                            return;
+                        }
+                        if (event.getClickCount() > 1) {
+                            comp.showProperties(tree, 0, 0);
+                        }
+                    }
                 });
 
             }
@@ -269,7 +305,7 @@ public class ComponentGroup extends ComponentHolder {
             comps.add(new JLabel(""));
             comps.add(treeSP);
             return;
-        } 
+        }
         ButtonGroup bg        = new ButtonGroup();
         boolean     fixedRows = getNumRows() != 0;
         displayOrderChanged = false;
@@ -287,7 +323,7 @@ public class ComponentGroup extends ComponentHolder {
                     ComponentHolder comp =
                         (ComponentHolder) displayList.getSelectedValue();
                     if (comp != null) {
-                        comp.showProperties(displayList,0,0);
+                        comp.showProperties(displayList, 0, 0);
                     }
                 }
             }
@@ -349,7 +385,8 @@ public class ComponentGroup extends ComponentHolder {
                                            layout == LAYOUT_VSPLIT);
         tabLayoutBtn  = new JRadioButton("Tabs ", layout == LAYOUT_TABS);
         gridLayoutBtn = new JRadioButton("Grid ", layout == LAYOUT_GRID);
-        graphLayoutBtn = new JRadioButton("Graph Paper", layout == LAYOUT_GRAPH);
+        graphLayoutBtn = new JRadioButton("Graph Paper",
+                                          layout == LAYOUT_GRAPH);
         treeLayoutBtn = new JRadioButton("Tree Panel", layout == LAYOUT_TREE);
         gridbagLayoutBtn = new JRadioButton("Columns ",
                                             layout == LAYOUT_GRIDBAG);
@@ -369,7 +406,7 @@ public class ComponentGroup extends ComponentHolder {
 
         comps.add(GuiUtils.rLabel("Layout: "));
         comps.add(GuiUtils.left(GuiUtils.hbox(tabLayoutBtn, hsplitLayoutBtn,
-                vsplitLayoutBtn,treeLayoutBtn)));
+                vsplitLayoutBtn, treeLayoutBtn)));
 
         comps.add(GuiUtils.filler());
         comps.add(GuiUtils.left(GuiUtils.hbox(gridLayoutBtn,
@@ -384,7 +421,7 @@ public class ComponentGroup extends ComponentHolder {
 
         comps.add(GuiUtils.filler());
         comps.add(GuiUtils.left(GuiUtils.hbox(graphLayoutBtn,
-                                              GuiUtils.makeButton("Edit", this,"editLayout"))));
+                GuiUtils.makeButton("Edit", this, "editLayout"))));
 
 
 
@@ -397,11 +434,17 @@ public class ComponentGroup extends ComponentHolder {
 
 
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     *
+     * @return _more_
+     */
     public DefaultMutableTreeNode makeTree(DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode         node = super.makeTree(parent);
+        DefaultMutableTreeNode node = super.makeTree(parent);
         for (int i = 0; i < displayComponents.size(); i++) {
-            ComponentHolder comp =
-                (ComponentHolder) displayComponents.get(i);
+            ComponentHolder comp = (ComponentHolder) displayComponents.get(i);
             comp.makeTree(node);
         }
         return node;
@@ -425,9 +468,8 @@ public class ComponentGroup extends ComponentHolder {
                 comps.add(displayComponent);
             }
             if (displayComponent instanceof ComponentGroup) {
-                comps.addAll(
-                    ((ComponentGroup) displayComponent).findComponentsWithType(
-                        compClass));
+                comps.addAll(((ComponentGroup) displayComponent)
+                    .findComponentsWithType(compClass));
             }
         }
         return comps;
@@ -438,7 +480,9 @@ public class ComponentGroup extends ComponentHolder {
      * Layout components
      */
     private void redoLayout() {
-        if(tabbedPane == null) return;
+        if (tabbedPane == null) {
+            return;
+        }
         tabbedPane.removeAll();
         container.setVisible(false);
         container.removeAll();
@@ -478,17 +522,20 @@ public class ComponentGroup extends ComponentHolder {
                 container.add(BorderLayout.CENTER,
                               GuiUtils.doMultiSplitPane(comps, false));
             }
-        }  else if (layout == LAYOUT_GRAPH) {
+        } else if (layout == LAYOUT_GRAPH) {
             container.add(GraphPaperLayout.layout(getLocations()));
-        }  else if (layout == LAYOUT_TREE) {
+        } else if (layout == LAYOUT_TREE) {
             TreePanel treePanel = new TreePanel();
             for (int i = 0; i < displayComponents.size(); i++) {
                 ComponentHolder comp =
                     (ComponentHolder) displayComponents.get(i);
-                if(comp.getName()==null) {
-                    System.err.println ("name is null " + comp.getClass().getName());
+                if (comp.getName() == null) {
+                    System.err.println("name is null "
+                                       + comp.getClass().getName());
                 }
-                treePanel.addComponent(comp.getContents(),comp.getCategory(),comp.getName(),null);
+                treePanel.addComponent(comp.getContents(),
+                                       comp.getCategory(), comp.getName(),
+                                       null);
             }
             container.add(treePanel);
         } else {
@@ -516,8 +563,9 @@ public class ComponentGroup extends ComponentHolder {
             }
             locations.add(
                 new GraphPaperLayout.Location(
-                                              displayComponent.getContents(), displayComponent,
-                    displayComponent.getName(), displayComponent.getLayoutRect()));
+                    displayComponent.getContents(), displayComponent,
+                    displayComponent.getName(),
+                    displayComponent.getLayoutRect()));
         }
         return locations;
     }
@@ -531,13 +579,17 @@ public class ComponentGroup extends ComponentHolder {
         for (int i = 0; i < locations.size(); i++) {
             GraphPaperLayout.Location loc =
                 (GraphPaperLayout.Location) locations.get(i);
-            ComponentHolder componentHolder = (ComponentHolder) loc.getObject();
+            ComponentHolder componentHolder =
+                (ComponentHolder) loc.getObject();
             componentHolder.setLayoutRect(loc.getRect());
         }
     }
 
 
 
+    /**
+     * _more_
+     */
     public void editLayout() {
         graphLayoutBtn.setSelected(true);
         List locations = getLocations();
@@ -577,9 +629,10 @@ public class ComponentGroup extends ComponentHolder {
      * @param displayComponent new one
      * @param index Where
      */
-    public void addComponent(ComponentHolder displayComponent,
-                                    int index) {
-        if(displayComponents.contains(displayComponent)) return;
+    public void addComponent(ComponentHolder displayComponent, int index) {
+        if (displayComponents.contains(displayComponent)) {
+            return;
+        }
 
         if (index >= 0) {
             displayComponents.add(index, displayComponent);
@@ -593,11 +646,14 @@ public class ComponentGroup extends ComponentHolder {
     }
 
 
+    /**
+     * _more_
+     */
     protected void subtreeChanged() {
-        if(tree!=null) {
+        if (tree != null) {
             tree.setModel(new DefaultTreeModel(makeTree(null)));
         }
-        if(parent!=null) {
+        if (parent != null) {
             parent.subtreeChanged();
         }
     }
@@ -690,7 +746,9 @@ public class ComponentGroup extends ComponentHolder {
      * do cleanup
      */
     public void doRemove() {
-        if(isRemoved) return;
+        if (isRemoved) {
+            return;
+        }
         List tmp = new ArrayList(displayComponents);
         for (int i = 0; i < tmp.size(); i++) {
             ((ComponentHolder) tmp.get(i)).doRemove();
@@ -706,6 +764,8 @@ public class ComponentGroup extends ComponentHolder {
      *
      *
      * @param items Holds the menu items
+     *
+     * @param value _more_
      *
      * @return The list of items
      */
@@ -827,19 +887,25 @@ public class ComponentGroup extends ComponentHolder {
         return iconified;
     }
 
+    /**
+     * _more_
+     *
+     * @param l _more_
+     */
     public void setLayout(String l) {
-        if(l.equals("tabs")) 
+        if (l.equals("tabs")) {
             setLayout(LAYOUT_TABS);
-        else if(l.equals("graph")) 
+        } else if (l.equals("graph")) {
             setLayout(LAYOUT_GRAPH);
-        else if(l.equals("gridbag")) 
+        } else if (l.equals("gridbag")) {
             setLayout(LAYOUT_GRIDBAG);
-        else if(l.equals("hsplit")) 
+        } else if (l.equals("hsplit")) {
             setLayout(LAYOUT_HSPLIT);
-        else if(l.equals("vsplit")) 
+        } else if (l.equals("vsplit")) {
             setLayout(LAYOUT_VSPLIT);
-        else if(l.equals("tree")) 
+        } else if (l.equals("tree")) {
             setLayout(LAYOUT_TREE);
+        }
     }
 
     /**
@@ -878,35 +944,45 @@ public class ComponentGroup extends ComponentHolder {
         return gridColumns;
     }
 
-    public static void main(String[]args) {
-        ComponentGroup g1 = new ComponentGroup("Group 1");
-        ComponentGroup g2 = new ComponentGroup("Group 2");
+    /**
+     * _more_
+     *
+     * @param args _more_
+     */
+    public static void main(String[] args) {
+        ComponentGroup  g1 = new ComponentGroup("Group 1");
+        ComponentGroup  g2 = new ComponentGroup("Group 2");
 
-        JComponent lbl;
+        JComponent      lbl;
         ComponentHolder comp;
-        g1.addComponent(comp = new ComponentHolder("label1",lbl=GuiUtils.wrap(new JLabel("label1"))));
+        g1.addComponent(comp = new ComponentHolder("label1",
+                lbl = GuiUtils.wrap(new JLabel("label1"))));
         lbl.setBackground(Color.red);
         comp.setCategory("Foo");
-        g1.addComponent(comp = new ComponentHolder("label2",lbl=GuiUtils.wrap(new JLabel("label2"))));
+        g1.addComponent(comp = new ComponentHolder("label2",
+                lbl = GuiUtils.wrap(new JLabel("label2"))));
         comp.setCategory("Foo");
         lbl.setBackground(Color.blue);
-        g1.addComponent(comp = new ComponentHolder("label3",lbl=GuiUtils.wrap(new JLabel("label3"))));
+        g1.addComponent(comp = new ComponentHolder("label3",
+                lbl = GuiUtils.wrap(new JLabel("label3"))));
         comp.setCategory("Bar");
 
         lbl.setBackground(Color.green);
-        g1.layout =  LAYOUT_TABS;
+        g1.layout = LAYOUT_TABS;
         g1.redoLayout();
 
 
         g2.layout = LAYOUT_HSPLIT;
         g2.addComponent(g1);
-        g2.addComponent(comp = new ComponentHolder("label4",lbl=GuiUtils.wrap(new JLabel("label4"))));
-        lbl.setBackground(Color.cyan);        
-        g2.addComponent(comp = new ComponentHolder("label5",lbl=GuiUtils.wrap(new JLabel("label5"))));
+        g2.addComponent(comp = new ComponentHolder("label4",
+                lbl = GuiUtils.wrap(new JLabel("label4"))));
+        lbl.setBackground(Color.cyan);
+        g2.addComponent(comp = new ComponentHolder("label5",
+                lbl = GuiUtils.wrap(new JLabel("label5"))));
         lbl.setBackground(Color.orange);
 
         JFrame f = new JFrame();
-        f.setLocation(300,300);
+        f.setLocation(300, 300);
         f.getContentPane().add(g2.getContents());
         f.pack();
         f.show();
