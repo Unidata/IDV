@@ -57,6 +57,7 @@ import ucar.unidata.idv.TransectViewManager;
 import ucar.unidata.idv.ViewContext;
 import ucar.unidata.idv.ViewDescriptor;
 import ucar.unidata.idv.ViewManager;
+import ucar.unidata.idv.ui.IdvComponentHolder;
 import ucar.unidata.idv.ui.DataSelector;
 import ucar.unidata.idv.ui.DataTreeDialog;
 import ucar.unidata.idv.ui.IdvUIManager;
@@ -205,6 +206,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
     /** The anim widget */
     private AnimationWidget animationWidget;
+
+    private IdvComponentHolder componentHolder;
 
     /**
      * the String
@@ -5991,6 +5994,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         hasBeenRemoved = true;
 
+        if(componentHolder!=null) {
+            componentHolder.removeDisplayControl(this);
+            componentHolder = null;
+        }
+
         if (detailsFrame != null) {
             detailsFrame.dispose();
             detailsFrame = null;
@@ -10169,6 +10177,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         return showInTabs;
     }
 
+    public boolean shouldBeDocked() {
+        return getShowInTabs() && componentHolder==null;
+    }
 
 
     /**
@@ -10455,6 +10466,24 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             logException("checkImageSize: ", e);
         }
     }
+
+/**
+Set the ComponentHolder property.
+
+@param value The new value for ComponentHolder
+**/
+public void setComponentHolder (IdvComponentHolder value) {
+	componentHolder = value;
+}
+
+/**
+Get the ComponentHolder property.
+
+@return The ComponentHolder
+**/
+public IdvComponentHolder getComponentHolder () {
+	return componentHolder;
+}
 
 
 }

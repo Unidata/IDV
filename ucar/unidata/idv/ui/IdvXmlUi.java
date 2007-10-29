@@ -31,6 +31,8 @@ import org.w3c.dom.NodeList;
 import ucar.unidata.idv.*;
 import ucar.unidata.idv.chooser.IdvChooserManager;
 
+import ucar.unidata.ui.ComponentGroup;
+import ucar.unidata.ui.ComponentHolder;
 import ucar.unidata.ui.FineLineBorder;
 import ucar.unidata.ui.RovingProgress;
 import ucar.unidata.ui.XmlUi;
@@ -238,6 +240,8 @@ public class IdvXmlUi extends XmlUi {
         super.dispose();
     }
 
+    int componentCnt=0;
+
 
     /**
      * Override the base class factory method to create
@@ -318,6 +322,20 @@ public class IdvXmlUi extends XmlUi {
                 LogUtil.logException("Error loading help", exc);
                 return null;
             }
+        }
+
+        if(tagName.equals(IdvUIManager.COMP_COMPONENTGROUP)) {
+            String key = XmlUtil.getAttribute(node,ATTR_ID,""+componentCnt);
+            componentCnt++;
+            ComponentGroup  compGroup = (ComponentGroup) window.getPersistentComponent(key);
+            
+            if(compGroup == null) {
+                compGroup = makeComponentGroup(node);
+                compGroup.setShowLabel(true);
+                window.putPersistentComponent(key, compGroup);
+            } else {
+            }
+            return compGroup.getContents();
         }
 
 
@@ -432,21 +450,6 @@ public class IdvXmlUi extends XmlUi {
 
         if (tagName.equals(IdvUIManager.COMP_MAPVIEW)
                 || tagName.equals(IdvUIManager.COMP_VIEW)) {
-            String         viewId = getAttr(node, "viewid", (String) null);
-            ViewDescriptor viewDescriptor = null;
-            if (viewId != null) {
-                viewDescriptor = new ViewDescriptor(viewId);
-            }
-
-            String properties = idv.getViewManagerProperties();
-            if (properties == null) {
-                properties = "";
-            }
-            String xmlProperties = getAttr(node, "properties", (String) null);
-            if (xmlProperties != null) {
-                properties += ";" + xmlProperties;
-            }
-
             ViewManager viewManager = null;
             if ((viewManagersToUse != null)
                     && (viewManagersToUse.size() > 0)) {
@@ -455,65 +458,115 @@ public class IdvXmlUi extends XmlUi {
             }
 
             if (viewManager == null) {
-                String className = getAttr(node, "class", (String) null);
-                //Handle any problems from the change over  to property based skins
-                if ((className != null) && className.startsWith("${")) {
-                    className = null;
-                }
-
-                if (className != null) {
-                    if (viewDescriptor == null) {
-                        viewDescriptor = new ViewDescriptor();
-                    }
-                    try {
-                        if (viewDescriptor == null) {
-                            viewDescriptor = new ViewDescriptor();
-                        }
-                        Class vmClass = Misc.findClass(className);
-                        Constructor ctor = Misc.findConstructor(vmClass,
-                                               new Class[] {
-                                                   IntegratedDataViewer.class,
-                                ViewDescriptor.class, String.class });
-                        if (ctor == null) {
-                            System.err.println("Could not find ctor for:"
-                                    + vmClass.getName());
-                        } else {
-                            viewManager =
-                                (ViewManager) ctor.newInstance(new Object[] {
-                                    idv,
-                                    viewDescriptor, properties });
-                            viewManager.initFromSkin(node);
-                            idv.getVMManager().addViewManager(viewManager);
-                            viewManagers.add(viewManager);
-                        }
-                    } catch (Exception exc) {
-                        LogUtil.logException("", exc);
-                        System.err.println("Error creating class:"
-                                           + className + " exception: "
-                                           + exc);
-                        exc.printStackTrace();
-                    }
-                }
+                viewManager = getViewManager(node);
             }
 
-
             if (viewManager == null) {
-                viewManager =
-                    idv.getVMManager().createViewManager(viewDescriptor,
-                        properties);
-                if (viewManager == null) {
-                    return new JLabel("Error creating view manager:"
-                                      + viewDescriptor);
-                }
-                viewManagers.add(viewManager);
-            } else {
-                //We don't want to apply the properties to
-                //an unpersisted vm, since it has its own state
-                //viewManager.parseProperties(properties);
+                return new JLabel("Error creating view manager");
             }
             return viewManager.getContents();
         }
         return super.createComponent(node, id);
+    }
+
+    private IdvComponentGroup makeComponentGroup(Element node) {
+        IdvComponentGroup compGroup = new IdvComponentGroup(idv,XmlUtil.getAttribute(node, "name",""));
+        String layout = XmlUtil.getAttribute(node,"layout",(String) null);
+        if(layout!=null) compGroup.setLayout(layout);
+        NodeList elements = XmlUtil.getElements(node);
+        for (int i = 0; i < elements.getLength(); i++) {
+            Element child = (Element) elements.item(i);
+            String  childTagName = child.getTagName();
+            if (childTagName.equals(IdvUIManager.COMP_MAPVIEW)
+                || childTagName.equals(IdvUIManager.COMP_VIEW)) {
+                ViewManager viewManager = getViewManager(child);
+                compGroup.addComponent(new IdvComponentHolder(idv,viewManager));
+            }  else if (childTagName.equals(IdvUIManager.COMP_COMPONENTGROUP)) {
+                IdvComponentGroup childCompGroup = makeComponentGroup(child);
+                compGroup.addComponent(childCompGroup);
+            }  else if (childTagName.equals(IdvUIManager.COMP_DATASELECTOR)) {                
+                compGroup.addComponent(new IdvComponentHolder(idv,idv.getIdvUIManager().createDataSelector(false,                                                                                                      false)));
+            }
+        }
+        return compGroup;
+    }
+
+
+    private ViewManager getViewManager(Element node) {
+        String properties = idv.getViewManagerProperties();
+        if (properties == null) {
+            properties = "";
+        }
+        String xmlProperties = getAttr(node, "properties", (String) null);
+        if (xmlProperties != null) {
+            properties += ";" + xmlProperties;
+        }
+            String         viewId = getAttr(node, "viewid", (String) null);
+            ViewDescriptor viewDescriptor = null;
+            if (viewId != null) {
+                viewDescriptor = new ViewDescriptor(viewId);
+            }
+
+
+
+
+        ViewManager viewManager = null;
+        String className = getAttr(node, "class", (String) null);
+        //Handle any problems from the change over  to property based skins
+        if ((className != null) && className.startsWith("${")) {
+            className = null;
+        }
+
+        if (className != null) {
+            if (viewDescriptor == null) {
+                viewDescriptor = new ViewDescriptor();
+            }
+            try {
+                if (viewDescriptor == null) {
+                    viewDescriptor = new ViewDescriptor();
+                }
+                Class vmClass = Misc.findClass(className);
+                Constructor ctor = Misc.findConstructor(vmClass,
+                                                        new Class[] {
+                                                            IntegratedDataViewer.class,
+                                                            ViewDescriptor.class, String.class });
+                if (ctor == null) {
+                    System.err.println("Could not find ctor for:"
+                                       + vmClass.getName());
+                } else {
+                    viewManager =
+                        (ViewManager) ctor.newInstance(new Object[] {
+                            idv,
+                            viewDescriptor, properties });
+                    viewManager.initFromSkin(node);
+                    idv.getVMManager().addViewManager(viewManager);
+                    viewManagers.add(viewManager);
+                }
+            } catch (Exception exc) {
+                LogUtil.logException("", exc);
+                System.err.println("Error creating class:"
+                                   + className + " exception: "
+                                   + exc);
+                exc.printStackTrace();
+            }
+        }
+
+
+
+        if (viewManager == null) {
+            viewManager =
+                idv.getVMManager().createViewManager(viewDescriptor,
+                                                     properties);
+            if (viewManager == null) {
+                return null;
+            }
+            viewManagers.add(viewManager);
+        } else {
+            //We don't want to apply the properties to
+            //an unpersisted vm, since it has its own state
+            //viewManager.parseProperties(properties);
+        }
+        return viewManager;
     }
 
     /**

@@ -45,6 +45,7 @@ import ucar.unidata.idv.control.MapDisplayControl;
 import ucar.unidata.idv.publish.IdvPublisher;
 
 import ucar.unidata.metdata.NamedStationTable;
+import ucar.unidata.ui.ComponentHolder;
 import ucar.unidata.ui.FineLineBorder;
 import ucar.unidata.ui.Help;
 import ucar.unidata.ui.HelpTipDialog;
@@ -209,6 +210,10 @@ public class IdvUIManager extends IdvManager {
     public static final String COMP_DATASELECTOR = "idv.dataselector";
 
 
+                                                      
+    public static final String COMP_COMPONENTGROUP = "idv.componentgroup";
+
+
     /** The identifier of the  toolbar component */
     public static final String COMP_MEMORYMONITOR = "idv.memorymonitor";
 
@@ -238,6 +243,12 @@ public class IdvUIManager extends IdvManager {
 
     /** Xml tag name for map view manager */
     public static final String COMP_MAPVIEW = "idv.mapview";
+
+    /** Xml tag name for map view manager */
+    public static final String COMP_GLOBEVIEW = "idv.globeview";
+
+    /** Xml tag name for map view manager */
+    public static final String COMP_TRANSECTVIEW = "idv.transectview";
 
     /** Xml tag name for any view manager */
     public static final String COMP_VIEW = "idv.view";
@@ -610,7 +621,7 @@ public class IdvUIManager extends IdvManager {
         if (active != null) {
             List windowComps = active.getComponents();
             if (windowComps != null) {
-                System.err.println("window comps:" + windowComps.size());
+                //                System.err.println("window comps:" + windowComps.size());
                 comps.addAll(windowComps);
             }
         }
@@ -1618,7 +1629,7 @@ public class IdvUIManager extends IdvManager {
                         createNewWindow(null, true,
                                         getWindowTitleFromSkin(skinIndex),
                                         skins.get(skinIndex).toString(),
-                                        skins.getRoot(skinIndex, false));
+                                        skins.getRoot(skinIndex, false),true,null);
                     }
                 });
             }
@@ -1755,7 +1766,7 @@ public class IdvUIManager extends IdvManager {
         Element root = skins.getRoot(skinIndex, false);
         createNewWindow(null, true, getWindowTitleFromSkin(skinIndex),
                         skins.get(skinIndex).toString(),
-                        skins.getRoot(skinIndex, false));
+                        skins.getRoot(skinIndex, false),true,null);
     }
 
 
@@ -1775,8 +1786,24 @@ public class IdvUIManager extends IdvManager {
         List windows = IdvWindow.getWindows();
         for (int i = 0; i < windows.size(); i++) {
             IdvWindow window = (IdvWindow) windows.get(i);
-            menu.add(GuiUtils.makeMenuItem(window.getTitle(), window,
-                                           "show"));
+            Hashtable components = window.getPersistentComponents();
+            if(components.size()>0) {
+                List subItems = new ArrayList();
+                subItems.add(GuiUtils.makeMenuItem("Show", window,
+                                                    "show"));
+
+                for (Enumeration keys =
+                         components.keys(); keys.hasMoreElements(); ) {
+                    Object key = keys.nextElement();
+                    ComponentHolder comp=(ComponentHolder)components.get(key);
+                    subItems.add(GuiUtils.makeMenuItem("Edit Component: " + comp.getName(), comp,"showProperties"));
+                }
+
+                menu.add(GuiUtils.makeMenu(window.getTitle(), subItems));
+            } else {
+                menu.add(GuiUtils.makeMenuItem(window.getTitle(), window,
+                                               "show"));
+            }
         }
     }
 
@@ -3453,6 +3480,7 @@ public class IdvUIManager extends IdvManager {
      */
     protected IdvWindow findWindowThatMatches(List currentWindows,
             WindowInfo windowInfo) {
+        if(windowInfo.getPersistentComponents().size()>0) return null;
         String skinPath = windowInfo.getSkinPath();
         List   newVms   = windowInfo.getViewManagers();
         for (int oldWindowIdx = 0; oldWindowIdx < currentWindows.size();
@@ -3506,6 +3534,7 @@ public class IdvUIManager extends IdvManager {
         for (int newWindowIdx = 0; newWindowIdx < windows.size();
                 newWindowIdx++) {
             WindowInfo windowInfo = (WindowInfo) windows.get(newWindowIdx);
+
             List       newVms     = windowInfo.getViewManagers();
             newViewManagers.removeAll(newVms);
 
@@ -3529,6 +3558,8 @@ public class IdvUIManager extends IdvManager {
                     currentWindows.remove(currentWindow);
                     currentWindow.setIsAMainWindow(
                         windowInfo.getIsAMainWindow());
+                    //                    System.err.println ("comps:" + windowInfo.getPersistentComponents());
+                    currentWindow.setPersistentComponents(windowInfo.getPersistentComponents());
                     currentWindow.setBounds(windowInfo.getBounds());
                 }
             }
@@ -3536,7 +3567,8 @@ public class IdvUIManager extends IdvManager {
                 getVMManager().addViewManagers(newVms);
                 String skinPath = windowInfo.getSkinPath();
                 IdvWindow window = createNewWindow(newVms, skinPath,
-                                       windowInfo.getTitle());
+                                       windowInfo.getTitle(),windowInfo);
+                window.setPersistentComponents(windowInfo.getPersistentComponents());
                 window.setBounds(windowInfo.getBounds());
             }
         }
@@ -3559,6 +3591,27 @@ public class IdvUIManager extends IdvManager {
         }
 
 
+    }
+
+    /**
+     * Get the window title from the skin
+     *
+     * @param index  the skin index
+     *
+     * @return  the title
+     */
+    private String getWindowTitleFromSkin(int index) {
+        XmlResourceCollection skins = getResourceManager().getXmlResources(
+                                          getResourceManager().RSC_SKIN);
+        List names = StringUtil.split(skins.getShortName(index), ">", true,
+                                      true);
+
+        String title = getStateManager().getTitle();
+
+        if (names.size() > 0) {
+            title = title + " - " + StringUtil.join(" - ", names);
+        }
+        return title;
     }
 
 
@@ -3585,27 +3638,19 @@ public class IdvUIManager extends IdvManager {
         return createNewWindow(viewManagers, true);
     }
 
-
     /**
-     * Get the window title from the skin
+     * Create a new IdvWindow with the lsit of ViewManager-s and the xml skin.
      *
-     * @param index  the skin index
+     * @param viewManagers The view managers to put in the window.
+     * @param skinPath The skin
      *
-     * @return  the title
+     * @return The window
      */
-    private String getWindowTitleFromSkin(int index) {
-        XmlResourceCollection skins = getResourceManager().getXmlResources(
-                                          getResourceManager().RSC_SKIN);
-        List names = StringUtil.split(skins.getShortName(index), ">", true,
-                                      true);
-
-        String title = getStateManager().getTitle();
-
-        if (names.size() > 0) {
-            title = title + " - " + StringUtil.join(" - ", names);
-        }
-        return title;
+    public IdvWindow createNewWindow(List viewManagers, String skinPath) {
+        return createNewWindow(viewManagers, skinPath, null,null);
     }
+
+
 
     /**
      * Create a new IdvWindow for the given viewManager. Put the
@@ -3642,21 +3687,12 @@ public class IdvUIManager extends IdvManager {
                 skinName = getWindowTitleFromSkin(i);
             }
         }
+
+
         return createNewWindow(viewManagers, notifyCollab, skinName, path,
-                               root);
+                               root,true,null);
     }
 
-    /**
-     * Create a new IdvWindow with the lsit of ViewManager-s and the xml skin.
-     *
-     * @param viewManagers The view managers to put in the window.
-     * @param skinPath The skin
-     *
-     * @return The window
-     */
-    public IdvWindow createNewWindow(List viewManagers, String skinPath) {
-        return createNewWindow(viewManagers, skinPath, null);
-    }
 
 
 
@@ -3670,12 +3706,12 @@ public class IdvUIManager extends IdvManager {
      * @return The window
      */
     public IdvWindow createNewWindow(List viewManagers, String skinPath,
-                                     String windowTitle) {
+                                     String windowTitle,WindowInfo windowInfo) {
         try {
             Element skinRoot = XmlUtil.getRoot(fixSkinPath(skinPath),
                                    getClass());
             return createNewWindow(viewManagers, false, windowTitle,
-                                   skinPath, skinRoot);
+                                   skinPath, skinRoot, true,windowInfo);
         } catch (Throwable excp) {
             logException("createNewWindow", excp);
             return null;
@@ -3715,7 +3751,7 @@ public class IdvUIManager extends IdvManager {
     public IdvWindow createNewWindow(List viewManagers, boolean notifyCollab,
                                      String skinPath, Element skinRoot) {
         return createNewWindow(viewManagers, notifyCollab, null, skinPath,
-                               skinRoot);
+                               skinRoot,true,null);
     }
 
     /**
@@ -3729,12 +3765,13 @@ public class IdvUIManager extends IdvManager {
      *
      * @return The window.
      */
+    /*
     public IdvWindow createNewWindow(List viewManagers, boolean notifyCollab,
                                      String title, String skinPath,
                                      Element skinRoot) {
         return createNewWindow(viewManagers, notifyCollab, title, skinPath,
-                               skinRoot, true);
-    }
+                               skinRoot, true,null);
+                               }*/
 
     /**
      * Create a new window
@@ -3751,7 +3788,7 @@ public class IdvUIManager extends IdvManager {
      */
     public IdvWindow createNewWindow(List viewManagers, boolean notifyCollab,
                                      String title, String skinPath,
-                                     Element skinRoot, boolean show) {
+                                     Element skinRoot, boolean show,WindowInfo windowInfo) {
 
         try {
             if (title == null) {
@@ -3774,6 +3811,9 @@ public class IdvUIManager extends IdvManager {
             }
 
             IdvWindow window = new IdvWindow(title, getIdv(), isMainWindow);
+            if(windowInfo!=null) {
+                window.setPersistentComponents(windowInfo.getPersistentComponents());
+            }
             window.setType(windowType);
             window.setVisible(false);
             ImageIcon icon =

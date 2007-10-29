@@ -129,6 +129,8 @@ public class IdvWindow extends MultiFrame {
     /** The groups within this window */
     private Hashtable groups = new Hashtable();
 
+    private Hashtable persistentComponents = new Hashtable();
+
     /**
      * Create the window
      *
@@ -594,6 +596,16 @@ public class IdvWindow extends MultiFrame {
 
 
 
+    public void putPersistentComponent(Object key, Object object) {
+        persistentComponents.put(key,object);
+    }
+
+    public Object getPersistentComponent(Object key) {
+        return persistentComponents.get(key);
+    }
+
+
+
     /**
      * An IdvWindow can hold a group of objects, identified
      * by the groupKey. We use this to store the choosers that are in
@@ -767,6 +779,24 @@ public class IdvWindow extends MultiFrame {
         return type;
     }
 
+
+/**
+Set the PersistenceComponents property.
+
+@param value The new value for PersistenceComponents
+**/
+public void setPersistentComponents (Hashtable value) {
+	persistentComponents = value;
+}
+
+/**
+Get the PersistentComponents property.
+
+@return The PersistentComponents
+**/
+public Hashtable getPersistentComponents () {
+	return persistentComponents;
+}
 
 
 

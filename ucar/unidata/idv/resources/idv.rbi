@@ -46,6 +46,14 @@
     </resource>
 
     <resource
+       label="Test"
+       location="%IDVPATH%/skins/testskin.xml">
+      <property
+         name="view_class"
+         value="ucar.unidata.idv.MapViewManager"/>
+    </resource>
+
+    <resource
        label="Map View&gt;Two Panes"
        location="%IDVPATH%/skins/twoviewskin.xml">
       <property

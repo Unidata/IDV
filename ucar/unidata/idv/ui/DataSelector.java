@@ -92,9 +92,6 @@ import javax.swing.tree.*;
 
 public class DataSelector extends DataSourceHolder {
 
-
-
-
     /** Icon for text search field */
     private static ImageIcon cancelIcon;
 
@@ -113,7 +110,6 @@ public class DataSelector extends DataSourceHolder {
 
     /** Layout display/times list horizontally */
     private boolean horizontalOrientation = false;
-
 
 
     /** The size of this DataSelector (defaults to 200x300) */

@@ -34,6 +34,7 @@ import visad.Unit;
 import java.awt.*;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 
 
@@ -61,6 +62,7 @@ public class WindowInfo {
     /** Window title to save */
     private String title;
 
+    private Hashtable persistentComponents = new Hashtable();
 
     /**
      * Ctor
@@ -76,11 +78,14 @@ public class WindowInfo {
         if (window.getViewManagers() != null) {
             this.viewManagers = new ArrayList(window.getViewManagers());
         }
+        this.persistentComponents  =window.getPersistentComponents();
         skinPath      = window.getSkinPath();
         bounds        = window.getBounds();
         isAMainWindow = window.getIsAMainWindow();
         this.title    = window.getTitle();
     }
+
+
 
     /**
      * to string
@@ -184,6 +189,24 @@ public class WindowInfo {
         return title;
     }
 
+
+/**
+Set the PersistentComponents property.
+
+@param value The new value for PersistentComponents
+**/
+public void setPersistentComponents (Hashtable value) {
+	persistentComponents = value;
+}
+
+/**
+Get the PersistentComponents property.
+
+@return The PersistentComponents
+**/
+public Hashtable getPersistentComponents () {
+	return persistentComponents;
+}
 
 
 

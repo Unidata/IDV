@@ -473,7 +473,8 @@ public class ViewPanel extends IdvManager {
      */
     public void addViewMenuItems(DisplayControl control, List items) {
         items.add(GuiUtils.MENU_SEPARATOR);
-        if ( !control.getShowInTabs()) {
+
+        if (!control.shouldBeDocked()) {
             items.add(GuiUtils.makeMenuItem("Dock in Dashboard", this,
                                             "dockControl", control));
         } else {
