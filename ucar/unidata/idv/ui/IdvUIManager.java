@@ -211,7 +211,8 @@ public class IdvUIManager extends IdvManager {
 
 
                                                       
-    public static final String COMP_COMPONENTGROUP = "idv.componentgroup";
+    public static final String COMP_COMPONENT_GROUP = "idv.component.group";
+    public static final String COMP_COMPONENT_HTML = "idv.component.html";
 
 
     /** The identifier of the  toolbar component */

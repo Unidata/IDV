@@ -324,7 +324,7 @@ public class IdvXmlUi extends XmlUi {
             }
         }
 
-        if(tagName.equals(IdvUIManager.COMP_COMPONENTGROUP)) {
+        if(tagName.equals(IdvUIManager.COMP_COMPONENT_GROUP)) {
             String key = XmlUtil.getAttribute(node,ATTR_ID,""+componentCnt);
             componentCnt++;
             ComponentGroup  compGroup = (ComponentGroup) window.getPersistentComponent(key);
@@ -481,7 +481,7 @@ public class IdvXmlUi extends XmlUi {
                 || childTagName.equals(IdvUIManager.COMP_VIEW)) {
                 ViewManager viewManager = getViewManager(child);
                 compGroup.addComponent(new IdvComponentHolder(idv,viewManager));
-            }  else if (childTagName.equals(IdvUIManager.COMP_COMPONENTGROUP)) {
+            }  else if (childTagName.equals(IdvUIManager.COMP_COMPONENT_GROUP)) {
                 IdvComponentGroup childCompGroup = makeComponentGroup(child);
                 compGroup.addComponent(childCompGroup);
             }  else if (childTagName.equals(IdvUIManager.COMP_DATASELECTOR)) {                

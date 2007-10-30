@@ -81,8 +81,14 @@ public class ComponentHolder extends PropertiedThing {
             "Line" };
 
 
+    private String borderLayoutLocation = BorderLayout.CENTER;
+
+
     /** _more_          */
     private String name;
+
+    protected JTextField nameFld;
+    
 
     /** _more_          */
     private boolean showLabel = false;
@@ -196,7 +202,8 @@ public class ComponentHolder extends PropertiedThing {
      * @return _more_
      */
     public JComponent doMakeContents() {
-        return null;
+
+        return contents;
     }
 
     /**
@@ -257,6 +264,12 @@ public class ComponentHolder extends PropertiedThing {
         if ( !result) {
             return false;
         }
+
+        //Apply this in case a subclass has changed anything
+        if (displayLabel != null) {
+            displayLabel.setText(getName());
+        }
+
         int newBorder = GuiUtils.getValueFromBox(borderBox);
         if (newBorder != border) {
             border = newBorder;
@@ -387,7 +400,7 @@ public class ComponentHolder extends PropertiedThing {
     public void setName(String value) {
         name = value;
         if (displayLabel != null) {
-            displayLabel.setText(name);
+            displayLabel.setText(getName());
         }
     }
 
@@ -511,6 +524,24 @@ public class ComponentHolder extends PropertiedThing {
     **/
     public int getBorder () {
 	return border;
+    }
+
+    /**
+       Set the BorderLayoutLocation property.
+
+       @param value The new value for BorderLayoutLocation
+    **/
+    public void setBorderLayoutLocation (String value) {
+	borderLayoutLocation = value;
+    }
+
+    /**
+       Get the BorderLayoutLocation property.
+
+       @return The BorderLayoutLocation
+    **/
+    public String getBorderLayoutLocation () {
+	return borderLayoutLocation;
     }
 
 

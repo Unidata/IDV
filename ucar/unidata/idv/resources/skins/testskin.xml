@@ -17,9 +17,9 @@
              id="idv.favoritesbar"
              place="North"/>
         </panel>
-        <idv.componentgroup name="Group" layout="tabs" id="comp1">
+        <idv.component.group name="Group" layout="tabs" id="comp1">
          <idv.view class="${view_class}"/>
-        </idv.componentgroup>
+        </idv.component.group>
       </panel>
       <idv.statusbar place="South"/>
     </panel>

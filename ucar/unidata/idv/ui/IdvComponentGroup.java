@@ -28,6 +28,8 @@ import ucar.unidata.idv.*;
 import ucar.unidata.idv.control.*;
 
 import ucar.unidata.ui.ComponentGroup;
+import ucar.unidata.ui.HtmlComponent;
+import ucar.unidata.ui.ComponentHolder;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 
@@ -80,7 +82,9 @@ public class IdvComponentGroup extends ComponentGroup {
         newItems.add(GuiUtils.makeMenuItem("Field Selector", this, "makeNew",
                                            IdvUIManager.COMP_DATASELECTOR));
         newItems.add(GuiUtils.makeMenuItem("Tab Group", this, "makeNew",
-                                           IdvUIManager.COMP_COMPONENTGROUP));
+                                           IdvUIManager.COMP_COMPONENT_GROUP));
+        newItems.add(GuiUtils.makeMenuItem("Html Text", this, "makeNew",
+                                           IdvUIManager.COMP_COMPONENT_HTML));
 
 
         items.add(GuiUtils.makeMenu("New", newItems));
@@ -179,7 +183,7 @@ public class IdvComponentGroup extends ComponentGroup {
                 addComponent(new IdvComponentHolder(idv,
                         idv.getIdvUIManager().createDataSelector(false,
                             false)));
-            } else if (what.equals(IdvUIManager.COMP_COMPONENTGROUP)) {
+            } else if (what.equals(IdvUIManager.COMP_COMPONENT_GROUP)) {
                 String name = GuiUtils.getInput("Enter name for tab group",
                                   "Name: ", "Group");
                 if (name == null) {
@@ -188,6 +192,16 @@ public class IdvComponentGroup extends ComponentGroup {
                 IdvComponentGroup group = new IdvComponentGroup(idv, name);
                 group.setLayout(group.LAYOUT_TABS);
                 addComponent(group);
+
+            } else if (what.equals(IdvUIManager.COMP_COMPONENT_HTML)) {
+                String text = GuiUtils.getInput("Enter html",
+                                  "Html: ", "");
+                if (text == null) {
+                    return;
+                }
+                ComponentHolder comp = new HtmlComponent("Html Text",text);
+                comp.setShowLabel(false);
+                addComponent(comp);
             }
         } catch (Exception exc) {
             LogUtil.logException("Error making new " + what, exc);

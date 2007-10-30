@@ -30,6 +30,7 @@ import ucar.unidata.xml.XmlUtil;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -82,8 +83,11 @@ public class ComponentGroup extends ComponentHolder {
     /** _more_          */
     public static final int LAYOUT_TREE = 6;
 
-    public static final String[]LAYOUT_NAMES = {"Columns", "Grid","Tabs","Hor. Split","Vert. Split", "Graph", "Tree"};
-    public static final int[]LAYOUTS = {LAYOUT_GRIDBAG,LAYOUT_GRID,LAYOUT_TABS,LAYOUT_HSPLIT,LAYOUT_VSPLIT,LAYOUT_GRAPH,LAYOUT_TREE};
+    /** _more_          */
+    public static final int LAYOUT_BORDER = 7;
+
+    public static final String[]LAYOUT_NAMES = {"Columns", "Grid","Tabs","Hor. Split","Vert. Split", "Graph", "Tree","Border"};
+    public static final int[]LAYOUTS = {LAYOUT_GRIDBAG,LAYOUT_GRID,LAYOUT_TABS,LAYOUT_HSPLIT,LAYOUT_VSPLIT,LAYOUT_GRAPH,LAYOUT_TREE,LAYOUT_BORDER};
 
     /** type of layout */
     private int layout = LAYOUT_GRID;
@@ -122,14 +126,13 @@ public class ComponentGroup extends ComponentHolder {
     /** properties widget */
     private JTextField dimFld;
 
-    private JTextField nameFld;
-
     /** properties widget */
     private JTextField colFld;
 
     private JComboBox layoutBox;
     private GuiUtils.CardLayoutPanel extraPanel;
 
+    Hashtable borderLayoutLocations;
     /** properties widget */
     private JRadioButton rowBtn;
 
@@ -347,9 +350,28 @@ public class ComponentGroup extends ComponentHolder {
         colFld = new JTextField(getGridColumns() + "", 5);
 
 
+
+        borderLayoutLocations = new Hashtable();
+        List borderComps = new ArrayList();
+        Vector borderLayouts = new Vector(Misc.newList(BorderLayout.CENTER,
+                                                       BorderLayout.NORTH,
+                                                       BorderLayout.EAST,
+                                                       BorderLayout.SOUTH,
+                                                       BorderLayout.WEST));
+        for (int i = 0; i < displayComponents.size(); i++) {
+            ComponentHolder comp = (ComponentHolder) displayComponents.get(i);
+            JComboBox box = new JComboBox(borderLayouts);
+            box.setSelectedItem(comp.getBorderLayoutLocation());
+            borderComps.add(new JLabel(comp.getName())+": ");
+            borderComps.add(box);
+            borderLayoutLocations.put(comp,box);
+        }
+
+
         layoutBox =  GuiUtils.makeComboBox(LAYOUTS, LAYOUT_NAMES, layout);
         extraPanel =  new GuiUtils.CardLayoutPanel();
         extraPanel.add("",new JLabel(" "));
+        extraPanel.add(LAYOUT_BORDER+"",GuiUtils.left(GuiUtils.hbox(borderComps)));
         extraPanel.add(LAYOUT_GRID+"",GuiUtils.left(GuiUtils.hbox(new JLabel("  Dimension: "), GuiUtils.wrap(dimFld),
                                                                   GuiUtils.hbox(colBtn, rowBtn))));
 
@@ -453,6 +475,8 @@ public class ComponentGroup extends ComponentHolder {
                 tabbedPane.add(displayComponent.getName(), comp);
             } else if (layout == LAYOUT_GRID) {
                 container.add(comp);
+            } else if (layout == LAYOUT_BORDER) {
+                container.add(displayComponent.getBorderLayoutLocation(),comp);
             } else {
                 comps.add(comp);
             }
@@ -627,9 +651,15 @@ public class ComponentGroup extends ComponentHolder {
             return false;
         }
         try {
-            if (displayOrderChanged) {
-                displayComponents = new ArrayList(propertiesList);
+
+            for (int i = 0; i < displayComponents.size(); i++) {
+                ComponentHolder comp = (ComponentHolder) displayComponents.get(i);
+                JComboBox box = (JComboBox) borderLayoutLocations.get(comp);
+                if(box!=null) {
+                    comp.setBorderLayoutLocation((String)box.getSelectedItem());
+                }
             }
+
 
             layout =  GuiUtils.getValueFromBox(layoutBox);
             if (rowBtn.isSelected()) {
