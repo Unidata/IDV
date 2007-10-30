@@ -152,6 +152,10 @@ public class ComponentHolder extends PropertiedThing {
         setName(XmlUtil.getAttribute(node, "name",""));
     }
 
+    protected void clearContents() {
+        contents = null;
+    }
+
     /**
      * _more_
      *
@@ -160,24 +164,26 @@ public class ComponentHolder extends PropertiedThing {
     public JComponent getContents() {
         if (contents == null) {
             contents     = doMakeContents();
-            displayLabel = new JLabel(getName());
-            displayLabel.setToolTipText("Right click to show menu");
-            displayLabel.addMouseListener(new MouseAdapter() {
-                public void mousePressed(MouseEvent e) {
-                    if ( !SwingUtilities.isRightMouseButton(e)
-                            && (e.getClickCount() > 1)) {
-                        showProperties(displayLabel, 0, 0);
-                        return;
-                    }
+            if(displayLabel==null) {
+                displayLabel = new JLabel(getName());
+                displayLabel.setToolTipText("Right click to show menu");
+                displayLabel.addMouseListener(new MouseAdapter() {
+                        public void mousePressed(MouseEvent e) {
+                            if ( !SwingUtilities.isRightMouseButton(e)
+                                 && (e.getClickCount() > 1)) {
+                                showProperties(displayLabel, 0, 0);
+                                return;
+                            }
 
-                    if (SwingUtilities.isRightMouseButton(e)) {
-                        showPopup(displayLabel, e.getX(), e.getY());
-                    }
-                }
-            });
-            displayLabelWrapper = GuiUtils.inset(displayLabel,
-                    new Insets(0, 5, 0, 0));
-            displayLabelWrapper.setVisible(getShowLabel());
+                            if (SwingUtilities.isRightMouseButton(e)) {
+                                showPopup(displayLabel, e.getX(), e.getY());
+                            }
+                        }
+                    });
+                displayLabelWrapper = GuiUtils.inset(displayLabel,
+                                                     new Insets(0, 5, 0, 0));
+                displayLabelWrapper.setVisible(getShowLabel());
+            }
             contents = GuiUtils.topCenter(displayLabelWrapper, contents);
             setBorder(contents);
         }
@@ -467,7 +473,6 @@ public class ComponentHolder extends PropertiedThing {
 
 
 
-
     /**
      * Set the ShowLabel property.
      *
@@ -488,6 +493,27 @@ public class ComponentHolder extends PropertiedThing {
     public boolean getShowLabel() {
         return showLabel;
     }
+
+
+    /**
+       Set the Border property.
+
+       @param value The new value for Border
+    **/
+    public void setBorder (int value) {
+	border = value;
+    }
+
+    /**
+       Get the Border property.
+
+       @return The Border
+    **/
+    public int getBorder () {
+	return border;
+    }
+
+
 
 }
 

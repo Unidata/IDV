@@ -27,9 +27,12 @@ import ucar.unidata.idv.*;
 import ucar.unidata.idv.*;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.ui.ComponentHolder;
+import ucar.unidata.ui.ComponentGroup;
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
 import ucar.unidata.util.GuiUtils;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,6 +92,7 @@ public class IdvComponentHolder extends ComponentHolder {
      * _more_
      */
     public void doRemove() {
+        //        Misc.printStack("doRemove",10,null);
         if ((object != null) && (idv != null)) {
             try {
                 if (object instanceof ViewManager) {
@@ -207,6 +211,23 @@ public class IdvComponentHolder extends ComponentHolder {
 
     }
 
+    public void displayControlHasInitialized() {
+        clearContents();
+        getContents().invalidate();
+        ComponentGroup parent = getParent();
+        if(parent!=null) {
+            parent.redoLayout();
+        }
+        Component comp = getContents();
+        //A total hack but...
+        Window w = GuiUtils.getWindow(comp);
+        if(w!=null) {
+            w.doLayout();
+        }
+    }
+
+
+
     /**
      * _more_
      *
@@ -219,6 +240,10 @@ public class IdvComponentHolder extends ComponentHolder {
         if (object instanceof DisplayControlImpl) {
             JComponent inner =
                 (JComponent) ((DisplayControlImpl) object).getOuterContents();
+
+            if(inner ==null) {
+                return new JLabel("");
+            }
             return inner;
         }
         if (object instanceof DataSelector) {

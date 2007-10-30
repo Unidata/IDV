@@ -1051,8 +1051,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         initDone();
 
+        if(componentHolder!=null) {
+            componentHolder.displayControlHasInitialized();
+        }
 
-
+        
 
 
         initializationDone = true;
@@ -3744,6 +3747,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         outerContents = GuiUtils.topCenter(doMakeMenuBar(), mainPanel);
         ucar.unidata.util.Msg.translateTree(outerContents, true);
+
     }
 
     /**

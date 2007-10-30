@@ -272,6 +272,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         LogUtil.setDialogManager(this);
         checkSystem();
         HTTPClient.CookieModule.setCookiePolicyHandler(null);
+
         /*
         VirtualUniverse.addRenderingErrorListener(new RenderingErrorListener() {
                 public void errorOccurred(RenderingError err) {

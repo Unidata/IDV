@@ -330,6 +330,16 @@ public class MapDisplayControl extends DisplayControlImpl {
             applyMapPosition();
             activateDisplays();
             updateLegendLabel();
+            if(newMap.getComponentHolder()!=null) {
+                if(this.getComponentHolder() !=null) {
+                    this.getComponentHolder().setObject(null);
+                    this.getComponentHolder().doRemove();
+                }
+                this.setComponentHolder(newMap.getComponentHolder());
+                newMap.setComponentHolder(null);
+                this.getComponentHolder().setObject(this);
+                this.getComponentHolder().displayControlHasInitialized();
+            }
         } catch (Exception exc) {
             logException("Loading new map", exc);
         }

@@ -190,7 +190,7 @@ public class ComponentGroup extends ComponentHolder {
     public JComponent doMakeContents() {
         tabbedPane     = new JTabbedPane();
         container      = new JPanel(new GridLayout(numRows, numColumns, 5,
-                5));
+                                                   5));
         outerContainer = GuiUtils.center(container);
         redoLayout();
         return outerContainer;
@@ -431,7 +431,7 @@ public class ComponentGroup extends ComponentHolder {
     /**
      * Layout components
      */
-    private void redoLayout() {
+    public void redoLayout() {
         if (tabbedPane == null) {
             return;
         }
@@ -496,7 +496,7 @@ public class ComponentGroup extends ComponentHolder {
                                             GuiUtils.WT_Y, GuiUtils.WT_Y));
         } 
         container.setVisible(true);
-        container.validate();
+        container.revalidate();
     }
 
 
