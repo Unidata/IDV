@@ -111,7 +111,7 @@ def defr(V):
       DEF ( V ) = ( STRD (V) ** 2 + SHR (V) ** 2 ) ** .5 
   </div>
   """
-  return mag(strd(V),shr(v))
+  return mag(strd(V),shr(V))
   
 def div(V):
   """ Horizontal Divergence 
@@ -244,6 +244,16 @@ def vr(V):
   """
   return DerivedGridFactory.getVComponent(V)
 
+def wshr(V, Z, top, bottom):
+  """  Magnitude of the vertical wind shear in a layer
+  <div class=jython>
+      WSHR ( V ) = MAG [ VLDF (V) ] / LDF (Z)
+  </div>
+  """
+  dv = mag(vldf(V,top,bottom))
+  dz = ldf(Z,top,bottom)
+  return dv/dz
+
 # Vector output
 def age(obs,geo):
   """  Ageostrophic wind 
@@ -268,6 +278,32 @@ def dvdy(V):
   </div>
   """
   return ddy(V)
+
+def frnt(S,V):
+  """  Frontogenesis function from theta and the wind
+  <div class=jython>
+      FRNT ( THTA, V ) = 1/2 * MAG ( GRAD (THTA) ) *
+                         ( DEF * COS (2 * BETA) - DIV )
+ 
+                         Where: BETA = ASIN ( (-DDX (THTA) * COS (PSI)
+                                          - DDY (THTA) * SIN (PSI))/
+                                       MAG ( GRAD (THTA) ) )
+                                PSI  = 1/2 ATAN2 ( SHR / STR )
+  </div>
+  """
+  shear = shr(V)
+  strch = strd(V)
+  psi = .5*atn2(shear,strch)
+  dxt = ddx(S)
+  dyt = ddy(S)
+  cosd = cos(psi)
+  sind = sin(psi)
+  gradt = grad(S)
+  mgradt = mag(gradt)
+  a = -cosd*dxt-sind*dyt
+  beta = asin(a/mgradt)
+  frnto = .5*mgradt*(defr(V)*cos(2*beta)-div(V))
+  return frnto
 
 def geo(z):
   """  geostrophic wind from height 

@@ -10,5 +10,6 @@ def makeFloatArray(rows,cols,value):
 def idveval(formula):
   """  evaluate a formula """
   from ucar.unidata.data import DerivedDataChoice
+  derivedDataChoice.setName(formula)
   ddc = DerivedDataChoice(idv,formula)
   return ddc.getData(None)

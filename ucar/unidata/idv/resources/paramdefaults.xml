@@ -387,4 +387,13 @@ specified  -->
      range_max="20.0"
      range_min="0.0"
      unit="inches"/>
+  <param ci_base="0.0" 
+     name="frnt.*"
+     ci_interval="1" 
+     ci_max="20.0" 
+     ci_min="-20.0" 
+     range_max="5.0" 
+     range_min="-5.0" 
+     table="VisAD" 
+     unit="K/(100km)/(3h)"/>
 </params>
