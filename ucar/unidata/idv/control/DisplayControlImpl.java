@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -57,9 +58,9 @@ import ucar.unidata.idv.TransectViewManager;
 import ucar.unidata.idv.ViewContext;
 import ucar.unidata.idv.ViewDescriptor;
 import ucar.unidata.idv.ViewManager;
-import ucar.unidata.idv.ui.IdvComponentHolder;
 import ucar.unidata.idv.ui.DataSelector;
 import ucar.unidata.idv.ui.DataTreeDialog;
+import ucar.unidata.idv.ui.IdvComponentHolder;
 import ucar.unidata.idv.ui.IdvUIManager;
 import ucar.unidata.idv.ui.IdvWindow;
 
@@ -207,6 +208,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** The anim widget */
     private AnimationWidget animationWidget;
 
+    /** component holder */
     private IdvComponentHolder componentHolder;
 
     /**
@@ -1051,11 +1053,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         initDone();
 
-        if(componentHolder!=null) {
+        if (componentHolder != null) {
             componentHolder.displayControlHasInitialized();
         }
 
-        
+
 
 
         initializationDone = true;
@@ -4344,7 +4346,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         List items = new ArrayList();
         getViewMenuItems(items, true);
         getIdv().getIdvUIManager().addViewMenuItems(this, items);
-        if(componentHolder!=null) {
+        if (componentHolder != null) {
             items.add(GuiUtils.makeMenuItem("Undock", componentHolder,
                                             "undockControl"));
         }
@@ -5064,6 +5066,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                              "Display Label", "Labels");
 
 
+        if (displayUnit != null) {
+            dsd.addPropertyValue(displayUnit, "settingsDisplayUnit",
+                                 "Display Unit", SETTINGS_GROUP_DISPLAY);
+        }
+
 
         ColorTable ct = getColorTable();
         if (ct != null) {
@@ -5086,13 +5093,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                  "Color Scale Settings",
                                  SETTINGS_GROUP_DISPLAY);
         }
-
-
-        if (displayUnit != null) {
-            dsd.addPropertyValue(displayUnit, "settingsDisplayUnit",
-                                 "Display Unit", SETTINGS_GROUP_DISPLAY);
-        }
-
 
         if (checkFlag(FLAG_LINEWIDTH)) {
             dsd.addPropertyValue(new Integer(lineWidth), "lineWidth",
@@ -6003,7 +6003,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         hasBeenRemoved = true;
 
-        if(componentHolder!=null) {
+        if (componentHolder != null) {
             componentHolder.removeDisplayControl(this);
             componentHolder = null;
         }
@@ -10186,12 +10186,22 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         return showInTabs;
     }
 
+    /**
+     * Should this be docked
+     *
+     * @return  true if should be docked
+     */
     public boolean shouldBeDocked() {
-        return getShowInTabs() && componentHolder==null;
+        return getShowInTabs() && (componentHolder == null);
     }
 
+    /**
+     * Can this be docked
+     *
+     * @return true if can be docked
+     */
     public boolean canBeDocked() {
-        return  componentHolder==null;
+        return componentHolder == null;
     }
 
 
@@ -10480,25 +10490,24 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
     }
 
-/**
-Set the ComponentHolder property.
+    /**
+     * Set the ComponentHolder property.
+     *
+     * @param value The new value for ComponentHolder
+     */
+    public void setComponentHolder(IdvComponentHolder value) {
+        componentHolder = value;
+        if (componentHolder != null) {}
+    }
 
-@param value The new value for ComponentHolder
-**/
-public void setComponentHolder (IdvComponentHolder value) {
-	componentHolder = value;
-        if(componentHolder!=null) {
-        }
-}
-
-/**
-Get the ComponentHolder property.
-
-@return The ComponentHolder
-**/
-public IdvComponentHolder getComponentHolder () {
-	return componentHolder;
-}
+    /**
+     * Get the ComponentHolder property.
+     *
+     * @return The ComponentHolder
+     */
+    public IdvComponentHolder getComponentHolder() {
+        return componentHolder;
+    }
 
 
 }
