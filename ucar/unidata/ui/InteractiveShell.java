@@ -151,7 +151,17 @@ public class InteractiveShell implements HyperlinkListener {
             url = e.getURL().toString();
         }
         url = new String(XmlUtil.decodeBase64(url));
-        Misc.run(this, "eval", url);
+        if(url.startsWith("eval:")) {
+            Misc.run(this, "eval", url.substring(5));
+        } else  if(url.startsWith("text:")) {
+            setText(url.substring(5));
+        }
+    }
+
+
+    public void setText(String text) {
+        getCommandFld().setText(text);
+        getCommandFld().requestFocus();
     }
 
 
@@ -370,6 +380,31 @@ public class InteractiveShell implements HyperlinkListener {
     public void eval() {
         JTextComponent cmdFld = getCommandFld();
         String         cmd    = cmdFld.getText();
+        if(cmd.trim().equals("!!")) {
+            if(history.size()==0) {
+                Toolkit.getDefaultToolkit().beep();
+                return;
+            }
+            cmd  = (String)history.get(history.size()-1);
+        }  else if(cmd.trim().startsWith("!")) {
+            if(history.size()==0) {
+                Toolkit.getDefaultToolkit().beep();
+                return;
+            }
+            String prefix = cmd.substring(1);
+            cmd = null;
+            for(int i=history.size()-1;i>=0;i--) {
+                String tmp = (String)history.get(i);
+                if(tmp.startsWith(prefix)) {
+                    cmd = tmp;
+                    break;
+                }
+            }
+            if(cmd==null) {
+                Toolkit.getDefaultToolkit().beep();
+                return;
+            }
+        }
         cmdFld.setText("");
         history.add(cmd);
         historyIdx = -1;
@@ -417,11 +452,17 @@ public class InteractiveShell implements HyperlinkListener {
      * @param code the code that was evaluated
      */
     public void eval(String code) {
-        String encoded = new String(XmlUtil.encodeBase64(code.getBytes()));
+        String evalCode = "eval:"+code;
+        String encoded1 = new String(XmlUtil.encodeBase64(evalCode.getBytes()));
+        String textCode = "text:"+code;
+        String encoded2 = new String(XmlUtil.encodeBase64(textCode.getBytes()));
         output("<div style=\"margin:0; margin-bottom:1; background-color:#cccccc; \"><table width=\"100%\"><tr><td>"
                + formatCode(code)
                + "</td><td align=\"right\" valign=\"top\"><a href=\""
-               + encoded
+               + encoded2
+               + "\"><img src=\"idvresource:/auxdata/ui/icons/Down16.gif\" border=0></a>"+
+               "<a href=\""
+               + encoded1
                + "\"><img alt=\"Reload\" src=\"idvresource:/auxdata/ui/icons/Refresh16.gif\" border=0></a></td></tr></table></div>");
     }
 
