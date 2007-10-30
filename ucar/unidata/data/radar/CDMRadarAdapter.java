@@ -1971,7 +1971,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             (RadialDatasetSweep.RadialVariable) rds.getDataVariable(varName);
         int       numberOfSweeps = sweepVar.getNumSweeps();
         int       numberOfRay    = 360;  //getRayNumber(sweepVar);
-        rhiData = null;
+       // rhiData = null;
         FlatField retField;
         double    range_step;
         double    range_to_first_gate;
@@ -2020,8 +2020,11 @@ public class CDMRadarAdapter implements RadarAdapter {
         Trace.call1("   getRHI.getdata");
         float[] azimuths = new float[numberOfRay];
 
-        if (rhiData == null) {
+        if (rhiData == null ) {
             getRHIData(sweepVar);
+        } else {
+            if( rhiData.get(sweepVar.getName())== null)
+                getRHIData(sweepVar);
         }
         float beamWidth = 0.95f;
         float res       = 360.0f / numberOfRay;
@@ -2166,6 +2169,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         float[][][] rdata;
         rhiData = new HashMap();
 
+        rhiData.put(sweepVar.getName(), sweepVar);
         RadialDatasetSweep.Sweep [] sweep = new RadialDatasetSweep.Sweep[numberOfSweeps];
         float [][] aziAll = new float[numberOfSweeps][numberOfRay];
         int [] radialNumber = new int[numberOfSweeps];
