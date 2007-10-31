@@ -25,7 +25,6 @@
 
 package ucar.unidata.xml;
 
-
 import org.w3c.dom.*;
 
 import org.xml.sax.*;
@@ -1307,6 +1306,12 @@ public abstract class XmlUtil {
         sb.append("<![CDATA[");
         sb.append(encodeBase64(bytes));
         sb.append("]]>");
+    }
+
+
+
+    public static CDATASection makeCDataNode(Document doc,String text) {
+        return doc.createCDATASection(XmlUtil.encodeBase64(text.getBytes()));
     }
 
 
