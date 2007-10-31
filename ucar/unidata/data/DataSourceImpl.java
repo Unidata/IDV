@@ -21,7 +21,11 @@
  */
 
 
+
 package ucar.unidata.data;
+
+
+import org.w3c.dom.Document;
 
 
 import org.w3c.dom.Element;
@@ -39,6 +43,8 @@ import ucar.unidata.geoloc.projection.*;
 
 
 
+
+import ucar.unidata.idv.DisplayControl;
 
 import ucar.unidata.idv.ui.DataControlDialog;
 import ucar.unidata.idv.ui.DataSelectionWidget;
@@ -245,7 +251,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     /** Where we cache data */
     private String dataCachePath;
 
-    /** _more_          */
+    /** _more_ */
     private List paramsToShow;
 
     /**
@@ -315,16 +321,17 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     protected void loadView() {
         String filterFile = (String) getProperty("idv.data.viewfile");
         if (filterFile != null) {
-        try {
-            String xml = IOUtil.readContents(filterFile, getClass(), (String) null);
-            if (xml == null) {
-                return;
+            try {
+                String xml = IOUtil.readContents(filterFile, getClass(),
+                                 (String) null);
+                if (xml == null) {
+                    return;
+                }
+                Element root = XmlUtil.getRoot(xml);
+                loadView(root);
+            } catch (Exception exc) {
+                throw new WrapperException(exc);
             }
-            Element root = XmlUtil.getRoot(xml);
-            loadView(root);
-        } catch (Exception exc) {
-            throw new WrapperException(exc);
-        }
         }
     }
 
@@ -342,6 +349,138 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             paramsToShow.add(XmlUtil.getAttribute(child, "name"));
         }
     }
+
+
+    /**
+     * _more_
+     */
+    public void writeViewFile() {
+
+        String filename = FileManager.getWriteFile(FileManager.FILTER_XML,
+                              FileManager.SUFFIX_XML);
+        if (filename == null) {
+            return;
+        }
+
+        List      choices            = getDataChoices();
+        List      checkboxes         = new ArrayList();
+        List      categories         = new ArrayList();
+        Hashtable catMap             = new Hashtable();
+        Hashtable currentDataChoices = new Hashtable();
+
+        List      displays = getDataContext().getIdv().getDisplayControls();
+        for (int i = 0; i < displays.size(); i++) {
+            List dataChoices =
+                ((DisplayControl) displays.get(i)).getDataChoices();
+            if (dataChoices == null) {
+                continue;
+            }
+            List finalOnes = new ArrayList();
+            for (int j = 0; j < dataChoices.size(); j++) {
+                ((DataChoice) dataChoices.get(j)).getFinalDataChoices(
+                    finalOnes);
+            }
+            for (int dcIdx = 0; dcIdx < finalOnes.size(); dcIdx++) {
+                DataChoice dc = (DataChoice) finalOnes.get(dcIdx);
+                if ( !(dc instanceof DirectDataChoice)) {
+                    continue;
+                }
+                DirectDataChoice ddc = (DirectDataChoice) dc;
+                if (ddc.getDataSource() != this) {
+                    continue;
+                }
+                currentDataChoices.put(ddc.getName(), "");
+            }
+        }
+
+
+
+        for (int i = 0; i < dataChoices.size(); i++) {
+            DataChoice dataChoice = (DataChoice) dataChoices.get(i);
+            if ( !(dataChoice instanceof DirectDataChoice)) {
+                continue;
+            }
+            String label = dataChoice.getDescription();
+            if (label.length() > 30) {
+                label = label.substring(0, 29) + "...";
+            }
+            JCheckBox cbx =
+                new JCheckBox(label,
+                              currentDataChoices.get(dataChoice.getName())
+                              != null);
+            cbx.setToolTipText(dataChoice.getName());
+            checkboxes.add(cbx);
+            DataCategory dc    = dataChoice.getDisplayCategory();
+            List         comps = (List) catMap.get(dc);
+            if (comps == null) {
+                comps = new ArrayList();
+                catMap.put(dc, comps);
+                categories.add(dc);
+            }
+            comps.add(cbx);
+        }
+
+        List catComps = new ArrayList();
+        for (int i = 0; i < categories.size(); i++) {
+            List comps = (List) catMap.get(categories.get(i));
+            JPanel innerPanel = GuiUtils.doLayout(comps, 1, GuiUtils.WT_NYN,
+                                    GuiUtils.WT_N);
+            JScrollPane sp = new JScrollPane(GuiUtils.top(innerPanel));
+            sp.setPreferredSize(new Dimension(300, 400));
+            JPanel top =
+                GuiUtils.left(new JLabel(categories.get(i).toString()));
+            catComps.add(GuiUtils.inset(GuiUtils.topCenter(top, sp), 5));
+        }
+
+
+        JComponent contents = GuiUtils.hbox(catComps);
+        contents = GuiUtils.topCenter(
+            GuiUtils.inset(new JLabel("Select the fields to write"), 5),
+            contents);
+        contents = GuiUtils.inset(contents, 5);
+        if ( !GuiUtils.showOkCancelDialog(null, "", contents, null)) {
+            return;
+        }
+
+        try {
+            Document doc  = XmlUtil.makeDocument();
+            Element  root = doc.createElement("view");
+
+            for (int i = 0; i < dataChoices.size(); i++) {
+                DataChoice dataChoice = (DataChoice) dataChoices.get(i);
+                if ( !(dataChoice instanceof DirectDataChoice)) {
+                    continue;
+                }
+                String label = dataChoice.getDescription();
+                if (label.length() > 30) {
+                    label = label.substring(0, 29) + "...";
+                }
+                JCheckBox cbx = (JCheckBox) checkboxes.get(i);
+                if ( !cbx.isSelected()) {
+                    continue;
+                }
+                Element child = doc.createElement("parameter");
+                child.setAttribute("name", dataChoice.getName());
+                root.appendChild(child);
+            }
+            writeViewFile(doc, root);
+
+
+            IOUtil.writeFile(filename, XmlUtil.toString(root));
+        } catch (Exception exc) {
+            logException("Writing view file", exc);
+        }
+
+    }
+
+    /**
+     * _more_
+     *
+     * @param doc _more_
+     * @param root _more_
+     */
+    protected void writeViewFile(Document doc, Element root) {}
+
 
     /**
      * Should we show the given parameter name

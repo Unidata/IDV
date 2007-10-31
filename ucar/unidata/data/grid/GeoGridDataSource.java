@@ -21,7 +21,11 @@
  */
 
 
+
 package ucar.unidata.data.grid;
+
+
+import org.w3c.dom.Document;
 
 
 import org.w3c.dom.Element;
@@ -90,6 +94,9 @@ import visad.georef.EarthLocationTuple;
 import visad.util.DataUtility;
 
 import java.awt.*;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.io.*;
 
@@ -234,6 +241,94 @@ public class GeoGridDataSource extends GridDataSource {
         //Make sure we pass filename up here - as opposed to calling
         //this (new File (filename)) because the new File (filename).getPath () != filename
         super(descriptor, files, "Geogrid data source", properties);
+    }
+
+
+    /**
+     * Load any subset info in view xml
+     *
+     * @param root xml root
+     */
+    protected void loadView(Element root) {
+        super.loadView(root);
+        GeoSelection geoSubset = getDataSelection().getGeoSelection();
+        if (geoSubset == null) {
+            geoSubset = new GeoSelection();
+            getDataSelection().setGeoSelection(geoSubset);
+        }
+        Element stride = XmlUtil.getElement(root, "stride");
+        if (stride != null) {
+            geoSubset.setXStride(XmlUtil.getAttribute(stride, "x",
+                    geoSubset.getXStride()));
+            geoSubset.setYStride(XmlUtil.getAttribute(stride, "y",
+                    geoSubset.getYStride()));
+            geoSubset.setZStride(XmlUtil.getAttribute(stride, "z",
+                    geoSubset.getZStride()));
+        }
+        Element subset = XmlUtil.getElement(root, "subset");
+        if (subset != null) {
+            geoSubset.setBoundingBox(
+                new GeoLocationInfo(
+                    XmlUtil.getAttribute(subset, "north", 0.0),
+                    XmlUtil.getAttribute(subset, "west", 0.0),
+                    XmlUtil.getAttribute(subset, "south", 0.0),
+                    XmlUtil.getAttribute(subset, "east", 0.0)));
+        }
+
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param actions _more_
+     */
+    protected void addActions(List actions) {
+        AbstractAction a = new AbstractAction("Write View File") {
+            public void actionPerformed(ActionEvent ae) {
+                Misc.run(new Runnable() {
+                    public void run() {
+                        Misc.run(GeoGridDataSource.this, "writeViewFile");
+                    }
+                });
+            }
+        };
+        actions.add(a);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param doc _more_
+     * @param root _more_
+     */
+    protected void writeViewFile(Document doc, Element root) {
+        GeoSelection geoSubset = getDataSelection().getGeoSelection();
+        if (geoSubset != null) {
+            Element stride = doc.createElement("stride");
+            root.appendChild(stride);
+            if (geoSubset.getXStride() > 1) {
+                stride.setAttribute("x", geoSubset.getXStride() + "");
+            }
+            if (geoSubset.getYStride() > 1) {
+                stride.setAttribute("y", geoSubset.getYStride() + "");
+            }
+            if (geoSubset.getZStride() > 1) {
+                stride.setAttribute("z", geoSubset.getYStride() + "");
+            }
+            GeoLocationInfo bbox = geoSubset.getBoundingBox();
+            if (bbox != null) {
+                Element subset = doc.createElement("subset");
+                subset.setAttribute("north", bbox.getMaxLat() + "");
+                subset.setAttribute("south", bbox.getMinLat() + "");
+                subset.setAttribute("west", bbox.getMinLon() + "");
+                subset.setAttribute("east", bbox.getMaxLon() + "");
+                root.appendChild(subset);
+            }
+
+        }
+
     }
 
 
@@ -458,7 +553,8 @@ public class GeoGridDataSource extends GridDataSource {
      * @return true if this DataSource can save data to local disk?
      */
     public boolean canSaveDataToLocalDisk() {
-        return !isFileBased() && (getProperty(PROP_SERVICE_NCSUBSETSERVICE) != null);
+        return !isFileBased()
+               && (getProperty(PROP_SERVICE_NCSUBSETSERVICE) != null);
     }
 
 
@@ -633,6 +729,9 @@ public class GeoGridDataSource extends GridDataSource {
         return newFiles;
 
     }
+
+
+
 
 
     /**
@@ -864,7 +963,9 @@ public class GeoGridDataSource extends GridDataSource {
         int cnt = 0;
         while (iter.hasNext()) {
             GeoGrid cfield = (GeoGrid) iter.next();
-            if(!canShowParameter(cfield.getName())) continue;
+            if ( !canShowParameter(cfield.getName())) {
+                continue;
+            }
 
             choice = makeDataChoiceFromGeoGrid(cfield, myTimes, timeToIndex);
             if (choice != null) {
@@ -983,7 +1084,8 @@ public class GeoGridDataSource extends GridDataSource {
 
 
             GeoGridAdapter geoGridAdapter = makeGeoGridAdapter(dataChoice,
-                                                dataSelection, null, fromLevelIndex, toLevelIndex);
+                                                dataSelection, null,
+                                                fromLevelIndex, toLevelIndex);
             if (geoGridAdapter != null) {
                 return geoGridAdapter.getLevels();
             }
