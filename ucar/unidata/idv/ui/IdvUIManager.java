@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -135,7 +136,8 @@ import javax.swing.text.JTextComponent;
 public class IdvUIManager extends IdvManager {
 
 
-    public  static ImageIcon ICON_LOCK;
+    /** _more_          */
+    public static ImageIcon ICON_LOCK;
 
     /** The icon used to show unlocked legend components */
     public static ImageIcon ICON_UNLOCK;
@@ -209,7 +211,10 @@ public class IdvUIManager extends IdvManager {
     /** The identifier of the  data selector component */
     public static final String COMP_DATASELECTOR = "idv.dataselector";
 
+    /** _more_          */
     public static final String COMP_COMPONENT_GROUP = "idv.component.group";
+
+    /** _more_          */
     public static final String COMP_COMPONENT_HTML = "idv.component.html";
 
 
@@ -1628,7 +1633,8 @@ public class IdvUIManager extends IdvManager {
                         createNewWindow(null, true,
                                         getWindowTitleFromSkin(skinIndex),
                                         skins.get(skinIndex).toString(),
-                                        skins.getRoot(skinIndex, false),true,null);
+                                        skins.getRoot(skinIndex, false),
+                                        true, null);
                     }
                 });
             }
@@ -1765,7 +1771,7 @@ public class IdvUIManager extends IdvManager {
         Element root = skins.getRoot(skinIndex, false);
         createNewWindow(null, true, getWindowTitleFromSkin(skinIndex),
                         skins.get(skinIndex).toString(),
-                        skins.getRoot(skinIndex, false),true,null);
+                        skins.getRoot(skinIndex, false), true, null);
     }
 
 
@@ -1784,24 +1790,25 @@ public class IdvUIManager extends IdvManager {
 
         List windows = IdvWindow.getWindows();
         for (int i = 0; i < windows.size(); i++) {
-            IdvWindow window = (IdvWindow) windows.get(i);
+            IdvWindow window     = (IdvWindow) windows.get(i);
             Hashtable components = window.getPersistentComponents();
-            if(components.size()>0) {
+            if (components.size() > 0) {
                 List subItems = new ArrayList();
-                subItems.add(GuiUtils.makeMenuItem("Show", window,
-                                                    "show"));
+                subItems.add(GuiUtils.makeMenuItem("Show", window, "show"));
 
-                for (Enumeration keys =
-                         components.keys(); keys.hasMoreElements(); ) {
+                for (Enumeration keys = components.keys();
+                        keys.hasMoreElements(); ) {
                     Object key = keys.nextElement();
-                    ComponentHolder comp=(ComponentHolder)components.get(key);
-                    subItems.add(GuiUtils.makeMenuItem("Edit Component: " + comp.getName(), comp,"showProperties"));
+                    ComponentHolder comp =
+                        (ComponentHolder) components.get(key);
+                    subItems.add(GuiUtils.makeMenuItem("Edit Component: "
+                            + comp.getName(), comp, "showProperties"));
                 }
 
                 menu.add(GuiUtils.makeMenu(window.getTitle(), subItems));
             } else {
                 menu.add(GuiUtils.makeMenuItem(window.getTitle(), window,
-                                               "show"));
+                        "show"));
             }
         }
     }
@@ -3479,7 +3486,9 @@ public class IdvUIManager extends IdvManager {
      */
     protected IdvWindow findWindowThatMatches(List currentWindows,
             WindowInfo windowInfo) {
-        if(windowInfo.getPersistentComponents().size()>0) return null;
+        if (windowInfo.getPersistentComponents().size() > 0) {
+            return null;
+        }
         String skinPath = windowInfo.getSkinPath();
         List   newVms   = windowInfo.getViewManagers();
         for (int oldWindowIdx = 0; oldWindowIdx < currentWindows.size();
@@ -3558,7 +3567,8 @@ public class IdvUIManager extends IdvManager {
                     currentWindow.setIsAMainWindow(
                         windowInfo.getIsAMainWindow());
                     //                    System.err.println ("comps:" + windowInfo.getPersistentComponents());
-                    currentWindow.setPersistentComponents(windowInfo.getPersistentComponents());
+                    currentWindow.setPersistentComponents(
+                        windowInfo.getPersistentComponents());
                     currentWindow.setBounds(windowInfo.getBounds());
                 }
             }
@@ -3566,8 +3576,9 @@ public class IdvUIManager extends IdvManager {
                 getVMManager().addViewManagers(newVms);
                 String skinPath = windowInfo.getSkinPath();
                 IdvWindow window = createNewWindow(newVms, skinPath,
-                                       windowInfo.getTitle(),windowInfo);
-                window.setPersistentComponents(windowInfo.getPersistentComponents());
+                                       windowInfo.getTitle(), windowInfo);
+                window.setPersistentComponents(
+                    windowInfo.getPersistentComponents());
                 window.setBounds(windowInfo.getBounds());
             }
         }
@@ -3646,7 +3657,7 @@ public class IdvUIManager extends IdvManager {
      * @return The window
      */
     public IdvWindow createNewWindow(List viewManagers, String skinPath) {
-        return createNewWindow(viewManagers, skinPath, null,null);
+        return createNewWindow(viewManagers, skinPath, null, null);
     }
 
 
@@ -3689,14 +3700,27 @@ public class IdvUIManager extends IdvManager {
 
 
         return createNewWindow(viewManagers, notifyCollab, skinName, path,
-                               root,true,null);
+                               root, true, null);
     }
 
 
 
-    public IdvWindow createNewWindow(List viewManagers, boolean notifyCollab, String title, String skinPath,
+    /**
+     * _more_
+     *
+     * @param viewManagers _more_
+     * @param notifyCollab _more_
+     * @param title _more_
+     * @param skinPath _more_
+     * @param root _more_
+     *
+     * @return _more_
+     */
+    public IdvWindow createNewWindow(List viewManagers, boolean notifyCollab,
+                                     String title, String skinPath,
                                      Element root) {
-        return createNewWindow(viewManagers, notifyCollab, title, skinPath, root, true, null);
+        return createNewWindow(viewManagers, notifyCollab, title, skinPath,
+                               root, true, null);
     }
 
 
@@ -3706,16 +3730,18 @@ public class IdvUIManager extends IdvManager {
      * @param viewManagers The view managers to put in the window.
      * @param skinPath The skin
      * @param  windowTitle title
+     * @param windowInfo _more_
      *
      * @return The window
      */
     public IdvWindow createNewWindow(List viewManagers, String skinPath,
-                                     String windowTitle,WindowInfo windowInfo) {
+                                     String windowTitle,
+                                     WindowInfo windowInfo) {
         try {
             Element skinRoot = XmlUtil.getRoot(fixSkinPath(skinPath),
                                    getClass());
             return createNewWindow(viewManagers, false, windowTitle,
-                                   skinPath, skinRoot, true,windowInfo);
+                                   skinPath, skinRoot, true, windowInfo);
         } catch (Throwable excp) {
             logException("createNewWindow", excp);
             return null;
@@ -3755,7 +3781,7 @@ public class IdvUIManager extends IdvManager {
     public IdvWindow createNewWindow(List viewManagers, boolean notifyCollab,
                                      String skinPath, Element skinRoot) {
         return createNewWindow(viewManagers, notifyCollab, null, skinPath,
-                               skinRoot,true,null);
+                               skinRoot, true, null);
     }
 
     /**
@@ -3766,6 +3792,8 @@ public class IdvUIManager extends IdvManager {
      * @param title        The title
      * @param skinPath The skin. May be null.
      * @param skinRoot Root of the skin xml. May be null.
+     * @param show _more_
+     * @param windowInfo _more_
      *
      * @return The window.
      */
@@ -3792,7 +3820,8 @@ public class IdvUIManager extends IdvManager {
      */
     public IdvWindow createNewWindow(List viewManagers, boolean notifyCollab,
                                      String title, String skinPath,
-                                     Element skinRoot, boolean show,WindowInfo windowInfo) {
+                                     Element skinRoot, boolean show,
+                                     WindowInfo windowInfo) {
 
         try {
             if (title == null) {
@@ -3815,8 +3844,9 @@ public class IdvUIManager extends IdvManager {
             }
 
             IdvWindow window = new IdvWindow(title, getIdv(), isMainWindow);
-            if(windowInfo!=null) {
-                window.setPersistentComponents(windowInfo.getPersistentComponents());
+            if (windowInfo != null) {
+                window.setPersistentComponents(
+                    windowInfo.getPersistentComponents());
             }
             window.setType(windowType);
             window.setVisible(false);
@@ -5524,7 +5554,8 @@ public class IdvUIManager extends IdvManager {
                 } else {
                     GuiUtils.showHtmlDialog(
                         html, "Unknown Support Request Response",
-                        "Unknown Support Request Response", null, true);
+                        "Unknown Support Request Response<br>Note: This form is inactive",
+                        null, true);
                 }
             } catch (Exception exc) {
                 LogUtil.logException("Doing support request form", exc);
