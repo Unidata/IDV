@@ -182,6 +182,12 @@ public abstract class DataChoice {
         this.id          = id;
         this.name        = name;
         this.description = description;
+        if(this.description == null) this.description = this.name;
+        if(this.description == null) {
+            this.name = "Data";
+            this.description = "Data";
+        }
+
         this.properties  = properties;
         if (categories != null) {
             this.categories = new ArrayList(categories);
