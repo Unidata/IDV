@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
@@ -1859,14 +1860,24 @@ public class PluginManager extends IdvManager {
     public void installPluginFromFile() {
         String filename = FileManager.getReadFile(FileManager.FILTER_JAR);
         if (filename != null) {
-            try {
-                installPlugin(filename, true);
-                updatePlugins();
-                LogUtil.userMessage(
-                    "You will need to restart the IDV for this plugin to take effect");
-            } catch (Throwable exc) {
-                logException("Installing plugin", exc);
-            }
+            installPluginFromFile(filename);
+        }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param filename _more_
+     */
+    public void installPluginFromFile(String filename) {
+        try {
+            installPlugin(filename, true);
+            updatePlugins();
+            LogUtil.userMessage(
+                "You will need to restart the IDV for this plugin to take effect");
+        } catch (Throwable exc) {
+            logException("Installing plugin", exc);
         }
     }
 
