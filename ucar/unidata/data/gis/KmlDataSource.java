@@ -716,6 +716,7 @@ public class KmlDataSource extends FilesDataSource {
                                   new ArrayList(currentDisplayCategories),
                                   PROP_HREF, href, PROP_BASEURL, baseUrl);
 
+            if(name == null) name = "Network Link";
             CompositeDataChoice newParentDataChoice =
                 new CompositeDataChoice(
                     this, ID_NETWORKLINK, "Network Link:" + href, name,

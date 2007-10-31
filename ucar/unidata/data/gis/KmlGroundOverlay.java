@@ -370,5 +370,25 @@ public class KmlGroundOverlay extends KmlInfo {
         return west;
     }
 
+/**
+Set the BaseUrl property.
+
+@param value The new value for BaseUrl
+**/
+public void setBaseUrl (String value) {
+	baseUrl = value;
+}
+
+/**
+Get the BaseUrl property.
+
+@return The BaseUrl
+**/
+public String getBaseUrl () {
+	return baseUrl;
+}
+
+
+
 }
 
