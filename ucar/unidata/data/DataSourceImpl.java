@@ -20,10 +20,12 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 
 
@@ -57,6 +59,7 @@ import ucar.unidata.util.Poller;
 import ucar.unidata.util.PollingInfo;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
+import ucar.unidata.util.WrapperException;
 
 import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlPersistable;
@@ -242,7 +245,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     /** Where we cache data */
     private String dataCachePath;
 
-
+    /** _more_          */
+    private List paramsToShow;
 
     /**
      *  Bean constructor
@@ -261,6 +265,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     public DataSourceImpl(DataSourceDescriptor descriptor) {
         this(descriptor, null, null, null);
     }
+
+
 
     /**
      * Create this DataSourceImpl, setting the dataContext, name and description
@@ -300,6 +306,67 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                 setName(pollingInfo.getName());
             }
         }
+    }
+
+
+    /**
+     * Check to see if there is a viewfile defined. If so load it in.
+     */
+    protected void loadView() {
+        String filterFile = (String) getProperty("idv.data.viewfile");
+        if (filterFile != null) {
+        try {
+            String xml = IOUtil.readContents(filterFile, getClass(), (String) null);
+            if (xml == null) {
+                return;
+            }
+            Element root = XmlUtil.getRoot(xml);
+            loadView(root);
+        } catch (Exception exc) {
+            throw new WrapperException(exc);
+        }
+        }
+    }
+
+
+    /**
+     * Load any parameter nodes in the given view xml
+     *
+     * @param root xml root
+     */
+    protected void loadView(Element root) {
+        paramsToShow = new ArrayList();
+        NodeList children = XmlUtil.getElements(root, "parameter");
+        for (int j = 0; j < children.getLength(); j++) {
+            Element child = (Element) children.item(j);
+            paramsToShow.add(XmlUtil.getAttribute(child, "name"));
+        }
+    }
+
+    /**
+     * Should we show the given parameter name
+     *
+     * @param name parameter name
+     *
+     * @return should show the parameter as a data choice
+     */
+    public boolean canShowParameter(String name) {
+        if ((paramsToShow == null) || (paramsToShow.size() == 0)) {
+            return true;
+        }
+        DataAlias alias = DataAlias.findAlias(name);
+        for (int i = 0; i < paramsToShow.size(); i++) {
+            String param = (String) paramsToShow.get(i);
+            if (StringUtil.stringMatch(name, param)) {
+                return true;
+            }
+            if (alias != null) {
+                if (StringUtil.stringMatch(alias.getName(), param)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 
@@ -366,6 +433,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (getPollingInfo().getIsActive()) {
             startPolling();
         }
+        loadView();
         //TODO: Let's not change anything for now
         //      descriptor = getDataContext().getIdv().getDataManager().getCurrent(descriptor);
     }
@@ -378,7 +446,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (getPollingInfo().getIsActive()) {
             startPolling();
         }
-
+        loadView();
         //For now we don't share        initSharable();
         //Don't do this for now. 
     }

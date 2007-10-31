@@ -864,6 +864,8 @@ public class GeoGridDataSource extends GridDataSource {
         int cnt = 0;
         while (iter.hasNext()) {
             GeoGrid cfield = (GeoGrid) iter.next();
+            if(!canShowParameter(cfield.getName())) continue;
+
             choice = makeDataChoiceFromGeoGrid(cfield, myTimes, timeToIndex);
             if (choice != null) {
                 cnt++;
@@ -1441,6 +1443,7 @@ public class GeoGridDataSource extends GridDataSource {
                 }
                 categories = newCategories;
             }
+
 
             choice = new DirectDataChoice(this, parmName, pseudoName,
                                           description, categories,
