@@ -20,25 +20,28 @@
  */
 
 
+
 package ucar.unidata.idv.ui;
+
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 import ucar.unidata.idv.*;
 import ucar.unidata.idv.*;
 import ucar.unidata.idv.control.DisplayControlImpl;
-import ucar.unidata.ui.ComponentHolder;
 import ucar.unidata.ui.ComponentGroup;
+import ucar.unidata.ui.ComponentHolder;
+import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.GuiUtils;
+import ucar.unidata.xml.XmlUtil;
 
 import java.awt.*;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import ucar.unidata.xml.XmlUtil;
 
 import javax.swing.*;
 
@@ -48,10 +51,10 @@ import javax.swing.*;
 
 public class IdvComponentHolder extends ComponentHolder {
 
-    /** _more_          */
+    /** _more_ */
     IntegratedDataViewer idv;
 
-    /** _more_          */
+    /** _more_ */
     private Object object;
 
     /**
@@ -92,12 +95,23 @@ public class IdvComponentHolder extends ComponentHolder {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param doc _more_
+     *
+     * @return _more_
+     */
     public Element createXmlNode(Document doc) {
-        if(object ==null) return null;
+        if (object == null) {
+            return null;
+        }
         if (object instanceof ViewManager) {
             Element node = doc.createElement(IdvUIManager.COMP_VIEW);
-            node.setAttribute(IdvXmlUi.ATTR_CLASS, object.getClass().getName());
-            node.appendChild(XmlUtil.makeCDataNode(doc,idv.encodeObject(object,false)));
+            node.setAttribute(IdvXmlUi.ATTR_CLASS,
+                              object.getClass().getName());
+            node.appendChild(XmlUtil.makeCDataNode(doc,
+                    idv.encodeObject(object, false)));
             return node;
         }
         return null;
@@ -144,6 +158,9 @@ public class IdvComponentHolder extends ComponentHolder {
     }
 
 
+    /**
+     * _more_
+     */
     public void undockControl() {
         DisplayControlImpl control = (DisplayControlImpl) object;
         object = null;
@@ -156,8 +173,15 @@ public class IdvComponentHolder extends ComponentHolder {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param items _more_
+     *
+     * @return _more_
+     */
     protected List getPopupMenuItems(List items) {
-        if(object instanceof DisplayControl) {
+        if (object instanceof DisplayControl) {
             items.add(GuiUtils.makeMenuItem("Undock " + getName(), this,
                                             "undockControl"));
         }
@@ -227,17 +251,20 @@ public class IdvComponentHolder extends ComponentHolder {
 
     }
 
+    /**
+     * _more_
+     */
     public void displayControlHasInitialized() {
         clearContents();
         getContents().invalidate();
         ComponentGroup parent = getParent();
-        if(parent!=null) {
+        if (parent != null) {
             parent.redoLayout();
         }
         Component comp = getContents();
         //A total hack but...
         Window w = GuiUtils.getWindow(comp);
-        if(w!=null) {
+        if (w != null) {
             w.doLayout();
         }
     }
@@ -257,7 +284,7 @@ public class IdvComponentHolder extends ComponentHolder {
             JComponent inner =
                 (JComponent) ((DisplayControlImpl) object).getOuterContents();
 
-            if(inner ==null) {
+            if (inner == null) {
                 return new JLabel("");
             }
             return inner;
