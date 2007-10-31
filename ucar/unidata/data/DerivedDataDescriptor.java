@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -383,11 +384,13 @@ public class DerivedDataDescriptor {
      * @param code            jython code (may be null)
      * @param properties      extra properties
      */
+
     public DerivedDataDescriptor(ArrayList myNeeds, String id,
                                  String description, ArrayList categories,
                                  String method, String formula, String code,
                                  Properties properties) {
-        this.myNeeds     = myNeeds;
+        this.myNeeds = myNeeds;
+        checkNeeds();
         this.id          = id;
         this.description = description;
         this.categories  = categories;
@@ -410,6 +413,7 @@ public class DerivedDataDescriptor {
         this.dataContext  = other.dataContext;
         if (other.myNeeds != null) {
             this.myNeeds = new ArrayList(other.myNeeds);
+            checkNeeds();
         }
         this.id          = other.id;
         this.description = other.description;
@@ -497,6 +501,7 @@ public class DerivedDataDescriptor {
                 myNeeds.add(derivedNeed);
             }
         }
+        checkNeeds();
     }
 
 
@@ -517,8 +522,23 @@ public class DerivedDataDescriptor {
      */
     public void setNeeds(List needs) {
         myNeeds = needs;
+        checkNeeds();
     }
 
+
+    /**
+     * _more_
+     */
+    private void checkNeeds() {
+        if (myNeeds != null) {
+            for (int i = 0; i < myNeeds.size(); i++) {
+                if ( !(myNeeds.get(i) instanceof DerivedNeed)) {
+                    throw new IllegalStateException(
+                        "Bad value in myNeeds list");
+                }
+            }
+        }
+    }
 
 
     /**
@@ -576,8 +596,8 @@ public class DerivedDataDescriptor {
      * @return  new DDC
      */
     public DerivedDataChoice getDataChoice() {
-        DerivedDataChoice ddc =  new DerivedDataChoice(dataContext, this);
-        if(properties!=null) {
+        DerivedDataChoice ddc = new DerivedDataChoice(dataContext, this);
+        if (properties != null) {
             ddc.setProperties(properties);
         }
         return ddc;
