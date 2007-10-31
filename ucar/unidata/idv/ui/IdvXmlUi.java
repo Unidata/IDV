@@ -37,6 +37,7 @@ import ucar.unidata.ui.FineLineBorder;
 import ucar.unidata.ui.RovingProgress;
 import ucar.unidata.ui.XmlUi;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.WrapperException;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
@@ -493,6 +494,16 @@ public class IdvXmlUi extends XmlUi {
 
 
     private ViewManager getViewManager(Element node) {
+        String bundleText = XmlUtil.getChildText(node);
+        if(bundleText!=null && bundleText.trim().length()>0) {
+            try {
+                bundleText  = new String(XmlUtil.decodeBase64(bundleText.trim()));
+                return (ViewManager)idv.decodeObject(bundleText);
+            } catch(Exception exc) {
+                throw new WrapperException(exc);
+            }
+        }
+
         String properties = idv.getViewManagerProperties();
         if (properties == null) {
             properties = "";
