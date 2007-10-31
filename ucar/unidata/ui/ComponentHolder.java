@@ -26,6 +26,7 @@ package ucar.unidata.ui;
 
 import ucar.unidata.collab.PropertiedThing;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.Misc;
 
 
 
@@ -60,26 +61,16 @@ import ucar.unidata.xml.XmlUtil;
  */
 public class ComponentHolder extends PropertiedThing {
 
-    /** _more_          */
-    public static final int BORDER_NONE = 0;
+    public static final String ATTR_NAME = "name";
+
 
     /** _more_          */
-    public static final int BORDER_TITLE = 1;
-
-    /** _more_          */
-    public static final int BORDER_ETCHED = 2;
-
-    /** _more_          */
-    public static final int BORDER_LINE = 3;
-
-    /** _more_          */
-    public static final int[] BORDERS = { BORDER_NONE, BORDER_TITLE,
-                                          BORDER_ETCHED, BORDER_LINE };
+    public static final String[] BORDERS = {XmlUi.BORDER_EMPTY, XmlUi.BORDER_TITLED,
+                                            XmlUi.BORDER_ETCHED, XmlUi.BORDER_LINE};
 
     /** _more_          */
     public static final String[] BORDER_NAMES = { "None", "Title", "Etched",
             "Line" };
-
 
     private String borderLayoutLocation = BorderLayout.CENTER;
 
@@ -117,7 +108,7 @@ public class ComponentHolder extends PropertiedThing {
     protected boolean isRemoved = false;
 
     /** _more_          */
-    private int border = BORDER_NONE;
+    private String border = XmlUi.BORDER_EMPTY;
 
     /** _more_          */
     private JComboBox borderBox;
@@ -154,8 +145,21 @@ public class ComponentHolder extends PropertiedThing {
     }
 
 
+    public void setState(Element node) {
+        node.setAttribute(ATTR_NAME, getName());
+        node.setAttribute(XmlUi.ATTR_BORDER, border);
+        node.setAttribute(XmlUi.ATTR_PLACE,borderLayoutLocation);
+    }
+
     public void initWith(Element node) {
-        setName(XmlUtil.getAttribute(node, "name",""));
+        setName(XmlUtil.getAttribute(node, ATTR_NAME,""));
+        if(XmlUtil.hasAttribute(node,XmlUi.ATTR_BORDER)) {
+            setBorder(XmlUtil.getAttribute(node, XmlUi.ATTR_BORDER,XmlUi.BORDER_EMPTY));            
+        }
+        if(XmlUtil.hasAttribute(node,XmlUi.ATTR_PLACE)) {
+            borderLayoutLocation = XmlUtil.getAttribute(node, XmlUi.ATTR_PLACE,"");
+        }
+
     }
 
     protected void clearContents() {
@@ -246,7 +250,8 @@ public class ComponentHolder extends PropertiedThing {
         super.getPropertiesComponents(comps, tabIdx);
         if (tabIdx == 0) {
             showLabelCbx = new JCheckBox("Show Label", showLabel);
-            borderBox = GuiUtils.makeComboBox(BORDERS, BORDER_NAMES, border);
+            borderBox = new JComboBox(new Vector(Misc.toList(BORDER_NAMES)));
+            borderBox.setSelectedIndex(Misc.toList(BORDERS).indexOf(border));
             comps.add(GuiUtils.rLabel("Border:"));
             comps.add(GuiUtils.left(GuiUtils.hbox(borderBox,
                     GuiUtils.filler(20, 5), showLabelCbx)));
@@ -270,8 +275,9 @@ public class ComponentHolder extends PropertiedThing {
             displayLabel.setText(getName());
         }
 
-        int newBorder = GuiUtils.getValueFromBox(borderBox);
-        if (newBorder != border) {
+        
+        String newBorder = BORDERS[Misc.toList(BORDER_NAMES).indexOf(borderBox.getSelectedItem())];
+        if (!newBorder.equals(border)) {
             border = newBorder;
             if (contents != null) {
                 setBorder(getContents());
@@ -291,11 +297,11 @@ public class ComponentHolder extends PropertiedThing {
      */
     protected void setBorder(JComponent comp) {
         Border theBorder = null;
-        if (border == BORDER_TITLE) {
+        if (border.equals(XmlUi.BORDER_TITLED)) {
             theBorder = BorderFactory.createTitledBorder(getName());
-        } else if (border == BORDER_LINE) {
+        } else if (border.equals(XmlUi.BORDER_LINE)) {
             theBorder = BorderFactory.createLineBorder(Color.black, 1);
-        } else if (border == BORDER_ETCHED) {
+        } else if (border.equals(XmlUi.BORDER_ETCHED)) {
             theBorder = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
         }
         if (comp != null) {
@@ -507,24 +513,26 @@ public class ComponentHolder extends PropertiedThing {
         return showLabel;
     }
 
+/**
+Set the Border property.
 
-    /**
-       Set the Border property.
-
-       @param value The new value for Border
-    **/
-    public void setBorder (int value) {
+@param value The new value for Border
+**/
+public void setBorder (String value) {
 	border = value;
-    }
+}
 
-    /**
-       Get the Border property.
+/**
+Get the Border property.
 
-       @return The Border
-    **/
-    public int getBorder () {
+@return The Border
+**/
+public String getBorder () {
 	return border;
-    }
+}
+
+
+
 
     /**
        Set the BorderLayoutLocation property.

@@ -209,8 +209,6 @@ public class IdvUIManager extends IdvManager {
     /** The identifier of the  data selector component */
     public static final String COMP_DATASELECTOR = "idv.dataselector";
 
-
-                                                      
     public static final String COMP_COMPONENT_GROUP = "idv.component.group";
     public static final String COMP_COMPONENT_HTML = "idv.component.html";
 

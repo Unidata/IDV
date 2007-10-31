@@ -36,6 +36,9 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import ucar.unidata.xml.XmlUtil;
 
 import javax.swing.*;
 
@@ -87,6 +90,19 @@ public class IdvComponentHolder extends ComponentHolder {
         }
         return name;
     }
+
+
+    public Element createXmlNode(Document doc) {
+        if(object ==null) return null;
+        if (object instanceof ViewManager) {
+            Element node = doc.createElement(IdvUIManager.COMP_VIEW);
+            node.setAttribute(IdvXmlUi.ATTR_CLASS, object.getClass().getName());
+            node.appendChild(XmlUtil.makeCDataNode(doc,idv.encodeObject(object,false)));
+            return node;
+        }
+        return null;
+    }
+
 
     /**
      * _more_

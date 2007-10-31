@@ -30,12 +30,25 @@ import ucar.unidata.idv.control.*;
 import ucar.unidata.ui.ComponentGroup;
 import ucar.unidata.ui.HtmlComponent;
 import ucar.unidata.ui.ComponentHolder;
+import ucar.unidata.xml.XmlUtil;
+
+
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.FileManager;
 import ucar.unidata.util.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.CDATASection;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  */
@@ -60,6 +73,54 @@ public class IdvComponentGroup extends ComponentGroup {
     public IdvComponentGroup(IntegratedDataViewer idv, String name) {
         super(name);
         this.idv = idv;
+    }
+
+
+    public void writeSkin() {
+        try {
+        String filename  = FileManager.getWriteFile(FileManager.FILTER_XML,
+                                         FileManager.SUFFIX_XML);
+        if (filename == null) {
+            return;
+        }
+        Element root = createXmlNode(XmlUtil.makeDocument());
+        setState(root);
+        String xml  = XmlUtil.toString(root);
+        String templatePath = idv.getProperty("idv.ui.skin.template",(String)null);
+        System.err.println (templatePath);
+        if(templatePath!=null) {
+            String template = IOUtil.readContents(templatePath, getClass(), (String) null);
+            if(template!=null) {
+                xml = StringUtil.replace(template,"%contents%", xml);
+            }
+        }
+        IOUtil.writeFile(filename, xml);
+        } catch(Exception exc) {
+            LogUtil.logException("Error writing skin file", exc);
+        }
+    }
+
+    public Element createXmlNode(Document doc) {
+        Element node = doc.createElement(IdvUIManager.COMP_COMPONENT_GROUP);
+        List displayComponents = getDisplayComponents();
+        for (int i = 0; i < displayComponents.size(); i++) {
+            ComponentHolder comp = (ComponentHolder) displayComponents.get(i);
+            Element child = null;
+            if(comp instanceof IdvComponentHolder) {
+                child = ((IdvComponentHolder)comp).createXmlNode(doc);
+            } else if(comp instanceof IdvComponentGroup) {
+                child = ((IdvComponentGroup)comp).createXmlNode(doc);
+            } else if(comp instanceof HtmlComponent) {
+                child = doc.createElement(IdvUIManager.COMP_COMPONENT_HTML);
+                child.appendChild(XmlUtil.makeCDataNode(doc,((HtmlComponent)comp).getText()));
+            }
+            if(child!=null) {
+                comp.setState(child);
+                node.appendChild(child);
+            }
+        }
+
+        return node;
     }
 
 
@@ -88,6 +149,7 @@ public class IdvComponentGroup extends ComponentGroup {
 
 
         items.add(GuiUtils.makeMenu("New", newItems));
+        items.add(GuiUtils.makeMenuItem("Write Skin", this,"writeSkin"));
 
 
         List importItems = new ArrayList();

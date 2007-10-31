@@ -87,6 +87,7 @@ public class ComponentGroup extends ComponentHolder {
     public static final int LAYOUT_BORDER = 7;
 
     public static final String[]LAYOUT_NAMES = {"Columns", "Grid","Tabs","Hor. Split","Vert. Split", "Graph", "Tree","Border"};
+    public static final String[]LAYOUT_STRINGS= {"gridbag", "grid","tabs","hsplit","vsplit", "graph", "tree","border"};
     public static final int[]LAYOUTS = {LAYOUT_GRIDBAG,LAYOUT_GRID,LAYOUT_TABS,LAYOUT_HSPLIT,LAYOUT_VSPLIT,LAYOUT_GRAPH,LAYOUT_TREE,LAYOUT_BORDER};
 
     /** type of layout */
@@ -171,6 +172,15 @@ public class ComponentGroup extends ComponentHolder {
             if(layout == LAYOUT_GRIDBAG) {
                 gridColumns = XmlUtil.getAttribute(node, "layout_columns",gridColumns);
             }
+        }
+    }
+
+    public void setState(Element node) {
+        super.setState(node);
+        String layoutString = XmlUtil.getAttribute(node,"layout",(String) null);
+        node.setAttribute("layout", getLayoutString());
+        if(layout == LAYOUT_GRIDBAG) {
+            node.setAttribute("layout_columns",gridColumns+"");
         }
     }
 
@@ -362,7 +372,7 @@ public class ComponentGroup extends ComponentHolder {
             ComponentHolder comp = (ComponentHolder) displayComponents.get(i);
             JComboBox box = new JComboBox(borderLayouts);
             box.setSelectedItem(comp.getBorderLayoutLocation());
-            borderComps.add(new JLabel(comp.getName())+": ");
+            borderComps.add(new JLabel(comp.getName()+": "));
             borderComps.add(box);
             borderLayoutLocations.put(comp,box);
         }
@@ -847,20 +857,26 @@ public class ComponentGroup extends ComponentHolder {
      * @param l _more_
      */
     public void setLayout(String l) {
-        if (l.equals("tabs")) {
-            setLayout(LAYOUT_TABS);
-        } else if (l.equals("graph")) {
-            setLayout(LAYOUT_GRAPH);
-        } else if (l.equals("gridbag")) {
-            setLayout(LAYOUT_GRIDBAG);
-        } else if (l.equals("hsplit")) {
-            setLayout(LAYOUT_HSPLIT);
-        } else if (l.equals("vsplit")) {
-            setLayout(LAYOUT_VSPLIT);
-        } else if (l.equals("tree")) {
-            setLayout(LAYOUT_TREE);
+        l = l.trim();
+        for(int i=0;i<LAYOUT_STRINGS.length;i++) {
+            if(l.equals(LAYOUT_STRINGS[i])) {
+                setLayout(LAYOUTS[i]);
+                return;
+            }
         }
+        throw new IllegalArgumentException ("Unknown layout:" + l);
     }
+
+    public String getLayoutString() {
+        for(int i=0;i<LAYOUT_STRINGS.length;i++) {
+            if(layout == LAYOUTS[i]) {
+                return LAYOUT_STRINGS[i];
+            }
+        }
+        throw new IllegalStateException ("Unknwon layout:" + layout);
+    }
+
+
 
     /**
      * Set the Layout property.

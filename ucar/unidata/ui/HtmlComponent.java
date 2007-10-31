@@ -60,6 +60,8 @@ import ucar.unidata.xml.XmlUtil;
  */
 public class HtmlComponent extends ComponentHolder {
 
+    public static final String ATTR_TEXT = "text";
+
     private String text;
     protected JTextArea textArea;
     protected JLabel label;
@@ -83,7 +85,11 @@ public class HtmlComponent extends ComponentHolder {
 
 
     public void initWith(Element node) {
-        setText(XmlUtil.getAttribute(node, "text",""));
+        if(XmlUtil.hasAttribute(node, ATTR_TEXT)) {
+            setText(XmlUtil.getAttribute(node, ATTR_TEXT,""));
+        } else {
+            setText(XmlUtil.getChildText(node));
+        }
     }
 
 
