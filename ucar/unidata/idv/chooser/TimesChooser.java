@@ -405,10 +405,10 @@ public class TimesChooser extends IdvChooser {
                 }
 
             public void selectedDatesChanged() {
+                super.selectedDatesChanged();
                 if (checkIgnore()) {
                     return;
                 }
-                super.selectedDatesChanged();
                 setSelectedAbsoluteTimes(timeline.getSelected());
                 updateStatus();
                 absoluteTimesSelectionChanged();
