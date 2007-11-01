@@ -315,20 +315,23 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
+    protected boolean canDoView() {
+        return false;
+    }
+
     /**
      * Check to see if there is a viewfile defined. If so load it in.
      */
     protected void loadView() {
-        String filterFile = (String) getProperty("idv.data.viewfile");
-        if (filterFile != null) {
+        String viewFile = (String) getProperty("idv.data.viewfile");
+        if (viewFile != null) {
             try {
-                String xml = IOUtil.readContents(filterFile, getClass(),
+                String xml = IOUtil.readContents(viewFile, getClass(),
                                  (String) null);
                 if (xml == null) {
                     return;
                 }
-                Element root = XmlUtil.getRoot(xml);
-                loadView(root);
+                applyView(XmlUtil.getRoot(xml));
             } catch (Exception exc) {
                 throw new WrapperException(exc);
             }
@@ -341,7 +344,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      *
      * @param root xml root
      */
-    protected void loadView(Element root) {
+    protected void applyView(Element root) {
         paramsToShow = new ArrayList();
         NodeList children = XmlUtil.getElements(root, "parameter");
         for (int j = 0; j < children.getLength(); j++) {
@@ -355,13 +358,18 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * _more_
      */
     public void writeViewFile() {
-
         String filename = FileManager.getWriteFile(FileManager.FILTER_XML,
                               FileManager.SUFFIX_XML);
         if (filename == null) {
             return;
         }
 
+        String datasourceFilename = IOUtil.stripExtension(filename) + "datasource.xml";
+        JCheckBox writeDataSourceXmlCbx = new JCheckBox("Write Datasource XML File:",true);
+        JTextField dataSourceFileFld = new JTextField(datasourceFilename);
+        JTextField labelFld  =new JTextField("");
+        String id = IOUtil.getFileTail(IOUtil.stripExtension(filename));
+        JTextField idFld  =new JTextField(id);
         List      choices            = getDataChoices();
         List      checkboxes         = new ArrayList();
         List      categories         = new ArrayList();
@@ -434,11 +442,21 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
         JComponent contents = GuiUtils.hbox(catComps);
-        contents = GuiUtils.topCenter(
-            GuiUtils.inset(new JLabel("Select the fields to write"), 5),
-            contents);
+        GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
+        JComponent top = GuiUtils.doLayout(new Component[]{
+            writeDataSourceXmlCbx,
+            GuiUtils.centerRight(dataSourceFileFld,GuiUtils.makeFileBrowseButton(dataSourceFileFld)),
+            GuiUtils.rLabel("ID:"), 
+            idFld,
+            GuiUtils.rLabel("Label:"), 
+            labelFld,
+            new JLabel("Select the fields to write"), 
+            GuiUtils.filler()},2,GuiUtils.WT_NY,
+                                           GuiUtils.WT_N);
+        top = GuiUtils.inset(top,5);
+        contents = GuiUtils.topCenter(top,contents);
         contents = GuiUtils.inset(contents, 5);
-        if ( !GuiUtils.showOkCancelDialog(null, "", contents, null)) {
+        if ( !GuiUtils.showOkCancelDialog(null, "Data Source View File", contents, null)) {
             return;
         }
 
@@ -464,9 +482,22 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                 root.appendChild(child);
             }
             writeViewFile(doc, root);
-
-
             IOUtil.writeFile(filename, XmlUtil.toString(root));
+            if(writeDataSourceXmlCbx.isSelected()) {
+                Document dsdoc = XmlUtil.makeDocument();
+                Element dsroot = doc.createElement("datasources");
+                Element dsnode  = doc.createElement("datasource");
+                Element propnode  = doc.createElement("property");
+                dsnode.setAttribute("id", idFld.getText());
+                dsnode.setAttribute("factory", getClass().getName());
+                dsnode.setAttribute("label", labelFld.getText());
+                propnode.setAttribute("name", "idv.data.viewfile");
+                propnode.setAttribute("value",  filename);
+                dsroot.appendChild(dsnode);
+                dsnode.appendChild(propnode);
+                IOUtil.writeFile(dataSourceFileFld.getText(), XmlUtil.toString(dsroot));
+            }
+
         } catch (Exception exc) {
             logException("Writing view file", exc);
         }
@@ -2814,6 +2845,20 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             };
             actions.add(a);
         }
+
+        if(canDoView()) {
+            a = new AbstractAction("Write View File") {
+            public void actionPerformed(ActionEvent ae) {
+                Misc.run(new Runnable() {
+                    public void run() {
+                        Misc.run(DataSourceImpl.this, "writeViewFile");
+                    }
+                });
+            }
+                };
+            actions.add(a);
+        }
+
 
 
     }

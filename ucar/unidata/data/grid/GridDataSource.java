@@ -55,6 +55,16 @@ import java.util.List;
  */
 public abstract class GridDataSource extends FilesDataSource {
 
+    public static final String ATTR_NORTH = "north";
+    public static final String ATTR_SOUTH = "south";
+    public static final String ATTR_EAST = "east";
+    public static final String ATTR_WEST = "west";
+
+    public static final String ATTR_X = "x";
+    public static final String ATTR_Y = "y";
+    public static final String ATTR_Z = "z";
+
+
     /** List of 2D categories for grids */
     private List twoDCategories;
 

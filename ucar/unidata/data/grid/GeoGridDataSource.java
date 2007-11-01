@@ -126,6 +126,9 @@ import javax.swing.*;
 
 public class GeoGridDataSource extends GridDataSource {
 
+
+
+
     /** Preference */
     public static final String PREF_VERTICALCS = IdvConstants.PREF_VERTICALCS;
 
@@ -249,8 +252,8 @@ public class GeoGridDataSource extends GridDataSource {
      *
      * @param root xml root
      */
-    protected void loadView(Element root) {
-        super.loadView(root);
+   protected void applyView(Element root) {
+        super.applyView(root);
         GeoSelection geoSubset = getDataSelection().getGeoSelection();
         if (geoSubset == null) {
             geoSubset = new GeoSelection();
@@ -258,43 +261,31 @@ public class GeoGridDataSource extends GridDataSource {
         }
         Element stride = XmlUtil.getElement(root, "stride");
         if (stride != null) {
-            geoSubset.setXStride(XmlUtil.getAttribute(stride, "x",
+            geoSubset.setXStride(XmlUtil.getAttribute(stride, ATTR_X,
                     geoSubset.getXStride()));
-            geoSubset.setYStride(XmlUtil.getAttribute(stride, "y",
+            geoSubset.setYStride(XmlUtil.getAttribute(stride, ATTR_Y,
                     geoSubset.getYStride()));
-            geoSubset.setZStride(XmlUtil.getAttribute(stride, "z",
+            geoSubset.setZStride(XmlUtil.getAttribute(stride, ATTR_Z,
                     geoSubset.getZStride()));
         }
         Element subset = XmlUtil.getElement(root, "subset");
         if (subset != null) {
             geoSubset.setBoundingBox(
                 new GeoLocationInfo(
-                    XmlUtil.getAttribute(subset, "north", 0.0),
-                    XmlUtil.getAttribute(subset, "west", 0.0),
-                    XmlUtil.getAttribute(subset, "south", 0.0),
-                    XmlUtil.getAttribute(subset, "east", 0.0)));
+                    XmlUtil.getAttribute(subset, ATTR_NORTH, 0.0),
+                    XmlUtil.getAttribute(subset, ATTR_WEST, 0.0),
+                    XmlUtil.getAttribute(subset, ATTR_SOUTH, 0.0),
+                    XmlUtil.getAttribute(subset, ATTR_EAST, 0.0)));
         }
 
     }
 
 
-    /**
-     * _more_
-     *
-     * @param actions _more_
-     */
-    protected void addActions(List actions) {
-        AbstractAction a = new AbstractAction("Write View File") {
-            public void actionPerformed(ActionEvent ae) {
-                Misc.run(new Runnable() {
-                    public void run() {
-                        Misc.run(GeoGridDataSource.this, "writeViewFile");
-                    }
-                });
-            }
-        };
-        actions.add(a);
+    protected boolean canDoView() {
+        return true;
     }
+
+
 
 
     /**
@@ -309,21 +300,21 @@ public class GeoGridDataSource extends GridDataSource {
             Element stride = doc.createElement("stride");
             root.appendChild(stride);
             if (geoSubset.getXStride() > 1) {
-                stride.setAttribute("x", geoSubset.getXStride() + "");
+                stride.setAttribute(ATTR_X, geoSubset.getXStride() + "");
             }
             if (geoSubset.getYStride() > 1) {
-                stride.setAttribute("y", geoSubset.getYStride() + "");
+                stride.setAttribute(ATTR_Y, geoSubset.getYStride() + "");
             }
             if (geoSubset.getZStride() > 1) {
-                stride.setAttribute("z", geoSubset.getYStride() + "");
+                stride.setAttribute(ATTR_Z, geoSubset.getZStride() + "");
             }
             GeoLocationInfo bbox = geoSubset.getBoundingBox();
             if (bbox != null) {
                 Element subset = doc.createElement("subset");
-                subset.setAttribute("north", bbox.getMaxLat() + "");
-                subset.setAttribute("south", bbox.getMinLat() + "");
-                subset.setAttribute("west", bbox.getMinLon() + "");
-                subset.setAttribute("east", bbox.getMaxLon() + "");
+                subset.setAttribute(ATTR_NORTH, bbox.getMaxLat() + "");
+                subset.setAttribute(ATTR_SOUTH, bbox.getMinLat() + "");
+                subset.setAttribute(ATTR_WEST, bbox.getMinLon() + "");
+                subset.setAttribute(ATTR_EAST, bbox.getMaxLon() + "");
                 root.appendChild(subset);
             }
 
