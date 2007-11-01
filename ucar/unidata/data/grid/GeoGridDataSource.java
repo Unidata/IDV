@@ -954,12 +954,9 @@ public class GeoGridDataSource extends GridDataSource {
         int cnt = 0;
         while (iter.hasNext()) {
             GeoGrid cfield = (GeoGrid) iter.next();
-            if ( !canShowParameter(cfield.getName())) {
-                continue;
-            }
-
             choice = makeDataChoiceFromGeoGrid(cfield, myTimes, timeToIndex);
             if (choice != null) {
+
                 cnt++;
                 if (gridRelativeWind == true) {
                     if ((choice.getDescription().indexOf("u-component") >= 0)

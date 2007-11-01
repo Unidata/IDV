@@ -125,6 +125,10 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             DataSourceImpl.class.getName());
 
 
+    public static int PARAM_SHOW_YES = 0;
+    public static int PARAM_SHOW_HIDE = 1;
+    public static int PARAM_SHOW_NO = 2;
+
     /** Used for doing file path switches on a bundle load */
     private List tmpPaths;
 
@@ -359,7 +363,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         NodeList children = XmlUtil.getElements(root, "parameter");
         for (int j = 0; j < children.getLength(); j++) {
             Element child = (Element) children.item(j);
-            paramsToShow.add(XmlUtil.getAttribute(child, "name"));
+            paramsToShow.add(child);
         }
     }
 
@@ -381,6 +385,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         JTextField idFld     = new JTextField(id);
         List      choices            = getDataChoices();
         List      checkboxes         = new ArrayList();        
+        List      hideCheckboxes         = new ArrayList();        
         List      paramNames         = new ArrayList();
         List      categories         = new ArrayList();
         Hashtable catMap             = new Hashtable();
@@ -426,6 +431,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                 new JCheckBox(label,
                               currentDataChoices.get(dataChoice.getName())
                               != null);
+            JCheckBox hideCbx = new JCheckBox("", false);
+            hideCbx.setToolTipText("If selected then the parameter is used to make derived quanitities but is not show");
+            hideCheckboxes.add(hideCbx);
             cbx.setToolTipText(dataChoice.getName());
             paramNames.add(dataChoice.getName());
             checkboxes.add(cbx);
@@ -437,26 +445,30 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                 catMap.put(dc, comps);
                 categories.add(dc);
             }
-            JComponent entry = cbx;
+            comps.add(cbx);
+            comps.add(GuiUtils.right(hideCbx));
             DataAlias alias = DataAlias.findAlias(dataChoice.getName());
             if(alias!=null) {
-                JCheckBox canonCbx = new JCheckBox("AKA: " + alias.getName(), false);
+                final JCheckBox canonCbx = new JCheckBox("AKA: " + alias.getName(), false);
                 checkboxes.add(canonCbx);
+                hideCbx = new JCheckBox("", false);
+                hideCbx.setToolTipText("If selected then the parameter is used to make derived quanitities but is not show");
+                hideCheckboxes.add(hideCbx);
                 paramNames.add(alias.getName());
-                entry  = GuiUtils.vbox(cbx,GuiUtils.inset(canonCbx, new Insets(0,30,0,0)));
+                comps.add(GuiUtils.inset(canonCbx,new Insets(0,10,0,0)));
+                comps.add(GuiUtils.right(hideCbx));
             }
-            comps.add(entry);
         }
 
         List catComps = new ArrayList();
         for (int i = 0; i < categories.size(); i++) {
             List comps = (List) catMap.get(categories.get(i));
-            JPanel innerPanel = GuiUtils.doLayout(comps, 1, GuiUtils.WT_NYN,
+            JPanel innerPanel = GuiUtils.doLayout(comps, 2, GuiUtils.WT_YY,
                                     GuiUtils.WT_N);
-            JScrollPane sp = new JScrollPane(GuiUtils.top(GuiUtils.left(innerPanel)));
+            JScrollPane sp = new JScrollPane(GuiUtils.top(innerPanel));
             sp.setPreferredSize(new Dimension(300, 400));
             JPanel top =
-                GuiUtils.left(new JLabel(categories.get(i).toString()));
+                GuiUtils.leftRight(new JLabel(categories.get(i).toString()), GuiUtils.inset(new JLabel("Hide"),new Insets(0,0,0,20)));
             catComps.add(GuiUtils.inset(GuiUtils.topCenter(top, sp), 5));
         }
 
@@ -488,11 +500,15 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
             for (int i = 0; i < checkboxes.size(); i++) {
                 JCheckBox cbx = (JCheckBox) checkboxes.get(i);
-                if ( !cbx.isSelected()) {
+                JCheckBox hideCbx = (JCheckBox) hideCheckboxes.get(i);
+                if ( !cbx.isSelected()&& !hideCbx.isSelected()) {
                     continue;
                 }
                 Element child = doc.createElement("parameter");
                 child.setAttribute("name", paramNames.get(i).toString());
+                if(hideCbx.isSelected()) {
+                    child.setAttribute("hide","true");
+                }
                 root.appendChild(child);
             }
             writeViewFile(doc, root);
@@ -542,23 +558,26 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      *
      * @return should show the parameter as a data choice
      */
-    public boolean canShowParameter(String name) {
+    public int canShowParameter(String name) {
         if ((paramsToShow == null) || (paramsToShow.size() == 0)) {
-            return true;
+            return PARAM_SHOW_YES;
         }
         DataAlias alias = DataAlias.findAlias(name);
         for (int i = 0; i < paramsToShow.size(); i++) {
-            String param = (String) paramsToShow.get(i);
-            if (StringUtil.stringMatch(name, param)) {
-                return true;
+            Element node = (Element) paramsToShow.get(i);
+            String param = XmlUtil.getAttribute(node, "name");
+            boolean match = StringUtil.stringMatch(name, param);
+            if (alias != null && !match) {
+                match = StringUtil.stringMatch(alias.getName(), param);
             }
-            if (alias != null) {
-                if (StringUtil.stringMatch(alias.getName(), param)) {
-                    return true;
+            if(match) {
+                if(XmlUtil.getAttribute(node, "hide",false)) {
+                    return PARAM_SHOW_HIDE;
                 }
+                return PARAM_SHOW_YES;
             }
         }
-        return false;
+        return PARAM_SHOW_NO;
     }
 
 
@@ -2135,6 +2154,14 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (dataChoices == null) {
             dataChoices = new ArrayList();
         }
+        int canShow = canShowParameter(choice.getName());
+        if (canShow == PARAM_SHOW_NO) {
+            return;
+        }
+        if (canShow == PARAM_SHOW_HIDE) {
+            choice.setProperty("forUser",false);
+        }
+
         dataChoices.add(choice);
     }
 

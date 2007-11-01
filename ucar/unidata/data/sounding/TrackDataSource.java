@@ -512,12 +512,10 @@ public class TrackDataSource extends FilesDataSource {
                     cats    = DataCategory.parseCategories("Track-"+cat+";trace", true);
                 }
 
-                if(canShowParameter(name)) {
-                    DirectDataChoice ddc = new DirectDataChoice(this,
-                                                                new String[] { trackName,
-                                                                               name }, name, description, cats, props);
-                    addDataChoice(ddc);
-                }
+                DirectDataChoice ddc = new DirectDataChoice(this,
+                                                            new String[] { trackName,
+                                                                           name }, name, description, cats, props);
+                addDataChoice(ddc);
             }
             // add in a station plot choice as well
             List pointCatList = pointCats;
@@ -528,12 +526,10 @@ public class TrackDataSource extends FilesDataSource {
             props = Misc.newHashtable(DataChoice.PROP_ICON,
                                       "/auxdata/ui/icons/Placemark16.gif");
             String pointLabel = getDataChoiceLabel(ID_POINTTRACE);
-            if(canShowParameter(pointLabel)) {
-                addDataChoice(new DirectDataChoice(this, new String[] { trackName,
-                                                                        ID_POINTTRACE }, pointLabel,
-                                                   pointLabel,
-                                     pointCatList, props));
-            }
+            addDataChoice(new DirectDataChoice(this, new String[] { trackName,
+                                                                    ID_POINTTRACE }, pointLabel,
+                                               pointLabel,
+                                               pointCatList, props));
             /*
             addDataChoice(new DirectDataChoice(this, new String[] { trackName,
                     ID_LASTOB }, getDataChoiceLabel(ID_LASTOB),
