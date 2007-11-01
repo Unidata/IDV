@@ -199,6 +199,7 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     private List selectedStations = new ArrayList();
 
 
+    private ActionListener dataSourceListener;
 
     /**
      *  Create the chooser
@@ -794,6 +795,13 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
         return makeDataSource(definingObject, null, properties);
     }
 
+    public void setDataSourceListener(ActionListener listener) {
+        this.dataSourceListener = listener;
+    }
+
+
+
+
     /**
      * Create the data source defined by the given definingObject
      * (ex: a string filename, a list of images).
@@ -811,9 +819,13 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      * @param properties extra properties
      * @return Was this creation successful
      */
-
     protected boolean makeDataSource(Object definingObject, String dataType,
                                      Hashtable properties) {
+        if(dataSourceListener!=null) {
+            dataSourceListener.actionPerformed(new ActionEvent(new Object[]{definingObject,properties},1,""));
+            return true;
+        }
+
         showWaitCursor();
         boolean result = idv.makeDataSource(definingObject, dataType,
                                             properties);

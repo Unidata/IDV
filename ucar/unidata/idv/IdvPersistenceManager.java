@@ -28,14 +28,18 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 
+import ucar.unidata.data.imagery.*;
+
 import ucar.unidata.data.DataManager;
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataSourceResults;
 
 
+import ucar.unidata.idv.chooser.*;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.idv.ui.DataSelector;
 import ucar.unidata.idv.ui.IdvUIManager;
+import ucar.unidata.idv.ui.IdvXmlUi;
 import ucar.unidata.idv.ui.IdvWindow;
 import ucar.unidata.idv.ui.ImageGenerator;
 import ucar.unidata.idv.ui.IslDialog;
@@ -86,6 +90,7 @@ import java.util.Vector;
 import java.util.zip.*;
 
 import javax.swing.*;
+import javax.swing.text.*;
 
 
 
@@ -3023,6 +3028,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         List dataEditableSources = new ArrayList();
         List dataEditableWidgets = new ArrayList();
 
+        double[]stretchy = new double[dataSources.size()];
+
         for (int dataSourceIdx = 0; dataSourceIdx < dataSources.size();
                 dataSourceIdx++) {
             DataSource dataSource =
@@ -3042,47 +3049,54 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 continue;
             }
             dataEditableSources.add(dataSource);
-            if (editableComps.size() == 0) {
-                editableComps.add(
-                    GuiUtils.cLabel(
-                        "You can choose new files for the following data sources"));
-            }
-            editableComps.add(new JLabel(" "));
-            editableComps.add(new JLabel(dataSource.toString()));
             List fields = new ArrayList();
             dataEditableWidgets.add(fields);
-            for (int sidx = 0; sidx < dataPaths.size(); sidx++) {
-                String path = dataPaths.get(sidx).toString();
-                String tail = IOUtil.getFileTail(path);
+            String fileString = StringUtil.join("\n",dataPaths);
+            JTextComponent textComponent;
+            JComponent widgetContents;
+
+            if(dataPaths.size()==1) {
+                textComponent = new JTextField(fileString, 40);
+                final JTextComponent fld = textComponent;
+                String tail = IOUtil.getFileTail(fileString);
                 final File relativeFile = new File(IOUtil.joinDir(bundlePath,
-                                              tail));
-                final JTextField fld = new JTextField(path, 40);
-                JComponent       extra;
+                                                                  tail));
                 if (relativeFile.exists()) {
                     JButton relativeBtn = new JButton("Use Relative");
-                    extra = relativeBtn;
                     relativeBtn.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent ae) {
                             fld.setText(relativeFile.toString());
                         }
                     });
-                } else {
-                    extra = new JPanel();
+                    widgetContents = GuiUtils.centerRight(GuiUtils.hfill(textComponent), relativeBtn);
+                }  else {
+                    widgetContents = GuiUtils.hfill(textComponent);
                 }
-                fields.add(fld);
-                editableComps.add(
-                    GuiUtils.leftCenter(
-                        new JLabel("     "),
-                        GuiUtils.centerRight(
-                            fld,
-                            GuiUtils.hbox(
-                                GuiUtils.makeFileBrowseButton(fld), extra))));
+                stretchy[editableComps.size()] = 0;
+            } else {
+                textComponent = new JTextArea(fileString, dataPaths.size()+1,40);
+                widgetContents = GuiUtils.makeScrollPane(textComponent,200,100);
+                widgetContents.setPreferredSize(new Dimension(200,100));
+                stretchy[editableComps.size()] = 1;
             }
+            if(IdvXmlUi.lastChooserNode!=null) {
+                JButton chooserBtn = GuiUtils.makeButton("Select Data", this, "selectData", new Object[]{textComponent,dataSource});
+                widgetContents = GuiUtils.centerRight(widgetContents, GuiUtils.top(chooserBtn));
+            }
+                fields.add(textComponent);
+                JComponent header  = GuiUtils.inset(new JLabel(dataSource.toString()),new Insets(10,0,0,0));
+                JComponent guts = GuiUtils.topCenter(header, GuiUtils.inset(widgetContents, new Insets(0,20,0,0)));
+                editableComps.add(guts);
         }
 
+
+
         if (editableComps.size() > 0) {
-            JComponent panel = GuiUtils.vbox(editableComps);
-            if ( !GuiUtils.askOkCancel("Data Sources", panel)) {
+            JComponent panel = GuiUtils.doLayout(editableComps,1,GuiUtils.WT_Y, stretchy);
+            panel = GuiUtils.topCenter(GuiUtils.cLabel(
+                                                       "You can choose new files for the following data sources"), panel);
+
+            if ( !GuiUtils.showOkCancelDialog(null, "Data Sources", panel,null)) {
                 return false;
             }
             for (int dataSourceIdx = 0;
@@ -3094,13 +3108,16 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                     (List) dataEditableWidgets.get(dataSourceIdx);
                 List dataPaths = new ArrayList();
 
-                for (int fldIdx = 0; fldIdx < fields.size(); fldIdx++) {
-                    final JTextField fld = (JTextField) fields.get(fldIdx);
+                dataPaths = StringUtil.split(((JTextComponent)fields.get(0)).getText(),
+                                             "\n",
+                                             true,true);
+                /*                for (int fldIdx = 0; fldIdx < fields.size(); fldIdx++) {
+                    final JTextComponent fld = (JTextComponent) fields.get(fldIdx);
                     String           s   = fld.getText().trim();
                     if (s.length() > 0) {
                         dataPaths.add(s);
                     }
-                }
+                    }*/
                 dataSource.setTmpPaths(dataPaths);
             }
         }
@@ -3110,6 +3127,60 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
     }
 
+
+
+    public void selectData(Object[]input) {
+        JTextComponent textComponent = (JTextComponent) input[0];
+        DataSource dataSource = (DataSource) input[1];
+        List choosers = new ArrayList();
+        Component comp =
+            getIdv().getIdvChooserManager().createChoosers(false, choosers,
+                                                      IdvXmlUi.lastChooserNode);
+
+        final Object[]result = {null};
+        final Hashtable[]properties = {null};
+        final JDialog dialog   = GuiUtils.createDialog(null, "Select new data", true);
+        ActionListener listener = new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    Object[] newData = (Object[]) ae.getSource();
+                    result[0] = newData[0];
+                    properties[0] = (Hashtable) newData[1];
+                    dialog.dispose();
+                }
+            };
+        for (int i = 0; i < choosers.size(); i++) {
+            IdvChooser chooser  = (IdvChooser) choosers.get(i);
+            chooser.setDataSourceListener(listener);
+        }
+
+        JButton cancelBtn = GuiUtils.makeButton("Cancel", dialog, "dispose");
+        comp = GuiUtils.inset(GuiUtils.topCenterBottom(GuiUtils.inset(new JLabel("Select new data for: " + dataSource),5),comp, GuiUtils.wrap(cancelBtn)),5);
+
+        dialog.getContentPane().add(comp);
+        dialog.pack();
+        dialog.show();
+        if(result[0]==null) return;
+        Object obj = result[0];
+        if(obj instanceof String) {
+            textComponent.setText(obj.toString());
+        } else if(obj instanceof List) {
+            List l = (List) obj;
+            textComponent.setText(StringUtil.join("\n",l));
+        } else if(obj instanceof ImageDataset) {
+            ImageDataset ids=(ImageDataset) obj;
+            List descriptors = ids.getImageDescriptors();
+            List urls  = new ArrayList();
+            for(int i=0;i<descriptors.size();i++) {
+                AddeImageDescriptor  aid = (AddeImageDescriptor) descriptors.get(i);
+                urls.add(aid.getImageInfo().makeAddeUrl());
+            }
+            textComponent.setText(StringUtil.join("\n",urls));
+
+        } else {
+            System.err.println ("Unknown result: " + result[0].getClass().getName());
+        }
+
+    }
 
 
     /**

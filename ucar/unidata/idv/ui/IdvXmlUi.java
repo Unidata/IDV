@@ -351,6 +351,7 @@ public class IdvXmlUi extends XmlUi {
                                  !idv.getProperty(
                                      IdvChooserManager.PROP_CHOOSER_TREEVIEW,
                                      false));
+            lastChooserNode = node;
             List choosers = new ArrayList();
             Component comp =
                 idv.getIdvChooserManager().createChoosers(inTabs, choosers,
@@ -469,6 +470,9 @@ public class IdvXmlUi extends XmlUi {
         }
         return super.createComponent(node, id);
     }
+
+    public static Element lastChooserNode;
+
 
     private IdvComponentGroup makeComponentGroup(Element node) {
         IdvComponentGroup compGroup = new IdvComponentGroup(idv,"");
