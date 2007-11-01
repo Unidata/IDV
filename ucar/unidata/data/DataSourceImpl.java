@@ -376,7 +376,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         String id = IOUtil.getFileTail(IOUtil.stripExtension(jarFile));
         String datasourceFilename = IOUtil.stripExtension(jarFile) + "datasource.xml";
         JCheckBox allCbx = new JCheckBox("Use this view for all data sources of this type",false);
-        JCheckBox installCbx = new JCheckBox("Install Plugin",true);
+        JCheckBox installCbx = new JCheckBox("Install Plugin",false);
         JTextField labelFld  = new JTextField(id);
         JTextField idFld     = new JTextField(id);
         List      choices            = getDataChoices();
