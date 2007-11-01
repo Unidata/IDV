@@ -1883,15 +1883,19 @@ public class IOUtil {
         ZipOutputStream zos =
             new ZipOutputStream(new FileOutputStream(filename));
         for (int i = 0; i < files.size(); i++) {
-            String file;
             String path;
             Object tmp = files.get(i);
+            byte[] bytes;
             if (tmp instanceof String) {
-                file = (String) tmp;
-                path = IOUtil.getFileTail(file);
+                bytes = IOUtil.readBytes(IOUtil.getInputStream((String) tmp));
+                path = IOUtil.getFileTail((String)tmp);
             } else if (tmp instanceof TwoFacedObject) {
                 TwoFacedObject tfo = (TwoFacedObject) tmp;
-                file = tfo.getId().toString();
+                if(tfo.getId() instanceof byte[]) {
+                    bytes = (byte[]) tfo.getId();
+                } else {
+                    bytes = IOUtil.readBytes(IOUtil.getInputStream(tfo.getId().toString()));
+                }
                 path = tfo.getLabel().toString();
             } else {
                 throw new IllegalArgumentException("Unknown file:" + tmp);
@@ -1900,7 +1904,6 @@ public class IOUtil {
                 path = pathPrefix + "/" + path;
             }
             zos.putNextEntry(new ZipEntry(path));
-            byte[] bytes = IOUtil.readBytes(IOUtil.getInputStream(file));
             zos.write(bytes, 0, bytes.length);
         }
         zos.close();
