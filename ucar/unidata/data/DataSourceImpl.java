@@ -418,8 +418,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                               != null);
             cbx.setToolTipText(dataChoice.getName());
             checkboxes.add(cbx);
-            DataCategory dc    = dataChoice.getDisplayCategory();
-            List         comps = (List) catMap.get(dc);
+            Object dc    = dataChoice.getDisplayCategory();
+            if(dc == null) dc = "";
+            List     comps =   (List) catMap.get(dc);
             if (comps == null) {
                 comps = new ArrayList();
                 catMap.put(dc, comps);
@@ -489,6 +490,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                 Element dsnode  = doc.createElement("datasource");
                 Element propnode  = doc.createElement("property");
                 dsnode.setAttribute("id", idFld.getText());
+                dsnode.setAttribute("fileselection", "true");
                 dsnode.setAttribute("factory", getClass().getName());
                 dsnode.setAttribute("label", labelFld.getText());
                 propnode.setAttribute("name", "idv.data.viewfile");

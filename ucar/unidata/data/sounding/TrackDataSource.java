@@ -512,10 +512,12 @@ public class TrackDataSource extends FilesDataSource {
                     cats    = DataCategory.parseCategories("Track-"+cat+";trace", true);
                 }
 
-                DirectDataChoice ddc = new DirectDataChoice(this,
-                                           new String[] { trackName,
-                        name }, name, description, cats, props);
-                addDataChoice(ddc);
+                if(canShowParameter(name)) {
+                    DirectDataChoice ddc = new DirectDataChoice(this,
+                                                                new String[] { trackName,
+                                                                               name }, name, description, cats, props);
+                    addDataChoice(ddc);
+                }
             }
             // add in a station plot choice as well
             List pointCatList = pointCats;
@@ -525,10 +527,13 @@ public class TrackDataSource extends FilesDataSource {
             }
             props = Misc.newHashtable(DataChoice.PROP_ICON,
                                       "/auxdata/ui/icons/Placemark16.gif");
-            addDataChoice(new DirectDataChoice(this, new String[] { trackName,
-                    ID_POINTTRACE }, getDataChoiceLabel(ID_POINTTRACE),
-                                     getDataChoiceLabel(ID_POINTTRACE),
+            String pointLabel = getDataChoiceLabel(ID_POINTTRACE);
+            if(canShowParameter(pointLabel)) {
+                addDataChoice(new DirectDataChoice(this, new String[] { trackName,
+                                                                        ID_POINTTRACE }, pointLabel,
+                                                   pointLabel,
                                      pointCatList, props));
+            }
             /*
             addDataChoice(new DirectDataChoice(this, new String[] { trackName,
                     ID_LASTOB }, getDataChoiceLabel(ID_LASTOB),
@@ -539,6 +544,10 @@ public class TrackDataSource extends FilesDataSource {
         }
 
 
+    }
+
+    protected boolean canDoView() {
+        return true;
     }
 
     /**
