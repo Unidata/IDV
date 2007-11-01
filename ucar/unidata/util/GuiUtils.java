@@ -6380,7 +6380,7 @@ public class GuiUtils {
      *
      * @return The button
      */
-    public static JButton makeFileBrowseButton(final JTextField fld) {
+    public static JButton makeFileBrowseButton(final JTextComponent fld) {
         return makeFileBrowseButton(fld, null);
     }
 
@@ -6392,7 +6392,7 @@ public class GuiUtils {
      *
      * @return The button
      */
-    public static JButton makeFileBrowseButton(final JTextField fld,
+    public static JButton makeFileBrowseButton(final JTextComponent fld,
             final List filters) {
         return makeFileBrowseButton(fld, false, filters);
     }
@@ -6406,7 +6406,7 @@ public class GuiUtils {
      *
      * @return The button
      */
-    public static JButton makeFileBrowseButton(final JTextField fld,
+    public static JButton makeFileBrowseButton(final JTextComponent fld,
             final boolean chooseDirectory, final List filters) {
         JButton browseButton = new JButton((chooseDirectory
                                             ? "Select Directory..."
