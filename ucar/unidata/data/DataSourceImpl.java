@@ -58,6 +58,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.util.ObjectPair;
 import ucar.unidata.util.PatternFileFilter;
@@ -323,18 +324,27 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * Check to see if there is a viewfile defined. If so load it in.
      */
     protected void loadView() {
-        String viewFile = (String) getProperty("idv.data.viewfile");
+        String viewFile = getDataContext().getIdv().getProperty(getClass().getName()+".viewfile",(String)null);
         if (viewFile != null) {
-            try {
-                String xml = IOUtil.readContents(viewFile, getClass(),
-                                 (String) null);
-                if (xml == null) {
-                    return;
-                }
-                applyView(XmlUtil.getRoot(xml));
-            } catch (Exception exc) {
-                throw new WrapperException(exc);
+            loadView(viewFile);
+        }
+        viewFile = (String) getProperty("idv.data.viewfile");
+        if (viewFile != null) {
+            loadView(viewFile);
+        }
+    }
+
+
+    protected void loadView(String viewFile) {
+        try {
+            String xml = IOUtil.readContents(viewFile, getClass(),
+                                             (String) null);
+            if (xml == null) {
+                return;
             }
+            applyView(XmlUtil.getRoot(xml));
+        } catch (Exception exc) {
+            throw new WrapperException(exc);
         }
     }
 
@@ -358,20 +368,20 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * _more_
      */
     public void writeViewFile() {
-        String filename = FileManager.getWriteFile(FileManager.FILTER_XML,
-                              FileManager.SUFFIX_XML);
-        if (filename == null) {
+        String jarFile = FileManager.getWriteFile(FileManager.FILTER_JAR,null);
+        if (jarFile == null) {
             return;
         }
 
-        String datasourceFilename = IOUtil.stripExtension(filename) + "datasource.xml";
-        JCheckBox writeDataSourceXmlCbx = new JCheckBox("Write Datasource XML File:",true);
-        JTextField dataSourceFileFld = new JTextField(datasourceFilename);
-        JTextField labelFld  =new JTextField("");
-        String id = IOUtil.getFileTail(IOUtil.stripExtension(filename));
-        JTextField idFld  =new JTextField(id);
+        String id = IOUtil.getFileTail(IOUtil.stripExtension(jarFile));
+        String datasourceFilename = IOUtil.stripExtension(jarFile) + "datasource.xml";
+        JCheckBox allCbx = new JCheckBox("Use this view for all data sources of this type",false);
+        JCheckBox installCbx = new JCheckBox("Install Plugin",true);
+        JTextField labelFld  = new JTextField(id);
+        JTextField idFld     = new JTextField(id);
         List      choices            = getDataChoices();
-        List      checkboxes         = new ArrayList();
+        List      checkboxes         = new ArrayList();        
+        List      paramNames         = new ArrayList();
         List      categories         = new ArrayList();
         Hashtable catMap             = new Hashtable();
         Hashtable currentDataChoices = new Hashtable();
@@ -417,6 +427,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                               currentDataChoices.get(dataChoice.getName())
                               != null);
             cbx.setToolTipText(dataChoice.getName());
+            paramNames.add(dataChoice.getName());
             checkboxes.add(cbx);
             Object dc    = dataChoice.getDisplayCategory();
             if(dc == null) dc = "";
@@ -426,7 +437,15 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                 catMap.put(dc, comps);
                 categories.add(dc);
             }
-            comps.add(cbx);
+            JComponent entry = cbx;
+            DataAlias alias = DataAlias.findAlias(dataChoice.getName());
+            if(alias!=null) {
+                JCheckBox canonCbx = new JCheckBox("AKA: " + alias.getName(), false);
+                checkboxes.add(canonCbx);
+                paramNames.add(alias.getName());
+                entry  = GuiUtils.vbox(cbx,GuiUtils.inset(canonCbx, new Insets(0,30,0,0)));
+            }
+            comps.add(entry);
         }
 
         List catComps = new ArrayList();
@@ -434,7 +453,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             List comps = (List) catMap.get(categories.get(i));
             JPanel innerPanel = GuiUtils.doLayout(comps, 1, GuiUtils.WT_NYN,
                                     GuiUtils.WT_N);
-            JScrollPane sp = new JScrollPane(GuiUtils.top(innerPanel));
+            JScrollPane sp = new JScrollPane(GuiUtils.top(GuiUtils.left(innerPanel)));
             sp.setPreferredSize(new Dimension(300, 400));
             JPanel top =
                 GuiUtils.left(new JLabel(categories.get(i).toString()));
@@ -445,15 +464,17 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         JComponent contents = GuiUtils.hbox(catComps);
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
         JComponent top = GuiUtils.doLayout(new Component[]{
-            writeDataSourceXmlCbx,
-            GuiUtils.centerRight(dataSourceFileFld,GuiUtils.makeFileBrowseButton(dataSourceFileFld)),
             GuiUtils.rLabel("ID:"), 
             idFld,
             GuiUtils.rLabel("Label:"), 
             labelFld,
-            new JLabel("Select the fields to write"), 
-            GuiUtils.filler()},2,GuiUtils.WT_NY,
-                                           GuiUtils.WT_N);
+            GuiUtils.filler(),
+            GuiUtils.left(allCbx),
+            GuiUtils.filler(),
+            GuiUtils.left(installCbx)
+        },2,GuiUtils.WT_NY,
+            GuiUtils.WT_N);
+        top  =GuiUtils.vbox(top,new JLabel("Select the fields to write")); 
         top = GuiUtils.inset(top,5);
         contents = GuiUtils.topCenter(top,contents);
         contents = GuiUtils.inset(contents, 5);
@@ -465,41 +486,40 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             Document doc  = XmlUtil.makeDocument();
             Element  root = doc.createElement("view");
 
-            for (int i = 0; i < dataChoices.size(); i++) {
-                DataChoice dataChoice = (DataChoice) dataChoices.get(i);
-                if ( !(dataChoice instanceof DirectDataChoice)) {
-                    continue;
-                }
-                String label = dataChoice.getDescription();
-                if (label.length() > 30) {
-                    label = label.substring(0, 29) + "...";
-                }
+            for (int i = 0; i < checkboxes.size(); i++) {
                 JCheckBox cbx = (JCheckBox) checkboxes.get(i);
                 if ( !cbx.isSelected()) {
                     continue;
                 }
                 Element child = doc.createElement("parameter");
-                child.setAttribute("name", dataChoice.getName());
+                child.setAttribute("name", paramNames.get(i).toString());
                 root.appendChild(child);
             }
             writeViewFile(doc, root);
-            IOUtil.writeFile(filename, XmlUtil.toString(root));
-            if(writeDataSourceXmlCbx.isSelected()) {
-                Document dsdoc = XmlUtil.makeDocument();
-                Element dsroot = doc.createElement("datasources");
-                Element dsnode  = doc.createElement("datasource");
-                Element propnode  = doc.createElement("property");
-                dsnode.setAttribute("id", idFld.getText());
-                dsnode.setAttribute("fileselection", "true");
-                dsnode.setAttribute("factory", getClass().getName());
-                dsnode.setAttribute("label", labelFld.getText());
-                propnode.setAttribute("name", "idv.data.viewfile");
-                propnode.setAttribute("value",  filename);
-                dsroot.appendChild(dsnode);
-                dsnode.appendChild(propnode);
-                IOUtil.writeFile(dataSourceFileFld.getText(), XmlUtil.toString(dsroot));
-            }
 
+            List files = new ArrayList();
+            files.add(new TwoFacedObject(id+".xml",XmlUtil.toString(root).getBytes()));
+            Document dsdoc = XmlUtil.makeDocument();
+            Element dsroot = doc.createElement("datasources");
+            Element dsnode  = doc.createElement("datasource");
+            Element propnode  = doc.createElement("property");
+            dsnode.setAttribute("id", idFld.getText());
+            dsnode.setAttribute("fileselection", "true");
+            dsnode.setAttribute("factory", getClass().getName());
+            dsnode.setAttribute("label", labelFld.getText());
+            propnode.setAttribute("name", "idv.data.viewfile");
+            propnode.setAttribute("value",  "/"+id+".xml");
+            dsroot.appendChild(dsnode);
+            dsnode.appendChild(propnode);
+            files.add(new TwoFacedObject(id+"datasource.xml",XmlUtil.toString(dsroot).getBytes()));
+            if(allCbx.isSelected()) {
+                String props = getClass().getName()+".viewfile = /" + id+".xml";
+                files.add(new TwoFacedObject(id+".properties",props.getBytes()));
+            }
+            IOUtil.writeJarFile(jarFile, files);
+            if(installCbx.isSelected()) {
+                getDataContext().getIdv().getPluginManager().installPluginFromFile(jarFile);
+            }
         } catch (Exception exc) {
             logException("Writing view file", exc);
         }
@@ -2849,7 +2869,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         }
 
         if(canDoView()) {
-            a = new AbstractAction("Write View File") {
+            a = new AbstractAction("Write View File Plugin") {
             public void actionPerformed(ActionEvent ae) {
                 Misc.run(new Runnable() {
                     public void run() {
