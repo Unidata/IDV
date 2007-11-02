@@ -97,6 +97,9 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         MouseMotionListener, KeyListener {
 
 
+    private static Color disabledColor = new Color(230,230,230);
+
+
     /* Implementation Notes:
        NavigatedPanel uses an image to buffer the image.
     */
@@ -282,7 +285,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         // catch resize events
         addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
-                setNewBounds(getBounds());
+                setNewBounds(getBounds(),false);
             }
         });
 
@@ -299,6 +302,13 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         lmMove = new ucar.unidata.util.ListenerManager(
             "ucar.unidata.view.geoloc.CursorMoveEventListener",
             "ucar.unidata.view.geoloc.CursorMoveEvent", "actionPerformed");
+    }
+
+
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        setNewBounds(getBounds(),true);
+        repaint();
     }
 
 
@@ -377,13 +387,18 @@ public class NavigatedPanel extends JPanel implements MouseListener,
 
     // accessor methods
 
+
+
+
+
+
     /**
      * Get the background color of the NavigatedPanel.
      *
      * @return background color
      */
     public Color getBackgroundColor() {
-        return backColor;
+        return (isEnabled()?backColor:disabledColor);
     }
 
     /**
@@ -628,7 +643,10 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         g2.setRenderingHint(RenderingHints.KEY_RENDERING,
                             RenderingHints.VALUE_RENDER_SPEED);
         g2.setClip(boundingBox);  // normalized coord system, because transform is applied
-        g2.setBackground(backColor);
+
+        Color foo = Color.red;
+        //        g2.setBackground(backColor);
+        g2.setBackground(foo);
 
         return g2;
     }
@@ -744,18 +762,18 @@ public class NavigatedPanel extends JPanel implements MouseListener,
      *
      * @param b new bounds
      */
-    private void setNewBounds(Rectangle b) {
+    private void setNewBounds(Rectangle b,boolean force) {
         boolean sameSize = (b.width == myBounds.width)
                            && (b.height == myBounds.height);
         if (debugBounds) {
             System.out.println("NavigatedPanel setBounds old= " + myBounds);
         }
-        if (sameSize && (b.x == myBounds.x) && (b.y == myBounds.y)) {
+        if (!force && sameSize && (b.x == myBounds.x) && (b.y == myBounds.y)) {
             return;
         }
 
         myBounds.setBounds(b);
-        if (sameSize) {
+        if (!force && sameSize) {
             return;
         }
 
@@ -802,10 +820,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         Rectangle bounds          = getBounds();
 
 
-        Color color = backColor;
-        if(!isEnabled()) {
-            color = Color.lightGray;
-        }
+        Color color = getBackgroundColor();
         
         if (draggingMode) {
             if (debugDraw) {

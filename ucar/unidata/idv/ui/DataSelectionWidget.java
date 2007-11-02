@@ -448,7 +448,7 @@ public class DataSelectionWidget {
             }
 
             if (areaComponent != null) {
-                areaTab.add(GuiUtils.topCenter(GuiUtils.inset(GuiUtils.right(areaCbx),new Insets(0,0,5,0)),areaComponent));
+                areaTab.add(GuiUtils.topCenter(GuiUtils.inset(GuiUtils.right(areaCbx),0),areaComponent));
                 selectionTab.add("Region", areaTab);
             }
             if (strideComponent != null) {
@@ -685,9 +685,9 @@ public class DataSelectionWidget {
      */
     public JComponent getTimesList() {
         if ( /*TODO dataSource != null*/false) {
-            return getTimesList("Use All ");
+            return getTimesList("Use All");
         } else {
-            return getTimesList("Use Default ");
+            return getTimesList("Use Default");
         }
     }
 
