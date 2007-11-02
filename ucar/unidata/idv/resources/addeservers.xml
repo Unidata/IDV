@@ -93,4 +93,9 @@ they essentially get it from their container type tag.
        names="PUB"
        type="image"/>
   </server>
+  <server description="EUMETSAT" name="adde.eumetsat.int">
+    <group
+       names="EUM_AD"
+       type="image"/>
+  </server>
 </servers>
