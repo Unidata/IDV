@@ -821,6 +821,9 @@ public class PointObFactory {
         while (dataIterator.hasNext()) {
             PointObsDatatype po = (PointObsDatatype) dataIterator.next();
             ucar.nc2.dt.EarthLocation el = po.getLocation();
+            if(el == null) {
+                continue;
+            }
             if ((llr != null)
                     && !llr.contains(el.getLatitude(), el.getLongitude())) {
                 continue;
