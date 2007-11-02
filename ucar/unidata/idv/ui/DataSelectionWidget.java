@@ -117,6 +117,17 @@ public class DataSelectionWidget {
     /** Holds the stride */
     private JPanel strideTab;
 
+    private JCheckBox strideCbx;
+
+    private JCheckBox areaCbx;
+
+
+    private   JComponent strideComponent;
+
+    private JComponent areaComponent;
+
+
+
     /** Holds the area subset */
     private JPanel areaTab;
 
@@ -357,7 +368,7 @@ public class DataSelectionWidget {
                 levelsTab = levelsScroller;
             }
             Vector tmp = new Vector();
-            tmp.add(new TwoFacedObject("Default", null));
+            tmp.add(new TwoFacedObject("All Levels", null));
             for (int i = 0; i < levels.size(); i++) {
                 Object o = levels.get(i);
                 if (o instanceof visad.Real) {
@@ -381,7 +392,10 @@ public class DataSelectionWidget {
                 }
             }
             if ( !didone) {
-                levelsList.setSelectedIndex(0);
+                if(tmp.size()>1)
+                    levelsList.setSelectedIndex(1);
+                else
+                    levelsList.setSelectedIndex(0);
             }
 
             selectionTab.add(levelsTab, "Level");
@@ -400,21 +414,45 @@ public class DataSelectionWidget {
             GeoSelectionPanel oldPanel = geoSelectionPanel;
             geoSelectionPanel =
                 ((DataSourceImpl) dataSource).doMakeGeoSelectionPanel(false);
-            JComponent strideComponent =
+            if(areaCbx == null) {
+                areaCbx = new JCheckBox("Use Default",true);
+                areaCbx.addActionListener(new ActionListener(){
+                        public void actionPerformed(ActionEvent ae) {
+                            if(areaComponent!=null) {
+                                GuiUtils.enableTree(areaComponent, !areaCbx.isSelected());
+                            }
+                        }
+                    });
+            }
+
+            if(strideCbx==null) {
+                strideCbx = new JCheckBox("Use Default",true);
+                strideCbx.addActionListener(new ActionListener(){
+                        public void actionPerformed(ActionEvent ae) {
+                            if(strideComponent!=null) {
+                                GuiUtils.enableTree(strideComponent, !strideCbx.isSelected());
+                            }
+                        }
+                    });
+            }
+            
+            strideComponent =
                 geoSelectionPanel.getStrideComponent();
-            JComponent areaComponent = geoSelectionPanel.getAreaComponent();
+            GuiUtils.enableTree(strideComponent, !strideCbx.isSelected());
+            areaComponent = geoSelectionPanel.getAreaComponent();
             areaComponent.setPreferredSize(new Dimension(200, 150));
+            GuiUtils.enableTree(areaComponent, !areaCbx.isSelected());
 
             if (oldPanel != null) {
                 geoSelectionPanel.initWith(oldPanel);
             }
 
             if (areaComponent != null) {
-                areaTab.add(areaComponent);
+                areaTab.add(GuiUtils.topCenter(GuiUtils.inset(GuiUtils.right(areaCbx),new Insets(0,0,5,0)),areaComponent));
                 selectionTab.add("Region", areaTab);
             }
             if (strideComponent != null) {
-                strideTab.add(strideComponent);
+                strideTab.add(GuiUtils.top(GuiUtils.topCenter(GuiUtils.inset(GuiUtils.right(strideCbx),new Insets(0,0,5,0)),strideComponent)));
                 selectionTab.add("Stride", strideTab);
             }
         }
@@ -460,7 +498,18 @@ public class DataSelectionWidget {
         } else {
             dataSelection = new DataSelection(getSelectedDateTimes());
         }
-        dataSelection.setGeoSelection(getGeoSelection());
+
+
+        GeoSelection geoSelection = getGeoSelection();
+        if(strideCbx.isSelected()) {
+            geoSelection.clearStride();
+        }
+
+        if(areaCbx.isSelected()) {
+            geoSelection.setBoundingBox(null);
+        }
+
+        dataSelection.setGeoSelection(geoSelection);
         Object[] levelRange = getSelectedLevelRange();
         if ((levelRange != null) && (levelRange.length > 0)) {
             if (addLevels || (levelRange.length == 2)) {

@@ -269,6 +269,12 @@ public class GeoSelection {
     }
 
 
+    public void clearStride() {
+        xStride = STRIDE_NONE;
+        yStride = STRIDE_NONE;
+        zStride = STRIDE_NONE;
+    }
+
 
     /**
      * Do we have a stride defined

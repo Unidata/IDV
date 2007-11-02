@@ -512,21 +512,21 @@ public class GeoSelectionPanel extends JPanel {
         if (xStrideBox != null) {
             geoSelection.setXStride(GuiUtils.getValueFromBox(xStrideBox));
             if (geoSelection.getXStride() == GeoSelection.STRIDE_BASE) {
-                geoSelection.setXStride(GeoSelection.STRIDE_NONE);
+                //                geoSelection.setXStride(GeoSelection.STRIDE_NONE);
             }
         }
 
         if (yStrideBox != null) {
             geoSelection.setYStride(GuiUtils.getValueFromBox(yStrideBox));
             if (geoSelection.getYStride() == GeoSelection.STRIDE_BASE) {
-                geoSelection.setYStride(GeoSelection.STRIDE_NONE);
+                //                geoSelection.setYStride(GeoSelection.STRIDE_NONE);
             }
         }
 
         if (zStrideBox != null) {
             geoSelection.setZStride(GuiUtils.getValueFromBox(zStrideBox));
             if (geoSelection.getZStride() == GeoSelection.STRIDE_BASE) {
-                geoSelection.setZStride(GeoSelection.STRIDE_NONE);
+                //                geoSelection.setZStride(GeoSelection.STRIDE_NONE);
             }
         }
 

@@ -179,7 +179,7 @@ public class SettingsTree extends DndTree {
             }
         });
 
-        contents = GuiUtils.centerBottom(settingsSP, showAllCbx);
+        contents = GuiUtils.topCenter(GuiUtils.right(showAllCbx),settingsSP);
 
         DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer() {
             public Component getTreeCellRendererComponent(JTree theTree,
