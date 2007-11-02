@@ -3049,89 +3049,41 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 continue;
             }
             dataEditableSources.add(dataSource);
-            List fields = new ArrayList();
-            dataEditableWidgets.add(fields);
-            String fileString = StringUtil.join("\n",dataPaths);
-            JTextComponent textComponent;
-            JComponent widgetContents;
-
-            if(dataPaths.size()==1) {
-                textComponent = new JTextField(fileString, 40);
-                final JTextComponent fld = textComponent;
-                String tail = IOUtil.getFileTail(fileString);
-                final File relativeFile = new File(IOUtil.joinDir(bundlePath,
-                                                                  tail));
-                if (relativeFile.exists()) {
-                    JButton relativeBtn = new JButton("Use Relative");
-                    relativeBtn.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent ae) {
-                            fld.setText(relativeFile.toString());
-                        }
-                    });
-                    widgetContents = GuiUtils.centerRight(GuiUtils.hfill(textComponent), relativeBtn);
-                }  else {
-                    widgetContents = GuiUtils.hfill(textComponent);
-                }
-                stretchy[editableComps.size()] = 0;
-            } else {
-                textComponent = new JTextArea(fileString, dataPaths.size()+1,40);
-                widgetContents = GuiUtils.makeScrollPane(textComponent,200,100);
-                widgetContents.setPreferredSize(new Dimension(200,100));
-                stretchy[editableComps.size()] = 1;
-            }
-            if(IdvXmlUi.lastChooserNode!=null) {
-                JButton chooserBtn = GuiUtils.makeButton("Select Data", this, "selectData", new Object[]{textComponent,dataSource});
-                widgetContents = GuiUtils.centerRight(widgetContents, GuiUtils.top(chooserBtn));
-            }
-                fields.add(textComponent);
-                JComponent header  = GuiUtils.inset(new JLabel(dataSource.toString()),new Insets(10,0,0,0));
-                JComponent guts = GuiUtils.topCenter(header, GuiUtils.inset(widgetContents, new Insets(0,20,0,0)));
-                editableComps.add(guts);
+            JLabel label = new JLabel(dataSource.toString());
+            JButton chooserBtn = GuiUtils.makeButton("Change Data:", this, "changeData", new Object[]{dataSource,label});
+            JComponent widgetContents = GuiUtils.leftCenter(chooserBtn, GuiUtils.inset(label,5));
+            widgetContents  = GuiUtils.inset(widgetContents,new Insets(10,0,0,0));
+            editableComps.add(widgetContents);
         }
-
-
 
         if (editableComps.size() > 0) {
             JComponent panel = GuiUtils.doLayout(editableComps,1,GuiUtils.WT_Y, stretchy);
-            panel = GuiUtils.topCenter(GuiUtils.cLabel(
-                                                       "You can choose new files for the following data sources"), panel);
+            panel = GuiUtils.inset(GuiUtils.topCenter(GuiUtils.cLabel(
+                                                       "You can choose new files for the following data sources"), panel),5);
 
             if ( !GuiUtils.showOkCancelDialog(null, "Data Sources", panel,null)) {
                 return false;
             }
-            for (int dataSourceIdx = 0;
-                    dataSourceIdx < dataEditableSources.size();
-                    dataSourceIdx++) {
-                DataSource dataSource =
-                    (DataSource) dataEditableSources.get(dataSourceIdx);
-                List fields    =
-                    (List) dataEditableWidgets.get(dataSourceIdx);
-                List dataPaths = new ArrayList();
-
-                dataPaths = StringUtil.split(((JTextComponent)fields.get(0)).getText(),
-                                             "\n",
-                                             true,true);
-                /*                for (int fldIdx = 0; fldIdx < fields.size(); fldIdx++) {
-                    final JTextComponent fld = (JTextComponent) fields.get(fldIdx);
-                    String           s   = fld.getText().trim();
-                    if (s.length() > 0) {
-                        dataPaths.add(s);
-                    }
-                    }*/
-                dataSource.setTmpPaths(dataPaths);
-            }
         }
-
-
         return true;
 
     }
 
 
 
-    public void selectData(Object[]input) {
-        JTextComponent textComponent = (JTextComponent) input[0];
-        DataSource dataSource = (DataSource) input[1];
+    public void changeData(Object[]input) {
+        DataSource dataSource = (DataSource) input[0];
+        JLabel label = (JLabel) input[1];
+        if(changeState(dataSource,false)) {
+            label.setText(dataSource.toString());
+        }
+    }
+
+    public boolean changeState(DataSource dataSource) {
+        return changeState(dataSource, true);
+    }
+
+    public boolean changeState(DataSource dataSource, boolean andReload) {
         List choosers = new ArrayList();
         Component comp =
             getIdv().getIdvChooserManager().createChoosers(false, choosers,
@@ -3139,7 +3091,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
         final Object[]result = {null};
         final Hashtable[]properties = {null};
-        final JDialog dialog   = GuiUtils.createDialog(null, "Select new data", true);
+        final JDialog dialog   = GuiUtils.createDialog(null, "Change data for: " + dataSource, true);
         ActionListener listener = new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     Object[] newData = (Object[]) ae.getSource();
@@ -3159,27 +3111,16 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         dialog.getContentPane().add(comp);
         dialog.pack();
         dialog.show();
-        if(result[0]==null) return;
-        Object obj = result[0];
-        if(obj instanceof String) {
-            textComponent.setText(obj.toString());
-        } else if(obj instanceof List) {
-            List l = (List) obj;
-            textComponent.setText(StringUtil.join("\n",l));
-        } else if(obj instanceof ImageDataset) {
-            ImageDataset ids=(ImageDataset) obj;
-            List descriptors = ids.getImageDescriptors();
-            List urls  = new ArrayList();
-            for(int i=0;i<descriptors.size();i++) {
-                AddeImageDescriptor  aid = (AddeImageDescriptor) descriptors.get(i);
-                urls.add(aid.getImageInfo().makeAddeUrl());
-            }
-            textComponent.setText(StringUtil.join("\n",urls));
+        if(result[0]==null) return false;
 
-        } else {
-            System.err.println ("Unknown result: " + result[0].getClass().getName());
+        try {
+            dataSource.updateState(result[0], properties[0]);
+            if(andReload) dataSource.reloadData();
+            return true;
+        } catch (Exception exc) {
+            logException("Updating data source", exc);
         }
-
+        return false;
     }
 
 

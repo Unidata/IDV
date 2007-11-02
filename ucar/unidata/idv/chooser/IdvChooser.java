@@ -895,6 +895,9 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      * Close the chooser window
      */
     protected void closeChooser() {
+        if(dataSourceListener!=null) {
+            return;
+        }
         if (chooserManager != null) {
             chooserManager.closeDataChooser();
         }

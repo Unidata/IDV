@@ -2314,6 +2314,11 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         return false;
     }
 
+
+    public boolean canChangeData() {
+        return true;
+    }
+
     /**
      * Save the data source files to local disk
      *
@@ -2877,6 +2882,15 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         };
         actions.add(a);
 
+        if (canChangeData()) {
+            a = new AbstractAction("Change Data") {
+            public void actionPerformed(ActionEvent ae) {
+                Misc.run(getDataContext().getIdv().getIdvUIManager(),"changeState", DataSourceImpl.this);
+            }};
+            actions.add(a);
+        }
+
+
         if (canSaveDataToLocalDisk()) {
             a = new AbstractAction("Make Data Source Local") {
                 public void actionPerformed(ActionEvent ae) {
@@ -3250,6 +3264,23 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         return relativePaths;
     }
 
+
+    public void updateState(Object newObject, Hashtable newProperties) {
+        if(newProperties!=null) {
+            if(properties!=null) {
+                properties.putAll(newProperties);
+            } else {
+                properties = newProperties;
+            }
+            String v = getProperty(PROP_TITLE, (String) null);
+            if (v == null) {
+                v = getProperty(PROP_NAME, (String) null);
+            }
+            if (v != null) {
+                this.name = v;
+            }
+        }
+    }
 
     /**
      * Set the TmpPaths property.

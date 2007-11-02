@@ -2837,8 +2837,12 @@ public class IdvUIManager extends IdvManager {
         menuItems.add(GuiUtils.makeMenuItem("Properties", dataSource,
                                             "showPropertiesDialog"));
 
-
         return menuItems;
+    }
+
+
+    public void changeState(DataSource dataSource) {
+        Misc.run(getPersistenceManager(),"changeState",dataSource);
     }
 
 

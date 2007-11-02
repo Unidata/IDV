@@ -181,6 +181,21 @@ public abstract class ImageDataSource extends DataSourceImpl {
         setDescription(getImageDataSourceName());
     }
 
+
+    public void updateState(Object newObject, Hashtable newProperties) {
+        super.updateState(newObject, newProperties);
+        if(newObject instanceof ImageDataset) {
+            ImageDataset ids = (ImageDataset) newObject;
+            setImageList(new ArrayList(ids.getImageDescriptors()));
+            setDescription(getImageDataSourceName());
+        }  else if(newObject instanceof List) {
+            setTmpPaths((List) newObject);
+        }  else if(newObject instanceof String) {
+            setTmpPaths(Misc.newList(newObject));
+        }
+    }
+
+
     /**
      * Get the paths for saving data files
      *
@@ -959,6 +974,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
         if (result != null) {
             return result;
         }
+        //        System.err.println ("source:" + source);
         //For now handle non adde urls here
         try {
             if ( !source.startsWith("adde:")) {
@@ -1108,8 +1124,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
             if (descriptorsToUse.size() == 0) {
                 return null;
             }
-
-
             AddeImageInfo biggestPosition = null;
             int           pos             = 0;
             //Find the descriptor with the largets position
@@ -1251,6 +1265,25 @@ public abstract class ImageDataSource extends DataSourceImpl {
                         AddeImageInfo aii =
                             (AddeImageInfo) desc.getImageInfo().clone();
                         BandInfo bi = (BandInfo) dataChoice.getId();
+                        List<BandInfo> bandInfos =
+                            (List<BandInfo>) getProperty(PROP_BANDINFO, (Object) null);
+                        boolean hasBand = true;
+                        //If this data source has been changed after we have create a display 
+                        //then the possibility exists that the bandinfo contained by the incoming
+                        //data choice might not be valid. If it isn't then default to the first 
+                        //one in the list
+                        if(bandInfos!=null) {
+                            hasBand = bandInfos.contains(bi);
+                            if(!hasBand) {
+                                //                                System.err.println("has band = " + bandInfos.contains(bi));
+                            }
+                            if(!hasBand && bandInfos.size()>0) {
+                                bi = bandInfos.get(0); 
+                            } else {
+                                //Not sure what to do here.
+                            }
+                        }
+
                         aii.setBand("" + bi.getBandNumber());
                         aii.setUnit(bi.getPreferredUnit());
                         desc.setImageInfo(aii);

@@ -502,6 +502,8 @@ public interface DataSource {
      */
     public List getTmpPaths();
 
+    public void updateState(Object newObject, Hashtable newProperties);
+
     /**
      * for changing paths
      *
