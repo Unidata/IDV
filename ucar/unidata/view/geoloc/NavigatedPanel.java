@@ -1,4 +1,4 @@
-/*
+/**
  * $Id: NavigatedPanel.java,v 1.60 2007/07/25 21:56:52 jeffmc Exp $
  *
  * Copyright  1997-2004 Unidata Program Center/University Corporation for
@@ -802,20 +802,25 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         Rectangle bounds          = getBounds();
 
 
+        Color color = backColor;
+        if(!isEnabled()) {
+            color = Color.lightGray;
+        }
+        
         if (draggingMode) {
             if (debugDraw) {
                 System.out.println("draw draggingMode ");
             }
             // Clear the image.
-            g.setBackground(backColor);
+            g.setBackground(color);
             g.clearRect(0, 0, bounds.width, bounds.height);
-            g.drawImage(bImage, deltax, deltay, backColor, imageObs);
+            g.drawImage(bImage, deltax, deltay, color, imageObs);
             redrawReference = false;
         } else {
             if (debugDraw) {
                 System.out.println("draw copy ");
             }
-            g.drawImage(bImage, 0, 0, backColor, imageObs);
+            g.drawImage(bImage, 0, 0, color, imageObs);
         }
 
         if (hasReference && redrawReference) {
@@ -1006,6 +1011,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
      * @param e  event to handle
      */
     public void mouseClicked(MouseEvent e) {
+        if(!isEnabled()) {return;}
         // pick event
         if (SwingUtilities.isRightMouseButton(e)) {
             LatLonPoint llp = screenToEarth(new Point2D.Double(e.getX(),
@@ -1059,6 +1065,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
      * @param e  event to handle
      */
     public void mousePressed(MouseEvent e) {
+        if(!isEnabled()) {return;}
         requestFocus();
         startX          = e.getX();
         startY          = e.getY();
@@ -1132,6 +1139,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
      * @param e  event to handle
      */
     public void mouseReleased(MouseEvent e) {
+        if(!isEnabled()) {return;}
 
         if (shouldSelectRegion(e) && (screenRegion != null)) {
             selectedRegion =
@@ -1199,6 +1207,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
      * @param e  event to handle
      */
     public void mouseDragged(MouseEvent e) {
+        if(!isEnabled()) {return;}
 
         if (regionDragPoint != null) {
             int       newX = e.getX();
@@ -1263,6 +1272,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
      * @param e  event to handle
      */
     public void mouseMoved(MouseEvent e) {
+        if(!isEnabled()) {return;}
         if ( !draggingMode) {
             showStatus(e.getX(), e.getY());
         }
