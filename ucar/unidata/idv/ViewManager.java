@@ -37,6 +37,7 @@ import ucar.unidata.idv.ui.*;
 import ucar.unidata.ui.Command;
 import ucar.unidata.ui.CommandManager;
 import ucar.unidata.ui.FontSelector;
+import ucar.unidata.ui.ImagePanel;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.Timeline;
 
@@ -773,11 +774,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
     }
 
+    JPanel contentsWrapper;
 
     /**
      * Create the ui
      */
-    protected void initUI() {
+   protected void initUI() {
         try {
             init();
             if (initProperties != null) {
@@ -797,6 +799,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         JComponent baseContents = (JComponent) doMakeContents();
 
         innerContents = GuiUtils.center(baseContents);
+        contentsWrapper  = GuiUtils.center(innerContents);
         menuBar       = doMakeMenuBar();
         if (menuBar != null) {
             menuBar.setBorderPainted(false);
@@ -822,8 +825,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         Component topBar = GuiUtils.leftCenterRight(GuiUtils.bottom(menuBar),
                                GuiUtils.bottom(nameLabel), topRight);
-        JComponent centerPanel = GuiUtils.topCenter(topBar, innerContents);
-
+        JComponent centerPanel = GuiUtils.topCenter(topBar, contentsWrapper);
         if (getShowBottomLegend()) {
             IdvLegend bottomLegend = new BottomLegend(this);
             legends.add(bottomLegend);
@@ -3435,6 +3437,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
             viewMenu.addSeparator();
         }
 
+        if(usingImagePanel) {
+            viewMenu.add(GuiUtils.makeMenuItem("Reset to display", this,"useDisplay"));
+        } else if(imagePanel!=null) {
+            viewMenu.add(GuiUtils.makeMenuItem("Reset to images", this,"useImages"));
+        }
+
         JMenu captureMenu = new JMenu("Capture");
         viewMenu.add(captureMenu);
         captureMenu.add(GuiUtils.makeMenuItem("Image...", this,
@@ -3538,6 +3546,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
                             if (evt.getPropertyName().equals(
                                     Animation.ANI_VALUE)) {
                                 updateTimelines(false);
+                                if(imagePanel!=null) {
+                                    imagePanel.setSelectedFile(animation.getCurrent());
+                                }
                             } else if (evt.getPropertyName().equals(
                                     Animation.ANI_SET) && (animationTimeline
                                         != null)) {
@@ -4242,7 +4253,37 @@ public class ViewManager extends SharableImpl implements ActionListener,
     public void actionPerformed(ActionEvent event) {}
 
 
+    private ImagePanel imagePanel;
+    boolean usingImagePanel  =false;
 
+    public void useDisplay() {
+        if(!usingImagePanel) return;
+        usingImagePanel = false;
+        contentsWrapper.removeAll();
+        contentsWrapper.add(BorderLayout.CENTER,innerContents);
+        contentsWrapper.revalidate();
+    }
+
+    public void useImages() {
+        if(usingImagePanel) {
+            return;
+        }
+        if(imagePanel == null) {
+            imagePanel = new ImagePanel();
+        }
+        contentsWrapper.removeAll();
+        contentsWrapper.add(BorderLayout.CENTER,imagePanel);
+        contentsWrapper.revalidate();
+        usingImagePanel = true;
+    }
+
+    public void useImages(List images) {
+        if(imagePanel == null) {
+            imagePanel = new ImagePanel();
+        }
+        imagePanel.setFiles(images);
+        imagePanel.setSelectedFile(animation.getCurrent());
+    }
 
 
     /**
@@ -4461,6 +4502,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 GuiUtils.buttonGroup(mainDisplayBtn,
                                      fullWindowBtn).add(contentsBtn);
             }
+
+
             JPanel qualityPanel = GuiUtils.vbox(new JLabel("Quality:"),
                                       hiBtn, medBtn, lowBtn);
 

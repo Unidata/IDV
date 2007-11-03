@@ -993,6 +993,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param andWrite write movie
      */
     private void stopAnimationCapture(boolean andWrite) {
+        if(viewManager!=null) {
+            viewManager.useImages(images);
+        }
         capturingAnim = false;
         if (andWrite) {
             writeMovie();
@@ -1382,54 +1385,46 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * Take a screen snapshot in blocking mode
      */
     private void grabImageAndBlock() {
+        try {
+            synchronized (MUTEX) {
+                //            String filename = getFilePrefix(imageCnt++);
+                String filename = getFilePrefix(images.size());
+                String tmp      = filename.toLowerCase();
+                if ( !(tmp.endsWith(".gif") || tmp.endsWith(".png")
+                       || tmp.endsWith(".jpg") || tmp.endsWith(".jpeg"))) {
+                    filename = filename + "." + getFileSuffix();
+                }
 
-        synchronized (MUTEX) {
-            //            String filename = getFilePrefix(imageCnt++);
-            String filename = getFilePrefix(images.size());
-            String tmp      = filename.toLowerCase();
-            if ( !(tmp.endsWith(".gif") || tmp.endsWith(".png")
-                    || tmp.endsWith(".jpg") || tmp.endsWith(".jpeg"))) {
-                filename = filename + "." + getFileSuffix();
-            }
-
-            String path = IOUtil.joinDir(getFileDirectory(), filename);
-            if (isInteractive() && !overwriteCbx.isSelected()
+                String path = IOUtil.joinDir(getFileDirectory(), filename);
+                if (isInteractive() && !overwriteCbx.isSelected()
                     && alternateDirCbx.isSelected()
                     && new File(path).exists()) {
-                if (JOptionPane
+                    if (JOptionPane
                         .showConfirmDialog(
-                            null, "File:" + path
-                            + " exists. Do you want to overwrite?", "File exists", JOptionPane
-                                .YES_NO_OPTION) == 1) {
-                    stopCapturingAuto();
-                    stopAnimationCapture(false);
-                    return;
+                                           null, "File:" + path
+                                           + " exists. Do you want to overwrite?", "File exists", JOptionPane
+                                           .YES_NO_OPTION) == 1) {
+                        stopCapturingAuto();
+                        stopAnimationCapture(false);
+                        return;
+                    }
+                    overwriteCbx.setSelected(true);
                 }
-                overwriteCbx.setSelected(true);
-            }
-            //            System.err.println ("ImageSequenceGrabber file dir: " +getFileDirectory() +" path: " +  path);
-            DateTime time = null;
-            try {
+                //            System.err.println ("ImageSequenceGrabber file dir: " +getFileDirectory() +" path: " +  path);
+                DateTime time = null;
+
                 time = (((anime != null) && (anime.getAniValue() != null))
                         ? new DateTime(anime.getAniValue())
                         : null);
-            } catch (Exception exc) {
-                LogUtil.logException("Getting animation time", exc);
-            }
-            if (alternateComponent != null) {
-                try {
+
+                if (alternateComponent != null) {
                     GuiUtils.toFront(GuiUtils.getFrame(alternateComponent));
                     Misc.sleep(50);
                     ImageUtils.writeImageToFile(alternateComponent, path);
-                } catch (Exception nfe) {
-                    LogUtil.userErrorMessage("Error");
-                    return;
-                }
-            } else {
-                viewManager.toFront();
-                Misc.sleep(100);
-                if (imageGenerator != null) {
-                    try {
+                } else {
+                    viewManager.toFront();
+                    Misc.sleep(100);
+                    if (imageGenerator != null) {
                         //                        System.err.println ("Calling getImage");
                         BufferedImage image =
                             viewManager.getMaster().getImage(false);
@@ -1441,15 +1436,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         imageGenerator.putIndex(props, ImageGenerator.PROP_IMAGEINDEX,
                                                 images.size());
                         imageGenerator.processImage(image, path,
-                                scriptingNode, props, viewManager);
-                    } catch (Throwable exc) {
-                        LogUtil.userErrorMessage("Error processing image:"
-                                + exc);
-                        exc.printStackTrace();
-                        return;
-                    }
-                } else {
-                    try {
+                                                    scriptingNode, props, viewManager);
+                    } else {
                         Component comp;
                         if (fullWindowBtn.isSelected()) {
                             comp = viewManager.getDisplayWindow()
@@ -1464,29 +1452,34 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         Robot     robot = new Robot();
                         BufferedImage image =
                             robot.createScreenCapture(new Rectangle(loc.x,
-                                loc.y, dim.width, dim.height));
+                                                                    loc.y, dim.width, dim.height));
 
                         if (backgroundTransparentBtn.isSelected()) {
                             image = ImageUtils.makeColorTransparent(image,
-                                    viewManager.getBackground());
+                                                                    viewManager.getBackground());
                         }
                         ImageUtils.writeImageToFile(image, path,
-                                getImageQuality());
-                    } catch (Exception exc) {
-                        LogUtil.logException("Saving image file", exc);
+                                                    getImageQuality());
+
                     }
                 }
+                images.add(path);
+                times.add(time);
+                //TODO
+                if (viewManager != null) {
+                    locs.add(viewManager.getVisibleGeoBounds());
+                } else {
+                    locs.add(null);
+                }
+                imagesChanged();
             }
-            images.add(path);
-            times.add(time);
-            //TODO
-            if (viewManager != null) {
-                locs.add(viewManager.getVisibleGeoBounds());
-            } else {
-                locs.add(null);
-            }
-            imagesChanged();
+        } catch (Throwable exc) {
+            stopAnimationCapture(false);
+            LogUtil.logException("Error capturing image", exc);
         }
+
+
+
 
     }
 
@@ -1583,6 +1576,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                              List times, List locs, Dimension size,
                              double displayRate, Element scriptingNode) {
 
+
         List fileToks = StringUtil.split(commaSeparatedFiles, ",", true,
                                          true);
 
@@ -1591,7 +1585,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             doingPanel = true;
         }
 
-        System.err.println("doingPanel:" + doingPanel + " " + scriptingNode);
+        //        System.err.println("doingPanel:" + doingPanel + " " + scriptingNode);
         for (int i = 0; i < fileToks.size(); i++) {
             String movieFile = (String) fileToks.get(i);
             try {
