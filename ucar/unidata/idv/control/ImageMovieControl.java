@@ -37,6 +37,7 @@ import ucar.unidata.gis.mcidasmap.McidasMap;
 
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.metdata.NamedStationImpl;
+import ucar.unidata.ui.ImagePanel;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.XmlTree;
 import ucar.unidata.ui.XmlUi;
@@ -109,28 +110,7 @@ import javax.swing.*;
  * @author Jeff McWhirter
  * @version $Revision: 1.71 $
  */
-public class ImageMovieControl extends DisplayControlImpl implements ImageObserver {
-
-    /** stop icon */
-    private static Icon stopIcon;
-
-    /** start icon */
-    private static Icon startIcon;
-
-    /** property for setting the widget to the first frame */
-    public static final String CMD_BEGINNING = "CMD_BEGINNING";
-
-    /** property for setting the widget to the loop in reverse */
-    public static final String CMD_BACKWARD = "CMD_BACKWARD";
-
-    /** property for setting the widget to the start or stop */
-    public static final String CMD_STARTSTOP = "CMD_STARTSTOP";
-
-    /** property for setting the widget to the loop forward */
-    public static final String CMD_FORWARD = "CMD_FORWARD";
-
-    /** property for setting the widget to the last frame */
-    public static final String CMD_END = "CMD_END";
+public class ImageMovieControl extends DisplayControlImpl  {
 
     /** Xml tag name */
     public static final String TAG_IMAGESET = "imageset";
@@ -197,18 +177,12 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
     private int dateType = DATETYPE_FILENAME;
 
 
-    /** Keep track of if the current run thread is the latest run thread */
-    private int runTimestamp = 0;
-
-    /** The file index we are currently looking at */
-    private int currentIndex = 0;
 
     /** Points to the imageset xml file */
     private String imageSetUrl;
 
     /** Points to the imageset root */
     private Element imageSetRoot;
-
 
     /** Do we do the imageset xml or do we look at the file system */
     private boolean doImageSet = true;
@@ -261,7 +235,7 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
     private JTextField dirFld;
 
     /** Holds all of the files */
-    private List files;
+    //    private List files;
 
     /** Holds all of the times */
     private List times;
@@ -286,26 +260,16 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
     private JLabel descLabel = new JLabel(" ");
 
     /** Displays the image */
-    private JPanel imagePanel;
+    private ImagePanel imagePanel;
 
     /** Where we show the preview image */
-    private JPanel previewPanel;
+    private ImagePanel previewPanel;
 
     /** Should we show the preview */
     private JCheckBox previewCbx;
 
     /** Last xml node we previewed */
     private Element lastPreviewNode;
-
-    /** The one we are drawing */
-    private Image currentImage;
-
-    /** The one we are drawing */
-    private Image previewImage;
-
-    /** The one we are loading */
-    private Image loadingImage;
-
 
     /** This is the index of the last selected point */
     private int pointIndex = -1;
@@ -419,7 +383,6 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
         };
 
 
-        files = new ArrayList();
         times = new ArrayList();
 
         if (dataChoice != null) {
@@ -447,11 +410,11 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
             if (directory == null) {
                 return false;
             }
-            if (files == null) {
+            /*            if (files == null) {
                 files = new ArrayList();
                 times = new ArrayList();
                 loadFilesFromDirectory();
-            }
+                }*/
         } else {
             loadFilesFromXml();
         }
@@ -563,69 +526,6 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
     }
 
 
-    /**
-     * Set the selected file. Will change index if it is invalid
-     *
-     * @param theIndex Index of the file.
-     */
-    private void setSelectedFile(int theIndex) {
-        if (theIndex < 0) {
-            theIndex = 0;
-        } else if (theIndex >= files.size()) {
-            theIndex = files.size() - 1;
-        }
-        currentIndex = theIndex;
-
-        String theFile = null;
-        if ((theIndex >= 0) && (theIndex < files.size())) {
-            theFile = (String) files.get(theIndex);
-        }
-
-
-        if (theFile == null) {
-            loadingImage = null;
-            currentImage = null;
-            imagePanel.repaint();
-        } else {
-            long t1 = System.currentTimeMillis();
-            try {
-                //fileList.setSelectedIndex(theIndex);
-                loadingImage = getImageFile(theFile);
-                loadingImage.getWidth(this);
-            } catch (Exception exc) {
-                logException("Error loading image", exc);
-            }
-            long t2 = System.currentTimeMillis();
-            //            System.err.println ("time:" + (t2-t1));
-        }
-
-
-
-
-    }
-
-
-    /**
-     * Read in the image from the given filename or url
-     *
-     * @param file File or url
-     *
-     * @return The image
-     *
-     * @throws Exception On badness
-     */
-    private Image getImageFile(String file) throws Exception {
-        if (file.startsWith("http:")) {
-            byte[] imageBytes = IOUtil.readBytesAndCache(file,
-                                    "ImageMovieControl");
-            if (imageBytes == null) {
-                return null;
-            }
-            return Toolkit.getDefaultToolkit().createImage(imageBytes);
-        } else {
-            return Toolkit.getDefaultToolkit().createImage(file);
-        }
-    }
 
 
     /**
@@ -651,7 +551,7 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
             if (lastDataImage != null) {
                 //Clear the last image to force the reload
                 lastDataImage = null;
-                loadImage(currentImage);
+                loadImage(getImagePanel().getImage());
             }
         } catch (Exception exc) {
             logException("Handling viewpoint changed", exc);
@@ -740,49 +640,13 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
 
 
     /**
-     * Handle the image update
-     *
-     * @param img img
-     * @param flags flags
-     * @param x x
-     * @param y y
-     * @param width width
-     * @param height height
-     *
-     * @return keep going
-     */
-    public boolean imageUpdate(Image img, int flags, int x, int y, int width,
-                               int height) {
-        if (img == currentImage) {
-            imagePanel.repaint();
-            return true;
-        }
-        if (img == previewImage) {
-            previewPanel.repaint();
-        }
-        if ((img != previewImage) && (img != loadingImage)) {
-            return false;
-        }
-        boolean all  = (flags & ImageObserver.ALLBITS) != 0;
-        boolean some = (flags & ImageObserver.SOMEBITS) != 0;
-        if (all && (img == loadingImage)) {
-            currentImage = loadingImage;
-
-            loadImage(currentImage);
-            imagePanel.repaint();
-            return true;
-        }
-        return true;
-    }
-
-    /**
      * Load in the image
      *
      * @param image  the image to load
      */
     private void loadImage(Image image) {
         try {
-            if ((image == null) || (imageLocation == null)
+            if ((image == null) || (getImageLocation() == null)
                     || !showImageInDisplay) {
                 lastDataImage = null;
                 imageDisplay.setVisible(false);
@@ -798,7 +662,7 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
             //FlatField   imageData   = DataUtility.makeField(image, true);
             Linear2DSet imageDomain = (Linear2DSet) imageData.getDomainSet();
             int[] screen =
-                earthToScreen(new EarthLocationTuple(imageLocation,
+                earthToScreen(new EarthLocationTuple(getImageLocation(),
                     new Real(RealType.Altitude, 0)));
             int width  = imageDomain.getX().getLength();
             int height = imageDomain.getY().getLength();
@@ -818,59 +682,9 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
             FlatField newImageData =
                 (FlatField) GridUtil.setSpatialDomain(imageData, domain);
             imageDisplay.loadData(newImageData);
-
-
-
-
         } catch (Exception exc) {
             logException("Making image data", exc);
         }
-    }
-
-    /**
-     * Draw the image
-     *
-     * @param g graphics_
-     * @param imagePanel Where do we paint into
-     * @param currentImage The image to paint
-     */
-    private void paintImage(Graphics g, JPanel imagePanel,
-                            Image currentImage) {
-
-
-        if (currentImage == null) {
-            return;
-        }
-        Rectangle bounds = imagePanel.getBounds();
-        if ((bounds.width == 0) || (bounds.height == 0)) {
-            return;
-        }
-        int imageWidth = currentImage.getWidth(this);
-        if (imageWidth <= 0) {
-            return;
-        }
-        int imageHeight = currentImage.getHeight(this);
-        if (imageHeight <= 0) {
-            return;
-        }
-        if ((imageWidth < bounds.width) && (imageHeight < bounds.height)) {
-            g.drawImage(currentImage, 0, 0, null);
-            return;
-        }
-
-
-        if (imageWidth / (double) bounds.width
-                > imageHeight / (double) bounds.height) {
-            imageHeight = (int) (imageHeight
-                                 * (bounds.width / (double) imageWidth));
-            imageWidth = bounds.width;
-        } else {
-            imageWidth = (int) (imageWidth
-                                * (bounds.height / (double) imageHeight));
-
-            imageHeight = bounds.height;
-        }
-        g.drawImage(currentImage, 0, 0, imageWidth, imageHeight, null);
     }
 
 
@@ -879,7 +693,7 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
      * Find the image  for the current animation time and display it
      */
     private void setImageForTime() {
-        setSelectedFile(currentIndex);
+        getImagePanel().setSelectedFile(getImagePanel().getCurrentIndex());
     }
 
 
@@ -897,13 +711,6 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
 
         enabledCbx = GuiUtils.makeCheckbox("Enabled", this, "enabled");
         tabbedPane = new JTabbedPane();
-        imagePanel = new JPanel() {
-            public void paint(Graphics g) {
-                super.paint(g);
-                paintImage(g, imagePanel, currentImage);
-            }
-        };
-        imagePanel.setPreferredSize(new Dimension(300, 300));
         previewCbx = new JCheckBox("Preview", false);
 
         previewCbx.addItemListener(new ItemListener() {
@@ -911,19 +718,12 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
                 doPreview(lastPreviewNode);
             }
         });
-        previewPanel = new JPanel() {
-            public void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                if ((previewImage != null) && previewCbx.isSelected()) {
-                    paintImage(g, previewPanel, previewImage);
-                }
-            }
-        };
-        //        previewPanel.setPreferredSize(new Dimension(300, 300));
+        previewPanel = new ImagePanel();
         JPanel topPanel = GuiUtils.left(getAnimationWidget().getContents());
         JPanel moviePanel = GuiUtils.topCenterBottom(topPanel, imagePanel,
                                 GuiUtils.left(descLabel));
         fileList = new JList();
+        /*
         fileList.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_DELETE) {
@@ -943,8 +743,7 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
                     setImageForTime();
                 }
             }
-
-        });
+            });*/
         addMoviesToList();
 
 
@@ -1252,7 +1051,7 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
     protected void timeChanged(Real time) {
         super.timeChanged(time);
         try {
-            setSelectedFile(getAnimation(true).getCurrent());
+            getImagePanel().setSelectedFile(getAnimation(true).getCurrent());
         } catch (Exception exc) {
             logException("Error setting time", exc);
         }
@@ -1301,6 +1100,17 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
     }
 
 
+
+    private LatLonPoint getImageLocation() {
+        if(imageLocation == null) {
+            setSelectedPoint();
+        }
+        return imageLocation;
+    }
+
+
+
+
     /**
      * Set the selected point by index
      *
@@ -1330,9 +1140,8 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
      */
     private void doPreview(Element node) {
         try {
-            previewImage = null;
+            previewPanel.setImage(null);
             doPreviewInner(node);
-            previewPanel.repaint();
         } catch (Exception exc) {
             logException("Error loading preview", exc);
         }
@@ -1394,10 +1203,7 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
                 url = base + url;
             }
         }
-        previewImage = getImageFile(url);
-
-
-
+        previewPanel.setImage(ImageUtils.getImageFile(url));
     }
 
 
@@ -1439,8 +1245,6 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
         if (name != null) {
             LogUtil.message("Location: " + name);
         }
-
-
         pointIndex = pointNodes.indexOf(node);
         setSelectedPoint();
         imageSetRoot = null;
@@ -1453,7 +1257,6 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
      * Reload the files
      */
     public void reloadFiles() {
-        currentIndex = 0;
         if ( !doImageSet) {
             loadFilesFromDirectory();
         } else {
@@ -1467,7 +1270,7 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
      * Load files
      */
     public void loadFilesFromXml() {
-        files = new ArrayList();
+        List files = new ArrayList();
         times = new ArrayList();
         if (imageSetUrl == null) {
             return;
@@ -1513,11 +1316,11 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
 
 
             //Make sure we create the animation before we call setAnimationSet
+            getImagePanel().setFiles(files);
             getAnimation(true);
             setAnimationSet(times);
+            getAnimation(true).setCurrent(files.size() - 1);
 
-            currentIndex = files.size() - 1;
-            getAnimation(true).setCurrent(currentIndex);
             String group = XmlUtil.getAttribute(imageSetRoot, ATTR_GROUP, "");
             String desc  = XmlUtil.getAttribute(imageSetRoot, ATTR_DESC, "");
             if (desc.length() > 0) {
@@ -1595,7 +1398,7 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
                     dir,
                     (java.io.FileFilter) new PatternFileFilter(
                         filePattern, false), false);
-            files = new ArrayList();
+            List files = new ArrayList();
             String  errorMsg = null;
             Pattern pattern  = Pattern.compile(getDatePattern());
             for (int i = 0; i < imageFiles.length; i++) {
@@ -1634,6 +1437,7 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
                 userMessage("No files were found using the pattern:"
                             + pattern);
             }
+            getImagePanel().setFiles(files);
         } catch (Exception exc) {
             logException("Error finding files", exc);
         }
@@ -1668,23 +1472,37 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
      */
     private void addMoviesToList() {
         Vector items = new Vector();
+        List files = getImagePanel().getFiles();
         for (int i = 0; i < files.size(); i++) {
             items.add(times.get(i).toString());
         }
         if (fileList != null) {
-            fileList.setListData(items);
+           fileList.setListData(items);
         }
     }
 
 
+    private ImagePanel getImagePanel() {
+        if(imagePanel == null) {
+            imagePanel = new ImagePanel() {
+                    public void setImage(Image image) {
+                        super.setImage(image);
+                        loadImage(imagePanel.getImage());
+                    }
+                };
+            imagePanel.setPreferredSize(new Dimension(300, 300));
+        }
+        return imagePanel;
+    }
 
     /**
      * initdone
      */
     public void initDone() {
-        if ((files.size() == 0) && (tabbedPane.getTabCount() > 1)) {
+        if (getImagePanel().getFiles().size() == 0 && tabbedPane.getTabCount() > 1) {
             tabbedPane.setSelectedIndex(1);
         }
+        
         setImageForTime();
         super.initDone();
     }
@@ -1729,21 +1547,8 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
      * @param value The new value for Files
      */
     public void setFiles(List value) {
-        files = value;
+        //        files = value;
     }
-
-    /**
-     * Get the Files property.
-     *
-     * @return The Files
-     */
-    public List getFiles() {
-        if (imageSetUrl != null) {
-            return null;
-        }
-        return files;
-    }
-
 
 
     /**
@@ -1930,7 +1735,7 @@ public class ImageMovieControl extends DisplayControlImpl implements ImageObserv
     public void setShowImageInDisplay(boolean value) {
         showImageInDisplay = value;
         if (imageDisplay != null) {
-            loadImage(currentImage);
+            loadImage(getImagePanel().getImage());
         }
     }
 
