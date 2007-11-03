@@ -1065,6 +1065,28 @@ public class ImageUtils {
 
 
 
+    /**
+     * Read in the image from the given filename or url
+     *
+     * @param file File or url
+     *
+     * @return The image
+     *
+     * @throws Exception On badness
+     */
+    public static Image getImageFile(String file) throws Exception {
+        if (IOUtil.isHttpProtocol("http:")) {
+            byte[] imageBytes = IOUtil.readBytesAndCache(file,
+                                    "ImageMovieControl");
+            if (imageBytes == null) {
+                return null;
+            }
+            return Toolkit.getDefaultToolkit().createImage(imageBytes);
+        } else {
+            return Toolkit.getDefaultToolkit().createImage(file);
+        }
+    }
+
 
 
 }
