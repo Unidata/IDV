@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -117,13 +118,17 @@ public class DataSelectionWidget {
     /** Holds the stride */
     private JPanel strideTab;
 
+    /** Stride Checkbox          */
     private JCheckBox strideCbx;
 
+    /** Area Checkbox */
     private JCheckBox areaCbx;
 
 
-    private   JComponent strideComponent;
+    /** Stride Component */
+    private JComponent strideComponent;
 
+    /** Area Component */
     private JComponent areaComponent;
 
 
@@ -392,10 +397,11 @@ public class DataSelectionWidget {
                 }
             }
             if ( !didone) {
-                if(tmp.size()>1)
+                if (tmp.size() > 1) {
                     levelsList.setSelectedIndex(1);
-                else
+                } else {
                     levelsList.setSelectedIndex(0);
+                }
             }
 
             selectionTab.add(levelsTab, "Level");
@@ -414,45 +420,58 @@ public class DataSelectionWidget {
             GeoSelectionPanel oldPanel = geoSelectionPanel;
             geoSelectionPanel =
                 ((DataSourceImpl) dataSource).doMakeGeoSelectionPanel(false);
-            if(areaCbx == null) {
-                areaCbx = new JCheckBox("Use Default",true);
-                areaCbx.addActionListener(new ActionListener(){
-                        public void actionPerformed(ActionEvent ae) {
-                            if(areaComponent!=null) {
-                                GuiUtils.enableTree(areaComponent, !areaCbx.isSelected());
-                            }
+            if (areaCbx == null) {
+                areaCbx = new JCheckBox("Use Default", true);
+                areaCbx.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        if (areaComponent != null) {
+                            GuiUtils.enableTree(areaComponent,
+                                    !areaCbx.isSelected());
                         }
-                    });
+                    }
+                });
             }
 
-            if(strideCbx==null) {
-                strideCbx = new JCheckBox("Use Default",true);
-                strideCbx.addActionListener(new ActionListener(){
-                        public void actionPerformed(ActionEvent ae) {
-                            if(strideComponent!=null) {
-                                GuiUtils.enableTree(strideComponent, !strideCbx.isSelected());
-                            }
+            if (strideCbx == null) {
+                strideCbx = new JCheckBox("Use Default", true);
+                strideCbx.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        if (strideComponent != null) {
+                            GuiUtils.enableTree(strideComponent,
+                                    !strideCbx.isSelected());
                         }
-                    });
+                    }
+                });
             }
-            
-            strideComponent =
-                geoSelectionPanel.getStrideComponent();
-            GuiUtils.enableTree(strideComponent, !strideCbx.isSelected());
+
+            strideComponent = geoSelectionPanel.getStrideComponent();
+            if (strideComponent != null) {
+                GuiUtils.enableTree(strideComponent, !strideCbx.isSelected());
+            }
             areaComponent = geoSelectionPanel.getAreaComponent();
-            areaComponent.setPreferredSize(new Dimension(200, 150));
-            GuiUtils.enableTree(areaComponent, !areaCbx.isSelected());
+            if (areaComponent != null) {
+                areaComponent.setPreferredSize(new Dimension(200, 150));
+                GuiUtils.enableTree(areaComponent, !areaCbx.isSelected());
+            }
 
             if (oldPanel != null) {
                 geoSelectionPanel.initWith(oldPanel);
             }
 
             if (areaComponent != null) {
-                areaTab.add(GuiUtils.topCenter(GuiUtils.inset(GuiUtils.right(areaCbx),0),areaComponent));
+                areaTab.add(
+                    GuiUtils.topCenter(
+                        GuiUtils.inset(GuiUtils.right(areaCbx), 0),
+                        areaComponent));
                 selectionTab.add("Region", areaTab);
             }
             if (strideComponent != null) {
-                strideTab.add(GuiUtils.top(GuiUtils.topCenter(GuiUtils.inset(GuiUtils.right(strideCbx),new Insets(0,0,5,0)),strideComponent)));
+                strideTab.add(
+                    GuiUtils.top(
+                        GuiUtils.topCenter(
+                            GuiUtils.inset(
+                                GuiUtils.right(strideCbx),
+                                new Insets(0, 0, 5, 0)), strideComponent)));
                 selectionTab.add("Stride", strideTab);
             }
         }
@@ -501,11 +520,11 @@ public class DataSelectionWidget {
 
 
         GeoSelection geoSelection = getGeoSelection();
-        if(strideCbx.isSelected()) {
+        if (strideCbx.isSelected()) {
             geoSelection.clearStride();
         }
 
-        if(areaCbx.isSelected()) {
+        if (areaCbx.isSelected()) {
             geoSelection.setBoundingBox(null);
         }
 
