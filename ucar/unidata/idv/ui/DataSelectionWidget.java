@@ -420,45 +420,20 @@ public class DataSelectionWidget {
             GeoSelectionPanel oldPanel = geoSelectionPanel;
             geoSelectionPanel =
                 ((DataSourceImpl) dataSource).doMakeGeoSelectionPanel(false);
-            if (areaCbx == null) {
-                areaCbx = new JCheckBox("Use Default", true);
-                areaCbx.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        if (areaComponent != null) {
-                            GuiUtils.enableTree(areaComponent,
-                                    !areaCbx.isSelected());
-                        }
-                    }
-                });
-            }
-
-            if (strideCbx == null) {
-                strideCbx = new JCheckBox("Use Default", true);
-                strideCbx.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        if (strideComponent != null) {
-                            GuiUtils.enableTree(strideComponent,
-                                    !strideCbx.isSelected());
-                        }
-                    }
-                });
-            }
-
             strideComponent = geoSelectionPanel.getStrideComponent();
-            if (strideComponent != null) {
-                GuiUtils.enableTree(strideComponent, !strideCbx.isSelected());
-            }
             areaComponent = geoSelectionPanel.getAreaComponent();
             if (areaComponent != null) {
                 areaComponent.setPreferredSize(new Dimension(200, 150));
                 GuiUtils.enableTree(areaComponent, !areaCbx.isSelected());
             }
-
             if (oldPanel != null) {
                 geoSelectionPanel.initWith(oldPanel);
             }
 
             if (areaComponent != null) {
+                areaComponent.setPreferredSize(new Dimension(200, 150));
+                GuiUtils.enableTree(areaComponent, !areaCbx.isSelected());
+                areaTab.add(GuiUtils.topCenter(GuiUtils.inset(GuiUtils.right(areaCbx),0),areaComponent));
                 areaTab.add(
                     GuiUtils.topCenter(
                         GuiUtils.inset(GuiUtils.right(areaCbx), 0),
@@ -466,6 +441,8 @@ public class DataSelectionWidget {
                 selectionTab.add("Region", areaTab);
             }
             if (strideComponent != null) {
+                GuiUtils.enableTree(strideComponent, !strideCbx.isSelected());
+                strideTab.add(GuiUtils.top(GuiUtils.topCenter(GuiUtils.inset(GuiUtils.right(strideCbx),new Insets(0,0,5,0)),strideComponent)));
                 strideTab.add(
                     GuiUtils.top(
                         GuiUtils.topCenter(
@@ -520,12 +497,14 @@ public class DataSelectionWidget {
 
 
         GeoSelection geoSelection = getGeoSelection();
-        if (strideCbx.isSelected()) {
-            geoSelection.clearStride();
-        }
-
-        if (areaCbx.isSelected()) {
-            geoSelection.setBoundingBox(null);
+        if(geoSelection!=null) {
+            if (strideCbx.isSelected()) {
+                geoSelection.clearStride();
+            }
+            
+            if (areaCbx.isSelected()) {
+                geoSelection.setBoundingBox(null);
+            }
         }
 
         dataSelection.setGeoSelection(geoSelection);
@@ -608,6 +587,26 @@ public class DataSelectionWidget {
      * @return The GUI
      */
     private JComponent doMakeContents() {
+        areaCbx = new JCheckBox("Use Default", true);
+        areaCbx.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    if (areaComponent != null) {
+                        GuiUtils.enableTree(areaComponent,
+                                            !areaCbx.isSelected());
+                    }
+                }
+            });
+
+        strideCbx = new JCheckBox("Use Default", true);
+        strideCbx.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    if (strideComponent != null) {
+                        GuiUtils.enableTree(strideComponent,
+                                            !strideCbx.isSelected());
+                    }
+                }
+            });
+
         timesComponent = getTimesList();
         selectionTab   = new JTabbedPane();
         selectionTab.setBorder(null);
@@ -709,8 +708,6 @@ public class DataSelectionWidget {
             return getTimesList("Use Default");
         }
     }
-
-
 
 
     /**
