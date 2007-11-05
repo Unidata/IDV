@@ -72,6 +72,8 @@ public class Animation extends Displayable {
      */
     public static final int REVERSE = 1;
 
+    private boolean enabled = true;
+
     /** ScalarMap for animation */
     private ScalarMap animationMap;
 
@@ -765,6 +767,7 @@ public class Animation extends Displayable {
             if (checkUserFrames) {
                 newIndex = clipIndex(newIndex, dir);
             }
+            if(enabled) {
             if (control == null) {
                 if ((animationSet != null) && (newIndex >= 0)
                         && (newIndex < animationSet.getLength())) {
@@ -775,6 +778,7 @@ public class Animation extends Displayable {
                 }
             } else {
                 control.setCurrent(newIndex);
+            }
             }
             //            System.err.println ("setCurrent.fire ANI_VALUE");
             if(!Misc.equals(lastTime, aniValue)) {
@@ -1088,6 +1092,27 @@ public class Animation extends Displayable {
         }
         return new DateTime[]{};
 
+    }
+
+    /**
+       Set the Enabled property.
+
+       @param value The new value for Enabled
+    **/
+    public void setEnabled (boolean value) {
+	enabled = value;
+        if(enabled!=value && value) {
+            setCurrent(currentIndex,false);
+        }
+    }
+
+    /**
+       Get the Enabled property.
+
+       @return The Enabled
+    **/
+    public boolean getEnabled () {
+	return enabled;
     }
 
 

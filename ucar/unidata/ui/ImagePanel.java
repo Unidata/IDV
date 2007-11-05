@@ -48,7 +48,7 @@ import javax.swing.*;
  * @author Jeff McWhirter
  * @version $Revision: 1.71 $
  */
-public class ImagePanel extends JPanel implements ImageObserver { 
+public class ImagePanel extends JPanel implements ImageObserver, MouseListener,MouseMotionListener, KeyListener { 
 
     /** The file index we are currently looking at */
     private int currentIndex = 0;
@@ -61,11 +61,133 @@ public class ImagePanel extends JPanel implements ImageObserver {
     /** The one we are drawing */
     private Image loadingImage;
 
+    private double scaleFactor = 1.0;
+
+    private int translateX = 0;
+    private int translateY = 0;
+
+    private int mouseX;
+    private int mouseY;
+
 
     /**
      * NOOP ctor
      */
-    public ImagePanel() {}
+    public ImagePanel() {
+        addMouseListener(this);
+        addMouseMotionListener(this);
+        addKeyListener(this);
+        addMouseWheelListener(new MouseWheelListener() {
+            public void mouseWheelMoved(MouseWheelEvent event) {
+                int notches = event.getWheelRotation();
+                if (notches < 0) {
+                    doZoomIn();
+                } else {
+                    doZoomOut();
+                }
+            }
+        });
+    }
+
+
+    public void keyPressed(KeyEvent e) {
+        if(e.isControlDown() && e.getKeyCode() == KeyEvent.VK_R) {
+            scaleFactor = 1;
+            translateX = 0;
+            translateY = 0;
+            currentTransX = 0;
+            currentTransY = 0;
+            repaint();
+        } else  if(e.isControlDown() && e.getKeyCode() == KeyEvent.VK_UP) {
+            doZoomIn();
+        } else  if(e.isControlDown() && e.getKeyCode() == KeyEvent.VK_DOWN) {
+            doZoomOut();
+        } else   if(e.getKeyCode() == KeyEvent.VK_DOWN) {
+            translateY+=20;
+            repaint();
+        } else   if(e.getKeyCode() == KeyEvent.VK_UP) {
+            translateY-=20;
+            repaint();
+        } else   if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
+            translateX+=20;
+            repaint();
+        } else   if(e.getKeyCode() == KeyEvent.VK_LEFT) {
+            translateX-=20;
+            repaint();
+        }
+    }
+
+
+    /**
+     * Noop
+     *
+     * @param e The event
+     */
+    public void keyReleased(KeyEvent e) {}
+
+    /**
+     * Noop
+     *
+     * @param e The event
+     */
+    public void keyTyped(KeyEvent e) {}
+
+    /**
+     * Noop
+     *
+     * @param e The event
+     */
+    public void mouseMoved(MouseEvent e) {}
+
+    public void mouseClicked(MouseEvent e) {}
+
+    /**
+     * Noop
+     *
+     * @param e The event
+     */
+    public void mouseEntered(MouseEvent e) {
+        requestFocus();
+    }
+
+    /**
+     * Noop
+     *
+     * @param e The event
+     */
+    public void mouseExited(MouseEvent e) {}
+
+
+    int baseTransX=0;
+    int baseTransY=0;
+    int currentTransX =0;
+    int currentTransY =0;
+
+    /**
+     * Mouse was pressed
+     *
+     * @param event The event
+     */
+    public void mousePressed(MouseEvent event) {
+        requestFocus();
+        mouseX = event.getX();        
+        mouseY = event.getY();
+        currentTransX = 0;
+        currentTransY = 0;
+    }
+
+    public void mouseReleased(MouseEvent event) {
+        translateX+=currentTransX;
+        translateY+=currentTransY;
+        currentTransX = 0;
+        currentTransY = 0;
+    }
+
+    public void mouseDragged(MouseEvent event) {
+        currentTransX = (int)((event.getX()-mouseX)/scaleFactor);
+        currentTransY = (int)((event.getY()-mouseY)/scaleFactor);
+        repaint();
+    }
 
 
     /**
@@ -118,6 +240,7 @@ public class ImagePanel extends JPanel implements ImageObserver {
     }
 
 
+
     /**
      * Handle the image update
      *
@@ -137,7 +260,6 @@ public class ImagePanel extends JPanel implements ImageObserver {
             return true;
         }
         boolean all  = (flags & ImageObserver.ALLBITS) != 0;
-        boolean some = (flags & ImageObserver.SOMEBITS) != 0;
         if (all && (img == loadingImage)) {
             loadingImageDone(loadingImage);
             return true;
@@ -146,8 +268,25 @@ public class ImagePanel extends JPanel implements ImageObserver {
     }
 
 
-    public void loadingImageDone(Image loadingImage) {
-        setImage(loadingImage);
+    public void loadingImageDone(Image image) {
+        setImage(image);
+    }
+
+
+    protected void doZoomIn() {
+        scaleFactor = scaleFactor + 0.1;
+        repaint();
+    }
+
+    /**
+     * zoom out
+     */
+    protected void doZoomOut() {
+        scaleFactor = scaleFactor - 0.1;
+        if (scaleFactor < 0.1) {
+            scaleFactor = 0.1;
+        }
+        repaint();
     }
 
 
@@ -158,7 +297,10 @@ public class ImagePanel extends JPanel implements ImageObserver {
      * @param imagePanel Where do we paint into
      * @param currentImage The image to paint
      */
-    private void paintImage(Graphics g) {
+    private void paintImage(Graphics2D g) {
+        
+        g.scale(scaleFactor, scaleFactor);
+        g.translate(translateX+currentTransX, translateY+currentTransY);
         if (currentImage == null) {
             return;
         }
@@ -194,9 +336,10 @@ public class ImagePanel extends JPanel implements ImageObserver {
         g.drawImage(currentImage, 0, 0, imageWidth, imageHeight, null);
     }
 
+
     public void paint(Graphics g) {
         super.paint(g);
-        paintImage(g);
+        paintImage((Graphics2D)g);
     }
 
     public void setImage(Image image) {

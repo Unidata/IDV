@@ -423,10 +423,20 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      */
     public ImageSequenceGrabber(ViewManager viewManager,
                                 JComponent alternateComponent) {
+        this(viewManager, alternateComponent, false);
+    }
+
+    private boolean justCaptureAnimation = false;
+    public ImageSequenceGrabber(ViewManager viewManager,
+                                JComponent alternateComponent, boolean justCaptureAnimation) {
         this.alternateComponent = alternateComponent;
         this.viewManager        = viewManager;
         this.idv                = viewManager.getIdv();
+        this.justCaptureAnimation = justCaptureAnimation;
         init();
+        if(this.justCaptureAnimation) {
+            startAnimationCapture();
+        }
     }
 
 
@@ -742,7 +752,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         checkEnabled();
 
         //Only show the window if init filename is null
-        if ((movieFileName == null) && (scriptingNode == null)) {
+        if (!justCaptureAnimation && (movieFileName == null) && (scriptingNode == null)) {
             GuiUtils.packDialog(mainDialog,
                                 GuiUtils.centerBottom(contents,
                                     GuiUtils.wrap(GuiUtils.inset(closeButton,
@@ -974,9 +984,6 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     }
                 }
             }
-
-
-
             if ( !keepRunning(timestamp)) {
                 return;
             }
@@ -994,7 +1001,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      */
     private void stopAnimationCapture(boolean andWrite) {
         if(viewManager!=null) {
-            viewManager.useImages(images);
+            viewManager.useImages(images,justCaptureAnimation);
+            if(justCaptureAnimation) {
+                return;
+            }
         }
         capturingAnim = false;
         if (andWrite) {
@@ -1276,6 +1286,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @return File suffix
      */
     protected String getFileSuffix() {
+        if(justCaptureAnimation) return "png";
         if (scriptingNode != null) {
             return imageGenerator.applyMacros(scriptingNode,
                     ATTR_IMAGESUFFIX, "jpg");
@@ -1380,13 +1391,19 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
 
 
-
     /**
      * Take a screen snapshot in blocking mode
      */
     private void grabImageAndBlock() {
         try {
             synchronized (MUTEX) {
+                if(viewManager!=null) {
+                    if(viewManager.useDisplay()) {
+                        //Sleep a bit to let the display get updated
+                        Misc.sleep(500);
+                    }
+                }
+
                 //            String filename = getFilePrefix(imageCnt++);
                 String filename = getFilePrefix(images.size());
                 String tmp      = filename.toLowerCase();

@@ -3437,12 +3437,17 @@ public class ViewManager extends SharableImpl implements ActionListener,
             viewMenu.addSeparator();
         }
 
+
+
+        List renderItems  = new ArrayList();
+        renderItems.add(GuiUtils.makeMenuItem("Make Frames", this,"makeFrames"));
         if(usingImagePanel) {
-            viewMenu.add(GuiUtils.makeMenuItem("Reset to display", this,"useDisplay"));
+            renderItems.add(GuiUtils.makeMenuItem("Reset to display", this,"useDisplay"));
         } else if(imagePanel!=null) {
-            viewMenu.add(GuiUtils.makeMenuItem("Reset to images", this,"useImages"));
+           renderItems.add(GuiUtils.makeMenuItem("Reset to images", this,"useImages"));
         }
 
+        viewMenu.add(GuiUtils.makeMenu("Rendering", renderItems));
         JMenu captureMenu = new JMenu("Capture");
         viewMenu.add(captureMenu);
         captureMenu.add(GuiUtils.makeMenuItem("Image...", this,
@@ -4256,12 +4261,19 @@ public class ViewManager extends SharableImpl implements ActionListener,
     private ImagePanel imagePanel;
     boolean usingImagePanel  =false;
 
-    public void useDisplay() {
-        if(!usingImagePanel) return;
+    public void makeFrames() {
+        ImageSequenceGrabber isg = new ImageSequenceGrabber(this, null,true);
+    }
+
+    public boolean useDisplay() {
+        if(!usingImagePanel) return false;
         usingImagePanel = false;
         contentsWrapper.removeAll();
         contentsWrapper.add(BorderLayout.CENTER,innerContents);
         contentsWrapper.revalidate();
+        //        animation.setEnabled(true);
+        return true;
+
     }
 
     public void useImages() {
@@ -4271,18 +4283,20 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if(imagePanel == null) {
             imagePanel = new ImagePanel();
         }
+        //        animation.setEnabled(false);
         contentsWrapper.removeAll();
         contentsWrapper.add(BorderLayout.CENTER,imagePanel);
         contentsWrapper.revalidate();
         usingImagePanel = true;
     }
 
-    public void useImages(List images) {
+    public void useImages(List images, boolean andShow) {
         if(imagePanel == null) {
             imagePanel = new ImagePanel();
         }
         imagePanel.setFiles(images);
         imagePanel.setSelectedFile(animation.getCurrent());
+        if(andShow) useImages();
     }
 
 
