@@ -66,6 +66,9 @@ public interface GempakConstants {
     /** float missing value */
     public static final float RMISSD = -9999.f;
 
+    /** missing value fuzziness */
+    public static final float RDIFFD = 0.1f;
+
     // Data file types
 
     /** Surface file type */

@@ -915,7 +915,11 @@ public class GempakFileReader implements GempakConstants {
         } else {
             rf.order(RandomAccessFile.BIG_ENDIAN);
         }
-        return rf.readInt();
+        int idata = rf.readInt();
+        if (IMISSD != dmLabel.kmissd) {
+            if (idata == dmLabel.kmissd) idata = IMISSD;
+        }
+        return idata;
     }
 
     /**
@@ -977,7 +981,11 @@ public class GempakFileReader implements GempakConstants {
         } else {
             rf.order(RandomAccessFile.BIG_ENDIAN);
         }
-        return rf.readFloat();
+        float rdata = rf.readFloat();
+        if (RMISSD != dmLabel.smissd) {
+            if (Math.abs(rdata - dmLabel.smissd) < RDIFFD) rdata = RMISSD;
+        }
+        return rdata;
     }
 
     /**
