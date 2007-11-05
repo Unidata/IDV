@@ -21,12 +21,20 @@
  */
 
 
+
+
+
+
 package ucar.unidata.ui;
+
+
+import org.w3c.dom.Element;
 
 
 import ucar.unidata.collab.PropertiedThing;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
+import ucar.unidata.xml.XmlUtil;
 
 
 
@@ -49,10 +57,6 @@ import javax.swing.table.*;
 import javax.swing.tree.*;
 
 
-import org.w3c.dom.Element;
-import ucar.unidata.xml.XmlUtil;
-
-
 /**
  *
  *
@@ -61,60 +65,69 @@ import ucar.unidata.xml.XmlUtil;
  */
 public class ComponentHolder extends PropertiedThing {
 
+    /** _more_ */
     public static final String ATTR_NAME = "name";
 
 
-    /** _more_          */
-    public static final String[] BORDERS = {XmlUi.BORDER_EMPTY, XmlUi.BORDER_TITLED,
-                                            XmlUi.BORDER_ETCHED, XmlUi.BORDER_LINE};
+    /** _more_ */
+    public static final String[] BORDERS = { XmlUi.BORDER_EMPTY,
+                                             XmlUi.BORDER_TITLED,
+                                             XmlUi.BORDER_ETCHED,
+                                             XmlUi.BORDER_LINE };
 
-    /** _more_          */
+    /** _more_ */
     public static final String[] BORDER_NAMES = { "None", "Title", "Etched",
             "Line" };
 
+    /** _more_ */
     private String borderLayoutLocation = BorderLayout.CENTER;
 
 
-    /** _more_          */
+    /** _more_ */
     private String name;
 
+    /** _more_ */
     protected JTextField nameFld;
-    
 
-    /** _more_          */
+
+    /** _more_ */
     private boolean showLabel = false;
 
-    /** _more_          */
+    /** _more_ */
     protected JLabel displayLabel;
 
-    /** _more_          */
+    /** _more_ */
     protected JComponent displayLabelWrapper;
 
 
 
-    /** _more_          */
+    /** _more_ */
     private String category;
 
-    /** _more_          */
+    /** _more_ */
     protected ComponentGroup parent;
 
-    /** _more_          */
+    /** _more_ */
     private JComponent contents;
 
-    /** _more_          */
+    /** _more_ */
     private Rectangle layoutRect;
 
-    /** _more_          */
+    /** _more_ */
     protected boolean isRemoved = false;
 
-    /** _more_          */
+    /** _more_ */
     private String border = XmlUi.BORDER_EMPTY;
 
-    /** _more_          */
+    /** _more_ */
     private JComboBox borderBox;
 
-    /** _more_          */
+    /** _more_ */
     private JCheckBox showLabelCbx;
+
+
+    /** _more_          */
+    private JInternalFrame frame;
 
 
     /**
@@ -145,23 +158,50 @@ public class ComponentHolder extends PropertiedThing {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public JInternalFrame getInternalFrame() {
+        if (frame == null) {
+            frame = new JInternalFrame(getName(), true, true, true, true);
+        }
+        return frame;
+    }
+
+    /**
+     * _more_
+     *
+     * @param node _more_
+     */
     public void setState(Element node) {
         node.setAttribute(ATTR_NAME, getName());
         node.setAttribute(XmlUi.ATTR_BORDER, border);
-        node.setAttribute(XmlUi.ATTR_PLACE,borderLayoutLocation);
+        node.setAttribute(XmlUi.ATTR_PLACE, borderLayoutLocation);
     }
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     */
     public void initWith(Element node) {
-        setName(XmlUtil.getAttribute(node, ATTR_NAME,""));
-        if(XmlUtil.hasAttribute(node,XmlUi.ATTR_BORDER)) {
-            setBorder(XmlUtil.getAttribute(node, XmlUi.ATTR_BORDER,XmlUi.BORDER_EMPTY));            
+        setName(XmlUtil.getAttribute(node, ATTR_NAME, ""));
+        if (XmlUtil.hasAttribute(node, XmlUi.ATTR_BORDER)) {
+            setBorder(XmlUtil.getAttribute(node, XmlUi.ATTR_BORDER,
+                                           XmlUi.BORDER_EMPTY));
         }
-        if(XmlUtil.hasAttribute(node,XmlUi.ATTR_PLACE)) {
-            borderLayoutLocation = XmlUtil.getAttribute(node, XmlUi.ATTR_PLACE,"");
+        if (XmlUtil.hasAttribute(node, XmlUi.ATTR_PLACE)) {
+            borderLayoutLocation = XmlUtil.getAttribute(node,
+                    XmlUi.ATTR_PLACE, "");
         }
 
     }
 
+    /**
+     * _more_
+     */
     protected void clearContents() {
         contents = null;
     }
@@ -173,25 +213,25 @@ public class ComponentHolder extends PropertiedThing {
      */
     public JComponent getContents() {
         if (contents == null) {
-            contents     = doMakeContents();
-            if(displayLabel==null) {
+            contents = doMakeContents();
+            if (displayLabel == null) {
                 displayLabel = new JLabel(getName());
                 displayLabel.setToolTipText("Right click to show menu");
                 displayLabel.addMouseListener(new MouseAdapter() {
-                        public void mousePressed(MouseEvent e) {
-                            if ( !SwingUtilities.isRightMouseButton(e)
-                                 && (e.getClickCount() > 1)) {
-                                showProperties(displayLabel, 0, 0);
-                                return;
-                            }
-
-                            if (SwingUtilities.isRightMouseButton(e)) {
-                                showPopup(displayLabel, e.getX(), e.getY());
-                            }
+                    public void mousePressed(MouseEvent e) {
+                        if ( !SwingUtilities.isRightMouseButton(e)
+                                && (e.getClickCount() > 1)) {
+                            showProperties(displayLabel, 0, 0);
+                            return;
                         }
-                    });
+
+                        if (SwingUtilities.isRightMouseButton(e)) {
+                            showPopup(displayLabel, e.getX(), e.getY());
+                        }
+                    }
+                });
                 displayLabelWrapper = GuiUtils.inset(displayLabel,
-                                                     new Insets(0, 5, 0, 0));
+                        new Insets(0, 5, 0, 0));
                 displayLabelWrapper.setVisible(getShowLabel());
             }
             contents = GuiUtils.topCenter(displayLabelWrapper, contents);
@@ -275,9 +315,10 @@ public class ComponentHolder extends PropertiedThing {
             displayLabel.setText(getName());
         }
 
-        
-        String newBorder = BORDERS[Misc.toList(BORDER_NAMES).indexOf(borderBox.getSelectedItem())];
-        if (!newBorder.equals(border)) {
+
+        String newBorder =
+            BORDERS[Misc.toList(BORDER_NAMES).indexOf(borderBox.getSelectedItem())];
+        if ( !newBorder.equals(border)) {
             border = newBorder;
             if (contents != null) {
                 setBorder(getContents());
@@ -378,8 +419,13 @@ public class ComponentHolder extends PropertiedThing {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param tab _more_
+     */
     public void print(String tab) {
-        System.err.println (tab + this);
+        System.err.println(tab + this);
     }
 
 
@@ -423,8 +469,6 @@ public class ComponentHolder extends PropertiedThing {
 
     /**
      * Set the Parent property.
-     *
-     * @param value The new value for Parent
      *
      * @param newParent _more_
      */
@@ -513,43 +557,43 @@ public class ComponentHolder extends PropertiedThing {
         return showLabel;
     }
 
-/**
-Set the Border property.
-
-@param value The new value for Border
-**/
-public void setBorder (String value) {
-	border = value;
-}
-
-/**
-Get the Border property.
-
-@return The Border
-**/
-public String getBorder () {
-	return border;
-}
-
-
-
-
     /**
-       Set the BorderLayoutLocation property.
-
-       @param value The new value for BorderLayoutLocation
-    **/
-    public void setBorderLayoutLocation (String value) {
-	borderLayoutLocation = value;
+     * Set the Border property.
+     *
+     * @param value The new value for Border
+     */
+    public void setBorder(String value) {
+        border = value;
     }
 
     /**
-       Get the BorderLayoutLocation property.
+     * Get the Border property.
+     *
+     * @return The Border
+     */
+    public String getBorder() {
+        return border;
+    }
 
-       @return The BorderLayoutLocation
-    **/
-    public String getBorderLayoutLocation () {
-	return borderLayoutLocation;
+
+
+
+    /**
+     *  Set the BorderLayoutLocation property.
+     *
+     *  @param value The new value for BorderLayoutLocation
+     */
+    public void setBorderLayoutLocation(String value) {
+        borderLayoutLocation = value;
+    }
+
+    /**
+     *  Get the BorderLayoutLocation property.
+     *
+     *  @return The BorderLayoutLocation
+     */
+    public String getBorderLayoutLocation() {
+        return borderLayoutLocation;
     }
 
 

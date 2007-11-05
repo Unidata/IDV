@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -39,6 +40,7 @@ import java.awt.event.*;
 import java.awt.image.*;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -129,6 +131,7 @@ public class IdvWindow extends MultiFrame {
     /** The groups within this window */
     private Hashtable groups = new Hashtable();
 
+    /** _more_          */
     private Hashtable persistentComponents = new Hashtable();
 
     /**
@@ -335,7 +338,7 @@ public class IdvWindow extends MultiFrame {
      * @return The string
      */
     public String toString() {
-        return "IdvWindow:" + skinPath + " vms:" + viewManagers;
+        return "IdvWindow:" + skinPath;
     }
 
     /**
@@ -536,8 +539,9 @@ public class IdvWindow extends MultiFrame {
         if (xmlUI != null) {
             //            xmlUI.dispose();
         }
-        viewManagers = null;
-        components   = null;
+        viewManagers         = null;
+        components           = null;
+        persistentComponents = null;
         super.dispose();
     }
 
@@ -545,6 +549,7 @@ public class IdvWindow extends MultiFrame {
      * Nuke the view managers held by this window
      */
     private void destroyViewManagers() {
+        List viewManagers = getViewManagers();
         if (viewManagers == null) {
             return;
         }
@@ -596,10 +601,23 @@ public class IdvWindow extends MultiFrame {
 
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param object _more_
+     */
     public void putPersistentComponent(Object key, Object object) {
-        persistentComponents.put(key,object);
+        persistentComponents.put(key, object);
     }
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
     public Object getPersistentComponent(Object key) {
         return persistentComponents.get(key);
     }
@@ -684,6 +702,7 @@ public class IdvWindow extends MultiFrame {
      * @return Contains view managers
      */
     public boolean hasViewManagers() {
+        List viewManagers = getViewManagers();
         if (viewManagers != null) {
             return viewManagers.size() > 0;
         }
@@ -701,12 +720,41 @@ public class IdvWindow extends MultiFrame {
     }
 
     /**
+     * _more_
+     *
+     * @param viewManager _more_
+     */
+    public void addViewManager(ViewManager viewManager) {
+        if (viewManagers == null) {
+            viewManagers = new ArrayList();
+        }
+        if ( !viewManagers.contains(viewManager)) {
+            viewManagers.add(viewManager);
+        }
+    }
+
+    /**
      *  Get the ViewManagers property.
      *
      *  @return The ViewManagers
      */
     public List getViewManagers() {
-        return viewManagers;
+        List tmp = new ArrayList();
+        if (viewManagers != null) {
+            tmp.addAll(viewManagers);
+        }
+
+        if (persistentComponents != null) {
+            for (Enumeration keys = persistentComponents.keys();
+                    keys.hasMoreElements(); ) {
+                Object key = keys.nextElement();
+                Object obj = persistentComponents.get(key);
+                if (obj instanceof IdvComponentGroup) {
+                    ((IdvComponentGroup) obj).getViewManagers(tmp);
+                }
+            }
+        }
+        return tmp;
     }
 
 
@@ -780,23 +828,28 @@ public class IdvWindow extends MultiFrame {
     }
 
 
-/**
-Set the PersistenceComponents property.
+    /**
+     * Set the PersistenceComponents property.
+     *
+     * @param value The new value for PersistenceComponents
+     */
+    public void setPersistentComponents(Hashtable value) {
+        if (value == null) {
+            persistentComponents = value;
+            return;
+        }
+        persistentComponents = new Hashtable();
+        persistentComponents.putAll(value);
+    }
 
-@param value The new value for PersistenceComponents
-**/
-public void setPersistentComponents (Hashtable value) {
-	persistentComponents = value;
-}
-
-/**
-Get the PersistentComponents property.
-
-@return The PersistentComponents
-**/
-public Hashtable getPersistentComponents () {
-	return persistentComponents;
-}
+    /**
+     * Get the PersistentComponents property.
+     *
+     * @return The PersistentComponents
+     */
+    public Hashtable getPersistentComponents() {
+        return persistentComponents;
+    }
 
 
 

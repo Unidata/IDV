@@ -21,6 +21,7 @@
 
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -64,6 +65,12 @@ public class IdvComponentGroup extends ComponentGroup {
     /** _more_ */
     IntegratedDataViewer idv;
 
+    /** _more_          */
+    private boolean autoImportDisplays = false;
+
+    /** _more_          */
+    private JCheckBox autoImportCbx;
+
     /**
      * _more_
      */
@@ -88,11 +95,12 @@ public class IdvComponentGroup extends ComponentGroup {
     public void writeSkin() {
         try {
             JCheckBox pluginCbx = new JCheckBox("Install as plugin", true);
-            JComponent extra =GuiUtils.inset(
-                GuiUtils.top(
-                    GuiUtils.vbox(
-                        new JLabel(
-                                   "Note: Filename should end in \"skin.xml\""), pluginCbx)),5);
+            JComponent extra =
+                GuiUtils
+                    .inset(GuiUtils
+                        .top(GuiUtils
+                            .vbox(new JLabel("Note: Filename should end in \"skin.xml\""),
+                                  pluginCbx)), 5);
             String filename =
                 FileManager.getWriteFile(FileManager.FILTER_XML,
                                          FileManager.SUFFIX_XML, extra);
@@ -113,7 +121,7 @@ public class IdvComponentGroup extends ComponentGroup {
                 }
             }
             IOUtil.writeFile(filename, xml);
-            if(pluginCbx.isSelected()) {
+            if (pluginCbx.isSelected()) {
                 idv.getPluginManager().installPluginFromFile(filename);
             }
         } catch (Exception exc) {
@@ -124,13 +132,26 @@ public class IdvComponentGroup extends ComponentGroup {
     /**
      * _more_
      *
+     * @param node _more_
+     */
+    public void initWith(Element node) {
+        super.initWith(node);
+        autoImportDisplays = XmlUtil.getAttribute(node, "autoimportdisplays",
+                autoImportDisplays);
+    }
+
+
+    /**
+     * _more_
+     *
      * @param doc _more_
      *
      * @return _more_
      */
     public Element createXmlNode(Document doc) {
         Element node = doc.createElement(IdvUIManager.COMP_COMPONENT_GROUP);
-        List    displayComponents = getDisplayComponents();
+        node.setAttribute("autoimportdisplays", "" + autoImportDisplays);
+        List displayComponents = getDisplayComponents();
         for (int i = 0; i < displayComponents.size(); i++) {
             ComponentHolder comp  =
                 (ComponentHolder) displayComponents.get(i);
@@ -188,17 +209,20 @@ public class IdvComponentGroup extends ComponentGroup {
             ViewManager vm              = (ViewManager) vms.get(vmIdx);
             List        viewItems       = new ArrayList();
             List        displayControls = vm.getControls();
-            if (displayControls.size() > 0) {
-                viewItems.add(GuiUtils.makeMenuItem("Import All", this,
-                        "importAllDisplayControls", displayControls));
-                viewItems.add(GuiUtils.MENU_SEPARATOR);
-            }
             for (int i = 0; i < displayControls.size(); i++) {
                 DisplayControlImpl dc =
                     (DisplayControlImpl) displayControls.get(i);
                 if ((dc.getComponentHolder() != null)
                         && (dc.getComponentHolder().getParent() == this)) {
                     continue;
+                }
+                if (viewItems.size() == 0) {
+                    if (displayControls.size() > 0) {
+                        viewItems.add(GuiUtils.makeMenuItem("Import All",
+                                this, "importAllDisplayControls",
+                                displayControls));
+                        viewItems.add(GuiUtils.MENU_SEPARATOR);
+                    }
                 }
                 viewItems.add(GuiUtils.makeMenuItem(dc.getLabel(), this,
                         "importDisplayControl", dc));
@@ -211,6 +235,9 @@ public class IdvComponentGroup extends ComponentGroup {
                 importItems.add(GuiUtils.makeMenu(name, viewItems));
             }
         }
+        if (importItems.size() == 0) {
+            importItems.add(new JMenuItem("No displays to import"));
+        }
         items.add(GuiUtils.makeMenu("Import Display", importItems));
 
         items.add(GuiUtils.makeMenuItem("Write Skin", this, "writeSkin"));
@@ -218,6 +245,31 @@ public class IdvComponentGroup extends ComponentGroup {
         super.getPopupMenuItems(items);
         return items;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param viewManagers _more_
+     */
+    public void getViewManagers(List viewManagers) {
+        List displayComponents = getDisplayComponents();
+        for (int i = 0; i < displayComponents.size(); i++) {
+            ComponentHolder comp  =
+                (ComponentHolder) displayComponents.get(i);
+            Element         child = null;
+            if (comp instanceof IdvComponentHolder) {
+                Object obj = ((IdvComponentHolder) comp).getObject();
+                if (obj instanceof ViewManager) {
+                    viewManagers.add(obj);
+                }
+            } else if (comp instanceof IdvComponentGroup) {
+                ((IdvComponentGroup) comp).getViewManagers(viewManagers);
+            }
+        }
+
+    }
+
 
     /**
      * _more_
@@ -234,6 +286,32 @@ public class IdvComponentGroup extends ComponentGroup {
             }
             importDisplayControl(dc);
         }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param control _more_
+     *
+     * @return _more_
+     */
+    public boolean tryToImportDisplayControl(DisplayControlImpl control) {
+        if (autoImportDisplays) {
+            importDisplayControl(control);
+            return true;
+        }
+        List displayComponents = getDisplayComponents();
+        for (int i = 0; i < displayComponents.size(); i++) {
+            ComponentHolder comp = (ComponentHolder) displayComponents.get(i);
+            if (comp instanceof IdvComponentGroup) {
+                if (((IdvComponentGroup) comp).tryToImportDisplayControl(
+                        control)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 
@@ -306,6 +384,39 @@ public class IdvComponentGroup extends ComponentGroup {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected boolean applyProperties() {
+        boolean result = super.applyProperties();
+        if ( !result) {
+            return false;
+        }
+        autoImportDisplays = autoImportCbx.isSelected();
+        return true;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param comps _more_
+     * @param tabIdx _more_
+     */
+    protected void getPropertiesComponents(List comps, int tabIdx) {
+        super.getPropertiesComponents(comps, tabIdx);
+        if (tabIdx == 0) {
+            autoImportCbx =
+                new JCheckBox("Import any displays added to window",
+                              autoImportDisplays);
+            comps.add(GuiUtils.filler());
+            comps.add(GuiUtils.left(autoImportCbx));
+        }
+    }
+
+
 
     /**
      *  Set the Idv property.
@@ -325,6 +436,23 @@ public class IdvComponentGroup extends ComponentGroup {
         return idv;
     }
 
+    /**
+     *  Set the AutoImportDisplays property.
+     *
+     *  @param value The new value for AutoImportDisplays
+     */
+    public void setAutoImportDisplays(boolean value) {
+        autoImportDisplays = value;
+    }
+
+    /**
+     *  Get the AutoImportDisplays property.
+     *
+     *  @return The AutoImportDisplays
+     */
+    public boolean getAutoImportDisplays() {
+        return autoImportDisplays;
+    }
 
 
 }

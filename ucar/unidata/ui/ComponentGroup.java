@@ -21,16 +21,21 @@
  */
 
 
+
+
+
+
 package ucar.unidata.ui;
 
 
 
 import org.w3c.dom.Element;
-import ucar.unidata.xml.XmlUtil;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.xml.XmlUtil;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -63,35 +68,47 @@ import javax.swing.tree.*;
 public class ComponentGroup extends ComponentHolder {
 
     /** type of layout */
-    public static final int LAYOUT_GRIDBAG = 0;
+    public static final String LAYOUT_GRIDBAG = "gridbag";
 
     /** type of layout */
-    public static final int LAYOUT_GRID = 1;
+    public static final String LAYOUT_GRID = "grid";
 
     /** type of layout */
-    public static final int LAYOUT_TABS = 2;
+    public static final String LAYOUT_TABS = "tabs";
 
     /** type of layout */
-    public static final int LAYOUT_HSPLIT = 3;
+    public static final String LAYOUT_HSPLIT = "hsplit";
 
     /** type of layout */
-    public static final int LAYOUT_VSPLIT = 4;
+    public static final String LAYOUT_VSPLIT = "vsplit";
 
-    /** _more_          */
-    public static final int LAYOUT_GRAPH = 5;
+    /** _more_ */
+    public static final String LAYOUT_GRAPH = "graph";
 
-    /** _more_          */
-    public static final int LAYOUT_TREE = 6;
+    /** _more_ */
+    public static final String LAYOUT_TREE = "tree";
 
-    /** _more_          */
-    public static final int LAYOUT_BORDER = 7;
+    /** _more_ */
+    public static final String LAYOUT_BORDER = "border";
 
-    public static final String[]LAYOUT_NAMES = {"Columns", "Grid","Tabs","Hor. Split","Vert. Split", "Graph", "Tree","Border"};
-    public static final String[]LAYOUT_STRINGS= {"gridbag", "grid","tabs","hsplit","vsplit", "graph", "tree","border"};
-    public static final int[]LAYOUTS = {LAYOUT_GRIDBAG,LAYOUT_GRID,LAYOUT_TABS,LAYOUT_HSPLIT,LAYOUT_VSPLIT,LAYOUT_GRAPH,LAYOUT_TREE,LAYOUT_BORDER};
+    /** _more_ */
+    public static final String LAYOUT_DESKTOP = "desktop";
+
+    /** _more_ */
+    public static final String[] LAYOUT_NAMES = {
+        "Columns", "Grid", "Tabs", "Hor. Split", "Vert. Split", "Graph",
+        "Tree", "Border", "Desktop"
+    };
+
+    /** _more_ */
+    public static final String[] LAYOUTS = {
+        LAYOUT_GRIDBAG, LAYOUT_GRID, LAYOUT_TABS, LAYOUT_HSPLIT,
+        LAYOUT_VSPLIT, LAYOUT_GRAPH, LAYOUT_TREE, LAYOUT_BORDER,
+        LAYOUT_DESKTOP
+    };
 
     /** type of layout */
-    private int layout = LAYOUT_GRID;
+    private String layout = LAYOUT_GRID;
 
     /** The gui */
     protected JComponent container;
@@ -104,6 +121,11 @@ public class ComponentGroup extends ComponentHolder {
 
     /** Tabbed pane */
     private JTabbedPane tabbedPane;
+
+
+    /** _more_          */
+    private JDesktopPane desktop;
+
 
     /** for layout */
     private int gridColumns = 1;
@@ -130,12 +152,23 @@ public class ComponentGroup extends ComponentHolder {
     /** properties widget */
     private JTextField colFld;
 
+    /** _more_ */
     private JComboBox layoutBox;
+
+    /** _more_ */
     private GuiUtils.CardLayoutPanel extraPanel;
 
+    /** _more_          */
+    private JComponent extraPanelHolder;
+
+    /** _more_ */
     Hashtable borderLayoutLocations;
+
     /** properties widget */
     private JRadioButton rowBtn;
+
+    /** _more_          */
+    private JRadioButton colBtn;
 
 
     /** properties widget */
@@ -145,8 +178,8 @@ public class ComponentGroup extends ComponentHolder {
     private boolean displayOrderChanged;
 
 
-    /** _more_          */
-    private MyDndTree tree;
+    /** _more_ */
+    private MyDndTree propertiesTree;
 
     /**
      * default ctor
@@ -164,23 +197,34 @@ public class ComponentGroup extends ComponentHolder {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     */
     public void initWith(Element node) {
         super.initWith(node);
-        String layoutString = XmlUtil.getAttribute(node,"layout",(String) null);
-        if(layoutString!=null) {
+        String layoutString = XmlUtil.getAttribute(node, "layout",
+                                  (String) null);
+        if (layoutString != null) {
             setLayout(layoutString);
-            if(layout == LAYOUT_GRIDBAG) {
-                gridColumns = XmlUtil.getAttribute(node, "layout_columns",gridColumns);
+            if (layout.equals(LAYOUT_GRIDBAG)) {
+                gridColumns = XmlUtil.getAttribute(node, "layout_columns",
+                        gridColumns);
             }
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     */
     public void setState(Element node) {
         super.setState(node);
-        String layoutString = XmlUtil.getAttribute(node,"layout",(String) null);
-        node.setAttribute("layout", getLayoutString());
-        if(layout == LAYOUT_GRIDBAG) {
-            node.setAttribute("layout_columns",gridColumns+"");
+        node.setAttribute("layout", getLayout());
+        if (layout.equals(LAYOUT_GRIDBAG)) {
+            node.setAttribute("layout_columns", gridColumns + "");
         }
     }
 
@@ -201,9 +245,10 @@ public class ComponentGroup extends ComponentHolder {
      * @return gui contents
      */
     public JComponent doMakeContents() {
+        desktop        = new JDesktopPane();
         tabbedPane     = new JTabbedPane();
         container      = new JPanel(new GridLayout(numRows, numColumns, 5,
-                                                   5));
+                5));
         outerContainer = GuiUtils.center(container);
         redoLayout();
         return outerContainer;
@@ -225,13 +270,13 @@ public class ComponentGroup extends ComponentHolder {
 
         for (int i = 0; i < displayComponents.size(); i++) {
             ComponentHolder comp = (ComponentHolder) displayComponents.get(i);
-            List compItems = new ArrayList();
+            List            compItems = new ArrayList();
             comp.getPopupMenuItems(compItems);
             subItems.add(GuiUtils.makeMenu(comp.getName(), compItems));
         }
 
 
-        if(subItems.size()>0) {
+        if (subItems.size() > 0) {
             items.add(GuiUtils.makeMenu("Components", subItems));
         }
 
@@ -264,17 +309,17 @@ public class ComponentGroup extends ComponentHolder {
     protected void getPropertiesComponents(List comps, int tabIdx) {
 
         super.getPropertiesComponents(comps, tabIdx);
-        if (tree == null) {
-            tree = new MyDndTree();
+        if (propertiesTree == null) {
+            propertiesTree = new MyDndTree();
         }
         nameFld = new JTextField(getName());
-        tree.setModel(new DefaultTreeModel(makeTree(null)));
+        propertiesTree.setModel(new DefaultTreeModel(makeTree(null)));
         comps.add(GuiUtils.rLabel("Name:"));
         comps.add(nameFld);
 
 
-        ButtonGroup bg        = new ButtonGroup();
-        boolean     fixedRows = getNumRows() != 0;
+
+
         displayOrderChanged = false;
         displayList =
             new JList(propertiesList = new Vector(displayComponents));
@@ -306,111 +351,111 @@ public class ComponentGroup extends ComponentHolder {
                 }
             }
         });
-        JButton upButton =
-            GuiUtils.getImageButton("/auxdata/ui/icons/Up16.gif", getClass());
-        upButton.setActionCommand("up");
-        upButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                int selectedIndex = displayList.getSelectedIndex();
-                if (selectedIndex > 0) {
-                    displayOrderChanged = true;
-                    Object o = propertiesList.remove(selectedIndex);
-                    propertiesList.add(selectedIndex - 1, o);
-                    displayList.setListData(new Vector(propertiesList));
-                    displayList.setSelectedIndex(propertiesList.indexOf(o));
-                }
+
+
+
+
+
+
+
+
+
+        Vector layoutList = new Vector(TwoFacedObject.createList(LAYOUTS,
+                                LAYOUT_NAMES));
+        layoutBox = new JComboBox(layoutList);
+        layoutBox.setSelectedItem(TwoFacedObject.findId(layout, layoutList));
+        layoutBox.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent event) {
+                checkExtraPanel(
+                    TwoFacedObject.getIdString(layoutBox.getSelectedItem()));
             }
         });
-        JButton downButton =
-            GuiUtils.getImageButton("/auxdata/ui/icons/Down16.gif",
-                                    getClass());
-        downButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                int selectedIndex = displayList.getSelectedIndex();
-                if (selectedIndex < propertiesList.size() - 1) {
-                    displayOrderChanged = true;
-                    Object o = propertiesList.remove(selectedIndex);
-                    propertiesList.add(selectedIndex + 1, o);
-                    displayList.setListData(new Vector(propertiesList));
-                    displayList.setSelectedIndex(propertiesList.indexOf(o));
-                }
-            }
-        });
-        displayPanel =
-            GuiUtils.centerRight(displayPanel,
-                                 GuiUtils.top(GuiUtils.vbox(upButton,
-                                     downButton)));
 
-        rowBtn = new JRadioButton("Rows", fixedRows);
-        JRadioButton colBtn = new JRadioButton("Columns", !fixedRows);
-        bg.add(rowBtn);
-        bg.add(colBtn);
+        makeExtraPanel();
+        comps.add(GuiUtils.rLabel("Layout: "));
+        comps.add(GuiUtils.left(GuiUtils.leftCenter(layoutBox,
+                GuiUtils.inset(extraPanelHolder, new Insets(0, 5, 0, 0)))));
+
+        comps.add(GuiUtils.rLabel("Tree:"));
+        propertiesTree.treeSP.setPreferredSize(new Dimension(200, 300));
+        comps.add(propertiesTree.treeSP);
 
 
+    }
 
 
+    /**
+     * _more_
+     */
+    private void makeExtraPanel() {
+        if (rowBtn == null) {
+            boolean fixedRows = getNumRows() != 0;
+            rowBtn = new JRadioButton("Rows", fixedRows);
+            colBtn = new JRadioButton("Columns", !fixedRows);
+            GuiUtils.buttonGroup(rowBtn, colBtn);
+            dimFld = new JTextField((fixedRows
+                                     ? getNumRows()
+                                     : getNumColumns()) + "", 5);
 
-
-
-
-        dimFld = new JTextField((fixedRows
-                                 ? getNumRows()
-                                 : getNumColumns()) + "", 5);
-
-        colFld = new JTextField(getGridColumns() + "", 5);
-
-
+            colFld = new JTextField(getGridColumns() + "", 5);
+        }
 
         borderLayoutLocations = new Hashtable();
         List borderComps = new ArrayList();
         Vector borderLayouts = new Vector(Misc.newList(BorderLayout.CENTER,
-                                                       BorderLayout.NORTH,
-                                                       BorderLayout.EAST,
-                                                       BorderLayout.SOUTH,
-                                                       BorderLayout.WEST));
+                                   BorderLayout.NORTH, BorderLayout.EAST,
+                                   BorderLayout.SOUTH, BorderLayout.WEST));
         for (int i = 0; i < displayComponents.size(); i++) {
             ComponentHolder comp = (ComponentHolder) displayComponents.get(i);
-            JComboBox box = new JComboBox(borderLayouts);
+            JComboBox       box  = new JComboBox(borderLayouts);
             box.setSelectedItem(comp.getBorderLayoutLocation());
-            borderComps.add(new JLabel(comp.getName()+": "));
+            borderComps.add(new JLabel(comp.getName() + ": "));
             borderComps.add(box);
-            borderLayoutLocations.put(comp,box);
+            borderLayoutLocations.put(comp, box);
         }
 
 
-        layoutBox =  GuiUtils.makeComboBox(LAYOUTS, LAYOUT_NAMES, layout);
-        extraPanel =  new GuiUtils.CardLayoutPanel();
-        extraPanel.add("",new JLabel(" "));
-        extraPanel.add(LAYOUT_BORDER+"",GuiUtils.left(GuiUtils.hbox(borderComps)));
-        extraPanel.add(LAYOUT_GRID+"",GuiUtils.left(GuiUtils.hbox(new JLabel("  Dimension: "), GuiUtils.wrap(dimFld),
-                                                                  GuiUtils.hbox(colBtn, rowBtn))));
+        extraPanel = new GuiUtils.CardLayoutPanel();
+        extraPanel.add("", new JLabel(" "));
+        extraPanel.add(LAYOUT_BORDER + "",
+                       GuiUtils.left(GuiUtils.hbox(borderComps)));
+        extraPanel.add(
+            LAYOUT_GRID + "",
+            GuiUtils.left(
+                GuiUtils.hbox(
+                    new JLabel("  Dimension: "), GuiUtils.wrap(dimFld),
+                    GuiUtils.hbox(colBtn, rowBtn))));
 
-        extraPanel.add(LAYOUT_GRIDBAG+"",GuiUtils.left(GuiUtils.hbox(new JLabel("  # Columns: "), GuiUtils.wrap(colFld))));
-        extraPanel.add(LAYOUT_GRAPH+"",GuiUtils.left(GuiUtils.wrap(GuiUtils.makeButton("Edit", this, "editLayout"))));
-        checkExtraPanel(layout);
+        extraPanel.add(
+            LAYOUT_GRIDBAG + "",
+            GuiUtils.left(
+                GuiUtils.hbox(
+                    new JLabel("  # Columns: "), GuiUtils.wrap(colFld))));
+        extraPanel.add(
+            LAYOUT_GRAPH + "",
+            GuiUtils.left(
+                GuiUtils.wrap(
+                    GuiUtils.makeButton("Edit", this, "editLayout"))));
+        if (extraPanelHolder == null) {
+            extraPanelHolder = new JPanel(new BorderLayout());
 
-        layoutBox.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent event) {
-                    checkExtraPanel(GuiUtils.getValueFromBox(layoutBox));
-                }
-            });
-
-        comps.add(GuiUtils.rLabel("Layout: "));
-        comps.add(GuiUtils.left(GuiUtils.leftCenter(layoutBox,GuiUtils.inset(extraPanel,new Insets(0,5,0,0)))));
-
-        comps.add(GuiUtils.rLabel("Tree:"));
-        tree.treeSP.setPreferredSize(new Dimension(200,300));
-        comps.add(tree.treeSP);
-
-
-        //        comps.add(GuiUtils.top(GuiUtils.rLabel("Displays: ")));
-        //        comps.add(displayPanel);
+        }
+        extraPanelHolder.removeAll();
+        extraPanelHolder.add(BorderLayout.CENTER, extraPanel);
+        if (layoutBox != null) {
+            checkExtraPanel(
+                TwoFacedObject.getIdString(layoutBox.getSelectedItem()));
+        }
     }
 
-
-    private void checkExtraPanel(int theLayout) {
-        if(extraPanel.containsKey(theLayout+"")) {
-            extraPanel.show(theLayout+"");
+    /**
+     * _more_
+     *
+     * @param theLayout _more_
+     */
+    private void checkExtraPanel(String theLayout) {
+        if (extraPanel.containsKey(theLayout)) {
+            extraPanel.show(theLayout);
         } else {
             extraPanel.show("");
         }
@@ -461,16 +506,28 @@ public class ComponentGroup extends ComponentHolder {
 
 
     /**
+     * _more_
+     *
+     * @param l _more_
+     *
+     * @return _more_
+     */
+    private boolean isLayout(String l) {
+        return layout.equals(l);
+    }
+
+    /**
      * Layout components
      */
     public void redoLayout() {
         if (tabbedPane == null) {
             return;
         }
+        desktop.removeAll();
         tabbedPane.removeAll();
         container.setVisible(false);
         container.removeAll();
-        if (layout == LAYOUT_GRID) {
+        if (isLayout(LAYOUT_GRID)) {
             container.setLayout(new GridLayout(numRows, numColumns, 5, 5));
         } else {
             container.setLayout(new BorderLayout());
@@ -481,12 +538,22 @@ public class ComponentGroup extends ComponentHolder {
             ComponentHolder displayComponent =
                 (ComponentHolder) displayComponents.get(i);
             JComponent comp = displayComponent.getContents();
-            if (layout == LAYOUT_TABS) {
+            if (comp.getParent() != null) {
+                comp.getParent().remove(comp);
+            }
+            if (isLayout(LAYOUT_TABS)) {
                 tabbedPane.add(displayComponent.getName(), comp);
-            } else if (layout == LAYOUT_GRID) {
+            } else if (isLayout(LAYOUT_DESKTOP)) {
+                JInternalFrame frame = displayComponent.getInternalFrame();
+                frame.getContentPane().add(comp);
+                frame.pack();
+                frame.show();
+                desktop.add(frame);
+            } else if (isLayout(LAYOUT_GRID)) {
                 container.add(comp);
-            } else if (layout == LAYOUT_BORDER) {
-                container.add(displayComponent.getBorderLayoutLocation(),comp);
+            } else if (isLayout(LAYOUT_BORDER)) {
+                container.add(displayComponent.getBorderLayoutLocation(),
+                              comp);
             } else {
                 comps.add(comp);
             }
@@ -494,41 +561,40 @@ public class ComponentGroup extends ComponentHolder {
 
 
 
-        if (layout == LAYOUT_TABS) {
+        if (isLayout(LAYOUT_TABS)) {
             container.add(BorderLayout.CENTER, tabbedPane);
-        } else if (layout == LAYOUT_GRID) {
-            //noop
-        } else if (layout == LAYOUT_HSPLIT) {
+        } else if (isLayout(LAYOUT_DESKTOP)) {
+            container.add(BorderLayout.CENTER, desktop);
+        } else if (isLayout(LAYOUT_HSPLIT)) {
             if (comps.size() > 0) {
                 container.add(BorderLayout.CENTER,
                               GuiUtils.doMultiSplitPane(comps, true));
             }
-        } else if (layout == LAYOUT_VSPLIT) {
+        } else if (isLayout(LAYOUT_VSPLIT)) {
             if (comps.size() > 0) {
                 container.add(BorderLayout.CENTER,
                               GuiUtils.doMultiSplitPane(comps, false));
             }
-        } else if (layout == LAYOUT_GRAPH) {
+        } else if (isLayout(LAYOUT_GRAPH)) {
             container.add(GraphPaperLayout.layout(getLocations()));
-        } else if (layout == LAYOUT_TREE) {
+        } else if (isLayout(LAYOUT_TREE)) {
             TreePanel treePanel = new TreePanel();
             for (int i = 0; i < displayComponents.size(); i++) {
                 ComponentHolder comp =
                     (ComponentHolder) displayComponents.get(i);
-                if (comp.getName() == null) {
-                    System.err.println("name is null "
-                                       + comp.getClass().getName());
+                String name = comp.getName();
+                if (name == null) {
+                    name = "Component";
                 }
                 treePanel.addComponent(comp.getContents(),
-                                       comp.getCategory(), comp.getName(),
-                                       null);
+                                       comp.getCategory(), name, null);
             }
             container.add(treePanel);
-        } else if (layout == LAYOUT_GRIDBAG) {
+        } else if (isLayout(LAYOUT_GRIDBAG)) {
             container.add(BorderLayout.CENTER,
                           GuiUtils.doLayout(comps, gridColumns,
                                             GuiUtils.WT_Y, GuiUtils.WT_Y));
-        } 
+        }
         container.setVisible(true);
         container.revalidate();
     }
@@ -616,10 +682,10 @@ public class ComponentGroup extends ComponentHolder {
      */
     public void addComponent(ComponentHolder displayComponent, int index) {
         boolean wasMine = displayComponents.contains(displayComponent);
-        if(wasMine) {
+        if (wasMine) {
             displayComponents.remove(displayComponent);
         }
-        if (index >= 0 && index< displayComponents.size()) {
+        if ((index >= 0) && (index < displayComponents.size())) {
             displayComponents.add(index, displayComponent);
         } else {
             displayComponents.add(displayComponent);
@@ -635,14 +701,21 @@ public class ComponentGroup extends ComponentHolder {
      * _more_
      */
     protected void subtreeChanged() {
-        if (tree != null) {
-            Hashtable paths = GuiUtils.initializeExpandedPathsBeforeChange(tree,(DefaultMutableTreeNode)tree.getModel().getRoot());
-            tree.setModel(new DefaultTreeModel(makeTree(null)));
-            GuiUtils.expandPathsAfterChange(tree, paths, (DefaultMutableTreeNode)tree.getModel().getRoot());
+        if (propertiesTree != null) {
+            Hashtable paths =
+                GuiUtils
+                    .initializeExpandedPathsBeforeChange(propertiesTree,
+                        (DefaultMutableTreeNode) propertiesTree.getModel()
+                            .getRoot());
+            propertiesTree.setModel(new DefaultTreeModel(makeTree(null)));
+            GuiUtils.expandPathsAfterChange(
+                propertiesTree, paths,
+                (DefaultMutableTreeNode) propertiesTree.getModel().getRoot());
         }
         if (parent != null) {
             parent.subtreeChanged();
         }
+        makeExtraPanel();
     }
 
 
@@ -656,22 +729,24 @@ public class ComponentGroup extends ComponentHolder {
      */
     protected boolean applyProperties() {
         setName(nameFld.getText());
-        boolean result  = super.applyProperties();
+        boolean result = super.applyProperties();
         if ( !result) {
             return false;
         }
         try {
 
             for (int i = 0; i < displayComponents.size(); i++) {
-                ComponentHolder comp = (ComponentHolder) displayComponents.get(i);
+                ComponentHolder comp =
+                    (ComponentHolder) displayComponents.get(i);
                 JComboBox box = (JComboBox) borderLayoutLocations.get(comp);
-                if(box!=null) {
-                    comp.setBorderLayoutLocation((String)box.getSelectedItem());
+                if (box != null) {
+                    comp.setBorderLayoutLocation(
+                        (String) box.getSelectedItem());
                 }
             }
 
 
-            layout =  GuiUtils.getValueFromBox(layoutBox);
+            layout = TwoFacedObject.getIdString(layoutBox.getSelectedItem());
             if (rowBtn.isSelected()) {
                 setRowsColumns(
                     new Integer(dimFld.getText().trim()).intValue(), 0);
@@ -723,18 +798,6 @@ public class ComponentGroup extends ComponentHolder {
 
 
 
-    /**
-     * Make the edit menu items
-     *
-     *
-     * @param items Holds the menu items
-     *
-     * @param value _more_
-     *
-     * @return The list of items
-     */
-    //    protected List getPopupMenuItems(List items) {
-    //    }
 
 
     /**
@@ -810,7 +873,7 @@ public class ComponentGroup extends ComponentHolder {
      * @return string
      */
     public String toString() {
-        return "Group: " + getName() + " (" +LAYOUT_NAMES[layout]+")";
+        return "Group: " + getName() + " (" + getLayout() + ")";
     }
 
 
@@ -851,31 +914,6 @@ public class ComponentGroup extends ComponentHolder {
         return iconified;
     }
 
-    /**
-     * _more_
-     *
-     * @param l _more_
-     */
-    public void setLayout(String l) {
-        l = l.trim();
-        for(int i=0;i<LAYOUT_STRINGS.length;i++) {
-            if(l.equals(LAYOUT_STRINGS[i])) {
-                setLayout(LAYOUTS[i]);
-                return;
-            }
-        }
-        throw new IllegalArgumentException ("Unknown layout:" + l);
-    }
-
-    public String getLayoutString() {
-        for(int i=0;i<LAYOUT_STRINGS.length;i++) {
-            if(layout == LAYOUTS[i]) {
-                return LAYOUT_STRINGS[i];
-            }
-        }
-        throw new IllegalStateException ("Unknwon layout:" + layout);
-    }
-
 
 
     /**
@@ -883,7 +921,7 @@ public class ComponentGroup extends ComponentHolder {
      *
      * @param value The new value for Layout
      */
-    public void setLayout(int value) {
+    public void setLayout(String value) {
         layout = value;
     }
 
@@ -892,7 +930,7 @@ public class ComponentGroup extends ComponentHolder {
      *
      * @return The Layout
      */
-    public int getLayout() {
+    public String getLayout() {
         return layout;
     }
 
@@ -959,12 +997,21 @@ public class ComponentGroup extends ComponentHolder {
     }
 
 
-    public static boolean isAncestor(ComponentGroup parent, ComponentHolder descendant) {
-        if(descendant==parent) {
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param descendant _more_
+     *
+     * @return _more_
+     */
+    public static boolean isAncestor(ComponentGroup parent,
+                                     ComponentHolder descendant) {
+        if (descendant == parent) {
             return true;
         }
 
-        if(descendant.getParent()==null) {
+        if (descendant.getParent() == null) {
             return false;
         }
 
@@ -981,79 +1028,112 @@ public class ComponentGroup extends ComponentHolder {
      */
     private void changeParent(ComponentHolder src, ComponentHolder dest,
                               boolean on) {
-        if (on && dest instanceof ComponentGroup) {
+        if (on && (dest instanceof ComponentGroup)) {
             if (dest == src) {
                 return;
             }
-            ((ComponentGroup)dest).addComponent(src);
-            src.setParent((ComponentGroup)dest);
+            ((ComponentGroup) dest).addComponent(src);
+            src.setParent((ComponentGroup) dest);
 
             return;
         }
 
-        ComponentGroup newParent =  dest.getParent();
-        if(newParent == null) return;
-        if(src.getParent()!=null) {
+        ComponentGroup newParent = dest.getParent();
+        if (newParent == null) {
+            return;
+        }
+        if (src.getParent() != null) {
             src.getParent().removeComponent(src);
         }
         //        System.err.println ("source:" + src + " dest:" + dest + " " + on + " index=" +newParent.indexOf(dest));
-        newParent.addComponent(src, newParent.indexOf(dest)+1);
+        newParent.addComponent(src, newParent.indexOf(dest) + 1);
     }
 
+    /**
+     * _more_
+     *
+     * @param tab _more_
+     */
     public void print(String tab) {
-        System.err.println (tab + this);
+        System.err.println(tab + this);
         for (int i = 0; i < displayComponents.size(); i++) {
             ComponentHolder displayComponent =
                 (ComponentHolder) displayComponents.get(i);
-            displayComponent.print(tab+"   ");
+            displayComponent.print(tab + "   ");
         }
     }
 
 
+    /**
+     * Class MyDndTree _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     private class MyDndTree extends DndTree {
+
+        /** _more_ */
         public JScrollPane treeSP;
 
+        /**
+         * _more_
+         */
         public MyDndTree() {
             treeSP = GuiUtils.makeScrollPane(this, 300, 400);
             setToolTipText(
-                    "Right click to show menu; Double click to show properties dialog");
+                "Right click to show menu; Double click to show properties dialog");
             addMouseListener(new MouseAdapter() {
-                    public void mouseClicked(MouseEvent event) {
-                        TreePath path = getPathForLocation(event.getX(),
-                                            event.getY());
-                        if (path == null) {
-                            return;
-                        }
-                        Object last = path.getLastPathComponent();
-                        if (last == null) {
-                            return;
-                        }
-                        DefaultMutableTreeNode node =
-                            (DefaultMutableTreeNode) last;
-                        ComponentHolder comp =
-                            (ComponentHolder) node.getUserObject();
-
-                        if (SwingUtilities.isRightMouseButton(event)) {
-                            comp.showPopup(treeSP, event.getX(),
-                                           event.getY());
-                            return;
-                        }
-                        if (event.getClickCount() > 1) {
-                            comp.showProperties(MyDndTree.this, 0, 0);
-                        }
+                public void mouseClicked(MouseEvent event) {
+                    TreePath path = getPathForLocation(event.getX(),
+                                        event.getY());
+                    if (path == null) {
+                        return;
                     }
-                });
+                    Object last = path.getLastPathComponent();
+                    if (last == null) {
+                        return;
+                    }
+                    DefaultMutableTreeNode node =
+                        (DefaultMutableTreeNode) last;
+                    ComponentHolder comp =
+                        (ComponentHolder) node.getUserObject();
+
+                    if (SwingUtilities.isRightMouseButton(event)) {
+                        comp.showPopup(treeSP, event.getX(), event.getY());
+                        return;
+                    }
+                    if (event.getClickCount() > 1) {
+                        comp.showProperties(MyDndTree.this, 0, 0);
+                    }
+                }
+            });
 
         }
 
+        /**
+         * _more_
+         *
+         * @param sourceNode _more_
+         * @param destNode _more_
+         * @param onNode _more_
+         */
         protected void doDrop(DefaultMutableTreeNode sourceNode,
                               DefaultMutableTreeNode destNode,
                               boolean onNode) {
-            changeParent(
-                         (ComponentHolder) sourceNode.getUserObject(),
-                         (ComponentHolder) destNode.getUserObject(),
-                         onNode);
+            changeParent((ComponentHolder) sourceNode.getUserObject(),
+                         (ComponentHolder) destNode.getUserObject(), onNode);
         }
+
+        /**
+         * _more_
+         *
+         * @param sourceNode _more_
+         * @param destNode _more_
+         * @param onNode _more_
+         *
+         * @return _more_
+         */
         protected boolean okToDrop(DefaultMutableTreeNode sourceNode,
                                    DefaultMutableTreeNode destNode,
                                    boolean onNode) {
@@ -1061,13 +1141,26 @@ public class ComponentGroup extends ComponentHolder {
             return result;
         }
 
+        /**
+         * _more_
+         *
+         * @param sourceNode _more_
+         * @param destNode _more_
+         * @param onNode _more_
+         *
+         * @return _more_
+         */
         protected boolean okToDropx(DefaultMutableTreeNode sourceNode,
-                                   DefaultMutableTreeNode destNode,
-                                   boolean onNode) {
-           
-            if(!(sourceNode.getUserObject() instanceof ComponentGroup))return true;
-            ComponentGroup srcGroup = (ComponentGroup) sourceNode.getUserObject();
-            return !isAncestor(srcGroup,(ComponentHolder) destNode.getUserObject());
+                                    DefaultMutableTreeNode destNode,
+                                    boolean onNode) {
+
+            if ( !(sourceNode.getUserObject() instanceof ComponentGroup)) {
+                return true;
+            }
+            ComponentGroup srcGroup =
+                (ComponentGroup) sourceNode.getUserObject();
+            return !isAncestor(srcGroup,
+                               (ComponentHolder) destNode.getUserObject());
         }
 
     }

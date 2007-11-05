@@ -3087,7 +3087,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         List choosers = new ArrayList();
         Component comp =
             getIdv().getIdvChooserManager().createChoosers(false, choosers,
-                                                      IdvXmlUi.lastChooserNode);
+                                                           null);
 
         final Object[]result = {null};
         final Hashtable[]properties = {null};

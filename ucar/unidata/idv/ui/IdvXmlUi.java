@@ -19,6 +19,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -37,13 +38,13 @@ import ucar.unidata.ui.FineLineBorder;
 import ucar.unidata.ui.RovingProgress;
 import ucar.unidata.ui.XmlUi;
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.WrapperException;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.MemoryMonitor;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.WrapperException;
 import ucar.unidata.xml.XmlUtil;
 
 import java.awt.*;
@@ -241,7 +242,8 @@ public class IdvXmlUi extends XmlUi {
         super.dispose();
     }
 
-    int componentCnt=0;
+    /** _more_          */
+    int componentCnt = 0;
 
 
     /**
@@ -325,17 +327,18 @@ public class IdvXmlUi extends XmlUi {
             }
         }
 
-        if(tagName.equals(IdvUIManager.COMP_COMPONENT_GROUP)) {
-            String key = XmlUtil.getAttribute(node,ATTR_ID,""+componentCnt);
+        if (tagName.equals(IdvUIManager.COMP_COMPONENT_GROUP)) {
+            String key = XmlUtil.getAttribute(node, ATTR_ID,
+                             "" + componentCnt);
             componentCnt++;
-            ComponentGroup  compGroup = (ComponentGroup) window.getPersistentComponent(key);
-            
-            if(compGroup == null) {
+            ComponentGroup compGroup =
+                (ComponentGroup) window.getPersistentComponent(key);
+
+            if (compGroup == null) {
                 compGroup = makeComponentGroup(node);
                 compGroup.setShowLabel(true);
                 window.putPersistentComponent(key, compGroup);
-            } else {
-            }
+            } else {}
             return compGroup.getContents();
         }
 
@@ -351,7 +354,6 @@ public class IdvXmlUi extends XmlUi {
                                  !idv.getProperty(
                                      IdvChooserManager.PROP_CHOOSER_TREEVIEW,
                                      false));
-            lastChooserNode = node;
             List choosers = new ArrayList();
             Component comp =
                 idv.getIdvChooserManager().createChoosers(inTabs, choosers,
@@ -471,39 +473,57 @@ public class IdvXmlUi extends XmlUi {
         return super.createComponent(node, id);
     }
 
-    public static Element lastChooserNode;
 
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     *
+     * @return _more_
+     */
     private IdvComponentGroup makeComponentGroup(Element node) {
-        IdvComponentGroup compGroup = new IdvComponentGroup(idv,"");
+        IdvComponentGroup compGroup = new IdvComponentGroup(idv, "");
         compGroup.initWith(node);
 
         NodeList elements = XmlUtil.getElements(node);
         for (int i = 0; i < elements.getLength(); i++) {
-            Element child = (Element) elements.item(i);
+            Element child        = (Element) elements.item(i);
             String  childTagName = child.getTagName();
             if (childTagName.equals(IdvUIManager.COMP_MAPVIEW)
-                || childTagName.equals(IdvUIManager.COMP_VIEW)) {
+                    || childTagName.equals(IdvUIManager.COMP_VIEW)) {
                 ViewManager viewManager = getViewManager(child);
-                compGroup.addComponent(new IdvComponentHolder(idv,viewManager));
-            }  else if (childTagName.equals(IdvUIManager.COMP_COMPONENT_GROUP)) {
+                compGroup.addComponent(new IdvComponentHolder(idv,
+                        viewManager));
+            } else if (childTagName.equals(
+                    IdvUIManager.COMP_COMPONENT_GROUP)) {
                 IdvComponentGroup childCompGroup = makeComponentGroup(child);
                 compGroup.addComponent(childCompGroup);
-            }  else if (childTagName.equals(IdvUIManager.COMP_DATASELECTOR)) {                
-                compGroup.addComponent(new IdvComponentHolder(idv,idv.getIdvUIManager().createDataSelector(false,                                                                                                      false)));
+            } else if (childTagName.equals(IdvUIManager.COMP_DATASELECTOR)) {
+                compGroup.addComponent(new IdvComponentHolder(idv,
+                        idv.getIdvUIManager().createDataSelector(false,
+                            false)));
             }
         }
         return compGroup;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     *
+     * @return _more_
+     */
     private ViewManager getViewManager(Element node) {
         String bundleText = XmlUtil.getChildText(node);
-        if(bundleText!=null && bundleText.trim().length()>0) {
+        if ((bundleText != null) && (bundleText.trim().length() > 0)) {
             try {
-                bundleText  = new String(XmlUtil.decodeBase64(bundleText.trim()));
-                return (ViewManager)idv.decodeObject(bundleText);
-            } catch(Exception exc) {
+                bundleText =
+                    new String(XmlUtil.decodeBase64(bundleText.trim()));
+                return (ViewManager) idv.decodeObject(bundleText);
+            } catch (Exception exc) {
                 throw new WrapperException(exc);
             }
         }
@@ -516,17 +536,18 @@ public class IdvXmlUi extends XmlUi {
         if (xmlProperties != null) {
             properties += ";" + xmlProperties;
         }
-            String         viewId = getAttr(node, "viewid", (String) null);
-            ViewDescriptor viewDescriptor = null;
-            if (viewId != null) {
-                viewDescriptor = new ViewDescriptor(viewId);
-            }
+        String         viewId         = getAttr(node, "viewid",
+                                            (String) null);
+        ViewDescriptor viewDescriptor = null;
+        if (viewId != null) {
+            viewDescriptor = new ViewDescriptor(viewId);
+        }
 
 
 
 
         ViewManager viewManager = null;
-        String className = getAttr(node, "class", (String) null);
+        String      className   = getAttr(node, "class", (String) null);
         //Handle any problems from the change over  to property based skins
         if ((className != null) && className.startsWith("${")) {
             className = null;
@@ -542,16 +563,16 @@ public class IdvXmlUi extends XmlUi {
                 }
                 Class vmClass = Misc.findClass(className);
                 Constructor ctor = Misc.findConstructor(vmClass,
-                                                        new Class[] {
-                                                            IntegratedDataViewer.class,
-                                                            ViewDescriptor.class, String.class });
+                                       new Class[] {
+                                           IntegratedDataViewer.class,
+                                           ViewDescriptor.class,
+                                           String.class });
                 if (ctor == null) {
                     System.err.println("Could not find ctor for:"
                                        + vmClass.getName());
                 } else {
                     viewManager =
-                        (ViewManager) ctor.newInstance(new Object[] {
-                            idv,
+                        (ViewManager) ctor.newInstance(new Object[] { idv,
                             viewDescriptor, properties });
                     viewManager.initFromSkin(node);
                     idv.getVMManager().addViewManager(viewManager);
@@ -559,9 +580,8 @@ public class IdvXmlUi extends XmlUi {
                 }
             } catch (Exception exc) {
                 LogUtil.logException("", exc);
-                System.err.println("Error creating class:"
-                                   + className + " exception: "
-                                   + exc);
+                System.err.println("Error creating class:" + className
+                                   + " exception: " + exc);
                 exc.printStackTrace();
             }
         }
@@ -571,7 +591,7 @@ public class IdvXmlUi extends XmlUi {
         if (viewManager == null) {
             viewManager =
                 idv.getVMManager().createViewManager(viewDescriptor,
-                                                     properties);
+                    properties);
             if (viewManager == null) {
                 return null;
             }

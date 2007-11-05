@@ -21,6 +21,7 @@
 
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -238,8 +239,20 @@ public class IdvComponentHolder extends ComponentHolder {
      * @return _more_
      */
     public String getTypeName() {
+        if (object instanceof MapViewManager) {
+            MapViewManager mvm = (MapViewManager) object;
+            if (mvm.getUseGlobeDisplay()) {
+                return "Globe View";
+            }
+            return "Map View";
+        }
+
+        if (object instanceof TransectViewManager) {
+            return "Transect View";
+        }
+
         if (object instanceof ViewManager) {
-            return "View Manager";
+            return "View";
         }
         if (object instanceof DisplayControl) {
             return "Display Control";

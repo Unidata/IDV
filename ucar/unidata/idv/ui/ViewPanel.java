@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -38,6 +39,7 @@ import java.awt.image.*;
 import java.beans.*;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -324,9 +326,32 @@ public class ViewPanel extends IdvManager {
      * @param forceShow If true then show the component in the window no matter what
      */
     private void addControlTab(DisplayControl control, boolean forceShow) {
-        if (!control.canBeDocked() || !control.shouldBeDocked()) {
+        if ( !control.canBeDocked() || !control.shouldBeDocked()) {
             return;
         }
+
+        ViewManager viewManager = control.getViewManager();
+        if (viewManager != null) {
+            IdvWindow window = viewManager.getDisplayWindow();
+            if (window != null) {
+                Hashtable map = window.getPersistentComponents();
+                for (Enumeration keys =
+                        map.keys(); keys.hasMoreElements(); ) {
+                    Object key = keys.nextElement();
+                    Object obj = map.get(key);
+                    if (obj instanceof IdvComponentGroup) {
+                        if (((IdvComponentGroup) obj)
+                                .tryToImportDisplayControl(
+                                    (DisplayControlImpl) control)) {
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+
+
 
         ControlInfo controlInfo = (ControlInfo) controlToInfo.get(control);
         if (controlInfo != null) {
@@ -476,12 +501,12 @@ public class ViewPanel extends IdvManager {
         items.add(GuiUtils.MENU_SEPARATOR);
 
         if (control.canBeDocked()) {
-            if (!control.shouldBeDocked()) {
+            if ( !control.shouldBeDocked()) {
                 items.add(GuiUtils.makeMenuItem("Dock in Dashboard", this,
-                                                "dockControl", control));
+                        "dockControl", control));
             } else {
-                items.add(GuiUtils.makeMenuItem("Undock from Dashboard", this,
-                                                "undockControl", control));
+                items.add(GuiUtils.makeMenuItem("Undock from Dashboard",
+                        this, "undockControl", control));
             }
         }
     }
