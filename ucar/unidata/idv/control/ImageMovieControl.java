@@ -720,7 +720,7 @@ public class ImageMovieControl extends DisplayControlImpl  {
         });
         previewPanel = new ImagePanel();
         JPanel topPanel = GuiUtils.left(getAnimationWidget().getContents());
-        JPanel moviePanel = GuiUtils.topCenterBottom(topPanel, imagePanel,
+        JPanel moviePanel = GuiUtils.topCenterBottom(topPanel, getImagePanel(),
                                 GuiUtils.left(descLabel));
         fileList = new JList();
         /*
