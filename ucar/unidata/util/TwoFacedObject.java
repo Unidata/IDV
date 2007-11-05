@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -182,6 +183,24 @@ public class TwoFacedObject implements Comparable {
      * @return list of tfos
      */
     public static List createList(int[] ids, String[] names) {
+        List l = new ArrayList();
+        for (int i = 0; i < ids.length; i++) {
+            l.add(new TwoFacedObject(names[i], ids[i]));
+        }
+        return l;
+    }
+
+
+
+    /**
+     * Create a list of tfos from the given int ids and names
+     *
+     * @param ids ids
+     * @param names names
+     *
+     * @return list of tfos
+     */
+    public static List createList(String[] ids, String[] names) {
         List l = new ArrayList();
         for (int i = 0; i < ids.length; i++) {
             l.add(new TwoFacedObject(names[i], ids[i]));
