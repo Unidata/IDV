@@ -40,7 +40,6 @@ import javax.swing.*;
  * @author Jeff McWhirter
  * @version $Id: DndImageButton.java,v 1.8 2007/07/06 20:45:29 jeffmc Exp $
  */
-
 public class DndImageButton extends JLabel implements DragSourceListener,
         DragGestureListener, Transferable {
 
@@ -147,8 +146,11 @@ public class DndImageButton extends JLabel implements DragSourceListener,
      * @return _more_
      */
     public DataFlavor[] getTransferDataFlavors() {
-        return new DataFlavor[] { new DataFlavor(mimeType, mimeType) };
+        return new DataFlavor[] { new ObjectFlavor(data) };
+        //        return new DataFlavor[] { new DataFlavor(mimeType, mimeType) };
     }
+
+
 
     //TODO:Fix this
 

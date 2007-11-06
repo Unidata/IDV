@@ -21,13 +21,7 @@
  */
 
 
-
-
-
-
 package ucar.unidata.ui;
-
-
 
 import org.w3c.dom.Element;
 
@@ -38,6 +32,8 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.dnd.*;
 import java.awt.event.*;
 
 
@@ -82,25 +78,25 @@ public class ComponentGroup extends ComponentHolder {
     /** type of layout */
     public static final String LAYOUT_VSPLIT = "vsplit";
 
-    /** _more_ */
+    /** type of layout */ 
     public static final String LAYOUT_GRAPH = "graph";
 
-    /** _more_ */
+    /** type of layout */ 
     public static final String LAYOUT_TREE = "tree";
 
-    /** _more_ */
+    /** type of layout */ 
     public static final String LAYOUT_BORDER = "border";
 
-    /** _more_ */
+    /** type of layout */ 
     public static final String LAYOUT_DESKTOP = "desktop";
 
-    /** _more_ */
+    /** user readable names of layouts*/
     public static final String[] LAYOUT_NAMES = {
         "Columns", "Grid", "Tabs", "Hor. Split", "Vert. Split", "Graph",
         "Tree", "Border", "Desktop"
     };
 
-    /** _more_ */
+    /** all of the layouts */
     public static final String[] LAYOUTS = {
         LAYOUT_GRIDBAG, LAYOUT_GRID, LAYOUT_TABS, LAYOUT_HSPLIT,
         LAYOUT_VSPLIT, LAYOUT_GRAPH, LAYOUT_TREE, LAYOUT_BORDER,
@@ -255,6 +251,26 @@ public class ComponentGroup extends ComponentHolder {
     }
 
 
+    protected JComponent wrapContents(JComponent contents) {
+        DropPanel dropPanel = new DropPanel() {
+                public void handleDrop(Object object) {
+                    doDrop(object);
+                }
+                public boolean okToDrop(Object object) {
+                    return dropOk(object);
+                }
+            };
+        dropPanel.add(BorderLayout.CENTER, contents);
+        return dropPanel;
+    }
+
+
+    public boolean dropOk(Object object) {
+        return false;
+    }
+
+    protected void doDrop(Object obj) {
+    }
 
     /**
      * Make the edit menu items
@@ -272,6 +288,9 @@ public class ComponentGroup extends ComponentHolder {
             ComponentHolder comp = (ComponentHolder) displayComponents.get(i);
             List            compItems = new ArrayList();
             comp.getPopupMenuItems(compItems);
+            subItems.add(GuiUtils.MENU_SEPARATOR);
+            subItems.add(GuiUtils.makeMenuItem("Properties...", this,
+                                               "showProperties"));
             subItems.add(GuiUtils.makeMenu(comp.getName(), compItems));
         }
 
@@ -542,7 +561,7 @@ public class ComponentGroup extends ComponentHolder {
                 comp.getParent().remove(comp);
             }
             if (isLayout(LAYOUT_TABS)) {
-                tabbedPane.add(displayComponent.getName(), comp);
+                tabbedPane.addTab(displayComponent.getName(), displayComponent.getIcon(), comp);
             } else if (isLayout(LAYOUT_DESKTOP)) {
                 JInternalFrame frame = displayComponent.getInternalFrame();
                 frame.getContentPane().add(comp);
@@ -587,7 +606,7 @@ public class ComponentGroup extends ComponentHolder {
                     name = "Component";
                 }
                 treePanel.addComponent(comp.getContents(),
-                                       comp.getCategory(), name, null);
+                                       comp.getCategory(), name,comp.getIcon());
             }
             container.add(treePanel);
         } else if (isLayout(LAYOUT_GRIDBAG)) {

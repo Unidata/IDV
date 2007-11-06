@@ -39,6 +39,7 @@ import ucar.unidata.xml.XmlUtil;
 
 
 import java.awt.*;
+import java.awt.dnd.*;
 import java.awt.event.*;
 
 
@@ -108,7 +109,8 @@ public class ComponentHolder extends PropertiedThing {
     protected ComponentGroup parent;
 
     /** _more_ */
-    private JComponent contents;
+    private JComponent innerContents;
+    private JComponent outerContents;
 
     /** _more_ */
     private Rectangle layoutRect;
@@ -154,7 +156,7 @@ public class ComponentHolder extends PropertiedThing {
      */
     public ComponentHolder(String name, JComponent contents) {
         this(name);
-        this.contents = contents;
+        this.innerContents = contents;
     }
 
 
@@ -168,6 +170,11 @@ public class ComponentHolder extends PropertiedThing {
             frame = new JInternalFrame(getName(), true, true, true, true);
         }
         return frame;
+    }
+
+    public String getHierachicalName() {
+        if(getParent()!=null) return getParent().getHierachicalName() + "-" + getName();
+        return getName();
     }
 
     /**
@@ -203,7 +210,8 @@ public class ComponentHolder extends PropertiedThing {
      * _more_
      */
     protected void clearContents() {
-        contents = null;
+        innerContents = null;
+        
     }
 
     /**
@@ -212,8 +220,8 @@ public class ComponentHolder extends PropertiedThing {
      * @return _more_
      */
     public JComponent getContents() {
-        if (contents == null) {
-            contents = doMakeContents();
+        if (innerContents == null) {
+            innerContents = doMakeContents();
             if (displayLabel == null) {
                 displayLabel = new JLabel(getName());
                 displayLabel.setToolTipText("Right click to show menu");
@@ -234,11 +242,17 @@ public class ComponentHolder extends PropertiedThing {
                         new Insets(0, 5, 0, 0));
                 displayLabelWrapper.setVisible(getShowLabel());
             }
-            contents = GuiUtils.topCenter(displayLabelWrapper, contents);
-            setBorder(contents);
+            innerContents = GuiUtils.topCenter(displayLabelWrapper, innerContents);
+            setBorder(innerContents);
+            outerContents = wrapContents(innerContents);
         }
+        return outerContents;
+    }
+
+    protected JComponent wrapContents(JComponent contents) {
         return contents;
     }
+
 
     /**
      * _more_
@@ -246,8 +260,7 @@ public class ComponentHolder extends PropertiedThing {
      * @return _more_
      */
     public JComponent doMakeContents() {
-
-        return contents;
+        return innerContents;
     }
 
     /**
@@ -320,8 +333,8 @@ public class ComponentHolder extends PropertiedThing {
             BORDERS[Misc.toList(BORDER_NAMES).indexOf(borderBox.getSelectedItem())];
         if ( !newBorder.equals(border)) {
             border = newBorder;
-            if (contents != null) {
-                setBorder(getContents());
+            if (innerContents != null) {
+                setBorder(innerContents);
             }
         }
         if (showLabel != showLabelCbx.isSelected()) {
@@ -534,7 +547,9 @@ public class ComponentHolder extends PropertiedThing {
         return category;
     }
 
-
+    public ImageIcon getIcon() {
+        return null;
+    }
 
     /**
      * Set the ShowLabel property.
