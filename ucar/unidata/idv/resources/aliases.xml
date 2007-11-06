@@ -92,7 +92,7 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="Z"
      label="Z"
-     aliases="z,Z,Geopotential_height,Geopotential"/>
+     aliases="z,Z,Geopotential_height"/>
   <alias
      name="ALTITUDE"
      label="Altitude"
