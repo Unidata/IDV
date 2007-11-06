@@ -3920,6 +3920,20 @@ public class IdvUIManager extends IdvManager {
     }
 
 
+    public List getComponentGroups() {
+        List groups = new ArrayList();
+        List allWindows = IdvWindow.getWindows();
+        for (int windowIdx = 0; windowIdx < allWindows.size(); windowIdx++) {
+            IdvWindow window = (IdvWindow) allWindows.get(windowIdx);
+            List groupsInWindow =window.getComponentGroups();
+            for(int i=0;i<groupsInWindow.size();i++) {
+                ((IdvComponentGroup)groupsInWindow.get(i)).addGroups(groups);
+            }
+        }
+        return groups;
+    }
+
+
     /**
      * Get the list of IdvWindows that should be saved in a bundle
      *

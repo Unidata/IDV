@@ -26,8 +26,6 @@ package ucar.unidata.idv.ui;
 
 
 import org.w3c.dom.CDATASection;
-
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -247,6 +245,8 @@ public class IdvComponentGroup extends ComponentGroup {
     }
 
 
+
+
     /**
      * _more_
      *
@@ -289,6 +289,22 @@ public class IdvComponentGroup extends ComponentGroup {
     }
 
 
+    protected void doDrop(Object object) {
+        if(object instanceof DisplayControl) {
+            importDisplayControl((DisplayControlImpl)object);
+        } else {
+            super.doDrop(object);
+        }
+    }
+
+    public boolean dropOk(Object object) {
+        if(object instanceof DisplayControl) {
+            return true;
+        }
+        return super.dropOk(object);
+    }
+
+
     /**
      * _more_
      *
@@ -314,6 +330,19 @@ public class IdvComponentGroup extends ComponentGroup {
         return false;
     }
 
+
+    public void addGroups(List l) {
+        l.add(this);
+        List displayComponents = getDisplayComponents();
+        for (int i = 0; i < displayComponents.size(); i++) {
+            ComponentHolder comp  =
+                (ComponentHolder) displayComponents.get(i);
+            Element         child = null;
+            if (comp instanceof IdvComponentGroup) {
+                ((IdvComponentGroup)comp).addGroups(l);
+            }
+        }
+    }
 
     /**
      * _more_

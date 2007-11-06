@@ -622,6 +622,20 @@ public class IdvWindow extends MultiFrame {
         return persistentComponents.get(key);
     }
 
+    public List getComponentGroups() {
+        List groups = new ArrayList();
+        Hashtable map = getPersistentComponents();
+        for (Enumeration keys =
+                 map.keys(); keys.hasMoreElements(); ) {
+            Object key = keys.nextElement();
+            Object obj = map.get(key);
+            if (obj instanceof IdvComponentGroup) {
+                groups.add(obj);
+            }
+        }
+        return groups;
+    }
+
 
 
     /**

@@ -92,16 +92,17 @@ public class ViewPanel extends IdvManager {
     static Font CATEGORY_FONT;
 
     /** icon for map views */
-    static ImageIcon ICON_MAP;
+    public   static ImageIcon ICON_MAP =  GuiUtils.getImageIcon("/auxdata/ui/icons/MapIcon.png", ViewPanel.class);
 
     /** icon for transect views */
-    static ImageIcon ICON_TRANSECT;
+    public static ImageIcon ICON_TRANSECT = GuiUtils.getImageIcon(
+                                                                  "/auxdata/ui/icons/TransectIcon.png", ViewPanel.class);
 
     /** icon for globe views */
-    static ImageIcon ICON_GLOBE;
+    public static ImageIcon ICON_GLOBE =GuiUtils.getImageIcon("/auxdata/ui/icons/GlobeIcon.png", ViewPanel.class);
 
     /** default icon */
-    static ImageIcon ICON_DEFAULT;
+    public     static ImageIcon ICON_DEFAULT = GuiUtils.getImageIcon("/auxdata/ui/icons/Host24.gif",  ViewPanel.class);
 
 
 
@@ -330,15 +331,14 @@ public class ViewPanel extends IdvManager {
             return;
         }
 
+        //Check if there are any groups that have autoimport set
         ViewManager viewManager = control.getViewManager();
         if (viewManager != null) {
             IdvWindow window = viewManager.getDisplayWindow();
             if (window != null) {
-                Hashtable map = window.getPersistentComponents();
-                for (Enumeration keys =
-                        map.keys(); keys.hasMoreElements(); ) {
-                    Object key = keys.nextElement();
-                    Object obj = map.get(key);
+                List groups =window.getComponentGroups();
+                for(int i=0;i<groups.size();i++) {
+                    Object obj = groups.get(i);
                     if (obj instanceof IdvComponentGroup) {
                         if (((IdvComponentGroup) obj)
                                 .tryToImportDisplayControl(
@@ -381,9 +381,12 @@ public class ViewPanel extends IdvManager {
         propBtn.setToolTipText("Show Display Control Properties");
 
 
+        ucar.unidata.ui.DndImageButton dnd = new ucar.unidata.ui.DndImageButton(control,"idv/display");
+        dnd.setToolTipText("Drag and drop to a window component");
         JPanel buttonPanel =
             GuiUtils.left(GuiUtils.hbox(Misc.newList(expandBtn, exportBtn,
-                propBtn, removeBtn), 4));
+                propBtn, removeBtn,dnd), 4));
+
 
         buttonPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0,
                 Color.lightGray.darker()));
@@ -498,15 +501,31 @@ public class ViewPanel extends IdvManager {
      * @param items List of menu items
      */
     public void addViewMenuItems(DisplayControl control, List items) {
-        items.add(GuiUtils.MENU_SEPARATOR);
+
+
+
 
         if (control.canBeDocked()) {
+            items.add(GuiUtils.MENU_SEPARATOR);
             if ( !control.shouldBeDocked()) {
                 items.add(GuiUtils.makeMenuItem("Dock in Dashboard", this,
                         "dockControl", control));
             } else {
                 items.add(GuiUtils.makeMenuItem("Undock from Dashboard",
                         this, "undockControl", control));
+            }
+            List groups = getIdv().getIdvUIManager().getComponentGroups();
+            List subItems = new ArrayList();
+            for(int i=0;i<groups.size();i++) {
+                IdvComponentGroup group = (IdvComponentGroup) groups.get(i);
+                subItems.add(GuiUtils.makeMenuItem(group.getHierachicalName(),
+                                                   group,
+                                                   "importDisplayControl",
+                                                   control));
+
+            }
+            if(subItems.size()>0) {
+                items.add(GuiUtils.makeMenu("Export to component",subItems));
             }
         }
     }
@@ -657,19 +676,7 @@ public class ViewPanel extends IdvManager {
             //Initialize stuff
             initButtonState(getIdv());
             BUTTON_ICON.getWidth(this);
-            if (ICON_TRANSECT == null) {
-                ICON_TRANSECT = GuiUtils.getImageIcon(
-                    "/auxdata/ui/icons/TransectIcon.png", getClass());
-                ICON_MAP =
-                    GuiUtils.getImageIcon("/auxdata/ui/icons/MapIcon.png",
-                                          getClass());
-                ICON_GLOBE =
-                    GuiUtils.getImageIcon("/auxdata/ui/icons/GlobeIcon.png",
-                                          getClass());
-                ICON_DEFAULT =
-                    GuiUtils.getImageIcon("/auxdata/ui/icons/Host24.gif",
-                                          getClass());
-            }
+
 
             this.obj         = obj;
             this.tabContents = new JPanel(new BorderLayout());

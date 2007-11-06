@@ -233,6 +233,22 @@ public class IdvComponentHolder extends ComponentHolder {
         return super.getName();
     }
 
+    public ImageIcon getIcon() {
+        if (object instanceof MapViewManager) {
+            MapViewManager mvm = (MapViewManager) object;
+            if (mvm.getUseGlobeDisplay()) {
+                return ViewPanel.ICON_GLOBE;
+            }
+            return ViewPanel.ICON_MAP;
+        }
+        if (object instanceof TransectViewManager) {
+            return ViewPanel.ICON_TRANSECT;
+        }
+        return super.getIcon();
+    }
+
+
+
     /**
      * _more_
      *
