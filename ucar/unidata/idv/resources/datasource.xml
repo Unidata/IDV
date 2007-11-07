@@ -398,7 +398,7 @@
      fileselection="false"
      doesmultiples="false"
      label="EOL netCDF Profiler files"/>
-
+<!--
   <datasource
      id="FILE.LEVEL2RADAR"
      patterns=".*6500KHGX.*$,.*NEXRAD.*$,.*\.raw$"
@@ -406,6 +406,7 @@
      doesmultiples="true"
      factory="ucar.unidata.data.radar.Level2RadarDataSource"
      label="Level II Radar files"></datasource>
+-->
 
 <!-- This needs to be last  -->
   <datasource
