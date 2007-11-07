@@ -1080,7 +1080,7 @@ public class NamedStationTable extends StationTableImpl {
 
     public static String xlsToCsv(String filename) throws Exception {
         StringBuffer sb = new StringBuffer();
-        InputStream myxls = new FileInputStream(filename);
+        InputStream myxls = IOUtil.getInputStream(filename, NamedStationTable.class);
         HSSFWorkbook wb     = new HSSFWorkbook(myxls);
         HSSFSheet sheet = wb.getSheetAt(0);       // first sheet
         for(int rowIdx=sheet.getFirstRowNum();rowIdx<=sheet.getLastRowNum();rowIdx++) {
@@ -1088,17 +1088,16 @@ public class NamedStationTable extends StationTableImpl {
             for(short colIdx=row.getFirstCellNum();colIdx<row.getPhysicalNumberOfCells();colIdx++) {
                 HSSFCell cell   = row.getCell(colIdx);
                 if(cell == null) continue;
-                HSSFComment comment = cell.getCellComment();
                 if(colIdx>0)
                     sb.append(",");
                 sb.append(cell.toString());
-                if(false && comment!=null) {
+                /*                if(false && comment!=null) {
                     String author = comment.getAuthor();
                     String str = comment.getString().getString();
                     str = StringUtil.replace(str, author+":","");
                     str = StringUtil.replace(str, "\n","");
                     sb.append("("+str+")");
-                }
+                    }*/
             }
             sb.append("\n");
         }
