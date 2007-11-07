@@ -138,13 +138,6 @@ public class ThreddsHandler extends XmlHandler {
     /** Service type value for the compound service */
     public static final String SERVICE_FILE = "FILE";
 
-    /** Service type value for the ncserver service */
-    public static final String SERVICE_NETCDFSUBSET = "NetcdfSubset";
-
-    /** Service type value for the wcs service */
-    public static final String SERVICE_WCS = "wcs";
-
-
     /** Service type value for the wcs service */
     public static final String SERVICE_HTTP = "HTTPServer";
 
@@ -156,9 +149,6 @@ public class ThreddsHandler extends XmlHandler {
 
     /** Service type value for the OPeNDAP service */
     public static final String SERVICE_OPENDAP = "OPENDAP";
-
-
-
 
     /** Value for the thredds catalog v0.4 */
     public static final double THREDDS_VERSION_0_4 = 0.4;
@@ -1776,25 +1766,6 @@ public class ThreddsHandler extends XmlHandler {
 
 
         Element dataServiceNode;
-        dataServiceNode = findServiceNodeForDataset(datasetNode,  /*root,*/
-                false, SERVICE_NETCDFSUBSET);
-        if (dataServiceNode != null) {
-            String serviceUrl = getAbsoluteUrl(dataServiceNode, urlPath);
-            //            System.err.println("service:" + serviceUrl);
-            if (serviceUrl != null) {
-                //TODO:                properties.put(DataSource.PROP_SERVICE_NCSUBSETSERVICE, serviceUrl);
-                //                properties.put(DataSource.PROP_SERVICE_NCSERVER, serviceUrl);
-            }
-        }
-
-        dataServiceNode = findServiceNodeForDataset(datasetNode,  /*root,*/
-                false, SERVICE_WCS);
-        if (dataServiceNode != null) {
-            String serviceUrl = getAbsoluteUrl(dataServiceNode, urlPath);
-            if (serviceUrl != null) {
-                properties.put(DataSource.PROP_SERVICE_WCS, serviceUrl);
-            }
-        }
 
         dataServiceNode = findServiceNodeForDataset(datasetNode,  /*root,*/
                 false, SERVICE_HTTP);
