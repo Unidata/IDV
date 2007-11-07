@@ -8005,6 +8005,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param newViewManager  new <code>ViewManager</code> to move to
      */
     public void moveTo(ViewManager newViewManager) {
+        defaultViewManager = newViewManager;
+        if ((defaultViewManager != null) && (defaultViewManager.getViewDescriptor() != null)) {
+            defaultView =  defaultViewManager.getViewDescriptor().getName();
+        }
+
         List displayList = getDisplayInfos();
         try {
             boolean didone = false;
