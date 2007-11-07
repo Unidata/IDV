@@ -29,6 +29,7 @@ package ucar.unidata.data.point;
 import edu.wisc.ssec.mcidas.McIDASUtil;
 
 import ucar.unidata.data.*;
+import ucar.unidata.metdata.NamedStationTable;
 
 
 import ucar.unidata.geoloc.LatLonRect;
@@ -201,11 +202,19 @@ public class TextPointDataSource extends PointDataSource {
                                 boolean sampleIt)
             throws Exception {
         String    source   = getSource(dataChoice);
-        String    contents = IOUtil.readContents(source, getClass());
+        String    contents;
+        String delimiter;
+        if(source.endsWith(".xls")) {
+            contents = NamedStationTable.xlsToCsv(source);
+            delimiter = ",";
+        } else {
+            contents = IOUtil.readContents(source, getClass());
+            delimiter = TextAdapter.getDelimiter(source);
+        }
+
         FieldImpl obs      = null;
         //        FieldImpl obs = (FieldImpl) getCache (source);
         if (obs == null) {
-            String      delimiter = TextAdapter.getDelimiter(source);
             TextAdapter ta        = null;
             try {
                 ta = new TextAdapter(
