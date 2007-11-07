@@ -464,10 +464,10 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      */
     public void setFlowScale(float f) {
         flowScaleValue = f;
+        if (getGridDisplay() != null) {
+            getGridDisplay().setFlowScale(flowScaleValue * scaleFactor);
+        }
         if (getHaveInitialized()) {
-            if (getGridDisplay() != null) {
-                getGridDisplay().setFlowScale(flowScaleValue * scaleFactor);
-            }
             doShare(SHARE_FLOWRANGE, flowRange);
         }
     }
@@ -490,16 +490,16 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      */
     public void setFlowRange(Range f) {
         flowRange = f;
-        if (getHaveInitialized()) {
-            if ((getGridDisplay() != null) && (flowRange != null)
-                    && !getWindbarbs()) {
-                try {
-                    getGridDisplay().setFlowRange(flowRange);
-                } catch (Exception excp) {
-                    logException("setFlowRange: ", excp);
-                }
+        if ((getGridDisplay() != null) && (flowRange != null)
+                && !getWindbarbs()) {
+            try {
+                getGridDisplay().setFlowRange(flowRange);
+            } catch (Exception excp) {
+                logException("setFlowRange: ", excp);
             }
-            setFlowRangeLabel();
+        }
+        setFlowRangeLabel();
+        if (getHaveInitialized()) {
             doShare(SHARE_FLOWRANGE, flowRange);
         }
     }
