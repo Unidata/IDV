@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -136,7 +137,7 @@ import javax.swing.text.JTextComponent;
 public class IdvUIManager extends IdvManager {
 
 
-    /** _more_          */
+    /** _more_ */
     public static ImageIcon ICON_LOCK;
 
     /** The icon used to show unlocked legend components */
@@ -211,10 +212,10 @@ public class IdvUIManager extends IdvManager {
     /** The identifier of the  data selector component */
     public static final String COMP_DATASELECTOR = "idv.dataselector";
 
-    /** _more_          */
+    /** _more_ */
     public static final String COMP_COMPONENT_GROUP = "idv.component.group";
 
-    /** _more_          */
+    /** _more_ */
     public static final String COMP_COMPONENT_HTML = "idv.component.html";
 
 
@@ -727,10 +728,20 @@ public class IdvUIManager extends IdvManager {
      */
     public ViewPanel getViewPanel() {
         if (viewPanel == null) {
-            viewPanel = new ViewPanel(getIdv());
-            viewPanel.getContents();
+            viewPanel = doMakeViewPanel();
         }
         return viewPanel;
+    }
+
+    /**
+     * Factory method for making the ViewPanel
+     *
+     * @return The view panel
+     */
+    protected ViewPanel doMakeViewPanel() {
+        ViewPanel vp = new ViewPanelImpl(getIdv());
+        vp.getContents();
+        return vp;
     }
 
 
@@ -2841,8 +2852,13 @@ public class IdvUIManager extends IdvManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param dataSource _more_
+     */
     public void changeState(DataSource dataSource) {
-        Misc.run(getPersistenceManager(),"changeState",dataSource);
+        Misc.run(getPersistenceManager(), "changeState", dataSource);
     }
 
 
@@ -3920,14 +3936,19 @@ public class IdvUIManager extends IdvManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List getComponentGroups() {
-        List groups = new ArrayList();
+        List groups     = new ArrayList();
         List allWindows = IdvWindow.getWindows();
         for (int windowIdx = 0; windowIdx < allWindows.size(); windowIdx++) {
-            IdvWindow window = (IdvWindow) allWindows.get(windowIdx);
-            List groupsInWindow =window.getComponentGroups();
-            for(int i=0;i<groupsInWindow.size();i++) {
-                ((IdvComponentGroup)groupsInWindow.get(i)).addGroups(groups);
+            IdvWindow window         = (IdvWindow) allWindows.get(windowIdx);
+            List      groupsInWindow = window.getComponentGroups();
+            for (int i = 0; i < groupsInWindow.size(); i++) {
+                ((IdvComponentGroup) groupsInWindow.get(i)).addGroups(groups);
             }
         }
         return groups;
