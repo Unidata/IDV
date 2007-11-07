@@ -69,6 +69,7 @@ import ucar.unidata.idv.ui.IdvWindow;
 import ucar.unidata.metdata.NamedStationImpl;
 
 import ucar.unidata.ui.DndImageButton;
+import ucar.unidata.ui.DragPanel;
 import ucar.unidata.ui.FontSelector;
 import ucar.unidata.ui.Help;
 import ucar.unidata.ui.ImageUtils;
@@ -3750,10 +3751,52 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             showNoteTextArea();
         }
 
+        //        outerContents = GuiUtils.topCenterBottom(doMakeMenuBar(), mainPanel, makeBottomButtons());
+        DndImageButton dndBtn = new DndImageButton(this,"control");
+        //        JComponent topPanel = GuiUtils.centerRight(doMakeMenuBar(),dndBtn);
         outerContents = GuiUtils.topCenter(doMakeMenuBar(), mainPanel);
+        //        outerContents = GuiUtils.topCenter(topPanel, mainPanel);
+
         ucar.unidata.util.Msg.translateTree(outerContents, true);
 
     }
+
+    /*
+    protected JComponent makeBottomButtons() {
+        JButton removeBtn =
+            GuiUtils.makeImageButton("/auxdata/ui/icons/Remove16.gif",
+                                     this, "doRemove");
+        removeBtn.setToolTipText("Remove Display Control");
+
+        JButton expandBtn =
+            GuiUtils.makeImageButton("/auxdata/ui/icons/DownDown.gif", this,
+                                     "expandControl", this);
+
+        expandBtn.setToolTipText("Expand in the tabs");
+        JButton exportBtn =
+            GuiUtils.makeImageButton("/auxdata/ui/icons/Export16.gif", this,
+                                     "undockControl", this);
+        exportBtn.setToolTipText("Undock control window");
+
+        JButton propBtn =
+            GuiUtils.makeImageButton("/auxdata/ui/icons/Information16.gif",
+                                     this, "showProperties");
+        propBtn.setToolTipText("Show Display Control Properties");
+
+
+        DndImageButton dnd = new DndImageButton(this,"idv/display");
+        dnd.setToolTipText("Drag and drop to a window component");
+        JPanel buttonPanel =
+            GuiUtils.left(GuiUtils.hbox(Misc.newList(expandBtn, exportBtn,
+                propBtn, removeBtn,dnd), 4));
+
+
+        buttonPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0,
+                Color.lightGray.darker()));
+        return buttonPanel;
+    }
+    */
+
 
     /**
      * Is the GUI being shown
@@ -3777,11 +3820,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return The menu bar
      */
     protected JMenuBar doMakeMenuBar() {
+        DndImageButton dndBtn = new DndImageButton(this,"control");
         List     menus   = doMakeMenuBarMenus(new ArrayList());
         JMenuBar menuBar = new JMenuBar();
         for (int i = 0; i < menus.size(); i++) {
             menuBar.add((JMenu) menus.get(i));
         }
+        //        menuBar.add(dndBtn);
         return menuBar;
     }
 
@@ -7978,8 +8023,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         } catch (Exception exc) {
             logException("Moving to a new view", exc);
         }
-
-
+        getIdv().getIdvUIManager().getViewPanel().controlMoved(this);
     }
 
 

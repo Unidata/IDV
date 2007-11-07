@@ -50,13 +50,26 @@ public class DropPanel extends JPanel implements  DropTargetListener {
     /** Some object for the DND */
     private DropTarget dropTarget;
 
+    private boolean doBorder;
+
     /**
      * Create me
      */
     public DropPanel() {
+        this(null);
+    }
+
+    public DropPanel(JComponent comp) {
+        this(comp, true);
+    }
+
+    public DropPanel(JComponent comp, boolean doBorder) {
         super(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
+        this.doBorder = doBorder;
+        if(doBorder)
+            setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
         dropTarget = new DropTarget(this, this);
+        if(comp!=null) this.add(BorderLayout.CENTER, comp);
     }
 
 
@@ -81,7 +94,8 @@ public class DropPanel extends JPanel implements  DropTargetListener {
      * @param dte The event
      */
     public void dragExit(DropTargetEvent dte) {
-        setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
+        if(doBorder)
+            setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
     }
 
 
@@ -97,7 +111,8 @@ public class DropPanel extends JPanel implements  DropTargetListener {
         Object object = getObject(dtde.getCurrentDataFlavors());
         if(object == null) return;
         if(okToDrop(object)) {
-            setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.blue));
+            if(doBorder)
+                setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.blue));
         }
     }
 
@@ -118,7 +133,8 @@ public class DropPanel extends JPanel implements  DropTargetListener {
      * @param dtde The event
      */
     public void drop(DropTargetDropEvent dtde) {
-        setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
+        if(doBorder)
+            setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
         dtde.acceptDrop(DnDConstants.ACTION_MOVE | DnDConstants.ACTION_COPY);
         Object object = getObject(dtde.getCurrentDataFlavors());
         if(object == null) return;

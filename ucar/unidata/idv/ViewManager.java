@@ -805,23 +805,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
 
         JComponent baseContents = (JComponent) doMakeContents();
-
-        DropPanel dropPanel = new DropPanel() {
-                public void handleDrop(Object object) {
-                    Misc.run(ViewManager.this,"doDrop",object);
-                }
-                public boolean okToDrop(Object object) {
-                    if(!(object instanceof DisplayControl)) return false;
-                    DisplayControl control = (DisplayControl) object;
-                    ViewManager vm = control.getViewManager();
-                    if(vm == null || vm == ViewManager.this || !vm.getClass().equals(ViewManager.this.getClass())) return false;
-
-                    return true;
-                }
-            };
-
-        dropPanel.add(BorderLayout.CENTER, baseContents);
-        baseContents = dropPanel;
+        baseContents = makeDropPanel(baseContents, false);
         innerContents = GuiUtils.center(baseContents);
         contentsWrapper  = GuiUtils.center(innerContents);
         menuBar       = doMakeMenuBar();
@@ -901,6 +885,26 @@ public class ViewManager extends SharableImpl implements ActionListener,
         fullContents.setBorder(getContentsBorder());
         fillLegends();
     }
+
+    public DropPanel makeDropPanel(JComponent contents, boolean doBorder) {
+        DropPanel dropPanel = new DropPanel(contents,doBorder) {
+                public void handleDrop(Object object) {
+                    Misc.run(ViewManager.this,"doDrop",object);
+                }
+                public boolean okToDrop(Object object) {
+                    if(!(object instanceof DisplayControl)) return false;
+                    DisplayControl control = (DisplayControl) object;
+                    ViewManager vm = control.getViewManager();
+                    if(vm == null || vm == ViewManager.this || !vm.getClass().equals(ViewManager.this.getClass())) {
+                        return false;
+                    }
+                    return true;
+                }
+            };
+
+        return dropPanel;
+    }
+
 
     /**
      * Set the contents boreder

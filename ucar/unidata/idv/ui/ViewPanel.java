@@ -28,6 +28,7 @@ import ucar.unidata.idv.*;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.idv.control.MapDisplayControl;
 
+import ucar.unidata.ui.DropPanel;
 import ucar.unidata.ui.DndImageButton;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
@@ -352,8 +353,6 @@ public class ViewPanel extends IdvManager {
         }
 
 
-
-
         ControlInfo controlInfo = (ControlInfo) controlToInfo.get(control);
         if (controlInfo != null) {
             //            System.err.println("Already have it");
@@ -361,6 +360,8 @@ public class ViewPanel extends IdvManager {
         }
         //For now cheat a little with the cast
         ((DisplayControlImpl) control).setMakeWindow(false);
+
+
         JButton removeBtn =
             GuiUtils.makeImageButton("/auxdata/ui/icons/Remove16.gif",
                                      control, "doRemove");
@@ -391,6 +392,8 @@ public class ViewPanel extends IdvManager {
 
         buttonPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0,
                 Color.lightGray.darker()));
+
+
         JComponent inner =
             (JComponent) ((DisplayControlImpl) control).getOuterContents();
         inner = GuiUtils.centerBottom(inner, buttonPanel);
@@ -502,10 +505,6 @@ public class ViewPanel extends IdvManager {
      * @param items List of menu items
      */
     public void addViewMenuItems(DisplayControl control, List items) {
-
-
-
-
         if (control.canBeDocked()) {
             items.add(GuiUtils.MENU_SEPARATOR);
             if ( !control.shouldBeDocked()) {
@@ -573,7 +572,10 @@ public class ViewPanel extends IdvManager {
         ((DisplayControlImpl) control).popup(null);
     }
 
-
+    public void controlMoved(DisplayControl control) {
+        removeControlTab(control);
+        addControlTab(control, true);
+    }
 
     /**
      * Initialize the button state
@@ -742,10 +744,11 @@ public class ViewPanel extends IdvManager {
             popupButton.setBorder(BorderFactory.createEmptyBorder(0, 0, 0,
                     0));
 
-            headerPanel = GuiUtils.leftCenter(
+            DropPanel dropPanel = viewManager.makeDropPanel(GuiUtils.leftCenter(
                 GuiUtils.hbox(
                     GuiUtils.inset(categoryToggleBtn, 1),
-                    popupButton), viewLabel);
+                    popupButton), viewLabel),true);
+            headerPanel = GuiUtils.center(dropPanel);
             JComponent headerWrapper = GuiUtils.center(headerPanel);
             headerPanel.setBorder(headerPanelBorder);
             contents = GuiUtils.topCenter(headerWrapper, tabContents);

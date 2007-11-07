@@ -33,6 +33,8 @@ import ucar.unidata.ui.DropPanel;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 
+import ucar.unidata.ui.DragPanel;
+
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.Resource;
 
@@ -321,8 +323,9 @@ public class SideLegend extends IdvLegend {
         /**
          * old code
          */
-        protected void xdoMakeContents() {
-            //            super.doMakeContents();
+        protected void doMakeContents() {
+            super.doMakeContents();
+            contents =  new DragPanel(control, contents);
             //            contents  = GuiUtils.inset(contents, new Insets(0, 6, 0, 0));
         }
 
