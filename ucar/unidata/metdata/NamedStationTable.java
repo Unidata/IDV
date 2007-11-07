@@ -24,6 +24,8 @@
 package ucar.unidata.metdata;
 
 
+import org.apache.poi.hssf.usermodel.*;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -1076,6 +1078,34 @@ public class NamedStationTable extends StationTableImpl {
     }
 
 
+    public static String xlsToCsv(String filename) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        InputStream myxls = new FileInputStream(filename);
+        HSSFWorkbook wb     = new HSSFWorkbook(myxls);
+        HSSFSheet sheet = wb.getSheetAt(0);       // first sheet
+        for(int rowIdx=sheet.getFirstRowNum();rowIdx<=sheet.getLastRowNum();rowIdx++) {
+            HSSFRow row     = sheet.getRow(rowIdx);
+            for(short colIdx=row.getFirstCellNum();colIdx<row.getPhysicalNumberOfCells();colIdx++) {
+                HSSFCell cell   = row.getCell(colIdx);
+                if(cell == null) continue;
+                HSSFComment comment = cell.getCellComment();
+                if(colIdx>0)
+                    sb.append(",");
+                sb.append(cell.toString());
+                if(false && comment!=null) {
+                    String author = comment.getAuthor();
+                    String str = comment.getString().getString();
+                    str = StringUtil.replace(str, author+":","");
+                    str = StringUtil.replace(str, "\n","");
+                    sb.append("("+str+")");
+                }
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+
 
     /**
      * Create a station table from a file
@@ -1103,6 +1133,18 @@ public class NamedStationTable extends StationTableImpl {
                     NamedStationTable.class));
             return table;
         }
+
+        if (filename.toLowerCase().endsWith(".xls")) {
+            NamedStationTable table = new NamedStationTable(
+                                          IOUtil.stripExtension(
+                                              IOUtil.getFileTail(filename)));
+
+            table.createStationTableFromCsv(xlsToCsv(filename));
+            return table;
+        }
+
+
+
 
         if (isKml(filename)) {
             NamedStationTable table = new NamedStationTable(
