@@ -55,6 +55,7 @@ public class DropPanel extends JPanel implements  DropTargetListener {
      */
     public DropPanel() {
         super(new BorderLayout());
+        setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
         dropTarget = new DropTarget(this, this);
     }
 

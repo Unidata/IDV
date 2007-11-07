@@ -32,10 +32,11 @@ import ucar.unidata.data.GeoLocationInfo;
 import ucar.unidata.data.gis.KmlDataSource;
 import ucar.unidata.idv.publish.PublishManager;
 
-import ucar.unidata.idv.ui.*;
 
+import ucar.unidata.idv.ui.*;
 import ucar.unidata.ui.Command;
 import ucar.unidata.ui.CommandManager;
+import ucar.unidata.ui.DropPanel;
 import ucar.unidata.ui.FontSelector;
 import ucar.unidata.ui.ImagePanel;
 import ucar.unidata.ui.ImageUtils;
@@ -775,6 +776,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     JPanel contentsWrapper;
+    public void  doDrop(Object object) {
+        DisplayControl control = (DisplayControl) object;
+        ViewManager vm = control.getViewManager();
+        if(vm == null || vm == this) return;
+        control.moveTo(this);
+    }
+
 
     /**
      * Create the ui
@@ -798,6 +806,22 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         JComponent baseContents = (JComponent) doMakeContents();
 
+        DropPanel dropPanel = new DropPanel() {
+                public void handleDrop(Object object) {
+                    Misc.run(ViewManager.this,"doDrop",object);
+                }
+                public boolean okToDrop(Object object) {
+                    if(!(object instanceof DisplayControl)) return false;
+                    DisplayControl control = (DisplayControl) object;
+                    ViewManager vm = control.getViewManager();
+                    if(vm == null || vm == ViewManager.this || !vm.getClass().equals(ViewManager.this.getClass())) return false;
+
+                    return true;
+                }
+            };
+
+        dropPanel.add(BorderLayout.CENTER, baseContents);
+        baseContents = dropPanel;
         innerContents = GuiUtils.center(baseContents);
         contentsWrapper  = GuiUtils.center(innerContents);
         menuBar       = doMakeMenuBar();

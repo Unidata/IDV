@@ -27,6 +27,7 @@ import ucar.unidata.idv.*;
 
 
 import ucar.unidata.idv.ui.*;
+import ucar.unidata.ui.DropPanel;
 
 
 import ucar.unidata.util.GuiUtils;
@@ -173,7 +174,7 @@ public class SideLegend extends IdvLegend {
                 category = "Displays";
             }
             CategoryPanel categoryPanel =
-                (CategoryPanel) categoryToPanel.get(category);
+               (CategoryPanel) categoryToPanel.get(category);
             if (categoryPanel == null) {
                 categoryPanel = new CategoryPanel(this, category);
                 categoryPanels.add(categoryPanel);
@@ -401,6 +402,20 @@ public class SideLegend extends IdvLegend {
             });
             setComponents(new JLabel("  " + category), visCbx, null);
         }
+
+        public boolean makeDropPanel() {
+            return true;
+        }
+
+        public boolean dropOk(Object object) {
+            return object instanceof DisplayControl;
+        }
+
+        public void doDrop(Object object) {
+            ((DisplayControl)object).setDisplayCategory(category);
+            legend.viewManager.displayControlChanged((DisplayControl)object);
+        }
+
 
         /**
          * Handle when the visibility of a display control has been changed

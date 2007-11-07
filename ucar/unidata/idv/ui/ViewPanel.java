@@ -28,6 +28,7 @@ import ucar.unidata.idv.*;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.idv.control.MapDisplayControl;
 
+import ucar.unidata.ui.DndImageButton;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
@@ -381,7 +382,7 @@ public class ViewPanel extends IdvManager {
         propBtn.setToolTipText("Show Display Control Properties");
 
 
-        ucar.unidata.ui.DndImageButton dnd = new ucar.unidata.ui.DndImageButton(control,"idv/display");
+        DndImageButton dnd = new DndImageButton(control,"idv/display");
         dnd.setToolTipText("Drag and drop to a window component");
         JPanel buttonPanel =
             GuiUtils.left(GuiUtils.hbox(Misc.newList(expandBtn, exportBtn,

@@ -68,6 +68,7 @@ import ucar.unidata.idv.ui.IdvWindow;
 
 import ucar.unidata.metdata.NamedStationImpl;
 
+import ucar.unidata.ui.DndImageButton;
 import ucar.unidata.ui.FontSelector;
 import ucar.unidata.ui.Help;
 import ucar.unidata.ui.ImageUtils;
@@ -3443,8 +3444,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         if (legendType == SIDE_LEGEND) {
             if (sideLegendButtonPanel == null) {
-                sideLegendButtonPanel = GuiUtils.hbox(makeLockButton(),
-                        makeRemoveButton(), 2);
+                DndImageButton dndBtn = new DndImageButton(this,"control");
+                sideLegendButtonPanel = GuiUtils.hbox(dndBtn,makeLockButton(),
+                                                      makeRemoveButton(), 2);
+                dndBtn.setToolTipText("Click to drag-and-drop");
                 sideLegendButtonPanel.setBackground(null);
             }
             return sideLegendButtonPanel;

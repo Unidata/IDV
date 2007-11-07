@@ -26,9 +26,12 @@ package ucar.unidata.idv.ui;
 import ucar.unidata.idv.*;
 
 
+
 import ucar.unidata.idv.ui.*;
 
+
 import ucar.unidata.ui.CheckboxCategoryPanel;
+import ucar.unidata.ui.DropPanel;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
@@ -230,9 +233,38 @@ public class LegendPanel {
             mainPanel.setBorder(new LegendBorder());
         }
         innerPanel.setVisible(innerVisible);
-        contents = GuiUtils.topCenter(mainPanel, innerPanel);
+        if(makeDropPanel()) {
+            DropPanel dropPanel = new DropPanel(){
+                    public void handleDrop(Object object) {
+                        doDrop(object);
+                    }
+                    public boolean okToDrop(Object object) {
+                        return dropOk(object);
+                    }
+                };
+            dropPanel.add(BorderLayout.CENTER, mainPanel);
+            contents = GuiUtils.topCenter(dropPanel, innerPanel);        
+        } else {
+            contents = GuiUtils.topCenter(mainPanel, innerPanel);        
+        }
+
+
+
+
     }
 
+
+
+    public boolean makeDropPanel() {
+        return false;
+    }
+
+    public boolean dropOk(Object object) {
+        return false;
+    }
+
+    public void doDrop(Object object) {
+    }
 
     /**
      * Add the component into the innerPanel.

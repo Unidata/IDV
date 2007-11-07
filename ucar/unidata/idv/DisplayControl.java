@@ -461,6 +461,9 @@ public interface DisplayControl extends Sharable {
     public String getDisplayCategory();
 
 
+    public void setDisplayCategory(String category);
+
+
 
     /**
      * Get the list of {@link ucar.unidata.data.DataCategory}s

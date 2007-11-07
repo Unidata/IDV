@@ -24,6 +24,7 @@ package ucar.unidata.ui;
 
 
 
+import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Resource;
 
 import java.awt.*;
@@ -54,6 +55,7 @@ public class DndImageButton extends JLabel implements DragSourceListener,
 
     /** _more_ */
     private static String iconName = "/ucar/unidata/ui/images/dnd.gif";
+    //    private static String iconName = "/auxdata/ui/icons/Move16.gif";
 
     /**
      * _more_
@@ -75,12 +77,13 @@ public class DndImageButton extends JLabel implements DragSourceListener,
      *
      */
     public DndImageButton(Object data, String mimeType, String icon) {
-        super(Resource.getIcon(icon, true));
+        super(GuiUtils.getImageIcon(icon, false));
         this.mimeType = mimeType;
         this.data     = data;
         dragSource    = new DragSource();
         dragSource.createDefaultDragGestureRecognizer(this,
                 DnDConstants.ACTION_MOVE, this);
+        setToolTipText("Click to drag-and-drop");
     }
 
     /**
