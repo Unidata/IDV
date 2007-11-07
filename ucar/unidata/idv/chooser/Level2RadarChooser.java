@@ -44,10 +44,10 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.PollingInfo;
 import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.xml.XmlResourceCollection;
 
 
 import ucar.unidata.xml.XmlUtil;
-import ucar.unidata.xml.XmlResourceCollection;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -145,9 +145,9 @@ public class Level2RadarChooser extends FileChooser {
 
         typeCbx = new JCheckBox("Use CDM", true);
         typeCbx.setToolTipText("Unselect to use old Level II reader");
-        comps.add(GuiUtils.left(GuiUtils.hbox(stationsCbx, GuiUtils.filler(),
-                typeCbx)));
-        //comps.add(GuiUtils.left(stationsCbx));
+        //comps.add(GuiUtils.left(GuiUtils.hbox(stationsCbx, GuiUtils.filler(),
+        //        typeCbx)));
+        comps.add(GuiUtils.left(stationsCbx));
 
         comps.add(GuiUtils.rLabel("Relative Times:"));
         comps.add(GuiUtils.left(getRecentFilesComponent()));
