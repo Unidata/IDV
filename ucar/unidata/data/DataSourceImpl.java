@@ -220,7 +220,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     private JCheckBox reloadCbx;
 
     /** geoselection panel */
-    private GeoSelectionPanel geoSelectionPanel;
+    protected GeoSelectionPanel geoSelectionPanel;
 
     /** Widget for properties dialog */
     private JTextField aliasFld;
@@ -2890,24 +2890,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             actions.add(a);
         }
 
-
-        if (canSaveDataToLocalDisk()) {
-            a = new AbstractAction("Make Data Source Local") {
-                public void actionPerformed(ActionEvent ae) {
-                    Misc.run(new Runnable() {
-                        public void run() {
-                            try {
-                                saveDataToLocalDisk(true, null);
-                            } catch (Exception exc) {
-                                logException("Writing data to local disk",
-                                             exc);
-                            }
-                        }
-                    });
-                }
-            };
-            actions.add(a);
-        }
+        makeSaveLocalActions(actions);
 
         if(canDoView()) {
             a = new AbstractAction("Write View File Plugin") {
@@ -2928,6 +2911,26 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
 
+    protected void makeSaveLocalActions(List actions) {
+        if (canSaveDataToLocalDisk()) {
+            AbstractAction a = new AbstractAction("Make Data Source Local") {
+                public void actionPerformed(ActionEvent ae) {
+                    Misc.run(new Runnable() {
+                        public void run() {
+                            try {
+                                saveDataToLocalDisk(true, null);
+                            } catch (Exception exc) {
+                                logException("Writing data to local disk",
+                                             exc);
+                            }
+                        }
+                    });
+                }
+            };
+            actions.add(a);
+        }
+
+    }
 
     /**
      * Called after created or unpersisted to strat up polling if need be.

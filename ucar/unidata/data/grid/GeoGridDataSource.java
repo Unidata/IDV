@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -55,6 +56,7 @@ import ucar.unidata.idv.chooser.ThreddsHandler;
 
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.ContourInfo;
+import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.JobManager;
@@ -252,7 +254,7 @@ public class GeoGridDataSource extends GridDataSource {
      *
      * @param root xml root
      */
-   protected void applyView(Element root) {
+    protected void applyView(Element root) {
         super.applyView(root);
         GeoSelection geoSubset = getDataSelection().getGeoSelection();
         if (geoSubset == null) {
@@ -281,6 +283,11 @@ public class GeoGridDataSource extends GridDataSource {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected boolean canDoView() {
         return true;
     }
@@ -544,9 +551,36 @@ public class GeoGridDataSource extends GridDataSource {
      * @return true if this DataSource can save data to local disk?
      */
     public boolean canSaveDataToLocalDisk() {
-        return !isFileBased()
-               && (getProperty(PROP_SERVICE_NCSUBSETSERVICE) != null);
+        return true;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param actions _more_
+     */
+    protected void makeSaveLocalActions(List actions) {
+        String         lbl = (isFileBased()
+                              ? "Subset grid file"
+                              : "Make Grid Local");
+        AbstractAction a   = new AbstractAction(lbl) {
+            public void actionPerformed(ActionEvent ae) {
+                Misc.run(new Runnable() {
+                    public void run() {
+                        try {
+                            saveDataToLocalDisk(true, null);
+                        } catch (Exception exc) {
+                            logException("Writing data to local disk", exc);
+                        }
+                    }
+                });
+            }
+        };
+        actions.add(a);
+    }
+
+
 
 
     /**
@@ -564,10 +598,6 @@ public class GeoGridDataSource extends GridDataSource {
     protected List saveDataToLocalDisk(String prefix, Object loadId,
                                        boolean changeLinks)
             throws Exception {
-
-        if ( !canSaveDataToLocalDisk()) {
-            return null;
-        }
 
         List      choices            = getDataChoices();
         List      checkboxes         = new ArrayList();
@@ -661,7 +691,8 @@ public class GeoGridDataSource extends GridDataSource {
             return null;
         }
 
-        String ncsAttrs = null;
+
+        List varNames = new ArrayList();
         for (int i = 0; i < dataChoices.size(); i++) {
             DataChoice dataChoice = (DataChoice) dataChoices.get(i);
             if ( !(dataChoice instanceof DirectDataChoice)) {
@@ -671,56 +702,71 @@ public class GeoGridDataSource extends GridDataSource {
             if ( !cbx.isSelected()) {
                 continue;
             }
-            if (ncsAttrs == null) {
-                ncsAttrs = "";
-            } else {
-                ncsAttrs = ncsAttrs + "&";
-            }
-            ncsAttrs = ncsAttrs + "grid=" + dataChoice.getName();
+            varNames.add(dataChoice.getName());
         }
-        if (ncsAttrs == null) {
+        if (varNames.size() == 0) {
             return null;
         }
 
-        GeoSelection geoSubset = getDataSelection().getGeoSelection();
-        if ((geoSubset != null) && (geoSubset.getBoundingBox() != null)) {
-            GeoLocationInfo bbox = geoSubset.getBoundingBox();
-            ncsAttrs = ncsAttrs + "&north=" + bbox.getMaxLat() + "&south="
-                       + bbox.getMinLat() + "&west=" + bbox.getMinLon()
-                       + "&east=" + bbox.getMaxLon();
+        LatLonRect   llr           = null;
+        int          hStride       = 1;
+        int          zStride       = 1;
+        int          timeStride    = 1;
+        GeoSelection geoSubset     = getDataSelection().getGeoSelection();
+        boolean      includeLatLon = false;
+
+        if (geoSubset != null) {
+            if (geoSubset.getBoundingBox() != null) {
+                llr = geoSubset.getBoundingBox().getLatLonRect();
+            }
+            if (geoSubset.hasXStride()) {
+                hStride = geoSubset.getXStride();
+            }
+            if (geoSubset.hasZStride()) {
+                zStride = geoSubset.getZStride();
+            }
         }
 
+        String         path   = prefix;
+        NetcdfCFWriter writer = new NetcdfCFWriter();
+        writer.makeFile(path, dataset, varNames, llr, /*dateRange*/ null,
+                        includeLatLon, hStride, zStride, timeStride);
 
 
-        String ncsUrl = (String) getProperty(PROP_SERVICE_NCSUBSETSERVICE);
-        //        String wcsUrl = (String) getProperty(PROP_SERVICE_WCS);
-        //        wcsUrl =
-        //            wcsUrl
-        //            + "?service=WCS&version=1.1.0&request=GetCoverage&identifier=grid&format=image/netcdf";
-        //&BoundingBox=-71,47,-66,51,urn:ogc:def:crs:OGC:2:84
-        //        System.out.println(wcsUrl);
-        ncsUrl = ncsUrl + "?";
-        ncsUrl = ncsUrl + ncsAttrs;
-
-        URL url = new URL(ncsUrl);
-        List newFiles = IOUtil.writeTo(
-                            Misc.newList(url), prefix,
-                            IOUtil.getFileExtension(
-                                sources.get(0).toString()), loadId);
-
-        if (newFiles != null) {
-            if (changeLinks) {
-                //Get rid of the resolver URL
-                getProperties().remove(PROP_RESOLVERURL);
-                getProperties().remove(PROP_SERVICE_NCSERVER);
-                getProperties().remove(PROP_SERVICE_WCS);
-                setNewFiles(newFiles);
+        if (geoSubset != null) {
+            geoSubset.clearStride();
+            geoSubset.setBoundingBox(null);
+            if (geoSelectionPanel != null) {
+                geoSelectionPanel.initWith(doMakeGeoSelectionPanel());
             }
+        }
+
+        //                       LatLonRect llbb, 
+        //                       boolean addLatLon,
+        //                       int horizStride, int stride_z, int stride_time) throws IOException, InvalidRangeException {
+
+
+        List newFiles = Misc.newList(path);
+        if (changeLinks) {
+            //Get rid of the resolver URL
+            getProperties().remove(PROP_RESOLVERURL);
+            setNewFiles(newFiles);
         }
         return newFiles;
 
     }
 
+    /**
+     * _more_
+     *
+     * @param label _more_
+     * @param prefix _more_
+     *
+     * @return _more_
+     */
+    protected String getLocalDirectory(String label, String prefix) {
+        return FileManager.getWriteFile(FileManager.FILTER_NETCDF, null);
+    }
 
 
 

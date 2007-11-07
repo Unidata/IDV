@@ -50,17 +50,6 @@ import javax.swing.Action;
  */
 public interface DataSource {
 
-    /** properties from the catalogs */
-    public static final String PROP_SERVICE_NCSERVER =
-        "prop.service.ncserver";
-
-
-    /** properties from the catalogs */
-    public static final String PROP_SERVICE_NCSUBSETSERVICE =
-        "prop.service.ncsubsetservice";
-
-    /** properties from the catalogs */
-    public static final String PROP_SERVICE_WCS = "prop.service.wcs";
 
     /** properties from the catalogs */
     public static final String PROP_SERVICE_HTTP = "prop.service.http";
