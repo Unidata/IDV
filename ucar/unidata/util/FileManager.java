@@ -815,6 +815,9 @@ public class FileManager {
     /** Suffix for CSV files */
     public static final String SUFFIX_CSV = ".csv";
 
+    /** Suffix for CSV files */
+    public static final String SUFFIX_XLS = ".xls";
+
     /** Suffix for JPEG files */
     public static final String SUFFIX_JPG = ".jpg";
 
@@ -854,6 +857,13 @@ public class FileManager {
         new PatternFileFilter(".+\\.csv",
                               "Comma-Separated Values (CSV) files (*.csv)",
                               SUFFIX_CSV);
+
+
+    /** Filter for xls files */
+    public static final PatternFileFilter FILTER_XLS =
+        new PatternFileFilter(".+\\.xls",
+                              "Microsoft Excel files",
+                              SUFFIX_XLS);
 
     /** File filter used for bundle files */
     public static final PatternFileFilter FILTER_JAR =
