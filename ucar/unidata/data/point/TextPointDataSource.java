@@ -1069,9 +1069,9 @@ public class TextPointDataSource extends PointDataSource {
                         others[j] = (allReals == true)
                                     ? (Real) tupleData[notReqIndices[j]]
                                     : (Data) tupleData[notReqIndices[j]];
-                        if (i == 0) {
-                            System.err.println("name:" + others[j].getType());
-                        }
+                        //if (i == 0) {
+                        //    System.err.println("name:" + others[j].getType());
+                        //}
                         if ((i == 0) && (others[j] instanceof Real)) {
                             Real r = (Real) others[j];
                             varNames.add(((RealType) r.getType()).getName());
