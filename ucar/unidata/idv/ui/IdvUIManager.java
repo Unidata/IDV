@@ -1701,6 +1701,89 @@ public class IdvUIManager extends IdvManager {
     }
 
 
+
+    public void getComponentGroupMenuItems(final IdvComponentGroup group, List items) {
+        List newItems = new ArrayList();
+        List mapviewItems = new ArrayList();
+        mapviewItems.add(GuiUtils.makeMenuItem("Map View", group, "makeNew",
+                                           IdvUIManager.COMP_MAPVIEW));
+        mapviewItems.add(GuiUtils.makeMenuItem("Globe View", group, "makeNew",
+                                           IdvUIManager.COMP_GLOBEVIEW));
+        mapviewItems.add(GuiUtils.makeMenuItem("Transect View", group, "makeNew",
+                                           IdvUIManager.COMP_TRANSECTVIEW));
+        newItems.add(GuiUtils.makeMenu("View", mapviewItems));
+
+        ActionListener listener = new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    int skinIndex = ((Integer)ae.getSource()).intValue();
+                    group.makeSkin(skinIndex);
+                }};
+
+        List skinItems =  getIdv().getIdvUIManager().makeSkinMenuItems(listener,false, true);
+        if(skinItems.size()>0) {
+            newItems.add(GuiUtils.makeMenu("User Interface", skinItems));
+        }
+
+
+        newItems.add(GuiUtils.makeMenuItem("Data Choosers", group, "makeNew",
+                                           IdvUIManager.COMP_COMPONENT_CHOOSERS));
+
+        newItems.add(GuiUtils.makeMenuItem("Field Selector", group, "makeNew",
+                                           IdvUIManager.COMP_DATASELECTOR));
+        newItems.add(
+            GuiUtils.makeMenuItem(
+                "Tab Group", group, "makeNew",
+                IdvUIManager.COMP_COMPONENT_GROUP));
+        newItems.add(GuiUtils.makeMenuItem("Html Text", group, "makeNew",
+                                           IdvUIManager.COMP_COMPONENT_HTML));
+
+
+
+        items.add(GuiUtils.makeMenu("New", newItems));
+
+
+        List importItems = new ArrayList();
+        List vms         = getIdv().getVMManager().getViewManagers();
+        for (int vmIdx = 0; vmIdx < vms.size(); vmIdx++) {
+            ViewManager vm              = (ViewManager) vms.get(vmIdx);
+            List        viewItems       = new ArrayList();
+            List        displayControls = vm.getControls();
+            for (int i = 0; i < displayControls.size(); i++) {
+                DisplayControlImpl dc =
+                    (DisplayControlImpl) displayControls.get(i);
+                if ((dc.getComponentHolder() != null)
+                        && (dc.getComponentHolder().getParent() == group)) {
+                    continue;
+                }
+                if (viewItems.size() == 0) {
+                    if (displayControls.size() > 0) {
+                        viewItems.add(GuiUtils.makeMenuItem("Import All",
+                                group, "importAllDisplayControls",
+                                displayControls));
+                        viewItems.add(GuiUtils.MENU_SEPARATOR);
+                    }
+                }
+                viewItems.add(GuiUtils.makeMenuItem(dc.getLabel(), group,
+                        "importDisplayControl", dc));
+            }
+            if (viewItems.size() > 0) {
+                String name = vm.getName();
+                if ((name == null) || (name.trim().length() == 0)) {
+                    name = "View " + (vmIdx + 1);
+                }
+                importItems.add(GuiUtils.makeMenu(name, viewItems));
+            }
+        }
+        if (importItems.size() == 0) {
+            importItems.add(new JMenuItem("No displays to import"));
+        }
+        items.add(GuiUtils.makeMenu("Import Display", importItems));
+
+        items.add(GuiUtils.makeMenuItem("Write Skin", group, "writeSkin"));
+        items.add(GuiUtils.MENU_SEPARATOR);
+    }
+
+
     public List makeSkinMenuItems(final ActionListener listener, boolean onlyUI, boolean onlyEmbedded) {
         List items = new ArrayList();
         final XmlResourceCollection skins =
@@ -1830,35 +1913,38 @@ public class IdvUIManager extends IdvManager {
     public void makeWindowsMenu(JMenu menu) {
         IdvWindow activeWindow = IdvWindow.getActiveWindow();
         if (activeWindow != null) {
-            //            menu.add(M
-            //            menu.addSeparator();
+            makeWindowMenu(activeWindow,menu);
         }
 
         List windows = IdvWindow.getWindows();
         for (int i = 0; i < windows.size(); i++) {
             IdvWindow window     = (IdvWindow) windows.get(i);
-            Hashtable components = window.getPersistentComponents();
-            if (components.size() > 0) {
-                List subItems = new ArrayList();
-                subItems.add(GuiUtils.makeMenuItem("Show", window, "show"));
-
-                for (Enumeration keys = components.keys();
-                        keys.hasMoreElements(); ) {
-                    Object key = keys.nextElement();
-                    ComponentHolder comp =
-                        (ComponentHolder) components.get(key);
-                    subItems.add(GuiUtils.makeMenuItem("Edit Component: "
-                            + comp.getName(), comp, "showProperties"));
-                }
-
-                menu.add(GuiUtils.makeMenu(window.getTitle(), subItems));
-            } else {
-                menu.add(GuiUtils.makeMenuItem(window.getTitle(), window,
-                        "show"));
-            }
+            if(window==activeWindow) continue;
+            makeWindowMenu(window,menu);
         }
     }
 
+    protected void makeWindowMenu(IdvWindow window,JMenu menu) {
+        Hashtable components = window.getPersistentComponents();
+        if (components.size() > 0) {
+            List subItems = new ArrayList();
+            subItems.add(GuiUtils.makeMenuItem("Show", window, "show"));
+            
+            for (Enumeration keys = components.keys();
+                 keys.hasMoreElements(); ) {
+                Object key = keys.nextElement();
+                ComponentHolder comp =
+                    (ComponentHolder) components.get(key);
+                subItems.add(GuiUtils.makeMenuItem("Edit Component: "
+                                                   + comp.getName(), comp, "showProperties"));
+            }
+            
+            menu.add(GuiUtils.makeMenu(window.getTitle(), subItems));
+        } else {
+            menu.add(GuiUtils.makeMenuItem(window.getTitle(), window,
+                                           "show"));
+        }
+    }
 
     /**
      *  This adds to the given menu a set of MenuItems, one for each saved viewmanager

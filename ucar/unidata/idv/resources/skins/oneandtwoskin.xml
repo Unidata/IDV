@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<skin>
+<skin embedded="true">
   <ui>
     <panel
        layout="border"
        bgcolor="red">
       <idv.menubar place="North"/>
-      <panel
+      <panel 
          layout="border"
          place="Center">
         <panel
@@ -18,7 +18,7 @@
              id="idv.favoritesbar"
              place="North"/>
         </panel>
-        <splitpane
+        <splitpane embeddednode="true"
            onetouchexpandable="true"
 	   resizeweight="0.6"
            orientation="h"

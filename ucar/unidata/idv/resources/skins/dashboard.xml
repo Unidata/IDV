@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<skin mainwindow="false" windowtitle="Dashboard">
+<skin mainwindow="false" windowtitle="Dashboard" embedded="true">
   <ui>
     <panel layout="border">
       <idv.menubar place="North"/>
@@ -17,7 +16,7 @@
              id="idv.favoritesbar"
              place="North"/>
         </panel>
-        <tabbedpane place="Center">
+        <tabbedpane place="Center" embeddednode="true">
         <idv.quicklinks title="Quicklinks" icon="/auxdata/ui/icons/Bookmarks24.gif" usepref="true"/>	
 
 <!--

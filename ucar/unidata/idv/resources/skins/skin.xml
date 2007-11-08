@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<skin>
+<skin embedded="true">
   <ui>
     <panel layout="border">
       <idv.menubar place="North"/>
@@ -17,7 +16,7 @@
              id="idv.favoritesbar"
              place="North"/>
         </panel>
-        <idv.view place="Center" class="${view_class}">
+        <idv.view embeddednode="true" place="Center" class="${view_class}">
         </idv.view>
       </panel>
       <idv.statusbar place="South"/>

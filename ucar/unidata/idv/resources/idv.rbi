@@ -130,7 +130,7 @@
     </resource>
 
     <resource
-	skinid="idv.skin.oneview.globe"
+       skinid="idv.skin.oneview.globe"
        label="Globe View&gt;One Pane"
        location="%IDVPATH%/skins/globeskin.xml"/>
 
@@ -138,10 +138,7 @@
        skinid="idv.skin.twoview.globe"
        label="Globe View&gt;Two Panes"
        location="%IDVPATH%/skins/twoglobeskin.xml">
-      <property
-         name="embedded"
-         value="true"/>
-	</resource>
+    </resource>
 
     <resource
        skinid="idv.skin.threeview.globe"

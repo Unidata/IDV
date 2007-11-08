@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<skin>
+<skin embedded="true">
   <ui>
     <panel layout="border">
       <idv.menubar place="North"/>
-      <panel
+      <panel embeddednode="true"
          layout="border"
          place="Center">
         <panel

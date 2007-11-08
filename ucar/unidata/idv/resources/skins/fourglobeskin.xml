@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<skin>
+<skin embedded="true">
 <!-- 
 See: /auxdata/docs/developer/contents/XmlUi.html
     -->
@@ -27,7 +27,7 @@ See: /auxdata/docs/developer/contents/XmlUi.html
              id="idv.favoritesbar"
              place="North"/>
         </panel>
-        <panel
+        <panel embeddednode="true"
            layout="grid"
            cols="2"
            place="Center">
