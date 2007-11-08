@@ -756,13 +756,13 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
             popupButton.setBorder(BorderFactory.createEmptyBorder(0, 0, 0,
                     0));
 
-            DropPanel dropPanel =
-                viewManager.makeDropPanel(
-                    GuiUtils.leftCenter(
+            headerPanel = GuiUtils.leftCenter(
                         GuiUtils.hbox(
                             GuiUtils.inset(categoryToggleBtn, 1),
-                            popupButton), viewLabel), true);
-            headerPanel = GuiUtils.center(dropPanel);
+                            popupButton), viewLabel);
+            if(viewManager!=null) {
+                headerPanel = viewManager.makeDropPanel(headerPanel, true);
+            }
             JComponent headerWrapper = GuiUtils.center(headerPanel);
             headerPanel.setBorder(headerPanelBorder);
             contents = GuiUtils.topCenter(headerWrapper, tabContents);
