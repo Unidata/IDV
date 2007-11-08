@@ -546,6 +546,14 @@ public class ComponentGroup extends ComponentHolder {
         tabbedPane.removeAll();
         container.setVisible(false);
         container.removeAll();
+
+        if(displayComponents.size()==0) {
+            container.setVisible(true);
+            container.setPreferredSize(new Dimension(100,100));
+            return;
+        }
+        container.setPreferredSize(null);
+
         if (isLayout(LAYOUT_GRID)) {
             container.setLayout(new GridLayout(numRows, numColumns, 5, 5));
         } else {

@@ -503,8 +503,14 @@ public class IdvXmlUi extends XmlUi {
                 ViewManager viewManager = getViewManager(child);
                 compGroup.addComponent(new IdvComponentHolder(idv,
                         viewManager));
+            } else if (childTagName.equals(IdvUIManager.COMP_COMPONENT_CHOOSERS)) {
+                IdvComponentHolder comp = new IdvComponentHolder(idv,"choosers");
+                comp.setType(comp.TYPE_CHOOSERS);
+                comp.setName(XmlUtil.getAttribute(child,"name","Choosers"));
+                compGroup.addComponent(comp);
             } else if (childTagName.equals(IdvUIManager.COMP_COMPONENT_SKIN)) {
                 IdvComponentHolder comp = new IdvComponentHolder(idv,XmlUtil.getAttribute(child,"url"));
+                comp.setType(comp.TYPE_SKIN);
                 comp.setName(XmlUtil.getAttribute(child,"name","UI"));
                 compGroup.addComponent(comp);
             } else if (childTagName.equals(

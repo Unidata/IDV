@@ -216,6 +216,9 @@ public class IdvUIManager extends IdvManager {
     public static final String COMP_COMPONENT_GROUP = "idv.component.group";
 
     /** _more_ */
+    public static final String COMP_COMPONENT_CHOOSERS = "idv.component.choosers";
+
+    /** _more_ */
     public static final String COMP_COMPONENT_SKIN = "idv.component.skin";
 
     /** _more_ */

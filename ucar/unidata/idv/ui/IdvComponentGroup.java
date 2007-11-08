@@ -208,6 +208,9 @@ public class IdvComponentGroup extends ComponentGroup {
         }
 
 
+        newItems.add(GuiUtils.makeMenuItem("Data Choosers", this, "makeNew",
+                                           IdvUIManager.COMP_COMPONENT_CHOOSERS));
+
         newItems.add(GuiUtils.makeMenuItem("Field Selector", this, "makeNew",
                                            IdvUIManager.COMP_DATASELECTOR));
         newItems.add(
@@ -385,6 +388,7 @@ public class IdvComponentGroup extends ComponentGroup {
         String id = skins.getProperty("skinid",skinIndex);
         if(id == null) id = skins.get(skinIndex).toString();
         IdvComponentHolder comp = new IdvComponentHolder(idv, id);
+        comp.setType(comp.TYPE_SKIN);
         comp.setName(skins.getLabel(skinIndex));
         addComponent(comp);
     }
@@ -417,6 +421,11 @@ public class IdvComponentGroup extends ComponentGroup {
                                      "showControlLegend=false");
                 idv.getVMManager().addViewManager(vm);
                 comp = new IdvComponentHolder(idv, vm);
+            } else if (what.equals(IdvUIManager.COMP_COMPONENT_CHOOSERS)) {
+                comp = new IdvComponentHolder(idv,
+                                              "choosers");
+                comp.setName("Data Choosers");
+                ((IdvComponentHolder)comp).setType(IdvComponentHolder.TYPE_CHOOSERS);
             } else if (what.equals(IdvUIManager.COMP_DATASELECTOR)) {
                 comp = new IdvComponentHolder(idv,
                                               idv.getIdvUIManager().createDataSelector(false,
