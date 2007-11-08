@@ -336,6 +336,29 @@ public class DataUtil {
     }
 
 
+    public static void writeXls(String filename,List rows) throws Exception {
+        HSSFWorkbook wb          = new HSSFWorkbook();
+        FileOutputStream fileOut = new FileOutputStream(filename);
+        HSSFSheet sheet = wb.createSheet();
+        for(int i=0;i<rows.size();i++) {
+            HSSFRow row     = sheet.createRow((short)i); 
+            List cols = (List) rows.get(i);
+            for(int colIdx=0;colIdx<cols.size();colIdx++) {
+                Object o = cols.get(colIdx);
+                HSSFCell cell   = row.createCell((short)colIdx); 
+                if(o instanceof Double) {
+                    cell.setCellValue(((Double)o).doubleValue()); 
+                } if(o instanceof Integer) {
+                    cell.setCellValue(((Integer)o).intValue()); 
+                } else {
+                    cell.setCellValue(o.toString());
+                }
+            }
+        }
+        wb.write(fileOut);
+        fileOut.close();
+    }
+
     public static String xlsToCsv(String filename) throws Exception {
         StringBuffer sb = new StringBuffer();
         InputStream myxls = IOUtil.getInputStream(filename, DataUtil.class);
