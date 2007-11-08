@@ -4860,9 +4860,35 @@ public class GuiUtils {
      * @param model The table model to write
      */
     public static void exportAsCsv(String header, TableModel model) {
-        String filename = FileManager.getWriteFile(FileManager.FILTER_CSV,
-                              FileManager.SUFFIX_CSV);
+        String filename = FileManager.getWriteFile(Misc.newList(FileManager.FILTER_CSV,FileManager.FILTER_XLS),
+                                                   FileManager.SUFFIX_CSV);
         if (filename == null) {
+            return;
+        } 
+       if(filename.toLowerCase().endsWith(".xls")) {
+            //A hack
+            try {
+                Class c = Misc.findClass("ucar.unidata.data.DataUtil");
+                Method method = Misc.findMethod(c,"writeXls", new Class[]{String.class, List.class});
+                List rows = new ArrayList();
+                int  numRows = model.getRowCount();
+                int  numCols = model.getColumnCount();
+                List colNames = new ArrayList();
+                for(int i=0;i<model.getColumnCount();i++) {
+                    colNames.add(model.getColumnName(i));
+                }
+                rows.add(colNames);
+                for (int row = 0; row < numRows; row++) {
+                    List cols = new ArrayList();
+                    rows.add(cols);
+                    for (int col = 0; col < numCols; col++) {
+                        cols.add(model.getValueAt(row, col));
+                    }
+                }
+                method.invoke(null, new Object[]{filename, rows});
+            } catch (Exception exc) {
+                LogUtil.logException("Exporting data to xsl", exc);
+            }
             return;
         }
         String csv = GuiUtils.toCsv(model);
