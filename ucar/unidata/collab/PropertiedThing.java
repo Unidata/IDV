@@ -304,6 +304,7 @@ public abstract class PropertiedThing  extends SharableImpl
             propertiesDialog.setLocation(loc);
         }
         propertiesDialog.show();
+        propertiesDialog = null;
         return true;
     }
 
