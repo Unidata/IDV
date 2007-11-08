@@ -932,14 +932,16 @@ public class NamedStationTable extends StationTableImpl {
 
         //ICAO code,Airport Name,Latitude,Longitude
         for (int i = 1; i < lines.size(); i++) {
-            List toks = StringUtil.split((String) lines.get(i), ",", true,
-                                         true);
+            String line =  lines.get(i).toString().trim();
+            if(line.length()==0) continue;
+            List toks = StringUtil.split(line, ",", true,
+                                         false);
             if (toks.size() == 0) {
                 continue;
             }
             if (toks.size() != names.size()) {
                 throw new IllegalStateException("CSV line: " + lines.get(i)
-                        + " does not have correct number of elements");
+                                                + " does not have correct number of elements. Has:" + toks.size() + " looking for:" + names.size());
             }
             double lat      = Misc.decodeLatLon((String) toks.get(latIndex));
             double lon      = Misc.decodeLatLon((String) toks.get(lonIndex));
@@ -1115,7 +1117,8 @@ public class NamedStationTable extends StationTableImpl {
                                           IOUtil.stripExtension(
                                               IOUtil.getFileTail(filename)));
 
-            table.createStationTableFromCsv(DataUtil.xlsToCsv(filename));
+            String csv = DataUtil.xlsToCsv(filename);
+            table.createStationTableFromCsv(csv);
             return table;
         }
 
