@@ -39,7 +39,7 @@ public final class GempakUtil {
     };
 
     /** day of month string */
-    private static String[] vert = new String[] {
+    public static String[] vertCoords = new String[] {
         "NONE", "PRES", "THTA", "HGHT", "SGMA", "DPTH"
     };
 
@@ -306,6 +306,17 @@ public final class GempakUtil {
     }
 
     /**
+     * Convert the int bits to a string
+     *
+     * @param values  array of values to convert
+     *
+     * @return  string representation
+     */
+    public static String ST_ITOC(int[] values) {
+        return McIDASUtil.intBitsToString(values);
+    }
+
+    /**
      * This subroutine translates a numeric value for IVCORD into its
      * character value in VCOORD.
      * @param ivcord  integer coordinate value
@@ -318,8 +329,8 @@ public final class GempakUtil {
 
         //Check for numeric vertical coordinates.
 
-        if ((ivcord >= 0) && (ivcord < vert.length)) {
-            vcoord = vert[ivcord];
+        if ((ivcord >= 0) && (ivcord < vertCoords.length)) {
+            vcoord = vertCoords[ivcord];
 
         } else if (ivcord > 100) {
             //     Check for character name as vertical coordinate.  Check that
@@ -364,5 +375,47 @@ public final class GempakUtil {
         McIDASUtil.flip(values, startIndex, endIndex);
         return values;
     }
+
+    /**
+     * Get a name for the grid packing type
+     *
+     * @param pktyp   packing type
+     *
+     * @return  String version of packing type
+     */
+    public static String getGridPackingName(int pktyp) {
+        String packingType = "UNKNOWN";
+        switch (pktyp) {
+
+          case GempakConstants.MDGNON :
+              packingType = "MDGNON";
+              break;
+
+          case GempakConstants.MDGGRB :
+              packingType = "MDGGRB";
+              break;
+
+          case GempakConstants.MDGNMC :
+              packingType = "MDGNMC";
+              break;
+
+          case GempakConstants.MDGDIF :
+              packingType = "MDGDIF";
+              break;
+
+          case GempakConstants.MDGDEC :
+              packingType = "MDGDEC";
+              break;
+
+          case GempakConstants.MDGRB2 :
+              packingType = "MDGRB2";
+              break;
+
+          default :
+              break;
+        }
+        return packingType;
+    }
+
 }
 

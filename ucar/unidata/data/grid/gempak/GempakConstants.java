@@ -109,5 +109,25 @@ public interface GempakConstants {
     /** Max grid hdr length */
     public static final int LLGDHD = 128;
 
+    // Grid packing types
+
+    /** no packing */
+    public static final int MDGNON = 0;
+
+    /** GRIB1 packing */
+    public static final int MDGGRB = 1;
+
+    /** NMC packing */
+    public static final int MDGNMC = 2;
+
+    /** DIF packing */
+    public static final int MDGDIF = 3;
+
+    /** decimal packing? */
+    public static final int MDGDEC = 4;
+
+    /** GRIB2 packing */
+    public static final int MDGRB2 = 5;
+
 }
 
