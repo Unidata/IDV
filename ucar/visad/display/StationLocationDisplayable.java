@@ -512,9 +512,17 @@ public class StationLocationDisplayable extends StationModelDisplayable {
                 String attrName = (String) keys.nextElement();
                 attrNames.add(attrName);
                 attrName = ucar.visad.Util.cleanName(attrName);
-                attrTypes.add(TextType.getTextType(attrName));
+                int cnt = 0;
+                TextType type = TextType.getTextType(attrName);
+                while(type==null) {
+                    cnt++;
+                    type = TextType.getTextType(attrName+"_"+ cnt);
+                    if(cnt>1000) break;
+                }
+                attrTypes.add(type);
             }
         }
+
 
         Data[] firstData = null;
         Trace.call1("make field"," stations:" + stations.size());
@@ -584,9 +592,12 @@ public class StationLocationDisplayable extends StationModelDisplayable {
                 if (attrValue instanceof Real) {
                     theData[arrayIndex] = (Real) attrValue;
                 } else {
-                    theData[arrayIndex] =
-                        new Text((TextType) attrTypes.get(attrIdx),
-                                 attrValue.toString());
+                    TextType textType = (TextType) attrTypes.get(attrIdx);
+                    try {
+                        theData[arrayIndex] =   new Text(textType,attrValue.toString());
+                    } catch(TypeException te) {
+                        throw te;
+                    }
                 }
             }
             pot = new PointObTuple(nlt, bogusTime, new Tuple(theData, false));
