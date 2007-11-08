@@ -25,6 +25,7 @@ package ucar.unidata.idv.ui;
 
 
 import ucar.unidata.idv.*;
+import ucar.unidata.ui.ComponentGroup;
 import ucar.unidata.ui.IndependentWindow;
 import ucar.unidata.ui.MultiFrame;
 import ucar.unidata.ui.RovingProgress;
@@ -535,13 +536,20 @@ public class IdvWindow extends MultiFrame {
     public void dispose() {
         allWindows.remove(this);
         mainWindows.remove(this);
+
+        List groups =getComponentGroups();
+        for(int i=0;i<groups.size();i++) {
+            ComponentGroup group = (ComponentGroup) groups.get(i);
+            group.doRemove();
+        }
+        persistentComponents = null;
+
         destroyViewManagers();
         if (xmlUI != null) {
             //            xmlUI.dispose();
         }
         viewManagers         = null;
         components           = null;
-        persistentComponents = null;
         super.dispose();
     }
 
@@ -608,6 +616,7 @@ public class IdvWindow extends MultiFrame {
      * @param object _more_
      */
     public void putPersistentComponent(Object key, Object object) {
+        if(persistentComponents == null) return;
         persistentComponents.put(key, object);
     }
 
@@ -619,10 +628,12 @@ public class IdvWindow extends MultiFrame {
      * @return _more_
      */
     public Object getPersistentComponent(Object key) {
+        if(persistentComponents == null) return null;
         return persistentComponents.get(key);
     }
 
     public List getComponentGroups() {
+        if(persistentComponents == null) return new ArrayList();
         List groups = new ArrayList();
         Hashtable map = getPersistentComponents();
         for (Enumeration keys =

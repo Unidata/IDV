@@ -65,6 +65,7 @@ public class IdvComponentHolder extends ComponentHolder {
     /** _more_ */
     private Object object;
 
+    private List viewManagers;
 
     /**
      * _more_
@@ -141,9 +142,18 @@ public class IdvComponentHolder extends ComponentHolder {
         //        Misc.printStack("doRemove",10,null);
         if ((object != null) && (idv != null)) {
             try {
+                if(viewManagers!=null) {
+                    for(int i=0;i<viewManagers.size();i++) {
+                        ((ViewManager)viewManagers.get(i)).destroy();
+                    }
+                    viewManagers = null;
+                }
+
+
                 if (object instanceof ViewManager) {
-                    idv.getVMManager().removeViewManager(
-                        (ViewManager) object);
+                    ((ViewManager)object).destroy();
+                    //                    idv.getVMManager().removeViewManager(
+                    //                        (ViewManager) object);
                 } else if (object instanceof DisplayControl) {
                     ((DisplayControl) object).doRemove();
                 } else if (object instanceof DataSelector) {
@@ -362,6 +372,7 @@ public class IdvComponentHolder extends ComponentHolder {
             if(startNode !=null) {
                 xmlUI.setStartNode(startNode);
             }
+            viewManagers = xmlUI.getViewManagers();
             return  (JComponent) xmlUI.getContents();
         } catch(Exception exc) {
             throw new WrapperException (exc);  
