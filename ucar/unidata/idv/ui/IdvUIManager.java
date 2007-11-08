@@ -216,6 +216,9 @@ public class IdvUIManager extends IdvManager {
     public static final String COMP_COMPONENT_GROUP = "idv.component.group";
 
     /** _more_ */
+    public static final String COMP_COMPONENT_SKIN = "idv.component.skin";
+
+    /** _more_ */
     public static final String COMP_COMPONENT_HTML = "idv.component.html";
 
 
@@ -1608,49 +1611,23 @@ public class IdvUIManager extends IdvManager {
         }
 
         //TODO: Perhaps we will put the different skins in the menu?
-        JMenuItem newDisplayMenu = (JMenuItem) menuMap.get(MENU_NEWDISPLAY);
+        JMenu newDisplayMenu = (JMenu) menuMap.get(MENU_NEWDISPLAY);
         if (newDisplayMenu != null) {
-            final XmlResourceCollection skins =
-                getResourceManager().getXmlResources(
-                    getResourceManager().RSC_SKIN);
-
-            Hashtable menus = new Hashtable();
-            for (int i = 0; i < skins.size(); i++) {
-                final Element root = skins.getRoot(i);
-                if (root == null) {
-                    continue;
-                }
-                final int skinIndex = i;
-                List names = StringUtil.split(skins.getShortName(i), ">",
-                                 true, true);
-                JMenuItem theMenu = newDisplayMenu;
-                String    path    = "";
-                for (int nameIdx = 0; nameIdx < names.size() - 1; nameIdx++) {
-                    String catName = (String) names.get(nameIdx);
-                    path = path + ">" + catName;
-                    JMenu tmpMenu = (JMenu) menus.get(path);
-                    if (tmpMenu == null) {
-                        tmpMenu = new JMenu(catName);
-                        theMenu.add(tmpMenu);
-                        menus.put(path, tmpMenu);
-                    }
-                    theMenu = tmpMenu;
-                }
-                final String name = (String) names.get(names.size() - 1);
-                JMenuItem    mi   = new JMenuItem(name);
-                theMenu.add(mi);
-                mi.addActionListener(new ActionListener() {
+            ActionListener listener = new ActionListener() {
                     public void actionPerformed(ActionEvent ae) {
+                        XmlResourceCollection skins =
+                            getResourceManager().getXmlResources(
+                                                                 getResourceManager().RSC_SKIN);
+                        int skinIndex = ((Integer)ae.getSource()).intValue();
                         createNewWindow(null, true,
                                         getWindowTitleFromSkin(skinIndex),
                                         skins.get(skinIndex).toString(),
                                         skins.getRoot(skinIndex, false),
                                         true, null);
-                    }
-                });
-            }
-        }
+                    }};
 
+            GuiUtils.makeMenu(newDisplayMenu, makeSkinMenuItems(listener, true, false));
+        }
 
         /*        JMenu newData = (JMenu) menuMap.get("file.newdata");
         if (newData != null) {
@@ -1721,6 +1698,59 @@ public class IdvUIManager extends IdvManager {
     }
 
 
+    public List makeSkinMenuItems(final ActionListener listener, boolean onlyUI, boolean onlyEmbedded) {
+        List items = new ArrayList();
+        final XmlResourceCollection skins =
+            getResourceManager().getXmlResources(
+                                                 getResourceManager().RSC_SKIN);
+
+        Hashtable menus = new Hashtable();
+        for (int i = 0; i < skins.size(); i++) {
+            final Element root = skins.getRoot(i);
+            if (root == null) {
+                continue;
+            }
+            if(onlyEmbedded) {
+                if(!XmlUtil.getAttribute(root,"embedded", false)) continue;
+            } else if(onlyUI && !XmlUtil.getAttribute(root,"forui", true)) {
+                continue;
+            }
+
+            if (Misc.equals(skins.getProperty("embedded", i), "true")) {
+                continue;
+            }
+            final int skinIndex = i;
+            List names = StringUtil.split(skins.getShortName(i), ">",
+                                          true, true);
+            JMenuItem theMenu = null;
+            String    path    = "";
+            for (int nameIdx = 0; nameIdx < names.size() - 1; nameIdx++) {
+                String catName = (String) names.get(nameIdx);
+                path = path + ">" + catName;
+                JMenu tmpMenu = (JMenu) menus.get(path);
+                if (tmpMenu == null) {
+                    tmpMenu = new JMenu(catName);
+                    if(theMenu == null) items.add(tmpMenu);
+                    else           theMenu.add(tmpMenu);
+                    menus.put(path, tmpMenu);
+                }
+                theMenu = tmpMenu;
+            }
+            final String name = (String) names.get(names.size() - 1);
+            JMenuItem    mi   = new JMenuItem(name);
+            if(theMenu == null) items.add(mi);
+            else theMenu.add(mi);
+            mi.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        ActionEvent action = new ActionEvent(new Integer(skinIndex),0,"");
+                        listener.actionPerformed(action);
+                    }
+                });
+        }
+        return items;
+    }
+
+
     /**
      * Get the skin's HTML
      *
@@ -1739,6 +1769,8 @@ public class IdvUIManager extends IdvManager {
             if (root == null) {
                 continue;
             }
+            if(!XmlUtil.getAttribute(root,"forui", true)) {continue;}
+
             List names = StringUtil.split(skins.getShortName(i), ">", true,
                                           true);
             String path = "";
@@ -1782,7 +1814,7 @@ public class IdvUIManager extends IdvManager {
         Element root = skins.getRoot(skinIndex, false);
         createNewWindow(null, true, getWindowTitleFromSkin(skinIndex),
                         skins.get(skinIndex).toString(),
-                        skins.getRoot(skinIndex, false), true, null);
+                        root, true, null);
     }
 
 
@@ -3320,17 +3352,21 @@ public class IdvUIManager extends IdvManager {
      * @return The status bar
      */
     public JPanel doMakeStatusBar(IdvWindow window) {
+        if(window == null) return new JPanel();
         JLabel msgLabel = new JLabel("                         ");
         LogUtil.addMessageLogger(msgLabel);
-        window.setComponent(COMP_MESSAGELABEL, msgLabel);
-        IdvXmlUi xmlUI = window.getXmlUI();
-        if (xmlUI != null) {
-            xmlUI.addComponent(COMP_MESSAGELABEL, msgLabel);
+        if(window!=null) {
+            window.setComponent(COMP_MESSAGELABEL, msgLabel);
+        }
+        if(window!=null) {
+            IdvXmlUi xmlUI = window.getXmlUI();
+            if (xmlUI != null) {
+                xmlUI.addComponent(COMP_MESSAGELABEL, msgLabel);
+            }
         }
 
-
         //        final JLabel waitLabel = new JLabel(window.getNormalIcon());
-        JLabel waitLabel = new JLabel(window.getNormalIcon());
+        JLabel waitLabel = new JLabel(IdvWindow.getNormalIcon());
         waitLabel.addMouseListener(new ObjectListener(null) {
             public void mouseClicked(MouseEvent e) {
                 getIdv().clearWaitCursor();

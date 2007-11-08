@@ -311,7 +311,6 @@ public class XmlResourceCollection extends ResourceCollection {
      * @param lookAtCache SHould we check the cache first
      *  @return The root Element.
      */
-
     public Element getRoot(int resourceIndex, boolean lookAtCache) {
         if (lookAtCache) {
             Element root = (Element) roots.get(get(resourceIndex));

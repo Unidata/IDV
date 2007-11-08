@@ -47,12 +47,17 @@ import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.Misc;
 import ucar.unidata.xml.XmlUtil;
+import ucar.unidata.xml.XmlResourceCollection;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.event.*;
 
 
 /**
@@ -182,12 +187,27 @@ public class IdvComponentGroup extends ComponentGroup {
      */
     protected List getPopupMenuItems(List items) {
         List newItems = new ArrayList();
-        newItems.add(GuiUtils.makeMenuItem("Map View", this, "makeNew",
+        List mapviewItems = new ArrayList();
+        mapviewItems.add(GuiUtils.makeMenuItem("Map View", this, "makeNew",
                                            IdvUIManager.COMP_MAPVIEW));
-        newItems.add(GuiUtils.makeMenuItem("Globe View", this, "makeNew",
+        mapviewItems.add(GuiUtils.makeMenuItem("Globe View", this, "makeNew",
                                            IdvUIManager.COMP_GLOBEVIEW));
-        newItems.add(GuiUtils.makeMenuItem("Transect View", this, "makeNew",
+        mapviewItems.add(GuiUtils.makeMenuItem("Transect View", this, "makeNew",
                                            IdvUIManager.COMP_TRANSECTVIEW));
+        newItems.add(GuiUtils.makeMenu("View", mapviewItems));
+
+        ActionListener listener = new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    int skinIndex = ((Integer)ae.getSource()).intValue();
+                    makeSkin(skinIndex);
+                }};
+
+        List skinItems =  idv.getIdvUIManager().makeSkinMenuItems(listener,false, true);
+        if(skinItems.size()>0) {
+            newItems.add(GuiUtils.makeMenu("User Interface", skinItems));
+        }
+
+
         newItems.add(GuiUtils.makeMenuItem("Field Selector", this, "makeNew",
                                            IdvUIManager.COMP_DATASELECTOR));
         newItems.add(
@@ -196,6 +216,7 @@ public class IdvComponentGroup extends ComponentGroup {
                 IdvUIManager.COMP_COMPONENT_GROUP));
         newItems.add(GuiUtils.makeMenuItem("Html Text", this, "makeNew",
                                            IdvUIManager.COMP_COMPONENT_HTML));
+
 
 
         items.add(GuiUtils.makeMenu("New", newItems));
@@ -358,36 +379,48 @@ public class IdvComponentGroup extends ComponentGroup {
         addComponent(new IdvComponentHolder(idv, dc));
     }
 
+    public void makeSkin(int skinIndex) {
+        XmlResourceCollection skins = getIdv().getResourceManager().getXmlResources(
+                                          IdvResourceManager.RSC_SKIN);
+        String id = skins.getProperty("skinid",skinIndex);
+        if(id == null) id = skins.get(skinIndex).toString();
+        IdvComponentHolder comp = new IdvComponentHolder(idv, id);
+        comp.setName(skins.getLabel(skinIndex));
+        addComponent(comp);
+    }
+
     /**
      * _more_
      *
      * @param what _more_
      */
     public void makeNew(String what) {
+
         try {
+            ComponentHolder comp = null;
             if (what.equals(IdvUIManager.COMP_MAPVIEW)) {
                 ViewManager vm = new MapViewManager(idv,
                                      new ViewDescriptor(),
                                      "showControlLegend=false");
                 idv.getVMManager().addViewManager(vm);
-                addComponent(new IdvComponentHolder(idv, vm));
+                comp = new IdvComponentHolder(idv, vm);
             } else if (what.equals(IdvUIManager.COMP_GLOBEVIEW)) {
                 MapViewManager vm = new MapViewManager(idv,
                                         new ViewDescriptor(),
                                         "showControlLegend=false");
                 vm.setUseGlobeDisplay(true);
                 idv.getVMManager().addViewManager(vm);
-                addComponent(new IdvComponentHolder(idv, vm));
+                comp = new IdvComponentHolder(idv, vm);
             } else if (what.equals(IdvUIManager.COMP_TRANSECTVIEW)) {
                 ViewManager vm = new TransectViewManager(idv,
                                      new ViewDescriptor(),
                                      "showControlLegend=false");
                 idv.getVMManager().addViewManager(vm);
-                addComponent(new IdvComponentHolder(idv, vm));
+                comp = new IdvComponentHolder(idv, vm);
             } else if (what.equals(IdvUIManager.COMP_DATASELECTOR)) {
-                addComponent(new IdvComponentHolder(idv,
-                        idv.getIdvUIManager().createDataSelector(false,
-                            false)));
+                comp = new IdvComponentHolder(idv,
+                                              idv.getIdvUIManager().createDataSelector(false,
+                                                                                       false));
             } else if (what.equals(IdvUIManager.COMP_COMPONENT_GROUP)) {
                 String name = GuiUtils.getInput("Enter name for tab group",
                                   "Name: ", "Group");
@@ -396,20 +429,23 @@ public class IdvComponentGroup extends ComponentGroup {
                 }
                 IdvComponentGroup group = new IdvComponentGroup(idv, name);
                 group.setLayout(group.LAYOUT_TABS);
-                addComponent(group);
-
+                comp = group;
             } else if (what.equals(IdvUIManager.COMP_COMPONENT_HTML)) {
                 String text = GuiUtils.getInput("Enter html", "Html: ", "");
                 if (text == null) {
                     return;
                 }
-                ComponentHolder comp = new HtmlComponent("Html Text", text);
-                comp.setShowLabel(false);
+                comp = new HtmlComponent("Html Text", text);
+                comp.setShowHeader(false);
+            }
+            if(comp!=null) {
                 addComponent(comp);
+                GuiUtils.showComponentInTabs(comp.getContents());
             }
         } catch (Exception exc) {
             LogUtil.logException("Error making new " + what, exc);
         }
+
     }
 
 

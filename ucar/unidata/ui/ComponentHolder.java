@@ -22,9 +22,6 @@
 
 
 
-
-
-
 package ucar.unidata.ui;
 
 
@@ -92,15 +89,13 @@ public class ComponentHolder extends PropertiedThing {
 
 
     /** _more_ */
-    private boolean showLabel = false;
+    private boolean showHeader = false;
 
     /** _more_ */
-    protected JLabel displayLabel;
+    protected JButton displayBtn;
 
     /** _more_ */
-    protected JComponent displayLabelWrapper;
-
-
+    protected JComponent header;
 
     /** _more_ */
     private String category;
@@ -125,7 +120,7 @@ public class ComponentHolder extends PropertiedThing {
     private JComboBox borderBox;
 
     /** _more_ */
-    private JCheckBox showLabelCbx;
+    private JCheckBox showHeaderCbx;
 
 
     /** _more_          */
@@ -157,6 +152,13 @@ public class ComponentHolder extends PropertiedThing {
     public ComponentHolder(String name, JComponent contents) {
         this(name);
         this.innerContents = contents;
+    }
+
+
+    public ComponentGroup getRoot() {
+        if(parent !=null) return parent.getRoot();
+        if(this instanceof ComponentGroup) return  (ComponentGroup) this;
+        return null;
     }
 
 
@@ -222,32 +224,30 @@ public class ComponentHolder extends PropertiedThing {
     public JComponent getContents() {
         if (innerContents == null) {
             innerContents = doMakeContents();
-            if (displayLabel == null) {
-                displayLabel = new JLabel(getName());
-                displayLabel.setToolTipText("Right click to show menu");
-                displayLabel.addMouseListener(new MouseAdapter() {
-                    public void mousePressed(MouseEvent e) {
-                        if ( !SwingUtilities.isRightMouseButton(e)
-                                && (e.getClickCount() > 1)) {
-                            showProperties(displayLabel, 0, 0);
-                            return;
-                        }
-
-                        if (SwingUtilities.isRightMouseButton(e)) {
-                            showPopup(displayLabel, e.getX(), e.getY());
-                        }
-                    }
-                });
-                displayLabelWrapper = GuiUtils.inset(displayLabel,
-                        new Insets(0, 5, 0, 0));
-                displayLabelWrapper.setVisible(getShowLabel());
+            if (header == null) {
+                header = doMakeHeader();
+                header.setVisible(getShowHeader());
             }
-            innerContents = GuiUtils.topCenter(displayLabelWrapper, innerContents);
+            innerContents = GuiUtils.topCenter(header, innerContents);
             setBorder(innerContents);
             outerContents = wrapContents(innerContents);
         }
         return outerContents;
     }
+
+    protected JComponent doMakeHeader() {
+        displayBtn = GuiUtils.getImageButton("/auxdata/ui/icons/Down16.gif",getClass());
+        displayBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    showPopup(displayBtn, 0,(int)displayBtn.getBounds().getHeight());
+                }
+            });
+        displayBtn.setPreferredSize(null);
+        displayBtn.setText(getName());
+        return GuiUtils.inset(GuiUtils.left(displayBtn),
+                              new Insets(0, 5, 0, 0));
+    }
+
 
     protected JComponent wrapContents(JComponent contents) {
         return contents;
@@ -302,12 +302,12 @@ public class ComponentHolder extends PropertiedThing {
     protected void getPropertiesComponents(List comps, int tabIdx) {
         super.getPropertiesComponents(comps, tabIdx);
         if (tabIdx == 0) {
-            showLabelCbx = new JCheckBox("Show Label", showLabel);
+            showHeaderCbx = new JCheckBox("Show Label", showHeader);
             borderBox = new JComboBox(new Vector(Misc.toList(BORDER_NAMES)));
             borderBox.setSelectedIndex(Misc.toList(BORDERS).indexOf(border));
             comps.add(GuiUtils.rLabel("Border:"));
             comps.add(GuiUtils.left(GuiUtils.hbox(borderBox,
-                    GuiUtils.filler(20, 5), showLabelCbx)));
+                    GuiUtils.filler(20, 5), showHeaderCbx)));
         }
     }
 
@@ -324,8 +324,8 @@ public class ComponentHolder extends PropertiedThing {
         }
 
         //Apply this in case a subclass has changed anything
-        if (displayLabel != null) {
-            displayLabel.setText(getName());
+        if (displayBtn != null) {
+            displayBtn.setText(getName());
         }
 
 
@@ -337,8 +337,8 @@ public class ComponentHolder extends PropertiedThing {
                 setBorder(innerContents);
             }
         }
-        if (showLabel != showLabelCbx.isSelected()) {
-            setShowLabel(showLabelCbx.isSelected());
+        if (showHeader != showHeaderCbx.isSelected()) {
+            setShowHeader(showHeaderCbx.isSelected());
         }
         return true;
     }
@@ -464,8 +464,8 @@ public class ComponentHolder extends PropertiedThing {
      */
     public void setName(String value) {
         name = value;
-        if (displayLabel != null) {
-            displayLabel.setText(getName());
+        if (displayBtn != null) {
+            displayBtn.setText(getName());
         }
     }
 
@@ -552,24 +552,24 @@ public class ComponentHolder extends PropertiedThing {
     }
 
     /**
-     * Set the ShowLabel property.
+     * Set the ShowHeader property.
      *
-     * @param value The new value for ShowLabel
+     * @param value The new value for ShowHeader
      */
-    public void setShowLabel(boolean value) {
-        showLabel = value;
-        if (displayLabelWrapper != null) {
-            displayLabelWrapper.setVisible(getShowLabel());
+    public void setShowHeader(boolean value) {
+        showHeader = value;
+        if (header != null) {
+            header.setVisible(getShowHeader());
         }
     }
 
     /**
-     * Get the ShowLabel property.
+     * Get the ShowHeader property.
      *
-     * @return The ShowLabel
+     * @return The ShowHeader
      */
-    public boolean getShowLabel() {
-        return showLabel;
+    public boolean getShowHeader() {
+        return showHeader;
     }
 
     /**

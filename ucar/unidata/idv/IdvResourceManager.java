@@ -975,9 +975,8 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
                     for (int attrIdx = 0; attrIdx < nnm.getLength();
                             attrIdx++) {
                         Attr attr = (Attr) nnm.item(attrIdx);
-                        if ( !attr.getNodeName().equals(ATTR_ID)
-                                && !attr.getNodeName().equals(
-                                    ATTR_LOCATION)) {
+                        if (!attr.getNodeName().equals(ATTR_LOCATION) &&
+                            !attr.getNodeName().equals(ATTR_ID)) {
                             if (nodeProperties == null) {
                                 nodeProperties = new Hashtable();
                             }

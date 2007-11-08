@@ -37,8 +37,9 @@ import ucar.unidata.ui.ComponentHolder;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.WrapperException;
 import ucar.unidata.xml.XmlUtil;
-
+import ucar.unidata.xml.XmlResourceCollection;
 import java.awt.*;
 
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ public class IdvComponentHolder extends ComponentHolder {
 
     /** _more_ */
     private Object object;
+
 
     /**
      * _more_
@@ -113,6 +115,11 @@ public class IdvComponentHolder extends ComponentHolder {
                               object.getClass().getName());
             node.appendChild(XmlUtil.makeCDataNode(doc,
                     idv.encodeObject(object, false)));
+            return node;
+        }
+        if(object instanceof String) {
+            Element node = doc.createElement(IdvUIManager.COMP_COMPONENT_SKIN);
+            node.setAttribute("url",  object.toString());
             return node;
         }
         return null;
@@ -212,6 +219,9 @@ public class IdvComponentHolder extends ComponentHolder {
         if (object instanceof DataSelector) {
             return "Tools";
         }
+        if (object instanceof String) {
+            return "UI Skin";
+        }
         return super.getCategory();
     }
 
@@ -276,6 +286,9 @@ public class IdvComponentHolder extends ComponentHolder {
         if (object instanceof DataSelector) {
             return "Field Selector";
         }
+        if (object instanceof String) {
+            return "UI Skin";
+        }
         return super.getTypeName();
 
     }
@@ -299,13 +312,50 @@ public class IdvComponentHolder extends ComponentHolder {
     }
 
 
-
     /**
      * _more_
      *
      * @return _more_
      */
     public JComponent doMakeContents() {
+        if (object instanceof String) {
+            try {
+                String path  = (String) object;
+                Element root = null;
+                XmlResourceCollection skins =getIdv().getResourceManager().getXmlResources(
+                                                                                           IdvResourceManager.RSC_SKIN);
+
+
+                for (int i = 0; i < skins.size(); i++) {
+                    String id = skins.getProperty("skinid",i);
+                    if(Misc.equals(path, skins.getProperty("skinid",i))) {
+                        root = skins.getRoot(i,false);
+                        break;                        
+                    }
+                }
+
+                if(root == null) {
+                    for (int i = 0; i < skins.size(); i++) {
+                        if(Misc.equals(path, skins.get(i).toString())) {
+                            root = skins.getRoot(i);
+                            break;
+                        }
+                    }
+                }
+                if(root == null) {
+                    root = XmlUtil.getRoot(path, getClass());
+                }
+                IdvXmlUi xmlUI =  getIdv().getIdvUIManager().doMakeIdvXmlUi(null, new ArrayList(), root);
+                Element startNode = XmlUtil.findElement(root, null,"embeddednode", "true");
+                if(startNode !=null) {
+                    xmlUI.setStartNode(startNode);
+                }
+                return  (JComponent) xmlUI.getContents();
+            } catch(Exception exc) {
+                throw new WrapperException (exc);  
+            }
+        }
+
         if (object instanceof ViewManager) {
             return (JComponent) ((ViewManager) object).getContents();
         }

@@ -288,8 +288,8 @@ public class ComponentGroup extends ComponentHolder {
             ComponentHolder comp = (ComponentHolder) displayComponents.get(i);
             List            compItems = new ArrayList();
             comp.getPopupMenuItems(compItems);
-            subItems.add(GuiUtils.MENU_SEPARATOR);
-            subItems.add(GuiUtils.makeMenuItem("Properties...", this,
+            compItems.add(GuiUtils.MENU_SEPARATOR);
+            compItems.add(GuiUtils.makeMenuItem("Properties...", this,
                                                "showProperties"));
             subItems.add(GuiUtils.makeMenu(comp.getName(), compItems));
         }

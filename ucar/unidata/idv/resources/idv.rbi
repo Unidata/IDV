@@ -35,6 +35,7 @@
     </resource>
 
     <resource
+       skinid="idv.skin.oneview.map"
        label="Map View&gt;One Pane"
        location="%IDVPATH%/skins/skin.xml">
       <property
@@ -52,6 +53,7 @@
          name="layout"
          value="tabs"/>
     </resource>
+
     <resource
        label="Component Group&gt;Tree"
        location="%IDVPATH%/skins/componentgroup.xml">
@@ -94,15 +96,11 @@
     </resource>
 
 
-    <resource
-       label="Test"
-       location="%IDVPATH%/skins/testskin.xml">
-      <property
-         name="view_class"
-         value="ucar.unidata.idv.MapViewManager"/>
-    </resource>
+
+
 
     <resource
+       skinid="idv.skin.twoview.map"
        label="Map View&gt;Two Panes"
        location="%IDVPATH%/skins/twoviewskin.xml">
       <property
@@ -112,30 +110,46 @@
          name="right_view_class"
          value="ucar.unidata.idv.MapViewManager"/>
     </resource>
+
     <resource
+       skinid="idv.skin.threeview.map"
        label="Map View&gt;Three Panes"
        location="%IDVPATH%/skins/threeviewskin.xml">
       <property
          name="view_class"
          value="ucar.unidata.idv.MapViewManager"/>
     </resource>
+
     <resource
+       skinid="idv.skin.fourview.map"
        label="Map View&gt;Four Panes"
        location="%IDVPATH%/skins/fourviewskin.xml">
       <property
          name="view_class"
          value="ucar.unidata.idv.MapViewManager"/>
     </resource>
+
     <resource
+	skinid="idv.skin.oneview.globe"
        label="Globe View&gt;One Pane"
        location="%IDVPATH%/skins/globeskin.xml"/>
+
     <resource
+       skinid="idv.skin.twoview.globe"
        label="Globe View&gt;Two Panes"
-       location="%IDVPATH%/skins/twoglobeskin.xml"/>
+       location="%IDVPATH%/skins/twoglobeskin.xml">
+      <property
+         name="embedded"
+         value="true"/>
+	</resource>
+
     <resource
+       skinid="idv.skin.threeview.globe"
        label="Globe View&gt;Three Panes"
        location="%IDVPATH%/skins/threeglobeskin.xml"/>
+
     <resource
+       skinid="idv.skin.fourview.globe"
        label="Globe View&gt;Four Panes"
        location="%IDVPATH%/skins/fourglobeskin.xml"/>
 
@@ -146,14 +160,18 @@
      <property name="view_class" value="ucar.unidata.idv.MapViewManager"/>
     </resource>
  -->
+
     <resource
+       skinid="idv.skin.oneview.transect"
        label="Transect View&gt;One Pane"
        location="%IDVPATH%/skins/skin.xml">
       <property
          name="view_class"
          value="ucar.unidata.idv.TransectViewManager"/>
     </resource>
+
     <resource
+       skinid="idv.skin.twoview.transect"
        label="Transect View&gt;Two Panes"
        location="%IDVPATH%/skins/twoviewskin.xml">
       <property
@@ -163,7 +181,9 @@
          name="right_view_class"
          value="ucar.unidata.idv.TransectViewManager"/>
     </resource>
+
     <resource
+       skinid="idv.skin.twoview.transectmap"
        label="Misc&gt;Transect and Map"
        location="%IDVPATH%/skins/twoviewskin.xml">
       <property
@@ -173,7 +193,9 @@
          name="right_view_class"
          value="ucar.unidata.idv.MapViewManager"/>
     </resource>
+
     <resource
+       skinid="idv.skin.oneview.map2d"
        label="Misc&gt;2D Map View"
        location="%IDVPATH%/skins/skin2D.xml">
       <property
@@ -182,22 +204,26 @@
     </resource>
 
     <resource
+       skinid="idv.skin.dashboard"
        label="Windows&gt;Dashboard"
        location="%IDVPATH%/skins/dashboard.xml"></resource>
 
     <resource
+       skinid="idv.skin.fieldselector"
        label="Windows&gt;Field Selector"
        location="%IDVPATH%/skins/windowtemplate.xml">
       <property  name="contents"><![CDATA[<idv.dataselector id="idv.dataselector"/>]]></property>
     </resource>
 
     <resource
+       skinid="idv.skin.datachooser"
        label="Windows&gt;Data Chooser"
        location="%IDVPATH%/skins/windowtemplate.xml">
       <property  name="contents"><![CDATA[<idv.choosers  intabs="false"/>]]></property>
     </resource>
 
     <resource
+       skinid="idv.skin.quicklinks"
        label="Windows&gt;Quick Links"
        location="%IDVPATH%/skins/windowtemplate.xml">
       <property  name="contents"><![CDATA[<idv.quicklinks/>]]></property>
@@ -205,6 +231,7 @@
 
 
     <resource
+       skinid="idv.skin.fieldselectorchooser"
        label="Windows&gt;Field Selector and Chooser"
        location="%IDVPATH%/skins/windowtemplate.xml">
       <property  name="contents"><![CDATA[<splitpane divider="200" onetouchexpandable="true" orientation="v"><idv.dataselector id="idv.dataselector"/><idv.choosers intabs="false"/></splitpane>]]></property>

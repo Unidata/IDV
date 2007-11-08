@@ -668,6 +668,9 @@ public class XmlUi implements ActionListener, ItemListener {
     /** root of ui xml */
     private Element root;
 
+    /** root of ui xml */
+    private Element startNode;
+
     /** The TAG_UI node */
     private Element uiNode;
 
@@ -799,7 +802,14 @@ public class XmlUi implements ActionListener, ItemListener {
 
     public XmlUi(Element root, Hashtable idToComponent,
                  ActionListener actionListener, Hashtable initProperties) {
+        this(root, null, idToComponent, actionListener, initProperties);
+    }
+
+    public XmlUi(Element root, Element startNode, Hashtable idToComponent,
+                 ActionListener actionListener, Hashtable initProperties) {
+
         this.root           = root;
+        this.startNode  = startNode;
         this.idToComponent  = ((idToComponent == null)
                                ? new Hashtable()
                                : idToComponent);
@@ -811,10 +821,14 @@ public class XmlUi implements ActionListener, ItemListener {
     }
 
 
+    public void setStartNode(Element node) {
+        this.startNode = node;
+    }
+
+
     /**
      * The destructor
      */
-
     public void dispose() {
         myContents          = null;
         root                = null;
@@ -1390,14 +1404,18 @@ public class XmlUi implements ActionListener, ItemListener {
             return xmlToUi(root);
         }
 
-        if (uiNode != null) {
+        Element initialNode = startNode;
+        if (initialNode == null && uiNode != null) {
             //            badState("Error: No <ui> tag found");
             //        }
             NodeList children = XmlUtil.getElements(uiNode);
             if (children.getLength() != 1) {
                 badState("Error: <ui> tag must have only one child");
             }
-            return xmlToUi((Element) children.item(0));
+            initialNode = (Element) children.item(0);
+        }
+        if(initialNode!=null) {
+            return xmlToUi(initialNode);
         }
         return xmlToUi(root);
     }

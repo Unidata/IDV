@@ -128,8 +128,12 @@ public class IdvXmlUi extends XmlUi {
      */
     public IdvXmlUi(IdvWindow window, List viewManagers,
                     IntegratedDataViewer idv, Element root) {
+        this(window, viewManagers, idv, root, null);
+    }
 
-        super(root, idv);
+    public IdvXmlUi(IdvWindow window, List viewManagers,
+                    IntegratedDataViewer idv, Element root, Element startNode) {
+        super(root, startNode, null, idv, null);
         this.window = window;
         if (viewManagers != null) {
             this.viewManagers.addAll(viewManagers);
@@ -332,12 +336,14 @@ public class IdvXmlUi extends XmlUi {
                              "" + componentCnt);
             componentCnt++;
             ComponentGroup compGroup =
-                (ComponentGroup) window.getPersistentComponent(key);
+                (ComponentGroup) (window!=null?window.getPersistentComponent(key):null);
 
             if (compGroup == null) {
                 compGroup = makeComponentGroup(node);
-                compGroup.setShowLabel(true);
-                window.putPersistentComponent(key, compGroup);
+                compGroup.setShowHeader(true);
+                if(window!=null) {
+                    window.putPersistentComponent(key, compGroup);
+                }
             } else {}
             return compGroup.getContents();
         }
@@ -359,8 +365,10 @@ public class IdvXmlUi extends XmlUi {
                 idv.getIdvChooserManager().createChoosers(inTabs, choosers,
                     node);
             for (int i = 0; i < choosers.size(); i++) {
-                window.addToGroup(IdvWindow.GROUP_CHOOSERS,
-                                  (Component) choosers.get(i));
+                if(window!=null) {
+                    window.addToGroup(IdvWindow.GROUP_CHOOSERS,
+                                      (Component) choosers.get(i));
+                }
             }
             return comp;
         }
@@ -495,8 +503,12 @@ public class IdvXmlUi extends XmlUi {
                 ViewManager viewManager = getViewManager(child);
                 compGroup.addComponent(new IdvComponentHolder(idv,
                         viewManager));
+            } else if (childTagName.equals(IdvUIManager.COMP_COMPONENT_SKIN)) {
+                IdvComponentHolder comp = new IdvComponentHolder(idv,XmlUtil.getAttribute(child,"url"));
+                comp.setName(XmlUtil.getAttribute(child,"name","UI"));
+                compGroup.addComponent(comp);
             } else if (childTagName.equals(
-                    IdvUIManager.COMP_COMPONENT_GROUP)) {
+                                           IdvUIManager.COMP_COMPONENT_GROUP)) {
                 IdvComponentGroup childCompGroup = makeComponentGroup(child);
                 compGroup.addComponent(childCompGroup);
             } else if (childTagName.equals(IdvUIManager.COMP_DATASELECTOR)) {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<skin>
+<skin embedded="true" forui ="false">
   <ui>
     <panel
        layout="border"
@@ -19,6 +19,7 @@
              place="North"/>
         </panel>
         <splitpane
+	   embeddednode="true"
 	   resizeweight="0.5"
            onetouchexpandable="true"
            orientation="h"
