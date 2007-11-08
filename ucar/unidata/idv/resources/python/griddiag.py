@@ -10,7 +10,8 @@
    grid relative components of a vector.
 """
 
-GRAVTY = DerivedGridFactory.GRAVITY
+def GRAVTY():
+  return DerivedGridFactory.GRAVITY;
 
 # Math functions
 def atn2(S1,S2):

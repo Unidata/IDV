@@ -94,6 +94,10 @@ The label is used  (if defined) for  the AliasEditor gui.
      label="Z"
      aliases="z,Z,Geopotential_height"/>
   <alias
+     name="GP"
+     label="Geopotential"
+     aliases="Geopotential"/>
+  <alias
      name="ALTITUDE"
      label="Altitude"
      aliases="Z_sfc, Altitude, altitude, Elevation, elevation, topo, Geopotential_height_surface,HGT"/>
