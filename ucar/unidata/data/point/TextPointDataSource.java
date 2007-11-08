@@ -23,16 +23,17 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
 import edu.wisc.ssec.mcidas.McIDASUtil;
 
 import ucar.unidata.data.*;
-import ucar.unidata.metdata.NamedStationTable;
 
 
 import ucar.unidata.geoloc.LatLonRect;
+import ucar.unidata.metdata.NamedStationTable;
 
 import ucar.unidata.ui.GraphPaperLayout;
 import ucar.unidata.util.GuiUtils;
@@ -83,6 +84,9 @@ public class TextPointDataSource extends PointDataSource {
 
     /** The visad textadapter map. We have this here if the data file does not have it */
     private String map;
+
+    /** _more_          */
+    private int skipRows = 0;
 
     /** The visad textadapter map params line. We have this here if the data file does not have it */
     private String params;
@@ -187,6 +191,36 @@ public class TextPointDataSource extends PointDataSource {
     /**
      * _more_
      *
+     * @param contents _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private InputStream getInputStream(String contents) throws Exception {
+        InputStream is = new ByteArrayInputStream(contents.getBytes());
+        for (int i = 0; i < skipRows; i++) {
+            while(is.available()>0) {
+                int c = is.read();
+                if(c=='\n') break;
+                if(c=='\r') {
+                    if(is.available()>0) {
+                        is.mark(10);
+                        c = is.read();                        
+                        if(c != '\n') is.reset();
+                    }
+                    break;
+                }
+            }
+        }
+        return is;
+
+    }
+
+
+    /**
+     * _more_
+     *
      * @param dataChoice _more_
      * @param subset _more_
      * @param bbox _more_
@@ -201,25 +235,24 @@ public class TextPointDataSource extends PointDataSource {
                                 LatLonRect bbox, String trackParam,
                                 boolean sampleIt)
             throws Exception {
-        String    source   = getSource(dataChoice);
-        String    contents;
+        String source = getSource(dataChoice);
+        String contents;
         String delimiter;
-        if(source.endsWith(".xls")) {
-            contents = DataUtil.xlsToCsv(source);
+        if (source.endsWith(".xls")) {
+            contents  = DataUtil.xlsToCsv(source);
             delimiter = ",";
         } else {
-            contents = IOUtil.readContents(source, getClass());
+            contents  = IOUtil.readContents(source, getClass());
             delimiter = TextAdapter.getDelimiter(source);
         }
 
-        FieldImpl obs      = null;
+        FieldImpl obs = null;
         //        FieldImpl obs = (FieldImpl) getCache (source);
         if (obs == null) {
-            TextAdapter ta        = null;
+            TextAdapter ta = null;
             try {
-                ta = new TextAdapter(
-                    new ByteArrayInputStream(contents.getBytes()), delimiter,
-                    map, params, sampleIt);
+                ta = new TextAdapter(getInputStream(contents), delimiter,
+                                     map, params, sampleIt);
             } catch (visad.data.BadFormException bfe) {
                 //Probably don't have the header info
                 //If we already have a map and params then we have problems
@@ -229,9 +262,8 @@ public class TextPointDataSource extends PointDataSource {
                 if ( !showAttributeGui(contents)) {
                     return null;
                 }
-                ta = new TextAdapter(
-                    new ByteArrayInputStream(contents.getBytes()), delimiter,
-                    map, params, sampleIt);
+                ta = new TextAdapter(getInputStream(contents), delimiter,
+                                     map, params, sampleIt);
             }
             try {
                 Data d = ta.getData();
@@ -265,7 +297,7 @@ public class TextPointDataSource extends PointDataSource {
         try {
             ta = new TextAdapter(
                 new ByteArrayInputStream(contents.getBytes()), delimiter,
-                map, params);
+                map, params, false);
         } catch (visad.data.BadFormException bfe) {
             throw bfe;
         }
@@ -324,6 +356,37 @@ public class TextPointDataSource extends PointDataSource {
 
 
 
+    /**
+     * _more_
+     *
+     * @param lbl _more_
+     * @param index _more_
+     * @param lines _more_
+     */
+    private void setLineText(JLabel lbl, int index, List lines) {
+        StringBuffer sb =
+            new StringBuffer("<html><table width=\"100%\" border=0>");
+        int[] indices = { index, index + 1, index + 2, index + 3, index + 4 };
+        for (int i = 0; i < indices.length; i++) {
+            String line;
+            if ((indices[i] < 0) || (indices[i] >= lines.size())) {
+                line = "&nbsp;";
+            } else {
+                line = (String) lines.get(indices[i]);
+            }
+            sb.append("<tr valign=top><td width=5>");
+            if (indices[i] == index) {
+                sb.append("<b>&gt;</b></td><td><b><u>" + line
+                          + "</u></b></td></tr>");
+            } else {
+                sb.append("</td><td>" + line + "</td></tr>");
+            }
+        }
+        sb.append("</table>");
+        sb.append("</html>");
+        lbl.setText(sb.toString());
+    }
+
 
     /**
      * Make, if needed, and return the gui metadata component
@@ -335,20 +398,60 @@ public class TextPointDataSource extends PointDataSource {
      * @throws IOException On badness
      */
     private JComponent getMetaDataComponent(String contents)
-            throws IOException {
+        throws IOException {
         if (metaDataComp == null) {
             if (contents == null) {
                 contents = IOUtil.readContents(getFilePath(), getClass());
             }
-            BufferedReader bis = new BufferedReader(
-                                     new InputStreamReader(
-                                         new ByteArrayInputStream(
-                                             contents.getBytes())));
-            String line = TextAdapter.readLine(bis);
+            final BufferedReader bis = new BufferedReader(
+                                           new InputStreamReader(
+                                               new ByteArrayInputStream(
+                                                   contents.getBytes())));
+            final List lines = new ArrayList();
+            for (int i = 0; i < 100; i++) {
+                String line = bis.readLine();
+                if (line == null) {
+                    break;
+                }
+                lines.add(line);
+            }
+            final int[]  skipCnt = { 0 };
+            final JLabel lineLbl = new JLabel("");
+            setLineText(lineLbl, skipCnt[0], lines);
+            JButton nextBtn = new JButton("Next");
+            nextBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    skipCnt[0]++;
+                    if (skipCnt[0] >= lines.size()) {
+                        skipCnt[0] = lines.size() - 1;
+                    }
+                    setLineText(lineLbl, skipCnt[0], lines);
+                }
+            });
+            JButton prevBtn = new JButton("Previous");
+            prevBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    skipCnt[0]--;
+                    if (skipCnt[0] < 0) {
+                        skipCnt[0] = 0;
+                    }
+                    setLineText(lineLbl, skipCnt[0], lines);
+                }
+            });
+            JComponent buttons = GuiUtils.hbox(prevBtn, nextBtn);
+            JComponent skipContents =
+                GuiUtils.topCenter(new JLabel("Pick the line to start"),
+                                   GuiUtils.leftCenter(GuiUtils.top(buttons),
+                                       GuiUtils.top(lineLbl)));
+            if ( !GuiUtils.showOkCancelDialog(null, "Line Select",
+                    skipContents, null)) {
+                return null;
+            }
+            skipRows = skipCnt[0];
+            String line = (String) lines.get(skipCnt[0]);
             if (line == null) {
                 throw new BadDataException("Could not read data");
             }
-
             List toks  = StringUtil.split(line, getDelimiter(), false, false);
             List comps = new ArrayList();
             comps.add(
@@ -432,6 +535,7 @@ public class TextPointDataSource extends PointDataSource {
                         panel))), 5);
         }
         return metaDataComp;
+
     }
 
 
@@ -967,7 +1071,7 @@ public class TextPointDataSource extends PointDataSource {
 
 
             if (trackParam != null) {
-                if (groupVarName != null && groupVarName.length()>0) {
+                if ((groupVarName != null) && (groupVarName.length() > 0)) {
                     int groupParamIndex = -1;
                     for (int typeIdx = 0; typeIdx < type.getDimension();
                             typeIdx++) {
@@ -1123,6 +1227,11 @@ public class TextPointDataSource extends PointDataSource {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private boolean isTrajectoryEnabled() {
         return getProperty("dataistrajectory", false);
     }
@@ -1158,11 +1267,14 @@ public class TextPointDataSource extends PointDataSource {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param comps _more_
+     */
     public void getPropertiesComponents(List comps) {
         super.getPropertiesComponents(comps);
-        if (isTrajectoryEnabled()) {
-            
-        }
+        if (isTrajectoryEnabled()) {}
     }
 
 
@@ -1318,6 +1430,24 @@ public class TextPointDataSource extends PointDataSource {
      */
     public String getGroupVarName() {
         return groupVarName;
+    }
+
+    /**
+     * Set the SkipRows property.
+     *
+     * @param value The new value for SkipRows
+     */
+    public void setSkipRows(int value) {
+        skipRows = value;
+    }
+
+    /**
+     * Get the SkipRows property.
+     *
+     * @return The SkipRows
+     */
+    public int getSkipRows() {
+        return skipRows;
     }
 
 
