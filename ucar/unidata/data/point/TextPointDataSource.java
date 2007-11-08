@@ -205,7 +205,7 @@ public class TextPointDataSource extends PointDataSource {
         String    contents;
         String delimiter;
         if(source.endsWith(".xls")) {
-            contents = NamedStationTable.xlsToCsv(source);
+            contents = DataUtil.xlsToCsv(source);
             delimiter = ",";
         } else {
             contents = IOUtil.readContents(source, getClass());

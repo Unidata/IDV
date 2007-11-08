@@ -27,6 +27,7 @@ import ucar.ma2.Array;
 import ucar.ma2.Index;
 
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.IOUtil;
 
 import ucar.unidata.util.Misc;
 import ucar.unidata.xml.XmlUtil;
@@ -41,6 +42,8 @@ import visad.data.vis5d.Vis5DVerticalSystem;
 
 import visad.georef.*;
 
+import java.io.*;
+
 import java.lang.reflect.*;
 
 import java.rmi.RemoteException;
@@ -50,6 +53,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+
+import org.apache.poi.hssf.usermodel.*;
 
 
 /**
@@ -329,6 +334,34 @@ public class DataUtil {
         }
         return getFlatField(((FieldImpl) field).getSample(0, false));
     }
+
+
+    public static String xlsToCsv(String filename) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        InputStream myxls = IOUtil.getInputStream(filename, DataUtil.class);
+        HSSFWorkbook wb     = new HSSFWorkbook(myxls);
+        HSSFSheet sheet = wb.getSheetAt(0);       // first sheet
+        for(int rowIdx=sheet.getFirstRowNum();rowIdx<=sheet.getLastRowNum();rowIdx++) {
+            HSSFRow row     = sheet.getRow(rowIdx);
+            for(short colIdx=row.getFirstCellNum();colIdx<row.getPhysicalNumberOfCells();colIdx++) {
+                HSSFCell cell   = row.getCell(colIdx);
+                if(cell == null) continue;
+                if(colIdx>0)
+                    sb.append(",");
+                sb.append(cell.toString());
+                /*                if(false && comment!=null) {
+                    String author = comment.getAuthor();
+                    String str = comment.getString().getString();
+                    str = StringUtil.replace(str, author+":","");
+                    str = StringUtil.replace(str, "\n","");
+                    sb.append("("+str+")");
+                    }*/
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
 
 
 }
