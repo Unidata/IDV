@@ -10,7 +10,9 @@
    grid relative components of a vector.
 """
 
-def GRAVTY():
+
+def GRAVITY():
+  """ Gravity constant """
   return DerivedGridFactory.GRAVITY;
 
 # Math functions
