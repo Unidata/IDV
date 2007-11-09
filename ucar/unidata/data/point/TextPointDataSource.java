@@ -1,4 +1,4 @@
-/*
+/**
  * $Id: TextPointDataSource.java,v 1.22 2007/08/16 12:00:50 jeffmc Exp $
  *
  * Copyright 1997-2004 Unidata Program Center/University Corporation for
@@ -88,6 +88,9 @@ public class TextPointDataSource extends PointDataSource {
     /** _more_          */
     private int skipRows = 0;
 
+
+
+
     /** The visad textadapter map params line. We have this here if the data file does not have it */
     private String params;
 
@@ -112,19 +115,16 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /** for the metadata gui */
-    List fields = new ArrayList();
+    List paramRows = new ArrayList();
 
     /** for the metadata gui */
-    List units = new ArrayList();
-
-    /** for the metadata gui */
-    List missings = new ArrayList();
-
-    /** for the metadata gui */
-    List extras = new ArrayList();
+    List extraParamRows = new ArrayList();
 
     /** for the metadata gui */
     JComponent metaDataComp;
+
+    JComponent widgetPanel;
+
 
     /** _more_ */
     private String groupVarName = null;
@@ -366,7 +366,12 @@ public class TextPointDataSource extends PointDataSource {
     private void setLineText(JLabel lbl, int index, List lines) {
         StringBuffer sb =
             new StringBuffer("<html><table width=\"100%\" border=0>");
-        int[] indices = { index, index + 1, index + 2, index + 3, index + 4 };
+        int[] indices;
+        if(index==0) {
+            indices = new int[] {index, index+1, index + 2};
+        } else {
+            indices = new int[] {index-1, index, index + 1};
+        }
         for (int i = 0; i < indices.length; i++) {
             String line;
             if ((indices[i] < 0) || (indices[i] >= lines.size())) {
@@ -385,7 +390,65 @@ public class TextPointDataSource extends PointDataSource {
         sb.append("</table>");
         sb.append("</html>");
         lbl.setText(sb.toString());
+
+        String line = (String) lines.get(index);
+        List toks  = StringUtil.split(line, getDelimiter(), false, false);
+        List comps = new ArrayList();
+        /*        comps.add(
+                  new GraphPaperLayout.Location(
+                                                new JLabel("Sample Value"), 0, 0));
+        comps.add(new GraphPaperLayout.Location(new JLabel("Name"), 1,
+                                                0));
+        comps.add(
+                  new GraphPaperLayout.Location(
+                                                new JLabel("Unit/Date Format"), 2, 0));
+        comps.add(
+                  new GraphPaperLayout.Location(
+                                                new JLabel("Missing Value"), 3, 0));
+        comps.add(
+                  new GraphPaperLayout.Location(
+                                                new JLabel("Extra (e.g., colspan)"), 4, 0));
+
+*/
+        comps.add(new JLabel("Value"));
+        comps.add(new JLabel("Name"));
+        comps.add(new JLabel("Unit/Date Format"));
+        comps.add(new JLabel("Missing Value"));
+        comps.add(new JLabel("Extra (e.g., colspan)"));
+
+
+
+
+        for (int i = 0; i < paramRows.size(); i++) {
+            ParamRow paramRow = (ParamRow) paramRows.get(i);
+            extraParamRows.add(0+i,paramRow);
+        }
+
+        paramRows = new ArrayList();
+        for (int tokIdx = 0; tokIdx < toks.size(); tokIdx++) {
+            ParamRow paramRow;
+            if(extraParamRows.size()>0) {
+                paramRow = (ParamRow)extraParamRows.remove(0);
+            } else {
+                paramRow = new ParamRow();
+            }
+            paramRow.init(tokIdx, toks, comps);
+            paramRows.add(paramRow);
+        }
+
+
+        applySavedMetaData(metaDataFields);
+        //        JComponent panel = GraphPaperLayout.layout(comps);
+        GuiUtils.tmpInsets = new Insets(5,5,0,0);
+        double[]stretch = {0.0,1.0,1.0,0.0,0.5};
+        JComponent panel = GuiUtils.doLayout(comps,5, stretch,
+                                             GuiUtils.WT_N);
+        widgetPanel.removeAll();
+        JScrollPane widgetSP  = GuiUtils.makeScrollPane(GuiUtils.top(panel),200,200);
+        //        widgetSP.setPreferredSize(new Dimension(200,300));
+        widgetPanel.add(BorderLayout.CENTER, widgetSP);
     }
+
 
 
     /**
@@ -412,127 +475,55 @@ public class TextPointDataSource extends PointDataSource {
                 String line = bis.readLine();
                 if (line == null) {
                     break;
-                }
+                } 
+                List toks  = StringUtil.split(line, getDelimiter(), false, false);
                 lines.add(line);
             }
-            final int[]  skipCnt = { 0 };
+
+
             final JLabel lineLbl = new JLabel("");
-            setLineText(lineLbl, skipCnt[0], lines);
-            JButton nextBtn = new JButton("Next");
+            JButton nextBtn = GuiUtils.getImageButton("/auxdata/ui/icons/Down.gif",getClass());
+            JButton prevBtn = GuiUtils.getImageButton("/auxdata/ui/icons/Up.gif", getClass());
             nextBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
-                    skipCnt[0]++;
-                    if (skipCnt[0] >= lines.size()) {
-                        skipCnt[0] = lines.size() - 1;
+                    skipRows++;
+                    if (skipRows >= lines.size()) {
+                        skipRows = lines.size() - 1;
                     }
-                    setLineText(lineLbl, skipCnt[0], lines);
+                    setLineText(lineLbl, skipRows, lines);
                 }
             });
-            JButton prevBtn = new JButton("Previous");
             prevBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
-                    skipCnt[0]--;
-                    if (skipCnt[0] < 0) {
-                        skipCnt[0] = 0;
+                    skipRows--;
+                    if (skipRows < 0) {
+                        skipRows = 0;
                     }
-                    setLineText(lineLbl, skipCnt[0], lines);
+                    setLineText(lineLbl, skipRows, lines);
                 }
             });
-            JComponent buttons = GuiUtils.hbox(prevBtn, nextBtn);
+            JComponent buttons = GuiUtils.vbox(prevBtn, nextBtn);
             JComponent skipContents =
-                GuiUtils.topCenter(new JLabel("Pick the line to start"),
+                GuiUtils.topCenter(new JLabel("Start line:"),
                                    GuiUtils.leftCenter(GuiUtils.top(buttons),
                                        GuiUtils.top(lineLbl)));
-            if ( !GuiUtils.showOkCancelDialog(null, "Line Select",
-                    skipContents, null)) {
-                return null;
-            }
-            skipRows = skipCnt[0];
-            String line = (String) lines.get(skipCnt[0]);
-            if (line == null) {
-                throw new BadDataException("Could not read data");
-            }
-            List toks  = StringUtil.split(line, getDelimiter(), false, false);
-            List comps = new ArrayList();
-            comps.add(
-                new GraphPaperLayout.Location(
-                    new JLabel("Sample Value"), 0, 0));
-            comps.add(new GraphPaperLayout.Location(new JLabel("Name"), 1,
-                    0));
-            comps.add(
-                new GraphPaperLayout.Location(
-                    new JLabel("Unit/Date Format"), 2, 0));
-            comps.add(
-                new GraphPaperLayout.Location(
-                    new JLabel("Missing Value"), 3, 0));
-            comps.add(
-                new GraphPaperLayout.Location(
-                    new JLabel("Extra (e.g., colspan)"), 4, 0));
 
-            Vector boxNames = new Vector(Misc.newList("", "Time", "Latitude",
-                                  "Longitude", "Altitude"));
-            String unitStr =
-                ";celsius;kelvin;fahrenheit;deg;degrees west;feet;km;meters;m;miles;kts;yyyy-MM-dd HH:mm:ss";
-            Vector unitNames = new Vector(StringUtil.split(unitStr, ";",
-                                   false, false));
-            for (int tokIdx = 0; tokIdx < toks.size(); tokIdx++) {
-                JComboBox nameBox = new JComboBox(boxNames);
-                nameBox.setEditable(true);
-                nameBox.setPreferredSize(new Dimension(40, 10));
-                fields.add(nameBox);
-                JTextField extraFld = new JTextField("", 10);
-                extras.add(extraFld);
-                extraFld.setToolTipText(
-                    "<html>Extra attributes, e.g.:<br>colspan=&quot;some column span&quot;<br>Note:Values must be quoted.</html>");
-                JTextField missingFld = new JTextField("", 10);
-                missings.add(missingFld);
-                final JTextField unitFld = new JTextField("", 10);
-
-
-                final JButton popupBtn =
-                    GuiUtils.getImageButton("/auxdata/ui/icons/Down.gif",
-                                            getClass());
-                popupBtn.setToolTipText("Set unit");
-                popupBtn.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        GuiUtils.popupUnitMenu(unitFld, popupBtn);
-                    }
-                });
-                units.add(unitFld);
-                JLabel sample = new JLabel(toks.get(tokIdx).toString());
-                comps.add(
-                    new GraphPaperLayout.Location(
-                        GuiUtils.inset(sample, 2), 0, tokIdx + 1));
-                comps.add(
-                    new GraphPaperLayout.Location(
-                        GuiUtils.inset(nameBox, 2), 1, tokIdx + 1));
-
-                comps.add(
-                    new GraphPaperLayout.Location(
-                        GuiUtils.inset(
-                            GuiUtils.centerRight(unitFld, popupBtn), 2), 2,
-                                tokIdx + 1));
-                comps.add(
-                    new GraphPaperLayout.Location(
-                        GuiUtils.inset(missingFld, 2), 3, tokIdx + 1));
-                comps.add(
-                    new GraphPaperLayout.Location(
-                        GuiUtils.inset(extraFld, 2), 4, tokIdx + 1));
-            }
-
-            initFields(metaDataFields);
-
-            JComponent panel = GraphPaperLayout.layout(comps);
+            widgetPanel = new JPanel(new BorderLayout());
             JLabel lbl =
                 new JLabel(
-                    "<html>The data file does not contain any meta-data<br><br>Please enter the field names and units. Leave the name field blank to skip the field</html>");
-            JPanel wrapper = new JPanel(new BorderLayout());
+                    "<html>Please enter the field names and units. Leave the name field blank to skip the field</html>");
+
+            JComponent wrapper = new JPanel(new BorderLayout());
             JButton saveBtn = GuiUtils.makeButton("Preferences", this,
                                   "popupMetaDataMenu", wrapper);
             wrapper.add(BorderLayout.CENTER, saveBtn);
-            metaDataComp = GuiUtils.inset(GuiUtils.topCenter(lbl,
-                    GuiUtils.top(GuiUtils.vbox(GuiUtils.right(wrapper),
-                        panel))), 5);
+
+            metaDataComp = GuiUtils.topCenter(GuiUtils.vbox(skipContents,lbl,
+                                                            GuiUtils.right(wrapper)),
+                                                             widgetPanel);
+            metaDataComp = GuiUtils.inset(metaDataComp, 5);
+            setLineText(lineLbl, skipRows, lines);
+
         }
         return metaDataComp;
 
@@ -585,7 +576,7 @@ public class TextPointDataSource extends PointDataSource {
                     keys.hasMoreElements(); ) {
                 String     key  = (String) keys.nextElement();
                 final List list = (List) pointMetaDataMap.get(key);
-                items.add(GuiUtils.makeMenuItem(key, this, "initFields",
+                items.add(GuiUtils.makeMenuItem(key, this, "applySavedMetaData",
                         list));
                 delitems.add(GuiUtils.makeMenuItem(key, this,
                         "deleteMetaData", key));
@@ -618,21 +609,9 @@ public class TextPointDataSource extends PointDataSource {
         String prefname       = box.getSelectedItem().toString().trim();
         List   metaDataFields = new ArrayList();
         String delimiter      = getDelimiter();
-        for (int i = 0; i < fields.size(); i++) {
-            String name = ((JComboBox) fields.get(
-                              i)).getSelectedItem().toString().trim();
-            //Remove illegal characters
-            name = ucar.visad.Util.cleanName(name);
-
-            String unit    = ((JTextField) units.get(i)).getText().trim();
-            String missing = ((JTextField) missings.get(i)).getText().trim();
-            String extra   = ((JTextField) extras.get(i)).getText().trim();
-            List   fields  = new ArrayList();
-            metaDataFields.add(fields);
-            fields.add(name);
-            fields.add(unit);
-            fields.add(missing);
-            fields.add(extra);
+        for (int i = 0; i < paramRows.size(); i++) {
+            ParamRow paramRow = (ParamRow) paramRows.get(i);
+            paramRow.addToMetaData(metaDataFields);
         }
         pointMetaDataMap.put(prefname, metaDataFields);
         getDataContext().getIdv().getStore().putEncodedFile(PREF_METADATAMAP,
@@ -703,24 +682,19 @@ public class TextPointDataSource extends PointDataSource {
         metaDataFields = new ArrayList();
         String delimiter = getDelimiter();
         int    skip      = 0;
-        for (int i = 0; i < fields.size(); i++) {
-            String name = ((JComboBox) fields.get(
-                              i)).getSelectedItem().toString().trim();
-            name = ucar.visad.Util.cleanName(name);
-            String unit    = ((JTextField) units.get(i)).getText().trim();
-            String missing = ((JTextField) missings.get(i)).getText().trim();
-            String extra   = ((JTextField) extras.get(i)).getText().trim();
+        for (int i = 0; i < paramRows.size(); i++) {
+            ParamRow paramRow = (ParamRow) paramRows.get(i);
+            String unit    = paramRow.getUnit();
+            String name = paramRow.getCleanName();
+            String missing = paramRow.getMissing();
+            String extra = paramRow.getExtra();
             List   fields  = new ArrayList();
             if (name.length() > 0) {
                 if (unit.length() == 0) {
                     unit = "Text";
                 }
             }
-            fields.add(name);
-            fields.add(unit);
-            fields.add(missing);
-            fields.add(extra);
-            metaDataFields.add(fields);
+            paramRow.addToMetaData(metaDataFields);
 
             if (skip > 0) {
                 skip--;
@@ -784,27 +758,12 @@ public class TextPointDataSource extends PointDataSource {
      *
      * @param fieldList widgets
      */
-    public void initFields(List fieldList) {
-        for (int tokIdx = 0; tokIdx < fields.size(); tokIdx++) {
-            JComboBox  nameBox    = (JComboBox) fields.get(tokIdx);
-            JTextField missingFld = (JTextField) missings.get(tokIdx);
-            JTextField extraFld   = (JTextField) extras.get(tokIdx);
-            JTextField unitFld    = (JTextField) units.get(tokIdx);
-            if ((fields != null) && (tokIdx < fieldList.size())) {
-                List fields = (List) fieldList.get(tokIdx);
-                nameBox.setSelectedItem((String) fields.get(0));
-                unitFld.setText((String) fields.get(1));
-                missingFld.setText((String) fields.get(2));
-                if (fields.size() >= 4) {
-                    extraFld.setText((String) fields.get(3));
-                } else {
-                    extraFld.setText("");
-                }
-
-            }
+    public void applySavedMetaData(List fieldList) {
+        for (int tokIdx = 0; tokIdx < paramRows.size() && tokIdx< fieldList.size(); tokIdx++) {
+            ParamRow paramRow = (ParamRow) paramRows.get(tokIdx);
+            paramRow.applyMetaData((List) fieldList.get(tokIdx));
         }
     }
-
 
     /**
      * Check to see if this TextPointDataSource is equal to the object
@@ -1450,6 +1409,96 @@ public class TextPointDataSource extends PointDataSource {
         return skipRows;
     }
 
+    private static class ParamRow {
+        JComboBox nameBox;
+        JTextField extraFld;
+        JTextField missingFld;
+        JTextField unitFld;
+        JButton popupBtn;
+        JLabel sample;
+        static Vector boxNames;
+        static Vector unitNames;
 
+        public ParamRow() {
+            if(boxNames == null) {
+                boxNames = new Vector(Misc.newList("", "Time", "Latitude",
+                                                   "Longitude", "Altitude"));
+                String unitStr =
+                    ";celsius;kelvin;fahrenheit;deg;degrees west;feet;km;meters;m;miles;kts;yyyy-MM-dd HH:mm:ss";
+                unitNames = new Vector(StringUtil.split(unitStr, ";",
+                                                        false, false));
+            }
+        }
+
+        public String getCleanName() {
+            return ucar.visad.Util.cleanName(getName());
+        }
+
+
+        public String getName() {
+            return nameBox.getSelectedItem().toString().trim();
+        }
+
+        public String getExtra() {
+            return extraFld.getText().trim();
+        }
+
+        public String getMissing() {
+            return missingFld.getText().trim();
+        }
+        public String getUnit() {
+            return unitFld.getText().trim();
+        }
+
+        public void init(int tokIdx, List toks, List comps) {
+            if(nameBox == null) {
+                nameBox = new JComboBox(boxNames);
+                nameBox.setEditable(true);
+                nameBox.setPreferredSize(new Dimension(40, 10));
+                extraFld = new JTextField("", 5);
+                extraFld.setToolTipText(
+                                        "<html>Extra attributes, e.g.:<br>colspan=&quot;some column span&quot;<br>Note:Values must be quoted.</html>"); 
+                missingFld = new JTextField("", 5);
+                unitFld= new JTextField("", 10);
+                popupBtn =   GuiUtils.getImageButton("/auxdata/ui/icons/Down.gif",
+                                                     getClass());
+                popupBtn.setToolTipText("Set unit");
+                popupBtn.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent ae) {
+                            GuiUtils.popupUnitMenu(unitFld, popupBtn);
+                        }
+                    });
+                sample = new JLabel("");
+            }
+            sample.setText(toks.get(tokIdx).toString());
+            comps.add(sample);
+            comps.add(nameBox);
+            comps.add(GuiUtils.centerRight(unitFld, popupBtn));
+            comps.add(missingFld);
+            comps.add(extraFld);
+        }
+
+        public void applyMetaData(List fields) {
+            nameBox.setSelectedItem((String) fields.get(0));
+            unitFld.setText((String) fields.get(1));
+            missingFld.setText((String) fields.get(2));
+            if (fields.size() >= 4) {
+                extraFld.setText((String) fields.get(3));
+            } else {
+                extraFld.setText("");
+            }
+        }
+
+        public void addToMetaData(List metaDataFields) {
+            metaDataFields.add(Misc.newList(
+                                            getCleanName(),
+                                            getUnit(),
+                                            getMissing(),
+                                            getExtra()));
+
+        }
+
+
+    }
 }
 
