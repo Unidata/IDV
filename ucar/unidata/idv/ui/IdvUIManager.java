@@ -4041,9 +4041,9 @@ public class IdvUIManager extends IdvManager {
             updateToolbars();
             Msg.translateTree(contents);
             window.setContents(contents);
-            if (viewManagers.size() > 0) {
+            //            if (viewManagers.size() > 0) {
                 associateWindowWithViewManagers(window, viewManagers);
-            }
+                //            }
 
             if (getIdv().okToShowWindows() && show) {
                 window.show();
