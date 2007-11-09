@@ -449,6 +449,15 @@ public class TextPointDataSource extends PointDataSource {
         widgetPanel.add(BorderLayout.CENTER, widgetSP);
     }
 
+    public void applyNames(String line) {
+        List toks  = StringUtil.split(line, getDelimiter(), false, false);
+        for (int i = 0; i < paramRows.size() && i<toks.size(); i++) {
+            ParamRow paramRow = (ParamRow) paramRows.get(i);
+            paramRow.setName((String) toks.get(i));
+        }
+    }
+
+
 
 
     /**
@@ -482,6 +491,15 @@ public class TextPointDataSource extends PointDataSource {
 
 
             final JLabel lineLbl = new JLabel("");
+            JButton applyNamesBtn = new JButton("Set Names");
+            applyNamesBtn.setToolTipText("Use current line as the field names");
+            applyNamesBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    applyNames(lines.get(skipRows).toString());
+                }
+            });
+
+
             JButton nextBtn = GuiUtils.getImageButton("/auxdata/ui/icons/Down.gif",getClass());
             JButton prevBtn = GuiUtils.getImageButton("/auxdata/ui/icons/Up.gif", getClass());
             nextBtn.addActionListener(new ActionListener() {
@@ -505,8 +523,8 @@ public class TextPointDataSource extends PointDataSource {
             JComponent buttons = GuiUtils.vbox(prevBtn, nextBtn);
             JComponent skipContents =
                 GuiUtils.topCenter(new JLabel("Start line:"),
-                                   GuiUtils.leftCenter(GuiUtils.top(buttons),
-                                       GuiUtils.top(lineLbl)));
+                                   GuiUtils.leftCenterRight(GuiUtils.top(buttons),
+                                       GuiUtils.top(lineLbl), GuiUtils.top(applyNamesBtn)));
 
             widgetPanel = new JPanel(new BorderLayout());
             JLabel lbl =
@@ -1434,6 +1452,10 @@ public class TextPointDataSource extends PointDataSource {
             return ucar.visad.Util.cleanName(getName());
         }
 
+
+        public void setName(String name) {
+            nameBox.setSelectedItem(name);
+        }
 
         public String getName() {
             return nameBox.getSelectedItem().toString().trim();
