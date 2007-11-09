@@ -2375,6 +2375,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * Called when the window is closed. This method closes any open legends.
      */
     protected void doClose() {
+        if(legends==null) return;
         for (int i = 0; i < legends.size(); i++) {
             ((IdvLegend) legends.get(i)).doClose();
         }
