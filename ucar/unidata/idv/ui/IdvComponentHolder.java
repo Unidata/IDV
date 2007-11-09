@@ -21,6 +21,7 @@
 
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -37,8 +38,9 @@ import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.WrapperException;
-import ucar.unidata.xml.XmlUtil;
 import ucar.unidata.xml.XmlResourceCollection;
+import ucar.unidata.xml.XmlUtil;
+
 import java.awt.*;
 
 import java.util.ArrayList;
@@ -52,10 +54,16 @@ import javax.swing.*;
 
 public class IdvComponentHolder extends ComponentHolder {
 
+    /** _more_          */
     public static final String TYPE_SKIN = "skin";
+
+    /** _more_          */
     public static final String TYPE_CHOOSERS = "choosers";
+
+    /** _more_          */
     public static final String TYPE_DEFAULT = "default";
 
+    /** _more_          */
     private String type = TYPE_DEFAULT;
 
 
@@ -65,6 +73,7 @@ public class IdvComponentHolder extends ComponentHolder {
     /** _more_ */
     private Object object;
 
+    /** _more_          */
     private List viewManagers;
 
     /**
@@ -124,10 +133,11 @@ public class IdvComponentHolder extends ComponentHolder {
                     idv.encodeObject(object, false)));
             return node;
         }
-        if(object instanceof String) {
-            if(type.equals(TYPE_SKIN)) {
-                Element node = doc.createElement(IdvUIManager.COMP_COMPONENT_SKIN);
-                node.setAttribute("url",  object.toString());
+        if (object instanceof String) {
+            if (type.equals(TYPE_SKIN)) {
+                Element node =
+                    doc.createElement(IdvUIManager.COMP_COMPONENT_SKIN);
+                node.setAttribute("url", object.toString());
                 return node;
             }
         }
@@ -142,16 +152,15 @@ public class IdvComponentHolder extends ComponentHolder {
         //        Misc.printStack("doRemove",10,null);
         if ((object != null) && (idv != null)) {
             try {
-                if(viewManagers!=null) {
-                    for(int i=0;i<viewManagers.size();i++) {
-                        ((ViewManager)viewManagers.get(i)).destroy();
+                if (viewManagers != null) {
+                    for (int i = 0; i < viewManagers.size(); i++) {
+                        ((ViewManager) viewManagers.get(i)).destroy();
                     }
                     viewManagers = null;
                 }
 
-
                 if (object instanceof ViewManager) {
-                    ((ViewManager)object).destroy();
+                    ((ViewManager) object).destroy();
                     //                    idv.getVMManager().removeViewManager(
                     //                        (ViewManager) object);
                 } else if (object instanceof DisplayControl) {
@@ -238,10 +247,10 @@ public class IdvComponentHolder extends ComponentHolder {
             return "Tools";
         }
         if (object instanceof String) {
-            if(type.equals(TYPE_SKIN)) {
+            if (type.equals(TYPE_SKIN)) {
                 return "UI Skin";
             }
-            if(type.equals(TYPE_CHOOSERS)) {
+            if (type.equals(TYPE_CHOOSERS)) {
                 return "Data Choosers";
             }
         }
@@ -266,6 +275,11 @@ public class IdvComponentHolder extends ComponentHolder {
         return super.getName();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public ImageIcon getIcon() {
         if (object instanceof MapViewManager) {
             MapViewManager mvm = (MapViewManager) object;
@@ -310,10 +324,10 @@ public class IdvComponentHolder extends ComponentHolder {
             return "Field Selector";
         }
         if (object instanceof String) {
-            if(type.equals(TYPE_SKIN)) {
+            if (type.equals(TYPE_SKIN)) {
                 return "UI Skin";
             }
-            if(type.equals(TYPE_CHOOSERS)) {
+            if (type.equals(TYPE_CHOOSERS)) {
                 return "Data Choosers";
             }
         }
@@ -340,42 +354,51 @@ public class IdvComponentHolder extends ComponentHolder {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected JComponent makeSkin() {
         try {
-            String path  = (String) object;
+            String  path = (String) object;
             Element root = null;
-            XmlResourceCollection skins =getIdv().getResourceManager().getXmlResources(
-                                                                                       IdvResourceManager.RSC_SKIN);
+            XmlResourceCollection skins =
+                getIdv().getResourceManager().getXmlResources(
+                    IdvResourceManager.RSC_SKIN);
 
 
             for (int i = 0; i < skins.size(); i++) {
-                String id = skins.getProperty("skinid",i);
-                if(Misc.equals(path, skins.getProperty("skinid",i))) {
-                    root = skins.getRoot(i,false);
-                    break;                        
+                String id = skins.getProperty("skinid", i);
+                if (Misc.equals(path, skins.getProperty("skinid", i))) {
+                    root = skins.getRoot(i, false);
+                    break;
                 }
             }
 
-            if(root == null) {
+            if (root == null) {
                 for (int i = 0; i < skins.size(); i++) {
-                    if(Misc.equals(path, skins.get(i).toString())) {
+                    if (Misc.equals(path, skins.get(i).toString())) {
                         root = skins.getRoot(i);
                         break;
                     }
                 }
             }
-            if(root == null) {
+            if (root == null) {
                 root = XmlUtil.getRoot(path, getClass());
             }
-            IdvXmlUi xmlUI =  getIdv().getIdvUIManager().doMakeIdvXmlUi(null, new ArrayList(), root);
-            Element startNode = XmlUtil.findElement(root, null,"embeddednode", "true");
-            if(startNode !=null) {
+            IdvXmlUi xmlUI = getIdv().getIdvUIManager().doMakeIdvXmlUi(null,
+                                 viewManagers, root);
+            Element startNode = XmlUtil.findElement(root, null,
+                                    "embeddednode", "true");
+            if (startNode != null) {
                 xmlUI.setStartNode(startNode);
             }
+            JComponent contents = (JComponent) xmlUI.getContents();
             viewManagers = xmlUI.getViewManagers();
-            return  (JComponent) xmlUI.getContents();
-        } catch(Exception exc) {
-            throw new WrapperException (exc);  
+            return contents;
+        } catch (Exception exc) {
+            throw new WrapperException(exc);
         }
 
     }
@@ -388,13 +411,13 @@ public class IdvComponentHolder extends ComponentHolder {
      */
     public JComponent doMakeContents() {
         if (object instanceof String) {
-            if(type.equals(TYPE_SKIN)) {
+            if (type.equals(TYPE_SKIN)) {
                 return makeSkin();
             }
-            if(type.equals(TYPE_CHOOSERS)) {
+            if (type.equals(TYPE_CHOOSERS)) {
                 List choosers = new ArrayList();
-                return (JComponent)getIdv().getIdvChooserManager().createChoosers(false, choosers,
-                                                                      null);
+                return (JComponent) getIdv().getIdvChooserManager()
+                    .createChoosers(false, choosers, null);
             }
             return new JLabel("Unknown component: " + object);
         }
@@ -460,21 +483,39 @@ public class IdvComponentHolder extends ComponentHolder {
 
 
     /**
-       Set the Type property.
-
-       @param value The new value for Type
-    **/
-    public void setType (String value) {
-	type = value;
+     *  Set the Type property.
+     *
+     *  @param value The new value for Type
+     */
+    public void setType(String value) {
+        type = value;
     }
 
     /**
-       Get the Type property.
+     *  Get the Type property.
+     *
+     *  @return The Type
+     */
+    public String getType() {
+        return type;
+    }
 
-       @return The Type
-    **/
-    public String getType () {
-	return type;
+    /**
+     * Set the ViewManagers property.
+     *
+     * @param value The new value for ViewManagers
+     */
+    public void setViewManagers(List value) {
+        viewManagers = value;
+    }
+
+    /**
+     * Get the ViewManagers property.
+     *
+     * @return The ViewManagers
+     */
+    public List getViewManagers() {
+        return viewManagers;
     }
 
 

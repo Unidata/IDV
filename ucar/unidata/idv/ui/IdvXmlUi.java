@@ -572,9 +572,6 @@ public class IdvXmlUi extends XmlUi {
         }
 
         if (className != null) {
-            if (viewDescriptor == null) {
-                viewDescriptor = new ViewDescriptor();
-            }
             try {
                 if (viewDescriptor == null) {
                     viewDescriptor = new ViewDescriptor();

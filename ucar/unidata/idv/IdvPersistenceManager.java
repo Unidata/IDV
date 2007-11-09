@@ -3292,6 +3292,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             List currentViewManagers = getVMManager().getViewManagers();
             List windows             = (List) ht.get(ID_WINDOWS);
             List newViewManagers     = (List) ht.get(ID_VIEWMANAGERS);
+
+
             if (newViewManagers != null) {
                 //This just does basic initialization
                 getVMManager().unpersistViewManagers(newViewManagers);
@@ -3334,7 +3336,6 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             }
 
 
-            //            System.err.println ("new VMS:" + newViewManagers);
             //            System.err.println ("new windows:" + windows);
 
             if (newViewManagers != null) {
@@ -3349,6 +3350,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                 didRemoveAll);
 
                     }
+                    getVMManager().addViewManagers(newViewManagers);
                 }
             }
 
@@ -3384,6 +3386,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                     }
                 }
             }
+
+
 
 
             if (loadDialog.okToRun()) {
