@@ -3350,7 +3350,6 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                 didRemoveAll);
 
                     }
-                    getVMManager().addViewManagers(newViewManagers);
                 }
             }
 
@@ -3385,6 +3384,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                             Misc.newList(viewManager));
                     }
                 }
+            } else if(newViewManagers!=null) {
+                //Add any remainders in
+                getVMManager().addViewManagers(newViewManagers);
             }
 
 
