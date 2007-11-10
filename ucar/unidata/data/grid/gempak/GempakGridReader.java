@@ -49,7 +49,7 @@ public class GempakGridReader extends GempakFileReader {
     public static final String GRID = "GRID";
 
     /** grid headers */
-    private List<GridHeader> gridList;
+    private List<GempakGridRecord> gridList;
 
     /** Navigation Block */
     private GridNavBlock navBlock;
@@ -151,7 +151,7 @@ public class GempakGridReader extends GempakFileReader {
         // TODO: move this up into GempakFileReader using DM_RHDA
         // and account for the flipping there.
         int iword = dmLabel.kpcolh;
-        gridList = new ArrayList<GridHeader>();
+        gridList = new ArrayList<GempakGridRecord>();
         int[] header = new int[dmLabel.kckeys];
         for (int i = 0; i < dmLabel.kcol; i++) {
             int valid = DM_RINT(iword++);
@@ -163,7 +163,7 @@ public class GempakGridReader extends GempakFileReader {
                     header[6] = GempakUtil.swp4(header[6]);
                 }
                 if (needToSwap) GempakUtil.swp4(header, 7, 9);
-                GridHeader gh = new GridHeader(i + 1, header);
+                GempakGridRecord gh = new GempakGridRecord(i + 1, header);
                 gridList.add(gh);
             }
             iword+=header.length;
@@ -172,7 +172,7 @@ public class GempakGridReader extends GempakFileReader {
         // find the packing types for these grids
         if ( !gridList.isEmpty()) {
             for (int i = 0; i < gridList.size(); i++) {
-                GridHeader gh = (GridHeader) gridList.get(i);
+                GempakGridRecord gh = (GempakGridRecord) gridList.get(i);
                 gh.packingType = getGridPackingType(gh.gridNumber);
             }
         }
@@ -200,7 +200,7 @@ public class GempakGridReader extends GempakFileReader {
         if (args.length > 1) {
             var = args[1];
         }
-        GridHeader gh = ggr.findGrid(var);
+        GempakGridRecord gh = ggr.findGrid(var);
         if (gh != null) {
             System.out.println(gh);
             float[] data = ggr.readGrid(gh.gridNumber);
@@ -293,12 +293,12 @@ public class GempakGridReader extends GempakFileReader {
      *
      * @return  the grid header or null
      */
-    public GridHeader findGrid(String parm) {
+    public GempakGridRecord findGrid(String parm) {
         if (gridList == null) {
             return null;
         }
         for (int i = 0; i < gridList.size(); i++) {
-            GridHeader gh = (GridHeader) gridList.get(i);
+            GempakGridRecord gh = (GempakGridRecord) gridList.get(i);
             if (gh.param.trim().equals(parm)) {
                 return gh;
             }
@@ -606,7 +606,7 @@ public class GempakGridReader extends GempakFileReader {
      * Get list of grids
      * @return list of grids
      */
-    public List<GridHeader> getGridList() {
+    public List<GempakGridRecord> getGridList() {
         return gridList;
     }
 

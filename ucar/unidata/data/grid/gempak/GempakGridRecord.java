@@ -24,15 +24,16 @@ package ucar.unidata.data.grid.gempak;
 
 
 import ucar.unidata.util.StringUtil;
+import java.util.Date;
 
 
 /**
- * A class to hold grid header information
+ * A class to hold grid record information
  *
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class GridHeader {
+public class GempakGridRecord implements GridRecord {
 
     /** Time 1 */
     public String time1;
@@ -63,7 +64,7 @@ public class GridHeader {
      * @param number  grid number
      * @param header integer bits
      */
-    public GridHeader(int number, int[] header) {
+    public GempakGridRecord(int number, int[] header) {
         gridNumber = number;
         int[] times1 = GempakUtil.TG_FTOI(header, 0);
         time1 = GempakUtil.TG_ITOC(times1);
@@ -76,6 +77,66 @@ public class GridHeader {
                 header[9] });
 
     }
+
+    /**
+     * Get the first level of this GridRecord
+     *
+     * @return the first level value
+     */
+    public double getLevel1() {return level1;
+    }
+
+    /**
+     * Get the second level of this GridRecord
+     *
+     * @return the second level value
+     */
+    public double getLevel2() {return level2;
+    }
+
+    /**
+     * Get the level type of this GridRecord
+     *
+     * @return level type
+     */
+    public int getLevelType() {return ivcord;
+    }
+
+    /**
+     * Get the first reference time of this GridRecord
+     *
+     * @return reference time
+     */
+    public Date getReferenceTime() {return null; // TODO: fill this in;
+    }
+
+    /**
+     * Get the valid time for this grid.
+     *
+     * @return valid time
+     */
+    public Date getValidTime() {return null; // TODO: fill this in;
+    }
+
+    /**
+     * Get valid time offset (hours) of this GridRecord
+     *
+     * @return time offset
+     */
+    public double getValidTimeOffset() {return -1; // TODO: fill this in;
+    }
+
+    /**
+     * Get the parameter name
+     *
+     * @return parameter name
+     */
+    public String getParameterName() {return param; }
+
+    /**
+     * Get the horizontal coordinate system (projection) of this GridRecord
+     * public GridHorizCoordSys getHorizCoordSys();
+     */
 
     /**
      * Get a String representation of this object
