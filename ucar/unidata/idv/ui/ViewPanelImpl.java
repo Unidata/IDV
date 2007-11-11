@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.idv.ui;
 
 
@@ -395,7 +394,7 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         dnd.setToolTipText("Drag and drop to a window component");
         JPanel buttonPanel =
             GuiUtils.left(GuiUtils.hbox(Misc.newList(expandBtn, exportBtn,
-                propBtn, removeBtn, dnd), 4));
+                dnd, propBtn, removeBtn), 4));
 
 
         buttonPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0,
@@ -581,9 +580,9 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
     }
 
     /**
-     * _more_
+     * Handle a control moved
      *
-     * @param control _more_
+     * @param control  the moved control
      */
     public void controlMoved(DisplayControl control) {
         removeControlTab(control);
@@ -757,10 +756,10 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
                     0));
 
             headerPanel = GuiUtils.leftCenter(
-                        GuiUtils.hbox(
-                            GuiUtils.inset(categoryToggleBtn, 1),
-                            popupButton), viewLabel);
-            if(viewManager!=null) {
+                GuiUtils.hbox(
+                    GuiUtils.inset(categoryToggleBtn, 1),
+                    popupButton), viewLabel);
+            if (viewManager != null) {
                 headerPanel = viewManager.makeDropPanel(headerPanel, true);
             }
             JComponent headerWrapper = GuiUtils.center(headerPanel);
