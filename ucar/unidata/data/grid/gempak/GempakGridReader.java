@@ -21,6 +21,8 @@
  */
 
 
+
+
 package ucar.unidata.data.grid.gempak;
 
 
@@ -48,14 +50,14 @@ public class GempakGridReader extends GempakFileReader {
     /** Grid identifier */
     public static final String GRID = "GRID";
 
-    /** grid headers */
-    private List<GempakGridRecord> gridList;
-
     /** Navigation Block */
     private GridNavBlock navBlock;
 
     /** Navigation Block */
     private GridAnalysisBlock analBlock;
+
+    /** Grid index */
+    private GridIndex gridIndex;
 
     /** column headers */
     private static final String[] kcolnm = {
@@ -105,6 +107,7 @@ public class GempakGridReader extends GempakFileReader {
         if ( !super.init()) {
             return false;
         }
+        gridIndex = new GridIndex();
 
         // Modeled after GD_OFIL
         if (dmLabel.kftype != MFGD) {
@@ -150,8 +153,7 @@ public class GempakGridReader extends GempakFileReader {
         // Make the grid headers
         // TODO: move this up into GempakFileReader using DM_RHDA
         // and account for the flipping there.
-        int iword = dmLabel.kpcolh;
-        gridList = new ArrayList<GempakGridRecord>();
+        int   iword  = dmLabel.kpcolh;
         int[] header = new int[dmLabel.kckeys];
         for (int i = 0; i < dmLabel.kcol; i++) {
             int valid = DM_RINT(iword++);
@@ -162,14 +164,17 @@ public class GempakGridReader extends GempakFileReader {
                 if (header[6] > GempakUtil.vertCoords.length) {
                     header[6] = GempakUtil.swp4(header[6]);
                 }
-                if (needToSwap) GempakUtil.swp4(header, 7, 9);
+                if (needToSwap) {
+                    GempakUtil.swp4(header, 7, 9);
+                }
                 GempakGridRecord gh = new GempakGridRecord(i + 1, header);
-                gridList.add(gh);
+                gridIndex.addGridRecord(gh);
             }
-            iword+=header.length;
+            iword += header.length;
         }
 
         // find the packing types for these grids
+        List gridList = gridIndex.getGridRecords();
         if ( !gridList.isEmpty()) {
             for (int i = 0; i < gridList.size(); i++) {
                 GempakGridRecord gh = (GempakGridRecord) gridList.get(i);
@@ -205,12 +210,14 @@ public class GempakGridReader extends GempakFileReader {
             System.out.println(gh);
             float[] data = ggr.readGrid(gh.gridNumber);
             System.out.println("# of points = " + data.length);
-            int cnt = 0;
-            int it = 10;
+            int   cnt = 0;
+            int   it  = 10;
             float min = Float.POSITIVE_INFINITY;
             float max = Float.NEGATIVE_INFINITY;
             for (int i = 0; i < data.length; i++) {
-                if (cnt == it) cnt = 0;
+                if (cnt == it) {
+                    cnt = 0;
+                }
                 //if (cnt == 0) System.out.print("\ndata["+i+"-"+(i+it)+"] = ");
                 //if (cnt == 0) System.out.print("\n");
                 //System.out.print(Misc.format(data[i])+", ");
@@ -222,10 +229,18 @@ public class GempakGridReader extends GempakFileReader {
                     max = data[i];
                 }
             }
-            System.out.println("max/min = " + max + "/"+min);
+            System.out.println("max/min = " + max + "/" + min);
         }
         /*
         */
+    }
+
+    /**
+     * Get the grid index
+     * @return the GridIndex
+     */
+    public GridIndex getGridIndex() {
+        return gridIndex;
     }
 
     /**
@@ -280,7 +295,7 @@ public class GempakGridReader extends GempakFileReader {
         int[] header = new int[ilenhd];
         DM_RINT(isword, header);
         int nword = length - ilenhd;
-        isword+=ilenhd;
+        isword += ilenhd;
         // read the data packing type
         int ipktyp = DM_RINT(isword);
         return ipktyp;
@@ -294,6 +309,7 @@ public class GempakGridReader extends GempakFileReader {
      * @return  the grid header or null
      */
     public GempakGridRecord findGrid(String parm) {
+        List gridList = gridIndex.getGridRecords();
         if (gridList == null) {
             return null;
         }
@@ -346,7 +362,7 @@ public class GempakGridReader extends GempakFileReader {
             return null;
         }
         int length = DM_RINT(istart);
-        int isword = istart+1;
+        int isword = istart + 1;
         if (length <= ilenhd) {
             System.out.println("length (" + length
                                + ") is less than header length (" + ilenhd
@@ -359,12 +375,12 @@ public class GempakGridReader extends GempakFileReader {
         int[] header = new int[ilenhd];
         DM_RINT(isword, header);
         int nword = length - ilenhd;
-        isword+=header.length;
-        
+        isword += header.length;
+
         // from DM_RPKG
         // read the data packing type
         int ipktyp = DM_RINT(isword);
-        int iiword = isword+1;
+        int iiword = isword + 1;
         int lendat = nword - 1;
         if (ipktyp == MDGNON) {  // no packing
             data = new float[lendat];
@@ -439,7 +455,8 @@ public class GempakGridReader extends GempakFileReader {
                                boolean miss, float difmin, int kx)
             throws IOException {
         if (ipktyp == MDGGRB) {
-            return unpackGrib1DataU(iiword, nword, kxky, nbits, ref, scale, miss);
+            return unpackGrib1DataU(iiword, nword, kxky, nbits, ref, scale,
+                                    miss);
             //return unpackGrib1DataG(iiword, nword, kxky, nbits, ref, scale, miss);
         } else if (ipktyp == MDGNMC) {
             return null;
@@ -450,84 +467,93 @@ public class GempakGridReader extends GempakFileReader {
     }
 
     /**
-     * Read packed Grib1 data using  Robb's code
+     * Read packed Grib1 data using GEMPAK code
      *
      * @param iiword  Starting word  (FORTRAN 1 based)
-     * @param lendat  Number of words
-     * @param iarray  integer packing info
-     * @param rarray  float packing info
+     * @param nword   number of words
+     * @param kxky    size of grid (kx*ky)
+     * @param nbits   number of bits per word
+     * @param ref     reference value
+     * @param scale   scale value
+     * @param miss    replace missing
      * @return   unpacked data
      *
      * @throws IOException problem reading file
      */
-    private float[] unpackGrib1DataG(int iiword, int nword, int kxky, int nbits, float ref, float scale, boolean miss)
+    private float[] unpackGrib1DataG(int iiword, int nword, int kxky,
+                                     int nbits, float ref, float scale,
+                                     boolean miss)
             throws IOException {
 
-            System.out.println("nbits = " + nbits);
-            float[] values = new float[kxky];
-            int     imax   = (int) Math.pow(2, nbits) - 1;
-            int     iword  = 0;
-            int     ibit   = 1;
-            int[] iwords = new int[nword];
-            DM_RINT(iiword,iwords);
-            int jshft, idat,idat2;
-            int idataw;
-            for (int i = 0; i < values.length; i++) {
-//C
-//C*          Get the integer from the buffer.
-//C
-                jshft = nbits + ibit - 33;
-                idat  = 0;
-                //idat  = ISHFT ( idata [iword], jshft );
-                //idat  = IAND  ( idat, imax );
-                idataw = iwords[iword];
-                idat = idataw >> jshft;
-                idat = idat & imax;
-//C
-//C*          Check to see if packed integer overflows into next word.
-//C
-                if  ( jshft  >   0 )  {
-                    jshft = jshft - 32;
-                    idat2 = 0;
-                    //idat2 = ISHFT ( idata [iword+1], jshft );
-                    //idat  = IOR ( idat, idat2 );
-                    idataw = iwords[iword+1];
-                    idat2 = idataw >> jshft;
-                    idat = idat | idat2;
-                }
-//C
-//C*          Compute value of word.
-//C
-                if  ( ( idat  ==  imax )  &&  miss )  {
-                    values [i] = RMISSD;
-                } else {
-                    values [i] = ref + idat * scale;
-                }
-//C
-//C*          Set location for next word.
-//C
-                ibit = ibit + nbits;
-                if  ( ibit  >   32 ) {
-                    ibit  = ibit - 32;
-                    iword = iword + 1;
-                }
-                //if (i < 25) System.out.println("idat["+i+"] = " + idat);
+        System.out.println("nbits = " + nbits);
+        float[] values = new float[kxky];
+        int     imax   = (int) Math.pow(2, nbits) - 1;
+        int     iword  = 0;
+        int     ibit   = 1;
+        int[]   iwords = new int[nword];
+        DM_RINT(iiword, iwords);
+        int jshft, idat, idat2;
+        int idataw;
+        for (int i = 0; i < values.length; i++) {
+            //C
+            //C*          Get the integer from the buffer.
+            //C
+            jshft = nbits + ibit - 33;
+            idat  = 0;
+            //idat  = ISHFT ( idata [iword], jshft );
+            //idat  = IAND  ( idat, imax );
+            idataw = iwords[iword];
+            idat   = idataw >> jshft;
+            idat   = idat & imax;
+            //C
+            //C*  Check to see if packed integer overflows into next word.
+            //C
+            if (jshft > 0) {
+                jshft = jshft - 32;
+                idat2 = 0;
+                //idat2 = ISHFT ( idata [iword+1], jshft );
+                //idat  = IOR ( idat, idat2 );
+                idataw = iwords[iword + 1];
+                idat2  = idataw >> jshft;
+                idat   = idat | idat2;
             }
-            return values;
+            //C
+            //C*          Compute value of word.
+            //C
+            if ((idat == imax) && miss) {
+                values[i] = RMISSD;
+            } else {
+                values[i] = ref + idat * scale;
+            }
+            //C
+            //C*          Set location for next word.
+            //C
+            ibit = ibit + nbits;
+            if (ibit > 32) {
+                ibit  = ibit - 32;
+                iword = iword + 1;
+            }
+            //if (i < 25) System.out.println("idat["+i+"] = " + idat);
+        }
+        return values;
     }
 
     /**
      * Read packed Grib1 data using ucar.grib code
-     *
      * @param iiword  Starting word  (FORTRAN 1 based)
-     * @param lendat  Number of words
-     * @param iarray  integer packing info
-     * @param rarray  float packing info
+     * @param nword   number of words
+     * @param kxky    size of grid (kx*ky)
+     * @param nbits   number of bits per word
+     * @param ref     reference value
+     * @param scale   scale value
+     * @param miss    replace missing
      * @return   unpacked data
      *
      * @throws IOException problem reading file
      */
-    private float[] unpackGrib1DataU(int iiword, int nword, int kxky, int nbits, float ref, float scale, boolean miss)
+    private float[] unpackGrib1DataU(int iiword, int nword, int kxky,
+                                     int nbits, float ref, float scale,
+                                     boolean miss)
             throws IOException {
         float[] values = new float[kxky];
         bitPos = 0;
@@ -542,9 +568,9 @@ public class GempakGridReader extends GempakFileReader {
             }
             */
             //values[i] = ref + scale * bits2UInt(nbits, rf);
-            if (miss && idat == IMISSD) {
+            if (miss && (idat == IMISSD)) {
                 values[i] = IMISSD;
-            } else  {
+            } else {
                 values[i] = ref + scale * idat;
             }
         }
@@ -606,14 +632,15 @@ public class GempakGridReader extends GempakFileReader {
      * Get list of grids
      * @return list of grids
      */
-    public List<GempakGridRecord> getGridList() {
-        return gridList;
+    public List<GridRecord> getGridList() {
+        return gridIndex.getGridRecords();
     }
 
     /**
      * Print out the grids.
      */
     public void printGrids() {
+        List gridList = gridIndex.getGridRecords();
         if (gridList == null) {
             return;
         }
@@ -628,6 +655,7 @@ public class GempakGridReader extends GempakFileReader {
      * List out the grids (aka GDINFO)
      */
     public void listGrids() {
+        List gridList = gridIndex.getGridRecords();
         System.out.println("/nGRID FILE: " + getFilename() + "\n");
         printNavBlock();
         System.out.println("");
@@ -648,13 +676,22 @@ public class GempakGridReader extends GempakFileReader {
     /** bit buffer size */
     int next = 0;
 
-    
-    private int ch1 = 0, ch2 = 0, ch3 = 0, ch4 = 0;
+    /** character 1 */
+    private int ch1 = 0;
+
+    /** character 2 */
+    private int ch2 = 0;
+
+    /** character 3 */
+    private int ch3 = 0;
+
+    /** character 4 */
+    private int ch4 = 0;
+
     /**
      * Convert bits (nb) to Unsigned Int .
      *
-     * @param nb
-     * @param raf
+     * @param nb  number of bits
      * @throws IOException
      * @return int of BinaryDataSection section
      */
@@ -690,26 +727,31 @@ public class GempakGridReader extends GempakFileReader {
         }                                        // end while
     }                                            // end bits2Int
 
+    /**
+     * Get the next byte
+     *
+     * @throws IOException problem reading the byte
+     */
     public void getNextByte() throws IOException {
-        if( !needToSwap ) {
+        if ( !needToSwap) {
             // Get the next byte from the RandomAccessFile
-                bitBuf = rf.read();
+            bitBuf = rf.read();
         } else {
-                if( next == 3 ) {
-                    bitBuf = ch3;
-                } else if( next == 2 ) {
-                    bitBuf = ch2;
-                } else if( next == 1 ) {
-                    bitBuf = ch1;
-                } else {
-                    ch1 = rf.read();
-                    ch2 = rf.read();
-                    ch3 = rf.read();
-                    ch4 = rf.read();
-                    bitBuf = ch4;
-                    next = 4;
-                }
-                next--;
+            if (next == 3) {
+                bitBuf = ch3;
+            } else if (next == 2) {
+                bitBuf = ch2;
+            } else if (next == 1) {
+                bitBuf = ch1;
+            } else {
+                ch1    = rf.read();
+                ch2    = rf.read();
+                ch3    = rf.read();
+                ch4    = rf.read();
+                bitBuf = ch4;
+                next   = 4;
+            }
+            next--;
         }
     }
 

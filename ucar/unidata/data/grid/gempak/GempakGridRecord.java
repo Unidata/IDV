@@ -1,29 +1,31 @@
 /*
  * $Id: IDV-Style.xjs,v 1.3 2007/02/16 19:18:30 dmurray Exp $
- * 
+ *
  * Copyright 1997-2007 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.grid.gempak;
 
 
 import ucar.unidata.util.StringUtil;
+
 import java.util.Date;
 
 
@@ -83,7 +85,8 @@ public class GempakGridRecord implements GridRecord {
      *
      * @return the first level value
      */
-    public double getLevel1() {return level1;
+    public double getLevel1() {
+        return level1;
     }
 
     /**
@@ -91,15 +94,26 @@ public class GempakGridRecord implements GridRecord {
      *
      * @return the second level value
      */
-    public double getLevel2() {return level2;
+    public double getLevel2() {
+        return level2;
     }
 
     /**
-     * Get the level type of this GridRecord
+     * Get the type for the first level of this GridRecord
      *
      * @return level type
      */
-    public int getLevelType() {return ivcord;
+    public int getLevelType1() {
+        return ivcord;
+    }
+
+    /**
+     * Get the type for the second level of this GridRecord
+     *
+     * @return level type
+     */
+    public int getLevelType2() {
+        return ivcord;
     }
 
     /**
@@ -107,7 +121,8 @@ public class GempakGridRecord implements GridRecord {
      *
      * @return reference time
      */
-    public Date getReferenceTime() {return null; // TODO: fill this in;
+    public Date getReferenceTime() {
+        return null;  // TODO: fill this in;
     }
 
     /**
@@ -115,7 +130,8 @@ public class GempakGridRecord implements GridRecord {
      *
      * @return valid time
      */
-    public Date getValidTime() {return null; // TODO: fill this in;
+    public Date getValidTime() {
+        return null;  // TODO: fill this in;
     }
 
     /**
@@ -123,7 +139,8 @@ public class GempakGridRecord implements GridRecord {
      *
      * @return time offset
      */
-    public double getValidTimeOffset() {return -1; // TODO: fill this in;
+    public int getValidTimeOffset() {
+        return -1;  // TODO: fill this in;
     }
 
     /**
@@ -131,11 +148,15 @@ public class GempakGridRecord implements GridRecord {
      *
      * @return parameter name
      */
-    public String getParameterName() {return param; }
+    public String getParameterName() {
+        return param;
+    }
 
     /**
      * Get the horizontal coordinate system (projection) of this GridRecord
      * public GridHorizCoordSys getHorizCoordSys();
+     *
+     * @return _more_
      */
 
     /**
@@ -165,3 +186,4 @@ public class GempakGridRecord implements GridRecord {
     }
 
 }
+
