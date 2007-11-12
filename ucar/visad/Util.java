@@ -2244,15 +2244,18 @@ public final class Util {
      */
     public static Real bearingDistance(EarthLocation el1, EarthLocation el2)
             throws Exception {
+
         LatLonPoint lllp = el1.getLatLonPoint();
         LatLonPoint rllp = el2.getLatLonPoint();
+        visad.Unit latUnit = lllp.getLatitude().getUnit();
+        visad.Unit lonUnit = lllp.getLongitude().getUnit();
         Bearing result =
             Bearing.calculateBearing(
                 new LatLonPointImpl(
                     lllp.getLatitude().getValue(),
                     lllp.getLongitude().getValue()), new LatLonPointImpl(
-                        rllp.getLatitude().getValue(),
-                        rllp.getLongitude().getValue()), null);
+                        rllp.getLatitude().getValue(latUnit),
+                        rllp.getLongitude().getValue(lonUnit)), null);
         return new Real(Length.getRealType(), result.getDistance(),
                         CommonUnits.KILOMETER);
     }
