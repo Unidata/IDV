@@ -136,7 +136,7 @@ package ucar.unidata.data.grid.gempak;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class GridNavBlock {
+public class GridNavBlock extends GridDefRecord {
 
     /** raw values */
     float[] vals = null;
@@ -162,6 +162,8 @@ public class GridNavBlock {
      */
     public void setValues(float[] values) {
         vals = values;
+        addParam("Proj", GempakUtil.ST_ITOC(Float.floatToIntBits(vals[1])));
+        setParams();
     }
 
     /**
@@ -200,5 +202,9 @@ public class GridNavBlock {
         buf.append(vals[9]);
         return buf.toString();
     }
-}
 
+    private void setParams() {
+        addParam(NX, String.valueOf(vals[4]));
+        addParam(NY, String.valueOf(vals[5]));
+    }
+}

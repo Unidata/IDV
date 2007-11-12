@@ -61,6 +61,9 @@ public class GempakGridRecord implements GridRecord {
     /** packing type */
     public int packingType;
 
+    /** packing type */
+    public GridNavBlock navBlock;
+
     /**
      * Create a grid header from the integer bits
      * @param number  grid number
@@ -158,6 +161,15 @@ public class GempakGridRecord implements GridRecord {
      *
      * @return _more_
      */
+
+    /**
+     * Get the grid def record id
+     *
+     * @return parameter name
+     */
+    public String getGridDefRecordId() {
+        return navBlock.toString();
+    };
 
     /**
      * Get a String representation of this object

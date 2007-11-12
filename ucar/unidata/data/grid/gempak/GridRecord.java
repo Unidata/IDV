@@ -90,6 +90,13 @@ public interface GridRecord {
     public String getParameterName();
 
     /**
+     * Get the grid def record id
+     *
+     * @return parameter name
+     */
+    public String getGridDefRecordId();
+
+    /**
      * Get the horizontal coordinate system (projection) of this GridRecord
      * public GridHorizCoordSys getHorizCoordSys();
      */

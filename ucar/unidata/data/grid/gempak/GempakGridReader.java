@@ -168,6 +168,7 @@ public class GempakGridReader extends GempakFileReader {
                     GempakUtil.swp4(header, 7, 9);
                 }
                 GempakGridRecord gh = new GempakGridRecord(i + 1, header);
+                gh.navBlock = navBlock;
                 gridIndex.addGridRecord(gh);
             }
             iword += header.length;
