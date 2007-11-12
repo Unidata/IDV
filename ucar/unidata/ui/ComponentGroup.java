@@ -90,16 +90,20 @@ public class ComponentGroup extends ComponentHolder {
     /** type of layout */ 
     public static final String LAYOUT_DESKTOP = "desktop";
 
+    /** type of layout */ 
+    public static final String LAYOUT_MENU = "menu";
+
     /** user readable names of layouts*/
     public static final String[] LAYOUT_NAMES = {
         "Columns", "Grid", "Tabs", "Hor. Split", "Vert. Split", "Graph",
-        "Tree", "Border", "Desktop"
+        "Tree", "Border", "Menu", "Desktop"
     };
 
     /** all of the layouts */
     public static final String[] LAYOUTS = {
         LAYOUT_GRIDBAG, LAYOUT_GRID, LAYOUT_TABS, LAYOUT_HSPLIT,
         LAYOUT_VSPLIT, LAYOUT_GRAPH, LAYOUT_TREE, LAYOUT_BORDER,
+        LAYOUT_MENU,
         LAYOUT_DESKTOP
     };
 
@@ -118,6 +122,10 @@ public class ComponentGroup extends ComponentHolder {
     /** Tabbed pane */
     private JTabbedPane tabbedPane;
 
+
+    private JComboBox menuBox;
+
+    private GuiUtils.CardLayoutPanel menuPanel;
 
     /** _more_          */
     private JDesktopPane desktop;
@@ -371,14 +379,6 @@ public class ComponentGroup extends ComponentHolder {
             }
         });
 
-
-
-
-
-
-
-
-
         Vector layoutList = new Vector(TwoFacedObject.createList(LAYOUTS,
                                 LAYOUT_NAMES));
         layoutBox = new JComboBox(layoutList);
@@ -560,6 +560,15 @@ public class ComponentGroup extends ComponentHolder {
             container.setLayout(new BorderLayout());
         }
 
+        int lastMenuIdx = 0;
+        if (isLayout(LAYOUT_MENU)) {
+            if(menuBox!=null) {
+                lastMenuIdx = menuBox.getSelectedIndex();
+            }
+            menuPanel = new GuiUtils.CardLayoutPanel();            
+        }
+        Vector menuItems = new Vector();
+
         List comps = new ArrayList();
         for (int i = 0; i < displayComponents.size(); i++) {
             ComponentHolder displayComponent =
@@ -576,6 +585,9 @@ public class ComponentGroup extends ComponentHolder {
                 frame.pack();
                 frame.show();
                 desktop.add(frame);
+            } else if (isLayout(LAYOUT_MENU)) {
+                menuPanel.addCard(comp);
+                menuItems.add(displayComponent.getName());
             } else if (isLayout(LAYOUT_GRID)) {
                 container.add(comp);
             } else if (isLayout(LAYOUT_BORDER)) {
@@ -590,6 +602,20 @@ public class ComponentGroup extends ComponentHolder {
 
         if (isLayout(LAYOUT_TABS)) {
             container.add(BorderLayout.CENTER, tabbedPane);
+        } else if (isLayout(LAYOUT_MENU)) {
+            menuBox = new JComboBox(menuItems);
+            menuBox.addItemListener(new ItemListener() {
+                    public void 	itemStateChanged(ItemEvent e) {
+                        if(menuBox.getSelectedIndex()>=0) {
+                            menuPanel.show(menuBox.getSelectedIndex());
+                        }
+                    }
+                });
+            if(lastMenuIdx>=0 && displayComponents.size()>0 && lastMenuIdx<displayComponents.size()) {
+                menuBox.setSelectedIndex(lastMenuIdx);
+                menuPanel.show(lastMenuIdx);
+            }
+            container.add(BorderLayout.CENTER, GuiUtils.topCenter(GuiUtils.left(menuBox),menuPanel));
         } else if (isLayout(LAYOUT_DESKTOP)) {
             container.add(BorderLayout.CENTER, desktop);
         } else if (isLayout(LAYOUT_HSPLIT)) {
