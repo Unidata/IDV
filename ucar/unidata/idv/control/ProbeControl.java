@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -885,11 +886,12 @@ public class ProbeControl extends DisplayControlImpl {
         for (int i = 0; i < choices.size(); i++) {
             try {
                 ProbeRowInfo info = getRowInfo(i);
-                Data         data = info.getDataInstance().getData();
+                /*                Data         data = info.getDataInstance().getData();
                 if ( !(data instanceof FieldImpl)) {
                     continue;
                 }
-                Set set = GridUtil.getTimeSet((FieldImpl) data);
+                Set set = GridUtil.getTimeSet((FieldImpl) data);*/
+                Set set = info.getTimeSet();
                 if (set != null) {
                     if (newSet == null) {
                         newSet = set;
@@ -1045,10 +1047,15 @@ public class ProbeControl extends DisplayControlImpl {
 
 
 
-    public void changePointParameter(Object[]param) {
+    /**
+     * _more_
+     *
+     * @param param _more_
+     */
+    public void changePointParameter(Object[] param) {
         try {
-            ProbeRowInfo rowInfo = (ProbeRowInfo)param[0];
-            String name = (String)param[1];
+            ProbeRowInfo rowInfo = (ProbeRowInfo) param[0];
+            String       name    = (String) param[1];
             rowInfo.setPointParameter(name);
             doMoveProbe();
         } catch (Exception exc) {
@@ -1073,19 +1080,24 @@ public class ProbeControl extends DisplayControlImpl {
 
         if ( !rowInfo.isGrid()) {
             try {
-            Tuple t = rowInfo.getTuple();
-            if(t!=null) {
-                List subItems = new ArrayList();
-                Data[] comps = t.getComponents();
-                for(int i=0;i<comps.length;i++) {
-                    if(!(comps[i] instanceof Real)) continue;
-                        String name = comps[i].getType().toString();
-                        subItems.add(GuiUtils.makeMenuItem(name, this, "changePointParameter",new Object[]{rowInfo,name}));
+                TupleType t = rowInfo.getTupleType();
+                if (t != null) {
+                    List   subItems = new ArrayList();
+                    for (int i = 0; i < t.getDimension(); i++) {
+                        if ( !(t.getComponent(i) instanceof RealType)) {
+                            continue;
+                        }
+                        String name = t.getComponent(i).toString();
+                        subItems.add(GuiUtils.makeMenuItem(name, this,
+                                "changePointParameter",
+                                new Object[] { rowInfo,
+                                name }));
+                    }
+                    if (subItems.size() > 0) {
+                        paramMenu.add(GuiUtils.makeMenu("Point Parameter",
+                                subItems));
+                    }
                 }
-                if(subItems.size()>0) {
-                    paramMenu.add(GuiUtils.makeMenu("Point Parameter", subItems));
-                }
-            }
             } catch (Exception exc) {
                 logException("Changing parameter", exc);
             }
@@ -1229,7 +1241,7 @@ public class ProbeControl extends DisplayControlImpl {
                 if (column == COL_VALUE) {
                     if (row < getDataChoices().size()) {
                         if (amExporting) {
-                            Data raw = getRowInfo(row).getRawValue();
+                            Data raw = getRowInfo(row).getTimeSample();
                             if (raw == null) {
                                 return "missing";
                             }
@@ -1622,8 +1634,10 @@ public class ProbeControl extends DisplayControlImpl {
      */
     String getFieldName(int row) {
         ProbeRowInfo rowInfo = getRowInfo(row);
-        if ( !rowInfo.isGrid()) {
-            return "Point: " + rowInfo.getPointParameter() + "@" + rowInfo.getStationName();
+        if (rowInfo.isPoint()) {
+            return "Point: " 
+                + rowInfo.getPointParameter() + "@"
+                + rowInfo.getStationName();
         }
         return rowInfo.getDataInstance().getDataChoice().getName();
     }
@@ -1758,7 +1772,7 @@ public class ProbeControl extends DisplayControlImpl {
 
         try {
             setData(aniValue, step);
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             logException("Updating time", exc);
         }
 
@@ -1777,21 +1791,10 @@ public class ProbeControl extends DisplayControlImpl {
             Real         theValue     = null;
             ProbeRowInfo info         = getRowInfo(i);
             DataInstance dataInstance = info.getDataInstance();
-            Data         raw          = info.getRawValue();
             List         reals        = new ArrayList();
-            Real         theReal         = info.getRealValue();
-            if(theReal!=null) {
+            Real         theReal      = info.getRealValue();
+            if (theReal != null) {
                 reals.add(theReal);
-            }
-            if (false &&raw != null) {
-                if (raw instanceof Real) {
-                    reals.add(raw);
-                } else {
-                    RealTuple rt = (RealTuple) raw;
-                    for (int rtIdx = 0; rtIdx < rt.getLength(); rtIdx++) {
-                        reals.add(rt.getComponent(rtIdx));
-                    }
-                }
             }
 
             if ((i > 0) && (i < 8)) {
@@ -1818,7 +1821,6 @@ public class ProbeControl extends DisplayControlImpl {
                 }
                 sideText.append(": ");
             }
-            info.setRawValue(raw);
             if (reals.size() == 0) {
                 info.setDisplayValue("missing");
                 if (i < 8) {
@@ -1891,6 +1893,7 @@ public class ProbeControl extends DisplayControlImpl {
                     }
                 }
 
+                //                System.err.println ("value str:" + valueStr);
                 info.setDisplayValue(valueStr);
                 if (theValue != null) {
                     info.playSound(theValue.getValue());
@@ -1977,8 +1980,7 @@ public class ProbeControl extends DisplayControlImpl {
     private void initRowInfo(ProbeRowInfo rowInfo, DataChoice dc)
             throws VisADException, RemoteException {
         rowInfo.setDataInstance(createDataInstance(dc));
-        if ( !rowInfo.isGrid() && (rowInfo.getPointParameter() == null)) {
-        }
+        if ( !rowInfo.isGrid() && (rowInfo.getPointParameter() == null)) {}
     }
 
     /**
@@ -2046,49 +2048,62 @@ public class ProbeControl extends DisplayControlImpl {
      *
      * @return sample
      *
+     *
+     * @throws Exception _more_
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
     private FieldImpl getSampleAtPoint(ProbeRowInfo info,
                                        EarthLocationTuple elt,
                                        LatLonPoint llp)
-            throws VisADException, RemoteException,Exception {
+            throws VisADException, RemoteException, Exception {
 
-        if (!info.isGrid()) {
+        FieldImpl sample = info.getPointSample(elt);
+        if (sample != null) {
+            return sample;
+        }
+
+        if (info.isPoint()) {
             FieldImpl pointObs = (FieldImpl) info.getDataInstance().getData();
             if (pointObs == null) {
                 return null;
             }
-            int       numObs       = pointObs.getDomainSet().getLength();
-            List obs = new ArrayList();
-            
-            PointOb closest = null;
-            double minDistance = 0;
+            int     numObs      = pointObs.getDomainSet().getLength();
+            List    obs         = new ArrayList();
+
+            PointOb closest     = null;
+            double  minDistance = 0;
 
             for (int i = 0; i < numObs; i++) {
-                PointOb ob = (PointOb)pointObs.getSample(i);
-                double distance = ucar.visad.Util.bearingDistance(ob.getEarthLocation(),elt).getValue();
-                if(closest == null ||distance<minDistance) {
-                    closest = ob;
+                PointOb ob = (PointOb) pointObs.getSample(i);
+                double distance =
+                    ucar.visad.Util.bearingDistance(ob.getEarthLocation(),
+                        elt).getValue();
+                if ((closest == null) || (distance < minDistance)) {
+                    closest     = ob;
                     minDistance = distance;
-                } 
+                }
             }
-            if(closest==null) return null;
+            if (closest == null) {
+                return null;
+            }
 
             EarthLocation closestEL = closest.getEarthLocation();
             for (int i = 0; i < numObs; i++) {
-                PointOb ob = (PointOb)pointObs.getSample(i);
-                if(ob.getEarthLocation().equals(closestEL)) {
+                PointOb ob = (PointOb) pointObs.getSample(i);
+                if (ob.getEarthLocation().equals(closestEL)) {
                     obs.add(ob);
                 }
             }
-            System.err.println("got obs:" + obs.size());
-            return PointObFactory.makeTimeSequenceOfPointObs(obs,0);
+            sample = PointObFactory.makeTimeSequenceOfPointObs(obs, 0,info.getPointIndex());
+            info.setStationName((PointOb)obs.get(0));
+            info.setPointSample(sample, elt);
+            setTimesForAnimation();
+            return sample;
         }
 
 
         //        System.out.println("getting sample for:" + info + " at:" + elt);
-        FieldImpl sample      = null;
         FieldImpl workingGrid = info.getWorkingGrid();
         if (workingGrid == null) {
             workingGrid = info.getGridDataInstance().getGrid();
@@ -2113,6 +2128,8 @@ public class ProbeControl extends DisplayControlImpl {
                                      info.getSamplingMode());
         }
         info.setWorkingGrid(workingGrid);
+        info.setPointSample(sample, elt);
+        setTimesForAnimation();
         return sample;
     }
 
@@ -2122,6 +2139,8 @@ public class ProbeControl extends DisplayControlImpl {
      * @param aniValue The time
      * @param step The time step
      *
+     *
+     * @throws Exception _more_
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
@@ -2130,42 +2149,47 @@ public class ProbeControl extends DisplayControlImpl {
         EarthLocationTuple elt     = getProbeLocation();
         LatLonPoint        llp     = elt.getLatLonPoint();
         List               choices = getDataChoices();
-        //List               rowInfos = new ArrayList();
         for (int i = 0; i < choices.size(); i++) {
-            ProbeRowInfo info = getRowInfo(i);
-            //rowInfos.add(info);
-            Data rt = null;
-            FieldImpl sample = getSampleAtPoint(info, elt, llp);
+            ProbeRowInfo info   = getRowInfo(i);
+            FieldImpl    sample = getSampleAtPoint(info, elt, llp);
+            Data         rt     = null;
             if (sample != null) {
                 if ((aniValue != null) && !aniValue.isMissing()) {
                     // can't use this because it uses floats
                     rt = sample.evaluate(aniValue, info.getSamplingMode(),
                                          Data.NO_ERRORS);
-                    Set timeSet = sample.getDomainSet();
-                    info.setTimeSet(timeSet);
                 } else {
                     rt = sample.getSample(step);
-                    info.setTimeSet(null);
                 }
-                info.setTimeSample(sample);
             }
-            if(rt == null) continue;
-
-            info.setValue(rt);
+            if (rt == null) {
+                continue;
+            }
+            info.setTimeSample(rt);
             Unit realUnit = null;
-            if (info.getRawValue() != null) {
-                realUnit = info.getRealValue().getUnit();
+            Real realValue = info.getRealValue();
+            //            System.err.println("rt:" + rt.getType());
+            //            System.err.println("realValue:" + realValue);
+            if (realValue != null) {
+                realUnit = realValue.getUnit();
             }
             Unit rowUnit = info.getUnit();
             if (rowUnit == null) {  // is null or hasn't been set
-                String name = info.getDataInstance().getParamName();
-                rowUnit = getDisplayConventions().selectDisplayUnit(name,
-                        realUnit);
+                if(info.isGrid()) {
+                    String name = info.getDataInstance().getParamName();
+                    rowUnit = getDisplayConventions().selectDisplayUnit(name,
+                                                                        realUnit);
+                } else {
+                    Real r = info.getRealValue();
+                    if(r!=null) 
+                        rowUnit = r.getUnit();
+                }
+                info.setUnit(rowUnit);
             }
 
-            info.setUnit(rowUnit);
 
-            if(info.isGrid()) {
+
+            if (info.isGrid()) {
                 info.setExtra("");
                 float values[][] = sample.getFloats(false);
                 if ((values.length > 0) && (values[0].length > 1)) {
@@ -2173,7 +2197,7 @@ public class ProbeControl extends DisplayControlImpl {
                     float max = 0.0f;
                     float avg = 0.0f;
                     for (int valueIdx = 0; valueIdx < values[0].length;
-                         valueIdx++) {
+                            valueIdx++) {
                         float value = values[0][valueIdx];
                         if ((valueIdx == 0) || (value < min)) {
                             min = value;
@@ -2284,14 +2308,16 @@ public class ProbeControl extends DisplayControlImpl {
 
                     Set       timeSet = info.getTimeSet();
                     Data      rt      = null;
-                    FieldImpl sample  = info.getTimeSample();
+                    FieldImpl sample  = info.getPointSample();
                     if ((sample != null) && (timeSet != null)) {
                         rt = sample.evaluate(aniValue,
                                              info.getSamplingMode(),
                                              Data.NO_ERRORS);
 
+
+
                         /*
-                        if (info.getTimeSample() != null) {
+                        if (info.getPointSample() != null) {
                             int step = 0;
                             if (timeSet != null) {
                                 double timeValue =
@@ -2304,7 +2330,7 @@ public class ProbeControl extends DisplayControlImpl {
                             }
                         */
                     } else {
-                        rt = info.getTimeSample().getSample(0);
+                        rt = info.getPointSample().getSample(0);
                     }
 
                     if (rt == null) {

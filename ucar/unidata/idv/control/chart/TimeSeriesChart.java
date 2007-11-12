@@ -391,6 +391,7 @@ public class TimeSeriesChart extends XYChartManager {
                     Unit[]     timeUnits  = timeSet.getSetUnits();
                     double[][] times      = timeSet.getDoubles();
                     double[][] values     = field.getValues(false);
+                    if(values == null) continue;
                     double[]   valueArray = values[0];
                     Unit rawUnit =
                         ucar.visad.Util.getDefaultRangeUnits(field)[0];

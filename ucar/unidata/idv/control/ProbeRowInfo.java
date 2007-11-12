@@ -113,6 +113,9 @@ public class ProbeRowInfo {
     /** Extra label to show in table */
     private String extra = "";
 
+    /** The raw sampled value */
+    private Data timeSample;
+
     /** the sample from the last point sample */
     private FieldImpl pointSample;
 
@@ -122,8 +125,6 @@ public class ProbeRowInfo {
     /** The last point that we sampled  on */
     private EarthLocationTuple lastPoint;
 
-    /** the sample from the last setValue on time */
-    private FieldImpl timeSample;
 
     /** the time set from the last setValue */
     private Set timeSet;
@@ -143,8 +144,6 @@ public class ProbeRowInfo {
     /** For playing sounds */
     private MidiProperties midiProperties;
 
-    /** The raw sampled value */
-    private Data rawValue;
 
     /** What is displayed. May be the formatted text or "missing" */
     private Object displayValue;
@@ -222,6 +221,9 @@ public class ProbeRowInfo {
         return (dataInstance instanceof GridDataInstance);
     }
 
+    public boolean isPoint() {
+        return !isGrid();
+    }
 
     /**
      * extra stuff for table
@@ -245,10 +247,10 @@ public class ProbeRowInfo {
      * Clear any cached samples
      */
     protected void clearCachedSamples() {
-        timeSample  = null;
         pointSample = null;
         lastPoint   = null;
         workingGrid = null;
+        tupleType = null;
     }
 
 
@@ -263,19 +265,20 @@ public class ProbeRowInfo {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public void setValue(Data rt) throws VisADException, RemoteException {
+    protected void setTimeSample(Data rt) throws VisADException, RemoteException {
         if (rt == null) {
-            rawValue = null;
+            timeSample = null;
         } else if (rt.isMissing()) {
-            rawValue = null;
+            timeSample = null;
         } else {
-            /*
-            rawValue = (rt instanceof RealTuple)
-                       ? (Real) ((RealTuple) rt).getComponent(0)
-                       : (Real) rt;
-            */
-            rawValue = rt;
+            timeSample = rt;
         }
+    }
+
+
+
+    protected Data getTimeSample() {
+        return  timeSample;
     }
 
 
@@ -286,7 +289,7 @@ public class ProbeRowInfo {
      */
     protected void initWith(ProbeRowInfo that) {
         this.displayValue = that.displayValue;
-        this.rawValue     = that.rawValue;
+        this.timeSample     = that.timeSample;
         this.unit         = that.unit;
         this.level        = that.level;
         this.altitude     = that.altitude;
@@ -433,44 +436,23 @@ public class ProbeRowInfo {
         return midiManager;
     }
 
-    public Tuple getTuple() throws VisADException, RemoteException {
-        if(rawValue!=null && rawValue instanceof FieldImpl) {
-            Data data = ((FieldImpl)rawValue).getSample(0);
-            if(data instanceof PointOb) {
-                PointOb ob = (PointOb) data;
-                return (Tuple)ob.getData();
-            }
-        }
-        return null;
+
+
+    private TupleType tupleType;
+
+    public TupleType getTupleType() throws VisADException, RemoteException {
+        if(tupleType != null) return tupleType;
+        if(isGrid()) return null;
+        FieldImpl pointObs = (FieldImpl) getDataInstance().getData();
+        if(pointObs==null) return null;
+        int     numObs      = pointObs.getDomainSet().getLength();
+        if(numObs==0) return null;
+        PointOb ob = (PointOb) pointObs.getSample(0);
+        tupleType =  (TupleType)((Tuple)ob.getData()).getType();
+        return tupleType;
     }
 
 
-    /**
-     * Set the RawValue property.
-     *
-     * @param value The new value for RawValue
-     */
-    protected void setRawValue(Data value) throws VisADException, RemoteException {
-        rawValue = value;
-        if(rawValue!=null && rawValue instanceof FieldImpl) {
-            Data data = ((FieldImpl)rawValue).getSample(0);
-            if(data instanceof PointOb) {
-                PointOb ob = (PointOb) data;
-                Tuple t  = (Tuple)ob.getData();
-                Data[] comps = t.getComponents();
-                stationName = "";
-                for(int i=0;i<comps.length;i++) {
-                    if(comps[i] instanceof visad.Text) {
-                        String name = StringUtil.replace(comps[i].getType().toString(),"(Text)","").toLowerCase();
-                        if(name.equals("id") || name.equals("idn") || name.startsWith("station")) {
-                            stationName = comps[i].toString();
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     /**
      * Get the value as a Real. We may be a Real, if so then return.
@@ -482,49 +464,59 @@ public class ProbeRowInfo {
      * @throws VisADException On badness
      */
     protected Real getRealValue() throws VisADException, RemoteException {
-        if (rawValue instanceof Real) {
-            return (Real) rawValue;
+        if(timeSample == null) return null;
+        //        System.err.println("timeSample:" + timeSample);
+        if (timeSample instanceof Real) {
+            return (Real) timeSample;
         }
-       if(rawValue instanceof FieldImpl) {
-            Data data = ((FieldImpl)rawValue).getSample(0);
+        if(timeSample instanceof FieldImpl) {
+            Data data = ((FieldImpl)timeSample).getSample(0);
+            if(data instanceof Real) {
+                return (Real) data;
+            }
+
             if(data instanceof PointOb) {
                 PointOb ob = (PointOb) data;
                 Tuple t  = (Tuple)ob.getData();
-                if(pointParameter == null) {
-                    Data[] comps = t.getComponents();
-                    for(int i=0;i<comps.length;i++) {
-                        if(!(comps[i] instanceof Real)) continue;
-                        setPointParameter(comps[i].getType().toString());
-                        break;
-                    }
-                }
-
-                if(pointIndex<0 && pointParameter!=null) {
-                    Data[] comps = t.getComponents();
-                    for(int i=0;i<comps.length;i++) {
-                        if(comps[i].getType().toString().equals(pointParameter)) {
-                            pointIndex = i;
-                            break;
-                        }
-                    }
-                }
+                getPointIndex();
                 if(pointIndex<0) return null;
                 return (Real)t.getComponent(pointIndex);
             }
             return null;
         }
-        return (Real) ((RealTuple) rawValue).getComponent(0);
+        return (Real) ((RealTuple) timeSample).getComponent(0);
     }
 
 
-    /**
-     * Get the RawValue property.
-     *
-     * @return The RawValue
-     */
-    protected Data getRawValue() {
-        return rawValue;
+    public String getPointParameterName()         throws VisADException, RemoteException {
+        if(pointParameter == null) {
+            TupleType tt= getTupleType();
+            if(tt==null)return null;
+            for (int i = 0; i < tt.getDimension(); i++) {
+                if(!(tt.getComponent(i) instanceof RealType)) continue;
+                setPointParameter(tt.getComponent(i).toString());
+                break;
+            }
+        }
+        return pointParameter;
     }
+
+    public int getPointIndex()         throws VisADException, RemoteException {
+        if(pointIndex>=0) return pointIndex;
+        getPointParameterName();
+        if(pointParameter!=null) {
+            TupleType tt= getTupleType();
+            if(tt==null)return -1;
+            for (int i = 0; i < tt.getDimension(); i++) {
+                if(tt.getComponent(i).toString().equals(pointParameter)) {
+                    pointIndex = i;
+                    break;
+                }
+            }
+        }
+        return pointIndex;
+    }
+
 
     /**
      * Set the Unit property.
@@ -535,42 +527,7 @@ public class ProbeRowInfo {
         unit = value;
     }
 
-    /**
-     * set the time set. Just a holder.
-     *
-     * @param s time set_
-     */
-    protected void setTimeSet(Set s) {
-        timeSet = s;
-    }
 
-    /**
-     * time set
-     *
-     * @return time set
-     */
-    protected Set getTimeSet() {
-        return timeSet;
-
-    }
-
-    /**
-     * Set the sample we last used
-     *
-     * @param sample sample
-     */
-    protected void setTimeSample(FieldImpl sample) {
-        this.timeSample = sample;
-    }
-
-    /**
-     * Get the sample we last used
-     *
-     * @return sample
-     */
-    public FieldImpl getTimeSample() {
-        return this.timeSample;
-    }
 
     /**
      * Set the working grid for this row
@@ -596,10 +553,44 @@ public class ProbeRowInfo {
      * @param sample sample
      * @param elt The point we sampled on
      */
-    protected void setPointSample(FieldImpl sample, EarthLocationTuple elt) {
+    protected void setPointSample(FieldImpl sample, EarthLocationTuple elt) 
+        throws VisADException, RemoteException {
         this.pointSample = sample;
         this.lastPoint   = elt;
     }
+
+
+    public void setStationName(PointOb ob)         
+        throws VisADException, RemoteException {
+        Tuple t  = (Tuple)ob.getData();
+        Data[] comps = t.getComponents();
+        for(int i=0;i<comps.length;i++) {
+            if(comps[i] instanceof visad.Text) {
+                String name = StringUtil.replace(comps[i].getType().toString(),"(Text)","").toLowerCase();
+                if(name.equals("id") || name.equals("idn") || name.startsWith("station")) {
+                    stationName = comps[i].toString();
+                    return;
+                }
+            }
+        }
+
+
+    }
+
+
+    /**
+     * time set
+     *
+     * @return time set
+     */
+    protected Set getTimeSet() 
+        throws VisADException, RemoteException {
+        if(pointSample!=null)
+            return pointSample.getDomainSet();
+        return null;
+
+    }
+
 
 
     /**
@@ -741,8 +732,10 @@ public class ProbeRowInfo {
      *  @param value The new value for PointParameter
      */
     public void setPointParameter(String value) {
+        unit = null;
         pointParameter = value;
         pointIndex = -1;
+        this.lastPoint   = null;
     }
 
     /**
