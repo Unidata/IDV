@@ -22,13 +22,16 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
 import ucar.unidata.collab.Sharable;
 
+
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 
@@ -1082,7 +1085,7 @@ public class ProbeControl extends DisplayControlImpl {
             try {
                 TupleType t = rowInfo.getTupleType();
                 if (t != null) {
-                    List   subItems = new ArrayList();
+                    List subItems = new ArrayList();
                     for (int i = 0; i < t.getDimension(); i++) {
                         if ( !(t.getComponent(i) instanceof RealType)) {
                             continue;
@@ -1635,9 +1638,8 @@ public class ProbeControl extends DisplayControlImpl {
     String getFieldName(int row) {
         ProbeRowInfo rowInfo = getRowInfo(row);
         if (rowInfo.isPoint()) {
-            return "Point: " 
-                + rowInfo.getPointParameter() + "@"
-                + rowInfo.getStationName();
+            return rowInfo.getPointParameter() + "@"
+                   + rowInfo.getStationName();
         }
         return rowInfo.getDataInstance().getDataChoice().getName();
     }
@@ -2095,8 +2097,9 @@ public class ProbeControl extends DisplayControlImpl {
                     obs.add(ob);
                 }
             }
-            sample = PointObFactory.makeTimeSequenceOfPointObs(obs, 0,info.getPointIndex());
-            info.setStationName((PointOb)obs.get(0));
+            sample = PointObFactory.makeTimeSequenceOfPointObs(obs, 0,
+                    info.getPointIndex());
+            info.setStationName((PointOb) obs.get(0));
             info.setPointSample(sample, elt);
             setTimesForAnimation();
             return sample;
@@ -2166,7 +2169,7 @@ public class ProbeControl extends DisplayControlImpl {
                 continue;
             }
             info.setTimeSample(rt);
-            Unit realUnit = null;
+            Unit realUnit  = null;
             Real realValue = info.getRealValue();
             //            System.err.println("rt:" + rt.getType());
             //            System.err.println("realValue:" + realValue);
@@ -2175,14 +2178,15 @@ public class ProbeControl extends DisplayControlImpl {
             }
             Unit rowUnit = info.getUnit();
             if (rowUnit == null) {  // is null or hasn't been set
-                if(info.isGrid()) {
+                if (info.isGrid()) {
                     String name = info.getDataInstance().getParamName();
                     rowUnit = getDisplayConventions().selectDisplayUnit(name,
-                                                                        realUnit);
+                            realUnit);
                 } else {
                     Real r = info.getRealValue();
-                    if(r!=null) 
+                    if (r != null) {
                         rowUnit = r.getUnit();
+                    }
                 }
                 info.setUnit(rowUnit);
             }
@@ -2262,32 +2266,61 @@ public class ProbeControl extends DisplayControlImpl {
     }
 
 
+    /** _more_          */
+    private JCheckBox columnsCbx;
+
     /**
      * Export the current time as csv
      */
     public void exportCsv() {
-        amExporting = true;
-        GuiUtils.exportAsCsv(tableModel);
-        amExporting = false;
-        paramsTable.repaint();
+        try {
+            Animation animation = getAnimation(true);
+            int       step      = animation.getCurrent();
+            Set       aniSet    = getAnimation(true).getSet();
+            Real[]    times     = Animation.getDateTimeArray(aniSet);
+            if (times.length == 0) {
+                return;
+            }
+            exportToCsv(new Real[] { times[step] });
+            //        GuiUtils.exportAsCsv(tableModel);
+            paramsTable.repaint();
+        } catch (Exception exc) {
+            logException("Exporting to csv", exc);
+        }
     }
 
+
+
     /**
-     * Export all times as csv
+     * _more_
      */
     public void exportCsvAllTimes() {
         try {
+            Set    aniSet = getAnimation(true).getSet();
+            Real[] times  = Animation.getDateTimeArray(aniSet);
+            exportToCsv(times);
+            paramsTable.repaint();
+        } catch (Exception exc) {
+            logException("Exporting to csv", exc);
+        }
+    }
+
+
+    /**
+     * Export all times as csv
+     *
+     * @param times _more_
+     */
+    public void exportToCsv(Real[] times) {
+        try {
             String filename =
-                FileManager.getWriteFile(FileManager.FILTER_CSV,
-                                         FileManager.SUFFIX_CSV);
+                FileManager.getWriteFile(Misc.newList(FileManager.FILTER_CSV,
+                    FileManager.FILTER_XLS), FileManager.SUFFIX_CSV);
             if (filename == null) {
                 return;
             }
             amExporting = true;
-            Set          aniSet  = getAnimation(true).getSet();
-            StringBuffer buff    = new StringBuffer();
-            DateTime[]   times   = Animation.getDateTimeArray(aniSet);
-            List         choices = getDataChoices();
+            List choices = getDataChoices();
 
             if (times.length == 0) {
                 LogUtil.userMessage("No times to export");
@@ -2296,45 +2329,39 @@ public class ProbeControl extends DisplayControlImpl {
 
             //Force the sampling. This sets the sample at the current location, time set, etc.
             setData(times[0], 0);
+            List rows = new ArrayList();
+            List cols;
+            cols = Misc.newList("Time");
+            for (int row = 0; row < choices.size(); row++) {
+                ProbeRowInfo info = getRowInfo(row);
+                cols.add(getFieldName(row));
+            }
+            rows.add(cols);
+
+            for (int timeIdx = 0; timeIdx < times.length; timeIdx++) {
+                Real aniValue = times[timeIdx];
+                cols = Misc.newList("" + aniValue);
+                rows.add(cols);
+            }
+
             for (int timeIdx = 0; timeIdx < times.length; timeIdx++) {
                 Real aniValue = times[timeIdx];
                 for (int row = 0; row < choices.size(); row++) {
-                    ProbeRowInfo info = getRowInfo(row);
-                    buff.append(
-                        info.getDataInstance().getDataChoice().getName());
-                    buff.append(",");
-                    buff.append(aniValue);
-                    buff.append(",");
-
-                    Set       timeSet = info.getTimeSet();
-                    Data      rt      = null;
-                    FieldImpl sample  = info.getPointSample();
+                    cols = (List) rows.get(timeIdx + 1);
+                    ProbeRowInfo info    = getRowInfo(row);
+                    Set          timeSet = info.getTimeSet();
+                    Data         rt      = null;
+                    FieldImpl    sample  = info.getPointSample();
                     if ((sample != null) && (timeSet != null)) {
                         rt = sample.evaluate(aniValue,
                                              info.getSamplingMode(),
                                              Data.NO_ERRORS);
-
-
-
-                        /*
-                        if (info.getPointSample() != null) {
-                            int step = 0;
-                            if (timeSet != null) {
-                                double timeValue =
-                                    aniValue.getValue(timeSet.getSetUnits()[0]);
-                                int[] index =
-                                    timeSet.doubleToIndex(new double[][] {
-                                    { timeValue }
-                                });
-                                step = index[0];
-                            }
-                        */
                     } else {
                         rt = info.getPointSample().getSample(0);
                     }
 
                     if (rt == null) {
-                        buff.append("missing");
+                        cols.add("missing");
                     } else {
                         if (info.getUnit() != null) {
                             Real real = null;
@@ -2344,18 +2371,14 @@ public class ProbeControl extends DisplayControlImpl {
                                 real = (Real) ((RealTuple) rt).getComponent(
                                     0);
                             }
-                            buff.append(real.getValue(info.getUnit()));
+                            cols.add(real.getValue(info.getUnit()));
                         } else {
-                            buff.append(rt.toString());
+                            cols.add(rt.toString());
                         }
                     }
-                    buff.append(",");
-                    buff.append(tableModel.getValueAt(row, COL_LEVEL));
-                    buff.append(",");
-                    buff.append("\n");
                 }
             }
-            IOUtil.writeFile(filename, buff.toString());
+            DataUtil.writeCsv(filename, rows);
         } catch (Exception exc) {
             logException("Exporting to csv", exc);
         }

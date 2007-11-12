@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -154,8 +155,10 @@ public class ProbeRowInfo {
     /** For probing on point data */
     private String pointParameter;
 
+    /** _more_          */
     private String stationName = "";
 
+    /** _more_          */
     private int pointIndex = -1;
 
     /** For playing sounds */
@@ -221,6 +224,11 @@ public class ProbeRowInfo {
         return (dataInstance instanceof GridDataInstance);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isPoint() {
         return !isGrid();
     }
@@ -250,7 +258,7 @@ public class ProbeRowInfo {
         pointSample = null;
         lastPoint   = null;
         workingGrid = null;
-        tupleType = null;
+        tupleType   = null;
     }
 
 
@@ -265,7 +273,8 @@ public class ProbeRowInfo {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    protected void setTimeSample(Data rt) throws VisADException, RemoteException {
+    protected void setTimeSample(Data rt)
+            throws VisADException, RemoteException {
         if (rt == null) {
             timeSample = null;
         } else if (rt.isMissing()) {
@@ -277,8 +286,13 @@ public class ProbeRowInfo {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected Data getTimeSample() {
-        return  timeSample;
+        return timeSample;
     }
 
 
@@ -288,12 +302,14 @@ public class ProbeRowInfo {
      * @param that that
      */
     protected void initWith(ProbeRowInfo that) {
-        this.displayValue = that.displayValue;
+        this.displayValue   = that.displayValue;
         this.timeSample     = that.timeSample;
-        this.unit         = that.unit;
-        this.level        = that.level;
-        this.altitude     = that.altitude;
-        this.samplingMode = that.samplingMode;
+        this.unit           = that.unit;
+        this.level          = that.level;
+        this.altitude       = that.altitude;
+        this.samplingMode   = that.samplingMode;
+        this.pointParameter = that.pointParameter;
+        this.stationName    = that.stationName;
         if (that.midiProperties != null) {
             this.midiProperties = new MidiProperties(that.midiProperties);
         }
@@ -438,17 +454,34 @@ public class ProbeRowInfo {
 
 
 
+    /** _more_          */
     private TupleType tupleType;
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     public TupleType getTupleType() throws VisADException, RemoteException {
-        if(tupleType != null) return tupleType;
-        if(isGrid()) return null;
+        if (tupleType != null) {
+            return tupleType;
+        }
+        if (isGrid()) {
+            return null;
+        }
         FieldImpl pointObs = (FieldImpl) getDataInstance().getData();
-        if(pointObs==null) return null;
-        int     numObs      = pointObs.getDomainSet().getLength();
-        if(numObs==0) return null;
+        if (pointObs == null) {
+            return null;
+        }
+        int numObs = pointObs.getDomainSet().getLength();
+        if (numObs == 0) {
+            return null;
+        }
         PointOb ob = (PointOb) pointObs.getSample(0);
-        tupleType =  (TupleType)((Tuple)ob.getData()).getType();
+        tupleType = (TupleType) ((Tuple) ob.getData()).getType();
         return tupleType;
     }
 
@@ -464,23 +497,27 @@ public class ProbeRowInfo {
      * @throws VisADException On badness
      */
     protected Real getRealValue() throws VisADException, RemoteException {
-        if(timeSample == null) return null;
+        if (timeSample == null) {
+            return null;
+        }
         //        System.err.println("timeSample:" + timeSample);
         if (timeSample instanceof Real) {
             return (Real) timeSample;
         }
-        if(timeSample instanceof FieldImpl) {
-            Data data = ((FieldImpl)timeSample).getSample(0);
-            if(data instanceof Real) {
+        if (timeSample instanceof FieldImpl) {
+            Data data = ((FieldImpl) timeSample).getSample(0);
+            if (data instanceof Real) {
                 return (Real) data;
             }
 
-            if(data instanceof PointOb) {
+            if (data instanceof PointOb) {
                 PointOb ob = (PointOb) data;
-                Tuple t  = (Tuple)ob.getData();
+                Tuple   t  = (Tuple) ob.getData();
                 getPointIndex();
-                if(pointIndex<0) return null;
-                return (Real)t.getComponent(pointIndex);
+                if (pointIndex < 0) {
+                    return null;
+                }
+                return (Real) t.getComponent(pointIndex);
             }
             return null;
         }
@@ -488,12 +525,25 @@ public class ProbeRowInfo {
     }
 
 
-    public String getPointParameterName()         throws VisADException, RemoteException {
-        if(pointParameter == null) {
-            TupleType tt= getTupleType();
-            if(tt==null)return null;
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public String getPointParameterName()
+            throws VisADException, RemoteException {
+        if (pointParameter == null) {
+            TupleType tt = getTupleType();
+            if (tt == null) {
+                return null;
+            }
             for (int i = 0; i < tt.getDimension(); i++) {
-                if(!(tt.getComponent(i) instanceof RealType)) continue;
+                if ( !(tt.getComponent(i) instanceof RealType)) {
+                    continue;
+                }
                 setPointParameter(tt.getComponent(i).toString());
                 break;
             }
@@ -501,14 +551,26 @@ public class ProbeRowInfo {
         return pointParameter;
     }
 
-    public int getPointIndex()         throws VisADException, RemoteException {
-        if(pointIndex>=0) return pointIndex;
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public int getPointIndex() throws VisADException, RemoteException {
+        if (pointIndex >= 0) {
+            return pointIndex;
+        }
         getPointParameterName();
-        if(pointParameter!=null) {
-            TupleType tt= getTupleType();
-            if(tt==null)return -1;
+        if (pointParameter != null) {
+            TupleType tt = getTupleType();
+            if (tt == null) {
+                return -1;
+            }
             for (int i = 0; i < tt.getDimension(); i++) {
-                if(tt.getComponent(i).toString().equals(pointParameter)) {
+                if (tt.getComponent(i).toString().equals(pointParameter)) {
                     pointIndex = i;
                     break;
                 }
@@ -552,22 +614,36 @@ public class ProbeRowInfo {
      *
      * @param sample sample
      * @param elt The point we sampled on
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
-    protected void setPointSample(FieldImpl sample, EarthLocationTuple elt) 
-        throws VisADException, RemoteException {
+    protected void setPointSample(FieldImpl sample, EarthLocationTuple elt)
+            throws VisADException, RemoteException {
         this.pointSample = sample;
         this.lastPoint   = elt;
     }
 
 
-    public void setStationName(PointOb ob)         
-        throws VisADException, RemoteException {
-        Tuple t  = (Tuple)ob.getData();
+    /**
+     * _more_
+     *
+     * @param ob _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void setStationName(PointOb ob)
+            throws VisADException, RemoteException {
+        Tuple  t     = (Tuple) ob.getData();
         Data[] comps = t.getComponents();
-        for(int i=0;i<comps.length;i++) {
-            if(comps[i] instanceof visad.Text) {
-                String name = StringUtil.replace(comps[i].getType().toString(),"(Text)","").toLowerCase();
-                if(name.equals("id") || name.equals("idn") || name.startsWith("station")) {
+        for (int i = 0; i < comps.length; i++) {
+            if (comps[i] instanceof visad.Text) {
+                String name =
+                    StringUtil.replace(comps[i].getType().toString(),
+                                       "(Text)", "").toLowerCase();
+                if (name.equals("id") || name.equals("idn")
+                        || name.startsWith("station")) {
                     stationName = comps[i].toString();
                     return;
                 }
@@ -582,11 +658,14 @@ public class ProbeRowInfo {
      * time set
      *
      * @return time set
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
-    protected Set getTimeSet() 
-        throws VisADException, RemoteException {
-        if(pointSample!=null)
+    protected Set getTimeSet() throws VisADException, RemoteException {
+        if (pointSample != null) {
             return pointSample.getDomainSet();
+        }
         return null;
 
     }
@@ -722,6 +801,11 @@ public class ProbeRowInfo {
         return lineState;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getStationName() {
         return stationName;
     }
@@ -732,10 +816,10 @@ public class ProbeRowInfo {
      *  @param value The new value for PointParameter
      */
     public void setPointParameter(String value) {
-        unit = null;
+        unit           = null;
         pointParameter = value;
-        pointIndex = -1;
-        this.lastPoint   = null;
+        pointIndex     = -1;
+        this.lastPoint = null;
     }
 
     /**
