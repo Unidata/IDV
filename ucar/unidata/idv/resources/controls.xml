@@ -535,7 +535,7 @@ example:
 
   <control
      id="probe"
-     categories="*-3D-*;*-2D-*;IMAGE-BAND-*;RGBIMAGE;"
+     categories="*-3D-*;*-2D-*;IMAGE-BAND-*;RGBIMAGE;POINT;StationPlot;PointPlot"
      class="ucar.unidata.idv.control.ProbeControl"
      description="Data Probe/Time Series"
      label="Data Probe/Time Series"
@@ -578,17 +578,6 @@ example:
      displaycategory="Probes"
      properties="windowVisible=true;displayName=Wind Barb Time/Height Display;showAsContours=false;windbarbs=true;"/>
 
-<!--
-  <control
-     id="timeseries"
-     categories="*-2D-TIME-*;SWEEP-3D-TIME;IMAGE-RASTER-TIME"
-     class="ucar.unidata.idv.control.ProbeControl"
-     valid="true"
-     description="Time Series Display"
-     label="Time Series"
-     displaycategory="Probes"
-     properties="windowVisible=true;displayName=Time Series;"/>
--->
 
 <!-- End Probe Displays -->
 

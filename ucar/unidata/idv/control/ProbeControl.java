@@ -2054,23 +2054,11 @@ public class ProbeControl extends DisplayControlImpl {
                                        LatLonPoint llp)
             throws VisADException, RemoteException,Exception {
 
-        if (info.getPointSample(elt) != null) {
-            System.err.println ("got point sample");
-            return info.getPointSample();
-        }
-
-        if ( !info.isGrid()) {
+        if (!info.isGrid()) {
             FieldImpl pointObs = (FieldImpl) info.getDataInstance().getData();
             if (pointObs == null) {
                 return null;
             }
-            /* TODO:
-               -create a findClosest method that takes the obs field
-               and returns a list of PointObs that are the closest to
-               the elt.
-               -extract the rowInfo.pointParameter column from the point obs
-               -make T->(lat,lon)->value field
-            */
             int       numObs       = pointObs.getDomainSet().getLength();
             List obs = new ArrayList();
             
@@ -2094,6 +2082,7 @@ public class ProbeControl extends DisplayControlImpl {
                     obs.add(ob);
                 }
             }
+            System.err.println("got obs:" + obs.size());
             return PointObFactory.makeTimeSequenceOfPointObs(obs,0);
         }
 
@@ -2124,7 +2113,6 @@ public class ProbeControl extends DisplayControlImpl {
                                      info.getSamplingMode());
         }
         info.setWorkingGrid(workingGrid);
-        info.setPointSample(sample, elt);
         return sample;
     }
 
