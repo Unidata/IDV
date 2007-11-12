@@ -20,6 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.data.point;
 
 
@@ -118,7 +120,6 @@ public class PointObFactory {
      */
     public static FieldImpl makeTimeSequenceOfPointObs(FieldImpl pointObs)
             throws VisADException, RemoteException {
-
         return makeTimeSequenceOfPointObs(pointObs, -1);
     }
 
@@ -137,25 +138,40 @@ public class PointObFactory {
     public static FieldImpl makeTimeSequenceOfPointObs(FieldImpl pointObs,
             int lumpMinutes)
             throws VisADException, RemoteException {
-        int       numObs       = pointObs.getDomainSet().getLength();
-        List obs = new ArrayList();
+        int  numObs = pointObs.getDomainSet().getLength();
+        List obs    = new ArrayList();
         for (int i = 0; i < numObs; i++) {
             obs.add(pointObs.getSample(i));
         }
-        return makeTimeSequenceOfPointObs(obs,lumpMinutes);
+        return makeTimeSequenceOfPointObs(obs, lumpMinutes, -1);
     }
 
+    /**
+     * From a field of point observations, reorder them with time
+     * as the outer dimension. If componentIndex &gt; -1 then we extract that
+     * real value from the observation tuple and use that in the range.
+     * We also skip the intermediate index field and only use the first PointOb
+     * for each time step
+     *
+     * @param pointObs    Field of point observations (index -> pointobs)
+     * @param lumpMinutes If greater then 0 is used to lump the times of the point obs together
+     * @param componentIndex If &gt;= 0 then make a T-&gt;componentvalue field
+     * @return    time sequence of obs (time -> (index -> pointobs))
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
     public static FieldImpl makeTimeSequenceOfPointObs(List pointObs,
-            int lumpMinutes)
+            int lumpMinutes, int componentIndex)
             throws VisADException, RemoteException {
 
         Trace.call1("makeTimeSequence");
 
-        FieldImpl timeSequence = null;
-        List      uniqueTimes  = new ArrayList();
-        int       numObs       = pointObs.size();
-        MathType  obType       = null;
-        Hashtable timeToObs    = new Hashtable();
+
+        List      uniqueTimes = new ArrayList();
+        int       numObs      = pointObs.size();
+        MathType  obType      = null;
+        Hashtable timeToObs   = new Hashtable();
         // loop through and find all the unique times
         Trace.call1("makeTimeSequence-loop1",
                     " " + lumpMinutes + " num obs:" + numObs);
@@ -163,7 +179,12 @@ public class PointObFactory {
         for (int i = 0; i < numObs; i++) {
             PointOb ob = (PointOb) pointObs.get(i);
             if (i == 0) {
-                obType = ob.getType();
+                if (componentIndex < 0) {
+                    obType = ob.getType();
+                } else {
+                    obType = ((Tuple) ob.getData()).getComponent(
+                        componentIndex).getType();
+                }
             }
             DateTime dttm = ob.getDateTime();
             if (lumpMinutes > 0) {
@@ -190,26 +211,41 @@ public class PointObFactory {
                                new DateTime[uniqueTimes.size()]);
         Arrays.sort(times);
         RealType     index      = RealType.getRealType("index");
+
         FunctionType sampleType = new FunctionType(index, obType);
         FunctionType timeSequenceType = new FunctionType(RealType.Time,
-                                            sampleType);
-        timeSequence = new FieldImpl(timeSequenceType,
+                                            ((componentIndex < 0)
+                                             ? (MathType) sampleType
+                                             : obType));
+        FieldImpl timeSequence = new FieldImpl(timeSequenceType,
                                      DateTime.makeTimeSet(times));
 
         List samples = new ArrayList();
         Trace.call1("makeTimeSequence-loop2");
         Data[] timeSamples = new Data[times.length];
         for (int i = 0; i < times.length; i++) {
-            DateTime     dttm   = times[i];
-            Double       dValue = new Double(dttm.getValue());
-            List         v      = (List) timeToObs.get(dValue);
-            PointOb[]    obs    =
-                (PointOb[]) v.toArray(new PointOb[v.size()]);
+            DateTime dttm   = times[i];
+            Double   dValue = new Double(dttm.getValue());
+            List     v      = (List) timeToObs.get(dValue);
+            Data[]   obs;
+            if (componentIndex < 0) {
+                obs = (Data[]) v.toArray(new PointOb[v.size()]);
+            } else {
+                obs = new Data[v.size()];
+                for (int obIdx = 0; obIdx < v.size(); obIdx++) {
+                    obs[obIdx] = ((Tuple) ((PointOb) v.get(
+                        obIdx)).getData()).getComponent(componentIndex);
+                }
+            }
+            Integer1DSet set = new Integer1DSet(index, v.size());
+            if (componentIndex < 0) {
+                FieldImpl sample = new FieldImpl(sampleType, set);
+                sample.setSamples(obs, false, false);
+                timeSamples[i] = sample;
+            } else {
+                timeSamples[i] = obs[0];
+            }
 
-            Integer1DSet set    = new Integer1DSet(index, obs.length);
-            FieldImpl    sample = new FieldImpl(sampleType, set);
-            sample.setSamples(obs, false, false);
-            timeSamples[i] = sample;
         }
         Trace.call2("makeTimeSequence-loop2");
         timeSequence.setSamples(timeSamples, false, false);
@@ -482,7 +518,7 @@ public class PointObFactory {
                                           (Real) ob.getComponent(lonIndex),
                                           (altIndex != -1)
                                           ? (Real) ob.getComponent(altIndex)
-                                          : new Real(RealType.Altitude,0));
+                                          : new Real(RealType.Altitude, 0));
 
                 Data rest = null;
                 // now make data
@@ -829,7 +865,7 @@ public class PointObFactory {
         while (dataIterator.hasNext()) {
             PointObsDatatype po = (PointObsDatatype) dataIterator.next();
             ucar.nc2.dt.EarthLocation el = po.getLocation();
-            if(el == null) {
+            if (el == null) {
                 continue;
             }
             if ((llr != null)
@@ -997,6 +1033,7 @@ public class PointObFactory {
      * Make a PointOb from an EarthLocation.  The time and data
      * are bogus.
      * @param el  EarthLocation to use
+     * @param dt _more_
      * @return PointOb
      *
      * @throws RemoteException  Java RMI error
@@ -1004,7 +1041,9 @@ public class PointObFactory {
      */
     public static PointOb makePointOb(EarthLocation el, DateTime dt)
             throws VisADException, RemoteException {
-        if (dt == null) dt = new DateTime(Double.NaN);
+        if (dt == null) {
+            dt = new DateTime(Double.NaN);
+        }
         return new PointObTuple(el, dt,
                                 new RealTuple(new Real[] { new Real(0) }));
     }
