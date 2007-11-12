@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.grid.gempak;
 
 
@@ -219,7 +220,7 @@ public class GempakFileReader implements GempakConstants {
         if (dmLabel == null) {
             return;
         }
-        int iread = dmLabel.kpfile;
+        int      iread      = dmLabel.kpfile;
         int      numheaders = dmLabel.kfhdrs;
         String[] names      = new String[numheaders];
         int[]    lens       = new int[numheaders];
@@ -280,7 +281,7 @@ public class GempakFileReader implements GempakConstants {
         if (dmLabel == null) {
             return;
         }
-        int iread = dmLabel.kppart;
+        int      iread     = dmLabel.kppart;
         int      numParts  = dmLabel.kprt;
         DMPart[] partArray = new DMPart[numParts];
         // read the part names
@@ -917,7 +918,9 @@ public class GempakFileReader implements GempakConstants {
         }
         int idata = rf.readInt();
         if (IMISSD != dmLabel.kmissd) {
-            if (idata == dmLabel.kmissd) idata = IMISSD;
+            if (idata == dmLabel.kmissd) {
+                idata = IMISSD;
+            }
         }
         return idata;
     }
@@ -983,7 +986,9 @@ public class GempakFileReader implements GempakConstants {
         }
         float rdata = rf.readFloat();
         if (RMISSD != dmLabel.smissd) {
-            if (Math.abs(rdata - dmLabel.smissd) < RDIFFD) rdata = RMISSD;
+            if (Math.abs(rdata - dmLabel.smissd) < RDIFFD) {
+                rdata = RMISSD;
+            }
         }
         return rdata;
     }

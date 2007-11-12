@@ -22,6 +22,7 @@
 
 package ucar.unidata.data.grid.gempak;
 
+
 /**
  * GridTableLookup.java
  */
@@ -175,7 +176,12 @@ public interface GridTableLookup {
 
     /**
      * Check to see if this grid is a layer variable
+     *
+     * @param gr  record to check
+     *
+     * @return  true if a layer
      */
     public boolean isLayer(GridRecord gr);
 
 }
+

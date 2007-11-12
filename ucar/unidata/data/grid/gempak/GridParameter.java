@@ -18,7 +18,9 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.grid.gempak;
+
 
 /**
  * Class which represents a grid parameter.
@@ -68,7 +70,7 @@ public final class GridParameter {
      * @param unit of parameter
      */
     public GridParameter(int number, String name, String description,
-                     String unit) {
+                         String unit) {
         this.number      = number;
         this.name        = name;
         this.description = description;

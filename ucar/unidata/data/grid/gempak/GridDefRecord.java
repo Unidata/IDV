@@ -1,24 +1,25 @@
 /*
  * $Id: IDV-Style.xjs,v 1.3 2007/02/16 19:18:30 dmurray Exp $
- * 
+ *
  * Copyright 1997-2007 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 
 package ucar.unidata.data.grid.gempak;
 
@@ -92,23 +93,29 @@ public class GridDefRecord {
     /** minor axis of earth */
     public static final String MINOR_AXIS_EARTH = "minor_axis_earth";
 
-    /** _more_ */
+    /** _more_ 
     public String gdsKey, winds;
+    */
 
-    /** _more_ */
+    /** _more_ 
     public int grid_type, nx, ny, resolution;
+    */
 
-    /** _more_ */
+    /** _more_ 
     public double dx, dy;
+    */
 
-    /** _more_ */
+    /** _more_ 
     public double latin1, latin2, La1, Lo1, LaD, LoV;
+    */
 
-    /** _more_ */
+    /** _more_ 
     public int grid_shape_code;
+    */
 
-    /** _more_ */
+    /** _more_ 
     public double radius_spherical_earth, major_axis_earth, minor_axis_earth;
+    */
 
     /**
      * constructor.
@@ -161,3 +168,4 @@ public class GridDefRecord {
         }
     }
 }
+

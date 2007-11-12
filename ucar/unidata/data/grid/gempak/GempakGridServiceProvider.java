@@ -22,14 +22,15 @@
 
 
 
+
 package ucar.unidata.data.grid.gempak;
 
 
 import ucar.ma2.*;
 
 import ucar.nc2.*;
-import ucar.nc2.util.CancelTask;
 import ucar.nc2.dt.fmr.FmrcCoordSys;
+import ucar.nc2.util.CancelTask;
 
 import ucar.unidata.io.RandomAccessFile;
 
@@ -46,7 +47,10 @@ import java.util.List;
  */
 public class GempakGridServiceProvider extends GempakIOServiceProvider {
 
+    /** FMRC coordinate system */
     protected FmrcCoordSys fmrcCoordSys;
+
+    /** debug timing flag */
     private boolean debugTiming = false;
 
     /**
@@ -91,8 +95,9 @@ public class GempakGridServiceProvider extends GempakIOServiceProvider {
      * @param special  isn't that special?
      */
     public void setSpecial(Object special) {
-        if (special instanceof FmrcCoordSys)
-          fmrcCoordSys = (FmrcCoordSys) special;
+        if (special instanceof FmrcCoordSys) {
+            fmrcCoordSys = (FmrcCoordSys) special;
+        }
     }
 
     /**
@@ -104,89 +109,158 @@ public class GempakGridServiceProvider extends GempakIOServiceProvider {
      * @throws IOException problem reading from file
      * @throws InvalidRangeException  invalid Range
      */
-  public Array readData(Variable v2, List section) throws IOException, InvalidRangeException {
-    long start = System.currentTimeMillis();
+    public Array readData(Variable v2, List section)
+            throws IOException, InvalidRangeException {
+        long start = System.currentTimeMillis();
 
-    Array dataArray = Array.factory( DataType.FLOAT.getClassType(), Range.getShape(section));
-    GridVariable pv = (GridVariable) v2.getSPobject();
+        Array dataArray = Array.factory(DataType.FLOAT.getClassType(),
+                                        Range.getShape(section));
+        GridVariable  pv        = (GridVariable) v2.getSPobject();
 
-    int count = 0;
-    Range timeRange = (Range) section.get(count++);
-    Range levRange = pv.hasVert() ? (Range) section.get(count++) : null;
-    Range yRange = (Range) section.get(count++);
-    Range xRange = (Range) section.get(count);
+        int           count     = 0;
+        Range         timeRange = (Range) section.get(count++);
+        Range         levRange  = pv.hasVert()
+                                  ? (Range) section.get(count++)
+                                  : null;
+        Range         yRange    = (Range) section.get(count++);
+        Range         xRange    = (Range) section.get(count);
 
-    IndexIterator ii = dataArray.getIndexIteratorFast();
+        IndexIterator ii        = dataArray.getIndexIteratorFast();
 
-    // loop over time
-    for (int timeIdx = timeRange.first(); timeIdx <= timeRange.last(); timeIdx += timeRange.stride()) {
-      if (pv.hasVert())
-        readLevel(v2, timeIdx, levRange, yRange, xRange, ii);
-      else
-        readXY(v2, timeIdx, 0, yRange, xRange, ii);
+        // loop over time
+        for (int timeIdx = timeRange.first(); timeIdx <= timeRange.last();
+                timeIdx += timeRange.stride()) {
+            if (pv.hasVert()) {
+                readLevel(v2, timeIdx, levRange, yRange, xRange, ii);
+            } else {
+                readXY(v2, timeIdx, 0, yRange, xRange, ii);
+            }
+        }
+
+        if (debugTiming) {
+            long took = System.currentTimeMillis() - start;
+            System.out.println("  read data took=" + took + " msec ");
+        }
+
+        return dataArray;
     }
 
-    if (debugTiming) {
-        long took = System.currentTimeMillis() - start;
-        System.out.println("  read data took="+took+" msec ");
+    // loop over level
+
+    /**
+     * Read a level
+     *
+     * @param v2 _more_
+     * @param timeIdx _more_
+     * @param levelRange _more_
+     * @param yRange _more_
+     * @param xRange _more_
+     * @param ii _more_
+     *
+     * @throws IOException _more_
+     * @throws InvalidRangeException _more_
+     */
+    private void readLevel(Variable v2, int timeIdx, Range levelRange,
+                          Range yRange, Range xRange, IndexIterator ii)
+            throws IOException, InvalidRangeException {
+        for (int levIdx = levelRange.first(); levIdx <= levelRange.last();
+                levIdx += levelRange.stride()) {
+            readXY(v2, timeIdx, levIdx, yRange, xRange, ii);
+        }
     }
 
-    return dataArray;
-  }
+    // read one product
 
-  // loop over level
-  public void readLevel(Variable v2, int timeIdx, Range levelRange, Range yRange, Range xRange, IndexIterator ii) throws IOException, InvalidRangeException {
-    for (int levIdx = levelRange.first(); levIdx <= levelRange.last(); levIdx += levelRange.stride()) {
-      readXY(v2, timeIdx, levIdx, yRange, xRange, ii);
+    /**
+     * _more_
+     *
+     * @param v2 _more_
+     * @param timeIdx _more_
+     * @param levIdx _more_
+     * @param yRange _more_
+     * @param xRange _more_
+     * @param ii _more_
+     *
+     * @throws IOException _more_
+     * @throws InvalidRangeException _more_
+     */
+    private void readXY(Variable v2, int timeIdx, int levIdx, Range yRange,
+                       Range xRange, IndexIterator ii)
+            throws IOException, InvalidRangeException {
+        Attribute         att           = v2.findAttribute("missing_value");
+        float             missing_value = (att == null)
+                                          ? -9999.0f
+                                          : att.getNumericValue()
+                                              .floatValue();
+
+        GridVariable      pv            = (GridVariable) v2.getSPobject();
+        GridHorizCoordSys hsys          = pv.getHorizCoordSys();
+        int               nx            = hsys.getNx();
+
+        GridRecord        record        = pv.findRecord(timeIdx, levIdx);
+        if (record == null) {
+            int xyCount = yRange.length() * xRange.length();
+            for (int j = 0; j < xyCount; j++) {
+                ii.setFloatNext(missing_value);
+            }
+            return;
+        }
+
+        // otherwise read it
+        float[] data;
+        try {
+            data = _readData(record);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        for (int y = yRange.first(); y <= yRange.last();
+                y += yRange.stride()) {
+            for (int x = xRange.first(); x <= xRange.last();
+                    x += xRange.stride()) {
+                int index = y * nx + x;
+                ii.setFloatNext(data[index]);
+            }
+        }
     }
-  }
 
-  // read one product
-  public void readXY(Variable v2, int timeIdx, int levIdx, Range yRange, Range xRange, IndexIterator ii) throws IOException, InvalidRangeException {
-    Attribute att = v2.findAttribute("missing_value");
-    float missing_value = (att == null) ? -9999.0f : att.getNumericValue().floatValue();
-
-    GridVariable pv = (GridVariable) v2.getSPobject();
-    GridHorizCoordSys hsys = pv.getHorizCoordSys();
-    int nx = hsys.getNx();
-
-    GridRecord record = pv.findRecord(timeIdx, levIdx);
-    if (record == null) {
-      int xyCount = yRange.length() * xRange.length();
-      for (int j=0; j<xyCount; j++)
-        ii.setFloatNext( missing_value);
-      return;
+    /**
+     * _more_
+     *
+     * @param v2 _more_
+     * @param timeIdx _more_
+     * @param levIdx _more_
+     *
+     * @return _more_
+     *
+     * @throws InvalidRangeException _more_
+     */
+    private boolean isMissingXY(Variable v2, int timeIdx, int levIdx)
+            throws InvalidRangeException {
+        GridVariable pv = (GridVariable) v2.getSPobject();
+        if ((timeIdx < 0) || (timeIdx >= pv.getNTimes())) {
+            throw new InvalidRangeException("timeIdx=" + timeIdx);
+        }
+        if ((levIdx < 0) || (levIdx >= pv.getVertNlevels())) {
+            throw new InvalidRangeException("levIdx=" + levIdx);
+        }
+        return (null == pv.findRecord(timeIdx, levIdx));
     }
 
-    // otherwise read it
-    float[] data;
-    try {
-      data = _readData(record);
-    } catch (Exception e) {
-      e.printStackTrace();
-      return;
+    /**
+     * Read the data for this GridRecord
+     *
+     * @param gr   grid identifier
+     *
+     * @return  the data (or null)
+     *
+     * @throws IOException  problem reading the data
+     */
+    protected float[] _readData(GridRecord gr) throws IOException {
+        return ((GempakGridReader) gemreader).readGrid(
+            ((GempakGridRecord) gr).gridNumber);
     }
-
-    for (int y = yRange.first(); y <= yRange.last(); y += yRange.stride()) {
-      for (int x = xRange.first(); x <= xRange.last(); x += xRange.stride()) {
-        int index = y * nx + x;
-        ii.setFloatNext( data[index]);
-      }
-    }
-  }
-
-  public boolean isMissingXY(Variable v2, int timeIdx, int levIdx) throws InvalidRangeException {
-    GridVariable pv = (GridVariable) v2.getSPobject();
-    if ((timeIdx < 0) || (timeIdx >= pv.getNTimes()))
-      throw new InvalidRangeException( "timeIdx="+timeIdx);
-    if ((levIdx < 0) || (levIdx >= pv.getVertNlevels()))
-      throw new InvalidRangeException( "levIdx="+levIdx);
-    return (null == pv.findRecord(timeIdx, levIdx));
-  }
-
-  protected float[] _readData(GridRecord gr) throws IOException {
-      return ((GempakGridReader) gemreader).readGrid(((GempakGridRecord)gr).gridNumber);
-  }
 
 }
 

@@ -19,6 +19,7 @@
  */
 
 
+
 package ucar.unidata.data.grid.gempak;
 
 
@@ -28,7 +29,7 @@ package ucar.unidata.data.grid.gempak;
  */
 public final class GempakLookup implements GridTableLookup {
 
-    /**  sample grid */
+    /** sample grid */
     private GempakGridRecord sample;
 
     /**
@@ -63,8 +64,8 @@ public final class GempakLookup implements GridTableLookup {
      * @return Parameter
      */
     public final GridParameter getParameter(GridRecord gr) {
-        String name = gr.getParameterName();
-        GridParameter p = new GridParameter(1,name,name,null);
+        String        name = gr.getParameterName();
+        GridParameter p    = new GridParameter(1, name, name, null);
         return p;
     }
 
@@ -148,20 +149,20 @@ public final class GempakLookup implements GridTableLookup {
      * @return ProjectionType
      */
     public final int getProjectionType(GridDefRecord gds) {
-          String name = getProjectionName(gds).trim();
-          if (name.equals("CED")) {
-              return -1;
-          } else if (name.equals("MER")) {
-              return Mercator;
-          } else if (name.equals("LCC")) {
-              return LambertConformal;
-          } else if (name.equals("PS")) {
-              return PolarStereographic;
-          } else if (name.equals("STR")) {
-              return PolarStereographic;
-          } else {
-              return -1;
-          }
+        String name = getProjectionName(gds).trim();
+        if (name.equals("CED")) {
+            return -1;
+        } else if (name.equals("MER")) {
+            return Mercator;
+        } else if (name.equals("LCC")) {
+            return LambertConformal;
+        } else if (name.equals("PS")) {
+            return PolarStereographic;
+        } else if (name.equals("STR")) {
+            return PolarStereographic;
+        } else {
+            return -1;
+        }
     }
 
     /**
@@ -171,10 +172,10 @@ public final class GempakLookup implements GridTableLookup {
      */
     public final boolean isVerticalCoordinate(GridRecord gr) {
         int type = gr.getLevelType1();
-        if (type > GempakUtil.vertCoords.length ||
-           !GempakUtil.vertCoords[type].equals("NONE")) {
-           return true;
-        } 
+        if ((type > GempakUtil.vertCoords.length)
+                || !GempakUtil.vertCoords[type].equals("NONE")) {
+            return true;
+        }
         return false;
     }
 
@@ -185,9 +186,9 @@ public final class GempakLookup implements GridTableLookup {
      */
     public final boolean isPositiveUp(GridRecord gr) {
         int type = gr.getLevelType1();
-        if (type == 1 || type == 5) {
+        if ((type == 1) || (type == 5)) {
             return false;
-        } 
+        }
         return true;
     }
 
@@ -199,13 +200,30 @@ public final class GempakLookup implements GridTableLookup {
         return GempakConstants.RMISSD;
     }
 
+    /**
+     * Is this a layer?
+     *
+     * @param gr  record to check
+     *
+     * @return true if a layer
+     */
     public boolean isLayer(GridRecord gr) {
-      if (gr.getLevel2() == -1) return true;
-      return false;      
+        if (gr.getLevel2() == -1) {
+            return true;
+        }
+        return false;
     }
 
+    /**
+     * Get the projection name
+     *
+     * @param gds  the projection name
+     *
+     * @return the name or null if not set
+     */
     private String getProjectionName(GridDefRecord gds) {
         return gds.getParam("Proj");
     }
 
 }
+

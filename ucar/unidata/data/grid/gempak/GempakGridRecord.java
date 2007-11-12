@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.grid.gempak;
 
 
@@ -169,7 +170,9 @@ public class GempakGridRecord implements GridRecord {
      */
     public String getGridDefRecordId() {
         return navBlock.toString();
-    };
+    }
+
+    ;
 
     /**
      * Get a String representation of this object
