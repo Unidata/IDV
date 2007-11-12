@@ -294,7 +294,6 @@ public class ResourceCollection {
      * @param resourceIdx
      *  @return A short name for the given resource.
      */
-
     public String getShortName(int resourceIdx) {
         //For now just return 
         String label = getLabel(resourceIdx);
@@ -302,6 +301,12 @@ public class ResourceCollection {
             return label;
         }
         String path = get(resourceIdx).toString();
+        try {
+            path =  java.net.URLDecoder.decode(path, "UTF-8");
+        } catch (java.io.UnsupportedEncodingException uee) {
+            System.err.println("decoding error:" + uee);
+        }
+
         String tail = IOUtil.getFileTail(path);
         if (tail.endsWith(".xml")) {
             tail = IOUtil.stripExtension(tail);
