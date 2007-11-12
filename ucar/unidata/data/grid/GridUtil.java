@@ -23,12 +23,15 @@
 
 package ucar.unidata.data.grid;
 
+import org.apache.poi.hssf.usermodel.*;
 
 import ucar.unidata.data.DataUtil;
 
 
 import ucar.unidata.data.point.PointObTuple;
 
+import ucar.unidata.util.JobManager;
+import ucar.unidata.util.FileManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
@@ -3822,6 +3825,98 @@ public class GridUtil {
                                + (t2 - t1) + " read:" + (t3 - t2));
         }
     }
+
+
+    public static void writeGridToXls(FieldImpl grid) throws Exception {
+        String filename = FileManager.getWriteFile(FileManager.FILTER_XLS,null);
+        if(filename == null) return;
+        writeGridToXls(grid, filename);
+    }
+
+    public static void writeGridToXls(FieldImpl grid,String filename) throws Exception {
+        Object loadId = JobManager.getManager().startLoad("Writing grid to xls", true);
+        try {
+            HSSFWorkbook wb  = new HSSFWorkbook();
+            HSSFRow row;
+            int sheetIdx = -1;
+            List sheets = new ArrayList();
+            OutputStream fileOut = new BufferedOutputStream(new FileOutputStream(filename),1000000);
+            int MAXROWS = 65000;
+            if (isTimeSequence(grid)) {
+                SampledSet   timeSet      = (SampledSet) getTimeSet(grid);
+                double[][]   times        = timeSet.getDoubles(false);
+                Unit         timeUnit     = timeSet.getSetUnits()[0];
+                int numTimes = timeSet.getLength();
+                float[][] domainVals =null;
+                int colOffset = 2;
+                int rowCnt;
+                int sheetCnt;
+                HSSFSheet sheet = null;
+                for (int timeIdx = 0; timeIdx < numTimes; timeIdx++) {
+                    DateTime dt = new DateTime(times[0][timeIdx], timeUnit);
+                    JobManager.getManager().setDialogLabel1(loadId, "Writing grid time:" +(timeIdx+1) +"/" + numTimes);
+                    FlatField ff = (FlatField)grid.getSample(timeIdx);
+                    if (ff == null) {
+                        continue;
+                    }
+                    if(sheets.size()==0) {
+                        SampledSet   ss  = getSpatialDomain(ff);
+                        SampledSet latLonSet =
+                            Util.convertDomain(
+                                               ss, ss.getCoordinateSystem().getReference(),
+                                               null);
+
+                        domainVals = latLonSet.getSamples(false);
+                        rowCnt = -1;
+                        for(int rowIdx=0;rowIdx< domainVals[0].length;rowIdx++) {
+                            if(rowCnt>=MAXROWS || rowCnt==-1) {
+                                sheets.add(sheet = wb.createSheet());
+                                row =  sheet.createRow(0);
+                                row.createCell((short)0).setCellValue("Latitude");
+                                row.createCell((short)1).setCellValue("Longitude");
+                                if(domainVals.length>2) {
+                                    row.createCell((short)2).setCellValue("Altitude");
+                                    colOffset = 3;
+                                }
+                                rowCnt=0;
+                            }
+                            row =  sheet.createRow(rowCnt+1);
+                            row.createCell((short)0).setCellValue(domainVals[0][rowIdx]);
+                            row.createCell((short)1).setCellValue(domainVals[1][rowIdx]);
+                            if(domainVals.length>2) {
+                                row.createCell((short)2).setCellValue(domainVals[2][rowIdx]);
+                            }
+                            rowCnt++;
+                        }
+                    }
+                    float[][] rangeVals = ff.getFloats(false);
+                    rowCnt = -1;
+                    sheetCnt = -1;
+                    sheet = null;
+                    for(int rowIdx=0;rowIdx< domainVals[0].length;rowIdx++) {
+                        if(rowCnt==-1 ||rowCnt>=MAXROWS) {
+                            rowCnt = 0;
+                            sheetCnt++;
+                            sheet = (HSSFSheet) sheets.get(sheetCnt);
+                            row = sheet.getRow(0);
+                            row.createCell((short)(colOffset+timeIdx)).setCellValue(dt.toString());
+                        }
+                        row = sheet.getRow(rowCnt+1);
+                        row.createCell((short)(colOffset+timeIdx)).setCellValue(rangeVals[0][rowIdx]);
+                        rowCnt++;
+                    }
+                }
+            }
+            JobManager.getManager().setDialogLabel1(loadId, "Writing spreadsheet");
+            wb.write(fileOut);
+            fileOut.close();
+        } catch(Exception exc) {
+            LogUtil.logException ("Writing grid to xls file: " + filename, exc);
+        } finally {
+            JobManager.getManager().stopLoad(loadId);
+        }
+    }
+
 
 }
 
