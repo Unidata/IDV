@@ -311,6 +311,7 @@ public class DataTreeDialog implements ActionListener {
                 }
             });
             DataSelectionWidget dsw = new DataSelectionWidget(idv, false);
+            dsw.setDefaultLevelToFirst(false);
             dataSelectionWidgets.add(dsw);
             DataChoice dataChoice =
                 ((DataTree) dataTrees.get(i)).getSelectedDataChoice();

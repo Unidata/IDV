@@ -151,6 +151,9 @@ public class DataSelectionWidget {
     /** Current list of levels */
     private List levels;
 
+    private boolean defaultLevelToFirst = true;
+
+
     /** Shows the levels */
     private JList levelsList;
 
@@ -372,33 +375,37 @@ public class DataSelectionWidget {
                         100);
                 levelsTab = levelsScroller;
             }
-            Vector tmp = new Vector();
-            tmp.add(new TwoFacedObject("All Levels", null));
+            Vector levelsForGui = new Vector();
+            levelsForGui.add(new TwoFacedObject("All Levels", null));
             for (int i = 0; i < levels.size(); i++) {
                 Object o = levels.get(i);
                 if (o instanceof visad.Real) {
                     visad.Real r = (visad.Real) levels.get(i);
-                    tmp.add(Util.labeledReal(r, true));
+                    levelsForGui.add(Util.labeledReal(r, true));
                 } else {
-                    tmp.add(o);
+                    levelsForGui.add(o);
                 }
             }
 
 
             Object[] selectedLevels = levelsList.getSelectedValues();
-            levelsList.setListData(tmp);
+            levelsList.setListData(levelsForGui);
             ListSelectionModel lsm    = levelsList.getSelectionModel();
             boolean            didone = false;
             for (int i = 0; i < selectedLevels.length; i++) {
-                int index = tmp.indexOf(selectedLevels[i]);
+                int index = levelsForGui.indexOf(selectedLevels[i]);
                 if (index >= 0) {
                     lsm.addSelectionInterval(index, index);
                     didone = true;
                 }
             }
             if ( !didone) {
-                if (tmp.size() > 1) {
-                    levelsList.setSelectedIndex(1);
+                if (levelsForGui.size() > 1) {
+                    if(defaultLevelToFirst) {
+                        levelsList.setSelectedIndex(1);
+                    } else {
+                        levelsList.setSelectedIndex(0);
+                    }
                 } else {
                     levelsList.setSelectedIndex(0);
                 }
@@ -829,6 +836,24 @@ public class DataSelectionWidget {
         return new JComponent[] { timesList, allTimesButton,
                                   GuiUtils.topCenter(top, scroller) };
     }
+
+/**
+Set the DefaultLevelToFirst property.
+
+@param value The new value for DefaultLevelToFirst
+**/
+public void setDefaultLevelToFirst (boolean value) {
+	defaultLevelToFirst = value;
+}
+
+/**
+Get the DefaultLevelToFirst property.
+
+@return The DefaultLevelToFirst
+**/
+public boolean getDefaultLevelToFirst () {
+	return defaultLevelToFirst;
+}
 
 
 
