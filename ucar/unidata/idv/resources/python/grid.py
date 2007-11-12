@@ -231,3 +231,9 @@ def makeTimeSequence(g):
      fld.setSample(i,g[index[i]].getSample(0),0)
   return fld
 
+
+
+def writeGridToXls(grid,filename='grid.xls'):
+    """Write out the grid data to an excel spreadsheet"""
+    GridUtil.writeGridToXls(grid,filename)
+    return grid

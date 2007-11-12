@@ -137,6 +137,13 @@ import javax.swing.text.JTextComponent;
  */
 public class IdvUIManager extends IdvManager {
 
+    public static final String FIELDTYPE_TEXT = "text";
+    public static final String FIELDTYPE_BOOLEAN = "boolean";
+    public static final String FIELDTYPE_CHOICE = "choice";
+    public static final String FIELDTYPE_FILE = "file";
+    public static final String FIELDTYPE_LOCATION = "location";
+    public static final String FIELDTYPE_AREA = "area";
+
 
     /** _more_ */
     public static ImageIcon ICON_LOCK;
@@ -5205,7 +5212,7 @@ public class IdvUIManager extends IdvManager {
             DataOperand operand   = (DataOperand) userOperands.get(i);
             String      fieldType = (String) operand.getProperty("type");
             if (fieldType == null) {
-                fieldType = "text";
+                fieldType = FIELDTYPE_TEXT;
             }
             String label         = operand.getLabel();
             Object dflt          = operand.getUserDefault();
@@ -5218,7 +5225,7 @@ public class IdvUIManager extends IdvManager {
             persistentCbxs.add(cbx);
             JComponent field     = null;
             JComponent fieldComp = null;
-            if (fieldType.equals("text")) {
+            if (fieldType.equals(FIELDTYPE_TEXT)) {
                 String rowString = (String) operand.getProperty("rows");
                 if (rowString == null) {
                     rowString = "1";
@@ -5234,12 +5241,12 @@ public class IdvUIManager extends IdvManager {
                             : "", rows, 15);
                     fieldComp = GuiUtils.makeScrollPane(field, 200, 100);
                 }
-            } else if (fieldType.equals("boolean")) {
+            } else if (fieldType.equals(FIELDTYPE_BOOLEAN)) {
                 field = new JCheckBox("", ((dflt != null)
                                            ? new Boolean(
                                            dflt.toString()).booleanValue()
                                            : true));
-            } else if (fieldType.equals("choice")) {
+            } else if (fieldType.equals(FIELDTYPE_CHOICE)) {
                 String choices = (String) operand.getProperty("choices");
                 if (choices == null) {
                     throw new IllegalArgumentException(
@@ -5251,8 +5258,29 @@ public class IdvUIManager extends IdvManager {
                 if ((dflt != null) && l.contains(dflt)) {
                     ((JComboBox) field).setSelectedItem(dflt);
                 }
-            } else if (fieldType.equals("location")) {
-                List l = StringUtil.split(dflt.toString(), ";", true, true);
+            } else if (fieldType.equals(FIELDTYPE_FILE)) {
+                JTextField fileFld = new JTextField((dflt!=null?dflt.toString():""),30);
+                field = fileFld;
+                String   patterns = operand.getProperty("filepattern");
+                List  filters=null;
+                if(patterns!=null) {
+                    filters = new ArrayList();
+                    List toks = StringUtil.split(patterns,";",true,true);
+                    for(int tokIdx=0;tokIdx<toks.size();tokIdx++) {
+                        String tok  = (String) toks.get(tokIdx);
+                        List subToks = StringUtil.split(tok,":",true,true);
+                        if(subToks.size()==2) {
+                            filters.add(new PatternFileFilter((String) subToks.get(0),
+                                                              (String) subToks.get(1)));
+                        } else {
+                            filters.add(new PatternFileFilter(tok,tok));
+                        }
+                    }
+                }
+                fieldComp = GuiUtils.centerRight(GuiUtils.hfill(fileFld),
+                                                 GuiUtils.makeFileBrowseButton(fileFld,filters));
+            } else if (fieldType.equals(FIELDTYPE_LOCATION)) {
+                List l = (dflt!=null?StringUtil.split(dflt.toString(), ";", true, true):(List)new ArrayList());
                 final LatLonWidget llw = new LatLonWidget();
                 field = llw;
                 if (l.size() == 2) {
@@ -5271,7 +5299,7 @@ public class IdvUIManager extends IdvManager {
                 JComponent centerPopup = GuiUtils.inset(centerPopupBtn,
                                              new Insets(0, 0, 0, 4));
                 fieldComp = GuiUtils.hbox(llw, centerPopup);
-            } else if (fieldType.equals("area")) {
+            } else if (fieldType.equals(FIELDTYPE_AREA)) {
                 //TODO:
             } else {
                 throw new IllegalArgumentException("Unknown type: "
