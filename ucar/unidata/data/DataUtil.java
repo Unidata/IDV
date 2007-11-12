@@ -385,8 +385,9 @@ public class DataUtil {
                 HSSFCell cell = row.createCell((short) colIdx);
                 if (o instanceof Double) {
                     cell.setCellValue(((Double) o).doubleValue());
-                }
-                if (o instanceof Integer) {
+                } else if (o instanceof Real) {
+                    cell.setCellValue(((Real) o).getValue());
+                } else if (o instanceof Integer) {
                     cell.setCellValue(((Integer) o).intValue());
                 } else {
                     cell.setCellValue(o.toString());
