@@ -438,14 +438,12 @@ public class TextPointDataSource extends PointDataSource {
 
 
         applySavedMetaData(metaDataFields);
-        //        JComponent panel = GraphPaperLayout.layout(comps);
         GuiUtils.tmpInsets = new Insets(5,5,0,0);
         double[]stretch = {0.0,1.0,1.0,0.0,0.5};
         JComponent panel = GuiUtils.doLayout(comps,5, stretch,
                                              GuiUtils.WT_N);
         widgetPanel.removeAll();
-        JScrollPane widgetSP  = GuiUtils.makeScrollPane(GuiUtils.top(panel),200,200);
-        //        widgetSP.setPreferredSize(new Dimension(200,300));
+        JScrollPane widgetSP  = GuiUtils.makeScrollPane(GuiUtils.top(GuiUtils.inset(panel,5)),200,200);
         widgetPanel.add(BorderLayout.CENTER, widgetSP);
     }
 
@@ -456,7 +454,6 @@ public class TextPointDataSource extends PointDataSource {
             paramRow.setName((String) toks.get(i));
         }
     }
-
 
 
 
@@ -529,15 +526,15 @@ public class TextPointDataSource extends PointDataSource {
             widgetPanel = new JPanel(new BorderLayout());
             JLabel lbl =
                 new JLabel(
-                    "<html>Please enter the field names and units. Leave the name field blank to skip the field</html>");
+                    "Enter the field names and units. Leave name field blank to skip the field    ");
 
             JComponent wrapper = new JPanel(new BorderLayout());
             JButton saveBtn = GuiUtils.makeButton("Preferences", this,
                                   "popupMetaDataMenu", wrapper);
             wrapper.add(BorderLayout.CENTER, saveBtn);
 
-            metaDataComp = GuiUtils.topCenter(GuiUtils.vbox(skipContents,lbl,
-                                                            GuiUtils.right(wrapper)),
+            metaDataComp = GuiUtils.topCenter(GuiUtils.vbox(skipContents,GuiUtils.leftRight(lbl,
+                                                            GuiUtils.right(wrapper))),
                                                              widgetPanel);
             metaDataComp = GuiUtils.inset(metaDataComp, 5);
             setLineText(lineLbl, skipRows, lines);
