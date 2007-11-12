@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.data.grid.gempak;
 
 
@@ -105,6 +106,7 @@ public class GempakGridReader extends GempakFileReader {
      */
     protected boolean init() throws IOException {
 
+        ucar.unidata.util.Misc.printStack("ggr.init()");
         if ( !super.init()) {
             return false;
         }
@@ -144,7 +146,9 @@ public class GempakGridReader extends GempakFileReader {
         if (headerArray == null) {
             return false;
         }
-        navBlock    = new GridNavBlock(headerArray);
+        navBlock = new GridNavBlock(headerArray);
+        gridIndex.addHorizCoordSys(navBlock);
+
         headerArray = getFileHeader("ANLB");
         if (headerArray == null) {
             return false;
@@ -170,7 +174,11 @@ public class GempakGridReader extends GempakFileReader {
                 }
                 GempakGridRecord gh = new GempakGridRecord(i + 1, header);
                 gh.navBlock = navBlock;
-                gridIndex.addGridRecord(gh);
+                String param = gh.getParameterName().trim();
+                if (param.equals("PMSL") || param.equals("TMPK")) {
+                    //if (param.equals("PMSL")) {
+                    gridIndex.addGridRecord(gh);
+                }
             }
             iword += header.length;
         }

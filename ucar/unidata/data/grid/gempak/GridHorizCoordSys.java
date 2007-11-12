@@ -55,41 +55,41 @@ import java.util.HashMap;
  */
 public class GridHorizCoordSys {
 
-    /** _more_          */
+    /** _more_ */
     private GridTableLookup lookup;
 
-    /** _more_          */
+    /** _more_ */
     private GridDefRecord gdsIndex;
 
-    /** _more_          */
+    /** _more_ */
     private Group g;
 
-    /** _more_          */
+    /** _more_ */
     private boolean debug = false;
 
-    /** _more_          */
+    /** _more_ */
     private String grid_name, shape_name, id;
 
-    /** _more_          */
+    /** _more_ */
     private boolean isLatLon   = true,
                     isGaussian = false;
 
-    /** _more_          */
+    /** _more_ */
     HashMap varHash = new HashMap(200);  // GridVariables that have this GridHorizCoordSys
 
-    /** _more_          */
+    /** _more_ */
     HashMap productHash = new HashMap(100);  // List of GridVariable, sorted by product desc
 
-    /** _more_          */
+    /** _more_ */
     HashMap vcsHash = new HashMap(30);  // GridVertCoordSys
 
-    /** _more_          */
+    /** _more_ */
     private double startx, starty;
 
-    /** _more_          */
+    /** _more_ */
     private ProjectionImpl proj;
 
-    /** _more_          */
+    /** _more_ */
     private ArrayList attributes = new ArrayList();
 
     /**
@@ -233,7 +233,8 @@ public class GridHorizCoordSys {
     void addToNetcdfFile(NetcdfFile ncfile) {
 
         if (isLatLon) {
-            double dy = (getParamValue("La2") < getParamValue(gdsIndex.LA1))
+            double dy = (getParamValue(gdsIndex.LA2)
+                         < getParamValue(gdsIndex.LA1))
                         ? -getParamValue(gdsIndex.DY)
                         : getParamValue(gdsIndex.DY);
             if (isGaussian) {
@@ -343,7 +344,7 @@ public class GridHorizCoordSys {
                 "Gaussian LAt/Lon grid must have NumberParallels parameter");
         }
         double            startLat       = getParamValue(gdsIndex.LA1);
-        double            endLat         = getParamValue("La2");
+        double            endLat         = getParamValue(gdsIndex.LA2);
 
         int               nlats          = (int) (2 * np);
         GaussianLatitudes gaussLats      = new GaussianLatitudes(nlats);
@@ -600,12 +601,16 @@ public class GridHorizCoordSys {
         startx = start.getX();
         starty = start.getY();
 
+        if (Double.isNaN(getDxInKm())) {
+            setDxDy(startx, starty, proj);
+        }
+
         if (debug) {
             System.out.println("GridHorizCoordSys.makeLC start at latlon "
                                + startLL);
 
-            double          Lo2   = gdsIndex.readDouble("Lo2");
-            double          La2   = gdsIndex.readDouble("La2");
+            double          Lo2   = gdsIndex.readDouble(gdsIndex.LO2);
+            double          La2   = gdsIndex.readDouble(gdsIndex.LA2);
             LatLonPointImpl endLL = new LatLonPointImpl(La2, Lo2);
             System.out.println("GridHorizCoordSys.makeLC end at latlon "
                                + endLL);
@@ -678,6 +683,10 @@ public class GridHorizCoordSys {
         startx = start.getX();
         starty = start.getY();
 
+        if (Double.isNaN(getDxInKm())) {
+            setDxDy(startx, starty, proj);
+        }
+
         if (debug) {
             System.out.println("start at proj coord " + start);
             LatLonPoint llpt = proj.projToLatLon(start);
@@ -729,8 +738,8 @@ public class GridHorizCoordSys {
                                      new Double(La1)));
 
         if (debug) {
-            double          Lo2   = getParamValue("Lo2") + 360.0;
-            double          La2   = getParamValue("La2");
+            double          Lo2   = getParamValue(gdsIndex.LO2) + 360.0;
+            double          La2   = getParamValue(gdsIndex.LA2);
             LatLonPointImpl endLL = new LatLonPointImpl(La2, Lo2);
             System.out.println(
                 "GridHorizCoordSys.makeMercator end at latlon " + endLL);
@@ -804,8 +813,8 @@ public class GridHorizCoordSys {
 
         if (debug) {
 
-            double          Lo2   = getParamValue("Lo2") + 360.0;
-            double          La2   = getParamValue("La2");
+            double          Lo2   = getParamValue(gdsIndex.LO2) + 360.0;
+            double          La2   = getParamValue(gdsIndex.LA2);
             LatLonPointImpl endLL = new LatLonPointImpl(La2, Lo2);
             System.out.println(
                 "GridHorizCoordSys.makeOrthographic end at latlon " + endLL);
@@ -842,5 +851,28 @@ public class GridHorizCoordSys {
         return gdsIndex.getParam(id);
     }
 
+    /**
+     * _more_
+     *
+     * @param startx _more_
+     * @param starty _more_
+     * @param proj _more_
+     */
+    private void setDxDy(double startx, double starty, ProjectionImpl proj) {
+        double Lo2 = gdsIndex.readDouble(gdsIndex.LO2);
+        double La2 = gdsIndex.readDouble(gdsIndex.LA2);
+        if (Double.isNaN(Lo2) || Double.isNaN(La2)) {
+            return;
+        }
+        LatLonPointImpl endLL = new LatLonPointImpl(La2, Lo2);
+        ProjectionPointImpl end =
+            (ProjectionPointImpl) proj.latLonToProj(endLL);
+        double dx = 1000 * Math.abs(end.getX() - startx)
+                    / (getParamValue(gdsIndex.NX) - 1);
+        double dy = 1000 * Math.abs(end.getY() - starty)
+                    / (getParamValue(gdsIndex.NY) - 1);
+        gdsIndex.addParam(gdsIndex.DX, String.valueOf(dx));
+        gdsIndex.addParam(gdsIndex.DY, String.valueOf(dy));
+    }
 }
 

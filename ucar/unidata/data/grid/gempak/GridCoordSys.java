@@ -39,31 +39,31 @@ import java.util.*;
  */
 public class GridCoordSys {
 
-    /** _more_          */
+    /** _more_ */
     private GridHorizCoordSys hcs;
 
-    /** _more_          */
+    /** _more_ */
     private GridRecord record;
 
-    /** _more_          */
+    /** _more_ */
     private String verticalName;
 
-    /** _more_          */
+    /** _more_ */
     private GridTableLookup lookup;
 
-    /** _more_          */
+    /** _more_ */
     private List levels;
 
-    /** _more_          */
+    /** _more_ */
     boolean dontUseVertical = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean debug = false;
 
-    /** _more_          */
+    /** _more_ */
     String positive = "up";
 
-    /** _more_          */
+    /** _more_ */
     String units;
 
     /**

@@ -43,29 +43,29 @@ import java.util.*;
  */
 public class GridTimeCoord {
 
-    /** _more_          */
+    /** _more_ */
     static private org.slf4j.Logger log =
         org.slf4j.LoggerFactory.getLogger(GridTimeCoord.class);
 
     // for parsing dates
 
-    /** _more_          */
+    /** _more_ */
     private DateFormatter formatter = new DateFormatter();
 
-    /** _more_          */
+    /** _more_ */
     private Calendar calendar;
 
-    /** _more_          */
+    /** _more_ */
     private String name;
 
-    /** _more_          */
+    /** _more_ */
     private GridTableLookup lookup;
 
-    /** _more_          */
+    /** _more_ */
     private ArrayList times = new ArrayList();  //  Date
     //private double[] offsetHours;
 
-    /** _more_          */
+    /** _more_ */
     private int seq = 0;
 
     /**
@@ -328,13 +328,15 @@ public class GridTimeCoord {
         } else if (timeUnit.equalsIgnoreCase("6hours")) {
             factor = 6;
         } else if (timeUnit.equalsIgnoreCase("12hours")) {
-            factor = 6;
+            // TODO: fix this in GRIB world
+            factor = 12;
         }
 
         calendar.setTime(validTime);
         calendar.add(calandar_unit, factor * record.getValidTimeOffset());
         validTime = calendar.getTime();
 
+        // TODO: should this just be done when the record is created?
         //record.setValidTime(validTime);
         return validTime;
     }

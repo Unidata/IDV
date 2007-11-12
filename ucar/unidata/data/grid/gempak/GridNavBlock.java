@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.grid.gempak;
 
 
@@ -142,6 +143,9 @@ public class GridNavBlock extends GridDefRecord {
     /** raw values */
     float[] vals = null;
 
+    /** projection type */
+    private String proj;
+
     /**
      * Create a new grid nav block
      */
@@ -163,7 +167,9 @@ public class GridNavBlock extends GridDefRecord {
      */
     public void setValues(float[] values) {
         vals = values;
-        addParam("Proj", GempakUtil.ST_ITOC(Float.floatToIntBits(vals[1])));
+        proj = GempakUtil.ST_ITOC(Float.floatToIntBits(vals[1])).trim();
+        addParam("Proj", proj);
+        addParam(GDS_KEY, this.toString());
         setParams();
     }
 
@@ -182,7 +188,7 @@ public class GridNavBlock extends GridDefRecord {
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("\n    PROJECTION:         ");
-        buf.append(GempakUtil.ST_ITOC(Float.floatToIntBits(vals[1])));
+        buf.append(proj);
         buf.append("\n    ANGLES:             ");
         buf.append(vals[10]);
         buf.append("  ");
@@ -206,10 +212,84 @@ public class GridNavBlock extends GridDefRecord {
 
     /**
      * Set the parameters for the GDS
+     *     In addition for full map projections, three angles MUST be specified
+     *     in PROJ.  The angles have the following meanings for the different
+     *     projection classes:
+     *
+     *       CYL     angle1 -- latitude of origin on the projection cylinder
+     *                         0 = Equator
+     *               angle2 -- longitude of origin on the projection cylinder
+     *                         0 = Greenwich meridian
+     *               angle3 -- angle to skew the projection by rotation of
+     *                         the cylindrical surface of projection about
+     *                         the line from the Earth's center passing
+     *                         through the origin point. This results in
+     *                         curved latitude and longitude lines.
+     *
+     *                         If angle3 is greater than 360 or less than -360
+     *                         degrees, then the rectangular Cartesian coordinate
+     *                         system on the projection plane is rotated
+     *                         +/- |angle3|-360 degrees. This results in
+     *                         latitude and longitude lines that are skewed
+     *                         with respect to the edge of the map.  This option
+     *                          is only valid when specifying a map projection and
+     *                          is not available for grid projections.
+     *
+     *                         The difference between |angle3| < 360 and
+     *                         |angle3| > 360 is that, in the former case,
+     *                         the rotation is applied to the developable
+     *                         cylindrical surface before projection and
+     *                         subsequent development; while, in the latter
+     *                         case, the rotation is applied to the Cartesian
+     *                         coordinate system in the plane after development.
+     *                         Development here refers to the mathematical
+     *                         flattening of the surface of projection into a
+     *                         planar surface.
+     *
+     *     Exception:
+     *
+     *     MCD     angle1 -- scaling factor for latitude
+     *                       0 = default scaling (1/cos(avglat))
+     *             angle2 -- longitude of origin (center longitude)
+     *             angle3 -- not used
+     *
+     *
+     *     AZM     angle1 -- latitude of the projection's point of tangency
+     *             angle2 -- longitude of the projection's point of tangency
+     *             angle3 -- angle to skew the projection by rotation about
+     *                       the line from the Earth's center passing
+     *                       through the point of tangency
+     *
+     *     CON     angle1 -- standard latitude 1
+     *             angle2 -- polon is the central longitude
+     *             angle3 -- standard latitude 2
+     *
      */
     private void setParams() {
+        String angle1 = String.valueOf(vals[10]);
+        String angle2 = String.valueOf(vals[11]);
+        String angle3 = String.valueOf(vals[12]);
+        String lllat  = String.valueOf(vals[6]);
+        String lllon  = String.valueOf(vals[7]);
+        String urlat  = String.valueOf(vals[8]);
+        String urlon  = String.valueOf(vals[9]);
         addParam(NX, String.valueOf(vals[4]));
         addParam(NY, String.valueOf(vals[5]));
+        if (proj.equals("STR")) {
+            addParam(LOV, angle2);
+            addParam(LA1, lllat);
+            addParam(LO1, lllon);
+            addParam(LA2, urlat);
+            addParam(LO2, urlon);
+        } else if (proj.equals("LCC")) {
+            addParam(LATIN1, angle1);
+            addParam(LOV, angle2);
+            addParam(LATIN2, angle3);
+            addParam(LA1, lllat);
+            addParam(LO1, lllon);
+            addParam(LA2, urlat);
+            addParam(LO2, urlon);
+        }
     }
 }
 

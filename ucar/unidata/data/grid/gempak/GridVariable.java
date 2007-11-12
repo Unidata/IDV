@@ -40,54 +40,54 @@ import java.util.List;
  */
 public class GridVariable {
 
-    /** _more_          */
+    /** _more_ */
     static private org.slf4j.Logger log =
         org.slf4j.LoggerFactory.getLogger(GridVariable.class);
 
-    /** _more_          */
+    /** _more_ */
     private String name, desc, vname;
 
-    /** _more_          */
+    /** _more_ */
     private GridRecord firstRecord;
 
-    /** _more_          */
+    /** _more_ */
     private GridTableLookup lookup;
 
-    /** _more_          */
+    /** _more_ */
     private boolean isGrib1;
 
-    /** _more_          */
+    /** _more_ */
     private GridHorizCoordSys hcs;
 
-    /** _more_          */
+    /** _more_ */
     private GridCoordSys vcs;  // maximal strategy (old way)
 
-    /** _more_          */
+    /** _more_ */
     private GridTimeCoord tcs;
 
-    /** _more_          */
+    /** _more_ */
     private GridVertCoord vc;
 
-    /** _more_          */
+    /** _more_ */
     private ArrayList records = new ArrayList();  // GridRecord
 
-    /** _more_          */
+    /** _more_ */
     private int nlevels, ntimes;
 
-    /** _more_          */
+    /** _more_ */
     private GridRecord[] recordTracker;
 
-    /** _more_          */
+    /** _more_ */
     private int decimalScale = 0;
 
-    /** _more_          */
+    /** _more_ */
     private boolean hasVert = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean showRecords = false,
                     showGen     = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean debug = false;
 
     /**
@@ -326,7 +326,13 @@ public class GridVariable {
         v.setDimensions(dims);
         GridParameter param = lookup.getParameter(firstRecord);
 
-        v.addAttribute(new Attribute("units", param.getUnit()));
+        //TODO:  handle null units?
+        //v.addAttribute(new Attribute("units", param.getUnit()));
+        String unit = param.getUnit();
+        if (unit == null) {
+            unit = "";
+        }
+        v.addAttribute(new Attribute("units", unit));
         v.addAttribute(new Attribute("long_name",
                                      GridIndexToNC.makeLongName(firstRecord,
                                          lookup)));
@@ -541,7 +547,7 @@ public class GridVariable {
     }
 
     /**
-     * Override Object.hashCode() to implement equals. 
+     * Override Object.hashCode() to implement equals.
      *
      * @return _more_
      */
@@ -556,7 +562,7 @@ public class GridVariable {
         return hashCode;
     }
 
-    /** _more_          */
+    /** _more_ */
     private volatile int hashCode = 0;
 
 

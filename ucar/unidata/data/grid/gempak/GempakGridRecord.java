@@ -22,11 +22,16 @@
 
 
 
+
 package ucar.unidata.data.grid.gempak;
+
+
+import edu.wisc.ssec.mcidas.McIDASUtil;
 
 
 import ucar.unidata.util.StringUtil;
 
+import java.util.Calendar;
 import java.util.Date;
 
 
@@ -65,6 +70,16 @@ public class GempakGridRecord implements GridRecord {
     /** packing type */
     public GridNavBlock navBlock;
 
+    /** reference time as a Date */
+    private Date refTime;
+
+    /** valid time offset in ninutes */
+    private int validOffset;
+
+    /** actual valid time */
+    private Date validTime;
+
+
     /**
      * Create a grid header from the integer bits
      * @param number  grid number
@@ -81,7 +96,26 @@ public class GempakGridRecord implements GridRecord {
         ivcord = header[6];
         param = GempakUtil.ST_ITOC(new int[] { header[7], header[8],
                 header[9] });
-
+        param = param.trim();
+        int ymd = times1[0];
+        if (ymd / 10000 < 50) {
+            ymd += 20000000;
+        } else if (ymd / 10000 < 100) {
+            ymd += 19000000;
+        }
+        int hms = times1[1] * 100;  // need to add seconds
+        refTime = new Date(McIDASUtil.mcDateHmsToSecs(ymd, hms) * 1000l);
+        int offset = times1[2] % 100000;
+        if ((offset == 0) || (offset % 100 == 0)) {  // 0 or no minutes
+            validOffset = (offset / 100) * 60;
+        } else {                                     // have minutes
+            validOffset = (offset / 100) * 60 + offset % 100;
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeZone(java.util.TimeZone.getTimeZone("GMT"));
+        calendar.setTime(refTime);
+        calendar.add(Calendar.MINUTE, validOffset);
+        validTime = calendar.getTime();
     }
 
     /**
@@ -126,7 +160,7 @@ public class GempakGridRecord implements GridRecord {
      * @return reference time
      */
     public Date getReferenceTime() {
-        return null;  // TODO: fill this in;
+        return refTime;
     }
 
     /**
@@ -135,16 +169,16 @@ public class GempakGridRecord implements GridRecord {
      * @return valid time
      */
     public Date getValidTime() {
-        return null;  // TODO: fill this in;
+        return validTime;
     }
 
     /**
-     * Get valid time offset (hours) of this GridRecord
+     * Get valid time offset (minutes) of this GridRecord
      *
      * @return time offset
      */
     public int getValidTimeOffset() {
-        return -1;  // TODO: fill this in;
+        return validOffset;
     }
 
     /**
@@ -194,7 +228,7 @@ public class GempakGridRecord implements GridRecord {
         buf.append("  ");
         buf.append(StringUtil.padLeft(GempakUtil.LV_CCRD(ivcord), 6));
         buf.append(" ");
-        buf.append(param.trim());
+        buf.append(param);
         buf.append(" ");
         buf.append(GempakUtil.getGridPackingName(packingType));
         return buf.toString();

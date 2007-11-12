@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.grid.gempak;
 
 
@@ -74,6 +75,12 @@ public class GridDefRecord {
     /** Lo1 */
     public static final String LO1 = "Lo1";
 
+    /** La2 */
+    public static final String LA2 = "La2";
+
+    /** Lo2 */
+    public static final String LO2 = "Lo2";
+
     /** LoD */
     public static final String LAD = "LaD";
 
@@ -93,29 +100,35 @@ public class GridDefRecord {
     /** minor axis of earth */
     public static final String MINOR_AXIS_EARTH = "minor_axis_earth";
 
-    /** _more_ 
-    public String gdsKey, winds;
-    */
+    /**
+     * _more_
+     * public String gdsKey, winds;
+     */
 
-    /** _more_ 
-    public int grid_type, nx, ny, resolution;
-    */
+    /**
+     * _more_
+     * public int grid_type, nx, ny, resolution;
+     */
 
-    /** _more_ 
-    public double dx, dy;
-    */
+    /**
+     * _more_
+     * public double dx, dy;
+     */
 
-    /** _more_ 
-    public double latin1, latin2, La1, Lo1, LaD, LoV;
-    */
+    /**
+     * _more_
+     * public double latin1, latin2, La1, Lo1, LaD, LoV;
+     */
 
-    /** _more_ 
-    public int grid_shape_code;
-    */
+    /**
+     * _more_
+     * public int grid_shape_code;
+     */
 
-    /** _more_ 
-    public double radius_spherical_earth, major_axis_earth, minor_axis_earth;
-    */
+    /**
+     * _more_
+     * public double radius_spherical_earth, major_axis_earth, minor_axis_earth;
+     */
 
     /**
      * constructor.

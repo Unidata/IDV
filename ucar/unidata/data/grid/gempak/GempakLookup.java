@@ -20,6 +20,7 @@
 
 
 
+
 package ucar.unidata.data.grid.gempak;
 
 
@@ -64,8 +65,16 @@ public final class GempakLookup implements GridTableLookup {
      * @return Parameter
      */
     public final GridParameter getParameter(GridRecord gr) {
-        String        name = gr.getParameterName();
-        GridParameter p    = new GridParameter(1, name, name, null);
+        String name = gr.getParameterName();
+        String unit;
+        if (name.equals("PMSL")) {
+            unit = "hPa";
+        } else if (name.equals("TMPK")) {
+            unit = "K";
+        } else {
+            unit = "";
+        }
+        GridParameter p = new GridParameter(1, name, name, unit);
         return p;
     }
 
@@ -123,7 +132,7 @@ public final class GempakLookup implements GridTableLookup {
      * @return TimeRangeUnitName
      */
     public final String getFirstTimeRangeUnitName() {
-        return "hours";
+        return "minute";
     }
 
     /**
@@ -209,9 +218,9 @@ public final class GempakLookup implements GridTableLookup {
      */
     public boolean isLayer(GridRecord gr) {
         if (gr.getLevel2() == -1) {
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     /**

@@ -41,38 +41,38 @@ import java.util.*;
  */
 public class GridVertCoord implements Comparable {
 
-    /** _more_          */
+    /** _more_ */
     static private org.slf4j.Logger logger =
         org.slf4j.LoggerFactory.getLogger(GridVertCoord.class);
 
-    /** _more_          */
+    /** _more_ */
     private GridRecord typicalRecord;
 
-    /** _more_          */
+    /** _more_ */
     private String levelName;
 
-    /** _more_          */
+    /** _more_ */
     private GridTableLookup lookup;
 
-    /** _more_          */
+    /** _more_ */
     private int seq = 0;
 
-    /** _more_          */
+    /** _more_ */
     private double[] coordValues;
 
-    /** _more_          */
+    /** _more_ */
     boolean usesBounds = false;
 
-    /** _more_          */
+    /** _more_ */
     boolean dontUseVertical = false;
 
-    /** _more_          */
+    /** _more_ */
     String positive = "up";
 
-    /** _more_          */
+    /** _more_ */
     String units;
 
-    /** _more_          */
+    /** _more_ */
     private boolean debug = false;
 
     /**
@@ -389,7 +389,7 @@ public class GridVertCoord implements Comparable {
         return getLevelName().compareToIgnoreCase(gv.getLevelName());
     }
 
-    /** _more_          */
+    /** _more_ */
     private ArrayList levels = new ArrayList();  // LevelCoord
 
     /**
@@ -401,10 +401,10 @@ public class GridVertCoord implements Comparable {
      */
     private class LevelCoord implements Comparable {
 
-        /** _more_          */
+        /** _more_ */
         double mid;
 
-        /** _more_          */
+        /** _more_ */
         double value1, value2;
 
         /**

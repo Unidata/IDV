@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.data.grid.gempak;
 
 
@@ -87,6 +88,14 @@ public class GempakGridServiceProvider extends GempakIOServiceProvider {
             gemreader = new GempakGridReader();
         }
         gemreader.init(raf);
+        GridIndex index = ((GempakGridReader) gemreader).getGridIndex();
+        GempakLookup lookup =
+            new GempakLookup(
+                (GempakGridRecord) index.getGridRecords().get(0));
+        GridIndexToNC delegate = new GridIndexToNC();
+        delegate.open(index, lookup, 4, ncfile, fmrcCoordSys, cancelTask);
+        ncfile.finish();
+
     }
 
     /**
@@ -161,7 +170,7 @@ public class GempakGridServiceProvider extends GempakIOServiceProvider {
      * @throws InvalidRangeException _more_
      */
     private void readLevel(Variable v2, int timeIdx, Range levelRange,
-                          Range yRange, Range xRange, IndexIterator ii)
+                           Range yRange, Range xRange, IndexIterator ii)
             throws IOException, InvalidRangeException {
         for (int levIdx = levelRange.first(); levIdx <= levelRange.last();
                 levIdx += levelRange.stride()) {
@@ -185,7 +194,7 @@ public class GempakGridServiceProvider extends GempakIOServiceProvider {
      * @throws InvalidRangeException _more_
      */
     private void readXY(Variable v2, int timeIdx, int levIdx, Range yRange,
-                       Range xRange, IndexIterator ii)
+                        Range xRange, IndexIterator ii)
             throws IOException, InvalidRangeException {
         Attribute         att           = v2.findAttribute("missing_value");
         float             missing_value = (att == null)
