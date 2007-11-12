@@ -20,16 +20,23 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
+
+
+import org.apache.poi.hssf.usermodel.*;
 
 
 import ucar.ma2.Array;
 import ucar.ma2.Index;
 
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.IOUtil;
 
+import ucar.unidata.util.LogUtil;
+
+
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.Util;
@@ -53,8 +60,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-
-import org.apache.poi.hssf.usermodel.*;
 
 
 /**
@@ -336,20 +341,53 @@ public class DataUtil {
     }
 
 
-    public static void writeXls(String filename,List rows) throws Exception {
-        HSSFWorkbook wb          = new HSSFWorkbook();
+    /**
+     * _more_
+     *
+     * @param filename _more_
+     * @param rows _more_
+     */
+    public static void writeCsv(String filename, List rows) {
+        try {
+            if (filename.toLowerCase().endsWith(".xls")) {
+                writeXls(filename, rows);
+                return;
+            }
+            StringBuffer sb = new StringBuffer();
+            for (int rowIdx = 0; rowIdx < rows.size(); rowIdx++) {
+                sb.append(StringUtil.join(",", (List) rows.get(rowIdx)));
+                sb.append("\n");
+            }
+            IOUtil.writeFile(filename, sb.toString());
+        } catch (Exception exc) {
+            LogUtil.logException("Writing CSV", exc);
+        }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param filename _more_
+     * @param rows _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void writeXls(String filename, List rows) throws Exception {
+        HSSFWorkbook     wb      = new HSSFWorkbook();
         FileOutputStream fileOut = new FileOutputStream(filename);
-        HSSFSheet sheet = wb.createSheet();
-        for(int i=0;i<rows.size();i++) {
-            HSSFRow row     = sheet.createRow((short)i); 
-            List cols = (List) rows.get(i);
-            for(int colIdx=0;colIdx<cols.size();colIdx++) {
-                Object o = cols.get(colIdx);
-                HSSFCell cell   = row.createCell((short)colIdx); 
-                if(o instanceof Double) {
-                    cell.setCellValue(((Double)o).doubleValue()); 
-                } if(o instanceof Integer) {
-                    cell.setCellValue(((Integer)o).intValue()); 
+        HSSFSheet        sheet   = wb.createSheet();
+        for (int i = 0; i < rows.size(); i++) {
+            HSSFRow row  = sheet.createRow((short) i);
+            List    cols = (List) rows.get(i);
+            for (int colIdx = 0; colIdx < cols.size(); colIdx++) {
+                Object   o    = cols.get(colIdx);
+                HSSFCell cell = row.createCell((short) colIdx);
+                if (o instanceof Double) {
+                    cell.setCellValue(((Double) o).doubleValue());
+                }
+                if (o instanceof Integer) {
+                    cell.setCellValue(((Integer) o).intValue());
                 } else {
                     cell.setCellValue(o.toString());
                 }
@@ -361,18 +399,32 @@ public class DataUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param filename _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public static String xlsToCsv(String filename) throws Exception {
-        StringBuffer sb = new StringBuffer();
-        InputStream myxls = IOUtil.getInputStream(filename, DataUtil.class);
-        HSSFWorkbook wb     = new HSSFWorkbook(myxls);
-        HSSFSheet sheet = wb.getSheetAt(0);       // first sheet
-        for(int rowIdx=sheet.getFirstRowNum();rowIdx<=sheet.getLastRowNum();rowIdx++) {
-            HSSFRow row     = sheet.getRow(rowIdx);
-            for(short colIdx=row.getFirstCellNum();colIdx<row.getPhysicalNumberOfCells();colIdx++) {
-                HSSFCell cell   = row.getCell(colIdx);
-                if(cell == null) continue;
-                if(colIdx>0)
+        StringBuffer sb    = new StringBuffer();
+        InputStream  myxls = IOUtil.getInputStream(filename, DataUtil.class);
+        HSSFWorkbook wb    = new HSSFWorkbook(myxls);
+        HSSFSheet    sheet = wb.getSheetAt(0);  // first sheet
+        for (int rowIdx = sheet.getFirstRowNum();
+                rowIdx <= sheet.getLastRowNum(); rowIdx++) {
+            HSSFRow row = sheet.getRow(rowIdx);
+            for (short colIdx = row.getFirstCellNum();
+                    colIdx < row.getPhysicalNumberOfCells(); colIdx++) {
+                HSSFCell cell = row.getCell(colIdx);
+                if (cell == null) {
+                    continue;
+                }
+                if (colIdx > 0) {
                     sb.append(",");
+                }
                 sb.append(cell.toString());
                 /*                if(false && comment!=null) {
                     String author = comment.getAuthor();
