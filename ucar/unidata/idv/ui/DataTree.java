@@ -1044,11 +1044,12 @@ public class DataTree extends DataSourceHolder {
             parent.remove(dataSourceNode);
         }
 
+        GuiUtils.moveSubtreesToTop(parentNode);
 
         //For now rebuild the data object to tree node mapping
         //This is overkill
         rebuildMaps();
-        if (cnt != 0) {
+        if (cnt != 0 || true) {
             treeStructureChanged(parentNode);
         }
 

@@ -6908,6 +6908,24 @@ public class GuiUtils {
             }});
     }
 
+    public static void moveSubtreesToTop(DefaultMutableTreeNode parent) {
+        boolean gotAny = false;
+        List children = Misc.toList(parent.children());
+        for(int i=0;i<children.size()&&!gotAny;i++) {
+            DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.get(i);
+            gotAny = child.getChildCount()>0;
+        }
+        if(!gotAny) return;
+        //        for(int i=0;i<children.size();i++) {
+        for(int i=children.size()-1;i>=0;i--) {
+            DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.get(i);
+            if(child.getChildCount()>0) {
+                moveSubtreesToTop(child);
+                parent.remove(child);
+                parent.insert(child,0);
+            }
+        }
+    }
 
 
 
