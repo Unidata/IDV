@@ -33,6 +33,7 @@ import ucar.unidata.idv.*;
 import ucar.unidata.idv.chooser.IdvChooserManager;
 
 import ucar.unidata.ui.ComponentGroup;
+import ucar.unidata.ui.HtmlComponent;
 import ucar.unidata.ui.ComponentHolder;
 import ucar.unidata.ui.FineLineBorder;
 import ucar.unidata.ui.RovingProgress;
@@ -513,6 +514,13 @@ public class IdvXmlUi extends XmlUi {
                 comp.setType(comp.TYPE_SKIN);
                 comp.setName(XmlUtil.getAttribute(child,"name","UI"));
                 compGroup.addComponent(comp);
+            } else if (childTagName.equals(IdvUIManager.COMP_COMPONENT_HTML)) {
+                String text = XmlUtil.getChildText(child);
+                text = new String(XmlUtil.decodeBase64(text.trim()));
+                ComponentHolder comp = new HtmlComponent("Html Text", text);
+                comp.setShowHeader(false);
+                comp.setName(XmlUtil.getAttribute(child,"name","HTML"));
+                compGroup.addComponent(comp);
             } else if (childTagName.equals(
                                            IdvUIManager.COMP_COMPONENT_GROUP)) {
                 IdvComponentGroup childCompGroup = makeComponentGroup(child);
@@ -521,6 +529,8 @@ public class IdvXmlUi extends XmlUi {
                 compGroup.addComponent(new IdvComponentHolder(idv,
                         idv.getIdvUIManager().createDataSelector(false,
                             false)));
+            } else {
+                System.err.println("Unknwon component element:" + XmlUtil.toString(child));
             }
         }
         return compGroup;

@@ -61,6 +61,7 @@ import ucar.unidata.ui.symbol.StationModel;
 import ucar.unidata.ui.symbol.StationModelManager;
 
 import ucar.unidata.util.ColorTable;
+import ucar.unidata.util.IOUtil;
 
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
@@ -1704,6 +1705,7 @@ public class IdvUIManager extends IdvManager {
 
     public void getComponentGroupMenuItems(final IdvComponentGroup group, List items) {
         List newItems = new ArrayList();
+        /*
         List mapviewItems = new ArrayList();
         mapviewItems.add(GuiUtils.makeMenuItem("Map View", group, "makeNew",
                                            IdvUIManager.COMP_MAPVIEW));
@@ -1711,7 +1713,7 @@ public class IdvUIManager extends IdvManager {
                                            IdvUIManager.COMP_GLOBEVIEW));
         mapviewItems.add(GuiUtils.makeMenuItem("Transect View", group, "makeNew",
                                            IdvUIManager.COMP_TRANSECTVIEW));
-        newItems.add(GuiUtils.makeMenu("View", mapviewItems));
+                                           newItems.add(GuiUtils.makeMenu("View", mapviewItems));*/
 
         ActionListener listener = new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
@@ -1725,11 +1727,13 @@ public class IdvUIManager extends IdvManager {
         }
 
 
+        /*
         newItems.add(GuiUtils.makeMenuItem("Data Choosers", group, "makeNew",
                                            IdvUIManager.COMP_COMPONENT_CHOOSERS));
 
         newItems.add(GuiUtils.makeMenuItem("Field Selector", group, "makeNew",
                                            IdvUIManager.COMP_DATASELECTOR));
+        */
         newItems.add(
             GuiUtils.makeMenuItem(
                 "Tab Group", group, "makeNew",
@@ -1857,7 +1861,8 @@ public class IdvUIManager extends IdvManager {
             }
             if(!XmlUtil.getAttribute(root,"forui", true)) {continue;}
 
-            List names = StringUtil.split(skins.getShortName(i), ">", true,
+            String shortName = skins.getShortName(i);
+            List names = StringUtil.split(shortName, ">", true,
                                           true);
             String path = "";
             for (int nameIdx = 0; nameIdx < names.size() - 1; nameIdx++) {
