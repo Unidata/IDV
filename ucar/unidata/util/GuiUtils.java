@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -4843,6 +4844,8 @@ public class GuiUtils {
     }
 
 
+
+
     /**
      * Write out the given table model as a csv file
      *
@@ -4860,21 +4863,36 @@ public class GuiUtils {
      * @param model The table model to write
      */
     public static void exportAsCsv(String header, TableModel model) {
-        String filename = FileManager.getWriteFile(Misc.newList(FileManager.FILTER_CSV,FileManager.FILTER_XLS),
-                                                   FileManager.SUFFIX_CSV);
+        String filename =
+            FileManager.getWriteFile(Misc.newList(FileManager.FILTER_CSV,
+                FileManager.FILTER_XLS), FileManager.SUFFIX_CSV);
         if (filename == null) {
             return;
-        } 
-       if(filename.toLowerCase().endsWith(".xls")) {
+        }
+        exportAsCsv(header, model, filename);
+    }
+
+    /**
+     * _more_
+     *
+     * @param header _more_
+     * @param model _more_
+     * @param filename _more_
+     */
+    public static void exportAsCsv(String header, TableModel model,
+                                   String filename) {
+        if (filename.toLowerCase().endsWith(".xls")) {
             //A hack
             try {
                 Class c = Misc.findClass("ucar.unidata.data.DataUtil");
-                Method method = Misc.findMethod(c,"writeXls", new Class[]{String.class, List.class});
-                List rows = new ArrayList();
-                int  numRows = model.getRowCount();
-                int  numCols = model.getColumnCount();
+                Method method = Misc.findMethod(c, "writeXls",
+                                    new Class[] { String.class,
+                        List.class });
+                List rows     = new ArrayList();
+                int  numRows  = model.getRowCount();
+                int  numCols  = model.getColumnCount();
                 List colNames = new ArrayList();
-                for(int i=0;i<model.getColumnCount();i++) {
+                for (int i = 0; i < model.getColumnCount(); i++) {
                     colNames.add(model.getColumnName(i));
                 }
                 rows.add(colNames);
@@ -4885,7 +4903,7 @@ public class GuiUtils {
                         cols.add(model.getValueAt(row, col));
                     }
                 }
-                method.invoke(null, new Object[]{filename, rows});
+                method.invoke(null, new Object[] { filename, rows });
             } catch (Exception exc) {
                 LogUtil.logException("Exporting data to xsl", exc);
             }
@@ -4907,6 +4925,8 @@ public class GuiUtils {
             LogUtil.logException("Exporting data", exc);
         }
     }
+
+
 
     /**
      * Set up a directory chooser
@@ -6577,7 +6597,7 @@ public class GuiUtils {
         /** maps component to key */
         Hashtable map = new Hashtable();
 
-        /** _more_          */
+        /** _more_ */
         Hashtable keyMap = new Hashtable();
 
         /**
@@ -6930,6 +6950,7 @@ public class GuiUtils {
 
 
 }
+
 
 
 
