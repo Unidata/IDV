@@ -29,6 +29,7 @@ import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.data.point.PointOb;
 import ucar.unidata.geoloc.Bearing;
 
 import ucar.unidata.geoloc.LatLonPointImpl;
@@ -153,6 +154,10 @@ public class ProbeRowInfo {
 
     /** For probing on point data */
     private String pointParameter;
+
+    private String stationName = "";
+
+    private int pointIndex = -1;
 
     /** For playing sounds */
     private MidiManager midiManager;
@@ -428,13 +433,43 @@ public class ProbeRowInfo {
         return midiManager;
     }
 
+    public Tuple getTuple() throws VisADException, RemoteException {
+        if(rawValue!=null && rawValue instanceof FieldImpl) {
+            Data data = ((FieldImpl)rawValue).getSample(0);
+            if(data instanceof PointOb) {
+                PointOb ob = (PointOb) data;
+                return (Tuple)ob.getData();
+            }
+        }
+        return null;
+    }
+
+
     /**
      * Set the RawValue property.
      *
      * @param value The new value for RawValue
      */
-    protected void setRawValue(Data value) {
+    protected void setRawValue(Data value) throws VisADException, RemoteException {
         rawValue = value;
+        if(rawValue!=null && rawValue instanceof FieldImpl) {
+            Data data = ((FieldImpl)rawValue).getSample(0);
+            if(data instanceof PointOb) {
+                PointOb ob = (PointOb) data;
+                Tuple t  = (Tuple)ob.getData();
+                Data[] comps = t.getComponents();
+                stationName = "";
+                for(int i=0;i<comps.length;i++) {
+                    if(comps[i] instanceof visad.Text) {
+                        String name = StringUtil.replace(comps[i].getType().toString(),"(Text)","").toLowerCase();
+                        if(name.equals("id") || name.equals("idn") || name.startsWith("station")) {
+                            stationName = comps[i].toString();
+                            return;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -449,6 +484,34 @@ public class ProbeRowInfo {
     protected Real getRealValue() throws VisADException, RemoteException {
         if (rawValue instanceof Real) {
             return (Real) rawValue;
+        }
+       if(rawValue instanceof FieldImpl) {
+            Data data = ((FieldImpl)rawValue).getSample(0);
+            if(data instanceof PointOb) {
+                PointOb ob = (PointOb) data;
+                Tuple t  = (Tuple)ob.getData();
+                if(pointParameter == null) {
+                    Data[] comps = t.getComponents();
+                    for(int i=0;i<comps.length;i++) {
+                        if(!(comps[i] instanceof Real)) continue;
+                        setPointParameter(comps[i].getType().toString());
+                        break;
+                    }
+                }
+
+                if(pointIndex<0 && pointParameter!=null) {
+                    Data[] comps = t.getComponents();
+                    for(int i=0;i<comps.length;i++) {
+                        if(comps[i].getType().toString().equals(pointParameter)) {
+                            pointIndex = i;
+                            break;
+                        }
+                    }
+                }
+                if(pointIndex<0) return null;
+                return (Real)t.getComponent(pointIndex);
+            }
+            return null;
         }
         return (Real) ((RealTuple) rawValue).getComponent(0);
     }
@@ -668,6 +731,10 @@ public class ProbeRowInfo {
         return lineState;
     }
 
+    public String getStationName() {
+        return stationName;
+    }
+
     /**
      *  Set the PointParameter property.
      *
@@ -675,6 +742,7 @@ public class ProbeRowInfo {
      */
     public void setPointParameter(String value) {
         pointParameter = value;
+        pointIndex = -1;
     }
 
     /**

@@ -137,12 +137,23 @@ public class PointObFactory {
     public static FieldImpl makeTimeSequenceOfPointObs(FieldImpl pointObs,
             int lumpMinutes)
             throws VisADException, RemoteException {
+        int       numObs       = pointObs.getDomainSet().getLength();
+        List obs = new ArrayList();
+        for (int i = 0; i < numObs; i++) {
+            obs.add(pointObs.getSample(i));
+        }
+        return makeTimeSequenceOfPointObs(obs,lumpMinutes);
+    }
+
+    public static FieldImpl makeTimeSequenceOfPointObs(List pointObs,
+            int lumpMinutes)
+            throws VisADException, RemoteException {
 
         Trace.call1("makeTimeSequence");
 
         FieldImpl timeSequence = null;
         List      uniqueTimes  = new ArrayList();
-        int       numObs       = pointObs.getDomainSet().getLength();
+        int       numObs       = pointObs.size();
         MathType  obType       = null;
         Hashtable timeToObs    = new Hashtable();
         // loop through and find all the unique times
@@ -150,7 +161,7 @@ public class PointObFactory {
                     " " + lumpMinutes + " num obs:" + numObs);
         Hashtable seenTime = new Hashtable();
         for (int i = 0; i < numObs; i++) {
-            PointOb ob = (PointOb) pointObs.getSample(i);
+            PointOb ob = (PointOb) pointObs.get(i);
             if (i == 0) {
                 obType = ob.getType();
             }
@@ -622,9 +633,6 @@ public class PointObFactory {
     public static FieldImpl makePointObs(PointObsDataset input,
                                          double binRoundTo, double binWidth)
             throws Exception {
-
-
-
         return makePointObs(input, binRoundTo, binWidth, null);
     }
 
