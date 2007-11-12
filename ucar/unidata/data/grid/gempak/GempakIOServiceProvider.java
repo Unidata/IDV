@@ -109,16 +109,6 @@ public abstract class GempakIOServiceProvider implements IOServiceProvider {
     }
 
     /**
-     * Set the special object on this IOSP
-     *
-     * @param special  isn't that special?
-     */
-    public void setSpecial(Object special) {
-        //if (special instanceof FmrcCoordSys)
-        //  fmrcCoordSys = (FmrcCoordSys) special;
-    }
-
-    /**
      * Debug string info (why is this in the interface?)
      *
      * @param o  object to debug

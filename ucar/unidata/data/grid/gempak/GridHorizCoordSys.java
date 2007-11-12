@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.Collections;
 
 /**
- * A horizontal coordinate system created from a Grib2GridDefinitionSection.
+ * A horizontal coordinate system created from a GridDefRecord
  * <p/>
  * <p/>
  * <p> Note on "false_easting" and "fale_northing" projection parameters:
@@ -56,9 +56,9 @@ public class GridHorizCoordSys {
 
   private String grid_name, shape_name, id;
   private boolean isLatLon = true, isGaussian = false;
-  HashMap varHash = new HashMap(200); // GribVariables that have this GridHorizCoordSys
-  HashMap productHash = new HashMap(100); // List of GribVariable, sorted by product desc
-  HashMap vcsHash = new HashMap(30); // GribVertCoordSys
+  HashMap varHash = new HashMap(200); // GridVariables that have this GridHorizCoordSys
+  HashMap productHash = new HashMap(100); // List of GridVariable, sorted by product desc
+  HashMap vcsHash = new HashMap(30); // GridVertCoordSys
 
   private double startx, starty;
   private ProjectionImpl proj;
@@ -153,7 +153,8 @@ public class GridHorizCoordSys {
               "y coordinate of projection", "projection_y_coordinate", AxisType.GeoY);
       double[] xData = addCoordAxis(ncfile, "x", (int) getParamValue(gdsIndex.NX), startx, getDxInKm(), "km",
               "x coordinate of projection", "projection_x_coordinate", AxisType.GeoX);
-      if (GridServiceProvider.addLatLon) addLatLon2D(ncfile, xData, yData);
+      // TODO: ?
+      //if (GribServiceProvider.addLatLon) addLatLon2D(ncfile, xData, yData);
       //add2DCoordSystem(ncfile, "projectionCoordSys", "time y x"); // LOOK is this needed?
     }
   }
