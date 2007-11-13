@@ -130,6 +130,9 @@ public class GeoGridDataSource extends GridDataSource {
 
 
 
+    /** The prefix we hack onto the u and v  variables */
+    private static final String PREFIX_GRIDRELATIVE = "GridRelative_";
+
 
     /** Preference */
     public static final String PREF_VERTICALCS = IdvConstants.PREF_VERTICALCS;
@@ -702,7 +705,12 @@ public class GeoGridDataSource extends GridDataSource {
             if ( !cbx.isSelected()) {
                 continue;
             }
-            varNames.add(dataChoice.getName());
+            String name = dataChoice.getName();
+            //hack, hack, hack,
+            if(name.startsWith(PREFIX_GRIDRELATIVE)) {
+                name = name.substring(PREFIX_GRIDRELATIVE.length());
+            }
+            varNames.add(name);
         }
         if (varNames.size() == 0) {
             return null;
@@ -1013,7 +1021,7 @@ public class GeoGridDataSource extends GridDataSource {
                     if ((choice.getDescription().indexOf("u-component") >= 0)
                             || (choice.getDescription().indexOf(
                                 "v-component") >= 0)) {
-                        choice.setName("GridRelative_" + choice.getName());
+                        choice.setName(PREFIX_GRIDRELATIVE + choice.getName());
                     }
                 }
                 addDataChoice(choice);
