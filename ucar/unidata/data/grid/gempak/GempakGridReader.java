@@ -170,12 +170,7 @@ public class GempakGridReader extends GempakFileReader {
                 }
                 GempakGridRecord gh = new GempakGridRecord(i + 1, header);
                 gh.navBlock = navBlock;
-                String param = gh.getParameterName().trim();
-                if (param.equals("PMSL") || param.equals("TMPK")) {
-                    //if (param.equals("PMSL")) {
-                    //gridIndex.addGridRecord(gh);
-                    tmpList.add(gh);
-                }
+                tmpList.add(gh);
             }
             iword += header.length;
         }
