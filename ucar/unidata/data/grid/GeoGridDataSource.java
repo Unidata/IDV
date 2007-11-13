@@ -563,7 +563,7 @@ public class GeoGridDataSource extends GridDataSource {
     protected void makeSaveLocalActions(List actions) {
         String         lbl = (isFileBased()
                               ? "Subset grid file"
-                              : "Make Grid Local");
+                              : "Make Data Source Local");
         AbstractAction a   = new AbstractAction(lbl) {
             public void actionPerformed(ActionEvent ae) {
                 Misc.run(new Runnable() {
@@ -729,8 +729,13 @@ public class GeoGridDataSource extends GridDataSource {
 
         String         path   = prefix;
         NetcdfCFWriter writer = new NetcdfCFWriter();
-        writer.makeFile(path, dataset, varNames, llr, /*dateRange*/ null,
-                        includeLatLon, hStride, zStride, timeStride);
+        try {
+            writer.makeFile(path, dataset, varNames, llr, /*dateRange*/ null,
+                            includeLatLon, hStride, zStride, timeStride);
+        } catch(Exception exc) {
+            logException ("Error writing local netcdf file.\nData:" + getFilePath() +"\nVariables:" + varNames, exc); 
+            return null;
+        }
 
 
         if (geoSubset != null) {
