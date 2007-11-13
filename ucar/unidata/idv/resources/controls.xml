@@ -780,6 +780,17 @@ example:
      displaycategory="General"
      properties="displayName=Range and Bearing;windowVisible=true;"/>
 
+
+  <control
+     id="animationtext"
+     categories="none"
+     class="ucar.unidata.idv.control.AnimationTextControl"
+     description="Synchronized text display"
+     canstandalone="true"
+     label="Animation Text"
+     displaycategory="General"
+     properties="displayName=Animation Text;"/>
+
   <control
      id="mapdisplay"
      categories="MAP"
