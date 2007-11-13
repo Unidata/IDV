@@ -54,6 +54,9 @@ public class DatedObject implements DatedThing {
     /** The object */
     private Object object;
 
+    public DatedObject() {
+    }
+
     /**
      * Construct this object with just a date
      *
@@ -104,6 +107,7 @@ public class DatedObject implements DatedThing {
         }
         return selected;
     }
+
 
 
     /**
@@ -178,7 +182,10 @@ public class DatedObject implements DatedThing {
 
         Object[] array = datedThings.toArray();
         Arrays.sort(array, comp);
-        return Arrays.asList(array);
+        List result = Arrays.asList(array);
+        datedThings = new ArrayList();
+        datedThings.addAll(result);
+        return  datedThings;
     }
 
     /**
