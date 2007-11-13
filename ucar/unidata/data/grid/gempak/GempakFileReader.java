@@ -479,7 +479,6 @@ public class GempakFileReader implements GempakConstants {
                 throw new IOException("File is null");
             }
 
-            //rf.order(getByteOrder());
             rf.order(RandomAccessFile.BIG_ENDIAN);
             int mmmm = DM_RINT(26);
             if (mmmm > 100) {
@@ -923,6 +922,7 @@ public class GempakFileReader implements GempakConstants {
                 idata = IMISSD;
             }
         }
+        rf.order(RandomAccessFile.BIG_ENDIAN);
         return idata;
     }
 
@@ -991,6 +991,8 @@ public class GempakFileReader implements GempakConstants {
                 rdata = RMISSD;
             }
         }
+        // reset to read normally
+        rf.order(RandomAccessFile.BIG_ENDIAN);
         return rdata;
     }
 

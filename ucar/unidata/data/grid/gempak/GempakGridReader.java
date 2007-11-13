@@ -21,10 +21,6 @@
  */
 
 
-
-
-
-
 package ucar.unidata.data.grid.gempak;
 
 
@@ -106,7 +102,6 @@ public class GempakGridReader extends GempakFileReader {
      */
     protected boolean init() throws IOException {
 
-        ucar.unidata.util.Misc.printStack("ggr.init()");
         if ( !super.init()) {
             return false;
         }
@@ -158,8 +153,9 @@ public class GempakGridReader extends GempakFileReader {
         // Make the grid headers
         // TODO: move this up into GempakFileReader using DM_RHDA
         // and account for the flipping there.
-        int   iword  = dmLabel.kpcolh;
-        int[] header = new int[dmLabel.kckeys];
+        List  tmpList = new ArrayList();
+        int   iword   = dmLabel.kpcolh;
+        int[] header  = new int[dmLabel.kckeys];
         for (int i = 0; i < dmLabel.kcol; i++) {
             int valid = DM_RINT(iword++);
             DM_RINT(iword, header);
@@ -177,19 +173,32 @@ public class GempakGridReader extends GempakFileReader {
                 String param = gh.getParameterName().trim();
                 if (param.equals("PMSL") || param.equals("TMPK")) {
                     //if (param.equals("PMSL")) {
-                    gridIndex.addGridRecord(gh);
+                    //gridIndex.addGridRecord(gh);
+                    tmpList.add(gh);
                 }
             }
             iword += header.length;
         }
 
         // find the packing types for these grids
-        List gridList = gridIndex.getGridRecords();
-        if ( !gridList.isEmpty()) {
-            for (int i = 0; i < gridList.size(); i++) {
-                GempakGridRecord gh = (GempakGridRecord) gridList.get(i);
+        // TODO: go back to using gridList
+        //List gridList = gridIndex.getGridRecords();
+        //if ( !gridList.isEmpty()) {
+        if ( !tmpList.isEmpty()) {
+            for (int i = 0; i < tmpList.size(); i++) {
+                GempakGridRecord gh = (GempakGridRecord) tmpList.get(i);
                 gh.packingType = getGridPackingType(gh.gridNumber);
+                if ((gh.packingType == MDGGRB)
+                        || (gh.packingType == MDGNON)) {
+                    gridIndex.addGridRecord(gh);
+                }
             }
+        } else {
+            return false;
+        }
+        // check to see if there are any grids that we can handle
+        if (gridIndex.getGridRecords().isEmpty()) {
+            return false;
         }
 
         return true;
@@ -460,12 +469,14 @@ public class GempakGridReader extends GempakFileReader {
      *
      * @throws IOException problem reading file
      */
-    private float[] unpackData(int iiword, int nword, int ipktyp, int kxky,
-                               int nbits, float ref, float scale,
-                               boolean miss, float difmin, int kx)
+    private synchronized float[] unpackData(int iiword, int nword,
+                                            int ipktyp, int kxky, int nbits,
+                                            float ref, float scale,
+                                            boolean miss, float difmin,
+                                            int kx)
             throws IOException {
         if (ipktyp == MDGGRB) {
-            return unpackGrib1DataU(iiword, nword, kxky, nbits, ref, scale,
+            return unpackGrib1Data(iiword, nword, kxky, nbits, ref, scale,
                                     miss);
             //return unpackGrib1DataG(iiword, nword, kxky, nbits, ref, scale, miss);
         } else if (ipktyp == MDGNMC) {
@@ -476,6 +487,7 @@ public class GempakGridReader extends GempakFileReader {
         return null;
     }
 
+    // THIS DOESN'T WORK!!!!!!!!
     /**
      * Read packed Grib1 data using GEMPAK code
      *
@@ -489,7 +501,6 @@ public class GempakGridReader extends GempakFileReader {
      * @return   unpacked data
      *
      * @throws IOException problem reading file
-     */
     private float[] unpackGrib1DataG(int iiword, int nword, int kxky,
                                      int nbits, float ref, float scale,
                                      boolean miss)
@@ -547,6 +558,7 @@ public class GempakGridReader extends GempakFileReader {
         }
         return values;
     }
+     */
 
     /**
      * Read packed Grib1 data using ucar.grib code
@@ -561,13 +573,18 @@ public class GempakGridReader extends GempakFileReader {
      *
      * @throws IOException problem reading file
      */
-    private float[] unpackGrib1DataU(int iiword, int nword, int kxky,
+    private float[] unpackGrib1Data(int iiword, int nword, int kxky,
                                      int nbits, float ref, float scale,
                                      boolean miss)
             throws IOException {
         float[] values = new float[kxky];
         bitPos = 0;
         bitBuf = 0;
+        next   = 0;
+        ch1    = 0;
+        ch2    = 0;
+        ch3    = 0;
+        ch4    = 0;
         rf.seek(getOffset(iiword));
         int idat;
         for (int i = 0; i < values.length; i++) {
@@ -577,7 +594,6 @@ public class GempakGridReader extends GempakFileReader {
                 System.out.println("idat[" + i + "] = " + idat);
             }
             */
-            //values[i] = ref + scale * bits2UInt(nbits, rf);
             if (miss && (idat == IMISSD)) {
                 values[i] = IMISSD;
             } else {
@@ -680,7 +696,7 @@ public class GempakGridReader extends GempakFileReader {
     /** bit position */
     int bitPos = 0;
 
-    /** bit buffer size */
+    /** bit buffer */
     int bitBuf = 0;
 
     /** bit buffer size */

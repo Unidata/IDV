@@ -21,9 +21,6 @@
  */
 
 
-
-
-
 package ucar.unidata.data.grid.gempak;
 
 
@@ -52,7 +49,7 @@ public class GempakGridServiceProvider extends GempakIOServiceProvider {
     protected FmrcCoordSys fmrcCoordSys;
 
     /** debug timing flag */
-    private boolean debugTiming = false;
+    private boolean debug = false;
 
     /**
      * Is this a valid file?
@@ -146,7 +143,7 @@ public class GempakGridServiceProvider extends GempakIOServiceProvider {
             }
         }
 
-        if (debugTiming) {
+        if (debug) {
             long took = System.currentTimeMillis() - start;
             System.out.println("  read data took=" + took + " msec ");
         }
@@ -207,6 +204,9 @@ public class GempakGridServiceProvider extends GempakIOServiceProvider {
         int               nx            = hsys.getNx();
 
         GridRecord        record        = pv.findRecord(timeIdx, levIdx);
+        if (debug) {
+            System.out.println(record);
+        }
         if (record == null) {
             int xyCount = yRange.length() * xRange.length();
             for (int j = 0; j < xyCount; j++) {
