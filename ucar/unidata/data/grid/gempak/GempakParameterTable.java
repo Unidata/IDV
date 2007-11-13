@@ -134,7 +134,7 @@ public class GempakParameterTable {
         } else {
             description = words[1];
         }
-        String unit = words[3];
+        String unit = words[2];
         if (unit != null) {
             unit = unit.replaceAll("\\*\\*", "\\^");
             if (unit.equals("-")) {
