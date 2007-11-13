@@ -178,6 +178,9 @@ public class DisplaySettingsDialog {
     }
 
 
+    private static Font FONT_NORMAL;
+    private static Font FONT_SELECTED;
+
     /**
      * _more_
      *
@@ -193,12 +196,18 @@ public class DisplaySettingsDialog {
         updatePropertiesComponent();
         for (int i = 0; i < displays.size(); i++) {
             DisplayWrapper dw = (DisplayWrapper) displayWrappers.get(i);
+            if(FONT_NORMAL ==null) {
+                FONT_NORMAL = dw.cbx.getFont();
+                FONT_SELECTED = FONT_NORMAL.deriveFont(Font.ITALIC);
+            }
             if (dw.dci == display) {
                 dw.cbx.setForeground(Color.blue);
                 dw.cbx.setSelected(true);
+                dw.cbx.setFont(FONT_SELECTED);
             } else {
                 dw.cbx.setForeground(Color.black);
                 dw.cbx.setSelected(false);
+                dw.cbx.setFont(FONT_NORMAL);
             }
         }
     }
