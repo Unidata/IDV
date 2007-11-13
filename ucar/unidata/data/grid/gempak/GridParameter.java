@@ -23,12 +23,14 @@
 package ucar.unidata.data.grid.gempak;
 
 
+import ucar.unidata.util.StringUtil;
+
+
 /**
  * Class which represents a grid parameter.
- * A parameter consists of a discipline( ie Meteorological_products),
- * a Category( ie Temperature ) and a number that refers to a name( ie Temperature),
- * Description( ie Temperature at 2 meters), and Units( ie K ).
- * see <a href="../../Parameters.txt">Parameters.txt</a>
+ * A parameter consists of a number that can be used to look up in a table,
+ * a name( ie Temperature), a description( ie Temperature at 2 meters),
+ * and Units( ie K ).
  */
 
 public final class GridParameter {
@@ -142,5 +144,51 @@ public final class GridParameter {
     public final void setUnit(String unit) {
         this.unit = unit;
     }
+
+    /**
+     * Return a String representation of this object
+     *
+     * @return a String representation of this object
+     */
+    public String toString() {
+        StringBuffer buf = new StringBuffer("GridParameter: ");
+        buf.append(StringUtil.padLeft(String.valueOf(getNumber()), 4));
+        buf.append(" ");
+        String param = getName() + " (" + getDescription() + ")";
+        buf.append(StringUtil.padRight(param, 40));
+        buf.append(" [");
+        buf.append(getUnit());
+        buf.append("]");
+        return buf.toString();
+    }
+
+    /**
+     * Check for equality
+     *
+     * @param o  the object in question
+     *
+     * @return  true if has the same parameters
+     */
+    public boolean equals(Object o) {
+        if ((o == null) || !(o instanceof GridParameter)) {
+            return false;
+        }
+        GridParameter that = (GridParameter) o;
+        return (number == that.number) && name.equals(that.name)
+               && description.equals(that.description)
+               && unit.equals(that.unit);
+    }
+
+    /**
+     * Generate a hash code.
+     *
+     * @return  the hash code
+     */
+    public int hashCode() {
+        return number + name.hashCode() + description.hashCode()
+               + unit.hashCode();
+    }
+
+
 }
 

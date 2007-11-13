@@ -33,12 +33,23 @@ public final class GempakLookup implements GridTableLookup {
     /** sample grid */
     private GempakGridRecord sample;
 
+    /** parameter table */
+    private GempakParameterTable paramTable;
+
+    /**
     /**
      * Gets a representative grid for this lookup
      * @param sample
      */
     public GempakLookup(GempakGridRecord sample) {
         this.sample = sample;
+        paramTable = new GempakParameterTable();
+        try {
+        paramTable.addParameters("wmogrib3.tbl");
+        paramTable.addParameters("ncepgrib2.tbl");
+        } catch (java.io.IOException ioe) {
+            System.out.println("couldn't add table");
+        }
     }
 
     /**
@@ -66,16 +77,11 @@ public final class GempakLookup implements GridTableLookup {
      */
     public final GridParameter getParameter(GridRecord gr) {
         String name = gr.getParameterName();
-        String unit;
-        if (name.equals("PMSL")) {
-            unit = "hPa";
-        } else if (name.equals("TMPK")) {
-            unit = "K";
-        } else {
-            unit = "";
+        GridParameter gp = paramTable.getParameter(name);
+        if (gp != null) {
+            return gp;
         }
-        GridParameter p = new GridParameter(1, name, name, unit);
-        return p;
+        return new GridParameter(0, name, name, "");
     }
 
     /**
@@ -114,7 +120,33 @@ public final class GempakLookup implements GridTableLookup {
      */
     public final String getLevelDescription(GridRecord gr) {
         // TODO:  flesh this out
-        return getLevelName(gr);
+        String levelName = getLevelName(gr);
+        if (levelName.equals("PRES")) {
+           return "pressure";
+        } else if (levelName.equals("NONE")) {
+           return "surface";
+        } else if (levelName.equals("HGHT")) {
+           return "height_above_ground";
+        } else if (levelName.equals("THTA")) {
+           return "isentropic";
+        } else if (levelName.equals("SGMA")) {
+           return "sigma";
+        } else if (levelName.equals("DPTH")) {
+           return "depth";
+        } else if (levelName.equals("PDLY")) {
+           return "layer_between_two_pressure_difference_from_ground";
+        } else if (levelName.equals("FRZL")) {
+           return "zeroDegC_isotherm";
+        } else if (levelName.equals("TROP")) {
+           return "tropopause";
+        } else if (levelName.equals("CLDL")) {
+           return "cloud_base";
+        } else if (levelName.equals("CLDT")) {
+           return "cloud_tops";
+        } else if (levelName.equals("MWSL")) {
+           return "maximum_wind_level";
+        }
+        return levelName;
     }
 
     /**
@@ -123,8 +155,22 @@ public final class GempakLookup implements GridTableLookup {
      * @return LevelUnit
      */
     public final String getLevelUnit(GridRecord gr) {
-        // TODO:  figure this out
-        return "hPa";
+        // TODO:  flesh this out
+        String levelName = getLevelName(gr);
+        if (levelName.equals("PRES")) {
+           return "hPa";
+        } else if (levelName.equals("HGHT")) {
+           return "m";
+        } else if (levelName.equals("THTA")) {
+           return "K";
+        } else if (levelName.equals("SGMA")) {
+           return "";
+        } else if (levelName.equals("DPTH")) {
+           return "m";
+        } else if (levelName.equals("PDLY")) {
+           return "hPa";
+        }
+        return "";
     }
 
     /**
