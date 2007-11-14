@@ -42,6 +42,12 @@
        p2="V"
        p3="Z"/>
   </paramgroup>
+  <paramgroup name="urel_vrel_z">
+    <params
+       p1="UREL"
+       p2="VREL"
+       p3="Z"/>
+  </paramgroup>
   <paramgroup name="temp_and_pressure">
     <params
        p1="TEMP"

@@ -571,6 +571,7 @@ or
     </categories>
     <operands categories="GRID-3D-*;">
       <paramgroup name="u_v_z"/>
+      <paramgroup name="urel_vrel_z"/>
     </operands>
   </derived>
   <derived 
@@ -586,7 +587,7 @@ or
          childidx="0" />
     </categories>
     <operands categories="GRID-3D-*;">
-      <paramgroup name="u_v_z"/>
+      <paramgroup name="urel_vrel_z"/>
     </operands>
   </derived>
   <derived description="Export Grid to Excel" formula="writeGridToXls(grid[,categories=GRID-3D-*;GRID-2D-*],file[type=file,isuser=true,label=Excel File,filepattern=\.xls:Excel Files])" id="writeGridToXls" isdefault="false" isenduser="true">
