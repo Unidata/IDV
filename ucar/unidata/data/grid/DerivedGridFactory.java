@@ -91,7 +91,6 @@ public class DerivedGridFactory {
     /** gravity */
     public static final Real GRAVITY;
 
-
     static {
         try {
             EARTH_RADIUS = new Real(Length.getRealType(), 6371000, SI.meter);
@@ -426,7 +425,8 @@ public class DerivedGridFactory {
 
         FieldImpl relVor  = createRelativeVorticity(uFI, vFI);
         FieldImpl latGrid = createLatitudeGrid(relVor);
-        FieldImpl fc = (FieldImpl) latGrid.sin().multiply(EARTH_TWO_OMEGA);
+        FieldImpl fc = 
+            (FieldImpl) latGrid.sinDegrees().multiply(EARTH_TWO_OMEGA);
         FieldImpl avFI    = (FieldImpl) relVor.add(fc);
         Unit      avUnit  = GridUtil.getParamUnits(avFI)[0];
         RealType  avRT    = DataUtil.makeRealType("absvorticity", avUnit);
@@ -2078,8 +2078,8 @@ public class DerivedGridFactory {
             twoDManifold = true;
             fToUse = (FlatField) GridUtil.make2DGridFromSlice(fToUse, false);
         }
-        FlatField retField = (FlatField) fToUse.derivative(var,
-                                 Data.NO_ERRORS);
+
+        FlatField retField = (FlatField) fToUse.derivative(var, Data.NO_ERRORS);
         if (twoDManifold) {
             retField = (FlatField) GridUtil.setSpatialDomain(retField,
                     domain);
@@ -2087,9 +2087,9 @@ public class DerivedGridFactory {
         if (var.equals(RealType.Longitude)
                 || var.getName().toLowerCase().startsWith("lon")) {
             FlatField latGrid = (FlatField) createLatitudeGrid(retField);
-            // take the cos, but account for 0 at poles.
-            FlatField latCosGrid =
-                (FlatField) latGrid.cos().max(new Real(Math.cos(89)));
+            FlatField latCosGrid = (FlatField) latGrid.cosDegrees();
+            // account for 0 at poles.
+            latCosGrid = (FlatField) latCosGrid.max(new Real(Math.cos(Math.toRadians(89))));
             FlatField factor = (FlatField) latCosGrid.multiply(KM_PER_DEGREE);
             retField = (FlatField) retField.divide(factor);
         } else if (var.equals(RealType.Latitude)
