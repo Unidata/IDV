@@ -822,7 +822,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
 
         JButton showBtn =
             GuiUtils.makeImageButton("/auxdata/ui/icons/About16.gif", this,
-                                     "showGroups");
+                                     "showGroups",null,true);
         showBtn.setToolTipText(
             "List the public datasets available on the server");
         JComponent extraTop = GuiUtils.hbox(groupSelector, showBtn);
@@ -844,7 +844,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
             propertiesLabel = GuiUtils.lLabel(" ");
             JButton editButton =
                 GuiUtils.makeImageButton("/auxdata/ui/icons/Edit16.gif",
-                                         this, "showPropPanel");
+                                         this, "showPropPanel",null,true);
             editButton.setToolTipText("Click to edit properties");
             bottomComps.add(GuiUtils.leftCenter(editButton, propertiesLabel));
         }
@@ -947,7 +947,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
                 centerLineFld      = new JTextField("", 3);
                 centerElementFld   = new JTextField("", 3);
 
-                lockBtn = GuiUtils.getToggleImageButton(IdvUIManager.ICON_UNLOCK,IdvUIManager.ICON_LOCK,0,0);
+                lockBtn = GuiUtils.getToggleImageButton(IdvUIManager.ICON_UNLOCK,IdvUIManager.ICON_LOCK,0,0,true);
                 lockBtn.setContentAreaFilled(false);
                 lockBtn.setSelected(true);
                 lockBtn.setToolTipText("Unlock to automatically change size when changing magnification");
@@ -988,14 +988,14 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
 
                 JButton locPosButton = GuiUtils.makeImageButton(
                                            "/auxdata/ui/icons/Refresh16.gif",
-                                           this, "cyclePlace", null);
+                                           this, "cyclePlace", null,true);
 
                 locPosButton.setToolTipText("Change place type");
 
                 JButton locTypeButton =
                     GuiUtils.makeImageButton(
                         "/auxdata/ui/icons/Refresh16.gif", locationPanel,
-                        "flip", null);
+                        "flip", null,true);
                 locTypeButton.setToolTipText(
                     "Toggle between Latitude/Longitude and Line/Element");
 
@@ -1314,7 +1314,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
 
         JButton archiveDayBtn =
             GuiUtils.makeImageButton("/auxdata/ui/icons/Archive.gif", this,
-                                     "getArchiveDay");
+                                     "getArchiveDay",null,true);
         archiveDayBtn.setToolTipText("Select a day for archive datasets");
         archiveDayLabel     = new JLabel("");
         archiveDayComponent = GuiUtils.hbox(archiveDayBtn, archiveDayLabel);
