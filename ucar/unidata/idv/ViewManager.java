@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
@@ -775,11 +776,20 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
     }
 
+    /** _more_          */
     JPanel contentsWrapper;
-    public void  doDrop(Object object) {
+
+    /**
+     * _more_
+     *
+     * @param object _more_
+     */
+    public void doDrop(Object object) {
         DisplayControl control = (DisplayControl) object;
-        ViewManager vm = control.getViewManager();
-        if(vm == null || vm == this) return;
+        ViewManager    vm      = control.getViewManager();
+        if ((vm == null) || (vm == this)) {
+            return;
+        }
         control.moveTo(this);
     }
 
@@ -787,7 +797,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /**
      * Create the ui
      */
-   protected void initUI() {
+    protected void initUI() {
         try {
             init();
             if (initProperties != null) {
@@ -805,10 +815,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
 
         JComponent baseContents = (JComponent) doMakeContents();
-        baseContents = makeDropPanel(baseContents, false);
-        innerContents = GuiUtils.center(baseContents);
-        contentsWrapper  = GuiUtils.center(innerContents);
-        menuBar       = doMakeMenuBar();
+        baseContents    = makeDropPanel(baseContents, false);
+        innerContents   = GuiUtils.center(baseContents);
+        contentsWrapper = GuiUtils.center(innerContents);
+        menuBar         = doMakeMenuBar();
         if (menuBar != null) {
             menuBar.setBorderPainted(false);
         }
@@ -886,23 +896,45 @@ public class ViewManager extends SharableImpl implements ActionListener,
         fillLegends();
     }
 
+    /**
+     * _more_
+     *
+     * @param contents _more_
+     * @param doBorder _more_
+     *
+     * @return _more_
+     */
     public DropPanel makeDropPanel(JComponent contents, boolean doBorder) {
-        DropPanel dropPanel = new DropPanel(contents,doBorder) {
-                public void handleDrop(Object object) {
-                    Misc.run(ViewManager.this,"doDrop",object);
+        DropPanel dropPanel = new DropPanel(contents, doBorder) {
+            public void handleDrop(Object object) {
+                Misc.run(ViewManager.this, "doDrop", object);
+            }
+            public boolean okToDrop(Object object) {
+                if ( !(object instanceof DisplayControl)) {
+                    return false;
                 }
-                public boolean okToDrop(Object object) {
-                    if(!(object instanceof DisplayControl)) return false;
-                    DisplayControl control = (DisplayControl) object;
-                    ViewManager vm = control.getViewManager();
-                    if(vm == null || vm == ViewManager.this || !vm.getClass().equals(ViewManager.this.getClass())) {
-                        return false;
-                    }
-                    return true;
-                }
-            };
+                return okToImportDisplay((DisplayControl) object);
+            }
+        };
 
         return dropPanel;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param control _more_
+     *
+     * @return _more_
+     */
+    public boolean okToImportDisplay(DisplayControl control) {
+        ViewManager vm = control.getViewManager();
+        if ((vm == null) || (vm == ViewManager.this)
+                || !vm.getClass().equals(ViewManager.this.getClass())) {
+            return false;
+        }
+        return true;
     }
 
 
@@ -1568,6 +1600,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
 
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public List getSunriseLocations() {
             return getIdv().getIdvUIManager().getMapLocations();
         }
@@ -2375,7 +2412,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * Called when the window is closed. This method closes any open legends.
      */
     protected void doClose() {
-        if(legends==null) return;
+        if (legends == null) {
+            return;
+        }
         for (int i = 0; i < legends.size(); i++) {
             ((IdvLegend) legends.get(i)).doClose();
         }
@@ -3468,12 +3507,15 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
 
-        List renderItems  = new ArrayList();
-        renderItems.add(GuiUtils.makeMenuItem("Make Frames", this,"makeFrames"));
-        if(usingImagePanel) {
-            renderItems.add(GuiUtils.makeMenuItem("Reset to display", this,"useDisplay"));
-        } else if(imagePanel!=null) {
-           renderItems.add(GuiUtils.makeMenuItem("Reset to images", this,"useImages"));
+        List renderItems = new ArrayList();
+        renderItems.add(GuiUtils.makeMenuItem("Make Frames", this,
+                "makeFrames"));
+        if (usingImagePanel) {
+            renderItems.add(GuiUtils.makeMenuItem("Reset to display", this,
+                    "useDisplay"));
+        } else if (imagePanel != null) {
+            renderItems.add(GuiUtils.makeMenuItem("Reset to images", this,
+                    "useImages"));
         }
 
         viewMenu.add(GuiUtils.makeMenu("Rendering", renderItems));
@@ -3580,8 +3622,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
                             if (evt.getPropertyName().equals(
                                     Animation.ANI_VALUE)) {
                                 updateTimelines(false);
-                                if(imagePanel!=null) {
-                                    imagePanel.setSelectedFile(animation.getCurrent());
+                                if (imagePanel != null) {
+                                    imagePanel.setSelectedFile(
+                                        animation.getCurrent());
                                 }
                             } else if (evt.getPropertyName().equals(
                                     Animation.ANI_SET) && (animationTimeline
@@ -4287,45 +4330,69 @@ public class ViewManager extends SharableImpl implements ActionListener,
     public void actionPerformed(ActionEvent event) {}
 
 
+    /** _more_          */
     private ImagePanel imagePanel;
-    boolean usingImagePanel  =false;
 
+    /** _more_          */
+    boolean usingImagePanel = false;
+
+    /**
+     * _more_
+     */
     public void makeFrames() {
-        ImageSequenceGrabber isg = new ImageSequenceGrabber(this, null,true);
+        ImageSequenceGrabber isg = new ImageSequenceGrabber(this, null, true);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean useDisplay() {
-        if(!usingImagePanel) return false;
+        if ( !usingImagePanel) {
+            return false;
+        }
         usingImagePanel = false;
         contentsWrapper.removeAll();
-        contentsWrapper.add(BorderLayout.CENTER,innerContents);
+        contentsWrapper.add(BorderLayout.CENTER, innerContents);
         contentsWrapper.revalidate();
         //        animation.setEnabled(true);
         return true;
 
     }
 
+    /**
+     * _more_
+     */
     public void useImages() {
-        if(usingImagePanel) {
+        if (usingImagePanel) {
             return;
         }
-        if(imagePanel == null) {
+        if (imagePanel == null) {
             imagePanel = new ImagePanel();
         }
         //        animation.setEnabled(false);
         contentsWrapper.removeAll();
-        contentsWrapper.add(BorderLayout.CENTER,imagePanel);
+        contentsWrapper.add(BorderLayout.CENTER, imagePanel);
         contentsWrapper.revalidate();
         usingImagePanel = true;
     }
 
+    /**
+     * _more_
+     *
+     * @param images _more_
+     * @param andShow _more_
+     */
     public void useImages(List images, boolean andShow) {
-        if(imagePanel == null) {
+        if (imagePanel == null) {
             imagePanel = new ImagePanel();
         }
         imagePanel.setFiles(images);
         imagePanel.setSelectedFile(animation.getCurrent());
-        if(andShow) useImages();
+        if (andShow) {
+            useImages();
+        }
     }
 
 

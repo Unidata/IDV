@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
@@ -112,8 +113,12 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 public class MapViewManager extends NavigatedViewManager {
 
+    /** _more_          */
     public static final String PREF_ADDRESS_LIST = "view.address.list";
-    public static final String PREF_ADDRESS_REPROJECT = "view.address.reproject";
+
+    /** _more_          */
+    public static final String PREF_ADDRESS_REPROJECT =
+        "view.address.reproject";
 
     /** Preference for autorotate in globe mode */
     public static final String PREF_AUTOROTATE = "View.AutoRotate";
@@ -699,9 +704,11 @@ public class MapViewManager extends NavigatedViewManager {
     private void goToAddressInner() {
         try {
             if (addressReprojectCbx == null) {
-                addressReprojectCbx = new JCheckBox("Reproject", getStore().get(PREF_ADDRESS_REPROJECT,true));
-                List savedAddresses = (List)getStore().get(PREF_ADDRESS_LIST);
-                if(savedAddresses!=null) {
+                addressReprojectCbx = new JCheckBox("Reproject",
+                        getStore().get(PREF_ADDRESS_REPROJECT, true));
+                List savedAddresses =
+                    (List) getStore().get(PREF_ADDRESS_LIST);
+                if (savedAddresses != null) {
                     GeoUtils.setSavedAddresses(savedAddresses);
                 }
             }
@@ -713,8 +720,9 @@ public class MapViewManager extends NavigatedViewManager {
                 return;
             }
 
-            getStore().put(PREF_ADDRESS_LIST,GeoUtils.getSavedAddresses());
-            getStore().put(PREF_ADDRESS_REPROJECT,addressReprojectCbx.isSelected());
+            getStore().put(PREF_ADDRESS_LIST, GeoUtils.getSavedAddresses());
+            getStore().put(PREF_ADDRESS_REPROJECT,
+                           addressReprojectCbx.isSelected());
 
 
             float x      = (float) llp.getLongitude().getValue();
@@ -1254,6 +1262,23 @@ public class MapViewManager extends NavigatedViewManager {
         } catch (Exception exc) {
             logException("Error setting pip panel", exc);
         }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param control _more_
+     *
+     * @return _more_
+     */
+    public boolean okToImportDisplay(DisplayControl control) {
+        //Base class method checks for non-null and class equality
+        if ( !super.okToImportDisplay(control)) {
+            return false;
+        }
+        MapViewManager vm = (MapViewManager) control.getViewManager();
+        return this.getUseGlobeDisplay() == vm.getUseGlobeDisplay();
     }
 
 
