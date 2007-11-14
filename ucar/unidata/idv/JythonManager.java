@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -44,6 +45,7 @@ import ucar.unidata.data.DerivedDataDescriptor;
 import ucar.unidata.data.DescriptorDataSource;
 
 import ucar.unidata.idv.ui.*;
+import ucar.unidata.ui.Help;
 
 import ucar.unidata.ui.TreePanel;
 import ucar.unidata.util.FileManager;
@@ -135,14 +137,18 @@ public class JythonManager extends IdvManager implements ActionListener {
     private String tmpJython = "";
 
 
-    /** _more_          */
+    /** _more_ */
     private TreePanel treePanel;
 
-    /** _more_          */
+    /** _more_ */
     private JTextField findFld;
 
+    /** _more_          */
     private JCheckBox caseCbx;
+
+    /** _more_          */
     JToggleButton highlightAllBtn;
+
     /** One text component per tab */
     private ArrayList libHolders;
 
@@ -463,30 +469,41 @@ public class JythonManager extends IdvManager implements ActionListener {
      * _more_
      *
      * @param text _more_
+     * @param next _more_
      */
-    private void searchFor(String text,boolean next) {
+    private void searchFor(String text, boolean next) {
         LibHolder holder = findVisibleComponent();
-        if ( !holder.find(text,highlightAllBtn.isSelected(),caseCbx.isSelected(),next)) {
+        if ( !holder.find(text, highlightAllBtn.isSelected(),
+                          caseCbx.isSelected(), next)) {
             findFld.setBackground(DataSelector.COLOR_BADSEARCH);
         } else {
             findFld.setBackground(Color.white);
         }
     }
 
+    /**
+     * _more_
+     */
     public void searchFor() {
-        searchFor(findFld.getText(),true);
+        searchFor(findFld.getText(), true);
     }
 
+    /**
+     * _more_
+     */
     public void doSearch() {
         LibHolder holder = findVisibleComponent();
         holder.resetToCurrentSearchIndex();
-        searchFor(findFld.getText(),true);
+        searchFor(findFld.getText(), true);
     }
 
+    /**
+     * _more_
+     */
     public void doSearchPrevious() {
         LibHolder holder = findVisibleComponent();
         holder.resetToCurrentSearchIndex();
-        searchFor(findFld.getText(),false);
+        searchFor(findFld.getText(), false);
     }
 
 
@@ -510,32 +527,38 @@ public class JythonManager extends IdvManager implements ActionListener {
                 LogUtil.userMessage("No Jython resources defined");
                 return null;
             }
-            highlightAllBtn = GuiUtils.getToggleImageButton("/auxdata/ui/icons/SearchHighlightOff16.gif",
-                                                            "/auxdata/ui/icons/SearchHighlightOn16.gif",
-                                                            0,0);
-            GuiUtils.makeMouseOverBorder(highlightAllBtn);
-            highlightAllBtn.addActionListener(GuiUtils.makeActionListener(this,"searchFor", null));
+            highlightAllBtn = GuiUtils.getToggleImageButton(
+                "/auxdata/ui/icons/SearchHighlightOff16.gif",
+                "/auxdata/ui/icons/SearchHighlightOn16.gif", 0, 0, true);
+            highlightAllBtn.addActionListener(
+                GuiUtils.makeActionListener(this, "searchFor", null));
 
             highlightAllBtn.setToolTipText("Highlight All");
             caseCbx = new JCheckBox("Match case", false);
             findFld = new JTextField("", 20);
-            JButton nextBtn = GuiUtils.makeImageButton("/auxdata/ui/icons/SearchNext16.gif", this,"doSearch");
-            JButton prevBtn = GuiUtils.makeImageButton("/auxdata/ui/icons/SearchPrev16.gif", this,"doSearchPrevious");
+            JButton nextBtn = GuiUtils.makeImageButton(
+                                  "/auxdata/ui/icons/SearchNext16.gif", this,
+                                  "doSearch", null, true);
+            JButton prevBtn = GuiUtils.makeImageButton(
+                                  "/auxdata/ui/icons/SearchPrev16.gif", this,
+                                  "doSearchPrevious", null, true);
             nextBtn.setToolTipText("Find Next");
             prevBtn.setToolTipText("Find Previous");
 
-            GuiUtils.makeMouseOverBorder(prevBtn);
-            GuiUtils.makeMouseOverBorder(nextBtn);
 
-            findFld.addActionListener(GuiUtils.makeActionListener(this,"doSearch", null));
+
+            findFld.addActionListener(GuiUtils.makeActionListener(this,
+                    "doSearch", null));
             findFld.addKeyListener(new KeyAdapter() {
-                    public void keyReleased(KeyEvent e) {
-                        if(e.isControlDown()) return;
-                        if(e.getKeyCode()!=e.VK_ENTER) {
-                            searchFor(findFld.getText(),true);
-                        }
+                public void keyReleased(KeyEvent e) {
+                    if (e.isControlDown()) {
+                        return;
                     }
-                });
+                    if (e.getKeyCode() != e.VK_ENTER) {
+                        searchFor(findFld.getText(), true);
+                    }
+                }
+            });
 
 
             treePanel  = new TreePanel();
@@ -621,11 +644,14 @@ public class JythonManager extends IdvManager implements ActionListener {
             menuBar.add(helpMenu);
             helpMenu.add(GuiUtils.makeMenuItem("Show Jython Help", this,
                     "showHelp"));
-            JComponent buttons = GuiUtils.hbox(Misc.newList(nextBtn,prevBtn,highlightAllBtn,caseCbx),4);
-            JComponent bottomPanel = GuiUtils.left(GuiUtils.hbox(new JLabel(" Find: "),
-                                                                 GuiUtils.hfill(findFld),buttons));
+            JComponent buttons = GuiUtils.hbox(Misc.newList(nextBtn, prevBtn,
+                                     highlightAllBtn, caseCbx), 2);
+            JComponent bottomPanel =
+                GuiUtils.left(GuiUtils.hbox(new JLabel(" Find: "),
+                                            GuiUtils.hfill(findFld),
+                                            buttons));
             return contents = GuiUtils.topCenterBottom(menuBar, treePanel,
-                    GuiUtils.inset(bottomPanel,2));
+                    GuiUtils.inset(bottomPanel, 1));
         } catch (Throwable exc) {
             logException("Creating jython editor", exc);
             return null;
@@ -688,10 +714,12 @@ public class JythonManager extends IdvManager implements ActionListener {
     private LibHolder makeLibHolder(boolean editable, String label,
                                     String path, String text)
             throws VisADException {
+
         final LibHolder[]   holderArray  = { null };
         final JPythonEditor jythonEditor = new JPythonEditor() {
             public void undoableEditHappened(UndoableEditEvent e) {
-                if (holderArray[0] != null && holderArray[0].saveBtn!=null) {
+                if ((holderArray[0] != null)
+                        && (holderArray[0].saveBtn != null)) {
                     holderArray[0].saveBtn.setEnabled(true);
                     holderArray[0].functions = null;
                 }
@@ -701,34 +729,71 @@ public class JythonManager extends IdvManager implements ActionListener {
 
 
         jythonEditor.getTextComponent().addKeyListener(new KeyAdapter() {
-                public void keyPressed(KeyEvent e) {
-                    if(e.isControlDown() && e.getKeyCode() == e.VK_F) {
-                        findFld.requestFocus();
-                        findFld.selectAll();
-                    }
+            public void keyPressed(KeyEvent e) {
+                if (e.isControlDown() && (e.getKeyCode() == e.VK_F)) {
+                    findFld.requestFocus();
+                    findFld.selectAll();
                 }
-            });
+            }
+        });
 
         jythonEditor.getTextComponent().addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
                 holderArray[0].setSearchIndex(new Point(e.getX(), e.getY()));
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    JTextComponent comp     = jythonEditor.getTextComponent();
-                    List           items    = new ArrayList();
-                    String         selected = comp.getSelectedText();
-                    if ((selected != null)
-                            && (selected.trim().length() > 0)) {
-                        selected = selected.trim();
+                    JTextComponent comp = jythonEditor.getTextComponent();
+                    int point = comp.viewToModel(new Point(e.getX(),
+                                    e.getY()));
+                    String text  = comp.getText();
+                    String token = "";
+                    int    idx   = point;
+                    while (idx >= 0) {
+                        char c = text.charAt(idx);
+                        idx--;
+                        if ( !Character.isJavaIdentifierPart(c)) {
+                            break;
+                        }
+                        token = c + token;
+                    }
+
+                    int len = text.length();
+                    idx = point + 1;
+                    while (idx < len) {
+                        char c = text.charAt(idx);
+                        idx++;
+                        if ( !Character.isJavaIdentifierPart(c)) {
+                            break;
+                        }
+                        token = token + c;
+                    }
+
+                    List items = new ArrayList();
+                    if (token.length() == 0) {
+                        token = comp.getSelectedText();
+                    }
+                    JMenuItem helpMenuItem = null;
+                    if ((token != null) && (token.trim().length() > 0)) {
+                        token = token.trim();
                         List funcs = findJythonMethods(true,
                                          Misc.newList(holderArray[0]));
                         for (int i = 0; i < funcs.size(); i++) {
                             PyFunction func = (PyFunction) funcs.get(i);
-                            if (func.__name__.equals(selected)) {
+                            if (func.__name__.equals(token)) {
+
                                 items.add(
                                     GuiUtils.makeMenuItem(
-                                        "Make formula for " + selected,
+                                        "Make formula for " + token,
                                         JythonManager.this, "makeFormula",
                                         func));
+                                String helpLink = "idv.tools.jythonlib."
+                                                  + func.__name__;
+                                if (Help.getDefaultHelp().isValidID(
+                                        helpLink)) {
+                                    helpMenuItem =
+                                        GuiUtils.makeMenuItem("Help",
+                                            JythonManager.this, "showHelp",
+                                            helpLink);
+                                }
                                 break;
                             }
                         }
@@ -744,8 +809,14 @@ public class JythonManager extends IdvManager implements ActionListener {
                             getIdv().getIdvUIManager().makeActionMenu(
                                 jythonEditor, "insertText", true)));
 
+                    if (helpMenuItem != null) {
+                        items.add(GuiUtils.MENU_SEPARATOR);
+                        items.add(helpMenuItem);
+                    }
+
                     JPopupMenu popup = GuiUtils.makePopupMenu(items);
-                    popup.show(jythonEditor, e.getX(), e.getY());
+                    popup.show(jythonEditor.getTextComponent(), e.getX(),
+                               e.getY());
                 }
             }
         });
@@ -754,6 +825,13 @@ public class JythonManager extends IdvManager implements ActionListener {
         JComponent wrapper = GuiUtils.center(jythonEditor);
         LibHolder libHolder = new LibHolder(editable, this, label,
                                             jythonEditor, path, wrapper);
+
+
+
+
+
+
+
         holderArray[0] = libHolder;
         if (mainHolder == null) {
             mainHolder = libHolder;
@@ -766,11 +844,36 @@ public class JythonManager extends IdvManager implements ActionListener {
         }
         if (text != null) {
             jythonEditor.setText(text);
+
+            /**
+             * for highlighting text
+             * List funcs = findJythonMethods(true,
+             *                              Misc.newList(libHolder));
+             * Highlighter highlighter = jythonEditor.getTextComponent().getHighlighter();
+             * DefaultHighlighter.DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.red);
+             * try {
+             *   for (int i = 0; i < funcs.size(); i++) {
+             *       PyFunction func = (PyFunction) funcs.get(i);
+             *       String name = func.__name__;
+             *       String funcDef = "def "+ name+"(";
+             *       int idx = text.indexOf(funcDef);
+             *       if(idx>=0) {
+             *           highlighter.addHighlight(idx,idx+funcDef.length(), painter);
+             *       }
+             *   }
+             * } catch (Exception exc) {
+             *   logException("An error occurred highlighting the jython library: " +path,
+             *                exc);
+             * }
+             */
+
+
         }
-        if(libHolder.saveBtn!=null) {
+        if (libHolder.saveBtn != null) {
             libHolder.saveBtn.setEnabled(false);
         }
         return libHolder;
+
     }
 
 
@@ -1031,7 +1134,17 @@ public class JythonManager extends IdvManager implements ActionListener {
      * SHow help
      */
     public void showHelp() {
-        getIdvUIManager().showHelp("idv.tools.jython");
+        showHelp("idv.tools.jython");
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param help _more_
+     */
+    public void showHelp(String help) {
+        getIdvUIManager().showHelp(help);
     }
 
     /**
@@ -2290,7 +2403,9 @@ public class JythonManager extends IdvManager implements ActionListener {
             for (int itemIdx = 0; itemIdx < funcs.size(); itemIdx++) {
                 Object[]   pair = (Object[]) funcs.get(itemIdx);
                 PyFunction func = (PyFunction) pair[1];
-                sb.append("<p><a name=\"" + func.__name__
+                sb.append("\n<meta name=\"jhid\" value=\"" + func.__name__
+                          + "\">");
+                sb.append("\n<p><a name=\"" + func.__name__
                           + "\"></a><code class=\"command\">" + func.__name__
                           + "(");
                 PyTableCode tc = (PyTableCode) func.func_code;
@@ -2332,10 +2447,10 @@ public class JythonManager extends IdvManager implements ActionListener {
      */
     public static class LibHolder {
 
-        /** _more_          */
+        /** _more_ */
         JythonManager jythonManager;
 
-        /** _more_          */
+        /** _more_ */
         private boolean editable;
 
         /** functions in lib */
@@ -2347,6 +2462,7 @@ public class JythonManager extends IdvManager implements ActionListener {
         /** widget */
         JPythonEditor pythonEditor;
 
+        /** _more_          */
         JTextComponent textComp;
 
 
@@ -2376,17 +2492,18 @@ public class JythonManager extends IdvManager implements ActionListener {
          * @param editor editor
          * @param filePath lib file
          * @param wrapper wrapper
-         * @param outerContents contents
          */
         public LibHolder(boolean editable, JythonManager jythonManager,
                          String label, JPythonEditor editor, String filePath,
                          JComponent wrapper) {
-            if(allPainter == null) {
-                allPainter = new DefaultHighlighter.DefaultHighlightPainter(Color.yellow);
-                onePainter = new DefaultHighlighter.DefaultHighlightPainter(Color.green);
+            if (allPainter == null) {
+                allPainter = new DefaultHighlighter.DefaultHighlightPainter(
+                    Color.yellow);
+                onePainter = new DefaultHighlighter.DefaultHighlightPainter(
+                    Color.green);
             }
             this.pythonEditor  = editor;
-            textComp = pythonEditor.getTextComponent();
+            textComp           = pythonEditor.getTextComponent();
             this.editable      = editable;
             this.jythonManager = jythonManager;
             this.label         = label;
@@ -2468,41 +2585,79 @@ public class JythonManager extends IdvManager implements ActionListener {
         }
 
 
-        /** _more_          */
+        /** _more_ */
         String lastSearch;
 
-        /** _more_          */
+        /** _more_ */
         int lastIndex = -1;
+
+        /** _more_          */
         int currentIndex = -1;
+
+        /**
+         * _more_
+         *
+         * @param pt _more_
+         */
         public void setSearchIndex(Point pt) {
             Highlighter highlighter = textComp.getHighlighter();
-            highlighter.removeAllHighlights();
-            lastIndex = textComp.viewToModel(pt);
+            removeHighlights();
+            lastIndex  = textComp.viewToModel(pt);
             lastSearch = null;
         }
 
 
-        static  DefaultHighlighter.DefaultHighlightPainter allPainter;
-        static  DefaultHighlighter.DefaultHighlightPainter onePainter;
+        /**
+         * _more_
+         */
+        public void removeHighlights() {
+            Highlighter highlighter = textComp.getHighlighter();
+            for (int i = 0; i < highlights.size(); i++) {
+                highlighter.removeHighlight(highlights.get(i));
+            }
+        }
 
+        /** _more_          */
+        List highlights = new ArrayList();
+
+        /** _more_          */
+        static DefaultHighlighter.DefaultHighlightPainter allPainter;
+
+        /** _more_          */
+        static DefaultHighlighter.DefaultHighlightPainter onePainter;
+
+        /**
+         * _more_
+         */
         public void resetToCurrentSearchIndex() {
             lastIndex = currentIndex;
         }
 
+        /**
+         * _more_
+         *
+         * @param what _more_
+         * @param t _more_
+         */
         private void highlightAll(String what, String t) {
-            if(what.length() ==0) return;
+            if (what.length() == 0) {
+                return;
+            }
             Highlighter highlighter = textComp.getHighlighter();
-            int baseIndex=0;
-            int index;
-            int lastIndex = -1;
+            int         baseIndex   = 0;
+            int         index;
+            int         lastIndex = -1;
             try {
-                while((index = t.indexOf(what,baseIndex)) >=0) {
-                    if(index == lastIndex) break;
+                while ((index = t.indexOf(what, baseIndex)) >= 0) {
+                    if (index == lastIndex) {
+                        break;
+                    }
                     lastIndex = index;
-                    highlighter.addHighlight(index,index+what.length(),allPainter);
-                    baseIndex = index+1;
+                    highlights.add(highlighter.addHighlight(index,
+                            index + what.length(), allPainter));
+                    baseIndex = index + 1;
                 }
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 logException("Bad highlight area", exc);
             }
 
@@ -2513,36 +2668,43 @@ public class JythonManager extends IdvManager implements ActionListener {
          * _more_
          *
          * @param what _more_
+         * @param highlightAll _more_
+         * @param doCase _more_
+         * @param next _more_
          *
          * @return _more_
          */
-        public boolean find(String what, boolean highlightAll, boolean doCase, boolean next) {
-            String         t        = textComp.getText();
-            if(!doCase) t = t.toLowerCase();
-            int            start    = 0;
+        public boolean find(String what, boolean highlightAll,
+                            boolean doCase, boolean next) {
+            String t = textComp.getText();
+            if ( !doCase) {
+                t = t.toLowerCase();
+            }
+            int start = 0;
             start = lastIndex + 1;
             Highlighter highlighter = textComp.getHighlighter();
-            highlighter.removeAllHighlights();
-            if(!next) {
-                String prevText =t;
-                if(currentIndex>=0) {
-                    prevText = prevText.substring(0,currentIndex);
+            removeHighlights();
+            if ( !next) {
+                String prevText = t;
+                if (currentIndex >= 0) {
+                    prevText = prevText.substring(0, currentIndex);
                 }
                 currentIndex = prevText.lastIndexOf(what, start);
             } else {
                 currentIndex = t.indexOf(what, start);
             }
-            if (currentIndex >=0) {
+            if (currentIndex >= 0) {
                 try {
-                    highlighter.addHighlight(currentIndex,currentIndex+what.length(),onePainter);
+                    highlights.add(highlighter.addHighlight(currentIndex,
+                            currentIndex + what.length(), onePainter));
                     textComp.setCaretPosition(currentIndex);
-                } catch(Exception exc) {
+                } catch (Exception exc) {
                     logException("Bad highlight area", exc);
                 }
-            } 
+            }
 
-            if(highlightAll) {
-                highlightAll(what,t);
+            if (highlightAll) {
+                highlightAll(what, t);
             }
             return currentIndex >= 0;
         }
