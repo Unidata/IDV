@@ -3498,17 +3498,31 @@ public class GuiUtils {
      */
     public static JToggleButton getToggleImageButton(ImageIcon icon,
             ImageIcon selectedIcon, int hinset, int vinset) {
-        JToggleButton b = new JToggleButton(icon);
+        final JToggleButton b = new JToggleButton(icon);
         if (icon != selectedIcon) {
             b.setSelectedIcon(selectedIcon);
         }
         b.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
+        //        b.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         b.setPreferredSize(new Dimension(icon.getIconWidth() + hinset,
                                          icon.getIconHeight() + vinset));
+
         return b;
     }
 
 
+    public static void makeMouseOverBorder(final JComponent b) {
+        b.setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
+        b.addMouseListener(new MouseAdapter() {
+                public void mouseEntered(MouseEvent e) {
+                    b.setBorder(BorderFactory.createLineBorder(Color.gray));
+                }
+                public void mouseExited(MouseEvent e) {
+                    b.setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
+                }
+            });
+
+    }
 
     /**
      * Create a toggle button with the given image.
