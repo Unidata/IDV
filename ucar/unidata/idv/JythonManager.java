@@ -464,9 +464,9 @@ public class JythonManager extends IdvManager implements ActionListener {
      *
      * @param text _more_
      */
-    private void searchFor(String text) {
+    private void searchFor(String text,boolean next) {
         LibHolder holder = findVisibleComponent();
-        if ( !holder.find(text,highlightAllBtn.isSelected(),caseCbx.isSelected())) {
+        if ( !holder.find(text,highlightAllBtn.isSelected(),caseCbx.isSelected(),next)) {
             findFld.setBackground(DataSelector.COLOR_BADSEARCH);
         } else {
             findFld.setBackground(Color.white);
@@ -474,13 +474,19 @@ public class JythonManager extends IdvManager implements ActionListener {
     }
 
     public void searchFor() {
-        searchFor(findFld.getText());
+        searchFor(findFld.getText(),true);
     }
 
     public void doSearch() {
         LibHolder holder = findVisibleComponent();
         holder.resetToCurrentSearchIndex();
-        searchFor(findFld.getText());
+        searchFor(findFld.getText(),true);
+    }
+
+    public void doSearchPrevious() {
+        LibHolder holder = findVisibleComponent();
+        holder.resetToCurrentSearchIndex();
+        searchFor(findFld.getText(),false);
     }
 
 
@@ -507,22 +513,31 @@ public class JythonManager extends IdvManager implements ActionListener {
             highlightAllBtn = GuiUtils.getToggleImageButton("/auxdata/ui/icons/SearchHighlightOff16.gif",
                                                             "/auxdata/ui/icons/SearchHighlightOn16.gif",
                                                             0,0);
+            GuiUtils.makeMouseOverBorder(highlightAllBtn);
             highlightAllBtn.addActionListener(GuiUtils.makeActionListener(this,"searchFor", null));
 
             highlightAllBtn.setToolTipText("Highlight All");
             caseCbx = new JCheckBox("Match case", false);
             findFld = new JTextField("", 20);
-            JButton findBtn = GuiUtils.makeImageButton("/auxdata/ui/icons/SearchNext16.gif", this,"doSearch");
-            findBtn.setToolTipText("Find Next");
+            JButton nextBtn = GuiUtils.makeImageButton("/auxdata/ui/icons/SearchNext16.gif", this,"doSearch");
+            JButton prevBtn = GuiUtils.makeImageButton("/auxdata/ui/icons/SearchPrev16.gif", this,"doSearchPrevious");
+            nextBtn.setToolTipText("Find Next");
+            prevBtn.setToolTipText("Find Previous");
+
+            GuiUtils.makeMouseOverBorder(prevBtn);
+            GuiUtils.makeMouseOverBorder(nextBtn);
+
             findFld.addActionListener(GuiUtils.makeActionListener(this,"doSearch", null));
             findFld.addKeyListener(new KeyAdapter() {
                     public void keyReleased(KeyEvent e) {
                         if(e.isControlDown()) return;
                         if(e.getKeyCode()!=e.VK_ENTER) {
-                            searchFor(findFld.getText());
+                            searchFor(findFld.getText(),true);
                         }
                     }
                 });
+
+
             treePanel  = new TreePanel();
             libHolders = new ArrayList();
             int       systemCnt = 1;
@@ -606,7 +621,7 @@ public class JythonManager extends IdvManager implements ActionListener {
             menuBar.add(helpMenu);
             helpMenu.add(GuiUtils.makeMenuItem("Show Jython Help", this,
                     "showHelp"));
-            JComponent buttons = GuiUtils.hbox(Misc.newList(findBtn,highlightAllBtn,caseCbx),4);
+            JComponent buttons = GuiUtils.hbox(Misc.newList(nextBtn,prevBtn,highlightAllBtn,caseCbx),4);
             JComponent bottomPanel = GuiUtils.left(GuiUtils.hbox(new JLabel(" Find: "),
                                                                  GuiUtils.hfill(findFld),buttons));
             return contents = GuiUtils.topCenterBottom(menuBar, treePanel,
@@ -2501,14 +2516,22 @@ public class JythonManager extends IdvManager implements ActionListener {
          *
          * @return _more_
          */
-        public boolean find(String what, boolean highlightAll, boolean doCase) {
+        public boolean find(String what, boolean highlightAll, boolean doCase, boolean next) {
             String         t        = textComp.getText();
             if(!doCase) t = t.toLowerCase();
             int            start    = 0;
             start = lastIndex + 1;
             Highlighter highlighter = textComp.getHighlighter();
             highlighter.removeAllHighlights();
-            currentIndex = t.indexOf(what, start);
+            if(!next) {
+                String prevText =t;
+                if(currentIndex>=0) {
+                    prevText = prevText.substring(0,currentIndex);
+                }
+                currentIndex = prevText.lastIndexOf(what, start);
+            } else {
+                currentIndex = t.indexOf(what, start);
+            }
             if (currentIndex >=0) {
                 try {
                     highlighter.addHighlight(currentIndex,currentIndex+what.length(),onePainter);
