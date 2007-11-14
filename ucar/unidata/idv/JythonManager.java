@@ -471,6 +471,10 @@ public class JythonManager extends IdvManager implements ActionListener {
         }
     }
 
+    public void doSearch() {
+        searchFor(findFld.getText().trim());
+    }
+
 
     /**
      * Create the jython editor. We create a tree panel that holds
@@ -495,7 +499,7 @@ public class JythonManager extends IdvManager implements ActionListener {
             findFld = new JTextField("", 20);
             findFld.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
-                    searchFor(findFld.getText().trim());
+                    doSearch();
                 }
             });
             treePanel  = new TreePanel();
@@ -581,8 +585,9 @@ public class JythonManager extends IdvManager implements ActionListener {
             menuBar.add(helpMenu);
             helpMenu.add(GuiUtils.makeMenuItem("Show Jython Help", this,
                     "showHelp"));
-            JComponent bottomPanel = GuiUtils.left(GuiUtils.label(" Find: ",
-                                         findFld));
+            JButton findBtn = GuiUtils.makeButton("Find:", this,"doSearch");
+            JComponent bottomPanel = GuiUtils.left(GuiUtils.hbox(findBtn,
+                                                                 GuiUtils.hfill(findFld)));
             return contents = GuiUtils.topCenterBottom(menuBar, treePanel,
                     GuiUtils.inset(bottomPanel,1));
         } catch (Throwable exc) {
