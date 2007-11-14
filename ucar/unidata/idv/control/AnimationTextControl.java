@@ -223,7 +223,7 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
 
     /**
      * Respond to a timeChange event
-     *
+    *
      * @param time new time
      */
     protected void timeChanged(Real time) {
@@ -241,6 +241,21 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
      */
     public void hyperlinkUpdate(HyperlinkEvent e) {}
 
+    public void goToNextTime() {
+        int index = timeBox.getSelectedIndex();
+        if(index < textList.size()-1) {
+            timeBox.setSelectedIndex(index+1);
+        }
+    }
+
+    public void goToPrevTime() {
+        int index = timeBox.getSelectedIndex();
+        if(index >=1) {
+            timeBox.setSelectedIndex(index-1);
+        }
+    }
+
+
     /**
      * Make the UI contents for this control.
      *
@@ -249,6 +264,16 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
     public Container doMakeContents() {
         subjectFld = new JTextField();
         editor     = new JEditorPane();
+        editor.addKeyListener(new KeyAdapter() {
+                public void keyPressed(KeyEvent e) {
+                    if(e.isControlDown() && e.getKeyCode() == e.VK_N) {
+                        goToNextTime();
+                    } else if(e.isControlDown() && e.getKeyCode() == e.VK_P) {
+                        goToPrevTime();
+                    }
+                }
+            });
+        editor.setToolTipText("Control-n: go to next time; Control-p: Go to previous time");
         editor.setEditable(true);
         editor.addHyperlinkListener(this);
         editor.setContentType("text/html");
