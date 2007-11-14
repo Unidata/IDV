@@ -2820,12 +2820,12 @@ public class IdvUIManager extends IdvManager {
                 if (categories.size() == 1) {
                     JButton btn = new JButton(bundle.getName(), fileIcon);
                     btn.setContentAreaFilled(false);
-                    btn.setBorder(BorderFactory.createEmptyBorder(2, 2, 2,
-                            2));
+                    //                    btn.setBorder(BorderFactory.createEmptyBorder(2, 2, 2,2));
+                    GuiUtils.makeMouseOverBorder(btn);
                     btn.setToolTipText("Click to open favorite: "
                                        + bundle.getName());
                     btn.addActionListener(listener);
-                    comps.add(btn);
+                    comps.add(GuiUtils.inset(btn,2));
                     //menuBar.add(btn);
                 } else {
                     String     catSoFar   = "";
@@ -2852,16 +2852,17 @@ public class IdvUIManager extends IdvManager {
                                 b.setToolTipText(
                                     "Click to show favorites category: "
                                     + category);
-                                b.setBorder(
-                                    BorderFactory.createEmptyBorder(
-                                        2, 2, 2, 2));
+                                //                                b.setBorder(
+                                //                                    BorderFactory.createEmptyBorder(
+                                //                                        2, 2, 2, 2));
+                                GuiUtils.makeMouseOverBorder(b);
                                 b.addActionListener(new ActionListener() {
                                     public void actionPerformed(
                                             ActionEvent ae) {
                                         popup.show(b, 0, b.getHeight());
                                     }
                                 });
-                                comps.add(b);
+                                comps.add(GuiUtils.inset(b,2));
                                 //menuBar.add(b);
                             }
                             parentMenu = catMenu;

@@ -288,10 +288,12 @@ public class FormulaDialog extends JFrame implements ActionListener {
             GuiUtils.makeImageButton("/auxdata/ui/icons/EditJython16.png",
                                      idv.getJythonManager(),
                                      "showJythonEditor");
+        GuiUtils.makeMouseOverBorder(jythonBtn);
         jythonBtn.setToolTipText("Edit Jython Library");
         JButton evalBtn =
             GuiUtils.makeImageButton("/auxdata/ui/icons/Evaluate16.png",
                                      this, "evaluate");
+        GuiUtils.makeMouseOverBorder(evalBtn);
         evalBtn.setToolTipText("Save and Evaluate Formula");
 
         formulaField = new JTextField(formula, 25);
@@ -575,8 +577,9 @@ public class FormulaDialog extends JFrame implements ActionListener {
         final JButton advancedBtn     = new JButton("Advanced  ");
         final JButton advancedIconBtn = new JButton(ICON_DOWNDOWN);
         advancedIconBtn.setContentAreaFilled(false);
-        advancedBtn.setBorder(BorderFactory.createEmptyBorder());
-        advancedIconBtn.setBorder(BorderFactory.createEmptyBorder());
+        GuiUtils.makeMouseOverBorder(advancedIconBtn);
+        //        advancedBtn.setBorder(BorderFactory.createEmptyBorder());
+        //        advancedIconBtn.setBorder(BorderFactory.createEmptyBorder());
 
 
         ActionListener advancedListener = new ActionListener() {

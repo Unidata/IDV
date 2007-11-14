@@ -695,6 +695,7 @@ public class DataSelector extends DataSourceHolder {
                 GuiUtils.topCenter(GuiUtils.leftRight(makeLabel("Fields"),
                     searchPanel), treePanel);
             left.setBorder(null);
+            GuiUtils.makeMouseOverBorder(searchBtn);
             searchBtn.setToolTipText("Search for a field by name");
             searchBtn.setFocusPainted(false);
 

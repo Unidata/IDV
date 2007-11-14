@@ -374,23 +374,27 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
                                      control, "doRemove");
         removeBtn.setToolTipText("Remove Display Control");
 
+        GuiUtils.makeMouseOverBorder(removeBtn);
         JButton expandBtn =
             GuiUtils.makeImageButton("/auxdata/ui/icons/DownDown.gif", this,
                                      "expandControl", control);
 
         expandBtn.setToolTipText("Expand in the tabs");
+        GuiUtils.makeMouseOverBorder(expandBtn);
         JButton exportBtn =
             GuiUtils.makeImageButton("/auxdata/ui/icons/Export16.gif", this,
                                      "undockControl", control);
         exportBtn.setToolTipText("Undock control window");
+        GuiUtils.makeMouseOverBorder(exportBtn);
 
         JButton propBtn =
             GuiUtils.makeImageButton("/auxdata/ui/icons/Information16.gif",
                                      control, "showProperties");
         propBtn.setToolTipText("Show Display Control Properties");
-
+        GuiUtils.makeMouseOverBorder(propBtn);
 
         DndImageButton dnd = new DndImageButton(control, "idv/display");
+        GuiUtils.makeMouseOverBorder(dnd);
         dnd.setToolTipText("Drag and drop to a window component");
         JPanel buttonPanel =
             GuiUtils.left(GuiUtils.hbox(Misc.newList(expandBtn, exportBtn,
