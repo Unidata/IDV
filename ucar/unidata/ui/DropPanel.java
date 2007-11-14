@@ -137,6 +137,10 @@ public class DropPanel extends JPanel implements  DropTargetListener {
             setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
         dtde.acceptDrop(DnDConstants.ACTION_MOVE | DnDConstants.ACTION_COPY);
         Object object = getObject(dtde.getCurrentDataFlavors());
+        if(!okToDrop(object)) {
+            return;
+        }
+
         if(object == null) return;
         handleDrop(object);
     }
