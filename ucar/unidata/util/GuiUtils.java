@@ -25,6 +25,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -3478,11 +3479,15 @@ public class GuiUtils {
      * @param selectedIcon Image to use when selected
      * @param hinset Hor. inset
      * @param vinset Vert. inset
+     * @param addMouseOverBorder _more_
      * @return New button
      */
     public static JToggleButton getToggleImageButton(String icon,
-                                                     String selectedIcon, int hinset, int vinset) {
-        return getToggleImageButton(getImageIcon(icon), getImageIcon(selectedIcon), hinset, vinset);
+            String selectedIcon, int hinset, int vinset,
+            boolean addMouseOverBorder) {
+        return getToggleImageButton(getImageIcon(icon),
+                                    getImageIcon(selectedIcon), hinset,
+                                    vinset, addMouseOverBorder);
     }
 
 
@@ -3498,12 +3503,35 @@ public class GuiUtils {
      */
     public static JToggleButton getToggleImageButton(ImageIcon icon,
             ImageIcon selectedIcon, int hinset, int vinset) {
+        return getToggleImageButton(icon, selectedIcon, hinset, vinset,
+                                    false);
+    }
+
+
+
+    /**
+     * Create a JToggleButton with the given image and, if non-null,
+     * the given  selected image.
+     *
+     * @param icon Image for button
+     * @param selectedIcon Image to use when selected
+     * @param hinset Hor. inset
+     * @param vinset Vert. inset
+     * @param addMouseOverBorder _more_
+     * @return New button
+     */
+    public static JToggleButton getToggleImageButton(ImageIcon icon,
+            ImageIcon selectedIcon, int hinset, int vinset,
+            boolean addMouseOverBorder) {
         final JToggleButton b = new JToggleButton(icon);
         if (icon != selectedIcon) {
             b.setSelectedIcon(selectedIcon);
         }
-        b.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
-        //        b.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        if (addMouseOverBorder) {
+            makeMouseOverBorder(b);
+        } else {
+            b.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
+        }
         b.setPreferredSize(new Dimension(icon.getIconWidth() + hinset,
                                          icon.getIconHeight() + vinset));
 
@@ -3511,16 +3539,23 @@ public class GuiUtils {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param b _more_
+     */
     public static void makeMouseOverBorder(final JComponent b) {
-        b.setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
+        b.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         b.addMouseListener(new MouseAdapter() {
-                public void mouseEntered(MouseEvent e) {
+            public void mouseEntered(MouseEvent e) {
+                if (b.isEnabled()) {
                     b.setBorder(BorderFactory.createLineBorder(Color.gray));
                 }
-                public void mouseExited(MouseEvent e) {
-                    b.setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
-                }
-            });
+            }
+            public void mouseExited(MouseEvent e) {
+                b.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+            }
+        });
 
     }
 
@@ -5257,8 +5292,33 @@ public class GuiUtils {
     public static JButton makeImageButton(String label, final Object object,
                                           final String methodName,
                                           final Object arg) {
+
+        return makeImageButton(label, object, methodName, arg, false);
+    }
+
+
+
+    /**
+     * Make a JButton. Call methodName on object when button pressed.
+     * Pass in given arg if non-null.
+     *
+     * @param label Label
+     * @param object Object to call
+     * @param methodName Method name to call
+     * @param arg Pass this to method name if non-null.
+     * @param addMouseOverBorder _more_
+     *
+     * @return The button
+     */
+    public static JButton makeImageButton(String label, final Object object,
+                                          final String methodName,
+                                          final Object arg,
+                                          boolean addMouseOverBorder) {
         final JButton btn = getImageButton(label, GuiUtils.class);
         btn.setBackground(null);
+        if (addMouseOverBorder) {
+            makeMouseOverBorder(btn);
+        }
         return (JButton) addActionListener(btn, object, methodName, arg);
     }
 
@@ -6245,6 +6305,7 @@ public class GuiUtils {
             final int value, final ChangeListener listener) {
         final JButton btn = getImageButton("/auxdata/ui/icons/Slider16.gif",
                                            GuiUtils.class);
+        makeMouseOverBorder(btn);
         btn.setToolTipText("Change the Value");
         final JSlider   slider      = new JSlider(min, max, value);
         final JDialog[] dialogArray = { null };
@@ -6279,6 +6340,7 @@ public class GuiUtils {
                 JButton closeBtn =
                     getImageButton("/auxdata/ui/icons/cancel.gif",
                                    GuiUtils.class);
+                makeMouseOverBorder(closeBtn);
                 closeBtn.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent ae) {
                         if (dialogArray[0] != null) {
@@ -6980,6 +7042,7 @@ public class GuiUtils {
 
 
 }
+
 
 
 
