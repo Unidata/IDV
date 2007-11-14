@@ -632,5 +632,13 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         }
     }
 
+    /**
+     * Show the color control widget in the widgets if FLAG_COLOR is set.
+     * @return  false  subclasses should override
+     */
+    public boolean  showColorControlWidget() {
+        return true;
+    }
+
 }
 

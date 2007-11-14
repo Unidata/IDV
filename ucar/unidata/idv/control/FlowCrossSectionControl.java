@@ -503,5 +503,13 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
         }
     }
 
+    /**
+     * Show the color control widget in the widgets if FLAG_COLOR is set.
+     * @return  false  subclasses should override
+     */
+    public boolean  showColorControlWidget() {
+        return true;
+    }
+
 }
 

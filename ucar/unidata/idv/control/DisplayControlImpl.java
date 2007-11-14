@@ -6567,14 +6567,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     doMakeZPositionSlider()));
         }
 
-        /*        if (checkFlag(FLAG_COLOR)) {
+        if (checkFlag(FLAG_COLOR) && showColorControlWidget()) {
             if (color == null) {
                 color = getDisplayConventions().getColor();
             }
             controlWidgets.add(new WrapperWidget(this,
                     GuiUtils.rLabel(getColorWidgetLabel() + ":"),
                     GuiUtils.left(doMakeColorControl(color))));
-                    }*/
+        }
         if (checkFlag(FLAG_SELECTRANGE)) {
             controlWidgets.add(getSelectRangeWidget(getSelectRange()));
         }
@@ -7383,7 +7383,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
         JPanel colorSwatch = null;
-        if (false && checkFlag(FLAG_COLOR)) {
+        if (showColorControlWidget() && checkFlag(FLAG_COLOR)) {
             colorSwatch = GuiUtils.wrap(new JLabel("     "));
             colorSwatches.add(colorSwatch);
             colorSwatch.setBackground(color);
@@ -10561,6 +10561,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         return componentHolder;
     }
 
+    /**
+     * Show the color control widget in the widgets if FLAG_COLOR is set.
+     * @return  false  subclasses should override
+     */
+    public boolean  showColorControlWidget() {
+        return false;
+    }
 
 }
 
