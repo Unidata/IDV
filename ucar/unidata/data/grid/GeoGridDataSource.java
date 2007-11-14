@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -561,6 +562,17 @@ public class GeoGridDataSource extends GridDataSource {
     /**
      * _more_
      *
+     * @return _more_
+     */
+    protected String getSaveDataFileLabel() {
+        return (isFileBased()
+                ? "Writing grid file"
+                : getSaveDataFileLabel());
+    }
+
+    /**
+     * _more_
+     *
      * @param actions _more_
      */
     protected void makeSaveLocalActions(List actions) {
@@ -572,7 +584,7 @@ public class GeoGridDataSource extends GridDataSource {
                 Misc.run(new Runnable() {
                     public void run() {
                         try {
-                            saveDataToLocalDisk(true, null);
+                            saveDataToLocalDisk();
                         } catch (Exception exc) {
                             logException("Writing data to local disk", exc);
                         }
@@ -707,7 +719,7 @@ public class GeoGridDataSource extends GridDataSource {
             }
             String name = dataChoice.getName();
             //hack, hack, hack,
-            if(name.startsWith(PREFIX_GRIDRELATIVE)) {
+            if (name.startsWith(PREFIX_GRIDRELATIVE)) {
                 name = name.substring(PREFIX_GRIDRELATIVE.length());
             }
             varNames.add(name);
@@ -740,8 +752,9 @@ public class GeoGridDataSource extends GridDataSource {
         try {
             writer.makeFile(path, dataset, varNames, llr, /*dateRange*/ null,
                             includeLatLon, hStride, zStride, timeStride);
-        } catch(Exception exc) {
-            logException ("Error writing local netcdf file.\nData:" + getFilePath() +"\nVariables:" + varNames, exc); 
+        } catch (Exception exc) {
+            logException("Error writing local netcdf file.\nData:"
+                         + getFilePath() + "\nVariables:" + varNames, exc);
             return null;
         }
 
@@ -778,7 +791,10 @@ public class GeoGridDataSource extends GridDataSource {
      * @return _more_
      */
     protected String getLocalDirectory(String label, String prefix) {
-        return FileManager.getWriteFile(FileManager.FILTER_NETCDF, null);
+        changeDataPathsCbx.setToolTipText(
+            "Should this data source also be changed");
+        return FileManager.getWriteFile(FileManager.FILTER_NETCDF, null,
+                                        GuiUtils.top(changeDataPathsCbx));
     }
 
 
@@ -1021,7 +1037,8 @@ public class GeoGridDataSource extends GridDataSource {
                     if ((choice.getDescription().indexOf("u-component") >= 0)
                             || (choice.getDescription().indexOf(
                                 "v-component") >= 0)) {
-                        choice.setName(PREFIX_GRIDRELATIVE + choice.getName());
+                        choice.setName(PREFIX_GRIDRELATIVE
+                                       + choice.getName());
                     }
                 }
                 addDataChoice(choice);

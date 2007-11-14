@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data;
 
 
@@ -58,7 +59,6 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.util.ObjectPair;
 import ucar.unidata.util.PatternFileFilter;
@@ -66,6 +66,7 @@ import ucar.unidata.util.Poller;
 import ucar.unidata.util.PollingInfo;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
+import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.WrapperException;
 
 import ucar.unidata.xml.XmlEncoder;
@@ -125,8 +126,13 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             DataSourceImpl.class.getName());
 
 
+    /** _more_          */
     public static int PARAM_SHOW_YES = 0;
+
+    /** _more_          */
     public static int PARAM_SHOW_HIDE = 1;
+
+    /** _more_          */
     public static int PARAM_SHOW_NO = 2;
 
     /** Used for doing file path switches on a bundle load */
@@ -218,6 +224,10 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
     /** Widget for properties dialog */
     private JCheckBox reloadCbx;
+
+    /** _more_          */
+    protected JCheckBox changeDataPathsCbx =
+        new JCheckBox("Change data source", true);
 
     /** geoselection panel */
     protected GeoSelectionPanel geoSelectionPanel;
@@ -320,6 +330,11 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected boolean canDoView() {
         return false;
     }
@@ -328,7 +343,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * Check to see if there is a viewfile defined. If so load it in.
      */
     protected void loadView() {
-        String viewFile = getDataContext().getIdv().getProperty(getClass().getName()+".viewfile",(String)null);
+        String viewFile =
+            getDataContext().getIdv().getProperty(getClass().getName()
+                + ".viewfile", (String) null);
         if (viewFile != null) {
             loadView(viewFile);
         }
@@ -339,6 +356,11 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param viewFile _more_
+     */
     protected void loadView(String viewFile) {
         try {
             String xml = IOUtil.readContents(viewFile, getClass(),
@@ -372,26 +394,32 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * _more_
      */
     public void writeViewFile() {
-        String jarFile = FileManager.getWriteFile(FileManager.FILTER_JAR,null);
+
+        String jarFile = FileManager.getWriteFile(FileManager.FILTER_JAR,
+                             null);
         if (jarFile == null) {
             return;
         }
 
         String id = IOUtil.getFileTail(IOUtil.stripExtension(jarFile));
-        String datasourceFilename = IOUtil.stripExtension(jarFile) + "datasource.xml";
-        JCheckBox allCbx = new JCheckBox("Use this view for all data sources of this type",false);
-        JCheckBox installCbx = new JCheckBox("Install Plugin",false);
-        JTextField labelFld  = new JTextField(id);
-        JTextField idFld     = new JTextField(id);
-        List      choices            = getDataChoices();
-        List      checkboxes         = new ArrayList();        
-        List      hideCheckboxes         = new ArrayList();        
-        List      paramNames         = new ArrayList();
-        List      categories         = new ArrayList();
-        Hashtable catMap             = new Hashtable();
-        Hashtable currentDataChoices = new Hashtable();
+        String datasourceFilename = IOUtil.stripExtension(jarFile)
+                                    + "datasource.xml";
+        JCheckBox allCbx =
+            new JCheckBox("Use this view for all data sources of this type",
+                          false);
+        JCheckBox  installCbx         = new JCheckBox("Install Plugin",
+                                            false);
+        JTextField labelFld           = new JTextField(id);
+        JTextField idFld              = new JTextField(id);
+        List       choices            = getDataChoices();
+        List       checkboxes         = new ArrayList();
+        List       hideCheckboxes     = new ArrayList();
+        List       paramNames         = new ArrayList();
+        List       categories         = new ArrayList();
+        Hashtable  catMap             = new Hashtable();
+        Hashtable  currentDataChoices = new Hashtable();
 
-        List      displays = getDataContext().getIdv().getDisplayControls();
+        List       displays = getDataContext().getIdv().getDisplayControls();
         for (int i = 0; i < displays.size(); i++) {
             List dataChoices =
                 ((DisplayControl) displays.get(i)).getDataChoices();
@@ -432,14 +460,17 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                               currentDataChoices.get(dataChoice.getName())
                               != null);
             JCheckBox hideCbx = new JCheckBox("", false);
-            hideCbx.setToolTipText("If selected then the parameter is used to make derived quanitities but is not show");
+            hideCbx.setToolTipText(
+                "If selected then the parameter is used to make derived quanitities but is not show");
             hideCheckboxes.add(hideCbx);
             cbx.setToolTipText(dataChoice.getName());
             paramNames.add(dataChoice.getName());
             checkboxes.add(cbx);
-            Object dc    = dataChoice.getDisplayCategory();
-            if(dc == null) dc = "";
-            List     comps =   (List) catMap.get(dc);
+            Object dc = dataChoice.getDisplayCategory();
+            if (dc == null) {
+                dc = "";
+            }
+            List comps = (List) catMap.get(dc);
             if (comps == null) {
                 comps = new ArrayList();
                 catMap.put(dc, comps);
@@ -448,14 +479,16 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             comps.add(cbx);
             comps.add(GuiUtils.right(hideCbx));
             DataAlias alias = DataAlias.findAlias(dataChoice.getName());
-            if(alias!=null) {
-                final JCheckBox canonCbx = new JCheckBox("AKA: " + alias.getName(), false);
+            if (alias != null) {
+                final JCheckBox canonCbx = new JCheckBox("AKA: "
+                                               + alias.getName(), false);
                 checkboxes.add(canonCbx);
                 hideCbx = new JCheckBox("", false);
-                hideCbx.setToolTipText("If selected then the parameter is used to make derived quanitities but is not show");
+                hideCbx.setToolTipText(
+                    "If selected then the parameter is used to make derived quanitities but is not show");
                 hideCheckboxes.add(hideCbx);
                 paramNames.add(alias.getName());
-                comps.add(GuiUtils.inset(canonCbx,new Insets(0,10,0,0)));
+                comps.add(GuiUtils.inset(canonCbx, new Insets(0, 10, 0, 0)));
                 comps.add(GuiUtils.right(hideCbx));
             }
         }
@@ -468,29 +501,26 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             JScrollPane sp = new JScrollPane(GuiUtils.top(innerPanel));
             sp.setPreferredSize(new Dimension(300, 400));
             JPanel top =
-                GuiUtils.leftRight(new JLabel(categories.get(i).toString()), GuiUtils.inset(new JLabel("Hide"),new Insets(0,0,0,20)));
+                GuiUtils.leftRight(new JLabel(categories.get(i).toString()),
+                                   GuiUtils.inset(new JLabel("Hide"),
+                                       new Insets(0, 0, 0, 20)));
             catComps.add(GuiUtils.inset(GuiUtils.topCenter(top, sp), 5));
         }
 
 
         JComponent contents = GuiUtils.hbox(catComps);
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
-        JComponent top = GuiUtils.doLayout(new Component[]{
-            GuiUtils.rLabel("ID:"), 
-            idFld,
-            GuiUtils.rLabel("Label:"), 
-            labelFld,
-            GuiUtils.filler(),
-            GuiUtils.left(allCbx),
-            GuiUtils.filler(),
-            GuiUtils.left(installCbx)
-        },2,GuiUtils.WT_NY,
-            GuiUtils.WT_N);
-        top  =GuiUtils.vbox(top,new JLabel("Select the fields to write")); 
-        top = GuiUtils.inset(top,5);
-        contents = GuiUtils.topCenter(top,contents);
+        JComponent top = GuiUtils.doLayout(new Component[] {
+            GuiUtils.rLabel("ID:"), idFld, GuiUtils.rLabel("Label:"),
+            labelFld, GuiUtils.filler(), GuiUtils.left(allCbx),
+            GuiUtils.filler(), GuiUtils.left(installCbx)
+        }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
+        top = GuiUtils.vbox(top, new JLabel("Select the fields to write"));
+        top      = GuiUtils.inset(top, 5);
+        contents = GuiUtils.topCenter(top, contents);
         contents = GuiUtils.inset(contents, 5);
-        if ( !GuiUtils.showOkCancelDialog(null, "Data Source View File", contents, null)) {
+        if ( !GuiUtils.showOkCancelDialog(null, "Data Source View File",
+                                          contents, null)) {
             return;
         }
 
@@ -499,46 +529,54 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             Element  root = doc.createElement("view");
 
             for (int i = 0; i < checkboxes.size(); i++) {
-                JCheckBox cbx = (JCheckBox) checkboxes.get(i);
+                JCheckBox cbx     = (JCheckBox) checkboxes.get(i);
                 JCheckBox hideCbx = (JCheckBox) hideCheckboxes.get(i);
-                if ( !cbx.isSelected()&& !hideCbx.isSelected()) {
+                if ( !cbx.isSelected() && !hideCbx.isSelected()) {
                     continue;
                 }
                 Element child = doc.createElement("parameter");
                 child.setAttribute("name", paramNames.get(i).toString());
-                if(hideCbx.isSelected()) {
-                    child.setAttribute("hide","true");
+                if (hideCbx.isSelected()) {
+                    child.setAttribute("hide", "true");
                 }
                 root.appendChild(child);
             }
             writeViewFile(doc, root);
 
             List files = new ArrayList();
-            files.add(new TwoFacedObject(id+".xml",XmlUtil.toString(root).getBytes()));
-            Document dsdoc = XmlUtil.makeDocument();
-            Element dsroot = doc.createElement("datasources");
-            Element dsnode  = doc.createElement("datasource");
-            Element propnode  = doc.createElement("property");
+            files.add(new TwoFacedObject(id + ".xml",
+                                         XmlUtil.toString(root).getBytes()));
+            Document dsdoc    = XmlUtil.makeDocument();
+            Element  dsroot   = doc.createElement("datasources");
+            Element  dsnode   = doc.createElement("datasource");
+            Element  propnode = doc.createElement("property");
             dsnode.setAttribute("id", idFld.getText());
             dsnode.setAttribute("fileselection", "true");
             dsnode.setAttribute("factory", getClass().getName());
             dsnode.setAttribute("label", labelFld.getText());
             propnode.setAttribute("name", "idv.data.viewfile");
-            propnode.setAttribute("value",  "/"+id+".xml");
+            propnode.setAttribute("value", "/" + id + ".xml");
             dsroot.appendChild(dsnode);
             dsnode.appendChild(propnode);
-            files.add(new TwoFacedObject(id+"datasource.xml",XmlUtil.toString(dsroot).getBytes()));
-            if(allCbx.isSelected()) {
-                String props = getClass().getName()+".viewfile = /" + id+".xml";
-                files.add(new TwoFacedObject(id+".properties",props.getBytes()));
+            files.add(
+                new TwoFacedObject(
+                    id + "datasource.xml",
+                    XmlUtil.toString(dsroot).getBytes()));
+            if (allCbx.isSelected()) {
+                String props = getClass().getName() + ".viewfile = /" + id
+                               + ".xml";
+                files.add(new TwoFacedObject(id + ".properties",
+                                             props.getBytes()));
             }
             IOUtil.writeJarFile(jarFile, files);
-            if(installCbx.isSelected()) {
-                getDataContext().getIdv().getPluginManager().installPluginFromFile(jarFile);
+            if (installCbx.isSelected()) {
+                getDataContext().getIdv().getPluginManager()
+                    .installPluginFromFile(jarFile);
             }
         } catch (Exception exc) {
             logException("Writing view file", exc);
         }
+
 
     }
 
@@ -564,14 +602,14 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         }
         DataAlias alias = DataAlias.findAlias(name);
         for (int i = 0; i < paramsToShow.size(); i++) {
-            Element node = (Element) paramsToShow.get(i);
-            String param = XmlUtil.getAttribute(node, "name");
+            Element node  = (Element) paramsToShow.get(i);
+            String  param = XmlUtil.getAttribute(node, "name");
             boolean match = StringUtil.stringMatch(name, param);
-            if (alias != null && !match) {
+            if ((alias != null) && !match) {
                 match = StringUtil.stringMatch(alias.getName(), param);
             }
-            if(match) {
-                if(XmlUtil.getAttribute(node, "hide",false)) {
+            if (match) {
+                if (XmlUtil.getAttribute(node, "hide", false)) {
                     return PARAM_SHOW_HIDE;
                 }
                 return PARAM_SHOW_YES;
@@ -2159,7 +2197,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             return;
         }
         if (canShow == PARAM_SHOW_HIDE) {
-            choice.setProperty("forUser",false);
+            choice.setProperty("forUser", false);
         }
 
         dataChoices.add(choice);
@@ -2315,6 +2353,11 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean canChangeData() {
         return true;
     }
@@ -2340,6 +2383,16 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public List saveDataToLocalDisk() {
+        return saveDataToLocalDisk(true, null);
+    }
+
+
+    /**
      * Save the data to local disk. If the uniqueFilePath is null this prompts
      * the user for a directory and a file prefix.
      *
@@ -2358,6 +2411,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (uniqueFilePath == null) {
             prefix = getLocalDirectory(getName() + " Data Directory",
                                        getDataPrefix());
+
+            changeLinks = changeDataPathsCbx.isSelected();
         } else {
             prefix = uniqueFilePath + "_" + getDataPrefix();
         }
@@ -2377,6 +2432,15 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         }
     }
 
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected String getSaveDataFileLabel() {
+        return "Copying data from server";
+    }
 
 
     /**
@@ -2413,6 +2477,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
+
+
+
     /**
      * Get the directory to write the localized data files to
      *
@@ -2422,12 +2489,16 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @return Path with the file prefix that the user specified appended
      */
     protected String getLocalDirectory(String label, String prefix) {
+        changeDataPathsCbx.setToolTipText(
+            "Should this data source also be changed");
         JTextField nameFld = new JTextField(prefix, 10);
         File dir = FileManager.getDirectory(
                        null, label,
                        GuiUtils.top(
                            GuiUtils.inset(
-                               GuiUtils.label("Prefix: ", nameFld), 5)));
+                               GuiUtils.vbox(
+                                   changeDataPathsCbx,
+                                   GuiUtils.label("Prefix: ", nameFld)), 5)));
         if (dir == null) {
             return null;
         }
@@ -2884,24 +2955,26 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
         if (canChangeData()) {
             a = new AbstractAction("Change Data") {
-            public void actionPerformed(ActionEvent ae) {
-                Misc.run(getDataContext().getIdv().getIdvUIManager(),"changeState", DataSourceImpl.this);
-            }};
+                public void actionPerformed(ActionEvent ae) {
+                    Misc.run(getDataContext().getIdv().getIdvUIManager(),
+                             "changeState", DataSourceImpl.this);
+                }
+            };
             actions.add(a);
         }
 
         makeSaveLocalActions(actions);
 
-        if(canDoView()) {
+        if (canDoView()) {
             a = new AbstractAction("Write View File Plugin") {
-            public void actionPerformed(ActionEvent ae) {
-                Misc.run(new Runnable() {
-                    public void run() {
-                        Misc.run(DataSourceImpl.this, "writeViewFile");
-                    }
-                });
-            }
-                };
+                public void actionPerformed(ActionEvent ae) {
+                    Misc.run(new Runnable() {
+                        public void run() {
+                            Misc.run(DataSourceImpl.this, "writeViewFile");
+                        }
+                    });
+                }
+            };
             actions.add(a);
         }
 
@@ -2911,6 +2984,11 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
 
+    /**
+     * _more_
+     *
+     * @param actions _more_
+     */
     protected void makeSaveLocalActions(List actions) {
         if (canSaveDataToLocalDisk()) {
             AbstractAction a = new AbstractAction("Make Data Source Local") {
@@ -2918,7 +2996,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                     Misc.run(new Runnable() {
                         public void run() {
                             try {
-                                saveDataToLocalDisk(true, null);
+                                saveDataToLocalDisk();
                             } catch (Exception exc) {
                                 logException("Writing data to local disk",
                                              exc);
@@ -3268,9 +3346,15 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param newObject _more_
+     * @param newProperties _more_
+     */
     public void updateState(Object newObject, Hashtable newProperties) {
-        if(newProperties!=null) {
-            if(properties!=null) {
+        if (newProperties != null) {
+            if (properties != null) {
                 properties.putAll(newProperties);
             } else {
                 properties = newProperties;
