@@ -90,6 +90,7 @@ public class GempakGridServiceProvider extends GempakIOServiceProvider {
             new GempakLookup(
                 (GempakGridRecord) index.getGridRecords().get(0));
         GridIndexToNC delegate = new GridIndexToNC();
+        delegate.setUseDescriptionForVariableName(false);
         delegate.open(index, lookup, 4, ncfile, fmrcCoordSys, cancelTask);
         ncfile.finish();
 
@@ -156,15 +157,15 @@ public class GempakGridServiceProvider extends GempakIOServiceProvider {
     /**
      * Read a level
      *
-     * @param v2 _more_
-     * @param timeIdx _more_
-     * @param levelRange _more_
-     * @param yRange _more_
-     * @param xRange _more_
-     * @param ii _more_
+     * @param v2    variable to put the data into
+     * @param timeIdx  time index
+     * @param levelRange level range
+     * @param yRange   x range
+     * @param xRange   y range
+     * @param ii       index iterator
      *
-     * @throws IOException _more_
-     * @throws InvalidRangeException _more_
+     * @throws IOException   problem reading the file
+     * @throws InvalidRangeException  invalid range
      */
     private void readLevel(Variable v2, int timeIdx, Range levelRange,
                            Range yRange, Range xRange, IndexIterator ii)
@@ -175,20 +176,19 @@ public class GempakGridServiceProvider extends GempakIOServiceProvider {
         }
     }
 
-    // read one product
 
     /**
-     * _more_
+     * read one product
      *
-     * @param v2 _more_
-     * @param timeIdx _more_
-     * @param levIdx _more_
-     * @param yRange _more_
-     * @param xRange _more_
-     * @param ii _more_
+     * @param v2    variable to put the data into
+     * @param timeIdx  time index
+     * @param levelRange level range
+     * @param yRange   x range
+     * @param xRange   y range
+     * @param ii       index iterator
      *
-     * @throws IOException _more_
-     * @throws InvalidRangeException _more_
+     * @throws IOException   problem reading the file
+     * @throws InvalidRangeException  invalid range
      */
     private void readXY(Variable v2, int timeIdx, int levIdx, Range yRange,
                         Range xRange, IndexIterator ii)

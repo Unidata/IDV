@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.grid.gempak;
 
 
@@ -45,18 +46,34 @@ import java.util.*;
  */
 public class GridIndexToNC {
 
+    /** logger */
+    static private org.slf4j.Logger logger =
+        org.slf4j.LoggerFactory.getLogger(GridIndexToNC.class);
+
+    /** map of horizontal coordinate systems */
+    private HashMap hcsHash = new HashMap(10);  // GridHorizCoordSys
+
+    /** date formattter */
+    private DateFormatter formatter = new DateFormatter();
+
+    /** debug flag */
+    private boolean debug = false;
+
+    /** flag for using GridParameter description for variable names */
+    private boolean useDescriptionForVariableName = true;
+
+    //TODO:  how to make format specific names if these are static
     /**
-     * _more_
+     * Make the level name
      *
-     * @param gr _more_
-     * @param lookup _more_
+     * @param gr   grid record
+     * @param lookup  lookup table
      *
-     * @return _more_
+     * @return name for the level
      */
-    static public String makeLevelName(GridRecord gr,
-                                       GridTableLookup lookup) {
+    public static String makeLevelName(GridRecord gr, GridTableLookup lookup) {
         String  vname   = lookup.getLevelName(gr);
-        boolean isGrib1 = false;
+        boolean isGrib1 = true;   // same for GEMPAK
         if (isGrib1) {
             return vname;
         }
@@ -68,64 +85,52 @@ public class GridIndexToNC {
     }
 
     /**
-     * _more_
+     * Make the variable name
      *
-     * @param gr _more_
-     * @param lookup _more_
+     * @param gr   grid record
+     * @param lookup  lookup table
      *
-     * @return _more_
+     * @return variable name
      */
-    static public String makeVariableName(GridRecord gr,
-                                          GridTableLookup lookup) {
+    public String makeVariableName(GridRecord gr, GridTableLookup lookup) {
         GridParameter param     = lookup.getParameter(gr);
         String        levelName = makeLevelName(gr, lookup);
+        String        paramName = (useDescriptionForVariableName)
+            ? param.getDescription()
+            : param.getName();
         return (levelName.length() == 0)
-               ? param.getDescription()
-               : param.getDescription() + "_" + levelName;
+               ? paramName
+               : paramName + "_" + levelName;
     }
 
     /**
-     * _more_
+     * TODO:  moved to GridVariable = made sense since it knows what it is
+     * Make a long name for the variable
      *
-     * @param gr _more_
-     * @param lookup _more_
+     * @param gr   grid record
+     * @param lookup  lookup table
      *
-     * @return _more_
-     */
-    static public String makeLongName(GridRecord gr, GridTableLookup lookup) {
+     * @return long variable name
+    public static String makeLongName(GridRecord gr, GridTableLookup lookup) {
         GridParameter param     = lookup.getParameter(gr);
         String        levelName = makeLevelName(gr, lookup);
         return (levelName.length() == 0)
                ? param.getDescription()
                : param.getDescription() + " @ " + makeLevelName(gr, lookup);
     }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /** _more_ */
-    static private org.slf4j.Logger logger =
-        org.slf4j.LoggerFactory.getLogger(GridIndexToNC.class);
-
-    /** _more_ */
-    private HashMap hcsHash = new HashMap(10);  // GridHorizCoordSys
-
-    /** _more_ */
-    private DateFormatter formatter = new DateFormatter();
-
-    /** _more_ */
-    private boolean debug = false;
+     */
 
     /**
-     * _more_
+     * Fill in the netCDF file
      *
-     * @param index _more_
-     * @param lookup _more_
-     * @param version _more_
-     * @param ncfile _more_
-     * @param fmrcCoordSys _more_
-     * @param cancelTask _more_
+     * @param index  grid index
+     * @param lookup lookup table
+     * @param version  version of data
+     * @param ncfile   netCDF file to fill in
+     * @param fmrcCoordSys  forecast model run CS
+     * @param cancelTask    cancel task
      *
-     * @throws IOException _more_
+     * @throws IOException Problem reading from the file
      */
     void open(GridIndex index, GridTableLookup lookup, int version,
               NetcdfFile ncfile, FmrcCoordSys fmrcCoordSys,
@@ -270,17 +275,16 @@ public class GridIndexToNC {
 
     }
 
-    // make coordinate system without missing data - means that we have to make a coordinate axis for each unique set
-    // of time or vertical levels.
-
     /**
-     * _more_
+     * Make coordinate system without missing data - means that we
+     * have to make a coordinate axis for each unique set
+     * of time or vertical levels.
      *
-     * @param ncfile _more_
-     * @param lookup _more_
-     * @param cancelTask _more_
+     * @param ncfile   netCDF file
+     * @param lookup   lookup  table
+     * @param cancelTask  cancel task
      *
-     * @throws IOException _more_
+     * @throws IOException problem reading file
      */
     private void makeDenseCoordSys(NetcdfFile ncfile, GridTableLookup lookup,
                                    CancelTask cancelTask)
@@ -414,9 +418,11 @@ public class GridIndexToNC {
                         GridVariable pv = (GridVariable) plist.get(k);
                         //int nlevels = pv.getVertNlevels();
                         //boolean useDesc = (k == 0) && (nlevels > 1); // keep using the level name if theres only one level
+                        // TODO: is there a better way to do this?
+                        boolean useDesc = (k==0 && useDescriptionForVariableName);
                         ncfile.addVariable(hcs.getGroup(),
                                            pv.makeVariable(ncfile,
-                                               hcs.getGroup(), (k == 0)));
+                                               hcs.getGroup(), useDesc));
                     }
                 }  // multipe vertical levels
 
@@ -438,14 +444,13 @@ public class GridIndexToNC {
 
     }
 
-    // vertCoords all with the same name
 
     /**
-     * _more_
+     * Make a vertical dimensions
      *
-     * @param vertCoordList _more_
-     * @param ncfile _more_
-     * @param group _more_
+     * @param vertCoordList vertCoords all with the same name
+     * @param ncfile  netCDF file to add to
+     * @param group   group in ncfile
      */
     private void makeVerticalDimensions(List vertCoordList,
                                         NetcdfFile ncfile, Group group) {
@@ -470,16 +475,15 @@ public class GridIndexToNC {
         }
     }
 
-    // make coordinate system from a Definition object
 
     /**
-     * _more_
+     * Make coordinate system from a Definition object
      *
-     * @param ncfile _more_
-     * @param lookup _more_
-     * @param fmr _more_
+     * @param ncfile  netCDF file to add to
+     * @param lookup  lookup table
+     * @param fmr     FmrcCoordSys
      *
-     * @throws IOException _more_
+     * @throws IOException problem reading from file
      */
     private void makeDefinedCoordSys(NetcdfFile ncfile,
                                      GridTableLookup lookup, FmrcCoordSys fmr)
@@ -505,7 +509,9 @@ public class GridIndexToNC {
                 // we dont know the name for sure yet, so have to try several
                 String searchName = findVariableName(ncfile, record, lookup,
                                         fmr);
+                System.out.println("Search name = " + searchName);
                 if (searchName == null) {  // cant find - just remove
+                    System.out.println("removing " + searchName);
                     removeVariables.add(key);  // cant remove (concurrentModException) so save for later
                     continue;
                 }
@@ -603,14 +609,14 @@ public class GridIndexToNC {
     }
 
     /**
-     * _more_
+     * Find the variable name for the grid
      *
-     * @param ncfile _more_
-     * @param gr _more_
-     * @param lookup _more_
-     * @param fmr _more_
+     * @param ncfile   netCDF file
+     * @param gr       grid record
+     * @param lookup   lookup table
+     * @param fmr      FmrcCoordSys
      *
-     * @return _more_
+     * @return  name for the grid
      */
     private String findVariableName(NetcdfFile ncfile, GridRecord gr,
                                     GridTableLookup lookup,
@@ -637,10 +643,8 @@ public class GridIndexToNC {
         return null;
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     /**
-     * Class CompareGridVariableListByName _more_
+     * Comparable object for grid variable
      *
      *
      * @author IDV Development Team
@@ -649,12 +653,12 @@ public class GridIndexToNC {
     private class CompareGridVariableListByName implements Comparator {
 
         /**
-         * _more_
+         * Compare the two lists of names
          *
-         * @param o1 _more_
-         * @param o2 _more_
+         * @param o1  first list
+         * @param o2  second list
          *
-         * @return _more_
+         * @return comparison
          */
         public int compare(Object o1, Object o2) {
             ArrayList    list1 = (ArrayList) o1;
@@ -668,8 +672,7 @@ public class GridIndexToNC {
     }
 
     /**
-     * Class CompareGridVariableByVertName _more_
-     *
+     * Comparator for grids by vertical variable name
      *
      * @author IDV Development Team
      * @version $Revision: 1.3 $
@@ -677,12 +680,12 @@ public class GridIndexToNC {
     private class CompareGridVariableByVertName implements Comparator {
 
         /**
-         * _more_
+         * Compare the two lists of names
          *
-         * @param o1 _more_
-         * @param o2 _more_
+         * @param o1  first list
+         * @param o2  second list
          *
-         * @return _more_
+         * @return comparison
          */
         public int compare(Object o1, Object o2) {
             GridVariable gv1 = (GridVariable) o1;
@@ -693,8 +696,7 @@ public class GridIndexToNC {
     }
 
     /**
-     * Class CompareGridVariableByNumberVertLevels _more_
-     *
+     * Comparator for grid variables by number of vertical levels
      *
      * @author IDV Development Team
      * @version $Revision: 1.3 $
@@ -702,12 +704,12 @@ public class GridIndexToNC {
     private class CompareGridVariableByNumberVertLevels implements Comparator {
 
         /**
-         * _more_
+         * Compare the two lists of names
          *
-         * @param o1 _more_
-         * @param o2 _more_
+         * @param o1  first list
+         * @param o2  second list
          *
-         * @return _more_
+         * @return comparison
          */
         public int compare(Object o1, Object o2) {
             GridVariable gv1 = (GridVariable) o1;
@@ -725,7 +727,13 @@ public class GridIndexToNC {
         }
     }
 
-
+    /**
+     * Should use the description for the variable name.
+     * @param value  false to use name instead of description
+     */
+    public void setUseDescriptionForVariableName(boolean value) {
+        useDescriptionForVariableName = value;
+    }
 
 }
 

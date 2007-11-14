@@ -19,8 +19,6 @@
  */
 
 
-
-
 package ucar.unidata.data.grid.gempak;
 
 
@@ -37,16 +35,16 @@ public final class GempakLookup implements GridTableLookup {
     private GempakParameterTable paramTable;
 
     /**
-    /**
+     *
      * Gets a representative grid for this lookup
      * @param sample
      */
     public GempakLookup(GempakGridRecord sample) {
         this.sample = sample;
-        paramTable = new GempakParameterTable();
+        paramTable  = new GempakParameterTable();
         try {
-        paramTable.addParameters("wmogrib3.tbl");
-        paramTable.addParameters("ncepgrib2.tbl");
+            paramTable.addParameters("wmogrib3.tbl");
+            paramTable.addParameters("ncepgrib2.tbl");
         } catch (java.io.IOException ioe) {
             System.out.println("couldn't add table");
         }
@@ -76,8 +74,8 @@ public final class GempakLookup implements GridTableLookup {
      * @return Parameter
      */
     public final GridParameter getParameter(GridRecord gr) {
-        String name = gr.getParameterName();
-        GridParameter gp = paramTable.getParameter(name);
+        String        name = gr.getParameterName();
+        GridParameter gp   = paramTable.getParameter(name);
         if (gp != null) {
             return gp;
         }
@@ -110,17 +108,9 @@ public final class GempakLookup implements GridTableLookup {
      * @return LevelName
      */
     public final String getLevelName(GridRecord gr) {
-        return GempakUtil.LV_CCRD(gr.getLevelType1());
-    }
-
-    /**
-     * gets the LevelDescription.
-     * @param  gr
-     * @return LevelDescription
-     */
-    public final String getLevelDescription(GridRecord gr) {
         // TODO:  flesh this out
-        String levelName = getLevelName(gr);
+        String levelName = GempakUtil.LV_CCRD(gr.getLevelType1());
+        /*
         if (levelName.equals("PRES")) {
            return "pressure";
         } else if (levelName.equals("NONE")) {
@@ -134,7 +124,7 @@ public final class GempakLookup implements GridTableLookup {
         } else if (levelName.equals("DPTH")) {
            return "depth";
         } else if (levelName.equals("PDLY")) {
-           return "layer_between_two_pressure_difference_from_ground";
+           return "pressure";
         } else if (levelName.equals("FRZL")) {
            return "zeroDegC_isotherm";
         } else if (levelName.equals("TROP")) {
@@ -146,6 +136,43 @@ public final class GempakLookup implements GridTableLookup {
         } else if (levelName.equals("MWSL")) {
            return "maximum_wind_level";
         }
+        */
+        return levelName;
+    }
+
+    /**
+     * gets the LevelDescription.
+     * @param  gr
+     * @return LevelDescription
+     */
+    public final String getLevelDescription(GridRecord gr) {
+        // TODO:  flesh this out
+        String levelName = getLevelName(gr);
+        if (levelName.equals("PRES")) {
+            return "pressure";
+        } else if (levelName.equals("NONE")) {
+            return "surface";
+        } else if (levelName.equals("HGHT")) {
+            return "height_above_ground";
+        } else if (levelName.equals("THTA")) {
+            return "isentropic";
+        } else if (levelName.equals("SGMA")) {
+            return "sigma";
+        } else if (levelName.equals("DPTH")) {
+            return "depth";
+        } else if (levelName.equals("PDLY")) {
+            return "layer_between_two_pressure_difference_from_ground";
+        } else if (levelName.equals("FRZL")) {
+            return "zeroDegC_isotherm";
+        } else if (levelName.equals("TROP")) {
+            return "tropopause";
+        } else if (levelName.equals("CLDL")) {
+            return "cloud_base";
+        } else if (levelName.equals("CLDT")) {
+            return "cloud_tops";
+        } else if (levelName.equals("MWSL")) {
+            return "maximum_wind_level";
+        }
         return levelName;
     }
 
@@ -156,19 +183,20 @@ public final class GempakLookup implements GridTableLookup {
      */
     public final String getLevelUnit(GridRecord gr) {
         // TODO:  flesh this out
-        String levelName = getLevelName(gr);
+        //String levelName = getLevelName(gr);
+        String levelName = GempakUtil.LV_CCRD(gr.getLevelType1());
         if (levelName.equals("PRES")) {
-           return "hPa";
+            return "hPa";
         } else if (levelName.equals("HGHT")) {
-           return "m";
+            return "m";
         } else if (levelName.equals("THTA")) {
-           return "K";
+            return "K";
         } else if (levelName.equals("SGMA")) {
-           return "";
+            return "";
         } else if (levelName.equals("DPTH")) {
-           return "m";
+            return "m";
         } else if (levelName.equals("PDLY")) {
-           return "hPa";
+            return "hPa";
         }
         return "";
     }

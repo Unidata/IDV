@@ -40,63 +40,70 @@ import java.util.List;
  */
 public class GridVariable {
 
-    /** _more_ */
+    /** logger */
     static private org.slf4j.Logger log =
         org.slf4j.LoggerFactory.getLogger(GridVariable.class);
 
-    /** _more_ */
-    private String name, desc, vname;
+    /** parameter name */
+    private String name;
 
-    /** _more_ */
+    /** parameter description */
+    private String desc;
+
+    /** variable name */
+    private String vname;
+
+    /** first grid record */
     private GridRecord firstRecord;
 
-    /** _more_ */
+    /** lookup table */
     private GridTableLookup lookup;
 
-    /** _more_ */
+    /** flag for grib1, TODO: */
     private boolean isGrib1;
 
-    /** _more_ */
+    /** horizontal coord system */
     private GridHorizCoordSys hcs;
 
-    /** _more_ */
+    /** vertical coord system */
     private GridCoordSys vcs;  // maximal strategy (old way)
 
-    /** _more_ */
+    /** time coord system */
     private GridTimeCoord tcs;
 
-    /** _more_ */
+    /** vertical coordinate */
     private GridVertCoord vc;
 
-    /** _more_ */
+    /** list of records that make up this variable */
     private ArrayList records = new ArrayList();  // GridRecord
 
-    /** _more_ */
-    private int nlevels, ntimes;
+    /** number of levels */
+    private int nlevels;
+    /** number of times */
+    private int ntimes;
 
-    /** _more_ */
+    /** record tracker */
     private GridRecord[] recordTracker;
 
-    /** _more_ */
+    /** decimal scale */
     private int decimalScale = 0;
 
-    /** _more_ */
+    /** flag for having a vertical coordinate */
     private boolean hasVert = false;
 
-    /** _more_ */
-    private boolean showRecords = false,
-                    showGen     = false;
+    /** debug flag */
+    private boolean showRecords = false;
 
-    /** _more_ */
-    private boolean debug = false;
+    /** debug flag */
+    private boolean showGen     = false;
 
     /**
-     * _more_
+     * Create a new GridVariable
      *
-     * @param name _more_
-     * @param desc _more_
-     * @param hcs _more_
-     * @param lookup _more_
+     * @param name  name
+     * @param desc  description
+     * @param hcs   horizontal coordinate system
+     * @param lookup  lookup table
      */
     GridVariable(String name, String desc, GridHorizCoordSys hcs,
                  GridTableLookup lookup) {
@@ -110,9 +117,9 @@ public class GridVariable {
     }
 
     /**
-     * _more_
+     * Add in a new product
      *
-     * @param record _more_
+     * @param record  grid  to add
      */
     void addProduct(GridRecord record) {
         records.add(record);
@@ -122,99 +129,99 @@ public class GridVariable {
     }
 
     /**
-     * _more_
+     * Get the list of grids
      *
-     * @return _more_
+     * @return grid records
      */
     List getRecords() {
         return records;
     }
 
     /**
-     * _more_
+     * get the first grid record
      *
-     * @return _more_
+     * @return  the first in the list
      */
     GridRecord getFirstRecord() {
         return (GridRecord) records.get(0);
     }
 
     /**
-     * _more_
+     * Get the horizontal coordinate system
      *
-     * @return _more_
+     * @return the horizontal coordinate system
      */
     GridHorizCoordSys getHorizCoordSys() {
         return hcs;
     }
 
     /**
-     * _more_
+     * Get the vertical coordinate system
      *
-     * @return _more_
+     * @return the vertical coordinate system
      */
     GridCoordSys getVertCoordSys() {
         return vcs;
     }
 
     /**
-     * _more_
+     * Get the vertical coordinate
      *
-     * @return _more_
+     * @return  the vertical coordinate
      */
     GridVertCoord getVertCoord() {
         return vc;
     }
 
     /**
-     * _more_
+     * Does this have a vertical dimension
      *
-     * @return _more_
+     * @return true if has a vertical dimension
      */
     boolean hasVert() {
         return hasVert;
     }
 
     /**
-     * _more_
+     * Set the variable name
      *
-     * @param vname _more_
+     * @param vname the variable name
      */
     void setVarName(String vname) {
         this.vname = vname;
     }
 
     /**
-     * _more_
+     * Set the vertical coordinate system
      *
-     * @param vcs _more_
+     * @param vcs  the vertical coordinate system
      */
     void setVertCoordSys(GridCoordSys vcs) {
         this.vcs = vcs;
     }
 
     /**
-     * _more_
+     * Set the vertical coordinate
      *
-     * @param vc _more_
+     * @param vc  the vertical coordinate
      */
     void setVertCoord(GridVertCoord vc) {
         this.vc = vc;
     }
 
     /**
-     * _more_
+     * Set the time coordinate
      *
-     * @param tcs _more_
+     * @param tcs the time coordinate
      */
     void setTimeCoord(GridTimeCoord tcs) {
         this.tcs = tcs;
     }
 
     /**
-     * _more_
+     * Get the number of vertical levels
      *
-     * @return _more_
+     * @return the number of vertical levels
      */
     int getVertNlevels() {
         return (vcs == null)
@@ -223,9 +230,9 @@ public class GridVariable {
     }
 
     /**
-     * _more_
+     * Get the name of the vertical dimension
      *
-     * @return _more_
+     * @return the name of the vertical dimension
      */
     String getVertName() {
         return (vcs == null)
@@ -234,9 +241,9 @@ public class GridVariable {
     }
 
     /**
-     * _more_
+     * Get the name of the vertical level
      *
-     * @return _more_
+     * @return the name of the vertical level
      */
     String getVertLevelName() {
         return (vcs == null)
@@ -245,9 +252,9 @@ public class GridVariable {
     }
 
     /**
-     * _more_
+     * Is vertical used?
      *
-     * @return _more_
+     * @return true if vertical used
      */
     boolean getVertIsUsed() {
         return (vcs == null)
@@ -256,11 +263,11 @@ public class GridVariable {
     }
 
     /**
-     * _more_
+     * Get the index in the vertical for the particular grid
      *
-     * @param p _more_
+     * @param p   grid to check
      *
-     * @return _more_
+     * @return the index
      */
     int getVertIndex(GridRecord p) {
         return (vcs == null)
@@ -269,9 +276,9 @@ public class GridVariable {
     }
 
     /**
-     * _more_
+     * Get the number of times
      *
-     * @return _more_
+     * @return  the number of times
      */
     int getNTimes() {
         return (tcs == null)
@@ -286,23 +293,23 @@ public class GridVariable {
     } */
 
     /**
-     * _more_
+     * Make the variable
      *
-     * @param ncfile _more_
-     * @param g _more_
-     * @param useDesc _more_
+     * @param ncfile   netCDF file
+     * @param g        group
+     * @param useDesc  true use the description
      *
-     * @return _more_
+     * @return  the variable
      */
     Variable makeVariable(NetcdfFile ncfile, Group g, boolean useDesc) {
 
         nlevels = getVertNlevels();
         ntimes  = tcs.getNTimes();
-        // TODO: What's this for?
+        // TODO:  this is not used 
         //decimalScale = firstRecord.decimalScale;
 
         if (vname == null) {
-            vname = NetcdfFile.createValidNetcdfObjectName(useDesc
+            vname = NetcdfFile.createValidNetcdfObjectName(useDesc && false
                     ? desc
                     : name);
         }
@@ -334,8 +341,7 @@ public class GridVariable {
         }
         v.addAttribute(new Attribute("units", unit));
         v.addAttribute(new Attribute("long_name",
-                                     GridIndexToNC.makeLongName(firstRecord,
-                                         lookup)));
+                                     makeLongName(firstRecord, lookup)));
         v.addAttribute(
             new Attribute(
                 "missing_value", new Float(lookup.getFirstMissingValue())));
@@ -346,24 +352,26 @@ public class GridVariable {
             v.addAttribute(new Attribute("grid_mapping", hcs.getGridName()));
         }
 
-        /**
-         * TODO: figure out what to do with this
-         * if (lookup instanceof Grib1Lookup) {
-         * int[] paramId = lookup.getParameterId(firstRecord);
-         * if (paramId[0] == 1) {
-         * v.addAttribute(new Attribute("GRIB_param_name", param.getDescription()));
-         * v.addAttribute(new Attribute("GRIB_center_id", new Integer(paramId[1])));
-         * v.addAttribute(new Attribute("GRIB_table_id", new Integer(paramId[2])));
-         * v.addAttribute(new Attribute("GRIB_param_number", new Integer(paramId[3])));
-         * } else {
-         * v.addAttribute(new Attribute("GRIB_param_discipline", lookup.getDisciplineName(firstRecord)));
-         * v.addAttribute(new Attribute("GRIB_param_category", lookup.getCategoryName(firstRecord)));
-         * v.addAttribute(new Attribute("GRIB_param_name", param.getName()));
-         * }
-         * v.addAttribute(new Attribute("GRIB_param_id", Array.factory(int.class, new int[]{paramId.length}, paramId)));
-         * v.addAttribute(new Attribute("GRIB_product_definition_type", lookup.getProductDefinitionName(firstRecord)));
-         * v.addAttribute(new Attribute("GRIB_level_type", new Integer(firstRecord.getLevelType1())));
-         * }
+        /*
+         * TODO: figure out what to do with this - perhaps have a subclass
+         * GribVariable that adds in the specific attributes.
+         *
+         if (lookup instanceof Grib1Lookup) {
+          int[] paramId = lookup.getParameterId(firstRecord);
+          if (paramId[0] == 1) {
+          v.addAttribute(new Attribute("GRIB_param_name", param.getDescription()));
+          v.addAttribute(new Attribute("GRIB_center_id", new Integer(paramId[1])));
+          v.addAttribute(new Attribute("GRIB_table_id", new Integer(paramId[2])));
+          v.addAttribute(new Attribute("GRIB_param_number", new Integer(paramId[3])));
+         } else {
+          v.addAttribute(new Attribute("GRIB_param_discipline", lookup.getDisciplineName(firstRecord)));
+          v.addAttribute(new Attribute("GRIB_param_category", lookup.getCategoryName(firstRecord)));
+          v.addAttribute(new Attribute("GRIB_param_name", param.getName()));
+          }
+          v.addAttribute(new Attribute("GRIB_param_id", Array.factory(int.class, new int[]{paramId.length}, paramId)));
+          v.addAttribute(new Attribute("GRIB_product_definition_type", lookup.getProductDefinitionName(firstRecord)));
+          v.addAttribute(new Attribute("GRIB_level_type", new Integer(firstRecord.getLevelType1())));
+         }
          */
 
         //if (pds.getTypeSecondFixedSurface() != 255 )
@@ -450,7 +458,7 @@ public class GridVariable {
     }
 
     /**
-     * _more_
+     * Dump out the missing data
      */
     void dumpMissing() {
         //System.out.println("  " +name+" ntimes (across)= "+ ntimes+" nlevs (down)= "+ nlevels+":");
@@ -468,9 +476,9 @@ public class GridVariable {
     }
 
     /**
-     * _more_
+     * Dump out the missing data as a summary
      *
-     * @return _more_
+     * @return number of missing levels
      */
     int dumpMissingSummary() {
         if (nlevels == 1) {
@@ -491,23 +499,23 @@ public class GridVariable {
     }
 
     /**
-     * _more_
+     * Find the grid record for the time and level indices
      *
-     * @param time _more_
-     * @param level _more_
+     * @param time   time index
+     * @param level  level index
      *
-     * @return _more_
+     * @return  the record or null
      */
     public GridRecord findRecord(int time, int level) {
         return recordTracker[time * nlevels + level];
     }
 
     /**
-     * _more_
+     * Check for equality
      *
-     * @param oo _more_
+     * @param oo   object in question
      *
-     * @return _more_
+     * @return  true if they are equal
      */
     public boolean equals(Object oo) {
         if (this == oo) {
@@ -520,27 +528,27 @@ public class GridVariable {
     }
 
     /**
-     * _more_
+     * Get the name
      *
-     * @return _more_
+     * @return the name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * _more_
+     * Get the parameter name
      *
-     * @return _more_
+     * @return description
      */
     public String getParamName() {
         return desc;
     }
 
     /**
-     * _more_
+     * Get the decimal scale
      *
-     * @return _more_
+     * @return  decimal scale
      */
     public int getDecimalScale() {
         return decimalScale;
@@ -549,7 +557,7 @@ public class GridVariable {
     /**
      * Override Object.hashCode() to implement equals.
      *
-     * @return _more_
+     * @return equals;
      */
     public int hashCode() {
         if (hashCode == 0) {
@@ -562,14 +570,14 @@ public class GridVariable {
         return hashCode;
     }
 
-    /** _more_ */
+    /** hash code  */
     private volatile int hashCode = 0;
 
 
     /**
-     * _more_
+     * Dump this variable
      *
-     * @return _more_
+     * @return the variable
      */
     public String dump() {
         DateFormatter formatter = new DateFormatter();
@@ -588,5 +596,23 @@ public class GridVariable {
         }
         return sbuff.toString();
     }
+
+    /**
+     * Make a long name for the variable
+     *
+     * @param gr   grid record
+     * @param lookup  lookup table
+     *
+     * @return long variable name
+     */
+    private String makeLongName(GridRecord gr, GridTableLookup lookup) {
+        GridParameter param     = lookup.getParameter(gr);
+        //String        levelName = GridIndexToNC.makeLevelName(gr, lookup);
+        String        levelName = lookup.getLevelDescription(gr);
+        return (levelName.length() == 0)
+               ? param.getDescription()
+               : param.getDescription() + " @ " + levelName;
+    }
+
 }
 

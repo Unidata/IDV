@@ -48,6 +48,12 @@ public class GempakGridReader extends GempakFileReader {
     /** Grid identifier */
     public static final String GRID = "GRID";
 
+    /** Grid analysis block identifier */
+    public static final String ANLB = "ANLB";
+
+    /** Grid nav block identifier */
+    public static final String NAVB = "NAVB";
+
     /** Navigation Block */
     private GridNavBlock navBlock;
 
@@ -137,14 +143,14 @@ public class GempakGridReader extends GempakFileReader {
         }
 
         // Make the NAV and ANAL blocks
-        float[] headerArray = getFileHeader("NAVB");
+        float[] headerArray = getFileHeader(NAVB);
         if (headerArray == null) {
             return false;
         }
         navBlock = new GridNavBlock(headerArray);
         gridIndex.addHorizCoordSys(navBlock);
 
-        headerArray = getFileHeader("ANLB");
+        headerArray = getFileHeader(ANLB);
         if (headerArray == null) {
             return false;
         }
@@ -170,7 +176,13 @@ public class GempakGridReader extends GempakFileReader {
                 }
                 GempakGridRecord gh = new GempakGridRecord(i + 1, header);
                 gh.navBlock = navBlock;
+                String name = gh.getParameterName();
+                //if (name.equals("TMPK") ||
+                //    name.equals("UREL") ||
+                //    name.equals("VREL") ||
+                //    name.equals("PMSL")) {
                 tmpList.add(gh);
+                //}
             }
             iword += header.length;
         }
@@ -221,8 +233,9 @@ public class GempakGridReader extends GempakFileReader {
         }
         GempakGridRecord gh = ggr.findGrid(var);
         if (gh != null) {
-            System.out.println(gh);
+            System.out.println("\n"+gh);
             float[] data = ggr.readGrid(gh.gridNumber);
+            if (data != null) {
             System.out.println("# of points = " + data.length);
             int   cnt = 0;
             int   it  = 10;
@@ -244,6 +257,9 @@ public class GempakGridReader extends GempakFileReader {
                 }
             }
             System.out.println("max/min = " + max + "/" + min);
+            } else {
+               System.out.println("unable to decode grid data");
+            }
         }
         /*
         */
@@ -612,6 +628,8 @@ public class GempakGridReader extends GempakFileReader {
     private float[] unpackGrib2Data(int iiword, int lendat, int[] iarray,
                                     float[] rarray)
             throws IOException {
+        //ucar.unidata.util.Misc.printArray("iarray",iarray);
+        //ucar.unidata.util.Misc.printArray("rarray",rarray);
         return null;
     }
 
