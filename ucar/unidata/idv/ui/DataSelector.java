@@ -100,7 +100,7 @@ public class DataSelector extends DataSourceHolder {
 
 
     /** Color for failed search */
-    private static final Color COLOR_BADSEARCH = new Color(255, 102, 102);
+    public static final Color COLOR_BADSEARCH = new Color(255, 102, 102);
 
     /** Width dimension to use for hor list sizes */
     private static final int DIM_H_X = 200;
