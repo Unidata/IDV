@@ -3480,6 +3480,22 @@ public class GuiUtils {
      * @param vinset Vert. inset
      * @return New button
      */
+    public static JToggleButton getToggleImageButton(String icon,
+                                                     String selectedIcon, int hinset, int vinset) {
+        return getToggleImageButton(getImageIcon(icon), getImageIcon(selectedIcon), hinset, vinset);
+    }
+
+
+    /**
+     * Create a JToggleButton with the given image and, if non-null,
+     * the given  selected image.
+     *
+     * @param icon Image for button
+     * @param selectedIcon Image to use when selected
+     * @param hinset Hor. inset
+     * @param vinset Vert. inset
+     * @return New button
+     */
     public static JToggleButton getToggleImageButton(ImageIcon icon,
             ImageIcon selectedIcon, int hinset, int vinset) {
         JToggleButton b = new JToggleButton(icon);

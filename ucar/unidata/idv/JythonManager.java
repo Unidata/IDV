@@ -141,6 +141,8 @@ public class JythonManager extends IdvManager implements ActionListener {
     /** _more_          */
     private JTextField findFld;
 
+    private JCheckBox caseCbx;
+    JToggleButton highlightAllBtn;
     /** One text component per tab */
     private ArrayList libHolders;
 
@@ -464,15 +466,21 @@ public class JythonManager extends IdvManager implements ActionListener {
      */
     private void searchFor(String text) {
         LibHolder holder = findVisibleComponent();
-        if ( !holder.find(text)) {
+        if ( !holder.find(text,highlightAllBtn.isSelected(),caseCbx.isSelected())) {
             findFld.setBackground(DataSelector.COLOR_BADSEARCH);
         } else {
             findFld.setBackground(Color.white);
         }
     }
 
+    public void searchFor() {
+        searchFor(findFld.getText());
+    }
+
     public void doSearch() {
-        searchFor(findFld.getText().trim());
+        LibHolder holder = findVisibleComponent();
+        holder.resetToCurrentSearchIndex();
+        searchFor(findFld.getText());
     }
 
 
@@ -496,12 +504,25 @@ public class JythonManager extends IdvManager implements ActionListener {
                 LogUtil.userMessage("No Jython resources defined");
                 return null;
             }
+            highlightAllBtn = GuiUtils.getToggleImageButton("/auxdata/ui/icons/SearchHighlightOff16.gif",
+                                                            "/auxdata/ui/icons/SearchHighlightOn16.gif",
+                                                            0,0);
+            highlightAllBtn.addActionListener(GuiUtils.makeActionListener(this,"searchFor", null));
+
+            highlightAllBtn.setToolTipText("Highlight All");
+            caseCbx = new JCheckBox("Match case", false);
             findFld = new JTextField("", 20);
-            findFld.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    doSearch();
-                }
-            });
+            JButton findBtn = GuiUtils.makeImageButton("/auxdata/ui/icons/SearchNext16.gif", this,"doSearch");
+            findBtn.setToolTipText("Find Next");
+            findFld.addActionListener(GuiUtils.makeActionListener(this,"doSearch", null));
+            findFld.addKeyListener(new KeyAdapter() {
+                    public void keyReleased(KeyEvent e) {
+                        if(e.isControlDown()) return;
+                        if(e.getKeyCode()!=e.VK_ENTER) {
+                            searchFor(findFld.getText());
+                        }
+                    }
+                });
             treePanel  = new TreePanel();
             libHolders = new ArrayList();
             int       systemCnt = 1;
@@ -585,11 +606,11 @@ public class JythonManager extends IdvManager implements ActionListener {
             menuBar.add(helpMenu);
             helpMenu.add(GuiUtils.makeMenuItem("Show Jython Help", this,
                     "showHelp"));
-            JButton findBtn = GuiUtils.makeButton("Find:", this,"doSearch");
-            JComponent bottomPanel = GuiUtils.left(GuiUtils.hbox(findBtn,
-                                                                 GuiUtils.hfill(findFld)));
+            JComponent buttons = GuiUtils.hbox(Misc.newList(findBtn,highlightAllBtn,caseCbx),4);
+            JComponent bottomPanel = GuiUtils.left(GuiUtils.hbox(new JLabel(" Find: "),
+                                                                 GuiUtils.hfill(findFld),buttons));
             return contents = GuiUtils.topCenterBottom(menuBar, treePanel,
-                    GuiUtils.inset(bottomPanel,1));
+                    GuiUtils.inset(bottomPanel,2));
         } catch (Throwable exc) {
             logException("Creating jython editor", exc);
             return null;
@@ -664,8 +685,18 @@ public class JythonManager extends IdvManager implements ActionListener {
         };
 
 
+        jythonEditor.getTextComponent().addKeyListener(new KeyAdapter() {
+                public void keyPressed(KeyEvent e) {
+                    if(e.isControlDown() && e.getKeyCode() == e.VK_F) {
+                        findFld.requestFocus();
+                        findFld.selectAll();
+                    }
+                }
+            });
+
         jythonEditor.getTextComponent().addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
+                holderArray[0].setSearchIndex(new Point(e.getX(), e.getY()));
                 if (SwingUtilities.isRightMouseButton(e)) {
                     JTextComponent comp     = jythonEditor.getTextComponent();
                     List           items    = new ArrayList();
@@ -704,7 +735,7 @@ public class JythonManager extends IdvManager implements ActionListener {
             }
         });
 
-        jythonEditor.setPreferredSize(new Dimension(400, 300));
+        jythonEditor.setPreferredSize(new Dimension(500, 400));
         JComponent wrapper = GuiUtils.center(jythonEditor);
         LibHolder libHolder = new LibHolder(editable, this, label,
                                             jythonEditor, path, wrapper);
@@ -2301,6 +2332,8 @@ public class JythonManager extends IdvManager implements ActionListener {
         /** widget */
         JPythonEditor pythonEditor;
 
+        JTextComponent textComp;
+
 
         /** file */
         String filePath;
@@ -2333,7 +2366,12 @@ public class JythonManager extends IdvManager implements ActionListener {
         public LibHolder(boolean editable, JythonManager jythonManager,
                          String label, JPythonEditor editor, String filePath,
                          JComponent wrapper) {
+            if(allPainter == null) {
+                allPainter = new DefaultHighlighter.DefaultHighlightPainter(Color.yellow);
+                onePainter = new DefaultHighlighter.DefaultHighlightPainter(Color.green);
+            }
             this.pythonEditor  = editor;
+            textComp = pythonEditor.getTextComponent();
             this.editable      = editable;
             this.jythonManager = jythonManager;
             this.label         = label;
@@ -2420,6 +2458,41 @@ public class JythonManager extends IdvManager implements ActionListener {
 
         /** _more_          */
         int lastIndex = -1;
+        int currentIndex = -1;
+        public void setSearchIndex(Point pt) {
+            Highlighter highlighter = textComp.getHighlighter();
+            highlighter.removeAllHighlights();
+            lastIndex = textComp.viewToModel(pt);
+            lastSearch = null;
+        }
+
+
+        static  DefaultHighlighter.DefaultHighlightPainter allPainter;
+        static  DefaultHighlighter.DefaultHighlightPainter onePainter;
+
+        public void resetToCurrentSearchIndex() {
+            lastIndex = currentIndex;
+        }
+
+        private void highlightAll(String what, String t) {
+            if(what.length() ==0) return;
+            Highlighter highlighter = textComp.getHighlighter();
+            int baseIndex=0;
+            int index;
+            int lastIndex = -1;
+            try {
+                while((index = t.indexOf(what,baseIndex)) >=0) {
+                    if(index == lastIndex) break;
+                    lastIndex = index;
+                    highlighter.addHighlight(index,index+what.length(),allPainter);
+                    baseIndex = index+1;
+                }
+            } catch(Exception exc) {
+                logException("Bad highlight area", exc);
+            }
+
+        }
+
 
         /**
          * _more_
@@ -2428,27 +2501,27 @@ public class JythonManager extends IdvManager implements ActionListener {
          *
          * @return _more_
          */
-        public boolean find(String what) {
-            JTextComponent textComp = pythonEditor.getTextComponent();
+        public boolean find(String what, boolean highlightAll, boolean doCase) {
             String         t        = textComp.getText();
+            if(!doCase) t = t.toLowerCase();
             int            start    = 0;
-            if (Misc.equals(lastSearch, what) && (lastIndex > 0)) {
-                start = lastIndex + 1;
-            }
+            start = lastIndex + 1;
+            Highlighter highlighter = textComp.getHighlighter();
+            highlighter.removeAllHighlights();
+            currentIndex = t.indexOf(what, start);
+            if (currentIndex >=0) {
+                try {
+                    highlighter.addHighlight(currentIndex,currentIndex+what.length(),onePainter);
+                    textComp.setCaretPosition(currentIndex);
+                } catch(Exception exc) {
+                    logException("Bad highlight area", exc);
+                }
+            } 
 
-            lastSearch = what;
-            int index = t.indexOf(what, start);
-            lastIndex = index;
-            if (index < 0) {
-                return false;
+            if(highlightAll) {
+                highlightAll(what,t);
             }
-            Caret caret = textComp.getCaret();
-            caret.setDot(index);
-            caret.moveDot(index + what.length());
-            caret.setVisible(true);
-            caret.setSelectionVisible(true);
-            return true;
-
+            return currentIndex >= 0;
         }
 
 
