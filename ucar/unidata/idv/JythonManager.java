@@ -130,6 +130,8 @@ public class JythonManager extends IdvManager implements ActionListener {
     /** The path to the editor executable */
     public static final String PROP_JYTHON_EDITOR = "idv.jython.editor";
 
+    private static final Color COLOR_DISABLED =  new Color(210,210, 210);
+
     /** any errors */
     private boolean inError = false;
 
@@ -535,6 +537,8 @@ public class JythonManager extends IdvManager implements ActionListener {
 
             highlightAllBtn.setToolTipText("Highlight All");
             caseCbx = new JCheckBox("Match case", false);
+            caseCbx.addActionListener(
+                GuiUtils.makeActionListener(this, "searchFor", null));
             findFld = new JTextField("", 20);
             JButton nextBtn = GuiUtils.makeImageButton(
                                   "/auxdata/ui/icons/SearchNext16.gif", this,
@@ -651,7 +655,7 @@ public class JythonManager extends IdvManager implements ActionListener {
                                             GuiUtils.hfill(findFld),
                                             buttons));
             return contents = GuiUtils.topCenterBottom(menuBar, treePanel,
-                    GuiUtils.inset(bottomPanel, 1));
+                                                       bottomPanel);
         } catch (Throwable exc) {
             logException("Creating jython editor", exc);
             return null;
@@ -716,7 +720,7 @@ public class JythonManager extends IdvManager implements ActionListener {
             throws VisADException {
 
         final LibHolder[]   holderArray  = { null };
-        final JPythonEditor jythonEditor = new JPythonEditor() {
+        final MyPythonEditor jythonEditor = new MyPythonEditor() {
             public void undoableEditHappened(UndoableEditEvent e) {
                 if ((holderArray[0] != null)
                         && (holderArray[0].saveBtn != null)) {
@@ -2460,7 +2464,7 @@ public class JythonManager extends IdvManager implements ActionListener {
         String label;
 
         /** widget */
-        JPythonEditor pythonEditor;
+        MyPythonEditor pythonEditor;
 
         /** _more_          */
         JTextComponent textComp;
@@ -2494,7 +2498,7 @@ public class JythonManager extends IdvManager implements ActionListener {
          * @param wrapper wrapper
          */
         public LibHolder(boolean editable, JythonManager jythonManager,
-                         String label, JPythonEditor editor, String filePath,
+                         String label, MyPythonEditor editor, String filePath,
                          JComponent wrapper) {
             if (allPainter == null) {
                 allPainter = new DefaultHighlighter.DefaultHighlightPainter(
@@ -2523,8 +2527,8 @@ public class JythonManager extends IdvManager implements ActionListener {
 
             if ( !editable) {
                 pythonEditor.getTextComponent().setEditable(false);
-                pythonEditor.getTextComponent().setBackground(new Color(210,
-                        210, 210));
+                pythonEditor.getTextComponent().setBackground(COLOR_DISABLED);
+                pythonEditor.getLineNumberComponent().setBackground(COLOR_DISABLED);
             }
 
         }
@@ -2750,6 +2754,17 @@ public class JythonManager extends IdvManager implements ActionListener {
         }
 
     }
+
+    private static  class MyPythonEditor extends JPythonEditor {
+        public MyPythonEditor() throws VisADException {
+        }
+
+        public JTextComponent getLineNumberComponent() {
+            return lineNumbers;
+        }
+    }
+
+
 
 }
 
