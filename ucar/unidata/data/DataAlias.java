@@ -289,10 +289,9 @@ public class DataAlias {
                                  TAG_ALIASES));
             DataAlias dataAlias =
                 (DataAlias) canonicalToObject.get(canonical);
-            //For now don't add in new aliases to previously created aliases
-            if (dataAlias != null) {
-                continue;
-            }
+            //            if (dataAlias != null) {
+            //                continue;
+            //            }
 
 
             if (dataAlias == null) {
@@ -400,6 +399,8 @@ public class DataAlias {
 
         }
         if (dataAlias != null) {
+            //Check for "!"
+            if(dataAlias.aliases.contains("!"+paramName)) return null;
             return dataAlias.getName();
         }
 
