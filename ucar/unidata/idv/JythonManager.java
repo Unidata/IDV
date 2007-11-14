@@ -803,15 +803,17 @@ public class JythonManager extends IdvManager implements ActionListener {
                         }
 
                     }
-                    items.add(GuiUtils.makeMenu("Insert Procedure Call",
-                            makeProcedureMenu(jythonEditor, "insertText",
-                                null)));
+                    if(holderArray[0].isEditable()) {
+                        items.add(GuiUtils.makeMenu("Insert Procedure Call",
+                                                    makeProcedureMenu(jythonEditor, "insertText",
+                                                                      null)));
 
-                    items.add(
-                        GuiUtils.makeMenu(
-                            "Insert Idv Action",
-                            getIdv().getIdvUIManager().makeActionMenu(
-                                jythonEditor, "insertText", true)));
+                        items.add(
+                                  GuiUtils.makeMenu(
+                                                    "Insert Idv Action",
+                                                    getIdv().getIdvUIManager().makeActionMenu(
+                                                                                              jythonEditor, "insertText", true)));
+                    }
 
                     if (helpMenuItem != null) {
                         items.add(GuiUtils.MENU_SEPARATOR);
