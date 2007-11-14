@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.ui;
 
 
@@ -76,10 +77,10 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
     /** The scroller */
     private JScrollPane treeView;
 
-    /** _more_          */
+    /** _more_ */
     private boolean useSplitPane = true;
 
-    /** _more_          */
+    /** _more_ */
     private int treeWidth = -1;
 
 
@@ -92,10 +93,10 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
     /** The panel */
     private GuiUtils.CardLayoutPanel panel;
 
-    /** _more_          */
+    /** _more_ */
     private JPanel emptyPanel;
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable catComponents = new Hashtable();
 
     /** Maps categories to tree node */
@@ -303,6 +304,29 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
      */
     public void addCategoryComponent(String cat, JComponent comp) {
         catComponents.put(">" + cat, comp);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param component _more_
+     */
+    public void removeComponent(JComponent component) {
+        DefaultMutableTreeNode node =
+            (DefaultMutableTreeNode) compToNode.get(component);
+        if (node == null) {
+            return;
+        }
+        compToNode.remove(component);
+        if (node.getParent() != null) {
+            node.removeFromParent();
+        }
+        panel.remove(component);
+        Hashtable stuff = GuiUtils.initializeExpandedPathsBeforeChange(tree,
+                              root);
+        treeModel.nodeStructureChanged(root);
+        GuiUtils.expandPathsAfterChange(tree, stuff, root);
     }
 
 
