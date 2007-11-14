@@ -581,10 +581,10 @@ public class JythonManager extends IdvManager implements ActionListener {
             menuBar.add(helpMenu);
             helpMenu.add(GuiUtils.makeMenuItem("Show Jython Help", this,
                     "showHelp"));
-            JComponent bottomPanel = GuiUtils.left(GuiUtils.label("Find: ",
+            JComponent bottomPanel = GuiUtils.left(GuiUtils.label(" Find: ",
                                          findFld));
             return contents = GuiUtils.topCenterBottom(menuBar, treePanel,
-                    bottomPanel);
+                    GuiUtils.inset(bottomPanel,1));
         } catch (Throwable exc) {
             logException("Creating jython editor", exc);
             return null;
@@ -650,7 +650,7 @@ public class JythonManager extends IdvManager implements ActionListener {
         final LibHolder[]   holderArray  = { null };
         final JPythonEditor jythonEditor = new JPythonEditor() {
             public void undoableEditHappened(UndoableEditEvent e) {
-                if (holderArray[0] != null) {
+                if (holderArray[0] != null && holderArray[0].saveBtn!=null) {
                     holderArray[0].saveBtn.setEnabled(true);
                     holderArray[0].functions = null;
                 }
@@ -716,7 +716,9 @@ public class JythonManager extends IdvManager implements ActionListener {
         if (text != null) {
             jythonEditor.setText(text);
         }
-        libHolder.saveBtn.setEnabled(false);
+        if(libHolder.saveBtn!=null) {
+            libHolder.saveBtn.setEnabled(false);
+        }
         return libHolder;
     }
 

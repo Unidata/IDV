@@ -292,9 +292,16 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
             catNode.add(panelNode);
         }
         panel.addCard(component);
-        treeModel.nodeStructureChanged(root);
+        treeChanged();
     }
 
+
+    private void treeChanged() {
+        Hashtable stuff = GuiUtils.initializeExpandedPathsBeforeChange(tree,
+                              root);
+        treeModel.nodeStructureChanged(root);
+        GuiUtils.expandPathsAfterChange(tree, stuff, root);
+    }
 
     /**
      * _more_
@@ -323,10 +330,8 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
             node.removeFromParent();
         }
         panel.remove(component);
-        Hashtable stuff = GuiUtils.initializeExpandedPathsBeforeChange(tree,
-                              root);
-        treeModel.nodeStructureChanged(root);
-        GuiUtils.expandPathsAfterChange(tree, stuff, root);
+        treeChanged();
+
     }
 
 
