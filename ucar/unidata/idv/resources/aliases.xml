@@ -8,19 +8,19 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="TEMP"
      label="Temperature"
-     aliases="T,t,Temperature,temperature,tdry,T_tenths,air_temperature,T,T22,T2"/>
+     aliases="T,t,Temperature,temperature,tdry,T_tenths,air_temperature,T,T22,T2,TMPK_PRES"/>
   <alias
      name="RH"
      label="Relative humidity"
-     aliases="rh,RH,Relative_humidity,relHumidity"/>
+     aliases="rh,RH,Relative_humidity,relHumidity,RELH_PRES"/>
   <alias
      name="DEWPOINT"
      label="Dewpoint"
-     aliases="dewpoint,Dewpoint,DEWPOINT,dp,dp_0,dp_1,TD_tenths,TD,dpdk,dew_point_temperature,Dew_point_temperature"/>
+     aliases="dewpoint,Dewpoint,DEWPOINT,dp,dp_0,dp_1,TD_tenths,TD,dpdk,dew_point_temperature,Dew_point_temperature,DWPK_PRES"/>
   <alias
       name="PRESSURE"
      label="Pressure"
-     aliases="p,P,SLP, PRE, seaLevelPress, seaLevelPressure, pres,pressure,Pressure,P_msl,Pm_msl,Psl_et,psl,air_pressure_at_sea_level,MSLP_Eta_Reduction,Mean_sea_level_pressure_ETA_model,PSFC,Pressure_reduced_to_MSL,Mean_sea_level_pressure"/>
+     aliases="p,P,SLP, PRE, seaLevelPress, seaLevelPressure, pres,pressure,Pressure,P_msl,Pm_msl,Psl_et,psl,air_pressure_at_sea_level,MSLP_Eta_Reduction,Mean_sea_level_pressure_ETA_model,PSFC,Pressure_reduced_to_MSL,Mean_sea_level_pressure,PMSL_NONE,EMSL_NONE"/>
   <alias
      name="ALTIMETER"
      label="Altimeter Setting"
@@ -72,11 +72,11 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="U"
      label="U component of wind"
-     aliases="u,U,GridRelative_u,u_sfc,u_wind,WesterlyWind,U_component_of_wind,U_component_of_wind_height_above_ground,Wind_Velocity_U_Component,U-component_of_wind,U_velocity,u_wind_height_above_ground"/>
+     aliases="u,U,GridRelative_u,u_sfc,u_wind,WesterlyWind,U_component_of_wind,U_component_of_wind_height_above_ground,Wind_Velocity_U_Component,U-component_of_wind,U_velocity,u_wind_height_above_ground,u-component_of_wind,UWND"/>
   <alias
      name="V"
      label="V component of wind"
-     aliases="v,V,GridRelative_v,v_sfc,v_wind,SoutherlyWind,V_component_of_wind,V_component_of_wind_height_above_ground,Wind_Velocity_V_Component,V-component_of_wind,V_velocity,v_wind_height_above_ground"/>
+     aliases="v,V,GridRelative_v,v_sfc,v_wind,SoutherlyWind,V_component_of_wind,V_component_of_wind_height_above_ground,Wind_Velocity_V_Component,V-component_of_wind,V_velocity,v_wind_height_above_ground,v-component_of_wind,VWND"/>
   <alias
      name="W"
      label="W component of wind"
@@ -84,15 +84,15 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="UREL"
      label="Grid Relative U component of wind"
-     aliases="GridRelative_u,GridRelative_u_fhg,U10"/>
+     aliases="GridRelative_u,GridRelative_u_fhg,U10,UREL_PRES,VREL_HGHT"/>
   <alias
      name="VREL"
      label="Grid Relative V component of wind"
-     aliases="GridRelative_v,GridRelative_v_fhg,V10"/>
+     aliases="GridRelative_v,GridRelative_v_fhg,V10,VREL_PRES,VREL_HGHT"/>
   <alias
      name="Z"
      label="Z"
-     aliases="z,Z,Geopotential_height"/>
+     aliases="z,Z,Geopotential_height,HGHT_PRES"/>
   <alias
      name="GP"
      label="Geopotential"
@@ -100,7 +100,7 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="ALTITUDE"
      label="Altitude"
-     aliases="Z_sfc, Altitude, altitude, Elevation, elevation, topo, Geopotential_height_surface,HGT"/>
+     aliases="Z_sfc, Altitude, altitude, Elevation, elevation, topo, Geopotential_height_surface,HGT,HGHT"/>
   <alias
      name="LOWCLOUD"
      label="Low Cloud Type"
@@ -132,7 +132,7 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="ABSVOR"
      label="Absolute Vorticity"
-     aliases="Absolute_Vorticity,absvor,absvort,Absolute_vorticity"/>
+     aliases="Absolute_Vorticity,absvor,absvort,Absolute_vorticity,AVOR_PRES"/>
   <alias
      name="HEADING"
      label="True Heading Angle"

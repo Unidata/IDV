@@ -68,10 +68,10 @@
   <datasource
      id="NetCDF.Grid,HTTPServer.Grid,File.Grid"
      factory="ucar.unidata.data.grid.GeoGridDataSource"
-     patterns="\.nc$,\.cdf$,.*netCDF.*,\.ncml$,\.wmo$,\.WMO$,\.grb$,\.grib$,\.gr2,\.grib1$,\.grib2$"
+     patterns="\.nc$,\.cdf$,.*netCDF.*,\.ncml$,\.wmo$,\.WMO$,\.grb$,\.grib$,\.gr2,\.grib1$,\.grib2$,\.gem$,\.grd"
      fileselection="true"
      doesmultiples="false"
-     label="Grid files (netCDF/GRIB/OPeNDAP)">
+     label="Grid files (netCDF/GRIB/OPeNDAP/GEMPAK)">
     <property
        name="icon"
        value="/auxdata/ui/icons/3D.gif"/>

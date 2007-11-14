@@ -4,6 +4,7 @@ Configuration file for netCDF java.  See docs at:
 http://www.unidata.ucar.edu/software/netcdf-java/reference/RuntimeLoading.html
 -->
 <nj22Config>
+<ioServiceProvider  class="ucar.unidata.data.grid.gempak.GempakGridServiceProvider"/>
 <typedDatasetFactory datatype="Trajectory" class="ucar.unidata.data.sounding.CosmicTrajectoryObsDataset"/>
 </nj22Config>
 
