@@ -268,6 +268,11 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
         new IdvResource("idv.resource.grib2lookuptables",
                         "Grib 2 Lookup tables", ".*grib2.*\\.lst$");
 
+    /** Points to the gempak parameter look up tables */
+    public static final IdvResource RSC_GEMPAKGRIDPARAMTABLES =
+        new IdvResource("idv.resource.gempakgridparam",
+                        "GEMPAK Grid Parameter tables", ".*grib.*\\.tbl$");
+
     /**
      * Points to jython libraries that are to be copied into the local
      * Jython directory

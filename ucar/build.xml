@@ -557,6 +557,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <include name="ucar/**/*.gif"/>
             <include name="ucar/**/*.jpg"/>
             <include name="ucar/**/*.jpeg"/>
+            <include name="ucar/**/*.tbl"/>
             <include name="ucar/**/README*"/>
             <include name="ucar/**/VERSION*"/>
             <include name="ucar/**/INSTALL*"/>

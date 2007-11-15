@@ -636,4 +636,12 @@
     <resource location="%USERHOME%/.unidata/nj22Config.xml"/>
     <resource location="%IDVPATH%/njConfig.xml"/>
   </resources>
+
+<!-- Where to find extra gempak grid lookup tables  -->
+  <resources name="idv.resource.gempakgridparam">
+    <resource location="%USERPATH%/gempakparamtable.tbl"/>
+    <resource location="%IDVPATH%/tables/ncepgrib2.tbl"/>
+    <resource location="%IDVPATH%/tables/wmogrib3.tbl"/>
+  </resources>
+
 </resourcebundle>

@@ -291,7 +291,7 @@ public class DataManager {
             resourceManager.getXmlResources(
                 IdvResourceManager.RSC_DATASOURCE));
 
-        loadGribResources(resourceManager);
+        loadIospResources(resourceManager);
         CachedFlatField.setCacheDir(new File(getDataCacheDirectory()));
         CachedFlatField.setCacheThreshold(
             dataContext.getObjectStore().get(
@@ -385,8 +385,18 @@ public class DataManager {
      * Load the grib lookup tables
      *
      * @param resourceManager The resource manager
+     * @deprecated  use loadIOSPResources(IdvResourceManager) instead
      */
     protected void loadGribResources(IdvResourceManager resourceManager) {
+        loadIospResources(resourceManager);
+    }
+
+    /**
+     * Load the grib lookup tables
+     *
+     * @param resourceManager The resource manager
+     */
+    protected void loadIospResources(IdvResourceManager resourceManager) {
         ucar.grib.GribResourceReader.setGribResourceReader(
             new ucar.grib.GribResourceReader() {
             public InputStream openInputStream(String resourceName)
@@ -438,6 +448,17 @@ public class DataManager {
                 }
             } catch (Exception exc) {
                 // System.err.println ("bad config:"+ exc);
+            }
+        }
+        ResourceCollection gempakParameters =
+            resourceManager.getResources(
+                IdvResourceManager.RSC_GEMPAKGRIDPARAMTABLES);
+        for (int i = 0; i < gempakParameters.size(); i++) {
+            try {
+                String r = gempakParameters.get(i).toString();
+                ucar.unidata.data.grid.gempak.GempakParameterTable.addParameters(r);
+            } catch (Exception exc) {
+                //                System.err.println ("bad:"+ exc);
             }
         }
 
