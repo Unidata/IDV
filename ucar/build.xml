@@ -624,6 +624,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <include name="ucar/**/*.jpg"/>                  
             <include name="ucar/**/*.png"/>                  
             <include name="ucar/**/*.jpeg"/>
+            <include name="ucar/**/*.tbl"/>
             <include name="ucar/unidata/idv/isl/**/*.isl"/>
             <include name="ucar/unidata/idv/isl/**/*.kml"/>
             <include name="ucar/**/README*"/>
