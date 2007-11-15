@@ -54,7 +54,6 @@ import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.MidiManager;
 import ucar.unidata.util.MidiProperties;
 import ucar.unidata.util.Misc;
 
@@ -168,7 +167,7 @@ public class ProbeControl extends DisplayControlImpl {
     private Real lastProbeAltitude;
 
     /** list of infos */
-    private List infos = new ArrayList();
+    private List<ProbeRowInfo> infos = new ArrayList();
 
     /** list of levels */
     private List _levels;
@@ -185,8 +184,6 @@ public class ProbeControl extends DisplayControlImpl {
     /** list of sound properties */
     private List _sounds;
 
-    /** list of sound properties */
-    private List midiManagers = new ArrayList();
 
     /** list of times */
     private List times = new ArrayList();
@@ -837,7 +834,7 @@ public class ProbeControl extends DisplayControlImpl {
      */
     protected void processNewData(List newChoices)
             throws VisADException, RemoteException {
-        List newInfos = new ArrayList();
+        List<ProbeRowInfo> newInfos = new ArrayList<ProbeRowInfo>();
         showWaitCursor();
         for (int i = 0; i < newChoices.size(); i++) {
             ProbeRowInfo info = new ProbeRowInfo(this);
@@ -1752,8 +1749,7 @@ public class ProbeControl extends DisplayControlImpl {
         List<ProbeRowInfo> rowInfos = new ArrayList();
         List choices  = getDataChoices();
         for (int i = 0; i < choices.size(); i++) {
-            ProbeRowInfo info = getRowInfo(i);
-            rowInfos.add(info);
+            rowInfos.add(getRowInfo(i));
         }
         if(showSunriseSunset) {
             getChart().setLocation(ucar.visad.Util.toLatLonPoint(llp));
@@ -2487,7 +2483,7 @@ public class ProbeControl extends DisplayControlImpl {
      *
      * @param value The new value for Infos
      */
-    public void setInfos(List value) {
+    public void setInfos(List<ProbeRowInfo> value) {
         infos = value;
     }
 
@@ -2496,7 +2492,7 @@ public class ProbeControl extends DisplayControlImpl {
      *
      * @return The Infos
      */
-    public List getInfos() {
+    public List<ProbeRowInfo> getInfos() {
         return infos;
     }
 

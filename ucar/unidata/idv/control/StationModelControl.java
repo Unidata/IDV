@@ -185,7 +185,7 @@ public class StationModelControl extends ObsDisplayControl {
     private PointOb currentTableOb;
 
     /** list of selected observations */
-    private List selectedObs = new ArrayList();
+    private List<PointOb> selectedObs = new ArrayList<PointOb>();
 
     /** the selected observation */
     private PointOb selectedOb;
@@ -726,7 +726,7 @@ public class StationModelControl extends ObsDisplayControl {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    private void findSelectedObs(FieldImpl theField, List obs)
+    private void findSelectedObs(FieldImpl theField, List<PointOb> obs)
             throws VisADException, RemoteException {
         Set domainSet = theField.getDomainSet();
         int numObs    = domainSet.getLength();
@@ -835,8 +835,8 @@ public class StationModelControl extends ObsDisplayControl {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    private List findSelectedObs() throws VisADException, RemoteException {
-        List              obs = new ArrayList();
+    private List<PointOb> findSelectedObs() throws VisADException, RemoteException {
+        List<PointOb>              obs = new ArrayList<PointOb>();
         PointDataInstance pdi = (PointDataInstance) getDataInstance();
         if (pdi == null) {
             return obs;
@@ -1031,7 +1031,7 @@ public class StationModelControl extends ObsDisplayControl {
             throws VisADException, RemoteException {
         selectedOb = ob;
         if (ob == null) {
-            selectedObs        = new ArrayList();
+            selectedObs        = new ArrayList<PointOb>();
             selectedObId       = null;
             selectedObLocation = null;
             idIndex            = -1;
@@ -1316,7 +1316,7 @@ public class StationModelControl extends ObsDisplayControl {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    private void setXYPlot(List obs) throws VisADException, RemoteException {
+    private void setXYPlot(List<PointOb> obs) throws VisADException, RemoteException {
         getChart().setPointObs(obs, chartParams);
     }
 
@@ -1595,7 +1595,7 @@ public class StationModelControl extends ObsDisplayControl {
 
             //Anything selected from before
             if ((selectedObId != null) || (selectedObLocation != null)) {
-                List obs = findSelectedObs();
+                List<PointOb> obs = findSelectedObs();
                 if (obs.size() > 0) {
                     setSelectedOb((PointOb) obs.get(0));
                 }

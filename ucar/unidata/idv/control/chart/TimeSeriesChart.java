@@ -317,7 +317,7 @@ public class TimeSeriesChart extends XYChartManager {
     long lastTime = -1;
 
     /** for changing the data */
-    List currentProbeData;
+    List<ProbeRowInfo> currentProbeData;
 
     /** for changing the data */
     boolean updatePending = false;
@@ -330,7 +330,7 @@ public class TimeSeriesChart extends XYChartManager {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public void setProbeSamples(List rowInfos)
+    public void setProbeSamples(List<ProbeRowInfo> rowInfos)
             throws VisADException, RemoteException {
         lastTime         = System.currentTimeMillis();
         currentProbeData = rowInfos;
@@ -375,13 +375,13 @@ public class TimeSeriesChart extends XYChartManager {
             throws VisADException, RemoteException {
         clearLineStates();
         updatePending = false;
-        List rowInfos = currentProbeData;
+        List<ProbeRowInfo> rowInfos = (currentProbeData==null?null:new ArrayList<ProbeRowInfo>(currentProbeData));
         try {
             initCharts();
             if ((rowInfos != null) && (rowInfos.size() > 0)) {
                 for (int paramIdx = 0; paramIdx < rowInfos.size();
                         paramIdx++) {
-                    ProbeRowInfo info = (ProbeRowInfo) rowInfos.get(paramIdx);
+                    ProbeRowInfo info = rowInfos.get(paramIdx);
                     LineState    lineState = info.getLineState();
                     addLineState(lineState);
                     FieldImpl field = info.getPointSample();
@@ -455,7 +455,7 @@ public class TimeSeriesChart extends XYChartManager {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public void setPointObs(List obs, List plotVars)
+    public void setPointObs(List<PointOb> obs, List plotVars)
             throws VisADException, RemoteException {
 
         try {
@@ -467,12 +467,11 @@ public class TimeSeriesChart extends XYChartManager {
                 if ((obs != null) && (obs.size() > 0)) {
                     List goodVars = new ArrayList();
                     for (int varIdx = 0; varIdx < plotVars.size(); varIdx++) {
-                        PointParam plotVar =
-                            (PointParam) plotVars.get(varIdx);
+                        PointParam plotVar = (PointParam)plotVars.get(varIdx);
                         LineState lineState = plotVar.getLineState();
                         addLineState(lineState);
                         String     var       = lineState.getName();
-                        PointOb    ob        = (PointOb) obs.get(0);
+                        PointOb    ob        = obs.get(0);
                         Tuple      tuple     = (Tuple) ob.getData();
                         TupleType  tupleType = (TupleType) tuple.getType();
                         MathType[] types     = tupleType.getComponents();
