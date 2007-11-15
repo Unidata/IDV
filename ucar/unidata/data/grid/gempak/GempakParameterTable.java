@@ -47,7 +47,7 @@ import java.util.List;
 public class GempakParameterTable {
 
     /** table to hold the  values */
-    private HashMap paramMap = new HashMap(256);
+    private static HashMap paramMap = new HashMap(256);
 
     /** indices of breakpoints in the table */
     private static int[] indices = {
@@ -75,7 +75,7 @@ public class GempakParameterTable {
      *
      * @throws IOException   problem reading table.
      */
-    public void addParameters(String tbl) throws IOException {
+    public static void addParameters(String tbl) throws IOException {
         String content = IOUtil.readContents(tbl, GempakParameterTable.class);
         List   lines   = StringUtil.split(content, "\n", false);
         List   result  = new ArrayList();
@@ -121,7 +121,7 @@ public class GempakParameterTable {
      *
      * @return  a grid parameter (may be null)
      */
-    private GridParameter makeParameter(String[] words) {
+    private static GridParameter makeParameter(String[] words) {
         int    num = 0;
         String description;
         if (words[0] != null) {
@@ -152,7 +152,7 @@ public class GempakParameterTable {
      *
      * @return  corresponding parameter or null if not found in table
      */
-    public GridParameter getParameter(String name) {
+    public static GridParameter getParameter(String name) {
         return (GridParameter) paramMap.get(name);
     }
 

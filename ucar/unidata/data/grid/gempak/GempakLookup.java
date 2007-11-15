@@ -31,9 +31,6 @@ public final class GempakLookup implements GridTableLookup {
     /** sample grid */
     private GempakGridRecord sample;
 
-    /** parameter table */
-    private GempakParameterTable paramTable;
-
     /**
      *
      * Gets a representative grid for this lookup
@@ -41,13 +38,6 @@ public final class GempakLookup implements GridTableLookup {
      */
     public GempakLookup(GempakGridRecord sample) {
         this.sample = sample;
-        paramTable  = new GempakParameterTable();
-        try {
-            paramTable.addParameters("wmogrib3.tbl");
-            paramTable.addParameters("ncepgrib2.tbl");
-        } catch (java.io.IOException ioe) {
-            System.out.println("couldn't add table");
-        }
     }
 
     /**
@@ -75,7 +65,7 @@ public final class GempakLookup implements GridTableLookup {
      */
     public final GridParameter getParameter(GridRecord gr) {
         String        name = gr.getParameterName();
-        GridParameter gp   = paramTable.getParameter(name);
+        GridParameter gp   = GempakParameterTable.getParameter(name);
         if (gp != null) {
             return gp;
         }
