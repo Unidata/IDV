@@ -124,7 +124,7 @@ public class ProbeRowInfo {
     private FieldImpl workingGrid;
 
     /** The last point that we sampled  on */
-    private EarthLocationTuple lastPoint;
+    private EarthLocation lastPoint;
 
 
     /** the time set from the last setValue */
@@ -497,6 +497,11 @@ public class ProbeRowInfo {
      * @throws VisADException On badness
      */
     protected Real getRealValue() throws VisADException, RemoteException {
+        return getRealValue(timeSample);
+    }
+
+
+    protected Real getRealValue(Data timeSample) throws VisADException, RemoteException {
         if (timeSample == null) {
             return null;
         }
@@ -618,7 +623,7 @@ public class ProbeRowInfo {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    protected void setPointSample(FieldImpl sample, EarthLocationTuple elt)
+    protected void setPointSample(FieldImpl sample, EarthLocation elt)
             throws VisADException, RemoteException {
         this.pointSample = sample;
         this.lastPoint   = elt;
@@ -691,7 +696,7 @@ public class ProbeRowInfo {
      * @param elt The point we want to sample on
      * @return sample
      */
-    public FieldImpl getPointSample(EarthLocationTuple elt) {
+    public FieldImpl getPointSample(EarthLocation elt) {
         if ( !Misc.equals(elt, lastPoint)) {
             pointSample = null;
         }

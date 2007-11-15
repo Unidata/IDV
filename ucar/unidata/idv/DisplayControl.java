@@ -20,6 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.idv;
 
 
@@ -31,6 +33,8 @@ import ucar.unidata.data.DataSelection;
 import ucar.visad.display.DisplayableData;
 
 import visad.VisADException;
+
+import visad.georef.EarthLocation;
 
 import visad.georef.MapProjection;
 
@@ -461,6 +465,11 @@ public interface DisplayControl extends Sharable {
     public String getDisplayCategory();
 
 
+    /**
+     * _more_
+     *
+     * @param category _more_
+     */
     public void setDisplayCategory(String category);
 
 
@@ -531,8 +540,18 @@ public interface DisplayControl extends Sharable {
      */
     public boolean getShowInTabs();
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean shouldBeDocked();
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean canBeDocked();
 
     /**
@@ -551,6 +570,22 @@ public interface DisplayControl extends Sharable {
      * @throws VisADException on badness
      */
     public visad.Set getTimeSet() throws RemoteException, VisADException;
+
+    /**
+     * _more_
+     *
+     * @param el _more_
+     * @param animationValue _more_
+     * @param animationStep _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List getCursorReadout(EarthLocation el, visad.Real animationValue,
+                                 int animationStep)
+     throws Exception;
+
 
 }
 

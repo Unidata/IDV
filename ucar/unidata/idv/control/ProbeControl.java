@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -245,6 +246,7 @@ public class ProbeControl extends DisplayControlImpl {
     /** Show the table in the legend */
     private boolean showTableInLegend = true;
 
+    /** _more_          */
     private boolean showSunriseSunset = false;
 
 
@@ -402,7 +404,8 @@ public class ProbeControl extends DisplayControlImpl {
                 "Show Thumbnail in Legend", getChart(), "showThumb", null));
         chartMenu.add(
             GuiUtils.makeCheckboxMenuItem(
-                "Show Sunrise/Sunset Times", this, "showSunriseSunset", null));
+                "Show Sunrise/Sunset Times", this, "showSunriseSunset",
+                null));
         List chartMenuItems = new ArrayList();
         getChart().addViewMenuItems(chartMenuItems);
         GuiUtils.makeMenu(chartMenu, chartMenuItems);
@@ -1747,11 +1750,11 @@ public class ProbeControl extends DisplayControlImpl {
 
         updateTime();
         List<ProbeRowInfo> rowInfos = new ArrayList();
-        List choices  = getDataChoices();
+        List               choices  = getDataChoices();
         for (int i = 0; i < choices.size(); i++) {
             rowInfos.add(getRowInfo(i));
         }
-        if(showSunriseSunset) {
+        if (showSunriseSunset) {
             getChart().setLocation(ucar.visad.Util.toLatLonPoint(llp));
         } else {
             getChart().setLocation(null);
@@ -2042,7 +2045,7 @@ public class ProbeControl extends DisplayControlImpl {
      */
     private void clearCachedSamples() {
         for (int rowIdx = 0; rowIdx < infos.size(); rowIdx++) {
-            ProbeRowInfo info = (ProbeRowInfo) infos.get(rowIdx);
+            ProbeRowInfo info = infos.get(rowIdx);
             info.clearCachedSamples();
         }
     }
@@ -2054,6 +2057,7 @@ public class ProbeControl extends DisplayControlImpl {
      * @param info the info
      * @param elt point
      * @param llp point again
+     * @param useRowInfoCache _more_
      *
      * @return sample
      *
@@ -2062,14 +2066,18 @@ public class ProbeControl extends DisplayControlImpl {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    private FieldImpl getSampleAtPoint(ProbeRowInfo info,
-                                       EarthLocationTuple elt,
-                                       LatLonPoint llp)
+    private FieldImpl getSampleAtPoint(ProbeRowInfo info, EarthLocation elt,
+                                       boolean useRowInfoCache)
             throws VisADException, RemoteException, Exception {
 
-        FieldImpl sample = info.getPointSample(elt);
-        if (sample != null) {
-            return sample;
+        LatLonPoint llp    = elt.getLatLonPoint();
+
+        FieldImpl   sample = null;
+        if (useRowInfoCache) {
+            sample = info.getPointSample(elt);
+            if (sample != null) {
+                return sample;
+            }
         }
 
         if (info.isPoint()) {
@@ -2106,9 +2114,11 @@ public class ProbeControl extends DisplayControlImpl {
             }
             sample = PointObFactory.makeTimeSequenceOfPointObs(obs, 0,
                     info.getPointIndex());
-            info.setStationName((PointOb) obs.get(0));
-            info.setPointSample(sample, elt);
-            setTimesForAnimation();
+            if (useRowInfoCache) {
+                info.setStationName((PointOb) obs.get(0));
+                info.setPointSample(sample, elt);
+                setTimesForAnimation();
+            }
             return sample;
         }
 
@@ -2137,11 +2147,91 @@ public class ProbeControl extends DisplayControlImpl {
             sample = GridUtil.sample(workingGrid, llp,
                                      info.getSamplingMode());
         }
-        info.setWorkingGrid(workingGrid);
-        info.setPointSample(sample, elt);
-        setTimesForAnimation();
+        if (useRowInfoCache) {
+            info.setWorkingGrid(workingGrid);
+            info.setPointSample(sample, elt);
+            setTimesForAnimation();
+        }
         return sample;
     }
+
+    /**
+     * _more_
+     *
+     * @param elt _more_
+     * @param animationValue _more_
+     * @param animationStep _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List getCursorReadoutInner(EarthLocation elt, Real animationValue,
+                                 int animationStep)
+            throws Exception {
+        List l = new ArrayList();
+        for (int rowIdx = 0; rowIdx < infos.size(); rowIdx++) {
+            ProbeRowInfo info = infos.get(rowIdx);
+            Data[] d = getSampleAt(info, elt, animationValue, animationStep,
+                                   false);
+            if (d == null) {
+                continue;
+            }
+            Data rt = d[1];
+            Real r = info.getRealValue(rt);
+            if (r == null|| r.isMissing()) {
+                continue;
+            }
+            if (l.size() == 0) {
+                l.add("<tr><td>"+getMenuLabel() + ":" +"</td><td></td></tr>");
+            }
+
+            Unit unit = info.getUnit();
+            double value = (unit!=null?r.getValue(unit):r.getValue());
+            if(unit == null) unit = r.getUnit();
+            l.add("<tr><td>&nbsp;&nbsp;&nbsp;" + info.toString() + ":</td><td align=\"right\">"
+                  + Misc.format(value) + "[" + unit + "]</td></tr>");
+        }
+        return l;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param info _more_
+     * @param elt _more_
+     * @param aniValue _more_
+     * @param step _more_
+     * @param useRowInfoCache _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Data[] getSampleAt(ProbeRowInfo info, EarthLocation elt,
+                               Real aniValue, int step,
+                               boolean useRowInfoCache)
+            throws Exception {
+        FieldImpl sample = getSampleAtPoint(info, elt, useRowInfoCache);
+        Data      rt     = null;
+        if (sample != null) {
+            if ((aniValue != null) && !aniValue.isMissing()) {
+                // can't use this because it uses floats
+                rt = sample.evaluate(aniValue, info.getSamplingMode(),
+                                     Data.NO_ERRORS);
+            } else {
+                rt = sample.getSample(step);
+            }
+        }
+        if (rt == null) {
+            return null;
+        }
+        return new Data[] { sample, rt };
+    }
+
+
 
     /**
      * Get the real values for the given time step
@@ -2157,24 +2247,19 @@ public class ProbeControl extends DisplayControlImpl {
     private void setData(Real aniValue, int step)
             throws VisADException, RemoteException, Exception {
         EarthLocationTuple elt     = getProbeLocation();
-        LatLonPoint        llp     = elt.getLatLonPoint();
         List               choices = getDataChoices();
         for (int i = 0; i < choices.size(); i++) {
-            ProbeRowInfo info   = getRowInfo(i);
-            FieldImpl    sample = getSampleAtPoint(info, elt, llp);
-            Data         rt     = null;
-            if (sample != null) {
-                if ((aniValue != null) && !aniValue.isMissing()) {
-                    // can't use this because it uses floats
-                    rt = sample.evaluate(aniValue, info.getSamplingMode(),
-                                         Data.NO_ERRORS);
-                } else {
-                    rt = sample.getSample(step);
-                }
+            ProbeRowInfo info = getRowInfo(i);
+            Data[]       d    = getSampleAt(info, elt, aniValue, step, true);
+            if (d == null) {
+                continue;
             }
+            FieldImpl sample = (FieldImpl) d[0];
+            Data      rt     = d[1];
             if (rt == null) {
                 continue;
             }
+
             info.setTimeSample(rt);
             Unit realUnit  = null;
             Real realValue = info.getRealValue();
@@ -2197,6 +2282,7 @@ public class ProbeControl extends DisplayControlImpl {
                 }
                 info.setUnit(rowUnit);
             }
+
 
 
 
@@ -2273,7 +2359,7 @@ public class ProbeControl extends DisplayControlImpl {
     }
 
 
-    /** _more_          */
+    /** _more_ */
     private JCheckBox columnsCbx;
 
     /**
@@ -2734,22 +2820,22 @@ public class ProbeControl extends DisplayControlImpl {
     }
 
     /**
-       Set the ShowSunriseSunset property.
-
-       @param value The new value for ShowSunriseSunset
-    **/
-    public void setShowSunriseSunset (boolean value) {
-	showSunriseSunset = value;
+     *  Set the ShowSunriseSunset property.
+     *
+     *  @param value The new value for ShowSunriseSunset
+     */
+    public void setShowSunriseSunset(boolean value) {
+        showSunriseSunset = value;
         doMoveProbe();
     }
 
     /**
-       Get the ShowSunriseSunset property.
-
-       @return The ShowSunriseSunset
-    **/
-    public boolean getShowSunriseSunset () {
-	return showSunriseSunset;
+     *  Get the ShowSunriseSunset property.
+     *
+     *  @return The ShowSunriseSunset
+     */
+    public boolean getShowSunriseSunset() {
+        return showSunriseSunset;
     }
 
 

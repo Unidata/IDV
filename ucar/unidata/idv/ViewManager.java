@@ -4184,13 +4184,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
 
 
+
         if (getIsShared() && !lastActive) {
             if (eventId == DisplayEvent.MOUSE_PRESSED) {
                 getVMManager().setLastActiveViewManager(this);
             } else if ( !clickToFocus
                         && (eventId == DisplayEvent.MOUSE_MOVED)) {
                 getVMManager().setLastActiveViewManager(this);
-            }
+            } 
         }
 
         if (eventId == DisplayEvent.KEY_PRESSED) {

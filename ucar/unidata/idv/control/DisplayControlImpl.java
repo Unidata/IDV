@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -117,6 +118,8 @@ import visad.*;
 
 import visad.georef.EarthLocation;
 
+import visad.georef.EarthLocation;
+
 
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
@@ -182,6 +185,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
     /** Should we use the times in this display control as part of the animation set */
     private boolean useTimesInAnimation = true;
+
+    private boolean doCursorReadout = true;
 
     /** Are we expanded in the main tabs */
     private boolean expandedInTabs = false;
@@ -3445,9 +3450,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         if (legendType == SIDE_LEGEND) {
             if (sideLegendButtonPanel == null) {
-                DndImageButton dndBtn = new DndImageButton(this,"control");
-                sideLegendButtonPanel = GuiUtils.hbox(dndBtn,makeLockButton(),
-                                                      makeRemoveButton(), 2);
+                DndImageButton dndBtn = new DndImageButton(this, "control");
+                sideLegendButtonPanel = GuiUtils.hbox(dndBtn,
+                        makeLockButton(), makeRemoveButton(), 2);
                 dndBtn.setToolTipText("Click to drag-and-drop");
                 sideLegendButtonPanel.setBackground(null);
             }
@@ -3752,7 +3757,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
         //        outerContents = GuiUtils.topCenterBottom(doMakeMenuBar(), mainPanel, makeBottomButtons());
-        DndImageButton dndBtn = new DndImageButton(this,"control");
+        DndImageButton dndBtn = new DndImageButton(this, "control");
         //        JComponent topPanel = GuiUtils.centerRight(doMakeMenuBar(),dndBtn);
         outerContents = GuiUtils.topCenter(doMakeMenuBar(), mainPanel);
         //        outerContents = GuiUtils.topCenter(topPanel, mainPanel);
@@ -3820,9 +3825,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return The menu bar
      */
     protected JMenuBar doMakeMenuBar() {
-        DndImageButton dndBtn = new DndImageButton(this,"control");
-        List     menus   = doMakeMenuBarMenus(new ArrayList());
-        JMenuBar menuBar = new JMenuBar();
+        DndImageButton dndBtn  = new DndImageButton(this, "control");
+        List           menus   = doMakeMenuBarMenus(new ArrayList());
+        JMenuBar       menuBar = new JMenuBar();
         for (int i = 0; i < menus.size(); i++) {
             menuBar.add((JMenu) menus.get(i));
         }
@@ -5175,6 +5180,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         dsd.addPropertyValue(new Boolean(getUseTimesInAnimation()),
                              "useTimesInAnimation", "Use Times In Animation",
                              SETTINGS_GROUP_FLAGS);
+       
+        dsd.addPropertyValue(new Boolean(getDoCursorReadout()),
+                             "doCursorReadout", "Include in cursor readout",
+                             SETTINGS_GROUP_FLAGS);
         dsd.addPropertyValue(new Boolean(getCanDoRemoveAll()),
                              "canDoRemoveAll", "Remove on Remove All",
                              SETTINGS_GROUP_FLAGS);
@@ -5281,6 +5290,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         methodNameToSettingsMap.put("setCanDoRemoveAll", cbx =
             new JCheckBox("Remove on Remove All", getCanDoRemoveAll()));
 
+        comps.add(cbx);
+
+        methodNameToSettingsMap.put("setDoCursorReadout",
+                                    cbx = new JCheckBox(
+                                                        "Include in cursor readout", getDoCursorReadout()));
         comps.add(cbx);
 
         methodNameToSettingsMap.put("setShowNoteText",
@@ -6255,6 +6269,62 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public void setDefaultView(String s) {
         defaultView = s;
     }
+
+    /**
+     * _more_
+     *
+     * @param el _more_
+     * @param animationValue _more_
+     * @param animationStep _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public final List getCursorReadout(EarthLocation el, Real animationValue,
+                                 int animationStep)
+        throws Exception {
+        if(!getDoCursorReadout()) return null;
+        try {
+            List l =getCursorReadoutInner(el, animationValue, animationStep);
+            return l;
+        } catch (Exception exc) {
+            LogUtil.consoleMessage("Error getting cursor readout");
+            LogUtil.consoleMessage(LogUtil.getStackTrace(exc));
+            setDoCursorReadout(false);
+        }
+        return null;
+    }
+
+    public List getCursorReadoutInner(EarthLocation el, Real animationValue,
+                                 int animationStep)
+            throws Exception {
+        return null;
+    }
+
+
+
+    protected String formatForCursorReadout(Real r) 
+        throws VisADException, RemoteException {
+        Unit displayUnit = getDisplayUnit();
+        double value;
+        Unit unit;
+        if(r.isMissing()) {
+            return "missing";
+        } else {
+            if(displayUnit!=null) {
+                value = r.getValue(displayUnit);
+                unit = displayUnit;
+            } else {
+                value = r.getValue();
+                unit = r.getUnit();
+            }
+            return Misc.format(value) + "[" + unit+"]";
+        }
+    }
+
+
+
 
     /**
      * Return the name  of the first {@link ucar.unidata.idv.ViewManager} found
@@ -8006,8 +8076,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public void moveTo(ViewManager newViewManager) {
         defaultViewManager = newViewManager;
-        if ((defaultViewManager != null) && (defaultViewManager.getViewDescriptor() != null)) {
-            defaultView =  defaultViewManager.getViewDescriptor().getName();
+        if ((defaultViewManager != null)
+                && (defaultViewManager.getViewDescriptor() != null)) {
+            defaultView = defaultViewManager.getViewDescriptor().getName();
         }
 
         List displayList = getDisplayInfos();
@@ -10565,9 +10636,28 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * Show the color control widget in the widgets if FLAG_COLOR is set.
      * @return  false  subclasses should override
      */
-    public boolean  showColorControlWidget() {
+    public boolean showColorControlWidget() {
         return false;
     }
+/**
+Set the DoCursorReadout property.
+
+@param value The new value for DoCursorReadout
+**/
+public void setDoCursorReadout (boolean value) {
+        doCursorReadout = value;
+}
+
+/**
+Get the DoCursorReadout property.
+
+@return The DoCursorReadout
+**/
+public boolean getDoCursorReadout () {
+        return doCursorReadout;
+}
+
+
 
 }
 

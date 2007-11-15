@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv;
 
 
@@ -113,10 +114,10 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 public class MapViewManager extends NavigatedViewManager {
 
-    /** _more_          */
+    /** _more_ */
     public static final String PREF_ADDRESS_LIST = "view.address.list";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PREF_ADDRESS_REPROJECT =
         "view.address.reproject";
 
@@ -374,7 +375,6 @@ public class MapViewManager extends NavigatedViewManager {
         checkPipPanel();
         super.displayChanged(de);
     }
-
 
 
 

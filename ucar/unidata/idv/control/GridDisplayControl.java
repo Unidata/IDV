@@ -69,6 +69,7 @@ import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -126,6 +127,21 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
      */
     public GridDataInstance getGridDataInstance() {
         return (GridDataInstance) getDataInstance();
+    }
+
+
+
+    public List getCursorReadoutInner(EarthLocation el, Real animationValue, int animationStep) throws Exception {
+        Data data = getGridDataInstance().getData();
+        if(data == null || !(data instanceof FieldImpl)) return null;
+        FieldImpl field = (FieldImpl) data;
+        if(field==null) {return null;}
+        List result = new ArrayList();
+        Real r = GridUtil.sampleToReal(field, el, animationValue);
+        if(r!=null && !r.isMissing()) {
+            result.add("<tr><td>"+getMenuLabel()+":</td><td align=\"right\">" +formatForCursorReadout(r)+"</td></tr>");
+        }
+        return result;
     }
 
 
