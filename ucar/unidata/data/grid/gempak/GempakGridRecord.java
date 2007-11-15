@@ -189,13 +189,6 @@ public class GempakGridRecord implements GridRecord {
     }
 
     /**
-     * Get the horizontal coordinate system (projection) of this GridRecord
-     * public GridHorizCoordSys getHorizCoordSys();
-     *
-     * @return _more_
-     */
-
-    /**
      * Get the grid def record id
      *
      * @return parameter name
@@ -203,8 +196,6 @@ public class GempakGridRecord implements GridRecord {
     public String getGridDefRecordId() {
         return navBlock.toString();
     }
-
-    ;
 
     /**
      * Get a String representation of this object

@@ -43,33 +43,33 @@ import java.util.*;
  */
 public class GridTimeCoord {
 
-    /** _more_ */
+    /** logger */
     static private org.slf4j.Logger log =
         org.slf4j.LoggerFactory.getLogger(GridTimeCoord.class);
 
     // for parsing dates
 
-    /** _more_ */
+    /** date formatter */
     private DateFormatter formatter = new DateFormatter();
 
-    /** _more_ */
+    /** calendar */
     private Calendar calendar;
 
-    /** _more_ */
+    /** name */
     private String name;
 
-    /** _more_ */
+    /** lookup table */
     private GridTableLookup lookup;
 
-    /** _more_ */
+    /** list of times */
     private ArrayList times = new ArrayList();  //  Date
     //private double[] offsetHours;
 
-    /** _more_ */
+    /** sequence # */
     private int seq = 0;
 
     /**
-     * _more_
+     * Create a new GridTimeCoord
      */
     GridTimeCoord() {
         // need to have this non-static for thread safety
@@ -78,10 +78,10 @@ public class GridTimeCoord {
     }
 
     /**
-     * _more_
+     * Create a new GridTimeCoord with the list of records
      *
-     * @param records _more_
-     * @param lookup _more_
+     * @param records  records to use
+     * @param lookup   lookup table
      */
     GridTimeCoord(List records, GridTableLookup lookup) {
         this();
@@ -91,11 +91,11 @@ public class GridTimeCoord {
     }
 
     /**
-     * _more_
+     * Create a new GridTimeCoord with the name, forecast times and  lookup
      *
-     * @param name _more_
-     * @param offsetHours _more_
-     * @param lookup _more_
+     * @param name   name
+     * @param offsetHours   forecast hours
+     * @param lookup        lookup table
      */
     GridTimeCoord(String name, double[] offsetHours, GridTableLookup lookup) {
         this();
@@ -123,9 +123,9 @@ public class GridTimeCoord {
     }
 
     /**
-     * _more_
+     * Add the times from the list of records
      *
-     * @param records _more_
+     * @param records   list of records
      */
     void addTimes(List records) {
         for (int i = 0; i < records.size(); i++) {
@@ -138,11 +138,11 @@ public class GridTimeCoord {
     }
 
     /**
-     * _more_
+     * match levels
      *
-     * @param records _more_
+     * @param records  list of records
      *
-     * @return _more_
+     * @return true if they are the same as this
      */
     boolean matchLevels(List records) {
 
@@ -161,18 +161,18 @@ public class GridTimeCoord {
     }
 
     /**
-     * _more_
+     * Set the sequence number
      *
-     * @param seq _more_
+     * @param seq the sequence number
      */
     void setSequence(int seq) {
         this.seq = seq;
     }
 
     /**
-     * _more_
+     * Get the name
      *
-     * @return _more_
+     * @return the name
      */
     String getName() {
         if (name != null) {
@@ -184,10 +184,10 @@ public class GridTimeCoord {
     }
 
     /**
-     * _more_
+     * Add this as a dimension to a netCDF file
      *
-     * @param ncfile _more_
-     * @param g _more_
+     * @param ncfile  the netCDF file
+     * @param g       the group in the file
      */
     void addDimensionsToNetcdfFile(NetcdfFile ncfile, Group g) {
         Collections.sort(times);
@@ -195,10 +195,10 @@ public class GridTimeCoord {
     }
 
     /**
-     * _more_
+     * Add this as a variable to the netCDF file
      *
-     * @param ncfile _more_
-     * @param g _more_
+     * @param ncfile  the netCDF file
+     * @param g       the group in the file
      */
     void addToNetcdfFile(NetcdfFile ncfile, Group g) {
         Variable v = new Variable(ncfile, g, null, getName());
@@ -243,11 +243,11 @@ public class GridTimeCoord {
     }
 
     /**
-     * _more_
+     * Get the index of a GridRecord
      *
-     * @param record _more_
+     * @param record  the record
      *
-     * @return _more_
+     * @return  the index or -1 if not found
      */
     int getIndex(GridRecord record) {
         Date validTime = getValidTime(record, lookup);
@@ -255,32 +255,32 @@ public class GridTimeCoord {
     }
 
     /**
-     * _more_
+     * Get the valid time for a GridRecord
      *
-     * @param record _more_
+     * @param record   the record
      *
-     * @return _more_
+     * @return  the valid time
      */
     Date getValidTime(GridRecord record) {
         return getValidTime(record, lookup);
     }
 
     /**
-     * _more_
+     * Get the number of times
      *
-     * @return _more_
+     * @return the number of times
      */
     int getNTimes() {
         return times.size();
     }
 
     /**
-     * _more_
+     * Get the valid time for this record
      *
-     * @param record _more_
-     * @param lookup _more_
+     * @param record   the record in question
+     * @param lookup   the lookup table
      *
-     * @return _more_
+     * @return  the valid time
      */
     private Date getValidTime(GridRecord record, GridTableLookup lookup) {
         Date validTime = record.getValidTime();

@@ -100,33 +100,16 @@ public class GridDefRecord {
     /** minor axis of earth */
     public static final String MINOR_AXIS_EARTH = "minor_axis_earth";
 
-    /**
-     * _more_
+    /* TODO:  The following are commented out from the original
+     * Index.GdsRecord.  I've moved to using the hashtable to
+     * store these, but would could consider what are the bare minimum
+     * methods we need for all 2D grids
+     *
      * public String gdsKey, winds;
-     */
-
-    /**
-     * _more_
      * public int grid_type, nx, ny, resolution;
-     */
-
-    /**
-     * _more_
      * public double dx, dy;
-     */
-
-    /**
-     * _more_
      * public double latin1, latin2, La1, Lo1, LaD, LoV;
-     */
-
-    /**
-     * _more_
      * public int grid_shape_code;
-     */
-
-    /**
-     * _more_
      * public double radius_spherical_earth, major_axis_earth, minor_axis_earth;
      */
 

@@ -235,15 +235,15 @@ public class GempakGridServiceProvider extends GempakIOServiceProvider {
     }
 
     /**
-     * _more_
+     * Is this XY level missing?
      *
-     * @param v2 _more_
-     * @param timeIdx _more_
-     * @param levIdx _more_
+     * @param v2   Variable
+     * @param timeIdx time index
+     * @param levIdx  level index
      *
-     * @return _more_
+     * @return true if missing
      *
-     * @throws InvalidRangeException _more_
+     * @throws InvalidRangeException  invalid range
      */
     private boolean isMissingXY(Variable v2, int timeIdx, int levIdx)
             throws InvalidRangeException {

@@ -76,7 +76,6 @@ public abstract class GempakIOServiceProvider implements IOServiceProvider {
      * @throws IOException problem closing file
      */
     public void close() throws IOException {
-        ncfile.close();
         raf.close();
     }
 

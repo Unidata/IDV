@@ -41,44 +41,47 @@ import java.util.*;
  */
 public class GridVertCoord implements Comparable {
 
-    /** _more_ */
+    /** logger */
     static private org.slf4j.Logger logger =
         org.slf4j.LoggerFactory.getLogger(GridVertCoord.class);
 
-    /** _more_ */
+    /** typical record for this vertical coordinate */
     private GridRecord typicalRecord;
 
-    /** _more_ */
+    /** level name */
     private String levelName;
 
-    /** _more_ */
+    /** lookup table */
     private GridTableLookup lookup;
 
-    /** _more_ */
+    /** sequence # */
     private int seq = 0;
 
-    /** _more_ */
+    /** coord values */
     private double[] coordValues;
 
-    /** _more_ */
+    /** uses bounds flag */
     boolean usesBounds = false;
 
-    /** _more_ */
+    /** don't use vertical flag */
     boolean dontUseVertical = false;
 
-    /** _more_ */
+    /** positive  direction */
     String positive = "up";
 
-    /** _more_ */
+    /** units */
     String units;
 
-    /** _more_ */
+    /** debug flag */
     private boolean debug = false;
 
+    /** levels */
+    private ArrayList levels = new ArrayList();  // LevelCoord
+
     /**
-     * _more_
+     * Create a new GridVertCoord with the given name
      *
-     * @param name _more_
+     * @param name  name
      */
     GridVertCoord(String name) {
         this.levelName  = name;
@@ -86,11 +89,11 @@ public class GridVertCoord implements Comparable {
     }
 
     /**
-     * _more_
+     * Create a new GridVertCoord with the appropriate params
      *
-     * @param records _more_
-     * @param levelName _more_
-     * @param lookup _more_
+     * @param records   list of GridRecords that make up this coord
+     * @param levelName the name of the level
+     * @param lookup    the lookup table
      */
     GridVertCoord(List records, String levelName, GridTableLookup lookup) {
         this.typicalRecord = (GridRecord) records.get(0);
@@ -115,13 +118,13 @@ public class GridVertCoord implements Comparable {
     }
 
     /**
-     * _more_
+     * Create a new GridVertCoord for a layer
      *
-     * @param record _more_
-     * @param levelName _more_
-     * @param lookup _more_
-     * @param level1 _more_
-     * @param level2 _more_
+     * @param record    layer record
+     * @param levelName name of this level
+     * @param lookup    lookup table
+     * @param level1    level 1
+     * @param level2    level 2
      */
     GridVertCoord(GridRecord record, String levelName,
                   GridTableLookup lookup, double[] level1, double[] level2) {
@@ -150,27 +153,27 @@ public class GridVertCoord implements Comparable {
     }
 
     /**
-     * _more_
+     * Set the sequence number
      *
-     * @param seq _more_
+     * @param seq  the sequence number
      */
     void setSequence(int seq) {
         this.seq = seq;
     }
 
     /**
-     * _more_
+     * Set the level name
      *
-     * @return _more_
+     * @return the level name
      */
     String getLevelName() {
         return levelName;
     }
 
     /**
-     * _more_
+     * Get the variable name
      *
-     * @return _more_
+     * @return the variable name
      */
     String getVariableName() {
         return (seq == 0)
@@ -179,9 +182,9 @@ public class GridVertCoord implements Comparable {
     }
 
     /**
-     * _more_
+     * Get the number of levels
      *
-     * @return _more_
+     * @return number of levels
      */
     int getNLevels() {
         return dontUseVertical
@@ -190,9 +193,9 @@ public class GridVertCoord implements Comparable {
     }
 
     /**
-     * _more_
+     * Add levels
      *
-     * @param records _more_
+     * @param records GridRecords, one for each level
      */
     void addLevels(List records) {
         for (int i = 0; i < records.size(); i++) {
@@ -218,11 +221,11 @@ public class GridVertCoord implements Comparable {
     }
 
     /**
-     * _more_
+     * Match levels
      *
-     * @param records _more_
+     * @param records  records to match
      *
-     * @return _more_
+     * @return  true if they have the same levels
      */
     boolean matchLevels(List records) {
 
@@ -247,10 +250,10 @@ public class GridVertCoord implements Comparable {
     }
 
     /**
-     * _more_
+     * Add this coord as a dimension to the netCDF file
      *
-     * @param ncfile _more_
-     * @param g _more_
+     * @param ncfile   file to add to
+     * @param g        group in the file
      */
     void addDimensionsToNetcdfFile(NetcdfFile ncfile, Group g) {
         if (dontUseVertical) {
@@ -261,10 +264,10 @@ public class GridVertCoord implements Comparable {
     }
 
     /**
-     * _more_
+     * Add this coord as a variable in the netCDF file
      *
-     * @param ncfile _more_
-     * @param g _more_
+     * @param ncfile   netCDF file to add to
+     * @param g        group in file
      */
     void addToNetcdfFile(NetcdfFile ncfile, Group g) {
         if (dontUseVertical) {
@@ -364,11 +367,11 @@ public class GridVertCoord implements Comparable {
     }
 
     /**
-     * _more_
+     * Get the index of the particular record
      *
-     * @param record _more_
+     * @param record  record in question
      *
-     * @return _more_
+     * @return  the index or -1 if not found
      */
     int getIndex(GridRecord record) {
         if (dontUseVertical) {
@@ -378,40 +381,36 @@ public class GridVertCoord implements Comparable {
     }
 
     /**
-     * _more_
+     * Compare this to another
      *
-     * @param o _more_
+     * @param o   the other GridVertCoord
      *
-     * @return _more_
+     * @return  the comparison
      */
     public int compareTo(Object o) {
         GridVertCoord gv = (GridVertCoord) o;
         return getLevelName().compareToIgnoreCase(gv.getLevelName());
     }
 
-    /** _more_ */
-    private ArrayList levels = new ArrayList();  // LevelCoord
-
     /**
-     * Class LevelCoord _more_
-     *
+     * A level coordinate
      *
      * @author IDV Development Team
      * @version $Revision: 1.3 $
      */
     private class LevelCoord implements Comparable {
 
-        /** _more_ */
+        /** midpoint */
         double mid;
 
-        /** _more_ */
+        /** top/bottom values */
         double value1, value2;
 
         /**
-         * _more_
+         * Create a new LevelCoord
          *
-         * @param value1 _more_
-         * @param value2 _more_
+         * @param value1  top
+         * @param value2  bottom
          */
         LevelCoord(double value1, double value2) {
             this.value1 = value1;
@@ -426,11 +425,11 @@ public class GridVertCoord implements Comparable {
         }
 
         /**
-         * _more_
+         * Compare to another LevelCoord
          *
-         * @param o _more_
+         * @param o another LevelCoord
          *
-         * @return _more_
+         * @return  the comparison
          */
         public int compareTo(Object o) {
             LevelCoord other = (LevelCoord) o;
@@ -445,11 +444,11 @@ public class GridVertCoord implements Comparable {
         }
 
         /**
-         * _more_
+         * Check for equality
          *
-         * @param oo _more_
+         * @param oo  object in question
          *
-         * @return _more_
+         * @return  true if equal
          */
         public boolean equals(Object oo) {
             if (this == oo) {
@@ -464,9 +463,9 @@ public class GridVertCoord implements Comparable {
         }
 
         /**
-         * _more_
+         * Generate a hashcode
          *
-         * @return _more_
+         * @return the hashcode
          */
         public int hashCode() {
             return (int) (value1 * 100000 + value2 * 100);
@@ -475,11 +474,11 @@ public class GridVertCoord implements Comparable {
 
 
     /**
-     * _more_
+     * Get the coordinate index for the record
      *
-     * @param record _more_
+     * @param record  record in question
      *
-     * @return _more_
+     * @return  index or -1 if not found
      */
     private int coordIndex(GridRecord record) {
         double val  = record.getLevel1();
@@ -506,4 +505,3 @@ public class GridVertCoord implements Comparable {
     }
 
 }
-

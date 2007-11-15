@@ -96,9 +96,4 @@ public interface GridRecord {
      */
     public String getGridDefRecordId();
 
-    /**
-     * Get the horizontal coordinate system (projection) of this GridRecord
-     * public GridHorizCoordSys getHorizCoordSys();
-     */
 }
-
