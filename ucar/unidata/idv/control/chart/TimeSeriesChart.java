@@ -48,7 +48,12 @@ import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.idv.control.ProbeRowInfo;
 import ucar.unidata.idv.control.chart.LineState;
 
+
 import ucar.unidata.ui.symbol.*;
+import ucar.unidata.ui.Timeline;
+
+import ucar.unidata.geoloc.LatLonPoint;
+import ucar.unidata.geoloc.LatLonPointImpl;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
@@ -79,7 +84,7 @@ import java.util.TimeZone;
 
 import javax.swing.*;
 
-
+import org.itc.idv.math.SunriseSunsetCollector;
 
 /**
  * A time series chart
@@ -102,6 +107,10 @@ public class TimeSeriesChart extends XYChartManager {
     /** format */
     NumberFormat numberFormat;
 
+    private List sunriseDates;
+    private LatLonPoint sunriseLocation;
+    private Date lastStartDate;
+    private Date lastEndDate;
 
     /**
      * ctor
@@ -151,13 +160,20 @@ public class TimeSeriesChart extends XYChartManager {
         sdf.setTimeZone(timeZone);
         timeAxis.setDateFormatOverride(sdf);
 
-        XYPlot xyPlot = new MyXYPlot(new TimeSeriesCollection(), timeAxis,
-                                     valueAxis, null);
+        final XYPlot[] xyPlotHolder = {null};
+
+        xyPlotHolder[0] = new MyXYPlot(new TimeSeriesCollection(), timeAxis,
+                                     valueAxis, null) {
+                public void drawBackground(Graphics2D g2, Rectangle2D area) {
+                    super.drawBackground(g2, area);
+                    drawSunriseSunset(g2, xyPlotHolder[0], area);
+                }
+            };
 
         if (animationTimeAnnotation != null) {
-            xyPlot.addAnnotation(animationTimeAnnotation);
+            xyPlotHolder[0].addAnnotation(animationTimeAnnotation);
         }
-        return xyPlot;
+        return xyPlotHolder[0];
     }
 
     /**
@@ -407,12 +423,8 @@ public class TimeSeriesChart extends XYChartManager {
                         if (valueArray[i] != valueArray[i]) {
                             continue;
                         }
-                        DateTime dttm = new DateTime(times[0][i],
-                                            timeUnits[0]);
-                        Date date =
-                            new Date(
-                                (long) (dttm.getValue(
-                                    CommonUnit.secondsSinceTheEpoch) * 1000));
+                        Date date = Util.makeDate(new DateTime(times[0][i],
+                                                               timeUnits[0]));
                         if ((i == 0) || (valueArray[i] > max)) {
                             max = valueArray[i];
                         }
@@ -667,6 +679,44 @@ public class TimeSeriesChart extends XYChartManager {
     public XYDataset getDummyDataset() {
         TimeSeriesCollection dummy = new TimeSeriesCollection();
         return dummy;
+    }
+
+
+     
+    public void setLocation(LatLonPoint llp) {
+        sunriseLocation = llp;
+        sunriseDates = null;
+        getContents().repaint();
+    }
+
+
+    private void drawSunriseSunset(Graphics2D g2, XYPlot plot, Rectangle2D dataArea) {
+        if(sunriseLocation == null) return;
+        DateAxis domainAxis = (DateAxis)plot.getDomainAxis();
+        Date startDate = ((DateAxis)domainAxis).getMinimumDate();
+        Date endDate = ((DateAxis)domainAxis).getMaximumDate();
+        if(sunriseDates == null || !Misc.equals(startDate, lastStartDate) ||
+           !Misc.equals(endDate, lastEndDate)) {
+            lastStartDate = startDate;
+            lastEndDate = endDate;
+            sunriseDates = Timeline.makeSunriseDates(sunriseLocation, startDate, endDate);
+        }
+        int top    = (int) (dataArea.getY());
+        int bottom = (int) (dataArea.getY() + dataArea.getHeight());
+        int height = bottom-top;
+        g2.setColor(Color.yellow);
+        Shape     originalClip      = g2.getClip();
+        g2.clip(dataArea);
+        for (int i = 0; i < sunriseDates.size(); i += 2) {
+            Date d1 = (Date) sunriseDates.get(i + 1);
+            Date d2 = (Date) sunriseDates.get(i);
+            int x1 = (int) domainAxis.valueToJava2D(d1.getTime(),
+                        dataArea, RectangleEdge.BOTTOM);
+            int x2 = (int) domainAxis.valueToJava2D(d2.getTime(),
+                        dataArea, RectangleEdge.BOTTOM);
+            g2.fillRect(x1, top, (x2 - x1), height);
+        }
+        g2.setClip(originalClip);
     }
 
 

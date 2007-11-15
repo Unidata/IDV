@@ -248,6 +248,9 @@ public class ProbeControl extends DisplayControlImpl {
     /** Show the table in the legend */
     private boolean showTableInLegend = true;
 
+    private boolean showSunriseSunset = false;
+
+
     /**
      * Cstr; sets flags; see init() for creation actions.
      * needed for bean persistence
@@ -400,6 +403,9 @@ public class ProbeControl extends DisplayControlImpl {
         chartMenu.add(
             GuiUtils.makeCheckboxMenuItem(
                 "Show Thumbnail in Legend", getChart(), "showThumb", null));
+        chartMenu.add(
+            GuiUtils.makeCheckboxMenuItem(
+                "Show Sunrise/Sunset Times", this, "showSunriseSunset", null));
         List chartMenuItems = new ArrayList();
         getChart().addViewMenuItems(chartMenuItems);
         GuiUtils.makeMenu(chartMenu, chartMenuItems);
@@ -1743,11 +1749,16 @@ public class ProbeControl extends DisplayControlImpl {
         }
 
         updateTime();
-        List rowInfos = new ArrayList();
+        List<ProbeRowInfo> rowInfos = new ArrayList();
         List choices  = getDataChoices();
         for (int i = 0; i < choices.size(); i++) {
             ProbeRowInfo info = getRowInfo(i);
             rowInfos.add(info);
+        }
+        if(showSunriseSunset) {
+            getChart().setLocation(ucar.visad.Util.toLatLonPoint(llp));
+        } else {
+            getChart().setLocation(null);
         }
         getChart().setProbeSamples(rowInfos);
     }
@@ -2725,6 +2736,27 @@ public class ProbeControl extends DisplayControlImpl {
     public boolean getShowTableInLegend() {
         return showTableInLegend;
     }
+
+    /**
+       Set the ShowSunriseSunset property.
+
+       @param value The new value for ShowSunriseSunset
+    **/
+    public void setShowSunriseSunset (boolean value) {
+	showSunriseSunset = value;
+        doMoveProbe();
+    }
+
+    /**
+       Get the ShowSunriseSunset property.
+
+       @return The ShowSunriseSunset
+    **/
+    public boolean getShowSunriseSunset () {
+	return showSunriseSunset;
+    }
+
+
 
 }
 
