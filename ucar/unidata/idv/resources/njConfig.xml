@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
-Configuration file for netCDF java.  See docs at:
+Available types:
+
+1) <ioServiceProvider  class="edu.univ.ny.stuff.FooFiles"/>
+ 
+2) <coordSysBuilder convention="foo" class="test.Foo"/>
+ 
+3) <coordTransBuilder name="atmos_ln_sigma_coordinates" type="vertical" class="my.stuff.atmosSigmaLog"/>
+ 
+4) <typedDatasetFactory datatype="Point" class="gov.noaa.obscure.file.Flabulate"/>
+
+5) <table type="GRIB1" filename="/home/rkambic/grib/tables/userlookup.lst"/>
+
+6) <table type="GRIB2" filename="/home/rkambic/grib/tables/grib2userparameters" />
+
+</nj22Config>
+Configuration file for netCDF java.  See full docs at:
 http://www.unidata.ucar.edu/software/netcdf-java/reference/RuntimeLoading.html
 -->
 <nj22Config>
