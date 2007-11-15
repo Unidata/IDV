@@ -138,7 +138,7 @@ package ucar.unidata.data.grid.gempak;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class GridNavBlock extends GridDefRecord {
+public class GempakNavBlock extends GridDefRecord {
 
     /** raw values */
     float[] vals = null;
@@ -149,14 +149,14 @@ public class GridNavBlock extends GridDefRecord {
     /**
      * Create a new grid nav block
      */
-    public GridNavBlock() {}
+    public GempakNavBlock() {}
 
     /**
      * Create a new grid nav block with the values
      *
      * @param words   analysis block values
      */
-    public GridNavBlock(float[] words) {
+    public GempakNavBlock(float[] words) {
         setValues(words);
     }
 

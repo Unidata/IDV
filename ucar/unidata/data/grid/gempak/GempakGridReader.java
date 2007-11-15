@@ -54,7 +54,7 @@ public class GempakGridReader extends GempakFileReader {
     public static final String NAVB = "NAVB";
 
     /** Navigation Block */
-    private GridNavBlock navBlock;
+    private GempakNavBlock navBlock;
 
     /** Navigation Block */
     private GridAnalysisBlock analBlock;
@@ -146,7 +146,7 @@ public class GempakGridReader extends GempakFileReader {
         if (headerArray == null) {
             return false;
         }
-        navBlock = new GridNavBlock(headerArray);
+        navBlock = new GempakNavBlock(headerArray);
         gridIndex.addHorizCoordSys(navBlock);
 
         headerArray = getFileHeader(ANLB);
