@@ -1706,17 +1706,25 @@ public class Timeline extends JPanel implements MouseListener,
      * _more_
      */
     private void makeSunriseDates() {
-        sunriseDates = new ArrayList();
+        sunriseDates = makeSunriseDates(sunriseLocation, getStartDate(), getEndDate());
+    }
+
+
+    /**
+     * _more_
+     */
+    public static List  makeSunriseDates(LatLonPoint sunriseLocation, Date startDate, Date endDate) {
+        List sunriseDates = new ArrayList();
         if (sunriseLocation == null) {
-            return;
+            return sunriseDates;
         }
         try {
             //Pad them out 24 hours
             GregorianCalendar gc1 = new GregorianCalendar();
-            gc1.setTime(new Date(getStartDate().getTime()
+            gc1.setTime(new Date(startDate.getTime()
                                  - DateUtil.hoursToMillis(48)));
             GregorianCalendar gc2 = new GregorianCalendar();
-            gc2.setTime(new Date(getEndDate().getTime()
+            gc2.setTime(new Date(endDate.getTime()
                                  + DateUtil.hoursToMillis(48)));
             List                   dates = Misc.newList(gc1, gc2);
             SunriseSunsetCollector ssc   = new SunriseSunsetCollector(dates);
@@ -1730,9 +1738,12 @@ public class Timeline extends JPanel implements MouseListener,
         } catch (Exception exc) {
             exc.printStackTrace();
         }
-
+        return sunriseDates;
 
     }
+
+
+
 
 
 
