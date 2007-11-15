@@ -2127,6 +2127,12 @@ public final class Util {
     }
 
 
+    public static ucar.unidata.geoloc.LatLonPointImpl toLatLonPoint(visad.georef.LatLonPoint llp) 
+        throws VisADException {
+        return new LatLonPointImpl(llp.getLatitude().getValue(CommonUnit.degree),
+                                   llp.getLongitude().getValue(CommonUnit.degree));
+    }
+
     /**
      * Calculate the bearing between the 2 points.
      * See calculateBearing below.
@@ -2251,11 +2257,9 @@ public final class Util {
         visad.Unit lonUnit = lllp.getLongitude().getUnit();
         Bearing result =
             Bearing.calculateBearing(
-                new LatLonPointImpl(
-                    lllp.getLatitude().getValue(),
-                    lllp.getLongitude().getValue()), new LatLonPointImpl(
-                        rllp.getLatitude().getValue(latUnit),
-                        rllp.getLongitude().getValue(lonUnit)), null);
+                                     toLatLonPoint(lllp),
+                                     toLatLonPoint(rllp),
+                                     null);
         return new Real(Length.getRealType(), result.getDistance(),
                         CommonUnits.KILOMETER);
     }
