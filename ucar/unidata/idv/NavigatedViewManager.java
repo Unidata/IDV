@@ -187,6 +187,8 @@ public abstract class NavigatedViewManager extends ViewManager {
     /** Used to show the cursor readout */
     private NavigatedDisplayCursorReadout readout;
 
+    /** _more_ */
+    protected CursorReadoutWindow cursorReadoutWindow;
 
     /** vert scale widget */
     private VertScaleDialog vertScaleWidget;
@@ -571,9 +573,19 @@ public abstract class NavigatedViewManager extends ViewManager {
         }
         if ((eventId == DisplayEvent.MOUSE_PRESSED)
                 || (eventId == DisplayEvent.MOUSE_DRAGGED)) {
-            handleMousePressedOrDragged((MouseEvent) inputEvent);
+            MouseEvent mouseEvent = (MouseEvent) inputEvent;
+            if (!(mouseEvent.isControlDown() || !SwingUtilities.isMiddleMouseButton(mouseEvent))) {
+                if (cursorReadoutWindow == null) {
+                    cursorReadoutWindow = new CursorReadoutWindow(this);
+                }
+                cursorReadoutWindow.handleMousePressedOrDragged(mouseEvent);
+            }
         } else if (eventId == DisplayEvent.MOUSE_RELEASED) {
-            handleMouseReleased((MouseEvent) inputEvent);
+            MouseEvent mouseEvent = (MouseEvent) inputEvent;
+            if (cursorReadoutWindow != null) {
+                cursorReadoutWindow.handleMouseReleased(mouseEvent);
+                cursorReadoutWindow      = null;
+            }
         }
 
 
@@ -581,101 +593,6 @@ public abstract class NavigatedViewManager extends ViewManager {
     }
 
 
-
-
-    /** _more_ */
-    protected JWindow cursorReadoutWindow;
-
-    /** _more_ */
-    protected JLabel cursorReadoutLabel;
-
-    /** _more_ */
-    protected int cursorReadoutWindowWidth = 0;
-
-    /**
-     * _more_
-     *
-     * @param e _more_
-     */
-    private void handleMouseReleased(MouseEvent e) {
-        if (cursorReadoutWindow != null) {
-            cursorReadoutWindow.dispose();
-            cursorReadoutWindow      = null;
-            cursorReadoutWindowWidth = -1;
-        }
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param e _more_
-     */
-    private void handleMousePressedOrDragged(MouseEvent e) {
-        if (e.isControlDown() || !SwingUtilities.isMiddleMouseButton(e)) {
-            return;
-        }
-        if (cursorReadoutWindow == null) {
-            cursorReadoutWindow = new JWindow();
-            cursorReadoutWindow.pack();
-            JComponent contents = fullContents;
-            //getInnerContents();
-            Rectangle b   = contents.bounds();
-            Point     loc = contents.getLocationOnScreen();
-            cursorReadoutWindow.setLocation(
-                (int) loc.getX(),
-                (int) (loc.getY() /*+contents.bounds().height*/));
-            cursorReadoutWindow.show();
-        }
-        double[] box =
-            getNavigatedDisplay().getSpatialCoordinatesFromScreen(e.getX(),
-                e.getY());
-        EarthLocation el = getNavigatedDisplay().getEarthLocation(box[0],
-                               box[1], box[2], true);
-
-        List         controls = getControls();
-        StringBuffer sb       = new StringBuffer();
-        sb.append("<html>Location: " + el + " <hr> <table width=\"100%\">");
-        Animation animation = getAnimation();
-        int       step      = animation.getCurrent();
-        Real      aniValue  = animation.getAniValue();
-
-        boolean   didone    = false;
-        try {
-            for (int i = 0; i < controls.size(); i++) {
-                DisplayControl display = (DisplayControl) controls.get(i);
-                List readout = display.getCursorReadout(el, aniValue, step);
-                if ((readout != null) && (readout.size() > 0)) {
-                    didone = true;
-                    sb.append(StringUtil.join("", readout));
-                }
-
-            }
-
-            if ( !didone) {
-                cursorReadoutWindow.setVisible(false);
-                return;
-            } else {
-                cursorReadoutWindow.setVisible(true);
-            }
-            cursorReadoutLabel = new JLabel(sb + "</table></html>");
-            cursorReadoutLabel.setBorder(
-                BorderFactory.createBevelBorder(BevelBorder.RAISED));
-            cursorReadoutWindow.getContentPane().removeAll();
-            cursorReadoutWindow.getContentPane().add(cursorReadoutLabel);
-            cursorReadoutWindow.pack();
-            int width  = (int) cursorReadoutWindow.bounds().getWidth();
-            int height = (int) cursorReadoutWindow.bounds().getHeight();
-            if (width > cursorReadoutWindowWidth) {
-                cursorReadoutWindowWidth = width;
-            } else {
-                //                cursorReadoutWindow.setSize(cursorReadoutWindowWidth,height);
-            }
-        } catch (Exception exc) {
-            logException("Getting cursor readouts", exc);
-        }
-    }
 
 
 

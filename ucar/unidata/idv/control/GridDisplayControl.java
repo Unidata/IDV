@@ -131,15 +131,20 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
 
 
 
-    public List getCursorReadoutInner(EarthLocation el, Real animationValue, int animationStep) throws Exception {
-        Data data = getGridDataInstance().getData();
+    protected Data getCursorReadoutData() throws Exception {
+        return  getGridDataInstance().getData();
+    }
+
+
+    protected List getCursorReadoutInner(EarthLocation el, Real animationValue, int animationStep) throws Exception {
+        Data data = getCursorReadoutData();
         if(data == null || !(data instanceof FieldImpl)) return null;
         FieldImpl field = (FieldImpl) data;
         if(field==null) {return null;}
         List result = new ArrayList();
         Real r = GridUtil.sampleToReal(field, el, animationValue);
         if(r!=null && !r.isMissing()) {
-            result.add("<tr><td>"+getMenuLabel()+":</td><td align=\"right\">" +formatForCursorReadout(r)+"</td></tr>");
+            result.add("<tr><td>"+getMenuLabel()+":</td><td width=\"60\" align=\"right\">" +formatForCursorReadout(r)+"</td></tr>");
         }
         return result;
     }

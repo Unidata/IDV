@@ -6296,7 +6296,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         return null;
     }
 
-    public List getCursorReadoutInner(EarthLocation el, Real animationValue,
+    protected List getCursorReadoutInner(EarthLocation el, Real animationValue,
                                  int animationStep)
             throws Exception {
         return null;
@@ -6309,8 +6309,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         Unit displayUnit = getDisplayUnit();
         double value;
         Unit unit;
+        String result; 
         if(r.isMissing()) {
-            return "missing";
+            result = "missing";
         } else {
             if(displayUnit!=null) {
                 value = r.getValue(displayUnit);
@@ -6319,8 +6320,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 value = r.getValue();
                 unit = r.getUnit();
             }
-            return Misc.format(value) + "[" + unit+"]";
+            result  = Misc.format(value);
+            //            result = StringUtil.padLeft(result, 20,"&nbsp;");
+            result= result + "[" + unit+"]";
         }
+
+        return result;
     }
 
 

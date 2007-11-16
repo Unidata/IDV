@@ -2166,7 +2166,7 @@ public class ProbeControl extends DisplayControlImpl {
      *
      * @throws Exception _more_
      */
-    public List getCursorReadoutInner(EarthLocation elt, Real animationValue,
+    protected List getCursorReadoutInner(EarthLocation elt, Real animationValue,
                                  int animationStep)
             throws Exception {
         List l = new ArrayList();

@@ -172,12 +172,16 @@ public abstract class PlanViewControl extends GridDisplayControl {
     }
 
 
-    public List getCursorReadoutInner(EarthLocation el, Real animationValue, int animationStep) throws Exception {
+    protected Data getCursorReadoutData() throws Exception {
+        return  currentSlice;
+    }
+
+    protected List getCursorReadoutInner(EarthLocation el, Real animationValue, int animationStep) throws Exception {
         if(currentSlice==null) {return null;}
         List result = new ArrayList();
         Real r = GridUtil.sampleToReal(currentSlice, el, animationValue);
         if(r!=null && !r.isMissing()) {
-            result.add("<tr><td>" + getMenuLabel()+":</td><td align=\"right\">" +formatForCursorReadout(r)+"</td></tr>");
+            result.add("<tr><td>" + getMenuLabel()+":</td><td width=\"60\" align=\"right\">" +formatForCursorReadout(r)+(currentLevel!=null?("@" + currentLevel):"") +"</td></tr>");
         }
         return result;
     }
