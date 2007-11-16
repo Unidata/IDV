@@ -785,9 +785,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** property widget */
     private JTextField idFld;
 
-    /** property widget */
-    private JDialog propertiesDialog;
-
     /** geoselection panel */
     private GeoSelectionPanel geoSelectionPanel;
 
@@ -4936,10 +4933,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * Show the properties dialog
      */
     public void showProperties() {
-
         JTabbedPane jtp = new JTabbedPane();
         addPropertiesComponents(jtp);
-
+        final JDialog propertiesDialog = GuiUtils.createDialog("Properties -- " + getTitle(), true);
         ActionListener listener = new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 String cmd = event.getActionCommand();
@@ -4951,24 +4947,19 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 }
                 if (cmd.equals(GuiUtils.CMD_OK)
                         || cmd.equals(GuiUtils.CMD_CANCEL)) {
-                    if (propertiesDialog != null) {
-                        propertiesDialog.dispose();
-                        propertiesDialog = null;
-                    }
+                    propertiesDialog.dispose();
                 }
             }
         };
-        JComponent buttons = GuiUtils.makeApplyOkCancelButtons(listener);
-        contents = GuiUtils.inset(GuiUtils.centerBottom(jtp, buttons), 5);
-        propertiesDialog = GuiUtils.createDialog("Properties -- "
-                + getTitle(), true);
-        propertiesDialog.getContentPane().add(contents);
-        propertiesDialog.pack();
         Window f = GuiUtils.getWindow(contents);
+        JComponent buttons = GuiUtils.makeApplyOkCancelButtons(listener);
+        JComponent propContents = GuiUtils.inset(GuiUtils.centerBottom(jtp, buttons), 5);
+        propertiesDialog.getContentPane().add(propContents);
+        propertiesDialog.pack();
         if (f != null) {
             GuiUtils.showDialogNearSrc(f, propertiesDialog);
         } else {
-            propertiesDialog.setVisible(true);
+            propertiesDialog.show();
         }
     }
 
