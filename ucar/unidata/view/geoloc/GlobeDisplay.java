@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.view.geoloc;
 
 
@@ -34,6 +33,7 @@ import ucar.unidata.util.LogUtil;
 
 import ucar.visad.Util;
 import ucar.visad.display.*;
+import ucar.visad.quantities.GeopotentialAltitude;
 
 import visad.*;
 
@@ -53,6 +53,8 @@ import java.beans.*;
 import java.net.URL;
 
 import java.rmi.RemoteException;
+
+import java.util.Iterator;
 
 import javax.media.j3d.*;
 
@@ -125,6 +127,9 @@ public class GlobeDisplay extends NavigatedDisplay {
 
     /** flag for stereo */
     private boolean canDoStereo = false;
+
+    /** Set of vertical maps */
+    private VerticalMapSet verticalMapSet = new VerticalMapSet();
 
     /**
      * Constructs a new GlobeDisplay.
@@ -802,6 +807,89 @@ public class GlobeDisplay extends NavigatedDisplay {
         }  // can't happen
         return value;
     }
+
+    /**
+     * Add a new mapping of this type to the vertical coordinate
+     *
+     * @param newVertType  RealType of map
+     *
+     * @throws RemoteException    Java RMI problem
+     * @throws VisADException     VisAD problem
+     */
+    public void addVerticalMap(RealType newVertType)
+            throws VisADException, RemoteException {
+
+        Unit u = newVertType.getDefaultUnit();
+        if ( !(Unit.canConvert(u, CommonUnit.meter)
+                || Unit.canConvert(
+                    u, GeopotentialAltitude.getGeopotentialMeter()))) {
+            throw new VisADException("Unable to handle units of "
+                                     + newVertType);
+        }
+        ScalarMap newMap = new ScalarMap(newVertType,
+                                         getDisplayAltitudeType());
+        setVerticalMapUnit(newMap, getVerticalRangeUnit());
+        double[] range = getVerticalRange();
+        newMap.setRange(range[0], range[1]);
+        verticalMapSet.add(newMap);
+        addScalarMaps(verticalMapSet);
+    }
+
+    /**
+     * Remove a new mapping of this type to the vertical coordinate
+     *
+     * @param vertType  RealType of map
+     *
+     * @throws RemoteException    Java RMI problem
+     * @throws VisADException     VisAD problem
+     */
+    public void removeVerticalMap(RealType vertType)
+            throws VisADException, RemoteException {
+        ScalarMapSet sms = new ScalarMapSet();
+        for (Iterator iter = verticalMapSet.iterator(); iter.hasNext(); ) {
+            ScalarMap s = (ScalarMap) iter.next();
+            if (((RealType) s.getScalar()).equals(vertType)) {
+                sms.add(s);
+            }
+        }
+        if ( !(sms.size() == 0)) {
+            verticalMapSet.remove(sms);
+            removeScalarMaps(sms);
+        }
+    }
+
+    /**
+     * Set the Unit of the vertical range
+     *
+     * @param  newUnit  unit of range
+     *
+     * @throws RemoteException    Java RMI problem
+     * @throws VisADException     VisAD problem
+     */
+    public void setVerticalRangeUnit(Unit newUnit)
+            throws VisADException, RemoteException {
+
+        super.setVerticalRangeUnit(newUnit);
+        if ((newUnit != null) && Unit.canConvert(newUnit, CommonUnit.meter)) {
+            verticalMapSet.setVerticalUnit(newUnit);
+        }
+    }
+
+    /**
+     * Set the range of the vertical coordinate
+     *
+     * @param  min  minimum value for vertical axis
+     * @param  max  maximum value for vertical axis
+     *
+     * @throws RemoteException    Java RMI problem
+     * @throws VisADException     VisAD problem
+     */
+    public void setVerticalRange(double min, double max)
+            throws VisADException, RemoteException {
+        super.setVerticalRange(min, max);
+        verticalMapSet.setVerticalRange(min, max);
+    }
+
 
     /**
      * Determine if this MapDisplay can do stereo.
