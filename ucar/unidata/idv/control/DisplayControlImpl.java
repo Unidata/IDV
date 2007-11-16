@@ -6321,8 +6321,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 unit = r.getUnit();
             }
             result  = Misc.format(value);
-            //            result = StringUtil.padLeft(result, 20,"&nbsp;");
             result= result + "[" + unit+"]";
+            int length  = result.length();
+            result = StringUtil.padLeft(result, 5*(20-length),"&nbsp;");
         }
 
         return result;

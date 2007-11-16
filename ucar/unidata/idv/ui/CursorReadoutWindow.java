@@ -146,13 +146,13 @@ public class CursorReadoutWindow {
                 //                window.toFront();
                 
             }
-            label = new JLabel("<html>Location: " + el +(didone?"<hr>":"") +"<table width=\"100%\">"+sb + "</table></html>");
+            label = GuiUtils.getFixedWidthLabel("<html>Location: " + el +(didone?"<hr>":"") +"<table cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">"+sb + "</table></html>");
             label.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 
             window.getContentPane().removeAll();
             window.getContentPane().add(label);
-            window.pack();
-            window.toFront();
+            window.pack(); 
+          window.toFront();
         } catch (Exception exc) {
             vm.logException("Getting cursor readouts", exc);
         }
