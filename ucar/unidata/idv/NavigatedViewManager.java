@@ -587,12 +587,15 @@ public abstract class NavigatedViewManager extends ViewManager {
                 cursorReadoutWindow      = null;
             }
         }
-
-
         super.displayChanged(de);
     }
 
-
+    protected void animationTimeChanged(){
+        super.animationTimeChanged();
+        if(cursorReadoutWindow!=null) {
+            cursorReadoutWindow.updateReadout();
+        }
+    }
 
 
 

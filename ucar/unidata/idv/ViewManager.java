@@ -1522,6 +1522,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
     }
 
+    protected void animationTimeChanged(){
+    }
+
+
     /**
      * update the timelines display
      *
@@ -3621,6 +3625,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                         try {
                             if (evt.getPropertyName().equals(
                                     Animation.ANI_VALUE)) {
+                                animationTimeChanged();
                                 updateTimelines(false);
                                 if (imagePanel != null) {
                                     imagePanel.setSelectedFile(

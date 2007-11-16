@@ -75,6 +75,8 @@ public class CursorReadoutWindow {
     /** _more_ */
     protected int windowWidth = 0;
 
+    private    EarthLocation lastEarthLocation;
+
     public CursorReadoutWindow(NavigatedViewManager vm) {
         this.vm = vm;
     }
@@ -93,6 +95,7 @@ public class CursorReadoutWindow {
             windowWidth = -1;
         }
     }
+
 
 
 
@@ -117,9 +120,15 @@ public class CursorReadoutWindow {
         double[] box =
             vm.getNavigatedDisplay().getSpatialCoordinatesFromScreen(e.getX(),
                 e.getY());
-        EarthLocation el = vm.getNavigatedDisplay().getEarthLocation(box[0],
-                               box[1], box[2], true);
+        lastEarthLocation = vm.getNavigatedDisplay().getEarthLocation(box[0],
+                                                                      box[1], box[2], true);
 
+        updateReadout();
+    }
+
+
+    public  void updateReadout() {
+        if(lastEarthLocation == null || window == null) return;
         List         controls = vm.getControls();
         StringBuffer sb       = new StringBuffer();
         Animation animation = vm.getAnimation();
@@ -130,7 +139,7 @@ public class CursorReadoutWindow {
         try {
             for (int i = 0; i < controls.size(); i++) {
                 DisplayControl display = (DisplayControl) controls.get(i);
-                List readout = display.getCursorReadout(el, aniValue, step);
+                List readout = display.getCursorReadout(lastEarthLocation, aniValue, step);
                 if ((readout != null) && (readout.size() > 0)) {
                     didone = true;
                     sb.append(StringUtil.join("", readout));
@@ -146,7 +155,7 @@ public class CursorReadoutWindow {
                 //                window.toFront();
                 
             }
-            label = GuiUtils.getFixedWidthLabel("<html>Location: " + el +(didone?"<hr>":"") +"<table cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">"+sb + "</table></html>");
+            label = GuiUtils.getFixedWidthLabel("<html>Location: " + lastEarthLocation +(didone?"<hr>":"") +"<table cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">"+sb + "</table></html>");
             label.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 
             window.getContentPane().removeAll();
