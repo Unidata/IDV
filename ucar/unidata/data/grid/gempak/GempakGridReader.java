@@ -54,10 +54,10 @@ public class GempakGridReader extends GempakFileReader {
     public static final String NAVB = "NAVB";
 
     /** Navigation Block */
-    private GempakNavBlock navBlock;
+    private NavigationBlock navBlock;
 
     /** Navigation Block */
-    private GridAnalysisBlock analBlock;
+    private AnalysisBlock analBlock;
 
     /** Grid index */
     private GridIndex gridIndex;
@@ -146,14 +146,14 @@ public class GempakGridReader extends GempakFileReader {
         if (headerArray == null) {
             return false;
         }
-        navBlock = new GempakNavBlock(headerArray);
+        navBlock = new NavigationBlock(headerArray);
         gridIndex.addHorizCoordSys(navBlock);
 
         headerArray = getFileHeader(ANLB);
         if (headerArray == null) {
             return false;
         }
-        analBlock = new GridAnalysisBlock(headerArray);
+        analBlock = new AnalysisBlock(headerArray);
 
         // Make the grid headers
         // TODO: move this up into GempakFileReader using DM_RHDA

@@ -66,7 +66,7 @@ public class GempakGridRecord implements GridRecord {
     public int packingType;
 
     /** packing type */
-    public GempakNavBlock navBlock;
+    public NavigationBlock navBlock;
 
     /** reference time as a Date */
     private Date refTime;

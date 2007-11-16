@@ -32,7 +32,7 @@ package ucar.unidata.data.grid.gempak;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class GempakAnalysisBlock {
+public class AnalysisBlock {
 
     /** raw values */
     float[] vals = null;
@@ -40,14 +40,14 @@ public class GempakAnalysisBlock {
     /**
      * Create a new analysis block
      */
-    public GempakAnalysisBlock() {}
+    public AnalysisBlock() {}
 
     /**
      * Create a new analysis block with the values
      *
      * @param words   analysis block values
      */
-    public GempakAnalysisBlock(float[] words) {
+    public AnalysisBlock(float[] words) {
         setValues(words);
     }
 
