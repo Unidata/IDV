@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.grid.gempak;
 
 
@@ -43,13 +44,10 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class GempakGridServiceProvider extends GempakIOServiceProvider {
+public class GempakGridServiceProvider extends GridServiceProvider {
 
-    /** FMRC coordinate system */
-    protected FmrcCoordSys fmrcCoordSys;
-
-    /** debug timing flag */
-    private boolean debug = false;
+    /** Gempak file reader */
+    protected GempakFileReader gemreader;
 
     /**
      * Is this a valid file?
@@ -86,6 +84,19 @@ public class GempakGridServiceProvider extends GempakIOServiceProvider {
         }
         gemreader.init(raf);
         GridIndex index = ((GempakGridReader) gemreader).getGridIndex();
+        open(index, cancelTask);
+    }
+
+    /**
+     * Open the index and create the netCDF file from that
+     *
+     * @param index   GridIndex to use
+     * @param cancelTask  cancel task
+     *
+     * @throws IOException  problem reading the file
+     */
+    protected void open(GridIndex index, CancelTask cancelTask)
+            throws IOException {
         GempakLookup lookup =
             new GempakLookup(
                 (GempakGridRecord) index.getGridRecords().get(0));
@@ -93,168 +104,24 @@ public class GempakGridServiceProvider extends GempakIOServiceProvider {
         delegate.setUseDescriptionForVariableName(false);
         delegate.open(index, lookup, 4, ncfile, fmrcCoordSys, cancelTask);
         ncfile.finish();
-
     }
 
     /**
-     * Set the special object on this IOSP
+     * Sync and extend
      *
-     * @param special  isn't that special?
+     * @return false
      */
-    public void setSpecial(Object special) {
-        if (special instanceof FmrcCoordSys) {
-            fmrcCoordSys = (FmrcCoordSys) special;
-        }
-    }
-
-    /**
-     * Read the data for the variable
-     * @param v2  Variable to read
-     * @param section   section infomation
-     * @return Array of data
-     *
-     * @throws IOException problem reading from file
-     * @throws InvalidRangeException  invalid Range
-     */
-    public Array readData(Variable v2, List section)
-            throws IOException, InvalidRangeException {
-        long start = System.currentTimeMillis();
-
-        Array dataArray = Array.factory(DataType.FLOAT.getClassType(),
-                                        Range.getShape(section));
-        GridVariable  pv        = (GridVariable) v2.getSPobject();
-
-        int           count     = 0;
-        Range         timeRange = (Range) section.get(count++);
-        Range         levRange  = pv.hasVert()
-                                  ? (Range) section.get(count++)
-                                  : null;
-        Range         yRange    = (Range) section.get(count++);
-        Range         xRange    = (Range) section.get(count);
-
-        IndexIterator ii        = dataArray.getIndexIteratorFast();
-
-        // loop over time
-        for (int timeIdx = timeRange.first(); timeIdx <= timeRange.last();
-                timeIdx += timeRange.stride()) {
-            if (pv.hasVert()) {
-                readLevel(v2, timeIdx, levRange, yRange, xRange, ii);
-            } else {
-                readXY(v2, timeIdx, 0, yRange, xRange, ii);
-            }
-        }
-
-        if (debug) {
-            long took = System.currentTimeMillis() - start;
-            System.out.println("  read data took=" + took + " msec ");
-        }
-
-        return dataArray;
-    }
-
-    // loop over level
-
-    /**
-     * Read a level
-     *
-     * @param v2    variable to put the data into
-     * @param timeIdx  time index
-     * @param levelRange level range
-     * @param yRange   x range
-     * @param xRange   y range
-     * @param ii       index iterator
-     *
-     * @throws IOException   problem reading the file
-     * @throws InvalidRangeException  invalid range
-     */
-    private void readLevel(Variable v2, int timeIdx, Range levelRange,
-                           Range yRange, Range xRange, IndexIterator ii)
-            throws IOException, InvalidRangeException {
-        for (int levIdx = levelRange.first(); levIdx <= levelRange.last();
-                levIdx += levelRange.stride()) {
-            readXY(v2, timeIdx, levIdx, yRange, xRange, ii);
-        }
-    }
-
-
-    /**
-     * read one product
-     *
-     * @param v2    variable to put the data into
-     * @param timeIdx  time index
-     * @param levelRange level range
-     * @param yRange   x range
-     * @param xRange   y range
-     * @param ii       index iterator
-     *
-     * @throws IOException   problem reading the file
-     * @throws InvalidRangeException  invalid range
-     */
-    private void readXY(Variable v2, int timeIdx, int levIdx, Range yRange,
-                        Range xRange, IndexIterator ii)
-            throws IOException, InvalidRangeException {
-        Attribute         att           = v2.findAttribute("missing_value");
-        float             missing_value = (att == null)
-                                          ? -9999.0f
-                                          : att.getNumericValue()
-                                              .floatValue();
-
-        GridVariable      pv            = (GridVariable) v2.getSPobject();
-        GridHorizCoordSys hsys          = pv.getHorizCoordSys();
-        int               nx            = hsys.getNx();
-
-        GridRecord        record        = pv.findRecord(timeIdx, levIdx);
-        if (debug) {
-            System.out.println(record);
-        }
-        if (record == null) {
-            int xyCount = yRange.length() * xRange.length();
-            for (int j = 0; j < xyCount; j++) {
-                ii.setFloatNext(missing_value);
-            }
-            return;
-        }
-
-        // otherwise read it
-        float[] data;
+    public boolean sync() {
         try {
-            data = _readData(record);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
+            gemreader.init();
+            GridIndex index = ((GempakGridReader) gemreader).getGridIndex();
+            // reconstruct the ncfile objects
+            ncfile.empty();
+            open(index, null);
+        } catch (IOException ioe) {
+            return false;
         }
-
-        for (int y = yRange.first(); y <= yRange.last();
-                y += yRange.stride()) {
-            for (int x = xRange.first(); x <= xRange.last();
-                    x += xRange.stride()) {
-                int index = y * nx + x;
-                ii.setFloatNext(data[index]);
-            }
-        }
-    }
-
-    /**
-     * Is this XY level missing?
-     *
-     * @param v2   Variable
-     * @param timeIdx time index
-     * @param levIdx  level index
-     *
-     * @return true if missing
-     *
-     * @throws InvalidRangeException  invalid range
-     */
-    private boolean isMissingXY(Variable v2, int timeIdx, int levIdx)
-            throws InvalidRangeException {
-        GridVariable pv = (GridVariable) v2.getSPobject();
-        if ((timeIdx < 0) || (timeIdx >= pv.getNTimes())) {
-            throw new InvalidRangeException("timeIdx=" + timeIdx);
-        }
-        if ((levIdx < 0) || (levIdx >= pv.getVertNlevels())) {
-            throw new InvalidRangeException("levIdx=" + levIdx);
-        }
-        return (null == pv.findRecord(timeIdx, levIdx));
+        return true;
     }
 
     /**
