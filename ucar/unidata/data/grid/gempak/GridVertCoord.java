@@ -72,9 +72,6 @@ public class GridVertCoord implements Comparable {
     /** units */
     String units;
 
-    /** debug flag */
-    private boolean debug = false;
-
     /** levels */
     private ArrayList levels = new ArrayList();  // LevelCoord
 
@@ -109,7 +106,7 @@ public class GridVertCoord implements Comparable {
         usesBounds         = lookup.isLayer(this.typicalRecord);
         addLevels(records);
 
-        if (debug) {
+        if (GridServiceProvider.debugVert) {
             System.out.println("GribVertCoord: " + getVariableName() + "("
                                + typicalRecord.getLevelType1()
                                + ") useVertical= " + ( !dontUseVertical)
@@ -205,7 +202,7 @@ public class GridVertCoord implements Comparable {
                 levels.add(new LevelCoord(record.getLevel1(),
                                           record.getLevel2()));
                 if (dontUseVertical && (levels.size() > 1)) {
-                    if (debug) {
+                    if (GridServiceProvider.debugVert) {
                         logger.warn(
                             "GribCoordSys: unused level coordinate has > 1 levels = "
                             + levelName + " " + record.getLevelType1() + " "

@@ -55,49 +55,46 @@ import java.util.HashMap;
  */
 public class GridHorizCoordSys {
 
-    /** _more_ */
+    /** lookup table */
     private GridTableLookup lookup;
 
-    /** _more_ */
+    /** the grid definition object */
     private GridDefRecord gdsIndex;
 
-    /** _more_ */
+    /** group for this system */
     private Group g;
 
-    /** _more_ */
-    private boolean debug = false;
-
-    /** _more_ */
+    /** grid name, shape name and id */
     private String grid_name, shape_name, id;
 
-    /** _more_ */
+    /** flags */
     private boolean isLatLon   = true,
                     isGaussian = false;
 
-    /** _more_ */
-    HashMap varHash = new HashMap(200);  // GridVariables that have this GridHorizCoordSys
+    /** GridVariables that have this GridHorizCoordSys */
+    HashMap varHash = new HashMap(200);  
 
-    /** _more_ */
-    HashMap productHash = new HashMap(100);  // List of GridVariable, sorted by product desc
+    /** List of GridVariable, sorted by product desc */
+    HashMap productHash = new HashMap(100);  
 
-    /** _more_ */
-    HashMap vcsHash = new HashMap(30);  // GridVertCoordSys
+    /** GridVertCoordSys */
+    HashMap vcsHash = new HashMap(30);  
 
-    /** _more_ */
+    /** startx, starty */
     private double startx, starty;
 
-    /** _more_ */
+    /** projection */
     private ProjectionImpl proj;
 
-    /** _more_ */
+    /** list of attributes */
     private ArrayList attributes = new ArrayList();
 
     /**
-     * _more_
+     * Create a new GridHorizCoordSys with the grid definition and lookup
      *
-     * @param gdsIndex _more_
-     * @param lookup _more_
-     * @param g _more_
+     * @param gdsIndex   grid definition
+     * @param lookup     lookup table for names
+     * @param g          Group for this coord system
      */
     GridHorizCoordSys(GridDefRecord gdsIndex, GridTableLookup lookup,
                       Group g) {
@@ -134,81 +131,81 @@ public class GridHorizCoordSys {
     }
 
     /**
-     * _more_
+     * Get the ID
      *
-     * @return _more_
+     * @return the ID
      */
     String getID() {
         return id;
     }  // unique within the file
 
     /**
-     * _more_
+     * Get the grid name
      *
-     * @return _more_
+     * @return the grid name
      */
     String getGridName() {
         return grid_name;
     }  // used in CF-1 attributes
 
     /**
-     * _more_
+     * Get the group
      *
-     * @return _more_
+     * @return the group
      */
     Group getGroup() {
         return g;
     }
 
     /**
-     * _more_
+     * Is this a lat/lon grid
      *
-     * @return _more_
+     * @return  true if is lat/lon
      */
     boolean isLatLon() {
         return isLatLon;
     }
 
     /**
-     * _more_
+     * Get the number of x points
      *
-     * @return _more_
+     * @return the number of x points
      */
     int getNx() {
         return (int) getParamValue(gdsIndex.NX);
     }
 
     /**
-     * _more_
+     * Get the number of Y points
      *
-     * @return _more_
+     * @return the number of Y points
      */
     int getNy() {
         return (int) getParamValue(gdsIndex.NY);
     }
 
     /**
-     * _more_
+     * Get the X spacing in kilometers
      *
-     * @return _more_
+     * @return the X spacing in kilometers
      */
     private double getDxInKm() {
         return getParamValue(gdsIndex.DX) * .001;
     }
 
     /**
-     * _more_
+     * Get the Y spacing in kilometers
      *
-     * @return _more_
+     * @return the Y spacing in kilometers
      */
     private double getDyInKm() {
         return getParamValue(gdsIndex.DY) * .001;
     }
 
     /**
-     * _more_
+     * Add the dimensions associated with this coord sys to the netCDF file
      *
-     * @param ncfile _more_
+     * @param ncfile  netCDF file to add to
      */
     void addDimensionsToNetcdfFile(NetcdfFile ncfile) {
 
@@ -226,9 +223,9 @@ public class GridHorizCoordSys {
     }
 
     /**
-     * _more_
+     * Add the variables to the netCDF file
      *
-     * @param ncfile _more_
+     * @param ncfile the netCDF file
      */
     void addToNetcdfFile(NetcdfFile ncfile) {
 
@@ -275,19 +272,19 @@ public class GridHorizCoordSys {
     }
 
     /**
-     * _more_
+     * Add a coordinate axis
      *
-     * @param ncfile _more_
-     * @param name _more_
-     * @param n _more_
-     * @param start _more_
-     * @param incr _more_
-     * @param units _more_
-     * @param desc _more_
-     * @param standard_name _more_
-     * @param axis _more_
+     * @param ncfile   the netCDF file to add to
+     * @param name     name of the axis
+     * @param n        number of points
+     * @param start    starting value
+     * @param incr     increment between points 
+     * @param units    units
+     * @param desc     description
+     * @param standard_name   standard name
+     * @param axis     axis type
      *
-     * @return _more_
+     * @return  the coordinate values
      */
     private double[] addCoordAxis(NetcdfFile ncfile, String name, int n,
                                   double start, double incr, String units,
@@ -320,16 +317,16 @@ public class GridHorizCoordSys {
     }
 
     /**
-     * _more_
+     * Add a gaussian lat axis
      *
-     * @param ncfile _more_
-     * @param name _more_
-     * @param units _more_
-     * @param desc _more_
-     * @param standard_name _more_
-     * @param axis _more_
+     * @param ncfile   netCDF file to add to
+     * @param name     name of the axis
+     * @param units    units
+     * @param desc     description
+     * @param standard_name  standard name
+     * @param axis     axis type
      *
-     * @return _more_
+     * @return  the values
      */
     private double[] addGaussianLatAxis(NetcdfFile ncfile, String name,
                                         String units, String desc,
@@ -413,11 +410,11 @@ public class GridHorizCoordSys {
 
 
     /**
-     * _more_
+     * Add 2D lat/lon variables (for CF compliance)
      *
-     * @param ncfile _more_
-     * @param xData _more_
-     * @param yData _more_
+     * @param ncfile   netCDF file
+     * @param xData    x values
+     * @param yData    y values
      */
     private void addLatLon2D(NetcdfFile ncfile, double[] xData,
                              double[] yData) {
@@ -473,9 +470,9 @@ public class GridHorizCoordSys {
     }
 
     /**
-     * _more_
+     * Make a projection and add it to the netCDF file
      *
-     * @param ncfile _more_
+     * @param ncfile   netCDF file
      */
     private void makeProjection(NetcdfFile ncfile) {
         switch (lookup.getProjectionType(gdsIndex)) {
@@ -527,10 +524,11 @@ public class GridHorizCoordSys {
         ncfile.addVariable(g, v);
     }
 
+    // TODO: This is GRIB specific - how to generalize
     /**
-     * _more_
+     * Add the GDS params to the variable as attributes
      *
-     * @param v _more_
+     * @param v   the GDS params.
      */
     private void addGDSparams(Variable v) {
         // add all the gds parameters
@@ -558,11 +556,11 @@ public class GridHorizCoordSys {
     }
 
     /**
-     * _more_
+     * Add coordinate system variable
      *
-     * @param ncfile _more_
-     * @param name _more_
-     * @param dims _more_
+     * @param ncfile   netCDF file
+     * @param name     name of the variable
+     * @param dims     dimensions
      */
     private void addCoordSystemVariable(NetcdfFile ncfile, String name,
                                         String dims) {
@@ -585,7 +583,7 @@ public class GridHorizCoordSys {
     // lambert conformal
 
     /**
-     * _more_
+     * Make a LambertConformalConic projection 
      */
     private void makeLC() {
         // we have to project in order to find the origin
@@ -605,7 +603,7 @@ public class GridHorizCoordSys {
             setDxDy(startx, starty, proj);
         }
 
-        if (debug) {
+        if (GridServiceProvider.debugProj) {
             System.out.println("GridHorizCoordSys.makeLC start at latlon "
                                + startLL);
 
@@ -657,11 +655,12 @@ public class GridHorizCoordSys {
     // polar stereographic
 
     /**
-     * _more_
+     * Make a PolarStereographic projection 
      */
     private void makePS() {
         double scale     = .933;
 
+        // TODO: should this be a value instead of a boolean?
         double latOrigin = 90.0;
         String s         = getParamString("NpProj");
         if ((s != null) && !s.equalsIgnoreCase("true")) {
@@ -687,7 +686,7 @@ public class GridHorizCoordSys {
             setDxDy(startx, starty, proj);
         }
 
-        if (debug) {
+        if (GridServiceProvider.debugProj) {
             System.out.println("start at proj coord " + start);
             LatLonPoint llpt = proj.projToLatLon(start);
             System.out.println("   end at lat/lon coord " + llpt);
@@ -711,7 +710,7 @@ public class GridHorizCoordSys {
     // Mercator
 
     /**
-     * _more_
+     * Make a Mercator projection 
      */
     private void makeMercator() {
 
@@ -737,7 +736,7 @@ public class GridHorizCoordSys {
         attributes.add(new Attribute("latitude_of_projection_origin",
                                      new Double(La1)));
 
-        if (debug) {
+        if (GridServiceProvider.debugProj) {
             double          Lo2   = getParamValue(gdsIndex.LO2) + 360.0;
             double          La2   = getParamValue(gdsIndex.LA2);
             LatLonPointImpl endLL = new LatLonPointImpl(La2, Lo2);
@@ -755,7 +754,7 @@ public class GridHorizCoordSys {
     }
 
     /**
-     * _more_
+     * Make a Space View Orthographic projection 
      */
     private void makeSpaceViewOrOthographic() {
         double Lat0 = getParamValue("Lap");  // sub-satellite point lat
@@ -811,7 +810,7 @@ public class GridHorizCoordSys {
                                          new Double(height)));
         }
 
-        if (debug) {
+        if (GridServiceProvider.debugProj) {
 
             double          Lo2   = getParamValue(gdsIndex.LO2) + 360.0;
             double          La2   = getParamValue(gdsIndex.LA2);
@@ -830,33 +829,33 @@ public class GridHorizCoordSys {
     }
 
     /**
-     * _more_
+     * Get the value of a GridDefRecord intrinsic
      *
-     * @param id _more_
+     * @param id a GridDefRecord intrinsic
      *
-     * @return _more_
+     * @return the values
      */
     private double getParamValue(String id) {
         return gdsIndex.readDouble(id);
     }
 
     /**
-     * _more_
+     * Get the String of a GridDefRecord intrinsic
      *
-     * @param id _more_
+     * @param id a GridDefRecord intrinsic
      *
-     * @return _more_
+     * @return the String
      */
     private String getParamString(String id) {
         return gdsIndex.getParam(id);
     }
 
     /**
-     * _more_
+     * Calculate the dx and dy from startx, starty and projection.
      *
-     * @param startx _more_
-     * @param starty _more_
-     * @param proj _more_
+     * @param startx    starting x projection point
+     * @param starty    starting y projection point
+     * @param proj      projection for transform
      */
     private void setDxDy(double startx, double starty, ProjectionImpl proj) {
         double Lo2 = gdsIndex.readDouble(gdsIndex.LO2);

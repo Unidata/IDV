@@ -79,12 +79,14 @@ public class GempakGridServiceProvider extends GridServiceProvider {
                      CancelTask cancelTask)
             throws IOException {
         super.open(raf, ncfile, cancelTask);
+        long start = System.currentTimeMillis();
         if (gemreader == null) {
             gemreader = new GempakGridReader();
         }
         gemreader.init(raf);
         GridIndex index = ((GempakGridReader) gemreader).getGridIndex();
         open(index, cancelTask);
+            if (debugOpen) System.out.println(" GridServiceProvider.open " + ncfile.getLocation()+" took "+(System.currentTimeMillis()-start));
     }
 
     /**

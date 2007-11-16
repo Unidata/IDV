@@ -39,40 +39,37 @@ import java.util.*;
  */
 public class GridCoordSys {
 
-    /** _more_ */
+    /** horizontal coordinate system */
     private GridHorizCoordSys hcs;
 
-    /** _more_ */
+    /** a grid record */
     private GridRecord record;
 
-    /** _more_ */
+    /** vertical name */
     private String verticalName;
 
-    /** _more_ */
+    /** lookup table */
     private GridTableLookup lookup;
 
-    /** _more_ */
+    /** list of levels */
     private List levels;
 
-    /** _more_ */
+    /** flag for not using the vertical */
     boolean dontUseVertical = false;
 
-    /** _more_ */
-    private boolean debug = false;
-
-    /** _more_ */
+    /** postive direction */
     String positive = "up";
 
-    /** _more_ */
+    /** units */
     String units;
 
     /**
-     * _more_
+     * Create a coordinate system 
      *
-     * @param hcs _more_
-     * @param record _more_
-     * @param name _more_
-     * @param lookup _more_
+     * @param hcs      horizontal coord sys
+     * @param record   grid record
+     * @param name     name of the vertical dimension
+     * @param lookup   lookuptable
      */
     GridCoordSys(GridHorizCoordSys hcs, GridRecord record, String name,
                  GridTableLookup lookup) {
@@ -88,7 +85,7 @@ public class GridCoordSys {
                             : "down";
         units             = lookup.getLevelUnit(record);
 
-        if (debug) {
+        if (GridServiceProvider.debugVert) {
             System.out.println("GribCoordSys: " + getVerticalDesc()
                                + " useVertical= " + ( !dontUseVertical)
                                + " positive=" + positive + " units=" + units);
@@ -96,36 +93,36 @@ public class GridCoordSys {
     }
 
     /**
-     * _more_
+     * Get the coordinate system name
      *
-     * @return _more_
+     * @return the coordinate system name
      */
     String getCoordSysName() {
         return verticalName + "_CoordSys";
     }
 
     /**
-     * _more_
+     * Get the vertical name
      *
-     * @return _more_
+     * @return the vertical name
      */
     String getVerticalName() {
         return verticalName;
     }
 
     /**
-     * _more_
+     * Get the vertical description
      *
-     * @return _more_
+     * @return the vertical description
      */
     String getVerticalDesc() {
         return verticalName + "(" + record.getLevelType1() + ")";
     }
 
     /**
-     * _more_
+     * Get the number of levels
      *
-     * @return _more_
+     * @return the number of levels
      */
     int getNLevels() {
         return dontUseVertical
@@ -134,9 +131,9 @@ public class GridCoordSys {
     }
 
     /**
-     * _more_
+     * Add levels from the GridRecords
      *
-     * @param records _more_
+     * @param records  the records
      */
     void addLevels(List records) {
         for (int i = 0; i < records.size(); i++) {
@@ -146,7 +143,7 @@ public class GridCoordSys {
                 levels.add(d);
             }
             if (dontUseVertical && (levels.size() > 1)) {
-                if (debug) {
+                if (GridServiceProvider.debugVert) {
                     System.out.println(
                         "GribCoordSys: unused level coordinate has > 1 levels = "
                         + verticalName + " " + record.getLevelType1() + " "
@@ -166,11 +163,11 @@ public class GridCoordSys {
     }
 
     /**
-     * _more_
+     * Match levels
      *
-     * @param records _more_
+     * @param records list of GridRecords
      *
-     * @return _more_
+     * @return true if they match
      */
     boolean matchLevels(List records) {
 
@@ -194,10 +191,10 @@ public class GridCoordSys {
     }
 
     /**
-     * _more_
+     * Add dimensions to the netcdf file
      *
-     * @param ncfile _more_
-     * @param g _more_
+     * @param ncfile  the netCDF file
+     * @param g       the group to add to
      */
     void addDimensionsToNetcdfFile(NetcdfFile ncfile, Group g) {
         if (dontUseVertical) {
@@ -208,10 +205,10 @@ public class GridCoordSys {
     }
 
     /**
-     * _more_
+     * Add this coordinate system to the netCDF file
      *
-     * @param ncfile _more_
-     * @param g _more_
+     * @param ncfile the netCDF file
+     * @param g the group to add to
      */
     void addToNetcdfFile(NetcdfFile ncfile, Group g) {
         if (dontUseVertical) {
@@ -293,11 +290,11 @@ public class GridCoordSys {
     }
 
     /**
-     * _more_
+     * Find the coordinate transform
      *
-     * @param g _more_
-     * @param nameStartsWith _more_
-     * @param levelType _more_
+     * @param g     group to check
+     * @param nameStartsWith   beginning of name
+     * @param levelType  type of level
      */
     void findCoordinateTransform(Group g, String nameStartsWith,
                                  int levelType) {
@@ -321,11 +318,11 @@ public class GridCoordSys {
     }
 
     /**
-     * _more_
+     * Get the index of a particular  GridRecord
      *
-     * @param record _more_
+     * @param record  record to find
      *
-     * @return _more_
+     * @return the index or -1
      */
     int getIndex(GridRecord record) {
         Double d = new Double(record.getLevel1());

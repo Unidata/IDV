@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.data.grid.gempak;
 
 
@@ -54,9 +53,6 @@ public abstract class GridServiceProvider implements IOServiceProvider {
 
     /** the file we are reading */
     protected RandomAccessFile raf;
-
-    /** debug timing flag */
-    private boolean debug = false;
 
     /** place to store debug stuff */
     protected StringBuffer parseInfo = new StringBuffer();
@@ -227,7 +223,7 @@ public abstract class GridServiceProvider implements IOServiceProvider {
             }
         }
 
-        if (debug) {
+        if (debugTiming) {
             long took = System.currentTimeMillis() - start;
             System.out.println("  read data took=" + took + " msec ");
         }
@@ -287,9 +283,6 @@ public abstract class GridServiceProvider implements IOServiceProvider {
         int               nx            = hsys.getNx();
 
         GridRecord        record        = pv.findRecord(timeIdx, levIdx);
-        if (debug) {
-            System.out.println(record);
-        }
         if (record == null) {
             int xyCount = yRange.length() * xRange.length();
             for (int j = 0; j < xyCount; j++) {

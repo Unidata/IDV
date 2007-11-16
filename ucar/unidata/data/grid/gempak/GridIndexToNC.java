@@ -159,7 +159,7 @@ public class GridIndexToNC {
         // run through each record
         GridRecord firstRecord = null;
         List       records     = index.getGridRecords();
-        if (debug) {
+        if (GridServiceProvider.debugOpen) {
             System.out.println(" number of products = " + records.size());
         }
         for (int i = 0; i < records.size(); i++) {
@@ -234,7 +234,7 @@ public class GridIndexToNC {
             makeDenseCoordSys(ncfile, lookup, cancelTask);
         }
 
-        if (debug) {
+        if (GridServiceProvider.debugMissing) {
             int      count   = 0;
             Iterator iterHcs = hcsHash.values().iterator();
             while (iterHcs.hasNext()) {
@@ -248,7 +248,7 @@ public class GridIndexToNC {
             System.out.println(" total missing= " + count);
         }
 
-        if (debug) {
+        if (GridServiceProvider.debugMissingDetails) {
             Iterator iterHcs = hcsHash.values().iterator();
             while (iterHcs.hasNext()) {  // loop over HorizCoordSys
                 GridHorizCoordSys hcs = (GridHorizCoordSys) iterHcs.next();
