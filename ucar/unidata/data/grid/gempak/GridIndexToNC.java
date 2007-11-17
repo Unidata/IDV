@@ -132,7 +132,7 @@ public class GridIndexToNC {
      *
      * @throws IOException Problem reading from the file
      */
-    void open(GridIndex index, GridTableLookup lookup, int version,
+    public void open(GridIndex index, GridTableLookup lookup, int version,
               NetcdfFile ncfile, FmrcCoordSys fmrcCoordSys,
               CancelTask cancelTask)
             throws IOException {

@@ -58,7 +58,7 @@ public abstract class GridServiceProvider implements IOServiceProvider {
     protected StringBuffer parseInfo = new StringBuffer();
 
     /** debug flags */
-    static boolean debugOpen           = false,
+    protected static boolean debugOpen           = false,
                    debugMissing        = false,
                    debugMissingDetails = false,
                    debugProj           = false,
