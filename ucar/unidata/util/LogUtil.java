@@ -817,7 +817,7 @@ public class LogUtil {
 	//Add the message if its a wrapper exception
 	if(originalException instanceof WrapperException) {
 	    String msg = originalException.getMessage();
-	    if(msg!=null && msg.length()>0) {
+	    if(msg!=null && msg.length()>0 && !msg.trim().equals(excMessage.trim())) {
 		excMessage = msg +" " + excMessage;
 	    }
 	}

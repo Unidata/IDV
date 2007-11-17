@@ -2192,6 +2192,15 @@ public class Misc {
         return f;
     }
 
+
+    public static double[] arrayToDouble(float[] d) {
+        double[] f = new double[d.length];
+        for (int i = 0; i < d.length; i++) {
+            f[i] = (float) d[i];
+        }
+        return f;
+    }
+
     /**
      * Convert to float
      *
