@@ -26,6 +26,7 @@ package ucar.unidata.data.sounding;
 
 import ucar.ma2.Range;
 
+import ucar.visad.quantities.CommonUnits;
 
 import ucar.unidata.data.BadDataException;
 import ucar.unidata.data.DataAlias;
@@ -62,17 +63,11 @@ import java.util.List;
  */
 public abstract class TrackInfo {
 
-    /** Fixed var name for lat */
-    public static final String VAR_LATITUDE = "Latitude";
+    protected String varTime;
+    protected String varLatitude;
+    protected String varLongitude;
+    protected String varAltitude;
 
-    /** Fixed var name for lon */
-    public static final String VAR_LONGITUDE = "Longitude";
-
-    /** Fixed var name for alt */
-    public static final String VAR_ALTITUDE = "Altitude";
-
-    /** Fixed var name for time */
-    public static final String VAR_TIME = "Time";
 
     /** RealType name for time */
     public static final String TIME_TYPE = "track_time";
@@ -152,6 +147,7 @@ public abstract class TrackInfo {
         parameterCategories.add(variable.getCategory());
     }
 
+
     /**
      * Get the starting time of this track.
      *
@@ -177,7 +173,11 @@ public abstract class TrackInfo {
      *
      * @return num points in track
      */
-    public abstract int getNumberPoints();
+    public int getNumberPoints() throws Exception {
+        float[] lats = getLatitude(null);
+        if(lats == null) return 0;
+        return lats.length;
+    }
 
 
 
@@ -317,7 +317,9 @@ public abstract class TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected abstract Unit getTimeUnit() throws Exception;
+    protected  Unit getTimeUnit() throws Exception {
+        return CommonUnit.secondsSinceTheEpoch;
+    }
 
     /**
      * Get the time for each ob
@@ -328,7 +330,9 @@ public abstract class TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected abstract double[] getTime(Range range) throws Exception;
+    protected  double[] getTime(Range range) throws Exception {
+        return getDoubleData(range, varTime);
+    }
 
     /**
      * Get latitude values
@@ -339,7 +343,9 @@ public abstract class TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected abstract float[] getLatitude(Range range) throws Exception;
+    protected float[] getLatitude(Range range) throws Exception {
+        return getFloatData(range, varLatitude);
+    }
 
     /**
      * get longitude values
@@ -350,7 +356,9 @@ public abstract class TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected abstract float[] getLongitude(Range range) throws Exception;
+    protected  float[] getLongitude(Range range) throws Exception {
+        return getFloatData(range, varLongitude);
+    }
 
 
     /**
@@ -362,7 +370,9 @@ public abstract class TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected abstract float[] getAltitude(Range range) throws Exception;
+    protected  float[] getAltitude(Range range) throws Exception {
+        return getFloatData(range, varAltitude);
+    }
 
 
     /**
@@ -375,8 +385,8 @@ public abstract class TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected float[] getData(Range range, Variable var) throws Exception {
-        return getData(range, var.getShortName());
+    protected float[] getFloatData(Range range, Variable var) throws Exception {
+        return getFloatData(range, var.getShortName());
     }
 
     /**
@@ -389,9 +399,9 @@ public abstract class TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected String[] getStrings(Range range, Variable var)
+    protected String[] getStringData(Range range, Variable var)
             throws Exception {
-        return getStrings(range, var.getShortName());
+        return getStringData(range, var.getShortName());
     }
 
 
@@ -405,8 +415,13 @@ public abstract class TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected abstract float[] getData(Range range, String var)
-     throws Exception;
+    protected abstract float[] getFloatData(Range range, String var)
+        throws Exception;
+
+
+    protected  double[] getDoubleData(Range range, String var)         throws Exception {
+        return Misc.arrayToDouble(getFloatData(range, var));
+    }
 
     /**
      * Get string values
@@ -419,8 +434,9 @@ public abstract class TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected abstract String[] getStrings(Range range, String var)
+    protected abstract String[] getStringData(Range range, String var)
      throws Exception;
+
 
 
 
@@ -433,7 +449,190 @@ public abstract class TrackInfo {
      * @return field of PointObs
      * @throws Exception On badness
      */
-    public abstract FieldImpl getPointObTrack(Range range) throws Exception;
+    public synchronized FieldImpl getPointObTrack(Range range)
+            throws Exception {
+
+        
+        //        Trace.startTrace();
+        Trace.call1("TrackAdapter.getPointObTrack");
+        Object loadId = JobManager.getManager().startLoad("TrackAdapter");
+        if (range == null) {
+            range = getFullRange();
+        }
+
+        float[]  lats     = getLatitude(range);
+        float[]  lons     = getLongitude(range);
+
+
+        float[]  alts     = getAltitude(range);
+        double[] timeVals = getTimeVals(range);
+        int      numObs   = lats.length;
+
+        timeVals = CommonUnit.secondsSinceTheEpoch.toThis(timeVals,
+                getTimeUnit());
+        List    varsToUse  = getVarsToUse();
+        int     numReals   = countReals(varsToUse);
+        int     numStrings = varsToUse.size() - numReals;
+        boolean allReals   = numStrings == 0;
+        int     numVars    = varsToUse.size();
+        Unit[]  units      = new Unit[numVars];
+        for (int varIdx = 0; varIdx < numVars; varIdx++) {
+            Variable var = (Variable) varsToUse.get(varIdx);
+            units[varIdx] = var.unit;
+        }
+
+        Trace.msg("TrackAdapter #obs: " + getNumberPoints() + " vars:"
+                  + numVars);
+
+        RealType      dirType        = Direction.getRealType();
+        EarthLocation lastEL         = null;
+        List          locations      = new ArrayList();
+        List          times          = new ArrayList();
+        List          tuples         = new ArrayList();
+        List          reals          = new ArrayList();
+        List          strings        = new ArrayList();
+        List          bearings       = new ArrayList();
+        List          stringTypeList = new ArrayList();
+
+
+
+        for (int obIdx = 0; obIdx < numObs; obIdx++) {
+            EarthLocation location =
+                new EarthLocationTuple(new Real(RealType.Latitude,
+                    lats[obIdx]), new Real(RealType.Longitude, lons[obIdx]),
+                                  new Real(RealType.Altitude, alts[obIdx]));
+            if (obIdx == 0) {
+                lastEL = location;
+            }
+            locations.add(location);
+
+            double dirVal = Util.calculateBearing(lastEL, location,
+                                workBearing).getAngle();
+
+
+            lastEL = location;
+            Real bearing = new Real(dirType, dirVal);
+            bearings.add(bearing);
+            times.add(new DateTime(timeVals[obIdx]));
+            //Do +1 for the bearing
+            Data[] tupleArray = (allReals == true)
+                                ? new Real[numVars + 1]
+                                : new Data[numVars + 1];
+            tuples.add(tupleArray);
+            double[] realArray = new double[numReals + 1];
+            reals.add(realArray);
+            realArray[realArray.length - 1] = dirVal;
+            strings.add(new String[numStrings]);
+        }
+
+        Trace.call1("TrackAdapter.reading data");
+
+
+        boolean doColumnOriented = true;
+        //            doColumnOriented = false;
+        if (doColumnOriented) {
+            int realCnt   = 0;
+            int stringCnt = 0;
+            for (int varIdx = 0; varIdx < numVars; varIdx++) {
+                if ( !JobManager.getManager().canContinue(loadId)) {
+                    return null;
+                }
+                Variable var = (Variable) varsToUse.get(varIdx);
+                if (var.isNumeric) {
+                    float[] fvalues = getFloatData(range, var.getShortName());
+                    if (var.realType == null) {
+                        //???
+                    }
+
+                    Data[] firstTuple = null;
+                    for (int obIdx = 0; obIdx < numObs; obIdx++) {
+                        Data[] tupleArray = (Data[]) tuples.get(obIdx);
+                        ((double[]) reals.get(obIdx))[realCnt] =
+                            fvalues[obIdx];
+                        if (firstTuple != null) {
+                            tupleArray[varIdx] =
+                                ((Real) firstTuple[varIdx]).cloneButValue(
+                                    fvalues[obIdx]);
+                        } else {
+                            firstTuple         = tupleArray;
+                            tupleArray[varIdx] = (var.unit == null)
+                                    ? new Real(var.realType, fvalues[obIdx])
+                                    : new Real(var.realType, fvalues[obIdx],
+                                    var.unit);
+                        }
+                    }
+                    realCnt++;
+                } else {
+                    String[] svalues = getStringData(range, var.getShortName());
+                    for (int obIdx = 0; obIdx < numObs; obIdx++) {
+                        Data[] tupleArray = (Data[]) tuples.get(obIdx);
+                        tupleArray[varIdx] = new Text(svalues[obIdx]);
+                        ((String[]) strings.get(obIdx))[stringCnt] =
+                            svalues[obIdx];
+                    }
+                    stringCnt++;
+                }
+            }
+        } 
+
+        Trace.call2("TrackAdapter.reading data");
+        Trace.call1("TrackAdapter.processing data", " all reals?" + allReals);
+        PointOb[]     obs     = new PointObTuple[locations.size()];
+        TupleType     tt      = null;
+        RealTupleType rtt     = null;
+        TupleType     finalTT = null;
+        for (int obIdx = 0; obIdx < obs.length; obIdx++) {
+            Data[]   tupleArray  = (Data[]) tuples.get(obIdx);
+            double[] realArray   = (double[]) reals.get(obIdx);
+            String[] stringArray = (String[]) strings.get(obIdx);
+            tupleArray[tupleArray.length - 1] = (Data) bearings.get(obIdx);
+            if (tt == null) {
+                tt = Tuple.buildTupleType(tupleArray);
+                if (allReals) {
+                    rtt = (RealTupleType) tt;
+                }
+            }
+            Data rest = (allReals == true)
+                        ? new RealTuple(rtt, (Real[]) tupleArray, null,
+                                        units, false)
+                        : new Tuple(tt, tupleArray, false, false);
+
+            PointObTuple pot = null;
+            if (finalTT == null) {
+                pot = new PointObTuple((EarthLocation) locations.get(obIdx),
+                                       (DateTime) times.get(obIdx), rest);
+                finalTT = Tuple.buildTupleType(pot.getComponents());
+            } else {
+                pot = new PointObTuple((EarthLocation) locations.get(obIdx),
+                                       (DateTime) times.get(obIdx), rest,
+                                       finalTT, false);
+
+            }
+            obs[obIdx] = pot;
+        }
+
+
+        Trace.call2("TrackAdapter.processing data");
+        //            Tuple.runCheck = !Tuple.runCheck;
+
+
+
+        Integer1DSet indexSet =
+            new Integer1DSet(RealType.getRealType("index"), numObs);
+        FieldImpl retField =
+            new FieldImpl(
+                new FunctionType(
+                    ((SetType) indexSet.getType()).getDomain(),
+                    obs[0].getType()), indexSet);
+        retField.setSamples(obs, false, false);
+
+        Trace.call2("TrackAdapter.getPointObTrack");
+        //      Trace.stopTrace();
+        return retField;
+
+    }
+
+
 
 
     /**
@@ -444,29 +643,19 @@ public abstract class TrackInfo {
      * @return The variable.
      */
     protected Variable getDataVariable(String variableName) {
-        if (variableName.equals(VAR_LATITUDE)) {
-            //                return tod.getLatitudeVariable();
-        } else if (variableName.equals(VAR_LONGITUDE)) {
-            //                return tod.getLongitudeVariable();
-        } else if (variableName.equals(VAR_ALTITUDE)) {
-            //                return tod.getAltitudeVariable();
-        }
-
         //Jump through some hoops for legacy bundles
-        for (int i = 0; i < 2; i++) {
-            if (i == 1) {
-                variableName = variableName.toLowerCase();
-            }
+        String []vars = {variableName,variableName.toLowerCase()};
+        for(int dummyIdx = 0;dummyIdx<vars.length;dummyIdx++) {
             for (int varIdx = 0; varIdx < variables.size(); varIdx++) {
                 Variable theVar = (Variable) variables.get(varIdx);
-                if (variableName.equals(theVar.getName())) {
+                if (vars[dummyIdx].equals(theVar.getName())) {
                     return theVar;
                 }
             }
 
             for (int varIdx = 0; varIdx < variables.size(); varIdx++) {
                 Variable theVar = (Variable) variables.get(varIdx);
-                if (variableName.equals(theVar.getDescription())) {
+                if (vars[dummyIdx].equals(theVar.getDescription())) {
                     return theVar;
                 }
             }
@@ -502,6 +691,13 @@ public abstract class TrackInfo {
         return trackName;
     }
 
+    public void setCoordinateVars(String lon, String lat, String alt, String time) {
+        varLongitude = lon;
+        varLatitude = lat;
+        varAltitude = alt;
+        varTime = time;
+    }
+
     /**
      * Get the appropriate RealType for the particular variable.  Used
      * to get alternate names for lat/lon/alt
@@ -518,9 +714,9 @@ public abstract class TrackInfo {
         if (varToCheck.equals(RealType.Altitude)) {
             varType = RealType.getRealType(ALT_TYPE, CommonUnit.meter);
         } else if (varToCheck.equals(RealType.Latitude)) {
-            varType = RealType.getRealType(LAT_TYPE, CommonUnit.degree);
+            varType = RealType.getRealType(LAT_TYPE, CommonUnits.DEGREE);
         } else if (varToCheck.equals(RealType.Longitude)) {
-            varType = RealType.getRealType(LON_TYPE, CommonUnit.degree);
+            varType = RealType.getRealType(LON_TYPE, CommonUnits.DEGREE);
         } else if (varToCheck.equals(RealType.Time)) {
             try {
                 Real value = new Real(RealType.Time, sampleValue, unit);
@@ -653,22 +849,13 @@ public abstract class TrackInfo {
         //call
         float[]  value  = null;
         double[] dvalue = null;
-        if (variableName.equals(VAR_LATITUDE)) {
-            unit  = DataUtil.parseUnit("degrees");
-            value = getLatitude(range);
-        } else if (variableName.equals(VAR_LONGITUDE)) {
-            unit  = DataUtil.parseUnit("degrees");
-            value = getLongitude(range);
-        } else if (variableName.equals(VAR_ALTITUDE)) {
-            unit  = DataUtil.parseUnit("m");
-            value = getAltitude(range);
-        } else if (variableName.equals(VAR_TIME)) {
+        if (Misc.equals(variableName,varTime)) {
             unit   = getTimeUnit();
             dvalue = getTime(range);
         } else {
             Variable var = getDataVariable(variableName);
             unit  = var.unit;
-            value = getData(range, var.getShortName());
+            value = getFloatData(range, var.getShortName());
         }
 
 
@@ -833,9 +1020,9 @@ public abstract class TrackInfo {
                                            (Set[]) null, addUnits);
 
         addField.setSamples(new float[][] {
-            getData(range, pressureVar), getData(range, tempVar),
-            getData(range, dewpointVar), getData(range, wspdVar),
-            getData(range, wdirVar), llaSamples[0], llaSamples[1],
+            getFloatData(range, pressureVar), getFloatData(range, tempVar),
+            getFloatData(range, dewpointVar), getFloatData(range, wspdVar),
+            getFloatData(range, wdirVar), llaSamples[0], llaSamples[1],
             llaSamples[2]
         });
         return addField;
@@ -917,8 +1104,21 @@ public abstract class TrackInfo {
          * @param unit unit
          */
         public Variable(String name, String desc, Unit unit) {
+            this(name,desc,null,unit);
+        }
+
+
+        /**
+         * ctor
+         *
+         * @param name name
+         * @param desc desc
+         * @param unit unit
+         */
+        public Variable(String name, String desc, String category, Unit unit) {
             this.name        = name;
             this.description = desc;
+            this.category = category;
             if ((this.description == null)
                     || (this.description.trim().length() == 0)) {
                 this.description = name;

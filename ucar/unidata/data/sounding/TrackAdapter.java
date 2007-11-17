@@ -461,8 +461,15 @@ public abstract class TrackAdapter {
         return filename;
     }
 
+    public String getDataSourceName() {
+        return null;
+    }
 
-    /**
+    public String getDataSourceDescription() {
+        return null;
+    }
+
+    /*
      * String representation of this adapter
      *
      * @return String representation of this adapter

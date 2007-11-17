@@ -259,8 +259,9 @@ public class SondeDataSource extends TrackDataSource {
                     //TODO:
                     TrajectoryObsDatatype todt =
                         ((CdmTrackInfo) trackInfo).getTodt();
-                    int numObs = trackInfo.getNumberPoints();
+                    int numObs = 0;
                     try {
+                        numObs = trackInfo.getNumberPoints();
                         double[] times =
                             trackInfo.getTimeVals(todt.getFullRange());
                         boolean ascendingTimes = (times[0]

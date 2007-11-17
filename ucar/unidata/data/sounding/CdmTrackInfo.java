@@ -94,6 +94,19 @@ import javax.swing.JFrame;
  */
 public class CdmTrackInfo extends TrackInfo {
 
+    /** Fixed var name for lat */
+    public static final String VAR_LATITUDE = "Latitude";
+
+    /** Fixed var name for lon */
+    public static final String VAR_LONGITUDE = "Longitude";
+
+    /** Fixed var name for alt */
+    public static final String VAR_ALTITUDE = "Altitude";
+
+    /** Fixed var name for time */
+    public static final String VAR_TIME = "Time";
+
+
 
     /** The data set */
     private TrajectoryObsDataset tod;
@@ -132,11 +145,34 @@ public class CdmTrackInfo extends TrackInfo {
      * @throws Exception On badness
      */
     private void init() throws Exception {
+        varTime = VAR_TIME;
+        varLatitude = VAR_LATITUDE;
+        varLongitude = VAR_LONGITUDE;
+        varAltitude = VAR_ALTITUDE;
+
         startTime = new DateTime(todt.getStartDate());
         endTime   = new DateTime(todt.getEndDate());
         List allVariables = tod.getDataVariables();
         //TODO: Check size
         StructureData structure = todt.getData(0);
+
+        addVariable(new Variable(VAR_TIME,
+                                 VAR_TIME,"Basic",
+                                 getTimeUnit()));
+
+        addVariable(new Variable(VAR_LATITUDE,
+                                 VAR_LATITUDE,"Basic",
+                                 CommonUnits.DEGREE));
+
+        addVariable(new Variable(VAR_LONGITUDE,
+                                 VAR_LONGITUDE,"Basic",
+                                 CommonUnits.DEGREE));
+
+        addVariable(new Variable(VAR_ALTITUDE,
+                                 VAR_ALTITUDE,"Basic",
+                                 DataUtil.parseUnit("m")));
+
+
         for (int varIdx = 0; varIdx < allVariables.size(); varIdx++) {
             VariableSimpleIF var =
                 (VariableSimpleIF) allVariables.get(varIdx);
@@ -156,10 +192,6 @@ public class CdmTrackInfo extends TrackInfo {
             if(attr!=null) {
                 variable.setCategory(attr.getStringValue());
             }
-
-
-
-
 
             if (structure != null) {
                 StructureMembers.Member member =
@@ -218,7 +250,7 @@ public class CdmTrackInfo extends TrackInfo {
         int   varCnt  = 0;
         for (int varIdx = 0; varIdx < numVars; varIdx++) {
             Variable var = (Variable) variables.get(varIdx);
-            getData(range, var.getShortName());
+            getFloatData(range, var.getShortName());
             varCnt++;
         }
         Trace.msg("Column read #vars:" + varCnt);
@@ -309,47 +341,6 @@ public class CdmTrackInfo extends TrackInfo {
 
 
     /**
-     * Get the altitude for each ob. May be subset by range.
-     *
-     * @param range Subset on range. May be null
-     *
-     * @return altitude values
-     *
-     * @throws Exception On badness
-     */
-    protected float[] getLatitude(Range range) throws Exception {
-        return DataUtil.toFloatArray(todt.getLatitude(range));
-        //        return qcLatLon(DataUtil.toFloatArray(todt.getLatitude(range)));
-    }
-
-    /**
-     * Get the longitude for each ob. May be subset by range.
-     *
-     * @param range Subset on range. May be null
-     *
-     * @return longitude values
-     *
-     * @throws Exception On badness
-     */
-    protected float[] getLongitude(Range range) throws Exception {
-        return DataUtil.toFloatArray(todt.getLongitude(range));
-        //        return qcLatLon(DataUtil.toFloatArray(todt.getLongitude(range)));
-    }
-
-    /**
-     * Get the altitude for each ob. May be subset by range.
-     *
-     * @param range Subset on range. May be null
-     *
-     * @return altitude values
-     *
-     * @throws Exception On badness
-     */
-    protected float[] getAltitude(Range range) throws Exception {
-        return DataUtil.toFloatArray(todt.getElevation(range));
-    }
-
-    /**
      * Get the data values for the range.
      *
      * @param range subset. May be null
@@ -359,9 +350,40 @@ public class CdmTrackInfo extends TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected float[] getData(Range range, String var) throws Exception {
+    protected float[] getFloatData(Range range, String var) throws Exception {
+        if(var.equals(VAR_TIME)) {
+            return DataUtil.toFloatArray(todt.getTime(range));
+        }
+        if(var.equals(VAR_LATITUDE)) {
+            return DataUtil.toFloatArray(todt.getLatitude(range));
+        }
+        if(var.equals(VAR_LONGITUDE)) {
+            return DataUtil.toFloatArray(todt.getLongitude(range));
+        }
+        if(var.equals(VAR_ALTITUDE)) {
+            return DataUtil.toFloatArray(todt.getElevation(range));
+        }
         return DataUtil.toFloatArray(todt.getData(range, var));
     }
+
+
+    protected double[] getDoubleData(Range range, String var) throws Exception {
+        if(var.equals(VAR_TIME)) {
+            return DataUtil.toDoubleArray(todt.getTime(range));
+        }
+        if(var.equals(VAR_LATITUDE)) {
+            return DataUtil.toDoubleArray(todt.getLatitude(range));
+        }
+        if(var.equals(VAR_LONGITUDE)) {
+            return DataUtil.toDoubleArray(todt.getLongitude(range));
+        }
+        if(var.equals(VAR_ALTITUDE)) {
+            return DataUtil.toDoubleArray(todt.getElevation(range));
+        }
+        return DataUtil.toDoubleArray(todt.getData(range, var));
+    }
+
+
 
     /**
      * Get the string values for the var
@@ -373,11 +395,9 @@ public class CdmTrackInfo extends TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected String[] getStrings(Range range, String var) throws Exception {
+    protected String[] getStringData(Range range, String var) throws Exception {
         return DataUtil.toStringArray(todt.getData(range, var));
     }
-
-
 
 
 
@@ -479,7 +499,7 @@ public class CdmTrackInfo extends TrackInfo {
                 }
                 Variable var = (Variable) varsToUse.get(varIdx);
                 if (var.isNumeric) {
-                    float[] fvalues = getData(range, var.getShortName());
+                    float[] fvalues = getFloatData(range, var.getShortName());
                     if (var.realType == null) {
                         //???
                     }
@@ -503,7 +523,7 @@ public class CdmTrackInfo extends TrackInfo {
                     }
                     realCnt++;
                 } else {
-                    String[] svalues = getStrings(range, var.getShortName());
+                    String[] svalues = getStringData(range, var.getShortName());
                     for (int obIdx = 0; obIdx < numObs; obIdx++) {
                         Data[] tupleArray = (Data[]) tuples.get(obIdx);
                         tupleArray[varIdx] = new Text(svalues[obIdx]);
