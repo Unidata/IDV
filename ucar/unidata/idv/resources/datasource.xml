@@ -50,6 +50,14 @@
      label="Track files"/>
 
   <datasource
+     id="EOL.TRACKDB"
+     factory="ucar.unidata.data.sounding.TrackDataSource"
+     patterns="^jdbc:.*"
+     label="Eol Track Database"/>
+
+
+
+  <datasource
      id="FILE.SONDE"
      factory="ucar.unidata.data.sounding.SondeDataSource"
      patterns="GLASS.*\.nc$,class.*\.nc$,sgp.*cdf$,SGP.*cdf$,sgp.*nc$,.*QCcdf,.*QC\.nc$$"
