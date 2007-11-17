@@ -268,7 +268,6 @@ public class ProbeControl extends DisplayControlImpl {
      * @throws VisADException   VisAD Error
      */
     public boolean init(List choices) throws VisADException, RemoteException {
-        //        System.err.println("probe init " + choices);
         if ((_levels != null) && (infos.size() == 0)) {
             //We have legacy muli-list table state
             for (int i = 0; i < _levels.size(); i++) {
@@ -288,12 +287,17 @@ public class ProbeControl extends DisplayControlImpl {
                 infos.add(new ProbeRowInfo(level, alt, theMethod, unit,
                                            sound));
             }
-
         }
 
 
 
 
+        for (int i = 0; i < choices.size(); i++) {
+            ProbeRowInfo info = getRowInfo(i);
+            if (!checkIfDataOk(info.getDataInstance())) {
+                return false;
+            }
+        }
         ActionListener llListener = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 handleLatLonWidgetChange();
