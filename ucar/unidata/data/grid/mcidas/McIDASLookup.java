@@ -70,14 +70,14 @@ public final class McIDASLookup implements GridTableLookup {
      * @return Parameter
      */
     public final GridParameter getParameter(GridRecord gr) {
-        String name = gr.getParameterName();
-        /*
-        GridParameter gp   = McIDASParameterTable.getParameter(name);
-        if (gp != null) {
-            return gp;
+        McIDASGridRecord mgr = (McIDASGridRecord) gr;
+        String name = mgr.getParameterName();
+        String desc = mgr.getGridDescription();
+        if (desc.trim().equals("")) {
+            desc = name;
         }
-        */
-        return new GridParameter(0, name, name, "");
+        String unit = mgr.getParamUnitName();
+        return new GridParameter(0, name, desc, "");
     }
 
     /**
@@ -107,35 +107,21 @@ public final class McIDASLookup implements GridTableLookup {
      */
     public final String getLevelName(GridRecord gr) {
         // TODO:  flesh this out
-        String levelName = GempakUtil.LV_CCRD(gr.getLevelType1());
-        /*
-        if (levelName.equals("PRES")) {
+        String levelUnit = getLevelUnit(gr);
+        int level1 = (int) gr.getLevel1();
+        int level2 = (int) gr.getLevel2();
+        if (levelUnit.equals("MB")) {
            return "pressure";
-        } else if (levelName.equals("NONE")) {
-           return "surface";
-        } else if (levelName.equals("HGHT")) {
-           return "height_above_ground";
-        } else if (levelName.equals("THTA")) {
-           return "isentropic";
-        } else if (levelName.equals("SGMA")) {
-           return "sigma";
-        } else if (levelName.equals("DPTH")) {
-           return "depth";
-        } else if (levelName.equals("PDLY")) {
-           return "pressure";
-        } else if (levelName.equals("FRZL")) {
-           return "zeroDegC_isotherm";
-        } else if (levelName.equals("TROP")) {
+        } else if (level1 == 1013) {
+           return "mean sea level";
+        } else if (level1 == 0) {
            return "tropopause";
-        } else if (levelName.equals("CLDL")) {
-           return "cloud_base";
-        } else if (levelName.equals("CLDT")) {
-           return "cloud_tops";
-        } else if (levelName.equals("MWSL")) {
-           return "maximum_wind_level";
+        } else if (level1 == 1001) {
+           return "surface";
+        } else if (level2 != 0) {
+           return "layer";
         }
-        */
-        return levelName;
+        return "";
     }
 
     /**
@@ -145,33 +131,7 @@ public final class McIDASLookup implements GridTableLookup {
      */
     public final String getLevelDescription(GridRecord gr) {
         // TODO:  flesh this out
-        String levelName = getLevelName(gr);
-        if (levelName.equals("PRES")) {
-            return "pressure";
-        } else if (levelName.equals("NONE")) {
-            return "surface";
-        } else if (levelName.equals("HGHT")) {
-            return "height_above_ground";
-        } else if (levelName.equals("THTA")) {
-            return "isentropic";
-        } else if (levelName.equals("SGMA")) {
-            return "sigma";
-        } else if (levelName.equals("DPTH")) {
-            return "depth";
-        } else if (levelName.equals("PDLY")) {
-            return "layer_between_two_pressure_difference_from_ground";
-        } else if (levelName.equals("FRZL")) {
-            return "zeroDegC_isotherm";
-        } else if (levelName.equals("TROP")) {
-            return "tropopause";
-        } else if (levelName.equals("CLDL")) {
-            return "cloud_base";
-        } else if (levelName.equals("CLDT")) {
-            return "cloud_tops";
-        } else if (levelName.equals("MWSL")) {
-            return "maximum_wind_level";
-        }
-        return levelName;
+        return getLevelName(gr);
     }
 
     /**
@@ -180,23 +140,7 @@ public final class McIDASLookup implements GridTableLookup {
      * @return LevelUnit
      */
     public final String getLevelUnit(GridRecord gr) {
-        // TODO:  flesh this out
-        //String levelName = getLevelName(gr);
-        String levelName = GempakUtil.LV_CCRD(gr.getLevelType1());
-        if (levelName.equals("PRES")) {
-            return "hPa";
-        } else if (levelName.equals("HGHT")) {
-            return "m";
-        } else if (levelName.equals("THTA")) {
-            return "K";
-        } else if (levelName.equals("SGMA")) {
-            return "";
-        } else if (levelName.equals("DPTH")) {
-            return "m";
-        } else if (levelName.equals("PDLY")) {
-            return "hPa";
-        }
-        return "";
+        return ((McIDASGridRecord)gr).getLevelUnitName();
     }
 
     /**
@@ -204,7 +148,7 @@ public final class McIDASLookup implements GridTableLookup {
      * @return TimeRangeUnitName
      */
     public final String getFirstTimeRangeUnitName() {
-        return "minute";
+        return "hour";
     }
 
     /**
@@ -221,7 +165,7 @@ public final class McIDASLookup implements GridTableLookup {
      * @return isLatLon
      */
     public final boolean isLatLon(GridDefRecord gds) {
-        return getProjectionName(gds).equals("CED");
+        return getProjectionName(gds).equals("4");
     }
 
     /**
@@ -231,15 +175,13 @@ public final class McIDASLookup implements GridTableLookup {
      */
     public final int getProjectionType(GridDefRecord gds) {
         String name = getProjectionName(gds).trim();
-        if (name.equals("CED")) {
-            return -1;
-        } else if (name.equals("MER")) {
+        if (name.equals("1")) {
             return Mercator;
-        } else if (name.equals("LCC")) {
+        } else if (name.equals("4")) {
+            return Mercator;
+        } else if (name.equals("6")) {
             return LambertConformal;
-        } else if (name.equals("PS")) {
-            return PolarStereographic;
-        } else if (name.equals("STR")) {
+        } else if (name.equals("2")) {
             return PolarStereographic;
         } else {
             return -1;
@@ -303,7 +245,7 @@ public final class McIDASLookup implements GridTableLookup {
      * @return the name or null if not set
      */
     private String getProjectionName(GridDefRecord gds) {
-        return gds.getParam("Proj");
+        return gds.getParam(gds.PROJ);
     }
 
 }

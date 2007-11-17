@@ -1,5 +1,5 @@
 //
-// McIDASGridDirectory.java
+// McIDASGridReader.java
 //
 
 /*
@@ -51,6 +51,9 @@ public class McIDASGridReader {
 
     /** swap flag */
     protected boolean needToSwap = false;
+
+    /** hashMap of GridDefRecords */
+    private HashMap gdsMap = new HashMap();
 
     /**
      * Bean ctor
@@ -135,6 +138,7 @@ public class McIDASGridReader {
         for (int i = 0; i < numEntries; i++) {
             entries[i] = readInt(i + 11);
         }
+
         // Don't swap:
         rf.order(RandomAccessFile.BIG_ENDIAN);
         for (int i = 0; i < numEntries; i++) {
@@ -148,10 +152,15 @@ public class McIDASGridReader {
                 swapGridHeader(header);
             }
             try {
-                GridRecord gr = new McIDASGridRecord(entries[i],
-                                    new GridDirectory(header));
+
+                McIDASGridRecord gr = new McIDASGridRecord(entries[i],header);
                 gridIndex.addGridRecord(gr);
-                // TODO: add in nav info
+                if (gdsMap.get(gr.getGridDefRecordId()) == null) {
+                    McGridDefRecord mcdef = gr.getGridDefRecord();
+                    System.out.println("new nav " + mcdef.toString());
+                    gdsMap.put(mcdef.toString(), mcdef);
+                    gridIndex.addHorizCoordSys(mcdef);
+                }
             } catch (McIDASException me) {
                 System.out.println("problem creating grid dir");
                 continue;

@@ -88,6 +88,9 @@ public class GridDefRecord {
     public static final String LOV = "LoV";
 
     /** LoV */
+    public static final String PROJ = "Proj";
+
+    /** LoV */
     public static final String GRID_SHAPE_CODE = "grid_shape_code";
 
     /** Radius of spherical earth */

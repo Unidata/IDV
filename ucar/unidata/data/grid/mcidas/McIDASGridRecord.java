@@ -26,6 +26,7 @@ package ucar.unidata.data.grid.mcidas;
 import edu.wisc.ssec.mcidas.GridDirectory;
 
 import edu.wisc.ssec.mcidas.McIDASUtil;
+import edu.wisc.ssec.mcidas.McIDASException;
 
 import ucar.unidata.data.grid.gempak.GridRecord;
 
@@ -38,10 +39,7 @@ import java.util.Date;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class McIDASGridRecord implements GridRecord {
-
-    /** grid information */
-    private GridDirectory directory;
+public class McIDASGridRecord extends GridDirectory implements GridRecord {
 
     /** offset to header */
     private int offsetToHeader;  // offset to header
@@ -55,36 +53,18 @@ public class McIDASGridRecord implements GridRecord {
     /** actual valid time */
     private Date validTime;
 
+    /** grid definition */
+    private McGridDefRecord gridDefRecord;
 
     /**
      * Create a grid header from the integer bits
      * @param offset  offset to grid header in file
-     * @param gd    grid directory
+     * @param header  header words
      */
-    public McIDASGridRecord(int offset, GridDirectory gd) {
+    public McIDASGridRecord(int offset, int[] header) throws McIDASException {
+        super(header);
+        gridDefRecord = new McGridDefRecord(header);
         offsetToHeader = offset;
-        directory  = gd;
-        /*
-        int ymd = times1[0];
-        if (ymd / 10000 < 50) {
-            ymd += 20000000;
-        } else if (ymd / 10000 < 100) {
-            ymd += 19000000;
-        }
-        int hms = times1[1] * 100;  // need to add seconds
-        refTime = new Date(McIDASUtil.mcDateHmsToSecs(ymd, hms) * 1000l);
-        int offset = times1[2] % 100000;
-        if ((offset == 0) || (offset % 100 == 0)) {  // 0 or no minutes
-            validOffset = (offset / 100) * 60;
-        } else {                                     // have minutes
-            validOffset = (offset / 100) * 60 + offset % 100;
-        }
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeZone(java.util.TimeZone.getTimeZone("GMT"));
-        calendar.setTime(refTime);
-        calendar.add(Calendar.MINUTE, validOffset);
-        validTime = calendar.getTime();
-        */
     }
 
     /**
@@ -93,7 +73,7 @@ public class McIDASGridRecord implements GridRecord {
      * @return the first level value
      */
     public double getLevel1() {
-        return directory.getLevelValue();
+        return getLevelValue();
     }
 
     /**
@@ -102,7 +82,7 @@ public class McIDASGridRecord implements GridRecord {
      * @return the second level value
      */
     public double getLevel2() {
-        return directory.getSecondLevelValue();
+        return getSecondLevelValue();
     }
 
     /**
@@ -127,19 +107,19 @@ public class McIDASGridRecord implements GridRecord {
      * Get the first reference time of this GridRecord
      *
      * @return reference time
-     */
     public Date getReferenceTime() {
-        return directory.getReferenceTime();
+        return y.getReferenceTime();
     }
+     */
 
     /**
      * Get the valid time for this grid.
      *
      * @return valid time
-     */
     public Date getValidTime() {
         return directory.getValidTime();
     }
+     */
 
     /**
      * Get valid time offset (minutes) of this GridRecord
@@ -147,7 +127,7 @@ public class McIDASGridRecord implements GridRecord {
      * @return time offset
      */
     public int getValidTimeOffset() {
-        return directory.getForecastHour();
+        return getForecastHour();
     }
 
     /**
@@ -156,7 +136,7 @@ public class McIDASGridRecord implements GridRecord {
      * @return parameter name
      */
     public String getParameterName() {
-        return directory.getParamName();
+        return getParamName();
     }
 
     /**
@@ -165,7 +145,16 @@ public class McIDASGridRecord implements GridRecord {
      * @return parameter name
      */
     public String getGridDefRecordId() {
-        return null;  // TODO
+        return gridDefRecord.toString();
+    }
+
+    /**
+     * Get the grid def record id
+     *
+     * @return parameter name
+     */
+    public McGridDefRecord getGridDefRecord() {
+        return gridDefRecord;
     }
 
     /**
@@ -176,35 +165,4 @@ public class McIDASGridRecord implements GridRecord {
     public int getOffsetToHeader() {
         return offsetToHeader;
     }
-
-    /**
-     * Get a String representation of this object
-     * @return a String representation of this object
-     */
-    public String toString() {
-        return directory.toString();
-        /*
-        StringBuffer buf = new StringBuffer();
-        buf.append(StringUtil.padLeft(String.valueOf(gridNumber), 5));
-        buf.append(StringUtil.padLeft(time1, 20));
-        buf.append(" ");
-        buf.append(StringUtil.padLeft(time2, 20));
-        buf.append(" ");
-        buf.append(StringUtil.padLeft(String.valueOf(level1), 5));
-        if (level2 != -1) {
-            buf.append(StringUtil.padLeft(String.valueOf(level2), 5));
-        } else {
-            buf.append("     ");
-        }
-        buf.append("  ");
-        buf.append(StringUtil.padLeft(GempakUtil.LV_CCRD(ivcord), 6));
-        buf.append(" ");
-        buf.append(param);
-        buf.append(" ");
-        buf.append(GempakUtil.getGridPackingName(packingType));
-        return buf.toString();
-        */
-    }
-
 }
-

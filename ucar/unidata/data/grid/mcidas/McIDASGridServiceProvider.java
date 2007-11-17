@@ -60,8 +60,10 @@ public class McIDASGridServiceProvider extends GridServiceProvider {
      * @throws IOException  problem reading file
      */
     public boolean isValidFile(RandomAccessFile raf) throws IOException {
+        System.out.println("trying as mcidas");
         try {
             mcGridReader = new McIDASGridReader(raf);
+            System.out.println("okay as mcidas");
         } catch (IOException ioe) {
             return false;
         }
