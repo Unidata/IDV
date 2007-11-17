@@ -115,6 +115,8 @@ argument -Dfoo=bar) -->
         <unjar src="${libsrc}/ij.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jh.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/geotransform.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/itext.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/postgres.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jfreechart.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/numericalMethods.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/sunrisesunset.jar" dest="${tmpjardir}"/>
