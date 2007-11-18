@@ -168,7 +168,7 @@ public class NavigationBlock extends GridDefRecord {
     public void setValues(float[] values) {
         vals = values;
         proj = GempakUtil.ST_ITOC(Float.floatToIntBits(vals[1])).trim();
-        addParam("Proj", proj);
+        addParam(PROJ, proj);
         addParam(GDS_KEY, this.toString());
         setParams();
     }

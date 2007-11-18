@@ -19,7 +19,6 @@
  */
 
 
-
 package ucar.unidata.data.grid.mcidas;
 
 
@@ -70,14 +69,14 @@ public final class McIDASLookup implements GridTableLookup {
      * @return Parameter
      */
     public final GridParameter getParameter(GridRecord gr) {
-        McIDASGridRecord mgr = (McIDASGridRecord) gr;
-        String name = mgr.getParameterName();
-        String desc = mgr.getGridDescription();
+        McIDASGridRecord mgr  = (McIDASGridRecord) gr;
+        String           name = mgr.getParameterName();
+        String           desc = mgr.getGridDescription();
         if (desc.trim().equals("")) {
             desc = name;
         }
         String unit = mgr.getParamUnitName();
-        return new GridParameter(0, name, desc, "");
+        return new GridParameter(0, name, desc, unit);
     }
 
     /**
@@ -108,18 +107,21 @@ public final class McIDASLookup implements GridTableLookup {
     public final String getLevelName(GridRecord gr) {
         // TODO:  flesh this out
         String levelUnit = getLevelUnit(gr);
-        int level1 = (int) gr.getLevel1();
-        int level2 = (int) gr.getLevel2();
-        if (levelUnit.equals("MB")) {
-           return "pressure";
+        int    level1    = (int) gr.getLevel1();
+        int    level2    = (int) gr.getLevel2();
+        int    levelType = gr.getLevelType1();
+        if (((McIDASGridRecord) gr).hasGribInfo()) {
+            return ucar.grib.grib1.GribPDSLevel.getNameShort(levelType);
+        } else if (levelUnit.equalsIgnoreCase("hPa")) {
+            return "pressure";
         } else if (level1 == 1013) {
-           return "mean sea level";
+            return "mean sea level";
         } else if (level1 == 0) {
-           return "tropopause";
+            return "tropopause";
         } else if (level1 == 1001) {
-           return "surface";
+            return "surface";
         } else if (level2 != 0) {
-           return "layer";
+            return "layer";
         }
         return "";
     }
@@ -131,6 +133,10 @@ public final class McIDASLookup implements GridTableLookup {
      */
     public final String getLevelDescription(GridRecord gr) {
         // TODO:  flesh this out
+        if (((McIDASGridRecord) gr).hasGribInfo()) {
+            return ucar.grib.grib1.GribPDSLevel.getNameShort(
+                gr.getLevelType1());
+        }
         return getLevelName(gr);
     }
 
@@ -140,7 +146,10 @@ public final class McIDASLookup implements GridTableLookup {
      * @return LevelUnit
      */
     public final String getLevelUnit(GridRecord gr) {
-        return ((McIDASGridRecord)gr).getLevelUnitName();
+
+
+        return visad.jmet.MetUnits.makeSymbol(
+            ((McIDASGridRecord) gr).getLevelUnitName());
     }
 
     /**
@@ -195,8 +204,26 @@ public final class McIDASLookup implements GridTableLookup {
      */
     public final boolean isVerticalCoordinate(GridRecord gr) {
         int type = gr.getLevelType1();
-        if ((type > GempakUtil.vertCoords.length)
-                || !GempakUtil.vertCoords[type].equals("NONE")) {
+        if (((McIDASGridRecord) gr).hasGribInfo()) {
+            if (type == 20) {
+                return true;
+            }
+            if (type == 100) {
+                return true;
+            }
+            if (type == 101) {
+                return true;
+            }
+            if ((type >= 103) && (type <= 128)) {
+                return true;
+            }
+            if (type == 141) {
+                return true;
+            }
+            if (type == 160) {
+                return true;
+            }
+        } else if (getLevelUnit(gr).equals("hPa")) {
             return true;
         }
         return false;
@@ -209,8 +236,30 @@ public final class McIDASLookup implements GridTableLookup {
      */
     public final boolean isPositiveUp(GridRecord gr) {
         int type = gr.getLevelType1();
-        if ((type == 1) || (type == 5)) {
-            return false;
+        if (((McIDASGridRecord) gr).hasGribInfo()) {
+            if (type == 103) {
+                return true;
+            }
+            if (type == 104) {
+                return true;
+            }
+            if (type == 105) {
+                return true;
+            }
+            if (type == 106) {
+                return true;
+            }
+            if (type == 111) {
+                return true;
+            }
+            if (type == 112) {
+                return true;
+            }
+            if (type == 125) {
+                return true;
+            } else if (getLevelUnit(gr).equals("hPa")) {
+                return false;
+            }
         }
         return true;
     }
@@ -231,7 +280,7 @@ public final class McIDASLookup implements GridTableLookup {
      * @return true if a layer
      */
     public boolean isLayer(GridRecord gr) {
-        if (gr.getLevel2() == -1) {
+        if (gr.getLevel2() == 0) {
             return false;
         }
         return true;

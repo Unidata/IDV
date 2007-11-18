@@ -140,5 +140,17 @@ public class GempakGridServiceProvider extends GridServiceProvider {
             ((GempakGridRecord) gr).gridNumber);
     }
 
+    public static void main(String[] args) throws IOException {
+        IOServiceProvider mciosp = new GempakGridServiceProvider();
+        RandomAccessFile rf = new RandomAccessFile(args[0], "r", 2048);
+        NetcdfFile ncfile = new MakeNetcdfFile(mciosp, rf, args[0], null);
+    }
+
+  static class MakeNetcdfFile extends NetcdfFile {
+        MakeNetcdfFile( IOServiceProvider spi, RandomAccessFile raf,
+                 String location, CancelTask cancelTask ) throws IOException {
+                             super( spi, raf, location, cancelTask );
+        }
+  }
 }
 

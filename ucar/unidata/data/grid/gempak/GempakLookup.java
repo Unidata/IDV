@@ -295,7 +295,7 @@ public final class GempakLookup implements GridTableLookup {
      * @return the name or null if not set
      */
     private String getProjectionName(GridDefRecord gds) {
-        return gds.getParam("Proj");
+        return gds.getParam(gds.PROJ);
     }
 
 }

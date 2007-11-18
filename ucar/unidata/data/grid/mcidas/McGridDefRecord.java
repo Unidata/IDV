@@ -21,11 +21,13 @@
  */
 
 
-
-
 package ucar.unidata.data.grid.mcidas;
 
+
+import edu.wisc.ssec.mcidas.*;
+
 import ucar.unidata.data.grid.gempak.GridDefRecord;
+
 
 /**
  * Class to hold the grid navigation information.
@@ -41,18 +43,27 @@ public class McGridDefRecord extends GridDefRecord {
     /** projection type */
     private String proj;
 
-  /** Navigation type for pseudo-mercator grids */
-  final int PSEUDO_MERCATOR = 1;
-  /** Navigation type for polar stero or lambert conformal conic grids */
-  final int PS_OR_LAMBERT_CONIC = 2;
-  /** Navigation type for equidistant grids */
-  final int EQUIDISTANT = 3;
-  /** Navigation type for pseudo-mercator (general case) grids */
-  final int PSEUDO_MERCATOR_GENERAL = 4;
-  final int NO_NAV = 5;
-  /** Navigation type for lambert conformal tangent grids */
-  final int LAMBERT_CONFORMAL_TANGENT = 6;
-  final double EARTH_RADIUS = 6371.23;
+    /** Navigation type for pseudo-mercator grids */
+    private static final int PSEUDO_MERCATOR = 1;
+
+    /** Navigation type for polar stero or lambert conformal conic grids */
+    private static final int PS_OR_LAMBERT_CONIC = 2;
+
+    /** Navigation type for equidistant grids */
+    private static final int EQUIDISTANT = 3;
+
+    /** Navigation type for pseudo-mercator (general case) grids */
+    private static final int PSEUDO_MERCATOR_GENERAL = 4;
+
+    /** no navigation          */
+    private static final int NO_NAV = 5;
+
+    /** Navigation type for lambert conformal tangent grids */
+    private static final int LAMBERT_CONFORMAL_TANGENT = 6;
+
+    /** Earth radius          */
+    private static final double EARTH_RADIUS = 6371.23;
+
     /**
      * Create a new grid nav block
      */
@@ -74,8 +85,8 @@ public class McGridDefRecord extends GridDefRecord {
      */
     public void setValues(int[] values) {
         vals = values;
-        addParam(GDS_KEY, this.toString());
         setParams();
+        addParam(GDS_KEY, this.toString());
     }
 
     /**
@@ -103,173 +114,198 @@ public class McGridDefRecord extends GridDefRecord {
     }
 
 
-  /* common calculation variables 
-  private int navType;
-  private double xnr;             // number of rows
-  private double xnc;             // number of columns
-  private double xnrow;           // number of rows for calculations
-  private double xncol;           // number of columns for calculations
-  private boolean wierd = false;  // JTYP = 1, navType > 10
-  */
+    /* common calculation variables
+    private int navType;
+    private double xnr;             // number of rows
+    private double xnc;             // number of columns
+    private double xnrow;           // number of rows for calculations
+    private double xncol;           // number of columns for calculations
+    private boolean wierd = false;  // JTYP = 1, navType > 10
+    */
 
-  /* Merc and pseudo_merc parameters 
-  private double glamx;           // max latitude
-  private double glomx;           // max longitude
-  private double ginct;           // grid increment in latitude
-  private double gincn;           // grid increment in longitude
-  */
+    /* Merc and pseudo_merc parameters
+    private double glamx;           // max latitude
+    private double glomx;           // max longitude
+    private double ginct;           // grid increment in latitude
+    private double gincn;           // grid increment in longitude
+    */
 
-  /* PS and CONF projection parameters 
-  private double xrowi;           // row # of North Pole*10000
-  private double xcoli;           // column # of North Pole* 10000
-  private double xqlon;           // longitude parallel to columns
-  private double xspace;          // column spacing at standard latitude
-  private double xh;              // 
-  private double xfac;            //
-  private double xblat;           //
-  */
+    /* PS and CONF projection parameters
+    private double xrowi;           // row # of North Pole*10000
+    private double xcoli;           // column # of North Pole* 10000
+    private double xqlon;           // longitude parallel to columns
+    private double xspace;          // column spacing at standard latitude
+    private double xh;              //
+    private double xfac;            //
+    private double xblat;           //
+    */
 
-  /* Equidistant params 
-  private double xrot;            // rotation angle
-  private double yspace;
-  private double xblon; 
-  */
+    /* Equidistant params
+    private double xrot;            // rotation angle
+    private double yspace;
+    private double xblon;
+    */
 
     /**
      * Set the parameters for the GDS
      */
     private void setParams() {
-     /*
-        String angle1 = String.valueOf(vals[10]);
-        String angle2 = String.valueOf(vals[11]);
-        String angle3 = String.valueOf(vals[12]);
-        String lllat  = String.valueOf(vals[6]);
-        String lllon  = String.valueOf(vals[7]);
-        String urlat  = String.valueOf(vals[8]);
-        String urlon  = String.valueOf(vals[9]);
-        addParam(NX, String.valueOf(vals[4]));
-        addParam(NY, String.valueOf(vals[5]));
-        if (proj.equals("STR")) {
-            addParam(LOV, angle2);
-            addParam(LA1, lllat);
-            addParam(LO1, lllon);
-            addParam(LA2, urlat);
-            addParam(LO2, urlon);
-        } else if (proj.equals("LCC")) {
-            addParam(LATIN1, angle1);
-            addParam(LOV, angle2);
-            addParam(LATIN2, angle3);
-            addParam(LA1, lllat);
-            addParam(LO1, lllon);
-            addParam(LA2, urlat);
-            addParam(LO2, urlon);
+
+        /* PS and CONF projection parameters */
+        double xrowi;   // row # of North Pole*10000
+        double xcoli;   // column # of North Pole* 10000
+        double xqlon;   // longitude parallel to columns
+        double xspace;  // column spacing at standard latitude
+        double xt1;     // standard latitude
+        double xt2;     // 2nd standard latitude
+        double xh;      // 
+        double xfac;    //
+        double xblat;   //
+        /* Merc and pseudo_merc parameters */
+        double glamx;  // max latitude
+        double glomx;  // max longitude
+        double ginct;  // grid increment in latitude
+        double gincn;  // grid increment in longitude
+
+        try {
+            GRIDnav nav      = new GRIDnav(vals);
+
+            int     gridType = vals[33];
+            int     navType  = (int) gridType % 10;
+            addParam("Proj", String.valueOf(navType));
+            boolean wierd = gridType / 10 == 1;
+            int     ny    = vals[1];
+            int     nx    = vals[2];
+            addParam(PROJ, String.valueOf(navType));
+            addParam(NX, String.valueOf(nx));
+            addParam(NY, String.valueOf(ny));
+            double[][] input = new double[2][2];
+            if (nav.isFlippedRowCoordinates()) {
+                input = new double[][] {
+                    { 1, nx }, { 1, ny }
+                };
+            } else {
+                input = new double[][] {
+                    { 1, nx }, { ny, 1 }
+                };
+            }
+            double[][] llur = nav.toLatLon(input);
+            addParam(LA1, String.valueOf(llur[0][0]));
+            addParam(LO1, String.valueOf(llur[1][0]));
+            addParam(LA2, String.valueOf(llur[0][1]));
+            addParam(LO2, String.valueOf(llur[1][1]));
+
+            switch (navType) {
+
+              case PSEUDO_MERCATOR :
+              case PSEUDO_MERCATOR_GENERAL :
+                  glamx = vals[34] / 10000.;
+                  glomx = -vals[35] / 10000.;
+                  ginct = vals[38] / 10000.;
+                  gincn = (navType == PSEUDO_MERCATOR_GENERAL)
+                          ? vals[39] / 10000.
+                          : ginct;
+                  addParam("Latin", String.valueOf(gincn * 10000));
+                  addParam(LA1, String.valueOf(glamx));
+                  addParam(LO1, String.valueOf(glomx));
+                  /*
+                  if (wierd) {
+                    double x = xnr;
+                    xnr = xnc;
+                    xnc = x;
+                  }
+                  */
+                  break;
+
+              case PS_OR_LAMBERT_CONIC :
+                  xrowi = vals[34] / 10000.;  // row # of the North pole*10000
+                  xcoli = vals[35] / 10000.;  // col # of the North pole*10000
+                  xspace = vals[36] / 1000.;  // column spacing at standard lat (m)
+                  xqlon = -vals[37] / 10000.;  // lon parallel to cols (deg*10000)
+                  xt1 = vals[38] / 10000.;  // first standard lat
+                  xt2 = vals[39] / 10000.;  // second standard lat
+                  addParam(LATIN1, String.valueOf(xt1));
+                  addParam(LOV, String.valueOf(xqlon));
+                  addParam(LATIN2, String.valueOf(xt2));
+                  addParam(DX, String.valueOf(xspace));
+                  addParam(DY, String.valueOf(xspace));
+                  /*
+                  xh = (xt1 >= 0) ? 1. : -1.;
+                  xt1 =(90.-xh*xt1)*xrad;
+                  xt2 =(90.-xh*xt2)*xrad;
+                  xfac =1.0;
+                  if (xt1 != xt2)
+                     xfac = (Math.log(Math.sin(xt1))-Math.log(Math.sin(xt2)))/
+                            (Math.log(Math.tan(.5*xt1))-Math.log(Math.tan(.5*xt2)));
+                  xfac = 1.0/xfac;
+                  xblat = 6370. * Math.sin(xt1)/
+                           (xspace*xfac*(Math.pow(Math.tan(xt1*.5),xfac)));
+                  if (wierd) {
+                     double x=xnr;
+                     xnr=xnc;
+                     xnc=x;
+                     x=xcoli;
+                     xcoli=xrowi;
+                     xrowi=xnr-x+1.0;
+                     xqlon=xqlon+90.;
+                  }
+                  */
+
+                  break;
+
+              case EQUIDISTANT :
+                  /*
+                  xrowi = 1.;
+                  xcoli = 1.;
+                  glamx = vals[34]/10000.;       // lat of (1,1) degrees*10000
+                  glomx = -vals[35]/10000.;       // lon of (1,1) degrees*10000
+                  xrot  = -xrad*vals[36]/10000.; // clockwise rotation of col 1
+                  xspace = vals[37]/1000.;       // column spacing
+                  yspace = vals[38]/1000.;       // row spacing
+                  xblat = EARTH_RADIUS*xrad/yspace;
+                  xblon = EARTH_RADIUS*xrad/xspace;
+
+                  if (wierd) {
+                    double x = xnr;
+                    xnr = xnc;
+                    xnc = x;
+                  }
+                  */
+
+                  break;
+
+              case LAMBERT_CONFORMAL_TANGENT :
+                  xrowi  = vals[34] / 10000.;  // lat at (1,1)
+                  xcoli  = vals[35] / 10000.;  // lon at (1,1)
+                  xspace = vals[36];  // column spacing at standard lat (m)
+                  xqlon = -vals[37] / 10000.;  // lon parallel to cols (deg*10000)
+                  xt1 = vals[38] / 10000.;  // standard lat 1
+                  xt2 = vals[39] / 10000.;  // standard lat 2
+                  if ((xt2 == McIDASUtil.MCMISSING) || (xt2 == 0)) {
+                      xt2 = xt1;
+                  }
+                  addParam(LATIN1, String.valueOf(xt1));
+                  addParam(LOV, String.valueOf(xqlon));
+                  addParam(LATIN2, String.valueOf(xt2));
+                  addParam(DX, String.valueOf(xspace));
+                  addParam(DY, String.valueOf(xspace));
+                  /*
+                  xh = (xt1 >= 0) ? 1. : -1.;
+                  xt1 = (90. - xh * xt1) * xrad;
+                  xfac = Math.cos(xt1);
+                  xblat = EARTH_RADIUS * Math.tan(xt1) /
+                             (xspace * Math.pow(Math.tan(xt1*.5), xfac));
+                             */
+
+                  break;
+
+              default :
+                  break;
+            }
+        } catch (McIDASException me) {
+            System.out.println("couldn't set nav");
         }
+
     }
-    */
-    int gridType = vals[33];
-    int navType = (int) gridType%10;
-    addParam("Proj", String.valueOf(navType));
-    boolean wierd = gridType/10 == 1;
-    addParam(NX, String.valueOf(vals[1]));
-    addParam(NY, String.valueOf(vals[2]));
-    switch(navType)
-    {
-      case PSEUDO_MERCATOR:
-      case PSEUDO_MERCATOR_GENERAL:
-        double glamx=vals[34]/10000.;
-        double glomx=vals[35]/10000.;
-        double ginct=vals[38]/10000.;
-        double gincn= 
-          (navType == PSEUDO_MERCATOR_GENERAL) 
-             ? vals[39]/10000. : ginct;
-        addParam("Latin", String.valueOf(gincn*10000));
-        addParam(LA1, String.valueOf(glamx));
-        addParam(LO1, String.valueOf(glomx));
-        /*
-        if (wierd) {
-          double x = xnr;
-          xnr = xnc;
-          xnc = x;
-        }
-        */
-        break;
-      case PS_OR_LAMBERT_CONIC:
-      case LAMBERT_CONFORMAL_TANGENT:
-        double xrowi  = vals[34]/10000.;  // row # of the North pole*10000
-        double xcoli  = vals[35]/10000.;  // col # of the North pole*10000
-        double xspace = vals[36]/1000.;   // column spacing at standard lat (m)
-        double xqlon  = vals[37]/10000.;  // lon parallel to cols (deg*10000)
-        double xt1 = vals[38]/10000.;  // first standard lat
-        double xt2 = xt1;
-        if (navType == PS_OR_LAMBERT_CONIC) {
-           xt2 = vals[39]/10000.;  // second standard lat
-        }
-        addParam(LATIN1, String.valueOf(xt1));
-        addParam(LOV, String.valueOf(xqlon));
-        addParam(LATIN2, String.valueOf(xt2));
-        addParam(DX, String.valueOf(xspace));
-        addParam(DY, String.valueOf(xspace));
-        /*
-        xh = (xt1 >= 0) ? 1. : -1.;
-        xt1 =(90.-xh*xt1)*xrad;
-        xt2 =(90.-xh*xt2)*xrad;
-        xfac =1.0;
-        if (xt1 != xt2) 
-           xfac = (Math.log(Math.sin(xt1))-Math.log(Math.sin(xt2)))/
-                  (Math.log(Math.tan(.5*xt1))-Math.log(Math.tan(.5*xt2)));
-        xfac = 1.0/xfac;
-        xblat = 6370. * Math.sin(xt1)/
-                 (xspace*xfac*(Math.pow(Math.tan(xt1*.5),xfac)));
-        if (wierd) {
-           double x=xnr;
-           xnr=xnc;
-           xnc=x;
-           x=xcoli;
-           xcoli=xrowi;
-           xrowi=xnr-x+1.0;
-           xqlon=xqlon+90.;
-        }
-        */
-
-        break;
-      case EQUIDISTANT:
-        /*
-        xrowi = 1.;
-        xcoli = 1.;
-        glamx = vals[34]/10000.;       // lat of (1,1) degrees*10000
-        glomx = vals[35]/10000.;       // lon of (1,1) degrees*10000
-        xrot  = -xrad*vals[36]/10000.; // clockwise rotation of col 1
-        xspace = vals[37]/1000.;       // column spacing
-        yspace = vals[38]/1000.;       // row spacing
-        xblat = EARTH_RADIUS*xrad/yspace;
-        xblon = EARTH_RADIUS*xrad/xspace;
-
-        if (wierd) {
-          double x = xnr;
-          xnr = xnc;
-          xnc = x;
-        }
-        */
-
-        break;
-        /*
-      case LAMBERT_CONFORMAL_TANGENT:
-        xrowi  = vals[34]/10000.;  // row # of the North pole*10000
-        xcoli  = vals[35]/10000.;  // col # of the North pole*10000
-        xspace = vals[36]/1000.;   // column spacing at standard lat (m)
-        xqlon  = vals[37]/10000.;  // lon parallel to cols (deg*10000)
-        double xtl = vals[38]/10000.; // standard lat
-        xh = (xtl >= 0) ? 1. : -1.;
-        xtl = (90. - xh * xtl) * xrad;
-        xfac = Math.cos(xtl);
-        xblat = EARTH_RADIUS * Math.tan(xtl) / 
-                   (xspace * Math.pow(Math.tan(xtl*.5), xfac));
-
-        break;
-        */
-      default:  
-        break;
-    }
-  }
 }
 

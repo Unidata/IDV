@@ -22,6 +22,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+
 package ucar.unidata.data.grid.mcidas;
 
 
@@ -153,13 +154,21 @@ public class McIDASGridReader {
             }
             try {
 
-                McIDASGridRecord gr = new McIDASGridRecord(entries[i],header);
-                gridIndex.addGridRecord(gr);
-                if (gdsMap.get(gr.getGridDefRecordId()) == null) {
-                    McGridDefRecord mcdef = gr.getGridDefRecord();
-                    System.out.println("new nav " + mcdef.toString());
-                    gdsMap.put(mcdef.toString(), mcdef);
-                    gridIndex.addHorizCoordSys(mcdef);
+                McIDASGridRecord gr = new McIDASGridRecord(entries[i],
+                                          header);
+                if (gr.getGridDefRecordId().equals("McNAV: 6 X:93 Y:65")) {
+                    //if (gr.getGridDefRecordId().equals("McNAV: 6 X:93 Y:65") &&
+                    //    (gr.getParameterName().equals("T") || 
+                    //     gr.getParameterName().equals("RH"))) {
+
+                    gridIndex.addGridRecord(gr);
+                    if (gdsMap.get(gr.getGridDefRecordId()) == null) {
+                        //ucar.unidata.util.Misc.printArray("header ", header);
+                        McGridDefRecord mcdef = gr.getGridDefRecord();
+                        //System.out.println("new nav " + mcdef.toString());
+                        gdsMap.put(mcdef.toString(), mcdef);
+                        gridIndex.addHorizCoordSys(mcdef);
+                    }
                 }
             } catch (McIDASException me) {
                 System.out.println("problem creating grid dir");
@@ -188,49 +197,37 @@ public class McIDASGridReader {
      * @return the data
      */
     public float[] readGrid(McIDASGridRecord gr) {
-        return null;
-    }
 
+        float[] data = null;
+        try {
+            int te   = (gr.getOffsetToHeader() + 64) * 4;
+            int rows = gr.getRows();
+            int cols = gr.getColumns();
+            rf.seek(te);
 
-    // internal method to fetch the 'ent'-th grid
-    /*
-    private void readEntry(int ent) {
-      try {
-        int te = entry[ent] * 4;
-        System.out.println("Entry 0 = "+te);
-        byte[] gridHeader = new byte[256];
-        rf.seek(te);
-        rf.readFully(gridHeader);
-        //gridHeader[32]='m';         // we had to make the units m instead of M
-        McIDASGridDirectory mgd = new McIDASGridDirectory(gridHeader);
-        System.out.println("grid header ="+mgd.toString());
-        CoordinateSystem c = mgd.getCoordinateSystem();
-        int rows = mgd.getRows();
-        int cols = mgd.getColumns();
-        System.out.println("# rows & cols = "+rows+" "+cols);
+            float scale = (float) gr.getParamScale();
 
-        double scale = mgd.getParamScale();
-        //System.out.println("param scale = "+scale+" gridType="+mgd.getGridType());
-
-        double[] data = new double[rows*cols];
-        int n = 0;
-              // store such that 0,0 is in lower left corner...
-        for (int nc=0; nc<cols; nc++) {
-          for (int nr=0; nr<rows; nr++) {
-           int temp = rf.readInt();           // check for missing value
-           data[(rows-nr-1)*cols + nc] =
-             (temp == McIDASUtil.MCMISSING)
-               ? Double.NaN
-               : ( (double) temp) / scale ;
-          }
+            data = new float[rows * cols];
+            rf.order(needToSwap
+                     ? rf.LITTLE_ENDIAN
+                     : rf.BIG_ENDIAN);
+            int n = 0;
+            // store such that 0,0 is in lower left corner...
+            for (int nc = 0; nc < cols; nc++) {
+                for (int nr = 0; nr < rows; nr++) {
+                    int temp = rf.readInt();  // check for missing value
+                    data[(rows - nr - 1) * cols + nc] = (temp
+                            == McIDASUtil.MCMISSING)
+                            ? Float.NaN
+                            : ((float) temp) / scale;
+                }
+            }
+            rf.order(rf.BIG_ENDIAN);
+        } catch (Exception esc) {
+            System.out.println(esc);
         }
-        gridH = new ArrayList();
-        gridD = new ArrayList();
-        gridH.add(mgd);
-        gridD.add(data);
-      } catch (Exception esc) {System.out.println(esc);}
+        return data;
     }
-    */
 
     /**
      * to get the grid header corresponding to the last grid read
@@ -277,9 +274,9 @@ public class McIDASGridReader {
         if (args.length > 0) {
             file = args[0];
         }
-        McIDASGridReader mg = new McIDASGridReader(file);
-        GridIndex gridIndex = mg.getGridIndex();
-        List grids = gridIndex.getGridRecords();
+        McIDASGridReader mg        = new McIDASGridReader(file);
+        GridIndex        gridIndex = mg.getGridIndex();
+        List             grids     = gridIndex.getGridRecords();
         System.out.println("found " + grids.size() + " grids");
         int num = Math.min(grids.size(), 10);
         for (int i = 0; i < num; i++) {
