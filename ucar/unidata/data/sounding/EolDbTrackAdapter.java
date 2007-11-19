@@ -353,6 +353,9 @@ public class EolDbTrackAdapter extends TrackAdapter {
         if (getConnection() == null) {
             return false;
         }
+        //jdbc:postgresql://eol-rt-data.guest.ucar.edu/real-time
+        //        evaluate("CREATE RULE update AS ON UPDATE TO global_attributes DO NOTIFY current;");
+
         Statement         stmt;
         ResultSet         results;
         SqlUtils.Iterator iter;
@@ -430,14 +433,10 @@ public class EolDbTrackAdapter extends TrackAdapter {
             while (results.next()) {
                 String name    = results.getString(COL_NAME).trim();
                 String desc    = results.getString(COL_LONG_NAME).trim();
-                String unit    = results.getString(COL_UNITS).trim();
-                double missing = results.getDouble(COL_MISSING_VALUE);
-                missingMap.put(name, new Double(missing));
+                Unit   unit    = DataUtil.parseUnit(results.getString(COL_UNITS).trim());
                 String  cat      = (String) cats.get(name);
-                VarInfo variable = new VarInfo(name, desc, unit);
-                if (cat != null) {
-                    variable.setCategory(cat);
-                }
+                double missing = results.getDouble(COL_MISSING_VALUE);
+                VarInfo variable = new VarInfo(name, desc, cat, unit, missing);
                 trackInfo.addVariable(variable);
             }
         }
@@ -578,9 +577,12 @@ public class EolDbTrackAdapter extends TrackAdapter {
          */
         protected float[] getFloatData(Range range, String var)
                 throws Exception {
+            long t1 = System.currentTimeMillis();
             float[] f = SqlUtils.readFloat(select("(" + var + ")",
                             TABLE_DATA, "order by " + varTime), 1,
                                 (float) getMissingValue(var));
+            long t2 = System.currentTimeMillis();
+            //            System.err.println("length:" + f.length + " time:" + (t2-t1));
             if (f.length == 0) {
                 throw new BadDataException(
                     "No observations found in data base");

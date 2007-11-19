@@ -90,13 +90,30 @@ public class SqlUtils {
         return actual;
     }
 
+    public static  String[] readString(Statement stmt, String columnName)
+        throws Exception {
+        return readString(stmt,-1,columnName);
+    }
+
+
+
     public static  String[] readString(Statement stmt, int column)
+        throws Exception {
+            return readString(stmt,column,null);
+    }
+
+
+    private static  String[] readString(Statement stmt, int column,String name)
         throws Exception {
         String [] current = new String[100000];
         int cnt = 0;
         ResultSet results;
         Iterator iter = getIterator(stmt);
         while((results = iter.next())!=null) {
+            if(name!=null) {
+                column = results.findColumn(name);
+                name = null;
+            }
             while(results.next()) {
                 current[cnt++] = results.getString(column);
                 if(cnt>= current.length) {

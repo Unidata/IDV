@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.sounding;
 
 
@@ -161,7 +162,7 @@ public class TrackDataSource extends FilesDataSource {
     private int lastNMinutes = -1;
 
 
-    /** _more_          */
+    /** _more_ */
     private boolean usingDataBase = false;
 
 
@@ -178,7 +179,7 @@ public class TrackDataSource extends FilesDataSource {
     /** widget for properties dialog */
     private boolean haveAskedToSubset = false;
 
-    /** _more_          */
+    /** _more_ */
     private SqlShell sqlShell;
 
     /** Default Constructor */
@@ -218,6 +219,18 @@ public class TrackDataSource extends FilesDataSource {
         super(descriptor, sources, "", "Track Files", properties);
     }
 
+
+
+    /**
+     * _more_
+     */
+    public void doRemove() {
+        super.doRemove();
+        if (sqlShell != null) {
+            sqlShell.close();
+
+        }
+    }
 
 
     /**

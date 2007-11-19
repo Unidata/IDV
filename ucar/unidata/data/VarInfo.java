@@ -86,7 +86,7 @@ public class VarInfo {
     /** The real type to use */
     private RealType realType;
 
-
+    private double missingValue;
 
 
     /**
@@ -110,6 +110,20 @@ public class VarInfo {
      * @param unit unit
      */
     public VarInfo(String name, String desc, String category, Unit unit) {
+        this(name,desc,category, unit, Double.NaN);
+    }
+
+
+    /**
+     * ctor
+     *
+     * @param name name
+     * @param desc desc
+     * @param category _more_
+     * @param unit unit
+     */
+
+    public VarInfo(String name, String desc, String category, Unit unit,double missingValue) {
         this.name        = name;
         this.description = desc;
         this.category    = category;
@@ -118,6 +132,7 @@ public class VarInfo {
             this.description = name;
         }
         this.unit = unit;
+        this.missingValue = missingValue;
         realType  = DataUtil.makeRealType(getShortName(), unit);
         if (realType == null) {
             System.out.println("can't create realtype for " + getShortName()
@@ -156,6 +171,39 @@ public class VarInfo {
     public VarInfo(String name, String desc, String units) {
         this(name, desc, DataUtil.parseUnit(units));
     }
+
+    /**
+     * Utility to find the variable with the given name
+     *
+     * @param variableName The name
+     *
+     * @return The variable.
+     */
+
+    public static VarInfo getVarInfo(String variableName, List<VarInfo> variables) {
+        //Jump through some hoops for legacy bundles
+        String[] vars = { variableName, variableName.toLowerCase() };
+        for (int dummyIdx = 0; dummyIdx < vars.length; dummyIdx++) {
+            for (int varIdx = 0; varIdx < variables.size(); varIdx++) {
+                VarInfo theVar = (VarInfo) variables.get(varIdx);
+                if (vars[dummyIdx].equals(theVar.getName())) {
+                    return theVar;
+                }
+            }
+
+            for (int varIdx = 0; varIdx < variables.size(); varIdx++) {
+                VarInfo theVar = (VarInfo) variables.get(varIdx);
+                if (vars[dummyIdx].equals(theVar.getDescription())) {
+                    return theVar;
+                }
+            }
+        }
+
+        throw new IllegalArgumentException("Unknown variable: "
+                                           + variableName);
+    }
+
+
 
     /**
      * get the name
@@ -272,6 +320,23 @@ public class VarInfo {
     }
 
 
+/**
+Set the MissingValue property.
+
+@param value The new value for MissingValue
+**/
+public void setMissingValue (double value) {
+        missingValue = value;
+}
+
+/**
+Get the MissingValue property.
+
+@return The MissingValue
+**/
+public double getMissingValue () {
+        return missingValue;
+}
 
 
 }

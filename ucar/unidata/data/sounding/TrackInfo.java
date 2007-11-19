@@ -855,7 +855,7 @@ public abstract class TrackInfo {
             unit   = getTimeUnit();
             dvalue = getTime(range);
         } else {
-            VarInfo var = getDataVariable(variableName);
+            VarInfo var = VarInfo.getVarInfo(variableName, variables);
             unit  = var.getUnit();
             value = getFloatData(range, var.getShortName());
         }
