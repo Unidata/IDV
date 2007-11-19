@@ -32,7 +32,7 @@ import java.util.HashMap;
  * Class to represent the grid definition (projection) information
  * purpose is to convert from String representation to native value.
  */
-public class GridDefRecord {
+public abstract class GridDefRecord {
 
     /** A class to hold grid parameter definitions */
     private HashMap params = new HashMap();
@@ -139,6 +139,13 @@ public class GridDefRecord {
     public final String getParam(String key) {
         return (String) params.get(key.trim());
     }
+
+    /**
+     * Get a short name for this GDSKey for the netCDF group.  
+     * Subclasses should implement as a short description
+     * @return short name
+     */
+    public abstract String getGroupName();
 
     /**
      * adds a param and value.

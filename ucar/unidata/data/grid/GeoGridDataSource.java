@@ -21,9 +21,6 @@
  */
 
 
-
-
-
 package ucar.unidata.data.grid;
 
 
@@ -36,7 +33,7 @@ import ucar.ma2.Array;
 import ucar.ma2.InvalidRangeException;
 
 import ucar.nc2.Attribute;
-
+import ucar.nc2.Group;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 
@@ -1610,6 +1607,28 @@ public class GeoGridDataSource extends GridDataSource {
                     newCategories.add(categories.get(i));
                 }
                 categories = newCategories;
+            }
+
+            // see if we have any categorization
+            Group group = null;
+            VariableEnhanced variable = cfield.getVariable();
+            if (variable != null) {
+                group = variable.getParentGroup();
+              if (group != null && !group.equals("")) {
+                String append = group.getName();
+                if (append != null) {
+                    append = append.replaceAll("/", "");
+                    append = append.replaceAll(DataCategory.DIVIDER, "_");
+                }
+                DataCategory cat = (DataCategory) categories.get(0);
+                cat = cat.copyAndAppend(append);
+                List newCategories = new ArrayList();
+                newCategories.add(cat);
+                for (int i = 1; i < categories.size(); i++) {
+                    newCategories.add(categories.get(i));
+                }
+                categories = newCategories;
+              }
             }
 
 

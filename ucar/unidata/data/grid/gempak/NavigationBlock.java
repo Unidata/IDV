@@ -324,5 +324,21 @@ public class NavigationBlock extends GridDefRecord {
             addParam(LO2, urlon);
         }
     }
+
+    /**
+     * Get a short name for this GDSKey for the netCDF group.  
+     * Subclasses should implement as a short description
+     * @return short name
+     */
+    public String getGroupName() {
+       StringBuffer buf = new StringBuffer();
+       buf.append(proj);
+       buf.append("_");
+       buf.append(getParam(NX));
+       buf.append("x");
+       buf.append(getParam(NY));
+       return buf.toString();
+    }
+
 }
 

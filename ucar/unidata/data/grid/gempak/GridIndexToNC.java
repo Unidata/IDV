@@ -145,7 +145,8 @@ public class GridIndexToNC {
 
             Group         g        = null;
             if (needGroups) {
-                g = new Group(ncfile, null, "proj" + i);
+                //g = new Group(ncfile, null, "proj" + i);
+                g = new Group(ncfile, null, gdsIndex.getGroupName());
                 ncfile.addGroup(null, g);
             }
 
