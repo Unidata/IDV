@@ -186,7 +186,9 @@ public class McIDASGridReader {
     private void swapGridHeader(int[] gh) {
         McIDASUtil.flip(gh, 0, 5);
         McIDASUtil.flip(gh, 7, 7);
-        McIDASUtil.flip(gh, 9, 51);
+        McIDASUtil.flip(gh, 9, 10);
+        McIDASUtil.flip(gh, 12, 14);
+        McIDASUtil.flip(gh, 32, 51);
     }
 
     /**

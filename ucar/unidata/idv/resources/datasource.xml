@@ -76,7 +76,7 @@
   <datasource
      id="NetCDF.Grid,HTTPServer.Grid,File.Grid"
      factory="ucar.unidata.data.grid.GeoGridDataSource"
-     patterns="\.nc$,\.cdf$,.*netCDF.*,\.ncml$,\.wmo$,\.WMO$,\.grb$,\.grib$,\.gr2,\.grib1$,\.grib2$,\.gem$,\.grd"
+     patterns="\.nc$,\.cdf$,.*netCDF.*,\.ncml$,\.wmo$,\.WMO$,\.grb$,\.grib$,\.gr2,\.grib1$,\.grib2$,\.gem$,\.grd,GRID....$"
      fileselection="true"
      doesmultiples="false"
      label="Grid files (netCDF/GRIB/OPeNDAP/GEMPAK)">
