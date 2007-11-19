@@ -211,7 +211,22 @@ public class NavigationBlock extends GridDefRecord {
     }
 
     /**
-     * Set the parameters for the GDS
+     * Set the parameters for the GDS.
+     * TODO Add the following:
+     *     The following simple map projections may be specified:
+     *
+     *       NOR     North Orthographic
+     *       SOR     South Orthographic
+     *       MER     (CYL)   Mercator
+     *       CED     (CYL)   Cylindrical Equidistant
+     *       MCD     (CYL)   Modified Cylindrical Equidistant
+     *       STR     (AZM)   Polar Stereographic
+     *       AED     (AZM)   Azimuthal Equidistant
+     *       ORT     (AZM)   Orthographic
+     *       LEA     (AZM)   Lambert equal area
+     *       GNO     (AZM)   Gnomonic
+     * </TODO>
+     *
      *     In addition for full map projections, three angles MUST be specified
      *     in PROJ.  The angles have the following meanings for the different
      *     projection classes:
@@ -275,18 +290,36 @@ public class NavigationBlock extends GridDefRecord {
         String urlon  = String.valueOf(vals[9]);
         addParam(NX, String.valueOf(vals[4]));
         addParam(NY, String.valueOf(vals[5]));
-        if (proj.equals("STR")) {
+        if (proj.equals("STR") ||
+            proj.equals("NPS") ||
+            proj.equals("SPS")
+            ) {
             addParam(LOV, angle2);
             addParam(LA1, lllat);
             addParam(LO1, lllon);
             addParam(LA2, urlat);
             addParam(LO2, urlon);
-        } else if (proj.equals("LCC")) {
-            addParam(LATIN1, angle1);
+            // TODO:  better to just set pole?
+            if (proj.equals("SPS")) {
+                addParam("NpProj", "false");
+            }
+        } else if (proj.equals("LCC") ||
+                   proj.equals("SCC")) {
+            addParam("Latin", angle1);
             addParam(LOV, angle2);
             addParam(LATIN2, angle3);
             addParam(LA1, lllat);
             addParam(LO1, lllon);
+            addParam(LA2, urlat);
+            addParam(LO2, urlon);
+        // TODO: test this
+        } else if (proj.equals("MER") ||
+                   proj.equals("CED") ||
+                   proj.equals("MCD")
+            ) {
+            addParam(LOV, angle3);
+            addParam(LA1, angle1);
+            addParam(LO1, angle2);
             addParam(LA2, urlat);
             addParam(LO2, urlon);
         }
