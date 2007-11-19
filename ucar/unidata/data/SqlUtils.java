@@ -41,19 +41,24 @@ public class SqlUtils {
         return "SELECT " + what + " FROM " + where + " " + extra +";";
     }
 
-    public static  double[] readTime(ResultSet results, int column) throws Exception {
+    public static  double[] readTime(Statement stmt, int column) throws Exception {
+        ResultSet results;
         double [] current = new double[100000];
         int cnt = 0;
-        while(results.next()) {
-            Date dttm = results.getDate(column);
-            double value =dttm.getTime();
-            current[cnt++] =value;
-            if(cnt>= current.length) {
-                double[] tmp = current;
-                current = new double[current.length*2];
-                System.arraycopy(tmp, 0, current, 0, tmp.length);
+        Iterator iter = getIterator(stmt);
+        while((results = iter.next())!=null) {
+            while(results.next()) {
+                Date dttm = results.getDate(column);
+                double value =dttm.getTime();
+                current[cnt++] =value;
+                if(cnt>= current.length) {
+                    double[] tmp = current;
+                    current = new double[current.length*2];
+                    System.arraycopy(tmp, 0, current, 0, tmp.length);
+                }
             }
         }
+
         double[] actual = new double[cnt];
         System.arraycopy(current, 0, actual, 0, cnt);
         return actual;
@@ -62,18 +67,22 @@ public class SqlUtils {
     }
 
 
-    public static  float[] readFloat(ResultSet results, int column, float missing)
+    public static  float[] readFloat(Statement stmt, int column, float missing)
         throws Exception {
         float [] current = new float[100000];
         int cnt = 0;
-        while(results.next()) {
-            float value =results.getFloat(column);
-            if(value == missing) value = Float.NaN;
-            current[cnt++] = value;
-            if(cnt>= current.length) {
-                float[] tmp = current;
-                current = new float[current.length*2];
-                System.arraycopy(tmp, 0, current, 0, tmp.length);
+        ResultSet results;
+        Iterator iter = getIterator(stmt);
+        while((results = iter.next())!=null) {
+            while(results.next()) {
+                float value =results.getFloat(column);
+                if(value == missing) value = Float.NaN;
+                current[cnt++] = value;
+                if(cnt>= current.length) {
+                    float[] tmp = current;
+                    current = new float[current.length*2];
+                    System.arraycopy(tmp, 0, current, 0, tmp.length);
+                }
             }
         }
         float[] actual = new float[cnt];
@@ -81,16 +90,20 @@ public class SqlUtils {
         return actual;
     }
 
-    public static  String[] readString(ResultSet results, int column)
+    public static  String[] readString(Statement stmt, int column)
         throws Exception {
         String [] current = new String[100000];
         int cnt = 0;
-        while(results.next()) {
-            current[cnt++] = results.getString(column);
-            if(cnt>= current.length) {
-                String[] tmp = current;
-                current = new String[current.length*2];
-                System.arraycopy(tmp, 0, current, 0, tmp.length);
+        ResultSet results;
+        Iterator iter = getIterator(stmt);
+        while((results = iter.next())!=null) {
+            while(results.next()) {
+                current[cnt++] = results.getString(column);
+                if(cnt>= current.length) {
+                    String[] tmp = current;
+                    current = new String[current.length*2];
+                    System.arraycopy(tmp, 0, current, 0, tmp.length);
+                }
             }
         }
         String[] actual = new String[cnt];
@@ -99,18 +112,22 @@ public class SqlUtils {
     }
 
 
-    public static double[] readDouble(ResultSet results, int column, double missing)
+    public static double[] readDouble(Statement stmt, int column, double missing)
         throws Exception {
         double [] current = new double[100000];
         int cnt = 0;
-        while(results.next()) {
-            double value =results.getDouble(column);
-            if(value == missing) value = Double.NaN;
-            current[cnt++] =value;
-            if(cnt>= current.length) {
-                double[] tmp = current;
-                current = new double[current.length*2];
-                System.arraycopy(tmp, 0, current, 0, tmp.length);
+        ResultSet results;
+        Iterator iter = getIterator(stmt);
+        while((results = iter.next())!=null) {
+            while(results.next()) {
+                double value =results.getDouble(column);
+                if(value == missing) value = Double.NaN;
+                current[cnt++] =value;
+                if(cnt>= current.length) {
+                    double[] tmp = current;
+                    current = new double[current.length*2];
+                    System.arraycopy(tmp, 0, current, 0, tmp.length);
+                }
             }
         }
         double[] actual = new double[cnt];
@@ -118,17 +135,21 @@ public class SqlUtils {
         return actual;
     }
 
-    public static Date[] readDate(ResultSet results, int column)
+    public static Date[] readDate(Statement stmt, int column)
         throws Exception {
         Date [] current = new Date[100000];
         int cnt = 0;
-        while(results.next()) {
-            Date value =results.getDate(column);
-            current[cnt++] =value;
-            if(cnt>= current.length) {
-                Date[] tmp = current;
-                current = new Date[current.length*2];
-                System.arraycopy(tmp, 0, current, 0, tmp.length);
+        ResultSet results;
+        Iterator iter = getIterator(stmt);
+        while((results = iter.next())!=null) {
+            while(results.next()) {
+                Date value =results.getDate(column);
+                current[cnt++] =value;
+                if(cnt>= current.length) {
+                    Date[] tmp = current;
+                    current = new Date[current.length*2];
+                    System.arraycopy(tmp, 0, current, 0, tmp.length);
+                }
             }
         }
         Date[] actual = new Date[cnt];
@@ -137,6 +158,25 @@ public class SqlUtils {
     }
 
 
+    public static Iterator getIterator(Statement stmt) {
+        return new Iterator(stmt);
+    }
+
+
+    public static class Iterator {
+        Statement stmt;
+        int cnt =0;
+        public Iterator(Statement stmt) {
+            this.stmt = stmt;
+        }
+        public ResultSet next() throws SQLException {
+            if(cnt != 0) {
+                stmt.getMoreResults();        
+            }
+            cnt++;
+            return stmt.getResultSet();
+        }
+    }
 
 
 }

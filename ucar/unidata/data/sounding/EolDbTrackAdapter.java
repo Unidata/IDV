@@ -34,7 +34,9 @@ import ucar.unidata.data.*;
 import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
 
+
 import ucar.unidata.ui.TwoListPanel;
+import ucar.unidata.ui.SqlShell;
 
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
@@ -72,7 +74,6 @@ import java.util.Date;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -123,6 +124,9 @@ public class EolDbTrackAdapter extends TrackAdapter {
 
     private Hashtable          missingMap;
 
+
+
+
     public EolDbTrackAdapter(TrackDataSource dataSource,String filename, Hashtable pointDataFilter,
                              int stride, int lastNMinutes)
         throws Exception {
@@ -131,6 +135,17 @@ public class EolDbTrackAdapter extends TrackAdapter {
         if(!initConnection()) dataSource.setInError(true, false, "");        
     }
 
+
+
+
+
+    protected void addActions(List actions) {
+        AbstractAction a =  new AbstractAction("Show Sql Shell") {
+            public void actionPerformed(ActionEvent ae) {
+                dataSource.showSqlShell();
+            }};
+        actions.add(a);
+    }
 
 
     public String getDataSourceName() {
@@ -142,7 +157,7 @@ public class EolDbTrackAdapter extends TrackAdapter {
         return description;
     }
 
-    private Connection getConnection() {
+    public Connection getConnection() {
         if(connection != null) {
             return connection;
         }
@@ -190,66 +205,74 @@ public class EolDbTrackAdapter extends TrackAdapter {
         }
     }
 
-
-
-    private ResultSet select(String what, String where, String extra) throws SQLException {
+    private Statement select(String what, String where, String extra) throws SQLException {
         return evaluate(SqlUtils.makeSelect(what,where,extra));
     }
 
-    private ResultSet select(String what, String where) throws SQLException {
+    private Statement select(String what, String where) throws SQLException {
         return evaluate(SqlUtils.makeSelect(what,where));
     }
 
-    private ResultSet evaluate(String sql) throws SQLException {
+    private Statement evaluate(String sql) throws SQLException {
         System.err.println ("EVAL: " + sql);
         Statement stmt = getConnection().createStatement();
-        return  stmt.executeQuery(sql);
+        stmt.execute(sql);
+        return stmt;
     }
 
     private boolean initConnection() throws Exception {
         if(getConnection()==null) return false;
+        Statement stmt;
+        ResultSet results;
+        SqlUtils.Iterator iter;
         EolDbTrackInfo trackInfo = new EolDbTrackInfo(this, "TRACK");
         Hashtable cats = new Hashtable();
         try {
-            ResultSet catResults  = select("*", TABLE_CATEGORIES);
-            while(catResults.next()) {
-                cats.put(catResults.getString(COL_VARIABLE),
-                         catResults.getString(COL_CATEGORY));
+            stmt  = select("*", TABLE_CATEGORIES);
+            iter = SqlUtils.getIterator(stmt);
+            while((results = iter.next())!=null) {
+                while(results.next()) {
+                    cats.put(results.getString(COL_VARIABLE),
+                             results.getString(COL_CATEGORY));
+                }
             }
         } catch(Exception exc) {
             //                exc.printStackTrace();
         }
 
         missingMap = new Hashtable();
-        ResultSet globalResults  = select("*", TABLE_GLOBALS);
+        stmt  = select("*", TABLE_GLOBALS);
         globals = new Hashtable();
         boolean gotCoords = false;
         description = "<b>Globals</b><br>";
-        while(globalResults.next()) {
-            String globalName = globalResults.getString(1).trim();            
-            String globalValue = globalResults.getString(2).trim();
-            globals.put(globalName,globalValue);
-            description = description +"<tr valign=\"top\"><td>"+globalName+"</td><td>" + globalValue +"</td></tr>";
+        iter = SqlUtils.getIterator(stmt);
+        while((results = iter.next())!=null) {
+            while(results.next()) {
+                String globalName = results.getString(1).trim();            
+                String globalValue = results.getString(2).trim();
+                globals.put(globalName,globalValue);
+                description = description +"<tr valign=\"top\"><td>"+globalName+"</td><td>" + globalValue +"</td></tr>";
 
-            //            System.err.println(globalName +"=" + globalValue);
+                //            System.err.println(globalName +"=" + globalValue);
 
-            if(globalName.equals(GLOBAL_STARTTIME)) {
-                startTime = new DateTime(DateUtil.parse(globalValue));
-            } else    if(globalName.equals(GLOBAL_ENDTIME)) {
-                endTime = new DateTime(DateUtil.parse(globalValue));
-            } else  if(globalName.equals(GLOBAL_COORDINATES)) {
-                List toks = StringUtil.split(globalValue, " ", true, true);
-                if(toks.size()!=4) {
-                    throw new BadDataException ("Incorrect coordinates value in database:" +  globalValue);
+                if(globalName.equals(GLOBAL_STARTTIME)) {
+                    startTime = new DateTime(DateUtil.parse(globalValue));
+                } else    if(globalName.equals(GLOBAL_ENDTIME)) {
+                    endTime = new DateTime(DateUtil.parse(globalValue));
+                } else  if(globalName.equals(GLOBAL_COORDINATES)) {
+                    List toks = StringUtil.split(globalValue, " ", true, true);
+                    if(toks.size()!=4) {
+                        throw new BadDataException ("Incorrect coordinates value in database:" +  globalValue);
+                    }
+                    gotCoords = true;
+                    System.err.println("coords:" + toks);
+                    trackInfo.setCoordinateVars((String) toks.get(0),
+                                                (String) toks.get(1),
+                                                (String) toks.get(2),
+                                                (String) toks.get(3));
+
+                    trackInfo.setCoordinateVars("GGLON","GGLAT","GGALT","datetime");
                 }
-                gotCoords = true;
-                System.err.println("coords:" + toks);
-                trackInfo.setCoordinateVars((String) toks.get(0),
-                                            (String) toks.get(1),
-                                            (String) toks.get(2),
-                                            (String) toks.get(3));
-
-                trackInfo.setCoordinateVars("GGLON","GGLAT","GGALT","datetime");
             }
         }
         description = description+"</table>";
@@ -264,8 +287,10 @@ public class EolDbTrackAdapter extends TrackAdapter {
             this.name += " - " + flight;
         }
 
-        ResultSet results  = select("*",TABLE_VARIABLE_LIST);
-        while(results.next()) {
+        stmt = select("*",TABLE_VARIABLE_LIST);
+        iter = SqlUtils.getIterator(stmt);
+        while((results = iter.next())!=null) {
+            while(results.next()) {
             String name = results.getString(COL_NAME).trim();
             String desc = results.getString(COL_LONG_NAME).trim();
             String unit  = results.getString(COL_UNITS).trim();            
@@ -277,6 +302,7 @@ public class EolDbTrackAdapter extends TrackAdapter {
                 variable.setCategory(cat);
             }
             trackInfo.addVariable(variable);
+            }
         }
         addTrackInfo(trackInfo);
         return true;
@@ -299,15 +325,20 @@ public class EolDbTrackAdapter extends TrackAdapter {
         public int getNumberPoints() 
             throws Exception {
             if(numberOfPoints<0) {
-                ResultSet results  = select("COUNT(" + varTime +")",  TABLE_DATA);
+                Statement stmt = select("COUNT(" + varTime +")",  TABLE_DATA);
+                ResultSet results;
                 int cnt = 0;
-                while(results.next()) {
-                    cnt++;
+                SqlUtils.Iterator iter = SqlUtils.getIterator(stmt);
+                while((results = iter.next())!=null) {
+                    while(results.next()) {
+                        cnt++;
+                    }
                 }
                 numberOfPoints= cnt;
             } 
             return numberOfPoints;
         }
+
 
         public DateTime getStartTime() {
             return EolDbTrackAdapter.this.getStartTime();

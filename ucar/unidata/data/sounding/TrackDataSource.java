@@ -40,6 +40,7 @@ import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
 
 import ucar.unidata.ui.TwoListPanel;
+import ucar.unidata.ui.SqlShell;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
@@ -175,6 +176,7 @@ public class TrackDataSource extends FilesDataSource {
     /** widget for properties dialog */
     private boolean haveAskedToSubset = false;
 
+    private SqlShell  sqlShell;
 
     /** Default Constructor */
     public TrackDataSource() {}
@@ -213,6 +215,23 @@ public class TrackDataSource extends FilesDataSource {
         super(descriptor, sources, "", "Track Files", properties);
     }
 
+
+
+    protected void addActions(List actions) {
+        super.addActions(actions);
+        if(traceAdapter!=null) {
+            traceAdapter.addActions(actions);
+        }
+    }
+
+
+
+    public void showSqlShell() {
+        if(sqlShell == null) {
+            sqlShell = new SqlShell("Sql Shell - " + getName(), ((EolDbTrackAdapter)traceAdapter).getConnection());
+        }
+        sqlShell.show();
+    }
 
 
     protected void initAfter() {

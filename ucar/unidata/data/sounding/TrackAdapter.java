@@ -41,6 +41,7 @@ import ucar.unidata.util.JobManager;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
 
+
 import ucar.visad.UtcDate;
 
 import ucar.visad.Util;
@@ -153,6 +154,12 @@ public abstract class TrackAdapter {
         this.pointDataFilter = pointDataFilter;
     }
 
+
+
+
+
+    protected void addActions(List actions) {
+    }
 
     /**
      * Add the track info to the list
