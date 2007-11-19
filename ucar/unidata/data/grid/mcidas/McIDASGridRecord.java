@@ -45,17 +45,11 @@ public class McIDASGridRecord extends GridDirectory implements GridRecord {
     /** offset to header */
     private int offsetToHeader;  // offset to header
 
-    /** reference time as a Date */
-    private Date refTime;
-
-    /** valid time offset in ninutes */
-    private int validOffset;
-
-    /** actual valid time */
-    private Date validTime;
-
     /** grid definition */
     private McGridDefRecord gridDefRecord;
+
+    /** decimal scale */
+    private int decimalScale = 0;
 
     /**
      * Create a grid header from the integer bits
@@ -130,6 +124,15 @@ public class McIDASGridRecord extends GridDirectory implements GridRecord {
      */
     public String getParameterName() {
         return getParamName();
+    }
+
+    /**
+     * Get the decimal scale
+     *
+     * @return decimal scale
+     */
+    public int getDecimalScale() {
+        return decimalScale;
     }
 
     /**

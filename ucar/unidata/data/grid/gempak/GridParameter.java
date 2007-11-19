@@ -33,7 +33,7 @@ import ucar.unidata.util.StringUtil;
  * and Units( ie K ).
  */
 
-public final class GridParameter {
+public class GridParameter {
 
     /**
      * parameter number.

@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.grid.gempak;
 
 
@@ -74,6 +75,9 @@ public class GempakGridRecord implements GridRecord {
     /** valid time offset in ninutes */
     private int validOffset;
 
+    /** decimal scale */
+    private int decimalScale = 0;
+
     /** actual valid time */
     private Date validTime;
 
@@ -114,6 +118,10 @@ public class GempakGridRecord implements GridRecord {
         calendar.setTime(refTime);
         calendar.add(Calendar.MINUTE, validOffset);
         validTime = calendar.getTime();
+        GempakGridParameter ggp = GempakParameterTable.getParameter(param);
+        if (ggp != null) {
+            decimalScale = ggp.getDecimalScale();
+        }
     }
 
     /**
@@ -195,6 +203,24 @@ public class GempakGridRecord implements GridRecord {
      */
     public String getGridDefRecordId() {
         return navBlock.toString();
+    }
+
+    /**
+     * Get the grid number
+     *
+     * @return grid number
+     */
+    public int getGridNumber() {
+        return gridNumber;
+    }
+
+    /**
+     * Get the decimal scale
+     *
+     * @return decimal scale
+     */
+    public int getDecimalScale() {
+        return decimalScale;
     }
 
     /**

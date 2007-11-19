@@ -233,7 +233,7 @@ public class GempakGridReader extends GempakFileReader {
         GempakGridRecord gh = ggr.findGrid(var);
         if (gh != null) {
             System.out.println("\n"+gh);
-            float[] data = ggr.readGrid(gh.gridNumber);
+            float[] data = ggr.readGrid(gh);
             if (data != null) {
             System.out.println("# of points = " + data.length);
             int   cnt = 0;
@@ -360,7 +360,8 @@ public class GempakGridReader extends GempakFileReader {
      *
      * @throws IOException problem reading file
      */
-    public float[] readGrid(int gridNumber) throws IOException {
+    public float[] readGrid(GridRecord gr) throws IOException {
+        int gridNumber = ((GempakGridRecord)gr).getGridNumber();
         float[] data = null;
         // See DM_RDTR
         int irow = 1;  // Always 1 for grids
@@ -456,8 +457,9 @@ public class GempakGridReader extends GempakFileReader {
         if (irw == 3) {
             difmin = rarray[2];
         }
+        int decimalScale = gr.getDecimalScale();
         data = unpackData(iiword, lendat, ipktyp, kxky, nbits, ref, scale,
-                          miss, difmin, kx);
+                          miss, difmin, kx, decimalScale);
         return data;
     }
 
@@ -474,6 +476,7 @@ public class GempakGridReader extends GempakFileReader {
      * @param miss           Missing data flag
      * @param difmin         Minimum value of differences
      * @param kx             Number of points in x direction
+     * @param decimalScale   scale of the values
      *
      * @return   unpacked data
      *
@@ -483,11 +486,11 @@ public class GempakGridReader extends GempakFileReader {
                                             int ipktyp, int kxky, int nbits,
                                             float ref, float scale,
                                             boolean miss, float difmin,
-                                            int kx)
+                                            int kx, int decimalScale)
             throws IOException {
         if (ipktyp == MDGGRB) {
             return unpackGrib1Data(iiword, nword, kxky, nbits, ref, scale,
-                                    miss);
+                                    miss, decimalScale);
             //return unpackGrib1DataG(iiword, nword, kxky, nbits, ref, scale, miss);
         } else if (ipktyp == MDGNMC) {
             return null;
@@ -579,14 +582,16 @@ public class GempakGridReader extends GempakFileReader {
      * @param ref     reference value
      * @param scale   scale value
      * @param miss    replace missing
+     * @param decimalScale   scale of the values
      * @return   unpacked data
      *
      * @throws IOException problem reading file
      */
     private float[] unpackGrib1Data(int iiword, int nword, int kxky,
                                      int nbits, float ref, float scale,
-                                     boolean miss)
+                                     boolean miss, int decimalScale)
             throws IOException {
+        System.out.println("scale = " + scale);
         float[] values = new float[kxky];
         bitPos = 0;
         bitBuf = 0;
@@ -597,18 +602,19 @@ public class GempakGridReader extends GempakFileReader {
         ch4    = 0;
         rf.seek(getOffset(iiword));
         int idat;
+        float scaleFactor =(float) Math.pow(10.0, -decimalScale);
         for (int i = 0; i < values.length; i++) {
             idat = bits2UInt(nbits);
-            /*
-            if (i < 25) {
-                System.out.println("idat[" + i + "] = " + idat);
-            }
-            */
             if (miss && (idat == IMISSD)) {
                 values[i] = IMISSD;
             } else {
-                values[i] = ref + scale * idat;
+                values[i] = (ref + scale * idat) * scaleFactor;
             }
+            /*
+            if (i < 25) {
+                System.out.println("values[" + i + "] = " + values[i]);
+            }
+            */
         }
         return values;
     }

@@ -18,7 +18,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-// $Id:GridVariable.java 63 2006-07-12 21:50:51Z edavis $
 
 package ucar.unidata.data.grid.gempak;
 
@@ -79,6 +78,7 @@ public class GridVariable {
 
     /** number of levels */
     private int nlevels;
+
     /** number of times */
     private int ntimes;
 
@@ -95,7 +95,7 @@ public class GridVariable {
     private boolean showRecords = false;
 
     /** debug flag */
-    private boolean showGen     = false;
+    private boolean showGen = false;
 
     /**
      * Create a new GridVariable
@@ -305,11 +305,11 @@ public class GridVariable {
 
         nlevels = getVertNlevels();
         ntimes  = tcs.getNTimes();
-        // TODO:  this is not used 
-        //decimalScale = firstRecord.decimalScale;
+        // TODO:  this is not used ?
+        decimalScale = firstRecord.getDecimalScale();
 
         if (vname == null) {
-            vname = NetcdfFile.createValidNetcdfObjectName(useDesc && false
+            vname = NetcdfFile.createValidNetcdfObjectName(useDesc
                     ? desc
                     : name);
         }
@@ -570,7 +570,7 @@ public class GridVariable {
         return hashCode;
     }
 
-    /** hash code  */
+    /** hash code */
     private volatile int hashCode = 0;
 
 
@@ -606,9 +606,9 @@ public class GridVariable {
      * @return long variable name
      */
     private String makeLongName(GridRecord gr, GridTableLookup lookup) {
-        GridParameter param     = lookup.getParameter(gr);
+        GridParameter param = lookup.getParameter(gr);
         //String        levelName = GridIndexToNC.makeLevelName(gr, lookup);
-        String        levelName = lookup.getLevelDescription(gr);
+        String levelName = lookup.getLevelDescription(gr);
         return (levelName.length() == 0)
                ? param.getDescription()
                : param.getDescription() + " @ " + levelName;

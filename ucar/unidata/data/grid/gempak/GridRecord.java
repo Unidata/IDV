@@ -96,4 +96,12 @@ public interface GridRecord {
      */
     public String getGridDefRecordId();
 
+    /**
+     * Get the decimal scale of the values
+     *
+     * @return decimal scale
+     */
+    public int getDecimalScale();
+
 }
+

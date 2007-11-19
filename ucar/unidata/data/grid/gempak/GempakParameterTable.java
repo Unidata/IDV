@@ -51,12 +51,12 @@ public class GempakParameterTable {
 
     /** indices of breakpoints in the table */
     private static int[] indices = {
-        0, 4, 37, 58, 71, 88, 96
+        0, 4, 38, 59, 72, 79, 90, 97
     };
 
     /** lengths */
     private static int[] lengths = {
-        4, 33, 21, 13, 16, 12, 1
+        4, 33, 21, 13, 7, 11, 6, 6
     };
 
     /**
@@ -65,7 +65,7 @@ public class GempakParameterTable {
     public GempakParameterTable() {}
 
     /*
-    ID# NAME                             UNITS                GNAM         SCALE   MISSING  HZREMAP DIRECTION
+ID# NAME                             UNITS                GNAM         SCALE   MISSING  HZREMAP DIRECTION
     */
 
     /**
@@ -121,7 +121,7 @@ public class GempakParameterTable {
      *
      * @return  a grid parameter (may be null)
      */
-    private static GridParameter makeParameter(String[] words) {
+    private static GempakGridParameter makeParameter(String[] words) {
         int    num = 0;
         String description;
         if (words[0] != null) {
@@ -142,7 +142,14 @@ public class GempakParameterTable {
                 unit = "";
             }
         }
-        return new GridParameter(num, words[3], description, unit);
+        int decimalScale = 0;
+        try {
+           decimalScale = Integer.parseInt(words[4].trim());
+        } catch (NumberFormatException ne) {
+           decimalScale = 0;
+        }
+
+        return new GempakGridParameter(num, words[3], description, unit, decimalScale);
     }
 
     /**
@@ -152,8 +159,8 @@ public class GempakParameterTable {
      *
      * @return  corresponding parameter or null if not found in table
      */
-    public static GridParameter getParameter(String name) {
-        return (GridParameter) paramMap.get(name);
+    public static GempakGridParameter getParameter(String name) {
+        return (GempakGridParameter) paramMap.get(name);
     }
 
     /**

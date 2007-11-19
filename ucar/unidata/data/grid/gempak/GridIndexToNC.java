@@ -396,7 +396,7 @@ public class GridIndexToNC {
                 if (plist.size() == 1) {
                     GridVariable pv = (GridVariable) plist.get(0);
                     Variable v = pv.makeVariable(ncfile, hcs.getGroup(),
-                                     true);
+                                     useDescriptionForVariableName);
                     ncfile.addVariable(hcs.getGroup(), v);
 
                 } else {
