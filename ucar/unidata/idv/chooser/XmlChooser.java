@@ -263,6 +263,7 @@ public class XmlChooser extends IdvChooser implements ActionListener {
         backBtn = GuiUtils.getImageButton(
             GuiUtils.getImageIcon(
                 "/ucar/unidata/ui/images/less.gif", getClass()));
+        GuiUtils.makeMouseOverBorder(backBtn);
         backBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 goBack();
@@ -272,6 +273,7 @@ public class XmlChooser extends IdvChooser implements ActionListener {
         fwdBtn = GuiUtils.getImageButton(
             GuiUtils.getImageIcon(
                 "/ucar/unidata/ui/images/greater.gif", getClass()));
+        GuiUtils.makeMouseOverBorder(fwdBtn);
         fwdBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 goForward();
@@ -299,8 +301,8 @@ public class XmlChooser extends IdvChooser implements ActionListener {
                 makeBlankTree();
             }
         }
-        JPanel navButtons = GuiUtils.doLayout(new Component[] { backBtn,
-                fwdBtn, new JLabel("  ") }, 3, GuiUtils.WT_N, GuiUtils.WT_N);
+        JPanel navButtons = GuiUtils.doLayout(new Component[] { backBtn,new JLabel(" "),
+                fwdBtn,  new JLabel("  ")}, 4, GuiUtils.WT_N, GuiUtils.WT_N);
 
         GuiUtils.tmpInsets = GRID_INSETS;
         JPanel catPanel = GuiUtils.doLayout(new Component[] {
