@@ -2925,9 +2925,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
         } catch (Throwable exc) {
             if (xmlFile != null) {
-                logException("Decoding bundle: " + xmlFile, exc);
+                logException("Error loading bundle: " + xmlFile, exc);
             } else {
-                logException("Decoding bundle", exc);
+                logException("Error loading bundle", exc);
             }
             inError = true;
         }
