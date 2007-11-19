@@ -36,6 +36,11 @@ public class SqlUtils {
         return "SELECT " + what + " FROM " + where +";";
     }
 
+
+    public static String makeSelect(String what, String where, String extra) {
+        return "SELECT " + what + " FROM " + where + " " + extra +";";
+    }
+
     public static  double[] readTime(ResultSet results, int column) throws Exception {
         double [] current = new double[100000];
         int cnt = 0;
@@ -49,7 +54,6 @@ public class SqlUtils {
                 System.arraycopy(tmp, 0, current, 0, tmp.length);
             }
         }
-        System.err.println("Read:" + cnt +" doubles");
         double[] actual = new double[cnt];
         System.arraycopy(current, 0, actual, 0, cnt);
         return actual;
@@ -109,8 +113,25 @@ public class SqlUtils {
                 System.arraycopy(tmp, 0, current, 0, tmp.length);
             }
         }
-        System.err.println("Read:" + cnt +" doubles");
         double[] actual = new double[cnt];
+        System.arraycopy(current, 0, actual, 0, cnt);
+        return actual;
+    }
+
+    public static Date[] readDate(ResultSet results, int column)
+        throws Exception {
+        Date [] current = new Date[100000];
+        int cnt = 0;
+        while(results.next()) {
+            Date value =results.getDate(column);
+            current[cnt++] =value;
+            if(cnt>= current.length) {
+                Date[] tmp = current;
+                current = new Date[current.length*2];
+                System.arraycopy(tmp, 0, current, 0, tmp.length);
+            }
+        }
+        Date[] actual = new Date[cnt];
         System.arraycopy(current, 0, actual, 0, cnt);
         return actual;
     }
