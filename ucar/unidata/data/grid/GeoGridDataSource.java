@@ -922,11 +922,13 @@ public class GeoGridDataSource extends GridDataSource {
             // System.out.println("" + sb);
         }
 
-
-
         try {
             GridDataset gds = GridDataset.open(file);
             return gds;
+        } catch (java.io.FileNotFoundException fnfe) {
+            setInError(true);
+            LogUtil.consoleMessage("Original error:\n" + fnfe.toString()+"\n"+LogUtil.getStackTrace(fnfe));
+            throw new BadDataException("Unable to open grid:\n" + file);
         } catch (Exception exc) {
             setInError(true);
             throw new WrapperException(
