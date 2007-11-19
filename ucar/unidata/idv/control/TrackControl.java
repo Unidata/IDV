@@ -516,33 +516,20 @@ public class TrackControl extends GridDisplayControl {
         if (seconds == 0) {
             seconds = 1;
         }
-        int numNewTimes = (int) (numTimes / seconds);
-        //System.out.println("num/sec/new " + numTimes + "/" + seconds + "/"
-        //                   + numNewTimes);
-
-        // first guess
-        double[] tmpTimes  = new double[numNewTimes];
-        double   firstTime = times[0];
-        tmpTimes[0] = firstTime;
+        double[] tmpTimes  = new double[times.length];
         int numFound = 0;
+        Hashtable seenTime   = new Hashtable();
         for (int timeIdx = 0; timeIdx < numTimes; timeIdx++) {
-            if (numFound >= numNewTimes) {
-                break;
-            }
-            if (times[timeIdx] < firstTime + ((numFound + 1) * seconds)) {
+            Integer timeKey = new Integer((int)(times[timeIdx] / seconds));
+            if ((timeIdx < numTimes - 1) && (seenTime.get(timeKey) != null)) {
                 continue;
             }
-            tmpTimes[numFound] = times[timeIdx];
-            numFound++;
+            seenTime.put(timeKey, timeKey);
+            tmpTimes[numFound++] = times[timeIdx];
         }
-        if (numFound < numNewTimes) {
-            //System.out.println("calculated " + numNewTimes
-            //                   + " new times, found " + numFound);
-            double[] newTimes = new double[numFound];
-            System.arraycopy(tmpTimes, 0, newTimes, 0, numFound);
-            return newTimes;
-        }
-        return tmpTimes;
+        double[] newTimes = new double[numFound];
+        System.arraycopy(tmpTimes, 0, newTimes, 0, numFound);
+        return newTimes;
     }
 
 
