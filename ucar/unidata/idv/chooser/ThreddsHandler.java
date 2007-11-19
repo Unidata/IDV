@@ -1228,6 +1228,7 @@ public class ThreddsHandler extends XmlHandler {
     private static String findBaseForDataset(Element datasetNode,
                                              Element root) {
 
+
         //Find the service node
         Element serviceNode = findServiceNodeForDataset(datasetNode,  /*root,*/
             true, null);
@@ -1655,27 +1656,32 @@ public class ThreddsHandler extends XmlHandler {
     private boolean collectUrlPaths(List urlPaths, Element datasetNode,
                                     Element root, boolean flagMissing) {
 
+
         String urlPath = getUrlPath(datasetNode);
 
         if (urlPath != null) {
-            Element serviceNode = findServiceNodeForDataset(datasetNode,
-                                      flagMissing, null);
-            if (serviceNode == null) {
-                return false;
-            }
-
-            String url = getAbsoluteUrl(serviceNode, urlPath);
-            if (url == null) {
-                if (flagMissing) {
-                    IdvChooser.errorMessage(
-                        "Could not read any dataset urls");
+            //A hack to allow for absolute paths in urls
+            String url;
+            Element serviceNode = null;
+            if(urlPath.indexOf(":")>=0) { 
+                url = urlPath;
+            } else {
+                serviceNode = findServiceNodeForDataset(datasetNode,
+                                                        flagMissing, null);
+                if (serviceNode == null) {
+                    return false;
                 }
-                return false;
+
+                url = getAbsoluteUrl(serviceNode, urlPath);
+                if (url == null) {
+                    if (flagMissing) {
+                        IdvChooser.errorMessage(
+                                                "Could not read any dataset urls");
+                    }
+                    return false;
+                }
             }
 
-            //If this is a "Resolver" service type then the url points to a catalog 
-            //that holds the real url.
-            String    serviceType = getServiceType(serviceNode);
             Hashtable properties  = new Hashtable();
             properties.put(PROP_CATALOGURL, path);
             String groupId = getPropertyAttributeFromChild(datasetNode,
@@ -1701,20 +1707,26 @@ public class ThreddsHandler extends XmlHandler {
             addServiceProperties(datasetNode, properties, urlPath);
 
 
-            getProperties(datasetNode, serviceNode, properties);
-            if (SERVICE_RESOLVER.equals(serviceType)) {
-                String   resolverUrl = url;
-                Object[] result = getResolverData(resolverUrl, properties);
-                if (result == null) {
-                    return false;
-                }
-                datasetNode = (Element) result[1];
-                serviceNode = (Element) result[2];
-                url         = (String) result[3];
-                properties.put(DataSource.PROP_RESOLVERURL, resolverUrl);
-                String title = getTitleFromDataset((Element) datasetNode);
-                if ((title != null) && (properties != null)) {
-                    properties.put(DataSource.PROP_TITLE, title);
+
+            if(serviceNode!=null) {
+                //If this is a "Resolver" service type then the url points to a catalog 
+                //that holds the real url.
+                String    serviceType = getServiceType(serviceNode);
+                getProperties(datasetNode, serviceNode, properties);
+                if (SERVICE_RESOLVER.equals(serviceType)) {
+                    String   resolverUrl = url;
+                    Object[] result = getResolverData(resolverUrl, properties);
+                    if (result == null) {
+                        return false;
+                    }
+                    datasetNode = (Element) result[1];
+                    serviceNode = (Element) result[2];
+                    url         = (String) result[3];
+                    properties.put(DataSource.PROP_RESOLVERURL, resolverUrl);
+                    String title = getTitleFromDataset((Element) datasetNode);
+                    if ((title != null) && (properties != null)) {
+                        properties.put(DataSource.PROP_TITLE, title);
+                    }
                 }
             }
             //      System.err.println ("Absolute url:" + url);
