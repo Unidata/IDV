@@ -77,6 +77,8 @@ public class DateUtil {
     public static final long MILLIS_MILLENIUM = MILLIS_CENTURY * 10;
 
 
+    public static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
+
 
     /** logger */
     private static org.slf4j.Logger log =
@@ -118,6 +120,45 @@ public class DateUtil {
         Date curSysDate = cal.getTime();
         return DateFormatHandler.ISO_DATE_TIME.getDateTimeStringFromDate(
             curSysDate);
+    }
+
+    
+    private static final String[] formats = {
+        "yyyy-MM-dd'T'HH:mm:ss",
+        "yyyy-MM-dd HH:mm:ss",
+        "yyyyMMdd'T'HHmmss",
+    };
+
+    public static SimpleDateFormat findFormatter(String dateString) {
+        for(int i=0;i<formats.length;i++) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat(formats[i]);
+                sdf.parse(dateString);
+                return sdf;
+            } catch(ParseException pe) {}
+        }
+        throw new IllegalArgumentException ("Could not find date format for:" + dateString);
+    }
+
+
+    public static Date parse(String s) throws java.text.ParseException {
+        SimpleDateFormat sdf = findFormatter(s);
+        return sdf.parse(s);
+    }
+
+    public static double[] toSeconds(String[]s) throws java.text.ParseException {
+        double[]d = new double[s.length];
+        if(s.length == 0) return d;
+        SimpleDateFormat sdf = findFormatter(s[0]);
+        double lastTime = 0;
+        for(int i=0;i<s.length;i++) {
+            d[i] = sdf.parse(s[i]).getTime()/1000.0;
+            if(d[i]< lastTime) System.out.println ("****" + s[i]);
+            //            else  System.out.println (s[i]);
+            lastTime = d[i];
+            //            System.out.println(d[i]);
+        }
+        return d;
     }
 
     /**
