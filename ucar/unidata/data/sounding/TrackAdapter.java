@@ -97,6 +97,7 @@ public abstract class TrackAdapter {
     /** sounding observation */
     SoundingOb soundingOb = null;
 
+    TrackDataSource dataSource;
 
     /** List of TrackInfo, one for each trajectory in the data */
     private List trackInfos = new ArrayList();
@@ -127,8 +128,8 @@ public abstract class TrackAdapter {
      *
      * @throws Exception    On badness
      */
-    public TrackAdapter(String filename) throws Exception {
-        this(filename, null, 1, -1);
+    public TrackAdapter(TrackDataSource dataSource, String filename) throws Exception {
+        this(dataSource, filename, null, 1, -1);
     }
 
 
@@ -142,9 +143,10 @@ public abstract class TrackAdapter {
      *
      * @throws Exception    On badness
      */
-    public TrackAdapter(String filename, Hashtable pointDataFilter,
+    public TrackAdapter(TrackDataSource dataSource,String filename, Hashtable pointDataFilter,
                         int stride, int lastNMinutes)
             throws Exception {
+        this.dataSource = dataSource;
         this.filename        = filename;
         this.stride          = stride;
         this.lastNMinutes    = lastNMinutes;

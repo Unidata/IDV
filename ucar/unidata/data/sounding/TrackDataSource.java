@@ -94,6 +94,9 @@ public class TrackDataSource extends FilesDataSource {
     /** mutex for initTrack */
     private static final Object MUTEX = new Object();
 
+
+
+
     /** track categories */
     private List traceCats;
 
@@ -157,7 +160,7 @@ public class TrackDataSource extends FilesDataSource {
 
 
     private boolean usingDataBase = false;
-    private JTextField jdbcUrlFld;
+
 
     /** widget for properties dialog */
     private JTextField strideFld;
@@ -212,28 +215,23 @@ public class TrackDataSource extends FilesDataSource {
 
 
 
+    protected void initAfter() {
+        super.initAfter();
+        getAdapters();
+        if(getInError()) return;
+        if (traceAdapter != null && traceAdapter.getDataSourceDescription()!=null) {
+            setDescription(traceAdapter.getDataSourceDescription());
+        }
+    }
+
+
     public void initAfterCreation() {
         super.initAfterCreation();
-        getAdapters();
+        if(getInError()) return;
         if (traceAdapter != null && traceAdapter.getDataSourceName()!=null) {
             setName(traceAdapter.getDataSourceName());
         }
-        System.err.println ("desc:" + traceAdapter.getDataSourceDescription());
-        if (traceAdapter != null && traceAdapter.getDataSourceDescription()!=null) {
-
-            setDescription(traceAdapter.getDataSourceDescription());
-        }
     }
-
-    public void initAfterUnpersistence() {
-        super.initAfterUnpersistence();
-        getAdapters();
-        if (traceAdapter != null && traceAdapter.getDataSourceDescription()!=null) {
-            setDescription(traceAdapter.getDataSourceDescription());
-        }
-
-    }
-
 
     /**
      * Initialize the categories
@@ -471,9 +469,9 @@ public class TrackDataSource extends FilesDataSource {
             throws Exception {
         if(file.startsWith("jdbc:")) {
             usingDataBase = true;
-            return new  EolDbTrackAdapter(file, pointDataFilter, stride, lastNMinutes);
+            return new  EolDbTrackAdapter(this,file, pointDataFilter, stride, lastNMinutes);
         }
-        return new CdmTrackAdapter(file, pointDataFilter, stride,
+        return new CdmTrackAdapter(this, file, pointDataFilter, stride,
                                    lastNMinutes);
     }
 
@@ -1150,8 +1148,6 @@ public class TrackDataSource extends FilesDataSource {
         if(usingDataBase) {
             comps.add(GuiUtils.filler());
             comps.add(getPropertiesHeader("Database"));
-            comps.add(GuiUtils.rLabel("Database:"));
-            comps.add(jdbcUrlFld = new JTextField(getFilePath()));
         }
 
 
@@ -1200,12 +1196,6 @@ public class TrackDataSource extends FilesDataSource {
     public boolean applyProperties() {
         if ( !super.applyProperties()) {
             return false;
-        }
-        if(jdbcUrlFld!=null) {
-            if(!Misc.equals(jdbcUrlFld.getText().trim(), getFilePath())) {
-                setSources(Misc.newList(jdbcUrlFld.getText().trim()));
-                adapters = null;
-            }
         }
 
         if (traceAdapter == null) {
@@ -1361,8 +1351,6 @@ public class TrackDataSource extends FilesDataSource {
     public int getLastNMinutes() {
         return lastNMinutes;
     }
-
-
 
 
 }

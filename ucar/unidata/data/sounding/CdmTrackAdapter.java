@@ -94,9 +94,9 @@ public class CdmTrackAdapter extends TrackAdapter {
      *
      * @throws Exception    On badness
      */
-    public CdmTrackAdapter(String filename) throws Exception {
-        super(filename);
-    }
+    //    public CdmTrackAdapter(String filename) throws Exception {
+    //        super(filename);
+    //    }
 
 
     /**
@@ -109,10 +109,10 @@ public class CdmTrackAdapter extends TrackAdapter {
      *
      * @throws Exception    On badness
      */
-    public CdmTrackAdapter(String filename, Hashtable pointDataFilter,
+    public CdmTrackAdapter(TrackDataSource dataSource,String filename, Hashtable pointDataFilter,
                            int stride, int lastNMinutes)
             throws Exception {
-        super(filename, pointDataFilter, stride, lastNMinutes);
+        super(dataSource,filename, pointDataFilter, stride, lastNMinutes);
         TrajectoryObsDataset tod = null;
         StringBuffer         buf = new StringBuffer();
         try {
