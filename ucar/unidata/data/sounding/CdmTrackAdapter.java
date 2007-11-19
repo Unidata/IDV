@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data.sounding;
 
 
@@ -90,7 +89,12 @@ public class CdmTrackAdapter extends TrackAdapter {
     /**
      * Construct a new track from the filename
      *
+     *
+     * @param dataSource _more_
      * @param filename  location of file
+     * @param pointDataFilter _more_
+     * @param stride _more_
+     * @param lastNMinutes _more_
      *
      * @throws Exception    On badness
      */
@@ -109,10 +113,11 @@ public class CdmTrackAdapter extends TrackAdapter {
      *
      * @throws Exception    On badness
      */
-    public CdmTrackAdapter(TrackDataSource dataSource,String filename, Hashtable pointDataFilter,
-                           int stride, int lastNMinutes)
+    public CdmTrackAdapter(TrackDataSource dataSource, String filename,
+                           Hashtable pointDataFilter, int stride,
+                           int lastNMinutes)
             throws Exception {
-        super(dataSource,filename, pointDataFilter, stride, lastNMinutes);
+        super(dataSource, filename, pointDataFilter, stride, lastNMinutes);
         TrajectoryObsDataset tod = null;
         StringBuffer         buf = new StringBuffer();
         try {

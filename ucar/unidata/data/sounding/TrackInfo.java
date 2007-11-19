@@ -20,18 +20,15 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data.sounding;
 
 
 import ucar.ma2.Range;
 
-import ucar.visad.quantities.CommonUnits;
-
 import ucar.unidata.data.BadDataException;
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataUtil;
-
+import ucar.unidata.data.VarInfo;
 import ucar.unidata.data.point.*;
 
 import ucar.unidata.geoloc.Bearing;
@@ -44,8 +41,12 @@ import ucar.visad.UtcDate;
 import ucar.visad.Util;
 import ucar.visad.quantities.*;
 
+import ucar.visad.quantities.CommonUnits;
+
 import visad.*;
+
 import visad.georef.*;
+
 import visad.util.DataUtility;
 
 import java.util.ArrayList;
@@ -63,9 +64,16 @@ import java.util.List;
  */
 public abstract class TrackInfo {
 
+    /** _more_          */
     protected String varTime;
+
+    /** _more_          */
     protected String varLatitude;
+
+    /** _more_          */
     protected String varLongitude;
+
+    /** _more_          */
     protected String varAltitude;
 
 
@@ -86,15 +94,6 @@ public abstract class TrackInfo {
 
     /** The adapater */
     protected TrackAdapter adapter;
-
-    /** List of parameter names */
-    protected List parameterNames = new ArrayList();
-
-    /** List of parameter descriptions */
-    protected List parameterDescriptions = new ArrayList();
-
-    /** List of parameter categories */
-    protected List parameterCategories = new ArrayList();
 
 
     /** lat/lon/altitude set */
@@ -140,13 +139,19 @@ public abstract class TrackInfo {
      *
      * @param variable the variable
      */
-    protected void addVariable(Variable variable) {
+    protected void addVariable(VarInfo variable) {
         variables.add(variable);
-        parameterNames.add(variable.getName());
-        parameterDescriptions.add(variable.getDescription());
-        parameterCategories.add(variable.getCategory());
     }
 
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public List<VarInfo> getVariables() {
+        return variables;
+    }
 
     /**
      * Get the starting time of this track.
@@ -172,10 +177,14 @@ public abstract class TrackInfo {
      * How many points in track
      *
      * @return num points in track
+     *
+     * @throws Exception _more_
      */
     public int getNumberPoints() throws Exception {
         float[] lats = getLatitude(null);
-        if(lats == null) return 0;
+        if (lats == null) {
+            return 0;
+        }
         return lats.length;
     }
 
@@ -193,41 +202,10 @@ public abstract class TrackInfo {
      * @throws Exception On badness
      */
     protected GriddedSet makeEarthDomainSet(Range range) throws Exception {
-        return ucar.visad.Util.makeEarthDomainSet(
-                                                  getLatitude(range),
-                                                  getLongitude(range),
-                                                  getAltitude(range));
+        return ucar.visad.Util.makeEarthDomainSet(getLatitude(range),
+                getLongitude(range), getAltitude(range));
     }
 
-
-    /**
-     *  Get the ParameterNames property.
-     *
-     *  @return The ParameterNames
-     */
-    public List getParameterNames() {
-        return parameterNames;
-    }
-
-
-
-    /**
-     *  Get the ParameterDescriptions property.
-     *
-     *  @return The ParameterDescriptions
-     */
-    public List getParameterDescriptions() {
-        return parameterDescriptions;
-    }
-
-    /**
-     *  Get the ParameterDescriptions property.
-     *
-     *  @return The ParameterDescriptions
-     */
-    public List getParameterCategories() {
-        return parameterCategories;
-    }
 
 
     /**
@@ -264,8 +242,9 @@ public abstract class TrackInfo {
         double[]   timeVals     = getTimeVals(range);
         newRangeVals[0] = vals[0];
         RealType timeType = getVarType(RealType.Time, timeUnit, timeVals[0]);
-        RealTupleType rangeType = new RealTupleType(getVarType(varType),timeType);
-        if (!getTimeUnit().equals(timeType.getDefaultUnit())) {
+        RealTupleType rangeType = new RealTupleType(getVarType(varType),
+                                      timeType);
+        if ( !getTimeUnit().equals(timeType.getDefaultUnit())) {
             Unit tmpUnit = timeType.getDefaultUnit();
             timeVals = tmpUnit.toThis(timeVals, timeUnit);
             timeUnit = tmpUnit;
@@ -317,7 +296,7 @@ public abstract class TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected  Unit getTimeUnit() throws Exception {
+    protected Unit getTimeUnit() throws Exception {
         return CommonUnit.secondsSinceTheEpoch;
     }
 
@@ -330,7 +309,7 @@ public abstract class TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected  double[] getTime(Range range) throws Exception {
+    protected double[] getTime(Range range) throws Exception {
         return getDoubleData(range, varTime);
     }
 
@@ -356,7 +335,7 @@ public abstract class TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected  float[] getLongitude(Range range) throws Exception {
+    protected float[] getLongitude(Range range) throws Exception {
         return getFloatData(range, varLongitude);
     }
 
@@ -370,7 +349,7 @@ public abstract class TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected  float[] getAltitude(Range range) throws Exception {
+    protected float[] getAltitude(Range range) throws Exception {
         return getFloatData(range, varAltitude);
     }
 
@@ -385,7 +364,8 @@ public abstract class TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected float[] getFloatData(Range range, Variable var) throws Exception {
+    protected float[] getFloatData(Range range, VarInfo var)
+            throws Exception {
         return getFloatData(range, var.getShortName());
     }
 
@@ -399,7 +379,7 @@ public abstract class TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected String[] getStringData(Range range, Variable var)
+    protected String[] getStringData(Range range, VarInfo var)
             throws Exception {
         return getStringData(range, var.getShortName());
     }
@@ -416,10 +396,21 @@ public abstract class TrackInfo {
      * @throws Exception On badness
      */
     protected abstract float[] getFloatData(Range range, String var)
-        throws Exception;
+     throws Exception;
 
 
-    protected  double[] getDoubleData(Range range, String var)         throws Exception {
+    /**
+     * _more_
+     *
+     * @param range _more_
+     * @param var _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected double[] getDoubleData(Range range, String var)
+            throws Exception {
         return Misc.arrayToDouble(getFloatData(range, var));
     }
 
@@ -452,7 +443,7 @@ public abstract class TrackInfo {
     public synchronized FieldImpl getPointObTrack(Range range)
             throws Exception {
 
-        
+
         //        Trace.startTrace();
         Trace.call1("TrackAdapter.getPointObTrack");
         Object loadId = JobManager.getManager().startLoad("TrackAdapter");
@@ -477,8 +468,8 @@ public abstract class TrackInfo {
         int     numVars    = varsToUse.size();
         Unit[]  units      = new Unit[numVars];
         for (int varIdx = 0; varIdx < numVars; varIdx++) {
-            Variable var = (Variable) varsToUse.get(varIdx);
-            units[varIdx] = var.unit;
+            VarInfo var = (VarInfo) varsToUse.get(varIdx);
+            units[varIdx] = var.getUnit();
         }
 
         Trace.msg("TrackAdapter #obs: " + getNumberPoints() + " vars:"
@@ -537,10 +528,10 @@ public abstract class TrackInfo {
                 if ( !JobManager.getManager().canContinue(loadId)) {
                     return null;
                 }
-                Variable var = (Variable) varsToUse.get(varIdx);
-                if (var.isNumeric) {
+                VarInfo var = (VarInfo) varsToUse.get(varIdx);
+                if (var.getIsNumeric()) {
                     float[] fvalues = getFloatData(range, var.getShortName());
-                    if (var.realType == null) {
+                    if (var.getRealType() == null) {
                         //???
                     }
 
@@ -555,15 +546,17 @@ public abstract class TrackInfo {
                                     fvalues[obIdx]);
                         } else {
                             firstTuple         = tupleArray;
-                            tupleArray[varIdx] = (var.unit == null)
-                                    ? new Real(var.realType, fvalues[obIdx])
-                                    : new Real(var.realType, fvalues[obIdx],
-                                    var.unit);
+                            tupleArray[varIdx] = (var.getUnit() == null)
+                                    ? new Real(var.getRealType(),
+                                    fvalues[obIdx])
+                                    : new Real(var.getRealType(),
+                                    fvalues[obIdx], var.getUnit());
                         }
                     }
                     realCnt++;
                 } else {
-                    String[] svalues = getStringData(range, var.getShortName());
+                    String[] svalues = getStringData(range,
+                                           var.getShortName());
                     for (int obIdx = 0; obIdx < numObs; obIdx++) {
                         Data[] tupleArray = (Data[]) tuples.get(obIdx);
                         tupleArray[varIdx] = new Text(svalues[obIdx]);
@@ -573,7 +566,7 @@ public abstract class TrackInfo {
                     stringCnt++;
                 }
             }
-        } 
+        }
 
         Trace.call2("TrackAdapter.reading data");
         Trace.call1("TrackAdapter.processing data", " all reals?" + allReals);
@@ -642,19 +635,19 @@ public abstract class TrackInfo {
      *
      * @return The variable.
      */
-    protected Variable getDataVariable(String variableName) {
+    protected VarInfo getDataVariable(String variableName) {
         //Jump through some hoops for legacy bundles
-        String []vars = {variableName,variableName.toLowerCase()};
-        for(int dummyIdx = 0;dummyIdx<vars.length;dummyIdx++) {
+        String[] vars = { variableName, variableName.toLowerCase() };
+        for (int dummyIdx = 0; dummyIdx < vars.length; dummyIdx++) {
             for (int varIdx = 0; varIdx < variables.size(); varIdx++) {
-                Variable theVar = (Variable) variables.get(varIdx);
+                VarInfo theVar = (VarInfo) variables.get(varIdx);
                 if (vars[dummyIdx].equals(theVar.getName())) {
                     return theVar;
                 }
             }
 
             for (int varIdx = 0; varIdx < variables.size(); varIdx++) {
-                Variable theVar = (Variable) variables.get(varIdx);
+                VarInfo theVar = (VarInfo) variables.get(varIdx);
                 if (vars[dummyIdx].equals(theVar.getDescription())) {
                     return theVar;
                 }
@@ -691,11 +684,20 @@ public abstract class TrackInfo {
         return trackName;
     }
 
-    public void setCoordinateVars(String lon, String lat, String alt, String time) {
+    /**
+     * _more_
+     *
+     * @param lon _more_
+     * @param lat _more_
+     * @param alt _more_
+     * @param time _more_
+     */
+    public void setCoordinateVars(String lon, String lat, String alt,
+                                  String time) {
         varLongitude = lon;
-        varLatitude = lat;
-        varAltitude = alt;
-        varTime = time;
+        varLatitude  = lat;
+        varAltitude  = alt;
+        varTime      = time;
     }
 
     /**
@@ -787,14 +789,14 @@ public abstract class TrackInfo {
     }
 
     /**
-     * Get list of Variables to use
+     * Get list of VarInfos to use
      *
      * @return List of vars
      */
     protected List getVarsToUse() {
         List varsToUse = new ArrayList();
         for (int varIdx = 0; varIdx < variables.size(); varIdx++) {
-            Variable var = (Variable) variables.get(varIdx);
+            VarInfo var = (VarInfo) variables.get(varIdx);
             if (includeInPointData(var.getShortName())) {
                 varsToUse.add(var);
             }
@@ -812,8 +814,8 @@ public abstract class TrackInfo {
     protected int countReals(List vars) {
         int numReals = 0;
         for (int varIdx = 0; varIdx < vars.size(); varIdx++) {
-            Variable var = (Variable) vars.get(varIdx);
-            if (var.isNumeric) {
+            VarInfo var = (VarInfo) vars.get(varIdx);
+            if (var.getIsNumeric()) {
                 numReals++;
             }
         }
@@ -845,16 +847,16 @@ public abstract class TrackInfo {
         }
         Unit unit = null;
         //Look for the special variables.
-        //We will replace this when we can do a getLatitudeVariable, etc. 
+        //We will replace this when we can do a getLatitudeVarInfo, etc. 
         //call
         float[]  value  = null;
         double[] dvalue = null;
-        if (Misc.equals(variableName,varTime)) {
+        if (Misc.equals(variableName, varTime)) {
             unit   = getTimeUnit();
             dvalue = getTime(range);
         } else {
-            Variable var = getDataVariable(variableName);
-            unit  = var.unit;
+            VarInfo var = getDataVariable(variableName);
+            unit  = var.getUnit();
             value = getFloatData(range, var.getShortName());
         }
 
@@ -916,7 +918,7 @@ public abstract class TrackInfo {
     /**
      * Should we include the given var in the point data
      *
-     * @param varName Variable name
+     * @param varName VarInfo name
      *
      * @return Include in point data
      */
@@ -933,18 +935,18 @@ public abstract class TrackInfo {
      */
     public Data getAerologicalDiagramData() throws Exception {
 
-        Variable pressureVar = null;
-        Variable tempVar     = null;
-        Variable dewpointVar = null;
-        Variable wspdVar     = null;
-        Variable wdirVar     = null;
+        VarInfo pressureVar = null;
+        VarInfo tempVar     = null;
+        VarInfo dewpointVar = null;
+        VarInfo wspdVar     = null;
+        VarInfo wdirVar     = null;
 
 
 
         for (int varIdx = 0; varIdx < variables.size(); varIdx++) {
-            Variable var       = (Variable) variables.get(varIdx);
-            String   name      = var.getShortName();
-            String   canonical = DataAlias.aliasToCanonical(name);
+            VarInfo var       = (VarInfo) variables.get(varIdx);
+            String  name      = var.getShortName();
+            String  canonical = DataAlias.aliasToCanonical(name);
             if (canonical == null) {
                 continue;
             }
@@ -993,18 +995,20 @@ public abstract class TrackInfo {
         Range        range        = getFullRange();
 
         FunctionType addFType     = new FunctionType(RealType.Time, addType);
-        GriddedSet llaSet         = getSpatialSet(getFullRange());
+        GriddedSet   llaSet       = getSpatialSet(getFullRange());
         Unit[]       llaUnits     = llaSet.getSetUnits();
-        Unit         tempUnit     = tempVar.unit;
-        Unit         dewpointUnit = dewpointVar.unit;
+        Unit         tempUnit     = tempVar.getUnit();
+        Unit         dewpointUnit = dewpointVar.getUnit();
         Unit[]       addUnits     = new Unit[] {
-            pressureVar.unit, (Unit.canConvert(tempUnit, CommonUnits.CELSIUS)
-                               ? tempUnit
-                               : CommonUnits.CELSIUS), (Unit.canConvert(
-                                   dewpointUnit, CommonUnits.CELSIUS)
-                    ? dewpointUnit
-                    : CommonUnits.CELSIUS), wspdVar.unit, wdirVar.unit,
-            llaUnits[0], llaUnits[1], llaUnits[2]
+            pressureVar.getUnit(),
+            (Unit.canConvert(tempUnit, CommonUnits.CELSIUS)
+             ? tempUnit
+             : CommonUnits.CELSIUS), (Unit.canConvert(dewpointUnit,
+                 CommonUnits.CELSIUS)
+                                      ? dewpointUnit
+                                      : CommonUnits.CELSIUS), wspdVar
+                                          .getUnit(),
+            wdirVar.getUnit(), llaUnits[0], llaUnits[1], llaUnits[2]
         };
         float[][] llaSamples = llaSet.getSamples();
 
@@ -1069,157 +1073,5 @@ public abstract class TrackInfo {
 
 
 
-    /**
-     * Class Variable Holds info about track variables
-     *
-     *
-     * @author IDV Development Team
-     * @version $Revision: 1.4 $
-     */
-    protected static class Variable {
-
-        /** name */
-        String name;
-
-        /** desc */
-        String description;
-
-        /** unit */
-        Unit unit;
-
-        /** is this numeric */
-        boolean isNumeric = true;
-
-        /** The real type to use */
-        RealType realType;
-
-        String category;
-
-
-        /**
-         * ctor
-         *
-         * @param name name
-         * @param desc desc
-         * @param unit unit
-         */
-        public Variable(String name, String desc, Unit unit) {
-            this(name,desc,null,unit);
-        }
-
-
-        /**
-         * ctor
-         *
-         * @param name name
-         * @param desc desc
-         * @param unit unit
-         */
-        public Variable(String name, String desc, String category, Unit unit) {
-            this.name        = name;
-            this.description = desc;
-            this.category = category;
-            if ((this.description == null)
-                    || (this.description.trim().length() == 0)) {
-                this.description = name;
-            }
-            this.unit = unit;
-            realType  = DataUtil.makeRealType(getShortName(), unit);
-            if (realType == null) {
-                System.out.println("can't create realtype for "
-                                   + getShortName() + " with unit " + unit);
-            }
-        }
-
-
-        /**
-         * ctor
-         *
-         * @param name name
-         * @param unit unit
-         */
-        public Variable(String name, Unit unit) {
-            this(name, name, unit);
-        }
-
-        /**
-         * ctor
-         *
-         * @param name name
-         * @param units unit string
-         */
-        public Variable(String name, String units) {
-            this(name, DataUtil.parseUnit(units));
-        }
-
-        /**
-         * ctor
-         *
-         * @param name name
-         * @param desc description
-         * @param units unit string
-         */
-        public Variable(String name, String desc, String units) {
-            this(name, desc, DataUtil.parseUnit(units));
-        }
-
-        /**
-         * get the name
-         *
-         * @return name
-         */
-        public String getName() {
-            return name;
-        }
-
-
-        /**
-         * get the name
-         *
-         * @return name
-         */
-        public String getShortName() {
-            return name;
-        }
-
-        /**
-         * get desc
-         *
-         * @return desc
-         */
-        public String getDescription() {
-            return description;
-        }
-
-/**
-Set the Category property.
-
-@param value The new value for Category
-**/
-public void setCategory (String value) {
-        category = value;
-}
-
-/**
-Get the Category property.
-
-@return The Category
-**/
-public String getCategory () {
-        return category;
-}
-
-
-
-        /**
-         * to string
-         *
-         * @return to string
-         */
-        public String toString() {
-            return name;
-        }
-
-    }
 }
 

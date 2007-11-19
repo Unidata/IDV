@@ -44,6 +44,7 @@ import ucar.unidata.data.BadDataException;
 
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.VarInfo;
 
 import ucar.unidata.data.point.*;
 import ucar.unidata.geoloc.Bearing;
@@ -135,8 +136,8 @@ public class CdmTrackInfo extends TrackInfo {
         //            ucar.unidata.util.Misc.run(new Runnable(){public void run(){testit();}});
     }
 
-    private static String[] categoryAttributes = {"category",
-                                                  "group"};
+    /** _more_          */
+    private static String[] categoryAttributes = { "category", "group" };
 
 
     /**
@@ -145,32 +146,27 @@ public class CdmTrackInfo extends TrackInfo {
      * @throws Exception On badness
      */
     private void init() throws Exception {
-        varTime = VAR_TIME;
-        varLatitude = VAR_LATITUDE;
+        varTime      = VAR_TIME;
+        varLatitude  = VAR_LATITUDE;
         varLongitude = VAR_LONGITUDE;
-        varAltitude = VAR_ALTITUDE;
+        varAltitude  = VAR_ALTITUDE;
 
-        startTime = new DateTime(todt.getStartDate());
-        endTime   = new DateTime(todt.getEndDate());
+        startTime    = new DateTime(todt.getStartDate());
+        endTime      = new DateTime(todt.getEndDate());
         List allVariables = tod.getDataVariables();
         //TODO: Check size
         StructureData structure = todt.getData(0);
 
-        addVariable(new Variable(VAR_TIME,
-                                 VAR_TIME,"Basic",
-                                 getTimeUnit()));
+        addVariable(new VarInfo(VAR_TIME, VAR_TIME, "Basic", getTimeUnit()));
 
-        addVariable(new Variable(VAR_LATITUDE,
-                                 VAR_LATITUDE,"Basic",
-                                 CommonUnits.DEGREE));
+        addVariable(new VarInfo(VAR_LATITUDE, VAR_LATITUDE, "Basic",
+                                CommonUnits.DEGREE));
 
-        addVariable(new Variable(VAR_LONGITUDE,
-                                 VAR_LONGITUDE,"Basic",
-                                 CommonUnits.DEGREE));
+        addVariable(new VarInfo(VAR_LONGITUDE, VAR_LONGITUDE, "Basic",
+                                CommonUnits.DEGREE));
 
-        addVariable(new Variable(VAR_ALTITUDE,
-                                 VAR_ALTITUDE,"Basic",
-                                 DataUtil.parseUnit("m")));
+        addVariable(new VarInfo(VAR_ALTITUDE, VAR_ALTITUDE, "Basic",
+                                DataUtil.parseUnit("m")));
 
 
         for (int varIdx = 0; varIdx < allVariables.size(); varIdx++) {
@@ -180,16 +176,17 @@ public class CdmTrackInfo extends TrackInfo {
             if (var.getRank() != 0) {
                 continue;
             }
-            Variable variable = new Variable(var.getShortName(),
-                                             var.getDescription(),
-                                             var.getUnitsString());
+            VarInfo variable = new VarInfo(var.getShortName(),
+                                           var.getDescription(),
+                                           var.getUnitsString());
 
 
             Attribute attr = null;
-            for(int i=0;i<categoryAttributes.length && attr==null;i++) {
-                attr= var.findAttributeIgnoreCase(categoryAttributes[i]);
+            for (int i = 0; (i < categoryAttributes.length) && (attr == null);
+                    i++) {
+                attr = var.findAttributeIgnoreCase(categoryAttributes[i]);
             }
-            if(attr!=null) {
+            if (attr != null) {
                 variable.setCategory(attr.getStringValue());
             }
 
@@ -197,9 +194,9 @@ public class CdmTrackInfo extends TrackInfo {
                 StructureMembers.Member member =
                     (StructureMembers.Member) structure.findMember(
                         var.getShortName());
-                variable.isNumeric =
-                    !((member.getDataType() == DataType.STRING)
-                      || (member.getDataType() == DataType.CHAR));
+                variable.setIsNumeric(
+                     !((member.getDataType() == DataType.STRING)
+                       || (member.getDataType() == DataType.CHAR)));
             }
             addVariable(variable);
         }
@@ -249,7 +246,7 @@ public class CdmTrackInfo extends TrackInfo {
         int   numVars = variables.size();
         int   varCnt  = 0;
         for (int varIdx = 0; varIdx < numVars; varIdx++) {
-            Variable var = (Variable) variables.get(varIdx);
+            VarInfo var = (VarInfo) variables.get(varIdx);
             getFloatData(range, var.getShortName());
             varCnt++;
         }
@@ -317,21 +314,34 @@ public class CdmTrackInfo extends TrackInfo {
     }
 
 
-    public static float[] qcLatLon(float[]v) {
-        if(v==null || v.length==0) return v;
+    /**
+     * _more_
+     *
+     * @param v _more_
+     *
+     * @return _more_
+     */
+    public static float[] qcLatLon(float[] v) {
+        if ((v == null) || (v.length == 0)) {
+            return v;
+        }
         float lastValue = v[0];
-        for(int i=0;i<v.length;i++) {
-            if(v[i]!=v[i]) continue;
-            if(v[i] == 0) {
-            } else {
+        for (int i = 0; i < v.length; i++) {
+            if (v[i] != v[i]) {
+                continue;
+            }
+            if (v[i] == 0) {}
+            else {
                 lastValue = v[i];
                 break;
             }
         }
 
-        for(int i=0;i<v.length;i++) {
-            if(v[i]!=v[i]) continue;
-            if(Math.abs(v[i]-lastValue)>10) {
+        for (int i = 0; i < v.length; i++) {
+            if (v[i] != v[i]) {
+                continue;
+            }
+            if (Math.abs(v[i] - lastValue) > 10) {
                 v[i] = lastValue;
             }
             lastValue = v[i];
@@ -351,33 +361,44 @@ public class CdmTrackInfo extends TrackInfo {
      * @throws Exception On badness
      */
     protected float[] getFloatData(Range range, String var) throws Exception {
-        if(var.equals(VAR_TIME)) {
+        if (var.equals(VAR_TIME)) {
             return DataUtil.toFloatArray(todt.getTime(range));
         }
-        if(var.equals(VAR_LATITUDE)) {
+        if (var.equals(VAR_LATITUDE)) {
             return DataUtil.toFloatArray(todt.getLatitude(range));
         }
-        if(var.equals(VAR_LONGITUDE)) {
+        if (var.equals(VAR_LONGITUDE)) {
             return DataUtil.toFloatArray(todt.getLongitude(range));
         }
-        if(var.equals(VAR_ALTITUDE)) {
+        if (var.equals(VAR_ALTITUDE)) {
             return DataUtil.toFloatArray(todt.getElevation(range));
         }
         return DataUtil.toFloatArray(todt.getData(range, var));
     }
 
 
-    protected double[] getDoubleData(Range range, String var) throws Exception {
-        if(var.equals(VAR_TIME)) {
+    /**
+     * _more_
+     *
+     * @param range _more_
+     * @param var _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected double[] getDoubleData(Range range, String var)
+            throws Exception {
+        if (var.equals(VAR_TIME)) {
             return DataUtil.toDoubleArray(todt.getTime(range));
         }
-        if(var.equals(VAR_LATITUDE)) {
+        if (var.equals(VAR_LATITUDE)) {
             return DataUtil.toDoubleArray(todt.getLatitude(range));
         }
-        if(var.equals(VAR_LONGITUDE)) {
+        if (var.equals(VAR_LONGITUDE)) {
             return DataUtil.toDoubleArray(todt.getLongitude(range));
         }
-        if(var.equals(VAR_ALTITUDE)) {
+        if (var.equals(VAR_ALTITUDE)) {
             return DataUtil.toDoubleArray(todt.getElevation(range));
         }
         return DataUtil.toDoubleArray(todt.getData(range, var));
@@ -395,7 +416,8 @@ public class CdmTrackInfo extends TrackInfo {
      *
      * @throws Exception On badness
      */
-    protected String[] getStringData(Range range, String var) throws Exception {
+    protected String[] getStringData(Range range, String var)
+            throws Exception {
         return DataUtil.toStringArray(todt.getData(range, var));
     }
 
@@ -412,7 +434,7 @@ public class CdmTrackInfo extends TrackInfo {
     public synchronized FieldImpl getPointObTrack(Range range)
             throws Exception {
 
-        
+
         //        Trace.startTrace();
         Trace.call1("TrackAdapter.getPointObTrack");
         Object loadId = JobManager.getManager().startLoad("TrackAdapter");
@@ -437,8 +459,8 @@ public class CdmTrackInfo extends TrackInfo {
         int     numVars    = varsToUse.size();
         Unit[]  units      = new Unit[numVars];
         for (int varIdx = 0; varIdx < numVars; varIdx++) {
-            Variable var = (Variable) varsToUse.get(varIdx);
-            units[varIdx] = var.unit;
+            VarInfo var = (VarInfo) varsToUse.get(varIdx);
+            units[varIdx] = var.getUnit();
         }
 
         Trace.msg("TrackAdapter #obs: " + getNumberPoints() + " vars:"
@@ -497,10 +519,10 @@ public class CdmTrackInfo extends TrackInfo {
                 if ( !JobManager.getManager().canContinue(loadId)) {
                     return null;
                 }
-                Variable var = (Variable) varsToUse.get(varIdx);
-                if (var.isNumeric) {
+                VarInfo var = (VarInfo) varsToUse.get(varIdx);
+                if (var.getIsNumeric()) {
                     float[] fvalues = getFloatData(range, var.getShortName());
-                    if (var.realType == null) {
+                    if (var.getRealType() == null) {
                         //???
                     }
 
@@ -515,15 +537,17 @@ public class CdmTrackInfo extends TrackInfo {
                                     fvalues[obIdx]);
                         } else {
                             firstTuple         = tupleArray;
-                            tupleArray[varIdx] = (var.unit == null)
-                                    ? new Real(var.realType, fvalues[obIdx])
-                                    : new Real(var.realType, fvalues[obIdx],
-                                    var.unit);
+                            tupleArray[varIdx] = (var.getUnit() == null)
+                                    ? new Real(var.getRealType(),
+                                    fvalues[obIdx])
+                                    : new Real(var.getRealType(),
+                                    fvalues[obIdx], var.getUnit());
                         }
                     }
                     realCnt++;
                 } else {
-                    String[] svalues = getStringData(range, var.getShortName());
+                    String[] svalues = getStringData(range,
+                                           var.getShortName());
                     for (int obIdx = 0; obIdx < numObs; obIdx++) {
                         Data[] tupleArray = (Data[]) tuples.get(obIdx);
                         tupleArray[varIdx] = new Text(svalues[obIdx]);
@@ -554,11 +578,11 @@ public class CdmTrackInfo extends TrackInfo {
                 //Some we ignore because we are filtering them
                 for (int varIdx = 0; varIdx < numVars; varIdx++) {
                     //TODO: don't do repeated look ups here
-                    Variable var = (Variable) varsToUse.get(varIdx);
+                    VarInfo var = (VarInfo) varsToUse.get(varIdx);
                     StructureMembers.Member member =
                         (StructureMembers.Member) structure.findMember(
                             var.getShortName());
-                    if ( !var.isNumeric) {
+                    if ( !var.getIsNumeric()) {
                         String value = new String(
                                            DataUtil.toCharArray(
                                                structure.getArray(member)));
@@ -568,9 +592,10 @@ public class CdmTrackInfo extends TrackInfo {
                         //TODO: do the cloneButValue call here
                         float value = structure.convertScalarFloat(member);
                         realArray[realCnt++] = value;
-                        tupleArray[varCnt]   = (var.unit == null)
-                                ? new Real(var.realType, value)
-                                : new Real(var.realType, value, var.unit);
+                        tupleArray[varCnt]   = (var.getUnit() == null)
+                                ? new Real(var.getRealType(), value)
+                                : new Real(var.getRealType(), value,
+                                           var.getUnit());
                     }
                     varCnt++;
                 }

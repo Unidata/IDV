@@ -20,8 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data.sounding;
+
 
 import ucar.ma2.Range;
 
@@ -35,12 +35,13 @@ import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.data.DataSourceImpl;
 import ucar.unidata.data.DirectDataChoice;
 import ucar.unidata.data.FilesDataSource;
+import ucar.unidata.data.VarInfo;
 
 import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
+import ucar.unidata.ui.SqlShell;
 
 import ucar.unidata.ui.TwoListPanel;
-import ucar.unidata.ui.SqlShell;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
@@ -160,6 +161,7 @@ public class TrackDataSource extends FilesDataSource {
     private int lastNMinutes = -1;
 
 
+    /** _more_          */
     private boolean usingDataBase = false;
 
 
@@ -176,7 +178,8 @@ public class TrackDataSource extends FilesDataSource {
     /** widget for properties dialog */
     private boolean haveAskedToSubset = false;
 
-    private SqlShell  sqlShell;
+    /** _more_          */
+    private SqlShell sqlShell;
 
     /** Default Constructor */
     public TrackDataSource() {}
@@ -217,37 +220,59 @@ public class TrackDataSource extends FilesDataSource {
 
 
 
+    /**
+     * _more_
+     *
+     * @param actions _more_
+     */
     protected void addActions(List actions) {
         super.addActions(actions);
-        if(traceAdapter!=null) {
+        if (traceAdapter != null) {
             traceAdapter.addActions(actions);
         }
     }
 
 
 
+    /**
+     * _more_
+     */
     public void showSqlShell() {
-        if(sqlShell == null) {
-            sqlShell = new SqlShell("Sql Shell - " + getName(), ((EolDbTrackAdapter)traceAdapter).getConnection());
+        if (sqlShell == null) {
+            sqlShell = new SqlShell(
+                "Sql Shell - " + getName(),
+                ((EolDbTrackAdapter) traceAdapter).getConnection());
         }
         sqlShell.show();
     }
 
 
+    /**
+     * _more_
+     */
     protected void initAfter() {
         super.initAfter();
         getAdapters();
-        if(getInError()) return;
-        if (traceAdapter != null && traceAdapter.getDataSourceDescription()!=null) {
+        if (getInError()) {
+            return;
+        }
+        if ((traceAdapter != null)
+                && (traceAdapter.getDataSourceDescription() != null)) {
             setDescription(traceAdapter.getDataSourceDescription());
         }
     }
 
 
+    /**
+     * _more_
+     */
     public void initAfterCreation() {
         super.initAfterCreation();
-        if(getInError()) return;
-        if (traceAdapter != null && traceAdapter.getDataSourceName()!=null) {
+        if (getInError()) {
+            return;
+        }
+        if ((traceAdapter != null)
+                && (traceAdapter.getDataSourceName() != null)) {
             setName(traceAdapter.getDataSourceName());
         }
     }
@@ -286,7 +311,8 @@ public class TrackDataSource extends FilesDataSource {
     public String getFullDescription() {
         StringBuffer desc = new StringBuffer("Track Data Source<p>");
         getAdapters();
-        if (traceAdapter != null && traceAdapter.getDataSourceDescription()!=null) {
+        if ((traceAdapter != null)
+                && (traceAdapter.getDataSourceDescription() != null)) {
             desc.append(traceAdapter.getDataSourceDescription());
             desc.append("<hr>");
         }
@@ -326,27 +352,27 @@ public class TrackDataSource extends FilesDataSource {
                 desc.append(trackInfo.getTrackName() + "<p>");
             }
             try {
-                desc.append(" Total observations:" + trackInfo.getNumberPoints()
-                            + "<p>\n");
-            } catch(Exception exc) {}
-            StringBuffer params         = new StringBuffer();
+                desc.append(" Total observations:"
+                            + trackInfo.getNumberPoints() + "<p>\n");
+            } catch (Exception exc) {}
+            StringBuffer  params = new StringBuffer();
 
 
-            List         parameterNames = trackInfo.getParameterNames();
-            List parameterDescriptions  =
-                trackInfo.getParameterDescriptions();
-            for (int i = 0; i < parameterNames.size(); i++) {
+            List<VarInfo> vars   = trackInfo.getVariables();
+            for (VarInfo varInfo : vars) {
                 total++;
-                String description = (String) parameterDescriptions.get(i);
-                String name        = (String) parameterNames.get(i);
+
+                String name = varInfo.getName();
                 if ( !trackInfo.includeInPointData(name)) {
                     hidden++;
                     if (extra == null) {
                         extra = new StringBuffer("");
                     }
-                    extra.append("<li>" + description + " (" + name + ")\n");
+                    extra.append("<li>" + varInfo.getDescription() + " ("
+                                 + name + ")\n");
                 } else {
-                    params.append("<li>" + description + " (" + name + ")\n");
+                    params.append("<li>" + varInfo.getDescription() + " ("
+                                  + name + ")\n");
                 }
             }
             desc.append("Parameters: ");
@@ -417,10 +443,10 @@ public class TrackDataSource extends FilesDataSource {
             sources = new ArrayList();
             for (int i = 0; i < tmp.size(); i++) {
                 String fileOrUrl = tmp.get(i).toString();
-                if(fileOrUrl.startsWith("jdbc:")) {
+                if (fileOrUrl.startsWith("jdbc:")) {
                     usingDataBase = true;
                     sources.add(fileOrUrl);
-                } else  if ((new File(fileOrUrl)).exists()) {
+                } else if ((new File(fileOrUrl)).exists()) {
                     sources.add(fileOrUrl);
                 } else {
                     try {
@@ -486,9 +512,10 @@ public class TrackDataSource extends FilesDataSource {
                                          Hashtable pointDataFilter,
                                          int stride, int lastNMinutes)
             throws Exception {
-        if(file.startsWith("jdbc:")) {
+        if (file.startsWith("jdbc:")) {
             usingDataBase = true;
-            return new  EolDbTrackAdapter(this,file, pointDataFilter, stride, lastNMinutes);
+            return new EolDbTrackAdapter(this, file, pointDataFilter, stride,
+                                         lastNMinutes);
         }
         return new CdmTrackAdapter(this, file, pointDataFilter, stride,
                                    lastNMinutes);
@@ -526,17 +553,17 @@ public class TrackDataSource extends FilesDataSource {
         List trackInfos = traceAdapter.getTrackInfos();
         List categories = traceCats;
         for (int trackIdx = 0; trackIdx < trackInfos.size(); trackIdx++) {
-            TrackInfo trackInfo        = (TrackInfo) trackInfos.get(trackIdx);
-            String    trackName        = trackInfo.getTrackName();
-            List      parameterNames   = trackInfo.getParameterNames();
-            List      parameterDescriptions = trackInfo.getParameterDescriptions();
-            List      parameterCats   = trackInfo.getParameterCategories();
+            TrackInfo     trackInfo = (TrackInfo) trackInfos.get(trackIdx);
+            List<VarInfo> vars      = trackInfo.getVariables();
 
-            String basicCat = null;
+            String        trackName = trackInfo.getTrackName();
+
+
+            String        basicCat  = null;
             //If there are any categories then use the Basic
-            if(parameterCats.size()>0 && parameterCats.get(0)!=null) {
-                basicCat = "Basic";
-            }
+            //            if(parameterCats.size()>0 && parameterCats.get(0)!=null) {
+            //                basicCat = "Basic";
+            //            }
 
             if (trackInfos.size() > 1) {
                 categories = DataCategory.parseCategories(trackName
@@ -544,19 +571,19 @@ public class TrackDataSource extends FilesDataSource {
             }
             Hashtable props = Misc.newHashtable(DataChoice.PROP_ICON,
                                   "/auxdata/ui/icons/TrajectoryData16.gif");
-            for (int i = 0; i < parameterNames.size(); i++) {
-                String description = (String) parameterDescriptions.get(i);
-                String name        = (String) parameterNames.get(i);
-                String cat = (String) parameterCats.get(i);
+            for (VarInfo varInfo : vars) {
                 List cats = categories;
-                if(cat!=null) {
-                    cat = StringUtil.replace(cat,"-"," ");
-                    cats    = DataCategory.parseCategories("Track-"+cat+";trace", true);
+                if (varInfo.getCategory() != null) {
+                    String cat = StringUtil.replace(varInfo.getCategory(),
+                                     "-", " ");
+                    cats = DataCategory.parseCategories("Track-" + cat
+                            + ";trace", true);
                 }
-
                 DirectDataChoice ddc = new DirectDataChoice(this,
-                                                            new String[] { trackName,
-                                                                           name }, name, description, cats, props);
+                                           new String[] { trackName,
+                        varInfo.getName() }, varInfo.getName(),
+                                             varInfo.getDescription(), cats,
+                                             props);
                 addDataChoice(ddc);
             }
             // add in a station plot choice as well
@@ -569,9 +596,8 @@ public class TrackDataSource extends FilesDataSource {
                                       "/auxdata/ui/icons/Placemark16.gif");
             String pointLabel = getDataChoiceLabel(ID_POINTTRACE);
             addDataChoice(new DirectDataChoice(this, new String[] { trackName,
-                                                                    ID_POINTTRACE }, pointLabel,
-                                               pointLabel,
-                                               pointCatList, props));
+                    ID_POINTTRACE }, pointLabel, pointLabel, pointCatList,
+                                     props));
             /*
             addDataChoice(new DirectDataChoice(this, new String[] { trackName,
                     ID_LASTOB }, getDataChoiceLabel(ID_LASTOB),
@@ -584,6 +610,11 @@ public class TrackDataSource extends FilesDataSource {
 
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected boolean canDoView() {
         return true;
     }
@@ -1047,6 +1078,15 @@ public class TrackDataSource extends FilesDataSource {
      */
     public static void main(String[] args) throws Exception {
 
+
+
+
+        if (true) {
+            return;
+        }
+
+
+
         if (args.length == 0) {
             System.out.println("Must supply a file name");
             System.exit(1);
@@ -1164,7 +1204,7 @@ public class TrackDataSource extends FilesDataSource {
     public void getPropertiesComponents(List comps) {
         super.getPropertiesComponents(comps);
 
-        if(usingDataBase) {
+        if (usingDataBase) {
             comps.add(GuiUtils.filler());
             comps.add(getPropertiesHeader("Database"));
         }
@@ -1277,20 +1317,18 @@ public class TrackDataSource extends FilesDataSource {
                                         new ArrayList(), "Current Fields",
                                         null);
 
-        TrackInfo trackInfo             = (TrackInfo) trackInfos.get(0);
-        List      parameterNames        = trackInfo.getParameterNames();
-        List      parameterDescriptions =
-            trackInfo.getParameterDescriptions();
-        List      labels                = new ArrayList();
-        List      ids                   = new ArrayList();
-        Hashtable currentMap            = new Hashtable();
-        for (int i = 0; i < parameterNames.size(); i++) {
-            String name = (String) parameterNames.get(i);
-            String desc = (String) parameterDescriptions.get(i);
-            labels.add(desc + "  (" + name + ")");
-            ids.add(name);
-            if (traceAdapter.includeInPointData(name)) {
-                currentMap.put(name, name);
+        TrackInfo     trackInfo  = (TrackInfo) trackInfos.get(0);
+        List<VarInfo> vars       = trackInfo.getVariables();
+
+        List          labels     = new ArrayList();
+        List          ids        = new ArrayList();
+        Hashtable     currentMap = new Hashtable();
+        for (VarInfo varInfo : vars) {
+            labels.add(varInfo.getDescription() + "  (" + varInfo.getName()
+                       + ")");
+            ids.add(varInfo.getName());
+            if (traceAdapter.includeInPointData(varInfo.getName())) {
+                currentMap.put(varInfo.getName(), varInfo.getName());
             }
         }
         JComponent contents =

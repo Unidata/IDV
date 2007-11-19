@@ -98,6 +98,7 @@ public abstract class TrackAdapter {
     /** sounding observation */
     SoundingOb soundingOb = null;
 
+    /** _more_          */
     TrackDataSource dataSource;
 
     /** List of TrackInfo, one for each trajectory in the data */
@@ -125,11 +126,14 @@ public abstract class TrackAdapter {
     /**
      * Construct a new track from the filename
      *
+     *
+     * @param dataSource _more_
      * @param filename  location of file
      *
      * @throws Exception    On badness
      */
-    public TrackAdapter(TrackDataSource dataSource, String filename) throws Exception {
+    public TrackAdapter(TrackDataSource dataSource, String filename)
+            throws Exception {
         this(dataSource, filename, null, 1, -1);
     }
 
@@ -137,6 +141,8 @@ public abstract class TrackAdapter {
     /**
      * Construct a new track from the filename
      *
+     *
+     * @param dataSource _more_
      * @param filename  location of file
      * @param pointDataFilter Filters the variables to use
      * @param stride The stride
@@ -144,10 +150,11 @@ public abstract class TrackAdapter {
      *
      * @throws Exception    On badness
      */
-    public TrackAdapter(TrackDataSource dataSource,String filename, Hashtable pointDataFilter,
-                        int stride, int lastNMinutes)
+    public TrackAdapter(TrackDataSource dataSource, String filename,
+                        Hashtable pointDataFilter, int stride,
+                        int lastNMinutes)
             throws Exception {
-        this.dataSource = dataSource;
+        this.dataSource      = dataSource;
         this.filename        = filename;
         this.stride          = stride;
         this.lastNMinutes    = lastNMinutes;
@@ -158,8 +165,12 @@ public abstract class TrackAdapter {
 
 
 
-    protected void addActions(List actions) {
-    }
+    /**
+     * _more_
+     *
+     * @param actions _more_
+     */
+    protected void addActions(List actions) {}
 
     /**
      * Add the track info to the list
@@ -470,10 +481,20 @@ public abstract class TrackAdapter {
         return filename;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getDataSourceName() {
         return null;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getDataSourceDescription() {
         return null;
     }
@@ -482,6 +503,12 @@ public abstract class TrackAdapter {
      * String representation of this adapter
      *
      * @return String representation of this adapter
+     */
+
+    /**
+     * _more_
+     *
+     * @return _more_
      */
     public String toString() {
         return filename;
