@@ -171,7 +171,7 @@ public class GempakGridReader extends GempakFileReader {
                     header[6] = GempakUtil.swp4(header[6]);
                 }
                 if (needToSwap) {
-                    GempakUtil.swp4(header, 7, 9);
+                    GempakUtil.swp4(header, 7, 3);
                 }
                 GempakGridRecord gh = new GempakGridRecord(i + 1, header);
                 gh.navBlock = navBlock;

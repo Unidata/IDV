@@ -118,7 +118,7 @@ public class McIDASGridReader {
         int numEntries = Math.abs(readInt(10));
         if (numEntries > 10000000) {
             needToSwap = true;
-            numEntries = Math.abs(McIDASUtil.swpbyt4(numEntries));
+            numEntries = Math.abs(McIDASUtil.swbyt4(numEntries));
         }
         //System.out.println("need to Swap = " + needToSwap);
         //System.out.println("number entries="+numEntries);

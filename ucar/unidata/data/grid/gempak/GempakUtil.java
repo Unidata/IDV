@@ -370,11 +370,11 @@ public final class GempakUtil {
      * Swap the order of the integers in place.
      * @param values  array of int values
      * @param startIndex  starting index of the array
-     * @param endIndex  ending index of the array
+     * @param number of bytes
      * @return input array with values swapped
      */
-    public static int[] swp4(int[] values, int startIndex, int endIndex) {
-        McIDASUtil.flip(values, startIndex, endIndex);
+    public static int[] swp4(int[] values, int startIndex, int number) {
+        McIDASUtil.swbyt4(values, startIndex, number);
         return values;
     }
 
