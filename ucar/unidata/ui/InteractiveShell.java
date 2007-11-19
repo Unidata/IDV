@@ -126,6 +126,28 @@ public class InteractiveShell implements HyperlinkListener {
         LogUtil.registerWindow(frame);
     }
 
+    public void close() {
+        frame.dispose();
+    }
+
+
+    public void show() {
+        frame.setVisible(true);
+    }
+
+    protected String getHref(String text, String label) {
+        String encoded = new String(XmlUtil.encodeBase64(("text:" + text).getBytes()));
+        return "<a href=\"" + encoded +"\">"+label+"</a>";
+    }
+
+    protected void showWaitCursor() {
+        frame.setCursor(GuiUtils.waitCursor);
+    }
+
+    protected void showNormalCursor() {
+        frame.setCursor(GuiUtils.normalCursor);
+    }
+
     /**
      * _more_
      */
