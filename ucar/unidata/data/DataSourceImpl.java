@@ -672,6 +672,14 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         return dataChoices;
     }
 
+    protected void initAfter() {
+        if (getPollingInfo().getIsActive()) {
+            startPolling();
+        }
+        loadView();
+
+    }
+
     /**
      * Implement the XmlPersistable  interface method that is called after
      * this object has been fully created and initialized after being
@@ -679,10 +687,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      */
     public void initAfterUnpersistence() {
         initAfterUnpersistenceBeenCalled = true;
-        if (getPollingInfo().getIsActive()) {
-            startPolling();
-        }
-        loadView();
+        initAfter();
         //TODO: Let's not change anything for now
         //      descriptor = getDataContext().getIdv().getDataManager().getCurrent(descriptor);
     }
@@ -692,10 +697,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * Gets called after creation. Initialize the polling.
      */
     public void initAfterCreation() {
-        if (getPollingInfo().getIsActive()) {
-            startPolling();
-        }
-        loadView();
+        initAfter();
         //For now we don't share        initSharable();
         //Don't do this for now. 
     }
@@ -930,7 +932,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @param e     true for error
      * @param msg   error message
      */
-    protected void setInError(boolean e, String msg) {
+    public void setInError(boolean e, String msg) {
         setInError(e, true, msg);
     }
 
@@ -942,7 +944,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @param needToShowErrorToUser SHould show to user
      * @param msg Any message
      */
-    protected void setInError(boolean inError, boolean needToShowErrorToUser,
+    public void setInError(boolean inError, boolean needToShowErrorToUser,
                               String msg) {
         this.needToShowErrorToUser = needToShowErrorToUser;
         this.inError               = inError;
@@ -955,7 +957,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      *
      * @param e     true for error
      */
-    protected void setInError(boolean e) {
+    public void setInError(boolean e) {
         inError = e;
     }
 
@@ -3491,6 +3493,69 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     public long getCacheClearDelay() {
         return cacheClearDelay;
     }
+
+    private String userName;
+    private String password;
+
+    public boolean showPasswordDialog(String title, String label) {
+        JTextField nameFld = new JTextField((this.getUserName()!=null?this.getUserName():""),10);
+        JTextField passwordFld = new JTextField((this.getPassword()!=null?this.getPassword():""),10);
+        GuiUtils.tmpInsets = new Insets(5,5,5,5);
+        JComponent contents = GuiUtils.doLayout(new Component[]{
+            GuiUtils.rLabel("User Name:"),
+            nameFld,
+            GuiUtils.rLabel("Password:"),
+            passwordFld
+        }, 2, GuiUtils.WT_NY,GuiUtils.WT_N);
+        contents = GuiUtils.inset(GuiUtils.topCenter(new JLabel(label),contents),5);
+        if(!GuiUtils.showOkCancelDialog(null,title, contents, null)) {
+            return false;
+        }
+        this.setUserName(nameFld.getText().trim());
+        this.setPassword(passwordFld.getText().trim());
+        return true;
+    }
+
+
+
+/**
+Set the UserName property.
+
+@param value The new value for UserName
+**/
+public void setUserName (String value) {
+	userName = value;
+}
+
+/**
+Get the UserName property.
+
+@return The UserName
+**/
+public String getUserName () {
+	return userName;
+}
+
+/**
+Set the Password property.
+
+@param value The new value for Password
+**/
+public void setPassword (String value) {
+	password = value;
+}
+
+/**
+Get the Password property.
+
+@return The Password
+**/
+public String getPassword () {
+	return password;
+}
+
+
+
 
 
 }
