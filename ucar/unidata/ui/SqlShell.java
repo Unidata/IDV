@@ -142,7 +142,7 @@ public class SqlShell extends InteractiveShell {
                     int colcnt = 0;
                     while(colcnt<rsmd.getColumnCount()) {
                         String s =results.getString(++colcnt); 
-                        if(colcnt>1) sb.append ("&nbsp;|&nbsp;");
+                        if(colcnt>1) sb.append (", ");
                         sb.append(s);
                     }
                     sb.append("<br>");
