@@ -828,7 +828,8 @@ public class LogUtil {
             excMessage = "\n" + excMessage;
         }
 
-        String msg = "An error has occurred:\n" + xmsg+" " + excMessage;
+        //"An error has occurred:\n"
+        String msg =  xmsg+" " + excMessage;
         if (file != null) {
             msg = msg + "\n\n" + "View file at:" + file;
         }
