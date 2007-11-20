@@ -156,17 +156,15 @@ public class McIDASGridReader {
 
                 McIDASGridRecord gr = new McIDASGridRecord(entries[i],
                                           header);
-                //if (gr.getGridDefRecordId().equals("CONF X:93 Y:65")) {
-                if ( !(gr.getGridDefRecordId().equals("MERC X:289 Y:145"))) {
-                    //if (gr.getGridDefRecordId().equals("McNAV: 6 X:93 Y:65") &&
-                    //    (gr.getParameterName().equals("T") || 
-                    //     gr.getParameterName().equals("RH"))) {
-
+                if (gr.getGridDefRecordId().equals("CONF X:93 Y:65")) {
+                //if (gr.getGridDefRecordId().equals("CONF X:54 Y:47")) {
+                // figure out how to handle Mercator projections
+                //if ( !(gr.getGridDefRecordId().startsWith("MERC"))) {
                     gridIndex.addGridRecord(gr);
                     if (gdsMap.get(gr.getGridDefRecordId()) == null) {
-                        //ucar.unidata.util.Misc.printArray("header ", header);
                         McGridDefRecord mcdef = gr.getGridDefRecord();
                         //System.out.println("new nav " + mcdef.toString());
+                        //ucar.unidata.util.Misc.printArray("header ", header);
                         gdsMap.put(mcdef.toString(), mcdef);
                         gridIndex.addHorizCoordSys(mcdef);
                     }
