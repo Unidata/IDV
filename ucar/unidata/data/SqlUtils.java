@@ -283,7 +283,7 @@ public class SqlUtils {
     public static void main(String[]args) throws Exception {
         Class.forName("com.mysql.jdbc.Driver");
         String url = "jdbc:mysql://localhost:3306/test?zeroDateTimeBehavior=convertToNull";
-        Connection connection = DriverManager.getConnection(url, "jeff", "mypassword");
+        Connection connection = DriverManager.getConnection(url, "jeff", "password");
         Statement stmt = connection.createStatement();
         //        makeTable(stmt);
         //        String s1 = "select * from nids";
