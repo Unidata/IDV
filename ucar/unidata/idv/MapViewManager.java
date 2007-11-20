@@ -325,6 +325,27 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
+
+
+
+    /**
+     * Get a list of named locations of the different points of the view rectangle. e.g., center, upper left, etc.
+     *
+     * @return list of locations
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public List<TwoFacedObject> getScreenCoordinates() throws VisADException, RemoteException {
+        List<TwoFacedObject> l = getNavigatedDisplay().getScreenCoordinates();
+        List<TwoFacedObject> result = new ArrayList<TwoFacedObject>();
+        for(TwoFacedObject tfo: l) {
+            result.add(new TwoFacedObject(tfo.toString(),getNavigatedDisplay().getEarthLocation((double[]) tfo.getId())));
+        }
+        return result;
+    }
+
+
     /**
      * Initialize this object.
      *

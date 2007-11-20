@@ -87,15 +87,17 @@ import ucar.unidata.xml.XmlPersistable;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
+
 import ucar.visad.VisADPersistence;
 import ucar.visad.display.DisplayMaster;
+
 
 import visad.Data;
 import visad.VisADException;
 
 
 import visad.georef.EarthLocation;
-
+import visad.georef.LatLonPoint;
 import visad.python.*;
 
 
@@ -6049,27 +6051,22 @@ public class IdvUIManager extends IdvManager {
      */
     public List makeCenterMenus(final ActionListener listener) {
         List menus = new ArrayList();
-        List vms   = getIdv().getVMManager().getViewManagers();
+        List vms   = getIdv().getVMManager().getViewManagers(MapViewManager.class);
         try {
             for (int i = 0; i < vms.size(); i++) {
-                ViewManager vm = (ViewManager) vms.get(i);
-                if ( !(vm instanceof MapViewManager)) {
-                    continue;
+                MapViewManager      mvm = (MapViewManager) vms.get(i);
+                List<TwoFacedObject> l = mvm.getScreenCoordinates();
+                List menuItemList = (vms.size()==1?menus: (List)new ArrayList());
+                for(TwoFacedObject tfo: l) {
+                    menuItemList.add(makeLocationMenuItem((EarthLocation) tfo.getId(), tfo.toString(), listener));
                 }
-                MapViewManager      mvm = (MapViewManager) vm;
-                final EarthLocation el  = mvm.getScreenCenter();
-                JMenuItem mi =
-                    new JMenuItem(
-                        getIdv().getDisplayConventions().formatEarthLocation(
-                            el, false));
-                mi.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        listener.actionPerformed(new ActionEvent(el, 1,
-                                "center"));
+                if(vms.size()>1) {
+                    String name = mvm.getName();
+                    if(name == null || name.length()==0) {
+                        name = "View " + (i+1);
                     }
-                });
-
-                menus.add(mi);
+                    menus.add(GuiUtils.makeMenu(name, menuItemList));
+                }
             }
         } catch (Exception exc) {
             logException("Making center menu", exc);
@@ -6077,6 +6074,20 @@ public class IdvUIManager extends IdvManager {
         return menus;
     }
 
+    private JMenuItem makeLocationMenuItem(final EarthLocation el, final String name, final ActionListener listener) {
+        LatLonPoint llp = el.getLatLonPoint();
+        JMenuItem mi =
+            new JMenuItem(StringUtil.padRight(name+": ",15," ")+
+                          getIdv().getDisplayConventions().formatLatLonPoint(llp));
+        GuiUtils.setFixedWidthFont(mi);
+        mi.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    listener.actionPerformed(new ActionEvent(el, 1,
+                                                             "name"));
+                }
+            });
+        return mi;
+    }
 
     /**
      * _more_

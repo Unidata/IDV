@@ -28,6 +28,7 @@ import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
 
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.display.*;
@@ -1012,6 +1013,17 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         java.awt.Rectangle screenBounds = getScreenBounds();
         return getSpatialCoordinatesFromScreen(screenBounds.width / 2,
                 screenBounds.height / 2);
+    }
+
+    
+    public List<TwoFacedObject> getScreenCoordinates() throws VisADException, RemoteException {
+        List<TwoFacedObject> l  = new ArrayList<TwoFacedObject>();
+        l.add(new TwoFacedObject("Center",getScreenCenter()));
+        l.add(new TwoFacedObject("Upper Left",getScreenUpperLeft()));
+        l.add(new TwoFacedObject("Upper Right",getScreenUpperRight()));
+        l.add(new TwoFacedObject("Lower Left",getScreenLowerLeft()));
+        l.add(new TwoFacedObject("Lower Right",getScreenLowerRight()));
+        return l;
     }
 
 
