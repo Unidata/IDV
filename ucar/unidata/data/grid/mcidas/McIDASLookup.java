@@ -60,7 +60,7 @@ public final class McIDASLookup implements GridTableLookup {
      * @return GridName
      */
     public final String getGridName(GridDefRecord gds) {
-        return getProjectionName(gds);
+        return gds.toString();
     }
 
     /**

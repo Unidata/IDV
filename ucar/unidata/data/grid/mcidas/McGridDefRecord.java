@@ -205,7 +205,7 @@ public class McGridDefRecord extends GridDefRecord {
                   gincn = (navType == PSEUDO_MERCATOR_GENERAL)
                           ? vals[39] / 10000.
                           : ginct;
-                  addParam("Latin", String.valueOf(gincn * 10000));
+                  addParam("Latin", String.valueOf(gincn));
                   addParam(LA1, String.valueOf(glamx));
                   addParam(LO1, String.valueOf(glomx));
                   /*
@@ -220,7 +220,7 @@ public class McGridDefRecord extends GridDefRecord {
               case PS_OR_LAMBERT_CONIC :
                   xrowi = vals[34] / 10000.;  // row # of the North pole*10000
                   xcoli = vals[35] / 10000.;  // col # of the North pole*10000
-                  xspace = vals[36] / 1000.;  // column spacing at standard lat (m)
+                  xspace = vals[36];  // column spacing at standard lat (m)
                   xqlon = -vals[37] / 10000.;  // lon parallel to cols (deg*10000)
                   xt1 = vals[38] / 10000.;  // first standard lat
                   xt2 = vals[39] / 10000.;  // second standard lat
