@@ -55,13 +55,13 @@ public class McGridDefRecord extends GridDefRecord {
     /** Navigation type for pseudo-mercator (general case) grids */
     private static final int PSEUDO_MERCATOR_GENERAL = 4;
 
-    /** no navigation          */
+    /** no navigation */
     private static final int NO_NAV = 5;
 
     /** Navigation type for lambert conformal tangent grids */
     private static final int LAMBERT_CONFORMAL_TANGENT = 6;
 
-    /** Earth radius          */
+    /** Earth radius */
     private static final double EARTH_RADIUS = 6371.23;
 
     /**
@@ -103,8 +103,7 @@ public class McGridDefRecord extends GridDefRecord {
      */
     public String toString() {
         // TODO: make this more unique
-        StringBuffer buf = new StringBuffer("McNAV: ");
-        buf.append(getParam("Proj"));
+        StringBuffer buf = new StringBuffer(getParam(PROJ));
         buf.append(" X:");
         buf.append(getParam(NX));
         buf.append(" ");
@@ -146,6 +145,9 @@ public class McGridDefRecord extends GridDefRecord {
     private double xblon;
     */
 
+    /** static debug count */
+    private static int cnt = 0;
+
     /**
      * Set the parameters for the GDS
      */
@@ -156,6 +158,7 @@ public class McGridDefRecord extends GridDefRecord {
         double xcoli;   // column # of North Pole* 10000
         double xqlon;   // longitude parallel to columns
         double xspace;  // column spacing at standard latitude
+        double yspace;  // row spacing at standard latitude
         double xt1;     // standard latitude
         double xt2;     // 2nd standard latitude
         double xh;      // 
@@ -164,6 +167,8 @@ public class McGridDefRecord extends GridDefRecord {
         /* Merc and pseudo_merc parameters */
         double glamx;  // max latitude
         double glomx;  // max longitude
+        double glamn;  // min latitude
+        double glomn;  // min longitude
         double ginct;  // grid increment in latitude
         double gincn;  // grid increment in longitude
 
@@ -176,7 +181,7 @@ public class McGridDefRecord extends GridDefRecord {
             boolean wierd = gridType / 10 == 1;
             int     ny    = vals[1];
             int     nx    = vals[2];
-            addParam(PROJ, String.valueOf(navType));
+            addParam(PROJ, getProjName(navType));
             addParam(NX, String.valueOf(nx));
             addParam(NY, String.valueOf(ny));
             double[][] input = new double[2][2];
@@ -190,6 +195,15 @@ public class McGridDefRecord extends GridDefRecord {
                 };
             }
             double[][] llur = nav.toLatLon(input);
+            /*
+            if (cnt == 0) {
+                ucar.unidata.util.Misc.printArray("input x", input[0]);
+                ucar.unidata.util.Misc.printArray("input y", input[1]);
+                ucar.unidata.util.Misc.printArray("lats", llur[0]);
+                ucar.unidata.util.Misc.printArray("lons", llur[1]);
+                cnt++;
+            }
+            */
             addParam(LA1, String.valueOf(llur[0][0]));
             addParam(LO1, String.valueOf(llur[1][0]));
             addParam(LA2, String.valueOf(llur[0][1]));
@@ -201,13 +215,15 @@ public class McGridDefRecord extends GridDefRecord {
               case PSEUDO_MERCATOR_GENERAL :
                   glamx = vals[34] / 10000.;
                   glomx = -vals[35] / 10000.;
+                  glamn = vals[34] / 10000.;
+                  glomn = -vals[35] / 10000.;
                   ginct = vals[38] / 10000.;
                   gincn = (navType == PSEUDO_MERCATOR_GENERAL)
                           ? vals[39] / 10000.
                           : ginct;
-                  addParam("Latin", String.valueOf(gincn));
-                  addParam(LA1, String.valueOf(glamx));
-                  addParam(LO1, String.valueOf(glomx));
+                  addParam("Latin", String.valueOf(glamx * 1000));
+                  addParam(DX, String.valueOf(gincn));
+                  addParam(DY, String.valueOf(ginct));
                   /*
                   if (wierd) {
                     double x = xnr;
@@ -218,8 +234,8 @@ public class McGridDefRecord extends GridDefRecord {
                   break;
 
               case PS_OR_LAMBERT_CONIC :
-                  xrowi = vals[34] / 10000.;  // row # of the North pole*10000
-                  xcoli = vals[35] / 10000.;  // col # of the North pole*10000
+                  xrowi  = vals[34] / 10000.;  // row # of the North pole*10000
+                  xcoli  = vals[35] / 10000.;  // col # of the North pole*10000
                   xspace = vals[36];  // column spacing at standard lat (m)
                   xqlon = -vals[37] / 10000.;  // lon parallel to cols (deg*10000)
                   xt1 = vals[38] / 10000.;  // first standard lat
@@ -254,14 +270,18 @@ public class McGridDefRecord extends GridDefRecord {
                   break;
 
               case EQUIDISTANT :
-                  /*
                   xrowi = 1.;
                   xcoli = 1.;
-                  glamx = vals[34]/10000.;       // lat of (1,1) degrees*10000
-                  glomx = -vals[35]/10000.;       // lon of (1,1) degrees*10000
-                  xrot  = -xrad*vals[36]/10000.; // clockwise rotation of col 1
-                  xspace = vals[37]/1000.;       // column spacing
-                  yspace = vals[38]/1000.;       // row spacing
+                  glamx = vals[34] / 10000.;   // lat of (1,1) degrees*10000
+                  glomx = -vals[35] / 10000.;  // lon of (1,1) degrees*10000
+                  //xrot  = -xrad*vals[36]/10000.; // clockwise rotation of col 1
+                  xspace = vals[37] / 1000.;   // column spacing
+                  yspace = vals[38] / 1000.;   // row spacing
+                  addParam(LA1, String.valueOf(glamx));
+                  addParam(LO1, String.valueOf(glomx));
+                  addParam(DX, String.valueOf(xspace));
+                  addParam(DY, String.valueOf(yspace));
+                  /*
                   xblat = EARTH_RADIUS*xrad/yspace;
                   xblon = EARTH_RADIUS*xrad/xspace;
 
@@ -309,19 +329,55 @@ public class McGridDefRecord extends GridDefRecord {
     }
 
     /**
-     * Get a short name for this GDSKey for the netCDF group.  
+     * Get a short name for this GDSKey for the netCDF group.
      * Subclasses should implement as a short description
      * @return short name
      */
     public String getGroupName() {
-       StringBuffer buf = new StringBuffer();
-       buf.append("Proj");
-       buf.append(getParam(PROJ));
-       buf.append("_");
-       buf.append(getParam(NX));
-       buf.append("x");
-       buf.append(getParam(NY));
-       return buf.toString();
+        StringBuffer buf = new StringBuffer();
+        buf.append(getParam(PROJ));
+        buf.append("_");
+        buf.append(getParam(NX));
+        buf.append("x");
+        buf.append(getParam(NY));
+        return buf.toString();
+    }
+
+    /**
+     * Get the name for the projection type
+     *
+     * @param type the projection type
+     *
+     * @return  a String name for the type
+     */
+    public String getProjName(int type) {
+        String projName = "UNKN";
+        switch (type) {
+
+          case PSEUDO_MERCATOR :
+          case PSEUDO_MERCATOR_GENERAL :
+              projName = "MERC";
+              break;
+
+          case PS_OR_LAMBERT_CONIC :
+              projName = (vals[38] == vals[39])
+                         ? "PS"
+                         : "CONF";
+              break;
+
+          case EQUIDISTANT :
+              projName = "EQUI";
+              break;
+
+          case LAMBERT_CONFORMAL_TANGENT :
+              projName = "CONF";
+              break;
+
+          default :
+              projName = "NAV" + type;
+        }
+        return projName;
+
     }
 
 }

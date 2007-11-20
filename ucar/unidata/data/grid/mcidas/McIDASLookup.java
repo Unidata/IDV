@@ -174,7 +174,7 @@ public final class McIDASLookup implements GridTableLookup {
      * @return isLatLon
      */
     public final boolean isLatLon(GridDefRecord gds) {
-        return getProjectionName(gds).equals("4");
+        return getProjectionName(gds).equals("EQUI");
     }
 
     /**
@@ -184,13 +184,11 @@ public final class McIDASLookup implements GridTableLookup {
      */
     public final int getProjectionType(GridDefRecord gds) {
         String name = getProjectionName(gds).trim();
-        if (name.equals("1")) {
+        if (name.equals("MERC")) {
             return Mercator;
-        } else if (name.equals("4")) {
-            return Mercator;
-        } else if (name.equals("6")) {
+        } else if (name.equals("CONF")) {
             return LambertConformal;
-        } else if (name.equals("2")) {
+        } else if (name.equals("PS")) {
             return PolarStereographic;
         } else {
             return -1;

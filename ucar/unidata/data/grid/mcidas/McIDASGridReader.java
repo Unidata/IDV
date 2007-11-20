@@ -156,7 +156,8 @@ public class McIDASGridReader {
 
                 McIDASGridRecord gr = new McIDASGridRecord(entries[i],
                                           header);
-                if (gr.getGridDefRecordId().equals("McNAV: 6 X:93 Y:65")) {
+                //if (gr.getGridDefRecordId().equals("CONF X:93 Y:65")) {
+                if ( !(gr.getGridDefRecordId().equals("MERC X:289 Y:145"))) {
                     //if (gr.getGridDefRecordId().equals("McNAV: 6 X:93 Y:65") &&
                     //    (gr.getParameterName().equals("T") || 
                     //     gr.getParameterName().equals("RH"))) {
