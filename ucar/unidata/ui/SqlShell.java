@@ -29,7 +29,9 @@ package ucar.unidata.ui;
 import org.python.core.*;
 import org.python.util.*;
 
+
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
@@ -83,6 +85,7 @@ public class SqlShell extends InteractiveShell {
 
 
 
+
     /**
      * _more_
      *
@@ -103,6 +106,7 @@ public class SqlShell extends InteractiveShell {
                 ResultSet catalogs = dbmd.getCatalogs();
                 while(catalogs.next()) {
                     String catalog = catalogs.getString(1);
+                    sb.append("<h3>" + catalog +"</h3>");
                     ResultSet tables = dbmd.getTables(catalog, null,tablePattern,null);
                     while(tables.next()) {
                         String tableName = tables.getString("TABLE_NAME");
