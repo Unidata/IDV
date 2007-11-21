@@ -299,8 +299,13 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      */
     protected void getDataSourceProperties(Hashtable ht) {
         if (autoCreateDisplayCbx != null) {
-            idv.getStore().put("idv." + getId() + ".autocreate",
-                               autoCreateDisplayCbx.isSelected());
+            String id = "idv." + getId() + ".autocreate";
+            boolean current = idv.getStore().get(id,autoCreateDisplayCbx.isSelected());
+            if(current !=autoCreateDisplayCbx.isSelected()) {
+                idv.getStore().put(id,
+                                   autoCreateDisplayCbx.isSelected());
+                idv.getStore().save();
+            }
             if (autoCreateDisplayCbx.isSelected()) {
                 String displayType = getDefaultDisplayType();
                 ht.put(DataSource.PROP_AUTOCREATEDISPLAY, displayType);
