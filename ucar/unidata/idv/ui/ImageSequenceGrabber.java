@@ -75,6 +75,7 @@ import java.util.TimeZone;
 import java.util.Vector;
 import java.util.zip.*;
 
+import java.text.DecimalFormat;
 
 import javax.media.*;
 import javax.media.control.*;
@@ -621,7 +622,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         }
         fileTemplateFld = new JTextField(dfltTemplate, 30);
         fileTemplateFld.setToolTipText(
-            "<html>Enter the file name template to use.<br><b>%count%</b> is the image counter<br>"
+            "<html>Enter the file name template to use.<br>" +
+            "<b>%count%</b> is the image counter<br>" +
+            "<b>%count:decimal format%</b> allows you to format the count. Google 'java decimalformat' for more information.<br>"
             + "<b>%time%</b> is the  animation time in the default format<br>"
             + "<b>%time:some time format string%</b> a macro that begins with &quot;time:&quot;,contains a time format string using the:<br>"
             + "java SimpleDateFormat formatting (see google)." + "</html>");
@@ -1337,7 +1340,22 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             }
         }
 
+
+
+        while(true) {
+            String formatString = StringUtil.findFormatString("count", "%",template);
+            if(formatString == null) break;
+            System.err.println (formatString);
+            DecimalFormat format = new DecimalFormat(formatString);
+            String formattedValue = format.format(cnt);
+            String tmp = StringUtil.replace(template, "%count:" + formatString+"%", formattedValue);
+            if(tmp.equals(template)) {
+                throw new IllegalStateException ("Bad formatting:" + tmp);
+            }
+            template = tmp;
+        }
         template = StringUtil.replace(template, "%count%", "" + cnt);
+        System.err.println ("template:" + template);
 
         try {
             DateTime dttm       = new DateTime(anime.getAniValue());
