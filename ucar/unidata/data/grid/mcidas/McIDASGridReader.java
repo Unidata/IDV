@@ -23,6 +23,7 @@
  */
 
 
+
 package ucar.unidata.data.grid.mcidas;
 
 
@@ -91,9 +92,7 @@ public class McIDASGridReader {
      * @throws IOException   problem reading file
      */
     public final void init(RandomAccessFile raf) throws IOException {
-        //setByteOrder();
-        gridIndex = new GridIndex();
-        rf        = raf;
+        rf = raf;
         raf.order(RandomAccessFile.BIG_ENDIAN);
         boolean ok = init();
         if ( !ok) {
@@ -111,8 +110,10 @@ public class McIDASGridReader {
      */
     protected boolean init() throws IOException {
         if (rf == null) {
-            throw new IOException("File is null");
+            logError("File is null");
+            return false;
         }
+        gridIndex = new GridIndex();
 
         rf.order(RandomAccessFile.BIG_ENDIAN);
         int numEntries = Math.abs(readInt(10));
@@ -120,8 +121,8 @@ public class McIDASGridReader {
             needToSwap = true;
             numEntries = Math.abs(McIDASUtil.swbyt4(numEntries));
         }
-        //System.out.println("need to Swap = " + needToSwap);
-        //System.out.println("number entries="+numEntries);
+        // System.out.println("need to Swap = " + needToSwap);
+        // System.out.println("number entries="+numEntries);
 
         // go back to the beginning
         rf.seek(0);
@@ -138,6 +139,11 @@ public class McIDASGridReader {
         int[] entries = new int[numEntries];
         for (int i = 0; i < numEntries; i++) {
             entries[i] = readInt(i + 11);
+            // sanity check that this is indeed a McIDAS Grid file
+            if (entries[i] < -1) {
+                logError("bad grid offset " + i + ": " + entries[i]);
+                return false;
+            }
         }
 
         // Don't swap:
@@ -157,9 +163,9 @@ public class McIDASGridReader {
                 McIDASGridRecord gr = new McIDASGridRecord(entries[i],
                                           header);
                 if (gr.getGridDefRecordId().equals("CONF X:93 Y:65")) {
-                //if (gr.getGridDefRecordId().equals("CONF X:54 Y:47")) {
-                // figure out how to handle Mercator projections
-                //if ( !(gr.getGridDefRecordId().startsWith("MERC"))) {
+                    //if (gr.getGridDefRecordId().equals("CONF X:54 Y:47")) {
+                    // figure out how to handle Mercator projections
+                    // if ( !(gr.getGridDefRecordId().startsWith("MERC"))) {
                     gridIndex.addGridRecord(gr);
                     if (gdsMap.get(gr.getGridDefRecordId()) == null) {
                         McGridDefRecord mcdef = gr.getGridDefRecord();
@@ -170,9 +176,14 @@ public class McIDASGridReader {
                     }
                 }
             } catch (McIDASException me) {
-                System.out.println("problem creating grid dir");
-                continue;
+                logError("problem creating grid dir");
+                return false;
             }
+        }
+        // check to see if there are any grids that we can handle
+        if (gridIndex.getGridRecords().isEmpty()) {
+            logError("no grids found");
+            return false;
         }
         return true;
     }
@@ -261,6 +272,15 @@ public class McIDASGridReader {
         int idata = rf.readInt();
         rf.order(RandomAccessFile.BIG_ENDIAN);
         return idata;
+    }
+
+    /**
+     * Log an error
+     *
+     * @param errMsg message to log
+     */
+    private void logError(String errMsg) {
+        errorMessage = errMsg;
     }
 
     /**
