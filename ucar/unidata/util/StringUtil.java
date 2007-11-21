@@ -123,6 +123,30 @@ public class StringUtil {
     }
 
     /**
+     * Return the format string in the given text for the given macro.
+     * text may contain a macro of the form 'macroDelimiter macroName:format string macroDelimiter'
+     * e.g.: %count:some format%
+     * This returns the format string
+     *
+     * @param macroName The name of the macro
+     * @param macroDelimiter The delimiter used. e.g. '%'
+     * @param text the text
+     * @return the format string or null
+     */
+    public static String findFormatString(String macroName, String macroDelimiter, String text) {
+        String prefix = macroDelimiter+macroName +":";
+        int idx1 = text.indexOf(prefix);
+        if (idx1 >= 0) {
+            int idx2 = text.indexOf(macroDelimiter, idx1 + 1);
+            if (idx2 > idx1) {
+                return text.substring(idx1 + prefix.length(), idx2);
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * Find all occurences of the "match" in original, and substitute the "subst" string.
      * @param original starting string
      * @param match string to match
