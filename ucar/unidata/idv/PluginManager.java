@@ -863,6 +863,7 @@ public class PluginManager extends IdvManager {
             }
             initializeMenu(theMenu, data);
         }
+        GuiUtils.limitMenuSize(menu, "Favorites", 20);
     }
 
     /**
