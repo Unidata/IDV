@@ -395,7 +395,7 @@ public class HttpServer {
          *
          * @throws Exception On badness
          */
-        protected void writeResult(boolean ok, String content,
+        public void writeResult(boolean ok, String content,
                                    String type) throws Exception {
             writeResult(ok, content.getBytes(), type);
         }
@@ -409,7 +409,7 @@ public class HttpServer {
          *
          * @throws Exception On badness
          */
-        protected void writeResult(boolean ok, byte[] content,
+        public void writeResult(boolean ok, byte[] content,
                                    String type) throws Exception {
             writeHeader(ok, content.length, type);
             output.write(content);
@@ -487,7 +487,7 @@ public class HttpServer {
      *
      * @param args args
      */
-    public static void main(String args[]) {
+    public static void xxxmain(String args[]) {
         int port = 80;
         try {
             if (args.length > 0) {

@@ -167,6 +167,10 @@ public abstract class XmlUtil {
         return " " + name + "=" + quote(encodeString(value)) + " ";
     }
 
+    public static String attrs(String name, String value) {
+        return " " + name + "=" + quote(encodeString(value)) + " ";
+    }
+
 
     /**
      *  Return a String with n1=&quot;v1&quot n2=&quot;v2&quot.
@@ -260,6 +264,10 @@ public abstract class XmlUtil {
         return "<" + name + ((attrs.length() > 0)
                              ? " "
                              : "") + attrs + ">\n";
+    }
+
+    public static String openTag(String name) {
+        return "<" + name + ">\n";
     }
 
     /**

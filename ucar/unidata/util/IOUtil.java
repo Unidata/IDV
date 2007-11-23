@@ -1445,7 +1445,7 @@ public class IOUtil {
     }
 
 
-    /**
+     /**
      * Recursively descend (if recurse is true)
      * through the given directory and return a
      * list of all files
@@ -1463,6 +1463,7 @@ public class IOUtil {
             files = new ArrayList();
         }
         List dirs = getDirectories(dir, recurse);
+        System.err.println ("dirs:" + dirs);
         for (int dirIdx = 0; dirIdx < dirs.size(); dirIdx++) {
             File   directory = (File) dirs.get(dirIdx);
             File[] allFiles  = ((filter == null)
@@ -1475,6 +1476,22 @@ public class IOUtil {
             }
         }
         return files;
+    }
+
+    
+    public static interface FileViewer {
+        public boolean viewFile(File f) throws Exception ;
+    }
+
+
+    public static boolean walkDirectory(File dir, FileViewer fileViewer) throws Exception {
+        File[] children  = dir.listFiles();
+        if(children == null) return true;
+        for (int i=0;i<children.length;i++) {
+            if(!fileViewer.viewFile(children[i])) return false;
+            if(!walkDirectory(children[i], fileViewer)) return false;
+        }
+        return true;
     }
 
 
