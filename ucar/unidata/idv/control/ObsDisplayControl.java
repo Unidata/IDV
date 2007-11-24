@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -27,8 +28,6 @@ import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.grid.GridUtil;
-
-
 
 import ucar.unidata.data.point.*;
 
@@ -840,6 +839,21 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
             timeDeclutterCbx.setSelected(value);
             ignoreTimeDeclutterEnabled = false;
         }
+    }
+
+    /**
+     * Add properties to the display settings dialog
+     *
+     * @param dsd display settings dialog
+     */
+    protected void addDisplaySettings(DisplaySettingsDialog dsd) {
+        super.addDisplaySettings(dsd);
+        dsd.addPropertyValue(new Boolean(getTimeDeclutterEnabled()),
+                             "timeDeclutterEnabled", "Subset Times",
+                             SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(new Float(getTimeDeclutterMinutes()),
+                             "timeDeclutterMinutes", "Subset Interval (min)",
+                             SETTINGS_GROUP_DISPLAY);
     }
 
     /**

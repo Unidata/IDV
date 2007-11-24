@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.visad.display;
 
 
@@ -186,6 +185,27 @@ public class StationModelDisplayable extends DisplayableData {
     /** ShapeControl for the weather symbol shapes */
     ShapeControl shapeControl = null;
 
+    /** ScalarMap for the time selection */
+    ScalarMap timeSelectMap = null;
+
+    /** RealType used for the time selection */
+    RealType timeSelectType = null;
+
+    /** Control for select range */
+    private RangeControl timeSelectControl;
+
+    /** low range for select */
+    private double lowSelectedRange = Double.NaN;  // low range for scalarmap
+
+    /** high range for select */
+    private double highSelectedRange = Double.NaN;  // high range for scalarmap
+
+    /** low range for select map */
+    private double minSelect = Double.NaN;  // low range for scalarmap
+
+    /** high range for select map */
+    private double maxSelect = Double.NaN;  // high range for scalarmap
+
     /** The weather symbol shapes */
     VisADGeometryArray[] shapes = null;
 
@@ -222,6 +242,9 @@ public class StationModelDisplayable extends DisplayableData {
 
     /** mutex for locking when creating shapes */
     private static Object SHAPES_MUTEX = new Object();
+
+    /** flag for a time sequence */
+    private boolean isTimeSequence = false;
 
     /**
      * Default constructor;
@@ -387,6 +410,34 @@ public class StationModelDisplayable extends DisplayableData {
                     throws RemoteException, VisADException {}
         });
         addScalarMap(wxMap);
+        timeSelectType = RealType.getRealType("Station_Model_Time"
+                + myInstance, CommonUnit.secondsSinceTheEpoch);
+        timeSelectMap = new ScalarMap(timeSelectType, Display.SelectRange);
+        timeSelectMap.addScalarMapListener(new ScalarMapListener() {
+            public void controlChanged(ScalarMapControlEvent event)
+                    throws RemoteException, VisADException {
+                int id = event.getId();
+                if ((id == event.CONTROL_ADDED)
+                        || (id == event.CONTROL_REPLACED)) {
+                    timeSelectControl =
+                        (RangeControl) timeSelectMap.getControl();
+                    if (hasSelectedRange() && (timeSelectControl != null)) {
+                        timeSelectControl.setRange(new double[] {
+                            lowSelectedRange,
+                            highSelectedRange });
+                    }
+                }
+            }
+
+            public void mapChanged(ScalarMapEvent event)
+                    throws RemoteException, VisADException {
+                if ((event.getId() == event.AUTO_SCALE)
+                        && hasSelectMinMax()) {
+                    timeSelectMap.setRange(minSelect, maxSelect);
+                }
+            }
+        });
+        addScalarMap(timeSelectMap);
     }
 
 
@@ -490,7 +541,7 @@ public class StationModelDisplayable extends DisplayableData {
         FieldImpl newFI = null;
         synchronized (SHAPES_MUTEX) {
             haveNotified = null;
-            boolean isTimeSequence =
+            isTimeSequence =
                 ucar.unidata.data.grid.GridUtil.isTimeSequence(data);
             int numTimes = 0;
             shapeIndex  = 0;
@@ -570,7 +621,8 @@ public class StationModelDisplayable extends DisplayableData {
             llType = RealTupleType.LatitudeLongitudeTuple;
         }
         //      System.err.println(" usealt:" + useAltitude +" llType:" + llType);
-        TupleType    tt = new TupleType(new MathType[] { wxType, llType });
+        TupleType tt = new TupleType(new MathType[] { wxType, llType,
+                timeSelectType });
         FunctionType retType          = new FunctionType(domain, tt);
         List         dataList         = new Vector();
 
@@ -615,12 +667,18 @@ public class StationModelDisplayable extends DisplayableData {
                 continue;
             }
             for (int j = 0; j < obShapes.size(); j++) {
-                Data location = (useAltitude
-                                 ? ob.getEarthLocation()
-                                 : ob.getEarthLocation().getLatLonPoint());
+                Data     location = (useAltitude
+                                     ? ob.getEarthLocation()
+                                     : ob.getEarthLocation()
+                                         .getLatLonPoint());
+                DateTime obTime   = ob.getDateTime();
+                Real time = new Real(
+                                timeSelectType,
+                                obTime.getValue(
+                                    timeSelectType.getDefaultUnit()));
                 Data[] dataArray = new Data[] {
                                        new Real(wxType, shapeIndex++),
-                                       location };
+                                       location, time };
                 if (dataTupleType == null) {
                     dataTupleType = Tuple.buildTupleType(dataArray);
                 }
@@ -1478,19 +1536,20 @@ public class StationModelDisplayable extends DisplayableData {
      */
     private int getIndex(String[] names, String lookingFor) {
         if (lookingFor.equals("*")) {
-            if(names.length>0)
+            if (names.length > 0) {
                 return 0;
+            }
             return PointOb.BAD_INDEX;
         }
 
 
         if (lookingFor.startsWith("#")) {
             int index = new Integer(lookingFor.substring(1)).intValue();
-            if(index<names.length) {
+            if (index < names.length) {
                 return index;
             }
             return PointOb.BAD_INDEX;
-            
+
         }
 
 
@@ -1638,6 +1697,66 @@ public class StationModelDisplayable extends DisplayableData {
      */
     public boolean getShouldUseAltitude() {
         return shouldUseAltitude;
+    }
+
+    /**
+     * Set selected range with the range for select
+     *
+     * @param low  low select value
+     * @param hi   hi select value
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   problem creating VisAD object
+     */
+    public void setSelectedRange(double low, double hi)
+            throws VisADException, RemoteException {
+
+        lowSelectedRange  = low;
+        highSelectedRange = hi;
+        if ((timeSelectControl != null) && hasSelectedRange()) {
+            timeSelectControl.setRange(new double[] { low, hi });
+        }
+
+    }
+
+    /**
+     * Set the upper and lower limit of the range values associated
+     * with a color table.
+     *
+     * @param low    the minimun value
+     * @param hi     the maximum value
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   problem creating VisAD object
+     */
+    public void setRangeForSelect(double low, double hi)
+            throws VisADException, RemoteException {
+
+        minSelect = low;
+        maxSelect = hi;
+        if ((timeSelectMap != null) && hasSelectMinMax()) {
+            timeSelectMap.setRange(low, hi);
+        }
+    }
+
+    /**
+     * Check to see if the range has been set for the select
+     *
+     * @return true if it has
+     */
+    private boolean hasSelectMinMax() {
+        return ( !Double.isNaN(minSelect) && !Double.isNaN(maxSelect));
+    }
+
+    /**
+     * Returns whether this Displayable has a valid range
+     * (i.e., lowSelectedRange and highSelectedRange are both not NaN's
+     *
+     * @return true if range has been set
+     */
+    public boolean hasSelectedRange() {
+        return ( !Double.isNaN(lowSelectedRange)
+                 && !Double.isNaN(highSelectedRange));
     }
 
 }

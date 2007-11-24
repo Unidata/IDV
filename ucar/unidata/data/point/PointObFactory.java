@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.data.point;
 
 
@@ -1033,7 +1032,7 @@ public class PointObFactory {
      * Make a PointOb from an EarthLocation.  The time and data
      * are bogus.
      * @param el  EarthLocation to use
-     * @param dt _more_
+     * @param dt  DateTime to use
      * @return PointOb
      *
      * @throws RemoteException  Java RMI error
@@ -1098,6 +1097,46 @@ public class PointObFactory {
         return stationField;
     }
 
+    /**
+     * Remove the time dimension from a field of point obs, returning
+     * just and indexed list of the obs
+     *
+     * @param pointObs  time field of obs
+     *
+     * @return indexed list of obs
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException problem getting the data
+     */
+    public static FieldImpl removeTimeDimension(FieldImpl pointObs)
+            throws VisADException, RemoteException {
+        if ( !GridUtil.isTimeSequence(pointObs)) {
+            return pointObs;
+        }
+        Set          timeSet = pointObs.getDomainSet();
+        List         l       = new ArrayList();
+        FunctionType ft      = null;
+        for (int i = 0; i < timeSet.getLength(); i++) {
+            FieldImpl indexField = (FieldImpl) pointObs.getSample(i, false);
+            if (ft == null) {
+                ft = (FunctionType) indexField.getType();
+            }
+            for (int j = 0; j < indexField.getLength(); j++) {
+                Data d = indexField.getSample(j, false);
+                if ((d == null) || d.isMissing()) {
+                    continue;
+                }
+                l.add(d);
+            }
+        }
+        RealTupleType rt       = ft.getDomain();
+        Integer1DSet  domain   = new Integer1DSet(rt, l.size());
+        FieldImpl     retField = new FieldImpl(ft, domain);
+        for (int i = 0; i < l.size(); i++) {
+            retField.setSample(i, (Data) l.get(i), false, false);
+        }
+        return retField;
+    }
 
     /**
      * main

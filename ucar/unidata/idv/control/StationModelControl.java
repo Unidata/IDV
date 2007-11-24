@@ -22,6 +22,8 @@
 
 
 
+
+
 package ucar.unidata.idv.control;
 
 
@@ -40,6 +42,7 @@ import ucar.unidata.data.DataAlias;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.DataTimeRange;
 import ucar.unidata.data.grid.GridUtil;
 
 import ucar.unidata.data.point.*;
@@ -80,6 +83,8 @@ import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.visad.ShapeUtility;
 import ucar.visad.Util;
 import ucar.visad.display.Animation;
+import ucar.visad.display.DisplayableData;
+import ucar.visad.display.LineDrawing;
 import ucar.visad.display.StationModelDisplayable;
 
 
@@ -156,6 +161,8 @@ public class StationModelControl extends ObsDisplayControl {
     /** This holds the chart */
     private JComponent plotPanel;
 
+    /** dummy data */
+    private static final Data DUMMY_DATA = new Real(0);
 
     /** The table that shows the drill-down info */
     private JTable table;
@@ -163,7 +170,11 @@ public class StationModelControl extends ObsDisplayControl {
     /** table scroller */
     private JScrollPane tableScroller;
 
+    /** The last time range we used */
+    private Range lastRange;
 
+    /** The range of all the data */
+    private Range timeRange;
 
     /** The table model that holds the drill-down info */
     private MyTableModel tableModel;
@@ -224,6 +235,9 @@ public class StationModelControl extends ObsDisplayControl {
     /** displayable for dat */
     StationModelDisplayable myDisplay;
 
+    /** time holder */
+    private DisplayableData timesHolder = null;
+
     /** station model to use */
     StationModel stationModel;
 
@@ -275,6 +289,9 @@ public class StationModelControl extends ObsDisplayControl {
 
     /** List of components to disable when not delcuttering */
     protected List densityComps = new ArrayList();
+
+    /** List of components to disable when not delcuttering */
+    protected List timeComps = new ArrayList();
 
     /** Keep around the last set of decluttered data */
     protected FieldImpl lastDeclutteredData;
@@ -334,6 +351,12 @@ public class StationModelControl extends ObsDisplayControl {
     /** The color table from the symbol in the layout model */
     private ColorTable stationModelColorTable;
 
+    /** Time strings */
+    private final static String[] TIMES_TO_USE = { "Individual",
+            "Accumulate" };
+
+    /** flag for using data times */
+    private boolean useDataTimes = true;
 
 
     /**
@@ -413,6 +436,10 @@ public class StationModelControl extends ObsDisplayControl {
         }
         myDisplay.setShouldUseAltitude(shouldUseAltitude);
         myDisplay.setScale(displayableScale);
+        timesHolder = new LineDrawing("ob_time" + dataChoice);
+        timesHolder.setManipulable(false);
+        timesHolder.setVisible(false);
+        addDisplayable(timesHolder);
         lastViewBounds = null;
 
         setScaleOnDisplayable();
@@ -579,6 +606,7 @@ public class StationModelControl extends ObsDisplayControl {
         try {
             getChart().timeChanged();
             updateTimes();
+            applyTimeRange();
         } catch (Exception exc) {
             logException("Property change", exc);
         }
@@ -835,8 +863,9 @@ public class StationModelControl extends ObsDisplayControl {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    private List<PointOb> findSelectedObs() throws VisADException, RemoteException {
-        List<PointOb>              obs = new ArrayList<PointOb>();
+    private List<PointOb> findSelectedObs()
+            throws VisADException, RemoteException {
+        List<PointOb>     obs = new ArrayList<PointOb>();
         PointDataInstance pdi = (PointDataInstance) getDataInstance();
         if (pdi == null) {
             return obs;
@@ -1316,7 +1345,8 @@ public class StationModelControl extends ObsDisplayControl {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    private void setXYPlot(List<PointOb> obs) throws VisADException, RemoteException {
+    private void setXYPlot(List<PointOb> obs)
+            throws VisADException, RemoteException {
         getChart().setPointObs(obs, chartParams);
     }
 
@@ -1413,6 +1443,81 @@ public class StationModelControl extends ObsDisplayControl {
 
 
     /**
+     * Handle some sort of time change.  Either the subsetting interval
+     * changes or there is a new timestep.
+     */
+    public void applyTimeRange() {
+        try {
+            DataTimeRange dataTimeRange = getDataTimeRange(true);
+            if (timeRange == null) {
+                System.out.println("timeRange = " + timeRange);
+                return;
+            }
+            /* TODO: figure out the time stuff
+            double sinceEpoch = timeRange.getMax();
+            int    years      = (int) (sinceEpoch / (365 * 24 * 3600));
+            int    year       = 1970 + (years);
+            Unit dataTimeUnit = Util.parseUnit("seconds since " + year
+                                    + "-1-1 0:00:00 0:00");
+            RealType dataTimeRealType = Util.getRealType(dataTimeUnit);
+            Real startReal = new Real(dataTimeRealType, timeRange.getMin(),
+                                      dataTimeUnit);
+            Real endReal = new Real(dataTimeRealType, timeRange.getMax(),
+                                    dataTimeUnit);
+            */
+
+            Real startReal = new Real(RealType.Time, timeRange.getMin());
+            Real endReal = new Real(RealType.Time, timeRange.getMax());
+
+            Animation anime    = getAnimation();
+            Real      aniValue = ((anime != null)
+                                  ? anime.getAniValue()
+                                  : null);
+
+            Real[] startEnd = getDataTimeRange().getTimeRange(startReal,
+                                  endReal, aniValue);
+            //System.out.println("start = " + startEnd[0]);
+            //System.out.println("end = " + startEnd[1]);
+
+
+            double startDate =
+                startEnd[0].getValue(CommonUnit.secondsSinceTheEpoch);
+            double endDate =
+                startEnd[1].getValue(CommonUnit.secondsSinceTheEpoch);
+            if ( !Misc.equals(lastRange, new Range(startDate, endDate))) {
+                lastRange = new Range(startDate, endDate);
+                if (myDisplay != null) {
+                    myDisplay.setSelectedRange(startDate, endDate);
+                }
+            }
+        } catch (Exception e) {
+            logException("applyTimeRange", e);
+        }
+    }
+
+    /**
+     * Get the range for time selection.
+     *
+     * @return the Range
+     *
+     * @throws RemoteException remote data error
+     * @throws VisADException  VisAD error
+     */
+    private Range getRangeForTimeSelect()
+            throws VisADException, RemoteException {
+        Range range = null;
+        if ((timesHolder != null)
+                && !timesHolder.getData().equals(DUMMY_DATA)) {
+            Set        timeSet = (Set) timesHolder.getData();
+            double[][] doubles = timeSet.getDoubles(false);
+            double     start   = doubles[0][0];
+            double     end     = doubles[0][timeSet.getLength() - 1];
+            range = new Range(start, end);
+        }
+        return range;
+    }
+
+    /**
      * A utility method that sets the wait cursor and calls loadData in a separate thread .
      */
     protected void loadDataInThread() {
@@ -1470,22 +1575,23 @@ public class StationModelControl extends ObsDisplayControl {
             Trace.call1("StationModelControl.loadData");
             FieldImpl data = null;
 
-
-
-
-
-
             if (isInTransectView() || (llBounds == null)) {
                 Trace.call1("getObs-1");
-                data = (showAllTimes)
+                data = pdi.getTimeSequence();
+                /*
+                data = ( !useDataTimes)
                        ? pdi.getPointObs()
                        : pdi.getTimeSequence();
+                */
                 Trace.call2("getObs-1");
             } else {
                 Trace.call1("getObs-2");
-                data = (showAllTimes)
+                data = pdi.getTimeSequence(llBounds);
+                /*
+                data = ( !useDataTimes)
                        ? pdi.getPointObs(llBounds)
                        : pdi.getTimeSequence(llBounds);
+                */
                 Trace.call2("getObs-2");
             }
             if (data == null) {
@@ -1494,10 +1600,16 @@ public class StationModelControl extends ObsDisplayControl {
                 return;
             }
 
+
             //In case the user did a remove displayable while we were waiting for the data
             if ( !getActive()) {
                 return;
             }
+            /*
+            // get the range of the data for time select.
+            FieldImpl timeData = data;
+            timeRange = getRangeForTimeSelect(timeData);
+            */
 
             //            Trace.call2("getting data");
             FieldImpl theData = data;
@@ -1513,6 +1625,7 @@ public class StationModelControl extends ObsDisplayControl {
                 }
             }
 
+            /*
             if (timeDeclutterRight != null) {
                 boolean isTimeSequence = GridUtil.isTimeSequence(theData);
                 if (isTimeSequence) {
@@ -1536,6 +1649,7 @@ public class StationModelControl extends ObsDisplayControl {
                 timeDeclutterRight = null;
                 timeDeclutterLeft  = null;
             }
+            */
 
 
             if ( !getTimeDeclutterEnabled()) {
@@ -1562,6 +1676,13 @@ public class StationModelControl extends ObsDisplayControl {
                 Trace.call1("doDeclutterTime");
                 theData = doDeclutterTime(theData);
                 Trace.call2("doDeclutterTime");
+            }
+
+            // remove the data times if we are in accumulate mode
+            if ( !getUseDataTimes()) {
+                setDataTimes(theData);
+                timeRange = getRangeForTimeSelect();
+                theData   = PointObFactory.removeTimeDimension(theData);
             }
 
             if (declutter) {
@@ -1600,6 +1721,7 @@ public class StationModelControl extends ObsDisplayControl {
                     setSelectedOb((PointOb) obs.get(0));
                 }
             }
+            applyTimeRange();
 
         } catch (Exception excp) {
             logException("loading data ", excp);
@@ -1612,6 +1734,34 @@ public class StationModelControl extends ObsDisplayControl {
     }
 
 
+    /**
+     * Make the time option widget
+     *
+     * @return  the time option widget
+     */
+    private Component doMakeTimeOptionWidget() {
+        JComboBox box = new JComboBox(TIMES_TO_USE);
+        box.setSelectedIndex(getUseDataTimes()
+                             ? 0
+                             : 1);
+        box.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setUseDataTimes(
+                    ((JComboBox) e.getSource()).getSelectedIndex() == 0);
+                loadDataInThread();
+            }
+        });
+
+        JComponent[] timeDeclutterComps = getTimeDeclutterComps();
+        JPanel timeDeclutter =
+            GuiUtils.left(GuiUtils.hflow(Misc.newList(new Component[] {
+            box, new JLabel(" Show Every: "), timeDeclutterComps[1],
+            new JLabel(" minutes "), timeDeclutterComps[0],
+            new JLabel("enabled")
+        }), 2, 1));
+        return timeDeclutter;
+
+    }
 
 
     /**
@@ -2197,17 +2347,6 @@ public class StationModelControl extends ObsDisplayControl {
         });
 
 
-        JCheckBox timesBox = new JCheckBox("", getShowAllTimes());
-        timesBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setShowAllTimes(((JCheckBox) e.getSource()).isSelected());
-                loadDataInThread();
-            }
-        });
-        JComponent timesComp =
-            GuiUtils.hbox(GuiUtils.rLabel("Show All Times at Once:"),
-                          timesBox);
-
         JComponent testButton = GuiUtils.makeButton("Test", this, "test");
         //        controlWidgets.add(new WrapperWidget(this, GuiUtils.rLabel(""),
         //                                             testButton));
@@ -2216,33 +2355,35 @@ public class StationModelControl extends ObsDisplayControl {
         controlWidgets.add(
             new WrapperWidget(
                 this, GuiUtils.rLabel("Declutter:"),
-                GuiUtils.leftRight(
-                    GuiUtils.hbox(toggle, getLockButton()), timesComp)));
+                GuiUtils.hbox(Misc.newList(new Object[] { toggle,
+                getLockButton(), GuiUtils.filler(),
+                addDensityComp(GuiUtils.rLabel(" Density: ")),
+                getDensityControl() }))));
+
+
+        JPanel timeModePanel =
+            GuiUtils.leftCenter(
+                GuiUtils.wrap(
+                    GuiUtils.makeButton(
+                        "Change", this,
+                        "showTimeRangeDialog")), GuiUtils.inset(
+                            getDataTimeRange(true).getTimeModeLabel(),
+                            new Insets(0, 10, 0, 0)));
+        addTimeComp(timeModePanel);
+
         controlWidgets.add(
             new WrapperWidget(
-                this, addDensityComp(GuiUtils.rLabel("Plot Density:")),
-                getDensityControl()));
+                this, GuiUtils.rLabel("Times to Use:"),
+                doMakeTimeOptionWidget()));
 
-
-
-
-
-
-
-        JComponent[] timeDeclutterComps = getTimeDeclutterComps();
-        timeDeclutterRight = GuiUtils.center(new JLabel(" "));
-        timeDeclutterLeft  = GuiUtils.center(new JLabel(" "));
-        controlWidgets.add(new WrapperWidget(this, timeDeclutterLeft,
-                                             timeDeclutterRight, null));
-
-
-        //Spacer
-        /*        controlWidgets.add(new WrapperWidget(this, GuiUtils.rLabel(" "),
-                  GuiUtils.rLabel(" ")));*/
-
+        controlWidgets.add(
+            new WrapperWidget(
+                this, addTimeComp(GuiUtils.rLabel("Accumulation Times:")),
+                timeModePanel));
 
 
         GuiUtils.enableComponents(densityComps, declutter);
+        GuiUtils.enableComponents(timeComps, !getUseDataTimes());
 
 
         final JTextField scaleField =
@@ -2559,6 +2700,19 @@ public class StationModelControl extends ObsDisplayControl {
     }
 
     /**
+     * Add the given component into the list of time accumulation components
+     * that are to be enabled/disabled when the time accumulation mode is set.
+     *
+     * @param comp The component to add into the lsit
+     *
+     * @return The same component. We return it as a convenience.
+     */
+    protected JComponent addTimeComp(JComponent comp) {
+        timeComps.add(comp);
+        return comp;
+    }
+
+    /**
      * Create the 'Low' slider 'High' jpanel for the density slider.
      *
      * @return The panel that holds the density slider.
@@ -2630,6 +2784,12 @@ public class StationModelControl extends ObsDisplayControl {
      */
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         super.addDisplaySettings(dsd);
+        if (getDataTimeRange() != null) {
+            dsd.addPropertyValue(getDataTimeRange(), "dataTimeRange",
+                                 "Accumulation Times", "Display");
+        }
+        dsd.addPropertyValue(new Boolean(getUseDataTimes()), "useDataTimes",
+                             "Use Data Times", SETTINGS_GROUP_DISPLAY);
         if ( !isChartEnabled()) {
             return;
         }
@@ -2870,8 +3030,28 @@ public class StationModelControl extends ObsDisplayControl {
         super.doRemove();
     }
 
-
-
+    /**
+     * Set the times in the times holder
+     *
+     * @param timeData  the data with times 
+     * 
+     * @throws RemoteException   Java RMI problem
+     * @throws VisADException    VisAD problem
+     */
+    private void setDataTimes(FieldImpl timeData)
+            throws VisADException, RemoteException {
+        if (timesHolder == null) {
+            return;
+        }
+        if (getUseDataTimes()) {
+            timesHolder.setData(DUMMY_DATA);
+            return;
+        }
+        if (GridUtil.isTimeSequence(timeData)) {
+            Set timeSet = timeData.getDomainSet();
+            timesHolder.setData(timeSet);
+        }
+    }
 
     /**
      * Declutters the observations.  This is just a wrapper around
@@ -3223,16 +3403,26 @@ public class StationModelControl extends ObsDisplayControl {
      * @param value The new value for showAllTimes
      */
     public void setShowAllTimes(boolean value) {
-        showAllTimes = value;
+        setUseDataTimes( !value);
     }
 
     /**
-     * Get the ShowAllTimes property.
+     * Set the use data times times property.
      *
-     * @return The ShowAllTimes
+     * @param value The new value for use data times
      */
-    public boolean getShowAllTimes() {
-        return showAllTimes;
+    public void setUseDataTimes(boolean value) {
+        useDataTimes = value;
+        GuiUtils.enableComponents(timeComps, !useDataTimes);
+    }
+
+    /**
+     * Get the use data times property.
+     *
+     * @return The use data times property
+     */
+    public boolean getUseDataTimes() {
+        return useDataTimes;
     }
 
 
