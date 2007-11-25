@@ -259,6 +259,43 @@ public class SqlUtils {
         return actual;
     }
 
+
+    /**
+     * _more_
+     *
+     * @param stmt _more_
+     * @param column _more_
+     * @param missing _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static int[] readInt(Statement stmt, int column)
+            throws Exception {
+        int[]   current = new int[10000];
+        int       cnt     = 0;
+        ResultSet results;
+        Iterator  iter = getIterator(stmt);
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                int value = results.getInt(column);
+                //                if (value == missing) {
+                //                    value = Integer.NaN;
+                //                }
+                current[cnt++] = value;
+                if (cnt >= current.length) {
+                    int[] tmp = current;
+                    current = new int[current.length * 2];
+                    System.arraycopy(tmp, 0, current, 0, tmp.length);
+                }
+            }
+        }
+        int[] actual = new int[cnt];
+        System.arraycopy(current, 0, actual, 0, cnt);
+        return actual;
+    }
+
     /**
      * _more_
      *
