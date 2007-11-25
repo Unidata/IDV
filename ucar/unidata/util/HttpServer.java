@@ -400,6 +400,23 @@ public class HttpServer {
             writeResult(ok, content.getBytes(), type);
         }
 
+
+        public void writeResult(boolean ok, StringBuffer content,
+                                   String type) throws Exception {
+            writeResult(ok, content.toString().getBytes(), type);
+        }
+
+
+
+        public void writeXml(StringBuffer content) throws Exception {
+            writeResult(true, content.toString().getBytes(), "text/xml");
+        }
+
+
+        public void writeHtml(StringBuffer content) throws Exception {
+            writeResult(true, content.toString().getBytes(), "text/html");
+        }
+
         /**
          * _more_
          *
