@@ -98,6 +98,7 @@ public class MetaDataServer extends HttpServer {
                 protected void handleRequest(String path,   Hashtable formArgs,
                                              Hashtable httpArgs,
                                              String content) throws Exception {
+                    System.err.println("request:" + path);
                     try {
                     if(path.equals("/radar/query")) {
                         processRadarQuery(this, formArgs, httpArgs);
@@ -114,6 +115,10 @@ public class MetaDataServer extends HttpServer {
                         processRadarList(this, formArgs, "collection","collection");
                     } else if(path.equals("/radar/maketable")) {
                         long t1 = System.currentTimeMillis();
+                        try {
+                            eval("DROP TABLE nids");
+                        } catch(Exception exc) {
+                        }
                         makeNidsTable();
                         long t2 = System.currentTimeMillis();
                         writeResult(true, "Time:" + (t2-t1), "text/html");
@@ -372,6 +377,10 @@ public class MetaDataServer extends HttpServer {
     private void processArgs(String[] args) throws Exception {
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("maketable")) {
+                try {
+                    eval("DROP TABLE nids");
+                } catch(Exception exc) {
+                }
                 makeNidsTable();
             } else {
                 eval(args[i]);
@@ -386,7 +395,7 @@ public class MetaDataServer extends HttpServer {
         long baseTime = new Date().getTime();
         for(int stationIdx=0;stationIdx<100;stationIdx++) {
             for(int i=0;i<500;i++) {
-                radarInfos.add(new RadarInfo(collection, "foobar_"+stationIdx+"_"+i+"_"+collection, "stn"+stationIdx, "product"+(i%20),
+                radarInfos.add(new RadarInfo(collection, "foobar_"+stationIdx+"_"+i+"_"+collection, "stn"+stationIdx+"_" + collection, "product"+(i%20),
                                              baseTime + radarInfos.size()*100));
             }
         }
@@ -446,7 +455,7 @@ public class MetaDataServer extends HttpServer {
      */
     public  void makeNidsTable()
             throws Exception {
-        String sql = IOUtil.readContents("/ucar/unidata/mddb/makedb.sql", getClass());
+        String sql = IOUtil.readContents("/ucar/unidata/repository/makedb.sql", getClass());
         SqlUtils.loadSql(sql, statement);
 
         File            rootDir = new File("/data/ldm/gempak/nexrad/NIDS");
