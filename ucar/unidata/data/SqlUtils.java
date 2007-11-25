@@ -28,6 +28,7 @@ package ucar.unidata.data;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 
 
 
@@ -73,7 +74,7 @@ public class SqlUtils {
      * @return _more_
      */
     public static String quote(Object s) {
-        return "\"" + s.toString() + "\"";
+        return "'" + s.toString() + "'";
     }
 
 
@@ -153,22 +154,37 @@ public class SqlUtils {
      * @return _more_
      */
     public static String makeSelect(String what, String where) {
-        return "SELECT " + what + " FROM " + where + ";";
+        return makeSelect(what, where, "");
     }
 
-
-    /**
-     * _more_
-     *
-     * @param what _more_
-     * @param where _more_
-     * @param extra _more_
-     *
-     * @return _more_
-     */
     public static String makeSelect(String what, String where, String extra) {
-        return "SELECT " + what + " FROM " + where + " " + extra + ";";
+        return "SELECT " + what + " FROM " + where + " " + extra;
     }
+
+
+
+
+
+    public static void loadSql(String sql, Statement statement) 
+            throws Exception {
+        List<String> toks = (List<String>)StringUtil.split(sql,"\n");
+        StringBuffer sb = new StringBuffer();
+        for(String line: toks) {
+            String trimLine = line.trim();
+            if(trimLine.startsWith("--")) continue;
+            sb.append (line);
+            sb.append ("\n");
+            if(trimLine.endsWith(";")) {
+                String lineSql = sb.toString().trim();
+                //Strip off the ";"
+                lineSql = lineSql.substring(0, lineSql.length()-1);
+                //                System.err.println ("EVAL:" +lineSql);
+                statement.execute(lineSql);
+                sb = new StringBuffer();
+            }
+        }
+    }
+
 
     /**
      * _more_
