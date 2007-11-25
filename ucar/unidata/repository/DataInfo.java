@@ -43,7 +43,7 @@ import java.util.List;
  */
 public class DataInfo {
 
-    String collection;
+    Collection collection;
 
     /** _more_ */
     String file;
@@ -53,7 +53,7 @@ public class DataInfo {
 
     long endDate;
 
-    public DataInfo (String collection, String file, long date) {
+    public DataInfo (Collection collection, String file, long date) {
         this(collection, file, date, date);
     }
 
@@ -66,7 +66,7 @@ public class DataInfo {
      * @param product _more_
      * @param date _more_
      */
-    public DataInfo(String collection, String file, long startDate, long endDate) {
+    public DataInfo(Collection collection, String file, long startDate, long endDate) {
         this.collection = collection;
         this.file    = file;
         this.startDate    = startDate;
@@ -134,7 +134,7 @@ Set the Collection property.
 
 @param value The new value for Collection
 **/
-public void setCollection (String value) {
+public void setCollection (Collection value) {
 	collection = value;
 }
 
@@ -143,10 +143,14 @@ Get the Collection property.
 
 @return The Collection
 **/
-public String getCollection () {
+public Collection getCollection () {
 	return collection;
 }
 
+public int getCollectionId () {
+    if(collection!=null) return collection.getId();
+    return -1;
+}
 
 
 }
