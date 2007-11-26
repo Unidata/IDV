@@ -53,7 +53,10 @@ import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.xml.XmlUtil;
 
+import java.io.File;
+
 import java.awt.*;
+
 import java.awt.event.*;
 
 
@@ -1663,7 +1666,7 @@ public class ThreddsHandler extends XmlHandler {
             //A hack to allow for absolute paths in urls
             String url;
             Element serviceNode = null;
-            if(urlPath.indexOf(":")>=0) { 
+            if(urlPath.indexOf(":")>=0 || new File(urlPath).exists()) { 
                 url = urlPath;
             } else {
                 serviceNode = findServiceNodeForDataset(datasetNode,
