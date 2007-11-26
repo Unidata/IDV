@@ -28,6 +28,7 @@ package ucar.unidata.repository;
 import ucar.unidata.data.SqlUtils;
 import ucar.unidata.xml.XmlUtil;
 
+import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.IOUtil;
@@ -39,6 +40,7 @@ import ucar.unidata.util.StringUtil;
 
 import java.net.*;
 import java.io.File;
+import java.io.InputStream;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -52,6 +54,8 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
+import java.util.Properties;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Date;
 import java.util.List;
@@ -69,6 +73,15 @@ import java.util.regex.*;
  * @version $Revision: 1.3 $
  */
 public class Repository {
+
+    long baseTime = System.currentTimeMillis();
+    long cnt = 0;
+
+
+    private String getKey() {
+        return baseTime +"_"+(cnt++);
+    }
+
 
     /** _more_          */
     private Connection connection;
@@ -138,7 +151,11 @@ public class Repository {
         sb.append(" <tr><td align=\"right\"><b>"+ label+"</b> </td><td><select name=\"" + name +"\">");
         sb.append("<option>" + "All" +"</option>");
         for(int i=0;i<values.length;i++) {
-            sb.append("<option>" + values[i] +"</option>");
+            String optionLabel = getProductName(values[i],null);
+            if(optionLabel!=null) optionLabel = optionLabel +" (" + values[i]+")";
+            else
+                optionLabel = values[i];
+            sb.append("<option value=\"" + values[i] +"\">" + optionLabel+"</option>");
         }
         sb.append("</td></tr>");
     }
@@ -149,7 +166,7 @@ public class Repository {
         Statement statement  =connection.createStatement();
         long t1 = System.currentTimeMillis();
         statement.execute("select distinct collection from nids ");
-        int[]collections = SqlUtils.readInt(statement,1);
+        String[]collections = SqlUtils.readString(statement,1);
         long t2 = System.currentTimeMillis();
 
         statement.execute("select distinct product from nids ");
@@ -182,7 +199,7 @@ public class Repository {
         sb.append(" <tr><td align=\"right\"><b>Collection:</b> </td><td><select name=\"collection\">");
         sb.append("<option>" + "All" +"</option>");
         for(int i=0;i<collections.length;i++) {
-            Collection collection = findCollection(collections[i]);
+            Collection collection = findCollectionFromId(collections[i]);
             if(collection!=null) {
                 sb.append("<option>" + collection.getFullName()+"</option>");
             }
@@ -226,7 +243,7 @@ public class Repository {
         sb.append (XmlUtil.XML_HEADER +"\n" );
         sb.append(XmlUtil.openTag(tag+"s"));
         for(int i=0;i<stations.length;i++) {
-            sb.append(XmlUtil.tag(tag, XmlUtil.attrs("name", stations[i])));
+            sb.append(XmlUtil.tag(tag, XmlUtil.attrs("id", stations[i],"name",getProductName(stations[i]))));
         }
         sb.append(XmlUtil.closeTag(tag+"s"));
         return sb;
@@ -238,12 +255,12 @@ public class Repository {
         Statement statement  =connection.createStatement();
         String query = "select distinct collection from nids " + assembleRadarWhereClause(args);
         statement.execute(query);
-        int []collections = SqlUtils.readInt(statement,1);
+        String []collections = SqlUtils.readString(statement,1);
         StringBuffer sb = new StringBuffer();
         sb.append (XmlUtil.XML_HEADER +"\n" );
         sb.append(XmlUtil.openTag("collections"));
         for(int i=0;i<collections.length;i++) {
-            Collection collection = findCollection(collections[i]);
+            Collection collection = findCollectionFromId(collections[i]);
             if(collection!=null) {
                 sb.append(XmlUtil.tag("collection", XmlUtil.attrs("name", collection.getFullName())));
             }
@@ -253,12 +270,18 @@ public class Repository {
     }
 
 
+    private String getDateString(String dttm) throws java.text.ParseException {
+        Date date = DateUtil.parse(dttm);
+        return SqlUtils.format(date);
+        
+    }
+
     protected String assembleRadarWhereClause(Hashtable args) throws Exception {
         List where = new ArrayList();
         String collectionName = (String) args.get("collection");
         if(collectionName!=null && !collectionName.toLowerCase().equals("all") ) {
             Collection collection = findCollection(collectionName);
-            where.add(" collection=" + collection.getId());
+            where.add(" collection=" + SqlUtils.quote(collection.getId()));
         }
 
         String station = (String) args.get("station");
@@ -273,11 +296,11 @@ public class Repository {
 
         String fromdate = (String) args.get("fromdate");
         if(fromdate!=null && fromdate.trim().length()>0) {
-            where.add(" date>=" + SqlUtils.quote(fromdate));
+            where.add(" date>=" + SqlUtils.quote(getDateString(fromdate)));
         }
         String todate = (String) args.get("todate");
         if(todate!=null && todate.trim().length()>0) {
-            where.add(" date<=" + SqlUtils.quote(todate));
+            where.add(" date<=" + SqlUtils.quote(getDateString(todate)));
         }
 
         if(where.size()>0) {
@@ -289,21 +312,21 @@ public class Repository {
 
     private static Hashtable collectionMap = new Hashtable();
 
-    protected Collection findCollection(int id) throws Exception {
-        if(id == -1) return  null;
-        Collection collection = (Collection) collectionMap.get(new Integer(id));
+    protected Collection findCollectionFromId(String id) throws Exception {
+        if(id == null || id.length()==0) return  null;
+        Collection collection = (Collection) collectionMap.get(id);
         if(collection!=null) return collection;
-        String query = "select id,parent,name,description from collections where id=" + id ;
+        String query = "select id,parent,name,description from collections where id=" + SqlUtils.quote(id) ;
         Statement statement  =connection.createStatement();
         statement.execute(query);
         ResultSet results = statement.getResultSet();        
         if(results.next()) {
-            collection = new Collection(findCollection(results.getInt(2)), results.getInt(1), results.getString(3), results.getString(4));
+            collection = new Collection(findCollectionFromId(results.getString(2)), results.getString(1), results.getString(3), results.getString(4));
         } else {
             //????
             return null;
         }
-        collectionMap.put(new Integer(id), collection);
+        collectionMap.put(id, collection);
         return collection;
     }
 
@@ -330,15 +353,15 @@ public class Repository {
         statement.execute(query);
         ResultSet results = statement.getResultSet();        
         if(results.next()) {
-            collection = new Collection(parent, results.getInt(1), results.getString(3), results.getString(4));
+            collection = new Collection(parent, results.getString(1), results.getString(3), results.getString(4));
         } else {
-            String insert = "insert into collections (parent, name, description) values(" + SqlUtils.comma((parent!=null?""+parent.getId():"-1"),
+            String insert = "insert into collections (id, parent, name, description) values(" + SqlUtils.comma(SqlUtils.quote(getKey()), (parent!=null?SqlUtils.quote(parent.getId()):"NULL"),
                                                                                                            SqlUtils.quote(lastName), SqlUtils.quote(lastName))+")";
             statement.execute(insert);
             return findCollection(name);
             //            collection = new Collection(parent,0,lastName,lastName);
         }
-        collectionMap.put(new Integer(collection.getId()), collection);
+        collectionMap.put(collection.getId(), collection);
         collectionMap.put(name, collection);
         return collection;
     }
@@ -346,6 +369,7 @@ public class Repository {
 
     protected List<RadarInfo> getRadarInfos(Hashtable args) throws Exception {
         String query = SqlUtils.makeSelect("collection,file,station,product,date","nids " + assembleRadarWhereClause(args),  "order by date");
+        System.err.println("query:" + query);
         Statement statement  =connection.createStatement();
         statement.execute(query);
         ResultSet results;
@@ -353,16 +377,41 @@ public class Repository {
         List<RadarInfo> radarInfos= new ArrayList<RadarInfo>();
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                radarInfos.add (new RadarInfo(findCollection(results.getInt(1)),
+                radarInfos.add (new RadarInfo(findCollectionFromId(results.getString(1)),
                                               results.getString(2),
                                               results.getString(3),
                                               results.getString(4),
-                                              results.getDate(5).getTime()));
+                                              results.getTimestamp(5).getTime()));
             }  
         }
         return radarInfos;
     }
 
+
+    Properties productMap;
+
+
+    protected String getProductName(String product) {
+        return getProductName(product, product);
+    }
+
+    protected String getProductName(String product, String dflt) {
+        if(productMap==null) {
+            productMap = new Properties();
+            try {
+                InputStream s = IOUtil.getInputStream("/ucar/unidata/repository/names.properties", getClass());
+                productMap.load(s);
+            } catch(Exception exc) {
+                System.err.println ("err:" + exc);
+            }
+        }
+        String name = (String)productMap.get(product);
+        if(name!=null) {
+            return name;
+        }
+        System.err.println("not there:" + product+":");
+        return dflt;
+    }
 
     protected StringBuffer processRadarQuery(Hashtable args) throws Exception {
 
@@ -372,28 +421,67 @@ public class Repository {
         String output = (String) args.get("output");        
         boolean html = (output==null || output.equals("html"));
 
+
         StringBuffer sb = new StringBuffer();
         if(html) {
             sb.append("<table><tr><td><b>File</b></td><td><b>Date</b></td></tr>");
         } else {
             sb.append (XmlUtil.XML_HEADER+"\n" );
-            sb.append(XmlUtil.openTag("dataset", XmlUtil.attrs("name","Radar Query Results")));
+            sb.append(XmlUtil.openTag("catalog", XmlUtil.attrs("name","Radar Query Results")));
         }
+
+        Hashtable map = new Hashtable();
         for(RadarInfo radarInfo: radarInfos) {
+            StringBufferCollection sbc = (StringBufferCollection) map.get(radarInfo.getStation());
+            if(sbc == null) {
+                sbc = new StringBufferCollection();
+                map.put(radarInfo.getStation(),sbc);
+            }
+
+            StringBuffer ssb = sbc.getBuffer(radarInfo.getProduct());
             if(html) {
-                sb.append("<tr><td>" +radarInfo.getFile()  +"</td><td>" +
+                ssb.append("<tr><td>" +radarInfo.getFile()  +"</td><td>" +
                           new Date(radarInfo.getStartDate()) +"</td></tr>");
             } else {
-                sb.append(XmlUtil.tag("dataset", 
+                ssb.append(XmlUtil.tag("dataset", 
                                       XmlUtil.attrs("name",
-                                                    radarInfo.getStation()+"-"+ radarInfo.getProduct(), 
+                                                    ""+new Date(radarInfo.getStartDate()),
                                                     "urlPath" ,radarInfo.getFile())));
             }  
         }
+        
+
+        for(Enumeration keys = map.keys();keys.hasMoreElements();) {
+            String station = (String)keys.nextElement();
+            StringBufferCollection sbc = (StringBufferCollection) map.get(station);
+            if(html) {
+                sb.append("<tr><td colspan=\"2\"><b>" + station +"</td></tr>");
+            } else {
+                sb.append(XmlUtil.openTag("dataset", XmlUtil.attrs("name",  getProductName(station)+ " (" + station +")")));
+            }
+            for(int i=0;i<sbc.getKeys().size();i++) {
+                String product  = (String) sbc.getKeys().get(i);
+                StringBuffer ssb = sbc.getBuffer(product);
+                if(html) {
+                    sb.append("<tr><td colspan=\"2\"><b>" + getProductName(product) +"</td></tr>");
+                    sb.append(ssb);
+                } else {
+                    sb.append("<dataset name=\""+ getProductName(product)+"\">\n");
+                    sb.append(ssb);
+                    sb.append(XmlUtil.closeTag("dataset"));
+                }
+            }
+            if(!html) {
+                sb.append(XmlUtil.closeTag("dataset"));
+            }
+        }
+
+
+
         if(html) {
             sb.append("</table>");
         } else {
-            sb.append(XmlUtil.closeTag("dataset"));
+                sb.append(XmlUtil.closeTag("catalog"));
         }
         System.err.println("query time:" + (t2 - t1));
         return sb;
@@ -403,7 +491,7 @@ public class Repository {
 
 
 
-    public List<RadarInfo> collectNidsFiles(File rootDir, String collectionName)
+    public List<RadarInfo> collectNidsFilesxxx(File rootDir, String collectionName)
         throws Exception {
         long                   t1         = System.currentTimeMillis();
         final List<RadarInfo>  radarInfos = new ArrayList();
@@ -428,7 +516,7 @@ public class Repository {
      *
      * @throws Exception _more_
      */
-    public  List<RadarInfo> collectNidsFilesxxx(File rootDir, final String collectionName)
+    public  List<RadarInfo> collectNidsFiles(File rootDir, final String collectionName)
         throws Exception {
         final Collection collection = findCollection(collectionName);
         long                   t1         = System.currentTimeMillis();
@@ -476,24 +564,24 @@ public class Repository {
         SqlUtils.loadSql(sql, statement);
 
         File            rootDir = new File("/data/ldm/gempak/nexrad/NIDS");
-        List<RadarInfo> files   = collectNidsFiles(rootDir,"LDM/LDM1");
-        files.addAll(collectNidsFiles(rootDir,"LDM/LDM2"));
+        List<RadarInfo> files   = collectNidsFiles(rootDir,"IDD");
+        //        files.addAll(collectNidsFiles(rootDir,"LDM/LDM2"));
         System.err.println ("Inserting:" + files.size() + " files");
 
         long t1  = System.currentTimeMillis();
         int  cnt = 0;
-        PreparedStatement psInsert = connection.prepareStatement("insert into nids values (?,?,?,?,?)");
+        PreparedStatement psInsert = connection.prepareStatement("insert into nids (collection, file, date, station, product) values (?,?,?,?,?)");
         int batchCnt = 0;
-        //        connection.setAutoCommit(false);
+        connection.setAutoCommit(false);
         for (RadarInfo radarInfo : files) {
             if ((++cnt) % 10000 == 0) {
                 long tt2 = System.currentTimeMillis();
                 double tseconds = (tt2-t1)/1000.0;
-                System.err.println("# " + cnt + " rate: " + (cnt/tseconds));
+                System.err.println("# " + cnt + " rate: " + ((int)(cnt/tseconds))+"/s");
             }
-            psInsert.setInt(1,radarInfo.getCollectionId());
+            psInsert.setString(1,radarInfo.getCollectionId());
             psInsert.setString(2,radarInfo.getFile().toString());
-            psInsert.setDate(3,new java.sql.Date(radarInfo.getStartDate()));
+            psInsert.setTimestamp(3,new java.sql.Timestamp(radarInfo.getStartDate()));
             psInsert.setString(4,radarInfo.getStation());
             psInsert.setString(5,radarInfo.getProduct());
             psInsert.addBatch();
@@ -503,11 +591,11 @@ public class Repository {
                 batchCnt=0;
             }
         }
-        if(batchCnt>100) {
+        if(batchCnt>0) {
             psInsert.executeBatch();
         }
-        //        connection.setAutoCommit(true);
-        //        connection.commit();
+        connection.setAutoCommit(true);
+        connection.commit();
         long t2 = System.currentTimeMillis();
         double seconds = (t2-t1)/1000.0;
         System.err.println("cnt:" + cnt + " time:" + seconds + " rate:" + (cnt/seconds));

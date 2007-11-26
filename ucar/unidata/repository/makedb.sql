@@ -12,15 +12,16 @@
 
 
 
-CREATE TABLE collections (id INT NOT NULL GENERATED ALWAYS AS IDENTITY,
-				parent INT,
-				name varchar(200),
-				description varchar(200));
+CREATE TABLE collections (id varchar(200),
+			parent varchar(200),
+			name varchar(200),
+			description varchar(200));
 
 
-CREATE TABLE nids (collection INT,
+
+CREATE TABLE nids (collection varchar(200),
 	           file varchar(200),
-	           date date, 
+	           date timestamp, 
                    station varchar(50), 
                    product varchar(50));
 

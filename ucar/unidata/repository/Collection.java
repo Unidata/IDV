@@ -42,14 +42,14 @@ import java.util.List;
  */
 public class Collection {
 
-    private int id;
+    private String id;
     private String name;
     private String description;
     private Collection parent;
 
     /**
      */
-    public Collection(Collection parent, int id, String name, String description) {
+    public Collection(Collection parent, String id, String name, String description) {
         this.parent = parent;
         this.id = id;
         this.name = name;
@@ -89,7 +89,7 @@ public class Collection {
 
        @param value The new value for Id
     **/
-    public void setId (int value) {
+    public void setId (String value) {
 	id = value;
     }
 
@@ -98,7 +98,7 @@ public class Collection {
 
        @return The Id
     **/
-    public int getId () {
+    public String getId () {
 	return id;
     }
 

@@ -147,9 +147,9 @@ public Collection getCollection () {
 	return collection;
 }
 
-public int getCollectionId () {
+public String getCollectionId () {
     if(collection!=null) return collection.getId();
-    return -1;
+    return "";
 }
 
 
