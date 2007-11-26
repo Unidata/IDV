@@ -127,6 +127,7 @@ public class DateUtil {
         "yyyy-MM-dd'T'HH:mm:ss",
         "yyyy-MM-dd HH:mm:ss",
         "yyyyMMdd'T'HHmmss",
+        "yyyy-MM-dd",
     };
 
     public static SimpleDateFormat findFormatter(String dateString) {
