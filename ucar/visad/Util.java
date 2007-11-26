@@ -1990,6 +1990,8 @@ public final class Util {
             unitName = unitIdentifier;
         }
         Unit u = null;
+        // clean up ** and replace with nothing
+        unitIdentifier = unitIdentifier.replaceAll("\\*\\*","");
         try {
 
             try {
