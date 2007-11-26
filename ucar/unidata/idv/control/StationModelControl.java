@@ -218,9 +218,6 @@ public class StationModelControl extends ObsDisplayControl {
     }
 
 
-
-
-
     /** displayable for dat */
     StationModelDisplayable myDisplay;
 
@@ -280,7 +277,7 @@ public class StationModelControl extends ObsDisplayControl {
     protected List densityComps = new ArrayList();
 
     /** List of components to disable when not delcuttering */
-    protected List timeComps = new ArrayList();
+    protected List timeDeclutterComps = new ArrayList();
 
     /** Keep around the last set of decluttered data */
     protected FieldImpl lastDeclutteredData;
@@ -341,8 +338,7 @@ public class StationModelControl extends ObsDisplayControl {
     private ColorTable stationModelColorTable;
 
     /** Time strings */
-    private final static String[] TIMES_TO_USE = { "Individual",
-            "Accumulate" };
+    private final static String[] TIMES_TO_USE = { "Individual", "Multiple" };
 
     /** flag for using data times */
     private boolean useDataTimes = true;
@@ -1454,13 +1450,13 @@ public class StationModelControl extends ObsDisplayControl {
                                     dataTimeUnit);
             */
 
-            Real startReal = new Real(RealType.Time, timeRange.getMin());
-            Real endReal = new Real(RealType.Time, timeRange.getMax());
+            Real      startReal = new Real(RealType.Time, timeRange.getMin());
+            Real      endReal   = new Real(RealType.Time, timeRange.getMax());
 
-            Animation anime    = getAnimation();
-            Real      aniValue = ((anime != null)
-                                  ? anime.getAniValue()
-                                  : null);
+            Animation anime     = getAnimation();
+            Real      aniValue  = ((anime != null)
+                                   ? anime.getAniValue()
+                                   : null);
 
             Real[] startEnd = getDataTimeRange().getTimeRange(startReal,
                                   endReal, aniValue);
@@ -1566,20 +1562,10 @@ public class StationModelControl extends ObsDisplayControl {
             if (isInTransectView() || (llBounds == null)) {
                 Trace.call1("getObs-1");
                 data = pdi.getTimeSequence();
-                /*
-                data = ( !useDataTimes)
-                       ? pdi.getPointObs()
-                       : pdi.getTimeSequence();
-                */
                 Trace.call2("getObs-1");
             } else {
                 Trace.call1("getObs-2");
                 data = pdi.getTimeSequence(llBounds);
-                /*
-                data = ( !useDataTimes)
-                       ? pdi.getPointObs(llBounds)
-                       : pdi.getTimeSequence(llBounds);
-                */
                 Trace.call2("getObs-2");
             }
             if (data == null) {
@@ -1593,11 +1579,6 @@ public class StationModelControl extends ObsDisplayControl {
             if ( !getActive()) {
                 return;
             }
-            /*
-            // get the range of the data for time select.
-            FieldImpl timeData = data;
-            timeRange = getRangeForTimeSelect(timeData);
-            */
 
             //            Trace.call2("getting data");
             FieldImpl theData = data;
@@ -1612,32 +1593,6 @@ public class StationModelControl extends ObsDisplayControl {
                     logException("Processing filters", exc);
                 }
             }
-
-            /*
-            if (timeDeclutterRight != null) {
-                boolean isTimeSequence = GridUtil.isTimeSequence(theData);
-                if (isTimeSequence) {
-                    JComponent[] timeDeclutterComps = getTimeDeclutterComps();
-                    Set          timeSet            = theData.getDomainSet();
-                    if (timeSet.getLength() > 10) {
-                        timeDeclutterLeft.add(BorderLayout.CENTER,
-                                GuiUtils.rLabel("Only Show Every:"));
-                        timeDeclutterRight.add(
-                            BorderLayout.CENTER,
-                            GuiUtils.left(
-                                GuiUtils.hbox(
-                                    timeDeclutterComps[1],
-                                    new JLabel(" minutes "),
-                                    timeDeclutterComps[0],
-                                    new JLabel("enabled"))));
-
-                        timeDeclutterLeft.getParent().validate();
-                    }
-                }
-                timeDeclutterRight = null;
-                timeDeclutterLeft  = null;
-            }
-            */
 
 
             if ( !getTimeDeclutterEnabled()) {
@@ -1728,27 +1683,39 @@ public class StationModelControl extends ObsDisplayControl {
      * @return  the time option widget
      */
     private Component doMakeTimeOptionWidget() {
-        JComboBox box = new JComboBox(TIMES_TO_USE);
-        box.setSelectedIndex(getUseDataTimes()
-                             ? 0
-                             : 1);
-        box.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setUseDataTimes(
-                    ((JComboBox) e.getSource()).getSelectedIndex() == 0);
-                loadDataInThread();
+        ActionListener listener = new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                JRadioButton b = (JRadioButton) ae.getSource();
+                setUseDataTimes(b.getText().equals(TIMES_TO_USE[0]));
             }
-        });
+            ;
+        };
+        ButtonGroup bg = new ButtonGroup();
+        JRadioButton single = new JRadioButton(TIMES_TO_USE[0],
+                                  getUseDataTimes());
+        bg.add(single);
+        single.addActionListener(listener);
+        JRadioButton range = new JRadioButton(TIMES_TO_USE[1],
+                                 !getUseDataTimes());
+        bg.add(range);
+        range.addActionListener(listener);
+        return GuiUtils.hbox(single, range);
+    }
 
+    /**
+     * Make the time option widget
+     *
+     * @return  the time option widget
+     */
+    private Component doMakeTimeDeclutterWidget() {
         JComponent[] timeDeclutterComps = getTimeDeclutterComps();
         JPanel timeDeclutter =
             GuiUtils.left(GuiUtils.hflow(Misc.newList(new Component[] {
-            box, new JLabel(" Show Every: "), timeDeclutterComps[1],
-            new JLabel(" minutes "), timeDeclutterComps[0],
-            new JLabel("enabled")
-        }), 2, 1));
+                addTimeDeclutterComp(new JLabel("Use every:  ")),
+                addTimeDeclutterComp(timeDeclutterComps[1]),
+                addTimeDeclutterComp(new JLabel(" minutes ")),
+                timeDeclutterComps[0], new JLabel("enabled") }), 2, 1));
         return timeDeclutter;
-
     }
 
 
@@ -2339,6 +2306,8 @@ public class StationModelControl extends ObsDisplayControl {
         //        controlWidgets.add(new WrapperWidget(this, GuiUtils.rLabel(""),
         //                                             testButton));
 
+        controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.makeHeader("Layout")));
 
         controlWidgets.add(
             new WrapperWidget(
@@ -2349,29 +2318,9 @@ public class StationModelControl extends ObsDisplayControl {
                 getDensityControl() }))));
 
 
-        JPanel timeModePanel =
-            GuiUtils.leftCenter(
-                GuiUtils.wrap(
-                    GuiUtils.makeButton(
-                        "Change", this,
-                        "showTimeRangeDialog")), GuiUtils.inset(
-                            getDataTimeRange(true).getTimeModeLabel(),
-                            new Insets(0, 10, 0, 0)));
-        addTimeComp(timeModePanel);
-
-        controlWidgets.add(
-            new WrapperWidget(
-                this, GuiUtils.rLabel("Times to Use:"),
-                doMakeTimeOptionWidget()));
-
-        controlWidgets.add(
-            new WrapperWidget(
-                this, addTimeComp(GuiUtils.rLabel("Accumulation Times:")),
-                timeModePanel));
 
 
         GuiUtils.enableComponents(densityComps, declutter);
-        GuiUtils.enableComponents(timeComps, !getUseDataTimes());
 
 
         final JTextField scaleField =
@@ -2406,7 +2355,7 @@ public class StationModelControl extends ObsDisplayControl {
 
         controlWidgets.add(
             new WrapperWidget(
-                this, GuiUtils.rLabel(getLineWidthWidgetLabel()),
+                this, GuiUtils.rLabel(getLineWidthWidgetLabel() + ": "),
                 getLineWidthWidget().getContents(false)));
 
         if (useZPosition()) {
@@ -2415,6 +2364,34 @@ public class StationModelControl extends ObsDisplayControl {
                     doMakeVerticalPositionPanel()));
         }
 
+        controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.makeHeader("Times")));
+
+        // Time stuff
+        controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.rLabel("  Show:"),
+                                             doMakeTimeOptionWidget()));
+
+
+        JPanel timeModePanel =
+            GuiUtils.leftCenter(
+                GuiUtils.wrap(
+                    GuiUtils.makeImageButton(
+                        "/ucar/unidata/idv/images/edit.gif", this,
+                        "showTimeRangeDialog")), GuiUtils.inset(
+                            getDataTimeRange(true).getTimeModeLabel(),
+                            new Insets(0, 10, 0, 0)));
+
+        controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.rLabel("  Range:"),
+                                             timeModePanel));
+
+        controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.rLabel("  Declutter:"),
+                                             doMakeTimeDeclutterWidget()));
+
+        GuiUtils.enableComponents(timeDeclutterComps,
+                                  getTimeDeclutterEnabled());
     }
 
     /**
@@ -2669,6 +2646,8 @@ public class StationModelControl extends ObsDisplayControl {
      */
     protected void timeDeclutterChanged() {
         lastDeclutteredData = null;
+        GuiUtils.enableComponents(timeDeclutterComps,
+                                  getTimeDeclutterEnabled());
         loadDataInThread();
     }
 
@@ -2688,15 +2667,15 @@ public class StationModelControl extends ObsDisplayControl {
     }
 
     /**
-     * Add the given component into the list of time accumulation components
-     * that are to be enabled/disabled when the time accumulation mode is set.
+     * Add the given component into the list of time declutter components
+     * that are to be enabled/disabled when the declutter checkbox is toggled.
      *
      * @param comp The component to add into the lsit
      *
      * @return The same component. We return it as a convenience.
      */
-    protected JComponent addTimeComp(JComponent comp) {
-        timeComps.add(comp);
+    protected JComponent addTimeDeclutterComp(JComponent comp) {
+        timeDeclutterComps.add(comp);
         return comp;
     }
 
@@ -3021,8 +3000,8 @@ public class StationModelControl extends ObsDisplayControl {
     /**
      * Set the times in the times holder
      *
-     * @param timeData  the data with times 
-     * 
+     * @param timeData  the data with times
+     *
      * @throws RemoteException   Java RMI problem
      * @throws VisADException    VisAD problem
      */
@@ -3401,7 +3380,13 @@ public class StationModelControl extends ObsDisplayControl {
      */
     public void setUseDataTimes(boolean value) {
         useDataTimes = value;
-        GuiUtils.enableComponents(timeComps, !useDataTimes);
+        if (getHaveInitialized()) {
+            try {
+                loadDataInThread();
+            } catch (Exception e) {
+                logException("setUseDataTimes", e);
+            }
+        }
     }
 
     /**
