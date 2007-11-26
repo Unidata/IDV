@@ -84,14 +84,7 @@ public class MetaDataServer extends HttpServer {
                             writeXml(repository.processRadarListCollection(formArgs));
                         } else if(path.equals("/radar/maketable")) {
                             long t1 = System.currentTimeMillis();
-                            try {
-                                repository.eval("DROP TABLE nids");
-                            } catch(Exception exc) {
-                            }
-                            try {
-                                repository.eval("DROP TABLE collections");
-                            } catch(Exception exc) {
-                            }
+                            deleteTables();
                             repository.makeNidsTable();
                             long t2 = System.currentTimeMillis();
                             writeResult(true, "Time:" + (t2-t1), "text/html");
@@ -108,6 +101,22 @@ public class MetaDataServer extends HttpServer {
     }
 
 
+    private void deleteTables() {
+        try {
+            repository.eval("DROP TABLE nids");
+        } catch(Exception exc) {
+        }
+        try {
+            repository.eval("DROP TABLE files");
+        } catch(Exception exc) {
+        }
+        try {
+            repository.eval("DROP TABLE collections");
+        } catch(Exception exc) {
+        }
+    }
+
+
     /**
      * _more_
      *
@@ -118,15 +127,7 @@ public class MetaDataServer extends HttpServer {
     private void processArgs(String[] args) throws Exception {
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("maketable")) {
-                try {
-                    repository.eval("DROP TABLE nids");
-                } catch(Exception exc) {
-                }
-                try {
-                    repository.eval("DROP TABLE collections");
-                } catch(Exception exc) {
-                }
-
+                deleteTables();
                 repository.makeNidsTable();
             } else {
                 repository.eval(args[i]);
