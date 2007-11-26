@@ -22,16 +22,12 @@
 
 
 
-
 package ucar.unidata.data;
 
 
 import org.w3c.dom.Document;
-
-
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
 
 
 import ucar.unidata.collab.SharableImpl;
@@ -39,10 +35,6 @@ import ucar.unidata.collab.SharableImpl;
 
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
-
-
-
-
 
 
 import ucar.unidata.idv.DisplayControl;
@@ -59,7 +51,6 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.ObjectPair;
 import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.Poller;
@@ -85,8 +76,6 @@ import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
-
 import java.io.*;
 
 import java.rmi.RemoteException;
@@ -96,8 +85,6 @@ import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-
-
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -126,13 +113,13 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             DataSourceImpl.class.getName());
 
 
-    /** _more_          */
+    /** flag for showing a parameter */
     public static int PARAM_SHOW_YES = 0;
 
-    /** _more_          */
+    /** flag for hiding a parameter */
     public static int PARAM_SHOW_HIDE = 1;
 
-    /** _more_          */
+    /** flag for hiding a parameter */
     public static int PARAM_SHOW_NO = 2;
 
     /** Used for doing file path switches on a bundle load */
@@ -225,7 +212,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     /** Widget for properties dialog */
     private JCheckBox reloadCbx;
 
-    /** _more_          */
+    /** change data paths checkbox */
     protected JCheckBox changeDataPathsCbx =
         new JCheckBox("Change data source", true);
 
@@ -266,7 +253,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     /** Where we cache data */
     private String dataCachePath;
 
-    /** _more_ */
+    /** list of params to show */
     private List paramsToShow;
 
     /**
@@ -331,9 +318,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
-     * _more_
+     * Can this do a view?
      *
-     * @return _more_
+     * @return false
      */
     protected boolean canDoView() {
         return false;
@@ -357,9 +344,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
-     * _more_
+     * Load the view
      *
-     * @param viewFile _more_
+     * @param viewFile  the view
      */
     protected void loadView(String viewFile) {
         try {
@@ -391,7 +378,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
-     * _more_
+     * Write a view file
      */
     public void writeViewFile() {
 
@@ -581,10 +568,10 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
     /**
-     * _more_
+     * Write the view file.  Subclasses should implement
      *
-     * @param doc _more_
-     * @param root _more_
+     * @param doc   document  to write to
+     * @param root  root element
      */
     protected void writeViewFile(Document doc, Element root) {}
 
@@ -672,6 +659,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         return dataChoices;
     }
 
+    /**
+     * Init after
+     */
     protected void initAfter() {
         if (getPollingInfo().getIsActive()) {
             startPolling();
@@ -945,7 +935,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @param msg Any message
      */
     public void setInError(boolean inError, boolean needToShowErrorToUser,
-                              String msg) {
+                           String msg) {
         this.needToShowErrorToUser = needToShowErrorToUser;
         this.inError               = inError;
         errorMessage               = msg;
@@ -2356,9 +2346,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
-     * _more_
+     * Can the data be changed?  Subclasses should override if they can't.
      *
-     * @return _more_
+     * @return true
      */
     public boolean canChangeData() {
         return true;
@@ -2385,9 +2375,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
-     * _more_
+     * Save dat to local disk
      *
-     * @return _more_
+     * @return list of  files?
      */
     public List saveDataToLocalDisk() {
         return saveDataToLocalDisk(true, null);
@@ -2436,9 +2426,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
-     * _more_
+     * Get the save data to a file label
      *
-     * @return _more_
+     * @return the save data to a file label
      */
     protected String getSaveDataFileLabel() {
         return "Copying data from server";
@@ -2601,13 +2591,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @return Header
      */
     protected JComponent getPropertiesHeader(String label) {
-        JComponent header = GuiUtils.lLabel(label);
-        header = GuiUtils.left(GuiUtils.inset(header,
-                new Insets(10, 5, 0, 0)));
-        header.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
-                Color.gray.darker()));
-        header = GuiUtils.inset(header, new Insets(0, 0, 0, 10));
-        return header;
+        return GuiUtils.makeHeader(label);
     }
 
     /**
@@ -2987,9 +2971,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
-     * _more_
+     * Make save local actions
      *
-     * @param actions _more_
+     * @param actions  list of actions
      */
     protected void makeSaveLocalActions(List actions) {
         if (canSaveDataToLocalDisk()) {
@@ -3349,10 +3333,10 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
-     * _more_
+     * Update the state
      *
-     * @param newObject _more_
-     * @param newProperties _more_
+     * @param newObject  new object
+     * @param newProperties  new properties to add
      */
     public void updateState(Object newObject, Hashtable newProperties) {
         if (newProperties != null) {
@@ -3494,21 +3478,36 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         return cacheClearDelay;
     }
 
+    /** user name          */
     private String userName;
+
+    /** password          */
     private String password;
 
+    /**
+     * Show the password dialog
+     *
+     * @param title  title
+     * @param label  label
+     *
+     * @return true if successful
+     */
     public boolean showPasswordDialog(String title, String label) {
-        JTextField nameFld = new JTextField((this.getUserName()!=null?this.getUserName():""),10);
-        JTextField passwordFld = new JTextField((this.getPassword()!=null?this.getPassword():""),10);
-        GuiUtils.tmpInsets = new Insets(5,5,5,5);
-        JComponent contents = GuiUtils.doLayout(new Component[]{
-            GuiUtils.rLabel("User Name:"),
-            nameFld,
-            GuiUtils.rLabel("Password:"),
-            passwordFld
-        }, 2, GuiUtils.WT_NY,GuiUtils.WT_N);
-        contents = GuiUtils.inset(GuiUtils.topCenter(new JLabel(label),contents),5);
-        if(!GuiUtils.showOkCancelDialog(null,title, contents, null)) {
+        JTextField nameFld     = new JTextField(((this.getUserName() != null)
+                ? this.getUserName()
+                : ""), 10);
+        JTextField passwordFld = new JTextField(((this.getPassword() != null)
+                ? this.getPassword()
+                : ""), 10);
+        GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
+        JComponent contents = GuiUtils.doLayout(new Component[] {
+                                  GuiUtils.rLabel("User Name:"),
+                                  nameFld, GuiUtils.rLabel("Password:"),
+                                  passwordFld }, 2, GuiUtils.WT_NY,
+                                      GuiUtils.WT_N);
+        contents = GuiUtils.inset(GuiUtils.topCenter(new JLabel(label),
+                contents), 5);
+        if ( !GuiUtils.showOkCancelDialog(null, title, contents, null)) {
             return false;
         }
         this.setUserName(nameFld.getText().trim());
@@ -3518,41 +3517,41 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
 
-/**
-Set the UserName property.
+    /**
+     * Set the UserName property.
+     *
+     * @param value The new value for UserName
+     */
+    public void setUserName(String value) {
+        userName = value;
+    }
 
-@param value The new value for UserName
-**/
-public void setUserName (String value) {
-	userName = value;
-}
+    /**
+     * Get the UserName property.
+     *
+     * @return The UserName
+     */
+    public String getUserName() {
+        return userName;
+    }
 
-/**
-Get the UserName property.
+    /**
+     * Set the Password property.
+     *
+     * @param value The new value for Password
+     */
+    public void setPassword(String value) {
+        password = value;
+    }
 
-@return The UserName
-**/
-public String getUserName () {
-	return userName;
-}
-
-/**
-Set the Password property.
-
-@param value The new value for Password
-**/
-public void setPassword (String value) {
-	password = value;
-}
-
-/**
-Get the Password property.
-
-@return The Password
-**/
-public String getPassword () {
-	return password;
-}
+    /**
+     * Get the Password property.
+     *
+     * @return The Password
+     */
+    public String getPassword() {
+        return password;
+    }
 
 
 
