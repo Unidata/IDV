@@ -21,11 +21,6 @@
  */
 
 
-
-
-
-
-
 package ucar.unidata.util;
 
 
@@ -7039,9 +7034,26 @@ public class GuiUtils {
         }
     }
 
+    /**
+     * Utility to create a header that is a label and a line.
+     *
+     * @param label Header label
+     *
+     * @return Header
+     */
+    public static JComponent makeHeader(String label) {
+        JComponent header = GuiUtils.lLabel(label);
+        header = GuiUtils.left(GuiUtils.inset(header,
+                new Insets(10, 5, 0, 0)));
+        header.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
+                Color.gray.darker()));
+        header = GuiUtils.inset(header, new Insets(0, 0, 0, 10));
+        return header;
+    }
 
 
 }
+
 
 
 
