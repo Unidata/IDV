@@ -21,9 +21,6 @@
  */
 
 
-
-
-
 package ucar.unidata.idv.control;
 
 
@@ -35,10 +32,7 @@ import org.jfree.data.*;
 import org.jfree.data.time.*;
 import org.jfree.data.xy.*;
 
-
-
 import ucar.unidata.data.DataAlias;
-
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
@@ -51,7 +45,6 @@ import ucar.unidata.geoloc.Bearing;
 
 import ucar.unidata.gis.SpatialGrid;
 
-
 import ucar.unidata.idv.ControlContext;
 
 import ucar.unidata.idv.control.chart.LineState;
@@ -62,14 +55,13 @@ import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.PropertyFilter;
 import ucar.unidata.ui.symbol.*;
 
-
 import ucar.unidata.ui.symbol.StationModelManager;
+
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.Resource;
@@ -79,7 +71,6 @@ import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
-
 import ucar.visad.ShapeUtility;
 import ucar.visad.Util;
 import ucar.visad.display.Animation;
@@ -87,12 +78,10 @@ import ucar.visad.display.DisplayableData;
 import ucar.visad.display.LineDrawing;
 import ucar.visad.display.StationModelDisplayable;
 
-
 import visad.*;
 
 import visad.georef.EarthLocation;
 import visad.georef.LatLonPoint;
-
 import visad.georef.MapProjection;
 
 import visad.util.BaseRGBMap;
@@ -1450,7 +1439,6 @@ public class StationModelControl extends ObsDisplayControl {
         try {
             DataTimeRange dataTimeRange = getDataTimeRange(true);
             if (timeRange == null) {
-                System.out.println("timeRange = " + timeRange);
                 return;
             }
             /* TODO: figure out the time stuff
