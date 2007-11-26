@@ -274,9 +274,7 @@ public class TwoFacedObject implements Comparable {
                 && (o instanceof TwoFacedObject)) {
             return ((Comparable) id).compareTo(((TwoFacedObject) o).id);
         }
-        return (this.label instanceof Comparable)
-               ? ((Comparable) label).compareTo(o)
-               : toString().compareTo(o.toString());
+        return toString().compareTo(o.toString());
     }
 }
 
