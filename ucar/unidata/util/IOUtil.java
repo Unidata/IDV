@@ -1463,7 +1463,7 @@ public class IOUtil {
             files = new ArrayList();
         }
         List dirs = getDirectories(dir, recurse);
-        System.err.println ("dirs:" + dirs);
+        //        System.err.println ("dirs:" + dirs);
         for (int dirIdx = 0; dirIdx < dirs.size(); dirIdx++) {
             File   directory = (File) dirs.get(dirIdx);
             File[] allFiles  = ((filter == null)
