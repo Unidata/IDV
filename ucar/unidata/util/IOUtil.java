@@ -1763,6 +1763,31 @@ public class IOUtil {
      * @throws Exception On badness
      */
     public static void main(String[] args) throws Exception {
+        final int[]cnt = {0};
+        IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
+                public boolean viewFile(File f) throws Exception {
+                    cnt[0]++;
+                    if(cnt[0]%1000 == 0) System.err.println ("cnt:" +cnt[0]);
+                    if(f.isDirectory()) {}
+                    return true;
+                }
+            };
+        long tt1= System.currentTimeMillis();
+        File rootDir = new File((args.length>0?args[0]:"c:/cygwin/home/jeffmc/unidata"));
+        IOUtil.walkDirectory(rootDir, fileViewer);
+        long tt2= System.currentTimeMillis();
+        System.err.println ("cnt: " + cnt[0]  + " " + (tt2-tt1));
+
+
+
+        File dir = new File("C:/tmpstuff");
+        //        System.err.println ("tmp:" + dir.exists() + " " + dir.lastModified());
+        //        Misc.sleep(10000);
+        //        System.err.println ("tmp:" + dir.exists() + " " + dir.lastModified());
+
+        if(true) return;
+
+
 
         float[][] f= new float[2][1000000];
 
