@@ -22,43 +22,45 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
 import ucar.unidata.data.SqlUtils;
-import ucar.unidata.xml.XmlUtil;
+import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.HttpServer;
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringBufferCollection;
-import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.xml.XmlUtil;
+
+import java.io.File;
+import java.io.InputStream;
 
 
 
 import java.net.*;
-import java.io.File;
-import java.io.InputStream;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
-import java.util.Properties;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 
 
@@ -74,60 +76,116 @@ import java.util.regex.*;
  */
 public interface TableDefinitions {
 
+    /** _more_          */
     public static final String TABLE_FILES = "files";
+
+    /** _more_          */
     public static final String TABLE_LEVEL3RADAR = "level3radar";
+
+    /** _more_          */
     public static final String TABLE_GROUPS = "groups";
 
 
-    public static final String COL_FILES_ID = TABLE_FILES +"." +"id";
-    public static final String COL_FILES_TYPE = TABLE_FILES +"." +"type";
-    public static final String COL_FILES_GROUP_ID = TABLE_FILES +"." +"group_id";
-    public static final String COL_FILES_FILE = TABLE_FILES +"." +"file";
-    public static final String COL_FILES_FROMDATE=TABLE_FILES +"." +"fromdate";
-    public static final String COL_FILES_TODATE=TABLE_FILES +"." +"todate";
+    /** _more_          */
+    public static final String COL_FILES_ID = TABLE_FILES + "." + "id";
+
+    /** _more_          */
+    public static final String COL_FILES_TYPE = TABLE_FILES + "." + "type";
+
+    /** _more_          */
+    public static final String COL_FILES_GROUP_ID = TABLE_FILES + "."
+                                                    + "group_id";
+
+    /** _more_          */
+    public static final String COL_FILES_FILE = TABLE_FILES + "." + "file";
+
+    /** _more_          */
+    public static final String COL_FILES_FROMDATE = TABLE_FILES + "."
+                                                    + "fromdate";
+
+    /** _more_          */
+    public static final String COL_FILES_TODATE = TABLE_FILES + "."
+                                                  + "todate";
 
 
-    public static final String COL_LEVEL3RADAR_ID = TABLE_LEVEL3RADAR +"." +"id";
-    public static final String COL_LEVEL3RADAR_STATION= TABLE_LEVEL3RADAR +"." +"station";
-    public static final String COL_LEVEL3RADAR_PRODUCT = TABLE_LEVEL3RADAR +"." +"product";
+    /** _more_          */
+    public static final String COL_LEVEL3RADAR_ID = TABLE_LEVEL3RADAR + "."
+                                                    + "id";
+
+    /** _more_          */
+    public static final String COL_LEVEL3RADAR_STATION = TABLE_LEVEL3RADAR
+                                                         + "." + "station";
+
+    /** _more_          */
+    public static final String COL_LEVEL3RADAR_PRODUCT = TABLE_LEVEL3RADAR
+                                                         + "." + "product";
 
 
-    public static final String COL_GROUPS_ID = TABLE_GROUPS +"." +"id";
-    public static final String COL_GROUPS_PARENT= TABLE_GROUPS +"." +"parent";
-    public static final String COL_GROUPS_NAME= TABLE_GROUPS +"." +"name";
-    public static final String COL_GROUPS_DESCRIPTION= TABLE_GROUPS +"." +"description";
+    /** _more_          */
+    public static final String COL_GROUPS_ID = TABLE_GROUPS + "." + "id";
+
+    /** _more_          */
+    public static final String COL_GROUPS_PARENT = TABLE_GROUPS + "."
+                                                   + "parent";
+
+    /** _more_          */
+    public static final String COL_GROUPS_NAME = TABLE_GROUPS + "." + "name";
+
+    /** _more_          */
+    public static final String COL_GROUPS_DESCRIPTION = TABLE_GROUPS + "."
+                                                        + "description";
 
 
-    public static final String COLUMNS_GROUPS =    SqlUtils.comma(COL_GROUPS_ID,
-                                                                  COL_GROUPS_PARENT,
-                                                                  COL_GROUPS_NAME,
-                                                                  COL_GROUPS_DESCRIPTION);
+    /** _more_          */
+    public static final String COLUMNS_GROUPS = SqlUtils.comma(COL_GROUPS_ID,
+                                                    COL_GROUPS_PARENT,
+                                                    COL_GROUPS_NAME,
+                                                    COL_GROUPS_DESCRIPTION);
 
 
-    public static final String SELECT_FILES_GROUPS=
-        SqlUtils.makeSelect(SqlUtils.distinct(COL_FILES_GROUP_ID), TABLE_FILES);
-    public static final String SELECT_LEVEL3RADAR_PRODUCTS=
-        SqlUtils.makeSelect(SqlUtils.distinct(COL_LEVEL3RADAR_PRODUCT), TABLE_LEVEL3RADAR);
-    public static final String SELECT_LEVEL3RADAR_STATIONS=
-        SqlUtils.makeSelect(SqlUtils.distinct(COL_LEVEL3RADAR_STATION),TABLE_LEVEL3RADAR);
+    /** _more_          */
+    public static final String SELECT_FILES_GROUPS =
+        SqlUtils.makeSelect(SqlUtils.distinct(COL_FILES_GROUP_ID),
+                            TABLE_FILES);
 
-    public static final String SELECT_FILES_MAXDATE=
+    /** _more_          */
+    public static final String SELECT_LEVEL3RADAR_PRODUCTS =
+        SqlUtils.makeSelect(SqlUtils.distinct(COL_LEVEL3RADAR_PRODUCT),
+                            TABLE_LEVEL3RADAR);
+
+    /** _more_          */
+    public static final String SELECT_LEVEL3RADAR_STATIONS =
+        SqlUtils.makeSelect(SqlUtils.distinct(COL_LEVEL3RADAR_STATION),
+                            TABLE_LEVEL3RADAR);
+
+    /** _more_          */
+    public static final String SELECT_FILES_MAXDATE =
         SqlUtils.makeSelect(SqlUtils.max(COL_FILES_FROMDATE), TABLE_FILES);
-    public static final String SELECT_FILES_MINDATE=
+
+    /** _more_          */
+    public static final String SELECT_FILES_MINDATE =
         SqlUtils.makeSelect(SqlUtils.min(COL_FILES_FROMDATE), TABLE_FILES);
 
-    public static final String INSERT_FILES = SqlUtils.makeInsert(TABLE_FILES,
-                                                                  SqlUtils.comma(
-                                                                                 COL_FILES_ID, COL_FILES_TYPE,COL_FILES_GROUP_ID, COL_FILES_FILE, COL_FILES_FROMDATE, COL_FILES_TODATE),
-                                                                  "?,?,?,?,?,?");
+    /** _more_          */
+    public static final String INSERT_FILES =
+        SqlUtils.makeInsert(TABLE_FILES,
+                            SqlUtils.comma(COL_FILES_ID, COL_FILES_TYPE,
+                                           COL_FILES_GROUP_ID,
+                                           COL_FILES_FILE,
+                                           COL_FILES_FROMDATE,
+                                           COL_FILES_TODATE), "?,?,?,?,?,?");
 
-    public static final String INSERT_LEVEL3RADAR = 
+    /** _more_          */
+    public static final String INSERT_LEVEL3RADAR =
         SqlUtils.makeInsert(TABLE_LEVEL3RADAR,
-                            SqlUtils.comma(
-                                           COL_LEVEL3RADAR_ID,   COL_LEVEL3RADAR_STATION, COL_LEVEL3RADAR_PRODUCT), "?,?,?");
+                            SqlUtils.comma(COL_LEVEL3RADAR_ID,
+                                           COL_LEVEL3RADAR_STATION,
+                                           COL_LEVEL3RADAR_PRODUCT), "?,?,?");
 
 
-    public static final String SELECT_GROUP =  SqlUtils.makeSelect(COLUMNS_GROUPS, TABLE_GROUPS);
+    /** _more_          */
+    public static final String SELECT_GROUP =
+        SqlUtils.makeSelect(COLUMNS_GROUPS, TABLE_GROUPS);
 
 
 

@@ -21,7 +21,9 @@
  */
 
 
+
 package ucar.unidata.repository;
+
 
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
@@ -43,6 +45,7 @@ import java.util.List;
 public class RadarInfo extends DataInfo {
 
 
+    /** _more_          */
     private String station;
 
     /** _more_ */
@@ -52,12 +55,15 @@ public class RadarInfo extends DataInfo {
     /**
      * _more_
      *
+     *
+     * @param group _more_
      * @param file _more_
      * @param station _more_
      * @param product _more_
      * @param date _more_
      */
-    public RadarInfo(Group group, String file, String station, String product, long date) {
+    public RadarInfo(Group group, String file, String station,
+                     String product, long date) {
         super(group, file, date);
         this.station = station;
         this.product = product;

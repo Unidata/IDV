@@ -20,22 +20,25 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
+
+
+import ucar.unidata.util.HttpServer;
+import ucar.unidata.util.IOUtil;
 
 
 
 import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.StringUtil;
 
 import java.net.*;
 
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
 
 
@@ -48,72 +51,96 @@ import java.util.List;
  */
 public class MetaDataServer extends HttpServer {
 
+    /** _more_          */
     Repository repository;
 
     /**
      * _more_
      *
+     *
+     * @param driver _more_
+     * @param connectionURL _more_
      * @throws Exception _more_
      */
-    public MetaDataServer(String driver, String connectionURL) throws Exception {
+    public MetaDataServer(String driver, String connectionURL)
+            throws Exception {
         super(8080);
         repository = new Repository(driver, connectionURL);
     }
 
 
-    protected RequestHandler doMakeRequestHandler(
-                                                  final Socket socket) throws Exception {
+    /**
+     * _more_
+     *
+     * @param socket _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected RequestHandler doMakeRequestHandler(final Socket socket)
+            throws Exception {
         return new RequestHandler(this, socket) {
-                protected void handleRequest(String path,   Hashtable formArgs,
-                                             Hashtable httpArgs,
-                                             String content) throws Exception {
-                    System.err.println("request:" + path);
-                    try {
-                        if(path.equals("/radar/query")) {
-                            StringBuffer sb = repository.processRadarQuery(formArgs);
-                            writeResult(true, sb, Misc.equals("html", formArgs.get("output"))?"text/html":"text/xml");
-                        } else if(path.equals("/query")) {
-                            writeHtml(repository.processQuery(formArgs));                        
-                        } else if(path.equals("/radar/form")) {
-                            writeResult(true, repository.processRadarForm(formArgs), "text/html");
-                        } else if(path.equals("/radar/liststations")) {
-                            writeXml(repository.processRadarList(formArgs, "station","station"));
-                        } else if(path.equals("/radar/listproducts")) {
-                            writeXml(repository.processRadarList(formArgs, "product","product"));
-                        } else if(path.equals("/radar/listgroups")) {
-                            writeXml(repository.processRadarListGroup(formArgs));
-                        } else if(path.equals("/radar/maketable")) {
-                            long t1 = System.currentTimeMillis();
-                            deleteTables();
-                            repository.makeLevel3RadarTable();
-                            long t2 = System.currentTimeMillis();
-                            writeResult(true, "Time:" + (t2-t1), "text/html");
-                        } else {
-                            writeResult(true, "Unknown url:" + path, "text/html");
-                        }
-                    } catch (Exception exc) {
-                        System.err.println ("Error:" + exc);
-                        String trace =  LogUtil.getStackTrace(exc);
-                        writeResult(true,"<pre>"+trace +"</pre>", "text/html");
+            protected void handleRequest(String path, Hashtable formArgs,
+                                         Hashtable httpArgs, String content)
+                    throws Exception {
+                System.err.println("request:" + path);
+                try {
+                    if (path.equals("/radar/query")) {
+                        StringBuffer sb =
+                            repository.processRadarQuery(formArgs);
+                        writeResult(true, sb,
+                                    Misc.equals("html",
+                                        formArgs.get("output"))
+                                    ? "text/html"
+                                    : "text/xml");
+                    } else if (path.equals("/query")) {
+                        writeHtml(repository.processQuery(formArgs));
+                    } else if (path.equals("/radar/form")) {
+                        writeResult(true,
+                                    repository.processRadarForm(formArgs),
+                                    "text/html");
+                    } else if (path.equals("/radar/liststations")) {
+                        writeXml(repository.processRadarList(formArgs,
+                                "station", "station"));
+                    } else if (path.equals("/radar/listproducts")) {
+                        writeXml(repository.processRadarList(formArgs,
+                                "product", "product"));
+                    } else if (path.equals("/radar/listgroups")) {
+                        writeXml(repository.processRadarListGroup(formArgs));
+                    } else if (path.equals("/radar/maketable")) {
+                        long t1 = System.currentTimeMillis();
+                        deleteTables();
+                        repository.makeLevel3RadarTable();
+                        long t2 = System.currentTimeMillis();
+                        writeResult(true, "Time:" + (t2 - t1), "text/html");
+                    } else {
+                        writeResult(true, "Unknown url:" + path, "text/html");
                     }
+                } catch (Exception exc) {
+                    System.err.println("Error:" + exc);
+                    String trace = LogUtil.getStackTrace(exc);
+                    writeResult(true, "<pre>" + trace + "</pre>",
+                                "text/html");
                 }
-            };
+            }
+        };
     }
 
 
+    /**
+     * _more_
+     */
     private void deleteTables() {
         try {
             repository.eval("DROP TABLE " + Repository.TABLE_LEVEL3RADAR);
-        } catch(Exception exc) {
-        }
+        } catch (Exception exc) {}
         try {
-            repository.eval("DROP TABLE " +Repository.TABLE_FILES);
-        } catch(Exception exc) {
-        }
+            repository.eval("DROP TABLE " + Repository.TABLE_FILES);
+        } catch (Exception exc) {}
         try {
-            repository.eval("DROP TABLE " +Repository.TABLE_GROUPS);
-        } catch(Exception exc) {
-        }
+            repository.eval("DROP TABLE " + Repository.TABLE_GROUPS);
+        } catch (Exception exc) {}
     }
 
 
@@ -145,7 +172,7 @@ public class MetaDataServer extends HttpServer {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-        String driver = "org.apache.derby.jdbc.EmbeddedDriver";
+        String driver        = "org.apache.derby.jdbc.EmbeddedDriver";
         String connectionURL = "jdbc:derby:testdb;create=true";
         //        String driver = "com.mysql.jdbc.Driver";
         //        String connectionURL = "jdbc:mysql://localhost:3306/test?zeroDateTimeBehavior=convertToNull";

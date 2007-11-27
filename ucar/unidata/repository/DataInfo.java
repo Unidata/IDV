@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -43,6 +44,7 @@ import java.util.List;
  */
 public class DataInfo {
 
+    /** _more_          */
     Group group;
 
     /** _more_ */
@@ -51,9 +53,17 @@ public class DataInfo {
     /** _more_ */
     long startDate;
 
+    /** _more_          */
     long endDate;
 
-    public DataInfo (Group group, String file, long date) {
+    /**
+     * _more_
+     *
+     * @param group _more_
+     * @param file _more_
+     * @param date _more_
+     */
+    public DataInfo(Group group, String file, long date) {
         this(group, file, date, date);
     }
 
@@ -61,96 +71,107 @@ public class DataInfo {
     /**
      * _more_
      *
+     *
+     * @param group _more_
      * @param file _more_
      * @param station _more_
      * @param product _more_
      * @param date _more_
+     * @param startDate _more_
+     * @param endDate _more_
      */
     public DataInfo(Group group, String file, long startDate, long endDate) {
-        this.group = group;
-        this.file    = file;
-        this.startDate    = startDate;
-        this.endDate    = endDate;
+        this.group     = group;
+        this.file      = file;
+        this.startDate = startDate;
+        this.endDate   = endDate;
     }
 
-/**
-Set the File property.
+    /**
+     * Set the File property.
+     *
+     * @param value The new value for File
+     */
+    public void setFile(String value) {
+        file = value;
+    }
 
-@param value The new value for File
-**/
-public void setFile (String value) {
-	file = value;
-}
+    /**
+     * Get the File property.
+     *
+     * @return The File
+     */
+    public String getFile() {
+        return file;
+    }
 
-/**
-Get the File property.
+    /**
+     * Set the StartDate property.
+     *
+     * @param value The new value for StartDate
+     */
+    public void setStartDate(long value) {
+        startDate = value;
+    }
 
-@return The File
-**/
-public String getFile () {
-	return file;
-}
+    /**
+     * Get the StartDate property.
+     *
+     * @return The StartDate
+     */
+    public long getStartDate() {
+        return startDate;
+    }
 
-/**
-Set the StartDate property.
+    /**
+     * Set the EndDate property.
+     *
+     * @param value The new value for EndDate
+     */
+    public void setEndDate(long value) {
+        endDate = value;
+    }
 
-@param value The new value for StartDate
-**/
-public void setStartDate (long value) {
-	startDate = value;
-}
-
-/**
-Get the StartDate property.
-
-@return The StartDate
-**/
-public long getStartDate () {
-	return startDate;
-}
-
-/**
-Set the EndDate property.
-
-@param value The new value for EndDate
-**/
-public void setEndDate (long value) {
-	endDate = value;
-}
-
-/**
-Get the EndDate property.
-
-@return The EndDate
-**/
-public long getEndDate () {
-	return endDate;
-}
+    /**
+     * Get the EndDate property.
+     *
+     * @return The EndDate
+     */
+    public long getEndDate() {
+        return endDate;
+    }
 
 
 
-/**
-Set the Group property.
+    /**
+     * Set the Group property.
+     *
+     * @param value The new value for Group
+     */
+    public void setGroup(Group value) {
+        group = value;
+    }
 
-@param value The new value for Group
-**/
-public void setGroup (Group value) {
-	group = value;
-}
+    /**
+     * Get the Group property.
+     *
+     * @return The Group
+     */
+    public Group getGroup() {
+        return group;
+    }
 
-/**
-Get the Group property.
-
-@return The Group
-**/
-public Group getGroup () {
-	return group;
-}
-
-public String getGroupId () {
-    if(group!=null) return group.getId();
-    return "";
-}
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getGroupId() {
+        if (group != null) {
+            return group.getId();
+        }
+        return "";
+    }
 
 
 }

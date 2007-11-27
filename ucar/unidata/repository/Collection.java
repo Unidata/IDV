@@ -21,7 +21,9 @@
  */
 
 
+
 package ucar.unidata.repository;
+
 
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
@@ -42,100 +44,126 @@ import java.util.List;
  */
 public class Collection {
 
+    /** _more_          */
     private String id;
+
+    /** _more_          */
     private String name;
+
+    /** _more_          */
     private String description;
+
+    /** _more_          */
     private Collection parent;
 
     /**
+     *
+     * @param parent _more_
+     * @param id _more_
+     * @param name _more_
+     * @param description _more_
      */
-    public Collection(Collection parent, String id, String name, String description) {
-        this.parent = parent;
-        this.id = id;
-        this.name = name;
+    public Collection(Collection parent, String id, String name,
+                      String description) {
+        this.parent      = parent;
+        this.id          = id;
+        this.name        = name;
         this.description = description;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getFullName() {
-        if(parent!=null) return parent.getFullName()+"/"+ name;
+        if (parent != null) {
+            return parent.getFullName() + "/" + name;
+        }
         return name;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
         return name + " id:" + id;
     }
 
     /**
-       Set the Parent property.
-
-       @param value The new value for Parent
-    **/
-    public void setParent (Collection value) {
-	parent = value;
+     *  Set the Parent property.
+     *
+     *  @param value The new value for Parent
+     */
+    public void setParent(Collection value) {
+        parent = value;
     }
 
     /**
-       Get the Parent property.
-
-       @return The Parent
-    **/
-    public Collection getParent () {
-	return parent;
+     *  Get the Parent property.
+     *
+     *  @return The Parent
+     */
+    public Collection getParent() {
+        return parent;
     }
 
     /**
-       Set the Id property.
-
-       @param value The new value for Id
-    **/
-    public void setId (String value) {
-	id = value;
+     *  Set the Id property.
+     *
+     *  @param value The new value for Id
+     */
+    public void setId(String value) {
+        id = value;
     }
 
     /**
-       Get the Id property.
-
-       @return The Id
-    **/
-    public String getId () {
-	return id;
+     *  Get the Id property.
+     *
+     *  @return The Id
+     */
+    public String getId() {
+        return id;
     }
 
     /**
-       Set the Name property.
-
-       @param value The new value for Name
-    **/
-    public void setName (String value) {
-	name = value;
+     *  Set the Name property.
+     *
+     *  @param value The new value for Name
+     */
+    public void setName(String value) {
+        name = value;
     }
 
     /**
-       Get the Name property.
-
-       @return The Name
-    **/
-    public String getName () {
-	return name;
+     *  Get the Name property.
+     *
+     *  @return The Name
+     */
+    public String getName() {
+        return name;
     }
 
     /**
-       Set the Description property.
-
-       @param value The new value for Description
-    **/
-    public void setDescription (String value) {
-	description = value;
+     *  Set the Description property.
+     *
+     *  @param value The new value for Description
+     */
+    public void setDescription(String value) {
+        description = value;
     }
 
     /**
-       Get the Description property.
-
-       @return The Description
-    **/
-    public String getDescription () {
-	return description;
+     *  Get the Description property.
+     *
+     *  @return The Description
+     */
+    public String getDescription() {
+        return description;
     }
 
 }
+
