@@ -129,6 +129,21 @@ public class SqlUtils {
                + "," + s4.toString();
     }
 
+    public static String comma(Object s1, Object s2, Object s3, Object s4,Object s5) {
+        return s1.toString() + "," + s2.toString() + "," + s3.toString()
+               + "," + s4.toString()+","+s5.toString();
+    }
+
+    public static String distinct(String name) {
+        return " distinct " + name;
+    }
+    public static String max(String name) {
+        return " max(" + name+")";
+    }
+    public static String min(String name) {
+        return " min(" + name+")";
+    }
+
     /**
      * _more_
      *
@@ -145,6 +160,22 @@ public class SqlUtils {
         sb.append(")");
     }
 
+
+
+    public static String makeInsert(String table, String names,
+                                    String values) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("INSERT INTO ");
+        sb.append(table);
+        sb.append(" (");
+        sb.append(names);
+        sb.append(" )");
+        sb.append(" VALUES (");
+        sb.append(values);
+        sb.append(")");
+        return sb.toString();
+    }
+
     /**
      * _more_
      *
@@ -157,8 +188,26 @@ public class SqlUtils {
         return makeSelect(what, where, "");
     }
 
-    public static String makeSelect(String what, String where, String extra) {
-        return "SELECT " + what + " FROM " + where + " " + extra;
+    public static String eq(String name, String value) {
+        return " " +name +"=" + value +" ";
+    }
+
+
+    public static String ge(String name, String value) {
+        return " " +name +">=" + value +" ";
+    }
+
+    public static String le(String name, String value) {
+        return " " +name +"<=" + value +" ";
+    }
+
+    public static String makeSelect(String what, String table, String where) {
+        return "SELECT " + what + " FROM " + table + (where.trim().length()>0?" WHERE "  + where:"");
+    }
+
+
+    public static String makeSelect(String what, String table, String where, String extra) {
+        return "SELECT " + what + " FROM " + table + (where.trim().length()>0?" WHERE "  + where:"") +" " +extra;
     }
 
 
