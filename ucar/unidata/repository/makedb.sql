@@ -1,12 +1,13 @@
 
 
 CREATE TABLE groups (id varchar(200),
-			parent varchar(200),
+	  		parent varchar(200),
 			name varchar(200),
 			description varchar(200));
 
 
 CREATE TABLE files (id varchar(200),
+                   type varchar(200),
                    group_id varchar(200),
 	           file varchar(200),
 	           fromdate timestamp, 
@@ -16,9 +17,6 @@ CREATE INDEX GROUPINDEX ON files (GROUP_ID);
 
 CREATE TABLE level3radar (
 	           id varchar(200),
-                   group_id varchar(200),
-	           file varchar(200),
-	           date timestamp, 
                    station varchar(50), 
                    product varchar(50));
 

@@ -75,6 +75,21 @@ import java.util.regex.*;
 public class Repository implements TableDefinitions {
 
 
+    public static final String TYPE_LEVEL3RADAR = "level3radar";
+    public static final String TYPE_LEVEL2RADAR = "level2radar";
+
+
+    public static final String ATTR_ID = "id";    
+    public static final String ATTR_NAME = "name";
+
+
+    public static final String ARG_TYPE = "type";
+    public static final String ARG_GROUP = "group";
+    public static final String ARG_TODATE = "todate";
+    public static final String ARG_FROMDATE = "fromdate";
+
+    public static final String ARG_PRODUCT = "product";
+    public static final String ARG_STATION = "station";
 
     long baseTime = System.currentTimeMillis();
     int keyCnt = 0;
@@ -207,7 +222,7 @@ public class Repository implements TableDefinitions {
         sb.append("<form action=\"/radar/query\">\n");
 
         if(groups.length>1) {
-            sb.append(" <tr><td align=\"right\"><b>Group:</b> </td><td><select name=\"group\">");
+            sb.append(" <tr><td align=\"right\"><b>Group:</b> </td><td><select name=\"" + ARG_GROUP +"\">");
             sb.append("<option>" + "All" +"</option>");
             for(int i=0;i<groups.length;i++) {
                 Group group = findGroupFromId(groups[i]);
@@ -218,18 +233,18 @@ public class Repository implements TableDefinitions {
             sb.append("</td></tr>");
         } else if(groups.length==1) {
             Group group = findGroupFromId(groups[0]);
-            makeHtmlHidden(sb,group.getFullName(), "group");
+            makeHtmlHidden(sb,group.getFullName(), ARG_GROUP);
         }
 
         if(stations.length>1) {
-            makeHtmlSelect(sb,stations, "station", "Station:");
+            makeHtmlSelect(sb,stations, ARG_STATION, "Station:");
         } else if(stations.length==1) {
-            makeHtmlHidden(sb,stations[0], "station");
+            makeHtmlHidden(sb,stations[0], ARG_STATION);
         }
         if(products.length>1) {
-            makeHtmlSelect(sb,products, "product", "Product:");
+            makeHtmlSelect(sb,products, ARG_PRODUCT, "Product:");
         } else if(products.length==1) {
-            makeHtmlHidden(sb,products[0], "product");
+            makeHtmlHidden(sb,products[0], ARG_PRODUCT);
         }
 
 
@@ -264,16 +279,14 @@ public class Repository implements TableDefinitions {
 
 
     protected StringBuffer processRadarList(Hashtable args, String column, String tag) throws Exception {
-        Statement statement  =connection.createStatement();
-        String query = SqlUtils.makeSelect("distinct " + column, TABLE_LEVEL3RADAR,   assembleRadarWhereClause(args));
-        System.err.println ("query:" + query);
-        statement.execute(query);
+        String query = SqlUtils.makeSelect(SqlUtils.distinct(column), TABLE_LEVEL3RADAR,   assembleRadarWhereClause(args));
+        Statement statement  =execute(query);
         String[]stations = SqlUtils.readString(statement,1);
         StringBuffer sb = new StringBuffer();
         sb.append (XmlUtil.XML_HEADER +"\n" );
         sb.append(XmlUtil.openTag(tag+"s"));
         for(int i=0;i<stations.length;i++) {
-            sb.append(XmlUtil.tag(tag, XmlUtil.attrs("id", stations[i],"name",getProductName(stations[i]))));
+            sb.append(XmlUtil.tag(tag, XmlUtil.attrs(ATTR_ID, stations[i],ATTR_NAME,getProductName(stations[i]))));
         }
         sb.append(XmlUtil.closeTag(tag+"s"));
         return sb;
@@ -282,9 +295,11 @@ public class Repository implements TableDefinitions {
 
 
     protected StringBuffer processRadarListGroup(Hashtable args) throws Exception {
-        Statement statement  =connection.createStatement();
-        String query = SqlUtils.makeSelect("distinct group_id",TABLE_LEVEL3RADAR,  assembleRadarWhereClause(args));
-        statement.execute(query);
+        String query = SqlUtils.makeSelect(SqlUtils.distinct(COL_FILES_GROUP_ID),
+                                           TABLE_FILES+","+TABLE_LEVEL3RADAR,  
+                                           SqlUtils.eq(COL_FILES_ID,COL_LEVEL3RADAR_ID) + " " +
+                                           assembleRadarWhereClause(args));
+        Statement statement  =execute(query);
         String []groups = SqlUtils.readString(statement,1);
         StringBuffer sb = new StringBuffer();
         sb.append (XmlUtil.XML_HEADER +"\n" );
@@ -306,33 +321,46 @@ public class Repository implements TableDefinitions {
         
     }
 
-    protected String assembleRadarWhereClause(Hashtable args) throws Exception {
+    private void addOr(String column, String value, List list) {
+        if(value!=null && value.trim().length()>0 && !value.toLowerCase().equals("all")) {
+            list.add("("+SqlUtils.makeOrSplit(column, value,true)+")");
+        }
+    }
+
+    protected String assembleWhereClause(Hashtable args) throws Exception {
         List where = new ArrayList();
         String groupName = (String) args.get("group");
         if(groupName!=null && !groupName.toLowerCase().equals("all") ) {
             Group group = findGroup(groupName);
-            where.add(SqlUtils.eq(COL_LEVEL3RADAR_GROUP_ID , SqlUtils.quote(group.getId())));
+            where.add(SqlUtils.eq(COL_FILES_GROUP_ID , SqlUtils.quote(group.getId())));
         }
 
-        String station = (String) args.get("station");
-        if(station!=null && !station.toLowerCase().equals("all") ) {
-            where.add(SqlUtils.eq(COL_LEVEL3RADAR_STATION, SqlUtils.quote(station)));
-        }
 
-        String product = (String) args.get("product");
-        if(product!=null && !product.toLowerCase().equals("all") ) {
-            where.add(SqlUtils.eq(COL_LEVEL3RADAR_PRODUCT , SqlUtils.quote(product)));
-        }
+        addOr(COL_FILES_TYPE, (String) args.get(ARG_TYPE), where);
 
-        String fromdate = (String) args.get("fromdate");
+        String fromdate = (String) args.get(ARG_FROMDATE);
         if(fromdate!=null && fromdate.trim().length()>0) {
-            where.add(SqlUtils.ge(COL_LEVEL3RADAR_DATE , SqlUtils.quote(getDateString(fromdate))));
+            where.add(SqlUtils.ge(COL_FILES_FROMDATE , SqlUtils.quote(getDateString(fromdate))));
         }
-        String todate = (String) args.get("todate");
+        String todate = (String) args.get(ARG_TODATE);
         if(todate!=null && todate.trim().length()>0) {
-            where.add(SqlUtils.le(COL_LEVEL3RADAR_DATE , SqlUtils.quote(getDateString(todate))));
+            where.add(SqlUtils.le(COL_FILES_TODATE , SqlUtils.quote(getDateString(todate))));
         }
 
+        if(where.size()>0) {
+            return StringUtil.join( " AND ",where);
+        }
+        return "";
+    }
+
+    protected String assembleRadarWhereClause(Hashtable args) throws Exception {
+        List where = new ArrayList();
+        String basic = assembleWhereClause(args);
+        if(basic.length()>0) {
+            where.add(basic);
+        }
+        addOr(COL_LEVEL3RADAR_STATION, (String) args.get(ARG_STATION), where);
+        addOr(COL_LEVEL3RADAR_PRODUCT, (String) args.get(ARG_PRODUCT), where);
         if(where.size()>0) {
             return StringUtil.join( " AND ",where);
         }
@@ -346,9 +374,8 @@ public class Repository implements TableDefinitions {
         if(id == null || id.length()==0) return  null;
         Group group = (Group) groupMap.get(id);
         if(group!=null) return group;
-        String query = SqlUtils.makeSelect("id,parent,name,description", TABLE_GROUPS,SqlUtils.eq("id", SqlUtils.quote(id))) ;
-        Statement statement  =connection.createStatement();
-        statement.execute(query);
+        String query = SELECT_GROUP+ " WHERE " +SqlUtils.eq("id", SqlUtils.quote(id)) ;
+        Statement statement  =execute(query);
         ResultSet results = statement.getResultSet();        
         if(results.next()) {
             group = new Group(findGroupFromId(results.getString(2)), results.getString(1), results.getString(3), results.getString(4));
@@ -376,10 +403,11 @@ public class Repository implements TableDefinitions {
         }
         String where = "";
         if(parent !=null) {
-            where += SqlUtils.eq("parent", SqlUtils.quote(parent.getId())) +" AND ";
+            where += SqlUtils.eq(COL_GROUPS_PARENT, SqlUtils.quote(parent.getId())) +" AND ";
         }
-        where += SqlUtils.eq("name", SqlUtils.quote(lastName));
-        String query = SqlUtils.makeSelect(SqlUtils.comma("id","parent","name","description"), TABLE_GROUPS, where);
+        where += SqlUtils.eq(COL_GROUPS_NAME, SqlUtils.quote(lastName));
+
+        String query = SELECT_GROUP+ " WHERE " + where;
 
         Statement statement  =connection.createStatement();
         statement.execute(query);
@@ -388,7 +416,7 @@ public class Repository implements TableDefinitions {
             group = new Group(parent, results.getString(1), results.getString(3), results.getString(4));
         } else {
             String insert = SqlUtils.makeInsert(TABLE_GROUPS,
-                                                SqlUtils.comma("id", "parent","name","description"), 
+                                                COLUMNS_GROUPS,
                                                 SqlUtils.comma(SqlUtils.quote(getKey()), 
                                                                (parent!=null?SqlUtils.quote(parent.getId()):"NULL"),
                                                                SqlUtils.quote(lastName), 
@@ -404,14 +432,22 @@ public class Repository implements TableDefinitions {
 
 
     protected List<RadarInfo> getRadarInfos(Hashtable args) throws Exception {
-        String query = SqlUtils.makeSelect(SqlUtils.comma(COL_LEVEL3RADAR_GROUP_ID,
-                                                          COL_LEVEL3RADAR_FILE,
+        String where = assembleRadarWhereClause(args);
+        if(where.trim().length()>0) {
+            where  = where + " AND ";
+        }
+        where += SqlUtils.eq(COL_FILES_ID,COL_LEVEL3RADAR_ID);
+        
+        
+        String query = SqlUtils.makeSelect(SqlUtils.comma(COL_FILES_GROUP_ID,
+                                                          COL_FILES_FILE,
                                                           COL_LEVEL3RADAR_STATION,
                                                           COL_LEVEL3RADAR_PRODUCT,
-                                                          COL_LEVEL3RADAR_DATE),
-                                           TABLE_LEVEL3RADAR,  
-                                           assembleRadarWhereClause(args),  
-                                           "order by " + COL_LEVEL3RADAR_DATE);
+                                                          COL_FILES_FROMDATE,
+                                                          COL_FILES_TODATE),
+                                           TABLE_LEVEL3RADAR+"," +TABLE_FILES,  
+                                           where,
+                                           "order by " + COL_FILES_FROMDATE);
         System.err.println("query:" + query);
         Statement statement  =connection.createStatement();
         statement.execute(query);
@@ -467,7 +503,7 @@ public class Repository implements TableDefinitions {
 
         StringBuffer sb = new StringBuffer();
         if(html) {
-            sb.append("<table><tr><td><b>File</b></td><td><b>Date</b></td></tr>");
+            sb.append("<ul>");
         } else {
             sb.append (XmlUtil.XML_HEADER+"\n" );
             sb.append(XmlUtil.openTag("catalog", XmlUtil.attrs("name","Radar Query Results")));
@@ -483,8 +519,7 @@ public class Repository implements TableDefinitions {
 
             StringBuffer ssb = sbc.getBuffer(radarInfo.getProduct());
             if(html) {
-                ssb.append("<tr><td>" +radarInfo.getFile()  +"</td><td>" +
-                          new Date(radarInfo.getStartDate()) +"</td></tr>");
+                ssb.append("<li>" +radarInfo.getFile()  +" " +  new Date(radarInfo.getStartDate()));
             } else {
                 ssb.append(XmlUtil.tag("dataset", 
                                       XmlUtil.attrs("name",
@@ -498,7 +533,7 @@ public class Repository implements TableDefinitions {
             String station = (String)keys.nextElement();
             StringBufferCollection sbc = (StringBufferCollection) map.get(station);
             if(html) {
-                sb.append("<tr><td colspan=\"2\"><b>" + station +"</td></tr>");
+                sb.append("<li>" + station +"<ul>");
             } else {
                 sb.append(XmlUtil.openTag("dataset", XmlUtil.attrs("name",  getProductName(station)+ " (" + station +")")));
             }
@@ -506,15 +541,18 @@ public class Repository implements TableDefinitions {
                 String product  = (String) sbc.getKeys().get(i);
                 StringBuffer ssb = sbc.getBuffer(product);
                 if(html) {
-                    sb.append("<tr><td colspan=\"2\"><b>" + getProductName(product) +"</td></tr>");
+                    sb.append("<li>" + getProductName(product) +"<ul>");
                     sb.append(ssb);
+                    sb.append("</ul>");
                 } else {
                     sb.append("<dataset name=\""+ getProductName(product)+"\">\n");
                     sb.append(ssb);
                     sb.append(XmlUtil.closeTag("dataset"));
                 }
             }
-            if(!html) {
+            if(html) {
+                sb.append("</ul>");
+            } else {
                 sb.append(XmlUtil.closeTag("dataset"));
             }
         }
@@ -611,8 +649,8 @@ public class Repository implements TableDefinitions {
 
         long t1  = System.currentTimeMillis();
         int  cnt = 0;
-        PreparedStatement filesInsert = connection.prepareStatement(SqlUtils.makeInsert(TABLE_FILES,"id, group_id, file, fromdate, todate","?,?,?,?,?"));
-        PreparedStatement radarInsert = connection.prepareStatement(SqlUtils.makeInsert(TABLE_LEVEL3RADAR,"id, group_id, file, date, station, product", "?,?,?,?,?,?"));
+        PreparedStatement filesInsert = connection.prepareStatement(INSERT_FILES);
+        PreparedStatement radarInsert = connection.prepareStatement(INSERT_LEVEL3RADAR);
 
         int batchCnt = 0;
         connection.setAutoCommit(false);
@@ -625,15 +663,15 @@ public class Repository implements TableDefinitions {
             int col = 1;
             String id = getKey();
             filesInsert.setString(col++,id);
+            filesInsert.setString(col++,TYPE_LEVEL3RADAR);
             filesInsert.setString(col++,radarInfo.getGroupId());
             filesInsert.setString(col++,radarInfo.getFile().toString());
             filesInsert.setTimestamp(col++,new java.sql.Timestamp(radarInfo.getStartDate()));
             filesInsert.setTimestamp(col++,new java.sql.Timestamp(radarInfo.getStartDate()));
+            filesInsert.addBatch();
+
             col=1;
             radarInsert.setString(col++,id);
-            radarInsert.setString(col++,radarInfo.getGroupId());
-            radarInsert.setString(col++,radarInfo.getFile().toString());
-            radarInsert.setTimestamp(col++,new java.sql.Timestamp(radarInfo.getStartDate()));
             radarInsert.setString(col++,radarInfo.getStation());
             radarInsert.setString(col++,radarInfo.getProduct());
             radarInsert.addBatch();
@@ -654,6 +692,14 @@ public class Repository implements TableDefinitions {
         double seconds = (t2-t1)/1000.0;
         System.err.println("cnt:" + cnt + " time:" + seconds + " rate:" + (cnt/seconds));
 
+    }
+
+
+    private Statement execute(String sql) throws Exception {
+        Statement statement =   connection.createStatement();
+        System.err.println ("query:" + sql);
+        statement.execute(sql);
+        return statement;
     }
 
 

@@ -134,6 +134,23 @@ public class SqlUtils {
                + "," + s4.toString()+","+s5.toString();
     }
 
+    public static String comma(Object s1, Object s2, Object s3, Object s4,Object s5, Object s6 ) {
+        return comma(s1,s2,s3,s4,s5)+","+s6;
+    }
+
+    public static String makeOrSplit(String column, String values, boolean quoteThem) {
+        List toks = StringUtil.split(values,",",true,true);
+        StringBuffer sb = new StringBuffer();
+        for(int i=0;i<toks.size();i++) {
+            if(i>0) sb.append (" OR ");
+            String value = toks.get(i).toString();
+            if(quoteThem) value  = quote(value);
+            sb.append(eq(column, value));
+        }
+        return sb.toString();
+    }
+
+
     public static String distinct(String name) {
         return " distinct " + name;
     }
