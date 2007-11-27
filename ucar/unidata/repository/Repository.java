@@ -72,14 +72,14 @@ import java.util.regex.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Repository {
+public class Repository implements TableDefinitions {
+
+
 
     long baseTime = System.currentTimeMillis();
-    long cnt = 0;
-
-
+    int keyCnt = 0;
     private String getKey() {
-        return baseTime +"_"+(cnt++);
+        return baseTime +"_"+(keyCnt++);
     }
 
 
@@ -147,7 +147,11 @@ public class Repository {
         return new StringBuffer("Fetched:" + cnt +" rows in: " + (t2-t1) +"ms <p>"+sb.toString());
     }
 
-    protected void makeSelect(StringBuffer sb, String[]values,String name, String label) {
+    protected void makeHtmlHidden(StringBuffer sb, String value,String name) {
+        sb.append("<input type=\"hidden\" name=\"" + name +"\" value=\"" + value +"\"/>");
+    }
+
+    protected void makeHtmlSelect(StringBuffer sb, String[]values,String name, String label) {
         sb.append(" <tr><td align=\"right\"><b>"+ label+"</b> </td><td><select name=\"" + name +"\">");
         sb.append("<option>" + "All" +"</option>");
         for(int i=0;i<values.length;i++) {
@@ -165,24 +169,30 @@ public class Repository {
 
         Statement statement  =connection.createStatement();
         long t1 = System.currentTimeMillis();
-        statement.execute("select distinct collection from nids ");
-        String[]collections = SqlUtils.readString(statement,1);
+
+        String where = assembleRadarWhereClause(args).trim();
+        if(where.length()>0) {
+            where  = " where " + where;
+        }
+
+        statement.execute(SELECT_FILES_GROUPS+where);
+        String[]groups = SqlUtils.readString(statement,1);
         long t2 = System.currentTimeMillis();
 
-        statement.execute("select distinct product from nids ");
+        statement.execute(SELECT_LEVEL3RADAR_PRODUCTS+where);
         String[]products = SqlUtils.readString(statement,1);
         long t3 = System.currentTimeMillis();
 
-        statement.execute("select distinct station from nids ");
+        statement.execute(SELECT_LEVEL3RADAR_STATIONS+where);
         String[]stations = SqlUtils.readString(statement,1);
         long t4 = System.currentTimeMillis();
 
         System.err.println("time:" + (t2-t1) + " " + (t3-t2) + " " + (t4-t3));
 
-        statement.execute("select max(date) from nids ");
+        statement.execute(SELECT_FILES_MAXDATE+where);
         String[]maxdates = SqlUtils.readString(statement,1);
 
-        statement.execute("select min(date) from nids ");
+        statement.execute(SELECT_FILES_MINDATE+where);
         String[]mindates = SqlUtils.readString(statement,1);
 
 
@@ -196,31 +206,50 @@ public class Repository {
         sb.append("<table cellpadding=\"5\">");
         sb.append("<form action=\"/radar/query\">\n");
 
-        sb.append(" <tr><td align=\"right\"><b>Collection:</b> </td><td><select name=\"collection\">");
-        sb.append("<option>" + "All" +"</option>");
-        for(int i=0;i<collections.length;i++) {
-            Collection collection = findCollectionFromId(collections[i]);
-            if(collection!=null) {
-                sb.append("<option>" + collection.getFullName()+"</option>");
+        if(groups.length>1) {
+            sb.append(" <tr><td align=\"right\"><b>Group:</b> </td><td><select name=\"group\">");
+            sb.append("<option>" + "All" +"</option>");
+            for(int i=0;i<groups.length;i++) {
+                Group group = findGroupFromId(groups[i]);
+                if(group!=null) {
+                    sb.append("<option>" + group.getFullName()+"</option>");
+                }
             }
+            sb.append("</td></tr>");
+        } else if(groups.length==1) {
+            Group group = findGroupFromId(groups[0]);
+            makeHtmlHidden(sb,group.getFullName(), "group");
         }
-        sb.append("</td></tr>");
 
-        makeSelect(sb,stations, "station", "Station:");
-        makeSelect(sb,products, "product", "Product:");
+        if(stations.length>1) {
+            makeHtmlSelect(sb,stations, "station", "Station:");
+        } else if(stations.length==1) {
+            makeHtmlHidden(sb,stations[0], "station");
+        }
+        if(products.length>1) {
+            makeHtmlSelect(sb,products, "product", "Product:");
+        } else if(products.length==1) {
+            makeHtmlHidden(sb,products[0], "product");
+        }
+
 
 
         sb.append("<tr><td align=\"right\"><b>Date Range: </b></td><td><input name=\"fromdate\" value=\"" + mindate +"\"> -- <input name=\"todate\" value=\"" + maxdate +"\"></td></tr>");
 
 
-        sb.append("<tr><td align=\"right\"><b>Output Type: </b></td><td><select name=\"output\"><option>html</option><option>xml</option></select></td></tr>");
+        String output = (String)args.get("output");
+        if(output == null) {
+            sb.append("<tr><td align=\"right\"><b>Output Type: </b></td><td><select name=\"output\"><option>html</option><option>xml</option></select></td></tr>");
+        } else {
+            makeHtmlHidden(sb, output,"output");
+        }
 
 
         sb.append("<tr><td><input  type=\"submit\" value=\"Search for radar\" /></td></tr>");
         sb.append("<table>");
 
         sb.append("</form>");
-        sb.append("<p><a href=\"/radar/listcollections\"> List collections</a>");
+        sb.append("<p><a href=\"/radar/listgroups\"> List groups</a>");
         sb.append("<p><a href=\"/radar/liststations\"> List stations</a>");
         sb.append("<p><a href=\"/radar/listproducts\"> List products</a>");
         sb.append("<p><a href=\"/radar/maketable\"> Scan disk</a>");
@@ -236,7 +265,8 @@ public class Repository {
 
     protected StringBuffer processRadarList(Hashtable args, String column, String tag) throws Exception {
         Statement statement  =connection.createStatement();
-        String query = "select distinct " + column +" from nids " + assembleRadarWhereClause(args);
+        String query = SqlUtils.makeSelect("distinct " + column, TABLE_LEVEL3RADAR,   assembleRadarWhereClause(args));
+        System.err.println ("query:" + query);
         statement.execute(query);
         String[]stations = SqlUtils.readString(statement,1);
         StringBuffer sb = new StringBuffer();
@@ -251,21 +281,21 @@ public class Repository {
 
 
 
-    protected StringBuffer processRadarListCollection(Hashtable args) throws Exception {
+    protected StringBuffer processRadarListGroup(Hashtable args) throws Exception {
         Statement statement  =connection.createStatement();
-        String query = "select distinct collection from nids " + assembleRadarWhereClause(args);
+        String query = SqlUtils.makeSelect("distinct group_id",TABLE_LEVEL3RADAR,  assembleRadarWhereClause(args));
         statement.execute(query);
-        String []collections = SqlUtils.readString(statement,1);
+        String []groups = SqlUtils.readString(statement,1);
         StringBuffer sb = new StringBuffer();
         sb.append (XmlUtil.XML_HEADER +"\n" );
-        sb.append(XmlUtil.openTag("collections"));
-        for(int i=0;i<collections.length;i++) {
-            Collection collection = findCollectionFromId(collections[i]);
-            if(collection!=null) {
-                sb.append(XmlUtil.tag("collection", XmlUtil.attrs("name", collection.getFullName())));
+        sb.append(XmlUtil.openTag("groups"));
+        for(int i=0;i<groups.length;i++) {
+            Group group = findGroupFromId(groups[i]);
+            if(group!=null) {
+                sb.append(XmlUtil.tag("group", XmlUtil.attrs("name", group.getFullName())));
             }
         }
-        sb.append(XmlUtil.closeTag("collections"));
+        sb.append(XmlUtil.closeTag("groups"));
         return sb;
     }
 
@@ -278,97 +308,110 @@ public class Repository {
 
     protected String assembleRadarWhereClause(Hashtable args) throws Exception {
         List where = new ArrayList();
-        String collectionName = (String) args.get("collection");
-        if(collectionName!=null && !collectionName.toLowerCase().equals("all") ) {
-            Collection collection = findCollection(collectionName);
-            where.add(" collection=" + SqlUtils.quote(collection.getId()));
+        String groupName = (String) args.get("group");
+        if(groupName!=null && !groupName.toLowerCase().equals("all") ) {
+            Group group = findGroup(groupName);
+            where.add(SqlUtils.eq(COL_LEVEL3RADAR_GROUP_ID , SqlUtils.quote(group.getId())));
         }
 
         String station = (String) args.get("station");
         if(station!=null && !station.toLowerCase().equals("all") ) {
-            where.add(" station=" + SqlUtils.quote(station));
+            where.add(SqlUtils.eq(COL_LEVEL3RADAR_STATION, SqlUtils.quote(station)));
         }
 
         String product = (String) args.get("product");
         if(product!=null && !product.toLowerCase().equals("all") ) {
-            where.add(" product=" + SqlUtils.quote(product));
+            where.add(SqlUtils.eq(COL_LEVEL3RADAR_PRODUCT , SqlUtils.quote(product)));
         }
 
         String fromdate = (String) args.get("fromdate");
         if(fromdate!=null && fromdate.trim().length()>0) {
-            where.add(" date>=" + SqlUtils.quote(getDateString(fromdate)));
+            where.add(SqlUtils.ge(COL_LEVEL3RADAR_DATE , SqlUtils.quote(getDateString(fromdate))));
         }
         String todate = (String) args.get("todate");
         if(todate!=null && todate.trim().length()>0) {
-            where.add(" date<=" + SqlUtils.quote(getDateString(todate)));
+            where.add(SqlUtils.le(COL_LEVEL3RADAR_DATE , SqlUtils.quote(getDateString(todate))));
         }
 
         if(where.size()>0) {
-            return " where " + StringUtil.join( " AND ",where);
+            return StringUtil.join( " AND ",where);
         }
         return "";
     }
 
 
-    private static Hashtable collectionMap = new Hashtable();
+    private Hashtable groupMap = new Hashtable();
 
-    protected Collection findCollectionFromId(String id) throws Exception {
+    protected Group findGroupFromId(String id) throws Exception {
         if(id == null || id.length()==0) return  null;
-        Collection collection = (Collection) collectionMap.get(id);
-        if(collection!=null) return collection;
-        String query = "select id,parent,name,description from collections where id=" + SqlUtils.quote(id) ;
+        Group group = (Group) groupMap.get(id);
+        if(group!=null) return group;
+        String query = SqlUtils.makeSelect("id,parent,name,description", TABLE_GROUPS,SqlUtils.eq("id", SqlUtils.quote(id))) ;
         Statement statement  =connection.createStatement();
         statement.execute(query);
         ResultSet results = statement.getResultSet();        
         if(results.next()) {
-            collection = new Collection(findCollectionFromId(results.getString(2)), results.getString(1), results.getString(3), results.getString(4));
+            group = new Group(findGroupFromId(results.getString(2)), results.getString(1), results.getString(3), results.getString(4));
         } else {
             //????
             return null;
         }
-        collectionMap.put(id, collection);
-        return collection;
+        groupMap.put(id, group);
+        return group;
     }
 
 
-    protected Collection findCollection(String name) throws Exception {
-        Collection collection = (Collection) collectionMap.get(name);
-        if(collection!=null) return collection;
+    protected Group findGroup(String name) throws Exception {
+        Group group = (Group) groupMap.get(name);
+        if(group!=null) return group;
         List<String> toks =  (List<String>)StringUtil.split(name,"/",true,true);
-        Collection parent = null;
+        Group parent = null;
         String lastName;
         if(toks.size()==0 || toks.size()==1) {
             lastName = name;
         } else {
             lastName = toks.get(toks.size()-1);
             toks.remove(toks.size()-1);
-            parent = findCollection(StringUtil.join("/",toks));
+            parent = findGroup(StringUtil.join("/",toks));
         }
-        String query = "select id,parent,name,description from collections where ";
+        String where = "";
         if(parent !=null) {
-            query += " parent=" + parent.getId() +" AND ";
+            where += SqlUtils.eq("parent", SqlUtils.quote(parent.getId())) +" AND ";
         }
-        query += " name=" + SqlUtils.quote(lastName);
+        where += SqlUtils.eq("name", SqlUtils.quote(lastName));
+        String query = SqlUtils.makeSelect(SqlUtils.comma("id","parent","name","description"), TABLE_GROUPS, where);
+
         Statement statement  =connection.createStatement();
         statement.execute(query);
         ResultSet results = statement.getResultSet();        
         if(results.next()) {
-            collection = new Collection(parent, results.getString(1), results.getString(3), results.getString(4));
+            group = new Group(parent, results.getString(1), results.getString(3), results.getString(4));
         } else {
-            String insert = "insert into collections (id, parent, name, description) values(" + SqlUtils.comma(SqlUtils.quote(getKey()), (parent!=null?SqlUtils.quote(parent.getId()):"NULL"),
-                                                                                                           SqlUtils.quote(lastName), SqlUtils.quote(lastName))+")";
+            String insert = SqlUtils.makeInsert(TABLE_GROUPS,
+                                                SqlUtils.comma("id", "parent","name","description"), 
+                                                SqlUtils.comma(SqlUtils.quote(getKey()), 
+                                                               (parent!=null?SqlUtils.quote(parent.getId()):"NULL"),
+                                                               SqlUtils.quote(lastName), 
+                                                               SqlUtils.quote(lastName)));
             statement.execute(insert);
-            return findCollection(name);
-            //            collection = new Collection(parent,0,lastName,lastName);
+            return findGroup(name);
+            //            group = new Group(parent,0,lastName,lastName);
         }
-        collectionMap.put(collection.getId(), collection);
-        collectionMap.put(name, collection);
-        return collection;
+        groupMap.put(group.getId(), group);
+        groupMap.put(name, group);
+        return group;
     }
 
 
     protected List<RadarInfo> getRadarInfos(Hashtable args) throws Exception {
-        String query = SqlUtils.makeSelect("collection,file,station,product,date","nids " + assembleRadarWhereClause(args),  "order by date");
+        String query = SqlUtils.makeSelect(SqlUtils.comma(COL_LEVEL3RADAR_GROUP_ID,
+                                                          COL_LEVEL3RADAR_FILE,
+                                                          COL_LEVEL3RADAR_STATION,
+                                                          COL_LEVEL3RADAR_PRODUCT,
+                                                          COL_LEVEL3RADAR_DATE),
+                                           TABLE_LEVEL3RADAR,  
+                                           assembleRadarWhereClause(args),  
+                                           "order by " + COL_LEVEL3RADAR_DATE);
         System.err.println("query:" + query);
         Statement statement  =connection.createStatement();
         statement.execute(query);
@@ -377,7 +420,7 @@ public class Repository {
         List<RadarInfo> radarInfos= new ArrayList<RadarInfo>();
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                radarInfos.add (new RadarInfo(findCollectionFromId(results.getString(1)),
+                radarInfos.add (new RadarInfo(findGroupFromId(results.getString(1)),
                                               results.getString(2),
                                               results.getString(3),
                                               results.getString(4),
@@ -409,7 +452,7 @@ public class Repository {
         if(name!=null) {
             return name;
         }
-        System.err.println("not there:" + product+":");
+        //        System.err.println("not there:" + product+":");
         return dflt;
     }
 
@@ -489,17 +532,15 @@ public class Repository {
 
 
 
-
-
-    public List<RadarInfo> collectNidsFilesxxx(File rootDir, String collectionName)
+    public List<RadarInfo> collectLevel3radarFiles(File rootDir, String groupName)
         throws Exception {
         long                   t1         = System.currentTimeMillis();
         final List<RadarInfo>  radarInfos = new ArrayList();
         long baseTime = new Date().getTime();
-        Collection collection = findCollection(collectionName);
+        Group group = findGroup(groupName);
         for(int stationIdx=0;stationIdx<100;stationIdx++) {
-            for(int i=0;i<500;i++) {
-                radarInfos.add(new RadarInfo(collection, "file"+stationIdx+"_"+i+"_"+collection, "stn"+stationIdx, "product"+(i%20),
+            for(int i=0;i<10;i++) {
+                radarInfos.add(new RadarInfo(group, "file"+stationIdx+"_"+i+"_"+group, "stn"+stationIdx, "product"+(i%20),
                                              baseTime + radarInfos.size()*100));
             }
         }
@@ -516,9 +557,9 @@ public class Repository {
      *
      * @throws Exception _more_
      */
-    public  List<RadarInfo> collectNidsFiles(File rootDir, final String collectionName)
+    public  List<RadarInfo> collectLevel3radarFilesxxx(File rootDir, final String groupName)
         throws Exception {
-        final Collection collection = findCollection(collectionName);
+        final Group group = findGroup(groupName);
         long                   t1         = System.currentTimeMillis();
         final List<RadarInfo>  radarInfos = new ArrayList();
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
@@ -536,7 +577,7 @@ public class Repository {
                     String station = matcher.group(1);
                     String product = matcher.group(2);
                     Date   dttm    = sdf.parse(matcher.group(3));
-                    radarInfos.add(new RadarInfo(collection,f.toString(), station, product,
+                    radarInfos.add(new RadarInfo(group,f.toString(), station, product,
                                                  dttm.getTime()));
                     return true;
                 }
@@ -557,20 +598,22 @@ public class Repository {
      *
      * @throws Exception _more_
      */
-    public  void makeNidsTable()
+    public  void makeLevel3RadarTable()
         throws Exception {
         String sql = IOUtil.readContents("/ucar/unidata/repository/makedb.sql", getClass());
         Statement statement  =connection.createStatement();
         SqlUtils.loadSql(sql, statement);
 
-        File            rootDir = new File("/data/ldm/gempak/nexrad/NIDS");
-        List<RadarInfo> files   = collectNidsFiles(rootDir,"IDD");
-        //        files.addAll(collectNidsFiles(rootDir,"LDM/LDM2"));
+        File            rootDir = new File("/data/ldm/gempak/nexrad/nids");
+        List<RadarInfo> files   = collectLevel3radarFiles(rootDir,"IDD");
+        files.addAll(collectLevel3radarFiles(rootDir,"LDM/LDM2"));
         System.err.println ("Inserting:" + files.size() + " files");
 
         long t1  = System.currentTimeMillis();
         int  cnt = 0;
-        PreparedStatement psInsert = connection.prepareStatement("insert into nids (collection, file, date, station, product) values (?,?,?,?,?)");
+        PreparedStatement filesInsert = connection.prepareStatement(SqlUtils.makeInsert(TABLE_FILES,"id, group_id, file, fromdate, todate","?,?,?,?,?"));
+        PreparedStatement radarInsert = connection.prepareStatement(SqlUtils.makeInsert(TABLE_LEVEL3RADAR,"id, group_id, file, date, station, product", "?,?,?,?,?,?"));
+
         int batchCnt = 0;
         connection.setAutoCommit(false);
         for (RadarInfo radarInfo : files) {
@@ -579,20 +622,31 @@ public class Repository {
                 double tseconds = (tt2-t1)/1000.0;
                 System.err.println("# " + cnt + " rate: " + ((int)(cnt/tseconds))+"/s");
             }
-            psInsert.setString(1,radarInfo.getCollectionId());
-            psInsert.setString(2,radarInfo.getFile().toString());
-            psInsert.setTimestamp(3,new java.sql.Timestamp(radarInfo.getStartDate()));
-            psInsert.setString(4,radarInfo.getStation());
-            psInsert.setString(5,radarInfo.getProduct());
-            psInsert.addBatch();
+            int col = 1;
+            String id = getKey();
+            filesInsert.setString(col++,id);
+            filesInsert.setString(col++,radarInfo.getGroupId());
+            filesInsert.setString(col++,radarInfo.getFile().toString());
+            filesInsert.setTimestamp(col++,new java.sql.Timestamp(radarInfo.getStartDate()));
+            filesInsert.setTimestamp(col++,new java.sql.Timestamp(radarInfo.getStartDate()));
+            col=1;
+            radarInsert.setString(col++,id);
+            radarInsert.setString(col++,radarInfo.getGroupId());
+            radarInsert.setString(col++,radarInfo.getFile().toString());
+            radarInsert.setTimestamp(col++,new java.sql.Timestamp(radarInfo.getStartDate()));
+            radarInsert.setString(col++,radarInfo.getStation());
+            radarInsert.setString(col++,radarInfo.getProduct());
+            radarInsert.addBatch();
             batchCnt++;
             if(batchCnt>100) {
-                psInsert.executeBatch();
+                filesInsert.executeBatch();
+                radarInsert.executeBatch();
                 batchCnt=0;
             }
         }
         if(batchCnt>0) {
-            psInsert.executeBatch();
+            filesInsert.executeBatch();
+            radarInsert.executeBatch();
         }
         connection.setAutoCommit(true);
         connection.commit();

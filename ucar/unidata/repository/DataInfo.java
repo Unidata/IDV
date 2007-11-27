@@ -43,7 +43,7 @@ import java.util.List;
  */
 public class DataInfo {
 
-    Collection collection;
+    Group group;
 
     /** _more_ */
     String file;
@@ -53,8 +53,8 @@ public class DataInfo {
 
     long endDate;
 
-    public DataInfo (Collection collection, String file, long date) {
-        this(collection, file, date, date);
+    public DataInfo (Group group, String file, long date) {
+        this(group, file, date, date);
     }
 
 
@@ -66,8 +66,8 @@ public class DataInfo {
      * @param product _more_
      * @param date _more_
      */
-    public DataInfo(Collection collection, String file, long startDate, long endDate) {
-        this.collection = collection;
+    public DataInfo(Group group, String file, long startDate, long endDate) {
+        this.group = group;
         this.file    = file;
         this.startDate    = startDate;
         this.endDate    = endDate;
@@ -130,25 +130,25 @@ public long getEndDate () {
 
 
 /**
-Set the Collection property.
+Set the Group property.
 
-@param value The new value for Collection
+@param value The new value for Group
 **/
-public void setCollection (Collection value) {
-	collection = value;
+public void setGroup (Group value) {
+	group = value;
 }
 
 /**
-Get the Collection property.
+Get the Group property.
 
-@return The Collection
+@return The Group
 **/
-public Collection getCollection () {
-	return collection;
+public Group getGroup () {
+	return group;
 }
 
-public String getCollectionId () {
-    if(collection!=null) return collection.getId();
+public String getGroupId () {
+    if(group!=null) return group.getId();
     return "";
 }
 

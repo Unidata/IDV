@@ -80,21 +80,21 @@ public class MetaDataServer extends HttpServer {
                             writeXml(repository.processRadarList(formArgs, "station","station"));
                         } else if(path.equals("/radar/listproducts")) {
                             writeXml(repository.processRadarList(formArgs, "product","product"));
-                        } else if(path.equals("/radar/listcollections")) {
-                            writeXml(repository.processRadarListCollection(formArgs));
+                        } else if(path.equals("/radar/listgroups")) {
+                            writeXml(repository.processRadarListGroup(formArgs));
                         } else if(path.equals("/radar/maketable")) {
                             long t1 = System.currentTimeMillis();
                             deleteTables();
-                            repository.makeNidsTable();
+                            repository.makeLevel3RadarTable();
                             long t2 = System.currentTimeMillis();
                             writeResult(true, "Time:" + (t2-t1), "text/html");
                         } else {
                             writeResult(true, "Unknown url:" + path, "text/html");
                         }
                     } catch (Exception exc) {
-                        System.err.println ("oops:" + exc);
-                        LogUtil.logException ("",exc);
-                        writeResult(true, LogUtil.getStackTrace(exc), "text/html");
+                        System.err.println ("Error:" + exc);
+                        String trace =  LogUtil.getStackTrace(exc);
+                        writeResult(true,"<pre>"+trace +"</pre>", "text/html");
                     }
                 }
             };
@@ -103,15 +103,15 @@ public class MetaDataServer extends HttpServer {
 
     private void deleteTables() {
         try {
-            repository.eval("DROP TABLE nids");
+            repository.eval("DROP TABLE " + Repository.TABLE_LEVEL3RADAR);
         } catch(Exception exc) {
         }
         try {
-            repository.eval("DROP TABLE files");
+            repository.eval("DROP TABLE " +Repository.TABLE_FILES);
         } catch(Exception exc) {
         }
         try {
-            repository.eval("DROP TABLE collections");
+            repository.eval("DROP TABLE " +Repository.TABLE_GROUPS);
         } catch(Exception exc) {
         }
     }
@@ -128,7 +128,7 @@ public class MetaDataServer extends HttpServer {
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("maketable")) {
                 deleteTables();
-                repository.makeNidsTable();
+                repository.makeLevel3RadarTable();
             } else {
                 repository.eval(args[i]);
             }
