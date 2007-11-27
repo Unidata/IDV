@@ -42,7 +42,7 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Collection {
+public class Group {
 
     /** _more_          */
     private String id;
@@ -54,7 +54,7 @@ public class Collection {
     private String description;
 
     /** _more_          */
-    private Collection parent;
+    private Group parent;
 
     /**
      *
@@ -63,7 +63,7 @@ public class Collection {
      * @param name _more_
      * @param description _more_
      */
-    public Collection(Collection parent, String id, String name,
+    public Group(Group parent, String id, String name,
                       String description) {
         this.parent      = parent;
         this.id          = id;
@@ -98,7 +98,7 @@ public class Collection {
      *
      *  @param value The new value for Parent
      */
-    public void setParent(Collection value) {
+    public void setParent(Group value) {
         parent = value;
     }
 
@@ -107,7 +107,7 @@ public class Collection {
      *
      *  @return The Parent
      */
-    public Collection getParent() {
+    public Group getParent() {
         return parent;
     }
 
