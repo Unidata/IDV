@@ -523,7 +523,7 @@ public class GempakGridReader extends GempakFileReader {
                                     int nbits, float ref, float scale,
                                     boolean miss, int decimalScale)
             throws IOException {
-        System.out.println("scale = " + scale);
+        //System.out.println("scale = " + scale);
         float[] values = new float[kxky];
         bitPos = 0;
         bitBuf = 0;
@@ -634,7 +634,7 @@ public class GempakGridReader extends GempakFileReader {
      */
     public void listGrids() {
         List gridList = gridIndex.getGridRecords();
-        System.out.println("/nGRID FILE: " + getFilename() + "\n");
+        System.out.println("\nGRID FILE: " + getFilename() + "\n");
         printNavBlock();
         System.out.println("");
         printAnalBlock();

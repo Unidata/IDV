@@ -79,6 +79,7 @@ public class GempakGridServiceProvider extends GridServiceProvider {
                      CancelTask cancelTask)
             throws IOException {
         super.open(raf, ncfile, cancelTask);
+        // debugProj = true;
         long start = System.currentTimeMillis();
         if (gemreader == null) {
             gemreader = new GempakGridReader();

@@ -290,15 +290,15 @@ public class NavigationBlock extends GridDefRecord {
         String urlon  = String.valueOf(vals[9]);
         addParam(NX, String.valueOf(vals[4]));
         addParam(NY, String.valueOf(vals[5]));
+        addParam(LA1, lllat);
+        addParam(LO1, lllon);
+        addParam(LA2, urlat);
+        addParam(LO2, urlon);
         if (proj.equals("STR") ||
             proj.equals("NPS") ||
             proj.equals("SPS")
             ) {
             addParam(LOV, angle2);
-            addParam(LA1, lllat);
-            addParam(LO1, lllon);
-            addParam(LA2, urlat);
-            addParam(LO2, urlon);
             // TODO:  better to just set pole?
             if (proj.equals("SPS")) {
                 addParam("NpProj", "false");
@@ -308,21 +308,25 @@ public class NavigationBlock extends GridDefRecord {
             addParam(LATIN1, angle1);
             addParam(LOV, angle2);
             addParam(LATIN2, angle3);
-            addParam(LA1, lllat);
-            addParam(LO1, lllon);
-            addParam(LA2, urlat);
-            addParam(LO2, urlon);
         // TODO: test this
         } else if (proj.equals("MER") ||
-                   proj.equals("CED") ||
                    proj.equals("MCD")
             ) {
             addParam("Latin", angle1);
-            addParam(LOV, angle3);
-            addParam(LA1, angle1);
-            addParam(LO1, angle2);
-            addParam(LA2, urlat);
-            addParam(LO2, urlon);
+            addParam(LOV, angle2);
+        } else if (proj.equals("CED")) {
+            double lllatv  = vals[6];
+            double lllonv  = vals[7];
+            double urlatv  = vals[8];
+            double urlonv  = vals[9];
+            if (urlonv<lllonv) urlonv += 360.;
+            double dx = Math.abs((urlonv-lllonv)/(vals[4]-1));
+            double dy = Math.abs((urlatv-lllatv)/(vals[5]-1));
+            addParam(DX, String.valueOf(dx));
+            addParam(DY, String.valueOf(dy));
+            addParam(LO2, String.valueOf(urlonv));
+                
+            
         }
     }
 

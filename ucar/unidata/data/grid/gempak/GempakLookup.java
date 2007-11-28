@@ -227,7 +227,11 @@ public final class GempakLookup implements GridTableLookup {
             return -1;
         } else if (name.equals("MER")) {
             return Mercator;
+        } else if (name.equals("MCD")) {
+            return Mercator;
         } else if (name.equals("LCC")) {
+            return LambertConformal;
+        } else if (name.equals("SCC")) {
             return LambertConformal;
         } else if (name.equals("PS")) {
             return PolarStereographic;

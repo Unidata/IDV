@@ -362,7 +362,7 @@ public final class GempakUtil {
      */
     public static int swp4(int value) {
         int[] vals = new int[] { value };
-        swp4(vals, 0, 0);
+        swp4(vals, 0, 1);
         return vals[0];
     }
 
