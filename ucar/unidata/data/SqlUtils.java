@@ -78,6 +78,23 @@ public class SqlUtils {
     }
 
 
+    public  static String makeAnd(List toks) {
+        return StringUtil.join(" AND ", toks);
+    }
+
+    public  static String makeOr(List toks) {
+        return StringUtil.join(" OR ", toks);
+    }
+
+
+    public static String makeWhere(List toks) {
+        if(toks.size()>0) {
+            return " WHERE " + StringUtil.join(" AND ", toks);
+        }
+        return " ";
+    }
+
+
     /**
      * _more_
      *
@@ -193,17 +210,6 @@ public class SqlUtils {
         return sb.toString();
     }
 
-    /**
-     * _more_
-     *
-     * @param what _more_
-     * @param where _more_
-     *
-     * @return _more_
-     */
-    public static String makeSelect(String what, String where) {
-        return makeSelect(what, where, "");
-    }
 
     public static String eq(String name, String value) {
         return " " +name +"=" + value +" ";
@@ -217,6 +223,20 @@ public class SqlUtils {
     public static String le(String name, String value) {
         return " " +name +"<=" + value +" ";
     }
+
+
+    /**
+     * _more_
+     *
+     * @param what _more_
+     * @param where _more_
+     *
+     * @return _more_
+     */
+    public static String makeSelect(String what, String where) {
+        return makeSelect(what, where, "");
+    }
+
 
     public static String makeSelect(String what, String table, String where) {
         return "SELECT " + what + " FROM " + table + (where.trim().length()>0?" WHERE "  + where:"");
