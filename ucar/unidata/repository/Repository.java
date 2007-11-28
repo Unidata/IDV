@@ -34,6 +34,7 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringBufferCollection;
+import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
@@ -77,15 +78,6 @@ import java.util.regex.*;
 public class Repository implements TableDefinitions {
 
 
-    public static final String TYPE_ALL = "all";
-
-
-    /** _more_          */
-    public static final String TYPE_LEVEL3RADAR = "level3radar";
-
-    /** _more_          */
-    public static final String TYPE_LEVEL2RADAR = "level2radar";
-
 
     /** _more_          */
     public static final String ATTR_ID = "id";
@@ -114,6 +106,8 @@ public class Repository implements TableDefinitions {
 
     /** _more_          */
     public static final String ARG_STATION = "station";
+
+
 
     /** _more_          */
     long baseTime = System.currentTimeMillis();
@@ -147,8 +141,8 @@ public class Repository implements TableDefinitions {
         Misc.findClass(driver);
         //        connection = DriverManager.getConnection(connectionURL, "jeff", "mypassword");
         connection = DriverManager.getConnection(connectionURL);
-        addTypeHandler(TYPE_ALL, new TypeHandler(this, TYPE_ALL));
-        addTypeHandler(TYPE_LEVEL3RADAR, new TypeHandler(this,TYPE_LEVEL3RADAR));
+        addTypeHandler(TypeHandler.TYPE_ANY, new TypeHandler(this, TypeHandler.TYPE_ANY));
+        addTypeHandler(TypeHandler.TYPE_LEVEL3RADAR, new TypeHandler(this,TypeHandler.TYPE_LEVEL3RADAR));
     }
 
 
@@ -211,44 +205,7 @@ public class Repository implements TableDefinitions {
                                 + "ms <p>" + sb.toString());
     }
 
-    /**
-     * _more_
-     *
-     * @param sb _more_
-     * @param value _more_
-     * @param name _more_
-     */
-    protected void makeHtmlHidden(StringBuffer sb, String value,
-                                  String name) {
-        sb.append("<input type=\"hidden\" name=\"" + name + "\" value=\""
-                  + value + "\"/>");
-    }
 
-    /**
-     * _more_
-     *
-     * @param sb _more_
-     * @param values _more_
-     * @param name _more_
-     * @param label _more_
-     */
-    protected void makeHtmlSelect(StringBuffer sb, String[] values,
-                                  String name, String label) {
-        sb.append(" <tr><td align=\"right\"><b>" + label
-                  + "</b> </td><td><select name=\"" + name + "\">");
-        sb.append("<option>" + "All" + "</option>");
-        for (int i = 0; i < values.length; i++) {
-            String optionLabel = getProductName(values[i], null);
-            if (optionLabel != null) {
-                optionLabel = optionLabel + " (" + values[i] + ")";
-            } else {
-                optionLabel = values[i];
-            }
-            sb.append("<option value=\"" + values[i] + "\">" + optionLabel
-                      + "</option>");
-        }
-        sb.append("</td></tr>");
-    }
 
 
     private Hashtable typeHandlers = new Hashtable();
@@ -259,9 +216,20 @@ public class Repository implements TableDefinitions {
 
     protected TypeHandler getTypeHandler(Hashtable args) throws Exception {
         String type = (String) args.get(ARG_TYPE);
-        if(type == null) type = TYPE_ALL;
+        if(type == null) type = TypeHandler.TYPE_ANY;
         return (TypeHandler)typeHandlers.get(type);
     }
+
+    public List<Group> getGroups(String[]groups) throws Exception {
+        List<Group> groupList = new ArrayList<Group>();
+        for (int i = 0; i < groups.length; i++) {
+            Group group = findGroupFromId(groups[i]);
+            if (group != null) {
+                groupList.add(group);
+            }
+        }
+        return groupList;
+    } 
 
 
     /**
@@ -276,52 +244,18 @@ public class Repository implements TableDefinitions {
     protected StringBuffer makeQueryForm(Hashtable args) throws Exception {
 
         Statement statement;
-        String    where     = assembleWhereClause(args).trim();
-        if (where.length() > 0) {
-            where = " where " + where;
-        }
-        String[] groups = SqlUtils.readString(execute(SELECT_FILES_GROUPS + where), 1);
-        String[] maxdates = SqlUtils.readString(execute(SELECT_FILES_MAXDATE + where), 1);
-        String[] mindates = SqlUtils.readString(execute(SELECT_FILES_MINDATE + where), 1);
-        String   maxdate  = ((maxdates.length > 0)
-                             ? maxdates[0]
-                             : "");
-        String   mindate  = ((mindates.length > 0)
-                             ? mindates[0]
-                             : "");
-
-
+        List    where     = assembleWhereClause(args);
         StringBuffer sb       = new StringBuffer();
         sb.append("<h2> Search Form</h2>");
         sb.append("<table cellpadding=\"5\">");
         sb.append("<form action=\"/query\">\n");
 
         TypeHandler typeHandler = getTypeHandler(args);
-        makeHtmlHidden(sb, typeHandler.getType(), ARG_TYPE);
+        sb.append(HtmlUtil.makeHidden(typeHandler.getType(), ARG_TYPE));
 
-        if (groups.length > 1) {
-            sb.append(
-                " <tr><td align=\"right\"><b>Group:</b> </td><td><select name=\""
-                + ARG_GROUP + "\">");
-            sb.append("<option>" + "All" + "</option>");
-            for (int i = 0; i < groups.length; i++) {
-                Group group = findGroupFromId(groups[i]);
-                if (group != null) {
-                    sb.append("<option>" + group.getFullName() + "</option>");
-                }
-            }
-            sb.append("</td></tr>");
-        } else if (groups.length == 1) {
-            Group group = findGroupFromId(groups[0]);
-            makeHtmlHidden(sb, group.getFullName(), ARG_GROUP);
-        }
 
         typeHandler.addToForm(sb, args, where);
 
-        sb.append(
-            "<tr><td align=\"right\"><b>Date Range: </b></td><td><input name=\"fromdate\" value=\""
-            + mindate + "\"> -- <input name=\"todate\" value=\"" + maxdate
-            + "\"></td></tr>");
 
 
         String output = (String) args.get("output");
@@ -329,12 +263,11 @@ public class Repository implements TableDefinitions {
             sb.append(
                 "<tr><td align=\"right\"><b>Output Type: </b></td><td><select name=\"output\"><option>html</option><option>xml</option></select></td></tr>");
         } else {
-            makeHtmlHidden(sb, output, "output");
+            sb.append(HtmlUtil.makeHidden(output, "output"));
         }
 
-
         sb.append(
-            "<tr><td><input  type=\"submit\" value=\"Search for radar\" /></td></tr>");
+            "<tr><td><input  type=\"submit\" value=\"Search\" /></td></tr>");
         sb.append("<table>");
 
         sb.append("</form>");
@@ -368,7 +301,7 @@ public class Repository implements TableDefinitions {
             throws Exception {
         String query = SqlUtils.makeSelect(SqlUtils.distinct(column),
                                            TABLE_LEVEL3RADAR,
-                                           assembleLevel3WhereClause(args));
+                                           SqlUtils.makeAnd(assembleLevel3WhereClause(args)));
         Statement    statement = execute(query);
         String[]     stations  = SqlUtils.readString(statement, 1);
         StringBuffer sb        = new StringBuffer();
@@ -378,7 +311,7 @@ public class Repository implements TableDefinitions {
             sb.append(XmlUtil.tag(tag,
                                   XmlUtil.attrs(ATTR_ID, stations[i],
                                       ATTR_NAME,
-                                      getProductName(stations[i]))));
+                                      getLongName(stations[i]))));
         }
         sb.append(XmlUtil.closeTag(tag + "s"));
         return sb;
@@ -401,11 +334,12 @@ public class Repository implements TableDefinitions {
      */
     protected StringBuffer listGroups(Hashtable args)
         throws Exception {
+        List where = assembleWhereClause(args);
+        where.add(SqlUtils.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID));
         String query =
             SqlUtils.makeSelect(SqlUtils.distinct(COL_FILES_GROUP_ID),
                                 getTables(args),
-                                SqlUtils.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID)
-                                + " " + assembleWhereClause(args));
+                                SqlUtils.makeAnd(where));
         Statement    statement = execute(query);
         String[]     groups    = SqlUtils.readString(statement, 1);
         StringBuffer sb        = new StringBuffer();
@@ -463,14 +397,14 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    protected String assembleWhereClause(Hashtable args) throws Exception {
+    protected List assembleWhereClause(Hashtable args) throws Exception {
         return assembleWhereClause(args, getTypeHandler(args));
     }
 
 
 
 
-    protected String assembleWhereClause(Hashtable args, TypeHandler typeHandler) throws Exception {
+    protected List assembleWhereClause(Hashtable args, TypeHandler typeHandler) throws Exception {
         List   where     = new ArrayList();
         String groupName = (String) args.get("group");
         if ((groupName != null) && !groupName.toLowerCase().equals("all")) {
@@ -491,11 +425,7 @@ public class Repository implements TableDefinitions {
             where.add(SqlUtils.le(COL_FILES_TODATE,
                                   SqlUtils.quote(getDateString(todate))));
         }
-
-        if (where.size() > 0) {
-            return StringUtil.join(" AND ", where);
-        }
-        return "";
+        return where;
     }
 
     /**
@@ -507,19 +437,12 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    protected String assembleLevel3WhereClause(Hashtable args)
+    protected List assembleLevel3WhereClause(Hashtable args)
             throws Exception {
         List   where = new ArrayList();
-        //        String basic = assembleWhereClause(args);
-        //        if (basic.length() > 0) {
-        //            where.add(basic);
-        //        }
         addOr(COL_LEVEL3RADAR_STATION, (String) args.get(ARG_STATION), where);
         addOr(COL_LEVEL3RADAR_PRODUCT, (String) args.get(ARG_PRODUCT), where);
-        if (where.size() > 0) {
-            return StringUtil.join(" AND ", where);
-        }
-        return "";
+        return where;
     }
 
 
@@ -627,18 +550,15 @@ public class Repository implements TableDefinitions {
      * @throws Exception _more_
      */
     protected List<RadarInfo> getRadarInfos(Hashtable args) throws Exception {
-        String where = assembleLevel3WhereClause(args);
-        if (where.trim().length() > 0) {
-            where = where + " AND ";
-        }
-        where += SqlUtils.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID);
+        List  where = assembleLevel3WhereClause(args);
+        where.add(SqlUtils.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID));
 
         String query =
             SqlUtils.makeSelect(SqlUtils.comma(COL_FILES_GROUP_ID,
                 COL_FILES_FILE, COL_LEVEL3RADAR_STATION,
                 COL_LEVEL3RADAR_PRODUCT, COL_FILES_FROMDATE,
                 COL_FILES_TODATE), TABLE_LEVEL3RADAR + "," + TABLE_FILES,
-                                   where, "order by " + COL_FILES_FROMDATE);
+                                   SqlUtils.makeAnd(where), "order by " + COL_FILES_FROMDATE);
         Statement statement = execute(query);
         ResultSet         results;
         SqlUtils.Iterator iter       = SqlUtils.getIterator(statement);
@@ -668,8 +588,8 @@ public class Repository implements TableDefinitions {
      *
      * @return _more_
      */
-    protected String getProductName(String product) {
-        return getProductName(product, product);
+    protected String getLongName(String product) {
+        return getLongName(product, product);
     }
 
     /**
@@ -680,7 +600,7 @@ public class Repository implements TableDefinitions {
      *
      * @return _more_
      */
-    protected String getProductName(String product, String dflt) {
+    protected String getLongName(String product, String dflt) {
         if (productMap == null) {
             productMap = new Properties();
             try {
@@ -758,18 +678,18 @@ public class Repository implements TableDefinitions {
             } else {
                 sb.append(XmlUtil.openTag("dataset",
                                           XmlUtil.attrs("name",
-                                              getProductName(station) + " ("
+                                              getLongName(station) + " ("
                                                   + station + ")")));
             }
             for (int i = 0; i < sbc.getKeys().size(); i++) {
                 String       product = (String) sbc.getKeys().get(i);
                 StringBuffer ssb     = sbc.getBuffer(product);
                 if (html) {
-                    sb.append("<li>" + getProductName(product) + "<ul>");
+                    sb.append("<li>" + getLongName(product) + "<ul>");
                     sb.append(ssb);
                     sb.append("</ul>");
                 } else {
-                    sb.append("<dataset name=\"" + getProductName(product)
+                    sb.append("<dataset name=\"" + getLongName(product)
                               + "\">\n");
                     sb.append(ssb);
                     sb.append(XmlUtil.closeTag("dataset"));
@@ -803,7 +723,7 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    public List<RadarInfo> collectLevel3radarFilesxxx(File rootDir,
+    public List<RadarInfo> collectLevel3radarFiles(File rootDir,
             String groupName)
             throws Exception {
         long                  t1         = System.currentTimeMillis();
@@ -834,7 +754,7 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    public List<RadarInfo> collectLevel3radarFiles(File rootDir,
+    public List<RadarInfo> collectLevel3radarFilesxxx(File rootDir,
             final String groupName)
             throws Exception {
         final Group            group      = findGroup(groupName);
@@ -906,7 +826,7 @@ public class Repository implements TableDefinitions {
             int    col = 1;
             String id  = getKey();
             filesInsert.setString(col++, id);
-            filesInsert.setString(col++, TYPE_LEVEL3RADAR);
+            filesInsert.setString(col++, TypeHandler.TYPE_LEVEL3RADAR);
             filesInsert.setString(col++, radarInfo.getGroupId());
             filesInsert.setString(col++, radarInfo.getFile().toString());
             filesInsert.setTimestamp(
@@ -951,7 +871,7 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    private Statement execute(String sql) throws Exception {
+    protected Statement execute(String sql) throws Exception {
         Statement statement = connection.createStatement();
         System.err.println("query:" + sql);
         statement.execute(sql);
@@ -978,44 +898,6 @@ public class Repository implements TableDefinitions {
         }
     }
 
-
-    public static class TypeHandler {
-        Repository repository;
-        String type;
-        public TypeHandler(Repository repository, String type) {
-            this.repository = repository;
-            this.type = type;
-        }
-
-        public String getType() {
-            return type;
-        }
-        
-        public boolean isType(String type) {
-            return this.type.equals(type);
-        }
-
-        public void addToForm(StringBuffer  sb, Hashtable args, String where) throws Exception {
-            if(isType(TYPE_LEVEL3RADAR)) {
-                String[] products = SqlUtils.readString(repository.execute(SELECT_LEVEL3RADAR_PRODUCTS + where), 1);
-                String[] stations = SqlUtils.readString(repository.execute(SELECT_LEVEL3RADAR_STATIONS + where), 1);
-
-                if (stations.length > 1) {
-                    repository.makeHtmlSelect(sb, stations, ARG_STATION, "Station:");
-                } else if (stations.length == 1) {
-                    repository.makeHtmlHidden(sb, stations[0], ARG_STATION);
-                }
-                if (products.length > 1) {
-                    repository.makeHtmlSelect(sb, products, ARG_PRODUCT, "Product:");
-                } else if (products.length == 1) {
-                    repository.makeHtmlHidden(sb, products[0], ARG_PRODUCT);
-                }
-            }
-
-        }
-
-
-    }
 
 
 

@@ -151,12 +151,12 @@ public interface TableDefinitions {
     /** _more_          */
     public static final String SELECT_LEVEL3RADAR_PRODUCTS =
         SqlUtils.makeSelect(SqlUtils.distinct(COL_LEVEL3RADAR_PRODUCT),
-                            TABLE_LEVEL3RADAR);
+                            TABLE_FILES+","+TABLE_LEVEL3RADAR);
 
     /** _more_          */
     public static final String SELECT_LEVEL3RADAR_STATIONS =
         SqlUtils.makeSelect(SqlUtils.distinct(COL_LEVEL3RADAR_STATION),
-                            TABLE_LEVEL3RADAR);
+                            TABLE_FILES+","+TABLE_LEVEL3RADAR);
 
     /** _more_          */
     public static final String SELECT_FILES_MAXDATE =
