@@ -1,4 +1,6 @@
 
+CREATE TABLE dummy (id varchar(200));
+
 
 CREATE TABLE groups (id varchar(200),
 	  		parent varchar(200),

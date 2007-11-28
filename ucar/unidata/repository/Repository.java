@@ -92,8 +92,12 @@ public class Repository implements TableDefinitions {
     /** _more_          */
     public static final String ARG_TYPE = "type";
 
+    public static final String ARG_ID = "id";
+
     /** _more_          */
     public static final String ARG_GROUP = "group";
+
+    public static final String ARG_GROUPID = "groupid";
 
     /** _more_          */
     public static final String ARG_TODATE = "todate";
@@ -115,15 +119,6 @@ public class Repository implements TableDefinitions {
     /** _more_          */
     int keyCnt = 0;
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    private String getKey() {
-        return baseTime + "_" + (keyCnt++);
-    }
-
 
     /** _more_ */
     private Connection connection;
@@ -137,13 +132,51 @@ public class Repository implements TableDefinitions {
      * @param connectionURL _more_
      * @throws Exception _more_
      */
-    public Repository(String driver, String connectionURL) throws Exception {
+    public Repository(String driver, String connectionURL, String userName, String password) throws Exception {
         Misc.findClass(driver);
-        //        connection = DriverManager.getConnection(connectionURL, "jeff", "mypassword");
-        connection = DriverManager.getConnection(connectionURL);
+        if(userName!=null) {
+            connection = DriverManager.getConnection(connectionURL, userName, password);
+        } else {
+            connection = DriverManager.getConnection(connectionURL);
+        }
+        initTable();
+        initTypeHandlers();
+    }
+
+    protected void initTable() throws Exception {
+        boolean ok = true;
+        try {
+            execute ("select * from dummy");
+        } catch(Exception dummy) {
+            ok = false;
+        }
+        if(ok) return;
+        System.err.println("making db");
+        String sql =
+            IOUtil.readContents("/ucar/unidata/repository/makedb.sql",
+                                getClass());
+        Statement statement = connection.createStatement();
+        SqlUtils.loadSql(sql, statement);
+        loadLevel3RadarFiles();
+        loadTestFiles();
+    }
+
+
+    protected void initTypeHandlers() {
         addTypeHandler(TypeHandler.TYPE_ANY, new TypeHandler(this, TypeHandler.TYPE_ANY));
         addTypeHandler(TypeHandler.TYPE_LEVEL3RADAR, new TypeHandler(this,TypeHandler.TYPE_LEVEL3RADAR));
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    private String getGUID() {
+        return baseTime + "_" + (keyCnt++);
+    }
+
+
 
 
     /**
@@ -217,7 +250,21 @@ public class Repository implements TableDefinitions {
     protected TypeHandler getTypeHandler(Hashtable args) throws Exception {
         String type = (String) args.get(ARG_TYPE);
         if(type == null) type = TypeHandler.TYPE_ANY;
-        return (TypeHandler)typeHandlers.get(type);
+        return getTypeHandler(type);
+    }
+
+    protected TypeHandler getTypeHandler(String type) throws Exception {
+        TypeHandler typeHandler = (TypeHandler)typeHandlers.get(type);
+        if(typeHandler == null) {
+            typeHandler = new TypeHandler(this,type);
+            addTypeHandler(type, typeHandler);
+        }
+        return typeHandler;
+    }
+
+    public List<Group> getGroups(String sql) throws Exception {
+        Statement statement = execute(sql);
+        return  getGroups(SqlUtils.readString(statement, 1));
     }
 
     public List<Group> getGroups(String[]groups) throws Exception {
@@ -252,12 +299,7 @@ public class Repository implements TableDefinitions {
 
         TypeHandler typeHandler = getTypeHandler(args);
         sb.append(HtmlUtil.makeHidden(typeHandler.getType(), ARG_TYPE));
-
-
         typeHandler.addToForm(sb, args, where);
-
-
-
         String output = (String) args.get("output");
         if (output == null) {
             sb.append(
@@ -271,9 +313,7 @@ public class Repository implements TableDefinitions {
         sb.append("<table>");
 
         sb.append("</form>");
-        sb.append("<p><a href=\"/listgroups\"> List groups</a>");
-        sb.append("<p><a href=\"/radar/liststations\"> List stations</a>");
-        sb.append("<p><a href=\"/radar/listproducts\"> List products</a>");
+        typeHandler.makeLinks(sb);
 
         sb.append("<form action=\"/sql\">\n");
         sb.append("<input  name=\"query\" size=\"40\"/>");
@@ -299,9 +339,10 @@ public class Repository implements TableDefinitions {
     protected StringBuffer processRadarList(Hashtable args, String column,
                                             String tag)
             throws Exception {
+        List where =getTypeHandler(TypeHandler.TYPE_LEVEL3RADAR).assembleWhereClause(args);
         String query = SqlUtils.makeSelect(SqlUtils.distinct(column),
                                            TABLE_LEVEL3RADAR,
-                                           SqlUtils.makeAnd(assembleLevel3WhereClause(args)));
+                                           SqlUtils.makeAnd(where));
         Statement    statement = execute(query);
         String[]     stations  = SqlUtils.readString(statement, 1);
         StringBuffer sb        = new StringBuffer();
@@ -319,9 +360,102 @@ public class Repository implements TableDefinitions {
 
 
 
-    private String getTables(Hashtable args) {
-        return TABLE_FILES + "," + TABLE_LEVEL3RADAR;
+
+
+    protected StringBuffer showFile(Hashtable args)
+        throws Exception {
+        String fileId = (String) args.get(ARG_ID);
+        if(fileId == null) throw new IllegalArgumentException ("No " + ARG_ID +" given");
+        StringBuffer sb        = new StringBuffer();
+        String query =
+            SqlUtils.makeSelect(SqlUtils.comma(COL_FILES_ID,COL_FILES_TYPE, COL_FILES_FILE),
+                                TABLE_FILES,
+                                SqlUtils.eq(COL_FILES_ID, SqlUtils.quote(fileId)));
+        ResultSet results = execute(query).getResultSet();
+        if(!results.next()) {
+            throw new IllegalArgumentException("Given file id:" + fileId +" is not in database");
+        }
+        String id = results.getString(1);
+        String type = results.getString(2);
+        String file = results.getString(3);
+        sb.append("File:" + file +"<br>");
+        sb.append("Type:" + type +"<br>");
+        return sb;
     }
+
+    protected StringBuffer showGroup(Hashtable args)
+        throws Exception {
+        String groupId = (String) args.get(ARG_GROUPID);
+        args.remove(ARG_GROUPID);
+        List<Group> groups= new ArrayList<Group>();
+        TypeHandler typeHandler = getTypeHandler(args);
+        boolean topLevel = false;
+        if(groupId == null) {
+            topLevel = true;
+            Statement statement =  execute(SqlUtils.makeSelect(COL_GROUPS_ID,TABLE_GROUPS,COL_GROUPS_PARENT+ " IS NULL"));
+            groups.addAll(getGroups(SqlUtils.readString(statement,1)));
+        } else {
+            Group g = findGroupFromId(groupId);
+            if(g==null) throw new IllegalStateException ("Could not find group with id:" + groupId);
+            groups.add(g);
+        }
+
+
+        List where = typeHandler.assembleWhereClause(args);
+        StringBuffer sb        = new StringBuffer();
+        if(topLevel) sb.append("Top Level Groups<ul>");
+
+        for(Group group: groups) {
+            if(topLevel) {
+                sb.append("<li><a href=\"/showgroup?groupid=" + group.getId() +"\">" +
+                          group.getFullName()+"</a>");
+                continue;
+            }
+            sb.append("<h2>Group: " + group.getFullName()+"</h2>");
+            List<Group> subGroups = getGroups(SqlUtils.makeSelect(COL_GROUPS_ID,TABLE_GROUPS,SqlUtils.eq(COL_GROUPS_PARENT, 
+                                                                                                         SqlUtils.quote(group.getId()))));
+            if(subGroups.size()>0) {
+                sb.append("<b>Sub groups:</b><ul>");
+                for(Group subGroup: subGroups) {
+                    sb.append("<li><a href=\"/showgroup?groupid=" + subGroup.getId() +"\">" +
+                              subGroup.getFullName()+"</a>");
+                }
+                sb.append("</ul>");
+            }
+            
+            where.add(SqlUtils.eq(COL_FILES_GROUP_ID, SqlUtils.quote(group.getId())));
+            String query =
+                SqlUtils.makeSelect(SqlUtils.comma(COL_FILES_ID,COL_FILES_TYPE, COL_FILES_FILE),
+                                    typeHandler.getQueryOnTables(args),
+                                    SqlUtils.makeAnd(where));
+            Statement stmt = execute(query);
+            SqlUtils.Iterator  iter    = SqlUtils.getIterator(stmt);
+            ResultSet results;
+            int cnt = 0;
+            while ((results = iter.next()) != null) {
+                while (results.next()) {
+                    if(cnt++>1000) {
+                        sb.append("<li> ...");
+                        break;
+                    }
+                    String id = results.getString(1);
+                    String type = results.getString(2);
+                    String file = results.getString(3);
+                    if(cnt==1) {
+                        sb.append("<b>Files:</b>");
+                        sb.append("<ul>");
+                    }
+                    sb.append("<li>" + HtmlUtil.href("/showfile?" + ARG_ID +"=" + id, file));
+                }
+            }
+            if(cnt>0) sb.append("</ul>");
+
+        }
+        if(topLevel) sb.append("</ul>");
+        return sb;
+    }
+
+
 
     /**
      * _more_
@@ -334,12 +468,13 @@ public class Repository implements TableDefinitions {
      */
     protected StringBuffer listGroups(Hashtable args)
         throws Exception {
-        List where = assembleWhereClause(args);
-        where.add(SqlUtils.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID));
+        TypeHandler typeHandler = getTypeHandler(args);
+        List where = typeHandler.assembleWhereClause(args);
         String query =
             SqlUtils.makeSelect(SqlUtils.distinct(COL_FILES_GROUP_ID),
-                                getTables(args),
+                                typeHandler.getQueryOnTables(args),
                                 SqlUtils.makeAnd(where));
+
         Statement    statement = execute(query);
         String[]     groups    = SqlUtils.readString(statement, 1);
         StringBuffer sb        = new StringBuffer();
@@ -349,8 +484,10 @@ public class Repository implements TableDefinitions {
             Group group = findGroupFromId(groups[i]);
             if (group != null) {
                 sb.append(XmlUtil.tag(TAG_GROUP,
-                                      XmlUtil.attrs("name",
-                                          group.getFullName())));
+                                      XmlUtil.attrs(ATTR_NAME,
+                                                    group.getFullName(),
+                                                    ATTR_ID,
+                                                    group.getId())));
             }
         }
         sb.append(XmlUtil.closeTag(TAG_GROUPS));
@@ -358,35 +495,6 @@ public class Repository implements TableDefinitions {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param dttm _more_
-     *
-     * @return _more_
-     *
-     * @throws java.text.ParseException _more_
-     */
-    private String getDateString(String dttm)
-            throws java.text.ParseException {
-        Date date = DateUtil.parse(dttm);
-        return SqlUtils.format(date);
-
-    }
-
-    /**
-     * _more_
-     *
-     * @param column _more_
-     * @param value _more_
-     * @param list _more_
-     */
-    private void addOr(String column, String value, List list) {
-        if ((value != null) && (value.trim().length() > 0)
-                && !value.toLowerCase().equals("all")) {
-            list.add("(" + SqlUtils.makeOrSplit(column, value, true) + ")");
-        }
-    }
 
     /**
      * _more_
@@ -398,52 +506,12 @@ public class Repository implements TableDefinitions {
      * @throws Exception _more_
      */
     protected List assembleWhereClause(Hashtable args) throws Exception {
-        return assembleWhereClause(args, getTypeHandler(args));
+        return getTypeHandler(args).assembleWhereClause(args);
     }
 
 
 
 
-    protected List assembleWhereClause(Hashtable args, TypeHandler typeHandler) throws Exception {
-        List   where     = new ArrayList();
-        String groupName = (String) args.get("group");
-        if ((groupName != null) && !groupName.toLowerCase().equals("all")) {
-            Group group = findGroup(groupName);
-            where.add(SqlUtils.eq(COL_FILES_GROUP_ID,
-                                  SqlUtils.quote(group.getId())));
-        }
-
-        addOr(COL_FILES_TYPE, (String) args.get(ARG_TYPE), where);
-
-        String fromdate = (String) args.get(ARG_FROMDATE);
-        if ((fromdate != null) && (fromdate.trim().length() > 0)) {
-            where.add(SqlUtils.ge(COL_FILES_FROMDATE,
-                                  SqlUtils.quote(getDateString(fromdate))));
-        }
-        String todate = (String) args.get(ARG_TODATE);
-        if ((todate != null) && (todate.trim().length() > 0)) {
-            where.add(SqlUtils.le(COL_FILES_TODATE,
-                                  SqlUtils.quote(getDateString(todate))));
-        }
-        return where;
-    }
-
-    /**
-     * _more_
-     *
-     * @param args _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected List assembleLevel3WhereClause(Hashtable args)
-            throws Exception {
-        List   where = new ArrayList();
-        addOr(COL_LEVEL3RADAR_STATION, (String) args.get(ARG_STATION), where);
-        addOr(COL_LEVEL3RADAR_PRODUCT, (String) args.get(ARG_PRODUCT), where);
-        return where;
-    }
 
 
     /** _more_          */
@@ -525,7 +593,7 @@ public class Repository implements TableDefinitions {
                               results.getString(3), results.getString(4));
         } else {
             String insert = SqlUtils.makeInsert(TABLE_GROUPS, COLUMNS_GROUPS,
-                                SqlUtils.comma(SqlUtils.quote(getKey()),
+                                SqlUtils.comma(SqlUtils.quote(getGUID()),
                                     ((parent != null)
                                      ? SqlUtils.quote(parent.getId())
                                      : "NULL"), SqlUtils.quote(lastName),
@@ -550,9 +618,7 @@ public class Repository implements TableDefinitions {
      * @throws Exception _more_
      */
     protected List<RadarInfo> getRadarInfos(Hashtable args) throws Exception {
-        List  where = assembleLevel3WhereClause(args);
-        where.add(SqlUtils.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID));
-
+        List where =getTypeHandler(TypeHandler.TYPE_LEVEL3RADAR).assembleWhereClause(args);
         String query =
             SqlUtils.makeSelect(SqlUtils.comma(COL_FILES_GROUP_ID,
                 COL_FILES_FILE, COL_LEVEL3RADAR_STATION,
@@ -632,7 +698,6 @@ public class Repository implements TableDefinitions {
      */
     protected StringBuffer processRadarQuery(Hashtable args)
             throws Exception {
-
         List<RadarInfo> radarInfos = getRadarInfos(args);
         boolean         html = !Misc.equals(args.get("output"), "xml");
         StringBuffer    sb         = new StringBuffer();
@@ -787,6 +852,27 @@ public class Repository implements TableDefinitions {
         return radarInfos;
     }
 
+
+    public List<DataInfo> collectFiles(File rootDir)
+            throws Exception {
+        final List<DataInfo>  dataInfos = new ArrayList();
+        IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
+            public boolean viewFile(File f) throws Exception {
+                if(f.isDirectory()) return true;
+                String  name    = f.toString();
+                String ext = IOUtil.getFileExtension(name);
+                if(ext.startsWith(".")) ext  = ext.substring(1);
+                Group            group      = findGroup("test/" + ext);
+                dataInfos.add(new DataInfo(group, f.toString(), f.lastModified()));
+                return true;
+            }
+        };
+
+        IOUtil.walkDirectory(rootDir, fileViewer);
+        long t2 = System.currentTimeMillis();
+        return dataInfos;
+    }
+
     /**
      * _more_
      *
@@ -795,18 +881,11 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    public void makeLevel3RadarTable() throws Exception {
-        String sql =
-            IOUtil.readContents("/ucar/unidata/repository/makedb.sql",
-                                getClass());
-        Statement statement = connection.createStatement();
-        SqlUtils.loadSql(sql, statement);
-
+    public void loadLevel3RadarFiles() throws Exception {
         File            rootDir = new File("/data/ldm/gempak/nexrad/NIDS");
         List<RadarInfo> files   = collectLevel3radarFiles(rootDir, "IDD");
         files.addAll(collectLevel3radarFiles(rootDir, "LDM/LDM2"));
         System.err.println("Inserting:" + files.size() + " files");
-
         long t1  = System.currentTimeMillis();
         int  cnt = 0;
         PreparedStatement filesInsert =
@@ -824,7 +903,7 @@ public class Repository implements TableDefinitions {
                                    + ((int) (cnt / tseconds)) + "/s");
             }
             int    col = 1;
-            String id  = getKey();
+            String id  = getGUID();
             filesInsert.setString(col++, id);
             filesInsert.setString(col++, TypeHandler.TYPE_LEVEL3RADAR);
             filesInsert.setString(col++, radarInfo.getGroupId());
@@ -859,6 +938,56 @@ public class Repository implements TableDefinitions {
                            + (cnt / seconds));
 
     }
+
+    public void loadTestFiles() throws Exception {
+        File            rootDir = new File("c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
+        List<DataInfo> files   = collectFiles(rootDir);
+        System.err.println("Inserting:" + files.size() + " files");
+        long t1  = System.currentTimeMillis();
+        int  cnt = 0;
+        PreparedStatement filesInsert =
+            connection.prepareStatement(INSERT_FILES);
+        int batchCnt = 0;
+        connection.setAutoCommit(false);
+        for (DataInfo dataInfo : files) {
+            if ((++cnt) % 10000 == 0) {
+                long   tt2      = System.currentTimeMillis();
+                double tseconds = (tt2 - t1) / 1000.0;
+                System.err.println("# " + cnt + " rate: "
+                                   + ((int) (cnt / tseconds)) + "/s");
+            }
+            int    col = 1;
+            String id  = getGUID();
+            filesInsert.setString(col++, id);
+            filesInsert.setString(col++, TypeHandler.TYPE_ANY);
+            filesInsert.setString(col++, dataInfo.getGroupId());
+            filesInsert.setString(col++, dataInfo.getFile().toString());
+            filesInsert.setTimestamp(
+                col++, new java.sql.Timestamp(dataInfo.getStartDate()));
+            filesInsert.setTimestamp(
+                col++, new java.sql.Timestamp(dataInfo.getStartDate()));
+            filesInsert.addBatch();
+
+            batchCnt++;
+            if (batchCnt > 100) {
+                filesInsert.executeBatch();
+                batchCnt = 0;
+            }
+        }
+        if (batchCnt > 0) {
+            filesInsert.executeBatch();
+        }
+        connection.setAutoCommit(true);
+        connection.commit();
+        long   t2      = System.currentTimeMillis();
+        double seconds = (t2 - t1) / 1000.0;
+        System.err.println("cnt:" + cnt + " time:" + seconds + " rate:"
+                           + (cnt / seconds));
+
+    }
+
+
+
 
 
 

@@ -62,10 +62,14 @@ public class MetaDataServer extends HttpServer {
      * @param connectionURL _more_
      * @throws Exception _more_
      */
-    public MetaDataServer(String driver, String connectionURL)
+    public MetaDataServer(String[]args, String driver, String connectionURL)
             throws Exception {
         super(8080);
-        repository = new Repository(driver, connectionURL);
+        //"jeff", "mypassword");
+        for (int i = 0; i < args.length; i++) {
+        }
+
+        repository = new Repository(driver, connectionURL,null,null);
     }
 
 
@@ -106,6 +110,10 @@ public class MetaDataServer extends HttpServer {
                                 "product", "product"));
                     } else if (path.equals("/listgroups")) {
                         writeXml(repository.listGroups(formArgs));
+                    } else if (path.equals("/showgroup")) {
+                        writeHtml(repository.showGroup(formArgs));
+                    } else if (path.equals("/showfile")) {
+                        writeHtml(repository.showFile(formArgs));
                     } else {
                         writeResult(false, "Unknown url:" + path, "text/html");
                     }
@@ -120,39 +128,10 @@ public class MetaDataServer extends HttpServer {
     }
 
 
-    /**
-     * _more_
-     */
-    private void deleteTables() {
-        try {
-            repository.eval("DROP TABLE " + Repository.TABLE_LEVEL3RADAR);
-        } catch (Exception exc) {}
-        try {
-            repository.eval("DROP TABLE " + Repository.TABLE_FILES);
-        } catch (Exception exc) {}
-        try {
-            repository.eval("DROP TABLE " + Repository.TABLE_GROUPS);
-        } catch (Exception exc) {}
-    }
 
 
-    /**
-     * _more_
-     *
-     * @param args _more_
-     *
-     * @throws Exception _more_
-     */
-    private void processArgs(String[] args) throws Exception {
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("maketable")) {
-                deleteTables();
-                repository.makeLevel3RadarTable();
-            } else {
-                repository.eval(args[i]);
-            }
-        }
-    }
+
+
 
 
 
@@ -168,8 +147,7 @@ public class MetaDataServer extends HttpServer {
         String connectionURL = "jdbc:derby:testdb;create=true";
         //        String driver = "com.mysql.jdbc.Driver";
         //        String connectionURL = "jdbc:mysql://localhost:3306/test?zeroDateTimeBehavior=convertToNull";
-        MetaDataServer mds = new MetaDataServer(driver, connectionURL);
-        mds.processArgs(args);
+        MetaDataServer mds = new MetaDataServer(args,driver, connectionURL);
         mds.init();
     }
 

@@ -106,6 +106,25 @@ public class SqlUtils {
         return sdf.format(d);
     }
 
+
+    /**
+     * _more_
+     *
+     * @param dttm _more_
+     *
+     * @return _more_
+     *
+     * @throws java.text.ParseException _more_
+     */
+    public static  String getDateString(String dttm)
+            throws java.text.ParseException {
+        Date date = DateUtil.parse(dttm);
+        return SqlUtils.format(date);
+
+    }
+
+
+
     /**
      * _more_
      *
@@ -265,7 +284,12 @@ public class SqlUtils {
                 //Strip off the ";"
                 lineSql = lineSql.substring(0, lineSql.length()-1);
                 //                System.err.println ("EVAL:" +lineSql);
-                statement.execute(lineSql);
+                try {
+                    statement.execute(lineSql);
+                } catch(Exception exc) {
+                    System.err.println ("bad query:" + lineSql);
+                    throw exc;
+                }
                 sb = new StringBuffer();
             }
         }

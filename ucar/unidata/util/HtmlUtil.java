@@ -46,6 +46,10 @@ public class HtmlUtil {
             + value + "\"/>";
     }
 
+    public static String href(String url, String label) {
+        return "<a href=\"" + url +"\">" + label +"</a>";
+    }
+
     /**
      * _more_
      *
@@ -65,8 +69,7 @@ public class HtmlUtil {
                 TwoFacedObject tfo = (TwoFacedObject) obj;
                 value = tfo.getId().toString();
                 label  = tfo.toString();
-            } else {
-                value = label = obj.toString();
+           } else {                value = label = obj.toString();
             }
             sb.append("<option value=\"" + value + "\">" + label
                       + "</option>");

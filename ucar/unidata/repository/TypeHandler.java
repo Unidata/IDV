@@ -127,6 +127,70 @@ public class TypeHandler implements TableDefinitions {
 
     }
 
+    protected List assembleWhereClause(Hashtable args) throws Exception {
+        List   where     = new ArrayList();
+        String groupName = (String) args.get(Repository.ARG_GROUP);
+        if ((groupName != null) && !groupName.toLowerCase().equals("all")) {
+            Group group = repository.findGroup(groupName);
+            where.add(SqlUtils.eq(COL_FILES_GROUP_ID,
+                                  SqlUtils.quote(group.getId())));
+        }
+        addOr(COL_FILES_TYPE, (String) args.get(Repository.ARG_TYPE), where);
+
+        String fromdate = (String) args.get(Repository.ARG_FROMDATE);
+        if ((fromdate != null) && (fromdate.trim().length() > 0)) {
+            where.add(SqlUtils.ge(COL_FILES_FROMDATE,
+                                  SqlUtils.quote(SqlUtils.getDateString(fromdate))));
+        }
+        String todate = (String) args.get(Repository.ARG_TODATE);
+        if ((todate != null) && (todate.trim().length() > 0)) {
+            where.add(SqlUtils.le(COL_FILES_TODATE,
+                                  SqlUtils.quote(SqlUtils.getDateString(todate))));
+        }
+
+        if(isType(TYPE_LEVEL3RADAR)) {
+            addOr(COL_LEVEL3RADAR_STATION, (String) args.get(Repository.ARG_STATION), where);
+            addOr(COL_LEVEL3RADAR_PRODUCT, (String) args.get(Repository.ARG_PRODUCT), where);
+            where.add(SqlUtils.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID));
+        }
+
+
+        return where;
+    }
+
+    protected String getQueryOnTables(Hashtable args) {
+        if(isType(TYPE_LEVEL3RADAR)) {
+            return TABLE_FILES + "," + TABLE_LEVEL3RADAR;
+        }
+        return TABLE_FILES;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param column _more_
+     * @param value _more_
+     * @param list _more_
+     */
+    private void addOr(String column, String value, List list) {
+        if ((value != null) && (value.trim().length() > 0)
+                && !value.toLowerCase().equals("all")) {
+            list.add("(" + SqlUtils.makeOrSplit(column, value, true) + ")");
+        }
+    }
+
+
+
+    public void makeLinks(StringBuffer sb) {
+        sb.append("<p><a href=\"/listgroups\"> List groups</a>");
+        if(isType(TYPE_LEVEL3RADAR)) {
+            sb.append("<p><a href=\"/radar/liststations\"> List stations</a>");
+            sb.append("<p><a href=\"/radar/listproducts\"> List products</a>");
+        }
+
+    }
 
 }
 
