@@ -86,19 +86,17 @@ public class MetaDataServer extends HttpServer {
                     throws Exception {
                 System.err.println("request:" + path);
                 try {
-                    if (path.equals("/radar/query")) {
-                        StringBuffer sb =
-                            repository.processRadarQuery(formArgs);
-                        writeResult(true, sb,
+                    if (path.equals("/query")) {
+                        writeResult(true, repository.processRadarQuery(formArgs),
                                     Misc.equals("html",
                                         formArgs.get("output"))
                                     ? "text/html"
                                     : "text/xml");
-                    } else if (path.equals("/query")) {
+                    } else if (path.equals("/sql")) {
                         writeHtml(repository.processQuery(formArgs));
-                    } else if (path.equals("/radar/form")) {
+                    } else if (path.equals("/searchform")) {
                         writeResult(true,
-                                    repository.processRadarForm(formArgs),
+                                    repository.makeQueryForm(formArgs),
                                     "text/html");
                     } else if (path.equals("/radar/liststations")) {
                         writeXml(repository.processRadarList(formArgs,
@@ -106,16 +104,10 @@ public class MetaDataServer extends HttpServer {
                     } else if (path.equals("/radar/listproducts")) {
                         writeXml(repository.processRadarList(formArgs,
                                 "product", "product"));
-                    } else if (path.equals("/radar/listgroups")) {
-                        writeXml(repository.processRadarListGroup(formArgs));
-                    } else if (path.equals("/radar/maketable")) {
-                        long t1 = System.currentTimeMillis();
-                        deleteTables();
-                        repository.makeLevel3RadarTable();
-                        long t2 = System.currentTimeMillis();
-                        writeResult(true, "Time:" + (t2 - t1), "text/html");
+                    } else if (path.equals("/listgroups")) {
+                        writeXml(repository.listGroups(formArgs));
                     } else {
-                        writeResult(true, "Unknown url:" + path, "text/html");
+                        writeResult(false, "Unknown url:" + path, "text/html");
                     }
                 } catch (Exception exc) {
                     System.err.println("Error:" + exc);

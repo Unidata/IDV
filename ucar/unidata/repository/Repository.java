@@ -77,6 +77,9 @@ import java.util.regex.*;
 public class Repository implements TableDefinitions {
 
 
+    public static final String TYPE_ALL = "all";
+
+
     /** _more_          */
     public static final String TYPE_LEVEL3RADAR = "level3radar";
 
@@ -90,6 +93,9 @@ public class Repository implements TableDefinitions {
     /** _more_          */
     public static final String ATTR_NAME = "name";
 
+
+    public static final String TAG_GROUPS = "groups";
+    public static final String TAG_GROUP = "group";
 
     /** _more_          */
     public static final String ARG_TYPE = "type";
@@ -141,6 +147,8 @@ public class Repository implements TableDefinitions {
         Misc.findClass(driver);
         //        connection = DriverManager.getConnection(connectionURL, "jeff", "mypassword");
         connection = DriverManager.getConnection(connectionURL);
+        addTypeHandler(TYPE_ALL, new TypeHandler(this, TYPE_ALL));
+        addTypeHandler(TYPE_LEVEL3RADAR, new TypeHandler(this,TYPE_LEVEL3RADAR));
     }
 
 
@@ -156,12 +164,11 @@ public class Repository implements TableDefinitions {
     protected StringBuffer processQuery(Hashtable args) throws Exception {
         long      t1        = System.currentTimeMillis();
         String    query     = (String) args.get("query");
-        Statement statement = connection.createStatement();
-        statement.execute(query);
+        Statement statement = execute(query);
         SqlUtils.Iterator iter = SqlUtils.getIterator(statement);
         int               cnt  = 0;
         StringBuffer      sb   = new StringBuffer();
-        sb.append("<form action=\"/query\">\n");
+        sb.append("<form action=\"/sql\">\n");
         sb.append("<input  name=\"query\" size=\"40\" value=\"" + query
                   + "\"/>");
         sb.append("<input  type=\"submit\" value=\"Query\" />");
@@ -244,6 +251,19 @@ public class Repository implements TableDefinitions {
     }
 
 
+    private Hashtable typeHandlers = new Hashtable();
+
+    protected void addTypeHandler(String typeName, TypeHandler typeHandler) {
+        typeHandlers.put(typeName, typeHandler);
+    }
+
+    protected TypeHandler getTypeHandler(Hashtable args) throws Exception {
+        String type = (String) args.get(ARG_TYPE);
+        if(type == null) type = TYPE_ALL;
+        return (TypeHandler)typeHandlers.get(type);
+    }
+
+
     /**
      * _more_
      *
@@ -253,51 +273,31 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    protected StringBuffer processRadarForm(Hashtable args) throws Exception {
+    protected StringBuffer makeQueryForm(Hashtable args) throws Exception {
 
-        Statement statement = connection.createStatement();
-        long      t1        = System.currentTimeMillis();
-
-        String    where     = assembleRadarWhereClause(args).trim();
+        Statement statement;
+        String    where     = assembleWhereClause(args).trim();
         if (where.length() > 0) {
             where = " where " + where;
         }
-
-        statement.execute(SELECT_FILES_GROUPS + where);
-        String[] groups = SqlUtils.readString(statement, 1);
-        long     t2     = System.currentTimeMillis();
-
-        statement.execute(SELECT_LEVEL3RADAR_PRODUCTS + where);
-        String[] products = SqlUtils.readString(statement, 1);
-        long     t3       = System.currentTimeMillis();
-
-        statement.execute(SELECT_LEVEL3RADAR_STATIONS + where);
-        String[] stations = SqlUtils.readString(statement, 1);
-        long     t4       = System.currentTimeMillis();
-
-        System.err.println("time:" + (t2 - t1) + " " + (t3 - t2) + " "
-                           + (t4 - t3));
-
-        statement.execute(SELECT_FILES_MAXDATE + where);
-        String[] maxdates = SqlUtils.readString(statement, 1);
-
-        statement.execute(SELECT_FILES_MINDATE + where);
-        String[]     mindates = SqlUtils.readString(statement, 1);
-
-
-        String       maxdate  = ((maxdates.length > 0)
-                                 ? maxdates[0]
-                                 : "");
-        String       mindate  = ((mindates.length > 0)
-                                 ? mindates[0]
-                                 : "");
+        String[] groups = SqlUtils.readString(execute(SELECT_FILES_GROUPS + where), 1);
+        String[] maxdates = SqlUtils.readString(execute(SELECT_FILES_MAXDATE + where), 1);
+        String[] mindates = SqlUtils.readString(execute(SELECT_FILES_MINDATE + where), 1);
+        String   maxdate  = ((maxdates.length > 0)
+                             ? maxdates[0]
+                             : "");
+        String   mindate  = ((mindates.length > 0)
+                             ? mindates[0]
+                             : "");
 
 
         StringBuffer sb       = new StringBuffer();
-        sb.append("<h2> Radar Search Form</h2>");
-
+        sb.append("<h2> Search Form</h2>");
         sb.append("<table cellpadding=\"5\">");
-        sb.append("<form action=\"/radar/query\">\n");
+        sb.append("<form action=\"/query\">\n");
+
+        TypeHandler typeHandler = getTypeHandler(args);
+        makeHtmlHidden(sb, typeHandler.getType(), ARG_TYPE);
 
         if (groups.length > 1) {
             sb.append(
@@ -316,18 +316,7 @@ public class Repository implements TableDefinitions {
             makeHtmlHidden(sb, group.getFullName(), ARG_GROUP);
         }
 
-        if (stations.length > 1) {
-            makeHtmlSelect(sb, stations, ARG_STATION, "Station:");
-        } else if (stations.length == 1) {
-            makeHtmlHidden(sb, stations[0], ARG_STATION);
-        }
-        if (products.length > 1) {
-            makeHtmlSelect(sb, products, ARG_PRODUCT, "Product:");
-        } else if (products.length == 1) {
-            makeHtmlHidden(sb, products[0], ARG_PRODUCT);
-        }
-
-
+        typeHandler.addToForm(sb, args, where);
 
         sb.append(
             "<tr><td align=\"right\"><b>Date Range: </b></td><td><input name=\"fromdate\" value=\""
@@ -349,15 +338,15 @@ public class Repository implements TableDefinitions {
         sb.append("<table>");
 
         sb.append("</form>");
-        sb.append("<p><a href=\"/radar/listgroups\"> List groups</a>");
+        sb.append("<p><a href=\"/listgroups\"> List groups</a>");
         sb.append("<p><a href=\"/radar/liststations\"> List stations</a>");
         sb.append("<p><a href=\"/radar/listproducts\"> List products</a>");
-        sb.append("<p><a href=\"/radar/maketable\"> Scan disk</a>");
 
-        sb.append("<form action=\"/query\">\n");
+        sb.append("<form action=\"/sql\">\n");
         sb.append("<input  name=\"query\" size=\"40\"/>");
         sb.append("<input  type=\"submit\" value=\"Query\" />");
         sb.append("</form>\n");
+
 
         return sb;
     }
@@ -379,7 +368,7 @@ public class Repository implements TableDefinitions {
             throws Exception {
         String query = SqlUtils.makeSelect(SqlUtils.distinct(column),
                                            TABLE_LEVEL3RADAR,
-                                           assembleRadarWhereClause(args));
+                                           assembleLevel3WhereClause(args));
         Statement    statement = execute(query);
         String[]     stations  = SqlUtils.readString(statement, 1);
         StringBuffer sb        = new StringBuffer();
@@ -397,6 +386,10 @@ public class Repository implements TableDefinitions {
 
 
 
+    private String getTables(Hashtable args) {
+        return TABLE_FILES + "," + TABLE_LEVEL3RADAR;
+    }
+
     /**
      * _more_
      *
@@ -406,27 +399,27 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    protected StringBuffer processRadarListGroup(Hashtable args)
-            throws Exception {
+    protected StringBuffer listGroups(Hashtable args)
+        throws Exception {
         String query =
             SqlUtils.makeSelect(SqlUtils.distinct(COL_FILES_GROUP_ID),
-                                TABLE_FILES + "," + TABLE_LEVEL3RADAR,
+                                getTables(args),
                                 SqlUtils.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID)
-                                + " " + assembleRadarWhereClause(args));
+                                + " " + assembleWhereClause(args));
         Statement    statement = execute(query);
         String[]     groups    = SqlUtils.readString(statement, 1);
         StringBuffer sb        = new StringBuffer();
         sb.append(XmlUtil.XML_HEADER + "\n");
-        sb.append(XmlUtil.openTag("groups"));
+        sb.append(XmlUtil.openTag(TAG_GROUPS));
         for (int i = 0; i < groups.length; i++) {
             Group group = findGroupFromId(groups[i]);
             if (group != null) {
-                sb.append(XmlUtil.tag("group",
+                sb.append(XmlUtil.tag(TAG_GROUP,
                                       XmlUtil.attrs("name",
                                           group.getFullName())));
             }
         }
-        sb.append(XmlUtil.closeTag("groups"));
+        sb.append(XmlUtil.closeTag(TAG_GROUPS));
         return sb;
     }
 
@@ -471,6 +464,13 @@ public class Repository implements TableDefinitions {
      * @throws Exception _more_
      */
     protected String assembleWhereClause(Hashtable args) throws Exception {
+        return assembleWhereClause(args, getTypeHandler(args));
+    }
+
+
+
+
+    protected String assembleWhereClause(Hashtable args, TypeHandler typeHandler) throws Exception {
         List   where     = new ArrayList();
         String groupName = (String) args.get("group");
         if ((groupName != null) && !groupName.toLowerCase().equals("all")) {
@@ -478,7 +478,6 @@ public class Repository implements TableDefinitions {
             where.add(SqlUtils.eq(COL_FILES_GROUP_ID,
                                   SqlUtils.quote(group.getId())));
         }
-
 
         addOr(COL_FILES_TYPE, (String) args.get(ARG_TYPE), where);
 
@@ -508,13 +507,13 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    protected String assembleRadarWhereClause(Hashtable args)
+    protected String assembleLevel3WhereClause(Hashtable args)
             throws Exception {
         List   where = new ArrayList();
-        String basic = assembleWhereClause(args);
-        if (basic.length() > 0) {
-            where.add(basic);
-        }
+        //        String basic = assembleWhereClause(args);
+        //        if (basic.length() > 0) {
+        //            where.add(basic);
+        //        }
         addOr(COL_LEVEL3RADAR_STATION, (String) args.get(ARG_STATION), where);
         addOr(COL_LEVEL3RADAR_PRODUCT, (String) args.get(ARG_PRODUCT), where);
         if (where.size() > 0) {
@@ -628,12 +627,11 @@ public class Repository implements TableDefinitions {
      * @throws Exception _more_
      */
     protected List<RadarInfo> getRadarInfos(Hashtable args) throws Exception {
-        String where = assembleRadarWhereClause(args);
+        String where = assembleLevel3WhereClause(args);
         if (where.trim().length() > 0) {
             where = where + " AND ";
         }
         where += SqlUtils.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID);
-
 
         String query =
             SqlUtils.makeSelect(SqlUtils.comma(COL_FILES_GROUP_ID,
@@ -641,9 +639,7 @@ public class Repository implements TableDefinitions {
                 COL_LEVEL3RADAR_PRODUCT, COL_FILES_FROMDATE,
                 COL_FILES_TODATE), TABLE_LEVEL3RADAR + "," + TABLE_FILES,
                                    where, "order by " + COL_FILES_FROMDATE);
-        System.err.println("query:" + query);
-        Statement statement = connection.createStatement();
-        statement.execute(query);
+        Statement statement = execute(query);
         ResultSet         results;
         SqlUtils.Iterator iter       = SqlUtils.getIterator(statement);
         List<RadarInfo>   radarInfos = new ArrayList<RadarInfo>();
@@ -717,13 +713,8 @@ public class Repository implements TableDefinitions {
     protected StringBuffer processRadarQuery(Hashtable args)
             throws Exception {
 
-        long            t1         = System.currentTimeMillis();
         List<RadarInfo> radarInfos = getRadarInfos(args);
-        long            t2         = System.currentTimeMillis();
-        String          output     = (String) args.get("output");
-        boolean         html = ((output == null) || output.equals("html"));
-
-
+        boolean         html = !Misc.equals(args.get("output"), "xml");
         StringBuffer    sb         = new StringBuffer();
         if (html) {
             sb.append("<ul>");
@@ -731,7 +722,7 @@ public class Repository implements TableDefinitions {
             sb.append(XmlUtil.XML_HEADER + "\n");
             sb.append(XmlUtil.openTag("catalog",
                                       XmlUtil.attrs("name",
-                                          "Radar Query Results")));
+                                          "Query Results")));
         }
 
         Hashtable map = new Hashtable();
@@ -792,13 +783,11 @@ public class Repository implements TableDefinitions {
         }
 
 
-
         if (html) {
             sb.append("</table>");
         } else {
             sb.append(XmlUtil.closeTag("catalog"));
         }
-        System.err.println("query time:" + (t2 - t1));
         return sb;
     }
 
@@ -814,7 +803,7 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    public List<RadarInfo> collectLevel3radarFiles(File rootDir,
+    public List<RadarInfo> collectLevel3radarFilesxxx(File rootDir,
             String groupName)
             throws Exception {
         long                  t1         = System.currentTimeMillis();
@@ -845,7 +834,7 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    public List<RadarInfo> collectLevel3radarFilesxxx(File rootDir,
+    public List<RadarInfo> collectLevel3radarFiles(File rootDir,
             final String groupName)
             throws Exception {
         final Group            group      = findGroup(groupName);
@@ -874,7 +863,6 @@ public class Repository implements TableDefinitions {
 
         IOUtil.walkDirectory(rootDir, fileViewer);
         long t2 = System.currentTimeMillis();
-
         System.err.println("found:" + radarInfos.size() + " in " + (t2 - t1));
         return radarInfos;
     }
@@ -894,7 +882,7 @@ public class Repository implements TableDefinitions {
         Statement statement = connection.createStatement();
         SqlUtils.loadSql(sql, statement);
 
-        File            rootDir = new File("/data/ldm/gempak/nexrad/nids");
+        File            rootDir = new File("/data/ldm/gempak/nexrad/NIDS");
         List<RadarInfo> files   = collectLevel3radarFiles(rootDir, "IDD");
         files.addAll(collectLevel3radarFiles(rootDir, "LDM/LDM2"));
         System.err.println("Inserting:" + files.size() + " files");
@@ -953,6 +941,7 @@ public class Repository implements TableDefinitions {
     }
 
 
+
     /**
      * _more_
      *
@@ -979,10 +968,7 @@ public class Repository implements TableDefinitions {
      * @throws Exception _more_
      */
     public void eval(String sql) throws Exception {
-        long t1 = System.currentTimeMillis();
-        System.err.println("sql: " + sql);
-        Statement statement = connection.createStatement();
-        statement.execute(sql);
+        Statement statement = execute(sql);
         String[] results = SqlUtils.readString(statement, 1);
         for (int i = 0; (i < results.length) && (i < 10); i++) {
             System.err.print(results[i] + " ");
@@ -990,11 +976,47 @@ public class Repository implements TableDefinitions {
                 System.err.print("...");
             }
         }
-
-        long t2 = System.currentTimeMillis();
-        System.err.println("\ntime:" + (t2 - t1) + " results:"
-                           + results.length);
     }
+
+
+    public static class TypeHandler {
+        Repository repository;
+        String type;
+        public TypeHandler(Repository repository, String type) {
+            this.repository = repository;
+            this.type = type;
+        }
+
+        public String getType() {
+            return type;
+        }
+        
+        public boolean isType(String type) {
+            return this.type.equals(type);
+        }
+
+        public void addToForm(StringBuffer  sb, Hashtable args, String where) throws Exception {
+            if(isType(TYPE_LEVEL3RADAR)) {
+                String[] products = SqlUtils.readString(repository.execute(SELECT_LEVEL3RADAR_PRODUCTS + where), 1);
+                String[] stations = SqlUtils.readString(repository.execute(SELECT_LEVEL3RADAR_STATIONS + where), 1);
+
+                if (stations.length > 1) {
+                    repository.makeHtmlSelect(sb, stations, ARG_STATION, "Station:");
+                } else if (stations.length == 1) {
+                    repository.makeHtmlHidden(sb, stations[0], ARG_STATION);
+                }
+                if (products.length > 1) {
+                    repository.makeHtmlSelect(sb, products, ARG_PRODUCT, "Product:");
+                } else if (products.length == 1) {
+                    repository.makeHtmlHidden(sb, products[0], ARG_PRODUCT);
+                }
+            }
+
+        }
+
+
+    }
+
 
 
 

@@ -21,6 +21,11 @@ CREATE TABLE level3radar (
                    product varchar(50));
 
 
+CREATE TABLE level2radar (
+	           id varchar(200),
+                   station varchar(50));
+
+
 
 CREATE INDEX STATIONINDEX ON level3radar (STATION);
 
