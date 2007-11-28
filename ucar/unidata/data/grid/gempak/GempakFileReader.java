@@ -21,8 +21,6 @@
  */
 
 
-
-
 package ucar.unidata.data.grid.gempak;
 
 
@@ -356,8 +354,8 @@ public class GempakFileReader implements GempakConstants {
      * @param fortranWord    1 based word offset
      * @return byte offset to that word
      */
-    public static int getOffset(int fortranWord) {
-        return (fortranWord - 1) * 4;
+    public static long getOffset(int fortranWord) {
+        return (fortranWord - 1) * 4l;
     }
 
     /**
@@ -484,6 +482,7 @@ public class GempakFileReader implements GempakConstants {
                 mmmm       = GempakUtil.swp4(mmmm);
                 needToSwap = true;
             }
+            //System.out.println("needToSwap = "  + needToSwap);
             kmachn = mmmm;
             mvmst  = (getByteOrder() == RandomAccessFile.BIG_ENDIAN);
             kvmst = ((kmachn == MTVAX) || (kmachn == MTULTX)
@@ -491,6 +490,7 @@ public class GempakFileReader implements GempakConstants {
                      || (kmachn == MTIGPH));
 
             String label = DM_RSTR(1, 28);
+            //System.out.println("label = " + label);
             if ( !label.equals(DMLABEL)) {
                 return false;
             }

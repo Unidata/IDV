@@ -305,7 +305,7 @@ public class NavigationBlock extends GridDefRecord {
             }
         } else if (proj.equals("LCC") ||
                    proj.equals("SCC")) {
-            addParam("Latin", angle1);
+            addParam(LATIN1, angle1);
             addParam(LOV, angle2);
             addParam(LATIN2, angle3);
             addParam(LA1, lllat);
@@ -317,6 +317,7 @@ public class NavigationBlock extends GridDefRecord {
                    proj.equals("CED") ||
                    proj.equals("MCD")
             ) {
+            addParam("Latin", angle1);
             addParam(LOV, angle3);
             addParam(LA1, angle1);
             addParam(LO1, angle2);

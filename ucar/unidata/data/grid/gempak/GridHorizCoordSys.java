@@ -729,6 +729,10 @@ public class GridHorizCoordSys {
         startx = 0;
         starty = 0;
 
+        if (Double.isNaN(getDxInKm())) {
+            setDxDy(startx, starty, proj);
+        }
+
         attributes.add(new Attribute("grid_mapping_name", "mercator"));
         attributes.add(new Attribute("standard_parallel", new Double(Latin)));
         attributes.add(new Attribute("longitude_of_projection_origin",
