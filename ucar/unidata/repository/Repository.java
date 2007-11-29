@@ -274,7 +274,7 @@ public class Repository implements TableDefinitions {
         }
 
         sb.append(
-            "<tr><td><input  type=\"submit\" value=\"Search\" /></td></tr>");
+            "<tr><td></td><td><input  type=\"submit\" value=\"Search\" /></td></tr>");
         sb.append("<table>");
         sb.append("</form>");
         typeHandler.makeLinks(sb);
@@ -994,7 +994,7 @@ public class Repository implements TableDefinitions {
     protected Statement execute(String sql) throws Exception {
         Statement statement = connection.createStatement();
         long t1 = System.currentTimeMillis();
-        System.err.println("query:" + sql);
+        //        System.err.println("query:" + sql);
         statement.execute(sql);
         long t2 = System.currentTimeMillis();
         //        System.err.println("done:" + (t2-t1));
