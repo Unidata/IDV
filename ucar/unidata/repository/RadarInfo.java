@@ -64,7 +64,7 @@ public class RadarInfo extends DataInfo {
      */
     public RadarInfo(Group group, String file, String station,
                      String product, long date) {
-        super(group, file, date);
+        super(group, file, TypeHandler.TYPE_LEVEL3RADAR, date);
         this.station = station;
         this.product = product;
     }

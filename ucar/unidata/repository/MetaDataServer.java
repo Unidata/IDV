@@ -65,11 +65,13 @@ public class MetaDataServer extends HttpServer {
     public MetaDataServer(String[]args, String driver, String connectionURL)
             throws Exception {
         super(8080);
-        //"jeff", "mypassword");
+        String user = null;
+        String password = null;
+        //user ="jeff";password= "mypassword";
         for (int i = 0; i < args.length; i++) {
         }
 
-        repository = new Repository(driver, connectionURL,null,null);
+        repository = new Repository(driver, connectionURL,user,password);
     }
 
 
@@ -91,13 +93,13 @@ public class MetaDataServer extends HttpServer {
                 System.err.println("request:" + path);
                 try {
                     if (path.equals("/query")) {
-                        writeResult(true, repository.processRadarQuery(formArgs),
+                        writeResult(true, repository.processQuery(formArgs),
                                     Misc.equals("html",
                                         formArgs.get("output"))
                                     ? "text/html"
                                     : "text/xml");
                     } else if (path.equals("/sql")) {
-                        writeHtml(repository.processQuery(formArgs));
+                        writeHtml(repository.processSql(formArgs));
                     } else if (path.equals("/searchform")) {
                         writeResult(true,
                                     repository.makeQueryForm(formArgs),

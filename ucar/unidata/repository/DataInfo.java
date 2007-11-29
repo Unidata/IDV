@@ -56,6 +56,8 @@ public class DataInfo {
     /** _more_          */
     long endDate;
 
+    String type;
+
     /**
      * _more_
      *
@@ -63,8 +65,9 @@ public class DataInfo {
      * @param file _more_
      * @param date _more_
      */
-    public DataInfo(Group group, String file, long date) {
+    public DataInfo(Group group, String type, String file, long date) {
         this(group, file, date, date);
+        this.type = type;
     }
 
 
@@ -172,6 +175,24 @@ public class DataInfo {
         }
         return "";
     }
+/**
+Set the Type property.
+
+@param value The new value for Type
+**/
+public void setType (String value) {
+        type = value;
+}
+
+/**
+Get the Type property.
+
+@return The Type
+**/
+public String getType () {
+        return type;
+}
+
 
 
 }

@@ -71,8 +71,13 @@ public class TypeHandler implements TableDefinitions {
 
     public void addToForm(StringBuffer  sb, Hashtable args, List where) throws Exception {
 
-        String[] maxdates = SqlUtils.readString(repository.execute(SELECT_FILES_MAXDATE + SqlUtils.makeWhere(where)), 1);
-        String[] mindates = SqlUtils.readString(repository.execute(SELECT_FILES_MINDATE + SqlUtils.makeWhere(where)), 1);
+        String[] maxdates = SqlUtils.readString(repository.execute(SqlUtils.makeSelect(SqlUtils.max(COL_FILES_TODATE), 
+                                                                                       getQueryOnTables(args),
+                                                                                       SqlUtils.makeAnd(where))), 1);
+        String[] mindates = SqlUtils.readString(repository.execute(SqlUtils.makeSelect(SqlUtils.min(COL_FILES_FROMDATE), 
+                                                                                       getQueryOnTables(args),
+                                                                                       SqlUtils.makeAnd(where))), 1);
+
         String   maxdate  = ((maxdates.length > 0)
                              ? maxdates[0]
                              : "");
@@ -151,16 +156,19 @@ public class TypeHandler implements TableDefinitions {
         if(isType(TYPE_LEVEL3RADAR)) {
             addOr(COL_LEVEL3RADAR_STATION, (String) args.get(Repository.ARG_STATION), where);
             addOr(COL_LEVEL3RADAR_PRODUCT, (String) args.get(Repository.ARG_PRODUCT), where);
-            where.add(SqlUtils.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID));
+            if(args.contains(Repository.ARG_STATION) || args.contains(Repository.ARG_PRODUCT)) {
+                where.add(SqlUtils.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID));
+            }
         }
-
-
         return where;
     }
 
+
     protected String getQueryOnTables(Hashtable args) {
         if(isType(TYPE_LEVEL3RADAR)) {
-            return TABLE_FILES + "," + TABLE_LEVEL3RADAR;
+            if(args.contains(Repository.ARG_PRODUCT) || args.contains(Repository.ARG_STATION)) {
+                return TABLE_FILES + "," + TABLE_LEVEL3RADAR;
+            }
         }
         return TABLE_FILES;
     }

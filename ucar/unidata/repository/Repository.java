@@ -188,7 +188,7 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    protected StringBuffer processQuery(Hashtable args) throws Exception {
+    protected StringBuffer processSql(Hashtable args) throws Exception {
         long      t1        = System.currentTimeMillis();
         String    query     = (String) args.get("query");
         Statement statement = execute(query);
@@ -617,29 +617,32 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    protected List<RadarInfo> getRadarInfos(Hashtable args) throws Exception {
-        List where =getTypeHandler(TypeHandler.TYPE_LEVEL3RADAR).assembleWhereClause(args);
+    protected List<DataInfo> getDataInfos(Hashtable args) throws Exception {
+        TypeHandler typeHandler = getTypeHandler(args);
+        List where =typeHandler.assembleWhereClause(args);
         String query =
             SqlUtils.makeSelect(SqlUtils.comma(COL_FILES_GROUP_ID,
-                COL_FILES_FILE, COL_LEVEL3RADAR_STATION,
-                COL_LEVEL3RADAR_PRODUCT, COL_FILES_FROMDATE,
-                COL_FILES_TODATE), TABLE_LEVEL3RADAR + "," + TABLE_FILES,
-                                   SqlUtils.makeAnd(where), "order by " + COL_FILES_FROMDATE);
+                                               COL_FILES_TYPE, 
+                                               COL_FILES_FILE, 
+                                               COL_FILES_FROMDATE,
+                                               COL_FILES_TODATE), typeHandler.getQueryOnTables(args),
+                                SqlUtils.makeAnd(where), "order by " + COL_FILES_FROMDATE);
         Statement statement = execute(query);
         ResultSet         results;
         SqlUtils.Iterator iter       = SqlUtils.getIterator(statement);
-        List<RadarInfo>   radarInfos = new ArrayList<RadarInfo>();
+        List<DataInfo>   dataInfos = new ArrayList<DataInfo>();
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                radarInfos.add(
-                    new RadarInfo(
+                int col = 1;
+                dataInfos.add(
+                    new DataInfo(
                         findGroupFromId(results.getString(1)),
-                        results.getString(2), results.getString(3),
-                        results.getString(4),
-                        results.getTimestamp(5).getTime()));
+                        results.getString(2),
+                        results.getString(3), 
+                        results.getTimestamp(4).getTime()));
             }
         }
-        return radarInfos;
+        return dataInfos;
     }
 
 
@@ -696,9 +699,9 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    protected StringBuffer processRadarQuery(Hashtable args)
+    protected StringBuffer processQuery(Hashtable args)
             throws Exception {
-        List<RadarInfo> radarInfos = getRadarInfos(args);
+        List<DataInfo> dataInfos = getDataInfos(args);
         boolean         html = !Misc.equals(args.get("output"), "xml");
         StringBuffer    sb         = new StringBuffer();
         if (html) {
@@ -710,61 +713,41 @@ public class Repository implements TableDefinitions {
                                           "Query Results")));
         }
 
-        Hashtable map = new Hashtable();
-        for (RadarInfo radarInfo : radarInfos) {
-            StringBufferCollection sbc =
-                (StringBufferCollection) map.get(radarInfo.getStation());
-            if (sbc == null) {
-                sbc = new StringBufferCollection();
-                map.put(radarInfo.getStation(), sbc);
-            }
 
-            StringBuffer ssb = sbc.getBuffer(radarInfo.getProduct());
+        StringBufferCollection sbc = new StringBufferCollection();
+        for (DataInfo dataInfo : dataInfos) {
+            StringBuffer ssb = sbc.getBuffer(dataInfo.getType());
             if (html) {
-                ssb.append("<li>" + radarInfo.getFile() + " "
-                           + new Date(radarInfo.getStartDate()));
+                ssb.append("<li>" + dataInfo.getFile() + " "
+                           + new Date(dataInfo.getStartDate()));
             } else {
                 ssb.append(
                     XmlUtil.tag(
                         "dataset",
                         XmlUtil.attrs(
-                            "name", "" + new Date(radarInfo.getStartDate()),
-                            "urlPath", radarInfo.getFile())));
+                            "name", "" + new Date(dataInfo.getStartDate()),
+                            "urlPath", dataInfo.getFile())));
             }
         }
 
 
-        for (Enumeration keys = map.keys(); keys.hasMoreElements(); ) {
-            String station = (String) keys.nextElement();
-            StringBufferCollection sbc =
-                (StringBufferCollection) map.get(station);
+        for (int i = 0; i < sbc.getKeys().size(); i++) {
+            String       type = (String) sbc.getKeys().get(i);
+            StringBuffer ssb     = sbc.getBuffer(type);
             if (html) {
-                sb.append("<li>" + station + "<ul>");
-            } else {
-                sb.append(XmlUtil.openTag("dataset",
-                                          XmlUtil.attrs("name",
-                                              getLongName(station) + " ("
-                                                  + station + ")")));
-            }
-            for (int i = 0; i < sbc.getKeys().size(); i++) {
-                String       product = (String) sbc.getKeys().get(i);
-                StringBuffer ssb     = sbc.getBuffer(product);
-                if (html) {
-                    sb.append("<li>" + getLongName(product) + "<ul>");
-                    sb.append(ssb);
-                    sb.append("</ul>");
-                } else {
-                    sb.append("<dataset name=\"" + getLongName(product)
-                              + "\">\n");
-                    sb.append(ssb);
-                    sb.append(XmlUtil.closeTag("dataset"));
-                }
-            }
-            if (html) {
+                sb.append("<li>" + type + "<ul>");
+                sb.append(ssb);
                 sb.append("</ul>");
             } else {
+                sb.append("<dataset name=\"" + type   + "\">\n");
+                sb.append(ssb);
                 sb.append(XmlUtil.closeTag("dataset"));
             }
+        }
+        if (html) {
+            sb.append("</ul>");
+        } else {
+            sb.append(XmlUtil.closeTag("dataset"));
         }
 
 
@@ -788,7 +771,7 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    public List<RadarInfo> collectLevel3radarFiles(File rootDir,
+    public List<RadarInfo> collectLevel3radarFilesxxx(File rootDir,
             String groupName)
             throws Exception {
         long                  t1         = System.currentTimeMillis();
@@ -819,7 +802,7 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    public List<RadarInfo> collectLevel3radarFilesxxx(File rootDir,
+    public List<RadarInfo> collectLevel3radarFiles(File rootDir,
             final String groupName)
             throws Exception {
         final Group            group      = findGroup(groupName);
@@ -836,6 +819,9 @@ public class Repository implements TableDefinitions {
                 Matcher matcher = pattern.matcher(name);
                 if ( !matcher.find()) {
                     return true;
+                }
+                if(radarInfos.size()%5000 == 0) {
+                    System.err.println ("Found:" + radarInfos.size());
                 }
                 String station = matcher.group(1);
                 String product = matcher.group(2);
@@ -863,7 +849,7 @@ public class Repository implements TableDefinitions {
                 String ext = IOUtil.getFileExtension(name);
                 if(ext.startsWith(".")) ext  = ext.substring(1);
                 Group            group      = findGroup("test/" + ext);
-                dataInfos.add(new DataInfo(group, f.toString(), f.lastModified()));
+                dataInfos.add(new DataInfo(group, f.toString(), "",f.lastModified()));
                 return true;
             }
         };
@@ -884,7 +870,7 @@ public class Repository implements TableDefinitions {
     public void loadLevel3RadarFiles() throws Exception {
         File            rootDir = new File("/data/ldm/gempak/nexrad/NIDS");
         List<RadarInfo> files   = collectLevel3radarFiles(rootDir, "IDD");
-        files.addAll(collectLevel3radarFiles(rootDir, "LDM/LDM2"));
+        //        files.addAll(collectLevel3radarFiles(rootDir, "LDM/LDM2"));
         System.err.println("Inserting:" + files.size() + " files");
         long t1  = System.currentTimeMillis();
         int  cnt = 0;
@@ -940,7 +926,8 @@ public class Repository implements TableDefinitions {
     }
 
     public void loadTestFiles() throws Exception {
-        File            rootDir = new File("c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
+        //        File            rootDir = new File("c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
+        File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
         List<DataInfo> files   = collectFiles(rootDir);
         System.err.println("Inserting:" + files.size() + " files");
         long t1  = System.currentTimeMillis();
@@ -1002,8 +989,11 @@ public class Repository implements TableDefinitions {
      */
     protected Statement execute(String sql) throws Exception {
         Statement statement = connection.createStatement();
+        long t1 = System.currentTimeMillis();
         System.err.println("query:" + sql);
         statement.execute(sql);
+        long t2 = System.currentTimeMillis();
+        System.err.println("done:" + (t2-t1));
         return statement;
     }
 
