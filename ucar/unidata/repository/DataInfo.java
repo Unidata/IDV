@@ -69,10 +69,10 @@ private      String type;
      * @param file _more_
      * @param date _more_
      */
-    public DataInfo(Group group, String type, String file, long date) {
-        this(group, file, date, date);
-        this.type = type;
+    public DataInfo(String name, String type, Group group, String file, long date) {
+        this(name, type, group, file, date, date);
     }
+
 
 
     /**
@@ -87,7 +87,9 @@ private      String type;
      * @param startDate _more_
      * @param endDate _more_
      */
-    public DataInfo(Group group, String file, long startDate, long endDate) {
+    public DataInfo(String name, String type, Group group,  String file, long startDate, long endDate) {
+        this.type = type;
+        this.name = name;
         this.group     = group;
         this.file      = file;
         this.startDate = startDate;

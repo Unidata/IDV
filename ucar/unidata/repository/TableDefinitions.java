@@ -90,6 +90,9 @@ public interface TableDefinitions {
     public static final String COL_FILES_ID = TABLE_FILES + "." + "id";
 
     /** _more_          */
+    public static final String COL_FILES_NAME = TABLE_FILES + "." + "name";
+
+    /** _more_          */
     public static final String COL_FILES_TYPE = TABLE_FILES + "." + "type";
 
     /** _more_          */
@@ -169,11 +172,13 @@ public interface TableDefinitions {
     /** _more_          */
     public static final String INSERT_FILES =
         SqlUtils.makeInsert(TABLE_FILES,
-                            SqlUtils.comma(COL_FILES_ID, COL_FILES_TYPE,
+                            SqlUtils.comma(COL_FILES_ID, 
+                                           COL_FILES_NAME,
+                                           COL_FILES_TYPE,
                                            COL_FILES_GROUP_ID,
                                            COL_FILES_FILE,
                                            COL_FILES_FROMDATE,
-                                           COL_FILES_TODATE), "?,?,?,?,?,?");
+                                           COL_FILES_TODATE), "?,?,?,?,?,?,?");
 
     /** _more_          */
     public static final String INSERT_LEVEL3RADAR =

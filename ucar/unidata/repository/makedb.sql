@@ -9,9 +9,9 @@ CREATE TABLE groups (id varchar(200),
 
 
 CREATE TABLE files (id varchar(200),
+	           name varchar(200),
                    type varchar(200),
                    group_id varchar(200),
-	           name varchar(200),
                    description varchar(500),
 	           file varchar(200),
 	           fromdate timestamp, 

@@ -26,7 +26,7 @@ package ucar.unidata.repository;
 
 import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
-
+import ucar.unidata.util.TextResult;
 
 
 import ucar.unidata.util.LogUtil;
@@ -94,10 +94,14 @@ public class MetaDataServer extends HttpServer {
     protected RequestHandler doMakeRequestHandler(final Socket socket)
             throws Exception {
         return new RequestHandler(this, socket) {
-                private void writeContent(boolean ok, String title, StringBuffer content) throws Exception {
-                    String html = StringUtil.replace(template, "%content%", content.toString());
-                    html = StringUtil.replace(html, "%title%", title);
-                    writeResult(ok, html,"text/html");
+                private void writeContent(boolean ok, TextResult result) throws Exception {
+                    if(result.isHtml()) {
+                        String html = StringUtil.replace(template, "%content%", result.getContent().toString());
+                        html = StringUtil.replace(html, "%title%", result.getTitle());
+                        writeResult(ok, html,result.getMimeType());
+                    } else {
+                        writeResult(ok, result.getContent(),result.getMimeType());
+                    }
                 }
 
 
@@ -110,34 +114,31 @@ public class MetaDataServer extends HttpServer {
                         boolean xml  = Misc.equals("xml",
                                                    formArgs.get("output"));
                         StringBuffer result = repository.processQuery(formArgs);
-                        if(xml) {
-                            writeXml(result);
-                        } else {
-                            writeContent(true, "Query Results",result);
-                        }
+                        writeContent(true, new TextResult("Query Results",result,(xml?TextResult.TYPE_XML:TextResult.TYPE_HTML)));
+
                     } else if (path.equals("/sql")) {
-                        writeContent(true,"SQL", repository.processSql(formArgs));
+                        writeContent(true, repository.processSql(formArgs));
                     } else if (path.equals("/searchform")) {
-                        writeContent(true, "Search Form", repository.makeQueryForm(formArgs));
+                        writeContent(true, repository.makeQueryForm(formArgs));
                     } else if (path.equals("/radar/liststations")) {
-                        writeXml(repository.processRadarList(formArgs,
-                                "station", "station"));
+                        writeContent(true,repository.processRadarList(formArgs,
+                                                                   "station", "station"));
                     } else if (path.equals("/radar/listproducts")) {
-                        writeXml(repository.processRadarList(formArgs,
+                        writeContent(true,repository.processRadarList(formArgs,
                                 "product", "product"));
                     } else if (path.equals("/listgroups")) {
-                        writeXml(repository.listGroups(formArgs));
+                        writeContent(true,repository.listGroups(formArgs));
                     } else if (path.equals("/showgroup")) {
-                        writeContent(true, "Show Group", repository.showGroup(formArgs));
+                        writeContent(true, repository.showGroup(formArgs));
                     } else if (path.equals("/showfile")) {
-                        writeContent(true,"Show File", repository.showFile(formArgs));
+                        writeContent(true,repository.showFile(formArgs));
                     } else {
-                        writeContent(false, "Error", new StringBuffer("Unknown url:" + path));
+                        writeContent(false, new TextResult("Error", new StringBuffer("Unknown url:" + path)));
                     }
                 } catch (Throwable exc) {
                     System.err.println("Error:" + exc);
                     String trace = LogUtil.getStackTrace(exc);
-                    writeContent(true, "Error", new StringBuffer("<pre>" + trace + "</pre>"));
+                    writeContent(true, new TextResult("Error", new StringBuffer("<pre>" + trace + "</pre>")));
                 }
             }
         };
