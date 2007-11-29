@@ -28,6 +28,7 @@ package ucar.unidata.repository;
 import ucar.unidata.data.SqlUtils;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.TextResult;
 import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
@@ -69,6 +70,21 @@ public class TypeHandler implements TableDefinitions {
         return this.type.equals(type);
     }
 
+
+    public TextResult showFile(DataInfo dataInfo,Hashtable args) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        sb.append("File:" + dataInfo.getFile() +"<br>");
+        sb.append("Type:" + dataInfo.getType() +"<br>");
+
+        if(isType(TYPE_LEVEL3RADAR)) {
+            
+        }
+
+
+        return new TextResult("File", sb);
+
+    }
+
     public void addToForm(StringBuffer  sb, Hashtable args, List where) throws Exception {
 
         String[] maxdates = SqlUtils.readString(repository.execute(SqlUtils.makeSelect(SqlUtils.max(COL_FILES_TODATE), 
@@ -105,7 +121,8 @@ public class TypeHandler implements TableDefinitions {
         }
 
         sb.append(HtmlUtil.makeTableEntry("<b>Date Range:</b>","<input name=\"fromdate\" value=\""
-            + mindate + "\"> -- <input name=\"todate\" value=\"" + maxdate + "\">"));
+                                          + (mindate!=null?""+mindate:"") + "\"> -- <input name=\"todate\" value=\"" + 
+                                          (maxdate!=null?""+maxdate:"") + "\">"));
 
         if(isType(TYPE_LEVEL3RADAR)) {
             where.add(SqlUtils.eq(COL_FILES_ID,COL_LEVEL3RADAR_ID));

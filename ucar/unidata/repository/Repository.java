@@ -117,14 +117,18 @@ public class Repository implements TableDefinitions {
         } catch(Exception dummy) {
             ok = false;
         }
-        if(ok) return;
+
+        if(ok) {
+            //            loadLevel3RadarFiles();
+            return;
+        }
         System.err.println("making db");
         String sql =
             IOUtil.readContents("/ucar/unidata/repository/makedb.sql",
                                 getClass());
         Statement statement = connection.createStatement();
         SqlUtils.loadSql(sql, statement);
-        //        loadLevel3RadarFiles();
+        loadLevel3RadarFiles();
         loadTestFiles();
     }
 
@@ -188,12 +192,12 @@ public class Repository implements TableDefinitions {
                     sb.append("<td>" + results.getString(++colcnt) + "</td>");
                 }
                 sb.append("</tr>\n");
-                if (cnt++ > 100000) {
+                if (cnt++ > 1000) {
                     sb.append("<tr><td>...</td></tr>");
                     break;
                 }
             }
-            if (cnt > 100000) {
+            if (cnt > 1000) {
                 break;
             }
         }
@@ -331,19 +335,26 @@ public class Repository implements TableDefinitions {
         if(fileId == null) throw new IllegalArgumentException ("No " + ARG_ID +" given");
         StringBuffer sb        = new StringBuffer();
         String query =
-            SqlUtils.makeSelect(SqlUtils.comma(COL_FILES_ID,COL_FILES_TYPE, COL_FILES_FILE),
+            SqlUtils.makeSelect(SqlUtils.comma(COL_FILES_ID,COL_FILES_NAME, COL_FILES_DESCRIPTION, COL_FILES_TYPE, COL_FILES_GROUP_ID,  COL_FILES_FILE,
+                                               COL_FILES_FROMDATE,
+                                               COL_FILES_TODATE),
                                 TABLE_FILES,
                                 SqlUtils.eq(COL_FILES_ID, SqlUtils.quote(fileId)));
         ResultSet results = execute(query).getResultSet();
         if(!results.next()) {
             throw new IllegalArgumentException("Given file id:" + fileId +" is not in database");
         }
-        String id = results.getString(1);
-        String type = results.getString(2);
-        String file = results.getString(3);
-        sb.append("File:" + file +"<br>");
-        sb.append("Type:" + type +"<br>");
-        return new TextResult("File", sb);
+        int col = 1;
+        String id = results.getString(col++);
+        DataInfo dataInfo = new DataInfo(results.getString(col++),  
+                                         results.getString(col++),
+                                         results.getString(col++),
+                                         findGroupFromId(results.getString(col++)), 
+                                         results.getString(col++),results.getDate(col++).getTime(),
+                                         results.getDate(col++).getTime());
+        dataInfo.setId(id);
+        TypeHandler typeHandler = getTypeHandler(dataInfo.getType());
+        return typeHandler.showFile(dataInfo,args);
     }
 
     protected TextResult showGroup(Hashtable args)
@@ -607,7 +618,9 @@ public class Repository implements TableDefinitions {
         TypeHandler typeHandler = getTypeHandler(args);
         List where =typeHandler.assembleWhereClause(args);
         String query =
-            SqlUtils.makeSelect(SqlUtils.comma(COL_FILES_NAME, 
+            SqlUtils.makeSelect(SqlUtils.comma(COL_FILES_ID,
+                                               COL_FILES_NAME, 
+                                               COL_FILES_DESCRIPTION, 
                                                COL_FILES_TYPE, 
                                                COL_FILES_GROUP_ID,
                                                COL_FILES_FILE, 
@@ -621,13 +634,18 @@ public class Repository implements TableDefinitions {
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 int col = 1;
-                dataInfos.add(
+                String id = results.getString(col++);
+                DataInfo dataInfo = 
                     new DataInfo(
+                        results.getString(col++),
                         results.getString(col++),
                         results.getString(col++),
                         findGroupFromId(results.getString(col++)),
                         results.getString(col++), 
-                        results.getTimestamp(col++).getTime()));
+                        results.getTimestamp(col++).getTime());
+                dataInfos.add(dataInfo);
+                dataInfo.setId(id);
+                              
             }
         }
         return dataInfos;
@@ -706,7 +724,8 @@ public class Repository implements TableDefinitions {
         for (DataInfo dataInfo : dataInfos) {
             StringBuffer ssb = sbc.getBuffer(dataInfo.getType());
             if (html) {
-                ssb.append("<li>" + dataInfo.getFile() + " "
+                
+                ssb.append("<li>" + HtmlUtil.href("/showfile?" + ARG_ID +"=" + dataInfo.getId(), dataInfo.getFile()) + " "
                            + new Date(dataInfo.getStartDate()));
             } else {
                 ssb.append(
@@ -714,7 +733,8 @@ public class Repository implements TableDefinitions {
                         "dataset",
                         XmlUtil.attrs(
                             "name", "" + new Date(dataInfo.getStartDate()),
-                            "urlPath", dataInfo.getFile())));
+                            "urlPath", HtmlUtil.href("/showfile?" + ARG_ID +"=" + dataInfo.getId(), dataInfo.getFile()))));
+
             }
         }
 
@@ -759,7 +779,7 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    public List<RadarInfo> collectLevel3radarFiles(File rootDir,
+    public List<RadarInfo> collectLevel3radarFilesxxx(File rootDir,
             String groupName)
             throws Exception {
         long                  t1         = System.currentTimeMillis();
@@ -768,7 +788,7 @@ public class Repository implements TableDefinitions {
         Group                 group      = findGroup(groupName);
         for (int stationIdx = 0; stationIdx < 100; stationIdx++) {
             for (int i = 0; i < 10; i++) {
-                radarInfos.add(new RadarInfo("", group, "file" + stationIdx + "_"
+                radarInfos.add(new RadarInfo("", "", group, "file" + stationIdx + "_"
                                              + i + "_" + group, "stn"
                                                  + stationIdx, "product"
                                                      + (i % 20), baseTime
@@ -790,10 +810,9 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    public List<RadarInfo> collectLevel3radarFilesxxx(File rootDir,
+    public List<RadarInfo> collectLevel3radarFiles(File rootDir,
             final String groupName)
             throws Exception {
-        final Group            group      = findGroup(groupName);
         long                   t1         = System.currentTimeMillis();
         final List<RadarInfo>  radarInfos = new ArrayList();
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
@@ -813,8 +832,9 @@ public class Repository implements TableDefinitions {
                 }
                 String station = matcher.group(1);
                 String product = matcher.group(2);
+                Group            group      = findGroup(groupName+"/"+"NIDS"+"/"+station+"/"+product);
                 Date   dttm    = sdf.parse(matcher.group(3));
-                radarInfos.add(new RadarInfo("", group, f.toString(), station,
+                radarInfos.add(new RadarInfo(dttm.toString(),"", group, f.toString(), station,
                                              product, dttm.getTime()));
                 return DO_CONTINUE;
             }
@@ -848,7 +868,7 @@ public class Repository implements TableDefinitions {
                 dirPath = dirPath.substring(rootStrLen);
                 List toks = StringUtil.split(dirPath, File.separator, true, true);
                 Group            group      = findGroup(StringUtil.join("/",toks));
-                dataInfos.add(new DataInfo(name, TypeHandler.TYPE_ANY, group,  f.toString(), f.lastModified()));
+                dataInfos.add(new DataInfo(name, name, TypeHandler.TYPE_ANY, group,  f.toString(), f.lastModified()));
                 if(dataInfos.size()>100) {
                     //                    return DO_STOP;
                 } 
@@ -894,6 +914,7 @@ public class Repository implements TableDefinitions {
             String id  = getGUID();
             filesInsert.setString(col++, id);
             filesInsert.setString(col++, radarInfo.getName());
+            filesInsert.setString(col++, radarInfo.getDescription());
             filesInsert.setString(col++, TypeHandler.TYPE_LEVEL3RADAR);
             filesInsert.setString(col++, radarInfo.getGroupId());
             filesInsert.setString(col++, radarInfo.getFile().toString());
@@ -929,8 +950,8 @@ public class Repository implements TableDefinitions {
     }
 
     public void loadTestFiles() throws Exception {
-        File            rootDir = new File("c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
-        //        File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
+        //        File            rootDir = new File("c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
+        File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
         List<DataInfo> files   = collectFiles(rootDir);
         System.err.println("Inserting:" + files.size() + " files");
         long t1  = System.currentTimeMillis();
@@ -950,6 +971,7 @@ public class Repository implements TableDefinitions {
             String id  = getGUID();
             filesInsert.setString(col++, id);
             filesInsert.setString(col++, dataInfo.getName());
+            filesInsert.setString(col++, dataInfo.getDescription());
             filesInsert.setString(col++, TypeHandler.TYPE_ANY);
             filesInsert.setString(col++, dataInfo.getGroupId());
             filesInsert.setString(col++, dataInfo.getFile().toString());
@@ -994,10 +1016,10 @@ public class Repository implements TableDefinitions {
     protected Statement execute(String sql) throws Exception {
         Statement statement = connection.createStatement();
         long t1 = System.currentTimeMillis();
-        //        System.err.println("query:" + sql);
+        System.err.println("query:" + sql);
         statement.execute(sql);
         long t2 = System.currentTimeMillis();
-        //        System.err.println("done:" + (t2-t1));
+        System.err.println("done:" + (t2-t1));
         return statement;
     }
 

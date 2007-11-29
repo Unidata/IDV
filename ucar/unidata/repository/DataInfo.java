@@ -44,6 +44,7 @@ import java.util.List;
  */
 public class DataInfo {
 
+    private String id;
     private      String name;
     private      String description;
 
@@ -69,8 +70,8 @@ private      String type;
      * @param file _more_
      * @param date _more_
      */
-    public DataInfo(String name, String type, Group group, String file, long date) {
-        this(name, type, group, file, date, date);
+    public DataInfo(String name, String description, String type, Group group, String file, long date) {
+        this(name, description,type, group, file, date, date);
     }
 
 
@@ -87,9 +88,10 @@ private      String type;
      * @param startDate _more_
      * @param endDate _more_
      */
-    public DataInfo(String name, String type, Group group,  String file, long startDate, long endDate) {
+    public DataInfo(String name, String description, String type, Group group,  String file, long startDate, long endDate) {
         this.type = type;
         this.name = name;
+        this.description = description;
         this.group     = group;
         this.file      = file;
         this.startDate = startDate;
@@ -234,6 +236,24 @@ Get the Description property.
 **/
 public String getDescription () {
 	return description;
+}
+
+/**
+Set the Id property.
+
+@param value The new value for Id
+**/
+public void setId (String value) {
+	id = value;
+}
+
+/**
+Get the Id property.
+
+@return The Id
+**/
+public String getId () {
+	return id;
 }
 
 
