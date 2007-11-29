@@ -234,10 +234,16 @@ public class SqlUtils {
     }
 
 
+
+
+    public static String like(String name, String value) {
+        return " " +name +" LIKE " + quote(value)+" ";
+    }
+
+
     public static String eq(String name, String value) {
         return " " +name +"=" + value +" ";
     }
-
 
     public static String ge(String name, String value) {
         return " " +name +">=" + value +" ";

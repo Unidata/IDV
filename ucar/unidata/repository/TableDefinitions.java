@@ -194,5 +194,44 @@ public interface TableDefinitions {
 
 
 
+
+
+    /** _more_          */
+    public static final String ATTR_ID = "id";
+
+    /** _more_          */
+    public static final String ATTR_NAME = "name";
+
+
+    public static final String TAG_GROUPS = "groups";
+    public static final String TAG_GROUP = "group";
+
+    /** _more_          */
+    public static final String ARG_TYPE = "type";
+
+    public static final String ARG_NAME = "name";
+
+    public static final String ARG_ID = "id";
+
+    /** _more_          */
+    public static final String ARG_GROUP = "group";
+
+    public static final String ARG_GROUPID = "groupid";
+
+    /** _more_          */
+    public static final String ARG_TODATE = "todate";
+
+    /** _more_          */
+    public static final String ARG_FROMDATE = "fromdate";
+
+    /** _more_          */
+    public static final String ARG_PRODUCT = "product";
+
+    /** _more_          */
+    public static final String ARG_STATION = "station";
+
+
+
+
 }
 

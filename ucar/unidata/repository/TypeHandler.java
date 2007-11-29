@@ -77,7 +77,6 @@ public class TypeHandler implements TableDefinitions {
         String[] mindates = SqlUtils.readString(repository.execute(SqlUtils.makeSelect(SqlUtils.min(COL_FILES_FROMDATE), 
                                                                                        getQueryOnTables(args),
                                                                                        SqlUtils.makeAnd(where))), 1);
-
         String   maxdate  = ((maxdates.length > 0)
                              ? maxdates[0]
                              : "");
@@ -85,16 +84,24 @@ public class TypeHandler implements TableDefinitions {
                              ? mindates[0]
                              : "");
 
+        String name = (String) args.get(ARG_NAME);
+
+        if(name == null) {
+            sb.append(HtmlUtil.makeTableEntry("<b>Name:</b>",HtmlUtil.makeInput(Repository.ARG_NAME,"")));
+        }
+
         List<Group> groups = repository.getGroups(SqlUtils.readString(repository.execute(SELECT_FILES_GROUPS + SqlUtils.makeWhere(where)), 1));
 
         if (groups.size() > 1) {
             List groupList = new ArrayList();
+            groupList.add("All");
             for (Group group: groups) {
                 groupList.add(new TwoFacedObject(group.getFullName()));
             }
+
             sb.append(HtmlUtil.makeTableEntry("<b>Group:</b>",HtmlUtil.makeSelect(groupList, Repository.ARG_GROUP)));
         } else if (groups.size() == 1) {
-            sb.append(HtmlUtil.makeHidden(groups.get(0).getFullName(), Repository.ARG_GROUP));
+            sb.append(HtmlUtil.makeHidden(Repository.ARG_GROUP, groups.get(0).getFullName()));
         }
 
         sb.append(HtmlUtil.makeTableEntry("<b>Date Range:</b>","<input name=\"fromdate\" value=\""
@@ -121,12 +128,12 @@ public class TypeHandler implements TableDefinitions {
             if (stations.length > 1) {
                 sb.append(HtmlUtil.makeTableEntry("<b>Station:</b>",HtmlUtil.makeSelect(stationList, Repository.ARG_STATION)));
             } else if (stations.length == 1) {
-                sb.append(HtmlUtil.makeHidden(stations[0], Repository.ARG_STATION));
+                sb.append(HtmlUtil.makeHidden(Repository.ARG_STATION, stations[0]));
             }
             if (products.length > 1) {
                 sb.append(HtmlUtil.makeTableEntry("<b>Product:</b>",HtmlUtil.makeSelect(productList, Repository.ARG_PRODUCT)));
             } else if (products.length == 1) {
-                sb.append(HtmlUtil.makeHidden(products[0], Repository.ARG_PRODUCT));
+                sb.append(HtmlUtil.makeHidden(Repository.ARG_PRODUCT, products[0]));
             }
         }
 
@@ -134,6 +141,9 @@ public class TypeHandler implements TableDefinitions {
 
     protected List assembleWhereClause(Hashtable args) throws Exception {
         List   where     = new ArrayList();
+        String name = (String) args.get(ARG_NAME);
+        if(name !=null) name = name.trim();
+
         String groupName = (String) args.get(Repository.ARG_GROUP);
         if ((groupName != null) && !groupName.toLowerCase().equals("all")) {
             Group group = repository.findGroup(groupName);
@@ -160,6 +170,16 @@ public class TypeHandler implements TableDefinitions {
                 where.add(SqlUtils.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID));
             }
         }
+
+        //        System.err.println ("name:" + name);
+        if(name!=null && name.length()>0) {
+            if(name.startsWith("%")) {
+                where.add(SqlUtils.like(COL_FILES_NAME, name));
+            } else {
+                where.add(SqlUtils.eq(COL_FILES_NAME, SqlUtils.quote(name)));
+            }
+        }
+
         return where;
     }
 

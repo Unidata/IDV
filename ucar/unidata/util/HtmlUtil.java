@@ -40,10 +40,14 @@ public class HtmlUtil {
      * @param value _more_
      * @param name _more_
      */
-    public static String makeHidden(String value,
-                                  String name) {
+    public static String makeHidden(String name,String value) {
         return "<input type=\"hidden\" name=\"" + name + "\" value=\""
             + value + "\"/>";
+    }
+
+
+    public static String makeInput(String name,String value) {
+        return "<input  name=\"" + name + "\" value=\""+ value + "\"/>";
     }
 
     public static String href(String url, String label) {
