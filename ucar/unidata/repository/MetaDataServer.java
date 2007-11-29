@@ -54,6 +54,8 @@ public class MetaDataServer extends HttpServer {
     /** _more_          */
     Repository repository;
 
+    String  template;
+
     /**
      * _more_
      *
@@ -71,8 +73,13 @@ public class MetaDataServer extends HttpServer {
         for (int i = 0; i < args.length; i++) {
         }
 
+        template =
+            IOUtil.readContents("/ucar/unidata/repository/template.html",
+                                getClass());
         repository = new Repository(driver, connectionURL,user,password);
     }
+
+
 
 
     /**
@@ -87,23 +94,31 @@ public class MetaDataServer extends HttpServer {
     protected RequestHandler doMakeRequestHandler(final Socket socket)
             throws Exception {
         return new RequestHandler(this, socket) {
+                private void writeContent(boolean ok, String title, StringBuffer content) throws Exception {
+                    String html = StringUtil.replace(template, "%content%", content.toString());
+                    html = StringUtil.replace(html, "%title%", title);
+                    writeResult(ok, html,"text/html");
+                }
+
+
             protected void handleRequest(String path, Hashtable formArgs,
                                          Hashtable httpArgs, String content)
                     throws Exception {
                 System.err.println("request:" + path);
                 try {
                     if (path.equals("/query")) {
-                        writeResult(true, repository.processQuery(formArgs),
-                                    Misc.equals("html",
-                                        formArgs.get("output"))
-                                    ? "text/html"
-                                    : "text/xml");
+                        boolean xml  = Misc.equals("xml",
+                                                   formArgs.get("output"));
+                        StringBuffer result = repository.processQuery(formArgs);
+                        if(xml) {
+                            writeXml(result);
+                        } else {
+                            writeContent(true, "Query Results",result);
+                        }
                     } else if (path.equals("/sql")) {
-                        writeHtml(repository.processSql(formArgs));
+                        writeContent(true,"SQL", repository.processSql(formArgs));
                     } else if (path.equals("/searchform")) {
-                        writeResult(true,
-                                    repository.makeQueryForm(formArgs),
-                                    "text/html");
+                        writeContent(true, "Search Form", repository.makeQueryForm(formArgs));
                     } else if (path.equals("/radar/liststations")) {
                         writeXml(repository.processRadarList(formArgs,
                                 "station", "station"));
@@ -113,17 +128,16 @@ public class MetaDataServer extends HttpServer {
                     } else if (path.equals("/listgroups")) {
                         writeXml(repository.listGroups(formArgs));
                     } else if (path.equals("/showgroup")) {
-                        writeHtml(repository.showGroup(formArgs));
+                        writeContent(true, "Show Group", repository.showGroup(formArgs));
                     } else if (path.equals("/showfile")) {
-                        writeHtml(repository.showFile(formArgs));
+                        writeContent(true,"Show File", repository.showFile(formArgs));
                     } else {
-                        writeResult(false, "Unknown url:" + path, "text/html");
+                        writeContent(false, "Error", new StringBuffer("Unknown url:" + path));
                     }
-                } catch (Exception exc) {
+                } catch (Throwable exc) {
                     System.err.println("Error:" + exc);
                     String trace = LogUtil.getStackTrace(exc);
-                    writeResult(true, "<pre>" + trace + "</pre>",
-                                "text/html");
+                    writeContent(true, "Error", new StringBuffer("<pre>" + trace + "</pre>"));
                 }
             }
         };
@@ -134,6 +148,10 @@ public class MetaDataServer extends HttpServer {
 
 
 
+    protected void handleError(String msg, Exception exc) {
+        System.err.println("Error:" + exc);
+        exc.printStackTrace();
+    }
 
 
 

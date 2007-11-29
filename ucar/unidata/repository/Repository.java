@@ -157,7 +157,7 @@ public class Repository implements TableDefinitions {
                                 getClass());
         Statement statement = connection.createStatement();
         SqlUtils.loadSql(sql, statement);
-        loadLevel3RadarFiles();
+        //        loadLevel3RadarFiles();
         loadTestFiles();
     }
 
@@ -411,7 +411,16 @@ public class Repository implements TableDefinitions {
                           group.getFullName()+"</a>");
                 continue;
             }
-            sb.append("<h2>Group: " + group.getFullName()+"</h2>");
+            List  breadcrumbs = new ArrayList();
+            Group parent  = group.getParent();
+            while(parent!=null) {
+                breadcrumbs.add(0,HtmlUtil.href("/showgroup?groupid="+ group.getParent().getId(),group.getParent().getName()));
+                parent = parent.getParent();
+            }
+            breadcrumbs.add(0,HtmlUtil.href("/showgroup", "Top"));
+            breadcrumbs.add(group.getName());
+            sb.append("<b>Group: " + StringUtil.join("&nbsp;&gt;&nbsp;", breadcrumbs)+"</b><hr>");
+
             List<Group> subGroups = getGroups(SqlUtils.makeSelect(COL_GROUPS_ID,TABLE_GROUPS,SqlUtils.eq(COL_GROUPS_PARENT, 
                                                                                                          SqlUtils.quote(group.getId()))));
             if(subGroups.size()>0) {
@@ -565,8 +574,10 @@ public class Repository implements TableDefinitions {
         if (group != null) {
             return group;
         }
+
         List<String> toks = (List<String>) StringUtil.split(name, "/", true,
                                 true);
+
         Group  parent = null;
         String lastName;
         if ((toks.size() == 0) || (toks.size() == 1)) {
@@ -580,13 +591,14 @@ public class Repository implements TableDefinitions {
         if (parent != null) {
             where += SqlUtils.eq(COL_GROUPS_PARENT,
                                  SqlUtils.quote(parent.getId())) + " AND ";
+        } else {
+            where += COL_GROUPS_PARENT +" is null AND ";
         }
         where += SqlUtils.eq(COL_GROUPS_NAME, SqlUtils.quote(lastName));
 
         String    query     = SELECT_GROUP + " WHERE " + where;
 
-        Statement statement = connection.createStatement();
-        statement.execute(query);
+        Statement statement = execute(query);
         ResultSet results = statement.getResultSet();
         if (results.next()) {
             group = new Group(parent, results.getString(1),
@@ -771,7 +783,7 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    public List<RadarInfo> collectLevel3radarFilesxxx(File rootDir,
+    public List<RadarInfo> collectLevel3radarFiles(File rootDir,
             String groupName)
             throws Exception {
         long                  t1         = System.currentTimeMillis();
@@ -802,7 +814,7 @@ public class Repository implements TableDefinitions {
      *
      * @throws Exception _more_
      */
-    public List<RadarInfo> collectLevel3radarFiles(File rootDir,
+    public List<RadarInfo> collectLevel3radarFilesxxx(File rootDir,
             final String groupName)
             throws Exception {
         final Group            group      = findGroup(groupName);
@@ -814,11 +826,11 @@ public class Repository implements TableDefinitions {
                 "([^/]+)/([^/]+)/[^/]+_(\\d\\d\\d\\d\\d\\d\\d\\d_\\d\\d\\d\\d)");
 
         IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
-            public boolean viewFile(File f) throws Exception {
+            public int viewFile(File f) throws Exception {
                 String  name    = f.toString();
                 Matcher matcher = pattern.matcher(name);
                 if ( !matcher.find()) {
-                    return true;
+                    return DO_CONTINUE;
                 }
                 if(radarInfos.size()%5000 == 0) {
                     System.err.println ("Found:" + radarInfos.size());
@@ -828,7 +840,7 @@ public class Repository implements TableDefinitions {
                 Date   dttm    = sdf.parse(matcher.group(3));
                 radarInfos.add(new RadarInfo(group, f.toString(), station,
                                              product, dttm.getTime()));
-                return true;
+                return DO_CONTINUE;
             }
         };
 
@@ -841,16 +853,37 @@ public class Repository implements TableDefinitions {
 
     public List<DataInfo> collectFiles(File rootDir)
             throws Exception {
+        final String rootStr = rootDir.toString();
+        final int rootStrLen = rootStr.length();
         final List<DataInfo>  dataInfos = new ArrayList();
         IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
-            public boolean viewFile(File f) throws Exception {
-                if(f.isDirectory()) return true;
-                String  name    = f.toString();
-                String ext = IOUtil.getFileExtension(name);
-                if(ext.startsWith(".")) ext  = ext.substring(1);
-                Group            group      = findGroup("test/" + ext);
+            public int viewFile(File f) throws Exception {
+                String name = f.getName();
+                //                System.err.println(name);
+                if(name.startsWith(".")) {
+                    return DO_DONTRECURSE;
+                }
+                if(f.isDirectory()) return DO_CONTINUE;
+                String  path    = f.toString();
+                String noext = IOUtil.stripExtension(path);
+
+
+                //                System.err.println ("PATH:" + path);
+                String dirPath = f.getParent().toString();
+                //                System.err.println ("DIRPATH1:" + dirPath);
+                dirPath = dirPath.substring(rootStrLen);
+                //                System.err.println ("DIRPATH2:" + dirPath);
+                List toks = StringUtil.split(dirPath, File.separator, true, true);
+                Group            group      = findGroup(StringUtil.join("/",toks));
+                if(f.toString().indexOf("DataSource.java")>0) {
+                    System.err.println ("Data:" + f);
+                    System.err.println ("Group:" +group.getFullName() + " " + group.getId());
+                }
                 dataInfos.add(new DataInfo(group, f.toString(), "",f.lastModified()));
-                return true;
+                if(dataInfos.size()>100) {
+                    //                    return DO_STOP;
+                } 
+                return DO_CONTINUE;
             }
         };
 
@@ -926,8 +959,8 @@ public class Repository implements TableDefinitions {
     }
 
     public void loadTestFiles() throws Exception {
-        //        File            rootDir = new File("c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
-        File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
+        File            rootDir = new File("c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
+        //        File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
         List<DataInfo> files   = collectFiles(rootDir);
         System.err.println("Inserting:" + files.size() + " files");
         long t1  = System.currentTimeMillis();
@@ -990,10 +1023,10 @@ public class Repository implements TableDefinitions {
     protected Statement execute(String sql) throws Exception {
         Statement statement = connection.createStatement();
         long t1 = System.currentTimeMillis();
-        System.err.println("query:" + sql);
+        //        System.err.println("query:" + sql);
         statement.execute(sql);
         long t2 = System.currentTimeMillis();
-        System.err.println("done:" + (t2-t1));
+        //        System.err.println("done:" + (t2-t1));
         return statement;
     }
 

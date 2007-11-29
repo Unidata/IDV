@@ -44,19 +44,23 @@ import java.util.List;
  */
 public class DataInfo {
 
-    /** _more_          */
-    Group group;
+    private      String name;
+    private      String description;
 
-    /** _more_ */
-    String file;
-
-    /** _more_ */
-    long startDate;
 
     /** _more_          */
-    long endDate;
+private      Group group;
 
-    String type;
+    /** _more_ */
+private      String file;
+
+    /** _more_ */
+private      long startDate;
+
+    /** _more_          */
+private      long endDate;
+
+private      String type;
 
     /**
      * _more_
@@ -193,6 +197,42 @@ public String getType () {
         return type;
 }
 
+
+/**
+Set the Name property.
+
+@param value The new value for Name
+**/
+public void setName (String value) {
+	name = value;
+}
+
+/**
+Get the Name property.
+
+@return The Name
+**/
+public String getName () {
+	return name;
+}
+
+/**
+Set the Description property.
+
+@param value The new value for Description
+**/
+public void setDescription (String value) {
+	description = value;
+}
+
+/**
+Get the Description property.
+
+@return The Description
+**/
+public String getDescription () {
+	return description;
+}
 
 
 }
