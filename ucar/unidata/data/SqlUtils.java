@@ -178,6 +178,10 @@ public class SqlUtils {
         return comma(s1,s2,s3,s4,s5,s6)+","+s7;
     }
 
+    public static String comma(Object s1, Object s2, Object s3, Object s4,Object s5, Object s6, Object s7 , Object s8) {
+        return comma(s1,s2,s3,s4,s5,s6,s7)+","+s8;
+    }
+
     public static String makeOrSplit(String column, String values, boolean quoteThem) {
         List toks = StringUtil.split(values,",",true,true);
         StringBuffer sb = new StringBuffer();
