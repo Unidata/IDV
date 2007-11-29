@@ -1480,16 +1480,28 @@ public class IOUtil {
 
     
     public static interface FileViewer {
-        public boolean viewFile(File f) throws Exception ;
+        public static int DO_CONTINUE = 1;
+        public static int DO_DONTRECURSE = 2;
+        public static int DO_STOP= 3;
+        public int viewFile(File f) throws Exception ;
     }
 
 
     public static boolean walkDirectory(File dir, FileViewer fileViewer) throws Exception {
+        return walkDirectory(dir, fileViewer, 0);
+    }
+
+    public static boolean walkDirectory(File dir, FileViewer fileViewer, int level) throws Exception {
         File[] children  = dir.listFiles();
         if(children == null) return true;
         for (int i=0;i<children.length;i++) {
-            if(!fileViewer.viewFile(children[i])) return false;
-            if(!walkDirectory(children[i], fileViewer)) return false;
+            if(level==0) System.err.println ("DIR:" + children[i]);
+            int what = fileViewer.viewFile(children[i]);
+            if(what == FileViewer.DO_STOP) 
+                return false;
+            if(what == FileViewer.DO_CONTINUE) {
+                if(!walkDirectory(children[i], fileViewer,level+1)) return false;
+            }
         }
         return true;
     }
@@ -1765,11 +1777,11 @@ public class IOUtil {
     public static void main(String[] args) throws Exception {
         final int[]cnt = {0};
         IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
-                public boolean viewFile(File f) throws Exception {
+                public int viewFile(File f) throws Exception {
                     cnt[0]++;
                     if(cnt[0]%1000 == 0) System.err.println ("cnt:" +cnt[0]);
                     if(f.isDirectory()) {}
-                    return true;
+                    return DO_CONTINUE;
                 }
             };
         long tt1= System.currentTimeMillis();
