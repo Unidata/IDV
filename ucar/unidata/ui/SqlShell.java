@@ -35,7 +35,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.data.SqlUtils;
+import ucar.unidata.data.SqlUtil;
 
 
 import ucar.unidata.xml.XmlUtil;
@@ -139,7 +139,7 @@ public class SqlShell extends InteractiveShell {
             stmt.execute(sql);
             ResultSet results;
             int cnt = 0;
-            SqlUtils.Iterator iter = SqlUtils.getIterator(stmt);
+            SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
             while((results = iter.next())!=null) {
                 ResultSetMetaData rsmd = results.getMetaData();
                 while(results.next()) {
