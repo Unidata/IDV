@@ -612,7 +612,7 @@ public class GeoGridDataSource extends GridDataSource {
             throws Exception {
 
         List      choices            = getDataChoices();
-        List      checkboxes         = new ArrayList();
+        final List<JCheckBox>      checkboxes         = new ArrayList<JCheckBox>();
         List      categories         = new ArrayList();
         Hashtable catMap             = new Hashtable();
         Hashtable currentDataChoices = new Hashtable();
@@ -678,6 +678,14 @@ public class GeoGridDataSource extends GridDataSource {
             }
         }
 
+        final JCheckBox allCbx = new JCheckBox("All");
+        allCbx.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    for(JCheckBox cbx: checkboxes) {
+                        cbx.setSelected(allCbx.isSelected());
+                    }
+                }
+            });
         List catComps = new ArrayList();
         for (int i = 0; i < categories.size(); i++) {
             List comps = (List) catMap.get(categories.get(i));
@@ -696,7 +704,7 @@ public class GeoGridDataSource extends GridDataSource {
 
         JComponent contents = GuiUtils.hbox(catComps);
         contents = GuiUtils.topCenter(
-            GuiUtils.inset(new JLabel("Select the fields to download"), 5),
+                                      GuiUtils.inset(GuiUtils.leftRight(new JLabel("Select the fields to download"), allCbx),5),
             contents);
         contents = GuiUtils.inset(contents, 5);
         if ( !GuiUtils.showOkCancelDialog(null, "", contents, null)) {
