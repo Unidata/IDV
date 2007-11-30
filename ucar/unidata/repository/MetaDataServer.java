@@ -113,23 +113,13 @@ public class MetaDataServer extends HttpServer {
                 System.err.println("request:" + path);
                 try {
                     if (path.equals(repository.getUrlBase()+"/query")) {
-                        boolean xml  = Misc.equals("xml",
-                                                   formArgs.get("output"));
-                        StringBuffer result = repository.processQuery(formArgs);
-                        writeContent(true, new TextResult("Query Results",result,(xml?TextResult.TYPE_XML:TextResult.TYPE_HTML)));
-
+                        writeContent(true, repository.processQuery(formArgs));
                     } else if (path.equals(repository.getUrlBase()+"/sql")) {
                         writeContent(true, repository.processSql(formArgs));
                     } else if (path.equals(repository.getUrlBase()+"/searchform")) {
                         writeContent(true, repository.makeQueryForm(formArgs));
-                    } else if (path.equals(repository.getUrlBase()+"/radar/liststations")) {
-                        writeContent(true,repository.processRadarList(formArgs,
-                                                                   "station", "station"));
-                    } else if (path.equals(repository.getUrlBase()+"/radar/listproducts")) {
-                        writeContent(true,repository.processRadarList(formArgs,
-                                "product", "product"));
-                    } else if (path.equals(repository.getUrlBase()+"/listgroups")) {
-                        writeContent(true,repository.listGroups(formArgs));
+                    } else if (path.equals(repository.getUrlBase()+"/list")) {
+                        writeContent(true,repository.processList(formArgs));
                     } else if (path.equals(repository.getUrlBase()+"/showgroup")) {
                         writeContent(true, repository.showGroup(formArgs));
                     } else if (path.equals(repository.getUrlBase()+"/showfile")) {

@@ -92,6 +92,7 @@ public class Repository implements Constants {
     /** _more_ */
     private Connection connection;
 
+    private Hashtable typeHandlersMap = new Hashtable();
 
     /**
      * _more_
@@ -131,14 +132,14 @@ public class Repository implements Constants {
                                 getClass());
         Statement statement = connection.createStatement();
         SqlUtil.loadSql(sql, statement);
-        //        loadLevel3RadarFiles();
-        loadTestFiles();
+        loadLevel3RadarFiles();
+        //        loadTestFiles();
     }
 
 
     protected void initTypeHandlers() {
-        addTypeHandler(TypeHandler.TYPE_ANY, new TypeHandler(this, TypeHandler.TYPE_ANY));
-        addTypeHandler(TypeHandler.TYPE_LEVEL3RADAR, new TypeHandler(this,TypeHandler.TYPE_LEVEL3RADAR));
+        addTypeHandler(TypeHandler.TYPE_ANY, new TypeHandler(this, TypeHandler.TYPE_ANY,"Any file types"));
+        addTypeHandler(TypeHandler.TYPE_LEVEL3RADAR, new TypeHandler(this,TypeHandler.TYPE_LEVEL3RADAR,"Level 3 Radar"));
     }
 
     /**
@@ -214,10 +215,9 @@ public class Repository implements Constants {
 
 
 
-    private Hashtable typeHandlers = new Hashtable();
 
     protected void addTypeHandler(String typeName, TypeHandler typeHandler) {
-        typeHandlers.put(typeName, typeHandler);
+        typeHandlersMap.put(typeName, typeHandler);
     }
 
     protected TypeHandler getTypeHandler(Hashtable args) throws Exception {
@@ -227,7 +227,7 @@ public class Repository implements Constants {
     }
 
     protected TypeHandler getTypeHandler(String type) throws Exception {
-        TypeHandler typeHandler = (TypeHandler)typeHandlers.get(type);
+        TypeHandler typeHandler = (TypeHandler)typeHandlersMap.get(type);
         if(typeHandler == null) {
             try {
                 Class c = Misc.findClass("ucar.unidata.repository." + type);
@@ -313,6 +313,13 @@ public class Repository implements Constants {
         return MAX_ROWS;
     }
 
+    protected String getValue(Hashtable args, String key, String dflt) {
+        String value  = (String) args.get(key);
+        if(value == null) return dflt;
+        return value;
+    }
+
+
     /**
      * _more_
      *
@@ -324,29 +331,17 @@ public class Repository implements Constants {
      *
      * @throws Exception _more_
      */
-    protected TextResult processRadarList(Hashtable args, String column,
-                                            String tag)
+    protected TextResult processList(Hashtable args) 
             throws Exception {
-        List where =getTypeHandler(TypeHandler.TYPE_LEVEL3RADAR).assembleWhereClause(args);
-        String query = SqlUtil.makeSelect(SqlUtil.distinct(column),
-                                           TABLE_LEVEL3RADAR,
-                                           SqlUtil.makeAnd(where));
-        Statement    statement = execute(query);
-        String[]     stations  = SqlUtil.readString(statement, 1);
-        StringBuffer sb        = new StringBuffer();
-        sb.append(XmlUtil.XML_HEADER + "\n");
-        sb.append(XmlUtil.openTag(tag + "s"));
-        for (int i = 0; i < stations.length; i++) {
-            sb.append(XmlUtil.tag(tag,
-                                  XmlUtil.attrs(ATTR_ID, stations[i],
-                                      ATTR_NAME,
-                                      getLongName(stations[i]))));
+        String what = getValue(args, ARG_WHAT, WHAT_TYPE);
+        if(what.equals(WHAT_GROUP)) {
+            return listGroups(args);
+        } else  if(what.equals(WHAT_TYPE)) {
+            return listTypes(args);
         }
-        sb.append(XmlUtil.closeTag(tag + "s"));
-        return new TextResult("", sb, TextResult.TYPE_XML);
+        TypeHandler typeHandler = getTypeHandler(args);
+        return typeHandler.processList(args,what);
     }
-
-
 
 
 
@@ -493,22 +488,126 @@ public class Repository implements Constants {
         Statement    statement = execute(query);
         String[]     groups    = SqlUtil.readString(statement, 1);
         StringBuffer sb        = new StringBuffer();
-        sb.append(XmlUtil.XML_HEADER + "\n");
-        sb.append(XmlUtil.openTag(TAG_GROUPS));
+        String output = getValue(args, ARG_OUTPUT, OUTPUT_HTML);
+        if(output.equals(OUTPUT_HTML)) {
+            sb.append("<h2>Groups</h2>");
+            sb.append("<ul>");
+        } else if(output.equals(OUTPUT_XML)) {
+            sb.append(XmlUtil.XML_HEADER + "\n");
+            sb.append(XmlUtil.openTag(TAG_GROUPS));
+
+        } else if(output.equals(OUTPUT_CSV)) {
+        } else {
+            throw new IllegalArgumentException("Unknown output type:" + output);
+        }
+
+
         for (int i = 0; i < groups.length; i++) {
             Group group = findGroupFromId(groups[i]);
-            if (group != null) {
+            if (group == null) {
+                continue;
+            }
+
+            if(output.equals(OUTPUT_HTML)) {
+                sb.append("<li>" +group.getFullName());
+            } else if(output.equals(OUTPUT_XML)) {
                 sb.append(XmlUtil.tag(TAG_GROUP,
                                       XmlUtil.attrs(ATTR_NAME,
                                                     group.getFullName(),
                                                     ATTR_ID,
                                                     group.getId())));
+            } else if(output.equals(OUTPUT_CSV)) {
+                sb.append(SqlUtil.comma(group.getFullName(),
+                                         group.getId()));
+                sb.append("\n");
             }
+
         }
-        sb.append(XmlUtil.closeTag(TAG_GROUPS));
-        return new TextResult("",sb, TextResult.TYPE_XML);
+        if(output.equals(OUTPUT_HTML)) {
+            sb.append("</ul>\n");
+        } else if(output.equals(OUTPUT_XML)) {
+            sb.append(XmlUtil.closeTag(TAG_GROUPS));
+        }
+
+        return new TextResult("",sb, getMimeType(output));
     }
 
+
+    protected List<TypeHandler> getTypeHandlers(Hashtable args) 
+        throws Exception {
+        TypeHandler typeHandler = getTypeHandler(args);
+        List where = typeHandler.assembleWhereClause(args);
+        String query =
+            SqlUtil.makeSelect(SqlUtil.distinct(COL_FILES_TYPE),
+                                typeHandler.getQueryOnTables(args),
+                                SqlUtil.makeAnd(where));
+
+        List<TypeHandler> typeHandlers = new ArrayList<TypeHandler>();
+        String[]     types    = SqlUtil.readString(execute(query), 1);
+        for (int i = 0; i < types.length; i++) {
+            typeHandlers.add(getTypeHandler(types[i]));
+        }
+        return typeHandlers;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param args _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected TextResult listTypes(Hashtable args)
+        throws Exception {
+        StringBuffer sb        = new StringBuffer();
+        String output = getValue(args, ARG_OUTPUT, OUTPUT_HTML);
+        if(output.equals(OUTPUT_HTML)) {
+            sb.append("<h2>Types</h2>");
+            sb.append("<ul>");
+        } else if(output.equals(OUTPUT_XML)) {
+            sb.append(XmlUtil.XML_HEADER + "\n");
+            sb.append(XmlUtil.openTag(TAG_TYPES));
+        } else if(output.equals(OUTPUT_CSV)) {
+        } else {
+            throw new IllegalArgumentException("Unknown output type:" + output);
+        }
+
+        List<TypeHandler> typeHandlers = getTypeHandlers(args);
+        for (TypeHandler theTypeHandler: typeHandlers) {
+            if(output.equals(OUTPUT_HTML)) {
+                sb.append("<li>");
+                sb.append(theTypeHandler.getType());
+            } else if(output.equals(OUTPUT_XML)) {
+                sb.append(XmlUtil.tag(TAG_TYPE,
+                                      XmlUtil.attrs(ATTR_TYPE,
+                                                    theTypeHandler.getType())));
+            } else if(output.equals(OUTPUT_CSV)) {
+                sb.append(SqlUtil.comma(theTypeHandler.getType(), 
+                                        theTypeHandler.getDescription()));
+                sb.append("\n");
+            }
+
+        }
+        if(output.equals(OUTPUT_HTML)) {
+            sb.append("</ul>");
+        } else if(output.equals(OUTPUT_XML)) {
+            sb.append(XmlUtil.closeTag(TAG_TYPES));
+        }
+        return new TextResult("",sb, getMimeType(output));
+    }
+
+    protected String getMimeType(String output) {
+        if(output.equals(OUTPUT_CSV)) {
+            return TextResult.TYPE_CSV;
+        } else if(output.equals(OUTPUT_XML)) {
+            return TextResult.TYPE_XML;
+        } else {
+            return TextResult.TYPE_HTML;
+        }
+    }
 
 
     protected String href(String url) {
@@ -762,35 +861,40 @@ public class Repository implements Constants {
      *
      * @throws Exception _more_
      */
-    protected StringBuffer processQuery(Hashtable args)
+    protected TextResult processQuery(Hashtable args)
             throws Exception {
         List<DataInfo> dataInfos = getDataInfos(args);
-        boolean         html = !Misc.equals(args.get(ARG_OUTPUT), "xml");
         StringBuffer    sb         = new StringBuffer();
-        if (html) {
+        String output = getValue(args, ARG_OUTPUT, OUTPUT_HTML);
+        if(output.equals(OUTPUT_HTML)) {
+            sb.append("<h2>Query Results</h2>");
             sb.append("<ul>");
-        } else {
+        } else if(output.equals(OUTPUT_XML)) {
             sb.append(XmlUtil.XML_HEADER + "\n");
-            sb.append(XmlUtil.openTag("catalog",
-                                      XmlUtil.attrs("name",
+            sb.append(XmlUtil.openTag(TAG_CATALOG,
+                                      XmlUtil.attrs(ATTR_NAME,
                                           "Query Results")));
+        } else if(output.equals(OUTPUT_CSV)) {
+        } else {
+            throw new IllegalArgumentException("Unknown output type:" + output);
         }
-
 
         StringBufferCollection sbc = new StringBufferCollection();
         for (DataInfo dataInfo : dataInfos) {
             StringBuffer ssb = sbc.getBuffer(dataInfo.getType());
-            if (html) {
+            if(output.equals(OUTPUT_HTML)) {
                 ssb.append("<li>" + href("/showfile?" + ARG_ID +"=" + dataInfo.getId(), dataInfo.getFile()) + " "
                            + new Date(dataInfo.getStartDate()));
-            } else {
+            } else if(output.equals(OUTPUT_XML)) {
                 ssb.append(
                     XmlUtil.tag(
-                        "dataset",
+                        TAG_DATASET,
                         XmlUtil.attrs(
-                            "name", "" + new Date(dataInfo.getStartDate()),
-                            "urlPath", href("/showfile?" + ARG_ID +"=" + dataInfo.getId(), dataInfo.getFile()))));
+                                      ATTR_NAME, "" + new Date(dataInfo.getStartDate()),
+                                      ATTR_URLPATH, dataInfo.getFile())));
 
+            } else if(output.equals(OUTPUT_CSV)) {
+                sb.append(SqlUtil.comma(dataInfo.getId(), dataInfo.getFile()));
             }
         }
 
@@ -798,29 +902,23 @@ public class Repository implements Constants {
         for (int i = 0; i < sbc.getKeys().size(); i++) {
             String       type = (String) sbc.getKeys().get(i);
             StringBuffer ssb     = sbc.getBuffer(type);
-            if (html) {
+            if(output.equals(OUTPUT_HTML)) {
                 sb.append("<li>" + type + "<ul>");
                 sb.append(ssb);
                 sb.append("</ul>");
-            } else {
-                sb.append("<dataset name=\"" + type   + "\">\n");
+            } else if(output.equals(OUTPUT_XML)) {
+                sb.append(XmlUtil.openTag(TAG_DATASET, XmlUtil.attrs(ATTR_NAME, type)));
                 sb.append(ssb);
-                sb.append(XmlUtil.closeTag("dataset"));
+                sb.append(XmlUtil.closeTag(TAG_DATASET));
             }
         }
-        if (html) {
-            sb.append("</ul>");
-        } else {
-            sb.append(XmlUtil.closeTag("dataset"));
-        }
 
-
-        if (html) {
+        if(output.equals(OUTPUT_HTML)) {
             sb.append("</table>");
-        } else {
-            sb.append(XmlUtil.closeTag("catalog"));
+        } else if(output.equals(OUTPUT_XML)) {
+            sb.append(XmlUtil.closeTag(TAG_CATALOG));
         }
-        return sb;
+        return new TextResult("Query Results",sb, getMimeType(output));
     }
 
 
@@ -835,7 +933,7 @@ public class Repository implements Constants {
      *
      * @throws Exception _more_
      */
-    public List<RadarInfo> collectLevel3radarFilesxxx(File rootDir,
+    public List<RadarInfo> collectLevel3radarFiles(File rootDir,
             String groupName)
             throws Exception {
         long                  t1         = System.currentTimeMillis();
@@ -844,10 +942,11 @@ public class Repository implements Constants {
         Group                 group      = findGroup(groupName);
         for (int stationIdx = 0; stationIdx < 100; stationIdx++) {
             for (int i = 0; i < 10; i++) {
+                String station = "stn"+ stationIdx;                
+                String product = "product" + (i % 20);
+                group = findGroup(groupName+"/"+ station+"/"+product);
                 radarInfos.add(new RadarInfo("", "", group, "file" + stationIdx + "_"
-                                             + i + "_" + group, "stn"
-                                                 + stationIdx, "product"
-                                                     + (i % 20), baseTime
+                                             + i + "_" + group, station, product, baseTime
                                                          + radarInfos.size()
                                                              * 100));
             }
@@ -866,7 +965,7 @@ public class Repository implements Constants {
      *
      * @throws Exception _more_
      */
-    public List<RadarInfo> collectLevel3radarFiles(File rootDir,
+    public List<RadarInfo> collectLevel3radarFilesxxx(File rootDir,
             final String groupName)
             throws Exception {
         long                   t1         = System.currentTimeMillis();
@@ -923,6 +1022,7 @@ public class Repository implements Constants {
                 String dirPath = f.getParent().toString();
                 dirPath = dirPath.substring(rootStrLen);
                 List toks = StringUtil.split(dirPath, File.separator, true, true);
+                toks.add(0,"Files");
                 Group            group      = findGroup(StringUtil.join("/",toks));
                 dataInfos.add(new DataInfo(name, name, TypeHandler.TYPE_ANY, group,  f.toString(), f.lastModified()));
                 if(dataInfos.size()>100) {

@@ -210,12 +210,31 @@ public interface Constants {
     /** _more_          */
     public static final String ATTR_NAME = "name";
 
+    /** _more_          */
+    public static final String ATTR_TYPE = "type";
+
+
+    public static final String ATTR_URLPATH = "urlPath";
+    public static final String TAG_CATALOG = "catalog";
+    public static final String TAG_DATASET = "dataset";
 
     public static final String TAG_GROUPS = "groups";
     public static final String TAG_GROUP = "group";
 
+    public static final String TAG_TYPES = "types";
+    public static final String TAG_TYPE = "type";
+
     /** _more_          */
     public static final String ARG_TYPE = "type";
+
+    public static final String ARG_WHAT = "what";
+
+    public static final String WHAT_TYPE = "type";
+    public static final String WHAT_GROUP = "group";
+    public static final String WHAT_PRODUCT = "product";
+    public static final String WHAT_STATION = "station";
+
+
 
     public static final String ARG_MAX = "max";
     public static final String ARG_OUTPUT = "output";

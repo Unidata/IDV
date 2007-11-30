@@ -26,6 +26,8 @@
 package ucar.unidata.repository;
 
 import ucar.unidata.data.SqlUtil;
+import ucar.unidata.xml.XmlUtil;
+
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.TextResult;
@@ -42,6 +44,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
+import java.sql.Statement;
 
 
 
@@ -56,11 +59,16 @@ public class TypeHandler implements Constants {
 
     Repository repository;
     String type;
-
+    String description;
 
     public TypeHandler(Repository repository, String type) {
+        this(repository, type, "");
+    }
+
+    public TypeHandler(Repository repository, String type, String description) {
         this.repository = repository;
         this.type = type;
+        this.description  = description;
     }
 
     public String getType() {
@@ -86,6 +94,69 @@ public class TypeHandler implements Constants {
 
     }
 
+    public TextResult processList(Hashtable args, String what) throws Exception {
+        return processRadarList(args, what);
+    }
+
+
+    public TextResult processRadarList(Hashtable args, String what) throws Exception {
+        String column;
+        String tag;
+        String title;
+        if(what.equals(WHAT_PRODUCT)) {
+            column = "product";
+            tag = "product";
+            title = "Level 3 Radar Products";
+        } else /*if(what.equals(WHAT_STATION))*/ {
+            column = "station";
+            tag = "station";
+            title = "Level 3 Radar Stations";
+        }
+        List where =assembleWhereClause(args);
+        String query = SqlUtil.makeSelect(SqlUtil.distinct(column),
+                                           TABLE_LEVEL3RADAR,
+                                           SqlUtil.makeAnd(where));
+        Statement    statement = repository.execute(query);
+        String[]     products  = SqlUtil.readString(statement, 1);
+        StringBuffer sb        = new StringBuffer();
+        String output = repository.getValue(args, ARG_OUTPUT, OUTPUT_HTML);
+        if(output.equals(OUTPUT_HTML)) {
+            sb.append("<h2>Products</h2>");
+            sb.append("<ul>");
+        } else if(output.equals(OUTPUT_XML)) {
+            sb.append(XmlUtil.XML_HEADER + "\n");
+            sb.append(XmlUtil.openTag(tag + "s"));
+
+        } else if(output.equals(OUTPUT_CSV)) {
+        } else {
+            throw new IllegalArgumentException("Unknown output type:" + output);
+        }
+
+        for (int i = 0; i < products.length; i++) {
+            if(output.equals(OUTPUT_HTML)) {
+                sb.append("<li>");
+                sb.append(repository.getLongName(products[i]) + " (" + products[i]+")");
+            } else if(output.equals(OUTPUT_XML)) {
+                sb.append(XmlUtil.tag(tag,
+                                      XmlUtil.attrs(ATTR_ID, products[i],
+                                                    ATTR_NAME,
+                                                    repository.getLongName(products[i]))));
+            } else if(output.equals(OUTPUT_CSV)) {
+                sb.append(SqlUtil.comma(products[i],
+                                        repository.getLongName(products[i])));
+                sb.append("\n");
+            }
+        }
+        if(output.equals(OUTPUT_HTML)) {
+            sb.append("</ul>");
+        } else if(output.equals(OUTPUT_XML)) {
+            sb.append(XmlUtil.closeTag(tag + "s"));
+        }
+        return new TextResult(title, sb, repository.getMimeType(output));
+    }
+
+
+
     public void addToForm(StringBuffer  sb, Hashtable args, List where) throws Exception {
 
         String[] maxdates = SqlUtil.readString(repository.execute(SqlUtil.makeSelect(SqlUtil.max(COL_FILES_TODATE), 
@@ -101,8 +172,19 @@ public class TypeHandler implements Constants {
                              ? mindates[0]
                              : "");
 
+        List<TypeHandler> typeHandlers = repository.getTypeHandlers(args);
+        if(typeHandlers.size()>1) {
+            List tmp = new ArrayList();
+            for (TypeHandler typeHandler: typeHandlers) {
+                tmp.add(new TwoFacedObject(typeHandler.getType(),typeHandler.getType()));
+            }
+            String typeSelect = HtmlUtil.makeSelect(Repository.ARG_TYPE,tmp);
+            sb.append(HtmlUtil.makeTableEntry("<b>Type:</b>",typeSelect));
+        } else if(typeHandlers.size()==1) {
+            sb.append(HtmlUtil.makeHidden(Repository.ARG_TYPE, typeHandlers.get(0).getType()));
+        }
+        
         String name = (String) args.get(ARG_NAME);
-
         if(name == null) {
             sb.append(HtmlUtil.makeTableEntry("<b>Name:</b>",HtmlUtil.makeInput(Repository.ARG_NAME,"")));
         }
@@ -239,13 +321,37 @@ public class TypeHandler implements Constants {
 
     public void makeLinks(StringBuffer sb) {
         sb.append("<p>");
-        sb.append(repository.href("/listgroups","List groups"));
-        if(isType(TYPE_LEVEL3RADAR)) {
-            sb.append("<p>"+ repository.href("/radar/liststations","List stations"));
-            sb.append("<p>"+ repository.href("/radar/products","List products"));
-        }
+        sb.append(repository.href("/list?what=" +WHAT_TYPE,"List types"));
+        sb.append ("&nbsp;|&nbsp;");
+        sb.append(repository.href("/list?what=" + WHAT_GROUP,"List groups"));
+        sb.append ("&nbsp;|&nbsp;");
+        //        if(isType(TYPE_LEVEL3RADAR)) {
+        sb.append ("&nbsp;|&nbsp;");
+        sb.append(repository.href("/list?what=" + WHAT_STATION,"List stations"));
+        sb.append ("&nbsp;|&nbsp;");
+        sb.append(repository.href("/list?what=" + WHAT_PRODUCT,"List products"));
+            //        }
 
     }
+
+
+/**
+Set the Description property.
+
+@param value The new value for Description
+**/
+public void setDescription (String value) {
+	description = value;
+}
+
+/**
+Get the Description property.
+
+@return The Description
+**/
+public String getDescription () {
+	return description;
+}
 
 }
 
