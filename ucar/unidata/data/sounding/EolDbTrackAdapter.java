@@ -309,7 +309,7 @@ public class EolDbTrackAdapter extends TrackAdapter {
      */
     private Statement select(String what, String where, String extra)
             throws SQLException {
-        return evaluate(SqlUtils.makeSelect(what, where, extra));
+        return evaluate(SqlUtil.makeSelect(what, where, extra));
     }
 
     /**
@@ -323,7 +323,7 @@ public class EolDbTrackAdapter extends TrackAdapter {
      * @throws SQLException _more_
      */
     private Statement select(String what, String where) throws SQLException {
-        return evaluate(SqlUtils.makeSelect(what, where));
+        return evaluate(SqlUtil.makeSelect(what, where));
     }
 
     /**
@@ -358,12 +358,12 @@ public class EolDbTrackAdapter extends TrackAdapter {
 
         Statement         stmt;
         ResultSet         results;
-        SqlUtils.Iterator iter;
+        SqlUtil.Iterator iter;
         EolDbTrackInfo    trackInfo = new EolDbTrackInfo(this, "TRACK");
         Hashtable         cats      = new Hashtable();
         try {
             stmt = select("*", TABLE_CATEGORIES);
-            iter = SqlUtils.getIterator(stmt);
+            iter = SqlUtil.getIterator(stmt);
             while ((results = iter.next()) != null) {
                 while (results.next()) {
                     cats.put(results.getString(COL_VARIABLE),
@@ -379,7 +379,7 @@ public class EolDbTrackAdapter extends TrackAdapter {
         globals    = new Hashtable();
         boolean gotCoords = false;
         description = "<b>Globals</b><br>";
-        iter        = SqlUtils.getIterator(stmt);
+        iter        = SqlUtil.getIterator(stmt);
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 String globalName  = results.getString(1).trim();
@@ -428,7 +428,7 @@ public class EolDbTrackAdapter extends TrackAdapter {
         }
 
         stmt = select("*", TABLE_VARIABLE_LIST);
-        iter = SqlUtils.getIterator(stmt);
+        iter = SqlUtil.getIterator(stmt);
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 String name    = results.getString(COL_NAME).trim();
@@ -497,7 +497,7 @@ public class EolDbTrackAdapter extends TrackAdapter {
                 Statement stmt = select("COUNT(" + varTime + ")", TABLE_DATA);
                 ResultSet         results;
                 int               cnt  = 0;
-                SqlUtils.Iterator iter = SqlUtils.getIterator(stmt);
+                SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
                 while ((results = iter.next()) != null) {
                     while (results.next()) {
                         cnt++;
@@ -539,7 +539,7 @@ public class EolDbTrackAdapter extends TrackAdapter {
          */
         protected double[] getDoubleData(Range range, String var)
                 throws Exception {
-            double[] d = SqlUtils.readDouble(select(var, TABLE_DATA,
+            double[] d = SqlUtil.readDouble(select(var, TABLE_DATA,
                              "order by " + varTime), 1, getMissingValue(var));
             if (d.length == 0) {
                 throw new BadDataException(
@@ -578,7 +578,7 @@ public class EolDbTrackAdapter extends TrackAdapter {
         protected float[] getFloatData(Range range, String var)
                 throws Exception {
             long t1 = System.currentTimeMillis();
-            float[] f = SqlUtils.readFloat(select("(" + var + ")",
+            float[] f = SqlUtil.readFloat(select("(" + var + ")",
                             TABLE_DATA, "order by " + varTime), 1,
                                 (float) getMissingValue(var));
             long t2 = System.currentTimeMillis();
@@ -602,7 +602,7 @@ public class EolDbTrackAdapter extends TrackAdapter {
          */
         protected String[] getStringData(Range range, String var)
                 throws Exception {
-            return SqlUtils.readString(select(var, TABLE_DATA,
+            return SqlUtil.readString(select(var, TABLE_DATA,
                     "order by " + varTime), 1);
         }
 

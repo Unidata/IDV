@@ -53,18 +53,20 @@ import java.util.regex.*;
 
 
 /**
- * Class SqlUtils _more_
+ * Class SqlUtil _more_
  *
  *
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class SqlUtils {
+public class SqlUtil {
 
 
     /** _more_          */
     private static final SimpleDateFormat sdf =
         new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+
 
     /**
      * _more_
@@ -119,7 +121,7 @@ public class SqlUtils {
     public static  String getDateString(String dttm)
             throws java.text.ParseException {
         Date date = DateUtil.parse(dttm);
-        return SqlUtils.format(date);
+        return SqlUtil.format(date);
 
     }
 
