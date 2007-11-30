@@ -26,7 +26,7 @@
 package ucar.unidata.repository;
 
 
-import ucar.unidata.data.SqlUtils;
+import ucar.unidata.data.SqlUtil;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
@@ -68,13 +68,17 @@ import java.util.regex.*;
 
 
 /**
- * Class SqlUtils _more_
+ * Class SqlUtil _more_
  *
  *
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public interface TableDefinitions {
+public interface Constants {
+
+
+    public static final int MAX_ROWS = 1000;
+
 
     /** _more_          */
     public static final String TABLE_FILES = "files";
@@ -143,7 +147,7 @@ public interface TableDefinitions {
 
 
     /** _more_          */
-    public static final String COLUMNS_GROUPS = SqlUtils.comma(COL_GROUPS_ID,
+    public static final String COLUMNS_GROUPS = SqlUtil.comma(COL_GROUPS_ID,
                                                     COL_GROUPS_PARENT,
                                                     COL_GROUPS_NAME,
                                                     COL_GROUPS_DESCRIPTION);
@@ -151,31 +155,31 @@ public interface TableDefinitions {
 
     /** _more_          */
     public static final String SELECT_FILES_GROUPS =
-        SqlUtils.makeSelect(SqlUtils.distinct(COL_FILES_GROUP_ID),
+        SqlUtil.makeSelect(SqlUtil.distinct(COL_FILES_GROUP_ID),
                             TABLE_FILES);
 
     /** _more_          */
     public static final String SELECT_LEVEL3RADAR_PRODUCTS =
-        SqlUtils.makeSelect(SqlUtils.distinct(COL_LEVEL3RADAR_PRODUCT),
+        SqlUtil.makeSelect(SqlUtil.distinct(COL_LEVEL3RADAR_PRODUCT),
                             TABLE_FILES+","+TABLE_LEVEL3RADAR);
 
     /** _more_          */
     public static final String SELECT_LEVEL3RADAR_STATIONS =
-        SqlUtils.makeSelect(SqlUtils.distinct(COL_LEVEL3RADAR_STATION),
+        SqlUtil.makeSelect(SqlUtil.distinct(COL_LEVEL3RADAR_STATION),
                             TABLE_FILES+","+TABLE_LEVEL3RADAR);
 
     /** _more_          */
     public static final String SELECT_FILES_MAXDATE =
-        SqlUtils.makeSelect(SqlUtils.max(COL_FILES_FROMDATE), TABLE_FILES);
+        SqlUtil.makeSelect(SqlUtil.max(COL_FILES_FROMDATE), TABLE_FILES);
 
     /** _more_          */
     public static final String SELECT_FILES_MINDATE =
-        SqlUtils.makeSelect(SqlUtils.min(COL_FILES_FROMDATE), TABLE_FILES);
+        SqlUtil.makeSelect(SqlUtil.min(COL_FILES_FROMDATE), TABLE_FILES);
 
     /** _more_          */
     public static final String INSERT_FILES =
-        SqlUtils.makeInsert(TABLE_FILES,
-                            SqlUtils.comma(COL_FILES_ID, 
+        SqlUtil.makeInsert(TABLE_FILES,
+                            SqlUtil.comma(COL_FILES_ID, 
                                            COL_FILES_NAME,
                                            COL_FILES_DESCRIPTION,
                                            COL_FILES_TYPE,
@@ -186,15 +190,15 @@ public interface TableDefinitions {
 
     /** _more_          */
     public static final String INSERT_LEVEL3RADAR =
-        SqlUtils.makeInsert(TABLE_LEVEL3RADAR,
-                            SqlUtils.comma(COL_LEVEL3RADAR_ID,
+        SqlUtil.makeInsert(TABLE_LEVEL3RADAR,
+                            SqlUtil.comma(COL_LEVEL3RADAR_ID,
                                            COL_LEVEL3RADAR_STATION,
                                            COL_LEVEL3RADAR_PRODUCT), "?,?,?");
 
 
     /** _more_          */
     public static final String SELECT_GROUP =
-        SqlUtils.makeSelect(COLUMNS_GROUPS, TABLE_GROUPS);
+        SqlUtil.makeSelect(COLUMNS_GROUPS, TABLE_GROUPS);
 
 
 
@@ -213,6 +217,9 @@ public interface TableDefinitions {
     /** _more_          */
     public static final String ARG_TYPE = "type";
 
+    public static final String ARG_MAX = "max";
+    public static final String ARG_OUTPUT = "output";
+
     public static final String ARG_NAME = "name";
 
     public static final String ARG_ID = "id";
@@ -222,6 +229,7 @@ public interface TableDefinitions {
 
     public static final String ARG_GROUPID = "groupid";
 
+    public static final String ARG_GROUP_CHILDREN = "group_children";
     /** _more_          */
     public static final String ARG_TODATE = "todate";
 
@@ -235,6 +243,9 @@ public interface TableDefinitions {
     public static final String ARG_STATION = "station";
 
 
+    public static final String OUTPUT_HTML = "html";
+    public static final String OUTPUT_XML = "xml";
+    public static final String OUTPUT_CSV = "csv";
 
 
 }

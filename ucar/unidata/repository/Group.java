@@ -53,6 +53,8 @@ public class Group {
     /** _more_          */
     private String description;
 
+    private String parentId;
+
     /** _more_          */
     private Group parent;
 
@@ -66,6 +68,14 @@ public class Group {
     public Group(Group parent, String id, String name,
                       String description) {
         this.parent      = parent;
+        this.id          = id;
+        this.name        = name;
+        this.description = description;
+    }
+
+    public Group(String id, String parentId, String name,
+                 String description) {
+        this.parentId      = parentId;
         this.id          = id;
         this.name        = name;
         this.description = description;
@@ -164,6 +174,26 @@ public class Group {
     public String getDescription() {
         return description;
     }
+
+/**
+Set the ParentId property.
+
+@param value The new value for ParentId
+**/
+public void setParentId (String value) {
+	parentId = value;
+}
+
+/**
+Get the ParentId property.
+
+@return The ParentId
+**/
+public String getParentId () {
+	return parentId;
+}
+
+
 
 }
 

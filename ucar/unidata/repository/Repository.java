@@ -26,7 +26,7 @@
 package ucar.unidata.repository;
 
 
-import ucar.unidata.data.SqlUtils;
+import ucar.unidata.data.SqlUtil;
 import ucar.unidata.util.TextResult;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HttpServer;
@@ -38,6 +38,8 @@ import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
+
+import java.lang.reflect.*;
 
 import java.io.File;
 import java.io.InputStream;
@@ -70,21 +72,21 @@ import java.util.regex.*;
 
 
 /**
- * Class SqlUtils _more_
+ * Class SqlUtil _more_
  *
  *
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Repository implements TableDefinitions {
+public class Repository implements Constants {
 
-
-
-    /** _more_          */
-    long baseTime = System.currentTimeMillis();
+    private String urlBase = "/repository";
 
     /** _more_          */
-    int keyCnt = 0;
+    private     long baseTime = System.currentTimeMillis();
+
+    /** _more_          */
+    private     int keyCnt = 0;
 
 
     /** _more_ */
@@ -108,6 +110,7 @@ public class Repository implements TableDefinitions {
         }
         initTable();
         initTypeHandlers();
+        initGroups();
     }
 
     protected void initTable() throws Exception {
@@ -127,8 +130,8 @@ public class Repository implements TableDefinitions {
             IOUtil.readContents("/ucar/unidata/repository/makedb.sql",
                                 getClass());
         Statement statement = connection.createStatement();
-        SqlUtils.loadSql(sql, statement);
-        loadLevel3RadarFiles();
+        SqlUtil.loadSql(sql, statement);
+        //        loadLevel3RadarFiles();
         loadTestFiles();
     }
 
@@ -163,10 +166,10 @@ public class Repository implements TableDefinitions {
         long      t1        = System.currentTimeMillis();
         String    query     = (String) args.get("query");
         Statement statement = execute(query);
-        SqlUtils.Iterator iter = SqlUtils.getIterator(statement);
+        SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
         int               cnt  = 0;
         StringBuffer      sb   = new StringBuffer();
-        sb.append("<form action=\"/sql\">\n");
+        sb.append(HtmlUtil.form(href("/sql")));
         sb.append("<input  name=\"query\" size=\"60\" value=\"" + query
                   + "\"/>");
         sb.append("<input  type=\"submit\" value=\"Query\" />");
@@ -226,6 +229,14 @@ public class Repository implements TableDefinitions {
     protected TypeHandler getTypeHandler(String type) throws Exception {
         TypeHandler typeHandler = (TypeHandler)typeHandlers.get(type);
         if(typeHandler == null) {
+            try {
+                Class c = Misc.findClass("ucar.unidata.repository." + type);
+                Constructor ctor = Misc.findConstructor(c, new Class[]{Repository.class,String.class});
+                typeHandler  = (TypeHandler) ctor.newInstance(new Object[]{this,type});
+            } catch(ClassNotFoundException cnfe) {}
+        }
+
+        if(typeHandler == null) {
             typeHandler = new TypeHandler(this,type);
             addTypeHandler(type, typeHandler);
         }
@@ -234,7 +245,7 @@ public class Repository implements TableDefinitions {
 
     public List<Group> getGroups(String sql) throws Exception {
         Statement statement = execute(sql);
-        return  getGroups(SqlUtils.readString(statement, 1));
+        return  getGroups(SqlUtil.readString(statement, 1));
     }
 
     public List<Group> getGroups(String[]groups) throws Exception {
@@ -259,31 +270,33 @@ public class Repository implements TableDefinitions {
      * @throws Exception _more_
      */
     protected TextResult makeQueryForm(Hashtable args) throws Exception {
-        Statement statement;
         List    where     = assembleWhereClause(args);
         StringBuffer sb       = new StringBuffer();
-        sb.append("<h2> Search Form</h2>");
+        sb.append("<h2>Search Form</h2>");
         sb.append("<table cellpadding=\"5\">");
-        sb.append("<form action=\"/query\">\n");
+        sb.append(HtmlUtil.form(href("/query")));
 
         TypeHandler typeHandler = getTypeHandler(args);
         sb.append(HtmlUtil.makeHidden(typeHandler.getType(), ARG_TYPE));
         typeHandler.addToForm(sb, args, where);
-        String output = (String) args.get("output");
+        String output = (String) args.get(ARG_OUTPUT);
         if (output == null) {
-            sb.append(
-                "<tr><td align=\"right\"><b>Output Type: </b></td><td><select name=\"output\"><option>html</option><option>xml</option></select></td></tr>");
+            sb.append(HtmlUtil.makeTableEntry("<b>Output Type:</b>",
+                                              HtmlUtil.makeSelect(ARG_OUTPUT,Misc.newList(OUTPUT_HTML,
+                                                                                          OUTPUT_XML,
+                                                                                          OUTPUT_CSV))));
         } else {
-            sb.append(HtmlUtil.makeHidden(output, "output"));
+            sb.append(HtmlUtil.makeHidden(output, ARG_OUTPUT));
         }
 
-        sb.append(
-            "<tr><td></td><td><input  type=\"submit\" value=\"Search\" /></td></tr>");
+        sb.append(HtmlUtil.makeTableEntry("",HtmlUtil.submit("Search")));
         sb.append("<table>");
         sb.append("</form>");
         typeHandler.makeLinks(sb);
 
-        sb.append("<form action=\"/sql\">\n");
+
+
+        sb.append(HtmlUtil.form(href("/sql")));
         sb.append("<input  name=\"query\" size=\"60\"/>");
         sb.append("<input  type=\"submit\" value=\"Query\" />");
         sb.append("</form>\n");
@@ -291,6 +304,14 @@ public class Repository implements TableDefinitions {
         return new TextResult("Search Form", sb);
     }
 
+
+    public int getMax(Hashtable args) {
+        String max = (String) args.get(ARG_MAX);
+        if(max!=null) {
+            return new Integer(max.trim()).intValue();
+        }
+        return MAX_ROWS;
+    }
 
     /**
      * _more_
@@ -307,11 +328,11 @@ public class Repository implements TableDefinitions {
                                             String tag)
             throws Exception {
         List where =getTypeHandler(TypeHandler.TYPE_LEVEL3RADAR).assembleWhereClause(args);
-        String query = SqlUtils.makeSelect(SqlUtils.distinct(column),
+        String query = SqlUtil.makeSelect(SqlUtil.distinct(column),
                                            TABLE_LEVEL3RADAR,
-                                           SqlUtils.makeAnd(where));
+                                           SqlUtil.makeAnd(where));
         Statement    statement = execute(query);
-        String[]     stations  = SqlUtils.readString(statement, 1);
+        String[]     stations  = SqlUtil.readString(statement, 1);
         StringBuffer sb        = new StringBuffer();
         sb.append(XmlUtil.XML_HEADER + "\n");
         sb.append(XmlUtil.openTag(tag + "s"));
@@ -335,11 +356,11 @@ public class Repository implements TableDefinitions {
         if(fileId == null) throw new IllegalArgumentException ("No " + ARG_ID +" given");
         StringBuffer sb        = new StringBuffer();
         String query =
-            SqlUtils.makeSelect(SqlUtils.comma(COL_FILES_ID,COL_FILES_NAME, COL_FILES_DESCRIPTION, COL_FILES_TYPE, COL_FILES_GROUP_ID,  COL_FILES_FILE,
+            SqlUtil.makeSelect(SqlUtil.comma(COL_FILES_ID,COL_FILES_NAME, COL_FILES_DESCRIPTION, COL_FILES_TYPE, COL_FILES_GROUP_ID,  COL_FILES_FILE,
                                                COL_FILES_FROMDATE,
                                                COL_FILES_TODATE),
                                 TABLE_FILES,
-                                SqlUtils.eq(COL_FILES_ID, SqlUtils.quote(fileId)));
+                                SqlUtil.eq(COL_FILES_ID, SqlUtil.quote(fileId)));
         ResultSet results = execute(query).getResultSet();
         if(!results.next()) {
             throw new IllegalArgumentException("Given file id:" + fileId +" is not in database");
@@ -371,8 +392,8 @@ public class Repository implements TableDefinitions {
         boolean topLevel = false;
         if(theGroup == null) {
             topLevel = true;
-            Statement statement =  execute(SqlUtils.makeSelect(COL_GROUPS_ID,TABLE_GROUPS,COL_GROUPS_PARENT+ " IS NULL"));
-            groups.addAll(getGroups(SqlUtils.readString(statement,1)));
+            Statement statement =  execute(SqlUtil.makeSelect(COL_GROUPS_ID,TABLE_GROUPS,COL_GROUPS_PARENT+ " IS NULL"));
+            groups.addAll(getGroups(SqlUtil.readString(statement,1)));
         } else {
             groups.add(theGroup);
         }
@@ -386,8 +407,8 @@ public class Repository implements TableDefinitions {
 
         for(Group group: groups) {
             if(topLevel) {
-                sb.append("<li><a href=\"/showgroup?group=" + group.getFullName() +"\">" +
-                          group.getFullName()+"</a>");
+                sb.append("<li>" + href("/showgroup?group=" + group.getFullName(),
+                                        group.getFullName())+"</a>");
                 continue;
             }
             List  breadcrumbs = new ArrayList();
@@ -395,33 +416,33 @@ public class Repository implements TableDefinitions {
             Group parent  = group.getParent();
             while(parent!=null) {
                 titleList.add(0,parent.getName());
-                breadcrumbs.add(0,HtmlUtil.href("/showgroup?group="+ parent.getFullName(),parent.getName()));
+                breadcrumbs.add(0,href("/showgroup?group="+ parent.getFullName(),parent.getName()));
                 parent = parent.getParent();
             }
-            breadcrumbs.add(0,HtmlUtil.href("/showgroup", "Top"));
+            breadcrumbs.add(0,href("/showgroup", "Top"));
             titleList.add(group.getName());
             breadcrumbs.add(group.getName());
             title = "Group: " + StringUtil.join("&nbsp;&gt;&nbsp;", titleList);
             sb.append("<b>Group: " + StringUtil.join("&nbsp;&gt;&nbsp;", breadcrumbs)+"</b><hr>");
 
-            List<Group> subGroups = getGroups(SqlUtils.makeSelect(COL_GROUPS_ID,TABLE_GROUPS,SqlUtils.eq(COL_GROUPS_PARENT, 
-                                                                                                         SqlUtils.quote(group.getId()))));
+            List<Group> subGroups = getGroups(SqlUtil.makeSelect(COL_GROUPS_ID,TABLE_GROUPS,SqlUtil.eq(COL_GROUPS_PARENT, 
+                                                                                                         SqlUtil.quote(group.getId()))));
             if(subGroups.size()>0) {
                 sb.append("<b>Sub groups:</b><ul>");
                 for(Group subGroup: subGroups) {
-                    sb.append("<li><a href=\"/showgroup?group=" + subGroup.getFullName() +"\">" +
-                              subGroup.getFullName()+"</a>");
+                    sb.append("<li>" + href("/showgroup?group=" + subGroup.getFullName(),
+                                            subGroup.getFullName())+"</a>");
                 }
                 sb.append("</ul>");
             }
             
-            where.add(SqlUtils.eq(COL_FILES_GROUP_ID, SqlUtils.quote(group.getId())));
+            where.add(SqlUtil.eq(COL_FILES_GROUP_ID, SqlUtil.quote(group.getId())));
             String query =
-                SqlUtils.makeSelect(SqlUtils.comma(COL_FILES_ID,COL_FILES_NAME,COL_FILES_TYPE, COL_FILES_FILE),
+                SqlUtil.makeSelect(SqlUtil.comma(COL_FILES_ID,COL_FILES_NAME,COL_FILES_TYPE, COL_FILES_FILE),
                                     typeHandler.getQueryOnTables(args),
-                                    SqlUtils.makeAnd(where));
+                                    SqlUtil.makeAnd(where));
             Statement stmt = execute(query);
-            SqlUtils.Iterator  iter    = SqlUtils.getIterator(stmt);
+            SqlUtil.Iterator  iter    = SqlUtil.getIterator(stmt);
             ResultSet results;
             int cnt = 0;
             while ((results = iter.next()) != null) {
@@ -439,7 +460,7 @@ public class Repository implements TableDefinitions {
                         sb.append("<b>Files:</b>");
                         sb.append("<ul>");
                     }
-                    sb.append("<li>" + HtmlUtil.href("/showfile?" + ARG_ID +"=" + id, name));
+                    sb.append("<li>" + href("/showfile?" + ARG_ID +"=" + id, name));
                 }
             }
             if(cnt>0) sb.append("</ul>");
@@ -465,12 +486,12 @@ public class Repository implements TableDefinitions {
         TypeHandler typeHandler = getTypeHandler(args);
         List where = typeHandler.assembleWhereClause(args);
         String query =
-            SqlUtils.makeSelect(SqlUtils.distinct(COL_FILES_GROUP_ID),
+            SqlUtil.makeSelect(SqlUtil.distinct(COL_FILES_GROUP_ID),
                                 typeHandler.getQueryOnTables(args),
-                                SqlUtils.makeAnd(where));
+                                SqlUtil.makeAnd(where));
 
         Statement    statement = execute(query);
-        String[]     groups    = SqlUtils.readString(statement, 1);
+        String[]     groups    = SqlUtil.readString(statement, 1);
         StringBuffer sb        = new StringBuffer();
         sb.append(XmlUtil.XML_HEADER + "\n");
         sb.append(XmlUtil.openTag(TAG_GROUPS));
@@ -488,6 +509,15 @@ public class Repository implements TableDefinitions {
         return new TextResult("",sb, TextResult.TYPE_XML);
     }
 
+
+
+    protected String href(String url) {
+        return urlBase+url;
+    }
+
+    protected String href(String url, String label) {
+        return HtmlUtil.href(urlBase +url, label);
+    }
 
 
     /**
@@ -509,7 +539,34 @@ public class Repository implements TableDefinitions {
 
 
     /** _more_          */
-    private Hashtable groupMap = new Hashtable();
+    private Hashtable<String,Group> groupMap = new Hashtable<String,Group>();
+
+    private void initGroups() throws Exception {
+        Statement statement =  execute(SqlUtil.makeSelect(SqlUtil.comma(COL_GROUPS_ID,COL_GROUPS_PARENT,COL_GROUPS_NAME,COL_GROUPS_DESCRIPTION),
+                                                           TABLE_GROUPS));
+
+        ResultSet         results;
+        SqlUtil.Iterator iter       = SqlUtil.getIterator(statement);
+        List<Group> groups  = new ArrayList<Group>();
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                int col =1;
+                Group group =new Group(results.getString(col++),
+                                     results.getString(col++),
+                                     results.getString(col++),
+                                     results.getString(col++));
+                groups.add(group);
+                groupMap.put(group.getId(), group);
+            }
+        }
+        for(Group group: groups) {
+            if(group.getParentId()!=null) {
+                group.setParent(groupMap.get(group.getParentId()));
+            }
+            groupMap.put(group.getFullName(), group);            
+        }
+    }
+
 
     /**
      * _more_
@@ -524,12 +581,12 @@ public class Repository implements TableDefinitions {
         if ((id == null) || (id.length() == 0)) {
             return null;
         }
-        Group group = (Group) groupMap.get(id);
+        Group group = groupMap.get(id);
         if (group != null) {
             return group;
         }
         String query = SELECT_GROUP + " WHERE "
-                       + SqlUtils.eq("id", SqlUtils.quote(id));
+                       + SqlUtil.eq("id", SqlUtil.quote(id));
         Statement statement = execute(query);
         ResultSet results   = statement.getResultSet();
         if (results.next()) {
@@ -555,7 +612,7 @@ public class Repository implements TableDefinitions {
      * @throws Exception _more_
      */
     protected Group findGroup(String name) throws Exception {
-        Group group = (Group) groupMap.get(name);
+        Group group = groupMap.get(name);
         if (group != null) {
             return group;
         }
@@ -574,12 +631,12 @@ public class Repository implements TableDefinitions {
         }
         String where = "";
         if (parent != null) {
-            where += SqlUtils.eq(COL_GROUPS_PARENT,
-                                 SqlUtils.quote(parent.getId())) + " AND ";
+            where += SqlUtil.eq(COL_GROUPS_PARENT,
+                                 SqlUtil.quote(parent.getId())) + " AND ";
         } else {
             where += COL_GROUPS_PARENT +" is null AND ";
         }
-        where += SqlUtils.eq(COL_GROUPS_NAME, SqlUtils.quote(lastName));
+        where += SqlUtil.eq(COL_GROUPS_NAME, SqlUtil.quote(lastName));
 
         String    query     = SELECT_GROUP + " WHERE " + where;
 
@@ -589,12 +646,12 @@ public class Repository implements TableDefinitions {
             group = new Group(parent, results.getString(1),
                               results.getString(3), results.getString(4));
         } else {
-            String insert = SqlUtils.makeInsert(TABLE_GROUPS, COLUMNS_GROUPS,
-                                SqlUtils.comma(SqlUtils.quote(getGUID()),
+            String insert = SqlUtil.makeInsert(TABLE_GROUPS, COLUMNS_GROUPS,
+                                SqlUtil.comma(SqlUtil.quote(getGUID()),
                                     ((parent != null)
-                                     ? SqlUtils.quote(parent.getId())
-                                     : "NULL"), SqlUtils.quote(lastName),
-                                         SqlUtils.quote(lastName)));
+                                     ? SqlUtil.quote(parent.getId())
+                                     : "NULL"), SqlUtil.quote(lastName),
+                                         SqlUtil.quote(lastName)));
             statement.execute(insert);
             return findGroup(name);
             //            group = new Group(parent,0,lastName,lastName);
@@ -618,7 +675,7 @@ public class Repository implements TableDefinitions {
         TypeHandler typeHandler = getTypeHandler(args);
         List where =typeHandler.assembleWhereClause(args);
         String query =
-            SqlUtils.makeSelect(SqlUtils.comma(COL_FILES_ID,
+            SqlUtil.makeSelect(SqlUtil.comma(COL_FILES_ID,
                                                COL_FILES_NAME, 
                                                COL_FILES_DESCRIPTION, 
                                                COL_FILES_TYPE, 
@@ -626,11 +683,11 @@ public class Repository implements TableDefinitions {
                                                COL_FILES_FILE, 
                                                COL_FILES_FROMDATE,
                                                COL_FILES_TODATE), typeHandler.getQueryOnTables(args),
-                                SqlUtils.makeAnd(where), "order by " + COL_FILES_FROMDATE);
-        Statement statement = execute(query);
-        ResultSet         results;
-        SqlUtils.Iterator iter       = SqlUtils.getIterator(statement);
+                                SqlUtil.makeAnd(where), "order by " + COL_FILES_FROMDATE);
+        Statement statement = execute(query, getMax(args));
         List<DataInfo>   dataInfos = new ArrayList<DataInfo>();
+        ResultSet         results;
+        SqlUtil.Iterator iter       = SqlUtil.getIterator(statement);
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 int col = 1;
@@ -708,7 +765,7 @@ public class Repository implements TableDefinitions {
     protected StringBuffer processQuery(Hashtable args)
             throws Exception {
         List<DataInfo> dataInfos = getDataInfos(args);
-        boolean         html = !Misc.equals(args.get("output"), "xml");
+        boolean         html = !Misc.equals(args.get(ARG_OUTPUT), "xml");
         StringBuffer    sb         = new StringBuffer();
         if (html) {
             sb.append("<ul>");
@@ -724,8 +781,7 @@ public class Repository implements TableDefinitions {
         for (DataInfo dataInfo : dataInfos) {
             StringBuffer ssb = sbc.getBuffer(dataInfo.getType());
             if (html) {
-                
-                ssb.append("<li>" + HtmlUtil.href("/showfile?" + ARG_ID +"=" + dataInfo.getId(), dataInfo.getFile()) + " "
+                ssb.append("<li>" + href("/showfile?" + ARG_ID +"=" + dataInfo.getId(), dataInfo.getFile()) + " "
                            + new Date(dataInfo.getStartDate()));
             } else {
                 ssb.append(
@@ -733,7 +789,7 @@ public class Repository implements TableDefinitions {
                         "dataset",
                         XmlUtil.attrs(
                             "name", "" + new Date(dataInfo.getStartDate()),
-                            "urlPath", HtmlUtil.href("/showfile?" + ARG_ID +"=" + dataInfo.getId(), dataInfo.getFile()))));
+                            "urlPath", href("/showfile?" + ARG_ID +"=" + dataInfo.getId(), dataInfo.getFile()))));
 
             }
         }
@@ -950,8 +1006,8 @@ public class Repository implements TableDefinitions {
     }
 
     public void loadTestFiles() throws Exception {
-        //        File            rootDir = new File("c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
-        File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
+        File            rootDir = new File("c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
+        //File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
         List<DataInfo> files   = collectFiles(rootDir);
         System.err.println("Inserting:" + files.size() + " files");
         long t1  = System.currentTimeMillis();
@@ -1014,12 +1070,19 @@ public class Repository implements TableDefinitions {
      * @throws Exception _more_
      */
     protected Statement execute(String sql) throws Exception {
+        return execute(sql, -1);
+    }
+
+    protected Statement execute(String sql, int max) throws Exception {
         Statement statement = connection.createStatement();
+        if(max>0) {
+            statement.setMaxRows(max);
+        }
         long t1 = System.currentTimeMillis();
         System.err.println("query:" + sql);
         statement.execute(sql);
         long t2 = System.currentTimeMillis();
-        System.err.println("done:" + (t2-t1));
+        //        System.err.println("done:" + (t2-t1));
         return statement;
     }
 
@@ -1034,7 +1097,7 @@ public class Repository implements TableDefinitions {
      */
     public void eval(String sql) throws Exception {
         Statement statement = execute(sql);
-        String[] results = SqlUtils.readString(statement, 1);
+        String[] results = SqlUtil.readString(statement, 1);
         for (int i = 0; (i < results.length) && (i < 10); i++) {
             System.err.print(results[i] + " ");
             if (i == 9) {
@@ -1044,6 +1107,24 @@ public class Repository implements TableDefinitions {
     }
 
 
+
+/**
+Set the UrlBase property.
+
+@param value The new value for UrlBase
+**/
+public void setUrlBase (String value) {
+	urlBase = value;
+}
+
+/**
+Get the UrlBase property.
+
+@return The UrlBase
+**/
+public String getUrlBase () {
+	return urlBase;
+}
 
 
 
