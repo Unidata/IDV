@@ -678,7 +678,7 @@ public class GeoGridDataSource extends GridDataSource {
             }
         }
 
-        final JCheckBox allCbx = new JCheckBox("All");
+        final JCheckBox allCbx = new JCheckBox("Select All");
         allCbx.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     for(JCheckBox cbx: checkboxes) {
