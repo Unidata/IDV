@@ -46,12 +46,24 @@ public class HtmlUtil {
     }
 
 
+    public static String checkbox(String name, String value) {
+        return "<input type=\"checkbox\" name=\"" + name +"    value=\"" + value +"\">";
+    }
+
+    public static String form(String url) {
+        return "<form action=\"" + url +"\">";
+    }
+
     public static String makeInput(String name,String value) {
         return "<input  name=\"" + name + "\" value=\""+ value + "\"/>";
     }
 
     public static String href(String url, String label) {
         return "<a href=\"" + url +"\">" + label +"</a>";
+    }
+
+    public static String submit(String label) {
+        return "<input  type=\"submit\" value=\"" + label +"\" />";
     }
 
     /**
@@ -62,9 +74,9 @@ public class HtmlUtil {
      * @param name _more_
      * @param label _more_
      */
-    public static String makeSelect(List values, String name) {
+    public static String makeSelect(String name,List values) {
         StringBuffer sb = new StringBuffer();
-        sb.append("<select name=\"" + name + "\">");
+        sb.append("<select name=\"" + name + "\">\n");
         for (int i = 0; i < values.size(); i++) {
             Object obj = values.get(i);
             String value;
@@ -76,9 +88,8 @@ public class HtmlUtil {
            } else {                value = label = obj.toString();
             }
             sb.append("<option value=\"" + value + "\">" + label
-                      + "</option>");
+                      + "</option>\n");
         }
-        sb.append("</td></tr>");
         return sb.toString();
     }
 
