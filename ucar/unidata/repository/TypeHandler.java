@@ -258,7 +258,10 @@ public class TypeHandler implements Constants {
                                      SqlUtil.quote(group.getId())));
                 //            }
         }
-        addOr(COL_FILES_TYPE, (String) args.get(Repository.ARG_TYPE), where);
+        String type = (String) args.get(Repository.ARG_TYPE);
+        if(type !=null && !type.equals(TYPE_ANY)) {
+            addOr(COL_FILES_TYPE, type, where);
+        }
 
         String fromdate = (String) args.get(Repository.ARG_FROMDATE);
         if ((fromdate != null) && (fromdate.trim().length() > 0)) {

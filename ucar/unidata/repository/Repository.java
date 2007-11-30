@@ -133,7 +133,7 @@ public class Repository implements Constants {
         Statement statement = connection.createStatement();
         SqlUtil.loadSql(sql, statement);
         loadLevel3RadarFiles();
-        //        loadTestFiles();
+        loadTestFiles();
     }
 
 
@@ -933,7 +933,7 @@ public class Repository implements Constants {
      *
      * @throws Exception _more_
      */
-    public List<RadarInfo> collectLevel3radarFiles(File rootDir,
+    public List<RadarInfo> collectLevel3radarFilesxxx(File rootDir,
             String groupName)
             throws Exception {
         long                  t1         = System.currentTimeMillis();
@@ -965,7 +965,7 @@ public class Repository implements Constants {
      *
      * @throws Exception _more_
      */
-    public List<RadarInfo> collectLevel3radarFilesxxx(File rootDir,
+    public List<RadarInfo> collectLevel3radarFiles(File rootDir,
             final String groupName)
             throws Exception {
         long                   t1         = System.currentTimeMillis();
@@ -1106,8 +1106,8 @@ public class Repository implements Constants {
     }
 
     public void loadTestFiles() throws Exception {
-        File            rootDir = new File("c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
-        //File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
+        //        File            rootDir = new File("c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
+        File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
         List<DataInfo> files   = collectFiles(rootDir);
         System.err.println("Inserting:" + files.size() + " files");
         long t1  = System.currentTimeMillis();
@@ -1179,7 +1179,7 @@ public class Repository implements Constants {
             statement.setMaxRows(max);
         }
         long t1 = System.currentTimeMillis();
-        System.err.println("query:" + sql);
+        //        System.err.println("query:" + sql);
         statement.execute(sql);
         long t2 = System.currentTimeMillis();
         //        System.err.println("done:" + (t2-t1));
