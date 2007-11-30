@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<project basedir="../../../" default="repositoryjar" name="Repository">
+
+    <import file="../../build.xml"/>
+
+    <target name="repository" depends="init">
+        <javac
+            classpath="${classpath}"
+            debug="true"
+            source="${srcversion}"
+            deprecation="false" 
+            destdir="${compiledir}"
+            failonerror="${failonerror}" 
+            nowarn="true"
+            srcdir="${srcdir}"
+        >
+        <include name="ucar/unidata/repository/**"/>
+        </javac>
+    </target>
+
+
+    <target name="repositoryjar" depends="repository">
+        <jar 
+            basedir="${srcdir}"
+            compress="true"
+            update="false"
+            jarfile="${jars_dest}/repository.jar"
+            manifest="${srcdir}/ucar/unidata/repository/repository.manifest">
+            <include name="ucar/**/*.class"/>
+            <include name="ucar/unidata/repository/*.html"/>
+            <include name="ucar/unidata/repository/*.sql"/>
+        </jar>
+    </target>
+
+
+</project>
