@@ -50,7 +50,7 @@ import ucar.unidata.idv.control.chart.LineState;
 
 
 import ucar.unidata.ui.symbol.*;
-import ucar.unidata.ui.Timeline;
+import ucar.unidata.idv.ui.IdvTimeline;
 
 import ucar.unidata.geoloc.LatLonPoint;
 import ucar.unidata.geoloc.LatLonPointImpl;
@@ -698,7 +698,7 @@ public class TimeSeriesChart extends XYChartManager {
            !Misc.equals(endDate, lastEndDate)) {
             lastStartDate = startDate;
             lastEndDate = endDate;
-            sunriseDates = Timeline.makeSunriseDates(sunriseLocation, startDate, endDate);
+            sunriseDates = IdvTimeline.makeSunriseDates(sunriseLocation, startDate, endDate);
         }
         int top    = (int) (dataArea.getY());
         int bottom = (int) (dataArea.getY() + dataArea.getHeight());
