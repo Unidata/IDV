@@ -27,30 +27,18 @@
 
 package ucar.unidata.ui;
 
-
-import org.itc.idv.math.SunriseSunsetCollector;
-
-
-import ucar.unidata.geoloc.LatLonPoint;
-import ucar.unidata.geoloc.LatLonPointImpl;
-
-
 import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.DateUtil;
 
-
-
 import ucar.unidata.util.DatedObject;
 import ucar.unidata.util.DatedThing;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.Misc;
+import ucar.unidata.util.LayoutUtil;
+import ucar.unidata.util.MenuUtil;
 import ucar.unidata.util.StringUtil;
 
 import java.awt.*;
 import java.awt.event.*;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 
 import java.io.*;
@@ -62,7 +50,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
-
 
 
 import java.util.Calendar;
@@ -87,6 +74,17 @@ import javax.swing.event.*;
  */
 public class Timeline extends JPanel implements MouseListener,
         MouseMotionListener {
+
+    /** Action command used for the Apply button */
+    public static String CMD_APPLY = "Apply";
+
+    /** Action command used for the Cancel button */
+    public static String CMD_CANCEL = "Cancel";
+
+
+    /** Action command used for the Cancel button */
+    public static String CMD_OK = "Ok";
+
 
     /** The normal cursor_ */
     public static final Cursor CURSOR_NORMAL =
@@ -420,13 +418,13 @@ public class Timeline extends JPanel implements MouseListener,
     private JCheckBox stickyCbx;
 
     /** for properties dialog */
-    private DateTimePicker startTimePicker;
+    //    private DateTimePicker startTimePicker;
 
     /** for properties dialog */
-    private DateTimePicker endTimePicker;
+    //    private DateTimePicker endTimePicker;
 
     /** for properties dialog */
-    private DateSelectionGui dateSelectionGui;
+    //SKIP    private DateSelectionGui dateSelectionGui;
 
     /** for properties dialog */
     private JDialog propertiesDialog;
@@ -500,13 +498,7 @@ public class Timeline extends JPanel implements MouseListener,
     private boolean sticky = false;
 
     /** _more_          */
-    private List sunriseDates = new ArrayList();
-
-    /** _more_          */
-    private LatLonPoint sunriseLocation;
-
-    /** _more_          */
-    private List sunriseLocations;
+    protected List sunriseDates = new ArrayList();
 
     /** Holds other timelines that we share start/end range with */
     private List timelineGroup;
@@ -1048,7 +1040,7 @@ public class Timeline extends JPanel implements MouseListener,
     protected void showPopupMenu(int x, int y) {
         List items = new ArrayList();
         getMenuItems(items);
-        JPopupMenu popup = GuiUtils.makePopupMenu(items);
+        JPopupMenu popup = MenuUtil.makePopupMenu(items);
         popup.show(this, x, y);
     }
 
@@ -1104,10 +1096,8 @@ public class Timeline extends JPanel implements MouseListener,
         List      subItems;
         JMenuItem mi;
 
-        items.add(mi = GuiUtils.makeMenuItem("Properties", this,
+        items.add(mi = MenuUtil.makeMenuItem("Properties", this,
                                              "showProperties"));
-
-
 
         subItems = new ArrayList();
         long     now = System.currentTimeMillis();
@@ -1120,99 +1110,72 @@ public class Timeline extends JPanel implements MouseListener,
         cal.add(Calendar.DAY_OF_YEAR, 1);
         now = cal.getTimeInMillis();
 
-        subItems.add(GuiUtils.makeMenuItem("Reset", this, "resetDateRange"));
+        subItems.add(MenuUtil.makeMenuItem("Reset", this, "resetDateRange"));
 
         subItems.add(
-            GuiUtils.makeMenuItem(
+            MenuUtil.makeMenuItem(
                 "Today", this, "setVisibleRange",
                 new Date[] { new Date(now - DateUtil.daysToMillis(1)),
                              new Date(now) }));
         subItems.add(
-            GuiUtils.makeMenuItem(
+            MenuUtil.makeMenuItem(
                 "Past Week", this, "setVisibleRange",
                 new Date[] { new Date(now - DateUtil.daysToMillis(7)),
                              new Date(now) }));
         subItems.add(
-            GuiUtils.makeMenuItem(
+            MenuUtil.makeMenuItem(
                 "Past Month", this, "setVisibleRange",
                 new Date[] { new Date(now - DateUtil.daysToMillis(30)),
                              new Date(now) }));
         subItems.add(
-            GuiUtils.makeMenuItem(
+            MenuUtil.makeMenuItem(
                 "Past Year", this, "setVisibleRange",
                 new Date[] { new Date(now - DateUtil.daysToMillis(365)),
                              new Date(now) }));
 
         if (dateSelectionActive()) {
-            subItems.add(GuiUtils.makeMenuItem("Selection Range", this,
+            subItems.add(MenuUtil.makeMenuItem("Selection Range", this,
                     "setVisibleRange",
                     new Date[] { dateSelection.getStartFixedDate(),
                                  dateSelection.getEndFixedDate() }));
         }
-        items.add(GuiUtils.makeMenu("Set Visible Range", subItems));
+        items.add(MenuUtil.makeMenu("Set Visible Range", subItems));
 
 
         if (dateSelectionActive()) {
             subItems = new ArrayList();
-            subItems.add(GuiUtils.makeMenuItem("View", this,
+            subItems.add(MenuUtil.makeMenuItem("View", this,
                     "setVisibleRange",
                     new Date[] { dateSelection.getStartFixedDate(),
                                  dateSelection.getEndFixedDate() }));
-            subItems.add(GuiUtils.makeMenuItem("Reset", this,
+            subItems.add(MenuUtil.makeMenuItem("Reset", this,
                     "resetDateSelection"));
 
-            subItems.add(GuiUtils.makeMenuItem("Today", this,
+            subItems.add(MenuUtil.makeMenuItem("Today", this,
                     "setDateSelection",
                     new Date[] { new Date(now - DateUtil.daysToMillis(1)),
                                  new Date(now) }));
-            subItems.add(GuiUtils.makeMenuItem("Past Week", this,
+            subItems.add(MenuUtil.makeMenuItem("Past Week", this,
                     "setDateSelection",
                     new Date[] { new Date(now - DateUtil.daysToMillis(7)),
                                  new Date(now) }));
-            subItems.add(GuiUtils.makeMenuItem("Past Month", this,
+            subItems.add(MenuUtil.makeMenuItem("Past Month", this,
                     "setDateSelection",
                     new Date[] { new Date(now - DateUtil.daysToMillis(30)),
                                  new Date(now) }));
-            items.add(GuiUtils.makeMenu("Set Date Selection", subItems));
+            items.add(MenuUtil.makeMenu("Set Date Selection", subItems));
         }
-
-
-        List sunriseLocations = getSunriseLocations();
-        subItems = new ArrayList();
-        subItems.add(GuiUtils.makeMenuItem("Clear Location", this,
-                                           "clearSunriseLocation"));
-        subItems.add(GuiUtils.makeMenuItem("Set Location", this,
-                                           "setSunriseLocationFromUser"));
-        if ((sunriseLocation != null) && getIsCapableOfSelection()) {
-            subItems.add(GuiUtils.makeMenuItem("Select daytime", this,
-                    "selectDaytime"));
-        }
-
-        if ((sunriseLocations != null) && (sunriseLocations.size() > 0)) {
-            subItems.add(GuiUtils.MENU_SEPARATOR);
-            for (int locIdx = 0; locIdx < sunriseLocations.size(); locIdx++) {
-                LatLonPoint llp = (LatLonPoint) sunriseLocations.get(locIdx);
-                subItems.add(
-                    GuiUtils.makeMenuItem(
-                        Misc.format(llp.getLatitude()) + "/"
-                        + Misc.format(llp.getLongitude()), this,
-                            "setSunriseLocation", llp));
-            }
-        }
-
-        items.add(GuiUtils.makeMenu("Sunrise/Sunset", subItems));
-
 
 
         if (isCapableOfSelection) {
-            items.add(GuiUtils.makeCheckboxMenuItem("Use Date Selection",
+            items.add(MenuUtil.makeCheckboxMenuItem("Use Date Selection",
                     this, "useDateSelection", null));
         }
         if ( !dateSelectionActive()) {
             return;
         }
 
-        items.add(GuiUtils.makeCheckboxMenuItem("Use Visible Range", this,
+        items.add(MenuUtil.makeCheckboxMenuItem("Use Visible Range", this,
                 "sticky", null));
         mi.setToolTipText("Make the selection range be the visible range");
 
@@ -1245,7 +1208,7 @@ public class Timeline extends JPanel implements MouseListener,
             if (intervals[i] == 0) {
                 lbl = "None";
             }
-            subItems.add(GuiUtils.makeMenuItem(((intervals[i]
+            subItems.add(MenuUtil.makeMenuItem(((intervals[i]
                     == currentInterval)
                     ? "-" + lbl + "-"
                     : " " + lbl + " "), this, "setInterval",
@@ -1253,7 +1216,7 @@ public class Timeline extends JPanel implements MouseListener,
 
         }
 
-        items.add(GuiUtils.makeMenu("Interval", subItems));
+        items.add(MenuUtil.makeMenu("Interval", subItems));
         if (dateSelection.hasInterval()) {
             subItems = new ArrayList();
             double range;
@@ -1264,13 +1227,13 @@ public class Timeline extends JPanel implements MouseListener,
                     isCurrent = true;
                 }
                 String lbl = intervalNames[i];
-                subItems.add(GuiUtils.makeMenuItem((isCurrent
+                subItems.add(MenuUtil.makeMenuItem((isCurrent
                         ? "-" + lbl + "-"
                         : " " + lbl + " "), this, "setPreRange",
                                             new Double(intervals[i])));
 
             }
-            items.add(GuiUtils.makeMenu("Before Range", subItems));
+            items.add(MenuUtil.makeMenu("Before Range", subItems));
 
             subItems = new ArrayList();
             range    = dateSelection.getPostRange();
@@ -1280,15 +1243,13 @@ public class Timeline extends JPanel implements MouseListener,
                     isCurrent = true;
                 }
                 String lbl = intervalNames[i];
-                subItems.add(GuiUtils.makeMenuItem((isCurrent
+                subItems.add(MenuUtil.makeMenuItem((isCurrent
                         ? "-" + lbl + "-"
                         : " " + lbl + " "), this, "setPostRange",
                                             new Double(intervals[i])));
 
             }
-            items.add(GuiUtils.makeMenu("After Range", subItems));
-
-
+            items.add(MenuUtil.makeMenu("After Range", subItems));
         }
 
 
@@ -1301,12 +1262,12 @@ public class Timeline extends JPanel implements MouseListener,
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 40, 50, 75, 100
         };
         for (int i = 0; i < skips.length; i++) {
-            subItems.add(GuiUtils.makeMenuItem(((skips[i] == currentSkip)
+            subItems.add(MenuUtil.makeMenuItem(((skips[i] == currentSkip)
                     ? "-" + skips[i] + "-"
                     : " " + skips[i] + " "), this, "setSkipFactor",
                                              new Integer(skips[i])));
         }
-        items.add(GuiUtils.makeMenu("Skip Factor", subItems));
+        items.add(MenuUtil.makeMenu("Skip Factor", subItems));
 
 
         subItems = new ArrayList();
@@ -1323,11 +1284,11 @@ public class Timeline extends JPanel implements MouseListener,
             } else {
                 lbl = "" + cnt;
             }
-            subItems.add(GuiUtils.makeMenuItem(((cnt == currentCount)
+            subItems.add(MenuUtil.makeMenuItem(((cnt == currentCount)
                     ? "-" + lbl + "-"
                     : " " + lbl + " "), this, "setCount", new Integer(cnt)));
         }
-        items.add(GuiUtils.makeMenu("Count", subItems));
+        items.add(MenuUtil.makeMenu("Count", subItems));
 
     }
 
@@ -1403,30 +1364,34 @@ public class Timeline extends JPanel implements MouseListener,
                     useDateSelection);
             showIntervalsCbx = new JCheckBox("Show Intervals", showIntervals);
             stickyCbx        = new JCheckBox("Use Visible Range", sticky);
-            startTimePicker  = new DateTimePicker(getStartDate());
-            endTimePicker    = new DateTimePicker(getEndDate());
-            dateSelectionGui = new DateSelectionGui(dateSelection);
+            //            startTimePicker  = new DateTimePicker(getStartDate());
+            //            endTimePicker    = new DateTimePicker(getEndDate());
+    //SKIP            dateSelectionGui = new DateSelectionGui(dateSelection);
 
-            JComponent timeRangePanel =
-                GuiUtils.hbox(GuiUtils.rLabel("Time Range: "),
+            JComponent timeRangePanel = new JPanel();
+
+            /*            JComponent timeRangePanel =
+                LayoutUtil.hbox(GuiUtils.rLabel("Time Range: "),
                               startTimePicker, new JLabel("  --  "),
-                              endTimePicker);
-            JComponent flagsPanel = GuiUtils.hbox(stickyCbx,
+                              endTimePicker);*/
+            JComponent flagsPanel = LayoutUtil.hbox(stickyCbx,
                                         showIntervalsCbx);
 
 
             JComponent contents;
 
             if (isCapableOfSelection) {
-                contents = GuiUtils.vbox(timeRangePanel,
-                                         GuiUtils.filler(10, 10),
+                /*                contents = LayoutUtil.vbox(timeRangePanel,
+                                         LayoutUtil.filler(10, 10),
                                          useDateSelectionCbx,
-                                         GuiUtils.inset(dateSelectionGui,
-                                             new Insets(0, 20, 0, 0)));
+                                         LayoutUtil.inset(dateSelectionGui,
+                                         new Insets(0, 20, 0, 0)));*/
+                contents = timeRangePanel;
+
             } else {
                 contents = timeRangePanel;
             }
-            contents = GuiUtils.inset(contents, 5);
+            contents = LayoutUtil.inset(contents, 5);
 
             propertiesDialog = new JDialog((JFrame) null, "Date Selection",
                                            true);
@@ -1434,30 +1399,68 @@ public class Timeline extends JPanel implements MouseListener,
             ActionListener listener = new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     String cmd = ae.getActionCommand();
-                    if (cmd.equals(GuiUtils.CMD_APPLY)
-                            || cmd.equals(GuiUtils.CMD_OK)) {
+                    if (cmd.equals(CMD_APPLY)
+                            || cmd.equals(CMD_OK)) {
                         if ( !applyProperties()) {
                             return;
                         }
                     }
-                    if (cmd.equals(GuiUtils.CMD_CANCEL)
-                            || cmd.equals(GuiUtils.CMD_OK)) {
+                    if (cmd.equals(CMD_CANCEL)
+                            || cmd.equals(CMD_OK)) {
                         propertiesDialog.setVisible(false);
                     }
                 }
             };
 
-            JComponent buttons = GuiUtils.makeApplyOkCancelButtons(listener);
+
+            JComponent buttons = makeButtons(listener, new String[]{CMD_APPLY, CMD_OK,CMD_CANCEL});
             propertiesDialog.getContentPane().add(
-                GuiUtils.inset(GuiUtils.centerBottom(contents, buttons), 5));
+                LayoutUtil.inset(LayoutUtil.centerBottom(contents, buttons), 5));
             propertiesDialog.pack();
         }
 
-        startTimePicker.setDate(getStartDate());
-        endTimePicker.setDate(getEndDate());
-        dateSelectionGui.setDateSelection(dateSelection);
+        //        startTimePicker.setDate(getStartDate());
+        //        endTimePicker.setDate(getEndDate());
+    //SKIP        dateSelectionGui.setDateSelection(dateSelection);
         propertiesDialog.setVisible(true);
     }
+
+    public static JPanel makeButtons(ActionListener l, String[] labels) {
+        return makeButtons(l, labels, labels);
+    }
+
+    public static JPanel makeButtons(ActionListener listener, String[] labels,
+                                     String[] cmds) {
+
+
+        JPanel p       = new JPanel();
+        List   buttons = new ArrayList();
+        p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
+        for (int i = 0; i < cmds.length; i++) {
+            String cmd   = ((cmds[i] != null)
+                            ? cmds[i]
+                            : ((labels != null)
+                               ? labels[i]
+                               : ""));
+            String label = ((labels != null)
+                            ? labels[i]
+                            : cmd);
+            if (label == null) {
+                label = cmd;
+            }
+            JButton button = new JButton(label);
+            button.addActionListener(listener);
+            button.setActionCommand(cmd);
+            if (cmd.equals(CMD_OK)) {
+                button.setDefaultCapable(true);
+            }
+            buttons.add(button);
+        }
+        return LayoutUtil.doLayout(p, LayoutUtil.getComponentArray(buttons), buttons.size(), LayoutUtil.WT_N,
+                                   LayoutUtil.WT_N, null, null, new Insets(5, 5, 5, 5));
+    }
+
+
 
 
     /**
@@ -1467,15 +1470,15 @@ public class Timeline extends JPanel implements MouseListener,
      */
     private boolean applyProperties() {
         if (isCapableOfSelection) {
-            if ( !dateSelectionGui.applyProperties()) {
-                return false;
-            }
+    //SKIP            if ( !dateSelectionGui.applyProperties()) {
+    //SKIP                return false;
+    //SKIP            }
             useDateSelection = useDateSelectionCbx.isSelected();
             showIntervals    = showIntervalsCbx.isSelected();
             sticky           = stickyCbx.isSelected();
         }
-        setStartDate(startTimePicker.getDate());
-        setEndDate(endTimePicker.getDate());
+        //        setStartDate(startTimePicker.getDate());
+        //        setEndDate(endTimePicker.getDate());
 
         timelineChanged();
         dateSelectionChanged();
@@ -1609,16 +1612,9 @@ public class Timeline extends JPanel implements MouseListener,
         repaint();
     }
 
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public List getSunriseLocations() {
-        return sunriseLocations;
+    public void makeSunriseDates() {
     }
+
 
     /**
      * _more_
@@ -1657,92 +1653,6 @@ public class Timeline extends JPanel implements MouseListener,
 
         setSelected(selected);
     }
-
-    /**
-     * _more_
-     */
-    public void setSunriseLocationFromUser() {
-        LatLonWidget llw = ((sunriseLocation != null)
-                            ? new LatLonWidget(sunriseLocation.getLatitude(),
-                                sunriseLocation.getLongitude())
-                            : new LatLonWidget(0, 0));
-        if ( !GuiUtils.showOkCancelDialog(null, "Sunrise Location",
-                                          GuiUtils.inset(llw, 5), null)) {
-            return;
-        }
-        setSunriseLocation(new LatLonPointImpl(llw.getLat(), llw.getLon()));
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param locations _more_
-     */
-    public void setSunriseLocations(List locations) {
-        this.sunriseLocations = locations;
-    }
-
-    /**
-     * _more_
-     */
-    public void clearSunriseLocation() {
-        setSunriseLocation(null);
-    }
-
-    /**
-     * _more_
-     *
-     * @param llp _more_
-     */
-    public void setSunriseLocation(LatLonPoint llp) {
-        sunriseLocation = llp;
-        makeSunriseDates();
-        repaint();
-    }
-
-    /**
-     * _more_
-     */
-    private void makeSunriseDates() {
-        sunriseDates = makeSunriseDates(sunriseLocation, getStartDate(), getEndDate());
-    }
-
-
-    /**
-     * _more_
-     */
-    public static List  makeSunriseDates(LatLonPoint sunriseLocation, Date startDate, Date endDate) {
-        List sunriseDates = new ArrayList();
-        if (sunriseLocation == null) {
-            return sunriseDates;
-        }
-        try {
-            //Pad them out 24 hours
-            GregorianCalendar gc1 = new GregorianCalendar();
-            gc1.setTime(new Date(startDate.getTime()
-                                 - DateUtil.hoursToMillis(48)));
-            GregorianCalendar gc2 = new GregorianCalendar();
-            gc2.setTime(new Date(endDate.getTime()
-                                 + DateUtil.hoursToMillis(48)));
-            List                   dates = Misc.newList(gc1, gc2);
-            SunriseSunsetCollector ssc   = new SunriseSunsetCollector(dates);
-            List cals = ssc.calculate(sunriseLocation.getLatitude(),
-                                      sunriseLocation.getLongitude());
-            for (int i = 0; i < cals.size(); i++) {
-                GregorianCalendar cal = (GregorianCalendar) cals.get(i);
-                sunriseDates.add(cal.getTime());
-            }
-            //            System.err.println("dates:" + sunriseDates);
-        } catch (Exception exc) {
-            exc.printStackTrace();
-        }
-        return sunriseDates;
-
-    }
-
-
 
 
 
@@ -1884,7 +1794,7 @@ public class Timeline extends JPanel implements MouseListener,
      * @param withButtons with dialog buttons
      */
     protected void doMakeContents(boolean withButtons) {
-        JPanel thisContainer = GuiUtils.inset(this, 0);
+        JPanel thisContainer = LayoutUtil.inset(this, 0);
         thisContainer.setBorder(
             BorderFactory.createBevelBorder(BevelBorder.LOWERED));
         if ( !withButtons) {
@@ -1894,14 +1804,14 @@ public class Timeline extends JPanel implements MouseListener,
         ActionListener listener = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 String cmd = ae.getActionCommand();
-                dialogOK = cmd.equals(GuiUtils.CMD_OK);
+                dialogOK = cmd.equals(CMD_OK);
                 dialog.setVisible(false);
             }
         };
 
 
-        JComponent bottom = GuiUtils.makeOkCancelButtons(listener);
-        contents = GuiUtils.centerBottom(thisContainer, bottom);
+        JComponent bottom = makeButtons(listener,new String[]{CMD_OK,CMD_CANCEL});
+        contents = LayoutUtil.centerBottom(thisContainer, bottom);
     }
 
 
@@ -2994,13 +2904,13 @@ public class Timeline extends JPanel implements MouseListener,
 
                 }
             });
-            JComponent bottom = GuiUtils.centerRight(searchFld,
-                                    GuiUtils.hbox(useSelectedBtn, resetBtn));
+            JComponent bottom = LayoutUtil.centerRight(searchFld,
+                                    LayoutUtil.hbox(useSelectedBtn, resetBtn));
             //            JComponent bottom = searchFld;
             JDialog dialog = new JDialog((JFrame) null, "Date Selection",
                                          true);
             dialog.getContentPane().add(
-                GuiUtils.centerBottom(timeline.getContents(true), bottom));
+                LayoutUtil.centerBottom(timeline.getContents(true), bottom));
             dialog.pack();
             dialog.setLocation(new Point(200, 200));
             dialog.show();
