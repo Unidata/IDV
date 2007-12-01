@@ -47,7 +47,6 @@ import ucar.unidata.metdata.Station;
 
 import ucar.unidata.ui.ChooserList;
 import ucar.unidata.ui.ChooserPanel;
-import ucar.unidata.ui.Timeline;
 
 import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.DateUtil;

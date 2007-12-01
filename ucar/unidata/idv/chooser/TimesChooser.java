@@ -32,7 +32,7 @@ import ucar.unidata.data.imagery.AddeImageDescriptor;
 import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.ui.ChooserList;
 import ucar.unidata.ui.ChooserPanel;
-import ucar.unidata.ui.Timeline;
+import ucar.unidata.idv.ui.IdvTimeline;
 
 import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.DateUtil;
@@ -113,10 +113,10 @@ public class TimesChooser extends IdvChooser {
     private boolean usingTimeline = false;
 
     /** The timeline we popup */
-    private Timeline popupTimeline;
+    private IdvTimeline popupTimeline;
 
     /** The in gui timeline */
-    private Timeline timeline;
+    private IdvTimeline timeline;
 
     /** _more_          */
     private JTabbedPane timesTab;
@@ -399,7 +399,7 @@ public class TimesChooser extends IdvChooser {
         timelineBtn.setToolTipText("Select times in timeline");
 
 
-        timeline = new Timeline(new ArrayList(), 200) {
+        timeline = new IdvTimeline(new ArrayList(), 200) {
                 public List getSunriseLocations() {
                     return getIdv().getIdvUIManager().getMapLocations();
                 }
@@ -776,7 +776,7 @@ public class TimesChooser extends IdvChooser {
         }
 
         if (popupTimeline == null) {
-            popupTimeline = new Timeline(datedObjects, 400);
+            popupTimeline = new IdvTimeline(datedObjects, 400);
             popupTimeline.setUseDateSelection(false);
             DateSelection dateSelection =
                 new DateSelection(popupTimeline.getStartDate(),
