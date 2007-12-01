@@ -123,13 +123,13 @@ public class JobManager {
             JLabel         waitLbl        = new JLabel(new ImageIcon(GuiUtils.getImage("/ucar/unidata/idv/images/wait.gif")));
             label1 = new JLabel("                                   ");
             label2 = new JLabel("                                   ");
-            JComponent contents = GuiUtils.vbox(GuiUtils.hbox(new JLabel(name), GuiUtils.inset(waitLbl,5)),
-                                                GuiUtils.vbox(GuiUtils.filler(300,5),
+            JComponent contents = LayoutUtil.vbox(LayoutUtil.hbox(new JLabel(name), LayoutUtil.inset(waitLbl,5)),
+                                                  LayoutUtil.vbox(LayoutUtil.filler(300,5),
                                                               label1,
                                                               label2),
-                                                GuiUtils.wrap(GuiUtils.inset(cancelBtn,10)));
+                                                  LayoutUtil.wrap(LayoutUtil.inset(cancelBtn,10)));
 
-            dialog.getContentPane().add(GuiUtils.inset(contents,5));
+            dialog.getContentPane().add(LayoutUtil.inset(contents,5));
             dialog.pack();
             GuiUtils.packInCenter(dialog);
             dialog.show();

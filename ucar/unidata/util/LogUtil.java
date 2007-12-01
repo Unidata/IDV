@@ -456,7 +456,7 @@ public class LogUtil {
             printExceptionsNoGui(errorMessages, exceptions);
             return;
         }
-        JComponent contents  =GuiUtils.topCenter(new JLabel(label),
+        JComponent contents  =LayoutUtil.topCenter(new JLabel(label),
                             getMultiExceptionsPanel(errorMessages,
                                                     exceptions));
         GuiUtils.showDialog("Errors",
@@ -544,13 +544,13 @@ public class LogUtil {
             comps.add(jb);
             comps.add(new JLabel("  " + message + "  "));
         }
-        JPanel jp = GuiUtils.doLayout(GuiUtils.getComponentArray(comps), 2,
-                                      GuiUtils.WT_NY, GuiUtils.WT_N);
-        JScrollPane jpScroll = GuiUtils.makeScrollPane(GuiUtils.top(jp), 100,
+        JPanel jp = LayoutUtil.doLayout(LayoutUtil.getComponentArray(comps), 2,
+                                      LayoutUtil.WT_NY, LayoutUtil.WT_N);
+        JScrollPane jpScroll = GuiUtils.makeScrollPane(LayoutUtil.top(jp), 100,
                                    100);
         jpScroll.setPreferredSize(new Dimension(100, 100));
         jpScroll.setSize(new Dimension(100, 100));
-        JPanel contents = GuiUtils.topCenter(jpScroll, sp);
+        JPanel contents = LayoutUtil.topCenter(jpScroll, sp);
         return contents;
     }
 
@@ -561,7 +561,7 @@ public class LogUtil {
      * @return  The stack trace
      */
     public static String getStackTrace() {
-        return getStackTrace(new IllegalArgumentException(""));
+        return Misc.getStackTrace();
     }
 
 
@@ -572,9 +572,7 @@ public class LogUtil {
      * @return The stack trace
      */
     public static String getStackTrace(Throwable exc) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        exc.printStackTrace(new PrintStream(baos));
-        return baos.toString();
+        return Misc.getStackTrace();
     }
 
     /** The window the error console is in */
@@ -623,10 +621,10 @@ public class LogUtil {
                     ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             JViewport vp = sp.getViewport();
             vp.setViewSize(new Dimension(300, 400));
-            JPanel contents = GuiUtils.centerBottom(
+            JPanel contents = LayoutUtil.centerBottom(
                                   sp,
-                                  GuiUtils.wrap(
-                                      GuiUtils.hflow(
+                                  LayoutUtil.wrap(
+                                      LayoutUtil.hflow(
                                           Misc.newList(clearBtn, writeBtn))));
             consoleWindow = GuiUtils.makeWindow("Console", contents, 10, 10);
         }
@@ -875,7 +873,7 @@ public class LogUtil {
 
             JButton         closeBtn     = new JButton("OK");
             final boolean[] showing      = { false };
-            final JPanel    detailsPanel = GuiUtils.center(sp);
+            final JPanel    detailsPanel = LayoutUtil.center(sp);
 
 
             closeBtn.addActionListener(new ActionListener() {
@@ -901,28 +899,28 @@ public class LogUtil {
             JComponent errorLbl = new JLabel(
                                       GuiUtils.getImageIcon(
                                           "/auxdata/ui/icons/Error.gif"));
-            errorLbl = GuiUtils.top(GuiUtils.inset(errorLbl,
+            errorLbl = LayoutUtil.top(LayoutUtil.inset(errorLbl,
                     new Insets(8, 8, 8, 8)));
 
             buttonList.add(detailsBtn);
             buttonList.add(closeBtn);
-            GuiUtils.tmpInsets = new Insets(0, 4, 0, 4);
-            JComponent buttons = GuiUtils.doLayout(buttonList,
-                                     buttonList.size(), GuiUtils.WT_N,
-                                     GuiUtils.WT_N);
+            LayoutUtil.tmpInsets = new Insets(0, 4, 0, 4);
+            JComponent buttons = LayoutUtil.doLayout(buttonList,
+                                     buttonList.size(), LayoutUtil.WT_N,
+                                     LayoutUtil.WT_N);
 
-            buttons = GuiUtils.inset(buttons, 5);
-            JComponent messageComp = GuiUtils.inset(getMessageComponent(msg),
+            buttons = LayoutUtil.inset(buttons, 5);
+            JComponent messageComp = LayoutUtil.inset(getMessageComponent(msg),
                                          new Insets(8, 0, 8, 8));
 
 
-            JComponent topPanel = GuiUtils.leftCenter(errorLbl, messageComp);
+            JComponent topPanel = LayoutUtil.leftCenter(errorLbl, messageComp);
             topPanel.setBackground(Color.red);
 
 
-            JComponent contents = GuiUtils.centerBottom(topPanel, buttons);
-            contents = GuiUtils.doLayout(new Component[] { contents,
-                    bottomPanel }, 1, GuiUtils.WT_Y, GuiUtils.WT_Y);
+            JComponent contents = LayoutUtil.centerBottom(topPanel, buttons);
+            contents = LayoutUtil.doLayout(new Component[] { contents,
+                    bottomPanel }, 1, LayoutUtil.WT_Y, LayoutUtil.WT_Y);
             dialog.getContentPane().add(contents);
             dialog.pack();
             Dimension screenSize =

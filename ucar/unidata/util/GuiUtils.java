@@ -30,7 +30,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import ucar.unidata.xml.XmlUtil;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -74,7 +73,7 @@ import javax.swing.tree.*;
  *
  * @author IDV development team
  */
-public class GuiUtils {
+public class GuiUtils extends LayoutUtil {
 
     /** xml attribute name */
     public static final String ATTR_ACTION = "action";
@@ -192,131 +191,6 @@ public class GuiUtils {
 
 
 
-
-    /** Used by the doLayout routine for the default layout insets */
-    private static final Insets DFLT_INSETS = new Insets(0, 0, 0, 0);
-
-    /**
-     * If you want to change the insets used in the doLayout routines
-     * you can set this and the routine will use the value and then set it to null.
-     * I know, I know, it isn't thread safe but...
-     */
-    public static Insets tmpInsets;
-
-    /** 5 pixel inset */
-    public static final Insets INSETS_5 = new Insets(5, 5, 5, 5);
-
-    /** 2 pixel inset */
-    public static final Insets INSETS_2 = new Insets(2, 2, 2, 2);
-
-    /**
-     * Use this to define your own column fills (i.e., horizontal expansion
-     * of the elements in the gribag). Will be set to null after use.
-     * Not thread safe but...
-     */
-    public static int[] tmpColFills = null;
-
-
-    /** This is the default anchor used in doLayout */
-    private static final int DFLT_ANCHOR = GridBagConstraints.WEST;
-
-    /**
-     * Set this to define your own anchor in the doLayout routines.
-     * Will get reset after use. Not thread safe. You can also
-     * call {@link #setAnchorBottom()} and {@link #setAnchorTop()} for
-     * changing the anchor.
-     */
-    public static int tmpAnchor = -1;
-
-    /**
-     * Set this to define your own fill in the doLayout routines.
-     * Will get reset after use. Not thread safe. You can also
-     * call {@link #setNoFill()} and {@link #setHFill()} for doing
-     * no fill and horizontal fill.
-     */
-    public static int tmpFill = -1;
-
-
-    /** A 0 inset */
-    public final static Insets ZERO_INSETS = new Insets(0, 0, 0, 0);
-
-
-
-    /**
-     * All of the WT_  members are used to define the column and row
-     * weights  for the doLayout routines.  They are double arrays,
-     * typically one for each col or row, that hold either a 1 or a 0.
-     * The &quot;Y&quot; and &quot;N&quot; implies YES or NO, i.e.,
-     * does the corresponding row/column get weight (Y) or not get weight (N).
-     * <p>
-     * So for example, if you wanted to have no stretchiness in the first column
-     * and put all of the stretchiness into the second column you would use:<pre>
-     * WT_NY</pre>
-     * <p>
-     * Note, you can pass in your own double arrays to doLayout. These are just here
-     * for convenience.
-     */
-    public static final double[] WT_Y = { 1 };
-
-    /** doLayout weights */
-    public static final double[] WT_YY = { 1, 1 };
-
-    /** doLayout weights */
-    public static final double[] WT_YYY = { 1, 1, 1 };
-
-    /** doLayout weights */
-    public static final double[] WT_N = { 0 };
-
-    /** doLayout weights */
-    public static final double[] WT_NN = { 0 };
-
-    /** doLayout weights */
-    public static final double[] WT_NNN = { 0 };
-
-    /** doLayout weights */
-    public static final double[] WT_YN = { 1, 0 };
-
-    /** doLayout weights */
-    public static final double[] WT_YYN = { 1, 1, 0 };
-
-    /** doLayout weights */
-    public static final double[] WT_YNYN = { 1, 0, 1, 0 };
-
-    /** doLayout weights */
-    public static final double[] WT_NY = { 0, 1 };
-
-    /** doLayout weights */
-    public static final double[] WT_NYN = { 0, 1, 0 };
-
-    /** doLayout weights */
-    public static final double[] WT_YNY = { 1, 0, 1 };
-
-    /** doLayout weights */
-    public static final double[] WT_YNN = { 1, 0, 0 };
-
-    /** doLayout weights */
-    public static final double[] WT_NNY = { 0, 0, 1 };
-
-    /** doLayout weights */
-    public static final double[] WT_NNNY = { 0, 0, 0, 1 };
-
-    /** doLayout weights */
-    public static final double[] WT_NNYN = { 0, 0, 1, 0 };
-
-    /** doLayout weights */
-    public static final double[] WT_NNYNY = { 0, 0, 1, 0, 1 };
-
-    /** doLayout weights */
-    public static final double[] WT_NNYNYNY = {
-        0, 0, 1, 0, 1, 0, 1
-    };
-
-    /** doLayout weights */
-    public static final double[] WT_NYNY = { 0, 1, 0, 1 };
-
-    /** Separator flag */
-    public static final String MENU_SEPARATOR = "separator";
-
     /** Holds a mapping from image filename to Image object */
     private static Hashtable imageCache = new Hashtable();
 
@@ -391,398 +265,8 @@ public class GuiUtils {
 
 
 
-    /**
-     * Turns off component fill for the doLayout routine
-     */
-    public static void setNoFill() {
-        tmpFill = GridBagConstraints.NONE;
-    }
-
-    /**
-     * Wrap the component so that it only expands horizontally, not vertically
-     *
-     * @param comp The component
-     *
-     * @return The wrapped component
-     */
-    public static JComponent hfill(JComponent comp) {
-        setHFill();
-        return doLayout(new Component[] { comp }, 1, GuiUtils.WT_Y,
-                        GuiUtils.WT_N);
-    }
-
-    /**
-     * Turns on component horizontal fill for the doLayout routine
-     */
-    public static void setHFill() {
-        tmpFill = GridBagConstraints.HORIZONTAL;
-    }
-
-    /**
-     * Sets the anchor to bottom for doLayout
-     */
-    public static void setAnchorBottom() {
-        tmpAnchor = GridBagConstraints.SOUTHWEST;
-    }
-
-    /**
-     * Sets the anchor to top for doLayout
-     */
-    public static void setAnchorTop() {
-        tmpAnchor = GridBagConstraints.NORTHEAST;
-    }
 
 
-
-
-    /**
-     * Inset the given component by the given insetSize, both
-     * horizontally  and vertically.
-     *
-     * @param c The component to wrap
-     * @param insetSize Horizontal and vertical inset
-     * @return A JPanel that contains the given component inset the specified amount.
-     */
-    public static JPanel inset(Component c, int insetSize) {
-        return inset(c, insetSize, insetSize);
-    }
-
-    /**
-     * Inset the given component by the given insetSize for
-     * horizontally  and vertically.
-     *
-     * @param c The component to wrap
-     * @param insetSizeHor Inset horizontal
-     * @param insetSizeVert Inset vertical
-     * @return A JPanel that contains the given component inset the specified amount.
-     */
-    public static JPanel inset(Component c, int insetSizeHor,
-                               int insetSizeVert) {
-        return doLayout(new JPanel(), new Component[] { c }, 1, WT_Y, WT_Y,
-                        null, null,
-                        new Insets(insetSizeVert, insetSizeHor,
-                                   insetSizeVert, insetSizeHor));
-    }
-
-    /**
-     * Inset the given component by the given insets.
-     *
-     * @param c The component to wrap
-     * @param insets The insets
-     * @return A JPanel that contains the given component inset the specified amount.
-     */
-    public static JPanel inset(Component c, Insets insets) {
-        return doLayout(new JPanel(), new Component[] { c }, 1, WT_Y, WT_Y,
-                        null, null, insets);
-    }
-
-    /**
-     * Inset the given component, adding it into the
-     * given parent container, by the given insetSize, both
-     * horizontally  and vertically.
-     *
-     * @param parent The panel to put the component in.
-     * @param c The component to wrap
-     * @param insetSize Horizontal and vertical inset
-     * @return A JPanel that contains the given component inset the specified amount.
-     */
-    public static JPanel inset(JPanel parent, Component c, int insetSize) {
-        return doLayout(parent, new Component[] { c }, 1, WT_Y, WT_Y, null,
-                        null,
-                        new Insets(insetSize, insetSize, insetSize,
-                                   insetSize));
-    }
-
-
-
-
-    /**
-     * Wrap the given component, aligning it to the left.
-     * It won't expand the component.
-     *
-     * @param c The component to wrap
-     * @return The wrapper
-     */
-    public static JPanel wrapLeft(Component c) {
-        return doLayout(new Component[] { c, filler() }, 2, WT_NY, WT_N);
-    }
-
-
-    /**
-     * Wrap the given component. This won't expand the component.
-     * Use this when you want to place a component and not expand it.
-     *
-     * @param c The component to wrap
-     * @return The wrapper
-     */
-    public static JPanel wrap(Component c) {
-        return doLayout(new Component[] { c }, 1, WT_N, WT_N);
-    }
-
-
-
-    /**
-     * This does a column oriented grid bag layout. It will layout
-     * the given components in a grid with the given number of columns.
-     *
-     * @param components List of {@link Component}s to layout
-     * @param numberOfColumns How many columns in the grid layout
-     * @param hinset hor. inset
-     * @param vinset vert. inset
-     * @return THe new panel
-     */
-    public static JPanel doLayout(List components, int numberOfColumns,
-                                  int hinset, int vinset) {
-        return doLayout(new JPanel(), getComponentArray(components),
-                        numberOfColumns, WT_N, WT_N, null, null,
-                        new Insets(hinset, vinset, hinset, vinset));
-    }
-
-
-    /**
-     * This does a column oriented grid bag layout. It will layout
-     * the given components in a grid with the given number of columns.
-     *
-     * @param components The  components to layout
-     * @param numberOfColumns How many columns in the grid layout
-     * @param weightsX Defines how much weight to give to each column width. If there are more
-     * columns than weights then we use the last weight.
-     * @param weightsY Defines how much weight to give to each row height. If there are more
-     * rows than weights then we use the last weight.
-     * @return New panel
-     */
-    public static JPanel doLayout(List components, int numberOfColumns,
-                                  double[] weightsX, double[] weightsY) {
-        return doLayout(new JPanel(), getComponentArray(components),
-                        numberOfColumns, weightsX, weightsY, null, null,
-                        null);
-    }
-
-
-
-    /**
-     * This does a column oriented grid bag layout. It will layout
-     * the given components in a grid with the given number of columns.
-     *
-     * @param components The  components to layout
-     * @param numberOfColumns How many columns in the grid layout
-     * @param weightsX Defines how much weight to give to each column width. If there are more
-     * columns than weights then we use the last weight.
-     * @param weightsY Defines how much weight to give to each row height. If there are more
-     * rows than weights then we use the last weight.
-     * @return New panel
-     */
-    public static JPanel doLayout(Component[] components,
-                                  int numberOfColumns, double[] weightsX,
-                                  double[] weightsY) {
-        return doLayout(new JPanel(), components, numberOfColumns, weightsX,
-                        weightsY, null, null, null);
-    }
-
-
-
-    /**
-     * This does a column oriented grid bag layout. It will layout
-     * the given components in a grid with the given number of columns.
-     *
-     * @param parentContainer The container to add components to. May be null.
-     * @param components The  components to layout
-     * @param numberOfColumns How many columns in the grid layout
-     * @param weightsX Defines how much weight to give to each column width. If there are more
-     * columns than weights then we use the last weight.
-     * @param weightsY Defines how much weight to give to each row height. If there are more
-     * rows than weights then we use the last weight.
-     * @return New panel
-     */
-    public static JPanel doLayout(JPanel parentContainer,
-                                  Component[] components,
-                                  int numberOfColumns, double[] weightsX,
-                                  double[] weightsY) {
-        return doLayout(parentContainer, components, numberOfColumns,
-                        weightsX, weightsY, null, null, null);
-    }
-
-
-    /**
-     * This does a column oriented grid bag layout. It will layout
-     * the given components in a grid with the given number of columns.
-     * It is probably good to read up a bit on
-     * <a href=http://java.sun.com/j2se/1.3/docs/api/java/awt/GridBagLayout.html>GridBagLayout</a>
-     * <p>
-     * The weights define how much weight or spacing to give to the width
-     * of each column and the height of each row.
-     * <p>
-     * To define the anchor value, i.e., how to fill a component in its grid square,
-     * you can either set the global static member <code>tmpAnchor</code> or, for individual
-     * Components you can use the anchors table to provide a mapping from Component to an
-     * Integer object holding the anchor value.
-     * <p>
-     * To define the fill value, i.e., how a component expands in its grid square,
-     * you can either set the global static member <code>tmpFill</code> or, for individual
-     * Components you can use the fills table to provide a mapping from Component to an
-     * Integer object holding the fill value.
-     * <p>
-     * If insets is non-null it will use those insets for the spacing in the grid.
-     * else if the static member tmpInsets is non-null then it will use those values
-     * and then set tmpInsets to null. Else it uses DFLT_INSETS, which is 0 spacing.
-     * <p>
-     *
-     *
-     * @param parentContainer The container to add components to. May be null.
-     * @param components The  components to layout
-     * @param numberOfColumns How many columns in the grid layout
-     * @param weightsX Defines how much weight to give to each column width. If there are more
-     * columns than weights then we use the last weight.
-     * @param weightsY Defines how much weight to give to each row height. If there are more
-     * rows than weights then we use the last weight.
-     * @param anchors Hashtable that maps Component to the Integer  which defines the component anchor
-     * @param fills Hashtable that maps Component to the Integer  which defines the component fill
-     * @param insets The insets to use in the grid
-     * @return The parentContainer or the new panel if parentContainer is null
-     */
-    public static JPanel doLayout(JPanel parentContainer,
-                                  Component[] components,
-                                  int numberOfColumns, double[] weightsX,
-                                  double[] weightsY, Hashtable anchors,
-                                  Hashtable fills, Insets insets) {
-
-        if (parentContainer == null) {
-            parentContainer = new JPanel();
-        }
-
-        //TODO: When we move to 1.6 we need to remove this fix
-        //Check if we've blown the size limit for gridbag
-        if (components.length > 512) {
-            //Not perfect but...
-            Component[] comps1 = new Component[components.length / 2];
-            Component[] comps2 = new Component[components.length / 2 + 1];
-            int         cnt    = 0;
-            for (int i = 0; i < components.length; i++) {
-                if (i < comps1.length) {
-                    comps1[i] = components[i];
-                } else {
-                    comps2[cnt++] = components[i];
-                }
-            }
-            JComponent comp1 = doLayout(null, comps1, numberOfColumns,
-                                        weightsX, weightsY, anchors, fills,
-                                        insets);
-            JComponent comp2 = doLayout(null, comps2, numberOfColumns,
-                                        weightsX, weightsY, anchors, fills,
-                                        insets);
-
-            return vbox(comp1, comp2);
-        }
-
-
-
-        GridBagLayout l = new GridBagLayout();
-        parentContainer.setLayout(l);
-
-        GridBagConstraints consts = new GridBagConstraints();
-        if (insets == null) {
-            insets    = tmpInsets;
-            tmpInsets = null;
-        }
-        consts.insets = ((insets == null)
-                         ? DFLT_INSETS
-                         : insets);
-
-
-        int[] dfltColFills = null;
-        if (tmpColFills != null) {
-            dfltColFills = tmpColFills;
-        }
-        tmpColFills = null;
-
-        int dfltAnchor = ((tmpAnchor == -1)
-                          ? DFLT_ANCHOR
-                          : tmpAnchor);
-        tmpAnchor = -1;
-        int dfltFill = ((tmpFill >= 0)
-                        ? tmpFill
-                        : GridBagConstraints.BOTH);
-        tmpFill = -1;
-
-        int    col     = 0;
-        int    row     = 0;
-
-        double weightX = 1.0;
-        double weightY = 0.0;
-
-        for (int i = 0; i < components.length; i++) {
-            Component comp = components[i];
-            consts.anchor = dfltAnchor;
-
-            consts.fill   = dfltFill;
-            if ((fills != null) && (comp != null)) {
-                Integer fill = (Integer) fills.get(comp);
-                if (fill != null) {
-                    consts.fill = fill.intValue();
-                }
-            } else if (dfltColFills != null) {
-                consts.fill = dfltColFills[col];
-            }
-
-            if ((weightsX != null) && (col < weightsX.length)) {
-                weightX = weightsX[col];
-            }
-
-            if ((weightsY != null) && (row < weightsY.length)) {
-                weightY = weightsY[row];
-            }
-
-            boolean lastCol = false;
-
-            if (col == (numberOfColumns - 1)) {
-                lastCol          = true;
-                consts.gridwidth = GridBagConstraints.REMAINDER;
-            } else {
-                col++;
-            }
-            consts.weightx = weightX;
-            consts.weighty = weightY;
-
-
-
-            if ((anchors != null) && (comp != null)) {
-                Integer anchor = (Integer) anchors.get(comp);
-                if (anchor != null) {
-                    consts.anchor = anchor.intValue();
-                }
-            }
-            if (lastCol) {
-                col = 0;
-                row++;
-            }
-
-            if (comp != null) {
-                l.setConstraints(comp, consts);
-                parentContainer.add(comp);
-            }
-            consts.gridwidth = 1;
-        }
-        return parentContainer;
-
-    }
-
-
-
-
-
-    /**
-     * A utility to convert the listOfComponents into a Component  array
-     *
-     * @param listOfComponents List of Components
-     * @return Component  array
-     */
-    public static Component[] getComponentArray(List listOfComponents) {
-        Component[] c = new Component[listOfComponents.size()];
-        for (int i = 0; i < listOfComponents.size(); i++) {
-            c[i] = (Component) listOfComponents.get(i);
-        }
-        return c;
-    }
 
 
     /**
@@ -1700,264 +1184,6 @@ public class GuiUtils {
 
 
 
-    /**
-     * Layout the given components vertically.
-     *
-     * @param c1 Component 1
-     * @param c2 Component 2
-     * @return The new container of the components.
-     */
-    public static JPanel vbox(Component c1, Component c2) {
-        return vbox(Misc.newList(c1, c2));
-    }
-
-    /**
-     * Layout the given components vertically.
-     *
-     * @param c1 Component 1
-     * @param c2 Component 2
-     * @param c3 Component 3
-     * @return The new container of the components.
-     */
-    public static JPanel vbox(Component c1, Component c2, Component c3) {
-        return vbox(Misc.newList(c1, c2, c3));
-    }
-
-    /**
-     * Layout the given components vertically.
-     *
-     * @param c1 Component 1
-     * @param c2 Component 2
-     * @param c3 Component 3
-     * @param c4 Component 4
-     * @return The new container of the components.
-     */
-    public static JPanel vbox(Component c1, Component c2, Component c3,
-                              Component c4) {
-        return vbox(Misc.newList(c1, c2, c3, c4));
-    }
-
-    /**
-     * Layout the given components vertically.
-     *
-     * @param components The components
-     * @return The new container of the components.
-     */
-    public static JPanel vbox(Component[] components) {
-        return vbox(Misc.toList(components));
-    }
-
-
-    /**
-     * Layout the given components vertically.
-     *
-     * @param components The components
-     * @return The new container of the components.
-     */
-    public static JPanel vbox(List components) {
-        return vbox(new JPanel(), components);
-    }
-
-    /**
-     * Layout the given components vertically.
-     *
-     * @param components The components
-     * @param panel The panel  to put the components in if on-null.
-     * @return The given panel if non-null, else the newly create panel.
-     */
-    public static JPanel vbox(JPanel panel, List components) {
-        return doLayout(panel, getComponentArray(components), 1, WT_Y, WT_N);
-    }
-
-
-
-    /**
-     *  This places the given components in a vertical orientation, left aligned.
-     *
-     * @param components The components
-     * @return The new container of the components.
-     */
-    public static JPanel leftVbox(List components) {
-        List tmp = new ArrayList();
-        for (int i = 0; i < components.size(); i++) {
-            tmp.add(left((Component) components.get(i)));
-        }
-        return GuiUtils.vbox(tmp);
-    }
-
-
-
-    /**
-     *  Creates a JPanel and does a BorderLayout-NORTH of the given component
-     *
-     * @param top The component to place
-     * @return The new JPanel
-     */
-    public static JPanel topLeft(Component top) {
-        return top(left(top));
-    }
-
-
-
-
-    /**
-     *  Creates a JPanel and does a BorderLayout-NORTH of the given component
-     *
-     * @param top The component to place
-     * @return The new JPanel
-     */
-    public static JPanel top(Component top) {
-        return topCenterBottom(top, filler(), null);
-    }
-
-
-    /**
-     *  Creates a JPanel and does a BorderLayout.WEST of the given component
-     *
-     * @param left The component to place
-     * @return The new JPanel
-     */
-    public static JPanel left(Component left) {
-        return leftCenter(left, filler());
-    }
-
-
-    /**
-     *  Creates a JPanel and does a BorderLayout NORTH/CENTER of the given components
-     *
-     * @param top The top component
-     * @param center The center component
-     * @return The new JPanel
-     */
-    public static JPanel topCenter(Component top, Component center) {
-        return topCenterBottom(top, center, null);
-    }
-
-    /**
-     *  Creates a JPanel and does a BorderLayout CENTER/SOUTH of the given components
-     *
-     * @param center The center component
-     * @param bottom The bottom component
-     * @return The new JPanel
-     */
-    public static JPanel centerBottom(Component center, Component bottom) {
-        return topCenterBottom(null, center, bottom);
-    }
-
-
-    /**
-     *  Creates a JPanel and does a BorderLayout SOUTH of the given component
-     *
-     * @param bottom The bottom component
-     * @return The new JPanel
-     */
-    public static JPanel bottom(Component bottom) {
-        return topCenterBottom(null, null, bottom);
-    }
-
-    /**
-     *  Creates a JPanel and does a BorderLayout CENTER of the given component
-     *
-     * @param center The center component
-     * @return The new JPanel
-     */
-    public static JPanel center(Component center) {
-        return topCenterBottom(null, center, null);
-    }
-
-
-    /**
-     *  Creates a JPanel and does a BorderLayout of the given components
-     *
-     * @param top The top component  (may be null)
-     * @param center The center component (may be null)
-     * @param bottom The bottom component (may be null)
-     * @return The new JPanel
-     */
-    public static JPanel topCenterBottom(Component top, Component center,
-                                         Component bottom) {
-        JPanel p = new JPanel(new BorderLayout());
-        if (top != null) {
-            p.add("North", top);
-        }
-        if (center != null) {
-            p.add("Center", center);
-        }
-        if (bottom != null) {
-            p.add("South", bottom);
-        }
-        return p;
-    }
-
-
-    /**
-     *  Creates a JPanel and does a BorderLayout of the given components
-     *
-     * @param left The left component
-     * @param right The right component
-     * @return The new panel
-     */
-    public static JPanel leftRight(Component left, Component right) {
-        return leftCenterRight(left, null, right);
-    }
-
-    /**
-     *  Creates a JPanel and does a BorderLayout of the given components
-     *
-     * @param left The left component
-     * @param center The center component
-     * @param right The right component
-     * @return The new panel
-     */
-    public static JPanel leftCenterRight(Component left, Component center,
-                                         Component right) {
-        JPanel p = new JPanel(new BorderLayout());
-        if (left != null) {
-            p.add("West", left);
-        }
-        if (center != null) {
-            p.add("Center", center);
-        }
-        if (right != null) {
-            p.add("East", right);
-        }
-        return p;
-    }
-
-    /**
-     *  Creates a JPanel and does a BorderLayout of the given components
-     *
-     * @param center The center component
-     * @param right The right component
-     * @return The new panel
-     */
-    public static JPanel centerRight(Component center, Component right) {
-        return leftCenterRight(null, center, right);
-    }
-
-    /**
-     *  Creates a JPanel and does a BorderLayout of the given components
-     *
-     * @param right The right component
-     * @return The new panel
-     */
-    public static JPanel right(Component right) {
-        return leftCenterRight(null, null, right);
-    }
-
-
-
-    /**
-     *  Creates a JPanel and does a BorderLayout of the given components
-     *
-     * @param left The left component
-     * @param center The center component
-     * @return The new panel
-     */
-
-    public static JPanel leftCenter(Component left, Component center) {
-        return leftCenterRight(left, center, null);
-    }
 
 
     /**
@@ -1996,363 +1222,6 @@ public class GuiUtils {
 
 
 
-    /**
-     * Do a horizontal layout of the given components with the given spacing.
-     *
-     * @param c1 Component 1
-     * @param c2 Component 2
-     * @param spacing Inter component spacing
-     * @return The new container of the components
-     */
-    public static JPanel hbox(Component c1, Component c2, int spacing) {
-        return hbox(new JPanel(), Misc.newList(c1, c2), spacing);
-    }
-
-
-
-    /**
-     * Do a horizontal layout of the given components with the given spacing.
-     *
-     * @param c1 Component 1
-     * @param c2 Component 2
-     * @param c3 Component 3
-     * @param spacing Inter component spacing
-     * @return The new container of the components
-     */
-    public static JPanel hbox(Component c1, Component c2, Component c3,
-                              int spacing) {
-        return hbox(new JPanel(), Misc.newList(c1, c2, c3), spacing);
-    }
-
-    /**
-     * Do a horizontal layout of the given components.
-     *
-     * @param c1 Component 1
-     * @param c2 Component 2
-     * @return The new container of the components
-     */
-
-    public static JPanel hbox(Component c1, Component c2) {
-        return hbox(Misc.newList(c1, c2));
-    }
-
-    /**
-     * Do a horizontal layout of the given components.
-     *
-     * @param c1 Component 1
-     * @param c2 Component 2
-     * @param c3 Component 3
-     * @return The new container of the components
-     */
-
-    public static JPanel hbox(Component c1, Component c2, Component c3) {
-        return hbox(Misc.newList(c1, c2, c3));
-    }
-
-    /**
-     * Do a horizontal layout of the given components.
-     *
-     * @param c1 Component 1
-     * @param c2 Component 2
-     * @param c3 Component 3
-     * @param c4 Component 4
-     * @return The new container of the components
-     */
-    public static JPanel hbox(Component c1, Component c2, Component c3,
-                              Component c4) {
-        return hbox(Misc.newList(c1, c2, c3, c4));
-    }
-
-    /**
-     * Do a horizontal layout of the given components.
-     *
-     * @param components The components
-     * @param spacing The spacing
-     * @return The new container of the components
-     */
-    public static JPanel hbox(List components, int spacing) {
-        return hbox(new JPanel(), components, spacing);
-    }
-
-
-    /**
-     * Do a horizontal layout of the given components.
-     *
-     * @param components The components
-     * @return The new container of the components
-     */
-    public static JPanel hbox(List components) {
-        return hbox(new JPanel(), components);
-    }
-
-
-    /**
-     * Do a horizontal layout of the given components.
-     *
-     * @param components The components
-     * @return The new container of the components
-     */
-    public static JPanel hbox(Component[] components) {
-        return hbox(new JPanel(), Misc.toList(components));
-    }
-
-    /**
-     * Do a horizontal layout of the given components.
-     *
-     * @param components The components
-     * @param spacing _more_
-     * @return The new container of the components
-     */
-    public static JPanel hbox(Component[] components, int spacing) {
-        return hbox(new JPanel(), Misc.toList(components), spacing);
-    }
-
-
-
-
-    /**
-     * Do a horizontal layout of the given components.
-     *
-     * @param panel The panel to use or, if null,  we'll create a new on.
-     * @param components The components
-     * @return The  container of the components
-     */
-    public static JPanel hbox(JPanel panel, List components) {
-        return hbox(panel, components, 0);
-    }
-
-
-
-
-    /**
-     * Do a horizontal layout of the given components.
-     *
-     * @param panel The panel to use or, if null,  we'll create a new on.
-     * @param components The components
-     * @param space SPacing to use
-     * @return The  container of the components
-     */
-    public static JPanel hbox(JPanel panel, List components, int space) {
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        for (int i = 0; i < components.size(); i++) {
-            panel.add((Component) components.get(i));
-            if (space > 0) {
-                panel.add(Box.createHorizontalStrut(space));
-            }
-        }
-        return panel;
-    }
-
-
-    /**
-     * Create a new JPanel and add the given components to it using
-     * a FlowLayout.
-     *
-     * @param components The components to layout
-     * @return The new JPanel
-     */
-    public static JPanel hflow(List components) {
-        return hflow(components, 0, 0);
-    }
-
-
-
-    /**
-     * Create a new JPanel and add the given components to it using
-     * a FlowLayout.
-     *
-     * @param components The components to layout
-     * @param hgap Horizontal spacing
-     * @param vgap Vertical spacing
-     * @return The new JPanel
-     */
-    public static JPanel hflow(List components, int hgap, int vgap) {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, hgap, vgap));
-        for (int i = 0; i < components.size(); i++) {
-            Component comp = (Component) components.get(i);
-            if (comp != null) {
-                p.add(comp);
-            }
-        }
-        return p;
-    }
-
-
-
-
-    /**
-     * Do a horizontal grid layout of the given components
-     *
-     *
-     * @param comp1 comp1
-     * @param comp2 comp2_
-     * @return The new JPanel holding the given components
-     */
-    public static JPanel hgrid(Component comp1, Component comp2) {
-        return hgrid(Misc.newList(comp1, comp2));
-    }
-
-
-    /**
-     * Do a horizontal grid layout of the given components
-     *
-     * @param components The components to layout
-     * @return The new JPanel holding the given components
-     */
-    public static JPanel hgrid(List components) {
-        return hgrid(components, 0);
-    }
-
-
-    /**
-     * Do a horizontal grid layout of the given components
-     *
-     * @param components The components to layout
-     * @param space The spacing
-     * @return The new JPanel holding the given components
-     */
-    public static JPanel hgrid(List components, int space) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(1, 0, space, space));
-        for (int i = 0; i < components.size(); i++) {
-            panel.add((Component) components.get(i));
-        }
-        return panel;
-    }
-
-
-    /**
-     * Do a single column  grid layout of the components
-     *
-     * @param components The components to layout
-     * @return The new JPanel
-     */
-    public static JPanel vgrid(List components) {
-        return vgrid(new JPanel(), components, 0);
-    }
-
-    /**
-     * Do a single column  grid layout of the components
-     *
-     * @param panel The panel to add to
-     * @param components The components to layout
-     * @param space The spacing
-     * @return The panel
-     */
-    public static JPanel vgrid(JPanel panel, List components, int space) {
-        if (panel == null) {
-            panel = new JPanel();
-        }
-        panel.setLayout(new GridLayout(0, 1, space, space));
-        for (int i = 0; i < components.size(); i++) {
-            panel.add((Component) components.get(i));
-        }
-        return panel;
-    }
-
-
-    /**
-     * Do a grid layout with the number of rows
-     *
-     * @param comps Components to layout
-     * @param rows Number of rows
-     * @return The new panel
-     */
-    public static JPanel rowGrid(List comps, int rows) {
-        return rowGrid(getComponentArray(comps), rows);
-    }
-
-    /**
-     * Do a grid layout with the number of rows
-     *
-     * @param components Components to layout
-     * @param rows Number of rows
-     * @return The new panel
-     */
-    public static JPanel rowGrid(Component[] components, int rows) {
-        return grid(components, rows, 0, 0);
-    }
-
-    /**
-     * Do a grid layout with the number of columns
-     *
-     * @param components Components to layout
-     * @param cols Number of cols
-     * @return The new panel
-     */
-
-    public static JPanel colGrid(Component[] components, int cols) {
-        return grid(components, 0, cols, 0);
-    }
-
-
-    /**
-     * Do a grid layout with the number of columns
-     *
-     * @param components Components to layout
-     * @param rows Number of rows (0 implies not fixed)
-     * @param cols Number of cols (0 implies not fixed)
-     * @return The new panel
-     */
-    public static JPanel grid(Component[] components, int rows, int cols) {
-        return grid(components, rows, cols, 0);
-    }
-
-
-    /**
-     * Do a grid layout with the number of columns
-     *
-     * @param components Components to layout
-     * @param rows Number of rows (0 implies not fixed)
-     * @param cols Number of cols (0 implies not fixed)
-     * @param space Spacing
-     * @return The new panel
-     */
-
-
-    public static JPanel grid(Component[] components, int rows, int cols,
-                              int space) {
-        JPanel p = new JPanel();
-        p.setLayout(new GridLayout(rows, cols, space, space));
-        for (int i = 0; i < components.length; i++) {
-            if (components[i] == null) {
-                p.add(filler());
-            } else {
-                p.add((Component) components[i]);
-            }
-        }
-        return p;
-    }
-
-
-    /**
-     * A utility for having fillers in layout. This just returns  an
-     * empty JPanel but we have it as a method so calling code can be explicit
-     * in what they are intending.
-     *
-     * @return Filler
-     */
-    public static Component filler() {
-        return new JPanel();
-    }
-
-
-
-    /**
-     * A utility for having fillers in layout. This just returns  an
-     * empty JPanel but we have it as a method so calling code can be explicit
-     * in what they are intending.
-     *
-     *
-     * @param width filler width
-     * @param height filler height
-     * @return Filler
-     */
-    public static JComponent filler(int width, int height) {
-        JPanel filler = new JPanel();
-        filler.setPreferredSize(new Dimension(width, height));
-        return filler;
-    }
 
 
     /**
@@ -2425,7 +1294,6 @@ public class GuiUtils {
      * @param buttonMap If non-null will hold a mapping from (String) command to JButton
      * @return JPanel that contains the buttons
      */
-
     public static JPanel makeButtons(ActionListener l, String[] labels,
                                      String[] cmds, String[] tooltips,
                                      Hashtable buttonMap) {
@@ -3264,91 +2132,6 @@ public class GuiUtils {
         }
         return menuBar;
     }
-
-
-    /**
-     * Create a popup menu and  show it near the given component
-     *
-     * @param menuItems List of menu items
-     * @param comp Component to show the menu at
-     */
-    public static void showPopupMenu(List menuItems, Component comp) {
-        JPopupMenu popup = makePopupMenu(menuItems);
-        popup.show(comp, 0, (int) comp.getBounds().getHeight());
-    }
-
-
-    /**
-     *  Create a JPopupMenu and add the menus contained with the menus list
-     *  If no menus then return null.
-     *
-     * @param menu The menu
-     * @param menuItems List of either, JMenu, JMenuItem or MENU_SEPARATOR
-     * @return The given menu
-     */
-    public static JPopupMenu makePopupMenu(JPopupMenu menu, List menuItems) {
-        if ((menuItems == null) || (menuItems.size() == 0)) {
-            return null;
-        }
-        for (int i = 0; i < menuItems.size(); i++) {
-            Object o = menuItems.get(i);
-            if (o.toString().equals(MENU_SEPARATOR)) {
-                menu.addSeparator();
-            } else if (o instanceof JMenuItem) {
-                menu.add((JMenuItem) o);
-            } else if (o instanceof JMenu) {
-                menu.add((JMenu) o);
-            }
-        }
-        return menu;
-    }
-
-    /**
-     *  Create a JPopupMenu and add the menus contained with the menus list
-     *  If no menus then return null.
-     *
-     * @param menuItems List of either, JMenu, JMenuItem or MENU_SEPARATOR
-     * @return The new popup menu
-     */
-    public static JPopupMenu makePopupMenu(List menuItems) {
-        return makePopupMenu(new JPopupMenu(), menuItems);
-    }
-
-    /**
-     *  Create a JMenu and add the menus contained with the menus list
-     *  If no menus then return null.
-     *
-     * @param name The menu name
-     * @param menuItems List of either, JMenu, JMenuItem or MENU_SEPARATOR
-     * @return The new menu
-     */
-    public static JMenu makeMenu(String name, List menuItems) {
-        return makeMenu(new JMenu(name), menuItems);
-    }
-
-    /**
-     *  Create a JMenu and add the menus contained with the menus list
-     *  If no menus then return null.
-     *
-     * @param menu The menu to add to
-     * @param menuItems List of either, JMenu, JMenuItem or MENU_SEPARATOR
-     * @return The given menu
-     */
-    public static JMenu makeMenu(JMenu menu, List menuItems) {
-        if (menuItems == null) {
-            return menu;
-        }
-        for (int i = 0; i < menuItems.size(); i++) {
-            Object o = menuItems.get(i);
-            if (o.toString().equals(MENU_SEPARATOR)) {
-                menu.addSeparator();
-            } else if (o instanceof JMenuItem) {
-                menu.add((JMenuItem) o);
-            }
-        }
-        return menu;
-    }
-
 
 
 
@@ -4227,9 +3010,9 @@ public class GuiUtils {
             ActionListener listener, Hashtable menuItems)
             throws Exception {
         NamedNodeMap attrs    = node.getAttributes();
-        String       label    = Msg.msg(XmlUtil.getAttribute(attrs, "label"));
+        String       label    = Msg.msg(getAttribute(attrs, "label"));
         JMenuItem    menuItem = new JMenuItem(label);
-        String mnemonic = XmlUtil.getAttribute(node, "mnemonic",
+        String mnemonic = getAttribute(node, "mnemonic",
                               (String) null);
         if (mnemonic != null) {
             int keyCode =
@@ -4239,18 +3022,17 @@ public class GuiUtils {
             }
         }
 
-
-        String tooltip = XmlUtil.getAttribute(attrs, ATTR_TOOLTIP,
+        String tooltip = getAttribute(attrs, ATTR_TOOLTIP,
                              (String) null);
         if (tooltip != null) {
             menuItem.setToolTipText(tooltip);
         }
 
 
-        String action = XmlUtil.getAttribute(attrs, ATTR_ACTION,
+        String action = getAttribute(attrs, ATTR_ACTION,
                                              (String) null);
-        String id   = XmlUtil.getAttribute(attrs, ATTR_ID, (String) null);
-        String icon = XmlUtil.getAttribute(attrs, ATTR_ICON, (String) null);
+        String id   = getAttribute(attrs, ATTR_ID, (String) null);
+        String icon = getAttribute(attrs, ATTR_ICON, (String) null);
         menuItem.addActionListener(listener);
         if (action != null) {
             menuItem.setActionCommand(action);
@@ -4366,6 +3148,7 @@ public class GuiUtils {
         return -1;
     }
 
+
     /**
      *     Create the JMenu from the given xml.
      *
@@ -4381,11 +3164,11 @@ public class GuiUtils {
                                        Hashtable menuItems)
             throws Exception {
         NamedNodeMap attrs    = menuNode.getAttributes();
-        String       id = XmlUtil.getAttribute(attrs, "id", (String) null);
+        String       id = getAttribute(attrs, "id", (String) null);
         NodeList     children = menuNode.getChildNodes();
-        String       label    = Msg.msg(XmlUtil.getAttribute(attrs, "label"));
+        String       label    = Msg.msg(getAttribute(attrs, "label"));
         JMenu        menu     = new JMenu(label);
-        String mnemonic = XmlUtil.getAttribute(menuNode, "mnemonic",
+        String mnemonic = getAttribute(menuNode.getAttributes(), "mnemonic",
                               (String) null);
         if (mnemonic != null) {
             int keyCode =
@@ -4404,7 +3187,7 @@ public class GuiUtils {
             } else {
                 menuToReturn = null;
                 menu         = existing;
-                if (XmlUtil.getAttribute(menuNode, "replace", false)) {
+                if (getAttribute(menuNode.getAttributes(), "replace", false)) {
                     menu.removeAll();
                 }
             }
@@ -4445,7 +3228,7 @@ public class GuiUtils {
             menuBar = new JMenuBar();
         }
         try {
-            List menus = XmlUtil.findChildren(root, "menu");
+            List menus = findChildren(root, "menu");
             for (int i = 0; i < menus.size(); i++) {
                 JMenu menu = processXmlMenu((Node) menus.get(i), listener,
                                             menuItems);
@@ -5365,140 +4148,6 @@ public class GuiUtils {
 
 
 
-    /**
-     * Utility to make a list of menu items.
-     *
-     * @param object The object to call the method on
-     * @param items An array. Each sub array has at least two elements:<pre>
-     * {Menu name, method name}
-     * </pre>
-     * If it has 3 elements then the 3rd element is an argument that is also passed
-     * to the method. If it has 4 elements then the 4th element is a tooltip.
-     * If there are 4 elements and the 3rd element is null then we don't try to find a method
-     * that tags an extra argument.
-     *
-     * @return List of menu items
-     */
-    public static List makeMenuItems(Object object, Object[][] items) {
-        List list = new ArrayList();
-        for (int i = 0; i < items.length; i++) {
-            JMenuItem menuItem = makeMenuItem(items[i][0].toString(), object,
-                                     items[i][1].toString(),
-                                     ((items[i].length >= 3)
-                                      ? items[i][2]
-                                      : null));
-
-            if (items[i].length == 4) {
-                menuItem.setToolTipText((String) items[i][3]);
-            }
-            list.add(menuItem);
-        }
-        return list;
-    }
-
-
-    /**
-     * Make a jmenuItem. Call methodName on object when menuItem pressed.
-     *
-     * @param label Label
-     * @param object Object to call
-     * @param methodName Method name to call
-     *
-     * @return The menuItem
-     */
-    public static JMenuItem makeMenuItem(String label, final Object object,
-                                         final String methodName) {
-        return makeMenuItem(label, object, methodName, null);
-    }
-
-
-
-    /**
-     * Make a checkbox menu item. Automatically call the set'property' method on the object
-     *
-     * @param label Label
-     * @param object  Object to call
-     * @param property Name of property to get/set value
-     * @param arg Optional arg to pass to method
-     *
-     * @return The checkbox
-     */
-    public static JCheckBoxMenuItem makeCheckboxMenuItem(String label,
-            final Object object, final String property, final Object arg) {
-
-        boolean value = true;
-        try {
-            String methodName = "get"
-                                + property.substring(0, 1).toUpperCase()
-                                + property.substring(1);
-            Method theMethod = Misc.findMethod(object.getClass(), methodName,
-                                   ((arg == null)
-                                    ? new Class[] {}
-                                    : new Class[] { arg.getClass() }));
-            if (theMethod != null) {
-                Boolean v = (Boolean) theMethod.invoke(object, ((arg == null)
-                        ? new Object[] {}
-                        : new Object[] { arg }));
-                value = v.booleanValue();
-            }
-        } catch (Exception exc) {
-            System.err.println("Error in makeCeckbox:" + exc);
-            exc.printStackTrace();
-        }
-        return makeCheckboxMenuItem(label, object, property, value, arg);
-    }
-
-
-
-    /**
-     * Make a checkbox menu item. Automatically call the set'property' method on the object
-     *
-     * @param label Label
-     * @param object  Object to call
-     * @param property Name of property to get/set value
-     * @param value The value
-     * @param arg Optional arg to pass to method
-     *
-     * @return The checkbox
-     */
-    public static JCheckBoxMenuItem makeCheckboxMenuItem(String label,
-            final Object object, final String property, boolean value,
-            final Object arg) {
-
-        final JCheckBoxMenuItem cbx      = new JCheckBoxMenuItem(label,
-                                               value);
-        ItemListener            listener = new ItemListener() {
-            public void itemStateChanged(ItemEvent event) {
-                try {
-                    String methodName =
-                        "set" + property.substring(0, 1).toUpperCase()
-                        + property.substring(1);
-                    Method theMethod = Misc.findMethod(object.getClass(),
-                                           methodName, ((arg == null)
-                            ? new Class[] { Boolean.TYPE }
-                            : new Class[] { Boolean.TYPE, arg.getClass() }));
-                    if (theMethod == null) {
-                        System.err.println("Unknown method:"
-                                           + object.getClass() + "."
-                                           + methodName);
-                    } else {
-                        theMethod.invoke(object, ((arg == null)
-                                ? new Object[] {
-                                    new Boolean(cbx.isSelected()) }
-                                : new Object[] {
-                                    new Boolean(cbx.isSelected()),
-                                    arg }));
-                    }
-                } catch (Exception exc) {
-                    System.err.println("Error in makeCheckbox:" + exc);
-                    exc.printStackTrace();
-                }
-            }
-        };
-        cbx.addItemListener(listener);
-        return cbx;
-    }
-
 
     /**
      * Create a menu and add a listener to it that removes all items
@@ -5553,71 +4202,6 @@ public class GuiUtils {
     }
 
 
-
-    /**
-     * Make a jmenuItem. Call methodName on object when menuItem pressed. Pass in given arg
-     * if non-null.
-     *
-     * @param label Label
-     * @param object Object to call
-     * @param methodName Method name to call
-     * @param arg Pass this to method name if non-null.
-     *
-     * @return The menuItem
-     */
-    public static JMenuItem makeMenuItem(String label, final Object object,
-                                         final String methodName,
-                                         final Object arg) {
-        return makeMenuItem(label, object, methodName, arg, false);
-    }
-
-
-    /**
-     * Make a jmenuItem. Call methodName on object when menuItem pressed. Pass in given arg
-     * if non-null.
-     *
-     * @param label Label
-     * @param object Object to call
-     * @param methodName Method name to call
-     * @param arg Pass this to method name if non-null.
-     * @param inThread If true then call the method in a thread
-     *
-     * @return The menuItem
-     */
-    public static JMenuItem makeMenuItem(String label, final Object object,
-                                         final String methodName,
-                                         final Object arg,
-                                         final boolean inThread) {
-        final Method    theMethod = findMethod(object, methodName, arg);
-        final JMenuItem mi        = new JMenuItem(label);
-        ActionListener  listener  = new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                if (inThread) {
-                    Misc.run(new Runnable() {
-                        public void run() {
-                            invokeMethod();
-                        }
-                    });
-                } else {
-                    invokeMethod();
-                }
-            }
-
-            public void invokeMethod() {
-                try {
-                    if (arg == null) {
-                        theMethod.invoke(object, new Object[] {});
-                    } else {
-                        theMethod.invoke(object, new Object[] { arg });
-                    }
-                } catch (Exception exc) {
-                    LogUtil.logException("Error in makeMenuItem", exc);
-                }
-            }
-        };
-        mi.addActionListener(listener);
-        return mi;
-    }
 
 
 
@@ -7050,6 +5634,73 @@ public class GuiUtils {
         header = GuiUtils.inset(header, new Insets(0, 0, 0, 10));
         return header;
     }
+
+
+
+    //Cut-and-pasted from XmlUtil to break the dependency
+
+    /**
+     *  Get the given name-d attribute from the given element. If not found
+     *  return the dflt argument.
+     *
+     *  @param element The xml element to look within.
+     *  @param name The attribute name.
+     *  @param dflt The default value.
+     *  @return The attribute value or the dflt if not found.
+     */
+    public static String getAttribute(Node element, String name,
+                                      String dflt) {
+        if (element == null) {
+            return dflt;
+        }
+        return getAttribute(element.getAttributes(), name, dflt);
+    }
+
+    public static String getAttribute(NamedNodeMap attrs, String name,
+                                      String dflt) {
+        if (attrs == null) {
+            return dflt;
+        }
+        Node n = attrs.getNamedItem(name);
+        return ((n == null)
+                ? dflt
+                : n.getNodeValue());
+    }
+
+    public static boolean getAttribute(NamedNodeMap attrs, String name,
+                                       boolean dflt) {
+        if (attrs == null) {
+            return dflt;
+        }
+        Node n = attrs.getNamedItem(name);
+        return ((n == null)
+                ? dflt
+                : new Boolean(n.getNodeValue()).booleanValue());
+    }
+
+    public static String getAttribute(NamedNodeMap attrs, String name) {
+        String value = getAttribute(attrs, name, (String) null);
+        if (value == null) {
+            throw new IllegalArgumentException(
+                "Could not find xml attribute:" + name);
+        }
+        return value;
+    }
+
+    public static List findChildren(Node parent, String tag) {
+        ArrayList found    = new ArrayList();
+        NodeList  children = parent.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if ((tag == null) || tag.equals("*")
+                    || child.getNodeName().equals(tag)) {
+                found.add(child);
+            }
+        }
+        return found;
+    }
+
+
 
 
 }

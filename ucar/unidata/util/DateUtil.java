@@ -81,8 +81,8 @@ public class DateUtil {
 
 
     /** logger */
-    private static org.slf4j.Logger log =
-        org.slf4j.LoggerFactory.getLogger(DateUtil.class);
+    //    private static org.slf4j.Logger log =
+    //        org.slf4j.LoggerFactory.getLogger(DateUtil.class);
 
     /**
      * format current time
@@ -222,8 +222,9 @@ public class DateUtil {
             try {
                 theDate = dateFormat.parse(dateTimeString);
             } catch (ParseException e) {
-                log.warn(e.getMessage());
-                return null;
+                throw new IllegalArgumentException(e.getMessage());
+                //                log.warn(e.getMessage());
+                //                return null;
             }
 
             return theDate;

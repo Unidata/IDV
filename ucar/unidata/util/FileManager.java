@@ -333,10 +333,10 @@ public class FileManager {
             urlField.setActionCommand(CMD_LOADURL);
             urlButton.addActionListener(listener);
             urlField.addActionListener(listener);
-            JPanel urlPanel = GuiUtils.doLayout(new Component[] { urlButton,
-                    urlField }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
-            contents = GuiUtils.centerBottom(contents,
-                                             GuiUtils.inset(urlPanel, 5));
+            JPanel urlPanel = LayoutUtil.doLayout(new Component[] { urlButton,
+                    urlField }, 2, LayoutUtil.WT_NY, LayoutUtil.WT_N);
+            contents = LayoutUtil.centerBottom(contents,
+                                             LayoutUtil.inset(urlPanel, 5));
         }
 
 
@@ -344,8 +344,8 @@ public class FileManager {
         JComponent historyComp = makeDirectoryHistoryComponent(chooser, true);
         if ((directoryHistory != null) && (directoryHistory.size() > 0)) {
             contents =
-                GuiUtils.centerRight(contents,
-                                     GuiUtils.top(GuiUtils.inset(historyComp,
+                LayoutUtil.centerRight(contents,
+                                     LayoutUtil.top(LayoutUtil.inset(historyComp,
                                          new Insets(13, 0, 0, 10))));
         }
 
@@ -398,7 +398,7 @@ public class FileManager {
             items.add(new JMenuItem("No file history"));
         }
 
-        JPopupMenu popup = GuiUtils.makePopupMenu(new JPopupMenu(), items);
+        JPopupMenu popup = MenuUtil.makePopupMenu(new JPopupMenu(), items);
         popup.show(goToBtn, 0, (int) goToBtn.getBounds().getHeight());
 
 

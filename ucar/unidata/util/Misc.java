@@ -1010,7 +1010,7 @@ public class Misc {
                     this.sleep(ms);
                     r.run();
                 } catch (Exception exc) {
-                    LogUtil.logException("", exc);
+                    //                    LogUtil.logException("", exc);
                 }
             }
         };
@@ -2056,7 +2056,7 @@ public class Misc {
      */
     public static void printStack(String msg, int maxLines,
                                   String onlyIfTraceContainsThisString) {
-        String trace = LogUtil.getStackTrace();
+        String trace = getStackTrace();
         if (onlyIfTraceContainsThisString != null) {
             if (trace.indexOf(onlyIfTraceContainsThisString) < 0) {
                 return;
@@ -4158,6 +4158,27 @@ public class Misc {
         System.err.println("Time:" + (t2 - t1) + " count " + count);
     }
 
+    /**
+     * Return the stack trace of this calling thread
+     *
+     * @return  The stack trace
+     */
+    public static String getStackTrace() {
+        return getStackTrace(new IllegalArgumentException(""));
+    }
+
+
+    /**
+     * Get the stack trace from the given exception
+     *
+     * @param exc The exception to get the trace from
+     * @return The stack trace
+     */
+    public static String getStackTrace(Throwable exc) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        exc.printStackTrace(new PrintStream(baos));
+        return baos.toString();
+    }
 
 
 }

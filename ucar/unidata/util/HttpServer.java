@@ -230,6 +230,7 @@ public class HttpServer {
             Hashtable props     = new Hashtable();
             while (true) {
                 String headerLine = br.readLine();
+                //                System.err.println("header:" + headerLine);
                 if (headerLine.equals(CRLF) || headerLine.equals("")) {
                     break;
                 }
@@ -275,6 +276,7 @@ public class HttpServer {
                 }
                 contentString = new String(content, 0, totalRead);
             }
+
             StringTokenizer s           = new StringTokenizer(firstLine);
             String          requestType = s.nextToken();
             Hashtable       args        = new Hashtable();
