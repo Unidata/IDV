@@ -21,8 +21,6 @@
  */
 
 
-
-
 package ucar.unidata.repository;
 
 
@@ -132,7 +130,7 @@ public class Repository implements Constants {
                                 getClass());
         Statement statement = connection.createStatement();
         SqlUtil.loadSql(sql, statement);
-        loadLevel3RadarFiles();
+        //        loadLevel3RadarFiles();
         loadTestFiles();
     }
 
@@ -377,11 +375,11 @@ public class Repository implements Constants {
         throws Exception {
         Group theGroup = null;
         String groupName = (String) args.get(ARG_GROUP);
+
         if(groupName!=null) {
             args.remove(ARG_GROUP);
             theGroup = findGroup(groupName);
         }
-
         List<Group> groups= new ArrayList<Group>();
         TypeHandler typeHandler = getTypeHandler(args);
         boolean topLevel = false;
@@ -394,12 +392,13 @@ public class Repository implements Constants {
         }
 
 
+        String output = getValue(args, ARG_OUTPUT, OUTPUT_HTML);
         List where = typeHandler.assembleWhereClause(args);
         StringBuffer sb        = new StringBuffer();
         if(topLevel) sb.append("<b>Top Level Groups</b><ul>");
 
-        String title = "Groups";
 
+        String title = "Groups";
         for(Group group: groups) {
             if(topLevel) {
                 sb.append("<li>" + href("/showgroup?group=" + group.getFullName(),
@@ -419,14 +418,15 @@ public class Repository implements Constants {
             breadcrumbs.add(group.getName());
             title = "Group: " + StringUtil.join("&nbsp;&gt;&nbsp;", titleList);
             sb.append("<b>Group: " + StringUtil.join("&nbsp;&gt;&nbsp;", breadcrumbs)+"</b><hr>");
-
             List<Group> subGroups = getGroups(SqlUtil.makeSelect(COL_GROUPS_ID,TABLE_GROUPS,SqlUtil.eq(COL_GROUPS_PARENT, 
                                                                                                          SqlUtil.quote(group.getId()))));
             if(subGroups.size()>0) {
                 sb.append("<b>Sub groups:</b><ul>");
+
                 for(Group subGroup: subGroups) {
                     sb.append("<li>" + href("/showgroup?group=" + subGroup.getFullName(),
                                             subGroup.getFullName())+"</a>");
+                        
                 }
                 sb.append("</ul>");
             }
@@ -459,10 +459,75 @@ public class Repository implements Constants {
                 }
             }
             if(cnt>0) sb.append("</ul>");
-
         }
         if(topLevel) sb.append("</ul>");
-        return new TextResult(title,sb);
+        return new TextResult(title,sb,getMimeType(output));
+    }
+
+
+    private static String graphTemplate;
+
+    protected TextResult getGraph(Hashtable args)
+        throws Exception {
+
+        if(graphTemplate == null) {
+            graphTemplate = IOUtil.readContents("/ucar/unidata/repository/graphtemplate.xml",
+                                                getClass());
+        }
+        String id = (String) args.get(ARG_ID);
+        String type = (String) args.get(ARG_TYPE);
+        if(id == null) {
+            throw new IllegalArgumentException("Could not find id:"+ args); 
+        }
+        if(type == null) {
+            type = "group";
+        }
+
+        StringBuffer sb        = new StringBuffer();
+
+        if(type.equals("file")) {
+            String xml  = StringUtil.replace(graphTemplate, "%content%", "");
+            return new TextResult("",new StringBuffer(xml),getMimeType(OUTPUT_GRAPH));
+        }
+
+
+        Group group = findGroup(id);
+        if(group == null) {
+            throw new IllegalArgumentException("Could not find group:"+ id); 
+        }
+        sb.append(XmlUtil.tag(TAG_NODE, XmlUtil.attrs(ATTR_TYPE, "group", ATTR_ID, group.getFullName(), ATTR_TITLE, group.getFullName())));
+        List<Group> subGroups = getGroups(SqlUtil.makeSelect(COL_GROUPS_ID,TABLE_GROUPS,SqlUtil.eq(COL_GROUPS_PARENT, 
+                                                                                                         SqlUtil.quote(group.getId()))));
+        for(Group subGroup: subGroups) {
+            
+            sb.append(XmlUtil.tag(TAG_NODE, XmlUtil.attrs(ATTR_TYPE, "group", ATTR_ID, subGroup.getFullName(), ATTR_TITLE, subGroup.getFullName())));
+            
+            sb.append(XmlUtil.tag(TAG_EDGE, XmlUtil.attrs(ATTR_FROM,group.getFullName(),ATTR_TO,
+                                                          subGroup.getFullName())));
+        }
+            
+        String query =
+            SqlUtil.makeSelect(SqlUtil.comma(COL_FILES_ID,COL_FILES_NAME,COL_FILES_TYPE, COL_FILES_FILE),
+                               TABLE_FILES,
+                               SqlUtil.eq(COL_FILES_GROUP_ID, SqlUtil.quote(group.getId())));
+        System.err.println("QUERY:" +query);
+        SqlUtil.Iterator  iter    = SqlUtil.getIterator(execute(query));
+        ResultSet results;
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                int col = 1;
+                String fileId = results.getString(col++);
+                String name = results.getString(col++);
+                String fileType = results.getString(col++);
+                String file = results.getString(col++);
+                sb.append(XmlUtil.tag(TAG_NODE, XmlUtil.attrs(ATTR_TYPE, "file", ATTR_ID, fileId, ATTR_TITLE, name)));
+                sb.append(XmlUtil.tag(TAG_EDGE, XmlUtil.attrs(ATTR_FROM,group.getFullName(),ATTR_TO,
+                                                              fileId)));
+                sb.append("\n");
+            }
+        }
+        String xml  = StringUtil.replace(graphTemplate, "%content%", sb.toString());
+        return new TextResult("",new StringBuffer(xml),getMimeType(OUTPUT_GRAPH));
     }
 
 
@@ -603,6 +668,8 @@ public class Repository implements Constants {
         if(output.equals(OUTPUT_CSV)) {
             return TextResult.TYPE_CSV;
         } else if(output.equals(OUTPUT_XML)) {
+            return TextResult.TYPE_XML;
+        } else if(output.equals(OUTPUT_GRAPH)) {
             return TextResult.TYPE_XML;
         } else {
             return TextResult.TYPE_HTML;
@@ -1015,6 +1082,9 @@ public class Repository implements Constants {
                     return DO_DONTRECURSE;
                 }
                 if(f.isDirectory()) return DO_CONTINUE;
+                if(!name.endsWith(".java")) {
+                    return DO_CONTINUE;
+                }
                 String  path    = f.toString();
                 String noext = IOUtil.stripExtension(path);
 
@@ -1106,8 +1176,8 @@ public class Repository implements Constants {
     }
 
     public void loadTestFiles() throws Exception {
-        //        File            rootDir = new File("c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
-        File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
+        File            rootDir = new File("c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
+        //o        File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
         List<DataInfo> files   = collectFiles(rootDir);
         System.err.println("Inserting:" + files.size() + " files");
         long t1  = System.currentTimeMillis();

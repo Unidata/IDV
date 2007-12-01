@@ -232,6 +232,33 @@ argument -Dfoo=bar) -->
         </antcall>
     </target>
 
+    <target name="timelinejar" depends="init,clean">
+        <javac
+            debug="true"
+            source="${srcversion}"
+            deprecation="false" 
+            destdir="${compiledir}"
+            failonerror="${failonerror}" 
+            srcdir="${srcdir}"
+            fork="${fork}"
+            memoryMaximumSize="${maxmemory}"
+        >
+<!--
+            <compilerarg value="-Xlint:-serial" compiler="javac1.5"/>
+-->
+            <include name="ucar/unidata/ui/TimelineApplet.java"/>
+           </javac>
+        <jar 
+            basedir="${compiledir}"
+            compress="true"
+            jarfile="${jars_dest}/timeline.jar"
+        >
+            <include name="ucar/**/*.class"/>
+       </jar>
+   </target>
+
+
+
     <target name="idv" depends="init">
         <javac
             classpath="${classpath}"

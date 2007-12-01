@@ -34,6 +34,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
 import java.net.*;
+import java.io.*;
 
 
 import java.util.ArrayList;
@@ -110,7 +111,8 @@ public class MetaDataServer extends HttpServer {
             protected void handleRequest(String path, Hashtable formArgs,
                                          Hashtable httpArgs, String content)
                     throws Exception {
-                System.err.println("request:" + path);
+                path = path.trim();
+                System.err.println("request:" + path+":");
                 try {
                     if (path.equals(repository.getUrlBase()+"/query")) {
                         writeContent(true, repository.processQuery(formArgs));
@@ -124,12 +126,33 @@ public class MetaDataServer extends HttpServer {
                         writeContent(true, repository.showGroup(formArgs));
                     } else if (path.equals(repository.getUrlBase()+"/showfile")) {
                         writeContent(true,repository.showFile(formArgs));
+                    } else if (path.equals(repository.getUrlBase()+"/graph")) {
+                        writeContent(true,repository.getGraph(formArgs));
                     } else {
-                        writeContent(false, new TextResult("Error", new StringBuffer("Unknown url:" + path)));
+                        String type = "text/html";
+                        try {
+                            InputStream is = IOUtil.getInputStream("/ucar/unidata/repository/htdocs" + path,getClass());
+                            byte [] bytes = IOUtil.readBytes(is);
+                            if(path.endsWith(".html")) {
+                                writeContent(true,new TextResult("",new String(bytes)));
+                            } else {
+                                writeResult(true, bytes,  type);
+                            }
+                        } catch (Exception e) {
+                            System.err.println("Error:" + e);
+                            String trace = LogUtil.getStackTrace(e);
+                            writeResult(false, "error:" + trace,"text/html");
+                        }                        
                     }
+                        
+                        //                    } else {
+                        //                        writeContent(false, new TextResult("Error", new StringBuffer("Unknown url:" + path)));
+                        //                    }
+
                 } catch (Throwable exc) {
                     System.err.println("Error:" + exc);
                     String trace = LogUtil.getStackTrace(exc);
+                    System.err.println(trace);
                     writeContent(true, new TextResult("Error", new StringBuffer("<pre>" + trace + "</pre>")));
                 }
             }

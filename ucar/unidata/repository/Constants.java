@@ -200,10 +200,6 @@ public interface Constants {
     public static final String SELECT_GROUP =
         SqlUtil.makeSelect(COLUMNS_GROUPS, TABLE_GROUPS);
 
-
-
-
-
     /** _more_          */
     public static final String ATTR_ID = "id";
 
@@ -213,6 +209,14 @@ public interface Constants {
     /** _more_          */
     public static final String ATTR_TYPE = "type";
 
+
+    public static final String TAG_NODE = "node";
+    public static final String TAG_EDGE = "edge";
+    public static final String ATTR_FROM = "from";
+    public static final String ATTR_TO = "to";
+
+
+    public static final String ATTR_TITLE = "title";
 
     public static final String ATTR_URLPATH = "urlPath";
     public static final String TAG_CATALOG = "catalog";
@@ -265,6 +269,7 @@ public interface Constants {
     public static final String OUTPUT_HTML = "html";
     public static final String OUTPUT_XML = "xml";
     public static final String OUTPUT_CSV = "csv";
+    public static final String OUTPUT_GRAPH = "graph";
 
 
 }
