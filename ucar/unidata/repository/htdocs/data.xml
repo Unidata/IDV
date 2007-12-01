@@ -1,0 +1,44 @@
+  <canvas>
+    <graph>
+<nodetype    name="Person"  parent="Item" fillcolor="#cccccc">
+  <command label="View journal" command="url(LIVEJOURNAL_WINDOW,http://www.livejournal.com/users/%id%)"/>
+  <command label="View user info" command="url(LIVEJOURNAL_WINDOW,http://www.livejournal.com/userinfo.bml?user=%id%)"/>
+  <shape>
+    <text flags="!iscenter" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
+    <text flags="iscenter" fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
+    <rrect src="label" fillcolor="%fillcolor%" from="c" to="c" color="black"/>
+    <image flags="Show images&beencenter"  src="label" from="n" to="s" id="thumbnail"  url="%image%"/>
+  <shape flags="iscenter" layout="h" src="label" from="n" to="s" dy="3">
+    <image url="btn_addfriend.gif"
+           alt="Add this user to your friends list"
+           href="url(LIVEJOURNAL_WINDOW,http://www.livejournal.com/friends/add.bml?user=%id%)"/>
+    <image url="btn_todo.gif"
+           alt="To-Do list"
+           href="url(LIVEJOURNAL_WINDOW,http://www.livejournal.com/todo/?user=%id%)"/>
+    <image url="btn_memories.gif"
+           alt="Memories"
+           href="url(LIVEJOURNAL_WINDOW,http://www.livejournal.com/tools/memories.bml?user=%id%)"/>
+    <image url="btn_tellfriend.gif"
+           alt="Tell a friend!"
+           href="url(LIVEJOURNAL_WINDOW,http://www.livejournal.com/tools/tellafriend.bml?user=%id%)"/>
+    <image url="btn_search.gif"
+           alt="Search this journal"
+           href="url(LIVEJOURNAL_WINDOW,http://www.livejournal.com/tools/search.bml?user=%id%)"/>
+  </shape>
+
+  </shape>
+</nodetype>
+
+       <nodetype name="type1"  fillcolor="red"/>
+       <edgetype name="type2" arrow="-3" />       
+       <node id="node1" type="Person" title="node1" />
+       <node id="node2" type="type1" title="node2" />
+       <node id="node3" type="type1" title="node3" />
+       <node id="node4" type="type1" title="node4" />
+       <node id="node5" type="type1" title="node5" />
+       <edge from="node1" to ="node2" title="foo"/>
+       <edge from="node1" to ="node3" title="foo"/>
+       <edge from="node1" to ="node5" title="foo"/>
+       <edge from="node3" to ="node4" title="foo"/>
+    </graph>
+  </canvas>
