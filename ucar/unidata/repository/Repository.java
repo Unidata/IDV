@@ -92,6 +92,12 @@ public class Repository implements Constants {
 
     private Hashtable typeHandlersMap = new Hashtable();
 
+
+    private static String timelineAppletTemplate;
+    private static String graphXmlTemplate;
+    private static String graphAppletTemplate;
+
+
     /**
      * _more_
      *
@@ -111,6 +117,35 @@ public class Repository implements Constants {
         initTypeHandlers();
         initGroups();
     }
+
+    private boolean isRequest(String incoming, String request) {
+        if(incoming.equals(request)) return true;
+        if(incoming.equals(getUrlBase()+request)) return true;
+        return false;
+    }
+
+    public TextResult handleRequest(Request request) throws Exception {
+        if (isRequest(request.getType(),Request.CALL_QUERY)) {
+            return  processQuery(request);
+        } else if (isRequest(request.getType(),Request.CALL_SQL)) {
+            return  processSql(request);
+        } else if (isRequest(request.getType(),Request.CALL_SEARCHFORM)) {
+            return  makeQueryForm(request);
+        } else if (isRequest(request.getType(),Request.CALL_LIST)) {
+            return processList(request);
+        } else if (isRequest(request.getType(),Request.CALL_SHOWGROUP)) {
+            return  showGroup(request);
+        } else if (isRequest(request.getType(),Request.CALL_SHOWFILE)) {
+            return showFile(request);
+        } else if (isRequest(request.getType(),Request.CALL_GRAPHVIEW)) {
+            return getGraphApplet(request);
+        } else if (isRequest(request.getType(),Request.CALL_GRAPH)) {
+            return getGraph(request);
+        } else {
+            return  null;
+        }
+    }
+
 
     protected void initTable() throws Exception {
         boolean ok = true;
@@ -152,6 +187,8 @@ public class Repository implements Constants {
 
 
 
+
+
     /**
      * _more_
      *
@@ -161,46 +198,44 @@ public class Repository implements Constants {
      *
      * @throws Exception _more_
      */
-    protected TextResult processSql(Hashtable args) throws Exception {
-        long      t1        = System.currentTimeMillis();
-        String    query     = (String) args.get("query");
-        Statement statement = execute(query);
-        SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
-        int               cnt  = 0;
+    protected TextResult processSql(Request request) throws Exception {
+        String    query     = (String) request.get("query");
         StringBuffer      sb   = new StringBuffer();
         sb.append(HtmlUtil.form(href("/sql")));
-        sb.append("<input  name=\"query\" size=\"60\" value=\"" + query
+        sb.append("<input  name=\"query\" size=\"60\" value=\"" + (query==null?"":query)
                   + "\"/>");
         sb.append("<input  type=\"submit\" value=\"Query\" />");
         sb.append("</form>\n");
         sb.append("<table>");
+        if(query == null) {
+            return new TextResult("SQL",  sb.toString());
+        }
 
-
+        long      t1        = System.currentTimeMillis();
+        Statement statement = execute(query);
+        SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
         ResultSet results;
+        int               cnt  = 0;
         while ((results = iter.next()) != null) {
             ResultSetMetaData rsmd = results.getMetaData();
             while (results.next()) {
                 int colcnt = 0;
-                if (cnt == 0) {
+                if (cnt++ == 0) {
                     sb.append("<table><tr>");
                     for (int i = 0; i < rsmd.getColumnCount(); i++) {
-                        sb.append("<td><b>" + rsmd.getColumnLabel(i + 1)
-                                  + "</b></td>");
+                        sb.append(HtmlUtil.col(HtmlUtil.bold(rsmd.getColumnLabel(i + 1))));
                     }
                     sb.append("</tr>");
                 }
                 sb.append("<tr>");
                 while (colcnt < rsmd.getColumnCount()) {
-                    sb.append("<td>" + results.getString(++colcnt) + "</td>");
+                    sb.append(HtmlUtil.col(results.getString(++colcnt)));
                 }
                 sb.append("</tr>\n");
                 if (cnt++ > 1000) {
-                    sb.append("<tr><td>...</td></tr>");
+                    sb.append(HtmlUtil.row("..."));
                     break;
                 }
-            }
-            if (cnt > 1000) {
-                break;
             }
         }
         sb.append("</table>");
@@ -218,8 +253,8 @@ public class Repository implements Constants {
         typeHandlersMap.put(typeName, typeHandler);
     }
 
-    protected TypeHandler getTypeHandler(Hashtable args) throws Exception {
-        String type = (String) args.get(ARG_TYPE);
+    protected TypeHandler getTypeHandler(Request request) throws Exception {
+        String type = (String) request.get(ARG_TYPE);
         if(type == null) type = TypeHandler.TYPE_ANY;
         return getTypeHandler(type);
     }
@@ -267,52 +302,64 @@ public class Repository implements Constants {
      *
      * @throws Exception _more_
      */
-    protected TextResult makeQueryForm(Hashtable args) throws Exception {
-        List    where     = assembleWhereClause(args);
+    protected TextResult makeQueryForm(Request request) throws Exception {
+        List    where     = assembleWhereClause(request);
         StringBuffer sb       = new StringBuffer();
         sb.append("<h2>Search Form</h2>");
         sb.append("<table cellpadding=\"5\">");
         sb.append(HtmlUtil.form(href("/query")));
 
-        TypeHandler typeHandler = getTypeHandler(args);
-        sb.append(HtmlUtil.makeHidden(typeHandler.getType(), ARG_TYPE));
-        typeHandler.addToForm(sb, args, where);
-        String output = (String) args.get(ARG_OUTPUT);
+        TypeHandler typeHandler = getTypeHandler(request);
+        sb.append(HtmlUtil.hidden(typeHandler.getType(), ARG_TYPE));
+        typeHandler.addToForm(sb, request, where);
+        String output = (String) request.get(ARG_OUTPUT);
         if (output == null) {
-            sb.append(HtmlUtil.makeTableEntry("<b>Output Type:</b>",
-                                              HtmlUtil.makeSelect(ARG_OUTPUT,Misc.newList(OUTPUT_HTML,
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Output Type:"),
+                                              HtmlUtil.select(ARG_OUTPUT,Misc.newList(OUTPUT_HTML,
                                                                                           OUTPUT_XML,
                                                                                           OUTPUT_CSV))));
         } else {
-            sb.append(HtmlUtil.makeHidden(output, ARG_OUTPUT));
+            sb.append(HtmlUtil.hidden(output, ARG_OUTPUT));
         }
 
-        sb.append(HtmlUtil.makeTableEntry("",HtmlUtil.submit("Search")));
+        sb.append(HtmlUtil.tableEntry("",HtmlUtil.submit("Search")));
         sb.append("<table>");
         sb.append("</form>");
-        typeHandler.makeLinks(sb);
-
-
-
-        sb.append(HtmlUtil.form(href("/sql")));
-        sb.append("<input  name=\"query\" size=\"60\"/>");
-        sb.append("<input  type=\"submit\" value=\"Query\" />");
-        sb.append("</form>\n");
 
         return new TextResult("Search Form", sb);
     }
 
 
-    public int getMax(Hashtable args) {
-        String max = (String) args.get(ARG_MAX);
+    public String getNavLinks() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(href("/showgroup","Group List","class=\"navtitle\""));
+        sb.append ("&nbsp;|&nbsp;");
+        sb.append(href("/searchform","Search","class=\"navtitle\""));
+        sb.append ("&nbsp;|&nbsp;");
+        sb.append(href("/sql","SQL","class=\"navtitle\""));
+        sb.append("&nbsp;&nbsp;&nbsp;<span class=\"navtitle\">List:</span> ");
+        sb.append(href(HtmlUtil.url("/list", "what", WHAT_TYPE),"Types","class=\"navtitle\""));
+        sb.append ("&nbsp;|&nbsp;");
+        sb.append(href(HtmlUtil.url("/list","what", WHAT_GROUP),"Groups","class=\"navtitle\""));
+        sb.append ("&nbsp;|&nbsp;");
+        sb.append(href(HtmlUtil.url("/list","what", WHAT_STATION),"Stations","class=\"navtitle\""));
+        sb.append ("&nbsp;|&nbsp;");
+        sb.append(href(HtmlUtil.url("/list","what" ,WHAT_PRODUCT),"Products","class=\"navtitle\""));
+        return sb.toString();
+    }
+
+
+
+    public int getMax(Request request) {
+        String max = (String) request.get(ARG_MAX);
         if(max!=null) {
             return new Integer(max.trim()).intValue();
         }
         return MAX_ROWS;
     }
 
-    protected String getValue(Hashtable args, String key, String dflt) {
-        String value  = (String) args.get(key);
+    protected String getValue(Request request, String key, String dflt) {
+        String value  = (String) request.get(key);
         if(value == null) return dflt;
         return value;
     }
@@ -329,23 +376,23 @@ public class Repository implements Constants {
      *
      * @throws Exception _more_
      */
-    protected TextResult processList(Hashtable args) 
+    protected TextResult processList(Request request) 
             throws Exception {
-        String what = getValue(args, ARG_WHAT, WHAT_TYPE);
+        String what = getValue(request, ARG_WHAT, WHAT_TYPE);
         if(what.equals(WHAT_GROUP)) {
-            return listGroups(args);
+            return listGroups(request);
         } else  if(what.equals(WHAT_TYPE)) {
-            return listTypes(args);
+            return listTypes(request);
         }
-        TypeHandler typeHandler = getTypeHandler(args);
-        return typeHandler.processList(args,what);
+        TypeHandler typeHandler = getTypeHandler(request);
+        return typeHandler.processList(request,what);
     }
 
 
 
-    protected TextResult showFile(Hashtable args)
+    protected TextResult showFile(Request request)
         throws Exception {
-        String fileId = (String) args.get(ARG_ID);
+        String fileId = (String) request.get(ARG_ID);
         if(fileId == null) throw new IllegalArgumentException ("No " + ARG_ID +" given");
         StringBuffer sb        = new StringBuffer();
         String query =
@@ -368,20 +415,20 @@ public class Repository implements Constants {
                                          results.getDate(col++).getTime());
         dataInfo.setId(id);
         TypeHandler typeHandler = getTypeHandler(dataInfo.getType());
-        return typeHandler.showFile(dataInfo,args);
+        return typeHandler.showFile(dataInfo,request);
     }
 
-    protected TextResult showGroup(Hashtable args)
+    protected TextResult showGroup(Request request)
         throws Exception {
         Group theGroup = null;
-        String groupName = (String) args.get(ARG_GROUP);
+        String groupName = (String) request.get(ARG_GROUP);
 
         if(groupName!=null) {
-            args.remove(ARG_GROUP);
+            request.getParameters().remove(ARG_GROUP);
             theGroup = findGroup(groupName);
         }
         List<Group> groups= new ArrayList<Group>();
-        TypeHandler typeHandler = getTypeHandler(args);
+        TypeHandler typeHandler = getTypeHandler(request);
         boolean topLevel = false;
         if(theGroup == null) {
             topLevel = true;
@@ -392,17 +439,19 @@ public class Repository implements Constants {
         }
 
 
-        String output = getValue(args, ARG_OUTPUT, OUTPUT_HTML);
-        List where = typeHandler.assembleWhereClause(args);
+        String output = getValue(request, ARG_OUTPUT, OUTPUT_HTML);
+        List where = typeHandler.assembleWhereClause(request);
         StringBuffer sb        = new StringBuffer();
-        if(topLevel) sb.append("<b>Top Level Groups</b><ul>");
+        if(topLevel) sb.append(HtmlUtil.bold("Top Level Groups")+"<ul>");
 
 
         String title = "Groups";
         for(Group group: groups) {
             if(topLevel) {
-                sb.append("<li>" + href("/showgroup?group=" + group.getFullName(),
-                                        group.getFullName())+"</a>");
+                sb.append("<li>" + href(HtmlUtil.url("/showgroup","group" ,group.getFullName()),
+                                        group.getFullName())+"</a> "+
+                          href(HtmlUtil.url("/graphview","id" , group.getFullName(),"type","group"),
+                               HtmlUtil.img(urlBase +"/tree.gif")));
                 continue;
             }
             List  breadcrumbs = new ArrayList();
@@ -410,21 +459,23 @@ public class Repository implements Constants {
             Group parent  = group.getParent();
             while(parent!=null) {
                 titleList.add(0,parent.getName());
-                breadcrumbs.add(0,href("/showgroup?group="+ parent.getFullName(),parent.getName()));
+                breadcrumbs.add(0,href(HtmlUtil.url("/showgroup","group",parent.getFullName()),parent.getName()));
                 parent = parent.getParent();
             }
             breadcrumbs.add(0,href("/showgroup", "Top"));
             titleList.add(group.getName());
-            breadcrumbs.add(group.getName());
+            breadcrumbs.add(group.getName()+" " +href(HtmlUtil.url("/graphview","id" , group.getFullName(),"type","group"),HtmlUtil.img(urlBase +"/tree.gif")));
             title = "Group: " + StringUtil.join("&nbsp;&gt;&nbsp;", titleList);
-            sb.append("<b>Group: " + StringUtil.join("&nbsp;&gt;&nbsp;", breadcrumbs)+"</b><hr>");
+            sb.append(HtmlUtil.bold("Group: " + StringUtil.join("&nbsp;&gt;&nbsp;", breadcrumbs)));
+            sb.append("<hr>");
             List<Group> subGroups = getGroups(SqlUtil.makeSelect(COL_GROUPS_ID,TABLE_GROUPS,SqlUtil.eq(COL_GROUPS_PARENT, 
                                                                                                          SqlUtil.quote(group.getId()))));
             if(subGroups.size()>0) {
-                sb.append("<b>Sub groups:</b><ul>");
+                sb.append(HtmlUtil.bold("Sub groups:"));
+                sb.append("<ul>");
 
                 for(Group subGroup: subGroups) {
-                    sb.append("<li>" + href("/showgroup?group=" + subGroup.getFullName(),
+                    sb.append("<li>" + href(HtmlUtil.url("/showgroup","group" , subGroup.getFullName()),
                                             subGroup.getFullName())+"</a>");
                         
                 }
@@ -434,7 +485,7 @@ public class Repository implements Constants {
             where.add(SqlUtil.eq(COL_FILES_GROUP_ID, SqlUtil.quote(group.getId())));
             String query =
                 SqlUtil.makeSelect(SqlUtil.comma(COL_FILES_ID,COL_FILES_NAME,COL_FILES_TYPE, COL_FILES_FILE),
-                                    typeHandler.getQueryOnTables(args),
+                                    typeHandler.getQueryOnTables(request),
                                     SqlUtil.makeAnd(where));
             Statement stmt = execute(query);
             SqlUtil.Iterator  iter    = SqlUtil.getIterator(stmt);
@@ -452,10 +503,10 @@ public class Repository implements Constants {
                     String type = results.getString(col++);
                     String file = results.getString(col++);
                     if(cnt==1) {
-                        sb.append("<b>Files:</b>");
+                        sb.append(HtmlUtil.bold("Files:"));
                         sb.append("<ul>");
                     }
-                    sb.append("<li>" + href("/showfile?" + ARG_ID +"=" + id, name));
+                    sb.append("<li>" + href(HtmlUtil.url("/showfile",  ARG_ID, id), name));
                 }
             }
             if(cnt>0) sb.append("</ul>");
@@ -465,31 +516,81 @@ public class Repository implements Constants {
     }
 
 
-    private static String graphTemplate;
 
-    protected TextResult getGraph(Hashtable args)
-        throws Exception {
 
-        if(graphTemplate == null) {
-            graphTemplate = IOUtil.readContents("/ucar/unidata/repository/graphtemplate.xml",
+    protected TextResult getGraphApplet(Request request) throws Exception {
+        if(true || graphAppletTemplate == null) {
+            graphAppletTemplate = IOUtil.readContents("/ucar/unidata/repository/graphapplet.html",
                                                 getClass());
         }
-        String id = (String) args.get(ARG_ID);
-        String type = (String) args.get(ARG_TYPE);
+
+        String type = getValue(request,ARG_TYPE, "group");
+        String id = getValue(request,ARG_ID, null);
+
+        if(type == null || id == null) {
+            throw new IllegalArgumentException ("no type or id argument specified");
+        }
+        String html  = StringUtil.replace(graphAppletTemplate, "%id%", id);
+        html  = StringUtil.replace(html, "%type%", type);
+        return new TextResult("Graph View", 
+                              html);
+    }
+
+
+    protected String getFileNodeXml(ResultSet results) throws Exception {
+        int col = 1;
+        String fileId = results.getString(col++);
+        String name = results.getString(col++);
+        String fileType = results.getString(col++);
+        String groupId = results.getString(col++);
+        String file = results.getString(col++);
+        String nodeType = TYPE_FILE;
+        if(fileType.equals(TypeHandler.TYPE_LEVEL3RADAR)) {
+            nodeType = TypeHandler.TYPE_LEVEL3RADAR;
+        }
+        nodeType = TypeHandler.TYPE_LEVEL3RADAR;
+        return XmlUtil.tag(TAG_NODE, XmlUtil.attrs(ATTR_TYPE, nodeType, ATTR_ID, fileId, ATTR_TITLE, name));
+    }
+
+
+    protected TextResult getGraph(Request request)
+        throws Exception {
+
+        if(true ||graphXmlTemplate == null) {
+            graphXmlTemplate = IOUtil.readContents("/ucar/unidata/repository/graphtemplate.xml",
+                                                getClass());
+        }
+        String id = (String) request.get(ARG_ID);
+        String type = (String) request.get(ARG_TYPE);
         if(id == null) {
-            throw new IllegalArgumentException("Could not find id:"+ args); 
+            throw new IllegalArgumentException("Could not find id:"+ request); 
         }
         if(type == null) {
             type = "group";
         }
 
         StringBuffer sb        = new StringBuffer();
+        if(!type.equals(TYPE_GROUP)) {
+            String filesQuery =
+                SqlUtil.makeSelect(SqlUtil.comma(COL_FILES_ID,COL_FILES_NAME,COL_FILES_TYPE, COL_FILES_GROUP_ID,COL_FILES_FILE),
+                                   TABLE_FILES,
+                                   SqlUtil.eq(COL_FILES_ID, SqlUtil.quote(id)));
 
-        if(type.equals("file")) {
-            String xml  = StringUtil.replace(graphTemplate, "%content%", "");
+
+            ResultSet results = execute(filesQuery).getResultSet();
+            if (!results.next()) {
+                throw new IllegalArgumentException ("Unknown file id:" + id);
+            }
+
+            sb.append(getFileNodeXml(results));
+            Group group = findGroupFromId(results.getString(4));
+            sb.append(XmlUtil.tag(TAG_NODE, XmlUtil.attrs(ATTR_TYPE, "group", ATTR_ID, group.getFullName(), ATTR_TITLE, group.getFullName())));
+            sb.append(XmlUtil.tag(TAG_EDGE, XmlUtil.attrs(ATTR_TYPE, "groupedby", ATTR_FROM,group.getFullName(),ATTR_TO,
+                                                          results.getString(1))));
+
+            String xml  = StringUtil.replace(graphXmlTemplate, "%content%", sb.toString());
             return new TextResult("",new StringBuffer(xml),getMimeType(OUTPUT_GRAPH));
         }
-
 
         Group group = findGroup(id);
         if(group == null) {
@@ -498,35 +599,40 @@ public class Repository implements Constants {
         sb.append(XmlUtil.tag(TAG_NODE, XmlUtil.attrs(ATTR_TYPE, "group", ATTR_ID, group.getFullName(), ATTR_TITLE, group.getFullName())));
         List<Group> subGroups = getGroups(SqlUtil.makeSelect(COL_GROUPS_ID,TABLE_GROUPS,SqlUtil.eq(COL_GROUPS_PARENT, 
                                                                                                          SqlUtil.quote(group.getId()))));
+
+        Group parent = group.getParent();
+        if(parent!=null) {
+            sb.append(XmlUtil.tag(TAG_NODE, XmlUtil.attrs(ATTR_TYPE, "group", ATTR_ID, parent.getFullName(), ATTR_TITLE, parent.getFullName())));
+            sb.append(XmlUtil.tag(TAG_EDGE, XmlUtil.attrs(ATTR_TYPE, "groupedby", ATTR_FROM,parent.getFullName(),ATTR_TO,
+                                                          group.getFullName())));
+        }
+
+
         for(Group subGroup: subGroups) {
             
             sb.append(XmlUtil.tag(TAG_NODE, XmlUtil.attrs(ATTR_TYPE, "group", ATTR_ID, subGroup.getFullName(), ATTR_TITLE, subGroup.getFullName())));
             
-            sb.append(XmlUtil.tag(TAG_EDGE, XmlUtil.attrs(ATTR_FROM,group.getFullName(),ATTR_TO,
+            sb.append(XmlUtil.tag(TAG_EDGE, XmlUtil.attrs(ATTR_TYPE, "groupedby", ATTR_FROM,group.getFullName(),ATTR_TO,
                                                           subGroup.getFullName())));
         }
             
         String query =
-            SqlUtil.makeSelect(SqlUtil.comma(COL_FILES_ID,COL_FILES_NAME,COL_FILES_TYPE, COL_FILES_FILE),
+            SqlUtil.makeSelect(SqlUtil.comma(COL_FILES_ID,COL_FILES_NAME,COL_FILES_TYPE, COL_FILES_GROUP_ID, COL_FILES_FILE),
                                TABLE_FILES,
                                SqlUtil.eq(COL_FILES_GROUP_ID, SqlUtil.quote(group.getId())));
-        System.err.println("QUERY:" +query);
         SqlUtil.Iterator  iter    = SqlUtil.getIterator(execute(query));
         ResultSet results;
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                int col = 1;
-                String fileId = results.getString(col++);
-                String name = results.getString(col++);
-                String fileType = results.getString(col++);
-                String file = results.getString(col++);
-                sb.append(XmlUtil.tag(TAG_NODE, XmlUtil.attrs(ATTR_TYPE, "file", ATTR_ID, fileId, ATTR_TITLE, name)));
-                sb.append(XmlUtil.tag(TAG_EDGE, XmlUtil.attrs(ATTR_FROM,group.getFullName(),ATTR_TO,
+                sb.append(getFileNodeXml(results));
+                String fileId = results.getString(1);
+                sb.append(XmlUtil.tag(TAG_EDGE, XmlUtil.attrs(ATTR_TYPE, "groupedby", ATTR_FROM,group.getFullName(),ATTR_TO,
                                                               fileId)));
                 sb.append("\n");
             }
         }
-        String xml  = StringUtil.replace(graphTemplate, "%content%", sb.toString());
+        String xml  = StringUtil.replace(graphXmlTemplate, "%content%", sb.toString());
+        xml  = StringUtil.replace(xml, "%root%", urlBase);
         return new TextResult("",new StringBuffer(xml),getMimeType(OUTPUT_GRAPH));
     }
 
@@ -541,19 +647,19 @@ public class Repository implements Constants {
      *
      * @throws Exception _more_
      */
-    protected TextResult listGroups(Hashtable args)
+    protected TextResult listGroups(Request request)
         throws Exception {
-        TypeHandler typeHandler = getTypeHandler(args);
-        List where = typeHandler.assembleWhereClause(args);
+        TypeHandler typeHandler = getTypeHandler(request);
+        List where = typeHandler.assembleWhereClause(request);
         String query =
             SqlUtil.makeSelect(SqlUtil.distinct(COL_FILES_GROUP_ID),
-                                typeHandler.getQueryOnTables(args),
+                                typeHandler.getQueryOnTables(request),
                                 SqlUtil.makeAnd(where));
 
         Statement    statement = execute(query);
         String[]     groups    = SqlUtil.readString(statement, 1);
         StringBuffer sb        = new StringBuffer();
-        String output = getValue(args, ARG_OUTPUT, OUTPUT_HTML);
+        String output = getValue(request, ARG_OUTPUT, OUTPUT_HTML);
         if(output.equals(OUTPUT_HTML)) {
             sb.append("<h2>Groups</h2>");
             sb.append("<ul>");
@@ -598,13 +704,13 @@ public class Repository implements Constants {
     }
 
 
-    protected List<TypeHandler> getTypeHandlers(Hashtable args) 
+    protected List<TypeHandler> getTypeHandlers(Request request) 
         throws Exception {
-        TypeHandler typeHandler = getTypeHandler(args);
-        List where = typeHandler.assembleWhereClause(args);
+        TypeHandler typeHandler = getTypeHandler(request);
+        List where = typeHandler.assembleWhereClause(request);
         String query =
             SqlUtil.makeSelect(SqlUtil.distinct(COL_FILES_TYPE),
-                                typeHandler.getQueryOnTables(args),
+                                typeHandler.getQueryOnTables(request),
                                 SqlUtil.makeAnd(where));
 
         List<TypeHandler> typeHandlers = new ArrayList<TypeHandler>();
@@ -619,16 +725,16 @@ public class Repository implements Constants {
     /**
      * _more_
      *
-     * @param args _more_
+     * @param request _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected TextResult listTypes(Hashtable args)
+    protected TextResult listTypes(Request request)
         throws Exception {
         StringBuffer sb        = new StringBuffer();
-        String output = getValue(args, ARG_OUTPUT, OUTPUT_HTML);
+        String output = getValue(request, ARG_OUTPUT, OUTPUT_HTML);
         if(output.equals(OUTPUT_HTML)) {
             sb.append("<h2>Types</h2>");
             sb.append("<ul>");
@@ -640,7 +746,7 @@ public class Repository implements Constants {
             throw new IllegalArgumentException("Unknown output type:" + output);
         }
 
-        List<TypeHandler> typeHandlers = getTypeHandlers(args);
+        List<TypeHandler> typeHandlers = getTypeHandlers(request);
         for (TypeHandler theTypeHandler: typeHandlers) {
             if(output.equals(OUTPUT_HTML)) {
                 sb.append("<li>");
@@ -682,21 +788,25 @@ public class Repository implements Constants {
     }
 
     protected String href(String url, String label) {
-        return HtmlUtil.href(urlBase +url, label);
+        return href(url, label,"");
+    }
+
+    protected String href(String url, String label, String extra) {
+        return HtmlUtil.href(urlBase +url, label,extra);
     }
 
 
     /**
      * _more_
      *
-     * @param args _more_
+     * @param request _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected List assembleWhereClause(Hashtable args) throws Exception {
-        return getTypeHandler(args).assembleWhereClause(args);
+    protected List assembleWhereClause(Request request) throws Exception {
+        return getTypeHandler(request).assembleWhereClause(request);
     }
 
 
@@ -778,6 +888,7 @@ public class Repository implements Constants {
      * @throws Exception _more_
      */
     protected Group findGroup(String name) throws Exception {
+        if(name.indexOf("_")>=0) Misc.printStack("id:" + name);
         Group group = groupMap.get(name);
         if (group != null) {
             return group;
@@ -831,15 +942,17 @@ public class Repository implements Constants {
     /**
      * _more_
      *
-     * @param args _more_
+     * @param request _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected List<DataInfo> getDataInfos(Hashtable args) throws Exception {
-        TypeHandler typeHandler = getTypeHandler(args);
-        List where =typeHandler.assembleWhereClause(args);
+    protected List<DataInfo> getDataInfos(Request request) throws Exception {
+
+
+        TypeHandler typeHandler = getTypeHandler(request);
+        List where =typeHandler.assembleWhereClause(request);
         String query =
             SqlUtil.makeSelect(SqlUtil.comma(COL_FILES_ID,
                                                COL_FILES_NAME, 
@@ -848,9 +961,9 @@ public class Repository implements Constants {
                                                COL_FILES_GROUP_ID,
                                                COL_FILES_FILE, 
                                                COL_FILES_FROMDATE,
-                                               COL_FILES_TODATE), typeHandler.getQueryOnTables(args),
+                                               COL_FILES_TODATE), typeHandler.getQueryOnTables(request),
                                 SqlUtil.makeAnd(where), "order by " + COL_FILES_FROMDATE);
-        Statement statement = execute(query, getMax(args));
+        Statement statement = execute(query, getMax(request));
         List<DataInfo>   dataInfos = new ArrayList<DataInfo>();
         ResultSet         results;
         SqlUtil.Iterator iter       = SqlUtil.getIterator(statement);
@@ -922,20 +1035,24 @@ public class Repository implements Constants {
     /**
      * _more_
      *
-     * @param args _more_
+     * @param request _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected TextResult processQuery(Hashtable args)
+    protected TextResult processQuery(Request request)
             throws Exception {
-        List<DataInfo> dataInfos = getDataInfos(args);
+        timelineAppletTemplate = IOUtil.readContents("/ucar/unidata/repository/timelineapplet.html",
+                                                     getClass());
+        List times = new ArrayList();
+        List labels = new ArrayList();
+        List<DataInfo> dataInfos = getDataInfos(request);
         StringBuffer    sb         = new StringBuffer();
-        String output = getValue(args, ARG_OUTPUT, OUTPUT_HTML);
+        String output = getValue(request, ARG_OUTPUT, OUTPUT_HTML);
         if(output.equals(OUTPUT_HTML)) {
             sb.append("<h2>Query Results</h2>");
-            sb.append("<ul>");
+            sb.append("<table>");
         } else if(output.equals(OUTPUT_XML)) {
             sb.append(XmlUtil.XML_HEADER + "\n");
             sb.append(XmlUtil.openTag(TAG_CATALOG,
@@ -948,10 +1065,13 @@ public class Repository implements Constants {
 
         StringBufferCollection sbc = new StringBufferCollection();
         for (DataInfo dataInfo : dataInfos) {
+            times.add(SqlUtil.format(new Date(dataInfo.getStartDate())));
+            labels.add(dataInfo.getName());
             StringBuffer ssb = sbc.getBuffer(dataInfo.getType());
             if(output.equals(OUTPUT_HTML)) {
-                ssb.append("<li>" + href("/showfile?" + ARG_ID +"=" + dataInfo.getId(), dataInfo.getFile()) + " "
-                           + new Date(dataInfo.getStartDate()));
+                ssb.append(HtmlUtil.row(
+                                        href(HtmlUtil.url("/graphview","id" , dataInfo.getId(),"type",dataInfo.getType()),HtmlUtil.img(urlBase +"/tree.gif"))+" " +
+                                        href(HtmlUtil.url("/showfile" , ARG_ID , dataInfo.getId()), dataInfo.getFile()),""+new Date(dataInfo.getStartDate())));
             } else if(output.equals(OUTPUT_XML)) {
                 ssb.append(
                     XmlUtil.tag(
@@ -966,13 +1086,18 @@ public class Repository implements Constants {
         }
 
 
+
+        String tmp = StringUtil.replace(timelineAppletTemplate, "%times%", StringUtil.join(",",times));
+        tmp = StringUtil.replace(tmp, "%labels%", StringUtil.join(",",labels));
+        sb.append(tmp);
+
+
         for (int i = 0; i < sbc.getKeys().size(); i++) {
             String       type = (String) sbc.getKeys().get(i);
             StringBuffer ssb     = sbc.getBuffer(type);
             if(output.equals(OUTPUT_HTML)) {
-                sb.append("<li>" + type + "<ul>");
+                sb.append(HtmlUtil.row(HtmlUtil.bold("Type:" + type)));
                 sb.append(ssb);
-                sb.append("</ul>");
             } else if(output.equals(OUTPUT_XML)) {
                 sb.append(XmlUtil.openTag(TAG_DATASET, XmlUtil.attrs(ATTR_NAME, type)));
                 sb.append(ssb);

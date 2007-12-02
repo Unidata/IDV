@@ -99,14 +99,25 @@ public class MetaDataServer extends HttpServer {
         return new RequestHandler(this, socket) {
                 private void writeContent(boolean ok, TextResult result) throws Exception {
                     if(result.isHtml()) {
+                        template =
+                            IOUtil.readContents("/ucar/unidata/repository/template.html",
+                                                getClass());
                         String html = StringUtil.replace(template, "%content%", result.getContent().toString());
                         html = StringUtil.replace(html, "%title%", result.getTitle());
+                        html = StringUtil.replace(html, "%root%", repository.getUrlBase());
+                        html = StringUtil.replace(html, "%links%",repository.getNavLinks());
                         writeResult(ok, html,result.getMimeType());
                     } else {
                         writeResult(ok, result.getContent(),result.getMimeType());
                     }
                 }
 
+        protected void writeHeaderArgs() throws Exception {
+            //            writeLine("Date: Fri, 12 Jan 2007 00:02:44 GMT"+CRLF);
+            writeLine("Cache-Control: no-cache"+CRLF);
+            writeLine("Last-Modified: Wed, 15 Nov 1995 04:58:08 GMT"+CRLF);
+            //            writeLine("Last-Modified:" + new Date()+CRLF);
+        }
 
             protected void handleRequest(String path, Hashtable formArgs,
                                          Hashtable httpArgs, String content)
@@ -114,28 +125,28 @@ public class MetaDataServer extends HttpServer {
                 path = path.trim();
                 System.err.println("request:" + path+":");
                 try {
-                    if (path.equals(repository.getUrlBase()+"/query")) {
-                        writeContent(true, repository.processQuery(formArgs));
-                    } else if (path.equals(repository.getUrlBase()+"/sql")) {
-                        writeContent(true, repository.processSql(formArgs));
-                    } else if (path.equals(repository.getUrlBase()+"/searchform")) {
-                        writeContent(true, repository.makeQueryForm(formArgs));
-                    } else if (path.equals(repository.getUrlBase()+"/list")) {
-                        writeContent(true,repository.processList(formArgs));
-                    } else if (path.equals(repository.getUrlBase()+"/showgroup")) {
-                        writeContent(true, repository.showGroup(formArgs));
-                    } else if (path.equals(repository.getUrlBase()+"/showfile")) {
-                        writeContent(true,repository.showFile(formArgs));
-                    } else if (path.equals(repository.getUrlBase()+"/graph")) {
-                        writeContent(true,repository.getGraph(formArgs));
+                    TextResult result = repository.handleRequest(new Request(path, new RequestContext(),formArgs));
+                    if(result!=null) {
+                        writeContent(true, result);
                     } else {
+                        //Try to serve up the file
                         String type = "text/html";
                         try {
+                            path  =StringUtil.replace(path,repository.getUrlBase(),"");
                             InputStream is = IOUtil.getInputStream("/ucar/unidata/repository/htdocs" + path,getClass());
                             byte [] bytes = IOUtil.readBytes(is);
                             if(path.endsWith(".html")) {
                                 writeContent(true,new TextResult("",new String(bytes)));
                             } else {
+                                if(path.endsWith(".gif")) {
+                                    type = "image/gif";
+                                } else  if(path.endsWith(".jpg")) {
+                                    type = "image/jpg";
+                                } else  if(path.endsWith(".png")) {
+                                    type = "image/png";
+                                } else {
+                                    type = "";
+                                }
                                 writeResult(true, bytes,  type);
                             }
                         } catch (Exception e) {
@@ -151,8 +162,9 @@ public class MetaDataServer extends HttpServer {
 
                 } catch (Throwable exc) {
                     System.err.println("Error:" + exc);
+                    exc.printStackTrace();
                     String trace = LogUtil.getStackTrace(exc);
-                    System.err.println(trace);
+                    //                    System.err.println(trace);
                     writeContent(true, new TextResult("Error", new StringBuffer("<pre>" + trace + "</pre>")));
                 }
             }

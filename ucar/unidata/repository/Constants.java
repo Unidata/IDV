@@ -271,6 +271,9 @@ public interface Constants {
     public static final String OUTPUT_CSV = "csv";
     public static final String OUTPUT_GRAPH = "graph";
 
+    public static final String TYPE_FILE    = "file";
+    public static final String TYPE_GROUP    = "group";
+
 
 }
 

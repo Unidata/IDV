@@ -1,0 +1,42 @@
+<canvas bgimage="%root%/logo.gif">
+<graph>
+    <edgetype name="groupedby" arrow="-6" />       
+
+<nodetype    name="Node"  />
+
+<nodetype    name="group" parent="Node" fillcolor="#cccccc">
+  <command label="View group" command="url(,%root%/showgroup?group=%id%)"/>
+  <shape>
+    <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
+    <rrect src="label" fillcolor="%fillcolor%" from="c" to="c" color="black"/>
+  </shape>
+</nodetype>
+
+<nodetype    name="file" fillcolor="#009900">
+  <command label="View file info" command="url(,%root%/showfile?id=%id%)"/>
+  <shape>
+    <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
+    <rrect src="label" fillcolor="%fillcolor%" from="c" to="c" color="black"/>
+  </shape>
+</nodetype>
+
+
+<nodetype    name="level3radar" parent="file">
+  <shape>
+  <shape  layout="h" src="label" from="n" to="n" dy="10">
+    <image url="%root%/Radar.gif"
+           alt="Level 3 Radar"/>
+   </shape>
+    <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
+  </shape>
+</nodetype>
+
+<nodetype    name="foo" fillcolor="blue">
+    <rrect src="label" fillcolor="%fillcolor%" from="c" to="c" color="black"/>
+</nodetype>
+
+%content%
+
+
+</graph>
+</canvas>

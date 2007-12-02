@@ -80,7 +80,7 @@ public class TypeHandler implements Constants {
     }
 
 
-    public TextResult showFile(DataInfo dataInfo,Hashtable args) throws Exception {
+    public TextResult showFile(DataInfo dataInfo,Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
         sb.append("File:" + dataInfo.getFile() +"<br>");
         sb.append("Type:" + dataInfo.getType() +"<br>");
@@ -94,12 +94,12 @@ public class TypeHandler implements Constants {
 
     }
 
-    public TextResult processList(Hashtable args, String what) throws Exception {
-        return processRadarList(args, what);
+    public TextResult processList(Request request, String what) throws Exception {
+        return processRadarList(request, what);
     }
 
 
-    public TextResult processRadarList(Hashtable args, String what) throws Exception {
+    public TextResult processRadarList(Request request, String what) throws Exception {
         String column;
         String tag;
         String title;
@@ -112,14 +112,14 @@ public class TypeHandler implements Constants {
             tag = "station";
             title = "Level 3 Radar Stations";
         }
-        List where =assembleWhereClause(args);
+        List where =assembleWhereClause(request);
         String query = SqlUtil.makeSelect(SqlUtil.distinct(column),
                                            TABLE_LEVEL3RADAR,
                                            SqlUtil.makeAnd(where));
         Statement    statement = repository.execute(query);
         String[]     products  = SqlUtil.readString(statement, 1);
         StringBuffer sb        = new StringBuffer();
-        String output = repository.getValue(args, ARG_OUTPUT, OUTPUT_HTML);
+        String output = repository.getValue(request, ARG_OUTPUT, OUTPUT_HTML);
         if(output.equals(OUTPUT_HTML)) {
             sb.append("<h2>Products</h2>");
             sb.append("<ul>");
@@ -157,13 +157,13 @@ public class TypeHandler implements Constants {
 
 
 
-    public void addToForm(StringBuffer  sb, Hashtable args, List where) throws Exception {
+    public void addToForm(StringBuffer  sb, Request request, List where) throws Exception {
 
         String[] maxdates = SqlUtil.readString(repository.execute(SqlUtil.makeSelect(SqlUtil.max(COL_FILES_TODATE), 
-                                                                                       getQueryOnTables(args),
+                                                                                       getQueryOnTables(request),
                                                                                        SqlUtil.makeAnd(where))), 1);
         String[] mindates = SqlUtil.readString(repository.execute(SqlUtil.makeSelect(SqlUtil.min(COL_FILES_FROMDATE), 
-                                                                                       getQueryOnTables(args),
+                                                                                       getQueryOnTables(request),
                                                                                        SqlUtil.makeAnd(where))), 1);
         String   maxdate  = ((maxdates.length > 0)
                              ? maxdates[0]
@@ -172,21 +172,21 @@ public class TypeHandler implements Constants {
                              ? mindates[0]
                              : "");
 
-        List<TypeHandler> typeHandlers = repository.getTypeHandlers(args);
+        List<TypeHandler> typeHandlers = repository.getTypeHandlers(request);
         if(typeHandlers.size()>1) {
             List tmp = new ArrayList();
             for (TypeHandler typeHandler: typeHandlers) {
                 tmp.add(new TwoFacedObject(typeHandler.getType(),typeHandler.getType()));
             }
-            String typeSelect = HtmlUtil.makeSelect(Repository.ARG_TYPE,tmp);
-            sb.append(HtmlUtil.makeTableEntry("<b>Type:</b>",typeSelect));
+            String typeSelect = HtmlUtil.select(Repository.ARG_TYPE,tmp);
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"),typeSelect));
         } else if(typeHandlers.size()==1) {
-            sb.append(HtmlUtil.makeHidden(Repository.ARG_TYPE, typeHandlers.get(0).getType()));
+            sb.append(HtmlUtil.hidden(Repository.ARG_TYPE, typeHandlers.get(0).getType()));
         }
         
-        String name = (String) args.get(ARG_NAME);
+        String name = (String) request.get(ARG_NAME);
         if(name == null) {
-            sb.append(HtmlUtil.makeTableEntry("<b>Name:</b>",HtmlUtil.makeInput(Repository.ARG_NAME,"")));
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),HtmlUtil.input(Repository.ARG_NAME,"")));
         }
 
         List<Group> groups = repository.getGroups(SqlUtil.readString(repository.execute(SELECT_FILES_GROUPS + SqlUtil.makeWhere(where)), 1));
@@ -197,14 +197,14 @@ public class TypeHandler implements Constants {
             for (Group group: groups) {
                 groupList.add(new TwoFacedObject(group.getFullName()));
             }
-            String groupSelect = HtmlUtil.makeSelect(Repository.ARG_GROUP,groupList);
+            String groupSelect = HtmlUtil.select(Repository.ARG_GROUP,groupList);
             //            groupSelect+="&nbsp;" +HtmlUtil.checkbox(ARG_GROUP_CHILDREN,"true") +" (Search subgroups)";
-            sb.append(HtmlUtil.makeTableEntry("<b>Group:</b>",groupSelect));
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Group:"),groupSelect));
         } else if (groups.size() == 1) {
-            sb.append(HtmlUtil.makeHidden(Repository.ARG_GROUP, groups.get(0).getFullName()));
+            sb.append(HtmlUtil.hidden(Repository.ARG_GROUP, groups.get(0).getFullName()));
         }
 
-        sb.append(HtmlUtil.makeTableEntry("<b>Date Range:</b>","<input name=\"fromdate\" value=\""
+        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Date Range:"),"<input name=\"fromdate\" value=\""
                                           + (mindate!=null?""+mindate:"") + "\"> -- <input name=\"todate\" value=\"" + 
                                           (maxdate!=null?""+maxdate:"") + "\">\n"));
 
@@ -227,28 +227,28 @@ public class TypeHandler implements Constants {
             }
             productList.add(0, "All");
             if (stations.length > 1) {
-                sb.append(HtmlUtil.makeTableEntry("<b>Station:</b>",HtmlUtil.makeSelect(Repository.ARG_STATION, stationList)));
+                sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Station:"),HtmlUtil.select(Repository.ARG_STATION, stationList)));
             } else if (stations.length == 1) {
-                sb.append(HtmlUtil.makeHidden(Repository.ARG_STATION, stations[0]));
+                sb.append(HtmlUtil.hidden(Repository.ARG_STATION, stations[0]));
             }
             if (products.length > 1) {
-                sb.append(HtmlUtil.makeTableEntry("<b>Product:</b>",HtmlUtil.makeSelect(Repository.ARG_PRODUCT,productList)));
+                sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Product:"),HtmlUtil.select(Repository.ARG_PRODUCT,productList)));
             } else if (products.length == 1) {
-                sb.append(HtmlUtil.makeHidden(Repository.ARG_PRODUCT, products[0]));
+                sb.append(HtmlUtil.hidden(Repository.ARG_PRODUCT, products[0]));
             }
         }
 
     }
 
-    protected List assembleWhereClause(Hashtable args) throws Exception {
+    protected List assembleWhereClause(Request request) throws Exception {
         List   where     = new ArrayList();
-        String name = (String) args.get(ARG_NAME);
+        String name = (String) request.get(ARG_NAME);
         if(name !=null) name = name.trim();
 
-        String groupName = (String) args.get(Repository.ARG_GROUP);
+        String groupName = (String) request.get(Repository.ARG_GROUP);
         if ((groupName != null) && !groupName.toLowerCase().equals("all")) {
             Group group = repository.findGroup(groupName);
-            String searchChildren =  (String) args.get(ARG_GROUP_CHILDREN);
+            String searchChildren =  (String) request.get(ARG_GROUP_CHILDREN);
             //            System.err.println ("child:" + searchChildren);
             //            if(Misc.equals(searchChildren,"true")) {
             //                where.add(SqlUtil.like(COL_FILES_GROUP_ID,
@@ -258,26 +258,26 @@ public class TypeHandler implements Constants {
                                      SqlUtil.quote(group.getId())));
                 //            }
         }
-        String type = (String) args.get(Repository.ARG_TYPE);
+        String type = (String) request.get(Repository.ARG_TYPE);
         if(type !=null && !type.equals(TYPE_ANY)) {
             addOr(COL_FILES_TYPE, type, where);
         }
 
-        String fromdate = (String) args.get(Repository.ARG_FROMDATE);
+        String fromdate = (String) request.get(Repository.ARG_FROMDATE);
         if ((fromdate != null) && (fromdate.trim().length() > 0)) {
             where.add(SqlUtil.ge(COL_FILES_FROMDATE,
                                   SqlUtil.quote(SqlUtil.getDateString(fromdate))));
         }
-        String todate = (String) args.get(Repository.ARG_TODATE);
+        String todate = (String) request.get(Repository.ARG_TODATE);
         if ((todate != null) && (todate.trim().length() > 0)) {
             where.add(SqlUtil.le(COL_FILES_TODATE,
                                   SqlUtil.quote(SqlUtil.getDateString(todate))));
         }
 
         if(isType(TYPE_LEVEL3RADAR)) {
-            addOr(COL_LEVEL3RADAR_STATION, (String) args.get(Repository.ARG_STATION), where);
-            addOr(COL_LEVEL3RADAR_PRODUCT, (String) args.get(Repository.ARG_PRODUCT), where);
-            if(args.contains(Repository.ARG_STATION) || args.contains(Repository.ARG_PRODUCT)) {
+            addOr(COL_LEVEL3RADAR_STATION, (String) request.get(Repository.ARG_STATION), where);
+            addOr(COL_LEVEL3RADAR_PRODUCT, (String) request.get(Repository.ARG_PRODUCT), where);
+            if(request.contains(Repository.ARG_STATION) || request.contains(Repository.ARG_PRODUCT)) {
                 where.add(SqlUtil.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID));
             }
         }
@@ -295,9 +295,9 @@ public class TypeHandler implements Constants {
     }
 
 
-    protected String getQueryOnTables(Hashtable args) {
+    protected String getQueryOnTables(Request request) {
         if(isType(TYPE_LEVEL3RADAR)) {
-            if(args.contains(Repository.ARG_PRODUCT) || args.contains(Repository.ARG_STATION)) {
+            if(request.contains(Repository.ARG_PRODUCT) || request.contains(Repository.ARG_STATION)) {
                 return TABLE_FILES + "," + TABLE_LEVEL3RADAR;
             }
         }
@@ -321,21 +321,6 @@ public class TypeHandler implements Constants {
     }
 
 
-
-    public void makeLinks(StringBuffer sb) {
-        sb.append("<p>");
-        sb.append(repository.href("/list?what=" +WHAT_TYPE,"List types"));
-        sb.append ("&nbsp;|&nbsp;");
-        sb.append(repository.href("/list?what=" + WHAT_GROUP,"List groups"));
-        sb.append ("&nbsp;|&nbsp;");
-        //        if(isType(TYPE_LEVEL3RADAR)) {
-        sb.append ("&nbsp;|&nbsp;");
-        sb.append(repository.href("/list?what=" + WHAT_STATION,"List stations"));
-        sb.append ("&nbsp;|&nbsp;");
-        sb.append(repository.href("/list?what=" + WHAT_PRODUCT,"List products"));
-            //        }
-
-    }
 
 
 /**
