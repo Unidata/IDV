@@ -1,0 +1,427 @@
+body{
+   font-weight: normal;
+   font-size: 10pt;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #000000;
+   text-decoration: none;
+   margin: 0px;
+   margin-top: 0px;
+}
+
+td {
+   font-weight: normal;
+   font-size: 10pt;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #000000;
+   text-decoration: none
+}
+
+
+
+A:link {
+   font-family: Arial, Helvetica, sans-serif;
+   color: #0000FF
+
+}
+
+A:visited {
+   font-family: Arial, Helvetica, sans-serif;
+   color: #A020F0
+}
+
+A:active {
+   font-family: Arial, Helvetica, sans-serif;
+   color: #FF0000;
+}
+
+a:hover {
+   font-family: Arial, Helvetica, sans-serif;
+   color: #FF0000;
+   text-decoration: underline
+}
+
+
+A { text-decoration: none }
+
+
+b {
+   font-weight: bold;
+   font-family: Arial, Helvetica, sans-serif;
+}
+
+i {
+   font-style: italic;
+   font-family: Arial, Helvetica, sans-serif;
+}
+
+
+
+.navtitle:link {
+   font-family: Arial, Helvetica, sans-serif;
+   color: #FFFFFF;
+}
+
+
+.navtitle:hover {
+   color: #FFFFFF;
+   text-decoration: underline
+}
+
+.navtitle:visited {
+   color: #FFFFFF;
+}
+
+.content {
+	margin:5px;
+}
+.nav {
+   margin:0;
+   font-family: Arial, Helvetica, sans-serif;
+   font-size: 10pt;
+   font-weight: bold;
+    border : 1px #ccc solid;
+    background-color : #669966;
+    padding:2;
+   color: #FFFFFF;
+}
+
+
+a.bnav:link {
+   font-size: 8pt;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #FFFFFF;
+}
+
+
+a.bnav:hover {
+   font-size: 8pt;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #FFFFFF;
+   text-decoration: underline
+}
+
+a.bnav:visited {
+   font-size: 8pt;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #FFFFFF;
+}
+
+
+a.menu:link {
+   font-size: 10pt;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #000000;
+}
+
+a.menu:hover {
+   font-size: 10pt;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #000000;
+   text-decoration: underline
+}
+
+a.menu:visited {
+   font-size: 10pt;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #000000;
+}
+
+a.sidemenu:link {
+   font-size: 10pt;
+   font-weight: bold;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #9C9C9C;
+}
+
+a.sidemenu:hover {
+   font-size: 10pt;
+   font-weight: bold;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #9C9C9C;
+   text-decoration: underline
+}
+
+a.sidemenu:visited {
+   font-size: 10pt;
+   font-weight: bold;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #9C9C9C;
+}
+
+a.stext {
+   font-size: 8pt;
+   font-weight: normal;
+   font-family: Arial, Helvetica, sans-serif;
+   text-decoration: underline;
+   margin-right: 5px
+}
+
+
+
+.menutitle {
+   font-size: 9pt;
+   font-weight: bold;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #FFFFFF;
+   text-decoration: none;
+}
+
+.menutitle2 {
+   font-size: 9pt;
+   font-weight: normal;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #FFFFFF;
+   text-decoration: none;
+}
+
+
+td.greentab {
+   background-image: url('/img/tabgreen.gif');
+   background-repeat: no-repeat;
+   background-position: center;
+}
+
+
+td.bluetab {
+   background-image: url('/img/tabblue.gif');
+   background-repeat: no-repeat;
+   background-position: center;
+}
+
+
+
+td.t {
+   background-image: url('/img/horizontal.gif');
+   background-repeat: no-repeat;
+   background-position: left;
+}
+
+.cat_title {
+   font-weight: bold;
+   font-size: 10pt;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #FFFFFF;
+
+}
+
+
+.sub_g {
+   font-weight: bold;
+   font-size: 12pt;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #000000;
+   border-bottom:4px solid #CCCCCC
+}
+
+.sub_b {
+   font-weight: bold;
+   font-size: 12pt;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #000000;
+   border-bottom:4px solid #006699
+}
+
+
+h2 {
+   font-size: 17pt;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #9C9C9C;
+}
+
+small {
+   font-size: 9pt;
+   font-weight: normal;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #000000;
+}
+
+small.ex {
+   font-size: 8pt;
+   font-weight: normal;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #000000;
+}
+
+
+small.imageinc {
+   font-size: 9pt;
+   font-weight: normal;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #000000;
+   text-align: justify;
+}
+
+small.date {
+   font-size: 9pt;
+   font-weight: normal;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #9C9C9C;
+}
+
+small.ad {
+   font-size: 8pt;
+   font-weight: normal;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #B5B5B5;
+}
+small.code {
+   font-size: 9pt;
+   font-weight: normal;
+   font-family: Courier New, serif;
+   color: #000000;
+}
+
+b.ctitle {
+   font-size: 12pt;
+   font-weight: bold;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #9C9C9C;
+}
+
+b.stitle {
+   font-size: 10pt;
+   font-weight: bold;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #9C9C9C;
+}
+
+
+b.ptitle {
+   font-size: 17pt;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #9C9C9C;
+}
+
+big.re {
+   font-size: 13pt;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #FF0000;
+}
+
+a.code {
+   font-size: 10pt;
+   font-weight: bold;
+   font-family: Courier New, serif
+}
+
+
+b.code {
+   font-size: 10pt;
+   font-weight: bold;
+   font-family: Courier New, serif
+}
+
+PRE {
+    font-size : 10pt;
+    font-family : courier new, monospaced;
+    margin : 0px;
+}
+
+.formrequired {
+    font-size : 10pt;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #9C9C9C;
+}
+
+
+/* ---------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------- */
+/*  Custom styles - used in many pages                                                            */
+/* ---------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------- */
+
+.jive-page-title {
+    font-size : 12pt;
+    font-weight : bold;
+}
+.jive-guest {
+    font-style : italic !important;
+}
+.nobreak {
+    white-space: nowrap;
+}
+
+/* --------------------------------------------- */
+/*  Account Box                                  */
+/* --------------------------------------------- */
+
+.jive-accountbox {
+    width : 200px;
+}
+.jive-accountbox .jive-icon {
+    padding : 3px;
+}
+.jive-accountbox .jive-icon-label {
+    padding : 3px;
+    white-space : nowrap;
+    padding-right : 1em;
+    font-size : 8pt;
+    font-family : verdana,arial,sans-serif;
+}
+.jive-accountbox .jive-icon-label .jive-active {
+    font-weight : bold;
+}
+.jive-accountbox THEAD TH {
+    text-align : left;
+    border-bottom : 1px #CFCFCF solid;
+}
+
+/* --------------------------------------------- */
+/*  Buttons                                      */
+/* --------------------------------------------- */
+
+
+
+/* --------------------------------------------- */
+/*  Jive User Search                             */
+/* --------------------------------------------- */
+
+.querybox {
+    background-color : #EEE;
+    border : 1px #CCC solid;
+    padding : 6px 6px 6px 6px;
+}
+.filterbox {
+    background-color : #EEE;
+    border : 1px #CCC solid;
+    vertical-align : top;
+    padding : 6px 6px 6px 6px;
+}
+.filterbox .filterOption {
+    width : 100%;
+    font-family : verdana, arial, helvetica, sans-serif;
+    font-size : 8pt;
+}
+.querybox label, .filterbox label {
+    font-weight : bold;
+}
+.resultbox {
+    vertical-align : top;
+}
+.resultbox .user-table {
+    border : 1px #CCC solid;
+}
+.resultbox .user-table thead {
+    background-color : #EEE;
+    text-align : left;
+    height : 30px;
+}
+.resultbox .user-table .header-table {
+    font-weight : bold;
+}
+.resultbox .user-table .user-column {
+    border-top : 1px #CCC solid;
+}
+.resultbox-odd {
+    background-color : #FFF;
+}
+.resultbox-even {
+    background-color : #EEE;
+}
+#profile tr td {
+    font-weight : bold;
+}
+#profile-details tr td {
+    color : #666;
+}
