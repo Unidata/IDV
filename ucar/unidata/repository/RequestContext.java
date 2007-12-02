@@ -21,26 +21,27 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
 import ucar.unidata.data.SqlUtil;
-import ucar.unidata.util.TextResult;
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringBufferCollection;
-import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.TextResult;
 import ucar.unidata.xml.XmlUtil;
-
-import java.lang.reflect.*;
 
 import java.io.File;
 import java.io.InputStream;
+
+import java.lang.reflect.*;
 
 
 
@@ -76,8 +77,5 @@ import java.util.regex.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class RequestContext {
-
-    
-}
+public class RequestContext {}
 

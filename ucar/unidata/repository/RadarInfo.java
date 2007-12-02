@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -45,7 +46,7 @@ import java.util.List;
 public class RadarInfo extends DataInfo {
 
 
-    /** _more_          */
+    /** _more_ */
     private String station;
 
     /** _more_ */
@@ -56,15 +57,19 @@ public class RadarInfo extends DataInfo {
      * _more_
      *
      *
+     *
+     * @param name _more_
+     * @param description _more_
      * @param group _more_
      * @param file _more_
      * @param station _more_
      * @param product _more_
      * @param date _more_
      */
-    public RadarInfo(String name, String description, Group group, String file, String station,
-                     String product, long date) {
-        super(name, description, TypeHandler.TYPE_LEVEL3RADAR, group, file,  date);
+    public RadarInfo(String name, String description, Group group,
+                     String file, String station, String product, long date) {
+        super(name, description, TypeHandler.TYPE_LEVEL3RADAR, group, file,
+              date);
         this.station = station;
         this.product = product;
     }

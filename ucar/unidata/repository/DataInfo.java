@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -44,34 +45,45 @@ import java.util.List;
  */
 public class DataInfo {
 
+    /** _more_          */
     private String id;
-    private      String name;
-    private      String description;
-
 
     /** _more_          */
-private      Group group;
-
-    /** _more_ */
-private      String file;
-
-    /** _more_ */
-private      long startDate;
+    private String name;
 
     /** _more_          */
-private      long endDate;
+    private String description;
 
-private      String type;
+
+    /** _more_ */
+    private Group group;
+
+    /** _more_ */
+    private String file;
+
+    /** _more_ */
+    private long startDate;
+
+    /** _more_ */
+    private long endDate;
+
+    /** _more_          */
+    private String type;
 
     /**
      * _more_
      *
+     *
+     * @param name _more_
+     * @param description _more_
+     * @param type _more_
      * @param group _more_
      * @param file _more_
      * @param date _more_
      */
-    public DataInfo(String name, String description, String type, Group group, String file, long date) {
-        this(name, description,type, group, file, date, date);
+    public DataInfo(String name, String description, String type,
+                    Group group, String file, long date) {
+        this(name, description, type, group, file, date, date);
     }
 
 
@@ -80,6 +92,10 @@ private      String type;
      * _more_
      *
      *
+     *
+     * @param name _more_
+     * @param description _more_
+     * @param type _more_
      * @param group _more_
      * @param file _more_
      * @param station _more_
@@ -88,14 +104,15 @@ private      String type;
      * @param startDate _more_
      * @param endDate _more_
      */
-    public DataInfo(String name, String description, String type, Group group,  String file, long startDate, long endDate) {
-        this.type = type;
-        this.name = name;
+    public DataInfo(String name, String description, String type,
+                    Group group, String file, long startDate, long endDate) {
+        this.type        = type;
+        this.name        = name;
         this.description = description;
-        this.group     = group;
-        this.file      = file;
-        this.startDate = startDate;
-        this.endDate   = endDate;
+        this.group       = group;
+        this.file        = file;
+        this.startDate   = startDate;
+        this.endDate     = endDate;
     }
 
     /**
@@ -183,78 +200,79 @@ private      String type;
         }
         return "";
     }
-/**
-Set the Type property.
 
-@param value The new value for Type
-**/
-public void setType (String value) {
+    /**
+     * Set the Type property.
+     *
+     * @param value The new value for Type
+     */
+    public void setType(String value) {
         type = value;
-}
+    }
 
-/**
-Get the Type property.
-
-@return The Type
-**/
-public String getType () {
+    /**
+     * Get the Type property.
+     *
+     * @return The Type
+     */
+    public String getType() {
         return type;
-}
+    }
 
 
-/**
-Set the Name property.
+    /**
+     * Set the Name property.
+     *
+     * @param value The new value for Name
+     */
+    public void setName(String value) {
+        name = value;
+    }
 
-@param value The new value for Name
-**/
-public void setName (String value) {
-	name = value;
-}
+    /**
+     * Get the Name property.
+     *
+     * @return The Name
+     */
+    public String getName() {
+        return name;
+    }
 
-/**
-Get the Name property.
+    /**
+     * Set the Description property.
+     *
+     * @param value The new value for Description
+     */
+    public void setDescription(String value) {
+        description = value;
+    }
 
-@return The Name
-**/
-public String getName () {
-	return name;
-}
+    /**
+     * Get the Description property.
+     *
+     * @return The Description
+     */
+    public String getDescription() {
+        return description;
+    }
 
-/**
-Set the Description property.
+    /**
+     * Set the Id property.
+     *
+     * @param value The new value for Id
+     */
+    public void setId(String value) {
+        id = value;
+    }
 
-@param value The new value for Description
-**/
-public void setDescription (String value) {
-	description = value;
-}
-
-/**
-Get the Description property.
-
-@return The Description
-**/
-public String getDescription () {
-	return description;
-}
-
-/**
-Set the Id property.
-
-@param value The new value for Id
-**/
-public void setId (String value) {
-	id = value;
-}
-
-/**
-Get the Id property.
-
-@return The Id
-**/
-public String getId () {
-	return id;
-}
+    /**
+     * Get the Id property.
+     *
+     * @return The Id
+     */
+    public String getId() {
+        return id;
+    }
 
 
 }

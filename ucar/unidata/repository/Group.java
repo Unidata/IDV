@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -44,18 +45,19 @@ import java.util.List;
  */
 public class Group {
 
-    /** _more_          */
+    /** _more_ */
     private String id;
 
-    /** _more_          */
+    /** _more_ */
     private String name;
 
-    /** _more_          */
+    /** _more_ */
     private String description;
 
+    /** _more_          */
     private String parentId;
 
-    /** _more_          */
+    /** _more_ */
     private Group parent;
 
     /**
@@ -65,17 +67,24 @@ public class Group {
      * @param name _more_
      * @param description _more_
      */
-    public Group(Group parent, String id, String name,
-                      String description) {
+    public Group(Group parent, String id, String name, String description) {
         this.parent      = parent;
         this.id          = id;
         this.name        = name;
         this.description = description;
     }
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param parentId _more_
+     * @param name _more_
+     * @param description _more_
+     */
     public Group(String id, String parentId, String name,
                  String description) {
-        this.parentId      = parentId;
+        this.parentId    = parentId;
         this.id          = id;
         this.name        = name;
         this.description = description;
@@ -175,23 +184,23 @@ public class Group {
         return description;
     }
 
-/**
-Set the ParentId property.
+    /**
+     * Set the ParentId property.
+     *
+     * @param value The new value for ParentId
+     */
+    public void setParentId(String value) {
+        parentId = value;
+    }
 
-@param value The new value for ParentId
-**/
-public void setParentId (String value) {
-	parentId = value;
-}
-
-/**
-Get the ParentId property.
-
-@return The ParentId
-**/
-public String getParentId () {
-	return parentId;
-}
+    /**
+     * Get the ParentId property.
+     *
+     * @return The ParentId
+     */
+    public String getParentId() {
+        return parentId;
+    }
 
 
 
