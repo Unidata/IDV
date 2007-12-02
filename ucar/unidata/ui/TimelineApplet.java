@@ -28,8 +28,12 @@ package ucar.unidata.ui;
 
 
 
+import ucar.unidata.util.LayoutUtil;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.DatedObject;
+import ucar.unidata.util.DateUtil;
 
+import ucar.unidata.util.DatedThing;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -75,11 +79,44 @@ import java.applet.*;
 public class TimelineApplet extends Applet {
     Timeline timeline;
     URL baseUrl;
+    JLabel label = new JLabel("  ");
+
     public TimelineApplet() {
-        timeline = new Timeline();
-        baseUrl =getDocumentBase();
+    }
+
+    public  void init () {
+        String times  = getParameter ("times");
+        String labels  = getParameter ("labels");
+        List realTimes = new ArrayList();
+        //        System.err.println("TIMES:" + times);
+        try {
+        if(times!=null&& labels!=null) {
+            List timeStrings = StringUtil.split(times,",",true, true);
+            List labelStrings = StringUtil.split(labels,",",true, true);
+            for(int i=0;i<timeStrings.size();i++) {
+                realTimes.add(new DatedObject(DateUtil.parse((String) timeStrings.get(i)),
+                                                             labelStrings.get(i)));
+            }
+        }
+        } catch(Exception exc) {
+            exc.printStackTrace();
+        }
+        //        System.err.println("Real times:" + realTimes);
+        timeline = new Timeline(realTimes,400) {
+                public void setHighlightedDate(DatedThing d) {
+                    super.setHighlightedDate( d);
+                    //                    System.err.println ("set hi:" + d);
+                    if(d==null) label.setText("");
+                    else label.setText(d.toString());
+                }
+            };
+        //        baseUrl =getDocumentBase();
         setLayout (new BorderLayout());
-        this.add(timeline.getContents(true));
+        timeline.setUseDateSelection(false);
+        JPanel container = LayoutUtil.centerBottom(timeline.getContents(false,false),LayoutUtil.inset(label,5));
+        container.setBorder(BorderFactory.createLineBorder(Color.black));
+
+        this.add(container);
     }
 }
 

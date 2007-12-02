@@ -40,11 +40,50 @@ public class HtmlUtil {
      * @param value _more_
      * @param name _more_
      */
-    public static String makeHidden(String name,String value) {
+    public static String hidden(String name,String value) {
         return "<input type=\"hidden\" name=\"" + name + "\" value=\""
             + value + "\"/>";
     }
 
+
+    public static String img(String path) {
+        return "<img border=\"0\" src=\"" + path +"\">";
+    }
+    public static String bold(String v1) {
+        return "<b>" + v1 +"</b>";
+    }
+
+    public static String col(String v1) {
+        return "<td>"+ v1 +"</td>";
+    }
+
+    public static String row(String v1) {
+        return "<tr><td>" + v1 +"</td></tr>";
+    }
+
+    public static String row(String v1,String v2) {
+        return "<tr><td>" + v1 +"</td><td>" + v2 +"</td></tr>";
+    }
+
+    public static String url(String path, String n1, String v1) {
+        return url(path, new String[]{n1,v1});
+    }
+
+
+    public static String url(String path, String n1, String v1, String n2, String v2) {
+        return url(path, new String[]{n1,v1,n2,v2});
+    }
+
+    public static String url(String path, String []args) {
+        if(args.length==0) return path;
+        path = path+"?";
+        for(int i=0;i<args.length;i+=2) {
+            if(i>0)
+                path = path+"&";
+            path = path + args[i]+"="+args[i+1];
+        }
+        return path;
+    }
 
     public static String checkbox(String name, String value) {
         return "<input type=\"checkbox\" name=\"" + name +"    value=\"" + value +"\">";
@@ -54,12 +93,16 @@ public class HtmlUtil {
         return "<form action=\"" + url +"\">";
     }
 
-    public static String makeInput(String name,String value) {
+    public static String input(String name,String value) {
         return "<input  name=\"" + name + "\" value=\""+ value + "\"/>";
     }
 
     public static String href(String url, String label) {
         return "<a href=\"" + url +"\">" + label +"</a>";
+    }
+
+    public static String href(String url, String label, String extra) {
+        return "<a href=\"" + url + "\"" + " " + extra+">" + label +"</a>";
     }
 
     public static String submit(String label) {
@@ -74,7 +117,7 @@ public class HtmlUtil {
      * @param name _more_
      * @param label _more_
      */
-    public static String makeSelect(String name,List values) {
+    public static String select(String name,List values) {
         StringBuffer sb = new StringBuffer();
         sb.append("<select name=\"" + name + "\">\n");
         for (int i = 0; i < values.size(); i++) {
@@ -93,7 +136,7 @@ public class HtmlUtil {
         return sb.toString();
     }
 
-    public static String makeTableEntry(String left, String right) {
+    public static String tableEntry(String left, String right) {
         return " <tr><td align=\"right\">" + left     + "</td><td>" + right +"</td></tr>";
 
     }

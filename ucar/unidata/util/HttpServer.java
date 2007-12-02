@@ -294,7 +294,9 @@ public class HttpServer {
                 if (okToParseContent(path, contentString, args)) {
                     parseArgs(contentString, args);
                 }
-            } else {}
+            } else {
+                System.err.println("TYPE: " + requestType);
+            }
             handleRequest(path, args, props, contentString);
         }
 
@@ -453,11 +455,16 @@ public class HttpServer {
                       : "HTTP/1.0 404 Not Found" + CRLF);
             writeLine("Content-Length: " + length + CRLF);
             writeLine("Content-type: " + type + CRLF);
+            writeHeaderArgs();
+            writeLine("\n");
+        }
+
+
+        protected void writeHeaderArgs() throws Exception {
             //            writeLine("Date: Fri, 12 Jan 2007 00:02:44 GMT"+CRLF);
             //            writeLine("Cache-Control: no-cache"+CRLF);
             writeLine("Last-Modified: Fri, 12 Jan 2007 00:02:44 GMT"+CRLF);
             //            writeLine("Last-Modified:" + new Date()+CRLF);
-            writeLine("\n");
         }
 
 

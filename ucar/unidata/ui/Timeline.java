@@ -29,6 +29,7 @@ package ucar.unidata.ui;
 
 import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.DatedThing;
 
 import ucar.unidata.util.DatedObject;
 import ucar.unidata.util.DatedThing;
@@ -680,7 +681,7 @@ public class Timeline extends JPanel implements MouseListener,
         }
         DatedThing closest = findClosest(new Point(me.getX(), me.getY()));
         boolean    changed = (closest != mouseHighlighted);
-        mouseHighlighted = closest;
+        setHighlightedDate(closest);
         setCursor(CURSOR_NORMAL);
         if ((selectionBox != null) && dateSelectionActive()) {
             Rectangle r = new Rectangle(selectionBox);
@@ -798,10 +799,9 @@ public class Timeline extends JPanel implements MouseListener,
      */
     public void mouseExited(MouseEvent e) {
         if (mouseHighlighted != null) {
-            mouseHighlighted = null;
+            setHighlightedDate(null);
             repaint();
         }
-
     }
 
     /**
@@ -1429,6 +1429,7 @@ public class Timeline extends JPanel implements MouseListener,
         return makeButtons(l, labels, labels);
     }
 
+
     public static JPanel makeButtons(ActionListener listener, String[] labels,
                                      String[] cmds) {
 
@@ -1459,6 +1460,7 @@ public class Timeline extends JPanel implements MouseListener,
         return LayoutUtil.doLayout(p, LayoutUtil.getComponentArray(buttons), buttons.size(), LayoutUtil.WT_N,
                                    LayoutUtil.WT_N, null, null, new Insets(5, 5, 5, 5));
     }
+
 
 
 
@@ -1566,7 +1568,9 @@ public class Timeline extends JPanel implements MouseListener,
      */
     protected void dateSelectionChanged() {
         if (dateSelectionActive()) {
-            setSelected(dateSelection.apply(datedThings));
+            if(datedThings!=null) {
+                setSelected(dateSelection.apply(datedThings));
+            }
         }
         repaint();
     }
@@ -1579,7 +1583,7 @@ public class Timeline extends JPanel implements MouseListener,
     private void rangeChanged(Timeline timeline) {
         startDate        = timeline.startDate;
         endDate          = timeline.endDate;
-        mouseHighlighted = null;
+        setHighlightedDate(mouseHighlighted);
         repaint();
     }
 
@@ -1605,10 +1609,8 @@ public class Timeline extends JPanel implements MouseListener,
         }
 
 
-
         makeSunriseDates();
-
-        mouseHighlighted = null;
+        setHighlightedDate(null);
         repaint();
     }
 
@@ -1779,8 +1781,12 @@ public class Timeline extends JPanel implements MouseListener,
      * @return gui
      */
     public JComponent getContents(boolean withButtons) {
+        return getContents(withButtons, true);
+    }
+
+    public JComponent getContents(boolean withButtons, boolean withBorder) {
         if (contents == null) {
-            doMakeContents(withButtons);
+            doMakeContents(withButtons, withBorder);
         }
         return contents;
     }
@@ -1794,9 +1800,14 @@ public class Timeline extends JPanel implements MouseListener,
      * @param withButtons with dialog buttons
      */
     protected void doMakeContents(boolean withButtons) {
+        doMakeContents(withButtons, true);
+    }
+    protected void doMakeContents(boolean withButtons, boolean withBorder) {
         JPanel thisContainer = LayoutUtil.inset(this, 0);
-        thisContainer.setBorder(
-            BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+        if(withBorder) {
+            thisContainer.setBorder(
+                                    BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+        }
         if ( !withButtons) {
             contents = thisContainer;
             return;
@@ -1805,7 +1816,9 @@ public class Timeline extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent ae) {
                 String cmd = ae.getActionCommand();
                 dialogOK = cmd.equals(CMD_OK);
-                dialog.setVisible(false);
+                if(dialog!=null) {
+                    dialog.setVisible(false);
+                }
             }
         };
 
@@ -2341,6 +2354,14 @@ public class Timeline extends JPanel implements MouseListener,
             }
         }
 
+    }
+
+    public void setHighlightedDate(DatedThing d) {
+        mouseHighlighted = d;
+    }
+
+    public DatedThing getHighlightedDate() {
+        return   mouseHighlighted;
     }
 
 
