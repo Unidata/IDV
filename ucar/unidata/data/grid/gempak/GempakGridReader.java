@@ -21,11 +21,7 @@
  */
 
 
-
 package ucar.unidata.data.grid.gempak;
-
-
-import edu.wisc.ssec.mcidas.McIDASUtil;
 
 import ucar.unidata.io.RandomAccessFile;
 import ucar.unidata.util.StringUtil;
