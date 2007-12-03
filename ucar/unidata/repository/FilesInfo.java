@@ -23,8 +23,6 @@
 
 
 
-
-
 package ucar.unidata.repository;
 
 
@@ -33,17 +31,20 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
 import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 
 /**
- * Class DataInfo _more_
+ * Class FilesInfo _more_
  *
  *
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class DataInfo {
+public class FilesInfo {
+
+    List<String> tags;
 
     /** _more_          */
     private String id;
@@ -58,8 +59,13 @@ public class DataInfo {
     /** _more_ */
     private Group group;
 
+    private User user;
+
     /** _more_ */
     private String file;
+
+    /** _more_ */
+    private long createDate;
 
     /** _more_ */
     private long startDate;
@@ -81,9 +87,9 @@ public class DataInfo {
      * @param file _more_
      * @param date _more_
      */
-    public DataInfo(String name, String description, String type,
-                    Group group, String file, long date) {
-        this(name, description, type, group, file, date, date);
+    public FilesInfo(String id, String name, String description, String type,
+                     Group group, User user, String file, long date) {
+        this(id,name, description, type, group, user,file, date, date,date);
     }
 
 
@@ -104,13 +110,16 @@ public class DataInfo {
      * @param startDate _more_
      * @param endDate _more_
      */
-    public DataInfo(String name, String description, String type,
-                    Group group, String file, long startDate, long endDate) {
+    public FilesInfo(String id, String name, String description, String type,
+                     Group group, User user, String file, long createDate, long startDate, long endDate) {
+        this.id = id;
         this.type        = type;
         this.name        = name;
         this.description = description;
         this.group       = group;
+        this.user        = user;
         this.file        = file;
+        this.createDate   = createDate;
         this.startDate   = startDate;
         this.endDate     = endDate;
     }
@@ -132,6 +141,26 @@ public class DataInfo {
     public String getFile() {
         return file;
     }
+
+    /**
+     * Set the CreateDate property.
+     *
+     * @param value The new value for CreateDate
+     */
+    public void setCreateDate(long value) {
+        createDate = value;
+    }
+
+    /**
+     * Get the CreateDate property.
+     *
+     * @return The CreateDate
+     */
+    public long getCreateDate() {
+        return createDate;
+    }
+
+
 
     /**
      * Set the StartDate property.
@@ -272,6 +301,52 @@ public class DataInfo {
      */
     public String getId() {
         return id;
+    }
+
+    /**
+       Set the User property.
+
+       @param value The new value for User
+    **/
+    public void setUser (User value) {
+	user = value;
+    }
+
+    /**
+       Get the User property.
+
+       @return The User
+    **/
+    public User getUser () {
+	return user;
+    }
+
+    /**
+       Set the Tags property.
+
+       @param value The new value for Tags
+    **/
+    public void setTags (List<String> value) {
+	tags = value;
+    }
+
+    /**
+       Get the Tags property.
+
+       @return The Tags
+    **/
+    public List<String> getTags () {
+	return tags;
+    }
+
+
+
+    public void  addTag(String tag) {
+        if(tags == null) {
+            tags = new ArrayList<String>();
+        }
+        tags.add(tag);
+
     }
 
 

@@ -82,6 +82,8 @@ public class Request {
     /** _more_          */
     public static final String CALL_QUERY = "/query";
 
+    public static final String CALL_FETCH = "/fetch";
+
     /** _more_          */
     public static final String CALL_SQL = "/sql";
 
@@ -135,8 +137,8 @@ public class Request {
      *
      * @return _more_
      */
-    public boolean contains(String key) {
-        return parameters.contains(key);
+    public boolean hasParameter(String key) {
+        return parameters.containsKey(key);
     }
 
     /**

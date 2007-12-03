@@ -67,9 +67,9 @@ public class Group {
      * @param name _more_
      * @param description _more_
      */
-    public Group(Group parent, String id, String name, String description) {
-        this.parent      = parent;
+    public Group(String id, Group parent, String name, String description) {
         this.id          = id;
+        this.parent      = parent;
         this.name        = name;
         this.description = description;
     }

@@ -126,6 +126,15 @@ public class SqlUtil {
     }
 
 
+    public static String getQuestionMarks(int cnt) {
+        String s = "";
+        for(int i=0;i<cnt;i++) {
+            if(i>0) s = s+",";
+            s = s+"?";
+        }
+        return s;
+    }
+
 
     /**
      * _more_
@@ -137,6 +146,10 @@ public class SqlUtil {
      */
     public static String comma(Object s1, Object s2) {
         return s1.toString() + "," + s2.toString();
+    }
+
+    public static String comma(String[]s) {
+        return StringUtil.join(",",s);
     }
 
     /**
@@ -286,8 +299,25 @@ public class SqlUtil {
 
 
 
-    public static void loadSql(String sql, Statement statement) 
+
+
+    public static void loadSql(String sql, Statement statement, boolean ignoreErrors) 
             throws Exception {
+        for(String command: parseSql(sql)) {
+            try {
+                statement.execute(command);
+                //                System.err.println ("OK:" + command);
+            } catch(Exception exc) {
+                if(!ignoreErrors) {
+                    System.err.println ("bad query:" + command);
+                    throw exc;
+                }
+            }
+        }
+    }
+
+    public static List<String> parseSql(String sql) {
+        List<String> result = new ArrayList<String>();
         List<String> toks = (List<String>)StringUtil.split(sql,"\n");
         StringBuffer sb = new StringBuffer();
         for(String line: toks) {
@@ -299,17 +329,14 @@ public class SqlUtil {
                 String lineSql = sb.toString().trim();
                 //Strip off the ";"
                 lineSql = lineSql.substring(0, lineSql.length()-1);
-                //                System.err.println ("EVAL:" +lineSql);
-                try {
-                    statement.execute(lineSql);
-                } catch(Exception exc) {
-                    System.err.println ("bad query:" + lineSql);
-                    throw exc;
-                }
+                result.add(lineSql);
                 sb = new StringBuffer();
             }
         }
+        return result;
     }
+
+
 
 
     /**

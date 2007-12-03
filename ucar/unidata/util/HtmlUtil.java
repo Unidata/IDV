@@ -47,7 +47,11 @@ public class HtmlUtil {
 
 
     public static String img(String path) {
-        return "<img border=\"0\" src=\"" + path +"\">";
+        return img(path, "");
+    }
+
+    public static String img(String path, String extra ) {
+        return "<img border=\"0\" src=\"" + path +"\"" + " " + extra +">";
     }
     public static String bold(String v1) {
         return "<b>" + v1 +"</b>";
@@ -90,12 +94,13 @@ public class HtmlUtil {
     }
 
     public static String form(String url) {
-        return "<form action=\"" + url +"\">";
+        return form(url,"");
+    }
+    public static String form(String url, String extra) {
+        return "<form action=\"" + url +"\"" + " " + extra +" >";
     }
 
-    public static String input(String name,String value) {
-        return "<input  name=\"" + name + "\" value=\""+ value + "\"/>";
-    }
+
 
     public static String href(String url, String label) {
         return "<a href=\"" + url +"\">" + label +"</a>";
@@ -107,6 +112,18 @@ public class HtmlUtil {
 
     public static String submit(String label) {
         return "<input  type=\"submit\" value=\"" + label +"\" />";
+    }
+
+    public static String input(String name) {
+        return input(name,null,"");
+    }
+
+    public static String input(String name,Object value) {
+        return input(name,value,"");
+    }
+
+    public static String input(String name, Object value, String extra) {
+        return "<input name=\"" + name +"\" value=\"" + (value==null?"":value.toString()) +"\" " + extra +"/>";
     }
 
     /**

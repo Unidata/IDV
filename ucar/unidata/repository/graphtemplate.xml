@@ -4,6 +4,12 @@
 
 <nodetype    name="Node"  />
 
+<nodetype    name="tag" parent="Node" fillcolor="blue">
+  <shape>
+    <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
+  </shape>
+</nodetype>
+
 <nodetype    name="group" parent="Node" fillcolor="#cccccc">
   <command label="View group" command="url(,%root%/showgroup?group=%id%)"/>
   <shape>

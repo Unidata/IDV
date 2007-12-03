@@ -133,7 +133,7 @@ public class MetaDataServer extends HttpServer {
                                          Hashtable httpArgs, String content)
                     throws Exception {
                 path = path.trim();
-                System.err.println("request:" + path + ":");
+                //                System.err.println("request:" + path + ":");
                 try {
                     TextResult result =
                         repository.handleRequest(new Request(path,
@@ -152,9 +152,10 @@ public class MetaDataServer extends HttpServer {
                                     getClass());
                             byte[] bytes = IOUtil.readBytes(is);
                             if (path.endsWith(".html")) {
-                                writeContent(true,
-                                             new TextResult("",
-                                                 new String(bytes)));
+                                writeResult(true, new String(bytes),"text/html");
+                                //                                writeContent(true,
+                                //                                             new TextResult("",
+                                //                                                 new String(bytes)));
                             } else {
                                 if (path.endsWith(".gif")) {
                                     type = "image/gif";

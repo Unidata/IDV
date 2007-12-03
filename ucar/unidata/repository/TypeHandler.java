@@ -58,7 +58,7 @@ import java.util.Properties;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class TypeHandler implements Constants {
+public class TypeHandler implements Constants, Tables {
 
     /** _more_          */
     public static final String TYPE_ANY = "any";
@@ -123,26 +123,43 @@ public class TypeHandler implements Constants {
     }
 
 
+
+
+
+
     /**
      * _more_
      *
-     * @param dataInfo _more_
+     * @param filesInfo _more_
      * @param request _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public TextResult showFile(DataInfo dataInfo, Request request)
+    public TextResult showFile(FilesInfo filesInfo, Request request)
             throws Exception {
         StringBuffer sb = new StringBuffer();
-        sb.append("File:" + dataInfo.getFile() + "<br>");
-        sb.append("Type:" + dataInfo.getType() + "<br>");
+        String         output    = repository.getValue(request, ARG_OUTPUT, OUTPUT_HTML);
+        if (output.equals(OUTPUT_HTML)) {
+            sb.append("<table>");
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"), filesInfo.getName() + " " +
+                                          repository.getFileFetchLink(filesInfo) +" " +
+                                          repository.getFileTreeLink(filesInfo)));
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Create Date:"),  ""+new Date(filesInfo.getCreateDate())));
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Creator:"),  filesInfo.getUser().getName()));
 
-        if (isType(TYPE_LEVEL3RADAR)) {}
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("File:"),  filesInfo.getFile()));
 
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"), filesInfo.getType()));
+            if (isType(TYPE_LEVEL3RADAR)) {}
+            sb.append("</table>");
+        } else if(output.equals(OUTPUT_XML)) {
 
-        return new TextResult("File", sb);
+        } else if(output.equals(OUTPUT_CSV)) {
+
+        }
+        return new TextResult("File: "+ filesInfo.getName(),  sb,repository.getMimeType(output));
 
     }
 
@@ -265,6 +282,14 @@ public class TypeHandler implements Constants {
         String            mindate      = ((mindates.length > 0)
                                           ? mindates[0]
                                           : "");
+        if(maxdate!=null) 
+            maxdate = SqlUtil.getDateString(maxdate);
+        if(mindate!=null) 
+            mindate = SqlUtil.getDateString(mindate);
+
+
+
+
 
         List<TypeHandler> typeHandlers = repository.getTypeHandlers(request);
         if (typeHandlers.size() > 1) {
@@ -273,26 +298,27 @@ public class TypeHandler implements Constants {
                 tmp.add(new TwoFacedObject(typeHandler.getType(),
                                            typeHandler.getType()));
             }
-            String typeSelect = HtmlUtil.select(Repository.ARG_TYPE, tmp);
+            String typeSelect = HtmlUtil.select(ARG_TYPE, tmp);
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"),
                                           typeSelect));
         } else if (typeHandlers.size() == 1) {
-            sb.append(HtmlUtil.hidden(Repository.ARG_TYPE,
+            sb.append(HtmlUtil.hidden(ARG_TYPE,
                                       typeHandlers.get(0).getType()));
         }
 
         String name = (String) request.get(ARG_NAME);
         if (name == null) {
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
-                                          HtmlUtil.input(Repository.ARG_NAME,
-                                              "")));
+                                          HtmlUtil.input(ARG_NAME)));
         }
 
         List<Group> groups = repository.getGroups(
                                  SqlUtil.readString(
                                      repository.execute(
-                                         SELECT_FILES_GROUPS
-                                         + SqlUtil.makeWhere(where)), 1));
+                                                        SqlUtil.makeSelect(
+                                                                           SqlUtil.distinct(COL_FILES_GROUP_ID), 
+                                                                           TABLE_FILES,
+                                                                           SqlUtil.makeWhere(where))), 1));
 
         if (groups.size() > 1) {
             List groupList = new ArrayList();
@@ -300,31 +326,34 @@ public class TypeHandler implements Constants {
             for (Group group : groups) {
                 groupList.add(new TwoFacedObject(group.getFullName()));
             }
-            String groupSelect = HtmlUtil.select(Repository.ARG_GROUP,
+            String groupSelect = HtmlUtil.select(ARG_GROUP,
                                      groupList);
             //            groupSelect+="&nbsp;" +HtmlUtil.checkbox(ARG_GROUP_CHILDREN,"true") +" (Search subgroups)";
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Group:"),
                                           groupSelect));
         } else if (groups.size() == 1) {
-            sb.append(HtmlUtil.hidden(Repository.ARG_GROUP,
+            sb.append(HtmlUtil.hidden(ARG_GROUP,
                                       groups.get(0).getFullName()));
         }
 
+        String calClick = "<A HREF=# onClick=\"" +
+            "window.dateStyle = '';\n"+
+            "window.dateField = document.query.fromdate\n" +
+            "calendar =window.open('/repository/calendar.html','cal','WIDTH=300,HEIGHT=350')\n"+
+            "\">CLICK</a>";
+
         sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Date Range:"),
-                                      "<input name=\"fromdate\" value=\""
-                                      + ((mindate != null)
-                                         ? "" + mindate
-                                         : "") + "\"> -- <input name=\"todate\" value=\""
-                                         + ((maxdate != null)
-                                            ? "" + maxdate
-                                            : "") + "\">\n"));
+                                      HtmlUtil.input(ARG_FROMDATE,  mindate)
+                                                     + " -- " +
+                                      HtmlUtil.input(ARG_TODATE,  maxdate)));
 
         if (isType(TYPE_LEVEL3RADAR)) {
             where.add(SqlUtil.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID));
             String[] products = SqlUtil.readString(
                                     repository.execute(
-                                        SELECT_LEVEL3RADAR_PRODUCTS
-                                        + SqlUtil.makeWhere(where)), 1);
+                                                       SqlUtil.makeSelect(SqlUtil.distinct(COL_LEVEL3RADAR_PRODUCT),
+                                                                          TABLE_FILES +"," + TABLE_LEVEL3RADAR,
+                                                                          SqlUtil.makeWhere(where))), 1);
             List productList = new ArrayList();
             for (int i = 0; i < products.length; i++) {
                 productList.add(
@@ -335,8 +364,9 @@ public class TypeHandler implements Constants {
 
             String[] stations = SqlUtil.readString(
                                     repository.execute(
-                                        SELECT_LEVEL3RADAR_STATIONS
-                                        + SqlUtil.makeWhere(where)), 1);
+                                                       SqlUtil.makeSelect(SqlUtil.distinct(COL_LEVEL3RADAR_STATION),
+                                                                          TABLE_FILES + "," + TABLE_LEVEL3RADAR,
+                                                                          SqlUtil.makeWhere(where))), 1);
 
             List stationList = new ArrayList();
             for (int i = 0; i < stations.length; i++) {
@@ -347,18 +377,18 @@ public class TypeHandler implements Constants {
             productList.add(0, "All");
             if (stations.length > 1) {
                 sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Station:"),
-                        HtmlUtil.select(Repository.ARG_STATION,
+                        HtmlUtil.select(ARG_STATION,
                                         stationList)));
             } else if (stations.length == 1) {
-                sb.append(HtmlUtil.hidden(Repository.ARG_STATION,
+                sb.append(HtmlUtil.hidden(ARG_STATION,
                                           stations[0]));
             }
             if (products.length > 1) {
                 sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Product:"),
-                        HtmlUtil.select(Repository.ARG_PRODUCT,
+                        HtmlUtil.select(ARG_PRODUCT,
                                         productList)));
             } else if (products.length == 1) {
-                sb.append(HtmlUtil.hidden(Repository.ARG_PRODUCT,
+                sb.append(HtmlUtil.hidden(ARG_PRODUCT,
                                           products[0]));
             }
         }
@@ -381,9 +411,15 @@ public class TypeHandler implements Constants {
             name = name.trim();
         }
 
-        String groupName = (String) request.get(Repository.ARG_GROUP);
+        String tag  = (String) request.get(ARG_TAG);
+        if(tag!=null) {
+            where.add(SqlUtil.eq(COL_FILES_ID, COL_TAGS_FILE_ID));
+            where.add(SqlUtil.eq(COL_TAGS_NAME, SqlUtil.quote(tag)));
+        }
+
+        String groupName = (String) request.get(ARG_GROUP);
         if ((groupName != null) && !groupName.toLowerCase().equals("all")) {
-            Group  group          = repository.findGroup(groupName);
+            Group  group          = repository.findGroupFromName(groupName);
             String searchChildren = (String) request.get(ARG_GROUP_CHILDREN);
             //            System.err.println ("child:" + searchChildren);
             //            if(Misc.equals(searchChildren,"true")) {
@@ -394,19 +430,20 @@ public class TypeHandler implements Constants {
                                  SqlUtil.quote(group.getId())));
             //            }
         }
-        String type = (String) request.get(Repository.ARG_TYPE);
+        String type = (String) request.get(ARG_TYPE);
         if ((type != null) && !type.equals(TYPE_ANY)) {
             addOr(COL_FILES_TYPE, type, where);
         }
 
-        String fromdate = (String) request.get(Repository.ARG_FROMDATE);
+        String fromdate = (String) request.get(ARG_FROMDATE);
         if ((fromdate != null) && (fromdate.trim().length() > 0)) {
             where.add(
                 SqlUtil.ge(
                     COL_FILES_FROMDATE,
                     SqlUtil.quote(SqlUtil.getDateString(fromdate))));
         }
-        String todate = (String) request.get(Repository.ARG_TODATE);
+
+        String todate = (String) request.get(ARG_TODATE);
         if ((todate != null) && (todate.trim().length() > 0)) {
             where.add(
                 SqlUtil.le(
@@ -414,13 +451,21 @@ public class TypeHandler implements Constants {
                     SqlUtil.quote(SqlUtil.getDateString(todate))));
         }
 
+        String createDate = (String) request.get(ARG_CREATEDATE);
+        if ((createDate != null) && (createDate.trim().length() > 0)) {
+            where.add(
+                SqlUtil.le(
+                    COL_FILES_CREATEDATE,
+                    SqlUtil.quote(SqlUtil.getDateString(createDate))));
+        }
+
         if (isType(TYPE_LEVEL3RADAR)) {
             addOr(COL_LEVEL3RADAR_STATION,
-                  (String) request.get(Repository.ARG_STATION), where);
+                  (String) request.get(ARG_STATION), where);
             addOr(COL_LEVEL3RADAR_PRODUCT,
-                  (String) request.get(Repository.ARG_PRODUCT), where);
-            if (request.contains(Repository.ARG_STATION)
-                    || request.contains(Repository.ARG_PRODUCT)) {
+                  (String) request.get(ARG_PRODUCT), where);
+            if (request.hasParameter(ARG_STATION)
+                    || request.hasParameter(ARG_PRODUCT)) {
                 where.add(SqlUtil.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID));
             }
         }
@@ -446,13 +491,18 @@ public class TypeHandler implements Constants {
      * @return _more_
      */
     protected String getQueryOnTables(Request request) {
+        String tables =  TABLE_FILES;
         if (isType(TYPE_LEVEL3RADAR)) {
-            if (request.contains(Repository.ARG_PRODUCT)
-                    || request.contains(Repository.ARG_STATION)) {
-                return TABLE_FILES + "," + TABLE_LEVEL3RADAR;
+            if (request.hasParameter(ARG_PRODUCT)
+                    || request.hasParameter(ARG_STATION)) {
+                tables+=","+ TABLE_LEVEL3RADAR;
             }
         }
-        return TABLE_FILES;
+
+        if(request.hasParameter(ARG_TAG)) {
+            tables+=","+ TABLE_TAGS;        
+        }
+        return tables;
     }
 
 
