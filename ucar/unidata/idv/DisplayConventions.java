@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
@@ -401,8 +402,7 @@ public class DisplayConventions extends IdvManager {
 
         if (dflt != null) {
             //Set pre-determined values into local data "contourInfo"
-            //System.out.println("  DC: findContourInfo got params contouring values "+
-            //         dflt.toString() );
+            //System.out.println("  DC: findContourInfo got params contouring values "+ dflt.toString() );
             contourInfo.setIfDefined(dflt);
         }
 
@@ -452,14 +452,13 @@ public class DisplayConventions extends IdvManager {
 
             if ((span <= 300.0) && (span > 5.0)) {  /* typical case */
                 clInterval = (float) rint;
-                clMin = clBase = clInterval
-                                 * ((int) (min / (int) clInterval));
-                clMax = clInterval * (1 + (int) (max / (int) clInterval));
-            } else if (span <= 5.0) {  /* for max-min less than 20 */
+                clMin      = clBase = clInterval * ((int) (min / clInterval));
+                clMax      = clInterval * (1 + (int) (max / clInterval));
+            } else if (span <= 5.0) {  /* for max-min less than 5 */
                 clInterval = (float) rint;
                 clMin      = clBase = min;
                 clMax      = max;
-            } else {                   /* for really big ranges, span > 300 */
+            } else { /* for really big ranges, span > 300 */
                 clInterval = (float) rint;
                 clMin      = clBase = (float) ((int) min);
                 clMax      = (float) ((int) max);
@@ -471,8 +470,7 @@ public class DisplayConventions extends IdvManager {
 
         // this should never be true; must be a leftover
         if (clInterval == 0.0f) {
-            //System.out.println
-            // ("  DC: findContourInfo got default contour interval of 20.0");
+            //System.out.println("  DC: findContourInfo got default contour interval of 20.0");
             clInterval = 20.0f;
         }
 
