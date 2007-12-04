@@ -77,5 +77,33 @@ import java.util.regex.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class RequestContext {}
+public class RequestContext {
+    private User user;
+
+    public RequestContext(User user) {
+        this.user = user;
+    } 
+
+/**
+Set the User property.
+
+@param value The new value for User
+**/
+public void setUser (User value) {
+	user = value;
+}
+
+/**
+Get the User property.
+
+@return The User
+**/
+public User getUser () {
+	return user;
+}
+
+
+
+
+}
 

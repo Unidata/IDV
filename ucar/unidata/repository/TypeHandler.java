@@ -35,7 +35,6 @@ import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.TextResult;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
@@ -63,6 +62,8 @@ public class TypeHandler implements Constants, Tables {
     /** _more_          */
     public static final String TYPE_ANY = "any";
 
+    public static final String TYPE_FILE = "file";
+
     /** _more_ */
     public static final String TYPE_LEVEL3RADAR = "level3radar";
 
@@ -77,6 +78,8 @@ public class TypeHandler implements Constants, Tables {
 
     /** _more_          */
     String description;
+
+
 
     /**
      * _more_
@@ -100,6 +103,11 @@ public class TypeHandler implements Constants, Tables {
         this.repository  = repository;
         this.type        = type;
         this.description = description;
+    }
+
+    public boolean equals(Object obj) {
+        if(!(obj instanceof TypeHandler)) return false;
+        return Misc.equals(type,((TypeHandler)obj).getType());
     }
 
     /**
@@ -137,7 +145,7 @@ public class TypeHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public TextResult showFile(FilesInfo filesInfo, Request request)
+    public Result showFile(FilesInfo filesInfo, Request request)
             throws Exception {
         StringBuffer sb = new StringBuffer();
         String         output    = repository.getValue(request, ARG_OUTPUT, OUTPUT_HTML);
@@ -159,7 +167,7 @@ public class TypeHandler implements Constants, Tables {
         } else if(output.equals(OUTPUT_CSV)) {
 
         }
-        return new TextResult("File: "+ filesInfo.getName(),  sb,repository.getMimeType(output));
+        return new Result("File: "+ filesInfo.getName(),  sb,repository.getMimeTypeFromOutput(output));
 
     }
 
@@ -173,7 +181,7 @@ public class TypeHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public TextResult processList(Request request, String what)
+    public Result processList(Request request, String what)
             throws Exception {
         return processRadarList(request, what);
     }
@@ -189,23 +197,24 @@ public class TypeHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public TextResult processRadarList(Request request, String what)
+    public Result processRadarList(Request request, String what)
             throws Exception {
         String column;
         String tag;
         String title;
         if (what.equals(WHAT_PRODUCT)) {
-            column = "product";
+            column = COL_LEVEL3RADAR_PRODUCT;
             tag    = "product";
             title  = "Level 3 Radar Products";
         } else /*if(what.equals(WHAT_STATION))*/ {
-            column = "station";
+            column = COL_LEVEL3RADAR_STATION;
             tag    = "station";
             title  = "Level 3 Radar Stations";
         }
         List where = assembleWhereClause(request);
+        where.add(SqlUtil.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID));
         String query = SqlUtil.makeSelect(SqlUtil.distinct(column),
-                                          TABLE_LEVEL3RADAR,
+                                          getTablesForQuery(request,Misc.newList(TABLE_LEVEL3RADAR)),
                                           SqlUtil.makeAnd(where));
         Statement    statement = repository.execute(query);
         String[]     products  = SqlUtil.readString(statement, 1);
@@ -247,7 +256,7 @@ public class TypeHandler implements Constants, Tables {
         } else if (output.equals(OUTPUT_XML)) {
             sb.append(XmlUtil.closeTag(tag + "s"));
         }
-        return new TextResult(title, sb, repository.getMimeType(output));
+        return new Result(title, sb, repository.getMimeTypeFromOutput(output));
     }
 
 
@@ -261,20 +270,20 @@ public class TypeHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public void addToForm(StringBuffer sb, Request request, List where)
+    public void addToForm(StringBuffer formBuffer, StringBuffer headerBuffer, Request request, List where)
             throws Exception {
 
         String[] maxdates = SqlUtil.readString(
                                 repository.execute(
                                     SqlUtil.makeSelect(
                                         SqlUtil.max(COL_FILES_TODATE),
-                                        getQueryOnTables(request),
+                                        getTablesForQuery(request,Misc.newList(TABLE_FILES)),
                                         SqlUtil.makeAnd(where))), 1);
         String[] mindates = SqlUtil.readString(
                                 repository.execute(
                                     SqlUtil.makeSelect(
                                         SqlUtil.min(COL_FILES_FROMDATE),
-                                        getQueryOnTables(request),
+                                        getTablesForQuery(request,Misc.newList(TABLE_FILES)),
                                         SqlUtil.makeAnd(where))), 1);
         String            maxdate      = ((maxdates.length > 0)
                                           ? maxdates[0]
@@ -289,8 +298,6 @@ public class TypeHandler implements Constants, Tables {
 
 
 
-
-
         List<TypeHandler> typeHandlers = repository.getTypeHandlers(request);
         if (typeHandlers.size() > 1) {
             List tmp = new ArrayList();
@@ -298,27 +305,34 @@ public class TypeHandler implements Constants, Tables {
                 tmp.add(new TwoFacedObject(typeHandler.getType(),
                                            typeHandler.getType()));
             }
+            TwoFacedObject anyTfo = new TwoFacedObject(TYPE_ANY,TYPE_ANY);
+            if(!tmp.contains(anyTfo)) {
+                tmp.add(0, anyTfo);
+            }
             String typeSelect = HtmlUtil.select(ARG_TYPE, tmp);
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"),
+            formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"),
                                           typeSelect));
         } else if (typeHandlers.size() == 1) {
-            sb.append(HtmlUtil.hidden(ARG_TYPE,
+            formBuffer.append(HtmlUtil.hidden(ARG_TYPE,
                                       typeHandlers.get(0).getType()));
+            formBuffer.append(HtmlUtil.tableEntry("<b>Type:</b>",typeHandlers.get(0).getDescription())); 
         }
 
         String name = (String) request.get(ARG_NAME);
         if (name == null) {
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
+            formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
                                           HtmlUtil.input(ARG_NAME)));
         }
 
+
+
+        String groupSelectSql = SqlUtil.makeSelect(
+                                                SqlUtil.distinct(COL_FILES_GROUP_ID), 
+                                                getTablesForQuery(request,Misc.newList(TABLE_FILES)),
+                                                SqlUtil.makeAnd(where));
         List<Group> groups = repository.getGroups(
-                                 SqlUtil.readString(
-                                     repository.execute(
-                                                        SqlUtil.makeSelect(
-                                                                           SqlUtil.distinct(COL_FILES_GROUP_ID), 
-                                                                           TABLE_FILES,
-                                                                           SqlUtil.makeWhere(where))), 1));
+                                                  SqlUtil.readString(
+                                                                     repository.execute(groupSelectSql),1));
 
         if (groups.size() > 1) {
             List groupList = new ArrayList();
@@ -327,14 +341,22 @@ public class TypeHandler implements Constants, Tables {
                 groupList.add(new TwoFacedObject(group.getFullName()));
             }
             String groupSelect = HtmlUtil.select(ARG_GROUP,
-                                     groupList);
-            //            groupSelect+="&nbsp;" +HtmlUtil.checkbox(ARG_GROUP_CHILDREN,"true") +" (Search subgroups)";
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Group:"),
+                                                 groupList);
+            groupSelect+="&nbsp;" +HtmlUtil.checkbox(ARG_GROUP_CHILDREN,"true") +" (Search subgroups)";
+            formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Group:"),
                                           groupSelect));
         } else if (groups.size() == 1) {
-            sb.append(HtmlUtil.hidden(ARG_GROUP,
+            formBuffer.append(HtmlUtil.hidden(ARG_GROUP,
                                       groups.get(0).getFullName()));
+            formBuffer.append(HtmlUtil.tableEntry("<b>Group:</b>", groups.get(0).getFullName()));
         }
+
+        String tag = (String) request.get(ARG_TAG);
+        if(tag == null) {
+            tag = "";
+        }
+        formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Tag:"),
+                                              HtmlUtil.input(ARG_TAG,tag)));
 
         String calClick = "<A HREF=# onClick=\"" +
             "window.dateStyle = '';\n"+
@@ -342,7 +364,7 @@ public class TypeHandler implements Constants, Tables {
             "calendar =window.open('/repository/calendar.html','cal','WIDTH=300,HEIGHT=350')\n"+
             "\">CLICK</a>";
 
-        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Date Range:"),
+        formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Date Range:"),
                                       HtmlUtil.input(ARG_FROMDATE,  mindate)
                                                      + " -- " +
                                       HtmlUtil.input(ARG_TODATE,  maxdate)));
@@ -352,8 +374,8 @@ public class TypeHandler implements Constants, Tables {
             String[] products = SqlUtil.readString(
                                     repository.execute(
                                                        SqlUtil.makeSelect(SqlUtil.distinct(COL_LEVEL3RADAR_PRODUCT),
-                                                                          TABLE_FILES +"," + TABLE_LEVEL3RADAR,
-                                                                          SqlUtil.makeWhere(where))), 1);
+                                                                          getTablesForQuery(request, Misc.newList(TABLE_FILES,TABLE_LEVEL3RADAR)),
+                                                                          SqlUtil.makeAnd(where))), 1);
             List productList = new ArrayList();
             for (int i = 0; i < products.length; i++) {
                 productList.add(
@@ -365,10 +387,11 @@ public class TypeHandler implements Constants, Tables {
             String[] stations = SqlUtil.readString(
                                     repository.execute(
                                                        SqlUtil.makeSelect(SqlUtil.distinct(COL_LEVEL3RADAR_STATION),
-                                                                          TABLE_FILES + "," + TABLE_LEVEL3RADAR,
-                                                                          SqlUtil.makeWhere(where))), 1);
+                                                                          getTablesForQuery(request, Misc.newList(TABLE_FILES,TABLE_LEVEL3RADAR)),
+                                                                          SqlUtil.makeAnd(where))), 1);
 
             List stationList = new ArrayList();
+            stationList.add(0,"All");
             for (int i = 0; i < stations.length; i++) {
                 stationList.add(
                     new TwoFacedObject(
@@ -376,19 +399,20 @@ public class TypeHandler implements Constants, Tables {
             }
             productList.add(0, "All");
             if (stations.length > 1) {
-                sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Station:"),
+                formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Station:"),
                         HtmlUtil.select(ARG_STATION,
                                         stationList)));
             } else if (stations.length == 1) {
-                sb.append(HtmlUtil.hidden(ARG_STATION,
+                formBuffer.append(HtmlUtil.tableEntry("<b>Station:</b>",stations[0]));
+                formBuffer.append(HtmlUtil.hidden(ARG_STATION,
                                           stations[0]));
             }
             if (products.length > 1) {
-                sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Product:"),
+                formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Product:"),
                         HtmlUtil.select(ARG_PRODUCT,
                                         productList)));
             } else if (products.length == 1) {
-                sb.append(HtmlUtil.hidden(ARG_PRODUCT,
+                formBuffer.append(HtmlUtil.hidden(ARG_PRODUCT,
                                           products[0]));
             }
         }
@@ -411,28 +435,40 @@ public class TypeHandler implements Constants, Tables {
             name = name.trim();
         }
 
+
         String tag  = (String) request.get(ARG_TAG);
         if(tag!=null) {
-            where.add(SqlUtil.eq(COL_FILES_ID, COL_TAGS_FILE_ID));
-            where.add(SqlUtil.eq(COL_TAGS_NAME, SqlUtil.quote(tag)));
+            tag = tag.trim();
+            if(tag.length()>0) {
+                where.add(SqlUtil.eq(COL_FILES_ID, COL_TAGS_FILE_ID));
+                addOr(COL_TAGS_NAME, tag,where,true);
+            }
         }
 
         String groupName = (String) request.get(ARG_GROUP);
         if ((groupName != null) && !groupName.toLowerCase().equals("all")) {
+            boolean doNot = groupName.startsWith("!");
+            if(doNot) {
+                groupName = groupName.substring(1);
+            }
             Group  group          = repository.findGroupFromName(groupName);
             String searchChildren = (String) request.get(ARG_GROUP_CHILDREN);
-            //            System.err.println ("child:" + searchChildren);
-            //            if(Misc.equals(searchChildren,"true")) {
-            //                where.add(SqlUtil.like(COL_FILES_GROUP_ID,
-            //                                       group.getId())));
-            //            } else {
-            where.add(SqlUtil.eq(COL_FILES_GROUP_ID,
-                                 SqlUtil.quote(group.getId())));
-            //            }
+            if(Misc.equals(searchChildren,"true")) {
+                where.add((doNot?" NOT ":"") + SqlUtil.like(COL_FILES_GROUP_ID,
+                                       group.getId()+"%"));
+            } else {
+                if(doNot) {
+                    where.add(SqlUtil.neq(COL_FILES_GROUP_ID,
+                                         SqlUtil.quote(group.getId())));
+                } else {
+                    where.add(SqlUtil.eq(COL_FILES_GROUP_ID,
+                                         SqlUtil.quote(group.getId())));
+                }
+            }
         }
         String type = (String) request.get(ARG_TYPE);
         if ((type != null) && !type.equals(TYPE_ANY)) {
-            addOr(COL_FILES_TYPE, type, where);
+            addOr(COL_FILES_TYPE, type, where,true);
         }
 
         String fromdate = (String) request.get(ARG_FROMDATE);
@@ -461,9 +497,9 @@ public class TypeHandler implements Constants, Tables {
 
         if (isType(TYPE_LEVEL3RADAR)) {
             addOr(COL_LEVEL3RADAR_STATION,
-                  (String) request.get(ARG_STATION), where);
+                  (String) request.get(ARG_STATION), where,true);
             addOr(COL_LEVEL3RADAR_PRODUCT,
-                  (String) request.get(ARG_PRODUCT), where);
+                  (String) request.get(ARG_PRODUCT), where,true);
             if (request.hasParameter(ARG_STATION)
                     || request.hasParameter(ARG_PRODUCT)) {
                 where.add(SqlUtil.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID));
@@ -472,11 +508,7 @@ public class TypeHandler implements Constants, Tables {
 
         //        System.err.println ("name:" + name);
         if ((name != null) && (name.length() > 0)) {
-            if (name.startsWith("%")) {
-                where.add(SqlUtil.like(COL_FILES_NAME, name));
-            } else {
-                where.add(SqlUtil.eq(COL_FILES_NAME, SqlUtil.quote(name)));
-            }
+            addOr(COL_FILES_NAME,name,where,true);
         }
 
         return where;
@@ -490,19 +522,24 @@ public class TypeHandler implements Constants, Tables {
      *
      * @return _more_
      */
-    protected String getQueryOnTables(Request request) {
-        String tables =  TABLE_FILES;
+    protected List getTablesForQuery(Request request) {
+        return getTablesForQuery(request, new ArrayList());
+    }
+
+    protected List getTablesForQuery(Request request, List initTables) {
+        initTables.add(TABLE_FILES);
         if (isType(TYPE_LEVEL3RADAR)) {
             if (request.hasParameter(ARG_PRODUCT)
                     || request.hasParameter(ARG_STATION)) {
-                tables+=","+ TABLE_LEVEL3RADAR;
+                initTables.add(TABLE_LEVEL3RADAR);
             }
         }
 
-        if(request.hasParameter(ARG_TAG)) {
-            tables+=","+ TABLE_TAGS;        
+        if(request.hasParameter(ARG_TAG) && request.get(ARG_TAG).trim().length()>0) {
+            initTables.add(TABLE_TAGS);        
+            initTables.add(TABLE_FILES);        
         }
-        return tables;
+        return initTables;
     }
 
 
@@ -514,10 +551,10 @@ public class TypeHandler implements Constants, Tables {
      * @param value _more_
      * @param list _more_
      */
-    private void addOr(String column, String value, List list) {
+    private void addOr(String column, String value, List list, boolean quoteThem) {
         if ((value != null) && (value.trim().length() > 0)
                 && !value.toLowerCase().equals("all")) {
-            list.add("(" + SqlUtil.makeOrSplit(column, value, true) + ")");
+            list.add("(" + SqlUtil.makeOrSplit(column, value, quoteThem) + ")");
         }
     }
 

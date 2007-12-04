@@ -1,0 +1,10 @@
+<api>
+  <method request="/query"       method="processQuery"    admin="true"/>
+  <method request="/sql"         method="processSql"      admin="true"/>
+  <method request="/searchform"  method="makeQueryForm"   admin="true"/>
+  <method request="/list"        method="processList"     admin="true"/>
+  <method request="/showgroup"   method="showGroup"       admin="true"/>
+  <method request="/showfile"    method="showFile"        admin="true"/>
+  <method request="/graphview"   method="getGraphApplet"  admin="true"/>
+  <method request="/graph"       method="getGraph"        admin="true"/>
+</api>

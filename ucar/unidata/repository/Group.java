@@ -31,6 +31,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
 import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -59,6 +60,9 @@ public class Group {
 
     /** _more_ */
     private Group parent;
+
+    private List<Group> children = new ArrayList<Group>();
+
 
     /**
      *

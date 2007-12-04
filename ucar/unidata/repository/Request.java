@@ -115,6 +115,7 @@ public class Request {
     /** _more_          */
     private Hashtable parameters;
 
+    private User user;
 
     /**
      * _more_
@@ -150,6 +151,12 @@ public class Request {
      */
     public String get(String key) {
         return (String) parameters.get(key);
+    }
+
+    public String get(String key,String dflt) {
+        String result = get(key);
+        if(result == null)return dflt;
+        return result;
     }
 
     /**

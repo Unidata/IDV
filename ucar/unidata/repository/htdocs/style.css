@@ -18,6 +18,13 @@ td {
 
 
 
+.smallestTag {font-size: xx-small; }
+.smallTag    {font-size: small; }
+.mediumTag   {font-size: medium; }
+.largeTag    {font-size: large; }
+.largestTag  {font-size: xx-large; } 
+
+
 A:link {
    font-family: Arial, Helvetica, sans-serif;
    color: #0000FF
@@ -82,6 +89,7 @@ i {
     border : 1px #ccc solid;
     background-color : #669966;
     padding:2;
+    padding-left:5;
    color: #FFFFFF;
 }
 

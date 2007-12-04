@@ -5,7 +5,7 @@
 
     <import file="../../build.xml"/>
 
-    <target name="repository" depends="init">
+    <target name="repository" depends="init,clean">
         <javac
             classpath="${classpath}"
             debug="true"
@@ -21,6 +21,7 @@
     </target>
 
 
+
     <target name="repositoryjar" depends="repository">
         <jar 
             basedir="${srcdir}"
@@ -29,8 +30,11 @@
             jarfile="${jars_dest}/repository.jar"
             manifest="${srcdir}/ucar/unidata/repository/repository.manifest">
             <include name="ucar/**/*.class"/>
-            <include name="ucar/unidata/repository/*.html"/>
-            <include name="ucar/unidata/repository/*.sql"/>
+            <include name="ucar/unidata/repository/htdocs/*.*"/>
+            <include name="ucar/unidata/repository/**/*.properties"/>
+            <include name="ucar/unidata/repository/**/*.html"/>
+            <include name="ucar/unidata/repository/**/*.xml"/>
+            <include name="ucar/unidata/repository/**/*.sql"/>
         </jar>
     </target>
 

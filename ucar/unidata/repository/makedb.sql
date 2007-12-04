@@ -1,7 +1,7 @@
 
 --- Initial data base creation
 
-CREATE TABLE  groups (id varchar(200),
+CREATE TABLE  groups (id varchar(500),
                      parent varchar(200),
                      name varchar(200),
 		     description varchar(200));

@@ -1,25 +1,28 @@
 <canvas bgimage="%root%/logo.gif">
 <graph>
+
     <edgetype name="groupedby" arrow="-6" />       
+    <edgetype name="taggedby" arrow="-6" color="blue"/>       
 
 <nodetype    name="Node"  />
 
-<nodetype    name="tag" parent="Node" fillcolor="blue">
+<nodetype    name="tag" parent="Node" fillcolor="0,153,153">
+  <command label="Search tag" command="url(,%root%/searchform?tag=%id%)"/>
+  <shape>
   <shape>
     <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
+    <rrect src="label" id="rect" fillcolor="%fillcolor%" from="c" to="c" color="black"/>
+  </shape>
+  <shape  layout="h" src="rect" from="n" to="s" >
+    <image url="%root%/Tag.png" alt="Tag"/>
+   </shape>
   </shape>
 </nodetype>
+
 
 <nodetype    name="group" parent="Node" fillcolor="#cccccc">
   <command label="View group" command="url(,%root%/showgroup?group=%id%)"/>
-  <shape>
-    <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
-    <rrect src="label" fillcolor="%fillcolor%" from="c" to="c" color="black"/>
-  </shape>
-</nodetype>
-
-<nodetype    name="file" fillcolor="#009900">
-  <command label="View file info" command="url(,%root%/showfile?id=%id%)"/>
+  <command label="Search group" command="url(,%root%/searchform?group=%id%)"/>
   <shape>
     <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
     <rrect src="label" fillcolor="%fillcolor%" from="c" to="c" color="black"/>
@@ -27,19 +30,23 @@
 </nodetype>
 
 
-<nodetype    name="level3radar" parent="file">
+<nodetype    name="file" parent="Node" fillcolor="255,255,153" imagepath="%root%/File.gif">
+  <command label="Search tag" command="url(,%root%/searchform?tag=%id%)"/>
   <shape>
-  <shape  layout="h" src="label" from="n" to="n" dy="10">
-    <image url="%root%/Radar.gif"
-           alt="Level 3 Radar"/>
+  <shape>
+    <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
+    <rrect src="label" id="rect" fillcolor="%fillcolor%" from="c" to="c" color="black"/>
+  </shape>
+
+  <shape  layout="h" src="rect" from="n" to="s" >
+    <image url="%root%/%imagepath%"
+           alt="Tag"/>
    </shape>
-    <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
   </shape>
 </nodetype>
 
-<nodetype    name="foo" fillcolor="blue">
-    <rrect src="label" fillcolor="%fillcolor%" from="c" to="c" color="black"/>
-</nodetype>
+
+<nodetype    name="level3radar" parent="file" alt="Level 3 Radar" imagepath="%root%/Radar.gif"/>
 
 %content%
 

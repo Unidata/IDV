@@ -97,6 +97,21 @@ public interface Constants {
 
     public static final String TAG_TAGS = "tags";
 
+    public static final String TAG_METHOD = "method";
+
+    public static final String ATTR_REQUEST = "request";
+    public static final String ATTR_METHOD = "method";
+    public static final String ATTR_ADMIN = "admin";
+
+    public static final String ATTR_RSS_VERSION = "version";
+    public static final String TAG_RSS_RSS = "rss";
+    public static final String TAG_RSS_CHANNEL = "channel";
+    public static final String TAG_RSS_ITEM = "item";
+    public static final String TAG_RSS_TITLE = "title";
+    public static final String TAG_RSS_PUBDATE = "pubDate";
+    public static final String TAG_RSS_DESCRIPTION = "description";
+
+
     /** _more_          */
     public static final String ATTR_FROM = "from";
 
@@ -131,13 +146,18 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    public static final String ARG_USER = "user";
+
     public static final String ARG_TAG = "tag";
 
     /** _more_          */
     public static final String ARG_WHAT = "what";
 
     /** _more_          */
+    public static final String WHAT_QUERY= "query";
+
     public static final String WHAT_TYPE = "type";
+
     public static final String WHAT_TAG = "tag";
 
     /** _more_          */
@@ -196,6 +216,8 @@ public interface Constants {
     /** _more_          */
     public static final String OUTPUT_HTML = "html";
 
+    public static final String OUTPUT_RSS = "rss";
+
     /** _more_          */
     public static final String OUTPUT_XML = "xml";
 
@@ -204,6 +226,9 @@ public interface Constants {
 
     /** _more_          */
     public static final String OUTPUT_GRAPH = "graph";
+
+    /** _more_          */
+    public static final String OUTPUT_CLOUD = "cloud";
 
     /** _more_          */
     public static final String TYPE_FILE = "file";
