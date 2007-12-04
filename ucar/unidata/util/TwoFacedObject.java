@@ -249,6 +249,17 @@ public class TwoFacedObject implements Comparable {
     }
 
 
+    public static String findLabel(Object id, List l) {
+        for (int i = 0; i < l.size(); i++) {
+            TwoFacedObject tfo = (TwoFacedObject) l.get(i);
+            if (Misc.equals(id, tfo.getId())) {
+                return tfo.toString();
+            }
+        }
+        return null;
+    }
+
+
 
     /**
      * Get a String representation for the objects in te lsit

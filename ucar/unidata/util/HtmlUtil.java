@@ -22,7 +22,12 @@
 
 
 package ucar.unidata.util;
+
+
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.List;
+import ucar.unidata.xml.XmlUtil;
 
 
 
@@ -90,7 +95,7 @@ public class HtmlUtil {
     }
 
     public static String checkbox(String name, String value) {
-        return "<input type=\"checkbox\" name=\"" + name +"    value=\"" + value +"\">";
+        return "<input " + XmlUtil.attrs("type","checkbox","name",name,"value", value) +">";
     }
 
     public static String form(String url) {
@@ -158,7 +163,23 @@ public class HtmlUtil {
 
     }
 
+    public static Hashtable cleanUpArguments(Hashtable formArgs) {
+        Hashtable cleanArgs = new Hashtable();
+        for(Enumeration keys = formArgs.keys();keys.hasMoreElements();) {
+            String key = (String) keys.nextElement();
+            String value = (String)formArgs.get(key);
+            value = cleanUpArgument(value);
+            cleanArgs.put(key,value);
+        }
+        return cleanArgs;
+    }
 
+
+
+    public static String cleanUpArgument(String value) {
+        //TODO: ACtually implement this!!!!
+        return value;
+    }
 
 }
 

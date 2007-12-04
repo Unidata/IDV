@@ -31,6 +31,7 @@ public class TextResult {
     public static String TYPE_HTML = "text/html";
     public static String TYPE_XML = "text/xml";
     public static String TYPE_CSV = "text/csv";
+    public static String TYPE_RSS = "application/rss+xml";
 
     private StringBuffer content;
     private String title = "";

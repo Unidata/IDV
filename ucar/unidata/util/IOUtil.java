@@ -1765,7 +1765,6 @@ public class IOUtil {
 
 
 
-
     /**
      * test main
      *
@@ -1774,6 +1773,11 @@ public class IOUtil {
      * @throws Exception On badness
      */
     public static void main(String[] args) throws Exception {
+        String s = "http://earthquake.usgs.gov/eqcenter/recenteqsww/catalogs/eqs7day-M2.5.xml";
+        System.out.println (readContents(s,IOUtil.class));
+            
+        if(true) return;
+
         final int[]cnt = {0};
         IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
                 public int viewFile(File f) throws Exception {

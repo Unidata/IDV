@@ -572,7 +572,7 @@ public class LogUtil {
      * @return The stack trace
      */
     public static String getStackTrace(Throwable exc) {
-        return Misc.getStackTrace();
+        return Misc.getStackTrace(exc);
     }
 
     /** The window the error console is in */
