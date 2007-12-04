@@ -85,10 +85,12 @@ public class TimelineApplet extends Applet {
     }
 
     public  void init () {
+        super.init();
         String times  = getParameter ("times");
         String labels  = getParameter ("labels");
         List realTimes = new ArrayList();
         //        System.err.println("TIMES:" + times);
+        //        System.err.println("labels:" + labels);
         try {
         if(times!=null&& labels!=null) {
             List timeStrings = StringUtil.split(times,",",true, true);
@@ -101,19 +103,18 @@ public class TimelineApplet extends Applet {
         } catch(Exception exc) {
             exc.printStackTrace();
         }
-        //        System.err.println("Real times:" + realTimes);
+        //        System.err.println("xxxx Real times:" + realTimes);
         timeline = new Timeline(realTimes,400) {
                 public void setHighlightedDate(DatedThing d) {
-                    super.setHighlightedDate( d);
-                    //                    System.err.println ("set hi:" + d);
-                    if(d==null) label.setText("");
+                    if(d==null) label.setText("  ");
                     else label.setText(d.toString());
+                    super.setHighlightedDate(d);
                 }
             };
         //        baseUrl =getDocumentBase();
         setLayout (new BorderLayout());
         timeline.setUseDateSelection(false);
-        JPanel container = LayoutUtil.centerBottom(timeline.getContents(false,false),LayoutUtil.inset(label,5));
+        JPanel container = LayoutUtil.centerBottom(timeline.getContents(false,false),LayoutUtil.inset(label,new Insets(0,5,0,0)));
         container.setBorder(BorderFactory.createLineBorder(Color.black));
 
         this.add(container);
