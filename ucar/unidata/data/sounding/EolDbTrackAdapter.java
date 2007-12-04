@@ -309,7 +309,7 @@ public class EolDbTrackAdapter extends TrackAdapter {
      */
     private Statement select(String what, String where, String extra)
             throws SQLException {
-        return evaluate(SqlUtil.makeSelect(what, where, extra));
+        return evaluate(SqlUtil.makeSelect(what, Misc.newList(where), extra));
     }
 
     /**
@@ -323,7 +323,7 @@ public class EolDbTrackAdapter extends TrackAdapter {
      * @throws SQLException _more_
      */
     private Statement select(String what, String where) throws SQLException {
-        return evaluate(SqlUtil.makeSelect(what, where));
+        return evaluate(SqlUtil.makeSelect(what, Misc.newList(where)));
     }
 
     /**
