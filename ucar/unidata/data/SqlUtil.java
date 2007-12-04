@@ -37,6 +37,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Hashtable;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -78,7 +79,6 @@ public class SqlUtil {
     public static String quote(Object s) {
         return "'" + s.toString() + "'";
     }
-
 
     public  static String makeAnd(List toks) {
         return StringUtil.join(" AND ", toks);
@@ -203,10 +203,14 @@ public class SqlUtil {
         for(int i=0;i<toks.size();i++) {
             if(i>0) sb.append (" OR ");
             String value = toks.get(i).toString();
-            if(quoteThem) value  = quote(value);
-            sb.append(eq(column, value));
+            sb.append(expr(column,value,quoteThem));
         }
         return sb.toString();
+    }
+
+
+    public static String count(String name) {
+        return " count(" + name+")";
     }
 
 
@@ -259,6 +263,11 @@ public class SqlUtil {
         return " " +name +" LIKE " + quote(value)+" ";
     }
 
+    public static String neq(String name, String value) {
+        return " " +name +"<>" + value +" ";
+    }
+
+
 
     public static String eq(String name, String value) {
         return " " +name +"=" + value +" ";
@@ -281,25 +290,45 @@ public class SqlUtil {
      *
      * @return _more_
      */
-    public static String makeSelect(String what, String where) {
-        return makeSelect(what, where, "");
+    public static String makeSelect(String what, List<String> tables) {
+        return makeSelect(what, tables, "");
     }
 
 
-    public static String makeSelect(String what, String table, String where) {
-        return "SELECT " + what + " FROM " + table + (where.trim().length()>0?" WHERE "  + where:"");
-    }
-
-
-    public static String makeSelect(String what, String table, String where, String extra) {
-        return "SELECT " + what + " FROM " + table + (where.trim().length()>0?" WHERE "  + where:"") +" " +extra;
+    public static String makeSelect(String what, List<String> tables, String where) {
+        return makeSelect(what, tables, where, "");
     }
 
 
 
+    public static String makeSelect(String what, List tables, String where, String extra) {
+        String tableClause = "";
+        Hashtable seen = new Hashtable();
+        for(int i=0;i<tables.size();i++) {
+            String table = (String)tables.get(i);
+            if(seen.get(table)!=null) continue;
+            seen.put(table,table);
+            if(tableClause.length()>0)
+                tableClause += ",";
+            tableClause += table;
+        }
+        return "SELECT " + what + " FROM " + tableClause + (where.trim().length()>0?" WHERE "  + where:"") +" " +extra;
+    }
 
 
 
+
+    public static String expr(String col, String value, boolean quoteThem) {
+        boolean doNot = false;
+        if(value.startsWith("!")) {
+            value = value.substring(1);
+            doNot = true;
+        }
+        if(value.startsWith("%") || value.endsWith("%")) {
+            return " " + col +(doNot?" NOT ":"") + " LIKE " + quote(value) + " " ;
+        }
+        return " " + col +(doNot?" <> ":"=")  + (quoteThem?quote(value):value) + " " ;
+    }
 
     public static void loadSql(String sql, Statement statement, boolean ignoreErrors) 
             throws Exception {
