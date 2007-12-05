@@ -80,6 +80,7 @@ import java.util.regex.*;
  */
 public class Repository implements Constants, Tables {
 
+    private Harvester harvester;
     private Properties mimeTypes;
 
     private Properties  properties = new Properties();
@@ -137,7 +138,7 @@ public class Repository implements Constants, Tables {
         Misc.findClass((String) properties.get(PROP_DB_DRIVER));
         urlBase = (String)properties.get(PROP_HTML_URLBASE);
         if(urlBase == null) urlBase = "";
-                              
+        harvester = new Harvester(this);
     }
 
     protected void makeConnection() throws Exception {
@@ -317,7 +318,7 @@ public class Repository implements Constants, Tables {
                                 getClass());
         Statement statement = connection.createStatement();
         SqlUtil.loadSql(sql, statement, true);
-        loadTestData();
+        //        loadTestData();
     }
 
     public void loadTestData() throws Exception {
@@ -325,11 +326,13 @@ public class Repository implements Constants, Tables {
         results.next();
         makeUserIfNeeded(new User("jdoe", "John Doe", true));
         makeUserIfNeeded(new User("jsmith", "John Smith", false));
-        //        loadTestFiles();
+        loadTestFiles();
         loadSatelliteFiles();
+        loadLevel3RadarFiles();
+        loadLevel2RadarFiles();
         if(results.getInt(1)==0) {
             System.err.println ("Adding test data");
-            loadLevel3RadarFiles();
+            //            loadLevel3RadarFiles();
             //            loadTestFiles();
         }
     }
@@ -349,6 +352,12 @@ public class Repository implements Constants, Tables {
         addTypeHandler(TypeHandler.TYPE_LEVEL3RADAR,
                        new TypeHandler(this, TypeHandler.TYPE_LEVEL3RADAR,
                                        "Level 3 Radar"));
+        addTypeHandler(TypeHandler.TYPE_LEVEL2RADAR,
+                       new TypeHandler(this, TypeHandler.TYPE_LEVEL2RADAR,
+                                       "Level 2 Radar"));
+        addTypeHandler(TypeHandler.TYPE_SATELLITE,
+                       new TypeHandler(this, TypeHandler.TYPE_SATELLITE,
+                                       "Satellite"));
     }
 
     /**
@@ -356,7 +365,7 @@ public class Repository implements Constants, Tables {
      *
      * @return _more_
      */
-    private String getGUID() {
+    protected String getGUID() {
         return baseTime + "_" + (keyCnt++);
     }
 
@@ -1311,7 +1320,7 @@ public class Repository implements Constants, Tables {
         for (TypeHandler theTypeHandler : typeHandlers) {
             if (output.equals(OUTPUT_HTML)) {
                 sb.append("<li>");
-                sb.append(theTypeHandler.getType());
+                sb.append(href(HtmlUtil.url("/searchform",ARG_TYPE,theTypeHandler.getType()),theTypeHandler.getType()));
             } else if (output.equals(OUTPUT_XML)) {
                 sb.append(XmlUtil.tag(TAG_TYPE,
                                       XmlUtil.attrs(ATTR_TYPE,
@@ -1966,202 +1975,7 @@ public class Repository implements Constants, Tables {
 
 
 
-    /**
-     * _more_
-     *
-     * @param rootDir _more_
-     * @param groupName _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public List<Level3RadarInfo> xxxxcollectLevel3radarFiles(File rootDir,
-            String groupName)
-            throws Exception {
-        final List<Level3RadarInfo> radarInfos = new ArrayList();
-        long                  baseTime   = currentTime();
-        Group                 group      = findGroupFromName(groupName);
-        User user = findUser("jdoe");
-        for (int stationIdx = 0; stationIdx < 100; stationIdx++) {
-            String station = "station" + stationIdx;
-            for (int productIdx = 0; productIdx < 20; productIdx++) {
-                String product = "product" + productIdx;
-                group = findGroupFromName(groupName + "/" + station + "/" + product);
-                for (int timeIdx = 0; timeIdx < 100; timeIdx++) {
-                    radarInfos.add(new Level3RadarInfo(getGUID(),
-                                                       "", "", group,
-                                                       user,
-                                                       "file" + stationIdx + "_" +productIdx
-                                                       + "_" + group, station, product,
-                                                       baseTime
-                                                       + timeIdx*1000*60));
-                }
-            }
-        }
 
-        return radarInfos;
-    }
-
-    /**
-     * _more_
-     *
-     *
-     * @param rootDir _more_
-     * @param groupName _more_
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public List<Level3RadarInfo> collectLevel3radarFiles(File rootDir,
-            final String groupName)
-            throws Exception {
-        long                   t1         = System.currentTimeMillis();
-        final List<Level3RadarInfo>  radarInfos = new ArrayList();
-        final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
-        final Pattern pattern =
-            Pattern.compile(
-                "([^/]+)/([^/]+)/[^/]+_(\\d\\d\\d\\d\\d\\d\\d\\d_\\d\\d\\d\\d)");
-
-        final User user = findUser("jdoe");
-        IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
-            public int viewFile(File f) throws Exception {
-                String  name    = f.toString();
-                Matcher matcher = pattern.matcher(name);
-                if ( !matcher.find()) {
-                    return DO_CONTINUE;
-                }
-                if (radarInfos.size() % 5000 == 0) {
-                    System.err.println("Found:" + radarInfos.size());
-                }
-                String station = matcher.group(1);
-                String product = matcher.group(2);
-                Group group = findGroupFromName(groupName + "/" + "NIDS" + "/"
-                                        + station + "/" + product);
-                Date dttm = sdf.parse(matcher.group(3));
-                radarInfos.add(new Level3RadarInfo(getGUID(),
-                                                   dttm.toString(), "", group, user,
-                                                   f.toString(), station, product,
-                                                   dttm.getTime()));
-                return DO_CONTINUE;
-            }
-        };
-
-        IOUtil.walkDirectory(rootDir, fileViewer);
-        long t2 = System.currentTimeMillis();
-        System.err.println("found:" + radarInfos.size() + " in " + (t2 - t1));
-        return radarInfos;
-    }
-
-
-
-    /**
-     * _more_
-     *
-     *
-     * @param rootDir _more_
-     * @param groupName _more_
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public List<SatelliteInfo> collectSatelliteFiles(File rootDir,
-            final String groupName)
-            throws Exception {
-        long                   t1         = System.currentTimeMillis();
-        final List<SatelliteInfo>  infos = new ArrayList();
-        final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
-        final Pattern pattern =
-            Pattern.compile(
-                "([^/]+)/([^/]+)/([^/]+)/[^/]+_(\\d\\d\\d\\d\\d\\d\\d\\d_\\d\\d\\d\\d)");
-
-        final User user = findUser("jdoe");
-        IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
-            public int viewFile(File f) throws Exception {
-                String  name    = f.toString();
-                Matcher matcher = pattern.matcher(name);
-                if ( !matcher.find()) {
-                    return DO_CONTINUE;
-                }
-                if (infos.size() % 5000 == 0) {
-                    System.err.println("Found:" + infos.size());
-                }
-                String platform = matcher.group(1);
-                String resolution = matcher.group(2);
-                String product = matcher.group(2);
-                Group group = findGroupFromName(groupName + "/" + "Satellite" + "/"
-                                                + platform + "/" + resolution +"/"+product);
-                Date dttm = sdf.parse(matcher.group(4));
-                infos.add(new SatelliteInfo(getGUID(),
-                                            dttm.toString(), "", group, user,
-                                            f.toString(), platform, resolution, product,
-                                            dttm.getTime()));
-                return DO_CONTINUE;
-            }
-        };
-
-        IOUtil.walkDirectory(rootDir, fileViewer);
-        long t2 = System.currentTimeMillis();
-        System.err.println("found sat files:" + infos.size() + " in " + (t2 - t1));
-        return infos;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param rootDir _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public List<FilesInfo> collectFiles(File rootDir, final String rootGroup) throws Exception {
-        final String         rootStr    = rootDir.toString();
-        final int            rootStrLen = rootStr.length();
-        final List<FilesInfo> filesInfos  = new ArrayList();
-        final User user = findUser("jdoe");
-        IOUtil.FileViewer    fileViewer = new IOUtil.FileViewer() {
-            public int viewFile(File f) throws Exception {
-                String name = f.getName();
-                //                System.err.println(name);
-                if (name.startsWith(".")) {
-                    return DO_DONTRECURSE;
-                }
-                if (f.isDirectory()) {
-                    return DO_CONTINUE;
-                }
-                //                if ( !name.endsWith(".java")) {
-                //                    return DO_CONTINUE;
-                //                }
-                String path    = f.toString();
-                String noext   = IOUtil.stripExtension(path);
-
-
-                String dirPath = f.getParent().toString();
-                dirPath = dirPath.substring(rootStrLen);
-                List toks = StringUtil.split(dirPath, File.separator, true,
-                                             true);
-                toks.add(0, rootGroup);
-                Group group = findGroupFromName(StringUtil.join("/", toks));
-                FilesInfo fileInfo = new FilesInfo(getGUID(),
-                                             name, name, TypeHandler.TYPE_FILE,
-                                             group, user, f.toString(),
-                                             f.lastModified());
-                String ext = IOUtil.getFileExtension(path);
-                if(ext.startsWith(".")) ext = ext.substring(1);
-                if(ext.trim().length()>0) {
-                    fileInfo.addTag(ext);
-                }
-                filesInfos.add(fileInfo);
-                return DO_CONTINUE;
-            }
-        };
-
-        IOUtil.walkDirectory(rootDir, fileViewer);
-        long t2 = System.currentTimeMillis();
-        return filesInfos;
-    }
 
     protected void setStatement(FilesInfo filesInfo, PreparedStatement statement) throws Exception {
         int    col = 1;
@@ -2192,7 +2006,7 @@ public class Repository implements Constants, Tables {
      */
     public void loadLevel3RadarFiles() throws Exception {
         File            rootDir = new File("/data/ldm/gempak/nexrad/NIDS");
-        List<Level3RadarInfo> files   = collectLevel3radarFiles(rootDir, "IDD");
+        List<Level3RadarInfo> files   = harvester.collectLevel3radarFiles(rootDir, "IDD");
         //        files.addAll(collectLevel3radarFiles(rootDir, "LDM/LDM2"));
         System.err.println("Inserting:" + files.size() + " radar files");
         long t1  = System.currentTimeMillis();
@@ -2241,6 +2055,66 @@ public class Repository implements Constants, Tables {
 
     }
 
+
+
+    /**
+     * _more_
+     *
+     * @param stmt _more_
+     * @param table _more_
+     *
+     * @throws Exception _more_
+     */
+    public void loadLevel2RadarFiles() throws Exception {
+        File            rootDir = new File("/data/ldm/gempak/nexrad/craft");
+        List<Level2RadarInfo> files   = harvester.collectLevel2radarFiles(rootDir, "IDD");
+        //        files.addAll(collectLevel2radarFiles(rootDir, "LDM/LDM2"));
+        System.err.println("Inserting:" + files.size() + " radar files");
+        long t1  = System.currentTimeMillis();
+        int  cnt = 0;
+        PreparedStatement filesInsert =
+            connection.prepareStatement(INSERT_FILES);
+        PreparedStatement radarInsert =
+            connection.prepareStatement(INSERT_LEVEL2RADAR);
+
+        int batchCnt = 0;
+        connection.setAutoCommit(false);
+        for (Level2RadarInfo radarInfo : files) {
+            if ((++cnt) % 10000 == 0) {
+                long   tt2      = System.currentTimeMillis();
+                double tseconds = (tt2 - t1) / 1000.0;
+                System.err.println("# " + cnt + " rate: "
+                                   + ((int) (cnt / tseconds)) + "/s");
+            }
+
+            String id  = getGUID();
+            radarInfo.setId(id);
+            setStatement(radarInfo, filesInsert);
+            filesInsert.addBatch();
+            int col = 1;
+            radarInsert.setString(col++, radarInfo.getId());
+            radarInsert.setString(col++, radarInfo.getStation());
+            radarInsert.addBatch();
+            batchCnt++;
+            if (batchCnt > 100) {
+                filesInsert.executeBatch();
+                radarInsert.executeBatch();
+                batchCnt = 0;
+            }
+        }
+        if (batchCnt > 0) {
+            filesInsert.executeBatch();
+            radarInsert.executeBatch();
+        }
+        connection.commit();
+        connection.setAutoCommit(true);
+        long   t2      = System.currentTimeMillis();
+        double seconds = (t2 - t1) / 1000.0;
+        System.err.println("cnt:" + cnt + " time:" + seconds + " rate:"
+                           + (cnt / seconds));
+
+    }
+
     
     /**
      * _more_
@@ -2252,7 +2126,7 @@ public class Repository implements Constants, Tables {
      */
     public void loadSatelliteFiles() throws Exception {
         File            rootDir = new File("/data/ldm/gempak/images/sat");
-        List<SatelliteInfo> files   = collectSatelliteFiles(rootDir, "IDD");
+        List<SatelliteInfo> files   = harvester.collectSatelliteFiles(rootDir, "IDD");
         //        files.addAll(collectLevel3radarFiles(rootDir, "LDM/LDM2"));
         System.err.println("Inserting:" + files.size() + " satellite files");
         long t1  = System.currentTimeMillis();
@@ -2313,11 +2187,8 @@ public class Repository implements Constants, Tables {
         File rootDir =
             new File(
                 "c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
-        File xxxrootDir =
-            new File(
-                "c:/cygwin/home/jeffmc/unidata/data");
-        //        File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
-        List<FilesInfo> files = collectFiles(rootDir,"Files");
+        rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
+        List<FilesInfo> files = harvester.collectFiles(rootDir,"Files");
         System.err.println("Inserting:" + files.size() + " test files");
         long t1  = System.currentTimeMillis();
         int  cnt = 0;

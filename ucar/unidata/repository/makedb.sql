@@ -3,10 +3,12 @@
 
 --drop table files;
 --drop table level3radar;
-drop table satellite;
+--drop table level3radar;
+--drop table satellite;
 --drop table groups;
 --drop table users;
 --drop table tags;
+
 
 CREATE TABLE  groups (id varchar(500),
                      parent varchar(200),

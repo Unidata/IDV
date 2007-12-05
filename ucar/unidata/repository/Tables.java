@@ -192,6 +192,21 @@ public interface Tables {
                            SqlUtil.getQuestionMarks(ARRAY_LEVEL3RADAR.length));
 
 
+    public static final String TABLE_LEVEL2RADAR = "level2radar";
+    public static final String COL_LEVEL2RADAR_ID = TABLE_LEVEL2RADAR + ".id";
+    public static final String COL_LEVEL2RADAR_STATION = TABLE_LEVEL2RADAR + ".station";
+    public static final String []ARRAY_LEVEL2RADAR = new String[]{COL_LEVEL2RADAR_ID,
+                                                                COL_LEVEL2RADAR_STATION};
+
+
+    public static final String COLUMNS_LEVEL2RADAR = SqlUtil.comma(ARRAY_LEVEL2RADAR);
+    
+    public static final String INSERT_LEVEL2RADAR =
+        SqlUtil.makeInsert(TABLE_LEVEL2RADAR,
+                           COLUMNS_LEVEL2RADAR,
+                           SqlUtil.getQuestionMarks(ARRAY_LEVEL2RADAR.length));
+
+
 
 
     public static final String TABLE_SATELLITE = "satellite";
