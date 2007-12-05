@@ -640,6 +640,16 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
 
         initDone();
 
+        /***
+        Misc.run(new Runnable() {
+                public void run() {
+        try {
+            ucar.unidata.repository.MetaDataServer mds = new ucar.unidata.repository.MetaDataServer(new String[]{});
+            mds.init();
+        } catch(Exception exc) {
+            logException ("Starting the metadata server", exc);
+        }
+        }});**/
     }
 
 
