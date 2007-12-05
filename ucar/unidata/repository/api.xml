@@ -5,9 +5,10 @@
   <method request="/list"        method="processList"     admin="true"/>
   <method request="/showgroup"   method="showGroup"       admin="true"/>
   <method request="/showfile"    method="showFile"        admin="true"/>
+  <method request="/getfiles"    method="getFiles"        admin="false"/>
   <method request="/graphview"   method="getGraphApplet"  admin="true"/>
   <method request="/graph"       method="getGraph"        admin="true"/>
   <method request="/fetch/*"     method="getFile"         admin="true"/>
-  <method request="/admin"     method="showAdmin"       admin="true"/>
+  <method request="/admin"       method="showAdmin"       admin="true"/>
   <method request="/admindo"     method="doAdmin"       admin="true"/>
 </api>

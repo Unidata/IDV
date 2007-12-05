@@ -60,8 +60,8 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
@@ -263,9 +263,12 @@ public class Repository implements Constants, Tables {
         return Misc.getProperty(properties,name, dflt);
     }
 
+
+
     public Result doAdmin(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
         String what = request.get("what","nothing");
+
         if(what.equals("shutdown")) {
             connection.close();
             connection = null;
@@ -278,7 +281,9 @@ public class Repository implements Constants, Tables {
                 sb.append("Database is restarted");
             }
         }
-        return new Result("Administration", sb);
+        Result result = new Result("Administration", sb);
+        result.putProperty(PROP_NAVSUBLINKS, getAdminLinks(request));
+        return result;
     }
 
     public Result showAdmin(Request request) throws Exception {
@@ -293,7 +298,9 @@ public class Repository implements Constants, Tables {
             sb.append(HtmlUtil.submit("Shut Down Database"));
         }
         sb.append("</form>");
-        return new Result("Administration", sb);
+        Result result = new Result("Administration", sb);
+        result.putProperty(PROP_NAVSUBLINKS, getAdminLinks(request));
+        return  result;
     }
 
 
@@ -370,13 +377,16 @@ public class Repository implements Constants, Tables {
     public Result processSql(Request request) throws Exception {
         String       query = (String) request.get(ARG_QUERY);
         StringBuffer sb    = new StringBuffer();
+        sb.append("<H2>SQL</h2>");
         sb.append(HtmlUtil.form(href("/sql")));
         sb.append(HtmlUtil.submit("Execute"));
         sb.append(HtmlUtil.input(ARG_QUERY, query, " size=\"60\" "));
         sb.append("</form>\n");
         sb.append("<table>");
         if (query == null) {
-            return new Result("SQL", sb);
+            Result result = new Result("SQL", sb);        
+            result.putProperty(PROP_NAVSUBLINKS, getAdminLinks(request));
+            return result;
         }
 
         long             t1        = System.currentTimeMillis();
@@ -416,9 +426,11 @@ public class Repository implements Constants, Tables {
         }
         sb.append("</table>");
         long t2 = System.currentTimeMillis();
-        return new Result("SQL",
+        Result result =  new Result("SQL",
                           new StringBuffer("Fetched:" + cnt + " rows in: " + (t2 - t1)
                                            + "ms <p>" + sb.toString()));
+        result.putProperty(PROP_NAVSUBLINKS, getAdminLinks(request));
+        return result;
     }
 
 
@@ -555,7 +567,7 @@ public class Repository implements Constants, Tables {
         } else {
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Search For:"),
                                           TwoFacedObject.findLabel(what,whatList)));
-            sb.append(HtmlUtil.hidden(what, ARG_OUTPUT));
+            sb.append(HtmlUtil.hidden(ARG_WHAT,what));
         }
 
 
@@ -577,8 +589,43 @@ public class Repository implements Constants, Tables {
         sb.append("</form>");
         headerBuffer.append(sb.toString());
 
-        return new Result("Search Form", headerBuffer);
+        Result result =new Result("Search Form", headerBuffer);
+        result.putProperty(PROP_NAVSUBLINKS, getSearchFormLinks(request));
+        return result;
     }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected List getAdminLinks(Request request) {
+        List links = new ArrayList();
+        String extra  = " style=\" font-family: Arial, Helvetica, sans-serif;  font-weight: bold; color:#ffffff;\" class=\"navtitle\"";
+        links.add(href("/admin/db", "Database", extra));
+        links.add(href("/sql", "SQL", extra));
+        return links;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected List getSearchFormLinks(Request request) {
+        List links = new ArrayList();
+        String extra  = " style=\" font-family: Arial, Helvetica, sans-serif;  font-weight: bold; color:#ffffff;\" class=\"navtitle\"";
+        links.add(href("/searchform?what="+WHAT_QUERY, "Files", extra));
+        links.add(href("/searchform?what="+WHAT_TYPE, "Data Types", extra));
+        links.add(href("/searchform?what="+WHAT_GROUP, "Groups", extra));
+        links.add(href("/searchform?what="+WHAT_TAG, "Tags", extra));
+
+        return links;
+    }
+
 
 
     /**
@@ -588,14 +635,12 @@ public class Repository implements Constants, Tables {
      */
     protected List getNavLinks(Request request) {
         List links = new ArrayList();
-
         String extra  = " style=\" font-family: Arial, Helvetica, sans-serif;  font-weight: bold; color:#ffffff;\" class=\"navtitle\"";
         links.add(href("/showgroup", "Group List", extra));
         links.add(href("/searchform", "Search", extra));
         RequestContext context = request.getRequestContext();
         User user = context.getUser();
         if(user.getAdmin()) {
-            links.add(href("/sql", "SQL", extra));
             links.add(href("/admin", "Admin", extra));
         }
         return links;
@@ -730,6 +775,35 @@ public class Repository implements Constants, Tables {
         return typeHandler.showFile(filesInfo, request);
     }
 
+
+    public Result getFiles(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+
+        sb.append(XmlUtil.openTag(TAG_CATALOG,
+                                  XmlUtil.attrs(ATTR_NAME,
+                                                "Query Results")));
+        String arg = (String) request.get(ARG_APPLET,"true");
+        for (Enumeration keys = request.getParameters().keys();
+                    keys.hasMoreElements(); ) {
+            String id = (String) keys.nextElement();
+            if(!Misc.equals(request.get(id), "true")) continue;
+            if(!id.startsWith("file_")) continue;
+            id = id.substring("file_".length());
+            FilesInfo filesInfo = findFile(id);
+            sb.append(
+                      XmlUtil.tag(
+                                  TAG_DATASET,
+                                  XmlUtil.attrs(
+                                                ATTR_NAME,
+                                                "" + new Date(filesInfo.getStartDate()),
+                                                ATTR_URLPATH, filesInfo.getFile())));
+            
+        }
+
+        sb.append(XmlUtil.closeTag(TAG_CATALOG));
+        return new Result("", sb, getMimeTypeFromOutput(OUTPUT_XML));
+    }
+
     protected long currentTime() {
         return new Date().getTime();
         
@@ -770,9 +844,18 @@ public class Repository implements Constants, Tables {
         String       output = getValue(request, ARG_OUTPUT, OUTPUT_HTML);
         List         where  = typeHandler.assembleWhereClause(request);
         StringBuffer sb     = new StringBuffer();
-        if (topLevel) {
-            sb.append(HtmlUtil.bold("Top Level Groups") + "<ul>");
+
+        if (output.equals(OUTPUT_HTML)) {
+            if (topLevel) {
+                sb.append(HtmlUtil.bold("Top Level Groups") + "<ul>");
+            }
+        } else if (output.equals(OUTPUT_XML)) {
+            sb.append(XmlUtil.XML_HEADER + "\n");
+            sb.append(XmlUtil.openTag(TAG_CATALOG,
+                                      XmlUtil.attrs(ATTR_NAME,
+                                          "Query Results")));
         }
+
 
 
         String title = "Groups";
@@ -801,6 +884,7 @@ public class Repository implements Constants, Tables {
 
             title = "Group: "
                     + StringUtil.join("&nbsp;&gt;&nbsp;", titleList);
+
             sb.append(HtmlUtil.bold("Group: "
                                     + StringUtil.join("&nbsp;&gt;&nbsp;",
                                         breadcrumbs)));
@@ -851,15 +935,19 @@ public class Repository implements Constants, Tables {
                     String file = results.getString(col++);
                     if (cnt == 1) {
                         sb.append(HtmlUtil.bold("Files:"));
+                        sb.append(HtmlUtil.form("/getfiles","getfiles"));
+                        sb.append(HtmlUtil.submit("Get Files"));
                         sb.append("<ul>");
                     }
-                    sb.append("<li>"
+
+                    sb.append("<li>" + HtmlUtil.checkbox("file_" + id,"true") +" " 
                               + href(HtmlUtil.url("/showfile", ARG_ID, id),
                                      name));
                 }
             }
             if (cnt > 0) {
                 sb.append("</ul>");
+                sb.append("</form>");
             }
         }
         if (topLevel) {
@@ -1641,8 +1729,6 @@ public class Repository implements Constants, Tables {
      * @throws Exception _more_
      */
     protected List<FilesInfo> getFilesInfos(Request request) throws Exception {
-
-
         TypeHandler typeHandler = getTypeHandler(request);
         List        where       = typeHandler.assembleWhereClause(request);
         String query =
@@ -1729,12 +1815,17 @@ public class Repository implements Constants, Tables {
 
     protected String getGraphLink (Request request, FilesInfo filesInfo) {
         if(!isAppletEnabled(request)) return "";
-        return href(HtmlUtil.url("/graphview", "id", filesInfo.getId(), "type", filesInfo.getType()), HtmlUtil
-                    .img(urlBase + "/tree.gif", "alt=\"Show file in graph\" title=\"Show file in graph\" "));
+        return href(HtmlUtil.url("/graphview", "id", filesInfo.getId(), "type", filesInfo.getType()), 
+            HtmlUtil.img(urlBase + "/tree.gif", "alt=\"Show file in graph\" title=\"Show file in graph\" "));
     }
 
     protected String getFileFetchLink(FilesInfo filesInfo) {
-        return href(HtmlUtil.url("/fetch/" + filesInfo.getName(),"id",filesInfo.getId()),HtmlUtil.img(href("/Fetch.gif"),"alt=\"Download file\"  title=\"Download file\"  "));
+        if(getProperty(PROP_HTML_DOWNLOADFILESASFILES,false)) {
+            return HtmlUtil.href("file://" + filesInfo.getFile(),
+                                HtmlUtil.img(href("/Fetch.gif"),"alt=\"Download file\"  title=\"Download file\"  "));
+        } else {
+            return href(HtmlUtil.url("/fetch/" + filesInfo.getName(),"id",filesInfo.getId()),HtmlUtil.img(href("/Fetch.gif"),"alt=\"Download file\"  title=\"Download file\"  "));
+        }
     }
 
 
@@ -1751,7 +1842,9 @@ public class Repository implements Constants, Tables {
         String what = request.get(ARG_WHAT,WHAT_QUERY);
 
         if(!what.equals(WHAT_QUERY)) {
-            return  processList(request);
+            Result result =   processList(request);
+            result.putProperty(PROP_NAVSUBLINKS, getSearchFormLinks(request));
+            return result;
         }
 
         timelineAppletTemplate = IOUtil.readContents(
@@ -1785,13 +1878,16 @@ public class Repository implements Constants, Tables {
                     + output);
         }
 
+
+
         StringBufferCollection sbc = new StringBufferCollection();
         for (FilesInfo filesInfo : filesInfos) {
             times.add(SqlUtil.format(new Date(filesInfo.getStartDate())));
             labels.add(filesInfo.getName());
             StringBuffer ssb = sbc.getBuffer(filesInfo.getType());
             if (output.equals(OUTPUT_HTML)) {
-                String links = getFileFetchLink(filesInfo) +" " +getGraphLink(request,filesInfo);
+                String links = HtmlUtil.checkbox("file_" + filesInfo.getId(),"true") +" " +
+                getFileFetchLink(filesInfo) +" " +getGraphLink(request,filesInfo);
                 ssb.append(HtmlUtil.row(links+" " + href(HtmlUtil.url("/showfile", ARG_ID, filesInfo.getId()),
                                                          filesInfo.getName()), 
                                         "" + new Date(filesInfo.getStartDate())));
@@ -1835,6 +1931,9 @@ public class Repository implements Constants, Tables {
         }
 
 
+        sb.append(HtmlUtil.form("/getfiles","getfiles"));
+        sb.append(HtmlUtil.submit("Get Files"));
+        sb.append("<br>");
         for (int i = 0; i < sbc.getKeys().size(); i++) {
             String       type = (String) sbc.getKeys().get(i);
             StringBuffer ssb  = sbc.getBuffer(type);
@@ -1848,6 +1947,7 @@ public class Repository implements Constants, Tables {
                 sb.append(XmlUtil.closeTag(TAG_DATASET));
             }
         }
+        sb.append("</form>");
 
         if (output.equals(OUTPUT_HTML)) {
             sb.append("</table>");
@@ -1857,7 +1957,9 @@ public class Repository implements Constants, Tables {
         } else if (output.equals(OUTPUT_XML)) {
             sb.append(XmlUtil.closeTag(TAG_CATALOG));
         }
-        return new Result("Query Results", sb, getMimeTypeFromOutput(output));
+        Result result = new Result("Query Results", sb, getMimeTypeFromOutput(output));
+        result.putProperty(PROP_NAVSUBLINKS, getSearchFormLinks(request));
+        return result;
     }
 
 
@@ -2090,14 +2192,14 @@ public class Repository implements Constants, Tables {
      * @throws Exception _more_
      */
     public void loadTestFiles() throws Exception {
-        File xxxrootDir =
+        File rootDir =
             new File(
                 "c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
-        File rootDir =
+        File xxxrootDir =
             new File(
                 "c:/cygwin/home/jeffmc/unidata/data");
         //        File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
-        List<FilesInfo> files = collectFiles(rootDir,"Files/Data");
+        List<FilesInfo> files = collectFiles(rootDir,"Files");
         System.err.println("Inserting:" + files.size() + " test files");
         long t1  = System.currentTimeMillis();
         int  cnt = 0;

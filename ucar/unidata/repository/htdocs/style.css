@@ -86,8 +86,20 @@ i {
    font-family: Arial, Helvetica, sans-serif;
    font-size: 10pt;
    font-weight: bold;
-    border : 1px #ccc solid;
+    border-bottom : 1px #ccc solid;
     background-color : #669966;
+    padding:2;
+    padding-left:5;
+   color: #FFFFFF;
+}
+
+.subnav {
+   margin:0;
+   font-family: Arial, Helvetica, sans-serif;
+   font-size: 10pt;
+   font-weight: bold;
+    border-bottom : 1px #ccc solid;
+    background-color : gray;
     padding:2;
     padding-left:5;
    color: #FFFFFF;

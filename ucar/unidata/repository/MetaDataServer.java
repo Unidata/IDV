@@ -99,8 +99,22 @@ public class MetaDataServer extends HttpServer implements Constants {
             if(links!=null) {
                 linksHtml = StringUtil.join("&nbsp;|&nbsp;", links);
             }
+
+            List sublinks = (List) result.getProperty(PROP_NAVSUBLINKS);
+            String sublinksHtml = "";
+            if(sublinks!=null) {
+                sublinksHtml = StringUtil.join("&nbsp;|&nbsp;", sublinks);
+            }
+              
+
             html = StringUtil.replace(html, "%links%",
                                       linksHtml);
+            if(sublinksHtml.length()>0) {
+                html = StringUtil.replace(html, "%sublinks%",
+                                          "<div class=\"subnav\">" +sublinksHtml  +"</div>");
+            } else {
+                html = StringUtil.replace(html, "%sublinks%","");
+            }
             handler.writeResult(ok, html, result.getMimeType());
         } else {
             handler.writeResult(ok, result.getContent(),

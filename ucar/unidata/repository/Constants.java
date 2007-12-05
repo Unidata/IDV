@@ -241,6 +241,7 @@ public interface Constants {
     public static final String TYPE_GROUP = "group";
 
     public static final String PROP_NAVLINKS = "udms.navlinks";
+    public static final String PROP_NAVSUBLINKS = "udms.navsublinks";
 
     public static final String PROP_SHOW_APPLET = "udms.html.showapplet";
 
@@ -251,5 +252,7 @@ public interface Constants {
     public static final String PROP_DB_URL = "udms.db.url";
     public static final String PROP_DB_USER = "udms.db.user";    
     public static final String PROP_DB_PASSWORD = "udms.db.password";
+    public static final String PROP_HTML_DOWNLOADFILESASFILES = "udms.html.downloadfilesasfiles";
+
 }
 
