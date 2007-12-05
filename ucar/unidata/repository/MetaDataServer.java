@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.List;
 
 
@@ -53,7 +54,7 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class MetaDataServer extends HttpServer {
+public class MetaDataServer extends HttpServer implements Constants {
 
     /** _more_ */
     Repository repository;
@@ -71,22 +72,15 @@ public class MetaDataServer extends HttpServer {
      * @param connectionURL _more_
      * @throws Exception _more_
      */
-    public MetaDataServer(String[] args, String driver, String connectionURL)
+    public MetaDataServer(String[] args)
             throws Exception {
         super(8080);
-        String user     = null;
-        String password = null;
-        user ="jeff";password= "mypassword";
-        for (int i = 0; i < args.length; i++) {}
-
+        repository = new Repository(args);
+        repository.init();
         template =
-            IOUtil.readContents("/ucar/unidata/repository/template.html",
+            IOUtil.readContents(repository.getProperty(PROP_HTML_TEMPLATE),
                                 getClass());
-        repository = new Repository(driver, connectionURL, user, password);
-        //        repository.setUrlBase("/repository");
-
     }
-
 
 
     protected void writeContent(RequestHandler handler, boolean ok, Result result)
@@ -100,8 +94,13 @@ public class MetaDataServer extends HttpServer {
                                       result.getTitle());
             html = StringUtil.replace(html, "%root%",
                                       repository.getUrlBase());
+            List links = (List) result.getProperty(PROP_NAVLINKS);
+            String linksHtml = "";
+            if(links!=null) {
+                linksHtml = StringUtil.join("&nbsp;|&nbsp;", links);
+            }
             html = StringUtil.replace(html, "%links%",
-                                      repository.getNavLinks());
+                                      linksHtml);
             handler.writeResult(ok, html, result.getMimeType());
         } else {
             handler.writeResult(ok, result.getContent(),
@@ -135,13 +134,13 @@ public class MetaDataServer extends HttpServer {
                     throws Exception {
                 path = path.trim();
                 //                System.err.println("request:" + path + ":");
+                formArgs = HtmlUtil.cleanUpArguments(formArgs);
+                User user =new User("jdoe","John Doe", true); 
+                RequestContext context = new RequestContext(user);
+                Request request = new Request(path,  context, formArgs);
                 try {
-                    formArgs = HtmlUtil.cleanUpArguments(formArgs);
-                    User user =new User("jdoe","John Doe", true); 
-                    RequestContext context = new RequestContext(user);
                     Result result =
-                        repository.handleRequest(new Request(path,
-                                                             context, formArgs));
+                        repository.handleRequest(request);
                     if (result != null) {
                         writeContent(this,true, result);
                     } else {
@@ -161,7 +160,9 @@ public class MetaDataServer extends HttpServer {
                                 writeResult(true, bytes, type);
                             }
                         } catch(IOException fnfe) {
-                            writeContent(this,false,new Result("Error",new StringBuffer("Unknown file:" + path)));
+                            result = new Result("Error",new StringBuffer("Unknown file:" + path));
+                            result.putProperty(PROP_NAVLINKS, repository.getNavLinks(request));
+                            writeContent(this,false,result);
                         }
                     }
                 } catch (Throwable exc) {
@@ -200,11 +201,8 @@ public class MetaDataServer extends HttpServer {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-        //        String driver        = "org.apache.derby.jdbc.EmbeddedDriver";
-        //        String connectionURL = "jdbc:derby:testdb;create=true";
-        String driver = "com.mysql.jdbc.Driver";
-        String connectionURL = "jdbc:mysql://localhost:3306/test?zeroDateTimeBehavior=convertToNull";
-        MetaDataServer mds = new MetaDataServer(args, driver, connectionURL);
+        System.setProperty("derby.language.logQueryPlan", "true");
+        MetaDataServer mds = new MetaDataServer(args);
         mds.init();
     }
 

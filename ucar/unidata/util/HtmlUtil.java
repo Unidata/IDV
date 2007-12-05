@@ -47,7 +47,7 @@ public class HtmlUtil {
      */
     public static String hidden(String name,String value) {
         return "<input type=\"hidden\" name=\"" + name + "\" value=\""
-            + value + "\"/>";
+            + value + "\">";
     }
 
 
@@ -116,7 +116,7 @@ public class HtmlUtil {
     }
 
     public static String submit(String label) {
-        return "<input  type=\"submit\" value=\"" + label +"\" />";
+        return "<input  type=\"submit\" value=\"" + label +"\" >";
     }
 
     public static String input(String name) {
@@ -128,7 +128,7 @@ public class HtmlUtil {
     }
 
     public static String input(String name, Object value, String extra) {
-        return "<input name=\"" + name +"\" value=\"" + (value==null?"":value.toString()) +"\" " + extra +"/>";
+        return "<input name=\"" + name +"\" value=\"" + (value==null?"":value.toString()) +"\" " + extra +">";
     }
 
     /**

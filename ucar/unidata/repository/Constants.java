@@ -146,6 +146,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    public static final String ARG_APPLET = "applet";
+
     public static final String ARG_USER = "user";
 
     public static final String ARG_TAG = "tag";
@@ -238,6 +240,16 @@ public interface Constants {
     /** _more_          */
     public static final String TYPE_GROUP = "group";
 
+    public static final String PROP_NAVLINKS = "udms.navlinks";
 
+    public static final String PROP_SHOW_APPLET = "udms.html.showapplet";
+
+    public static final String PROP_HTML_URLBASE = "udms.html.urlbase";
+    public static final String PROP_HTML_TEMPLATE = "udms.html.template";
+
+    public static final String PROP_DB_DRIVER = "udms.db.driver";
+    public static final String PROP_DB_URL = "udms.db.url";
+    public static final String PROP_DB_USER = "udms.db.user";    
+    public static final String PROP_DB_PASSWORD = "udms.db.password";
 }
 

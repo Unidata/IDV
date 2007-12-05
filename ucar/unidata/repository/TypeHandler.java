@@ -153,7 +153,7 @@ public class TypeHandler implements Constants, Tables {
             sb.append("<table>");
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"), filesInfo.getName() + " " +
                                           repository.getFileFetchLink(filesInfo) +" " +
-                                          repository.getFileTreeLink(filesInfo)));
+                                          repository.getGraphLink(request,filesInfo)));
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Create Date:"),  ""+new Date(filesInfo.getCreateDate())));
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Creator:"),  filesInfo.getUser().getName()));
 
@@ -212,7 +212,7 @@ public class TypeHandler implements Constants, Tables {
             title  = "Level 3 Radar Stations";
         }
         List where = assembleWhereClause(request);
-        if(where.toString().indexOf(TABLE_FILES=0)) {
+        if(where.toString().indexOf(TABLE_FILES)==0) {
             where.add(SqlUtil.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID));
         }
         String query = SqlUtil.makeSelect(SqlUtil.distinct(column),
@@ -332,9 +332,12 @@ public class TypeHandler implements Constants, Tables {
                                                 SqlUtil.distinct(COL_FILES_GROUP_ID), 
                                                 getTablesForQuery(request,Misc.newList(TABLE_FILES)),
                                                 SqlUtil.makeAnd(where));
+
         List<Group> groups = repository.getGroups(
                                                   SqlUtil.readString(
                                                                      repository.execute(groupSelectSql),1));
+
+
 
         if (groups.size() > 1) {
             List groupList = new ArrayList();
@@ -352,6 +355,7 @@ public class TypeHandler implements Constants, Tables {
                                       groups.get(0).getFullName()));
             formBuffer.append(HtmlUtil.tableEntry("<b>Group:</b>", groups.get(0).getFullName()));
         }
+
 
         String tag = (String) request.get(ARG_TAG);
         if(tag == null) {

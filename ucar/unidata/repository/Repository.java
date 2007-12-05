@@ -80,8 +80,10 @@ import java.util.regex.*;
  */
 public class Repository implements Constants, Tables {
 
+
     private Properties mimeTypes;
 
+    private Properties  properties = new Properties();
 
     /** _more_          */
     private String urlBase = "/repository";
@@ -118,31 +120,43 @@ public class Repository implements Constants, Tables {
                                                     User>();
 
 
+
     /**
      * _more_
      *
      *
-     * @param driver _more_
-     * @param connectionURL _more_
-     * @param userName _more_
-     * @param password _more_
      * @throws Exception _more_
      */
-    public Repository(String driver, String connectionURL, String userName,
-                      String password)
-            throws Exception {
-        Misc.findClass(driver);
+    public Repository(String[]args)  throws Exception {
+        properties = new Properties();
+        properties.load(IOUtil.getInputStream("/ucar/unidata/repository/repository.properties",getClass()));
+        for (int i = 0; i < args.length; i++) {
+            if(args[i].endsWith(".properties")) {
+                properties.load(IOUtil.getInputStream(args[i],getClass()));
+            }
+        }
+        Misc.findClass((String) properties.get(PROP_DB_DRIVER));
+        urlBase = (String)properties.get(PROP_HTML_URLBASE);
+        if(urlBase == null) urlBase = "";
+                              
+    }
+
+    protected void makeConnection() throws Exception {
+        String userName = (String) properties.get(PROP_DB_USER);
+        String password = (String) properties.get(PROP_DB_PASSWORD);
+        String connectionURL = (String) properties.get(PROP_DB_URL);
+
         if (userName != null) {
             connection = DriverManager.getConnection(connectionURL, userName,
-                    password);
+                                                     password);
         } else {
             connection = DriverManager.getConnection(connectionURL);
         }
-        init();
-
     }
 
+
     protected void init() throws Exception {
+        makeConnection();
         mimeTypes= new Properties();
         mimeTypes.load(IOUtil.getInputStream("/ucar/unidata/repository/mimetypes.properties",getClass()));
         initTable();
@@ -151,15 +165,24 @@ public class Repository implements Constants, Tables {
         initRequests();
     }
 
+    protected boolean isAppletEnabled(Request request) {
+        if(!getProperty(PROP_SHOW_APPLET, true)) return false;
+        String arg = (String) request.get(ARG_APPLET,"true");
+        return Misc.equals(arg,"true");
+    }
+
+
+    List api = new ArrayList();
     Hashtable requestMap = new Hashtable();
 
     protected void addRequest(String request,String methodName, Permission permission) {
         Class []paramTypes = new Class[]{Request.class};
         Method method = Misc.findMethod(getClass(),methodName, paramTypes);
         if(method == null) throw new IllegalArgumentException ("Unknown request method:" + methodName);
-        Object[]pair = new Object[]{permission, method};
-        requestMap.put(request, pair);
-        requestMap.put(getUrlBase()+request, pair);
+        Object[]tuple = new Object[]{request,permission, method};
+        api.add(tuple);
+        requestMap.put(request, tuple);
+        requestMap.put(getUrlBase()+request, tuple);
     }
 
     protected void initRequests() throws Exception {
@@ -185,20 +208,93 @@ public class Repository implements Constants, Tables {
      * @throws Exception _more_
      */
     public Result handleRequest(Request request) throws Exception {
-        User user = request.getRequestContext().getUser();
-        Object[]pair = (Object[])requestMap.get(request.getType());
-        if(pair!=null) {
-            Permission permission = (Permission) pair[0];
-            Method method = (Method) pair[1];
-            if(!permission.isRequestOk(request, this)) {
-                return new Result("Error",new StringBuffer("Access Violation"));
-            }
-            return (Result) method.invoke(this, new Object[]{request});
-        } else if (request.getType().startsWith(getUrlBase()+Request.CALL_FETCH)) {
-            return getFile(request);
-        } else {
-            return null;
+        String incoming = request.getType().trim();
+        if(incoming.endsWith("/")) {
+            incoming = incoming.substring(0,incoming.length()-1);
         }
+        //        System.err.println ("incoming:"+incoming+":");
+        if(incoming.startsWith(getUrlBase())) {
+            incoming = incoming.substring(getUrlBase().length());
+        }
+        User user = request.getRequestContext().getUser();
+        Object[]tuple = (Object[])requestMap.get(incoming);
+        if(tuple == null) {
+            incoming = incoming;
+            for(int i=0;i<api.size();i++) {
+                Object[]tmp = (Object[]) api.get(i);
+                String path = (String) tmp[0];
+                if(path.endsWith("/*")) {
+                    path = path.substring(0,path.length()-2);
+                    //                    System.err.println (path +":"+incoming);
+                    if(incoming.startsWith(path)) {
+                        tuple = tmp;
+                        break;
+                    }
+                }
+            }
+        }
+        Result result = null;
+        if(tuple!=null) {
+            Permission permission = (Permission) tuple[1];
+            Method method = (Method) tuple[2];
+            if(!permission.isRequestOk(request, this)) {
+                result =  new Result("Error",new StringBuffer("Access Violation"));
+            } else {
+                if(connection ==null && !incoming.startsWith("/admin")) {
+                    result =  new Result("No Database",new StringBuffer("Database is shutdown"));
+                } else {
+                    result =(Result) method.invoke(this, new Object[]{request});
+                }
+            }
+        }  else {
+            //            result = new Result("Unknown Request",new StringBuffer("Unknown request:" + request.getType()));
+        }
+        if(result!=null) {
+            result.putProperty(PROP_NAVLINKS, getNavLinks(request));
+        }
+        return result;
+    }
+
+
+    public String getProperty(String name) {
+        return (String)properties.get(name);
+    }
+
+    public boolean getProperty(String name, boolean dflt) {
+        return Misc.getProperty(properties,name, dflt);
+    }
+
+    public Result doAdmin(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        String what = request.get("what","nothing");
+        if(what.equals("shutdown")) {
+            connection.close();
+            connection = null;
+            sb.append("Database is shut down");
+        } else if(what.equals("restart")) {
+            if(connection!=null) {
+                sb.append("Already connected to database");
+            } else {
+                makeConnection();
+                sb.append("Database is restarted");
+            }
+        }
+        return new Result("Administration", sb);
+    }
+
+    public Result showAdmin(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        sb.append("<h2>Administration</h2>");
+        sb.append(HtmlUtil.form(href("/admindo")," name=\"admin\""));
+        if(connection ==null) {
+            sb.append(HtmlUtil.hidden("what", "restart"));
+            sb.append(HtmlUtil.submit("Restart Database"));
+        } else {
+            sb.append(HtmlUtil.hidden("what", "shutdown"));
+            sb.append(HtmlUtil.submit("Shut Down Database"));
+        }
+        sb.append("</form>");
+        return new Result("Administration", sb);
     }
 
 
@@ -288,11 +384,17 @@ public class Repository implements Constants, Tables {
         SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
         ResultSet        results;
         int              cnt = 0;
+        Hashtable map = new Hashtable();
+        int unique = 0;
         while ((results = iter.next()) != null) {
             ResultSetMetaData rsmd = results.getMetaData();
             while (results.next()) {
+                cnt++;
+                if (cnt > 1000) {
+                    continue;
+                }
                 int colcnt = 0;
-                if (cnt++ == 0) {
+                if (cnt == 1) {
                     sb.append("<table><tr>");
                     for (int i = 0; i < rsmd.getColumnCount(); i++) {
                         sb.append(
@@ -306,10 +408,10 @@ public class Repository implements Constants, Tables {
                     sb.append(HtmlUtil.col(results.getString(++colcnt)));
                 }
                 sb.append("</tr>\n");
-                if (cnt++ > 1000) {
-                    sb.append(HtmlUtil.row("..."));
-                    break;
-                }
+                //                if (cnt++ > 1000) {
+                //                    sb.append(HtmlUtil.row("..."));
+                //                    break;
+                //                }
             }
         }
         sb.append("</table>");
@@ -484,30 +586,19 @@ public class Repository implements Constants, Tables {
      *
      * @return _more_
      */
-    public String getNavLinks() {
-        StringBuffer sb = new StringBuffer();
-        sb.append(href("/showgroup", "Group List", "class=\"navtitle\""));
-        sb.append("&nbsp;|&nbsp;");
-        sb.append(href("/searchform", "Search", "class=\"navtitle\""));
-        sb.append("&nbsp;|&nbsp;");
-        sb.append(href("/sql", "SQL", "class=\"navtitle\""));
-        if(true) return sb.toString();
-        sb.append("&nbsp;&nbsp;&nbsp;<span class=\"navtitle\">List:</span> ");
-        sb.append(href(HtmlUtil.url("/list", "what", WHAT_TYPE), "Types",
-                       "class=\"navtitle\""));
-        sb.append("&nbsp;|&nbsp;");
-        sb.append(href(HtmlUtil.url("/list", "what", WHAT_GROUP), "Groups",
-                       "class=\"navtitle\""));
-        sb.append("&nbsp;|&nbsp;");
-        sb.append(href(HtmlUtil.url("/list", "what", WHAT_TAG), "Tags",
-                       "class=\"navtitle\""));
-        sb.append("&nbsp;|&nbsp;");
-        sb.append(href(HtmlUtil.url("/list", "what", WHAT_STATION),
-                       "Stations", "class=\"navtitle\""));
-        sb.append("&nbsp;|&nbsp;");
-        sb.append(href(HtmlUtil.url("/list", "what", WHAT_PRODUCT),
-                       "Products", "class=\"navtitle\""));
-        return sb.toString();
+    protected List getNavLinks(Request request) {
+        List links = new ArrayList();
+
+        String extra  = " style=\" font-family: Arial, Helvetica, sans-serif;  font-weight: bold; color:#ffffff;\" class=\"navtitle\"";
+        links.add(href("/showgroup", "Group List", extra));
+        links.add(href("/searchform", "Search", extra));
+        RequestContext context = request.getRequestContext();
+        User user = context.getUser();
+        if(user.getAdmin()) {
+            links.add(href("/sql", "SQL", extra));
+            links.add(href("/admin", "Admin", extra));
+        }
+        return links;
     }
 
 
@@ -692,10 +783,7 @@ public class Repository implements Constants, Tables {
                     + href(HtmlUtil.url(
                         "/showgroup", "group",
                         group.getFullName()), group.getFullName()) + "</a> "
-                            + href(HtmlUtil.url(
-                                "/graphview", "id", group.getFullName(),
-                                "type", "group"), HtmlUtil.img(
-                                    urlBase + "/tree.gif")));
+                    + getGraphLink(request, group));
                 continue;
             }
             List  breadcrumbs = new ArrayList();
@@ -709,11 +797,8 @@ public class Repository implements Constants, Tables {
             }
             breadcrumbs.add(0, href("/showgroup", "Top"));
             titleList.add(group.getName());
-            breadcrumbs.add(group.getName() + " "
-                            + href(HtmlUtil.url("/graphview", "id",
-                                group.getFullName(), "type",
-                                "group"), HtmlUtil.img(urlBase
-                                + "/tree.gif")));
+            breadcrumbs.add(group.getName() + " "+ getGraphLink(request, group));
+
             title = "Group: "
                     + StringUtil.join("&nbsp;&gt;&nbsp;", titleList);
             sb.append(HtmlUtil.bold("Group: "
@@ -1223,8 +1308,10 @@ public class Repository implements Constants, Tables {
                 sb.append("<li>");
                 sb.append(tag);
                 sb.append("(" + count +")");
-                sb.append(href(HtmlUtil.url("/graphview", "id", tag, "type", TYPE_TAG), 
-                               HtmlUtil.img(urlBase + "/tree.gif", "alt=\"Show tag in graph\" title=\"Show file in graph\" ")));
+                if(isAppletEnabled(request)) {
+                    sb.append(href(HtmlUtil.url("/graphview", "id", tag, "type", TYPE_TAG), 
+                                   HtmlUtil.img(urlBase + "/tree.gif", "alt=\"Show tag in graph\" title=\"Show file in graph\" ")));
+                }
             } else         if (output.equals(OUTPUT_CLOUD)) {
 
                 double percent = count/distribution;
@@ -1275,6 +1362,8 @@ public class Repository implements Constants, Tables {
         } else if (output.equals(OUTPUT_RSS)) {
             return getMimeType(".rss");
         } else if (output.equals(OUTPUT_HTML)) {
+            return getMimeType(".html");
+        } else if (output.equals(OUTPUT_CLOUD)) {
             return getMimeType(".html");
         } else {
             return getMimeType(".txt");
@@ -1503,10 +1592,15 @@ public class Repository implements Constants, Tables {
                               results.getString(3), results.getString(4));
         } else {
             String id;
+            //            "select count(*) from groups where group.parent is NULL"
+            //            int cnt = SqlUtil.readInt(execute(select));
+            //            while(true) {
+            //            }
             if(parent == null) {
-                id  =   getGUID();
+                id = ""+(keyCnt++);
+                //xxx                id  =   getGUID();
             } else {
-                id = parent.getId()+"_"+getGUID();
+                id = parent.getId()+"_"+(keyCnt++);
             }
 
             execute(INSERT_GROUPS, new Object[]{
@@ -1624,7 +1718,16 @@ public class Repository implements Constants, Tables {
         return dflt;
     }
 
-    protected String getFileTreeLink(FilesInfo filesInfo) {
+    protected String getGraphLink (Request request, Group group) {
+        if(!isAppletEnabled(request)) return "";
+        return href(HtmlUtil.url(
+                                 "/graphview", "id", group.getFullName(),
+                                 "type", "group"), HtmlUtil.img(
+                                                                urlBase + "/tree.gif"));
+    }
+
+    protected String getGraphLink (Request request, FilesInfo filesInfo) {
+        if(!isAppletEnabled(request)) return "";
         return href(HtmlUtil.url("/graphview", "id", filesInfo.getId(), "type", filesInfo.getType()), HtmlUtil
                     .img(urlBase + "/tree.gif", "alt=\"Show file in graph\" title=\"Show file in graph\" "));
     }
@@ -1687,7 +1790,7 @@ public class Repository implements Constants, Tables {
             labels.add(filesInfo.getName());
             StringBuffer ssb = sbc.getBuffer(filesInfo.getType());
             if (output.equals(OUTPUT_HTML)) {
-                String links = getFileFetchLink(filesInfo) +" " +getFileTreeLink(filesInfo);
+                String links = getFileFetchLink(filesInfo) +" " +getGraphLink(request,filesInfo);
                 ssb.append(HtmlUtil.row(links+" " + href(HtmlUtil.url("/showfile", ARG_ID, filesInfo.getId()),
                                                          filesInfo.getName()), 
                                         "" + new Date(filesInfo.getStartDate())));
@@ -1724,7 +1827,9 @@ public class Repository implements Constants, Tables {
                                                 StringUtil.join(",", times));
                 tmp = StringUtil.replace(tmp, "%labels%",
                                          StringUtil.join(",", labels));
-                sb.append(tmp);
+                if(isAppletEnabled(request)) {
+                    sb.append(tmp);
+                }
             }
         }
 
@@ -1766,27 +1871,27 @@ public class Repository implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public List<Level3RadarInfo> collectLevel3radarFilesxxx(File rootDir,
+    public List<Level3RadarInfo> collectLevel3radarFiles(File rootDir,
             String groupName)
             throws Exception {
-        long                  t1         = System.currentTimeMillis();
         final List<Level3RadarInfo> radarInfos = new ArrayList();
         long                  baseTime   = currentTime();
         Group                 group      = findGroupFromName(groupName);
         User user = findUser("jdoe");
         for (int stationIdx = 0; stationIdx < 100; stationIdx++) {
-            for (int i = 0; i < 10; i++) {
-                String station = "stn" + stationIdx;
-                String product = "product" + (i % 20);
+            String station = "station" + stationIdx;
+            for (int productIdx = 0; productIdx < 20; productIdx++) {
+                String product = "product" + productIdx;
                 group = findGroupFromName(groupName + "/" + station + "/" + product);
-                radarInfos.add(new Level3RadarInfo(getGUID(),
-                                                   "", "", group,
-                                                   user,
-                                             "file" + stationIdx + "_" + i
-                                             + "_" + group, station, product,
-                                                 baseTime
-                                                     + radarInfos.size()
-                                                         * 100));
+                for (int timeIdx = 0; timeIdx < 100; timeIdx++) {
+                    radarInfos.add(new Level3RadarInfo(getGUID(),
+                                                       "", "", group,
+                                                       user,
+                                                       "file" + stationIdx + "_" +productIdx
+                                                       + "_" + group, station, product,
+                                                       baseTime
+                                                       + timeIdx*1000*60));
+                }
             }
         }
 
@@ -1803,7 +1908,7 @@ public class Repository implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public List<Level3RadarInfo> collectLevel3radarFiles(File rootDir,
+    public List<Level3RadarInfo> xxxcollectLevel3radarFiles(File rootDir,
             final String groupName)
             throws Exception {
         long                   t1         = System.currentTimeMillis();
@@ -1931,7 +2036,7 @@ public class Repository implements Constants, Tables {
         File            rootDir = new File("/data/ldm/gempak/nexrad/NIDS");
         List<Level3RadarInfo> files   = collectLevel3radarFiles(rootDir, "IDD");
         //        files.addAll(collectLevel3radarFiles(rootDir, "LDM/LDM2"));
-        System.err.println("Inserting:" + files.size() + " files");
+        System.err.println("Inserting:" + files.size() + " radar files");
         long t1  = System.currentTimeMillis();
         int  cnt = 0;
         PreparedStatement filesInsert =
@@ -1984,10 +2089,10 @@ public class Repository implements Constants, Tables {
      * @throws Exception _more_
      */
     public void loadTestFiles() throws Exception {
-        File xxxrootDir =
+        File rootDir =
             new File(
                 "c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
-        File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
+        //        File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
         List<FilesInfo> files = collectFiles(rootDir);
         System.err.println("Inserting:" + files.size() + " test files");
         long t1  = System.currentTimeMillis();
@@ -2078,7 +2183,7 @@ public class Repository implements Constants, Tables {
             throw exc;
         }
         long t2 = System.currentTimeMillis();
-        if(t2-t1>1000) {
+        if(t2-t1>300) {
             System.err.println("query:" + sql);
             System.err.println("time:" + (t2-t1));}
         return statement;

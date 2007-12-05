@@ -22,6 +22,7 @@
 
 package ucar.unidata.repository;
 
+import java.util.Hashtable;
 
 
 /**
@@ -37,6 +38,8 @@ public class Result {
     private String title = "";
     private String mimeType = "text/html";
     private boolean shouldDecorate = true;
+
+    private Hashtable properties = new Hashtable();
 
     public Result(String title, byte[]content) {
         this(title, content,TYPE_HTML);
@@ -62,6 +65,15 @@ public class Result {
         this.title = title;
         this.mimeType = mimeType;
         this.shouldDecorate = shouldDecorate;
+    }
+
+
+    public void putProperty(String name, Object value) {
+        properties.put(name, value);
+    }
+
+    public Object getProperty(String name) {
+        return properties.get(name);
     }
 
     public boolean isHtml() {
