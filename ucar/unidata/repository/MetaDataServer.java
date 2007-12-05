@@ -201,7 +201,6 @@ public class MetaDataServer extends HttpServer implements Constants {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-        System.setProperty("derby.language.logQueryPlan", "true");
         MetaDataServer mds = new MetaDataServer(args);
         mds.init();
     }

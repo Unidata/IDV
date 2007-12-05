@@ -80,7 +80,6 @@ import java.util.regex.*;
  */
 public class Repository implements Constants, Tables {
 
-
     private Properties mimeTypes;
 
     private Properties  properties = new Properties();
@@ -318,10 +317,11 @@ public class Repository implements Constants, Tables {
         results.next();
         makeUserIfNeeded(new User("jdoe", "John Doe", true));
         makeUserIfNeeded(new User("jsmith", "John Smith", false));
+        loadTestFiles();
         if(results.getInt(1)==0) {
             System.err.println ("Adding test data");
-            loadLevel3RadarFiles();
-            loadTestFiles();
+            //            loadLevel3RadarFiles();
+            //            loadTestFiles();
         }
     }
 
@@ -1597,10 +1597,11 @@ public class Repository implements Constants, Tables {
             //            while(true) {
             //            }
             if(parent == null) {
-                id = ""+(keyCnt++);
-                //xxx                id  =   getGUID();
+                //                id = ""+(keyCnt++);
+                id  =   getGUID();
             } else {
-                id = parent.getId()+"_"+(keyCnt++);
+                //                id = parent.getId()+"_"+(keyCnt++);
+                id = parent.getId()+"_"+getGUID();
             }
 
             execute(INSERT_GROUPS, new Object[]{
@@ -1958,7 +1959,7 @@ public class Repository implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public List<FilesInfo> collectFiles(File rootDir) throws Exception {
+    public List<FilesInfo> collectFiles(File rootDir, final String rootGroup) throws Exception {
         final String         rootStr    = rootDir.toString();
         final int            rootStrLen = rootStr.length();
         final List<FilesInfo> filesInfos  = new ArrayList();
@@ -1984,7 +1985,7 @@ public class Repository implements Constants, Tables {
                 dirPath = dirPath.substring(rootStrLen);
                 List toks = StringUtil.split(dirPath, File.separator, true,
                                              true);
-                toks.add(0, "Files");
+                toks.add(0, rootGroup);
                 Group group = findGroupFromName(StringUtil.join("/", toks));
                 FilesInfo fileInfo = new FilesInfo(getGUID(),
                                              name, name, TypeHandler.TYPE_FILE,
@@ -2089,11 +2090,14 @@ public class Repository implements Constants, Tables {
      * @throws Exception _more_
      */
     public void loadTestFiles() throws Exception {
-        File rootDir =
+        File xxxrootDir =
             new File(
                 "c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
+        File rootDir =
+            new File(
+                "c:/cygwin/home/jeffmc/unidata/data");
         //        File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
-        List<FilesInfo> files = collectFiles(rootDir);
+        List<FilesInfo> files = collectFiles(rootDir,"Files/Data");
         System.err.println("Inserting:" + files.size() + " test files");
         long t1  = System.currentTimeMillis();
         int  cnt = 0;
