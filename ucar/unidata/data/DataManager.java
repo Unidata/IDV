@@ -851,10 +851,12 @@ public class DataManager {
                 }
                 List workingList = null;
                 List tmpList     = new ArrayList(definingObjects);
+
                 for (int stringIdx = 0; stringIdx < tmpList.size();
                         stringIdx++) {
                     String s = (String) tmpList.get(stringIdx);
-                    if (filter.match(s)) {
+                    boolean match = filter.match(s);
+                    if (match) {
                         //                        System.err.println("match:" + descriptor);
                         definingObjects.remove(s);
                         if (workingList == null) {
@@ -941,9 +943,18 @@ public class DataManager {
      */
     private String findDataType(String definingObject, List filters) {
         String file = definingObject.trim().toLowerCase();
+        int questionMarkIdx  =file.indexOf("?");
+        String substring=null;
+        if(questionMarkIdx>=0) {
+            substring = file.substring(0,questionMarkIdx);
+        }
         for (int i = 0; i < filters.size(); i++) {
             PatternFileFilter filter = (PatternFileFilter) filters.get(i);
-            if (filter.match(file)) {
+            boolean match = filter.match(file);
+            if(!match && substring!=null) {
+                match = filter.match(substring);
+            }
+            if(match) {
                 return filter.getId().toString();
             }
         }
