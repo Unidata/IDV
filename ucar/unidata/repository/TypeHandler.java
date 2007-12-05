@@ -212,7 +212,9 @@ public class TypeHandler implements Constants, Tables {
             title  = "Level 3 Radar Stations";
         }
         List where = assembleWhereClause(request);
-        where.add(SqlUtil.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID));
+        if(where.toString().indexOf(TABLE_FILES=0)) {
+            where.add(SqlUtil.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID));
+        }
         String query = SqlUtil.makeSelect(SqlUtil.distinct(column),
                                           getTablesForQuery(request,Misc.newList(TABLE_LEVEL3RADAR)),
                                           SqlUtil.makeAnd(where));
@@ -500,8 +502,8 @@ public class TypeHandler implements Constants, Tables {
                   (String) request.get(ARG_STATION), where,true);
             addOr(COL_LEVEL3RADAR_PRODUCT,
                   (String) request.get(ARG_PRODUCT), where,true);
-            if (request.hasParameter(ARG_STATION)
-                    || request.hasParameter(ARG_PRODUCT)) {
+            if (request.hasSetParameter(ARG_STATION)
+                    || request.hasSetParameter(ARG_PRODUCT)) {
                 where.add(SqlUtil.eq(COL_FILES_ID, COL_LEVEL3RADAR_ID));
             }
         }
@@ -529,13 +531,13 @@ public class TypeHandler implements Constants, Tables {
     protected List getTablesForQuery(Request request, List initTables) {
         initTables.add(TABLE_FILES);
         if (isType(TYPE_LEVEL3RADAR)) {
-            if (request.hasParameter(ARG_PRODUCT)
-                    || request.hasParameter(ARG_STATION)) {
+            if (request.hasSetParameter(ARG_PRODUCT)
+                    || request.hasSetParameter(ARG_STATION)) {
                 initTables.add(TABLE_LEVEL3RADAR);
             }
         }
 
-        if(request.hasParameter(ARG_TAG) && request.get(ARG_TAG).trim().length()>0) {
+        if(request.hasSetParameter(ARG_TAG)) {
             initTables.add(TABLE_TAGS);        
             initTables.add(TABLE_FILES);        
         }

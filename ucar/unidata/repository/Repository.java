@@ -1766,7 +1766,7 @@ public class Repository implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public List<Level3RadarInfo> collectLevel3radarFiles(File rootDir,
+    public List<Level3RadarInfo> collectLevel3radarFilesxxx(File rootDir,
             String groupName)
             throws Exception {
         long                  t1         = System.currentTimeMillis();
@@ -1803,7 +1803,7 @@ public class Repository implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public List<Level3RadarInfo> collectLevel3radarFilesxxx(File rootDir,
+    public List<Level3RadarInfo> collectLevel3radarFiles(File rootDir,
             final String groupName)
             throws Exception {
         long                   t1         = System.currentTimeMillis();
@@ -1969,8 +1969,8 @@ public class Repository implements Constants, Tables {
             filesInsert.executeBatch();
             radarInsert.executeBatch();
         }
-        connection.setAutoCommit(true);
         connection.commit();
+        connection.setAutoCommit(true);
         long   t2      = System.currentTimeMillis();
         double seconds = (t2 - t1) / 1000.0;
         System.err.println("cnt:" + cnt + " time:" + seconds + " rate:"
@@ -1984,10 +1984,10 @@ public class Repository implements Constants, Tables {
      * @throws Exception _more_
      */
     public void loadTestFiles() throws Exception {
-        File rootDir =
+        File xxxrootDir =
             new File(
                 "c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
-        //o        File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
+        File            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
         List<FilesInfo> files = collectFiles(rootDir);
         System.err.println("Inserting:" + files.size() + " test files");
         long t1  = System.currentTimeMillis();
@@ -2029,7 +2029,7 @@ public class Repository implements Constants, Tables {
             tagsInsert.executeBatch();
         }
         connection.setAutoCommit(true);
-        connection.commit();
+        //        connection.commit();
         long   t2      = System.currentTimeMillis();
         double seconds = (t2 - t1) / 1000.0;
         System.err.println("cnt:" + cnt + " time:" + seconds + " rate:"
@@ -2071,7 +2071,6 @@ public class Repository implements Constants, Tables {
             statement.setMaxRows(max);
         }
         long t1 = System.currentTimeMillis();
-        System.err.println("query:" + sql);
         try {
             statement.execute(sql);
         } catch(Exception exc) {
@@ -2079,7 +2078,9 @@ public class Repository implements Constants, Tables {
             throw exc;
         }
         long t2 = System.currentTimeMillis();
-        System.err.println("done:" + (t2-t1));
+        if(t2-t1>1000) {
+            System.err.println("query:" + sql);
+            System.err.println("time:" + (t2-t1));}
         return statement;
     }
 

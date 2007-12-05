@@ -141,6 +141,13 @@ public class Request {
         return parameters.containsKey(key);
     }
 
+    public boolean hasSetParameter(String key) {
+        String v = (String) parameters.get(key);
+        if(v == null || v.trim().length() == 0) return false;
+        return true;
+    }
+
+
     /**
      * _more_
      *

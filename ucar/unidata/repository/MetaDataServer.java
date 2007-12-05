@@ -76,14 +76,14 @@ public class MetaDataServer extends HttpServer {
         super(8080);
         String user     = null;
         String password = null;
-        //user ="jeff";password= "mypassword";
+        user ="jeff";password= "mypassword";
         for (int i = 0; i < args.length; i++) {}
 
         template =
             IOUtil.readContents("/ucar/unidata/repository/template.html",
                                 getClass());
         repository = new Repository(driver, connectionURL, user, password);
-        repository.setUrlBase("/repository");
+        //        repository.setUrlBase("/repository");
 
     }
 
@@ -149,18 +149,17 @@ public class MetaDataServer extends HttpServer {
                         String type = repository.getMimeType(IOUtil.getFileExtension(path));
                         path = StringUtil.replace(path,
                                                   repository.getUrlBase(), "");
-
                         try {
-                        InputStream is =
-                            IOUtil.getInputStream(
-                                                  "/ucar/unidata/repository/htdocs" + path,
-                                                  getClass());
-                        byte[] bytes = IOUtil.readBytes(is);
-                        if (path.endsWith(".html")) {
-                            writeResult(true, new String(bytes),type);
-                        } else {
-                            writeResult(true, bytes, type);
-                        }
+                            InputStream is =
+                                IOUtil.getInputStream(
+                                                      "/ucar/unidata/repository/htdocs" + path,
+                                                      getClass());
+                            byte[] bytes = IOUtil.readBytes(is);
+                            if (path.endsWith(".html")) {
+                                writeResult(true, new String(bytes),type);
+                            } else {
+                                writeResult(true, bytes, type);
+                            }
                         } catch(IOException fnfe) {
                             writeContent(this,false,new Result("Error",new StringBuffer("Unknown file:" + path)));
                         }
@@ -201,10 +200,10 @@ public class MetaDataServer extends HttpServer {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-        String driver        = "org.apache.derby.jdbc.EmbeddedDriver";
-        String connectionURL = "jdbc:derby:testdb;create=true";
-        //        String driver = "com.mysql.jdbc.Driver";
-        //        String connectionURL = "jdbc:mysql://localhost:3306/test?zeroDateTimeBehavior=convertToNull";
+        //        String driver        = "org.apache.derby.jdbc.EmbeddedDriver";
+        //        String connectionURL = "jdbc:derby:testdb;create=true";
+        String driver = "com.mysql.jdbc.Driver";
+        String connectionURL = "jdbc:mysql://localhost:3306/test?zeroDateTimeBehavior=convertToNull";
         MetaDataServer mds = new MetaDataServer(args, driver, connectionURL);
         mds.init();
     }
