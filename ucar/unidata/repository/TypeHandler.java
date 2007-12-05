@@ -67,6 +67,8 @@ public class TypeHandler implements Constants, Tables {
     /** _more_ */
     public static final String TYPE_LEVEL3RADAR = "level3radar";
 
+    public static final String TYPE_SATELLITE = "satellite";
+
     /** _more_ */
     public static final String TYPE_LEVEL2RADAR = "level2radar";
 

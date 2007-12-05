@@ -145,6 +145,7 @@ public class Repository implements Constants, Tables {
         String password = (String) properties.get(PROP_DB_PASSWORD);
         String connectionURL = (String) properties.get(PROP_DB_URL);
 
+        System.err.println ("db:" + connectionURL);
         if (userName != null) {
             connection = DriverManager.getConnection(connectionURL, userName,
                                                      password);
@@ -324,10 +325,11 @@ public class Repository implements Constants, Tables {
         results.next();
         makeUserIfNeeded(new User("jdoe", "John Doe", true));
         makeUserIfNeeded(new User("jsmith", "John Smith", false));
-        loadTestFiles();
+        //        loadTestFiles();
+        loadSatelliteFiles();
         if(results.getInt(1)==0) {
             System.err.println ("Adding test data");
-            //            loadLevel3RadarFiles();
+            loadLevel3RadarFiles();
             //            loadTestFiles();
         }
     }
@@ -1974,7 +1976,7 @@ public class Repository implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public List<Level3RadarInfo> collectLevel3radarFiles(File rootDir,
+    public List<Level3RadarInfo> xxxxcollectLevel3radarFiles(File rootDir,
             String groupName)
             throws Exception {
         final List<Level3RadarInfo> radarInfos = new ArrayList();
@@ -2011,7 +2013,7 @@ public class Repository implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public List<Level3RadarInfo> xxxcollectLevel3radarFiles(File rootDir,
+    public List<Level3RadarInfo> collectLevel3radarFiles(File rootDir,
             final String groupName)
             throws Exception {
         long                   t1         = System.currentTimeMillis();
@@ -2049,6 +2051,59 @@ public class Repository implements Constants, Tables {
         long t2 = System.currentTimeMillis();
         System.err.println("found:" + radarInfos.size() + " in " + (t2 - t1));
         return radarInfos;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     *
+     * @param rootDir _more_
+     * @param groupName _more_
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List<SatelliteInfo> collectSatelliteFiles(File rootDir,
+            final String groupName)
+            throws Exception {
+        long                   t1         = System.currentTimeMillis();
+        final List<SatelliteInfo>  infos = new ArrayList();
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
+        final Pattern pattern =
+            Pattern.compile(
+                "([^/]+)/([^/]+)/([^/]+)/[^/]+_(\\d\\d\\d\\d\\d\\d\\d\\d_\\d\\d\\d\\d)");
+
+        final User user = findUser("jdoe");
+        IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
+            public int viewFile(File f) throws Exception {
+                String  name    = f.toString();
+                Matcher matcher = pattern.matcher(name);
+                if ( !matcher.find()) {
+                    return DO_CONTINUE;
+                }
+                if (infos.size() % 5000 == 0) {
+                    System.err.println("Found:" + infos.size());
+                }
+                String platform = matcher.group(1);
+                String resolution = matcher.group(2);
+                String product = matcher.group(2);
+                Group group = findGroupFromName(groupName + "/" + "Satellite" + "/"
+                                                + platform + "/" + resolution +"/"+product);
+                Date dttm = sdf.parse(matcher.group(4));
+                infos.add(new SatelliteInfo(getGUID(),
+                                            dttm.toString(), "", group, user,
+                                            f.toString(), platform, resolution, product,
+                                            dttm.getTime()));
+                return DO_CONTINUE;
+            }
+        };
+
+        IOUtil.walkDirectory(rootDir, fileViewer);
+        long t2 = System.currentTimeMillis();
+        System.err.println("found sat files:" + infos.size() + " in " + (t2 - t1));
+        return infos;
     }
 
 
@@ -2185,6 +2240,69 @@ public class Repository implements Constants, Tables {
                            + (cnt / seconds));
 
     }
+
+    
+    /**
+     * _more_
+     *
+     * @param stmt _more_
+     * @param table _more_
+     *
+     * @throws Exception _more_
+     */
+    public void loadSatelliteFiles() throws Exception {
+        File            rootDir = new File("/data/ldm/gempak/images/sat");
+        List<SatelliteInfo> files   = collectSatelliteFiles(rootDir, "IDD");
+        //        files.addAll(collectLevel3radarFiles(rootDir, "LDM/LDM2"));
+        System.err.println("Inserting:" + files.size() + " satellite files");
+        long t1  = System.currentTimeMillis();
+        int  cnt = 0;
+        PreparedStatement filesInsert =
+            connection.prepareStatement(INSERT_FILES);
+        PreparedStatement satelliteInsert =
+            connection.prepareStatement(INSERT_SATELLITE);
+
+        int batchCnt = 0;
+        connection.setAutoCommit(false);
+        for (SatelliteInfo info : files) {
+            if ((++cnt) % 10000 == 0) {
+                long   tt2      = System.currentTimeMillis();
+                double tseconds = (tt2 - t1) / 1000.0;
+                System.err.println("# " + cnt + " rate: "
+                                   + ((int) (cnt / tseconds)) + "/s");
+            }
+
+            String id  = getGUID();
+            info.setId(id);
+            setStatement(info, filesInsert);
+            filesInsert.addBatch();
+            int col = 1;
+            satelliteInsert.setString(col++, info.getId());
+            satelliteInsert.setString(col++, info.getPlatform());
+            satelliteInsert.setString(col++, info.getResolution());
+            satelliteInsert.setString(col++, info.getProduct());
+            satelliteInsert.addBatch();
+            batchCnt++;
+            if (batchCnt > 100) {
+                filesInsert.executeBatch();
+                satelliteInsert.executeBatch();
+                batchCnt = 0;
+            }
+        }
+        if (batchCnt > 0) {
+            filesInsert.executeBatch();
+            satelliteInsert.executeBatch();
+        }
+        connection.commit();
+        connection.setAutoCommit(true);
+        long   t2      = System.currentTimeMillis();
+        double seconds = (t2 - t1) / 1000.0;
+        System.err.println("cnt:" + cnt + " time:" + seconds + " rate:"
+                           + (cnt / seconds));
+
+    }
+
+
 
     /**
      * _more_

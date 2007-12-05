@@ -194,6 +194,27 @@ public interface Tables {
 
 
 
+    public static final String TABLE_SATELLITE = "satellite";
+    public static final String COL_SATELLITE_ID = TABLE_SATELLITE + ".id";
+    public static final String COL_SATELLITE_PLATFORM = TABLE_SATELLITE + ".platform";
+    public static final String COL_SATELLITE_RESOLUTION = TABLE_SATELLITE + ".resolution";
+    public static final String COL_SATELLITE_PRODUCT = TABLE_SATELLITE + ".product";
+    public static final String []ARRAY_SATELLITE = new String[]{COL_SATELLITE_ID,
+                                                                COL_SATELLITE_PLATFORM,
+                                                                COL_SATELLITE_RESOLUTION,
+                                                                COL_SATELLITE_PRODUCT};
+
+
+    public static final String COLUMNS_SATELLITE = SqlUtil.comma(ARRAY_SATELLITE);
+    
+    public static final String INSERT_SATELLITE =
+        SqlUtil.makeInsert(TABLE_SATELLITE,
+                           COLUMNS_SATELLITE,
+                           SqlUtil.getQuestionMarks(ARRAY_SATELLITE.length));
+
+
+
+
     //J+
 }
 
