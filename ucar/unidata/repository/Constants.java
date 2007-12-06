@@ -99,9 +99,10 @@ public interface Constants {
 
     public static final String TAG_METHOD = "method";
 
-    public static final String ATTR_REQUEST = "request";
-    public static final String ATTR_METHOD = "method";
-    public static final String ATTR_ADMIN = "admin";
+    public static final String ATTR_API_REQUEST = "request";
+    public static final String ATTR_API_METHOD = "method";
+    public static final String ATTR_API_ADMIN = "admin";
+    public static final String ATTR_API_CANCACHE = "cancache";
 
     public static final String ATTR_RSS_VERSION = "version";
     public static final String TAG_RSS_RSS = "rss";
@@ -223,6 +224,8 @@ public interface Constants {
     /** _more_          */
     public static final String OUTPUT_XML = "xml";
 
+    public static final String OUTPUT_CATALOG = "xml";
+
     /** _more_          */
     public static final String OUTPUT_CSV = "csv";
 
@@ -231,6 +234,8 @@ public interface Constants {
 
     /** _more_          */
     public static final String OUTPUT_CLOUD = "cloud";
+
+    public static final String OUTPUT_ZIP = "zip";
 
     /** _more_          */
     public static final String TYPE_FILE = "file";
@@ -247,6 +252,8 @@ public interface Constants {
 
     public static final String PROP_HTML_URLBASE = "udms.html.urlbase";
     public static final String PROP_HTML_TEMPLATE = "udms.html.template";
+
+    public static final String PROP_DB_CANCACHE = "udms.db.cancache";
 
     public static final String PROP_DB_DRIVER = "udms.db.driver";
     public static final String PROP_DB_URL = "udms.db.url";

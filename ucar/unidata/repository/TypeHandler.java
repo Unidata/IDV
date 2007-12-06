@@ -332,6 +332,11 @@ public class TypeHandler implements Constants, Tables {
 
 
 
+        String groupArg = (String) request.get(ARG_GROUP);
+        if(groupArg!=null) {
+            //            formBuffer.append(HtmlUtil.tableEntry("<b>Group:</b>", groupArg));
+            formBuffer.append(HtmlUtil.hidden(ARG_GROUP,groupArg));
+        } else {
         String groupSelectSql = SqlUtil.makeSelect(
                                                 SqlUtil.distinct(COL_FILES_GROUP_ID), 
                                                 getTablesForQuery(request,Misc.newList(TABLE_FILES)),
@@ -340,8 +345,6 @@ public class TypeHandler implements Constants, Tables {
         List<Group> groups = repository.getGroups(
                                                   SqlUtil.readString(
                                                                      repository.execute(groupSelectSql),1));
-
-
 
         if (groups.size() > 1) {
             List groupList = new ArrayList();
@@ -358,6 +361,7 @@ public class TypeHandler implements Constants, Tables {
             formBuffer.append(HtmlUtil.hidden(ARG_GROUP,
                                       groups.get(0).getFullName()));
             formBuffer.append(HtmlUtil.tableEntry("<b>Group:</b>", groups.get(0).getFullName()));
+        }
         }
 
 
@@ -461,18 +465,24 @@ public class TypeHandler implements Constants, Tables {
             if(doNot) {
                 groupName = groupName.substring(1);
             }
-            Group  group          = repository.findGroupFromName(groupName);
-            String searchChildren = (String) request.get(ARG_GROUP_CHILDREN);
-            if(Misc.equals(searchChildren,"true")) {
-                where.add((doNot?" NOT ":"") + SqlUtil.like(COL_FILES_GROUP_ID,
-                                       group.getId()+"%"));
+            if(groupName.endsWith("%")) {
+                //                where.add(SqlUtil.eq(COL_GROUPS_ID,FILES_GROUP_ID));
+                where.add(SqlUtil.like(COL_FILES_GROUP_ID,
+                                       groupName));
             } else {
-                if(doNot) {
-                    where.add(SqlUtil.neq(COL_FILES_GROUP_ID,
-                                         SqlUtil.quote(group.getId())));
+                Group  group          = repository.findGroupFromName(groupName);
+                String searchChildren = (String) request.get(ARG_GROUP_CHILDREN);
+                if(Misc.equals(searchChildren,"true")) {
+                    where.add((doNot?" NOT ":"") + SqlUtil.like(COL_FILES_GROUP_ID,
+                                                                group.getId()+"%"));
                 } else {
-                    where.add(SqlUtil.eq(COL_FILES_GROUP_ID,
-                                         SqlUtil.quote(group.getId())));
+                    if(doNot) {
+                        where.add(SqlUtil.neq(COL_FILES_GROUP_ID,
+                                              SqlUtil.quote(group.getId())));
+                    } else {
+                        where.add(SqlUtil.eq(COL_FILES_GROUP_ID,
+                                             SqlUtil.quote(group.getId())));
+                    }
                 }
             }
         }

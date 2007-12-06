@@ -1,14 +1,17 @@
 <api>
-  <method request="/query"       method="processQuery"    admin="true"/>
-  <method request="/sql"         method="processSql"      admin="true"/>
-  <method request="/searchform"  method="makeQueryForm"   admin="true"/>
-  <method request="/list"        method="processList"     admin="true"/>
-  <method request="/showgroup"   method="showGroup"       admin="true"/>
-  <method request="/showfile"    method="showFile"        admin="true"/>
-  <method request="/getfiles"    method="getFiles"        admin="false"/>
-  <method request="/graphview"   method="getGraphApplet"  admin="true"/>
-  <method request="/graph"       method="getGraph"        admin="true"/>
-  <method request="/fetch/*"     method="getFile"         admin="true"/>
-  <method request="/admin"       method="showAdmin"       admin="true"/>
-  <method request="/admindo"     method="doAdmin"       admin="true"/>
+
+  <method request="/query"       method="processQuery"    admin="false" cancache="true"/>
+  <method request="/searchform"  method="makeQueryForm"   admin="false" cancache="true"/>
+  <method request="/list"        method="processList"     admin="false" cancache="true"/>
+  <method request="/showgroup"   method="showGroup"       admin="false" cancache="true"/>
+  <method request="/showfile"    method="showFile"        admin="false" cancache="true"/>
+  <method request="/getfiles"    method="getFiles"        admin="false" cancache="true"/>
+  <method request="/graphview"   method="getGraphApplet"  admin="false" cancache="true"/>
+  <method request="/graph"       method="getGraph"        admin="false" cancache="true"/>
+
+  <method request="/fetch/*"     method="getFile"         admin="false" cancache="false"/>
+
+  <method request="/sql"         method="processSql"      admin="true" cancache="false"/>
+  <method request="/admin"       method="showAdmin"       admin="true" cancache="false"/>
+  <method request="/admindo"     method="doAdmin"         admin="true" cancache="false"/>
 </api>

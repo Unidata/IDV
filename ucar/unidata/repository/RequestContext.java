@@ -83,6 +83,18 @@ public class RequestContext {
         this.user = user;
     } 
 
+    public boolean equals(Object o) {
+        if(!o.getClass().equals(getClass())) return false;
+        RequestContext that = (RequestContext) o;
+        return Misc.equals(this.user, that.user);
+    }
+
+
+    public int hashCode() {
+        return user.hashCode();
+    }
+
+
 /**
 Set the User property.
 

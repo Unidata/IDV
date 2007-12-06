@@ -53,6 +53,20 @@ public class User {
         this.admin  = admin;
     }
 
+    public int hashCode() {
+        return Misc.hashcode(id) ^ 
+            Misc.hashcode(name) ^ 
+            (admin? 1:2); 
+    }
+
+    public boolean equals(Object o) {
+        if(!o.getClass().equals(getClass())) return false;
+        User that = (User) o;
+        return Misc.equals(this.id, that.id);
+    }
+
+
+
 /**
 Set the Id property.
 

@@ -114,8 +114,6 @@ public class Request {
     /** _more_          */
     private Hashtable parameters;
 
-    private User user;
-
     /**
      * _more_
      *
@@ -128,6 +126,19 @@ public class Request {
         this.type           = type;
         this.requestContext = requestContext;
         this.parameters     = parameters;
+    }
+
+    public boolean equals(Object o) {
+        if(!o.getClass().equals(getClass())) return false;
+        Request that = (Request) o;
+        return this.type.equals(that.type) &&
+            this.requestContext.equals(that.requestContext) &&
+            this.parameters.equals(that.parameters);
+    }
+
+
+    public int hashCode() {
+        return type.hashCode() ^ requestContext.hashCode() ^ parameters.hashCode();
     }
 
     /**

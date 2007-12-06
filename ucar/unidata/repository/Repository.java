@@ -57,8 +57,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 
+import java.io.*;
 import java.text.SimpleDateFormat;
 
+import java.util.zip.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Date;
@@ -79,6 +81,8 @@ import java.util.regex.*;
  * @version $Revision: 1.3 $
  */
 public class Repository implements Constants, Tables {
+
+    private static final int PAGE_CACHE_LIMIT = 100;
 
     private Harvester harvester;
     private Properties mimeTypes;
@@ -176,14 +180,14 @@ public class Repository implements Constants, Tables {
     List api = new ArrayList();
     Hashtable requestMap = new Hashtable();
 
-    protected void addRequest(String request,String methodName, Permission permission) {
+    protected void addRequest(String request,String methodName, Permission permission, boolean canCache) {
         Class []paramTypes = new Class[]{Request.class};
         Method method = Misc.findMethod(getClass(),methodName, paramTypes);
         if(method == null) throw new IllegalArgumentException ("Unknown request method:" + methodName);
-        Object[]tuple = new Object[]{request,permission, method};
-        api.add(tuple);
-        requestMap.put(request, tuple);
-        requestMap.put(getUrlBase()+request, tuple);
+        EntryPoint entryPoint=  new EntryPoint(request, permission, method,canCache);
+        api.add(entryPoint);
+        requestMap.put(request, entryPoint);
+        requestMap.put(getUrlBase()+request, entryPoint);
     }
 
     protected void initRequests() throws Exception {
@@ -191,12 +195,17 @@ public class Repository implements Constants, Tables {
         List children = XmlUtil.findChildren(apiRoot, TAG_METHOD);
         for(int i=0;i<children.size();i++) {
             Element node = (Element) children.get(i);
-            String request = XmlUtil.getAttribute(node,ATTR_REQUEST);
-            String method = XmlUtil.getAttribute(node,ATTR_METHOD);
-            boolean admin = XmlUtil.getAttribute(node,ATTR_ADMIN,true);
-            addRequest(request, method, new Permission(admin));
+            String request = XmlUtil.getAttribute(node,ATTR_API_REQUEST);
+            String method = XmlUtil.getAttribute(node,ATTR_API_METHOD);
+            boolean admin = XmlUtil.getAttribute(node,ATTR_API_ADMIN,true);
+            boolean canCache = XmlUtil.getAttribute(node,ATTR_API_CANCACHE,false);
+            addRequest(request, method, new Permission(admin),canCache);
         }
     }
+
+    private Hashtable pageCache = new Hashtable();    
+    private List     pageCacheList = new ArrayList();
+
 
 
     /**
@@ -218,44 +227,64 @@ public class Repository implements Constants, Tables {
             incoming = incoming.substring(getUrlBase().length());
         }
         User user = request.getRequestContext().getUser();
-        Object[]tuple = (Object[])requestMap.get(incoming);
-        if(tuple == null) {
+        EntryPoint entryPoint = (EntryPoint)requestMap.get(incoming);
+        if(entryPoint == null) {
             incoming = incoming;
             for(int i=0;i<api.size();i++) {
-                Object[]tmp = (Object[]) api.get(i);
-                String path = (String) tmp[0];
+                EntryPoint tmp = (EntryPoint) api.get(i);
+                String path = tmp.getRequest();
                 if(path.endsWith("/*")) {
                     path = path.substring(0,path.length()-2);
                     //                    System.err.println (path +":"+incoming);
                     if(incoming.startsWith(path)) {
-                        tuple = tmp;
+                        entryPoint = tmp;
                         break;
                     }
                 }
             }
         }
         Result result = null;
-        if(tuple!=null) {
-            Permission permission = (Permission) tuple[1];
-            Method method = (Method) tuple[2];
-            if(!permission.isRequestOk(request, this)) {
-                result =  new Result("Error",new StringBuffer("Access Violation"));
-            } else {
-                if(connection ==null && !incoming.startsWith("/admin")) {
-                    result =  new Result("No Database",new StringBuffer("Database is shutdown"));
+        if(entryPoint!=null) {
+            if(canCache() && entryPoint.getCanCache()) {
+                result = (Result) pageCache.get(request);
+                //                System.err.println("from cache:" + request.getType() +  " " +(result!=null));
+                if(result!=null) {
+                    pageCacheList.remove(request);
+                    pageCacheList.add(request);
+                }
+            }
+            if(result == null) {
+                if(!entryPoint.getPermission().isRequestOk(request, this)) {
+                    result =  new Result("Error",new StringBuffer("Access Violation"));
                 } else {
-                    result =(Result) method.invoke(this, new Object[]{request});
+                    if(connection ==null && !incoming.startsWith("/admin")) {
+                        result =  new Result("No Database",new StringBuffer("Database is shutdown"));
+                    } else {
+                        result =(Result) entryPoint.getMethod().invoke(this, new Object[]{request});
+                    }
                 }
             }
         }  else {
             //            result = new Result("Unknown Request",new StringBuffer("Unknown request:" + request.getType()));
         }
         if(result!=null) {
+            if(canCache() && entryPoint.getCanCache()) {
+                pageCache.put(request,result);
+                pageCacheList.add(request);
+                while(pageCacheList.size()>PAGE_CACHE_LIMIT) {
+                    Request tmp = (Request)pageCacheList.remove(0);
+                    pageCache.remove(tmp);
+                }
+            }
             result.putProperty(PROP_NAVLINKS, getNavLinks(request));
         }
         return result;
     }
 
+
+    protected boolean canCache() {
+        return getProperty(PROP_DB_CANCACHE, true);
+    }
 
     public String getProperty(String name) {
         return (String)properties.get(name);
@@ -318,7 +347,8 @@ public class Repository implements Constants, Tables {
                                 getClass());
         Statement statement = connection.createStatement();
         SqlUtil.loadSql(sql, statement, true);
-        loadModelFiles();
+        //        loadTestFiles();
+        //        loadModelFiles();
         //        loadTestData();
     }
 
@@ -791,32 +821,34 @@ public class Repository implements Constants, Tables {
     }
 
 
+    public List<FilesInfo> filterFiles(Request request,List<FilesInfo> files) throws Exception {
+        //TODO: Check for access
+        return files;
+    }
+
+
     public Result getFiles(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-
-        sb.append(XmlUtil.openTag(TAG_CATALOG,
-                                  XmlUtil.attrs(ATTR_NAME,
-                                                "Query Results")));
-        String arg = (String) request.get(ARG_APPLET,"true");
+        List<FilesInfo> files = new ArrayList();
         for (Enumeration keys = request.getParameters().keys();
                     keys.hasMoreElements(); ) {
             String id = (String) keys.nextElement();
             if(!Misc.equals(request.get(id), "true")) continue;
             if(!id.startsWith("file_")) continue;
             id = id.substring("file_".length());
-            FilesInfo filesInfo = findFile(id);
-            sb.append(
-                      XmlUtil.tag(
-                                  TAG_DATASET,
-                                  XmlUtil.attrs(
-                                                ATTR_NAME,
-                                                "" + new Date(filesInfo.getStartDate()),
-                                                ATTR_URLPATH, filesInfo.getFile())));
-            
+            files.add(findFile(id));
         }
 
-        sb.append(XmlUtil.closeTag(TAG_CATALOG));
-        return new Result("", sb, getMimeTypeFromOutput(OUTPUT_XML));
+        files = filterFiles(request,files);
+        String       output = getValue(request, ARG_OUTPUT, OUTPUT_CATALOG);
+        if(output.equals(OUTPUT_CATALOG)) {
+            return toCatalog(request, files,"Directory Listing");
+        } else if(output.equals(OUTPUT_ZIP)) {
+            return toZip(request, files);
+        } else {
+            throw new IllegalArgumentException("Unknown output type:"
+                    + output);
+        }
     }
 
     protected long currentTime() {
@@ -895,7 +927,7 @@ public class Repository implements Constants, Tables {
             }
             breadcrumbs.add(0, href("/showgroup", "Top"));
             titleList.add(group.getName());
-            breadcrumbs.add(group.getName() + " "+ getGraphLink(request, group));
+            breadcrumbs.add(group.getName() + " "+ getGroupLinks(request, group));
 
             title = "Group: "
                     + StringUtil.join("&nbsp;&gt;&nbsp;", titleList);
@@ -949,15 +981,23 @@ public class Repository implements Constants, Tables {
                     String type = results.getString(col++);
                     String file = results.getString(col++);
                     if (cnt == 1) {
+                        sb.append("\n");
                         sb.append(HtmlUtil.bold("Files:"));
+                        sb.append("<br>");
                         sb.append(HtmlUtil.form("/getfiles","getfiles"));
-                        sb.append(HtmlUtil.submit("Get Files"));
-                        sb.append("<ul>");
+                        sb.append(HtmlUtil.submit("Get Select Files"));
+                        List outputList = Misc.toList(new Object[]{
+                            new TwoFacedObject("As catalog",OUTPUT_XML),
+                            new TwoFacedObject("As zip file",OUTPUT_ZIP)});
+                        sb.append(HtmlUtil.select(ARG_OUTPUT,outputList));
+                        sb.append("<p>\n");
+                        sb.append("<ul>\n");
                     }
 
                     sb.append("<li>" + HtmlUtil.checkbox("file_" + id,"true") +" " 
                               + href(HtmlUtil.url("/showfile", ARG_ID, id),
                                      name));
+                    sb.append("\n");
                 }
             }
             if (cnt > 0) {
@@ -1468,6 +1508,8 @@ public class Repository implements Constants, Tables {
             return getMimeType(".html");
         } else if (output.equals(OUTPUT_CLOUD)) {
             return getMimeType(".html");
+        } else if (output.equals(OUTPUT_ZIP)) {
+            return getMimeType(".zip");
         } else {
             return getMimeType(".txt");
         }
@@ -1820,6 +1862,15 @@ public class Repository implements Constants, Tables {
         return dflt;
     }
 
+    protected String getGroupLinks (Request request, Group group) throws Exception {
+        String search = href(HtmlUtil.url(
+                                 "/searchform", "group", 
+                                 java.net.URLEncoder.encode(group.getId()+"%", "UTF-8")), HtmlUtil.img(
+                                                                urlBase + "/Search16.gif"));
+
+        return search+" " + getGraphLink(request, group);
+    }
+
     protected String getGraphLink (Request request, Group group) {
         if(!isAppletEnabled(request)) return "";
         return href(HtmlUtil.url(
@@ -1867,19 +1918,20 @@ public class Repository implements Constants, Tables {
         List           times     = new ArrayList();
         List           labels    = new ArrayList();
         List<FilesInfo> filesInfos = getFilesInfos(request);
+
+
         StringBuffer   sb        = new StringBuffer();
         String         output    = getValue(request, ARG_OUTPUT, OUTPUT_HTML);
+        if (output.equals(OUTPUT_CATALOG)) {
+            return toCatalog(request, filesInfos, "Query Results");
+        }
+
         if (output.equals(OUTPUT_HTML)) {
             sb.append("<h2>Query Results</h2>");
             if(filesInfos.size()==0) {
                 sb.append("<b>Nothing Found</b><p>");
             }
             sb.append("<table>");
-        } else if (output.equals(OUTPUT_XML)) {
-            sb.append(XmlUtil.XML_HEADER + "\n");
-            sb.append(XmlUtil.openTag(TAG_CATALOG,
-                                      XmlUtil.attrs(ATTR_NAME,
-                                          "Query Results")));
         } else if (output.equals(OUTPUT_RSS)) {
             sb.append(XmlUtil.XML_HEADER + "\n");
             sb.append(XmlUtil.openTag(TAG_RSS_RSS,
@@ -1892,7 +1944,6 @@ public class Repository implements Constants, Tables {
             throw new IllegalArgumentException("Unknown output type:"
                     + output);
         }
-
 
 
         StringBufferCollection sbc = new StringBufferCollection();
@@ -1916,16 +1967,6 @@ public class Repository implements Constants, Tables {
                                       filesInfo.getDescription()));
                 sb.append(XmlUtil.closeTag(TAG_RSS_ITEM));
                 //      <link>http://earthquake.usgs.gov/eqcenter/recenteqsww/Quakes/us2007kmae.php</link>
-
-            } else if (output.equals(OUTPUT_XML)) {
-                ssb.append(
-                    XmlUtil.tag(
-                        TAG_DATASET,
-                        XmlUtil.attrs(
-                            ATTR_NAME,
-                            "" + new Date(filesInfo.getStartDate()),
-                            ATTR_URLPATH, filesInfo.getFile())));
-
             } else if (output.equals(OUTPUT_CSV)) {
                 sb.append(SqlUtil.comma(filesInfo.getId(),
                                         filesInfo.getFile()));
@@ -1943,34 +1984,26 @@ public class Repository implements Constants, Tables {
                     sb.append(tmp);
                 }
             }
+            sb.append(HtmlUtil.form("/getfiles","getfiles"));
+            sb.append(HtmlUtil.submit("Get Files"));
+            sb.append("<br>");
         }
-
-
-        sb.append(HtmlUtil.form("/getfiles","getfiles"));
-        sb.append(HtmlUtil.submit("Get Files"));
-        sb.append("<br>");
         for (int i = 0; i < sbc.getKeys().size(); i++) {
             String       type = (String) sbc.getKeys().get(i);
             StringBuffer ssb  = sbc.getBuffer(type);
             if (output.equals(OUTPUT_HTML)) {
                 sb.append(HtmlUtil.row(HtmlUtil.bold("Type:" + type)));
                 sb.append(ssb);
-            } else if (output.equals(OUTPUT_XML)) {
-                sb.append(XmlUtil.openTag(TAG_DATASET,
-                                          XmlUtil.attrs(ATTR_NAME, type)));
-                sb.append(ssb);
-                sb.append(XmlUtil.closeTag(TAG_DATASET));
+
             }
         }
-        sb.append("</form>");
 
         if (output.equals(OUTPUT_HTML)) {
+            sb.append("</form>");
             sb.append("</table>");
         } else if (output.equals(OUTPUT_RSS)) {
             sb.append(XmlUtil.closeTag(TAG_RSS_CHANNEL));            
             sb.append(XmlUtil.closeTag(TAG_RSS_RSS));
-        } else if (output.equals(OUTPUT_XML)) {
-            sb.append(XmlUtil.closeTag(TAG_CATALOG));
         }
         Result result = new Result("Query Results", sb, getMimeTypeFromOutput(output));
         result.putProperty(PROP_NAVSUBLINKS, getSearchFormLinks(request));
@@ -1978,6 +2011,59 @@ public class Repository implements Constants, Tables {
     }
 
 
+
+    protected Result toZip(Request request, List<FilesInfo> files) throws Exception {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ZipOutputStream zos = new ZipOutputStream(bos);
+        Hashtable seen =new Hashtable();
+        for (FilesInfo fileInfo: files) {
+            String path = fileInfo.getFile();
+            String name  = IOUtil.getFileTail(path);
+            int cnt = 1;
+            while(seen.get(name)!=null) {
+                name = (cnt++)+"_"+name;
+            }
+            seen.put(name,name);
+            zos.putNextEntry(new ZipEntry(name));
+            byte[] bytes = IOUtil.readBytes(IOUtil.getInputStream(path, getClass()));
+            zos.write(bytes, 0, bytes.length);
+            zos.closeEntry();
+        }
+        zos.close();
+        bos.close();
+        return new  Result("",bos.toByteArray(),getMimeTypeFromOutput(OUTPUT_ZIP));
+    }
+
+
+    protected Result toCatalog(Request request, List<FilesInfo> files, String title) throws Exception {
+        StringBuffer   sb        = new StringBuffer();
+        sb.append(XmlUtil.XML_HEADER + "\n");
+        sb.append(XmlUtil.openTag(TAG_CATALOG,
+                                  XmlUtil.attrs(ATTR_NAME,title)));
+        StringBufferCollection sbc = new StringBufferCollection();
+        for (FilesInfo filesInfo : files) {
+            StringBuffer ssb = sbc.getBuffer(filesInfo.getType());
+            ssb.append(
+                       XmlUtil.tag(
+                                   TAG_DATASET,
+                                   XmlUtil.attrs(
+                                                 ATTR_NAME,
+                                                 "" + new Date(filesInfo.getStartDate()),
+                                                 ATTR_URLPATH, filesInfo.getFile())));
+        }
+
+        for (int i = 0; i < sbc.getKeys().size(); i++) {
+            String       type = (String) sbc.getKeys().get(i);
+            StringBuffer ssb  = sbc.getBuffer(type);
+            sb.append(XmlUtil.openTag(TAG_DATASET,
+                                      XmlUtil.attrs(ATTR_NAME, type)));
+            sb.append(ssb);
+            sb.append(XmlUtil.closeTag(TAG_DATASET));
+        }
+        sb.append(XmlUtil.closeTag(TAG_CATALOG));
+        Result result = new Result("Query Results", sb, getMimeTypeFromOutput(OUTPUT_CATALOG));
+        return result;
+    }
 
 
 
@@ -2341,6 +2427,7 @@ public class Repository implements Constants, Tables {
             throw exc;
         }
         long t2 = System.currentTimeMillis();
+        System.err.println("query:" + sql);
         if(t2-t1>300) {
             System.err.println("query:" + sql);
             System.err.println("time:" + (t2-t1));}
