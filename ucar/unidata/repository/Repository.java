@@ -318,6 +318,7 @@ public class Repository implements Constants, Tables {
                                 getClass());
         Statement statement = connection.createStatement();
         SqlUtil.loadSql(sql, statement, true);
+        loadModelFiles();
         //        loadTestData();
     }
 
@@ -358,6 +359,9 @@ public class Repository implements Constants, Tables {
         addTypeHandler(TypeHandler.TYPE_SATELLITE,
                        new TypeHandler(this, TypeHandler.TYPE_SATELLITE,
                                        "Satellite"));
+        addTypeHandler(TypeHandler.TYPE_MODEL,
+                       new TypeHandler(this, TypeHandler.TYPE_MODEL,
+                                       "Model"));
     }
 
     /**
@@ -2105,6 +2109,65 @@ public class Repository implements Constants, Tables {
         if (batchCnt > 0) {
             filesInsert.executeBatch();
             radarInsert.executeBatch();
+        }
+        connection.commit();
+        connection.setAutoCommit(true);
+        long   t2      = System.currentTimeMillis();
+        double seconds = (t2 - t1) / 1000.0;
+        System.err.println("cnt:" + cnt + " time:" + seconds + " rate:"
+                           + (cnt / seconds));
+
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param stmt _more_
+     * @param table _more_
+     *
+     * @throws Exception _more_
+     */
+    public void loadModelFiles() throws Exception {
+        File            rootDir = new File("/data/ldm/gempak/model");
+        List<ModelInfo> files   = harvester.collectModelFiles(rootDir, "IDD");
+        System.err.println("Inserting:" + files.size() + " model files");
+        long t1  = System.currentTimeMillis();
+        int  cnt = 0;
+        PreparedStatement filesInsert =
+            connection.prepareStatement(INSERT_FILES);
+        PreparedStatement modelInsert =
+            connection.prepareStatement(INSERT_MODEL);
+
+        int batchCnt = 0;
+        connection.setAutoCommit(false);
+        for (ModelInfo modelInfo : files) {
+            if ((++cnt) % 10000 == 0) {
+                long   tt2      = System.currentTimeMillis();
+                double tseconds = (tt2 - t1) / 1000.0;
+                System.err.println("# " + cnt + " rate: "
+                                   + ((int) (cnt / tseconds)) + "/s");
+            }
+
+            String id  = getGUID();
+            modelInfo.setId(id);
+            setStatement(modelInfo, filesInsert);
+            filesInsert.addBatch();
+            int col = 1;
+            modelInsert.setString(col++, modelInfo.getId());
+            modelInsert.setString(col++, modelInfo.getModelGroup());
+            modelInsert.setString(col++, modelInfo.getModelRun());
+            modelInsert.addBatch();
+            batchCnt++;
+            if (batchCnt > 100) {
+                filesInsert.executeBatch();
+                modelInsert.executeBatch();
+                batchCnt = 0;
+            }
+        }
+        if (batchCnt > 0) {
+            filesInsert.executeBatch();
+            modelInsert.executeBatch();
         }
         connection.commit();
         connection.setAutoCommit(true);

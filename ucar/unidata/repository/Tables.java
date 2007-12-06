@@ -230,6 +230,28 @@ public interface Tables {
 
 
 
+
+    public static final String TABLE_MODEL = "model";
+    public static final String COL_MODEL_ID = TABLE_MODEL + ".id";
+    public static final String COL_MODEL_MODELGROUP = TABLE_MODEL + ".modelgroup";
+    public static final String COL_MODEL_MODELRUN = TABLE_MODEL + ".modelrun";
+    public static final String []ARRAY_MODEL = new String[]{COL_MODEL_ID,
+                                                            COL_MODEL_MODELGROUP ,
+                                                                COL_MODEL_MODELRUN 
+};
+
+
+    public static final String COLUMNS_MODEL = SqlUtil.comma(ARRAY_MODEL);
+    
+    public static final String INSERT_MODEL =
+        SqlUtil.makeInsert(TABLE_MODEL,
+                           COLUMNS_MODEL,
+                           SqlUtil.getQuestionMarks(ARRAY_MODEL.length));
+
+
+
+
+
     //J+
 }
 

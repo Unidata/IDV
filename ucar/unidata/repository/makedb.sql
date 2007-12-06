@@ -10,6 +10,15 @@
 --drop table tags;
 
 
+drop TABLE model;
+alter table model drop index  MODEL_INDEX_ID;
+alter table model drop index  MODEL_INDEX_MODELGROUP;
+
+drop INDEX MODEL_INDEX_ID;
+drop INDEX MODEL_INDEX_MODEL;
+
+
+
 CREATE TABLE  groups (id varchar(500),
                      parent varchar(200),
                      name varchar(200),
@@ -70,6 +79,7 @@ CREATE INDEX LEVEL3RADAR_INDEX_STATION ON level3radar (STATION);
 --drop INDEX LEVEL3RADAR_INDEX_PRODUCT;
 CREATE INDEX LEVEL3RADAR_INDEX_PRODUCT ON level3radar (PRODUCT);
 
+
 CREATE TABLE level2radar (
 	           id varchar(200),
                    station varchar(50));
@@ -93,6 +103,17 @@ CREATE INDEX SATELLITE_INDEX_STATION ON satellite (STATION);
 CREATE INDEX SATELLITE_INDEX_PRODUCT ON satellite (PRODUCT);
 
 
+
+CREATE TABLE model (
+	           id varchar(200),
+                   modelgroup varchar(50),
+                   modelrun varchar(50));
+
+
+
+
+CREATE INDEX MODEL_INDEX_ID  ON model (ID);
+CREATE INDEX MODEL_INDEX_MODELGROUP ON model (MODELGROUP);
 
 
 

@@ -176,7 +176,7 @@ public class Harvester {
 
 
 
-
+ 
     /**
      * _more_
      *
@@ -335,6 +335,73 @@ public class Harvester {
         long t2 = System.currentTimeMillis();
         return filesInfos;
     }
+
+
+    public List<ModelInfo> collectModelFiles(File rootDir,
+            final String groupName)
+            throws Exception {
+        long                   t1         = System.currentTimeMillis();
+        final List<ModelInfo>  infos = new ArrayList();
+        final SimpleDateFormat[] sdf = {
+            new SimpleDateFormat("yyyyMMddHH"),
+            new SimpleDateFormat("yyyyMMdd")};
+        final String regex= 
+            "([^/]+)/[^/\\d]*(\\d+)(f\\d+)?_([^\\.]+)";
+        final Pattern pattern =
+            Pattern.compile(regex);
+
+
+        final User user = repository.findUser("jdoe");
+        IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
+            public int viewFile(File f) throws Exception {
+                String  name    = f.toString();
+                Matcher matcher = pattern.matcher(name);
+                if ( !matcher.find()) {
+                    if(!f.isDirectory()) {
+                        System.err.println (name);
+                        System.err.println (regex);
+                    }
+                    return DO_CONTINUE;
+                }
+                //                    System.err.println (name);
+                if (infos.size() % 5000 == 0) {
+                    System.err.println("Found:" + infos.size());
+                }
+                String modelGroup = matcher.group(1);
+                Date dttm=null;
+                String dateString = matcher.group(2);
+                for(int i=0;i<sdf.length;i++) {
+                    try {
+                        dttm= sdf[i].parse(dateString);
+                        break;
+                    } catch(Exception exc) {
+                    }
+                }
+                if(dttm == null) {
+                    System.err.println ("Could not parse date:" + dateString);
+                    return DO_CONTINUE;
+                }
+                String forecasrHour = matcher.group(3);
+                String modelRun = matcher.group(4);
+
+
+                Group group = repository.findGroupFromName(groupName + "/" + "model" + "/"
+                                        + modelGroup +"/"+modelRun);
+
+                infos.add(new ModelInfo(repository.getGUID(),
+                                        IOUtil.getFileTail(f.toString()), "",group, user,
+                                        f.toString(), modelGroup, modelRun,
+                                        dttm.getTime()));
+                return DO_CONTINUE;
+            }
+        };
+
+        IOUtil.walkDirectory(rootDir, fileViewer);
+        long t2 = System.currentTimeMillis();
+        System.err.println("found:" + infos.size() + " in " + (t2 - t1));
+        return infos;
+    }
+
 
 
 
