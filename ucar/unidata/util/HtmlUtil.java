@@ -155,6 +155,7 @@ public class HtmlUtil {
             sb.append("<option value=\"" + value + "\">" + label
                       + "</option>\n");
         }
+        sb.append("</select>\n");
         return sb.toString();
     }
 
