@@ -10,12 +10,12 @@
 --drop table tags;
 
 
-drop TABLE model;
-alter table model drop index  MODEL_INDEX_ID;
-alter table model drop index  MODEL_INDEX_MODELGROUP;
+--drop TABLE model;
+--alter table model drop index  MODEL_INDEX_ID;
+--alter table model drop index  MODEL_INDEX_MODELGROUP;
 
-drop INDEX MODEL_INDEX_ID;
-drop INDEX MODEL_INDEX_MODEL;
+--drop INDEX MODEL_INDEX_ID;
+--drop INDEX MODEL_INDEX_MODEL;
 
 
 

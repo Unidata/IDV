@@ -104,12 +104,12 @@ public class Harvester {
         long                  baseTime   = repository.currentTime();
         Group                 group      = repository.findGroupFromName(groupName);
         User user = repository.findUser("jdoe");
-        for (int stationIdx = 0; stationIdx < 100; stationIdx++) {
+        for (int stationIdx = 0; stationIdx < 120; stationIdx++) {
             String station = "station" + stationIdx;
             for (int productIdx = 0; productIdx < 20; productIdx++) {
                 String product = "product" + productIdx;
                 group = repository.findGroupFromName(groupName + "/" + station + "/" + product);
-                for (int timeIdx = 0; timeIdx < 100; timeIdx++) {
+                for (int timeIdx = 0; timeIdx < 1000; timeIdx++) {
                     radarInfos.add(new Level3RadarInfo(repository.getGUID(),
                                                        "", "", group,
                                                        user,
@@ -117,6 +117,7 @@ public class Harvester {
                                                        + "_" + group, station, product,
                                                        baseTime
                                                        + timeIdx*1000*60));
+                    
                 }
             }
         }

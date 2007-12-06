@@ -345,11 +345,12 @@ public class Repository implements Constants, Tables {
         String sql =
             IOUtil.readContents("/ucar/unidata/repository/makedb.sql",
                                 getClass());
-        Statement statement = connection.createStatement();
-        SqlUtil.loadSql(sql, statement, true);
+        //        Statement statement = connection.createStatement();
+        //        SqlUtil.loadSql(sql, statement, true);
+        //        loadLevel3RadarFiles();
         //        loadTestFiles();
         //        loadModelFiles();
-        //        loadTestData();
+        loadTestData();
     }
 
     public void loadTestData() throws Exception {
@@ -435,7 +436,16 @@ public class Repository implements Constants, Tables {
         }
 
         long             t1        = System.currentTimeMillis();
-        Statement        statement = execute(query);
+        
+        Statement        statement=null;
+        System.err.println ("before");
+        try {
+            statement = execute(query);
+        } catch(Exception exc) {
+            exc.printStackTrace();
+            throw exc;
+        }
+        System.err.println ("after");
         SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
         ResultSet        results;
         int              cnt = 0;
@@ -2427,7 +2437,7 @@ public class Repository implements Constants, Tables {
             throw exc;
         }
         long t2 = System.currentTimeMillis();
-        System.err.println("query:" + sql);
+        //        System.err.println("query:" + sql);
         if(t2-t1>300) {
             System.err.println("query:" + sql);
             System.err.println("time:" + (t2-t1));}
