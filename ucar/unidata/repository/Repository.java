@@ -345,12 +345,12 @@ public class Repository implements Constants, Tables {
         String sql =
             IOUtil.readContents("/ucar/unidata/repository/makedb.sql",
                                 getClass());
-        //        Statement statement = connection.createStatement();
-        //        SqlUtil.loadSql(sql, statement, true);
+        Statement statement = connection.createStatement();
+        SqlUtil.loadSql(sql, statement, true);
         //        loadLevel3RadarFiles();
         //        loadTestFiles();
         //        loadModelFiles();
-        loadTestData();
+        //        loadTestData();
     }
 
     public void loadTestData() throws Exception {
@@ -358,12 +358,12 @@ public class Repository implements Constants, Tables {
         results.next();
         makeUserIfNeeded(new User("jdoe", "John Doe", true));
         makeUserIfNeeded(new User("jsmith", "John Smith", false));
+        System.err.println ("Adding test data");
         loadTestFiles();
         loadSatelliteFiles();
         loadLevel3RadarFiles();
         loadLevel2RadarFiles();
         if(results.getInt(1)==0) {
-            System.err.println ("Adding test data");
             //            loadLevel3RadarFiles();
             //            loadTestFiles();
         }
@@ -906,7 +906,7 @@ public class Repository implements Constants, Tables {
             if (topLevel) {
                 sb.append(HtmlUtil.bold("Top Level Groups") + "<ul>");
             }
-        } else if (output.equals(OUTPUT_XML)) {
+        } else if (output.equals(OUTPUT_CATALOG)) {
             sb.append(XmlUtil.XML_HEADER + "\n");
             sb.append(XmlUtil.openTag(TAG_CATALOG,
                                       XmlUtil.attrs(ATTR_NAME,
@@ -975,6 +975,10 @@ public class Repository implements Constants, Tables {
                     COL_FILES_NAME, COL_FILES_TYPE,
                     COL_FILES_FILE), typeHandler.getTablesForQuery(request),
                                      SqlUtil.makeAnd(where));
+            //            List<FilesInfo>
+                //            Files  xxxxxreturn getFilesInfos(request, query);
+
+
             Statement        stmt = execute(query);
             SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
             ResultSet        results;
@@ -1459,8 +1463,13 @@ public class Repository implements Constants, Tables {
             int count = counts.get(i).intValue();
             if (output.equals(OUTPUT_HTML)) {
                 sb.append("<li>");
+                String search = href(HtmlUtil.url(
+                                 "/searchform", ARG_TAG, 
+                                 java.net.URLEncoder.encode(tag)), HtmlUtil.img(
+                                                                urlBase + "/Search16.gif"));
                 sb.append(tag);
-                sb.append("(" + count +")");
+                sb.append("(" + count +") ");
+                sb.append(search);
                 if(isAppletEnabled(request)) {
                     sb.append(href(HtmlUtil.url("/graphview", "id", tag, "type", TYPE_TAG), 
                                    HtmlUtil.img(urlBase + "/tree.gif", "alt=\"Show tag in graph\" title=\"Show file in graph\" ")));
@@ -1802,7 +1811,10 @@ public class Repository implements Constants, Tables {
             SqlUtil.makeSelect(COLUMNS_FILES, typeHandler.getTablesForQuery(request),
                                        SqlUtil.makeAnd(where),
                                        "order by " + COL_FILES_FROMDATE);
-        //        System.err.println("Query:"+ query);
+        return getFilesInfos(request, query);
+    }
+
+    protected List<FilesInfo> getFilesInfos(Request request, String query) throws Exception {
         Statement        statement = execute(query, getMax(request));
         List<FilesInfo>   filesInfos = new ArrayList<FilesInfo>();
         ResultSet        results;
@@ -2023,6 +2035,9 @@ public class Repository implements Constants, Tables {
 
 
     protected Result toZip(Request request, List<FilesInfo> files) throws Exception {
+        if(files.size()==0) {
+            return new  Result("No files selected",new StringBuffer("No files selected"),getMimeType(".html"));
+        }
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ZipOutputStream zos = new ZipOutputStream(bos);
         Hashtable seen =new Hashtable();
@@ -2045,21 +2060,35 @@ public class Repository implements Constants, Tables {
     }
 
 
-    protected Result toCatalog(Request request, List<FilesInfo> files, String title) throws Exception {
+    protected Result toCatalog(Request request, List items, String title) throws Exception {
         StringBuffer   sb        = new StringBuffer();
         sb.append(XmlUtil.XML_HEADER + "\n");
         sb.append(XmlUtil.openTag(TAG_CATALOG,
                                   XmlUtil.attrs(ATTR_NAME,title)));
         StringBufferCollection sbc = new StringBufferCollection();
-        for (FilesInfo filesInfo : files) {
-            StringBuffer ssb = sbc.getBuffer(filesInfo.getType());
-            ssb.append(
-                       XmlUtil.tag(
-                                   TAG_DATASET,
-                                   XmlUtil.attrs(
-                                                 ATTR_NAME,
-                                                 "" + new Date(filesInfo.getStartDate()),
-                                                 ATTR_URLPATH, filesInfo.getFile())));
+        for(int i=0;i<items.size();i++) {
+            Object o = items.get(i);
+            if(o instanceof Group) {
+                Group g = (Group) o;
+                sb.append(XmlUtil.tag("catalogRef", 
+                                      XmlUtil.attrs("xlink:title",g.getFullName(),
+                                                    "xlink:href",
+                                                    href(HtmlUtil.url(
+                                                                      "/showgroup", ARG_GROUP,
+                                                                      g.getFullName(),
+                                                                      ARG_OUTPUT,
+                                                                      OUTPUT_CATALOG)))));
+            } else  if(o instanceof FilesInfo) {
+                FilesInfo filesInfo = (FilesInfo) o;
+                StringBuffer ssb = sbc.getBuffer(filesInfo.getType());
+                ssb.append(
+                           XmlUtil.tag(
+                                       TAG_DATASET,
+                                       XmlUtil.attrs(
+                                                     ATTR_NAME,
+                                                     "" + new Date(filesInfo.getStartDate()),
+                                                     ATTR_URLPATH, filesInfo.getFile())));
+            }
         }
 
         for (int i = 0; i < sbc.getKeys().size(); i++) {
