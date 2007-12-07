@@ -76,7 +76,8 @@ public class Entry {
     private long endDate;
 
     /** _more_          */
-    private String type;
+    private TypeHandler typeHandler;
+
 
     /**
      * _more_
@@ -89,9 +90,9 @@ public class Entry {
      * @param file _more_
      * @param date _more_
      */
-    public Entry(String id, String name, String description, String type,
+    public Entry(String id, TypeHandler typeHandler, String name, String description, 
                      Group group, User user, String file, long date) {
-        this(id,name, description, type, group, user,file, date, date,date);
+        this(id,typeHandler, name, description,  group, user,file, date, date,date);
     }
 
 
@@ -111,10 +112,10 @@ public class Entry {
      * @param startDate _more_
      * @param endDate _more_
      */
-    public Entry(String id, String name, String description, String type,
+    public Entry(String id, TypeHandler typeHandler, String name, String description, 
                      Group group, User user, String file, long createDate, long startDate, long endDate) {
         this.id = id;
-        this.type        = type;
+        this.typeHandler        = typeHandler;
         this.name        = name;
         this.description = description;
         this.group       = group;
@@ -237,17 +238,22 @@ public class Entry {
      *
      * @param value The new value for Type
      */
-    public void setType(String value) {
-        type = value;
+    public void setTypeHandler(TypeHandler value) {
+        typeHandler = value;
     }
+
+    public String getType() {
+        return typeHandler.getType();
+    }
+
 
     /**
      * Get the Type property.
      *
      * @return The Type
      */
-    public String getType() {
-        return type;
+    public TypeHandler getTypeHandler() {
+        return typeHandler;
     }
 
 

@@ -58,9 +58,9 @@ public class GenericEntry extends Entry {
      * @param file _more_
      * @param date _more_
      */
-    public GenericEntry(String id, String type, String name, String description, 
+    public GenericEntry(String id, TypeHandler typeHandler, String name, String description, 
                      Group group, User user, String file, long date) {
-        super(id,type, name, description, group, user,file, date, date,date);
+        super(id,typeHandler, name, description, group, user,file, date, date,date);
     }
 
 
@@ -81,10 +81,10 @@ public class GenericEntry extends Entry {
      * @param startDate _more_
      * @param endDate _more_
      */
-    public GenericEntry(String id, String type,
+    public GenericEntry(String id, TypeHandler typeHandler,
                         String name, String description, 
                      Group group, User user, String file, long createDate, long startDate, long endDate) {
-        super(id, type, name, description, group, user,file, createDate, startDate,endDate);
+        super(id, typeHandler, name, description, group, user,file, createDate, startDate,endDate);
     }
 
     public Object get(String name) {

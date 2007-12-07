@@ -64,11 +64,11 @@ public class Level2RadarEntry extends Entry {
      * @param date _more_
      */
     public Level2RadarEntry(String id,                            
-                            String type,
+                            TypeHandler typeHandler,
                             String name, String description, Group group,
                             User user,
                            String file, String station, long date) {
-        super(id, type, name, description, group, user, file,
+        super(id, typeHandler, name, description, group, user, file,
               new Date().getTime(), date,date);
         this.station = station;
     }

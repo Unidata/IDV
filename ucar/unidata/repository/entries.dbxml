@@ -1,0 +1,25 @@
+<entries>
+  <entry name="model" >
+     <column name="modelgroup" type="string" isindex="true" issearchable="true" label="Model Group"/>
+     <column name="modelrun" type="string" isindex="true" issearchable="true" label="Model Run"/>
+  </entry>
+
+  <entry name="level3radar" description="Level 3 Radar Files">
+	<column name="station" type="string" isindex="true" issearchable="true" label="Station" rows="5" columns="10"/>
+	<column name="product" type="string" isindex="true" issearchable="true" label="Product"/>
+  </entry>
+
+
+  <entry name="level2radar" description="Level 2 Radar Files">
+	<column name="station" type="string" isindex="true" issearchable="true" label="Station"/>
+  </entry>
+
+
+  <entry name="satellite" description="Satellite Files">>
+	<column name="platform" type="string" isindex="true" issearchable="true" label="Platform"/>
+	<column name="resolution" type="string" isindex="true" issearchable="true" label="Resolution"/>		
+	<column name="product" type="string" isindex="true" issearchable="true" label="Product"/>
+  </entry>
+
+
+</entries>

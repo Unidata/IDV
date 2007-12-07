@@ -64,11 +64,11 @@ public class ModelEntry extends Entry {
      * @param model _more_
      * @param date _more_
      */
-    public ModelEntry(String id, String type,
+    public ModelEntry(String id, TypeHandler typeHandler,
                       String name, String description, Group group,
                       User user,
                       String file,  String modelGroup,String modelRun, long date) {
-        super(id, type, name, description, group, user, file,
+        super(id, typeHandler, name, description, group, user, file,
               new Date().getTime(), date,date);
         this.modelGroup = modelGroup;
         this.modelRun = modelRun;

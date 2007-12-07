@@ -141,7 +141,7 @@ public class TypeHandler implements Constants, Tables {
         int col=1;
         Entry entry =
             new Entry(results.getString(col++),
-                          results.getString(col++), 
+                      repository.getTypeHandler(results.getString(col++)), 
                           results.getString(col++),
                           results.getString(col++),
                           repository.findGroup(results.getString(col++)),
@@ -179,8 +179,6 @@ public class TypeHandler implements Constants, Tables {
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("File:"),  entry.getFile()));
 
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"), entry.getType()));
-            if (isType(TYPE_LEVEL3RADAR)) {
-            }
             sb.append("</table>");
         } else if(output.equals(OUTPUT_XML)) {
 
@@ -390,55 +388,6 @@ public class TypeHandler implements Constants, Tables {
                                                      + " -- " +
                                       HtmlUtil.input(ARG_TODATE,  maxDate)));
 
-        if (isType(TYPE_LEVEL3RADAR)) {
-            where.add(SqlUtil.eq(COL_ENTRIES_ID, COL_LEVEL3RADAR_ID));
-            String[] products = SqlUtil.readString(
-                                    repository.execute(
-                                                       SqlUtil.makeSelect(SqlUtil.distinct(COL_LEVEL3RADAR_PRODUCT),
-                                                                          getTablesForQuery(request, Misc.newList(TABLE_ENTRIES,TABLE_LEVEL3RADAR)),
-                                                                          SqlUtil.makeAnd(where))), 1);
-            List productList = new ArrayList();
-            for (int i = 0; i < products.length; i++) {
-                productList.add(
-                    new TwoFacedObject(
-                        repository.getLongName(products[i]), products[i]));
-            }
-            productList.add(0, "All");
-
-            String[] stations = SqlUtil.readString(
-                                    repository.execute(
-                                                       SqlUtil.makeSelect(SqlUtil.distinct(COL_LEVEL3RADAR_STATION),
-                                                                          getTablesForQuery(request, Misc.newList(TABLE_ENTRIES,TABLE_LEVEL3RADAR)),
-                                                                          SqlUtil.makeAnd(where))), 1);
-
-            List stationList = new ArrayList();
-            stationList.add(0,"All");
-            for (int i = 0; i < stations.length; i++) {
-                stationList.add(
-                    new TwoFacedObject(
-                        repository.getLongName(stations[i]), stations[i]));
-            }
-            productList.add(0, "All");
-            if (stations.length > 1) {
-                formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Station:"),
-                        HtmlUtil.select(ARG_STATION,
-                                        stationList)));
-            } else if (stations.length == 1) {
-                formBuffer.append(HtmlUtil.tableEntry("<b>Station:</b>",stations[0]));
-                formBuffer.append(HtmlUtil.hidden(ARG_STATION,
-                                          stations[0]));
-            }
-            if (products.length > 1) {
-                formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Product:"),
-                        HtmlUtil.select(ARG_PRODUCT,
-                                        productList)));
-            } else if (products.length == 1) {
-                formBuffer.append(HtmlUtil.hidden(ARG_PRODUCT,
-                                          products[0]));
-            }
-        }
-        
-
     }
 
     /**
@@ -523,16 +472,6 @@ public class TypeHandler implements Constants, Tables {
                     SqlUtil.quote(SqlUtil.getDateString(createDate))));
         }
 
-        if (isType(TYPE_LEVEL3RADAR)) {
-            addOr(COL_LEVEL3RADAR_STATION,
-                  (String) request.get(ARG_STATION), where,true);
-            addOr(COL_LEVEL3RADAR_PRODUCT,
-                  (String) request.get(ARG_PRODUCT), where,true);
-            if (request.hasSetParameter(ARG_STATION)
-                    || request.hasSetParameter(ARG_PRODUCT)) {
-                where.add(SqlUtil.eq(COL_ENTRIES_ID, COL_LEVEL3RADAR_ID));
-            }
-        }
 
         //        System.err.println ("name:" + name);
         if ((name != null) && (name.length() > 0)) {
@@ -556,12 +495,6 @@ public class TypeHandler implements Constants, Tables {
 
     protected List getTablesForQuery(Request request, List initTables) {
         initTables.add(TABLE_ENTRIES);
-        if (isType(TYPE_LEVEL3RADAR)) {
-            if (request.hasSetParameter(ARG_PRODUCT)
-                    || request.hasSetParameter(ARG_STATION)) {
-                initTables.add(TABLE_LEVEL3RADAR);
-            }
-        }
 
         if(request.hasSetParameter(ARG_TAG)) {
             initTables.add(TABLE_TAGS);        
@@ -579,7 +512,7 @@ public class TypeHandler implements Constants, Tables {
      * @param value _more_
      * @param list _more_
      */
-    private void addOr(String column, String value, List list, boolean quoteThem) {
+    protected void addOr(String column, String value, List list, boolean quoteThem) {
         if ((value != null) && (value.trim().length() > 0)
                 && !value.toLowerCase().equals("all")) {
             list.add("(" + SqlUtil.makeOrSplit(column, value, quoteThem) + ")");
@@ -606,6 +539,11 @@ public class TypeHandler implements Constants, Tables {
     public String getDescription() {
         return description;
     }
+
+    public String toString() {
+        return type +" " + description;
+    }
+
 
 }
 

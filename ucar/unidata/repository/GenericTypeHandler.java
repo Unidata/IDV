@@ -60,27 +60,20 @@ import java.util.Properties;
  */
 public class GenericTypeHandler extends TypeHandler {
 
-    /**
-     * _more_
-     *
-     * @param repository _more_
-     * @param type _more_
-     */
-    public GenericTypeHandler(Repository repository, String type) {
-        super(repository, type, "");
-    }
+    List<Column> columns;
+
 
     /**
      * _more_
      *
      * @param repository _more_
      * @param type _more_
-     * @param description _more_
      */
-    public GenericTypeHandler(Repository repository, String type,
-                       String description) {
+    public GenericTypeHandler(Repository repository, String type, String description, List<Column> columns) {
         super(repository, type, description);
+        this.columns = columns;
     }
+
 
     public boolean equals(Object obj) {
         if(!super.equals(obj)) return false;
@@ -88,9 +81,64 @@ public class GenericTypeHandler extends TypeHandler {
         return true;
     }
 
+    public String getTableName() {
+        return type;
+    }
+
+    protected List assembleWhereClause(Request request) throws Exception {
+        List   where = super.assembleWhereClause(request);
+        for(Column column: columns) {
+            if(!column.getIsSearchable()) continue;
+            addOr(column.getFullName(),
+                  (String) request.get(column.getFullName()),
+                  where,true);
+        }
+        return where;
+    }
+
+
+    protected List getTablesForQuery(Request request, List initTables) {
+        super.getTablesForQuery(request, initTables);
+        for(Column column: columns) {
+            if(!column.getIsSearchable()) continue;
+            String value = request.get(column.getFullName(),"");
+            if(value.trim().length()>0) {
+                initTables.add(getTableName());
+                break;
+            }
+        }
+        return initTables;
+    }
+
     public void addToForm(StringBuffer formBuffer, StringBuffer headerBuffer, Request request, List where)
             throws Exception {
         super.addToForm(formBuffer, headerBuffer, request, where);
+        for(Column column: columns) {
+            if(!column.getIsSearchable()) continue;
+            // && column.getType().equals(Column.TYPE_ENUMERATION)) {
+            if(false && column.getIsIndex()) {
+                where.add(SqlUtil.eq(COL_ENTRIES_ID, getTableName()+".ID"));
+                String[] values = SqlUtil.readString(
+                                    repository.execute(
+                                                       SqlUtil.makeSelect(SqlUtil.distinct(column.getFullName()),
+                                                                          getTablesForQuery(request, Misc.newList(TABLE_ENTRIES,getTableName())),
+                                                                          SqlUtil.makeAnd(where))), 1);
+                List list = new ArrayList();
+                for (int i = 0; i < values.length; i++) {
+                    list.add(
+                             new TwoFacedObject(
+                                                repository.getLongName(values[i]), values[i]));
+                }
+                list.add(0, "All");
+                formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold(column.getLabel()+":"),
+                        HtmlUtil.select(column.getFullName(),
+                                        list)));
+            } else {
+                formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold(column.getLabel()+":"),
+                                                      column.getHtmlFormEntry()));
+            }
+            formBuffer.append("\n");
+        }
     }
 
 

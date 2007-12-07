@@ -97,22 +97,23 @@ public class Harvester {
      *
      * @throws Exception _more_
      */
-    public List<Level3RadarEntry> xxxxcollectLevel3radarFiles(File rootDir,
-                                                              String groupName,
-                                                              final TypeHandler typeHandler)
+    public List<Level3RadarEntry> collectLevel3radarFiles(File rootDir,
+                                                          String groupName,
+                                                          final TypeHandler typeHandler)
             throws Exception {
+        System.err.println("harvesting:" + typeHandler);
         final List<Level3RadarEntry> radarEntrys = new ArrayList();
         long                  baseTime   = repository.currentTime();
         Group                 group      = repository.findGroupFromName(groupName);
         User user = repository.findUser("jdoe");
-        for (int stationIdx = 0; stationIdx < 120; stationIdx++) {
+        for (int stationIdx = 0; stationIdx < 50; stationIdx++) {
             String station = "station" + stationIdx;
-            for (int productIdx = 0; productIdx < 20; productIdx++) {
+            for (int productIdx = 0; productIdx < 10; productIdx++) {
                 String product = "product" + productIdx;
                 group = repository.findGroupFromName(groupName + "/" + station + "/" + product);
-                for (int timeIdx = 0; timeIdx < 1000; timeIdx++) {
+                for (int timeIdx = 0; timeIdx < 10; timeIdx++) {
                     radarEntrys.add(new Level3RadarEntry(repository.getGUID(),
-                                                         typeHandler.getType(),
+                                                         typeHandler,
                                                          "", "", 
 
                                                          group,
@@ -139,7 +140,7 @@ public class Harvester {
      *
      * @throws Exception _more_
      */
-    public List<Level3RadarEntry> collectLevel3radarFiles(File rootDir,
+    public List<Level3RadarEntry> xxxxxcollectLevel3radarFiles(File rootDir,
                                                           final String groupName,
                                                           final TypeHandler typeHandler)
             throws Exception {
@@ -167,7 +168,7 @@ public class Harvester {
                                         + station + "/" + product);
                 Date dttm = sdf.parse(matcher.group(3));
                 radarEntrys.add(new Level3RadarEntry(repository.getGUID(),
-                                                     typeHandler.getType(),
+                                                     typeHandler,
                                                    dttm.toString(), "", 
 
                                                      group, user,
@@ -224,7 +225,7 @@ public class Harvester {
                                         + station);
                 Date dttm = sdf.parse(matcher.group(2));
                 radarEntrys.add(new Level2RadarEntry(repository.getGUID(),
-                                                     typeHandler.getType(),
+                                                     typeHandler,
                                                    dttm.toString(), "", 
 
                                                      group, user,
@@ -281,7 +282,7 @@ public class Harvester {
                                                 + platform + "/" + resolution +"/"+product);
                 Date dttm = sdf.parse(matcher.group(4));
                 entries.add(new SatelliteEntry(repository.getGUID(),
-                                               typeHandler.getType(),
+                                               typeHandler,
                                             dttm.toString(), "", 
 
                                                group, user,
@@ -338,7 +339,7 @@ public class Harvester {
                 toks.add(0, rootGroup);
                 Group group = repository.findGroupFromName(StringUtil.join("/", toks));
                 Entry fileEntry = new Entry(repository.getGUID(),
-                                            typeHandler.getType(),
+                                            typeHandler,
                                              name, name, 
 
                                              group, user, f.toString(),
@@ -412,7 +413,7 @@ public class Harvester {
                                         + modelGroup +"/"+modelRun);
 
                 entries.add(new ModelEntry(repository.getGUID(),
-                                           typeHandler.getType(),
+                                           typeHandler,
                                         IOUtil.getFileTail(f.toString()), "",
 
                                            group, user,

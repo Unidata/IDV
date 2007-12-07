@@ -351,6 +351,39 @@ public class Repository implements Constants, Tables {
                                 getClass());
         Statement statement = connection.createStatement();
         SqlUtil.loadSql(sql, statement, true);
+        Element entriesRoot = XmlUtil.getRoot("/ucar/unidata/repository/entries.dbxml",getClass());
+        List children = XmlUtil.findChildren(entriesRoot, TAG_DB_ENTRY);
+
+        for(int i=0;i<children.size();i++) {
+            Element entryNode = (Element) children.get(i);
+            String name= XmlUtil.getAttribute(entryNode, ATTR_DB_NAME);
+            String description =XmlUtil.getAttribute(entryNode, ATTR_DB_DESCRIPTION,name);
+            List columnNodes = XmlUtil.findChildren(entryNode, TAG_DB_COLUMN);
+            List<Column> columns = new ArrayList();
+            StringBuffer tableDef = new StringBuffer("create table " + name + " (\n");
+            StringBuffer indexDef = new StringBuffer();
+            tableDef.append("id varchar(200)");
+            for(int colIdx=0;colIdx<columnNodes.size();colIdx++) {
+                Element columnNode = (Element) columnNodes.get(colIdx);
+                Column column = new Column(name,columnNode);
+                columns.add(column);
+                tableDef.append(",\n");
+                tableDef.append(column.getSqlCreate());
+                indexDef.append(column.getSqlIndex());
+            }
+            tableDef.append(")");
+            System.err.println ("table:" + tableDef);
+            System.err.println ("index:" + indexDef);
+            try {
+                statement.execute(tableDef.toString());
+                SqlUtil.loadSql(indexDef.toString(), statement, false);
+            } catch(Exception exc) {
+                if(exc.toString().indexOf("already exists")<0) throw exc;
+            }
+            GenericTypeHandler  typeHandler =  new GenericTypeHandler(this, name, description, columns);
+            addTypeHandler(name,typeHandler);
+        }
+
         makeUserIfNeeded(new User("jdoe", "John Doe", true));
         makeUserIfNeeded(new User("jsmith", "John Smith", false));
         loadTestData();
@@ -380,18 +413,6 @@ public class Repository implements Constants, Tables {
         addTypeHandler(TypeHandler.TYPE_FILE,
                        new TypeHandler(this, TypeHandler.TYPE_FILE,
                                        "File"));
-        addTypeHandler(TypeHandler.TYPE_LEVEL3RADAR,
-                       new TypeHandler(this, TypeHandler.TYPE_LEVEL3RADAR,
-                                       "Level 3 Radar"));
-        addTypeHandler(TypeHandler.TYPE_LEVEL2RADAR,
-                       new TypeHandler(this, TypeHandler.TYPE_LEVEL2RADAR,
-                                       "Level 2 Radar"));
-        addTypeHandler(TypeHandler.TYPE_SATELLITE,
-                       new TypeHandler(this, TypeHandler.TYPE_SATELLITE,
-                                       "Satellite"));
-        addTypeHandler(TypeHandler.TYPE_MODEL,
-                       new TypeHandler(this, TypeHandler.TYPE_MODEL,
-                                       "Model"));
     }
 
     /**
@@ -1980,7 +2001,9 @@ public class Repository implements Constants, Tables {
                 }
             }
             sb.append(HtmlUtil.form("/getfiles","getfiles"));
-            sb.append(HtmlUtil.submit("Get Entries"));
+            if(entries.size()>0) {
+                sb.append(HtmlUtil.submit("Get Entries"));
+            }
             sb.append("<br>");
         }
         for (int i = 0; i < sbc.getKeys().size(); i++) {

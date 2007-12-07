@@ -261,5 +261,13 @@ public interface Constants {
     public static final String PROP_DB_PASSWORD = "udms.db.password";
     public static final String PROP_HTML_DOWNLOADENTRIESASFILES = "udms.html.downloadentriesasfiles";
 
+
+    public static final String TAG_DB_ENTRY = "entry";
+    public static final String TAG_DB_COLUMN = "column";
+    public static final String ATTR_DB_NAME = "name";
+    public static final String ATTR_DB_DESCRIPTION = "description";
+
+
+
 }
 

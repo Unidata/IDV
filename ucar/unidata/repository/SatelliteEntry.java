@@ -68,11 +68,11 @@ public class SatelliteEntry extends Entry {
      * @param product _more_
      * @param date _more_
      */
-    public SatelliteEntry(String id, String type, 
+    public SatelliteEntry(String id, TypeHandler typeHandler,
                           String name, String description, Group group,
                          User user,
                          String file, String platform, String resolution, String product, long date) {
-        super(id, type, name, description,  group, user, file,
+        super(id, typeHandler, name, description,  group, user, file,
               new Date().getTime(), date,date);
         this.platform = platform;
         this.resolution = resolution;
