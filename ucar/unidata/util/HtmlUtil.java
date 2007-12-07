@@ -119,6 +119,10 @@ public class HtmlUtil {
         return "<input  type=\"submit\" value=\"" + label +"\" >";
     }
 
+    public static String textArea(String name, String value, int rows, int columns) {
+        return "<textarea name=\"" + name +"\" rows=\"" + rows + "\"  cols=\"" + columns +"\">" + value +"</textarea>";
+    }
+
     public static String input(String name) {
         return input(name,null,"");
     }
