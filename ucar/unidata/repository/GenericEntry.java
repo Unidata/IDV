@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -30,8 +31,9 @@ import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
-import java.util.Date;
 import java.util.ArrayList;
+
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -45,22 +47,29 @@ import java.util.List;
  */
 public class GenericEntry extends Entry {
 
-    Hashtable attributes  = new Hashtable();
+    /** _more_          */
+    Hashtable attributes = new Hashtable();
 
     /**
      * _more_
      *
      *
+     *
+     * @param id _more_
+     * @param typeHandler _more_
      * @param name _more_
      * @param description _more_
      * @param type _more_
      * @param group _more_
+     * @param user _more_
      * @param file _more_
      * @param date _more_
      */
-    public GenericEntry(String id, TypeHandler typeHandler, String name, String description, 
-                     Group group, User user, String file, long date) {
-        super(id,typeHandler, name, description, group, user,file, date, date,date);
+    public GenericEntry(String id, TypeHandler typeHandler, String name,
+                        String description, Group group, User user,
+                        String file, long date) {
+        super(id, typeHandler, name, description, group, user, file, date,
+              date, date);
     }
 
 
@@ -70,29 +79,49 @@ public class GenericEntry extends Entry {
      *
      *
      *
+     *
+     * @param id _more_
+     * @param typeHandler _more_
      * @param name _more_
      * @param description _more_
      * @param type _more_
      * @param group _more_
+     * @param user _more_
      * @param file _more_
      * @param station _more_
      * @param product _more_
      * @param date _more_
+     * @param createDate _more_
      * @param startDate _more_
      * @param endDate _more_
      */
-    public GenericEntry(String id, TypeHandler typeHandler,
-                        String name, String description, 
-                     Group group, User user, String file, long createDate, long startDate, long endDate) {
-        super(id, typeHandler, name, description, group, user,file, createDate, startDate,endDate);
+    public GenericEntry(String id, TypeHandler typeHandler, String name,
+                        String description, Group group, User user,
+                        String file, long createDate, long startDate,
+                        long endDate) {
+        super(id, typeHandler, name, description, group, user, file,
+              createDate, startDate, endDate);
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     *
+     * @return _more_
+     */
     public Object get(String name) {
         return attributes.get(name);
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     */
     public void put(String name, Object value) {
-        attributes.put(name,value);
+        attributes.put(name, value);
     }
 
 

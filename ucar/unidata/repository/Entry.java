@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -30,8 +31,9 @@ import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
-import java.util.Date;
 import java.util.ArrayList;
+
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -46,21 +48,23 @@ import java.util.List;
 public class Entry {
 
 
+    /** _more_          */
     List<String> tags;
 
-    /** _more_          */
+    /** _more_ */
     private String id;
 
-    /** _more_          */
+    /** _more_ */
     private String name;
 
-    /** _more_          */
+    /** _more_ */
     private String description;
 
 
     /** _more_ */
     private Group group;
 
+    /** _more_          */
     private User user;
 
     /** _more_ */
@@ -75,7 +79,7 @@ public class Entry {
     /** _more_ */
     private long endDate;
 
-    /** _more_          */
+    /** _more_ */
     private TypeHandler typeHandler;
 
 
@@ -83,16 +87,22 @@ public class Entry {
      * _more_
      *
      *
+     *
+     * @param id _more_
+     * @param typeHandler _more_
      * @param name _more_
      * @param description _more_
      * @param type _more_
      * @param group _more_
+     * @param user _more_
      * @param file _more_
      * @param date _more_
      */
-    public Entry(String id, TypeHandler typeHandler, String name, String description, 
-                     Group group, User user, String file, long date) {
-        this(id,typeHandler, name, description,  group, user,file, date, date,date);
+    public Entry(String id, TypeHandler typeHandler, String name,
+                 String description, Group group, User user, String file,
+                 long date) {
+        this(id, typeHandler, name, description, group, user, file, date,
+             date, date);
     }
 
 
@@ -101,27 +111,33 @@ public class Entry {
      *
      *
      *
+     *
+     * @param id _more_
+     * @param typeHandler _more_
      * @param name _more_
      * @param description _more_
      * @param type _more_
      * @param group _more_
+     * @param user _more_
      * @param file _more_
      * @param station _more_
      * @param product _more_
      * @param date _more_
+     * @param createDate _more_
      * @param startDate _more_
      * @param endDate _more_
      */
-    public Entry(String id, TypeHandler typeHandler, String name, String description, 
-                     Group group, User user, String file, long createDate, long startDate, long endDate) {
-        this.id = id;
-        this.typeHandler        = typeHandler;
+    public Entry(String id, TypeHandler typeHandler, String name,
+                 String description, Group group, User user, String file,
+                 long createDate, long startDate, long endDate) {
+        this.id          = id;
+        this.typeHandler = typeHandler;
         this.name        = name;
         this.description = description;
         this.group       = group;
         this.user        = user;
         this.file        = file;
-        this.createDate   = createDate;
+        this.createDate  = createDate;
         this.startDate   = startDate;
         this.endDate     = endDate;
     }
@@ -242,6 +258,11 @@ public class Entry {
         typeHandler = value;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getType() {
         return typeHandler.getType();
     }
@@ -312,45 +333,50 @@ public class Entry {
     }
 
     /**
-       Set the User property.
-
-       @param value The new value for User
-    **/
-    public void setUser (User value) {
-	user = value;
+     *  Set the User property.
+     *
+     *  @param value The new value for User
+     */
+    public void setUser(User value) {
+        user = value;
     }
 
     /**
-       Get the User property.
-
-       @return The User
-    **/
-    public User getUser () {
-	return user;
+     *  Get the User property.
+     *
+     *  @return The User
+     */
+    public User getUser() {
+        return user;
     }
 
     /**
-       Set the Tags property.
-
-       @param value The new value for Tags
-    **/
-    public void setTags (List<String> value) {
-	tags = value;
+     *  Set the Tags property.
+     *
+     *  @param value The new value for Tags
+     */
+    public void setTags(List<String> value) {
+        tags = value;
     }
 
     /**
-       Get the Tags property.
-
-       @return The Tags
-    **/
-    public List<String> getTags () {
-	return tags;
+     *  Get the Tags property.
+     *
+     *  @return The Tags
+     */
+    public List<String> getTags() {
+        return tags;
     }
 
 
 
-    public void  addTag(String tag) {
-        if(tags == null) {
+    /**
+     * _more_
+     *
+     * @param tag _more_
+     */
+    public void addTag(String tag) {
+        if (tags == null) {
             tags = new ArrayList<String>();
         }
         tags.add(tag);

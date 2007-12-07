@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -78,7 +79,7 @@ import java.util.regex.*;
 public interface Tables {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final int MAX_ROWS = 1000;
 
 

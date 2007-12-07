@@ -20,7 +20,9 @@
 
 
 
+
 package ucar.unidata.repository;
+
 
 import java.util.Hashtable;
 
@@ -29,140 +31,225 @@ import java.util.Hashtable;
  */
 
 public class Result {
+
+    /** _more_          */
     public static String TYPE_HTML = "text/html";
+
+    /** _more_          */
     public static String TYPE_XML = "text/xml";
+
+    /** _more_          */
     public static String TYPE_CSV = "text/csv";
+
+    /** _more_          */
     public static String TYPE_RSS = "application/rss+xml";
 
-    private byte[]content;
+    /** _more_          */
+    private byte[] content;
+
+    /** _more_          */
     private String title = "";
+
+    /** _more_          */
     private String mimeType = "text/html";
+
+    /** _more_          */
     private boolean shouldDecorate = true;
 
+    /** _more_          */
     private Hashtable properties = new Hashtable();
 
-    public Result(String title, byte[]content) {
-        this(title, content,TYPE_HTML);
+    /**
+     * _more_
+     *
+     * @param title _more_
+     * @param content _more_
+     */
+    public Result(String title, byte[] content) {
+        this(title, content, TYPE_HTML);
     }
 
-    public Result(StringBuffer  content) {
+    /**
+     * _more_
+     *
+     * @param content _more_
+     */
+    public Result(StringBuffer content) {
         this("", content);
     }
-    public Result(String title, StringBuffer  content) {
-        this(title, content.toString().getBytes(),  TYPE_HTML);
+
+    /**
+     * _more_
+     *
+     * @param title _more_
+     * @param content _more_
+     */
+    public Result(String title, StringBuffer content) {
+        this(title, content.toString().getBytes(), TYPE_HTML);
     }
 
-    public Result(String title, StringBuffer  content, String mimeType) {
-        this(title,content.toString().getBytes(), mimeType);
+    /**
+     * _more_
+     *
+     * @param title _more_
+     * @param content _more_
+     * @param mimeType _more_
+     */
+    public Result(String title, StringBuffer content, String mimeType) {
+        this(title, content.toString().getBytes(), mimeType);
     }
 
-    public Result(String title, byte[]content, String mimeType) {
-        this(title, content,mimeType, true);
+    /**
+     * _more_
+     *
+     * @param title _more_
+     * @param content _more_
+     * @param mimeType _more_
+     */
+    public Result(String title, byte[] content, String mimeType) {
+        this(title, content, mimeType, true);
     }
 
-    public Result(String title, byte[]content, String mimeType, boolean shouldDecorate) {
-        this.content = content;
-        this.title = title;
-        this.mimeType = mimeType;
+    /**
+     * _more_
+     *
+     * @param title _more_
+     * @param content _more_
+     * @param mimeType _more_
+     * @param shouldDecorate _more_
+     */
+    public Result(String title, byte[] content, String mimeType,
+                  boolean shouldDecorate) {
+        this.content        = content;
+        this.title          = title;
+        this.mimeType       = mimeType;
         this.shouldDecorate = shouldDecorate;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     */
     public void putProperty(String name, Object value) {
         properties.put(name, value);
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     *
+     * @return _more_
+     */
     public Object getProperty(String name) {
         return properties.get(name);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isHtml() {
         return mimeType.equals(TYPE_HTML);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isXml() {
         return mimeType.equals(TYPE_XML);
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isCsv() {
         return mimeType.equals(TYPE_CSV);
     }
 
 
-/**
-Set the Content property.
+    /**
+     * Set the Content property.
+     *
+     * @param value The new value for Content
+     */
+    public void setContent(byte[] value) {
+        content = value;
+    }
 
-@param value The new value for Content
-**/
-public void setContent (byte[] value) {
-	content = value;
-}
+    /**
+     * Get the Content property.
+     *
+     * @return The Content
+     */
+    public byte[] getContent() {
+        return content;
+    }
 
-/**
-Get the Content property.
+    /**
+     * Set the Title property.
+     *
+     * @param value The new value for Title
+     */
+    public void setTitle(String value) {
+        title = value;
+    }
 
-@return The Content
-**/
-public byte[] getContent () {
-	return content;
-}
+    /**
+     * Get the Title property.
+     *
+     * @return The Title
+     */
+    public String getTitle() {
+        return title;
+    }
 
-/**
-Set the Title property.
+    /**
+     * Set the MimeType property.
+     *
+     * @param value The new value for MimeType
+     */
+    public void setMimeType(String value) {
+        mimeType = value;
+    }
 
-@param value The new value for Title
-**/
-public void setTitle (String value) {
-	title = value;
-}
-
-/**
-Get the Title property.
-
-@return The Title
-**/
-public String getTitle () {
-	return title;
-}
-
-/**
-Set the MimeType property.
-
-@param value The new value for MimeType
-**/
-public void setMimeType (String value) {
-	mimeType = value;
-}
-
-/**
-Get the MimeType property.
-
-@return The MimeType
-**/
-public String getMimeType () {
-	return mimeType;
-}
+    /**
+     * Get the MimeType property.
+     *
+     * @return The MimeType
+     */
+    public String getMimeType() {
+        return mimeType;
+    }
 
 
 
-/**
-Set the ShouldDecorate property.
+    /**
+     * Set the ShouldDecorate property.
+     *
+     * @param value The new value for ShouldDecorate
+     */
+    public void setShouldDecorate(boolean value) {
+        shouldDecorate = value;
+    }
 
-@param value The new value for ShouldDecorate
-**/
-public void setShouldDecorate (boolean value) {
-	shouldDecorate = value;
-}
-
-/**
-Get the ShouldDecorate property.
-
-@return The ShouldDecorate
-**/
-public boolean getShouldDecorate () {
-	return shouldDecorate;
-}
+    /**
+     * Get the ShouldDecorate property.
+     *
+     * @return The ShouldDecorate
+     */
+    public boolean getShouldDecorate() {
+        return shouldDecorate;
+    }
 
 
 

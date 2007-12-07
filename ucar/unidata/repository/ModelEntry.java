@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -48,6 +49,7 @@ public class ModelEntry extends Entry {
     /** _more_ */
     private String modelGroup;
 
+    /** _more_          */
     private String modelRun;
 
 
@@ -57,21 +59,27 @@ public class ModelEntry extends Entry {
      *
      *
      *
+     *
+     * @param id _more_
+     * @param typeHandler _more_
      * @param name _more_
      * @param description _more_
      * @param group _more_
+     * @param user _more_
      * @param file _more_
      * @param model _more_
+     * @param modelGroup _more_
+     * @param modelRun _more_
      * @param date _more_
      */
-    public ModelEntry(String id, TypeHandler typeHandler,
-                      String name, String description, Group group,
-                      User user,
-                      String file,  String modelGroup,String modelRun, long date) {
+    public ModelEntry(String id, TypeHandler typeHandler, String name,
+                      String description, Group group, User user,
+                      String file, String modelGroup, String modelRun,
+                      long date) {
         super(id, typeHandler, name, description, group, user, file,
-              new Date().getTime(), date,date);
+              new Date().getTime(), date, date);
         this.modelGroup = modelGroup;
-        this.modelRun = modelRun;
+        this.modelRun   = modelRun;
     }
 
 

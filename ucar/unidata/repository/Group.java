@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -30,8 +31,9 @@ import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
-import java.util.Date;
 import java.util.ArrayList;
+
+import java.util.Date;
 import java.util.List;
 
 
@@ -55,12 +57,13 @@ public class Group {
     /** _more_ */
     private String description;
 
-    /** _more_          */
+    /** _more_ */
     private String parentId;
 
     /** _more_ */
     private Group parent;
 
+    /** _more_          */
     private List<Group> children = new ArrayList<Group>();
 
 

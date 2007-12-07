@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -58,21 +59,24 @@ public class Level3RadarEntry extends Entry {
      *
      *
      *
+     *
+     * @param id _more_
+     * @param typeHandler _more_
      * @param name _more_
      * @param description _more_
      * @param group _more_
+     * @param user _more_
      * @param file _more_
      * @param station _more_
      * @param product _more_
      * @param date _more_
      */
-    public Level3RadarEntry(String id, 
-                            TypeHandler typeHandler,
-                            String name, String description, Group group,
-                            User user,
-                            String file, String station, String product, long date) {
+    public Level3RadarEntry(String id, TypeHandler typeHandler, String name,
+                            String description, Group group, User user,
+                            String file, String station, String product,
+                            long date) {
         super(id, typeHandler, name, description, group, user, file,
-              new Date().getTime(), date,date);
+              new Date().getTime(), date, date);
         this.station = station;
         this.product = product;
     }

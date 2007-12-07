@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -77,27 +78,56 @@ import java.util.regex.*;
  * @version $Revision: 1.3 $
  */
 public class Permission {
+
+    /** _more_          */
     private boolean mustBeAdmin = true;
+
+    /** _more_          */
     private List<String> onlyTheseIps;
 
+    /**
+     * _more_
+     */
     public Permission() {
         this(true, null);
     }
+
+    /**
+     * _more_
+     *
+     * @param mustBeAdmin _more_
+     */
     public Permission(boolean mustBeAdmin) {
         this(mustBeAdmin, null);
     }
 
-    public Permission(boolean mustBeAdmin, List<String>onlyTheseIps) {
-        this.mustBeAdmin = mustBeAdmin;
+    /**
+     * _more_
+     *
+     * @param mustBeAdmin _more_
+     * @param onlyTheseIps _more_
+     */
+    public Permission(boolean mustBeAdmin, List<String> onlyTheseIps) {
+        this.mustBeAdmin  = mustBeAdmin;
         this.onlyTheseIps = onlyTheseIps;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param repository _more_
+     *
+     * @return _more_
+     */
     public boolean isRequestOk(Request request, Repository repository) {
         RequestContext context = request.getRequestContext();
-        if(mustBeAdmin) {
+        if (mustBeAdmin) {
             User user = context.getUser();
-            if(user == null || !user.getAdmin()) return false;
+            if ((user == null) || !user.getAdmin()) {
+                return false;
+            }
         }
         return true;
     }

@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -38,8 +39,9 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
-import java.sql.Statement;
 import java.sql.ResultSet;
+
+import java.sql.Statement;
 
 
 import java.util.ArrayList;
@@ -60,6 +62,7 @@ import java.util.Properties;
  */
 public class GenericTypeHandler extends TypeHandler {
 
+    /** _more_          */
     List<Column> columns;
 
 
@@ -68,41 +71,84 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @param repository _more_
      * @param type _more_
+     * @param description _more_
+     * @param columns _more_
      */
-    public GenericTypeHandler(Repository repository, String type, String description, List<Column> columns) {
+    public GenericTypeHandler(Repository repository, String type,
+                              String description, List<Column> columns) {
         super(repository, type, description);
         this.columns = columns;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param obj _more_
+     *
+     * @return _more_
+     */
     public boolean equals(Object obj) {
-        if(!super.equals(obj)) return false;
+        if ( !super.equals(obj)) {
+            return false;
+        }
         //TODO
         return true;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getTableName() {
         return type;
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected List assembleWhereClause(Request request) throws Exception {
-        List   where = super.assembleWhereClause(request);
-        for(Column column: columns) {
-            if(!column.getIsSearchable()) continue;
-            addOr(column.getFullName(),
-                  (String) request.get(column.getFullName()),
-                  where,true);
+        List    where        = super.assembleWhereClause(request);
+        boolean hadBaseWhere = where.size() > 0;
+        boolean didOne       = false;
+        for (Column column : columns) {
+            if ( !column.getIsSearchable()) {
+                continue;
+            }
+            didOne |= addOr(column.getFullName(),
+                            (String) request.get(column.getFullName()),
+                            where, true);
+        }
+        if (didOne && hadBaseWhere) {
+            where.add(SqlUtil.eq(COL_ENTRIES_ID, getTableName() + ".id"));
         }
         return where;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param initTables _more_
+     *
+     * @return _more_
+     */
     protected List getTablesForQuery(Request request, List initTables) {
         super.getTablesForQuery(request, initTables);
-        for(Column column: columns) {
-            if(!column.getIsSearchable()) continue;
-            String value = request.get(column.getFullName(),"");
-            if(value.trim().length()>0) {
+        for (Column column : columns) {
+            if ( !column.getIsSearchable()) {
+                continue;
+            }
+            String value = request.get(column.getFullName(), "");
+            if (value.trim().length() > 0) {
                 initTables.add(getTableName());
                 break;
             }
@@ -110,34 +156,22 @@ public class GenericTypeHandler extends TypeHandler {
         return initTables;
     }
 
-    public void addToForm(StringBuffer formBuffer, StringBuffer headerBuffer, Request request, List where)
+    /**
+     * _more_
+     *
+     * @param formBuffer _more_
+     * @param headerBuffer _more_
+     * @param request _more_
+     * @param where _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addToForm(StringBuffer formBuffer, StringBuffer headerBuffer,
+                          Request request, List where)
             throws Exception {
         super.addToForm(formBuffer, headerBuffer, request, where);
-        for(Column column: columns) {
-            if(!column.getIsSearchable()) continue;
-            // && column.getType().equals(Column.TYPE_ENUMERATION)) {
-            if(false && column.getIsIndex()) {
-                where.add(SqlUtil.eq(COL_ENTRIES_ID, getTableName()+".ID"));
-                String[] values = SqlUtil.readString(
-                                    repository.execute(
-                                                       SqlUtil.makeSelect(SqlUtil.distinct(column.getFullName()),
-                                                                          getTablesForQuery(request, Misc.newList(TABLE_ENTRIES,getTableName())),
-                                                                          SqlUtil.makeAnd(where))), 1);
-                List list = new ArrayList();
-                for (int i = 0; i < values.length; i++) {
-                    list.add(
-                             new TwoFacedObject(
-                                                repository.getLongName(values[i]), values[i]));
-                }
-                list.add(0, "All");
-                formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold(column.getLabel()+":"),
-                        HtmlUtil.select(column.getFullName(),
-                                        list)));
-            } else {
-                formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold(column.getLabel()+":"),
-                                                      column.getHtmlFormEntry()));
-            }
-            formBuffer.append("\n");
+        for (Column column : columns) {
+            column.addToForm(this, formBuffer, headerBuffer, request, where);
         }
     }
 

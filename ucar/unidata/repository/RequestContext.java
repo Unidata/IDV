@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -77,41 +78,62 @@ import java.util.regex.*;
  * @version $Revision: 1.3 $
  */
 public class RequestContext {
+
+    /** _more_          */
     private User user;
 
+    /**
+     * _more_
+     *
+     * @param user _more_
+     */
     public RequestContext(User user) {
         this.user = user;
-    } 
+    }
 
+    /**
+     * _more_
+     *
+     * @param o _more_
+     *
+     * @return _more_
+     */
     public boolean equals(Object o) {
-        if(!o.getClass().equals(getClass())) return false;
+        if ( !o.getClass().equals(getClass())) {
+            return false;
+        }
         RequestContext that = (RequestContext) o;
         return Misc.equals(this.user, that.user);
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int hashCode() {
         return user.hashCode();
     }
 
 
-/**
-Set the User property.
+    /**
+     * Set the User property.
+     *
+     * @param value The new value for User
+     */
+    public void setUser(User value) {
+        user = value;
+    }
 
-@param value The new value for User
-**/
-public void setUser (User value) {
-	user = value;
-}
-
-/**
-Get the User property.
-
-@return The User
-**/
-public User getUser () {
-	return user;
-}
+    /**
+     * Get the User property.
+     *
+     * @return The User
+     */
+    public User getUser() {
+        return user;
+    }
 
 
 

@@ -22,11 +22,14 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
-import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.HtmlUtil;
+
+
+import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
 
 
@@ -43,8 +46,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Properties;
 import java.util.List;
+import java.util.Properties;
 
 
 
@@ -59,7 +62,7 @@ public class MetaDataServer extends HttpServer implements Constants {
     /** _more_ */
     Repository repository;
 
-    /** _more_          */
+    /** _more_ */
     String template;
 
     /**
@@ -72,8 +75,7 @@ public class MetaDataServer extends HttpServer implements Constants {
      * @param connectionURL _more_
      * @throws Exception _more_
      */
-    public MetaDataServer(String[] args)
-            throws Exception {
+    public MetaDataServer(String[] args) throws Exception {
         super(8080);
         repository = new Repository(args);
         repository.init();
@@ -83,42 +85,52 @@ public class MetaDataServer extends HttpServer implements Constants {
     }
 
 
-    protected void writeContent(RequestHandler handler, boolean ok, Result result)
-        throws Exception {
+    /**
+     * _more_
+     *
+     * @param handler _more_
+     * @param ok _more_
+     * @param result _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void writeContent(RequestHandler handler, boolean ok,
+                                Result result)
+            throws Exception {
         if (result.isHtml() && result.getShouldDecorate()) {
-            template = IOUtil.readContents(
-                                           "/ucar/unidata/repository/template.html", getClass());
+            template =
+                IOUtil.readContents("/ucar/unidata/repository/template.html",
+                                    getClass());
             String html = StringUtil.replace(template, "%content%",
                                              new String(result.getContent()));
-            html = StringUtil.replace(html, "%title%",
-                                      result.getTitle());
+            html = StringUtil.replace(html, "%title%", result.getTitle());
             html = StringUtil.replace(html, "%root%",
                                       repository.getUrlBase());
-            List links = (List) result.getProperty(PROP_NAVLINKS);
+            List   links     = (List) result.getProperty(PROP_NAVLINKS);
             String linksHtml = "";
-            if(links!=null) {
+            if (links != null) {
                 linksHtml = StringUtil.join("&nbsp;|&nbsp;", links);
             }
 
-            List sublinks = (List) result.getProperty(PROP_NAVSUBLINKS);
+            List   sublinks     = (List) result.getProperty(PROP_NAVSUBLINKS);
             String sublinksHtml = "";
-            if(sublinks!=null) {
+            if (sublinks != null) {
                 sublinksHtml = StringUtil.join("&nbsp;|&nbsp;", sublinks);
             }
-              
 
-            html = StringUtil.replace(html, "%links%",
-                                      linksHtml);
-            if(sublinksHtml.length()>0) {
+
+            html = StringUtil.replace(html, "%links%", linksHtml);
+            if (sublinksHtml.length() > 0) {
                 html = StringUtil.replace(html, "%sublinks%",
-                                          "<div class=\"subnav\">" +sublinksHtml  +"</div>");
+                                          "<div class=\"subnav\">"
+                                          + sublinksHtml + "</div>");
             } else {
-                html = StringUtil.replace(html, "%sublinks%","");
+                html = StringUtil.replace(html, "%sublinks%", "");
             }
             handler.writeResult(ok, html, result.getMimeType());
         } else {
             handler.writeResult(ok, result.getContent(),
-                        result.getMimeType());
+                                result.getMimeType());
         }
     }
 
@@ -140,7 +152,7 @@ public class MetaDataServer extends HttpServer implements Constants {
 
             protected void writeHeaderArgs() throws Exception {
                 writeLine("Cache-Control: no-cache" + CRLF);
-                writeLine("Last-Modified:" + new Date()+CRLF);
+                writeLine("Last-Modified:" + new Date() + CRLF);
             }
 
             protected void handleRequest(String path, Hashtable formArgs,
@@ -149,44 +161,46 @@ public class MetaDataServer extends HttpServer implements Constants {
                 path = path.trim();
                 //                System.err.println("request:" + path + ":");
                 formArgs = HtmlUtil.cleanUpArguments(formArgs);
-                User user =new User("jdoe","John Doe", true); 
+                User           user    = new User("jdoe", "John Doe", true);
                 RequestContext context = new RequestContext(user);
-                Request request = new Request(path,  context, formArgs);
+                Request        request = new Request(path, context, formArgs);
                 try {
-                    Result result =
-                        repository.handleRequest(request);
+                    Result result = repository.handleRequest(request);
                     if (result != null) {
-                        writeContent(this,true, result);
+                        writeContent(this, true, result);
                     } else {
                         //Try to serve up the file
-                        String type = repository.getMimeType(IOUtil.getFileExtension(path));
+                        String type = repository.getMimeType(
+                                          IOUtil.getFileExtension(path));
                         path = StringUtil.replace(path,
-                                                  repository.getUrlBase(), "");
+                                repository.getUrlBase(), "");
                         try {
                             InputStream is =
                                 IOUtil.getInputStream(
-                                                      "/ucar/unidata/repository/htdocs" + path,
-                                                      getClass());
+                                    "/ucar/unidata/repository/htdocs" + path,
+                                    getClass());
                             byte[] bytes = IOUtil.readBytes(is);
                             if (path.endsWith(".html")) {
-                                writeResult(true, new String(bytes),type);
+                                writeResult(true, new String(bytes), type);
                             } else {
                                 writeResult(true, bytes, type);
                             }
-                        } catch(IOException fnfe) {
-                            result = new Result("Error",new StringBuffer("Unknown file:" + path));
-                            result.putProperty(PROP_NAVLINKS, repository.getNavLinks(request));
-                            writeContent(this,false,result);
+                        } catch (IOException fnfe) {
+                            result = new Result("Error",
+                                    new StringBuffer("Unknown file:" + path));
+                            result.putProperty(PROP_NAVLINKS,
+                                    repository.getNavLinks(request));
+                            writeContent(this, false, result);
                         }
                     }
                 } catch (Throwable exc) {
                     System.err.println("Error:" + exc);
                     exc.printStackTrace();
                     String trace = LogUtil.getStackTrace(exc);
-                    writeContent(this,false,
+                    writeContent(this, false,
                                  new Result("Error",
-                                     new StringBuffer("<pre>" + trace
-                                         + "</pre>")));
+                                            new StringBuffer("<pre>" + trace
+                                                + "</pre>")));
                 }
             }
         };

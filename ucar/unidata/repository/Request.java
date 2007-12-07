@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -78,40 +79,41 @@ import java.util.regex.*;
  */
 public class Request {
 
-    /** _more_          */
+    /** _more_ */
     public static final String CALL_QUERY = "/query";
 
+    /** _more_          */
     public static final String CALL_FETCH = "/fetch";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CALL_SQL = "/sql";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CALL_SEARCHFORM = "/searchform";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CALL_LIST = "/list";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CALL_SHOWGROUP = "/showgroup";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CALL_SHOWFILE = "/showfile";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CALL_GRAPH = "/graph";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CALL_GRAPHVIEW = "/graphview";
 
 
-    /** _more_          */
+    /** _more_ */
     private String type;
 
-    /** _more_          */
+    /** _more_ */
     private RequestContext requestContext;
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable parameters;
 
     /**
@@ -128,17 +130,32 @@ public class Request {
         this.parameters     = parameters;
     }
 
+    /**
+     * _more_
+     *
+     * @param o _more_
+     *
+     * @return _more_
+     */
     public boolean equals(Object o) {
-        if(!o.getClass().equals(getClass())) return false;
+        if ( !o.getClass().equals(getClass())) {
+            return false;
+        }
         Request that = (Request) o;
-        return this.type.equals(that.type) &&
-            this.requestContext.equals(that.requestContext) &&
-            this.parameters.equals(that.parameters);
+        return this.type.equals(that.type)
+               && this.requestContext.equals(that.requestContext)
+               && this.parameters.equals(that.parameters);
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int hashCode() {
-        return type.hashCode() ^ requestContext.hashCode() ^ parameters.hashCode();
+        return type.hashCode() ^ requestContext.hashCode()
+               ^ parameters.hashCode();
     }
 
     /**
@@ -152,9 +169,18 @@ public class Request {
         return parameters.containsKey(key);
     }
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
     public boolean hasSetParameter(String key) {
         String v = (String) parameters.get(key);
-        if(v == null || v.trim().length() == 0) return false;
+        if ((v == null) || (v.trim().length() == 0)) {
+            return false;
+        }
         return true;
     }
 
@@ -170,9 +196,19 @@ public class Request {
         return (String) parameters.get(key);
     }
 
-    public String get(String key,String dflt) {
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    public String get(String key, String dflt) {
         String result = get(key);
-        if(result == null)return dflt;
+        if (result == null) {
+            return dflt;
+        }
         return result;
     }
 

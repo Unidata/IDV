@@ -20,257 +20,412 @@
 
 
 
+
 package ucar.unidata.repository;
+
+
+import org.w3c.dom.*;
+
+
+
+
+import ucar.unidata.data.SqlUtil;
+
+import ucar.unidata.util.HtmlUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.TwoFacedObject;
+
+
+import ucar.unidata.xml.XmlUtil;
+
+import java.util.ArrayList;
 
 import java.util.Hashtable;
 import java.util.List;
 
 
-
-
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.HtmlUtil;
-
-import ucar.unidata.xml.XmlUtil;
-import org.w3c.dom.*;
-
-
 /**
  */
 
-public class Column {
+public class Column implements Tables, Constants {
+
+    /** _more_          */
     public static final String TYPE_STRING = "string";
+
+    /** _more_          */
     public static final String TYPE_INT = "int";
+
+    /** _more_          */
     public static final String TYPE_DOUBLE = "double";
+
+    /** _more_          */
     public static final String TYPE_BOOLEAN = "boolean";
-    public static final String TYPE_ENUMERATION    = "enumeration";
-    public static final String TYPE_TIMESTAMP    = "timestamp";
 
-    private static final  String ATTR_NAME="name"; 
-    private static final  String ATTR_LABEL="label"; 
-    private static final  String ATTR_DESCRIPTION="description"; 
-    private static final  String ATTR_TYPE="type"; 
-    private static final  String ATTR_ISINDEX="isindex"; 
-    private static final  String ATTR_ISSEARCHABLE="issearchable"; 
-    private static final  String ATTR_VALUES="values";     
-    private static final  String ATTR_DEFAULT="default"; 
-    private static final  String ATTR_SIZE="size"; 
-    private static final  String ATTR_ROWS="rows";     
-    private static final  String ATTR_COLUMNS="columns"; 
+    /** _more_          */
+    public static final String TYPE_ENUMERATION = "enumeration";
+
+    /** _more_          */
+    public static final String TYPE_TIMESTAMP = "timestamp";
+
+    /** _more_          */
+    public static final String SEARCHTYPE_TEXT = "text";
+
+    /** _more_          */
+    public static final String SEARCHTYPE_SELECT = "select";
 
 
+    /** _more_          */
+    private static final String ATTR_NAME = "name";
 
+    /** _more_          */
+    private static final String ATTR_LABEL = "label";
+
+    /** _more_          */
+    private static final String ATTR_DESCRIPTION = "description";
+
+    /** _more_          */
+    private static final String ATTR_TYPE = "type";
+
+    /** _more_          */
+    private static final String ATTR_ISINDEX = "isindex";
+
+    /** _more_          */
+    private static final String ATTR_ISSEARCHABLE = "issearchable";
+
+    /** _more_          */
+    private static final String ATTR_VALUES = "values";
+
+    /** _more_          */
+    private static final String ATTR_DEFAULT = "default";
+
+    /** _more_          */
+    private static final String ATTR_SIZE = "size";
+
+    /** _more_          */
+    private static final String ATTR_ROWS = "rows";
+
+    /** _more_          */
+    private static final String ATTR_COLUMNS = "columns";
+
+    /** _more_          */
+    private static final String ATTR_SEARCHTYPE = "searchtype";
+
+
+
+    /** _more_          */
     private String table;
-    private String name;
-    private String label;
-    private String description;
-    private String type;
-    private boolean isIndex;
-    private boolean isSearchable;
-    private List values;
-    private String dflt;
-    private int size=200;
-    private int rows=1;
-    private int columns=40;
 
+    /** _more_          */
+    private String name;
+
+    /** _more_          */
+    private String label;
+
+    /** _more_          */
+    private String description;
+
+    /** _more_          */
+    private String type;
+
+    /** _more_          */
+    private String searchType = SEARCHTYPE_TEXT;
+
+    /** _more_          */
+    private boolean isIndex;
+
+    /** _more_          */
+    private boolean isSearchable;
+
+    /** _more_          */
+    private List values;
+
+    /** _more_          */
+    private String dflt;
+
+    /** _more_          */
+    private int size = 200;
+
+    /** _more_          */
+    private int rows = 1;
+
+    /** _more_          */
+    private int columns = 40;
+
+    /**
+     * _more_
+     *
+     * @param table _more_
+     * @param element _more_
+     */
     public Column(String table, Element element) {
         this.table = table;
-        name = XmlUtil.getAttribute(element,ATTR_NAME);
-        label = XmlUtil.getAttribute(element,ATTR_LABEL,name);
-        description = XmlUtil.getAttribute(element,ATTR_DESCRIPTION,label);
-        type = XmlUtil.getAttribute(element,ATTR_TYPE);
-        dflt = XmlUtil.getAttribute(element,ATTR_DEFAULT,"");
-        isIndex = XmlUtil.getAttribute(element,ATTR_ISINDEX,false);
-        isSearchable = XmlUtil.getAttribute(element,ATTR_ISSEARCHABLE,false);
-        size = XmlUtil.getAttribute(element,ATTR_SIZE,size);
-        rows = XmlUtil.getAttribute(element,ATTR_ROWS, rows);
-        columns = XmlUtil.getAttribute(element,ATTR_COLUMNS, columns);
-        if(type.equals(TYPE_ENUMERATION)) {
-            values= StringUtil.split(XmlUtil.getAttribute(element, ATTR_VALUES),",",true,true); 
+        name       = XmlUtil.getAttribute(element, ATTR_NAME);
+        label      = XmlUtil.getAttribute(element, ATTR_LABEL, name);
+        searchType = XmlUtil.getAttribute(element, ATTR_SEARCHTYPE,
+                                          searchType);
+        description  = XmlUtil.getAttribute(element, ATTR_DESCRIPTION, label);
+        type         = XmlUtil.getAttribute(element, ATTR_TYPE);
+        dflt         = XmlUtil.getAttribute(element, ATTR_DEFAULT, "");
+        isIndex      = XmlUtil.getAttribute(element, ATTR_ISINDEX, false);
+        isSearchable = XmlUtil.getAttribute(element, ATTR_ISSEARCHABLE,
+                                            false);
+        size    = XmlUtil.getAttribute(element, ATTR_SIZE, size);
+        rows    = XmlUtil.getAttribute(element, ATTR_ROWS, rows);
+        columns = XmlUtil.getAttribute(element, ATTR_COLUMNS, columns);
+        if (type.equals(TYPE_ENUMERATION)) {
+            values = StringUtil.split(XmlUtil.getAttribute(element,
+                    ATTR_VALUES), ",", true, true);
         }
     }
 
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getSqlCreate() {
         String def = " " + name + " ";
-        if(type.equals(TYPE_STRING)) 
-            return  def+"varchar(" + size+") ";
-        else if(type.equals(TYPE_ENUMERATION)) 
-            return  def+"varchar(" + size+") ";
-        else if(type.equals(TYPE_INT)) 
-            return  def+"int ";
-        else if(type.equals(TYPE_DOUBLE)) 
-            return  def+"double ";
-        else if(type.equals(TYPE_BOOLEAN)) 
-            return  def+"int ";
-        else 
-            throw new IllegalArgumentException ("Unknwon column type:" + type + " for " + name);
-    }
-
-    public String getSqlIndex() {
-        if(isIndex)
-            return "CREATE INDEX " + table + "_INDEX_" + name +"  ON " + table + " ("+ name +");\n";
-        else return  "";
-    }
-
-    public String getHtmlFormEntry() {
-        if(rows>1) {
-            return HtmlUtil.textArea(getFullName(), "",rows, columns);
+        if (type.equals(TYPE_STRING)) {
+            return def + "varchar(" + size + ") ";
+        } else if (type.equals(TYPE_ENUMERATION)) {
+            return def + "varchar(" + size + ") ";
+        } else if (type.equals(TYPE_INT)) {
+            return def + "int ";
+        } else if (type.equals(TYPE_DOUBLE)) {
+            return def + "double ";
+        } else if (type.equals(TYPE_BOOLEAN)) {
+            return def + "int ";
+        } else {
+            throw new IllegalArgumentException("Unknwon column type:" + type
+                    + " for " + name);
         }
-        return HtmlUtil.input(getFullName(), "", "size=\"" + columns +"\"");
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getSqlIndex() {
+        if (isIndex) {
+            return "CREATE INDEX " + table + "_INDEX_" + name + "  ON "
+                   + table + " (" + name + ");\n";
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @param typeHandler _more_
+     * @param formBuffer _more_
+     * @param headerBuffer _more_
+     * @param request _more_
+     * @param where _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addToForm(GenericTypeHandler typeHandler,
+                          StringBuffer formBuffer, StringBuffer headerBuffer,
+                          Request request, List where)
+            throws Exception {
+        if ( !getIsSearchable()) {
+            return;
+        }
+
+        List tmp = new ArrayList(where);
+        if (searchType.equals(SEARCHTYPE_SELECT)) {
+            String[] values = SqlUtil.readString(
+                                                 typeHandler.executeSelect(request,
+                                      SqlUtil.distinct(getFullName()),
+                                                                           tmp), 1);
+            List list = new ArrayList();
+            for (int i = 0; i < values.length; i++) {
+                list.add(
+                    new TwoFacedObject(
+                        typeHandler.getRepository().getLongName(values[i]),
+                        values[i]));
+            }
+            list.add(0, "All");
+            formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold(getLabel()
+                    + ":"), HtmlUtil.select(getFullName(), list)));
+        } else {
+            if (rows > 1) {
+                formBuffer.append(
+                    HtmlUtil.tableEntry(
+                        HtmlUtil.bold(getLabel() + ":"),
+                        HtmlUtil.textArea(getFullName(), "", rows, columns)));
+            } else {
+                formBuffer.append(
+                    HtmlUtil.tableEntry(
+                        HtmlUtil.bold(getLabel() + ":"),
+                        HtmlUtil.input(
+                            getFullName(), "", "size=\"" + columns + "\"")));
+            }
+        }
+        formBuffer.append("\n");
     }
 
 
-public String getFullName () {
-    return table +"." + name;
-}
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getFullName() {
+        return table + "." + name;
+    }
 
 
-/**
-Set the Name property.
+    /**
+     * Set the Name property.
+     *
+     * @param value The new value for Name
+     */
+    public void setName(String value) {
+        name = value;
+    }
 
-@param value The new value for Name
-**/
-public void setName (String value) {
-	name = value;
-}
+    /**
+     * Get the Name property.
+     *
+     * @return The Name
+     */
+    public String getName() {
+        return name;
+    }
 
-/**
-Get the Name property.
+    /**
+     * Set the Label property.
+     *
+     * @param value The new value for Label
+     */
+    public void setLabel(String value) {
+        label = value;
+    }
 
-@return The Name
-**/
-public String getName () {
-	return name;
-}
+    /**
+     * Get the Label property.
+     *
+     * @return The Label
+     */
+    public String getLabel() {
+        return label;
+    }
 
-/**
-Set the Label property.
+    /**
+     * Set the Description property.
+     *
+     * @param value The new value for Description
+     */
+    public void setDescription(String value) {
+        description = value;
+    }
 
-@param value The new value for Label
-**/
-public void setLabel (String value) {
-	label = value;
-}
+    /**
+     * Get the Description property.
+     *
+     * @return The Description
+     */
+    public String getDescription() {
+        return description;
+    }
 
-/**
-Get the Label property.
+    /**
+     * Set the Type property.
+     *
+     * @param value The new value for Type
+     */
+    public void setType(String value) {
+        type = value;
+    }
 
-@return The Label
-**/
-public String getLabel () {
-	return label;
-}
+    /**
+     * Get the Type property.
+     *
+     * @return The Type
+     */
+    public String getType() {
+        return type;
+    }
 
-/**
-Set the Description property.
+    /**
+     * Set the IsIndex property.
+     *
+     * @param value The new value for IsIndex
+     */
+    public void setIsIndex(boolean value) {
+        isIndex = value;
+    }
 
-@param value The new value for Description
-**/
-public void setDescription (String value) {
-	description = value;
-}
-
-/**
-Get the Description property.
-
-@return The Description
-**/
-public String getDescription () {
-	return description;
-}
-
-/**
-Set the Type property.
-
-@param value The new value for Type
-**/
-public void setType (String value) {
-	type = value;
-}
-
-/**
-Get the Type property.
-
-@return The Type
-**/
-public String getType () {
-	return type;
-}
-
-/**
-Set the IsIndex property.
-
-@param value The new value for IsIndex
-**/
-public void setIsIndex (boolean value) {
-	isIndex = value;
-}
-
-/**
-Get the IsIndex property.
-
-@return The IsIndex
-**/
-public boolean getIsIndex () {
-	return isIndex;
-}
-
-
-/**
-Set the IsSearchable property.
-
-@param value The new value for IsSearchable
-**/
-public void setIsSearchable (boolean value) {
-	isSearchable = value;
-}
-
-/**
-Get the IsSearchable property.
-
-@return The IsSearchable
-**/
-public boolean getIsSearchable () {
-	return isSearchable;
-}
+    /**
+     * Get the IsIndex property.
+     *
+     * @return The IsIndex
+     */
+    public boolean getIsIndex() {
+        return isIndex;
+    }
 
 
+    /**
+     * Set the IsSearchable property.
+     *
+     * @param value The new value for IsSearchable
+     */
+    public void setIsSearchable(boolean value) {
+        isSearchable = value;
+    }
 
-/**
-Set the Values property.
+    /**
+     * Get the IsSearchable property.
+     *
+     * @return The IsSearchable
+     */
+    public boolean getIsSearchable() {
+        return isSearchable;
+    }
 
-@param value The new value for Values
-**/
-public void setValues (List value) {
-	values = value;
-}
 
-/**
-Get the Values property.
 
-@return The Values
-**/
-public List getValues () {
-	return values;
-}
+    /**
+     * Set the Values property.
+     *
+     * @param value The new value for Values
+     */
+    public void setValues(List value) {
+        values = value;
+    }
 
-/**
-Set the Dflt property.
+    /**
+     * Get the Values property.
+     *
+     * @return The Values
+     */
+    public List getValues() {
+        return values;
+    }
 
-@param value The new value for Dflt
-**/
-public void setDflt (String value) {
-	dflt = value;
-}
+    /**
+     * Set the Dflt property.
+     *
+     * @param value The new value for Dflt
+     */
+    public void setDflt(String value) {
+        dflt = value;
+    }
 
-/**
-Get the Dflt property.
-
-@return The Dflt
-**/
-public String getDflt () {
-	return dflt;
-}
+    /**
+     * Get the Dflt property.
+     *
+     * @return The Dflt
+     */
+    public String getDflt() {
+        return dflt;
+    }
 
 
 }

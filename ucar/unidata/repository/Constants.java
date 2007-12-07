@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -87,120 +88,149 @@ public interface Constants {
     public static final String ATTR_TYPE = "type";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_NODE = "node";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_EDGE = "edge";
 
+    /** _more_          */
     public static final String TAG_TAG = "tag";
 
+    /** _more_          */
     public static final String TAG_TAGS = "tags";
 
+    /** _more_          */
     public static final String TAG_METHOD = "method";
 
+    /** _more_          */
     public static final String ATTR_API_REQUEST = "request";
+
+    /** _more_          */
     public static final String ATTR_API_METHOD = "method";
+
+    /** _more_          */
     public static final String ATTR_API_ADMIN = "admin";
+
+    /** _more_          */
     public static final String ATTR_API_CANCACHE = "cancache";
 
+    /** _more_          */
     public static final String ATTR_RSS_VERSION = "version";
+
+    /** _more_          */
     public static final String TAG_RSS_RSS = "rss";
+
+    /** _more_          */
     public static final String TAG_RSS_CHANNEL = "channel";
+
+    /** _more_          */
     public static final String TAG_RSS_ITEM = "item";
+
+    /** _more_          */
     public static final String TAG_RSS_TITLE = "title";
+
+    /** _more_          */
     public static final String TAG_RSS_PUBDATE = "pubDate";
+
+    /** _more_          */
     public static final String TAG_RSS_DESCRIPTION = "description";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_FROM = "from";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TO = "to";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TITLE = "title";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_URLPATH = "urlPath";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_CATALOG = "catalog";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DATASET = "dataset";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_GROUPS = "groups";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_GROUP = "group";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TYPES = "types";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TYPE = "type";
 
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    /** _more_          */
     public static final String ARG_APPLET = "applet";
 
+    /** _more_          */
     public static final String ARG_USER = "user";
 
+    /** _more_          */
     public static final String ARG_TAG = "tag";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_WHAT = "what";
 
-    /** _more_          */
-    public static final String WHAT_QUERY= "query";
+    /** _more_ */
+    public static final String WHAT_QUERY = "query";
 
+    /** _more_          */
     public static final String WHAT_TYPE = "type";
 
+    /** _more_          */
     public static final String WHAT_TAG = "tag";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WHAT_USER = "user";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WHAT_GROUP = "group";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WHAT_PRODUCT = "product";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WHAT_STATION = "station";
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_MAX = "max";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_OUTPUT = "output";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_NAME = "name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ID = "id";
 
     /** _more_ */
     public static final String ARG_GROUP = "group";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_GROUPID = "groupid";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_GROUP_CHILDREN = "group_children";
 
     /** _more_ */
     public static final String ARG_CREATEDATE = "createdate";
 
+    /** _more_          */
     public static final String ARG_QUERY = "query";
 
     /** _more_ */
@@ -216,55 +246,84 @@ public interface Constants {
     public static final String ARG_STATION = "station";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String OUTPUT_HTML = "html";
 
+    /** _more_          */
     public static final String OUTPUT_RSS = "rss";
 
-    /** _more_          */
+    /** _more_ */
     public static final String OUTPUT_XML = "xml";
 
+    /** _more_          */
     public static final String OUTPUT_CATALOG = "xml";
 
-    /** _more_          */
+    /** _more_ */
     public static final String OUTPUT_CSV = "csv";
 
-    /** _more_          */
+    /** _more_ */
     public static final String OUTPUT_GRAPH = "graph";
 
-    /** _more_          */
+    /** _more_ */
     public static final String OUTPUT_CLOUD = "cloud";
 
+    /** _more_          */
     public static final String OUTPUT_ZIP = "zip";
 
-    /** _more_          */
+    /** _more_ */
     public static final String NODETYPE_ENTRY = "entry";
 
+    /** _more_          */
     public static final String TYPE_TAG = "tag";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_GROUP = "group";
 
+    /** _more_          */
     public static final String PROP_NAVLINKS = "udms.navlinks";
+
+    /** _more_          */
     public static final String PROP_NAVSUBLINKS = "udms.navsublinks";
 
+    /** _more_          */
     public static final String PROP_SHOW_APPLET = "udms.html.showapplet";
 
+    /** _more_          */
     public static final String PROP_HTML_URLBASE = "udms.html.urlbase";
+
+    /** _more_          */
     public static final String PROP_HTML_TEMPLATE = "udms.html.template";
 
+    /** _more_          */
     public static final String PROP_DB_CANCACHE = "udms.db.cancache";
 
+    /** _more_          */
     public static final String PROP_DB_DRIVER = "udms.db.driver";
+
+    /** _more_          */
     public static final String PROP_DB_URL = "udms.db.url";
-    public static final String PROP_DB_USER = "udms.db.user";    
+
+    /** _more_          */
+    public static final String PROP_DB_USER = "udms.db.user";
+
+    /** _more_          */
     public static final String PROP_DB_PASSWORD = "udms.db.password";
-    public static final String PROP_HTML_DOWNLOADENTRIESASFILES = "udms.html.downloadentriesasfiles";
+
+    /** _more_          */
+    public static final String PROP_HTML_DOWNLOADENTRIESASFILES =
+        "udms.html.downloadentriesasfiles";
 
 
+    /** _more_          */
     public static final String TAG_DB_ENTRY = "entry";
+
+    /** _more_          */
     public static final String TAG_DB_COLUMN = "column";
+
+    /** _more_          */
     public static final String ATTR_DB_NAME = "name";
+
+    /** _more_          */
     public static final String ATTR_DB_DESCRIPTION = "description";
 
 

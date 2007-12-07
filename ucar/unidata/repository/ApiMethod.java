@@ -20,102 +20,122 @@
 
 
 
+
 package ucar.unidata.repository;
 
-import java.util.Hashtable;
+
 import java.lang.reflect.Method;
+
+import java.util.Hashtable;
 
 
 /**
  */
 
 public class ApiMethod {
+
+    /** _more_          */
     private String request;
+
+    /** _more_          */
     private Permission permission;
+
+    /** _more_          */
     private Method method;
+
+    /** _more_          */
     private boolean canCache = false;
 
-    public ApiMethod(String request, Permission permission, Method method,boolean canCache) {
-        this.request = request;
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param permission _more_
+     * @param method _more_
+     * @param canCache _more_
+     */
+    public ApiMethod(String request, Permission permission, Method method,
+                     boolean canCache) {
+        this.request    = request;
         this.permission = permission;
-        this.method = method;
-        this.canCache = canCache;
+        this.method     = method;
+        this.canCache   = canCache;
     }
 
-/**
-Set the Request property.
+    /**
+     * Set the Request property.
+     *
+     * @param value The new value for Request
+     */
+    public void setRequest(String value) {
+        request = value;
+    }
 
-@param value The new value for Request
-**/
-public void setRequest (String value) {
-	request = value;
-}
+    /**
+     * Get the Request property.
+     *
+     * @return The Request
+     */
+    public String getRequest() {
+        return request;
+    }
 
-/**
-Get the Request property.
+    /**
+     * Set the Permission property.
+     *
+     * @param value The new value for Permission
+     */
+    public void setPermission(Permission value) {
+        permission = value;
+    }
 
-@return The Request
-**/
-public String getRequest () {
-	return request;
-}
+    /**
+     * Get the Permission property.
+     *
+     * @return The Permission
+     */
+    public Permission getPermission() {
+        return permission;
+    }
 
-/**
-Set the Permission property.
+    /**
+     * Set the Method property.
+     *
+     * @param value The new value for Method
+     */
+    public void setMethod(Method value) {
+        method = value;
+    }
 
-@param value The new value for Permission
-**/
-public void setPermission (Permission value) {
-	permission = value;
-}
-
-/**
-Get the Permission property.
-
-@return The Permission
-**/
-public Permission getPermission () {
-	return permission;
-}
-
-/**
-Set the Method property.
-
-@param value The new value for Method
-**/
-public void setMethod (Method value) {
-	method = value;
-}
-
-/**
-Get the Method property.
-
-@return The Method
-**/
-public Method getMethod () {
-	return method;
-}
-
-
+    /**
+     * Get the Method property.
+     *
+     * @return The Method
+     */
+    public Method getMethod() {
+        return method;
+    }
 
 
-/**
-Set the CanCache property.
 
-@param value The new value for CanCache
-**/
-public void setCanCache (boolean value) {
-	canCache = value;
-}
 
-/**
-Get the CanCache property.
+    /**
+     * Set the CanCache property.
+     *
+     * @param value The new value for CanCache
+     */
+    public void setCanCache(boolean value) {
+        canCache = value;
+    }
 
-@return The CanCache
-**/
-public boolean getCanCache () {
-	return canCache;
-}
+    /**
+     * Get the CanCache property.
+     *
+     * @return The CanCache
+     */
+    public boolean getCanCache() {
+        return canCache;
+    }
 
 
 

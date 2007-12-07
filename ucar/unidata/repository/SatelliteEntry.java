@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -52,6 +53,7 @@ public class SatelliteEntry extends Entry {
     private String resolution;
 
 
+    /** _more_          */
     private String product;
 
 
@@ -60,78 +62,84 @@ public class SatelliteEntry extends Entry {
      *
      *
      *
+     *
+     * @param id _more_
+     * @param typeHandler _more_
      * @param name _more_
      * @param description _more_
      * @param group _more_
+     * @param user _more_
      * @param file _more_
      * @param station _more_
+     * @param platform _more_
+     * @param resolution _more_
      * @param product _more_
      * @param date _more_
      */
-    public SatelliteEntry(String id, TypeHandler typeHandler,
-                          String name, String description, Group group,
-                         User user,
-                         String file, String platform, String resolution, String product, long date) {
-        super(id, typeHandler, name, description,  group, user, file,
-              new Date().getTime(), date,date);
-        this.platform = platform;
+    public SatelliteEntry(String id, TypeHandler typeHandler, String name,
+                          String description, Group group, User user,
+                          String file, String platform, String resolution,
+                          String product, long date) {
+        super(id, typeHandler, name, description, group, user, file,
+              new Date().getTime(), date, date);
+        this.platform   = platform;
         this.resolution = resolution;
-        this.product = product;
+        this.product    = product;
     }
 
-/**
-Set the Platform property.
+    /**
+     * Set the Platform property.
+     *
+     * @param value The new value for Platform
+     */
+    public void setPlatform(String value) {
+        platform = value;
+    }
 
-@param value The new value for Platform
-**/
-public void setPlatform (String value) {
-	platform = value;
-}
+    /**
+     * Get the Platform property.
+     *
+     * @return The Platform
+     */
+    public String getPlatform() {
+        return platform;
+    }
 
-/**
-Get the Platform property.
+    /**
+     * Set the Resolution property.
+     *
+     * @param value The new value for Resolution
+     */
+    public void setResolution(String value) {
+        resolution = value;
+    }
 
-@return The Platform
-**/
-public String getPlatform () {
-	return platform;
-}
+    /**
+     * Get the Resolution property.
+     *
+     * @return The Resolution
+     */
+    public String getResolution() {
+        return resolution;
+    }
 
-/**
-Set the Resolution property.
+    /**
+     * Set the Product property.
+     *
+     * @param value The new value for Product
+     */
+    public void setProduct(String value) {
+        product = value;
+    }
 
-@param value The new value for Resolution
-**/
-public void setResolution (String value) {
-	resolution = value;
-}
-
-/**
-Get the Resolution property.
-
-@return The Resolution
-**/
-public String getResolution () {
-	return resolution;
-}
-
-/**
-Set the Product property.
-
-@param value The new value for Product
-**/
-public void setProduct (String value) {
-	product = value;
-}
-
-/**
-Get the Product property.
-
-@return The Product
-**/
-public String getProduct () {
-	return product;
-}
+    /**
+     * Get the Product property.
+     *
+     * @return The Product
+     */
+    public String getProduct() {
+        return product;
+    }
 
 
 
