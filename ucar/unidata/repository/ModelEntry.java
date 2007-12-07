@@ -37,20 +37,20 @@ import java.util.List;
 
 
 /**
- * Class Level3RadarInfo _more_
+ * Class ModelEntry _more_
  *
  *
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Level3RadarInfo extends FilesInfo {
+public class ModelEntry extends Entry {
 
 
     /** _more_ */
-    private String station;
+    private String modelGroup;
 
-    /** _more_ */
-    private String product;
+    private String modelRun;
+
 
 
     /**
@@ -62,55 +62,56 @@ public class Level3RadarInfo extends FilesInfo {
      * @param description _more_
      * @param group _more_
      * @param file _more_
-     * @param station _more_
-     * @param product _more_
+     * @param model _more_
      * @param date _more_
      */
-    public Level3RadarInfo(String id, String name, String description, Group group,
+    public ModelEntry(String id, String name, String description, Group group,
                            User user,
-                           String file, String station, String product, long date) {
-        super(id, name, description, TypeHandler.TYPE_LEVEL3RADAR, group, user, file,
+                     String file,  String modelGroup,String modelRun, long date) {
+        super(id, name, description, TypeHandler.TYPE_MODEL, group, user, file,
               new Date().getTime(), date,date);
-        this.station = station;
-        this.product = product;
+        this.modelGroup = modelGroup;
+        this.modelRun = modelRun;
     }
 
 
 
     /**
-     * Set the Product property.
+     * Set the ModelGroupl property.
      *
-     * @param value The new value for Product
+     * @param value The new value for ModelGroupl
      */
-    public void setProduct(String value) {
-        product = value;
+    public void setModelGroup(String value) {
+        modelGroup = value;
     }
 
     /**
-     * Get the Product property.
+     * Get the ModelGroup property.
      *
-     * @return The Product
+     * @return The ModelGroup
      */
-    public String getProduct() {
-        return product;
+    public String getModelGroup() {
+        return modelGroup;
+    }
+
+
+
+    /**
+     * Set the ModelGroupl property.
+     *
+     * @param value The new value for Model
+     */
+    public void setModelRun(String value) {
+        modelRun = value;
     }
 
     /**
-     * Set the Station property.
+     * Get the ModelRun property.
      *
-     * @param value The new value for Station
+     * @return The ModelRun
      */
-    public void setStation(String value) {
-        station = value;
-    }
-
-    /**
-     * Get the Station property.
-     *
-     * @return The Station
-     */
-    public String getStation() {
-        return station;
+    public String getModelRun() {
+        return modelRun;
     }
 
 

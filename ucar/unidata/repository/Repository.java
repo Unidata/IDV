@@ -85,7 +85,11 @@ public class Repository implements Constants, Tables {
     private static final int PAGE_CACHE_LIMIT = 100;
 
     private Harvester harvester;
+
     private Properties mimeTypes;
+
+    /** _more_ */
+    private Properties productMap;
 
     private Properties  properties = new Properties();
 
@@ -184,10 +188,10 @@ public class Repository implements Constants, Tables {
         Class []paramTypes = new Class[]{Request.class};
         Method method = Misc.findMethod(getClass(),methodName, paramTypes);
         if(method == null) throw new IllegalArgumentException ("Unknown request method:" + methodName);
-        EntryPoint entryPoint=  new EntryPoint(request, permission, method,canCache);
-        api.add(entryPoint);
-        requestMap.put(request, entryPoint);
-        requestMap.put(getUrlBase()+request, entryPoint);
+        ApiMethod apiMethod  =new ApiMethod(request, permission, method,canCache);
+        api.add(apiMethod);
+        requestMap.put(request, apiMethod);
+        requestMap.put(getUrlBase()+request, apiMethod);
     }
 
     protected void initRequests() throws Exception {
@@ -227,25 +231,25 @@ public class Repository implements Constants, Tables {
             incoming = incoming.substring(getUrlBase().length());
         }
         User user = request.getRequestContext().getUser();
-        EntryPoint entryPoint = (EntryPoint)requestMap.get(incoming);
-        if(entryPoint == null) {
+        ApiMethod apiMethod = (ApiMethod)requestMap.get(incoming);
+        if(apiMethod == null) {
             incoming = incoming;
             for(int i=0;i<api.size();i++) {
-                EntryPoint tmp = (EntryPoint) api.get(i);
+                ApiMethod tmp = (ApiMethod) api.get(i);
                 String path = tmp.getRequest();
                 if(path.endsWith("/*")) {
                     path = path.substring(0,path.length()-2);
                     //                    System.err.println (path +":"+incoming);
                     if(incoming.startsWith(path)) {
-                        entryPoint = tmp;
+                        apiMethod = tmp;
                         break;
                     }
                 }
             }
         }
         Result result = null;
-        if(entryPoint!=null) {
-            if(canCache() && entryPoint.getCanCache()) {
+        if(apiMethod!=null) {
+            if(canCache() && apiMethod.getCanCache()) {
                 result = (Result) pageCache.get(request);
                 //                System.err.println("from cache:" + request.getType() +  " " +(result!=null));
                 if(result!=null) {
@@ -254,13 +258,13 @@ public class Repository implements Constants, Tables {
                 }
             }
             if(result == null) {
-                if(!entryPoint.getPermission().isRequestOk(request, this)) {
+                if(!apiMethod.getPermission().isRequestOk(request, this)) {
                     result =  new Result("Error",new StringBuffer("Access Violation"));
                 } else {
                     if(connection ==null && !incoming.startsWith("/admin")) {
                         result =  new Result("No Database",new StringBuffer("Database is shutdown"));
                     } else {
-                        result =(Result) entryPoint.getMethod().invoke(this, new Object[]{request});
+                        result =(Result) apiMethod.getMethod().invoke(this, new Object[]{request});
                     }
                 }
             }
@@ -268,7 +272,7 @@ public class Repository implements Constants, Tables {
             //            result = new Result("Unknown Request",new StringBuffer("Unknown request:" + request.getType()));
         }
         if(result!=null) {
-            if(canCache() && entryPoint.getCanCache()) {
+            if(canCache() && apiMethod.getCanCache()) {
                 pageCache.put(request,result);
                 pageCacheList.add(request);
                 while(pageCacheList.size()>PAGE_CACHE_LIMIT) {
@@ -347,25 +351,20 @@ public class Repository implements Constants, Tables {
                                 getClass());
         Statement statement = connection.createStatement();
         SqlUtil.loadSql(sql, statement, true);
-        //        loadLevel3RadarFiles();
-        //        loadTestFiles();
-        //        loadModelFiles();
-        //        loadTestData();
+        makeUserIfNeeded(new User("jdoe", "John Doe", true));
+        makeUserIfNeeded(new User("jsmith", "John Smith", false));
+        loadTestData();
     }
 
     public void loadTestData() throws Exception {
-        ResultSet results = execute("select count(*) from files").getResultSet();
+        ResultSet results = execute("select count(*) from " + TABLE_ENTRIES).getResultSet();
         results.next();
-        makeUserIfNeeded(new User("jdoe", "John Doe", true));
-        makeUserIfNeeded(new User("jsmith", "John Smith", false));
-        System.err.println ("Adding test data");
-        loadTestFiles();
-        loadSatelliteFiles();
-        loadLevel3RadarFiles();
-        loadLevel2RadarFiles();
         if(results.getInt(1)==0) {
-            //            loadLevel3RadarFiles();
-            //            loadTestFiles();
+            System.err.println ("Adding test data");
+            loadTestFiles();
+            loadSatelliteFiles();
+            loadLevel3RadarFiles();
+            loadLevel2RadarFiles();
         }
     }
 
@@ -607,7 +606,7 @@ public class Repository implements Constants, Tables {
 
         String what = (String) request.get(ARG_WHAT);
             List whatList = Misc.toList(new Object[]{
-                new TwoFacedObject("Files",WHAT_QUERY),
+                new TwoFacedObject("Entries",WHAT_QUERY),
                 new TwoFacedObject("Data Types",WHAT_TYPE),
                 new TwoFacedObject("Groups",WHAT_GROUP),
                 new TwoFacedObject("Tags",WHAT_TAG),
@@ -673,7 +672,7 @@ public class Repository implements Constants, Tables {
     protected List getSearchFormLinks(Request request) {
         List links = new ArrayList();
         String extra  = " style=\" font-family: Arial, Helvetica, sans-serif;  font-weight: bold; color:#ffffff;\" class=\"navtitle\"";
-        links.add(href("/searchform?what="+WHAT_QUERY, "Files", extra));
+        links.add(href("/searchform?what="+WHAT_QUERY, "Entries", extra));
         links.add(href("/searchform?what="+WHAT_TYPE, "Data Types", extra));
         links.add(href("/searchform?what="+WHAT_GROUP, "Groups", extra));
         links.add(href("/searchform?what="+WHAT_TAG, "Tags", extra));
@@ -764,49 +763,32 @@ public class Repository implements Constants, Tables {
 
 
     
-    public Result getFile(Request request) throws Exception {
+    public Result fetchFile(Request request) throws Exception {
         String fileId = (String) request.get(ARG_ID);
         if (fileId == null) {
             throw new IllegalArgumentException("No " + ARG_ID + " given");
         }
-        StringBuffer sb = new StringBuffer();
-        String query = SqlUtil.makeSelect(COL_FILES_FILE, Misc.newList(TABLE_FILES),SqlUtil.eq(COL_FILES_ID,
-                                                                     SqlUtil.quote(fileId)));
-        ResultSet results = execute(query).getResultSet();
-        if ( !results.next()) {
-            throw new IllegalArgumentException("Given file id:" + fileId
-                    + " is not in database");
+        Entry entry =  getFile(fileId,request);
+        if(entry==null) {
+            throw new IllegalArgumentException("Could not find file");
         }
-        String fileName = results.getString(1);
         String contents =  IOUtil.readContents(
-                                               fileName, getClass());
-        return new Result("", new StringBuffer(contents),IOUtil.getFileExtension(fileName));
+                                               entry.getFile(), getClass());
+        return new Result("", new StringBuffer(contents),IOUtil.getFileExtension(entry.getFile()));
     }
 
-    protected FilesInfo findFile(String fileId) throws Exception {
-        String query = SqlUtil.makeSelect(COLUMNS_FILES,
-                                          Misc.newList(TABLE_FILES),
-                                          SqlUtil.eq(COL_FILES_ID,
+
+    protected Entry getFile(String fileId, Request request) throws Exception {
+        String query = SqlUtil.makeSelect(COLUMNS_ENTRIES,
+                                          Misc.newList(TABLE_ENTRIES),
+                                          SqlUtil.eq(COL_ENTRIES_ID,
                                                      SqlUtil.quote(fileId)));
         ResultSet results = execute(query).getResultSet();
         if ( !results.next()) {
-            throw new IllegalArgumentException("Given file id:" + fileId
-                    + " is not in database");
+            return null;
         }
-        int    col = 1;
-        //id,name,desc,type,group,user,file,createdata,fromdate,todate
-        FilesInfo filesInfo =
-            new FilesInfo(results.getString(col++),
-                          results.getString(col++), 
-                          results.getString(col++),
-                          results.getString(col++),
-                          findGroup(results.getString(col++)),
-                          findUser(results.getString(col++)),
-                          results.getString(col++),
-                          results.getDate(col++).getTime(),
-                          results.getDate(col++).getTime(),
-                          results.getDate(col++).getTime());
-        return filesInfo;
+        TypeHandler typeHandler = getTypeHandler(results.getString(4));
+        return filterEntry(request,typeHandler.getEntry(results));
     }
 
 
@@ -819,42 +801,56 @@ public class Repository implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public Result showFile(Request request) throws Exception {
+    public Result showEntry(Request request) throws Exception {
         String fileId = (String) request.get(ARG_ID);
         if (fileId == null) {
             throw new IllegalArgumentException("No " + ARG_ID + " given");
         }
-        StringBuffer sb = new StringBuffer();
-        FilesInfo filesInfo = findFile(fileId);
-        TypeHandler typeHandler = getTypeHandler(filesInfo.getType());
-        return typeHandler.showFile(filesInfo, request);
+        Entry entry = getFile(fileId, request);
+        if(entry==null) {
+            throw new IllegalArgumentException("Could not find file");
+        }
+        return getTypeHandler(entry.getType()).showEntry(entry, request);
     }
 
 
-    public List<FilesInfo> filterFiles(Request request,List<FilesInfo> files) throws Exception {
+    public Entry filterEntry(Request request,Entry file) throws Exception {
         //TODO: Check for access
-        return files;
+        return file;
     }
 
 
-    public Result getFiles(Request request) throws Exception {
-        StringBuffer sb = new StringBuffer();
-        List<FilesInfo> files = new ArrayList();
+    public List<Entry> filterEntries(Request request,List<Entry> entries) throws Exception {
+        List<Entry> filtered = new ArrayList();
+        for(Entry entry: entries) {
+            entry = filterEntry(request,entry);
+            if(entry!=null) {
+                filtered.add(entry);
+            }
+        }
+        return filtered;
+    }
+
+
+    public Result fetchEntries(Request request) throws Exception {
+        List<Entry> entries = new ArrayList();
         for (Enumeration keys = request.getParameters().keys();
                     keys.hasMoreElements(); ) {
             String id = (String) keys.nextElement();
             if(!Misc.equals(request.get(id), "true")) continue;
             if(!id.startsWith("file_")) continue;
             id = id.substring("file_".length());
-            files.add(findFile(id));
+            Entry entry = getFile(id,request);
+            if(entry!=null) {
+                entries.add(entry);
+            }
         }
-
-        files = filterFiles(request,files);
+        entries = filterEntries(request,entries);
         String       output = getValue(request, ARG_OUTPUT, OUTPUT_CATALOG);
         if(output.equals(OUTPUT_CATALOG)) {
-            return toCatalog(request, files,"Directory Listing");
+            return toCatalog(request, entries,"Directory Listing");
         } else if(output.equals(OUTPUT_ZIP)) {
-            return toZip(request, files);
+            return toZip(request, entries);
         } else {
             throw new IllegalArgumentException("Unknown output type:"
                     + output);
@@ -906,7 +902,7 @@ public class Repository implements Constants, Tables {
             if (topLevel) {
                 sb.append(HtmlUtil.bold("Top Level Groups") + "<ul>");
             }
-        } else if (output.equals(OUTPUT_CATALOG)) {
+        } else if (output.equals(OUTPUT_XML)) {
             sb.append(XmlUtil.XML_HEADER + "\n");
             sb.append(XmlUtil.openTag(TAG_CATALOG,
                                       XmlUtil.attrs(ATTR_NAME,
@@ -968,17 +964,13 @@ public class Repository implements Constants, Tables {
                 sb.append("</ul>");
             }
 
-            where.add(SqlUtil.eq(COL_FILES_GROUP_ID,
+            where.add(SqlUtil.eq(COL_ENTRIES_GROUP_ID,
                                  SqlUtil.quote(group.getId())));
             String query =
-                SqlUtil.makeSelect(SqlUtil.comma(COL_FILES_ID,
-                    COL_FILES_NAME, COL_FILES_TYPE,
-                    COL_FILES_FILE), typeHandler.getTablesForQuery(request),
+                SqlUtil.makeSelect(SqlUtil.comma(COL_ENTRIES_ID,
+                    COL_ENTRIES_NAME, COL_ENTRIES_TYPE,
+                    COL_ENTRIES_FILE), typeHandler.getTablesForQuery(request),
                                      SqlUtil.makeAnd(where));
-            //            List<FilesInfo>
-                //            Files  xxxxxreturn getFilesInfos(request, query);
-
-
             Statement        stmt = execute(query);
             SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
             ResultSet        results;
@@ -996,10 +988,10 @@ public class Repository implements Constants, Tables {
                     String file = results.getString(col++);
                     if (cnt == 1) {
                         sb.append("\n");
-                        sb.append(HtmlUtil.bold("Files:"));
+                        sb.append(HtmlUtil.bold("Entries:"));
                         sb.append("<br>");
                         sb.append(HtmlUtil.form("/getfiles","getfiles"));
-                        sb.append(HtmlUtil.submit("Get Select Files"));
+                        sb.append(HtmlUtil.submit("Get Selected Entries"));
                         List outputList = Misc.toList(new Object[]{
                             new TwoFacedObject("As catalog",OUTPUT_XML),
                             new TwoFacedObject("As zip file",OUTPUT_ZIP)});
@@ -1009,7 +1001,7 @@ public class Repository implements Constants, Tables {
                     }
 
                     sb.append("<li>" + HtmlUtil.checkbox("file_" + id,"true") +" " 
-                              + href(HtmlUtil.url("/showfile", ARG_ID, id),
+                              + href(HtmlUtil.url("/showentry", ARG_ID, id),
                                      name));
                     sb.append("\n");
                 }
@@ -1073,7 +1065,7 @@ public class Repository implements Constants, Tables {
         String fileType = results.getString(col++);
         String groupId  = results.getString(col++);
         String file     = results.getString(col++);
-        String nodeType = TYPE_FILE;
+        String nodeType = NODETYPE_ENTRY;
         if (fileType.equals(TypeHandler.TYPE_LEVEL3RADAR)) {
             nodeType = TypeHandler.TYPE_LEVEL3RADAR;
         }
@@ -1112,10 +1104,10 @@ public class Repository implements Constants, Tables {
         StringBuffer sb = new StringBuffer();
         if (type.equals(TYPE_TAG)) {
             String query =
-                SqlUtil.makeSelect(SqlUtil.comma(COL_FILES_ID, 
-                    COL_FILES_NAME, COL_FILES_TYPE, COL_FILES_GROUP_ID,
-                    COL_FILES_FILE), Misc.newList(TABLE_FILES,TABLE_TAGS),
-                                   SqlUtil.eq(COL_TAGS_FILE_ID, COL_FILES_ID) +" AND " +
+                SqlUtil.makeSelect(SqlUtil.comma(COL_ENTRIES_ID, 
+                    COL_ENTRIES_NAME, COL_ENTRIES_TYPE, COL_ENTRIES_GROUP_ID,
+                    COL_ENTRIES_FILE), Misc.newList(TABLE_ENTRIES,TABLE_TAGS),
+                                   SqlUtil.eq(COL_TAGS_FILE_ID, COL_ENTRIES_ID) +" AND " +
                                    SqlUtil.eq(COL_TAGS_NAME, SqlUtil.quote(id))); 
 
             //            System.err.println ("tag query:" + query);
@@ -1143,15 +1135,15 @@ public class Repository implements Constants, Tables {
         }
 
         if ( !type.equals(TYPE_GROUP)) {
-            String filesQuery =
-                SqlUtil.makeSelect(SqlUtil.comma(COL_FILES_ID,
-                    COL_FILES_NAME, COL_FILES_TYPE, COL_FILES_GROUP_ID,
-                    COL_FILES_FILE), Misc.newList(TABLE_FILES),
-                                     SqlUtil.eq(COL_FILES_ID,
+            String entriesQuery =
+                SqlUtil.makeSelect(SqlUtil.comma(COL_ENTRIES_ID,
+                    COL_ENTRIES_NAME, COL_ENTRIES_TYPE, COL_ENTRIES_GROUP_ID,
+                    COL_ENTRIES_FILE), Misc.newList(TABLE_ENTRIES),
+                                     SqlUtil.eq(COL_ENTRIES_ID,
                                          SqlUtil.quote(id)));
 
 
-            ResultSet results = execute(filesQuery).getResultSet();
+            ResultSet results = execute(entriesQuery).getResultSet();
             if ( !results.next()) {
                 throw new IllegalArgumentException("Unknown file id:" + id);
             }
@@ -1229,10 +1221,10 @@ public class Repository implements Constants, Tables {
                                       ATTR_TO, subGroup.getFullName())));
         }
 
-        String query = SqlUtil.makeSelect(SqlUtil.comma(COL_FILES_ID,
-                           COL_FILES_NAME, COL_FILES_TYPE,
-                           COL_FILES_GROUP_ID, COL_FILES_FILE), Misc.newList(TABLE_FILES),
-                               SqlUtil.eq(COL_FILES_GROUP_ID,
+        String query = SqlUtil.makeSelect(SqlUtil.comma(COL_ENTRIES_ID,
+                           COL_ENTRIES_NAME, COL_ENTRIES_TYPE,
+                           COL_ENTRIES_GROUP_ID, COL_ENTRIES_FILE), Misc.newList(TABLE_ENTRIES),
+                               SqlUtil.eq(COL_ENTRIES_GROUP_ID,
                                           SqlUtil.quote(group.getId())));
         SqlUtil.Iterator iter = SqlUtil.getIterator(execute(query));
         ResultSet        results;
@@ -1271,7 +1263,7 @@ public class Repository implements Constants, Tables {
         TypeHandler typeHandler = getTypeHandler(request);
         List        where       = typeHandler.assembleWhereClause(request);
         String query =
-            SqlUtil.makeSelect(SqlUtil.distinct(COL_FILES_GROUP_ID),
+            SqlUtil.makeSelect(SqlUtil.distinct(COL_ENTRIES_GROUP_ID),
                                typeHandler.getTablesForQuery(request),
                                SqlUtil.makeAnd(where));
 
@@ -1336,7 +1328,7 @@ public class Repository implements Constants, Tables {
         TypeHandler typeHandler = getTypeHandler(request);
         List        where       = typeHandler.assembleWhereClause(request);
         String query =
-            SqlUtil.makeSelect(SqlUtil.distinct(COL_FILES_TYPE),
+            SqlUtil.makeSelect(SqlUtil.distinct(COL_ENTRIES_TYPE),
                                typeHandler.getTablesForQuery(request),
                                SqlUtil.makeAnd(where));
 
@@ -1430,7 +1422,7 @@ public class Repository implements Constants, Tables {
         List        where       = typeHandler.assembleWhereClause(request);
         List tables = Misc.newList(TABLE_TAGS);
         if(where.size()>0) {
-            where.add(0,SqlUtil.eq(COL_TAGS_FILE_ID, COL_FILES_ID));
+            where.add(0,SqlUtil.eq(COL_TAGS_FILE_ID, COL_ENTRIES_ID));
             tables.addAll(typeHandler.getTablesForQuery(request));
         }
 
@@ -1463,13 +1455,8 @@ public class Repository implements Constants, Tables {
             int count = counts.get(i).intValue();
             if (output.equals(OUTPUT_HTML)) {
                 sb.append("<li>");
-                String search = href(HtmlUtil.url(
-                                 "/searchform", ARG_TAG, 
-                                 java.net.URLEncoder.encode(tag)), HtmlUtil.img(
-                                                                urlBase + "/Search16.gif"));
                 sb.append(tag);
-                sb.append("(" + count +") ");
-                sb.append(search);
+                sb.append("(" + count +")");
                 if(isAppletEnabled(request)) {
                     sb.append(href(HtmlUtil.url("/graphview", "id", tag, "type", TYPE_TAG), 
                                    HtmlUtil.img(urlBase + "/tree.gif", "alt=\"Show tag in graph\" title=\"Show file in graph\" ")));
@@ -1804,44 +1791,30 @@ public class Repository implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    protected List<FilesInfo> getFilesInfos(Request request) throws Exception {
+    protected List<Entry> getEntries(Request request) throws Exception {
         TypeHandler typeHandler = getTypeHandler(request);
         List        where       = typeHandler.assembleWhereClause(request);
         String query =
-            SqlUtil.makeSelect(COLUMNS_FILES, typeHandler.getTablesForQuery(request),
+            SqlUtil.makeSelect(COLUMNS_ENTRIES, typeHandler.getTablesForQuery(request),
                                        SqlUtil.makeAnd(where),
-                                       "order by " + COL_FILES_FROMDATE);
-        return getFilesInfos(request, query);
-    }
-
-    protected List<FilesInfo> getFilesInfos(Request request, String query) throws Exception {
+                                       "order by " + COL_ENTRIES_FROMDATE);
+        //        System.err.println("Query:"+ query);
         Statement        statement = execute(query, getMax(request));
-        List<FilesInfo>   filesInfos = new ArrayList<FilesInfo>();
+        List<Entry>   entries = new ArrayList<Entry>();
         ResultSet        results;
         SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                int    col = 1;
                 //id,name,desc,type,group,user,file,createdata,fromdate,todate
-                FilesInfo filesInfo =
-                    new FilesInfo(results.getString(col++),results.getString(col++),
-                                 results.getString(col++),
-                                 results.getString(col++),
-                                 findGroup(results.getString(col++)),
-                                 findUser(results.getString(col++)),
-                                 results.getString(col++),
-                                 results.getTimestamp(col++).getTime(),
-                                 results.getTimestamp(col++).getTime(),
-                                  results.getTimestamp(col++).getTime());
-                filesInfos.add(filesInfo);
+                TypeHandler localTypeHandler = getTypeHandler(results.getString(4));
+                entries.add(localTypeHandler.getEntry(results));
             }
         }
-        return filesInfos;
+        return entries;
     }
 
 
-    /** _more_ */
-    Properties productMap;
+
 
 
     /**
@@ -1901,18 +1874,18 @@ public class Repository implements Constants, Tables {
                                                                 urlBase + "/tree.gif"));
     }
 
-    protected String getGraphLink (Request request, FilesInfo filesInfo) {
+    protected String getGraphLink (Request request, Entry entry) {
         if(!isAppletEnabled(request)) return "";
-        return href(HtmlUtil.url("/graphview", "id", filesInfo.getId(), "type", filesInfo.getType()), 
+        return href(HtmlUtil.url("/graphview", "id", entry.getId(), "type", entry.getType()), 
             HtmlUtil.img(urlBase + "/tree.gif", "alt=\"Show file in graph\" title=\"Show file in graph\" "));
     }
 
-    protected String getFileFetchLink(FilesInfo filesInfo) {
-        if(getProperty(PROP_HTML_DOWNLOADFILESASFILES,false)) {
-            return HtmlUtil.href("file://" + filesInfo.getFile(),
+    protected String getFileFetchLink(Entry entry) {
+        if(getProperty(PROP_HTML_DOWNLOADENTRIESASFILES,false)) {
+            return HtmlUtil.href("file://" + entry.getFile(),
                                 HtmlUtil.img(href("/Fetch.gif"),"alt=\"Download file\"  title=\"Download file\"  "));
         } else {
-            return href(HtmlUtil.url("/fetch/" + filesInfo.getName(),"id",filesInfo.getId()),HtmlUtil.img(href("/Fetch.gif"),"alt=\"Download file\"  title=\"Download file\"  "));
+            return href(HtmlUtil.url("/fetch/" + entry.getName(),"id",entry.getId()),HtmlUtil.img(href("/Fetch.gif"),"alt=\"Download file\"  title=\"Download file\"  "));
         }
     }
 
@@ -1939,18 +1912,18 @@ public class Repository implements Constants, Tables {
             "/ucar/unidata/repository/timelineapplet.html", getClass());
         List           times     = new ArrayList();
         List           labels    = new ArrayList();
-        List<FilesInfo> filesInfos = getFilesInfos(request);
+        List<Entry> entries = getEntries(request);
 
 
         StringBuffer   sb        = new StringBuffer();
         String         output    = getValue(request, ARG_OUTPUT, OUTPUT_HTML);
         if (output.equals(OUTPUT_CATALOG)) {
-            return toCatalog(request, filesInfos, "Query Results");
+            return toCatalog(request, entries, "Query Results");
         }
 
         if (output.equals(OUTPUT_HTML)) {
             sb.append("<h2>Query Results</h2>");
-            if(filesInfos.size()==0) {
+            if(entries.size()==0) {
                 sb.append("<b>Nothing Found</b><p>");
             }
             sb.append("<table>");
@@ -1969,35 +1942,35 @@ public class Repository implements Constants, Tables {
 
 
         StringBufferCollection sbc = new StringBufferCollection();
-        for (FilesInfo filesInfo : filesInfos) {
-            times.add(SqlUtil.format(new Date(filesInfo.getStartDate())));
-            labels.add(filesInfo.getName());
-            StringBuffer ssb = sbc.getBuffer(filesInfo.getType());
+        for (Entry entry : entries) {
+            times.add(SqlUtil.format(new Date(entry.getStartDate())));
+            labels.add(entry.getName());
+            StringBuffer ssb = sbc.getBuffer(entry.getType());
             if (output.equals(OUTPUT_HTML)) {
-                String links = HtmlUtil.checkbox("file_" + filesInfo.getId(),"true") +" " +
-                getFileFetchLink(filesInfo) +" " +getGraphLink(request,filesInfo);
-                ssb.append(HtmlUtil.row(links+" " + href(HtmlUtil.url("/showfile", ARG_ID, filesInfo.getId()),
-                                                         filesInfo.getName()), 
-                                        "" + new Date(filesInfo.getStartDate())));
+                String links = HtmlUtil.checkbox("file_" + entry.getId(),"true") +" " +
+                getFileFetchLink(entry) +" " +getGraphLink(request,entry);
+                ssb.append(HtmlUtil.row(links+" " + href(HtmlUtil.url("/showentry", ARG_ID, entry.getId()),
+                                                         entry.getName()), 
+                                        "" + new Date(entry.getStartDate())));
             } else if (output.equals(OUTPUT_RSS)) {
                 sb.append(XmlUtil.openTag(TAG_RSS_ITEM));
                 sb.append(XmlUtil.tag(TAG_RSS_PUBDATE,"",
-                                      "" + new Date(filesInfo.getStartDate())));
+                                      "" + new Date(entry.getStartDate())));
                 sb.append(XmlUtil.tag(TAG_RSS_TITLE,"",
-                                      filesInfo.getName()));
+                                      entry.getName()));
                 sb.append(XmlUtil.tag(TAG_RSS_DESCRIPTION,"",
-                                      filesInfo.getDescription()));
+                                      entry.getDescription()));
                 sb.append(XmlUtil.closeTag(TAG_RSS_ITEM));
                 //      <link>http://earthquake.usgs.gov/eqcenter/recenteqsww/Quakes/us2007kmae.php</link>
             } else if (output.equals(OUTPUT_CSV)) {
-                sb.append(SqlUtil.comma(filesInfo.getId(),
-                                        filesInfo.getFile()));
+                sb.append(SqlUtil.comma(entry.getId(),
+                                        entry.getFile()));
             }
         }
 
 
         if (output.equals(OUTPUT_HTML)) {
-            if(filesInfos.size()>0) {
+            if(entries.size()>0) {
                 String tmp = StringUtil.replace(timelineAppletTemplate, "%times%",
                                                 StringUtil.join(",", times));
                 tmp = StringUtil.replace(tmp, "%labels%",
@@ -2007,7 +1980,7 @@ public class Repository implements Constants, Tables {
                 }
             }
             sb.append(HtmlUtil.form("/getfiles","getfiles"));
-            sb.append(HtmlUtil.submit("Get Files"));
+            sb.append(HtmlUtil.submit("Get Entries"));
             sb.append("<br>");
         }
         for (int i = 0; i < sbc.getKeys().size(); i++) {
@@ -2034,15 +2007,12 @@ public class Repository implements Constants, Tables {
 
 
 
-    protected Result toZip(Request request, List<FilesInfo> files) throws Exception {
-        if(files.size()==0) {
-            return new  Result("No files selected",new StringBuffer("No files selected"),getMimeType(".html"));
-        }
+    protected Result toZip(Request request, List<Entry> entries) throws Exception {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ZipOutputStream zos = new ZipOutputStream(bos);
         Hashtable seen =new Hashtable();
-        for (FilesInfo fileInfo: files) {
-            String path = fileInfo.getFile();
+        for (Entry entry: entries) {
+            String path = entry.getFile();
             String name  = IOUtil.getFileTail(path);
             int cnt = 1;
             while(seen.get(name)!=null) {
@@ -2060,35 +2030,21 @@ public class Repository implements Constants, Tables {
     }
 
 
-    protected Result toCatalog(Request request, List items, String title) throws Exception {
+    protected Result toCatalog(Request request, List<Entry> entries, String title) throws Exception {
         StringBuffer   sb        = new StringBuffer();
         sb.append(XmlUtil.XML_HEADER + "\n");
         sb.append(XmlUtil.openTag(TAG_CATALOG,
                                   XmlUtil.attrs(ATTR_NAME,title)));
         StringBufferCollection sbc = new StringBufferCollection();
-        for(int i=0;i<items.size();i++) {
-            Object o = items.get(i);
-            if(o instanceof Group) {
-                Group g = (Group) o;
-                sb.append(XmlUtil.tag("catalogRef", 
-                                      XmlUtil.attrs("xlink:title",g.getFullName(),
-                                                    "xlink:href",
-                                                    href(HtmlUtil.url(
-                                                                      "/showgroup", ARG_GROUP,
-                                                                      g.getFullName(),
-                                                                      ARG_OUTPUT,
-                                                                      OUTPUT_CATALOG)))));
-            } else  if(o instanceof FilesInfo) {
-                FilesInfo filesInfo = (FilesInfo) o;
-                StringBuffer ssb = sbc.getBuffer(filesInfo.getType());
-                ssb.append(
-                           XmlUtil.tag(
-                                       TAG_DATASET,
-                                       XmlUtil.attrs(
-                                                     ATTR_NAME,
-                                                     "" + new Date(filesInfo.getStartDate()),
-                                                     ATTR_URLPATH, filesInfo.getFile())));
-            }
+        for (Entry entry : entries) {
+            StringBuffer ssb = sbc.getBuffer(entry.getType());
+            ssb.append(
+                       XmlUtil.tag(
+                                   TAG_DATASET,
+                                   XmlUtil.attrs(
+                                                 ATTR_NAME,
+                                                 "" + new Date(entry.getStartDate()),
+                                                 ATTR_URLPATH, entry.getFile())));
         }
 
         for (int i = 0; i < sbc.getKeys().size(); i++) {
@@ -2106,22 +2062,22 @@ public class Repository implements Constants, Tables {
 
 
 
-    protected void setStatement(FilesInfo filesInfo, PreparedStatement statement) throws Exception {
+    protected void setStatement(Entry entry, PreparedStatement statement) throws Exception {
         int    col = 1;
         //id,name,desc,type,group,user,file,createdata,fromdate,todate
-        statement.setString(col++, filesInfo.getId());
-        statement.setString(col++, filesInfo.getName());
-        statement.setString(col++, filesInfo.getDescription());
-        statement.setString(col++, filesInfo.getType());
-        statement.setString(col++, filesInfo.getGroupId());
-        statement.setString(col++, filesInfo.getUser().getId());
-        statement.setString(col++, filesInfo.getFile().toString());
+        statement.setString(col++, entry.getId());
+        statement.setString(col++, entry.getName());
+        statement.setString(col++, entry.getDescription());
+        statement.setString(col++, entry.getType());
+        statement.setString(col++, entry.getGroupId());
+        statement.setString(col++, entry.getUser().getId());
+        statement.setString(col++, entry.getFile().toString());
         statement.setTimestamp(
                                  col++, new java.sql.Timestamp(currentTime()));
         statement.setTimestamp(
-                                 col++, new java.sql.Timestamp(filesInfo.getStartDate()));
+                                 col++, new java.sql.Timestamp(entry.getStartDate()));
         statement.setTimestamp(
-                                 col++, new java.sql.Timestamp(filesInfo.getStartDate()));
+                                 col++, new java.sql.Timestamp(entry.getStartDate()));
     }
 
 
@@ -2135,19 +2091,19 @@ public class Repository implements Constants, Tables {
      */
     public void loadLevel3RadarFiles() throws Exception {
         File            rootDir = new File("/data/ldm/gempak/nexrad/NIDS");
-        List<Level3RadarInfo> files   = harvester.collectLevel3radarFiles(rootDir, "IDD");
+        List<Level3RadarEntry> files   = harvester.collectLevel3radarFiles(rootDir, "IDD");
         //        files.addAll(collectLevel3radarFiles(rootDir, "LDM/LDM2"));
         System.err.println("Inserting:" + files.size() + " radar files");
         long t1  = System.currentTimeMillis();
         int  cnt = 0;
-        PreparedStatement filesInsert =
-            connection.prepareStatement(INSERT_FILES);
+        PreparedStatement entryInsert =
+            connection.prepareStatement(INSERT_ENTRIES);
         PreparedStatement radarInsert =
             connection.prepareStatement(INSERT_LEVEL3RADAR);
 
         int batchCnt = 0;
         connection.setAutoCommit(false);
-        for (Level3RadarInfo radarInfo : files) {
+        for (Level3RadarEntry radarEntry : files) {
             if ((++cnt) % 10000 == 0) {
                 long   tt2      = System.currentTimeMillis();
                 double tseconds = (tt2 - t1) / 1000.0;
@@ -2156,23 +2112,23 @@ public class Repository implements Constants, Tables {
             }
 
             String id  = getGUID();
-            radarInfo.setId(id);
-            setStatement(radarInfo, filesInsert);
-            filesInsert.addBatch();
+            radarEntry.setId(id);
+            setStatement(radarEntry, entryInsert);
+            entryInsert.addBatch();
             int col = 1;
-            radarInsert.setString(col++, radarInfo.getId());
-            radarInsert.setString(col++, radarInfo.getStation());
-            radarInsert.setString(col++, radarInfo.getProduct());
+            radarInsert.setString(col++, radarEntry.getId());
+            radarInsert.setString(col++, radarEntry.getStation());
+            radarInsert.setString(col++, radarEntry.getProduct());
             radarInsert.addBatch();
             batchCnt++;
             if (batchCnt > 100) {
-                filesInsert.executeBatch();
+                entryInsert.executeBatch();
                 radarInsert.executeBatch();
                 batchCnt = 0;
             }
         }
         if (batchCnt > 0) {
-            filesInsert.executeBatch();
+            entryInsert.executeBatch();
             radarInsert.executeBatch();
         }
         connection.commit();
@@ -2196,19 +2152,19 @@ public class Repository implements Constants, Tables {
      */
     public void loadLevel2RadarFiles() throws Exception {
         File            rootDir = new File("/data/ldm/gempak/nexrad/craft");
-        List<Level2RadarInfo> files   = harvester.collectLevel2radarFiles(rootDir, "IDD");
+        List<Level2RadarEntry> files   = harvester.collectLevel2radarFiles(rootDir, "IDD");
         //        files.addAll(collectLevel2radarFiles(rootDir, "LDM/LDM2"));
         System.err.println("Inserting:" + files.size() + " radar files");
         long t1  = System.currentTimeMillis();
         int  cnt = 0;
-        PreparedStatement filesInsert =
-            connection.prepareStatement(INSERT_FILES);
+        PreparedStatement entryInsert =
+            connection.prepareStatement(INSERT_ENTRIES);
         PreparedStatement radarInsert =
             connection.prepareStatement(INSERT_LEVEL2RADAR);
 
         int batchCnt = 0;
         connection.setAutoCommit(false);
-        for (Level2RadarInfo radarInfo : files) {
+        for (Level2RadarEntry entry : files) {
             if ((++cnt) % 10000 == 0) {
                 long   tt2      = System.currentTimeMillis();
                 double tseconds = (tt2 - t1) / 1000.0;
@@ -2217,22 +2173,22 @@ public class Repository implements Constants, Tables {
             }
 
             String id  = getGUID();
-            radarInfo.setId(id);
-            setStatement(radarInfo, filesInsert);
-            filesInsert.addBatch();
+            entry.setId(id);
+            setStatement(entry, entryInsert);
+            entryInsert.addBatch();
             int col = 1;
-            radarInsert.setString(col++, radarInfo.getId());
-            radarInsert.setString(col++, radarInfo.getStation());
+            radarInsert.setString(col++, entry.getId());
+            radarInsert.setString(col++, entry.getStation());
             radarInsert.addBatch();
             batchCnt++;
             if (batchCnt > 100) {
-                filesInsert.executeBatch();
+                entryInsert.executeBatch();
                 radarInsert.executeBatch();
                 batchCnt = 0;
             }
         }
         if (batchCnt > 0) {
-            filesInsert.executeBatch();
+            entryInsert.executeBatch();
             radarInsert.executeBatch();
         }
         connection.commit();
@@ -2255,18 +2211,18 @@ public class Repository implements Constants, Tables {
      */
     public void loadModelFiles() throws Exception {
         File            rootDir = new File("/data/ldm/gempak/model");
-        List<ModelInfo> files   = harvester.collectModelFiles(rootDir, "IDD");
+        List<ModelEntry> files   = harvester.collectModelFiles(rootDir, "IDD");
         System.err.println("Inserting:" + files.size() + " model files");
         long t1  = System.currentTimeMillis();
         int  cnt = 0;
-        PreparedStatement filesInsert =
-            connection.prepareStatement(INSERT_FILES);
+        PreparedStatement entryInsert =
+            connection.prepareStatement(INSERT_ENTRIES);
         PreparedStatement modelInsert =
             connection.prepareStatement(INSERT_MODEL);
 
         int batchCnt = 0;
         connection.setAutoCommit(false);
-        for (ModelInfo modelInfo : files) {
+        for (ModelEntry entry : files) {
             if ((++cnt) % 10000 == 0) {
                 long   tt2      = System.currentTimeMillis();
                 double tseconds = (tt2 - t1) / 1000.0;
@@ -2275,23 +2231,23 @@ public class Repository implements Constants, Tables {
             }
 
             String id  = getGUID();
-            modelInfo.setId(id);
-            setStatement(modelInfo, filesInsert);
-            filesInsert.addBatch();
+            entry.setId(id);
+            setStatement(entry, entryInsert);
+            entryInsert.addBatch();
             int col = 1;
-            modelInsert.setString(col++, modelInfo.getId());
-            modelInsert.setString(col++, modelInfo.getModelGroup());
-            modelInsert.setString(col++, modelInfo.getModelRun());
+            modelInsert.setString(col++, entry.getId());
+            modelInsert.setString(col++, entry.getModelGroup());
+            modelInsert.setString(col++, entry.getModelRun());
             modelInsert.addBatch();
             batchCnt++;
             if (batchCnt > 100) {
-                filesInsert.executeBatch();
+                entryInsert.executeBatch();
                 modelInsert.executeBatch();
                 batchCnt = 0;
             }
         }
         if (batchCnt > 0) {
-            filesInsert.executeBatch();
+            entryInsert.executeBatch();
             modelInsert.executeBatch();
         }
         connection.commit();
@@ -2314,19 +2270,19 @@ public class Repository implements Constants, Tables {
      */
     public void loadSatelliteFiles() throws Exception {
         File            rootDir = new File("/data/ldm/gempak/images/sat");
-        List<SatelliteInfo> files   = harvester.collectSatelliteFiles(rootDir, "IDD");
+        List<SatelliteEntry> files   = harvester.collectSatelliteFiles(rootDir, "IDD");
         //        files.addAll(collectLevel3radarFiles(rootDir, "LDM/LDM2"));
         System.err.println("Inserting:" + files.size() + " satellite files");
         long t1  = System.currentTimeMillis();
         int  cnt = 0;
-        PreparedStatement filesInsert =
-            connection.prepareStatement(INSERT_FILES);
+        PreparedStatement entryInsert =
+            connection.prepareStatement(INSERT_ENTRIES);
         PreparedStatement satelliteInsert =
             connection.prepareStatement(INSERT_SATELLITE);
 
         int batchCnt = 0;
         connection.setAutoCommit(false);
-        for (SatelliteInfo info : files) {
+        for (SatelliteEntry info : files) {
             if ((++cnt) % 10000 == 0) {
                 long   tt2      = System.currentTimeMillis();
                 double tseconds = (tt2 - t1) / 1000.0;
@@ -2336,8 +2292,8 @@ public class Repository implements Constants, Tables {
 
             String id  = getGUID();
             info.setId(id);
-            setStatement(info, filesInsert);
-            filesInsert.addBatch();
+            setStatement(info, entryInsert);
+            entryInsert.addBatch();
             int col = 1;
             satelliteInsert.setString(col++, info.getId());
             satelliteInsert.setString(col++, info.getPlatform());
@@ -2346,13 +2302,13 @@ public class Repository implements Constants, Tables {
             satelliteInsert.addBatch();
             batchCnt++;
             if (batchCnt > 100) {
-                filesInsert.executeBatch();
+                entryInsert.executeBatch();
                 satelliteInsert.executeBatch();
                 batchCnt = 0;
             }
         }
         if (batchCnt > 0) {
-            filesInsert.executeBatch();
+            entryInsert.executeBatch();
             satelliteInsert.executeBatch();
         }
         connection.commit();
@@ -2375,45 +2331,45 @@ public class Repository implements Constants, Tables {
         File rootDir =
             new File(
                 "c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
-        rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
-        List<FilesInfo> files = harvester.collectFiles(rootDir,"Files");
+        //        rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
+        List<Entry> files = harvester.collectFiles(rootDir,"Files");
         System.err.println("Inserting:" + files.size() + " test files");
         long t1  = System.currentTimeMillis();
         int  cnt = 0;
-        PreparedStatement filesInsert =
-            connection.prepareStatement(INSERT_FILES);
+        PreparedStatement entryInsert =
+            connection.prepareStatement(INSERT_ENTRIES);
         PreparedStatement tagsInsert =
             connection.prepareStatement(INSERT_TAGS);
         int batchCnt = 0;
         connection.setAutoCommit(false);
-        for (FilesInfo filesInfo : files) {
+        for (Entry entry : files) {
             if ((++cnt) % 10000 == 0) {
                 long   tt2      = System.currentTimeMillis();
                 double tseconds = (tt2 - t1) / 1000.0;
                 System.err.println("# " + cnt + " rate: "
                                    + ((int) (cnt / tseconds)) + "/s");
             }
-            setStatement(filesInfo, filesInsert);
-            filesInsert.addBatch();
+            setStatement(entry, entryInsert);
+            entryInsert.addBatch();
             batchCnt++;
-            List<String> tags = filesInfo.getTags();
+            List<String> tags = entry.getTags();
             if(tags !=null) {
                 for(String tag: tags) {
                     tagsInsert.setString(1, tag);
-                    tagsInsert.setString(2, filesInfo.getId());
+                    tagsInsert.setString(2, entry.getId());
                     batchCnt++;
                     tagsInsert.addBatch();
                 }
             }
 
             if (batchCnt > 100) {
-                filesInsert.executeBatch();
+                entryInsert.executeBatch();
                 tagsInsert.executeBatch();
                 batchCnt = 0;
             }
         }
         if (batchCnt > 0) {
-            filesInsert.executeBatch();
+            entryInsert.executeBatch();
             tagsInsert.executeBatch();
         }
         connection.setAutoCommit(true);

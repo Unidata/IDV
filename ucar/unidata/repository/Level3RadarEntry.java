@@ -37,18 +37,20 @@ import java.util.List;
 
 
 /**
- * Class Level2RadarInfo _more_
+ * Class Level3RadarEntry _more_
  *
  *
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Level2RadarInfo extends FilesInfo {
+public class Level3RadarEntry extends Entry {
 
 
     /** _more_ */
     private String station;
 
+    /** _more_ */
+    private String product;
 
 
     /**
@@ -61,17 +63,37 @@ public class Level2RadarInfo extends FilesInfo {
      * @param group _more_
      * @param file _more_
      * @param station _more_
+     * @param product _more_
      * @param date _more_
      */
-    public Level2RadarInfo(String id, String name, String description, Group group,
+    public Level3RadarEntry(String id, String name, String description, Group group,
                            User user,
-                           String file, String station, long date) {
-        super(id, name, description, TypeHandler.TYPE_LEVEL2RADAR, group, user, file,
+                           String file, String station, String product, long date) {
+        super(id, name, description, TypeHandler.TYPE_LEVEL3RADAR, group, user, file,
               new Date().getTime(), date,date);
         this.station = station;
+        this.product = product;
     }
 
 
+
+    /**
+     * Set the Product property.
+     *
+     * @param value The new value for Product
+     */
+    public void setProduct(String value) {
+        product = value;
+    }
+
+    /**
+     * Get the Product property.
+     *
+     * @return The Product
+     */
+    public String getProduct() {
+        return product;
+    }
 
     /**
      * Set the Station property.

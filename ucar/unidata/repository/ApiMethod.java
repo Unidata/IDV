@@ -29,13 +29,13 @@ import java.lang.reflect.Method;
 /**
  */
 
-public class EntryPoint {
+public class ApiMethod {
     private String request;
     private Permission permission;
     private Method method;
     private boolean canCache = false;
 
-    public EntryPoint(    String request, Permission permission, Method method,boolean canCache) {
+    public ApiMethod(String request, Permission permission, Method method,boolean canCache) {
         this.request = request;
         this.permission = permission;
         this.method = method;

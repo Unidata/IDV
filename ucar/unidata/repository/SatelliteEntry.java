@@ -42,7 +42,7 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class SatelliteInfo extends FilesInfo {
+public class SatelliteEntry extends Entry {
 
 
     /** _more_ */
@@ -68,7 +68,7 @@ public class SatelliteInfo extends FilesInfo {
      * @param product _more_
      * @param date _more_
      */
-    public SatelliteInfo(String id, String name, String description, Group group,
+    public SatelliteEntry(String id, String name, String description, Group group,
                          User user,
                          String file, String platform, String resolution, String product, long date) {
         super(id, name, description, TypeHandler.TYPE_SATELLITE, group, user, file,

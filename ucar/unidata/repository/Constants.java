@@ -238,7 +238,7 @@ public interface Constants {
     public static final String OUTPUT_ZIP = "zip";
 
     /** _more_          */
-    public static final String TYPE_FILE = "file";
+    public static final String NODETYPE_ENTRY = "entry";
 
     public static final String TYPE_TAG = "tag";
 
@@ -259,7 +259,7 @@ public interface Constants {
     public static final String PROP_DB_URL = "udms.db.url";
     public static final String PROP_DB_USER = "udms.db.user";    
     public static final String PROP_DB_PASSWORD = "udms.db.password";
-    public static final String PROP_HTML_DOWNLOADFILESASFILES = "udms.html.downloadfilesasfiles";
+    public static final String PROP_HTML_DOWNLOADENTRIESASFILES = "udms.html.downloadentriesasfiles";
 
 }
 

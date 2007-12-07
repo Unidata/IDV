@@ -37,19 +37,17 @@ import java.util.List;
 
 
 /**
- * Class ModelInfo _more_
+ * Class Level2RadarEntry _more_
  *
  *
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class ModelInfo extends FilesInfo {
+public class Level2RadarEntry extends Entry {
 
 
     /** _more_ */
-    private String modelGroup;
-
-    private String modelRun;
+    private String station;
 
 
 
@@ -62,56 +60,35 @@ public class ModelInfo extends FilesInfo {
      * @param description _more_
      * @param group _more_
      * @param file _more_
-     * @param model _more_
+     * @param station _more_
      * @param date _more_
      */
-    public ModelInfo(String id, String name, String description, Group group,
+    public Level2RadarEntry(String id, String name, String description, Group group,
                            User user,
-                     String file,  String modelGroup,String modelRun, long date) {
-        super(id, name, description, TypeHandler.TYPE_MODEL, group, user, file,
+                           String file, String station, long date) {
+        super(id, name, description, TypeHandler.TYPE_LEVEL2RADAR, group, user, file,
               new Date().getTime(), date,date);
-        this.modelGroup = modelGroup;
-        this.modelRun = modelRun;
+        this.station = station;
     }
 
 
 
     /**
-     * Set the ModelGroupl property.
+     * Set the Station property.
      *
-     * @param value The new value for ModelGroupl
+     * @param value The new value for Station
      */
-    public void setModelGroup(String value) {
-        modelGroup = value;
+    public void setStation(String value) {
+        station = value;
     }
 
     /**
-     * Get the ModelGroup property.
+     * Get the Station property.
      *
-     * @return The ModelGroup
+     * @return The Station
      */
-    public String getModelGroup() {
-        return modelGroup;
-    }
-
-
-
-    /**
-     * Set the ModelGroupl property.
-     *
-     * @param value The new value for Model
-     */
-    public void setModelRun(String value) {
-        modelRun = value;
-    }
-
-    /**
-     * Get the ModelRun property.
-     *
-     * @return The ModelRun
-     */
-    public String getModelRun() {
-        return modelRun;
+    public String getStation() {
+        return station;
     }
 
 

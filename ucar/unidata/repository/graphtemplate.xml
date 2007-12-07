@@ -30,8 +30,8 @@
 </nodetype>
 
 
-<nodetype    name="file" parent="Node" fillcolor="255,255,153" imagepath="%root%/File.gif">
-  <command label="Search tag" command="url(,%root%/searchform?tag=%id%)"/>
+<nodetype    name="entry" parent="Node" fillcolor="255,255,153" imagepath="%root%/File.gif">
+  <command label="Show entry" command="url(,%root%/showentry?id=%id%)"/>
   <shape>
   <shape>
     <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
@@ -46,7 +46,7 @@
 </nodetype>
 
 
-<nodetype    name="level3radar" parent="file" alt="Level 3 Radar" imagepath="%root%/Radar.gif"/>
+<nodetype    name="level3radar" parent="entry" alt="Level 3 Radar" imagepath="%root%/Radar.gif"/>
 
 %content%
 

@@ -32,17 +32,20 @@ import ucar.unidata.util.Misc;
 
 import java.util.Date;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 
 /**
- * Class FilesInfo _more_
+ * Class Entry _more_
  *
  *
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class FilesInfo {
+public class Entry {
+
+    Hashtable attributes  = new Hashtable();
 
     List<String> tags;
 
@@ -87,7 +90,7 @@ public class FilesInfo {
      * @param file _more_
      * @param date _more_
      */
-    public FilesInfo(String id, String name, String description, String type,
+    public Entry(String id, String name, String description, String type,
                      Group group, User user, String file, long date) {
         this(id,name, description, type, group, user,file, date, date,date);
     }
@@ -110,7 +113,7 @@ public class FilesInfo {
      * @param startDate _more_
      * @param endDate _more_
      */
-    public FilesInfo(String id, String name, String description, String type,
+    public Entry(String id, String name, String description, String type,
                      Group group, User user, String file, long createDate, long startDate, long endDate) {
         this.id = id;
         this.type        = type;
@@ -123,6 +126,16 @@ public class FilesInfo {
         this.startDate   = startDate;
         this.endDate     = endDate;
     }
+
+    public Object get(String name) {
+        return attributes.get(name);
+    }
+
+    public void put(String name, Object value) {
+        attributes.put(name,value);
+    }
+
+
 
     /**
      * Set the File property.

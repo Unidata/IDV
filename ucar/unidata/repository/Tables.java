@@ -92,38 +92,38 @@ public interface Tables {
      */
 
     //J-
-    public static final String TABLE_FILES = "files";
-    public static final String COL_FILES_ID             = TABLE_FILES + ".id";
-    public static final String COL_FILES_NAME           = TABLE_FILES + ".name";
-    public static final String COL_FILES_DESCRIPTION    = TABLE_FILES + ".description";
-    public static final String COL_FILES_TYPE           = TABLE_FILES + ".type";
-    public static final String COL_FILES_GROUP_ID       = TABLE_FILES + ".group_id";
-    public static final String COL_FILES_USER_ID        = TABLE_FILES + ".user_id";
-    public static final String COL_FILES_FILE           = TABLE_FILES + ".file";
-    public static final String COL_FILES_CREATEDATE     = TABLE_FILES + ".createdate";
-    public static final String COL_FILES_FROMDATE       = TABLE_FILES + ".fromdate";
-    public static final String COL_FILES_TODATE         = TABLE_FILES + ".todate";
+    public static final String TABLE_ENTRIES              = "entries";
+    public static final String COL_ENTRIES_ID             = TABLE_ENTRIES + ".id";
+    public static final String COL_ENTRIES_NAME           = TABLE_ENTRIES + ".name";
+    public static final String COL_ENTRIES_DESCRIPTION    = TABLE_ENTRIES + ".description";
+    public static final String COL_ENTRIES_TYPE           = TABLE_ENTRIES + ".type";
+    public static final String COL_ENTRIES_GROUP_ID       = TABLE_ENTRIES + ".group_id";
+    public static final String COL_ENTRIES_USER_ID        = TABLE_ENTRIES + ".user_id";
+    public static final String COL_ENTRIES_FILE           = TABLE_ENTRIES + ".file";
+    public static final String COL_ENTRIES_CREATEDATE     = TABLE_ENTRIES + ".createdate";
+    public static final String COL_ENTRIES_FROMDATE       = TABLE_ENTRIES + ".fromdate";
+    public static final String COL_ENTRIES_TODATE         = TABLE_ENTRIES + ".todate";
 
-    public static final String []ARRAY_FILES = new String[]{
-        COL_FILES_ID,
-        COL_FILES_NAME,
-        COL_FILES_DESCRIPTION,
-        COL_FILES_TYPE,
-        COL_FILES_GROUP_ID,
-        COL_FILES_USER_ID,
-        COL_FILES_FILE,
-        COL_FILES_CREATEDATE,
-        COL_FILES_FROMDATE,
-        COL_FILES_TODATE
+    public static final String []ARRAY_ENTRIES = new String[]{
+        COL_ENTRIES_ID,
+        COL_ENTRIES_NAME,
+        COL_ENTRIES_DESCRIPTION,
+        COL_ENTRIES_TYPE,
+        COL_ENTRIES_GROUP_ID,
+        COL_ENTRIES_USER_ID,
+        COL_ENTRIES_FILE,
+        COL_ENTRIES_CREATEDATE,
+        COL_ENTRIES_FROMDATE,
+        COL_ENTRIES_TODATE
     };
 
 
-    public static final String COLUMNS_FILES = SqlUtil.comma(ARRAY_FILES);
-    public static final String INSERT_FILES =
+    public static final String COLUMNS_ENTRIES = SqlUtil.comma(ARRAY_ENTRIES);
+    public static final String INSERT_ENTRIES =
         SqlUtil.makeInsert(
-            TABLE_FILES,
-            COLUMNS_FILES,
-            SqlUtil.getQuestionMarks(ARRAY_FILES.length));
+            TABLE_ENTRIES,
+            COLUMNS_ENTRIES,
+            SqlUtil.getQuestionMarks(ARRAY_ENTRIES.length));
 
 
     public static final String TABLE_USERS = "users";

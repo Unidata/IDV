@@ -1,7 +1,7 @@
 
 --- Initial data base creation
 
---drop table files;
+--drop table entries;
 --drop table level3radar;
 --drop table level3radar;
 --drop table satellite;
@@ -42,7 +42,7 @@ CREATE TABLE  users (id varchar(200),
 		     admin int);
 
 
-CREATE TABLE files (id varchar(200),
+CREATE TABLE entries (id varchar(200),
 	           name varchar(200),
                    description varchar(500),
                    type varchar(200),
@@ -53,17 +53,17 @@ CREATE TABLE files (id varchar(200),
 	           fromdate timestamp, 
 	           todate timestamp); 
 
---drop INDEX FILES_INDEX_ID;
-CREATE INDEX FILES_INDEX_ID ON files (ID);
+--drop INDEX ENTRIES_INDEX_ID;
+CREATE INDEX ENTRIES_INDEX_ID ON entries (ID);
 
---drop INDEX FILES_INDEX_GROUP;
-CREATE INDEX FILES_INDEX_GROUP ON files (GROUP_ID);
+--drop INDEX ENTRIES_INDEX_GROUP;
+CREATE INDEX ENTRIES_INDEX_GROUP ON entries (GROUP_ID);
 
---drop INDEX FILES_INDEX_TYPE;
-CREATE INDEX FILES_INDEX_TYPE ON files (TYPE);
+--drop INDEX ENTRIES_INDEX_TYPE;
+CREATE INDEX ENTRIES_INDEX_TYPE ON entries (TYPE);
 
---drop INDEX FILES_INDEX_USER_ID;
-CREATE INDEX FILES_INDEX_USER_ID ON files (USER_ID);
+--drop INDEX ENTRIES_INDEX_USER_ID;
+CREATE INDEX ENTRIES_INDEX_USER_ID ON entries (USER_ID);
 
 CREATE TABLE level3radar (
 	           id varchar(200),
