@@ -84,7 +84,6 @@ public class GempakGridServiceProvider extends GridServiceProvider {
         if (gemreader == null) {
             gemreader = new GempakGridReader();
         }
-        initTables();
         gemreader.init(raf, true);
         GridIndex index = ((GempakGridReader) gemreader).getGridIndex();
         open(index, cancelTask);
@@ -171,16 +170,4 @@ public class GempakGridServiceProvider extends GridServiceProvider {
         }
     }
 
-    /**
-     * Initialize the parameter tables.
-     *
-     * @throws IOException problem reading files
-     */
-    private void initTables() throws IOException {
-        GempakParameterTable.addParameters(
-            "resources/nj22/tables/gempak/wmogrib3.tbl");
-        GempakParameterTable.addParameters(
-            "resources/nj22/tables/gempak/ncepgrib2.tbl");
-    }
 }
-
