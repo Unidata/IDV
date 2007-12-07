@@ -1,23 +1,6 @@
 
 --- Initial data base creation
 
---drop table entries;
---drop table level3radar;
---drop table level3radar;
---drop table satellite;
---drop table groups;
---drop table users;
---drop table tags;
-
-
---drop TABLE model;
---alter table model drop index  MODEL_INDEX_ID;
---alter table model drop index  MODEL_INDEX_MODELGROUP;
-
---drop INDEX MODEL_INDEX_ID;
---drop INDEX MODEL_INDEX_MODEL;
-
-
 
 CREATE TABLE  groups (id varchar(500),
                      parent varchar(200),
@@ -31,9 +14,7 @@ CREATE INDEX GROUPS_INDEX_ID ON groups (ID);
 CREATE TABLE tags (name varchar(200),
 	           file_id varchar(200));
 
---drop INDEX TAGS_INDEX_NAME;
 CREATE INDEX TAGS_INDEX_NAME ON tags (NAME);
---drop INDEX TAGS_INDEX_FILE_ID;
 CREATE INDEX TAGS_INDEX_FILE_ID ON tags (FILE_ID);
 
 
@@ -53,16 +34,9 @@ CREATE TABLE entries (id varchar(200),
 	           fromdate timestamp, 
 	           todate timestamp); 
 
---drop INDEX ENTRIES_INDEX_ID;
 CREATE INDEX ENTRIES_INDEX_ID ON entries (ID);
-
---drop INDEX ENTRIES_INDEX_GROUP;
 CREATE INDEX ENTRIES_INDEX_GROUP ON entries (GROUP_ID);
-
---drop INDEX ENTRIES_INDEX_TYPE;
 CREATE INDEX ENTRIES_INDEX_TYPE ON entries (TYPE);
-
---drop INDEX ENTRIES_INDEX_USER_ID;
 CREATE INDEX ENTRIES_INDEX_USER_ID ON entries (USER_ID);
 
 CREATE TABLE level3radar (
@@ -70,13 +44,8 @@ CREATE TABLE level3radar (
                    station varchar(50), 
                    product varchar(50));
 
---drop INDEX LEVEL3RADAR_INDEX_ID;
 CREATE INDEX LEVEL3RADAR_INDEX_ID ON level3radar (ID);
-
---drop INDEX LEVEL3RADAR_INDEX_STATION;
 CREATE INDEX LEVEL3RADAR_INDEX_STATION ON level3radar (STATION);
-
---drop INDEX LEVEL3RADAR_INDEX_PRODUCT;
 CREATE INDEX LEVEL3RADAR_INDEX_PRODUCT ON level3radar (PRODUCT);
 
 
@@ -84,11 +53,8 @@ CREATE TABLE level2radar (
 	           id varchar(200),
                    station varchar(50));
 
---drop INDEX LEVEL2RADAR_INDEX_ID;
 CREATE INDEX LEVEL2RADAR_INDEX_ID ON level2radar (ID);
---drop INDEX LEVEL2RADAR_INDEX_STATION;
 CREATE INDEX LEVEL2RADAR_INDEX_STATION ON level2radar (STATION);
-
 
 
 CREATE TABLE satellite (
@@ -108,7 +74,6 @@ CREATE TABLE model (
 	           id varchar(200),
                    modelgroup varchar(50),
                    modelrun varchar(50));
-
 
 
 

@@ -45,7 +45,6 @@ import java.util.List;
  */
 public class Entry {
 
-    Hashtable attributes  = new Hashtable();
 
     List<String> tags;
 
@@ -96,7 +95,6 @@ public class Entry {
     }
 
 
-
     /**
      * _more_
      *
@@ -126,15 +124,6 @@ public class Entry {
         this.startDate   = startDate;
         this.endDate     = endDate;
     }
-
-    public Object get(String name) {
-        return attributes.get(name);
-    }
-
-    public void put(String name, Object value) {
-        attributes.put(name,value);
-    }
-
 
 
     /**

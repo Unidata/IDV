@@ -66,10 +66,12 @@ public class Level3RadarEntry extends Entry {
      * @param product _more_
      * @param date _more_
      */
-    public Level3RadarEntry(String id, String name, String description, Group group,
-                           User user,
-                           String file, String station, String product, long date) {
-        super(id, name, description, TypeHandler.TYPE_LEVEL3RADAR, group, user, file,
+    public Level3RadarEntry(String id, 
+                            String type,
+                            String name, String description, Group group,
+                            User user,
+                            String file, String station, String product, long date) {
+        super(id, type, name, description, group, user, file,
               new Date().getTime(), date,date);
         this.station = station;
         this.product = product;

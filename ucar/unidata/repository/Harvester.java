@@ -98,7 +98,8 @@ public class Harvester {
      * @throws Exception _more_
      */
     public List<Level3RadarEntry> xxxxcollectLevel3radarFiles(File rootDir,
-            String groupName)
+                                                              String groupName,
+                                                              final TypeHandler typeHandler)
             throws Exception {
         final List<Level3RadarEntry> radarEntrys = new ArrayList();
         long                  baseTime   = repository.currentTime();
@@ -111,7 +112,10 @@ public class Harvester {
                 group = repository.findGroupFromName(groupName + "/" + station + "/" + product);
                 for (int timeIdx = 0; timeIdx < 1000; timeIdx++) {
                     radarEntrys.add(new Level3RadarEntry(repository.getGUID(),
-                                                       "", "", group,
+                                                         typeHandler.getType(),
+                                                         "", "", 
+
+                                                         group,
                                                        user,
                                                        "file" + stationIdx + "_" +productIdx
                                                        + "_" + group, station, product,
@@ -136,7 +140,8 @@ public class Harvester {
      * @throws Exception _more_
      */
     public List<Level3RadarEntry> collectLevel3radarFiles(File rootDir,
-            final String groupName)
+                                                          final String groupName,
+                                                          final TypeHandler typeHandler)
             throws Exception {
         long                   t1         = System.currentTimeMillis();
         final List<Level3RadarEntry>  radarEntrys = new ArrayList();
@@ -162,7 +167,10 @@ public class Harvester {
                                         + station + "/" + product);
                 Date dttm = sdf.parse(matcher.group(3));
                 radarEntrys.add(new Level3RadarEntry(repository.getGUID(),
-                                                   dttm.toString(), "", group, user,
+                                                     typeHandler.getType(),
+                                                   dttm.toString(), "", 
+
+                                                     group, user,
                                                    f.toString(), station, product,
                                                    dttm.getTime()));
                 return DO_CONTINUE;
@@ -189,7 +197,9 @@ public class Harvester {
      * @throws Exception _more_
      */
     public List<Level2RadarEntry> collectLevel2radarFiles(File rootDir,
-            final String groupName)
+                                                          final String groupName,
+                                                          final TypeHandler typeHandler)
+
             throws Exception {
         long                   t1         = System.currentTimeMillis();
         final List<Level2RadarEntry>  radarEntrys = new ArrayList();
@@ -214,7 +224,10 @@ public class Harvester {
                                         + station);
                 Date dttm = sdf.parse(matcher.group(2));
                 radarEntrys.add(new Level2RadarEntry(repository.getGUID(),
-                                                   dttm.toString(), "", group, user,
+                                                     typeHandler.getType(),
+                                                   dttm.toString(), "", 
+
+                                                     group, user,
                                                    f.toString(), station, 
                                                    dttm.getTime()));
                 return DO_CONTINUE;
@@ -240,10 +253,11 @@ public class Harvester {
      * @throws Exception _more_
      */
     public List<SatelliteEntry> collectSatelliteFiles(File rootDir,
-            final String groupName)
+                                                      final String groupName,
+                                                      final TypeHandler typeHandler)
             throws Exception {
         long                   t1         = System.currentTimeMillis();
-        final List<SatelliteEntry>  infos = new ArrayList();
+        final List<SatelliteEntry>  entries = new ArrayList();
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
         final Pattern pattern =
             Pattern.compile(
@@ -257,8 +271,8 @@ public class Harvester {
                 if ( !matcher.find()) {
                     return DO_CONTINUE;
                 }
-                if (infos.size() % 5000 == 0) {
-                    System.err.println("Found:" + infos.size());
+                if (entries.size() % 5000 == 0) {
+                    System.err.println("Found:" + entries.size());
                 }
                 String platform = matcher.group(1);
                 String resolution = matcher.group(2);
@@ -266,8 +280,11 @@ public class Harvester {
                 Group group = repository.findGroupFromName(groupName + "/" + "Satellite" + "/"
                                                 + platform + "/" + resolution +"/"+product);
                 Date dttm = sdf.parse(matcher.group(4));
-                infos.add(new SatelliteEntry(repository.getGUID(),
-                                            dttm.toString(), "", group, user,
+                entries.add(new SatelliteEntry(repository.getGUID(),
+                                               typeHandler.getType(),
+                                            dttm.toString(), "", 
+
+                                               group, user,
                                             f.toString(), platform, resolution, product,
                                             dttm.getTime()));
                 return DO_CONTINUE;
@@ -276,8 +293,8 @@ public class Harvester {
 
         IOUtil.walkDirectory(rootDir, fileViewer);
         long t2 = System.currentTimeMillis();
-        System.err.println("found sat files:" + infos.size() + " in " + (t2 - t1));
-        return infos;
+        System.err.println("found sat files:" + entries.size() + " in " + (t2 - t1));
+        return entries;
     }
 
 
@@ -290,7 +307,9 @@ public class Harvester {
      *
      * @throws Exception _more_
      */
-    public List<Entry> collectFiles(File rootDir, final String rootGroup) throws Exception {
+    public List<Entry> collectFiles(File rootDir, 
+                                    final String rootGroup,
+                                    final TypeHandler typeHandler) throws Exception {
         final String         rootStr    = rootDir.toString();
         final int            rootStrLen = rootStr.length();
         final List<Entry> entries  = new ArrayList();
@@ -319,7 +338,9 @@ public class Harvester {
                 toks.add(0, rootGroup);
                 Group group = repository.findGroupFromName(StringUtil.join("/", toks));
                 Entry fileEntry = new Entry(repository.getGUID(),
-                                             name, name, TypeHandler.TYPE_FILE,
+                                            typeHandler.getType(),
+                                             name, name, 
+
                                              group, user, f.toString(),
                                              f.lastModified());
                 String ext = IOUtil.getFileExtension(path);
@@ -339,10 +360,11 @@ public class Harvester {
 
 
     public List<ModelEntry> collectModelFiles(File rootDir,
-            final String groupName)
+                                              final String groupName,
+                                              final TypeHandler typeHandler)
             throws Exception {
         long                   t1         = System.currentTimeMillis();
-        final List<ModelEntry>  infos = new ArrayList();
+        final List<ModelEntry>  entries = new ArrayList();
         final SimpleDateFormat[] sdf = {
             new SimpleDateFormat("yyyyMMddHH"),
             new SimpleDateFormat("yyyyMMdd")};
@@ -365,8 +387,8 @@ public class Harvester {
                     return DO_CONTINUE;
                 }
                 //                    System.err.println (name);
-                if (infos.size() % 5000 == 0) {
-                    System.err.println("Found:" + infos.size());
+                if (entries.size() % 5000 == 0) {
+                    System.err.println("Found:" + entries.size());
                 }
                 String modelGroup = matcher.group(1);
                 Date dttm=null;
@@ -389,8 +411,11 @@ public class Harvester {
                 Group group = repository.findGroupFromName(groupName + "/" + "model" + "/"
                                         + modelGroup +"/"+modelRun);
 
-                infos.add(new ModelEntry(repository.getGUID(),
-                                        IOUtil.getFileTail(f.toString()), "",group, user,
+                entries.add(new ModelEntry(repository.getGUID(),
+                                           typeHandler.getType(),
+                                        IOUtil.getFileTail(f.toString()), "",
+
+                                           group, user,
                                         f.toString(), modelGroup, modelRun,
                                         dttm.getTime()));
                 return DO_CONTINUE;
@@ -399,8 +424,8 @@ public class Harvester {
 
         IOUtil.walkDirectory(rootDir, fileViewer);
         long t2 = System.currentTimeMillis();
-        System.err.println("found:" + infos.size() + " in " + (t2 - t1));
-        return infos;
+        System.err.println("found:" + entries.size() + " in " + (t2 - t1));
+        return entries;
     }
 
 

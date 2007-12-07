@@ -2091,7 +2091,8 @@ public class Repository implements Constants, Tables {
      */
     public void loadLevel3RadarFiles() throws Exception {
         File            rootDir = new File("/data/ldm/gempak/nexrad/NIDS");
-        List<Level3RadarEntry> files   = harvester.collectLevel3radarFiles(rootDir, "IDD");
+        List<Level3RadarEntry> files   = harvester.collectLevel3radarFiles(rootDir, "IDD",
+                                                                           getTypeHandler(TypeHandler.TYPE_LEVEL3RADAR));
         //        files.addAll(collectLevel3radarFiles(rootDir, "LDM/LDM2"));
         System.err.println("Inserting:" + files.size() + " radar files");
         long t1  = System.currentTimeMillis();
@@ -2152,7 +2153,8 @@ public class Repository implements Constants, Tables {
      */
     public void loadLevel2RadarFiles() throws Exception {
         File            rootDir = new File("/data/ldm/gempak/nexrad/craft");
-        List<Level2RadarEntry> files   = harvester.collectLevel2radarFiles(rootDir, "IDD");
+        List<Level2RadarEntry> files   = harvester.collectLevel2radarFiles(rootDir, "IDD",
+                                                                           getTypeHandler(TypeHandler.TYPE_LEVEL2RADAR));
         //        files.addAll(collectLevel2radarFiles(rootDir, "LDM/LDM2"));
         System.err.println("Inserting:" + files.size() + " radar files");
         long t1  = System.currentTimeMillis();
@@ -2211,7 +2213,8 @@ public class Repository implements Constants, Tables {
      */
     public void loadModelFiles() throws Exception {
         File            rootDir = new File("/data/ldm/gempak/model");
-        List<ModelEntry> files   = harvester.collectModelFiles(rootDir, "IDD");
+        List<ModelEntry> files   = harvester.collectModelFiles(rootDir, "IDD",
+                                                               getTypeHandler(TypeHandler.TYPE_MODEL));
         System.err.println("Inserting:" + files.size() + " model files");
         long t1  = System.currentTimeMillis();
         int  cnt = 0;
@@ -2270,7 +2273,8 @@ public class Repository implements Constants, Tables {
      */
     public void loadSatelliteFiles() throws Exception {
         File            rootDir = new File("/data/ldm/gempak/images/sat");
-        List<SatelliteEntry> files   = harvester.collectSatelliteFiles(rootDir, "IDD");
+        List<SatelliteEntry> files   = harvester.collectSatelliteFiles(rootDir, "IDD",
+                                                                       getTypeHandler(TypeHandler.TYPE_SATELLITE));
         //        files.addAll(collectLevel3radarFiles(rootDir, "LDM/LDM2"));
         System.err.println("Inserting:" + files.size() + " satellite files");
         long t1  = System.currentTimeMillis();
@@ -2282,7 +2286,7 @@ public class Repository implements Constants, Tables {
 
         int batchCnt = 0;
         connection.setAutoCommit(false);
-        for (SatelliteEntry info : files) {
+        for (SatelliteEntry entry : files) {
             if ((++cnt) % 10000 == 0) {
                 long   tt2      = System.currentTimeMillis();
                 double tseconds = (tt2 - t1) / 1000.0;
@@ -2291,14 +2295,14 @@ public class Repository implements Constants, Tables {
             }
 
             String id  = getGUID();
-            info.setId(id);
-            setStatement(info, entryInsert);
+            entry.setId(id);
+            setStatement(entry, entryInsert);
             entryInsert.addBatch();
             int col = 1;
-            satelliteInsert.setString(col++, info.getId());
-            satelliteInsert.setString(col++, info.getPlatform());
-            satelliteInsert.setString(col++, info.getResolution());
-            satelliteInsert.setString(col++, info.getProduct());
+            satelliteInsert.setString(col++, entry.getId());
+            satelliteInsert.setString(col++, entry.getPlatform());
+            satelliteInsert.setString(col++, entry.getResolution());
+            satelliteInsert.setString(col++, entry.getProduct());
             satelliteInsert.addBatch();
             batchCnt++;
             if (batchCnt > 100) {
@@ -2332,7 +2336,8 @@ public class Repository implements Constants, Tables {
             new File(
                 "c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
         //        rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
-        List<Entry> files = harvester.collectFiles(rootDir,"Files");
+        List<Entry> files = harvester.collectFiles(rootDir,"Files",
+                                                   getTypeHandler(TypeHandler.TYPE_FILE));
         System.err.println("Inserting:" + files.size() + " test files");
         long t1  = System.currentTimeMillis();
         int  cnt = 0;

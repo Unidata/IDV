@@ -23,74 +23,74 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
+import ucar.unidata.data.SqlUtil;
 import ucar.unidata.util.DateUtil;
+
+import ucar.unidata.util.HtmlUtil;
+import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.xml.XmlUtil;
 
+import java.sql.Statement;
+import java.sql.ResultSet;
+
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.List;
-
+import java.util.Properties;
 
 
 
 /**
- * Class Level2RadarEntry _more_
+ * Class TypeHandler _more_
  *
  *
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Level2RadarEntry extends Entry {
-
-
-    /** _more_ */
-    private String station;
-
-
+public class GenericTypeHandler extends TypeHandler {
 
     /**
      * _more_
      *
+     * @param repository _more_
+     * @param type _more_
+     */
+    public GenericTypeHandler(Repository repository, String type) {
+        super(repository, type, "");
+    }
+
+    /**
+     * _more_
      *
-     *
-     * @param name _more_
+     * @param repository _more_
+     * @param type _more_
      * @param description _more_
-     * @param group _more_
-     * @param file _more_
-     * @param station _more_
-     * @param date _more_
      */
-    public Level2RadarEntry(String id,                            
-                            String type,
-                            String name, String description, Group group,
-                            User user,
-                           String file, String station, long date) {
-        super(id, type, name, description, group, user, file,
-              new Date().getTime(), date,date);
-        this.station = station;
+    public GenericTypeHandler(Repository repository, String type,
+                       String description) {
+        super(repository, type, description);
     }
 
-
-
-    /**
-     * Set the Station property.
-     *
-     * @param value The new value for Station
-     */
-    public void setStation(String value) {
-        station = value;
+    public boolean equals(Object obj) {
+        if(!super.equals(obj)) return false;
+        //TODO
+        return true;
     }
 
-    /**
-     * Get the Station property.
-     *
-     * @return The Station
-     */
-    public String getStation() {
-        return station;
+    public void addToForm(StringBuffer formBuffer, StringBuffer headerBuffer, Request request, List where)
+            throws Exception {
+        super.addToForm(formBuffer, headerBuffer, request, where);
     }
 
 
