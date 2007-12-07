@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.data.grid.gempak;
 
 
@@ -60,7 +59,8 @@ public class GempakGridServiceProvider extends GridServiceProvider {
      */
     public boolean isValidFile(RandomAccessFile raf) throws IOException {
         try {
-            gemreader = new GempakGridReader(raf);
+            gemreader = new GempakGridReader();
+            gemreader.init(raf, false);
         } catch (IOException ioe) {
             return false;
         }
@@ -84,10 +84,15 @@ public class GempakGridServiceProvider extends GridServiceProvider {
         if (gemreader == null) {
             gemreader = new GempakGridReader();
         }
-        gemreader.init(raf);
+        initTables();
+        gemreader.init(raf, true);
         GridIndex index = ((GempakGridReader) gemreader).getGridIndex();
         open(index, cancelTask);
-            if (debugOpen) System.out.println(" GridServiceProvider.open " + ncfile.getLocation()+" took "+(System.currentTimeMillis()-start));
+        if (debugOpen) {
+            System.out.println(" GridServiceProvider.open "
+                               + ncfile.getLocation() + " took "
+                               + (System.currentTimeMillis() - start));
+        }
     }
 
     /**
@@ -116,7 +121,7 @@ public class GempakGridServiceProvider extends GridServiceProvider {
      */
     public boolean sync() {
         try {
-            gemreader.init();
+            gemreader.init(true);
             GridIndex index = ((GempakGridReader) gemreader).getGridIndex();
             // reconstruct the ncfile objects
             ncfile.empty();
@@ -137,20 +142,45 @@ public class GempakGridServiceProvider extends GridServiceProvider {
      * @throws IOException  problem reading the data
      */
     protected float[] _readData(GridRecord gr) throws IOException {
-        return ((GempakGridReader) gemreader).readGrid((GempakGridRecord)gr);
+        return ((GempakGridReader) gemreader).readGrid((GempakGridRecord) gr);
     }
 
+    /**
+     * Test this.
+     *
+     * @param args file name
+     *
+     * @throws IOException  problem reading the file
+     */
     public static void main(String[] args) throws IOException {
         IOServiceProvider mciosp = new GempakGridServiceProvider();
-        RandomAccessFile rf = new RandomAccessFile(args[0], "r", 2048);
+        RandomAccessFile  rf     = new RandomAccessFile(args[0], "r", 2048);
         NetcdfFile ncfile = new MakeNetcdfFile(mciosp, rf, args[0], null);
     }
 
-  static class MakeNetcdfFile extends NetcdfFile {
-        MakeNetcdfFile( IOServiceProvider spi, RandomAccessFile raf,
-                 String location, CancelTask cancelTask ) throws IOException {
-                             super( spi, raf, location, cancelTask );
+    /**
+     * TODO:  generalize this
+     * static class for testing
+     */
+    protected static class MakeNetcdfFile extends NetcdfFile {
+
+        MakeNetcdfFile(IOServiceProvider spi, RandomAccessFile raf,
+                       String location, CancelTask cancelTask)
+                throws IOException {
+            super(spi, raf, location, cancelTask);
         }
-  }
+    }
+
+    /**
+     * Initialize the parameter tables.
+     *
+     * @throws IOException problem reading files
+     */
+    private void initTables() throws IOException {
+        GempakParameterTable.addParameters(
+            "resources/nj22/tables/gempak/wmogrib3.tbl");
+        GempakParameterTable.addParameters(
+            "resources/nj22/tables/gempak/ncepgrib2.tbl");
+    }
 }
 

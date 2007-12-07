@@ -91,20 +91,21 @@ public class GempakFileReader implements GempakConstants {
      * @throws IOException problem reading file
      */
     public GempakFileReader(RandomAccessFile raf) throws IOException {
-        init(raf);
+        init(raf, true);
     }
 
     /**
      * Initialize the file, read in all the metadata (ala DM_OPEN)
      *
      * @param raf   RandomAccessFile to read.
+     * @param fullCheck  if true, check entire structure
      *
      * @throws IOException   problem reading file
      */
-    public final void init(RandomAccessFile raf) throws IOException {
+    public final void init(RandomAccessFile raf, boolean fullCheck) throws IOException {
         setByteOrder();
         rf = raf;
-        boolean ok = init();
+        boolean ok = init(fullCheck);
         if ( !ok) {
             throw new IOException("Unable to open GEMPAK file: "
                                   + errorMessage);
@@ -114,11 +115,12 @@ public class GempakFileReader implements GempakConstants {
     /**
      * Initialize the file, read in all the metadata (ala DM_OPEN)
      *
+     * @param fullCheck  if true, check entire structure
      * @return  true if successful
      *
      * @throws IOException   problem reading file
      */
-    protected boolean init() throws IOException {
+    protected boolean init(boolean fullCheck) throws IOException {
         if (rf == null) {
             throw new IOException("file has not been set");
         }

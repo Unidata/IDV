@@ -96,15 +96,27 @@ public class GempakGridReader extends GempakFileReader {
     }
 
     /**
-     * Initialize this reader.  Get the Grid specific info
+     * Initialize this reader.  Read all the metadata
      *
      * @return true if successful
      *
      * @throws IOException  problem reading the data
      */
     protected boolean init() throws IOException {
+        return init(true);
+    }
 
-        if ( !super.init()) {
+    /**
+     * Initialize this reader.  Get the Grid specific info
+     *
+     * @param fullCheck  check to make sure there are grids we can handle
+     * @return true if successful
+     *
+     * @throws IOException  problem reading the data
+     */
+    protected boolean init(boolean fullCheck) throws IOException {
+
+        if ( !super.init(fullCheck)) {
             return false;
         }
         gridIndex = new GridIndex();
@@ -137,6 +149,7 @@ public class GempakGridReader extends GempakFileReader {
                 return false;
             }
         }
+        if (!fullCheck) return true;
 
         // Make the NAV and ANAL blocks
         float[] headerArray = getFileHeader(NAVB);
@@ -156,7 +169,7 @@ public class GempakGridReader extends GempakFileReader {
         // Make the grid headers
         // TODO: move this up into GempakFileReader using DM_RHDA
         // and account for the flipping there.
-        List  tmpList = new ArrayList();
+        List<GempakGridRecord>  tmpList = new ArrayList<GempakGridRecord>();
         int   iword   = dmLabel.kpcolh;
         int[] header  = new int[dmLabel.kckeys];
         for (int i = 0; i < dmLabel.kcol; i++) {
@@ -165,7 +178,7 @@ public class GempakGridReader extends GempakFileReader {
             if (valid != IMISSD) {
                 // swap the appropriate strings
                 // vertical coord if stored as a string
-                if (header[6] > GempakUtil.vertCoords.length) {
+                if (header[6] > GempakUtil.vertCoords.length && needToSwap) {
                     header[6] = GempakUtil.swp4(header[6]);
                 }
                 if (needToSwap) {
@@ -242,9 +255,6 @@ public class GempakGridReader extends GempakFileReader {
                     if (cnt == it) {
                         cnt = 0;
                     }
-                    //if (cnt == 0) System.out.print("\ndata["+i+"-"+(i+it)+"] = ");
-                    //if (cnt == 0) System.out.print("\n");
-                    //System.out.print(Misc.format(data[i])+", ");
                     cnt++;
                     if ((data[i] != RMISSD) && (data[i] < min)) {
                         min = data[i];
@@ -519,7 +529,7 @@ public class GempakGridReader extends GempakFileReader {
                                     int nbits, float ref, float scale,
                                     boolean miss, int decimalScale)
             throws IOException {
-        //System.out.println("scale = " + scale);
+        //System.out.println("decimal scale = " + decimalScale);
         float[] values = new float[kxky];
         bitPos = 0;
         bitBuf = 0;
@@ -565,6 +575,9 @@ public class GempakGridReader extends GempakFileReader {
         long            start    = getOffset(iiword);
         GempakGrib2Data gemGrib2 = new GempakGrib2Data(rf);
         float[]         data     = gemGrib2.getData(start);
+        if ((( iarray[3] >> 6 ) & 1) == 0) { // -y scanning - flip
+            data = gb2_ornt(iarray[1],iarray[2],iarray[3],data);
+        }
         return data;
     }
 
@@ -729,6 +742,124 @@ public class GempakGridReader extends GempakFileReader {
         }
     }
 
+/************************************************************************
+ * gb2_ornt                                                             *
+ *                                                                      *
+ * This function checks the fields scanning mode flags and re-orders    *
+ * the grid point values so that they traverse left to right for each   *
+ * row starting at the bottom row.                                      *
+ *                                                                      *
+ * gb2_ornt ( kx, ky, scan_mode, ingrid, fgrid, iret )                  *
+ *                                                                      *
+ * Input parameters:                                                    *
+ *      kx              int             Number of columns               *
+ *      ky              int             Number of rows                  *
+ *      scan_mode       int             GRIB2 scanning mode flag        *
+ *      *ingrid         float           unpacked GRIB2 grid data        *
+ *                                                                      *
+ * Output parameters:                                                   *
+ *  *fgrid      float   Unpacked grid data                              *
+ *  *iret       int             Return code                             *
+ *                       -40 = scan mode not implemented                *
+ **                                                                     *
+ * Log:                                                                 *
+ * S. Gilbert            1/04                                           *
+ ***********************************************************************/
+private float[] gb2_ornt ( int kx, int ky, int scan_mode, float[] ingrid) 
+{
+    float[] fgrid = new float[ingrid.length];
+
+    int ibeg, jbeg, iinc, jinc, itmp;
+    int icnt, jcnt, kcnt, idxarr;
+
+    int idrct, jdrct, consec, boustr;
+
+
+/*---------------------------------------------------------------------*/
+
+    idrct  = ( scan_mode >> 7 ) & 1;
+    jdrct  = ( scan_mode >> 6 ) & 1;
+    consec = ( scan_mode >> 5 ) & 1;
+    boustr = ( scan_mode >> 4 ) & 1;
+
+    if ( idrct == 0 ) {
+        ibeg = 0;
+        iinc = 1;
+    }
+    else {
+        ibeg = kx - 1;
+        iinc = -1;
+    }
+    if ( jdrct == 1 ) {
+        jbeg = 0;
+        jinc = 1;
+    }
+    else {
+        jbeg = ky - 1;
+        jinc = -1;
+    }
+
+    kcnt = 0;
+    if ( consec == 1 && boustr == 0 ) {
+        /*  adjacent points in same column;  each column same direction  */
+        for ( jcnt=jbeg; (0<=jcnt&&jcnt<ky); jcnt+=jinc ) {
+            for ( icnt=ibeg; (0<=icnt&&icnt<kx); icnt+=iinc ) {
+               idxarr = ky * icnt + jcnt;
+               fgrid[kcnt] = ingrid[idxarr];
+               kcnt++;
+            }
+        }
+    }
+    else if( consec == 0 && boustr == 0 ) {
+        /*  adjacent points in same row;  each row same direction  */
+        for ( jcnt=jbeg; (0<=jcnt&&jcnt<ky); jcnt+=jinc ) {
+            for ( icnt=ibeg; (0<=icnt&&icnt<kx); icnt+=iinc ) {
+               idxarr = kx * jcnt + icnt;
+               fgrid[kcnt] = ingrid[idxarr];
+               kcnt++;
+            }
+        }
+    }
+    else if ( consec == 1 && boustr == 1 ) {
+        /*  adjacent points in same column; each column alternates direction */
+        for ( jcnt=jbeg; (0<=jcnt&&jcnt<ky); jcnt+=jinc ) {
+            itmp=jcnt;
+            if (idrct == 1 && kx%2 == 0 ) itmp = ky - jcnt - 1;
+            for ( icnt=ibeg; (0<=icnt&&icnt<kx); icnt+=iinc ) {
+               idxarr = ky * icnt + itmp;
+               fgrid[kcnt] = ingrid[idxarr];
+               itmp = ( itmp != jcnt ) ? jcnt : ky - jcnt - 1;  /* toggle */
+               kcnt++;
+            }
+        }
+    }
+    else if( consec == 0 && boustr == 1 ) {
+        /*  adjacent points in same row;  each row alternates direction  */
+        if ( jdrct == 0 ) {
+           if (idrct == 0 && ky%2 == 0) {
+              ibeg = kx - 1;
+              iinc = -1;
+           } 
+           if (idrct == 1 && ky%2 == 0) {
+              ibeg = 0;
+              iinc = 1;
+           } 
+        }
+        for ( jcnt=jbeg; (0<=jcnt&&jcnt<ky); jcnt+=jinc ) {
+            for ( icnt=ibeg; (0<=icnt&&icnt<kx); icnt+=iinc ) {
+               idxarr = kx * jcnt + icnt;
+               fgrid[kcnt] = ingrid[idxarr];
+               kcnt++;
+            } 
+            ibeg = ( ibeg != 0 ) ? 0 : kx - 1;         /* toggle */
+            iinc = ( iinc != 1 ) ? 1 : - 1;         /* toggle */
+        }      
+    } else {
+        fgrid = ingrid;
+    } 
+    return fgrid;
+    
+}       
 
 }
 
