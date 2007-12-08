@@ -1100,7 +1100,7 @@ public class StringUtil {
      *
      * @return List of String tokens.
      */
-    public static List split(Object source) {
+    public static List<String> split(Object source) {
         return split(source, ",");
     }
 
@@ -1234,7 +1234,7 @@ public class StringUtil {
      * @param delimiter  The delimiter to break up the sourceString on.
      * @return List of String tokens.
      */
-    public static List split(Object source, String delimiter) {
+    public static List<String> split(Object source, String delimiter) {
         return split(source, delimiter, true);
     }
 
@@ -1248,7 +1248,7 @@ public class StringUtil {
      *
      * @return List of String tokens.
      */
-    public static List split(Object source, String delimiter, boolean trim) {
+    public static List<String> split(Object source, String delimiter, boolean trim) {
         return split(source, delimiter, trim, false);
     }
 
@@ -1263,9 +1263,9 @@ public class StringUtil {
      *
      * @return List of String tokens.
      */
-    public static List split(Object source, String delimiter, boolean trim,
+    public static List<String> split(Object source, String delimiter, boolean trim,
                              boolean excludeZeroLength) {
-        ArrayList list = new ArrayList();
+        ArrayList<String> list = new ArrayList();
         if (source == null) {
             return list;
         }

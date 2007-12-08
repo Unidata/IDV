@@ -55,8 +55,12 @@ public class HtmlUtil {
         return img(path, "");
     }
 
-    public static String img(String path, String extra ) {
-        return "<img border=\"0\" src=\"" + path +"\"" + " " + extra +">";
+    public static String img(String path, String title ) {
+        return img(path, title, "");
+    }
+
+    public static String img(String path, String title, String extra) {
+        return "<img "  + XmlUtil.attrs("border","0", "src",path,"title", title, "alt", title) +" " + extra +">";
     }
     public static String bold(String v1) {
         return "<b>" + v1 +"</b>";
@@ -95,7 +99,11 @@ public class HtmlUtil {
     }
 
     public static String checkbox(String name, String value) {
-        return "<input " + XmlUtil.attrs("type","checkbox","name",name,"value", value) +">";
+        return checkbox(name, value, false);
+    }
+
+    public static String checkbox(String name, String value, boolean   checked) {
+        return "<input " + XmlUtil.attrs("type","checkbox","name",name,"value", value)+ (checked?" checked ":"")+">";
     }
 
     public static String form(String url) {
