@@ -48,6 +48,8 @@ import java.util.List;
 public class Entry {
 
 
+    Object []values;
+
     /** _more_          */
     List<String> tags;
 
@@ -106,11 +108,16 @@ public class Entry {
     }
 
 
+    public Entry(String id, TypeHandler typeHandler, String name,
+                 String description, Group group, User user, String file,
+                 long date, Object[]values) {
+        this(id, typeHandler, name, description, group, user, file, date,
+             date, date,values);
+    }
+
+
     /**
      * _more_
-     *
-     *
-     *
      *
      * @param id _more_
      * @param typeHandler _more_
@@ -130,6 +137,13 @@ public class Entry {
     public Entry(String id, TypeHandler typeHandler, String name,
                  String description, Group group, User user, String file,
                  long createDate, long startDate, long endDate) {
+        this(id,typeHandler, name, description, group, user, file, createDate,
+              startDate, endDate, null);
+    }
+
+    public Entry(String id, TypeHandler typeHandler, String name,
+                 String description, Group group, User user, String file,
+                 long createDate, long startDate, long endDate, Object[]values) {
         this.id          = id;
         this.typeHandler = typeHandler;
         this.name        = name;
@@ -140,8 +154,13 @@ public class Entry {
         this.createDate  = createDate;
         this.startDate   = startDate;
         this.endDate     = endDate;
+        this.values = values;
     }
 
+
+    public String getInsertSql() {
+        return null;
+    }
 
     /**
      * Set the File property.
@@ -382,6 +401,28 @@ public class Entry {
         tags.add(tag);
 
     }
+
+
+/**
+Set the Values property.
+
+@param value The new value for Values
+**/
+public void setValues (Object[] value) {
+	values = value;
+}
+
+/**
+Get the Values property.
+
+@return The Values
+**/
+public Object[] getValues () {
+	return values;
+}
+
+
+
 
 
 }

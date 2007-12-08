@@ -47,8 +47,9 @@ import java.util.List;
  */
 public class GenericEntry extends Entry {
 
-    /** _more_          */
-    Hashtable attributes = new Hashtable();
+
+
+
 
     /**
      * _more_
@@ -67,17 +68,15 @@ public class GenericEntry extends Entry {
      */
     public GenericEntry(String id, TypeHandler typeHandler, String name,
                         String description, Group group, User user,
-                        String file, long date) {
-        super(id, typeHandler, name, description, group, user, file, date,
-              date, date);
+                        String file, long date,Object[]values) {
+        this(id, typeHandler, name, description, group, user, file, date,
+              date, date,values);
     }
 
 
 
     /**
      * _more_
-     *
-     *
      *
      *
      * @param id _more_
@@ -98,31 +97,12 @@ public class GenericEntry extends Entry {
     public GenericEntry(String id, TypeHandler typeHandler, String name,
                         String description, Group group, User user,
                         String file, long createDate, long startDate,
-                        long endDate) {
+                        long endDate,Object []values) {
         super(id, typeHandler, name, description, group, user, file,
               createDate, startDate, endDate);
+        this.values = values;
     }
 
-    /**
-     * _more_
-     *
-     * @param name _more_
-     *
-     * @return _more_
-     */
-    public Object get(String name) {
-        return attributes.get(name);
-    }
-
-    /**
-     * _more_
-     *
-     * @param name _more_
-     * @param value _more_
-     */
-    public void put(String name, Object value) {
-        attributes.put(name, value);
-    }
 
 
 

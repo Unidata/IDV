@@ -41,6 +41,7 @@ import ucar.unidata.xml.XmlUtil;
 
 import java.sql.ResultSet;
 
+import java.sql.PreparedStatement;
 import java.sql.Statement;
 
 
@@ -65,6 +66,7 @@ public class GenericTypeHandler extends TypeHandler {
     /** _more_          */
     List<Column> columns;
 
+    String[] colNames;
 
     /**
      * _more_
@@ -78,6 +80,12 @@ public class GenericTypeHandler extends TypeHandler {
                               String description, List<Column> columns) {
         super(repository, type, description);
         this.columns = columns;
+        colNames = new String[columns.size()+1];
+        colNames[0] = "id";
+        int cnt=1;
+        for (Column column : columns) {
+            colNames[cnt++]  = column.getName();
+        }
     }
 
 
@@ -132,6 +140,59 @@ public class GenericTypeHandler extends TypeHandler {
         return where;
     }
 
+
+    public String getInsertSql() {
+        return SqlUtil.makeInsert(getTableName(),
+                                  SqlUtil.comma(colNames),
+                                  SqlUtil.getQuestionMarks(colNames.length));
+    }
+
+
+
+    public void setStatement(Entry entry, PreparedStatement stmt) throws Exception {
+        int col = 1;
+        stmt.setString(col++, entry.getId());
+        Object[]values = entry.getValues();
+        for (Column column : columns) {
+            stmt.setString(col, values[col-2].toString());
+            col++;
+        }
+    }
+
+
+    public Entry getEntry(ResultSet results) throws Exception {
+        Entry entry = super.getEntry(results);
+        Object[]values = new Object[columns.size()];
+        String query = SqlUtil.makeSelect(SqlUtil.comma(colNames),
+                                          Misc.newList(getTableName()),
+                                          SqlUtil.eq("id",
+                                                     SqlUtil.quote(entry.getId())));
+        ResultSet results2 = getRepository().execute(query).getResultSet();
+        if (results2.next()) {
+            for(int i=0;i<values.length;i++) {
+                values[i] = results2.getString(i+2);
+            }
+        }
+        entry.setValues(values);
+        return entry;
+    }
+
+
+
+    public StringBuffer getInnerEntryContent(Entry entry, Request request,String output) throws Exception {
+        StringBuffer sb = super.getInnerEntryContent(entry, request, output);
+        if (output.equals(OUTPUT_HTML)) {
+            int i=0;
+            for (Column column : columns) {
+                sb.append(HtmlUtil.tableEntry(HtmlUtil.bold(column.getLabel()+":"), 
+                                              ""+entry.getValues()[i++]));
+            }
+        } else if (output.equals(OUTPUT_XML)) {
+        }
+        else if (output.equals(OUTPUT_CSV)) {
+        }
+        return sb;
+    }
 
     /**
      * _more_

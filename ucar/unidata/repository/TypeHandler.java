@@ -21,10 +21,6 @@
  */
 
 
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -42,6 +38,8 @@ import ucar.unidata.xml.XmlUtil;
 import java.sql.ResultSet;
 
 import java.sql.Statement;
+
+import java.sql.PreparedStatement;
 
 
 import java.util.ArrayList;
@@ -67,16 +65,6 @@ public class TypeHandler implements Constants, Tables {
 
     /** _more_          */
     public static final String TYPE_FILE = "file";
-
-    /** _more_ */
-    public static final String TYPE_LEVEL3RADAR = "level3radar";
-
-
-    /** _more_ */
-    public static final String TYPE_LEVEL2RADAR = "level2radar";
-
-    /** _more_          */
-    public static final String TYPE_MODEL = "model";
 
     /** _more_ */
     Repository repository;
@@ -113,6 +101,14 @@ public class TypeHandler implements Constants, Tables {
         this.description = description;
     }
 
+    public String getDatasetTag(Entry entry, Request request) {
+        return XmlUtil.tag(TAG_DATASET,
+                           XmlUtil.attrs(ATTR_NAME,
+                                         entry.getName(),
+                                         ATTR_URLPATH, entry.getFile()));
+    }
+
+
     /**
      * _more_
      *
@@ -125,6 +121,10 @@ public class TypeHandler implements Constants, Tables {
             return false;
         }
         return Misc.equals(type, ((TypeHandler) obj).getType());
+    }
+
+    public String getNodeType() {
+        return  NODETYPE_ENTRY;
     }
 
     /**
@@ -158,18 +158,18 @@ public class TypeHandler implements Constants, Tables {
      * @throws Exception _more_
      */
     public Entry getEntry(ResultSet results) throws Exception {
-        //id,name,desc,type,group,user,file,createdata,fromdate,todate
-        int col = 1;
+        //id,type,name,desc,group,user,file,createdata,fromdate,todate
+        int col = 3;
         Entry entry =
-            new Entry(results.getString(col++),
-                      repository.getTypeHandler(results.getString(col++)),
+            new Entry(results.getString(1),
+                      this,
                       results.getString(col++), results.getString(col++),
                       repository.findGroup(results.getString(col++)),
                       repository.findUser(results.getString(col++)),
                       results.getString(col++),
-                      results.getDate(col++).getTime(),
-                      results.getDate(col++).getTime(),
-                      results.getDate(col++).getTime());
+                      results.getTimestamp(col++).getTime(),
+                      results.getTimestamp(col++).getTime(),
+                      results.getTimestamp(col++).getTime());
         return entry;
     }
 
@@ -184,33 +184,111 @@ public class TypeHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public Result showEntry(Entry entry, Request request) throws Exception {
+    public StringBuffer getEntryContent(Entry entry, Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
         String output = repository.getValue(request, ARG_OUTPUT, OUTPUT_HTML);
         if (output.equals(OUTPUT_HTML)) {
-            sb.append("<table>");
+            sb.append("<table cellspacing=\"5\" cellpadding=\"2\">");
+            sb.append(getInnerEntryContent(entry, request, output));
+        } else if (output.equals(OUTPUT_XML)) {
+        }
+        else if (output.equals(OUTPUT_CSV)) {
+        }
+        return sb;
+    }
+
+    protected String getEntryLinks(Entry entry, Request request) {
+        return getEntryDownloadLink(entry)
+            + "&nbsp;"
+            + getGraphLink(request, entry);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
+    protected String getGraphLink(Request request, Entry entry) {
+        if ( !repository.isAppletEnabled(request)) {
+            return "";
+        }
+        return repository.href(HtmlUtil.url("/graphview", ARG_ID, entry.getId(), ARG_NODETYPE,
+                entry.getType()), HtmlUtil.img(repository.href("/tree.gif"),
+                                               "Show file in graph"));
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
+    protected String getEntryDownloadLink(Entry entry) {
+        if (repository.getProperty(PROP_HTML_DOWNLOADENTRIESASFILES, false)) {
+            return HtmlUtil.href(
+                "file://" + entry.getFile(),
+                HtmlUtil.img(
+                    repository.href("/Fetch.gif"),
+                    "Download file"));
+        } else {
+            return repository.href(HtmlUtil.url("/getentry/" + entry.getName(), ARG_ID,
+                    entry.getId()), HtmlUtil.img(repository.href("/Fetch.gif"),
+                                                 "Download file"));
+        }
+    }
+
+
+
+
+    public StringBuffer getInnerEntryContent(Entry entry, Request request,String output) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        if (output.equals(OUTPUT_HTML)) {
             sb.append(
                 HtmlUtil.tableEntry(
                     HtmlUtil.bold("Name:"),
-                    entry.getName() + " "
-                    + repository.getFileFetchLink(entry) + " "
-                    + repository.getGraphLink(request, entry)));
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Create Date:"), ""
-                                          + new Date(entry.getCreateDate())));
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Creator:"),
-                                          entry.getUser().getName()));
+                    entry.getName() + "&nbsp;" +
+                    getEntryLinks(entry, request)));
+
+            String desc = entry.getDescription();
+            if(desc!=null && desc.length()>0) {
+                sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Description:"), desc));
+            }
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Created by:"),
+                                          entry.getUser().getName() + " @ " +
+                                          fmt(entry.getCreateDate())));
 
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("File:"),
                                           entry.getFile()));
-
+            
+            if(entry.getCreateDate()!= entry.getStartDate() ||
+               entry.getCreateDate()!= entry.getEndDate()) {
+                if(entry.getEndDate()!= entry.getStartDate()) {
+                    sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Date Range:"), 
+                                                  fmt(entry.getStartDate()) +" -- " +
+                                                  fmt(entry.getEndDate())));
+                } else {
+                    sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Date:"), fmt(entry.getStartDate())));
+                }
+            }
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"),
-                                          entry.getType()));
-            sb.append("</table>");
-        } else if (output.equals(OUTPUT_XML)) {}
-        else if (output.equals(OUTPUT_CSV)) {}
-        return new Result("File: " + entry.getName(), sb,
-                          repository.getMimeTypeFromOutput(output));
+                                          entry.getTypeHandler().getDescription()));
+        } else if (output.equals(OUTPUT_XML)) {
+        }
+        else if (output.equals(OUTPUT_CSV)) {
+        }
+        return sb;
+    }
 
+
+    private String fmt(long dttm) {
+        return ""+new Date(dttm);
     }
 
     /**
@@ -285,18 +363,14 @@ public class TypeHandler implements Constants, Tables {
             }
         }
 
-
-
         //The join
         if(didEntries && didOther && !TABLE_ENTRIES.equalsIgnoreCase(getTableName())) {
             whereList.add(0,SqlUtil.eq(COL_ENTRIES_ID, getTableName()+".id"));
             where = SqlUtil.makeAnd(whereList);
         }
         String sql = SqlUtil.makeSelect(what, tables, where,extra);
-        //        System.err.println (sql);
         return getRepository().execute(sql,repository.getMax(request));
     }
-
 
     /**
      * _more_
@@ -310,14 +384,8 @@ public class TypeHandler implements Constants, Tables {
      */
     public Result processRadarList(Request request, String what)
             throws Exception {
-        String column;
-        String tag;
-        String title;
-        if (what.equals(WHAT_PRODUCT)) {
-            column = COL_LEVEL3RADAR_PRODUCT;
-            tag    = "product";
-            title  = "Level 3 Radar Products";
-        } else /*if(what.equals(WHAT_STATION))*/ {
+        /*
+  
             column = COL_LEVEL3RADAR_STATION;
             tag    = "station";
             title  = "Level 3 Radar Stations";
@@ -334,7 +402,7 @@ public class TypeHandler implements Constants, Tables {
         StringBuffer sb        = new StringBuffer();
         String output = repository.getValue(request, ARG_OUTPUT, OUTPUT_HTML);
         if (output.equals(OUTPUT_HTML)) {
-            sb.append("<h2>Products</h2>");
+            sb.append("<h3>Products</h3>");
             sb.append("<ul>");
         } else if (output.equals(OUTPUT_XML)) {
             sb.append(XmlUtil.XML_HEADER + "\n");
@@ -371,6 +439,8 @@ public class TypeHandler implements Constants, Tables {
         }
         return new Result(title, sb,
                           repository.getMimeTypeFromOutput(output));
+*/
+            return null;
     }
 
 
@@ -447,19 +517,29 @@ public class TypeHandler implements Constants, Tables {
         formBuffer.append("\n");
 
 
-        String name = (String) request.get(ARG_NAME);
-        if (name == null) {
+        String name = (String) request.get(ARG_NAME,"");
+        if (name.trim().length()==0) {
             formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
                     HtmlUtil.input(ARG_NAME)));
-            formBuffer.append("\n");
+        } else {
+            formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
+                                                  name));
         }
-
+        formBuffer.append("\n");
 
 
         String groupArg = (String) request.get(ARG_GROUP);
         if (groupArg != null) {
-            //            formBuffer.append(HtmlUtil.tableEntry("<b>Group:</b>", groupArg));
             formBuffer.append(HtmlUtil.hidden(ARG_GROUP, groupArg));
+            if(groupArg.endsWith("%")) {
+                groupArg = groupArg.substring(0,groupArg.length()-1);
+            }
+            Group group = repository.findGroup(groupArg); 
+            if(group!=null) {
+                formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Group:"),
+                        group.getFullName()));
+
+            }
         } else {
             Statement stmt = executeSelect(request,
                                            SqlUtil.distinct(COL_ENTRIES_GROUP_ID),
@@ -483,11 +563,11 @@ public class TypeHandler implements Constants, Tables {
             } else if (groups.size() == 1) {
                 formBuffer.append(HtmlUtil.hidden(ARG_GROUP,
                         groups.get(0).getFullName()));
-                formBuffer.append(HtmlUtil.tableEntry("<b>Group:</b>",
+                formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Group:"),
                         groups.get(0).getFullName()));
             }
         }
-
+        formBuffer.append("\n");
 
         String tag = (String) request.get(ARG_TAG);
         if (tag == null) {
@@ -496,16 +576,13 @@ public class TypeHandler implements Constants, Tables {
         formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Tag:"),
                 HtmlUtil.input(ARG_TAG, tag)));
 
-        String calClick =
-            "<A HREF=# onClick=\"" + "window.dateStyle = '';\n"
-            + "window.dateField = document.query.fromdate\n"
-            + "calendar =window.open('/repository/calendar.html','cal','WIDTH=300,HEIGHT=350')\n"
-            + "\">CLICK</a>";
+        formBuffer.append("\n");
 
         formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Date Range:"),
                 HtmlUtil.input(ARG_FROMDATE, minDate) + " -- "
                 + HtmlUtil.input(ARG_TODATE, maxDate)));
 
+        formBuffer.append("\n");
     }
 
     /**
@@ -519,10 +596,8 @@ public class TypeHandler implements Constants, Tables {
      */
     protected List assembleWhereClause(Request request) throws Exception {
         List   where = new ArrayList();
-        String name  = (String) request.get(ARG_NAME);
-        if (name != null) {
-            name = name.trim();
-        }
+        String name  = (String) request.get(ARG_NAME,"").trim();
+
 
         String tag = (String) request.get(ARG_TAG);
         if (tag != null) {
@@ -588,14 +663,21 @@ public class TypeHandler implements Constants, Tables {
         }
 
 
-        //        System.err.println ("name:" + name);
         if ((name != null) && (name.length() > 0)) {
             addOr(COL_ENTRIES_NAME, name, where, true);
+            addOr(COL_ENTRIES_DESCRIPTION, name, where, true);
         }
 
         return where;
     }
 
+
+    public void setStatement(Entry entry, PreparedStatement stmt) throws Exception {
+    }
+
+    public String getInsertSql() {
+        return null;
+    }
 
     /**
      * _more_

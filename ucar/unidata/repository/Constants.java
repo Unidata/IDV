@@ -184,7 +184,7 @@ public interface Constants {
     public static final String ARG_WHAT = "what";
 
     /** _more_ */
-    public static final String WHAT_QUERY = "query";
+    public static final String WHAT_ENTRIES = "entries";
 
     /** _more_          */
     public static final String WHAT_TYPE = "type";
@@ -199,14 +199,6 @@ public interface Constants {
     public static final String WHAT_GROUP = "group";
 
     /** _more_ */
-    public static final String WHAT_PRODUCT = "product";
-
-    /** _more_ */
-    public static final String WHAT_STATION = "station";
-
-
-
-    /** _more_ */
     public static final String ARG_MAX = "max";
 
     /** _more_ */
@@ -217,6 +209,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_ID = "id";
+    public static final String ARG_IDS = "ids";
 
     /** _more_ */
     public static final String ARG_GROUP = "group";
@@ -270,8 +263,6 @@ public interface Constants {
     /** _more_          */
     public static final String OUTPUT_ZIP = "zip";
 
-    /** _more_ */
-    public static final String NODETYPE_ENTRY = "entry";
 
     /** _more_          */
     public static final String TYPE_TAG = "tag";
@@ -317,6 +308,8 @@ public interface Constants {
     /** _more_          */
     public static final String TAG_DB_ENTRY = "entry";
 
+    public static final String TAG_DB_HANDLER = "handler";
+
     /** _more_          */
     public static final String TAG_DB_COLUMN = "column";
 
@@ -328,5 +321,16 @@ public interface Constants {
 
 
 
+    public static final String ARG_NODETYPE = "nodetype";
+
+    /** _more_ */
+    public static final String NODETYPE_ENTRY = "entry";
+
+    /** _more_ */
+    public static final String NODETYPE_GROUP = "group";
+
+    public static final String TAG_CATALOGREF= "catalogRef";
+    public static final String ATTR_XLINKTITLE="xlink:title";
+    public static final String ATTR_XLINKHREF = "xlink:href";
 }
 

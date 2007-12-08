@@ -194,6 +194,7 @@ public class MetaDataServer extends HttpServer implements Constants {
                         }
                     }
                 } catch (Throwable exc) {
+                    exc = LogUtil.getInnerException(exc);
                     System.err.println("Error:" + exc);
                     exc.printStackTrace();
                     String trace = LogUtil.getStackTrace(exc);

@@ -95,9 +95,9 @@ public interface Tables {
     //J-
     public static final String TABLE_ENTRIES              = "entries";
     public static final String COL_ENTRIES_ID             = TABLE_ENTRIES + ".id";
+    public static final String COL_ENTRIES_TYPE           = TABLE_ENTRIES + ".type";
     public static final String COL_ENTRIES_NAME           = TABLE_ENTRIES + ".name";
     public static final String COL_ENTRIES_DESCRIPTION    = TABLE_ENTRIES + ".description";
-    public static final String COL_ENTRIES_TYPE           = TABLE_ENTRIES + ".type";
     public static final String COL_ENTRIES_GROUP_ID       = TABLE_ENTRIES + ".group_id";
     public static final String COL_ENTRIES_USER_ID        = TABLE_ENTRIES + ".user_id";
     public static final String COL_ENTRIES_FILE           = TABLE_ENTRIES + ".file";
@@ -107,9 +107,9 @@ public interface Tables {
 
     public static final String []ARRAY_ENTRIES = new String[]{
         COL_ENTRIES_ID,
+        COL_ENTRIES_TYPE,
         COL_ENTRIES_NAME,
         COL_ENTRIES_DESCRIPTION,
-        COL_ENTRIES_TYPE,
         COL_ENTRIES_GROUP_ID,
         COL_ENTRIES_USER_ID,
         COL_ENTRIES_FILE,
@@ -173,83 +173,6 @@ public interface Tables {
         SqlUtil.makeInsert(TABLE_TAGS,
                            COLUMNS_TAGS,
                            SqlUtil.getQuestionMarks(ARRAY_TAGS.length));
-
-
-
-    public static final String TABLE_LEVEL3RADAR = "level3radar";
-    public static final String COL_LEVEL3RADAR_ID = TABLE_LEVEL3RADAR + ".id";
-    public static final String COL_LEVEL3RADAR_STATION = TABLE_LEVEL3RADAR + ".station";
-    public static final String COL_LEVEL3RADAR_PRODUCT = TABLE_LEVEL3RADAR + ".product";
-    public static final String []ARRAY_LEVEL3RADAR = new String[]{COL_LEVEL3RADAR_ID,
-                                                                COL_LEVEL3RADAR_STATION,
-                                                                COL_LEVEL3RADAR_PRODUCT};
-
-
-    public static final String COLUMNS_LEVEL3RADAR = SqlUtil.comma(ARRAY_LEVEL3RADAR);
-    
-    public static final String INSERT_LEVEL3RADAR =
-        SqlUtil.makeInsert(TABLE_LEVEL3RADAR,
-                           COLUMNS_LEVEL3RADAR,
-                           SqlUtil.getQuestionMarks(ARRAY_LEVEL3RADAR.length));
-
-
-    public static final String TABLE_LEVEL2RADAR = "level2radar";
-    public static final String COL_LEVEL2RADAR_ID = TABLE_LEVEL2RADAR + ".id";
-    public static final String COL_LEVEL2RADAR_STATION = TABLE_LEVEL2RADAR + ".station";
-    public static final String []ARRAY_LEVEL2RADAR = new String[]{COL_LEVEL2RADAR_ID,
-                                                                COL_LEVEL2RADAR_STATION};
-
-
-    public static final String COLUMNS_LEVEL2RADAR = SqlUtil.comma(ARRAY_LEVEL2RADAR);
-    
-    public static final String INSERT_LEVEL2RADAR =
-        SqlUtil.makeInsert(TABLE_LEVEL2RADAR,
-                           COLUMNS_LEVEL2RADAR,
-                           SqlUtil.getQuestionMarks(ARRAY_LEVEL2RADAR.length));
-
-
-
-
-    public static final String TABLE_SATELLITE = "satellite";
-    public static final String COL_SATELLITE_ID = TABLE_SATELLITE + ".id";
-    public static final String COL_SATELLITE_PLATFORM = TABLE_SATELLITE + ".platform";
-    public static final String COL_SATELLITE_RESOLUTION = TABLE_SATELLITE + ".resolution";
-    public static final String COL_SATELLITE_PRODUCT = TABLE_SATELLITE + ".product";
-    public static final String []ARRAY_SATELLITE = new String[]{COL_SATELLITE_ID,
-                                                                COL_SATELLITE_PLATFORM,
-                                                                COL_SATELLITE_RESOLUTION,
-                                                                COL_SATELLITE_PRODUCT};
-
-
-    public static final String COLUMNS_SATELLITE = SqlUtil.comma(ARRAY_SATELLITE);
-    
-    public static final String INSERT_SATELLITE =
-        SqlUtil.makeInsert(TABLE_SATELLITE,
-                           COLUMNS_SATELLITE,
-                           SqlUtil.getQuestionMarks(ARRAY_SATELLITE.length));
-
-
-
-
-
-    public static final String TABLE_MODEL = "model";
-    public static final String COL_MODEL_ID = TABLE_MODEL + ".id";
-    public static final String COL_MODEL_MODELGROUP = TABLE_MODEL + ".modelgroup";
-    public static final String COL_MODEL_MODELRUN = TABLE_MODEL + ".modelrun";
-    public static final String []ARRAY_MODEL = new String[]{COL_MODEL_ID,
-                                                            COL_MODEL_MODELGROUP ,
-                                                                COL_MODEL_MODELRUN 
-};
-
-
-    public static final String COLUMNS_MODEL = SqlUtil.comma(ARRAY_MODEL);
-    
-    public static final String INSERT_MODEL =
-        SqlUtil.makeInsert(TABLE_MODEL,
-                           COLUMNS_MODEL,
-                           SqlUtil.getQuestionMarks(ARRAY_MODEL.length));
-
-
 
 
 

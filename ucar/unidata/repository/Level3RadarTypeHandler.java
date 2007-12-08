@@ -24,78 +24,65 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
+import ucar.unidata.data.SqlUtil;
 import ucar.unidata.util.DateUtil;
+
+import ucar.unidata.util.HtmlUtil;
+import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.xml.XmlUtil;
 
+import java.sql.ResultSet;
+
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.List;
-
+import java.util.Properties;
 
 
 
 /**
- * Class Level2RadarEntry _more_
  *
  *
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Level2RadarEntry extends Entry {
-
-
-    /** _more_ */
-    private String station;
+public class Level3RadarTypeHandler extends GenericTypeHandler {
 
 
 
     /**
      * _more_
      *
-     *
-     *
-     *
-     * @param id _more_
-     * @param typeHandler _more_
-     * @param name _more_
+     * @param repository _more_
+     * @param type _more_
      * @param description _more_
-     * @param group _more_
-     * @param user _more_
-     * @param file _more_
-     * @param station _more_
-     * @param date _more_
+     * @param columns _more_
      */
-    public Level2RadarEntry(String id, TypeHandler typeHandler, String name,
-                            String description, Group group, User user,
-                            String file, String station, long date) {
-        super(id, typeHandler, name, description, group, user, file,
-              new Date().getTime(), date, date);
-        this.station = station;
+    public Level3RadarTypeHandler(Repository repository, String type,
+                              String description, List<Column> columns) {
+        super(repository, type, description,columns);
     }
 
+    protected String getEntryLinks(Entry entry, Request request) {
+        return super.getEntryLinks(entry, request) + " " +
+            HtmlUtil.href("http://radar.weather.gov/radar.php?rid=" + entry.getValues()[0] +"&product=" +
+                          entry.getValues()[0] +"", "NWS Radar web site"," target=_OTHER");
 
-
-    /**
-     * Set the Station property.
-     *
-     * @param value The new value for Station
-     */
-    public void setStation(String value) {
-        station = value;
     }
-
-    /**
-     * Get the Station property.
-     *
-     * @return The Station
-     */
-    public String getStation() {
-        return station;
-    }
-
 
 }
 

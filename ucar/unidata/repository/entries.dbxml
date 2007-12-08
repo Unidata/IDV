@@ -4,7 +4,7 @@
      <column name="modelrun" type="string" isindex="true" issearchable="true" searchtype="select"  label="Model Run"/>
   </entry>
 
-  <entry name="level3radar" description="Level 3 Radar Files">
+  <entry name="level3radar" description="Level 3 Radar Files" handler="ucar.unidata.repository.Level3RadarTypeHandler">
 	<column name="station" type="string" isindex="true" issearchable="true" searchtype="select" label="Station" rows="5" columns="10"/>
 	<column name="product" type="string" isindex="true" issearchable="true" searchtype="select" label="Product"/>
   </entry>

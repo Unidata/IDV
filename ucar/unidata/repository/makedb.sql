@@ -24,9 +24,9 @@ CREATE TABLE  users (id varchar(200),
 
 
 CREATE TABLE entries (id varchar(200),
+                   type varchar(200),
 	           name varchar(200),
                    description varchar(500),
-                   type varchar(200),
                    group_id varchar(200),
    		   user_id varchar(200),
 	           file varchar(200),

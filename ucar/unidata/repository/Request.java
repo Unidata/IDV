@@ -116,6 +116,12 @@ public class Request {
     /** _more_ */
     private Hashtable parameters;
 
+    private Hashtable originalParameters;
+
+    public String toString() {
+        return type + " params:" + parameters;
+    }
+
     /**
      * _more_
      *
@@ -128,7 +134,25 @@ public class Request {
         this.type           = type;
         this.requestContext = requestContext;
         this.parameters     = parameters;
+        this.originalParameters= new Hashtable();
+        originalParameters.putAll(parameters);
     }
+
+    public String getUrlArgs() {
+        StringBuffer sb = new StringBuffer();
+        int cnt = 0;
+        for (Enumeration keys = parameters.keys();
+                keys.hasMoreElements(); ) {
+            String arg = (String) keys.nextElement();
+            String value = (String) parameters.get(arg);
+            if(value.length()==0) continue;
+            if(cnt>0)
+                sb.append("&");
+            sb.append(arg+"="+value);
+        }
+        return sb.toString();
+    }
+
 
     /**
      * _more_
@@ -144,7 +168,7 @@ public class Request {
         Request that = (Request) o;
         return this.type.equals(that.type)
                && this.requestContext.equals(that.requestContext)
-               && this.parameters.equals(that.parameters);
+               && this.originalParameters.equals(that.originalParameters);
     }
 
 
@@ -155,7 +179,7 @@ public class Request {
      */
     public int hashCode() {
         return type.hashCode() ^ requestContext.hashCode()
-               ^ parameters.hashCode();
+            ^ originalParameters.hashCode();
     }
 
     /**
