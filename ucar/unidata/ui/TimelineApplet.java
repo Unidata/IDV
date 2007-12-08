@@ -51,6 +51,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 
 
@@ -80,6 +81,8 @@ public class TimelineApplet extends Applet {
     Timeline timeline;
     URL baseUrl;
     JLabel label = new JLabel("  ");
+    JButton loadBtn;    
+    JComboBox loadWhat;
 
     public TimelineApplet() {
     }
@@ -88,36 +91,102 @@ public class TimelineApplet extends Applet {
         super.init();
         String times  = getParameter ("times");
         String labels  = getParameter ("labels");
+        String ids  = getParameter ("ids");
         List realTimes = new ArrayList();
         //        System.err.println("TIMES:" + times);
         //        System.err.println("labels:" + labels);
+        List idList = null;
+        JComponent loadComp = new JPanel();
         try {
-        if(times!=null&& labels!=null) {
-            List timeStrings = StringUtil.split(times,",",true, true);
-            List labelStrings = StringUtil.split(labels,",",true, true);
-            for(int i=0;i<timeStrings.size();i++) {
-                realTimes.add(new DatedObject(DateUtil.parse((String) timeStrings.get(i)),
-                                                             labelStrings.get(i)));
+            if(times!=null&& labels!=null) {
+                List timeStrings = StringUtil.split(times,",",true, true);
+                List labelStrings = StringUtil.split(labels,",",true, true);
+                if(ids!=null) idList = StringUtil.split(ids,",",true, true);
+                for(int i=0;i<timeStrings.size();i++) {
+                    realTimes.add(new MyDatedObject(DateUtil.parse((String) timeStrings.get(i)),
+                                                    (String)labelStrings.get(i),
+                                                    (String)(idList!=null?idList.get(i):null)));
+                }
             }
-        }
         } catch(Exception exc) {
             exc.printStackTrace();
         }
-        //        System.err.println("xxxx Real times:" + realTimes);
-        timeline = new Timeline(realTimes,400) {
+
+        final String  loadUrl  = getParameter("loadurl");
+        if(loadUrl!=null && idList!=null) {
+            String loadLabel  = getParameter("loadlabel");
+            if(loadLabel == null)
+                loadLabel = "Load Selected";
+            loadBtn  = new JButton(loadLabel);
+            loadBtn.setEnabled(false);
+            loadBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        doLoad(loadUrl);
+                    }
+                });
+            String  loadTypes  = getParameter("loadtypes");
+            if(loadTypes!=null && loadUrl.indexOf("%loadtype%")>=0) {
+                loadWhat = new JComboBox(new Vector(StringUtil.split(loadTypes,",",true,true)));
+                loadComp = LayoutUtil.hbox(loadBtn, loadWhat);
+            } else {
+                loadComp = loadBtn;
+            }
+        }
+
+
+        timeline = new Timeline(new ArrayList(),400) {
                 public void setHighlightedDate(DatedThing d) {
                     if(d==null) label.setText("  ");
                     else label.setText(d.toString());
                     super.setHighlightedDate(d);
                 }
+                public void selectedDatesChanged() {
+                    super.selectedDatesChanged();
+                    if(loadBtn!=null)
+                        loadBtn.setEnabled(getSelected().size()>0);
+                }
             };
+
+
         //        baseUrl =getDocumentBase();
         setLayout (new BorderLayout());
+        timeline.setDatedThings(realTimes, true);
         timeline.setUseDateSelection(false);
-        JPanel container = LayoutUtil.centerBottom(timeline.getContents(false,false),LayoutUtil.inset(label,new Insets(0,5,0,0)));
+        JPanel container = LayoutUtil.centerBottom(timeline.getContents(false,false),LayoutUtil.inset(LayoutUtil.centerRight(
+                                                                                                                         label,loadComp),new Insets(0,5,0,0)));
         container.setBorder(BorderFactory.createLineBorder(Color.black));
 
         this.add(container);
     }
+
+    private void doLoad(String loadUrl) {
+        try {
+        StringBuffer  ids = new StringBuffer();
+        List selected = timeline.getSelected();
+        for(int i=0;i<selected.size();i++) {
+            if(i>0) ids.append(",");
+            ids.append(((MyDatedObject) selected.get(i)).id.toString());
+        }
+        URL base  = getDocumentBase();
+        loadUrl  = loadUrl.replace("%ids%", ids.toString());
+        if(loadWhat!=null) {
+            loadUrl  = loadUrl.replace("%loadtype%", loadWhat.getSelectedItem().toString());
+        }
+        String s = "http://" + base.getHost() +":" + base.getPort() +loadUrl;
+        URL doc = new URL(s);
+        getAppletContext().showDocument(doc);
+        } catch(Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    private static class MyDatedObject extends DatedObject {
+        private Object id;
+        public MyDatedObject(Date date, String label, String id) {
+            super(date, label);
+            this.id = id;
+        }
+    }
+
 }
 
