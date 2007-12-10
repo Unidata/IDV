@@ -2121,7 +2121,7 @@ public class JythonManager extends IdvManager implements ActionListener {
      * @param descriptor The descriptor for the formula.
      */
     public void showFormulaDialog(DerivedDataDescriptor descriptor) {
-        showFormulaDialog(descriptor, false);
+        showFormulaDialog(descriptor, (descriptor==null));
     }
 
     public void showFormulaDialog(DerivedDataDescriptor descriptor, boolean isNew) {
