@@ -900,7 +900,9 @@ public class JythonManager extends IdvManager implements ActionListener {
             }
         }
 
+        boolean isNew = true;
         if (ddd != null) {
+            isNew = false;
             if ( !GuiUtils.askOkCancel(
                     "Formula Exists",
                     "<html>A formula with the name: " + name
@@ -916,7 +918,7 @@ public class JythonManager extends IdvManager implements ActionListener {
                                             makeCallString(func, null),
                                             new ArrayList());
         }
-        new FormulaDialog(getIdv(), ddd, null, new ArrayList());
+        showFormulaDialog(ddd, isNew);
     }
 
     /**
@@ -2119,6 +2121,10 @@ public class JythonManager extends IdvManager implements ActionListener {
      * @param descriptor The descriptor for the formula.
      */
     public void showFormulaDialog(DerivedDataDescriptor descriptor) {
+        showFormulaDialog(descriptor, false);
+    }
+
+    public void showFormulaDialog(DerivedDataDescriptor descriptor, boolean isNew) {
         List                 categories = new ArrayList();
         DescriptorDataSource dds        = getDescriptorDataSource();
         if (dds != null) {
@@ -2139,7 +2145,7 @@ public class JythonManager extends IdvManager implements ActionListener {
             }
         }
 
-        new FormulaDialog(getIdv(), descriptor, null, categories);
+        new FormulaDialog(getIdv(), descriptor, null, categories,isNew);
     }
 
 
