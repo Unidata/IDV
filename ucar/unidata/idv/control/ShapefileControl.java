@@ -459,7 +459,11 @@ public class ShapefileControl extends DisplayControlImpl {
             }
 
             public int getRowCount() {
-                return visibleRows.size();
+                if (tableCols.size()>0) {
+                    List colData = (List) tableCols.get(0);
+                    return colData.size();
+                }
+                return 0;
             }
 
             public int getColumnCount() {
