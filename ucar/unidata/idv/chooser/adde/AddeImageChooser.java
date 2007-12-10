@@ -21,6 +21,8 @@
  */
 
 
+
+
 package ucar.unidata.idv.chooser.adde;
 
 
@@ -35,11 +37,11 @@ import ucar.unidata.data.imagery.BandInfo;
 import ucar.unidata.data.imagery.ImageDataSource;
 import ucar.unidata.data.imagery.ImageDataset;
 
-import ucar.unidata.idv.ui.IdvUIManager;
-
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.idv.chooser.IdvChooser;
 import ucar.unidata.idv.chooser.IdvChooserManager;
+
+import ucar.unidata.idv.ui.IdvUIManager;
 
 
 import ucar.unidata.ui.ChooserList;
@@ -99,8 +101,10 @@ import javax.swing.event.*;
  *
  * @author Don Murray
  */
-public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.imagery.ImageSelector {
+public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
+    .imagery.ImageSelector {
 
+    /** _more_ */
     private static final int SIZE_THRESHOLD = 30;
 
 
@@ -302,6 +306,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
     /** Widget for the element  center point in the advanced section */
     protected JTextField centerElementFld;
 
+    /** _more_ */
     private JToggleButton lockBtn;
 
     /** Label used for the line center */
@@ -473,10 +478,10 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
                     setStatus("Please select a " + name, "imagetype");
                 }
             }
-        } else if (readTimesTask!=null) {
-            if(taskOk(readTimesTask)) {
+        } else if (readTimesTask != null) {
+            if (taskOk(readTimesTask)) {
                 setStatus("Reading available times from server");
-            } 
+            }
         } else if (getDoAbsoluteTimes() && !haveTimeSelected()) {
             setStatus(MSG_TIMES);
         }
@@ -803,6 +808,11 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected List processServerComponents() {
         if (groupSelector != null) {
             clearOnChange(groupSelector);
@@ -822,16 +832,21 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
 
         JButton showBtn =
             GuiUtils.makeImageButton("/auxdata/ui/icons/About16.gif", this,
-                                     "showGroups",null,true);
+                                     "showGroups", null, true);
         showBtn.setToolTipText(
             "List the public datasets available on the server");
         JComponent extraTop = GuiUtils.hbox(groupSelector, showBtn);
-        List comps = new ArrayList();
+        List       comps    = new ArrayList();
         addTopComponents(comps, LABEL_DATASET, extraTop);
         return comps;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected List processPropertyComponents() {
         List bottomComps = new ArrayList();
         // need to call this to create the propPanel
@@ -844,7 +859,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
             propertiesLabel = GuiUtils.lLabel(" ");
             JButton editButton =
                 GuiUtils.makeImageButton("/auxdata/ui/icons/Edit16.gif",
-                                         this, "showPropPanel",null,true);
+                                         this, "showPropPanel", null, true);
             editButton.setToolTipText("Click to edit properties");
             bottomComps.add(GuiUtils.leftCenter(editButton, propertiesLabel));
         }
@@ -943,22 +958,26 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
                 changePlace(PLACE_CENTER);
                 addPropComp(PROP_PLACE, placeLbl);
 
-                latLonWidget       = new LatLonWidget();
-                centerLineFld      = new JTextField("", 3);
-                centerElementFld   = new JTextField("", 3);
+                latLonWidget     = new LatLonWidget();
+                centerLineFld    = new JTextField("", 3);
+                centerElementFld = new JTextField("", 3);
 
-                lockBtn = GuiUtils.getToggleImageButton(IdvUIManager.ICON_UNLOCK,IdvUIManager.ICON_LOCK,0,0,true);
+                lockBtn =
+                    GuiUtils.getToggleImageButton(IdvUIManager.ICON_UNLOCK,
+                        IdvUIManager.ICON_LOCK, 0, 0, true);
                 lockBtn.setContentAreaFilled(false);
                 lockBtn.setSelected(true);
-                lockBtn.setToolTipText("Unlock to automatically change size when changing magnification");
+                lockBtn.setToolTipText(
+                    "Unlock to automatically change size when changing magnification");
 
                 final JButton centerPopupBtn =
-                    GuiUtils.getImageButton("/auxdata/ui/icons/MapIcon16.png",
-                                            getClass());
+                    GuiUtils.getImageButton(
+                        "/auxdata/ui/icons/MapIcon16.png", getClass());
                 centerPopupBtn.setToolTipText("Center on current displays");
                 centerPopupBtn.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent ae) {
-                        getIdv().getIdvUIManager().popupCenterMenu(centerPopupBtn,latLonWidget);
+                        getIdv().getIdvUIManager().popupCenterMenu(
+                            centerPopupBtn, latLonWidget);
                     }
                 });
                 JComponent centerPopup = GuiUtils.inset(centerPopupBtn,
@@ -988,14 +1007,14 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
 
                 JButton locPosButton = GuiUtils.makeImageButton(
                                            "/auxdata/ui/icons/Refresh16.gif",
-                                           this, "cyclePlace", null,true);
+                                           this, "cyclePlace", null, true);
 
                 locPosButton.setToolTipText("Change place type");
 
                 JButton locTypeButton =
                     GuiUtils.makeImageButton(
                         "/auxdata/ui/icons/Refresh16.gif", locationPanel,
-                        "flip", null,true);
+                        "flip", null, true);
                 locTypeButton.setToolTipText(
                     "Toggle between Latitude/Longitude and Line/Element");
 
@@ -1011,7 +1030,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
                         if (amSettingProperties) {
                             return;
                         }
-                        lineMagSliderChanged(!lockBtn.isSelected());
+                        lineMagSliderChanged( !lockBtn.isSelected());
                     }
                 };
                 ChangeListener elementListener = new ChangeListener() {
@@ -1109,7 +1128,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
                 JPanel sizePanel =
                     GuiUtils.left(GuiUtils.doLayout(new Component[] {
                         numLinesFld,
-                        new JLabel(" X "), numElementsFld, lockBtn,/*new JLabel(" "),*/
+                        new JLabel(" X "), numElementsFld, lockBtn,  /*new JLabel(" "),*/
                         sizeLbl }, 5, GuiUtils.WT_N, GuiUtils.WT_N));
                 addPropComp(PROP_SIZE, propComp = sizePanel);
             }
@@ -1154,29 +1173,29 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
 
 
 
+    /**
+     * _more_
+     *
+     * @param recomputeLineEleRatio _more_
+     */
     private void elementMagSliderChanged(boolean recomputeLineEleRatio) {
         int value = getElementMagValue();
         if ((Math.abs(value) < SLIDER_MAX)) {
             int lineMag = getLineMagValue();
             if (lineMag > value) {
-                linesToElements = Math.abs(lineMag
-                                           / (double) value);
+                linesToElements = Math.abs(lineMag / (double) value);
             } else {
-                linesToElements = Math.abs((double) value
-                                           / lineMag);
+                linesToElements = Math.abs((double) value / lineMag);
             }
         }
         //System.out.println(" changelistener: linesToElements = " + linesToElements);
-        elementMagLbl.setText(StringUtil.padLeft("" + value,
-                                                 4));
-        if(!lockBtn.isSelected()) {
+        elementMagLbl.setText(StringUtil.padLeft("" + value, 4));
+        if ( !lockBtn.isSelected()) {
             if (value > 0) {
-                numElementsFld.setText(""
-                                       + (int) (baseNumElements * value));
+                numElementsFld.setText("" + (int) (baseNumElements * value));
             } else {
-                numElementsFld.setText(""
-                                       + (int) (baseNumElements
-                                                / (double) -value));
+                numElementsFld.setText("" + (int) (baseNumElements
+                        / (double) -value));
             }
         }
     }
@@ -1185,22 +1204,23 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
     /**
      * Handle the line mag slider changed event
      *
-     * @param evt  the event
+     *
+     * @param autoSetSize _more_
      */
     private void lineMagSliderChanged(boolean autoSetSize) {
         try {
             int value = getLineMagValue();
             lineMagLbl.setText(StringUtil.padLeft("" + value, 4));
-            if(autoSetSize) {
+            if (autoSetSize) {
                 if (value > 0) {
                     numLinesFld.setText("" + (int) (baseNumLines * value));
                 } else {
                     numLinesFld.setText("" + (int) (baseNumLines
-                                                    / (double) -value));
+                            / (double) -value));
                 }
             }
 
-            if (value == 1) {                     // special case
+            if (value == 1) {                   // special case
                 if (linesToElements < 1.0) {
                     value = (int) (-value / linesToElements);
                 } else {
@@ -1214,9 +1234,9 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
                 value = (int) (value / linesToElements);
             }
 
-            value                 = (value > 0)
-                                    ? value - 1
-                                    : value + 1;  // since slider is one off
+            value               = (value > 0)
+                                  ? value - 1
+                                  : value + 1;  // since slider is one off
             amSettingProperties = true;
             elementMagSlider.setValue(value);
             amSettingProperties = false;
@@ -1314,7 +1334,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
 
         JButton archiveDayBtn =
             GuiUtils.makeImageButton("/auxdata/ui/icons/Archive.gif", this,
-                                     "getArchiveDay",null,true);
+                                     "getArchiveDay", null, true);
         archiveDayBtn.setToolTipText("Select a day for archive datasets");
         archiveDayLabel     = new JLabel("");
         archiveDayComponent = GuiUtils.hbox(archiveDayBtn, archiveDayLabel);
@@ -1584,6 +1604,9 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
     }
 
 
+    /**
+     * _more_
+     */
     public void doCancel() {
         readTimesTask = null;
         setState(STATE_UNCONNECTED);
@@ -1594,7 +1617,6 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
     /**
      * Set the list of dates/times based on the image selection
      *
-     * @param timestep    the timestep for the image selection
      */
     private void readTimesInner() {
         String       descriptor  = getDescriptor();
@@ -1630,7 +1652,6 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
      * Load the images for the given URL and timestep
      *
      * @param url          ADDE URL
-     * @param timestep     valid timestep
      */
     private void loadImages(String url) {
         readTimesTask = startTask();
@@ -1640,7 +1661,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
             AreaDirectoryList adir = new AreaDirectoryList(url);
             //Make sure no other loads are  occurred
             boolean ok = stopTaskAndIsOk(task);
-            if(!Misc.equals(readTimesTask, task) || !ok) {
+            if ( !Misc.equals(readTimesTask, task) || !ok) {
                 return;
             }
             readTimesTask = null;
@@ -1848,9 +1869,9 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
                 for (int i = 0; i < relativeTimesIndices.length; i++) {
                     AddeImageDescriptor aid =
                         new AddeImageDescriptor(relativeTimesIndices[i],
-                                                firstDescriptor);
-                    AddeImageInfo aii = makeImageInfo(aid.getDirectory(), true,
-                                                      relativeTimesIndices[i]);
+                            firstDescriptor);
+                    AddeImageInfo aii = makeImageInfo(aid.getDirectory(),
+                                            true, relativeTimesIndices[i]);
                     aid.setImageInfo(aii);
                     aid.setSource(aii.getURLString());
                     images.add(aid);
@@ -1860,16 +1881,16 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
                 for (int i = 0; i < selectedTimes.size(); i++) {
                     AddeImageDescriptor aid =
                         new AddeImageDescriptor(
-                                                (AddeImageDescriptor) selectedTimes.get(i));
-                    AddeImageInfo aii = makeImageInfo(aid.getDirectory(), false,
-                                                      i);
+                            (AddeImageDescriptor) selectedTimes.get(i));
+                    AddeImageInfo aii = makeImageInfo(aid.getDirectory(),
+                                            false, i);
                     aid.setImageInfo(aii);
                     aid.setSource(aii.getURLString());
                     images.add(aid);
                 }
             }
-        } catch(Exception exc) {
-            logException("Error occured",exc);
+        } catch (Exception exc) {
+            logException("Error occured", exc);
             return null;
         }
         return images;
@@ -2035,7 +2056,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
      * @param ad    image directory
      * @return   request size
      */
-    protected String getSize(AreaDirectory ad) {
+    protected String getSizeString(AreaDirectory ad) {
         String retString = MAX_SIZE + " " + MAX_SIZE;
         if (ad != null) {
             int x = ad.getElements();
@@ -2175,7 +2196,16 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
         if (usePropFromUser(prop)) {
             return getUserPropValue(prop, ad);
         }
-        return getDefault(prop, getDefaultPropValue(prop, ad, false));
+
+        //Handle size specially because we really want to get the minimum of the default and the ad size
+        if (prop.equals(PROP_SIZE)) {
+            int[] size = getSize(ad);
+            return size[0] + " " + size[1];
+        }
+
+
+        String value = getDefault(prop, getDefaultPropValue(prop, ad, false));
+        return value;
     }
 
 
@@ -2428,6 +2458,44 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
     }
 
     /**
+     * _more_
+     *
+     * @param ad _more_
+     *
+     * @return _more_
+     */
+    protected int[] getSize(AreaDirectory ad) {
+        baseNumLines    = ad.getLines();
+        baseNumElements = ad.getElements();
+
+        String sizeDefault = getDefault(PROP_SIZE, (String) null);
+        List   toks        = ((sizeDefault != null)
+                              ? StringUtil.split(sizeDefault, " ", true, true)
+                              : null);
+        if ((toks == null) || (toks.size() == 0)) {
+            return new int[] { (int) baseNumLines, (int) baseNumElements };
+        } else {
+            String lines = "" + toks.get(0);
+            if (lines.equalsIgnoreCase(ALL)) {
+                lines = "" + (int) baseNumLines;
+            }
+            int    numLines = new Integer(lines.trim()).intValue();
+
+            String elems    = (toks.size() > 1)
+                              ? "" + toks.get(1)
+                              : "" + (int) baseNumElements;
+            if (elems.equalsIgnoreCase(ALL)) {
+                elems = "" + baseNumElements;
+            }
+            int numElements = new Integer(elems.trim()).intValue();
+            return new int[] { (int) Math.min(numLines, baseNumLines),
+                               (int) Math.min(numElements, baseNumElements) };
+        }
+
+    }
+
+
+    /**
      * Set the widgets with the state from the given AreaDirectory
      *
      * @param ad   AreaDirectory for the image
@@ -2458,41 +2526,10 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
 
 
         if (numLinesFld != null) {
-            baseNumLines    = ad.getLines();
-            baseNumElements = ad.getElements();
-
-
-
-            //use defaults here
-            String sizeDefault = getDefault(PROP_SIZE, (String) null);
-            List   toks        = ((sizeDefault != null)
-                                  ? StringUtil.split(sizeDefault, " ", true,
-                                      true)
-                                  : null);
-            if ((toks == null) || (toks.size() == 0)) {
-                numLinesFld.setText("" + (int) baseNumLines);
-                numElementsFld.setText("" + (int) baseNumElements);
-            } else {
-                String lines = "" + toks.get(0);
-                if (lines.equalsIgnoreCase(ALL)) {
-                    lines = "" + (int) baseNumLines;
-                }
-                numLinesFld.setText(lines);
-                String elems = (toks.size() > 1)
-                               ? "" + toks.get(1)
-                               : "" + (int) baseNumElements;
-                if (elems.equalsIgnoreCase(ALL)) {
-                    elems = "" + baseNumElements;
-                }
-                numElementsFld.setText(elems);
-            }
-
-
+            int[] size = getSize(ad);
+            numLinesFld.setText("" + size[0]);
+            numElementsFld.setText("" + size[1]);
             if (sizeLbl != null) {
-                String defaultSize = getDefault(PROP_SIZE,
-                                         getDefaultPropValue(PROP_SIZE, ad,
-                                             true));
-
                 String label = "  Raw size: " + ad.getLines() + " X "
                                + ad.getElements();
                 sizeLbl.setText(label);
@@ -3188,54 +3225,75 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui.ima
         }
 
         List imageList = getImageList();
-        if(imageList==null || imageList.size()==0) return;
+        if ((imageList == null) || (imageList.size() == 0)) {
+            return;
+        }
 
         //Check for size threshold
-        final int []dim ={0,0};
-        AddeImageDescriptor aid =(AddeImageDescriptor) imageList.get(0);
+        final int[]         dim = { 0, 0 };
+        AddeImageDescriptor aid = (AddeImageDescriptor) imageList.get(0);
         dim[0] = aid.getImageInfo().getElements();
         dim[1] = aid.getImageInfo().getLines();
-        int numPixels = dim[0]*dim[1]*imageList.size();
-        double megs = (4*numPixels)/(double)1000000;
-        if(megs > SIZE_THRESHOLD) {
-            final JCheckBox maintainSize = new JCheckBox("Maintain spatial extent",false);
-            final JLabel sizeLbl =new JLabel(StringUtil.padRight("  "+((double)((int)megs*100))/100.0+" MB",14));
+        System.err.println("dim:" + dim[0] + " x " + dim[1] + " # images:"
+                           + imageList.size());
+        int    numPixels = dim[0] * dim[1] * imageList.size();
+        double megs      = (4 * numPixels) / (double) 1000000;
+
+        if (megs > SIZE_THRESHOLD) {
+            final JCheckBox maintainSize =
+                new JCheckBox("Maintain spatial extent", false);
+            final JLabel sizeLbl = new JLabel(StringUtil.padRight("  "
+                                       + ((double) ((int) megs * 100))
+                                         / 100.0 + " MB", 14));
             GuiUtils.setFixedWidthFont(sizeLbl);
-            final List[]listHolder ={imageList};
-            final JSlider slider = new JSlider(2,(int)megs, (int)megs);
-            slider.setMajorTickSpacing((int)(megs-2)/10);
-            slider.setMinorTickSpacing((int)(megs-2)/10);
+            final List[]  listHolder = { imageList };
+            final JSlider slider     = new JSlider(2, (int) megs, (int) megs);
+            slider.setMajorTickSpacing((int) (megs - 2) / 10);
+            slider.setMinorTickSpacing((int) (megs - 2) / 10);
             //            slider.setPaintTicks(true);
             slider.setSnapToTicks(true);
             ChangeListener sizeListener =
                 new javax.swing.event.ChangeListener() {
-                    public void stateChanged(ChangeEvent evt) {
-                        JSlider slider = (JSlider) evt.getSource();
-                        int pixelsPerImage = 1000000*slider.getValue()/listHolder[0].size()/4;
-                        double aspect = dim[1]/(double)dim[0];
-                        int nx = (int)Math.sqrt(pixelsPerImage/aspect);
-                        int ny = (int)(aspect*nx);
-                        if(maintainSize.isSelected()) {
-                            //doesn't work
-                            lineMagSlider.setValue(getLineMagValue()-1);
-                            lineMagSliderChanged(true);
-                        } else {
-                            numElementsFld.setText(""+nx);
-                            numLinesFld.setText(""+ny);
-                        }
-                        listHolder[0] = getImageList();
-                        AddeImageDescriptor aid =(AddeImageDescriptor) listHolder[0].get(0);
-                        dim[0] = aid.getImageInfo().getElements();
-                        dim[1] = aid.getImageInfo().getLines();
-                        int numPixels = dim[0]*dim[1]*listHolder[0].size();
-                        double nmegs = (4*numPixels)/(double)1000000;
-                        sizeLbl.setText(StringUtil.padRight("  "+((double)((int)nmegs*100))/100.0+" MB",14));
+                public void stateChanged(ChangeEvent evt) {
+                    JSlider slider = (JSlider) evt.getSource();
+                    int pixelsPerImage = 1000000 * slider.getValue()
+                                         / listHolder[0].size() / 4;
+                    double aspect = dim[1] / (double) dim[0];
+                    int    nx     = (int) Math.sqrt(pixelsPerImage / aspect);
+                    int    ny     = (int) (aspect * nx);
+                    if (maintainSize.isSelected()) {
+                        //doesn't work
+                        lineMagSlider.setValue(getLineMagValue() - 1);
+                        lineMagSliderChanged(true);
+                    } else {
+                        numElementsFld.setText("" + nx);
+                        numLinesFld.setText("" + ny);
                     }
-                };
+                    listHolder[0] = getImageList();
+                    AddeImageDescriptor aid =
+                        (AddeImageDescriptor) listHolder[0].get(0);
+                    dim[0] = aid.getImageInfo().getElements();
+                    dim[1] = aid.getImageInfo().getLines();
+                    int    numPixels = dim[0] * dim[1] * listHolder[0].size();
+                    double nmegs     = (4 * numPixels) / (double) 1000000;
+                    sizeLbl.setText(StringUtil.padRight("  "
+                            + ((double) ((int) nmegs * 100)) / 100.0
+                            + " MB", 14));
+                }
+            };
             slider.addChangeListener(sizeListener);
-            JComponent msgContents = GuiUtils.vbox(new JLabel("<html>You are about to load " + megs + " MB of imagery.<br>Are you sure you want to do this?<p><hr><p></html>"),GuiUtils.inset(GuiUtils.leftCenterRight(new JLabel("Change Size: "),GuiUtils.inset(slider,5),sizeLbl),5));
 
-            if(!GuiUtils.askOkCancel("Image Size", msgContents)) {
+            JComponent msgContents =
+                GuiUtils
+                    .vbox(new JLabel(
+                        "<html>You are about to load " + megs
+                        + " MB of imagery.<br>Are you sure you want to do this?<p><hr><p></html>"), GuiUtils
+                            .inset(GuiUtils
+                                .leftCenterRight(
+                                    new JLabel("Change Size: "),
+                                    GuiUtils.inset(slider, 5), sizeLbl), 5));
+
+            if ( !GuiUtils.askOkCancel("Image Size", msgContents)) {
                 return;
             }
             imageList = listHolder[0];
