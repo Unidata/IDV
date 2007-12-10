@@ -4,6 +4,7 @@
 
 import ucar.unidata.data.DataChoice as DataChoice
 
+shell=None
 
 def selectData(name1='Select Field',name2=None,name3=None,name4=None,name5=None):
     """Select up to 5 data fields. This returns a List of the actual Data objects """
@@ -34,7 +35,8 @@ def selectDataChoice(name1='Select Field',name2=None,name3=None,name4=None,name5
     if(name5!=None):
         list.add(name5);
     result = idv.selectDataChoices(list);
-    shell.toFront();
+    if (shell != None):
+       shell.toFront();
     if(result == None): 
         return None;
     if(result.size()==1):
@@ -65,7 +67,8 @@ def createDisplay(displayType, data, dataName='Data'):
                 obj = DataDataChoice(label,obj);
             dataList.add(obj);
         control = idv.doMakeControl(displayType, dataList);
-        shell.toFront();
+        if (shell != None):
+            shell.toFront();
         return control
 
 
