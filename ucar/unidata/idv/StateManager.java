@@ -49,6 +49,7 @@ import java.awt.Dimension;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -800,7 +801,18 @@ public class StateManager extends IdvManager {
      *
      * @param dir The new directory
      */
-    protected void initNewUserDirectory(File dir) {}
+    protected void initNewUserDirectory(File dir) {
+        try {
+            //Copy the README file over to the .metapps dir
+            String readMeFile = IOUtil.joinDir(dir, "README");
+            FileOutputStream fos = new FileOutputStream(readMeFile);
+            InputStream readmeInputStream = IOUtil.getInputStream("/ucar/unidata/idv/resources/README.store", getClass());
+            IOUtil.writeTo(readmeInputStream, fos);
+        } catch(Exception exc) {
+            //noop
+        }
+        
+    }
 
 
     /**
