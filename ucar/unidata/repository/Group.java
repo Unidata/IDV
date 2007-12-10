@@ -48,6 +48,8 @@ import java.util.List;
  */
 public class Group {
 
+    public static final String IDDELIMITER = "/";
+
     /** _more_ */
     private String id;
 

@@ -1,24 +1,28 @@
 <entries>
-  <entry name="model" >
-     <column name="modelgroup" type="string" isindex="true" issearchable="true" searchtype="select" label="Model Group"/>
-     <column name="modelrun" type="string" isindex="true" issearchable="true" searchtype="select"  label="Model Run"/>
+  <entry name="model"  description="Models">
+     <column name="modelgroup" type="string" isindex="true" cansearch="true" searchtype="select" label="Model Group"/>
+     <column name="modelrun" type="string" isindex="true" cansearch="true" searchtype="select"  label="Model Run"/>
   </entry>
 
   <entry name="level3radar" description="Level 3 Radar Files" handler="ucar.unidata.repository.Level3RadarTypeHandler">
-	<column name="station" type="string" isindex="true" issearchable="true" searchtype="select" label="Station" rows="5" columns="10"/>
-	<column name="product" type="string" isindex="true" issearchable="true" searchtype="select" label="Product"/>
+	<column name="station" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Station" rows="5" columns="10"/>
+	<column name="product" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Product"  />
+	<column name="location" type="latlon"  label="Location" cansearch="true"  />
+	<column name="fruit" type="enumeration"  values="Apple,Banana,Orange" label="Fruit" isindex="true" cansearch="true" canlist="true" />
+	<column name="flag" type="boolean"  label="Flag"  isindex="true" cansearch="true" />
+	<column name="number" type="double" cansearch="true" />
   </entry>
 
 
   <entry name="level2radar" description="Level 2 Radar Files">
-	<column name="station" type="string" isindex="true" issearchable="true" searchtype="select" label="Station"/>
+	<column name="station" type="string" isindex="true" cansearch="true" searchtype="select" label="Station"/>
   </entry>
 
 
   <entry name="satellite" description="Satellite Files">>
-	<column name="platform" type="string" isindex="true" issearchable="true" searchtype="select" label="Platform"/>
-	<column name="resolution" type="string" isindex="true" issearchable="true" searchtype="select"  label="Resolution"/>		
-	<column name="product" type="string" isindex="true" issearchable="true" searchtype="select"  label="Product"/>
+	<column name="platform" type="string" isindex="true" cansearch="true" searchtype="select" label="Platform"/>
+	<column name="resolution" type="string" isindex="true" cansearch="true" searchtype="select"  label="Resolution"/>		
+	<column name="product" type="string" isindex="true" cansearch="true" searchtype="select"  label="Product"/>
   </entry>
 
 

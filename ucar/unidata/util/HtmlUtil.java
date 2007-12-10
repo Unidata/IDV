@@ -98,6 +98,21 @@ public class HtmlUtil {
         return path;
     }
 
+    public static String makeLatLonBox(String baseName, String lat1, String lat2, String lon1, String lon2) {
+        return  "<table>" +
+            "<tr><td colspan=\"2\" align=\"center\">" +
+            input(baseName+"_lat2", lat2," size=\"10\"") +
+            "</td></tr>" +
+            "<tr><td>" +
+            input(baseName+"_lon2", lat2," size=\"10\"") +
+            "</td><td>" +
+            input(baseName+"_lon1", lat2," size=\"10\"") +
+            "</tr>" +
+            "<tr><td colspan=\"2\" align=\"center\">" +
+            input(baseName+"_lat1", lat2," size=\"10\"") +
+            "</table>";
+    }
+
     public static String checkbox(String name, String value) {
         return checkbox(name, value, false);
     }

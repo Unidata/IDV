@@ -146,7 +146,7 @@ public class Request {
             String arg = (String) keys.nextElement();
             String value = (String) parameters.get(arg);
             if(value.length()==0) continue;
-            if(cnt>0)
+            if(cnt++>0)
                 sb.append("&");
             sb.append(arg+"="+value);
         }

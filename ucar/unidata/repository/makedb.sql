@@ -12,10 +12,15 @@ CREATE INDEX GROUPS_INDEX_ID ON groups (ID);
 
 
 CREATE TABLE tags (name varchar(200),
-	           file_id varchar(200));
+	           entry_id varchar(200));
+
+CREATE TABLE associations (name varchar(200),
+			   from_entry_id varchar(200),
+		           to_entry_id varchar(200));
+
 
 CREATE INDEX TAGS_INDEX_NAME ON tags (NAME);
-CREATE INDEX TAGS_INDEX_FILE_ID ON tags (FILE_ID);
+CREATE INDEX TAGS_INDEX_ENTRY_ID ON tags (ENTRY_ID);
 
 
 CREATE TABLE  users (id varchar(200),

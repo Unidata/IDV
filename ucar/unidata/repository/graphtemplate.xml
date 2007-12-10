@@ -3,6 +3,7 @@
 
     <edgetype name="groupedby" arrow="-6" />       
     <edgetype name="taggedby" arrow="-6" color="blue"/>       
+    <edgetype name="etc" arrow="-6" color="red"/>       
 
 <nodetype    name="Node"  />
 
@@ -23,6 +24,14 @@
 <nodetype    name="group" parent="Node" fillcolor="#cccccc">
   <command label="View group" command="url(,%root%/showgroup?group=%id%)"/>
   <command label="Search group" command="url(,%root%/searchform?group=%id%)"/>
+  <shape>
+    <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
+    <rrect src="label" fillcolor="%fillcolor%" from="c" to="c" color="black"/>
+  </shape>
+</nodetype>
+
+
+<nodetype    name="skip" parent="Node" fillcolor="red">
   <shape>
     <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
     <rrect src="label" fillcolor="%fillcolor%" from="c" to="c" color="black"/>

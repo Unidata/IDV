@@ -60,11 +60,10 @@ import java.util.Properties;
  */
 public class TypeHandler implements Constants, Tables {
 
+    public static final Object ALL_OBJECT = new TwoFacedObject("All","");
+
     /** _more_ */
     public static final String TYPE_ANY = "any";
-
-    /** _more_          */
-    public static final String TYPE_FILE = "file";
 
     /** _more_ */
     Repository repository;
@@ -75,6 +74,11 @@ public class TypeHandler implements Constants, Tables {
     /** _more_ */
     String description;
 
+
+
+    public TypeHandler(Repository repository) {
+        this.repository = repository;
+    }
 
 
     /**
@@ -186,10 +190,21 @@ public class TypeHandler implements Constants, Tables {
      */
     public StringBuffer getEntryContent(Entry entry, Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        String output = repository.getValue(request, ARG_OUTPUT, OUTPUT_HTML);
+        String output = request.get(ARG_OUTPUT, OUTPUT_HTML);
+        String[] tags = repository.getTags(request,entry.getId());
         if (output.equals(OUTPUT_HTML)) {
             sb.append("<table cellspacing=\"5\" cellpadding=\"2\">");
             sb.append(getInnerEntryContent(entry, request, output));
+            sb.append("</table>\n");
+            if(tags.length>0) {
+                sb.append("<h3>Tags</h3><ul>\n");
+                for(int i=0;i<tags.length;i++) {
+                    sb.append("<li> ");
+                    sb.append(repository.getTagLinks(request, tags[i]));
+                    sb.append(tags[i]);
+                }
+                sb.append("</ul>\n");
+            }
         } else if (output.equals(OUTPUT_XML)) {
         }
         else if (output.equals(OUTPUT_CSV)) {
@@ -198,7 +213,7 @@ public class TypeHandler implements Constants, Tables {
     }
 
     protected String getEntryLinks(Entry entry, Request request) {
-        return getEntryDownloadLink(entry)
+        return getEntryDownloadLink(request, entry)
             + "&nbsp;"
             + getGraphLink(request, entry);
     }
@@ -223,6 +238,11 @@ public class TypeHandler implements Constants, Tables {
 
 
 
+    protected boolean isEntryDownloadable(Request request, Entry entry) {
+        return true;
+    }
+
+
     /**
      * _more_
      *
@@ -230,7 +250,8 @@ public class TypeHandler implements Constants, Tables {
      *
      * @return _more_
      */
-    protected String getEntryDownloadLink(Entry entry) {
+    protected String getEntryDownloadLink(Request request, Entry entry) {
+        if(!isEntryDownloadable(request, entry)) return "";
         if (repository.getProperty(PROP_HTML_DOWNLOADENTRIESASFILES, false)) {
             return HtmlUtil.href(
                 "file://" + entry.getFile(),
@@ -291,6 +312,12 @@ public class TypeHandler implements Constants, Tables {
         return ""+new Date(dttm);
     }
 
+
+    public List<TwoFacedObject> getListTypes(boolean longName) {
+        return new ArrayList<TwoFacedObject>();
+
+    }
+
     /**
      * _more_
      *
@@ -302,7 +329,8 @@ public class TypeHandler implements Constants, Tables {
      * @throws Exception _more_
      */
     public Result processList(Request request, String what) throws Exception {
-        return processRadarList(request, what);
+        return  new Result("Error",
+                           new StringBuffer("Unknown listing type:" +what));
     }
 
     /**
@@ -339,7 +367,7 @@ public class TypeHandler implements Constants, Tables {
         throws Exception {
         whereList = new ArrayList(whereList);
         String[] tableNames = { TABLE_ENTRIES, getTableName(), TABLE_USERS, TABLE_GROUPS,
-                                TABLE_TAGS};
+                                TABLE_TAGS,TABLE_ASSOCIATIONS};
         List tables = new ArrayList();
         boolean didEntries = false;
         boolean didOther = false;
@@ -372,77 +400,6 @@ public class TypeHandler implements Constants, Tables {
         return getRepository().execute(sql,repository.getMax(request));
     }
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param what _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processRadarList(Request request, String what)
-            throws Exception {
-        /*
-  
-            column = COL_LEVEL3RADAR_STATION;
-            tag    = "station";
-            title  = "Level 3 Radar Stations";
-        }
-        List where = assembleWhereClause(request);
-        if (where.toString().indexOf(TABLE_ENTRIES) == 0) {
-            where.add(SqlUtil.eq(COL_ENTRIES_ID, COL_LEVEL3RADAR_ID));
-        }
-        Statement    statement = executeSelect(request,
-                                               SqlUtil.distinct(column),
-                                               where);
-
-        String[]     products  = SqlUtil.readString(statement, 1);
-        StringBuffer sb        = new StringBuffer();
-        String output = repository.getValue(request, ARG_OUTPUT, OUTPUT_HTML);
-        if (output.equals(OUTPUT_HTML)) {
-            sb.append("<h3>Products</h3>");
-            sb.append("<ul>");
-        } else if (output.equals(OUTPUT_XML)) {
-            sb.append(XmlUtil.XML_HEADER + "\n");
-            sb.append(XmlUtil.openTag(tag + "s"));
-
-        } else if (output.equals(OUTPUT_CSV)) {}
-        else {
-            throw new IllegalArgumentException("Unknown output type:"
-                    + output);
-        }
-
-        for (int i = 0; i < products.length; i++) {
-            if (output.equals(OUTPUT_HTML)) {
-                sb.append("<li>");
-                sb.append(repository.getLongName(products[i]) + " ("
-                          + products[i] + ")");
-            } else if (output.equals(OUTPUT_XML)) {
-                sb.append(
-                    XmlUtil.tag(
-                        tag,
-                        XmlUtil.attrs(
-                            ATTR_ID, products[i], ATTR_NAME,
-                            repository.getLongName(products[i]))));
-            } else if (output.equals(OUTPUT_CSV)) {
-                sb.append(SqlUtil.comma(products[i],
-                                        repository.getLongName(products[i])));
-                sb.append("\n");
-            }
-        }
-        if (output.equals(OUTPUT_HTML)) {
-            sb.append("</ul>");
-        } else if (output.equals(OUTPUT_XML)) {
-            sb.append(XmlUtil.closeTag(tag + "s"));
-        }
-        return new Result(title, sb,
-                          repository.getMimeTypeFromOutput(output));
-*/
-            return null;
-    }
-
 
 
     /**
@@ -466,7 +423,7 @@ public class TypeHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public void addToForm(StringBuffer formBuffer, StringBuffer headerBuffer,
+    public void addToSearchForm(StringBuffer formBuffer, StringBuffer headerBuffer,
                           Request request, List where)
             throws Exception {
 
@@ -531,13 +488,12 @@ public class TypeHandler implements Constants, Tables {
         String groupArg = (String) request.get(ARG_GROUP);
         if (groupArg != null) {
             formBuffer.append(HtmlUtil.hidden(ARG_GROUP, groupArg));
-            if(groupArg.endsWith("%")) {
-                groupArg = groupArg.substring(0,groupArg.length()-1);
-            }
             Group group = repository.findGroup(groupArg); 
             if(group!=null) {
                 formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Group:"),
-                        group.getFullName()));
+                        group.getFullName() + "&nbsp;"
+                                                      + HtmlUtil.checkbox(ARG_GROUP_CHILDREN,
+                                                                          "true") + " (Search subgroups)"));
 
             }
         } else {
@@ -549,7 +505,7 @@ public class TypeHandler implements Constants, Tables {
 
             if (groups.size() > 1) {
                 List groupList = new ArrayList();
-                groupList.add("All");
+                groupList.add(ALL_OBJECT);
                 for (Group group : groups) {
                     groupList.add(new TwoFacedObject(group.getFullName()));
                 }
@@ -598,18 +554,17 @@ public class TypeHandler implements Constants, Tables {
         List   where = new ArrayList();
         String name  = (String) request.get(ARG_NAME,"").trim();
 
-
         String tag = (String) request.get(ARG_TAG);
         if (tag != null) {
             tag = tag.trim();
             if (tag.length() > 0) {
-                where.add(SqlUtil.eq(COL_ENTRIES_ID, COL_TAGS_FILE_ID));
+                where.add(SqlUtil.eq(COL_ENTRIES_ID, COL_TAGS_ENTRY_ID));
                 addOr(COL_TAGS_NAME, tag, where, true);
             }
         }
 
-        String groupName = (String) request.get(ARG_GROUP);
-        if ((groupName != null) && !groupName.toLowerCase().equals("all")) {
+        String groupName = (String) request.get(ARG_GROUP,"").trim();
+        if (groupName.length()>0) {
             boolean doNot = groupName.startsWith("!");
             if (doNot) {
                 groupName = groupName.substring(1);
@@ -619,13 +574,19 @@ public class TypeHandler implements Constants, Tables {
                 where.add(SqlUtil.like(COL_ENTRIES_GROUP_ID, groupName));
             } else {
                 Group group = repository.findGroupFromName(groupName);
+                if(group == null) {
+                    throw new IllegalArgumentException ("Could not find group:" + groupName);
+                }
                 String searchChildren =
                     (String) request.get(ARG_GROUP_CHILDREN);
                 if (Misc.equals(searchChildren, "true")) {
-                    where.add((doNot
-                               ? " NOT "
-                               : "") + SqlUtil.like(COL_ENTRIES_GROUP_ID,
-                               group.getId() + "%"));
+                    String sub = (doNot?
+                                  SqlUtil.notLike(COL_ENTRIES_GROUP_ID, group.getId() + Group.IDDELIMITER+"%"):
+                                  SqlUtil.like(COL_ENTRIES_GROUP_ID, group.getId() + Group.IDDELIMITER+ "%"));
+                    String equals = (doNot?
+                                     SqlUtil.neq(COL_ENTRIES_GROUP_ID,SqlUtil.quote(group.getId())):
+                                     SqlUtil.eq(COL_ENTRIES_GROUP_ID,SqlUtil.quote(group.getId())));
+                    where.add("("+sub +" OR " + equals+")");
                 } else {
                     if (doNot) {
                         where.add(SqlUtil.neq(COL_ENTRIES_GROUP_ID,
@@ -638,21 +599,51 @@ public class TypeHandler implements Constants, Tables {
             }
         }
 
-        String fromdate = (String) request.get(ARG_FROMDATE);
-        if ((fromdate != null) && (fromdate.trim().length() > 0)) {
+        Date now = new Date();
+        String fromDate = (String) request.get(ARG_FROMDATE,"").trim().toLowerCase();
+        String toDate = (String) request.get(ARG_TODATE,"").trim().toLowerCase();
+
+        Date fromDttm=DateUtil.parseRelative(now,fromDate,-1);
+        Date toDttm=DateUtil.parseRelative(now,toDate,+1);
+        if(fromDate.length()>0 && fromDttm==null) {
+            if(!fromDate.startsWith("-")) {
+                fromDttm = DateUtil.parse(fromDate);
+            }
+        }
+        if(toDate.length()>0 &&toDttm==null) {
+            if(!toDate.startsWith("+")) {
+                toDttm = DateUtil.parse(toDate);
+            }
+        }
+
+        if(fromDttm ==null && fromDate.startsWith("-")) {
+            if(toDttm == null) throw new IllegalArgumentException("Cannot do relative From Date when To Date is not set");
+            fromDttm = DateUtil.getRelativeDate(toDttm, fromDate);
+            
+        }
+
+        if(toDttm == null && toDate.startsWith("+")) {
+            if(fromDttm == null) throw new IllegalArgumentException("Cannot do relative From Date when To Date is not set");
+            toDttm = DateUtil.getRelativeDate(fromDttm, toDate);
+        }
+
+        //        System.err.println (fromDttm +"   --   " + toDttm);
+        if (fromDttm!=null) {
             where.add(
                 SqlUtil.ge(
                     COL_ENTRIES_FROMDATE,
-                    SqlUtil.quote(SqlUtil.getDateString(fromdate))));
+                    SqlUtil.quote(SqlUtil.getDateString(SqlUtil.format(fromDttm)))));
         }
 
-        String todate = (String) request.get(ARG_TODATE);
-        if ((todate != null) && (todate.trim().length() > 0)) {
+
+        if (toDttm!=null) {
             where.add(
                 SqlUtil.le(
                     COL_ENTRIES_TODATE,
-                    SqlUtil.quote(SqlUtil.getDateString(todate))));
+                    SqlUtil.quote(SqlUtil.getDateString(SqlUtil.format(toDttm)))));
         }
+
+        //        System.err.println (fromDttm + " ---- "  + toDttm);
 
         String createDate = (String) request.get(ARG_CREATEDATE);
         if ((createDate != null) && (createDate.trim().length() > 0)) {

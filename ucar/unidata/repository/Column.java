@@ -19,15 +19,9 @@
  */
 
 
-
-
 package ucar.unidata.repository;
 
-
 import org.w3c.dom.*;
-
-
-
 
 import ucar.unidata.data.SqlUtil;
 
@@ -40,15 +34,28 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import java.util.Hashtable;
 import java.util.List;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 
 
 /**
  */
 
 public class Column implements Tables, Constants {
+
+    public static final String EXPR_EQUALS = "=";
+    public static final String EXPR_LE = "<=";
+    public static final String EXPR_GE = ">=";
+    public static final String EXPR_BETWEEN = "between";
+    public static final List EXPR_ITEMS = Misc.newList(new TwoFacedObject("=",EXPR_EQUALS),
+                                                       new TwoFacedObject("<=",EXPR_LE),
+                                                       new TwoFacedObject(">=",EXPR_GE),
+                                                       new TwoFacedObject("between",EXPR_BETWEEN));
 
     /** _more_          */
     public static final String TYPE_STRING = "string";
@@ -67,6 +74,9 @@ public class Column implements Tables, Constants {
 
     /** _more_          */
     public static final String TYPE_TIMESTAMP = "timestamp";
+
+    /** _more_          */
+    public static final String TYPE_LATLON = "latlon";
 
     /** _more_          */
     public static final String SEARCHTYPE_TEXT = "text";
@@ -91,7 +101,10 @@ public class Column implements Tables, Constants {
     private static final String ATTR_ISINDEX = "isindex";
 
     /** _more_          */
-    private static final String ATTR_ISSEARCHABLE = "issearchable";
+    private static final String ATTR_CANSEARCH = "cansearch";
+
+    /** _more_          */
+    private static final String ATTR_CANLIST = "canlist";
 
     /** _more_          */
     private static final String ATTR_VALUES = "values";
@@ -113,8 +126,9 @@ public class Column implements Tables, Constants {
 
 
 
-    /** _more_          */
-    private String table;
+    private GenericTypeHandler typeHandler;
+
+
 
     /** _more_          */
     private String name;
@@ -135,7 +149,10 @@ public class Column implements Tables, Constants {
     private boolean isIndex;
 
     /** _more_          */
-    private boolean isSearchable;
+    private boolean canSearch;
+
+    /** _more_          */
+    private boolean canList;
 
     /** _more_          */
     private List values;
@@ -158,8 +175,8 @@ public class Column implements Tables, Constants {
      * @param table _more_
      * @param element _more_
      */
-    public Column(String table, Element element) {
-        this.table = table;
+    public Column(GenericTypeHandler typeHandler, Element element) {
+        this.typeHandler = typeHandler;
         name       = XmlUtil.getAttribute(element, ATTR_NAME);
         label      = XmlUtil.getAttribute(element, ATTR_LABEL, name);
         searchType = XmlUtil.getAttribute(element, ATTR_SEARCHTYPE,
@@ -168,7 +185,9 @@ public class Column implements Tables, Constants {
         type         = XmlUtil.getAttribute(element, ATTR_TYPE);
         dflt         = XmlUtil.getAttribute(element, ATTR_DEFAULT, "");
         isIndex      = XmlUtil.getAttribute(element, ATTR_ISINDEX, false);
-        isSearchable = XmlUtil.getAttribute(element, ATTR_ISSEARCHABLE,
+        canSearch = XmlUtil.getAttribute(element, ATTR_CANSEARCH,
+                                            false);
+        canList = XmlUtil.getAttribute(element, ATTR_CANLIST,
                                             false);
         size    = XmlUtil.getAttribute(element, ATTR_SIZE, size);
         rows    = XmlUtil.getAttribute(element, ATTR_ROWS, rows);
@@ -177,6 +196,79 @@ public class Column implements Tables, Constants {
             values = StringUtil.split(XmlUtil.getAttribute(element,
                     ATTR_VALUES), ",", true, true);
         }
+    }
+
+
+    private boolean isNumeric() {
+        return type.equals(TYPE_INT) || type.equals(TYPE_DOUBLE);
+    }
+
+    protected int formatValue(StringBuffer sb, String output, Object []values, int valueIdx) {
+        if (type.equals(TYPE_LATLON)) {
+            sb.append(values[valueIdx].toString());
+            valueIdx++;
+            sb.append(",");
+            sb.append(values[valueIdx].toString());
+            valueIdx++;
+        } else {
+            sb.append(values[valueIdx].toString());
+            valueIdx++;
+        }
+        return valueIdx;
+    }
+
+    protected int setValues(PreparedStatement stmt, Object[]values, int valueIdx) throws Exception {
+        if (type.equals(TYPE_INT)) {
+            stmt.setInt(valueIdx+2, ((Integer)values[valueIdx]).intValue());
+            valueIdx++;
+        } else if (type.equals(TYPE_DOUBLE)) {
+            stmt.setDouble(valueIdx+2, ((Double)values[valueIdx]).doubleValue());
+            valueIdx++;
+        } else if (type.equals(TYPE_BOOLEAN)) {
+            boolean v = ((Boolean)values[valueIdx]).booleanValue();
+            stmt.setInt(valueIdx+2, (v?1:0));
+            valueIdx++;
+        } else if (type.equals(TYPE_TIMESTAMP)) {
+            Date dttm  =(Date) values[valueIdx];
+            stmt.setTimestamp(valueIdx+2, new java.sql.Timestamp(dttm.getTime()));
+            valueIdx++;
+        } else if (type.equals(TYPE_LATLON)) {
+            double lat = ((Double) values[valueIdx]).doubleValue();
+            stmt.setDouble(valueIdx+2, lat);
+            valueIdx++;
+            double lon = ((Double) values[valueIdx]).doubleValue();
+            stmt.setDouble(valueIdx+2, lon);
+            valueIdx++;
+        } else {
+            stmt.setString(valueIdx+2, values[valueIdx].toString());
+            valueIdx++;
+        }
+        return valueIdx;
+
+
+    }
+
+
+    protected int readValues(ResultSet results, Object[]values, int valueIdx) throws Exception {
+        if (type.equals(TYPE_INT)) {
+            values[valueIdx] = new Integer(results.getInt(valueIdx+2));
+            valueIdx++;
+        } else if (type.equals(TYPE_DOUBLE)) {
+            values[valueIdx] = new Double(results.getDouble(valueIdx+2));
+            valueIdx++;
+        } else if (type.equals(TYPE_BOOLEAN)) {
+            values[valueIdx] = new Boolean(results.getInt(valueIdx+2)==1);
+            valueIdx++;
+        } else if (type.equals(TYPE_LATLON)) {
+            values[valueIdx] = new Double(results.getDouble(valueIdx+2));
+            valueIdx++;
+            values[valueIdx] = new Double(results.getDouble(valueIdx+2));
+            valueIdx++;
+        } else {
+            values[valueIdx] = results.getString(valueIdx+2);
+            valueIdx++;
+        }
+        return valueIdx;
     }
 
 
@@ -197,8 +289,10 @@ public class Column implements Tables, Constants {
             return def + "double ";
         } else if (type.equals(TYPE_BOOLEAN)) {
             return def + "int ";
+        } else if (type.equals(TYPE_LATLON)) {
+            return " " + name+"_lat double, " + name+"_lon double ";
         } else {
-            throw new IllegalArgumentException("Unknwon column type:" + type
+            throw new IllegalArgumentException("Unknown column type:" + type
                     + " for " + name);
         }
     }
@@ -210,11 +304,67 @@ public class Column implements Tables, Constants {
      */
     public String getSqlIndex() {
         if (isIndex) {
-            return "CREATE INDEX " + table + "_INDEX_" + name + "  ON "
-                   + table + " (" + name + ");\n";
+            return "CREATE INDEX " + typeHandler.getTableName() + "_INDEX_" + name + "  ON "
+                   +  typeHandler.getTableName() + " (" + name + ");\n";
         } else {
             return "";
         }
+    }
+
+
+    protected void assembleWhereClause(Request request, List where) throws Exception {            
+        String id = getFullName();
+        if (type.equals(TYPE_LATLON)) {
+            String lat1 = request.get(id+"_lat1","").trim();
+            String lat2 = request.get(id+"_lat2","").trim();
+            String lon1 = request.get(id+"_lon1","").trim();
+            String lon2 = request.get(id+"_lon2","").trim();
+            if(lat1.length()>0 && lat2.length()>0 && lon1.length()>0 && lon2.length()>0) {
+                where.add(SqlUtil.ge(getFullName()+"_lat",lat1));
+                where.add(SqlUtil.le(getFullName()+"_lat",lat2));
+                where.add(SqlUtil.le(getFullName()+"_lon",lon1));
+                where.add(SqlUtil.ge(getFullName()+"_lon",lon2));
+            }
+        } else if (isNumeric()) {       
+            String expr = request.get(id+"_expr",EXPR_EQUALS);
+            String from = request.get(id+"_from","").trim();
+            String to = request.get(id+"_to","").trim();
+            String value = request.get(id,"").trim();
+            if(from.length()>0 && to.length()==0) {
+                to = value;
+            } else if(from.length()==0 && to.length()>0) {
+                from = value;
+            } else if(from.length()==0 && to.length()==0) {
+                from = value;
+                to = value;
+            }  
+            if(from.length()>0) {
+                if(expr.equals(EXPR_EQUALS)) {
+                    where.add(SqlUtil.eq(getFullName(),from));
+                } else  if(expr.equals(EXPR_LE)) {
+                    where.add(SqlUtil.le(getFullName(),from));
+                } else  if(expr.equals(EXPR_GE)) {
+                    where.add(SqlUtil.ge(getFullName(),to));
+                } else  if(expr.equals(EXPR_BETWEEN)) {
+                    where.add(SqlUtil.ge(getFullName(),from));
+                    where.add(SqlUtil.le(getFullName(),to));
+                } else if(expr.length()>0) {
+                    throw new IllegalArgumentException("Unknown expression:" + expr);
+                }
+                System.err.println ("where:" + where);
+            }
+        } else if (type.equals(TYPE_BOOLEAN)) {       
+            String value = request.get(id,"");
+            if(value.length()>0) {
+                where.add(SqlUtil.eq(getFullName(),value.toLowerCase().equals("true")?"1":"0"));
+            }
+        } else {
+            String value = request.get(id,"");
+            typeHandler.addOr(getFullName(),
+                              (String) request.get(getFullName()),
+                              where, !(type.equals(TYPE_INT) || type.equals(TYPE_DOUBLE)));
+        }
+
     }
 
     /**
@@ -228,44 +378,56 @@ public class Column implements Tables, Constants {
      *
      * @throws Exception _more_
      */
-    public void addToForm(GenericTypeHandler typeHandler,
-                          StringBuffer formBuffer, StringBuffer headerBuffer,
+    public void addToSearchForm(StringBuffer formBuffer, StringBuffer headerBuffer,
                           Request request, List where)
-            throws Exception {
-        if ( !getIsSearchable()) {
+        throws Exception {
+        
+        if (!getCanSearch()) {
             return;
         }
 
         List tmp = new ArrayList(where);
-        if (searchType.equals(SEARCHTYPE_SELECT)) {
-            String[] values = SqlUtil.readString(
-                                                 typeHandler.executeSelect(request,
-                                      SqlUtil.distinct(getFullName()),
-                                                                           tmp), 1);
-            List list = new ArrayList();
-            for (int i = 0; i < values.length; i++) {
-                list.add(
-                    new TwoFacedObject(
-                        typeHandler.getRepository().getLongName(values[i]),
-                        values[i]));
-            }
-            list.add(0, "All");
-            formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold(getLabel()
-                    + ":"), HtmlUtil.select(getFullName(), list)));
+        String widget = "";
+        if (type.equals(TYPE_LATLON)) {
+            widget = HtmlUtil.makeLatLonBox(getFullName(),"","","","");
+        } else  if (type.equals(TYPE_BOOLEAN)) {
+            widget =  HtmlUtil.select(getFullName(),Misc.newList(TypeHandler.ALL_OBJECT,
+                                                                 "True","False"));
+        } else  if (type.equals(TYPE_ENUMERATION)) {
+            List tmpValues = Misc.newList(TypeHandler.ALL_OBJECT);
+            tmpValues.addAll(values);
+            widget = HtmlUtil.select(getFullName(),tmpValues);
+        } else if(isNumeric()) {
+            String id = getFullName();
+            String expr = HtmlUtil.select(id+"_expr",EXPR_ITEMS);
+            widget = expr +
+                HtmlUtil.input(id+"_from", "", "size=\"10\"") +
+                HtmlUtil.input(id+"_to", "", "size=\"10\"");
         } else {
-            if (rows > 1) {
-                formBuffer.append(
-                    HtmlUtil.tableEntry(
-                        HtmlUtil.bold(getLabel() + ":"),
-                        HtmlUtil.textArea(getFullName(), "", rows, columns)));
+            //TEXT
+            if (searchType.equals(SEARCHTYPE_SELECT)) {
+                String[] values = SqlUtil.readString(
+                                                     typeHandler.executeSelect(request,
+                                                                               SqlUtil.distinct(getFullName()),
+                                                                               tmp), 1);
+                List list = new ArrayList();
+                for (int i = 0; i < values.length; i++) {
+                    if(values[i] == null) continue;
+                    list.add(
+                             new TwoFacedObject(
+                                                typeHandler.getRepository().getLongName(values[i]),
+                                                values[i]));
+                }
+                list.add(0, TypeHandler.ALL_OBJECT);
+                widget =  HtmlUtil.select(getFullName(), list);
+            } else if (rows > 1) {
+                widget = HtmlUtil.textArea(getFullName(), "", rows, columns);
             } else {
-                formBuffer.append(
-                    HtmlUtil.tableEntry(
-                        HtmlUtil.bold(getLabel() + ":"),
-                        HtmlUtil.input(
-                            getFullName(), "", "size=\"" + columns + "\"")));
+                widget = HtmlUtil.input(getFullName(), "", "size=\"" + columns + "\"");
             }
         }
+        formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold(getLabel()
+                                                            + ":"), widget));
         formBuffer.append("\n");
     }
 
@@ -276,7 +438,7 @@ public class Column implements Tables, Constants {
      * @return _more_
      */
     public String getFullName() {
-        return table + "." + name;
+        return  typeHandler.getTableName() + "." + name;
     }
 
 
@@ -288,6 +450,18 @@ public class Column implements Tables, Constants {
     public void setName(String value) {
         name = value;
     }
+
+    public List getColumnNames() {
+        List names = new ArrayList();
+        if (type.equals(TYPE_LATLON)) {
+            names.add(name+"_lat");
+            names.add(name+"_lon");
+        } else {
+            names.add(name);
+        }
+        return names;
+    }
+
 
     /**
      * Get the Name property.
@@ -376,8 +550,8 @@ public class Column implements Tables, Constants {
      *
      * @param value The new value for IsSearchable
      */
-    public void setIsSearchable(boolean value) {
-        isSearchable = value;
+    public void setCanSearch(boolean value) {
+        canSearch = value;
     }
 
     /**
@@ -385,8 +559,26 @@ public class Column implements Tables, Constants {
      *
      * @return The IsSearchable
      */
-    public boolean getIsSearchable() {
-        return isSearchable;
+    public boolean getCanSearch() {
+        return canSearch;
+    }
+
+    /**
+     * Set the IsListable property.
+     *
+     * @param value The new value for IsListable
+     */
+    public void setCanList(boolean value) {
+        canList = value;
+    }
+
+    /**
+     * Get the IsListable property.
+     *
+     * @return The IsListable
+     */
+    public boolean getCanList() {
+        return canList;
     }
 
 

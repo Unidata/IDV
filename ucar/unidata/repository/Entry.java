@@ -53,6 +53,9 @@ public class Entry {
     /** _more_          */
     List<String> tags;
 
+
+
+
     /** _more_ */
     private String id;
 
@@ -389,6 +392,7 @@ public class Entry {
 
 
 
+
     /**
      * _more_
      *
@@ -401,6 +405,7 @@ public class Entry {
         tags.add(tag);
 
     }
+
 
 
 /**

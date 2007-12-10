@@ -96,9 +96,12 @@ public interface Constants {
 
     /** _more_          */
     public static final String TAG_TAG = "tag";
+    public static final String TAG_ASSOCIATION = "association";
 
     /** _more_          */
     public static final String TAG_TAGS = "tags";
+    /** _more_          */
+    public static final String TAG_ASSOCIATIONS = "associations";
 
     /** _more_          */
     public static final String TAG_METHOD = "method";
@@ -170,6 +173,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_TYPE = "type";
+    public static final String ARG_SKIP = "skip";
 
     /** _more_          */
     public static final String ARG_APPLET = "applet";
@@ -179,6 +183,9 @@ public interface Constants {
 
     /** _more_          */
     public static final String ARG_TAG = "tag";
+
+    /** _more_          */
+    public static final String ARG_ASSOCIATION = "association";
 
     /** _more_ */
     public static final String ARG_WHAT = "what";
@@ -191,6 +198,9 @@ public interface Constants {
 
     /** _more_          */
     public static final String WHAT_TAG = "tag";
+
+    /** _more_          */
+    public static final String WHAT_ASSOCIATION = "association";
 
     /** _more_ */
     public static final String WHAT_USER = "user";
@@ -267,6 +277,9 @@ public interface Constants {
     /** _more_          */
     public static final String TYPE_TAG = "tag";
 
+    /** _more_          */
+    public static final String TYPE_ASSOCIATION = "association";
+
     /** _more_ */
     public static final String TYPE_GROUP = "group";
 
@@ -332,5 +345,9 @@ public interface Constants {
     public static final String TAG_CATALOGREF= "catalogRef";
     public static final String ATTR_XLINKTITLE="xlink:title";
     public static final String ATTR_XLINKHREF = "xlink:href";
+
+
+    public static final String ARG_ADMIN_WHAT = "what";
+
 }
 

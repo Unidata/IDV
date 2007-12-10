@@ -148,7 +148,13 @@ public class SqlUtil {
         return s1.toString() + "," + s2.toString();
     }
 
+
+
     public static String comma(String[]s) {
+        return StringUtil.join(",",s);
+    }
+
+    public static String comma(List s) {
         return StringUtil.join(",",s);
     }
 
@@ -261,6 +267,9 @@ public class SqlUtil {
 
     public static String like(String name, String value) {
         return " " +name +" LIKE " + quote(value)+" ";
+    }
+    public static String notLike(String name, String value) {
+        return " NOT " +name +" LIKE " + quote(value)+" ";
     }
 
     public static String neq(String name, String value) {

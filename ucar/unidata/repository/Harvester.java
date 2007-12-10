@@ -110,19 +110,19 @@ public class Harvester {
     public List<Entry> collectLevel3radarFiles(File rootDir,
                                                       String groupName, final TypeHandler typeHandler)
         throws Exception {
-        List<Entry> radarEntrys = new ArrayList();
+        List<Entry> entries = new ArrayList();
         long  baseTime    = repository.currentTime();
-        Group group = repository.findGroupFromName(groupName);
+        Group group = repository.findGroupFromName(groupName,true);
         User user = repository.findUser("jdoe");
         for (int stationIdx = 0; stationIdx < 50; stationIdx++) {
             String station = "station" + stationIdx;
             for (int productIdx = 0; productIdx < 10; productIdx++) {
                 String product = "product" + productIdx;
                 group = repository.findGroupFromName(groupName + "/"
-                        + station + "/" + product);
+                        + station + "/" + product,true);
                 for (int timeIdx = 0; timeIdx < 10; timeIdx++) {
                     long time =  baseTime + timeIdx * 1000 * 60*60;
-                    radarEntrys.add(
+                    entries.add(
                         new Entry(
                             repository.getGUID(), 
                             typeHandler, 
@@ -133,13 +133,13 @@ public class Harvester {
                             user,
                             "file:" + stationIdx + "_" + productIdx + "_"
                             + group, 
-                            time,new Object[]{station,product}));
+                            time,new Object[]{station,product, new Double(40), new Double(-107),"Banana", new Boolean(true), new Double(stationIdx)}));
 
                 }
             }
         }
 
-        return radarEntrys;
+        return entries;
     }
 
     /**
@@ -177,7 +177,7 @@ public class Harvester {
                 String station = matcher.group(1);
                 String product = matcher.group(2);
                 Group group = repository.findGroupFromName(groupName + "/"
-                                  + "NIDS" + "/" + station + "/" + product);
+                                  + "NIDS" + "/" + station + "/" + product,true);
                 Date dttm = sdf.parse(matcher.group(3));
                 entries.add(new Entry(repository.getGUID(),
                                              typeHandler, dttm.toString(), "", group, user,
@@ -232,7 +232,7 @@ public class Harvester {
                 }
                 String station = matcher.group(1);
                 Group group = repository.findGroupFromName(groupName + "/"
-                                  + "craft" + "/" + station);
+                                  + "craft" + "/" + station,true);
                 Date dttm = sdf.parse(matcher.group(2));
                 entries.add(new Entry(repository.getGUID(),
                         typeHandler, dttm.toString(), "", group, user,
@@ -288,7 +288,7 @@ public class Harvester {
                 String product    = matcher.group(3);
                 Group group = repository.findGroupFromName(groupName + "/"
                                   + "Satellite" + "/" + platform + "/"
-                                  + resolution + "/" + product);
+                                  + resolution + "/" + product,true);
                 Date dttm = sdf.parse(matcher.group(4));
                 entries.add(new Entry(repository.getGUID(),
                         typeHandler, dttm.toString(), "", group, user,
@@ -321,7 +321,8 @@ public class Harvester {
      * @throws Exception _more_
      */
     public List<Entry> collectFiles(File rootDir, final String rootGroup,
-                                           final TypeHandler typeHandler)
+                                           final TypeHandler typeHandler,
+                                    final List<FileInfo> directories)
             throws Exception {
         final String      rootStr    = rootDir.toString();
         final int         rootStrLen = rootStr.length();
@@ -335,6 +336,7 @@ public class Harvester {
                     return DO_DONTRECURSE;
                 }
                 if (f.isDirectory()) {
+                    directories.add(new FileInfo(f,true));
                     return DO_CONTINUE;
                 }
                 //                if ( !name.endsWith(".java")) {
@@ -350,7 +352,7 @@ public class Harvester {
                                              true);
                 toks.add(0, rootGroup);
                 Group group =
-                    repository.findGroupFromName(StringUtil.join("/", toks));
+                    repository.findGroupFromName(StringUtil.join("/", toks),true);
                 Entry entry = new Entry(repository.getGUID(),
                                                typeHandler, name, name, group,
                                                user, f.toString(),
@@ -427,7 +429,7 @@ public class Harvester {
 
                 Group group = repository.findGroupFromName(groupName + "/"
                                   + "model" + "/" + modelGroup + "/"
-                                  + modelRun);
+                                  + modelRun,true);
 
                 entries.add(new Entry(repository.getGUID(), typeHandler,
                                            IOUtil.getFileTail(f.toString()),

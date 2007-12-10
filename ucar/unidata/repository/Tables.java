@@ -165,14 +165,28 @@ public interface Tables {
 
     public static final String TABLE_TAGS = "tags";
     public static final String COL_TAGS_NAME = TABLE_TAGS + ".name";
-    public static final String COL_TAGS_FILE_ID= TABLE_TAGS + ".file_id";
-    public static final String []ARRAY_TAGS =  new String[]{COL_TAGS_NAME,COL_TAGS_FILE_ID};
+    public static final String COL_TAGS_ENTRY_ID= TABLE_TAGS + ".entry_id";
+    public static final String []ARRAY_TAGS =  new String[]{COL_TAGS_NAME,COL_TAGS_ENTRY_ID};
     public static final String COLUMNS_TAGS = SqlUtil.comma(ARRAY_TAGS);
     
     public static final String INSERT_TAGS =
         SqlUtil.makeInsert(TABLE_TAGS,
                            COLUMNS_TAGS,
                            SqlUtil.getQuestionMarks(ARRAY_TAGS.length));
+
+
+
+    public static final String TABLE_ASSOCIATIONS = "associations";
+    public static final String COL_ASSOCIATIONS_NAME = TABLE_ASSOCIATIONS + ".name";
+    public static final String COL_ASSOCIATIONS_FROM_ENTRY_ID= TABLE_ASSOCIATIONS + ".from_entry_id";
+    public static final String COL_ASSOCIATIONS_TO_ENTRY_ID= TABLE_ASSOCIATIONS + ".to_entry_id";
+    public static final String []ARRAY_ASSOCIATIONS =  new String[]{COL_ASSOCIATIONS_NAME,COL_ASSOCIATIONS_FROM_ENTRY_ID,COL_ASSOCIATIONS_TO_ENTRY_ID};
+    public static final String COLUMNS_ASSOCIATIONS = SqlUtil.comma(ARRAY_ASSOCIATIONS);
+    
+    public static final String INSERT_ASSOCIATIONS =
+        SqlUtil.makeInsert(TABLE_ASSOCIATIONS,
+                           COLUMNS_ASSOCIATIONS,
+                           SqlUtil.getQuestionMarks(ARRAY_ASSOCIATIONS.length));
 
 
 

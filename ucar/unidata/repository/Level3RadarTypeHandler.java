@@ -52,7 +52,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
-
+import org.w3c.dom.*;
 
 /**
  *
@@ -63,7 +63,6 @@ import java.util.Properties;
 public class Level3RadarTypeHandler extends GenericTypeHandler {
 
 
-
     /**
      * _more_
      *
@@ -72,15 +71,17 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
      * @param description _more_
      * @param columns _more_
      */
-    public Level3RadarTypeHandler(Repository repository, String type,
-                              String description, List<Column> columns) {
-        super(repository, type, description,columns);
+    public Level3RadarTypeHandler(Repository repository, Element entryNode) throws Exception {
+        super(repository, entryNode);
     }
 
     protected String getEntryLinks(Entry entry, Request request) {
         return super.getEntryLinks(entry, request) + " " +
             HtmlUtil.href("http://radar.weather.gov/radar.php?rid=" + entry.getValues()[0] +"&product=" +
-                          entry.getValues()[0] +"", "NWS Radar web site"," target=_OTHER");
+                          entry.getValues()[0] +"", 
+                          HtmlUtil.img(repository.href("/Radar.gif"),
+                                       "Show NWS Radar Site")," target=_OTHER");
+        
 
     }
 

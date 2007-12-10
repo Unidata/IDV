@@ -107,7 +107,7 @@ public class MetaDataServer extends HttpServer implements Constants {
             html = StringUtil.replace(html, "%root%",
                                       repository.getUrlBase());
             List   links     = (List) result.getProperty(PROP_NAVLINKS);
-            String linksHtml = "";
+            String linksHtml = "&nbsp;";
             if (links != null) {
                 linksHtml = StringUtil.join("&nbsp;|&nbsp;", links);
             }
