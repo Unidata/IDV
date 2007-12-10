@@ -126,6 +126,8 @@ public class TextPointDataSource extends PointDataSource {
     JComponent widgetPanel;
 
 
+    private  JButton  applyNamesBtn;
+
     /** _more_ */
     private String groupVarName = null;
 
@@ -170,6 +172,7 @@ public class TextPointDataSource extends PointDataSource {
     protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
                                 LatLonRect bbox)
             throws Exception {
+        //        System.err.println("MAKE OBS");
         return makeObs(dataChoice, subset, bbox, null, false);
     }
 
@@ -364,8 +367,12 @@ public class TextPointDataSource extends PointDataSource {
      * @param lines _more_
      */
     private void setLineText(JLabel lbl, int index, List lines) {
+        //        if(true) {
+        //            lbl.setText("HELLO THERE");
+        //            return;
+        //        }
         StringBuffer sb =
-            new StringBuffer("<html><table width=\"100%\" border=0>");
+            new StringBuffer("<html><body style=\"margin:0;\"><table width=\"100%\" border=\"0\">");
         int[] indices;
         if(index==0) {
             indices = new int[] {index, index+1, index + 2};
@@ -388,8 +395,9 @@ public class TextPointDataSource extends PointDataSource {
             }
         }
         sb.append("</table>");
-        sb.append("</html>");
+        sb.append("</body></html>");
         lbl.setText(sb.toString());
+
 
         String line = (String) lines.get(index);
         List toks  = StringUtil.split(line, getDelimiter(), false, false);
@@ -410,7 +418,8 @@ public class TextPointDataSource extends PointDataSource {
                                                 new JLabel("Extra (e.g., colspan)"), 4, 0));
 
 */
-        comps.add(new JLabel("Value"));
+        
+        comps.add(GuiUtils.leftRight(new JLabel("Value"),applyNamesBtn));
         comps.add(new JLabel("Name"));
         comps.add(new JLabel("Unit/Date Format"));
         comps.add(new JLabel("Missing Value"));
@@ -439,7 +448,7 @@ public class TextPointDataSource extends PointDataSource {
 
         applySavedMetaData(metaDataFields);
         GuiUtils.tmpInsets = new Insets(5,5,0,0);
-        double[]stretch = {0.0,1.0,1.0,0.0,0.5};
+        double[]stretch = {0.0,1.0,0.5,0.0,0.5};
         JComponent panel = GuiUtils.doLayout(comps,5, stretch,
                                              GuiUtils.WT_N);
         widgetPanel.removeAll();
@@ -487,9 +496,11 @@ public class TextPointDataSource extends PointDataSource {
             }
 
 
-            final JLabel lineLbl = new JLabel("");
-            JButton applyNamesBtn = new JButton("Set Names");
-            applyNamesBtn.setToolTipText("Use current line as the field names");
+            final JLabel lineLbl = new JLabel(" ");
+            lineLbl.setVerticalAlignment(SwingConstants.TOP);
+            lineLbl.setPreferredSize(new Dimension(700,150));
+            applyNamesBtn = GuiUtils.getImageButton("/auxdata/ui/icons/HorArrow16.gif",getClass());
+            applyNamesBtn.setToolTipText("Use column values as the field names");
             applyNamesBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     applyNames(lines.get(skipRows).toString());
@@ -518,10 +529,13 @@ public class TextPointDataSource extends PointDataSource {
                 }
             });
             JComponent buttons = GuiUtils.vbox(prevBtn, nextBtn);
+            JComponent skipInner =  GuiUtils.leftCenter(GuiUtils.top(buttons),
+                                                             lineLbl);
+            
+
             JComponent skipContents =
-                GuiUtils.topCenter(new JLabel("Start line:"),
-                                   GuiUtils.leftCenterRight(GuiUtils.top(buttons),
-                                       GuiUtils.top(lineLbl), GuiUtils.top(applyNamesBtn)));
+                GuiUtils.topCenter(new JLabel("Start line:"),skipInner);
+
 
             widgetPanel = new JPanel(new BorderLayout());
             JLabel lbl =
@@ -580,6 +594,7 @@ public class TextPointDataSource extends PointDataSource {
      * @param near The component to show the menu near
      */
     public void popupMetaDataMenu(JComponent near) {
+
         List items = new ArrayList();
         items.add(GuiUtils.makeMenuItem("Save Currrent", this,
                                         "saveMetaDataMap"));
@@ -644,6 +659,7 @@ public class TextPointDataSource extends PointDataSource {
      * @throws IOException On badness
      */
     private boolean showAttributeGui(String contents) throws IOException {
+        //        Misc.printStack("meta");
         if ( !GuiUtils.showOkCancelDialog(null, "Point Data",
                                           getMetaDataComponent(contents),
                                           null)) {
