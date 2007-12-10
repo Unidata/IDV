@@ -459,7 +459,8 @@ public class AddeServer extends NamedThing {
         name = name.trim();
         for (int i = 0; i < groups.size(); i++) {
             Group g = (Group) groups.get(i);
-            if (g.getName().toLowerCase().equals(name.toLowerCase())) {
+            //            if (g.getName().toLowerCase().equals(name.toLowerCase())) {
+            if (g.getName().equals(name)) {
                 return g;
             }
         }
