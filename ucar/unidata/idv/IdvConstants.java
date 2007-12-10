@@ -587,6 +587,9 @@ public interface IdvConstants {
     /** default time zone */
     public static final String DEFAULT_TIMEZONE = "GMT";
 
+    /** Preference for the locale */
+    public static final String PREF_LOCALE = PREF_DATAPREFIX + "Locale";
+
     /** Preference for showing the display control windows */
     public static final String PREF_SHOWCONTROLWINDOW =
         "Display.showControlWindow";

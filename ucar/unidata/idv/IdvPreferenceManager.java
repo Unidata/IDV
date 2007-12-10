@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
@@ -39,15 +40,16 @@ import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.Msg;
-
 import ucar.unidata.util.ObjectArray;
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.Resource;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
+
 import ucar.unidata.view.geoloc.NavigatedDisplay;
+
 import ucar.unidata.xml.PreferenceManager;
 import ucar.unidata.xml.XmlObjectStore;
 import ucar.unidata.xml.XmlUtil;
@@ -59,15 +61,11 @@ import visad.*;
 import java.awt.*;
 import java.awt.event.*;
 
-
-//JDK1.4
 import java.beans.*;
 import java.beans.PropertyChangeEvent;
-
 import java.beans.PropertyChangeListener;
 
 import java.io.*;
-
 
 import java.rmi.RemoteException;
 
@@ -88,7 +86,6 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.filechooser.FileFilter;
-
 import javax.swing.tree.*;
 
 
@@ -402,6 +399,14 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                     if (((JRadioButton) widget).isSelected()) {
                         store.put(PREF_SAMPLINGMODE,
                                   ((JRadioButton) widget).getText());
+                    }
+                } else if (key.equals("SYSTEM_LOCALE")
+                           || key.equals("US_LOCALE")) {
+                    if (key.equals("SYSTEM_LOCALE")
+                            && ((JRadioButton) widget).isSelected()) {
+                        store.remove(PREF_LOCALE);
+                    } else if (((JRadioButton) widget).isSelected()) {
+                        store.put(PREF_LOCALE, key);
                     }
                 } else {
                     if (((JRadioButton) widget).isSelected()) {
@@ -786,9 +791,6 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         }
         widgets.put(PREF_LOOKANDFEEL, lookAndFeelBox);
 
-
-
-
         JComponent topPanel = GuiUtils.formLayout(new Component[] {
             GuiUtils.rLabel("Resource Sitepath:"),
             GuiUtils.left(sitePathField), GuiUtils.rLabel("External Editor:"),
@@ -906,6 +908,19 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         dateFormatBox.addActionListener(timeLabelListener);
         timeZoneBox.addActionListener(timeLabelListener);
 
+        String defaultLocale = getStore().get(PREF_LOCALE, "SYSTEM_LOCALE");
+        JRadioButton sysLocale = new JRadioButton("System Default",
+                                     defaultLocale.equals("SYSTEM_LOCALE"));
+        sysLocale.setToolTipText(
+            "Use the system default locale for number formatting");
+        JRadioButton usLocale = new JRadioButton("English/US",
+                                    !defaultLocale.equals("SYSTEM_LOCALE"));
+        usLocale.setToolTipText("Use the US number formatting");
+        GuiUtils.buttonGroup(sysLocale, usLocale);
+        widgets.put("SYSTEM_LOCALE", sysLocale);
+        widgets.put("US_LOCALE", usLocale);
+
+
         String probeFormat =
             getStore().get(DisplayControl.PREF_PROBEFORMAT,
                            DisplayControl.DEFAULT_PROBEFORMAT);
@@ -946,9 +961,10 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                              defaultVertCS.equals(DataUtil.STD_ATMOSPHERE));
         sa.setToolTipText("Use a standard atmosphere height approximation");
         JRadioButton v5d =
-            new JRadioButton("Vis5D",
+            new JRadioButton("Logarithmic",
                              defaultVertCS.equals(DataUtil.VIS5D_VERTICALCS));
-        v5d.setToolTipText("Use the Vis5D vertical transformation");
+        v5d.setToolTipText(
+            "Use a logarithmic pressure to height vertical transformation");
         widgets.put(DataUtil.STD_ATMOSPHERE, sa);
         widgets.put(DataUtil.VIS5D_VERTICALCS, v5d);
         GuiUtils.buttonGroup(sa, v5d);
@@ -1017,6 +1033,9 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                     getIdv().makeHelpButton(
                         "idv.tools.preferences.latlonformat"), formatLabel,
                             5)));
+
+        formatComps.add(GuiUtils.rLabel("Number Style:"));
+        formatComps.add(GuiUtils.left(GuiUtils.hbox(sysLocale, usLocale)));
 
 
         formatComps.add(GuiUtils.rLabel("Probe Format:"));

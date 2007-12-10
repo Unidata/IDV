@@ -114,11 +114,11 @@ import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -493,6 +493,10 @@ public class IdvUIManager extends IdvManager {
             } catch (Exception exc) {
                 System.err.println("Unknown look and feel:" + lookAndFeel);
             }
+        }
+        String locale = getStore().get(PREF_LOCALE, (String) null);
+        if (locale != null) {
+            Locale.setDefault(Locale.US);
         }
     }
 
