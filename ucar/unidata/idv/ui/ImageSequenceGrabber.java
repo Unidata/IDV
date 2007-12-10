@@ -590,6 +590,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
         mainDialog     = GuiUtils.createDialog("Movie Capture", false);
 
+
+
         frameLbl       = GuiUtils.cLabel("No frames");
 
         displayRateFld = new JTextField("2", 3);
@@ -975,11 +977,12 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         Misc.sleep(sleepTime);
                     } catch (Exception exc) {}
                     //Has the user pressed Stop?
-                    if ( !keepRunning(timestamp)) {
+                    if (anime == null ||  !keepRunning(timestamp)) {
                         break;
                     }
                     //Now grab the image in block mode
                     grabImageAndBlock();
+                    if(anime==null) break;
                     int current = anime.getCurrent();
                     animationWidget.stepForward();
                     if (current == anime.getCurrent()) {
@@ -1227,14 +1230,13 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * Close the window
      */
     private void close() {
+        captureTimeStamp++;
+        capturingAuto = false;
         anime = null;
-
         if (previewDialog != null) {
             previewDialog.dispose();
             previewDialog = null;
         }
-
-        capturingAuto = false;
         viewManager.clearImageGrabber(this);
 
         mainDialog.dispose();
@@ -1267,6 +1269,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         capturingAuto = true;
         while (capturingAuto) {
             grabImageAndBlock();
+            if(!capturingAuto) return;
             double captureRate = 2.0;
             try {
                 captureRate = (new Double(
@@ -1355,7 +1358,6 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             template = tmp;
         }
         template = StringUtil.replace(template, "%count%", "" + cnt);
-        System.err.println ("template:" + template);
 
         try {
             DateTime dttm       = new DateTime(anime.getAniValue());
