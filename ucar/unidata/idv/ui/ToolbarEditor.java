@@ -88,11 +88,11 @@ public class ToolbarEditor implements ActionListener {
     private static final String CMD_REMOVEWRITABLE = "Reload System";
 
     /** action command */
-    private static final String CMD_EXPORTPLUGIN = "Export to Plugin";
+    private static final String CMD_EXPORTPLUGIN = "Export Selected to Plugin";
 
     /** action command */
     private static final String CMD_EXPORTMENUPLUGIN =
-        "Export to Menu Plugin";
+        "Export Selected to Menu Plugin";
 
     /** For adding a space */
     private static final String SPACE = "-space-";
