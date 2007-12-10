@@ -853,10 +853,14 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         if (selectedRegion != null) {
             Rectangle2D screenRect = navigate.worldToScreen(selectedRegion);
             g.setColor(Color.cyan);
+            Stroke stroke = g.getStroke();
+            
+            g.setStroke(new BasicStroke(2.0f));
             g.draw(screenRect);
+            g.setStroke(stroke);
             if (selectRegionMode) {
                 g.setColor(Color.black);
-                Glyph.paintSelectionPoints(g, screenRect, 4);
+                Glyph.paintSelectionPoints(g, screenRect, 6);
             }
         }
 
