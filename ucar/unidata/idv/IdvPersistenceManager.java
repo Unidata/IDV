@@ -469,7 +469,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                     new Insets(0, 3, 0, 0))));
             accessories.add(GuiUtils.filler(1, 5));
             accessories.add(makeDataRelativeCbx);
-            accessories.add(makeDataEditableCbx);
+            //            accessories.add(makeDataEditableCbx);
 
             fileAccessory = GuiUtils.top(
                 GuiUtils.vbox(
