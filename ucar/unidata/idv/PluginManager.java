@@ -53,6 +53,7 @@ import ucar.unidata.util.ColorTable;
 
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.MenuUtil;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.JobManager;
@@ -824,7 +825,8 @@ public class PluginManager extends IdvManager {
      */
     public void initializeStationModelsMenu(JMenu menu) {
         initializeMenu(menu,
-                       getIdv().getStationModelManager().getStationModels());
+                       getIdv().getStationModelManager().getStationModels(),
+                       "Layout Models");
     }
 
     /**
@@ -847,21 +849,21 @@ public class PluginManager extends IdvManager {
             if (multiples) {
                 menu.add(theMenu = new JMenu("Bundles"));
             }
-            initializeMenu(theMenu, favorites);
+            initializeMenu(theMenu, favorites, "Favorites");
         }
         theMenu = menu;
         if (displays.size() > 0) {
             if (multiples) {
                 menu.add(theMenu = new JMenu("Displays"));
             }
-            initializeMenu(theMenu, displays);
+            initializeMenu(theMenu, displays,"Display Favorites");
         }
         theMenu = menu;
         if (data.size() > 0) {
             if (multiples) {
                 menu.add(theMenu = new JMenu("Data"));
             }
-            initializeMenu(theMenu, data);
+            initializeMenu(theMenu, data,"Data Favorites");
         }
         GuiUtils.limitMenuSize(menu, "Favorites", 20);
     }
@@ -872,7 +874,7 @@ public class PluginManager extends IdvManager {
      * @param menu the menu
      */
     public void initializeFormulasMenu(JMenu menu) {
-        initializeMenu(menu, getIdv().getJythonManager().getDescriptors());
+        initializeMenu(menu, getIdv().getJythonManager().getDescriptors(),"Formulas");
     }
 
 
@@ -932,7 +934,7 @@ public class PluginManager extends IdvManager {
      */
     public void initializeParamDefaultsMenu(JMenu menu) {
         initializeMenu(menu,
-                       getIdv().getParamDefaultsEditor().getParamInfos(true));
+                       getIdv().getParamDefaultsEditor().getParamInfos(true),"Param Defaults");
     }
 
 
@@ -959,7 +961,7 @@ public class PluginManager extends IdvManager {
      * @param menu the menu
      * @param list List of entries
      */
-    public void initializeMenu(JMenu menu, List list) {
+    public void initializeMenu(JMenu menu, List list, String name) {
         List items = new ArrayList();
         for (int i = 0; i < list.size(); i++) {
             Object obj = list.get(i);
@@ -972,7 +974,8 @@ public class PluginManager extends IdvManager {
             items.add(GuiUtils.makeMenuItem(label, this, "addObject", obj));
         }
 
-        GuiUtils.makeMenu(menu, items);
+        MenuUtil.makeMenu(menu, items);
+        GuiUtils.limitMenuSize(menu,name,20);
     }
 
     /**
