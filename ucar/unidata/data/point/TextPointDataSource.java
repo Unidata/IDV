@@ -88,7 +88,7 @@ public class TextPointDataSource extends PointDataSource {
     /** _more_          */
     private int skipRows = 0;
 
-
+    private boolean metaDataOk = false;
 
 
     /** The visad textadapter map params line. We have this here if the data file does not have it */
@@ -123,6 +123,7 @@ public class TextPointDataSource extends PointDataSource {
     /** for the metadata gui */
     JComponent metaDataComp;
 
+    JComponent metaDataPropertiesWrapper;
     JComponent widgetPanel;
 
 
@@ -173,7 +174,7 @@ public class TextPointDataSource extends PointDataSource {
                                 LatLonRect bbox)
             throws Exception {
         //        System.err.println("MAKE OBS");
-        return makeObs(dataChoice, subset, bbox, null, false);
+        return makeObs(dataChoice, subset, bbox, null, false, true);
     }
 
     /**
@@ -236,7 +237,7 @@ public class TextPointDataSource extends PointDataSource {
      */
     protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
                                 LatLonRect bbox, String trackParam,
-                                boolean sampleIt)
+                                boolean sampleIt, boolean showAttributeGuiIfNeeded)
             throws Exception {
         String source = getSource(dataChoice);
         String contents;
@@ -262,6 +263,9 @@ public class TextPointDataSource extends PointDataSource {
                 if ((map != null) && (params != null)) {
                     throw bfe;
                 }
+                if(!showAttributeGuiIfNeeded) {
+                    return null;
+                }
                 if ( !showAttributeGui(contents)) {
                     return null;
                 }
@@ -271,6 +275,7 @@ public class TextPointDataSource extends PointDataSource {
             try {
                 Data d = ta.getData();
                 obs = makePointObs(d, trackParam);
+                metaDataOk = true;
             } catch (Exception exc) {
                 map    = null;
                 params = null;
@@ -660,9 +665,18 @@ public class TextPointDataSource extends PointDataSource {
      */
     private boolean showAttributeGui(String contents) throws IOException {
         //        Misc.printStack("meta");
-        if ( !GuiUtils.showOkCancelDialog(null, "Point Data",
-                                          getMetaDataComponent(contents),
-                                          null)) {
+
+
+        JComponent metaDataComp = getMetaDataComponent(contents);
+
+        boolean ok = GuiUtils.showOkCancelDialog(null, "Point Data",
+                                                 metaDataComp,
+                                                 null); 
+        if(metaDataPropertiesWrapper!=null) {
+            metaDataPropertiesWrapper.add(BorderLayout.CENTER, metaDataComp);
+        }
+    
+        if(!ok) {
             return false;
         }
         applyMetaDataFields();
@@ -692,10 +706,19 @@ public class TextPointDataSource extends PointDataSource {
      */
     public void addPropertiesTabs(JTabbedPane tabbedPane) {
         super.addPropertiesTabs(tabbedPane);
-        if (map != null) {
+        if (!metaDataOk && map == null) {
+            try {
+                DataChoice dataChoice = (DataChoice) getDataChoices().get(0);
+                Data sample = makeObs(dataChoice, null, null, null, true, false);
+            } catch(Exception exc) {
+            }
+        }
+
+        if (!metaDataOk || map != null) {
             try {
                 JComponent comp = getMetaDataComponent(null);
-                tabbedPane.add("Point Meta-data", comp);
+                metaDataPropertiesWrapper = GuiUtils.center(comp);
+                tabbedPane.add("Point Meta-data", metaDataPropertiesWrapper);
             } catch (IOException exc) {
                 logException("Creating metadata properties", exc);
             }
@@ -1238,7 +1261,7 @@ public class TextPointDataSource extends PointDataSource {
             }
             try {
                 DataChoice dataChoice = (DataChoice) getDataChoices().get(0);
-                Data sample = makeObs(dataChoice, null, null, null, true);
+                Data sample = makeObs(dataChoice, null, null, null, true, true);
                 //            System.err.println ("sample:" + sample);
 
                 List cats = DataCategory.parseCategories("Track" + ";trace",
@@ -1290,7 +1313,7 @@ public class TextPointDataSource extends PointDataSource {
         if ((id instanceof String) && (id.toString().startsWith("track:"))) {
             try {
                 return makeObs((DataChoice) dataChoice, dataSelection, null,
-                               id.toString().substring(6), false);
+                               id.toString().substring(6), false, true);
             } catch (Exception exc) {
                 logException("Creating obs", exc);
                 return null;
