@@ -1736,7 +1736,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                                animationWidget.getTimes()));
                     if (animationTimeline == null) {
                         animationTimeline = new MyTimeline(datedThings, 300,
-                                75);
+                                100);
                     }
                     if (datedThings.size() > 0) {
                         allTimes.addAll(datedThings);
