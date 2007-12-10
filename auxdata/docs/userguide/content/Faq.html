@@ -360,13 +360,13 @@ For non-projected (i.e., lat/lon grids), grid relative is the same as true.
 </faqitem>
 
 <faqitem q="What is the difference between the Standard Atmosphere 
-and Vis5D pressure to height conversion?" id="pressure_to_height">
+and logarithmic pressure to height conversion?" id="pressure_to_height">
 The IDV displays pressure surfaces by converting the pressure
 to a height in some reference system.  There are two reference
 systems that come standard with the IDV - the U.S. Standard Atmosphere
-and Vis5D.  The U.S. Standard Atmosphere only computes has conversions
-for pressures up to about 80 km.  The Vis5D coordinate system uses a
-logarithmic conversion:
+and a logarithmic conversion (also used in Vis5D).  The U.S. Standard 
+Atmosphere only computes conversions for pressures up to about 80 km.  
+The logarithmic coordinate system uses the following equations:
 <pre>
       P = 1012.5 * e^( H / -7.2 )        (^ denotes exponentiation)
       H = -7.2 * Ln( P / 1012.5 )        (Ln denotes natural log)
