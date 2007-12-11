@@ -640,8 +640,8 @@
 <!-- Where to find extra gempak grid lookup tables  -->
   <resources name="idv.resource.gempakgridparam">
     <resource location="%USERPATH%/gempakparamtable.tbl"/>
-    <resource location="%IDVPATH%/tables/ncepgrib2.tbl"/>
-    <resource location="%IDVPATH%/tables/wmogrib3.tbl"/>
+    <resource location="%SITEPATH%/gempakparamtable.tbl"/>
+    <resource location="%APPPATH%/gempakparamtable.tbl"/>
   </resources>
 
 </resourcebundle>
