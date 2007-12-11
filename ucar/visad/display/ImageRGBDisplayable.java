@@ -20,21 +20,25 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.visad.display;
 
 
-import java.rmi.RemoteException;
-
-import ucar.unidata.util.Misc;
 import ucar.unidata.data.grid.GridUtil;
 
+import ucar.unidata.util.Misc;
+
 import visad.*;
-import visad.java2d.*;
 
 import visad.bom.ImageRendererJ3D;
 
-import visad.java2d.DisplayRendererJ2D;
+import visad.java2d.*;
 import visad.java2d.DefaultRendererJ2D;
+
+import visad.java2d.DisplayRendererJ2D;
+
+
+import java.rmi.RemoteException;
 
 
 
@@ -45,8 +49,7 @@ import visad.java2d.DefaultRendererJ2D;
  * @author IDV development team
  * @version $Revision: 1.17 $
  */
-public class ImageRGBDisplayable extends DisplayableData
-        implements GridDisplayable {
+public class ImageRGBDisplayable extends DisplayableData implements GridDisplayable {
 
 
     /** color ScalarMaps */
@@ -64,6 +67,7 @@ public class ImageRGBDisplayable extends DisplayableData
     /** What do we map with */
     private DisplayRealType mapType = Display.RGB;
 
+    /** flag for whether we use Alpha channel or not*/
     private boolean doAlpha = false;
 
 
@@ -81,16 +85,43 @@ public class ImageRGBDisplayable extends DisplayableData
     }
 
 
+    /**
+     * Constructs from a name for the Displayable and the type of the
+     * RGB parameter.
+     *
+     * @param name              The name for the displayable.
+     * @param doAlpha           true to map to RGBA
+     * @throws VisADException   VisAD failure.
+     * @throws RemoteException  Java RMI failure.
+     */
     public ImageRGBDisplayable(String name, boolean doAlpha)
             throws VisADException, RemoteException {
+        this(name, BaseColorControl.initTableGreyWedge(new float[(doAlpha)
+                ? 4
+                : 3][255]), doAlpha);
+    }
+
+    /**
+     * Constructs from a name for the Displayable and the type of the
+     * RGB parameter.
+     *
+     * @param name              The name for the displayable.
+     * @param colorPalette      The color palette
+     * @param doAlpha           true to map to RGBA
+     * @throws VisADException   VisAD failure.
+     * @throws RemoteException  Java RMI failure.
+     */
+    public ImageRGBDisplayable(String name, float[][] colorPalette,
+                               boolean doAlpha)
+            throws VisADException, RemoteException {
         super(name);
-        this.doAlpha  = doAlpha;
-        if(doAlpha) {
-            mapType = Display.RGBA;
-            colorMaps = new ScalarMap[]{ null, null, null,null };
+        this.doAlpha = doAlpha;
+        if (doAlpha) {
+            mapType   = Display.RGBA;
+            colorMaps = new ScalarMap[] { null, null, null, null };
         }
 
-        addConstantMaps(new ConstantMap[]{
+        addConstantMaps(new ConstantMap[] {
             new ConstantMap(GraphicsModeControl.SUM_COLOR_MODE,
                             Display.ColorMode),
             new ConstantMap(1.0, Display.MissingTransparent) });
@@ -107,8 +138,9 @@ public class ImageRGBDisplayable extends DisplayableData
             throws VisADException, RemoteException {
 
         super(that);
-        this.doAlpha = that.doAlpha;
+        this.doAlpha   = that.doAlpha;
         colorTupleType = that.colorTupleType;
+        colorPalette   = Set.copyFloats(that.colorPalette);
         if (colorTupleType != null) {
             setColorMaps();
         }
@@ -215,7 +247,7 @@ public class ImageRGBDisplayable extends DisplayableData
      * @throws VisADException On badness
      */
     public void setAlpha(float alpha) throws RemoteException, VisADException {
-        addConstantMaps(new ConstantMap[]{
+        addConstantMaps(new ConstantMap[] {
             new ConstantMap(alpha, Display.Alpha) });
     }
 
@@ -326,7 +358,8 @@ public class ImageRGBDisplayable extends DisplayableData
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
      */
-    private void setColorsInControls(float[][] colorPalette, int colorMapIndex)
+    private void setColorsInControls(float[][] colorPalette,
+                                     int colorMapIndex)
             throws RemoteException, VisADException {
         if (colorPalette == null) {
             return;
@@ -357,3 +390,4 @@ public class ImageRGBDisplayable extends DisplayableData
     public void setColoredByAnother(boolean yesno) {}
 
 }
+
