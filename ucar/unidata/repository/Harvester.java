@@ -107,7 +107,7 @@ public class Harvester {
      *
      * @throws Exception _more_
      */
-    public List<Entry> collectLevel3radarFiles(File rootDir,
+    public List<Entry> collectDummyLevel3RadarFiles(File rootDir,
                                                       String groupName, final TypeHandler typeHandler)
         throws Exception {
         List<Entry> entries = new ArrayList();
@@ -153,7 +153,7 @@ public class Harvester {
      *
      * @throws Exception _more_
      */
-    public List<Entry> xxxxxcollectLevel3radarFiles(File rootDir,
+    public List<Entry> collectLevel3RadarFiles(File rootDir,
             final String groupName, final TypeHandler typeHandler)
             throws Exception {
         long                         t1          = System.currentTimeMillis();
@@ -181,7 +181,7 @@ public class Harvester {
                 Date dttm = sdf.parse(matcher.group(3));
                 entries.add(new Entry(repository.getGUID(),
                                              typeHandler, dttm.toString(), "", group, user,
-                                             f.toString(),  dttm.getTime(), new Object[]{station, product}));
+                                             f.toString(),  dttm.getTime(), new Object[]{station, product, new Double(40), new Double(-107),"Banana", new Boolean(true), new Double(5)}));
                 return DO_CONTINUE;
             }
         };
@@ -286,8 +286,7 @@ public class Harvester {
                 String platform   = matcher.group(1);
                 String resolution = matcher.group(2);
                 String product    = matcher.group(3);
-                Group group = repository.findGroupFromName(groupName + "/"
-                                  + "Satellite" + "/" + platform + "/"
+                Group group = repository.findGroupFromName(groupName +  "/" + platform + "/"
                                   + resolution + "/" + product,true);
                 Date dttm = sdf.parse(matcher.group(4));
                 entries.add(new Entry(repository.getGUID(),

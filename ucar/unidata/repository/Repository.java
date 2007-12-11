@@ -528,9 +528,10 @@ public class Repository implements Constants, Tables {
         StringBuffer sb = new StringBuffer();
         sb.append("<h3>Repository Statistics</h3>");
         sb.append("<table>\n");
-        String []tables = {"Users","Tags","Groups","Associations"};
+        String []names = {"Users","Tags","Groups","Associations"};
+        String []tables = {TABLE_USERS,TABLE_TAGS,TABLE_GROUPS,TABLE_ASSOCIATIONS};
         for(int i=0;i<tables.length;i++) {
-            sb.append("<tr><td>"+ getCount(tables[i],"")+"</td><td>"+tables[i]+"</td></tr>");
+            sb.append("<tr><td>"+ getCount(tables[i].toLowerCase(),"")+"</td><td>"+names[i]+"</td></tr>");
         }
 
 
@@ -1489,12 +1490,13 @@ public class Repository implements Constants, Tables {
             sb.append(XmlUtil.tag(TAG_NODE,
                                   XmlUtil.attrs(ATTR_TYPE, TYPE_TAG, ATTR_ID,
                                       originalId, ATTR_TITLE, originalId)));
+
             Statement stmt = typeHandler.executeSelect(request,
                                                        SqlUtil.comma(COL_ENTRIES_ID,
                                                                      COL_ENTRIES_NAME, COL_ENTRIES_TYPE,
                                                                      COL_ENTRIES_GROUP_ID, COL_ENTRIES_FILE),
                                                        Misc.newList(SqlUtil.eq(COL_TAGS_ENTRY_ID,COL_ENTRIES_ID),
-                                                                    SqlUtil.eq(COL_TAGS_NAME, SqlUtil.quote(id))));
+                                                                    SqlUtil.eq(COL_TAGS_NAME, SqlUtil.quote(id)))," order by " + COL_ENTRIES_FROMDATE);
 
             SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
             ResultSet        results;
@@ -3040,9 +3042,15 @@ public class Repository implements Constants, Tables {
     public void loadLevel3RadarFiles() throws Exception {
         File rootDir = new File("/data/ldm/gempak/nexrad/NIDS");
         TypeHandler typeHandler = getTypeHandler("level3radar");
-        List<Entry> entries =
-            harvester.collectLevel3radarFiles(rootDir, "IDD/Level3",
-                typeHandler);
+
+        List<Entry> entries=null;
+        if(rootDir.exists()) {
+            entries =  harvester.collectLevel3RadarFiles(rootDir, "IDD/Level3",
+                                              typeHandler);
+        } else {
+            entries = harvester.collectDummyLevel3RadarFiles(rootDir, "IDD/Level3",
+                                              typeHandler);
+        }
         insertEntries(typeHandler, entries);
     }
 
