@@ -170,7 +170,7 @@ public class MetaDataServer extends HttpServer implements Constants {
                         writeContent(this, true, result);
                     } else {
                         //Try to serve up the file
-                        String type = repository.getMimeType(
+                        String type = repository.getMimeTypeFromSuffix(
                                           IOUtil.getFileExtension(path));
                         path = StringUtil.replace(path,
                                 repository.getUrlBase(), "");

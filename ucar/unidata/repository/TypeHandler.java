@@ -178,6 +178,7 @@ public class TypeHandler implements Constants, Tables {
     }
 
 
+
     /**
      * _more_
      *
@@ -190,9 +191,9 @@ public class TypeHandler implements Constants, Tables {
      */
     public StringBuffer getEntryContent(Entry entry, Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        String output = request.get(ARG_OUTPUT, OUTPUT_HTML);
+        String output = request.get(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
         String[] tags = repository.getTags(request,entry.getId());
-        if (output.equals(OUTPUT_HTML)) {
+        if (output.equals(OutputHandler.OUTPUT_HTML)) {
             sb.append("<table cellspacing=\"5\" cellpadding=\"2\">");
             sb.append(getInnerEntryContent(entry, request, output));
             sb.append("</table>\n");
@@ -205,9 +206,9 @@ public class TypeHandler implements Constants, Tables {
                 }
                 sb.append("</ul>\n");
             }
-        } else if (output.equals(OUTPUT_XML)) {
+        } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {
         }
-        else if (output.equals(OUTPUT_CSV)) {
+        else if (output.equals(DefaultOutputHandler.OUTPUT_CSV)) {
         }
         return sb;
     }
@@ -270,7 +271,7 @@ public class TypeHandler implements Constants, Tables {
 
     public StringBuffer getInnerEntryContent(Entry entry, Request request,String output) throws Exception {
         StringBuffer sb = new StringBuffer();
-        if (output.equals(OUTPUT_HTML)) {
+        if (output.equals(OutputHandler.OUTPUT_HTML)) {
             sb.append(
                 HtmlUtil.tableEntry(
                     HtmlUtil.bold("Name:"),
@@ -300,9 +301,9 @@ public class TypeHandler implements Constants, Tables {
             }
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"),
                                           entry.getTypeHandler().getDescription()));
-        } else if (output.equals(OUTPUT_XML)) {
+        } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {
         }
-        else if (output.equals(OUTPUT_CSV)) {
+        else if (output.equals(DefaultOutputHandler.OUTPUT_CSV)) {
         }
         return sb;
     }
@@ -464,7 +465,7 @@ public class TypeHandler implements Constants, Tables {
             }
             String typeSelect = HtmlUtil.select(ARG_TYPE, tmp);
             formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"),
-                    typeSelect));
+                    typeSelect+" " + HtmlUtil.submitImage(repository.getUrlBase()+ "/Search16.gif","submit_type","Show search form with this type")));
         } else if (typeHandlers.size() == 1) {
             formBuffer.append(HtmlUtil.hidden(ARG_TYPE,
                     typeHandlers.get(0).getType()));
@@ -485,8 +486,8 @@ public class TypeHandler implements Constants, Tables {
         formBuffer.append("\n");
 
 
-        String groupArg = (String) request.get(ARG_GROUP);
-        if (groupArg != null) {
+        String groupArg = (String) request.get(ARG_GROUP,"");
+        if (groupArg.length()>0) {
             formBuffer.append(HtmlUtil.hidden(ARG_GROUP, groupArg));
             Group group = repository.findGroup(groupArg); 
             if(group!=null) {
@@ -525,10 +526,7 @@ public class TypeHandler implements Constants, Tables {
         }
         formBuffer.append("\n");
 
-        String tag = (String) request.get(ARG_TAG);
-        if (tag == null) {
-            tag = "";
-        }
+        String tag = (String) request.get(ARG_TAG,"");
         formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Tag:"),
                 HtmlUtil.input(ARG_TAG, tag)));
 

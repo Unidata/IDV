@@ -161,15 +161,15 @@ public class GenericTypeHandler extends TypeHandler {
 
         String[]     products  = SqlUtil.readString(statement, 1);
         StringBuffer sb        = new StringBuffer();
-        String output = request.get(ARG_OUTPUT, OUTPUT_HTML);
-        if (output.equals(OUTPUT_HTML)) {
+        String output = request.get(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
+        if (output.equals(OutputHandler.OUTPUT_HTML)) {
             sb.append("<h3>"+ title +"</h3>");
             sb.append("<ul>");
-        } else if (output.equals(OUTPUT_XML)) {
+        } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {
             sb.append(XmlUtil.XML_HEADER + "\n");
             sb.append(XmlUtil.openTag(tag + "s"));
 
-        } else if (output.equals(OUTPUT_CSV)) {}
+        } else if (output.equals(DefaultOutputHandler.OUTPUT_CSV)) {}
         else {
             throw new IllegalArgumentException("Unknown output type:"
                     + output);
@@ -177,7 +177,7 @@ public class GenericTypeHandler extends TypeHandler {
 
         for (int i = 0; i < products.length; i++) {
             String longName = repository.getLongName(products[i]);
-            if (output.equals(OUTPUT_HTML)) {
+            if (output.equals(OutputHandler.OUTPUT_HTML)) {
                 sb.append("<li>");
                 if(longName.equals(products[i])) {
                     sb.append(longName);
@@ -185,26 +185,26 @@ public class GenericTypeHandler extends TypeHandler {
                     sb.append(longName + " ("
                           + products[i] + ")");
                 }
-            } else if (output.equals(OUTPUT_XML)) {
+            } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {
                 sb.append(
                     XmlUtil.tag(
                         tag,
                         XmlUtil.attrs(
                             ATTR_ID, products[i], ATTR_NAME,
                             longName)));
-            } else if (output.equals(OUTPUT_CSV)) {
+            } else if (output.equals(DefaultOutputHandler.OUTPUT_CSV)) {
                 sb.append(SqlUtil.comma(products[i],
                                         longName));
                 sb.append("\n");
             }
         }
-        if (output.equals(OUTPUT_HTML)) {
+        if (output.equals(OutputHandler.OUTPUT_HTML)) {
             sb.append("</ul>");
-        } else if (output.equals(OUTPUT_XML)) {
+        } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {
             sb.append(XmlUtil.closeTag(tag + "s"));
         }
         return new Result(title, sb,
-                          repository.getMimeTypeFromOutput(output));
+                          repository.getOutputHandler(request).getMimeType(output));
     }
 
 
@@ -298,7 +298,7 @@ public class GenericTypeHandler extends TypeHandler {
 
     public StringBuffer getInnerEntryContent(Entry entry, Request request,String output) throws Exception {
         StringBuffer sb = super.getInnerEntryContent(entry, request, output);
-        if (output.equals(OUTPUT_HTML)) {
+        if (output.equals(OutputHandler.OUTPUT_HTML)) {
             int valueIdx = 0;
             Object[]values = entry.getValues();
             for (Column column : columns) {
@@ -308,9 +308,9 @@ public class GenericTypeHandler extends TypeHandler {
                                               tmpSb.toString()));
 
             }
-        } else if (output.equals(OUTPUT_XML)) {
+        } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {
         }
-        else if (output.equals(OUTPUT_CSV)) {
+        else if (output.equals(DefaultOutputHandler.OUTPUT_CSV)) {
         }
         return sb;
     }

@@ -40,7 +40,7 @@
 
 
 <nodetype    name="entry" parent="Node" fillcolor="255,255,153" imagepath="%root%/File.gif">
-  <command label="Show entry" command="url(,%root%/showentry?id=%id%)"/>
+  <command label="View entry" command="url(,%root%/showentry?id=%id%)"/>
   <shape>
   <shape>
     <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>

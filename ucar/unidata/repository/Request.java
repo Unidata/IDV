@@ -209,6 +209,14 @@ public class Request {
     }
 
 
+    public void remove(String key) {
+        parameters.remove(key);
+    }
+
+    public void put(String key, String value) {
+        parameters.put(key,value);
+    }
+
     /**
      * _more_
      *

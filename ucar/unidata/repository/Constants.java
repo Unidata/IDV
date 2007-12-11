@@ -249,29 +249,6 @@ public interface Constants {
     public static final String ARG_STATION = "station";
 
 
-    /** _more_ */
-    public static final String OUTPUT_HTML = "html";
-
-    /** _more_          */
-    public static final String OUTPUT_RSS = "rss";
-
-    /** _more_ */
-    public static final String OUTPUT_XML = "xml";
-
-    /** _more_          */
-    public static final String OUTPUT_CATALOG = "xml";
-
-    /** _more_ */
-    public static final String OUTPUT_CSV = "csv";
-
-    /** _more_ */
-    public static final String OUTPUT_GRAPH = "graph";
-
-    /** _more_ */
-    public static final String OUTPUT_CLOUD = "cloud";
-
-    /** _more_          */
-    public static final String OUTPUT_ZIP = "zip";
 
 
     /** _more_          */
