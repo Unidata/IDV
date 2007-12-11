@@ -251,12 +251,12 @@ public class GeoGridDataSource extends GridDataSource {
 
 
     /**
-     * Load any subset info in view xml
+     * Load any subset info in field mask xml
      *
      * @param root xml root
      */
-    protected void applyView(Element root) {
-        super.applyView(root);
+    protected void applyFieldMask(Element root) {
+        super.applyFieldMask(root);
         GeoSelection geoSubset = getDataSelection().getGeoSelection();
         if (geoSubset == null) {
             geoSubset = new GeoSelection();
@@ -285,11 +285,11 @@ public class GeoGridDataSource extends GridDataSource {
 
 
     /**
-     * _more_
+     * Can we mask the data?
      *
-     * @return _more_
+     * @return  true if we can
      */
-    protected boolean canDoView() {
+    protected boolean canDoFieldMask() {
         return true;
     }
 
@@ -297,12 +297,12 @@ public class GeoGridDataSource extends GridDataSource {
 
 
     /**
-     * _more_
+     * Write out the field mask file
      *
-     * @param doc _more_
-     * @param root _more_
+     * @param doc   doc to write to
+     * @param root  root node
      */
-    protected void writeViewFile(Document doc, Element root) {
+    protected void writeFieldMaskFile(Document doc, Element root) {
         GeoSelection geoSubset = getDataSelection().getGeoSelection();
         if (geoSubset != null) {
             Element stride = doc.createElement("stride");
@@ -924,7 +924,7 @@ public class GeoGridDataSource extends GridDataSource {
                 logException("Unable to write file: " + file, ioe);
                 return null;
             }
-            // System.out.println("" + sb);
+            System.out.println("" + sb);
         }
 
         try {

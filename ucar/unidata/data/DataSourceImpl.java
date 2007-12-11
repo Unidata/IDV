@@ -318,44 +318,44 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
-     * Can this do a view?
+     * Can this do a field mask?
      *
      * @return false
      */
-    protected boolean canDoView() {
+    protected boolean canDoFieldMask() {
         return false;
     }
 
     /**
-     * Check to see if there is a viewfile defined. If so load it in.
+     * Check to see if there is a field maskfile defined. If so load it in.
      */
-    protected void loadView() {
-        String viewFile =
+    protected void loadFieldMask() {
+        String maskFile =
             getDataContext().getIdv().getProperty(getClass().getName()
-                + ".viewfile", (String) null);
-        if (viewFile != null) {
-            loadView(viewFile);
+                + ".maskfile", (String) null);
+        if (maskFile != null) {
+            loadFieldMask(maskFile);
         }
-        viewFile = (String) getProperty("idv.data.viewfile");
-        if (viewFile != null) {
-            loadView(viewFile);
+        maskFile = (String) getProperty("idv.data.maskfile");
+        if (maskFile != null) {
+            loadFieldMask(maskFile);
         }
     }
 
 
     /**
-     * Load the view
+     * Load the field mask
      *
-     * @param viewFile  the view
+     * @param maskFile  the field mask
      */
-    protected void loadView(String viewFile) {
+    protected void loadFieldMask(String maskFile) {
         try {
-            String xml = IOUtil.readContents(viewFile, getClass(),
+            String xml = IOUtil.readContents(maskFile, getClass(),
                                              (String) null);
             if (xml == null) {
                 return;
             }
-            applyView(XmlUtil.getRoot(xml));
+            applyFieldMask(XmlUtil.getRoot(xml));
         } catch (Exception exc) {
             throw new WrapperException(exc);
         }
@@ -363,11 +363,11 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
-     * Load any parameter nodes in the given view xml
+     * Load any parameter nodes in the given mask xml
      *
      * @param root xml root
      */
-    protected void applyView(Element root) {
+    protected void applyFieldMask(Element root) {
         paramsToShow = new ArrayList();
         NodeList children = XmlUtil.getElements(root, "parameter");
         for (int j = 0; j < children.getLength(); j++) {
@@ -378,9 +378,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
-     * Write a view file
+     * Write a mask file
      */
-    public void writeViewFile() {
+    public void writeFieldMaskFile() {
 
         String jarFile = FileManager.getWriteFile(FileManager.FILTER_JAR,
                              null);
@@ -392,7 +392,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         String datasourceFilename = IOUtil.stripExtension(jarFile)
                                     + "datasource.xml";
         JCheckBox allCbx =
-            new JCheckBox("Use this view for all data sources of this type",
+            new JCheckBox("Use this mask for all data sources of this type",
                           false);
         JCheckBox  installCbx         = new JCheckBox("Install Plugin",
                                             false);
@@ -467,12 +467,12 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             comps.add(GuiUtils.right(hideCbx));
             DataAlias alias = DataAlias.findAlias(dataChoice.getName());
             if (alias != null) {
-                final JCheckBox canonCbx = new JCheckBox("AKA: "
+                final JCheckBox canonCbx = new JCheckBox("Include As Alias: "
                                                + alias.getName(), false);
                 checkboxes.add(canonCbx);
                 hideCbx = new JCheckBox("", false);
                 hideCbx.setToolTipText(
-                    "If selected then the parameter is used to make derived quanitities but is not show");
+                    "If selected then the parameter is used to make derived quanitities but is not shown");
                 hideCheckboxes.add(hideCbx);
                 paramNames.add(alias.getName());
                 comps.add(GuiUtils.inset(canonCbx, new Insets(0, 10, 0, 0)));
@@ -506,14 +506,14 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         top      = GuiUtils.inset(top, 5);
         contents = GuiUtils.topCenter(top, contents);
         contents = GuiUtils.inset(contents, 5);
-        if ( !GuiUtils.showOkCancelDialog(null, "Data Source View File",
+        if ( !GuiUtils.showOkCancelDialog(null, "Data Source Field Mask File",
                                           contents, null)) {
             return;
         }
 
         try {
             Document doc  = XmlUtil.makeDocument();
-            Element  root = doc.createElement("view");
+            Element  root = doc.createElement("mask");
 
             for (int i = 0; i < checkboxes.size(); i++) {
                 JCheckBox cbx     = (JCheckBox) checkboxes.get(i);
@@ -528,7 +528,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                 }
                 root.appendChild(child);
             }
-            writeViewFile(doc, root);
+            writeFieldMaskFile(doc, root);
 
             List files = new ArrayList();
             files.add(new TwoFacedObject(id + ".xml",
@@ -541,7 +541,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             dsnode.setAttribute("fileselection", "true");
             dsnode.setAttribute("factory", getClass().getName());
             dsnode.setAttribute("label", labelFld.getText());
-            propnode.setAttribute("name", "idv.data.viewfile");
+            propnode.setAttribute("name", "idv.data.maskfile");
             propnode.setAttribute("value", "/" + id + ".xml");
             dsroot.appendChild(dsnode);
             dsnode.appendChild(propnode);
@@ -550,7 +550,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                     id + "datasource.xml",
                     XmlUtil.toString(dsroot).getBytes()));
             if (allCbx.isSelected()) {
-                String props = getClass().getName() + ".viewfile = /" + id
+                String props = getClass().getName() + ".maskfile = /" + id
                                + ".xml";
                 files.add(new TwoFacedObject(id + ".properties",
                                              props.getBytes()));
@@ -561,19 +561,19 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                     .installPluginFromFile(jarFile);
             }
         } catch (Exception exc) {
-            logException("Writing view file", exc);
+            logException("Writing field mask file", exc);
         }
 
 
     }
 
     /**
-     * Write the view file.  Subclasses should implement
+     * Write the field mask file.  Subclasses should implement
      *
      * @param doc   document  to write to
      * @param root  root element
      */
-    protected void writeViewFile(Document doc, Element root) {}
+    protected void writeFieldMaskFile(Document doc, Element root) {}
 
 
     /**
@@ -666,7 +666,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (getPollingInfo().getIsActive()) {
             startPolling();
         }
-        loadView();
+        loadFieldMask();
 
     }
 
@@ -2951,12 +2951,12 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
         makeSaveLocalActions(actions);
 
-        if (canDoView()) {
-            a = new AbstractAction("Write View File Plugin") {
+        if (canDoFieldMask()) {
+            a = new AbstractAction("Write Field Mask Plugin") {
                 public void actionPerformed(ActionEvent ae) {
                     Misc.run(new Runnable() {
                         public void run() {
-                            Misc.run(DataSourceImpl.this, "writeViewFile");
+                            Misc.run(DataSourceImpl.this, "writeFieldMaskFile");
                         }
                     });
                 }
