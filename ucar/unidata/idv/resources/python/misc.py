@@ -10,6 +10,12 @@ def makeFloatArray(rows,cols,value):
 def idveval(formula):
   """  evaluate a formula """
   from ucar.unidata.data import DerivedDataChoice
+  from ucar.unidata.data import DataCancelException
   derivedDataChoice.setName(formula)
-  ddc = DerivedDataChoice(idv,formula)
-  return ddc.getData(None)
+  try:
+    ddc = DerivedDataChoice(idv,formula)
+    return ddc.getData(None)  
+  except DataCancelException, dce:
+    return None;    
+
+
