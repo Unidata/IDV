@@ -348,7 +348,7 @@ public class CDMRadarDataSource extends RadarDataSource {
                     Hashtable dataChoiceProperties =
                         Misc.newHashtable(new Object[] {
                         PROP_ANGLES, new double[] { angles[j] }, PROP_ANGLE,
-                        new Double(angles[j]), PROP_VOLUMEORSWEEP, VALUE_SWEEP
+                        new Integer(j), PROP_VOLUMEORSWEEP, VALUE_SWEEP
                     });
 
                     dataChoiceProperties.put(STATION_LOCATION, namedStation);
