@@ -138,6 +138,17 @@ public class HtmlUtil {
         return "<a href=\"" + url + "\"" + " " + extra+">" + label +"</a>";
     }
 
+    public static String submitImage(String img,String name,String alt) {
+        return "<input " +XmlUtil.attrs("name", name, "border","0", "src",img) +
+            XmlUtil.attrs("title", alt, "alt", alt,"type","image") +
+            " >";
+    }
+
+
+    public static String submit(String label,String name) {
+        return "<input  name=\""+ name +"\"   type=\"submit\" value=\"" + label +"\" >";
+    }
+
     public static String submit(String label) {
         return "<input  type=\"submit\" value=\"" + label +"\" >";
     }
