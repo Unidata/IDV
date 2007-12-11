@@ -50,6 +50,7 @@ import ucar.visad.data.CachedFlatField;
 import ucar.visad.RadarMapProjection;
 import ucar.visad.Util;
 import visad.*;
+import visad.Set;
 import visad.bom.Radar2DCoordinateSystem;
 import visad.bom.Radar3DCoordinateSystem;
 import visad.georef.EarthLocation;
@@ -58,10 +59,7 @@ import visad.georef.NamedLocation;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -820,15 +818,16 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         //float range_step;
         //float range_to_first_gate = 0;
-
+        Object [] cut = getCutIdx(sweepVar);
 
         /* using sw0 information to construct the CAPPI*/
 
-        int                      swIdx      = 0;
+        int                      numSweep   = cut.length;
+        int                      swIdx      = numSweep - 1;
         RadialDatasetSweep.Sweep sw0        = sweepVar.getSweep(swIdx);
         int                      numRay     = 361;
-        int                      numBin     = sw0.getGateNumber();
-        int                      numSweep   = sweepVar.getNumSweeps();
+        int                      numBin     = getGateNumber(sweepVar);
+
         float                    beamWidth  = sw0.getBeamWidth();
         float                    gateSize   = sw0.getGateSize();
         float                    range_step = sw0.getGateSize();
@@ -867,17 +866,22 @@ public class CDMRadarAdapter implements RadarAdapter {
         // read all the azimuth and sorted
         float[][] aziArray    = new float[numSweep][];
         int[][]   aziArrayIdx = new int[numSweep][];
+        int [] rNum = new int[numSweep];
+        HashMap  cutmap = new HashMap();
 
         for (int b = 0; b < numSweep; b++) {
-            RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(b);
-            aziArray[b]    = s1.getAzimuth();
+            int sb =  Integer.parseInt(cut[b].toString());
+            RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(sb);
+            aziArray[b]    = getAzimuth(s1);
             aziArrayIdx[b] = QuickSort.sort(aziArray[b]);
+            rNum[b] = s1.getRadialNumber();
+            cutmap.put(sb, b);
         }
 
         // now get the hash map for each sweep contain azi as index and ray information.
         Trace.call1("   sweep list");
         if (RSL_sweep_list == null) {
-            RSL_sweep_list = new CDMRadarSweepDB[sweepVar.getNumSweeps()];
+            RSL_sweep_list = new CDMRadarSweepDB[numSweep];
 
             for (int b = 0; b < numSweep; b++) {
                 //   RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(b);
@@ -900,10 +904,10 @@ public class CDMRadarAdapter implements RadarAdapter {
             az[i] = i;
         }
 
-
+        int rayNum = getRayNumber(sweepVar);
         if (rayIndex == null) {
-            rayIndex = getRayIndex(sweepVar, az, numRay, numSweep);
-            rayData  = getRayData(sweepVar, numRay, numSweep, numBin);
+            rayIndex = getRayIndex(sweepVar, az, numRay);
+            rayData  = getRayData(sweepVar, rayNum, numBin, rNum);
         }
 
         // get the cappi value for each ray and bin
@@ -916,11 +920,12 @@ public class CDMRadarAdapter implements RadarAdapter {
                 if (swIndex == 999) {
                     cappiValue[b][a] = Float.NaN;
                 } else {
-                    int rayIndx = rayIndex[swIndex][a];
+                    int cutIdx = Integer.parseInt(cutmap.get(swIndex).toString());
+                    int rayIndx = rayIndex[cutIdx][a];
                     if ((rayIndx == 999) || (rayIndx >= 360)) {
                         cappiValue[b][a] = Float.NaN;
                     } else {
-                        float[] rdata = rayData[swIndex][rayIndx];
+                        float[] rdata = rayData[cutIdx][rayIndx];
                         cappiValue[b][a] = getValueFromRay(rdata,
                                 slantrElev[b][0], gateSize,
                                 range_to_first_gate);
@@ -988,8 +993,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * re arrange the volume data
      *
      * @param sweepVar
-     * @param numRay number of radial, 360
-     * @param numSweep sweep number
+     * @param numberOfRay number of radial, 360
      * @param numBin gate number
      *
      * @return 3d volume data
@@ -997,50 +1001,39 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws IOException _more_
      */
     float[][][] getRayData(RadialDatasetSweep.RadialVariable sweepVar,
-                           int numRay, int numSweep,
-                           int numBin) throws IOException {
+                           int numberOfRay, int numBin, int [] rNum) throws IOException {
 
-
-        float[][][] rData = new float[numSweep][numRay][numBin];
+        Object [] cut = getCutIdx(sweepVar);
+        int numberOfSweeps = cut.length;
+        //float[][][] rData = new float[numberOfSweeps][numberOfRay][numBin];
 
 
         // get data for the whole volume
-        for (int swIndex = 0; swIndex < numSweep; swIndex++) {
+        float [] allData = sweepVar.readAllData();
+        float [][][] data2 = new float[numberOfSweeps][numberOfRay][numBin];
 
-            RadialDatasetSweep.Sweep s1   = sweepVar.getSweep(swIndex);
-            int                      rNum = s1.getRadialNumber();
-            if (rNum > 360) {
-                rNum = 360;
-            }
-
-            float[] _swData = s1.readData();
-
-            for (int r = 0; r < rNum; r++) {
-
-                float[] _rayData = new float[numBin];
-
-                for (int b = 0; b < numBin; b++) {
-                    _rayData[b] = _swData[r * numBin + b];
-                }
-
-                rData[swIndex][r] = _rayData;
-            }
+        for (int sweepIdx = 0; sweepIdx <numberOfSweeps; sweepIdx++) {
+            float [][]               _data2       = data2[sweepIdx];
+            int sb =  Integer.parseInt(cut[sweepIdx].toString());
 
 
-            // fill the value of missing radials
-            if (rNum < 360) {
-                for (int r = rNum; r < 360; r++) {
-                    float[] _rayData = new float[numBin];
-                    for (int b = 0; b < numBin; b++) {
-                        _rayData[b] = Float.NaN;
+            for (int rayIdx = 0; rayIdx < numberOfRay; rayIdx++) {
+                //int si = rayIndex[sweepIdx][rayIdx];
+                float []               __data2       = _data2[rayIdx];
+                int rnumber = rNum[sweepIdx];
+                if(rayIdx < rnumber ) {
+                    for (int gateIdx = 0; gateIdx < numBin; gateIdx++) {
+                        __data2[gateIdx] = allData[numBin*numberOfRay*sb + numBin * rayIdx + gateIdx];
                     }
-                    rData[swIndex][r] = _rayData;
                 }
+                else
+                   _data2[rayIdx] = getFloatNaN(numBin);
             }
 
         }
 
-        return rData;
+        return data2;
+
     }
 
     /**
@@ -1049,25 +1042,34 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @param sweepVar sweep variable
      * @param az cappi azimuth array
      * @param numRay number of radial
-     * @param numSweep number of sweep
      *
      * @return index
      */
     int[][] getRayIndex(RadialDatasetSweep.RadialVariable sweepVar,
-                        float[] az, int numRay, int numSweep) {
+                        float[] az, int numRay) {
+
+        Object [] cut = getCutIdx(sweepVar);
+        int numSweep = cut.length;
         int[][] rIndex = new int[numSweep][numRay];
 
-
         //  calc the true value of index
-        for (int swIndex = 0; swIndex < numSweep; swIndex++) {
+        for (int sIndex = 0; sIndex < numSweep; sIndex++) {
+            int swIndex =  Integer.parseInt(cut[sIndex].toString());
             RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(swIndex);
+
             //
             float r = s1.getBeamWidth() / 2;
+            float [] azs = null;
+            try {
+                azs = getAzimuth(s1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             for (int i = 0; i < 360; i++) {
                 float azi = az[i];
-
-                rIndex[swIndex][i] = getClosestRayFromSweep(s1, azi, r);
+                int ii =  getClosestRayFromSweep(s1, azi, r, sIndex, azs);
+                rIndex[sIndex][i] = ii;
             }
 
         }
@@ -1126,7 +1128,6 @@ public class CDMRadarAdapter implements RadarAdapter {
 
     /** _more_          */
     private HashMap rhiData = null;
-
     /**
      * return data in sweep variable within limit (angle) specified
      * in parameter list.  Assume PPI mode.
@@ -1279,10 +1280,13 @@ public class CDMRadarAdapter implements RadarAdapter {
             return -1;
         }
 
+        Object [] cut = getCutIdx(sweepVar);
+
         ci = 0;
-        int numberOfSweeps = sweepVar.getNumSweeps();
+        int numberOfSweeps = cut.length;
         for (i = 0; i < numberOfSweeps; i++) {
-            s = sweepVar.getSweep(i);
+            int sb =  Integer.parseInt(cut[i].toString());
+            s = sweepVar.getSweep(sb);
             if (s == null) {
                 continue;
             }
@@ -1291,7 +1295,7 @@ public class CDMRadarAdapter implements RadarAdapter {
 
             if (check_angle <= delta_angle) {
                 delta_angle = check_angle;
-                ci          = i;
+                ci          = sb;
             }
         }
         s           = sweepVar.getSweep(ci);
@@ -1316,19 +1320,19 @@ public class CDMRadarAdapter implements RadarAdapter {
      *
      */
     int getClosestRayFromSweep(RadialDatasetSweep.Sweep s, float ray_angle,
-                               float limit) {
+                               float limit, int tableIdx, float [] azimuths) {
 
         CDMRadarSweepDB sweepTable;
         int             closestRay;
         double          close_diff;
 
         float           beamwidth = limit * 2.f;
-        int             i         = s.getSweepIndex();
+        //int             i         = s.getSweepIndex();
 
-        sweepTable = RSL_sweep_list[i];
+        sweepTable = RSL_sweep_list[tableIdx];
 
-        CDMRadarSweepDB.Ray r = hashBin(sweepTable, ray_angle,
-                                        s.getRadialNumber());
+        CDMRadarSweepDB.Ray r = hashBin(sweepTable, ray_angle, 360);
+                                      //  s.getRadialNumber());
 
         /* Find hash entry with closest Ray */
         if(r == null) return 999;
@@ -1341,12 +1345,9 @@ public class CDMRadarAdapter implements RadarAdapter {
         if (closestRay == 999) {
             return 999;
         }
-        try {
-            close_diff = angleDiff(ray_angle, s.getAzimuth(closestRay));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return 999;
-        }
+
+            close_diff = angleDiff(ray_angle, azimuths[closestRay]);
+
         if (close_diff <= beamwidth) {
             return closestRay;
         }
@@ -1385,7 +1386,7 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         float   clow, chigh, cclow;
         float   high, low;
-        int     rNum      = s.getRadialNumber() - 1;
+        //int     rNum      = s.getRadialNumber() - 1;
         float[] _azimuths = null;
         /* Set low pointer to hash index with ray angle just below
              * requested angle and high pointer to just above requested
@@ -1394,11 +1395,12 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         /* set low and high pointers to initial search locations*/
         try {
-            _azimuths = s.getAzimuth();
+            _azimuths = getAzimuth(s);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        int rNum = _azimuths.length -1;
 
         if (hindex >= rNum) {
             hindex = (hindex - rNum);
@@ -1684,7 +1686,13 @@ public class CDMRadarAdapter implements RadarAdapter {
                         throw new IllegalArgumentException(
                             "No angle specified");
                     }
-                    fi = getSweep(moment, value, vn, !in2D);
+                    Object s = dataChoice.getProperty(PROP_ANGLE);
+                    int sIndex = 0;
+                    if(s == null)
+                        sIndex = getAngleIdx((double [])anglesMap.get(vn), value);
+                    else
+                        sIndex = (Integer)s;
+                    fi = getSweep(moment, value, vn, sIndex, !in2D);
                 } catch (IOException ex) {
                     LogUtil.logException("getSweep", ex);
                 }
@@ -1698,6 +1706,15 @@ public class CDMRadarAdapter implements RadarAdapter {
 
     }
 
+    int getAngleIdx(double[] angles, double angle) {
+        int size = angles.length;
+
+        for(int i = 0; i< size; i++) {
+            if(angle == angles[i])
+                return i;
+        }
+        return 0;
+    }
 
     /**
      * Clear the rds data
@@ -1969,9 +1986,11 @@ public class CDMRadarAdapter implements RadarAdapter {
         Trace.call1("   getRHI.setup");
         RadialDatasetSweep.RadialVariable sweepVar =
             (RadialDatasetSweep.RadialVariable) rds.getDataVariable(varName);
-        int       numberOfSweeps = sweepVar.getNumSweeps();
+
+        Object [] cut = getCutIdx(sweepVar);
+        int       numberOfSweeps = cut.length;
         int       numberOfRay    = 360;  //getRayNumber(sweepVar);
-       // rhiData = null;
+     //   rhiData = null;
         FlatField retField;
         double    range_step;
         double    range_to_first_gate;
@@ -2000,8 +2019,9 @@ public class CDMRadarAdapter implements RadarAdapter {
         int[][]    aziArrayIdx = new int[numberOfSweeps][];
         float[]    meanEle     = new float[numberOfSweeps];
         for (int b = 0; b < numberOfSweeps; b++) {
-            RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(b);
-            aziArray[b]    = s1.getAzimuth();
+            int sb =  Integer.parseInt(cut[b].toString());
+            RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(sb);
+            aziArray[b]    = getAzimuth(s1);
             aziArrayIdx[b] = QuickSort.sort(aziArray[b]);
             meanEle[b]     = s1.getMeanElevation();
         }
@@ -2037,10 +2057,10 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         float[][] rdata = (float[][]) rhiData.get(Integer.toString(iazim));
 
-        RadialDatasetSweep.Sweep s0    = sweepVar.getSweep(0);
+        RadialDatasetSweep.Sweep s0    = sweepVar.getSweep( numberOfSweeps -1);
         range_to_first_gate = s0.getRangeToFirstGate() / 1000.0;
         range_step          = s0.getGateSize() / 1000.0;
-        number_of_bins      = s0.getGateNumber();
+        number_of_bins      = getGateNumber(sweepVar);
 
         for (int ti = 0; ti < numberOfSweeps; ti++) {
 
@@ -2162,11 +2182,13 @@ public class CDMRadarAdapter implements RadarAdapter {
      */
     private void getRHIData(
             RadialDatasetSweep.RadialVariable sweepVar) throws IOException {
-        int       numberOfSweeps = sweepVar.getNumSweeps();
+
+        Object [] cut = getCutIdx(sweepVar);
+        int       numberOfSweeps = cut.length;
         int       numberOfRay    = getRayNumber(sweepVar);
         float[]   azimuths       = new float[numberOfRay];
+        int numberOfBin = getGateNumber(sweepVar);
 
-        float[][][] rdata;
         rhiData = new HashMap();
 
         rhiData.put(sweepVar.getName(), sweepVar);
@@ -2175,32 +2197,19 @@ public class CDMRadarAdapter implements RadarAdapter {
         int [] radialNumber = new int[numberOfSweeps];
         int [] gateNumber = new int[numberOfSweeps];
         float [] beamWidth = new float[numberOfSweeps];
-        rdata = new float[numberOfSweeps][][];
         
         for(int i = 0; i< numberOfSweeps; i++ ) {
-            RadialDatasetSweep.Sweep sp = sweepVar.getSweep(i);
+            int sb =  Integer.parseInt(cut[i].toString());
+            RadialDatasetSweep.Sweep sp = sweepVar.getSweep(sb);
             sweep[i] = sp;
-            aziAll[i] = sp.getAzimuth();
-            int rNumber = sp.getRadialNumber();
-            radialNumber[i] = rNumber;
-            int gNumber = sp.getGateNumber();
-            gateNumber[i] = gNumber;
+            aziAll[i] = getAzimuth(sp);
+            radialNumber[i] = numberOfRay; //sp.getRadialNumber();
+            gateNumber[i] = numberOfBin; //sp.getGateNumber();
             beamWidth[i] = sp.getBeamWidth();
-            rdata[i] = new float[rNumber][gNumber];
-            float[] vdata        = sp.readData();
-           // for(int j = 0; j<rNumber; j++) {
-           //     rdata[i][j] = sp.  .readData(j);
-            //}
-            float [][]               _data2       = rdata[i];
-            for (int rayIdx = 0; rayIdx < rNumber; rayIdx++) {
-                float []               __data2       = _data2[rayIdx];
-
-                for (int gateIdx = 0; gateIdx < gNumber; gateIdx++) {
-                        __data2[gateIdx] = vdata[gNumber * rayIdx + gateIdx];
-                }
-
-            }
         }
+
+        float[][][] rdata =  getRayData(sweepVar, numberOfRay, numberOfBin, radialNumber);
+
 
         for (int r = 0; r < 360; r++) {
             float rhiAz = r;
@@ -2228,9 +2237,9 @@ public class CDMRadarAdapter implements RadarAdapter {
                     }
 
                 }
+                float [] azs = getAzimuth(sp);
 
-
-                int j = getClosestRayFromSweep(sp, rhiAz, f);
+                int j = getClosestRayFromSweep(sp, rhiAz, f, ti, azs);
 
                 if (j == -1) {
                     continue;
@@ -2299,11 +2308,27 @@ public class CDMRadarAdapter implements RadarAdapter {
                 }
             }
         }
+        if(numRay == 720)
+            numRay = numRay/2;
 
         return numRay;
     }
 
+    private int getGateNumber(RadialDatasetSweep.RadialVariable sweepVar) {
+        int numSweep = sweepVar.getNumSweeps();
+        int numGate   = sweepVar.getSweep(0).getGateNumber();
 
+
+        for (int i = 0; i < numSweep; i++) {
+            int num = sweepVar.getSweep(i).getGateNumber();
+
+            if (num < numGate) {
+                numGate = num;
+            }
+        }
+
+        return numGate;
+    }
 
     /**
      * Get the station ID
@@ -2529,7 +2554,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws VisADException  Couldn't create VisAD Object
      */
     public FlatField getSweep(int moment, double elevation, String varName,
-                              boolean want3D) throws VisADException,
+                              int idx, boolean want3D) throws VisADException,
                                   RemoteException, IOException {
 
         Trace.call1(" getSweep " + elevation);
@@ -2540,8 +2565,8 @@ public class CDMRadarAdapter implements RadarAdapter {
                                           radarLocation,
                                           baseTime), new ObjectPair(
                                               new Integer(moment),
-                                              new Double(
-                                                  elevation))), new Boolean(
+                                              new ObjectPair( new Double(elevation),
+                                                      new Integer(idx)))), new Boolean(
                                                       want3D));
         FlatField retField = (FlatField) getCache(cacheKey);
 
@@ -2550,7 +2575,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             return retField;
         }
 
-        int sweepNum = getSweepNumber(varName, elevation);
+        int sweepNum = idx; //getSweepNumber(varName, elevation);
         if (sweepNum < 0) {
             // System.out.println("couldn't find sweep at " + elevation);
             Trace.call2(" getSweep " + elevation);
@@ -2769,6 +2794,42 @@ public class CDMRadarAdapter implements RadarAdapter {
     static boolean newWay = true;
 
     /**
+     *
+     * @return
+     */
+    public Object [] getCutIdx(RadialDatasetSweep.RadialVariable sweepVar) {
+
+        int spNum = sweepVar.getNumSweeps();
+        ArrayList eleArray = new ArrayList();
+        float eleLast = 0.0f;
+        for (int i = 0; i < spNum; i++) {
+            RadialDatasetSweep.Sweep sp = sweepVar.getSweep(i);
+            float ele = sp.getMeanElevation();
+            if(ele != eleLast && (ele - eleLast) > 0.2) {
+                eleArray.add(i);
+                eleLast = ele;
+            }
+
+        }
+
+        return eleArray.toArray();
+    }
+
+    float [] getAzimuth(RadialDatasetSweep.Sweep s1) throws IOException{
+        float [] az = s1.getAzimuth();
+        int aSize = az.length;
+        float [] az1 = new float[aSize/2];
+        if(az.length <= 400)
+            return az;
+        else {
+            for(int i= 0; i< aSize/2; i++){
+               az1[i] = az[i*2];
+            }
+            return az1;
+        }
+
+    }
+    /**
      *  Makes a field of all data from one common data model radar adapter;
      *
      *
@@ -2797,30 +2858,34 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
 
 
-
         // String varName = pType.getName();
         RadialDatasetSweep.RadialVariable sweepVar =
             (RadialDatasetSweep.RadialVariable) rds.getDataVariable(varName);
-        int       numberOfSweeps = sweepVar.getNumSweeps();
+        int       numberOfSweeps ; //= sweepVar.getNumSweeps();
         int       numberOfRay    = getRayNumber(sweepVar);
-        int       gates          = 1000;
+        int       gates          = getGateNumber(sweepVar);
+
+        Object [] cut = getCutIdx(sweepVar);
+        numberOfSweeps = cut.length;
+
 
         if (moment == REFLECTIVITY) {
-            gates = 500;
+           // gates = 500;
         }
 
         float[][]  aziArray    = new float[numberOfSweeps][];
         int[][]    aziArrayIdx = new int[numberOfSweeps][];
         float[]    meanEle     = new float[numberOfSweeps];
         for (int b = 0; b < numberOfSweeps; b++) {
-            RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(b);
-            aziArray[b]    = s1.getAzimuth();
+            int sb =  Integer.parseInt(cut[b].toString());
+            RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(sb);
+            aziArray[b]    = getAzimuth(s1);
             aziArrayIdx[b] = QuickSort.sort(aziArray[b]);
             meanEle[b]     = s1.getMeanElevation();
         }
 
         if (RSL_sweep_list == null) {
-            RSL_sweep_list = new CDMRadarSweepDB[sweepVar.getNumSweeps()];
+            RSL_sweep_list = new CDMRadarSweepDB[numberOfSweeps];
             // now get the hash map for each sweep contain azi as index and ray information.
             for (int b = 0; b < numberOfSweeps; b++) {
                 //   RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(b);
@@ -2830,9 +2895,9 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
 
         double[][] ranges     = new double[numberOfSweeps][gates];
-        double     range_step = sweepVar.getSweep(0).getGateSize();
+        double     range_step = sweepVar.getSweep(numberOfSweeps-1).getGateSize();
         double range_to_first_gate =
-            sweepVar.getSweep(0).getRangeToFirstGate();
+            sweepVar.getSweep(numberOfSweeps-1).getRangeToFirstGate();
 
 
 
@@ -2863,26 +2928,47 @@ public class CDMRadarAdapter implements RadarAdapter {
         float[] domainVals2 = domainVals[2];
 
         int[][] rayIndex  = new int[numberOfSweeps][numberOfRay];
-
+        int [] rNum  = new int[numberOfSweeps];
 
         for (int sweepIdx = 0; sweepIdx < numberOfSweeps; sweepIdx++) {
-            RadialDatasetSweep.Sweep sweep      = sweepVar.getSweep(sweepIdx);
+            int sb =  Integer.parseInt(cut[sweepIdx].toString());
+            RadialDatasetSweep.Sweep sweep      = sweepVar.getSweep(sb);
             float                     f         = sweep.getBeamWidth() / 2;
-
+            rNum[sweepIdx]     = sweep.getRadialNumber();
+            float [] azs = getAzimuth(sweep);
             for (int rayIdx = 0; rayIdx < numberOfRay; rayIdx++) {
                 float rhiAz = rayIdx;
-                rayIndex[sweepIdx][rayIdx] = getClosestRayFromSweep(sweep, rhiAz, f);
+                rayIndex[sweepIdx][rayIdx] = getClosestRayFromSweep(sweep, rhiAz, f, sweepIdx, azs);
 
             }
 
         }
 
-
-
         //        Trace.call2("volume preamble");
 
         //        Trace.call1("data read");
+        float [] allData = sweepVar.readAllData();
+        float [][][] data2 = new float[numberOfSweeps][numberOfRay][gates];
 
+        for (int sweepIdx = 0; sweepIdx <numberOfSweeps; sweepIdx++) {
+            float [][]               _data2       = data2[sweepIdx];
+            int sb =  Integer.parseInt(cut[sweepIdx].toString());
+            int rnumber = rNum[sweepIdx];
+
+            for (int rayIdx = 0; rayIdx < numberOfRay; rayIdx++) {
+                int si = rayIndex[sweepIdx][rayIdx];
+                float []               __data2       = _data2[rayIdx];
+                if(si < rnumber ) {
+                    for (int gateIdx = 0; gateIdx < gates; gateIdx++) {
+                        __data2[gateIdx] = allData[gates*numberOfRay*sb + gates * si + gateIdx];
+                    }
+                }
+                else
+                   _data2[rayIdx] = getFloatNaN(gates);
+            }
+
+        }
+   /*
       //  float [][] azimuth2 = new float[numberOfSweeps][numberOfRay];
         float [][][] data2 = new float[numberOfSweeps][numberOfRay][gates];
 
@@ -2913,7 +2999,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                 }
             }
         }
-
+     */
         int     k           = 0;
 
         for (int sweepIdx = 0; sweepIdx < numberOfSweeps; sweepIdx++) {
@@ -2971,7 +3057,14 @@ public class CDMRadarAdapter implements RadarAdapter {
         return retField;
     }
 
+   public float [] getFloatNaN(int n) {
+        float [] data = new float[n];
+        for (int gIdx = 0; gIdx < n; gIdx++) {
+             data[gIdx] = Float.NaN;
+        }
 
+        return data;
+   }
     /**
      * Get the parameters for this adapter
      *
