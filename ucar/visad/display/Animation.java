@@ -809,9 +809,15 @@ public class Animation extends Displayable {
         try {
             int nextIndex = getCurrent();
             if (direction == FORWARD) {
-                nextIndex++;
+                if(anyStepsForward())
+                    nextIndex++;
+                else
+                    nextIndex=0;
             } else {
-                nextIndex--;
+                if(anyStepsBack())
+                    nextIndex--;
+                else
+                    nextIndex = getNumSteps()-1;
             }
             setCurrent(clipIndex(nextIndex, direction == FORWARD));
         } catch (Exception ve) {
