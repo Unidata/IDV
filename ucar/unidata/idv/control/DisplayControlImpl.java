@@ -10602,7 +10602,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     if (skipSlider != null) {
                         skipSlider.setValue(skipValue);
                     }
-                    setSkipValue(skipValue);
+                    this.skipValue = skipValue;
                 }
             }
         } catch (Exception e) {
