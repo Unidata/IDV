@@ -1,0 +1,61 @@
+
+<title>RBI File </title>
+
+<div class="overview">
+The RBI file specifies where everything is.
+</div>
+
+<ul>
+
+  
+  <li> The RBI (Resource Bundle for the IDV) file  is where the real work of configuration is defined. These are XML files that specify where to find all of the resources that the IDV uses to configure itself.
+      <ul> 
+      <li> Jython libraries.</li>
+      <li> Color tables.</li>
+      <li> Projections.</li>
+      <li> Etc.</li>
+      </ul>
+
+  <li> As a convenience, the IDV places an example resource file in your local directory:
+         [ht::popup idv.rbi.txt idv.rbi]
+  </li>
+
+
+  <li> Here is the RBI file that the IDV comes with:
+         [ht::popup idvfull.rbi.txt idvfull.rbi]
+  </li>
+  
+
+<li> Lets look at how the IDV uses these resources. From the command line run the IDV with the <i>-listresources</i> argument:
+<pre>
+idv  -listresources 
+</pre>
+
+
+<li> This will show a dialog that lists all of the resources specified by the RBI file (or files).
+
+
+<li> Let's go and change the the local idv.rbi file in ~/.metapps/DefaultIdv and add some resource paths to the color tables entry. 
+e.g.:
+<pre>
+  &lt;resources name="idv.resource.colortables" loadmore="true"&gt;
+    &lt;resource location="some location"/&gt;
+    &lt;resource location="some other location"/&gt;
+    &lt;resource location="http://www.unidata.ucar.edu/software/idv/colortables.xml"/&gt;
+  &lt;/resources>
+</pre>
+
+
+<li> Now lets run the IDV again and look at the color tables entry that we just changed.
+<pre>
+idv  -listresources 
+</pre>
+
+
+  </ul>
+
+
+
+</ol>
+
+
