@@ -254,6 +254,7 @@ public class SqlUtil {
 
 
 
+
     public static String makeInsert(String table, String names,
                                     String values) {
         StringBuffer sb = new StringBuffer();
@@ -265,6 +266,36 @@ public class SqlUtil {
         sb.append(" VALUES (");
         sb.append(values);
         sb.append(")");
+        return sb.toString();
+    }
+
+
+
+
+
+
+    public static String makeDelete(String table, String colId, String id) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("DELETE FROM   ");
+        sb.append(table);
+        sb.append (" WHERE ");
+        sb.append(colId +"=" + id);
+        return sb.toString();
+    }
+
+    public static String makeUpdate(String table, String colId, String id, String []names,
+                                    String[]values) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("UPDATE  ");
+        sb.append(table);
+        sb.append(" SET ");
+        for(int i=0;i<names.length;i++) {
+            if(i>0)
+                sb.append(",");
+            sb.append(" " + names[i] +"=" + values[i] +" " );
+        }
+        sb.append(" WHERE ");
+        sb.append(colId +" = " + id);
         return sb.toString();
     }
 

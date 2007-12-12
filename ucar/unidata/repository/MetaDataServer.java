@@ -116,7 +116,7 @@ public class MetaDataServer extends HttpServer implements Constants {
             List   sublinks     = (List) result.getProperty(PROP_NAVSUBLINKS);
             String sublinksHtml = "";
             if (sublinks != null) {
-                sublinksHtml = StringUtil.join("&nbsp;|&nbsp;\n", sublinks);
+                sublinksHtml = StringUtil.join("\n&nbsp;|&nbsp;\n", sublinks);
             }
 
 

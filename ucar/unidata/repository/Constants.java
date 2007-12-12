@@ -284,10 +284,19 @@ public interface Constants {
     public static final String PROP_HTML_TEMPLATE = "jdms.html.template";
 
     /** _more_          */
+    public static final String PROP_HTML_TIMELINEAPPLET = "jdms.html.timelineapplet";
+    public static final String PROP_HTML_MIMEPROPERTIES  = "jdms.html.mimeproperties";
+    public static final String PROP_HTML_GRAPHAPPLET  = "jdms.html.graphapplet";
+    public static final String PROP_HTML_GRAPHTEMPLATE  = "jdms.html.graphtemplate";
+
+
+    /** _more_          */
     public static final String PROP_DB_CANCACHE = "jdms.db.cancache";
 
     /** _more_          */
     public static final String PROP_DB_DRIVER = "jdms.db.driver";
+
+    public static final String PROP_DB_DERBY_HOME ="jdms.db.derby.home";
 
     /** _more_          */
     public static final String PROP_DB_URL = "jdms.db.url";

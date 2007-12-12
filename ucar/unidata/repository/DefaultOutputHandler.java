@@ -722,8 +722,8 @@ public class DefaultOutputHandler extends OutputHandler {
 
 
     protected String getTimelineApplet(Request request, List<Entry> entries) throws Exception {
-        timelineAppletTemplate = IOUtil.readContents(
-            "/ucar/unidata/repository/resources/timelineapplet.html", getClass());        List         times   = new ArrayList();
+        timelineAppletTemplate = IOUtil.readContents(repository.getProperty(PROP_HTML_TIMELINEAPPLET), getClass());
+        List         times   = new ArrayList();
         List         labels  = new ArrayList();
         List         ids     = new ArrayList();
         for (Entry entry : entries) {

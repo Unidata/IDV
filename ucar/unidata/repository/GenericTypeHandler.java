@@ -95,6 +95,7 @@ public class GenericTypeHandler extends TypeHandler {
                                                  + " (\n");
         StringBuffer indexDef = new StringBuffer();
         tableDef.append("id varchar(200)");
+        indexDef.append( "CREATE INDEX " + getTableName() + "_INDEX_" + "id" + "  ON "    +  getTableName() + " (" + "id" + ");\n");
         for (int colIdx = 0; colIdx < columnNodes.size(); colIdx++) {
             Element columnNode = (Element) columnNodes.get(colIdx);
             Column  column     = new Column(this, columnNode);
@@ -107,15 +108,15 @@ public class GenericTypeHandler extends TypeHandler {
         tableDef.append(")");
         //            System.err.println("table:" + tableDef);
         //            System.err.println("index:" + indexDef);
+        Statement statement = getRepository().getConnection().createStatement();
         try {
-            Statement statement = getRepository().getConnection().createStatement();
             statement.execute(tableDef.toString());
-            SqlUtil.loadSql(indexDef.toString(), statement, false);
         } catch (Exception exc) {
             if (exc.toString().indexOf("already exists") < 0) {
                 throw exc;
             }
         }
+        SqlUtil.loadSql(indexDef.toString(), statement, false);
     }
 
     public List<TwoFacedObject> getListTypes(boolean longName) {
@@ -270,15 +271,18 @@ public class GenericTypeHandler extends TypeHandler {
     public void setStatement(Entry entry, PreparedStatement stmt) throws Exception {
         stmt.setString(1, entry.getId());
         Object[]values = entry.getValues();
-        int valueIdx = 0;
-        for (Column column : columns) {
-            valueIdx = column.setValues(stmt, values,valueIdx);
+        if(values!=null) {
+            int valueIdx = 0;
+            for (Column column : columns) {
+                valueIdx = column.setValues(stmt, values,valueIdx);
+            }
         }
     }
 
 
     public Entry getEntry(ResultSet results) throws Exception {
         Entry entry = super.getEntry(results);
+        //        if(true) return entry;
         Object[]values = new Object[colNames.size()];
         String query = SqlUtil.makeSelect(SqlUtil.comma(colNames),
                                           Misc.newList(getTableName()),
@@ -301,11 +305,13 @@ public class GenericTypeHandler extends TypeHandler {
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             int valueIdx = 0;
             Object[]values = entry.getValues();
-            for (Column column : columns) {
-                StringBuffer tmpSb = new StringBuffer();
-                valueIdx = column.formatValue(tmpSb, output, values, valueIdx);
-                sb.append(HtmlUtil.tableEntry(HtmlUtil.bold(column.getLabel()+":"), 
-                                              tmpSb.toString()));
+            if(values!=null) {
+                for (Column column : columns) {
+                    StringBuffer tmpSb = new StringBuffer();
+                    valueIdx = column.formatValue(tmpSb, output, values, valueIdx);
+                    sb.append(HtmlUtil.tableEntry(HtmlUtil.bold(column.getLabel()+":"), 
+                                                  tmpSb.toString()));
+                }
 
             }
         } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {

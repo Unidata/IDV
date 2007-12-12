@@ -76,7 +76,11 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
     }
 
     protected String getEntryLinks(Entry entry, Request request) {
+        if(entry.getValues()==null) {
+            return super.getEntryLinks(entry, request);
+        }
         return super.getEntryLinks(entry, request) + " " +
+  
             HtmlUtil.href("http://radar.weather.gov/radar.php?rid=" + entry.getValues()[0] +"&product=" +
                           entry.getValues()[0] +"", 
                           HtmlUtil.img(repository.href("/Radar.gif"),

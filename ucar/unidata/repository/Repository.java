@@ -151,7 +151,7 @@ public class Repository implements Constants, Tables {
     /** _more_          */
     private List pageCacheList = new ArrayList();
 
-
+    private List<User> cmdLineUsers = new ArrayList();
 
     /**
      * _more_
@@ -173,18 +173,19 @@ public class Repository implements Constants, Tables {
      */
     protected void init() throws Exception {
         initProperties();
-
         makeConnection();
         mimeTypes = new Properties();
-        mimeTypes.load(
-            IOUtil.getInputStream(
-                "/ucar/unidata/repository/resources/mimetypes.properties", getClass()));
+        for(String mimeFile: StringUtil.split(getProperty(PROP_HTML_MIMEPROPERTIES),";",true,true)) {
+            mimeTypes.load(IOUtil.getInputStream(mimeFile, getClass()));
+        }
         initTable();
         initTypeHandlers();
         initOutputHandlers();
         initGroups();
         initApi();
+        initUsers();
     }
+
 
 
     protected void initProperties() throws Exception {
@@ -206,11 +207,16 @@ public class Repository implements Constants, Tables {
                 argEntryDefFiles.add(args[i]);
             } else if(args[i].indexOf("outputhandlers.xml")>=0) {
                 argOutputDefFiles.add(args[i]);
+            } else if(args[i].equals("-admin")) {
+                cmdLineUsers.add(new User(args[i+1],args[i+1],true));
+                i++;
             } else if(args[i].startsWith("-D")) {
                 String s = args[i].substring(2);
                 List<String> toks = StringUtil.split(s,"=",true,true);
                 if(toks.size()!=2) throw new IllegalArgumentException("Bad argument:" + args[i]);
                 properties.put(toks.get(0), toks.get(1));
+            } else  {
+                throw new IllegalArgumentException("Unknown argument: " + args[i]);
             }
         }
         apiDefFiles=StringUtil.split(getProperty(PROP_API));
@@ -227,7 +233,7 @@ public class Repository implements Constants, Tables {
             urlBase = "";
         }
 
-        String derbyHome = (String) properties.get("jdms.db.derby.home");
+        String derbyHome = (String) properties.get(PROP_DB_DERBY_HOME);
         if(derbyHome!=null) {
             derbyHome = derbyHome.replace("%userhome%",Misc.getSystemProperty("user.home", "."));
             File dir = new File(derbyHome);
@@ -238,6 +244,17 @@ public class Repository implements Constants, Tables {
         harvester = new Harvester(this);
         Misc.findClass((String) properties.get(PROP_DB_DRIVER));
 
+    }
+
+
+    protected void log(String message) {
+        System.err.println (message);
+    }
+
+    protected void initUsers() throws Exception {
+        for(User user: cmdLineUsers) {
+            makeUser(user,true);
+        }
     }
 
 
@@ -1094,8 +1111,7 @@ public class Repository implements Constants, Tables {
      */
     protected List getAdminLinks(Request request) {
         List links = new ArrayList();
-        String extra =
-            " style=\" font-family: Arial, Helvetica, sans-serif;  font-weight: bold; color:#ffffff;\" class=\"navtitle\"";
+        String extra = " class=\"navlink\" ";
         links.add(href("/admin/home", "Home", extra));
         links.add(href("/admin/db", "Database", extra));
         links.add(href("/admin/stats", "Statistics", extra));
@@ -1246,6 +1262,7 @@ public class Repository implements Constants, Tables {
                           IOUtil.getFileExtension(entry.getFile()));
     }
 
+    PreparedStatement entryStmt;
 
     /**
      * _more_
@@ -1257,12 +1274,23 @@ public class Repository implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    protected Entry getEntry(String fileId, Request request) throws Exception {
+    protected Entry getEntry(String entryId, Request request) throws Exception {
+        if(entryStmt==null) {
+            String query = SqlUtil.makeSelect(COLUMNS_ENTRIES,
+                                          Misc.newList(TABLE_ENTRIES),
+                                              SqlUtil.eq(COL_ENTRIES_ID,"?"));
+            entryStmt = connection.prepareStatement(query);
+
+        }
+        /*
         String query = SqlUtil.makeSelect(COLUMNS_ENTRIES,
                                           Misc.newList(TABLE_ENTRIES),
                                           SqlUtil.eq(COL_ENTRIES_ID,
-                                                     SqlUtil.quote(fileId)));
-        ResultSet results = execute(query).getResultSet();
+                                          SqlUtil.quote(entryId)));*/
+        //        ResultSet results = execute(query).getResultSet();
+        entryStmt.setString(1,entryId);
+        entryStmt.execute();
+        ResultSet results = entryStmt.getResultSet();
         if ( !results.next()) {
             return null;
         }
@@ -1437,11 +1465,11 @@ public class Repository implements Constants, Tables {
         List<Entry> entries = new ArrayList();
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                    int    col  = 1;
-                    String id   = results.getString(col++);
-                    Entry entry = getEntry(id,request);
-                    if(entry!=null) entries.add(entry);
-                }
+                int    col  = 1;
+                String id   = results.getString(col++);
+                Entry entry = getEntry(id,request);
+                if(entry!=null) entries.add(entry);
+            }
         }
         entries = filterEntries(request, entries);
         return outputHandler.processShowGroup(request, group, subGroups, entries);
@@ -1460,8 +1488,7 @@ public class Repository implements Constants, Tables {
      */
     public Result processGraphView(Request request) throws Exception {
         if (true || (graphAppletTemplate == null)) {
-            graphAppletTemplate = IOUtil.readContents(
-                "/ucar/unidata/repository/resources/graphapplet.html", getClass());
+            graphAppletTemplate = IOUtil.readContents(getProperty(PROP_HTML_GRAPHAPPLET), getClass());
         }
 
         String type = request.getString(ARG_NODETYPE, NODETYPE_GROUP);
@@ -1522,8 +1549,7 @@ public class Repository implements Constants, Tables {
     public Result processGetGraph(Request request) throws Exception {
 
         if (true || (graphXmlTemplate == null)) {
-            graphXmlTemplate = IOUtil.readContents(
-                "/ucar/unidata/repository/resources/graphtemplate.xml", getClass());
+            graphXmlTemplate = IOUtil.readContents(getProperty(PROP_HTML_GRAPHTEMPLATE), getClass());
         }
         String id   = (String) request.getId((String)null);
         String originalId   = id;
@@ -1983,8 +2009,23 @@ public class Repository implements Constants, Tables {
      */
     protected void makeUserIfNeeded(User user) throws Exception {
         if (findUser(user.getId()) == null) {
-            makeUser(user);
+            makeUser(user,true);
         }
+    }
+
+    protected boolean tableContains(String id, String tableName, String column) throws Exception {
+        String query = SqlUtil.makeSelect(column,
+                                          Misc.newList(tableName),
+                                          SqlUtil.eq(column,
+                                              SqlUtil.quote(id)));
+        ResultSet results = execute(query).getResultSet();
+        return results.next();
+    }
+
+
+    protected void deleteUser(User user) throws Exception {
+        String query =SqlUtil.makeDelete(TABLE_USERS, COL_USERS_ID, SqlUtil.quote(user.getId()));
+        execute(query);
     }
 
     /**
@@ -1994,7 +2035,18 @@ public class Repository implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    protected void makeUser(User user) throws Exception {
+    protected void makeUser(User user,boolean updateIfNeeded) throws Exception {
+        if(tableContains(user.getId(), TABLE_USERS, COL_USERS_ID)) {
+            if(!updateIfNeeded) throw new IllegalArgumentException("Database already contains user:" + user.getId());
+            String query = SqlUtil.makeUpdate(TABLE_USERS, COL_USERS_ID, 
+                                              SqlUtil.quote(user.getId()), 
+                                              new String[]{COL_USERS_NAME,COL_USERS_ADMIN},
+                                              new String[]{SqlUtil.quote(user.getName()),
+                                                           (user.getAdmin()?"1":"0")});
+            execute(query);
+            return;
+        }
+
         execute(INSERT_USERS, new Object[] { user.getId(), user.getName(),
                                              new Boolean(user.getAdmin()) });
     }
