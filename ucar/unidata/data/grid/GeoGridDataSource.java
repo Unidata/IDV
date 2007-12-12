@@ -687,6 +687,7 @@ public class GeoGridDataSource extends GridDataSource {
                 }
             });
         List catComps = new ArrayList();
+        JTabbedPane tab = new JTabbedPane();
         for (int i = 0; i < categories.size(); i++) {
             List comps = (List) catMap.get(categories.get(i));
             JPanel innerPanel = GuiUtils.doLayout(comps, 3, GuiUtils.WT_NYN,
@@ -694,15 +695,15 @@ public class GeoGridDataSource extends GridDataSource {
             JScrollPane sp = new JScrollPane(GuiUtils.top(innerPanel));
             sp.setPreferredSize(new Dimension(300, 400));
             JPanel top =
-                GuiUtils.leftRight(new JLabel(categories.get(i).toString()),
-                                   GuiUtils.rLabel("Grid Size (Points)  "));
-            catComps.add(GuiUtils.inset(GuiUtils.topCenter(top, sp), 5));
-
-
+                GuiUtils.right(GuiUtils.rLabel("Grid Size (Points)  "));
+            JComponent inner = GuiUtils.inset(GuiUtils.topCenter(top, sp), 5);
+            tab.addTab(categories.get(i).toString(), inner);
+            //            catComps.add();
         }
 
 
-        JComponent contents = GuiUtils.hbox(catComps);
+        //        JComponent contents = GuiUtils.hbox(catComps);
+        JComponent contents = tab;
         contents = GuiUtils.topCenter(
                                       GuiUtils.inset(GuiUtils.leftRight(new JLabel("Select the fields to download"), allCbx),5),
             contents);

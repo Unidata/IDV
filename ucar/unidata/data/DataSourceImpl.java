@@ -480,6 +480,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             }
         }
 
+        JTabbedPane tab = new JTabbedPane();
         List catComps = new ArrayList();
         for (int i = 0; i < categories.size(); i++) {
             List comps = (List) catMap.get(categories.get(i));
@@ -488,14 +489,13 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             JScrollPane sp = new JScrollPane(GuiUtils.top(innerPanel));
             sp.setPreferredSize(new Dimension(300, 400));
             JPanel top =
-                GuiUtils.leftRight(new JLabel(categories.get(i).toString()),
-                                   GuiUtils.inset(new JLabel("Hide"),
-                                       new Insets(0, 0, 0, 20)));
-            catComps.add(GuiUtils.inset(GuiUtils.topCenter(top, sp), 5));
+                GuiUtils.right(GuiUtils.inset(new JLabel("Hide"),
+                                              new Insets(0, 0, 0, 20)));
+            JComponent inner = GuiUtils.inset(GuiUtils.topCenter(top, sp), 5);
+            tab.addTab(categories.get(i).toString(), inner);
         }
-
-
-        JComponent contents = GuiUtils.hbox(catComps);
+        //        JComponent contents = GuiUtils.hbox(catComps);
+        JComponent contents = tab;
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
         JComponent top = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("ID:"), idFld, GuiUtils.rLabel("Label:"),
