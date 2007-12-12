@@ -28,8 +28,6 @@
 <stn name="Bishkek " lat="42:54:N" lon="74:36:E"/>
 <stn name="Bonin Islands" lat="27:00:N" lon="142:10:E"/>
 <stn name="Borneo " lat="0:30:N" lon="114:00:E"/>
-<stn name="Borneo " lat="0:30:N" lon="114:00:E"/>
-<stn name="Borneo " lat="0:30:N" lon="114:00:E"/>
 <stn name="Canton " lat="23:06:N" lon="113:16:E"/>
 <stn name="Celebes " lat="2:00:S" lon="121:00:E"/>
 <stn name="Ceylon " lat="7:00:N" lon="81:00:E"/>
@@ -52,29 +50,14 @@
 <stn name="Dushanbe " lat="38:35:N" lon="68:48:E"/>
 <stn name="Dutch East Indies " lat="5:00:S" lon="120:00:E"/>
 <stn name="Dzungarian Gate " lat="45:25:N" lon="82:25:E"/>
-<stn name="Dzungarian Gate " lat="45:25:N" lon="82:25:E"/>
 <stn name="East Pakistan " lat="24:00:N" lon="90:00:E"/>
-<stn name="Fergana Valley" lat="41:00:N" lon="72:00:E"/>
-<stn name="Fergana Valley" lat="41:00:N" lon="72:00:E"/>
 <stn name="Fergana Valley" lat="41:00:N" lon="72:00:E"/>
 <stn name="Filipinas " lat="13:00:N" lon="122:00:E"/>
 <stn name="Flores " lat="8:45:S" lon="121:00:E"/>
-<stn name="Former Soviet Union " lat="" lon=""/>
-<stn name="Former Soviet Union " lat="" lon=""/>
-<stn name="Former Soviet Union " lat="" lon=""/>
-<stn name="Former Soviet Union " lat="" lon=""/>
-<stn name="Former Soviet Union " lat="" lon=""/>
-<stn name="Formosa " lat="23:30:N" lon="121:00:E"/>
-<stn name="French Indochina " lat="15:00:N" lon="107:00:E"/>
-<stn name="French Indochina " lat="15:00:N" lon="107:00:E"/>
-<stn name="French Indochina " lat="15:00:N" lon="107:00:E"/>
 <stn name="Frunze " lat="42:54:N" lon="74:36:E"/>
 <stn name="George Town " lat="5:26:N" lon="100:16:E"/>
 <stn name="Goa " lat="15:20:N" lon="74:00:E"/>
 <stn name="Gobi " lat="42:30:N" lon="107:00:E"/>
-<stn name="Gobi " lat="42:30:N" lon="107:00:E"/>
-<stn name="Greater Sunda Islands" lat="2:00:S" lon="110:00:E"/>
-<stn name="Greater Sunda Islands" lat="2:00:S" lon="110:00:E"/>
 <stn name="Greater Sunda Islands" lat="2:00:S" lon="110:00:E"/>
 <stn name="Hainan Dao " lat="19:00:N" lon="109:30:E"/>
 <stn name="Haiphong " lat="20:52:N" lon="106:41:E"/>
@@ -85,9 +68,6 @@
 <stn name="Hokkaido " lat="44:00:N" lon="143:00:E"/>
 <stn name="Hong Kong " lat="22:15:N" lon="114:10:E"/>
 <stn name="Honshu " lat="36:00:N" lon="138:00:E"/>
-<stn name="Indochina " lat="15:00:N" lon="107:00:E"/>
-<stn name="Indochina " lat="15:00:N" lon="107:00:E"/>
-<stn name="Indochina " lat="15:00:N" lon="107:00:E"/>
 <stn name="Inland Sea" lat="34:20:N" lon="133:30:E"/>
 <stn name="Inner Mongolia " lat="42:00:N" lon="113:00:E"/>
 <stn name="Irian Jaya " lat="5:00:S" lon="138:00:E"/>
@@ -102,22 +82,18 @@
 <stn name="Kalimantan " lat="0:00:N" lon="115:00:E"/>
 <stn name="Kampuchea " lat="13:00:N" lon="105:00:E"/>
 <stn name="Karakoram Pass" lat="35:30:N" lon="77:50:E"/>
-<stn name="Karakoram Pass" lat="35:30:N" lon="77:50:E"/>
 <stn name="Kashmir " lat="34:00:N" lon="76:00:E"/>
 <stn name="Kathmandu " lat="27:43:N" lon="85:19:E"/>
 <stn name="Kazakstan " lat="48:00:N" lon="68:00:E"/>
 <stn name="Kerulen River" lat="48:48:N" lon="117:00:E"/>
-<stn name="Kerulen River" lat="48:48:N" lon="117:00:E"/>
 <stn name="Khanka, Lake" lat="45:00:N" lon="132:24:E"/>
 <stn name="Khmer Republic " lat="13:00:N" lon="105:00:E"/>
 <stn name="Kirghiziya " lat="41:00:N" lon="75:00:E"/>
-<stn name="Kirgizia " lat="41:00:N" lon="75:00:E"/>
 <stn name="Kirguizstan " lat="41:00:N" lon="75:00:E"/>
 <stn name="Kobe " lat="34:41:N" lon="135:10:E"/>
 <stn name="Korea, Democratic People's Republic of" lat="40:00:N" lon="127:00:E"/>
 <stn name="Korea, Republic of" lat="37:00:N" lon="127:30:E"/>
 <stn name="Kowloon " lat="22:18:N" lon="114:10:E"/>
-<stn name="Kra, Isthmus of" lat="10:20:N" lon="99:00:E"/>
 <stn name="Kra, Isthmus of" lat="10:20:N" lon="99:00:E"/>
 <stn name="Krakatoa " lat="6:07:S" lon="105:24:E"/>
 <stn name="Kuala Lumpur " lat="3:10:N" lon="101:42:E"/>
@@ -135,10 +111,6 @@
 <stn name="Macao" lat="22:10:N" lon="113:33:E"/>
 <stn name="Madras " lat="13:04:N" lon="80:16:E"/>
 <stn name="Malay Archipelago" lat="2:30:N" lon="120:00:E"/>
-<stn name="Malay Archipelago" lat="2:30:N" lon="120:00:E"/>
-<stn name="Malay Archipelago" lat="2:30:N" lon="120:00:E"/>
-<stn name="Malay Archipelago" lat="2:30:N" lon="120:00:E"/>
-<stn name="Malay Peninsula" lat="7:10:N" lon="100:35:E"/>
 <stn name="Malay Peninsula" lat="7:10:N" lon="100:35:E"/>
 <stn name="Male " lat="4:10:N" lon="73:31:E"/>
 <stn name="Manchukuo " lat="44:00:N" lon="124:00:E"/>
@@ -171,7 +143,6 @@
 <stn name="P'yongyang " lat="39:01:N" lon="125:45:E"/>
 <stn name="Palawan " lat="9:30:N" lon="118:30:E"/>
 <stn name="Pamirs " lat="38:00:N" lon="73:00:E"/>
-<stn name="Pamirs " lat="38:00:N" lon="73:00:E"/>
 <stn name="Panay " lat="11:15:N" lon="122:30:E"/>
 <stn name="Parece Vela " lat="20:20:N" lon="136:00:E"/>
 <stn name="Penang Island" lat="5:23:N" lon="100:15:E"/>
@@ -201,17 +172,11 @@
 <stn name="Songkhla " lat="7:12:N" lon="100:36:E"/>
 <stn name="South Korea" lat="37:00:N" lon="127:30:E"/>
 <stn name="South Vietnam " lat="12:00:N" lon="108:00:E"/>
-<stn name="Soviet Union " lat="" lon=""/>
-<stn name="Soviet Union " lat="" lon=""/>
-<stn name="Soviet Union " lat="" lon=""/>
-<stn name="Soviet Union " lat="" lon=""/>
-<stn name="Soviet Union " lat="" lon=""/>
 <stn name="Sulawesi " lat="2:00:S" lon="121:00:E"/>
 <stn name="Sulu Archipelago " lat="6:00:N" lon="121:00:E"/>
 <stn name="Sumatra " lat="0:00:N" lon="102:00:E"/>
 <stn name="Sumba " lat="10:00:S" lon="120:00:E"/>
 <stn name="Sumbawa " lat="8:30:S" lon="118:00:E"/>
-<stn name="Sunda Islands " lat="2:00:S" lon="110:00:E"/>
 <stn name="Sunda Islands " lat="2:00:S" lon="110:00:E"/>
 <stn name="Tadzhikistan " lat="39:00:N" lon="71:00:E"/>
 <stn name="Taipei " lat="25:03:N" lon="121:30:E"/>
@@ -221,18 +186,12 @@
 <stn name="Tien Shan " lat="42:00:N" lon="80:00:E"/>
 <stn name="Tien Shan " lat="42:00:N" lon="80:00:E"/>
 <stn name="Timor " lat="9:00:S" lon="125:00:E"/>
-<stn name="Timor " lat="9:00:S" lon="125:00:E"/>
 <stn name="Timor-Leste, Timor Lorosae " lat="9:00:N" lon="126:00:E"/>
 <stn name="Tokyo " lat="35:42:N" lon="139:46:E"/>
 <stn name="Turkmenia " lat="40:00:N" lon="60:00:E"/>
 <stn name="Turkmeniya " lat="40:00:N" lon="60:00:E"/>
 <stn name="Ulaanbaatar " lat="47:55:N" lon="106:53:E"/>
 <stn name="Ullung-do " lat="37:29:N" lon="130:52:E"/>
-<stn name="Union of Soviet Socialist Republics or USSR " lat="" lon=""/>
-<stn name="Union of Soviet Socialist Republics or USSR " lat="" lon=""/>
-<stn name="Union of Soviet Socialist Republics or USSR " lat="" lon=""/>
-<stn name="Union of Soviet Socialist Republics or USSR " lat="" lon=""/>
-<stn name="Union of Soviet Socialist Republics or USSR " lat="" lon=""/>
 <stn name="Ural Mountains" lat="60:00:N" lon="60:00:E"/>
 <stn name="Ussuri River" lat="48:28:N" lon="135:02:E"/>
 <stn name="Vientiane " lat="17:58:N" lon="102:36:E"/>
