@@ -40,7 +40,7 @@ to capture the time series chart of the station model and data probe displays.
 
 
 [isl::tagdef movie {Create a Quicktime movie, animated GIF or Google Earth KMZ file} -attrs {file {movie file} view {view name or names to match} imagedir {The directory to place the images.} imagetemplate {The file name template to use} imagesuffix {Should be jpg if generating a QuickTime movie but can be gif or png as well}}]
-The [isl::tag movie] tag allows you to capture a time animation as a Quicktime movie or
+The [isl::tag movie] tag allows you to capture a time animation as a Quicktime movie, Google Earth KMZ file or
 as an animated gif.
 <p>
 
@@ -74,7 +74,32 @@ The generic date format can contain a specification that is used by the Java
 <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/text/SimpleDateFormat.html">SimpleDateFormat</a>
 and is described in <a href="BasicTags.html#simpledateformat">Basic Tags</a>.
 
+<p>
+<b>KML Attributes</b>
+<p>
+The movie tag also supports a set of KML specific attributes that allow you to configure the generated KML file.
 
+[isl::xml {
+      <movie
+         file="test.kmz"
+         kml_desc="&lt;a href=&quot;${wwwroot}/${bundle}&quot;&gt;Run in the IDV&lt;/a&gt; (Needs Java Webstart)"
+         kml_name="${label}"
+         kml_visibility="0"
+         kml_open="0">
+}]
+
+<ul>
+<li> [isl::attr kml_desc] is the description for the KML Folder that holds the images. It can contain html
+<li> [isl::attr kml_name] is the folder name.
+<li> [isl::attr kml_visibility] specifies whether the images are shown initially or not.
+<li> [isl::attr kml_open] specifies whether the Folder is open or not.
+</ul>
+
+
+
+
+<p>
+<b>Using your own images</b>
 <p>
 You can also use any number of  contained [isl::tag fileset] tags to define a custom list of images
 that are used instead of the default images derived from an animation capture.
