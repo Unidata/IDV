@@ -790,14 +790,14 @@ public class DataSelectionWidget {
 
         //If there are no time selected then turn on the all times checkbox
         if ((selected == null) || (selected.size() == 0)) {
-            allTimesButton.setSelected(true);
+            //            allTimesButton.setSelected(true);
         }
 
 
         //Don't automatically toggle the checkbox
         //OLD
         timesList.setEnabled( !allTimesButton.isSelected());
-        allTimesButton.setSelected(allSelected);
+        //        allTimesButton.setSelected(allSelected);
     }
 
 
