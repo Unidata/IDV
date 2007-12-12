@@ -35,6 +35,7 @@ import ucar.unidata.util.StringUtil;
 import java.io.File;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Date;
 import java.util.List;
 import java.util.Hashtable;
@@ -215,19 +216,24 @@ public class SqlUtil {
     }
 
 
+    public static String validName(String name) {
+        //TODO: Check if the given name is a valid table column name
+        return name;
+    }
+
     public static String count(String name) {
-        return " count(" + name+")";
+        return " count(" + validName(name)+")";
     }
 
 
     public static String distinct(String name) {
-        return " distinct " + name;
+        return " distinct " + validName(name);
     }
     public static String max(String name) {
-        return " max(" + name+")";
+        return " max(" + validName(name)+")";
     }
     public static String min(String name) {
-        return " min(" + name+")";
+        return " min(" + validName(name)+")";
     }
 
     /**
@@ -266,28 +272,66 @@ public class SqlUtil {
 
 
     public static String like(String name, String value) {
-        return " " +name +" LIKE " + quote(value)+" ";
+        return " " +validName(name) +" LIKE " + quote(value)+" ";
     }
     public static String notLike(String name, String value) {
-        return " NOT " +name +" LIKE " + quote(value)+" ";
+        return " NOT " +validName(name) +" LIKE " + quote(value)+" ";
     }
 
     public static String neq(String name, String value) {
-        return " " +name +"<>" + value +" ";
+        return " " +validName(name) +"<>" + value +" ";
     }
 
+    public static String eq(String name, double value) {
+        return " " +validName(name) +"=" + value +" ";
+    }
 
+    public static String eq(String name, int value) {
+        return " " +validName(name) +"=" + value +" ";
+    }
 
     public static String eq(String name, String value) {
-        return " " +name +"=" + value +" ";
+        return " " +validName(name) +"=" + value +" ";
     }
+
+    public static String ge(String name, double value) {
+        return " " +validName(name) +">=" + value +" ";
+    }
+
+
+    public static String ge(String name, int value) {
+        return " " +validName(name) +">=" + value +" ";
+    }
+
 
     public static String ge(String name, String value) {
-        return " " +name +">=" + value +" ";
+        return " " +validName(name) +">=" + value +" ";
     }
 
-    public static String le(String name, String value) {
-        return " " +name +"<=" + value +" ";
+
+    public static String le(String name, double value) {
+        return " " +validName(name) +"<=" + value +" ";
+    }
+
+    public static String le(String name, int value) {
+        return " " +validName(name) +"<=" + value +" ";
+    }
+
+
+    public static String le(String name, Date value) {
+        return " " + validName(name) + "<=" + quote(format(value)) +" ";
+    }
+
+    public static String ge(String name, Date value) {
+        return " " + validName(name) + ">=" + quote(format(value)) +" ";
+    }
+
+    public static String eq(String name, Date value) {
+        return " " + validName(name) + "=" + quote(format(value)) +" ";
+    }
+
+    public static String neq(String name, Date value) {
+        return " " + validName(name) + "<>" + quote(format(value)) +" ";
     }
 
 
@@ -487,6 +531,7 @@ public class SqlUtil {
         return actual;
     }
 
+
     /**
      * _more_
      *
@@ -682,6 +727,25 @@ public class SqlUtil {
         }
     }
 
+    public static Hashtable cleanUpArguments(Hashtable formArgs) {
+
+        Hashtable cleanArgs = new Hashtable();
+        for(Enumeration keys = formArgs.keys();keys.hasMoreElements();) {
+            String key = (String) keys.nextElement();
+            String value = (String)formArgs.get(key);
+            value = cleanUpArgument(value);
+            cleanArgs.put(key,value);
+        }
+        return cleanArgs;
+    }
+
+
+
+    public static String cleanUpArgument(String value) {
+        //TODO: Atually implement this!!!!
+        value = value.replace("'","\\'");
+        return value;
+    }
 
 
 }

@@ -74,9 +74,15 @@ public class HtmlUtil {
         return "<tr><td>" + v1 +"</td></tr>";
     }
 
+
     public static String row(String v1,String v2) {
         return "<tr><td>" + v1 +"</td><td>" + v2 +"</td></tr>";
     }
+
+    public static String span(String content,String extra) {
+        return "<span " + extra+">" + content+"</span>";
+    }
+
 
     public static String url(String path, String n1, String v1) {
         return url(path, new String[]{n1,v1});
@@ -202,23 +208,6 @@ public class HtmlUtil {
 
     }
 
-    public static Hashtable cleanUpArguments(Hashtable formArgs) {
-        Hashtable cleanArgs = new Hashtable();
-        for(Enumeration keys = formArgs.keys();keys.hasMoreElements();) {
-            String key = (String) keys.nextElement();
-            String value = (String)formArgs.get(key);
-            value = cleanUpArgument(value);
-            cleanArgs.put(key,value);
-        }
-        return cleanArgs;
-    }
-
-
-
-    public static String cleanUpArgument(String value) {
-        //TODO: ACtually implement this!!!!
-        return value;
-    }
 
 }
 

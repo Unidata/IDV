@@ -255,11 +255,11 @@ public class HttpServer {
             }
             String contentLength = (String) props.get("Content-Length");
             String contentString = null;
+            char[] content    =null;
             if (contentLength != null) {
-                //                System.err.println("length:" + contentLength);
+                content = new char[100000];
                 int    len       = new Integer(contentLength).intValue();
-                char[] content   = new char[10000];
-                char[] buffer    = new char[10000];
+                char[] buffer    = new char[100000];
                 int    totalRead = 0;
                 while (totalRead < len) {
                     int howMany = br.read(buffer, 0, buffer.length);
@@ -274,7 +274,9 @@ public class HttpServer {
                     System.arraycopy(buffer, 0, content, totalRead, howMany);
                     totalRead += howMany;
                 }
-                contentString = new String(content, 0, totalRead);
+                char[] tmp = content;
+                content = new char[totalRead];
+                System.arraycopy(tmp, 0, content, 0, totalRead);
             }
 
             StringTokenizer s           = new StringTokenizer(firstLine);
@@ -285,19 +287,62 @@ public class HttpServer {
             if (toks != null) {
                 path = toks[0];
             }
+            if(content!=null) {
+                contentString = new String(content, 0, content.length);
+            }
             if (requestType.equals(TYPE_GET)) {
                 if ((toks != null) && (toks.length > 1)) {
                     parseArgs(toks[1], args);
                 }
-
             } else if (requestType.equals(TYPE_POST)) {
-                if (okToParseContent(path, contentString, args)) {
-                    parseArgs(contentString, args);
+                String type =  (String)props.get("Content-Type");
+                System.err.println ("type:" + type);
+                if(type!=null && type.trim().startsWith("multipart/form-data")) {
+                    System.err.println ("type:" + type);
+                    parseMultiPartFormData(type,props,content,args);
+                } else {
+                    if (okToParseContent(path, contentString, args)) {
+                        parseArgs(contentString, args);
+                    }
                 }
             } else {
                 System.err.println("TYPE: " + requestType);
             }
             handleRequest(path, args, props, contentString);
+        }
+
+        private void parseMultiPartFormData(String type,Hashtable props, char[]content,Hashtable args) {
+            System.err.println ("type:\n" + type);
+            String boundary = null;
+            List<String> toks = StringUtil.split(type,";",true,true);
+            for(String tok: toks) {
+                if(tok.indexOf("=")>0) {
+                    List<String> subToks = StringUtil.split(tok,"=",true,true);
+                    if(subToks.size()==2) {
+                        String name = subToks.get(0).trim();
+                        String value = subToks.get(1).trim();
+                        if(name.equals("boundary")) {
+                            boundary = value;
+                        }
+                    }
+                }
+            }
+            if(boundary==null) throw new IllegalArgumentException("Could not find mime boundary in:" + type);
+            //??
+            boundary = "--" + boundary;
+            System.err.println ("boundary:\n" + boundary);
+            String s = new String(content);
+            System.err.println ("multipart:\n" + s);
+            int currentIdx=0;
+            List<String> contentToks = StringUtil.split(s,boundary);
+            System.err.println ("\nTOKS:");
+            int cnt = 0;
+            for(String tok: contentToks) {
+                //Skip the first newline
+                if(cnt++==0) continue;
+                if(tok.equals("--")) break;
+                System.err.println("CONTENT:\n"+tok);
+            }
         }
 
         /**
@@ -501,7 +546,6 @@ public class HttpServer {
             if (fileName.endsWith(".htm") || fileName.endsWith(".html")) {
                 return "text/html";
             }
-
             return "";
 
         }
@@ -513,7 +557,7 @@ public class HttpServer {
      *
      * @param args args
      */
-    public static void xxxmain(String args[]) {
+    public static void xxxxmain(String args[]) {
         int port = 80;
         try {
             if (args.length > 0) {
