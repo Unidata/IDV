@@ -534,6 +534,30 @@ example:
      properties="windowVisible=true;displayName=Vertical Profile;showThumbNail=true"/>
 
   <control
+     id="stationmodelcontrol"
+     categories="POINT;StationPlot;PointPlot"
+     class="ucar.unidata.idv.control.StationModelControl"
+     description="Point Data Plot"
+     canstandalone="false"
+     doeslevels="true"
+     label="Point Data Plot"
+     displaycategory="Point Data"
+     properties="displayName=Point Data Plot Control;windowVisible=false;showThumbNail=true">
+    </control>
+
+  <control
+     id="obslistcontrol"
+     categories="POINT;StationPlot;PointPlot"
+     class="ucar.unidata.idv.control.ObsListControl"
+     description="Point Data List"
+     canstandalone="false"
+     label="Point Data List"
+     displaycategory="Point Data"
+     properties="displayName=Point Data List;windowVisible=true;"/>
+
+
+
+  <control
      id="probe"
      categories="*-3D-*;*-2D-*;IMAGE-BAND-*;RGBIMAGE;POINT;StationPlot;PointPlot"
      class="ucar.unidata.idv.control.ProbeControl"
@@ -710,27 +734,6 @@ example:
      displaycategory="General"
      properties="windowVisible=true; displayName=Movie Display;"/>
 
-  <control
-     id="stationmodelcontrol"
-     categories="POINT;StationPlot;PointPlot"
-     class="ucar.unidata.idv.control.StationModelControl"
-     description="Point Data Plot"
-     canstandalone="false"
-     doeslevels="true"
-     label="Point Data Plot"
-     displaycategory="Point Data"
-     properties="displayName=Point Data Plot Control;windowVisible=false;showThumbNail=true">
-    </control>
-
-  <control
-     id="obslistcontrol"
-     categories="POINT;StationPlot;PointPlot"
-     class="ucar.unidata.idv.control.ObsListControl"
-     description="Point Data List"
-     canstandalone="false"
-     label="Point Data List"
-     displaycategory="Point Data"
-     properties="displayName=Point Data List;windowVisible=true;"/>
 
 <!--
   <control
