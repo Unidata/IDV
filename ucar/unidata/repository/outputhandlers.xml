@@ -1,0 +1,6 @@
+<outputhandlers>
+  <outputhandler class="ucar.unidata.repository.DefaultOutputHandler"/>
+  <outputhandler class="ucar.unidata.repository.RssOutputHandler"/>
+  <outputhandler class="ucar.unidata.repository.CatalogOutputHandler"/>
+  <outputhandler class="ucar.unidata.repository.TestOutputHandler"/>
+</outputhandlers>
