@@ -134,6 +134,8 @@ public class DataTimeRange {
     /** widget */
     private JLabel timeModeLabel;
 
+    private boolean oneLineLabel = false;
+
     /** Was ok pressed */
     private boolean dialogOk = false;
 
@@ -406,6 +408,10 @@ public class DataTimeRange {
 
 
 
+    public void setOneLineLabel(boolean v) {
+        oneLineLabel  = v;
+    }
+
     /**
      * Label that describes the range
      *
@@ -429,7 +435,13 @@ public class DataTimeRange {
         }
 
 
-        lbl += "<br> End: ";
+        if(!oneLineLabel) {
+            lbl += "<br>";
+        } else {
+            lbl += "&nbsp;&nbsp;&nbsp;";
+        }
+
+        lbl += " End: ";
         if (endMode == MODE_DATA) {
             lbl += "from data ";
         } else if (endMode == MODE_ANIMATION) {
