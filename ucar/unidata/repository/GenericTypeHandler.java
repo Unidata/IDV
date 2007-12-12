@@ -31,6 +31,7 @@ package ucar.unidata.repository;
 import ucar.unidata.data.SqlUtil;
 import ucar.unidata.util.DateUtil;
 
+import ucar.unidata.util.WrapperException;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
@@ -111,12 +112,19 @@ public class GenericTypeHandler extends TypeHandler {
         Statement statement = getRepository().getConnection().createStatement();
         try {
             statement.execute(tableDef.toString());
-        } catch (Exception exc) {
+        } catch (Throwable exc) {
             if (exc.toString().indexOf("already exists") < 0) {
-                throw exc;
+                //TODO:
+                //                throw new WrapperException(exc);
             }
         }
-        SqlUtil.loadSql(indexDef.toString(), statement, false);
+        try {
+            SqlUtil.loadSql(indexDef.toString(), statement, false);
+        } catch (Throwable exc) {
+            //TODO:
+            //            throw new WrapperException(exc);
+        }
+
     }
 
     public List<TwoFacedObject> getListTypes(boolean longName) {

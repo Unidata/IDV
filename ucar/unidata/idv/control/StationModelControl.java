@@ -421,13 +421,13 @@ public class StationModelControl extends ObsDisplayControl {
             shouldUseAltitude = false;
         }
         myDisplay.setShouldUseAltitude(shouldUseAltitude);
-        myDisplay.setScale(displayableScale);
         timesHolder = new LineDrawing("ob_time" + dataChoice);
         timesHolder.setManipulable(false);
         timesHolder.setVisible(false);
         addDisplayable(timesHolder);
         lastViewBounds = null;
 
+        //        Misc.runInABit(2000, this,"setScaleOnDisplayable",null);
         setScaleOnDisplayable();
 
         getControlContext().getStationModelManager()
@@ -1843,7 +1843,7 @@ public class StationModelControl extends ObsDisplayControl {
      * @throws RemoteException When bad things happen
      * @throws VisADException When bad things happen
      */
-    protected void setScaleOnDisplayable()
+    public void setScaleOnDisplayable()
             throws RemoteException, VisADException {
         System.err.println ("setScaleOnDisplayable: "+getDisplayScale());
         setScaleOnDisplayable(getDisplayScale() * displayableScale);

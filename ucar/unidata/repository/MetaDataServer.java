@@ -76,7 +76,7 @@ public class MetaDataServer extends HttpServer implements Constants {
      * @param connectionURL _more_
      * @throws Exception _more_
      */
-    public MetaDataServer(String[] args) throws Exception {
+    public MetaDataServer(String[] args) throws Throwable {
         super(8080);
         repository = new Repository(args);
         repository.init();
@@ -100,7 +100,7 @@ public class MetaDataServer extends HttpServer implements Constants {
             throws Exception {
         if (result.isHtml() && result.getShouldDecorate()) {
             template =
-                IOUtil.readContents("/ucar/unidata/repository/resources/template.html",
+                IOUtil.readContents(repository.getProperty(PROP_HTML_TEMPLATE),
                                     getClass());
             String html = StringUtil.replace(template, "%content%",
                                              new String(result.getContent()));
@@ -257,7 +257,7 @@ public class MetaDataServer extends HttpServer implements Constants {
      *
      * @throws Exception _more_
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Throwable {
         System.setProperty("derby.system.home", "foobar");
         MetaDataServer mds = new MetaDataServer(args);
         mds.init();

@@ -161,7 +161,7 @@ public class Repository implements Constants, Tables {
      * @param args _more_
      * @throws Exception _more_
      */
-    public Repository(String[] args) throws Exception {
+    public Repository(String[] args) throws Throwable {
         this.args = args;
     }
 
@@ -171,7 +171,7 @@ public class Repository implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    protected void init() throws Exception {
+    protected void init() throws Throwable {
         initProperties();
         makeConnection();
         mimeTypes = new Properties();
@@ -451,7 +451,7 @@ public class Repository implements Constants, Tables {
             result.putProperty(PROP_NAVLINKS, getNavLinks(request));
         }
         long t2 = System.currentTimeMillis();
-        if((t2!=t1) && (true || request.get("debug",false))) {
+        if(result!=null && (t2!=t1) && (true || request.get("debug",false))) {
             System.err.println ("Time:" + request.getType() + " " +(t2-t1));
         }
         return result;
@@ -508,7 +508,7 @@ public class Repository implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    protected void initTable() throws Exception {
+    protected void initTable() throws Throwable {
         String sql =
             IOUtil.readContents(getProperty(PROP_DB_SCRIPT),
                                 getClass());
@@ -1371,15 +1371,15 @@ public class Repository implements Constants, Tables {
      */
     public Result processGetEntries(Request request) throws Exception {
         List<Entry> entries = new ArrayList();
-        boolean doAll = request.defined("all");
-        boolean doSelected = request.defined("selected");
+        boolean doAll = request.defined("getall");
+        boolean doSelected = request.defined("getselected");
         String prefix = (doAll?"all_":"entry_");
 
         for (Enumeration keys = request.keys();
                 keys.hasMoreElements(); ) {
             String id = (String) keys.nextElement();
             if(doSelected) {
-                if (request.get(id,false)) {
+                if (!request.get(id,false)) {
                     continue;
                 }
             }

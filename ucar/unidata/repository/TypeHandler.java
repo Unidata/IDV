@@ -447,7 +447,10 @@ public class TypeHandler implements Constants, Tables {
                         maxDate = SqlUtil.getDateString("" + dateResults.getDate(2));
                 }
             }
-            }*/
+            }
+
+
+*/
 
         minDate     = "";
         maxDate     = "";
@@ -535,9 +538,10 @@ public class TypeHandler implements Constants, Tables {
 
         formBuffer.append("\n");
 
+        String dateHelp = " (e.g., 2007-12-11 00:00:00)";
         formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Date Range:"),
                 HtmlUtil.input(ARG_FROMDATE, minDate) + " -- "
-                + HtmlUtil.input(ARG_TODATE, maxDate)));
+                + HtmlUtil.input(ARG_TODATE, maxDate)+dateHelp));
 
         formBuffer.append("\n");
     }

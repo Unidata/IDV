@@ -230,8 +230,8 @@ public class DefaultOutputHandler extends OutputHandler {
     public void getEntryHtml(StringBuffer sb, List<Entry> entries, Request request, boolean doForm, boolean dfltSelected)  throws Exception {
         if(doForm) {
             sb.append(HtmlUtil.form(repository.href("/getentries"), "getentries"));
-            sb.append(HtmlUtil.submit("Get selected","selected"));
-            sb.append(HtmlUtil.submit("Get all","all"));
+            sb.append(HtmlUtil.submit("Get selected","getselected"));
+            sb.append(HtmlUtil.submit("Get all","getall"));
             sb.append(" As:");
             List outputList =  repository.getOutputTypesForEntries(request);
             sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
@@ -803,11 +803,11 @@ public class DefaultOutputHandler extends OutputHandler {
             if (entries.size() > 0 && showApplet){
                 sb.append(getTimelineApplet(request, entries));
             }
-            sb.append(HtmlUtil.form(repository.href("/getentries"), "getentries"));
+            sb.append(HtmlUtil.form(repository.href("/getentries"), "name=\"getentries\" method=\"post\""));
             if (entries.size() > 0) {
-                sb.append(HtmlUtil.submit("Get selected", "selected"));
-                sb.append(HtmlUtil.submit("Get all", "all"));
-                sb.append(" As:");
+                sb.append(HtmlUtil.submit("Get selected", "getselected"));
+                sb.append(HtmlUtil.submit("Get all", "getall"));
+                sb.append(" As: ");
                 List outputList =  repository.getOutputTypesForEntries(request);
                 sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
             }

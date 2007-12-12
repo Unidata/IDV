@@ -360,12 +360,20 @@ public class DateUtil {
     public static long parseRelativeTimeString(String relativeTimeString) {
         List toks = StringUtil.split(relativeTimeString," ", true, true);
         if(toks.size()!=2)
-            throw new IllegalArgumentException("Bad format for relative time string:" + relativeTimeString);
+            throw new IllegalArgumentException("Bad format for relative time string:" + relativeTimeString +" Needs to be of the form: +/-<number> timeunit");
         int delta=0;
         try {
-            delta = new Integer((String)toks.get(0));
+            String s = toks.get(0).toString();
+            int factor = 1;
+            if(s.startsWith("+")) {
+                s = s.substring(1);
+            } else if(s.startsWith("-")) {
+                s = s.substring(1);
+                factor = -1;
+            }
+            delta = factor*new Integer(s);
         } catch(Exception exc) {
-            throw new IllegalArgumentException("Bad format for relative time string:" + relativeTimeString);
+            throw new IllegalArgumentException("Bad format for relative time string:" + relativeTimeString+" Could not parse initial number:" + toks.get(0));
         }
         String what = (String)toks.get(1);
         long milliseconds = 0;
