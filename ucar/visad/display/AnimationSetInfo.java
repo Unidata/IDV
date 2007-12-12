@@ -65,13 +65,13 @@ public class AnimationSetInfo {
                                       TIMEMODE_FIXED, TIMEMODE_RELATIVE };
 
     /** Mode for constructing set */
-    public static String[] STARTMODELABELS = { "Use First Time from Data",
+    public static String[] STARTMODELABELS = { "Use Minimum Time from All Data",
                                                "Current Time (Now)", "Fixed",
                                                "Relative to End Time" };
 
 
     /** Mode for constructing set */
-    public static String[] ENDMODELABELS = { "Use Last Time from Data",
+    public static String[] ENDMODELABELS = { "Use Maximum Time from All Data",
                                              "Current Time (Now)", "Fixed",
                                              "Relative to Start Time" };
 
