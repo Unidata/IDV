@@ -223,6 +223,7 @@ public class DrawingControl extends DisplayControlImpl {
     /** Ignore time. Show all glyphs */
     private boolean ignoreTime = false;
 
+    private String clipboardXml;
 
     /** Message label */
     JLabel msgLabel;
@@ -838,7 +839,17 @@ public class DrawingControl extends DisplayControlImpl {
                         doCut();
                         return;
                     }
-
+                    if ((keyEvent.getKeyCode() == KeyEvent.VK_C)
+                            && keyEvent.isControlDown()) {
+                        clipboardXml = toXml(selectedGlyphs);
+                        return;
+                    }
+                    if ((keyEvent.getKeyCode() == KeyEvent.VK_V)
+                            && keyEvent.isControlDown()) {
+                        if(clipboardXml != null)
+                            doImportXml(clipboardXml);
+                        return;
+                    }
                     if ((keyEvent.getKeyCode() == KeyEvent.VK_P)
                             && keyEvent.isControlDown()) {
                         doProperties(selectedGlyphs);
@@ -1190,13 +1201,17 @@ public class DrawingControl extends DisplayControlImpl {
     protected void doCut() throws VisADException, RemoteException {
         setDisplayInactive();
         List tmp = new ArrayList(selectedGlyphs);
+        List cutGlyphs = new ArrayList();
+
         for (int i = 0; i < tmp.size(); i++) {
             DrawingGlyph g = (DrawingGlyph) tmp.get(i);
             if ( !g.isVisible()) {
                 continue;
             }
             removeGlyph(g);
+            cutGlyphs.add(g);
         }
+        clipboardXml = toXml(cutGlyphs);
         selectionChanged();
         setDisplayActive();
     }
@@ -1347,7 +1362,7 @@ public class DrawingControl extends DisplayControlImpl {
         commands.add(GlyphCreatorCommand.CMD_ARROW);
         commands.add(GlyphCreatorCommand.CMD_HARROW);
         commands.add(GlyphCreatorCommand.CMD_VARROW);
-        //GlyphCreatorCommand.CMD_OVAL); 
+        //GlyphCreatorCommand.CMD_OVAL);
         commands.add(GlyphCreatorCommand.CMD_TEXT);
         commands.add(GlyphCreatorCommand.CMD_WAYPOINT);
         commands.add(GlyphCreatorCommand.CMD_IMAGE);
@@ -1836,6 +1851,15 @@ public class DrawingControl extends DisplayControlImpl {
         }
     }
 
+    private void doImportXml(String xml) {
+        try {
+            Element root = XmlUtil.getRoot(xml);
+            processXml(root, false);
+        } catch (Exception exc) {
+            logException("Importing drawing", exc);
+        }
+    }
+
 
     /**
      * Export a grf file
@@ -1852,20 +1876,33 @@ public class DrawingControl extends DisplayControlImpl {
             if (filename == null) {
                 return;
             }
-            Document doc  = XmlUtil.getDocument("<shapes></shapes>");
-            Element  root = doc.getDocumentElement();
-            for (int i = 0; i < glyphs.size(); i++) {
-                DrawingGlyph g = (DrawingGlyph) glyphs.get(i);
-                root.appendChild(g.getElement(doc));
-            }
-            IOUtil.writeFile(filename, XmlUtil.toString(root));
-            if (loadAsMapData.isSelected()) {
+            String xml = toXml(glyphs);
+            if(xml == null) return;
+            IOUtil.writeFile(filename, xml);
+            if(loadAsMapData.isSelected()) {
                 getIdv().makeOneDataSource(filename, "FILE.MAPFILE", null);
             }
         } catch (Exception exc) {
             logException("Exporting drawing", exc);
         }
 
+    }
+
+    private String toXml(List glyphs) {
+        try {
+
+            Document doc  = XmlUtil.getDocument("<shapes></shapes>");
+            Element  root = doc.getDocumentElement();
+            for (int i = 0; i < glyphs.size(); i++) {
+                DrawingGlyph g = (DrawingGlyph) glyphs.get(i);
+                root.appendChild(g.getElement(doc));
+            }
+            return XmlUtil.toString(root);
+
+        } catch (Exception exc) {
+            logException("Exporting drawing", exc);
+        }
+        return null;
     }
 
     /**
