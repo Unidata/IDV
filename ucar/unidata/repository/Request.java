@@ -64,6 +64,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.*;
 
 
 
@@ -77,7 +78,7 @@ import java.util.regex.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Request {
+public class Request implements Constants {
 
     /** _more_ */
     public static final String CALL_QUERY = "/query";
@@ -118,6 +119,8 @@ public class Request {
 
     private Hashtable originalParameters;
 
+    private Repository repository;
+
     public String toString() {
         return type + " params:" + parameters;
     }
@@ -129,8 +132,9 @@ public class Request {
      * @param requestContext _more_
      * @param parameters _more_
      */
-    public Request(String type, RequestContext requestContext,
+    public Request(Repository repository, String type, RequestContext requestContext,
                    Hashtable parameters) {
+        this.repository     = repository;
         this.type           = type;
         this.requestContext = requestContext;
         this.parameters     = parameters;
@@ -217,15 +221,51 @@ public class Request {
         parameters.put(key,value);
     }
 
-    /**
-     * _more_
-     *
-     * @param key _more_
-     *
-     * @return _more_
-     */
-    public String get(String key) {
-        return (String) parameters.get(key);
+
+    public boolean defined(String key) {
+        String result = (String) get(key,(String)null);
+        if (result == null) {
+            return false;
+        }
+        if(result.trim().length()==0) return false;
+        return true;
+    }
+
+    public String getUnsafeString(String key, String dflt) {
+        String result = (String)get(key,(String)null);
+        if (result == null) {
+            return dflt;
+        }
+        return result;
+    }
+
+
+    private static Pattern checker;
+
+    public String getCheckedString(String key, String dflt, String patternString) {
+        return getCheckedString(key,dflt, Pattern.compile(patternString));
+    }
+
+
+    public String getCheckedString(String key, String dflt, Pattern pattern) {
+        String v = (String)get(key,(String)null);
+        if (v == null) {
+            return dflt;
+        }
+        Matcher matcher = pattern.matcher(v);
+        if(!matcher.find()) {
+            throw new BadInputException("Incorrect input for:" + key+" value:" + v+":");
+        }
+        //TODO:Check the value
+        return v;
+    }
+
+
+    public String getString(String key, String dflt) {
+        if(checker==null) {
+            checker = Pattern.compile(repository.getProperty(PROP_DB_PATTERN));
+        }
+        return getCheckedString(key,dflt, checker);
     }
 
     /**
@@ -236,36 +276,92 @@ public class Request {
      *
      * @return _more_
      */
-    public String get(String key, String dflt) {
-        String result = get(key);
+    private String get(String key, String dflt) {
+        String result = (String)parameters.get(key);
         if (result == null) {
             return dflt;
         }
         return result;
     }
 
-    /**
-     * Set the Parameters property.
-     *
-     * @param value The new value for Parameters
-     */
-    public void setParameters(Hashtable value) {
-        parameters = value;
+    public String getOutput() {
+        return getOutput(OutputHandler.OUTPUT_HTML);
+    }
+
+    public String getOutput(String dflt) {
+        return  getString(ARG_OUTPUT,dflt);
+    }
+
+
+    public String getId(String dflt) {
+        return  getString(ARG_ID,dflt);
+    }
+
+
+    public String getIds(String dflt) {
+        return  getString(ARG_IDS,dflt);
+    }
+
+    public String getDateSelect(String name, String dflt) {
+        String v =  getUnsafeString(name,(String)null);
+        if(v==null) return dflt;
+        //TODO:Check value
+        return v;
+    }
+
+    public String getWhat(String dflt) {
+        return   getString(ARG_WHAT,dflt);
+    }
+
+    public String getType(String dflt) {
+        return  getString(ARG_TYPE,dflt);
+    }
+
+
+    public String getUser() {
+        return   getString(ARG_USER,(String)null);
     }
 
 
 
+    public int get(String key, int dflt) {
+        String result = (String)get(key,(String)null);
+        if (result == null || result.trim().length()==0) {
+            return dflt;
+        }
+        return new Integer(result).intValue();
+    }
 
-    /**
-     * Get the Parameters property.
-     *
-     * @return The Parameters
-     */
-    public Hashtable getParameters() {
-        return parameters;
+    public double get(String key, double dflt) {
+        String result = (String)get(key,(String)null);
+        if (result == null || result.trim().length()==0) {
+            return dflt;
+        }
+        return new Double(result).doubleValue();
     }
 
 
+    public Date get(String key, Date dflt) throws java.text.ParseException {
+        String result = (String)get(key,(String)null);
+        if (result == null || result.trim().length()==0) {
+            return dflt;
+        }
+        return  DateUtil.parse(result);
+    }
+
+
+    public boolean get(String key, boolean dflt) {
+        String result =(String) get(key,(String)null);
+        if (result == null || result.trim().length()==0) {
+            return dflt;
+        }
+        return new Boolean(result).booleanValue();
+    }
+
+
+    public Enumeration keys() {
+        return parameters.keys();
+    }
 
     /**
      * Set the Type property.
@@ -303,6 +399,12 @@ public class Request {
         return requestContext;
     }
 
+
+    public static class BadInputException extends RuntimeException {
+        public BadInputException(String msg) {
+            super(msg);
+        }
+    }
 
 
 }

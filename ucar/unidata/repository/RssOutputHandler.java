@@ -94,12 +94,12 @@ public class RssOutputHandler extends OutputHandler {
      * @param args _more_
      * @throws Exception _more_
      */
-    public RssOutputHandler(Repository repository) throws Exception {
-        super(repository);
+    public RssOutputHandler(Repository repository,Element element) throws Exception {
+        super(repository,element);
     }
 
     public boolean canHandle(Request request)  {
-        String output = (String) request.get(ARG_OUTPUT,OUTPUT_HTML);
+        String output = (String) request.getOutput();
         return output.equals(OUTPUT_RSS);
     }
 
@@ -165,7 +165,6 @@ public class RssOutputHandler extends OutputHandler {
         sb.append(XmlUtil.closeTag(TAG_RSS_RSS));
         Result result = new Result("Query Results", sb,
                                    getMimeType(OUTPUT_RSS));
-        result.putProperty(PROP_NAVSUBLINKS, repository.getSearchFormLinks(request));
         return result;
 
     }

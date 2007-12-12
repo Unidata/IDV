@@ -36,6 +36,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.data.SqlUtil;
 
 import java.io.*;
 
@@ -99,7 +100,7 @@ public class MetaDataServer extends HttpServer implements Constants {
             throws Exception {
         if (result.isHtml() && result.getShouldDecorate()) {
             template =
-                IOUtil.readContents("/ucar/unidata/repository/template.html",
+                IOUtil.readContents("/ucar/unidata/repository/resources/template.html",
                                     getClass());
             String html = StringUtil.replace(template, "%content%",
                                              new String(result.getContent()));
@@ -115,7 +116,7 @@ public class MetaDataServer extends HttpServer implements Constants {
             List   sublinks     = (List) result.getProperty(PROP_NAVSUBLINKS);
             String sublinksHtml = "";
             if (sublinks != null) {
-                sublinksHtml = StringUtil.join("&nbsp;|&nbsp;", sublinks);
+                sublinksHtml = StringUtil.join("&nbsp;|&nbsp;\n", sublinks);
             }
 
 
@@ -159,12 +160,21 @@ public class MetaDataServer extends HttpServer implements Constants {
                                          Hashtable httpArgs, String content)
                     throws Exception {
                 path = path.trim();
-                //                System.err.println("request:" + path + ":");
-                formArgs = HtmlUtil.cleanUpArguments(formArgs);
-                User           user    = new User("jdoe", "John Doe", true);
-                RequestContext context = new RequestContext(user);
-                Request        request = new Request(path, context, formArgs);
+                formArgs = SqlUtil.cleanUpArguments(formArgs);
                 try {
+                    User           user    = repository.findUser("jdoe");
+                    //                    User           user    = repository.findUser("anonymous");
+                    RequestContext context = new RequestContext(user);
+                    Request        request = new Request(repository,path, context, formArgs);
+                    if(user==null) {
+                        Result result = new Result("Error",
+                                            new StringBuffer("Unknown request:" + path));
+                        result.putProperty(PROP_NAVLINKS,
+                                           repository.getNavLinks(request));
+                        writeContent(this, false, result);
+                        return;
+                    }
+
                     Result result = repository.handleRequest(request);
                     if (result != null) {
                         writeContent(this, true, result);
@@ -174,6 +184,14 @@ public class MetaDataServer extends HttpServer implements Constants {
                                           IOUtil.getFileExtension(path));
                         path = StringUtil.replace(path,
                                 repository.getUrlBase(), "");
+                        if(path.trim().length()==0||path.equals("/")) {
+                           result = new Result("Error",
+                                    new StringBuffer("Unknown request:" + path));
+                            result.putProperty(PROP_NAVLINKS,
+                                    repository.getNavLinks(request));
+                            writeContent(this, false, result);
+                            return;
+                        }
                         try {
                             InputStream is =
                                 IOUtil.getInputStream(
@@ -185,9 +203,10 @@ public class MetaDataServer extends HttpServer implements Constants {
                             } else {
                                 writeResult(true, bytes, type);
                             }
+
                         } catch (IOException fnfe) {
                             result = new Result("Error",
-                                    new StringBuffer("Unknown file:" + path));
+                                    new StringBuffer("Unknown request:" + path));
                             result.putProperty(PROP_NAVLINKS,
                                     repository.getNavLinks(request));
                             writeContent(this, false, result);
@@ -195,13 +214,22 @@ public class MetaDataServer extends HttpServer implements Constants {
                     }
                 } catch (Throwable exc) {
                     exc = LogUtil.getInnerException(exc);
-                    System.err.println("Error:" + exc);
-                    exc.printStackTrace();
-                    String trace = LogUtil.getStackTrace(exc);
-                    writeContent(this, false,
-                                 new Result("Error",
-                                            new StringBuffer("<pre>" + trace
-                                                + "</pre>")));
+                    if(exc instanceof Request.BadInputException) {
+                        Result result = new Result("Error",
+                                                   new StringBuffer(exc.getMessage()));
+                        result.putProperty(PROP_NAVLINKS,
+                                           repository.getNavLinks(null));
+                        writeContent(this, false, result);
+                        exc.printStackTrace();
+                    } else {
+                        System.err.println("Error:" + exc);
+                        exc.printStackTrace();
+                        String trace = LogUtil.getStackTrace(exc);
+                        writeContent(this, false,
+                                     new Result("Error",
+                                                new StringBuffer("<pre>" + trace
+                                                                 + "</pre>")));
+                    }
                 }
             }
         };
@@ -230,6 +258,7 @@ public class MetaDataServer extends HttpServer implements Constants {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
+        System.setProperty("derby.system.home", "foobar");
         MetaDataServer mds = new MetaDataServer(args);
         mds.init();
     }

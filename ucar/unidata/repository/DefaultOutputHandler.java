@@ -111,12 +111,12 @@ public class DefaultOutputHandler extends OutputHandler {
      * @param args _more_
      * @throws Exception _more_
      */
-    public DefaultOutputHandler(Repository repository) throws Exception {
-        super(repository);
+    public DefaultOutputHandler(Repository repository,Element element) throws Exception {
+        super(repository,element);
     }
 
     public boolean canHandle(Request request)  {
-        String output = (String) request.get(ARG_OUTPUT,OUTPUT_HTML);
+        String output = (String) request.getOutput();
         return output.equals(OUTPUT_HTML) ||
             output.equals(OUTPUT_TIMELINE) ||
             output.equals(OUTPUT_XML) ||
@@ -182,13 +182,13 @@ public class DefaultOutputHandler extends OutputHandler {
         TypeHandler typeHandler = repository.getTypeHandler(entry.getType());
         StringBuffer sb = typeHandler.getEntryContent(entry, request);
         return new Result("Entry: " + entry.getName(), sb,
-                          getMimeType(request.get(ARG_OUTPUT,OUTPUT_HTML)));
+                          getMimeType(request.getOutput()));
     }
 
 
     protected Result listGroups(Request request, List<Group> groups) throws Exception {
         StringBuffer sb        = new StringBuffer();
-        String       output    = request.get(ARG_OUTPUT, OUTPUT_HTML);
+        String       output    = request.getOutput();
         if (output.equals(OUTPUT_HTML)) {
             sb.append("<h3>Groups</h3>");
             sb.append("<ul>");
@@ -229,8 +229,10 @@ public class DefaultOutputHandler extends OutputHandler {
 
     public void getEntryHtml(StringBuffer sb, List<Entry> entries, Request request, boolean doForm, boolean dfltSelected)  throws Exception {
         if(doForm) {
-            sb.append(HtmlUtil.form("/getentries", "getentries"));
-            sb.append(HtmlUtil.submit("Get selected entries as:"));
+            sb.append(HtmlUtil.form(repository.href("/getentries"), "getentries"));
+            sb.append(HtmlUtil.submit("Get selected","selected"));
+            sb.append(HtmlUtil.submit("Get all","all"));
+            sb.append(" As:");
             List outputList =  repository.getOutputTypesForEntries(request);
             sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
             sb.append("<p>\n");
@@ -238,10 +240,13 @@ public class DefaultOutputHandler extends OutputHandler {
 
         }
         for(Entry entry: entries) {
-            sb.append(HtmlUtil.checkbox("entry_" + entry.getId(), "true",dfltSelected) + " " +
-                      entry.getTypeHandler().getEntryLinks(entry,request) + " " +
-                      repository.href(HtmlUtil.url("/showentry", ARG_ID, entry.getId()),
-                             entry.getName()));
+            sb.append(HtmlUtil.checkbox("entry_" + entry.getId(), "true",dfltSelected));
+            sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
+            sb.append(" ");
+            sb.append(entry.getTypeHandler().getEntryLinks(entry,request));
+            sb.append(" ");
+            sb.append(repository.href(HtmlUtil.url("/showentry", ARG_ID, entry.getId()),
+                                      entry.getName()));
             sb.append("<br>\n");
         }
         if(doForm) {
@@ -268,7 +273,7 @@ public class DefaultOutputHandler extends OutputHandler {
                                                             SqlUtil.distinct(COL_ENTRIES_GROUP_ID));
         String[]     groups    = SqlUtil.readString(statement, 1);
         StringBuffer sb        = new StringBuffer();
-        String       output    = request.get(ARG_OUTPUT, OUTPUT_HTML);
+        String       output    = request.getOutput();
         if (output.equals(OUTPUT_HTML)) {
             sb.append("<h3>Groups</h3>");
             sb.append("<ul>");
@@ -324,7 +329,7 @@ public class DefaultOutputHandler extends OutputHandler {
      */
     protected Result listTypes(Request request,List<TypeHandler> typeHandlers) throws Exception {
         StringBuffer sb     = new StringBuffer();
-        String       output = request.get(ARG_OUTPUT, OUTPUT_HTML);
+        String       output = request.getOutput();
         if (output.equals(OUTPUT_HTML)) {
             appendListHeader(request, output, WHAT_TYPE, sb);
             sb.append("<ul>");
@@ -374,38 +379,38 @@ public class DefaultOutputHandler extends OutputHandler {
         List<TwoFacedObject>  outputTypes = repository.getOutputTypesFor(request, what);
         int cnt = 0;
         sb.append("<b>");
-        String initialOutput =  request.get(ARG_OUTPUT);
+        String initialOutput =  request.getOutput((String)null);
         for(TwoFacedObject tfo: outputTypes) {
             if(cnt++>0) sb.append("&nbsp;|&nbsp;");
-            request.getParameters().put(ARG_OUTPUT, (String)tfo.getId());
+            request.put(ARG_OUTPUT, (String)tfo.getId());
             if(tfo.getId().equals(output)) {
-                sb.append(tfo.toString());
+                sb.append(HtmlUtil.span(tfo.toString(),""));
             } else {
                 sb.append(HtmlUtil.href(request.getType()+"?"+request.getUrlArgs(),tfo.toString()));
             }
         }
-        if(initialOutput!=null)   request.getParameters().put(ARG_OUTPUT,initialOutput);
+        if(initialOutput!=null)   request.put(ARG_OUTPUT,initialOutput);
         sb.append("</b>");
 
     }
 
 
-    protected void appendEntriesHeader(Request request, String output, StringBuffer sb) 
+    protected List getEntriesHeader(Request request, String output, String what) 
         throws Exception {
-        List<TwoFacedObject>  outputTypes = repository.getOutputTypesFor(request, WHAT_ENTRIES);
+        List<TwoFacedObject>  outputTypes = repository.getOutputTypesFor(request, what);
         int cnt = 0;
-        sb.append("<b>");
+        List items = new ArrayList();
         for(TwoFacedObject tfo: outputTypes) {
-            if(cnt++>0) sb.append("&nbsp;|&nbsp;");
-            request.getParameters().put(ARG_OUTPUT, (String)tfo.getId());
+            request.put(ARG_OUTPUT, (String)tfo.getId());
             if(tfo.getId().equals(output)) {
-                sb.append(tfo.toString());
+                items.add(tfo.toString());
             } else {
-                sb.append(HtmlUtil.href(request.getType()+"?"+request.getUrlArgs(),tfo.toString()));
+                items.add(HtmlUtil.href(request.getType()+"?"+request.getUrlArgs(),tfo.toString(), " class=\"subnavlink\" "));
             }
         }
-        sb.append("</b>");
+        return items;
     }
+
 
 
     /**
@@ -419,7 +424,7 @@ public class DefaultOutputHandler extends OutputHandler {
      */
     protected Result listTags(Request request,List<Tag> tags) throws Exception {
         StringBuffer sb     = new StringBuffer();
-        String       output = request.get(ARG_OUTPUT, OUTPUT_HTML);
+        String       output = request.getOutput();
         if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_CLOUD)) {
             appendListHeader(request, output, WHAT_TAG, sb);
             sb.append("<ul>");
@@ -431,7 +436,7 @@ public class DefaultOutputHandler extends OutputHandler {
             throw new IllegalArgumentException("Unknown output type:"
                     + output);
         }
-        request.getParameters().remove(ARG_OUTPUT);            
+        request.remove(ARG_OUTPUT);            
         int              max  = -1;
         int              min  = -1;
 
@@ -488,7 +493,11 @@ public class DefaultOutputHandler extends OutputHandler {
         } else if (output.equals(OUTPUT_XML)) {
             sb.append(XmlUtil.closeTag(TAG_TAGS));
         }
-        return new Result(pageTitle, sb, getMimeType(output));
+        Result result = new Result(pageTitle, sb, getMimeType(output));
+        //        StringBuffer  tsb = new StringBuffer();
+        //        appendListHeader(request, output, WHAT_TAG, tsb);
+        //        result.putProperty(PROP_NAVSUBLINKS, 
+        return result;
     }
 
 
@@ -523,7 +532,7 @@ public class DefaultOutputHandler extends OutputHandler {
      */
     protected Result listAssociations(Request request) throws Exception {
         StringBuffer sb     = new StringBuffer();
-        String       output = request.get(ARG_OUTPUT, OUTPUT_HTML);
+        String       output = request.getOutput();
         if (output.equals(OUTPUT_HTML)) {
             appendListHeader(request, output, WHAT_ASSOCIATION, sb);
             sb.append("<ul>");
@@ -549,6 +558,13 @@ public class DefaultOutputHandler extends OutputHandler {
                                                                              SqlUtil.distinct(COL_ASSOCIATIONS_NAME),
                                                                              where),1);
 
+        
+        if(associations.length==0) {
+            if (output.equals(OUTPUT_HTML) ||
+                output.equals(OUTPUT_CLOUD)) {
+                sb.append("No associations found");
+            }
+        }
         List<String>     names  = new ArrayList<String>();
         List<Integer>    counts = new ArrayList<Integer>();
         ResultSet        results;
@@ -623,7 +639,7 @@ public class DefaultOutputHandler extends OutputHandler {
 
 
     public Result processShowGroup(Request request,Group group, List<Group> subGroups, List<Entry>entries) throws Exception {
-        String       output = request.get(ARG_OUTPUT, OUTPUT_HTML);
+        String       output = request.getOutput();
         if(output.equals(OUTPUT_XML) || output.equals(OUTPUT_CSV)) return listGroups(request, subGroups);
         boolean showApplet = repository.isAppletEnabled(request);
         String  title = group.getFullName();
@@ -634,12 +650,14 @@ public class DefaultOutputHandler extends OutputHandler {
             } else {
                 //                output = OUTPUT_TIMELINE;
             }
-            appendListHeader(request, output, WHAT_GROUP, sb);
+            //xxxxx
+            //            appendListHeader(request, output, WHAT_GROUP, sb);
             sb.append("<p>\n");
             String[] crumbs = getBreadCrumbs(request, group);
             title = crumbs[0];
             sb.append(HtmlUtil.bold("Group: ")+ crumbs[1]);
-            sb.append("<hr>");
+            //            sb.append("<hr>");
+            sb.append("<p>");
             if (subGroups.size() > 0) {
                 sb.append(HtmlUtil.bold("Sub groups:"));
                 sb.append("<ul>");
@@ -665,19 +683,19 @@ public class DefaultOutputHandler extends OutputHandler {
             }
         }
 
-        return new Result(title, sb, getMimeType(output));
-
+        Result result = new Result(title, sb, getMimeType(output));
+        result.putProperty(PROP_NAVSUBLINKS,  getEntriesHeader(request,  output,WHAT_GROUP)); 
+        return result;
     }
 
 
 
 
     public Result processShowGroups(Request request,List<Group> groups) throws Exception {
-        String       output = request.get(ARG_OUTPUT, OUTPUT_HTML);
+        String       output = request.getOutput();
         if(output.equals(OUTPUT_XML) || output.equals(OUTPUT_CSV)) return listGroups(request, groups);
         StringBuffer sb     = new StringBuffer();
         String title = "Groups";
-
         
         if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
             appendListHeader(request, output, WHAT_GROUP, sb);
@@ -695,8 +713,9 @@ public class DefaultOutputHandler extends OutputHandler {
                 sb.append("\n<br>\n");
             }
         }
-        return new Result(title, sb, getMimeType(output));
-
+        Result result = new Result(title, sb, getMimeType(output));
+        result.putProperty(PROP_NAVSUBLINKS,  getEntriesHeader(request,  output,WHAT_GROUP)); 
+        return result;
     }
 
 
@@ -704,7 +723,7 @@ public class DefaultOutputHandler extends OutputHandler {
 
     protected String getTimelineApplet(Request request, List<Entry> entries) throws Exception {
         timelineAppletTemplate = IOUtil.readContents(
-            "/ucar/unidata/repository/timelineapplet.html", getClass());        List         times   = new ArrayList();
+            "/ucar/unidata/repository/resources/timelineapplet.html", getClass());        List         times   = new ArrayList();
         List         labels  = new ArrayList();
         List         ids     = new ArrayList();
         for (Entry entry : entries) {
@@ -738,10 +757,10 @@ public class DefaultOutputHandler extends OutputHandler {
 
 
         StringBuffer sb      = new StringBuffer();
-        String       output  = request.get(ARG_OUTPUT, OUTPUT_HTML);
+        String       output  = request.getOutput();
         boolean showApplet = repository.isAppletEnabled(request);
         if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
-            appendEntriesHeader(request,  output,  sb) ;
+            //appendEntriesHeader(request,  output,  sb) ;
             sb.append("<p>\n");
             if (entries.size() == 0) {
                 sb.append("<b>Nothing Found</b><p>");
@@ -749,7 +768,6 @@ public class DefaultOutputHandler extends OutputHandler {
             sb.append("<table>");
 
             if (output.equals(OUTPUT_TIMELINE)) {
-                output = OUTPUT_HTML;
             } else {
                 showApplet = false;
             }
@@ -764,10 +782,11 @@ public class DefaultOutputHandler extends OutputHandler {
         StringBufferCollection sbc = new StringBufferCollection();
         for (Entry entry : entries) {
             StringBuffer ssb = sbc.getBuffer(entry.getTypeHandler().getDescription());
-            if (output.equals(OUTPUT_HTML)) {
+            if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
                 String links = HtmlUtil.checkbox("entry_" + entry.getId(),
                                                  "true") + " " + entry.getTypeHandler().getEntryLinks(entry,request);
 
+                ssb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
                 ssb.append(HtmlUtil
                     .row(links + " "
                          + repository.href(HtmlUtil
@@ -780,13 +799,15 @@ public class DefaultOutputHandler extends OutputHandler {
         }
 
 
-        if (output.equals(OUTPUT_HTML)) {
+        if (output.equals(OUTPUT_HTML)  || output.equals(OUTPUT_TIMELINE)) {
             if (entries.size() > 0 && showApplet){
                 sb.append(getTimelineApplet(request, entries));
             }
-            sb.append(HtmlUtil.form("/getentries", "getentries"));
+            sb.append(HtmlUtil.form(repository.href("/getentries"), "getentries"));
             if (entries.size() > 0) {
-                sb.append(HtmlUtil.submit("Get selected entries as:"));
+                sb.append(HtmlUtil.submit("Get selected", "selected"));
+                sb.append(HtmlUtil.submit("Get all", "all"));
+                sb.append(" As:");
                 List outputList =  repository.getOutputTypesForEntries(request);
                 sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
             }
@@ -795,20 +816,22 @@ public class DefaultOutputHandler extends OutputHandler {
         for (int i = 0; i < sbc.getKeys().size(); i++) {
             String       type = (String) sbc.getKeys().get(i);
             StringBuffer ssb  = sbc.getBuffer(type);
-            if (output.equals(OUTPUT_HTML)) {
+            if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
                 sb.append(HtmlUtil.row(HtmlUtil.bold("Type:" + type)));
                 sb.append(ssb);
             }
         }
 
-        if (output.equals(OUTPUT_HTML)) {
+        if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
             sb.append("</form>");
             sb.append("</table>");
 
         }
         Result result = new Result("Query Results", sb,
                                    getMimeType(output));
-        result.putProperty(PROP_NAVSUBLINKS, repository.getSearchFormLinks(request));
+        result.putProperty(PROP_NAVSUBLINKS, getEntriesHeader(request,  output,WHAT_ENTRIES)); 
+
+        //        result.putProperty(PROP_NAVSUBLINKS, repository.getSearchFormLinks(request));
         return result;
 
     }

@@ -91,12 +91,12 @@ public class TestOutputHandler extends OutputHandler {
      * @param args _more_
      * @throws Exception _more_
      */
-    public TestOutputHandler(Repository repository) throws Exception {
-        super(repository);
+    public TestOutputHandler(Repository repository,Element element) throws Exception {
+        super(repository,element);
     }
 
     public boolean canHandle(Request request)  {
-        String output = (String) request.get(ARG_OUTPUT,OUTPUT_HTML);
+        String output = (String) request.getOutput();
         return output.equals("testit");
     }
 

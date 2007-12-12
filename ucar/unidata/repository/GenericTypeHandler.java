@@ -161,7 +161,7 @@ public class GenericTypeHandler extends TypeHandler {
 
         String[]     products  = SqlUtil.readString(statement, 1);
         StringBuffer sb        = new StringBuffer();
-        String output = request.get(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
+        String output = request.getOutput();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             sb.append("<h3>"+ title +"</h3>");
             sb.append("<ul>");
@@ -329,8 +329,7 @@ public class GenericTypeHandler extends TypeHandler {
             if ( !column.getCanSearch()) {
                 continue;
             }
-            String value = request.get(column.getFullName(), "");
-            if (value.trim().length() > 0) {
+            if(request.defined(column.getFullName())) {
                 initTables.add(getTableName());
                 break;
             }

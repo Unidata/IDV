@@ -261,38 +261,46 @@ public interface Constants {
     public static final String TYPE_GROUP = "group";
 
     /** _more_          */
-    public static final String PROP_NAVLINKS = "udms.navlinks";
+    public static final String PROP_DB_PATTERN = "jdms.db.pattern";
+
+    public static final String PROP_DB_SCRIPT="jdms.db.script";
+    public static final String PROP_DB_ENTRIES = "jdms.db.entries";
+    public static final String PROP_OUTPUT_FILES = "jdms.output.files";
+
+    public static final String PROP_NAVLINKS = "jdms.navlinks";
+
+    public static final String PROP_API = "jdms.api";
 
     /** _more_          */
-    public static final String PROP_NAVSUBLINKS = "udms.navsublinks";
+    public static final String PROP_NAVSUBLINKS = "jdms.navsublinks";
 
     /** _more_          */
-    public static final String PROP_SHOW_APPLET = "udms.html.showapplet";
+    public static final String PROP_SHOW_APPLET = "jdms.html.showapplet";
 
     /** _more_          */
-    public static final String PROP_HTML_URLBASE = "udms.html.urlbase";
+    public static final String PROP_HTML_URLBASE = "jdms.html.urlbase";
 
     /** _more_          */
-    public static final String PROP_HTML_TEMPLATE = "udms.html.template";
+    public static final String PROP_HTML_TEMPLATE = "jdms.html.template";
 
     /** _more_          */
-    public static final String PROP_DB_CANCACHE = "udms.db.cancache";
+    public static final String PROP_DB_CANCACHE = "jdms.db.cancache";
 
     /** _more_          */
-    public static final String PROP_DB_DRIVER = "udms.db.driver";
+    public static final String PROP_DB_DRIVER = "jdms.db.driver";
 
     /** _more_          */
-    public static final String PROP_DB_URL = "udms.db.url";
+    public static final String PROP_DB_URL = "jdms.db.url";
 
     /** _more_          */
-    public static final String PROP_DB_USER = "udms.db.user";
+    public static final String PROP_DB_USER = "jdms.db.user";
 
     /** _more_          */
-    public static final String PROP_DB_PASSWORD = "udms.db.password";
+    public static final String PROP_DB_PASSWORD = "jdms.db.password";
 
     /** _more_          */
     public static final String PROP_HTML_DOWNLOADENTRIESASFILES =
-        "udms.html.downloadentriesasfiles";
+        "jdms.html.downloadentriesasfiles";
 
 
     /** _more_          */
@@ -300,11 +308,15 @@ public interface Constants {
 
     public static final String TAG_DB_HANDLER = "handler";
 
+    public static final String TAG_OUTPUTHANDLER = "outputhandler";
+
     /** _more_          */
     public static final String TAG_DB_COLUMN = "column";
 
     /** _more_          */
     public static final String ATTR_DB_NAME = "name";
+
+    public static final String ATTR_CLASS = "class";
 
     /** _more_          */
     public static final String ATTR_DB_DESCRIPTION = "description";

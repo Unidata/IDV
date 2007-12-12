@@ -110,7 +110,7 @@ public class OutputHandler implements Constants, Tables {
      * @param args _more_
      * @throws Exception _more_
      */
-    public OutputHandler(Repository repository) throws Exception {
+    public OutputHandler(Repository repository,Element element) throws Exception {
         this.repository = repository;
     }
 
@@ -155,7 +155,7 @@ public class OutputHandler implements Constants, Tables {
         List  breadcrumbs = new ArrayList();
         List  titleList   = new ArrayList();
         Group parent      = group.getParent();
-        String output = request.get(ARG_OUTPUT, OUTPUT_HTML);
+        String output = request.getOutput();
         while (parent != null) {
             titleList.add(0, parent.getName());
             breadcrumbs.add(0, repository.href(HtmlUtil.url("/showgroup", ARG_GROUP,

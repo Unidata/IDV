@@ -191,7 +191,7 @@ public class TypeHandler implements Constants, Tables {
      */
     public StringBuffer getEntryContent(Entry entry, Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        String output = request.get(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
+        String output = request.getOutput();
         String[] tags = repository.getTags(request,entry.getId());
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             sb.append("<table cellspacing=\"5\" cellpadding=\"2\">");
@@ -385,7 +385,7 @@ public class TypeHandler implements Constants, Tables {
 
 
         if(didEntries) {
-            String type = (String) request.get(ARG_TYPE,"").trim();
+            String type = (String) request.getType("").trim();
             if (type.length()>0 && !type.equals(TYPE_ANY)) {
                 addOr(COL_ENTRIES_TYPE, type, whereList, true);
                 where = SqlUtil.makeAnd(whereList);
@@ -428,9 +428,9 @@ public class TypeHandler implements Constants, Tables {
                           Request request, List where)
             throws Exception {
 
-        String    minDate     = request.get(ARG_FROMDATE);
-        String    maxDate     = request.get(ARG_TODATE);
-
+        String minDate     = request.getDateSelect(ARG_FROMDATE,(String)null);
+        String maxDate     = request.getDateSelect(ARG_TODATE,(String)null);
+        /*
         if(minDate==null || maxDate == null) {
             Statement stmt = executeSelect(request,
                                            SqlUtil.comma(
@@ -447,11 +447,14 @@ public class TypeHandler implements Constants, Tables {
                         maxDate = SqlUtil.getDateString("" + dateResults.getDate(2));
                 }
             }
-        }
+            }*/
+
+        minDate     = "";
+        maxDate     = "";
 
         List<TypeHandler> typeHandlers = repository.getTypeHandlers(request);
-        if(typeHandlers.size()==0 && request.get(ARG_TYPE)!=null) {
-            typeHandlers.add(repository.getTypeHandler(request.get(ARG_TYPE)));
+        if(typeHandlers.size()==0 && request.defined(ARG_TYPE)) {
+            typeHandlers.add(repository.getTypeHandler(request.getType()));
         }
         if (typeHandlers.size() > 1) {
             List tmp = new ArrayList();
@@ -475,7 +478,7 @@ public class TypeHandler implements Constants, Tables {
         formBuffer.append("\n");
 
 
-        String name = (String) request.get(ARG_NAME,"");
+        String name = (String) request.getString(ARG_NAME,"");
         if (name.trim().length()==0) {
             formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
                     HtmlUtil.input(ARG_NAME)));
@@ -486,7 +489,7 @@ public class TypeHandler implements Constants, Tables {
         formBuffer.append("\n");
 
 
-        String groupArg = (String) request.get(ARG_GROUP,"");
+        String groupArg = (String) request.getString(ARG_GROUP,"");
         if (groupArg.length()>0) {
             formBuffer.append(HtmlUtil.hidden(ARG_GROUP, groupArg));
             Group group = repository.findGroup(groupArg); 
@@ -526,7 +529,7 @@ public class TypeHandler implements Constants, Tables {
         }
         formBuffer.append("\n");
 
-        String tag = (String) request.get(ARG_TAG,"");
+        String tag = (String) request.getString(ARG_TAG,"");
         formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Tag:"),
                 HtmlUtil.input(ARG_TAG, tag)));
 
@@ -550,9 +553,9 @@ public class TypeHandler implements Constants, Tables {
      */
     protected List assembleWhereClause(Request request) throws Exception {
         List   where = new ArrayList();
-        String name  = (String) request.get(ARG_NAME,"").trim();
+        String name  = (String) request.getString(ARG_NAME,"").trim();
 
-        String tag = (String) request.get(ARG_TAG);
+        String tag = (String) request.getString(ARG_TAG,(String)null);
         if (tag != null) {
             tag = tag.trim();
             if (tag.length() > 0) {
@@ -561,7 +564,7 @@ public class TypeHandler implements Constants, Tables {
             }
         }
 
-        String groupName = (String) request.get(ARG_GROUP,"").trim();
+        String groupName = (String) request.getString(ARG_GROUP,"").trim();
         if (groupName.length()>0) {
             boolean doNot = groupName.startsWith("!");
             if (doNot) {
@@ -576,7 +579,7 @@ public class TypeHandler implements Constants, Tables {
                     throw new IllegalArgumentException ("Could not find group:" + groupName);
                 }
                 String searchChildren =
-                    (String) request.get(ARG_GROUP_CHILDREN);
+                    (String) request.getString(ARG_GROUP_CHILDREN,(String)null);
                 if (Misc.equals(searchChildren, "true")) {
                     String sub = (doNot?
                                   SqlUtil.notLike(COL_ENTRIES_GROUP_ID, group.getId() + Group.IDDELIMITER+"%"):
@@ -598,8 +601,8 @@ public class TypeHandler implements Constants, Tables {
         }
 
         Date now = new Date();
-        String fromDate = (String) request.get(ARG_FROMDATE,"").trim().toLowerCase();
-        String toDate = (String) request.get(ARG_TODATE,"").trim().toLowerCase();
+        String fromDate = (String) request.getDateSelect(ARG_FROMDATE,"").trim().toLowerCase();
+        String toDate = (String) request.getDateSelect(ARG_TODATE,"").trim().toLowerCase();
 
         Date fromDttm=DateUtil.parseRelative(now,fromDate,-1);
         Date toDttm=DateUtil.parseRelative(now,toDate,+1);
@@ -625,32 +628,20 @@ public class TypeHandler implements Constants, Tables {
             toDttm = DateUtil.getRelativeDate(fromDttm, toDate);
         }
 
-        //        System.err.println (fromDttm +"   --   " + toDttm);
         if (fromDttm!=null) {
-            where.add(
-                SqlUtil.ge(
-                    COL_ENTRIES_FROMDATE,
-                    SqlUtil.quote(SqlUtil.getDateString(SqlUtil.format(fromDttm)))));
+            where.add(SqlUtil.ge(COL_ENTRIES_FROMDATE,fromDttm));
         }
 
 
         if (toDttm!=null) {
-            where.add(
-                SqlUtil.le(
-                    COL_ENTRIES_TODATE,
-                    SqlUtil.quote(SqlUtil.getDateString(SqlUtil.format(toDttm)))));
+            where.add(SqlUtil.le(COL_ENTRIES_TODATE,toDttm));
         }
 
-        //        System.err.println (fromDttm + " ---- "  + toDttm);
 
-        String createDate = (String) request.get(ARG_CREATEDATE);
-        if ((createDate != null) && (createDate.trim().length() > 0)) {
-            where.add(
-                SqlUtil.le(
-                    COL_ENTRIES_CREATEDATE,
-                    SqlUtil.quote(SqlUtil.getDateString(createDate))));
+        Date createDate =  request.get(ARG_CREATEDATE,(Date) null);
+        if (createDate != null) {
+            where.add(SqlUtil.le(COL_ENTRIES_CREATEDATE,createDate));
         }
-
 
         if ((name != null) && (name.length() > 0)) {
             addOr(COL_ENTRIES_NAME, name, where, true);

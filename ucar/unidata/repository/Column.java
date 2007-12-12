@@ -40,6 +40,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.sql.Timestamp;
 
 
@@ -56,6 +57,11 @@ public class Column implements Tables, Constants {
                                                        new TwoFacedObject("<=",EXPR_LE),
                                                        new TwoFacedObject(">=",EXPR_GE),
                                                        new TwoFacedObject("between",EXPR_BETWEEN));
+
+    public static final String EXPR_PATTERN = EXPR_EQUALS +"|" +
+        EXPR_LE +"|" +
+        EXPR_GE +"|" +
+        EXPR_BETWEEN;
 
     /** _more_          */
     public static final String TYPE_STRING = "string";
@@ -315,30 +321,30 @@ public class Column implements Tables, Constants {
     protected void assembleWhereClause(Request request, List where) throws Exception {            
         String id = getFullName();
         if (type.equals(TYPE_LATLON)) {
-            String lat1 = request.get(id+"_lat1","").trim();
-            String lat2 = request.get(id+"_lat2","").trim();
-            String lon1 = request.get(id+"_lon1","").trim();
-            String lon2 = request.get(id+"_lon2","").trim();
-            if(lat1.length()>0 && lat2.length()>0 && lon1.length()>0 && lon2.length()>0) {
+            double lat1 = request.get(id+"_lat1",Double.NaN);
+            double lat2 = request.get(id+"_lat2",Double.NaN);
+            double lon1 = request.get(id+"_lon1",Double.NaN);
+            double lon2 = request.get(id+"_lon2",Double.NaN);
+            if(lat1==lat1 && lat2 == lat2 && lon1==lon1 && lon2 == lon2) {
                 where.add(SqlUtil.ge(getFullName()+"_lat",lat1));
                 where.add(SqlUtil.le(getFullName()+"_lat",lat2));
                 where.add(SqlUtil.le(getFullName()+"_lon",lon1));
                 where.add(SqlUtil.ge(getFullName()+"_lon",lon2));
             }
         } else if (isNumeric()) {       
-            String expr = request.get(id+"_expr",EXPR_EQUALS);
-            String from = request.get(id+"_from","").trim();
-            String to = request.get(id+"_to","").trim();
-            String value = request.get(id,"").trim();
-            if(from.length()>0 && to.length()==0) {
+            String expr = request.getCheckedString(id+"_expr",EXPR_EQUALS,EXPR_PATTERN);
+            double from = request.get(id+"_from",Double.NaN);
+            double to = request.get(id+"_to",Double.NaN);
+            double value = request.get(id,Double.NaN);
+            if(from==from && to!=to) {
                 to = value;
-            } else if(from.length()==0 && to.length()>0) {
+            } else if(from!=from && to==to) {
                 from = value;
-            } else if(from.length()==0 && to.length()==0) {
+            } else if(from!=from && to!=to) {
                 from = value;
                 to = value;
             }  
-            if(from.length()>0) {
+            if(from==from) {
                 if(expr.equals(EXPR_EQUALS)) {
                     where.add(SqlUtil.eq(getFullName(),from));
                 } else  if(expr.equals(EXPR_LE)) {
@@ -354,14 +360,13 @@ public class Column implements Tables, Constants {
                 System.err.println ("where:" + where);
             }
         } else if (type.equals(TYPE_BOOLEAN)) {       
-            String value = request.get(id,"");
-            if(value.length()>0) {
-                where.add(SqlUtil.eq(getFullName(),value.toLowerCase().equals("true")?"1":"0"));
+            if(request.defined(id)) {
+                where.add(SqlUtil.eq(getFullName(),(request.get(id,true)?1:0)));
             }
         } else {
-            String value = request.get(id,"");
+            String value = request.getString(id,"");
             typeHandler.addOr(getFullName(),
-                              (String) request.get(getFullName()),
+                              (String) request.getString(getFullName(),(String)null),
                               where, !(type.equals(TYPE_INT) || type.equals(TYPE_DOUBLE)));
         }
 
@@ -386,6 +391,7 @@ public class Column implements Tables, Constants {
             return;
         }
 
+
         List tmp = new ArrayList(where);
         String widget = "";
         if (type.equals(TYPE_LATLON)) {
@@ -404,12 +410,15 @@ public class Column implements Tables, Constants {
                 HtmlUtil.input(id+"_from", "", "size=\"10\"") +
                 HtmlUtil.input(id+"_to", "", "size=\"10\"");
         } else {
-            //TEXT
             if (searchType.equals(SEARCHTYPE_SELECT)) {
-                String[] values = SqlUtil.readString(
-                                                     typeHandler.executeSelect(request,
-                                                                               SqlUtil.distinct(getFullName()),
-                                                                               tmp), 1);
+                long t1  = System.currentTimeMillis();
+                Statement stmt =  typeHandler.executeSelect(request,
+                                                            SqlUtil.distinct(getFullName()),
+                                                            tmp);
+                long t2  = System.currentTimeMillis();
+                String[] values = SqlUtil.readString(stmt, 1);
+                long t3  = System.currentTimeMillis();
+                //                System.err.println("TIME:" + (t2-t1) + " " + (t3-t2));
                 List list = new ArrayList();
                 for (int i = 0; i < values.length; i++) {
                     if(values[i] == null) continue;
