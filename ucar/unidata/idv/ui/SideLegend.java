@@ -504,6 +504,10 @@ public class SideLegend extends IdvLegend {
                 if (lastVisibility == null) {
                     lastVisibility = dflt;
                 }
+                control.setDisplayVisibility(on);
+                //Don't be too tricky here for now
+                if(true) continue;
+                
                 if (on) {
                     control.setDisplayVisibility(
                         lastVisibility.booleanValue());
