@@ -60,6 +60,7 @@ import ucar.unidata.ui.symbol.StationModelManager;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.LayoutUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectListener;
@@ -1844,6 +1845,7 @@ public class StationModelControl extends ObsDisplayControl {
      */
     protected void setScaleOnDisplayable()
             throws RemoteException, VisADException {
+        System.err.println ("setScaleOnDisplayable: "+getDisplayScale());
         setScaleOnDisplayable(getDisplayScale() * displayableScale);
     }
 
@@ -2306,9 +2308,6 @@ public class StationModelControl extends ObsDisplayControl {
         //        controlWidgets.add(new WrapperWidget(this, GuiUtils.rLabel(""),
         //                                             testButton));
 
-        controlWidgets.add(new WrapperWidget(this,
-                                             GuiUtils.makeHeader("Layout")));
-
         controlWidgets.add(
             new WrapperWidget(
                 this, GuiUtils.rLabel("Declutter:"),
@@ -2328,9 +2327,10 @@ public class StationModelControl extends ObsDisplayControl {
         ActionListener scaleListener = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 try {
+                    System.err.println ("display scale = "+getDisplayScale());
                     setDisplayableScale(
-                        (float) Misc.parseNumber(scaleField.getText()));
-                } catch (NumberFormatException nfe) {
+                                        (float) Misc.parseNumber(scaleField.getText()));
+                } catch (Exception nfe) {
                     userErrorMessage("Bad scale format");
                 }
             }
@@ -2364,34 +2364,6 @@ public class StationModelControl extends ObsDisplayControl {
                     doMakeVerticalPositionPanel()));
         }
 
-        controlWidgets.add(new WrapperWidget(this,
-                                             GuiUtils.makeHeader("Times")));
-
-        // Time stuff
-        controlWidgets.add(new WrapperWidget(this,
-                                             GuiUtils.rLabel("  Show:"),
-                                             doMakeTimeOptionWidget()));
-
-
-        JPanel timeModePanel =
-            GuiUtils.leftCenter(
-                GuiUtils.wrap(
-                    GuiUtils.makeImageButton(
-                        "/ucar/unidata/idv/images/edit.gif", this,
-                        "showTimeRangeDialog")), GuiUtils.inset(
-                            getDataTimeRange(true).getTimeModeLabel(),
-                            new Insets(0, 10, 0, 0)));
-
-        controlWidgets.add(new WrapperWidget(this,
-                                             GuiUtils.rLabel("  Range:"),
-                                             timeModePanel));
-
-        controlWidgets.add(new WrapperWidget(this,
-                                             GuiUtils.rLabel("  Declutter:"),
-                                             doMakeTimeDeclutterWidget()));
-
-        GuiUtils.enableComponents(timeDeclutterComps,
-                                  getTimeDeclutterEnabled());
     }
 
     /**
@@ -2585,10 +2557,36 @@ public class StationModelControl extends ObsDisplayControl {
 
         plotPanel = GuiUtils.centerBottom(getChart().getContents(),
                                           tableScroller);
+
+        List timeWidgets = new ArrayList();
+        timeWidgets.add(GuiUtils.rLabel("Show:"));
+        timeWidgets.add(doMakeTimeOptionWidget());
+        getDataTimeRange(true).setOneLineLabel(true);
+        JPanel timeModePanel =
+            GuiUtils.leftCenter(
+                GuiUtils.wrap(
+                    GuiUtils.makeImageButton(
+                        "/ucar/unidata/idv/images/edit.gif", this,
+                        "showTimeRangeDialog")), GuiUtils.inset(
+                            getDataTimeRange(true).getTimeModeLabel(),
+                            new Insets(0, 10, 0, 0)));
+
+        timeWidgets.add(GuiUtils.rLabel("Range:"));
+        timeWidgets.add(timeModePanel);
+        timeWidgets.add(GuiUtils.rLabel("Declutter:"));
+        timeWidgets.add(doMakeTimeDeclutterWidget());
+
+        GuiUtils.enableComponents(timeDeclutterComps,
+                                  getTimeDeclutterEnabled());
+
+
         JComponent plotComp =
             GuiUtils.topCenter(GuiUtils.inset(selectedObLbl, 3), plotPanel);
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.add("Settings", GuiUtils.top(widgets));
+        tabbedPane.add("Layout", GuiUtils.top(widgets));
+        LayoutUtil.tmpInsets  = LayoutUtil.INSETS_5;
+        JComponent timeComp  = LayoutUtil.doLayout(timeWidgets,2,GuiUtils.WT_N, GuiUtils.WT_N);
+        tabbedPane.add("Times", GuiUtils.topLeft(timeComp));
         tabbedPane.add("Plot", plotComp);
         tabbedPane.add("Filters", doMakeFilterGui(false));
         return tabbedPane;
