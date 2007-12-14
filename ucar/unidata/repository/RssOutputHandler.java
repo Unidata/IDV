@@ -83,7 +83,7 @@ import java.util.zip.*;
 public class RssOutputHandler extends OutputHandler {
 
     /** _more_          */
-    public static final String OUTPUT_RSS = "rss";
+    public static final String OUTPUT_RSS = "rss.rss";
 
 
     /**

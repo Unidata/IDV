@@ -26,6 +26,7 @@ package ucar.unidata.repository;
 
 import ucar.unidata.data.SqlUtil;
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
@@ -60,7 +61,7 @@ import java.util.Properties;
  */
 public class TypeHandler implements Constants, Tables {
 
-    public static final Object ALL_OBJECT = new TwoFacedObject("All","");
+    public static final TwoFacedObject ALL_OBJECT = new TwoFacedObject("All","");
 
     /** _more_ */
     public static final String TYPE_ANY = "any";
@@ -428,12 +429,14 @@ public class TypeHandler implements Constants, Tables {
     protected Statement executeSelect(Request request, String what, List whereList, String extra)
         throws Exception {
         whereList = new ArrayList(whereList);
-        String[] tableNames = { TABLE_ENTRIES, getTableName(), TABLE_USERS, TABLE_GROUPS,
+        String where = SqlUtil.makeAnd(whereList);
+
+        String[] tableNames = { TABLE_ENTRIES, getTableName(), TABLE_METADATA, TABLE_USERS, TABLE_GROUPS,
                                 TABLE_TAGS,TABLE_ASSOCIATIONS};
         List tables = new ArrayList();
         boolean didEntries = false;
         boolean didOther = false;
-        String where = SqlUtil.makeAnd(whereList);
+        boolean didMeta = false;
         for (int i = 0; i < tableNames.length; i++) {
             if (what.indexOf(tableNames[i] + ".") >= 0 ||
                 where.indexOf(tableNames[i] + ".") >= 0 ||
@@ -441,23 +444,31 @@ public class TypeHandler implements Constants, Tables {
                 tables.add(tableNames[i]);
                 if(i == 0) didEntries = true;
                 else if(i == 1) didOther = true;
+                else if(i == 2) didMeta = true;
             }
         }
 
+
+        if(didMeta) {
+            whereList.add(SqlUtil.eq(COL_METADATA_ID,COL_ENTRIES_ID));
+            didEntries = true;
+        }
 
         if(didEntries) {
             String type = (String) request.getType("").trim();
             if (type.length()>0 && !type.equals(TYPE_ANY)) {
                 addOr(COL_ENTRIES_TYPE, type, whereList, true);
-                where = SqlUtil.makeAnd(whereList);
             }
         }
+
 
         //The join
         if(didEntries && didOther && !TABLE_ENTRIES.equalsIgnoreCase(getTableName())) {
             whereList.add(0,SqlUtil.eq(COL_ENTRIES_ID, getTableName()+".id"));
-            where = SqlUtil.makeAnd(whereList);
         }
+
+
+        where = SqlUtil.makeAnd(whereList);
         String sql = SqlUtil.makeSelect(what, tables, where,extra);
         return getRepository().execute(sql,repository.getMax(request));
     }
@@ -518,8 +529,9 @@ public class TypeHandler implements Constants, Tables {
 
         List<TypeHandler> typeHandlers = repository.getTypeHandlers(request);
         if(typeHandlers.size()==0 && request.defined(ARG_TYPE)) {
-            typeHandlers.add(repository.getTypeHandler(request.getType()));
+            typeHandlers.add(repository.getTypeHandler(request));
         }
+
         if (typeHandlers.size() > 1) {
             List tmp = new ArrayList();
             for (TypeHandler typeHandler : typeHandlers) {
@@ -536,32 +548,35 @@ public class TypeHandler implements Constants, Tables {
         } else if (typeHandlers.size() == 1) {
             formBuffer.append(HtmlUtil.hidden(ARG_TYPE,
                     typeHandlers.get(0).getType()));
+            System.err.println ("type handler: " + typeHandlers.get(0).getDescription() + " " + typeHandlers.get(0).getType());
+            System.err.println ("request:" + request.toString());
             formBuffer.append(HtmlUtil.tableEntry("<b>Type:</b>",
-                    typeHandlers.get(0).getDescription()));
-        }
+                                                  typeHandlers.get(0).getDescription()));
+        } 
         formBuffer.append("\n");
 
 
         String name = (String) request.getString(ARG_NAME,"");
+        String searchMetaData = " " + HtmlUtil.checkbox(ARG_SEARCHMETADATA,"true",request.get(ARG_SEARCHMETADATA,false)) + " Search metadata";
         if (name.trim().length()==0) {
             formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
-                    HtmlUtil.input(ARG_NAME)));
+                                                  HtmlUtil.input(ARG_NAME)+searchMetaData));
         } else {
+            HtmlUtil.hidden(ARG_NAME,name);
             formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
-                                                  name));
+                                                  name+searchMetaData));
         }
         formBuffer.append("\n");
 
 
         String groupArg = (String) request.getString(ARG_GROUP,"");
+        String searchChildren = " " + HtmlUtil.checkbox(ARG_GROUP_CHILDREN,"true",request.get(ARG_GROUP_CHILDREN,false)) + " (Search subgroups)";
         if (groupArg.length()>0) {
             formBuffer.append(HtmlUtil.hidden(ARG_GROUP, groupArg));
             Group group = repository.findGroup(groupArg); 
             if(group!=null) {
                 formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Group:"),
-                        group.getFullName() + "&nbsp;"
-                                                      + HtmlUtil.checkbox(ARG_GROUP_CHILDREN,
-                                                                          "true") + " (Search subgroups)"));
+                                                      group.getFullName() + "&nbsp;" + searchChildren));
 
             }
         } else {
@@ -578,17 +593,14 @@ public class TypeHandler implements Constants, Tables {
                     groupList.add(new TwoFacedObject(group.getFullName()));
                 }
                 String groupSelect = HtmlUtil.select(ARG_GROUP, groupList);
-                groupSelect += "&nbsp;"
-                               + HtmlUtil.checkbox(ARG_GROUP_CHILDREN,
-                                   "true") + " (Search subgroups)";
                 formBuffer.append(
                     HtmlUtil.tableEntry(
-                        HtmlUtil.bold("Group:"), groupSelect));
+                        HtmlUtil.bold("Group:"), groupSelect+searchChildren));
             } else if (groups.size() == 1) {
                 formBuffer.append(HtmlUtil.hidden(ARG_GROUP,
                         groups.get(0).getFullName()));
                 formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Group:"),
-                        groups.get(0).getFullName()));
+                        groups.get(0).getFullName() + searchChildren));
             }
         }
         formBuffer.append("\n");
@@ -618,7 +630,7 @@ public class TypeHandler implements Constants, Tables {
      */
     protected List assembleWhereClause(Request request) throws Exception {
         List   where = new ArrayList();
-        String name  = (String) request.getString(ARG_NAME,"").trim();
+
 
         String tag = (String) request.getString(ARG_TAG,(String)null);
         if (tag != null) {
@@ -708,11 +720,17 @@ public class TypeHandler implements Constants, Tables {
             where.add(SqlUtil.le(COL_ENTRIES_CREATEDATE,createDate));
         }
 
+        String name  = (String) request.getString(ARG_NAME,"").trim();
         if ((name != null) && (name.length() > 0)) {
-            addOr(COL_ENTRIES_NAME, name, where, true);
-            addOr(COL_ENTRIES_DESCRIPTION, name, where, true);
+            List ors = new ArrayList();
+            ors.add(SqlUtil.makeOrSplit(COL_ENTRIES_NAME, name, true));
+            ors.add(SqlUtil.makeOrSplit(COL_ENTRIES_DESCRIPTION, name, true));
+            if(request.get(ARG_SEARCHMETADATA, false)) {
+                ors.add(SqlUtil.makeOrSplit(COL_METADATA_CONTENT, name, true));
+            }
+            where.add("(" + StringUtil.join(" OR ", ors) +")");
         }
-
+        //        System.err.println("where:" + where);
         return where;
     }
 

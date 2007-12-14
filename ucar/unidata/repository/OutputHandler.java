@@ -83,10 +83,10 @@ import java.util.zip.*;
 public class OutputHandler implements Constants, Tables {
 
     /** _more_ */
-    public static final String OUTPUT_HTML = "html";
+    public static final String OUTPUT_HTML = "default.html";
 
     /** _more_          */
-    public static final String OUTPUT_ZIP = "zip";
+    public static final String OUTPUT_ZIP = "default.zip";
 
 
 

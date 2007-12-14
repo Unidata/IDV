@@ -85,7 +85,7 @@ public class CatalogOutputHandler extends OutputHandler {
     public static final String CATALOG_ATTRS = " xmlns=\"http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" ";
 
     /** _more_          */
-    public static final String OUTPUT_CATALOG = "catalog";
+    public static final String OUTPUT_CATALOG = "thredds.catalog";
 
 
 

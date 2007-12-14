@@ -168,7 +168,7 @@ public class GenericTypeHandler extends TypeHandler {
                                                SqlUtil.distinct(column),
                                                where);
 
-        String[]     products  = SqlUtil.readString(statement, 1);
+        String[]     values  = SqlUtil.readString(statement, 1);
         StringBuffer sb        = new StringBuffer();
         String output = request.getOutput();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
@@ -184,25 +184,20 @@ public class GenericTypeHandler extends TypeHandler {
                     + output);
         }
 
-        for (int i = 0; i < products.length; i++) {
-            String longName = repository.getLongName(products[i]);
+        for (int i = 0; i < values.length; i++) {
+            String longName = theColumn.getLabel(values[i]);
             if (output.equals(OutputHandler.OUTPUT_HTML)) {
                 sb.append("<li>");
-                if(longName.equals(products[i])) {
-                    sb.append(longName);
-                }  else {
-                    sb.append(longName + " ("
-                          + products[i] + ")");
-                }
+                sb.append(longName);
             } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {
                 sb.append(
                     XmlUtil.tag(
                         tag,
                         XmlUtil.attrs(
-                            ATTR_ID, products[i], ATTR_NAME,
+                            ATTR_ID, values[i], ATTR_NAME,
                             longName)));
             } else if (output.equals(DefaultOutputHandler.OUTPUT_CSV)) {
-                sb.append(SqlUtil.comma(products[i],
+                sb.append(SqlUtil.comma(values[i],
                                         longName));
                 sb.append("\n");
             }

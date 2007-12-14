@@ -139,6 +139,7 @@ public class Repository implements Constants, Tables, RequestHandler {
     /** _more_          */
     private Hashtable<String, User> userMap = new Hashtable<String, User>();
 
+
     List<String>  entryDefFiles;
     List<String>  apiDefFiles;
     List<String>  outputDefFiles;
@@ -584,6 +585,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         if (results.getInt(1) == 0) {
             System.err.println("Adding test data");
             loadTestFiles();
+            loadModelFiles();
             loadSatelliteFiles();
             loadLevel3RadarFiles();
             loadLevel2RadarFiles();
@@ -1133,7 +1135,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         typeHandler.addToSearchForm(sb, headerBuffer, request, where);
 
 
-        sb.append(HtmlUtil.tableEntry("", HtmlUtil.submit("Search","submit")));
+        sb.append(HtmlUtil.tableEntry("", HtmlUtil.submit("Search","submit") +" " + HtmlUtil.submit("Search Subset","submit_subset")));
         sb.append("<table>");
         sb.append("</form>");
         headerBuffer.append(sb.toString());
@@ -2329,6 +2331,27 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
 
+    private Hashtable namesHolder = new Hashtable();
+
+
+    protected String getFieldDescription(String fieldValue, String namesFile) throws Exception {
+        if(namesFile == null) return getLongName(fieldValue);
+        Properties names = (Properties) namesHolder.get(namesFile);
+        if(names == null) {
+            try {
+                names  = new Properties();
+                InputStream s = IOUtil.getInputStream(namesFile, getClass());
+                names.load(s);
+                namesHolder.put(namesFile, names);
+            } catch (Exception exc) {
+                System.err.println("err:" + exc);
+                throw exc;
+            }
+        }
+        return (String) names.get(fieldValue);
+    }
+
+
 
     /**
      * _more_
@@ -2460,6 +2483,11 @@ public class Repository implements Constants, Tables, RequestHandler {
     public Result processQuery(Request request) throws Exception {
         //        System.err.println("submit:" + request.getString("submit","YYY"));
         if(request.defined("submit_type.x")) {
+            //            System.err.println("request:" + request.getString("submit_type.x","XXX"));
+            request.remove(ARG_OUTPUT);
+            return processSearchForm(request);
+        }
+        if(request.defined("submit_subset")) {
             //            System.err.println("request:" + request.getString("submit_type.x","XXX"));
             request.remove(ARG_OUTPUT);
             return processSearchForm(request);
@@ -2692,7 +2720,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      *
      * @throws Exception _more_
      */
-    public void loadModelFiles() throws Exception {
+    public void  loadModelFiles() throws Exception {
         File rootDir = new File("/data/ldm/gempak/model");
         TypeHandler typeHandler = getTypeHandler("model");
         List<Entry> entries = harvester.collectModelFiles(rootDir, "IDD/Model",typeHandler);

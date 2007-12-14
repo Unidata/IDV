@@ -205,6 +205,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_NAME = "name";
 
+    public static final String ARG_SEARCHMETADATA = "searchmetadata";
     /** _more_ */
     public static final String ARG_ID = "id";
     public static final String ARG_IDS = "ids";

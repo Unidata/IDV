@@ -84,22 +84,20 @@ public class DefaultOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final String OUTPUT_XML = "xml";
+    public static final String OUTPUT_XML = "default.xml";
 
     /** _more_ */
-    public static final String OUTPUT_TIMELINE = "timeline";
+    public static final String OUTPUT_TIMELINE = "default.timeline";
 
 
     /** _more_ */
-    public static final String OUTPUT_CSV = "csv";
+    public static final String OUTPUT_CSV = "default.csv";
 
     /** _more_ */
-    public static final String OUTPUT_GRAPH = "graph";
+    public static final String OUTPUT_GRAPH = "default.graph";
 
     /** _more_ */
-    public static final String OUTPUT_CLOUD = "cloud";
-
-
+    public static final String OUTPUT_CLOUD = "default.cloud";
 
 
 

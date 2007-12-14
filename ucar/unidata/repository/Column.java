@@ -93,6 +93,7 @@ public class Column implements Tables, Constants {
 
     /** _more_          */
     private static final String ATTR_NAME = "name";
+    private static final String ATTR_NAMES = "names";
 
     /** _more_          */
     private static final String ATTR_LABEL = "label";
@@ -175,6 +176,8 @@ public class Column implements Tables, Constants {
     /** _more_          */
     private int columns = 40;
 
+    private String namesFile;
+
     /**
      * _more_
      *
@@ -187,6 +190,8 @@ public class Column implements Tables, Constants {
         label      = XmlUtil.getAttribute(element, ATTR_LABEL, name);
         searchType = XmlUtil.getAttribute(element, ATTR_SEARCHTYPE,
                                           searchType);
+        namesFile =XmlUtil.getAttribute(element, ATTR_NAMES,(String)null);
+
         description  = XmlUtil.getAttribute(element, ATTR_DESCRIPTION, label);
         type         = XmlUtil.getAttribute(element, ATTR_TYPE);
         dflt         = XmlUtil.getAttribute(element, ATTR_DEFAULT, "");
@@ -419,16 +424,17 @@ public class Column implements Tables, Constants {
                 String[] values = SqlUtil.readString(stmt, 1);
                 long t3  = System.currentTimeMillis();
                 //                System.err.println("TIME:" + (t2-t1) + " " + (t3-t2));
-                List list = new ArrayList();
+                List<TwoFacedObject> list = new ArrayList();
                 for (int i = 0; i < values.length; i++) {
                     if(values[i] == null) continue;
-                    list.add(
-                             new TwoFacedObject(
-                                                typeHandler.getRepository().getLongName(values[i]),
-                                                values[i]));
+                    list.add(new TwoFacedObject(getLabel(values[i]), values[i]));
                 }
-                list.add(0, TypeHandler.ALL_OBJECT);
-                widget =  HtmlUtil.select(getFullName(), list);
+                if(list.size()==1) {
+                    widget =  HtmlUtil.hidden(getFullName(), (String)list.get(0).getId()) + " " +list.get(0).toString();
+                } else {
+                    list.add(0, TypeHandler.ALL_OBJECT);
+                    widget =  HtmlUtil.select(getFullName(), list);
+                }
             } else if (rows > 1) {
                 widget = HtmlUtil.textArea(getFullName(), "", rows, columns);
             } else {
@@ -440,6 +446,18 @@ public class Column implements Tables, Constants {
         formBuffer.append("\n");
     }
 
+
+    protected String getLabel(String value) throws Exception {
+        String desc = typeHandler.getRepository().getFieldDescription(value,namesFile);
+        if(desc == null) desc = value;
+        else {
+            if(desc.indexOf("%value%")>=0) {
+                desc = desc.replace("%value%", value);
+            } 
+        }
+        return desc;
+        
+    }
 
     /**
      * _more_
