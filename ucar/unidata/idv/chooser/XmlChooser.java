@@ -252,7 +252,6 @@ public class XmlChooser extends IdvChooser implements ActionListener {
         if(sizeY>75) {
             sizeY = 24;
         }
-        System.err.println ("size:" + sizeY);
         urlBox.setPreferredSize(new Dimension(200,sizeY));
 
         // top panel
