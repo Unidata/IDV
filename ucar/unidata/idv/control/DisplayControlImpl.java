@@ -3380,6 +3380,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public DisplayableData getDisplayListDisplayable(ViewManager view) {
         DisplayableData displayListDisplayable = null;
+        if (displayListTable == null) return null;  // in process of removing ?
         try {
             displayListDisplayable =
                 (DisplayableData) displayListTable.get(view);

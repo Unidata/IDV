@@ -392,6 +392,7 @@ example:
     class="ucar.unidata.idv.control.FlowPlanViewControl" 
     description="Streamlines over topography" 
     label="Streamlines Over Topography" 
+    doeslevels="true"
     code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
     displaycategory="3D Surface"
     properties="streamlines=true;windbarbs=true;displayName=Streamlines Over Topography;multipleIsTopography=true" />
@@ -465,6 +466,7 @@ example:
      categories="GRID-2D-*;GRID-3D-*"
      class="ucar.unidata.idv.control.ContourPlanViewControl"
      description="Plan view contour plot on topography"
+     doeslevels="true"
      icon="/ucar/unidata/idv/images/planview.png"
      label="Contour Plan View Over Topography"
      code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
@@ -479,6 +481,7 @@ example:
      class="ucar.unidata.idv.control.ContourPlanViewControl"
      description="Color-filled contour plan view on topography"
      label="Color-Filled Contour Plan View Over Topography"
+     doeslevels="true"
      code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
      displaycategory="3D Surface"
      properties="displayName=Color-Filled Contour Plan View Over Topography;colorFill=true;multipleIsTopography=true">
@@ -489,6 +492,7 @@ example:
      id="planviewcoloroverz"
      categories="GRID-2D-*;GRID-3D-*"
      class="ucar.unidata.idv.control.ColorPlanViewControl"
+     doeslevels="true"
      description="Plan view color-shaded image on topography"
      label="Color-Shaded Plan View Over Topography"
      code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"

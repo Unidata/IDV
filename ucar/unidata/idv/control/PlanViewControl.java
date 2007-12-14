@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -172,16 +173,43 @@ public abstract class PlanViewControl extends GridDisplayControl {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected Data getCursorReadoutData() throws Exception {
-        return  currentSlice;
+        return currentSlice;
     }
 
-    protected List getCursorReadoutInner(EarthLocation el, Real animationValue, int animationStep) throws Exception {
-        if(currentSlice==null) {return null;}
+    /**
+     * _more_
+     *
+     * @param el _more_
+     * @param animationValue _more_
+     * @param animationStep _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List getCursorReadoutInner(EarthLocation el,
+                                         Real animationValue,
+                                         int animationStep)
+            throws Exception {
+        if (currentSlice == null) {
+            return null;
+        }
         List result = new ArrayList();
-        Real r = GridUtil.sampleToReal(currentSlice, el, animationValue);
-        if(r!=null && !r.isMissing()) {
-            result.add("<tr><td>" + getMenuLabel()+":</td><td width=\"60\" align=\"right\">" +formatForCursorReadout(r)+(currentLevel!=null?("@" + currentLevel):"") +"</td></tr>");
+        Real r      = GridUtil.sampleToReal(currentSlice, el, animationValue);
+        if ((r != null) && !r.isMissing()) {
+            result.add("<tr><td>" + getMenuLabel()
+                       + ":</td><td width=\"60\" align=\"right\">"
+                       + formatForCursorReadout(r) + ((currentLevel != null)
+                    ? ("@" + currentLevel)
+                    : "") + "</td></tr>");
         }
         return result;
     }
@@ -219,17 +247,23 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     public void addToRangeMenu(final RangeWidget rw, List items) {
         super.addToRangeMenu(rw, items);
-        final Range r = getLevelColorRange();
-        if (r == null) {
-            return;
-        }
-        JMenuItem mi = new JMenuItem("From Displayed Data");
-        items.add(mi);
-        mi.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                rw.setRangeDialog(convertColorRange(r));
+        try {
+            if ((workingGrid != null) && GridUtil.isVolume(workingGrid)) {
+                final Range r = getLevelColorRange();
+                if (r == null) {
+                    return;
+                }
+                JMenuItem mi = new JMenuItem("From Displayed Data");
+                items.add(mi);
+                mi.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        rw.setRangeDialog(convertColorRange(r));
+                    }
+                });
             }
-        });
+        } catch (Exception exc) {
+            logException("addToRangeMenu", exc);
+        }
     }
 
     /**
@@ -917,11 +951,13 @@ public abstract class PlanViewControl extends GridDisplayControl {
             } else {
                 // only one level?  - can we get here?
                 //                System.out.println("PlanViewControl: only one level?");
+                Trace.msg("got here");
                 currentSlice = workingGrid;
             }
         } else {  // 2D grid or requested slice
             currentSlice = workingGrid;
-            if (GridUtil.is3D(currentSlice) && !displayIs3D) {
+            if (GridUtil.is3D(currentSlice) && 
+                (!displayIs3D || getMultipleIsTopography())) {
                 currentSlice = GridUtil.make2DGridFromSlice(currentSlice);
             }
         }
