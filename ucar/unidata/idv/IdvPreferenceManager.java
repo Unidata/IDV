@@ -998,7 +998,6 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
         List formatComps = new ArrayList();
 
-
         GuiUtils.tmpInsets = new Insets(0, 5, 0, 5);
         JPanel datePanel = GuiUtils.doLayout(new Component[] {
                                new JLabel("Pattern:"),
@@ -1058,8 +1057,6 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         widgets.put(PREF_DISTANCEUNIT, unitBox);
 
 
-
-
         formatComps.add(GuiUtils.rLabel("Distance Unit:"));
         formatComps.add(GuiUtils.left(unitBox));
 
@@ -1081,8 +1078,9 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         JTextField cacheSizeFld =
             new JTextField(Misc.format(getStore().get(PREF_CACHESIZE, 20.0)),
                            5);
-        List cacheComps = Misc.newList(new JLabel("   Disk Cache Size: "),
-                                       cacheSizeFld, new JLabel(" (MB)"));
+        List cacheComps =
+            Misc.newList(new JLabel("   Disk Cache Size: "), cacheSizeFld,
+                         new JLabel(" (MB)  (for temporary files"));
         widgets.put(PREF_CACHESIZE, cacheSizeFld);
         formatComps.add(GuiUtils.left(cacheCbx));
         formatComps.add(GuiUtils.filler());
