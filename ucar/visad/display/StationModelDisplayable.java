@@ -1439,8 +1439,11 @@ public class StationModelDisplayable extends DisplayableData {
     public void setScale(float newScale)
             throws VisADException, RemoteException {
         if ((shapeControl != null) && (newScale != scale)) {
-            //            System.err.println("setScale:" + newScale);
+            //We set auto scale false here so the shape control 
+            //clears out its controllistener which was keeping around the old initial scale
+            shapeControl.setAutoScale(false);
             shapeControl.setScale(newScale);
+            shapeControl.setAutoScale(true);
         }
         scale = newScale;
     }
