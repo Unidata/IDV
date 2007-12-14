@@ -76,7 +76,7 @@ A { text-decoration: none }
 
 a.navlink {
   color:#ffffff;
-  font-size: 14pt;
+  font-size: 12pt;
   font-weight: bold;
 }
 
@@ -89,7 +89,7 @@ a.navlink {
 .nav {
    margin:0;
    font-family: Arial, Helvetica, sans-serif;
-   font-size: 13pt;
+   font-size: 12pt;
    border-bottom : 1px #666666 solid;
    background-color : #77aa77;
    padding-top:1;

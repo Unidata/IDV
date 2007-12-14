@@ -107,18 +107,6 @@ public interface Constants {
     public static final String TAG_METHOD = "method";
 
     /** _more_          */
-    public static final String ATTR_API_REQUEST = "request";
-
-    /** _more_          */
-    public static final String ATTR_API_METHOD = "method";
-
-    /** _more_          */
-    public static final String ATTR_API_ADMIN = "admin";
-
-    /** _more_          */
-    public static final String ATTR_API_CANCACHE = "cancache";
-
-    /** _more_          */
     public static final String ATTR_RSS_VERSION = "version";
 
     /** _more_          */

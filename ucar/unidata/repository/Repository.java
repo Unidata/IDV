@@ -85,7 +85,7 @@ import java.util.zip.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Repository implements Constants, Tables {
+public class Repository implements Constants, Tables, RequestHandler {
 
 
     /** _more_          */
@@ -299,10 +299,11 @@ public class Repository implements Constants, Tables {
 
 
     /** _more_          */
-    List api = new ArrayList();
+    Hashtable<String,ApiMethod> requestMap = new Hashtable();
+    ApiMethod homeApi; 
+    ArrayList<ApiMethod> apiMethods = new ArrayList();
+    ArrayList<ApiMethod> topLevelMethods = new ArrayList();
 
-    /** _more_          */
-    Hashtable requestMap = new Hashtable();
 
     /**
      * _more_
@@ -312,20 +313,55 @@ public class Repository implements Constants, Tables {
      * @param permission _more_
      * @param canCache _more_
      */
-    protected void addRequest(String request, String methodName,
-                              Permission permission, boolean canCache) {
+    protected void addRequest(Element node) throws Exception {
+
+        String  request = XmlUtil.getAttribute(node, ApiMethod.ATTR_REQUEST);
+        String  methodName  = XmlUtil.getAttribute(node, ApiMethod.ATTR_METHOD);
+        boolean admin = XmlUtil.getAttribute(node, ApiMethod.ATTR_ADMIN, true);
+
+        Permission permission = new Permission(admin);
+
+        RequestHandler handler = this;
+        if(XmlUtil.hasAttribute(node, ApiMethod.ATTR_HANDLER)) {
+            Class c = Misc.findClass(XmlUtil.getAttribute(node, ApiMethod.ATTR_HANDLER));
+            Constructor ctor = Misc.findConstructor(c,
+                                                    new Class[] { Repository.class,Element.class});
+            handler = (RequestHandler) ctor.newInstance(new Object[]{this,node});
+        }
+
+        String url = getUrlBase() + request;
+        ApiMethod oldMethod = requestMap.get(url);
+        if(oldMethod!=null) {
+            requestMap.remove(url);
+        }
+
+
         Class[] paramTypes = new Class[] { Request.class };
-        Method  method = Misc.findMethod(getClass(), methodName, paramTypes);
+        Method  method = Misc.findMethod(handler.getClass(), methodName, paramTypes);
         if (method == null) {
             throw new IllegalArgumentException("Unknown request method:"
                     + methodName);
         }
-        ApiMethod apiMethod = new ApiMethod(request, permission, method,
-                                            canCache);
-        api.add(apiMethod);
-        //        requestMap.put(request, apiMethod);
-        requestMap.put(getUrlBase() + request, apiMethod);
+        ApiMethod apiMethod = new ApiMethod(handler,
+                                            request, 
+                                            XmlUtil.getAttribute(node, ApiMethod.ATTR_NAME,request),
+                                            permission, 
+                                            method,
+                                            XmlUtil.getAttribute(node, ApiMethod.ATTR_CANCACHE, false),
+                                            XmlUtil.getAttribute(node, ApiMethod.ATTR_TOPLEVEL,false));
+        if(XmlUtil.getAttribute(node, ApiMethod.ATTR_ISHOME,false)) {
+            homeApi = apiMethod;
+        }
+        requestMap.put(url, apiMethod);
+        if(oldMethod!=null) {
+            int index = apiMethods.indexOf(oldMethod);
+            apiMethods.remove(index);
+            apiMethods.add(index, apiMethod);
+        }  else {
+            apiMethods.add(apiMethod);
+        }
     }
+
 
     /**
      * _more_
@@ -338,14 +374,16 @@ public class Repository implements Constants, Tables {
             List children = XmlUtil.findChildren(apiRoot, TAG_METHOD);
             for (int i = 0; i < children.size(); i++) {
                 Element node    = (Element) children.get(i);
-                String  request = XmlUtil.getAttribute(node, ATTR_API_REQUEST);
-                String  method  = XmlUtil.getAttribute(node, ATTR_API_METHOD);
-                boolean admin = XmlUtil.getAttribute(node, ATTR_API_ADMIN, true);
-                boolean canCache = XmlUtil.getAttribute(node, ATTR_API_CANCACHE,
-                                                        false);
-                addRequest(request, method, new Permission(admin), canCache);
+                addRequest(node);
             }
         }
+        for (ApiMethod apiMethod: apiMethods) {
+            if(apiMethod.getIsTopLevel()) {
+                topLevelMethods.add(apiMethod);
+            }
+        }
+
+
     }
 
 
@@ -396,8 +434,7 @@ public class Repository implements Constants, Tables {
         ApiMethod apiMethod = (ApiMethod) requestMap.get(incoming);
         if (apiMethod == null) {
             incoming = incoming;
-            for (int i = 0; i < api.size(); i++) {
-                ApiMethod tmp  = (ApiMethod) api.get(i);
+            for (ApiMethod tmp: apiMethods) {
                 String    path = tmp.getRequest();
                 if (path.endsWith("/*")) {
                     path = path.substring(0, path.length() - 2);
@@ -408,6 +445,9 @@ public class Repository implements Constants, Tables {
                     }
                 }
             }
+        }
+        if(apiMethod == null && incoming.equals(getUrlBase())) {
+            apiMethod = homeApi;
         }
         Result result = null;
         if (apiMethod != null) {
@@ -430,8 +470,7 @@ public class Repository implements Constants, Tables {
                             "No Database",
                             new StringBuffer("Database is shutdown"));
                     } else {
-                        result = (Result) apiMethod.getMethod().invoke(this,
-                                new Object[] { request });
+                        result = (Result) apiMethod.invoke(request);
                     }
                 }
             }
@@ -1048,6 +1087,9 @@ public class Repository implements Constants, Tables {
 
         sb.append(HtmlUtil.form(href(HtmlUtil.url("/query", "name",WHAT_ENTRIES))));
 
+        //Put in an empty submit button so when the user presses return 
+        //it acts like a regular submit (not a submit to change the type)
+        sb.append(HtmlUtil.submitImage(getUrlBase()+ "/blank.gif","submit"));
         TypeHandler typeHandler = getTypeHandler(request);
 
         String      what        = (String) request.getWhat("");
@@ -1091,7 +1133,7 @@ public class Repository implements Constants, Tables {
         typeHandler.addToSearchForm(sb, headerBuffer, request, where);
 
 
-        sb.append(HtmlUtil.tableEntry("", HtmlUtil.submit("Search")));
+        sb.append(HtmlUtil.tableEntry("", HtmlUtil.submit("Search","submit")));
         sb.append("<table>");
         sb.append("</form>");
         headerBuffer.append(sb.toString());
@@ -1176,15 +1218,16 @@ public class Repository implements Constants, Tables {
     protected List getNavLinks(Request request) {
         List links = new ArrayList();
         String extra = " class=navlink ";
-        links.add(href("/showgroup", "Groups", extra));
-        links.add(href("/searchform", "Search", extra));
-        links.add(href("/list/home", "List", extra));
+        boolean isAdmin = false;
         if(request!=null) {
             RequestContext context = request.getRequestContext();
             User           user    = context.getUser();
-            if (user.getAdmin()) {
-                links.add(href("/admin/home", "Admin", extra));
-            }
+            isAdmin = user.getAdmin();
+        }
+
+        for(ApiMethod apiMethod: topLevelMethods) {
+            if(apiMethod.getPermission().getMustBeAdmin() && !isAdmin) continue;
+            links.add(href(apiMethod.getRequest(), apiMethod.getName(), extra));
         }
         return links;
     }
@@ -1639,6 +1682,31 @@ public class Repository implements Constants, Tables {
             }
 
             sb.append(getEntryNodeXml(request,results));
+            List<Association> associations = getAssociations(request, id);
+            for(Association association: associations) {
+                Entry other = null;
+                boolean isTail=true;
+                if(association.getFromId().equals(id)) {
+                    other = getEntry(association.getToId(),request);
+                    isTail=true;
+                } else {
+                    other = getEntry(association.getFromId(),request);
+                    isTail=false;
+                }
+                    
+                if(other!=null) {
+                    sb.append(XmlUtil.tag(TAG_NODE,
+                                          XmlUtil.attrs(ATTR_TYPE, other.getTypeHandler().getNodeType(), ATTR_ID,
+                                                        other.getId(), ATTR_TITLE, other.getName())));
+                    sb.append(XmlUtil.tag(TAG_EDGE,
+                                          XmlUtil.attrs(ATTR_TYPE, "association",
+                                                        ATTR_FROM, (isTail?id:other.getId()),
+                                                        ATTR_TO, (isTail?other.getId():id))));
+                }
+            }
+            
+
+
             Group group = findGroup(results.getString(4));
             sb.append(XmlUtil.tag(TAG_NODE,
                                   XmlUtil.attrs(ATTR_TYPE, NODETYPE_GROUP, ATTR_ID,
@@ -2194,6 +2262,7 @@ public class Repository implements Constants, Tables {
                 baseId++;
             }
             //            System.err.println ("made id:" + newId);
+            //            System.err.println ("last name" + lastName);
             execute(INSERT_GROUPS, new Object[] { newId, ((parent != null)
                     ? parent.getId()
                     : null), lastName, lastName });
@@ -2320,20 +2389,42 @@ public class Repository implements Constants, Tables {
     }
 
 
+    protected String getEntryUrl(Entry entry) {
+        return href(HtmlUtil.url("/showentry", ARG_ID, entry.getId()),
+                    entry.getName());
+    }
+
+    protected List<Association> getAssociations(Request request, String entryId) throws Exception {
+        String query = SqlUtil.makeSelect(COLUMNS_ASSOCIATIONS,
+                                             Misc.newList(TABLE_ASSOCIATIONS),
+                                             SqlUtil.eq(COL_ASSOCIATIONS_FROM_ENTRY_ID,
+                                                        SqlUtil.quote(entryId))+" OR " +
+                                             SqlUtil.eq(COL_ASSOCIATIONS_TO_ENTRY_ID,
+                                                        SqlUtil.quote(entryId)));
+        List<Association> associations = new ArrayList();
+        SqlUtil.Iterator iter = SqlUtil.getIterator(execute(query));
+        ResultSet        results;
+        while ((results = iter.next()) != null) {
+                while (results.next()) {
+                    associations.add(new Association(results.getString(1),
+                                                     results.getString(2),
+                                                     results.getString(3)));
+                }
+        }
+        return associations;
+    }
+
+
+
     protected String getAssociationLinks(Request request, String association)
-            throws Exception {
+        throws Exception {
+        if(true) return "";
         String search =
             href(HtmlUtil.url("/searchform", ARG_ASSOCIATION,
                               java.net.URLEncoder.encode(association,
                                   "UTF-8")), HtmlUtil.img(urlBase
                                       + "/Search16.gif", "Search in association"));
 
-        if (isAppletEnabled(request)) {
-            search += href(HtmlUtil.url("/graphview", ARG_ID, association,
-                                        ARG_NODETYPE,
-                                        TYPE_ASSOCIATION), HtmlUtil.img(urlBase + "/tree.gif",
-                                                                "Show association in graph"));
-        }
         return search;
     }
 
@@ -2367,7 +2458,9 @@ public class Repository implements Constants, Tables {
      * @throws Exception _more_
      */
     public Result processQuery(Request request) throws Exception {
+        //        System.err.println("submit:" + request.getString("submit","YYY"));
         if(request.defined("submit_type.x")) {
+            //            System.err.println("request:" + request.getString("submit_type.x","XXX"));
             request.remove(ARG_OUTPUT);
             return processSearchForm(request);
         }
@@ -2417,6 +2510,22 @@ public class Repository implements Constants, Tables {
     }
 
 
+    public void insertMetadata(Group group, String type,String name,  String content) throws Exception {
+        insertMetadata(new Metadata(group.getId(), Metadata.IDTYPE_GROUP,type,name,content));
+    } 
+
+    public void insertMetadata(Metadata metadata) throws Exception {
+        PreparedStatement metadataInsert =
+            connection.prepareStatement(INSERT_METADATA);
+        int col=1;
+        metadataInsert.setString(col++, metadata.getId());
+        metadataInsert.setString(col++, metadata.getIdType());
+        metadataInsert.setString(col++, metadata.getMetadataType());
+        metadataInsert.setString(col++, metadata.getName());
+        metadataInsert.setString(col++, metadata.getContent());
+        metadataInsert.execute();
+    }
+
     public void insertEntries(TypeHandler typeHandler, List<Entry> entries) throws Exception {
         if(entries.size() == 0) return;
         System.err.println("Inserting:" + entries.size() + " " + typeHandler.getType()+" entries");
@@ -2441,7 +2550,6 @@ public class Repository implements Constants, Tables {
                                    + ((int) (cnt / tseconds)) + "/s");
             }
             String id = getGUID();
-            entry.setId(id);
             setStatement(entry, entryInsert);
             entryInsert.addBatch();
 
@@ -2468,6 +2576,9 @@ public class Repository implements Constants, Tables {
                     typeInsert.executeBatch();
                 }
                 batchCnt = 0;
+            }
+            for(Metadata metadata: entry.getMetadata()) {
+                insertMetadata(metadata);
             }
         }
         if (batchCnt > 0) {
@@ -2626,6 +2737,40 @@ public class Repository implements Constants, Tables {
         //        System.err.println ("dirs:" + dirs.size());
         //        Misc.run(this,"listen", dirs);
         insertEntries(typeHandler,entries);
+        Hashtable javaFiles = new Hashtable();
+        for(Entry entry: entries) {
+            if(entry.getFile().endsWith(".java")) {
+                javaFiles.put(entry.getFile(), entry);
+            }
+        }
+        PreparedStatement associationInsert =
+            connection.prepareStatement(INSERT_ASSOCIATIONS);
+        for(Entry entry: entries) {
+            String f =entry.getFile();
+            if(f.endsWith(".class")) {
+                int idx = f.indexOf("$");
+                if(idx>=0) {
+                    f = f.substring(0,idx)+".java";
+                } else {
+                    idx = f.indexOf(".class");
+                    f = f.substring(0,idx)+".java";
+                }
+                Entry javaEntry = (Entry) javaFiles.get(f);
+                if(javaEntry==null) {
+                    //                    System.err.println ("??:" + f);                    
+                } else {
+                    int col=1;
+                    associationInsert.setString(col++,"compiledfrom");
+                    associationInsert.setString(col++,javaEntry.getId());
+                    associationInsert.setString(col++,entry.getId());
+                    associationInsert.execute();
+                }
+            }
+            
+        }
+        
+
+
     }
 
     public void listen(List<FileInfo> dirs) {
@@ -2652,16 +2797,50 @@ public class Repository implements Constants, Tables {
     public void loadLevel3RadarFiles() throws Exception {
         File rootDir = new File("/data/ldm/gempak/nexrad/NIDS");
         TypeHandler typeHandler = getTypeHandler("level3radar");
-
+        Group group = findGroupFromName("IDD/Level3",true);
         List<Entry> entries=null;
         if(rootDir.exists()) {
-            entries =  harvester.collectLevel3RadarFiles(rootDir, "IDD/Level3",
+            entries =  harvester.collectLevel3RadarFiles(rootDir, group,
                                               typeHandler);
         } else {
-            entries = harvester.collectDummyLevel3RadarFiles(rootDir, "IDD/Level3",
+            entries = harvester.collectDummyLevel3RadarFiles(rootDir, group,
                                               typeHandler);
         }
         insertEntries(typeHandler, entries);
+        insertMetadata(group,Metadata.TYPE_HTML,"description", "A description of level3 radar files");
+        insertMetadata(group,Metadata.TYPE_LINK,"link", "A link to level 3");
+    }
+
+    public List<Metadata> getMetadata(Group group) throws Exception {
+        return getMetadata(group.getId(), Metadata.IDTYPE_GROUP);
+    }
+
+    public List<Metadata> getMetadata(Entry entry) throws Exception {
+        return getMetadata(entry.getId(), Metadata.IDTYPE_ENTRY);
+    }
+
+    public List<Metadata> getMetadata(String id,String type) throws Exception {
+        String query = SqlUtil.makeSelect(COLUMNS_METADATA,
+                                          Misc.newList(TABLE_METADATA),
+                                          SqlUtil.makeAnd(Misc.newList(
+                                                                       SqlUtil.eq(COL_METADATA_ID,SqlUtil.quote(id)),
+                                                                       SqlUtil.eq(COL_METADATA_ID_TYPE,SqlUtil.quote(type)))));
+
+        System.err.println("query: " + query);
+        SqlUtil.Iterator iter = SqlUtil.getIterator(execute(query));
+        ResultSet        results;
+        List<Metadata> metadata = new ArrayList();
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                int col = 1;
+                metadata.add(new Metadata(results.getString(col++),
+                             results.getString(col++),
+                             results.getString(col++),
+                             results.getString(col++),
+                             results.getString(col++)));
+            }
+        }
+        return metadata;
     }
 
 

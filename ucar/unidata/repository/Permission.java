@@ -132,6 +132,24 @@ public class Permission {
         return true;
     }
 
+/**
+Set the MustBeAdmin property.
+
+@param value The new value for MustBeAdmin
+**/
+public void setMustBeAdmin (boolean value) {
+	mustBeAdmin = value;
+}
+
+/**
+Get the MustBeAdmin property.
+
+@return The MustBeAdmin
+**/
+public boolean getMustBeAdmin () {
+	return mustBeAdmin;
+}
+
 
 
 }

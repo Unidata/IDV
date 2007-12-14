@@ -151,7 +151,7 @@ public class OutputHandler implements Constants, Tables {
         return null;
     }
 
-    protected String[] getBreadCrumbs(Request request, Group group) throws Exception {
+    protected String[] getBreadCrumbs(Request request, Group group, boolean makeLinkForLastGroup) throws Exception {
         List  breadcrumbs = new ArrayList();
         List  titleList   = new ArrayList();
         Group parent      = group.getParent();
@@ -164,8 +164,13 @@ public class OutputHandler implements Constants, Tables {
         }
         breadcrumbs.add(0, repository.href("/showgroup", "Top"));
         titleList.add(group.getName());
-        breadcrumbs.add(HtmlUtil.bold(group.getName()) + "&nbsp;"
-                        + getGroupLinks(request, group));
+        if(makeLinkForLastGroup) {
+            breadcrumbs.add(repository.href(HtmlUtil.url("/showgroup", ARG_GROUP,
+                                                         group.getFullName(),ARG_OUTPUT,output),group.getName()));
+        } else {
+            breadcrumbs.add(HtmlUtil.bold(group.getName()) + "&nbsp;"
+                            + getGroupLinks(request, group));
+        }
         String title = "Group: "
             + StringUtil.join("&nbsp;&gt;&nbsp;", titleList);
         return new String[]{title, StringUtil.join("&nbsp;&gt;&nbsp;", breadcrumbs)};

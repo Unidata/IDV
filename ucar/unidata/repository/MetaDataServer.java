@@ -163,7 +163,7 @@ public class MetaDataServer extends HttpServer implements Constants {
                 formArgs = SqlUtil.cleanUpArguments(formArgs);
                 try {
                     User           user    = repository.findUser("jdoe");
-                    //                    User           user    = repository.findUser("anonymous");
+                    //user    = repository.findUser("anonymous");
                     RequestContext context = new RequestContext(user);
                     Request        request = new Request(repository,path, context, formArgs);
                     if(user==null) {

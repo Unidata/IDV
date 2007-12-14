@@ -144,6 +144,26 @@ public interface Tables {
 
 
 
+    public static final String TABLE_METADATA = "metadata";
+    public static final String COL_METADATA_ID = TABLE_METADATA + ".id";
+    public static final String COL_METADATA_ID_TYPE = TABLE_METADATA + ".id_type";
+    public static final String COL_METADATA_TYPE = TABLE_METADATA + ".type";
+    public static final String COL_METADATA_NAME = TABLE_METADATA + ".name";
+    public static final String COL_METADATA_CONTENT = TABLE_METADATA + ".content";
+    public static final String []ARRAY_METADATA = new String[]{COL_METADATA_ID,
+                                                               COL_METADATA_ID_TYPE,
+                                                               COL_METADATA_TYPE,
+                                                               COL_METADATA_NAME,
+                                                               COL_METADATA_CONTENT};
+
+    public static final String COLUMNS_METADATA = SqlUtil.comma(ARRAY_METADATA);
+    public static final String INSERT_METADATA =
+        SqlUtil.makeInsert(
+            TABLE_METADATA,
+            COLUMNS_METADATA, 
+            SqlUtil.getQuestionMarks(ARRAY_METADATA.length));
+
+
     /** _more_ */
     public static final String TABLE_GROUPS = "groups";
     public static final String COL_GROUPS_ID = TABLE_GROUPS + ".id";

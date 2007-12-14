@@ -2,6 +2,7 @@
 <graph>
 
     <edgetype name="groupedby" arrow="-6" />       
+    <edgetype name="association" arrow="6" width="3" color="#449944" />       
     <edgetype name="taggedby" arrow="-6" color="blue"/>       
     <edgetype name="etc" arrow="-6" color="red"/>       
 

@@ -653,9 +653,23 @@ public class DefaultOutputHandler extends OutputHandler {
             //xxxxx
             //            appendListHeader(request, output, WHAT_GROUP, sb);
             sb.append("<p>\n");
-            String[] crumbs = getBreadCrumbs(request, group);
+            String[] crumbs = getBreadCrumbs(request, group,false);
             title = crumbs[0];
             sb.append(HtmlUtil.bold("Group: ")+ crumbs[1]);
+            List<Metadata> metadataList = repository.getMetadata(group);
+            if(metadataList.size()>0) {
+                sb.append("<p>");
+                sb.append(HtmlUtil.bold("Metadata:"));
+                sb.append("<ul>");
+                for(Metadata metadata:  metadataList) {
+                    sb.append("<li>");
+                    sb.append(metadata.getName());
+                    sb.append("<br>");
+                    sb.append(metadata.getContent());
+                }
+            }
+
+
             //            sb.append("<hr>");
             sb.append("<p>");
             if (subGroups.size() > 0) {

@@ -198,7 +198,7 @@ public class TypeHandler implements Constants, Tables {
             sb.append(getInnerEntryContent(entry, request, output));
             sb.append("</table>\n");
             if(tags.length>0) {
-                sb.append("<h3>Tags</h3><ul>\n");
+                sb.append("<b>Tags</b><ul>\n");
                 for(int i=0;i<tags.length;i++) {
                     sb.append("<li> ");
                     sb.append(repository.getTagLinks(request, tags[i]));
@@ -206,6 +206,59 @@ public class TypeHandler implements Constants, Tables {
                 }
                 sb.append("</ul>\n");
             }
+
+
+
+            List<Metadata> metadataList = repository.getMetadata(entry);
+            if(metadataList.size()>0) {
+                sb.append("<p>");
+                sb.append(HtmlUtil.bold("Metadata:"));
+                sb.append("<ul>");
+                for(Metadata metadata:  metadataList) {
+                    sb.append("<li>");
+                    if(metadata.getMetadataType().equals(Metadata.TYPE_LINK)) {
+                        sb.append(metadata.getName()+": ");
+                        sb.append(HtmlUtil.href(metadata.getContent(), metadata.getContent())); 
+                    } else {
+                        sb.append(metadata.getName());
+                        sb.append(" ");
+                        sb.append(metadata.getContent());
+                    }
+                }
+                sb.append("</ul>");
+            }
+
+
+
+            List<Association> associations = repository.getAssociations(request, entry.getId());
+            if(associations.size()>0) {
+                sb.append("<b>Associations</b><ul>\n");
+                for(Association association: associations) {
+                    Entry fromEntry=null;
+                    Entry toEntry=null;
+                    if(association.getFromId().equals(entry.getId())) {
+                        fromEntry = entry;
+                    } else {
+                        fromEntry = repository.getEntry(association.getFromId(),request);
+                    }
+                    if(association.getToId().equals(entry.getId())) {
+                        toEntry = entry;
+                    } else {
+                        toEntry = repository.getEntry(association.getToId(),request);
+                    }
+                    if(fromEntry == null || toEntry == null) continue;
+                    sb.append("<li>");
+                    sb.append ((fromEntry==entry?fromEntry.getName():repository.getEntryUrl(fromEntry)));
+                    sb.append("&nbsp;&nbsp;");
+                    sb.append(HtmlUtil.bold(association.getName()) +" " +
+                              HtmlUtil.img(repository.href("/Arrow16.gif")));
+                    sb.append("&nbsp;&nbsp;");
+                    sb.append ((toEntry==entry?toEntry.getName():repository.getEntryUrl(toEntry)));
+                }
+
+                sb.append("</ul>\n");
+            }
+
         } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {
         }
         else if (output.equals(DefaultOutputHandler.OUTPUT_CSV)) {
@@ -278,6 +331,12 @@ public class TypeHandler implements Constants, Tables {
                     entry.getName() + "&nbsp;" +
                     getEntryLinks(entry, request)));
 
+            String[] crumbs = repository.getOutputHandler(request).getBreadCrumbs(request, entry.getGroup(),true);
+            sb.append(
+                HtmlUtil.tableEntry(
+                    HtmlUtil.bold("Group:"),
+                    crumbs[1]));
+
             String desc = entry.getDescription();
             if(desc!=null && desc.length()>0) {
                 sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Description:"), desc));
@@ -301,6 +360,8 @@ public class TypeHandler implements Constants, Tables {
             }
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"),
                                           entry.getTypeHandler().getDescription()));
+
+
         } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {
         }
         else if (output.equals(DefaultOutputHandler.OUTPUT_CSV)) {

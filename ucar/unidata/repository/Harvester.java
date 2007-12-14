@@ -108,17 +108,16 @@ public class Harvester {
      * @throws Exception _more_
      */
     public List<Entry> collectDummyLevel3RadarFiles(File rootDir,
-                                                      String groupName, final TypeHandler typeHandler)
+                                                    Group topGroup, final TypeHandler typeHandler)
         throws Exception {
         List<Entry> entries = new ArrayList();
         long  baseTime    = repository.currentTime();
-        Group group = repository.findGroupFromName(groupName,true);
         User user = repository.findUser("jdoe");
         for (int stationIdx = 0; stationIdx < 50; stationIdx++) {
             String station = "station" + stationIdx;
             for (int productIdx = 0; productIdx < 10; productIdx++) {
                 String product = "product" + productIdx;
-                group = repository.findGroupFromName(groupName + "/"
+                Group group = repository.findGroupFromName(topGroup.getFullName() + "/"
                         + station + "/" + product,true);
                 for (int timeIdx = 0; timeIdx < 10; timeIdx++) {
                     long time =  baseTime + timeIdx * 1000 * 60*60;
@@ -154,7 +153,7 @@ public class Harvester {
      * @throws Exception _more_
      */
     public List<Entry> collectLevel3RadarFiles(File rootDir,
-            final String groupName, final TypeHandler typeHandler)
+            final Group topGroup, final TypeHandler typeHandler)
             throws Exception {
         long                         t1          = System.currentTimeMillis();
         final List<Entry> entries = new ArrayList();
@@ -176,7 +175,7 @@ public class Harvester {
                 }
                 String station = matcher.group(1);
                 String product = matcher.group(2);
-                Group group = repository.findGroupFromName(groupName + "/"
+                Group group = repository.findGroupFromName(topGroup.getFullName() + "/"
                                   + "NIDS" + "/" + station + "/" + product,true);
                 Date dttm = sdf.parse(matcher.group(3));
                 entries.add(new Entry(repository.getGUID(),
@@ -320,7 +319,7 @@ public class Harvester {
      * @throws Exception _more_
      */
     public List<Entry> collectFiles(File rootDir, final String rootGroup,
-                                           final TypeHandler typeHandler,
+                                    final TypeHandler typeHandler,
                                     final List<FileInfo> directories)
             throws Exception {
         final String      rootStr    = rootDir.toString();
@@ -356,6 +355,20 @@ public class Harvester {
                                                typeHandler, name, name, group,
                                                user, f.toString(),
                                                f.lastModified(),null);
+                if (name.endsWith(".java")) {
+                    String classPath = IOUtil.stripExtension(f.toString());
+                    classPath = classPath.replace("\\","/");
+                    int idx = classPath.indexOf("ucar/unidata");
+                    if(idx>=0) {
+                        classPath = classPath.substring(idx);
+                        String link = "http://www.unidata.ucar.edu/software/idv/docs/javadoc/" + classPath+".html";
+                        System.err.println ("class:" + classPath);
+                        entry.addMetadata(new Metadata(entry.getId(), Metadata.IDTYPE_ENTRY,Metadata.TYPE_LINK,"javadoc",link));
+                   }
+
+                    
+                }
+
                 String ext = IOUtil.getFileExtension(path);
                 if (ext.startsWith(".")) {
                     ext = ext.substring(1);

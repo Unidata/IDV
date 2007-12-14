@@ -34,11 +34,39 @@ import java.util.Hashtable;
 
 public class ApiMethod {
 
+
+    /** _more_          */
+    public static final String ATTR_REQUEST = "request";
+
+    public static final String ATTR_HANDLER = "handler";
+
+    public static final String ATTR_TOPLEVEL = "toplevel";
+
+    public static final String ATTR_NAME = "name";
+
+    /** _more_          */
+    public static final String ATTR_METHOD = "method";
+
+    /** _more_          */
+    public static final String ATTR_ADMIN = "admin";
+
+    /** _more_          */
+    public static final String ATTR_CANCACHE = "cancache";
+
+    public static final String ATTR_ISHOME = "ishome";
+
     /** _more_          */
     private String request;
 
     /** _more_          */
+    private String name;
+
+    private boolean isTopLevel = false;
+
+    /** _more_          */
     private Permission permission;
+
+    private RequestHandler requestHandler; 
 
     /** _more_          */
     private Method method;
@@ -54,13 +82,30 @@ public class ApiMethod {
      * @param method _more_
      * @param canCache _more_
      */
-    public ApiMethod(String request, Permission permission, Method method,
-                     boolean canCache) {
+    public ApiMethod(RequestHandler requestHandler,
+                     String request, 
+                     String name,
+                     Permission permission, Method method,
+                     boolean canCache,
+                     boolean isTopLevel) {
+        this.requestHandler = requestHandler;
         this.request    = request;
+        this.name = name;
         this.permission = permission;
         this.method     = method;
         this.canCache   = canCache;
+        this.isTopLevel   = isTopLevel;
     }
+
+    public String toString() {
+        return request;
+    }
+
+    public Result invoke(Request request) throws Exception {
+        return (Result) getMethod().invoke(requestHandler,
+                                           new Object[] { request });
+    }
+
 
     /**
      * Set the Request property.
@@ -137,6 +182,42 @@ public class ApiMethod {
         return canCache;
     }
 
+
+/**
+Set the Name property.
+
+@param value The new value for Name
+**/
+public void setName (String value) {
+	name = value;
+}
+
+/**
+Get the Name property.
+
+@return The Name
+**/
+public String getName () {
+	return name;
+}
+
+/**
+Set the IsTopLevel property.
+
+@param value The new value for IsTopLevel
+**/
+public void setIsTopLevel (boolean value) {
+	isTopLevel = value;
+}
+
+/**
+Get the IsTopLevel property.
+
+@return The IsTopLevel
+**/
+public boolean getIsTopLevel () {
+	return isTopLevel;
+}
 
 
 

@@ -53,7 +53,9 @@ public class Entry {
     /** _more_          */
     List<String> tags;
 
+    List<Association> associations = new ArrayList<Association>();
 
+    List<Metadata> metadata = new ArrayList<Metadata>();
 
 
     /** _more_ */
@@ -391,8 +393,6 @@ public class Entry {
     }
 
 
-
-
     /**
      * _more_
      *
@@ -403,6 +403,56 @@ public class Entry {
             tags = new ArrayList<String>();
         }
         tags.add(tag);
+
+    }
+
+/**
+Set the Metadata property.
+
+@param value The new value for Metadata
+**/
+public void setMetadata (List<Metadata> value) {
+	metadata = value;
+}
+
+/**
+Get the Metadata property.
+
+@return The Metadata
+**/
+public List<Metadata> getMetadata () {
+	return metadata;
+}
+
+    public void addMetadata(Metadata value) {
+        metadata.add(value);
+    }
+
+
+/**
+Set the Associations property.
+
+@param value The new value for Associations
+**/
+public void setAssociations (List<Association> value) {
+	associations = value;
+}
+
+/**
+Get the Associations property.
+
+@return The Associations
+**/
+public List<Association> getAssociations () {
+	return associations;
+}
+
+
+    public void addAssociation(Association value) {
+        if (associations == null) {
+            associations = new ArrayList<Association>();
+        }
+        associations.add(value);
 
     }
 
