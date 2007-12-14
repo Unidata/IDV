@@ -495,13 +495,17 @@ public class JythonShell extends InteractiveShell {
                 }
             }
             PythonInterpreter interp = getInterpreter();
+            startBufferingOutput();
             interp.exec(sb.toString());
+            endBufferingOutput();
         } catch (PyException pse) {
+            endBufferingOutput();
             output("<font color=\"red\">Error: " + pse.toString()
                    + "</font><br>");
         } catch (Exception exc) {
+            endBufferingOutput();
             output("<font color=\"red\">Error: " + exc + "</font><br>");
-        }
+        } 
     }
 
 

@@ -101,3 +101,64 @@ def makeDataSource(path,type=None):
         return idv.makeOneDataSource(path, type,None);
 
 
+def findDataSource(name=None):
+    """Find the data source object with the given name. If no name is given then this will return the first (non-formula)
+    data source"""
+    return idv.getDataManager().findDataSource(name);
+
+
+def getDataChoice(dataSourceName=None,dataChoiceName=None):
+    """Find the data source with the given name and the data choice on that data source with the given name.
+    If no dataSourceName is given then use the first one in the list
+    If no dataChoiceName is given then use the first one held by the data source
+    Return the data choice
+    If no data source or data choice is found then return null"""
+
+    dataSource=idv.getDataManager().findDataSource(dataSourceName);
+    if(dataSource == None):
+        return None;
+    return  dataSource.findDataChoice(dataChoiceName);
+
+
+def getData(dataSourceName=None,dataChoiceName=None):
+    """Find the data source with the given name and the data choice on that data source with the given name.
+    If no dataSourceName is given then use the first one in the list
+    If no dataChoiceName is given then use the first one held by the data source
+    Return the data for the data choice.
+    If no data source or data choice is found then return null"""
+    dataChoice = getDataChoice(dataSourceName, dataChoiceName);
+    if(dataChoice==None):
+        return None;
+    return dataChoice.getData(None);
+
+
+
+def setDataSources():
+    """This procedure will define a set of jython variables, 'dataSource0, dataSource1, ...'  that correspond to 
+    loaded data sources."""
+    dataSources  = idv.getDataSources();
+    for i in range(dataSources.size()):
+        dataSource = dataSources.get(i);
+        interpreter.set('dataSource'+str(i),dataSource);
+        shell.output('dataSource' + str(i) +'= ' +str(dataSource));
+        shell.output('<br>');
+         
+
+def setDataChoices(dataSource=None):
+    """The given dataSource can be an actual data source or the name of a data source.
+    This procedure will define a set of jython variables that correspond to the data choices
+    held by the given data source. """
+    if(dataSource==None):
+        dataSource = findDataSource();
+    if(dataSource == None):
+        return;
+    if(isinstance(dataSource,java.lang.String)==1):
+        dataSource = findDataSource(dataSource);
+    if(dataSource == None):
+        return;
+    choices  = dataSource.getDataChoices();
+    for i in range(choices.size()):
+        dataChoice  = choices.get(i)
+        interpreter.set(dataChoice.getName(), dataChoice);
+        shell.output(dataChoice.getName() + '=' +dataChoice.getDescription());
+        shell.output('<br>');
