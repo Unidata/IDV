@@ -436,7 +436,8 @@ public class SideLegend extends IdvLegend {
                 anyOn |= control.getDisplayVisibility();
             }
             //            System.err.println ("anyOn:" + anyOn + " toWhat:" + toWhat);
-            visCbx.setSelected(anyOn);
+            //Don't do this now.
+            //            visCbx.setSelected(anyOn);
             ignoreVisChanges = false;
         }
 
