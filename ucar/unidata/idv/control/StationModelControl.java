@@ -289,6 +289,7 @@ public class StationModelControl extends ObsDisplayControl {
     /** bounds of the display */
     private Rectangle2D lastViewBounds = null;
 
+    private boolean haveSetInitialScale = false;
 
     /** scale factor for the shapes */
     private float lastViewScale = -1.0f;
@@ -427,7 +428,6 @@ public class StationModelControl extends ObsDisplayControl {
         addDisplayable(timesHolder);
         lastViewBounds = null;
 
-        //        Misc.runInABit(2000, this,"setScaleOnDisplayable",null);
         setScaleOnDisplayable();
 
         getControlContext().getStationModelManager()
@@ -1546,6 +1546,10 @@ public class StationModelControl extends ObsDisplayControl {
             }
             //            Trace.startTrace();
 
+            if(!haveSetInitialScale)
+                setScaleOnDisplayable();
+            haveSetInitialScale = true;
+
             lastViewScale  = getScaleFromDisplayable();
             lastViewBounds = calculateRectangle();
             LinearLatLonSet llBounds = calculateLatLonBounds(lastViewBounds);
@@ -1845,7 +1849,6 @@ public class StationModelControl extends ObsDisplayControl {
      */
     public void setScaleOnDisplayable()
             throws RemoteException, VisADException {
-        System.err.println ("setScaleOnDisplayable: "+getDisplayScale());
         setScaleOnDisplayable(getDisplayScale() * displayableScale);
     }
 
