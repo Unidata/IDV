@@ -2009,19 +2009,32 @@ public class StationModelControl extends ObsDisplayControl {
                 PropertyFilter filter =
                     (PropertyFilter) filters.get(filterIdx);
                 String paramName = filter.getName();
-                int    dataIndex = -1;
-                for (int typeIdx = 0;
-                        (dataIndex == -1) && (typeIdx < typeNames.length);
-                        typeIdx++) {
-                    if (paramName.equals(typeNames[typeIdx])) {
-                        dataIndex = typeIdx;
+
+                Data dataElement = null;
+
+                if(paramName.equals(PointOb.PARAM_LAT)) {
+                    dataElement =ob.getEarthLocation().getLatitude();
+                } else if(paramName.equals(PointOb.PARAM_LON)) {
+                    dataElement =ob.getEarthLocation().getLongitude();
+                } else if(paramName.equals(PointOb.PARAM_ALT)) {
+                    dataElement =ob.getEarthLocation().getAltitude();
+                } else {
+                    int    dataIndex = -1;
+                    for (int typeIdx = 0;
+                         (dataIndex == -1) && (typeIdx < typeNames.length);
+                         typeIdx++) {
+                        if (paramName.equals(typeNames[typeIdx])) {
+                            dataIndex = typeIdx;
+                        }
                     }
+                    
+                    if (dataIndex < 0) {
+                        continue;
+                    }
+                    dataElement = tuple.getComponent(dataIndex);
                 }
 
-                if (dataIndex < 0) {
-                    continue;
-                }
-                Data dataElement = tuple.getComponent(dataIndex);
+                if(dataElement == null) continue;
                 if (dataElement.isMissing()) {
                     if (matchAll) {
                         ok = false;
@@ -2962,6 +2975,9 @@ public class StationModelControl extends ObsDisplayControl {
                 String typeName = Util.cleanTypeName(typeId);
                 names.add(new TwoFacedObject(typeName, typeId));
             }
+            names.add(new TwoFacedObject("Latitude", PointOb.PARAM_LAT));
+            names.add(new TwoFacedObject("Longitude", PointOb.PARAM_LON));
+            names.add(new TwoFacedObject("Altitude", PointOb.PARAM_ALT));
             return names;
         } catch (Exception exc) {
             logException("Getting filter names", exc);
