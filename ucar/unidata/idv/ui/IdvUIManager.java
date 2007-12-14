@@ -450,12 +450,6 @@ public class IdvUIManager extends IdvManager {
     /** The view panel */
     private ViewPanel viewPanel;
 
-    /** The control tabs */
-    private JTabbedPane legendTabs;
-
-    /** Maps ViewManager to the JComponent in the legend tab */
-    Hashtable legendTabMap = new Hashtable();
-
 
     /** the desktop pane */
     private JDesktopPane desktopPane;
@@ -766,9 +760,7 @@ public class IdvUIManager extends IdvManager {
 
 
     /**
-     * This gets called by the view manager to see if the uimanager should do
-     * something with the side legend, whether the side legend is embedded in some
-     * window.
+     * noop
      *
      * @param viewManager The view manager
      * @param sideLegend The side legend
@@ -781,21 +773,7 @@ public class IdvUIManager extends IdvManager {
         if (getArgsManager().getIsOffScreen()) {
             return false;
         }
-
-        if (legendTabs == null) {
-            return false;
-        }
-        JComponent wrapper;
-        JButton showBtn = GuiUtils.makeButton("Show Window", viewManager,
-                              "toFront");
-        wrapper = GuiUtils.topCenter(GuiUtils.left(GuiUtils.inset(showBtn,
-                2)), sideLegend);
-        wrapper = GuiUtils.left(wrapper);
-        legendTabMap.put(viewManager, wrapper);
-        legendTabs.add(getViewManagerTabLabel(viewManager, legendTabs),
-                       wrapper);
-        legendTabs.setSelectedIndex(legendTabs.getTabCount() - 1);
-        return true;
+        return false;
     }
 
 
@@ -827,12 +805,6 @@ public class IdvUIManager extends IdvManager {
         if (getViewPanel() != null) {
             getViewPanel().viewManagerDestroyed(viewManager);
         }
-
-        JComponent wrapper = (JComponent) legendTabMap.get(viewManager);
-        if ((wrapper != null) && (legendTabs != null)) {
-            legendTabMap.remove(viewManager);
-            legendTabs.remove(wrapper);
-        }
     }
 
 
@@ -861,14 +833,6 @@ public class IdvUIManager extends IdvManager {
         if (getViewPanel() != null) {
             getViewPanel().viewManagerChanged(viewManager);
         }
-
-        JComponent wrapper = (JComponent) legendTabMap.get(viewManager);
-        if ((wrapper != null) && (legendTabs != null)) {
-            legendTabs.setTitleAt(legendTabs.indexOfComponent(wrapper),
-                                  getViewManagerTabLabel(viewManager,
-                                      legendTabs));
-        }
-
     }
 
 
