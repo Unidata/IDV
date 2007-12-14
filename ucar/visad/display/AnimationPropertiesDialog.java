@@ -1010,7 +1010,7 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
                     && (Misc.getPrototypeManager() != null)) {
                 Misc.getPrototypeManager().writePrototype(myInfo);
             }
-            animationWidget.applyProperties(myInfo, true);
+            animationWidget.applyProperties(myInfo, false);
         }
 
         if (cmd.equals(GuiUtils.CMD_OK) || cmd.equals(GuiUtils.CMD_CANCEL)) {
