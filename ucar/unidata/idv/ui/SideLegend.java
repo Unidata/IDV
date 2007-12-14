@@ -66,6 +66,8 @@ import javax.swing.event.*;
 
 public class SideLegend extends IdvLegend {
 
+
+
     /** This holds the display control legends */
     private JPanel legendsPanel;
 
@@ -111,16 +113,13 @@ public class SideLegend extends IdvLegend {
         legendsPanel = new JPanel();
         legendsPanel.setLayout(new BorderLayout());
         JLabel displaysLbl = GuiUtils.cLabel("Legend");
-
         Font   font        = displaysLbl.getFont();
         displaysLbl.setFont(font.deriveFont(font.getSize()
                                             + 3.0f).deriveFont(Font.BOLD));
-        JComponent floatComp = ((getContainer() == null)
-                                ? (JComponent) new JPanel()
-                                : (JComponent) getFloatButton());
+
+        JComponent floatComp  = getFloatButton();
         JComponent outerPanel =
-            GuiUtils.topCenter(GuiUtils.leftCenter(GuiUtils.inset(floatComp,
-                2), displaysLbl), legendsPanel);
+            GuiUtils.topCenter(GuiUtils.centerRight(displaysLbl,floatComp), legendsPanel);
         JScrollPane scroller =
             new JScrollPane(
                 outerPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,

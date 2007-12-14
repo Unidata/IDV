@@ -58,6 +58,14 @@ import javax.swing.event.*;
 
 public abstract class IdvLegend {
 
+    public static final String STATE_HIDDEN = "hidden";
+    public static final String STATE_DOCKED = "docked";
+    public static final String STATE_FLOAT  = "float";
+
+
+    public static final ImageIcon  ICON_FLOAT = GuiUtils.getImageIcon("/auxdata/ui/icons/Export16.gif");
+    public static final ImageIcon  ICON_DOCKED = GuiUtils.getImageIcon("/auxdata/ui/icons/Import16.gif");
+
     /** The icon used to bring up the display properties window */
     protected static ImageIcon ICON_PROPERTIES;
 
@@ -82,17 +90,17 @@ public abstract class IdvLegend {
     /** This is the main GUI contents */
     private JComponent contents;
 
-    /** Is this legend currently floating */
-    private boolean amFloating = false;
-
     /** The button used to float/embed this legend */
     private JButton floatBtn;
 
     /** If floating, this is the window we are floating in */
-    private JFrame legendFloatFrame;
+    private JFrame floatFrame;
 
     /** Are we active or has the ViewManager we are part of  been closed */
     private boolean closed = false;
+
+
+    private Point lastLocation = new Point(20,20);
 
 
     /**
@@ -175,33 +183,22 @@ public abstract class IdvLegend {
     protected JButton getFloatButton() {
         if (floatBtn == null) {
             floatBtn =
-                GuiUtils.getImageButton("/ucar/unidata/idv/images/float.gif",
+                GuiUtils.getImageButton("/auxdata/ui/icons/Export16.gif",
                                         getClass());
             setFloatToolTip();
             floatBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
-                    toggleFloat();
+                    if(floatFrame!=null) {
+                        viewManager.setLegendState(IdvLegend.this,STATE_DOCKED);
+                    } else {
+                        viewManager.setLegendState(IdvLegend.this,STATE_FLOAT);
+                    }
                 }
             });
         }
         return floatBtn;
     }
 
-    /**
-     * Float or embed this legend in its own window.
-     */
-    public void toggleFloat() {
-        if (closed) {
-            return;
-        }
-        amFloating = !amFloating;
-        setFloatToolTip();
-        if (amFloating) {
-            floatLegend(floatBtn.getLocationOnScreen());
-        } else {
-            embedLegend();
-        }
-    }
 
     /**
      * This will float the legend.
@@ -210,15 +207,13 @@ public abstract class IdvLegend {
         if (closed) {
             return;
         }
-        if ( !amFloating) {
-            amFloating = true;
-            setFloatToolTip();
-            floatLegend(new Point(20, 20));
-        } else if (legendFloatFrame != null) {
-            legendFloatFrame.setState(Frame.NORMAL);
-            legendFloatFrame.show();
-
+        if (floatFrame == null) {
+            floatLegend();
+        } else if (floatFrame != null) {
+            floatFrame.setState(Frame.NORMAL);
+            floatFrame.show();
         }
+        setFloatToolTip();
     }
 
     /**
@@ -227,9 +222,11 @@ public abstract class IdvLegend {
      */
     private void setFloatToolTip() {
         if (floatBtn != null) {
-            if (amFloating) {
+            if (floatFrame!=null) {
+                floatBtn.setIcon(ICON_DOCKED);
                 floatBtn.setToolTipText("Embed the legend");
             } else {
+                floatBtn.setIcon(ICON_FLOAT);
                 floatBtn.setToolTipText("Float the legend");
             }
         }
@@ -245,6 +242,7 @@ public abstract class IdvLegend {
 
     /** For synchronizing when filling the legend */
     private Object MUTEX = new Object();
+
 
     /**
      *  This is called when there is a change to the list of DisplayControls shown in this legend.
@@ -292,21 +290,15 @@ public abstract class IdvLegend {
         return propertiesBtn;
     }
 
-
-
-
-
-
-
     /**
      *  The ViewManager in which thie legend is a part of has been closed.
      *  This method disposes of the floatFrame if it is non-null.
      */
     public void doClose() {
         closed = true;
-        if (legendFloatFrame != null) {
-            legendFloatFrame.dispose();
-            legendFloatFrame = null;
+        if (floatFrame != null) {
+            floatFrame.dispose();
+            floatFrame = null;
         }
     }
 
@@ -321,37 +313,36 @@ public abstract class IdvLegend {
     }
 
 
+    public void unFloatLegend() {
+        if(floatFrame!=null) {
+            lastLocation = floatFrame.getLocation();
+            floatFrame.dispose();
+            floatFrame = null;
+            setFloatToolTip();
+        }
+    }
+
+
     /**
      * Float the legend in its own window.
      *
      * @param windowLoc Where to show the window.
      */
-    protected void floatLegend(Point windowLoc) {
-        legendFloatFrame = GuiUtils.createFrame(getTitle());
-        legendFloatFrame.addWindowListener(new WindowAdapter() {
+    public void floatLegend() {
+        floatFrame = GuiUtils.createFrame(getTitle());
+        floatFrame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                toggleFloat();
+                lastLocation = floatFrame.getLocation();
+                viewManager.setLegendState(IdvLegend.this,STATE_HIDDEN);
+                floatFrame = null;
             }
         });
-        legendFloatFrame.getContentPane().add(getContents());
-        legendFloatFrame.pack();
-        if (windowLoc != null) {
-            legendFloatFrame.setLocation(windowLoc);
-        }
-        legendFloatFrame.show();
+        floatFrame.getContentPane().add(getContents());
+        floatFrame.pack();
+        floatFrame.setLocation(lastLocation);
+        floatFrame.show();
+        setFloatToolTip();
     }
-
-    /**
-     * Embed the legend back into its view manager. Dispose of the legendFloatFrame.
-     */
-    protected void embedLegend() {
-        viewManager.embedLegend(this);
-        legendFloatFrame.dispose();
-        legendFloatFrame = null;
-    }
-
-
-
 
 
 }

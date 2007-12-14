@@ -318,13 +318,18 @@ public class ViewManager extends SharableImpl implements ActionListener,
     private boolean hasWindow = false;
 
     /** List of {@link IdvLegend}s */
-    private List legends = new ArrayList();
+    private List<IdvLegend> legends = new ArrayList();
 
     /** The side legend */
     private SideLegend sideLegend;
 
+    private boolean canShowSideLegend = true;
+
     /** This holds the side legend */
     private JComponent sideLegendComponent;
+
+    private String legendState = IdvLegend.STATE_DOCKED;
+
 
     /** flag for where the legend is */
     private boolean legendOnLeft = false;
@@ -779,6 +784,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** _more_          */
     JPanel contentsWrapper;
 
+    JComponent centerPanel;
+    JComponent centerPanelWrapper;
+
+
+
     /**
      * _more_
      *
@@ -843,7 +853,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         Component topBar = GuiUtils.leftCenterRight(GuiUtils.bottom(menuBar),
                                GuiUtils.bottom(nameLabel), topRight);
-        JComponent centerPanel = GuiUtils.topCenter(topBar, contentsWrapper);
+        centerPanel = GuiUtils.topCenter(topBar, contentsWrapper);
         if (getShowBottomLegend()) {
             IdvLegend bottomLegend = new BottomLegend(this);
             legends.add(bottomLegend);
@@ -860,10 +870,31 @@ public class ViewManager extends SharableImpl implements ActionListener,
             sideLegend = new SideLegend(this);
         }
         legends.add(sideLegend);
-        JComponent contents = sideLegend.getContents();
-        sideLegendComponent = getSideComponent(contents);
-        if ( !getIdvUIManager().handleSideLegend(this, sideLegendComponent)
-                && getShowSideLegend() && showControlLegend) {
+        JComponent legendContents = sideLegend.getContents();
+        sideLegendComponent = getSideComponent(legendContents);
+        canShowSideLegend = !getIdvUIManager().handleSideLegend(this, sideLegendComponent)
+            && getShowSideLegend();
+        //        if (canShowSideLegend  && showControlLegend) {
+        //        }
+
+        centerPanelWrapper = new JPanel(new BorderLayout());
+        fullContents = GuiUtils.leftCenter(leftNav, centerPanelWrapper);
+        fullContents.setBorder(getContentsBorder());
+        insertSideLegend();
+        fillLegends();
+    }
+
+
+    public  void  setSideLegendPosition(String state) {
+        legendState = state;
+        insertSideLegend();
+    }
+
+
+    protected void  insertSideLegend() {
+        centerPanelWrapper.removeAll();
+        if(legendState.equals(IdvLegend.STATE_DOCKED)) {
+            sideLegend.unFloatLegend();
             JComponent leftComp  = (legendOnLeft
                                     ? sideLegendComponent
                                     : centerPanel);
@@ -889,12 +920,17 @@ public class ViewManager extends SharableImpl implements ActionListener,
             }
             sideLegendContainer.setOneTouchExpandable(true);
             sideLegend.setTheContainer(sideLegendContainer);
-            centerPanel = sideLegendContainer;
+            centerPanelWrapper.add(BorderLayout.CENTER, sideLegendContainer); 
+        } else if(legendState.equals(IdvLegend.STATE_FLOAT)) {
+            sideLegend.floatLegend();
+            centerPanelWrapper.add(BorderLayout.CENTER, centerPanel); 
+        } else if(legendState.equals(IdvLegend.STATE_HIDDEN)) {
+            sideLegend.unFloatLegend();
+            centerPanelWrapper.add(BorderLayout.CENTER, centerPanel); 
         }
-        fullContents = GuiUtils.leftCenter(leftNav, centerPanel);
-        fullContents.setBorder(getContentsBorder());
-        fillLegends();
+
     }
+
 
     /**
      * _more_
@@ -2254,31 +2290,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
-
-    /**
-     * Embed the given legend back into the GUI. We only
-     * embed the side legend. This needs to be generalized some more
-     * as we support other kinds of legends.
-     *
-     * @param theLegend The legend component to embed
-     */
-    public void embedLegend(IdvLegend theLegend) {
-        JComponent legendComp = theLegend.getContents();
-        if (theLegend instanceof SideLegend) {
-            JSplitPane container = (JSplitPane) theLegend.getContainer();
-            if (container != null) {
-                if (legendOnLeft) {
-                    container.setLeftComponent(legendComp);
-                    container.setDividerLocation(0.25);
-                } else {
-                    container.setRightComponent(legendComp);
-                    container.setDividerLocation(0.75);
-                }
-                legendComp.invalidate();
-                container.validate();
-            }
-        }
+    public void setLegendState(IdvLegend legend, String state) {
+        legendState = state;
+        insertSideLegend();
     }
+
 
 
     /**
@@ -2419,8 +2435,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (legends == null) {
             return;
         }
-        for (int i = 0; i < legends.size(); i++) {
-            ((IdvLegend) legends.get(i)).doClose();
+        for (IdvLegend legend: legends) {
+            legend.doClose();
         }
     }
 
@@ -2429,14 +2445,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * Show (float) all legends
      */
     public void showLegend() {
-        if (getIdv().getIdvUIManager().embedLegendInDashboard()) {
-            if (sideLegendComponent != null) {
-                GuiUtils.showComponentInTabs(sideLegendComponent);
-            }
-        } else {
-            for (int i = 0; i < legends.size(); i++) {
-                ((IdvLegend) legends.get(i)).showLegend();
-            }
+        for (IdvLegend legend: legends) {
+            legend.showLegend();
         }
     }
 
@@ -3031,6 +3041,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public void setShowControlLegend(boolean b) {
         showControlLegend = b;
+        if(showControlLegend) legendState = IdvLegend.STATE_DOCKED;
+        else legendState = IdvLegend.STATE_HIDDEN;
     }
 
     /**
@@ -3041,6 +3053,26 @@ public class ViewManager extends SharableImpl implements ActionListener,
     public boolean getShowControlLegend() {
         return showControlLegend;
     }
+
+/**
+Set the LegendState property.
+
+@param value The new value for LegendState
+**/
+public void setLegendState (String value) {
+	legendState = value;
+}
+
+/**
+Get the LegendState property.
+
+@return The LegendState
+**/
+public String getLegendState () {
+	return legendState;
+}
+
+
 
     /**
      * Create and return the menu bar.
@@ -3123,8 +3155,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (legends == null) {
             return;
         }
-        for (int i = 0; i < legends.size(); i++) {
-            ((IdvLegend) legends.get(i)).setColors(foreground, background);
+        for (IdvLegend legend: legends) {
+            legend.setColors(foreground, background);
         }
     }
 
@@ -3227,8 +3259,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
         fillLegendsPending = false;
         updateDisplayList();
         synchronized (LEGENDMUTEX) {
-            for (int i = 0; i < legends.size(); i++) {
-                ((IdvLegend) legends.get(i)).fillLegend();
+            for (IdvLegend legend: legends) {
+                legend.fillLegend();
             }
         }
     }
@@ -3247,8 +3279,15 @@ public class ViewManager extends SharableImpl implements ActionListener,
         boolean   didone   = false;
         int       cnt      = 0;
         if (getShowSideLegend()) {
-            displayMenu.add(GuiUtils.makeMenuItem("Legend", this,
-                    "showLegend"));
+            if(!legendState.equals(IdvLegend.STATE_HIDDEN)) 
+                displayMenu.add(GuiUtils.makeMenuItem("Hide Legend", this,
+                                                      "setSideLegendPosition",IdvLegend.STATE_HIDDEN));
+            if(!legendState.equals(IdvLegend.STATE_DOCKED)) 
+                displayMenu.add(GuiUtils.makeMenuItem("Embed Legend", this,
+                                                      "setSideLegendPosition",IdvLegend.STATE_DOCKED));
+            if(!legendState.equals(IdvLegend.STATE_FLOAT)) 
+                displayMenu.add(GuiUtils.makeMenuItem("Float Legend", this,
+                                                      "setSideLegendPosition",IdvLegend.STATE_FLOAT));
             displayMenu.addSeparator();
         }
 
