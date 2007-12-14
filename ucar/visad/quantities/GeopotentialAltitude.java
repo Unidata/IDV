@@ -272,11 +272,13 @@ public final class GeopotentialAltitude extends ScalarQuantity {
                                       boolean copy) throws VisADException,
                                           RemoteException {
 
-        System.arraycopy(geoUnit.toThat(geoAlts,
-                                        getGeopotentialUnit(altUnit,
-                                            gravity), copy), 0, altitudes, 0,
-                                                geoAlts.length);
-
+        altitudes = geoUnit.toThat(geoAlts, 
+                                   getGeopotentialUnit(altUnit, gravity), 
+                                   copy);
+        double gVal = gravity.getValue();
+        for (int i = 0; i < altitudes.length; i++) {
+            altitudes[i] /= gVal;
+        }
         return altitudes;
     }
 
@@ -328,11 +330,13 @@ public final class GeopotentialAltitude extends ScalarQuantity {
                                      boolean copy) throws VisADException,
                                          RemoteException {
 
-        System.arraycopy(geoUnit.toThat(geoAlts,
-                                        getGeopotentialUnit(altUnit,
-                                            gravity), copy), 0, altitudes, 0,
-                                                geoAlts.length);
-
+        altitudes = geoUnit.toThat(geoAlts, 
+                                   getGeopotentialUnit(altUnit, gravity), 
+                                   copy);
+        float gVal = (float) gravity.getValue();
+        for (int i = 0; i < altitudes.length; i++) {
+            altitudes[i] /= gVal;
+        }
         return altitudes;
     }
 
