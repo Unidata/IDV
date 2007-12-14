@@ -913,6 +913,11 @@ public class GeoGridAdapter {
                         false);
                 vtu = CommonUnit.meter;
             }
+            /*
+            for (int i = 0; i < 10; i++) {
+                System.out.println("vals["+i+"] = " + refVals[2][i]);
+            }
+            */
 
 
             int[]  lengths        = domainSet.getLengths();
