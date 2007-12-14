@@ -194,12 +194,11 @@ public class AnimationSetInfo {
         double     endSeconds   = 0.0;
         double[][] dataTimeSet  = null;
 
-        //        System.err.println ("makeTimeSet");
-        if (displayMaster!=null && (startMode == TIMEMODE_DATA || endMode == TIMEMODE_DATA)) {
-            Set timeSet = (baseTimes!=null?baseTimes:displayMaster.getAnimationSetFromDisplayables());
-            if (timeSet != null) {
-                dataTimeSet = timeSet.getDoubles();
-            }
+        //        System.err.println ("makeTimeSet " + baseTimes + " " + displayMaster);
+        if ((startMode == TIMEMODE_DATA || endMode == TIMEMODE_DATA)) {
+            Set timeSet = (baseTimes!=null?baseTimes:(displayMaster!=null?displayMaster.getAnimationSetFromDisplayables():null));
+            if(timeSet == null) return null;
+            dataTimeSet = timeSet.getDoubles();
             if ((dataTimeSet == null) || (dataTimeSet.length == 0)
                     || (dataTimeSet[0].length == 0)) {
                 //                System.err.println ("\tdata is null");
