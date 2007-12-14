@@ -169,7 +169,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     private List relativePaths;
 
     /** List of associated DataChoices */
-    protected List dataChoices = null;
+    protected List<DataChoice> dataChoices = null;
 
     /** The descriptor for this DataSource */
     private DataSourceDescriptor descriptor;
@@ -1464,6 +1464,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
+
+
     /**
      * Search through the list of DataChoice-s and return the
      * DataChoice object whose id equals the given id parameter.
@@ -1475,8 +1477,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @return  the DataChoice which has id or <code>null</code>
      */
     public DataChoice findDataChoice(Object id) {
+        if(id == null) id = "#0";
         String asString = id.toString();
-        List   choices  = getDataChoices();
+        List<DataChoice>   choices  = getDataChoices();
         if (asString.startsWith("#")) {
             try {
                 int index = new Integer(asString.substring(1)).intValue();
@@ -1487,16 +1490,14 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         }
 
         //First check if the choice.id equals the given id
-        for (int i = 0; i < choices.size(); i++) {
-            DataChoice choice = (DataChoice) choices.get(i);
+        for (DataChoice choice: choices) {
             if (choice.getId().equals(id)) {
                 return choice.cloneMe();
             }
         }
 
         //Now check the toString
-        for (int i = 0; i < choices.size(); i++) {
-            DataChoice choice = (DataChoice) choices.get(i);
+        for (DataChoice choice: choices) {
             if (choice.toString().equals(asString)) {
                 return choice;
             }
@@ -1506,10 +1507,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         }
 
         //Now check for aliases
-        for (int i = 0; i < choices.size(); i++) {
-            DataChoice choice = (DataChoice) choices.get(i);
+        for (DataChoice choice: choices) {
             String canonical =
-                DataAlias.aliasToCanonical(choice.getId().toString());
+                DataAlias.aliasToCanonical(choice.getName().toString());
             if ((canonical != null)
                     && canonical.toLowerCase().equals(
                         asString.toLowerCase())) {
@@ -1520,10 +1520,15 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
         if (id instanceof String) {
             String sid = id.toString();
+            boolean isRegexp =false;
             if (sid.startsWith("pattern:")) {
+                isRegexp = true;
                 sid = sid.substring(8);
-                for (int i = 0; i < choices.size(); i++) {
-                    DataChoice choice = (DataChoice) choices.get(i);
+            } else {
+                isRegexp = StringUtil.containsRegExp(sid);
+            }
+            if(isRegexp) {
+                for (DataChoice choice: choices) {
                     if (StringUtil.stringMatch(choice.getDescription(), sid,
                             true, false)) {
                         return choice;

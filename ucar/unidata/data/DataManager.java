@@ -199,7 +199,7 @@ public class DataManager {
     /**
      * The list of {@link  DataSource}s currently active within the idv.
      */
-    private ArrayList dataSources = new ArrayList();
+    private ArrayList<DataSource> dataSources = new ArrayList();
 
     /**
      * The list of {@link DataSourceDescriptor}s defined by the datasource.xml
@@ -1022,6 +1022,26 @@ public class DataManager {
         for (int i = 0; i < dataSources.size(); i++) {
             dataSource = (DataSource) dataSources.get(i);
             if (dataSource.identifiedBy(definingObject)) {
+                return dataSource;
+            }
+        }
+        return null;
+    }
+
+
+
+    public DataSource findDataSource(String name) {
+        if(name == null) name = "#0";
+        if(name.startsWith("#")) {
+            int index = new Integer(name.substring(1).trim()).intValue();
+            if(index>=0 && index< dataSources.size()) {
+                return dataSources.get(index);
+            }
+            return null;
+        }
+
+        for (DataSource dataSource: dataSources) {
+            if (dataSource.identifiedBy(name)) {
                 return dataSource;
             }
         }
