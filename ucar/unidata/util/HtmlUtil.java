@@ -144,6 +144,14 @@ public class HtmlUtil {
         return "<a href=\"" + url + "\"" + " " + extra+">" + label +"</a>";
     }
 
+    public static String submitImage(String img,String name) {
+        return "<input " +XmlUtil.attrs("name", name, "border","0", "src",img) +
+            XmlUtil.attrs("type","image") +
+            " >";
+
+    }
+
+
     public static String submitImage(String img,String name,String alt) {
         return "<input " +XmlUtil.attrs("name", name, "border","0", "src",img) +
             XmlUtil.attrs("title", alt, "alt", alt,"type","image") +

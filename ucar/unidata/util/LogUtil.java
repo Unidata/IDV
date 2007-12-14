@@ -486,6 +486,9 @@ public class LogUtil {
                 inner = innerInner;
             }
         }
+        if (inner== null) {
+            return exc;
+        }
         return inner;
     }
 
