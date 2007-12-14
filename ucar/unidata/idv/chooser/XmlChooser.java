@@ -247,8 +247,13 @@ public class XmlChooser extends IdvChooser implements ActionListener {
                 catListListener, true);
 
 
-        urlBox.setPreferredSize(new Dimension(200,
-                urlBox.getPreferredSize().height));
+        int sizeY =  urlBox.getPreferredSize().height;
+        //A hack to fix the huge combobox problem
+        if(sizeY>75) {
+            sizeY = 24;
+        }
+        System.err.println ("size:" + sizeY);
+        urlBox.setPreferredSize(new Dimension(200,sizeY));
 
         // top panel
         JButton browseButton = new JButton("Select File...");
