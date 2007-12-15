@@ -53,8 +53,10 @@ import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.data.CachedFlatField;
 
+import java.util.TimeZone;
 
 import visad.*;
+import visad.data.text.TextAdapter;
 
 import visad.VisADException;
 
@@ -316,6 +318,33 @@ public class DataManager {
         String defaultBoundingBoxString =
             dataContext.getIdv().getProperty(PROP_GEOSUBSET_BBOX,
                                              (String) null);
+
+        TextAdapter.addDateParser(new TextAdapter.DateParser() {
+                public DateTime createDateTime(String value, String format, TimeZone timezone) throws VisADException {
+                    if(format.endsWith("dh1") || format.endsWith("dh2") || format.endsWith("dh3") || format.endsWith("dh4")) {
+                        int len=new Integer(format.substring(format.length()-1)).intValue();
+                        value = value.trim();
+                        int idx = value.lastIndexOf(" ");
+                        if(idx<0) idx=0;
+                        String dh = value.substring(idx+1);
+                        int ptIdx = dh.length()-len;
+                        dh = dh.substring(0,ptIdx)+"."+
+                            dh.substring(ptIdx);
+                        while(dh.length()>1 && dh.startsWith("0")) {
+                            dh = dh.substring(1);
+                        }
+                        double hours = new Double(dh);
+                        String HH = ""+(int) hours;
+                        String mm = ""+(int)(60*(hours-(int) hours));
+                        format = format.replace("dh"+ len, "HH:mm");
+                        String newValue  = value.trim().substring(0,idx+1) + HH+":"+mm;
+                        return visad.DateTime.createDateTime(newValue, format, timezone);
+                    }
+
+                    return null;
+                }
+            });
+
 
         if (defaultBoundingBoxString != null) {
             List toks = StringUtil.split(defaultBoundingBoxString, ",", true,
