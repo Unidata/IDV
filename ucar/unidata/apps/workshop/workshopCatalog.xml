@@ -3,11 +3,7 @@
 xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
 xmlns:xlink="http://www.w3.org/1999/xlink">
 
-<service name="grids" serviceType="Compound" base="">
-    <service name="ncdods" serviceType="OPENDAP" base="http://motherlode.ucar.edu:8080/thredds/dodsC/" />
-    <service name="HTTPServer" serviceType="HTTPServer" base="http://motherlode.ucar.edu:8080/thredds/fileServer/" /> 
-    <service name="subsetter" serviceType="NetcdfServer" base="http://motherlode.ucar.edu:8080/thredds/ncServer/" /> 
-</service>
+<service name="ncdods" serviceType="OPENDAP" base="http://motherlode.ucar.edu:8080/thredds/dodsC/" />
 
     <dataset name="Case Studies">
     <catalogRef xlink:title="Data for Comet Case Study 039" xlink:href="http://motherlode.ucar.edu:8080/thredds/catalog/casestudies/ccs039Catalog.xml"/>
@@ -27,10 +23,10 @@ xmlns:xlink="http://www.w3.org/1999/xlink">
             <serviceName>ncdods</serviceName>
         </dataset>
         <dataset name="Sample GFS 0.5 degree Global data" urlPath="casestudies/idvtest/grids/GFS_Global_0p5deg_20061101_1200.grib2" >
-            <serviceName>grids</serviceName>
+            <serviceName>ncdods</serviceName>
         </dataset>
         <dataset name="Sample 12 km CONUS NAM data" urlPath="casestudies/idvtest/grids/NAM_CONUS_12km_20061029_1200.grib2" >
-            <serviceName>grids</serviceName>
+            <serviceName>ncdods</serviceName>
         </dataset>
     </dataset>
 
