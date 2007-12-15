@@ -2153,7 +2153,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         if (copyComps.size() > 0) {
             copyComps.add(
                 0, new JLabel(
-                    "Which remote data sources should be copied over and included"));
+                    "Which remote data sources should be copied over and included?"));
             comps.add(GuiUtils.vbox(copyComps));
         }
 
@@ -2164,7 +2164,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             comps.add(
                 GuiUtils
                     .vbox(new JLabel(
-                        "Which local data sources should be included"), GuiUtils
+                        "Which local data sources should be included?"), GuiUtils
                             .doLayout(
                                 fileComps, 2, GuiUtils.WT_NY,
                                 GuiUtils.WT_N)));
@@ -2604,7 +2604,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                     JComponent contents =
                         GuiUtils
                             .vbox(GuiUtils
-                                .inset(new JLabel("Where should the data files be written to"),
+                                .inset(new JLabel("Where should the data files be written to?"),
                                        5), tmpBtn,
                                            GuiUtils.hbox(dirBtn, dirComp),
                                            GuiUtils
