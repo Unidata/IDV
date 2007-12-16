@@ -160,7 +160,7 @@ public class MetaDataServer extends HttpServer implements Constants {
                                          Hashtable httpArgs, String content)
                     throws Exception {
                 path = path.trim();
-                formArgs = SqlUtil.cleanUpArguments(formArgs);
+                //                formArgs = SqlUtil.cleanUpArguments(formArgs);
                 try {
                     User           user    = repository.findUser("jdoe");
                     //user    = repository.findUser("anonymous");

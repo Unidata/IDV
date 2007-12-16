@@ -1,7 +1,7 @@
    <APPLET CODE=com.infocetera.graph.GraphApplet.class WIDTH="100%" HEIGHT="500"  CODEBASE="." ARCHIVE="graph.jar">
 	    <PARAM NAME=istree  VALUE=true>
-            <PARAM NAME=dataurl VALUE="%root%/getgraph?id=%id%&amp;nodetype=%type%&amp;URL=DATAURL">
-            <PARAM NAME=nodeurl VALUE="%root%/getgraph?id=%nodeids%&amp;&nodetype=%nodetypes%&amp;URL=NODEURL">
+            <PARAM NAME=dataurl VALUE="${root}/getgraph?id=${id}&amp;nodetype=${type}&amp;URL=DATAURL">
+            <PARAM NAME=nodeurl VALUE="${root}/getgraph?id=%nodeids%&amp;&nodetype=%nodetypes%&amp;URL=NODEURL">
             <PARAM NAME=debug VALUE=true>
             <PARAM NAME=shownodelist VALUE=false>
    </APPLET>

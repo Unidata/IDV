@@ -83,8 +83,17 @@ import java.util.regex.*;
  */
 public class Harvester {
 
+    public static final String ATTR_MONITOR="monitor";
+    public static final String ATTR_SLEEP="sleep";
+
     /** _more_          */
-    private Repository repository;
+    protected Repository repository;
+
+    private Element element;
+
+    private boolean monitor = false;
+
+    private double sleepMinutes=5;
 
     /**
      * _more_
@@ -93,6 +102,13 @@ public class Harvester {
      */
     public Harvester(Repository repository) {
         this.repository = repository;
+    }
+
+
+    public Harvester(Repository repository,Element element) {
+        this(repository);
+        this.monitor = XmlUtil.getAttribute(element,ATTR_MONITOR,false);
+        this.sleepMinutes = XmlUtil.getAttribute(element,ATTR_SLEEP,sleepMinutes);
     }
 
 
@@ -193,6 +209,8 @@ public class Harvester {
         }
         return entries;
     }
+
+
 
 
 
@@ -456,6 +474,42 @@ public class Harvester {
         return entries;
     }
 
+
+/**
+Set the Monitor property.
+
+@param value The new value for Monitor
+**/
+public void setMonitor (boolean value) {
+	monitor = value;
+}
+
+/**
+Get the Monitor property.
+
+@return The Monitor
+**/
+public boolean getMonitor () {
+	return monitor;
+}
+
+/**
+Set the SleepMinutes property.
+
+@param value The new value for SleepMinutes
+**/
+public void setSleepMinutes (double value) {
+	sleepMinutes = value;
+}
+
+/**
+Get the SleepMinutes property.
+
+@return The SleepMinutes
+**/
+public double getSleepMinutes () {
+	return sleepMinutes;
+}
 
 
 

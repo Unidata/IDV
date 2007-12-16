@@ -421,7 +421,7 @@ public class SqlUtil {
                 statement.execute(command);
                 //                System.err.println ("OK:" + command);
             } catch(Throwable exc) {
-                System.err.println ("bad sql:" + command+ " " + exc);
+                //                System.err.println ("bad sql:" + command+ " " + exc);
                 if(!ignoreErrors) {
                     System.err.println ("bad query:" + command);
                     throw exc;
@@ -765,7 +765,7 @@ public class SqlUtil {
         for(Enumeration keys = formArgs.keys();keys.hasMoreElements();) {
             String key = (String) keys.nextElement();
             String value = (String)formArgs.get(key);
-            value = cleanUpArgument(value);
+            value = cleanUp(value);
             cleanArgs.put(key,value);
         }
         return cleanArgs;
@@ -773,9 +773,9 @@ public class SqlUtil {
 
 
 
-    public static String cleanUpArgument(String value) {
+    public static String cleanUp(String value) {
         //TODO: Atually implement this!!!!
-        value = value.replace("'","\\'");
+        value = value.replace("'","");
         return value;
     }
 

@@ -451,8 +451,8 @@ public class Column implements Tables, Constants {
         String desc = typeHandler.getRepository().getFieldDescription(value,namesFile);
         if(desc == null) desc = value;
         else {
-            if(desc.indexOf("%value%")>=0) {
-                desc = desc.replace("%value%", value);
+            if(desc.indexOf("${value}")>=0) {
+                desc = desc.replace("${value}", value);
             } 
         }
         return desc;

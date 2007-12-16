@@ -131,6 +131,9 @@ public class DateUtil {
         "yyyy-MM-dd",
     };
 
+    private static SimpleDateFormat[] sdfs;
+
+
     public static Date roundByDay(Date dttm,int day) {
         if(day ==0) return dttm;
         if(day<0) day++;
@@ -145,11 +148,16 @@ public class DateUtil {
     }
 
     public static SimpleDateFormat findFormatter(String dateString) {
+        if(sdfs == null) {
+            sdfs = new SimpleDateFormat[formats.length];
+            for(int i=0;i<formats.length;i++) {
+                sdfs[i] = new SimpleDateFormat(formats[i]);
+            }
+        }
         for(int i=0;i<formats.length;i++) {
             try {
-                SimpleDateFormat sdf = new SimpleDateFormat(formats[i]);
-                sdf.parse(dateString);
-                return sdf;
+                sdfs[i].parse(dateString);
+                return sdfs[i];
             } catch(ParseException pe) {}
         }
         throw new IllegalArgumentException ("Could not find date format for:" + dateString);
@@ -404,6 +412,11 @@ public class DateUtil {
 
 
     public static void main(String[]args) throws Exception {
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-mm-dd HH");
+        Date dttm = fmt.parse("2007-12-01 00.65");
+        System.err.println("dttm:" + dttm);
+        if(true) return;
+
         Date now = new Date();
         for(int i=0;i<args.length;i++) {
             Date fromDttm = null;

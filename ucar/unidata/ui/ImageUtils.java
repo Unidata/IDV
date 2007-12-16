@@ -733,7 +733,13 @@ public class ImageUtils {
     }
 
 
-
+    public static boolean isImage(String file) {
+        file = file.toLowerCase();
+        return file.endsWith(".jpg") ||
+            file.endsWith(".jpeg") ||
+            file.endsWith(".gif") ||
+            file.endsWith(".png");
+    }
 
     /**
      * Make a screen capture of the window. Write it to the file.

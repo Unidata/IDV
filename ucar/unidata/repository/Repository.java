@@ -22,7 +22,6 @@
 
 
 
-
 package ucar.unidata.repository;
 
 
@@ -33,6 +32,7 @@ import ucar.unidata.data.SqlUtil;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
+import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -42,13 +42,20 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
+import ucar.unidata.ui.ImageUtils;
 
+
+import java.awt.*;
+import javax.swing.*;
 import java.io.*;
 
 import java.io.File;
 import java.io.InputStream;
 
 import java.lang.reflect.*;
+import java.awt.image.*;
+import java.awt.Image;
+import java.awt.Toolkit;
 
 
 
@@ -94,11 +101,16 @@ public class Repository implements Constants, Tables, RequestHandler {
     /** _more_          */
     private Harvester harvester;
 
+    private List<Harvester> harvesters = new ArrayList();
+
     /** _more_          */
     private Properties mimeTypes;
 
     /** _more_ */
     private Properties productMap;
+
+    private String repositoryDir;
+    private String tmpDir;
 
     /** _more_          */
     private Properties properties = new Properties();
@@ -154,6 +166,11 @@ public class Repository implements Constants, Tables, RequestHandler {
 
     private List<User> cmdLineUsers = new ArrayList();
 
+    protected void clearPageCache() {
+        pageCache = new Hashtable();
+        pageCacheList = new ArrayList();
+    }
+
     /**
      * _more_
      *
@@ -182,9 +199,10 @@ public class Repository implements Constants, Tables, RequestHandler {
         initTable();
         initTypeHandlers();
         initOutputHandlers();
-        initGroups();
         initApi();
         initUsers();
+        initGroups();
+        initHarvesters();
     }
 
 
@@ -234,6 +252,12 @@ public class Repository implements Constants, Tables, RequestHandler {
             urlBase = "";
         }
 
+        repositoryDir = IOUtil.joinDir(Misc.getSystemProperty("user.home", "."),IOUtil.joinDir(".unidata","repository"));
+        tmpDir = IOUtil.joinDir(repositoryDir,"tmp");
+        IOUtil.makeDirRecursive(new File(repositoryDir));
+        IOUtil.makeDirRecursive(new File(tmpDir));
+
+
         String derbyHome = (String) properties.get(PROP_DB_DERBY_HOME);
         if(derbyHome!=null) {
             derbyHome = derbyHome.replace("%userhome%",Misc.getSystemProperty("user.home", "."));
@@ -245,6 +269,12 @@ public class Repository implements Constants, Tables, RequestHandler {
         harvester = new Harvester(this);
         Misc.findClass((String) properties.get(PROP_DB_DRIVER));
 
+    }
+
+
+    protected void log(String message, Exception exc) {
+        System.err.println (message);
+        exc.printStackTrace();
     }
 
 
@@ -387,19 +417,38 @@ public class Repository implements Constants, Tables, RequestHandler {
 
     }
 
-
-    protected void initOutputHandlers() throws Exception {
-        for(String file: outputDefFiles) {
-            try {
-                Element root = XmlUtil.getRoot(file, getClass());
-            List children = XmlUtil.findChildren(root, TAG_OUTPUTHANDLER);
+    protected void initHarvesters() throws Exception {
+        try {
+            Element root = XmlUtil.getRoot("/ucar/unidata/repository/resources/harvesters.xml", getClass());
+            List children = XmlUtil.findChildren(root, TAG_HARVESTER);
             for (int i = 0; i < children.size(); i++) {
                 Element node = (Element) children.get(i);
                 Class c = Misc.findClass(XmlUtil.getAttribute(node, ATTR_CLASS));
                 Constructor ctor = Misc.findConstructor(c,
                                                         new Class[] { Repository.class,Element.class});
-                outputHandlers.add((OutputHandler)ctor.newInstance(new Object[]{this,node}));
+                harvesters.add((Harvester)ctor.newInstance(new Object[]{this,node}));
             }
+        } catch(Exception exc) {
+            System.err.println("Error loading harvester file");
+            throw exc;
+        }
+        for(Harvester harvester: harvesters) {
+            Misc.run(harvester,"run");
+        }
+    }
+
+    protected void initOutputHandlers() throws Exception {
+        for(String file: outputDefFiles) {
+            try {
+                Element root = XmlUtil.getRoot(file, getClass());
+                List children = XmlUtil.findChildren(root, TAG_OUTPUTHANDLER);
+                for (int i = 0; i < children.size(); i++) {
+                    Element node = (Element) children.get(i);
+                    Class c = Misc.findClass(XmlUtil.getAttribute(node, ATTR_CLASS));
+                    Constructor ctor = Misc.findConstructor(c,
+                                                            new Class[] { Repository.class,Element.class});
+                    outputHandlers.add((OutputHandler)ctor.newInstance(new Object[]{this,node}));
+                }
             } catch(Exception exc) {
                 System.err.println("Error loading output handler file:" + file);
                 throw exc;
@@ -504,7 +553,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @return _more_
      */
     protected boolean canCache() {
-        //        if(true) return false;
+        if(true) return false;
         return getProperty(PROP_DB_CANCACHE, true);
     }
 
@@ -582,9 +631,15 @@ public class Repository implements Constants, Tables, RequestHandler {
         ResultSet results = execute("select count(*) from "
                                     + TABLE_ENTRIES).getResultSet();
         results.next();
-        if (results.getInt(1) == 0) {
+        File rootDir =
+            new File(
+                "c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
+        if(!rootDir.exists())
+            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
+        TypeHandler typeHandler = getTypeHandler("file");
+        if (false && results.getInt(1) == 0) {
             System.err.println("Adding test data");
-            loadTestFiles();
+            //            loadTestFiles();
             loadModelFiles();
             loadSatelliteFiles();
             loadLevel3RadarFiles();
@@ -1302,8 +1357,24 @@ public class Repository implements Constants, Tables, RequestHandler {
         if(!entry.getTypeHandler().isEntryDownloadable(request, entry)) {
             throw new IllegalArgumentException("Cannot download file with id:" + fileId);
         }
-        String contents = IOUtil.readContents(entry.getFile(), getClass());
-        return new Result("", new StringBuffer(contents),
+
+        byte[]bytes;
+        //        System.err.println("request:" + request);
+        if(request.defined(ARG_IMAGEWIDTH) && ImageUtils.isImage(entry.getFile())) {
+            int width = request.get(ARG_IMAGEWIDTH,75);
+            String thumb = IOUtil.joinDir(tmpDir,entry.getId()+"_"+width+".jpg");
+            Image image = ImageUtils.readImage(entry.getFile());
+            Image resizedImage =image.getScaledInstance(width, -1,Image.SCALE_AREA_AVERAGING);
+            ImageUtils.waitOnImage(resizedImage);
+            System.err.println ("thumb:"+ thumb);
+            //            GuiUtils.showOkCancelDialog(null,"",new JLabel(new ImageIcon(resizedImage)),null);
+            //            System.err.println ("AFTER");
+            ImageUtils.writeImageToFile(resizedImage,thumb);
+            bytes = IOUtil.readBytes(IOUtil.getInputStream(thumb, getClass()));
+        } else {
+            bytes = IOUtil.readBytes(IOUtil.getInputStream(entry.getFile(), getClass()));
+        }
+        return new Result("", bytes,
                           IOUtil.getFileExtension(entry.getFile()));
     }
 
@@ -1543,8 +1614,9 @@ public class Repository implements Constants, Tables, RequestHandler {
             throw new IllegalArgumentException(
                 "no type or id argument specified");
         }
-        String html = StringUtil.replace(graphAppletTemplate, "%id%", id);
-        html = StringUtil.replace(html, "%type%", type);
+        String html = StringUtil.replace(graphAppletTemplate, "${id}", encode(id));
+        html = StringUtil.replace(html, "${root}", urlBase);
+        html = StringUtil.replace(html, "${type}", encode(type));
         return new Result("Graph View", html.getBytes(), Result.TYPE_HTML);
     }
 
@@ -1567,9 +1639,18 @@ public class Repository implements Constants, Tables, RequestHandler {
         String file     = results.getString(col++);
         TypeHandler typeHandler = getTypeHandler(request);
         String nodeType = typeHandler.getNodeType();
-        return XmlUtil.tag(TAG_NODE,
-                           XmlUtil.attrs(ATTR_TYPE, nodeType, ATTR_ID,
-                                         fileId, ATTR_TITLE, name));
+        if(file.endsWith(".jpg")) {
+            nodeType = "imageentry";
+        }
+        String attrs = XmlUtil.attrs(ATTR_TYPE, nodeType, ATTR_ID,
+                                     fileId, ATTR_TITLE, name);
+        if(file.endsWith(".jpg")) {
+            nodeType = "imageentry";
+            attrs = attrs +" " + "image=\"" + href(HtmlUtil.url("/getentry/" + fileId+".jpg", ARG_ID,
+                                                                fileId,ARG_IMAGEWIDTH,"75"))+"\"";
+        }
+        //        System.err.println (XmlUtil.tag(TAG_NODE,attrs));
+        return XmlUtil.tag(TAG_NODE,attrs);
     }
 
 
@@ -1600,7 +1681,6 @@ public class Repository implements Constants, Tables, RequestHandler {
         String originalId   = id;
         String type = (String) request.getString(ARG_NODETYPE,(String)null);
         int skip =  request.get(ARG_SKIP,0);
-
         boolean haveSkip = false;
         if(id.startsWith("skip_")) {
             haveSkip = true;
@@ -1650,7 +1730,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                                           XmlUtil.attrs(ATTR_TYPE,
                                               "taggedby", ATTR_FROM, originalId,
                                                   ATTR_TO,
-                                                      results.getString(1))));
+                                                        results.getString(1))));
 
                     if (actualCnt >= MAX_EDGES) {
                         String skipId  = "skip_" + type +"_" +(actualCnt+skip)+"_"+id;
@@ -1665,11 +1745,13 @@ public class Repository implements Constants, Tables, RequestHandler {
                     }
                 }
             }
-            String xml = StringUtil.replace(graphXmlTemplate, "%content%",
+            String xml = StringUtil.replace(graphXmlTemplate, "${content}",
                                             sb.toString());
+            xml = StringUtil.replace(xml, "${root}", urlBase);            
             return new Result("", new StringBuffer(xml),
                               getMimeTypeFromSuffix(".xml"));
         }
+
 
         if ( !type.equals(TYPE_GROUP)) {
             Statement stmt = typeHandler.executeSelect(request,
@@ -1684,6 +1766,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             }
 
             sb.append(getEntryNodeXml(request,results));
+
             List<Association> associations = getAssociations(request, id);
             for(Association association: associations) {
                 Entry other = null;
@@ -1712,8 +1795,8 @@ public class Repository implements Constants, Tables, RequestHandler {
             Group group = findGroup(results.getString(4));
             sb.append(XmlUtil.tag(TAG_NODE,
                                   XmlUtil.attrs(ATTR_TYPE, NODETYPE_GROUP, ATTR_ID,
-                                      group.getFullName(), ATTR_TITLE,
-                                      group.getFullName())));
+                                                group.getFullName(), ATTR_TITLE,
+                                                group.getFullName())));
             sb.append(XmlUtil.tag(TAG_EDGE,
                                   XmlUtil.attrs(ATTR_TYPE, "groupedby",
                                       ATTR_FROM, group.getFullName(),
@@ -1724,7 +1807,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                 sb.append(XmlUtil.tag(TAG_NODE,
                                       XmlUtil.attrs(ATTR_TYPE, TYPE_TAG,
                                           ATTR_ID, tags[i], ATTR_TITLE,
-                                          tags[i])));
+                                                    tags[i])));
                 sb.append(XmlUtil.tag(TAG_EDGE,
                                       XmlUtil.attrs(ATTR_TYPE, "taggedby",
                                           ATTR_FROM, tags[i], ATTR_TO, id)));
@@ -1733,8 +1816,10 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
 
-            String xml = StringUtil.replace(graphXmlTemplate, "%content%",
+            String xml = StringUtil.replace(graphXmlTemplate, "${content}",
                                             sb.toString());
+
+            xml = StringUtil.replace(xml, "${root}", urlBase);            
             return new Result("", new StringBuffer(xml),
                               getMimeTypeFromSuffix(".xml"));
         }
@@ -1774,7 +1859,7 @@ public class Repository implements Constants, Tables, RequestHandler {
 
             sb.append(XmlUtil.tag(TAG_EDGE,
                                   XmlUtil.attrs(ATTR_TYPE, "groupedby",
-                                      ATTR_FROM, group.getFullName(),
+                                      ATTR_FROM,group.getFullName(),
                                       ATTR_TO, subGroup.getFullName())));
         }
 
@@ -1813,9 +1898,9 @@ public class Repository implements Constants, Tables, RequestHandler {
                 }
             }
         }
-        String xml = StringUtil.replace(graphXmlTemplate, "%content%",
+        String xml = StringUtil.replace(graphXmlTemplate, "${content}",
                                         sb.toString());
-        xml = StringUtil.replace(xml, "%root%", urlBase);
+        xml = StringUtil.replace(xml, "${root}", urlBase);
         return new Result("", new StringBuffer(xml),getMimeTypeFromSuffix(".xml"));
     }
 
@@ -2394,6 +2479,10 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
+    protected String encode(String s) throws Exception {
+        return java.net.URLEncoder.encode(s,"UTF-8");
+    }
+
     protected String getTagLinks(Request request, String tag)
             throws Exception {
         String search =
@@ -2556,6 +2645,7 @@ public class Repository implements Constants, Tables, RequestHandler {
 
     public void insertEntries(TypeHandler typeHandler, List<Entry> entries) throws Exception {
         if(entries.size() == 0) return;
+        clearPageCache();
         System.err.println("Inserting:" + entries.size() + " " + typeHandler.getType()+" entries");
         long t1  = System.currentTimeMillis();
         int  cnt = 0;
@@ -2746,6 +2836,60 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
 
+    public boolean processEntries(Harvester harvester,  TypeHandler typeHandler, List<Entry> entries)  {
+        String query="";
+        try {
+            if(entries.size() == 0) return true;
+            //            long  tt1 = System.currentTimeMillis();
+            //            String allQuery = SqlUtil.makeSelect(COL_ENTRIES_FILE,
+            //                                                 Misc.newList(TABLE_ENTRIES));
+            //            String[] files =  SqlUtil.readString(execute(allQuery), 1);
+            //            long  tt2 = System.currentTimeMillis();
+            //            System.err.println ("tt:"+ (tt2-tt1) + " #files:" + files.length );
+
+
+            PreparedStatement select =
+                connection.prepareStatement(query = SqlUtil.makeSelect("count("+COL_ENTRIES_ID+")",
+                                                                       Misc.newList(TABLE_ENTRIES),
+                                                                       SqlUtil.eq(COL_ENTRIES_FILE,"?")));
+            long  t1 = System.currentTimeMillis();
+            List<Entry> needToAdd = new ArrayList();
+            for(Entry entry: entries) {
+                select.setString(1,entry.getFile());
+                //                select.addBatch();
+                ResultSet results = select.executeQuery();
+                if(results.next()) {
+                    int found = results.getInt(1);
+                    if(found ==0) {
+                        needToAdd.add(entry);
+                        //                        System.err.println ("adding: " + entry.getFile());
+                    }
+                }
+            }
+            /*
+            ResultSet results = select.executeBatch();
+            int cnt = 0;
+            while(results.next()) {
+                int found = results.getInt(1);
+                if(found ==0) {
+                    needToAdd.add(entries.get(cnt));
+                    System.err.println ("adding: " + entries.get(cnt).getFile());
+                }
+                cnt++;
+            }
+            System.err.println ("#results:" + cnt);
+            */
+            long  t2 = System.currentTimeMillis();
+            insertEntries(typeHandler,needToAdd);
+            System.err.println ("Took:" + (t2-t1) +"ms to check: " + entries.size());
+        } catch(Exception exc) {
+            log("Processing:" + query, exc);
+            return false;
+        }
+        return true;
+    }
+
+
     /**
      * _more_
      *
@@ -2761,9 +2905,6 @@ public class Repository implements Constants, Tables, RequestHandler {
         List<FileInfo> dirs = new ArrayList();
         List<Entry> entries = harvester.collectFiles(rootDir, "Files",
                                                             typeHandler, dirs);
-
-        //        System.err.println ("dirs:" + dirs.size());
-        //        Misc.run(this,"listen", dirs);
         insertEntries(typeHandler,entries);
         Hashtable javaFiles = new Hashtable();
         for(Entry entry: entries) {
@@ -2811,6 +2952,8 @@ public class Repository implements Constants, Tables, RequestHandler {
             Misc.sleep(1000);
         }
     }
+
+
 
 
 

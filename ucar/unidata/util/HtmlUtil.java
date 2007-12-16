@@ -51,6 +51,10 @@ public class HtmlUtil {
     }
 
 
+    public static String quote(String s) {
+        return "\"" + s +"\"";
+    }
+
     public static String img(String path) {
         return img(path, "");
     }

@@ -22,11 +22,13 @@
 
 
 
-
 package ucar.unidata.repository;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
 import java.io.File;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Class FileInfo _more_
@@ -61,13 +63,12 @@ public class FileInfo {
     }
 
     public FileInfo(File f, boolean isDir) {
+        this.isDir = isDir;
         file = f;
-        if (file.exists()) {
-            time           = file.lastModified();
-            if(!isDir)
-                size           = file.length();
-            hasInitialized = true;
-        }
+        time           = file.lastModified();
+        if(!isDir)
+            size           = file.length();
+        hasInitialized = true;
     }
 
     /**
@@ -136,6 +137,75 @@ public class FileInfo {
      */
     public String toString() {
         return file.toString();
+    }
+
+    public static List<FileInfo> collectDirs(File rootDir) throws  Exception {
+        final List<FileInfo> dirs    = new ArrayList();
+        IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
+            public int viewFile(File f) throws Exception {
+                if (f.isDirectory()) {
+                    if(f.getName().startsWith(".")) return DO_DONTRECURSE;
+                    dirs.add(new FileInfo(f,true));
+                }
+                return DO_CONTINUE;
+            }
+        };
+        IOUtil.walkDirectory(rootDir, fileViewer);
+        return dirs;
+    }
+
+
+    public static void main(String[]args) throws Exception {
+        File rootDir =
+            new File(
+                "c:/cygwin/home/jeffmc/unidata");
+        if(!rootDir.exists()) {
+            rootDir =
+                new File(
+                         "/data/ldm/gempak/nexrad/NIDS");            
+        }
+        if(args.length>0) 
+            rootDir = new File(args[0]);
+        final List<FileInfo> dirs    = new ArrayList();
+        final int[]cnt = {0};
+        IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
+            public int viewFile(File f) throws Exception {
+                cnt[0]++;
+                if(cnt[0]%1000==0) System.err.print(".");
+                if (f.isDirectory()) {
+                    dirs.add(new FileInfo(f,true));
+                    //    if(dirs.size()%1000==0) System.err.print(".");
+                }
+                return DO_CONTINUE;
+            }
+        };
+
+        long tt1= System.currentTimeMillis();
+        IOUtil.walkDirectory(rootDir, fileViewer);
+        long tt2= System.currentTimeMillis();
+        System.err.println("found:" + dirs.size() + " in:" + (tt2-tt1) + " looked at:" + cnt[0] );
+
+        while(true) {
+            long t1 = System.currentTimeMillis();
+            for(FileInfo fileInfo: dirs) {
+                long oldTime = fileInfo.time;
+                if(fileInfo.hasChanged()) {
+                    System.err.println ("Changed:" + fileInfo);
+                    File[]files = fileInfo.file.listFiles();
+                    for(int i=0;i<files.length;i++) {
+                        if(files[i].lastModified()> oldTime) {
+                            System.err.println ("    " + files[i].getName());
+                        }
+
+                    }
+                    
+
+                }
+            }
+            long t2= System.currentTimeMillis();
+            //            System.err.println ("Time:" + (t2-t1));
+            Misc.sleep(5000);
+        }
     }
 
 }

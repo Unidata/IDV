@@ -26,6 +26,7 @@ package ucar.unidata.repository;
 
 import ucar.unidata.data.SqlUtil;
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.util.HtmlUtil;
@@ -362,6 +363,10 @@ public class TypeHandler implements Constants, Tables {
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"),
                                           entry.getTypeHandler().getDescription()));
 
+            if(ImageUtils.isImage(entry.getFile())) {
+                sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Image:"),"<img width=\"400\" src=\"" + repository.href(HtmlUtil.url("/getentry/" + entry.getName(), ARG_ID, entry.getId()))+
+                          "\">\n"));
+            }
 
         } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {
         }

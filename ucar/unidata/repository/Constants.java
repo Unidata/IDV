@@ -301,6 +301,7 @@ public interface Constants {
         "jdms.html.downloadentriesasfiles";
 
 
+    public static final String TAG_HARVESTER = "harvester";
     /** _more_          */
     public static final String TAG_DB_ENTRY = "entry";
 
@@ -322,6 +323,7 @@ public interface Constants {
 
 
     public static final String ARG_NODETYPE = "nodetype";
+    public static final String ARG_IMAGEWIDTH = "imagewidth";
 
     /** _more_ */
     public static final String NODETYPE_ENTRY = "entry";

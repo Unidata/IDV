@@ -29,6 +29,7 @@ import org.w3c.dom.*;
 
 
 import ucar.unidata.data.SqlUtil;
+import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -85,6 +86,8 @@ public class DefaultOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final String OUTPUT_XML = "default.xml";
+
+
 
     /** _more_ */
     public static final String OUTPUT_TIMELINE = "default.timeline";
@@ -243,8 +246,7 @@ public class DefaultOutputHandler extends OutputHandler {
             sb.append(" ");
             sb.append(entry.getTypeHandler().getEntryLinks(entry,request));
             sb.append(" ");
-            sb.append(repository.href(HtmlUtil.url("/showentry", ARG_ID, entry.getId()),
-                                      entry.getName()));
+            sb.append(getEntryUrl(entry));
             sb.append("<br>\n");
         }
         if(doForm) {
@@ -253,6 +255,11 @@ public class DefaultOutputHandler extends OutputHandler {
         }
     }
 
+
+    protected String getEntryUrl(Entry entry) {
+        return repository.href(HtmlUtil.url("/showentry", ARG_ID, entry.getId()),
+                               entry.getName());
+    }
 
     /**
      * _more_
@@ -393,21 +400,6 @@ public class DefaultOutputHandler extends OutputHandler {
     }
 
 
-    protected List getEntriesHeader(Request request, String output, String what) 
-        throws Exception {
-        List<TwoFacedObject>  outputTypes = repository.getOutputTypesFor(request, what);
-        int cnt = 0;
-        List items = new ArrayList();
-        for(TwoFacedObject tfo: outputTypes) {
-            request.put(ARG_OUTPUT, (String)tfo.getId());
-            if(tfo.getId().equals(output)) {
-                items.add(tfo.toString());
-            } else {
-                items.add(HtmlUtil.href(request.getType()+"?"+request.getUrlArgs(),tfo.toString(), " class=\"subnavlink\" "));
-            }
-        }
-        return items;
-    }
 
 
 
@@ -778,11 +770,7 @@ public class DefaultOutputHandler extends OutputHandler {
                 sb.append("<b>Nothing Found</b><p>");
             }
             sb.append("<table>");
-
-            if (output.equals(OUTPUT_TIMELINE)) {
-            } else {
-                showApplet = false;
-            }
+            showApplet= showApplet & output.equals(OUTPUT_TIMELINE);
         } else if (output.equals(OUTPUT_ZIP)) {
             return toZip(request, entries);
         } else if (output.equals(OUTPUT_CSV)) {}
@@ -791,20 +779,21 @@ public class DefaultOutputHandler extends OutputHandler {
                     + output);
         }
 
+        
         StringBufferCollection sbc = new StringBufferCollection();
         for (Entry entry : entries) {
             StringBuffer ssb = sbc.getBuffer(entry.getTypeHandler().getDescription());
             if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
                 String links = HtmlUtil.checkbox("entry_" + entry.getId(),
                                                  "true") + " " + entry.getTypeHandler().getEntryLinks(entry,request);
-
+                
                 ssb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
                 ssb.append(HtmlUtil
-                    .row(links + " "
-                         + repository.href(HtmlUtil
-                             .url("/showentry", ARG_ID, entry.getId()), entry
-                             .getName()), "" + new Date(entry
-                             .getStartDate())));
+                           .row(links + " "
+                                + repository.href(HtmlUtil
+                                                  .url("/showentry", ARG_ID, entry.getId()), entry
+                                                  .getName()), "" + new Date(entry
+                                                                             .getStartDate())));
             } else if (output.equals(OUTPUT_CSV)) {
                 sb.append(SqlUtil.comma(entry.getId(), entry.getFile()));
             }

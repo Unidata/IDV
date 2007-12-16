@@ -196,6 +196,28 @@ public class OutputHandler implements Constants, Tables {
         notImplemented();
     }
 
+    protected String getEntryUrl(Entry entry) {
+        return repository.href(HtmlUtil.url("/showentry", ARG_ID, entry.getId()),
+                               entry.getName());
+    }
+
+    protected List getEntriesHeader(Request request, String output, String what) 
+        throws Exception {
+        List<TwoFacedObject>  outputTypes = repository.getOutputTypesFor(request, what);
+        int cnt = 0;
+        List items = new ArrayList();
+        for(TwoFacedObject tfo: outputTypes) {
+            request.put(ARG_OUTPUT, (String)tfo.getId());
+            if(tfo.getId().equals(output)) {
+                items.add(tfo.toString());
+            } else {
+                items.add(HtmlUtil.href(request.getType()+"?"+request.getUrlArgs(),tfo.toString(), " class=\"subnavlink\" "));
+            }
+        }
+        return items;
+    }
+
+
 
     /**
      * _more_

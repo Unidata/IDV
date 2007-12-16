@@ -27,15 +27,33 @@
             basedir="${srcdir}"
             compress="true"
             update="false"
-            jarfile="${jars_dest}/repository.jar"
-            manifest="${srcdir}/ucar/unidata/repository/repository.manifest">
+            jarfile="${jars_dest}/repositorytmp.jar">
             <include name="ucar/**/*.class"/>
             <include name="ucar/unidata/repository/htdocs/*.*"/>
-            <include name="ucar/unidata/repository/**/*.properties"/>
-            <include name="ucar/unidata/repository/**/*.html"/>
-            <include name="ucar/unidata/repository/**/*.xml"/>
-            <include name="ucar/unidata/repository/**/*.sql"/>
+            <include name="ucar/unidata/repository/resources/*.*"/>
         </jar>
+        <mkdir dir="${tmpjardir}"/>
+        <delete includeemptydirs="true">
+            <fileset dir="${tmpjardir}" includes="**/*"/>
+        </delete>
+        <unjar src="${jars_dest}/repositorytmp.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/postgres.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/mysql.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/derby.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/derbytools.jar" dest="${tmpjardir}"/>
+        <jar 
+            basedir="${tmpjardir}"
+            compress="true"
+            manifest="${srcdir}/ucar/unidata/repository/repository.manifest"
+            jarfile="${libsdir}/repository.jar">
+              <include name="**"/>
+        </jar>
+
+        <delete dir="${tmpjardir}"/>
+        <delete file="${jars_dest}/repositorytmp.jar"/>
+
+
+
     </target>
 
 

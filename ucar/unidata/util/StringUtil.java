@@ -23,6 +23,12 @@
 
 package ucar.unidata.util;
 
+import ucar.unidata.xml.XmlUtil;
+
+
+import java.security.SignatureException;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 import java.text.ParsePosition;
 
@@ -1969,11 +1975,17 @@ public class StringUtil {
      * @throws Exception some problem
      */
     public static void main(String[] args) throws Exception {
+        String key = "the key";
+        for(int i=0;i<args.length;i++) {
+            System.err.println(calculateRFC2104HMAC(args[i], args[i]));
+        }
 
+        /*
         String extra = "hello there colspan=\"5\" how are you";
         String pattern = "colspan *= *\"([^\"]+)\"";
         String colspan = StringUtil.findPattern(extra,pattern);
         System.err.println(colspan);
+        */
         //        String s = IOUtil.readContents(args[0], "");
         //        System.out.println(stripTags(s));
 
@@ -2161,6 +2173,51 @@ public class StringUtil {
         }
         return "a";
     }
+
+
+
+
+
+private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
+    
+    /**
+     * Computes RFC 2104-compliant HMAC signature.
+     * 
+     * @param data
+     *     The data to be signed.
+     * @param key
+     *     The signing key.
+     * @return
+     *     The base64-encoded RFC 2104-compliant HMAC signature.
+     * @throws
+     *     java.security.SignatureException when signature generation fails
+     */
+    public static String calculateRFC2104HMAC(String data, String key)
+        throws java.security.SignatureException
+    {
+        String result;
+        try {
+            // get an hmac_sha1 key from the raw key bytes
+            SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), 
+                                                         HMAC_SHA1_ALGORITHM);
+            
+            // get an hmac_sha1 Mac instance and initialize with the signing key
+            Mac mac = Mac.getInstance(HMAC_SHA1_ALGORITHM);
+            mac.init(signingKey);
+            
+            // compute the hmac on input data bytes
+            byte[] rawHmac = mac.doFinal(data.getBytes());
+            
+            // base64-encode the hmac
+            result = XmlUtil.encodeBase64(rawHmac);
+        } 
+        catch (Exception e) {
+            throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
+        }
+        return result;
+    }
+
+
 
 
 

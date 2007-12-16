@@ -1,0 +1,36 @@
+<harvesters>
+
+<!--
+  <harvester    class="ucar.unidata.repository.PatternHarvester"
+		rootdir="c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar"
+		basegroup="Files/Source"
+		filepattern=".*\.java$"
+		type="file"
+                monitor="false"
+		sleep="1"/>
+
+
+  <harvester    class="ucar.unidata.repository.PatternHarvester"
+		rootdir="c:/cygwin/home/jeffmc/pictures"
+		basegroup="Files/Images"
+		filepattern=".*\.jpg$|.*\.jpeg$|.*\.gif$|.*\.png$"
+		type="image"
+                monitor="false"
+		sleep="1"/>
+-->
+
+  <harvester    class="ucar.unidata.repository.PatternHarvester"
+		rootdir="c:/cygwin/home/jeffmc/unidata/data/repository/NIDS"
+		basegroup="IDD/NIDS"
+		filepattern="([^/]+)/([^/]+)/[^/]+_(\d\d\d\d\d\d\d\d_\d\d\d\d)"
+		type="level3radar"
+		columns = "station,product"
+		patternnames="station,product,fromDate"
+		patterntypes="string,string,date"
+		grouptemplate = "${station}/${product}"
+		nametemplate="${station}-${product}-${fromDate}"
+		desctemplate= "${name} description"
+                monitor="false"
+		sleep="1"/>
+</harvesters>
+		
