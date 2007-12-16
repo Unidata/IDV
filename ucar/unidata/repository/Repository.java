@@ -2708,6 +2708,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         }
         connection.commit();
         connection.setAutoCommit(true);
+        System.err.println("done");
     }
 
 

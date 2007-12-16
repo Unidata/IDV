@@ -163,8 +163,10 @@ public class PatternHarvester extends Harvester {
 
     public void run()         
         throws Exception { 
+        long tt1 = System.currentTimeMillis();
         List<FileInfo> dirs = FileInfo.collectDirs(rootDir);        
-        System.err.println ("dirs:" + dirs.size());
+        long tt2 = System.currentTimeMillis();
+        System.err.println ("took:" + (tt2-tt1) +" to find dirs:" + dirs.size());
 
         int cnt = 0;
         while(running) {
@@ -220,6 +222,8 @@ public class PatternHarvester extends Harvester {
                 if ( !matcher.find()) {
                     continue;
                 }
+                if(entries.size()%1000==0) 
+                    System.err.print(".");
                 Hashtable map =new Hashtable();
                 Date fromDate=null;                
                 Date toDate=null;

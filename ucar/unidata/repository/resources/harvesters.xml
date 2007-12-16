@@ -1,14 +1,18 @@
 <harvesters>
 
-<!--
+
+
   <harvester    class="ucar.unidata.repository.PatternHarvester"
-		rootdir="c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar"
+		xrootdir="c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar"
+		rootdir="/harpo/jeffmc/src/idv/trunk/ucar"
 		basegroup="Files/Source"
-		filepattern=".*\.java$"
+
+		filepattern=".*"
 		type="file"
                 monitor="false"
 		sleep="1"/>
 
+<!--
 
   <harvester    class="ucar.unidata.repository.PatternHarvester"
 		rootdir="c:/cygwin/home/jeffmc/pictures"
@@ -17,10 +21,11 @@
 		type="image"
                 monitor="false"
 		sleep="1"/>
--->
+
 
   <harvester    class="ucar.unidata.repository.PatternHarvester"
-		rootdir="c:/cygwin/home/jeffmc/unidata/data/repository/NIDS"
+		xrootdir="c:/cygwin/home/jeffmc/unidata/data/repository/NIDS"
+		rootdir="/data/ldm/gempak/nexrad/NIDS"
 		basegroup="IDD/NIDS"
 		filepattern="([^/]+)/([^/]+)/[^/]+_(\d\d\d\d\d\d\d\d_\d\d\d\d)"
 		type="level3radar"
@@ -32,5 +37,29 @@
 		desctemplate= "${name} description"
                 monitor="false"
 		sleep="1"/>
+
+
+
+
+
+
+   <harvester    class="ucar.unidata.repository.PatternHarvester"
+		rootdir="/data/ldm/gempak/nexrad/craft"
+		basegroup="IDD/Craft"
+		filepattern="([^/]+)/[^/]+_(\d\d\d\d\d\d\d\d_\d\d\d\d)"
+		type="level2radar"
+		columns = "station"
+		patternnames="station,fromDate"
+		patterntypes="string,date"
+		grouptemplate = "${station}"
+		nametemplate="${station}-${fromDate}"
+		desctemplate= "${name} description"
+                monitor="false"
+		sleep="1"/>
+
+-->
+
+
+
 </harvesters>
 		
