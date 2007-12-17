@@ -692,6 +692,7 @@ public class TextPointDataSource extends PointDataSource {
      * @return ok
      */
     public boolean applyProperties() {
+        if(!super.applyProperties()) return false;
         if (map != null) {
             applyMetaDataFields();
             flushCache();
@@ -1157,6 +1158,7 @@ public class TextPointDataSource extends PointDataSource {
                 return makeTrack(trackParamIndex, latIndex, lonIndex,
                                  altIndex, times, tuples);
             }
+
 
 
             times = PointObFactory.binTimes(times, getBinRoundTo(),
