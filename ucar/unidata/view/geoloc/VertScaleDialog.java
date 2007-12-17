@@ -118,7 +118,9 @@ public class VertScaleDialog extends JPanel implements ActionListener {
         if (transfer != null) {
             min.setText(Misc.format(transfer.minVertScale));
             max.setText(Misc.format(transfer.maxVertScale));
-            unitCombo.setSelectedItem(transfer.unit.toString());
+            if(transfer.unit!=null) {
+                unitCombo.setSelectedItem(transfer.unit.toString());
+            }
         }
 
     }
