@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -491,6 +492,12 @@ public interface DataSource {
      */
     public List getTmpPaths();
 
+    /**
+     * _more_
+     *
+     * @param newObject _more_
+     * @param newProperties _more_
+     */
     public void updateState(Object newObject, Hashtable newProperties);
 
     /**
@@ -499,6 +506,11 @@ public interface DataSource {
      * @param strings Changed paths
      */
     public void setTmpPaths(List strings);
+
+    /**
+     * This gets called after we have been saved in a zidv bundle to reset us back to any original state
+     */
+    public void resetTmpState();
 
 
     /**

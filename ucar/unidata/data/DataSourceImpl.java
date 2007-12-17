@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data;
 
 
@@ -480,17 +481,16 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             }
         }
 
-        JTabbedPane tab = new JTabbedPane();
-        List catComps = new ArrayList();
+        JTabbedPane tab      = new JTabbedPane();
+        List        catComps = new ArrayList();
         for (int i = 0; i < categories.size(); i++) {
             List comps = (List) catMap.get(categories.get(i));
             JPanel innerPanel = GuiUtils.doLayout(comps, 2, GuiUtils.WT_YY,
                                     GuiUtils.WT_N);
             JScrollPane sp = new JScrollPane(GuiUtils.top(innerPanel));
             sp.setPreferredSize(new Dimension(300, 400));
-            JPanel top =
-                GuiUtils.right(GuiUtils.inset(new JLabel("Hide"),
-                                              new Insets(0, 0, 0, 20)));
+            JPanel top = GuiUtils.right(GuiUtils.inset(new JLabel("Hide"),
+                             new Insets(0, 0, 0, 20)));
             JComponent inner = GuiUtils.inset(GuiUtils.topCenter(top, sp), 5);
             tab.addTab(categories.get(i).toString(), inner);
         }
@@ -506,7 +506,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         top      = GuiUtils.inset(top, 5);
         contents = GuiUtils.topCenter(top, contents);
         contents = GuiUtils.inset(contents, 5);
-        if ( !GuiUtils.showOkCancelDialog(null, "Data Source Field Mask File",
+        if ( !GuiUtils.showOkCancelDialog(null,
+                                          "Data Source Field Mask File",
                                           contents, null)) {
             return;
         }
@@ -1477,9 +1478,11 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @return  the DataChoice which has id or <code>null</code>
      */
     public DataChoice findDataChoice(Object id) {
-        if(id == null) id = "#0";
-        String asString = id.toString();
-        List<DataChoice>   choices  = getDataChoices();
+        if (id == null) {
+            id = "#0";
+        }
+        String           asString = id.toString();
+        List<DataChoice> choices  = getDataChoices();
         if (asString.startsWith("#")) {
             try {
                 int index = new Integer(asString.substring(1)).intValue();
@@ -1490,14 +1493,14 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         }
 
         //First check if the choice.id equals the given id
-        for (DataChoice choice: choices) {
+        for (DataChoice choice : choices) {
             if (choice.getId().equals(id)) {
                 return choice.cloneMe();
             }
         }
 
         //Now check the toString
-        for (DataChoice choice: choices) {
+        for (DataChoice choice : choices) {
             if (choice.toString().equals(asString)) {
                 return choice;
             }
@@ -1507,7 +1510,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         }
 
         //Now check for aliases
-        for (DataChoice choice: choices) {
+        for (DataChoice choice : choices) {
             String canonical =
                 DataAlias.aliasToCanonical(choice.getName().toString());
             if ((canonical != null)
@@ -1519,16 +1522,16 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
         if (id instanceof String) {
-            String sid = id.toString();
-            boolean isRegexp =false;
+            String  sid      = id.toString();
+            boolean isRegexp = false;
             if (sid.startsWith("pattern:")) {
                 isRegexp = true;
-                sid = sid.substring(8);
+                sid      = sid.substring(8);
             } else {
                 isRegexp = StringUtil.containsRegExp(sid);
             }
-            if(isRegexp) {
-                for (DataChoice choice: choices) {
+            if (isRegexp) {
+                for (DataChoice choice : choices) {
                     if (StringUtil.stringMatch(choice.getDescription(), sid,
                             true, false)) {
                         return choice;
@@ -2961,7 +2964,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                 public void actionPerformed(ActionEvent ae) {
                     Misc.run(new Runnable() {
                         public void run() {
-                            Misc.run(DataSourceImpl.this, "writeFieldMaskFile");
+                            Misc.run(DataSourceImpl.this,
+                                     "writeFieldMaskFile");
                         }
                     });
                 }
@@ -3361,6 +3365,14 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
     /**
+     * This gets called after we have been saved in a zidv bundle to reset us back to any original state
+     */
+    public void resetTmpState() {
+        tmpPaths = null;
+        setDataIsEditable(false);
+    }
+
+    /**
      * Set the TmpPaths property.
      *
      * @param value The new value for TmpPaths
@@ -3483,10 +3495,10 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         return cacheClearDelay;
     }
 
-    /** user name          */
+    /** user name */
     private String userName;
 
-    /** password          */
+    /** password */
     private String password;
 
     /**

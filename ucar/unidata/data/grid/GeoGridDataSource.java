@@ -459,6 +459,7 @@ public class GeoGridDataSource extends GridDataSource {
     public void setTmpPaths(List paths) {
         //TODO: Figure out what to do here
         String resolverUrl = (String) getProperty(PROP_RESOLVERURL);
+        oldResolverUrl =resolverUrl;
         if (((paths != null) && (paths.size() > 0)) && (resolverUrl != null)
                 && (resolverUrl.length() > 0)) {
             Hashtable properties = getProperties();
@@ -466,12 +467,16 @@ public class GeoGridDataSource extends GridDataSource {
                 properties = new Hashtable();
             }
             String firstone = paths.get(0).toString();
-            String resolvedUrl = ThreddsHandler.resolveUrl(firstone,
-                                     properties);
-            if (resolvedUrl != null) {
-                setProperty(PROP_RESOLVERURL, firstone);
+            //If we are being saved as a zidv then we remove the resolverurl
+            if(firstone.indexOf(ucar.unidata.idv.IdvPersistenceManager.PROP_ZIDVPATH)>=0) {
+                getProperties().remove(PROP_RESOLVERURL);
+            } else {
+                String resolvedUrl = ThreddsHandler.resolveUrl(firstone,
+                                                               properties);
+                if (resolvedUrl != null) {
+                    setProperty(PROP_RESOLVERURL, firstone);
+                }
             }
-            return;
         }
         super.setTmpPaths(paths);
     }
@@ -858,6 +863,11 @@ public class GeoGridDataSource extends GridDataSource {
         StringBuffer sb = null;
         if ((sb2d != null) || (sb3d != null)) {
             sb = new StringBuffer(desc);
+            String resolverUrl = (String) getProperty(PROP_RESOLVERURL);
+            if(resolverUrl!=null) {
+                sb.append("<p>");
+                sb.append("Resolver URL:" + resolverUrl);
+            }
             sb.append(
                 "<p><table><tr><td><b>Field</b></td><td><b>Description</b></td><td><b>Dimensions</b></td><td><b>#Times</b></td><td><b>#Points</b></td></tr>\n");
         }
@@ -874,6 +884,16 @@ public class GeoGridDataSource extends GridDataSource {
         return sb.toString();
     }
 
+
+    private String oldResolverUrl;
+    public void resetTmpState() {
+        super.resetTmpState();
+        if(oldResolverUrl!=null) {
+            setProperty(PROP_RESOLVERURL, oldResolverUrl);
+        }
+
+
+    }
 
     /**
      * Create the dataset from the name of this DataSource.
