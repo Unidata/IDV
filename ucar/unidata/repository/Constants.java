@@ -20,11 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -94,37 +89,40 @@ public interface Constants {
     /** _more_ */
     public static final String TAG_EDGE = "edge";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TAG = "tag";
+
+    /** _more_ */
     public static final String TAG_ASSOCIATION = "association";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TAGS = "tags";
-    /** _more_          */
+
+    /** _more_ */
     public static final String TAG_ASSOCIATIONS = "associations";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_METHOD = "method";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_RSS_VERSION = "version";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_RSS_RSS = "rss";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_RSS_CHANNEL = "channel";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_RSS_ITEM = "item";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_RSS_TITLE = "title";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_RSS_PUBDATE = "pubDate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_RSS_DESCRIPTION = "description";
 
 
@@ -161,18 +159,20 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_TYPE = "type";
+
+    /** _more_ */
     public static final String ARG_SKIP = "skip";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_APPLET = "applet";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_USER = "user";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_TAG = "tag";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ASSOCIATION = "association";
 
     /** _more_ */
@@ -181,13 +181,13 @@ public interface Constants {
     /** _more_ */
     public static final String WHAT_ENTRIES = "entries";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WHAT_TYPE = "type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WHAT_TAG = "tag";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WHAT_ASSOCIATION = "association";
 
     /** _more_ */
@@ -205,9 +205,13 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_NAME = "name";
 
+    /** _more_ */
     public static final String ARG_SEARCHMETADATA = "searchmetadata";
+
     /** _more_ */
     public static final String ARG_ID = "id";
+
+    /** _more_ */
     public static final String ARG_IDS = "ids";
 
     /** _more_ */
@@ -222,7 +226,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_CREATEDATE = "createdate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_QUERY = "query";
 
     /** _more_ */
@@ -240,88 +244,119 @@ public interface Constants {
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_TAG = "tag";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_ASSOCIATION = "association";
 
     /** _more_ */
     public static final String TYPE_GROUP = "group";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_DB_PATTERN = "jdms.db.pattern";
 
-    public static final String PROP_DB_SCRIPT="jdms.db.script";
+    /** _more_ */
+    public static final String PROP_DB_SCRIPT = "jdms.db.script";
+
+    /** _more_ */
     public static final String PROP_DB_ENTRIES = "jdms.db.entries";
+
+    /** _more_ */
     public static final String PROP_OUTPUT_FILES = "jdms.output.files";
 
+    /** _more_ */
     public static final String PROP_NAVLINKS = "jdms.navlinks";
 
+    /** _more_ */
     public static final String PROP_API = "jdms.api";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_NAVSUBLINKS = "jdms.navsublinks";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_SHOW_APPLET = "jdms.html.showapplet";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_HTML_URLBASE = "jdms.html.urlbase";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_HTML_TEMPLATE = "jdms.html.template";
-    public static final String PROP_HTML_IMAGEPLAYER = "jdms.html.imageplayer";
-    public static final String PROP_HTML_TIMELINEAPPLET = "jdms.html.timelineapplet";
-    public static final String PROP_HTML_MIMEPROPERTIES  = "jdms.html.mimeproperties";
-    public static final String PROP_HTML_GRAPHAPPLET  = "jdms.html.graphapplet";
-    public static final String PROP_HTML_GRAPHTEMPLATE  = "jdms.html.graphtemplate";
+
+    /** _more_ */
+    public static final String PROP_HTML_IMAGEPLAYER =
+        "jdms.html.imageplayer";
+
+    /** _more_ */
+    public static final String PROP_HTML_TIMELINEAPPLET =
+        "jdms.html.timelineapplet";
+
+    /** _more_ */
+    public static final String PROP_HTML_MIMEPROPERTIES =
+        "jdms.html.mimeproperties";
+
+    /** _more_ */
+    public static final String PROP_HTML_GRAPHAPPLET =
+        "jdms.html.graphapplet";
+
+    /** _more_ */
+    public static final String PROP_HTML_GRAPHTEMPLATE =
+        "jdms.html.graphtemplate";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_DB_CANCACHE = "jdms.db.cancache";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_DB_DRIVER = "jdms.db.driver";
 
-    public static final String PROP_DB_DERBY_HOME ="jdms.db.derby.home";
+    /** _more_ */
+    public static final String PROP_DB_DERBY_HOME = "jdms.db.derby.home";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_DB_URL = "jdms.db.url";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_DB_USER = "jdms.db.user";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_DB_PASSWORD = "jdms.db.password";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_HTML_DOWNLOADENTRIESASFILES =
         "jdms.html.downloadentriesasfiles";
 
 
+    /** _more_ */
     public static final String TAG_HARVESTER = "harvester";
-    /** _more_          */
+
+    /** _more_ */
     public static final String TAG_DB_ENTRY = "entry";
 
+    /** _more_ */
     public static final String TAG_DB_HANDLER = "handler";
 
+    /** _more_ */
     public static final String TAG_OUTPUTHANDLER = "outputhandler";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DB_COLUMN = "column";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_DB_NAME = "name";
 
+    /** _more_ */
     public static final String ATTR_CLASS = "class";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_DB_DESCRIPTION = "description";
 
 
 
+    /** _more_ */
     public static final String ARG_NODETYPE = "nodetype";
+
+    /** _more_ */
     public static final String ARG_IMAGEWIDTH = "imagewidth";
 
     /** _more_ */
@@ -330,14 +365,21 @@ public interface Constants {
     /** _more_ */
     public static final String NODETYPE_GROUP = "group";
 
-    public static final String TAG_CATALOGREF= "catalogRef";
-    public static final String ATTR_XLINKTITLE="xlink:title";
+    /** _more_ */
+    public static final String TAG_CATALOGREF = "catalogRef";
+
+    /** _more_ */
+    public static final String ATTR_XLINKTITLE = "xlink:title";
+
+    /** _more_ */
     public static final String ATTR_XLINKHREF = "xlink:href";
 
 
+    /** _more_ */
     public static final String ARG_WIDTH = "width";
 
 
+    /** _more_ */
     public static final String ARG_ADMIN_WHAT = "what";
 
 

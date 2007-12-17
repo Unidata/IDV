@@ -4,6 +4,7 @@
      <column name="modelrun" type="string" isindex="true" cansearch="true" searchtype="select"  label="Model Run"/>
   </entry>
 
+
   <entry name="level3radar" description="Level 3 Radar Files" handler="ucar.unidata.repository.Level3RadarTypeHandler">
 	<column name="station" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Station" rows="5" columns="10"
                 names="/ucar/unidata/repository/resources/level3radar.station.properties"/>
@@ -21,7 +22,7 @@
 
   <entry name="level2radar" description="Level 2 Radar Files">
 	<column name="station" type="string" isindex="true" cansearch="true" searchtype="select" label="Station"
-                names="/ucar/unidata/repository/resources/level3radar.product.properties"/>
+                names="/ucar/unidata/repository/resources/level3radar.station.properties"/>
   </entry>
 
 

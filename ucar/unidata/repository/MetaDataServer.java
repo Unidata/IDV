@@ -20,10 +20,10 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository;
+
+
+import ucar.unidata.data.SqlUtil;
 
 
 import ucar.unidata.util.HtmlUtil;
@@ -36,7 +36,6 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.data.SqlUtil;
 
 import java.io.*;
 
@@ -67,12 +66,8 @@ public class MetaDataServer extends HttpServer implements Constants {
     /**
      * _more_
      *
-     *
-     *
      * @param args _more_
-     * @param driver _more_
-     * @param connectionURL _more_
-     * @throws Exception _more_
+     * @throws Throwable _more_
      */
     public MetaDataServer(String[] args) throws Throwable {
         super(8080);
@@ -122,7 +117,7 @@ public class MetaDataServer extends HttpServer implements Constants {
                 html = StringUtil.replace(html, "${sublinks}", "");
             }
             handler.writeResult(ok, html, result.getMimeType());
-        } else if(result.getInputStream()!=null) {
+        } else if (result.getInputStream() != null) {
             handler.writeResult(ok, result.getInputStream(),
                                 result.getMimeType());
 
@@ -159,13 +154,16 @@ public class MetaDataServer extends HttpServer implements Constants {
                 path = path.trim();
                 //                formArgs = SqlUtil.cleanUpArguments(formArgs);
                 try {
-                    User           user    = repository.findUser("jdoe");
+                    User user = repository.findUser("jdoe");
                     //user    = repository.findUser("anonymous");
                     RequestContext context = new RequestContext(user);
-                    Request        request = new Request(repository,path, context, formArgs);
-                    if(user==null) {
-                        Result result = new Result("Error",
-                                            new StringBuffer("Unknown request:" + path));
+                    Request request = new Request(repository, path, context,
+                                          formArgs);
+                    if (user == null) {
+                        Result result =
+                            new Result("Error",
+                                       new StringBuffer("Unknown request:"
+                                           + path));
                         result.putProperty(PROP_NAVLINKS,
                                            repository.getNavLinks(request));
                         writeContent(this, false, result);
@@ -181,9 +179,10 @@ public class MetaDataServer extends HttpServer implements Constants {
                                           IOUtil.getFileExtension(path));
                         path = StringUtil.replace(path,
                                 repository.getUrlBase(), "");
-                        if(path.trim().length()==0||path.equals("/")) {
-                           result = new Result("Error",
-                                    new StringBuffer("Unknown request:" + path));
+                        if ((path.trim().length() == 0) || path.equals("/")) {
+                            result = new Result("Error",
+                                    new StringBuffer("Unknown request:"
+                                        + path));
                             result.putProperty(PROP_NAVLINKS,
                                     repository.getNavLinks(request));
                             writeContent(this, false, result);
@@ -197,7 +196,8 @@ public class MetaDataServer extends HttpServer implements Constants {
                             writeResult(true, is, type);
                         } catch (IOException fnfe) {
                             result = new Result("Error",
-                                    new StringBuffer("Unknown request:" + path));
+                                    new StringBuffer("Unknown request:"
+                                        + path));
                             result.putProperty(PROP_NAVLINKS,
                                     repository.getNavLinks(request));
                             writeContent(this, false, result);
@@ -205,9 +205,10 @@ public class MetaDataServer extends HttpServer implements Constants {
                     }
                 } catch (Throwable exc) {
                     exc = LogUtil.getInnerException(exc);
-                    if(exc instanceof Request.BadInputException) {
-                        Result result = new Result("Error",
-                                                   new StringBuffer(exc.getMessage()));
+                    if (exc instanceof Request.BadInputException) {
+                        Result result =
+                            new Result("Error",
+                                       new StringBuffer(exc.getMessage()));
                         result.putProperty(PROP_NAVLINKS,
                                            repository.getNavLinks(null));
                         writeContent(this, false, result);
@@ -218,8 +219,8 @@ public class MetaDataServer extends HttpServer implements Constants {
                         String trace = LogUtil.getStackTrace(exc);
                         writeContent(this, false,
                                      new Result("Error",
-                                                new StringBuffer("<pre>" + trace
-                                                                 + "</pre>")));
+                                         new StringBuffer("<pre>" + trace
+                                             + "</pre>")));
                     }
                 }
             }
@@ -246,7 +247,7 @@ public class MetaDataServer extends HttpServer implements Constants {
      *
      * @param args _more_
      *
-     * @throws Exception _more_
+     * @throws Throwable _more_
      */
     public static void main(String[] args) throws Throwable {
         System.setProperty("derby.system.home", "foobar");

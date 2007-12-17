@@ -18,14 +18,13 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository;
 
 
-import java.util.Hashtable;
 import java.io.InputStream;
+
+
+import java.util.Hashtable;
 
 
 /**
@@ -33,33 +32,34 @@ import java.io.InputStream;
 
 public class Result {
 
-    /** _more_          */
+    /** _more_ */
     public static String TYPE_HTML = "text/html";
 
-    /** _more_          */
+    /** _more_ */
     public static String TYPE_XML = "text/xml";
 
-    /** _more_          */
+    /** _more_ */
     public static String TYPE_CSV = "text/csv";
 
-    /** _more_          */
+    /** _more_ */
     public static String TYPE_RSS = "application/rss+xml";
 
-    /** _more_          */
+    /** _more_ */
     private byte[] content;
 
-    /** _more_          */
+    /** _more_ */
     private String title = "";
 
-    /** _more_          */
+    /** _more_ */
     private String mimeType = "text/html";
 
-    /** _more_          */
+    /** _more_ */
     private boolean shouldDecorate = true;
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable properties = new Hashtable();
 
+    /** _more_ */
     private InputStream inputStream;
 
     /**
@@ -113,16 +113,23 @@ public class Result {
         this(title, content, mimeType, true);
     }
 
+    /**
+     * _more_
+     *
+     * @param title _more_
+     * @param inputStream _more_
+     * @param mimeType _more_
+     */
     public Result(String title, InputStream inputStream, String mimeType) {
-        this.title = title;
-        this.inputStream = inputStream;
-        this.mimeType  = mimeType;
+        this.title          = title;
+        this.inputStream    = inputStream;
+        this.mimeType       = mimeType;
         this.shouldDecorate = false;
     }
 
 
     /**
-
+     *
      * _more_
      *
      * @param title _more_
@@ -263,23 +270,23 @@ public class Result {
         return shouldDecorate;
     }
 
-/**
-Set the InputStream property.
+    /**
+     * Set the InputStream property.
+     *
+     * @param value The new value for InputStream
+     */
+    public void setInputStream(InputStream value) {
+        inputStream = value;
+    }
 
-@param value The new value for InputStream
-**/
-public void setInputStream (InputStream value) {
-	inputStream = value;
-}
-
-/**
-Get the InputStream property.
-
-@return The InputStream
-**/
-public InputStream getInputStream () {
-	return inputStream;
-}
+    /**
+     * Get the InputStream property.
+     *
+     * @return The InputStream
+     */
+    public InputStream getInputStream() {
+        return inputStream;
+    }
 
 
 

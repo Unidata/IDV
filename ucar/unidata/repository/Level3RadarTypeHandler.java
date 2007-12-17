@@ -20,12 +20,10 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
 package ucar.unidata.repository;
+
+
+import org.w3c.dom.*;
 
 
 import ucar.unidata.data.SqlUtil;
@@ -39,9 +37,9 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
-import java.sql.ResultSet;
-
 import java.sql.PreparedStatement;
+
+import java.sql.ResultSet;
 import java.sql.Statement;
 
 
@@ -52,7 +50,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
-import org.w3c.dom.*;
 
 /**
  *
@@ -67,26 +64,36 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
      * _more_
      *
      * @param repository _more_
-     * @param type _more_
-     * @param description _more_
-     * @param columns _more_
+     * @param entryNode _more_
+     *
+     * @throws Exception _more_
      */
-    public Level3RadarTypeHandler(Repository repository, Element entryNode) throws Exception {
+    public Level3RadarTypeHandler(Repository repository, Element entryNode)
+            throws Exception {
         super(repository, entryNode);
     }
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param request _more_
+     *
+     * @return _more_
+     */
     protected String getEntryLinks(Entry entry, Request request) {
-        if(entry.getValues()==null) {
+        if (entry.getValues() == null) {
             return super.getEntryLinks(entry, request);
         }
-        return super.getEntryLinks(entry, request) + " " +
-  
-            HtmlUtil.href(HtmlUtil.url("http://radar.weather.gov/radar.php","rid", (String)entry.getValues()[1],
-                                       "product",
-                                       (String)entry.getValues()[0]), 
-                          HtmlUtil.img(repository.fileUrl("/Radar.gif"),
-                                       "Show NWS Radar Site")," target=_OTHER");
-        
+        return super.getEntryLinks(entry, request) + " "
+               + HtmlUtil.href(
+                   HtmlUtil.url(
+                       "http://radar.weather.gov/radar.php", "rid",
+                       (String) entry.getValues()[1], "product",
+                       (String) entry.getValues()[0]), HtmlUtil.img(
+                           repository.fileUrl("/Radar.gif"),
+                           "Show NWS Radar Site"), " target=_OTHER");
+
 
     }
 

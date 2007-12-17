@@ -20,10 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -60,17 +56,17 @@ public class GenericEntry extends Entry {
      * @param typeHandler _more_
      * @param name _more_
      * @param description _more_
-     * @param type _more_
      * @param group _more_
      * @param user _more_
      * @param file _more_
      * @param date _more_
+     * @param values _more_
      */
     public GenericEntry(String id, TypeHandler typeHandler, String name,
                         String description, Group group, User user,
-                        String file, long date,Object[]values) {
+                        String file, long date, Object[] values) {
         this(id, typeHandler, name, description, group, user, file, date,
-              date, date,values);
+             date, date, values);
     }
 
 
@@ -83,21 +79,18 @@ public class GenericEntry extends Entry {
      * @param typeHandler _more_
      * @param name _more_
      * @param description _more_
-     * @param type _more_
      * @param group _more_
      * @param user _more_
      * @param file _more_
-     * @param station _more_
-     * @param product _more_
-     * @param date _more_
      * @param createDate _more_
      * @param startDate _more_
      * @param endDate _more_
+     * @param values _more_
      */
     public GenericEntry(String id, TypeHandler typeHandler, String name,
                         String description, Group group, User user,
                         String file, long createDate, long startDate,
-                        long endDate,Object []values) {
+                        long endDate, Object[] values) {
         super(id, typeHandler, name, description, group, user, file,
               createDate, startDate, endDate);
         this.values = values;

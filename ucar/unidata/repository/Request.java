@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository;
 
 
@@ -91,10 +88,17 @@ public class Request implements Constants {
     /** _more_ */
     private Hashtable parameters;
 
+    /** _more_ */
     private Hashtable originalParameters;
 
+    /** _more_ */
     private Repository repository;
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
         return type + " params:" + parameters;
     }
@@ -102,31 +106,40 @@ public class Request implements Constants {
     /**
      * _more_
      *
+     *
+     * @param repository _more_
      * @param type _more_
      * @param requestContext _more_
      * @param parameters _more_
      */
-    public Request(Repository repository, String type, RequestContext requestContext,
-                   Hashtable parameters) {
-        this.repository     = repository;
-        this.type           = type;
-        this.requestContext = requestContext;
-        this.parameters     = parameters;
-        this.originalParameters= new Hashtable();
+    public Request(Repository repository, String type,
+                   RequestContext requestContext, Hashtable parameters) {
+        this.repository         = repository;
+        this.type               = type;
+        this.requestContext     = requestContext;
+        this.parameters         = parameters;
+        this.originalParameters = new Hashtable();
         originalParameters.putAll(parameters);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getUrlArgs() {
-        StringBuffer sb = new StringBuffer();
-        int cnt = 0;
-        for (Enumeration keys = parameters.keys();
-                keys.hasMoreElements(); ) {
-            String arg = (String) keys.nextElement();
+        StringBuffer sb  = new StringBuffer();
+        int          cnt = 0;
+        for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {
+            String arg   = (String) keys.nextElement();
             String value = (String) parameters.get(arg);
-            if(value.length()==0) continue;
-            if(cnt++>0)
+            if (value.length() == 0) {
+                continue;
+            }
+            if (cnt++ > 0) {
                 sb.append("&");
-            sb.append(arg+"="+value);
+            }
+            sb.append(arg + "=" + value);
         }
         return sb.toString();
     }
@@ -157,7 +170,7 @@ public class Request implements Constants {
      */
     public int hashCode() {
         return type.hashCode() ^ requestContext.hashCode()
-            ^ originalParameters.hashCode();
+               ^ originalParameters.hashCode();
     }
 
     /**
@@ -187,26 +200,54 @@ public class Request implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     */
     public void remove(String key) {
         parameters.remove(key);
     }
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param value _more_
+     */
     public void put(String key, String value) {
-        parameters.put(key,value);
+        parameters.put(key, value);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
     public boolean defined(String key) {
-        String result = (String) get(key,(String)null);
+        String result = (String) get(key, (String) null);
         if (result == null) {
             return false;
         }
-        if(result.trim().length()==0) return false;
+        if (result.trim().length() == 0) {
+            return false;
+        }
         return true;
     }
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public String getUnsafeString(String key, String dflt) {
-        String result = (String)get(key,(String)null);
+        String result = (String) get(key, (String) null);
         if (result == null) {
             return dflt;
         }
@@ -214,32 +255,62 @@ public class Request implements Constants {
     }
 
 
+    /** _more_ */
     private static Pattern checker;
 
-    public String getCheckedString(String key, String dflt, String patternString) {
-        return getCheckedString(key,dflt, Pattern.compile(patternString));
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param dflt _more_
+     * @param patternString _more_
+     *
+     * @return _more_
+     */
+    public String getCheckedString(String key, String dflt,
+                                   String patternString) {
+        return getCheckedString(key, dflt, Pattern.compile(patternString));
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param dflt _more_
+     * @param pattern _more_
+     *
+     * @return _more_
+     */
     public String getCheckedString(String key, String dflt, Pattern pattern) {
-        String v = (String)get(key,(String)null);
+        String v = (String) get(key, (String) null);
         if (v == null) {
             return dflt;
         }
         Matcher matcher = pattern.matcher(v);
-        if(!matcher.find()) {
-            throw new BadInputException("Incorrect input for:" + key+" value:" + v+":");
+        if ( !matcher.find()) {
+            throw new BadInputException("Incorrect input for:" + key
+                                        + " value:" + v + ":");
         }
         //TODO:Check the value
         return v;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public String getString(String key, String dflt) {
-        if(checker==null) {
-            checker = Pattern.compile(repository.getProperty(PROP_DB_PATTERN));
+        if (checker == null) {
+            checker =
+                Pattern.compile(repository.getProperty(PROP_DB_PATTERN));
         }
-        return getCheckedString(key,dflt, checker);
+        return getCheckedString(key, dflt, checker);
     }
 
     /**
@@ -251,88 +322,182 @@ public class Request implements Constants {
      * @return _more_
      */
     private String get(String key, String dflt) {
-        String result = (String)parameters.get(key);
+        String result = (String) parameters.get(key);
         if (result == null) {
             return dflt;
         }
         return result;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getOutput() {
         return getOutput(OutputHandler.OUTPUT_HTML);
     }
 
+    /**
+     * _more_
+     *
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public String getOutput(String dflt) {
-        return  getString(ARG_OUTPUT,dflt);
+        return getString(ARG_OUTPUT, dflt);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public String getId(String dflt) {
-        return  getString(ARG_ID,dflt);
+        return getString(ARG_ID, dflt);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public String getIds(String dflt) {
-        return  getString(ARG_IDS,dflt);
+        return getString(ARG_IDS, dflt);
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public String getDateSelect(String name, String dflt) {
-        String v =  getUnsafeString(name,(String)null);
-        if(v==null) return dflt;
+        String v = getUnsafeString(name, (String) null);
+        if (v == null) {
+            return dflt;
+        }
         //TODO:Check value
         return v;
     }
 
+    /**
+     * _more_
+     *
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public String getWhat(String dflt) {
-        return   getString(ARG_WHAT,dflt);
+        return getString(ARG_WHAT, dflt);
     }
 
+    /**
+     * _more_
+     *
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public String getType(String dflt) {
-        return  getString(ARG_TYPE,dflt);
+        return getString(ARG_TYPE, dflt);
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getUser() {
-        return   getString(ARG_USER,(String)null);
+        return getString(ARG_USER, (String) null);
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public int get(String key, int dflt) {
-        String result = (String)get(key,(String)null);
-        if (result == null || result.trim().length()==0) {
+        String result = (String) get(key, (String) null);
+        if ((result == null) || (result.trim().length() == 0)) {
             return dflt;
         }
         return new Integer(result).intValue();
     }
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public double get(String key, double dflt) {
-        String result = (String)get(key,(String)null);
-        if (result == null || result.trim().length()==0) {
+        String result = (String) get(key, (String) null);
+        if ((result == null) || (result.trim().length() == 0)) {
             return dflt;
         }
         return new Double(result).doubleValue();
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     *
+     * @throws java.text.ParseException _more_
+     */
     public Date get(String key, Date dflt) throws java.text.ParseException {
-        String result = (String)get(key,(String)null);
-        if (result == null || result.trim().length()==0) {
+        String result = (String) get(key, (String) null);
+        if ((result == null) || (result.trim().length() == 0)) {
             return dflt;
         }
-        return  DateUtil.parse(result);
+        return DateUtil.parse(result);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public boolean get(String key, boolean dflt) {
-        String result =(String) get(key,(String)null);
-        if (result == null || result.trim().length()==0) {
+        String result = (String) get(key, (String) null);
+        if ((result == null) || (result.trim().length() == 0)) {
             return dflt;
         }
         return new Boolean(result).booleanValue();
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Enumeration keys() {
         return parameters.keys();
     }
@@ -374,7 +539,20 @@ public class Request implements Constants {
     }
 
 
+    /**
+     * Class BadInputException _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     public static class BadInputException extends RuntimeException {
+
+        /**
+         * _more_
+         *
+         * @param msg _more_
+         */
         public BadInputException(String msg) {
             super(msg);
         }

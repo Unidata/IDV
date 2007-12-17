@@ -19,9 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository;
 
 
@@ -81,14 +78,13 @@ import java.util.zip.*;
  */
 public class MetadataHandler implements Constants, Tables {
 
+    /** _more_ */
     private Repository repository;
 
     /**
      * _more_
      *
-     *
-     *
-     * @param args _more_
+     * @param repository _more_
      * @throws Exception _more_
      */
     public MetadataHandler(Repository repository) throws Exception {

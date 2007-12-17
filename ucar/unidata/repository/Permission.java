@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository;
 
 
@@ -79,10 +76,10 @@ import java.util.regex.*;
  */
 public class Permission {
 
-    /** _more_          */
+    /** _more_ */
     private boolean mustBeAdmin = true;
 
-    /** _more_          */
+    /** _more_ */
     private List<String> onlyTheseIps;
 
     /**
@@ -132,23 +129,23 @@ public class Permission {
         return true;
     }
 
-/**
-Set the MustBeAdmin property.
+    /**
+     * Set the MustBeAdmin property.
+     *
+     * @param value The new value for MustBeAdmin
+     */
+    public void setMustBeAdmin(boolean value) {
+        mustBeAdmin = value;
+    }
 
-@param value The new value for MustBeAdmin
-**/
-public void setMustBeAdmin (boolean value) {
-	mustBeAdmin = value;
-}
-
-/**
-Get the MustBeAdmin property.
-
-@return The MustBeAdmin
-**/
-public boolean getMustBeAdmin () {
-	return mustBeAdmin;
-}
+    /**
+     * Get the MustBeAdmin property.
+     *
+     * @return The MustBeAdmin
+     */
+    public boolean getMustBeAdmin() {
+        return mustBeAdmin;
+    }
 
 
 

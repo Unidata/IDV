@@ -20,13 +20,13 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository;
+
+
 import ucar.unidata.util.Misc;
 
 import java.io.File;
+
 
 /**
  *
@@ -36,53 +36,68 @@ import java.io.File;
  */
 public class Tag {
 
+    /** _more_ */
     private String name;
-    private int count=-1;
 
+    /** _more_ */
+    private int count = -1;
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     */
     public Tag(String name) {
         this.name = name;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param count _more_
+     */
     public Tag(String name, int count) {
-        this.name = name;
+        this.name  = name;
         this.count = count;
     }
 
-/**
-Set the Name property.
+    /**
+     * Set the Name property.
+     *
+     * @param value The new value for Name
+     */
+    public void setName(String value) {
+        name = value;
+    }
 
-@param value The new value for Name
-**/
-public void setName (String value) {
-	name = value;
+    /**
+     * Get the Name property.
+     *
+     * @return The Name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Set the Count property.
+     *
+     * @param value The new value for Count
+     */
+    public void setCount(int value) {
+        count = value;
+    }
+
+    /**
+     * Get the Count property.
+     *
+     * @return The Count
+     */
+    public int getCount() {
+        return count;
+    }
+
 }
 
-/**
-Get the Name property.
-
-@return The Name
-**/
-public String getName () {
-	return name;
-}
-
-/**
-Set the Count property.
-
-@param value The new value for Count
-**/
-public void setCount (int value) {
-	count = value;
-}
-
-/**
-Get the Count property.
-
-@return The Count
-**/
-public int getCount () {
-	return count;
-}
-
-}

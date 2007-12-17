@@ -19,9 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository;
 
 
@@ -80,128 +77,148 @@ import java.util.zip.*;
  * @version $Revision: 1.3 $
  */
 public class Metadata implements Constants, Tables {
+
+    /** _more_ */
     public static final String TYPE_HTML = "html";
+
+    /** _more_ */
     public static final String TYPE_URL = "html";
+
+    /** _more_ */
     public static final String TYPE_LINK = "link";
 
+    /** _more_ */
     public static final String IDTYPE_ENTRY = "entry";
+
+    /** _more_ */
     public static final String IDTYPE_GROUP = "group";
 
 
 
+    /** _more_ */
     private String id;
+
+    /** _more_ */
     private String idType;
+
+    /** _more_ */
     private String name;
+
+    /** _more_ */
     private String metadataType;
+
+    /** _more_ */
     private String content;
 
     /**
      * _more_
      *
-     *
-     *
-     * @param args _more_
-     * @throws Exception _more_
+     * @param id _more_
+     * @param idType _more_
+     * @param metadataType _more_
+     * @param name _more_
+     * @param content _more_
      */
-    public Metadata(String id, String idType, String metadataType, String name,  String content) {
-        this.id=id;
-        this.name=name;
-        this.idType=idType;
-        this.metadataType=metadataType;
-        this.content=content;
+    public Metadata(String id, String idType, String metadataType,
+                    String name, String content) {
+        this.id           = id;
+        this.name         = name;
+        this.idType       = idType;
+        this.metadataType = metadataType;
+        this.content      = content;
     }
 
 
-/**
-Set the Name property.
+    /**
+     * Set the Name property.
+     *
+     * @param value The new value for Name
+     */
+    public void setName(String value) {
+        name = value;
+    }
 
-@param value The new value for Name
-**/
-public void setName (String value) {
-	name = value;
-}
-
-/**
-Get the Name property.
-
-@return The Name
-**/
-public String getName () {
-	return name;
-}
+    /**
+     * Get the Name property.
+     *
+     * @return The Name
+     */
+    public String getName() {
+        return name;
+    }
 
 
-/**
-Set the Id property.
+    /**
+     * Set the Id property.
+     *
+     * @param value The new value for Id
+     */
+    public void setId(String value) {
+        id = value;
+    }
 
-@param value The new value for Id
-**/
-public void setId (String value) {
-	id = value;
-}
+    /**
+     * Get the Id property.
+     *
+     * @return The Id
+     */
+    public String getId() {
+        return id;
+    }
 
-/**
-Get the Id property.
+    /**
+     * Set the IdType property.
+     *
+     * @param value The new value for IdType
+     */
+    public void setIdType(String value) {
+        idType = value;
+    }
 
-@return The Id
-**/
-public String getId () {
-	return id;
-}
+    /**
+     * Get the IdType property.
+     *
+     * @return The IdType
+     */
+    public String getIdType() {
+        return idType;
+    }
 
-/**
-Set the IdType property.
+    /**
+     * Set the MetadataType property.
+     *
+     * @param value The new value for MetadataType
+     */
+    public void setMetadataType(String value) {
+        metadataType = value;
+    }
 
-@param value The new value for IdType
-**/
-public void setIdType (String value) {
-	idType = value;
-}
+    /**
+     * Get the MetadataType property.
+     *
+     * @return The MetadataType
+     */
+    public String getMetadataType() {
+        return metadataType;
+    }
 
-/**
-Get the IdType property.
+    /**
+     * Set the Content property.
+     *
+     * @param value The new value for Content
+     */
+    public void setContent(String value) {
+        content = value;
+    }
 
-@return The IdType
-**/
-public String getIdType () {
-	return idType;
-}
-
-/**
-Set the MetadataType property.
-
-@param value The new value for MetadataType
-**/
-public void setMetadataType (String value) {
-	metadataType = value;
-}
-
-/**
-Get the MetadataType property.
-
-@return The MetadataType
-**/
-public String getMetadataType () {
-	return metadataType;
-}
-
-/**
-Set the Content property.
-
-@param value The new value for Content
-**/
-public void setContent (String value) {
-	content = value;
-}
-
-/**
-Get the Content property.
-
-@return The Content
-**/
-public String getContent () {
-	return content;
-}
+    /**
+     * Get the Content property.
+     *
+     * @return The Content
+     */
+    public String getContent() {
+        return content;
+    }
 
 
 

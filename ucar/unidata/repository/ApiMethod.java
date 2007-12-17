@@ -18,9 +18,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository;
 
 
@@ -35,72 +32,93 @@ import java.util.Hashtable;
 public class ApiMethod {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_REQUEST = "request";
 
+    /** _more_ */
     public static final String ATTR_HANDLER = "handler";
 
+    /** _more_ */
     public static final String ATTR_TOPLEVEL = "toplevel";
 
+    /** _more_ */
     public static final String ATTR_NAME = "name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_METHOD = "method";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ADMIN = "admin";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_CANCACHE = "cancache";
 
+    /** _more_ */
     public static final String ATTR_ISHOME = "ishome";
 
-    /** _more_          */
+    /** _more_ */
     private String request;
 
-    /** _more_          */
+    /** _more_ */
     private String name;
 
+    /** _more_ */
     private boolean isTopLevel = false;
 
-    /** _more_          */
+    /** _more_ */
     private Permission permission;
 
-    private RequestHandler requestHandler; 
+    /** _more_ */
+    private RequestHandler requestHandler;
 
-    /** _more_          */
+    /** _more_ */
     private Method method;
 
-    /** _more_          */
+    /** _more_ */
     private boolean canCache = false;
 
     /**
      * _more_
      *
+     *
+     * @param requestHandler _more_
      * @param request _more_
+     * @param name _more_
      * @param permission _more_
      * @param method _more_
      * @param canCache _more_
+     * @param isTopLevel _more_
      */
-    public ApiMethod(RequestHandler requestHandler,
-                     String request, 
-                     String name,
-                     Permission permission, Method method,
-                     boolean canCache,
-                     boolean isTopLevel) {
+    public ApiMethod(RequestHandler requestHandler, String request,
+                     String name, Permission permission, Method method,
+                     boolean canCache, boolean isTopLevel) {
         this.requestHandler = requestHandler;
-        this.request    = request;
-        this.name = name;
-        this.permission = permission;
-        this.method     = method;
-        this.canCache   = canCache;
-        this.isTopLevel   = isTopLevel;
+        this.request        = request;
+        this.name           = name;
+        this.permission     = permission;
+        this.method         = method;
+        this.canCache       = canCache;
+        this.isTopLevel     = isTopLevel;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
         return request;
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result invoke(Request request) throws Exception {
         return (Result) getMethod().invoke(requestHandler,
                                            new Object[] { request });
@@ -183,41 +201,41 @@ public class ApiMethod {
     }
 
 
-/**
-Set the Name property.
+    /**
+     * Set the Name property.
+     *
+     * @param value The new value for Name
+     */
+    public void setName(String value) {
+        name = value;
+    }
 
-@param value The new value for Name
-**/
-public void setName (String value) {
-	name = value;
-}
+    /**
+     * Get the Name property.
+     *
+     * @return The Name
+     */
+    public String getName() {
+        return name;
+    }
 
-/**
-Get the Name property.
+    /**
+     * Set the IsTopLevel property.
+     *
+     * @param value The new value for IsTopLevel
+     */
+    public void setIsTopLevel(boolean value) {
+        isTopLevel = value;
+    }
 
-@return The Name
-**/
-public String getName () {
-	return name;
-}
-
-/**
-Set the IsTopLevel property.
-
-@param value The new value for IsTopLevel
-**/
-public void setIsTopLevel (boolean value) {
-	isTopLevel = value;
-}
-
-/**
-Get the IsTopLevel property.
-
-@return The IsTopLevel
-**/
-public boolean getIsTopLevel () {
-	return isTopLevel;
-}
+    /**
+     * Get the IsTopLevel property.
+     *
+     * @return The IsTopLevel
+     */
+    public boolean getIsTopLevel() {
+        return isTopLevel;
+    }
 
 
 

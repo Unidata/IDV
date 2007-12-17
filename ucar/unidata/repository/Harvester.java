@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository;
 
 
@@ -83,17 +80,35 @@ import java.util.regex.*;
  */
 public class Harvester {
 
-    public static final String ATTR_MONITOR="monitor";
-    public static final String ATTR_SLEEP="sleep";
+    /** _more_ */
+    public static final String ATTR_MONITOR = "monitor";
 
-    /** _more_          */
+    /** _more_ */
+    public static final String ATTR_NAME = "name";
+
+    /** _more_ */
+    public static final String ATTR_ACTIVE = "active";
+
+    /** _more_ */
+    public static final String ATTR_SLEEP = "sleep";
+
+    /** _more_ */
+    private String name;
+
+    /** _more_ */
     protected Repository repository;
 
+    /** _more_ */
     private Element element;
 
+    /** _more_ */
     private boolean monitor = false;
 
-    private double sleepMinutes=5;
+    /** _more_ */
+    private boolean active = false;
+
+    /** _more_ */
+    private double sleepMinutes = 5;
 
     /**
      * _more_
@@ -105,166 +120,21 @@ public class Harvester {
     }
 
 
-    public Harvester(Repository repository,Element element) {
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param element _more_
+     */
+    public Harvester(Repository repository, Element element) {
         this(repository);
-        this.monitor = XmlUtil.getAttribute(element,ATTR_MONITOR,false);
-        this.sleepMinutes = XmlUtil.getAttribute(element,ATTR_SLEEP,sleepMinutes);
+        this.name    = XmlUtil.getAttribute(element, ATTR_NAME, "");
+        this.monitor = XmlUtil.getAttribute(element, ATTR_MONITOR, false);
+        this.active  = XmlUtil.getAttribute(element, ATTR_ACTIVE, false);
+        this.sleepMinutes = XmlUtil.getAttribute(element, ATTR_SLEEP,
+                sleepMinutes);
+
     }
-
-
-    /**
-     * _more_
-     *
-     * @param rootDir _more_
-     * @param groupName _more_
-     * @param typeHandler _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public List<Entry> collectDummyLevel3RadarFiles(File rootDir,
-                                                    Group topGroup, final TypeHandler typeHandler)
-        throws Exception {
-        List<Entry> entries = new ArrayList();
-        long  baseTime    = repository.currentTime();
-        User user = repository.findUser("jdoe");
-        for (int stationIdx = 0; stationIdx < 50; stationIdx++) {
-            String station = "station" + stationIdx;
-            for (int productIdx = 0; productIdx < 10; productIdx++) {
-                String product = "product" + productIdx;
-                Group group = repository.findGroupFromName(topGroup.getFullName() + "/"
-                        + station + "/" + product,true);
-                for (int timeIdx = 0; timeIdx < 10; timeIdx++) {
-                    long time =  baseTime + timeIdx * 1000 * 60*60;
-                    entries.add(
-                        new Entry(
-                            repository.getGUID(), 
-                            typeHandler, 
-                            "file:" + stationIdx + "_" + productIdx + "_"
-                            + group, 
-                            "", 
-                            group,
-                            user,
-                            "file:" + stationIdx + "_" + productIdx + "_"
-                            + group, 
-                            time,new Object[]{station,product, new Double(40), new Double(-107),"Banana", new Boolean(true), new Double(stationIdx)}));
-
-                }
-            }
-        }
-
-        return entries;
-    }
-
-    /**
-     * _more_
-     *
-     *
-     * @param rootDir _more_
-     * @param groupName _more_
-     * @param typeHandler _more_
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public List<Entry> collectLevel3RadarFiles(File rootDir,
-            final Group topGroup, final TypeHandler typeHandler)
-            throws Exception {
-        long                         t1          = System.currentTimeMillis();
-        final List<Entry> entries = new ArrayList();
-        final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
-        final Pattern pattern =
-            Pattern.compile(
-                "([^/]+)/([^/]+)/[^/]+_(\\d\\d\\d\\d\\d\\d\\d\\d_\\d\\d\\d\\d)");
-
-        final User        user       = repository.findUser("jdoe");
-        IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
-            public int viewFile(File f) throws Exception {
-                String  name    = f.toString();
-                Matcher matcher = pattern.matcher(name);
-                if ( !matcher.find()) {
-                    return DO_CONTINUE;
-                }
-                if (entries.size() % 5000 == 0) {
-                    System.err.println("Found:" + entries.size());
-                }
-                String station = matcher.group(1);
-                String product = matcher.group(2);
-                Group group = repository.findGroupFromName(topGroup.getFullName() + "/"
-                                  + "NIDS" + "/" + station + "/" + product,true);
-                Date dttm = sdf.parse(matcher.group(3));
-                entries.add(new Entry(repository.getGUID(),
-                                             typeHandler, dttm.toString(), "", group, user,
-                                             f.toString(),  dttm.getTime(), new Object[]{station, product, new Double(40), new Double(-107),"Banana", new Boolean(true), new Double(5)}));
-                return DO_CONTINUE;
-            }
-        };
-
-        IOUtil.walkDirectory(rootDir, fileViewer);
-        long t2 = System.currentTimeMillis();
-        if(entries.size()>0) {
-            System.err.println("found:" + entries.size() + " in "
-                               + (t2 - t1));
-        }
-        return entries;
-    }
-
-
-
-
-
-
-    /**
-     * _more_
-     *
-     *
-     * @param rootDir _more_
-     * @param groupName _more_
-     * @param typeHandler _more_
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public List<Entry> collectLevel2radarFiles(File rootDir,
-            final String groupName, final TypeHandler typeHandler)
-            throws Exception {
-        long                         t1          = System.currentTimeMillis();
-        final List<Entry> entries = new ArrayList();
-        final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
-        final Pattern pattern =
-            Pattern.compile(
-                "([^/]+)/[^/]+_(\\d\\d\\d\\d\\d\\d\\d\\d_\\d\\d\\d\\d)");
-
-        final User        user       = repository.findUser("jdoe");
-        IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
-            public int viewFile(File f) throws Exception {
-                String  name    = f.toString();
-                Matcher matcher = pattern.matcher(name);
-                if ( !matcher.find()) {
-                    return DO_CONTINUE;
-                }
-                if (entries.size() % 5000 == 0) {
-                    System.err.println("Found:" + entries.size());
-                }
-                String station = matcher.group(1);
-                Group group = repository.findGroupFromName(groupName + "/"
-                                  + "craft" + "/" + station,true);
-                Date dttm = sdf.parse(matcher.group(2));
-                entries.add(new Entry(repository.getGUID(),
-                        typeHandler, dttm.toString(), "", group, user,
-                        f.toString(),dttm.getTime(), new Object[]{station}));
-                return DO_CONTINUE;
-            }
-        };
-
-        IOUtil.walkDirectory(rootDir, fileViewer);
-        long t2 = System.currentTimeMillis();
-        System.err.println("found:" + entries.size() + " in "
-                           + (t2 - t1));
-        return entries;
-    }
-
 
 
     /**
@@ -279,11 +149,12 @@ public class Harvester {
      * @throws Exception _more_
      */
     public List<Entry> collectSatelliteFiles(File rootDir,
-            final String groupName, final TypeHandler typeHandler)
+                                             final String groupName,
+                                             final TypeHandler typeHandler)
             throws Exception {
-        long                       t1      = System.currentTimeMillis();
-        final List<Entry> entries = new ArrayList();
-        final SimpleDateFormat     sdf =
+        long                   t1      = System.currentTimeMillis();
+        final List<Entry>      entries = new ArrayList();
+        final SimpleDateFormat sdf     =
             new SimpleDateFormat("yyyyMMdd_HHmm");
         final Pattern pattern =
             Pattern.compile(
@@ -303,21 +174,22 @@ public class Harvester {
                 String platform   = matcher.group(1);
                 String resolution = matcher.group(2);
                 String product    = matcher.group(3);
-                Group group = repository.findGroupFromName(groupName +  "/" + platform + "/"
-                                  + resolution + "/" + product,true);
+                Group group = repository.findGroupFromName(groupName + "/"
+                                  + platform + "/" + resolution + "/"
+                                  + product, true);
                 Date dttm = sdf.parse(matcher.group(4));
-                entries.add(new Entry(repository.getGUID(),
-                        typeHandler, dttm.toString(), "", group, user,
-                        f.toString(),
-                        dttm.getTime(),
-                                              new Object[]{platform, resolution, product}));
+                entries.add(new Entry(repository.getGUID(), typeHandler,
+                                      dttm.toString(), "", group, user,
+                                      f.toString(), dttm.getTime(),
+                                      new Object[] { platform,
+                        resolution, product }));
                 return DO_CONTINUE;
             }
         };
 
         IOUtil.walkDirectory(rootDir, fileViewer);
         long t2 = System.currentTimeMillis();
-        if(entries.size()>0) {
+        if (entries.size() > 0) {
             System.err.println("found sat files:" + entries.size() + " in "
                                + (t2 - t1));
         }
@@ -331,6 +203,7 @@ public class Harvester {
      * @param rootDir _more_
      * @param rootGroup _more_
      * @param typeHandler _more_
+     * @param directories _more_
      *
      * @return _more_
      *
@@ -352,7 +225,7 @@ public class Harvester {
                     return DO_DONTRECURSE;
                 }
                 if (f.isDirectory()) {
-                    directories.add(new FileInfo(f,true));
+                    directories.add(new FileInfo(f, true));
                     return DO_CONTINUE;
                 }
                 //                if ( !name.endsWith(".java")) {
@@ -368,23 +241,27 @@ public class Harvester {
                                              true);
                 toks.add(0, rootGroup);
                 Group group =
-                    repository.findGroupFromName(StringUtil.join("/", toks),true);
-                Entry entry = new Entry(repository.getGUID(),
-                                               typeHandler, name, name, group,
-                                               user, f.toString(),
-                                               f.lastModified(),null);
+                    repository.findGroupFromName(StringUtil.join("/", toks),
+                        true);
+                Entry entry = new Entry(repository.getGUID(), typeHandler,
+                                        name, name, group, user,
+                                        f.toString(), f.lastModified(), null);
                 if (name.endsWith(".java")) {
                     String classPath = IOUtil.stripExtension(f.toString());
-                    classPath = classPath.replace("\\","/");
+                    classPath = classPath.replace("\\", "/");
                     int idx = classPath.indexOf("ucar/unidata");
-                    if(idx>=0) {
+                    if (idx >= 0) {
                         classPath = classPath.substring(idx);
-                        String link = "http://www.unidata.ucar.edu/software/idv/docs/javadoc/" + classPath+".html";
-                        System.err.println ("class:" + classPath);
-                        entry.addMetadata(new Metadata(entry.getId(), Metadata.IDTYPE_ENTRY,Metadata.TYPE_LINK,"javadoc",link));
-                   }
+                        String link =
+                            "http://www.unidata.ucar.edu/software/idv/docs/javadoc/"
+                            + classPath + ".html";
+                        System.err.println("class:" + classPath);
+                        entry.addMetadata(new Metadata(entry.getId(),
+                                Metadata.IDTYPE_ENTRY, Metadata.TYPE_LINK,
+                                "javadoc", link));
+                    }
 
-                    
+
                 }
 
                 String ext = IOUtil.getFileExtension(path);
@@ -417,7 +294,8 @@ public class Harvester {
      * @throws Exception _more_
      */
     public List<Entry> collectModelFiles(File rootDir,
-            final String groupName, final TypeHandler typeHandler)
+                                         final String groupName,
+                                         final TypeHandler typeHandler)
             throws Exception {
         final List<Entry> entries = new ArrayList();
         final SimpleDateFormat[] sdf = { new SimpleDateFormat("yyyyMMddHH"),
@@ -459,13 +337,14 @@ public class Harvester {
 
                 Group group = repository.findGroupFromName(groupName + "/"
                                   + "model" + "/" + modelGroup + "/"
-                                  + modelRun,true);
+                                  + modelRun, true);
 
                 entries.add(new Entry(repository.getGUID(), typeHandler,
-                                           IOUtil.getFileTail(f.toString()),
-                                           "", group, user, f.toString(),
-                                           dttm.getTime(),
-                                             new Object[]{modelGroup, modelRun}));
+                                      IOUtil.getFileTail(f.toString()), "",
+                                      group, user, f.toString(),
+                                      dttm.getTime(),
+                                      new Object[] { modelGroup,
+                        modelRun }));
                 return DO_CONTINUE;
             }
         };
@@ -474,42 +353,112 @@ public class Harvester {
         return entries;
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    public final void run() throws Exception {
+        try {
+            runInner();
+            setActive(false);
+        } catch (Exception exc) {
+            repository.log("In harvester", exc);
+        }
+    }
 
-/**
-Set the Monitor property.
 
-@param value The new value for Monitor
-**/
-public void setMonitor (boolean value) {
-	monitor = value;
-}
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getExtraInfo() {
+        return "";
+    }
 
-/**
-Get the Monitor property.
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void runInner() throws Exception {}
 
-@return The Monitor
-**/
-public boolean getMonitor () {
-	return monitor;
-}
 
-/**
-Set the SleepMinutes property.
 
-@param value The new value for SleepMinutes
-**/
-public void setSleepMinutes (double value) {
-	sleepMinutes = value;
-}
+    /**
+     * Set the Active property.
+     *
+     * @param value The new value for Active
+     */
+    public void setActive(boolean value) {
+        active = value;
+    }
 
-/**
-Get the SleepMinutes property.
+    /**
+     * Get the Active property.
+     *
+     * @return The Active
+     */
+    public boolean getActive() {
+        return active;
+    }
 
-@return The SleepMinutes
-**/
-public double getSleepMinutes () {
-	return sleepMinutes;
-}
+
+
+    /**
+     * Set the Monitor property.
+     *
+     * @param value The new value for Monitor
+     */
+    public void setMonitor(boolean value) {
+        monitor = value;
+    }
+
+    /**
+     * Get the Monitor property.
+     *
+     * @return The Monitor
+     */
+    public boolean getMonitor() {
+        return monitor;
+    }
+
+    /**
+     * Set the SleepMinutes property.
+     *
+     * @param value The new value for SleepMinutes
+     */
+    public void setSleepMinutes(double value) {
+        sleepMinutes = value;
+    }
+
+    /**
+     * Get the SleepMinutes property.
+     *
+     * @return The SleepMinutes
+     */
+    public double getSleepMinutes() {
+        return sleepMinutes;
+    }
+
+    /**
+     * Set the Name property.
+     *
+     * @param value The new value for Name
+     */
+    public void setName(String value) {
+        name = value;
+    }
+
+    /**
+     * Get the Name property.
+     *
+     * @return The Name
+     */
+    public String getName() {
+        return name;
+    }
 
 
 

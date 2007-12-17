@@ -20,10 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -48,13 +44,16 @@ import java.util.List;
 public class Entry {
 
 
-    Object []values;
+    /** _more_ */
+    Object[] values;
 
-    /** _more_          */
+    /** _more_ */
     List<String> tags;
 
+    /** _more_ */
     List<Association> associations = new ArrayList<Association>();
 
+    /** _more_ */
     List<Metadata> metadata = new ArrayList<Metadata>();
 
 
@@ -71,7 +70,7 @@ public class Entry {
     /** _more_ */
     private Group group;
 
-    /** _more_          */
+    /** _more_ */
     private User user;
 
     /** _more_ */
@@ -99,7 +98,6 @@ public class Entry {
      * @param typeHandler _more_
      * @param name _more_
      * @param description _more_
-     * @param type _more_
      * @param group _more_
      * @param user _more_
      * @param file _more_
@@ -113,11 +111,24 @@ public class Entry {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param typeHandler _more_
+     * @param name _more_
+     * @param description _more_
+     * @param group _more_
+     * @param user _more_
+     * @param file _more_
+     * @param date _more_
+     * @param values _more_
+     */
     public Entry(String id, TypeHandler typeHandler, String name,
                  String description, Group group, User user, String file,
-                 long date, Object[]values) {
+                 long date, Object[] values) {
         this(id, typeHandler, name, description, group, user, file, date,
-             date, date,values);
+             date, date, values);
     }
 
 
@@ -128,13 +139,9 @@ public class Entry {
      * @param typeHandler _more_
      * @param name _more_
      * @param description _more_
-     * @param type _more_
      * @param group _more_
      * @param user _more_
      * @param file _more_
-     * @param station _more_
-     * @param product _more_
-     * @param date _more_
      * @param createDate _more_
      * @param startDate _more_
      * @param endDate _more_
@@ -142,13 +149,29 @@ public class Entry {
     public Entry(String id, TypeHandler typeHandler, String name,
                  String description, Group group, User user, String file,
                  long createDate, long startDate, long endDate) {
-        this(id,typeHandler, name, description, group, user, file, createDate,
-              startDate, endDate, null);
+        this(id, typeHandler, name, description, group, user, file,
+             createDate, startDate, endDate, null);
     }
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param typeHandler _more_
+     * @param name _more_
+     * @param description _more_
+     * @param group _more_
+     * @param user _more_
+     * @param file _more_
+     * @param createDate _more_
+     * @param startDate _more_
+     * @param endDate _more_
+     * @param values _more_
+     */
     public Entry(String id, TypeHandler typeHandler, String name,
                  String description, Group group, User user, String file,
-                 long createDate, long startDate, long endDate, Object[]values) {
+                 long createDate, long startDate, long endDate,
+                 Object[] values) {
         this.id          = id;
         this.typeHandler = typeHandler;
         this.name        = name;
@@ -159,10 +182,15 @@ public class Entry {
         this.createDate  = createDate;
         this.startDate   = startDate;
         this.endDate     = endDate;
-        this.values = values;
+        this.values      = values;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getInsertSql() {
         return null;
     }
@@ -406,48 +434,58 @@ public class Entry {
 
     }
 
-/**
-Set the Metadata property.
+    /**
+     * Set the Metadata property.
+     *
+     * @param value The new value for Metadata
+     */
+    public void setMetadata(List<Metadata> value) {
+        metadata = value;
+    }
 
-@param value The new value for Metadata
-**/
-public void setMetadata (List<Metadata> value) {
-	metadata = value;
-}
+    /**
+     * Get the Metadata property.
+     *
+     * @return The Metadata
+     */
+    public List<Metadata> getMetadata() {
+        return metadata;
+    }
 
-/**
-Get the Metadata property.
-
-@return The Metadata
-**/
-public List<Metadata> getMetadata () {
-	return metadata;
-}
-
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
     public void addMetadata(Metadata value) {
         metadata.add(value);
     }
 
 
-/**
-Set the Associations property.
+    /**
+     * Set the Associations property.
+     *
+     * @param value The new value for Associations
+     */
+    public void setAssociations(List<Association> value) {
+        associations = value;
+    }
 
-@param value The new value for Associations
-**/
-public void setAssociations (List<Association> value) {
-	associations = value;
-}
-
-/**
-Get the Associations property.
-
-@return The Associations
-**/
-public List<Association> getAssociations () {
-	return associations;
-}
+    /**
+     * Get the Associations property.
+     *
+     * @return The Associations
+     */
+    public List<Association> getAssociations() {
+        return associations;
+    }
 
 
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
     public void addAssociation(Association value) {
         if (associations == null) {
             associations = new ArrayList<Association>();
@@ -458,23 +496,23 @@ public List<Association> getAssociations () {
 
 
 
-/**
-Set the Values property.
+    /**
+     * Set the Values property.
+     *
+     * @param value The new value for Values
+     */
+    public void setValues(Object[] value) {
+        values = value;
+    }
 
-@param value The new value for Values
-**/
-public void setValues (Object[] value) {
-	values = value;
-}
-
-/**
-Get the Values property.
-
-@return The Values
-**/
-public Object[] getValues () {
-	return values;
-}
+    /**
+     * Get the Values property.
+     *
+     * @return The Values
+     */
+    public Object[] getValues() {
+        return values;
+    }
 
 
 

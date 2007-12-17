@@ -19,9 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository;
 
 
@@ -84,7 +81,10 @@ public class ImageOutputHandler extends OutputHandler {
 
 
 
+    /** _more_ */
     public static final String OUTPUT_GALLERY = "default.gallery";
+
+    /** _more_ */
     public static final String OUTPUT_PLAYER = "default.player";
 
 
@@ -94,34 +94,62 @@ public class ImageOutputHandler extends OutputHandler {
      * _more_
      *
      *
-     *
-     * @param args _more_
+     * @param repository _more_
+     * @param element _more_
      * @throws Exception _more_
      */
-    public ImageOutputHandler(Repository repository,Element element) throws Exception {
-        super(repository,element);
+    public ImageOutputHandler(Repository repository, Element element)
+            throws Exception {
+        super(repository, element);
     }
 
-    public boolean canHandle(Request request)  {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
+    public boolean canHandle(Request request) {
         String output = (String) request.getOutput();
-        return  output.equals(OUTPUT_GALLERY) ||
-            output.equals(OUTPUT_PLAYER);
+        return output.equals(OUTPUT_GALLERY) || output.equals(OUTPUT_PLAYER);
     }
 
 
-    protected List getOutputTypesFor(Request request, String what) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param what _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List getOutputTypesFor(Request request, String what)
+            throws Exception {
         List list = new ArrayList();
-        if(what.equals(WHAT_ENTRIES)) {
-            list.add(new TwoFacedObject("Gallery",OUTPUT_GALLERY));
-            list.add(new TwoFacedObject("Image Player",OUTPUT_PLAYER));
+        if (what.equals(WHAT_ENTRIES)) {
+            list.add(new TwoFacedObject("Gallery", OUTPUT_GALLERY));
+            list.add(new TwoFacedObject("Image Player", OUTPUT_PLAYER));
         }
         return list;
     }
 
-    protected List getOutputTypesForEntries(Request request) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List getOutputTypesForEntries(Request request)
+            throws Exception {
         List list = new ArrayList();
-        list.add(new TwoFacedObject("Gallery",OUTPUT_GALLERY));
-        list.add(new TwoFacedObject("Image Player",OUTPUT_PLAYER));
+        list.add(new TwoFacedObject("Gallery", OUTPUT_GALLERY));
+        list.add(new TwoFacedObject("Image Player", OUTPUT_PLAYER));
         return list;
     }
 
@@ -132,6 +160,13 @@ public class ImageOutputHandler extends OutputHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param output _more_
+     *
+     * @return _more_
+     */
     public String getMimeType(String output) {
         if (output.equals(OUTPUT_GALLERY)) {
             return repository.getMimeTypeFromSuffix(".html");
@@ -149,62 +184,77 @@ public class ImageOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param entries _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Result processEntries(Request request, List<Entry> entries) throws Exception {
-        StringBuffer sb      = new StringBuffer();
-        String       output  = request.getOutput();
-        boolean showApplet = repository.isAppletEnabled(request);
+    public Result processEntries(Request request, List<Entry> entries)
+            throws Exception {
+        StringBuffer sb         = new StringBuffer();
+        String       output     = request.getOutput();
+        boolean      showApplet = repository.isAppletEnabled(request);
         if (entries.size() == 0) {
             sb.append("<b>Nothing Found</b><p>");
             Result result = new Result("Query Results", sb,
                                        getMimeType(output));
-            result.putProperty(PROP_NAVSUBLINKS, getEntriesHeader(request,  output,WHAT_ENTRIES)); 
+            result.putProperty(PROP_NAVSUBLINKS,
+                               getEntriesHeader(request, output,
+                                   WHAT_ENTRIES));
             return result;
         }
 
-        if (output.equals(OUTPUT_GALLERY) ) {
+        if (output.equals(OUTPUT_GALLERY)) {
             sb.append("<table>");
-        } else if(output.equals(OUTPUT_PLAYER)) {
-        }
+        } else if (output.equals(OUTPUT_PLAYER)) {}
 
-        
-        int col=0;
-        String firstImage="";
-        if(output.equals(OUTPUT_PLAYER)) {
-            int cnt=0;
-            for (int i=entries.size()-1;i>=0;i--) {
+
+        int    col        = 0;
+        String firstImage = "";
+        if (output.equals(OUTPUT_PLAYER)) {
+            int cnt = 0;
+            for (int i = entries.size() - 1; i >= 0; i--) {
                 Entry entry = entries.get(i);
-                if(!ImageUtils.isImage(entry.getFile())) continue;
-                String url = HtmlUtil.url(repository.URL_GETENTRY + entry.getName(), ARG_ID, entry.getId());
-                if(cnt==0) firstImage = url;
+                if ( !ImageUtils.isImage(entry.getFile())) {
+                    continue;
+                }
+                String url = HtmlUtil.url(repository.URL_GETENTRY
+                                          + entry.getName(), ARG_ID,
+                                              entry.getId());
+                if (cnt == 0) {
+                    firstImage = url;
+                }
                 String entryUrl = getEntryUrl(entry);
-                String title ="<table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">";
-                title +="<tr><td><b>Image:</b> " +entryUrl +"</td><td align=right>" + new Date(entry.getStartDate());
-                title+="</table>";
+                String title =
+                    "<table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">";
+                title += "<tr><td><b>Image:</b> " + entryUrl
+                         + "</td><td align=right>"
+                         + new Date(entry.getStartDate());
+                title += "</table>";
                 title = title.replace("\"", "\\\"");
-                sb.append("addImage("+
-                          HtmlUtil.quote(url)+","+
-                          HtmlUtil.quote(title)+");\n");
+                sb.append("addImage(" + HtmlUtil.quote(url) + ","
+                          + HtmlUtil.quote(title) + ");\n");
                 cnt++;
             }
         } else {
             for (Entry entry : entries) {
-                if(!ImageUtils.isImage(entry.getFile())) continue;
-                if(col>=2) {
-                    sb.append("</tr>");
-                    col=0;
+                if ( !ImageUtils.isImage(entry.getFile())) {
+                    continue;
                 }
-                if(col==0) 
+                if (col >= 2) {
+                    sb.append("</tr>");
+                    col = 0;
+                }
+                if (col == 0) {
                     sb.append("<tr valign=\"bottom\">");
+                }
                 col++;
-                
+
                 sb.append("<td>");
-                sb.append(HtmlUtil.img(HtmlUtil.url(repository.URL_GETENTRY + entry.getName(), ARG_ID, entry.getId()),"",
-                                       XmlUtil.attr(ARG_WIDTH,"400")));
+                sb.append(HtmlUtil.img(HtmlUtil.url(repository.URL_GETENTRY
+                        + entry.getName(), ARG_ID, entry.getId()), "",
+                            XmlUtil.attr(ARG_WIDTH, "400")));
                 sb.append("<br>\n");
                 sb.append(getEntryUrl(entry));
                 sb.append(" " + new Date(entry.getStartDate()));
@@ -216,15 +266,17 @@ public class ImageOutputHandler extends OutputHandler {
         if (output.equals(OUTPUT_GALLERY)) {
             sb.append("</table>\n");
         } else if (output.equals(OUTPUT_PLAYER)) {
-            String playerTemplate = repository.getResource(PROP_HTML_IMAGEPLAYER);
-            String tmp = playerTemplate.replace("${imagelist}", sb.toString());
-            tmp = tmp.replace("${firstimage}", firstImage);            
+            String playerTemplate =
+                repository.getResource(PROP_HTML_IMAGEPLAYER);
+            String tmp = playerTemplate.replace("${imagelist}",
+                             sb.toString());
+            tmp = tmp.replace("${firstimage}", firstImage);
             tmp = StringUtil.replace(tmp, "${root}", repository.getUrlBase());
-            sb = new StringBuffer(tmp);
+            sb  = new StringBuffer(tmp);
         }
-        Result result = new Result("Query Results", sb,
-                                   getMimeType(output));
-        result.putProperty(PROP_NAVSUBLINKS, getEntriesHeader(request,  output,WHAT_ENTRIES)); 
+        Result result = new Result("Query Results", sb, getMimeType(output));
+        result.putProperty(PROP_NAVSUBLINKS,
+                           getEntriesHeader(request, output, WHAT_ENTRIES));
         return result;
 
     }

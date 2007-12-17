@@ -20,15 +20,17 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.repository;
+
+
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
 import java.io.File;
-import java.util.List;
+
 import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Class FileInfo _more_
@@ -46,11 +48,12 @@ public class FileInfo {
     long time;
 
     /** _more_ */
-    long size=0;
+    long size = 0;
 
     /** _more_ */
     boolean hasInitialized = false;
 
+    /** _more_ */
     boolean isDir;
 
     /**
@@ -62,12 +65,19 @@ public class FileInfo {
         this(f, f.isDirectory());
     }
 
+    /**
+     * _more_
+     *
+     * @param f _more_
+     * @param isDir _more_
+     */
     public FileInfo(File f, boolean isDir) {
         this.isDir = isDir;
-        file = f;
-        time           = file.lastModified();
-        if(!isDir)
-            size           = file.length();
+        file       = f;
+        time       = file.lastModified();
+        if ( !isDir) {
+            size = file.length();
+        }
         hasInitialized = true;
     }
 
@@ -95,9 +105,10 @@ public class FileInfo {
     public boolean hasChanged() {
         if ( !hasInitialized) {
             if (file.exists()) {
-                time           = file.lastModified();
-                if(!isDir)
-                    size           = file.length();
+                time = file.lastModified();
+                if ( !isDir) {
+                    size = file.length();
+                }
                 hasInitialized = true;
                 return true;
             } else {
@@ -105,7 +116,9 @@ public class FileInfo {
             }
         }
         long    newTime = file.lastModified();
-        long    newSize = (isDir?0:file.length());
+        long    newSize = (isDir
+                           ? 0
+                           : file.length());
         boolean changed = (newTime != time) || (newSize != size);
         time = newTime;
         size = newSize;
@@ -139,13 +152,24 @@ public class FileInfo {
         return file.toString();
     }
 
-    public static List<FileInfo> collectDirs(File rootDir) throws  Exception {
-        final List<FileInfo> dirs    = new ArrayList();
-        IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
+    /**
+     * _more_
+     *
+     * @param rootDir _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static List<FileInfo> collectDirs(File rootDir) throws Exception {
+        final List<FileInfo> dirs       = new ArrayList();
+        IOUtil.FileViewer    fileViewer = new IOUtil.FileViewer() {
             public int viewFile(File f) throws Exception {
                 if (f.isDirectory()) {
-                    if(f.getName().startsWith(".")) return DO_DONTRECURSE;
-                    dirs.add(new FileInfo(f,true));
+                    if (f.getName().startsWith(".")) {
+                        return DO_DONTRECURSE;
+                    }
+                    dirs.add(new FileInfo(f, true));
                 }
                 return DO_CONTINUE;
             }
@@ -155,57 +179,65 @@ public class FileInfo {
     }
 
 
-    public static void main(String[]args) throws Exception {
-        File rootDir =
-            new File(
-                "c:/cygwin/home/jeffmc/unidata");
-        if(!rootDir.exists()) {
-            rootDir =
-                new File(
-                         "/data/ldm/gempak/nexrad/NIDS");            
+    /**
+     * _more_
+     *
+     * @param args _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void main(String[] args) throws Exception {
+        File rootDir = new File("c:/cygwin/home/jeffmc/unidata");
+        if ( !rootDir.exists()) {
+            rootDir = new File("/data/ldm/gempak/nexrad/NIDS");
         }
-        if(args.length>0) 
+        if (args.length > 0) {
             rootDir = new File(args[0]);
-        final List<FileInfo> dirs    = new ArrayList();
-        final int[]cnt = {0};
-        IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
+        }
+        final List<FileInfo> dirs       = new ArrayList();
+        final int[]          cnt        = { 0 };
+        IOUtil.FileViewer    fileViewer = new IOUtil.FileViewer() {
             public int viewFile(File f) throws Exception {
                 cnt[0]++;
-                if(cnt[0]%1000==0) System.err.print(".");
+                if (cnt[0] % 1000 == 0) {
+                    System.err.print(".");
+                }
                 if (f.isDirectory()) {
-                    dirs.add(new FileInfo(f,true));
+                    dirs.add(new FileInfo(f, true));
                     //    if(dirs.size()%1000==0) System.err.print(".");
                 }
                 return DO_CONTINUE;
             }
         };
 
-        long tt1= System.currentTimeMillis();
+        long tt1 = System.currentTimeMillis();
         IOUtil.walkDirectory(rootDir, fileViewer);
-        long tt2= System.currentTimeMillis();
-        System.err.println("found:" + dirs.size() + " in:" + (tt2-tt1) + " looked at:" + cnt[0] );
+        long tt2 = System.currentTimeMillis();
+        System.err.println("found:" + dirs.size() + " in:" + (tt2 - tt1)
+                           + " looked at:" + cnt[0]);
 
-        while(true) {
+        while (true) {
             long t1 = System.currentTimeMillis();
-            for(FileInfo fileInfo: dirs) {
+            for (FileInfo fileInfo : dirs) {
                 long oldTime = fileInfo.time;
-                if(fileInfo.hasChanged()) {
-                    System.err.println ("Changed:" + fileInfo);
-                    File[]files = fileInfo.file.listFiles();
-                    for(int i=0;i<files.length;i++) {
-                        if(files[i].lastModified()> oldTime) {
-                            System.err.println ("    " + files[i].getName());
+                if (fileInfo.hasChanged()) {
+                    System.err.println("Changed:" + fileInfo);
+                    File[] files = fileInfo.file.listFiles();
+                    for (int i = 0; i < files.length; i++) {
+                        if (files[i].lastModified() > oldTime) {
+                            System.err.println("    " + files[i].getName());
                         }
 
                     }
-                    
+
 
                 }
             }
-            long t2= System.currentTimeMillis();
+            long t2 = System.currentTimeMillis();
             //            System.err.println ("Time:" + (t2-t1));
             Misc.sleep(5000);
         }
     }
 
 }
+

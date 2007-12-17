@@ -20,10 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -58,10 +54,17 @@ public class Association {
     private String toId;
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param fromId _more_
+     * @param toId _more_
+     */
     public Association(String name, String fromId, String toId) {
-        this.name = name;
+        this.name   = name;
         this.fromId = fromId;
-        this.toId = toId;
+        this.toId   = toId;
     }
 
 
@@ -86,41 +89,41 @@ public class Association {
 
 
 
-/**
-Set the FromId property.
+    /**
+     * Set the FromId property.
+     *
+     * @param value The new value for FromId
+     */
+    public void setFromId(String value) {
+        fromId = value;
+    }
 
-@param value The new value for FromId
-**/
-public void setFromId (String value) {
-	fromId = value;
-}
+    /**
+     * Get the FromId property.
+     *
+     * @return The FromId
+     */
+    public String getFromId() {
+        return fromId;
+    }
 
-/**
-Get the FromId property.
+    /**
+     * Set the ToId property.
+     *
+     * @param value The new value for ToId
+     */
+    public void setToId(String value) {
+        toId = value;
+    }
 
-@return The FromId
-**/
-public String getFromId () {
-	return fromId;
-}
-
-/**
-Set the ToId property.
-
-@param value The new value for ToId
-**/
-public void setToId (String value) {
-	toId = value;
-}
-
-/**
-Get the ToId property.
-
-@return The ToId
-**/
-public String getToId () {
-	return toId;
-}
+    /**
+     * Get the ToId property.
+     *
+     * @return The ToId
+     */
+    public String getToId() {
+        return toId;
+    }
 
 
 

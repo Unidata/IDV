@@ -19,9 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository;
 
 
@@ -85,11 +82,12 @@ public class OutputHandler implements Constants, Tables {
     /** _more_ */
     public static final String OUTPUT_HTML = "default.html";
 
-    /** _more_          */
+    /** _more_ */
     public static final String OUTPUT_ZIP = "default.zip";
 
 
 
+    /** _more_ */
     protected Repository repository;
 
     /** _more_ */
@@ -105,32 +103,41 @@ public class OutputHandler implements Constants, Tables {
     /**
      * _more_
      *
-     *
-     *
-     * @param args _more_
+     * @param repository _more_
+     * @param element _more_
      * @throws Exception _more_
      */
-    public OutputHandler(Repository repository,Element element) throws Exception {
+    public OutputHandler(Repository repository, Element element)
+            throws Exception {
         this.repository = repository;
     }
 
-    public boolean canHandle(Request request)  {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
+    public boolean canHandle(Request request) {
         return false;
     }
 
-    protected List getOutputTypesFor(Request request, String what) throws Exception {
-        return  new ArrayList();
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param what _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List getOutputTypesFor(Request request, String what)
+            throws Exception {
+        return new ArrayList();
     }
 
-
-    protected List getOutputTypesForEntries(Request request) throws Exception {
-        return  new ArrayList();
-    }
-
-
-    private Result notImplemented() {
-        throw new IllegalArgumentException ("Given method  not implemented");
-    }
 
     /**
      * _more_
@@ -141,39 +148,95 @@ public class OutputHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public Result processShowEntry(Request request, Entry entry) throws Exception {
+    protected List getOutputTypesForEntries(Request request)
+            throws Exception {
+        return new ArrayList();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    private Result notImplemented() {
+        throw new IllegalArgumentException("Given method  not implemented");
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processShowEntry(Request request, Entry entry)
+            throws Exception {
         return notImplemented();
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param output _more_
+     *
+     * @return _more_
+     */
     public String getMimeType(String output) {
         return null;
     }
 
-    protected String[] getBreadCrumbs(Request request, Group group, boolean makeLinkForLastGroup) throws Exception {
-        List  breadcrumbs = new ArrayList();
-        List  titleList   = new ArrayList();
-        Group parent      = group.getParent();
-        String output = request.getOutput();
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param makeLinkForLastGroup _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected String[] getBreadCrumbs(Request request, Group group,
+                                      boolean makeLinkForLastGroup)
+            throws Exception {
+        List   breadcrumbs = new ArrayList();
+        List   titleList   = new ArrayList();
+        Group  parent      = group.getParent();
+        String output      = request.getOutput();
         while (parent != null) {
             titleList.add(0, parent.getName());
-            breadcrumbs.add(0, HtmlUtil.href(HtmlUtil.url(repository.URL_SHOWGROUP, ARG_GROUP,
-                                                 parent.getFullName(),ARG_OUTPUT,output), parent.getName()));
+            breadcrumbs.add(
+                0, HtmlUtil.href(
+                    HtmlUtil.url(
+                        repository.URL_SHOWGROUP, ARG_GROUP,
+                        parent.getFullName(), ARG_OUTPUT,
+                        output), parent.getName()));
             parent = parent.getParent();
         }
         breadcrumbs.add(0, HtmlUtil.href(repository.URL_SHOWGROUP, "Top"));
         titleList.add(group.getName());
-        if(makeLinkForLastGroup) {
-            breadcrumbs.add(HtmlUtil.href(HtmlUtil.url(repository.URL_SHOWGROUP, ARG_GROUP,
-                                                         group.getFullName(),ARG_OUTPUT,output),group.getName()));
+        if (makeLinkForLastGroup) {
+            breadcrumbs.add(
+                HtmlUtil.href(
+                    HtmlUtil.url(
+                        repository.URL_SHOWGROUP, ARG_GROUP,
+                        group.getFullName(), ARG_OUTPUT,
+                        output), group.getName()));
         } else {
             breadcrumbs.add(HtmlUtil.bold(group.getName()) + "&nbsp;"
                             + getGroupLinks(request, group));
         }
         String title = "Group: "
-            + StringUtil.join("&nbsp;&gt;&nbsp;", titleList);
-        return new String[]{title, StringUtil.join("&nbsp;&gt;&nbsp;", breadcrumbs)};
+                       + StringUtil.join("&nbsp;&gt;&nbsp;", titleList);
+        return new String[] { title,
+                              StringUtil.join("&nbsp;&gt;&nbsp;",
+                              breadcrumbs) };
     }
 
 
@@ -192,26 +255,63 @@ public class OutputHandler implements Constants, Tables {
         return notImplemented();
     }
 
-    public void getEntryHtml(StringBuffer sb, List<Entry> entries, Request request, boolean doForm, boolean dfltSelected) throws Exception {
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     * @param entries _more_
+     * @param request _more_
+     * @param doForm _more_
+     * @param dfltSelected _more_
+     *
+     * @throws Exception _more_
+     */
+    public void getEntryHtml(StringBuffer sb, List<Entry> entries,
+                             Request request, boolean doForm,
+                             boolean dfltSelected)
+            throws Exception {
         notImplemented();
     }
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     protected String getEntryUrl(Entry entry) {
-        return HtmlUtil.href(HtmlUtil.url(repository.URL_SHOWENTRY, ARG_ID, entry.getId()),
-                               entry.getName());
+        return HtmlUtil.href(HtmlUtil.url(repository.URL_SHOWENTRY, ARG_ID,
+                                          entry.getId()), entry.getName());
     }
 
-    protected List getEntriesHeader(Request request, String output, String what) 
-        throws Exception {
-        List<TwoFacedObject>  outputTypes = repository.getOutputTypesFor(request, what);
-        int cnt = 0;
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param output _more_
+     * @param what _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List getEntriesHeader(Request request, String output,
+                                    String what)
+            throws Exception {
+        List<TwoFacedObject> outputTypes =
+            repository.getOutputTypesFor(request, what);
+        int  cnt   = 0;
         List items = new ArrayList();
-        for(TwoFacedObject tfo: outputTypes) {
-            request.put(ARG_OUTPUT, (String)tfo.getId());
-            if(tfo.getId().equals(output)) {
+        for (TwoFacedObject tfo : outputTypes) {
+            request.put(ARG_OUTPUT, (String) tfo.getId());
+            if (tfo.getId().equals(output)) {
                 items.add(tfo.toString());
             } else {
-                items.add(HtmlUtil.href(request.getType()+"?"+request.getUrlArgs(),tfo.toString(), " class=\"subnavlink\" "));
+                items.add(
+                    HtmlUtil.href(
+                        request.getType() + "?" + request.getUrlArgs(),
+                        tfo.toString(), " class=\"subnavlink\" "));
             }
         }
         return items;
@@ -221,8 +321,6 @@ public class OutputHandler implements Constants, Tables {
 
     /**
      * _more_
-     *
-     * @param args _more_
      *
      * @param request _more_
      *
@@ -241,12 +339,15 @@ public class OutputHandler implements Constants, Tables {
      * _more_
      *
      * @param request _more_
+     * @param typeHandlers _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected Result listTypes(Request request,List<TypeHandler> typeHandlers) throws Exception {
+    protected Result listTypes(Request request,
+                               List<TypeHandler> typeHandlers)
+            throws Exception {
         return notImplemented();
     }
 
@@ -257,12 +358,14 @@ public class OutputHandler implements Constants, Tables {
      * _more_
      *
      * @param request _more_
+     * @param tags _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected Result listTags(Request request,List<Tag> tags) throws Exception {
+    protected Result listTags(Request request, List<Tag> tags)
+            throws Exception {
         return notImplemented();
     }
 
@@ -285,7 +388,21 @@ public class OutputHandler implements Constants, Tables {
 
 
 
-    public Result processShowGroup(Request request,Group group, List<Group> subGroups, List<Entry>entries) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param subGroups _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processShowGroup(Request request, Group group,
+                                   List<Group> subGroups, List<Entry> entries)
+            throws Exception {
         return notImplemented();
     }
 
@@ -301,17 +418,30 @@ public class OutputHandler implements Constants, Tables {
      */
     protected String getGroupLinks(Request request, Group group)
             throws Exception {
-        String search =
-            HtmlUtil.href(HtmlUtil.url(repository.URL_SEARCHFORM, ARG_GROUP,
-                                       group.getId()), HtmlUtil.img(repository.fileUrl("/Search16.gif"), 
-                                                                    "Search in Group"));
-        return search + "&nbsp;" +repository.getGraphLink(request, group);
+        String search = HtmlUtil.href(
+                            HtmlUtil.url(
+                                repository.URL_SEARCHFORM, ARG_GROUP,
+                                group.getId()), HtmlUtil.img(
+                                    repository.fileUrl("/Search16.gif"),
+                                    "Search in Group"));
+        return search + "&nbsp;" + repository.getGraphLink(request, group);
     }
 
 
 
 
-    public Result processShowGroups(Request request,List<Group> groups) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param groups _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processShowGroups(Request request, List<Group> groups)
+            throws Exception {
         return notImplemented();
     }
 
@@ -322,12 +452,14 @@ public class OutputHandler implements Constants, Tables {
      * _more_
      *
      * @param request _more_
+     * @param entries _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Result processEntries(Request request, List<Entry> entries) throws Exception {
+    public Result processEntries(Request request, List<Entry> entries)
+            throws Exception {
         return notImplemented();
     }
 
@@ -364,8 +496,7 @@ public class OutputHandler implements Constants, Tables {
         }
         zos.close();
         bos.close();
-        return new Result("", bos.toByteArray(),
-                          getMimeType(OUTPUT_ZIP));
+        return new Result("", bos.toByteArray(), getMimeType(OUTPUT_ZIP));
     }
 
 

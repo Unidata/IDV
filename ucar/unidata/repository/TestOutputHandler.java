@@ -19,9 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository;
 
 
@@ -86,24 +83,42 @@ public class TestOutputHandler extends OutputHandler {
     /**
      * _more_
      *
-     *
-     *
-     * @param args _more_
+     * @param repository _more_
+     * @param element _more_
      * @throws Exception _more_
      */
-    public TestOutputHandler(Repository repository,Element element) throws Exception {
-        super(repository,element);
+    public TestOutputHandler(Repository repository, Element element)
+            throws Exception {
+        super(repository, element);
     }
 
-    public boolean canHandle(Request request)  {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
+    public boolean canHandle(Request request) {
         String output = (String) request.getOutput();
         return output.equals("testit");
     }
 
-    protected List getOutputTypesFor(Request request, String what) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param what _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List getOutputTypesFor(Request request, String what)
+            throws Exception {
         List list = new ArrayList();
-        if(what.equals(WHAT_ENTRIES)) {
-            list.add(new TwoFacedObject("testit","testit"));
+        if (what.equals(WHAT_ENTRIES)) {
+            list.add(new TwoFacedObject("testit", "testit"));
         }
         return list;
     }

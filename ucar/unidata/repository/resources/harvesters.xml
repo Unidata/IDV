@@ -2,11 +2,12 @@
 
 
 
-  <harvester    class="ucar.unidata.repository.PatternHarvester"
-		rootdir="c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar"
-		xrootdir="/harpo/jeffmc/src/idv/trunk/ucar"
+  <harvester    name="Source Files"
+                class="ucar.unidata.repository.PatternHarvester"
+		xrootdir="c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar"
+		rootdir="/harpo/jeffmc/src/idv/trunk/ucar"
 		basegroup="Files/Source"
-
+                active="true"
 		filepattern=".*"
 		type="file"
                 monitor="false"
@@ -14,18 +15,22 @@
 
 
 
-  <harvester    class="ucar.unidata.repository.PatternHarvester"
-		rootdir="c:/cygwin/home/jeffmc/pictures"
+  <harvester    name="Pictures"
+                class="ucar.unidata.repository.PatternHarvester"
+		xrootdir="c:/cygwin/home/jeffmc/pictures"
+		rootdir="/home/jeffmc/pictures"
 		basegroup="Files/Images"
 		filepattern=".*\.jpg$|.*\.jpeg$|.*\.gif$|.*\.png$"
+                active="true"
 		type="image"
                 monitor="false"
 		sleep="1"/>
 
 
-  <harvester    class="ucar.unidata.repository.PatternHarvester"
-		rootdir="c:/cygwin/home/jeffmc/unidata/data/repository/NIDS"
-		xrootdir="/data/ldm/gempak/nexrad/NIDS"
+  <harvester    name="IDD/NIDS"
+                class="ucar.unidata.repository.PatternHarvester"
+		xrootdir="c:/cygwin/home/jeffmc/unidata/data/repository/NIDS"
+		rootdir="/data/ldm/gempak/nexrad/NIDS"
 		basegroup="IDD/NIDS"
 		filepattern="([^/]+)/([^/]+)/[^/]+_(\d\d\d\d\d\d\d\d_\d\d\d\d)"
 		type="level3radar"
@@ -36,11 +41,12 @@
 		nametemplate="${station}-${product}-${fromDate}"
 		desctemplate= "${name} description"
                 monitor="false"
+                active="false"
 		sleep="1"/>
 
-<!--
 
-   <harvester    class="ucar.unidata.repository.PatternHarvester"
+   <harvester   name="IDD/Craft"
+                class="ucar.unidata.repository.PatternHarvester"
 		rootdir="/data/ldm/gempak/nexrad/craft"
 		basegroup="IDD/Craft"
 		filepattern="([^/]+)/[^/]+_(\d\d\d\d\d\d\d\d_\d\d\d\d)"
@@ -52,9 +58,9 @@
 		nametemplate="${station}-${fromDate}"
 		desctemplate= "${name} description"
                 monitor="false"
+                active="false"
 		sleep="1"/>
 
--->
 
 
 

@@ -20,10 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -48,6 +44,7 @@ import java.util.List;
  */
 public class Group {
 
+    /** _more_ */
     public static final String IDDELIMITER = "/";
 
     /** _more_ */
@@ -65,7 +62,7 @@ public class Group {
     /** _more_ */
     private Group parent;
 
-    /** _more_          */
+    /** _more_ */
     private List<Group> children = new ArrayList<Group>();
 
 

@@ -20,6 +20,7 @@
   <method request="/admin/db"           method="adminDb"       admin="true" cancache="false"/>
   <method request="/admin/stats"        method="adminStats"    admin="true" cancache="false"/>
   <method request="/admin/users"        method="adminUsers"    admin="true" cancache="false"/>
+  <method request="/admin/harvesters"   method="adminHarvesters"    admin="true" cancache="false"/>
 
 
 <!-- 
