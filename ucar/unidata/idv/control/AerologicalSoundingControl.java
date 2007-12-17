@@ -1296,7 +1296,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                                          ? reals[0].getValue()
                                          : 1.0 });
 
-            latLon = elt.getLatLonPoint();
+            if (elt != null) {
+                latLon = elt.getLatLonPoint();
+            }
         }
 
         return latLon;
