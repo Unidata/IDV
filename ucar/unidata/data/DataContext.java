@@ -162,5 +162,17 @@ public interface DataContext extends IdvContext {
      */
     public String selectDataType(Object definingObject);
 
+
+
+
+    /**
+     * Ask the user what data type to use
+     *
+     * @param definingObject defines the data source to be created
+     *
+     * @return The data type or null
+     */
+    public String selectDataType(Object definingObject, String label);
+
 }
 

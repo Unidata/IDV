@@ -1122,13 +1122,22 @@ public class DataManager {
      * @return The list of {@link  DataSource} defined by the given
      *         definingObject  or null.
      */
-    public DataSourceResults createDataSourceAndAskForType(
+    public void createDataSourceAndAskForType(
             Object definingObject, Hashtable properties) {
         String dataType = dataContext.selectDataType(definingObject);
         if (dataType == null) {
-            return null;
+            return;
         }
-        return createDataSource(definingObject, dataType, properties);
+        while(true) {
+            try {
+                DataSourceResults results =createDataSource(definingObject, dataType, properties);
+                if(!results.anyFailed())  return;
+            } catch(BadDataException bde) {}
+            dataType = dataContext.selectDataType(definingObject, "<html>Failed to load the data as the given type. Try again?</html>");
+            if (dataType == null) {
+                return;
+            }
+        }
     }
 
 
