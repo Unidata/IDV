@@ -667,7 +667,7 @@ public class PluginManager extends IdvManager {
             }
 
             //            System.err.println("files:" + files);
-            IOUtil.writeJarFile(jarFile, files);
+            IOUtil.writeJarFile(jarFile, files,null,true);
             if (autoInstallCbx.isSelected()) {
                 installPlugin(jarFile, true);
                 updatePlugins();
