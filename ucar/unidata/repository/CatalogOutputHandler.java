@@ -234,11 +234,11 @@ public class CatalogOutputHandler extends OutputHandler {
 
         }
         for(Group group: groups) {
-            String url = /* "http://localhost:8080"+*/repository.href(HtmlUtil.url(
-                                             "/showgroup", ARG_GROUP,
+            String url = /* "http://localhost:8080"+*/HtmlUtil.url(
+                                             repository.URL_SHOWGROUP, ARG_GROUP,
                                              group.getFullName(),
                                              ARG_OUTPUT,
-                                             OUTPUT_CATALOG));
+                                             OUTPUT_CATALOG);
             sb.append(XmlUtil.tag(TAG_CATALOGREF, XmlUtil.attrs(ATTR_XLINKTITLE, group.getName(),
                                                                 ATTR_XLINKHREF,
                                                                 url)));

@@ -230,7 +230,7 @@ public class DefaultOutputHandler extends OutputHandler {
 
     public void getEntryHtml(StringBuffer sb, List<Entry> entries, Request request, boolean doForm, boolean dfltSelected)  throws Exception {
         if(doForm) {
-            sb.append(HtmlUtil.form(repository.href("/getentries"), "getentries"));
+            sb.append(HtmlUtil.form(repository.URL_GETENTRIES, "getentries"));
             sb.append(HtmlUtil.submit("Get selected","getselected"));
             sb.append(HtmlUtil.submit("Get all","getall"));
             sb.append(" As:");
@@ -257,8 +257,8 @@ public class DefaultOutputHandler extends OutputHandler {
 
 
     protected String getEntryUrl(Entry entry) {
-        return repository.href(HtmlUtil.url("/showentry", ARG_ID, entry.getId()),
-                               entry.getName());
+        return HtmlUtil.href(HtmlUtil.url(repository.URL_SHOWENTRY, ARG_ID, entry.getId()),
+                             entry.getName());
     }
 
     /**
@@ -351,14 +351,15 @@ public class DefaultOutputHandler extends OutputHandler {
             if (output.equals(OUTPUT_HTML)) {
                 sb.append("<li>");
                 sb.append(
-                    repository.href(HtmlUtil.url(
-                        "/searchform", ARG_TYPE,
-                        theTypeHandler.getType()), HtmlUtil.img(repository.getUrlBase() + "/Search16.gif", "Search in Group")));
+                          HtmlUtil.href(HtmlUtil.url(
+                                                     repository.URL_SEARCHFORM, ARG_TYPE,
+                                                     theTypeHandler.getType()), 
+                                        HtmlUtil.img(repository.fileUrl("/Search16.gif"), "Search in Group")));
                 sb.append(" ");
                 sb.append(
-                    repository.href(HtmlUtil.url(
-                        "/list/home", ARG_TYPE,
-                        theTypeHandler.getType()), theTypeHandler.getType()));
+                          HtmlUtil.href(HtmlUtil.url(
+                                                     repository.URL_LIST_HOME, ARG_TYPE,
+                                                     theTypeHandler.getType()), theTypeHandler.getType()));
             } else if (output.equals(OUTPUT_XML)) {
                 sb.append(XmlUtil.tag(TAG_TYPE,
                                       XmlUtil.attrs(ATTR_TYPE,
@@ -457,8 +458,8 @@ public class DefaultOutputHandler extends OutputHandler {
                 sb.append("<span style=\"" + css + "\">");
                 String extra = XmlUtil.attrs("alt", "Count:" + tag.getCount(),
                                              "title", "Count:" + tag.getCount());
-                sb.append(repository.href(HtmlUtil.url("/graphview", ARG_ID, tag.getName(), ARG_NODETYPE,
-                                            TYPE_TAG), tag.getName(), extra));
+                sb.append(HtmlUtil.href(HtmlUtil.url(repository.URL_GRAPHVIEW, ARG_ID, tag.getName(), ARG_NODETYPE,
+                                                     TYPE_TAG), tag.getName(), extra));
                 sb.append("</span>");
                 sb.append(" &nbsp; ");
             } else if (output.equals(OUTPUT_XML)) {
@@ -599,8 +600,8 @@ public class DefaultOutputHandler extends OutputHandler {
                 sb.append("<span style=\"" + css + "\">");
                 String extra = XmlUtil.attrs("alt", "Count:" + count,
                                              "title", "Count:" + count);
-                sb.append(repository.href(HtmlUtil.url("/graphview", ARG_ID, association, ARG_NODETYPE,
-                                            TYPE_ASSOCIATION), association, extra));
+                sb.append(HtmlUtil.href(HtmlUtil.url(repository.URL_GRAPHVIEW, ARG_ID, association, ARG_NODETYPE,
+                                                     TYPE_ASSOCIATION), association, extra));
                 sb.append("</span>");
                 sb.append(" &nbsp; ");
             } else if (output.equals(OUTPUT_XML)) {
@@ -666,12 +667,11 @@ public class DefaultOutputHandler extends OutputHandler {
                 sb.append(HtmlUtil.bold("Sub groups:"));
                 sb.append("<ul>");
                 for (Group subGroup : subGroups) {
-                    sb.append(getGroupLinks(request, subGroup) + " " 
-                              + repository.href(HtmlUtil
-                                     .url("/showgroup", ARG_GROUP,
-                                          subGroup.getFullName(),ARG_OUTPUT,output), subGroup
-                                     .getName()) + "</a>");
-
+                    sb.append(getGroupLinks(request, subGroup));
+                    sb.append(" ");
+                    sb.append(HtmlUtil.href(HtmlUtil.url(repository.URL_SHOWGROUP, ARG_GROUP,
+                                                         subGroup.getFullName(),ARG_OUTPUT,output), subGroup.getName()));
+                    
                     sb.append("\n<br>\n");
                 }
                 sb.append("</ul>");
@@ -710,10 +710,9 @@ public class DefaultOutputHandler extends OutputHandler {
             if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
                 sb.append(
                           getGroupLinks(request, group) + " " );
-                sb.append(repository.href(HtmlUtil.url(
-                                                       "/showgroup", ARG_OUTPUT, output,ARG_GROUP,
-                                                       group.getFullName()), group.getFullName()) + "</a> "
-                          );
+                sb.append(HtmlUtil.href(HtmlUtil.url(
+                                                     repository.URL_SHOWGROUP, ARG_OUTPUT, output,ARG_GROUP,
+                                                     group.getFullName()), group.getFullName()));
                 sb.append("\n<br>\n");
             }
         }
@@ -726,7 +725,7 @@ public class DefaultOutputHandler extends OutputHandler {
 
 
     protected String getTimelineApplet(Request request, List<Entry> entries) throws Exception {
-        timelineAppletTemplate = IOUtil.readContents(repository.getProperty(PROP_HTML_TIMELINEAPPLET), getClass());
+        String timelineAppletTemplate = repository.getResource(PROP_HTML_TIMELINEAPPLET);
         List         times   = new ArrayList();
         List         labels  = new ArrayList();
         List         ids     = new ArrayList();
@@ -742,7 +741,7 @@ public class DefaultOutputHandler extends OutputHandler {
         tmp = StringUtil.replace(tmp, "%ids%",
                                  StringUtil.join(",", ids));
         tmp = StringUtil.replace(tmp, "%loadurl%",
-                                 repository.href(HtmlUtil.url("/getentries",ARG_IDS,"%ids%", ARG_OUTPUT,OUTPUT_HTML)));
+                                 HtmlUtil.url(repository.URL_GETENTRIES,ARG_IDS,"%ids%", ARG_OUTPUT,OUTPUT_HTML));
         return tmp;
 
     }
@@ -788,12 +787,10 @@ public class DefaultOutputHandler extends OutputHandler {
                                                  "true") + " " + entry.getTypeHandler().getEntryLinks(entry,request);
                 
                 ssb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
-                ssb.append(HtmlUtil
-                           .row(links + " "
-                                + repository.href(HtmlUtil
-                                                  .url("/showentry", ARG_ID, entry.getId()), entry
-                                                  .getName()), "" + new Date(entry
-                                                                             .getStartDate())));
+                String col1 = links + " " + HtmlUtil.href(HtmlUtil.url(repository.URL_SHOWENTRY, ARG_ID, entry.getId()), 
+                                                          entry.getName());
+                String col2 =  "" + new Date(entry.getStartDate());
+                ssb.append(HtmlUtil.row(HtmlUtil.cols(col1,col2)));
             } else if (output.equals(OUTPUT_CSV)) {
                 sb.append(SqlUtil.comma(entry.getId(), entry.getFile()));
             }
@@ -804,7 +801,7 @@ public class DefaultOutputHandler extends OutputHandler {
             if (entries.size() > 0 && showApplet){
                 sb.append(getTimelineApplet(request, entries));
             }
-            sb.append(HtmlUtil.form(repository.href("/getentries"), "name=\"getentries\" method=\"post\""));
+            sb.append(HtmlUtil.form(repository.URL_GETENTRIES, "name=\"getentries\" method=\"post\""));
             if (entries.size() > 0) {
                 sb.append(HtmlUtil.submit("Get selected", "getselected"));
                 sb.append(HtmlUtil.submit("Get all", "getall"));
@@ -818,7 +815,7 @@ public class DefaultOutputHandler extends OutputHandler {
             String       type = (String) sbc.getKeys().get(i);
             StringBuffer ssb  = sbc.getBuffer(type);
             if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
-                sb.append(HtmlUtil.row(HtmlUtil.bold("Type:" + type)));
+                sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold("Type:" + type))));
                 sb.append(ssb);
             }
         }

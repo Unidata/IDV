@@ -179,10 +179,12 @@ public class ImageOutputHandler extends OutputHandler {
             for (int i=entries.size()-1;i>=0;i--) {
                 Entry entry = entries.get(i);
                 if(!ImageUtils.isImage(entry.getFile())) continue;
-                String url = repository.href(HtmlUtil.url("/getentry/" + entry.getName(), ARG_ID, entry.getId()));
+                String url = HtmlUtil.url(repository.URL_GETENTRY + entry.getName(), ARG_ID, entry.getId());
                 if(cnt==0) firstImage = url;
                 String entryUrl = getEntryUrl(entry);
-                String title ="<table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tr><td><b>Image:</b> " +entryUrl +"</td><td align=right>" + new Date(entry.getStartDate()) +"</table>";
+                String title ="<table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">";
+                title +="<tr><td><b>Image:</b> " +entryUrl +"</td><td align=right>" + new Date(entry.getStartDate());
+                title+="</table>";
                 title = title.replace("\"", "\\\"");
                 sb.append("addImage("+
                           HtmlUtil.quote(url)+","+
@@ -200,9 +202,10 @@ public class ImageOutputHandler extends OutputHandler {
                     sb.append("<tr valign=\"bottom\">");
                 col++;
                 
-                sb.append("<td><img width=\"400\" src=\"" + repository.href(HtmlUtil.url("/getentry/" + entry.getName(), ARG_ID, entry.getId()))+
-                          "\"><br>\n");
-                
+                sb.append("<td>");
+                sb.append(HtmlUtil.img(HtmlUtil.url(repository.URL_GETENTRY + entry.getName(), ARG_ID, entry.getId()),"",
+                                       XmlUtil.attr(ARG_WIDTH,"400")));
+                sb.append("<br>\n");
                 sb.append(getEntryUrl(entry));
                 sb.append(" " + new Date(entry.getStartDate()));
                 sb.append("<p></td>");
@@ -213,9 +216,7 @@ public class ImageOutputHandler extends OutputHandler {
         if (output.equals(OUTPUT_GALLERY)) {
             sb.append("</table>\n");
         } else if (output.equals(OUTPUT_PLAYER)) {
-            //            sb.append ("startImage=" + HtmlUtil.quote("${root}/imageplayer/Play24.gif")+";\n");
-            //            sb.append ("stopImage=" + HtmlUtil.quote("${root}/imageplayer/Pause24.gif")+";\n");
-            String playerTemplate = IOUtil.readContents("/ucar/unidata/repository/resources/imageplayer.html", getClass());
+            String playerTemplate = repository.getResource(PROP_HTML_IMAGEPLAYER);
             String tmp = playerTemplate.replace("${imagelist}", sb.toString());
             tmp = tmp.replace("${firstimage}", firstImage);            
             tmp = StringUtil.replace(tmp, "${root}", repository.getUrlBase());

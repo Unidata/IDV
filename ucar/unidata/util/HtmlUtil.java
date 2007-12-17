@@ -64,7 +64,9 @@ public class HtmlUtil {
     }
 
     public static String img(String path, String title, String extra) {
-        return "<img "  + XmlUtil.attrs("border","0", "src",path,"title", title, "alt", title) +" " + extra +">";
+        if(title.length()>0) 
+            return "<img "  + XmlUtil.attrs("border","0", "src",path,"title", title, "alt", title) +" " + extra +">";
+        return "<img "  + XmlUtil.attrs("border","0", "src",path) +" " + extra +">";
     }
     public static String bold(String v1) {
         return "<b>" + v1 +"</b>";
@@ -74,14 +76,6 @@ public class HtmlUtil {
         return "<td>"+ v1 +"</td>";
     }
 
-    public static String row(String v1) {
-        return "<tr><td>" + v1 +"</td></tr>";
-    }
-
-
-    public static String row(String v1,String v2) {
-        return "<tr><td>" + v1 +"</td><td>" + v2 +"</td></tr>";
-    }
 
     public static String span(String content,String extra) {
         return "<span " + extra+">" + content+"</span>";
@@ -106,6 +100,26 @@ public class HtmlUtil {
             path = path + args[i]+"="+args[i+1];
         }
         return path;
+    }
+
+
+    public static String row(String row) {
+        return "<tr>" + row +"</tr>";
+    }
+
+
+    public static String cols(String s1) {
+        return "<td>" + s1 +"</td>";
+    }
+
+    public static String cols(String s1,String s2) {
+        return cols(s1)+cols(s2);
+    }
+    public static String cols(String s1,String s2,String s3) {
+        return cols(s1)+cols(s2)+cols(s3);
+    }
+    public static String cols(String s1,String s2,String s3,String s4) {
+        return cols(s1)+cols(s2)+cols(s3)+cols(s4);
     }
 
     public static String makeLatLonBox(String baseName, String lat1, String lat2, String lon1, String lon2) {

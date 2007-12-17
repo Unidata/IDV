@@ -63,8 +63,6 @@ public class MetaDataServer extends HttpServer implements Constants {
     /** _more_ */
     Repository repository;
 
-    /** _more_ */
-    String template;
 
     /**
      * _more_
@@ -80,9 +78,6 @@ public class MetaDataServer extends HttpServer implements Constants {
         super(8080);
         repository = new Repository(args);
         repository.init();
-        template =
-            IOUtil.readContents(repository.getProperty(PROP_HTML_TEMPLATE),
-                                getClass());
     }
 
 
@@ -99,13 +94,11 @@ public class MetaDataServer extends HttpServer implements Constants {
                                 Result result)
             throws Exception {
         if (result.isHtml() && result.getShouldDecorate()) {
-            template =
-                IOUtil.readContents(repository.getProperty(PROP_HTML_TEMPLATE),
-                                    getClass());
-            String html = StringUtil.replace(template, "%content%",
+            String template = repository.getResource(PROP_HTML_TEMPLATE);
+            String html = StringUtil.replace(template, "${content}",
                                              new String(result.getContent()));
-            html = StringUtil.replace(html, "%title%", result.getTitle());
-            html = StringUtil.replace(html, "%root%",
+            html = StringUtil.replace(html, "${title}", result.getTitle());
+            html = StringUtil.replace(html, "${root}",
                                       repository.getUrlBase());
             List   links     = (List) result.getProperty(PROP_NAVLINKS);
             String linksHtml = "&nbsp;";
@@ -120,15 +113,19 @@ public class MetaDataServer extends HttpServer implements Constants {
             }
 
 
-            html = StringUtil.replace(html, "%links%", linksHtml);
+            html = StringUtil.replace(html, "${links}", linksHtml);
             if (sublinksHtml.length() > 0) {
-                html = StringUtil.replace(html, "%sublinks%",
+                html = StringUtil.replace(html, "${sublinks}",
                                           "<div class=\"subnav\">"
                                           + sublinksHtml + "</div>");
             } else {
-                html = StringUtil.replace(html, "%sublinks%", "");
+                html = StringUtil.replace(html, "${sublinks}", "");
             }
             handler.writeResult(ok, html, result.getMimeType());
+        } else if(result.getInputStream()!=null) {
+            handler.writeResult(ok, result.getInputStream(),
+                                result.getMimeType());
+
         } else {
             handler.writeResult(ok, result.getContent(),
                                 result.getMimeType());
@@ -197,13 +194,7 @@ public class MetaDataServer extends HttpServer implements Constants {
                                 IOUtil.getInputStream(
                                     "/ucar/unidata/repository/htdocs" + path,
                                     getClass());
-                            byte[] bytes = IOUtil.readBytes(is);
-                            if (path.endsWith(".html")) {
-                                writeResult(true, new String(bytes), type);
-                            } else {
-                                writeResult(true, bytes, type);
-                            }
-
+                            writeResult(true, is, type);
                         } catch (IOException fnfe) {
                             result = new Result("Error",
                                     new StringBuffer("Unknown request:" + path));

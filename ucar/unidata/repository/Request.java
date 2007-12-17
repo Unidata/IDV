@@ -80,32 +80,6 @@ import java.util.regex.*;
  */
 public class Request implements Constants {
 
-    /** _more_ */
-    public static final String CALL_QUERY = "/query";
-
-    /** _more_          */
-    public static final String CALL_FETCH = "/fetch";
-
-    /** _more_ */
-    public static final String CALL_SQL = "/sql";
-
-    /** _more_ */
-    public static final String CALL_SEARCHFORM = "/searchform";
-
-    /** _more_ */
-    public static final String CALL_LIST = "/list";
-
-    /** _more_ */
-    public static final String CALL_SHOWGROUP = "/showgroup";
-
-    /** _more_ */
-    public static final String CALL_SHOWFILE = "/showfile";
-
-    /** _more_ */
-    public static final String CALL_GRAPH = "/graph";
-
-    /** _more_ */
-    public static final String CALL_GRAPHVIEW = "/graphview";
 
 
     /** _more_ */

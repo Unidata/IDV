@@ -25,6 +25,7 @@ package ucar.unidata.repository;
 
 
 import java.util.Hashtable;
+import java.io.InputStream;
 
 
 /**
@@ -58,6 +59,8 @@ public class Result {
 
     /** _more_          */
     private Hashtable properties = new Hashtable();
+
+    private InputStream inputStream;
 
     /**
      * _more_
@@ -110,7 +113,16 @@ public class Result {
         this(title, content, mimeType, true);
     }
 
+    public Result(String title, InputStream inputStream, String mimeType) {
+        this.title = title;
+        this.inputStream = inputStream;
+        this.mimeType  = mimeType;
+        this.shouldDecorate = false;
+    }
+
+
     /**
+
      * _more_
      *
      * @param title _more_
@@ -250,6 +262,24 @@ public class Result {
     public boolean getShouldDecorate() {
         return shouldDecorate;
     }
+
+/**
+Set the InputStream property.
+
+@param value The new value for InputStream
+**/
+public void setInputStream (InputStream value) {
+	inputStream = value;
+}
+
+/**
+Get the InputStream property.
+
+@return The InputStream
+**/
+public InputStream getInputStream () {
+	return inputStream;
+}
 
 
 

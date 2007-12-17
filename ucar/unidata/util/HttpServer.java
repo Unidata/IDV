@@ -482,6 +482,15 @@ public class HttpServer {
         }
 
 
+        public void writeResult(boolean ok, InputStream inputStream,
+                                   String type) throws Exception {
+            writeHeader(ok, -1, type);
+            IOUtil.writeTo(inputStream, output);
+            //            output.write(content);
+            output.close();
+        }
+
+
 
 
         /**
@@ -498,7 +507,8 @@ public class HttpServer {
             writeLine(ok
                       ? "HTTP/1.0 200 OK" + CRLF
                       : "HTTP/1.0 404 Not Found" + CRLF);
-            writeLine("Content-Length: " + length + CRLF);
+            if(length>=0) 
+                writeLine("Content-Length: " + length + CRLF);
             writeLine("Content-type: " + type + CRLF);
             writeHeaderArgs();
             writeLine("\n");

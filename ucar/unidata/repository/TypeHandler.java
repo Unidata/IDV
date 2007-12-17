@@ -194,17 +194,17 @@ public class TypeHandler implements Constants, Tables {
     public StringBuffer getEntryContent(Entry entry, Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
         String output = request.getOutput();
-        String[] tags = repository.getTags(request,entry.getId());
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             sb.append("<table cellspacing=\"5\" cellpadding=\"2\">");
             sb.append(getInnerEntryContent(entry, request, output));
             sb.append("</table>\n");
-            if(tags.length>0) {
+            List<Tag> tags = repository.getTags(request,entry.getId());
+            if(tags.size()>0) {
                 sb.append("<b>Tags</b><ul>\n");
-                for(int i=0;i<tags.length;i++) {
+                for(Tag tag: tags) {
                     sb.append("<li> ");
-                    sb.append(repository.getTagLinks(request, tags[i]));
-                    sb.append(tags[i]);
+                    sb.append(repository.getTagLinks(request, tag.getName()));
+                    sb.append(tag.getName());
                 }
                 sb.append("</ul>\n");
             }
@@ -253,7 +253,7 @@ public class TypeHandler implements Constants, Tables {
                     sb.append ((fromEntry==entry?fromEntry.getName():repository.getEntryUrl(fromEntry)));
                     sb.append("&nbsp;&nbsp;");
                     sb.append(HtmlUtil.bold(association.getName()) +" " +
-                              HtmlUtil.img(repository.href("/Arrow16.gif")));
+                              HtmlUtil.img(repository.fileUrl("/Arrow16.gif")));
                     sb.append("&nbsp;&nbsp;");
                     sb.append ((toEntry==entry?toEntry.getName():repository.getEntryUrl(toEntry)));
                 }
@@ -287,8 +287,8 @@ public class TypeHandler implements Constants, Tables {
         if ( !repository.isAppletEnabled(request)) {
             return "";
         }
-        return repository.href(HtmlUtil.url("/graphview", ARG_ID, entry.getId(), ARG_NODETYPE,
-                entry.getType()), HtmlUtil.img(repository.href("/tree.gif"),
+        return HtmlUtil.href(HtmlUtil.url(repository.URL_GRAPHVIEW, ARG_ID, entry.getId(), ARG_NODETYPE,
+                entry.getType()), HtmlUtil.img(repository.fileUrl("/tree.gif"),
                                                "Show file in graph"));
     }
 
@@ -312,11 +312,11 @@ public class TypeHandler implements Constants, Tables {
             return HtmlUtil.href(
                 "file://" + entry.getFile(),
                 HtmlUtil.img(
-                    repository.href("/Fetch.gif"),
+                             repository.fileUrl("/Fetch.gif"),
                     "Download file"));
         } else {
-            return repository.href(HtmlUtil.url("/getentry/" + entry.getName(), ARG_ID,
-                    entry.getId()), HtmlUtil.img(repository.href("/Fetch.gif"),
+            return HtmlUtil.href(HtmlUtil.url(repository.URL_GETENTRY + entry.getName(), ARG_ID,
+                    entry.getId()), HtmlUtil.img(repository.fileUrl("/Fetch.gif"),
                                                  "Download file"));
         }
     }
@@ -364,8 +364,9 @@ public class TypeHandler implements Constants, Tables {
                                           entry.getTypeHandler().getDescription()));
 
             if(ImageUtils.isImage(entry.getFile())) {
-                sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Image:"),"<img width=\"400\" src=\"" + repository.href(HtmlUtil.url("/getentry/" + entry.getName(), ARG_ID, entry.getId()))+
-                          "\">\n"));
+                sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Image:"),
+                                              HtmlUtil.img(HtmlUtil.url(repository.URL_GETENTRY + entry.getName(), ARG_ID, entry.getId()),
+                                                           "",XmlUtil.attr(ARG_WIDTH,"400"))));
             }
 
         } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {
@@ -549,7 +550,7 @@ public class TypeHandler implements Constants, Tables {
             }
             String typeSelect = HtmlUtil.select(ARG_TYPE, tmp);
             formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"),
-                    typeSelect+" " + HtmlUtil.submitImage(repository.getUrlBase()+ "/Search16.gif","submit_type","Show search form with this type")));
+                    typeSelect+" " + HtmlUtil.submitImage(repository.fileUrl("/Search16.gif"),"submit_type","Show search form with this type")));
         } else if (typeHandlers.size() == 1) {
             formBuffer.append(HtmlUtil.hidden(ARG_TYPE,
                     typeHandlers.get(0).getType()));

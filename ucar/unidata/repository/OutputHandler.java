@@ -158,14 +158,14 @@ public class OutputHandler implements Constants, Tables {
         String output = request.getOutput();
         while (parent != null) {
             titleList.add(0, parent.getName());
-            breadcrumbs.add(0, repository.href(HtmlUtil.url("/showgroup", ARG_GROUP,
+            breadcrumbs.add(0, HtmlUtil.href(HtmlUtil.url(repository.URL_SHOWGROUP, ARG_GROUP,
                                                  parent.getFullName(),ARG_OUTPUT,output), parent.getName()));
             parent = parent.getParent();
         }
-        breadcrumbs.add(0, repository.href("/showgroup", "Top"));
+        breadcrumbs.add(0, HtmlUtil.href(repository.URL_SHOWGROUP, "Top"));
         titleList.add(group.getName());
         if(makeLinkForLastGroup) {
-            breadcrumbs.add(repository.href(HtmlUtil.url("/showgroup", ARG_GROUP,
+            breadcrumbs.add(HtmlUtil.href(HtmlUtil.url(repository.URL_SHOWGROUP, ARG_GROUP,
                                                          group.getFullName(),ARG_OUTPUT,output),group.getName()));
         } else {
             breadcrumbs.add(HtmlUtil.bold(group.getName()) + "&nbsp;"
@@ -197,7 +197,7 @@ public class OutputHandler implements Constants, Tables {
     }
 
     protected String getEntryUrl(Entry entry) {
-        return repository.href(HtmlUtil.url("/showentry", ARG_ID, entry.getId()),
+        return HtmlUtil.href(HtmlUtil.url(repository.URL_SHOWENTRY, ARG_ID, entry.getId()),
                                entry.getName());
     }
 
@@ -302,9 +302,9 @@ public class OutputHandler implements Constants, Tables {
     protected String getGroupLinks(Request request, Group group)
             throws Exception {
         String search =
-            repository.href(HtmlUtil.url("/searchform", ARG_GROUP,
-                              group.getId()), HtmlUtil.img(repository.getUrlBase()
-                                      + "/Search16.gif", "Search in Group"));
+            HtmlUtil.href(HtmlUtil.url(repository.URL_SEARCHFORM, ARG_GROUP,
+                                       group.getId()), HtmlUtil.img(repository.fileUrl("/Search16.gif"), 
+                                                                    "Search in Group"));
         return search + "&nbsp;" +repository.getGraphLink(request, group);
     }
 

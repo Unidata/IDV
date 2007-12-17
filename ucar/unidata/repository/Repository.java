@@ -94,6 +94,23 @@ import java.util.zip.*;
  */
 public class Repository implements Constants, Tables, RequestHandler {
 
+    public  String URL_SHOWGROUP = "/showgroup";
+    public  String URL_SEARCHFORM = "/searchform";
+    public  String URL_LIST_HOME = "/list/home";
+    public  String URL_QUERY = "/query";
+    public  String URL_LIST_SHOW = "/list/show";
+    public  String URL_GRAPHVIEW = "/graphview";
+    public  String URL_GETGRAPH = "/getgraph";
+    public  String URL_SHOWENTRY = "/showentry";
+    public  String URL_GETENTRIES = "/getentries";
+    public  String URL_GETENTRY = "/getentry/*";
+    public  String URL_ADMIN_SQL = "/admin/sql";
+    public  String URL_ADMIN_HOME = "/admin/home";
+    public  String URL_ADMIN_DB = "/admin/db";
+    public  String URL_ADMIN_STATS = "/admin/stats";
+    public  String URL_ADMIN_USERS = "/admin/users";
+
+
 
     /** _more_          */
     private static final int PAGE_CACHE_LIMIT = 100;
@@ -134,14 +151,10 @@ public class Repository implements Constants, Tables, RequestHandler {
     private List<OutputHandler> outputHandlers = new ArrayList();
 
 
-    /** _more_ */
-    private static String timelineAppletTemplate;
+    private Hashtable resources = new Hashtable();
 
-    /** _more_ */
-    private static String graphXmlTemplate;
 
-    /** _more_ */
-    private static String graphAppletTemplate;
+
 
 
     /** _more_ */
@@ -191,6 +204,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      */
     protected void init() throws Throwable {
         initProperties();
+        initUrls();
         makeConnection();
         mimeTypes = new Properties();
         for(String mimeFile: StringUtil.split(getProperty(PROP_HTML_MIMEPROPERTIES),";",true,true)) {
@@ -269,6 +283,25 @@ public class Repository implements Constants, Tables, RequestHandler {
         harvester = new Harvester(this);
         Misc.findClass((String) properties.get(PROP_DB_DRIVER));
 
+    }
+
+
+    protected void initUrls() {
+        URL_SHOWGROUP =  getUrlBase() + "/showgroup";
+        URL_SEARCHFORM =  getUrlBase() + "/searchform";
+        URL_LIST_HOME =  getUrlBase() + "/list/home";
+        URL_QUERY =  getUrlBase() + "/query";
+        URL_LIST_SHOW =  getUrlBase() + "/list/show";
+        URL_GRAPHVIEW =  getUrlBase() + "/graphview";
+        URL_GETGRAPH =  getUrlBase() + "/getgraph";
+        URL_SHOWENTRY =  getUrlBase() + "/showentry";
+        URL_GETENTRIES =  getUrlBase() + "/getentries";
+        URL_GETENTRY =  getUrlBase() + "/getentry/*";
+        URL_ADMIN_SQL =  getUrlBase() + "/admin/sql";
+        URL_ADMIN_HOME =  getUrlBase() + "/admin/home";
+        URL_ADMIN_DB =  getUrlBase() + "/admin/db";
+        URL_ADMIN_STATS =  getUrlBase() + "/admin/stats";
+        URL_ADMIN_USERS =  getUrlBase() + "/admin/users";
     }
 
 
@@ -678,7 +711,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             }
         } 
         sb.append("<p>");
-        sb.append(HtmlUtil.form(href("/admin/db"), " name=\"admin\""));
+        sb.append(HtmlUtil.form(URL_ADMIN_DB, " name=\"admin\""));
         if (connection == null) {
             sb.append(HtmlUtil.hidden(ARG_ADMIN_WHAT, "restart"));
             sb.append(HtmlUtil.submit("Restart Database"));
@@ -705,11 +738,11 @@ public class Repository implements Constants, Tables, RequestHandler {
         StringBuffer sb = new StringBuffer();
         sb.append("<h3>Repository Administration</h3><ul>\n");
         sb.append("<li> ");
-        sb.append(href("/admin/db", "Administer Database"));
+        sb.append(HtmlUtil.href(URL_ADMIN_DB, "Administer Database"));
         sb.append("<li> ");
-        sb.append(href("/admin/stats", "Statistics"));
+        sb.append(HtmlUtil.href(URL_ADMIN_STATS, "Statistics"));
         sb.append("<li> ");
-        sb.append(href("/admin/sql", "Execute SQL"));
+        sb.append(HtmlUtil.href(URL_ADMIN_SQL, "Execute SQL"));
         sb.append("</ul>");
         Result result = new Result("Administration", sb);
         result.putProperty(PROP_NAVSUBLINKS, getAdminLinks(request));
@@ -764,11 +797,12 @@ public class Repository implements Constants, Tables, RequestHandler {
                     users.add(getUser(results));
                 }
             }
-            sb.append("<table><tr><td><b>ID</b></td><td><b>Name</b></td><td><b>Admin?</b></td></tr>");
+            sb.append("<table>");
+            sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold("ID"),HtmlUtil.bold("Name"), HtmlUtil.bold("Admin?"))));
             for(User user: users) {
-                sb.append("<tr><td>"+
-                          href("/admin/users?"+ ARG_USER+"=" + user.getId(), user.getId(),user.getId())+
-"</td><td>" + user.getName() +"</td><td>"+ user.getAdmin()+"</td></tr>\n");
+                sb.append(HtmlUtil.row(HtmlUtil.cols(
+                                        HtmlUtil.href(HtmlUtil.url(URL_ADMIN_USERS, ARG_USER, user.getId()),user.getId()),
+                                        user.getName(), ""+user.getAdmin())));
             }
             sb.append("</table>");
         }
@@ -786,21 +820,21 @@ public class Repository implements Constants, Tables, RequestHandler {
         String []names = {"Users","Tags","Groups","Associations"};
         String []tables = {TABLE_USERS,TABLE_TAGS,TABLE_GROUPS,TABLE_ASSOCIATIONS};
         for(int i=0;i<tables.length;i++) {
-            sb.append("<tr><td>"+ getCount(tables[i].toLowerCase(),"")+"</td><td>"+names[i]+"</td></tr>");
+            sb.append(HtmlUtil.row(HtmlUtil.cols(""+getCount(tables[i].toLowerCase(),""),names[i])));
         }
 
 
-        sb.append("<tr><td colspan=\"2\">&nbsp;<p><b>Types:</b></td></tr>\n");
+        sb.append(HtmlUtil.row("<td colspan=\"2\">&nbsp;<p><b>Types:</b></td>"));
         int total = 0;
-        sb.append("<tr><td>"+ getCount(TABLE_ENTRIES,"")+"</td><td>Total entries</td></tr>");
+        sb.append(HtmlUtil.row(HtmlUtil.cols(""+getCount(TABLE_ENTRIES,""),"Total entries")));
         for (Enumeration keys = typeHandlersMap.keys();
              keys.hasMoreElements(); ) {
             String id = (String) keys.nextElement();
             if(id.equals(TypeHandler.TYPE_ANY)) continue;
             TypeHandler typeHandler = (TypeHandler) typeHandlersMap.get(id);
             int cnt = getCount(TABLE_ENTRIES,"type=" + SqlUtil.quote(id));
-            String url = href(HtmlUtil.url("/searchform",ARG_TYPE, id), typeHandler.getDescription());
-            sb.append("<tr><td>"+ cnt+"</td><td>"+ url+"</td></tr>");            
+            String url = HtmlUtil.href(HtmlUtil.url(URL_SEARCHFORM,ARG_TYPE, id), typeHandler.getDescription());
+            sb.append(HtmlUtil.row(HtmlUtil.cols(""+cnt,url)));
         }
 
 
@@ -831,7 +865,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         String       query = (String) request.getUnsafeString(ARG_QUERY,(String)null);
         StringBuffer sb    = new StringBuffer();
         sb.append("<H3>SQL</h3>");
-        sb.append(HtmlUtil.form(href("/admin/sql")));
+        sb.append(HtmlUtil.form(URL_ADMIN_SQL));
         sb.append(HtmlUtil.submit("Execute"));
         sb.append(HtmlUtil.input(ARG_QUERY, query, " size=\"60\" "));
         sb.append("</form>\n");
@@ -1052,7 +1086,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             sb.append("<ul>");
             for(TwoFacedObject tfo: typeList) {
                 sb.append("<li>");
-                sb.append(href("/list/show?what=" +tfo.getId() +"&type=" + typeHandler.getType() , tfo.toString()));
+                sb.append(HtmlUtil.href(HtmlUtil.url(URL_LIST_SHOW,ARG_WHAT, tfo.getId(),ARG_TYPE,,typeHandler.getType()) , tfo.toString())));
                 sb.append("\n");
             }
             sb.append("</ul>");
@@ -1094,7 +1128,8 @@ public class Repository implements Constants, Tables, RequestHandler {
                 if(what.equals(tfo.getId())) {
                     links.add(HtmlUtil.span(tfo.toString(),extra1));
                 } else {
-                    links.add(href("/list/show?what=" +tfo.getId() +"&type=" + typeHandler.getType() , tfo.toString(),extra2));
+                    links.add(HtmlUtil.href(HtmlUtil.url(URL_LIST_SHOW,ARG_WHAT,(String)tfo.getId(),ARG_TYPE,(String)typeHandler.getType()), 
+                                            tfo.toString(),extra2));
                 }
             }
         }
@@ -1110,7 +1145,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             if(what.equals(whats[i])) {
                 links.add(HtmlUtil.span(names[i], extra1));
             } else {
-                links.add(href("/list/show?what=" +whats[i]+typeAttr, names[i], extra2));
+                links.add(HtmlUtil.href(HtmlUtil.url(URL_LIST_SHOW,ARG_WHAT,whats[i])+typeAttr, names[i], extra2));
             }
         }
 
@@ -1142,7 +1177,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         //        headerBuffer.append("<h3>Search Form</h3>");
         headerBuffer.append("<table cellpadding=\"5\">");
 
-        sb.append(HtmlUtil.form(href(HtmlUtil.url("/query", "name",WHAT_ENTRIES))));
+        sb.append(HtmlUtil.form(HtmlUtil.url(URL_QUERY, ARG_NAME,WHAT_ENTRIES)));
 
         //Put in an empty submit button so when the user presses return 
         //it acts like a regular submit (not a submit to change the type)
@@ -1191,7 +1226,7 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
         sb.append(HtmlUtil.tableEntry("", HtmlUtil.submit("Search","submit") +" " + HtmlUtil.submit("Search Subset","submit_subset")));
-        sb.append("<table>");
+        sb.append("</table>");
         sb.append("</form>");
         headerBuffer.append(sb.toString());
 
@@ -1211,11 +1246,11 @@ public class Repository implements Constants, Tables, RequestHandler {
     protected List getAdminLinks(Request request) {
         List links = new ArrayList();
         String extra = " class=\"navlink\" ";
-        links.add(href("/admin/home", "Home", extra));
-        links.add(href("/admin/db", "Database", extra));
-        links.add(href("/admin/stats", "Statistics", extra));
-        links.add(href("/admin/users", "Users", extra));
-        links.add(href("/admin/sql", "SQL", extra));
+        links.add(HtmlUtil.href(URL_ADMIN_HOME, "Home", extra));
+        links.add(HtmlUtil.href(URL_ADMIN_DB, "Database", extra));
+        links.add(HtmlUtil.href(URL_ADMIN_STATS, "Statistics", extra));
+        links.add(HtmlUtil.href(URL_ADMIN_USERS, "Users", extra));
+        links.add(HtmlUtil.href(URL_ADMIN_SQL, "SQL", extra));
 
         return links;
     }
@@ -1245,7 +1280,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             if(what.equals(whats[i])) 
                 item = HtmlUtil.span(names[i],extra1);
             else
-                item = href(HtmlUtil.url("/searchform", ARG_WHAT, whats[i]), names[i], extra2);
+                item = HtmlUtil.href(HtmlUtil.url(URL_SEARCHFORM, ARG_WHAT, whats[i]), names[i], extra2);
             if(i==0) 
                 item = "<span " + extra1+">Search For:&nbsp;&nbsp;&nbsp; </span>" +item;
             links.add(item);
@@ -1256,7 +1291,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             if(tfo.getId().equals(what)) {
                 links.add(HtmlUtil.span(tfo.toString(), extra1));            
             } else {
-                links.add(href(HtmlUtil.url("/searchform", ARG_WHAT, ""+tfo.getId(),ARG_TYPE, typeHandler.getType()), tfo.toString(), extra2));            
+                links.add(HtmlUtil.href(HtmlUtil.url(URL_SEARCHFORM, ARG_WHAT, ""+tfo.getId(),ARG_TYPE, typeHandler.getType()), tfo.toString(), extra2));            
             }
         }
 
@@ -1284,7 +1319,7 @@ public class Repository implements Constants, Tables, RequestHandler {
 
         for(ApiMethod apiMethod: topLevelMethods) {
             if(apiMethod.getPermission().getMustBeAdmin() && !isAdmin) continue;
-            links.add(href(apiMethod.getRequest(), apiMethod.getName(), extra));
+            links.add(HtmlUtil.href(fileUrl(apiMethod.getRequest()), apiMethod.getName(), extra));
         }
         return links;
     }
@@ -1371,11 +1406,12 @@ public class Repository implements Constants, Tables, RequestHandler {
             //            System.err.println ("AFTER");
             ImageUtils.writeImageToFile(resizedImage,thumb);
             bytes = IOUtil.readBytes(IOUtil.getInputStream(thumb, getClass()));
+            return new Result("", bytes, IOUtil.getFileExtension(entry.getFile()));
         } else {
-            bytes = IOUtil.readBytes(IOUtil.getInputStream(entry.getFile(), getClass()));
+            return new Result("", IOUtil.getInputStream(entry.getFile(), getClass()),
+                              IOUtil.getFileExtension(entry.getFile()));
         }
-        return new Result("", bytes,
-                          IOUtil.getFileExtension(entry.getFile()));
+
     }
 
     PreparedStatement entryStmt;
@@ -1593,6 +1629,23 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
 
+    public String getResource(String id) throws Exception {
+        String resource  = (String) resources.get(id);
+        if(resource!=null)
+            return resource;
+        String fromProperties = getProperty(id);
+        if(fromProperties!=null) {
+            resource = IOUtil.readContents(fromProperties, getClass());
+        } else {
+            resource = IOUtil.readContents(id, getClass());
+        }
+        if(resource!=null) {
+            resources.put(id,resource);
+        }
+        return resource;
+    }
+
+
     /**
      * _more_
      *
@@ -1603,10 +1656,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @throws Exception _more_
      */
     public Result processGraphView(Request request) throws Exception {
-        if (true || (graphAppletTemplate == null)) {
-            graphAppletTemplate = IOUtil.readContents(getProperty(PROP_HTML_GRAPHAPPLET), getClass());
-        }
-
+        String graphAppletTemplate =getResource(PROP_HTML_GRAPHAPPLET);
         String type = request.getString(ARG_NODETYPE, NODETYPE_GROUP);
         String id   = request.getId((String)null);
 
@@ -1615,7 +1665,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                 "no type or id argument specified");
         }
         String html = StringUtil.replace(graphAppletTemplate, "${id}", encode(id));
-        html = StringUtil.replace(html, "${root}", urlBase);
+        html = StringUtil.replace(html, "${root}", getUrlBase());
         html = StringUtil.replace(html, "${type}", encode(type));
         return new Result("Graph View", html.getBytes(), Result.TYPE_HTML);
     }
@@ -1639,27 +1689,34 @@ public class Repository implements Constants, Tables, RequestHandler {
         String file     = results.getString(col++);
         TypeHandler typeHandler = getTypeHandler(request);
         String nodeType = typeHandler.getNodeType();
-        if(file.endsWith(".jpg")) {
+        if(ImageUtils.isImage(file)) {
             nodeType = "imageentry";
         }
         String attrs = XmlUtil.attrs(ATTR_TYPE, nodeType, ATTR_ID,
                                      fileId, ATTR_TITLE, name);
-        if(file.endsWith(".jpg")) {
-            nodeType = "imageentry";
-            attrs = attrs +" " + "image=\"" + href(HtmlUtil.url("/getentry/" + fileId+".jpg", ARG_ID,
-                                                                fileId,ARG_IMAGEWIDTH,"75"))+"\"";
+        if(ImageUtils.isImage(file)) {
+            String imageUrl = HtmlUtil.url(URL_GETENTRY + fileId+IOUtil.getFileExtension(file), 
+                                           ARG_ID,
+                                           fileId,
+                                           ARG_IMAGEWIDTH,"75");
+            attrs = attrs +" " + XmlUtil.attr("image", imageUrl);
         }
         //        System.err.println (XmlUtil.tag(TAG_NODE,attrs));
         return XmlUtil.tag(TAG_NODE,attrs);
     }
 
 
-    protected String[]getTags(Request request, String entryId) throws Exception {
+    protected List<Tag> getTags(Request request, String entryId) throws Exception {
         String tagQuery = SqlUtil.makeSelect(COL_TAGS_NAME,
                                              Misc.newList(TABLE_TAGS),
                                              SqlUtil.eq(COL_TAGS_ENTRY_ID,
                                                         SqlUtil.quote(entryId)));
-        return SqlUtil.readString(execute(tagQuery), 1);
+        String[] tags =  SqlUtil.readString(execute(tagQuery), 1);
+        List<Tag> tagList = new ArrayList();
+        for(int i=0;i<tags.length;i++) {
+            tagList.add(new Tag(tags[i]));
+        }
+        return tagList;
     }
 
 
@@ -1673,10 +1730,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @throws Exception _more_
      */
     public Result processGetGraph(Request request) throws Exception {
-
-        if (true || (graphXmlTemplate == null)) {
-            graphXmlTemplate = IOUtil.readContents(getProperty(PROP_HTML_GRAPHTEMPLATE), getClass());
-        }
+        String graphXmlTemplate = getResource(PROP_HTML_GRAPHTEMPLATE);
         String id   = (String) request.getId((String)null);
         String originalId   = id;
         String type = (String) request.getString(ARG_NODETYPE,(String)null);
@@ -1747,7 +1801,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             }
             String xml = StringUtil.replace(graphXmlTemplate, "${content}",
                                             sb.toString());
-            xml = StringUtil.replace(xml, "${root}", urlBase);            
+            xml = StringUtil.replace(xml, "${root}",  getUrlBase());            
             return new Result("", new StringBuffer(xml),
                               getMimeTypeFromSuffix(".xml"));
         }
@@ -1802,15 +1856,14 @@ public class Repository implements Constants, Tables, RequestHandler {
                                       ATTR_FROM, group.getFullName(),
                                       ATTR_TO, results.getString(1))));
 
-            String[] tags = getTags(request,id);
-            for (int i = 0; i < tags.length; i++) {
+            for (Tag tag: getTags(request,id)) {
                 sb.append(XmlUtil.tag(TAG_NODE,
                                       XmlUtil.attrs(ATTR_TYPE, TYPE_TAG,
-                                          ATTR_ID, tags[i], ATTR_TITLE,
-                                                    tags[i])));
+                                          ATTR_ID, tag.getName(), ATTR_TITLE,
+                                                    tag.getName())));
                 sb.append(XmlUtil.tag(TAG_EDGE,
                                       XmlUtil.attrs(ATTR_TYPE, "taggedby",
-                                          ATTR_FROM, tags[i], ATTR_TO, id)));
+                                          ATTR_FROM, tag.getName(), ATTR_TO, id)));
             }
 
 
@@ -1819,7 +1872,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             String xml = StringUtil.replace(graphXmlTemplate, "${content}",
                                             sb.toString());
 
-            xml = StringUtil.replace(xml, "${root}", urlBase);            
+            xml = StringUtil.replace(xml, "${root}",  getUrlBase());            
             return new Result("", new StringBuffer(xml),
                               getMimeTypeFromSuffix(".xml"));
         }
@@ -1900,7 +1953,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         }
         String xml = StringUtil.replace(graphXmlTemplate, "${content}",
                                         sb.toString());
-        xml = StringUtil.replace(xml, "${root}", urlBase);
+        xml = StringUtil.replace(xml, "${root}",  getUrlBase());
         return new Result("", new StringBuffer(xml),getMimeTypeFromSuffix(".xml"));
     }
 
@@ -2062,42 +2115,6 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
-
-    /**
-     * _more_
-     *
-     * @param url _more_
-     *
-     * @return _more_
-     */
-    protected String href(String url) {
-        return urlBase + url;
-    }
-
-    /**
-     * _more_
-     *
-     * @param url _more_
-     * @param label _more_
-     *
-     * @return _more_
-     */
-    protected String href(String url, String label) {
-        return href(url, label, "");
-    }
-
-    /**
-     * _more_
-     *
-     * @param url _more_
-     * @param label _more_
-     * @param extra _more_
-     *
-     * @return _more_
-     */
-    protected String href(String url, String label, String extra) {
-        return HtmlUtil.href(urlBase + url, label, extra);
-    }
 
 
     /**
@@ -2486,15 +2503,14 @@ public class Repository implements Constants, Tables, RequestHandler {
     protected String getTagLinks(Request request, String tag)
             throws Exception {
         String search =
-            href(HtmlUtil.url("/searchform", ARG_TAG,
+            HtmlUtil.href(HtmlUtil.url(URL_SEARCHFORM, ARG_TAG,
                               java.net.URLEncoder.encode(tag,
-                                  "UTF-8")), HtmlUtil.img(urlBase
-                                      + "/Search16.gif", "Search in tag"));
+                                  "UTF-8")), HtmlUtil.img(fileUrl("/Search16.gif"), "Search in tag"));
 
         if (isAppletEnabled(request)) {
-            search += href(HtmlUtil.url("/graphview", ARG_ID, tag,
+            search += HtmlUtil.href(HtmlUtil.url(URL_GRAPHVIEW, ARG_ID, tag,
                                         ARG_NODETYPE,
-                                        TYPE_TAG), HtmlUtil.img(urlBase + "/tree.gif",
+                                        TYPE_TAG), HtmlUtil.img(fileUrl("/tree.gif"),
                                                                 "Show tag in graph"));
         }
         return search;
@@ -2502,8 +2518,8 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
     protected String getEntryUrl(Entry entry) {
-        return href(HtmlUtil.url("/showentry", ARG_ID, entry.getId()),
-                    entry.getName());
+        return HtmlUtil.href(HtmlUtil.url(URL_SHOWENTRY, ARG_ID, entry.getId()),
+                             entry.getName());
     }
 
     protected List<Association> getAssociations(Request request, String entryId) throws Exception {
@@ -2532,12 +2548,17 @@ public class Repository implements Constants, Tables, RequestHandler {
         throws Exception {
         if(true) return "";
         String search =
-            href(HtmlUtil.url("/searchform", ARG_ASSOCIATION,
-                              java.net.URLEncoder.encode(association,
-                                  "UTF-8")), HtmlUtil.img(urlBase
-                                      + "/Search16.gif", "Search in association"));
+            HtmlUtil.href(HtmlUtil.url(URL_SEARCHFORM, ARG_ASSOCIATION,
+                                       encode(association)), 
+                          HtmlUtil.img(fileUrl("/Search16.gif"), "Search in association"));
 
         return search;
+    }
+
+
+
+    public String fileUrl(String f) {
+        return urlBase + f;
     }
 
     /**
@@ -2552,10 +2573,9 @@ public class Repository implements Constants, Tables, RequestHandler {
         if ( !isAppletEnabled(request)) {
             return "";
         }
-        return href(HtmlUtil.url("/graphview", ARG_ID, group.getFullName(),
-                                 ARG_NODETYPE,
-                                 NODETYPE_GROUP), HtmlUtil.img(urlBase
-                                 + "/tree.gif","Show group in graph"));
+        return HtmlUtil.href(HtmlUtil.url(URL_GRAPHVIEW, ARG_ID, group.getFullName(),
+                                          ARG_NODETYPE,
+                                          NODETYPE_GROUP), HtmlUtil.img(fileUrl("/tree.gif"),"Show group in graph"));
     }
 
 
@@ -3040,4 +3060,6 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
 }
+
+
 

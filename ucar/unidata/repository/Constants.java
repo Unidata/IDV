@@ -271,8 +271,7 @@ public interface Constants {
 
     /** _more_          */
     public static final String PROP_HTML_TEMPLATE = "jdms.html.template";
-
-    /** _more_          */
+    public static final String PROP_HTML_IMAGEPLAYER = "jdms.html.imageplayer";
     public static final String PROP_HTML_TIMELINEAPPLET = "jdms.html.timelineapplet";
     public static final String PROP_HTML_MIMEPROPERTIES  = "jdms.html.mimeproperties";
     public static final String PROP_HTML_GRAPHAPPLET  = "jdms.html.graphapplet";
@@ -336,7 +335,16 @@ public interface Constants {
     public static final String ATTR_XLINKHREF = "xlink:href";
 
 
+    public static final String ARG_WIDTH = "width";
+
+
     public static final String ARG_ADMIN_WHAT = "what";
+
+
+
+
+
+
 
 }
 
