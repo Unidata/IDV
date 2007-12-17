@@ -1944,8 +1944,15 @@ public class IOUtil {
     public static void writeJarFile(String filename, List files,
                                     String pathPrefix)
             throws IOException {
+        writeJarFile(filename, files, pathPrefix, false);
+    }    
+
+    public static void writeJarFile(String filename, List files,
+                                    String pathPrefix, boolean makeFilesUnique)
+            throws IOException {
         ZipOutputStream zos =
             new ZipOutputStream(new FileOutputStream(filename));
+        Hashtable seen = new Hashtable();
         for (int i = 0; i < files.size(); i++) {
             String path;
             Object tmp = files.get(i);
@@ -1963,6 +1970,13 @@ public class IOUtil {
                 path = tfo.getLabel().toString();
             } else {
                 throw new IllegalArgumentException("Unknown file:" + tmp);
+            }
+            if(makeFilesUnique) {
+                int cnt=0;
+                while(seen.get(path)!=null) {
+                    path = "v" +(cnt++)+"_"+path;
+                }
+                seen.put(path,path);
             }
             if (pathPrefix != null) {
                 path = pathPrefix + "/" + path;
