@@ -666,7 +666,7 @@ public class PluginManager extends IdvManager {
                 return;
             }
 
-            System.err.println("files:" + files);
+            //            System.err.println("files:" + files);
             IOUtil.writeJarFile(jarFile, files);
             if (autoInstallCbx.isSelected()) {
                 installPlugin(jarFile, true);
@@ -759,6 +759,25 @@ public class PluginManager extends IdvManager {
         addCreateFile(file, null);
     }
 
+    private JComponent getBundleComponent(String name) {
+        if (categoryBox == null) {
+            categoryBox = getPersistenceManager().makeCategoryBox();
+        }
+            
+        Object selected = categoryBox.getSelectedItem();
+        GuiUtils.setListData(
+                             categoryBox, getPersistenceManager().getFavoritesCategories());
+        if (selected != null) {
+            categoryBox.setSelectedItem(selected);
+        }
+        if(name!=null)
+            nameFld.setText(name);
+        return
+            GuiUtils.top(GuiUtils.vbox(new JLabel("Name:"), nameFld,
+                                       new JLabel("Category:"), categoryBox));
+
+    }
+
     /**
      * add a file name with the given label to show
      *
@@ -766,6 +785,16 @@ public class PluginManager extends IdvManager {
      * @param label label
      */
     private void addCreateFile(String file, String label) {
+        if(ArgsManager.isBundleFile(file)) {
+            String name = IOUtil.getFileTail(IOUtil.stripExtension(file));
+            if(!GuiUtils.showOkCancelDialog(null,"Favorite Bundle Category",
+                                            GuiUtils.inset(getBundleComponent(name),10), null)) return;
+
+            makeSavedBundle(file);
+            return;
+        }
+
+
         Wrapper wrapper = new Wrapper(file, label);
         showCreatePlugin();
         if ( !createFileList.contains(wrapper)) {
@@ -883,25 +912,11 @@ public class PluginManager extends IdvManager {
      * Load bundles from disk
      */
     public void loadBundlesFromDisk() {
-
-        if (categoryBox == null) {
-            categoryBox = getPersistenceManager().makeCategoryBox();
-        }
-
-        Object selected = categoryBox.getSelectedItem();
-        GuiUtils.setListData(
-            categoryBox, getPersistenceManager().getFavoritesCategories());
-        if (selected != null) {
-            categoryBox.setSelectedItem(selected);
-        }
-        JComponent accessory =
-            GuiUtils.top(GuiUtils.vbox(new JLabel("Name:"), nameFld,
-                                       new JLabel("Category:"), categoryBox));
         String file =
             FileManager.getReadFileOrURL("Bundle to load into plugin",
                                          Misc.newList(FILTER_XIDV,
                                              FILTER_JNLP, FILTER_ISL,
-                                             FILTER_ZIDV), accessory);
+                                             FILTER_ZIDV), getBundleComponent(null));
         if (file == null) {
             return;
         }
@@ -909,6 +924,12 @@ public class PluginManager extends IdvManager {
         if (file.length() == 0) {
             return;
         }
+
+        makeSavedBundle(file);
+
+    }
+
+    private void makeSavedBundle(String file) {
         String name = nameFld.getText().trim();
         if (name.length() == 0) {
             name = IOUtil.stripExtension(IOUtil.getFileTail(file));
