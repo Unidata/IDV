@@ -20,14 +20,18 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.sounding;
 
 
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
+import ucar.visad.Util;
+import ucar.visad.quantities.AirPressure;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.GeopotentialAltitude;
+import ucar.visad.quantities.Gravity;
 
 import visad.*;
 
@@ -57,6 +61,20 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
 
     /** The list of levels */
     List soundingLevels;
+
+    /** Height unit */
+    Unit heightUnit;
+
+    /** unit for geopotential */
+    private static final Unit GEOPOTENTIAL_UNIT;
+
+    static {
+        try {
+            GEOPOTENTIAL_UNIT = Util.parseUnit("m2/s2");
+        } catch (Exception ex) {
+            throw new ExceptionInInitializerError(ex.toString());
+        }
+    }
 
     /**
      *  Constructor for reflection based construction
@@ -122,7 +140,10 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         // get date and number of stations
         String          info    = br.readLine();
-        StringTokenizer tok     = new StringTokenizer(info, " ");
+        String          delim   = (info.indexOf(",") >= 0)
+                                  ? ","
+                                  : " ";
+        StringTokenizer tok     = new StringTokenizer(info, delim);
         int             numToks = tok.countTokens();
         if (numToks != 5) {
             throw new Exception("Can't find date and number of stations");
@@ -138,7 +159,6 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
         // now should have something like 2007-1-27-0
         DateTime dt = DateTime.createDateTime(buf.toString(),
                           "yyyy-MM-dd-HH");
-        // System.out.println("date = " + dt);
         times = new ArrayList(1);
         times.add(dt);
 
@@ -160,7 +180,10 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
             if (data == null) {
                 break;
             }
-            tok     = new StringTokenizer(data);
+            if (data.trim().equals("")) {
+                continue;
+            }
+            tok     = new StringTokenizer(data, delim);
             numToks = tok.countTokens();
             if (numToks == 4) {  // new station
                 if (levels != null) {
@@ -170,8 +193,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
                     numFound++;
                 }
                 currentStation = makeSoundingStation(tok);
-                // System.out.println("Station: " + currentStation);
-                levels = new ArrayList();
+                levels         = new ArrayList();
             } else {
                 appendLevels(levels, tok);
             }
@@ -200,6 +222,22 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
         sld.dewpoint    = getValue(tok.nextToken());
         sld.direction   = getValue(tok.nextToken());
         sld.speed       = getValue(tok.nextToken());
+        try {
+            // figure out if we are in Geopotential or GeopotentialMeters
+            if ((heightUnit == null) && !Double.isNaN(sld.height)) {
+                float expected =
+                    AirPressure.getStandardAtmosphereCS().toReference(
+                        new float[][] {
+                    { sld.pressure }
+                })[0][0];
+                if (Math.abs(sld.height) > expected + 50) {
+                    heightUnit = GEOPOTENTIAL_UNIT;
+                } else {
+                    heightUnit = GeopotentialAltitude.getGeopotentialMeter();
+                }
+            }
+        } catch (VisADException ve) {}
+
         levels.add(sld);
     }
 
@@ -214,7 +252,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
         double val;
         try {
             val = Misc.parseDouble(s);
-            if (val == 99999.90) {
+            if ((val == 99999.90) || (val == 999999.0)) {
                 val = Double.NaN;
             }
         } catch (NumberFormatException nfe) {
@@ -278,6 +316,17 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
             speeds[i]    = sld.speed;
         }
         try {
+            // not really meters, but we use this as a hack for Geopotential
+            if (heightUnit.equals(GEOPOTENTIAL_UNIT)) {
+                float[] newHeights =
+                    GeopotentialAltitude.toAltitude(
+                        heights,
+                        GeopotentialAltitude.getGeopotentialUnit(
+                            CommonUnit.meter), Gravity.newReal(),
+                                new float[heights.length], CommonUnit.meter,
+                                true);
+                heights = newHeights;
+            }
             RAOB r = so.getRAOB();
             r.setMandatoryPressureProfile(
                 CommonUnits.MILLIBAR, pressures, CommonUnits.CELSIUS, temps,
@@ -285,7 +334,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
                 speeds, CommonUnit.degree, dirs,
                 GeopotentialAltitude.getGeopotentialUnit(CommonUnit.meter),
                 heights);
-            // System.out.println("data = " + r.getMandatoryPressureProfile());
+            //System.out.println("data = " + r.getMandatoryPressureProfile());
         } catch (Exception excp) {
             //System.out.println("couldn't set RAOB data");
             System.out.println(excp.getMessage());
