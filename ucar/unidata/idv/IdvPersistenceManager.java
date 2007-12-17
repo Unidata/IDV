@@ -1431,8 +1431,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 dataSourceIdx++) {
             DataSource dataSource =
                 (DataSource) dataSources.get(dataSourceIdx);
-            dataSource.setTmpPaths(null);
-            dataSource.setDataIsEditable(false);
+            dataSource.resetTmpState();
         }
     }
 
