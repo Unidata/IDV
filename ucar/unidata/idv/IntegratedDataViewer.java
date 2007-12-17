@@ -1878,13 +1878,17 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      * @return The data type name or null
      */
     public String selectDataType(Object definingObject) {
+        return selectDataType(definingObject,
+                "<html>Unable to figure out how to read the data:<br>&nbsp;<p>&nbsp;&nbsp;&nbsp;<i>"
+                + definingObject + "</i>"
+                              + "<br>&nbsp;<p>Please specify a data source type<br>&nbsp;</html>");
+    }
+
+
+    public String selectDataType(Object definingObject, String message) {
         JComboBox dataSourcesCbx = IdvChooser.getDataSourcesComponent(false,
                                        getDataManager(), false);
-        JLabel label =
-            new JLabel(
-                "<html>We are unable to figure out how to read this data:<br>&nbsp;<p>&nbsp;&nbsp;&nbsp;<i>"
-                + definingObject + "</i>"
-                + "<br>&nbsp;<p>Please specify a data source type<br>&nbsp;</html>");
+        JLabel label = new JLabel(message);
         JPanel contents = GuiUtils.vbox(
                               GuiUtils.inset(label, 5),
                               GuiUtils.inset(
