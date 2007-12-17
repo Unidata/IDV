@@ -415,12 +415,12 @@ public class SqlUtil {
     }
 
     public static void loadSql(String sql, Statement statement, boolean ignoreErrors) 
-            throws Throwable {
+            throws Exception {
         for(String command: parseSql(sql)) {
             try {
                 statement.execute(command);
                 //                System.err.println ("OK:" + command);
-            } catch(Throwable exc) {
+            } catch(Exception exc) {
                 //                System.err.println ("bad sql:" + command+ " " + exc);
                 if(!ignoreErrors) {
                     System.err.println ("bad query:" + command);
