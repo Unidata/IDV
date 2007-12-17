@@ -478,6 +478,10 @@ public class ArgsManager extends IdvManager {
         return IOUtil.hasSuffix(name, SUFFIX_XIDV);
     }
 
+    public static boolean isBundleFile(String name) {
+        return isXidvFile(name) || isZidvFile(name);
+    }
+
 
     /**
      * Helper method to determine if the given  filename is an isl file
