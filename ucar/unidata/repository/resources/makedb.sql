@@ -44,13 +44,17 @@ CREATE TABLE  users (id varchar(200),
 CREATE TABLE entries (id varchar(200),
                    type varchar(200),
 	           name varchar(200),
-                   description varchar(500),
+                   description varchar(1000),
                    group_id varchar(200),
    		   user_id varchar(200),
 	           file varchar(200),
 	           createdate timestamp, 
 	           fromdate timestamp, 
-	           todate timestamp); 
+	           todate timestamp,
+	           minlat double,
+	           maxlat double,
+	           minlon double,
+	           maxlon double); 
 
 CREATE INDEX ENTRIES_INDEX_ID ON entries (ID);
 CREATE INDEX ENTRIES_INDEX_FILE ON entries (FILE);

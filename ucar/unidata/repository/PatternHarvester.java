@@ -385,11 +385,14 @@ public class PatternHarvester extends Harvester {
 
                 Group group = repository.findGroupFromName(rootGroup + "/"
                                   + groupName, true);
-                entries.add(new Entry(repository.getGUID(), typeHandler,
+                Entry entry;
+                entries.add(entry = new Entry(repository.getGUID(), typeHandler,
                                       name, desc, group, user, fileName,
                                       createDate.getTime(),
                                       fromDate.getTime(), toDate.getTime(),
                                       values));
+                typeHandler.initializeNewEntry(entry);
+
             }
         }
         return entries;

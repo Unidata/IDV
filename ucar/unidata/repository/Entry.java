@@ -43,6 +43,7 @@ import java.util.List;
  */
 public class Entry {
 
+    public static final double NONGEO = -999999;
 
     /** _more_ */
     Object[] values;
@@ -84,6 +85,11 @@ public class Entry {
 
     /** _more_ */
     private long endDate;
+
+    private double minLat = NONGEO;
+    private double maxLat = NONGEO;
+    private double minLon = NONGEO;
+    private double maxLon = NONGEO;
 
     /** _more_ */
     private TypeHandler typeHandler;
@@ -170,7 +176,7 @@ public class Entry {
      */
     public Entry(String id, TypeHandler typeHandler, String name,
                  String description, Group group, User user, String file,
-                 long createDate, long startDate, long endDate,
+                 long createDate, long startDate, long endDate, 
                  Object[] values) {
         this.id          = id;
         this.typeHandler = typeHandler;
@@ -513,6 +519,94 @@ public class Entry {
     public Object[] getValues() {
         return values;
     }
+
+
+
+    public boolean hasLocationDefined() {
+        if(minLat!=NONGEO && minLon!=NONGEO &&!hasAreaDefined()) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean hasAreaDefined() {
+        if(minLat!=NONGEO && minLon!=NONGEO && maxLat!=NONGEO && maxLon!=NONGEO) {
+            return true;
+        }
+        return false;
+    }
+
+/**
+Set the MinLat property.
+
+@param value The new value for MinLat
+**/
+public void setMinLat (double value) {
+	minLat = value;
+}
+
+/**
+Get the MinLat property.
+
+@return The MinLat
+**/
+public double getMinLat () {
+    return minLat;
+}
+
+/**
+Set the MaxLat property.
+
+@param value The new value for MaxLat
+**/
+public void setMaxLat (double value) {
+	maxLat = value;
+}
+
+/**
+Get the MaxLat property.
+
+@return The MaxLat
+**/
+public double getMaxLat () {
+    return maxLat;
+}
+
+/**
+Set the MinLon property.
+
+@param value The new value for MinLon
+**/
+public void setMinLon (double value) {
+	minLon = value;
+}
+
+/**
+Get the MinLon property.
+
+@return The MinLon
+**/
+public double getMinLon () {
+	return minLon;
+}
+
+/**
+Set the MaxLon property.
+
+@param value The new value for MaxLon
+**/
+public void setMaxLon (double value) {
+	maxLon = value;
+}
+
+/**
+Get the MaxLon property.
+
+@return The MaxLon
+**/
+public double getMaxLon () {
+	return maxLon;
+}
 
 
 

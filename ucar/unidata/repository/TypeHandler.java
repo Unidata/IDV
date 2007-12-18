@@ -193,6 +193,10 @@ public class TypeHandler implements Constants, Tables {
                       results.getTimestamp(col++).getTime(),
                       results.getTimestamp(col++).getTime(),
                       results.getTimestamp(col++).getTime());
+        entry.setMinLat(results.getDouble(col++));
+        entry.setMaxLat(results.getDouble(col++));
+        entry.setMinLon(results.getDouble(col++));
+        entry.setMaxLon(results.getDouble(col++));
         return entry;
     }
 
@@ -375,7 +379,6 @@ public class TypeHandler implements Constants, Tables {
 
 
 
-
     /**
      * _more_
      *
@@ -392,10 +395,12 @@ public class TypeHandler implements Constants, Tables {
             throws Exception {
         StringBuffer sb = new StringBuffer();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
+            OutputHandler outputHandler = repository.getOutputHandler(request);
+            String nextPrev = outputHandler.getNextPrevLink(request, entry, output);
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
                                           entry.getName() + "&nbsp;"
-                                          + getEntryLinks(entry, request)));
-
+                                          + getEntryLinks(entry, request)+ "&nbsp;&nbsp;" +
+                                          nextPrev));
             String[] crumbs =
                 repository.getOutputHandler(request).getBreadCrumbs(request,
                                             entry.getGroup(), true);
@@ -427,10 +432,36 @@ public class TypeHandler implements Constants, Tables {
                             fmt(entry.getStartDate())));
                 }
             }
+            String typeDesc =  entry.getTypeHandler().getDescription();
+            if(typeDesc==null || typeDesc.trim().length()==0) {
+                typeDesc =  entry.getTypeHandler().getType();
+            }
             sb.append(
                 HtmlUtil.tableEntry(
                     HtmlUtil.bold("Type:"),
-                    entry.getTypeHandler().getDescription()));
+                    typeDesc));
+
+            if(entry.hasLocationDefined()) {
+                sb.append(HtmlUtil.tableEntry(
+                    HtmlUtil.bold("Location:"),
+                    entry.getMinLat()+"/"+entry.getMinLon()));
+            } else  if(entry.hasAreaDefined()) {
+                String img = HtmlUtil.img(HtmlUtil.url("http://data.eol.ucar.edu/cgi-bin/codiac/mm5","cmds","box+"+
+                                                       entry.getMinLon()+"+"+
+                                                       entry.getMinLat()+"+"+
+                                                       entry.getMaxLon()+"+"+
+                                                       entry.getMaxLat()+"+red"),""," width=200");
+                /*                sb.append(HtmlUtil.tableEntry(
+                                              HtmlUtil.bold("Area:"),
+                                              HtmlUtil.makeAreaLabel(
+                                                                     entry.getMinLat(),
+                                                                     entry.getMaxLat(),
+                                                                     entry.getMinLon(),
+                                                                     entry.getMaxLon())));*/
+               sb.append(HtmlUtil.tableEntry(
+                                             HtmlUtil.bold("Area:"),
+                                             img));
+            }
 
             if (ImageUtils.isImage(entry.getFile())) {
                 sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Image:"),
@@ -444,6 +475,9 @@ public class TypeHandler implements Constants, Tables {
         return sb;
     }
 
+
+    public void initializeNewEntry(Entry entry) throws Exception {
+    }
 
     /**
      * _more_
@@ -556,9 +590,9 @@ public class TypeHandler implements Constants, Tables {
         boolean didOther   = false;
         boolean didMeta    = false;
         for (int i = 0; i < tableNames.length; i++) {
-            if ((what.indexOf(tableNames[i] + ".") >= 0)
-                    || (where.indexOf(tableNames[i] + ".") >= 0)
-                    || (extra.indexOf(tableNames[i] + ".") >= 0)) {
+            if ((what.indexOf(" " +tableNames[i] + ".") >= 0)
+                    || (where.indexOf(" " +tableNames[i] + ".") >= 0)
+                    || (extra.indexOf(" " + tableNames[i] + ".") >= 0)) {
                 tables.add(tableNames[i]);
                 if (i == 0) {
                     didEntries = true;
@@ -579,7 +613,9 @@ public class TypeHandler implements Constants, Tables {
         if (didEntries) {
             String type = (String) request.getType("").trim();
             if ((type.length() > 0) && !type.equals(TYPE_ANY)) {
-                addOr(COL_ENTRIES_TYPE, type, whereList, true);
+                if(whereList.toString().indexOf(COL_ENTRIES_TYPE)<0) {         
+                    addOr(COL_ENTRIES_TYPE, type, whereList, true);
+                }
             }
         }
 
@@ -594,6 +630,7 @@ public class TypeHandler implements Constants, Tables {
 
         where = SqlUtil.makeAnd(whereList);
         String sql = SqlUtil.makeSelect(what, tables, where, extra);
+        System.err.println (sql);
         return getRepository().execute(sql, repository.getMax(request));
     }
 
@@ -620,7 +657,7 @@ public class TypeHandler implements Constants, Tables {
      */
     public void addToSearchForm(StringBuffer formBuffer,
                                 StringBuffer headerBuffer, Request request,
-                                List where)
+                                List where, boolean simpleForm)
             throws Exception {
 
         String minDate = request.getDateSelect(ARG_FROMDATE, (String) null);
@@ -716,57 +753,61 @@ public class TypeHandler implements Constants, Tables {
         formBuffer.append("\n");
 
 
-        String groupArg = (String) request.getString(ARG_GROUP, "");
-        String searchChildren = " "
-                                + HtmlUtil.checkbox(ARG_GROUP_CHILDREN,
+        if(!simpleForm) {
+            String groupArg = (String) request.getString(ARG_GROUP, "");
+            String searchChildren = " "
+                + HtmlUtil.checkbox(ARG_GROUP_CHILDREN,
                                     "true",
                                     request.get(ARG_GROUP_CHILDREN,
-                                        false)) + " (Search subgroups)";
-        if (groupArg.length() > 0) {
-            formBuffer.append(HtmlUtil.hidden(ARG_GROUP, groupArg));
-            Group group = repository.findGroup(groupArg);
-            if (group != null) {
-                formBuffer.append(
-                    HtmlUtil.tableEntry(
-                        HtmlUtil.bold("Group:"),
-                        group.getFullName() + "&nbsp;" + searchChildren));
+                                                false)) + " (Search subgroups)";
+            if (groupArg.length() > 0) {
+                formBuffer.append(HtmlUtil.hidden(ARG_GROUP, groupArg));
+                Group group = repository.findGroup(groupArg);
+                if (group != null) {
+                    formBuffer.append(
+                                      HtmlUtil.tableEntry(
+                                                          HtmlUtil.bold("Group:"),
+                                                          group.getFullName() + "&nbsp;" + searchChildren));
 
-            }
-        } else {
-            Statement stmt =
-                executeSelect(request,
-                              SqlUtil.distinct(COL_ENTRIES_GROUP_ID), where);
-
-            List<Group> groups =
-                repository.getGroups(SqlUtil.readString(stmt, 1));
-
-            if (groups.size() > 1) {
-                List groupList = new ArrayList();
-                groupList.add(ALL_OBJECT);
-                for (Group group : groups) {
-                    groupList.add(new TwoFacedObject(group.getFullName()));
                 }
-                String groupSelect = HtmlUtil.select(ARG_GROUP, groupList);
-                formBuffer.append(
-                    HtmlUtil.tableEntry(
-                        HtmlUtil.bold("Group:"),
-                        groupSelect + searchChildren));
-            } else if (groups.size() == 1) {
-                formBuffer.append(HtmlUtil.hidden(ARG_GROUP,
-                        groups.get(0).getFullName()));
-                formBuffer.append(
-                    HtmlUtil.tableEntry(
-                        HtmlUtil.bold("Group:"),
-                        groups.get(0).getFullName() + searchChildren));
+            } else {
+                Statement stmt =
+                    executeSelect(request,
+                                  SqlUtil.distinct(COL_ENTRIES_GROUP_ID), where);
+
+                List<Group> groups =
+                    repository.getGroups(SqlUtil.readString(stmt, 1));
+
+                if (groups.size() > 1) {
+                    List groupList = new ArrayList();
+                    groupList.add(ALL_OBJECT);
+                    for (Group group : groups) {
+                        groupList.add(new TwoFacedObject(group.getFullName()));
+                    }
+                    String groupSelect = HtmlUtil.select(ARG_GROUP, groupList);
+                    formBuffer.append(
+                                      HtmlUtil.tableEntry(
+                                                          HtmlUtil.bold("Group:"),
+                                                          groupSelect + searchChildren));
+                } else if (groups.size() == 1) {
+                    formBuffer.append(HtmlUtil.hidden(ARG_GROUP,
+                                                      groups.get(0).getFullName()));
+                    formBuffer.append(
+                                      HtmlUtil.tableEntry(
+                                                          HtmlUtil.bold("Group:"),
+                                                          groups.get(0).getFullName() + searchChildren));
+                }
             }
+            formBuffer.append("\n");
         }
-        formBuffer.append("\n");
 
-        String tag = (String) request.getString(ARG_TAG, "");
-        formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Tag:"),
-                HtmlUtil.input(ARG_TAG, tag)));
+        if(!simpleForm) {
+            String tag = (String) request.getString(ARG_TAG, "");
+            formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Tag:"),
+                                                  HtmlUtil.input(ARG_TAG, tag)));
 
-        formBuffer.append("\n");
+            formBuffer.append("\n");
+        }
 
         String dateHelp = " (e.g., 2007-12-11 00:00:00)";
         formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Date Range:"),
@@ -774,6 +815,17 @@ public class TypeHandler implements Constants, Tables {
                 + HtmlUtil.input(ARG_TODATE, maxDate) + dateHelp));
 
         formBuffer.append("\n");
+
+
+        if(!simpleForm) {
+            String nonGeo =  HtmlUtil.checkbox(ARG_INCLUDENONGEO,
+                                               "true",
+                                               request.get(ARG_INCLUDENONGEO,true))+" Include non-geographic";
+            String areaWidget  = HtmlUtil.makeLatLonBox(ARG_AREA, "", "", "", "");
+            areaWidget = "<table>" + HtmlUtil.cols(areaWidget, nonGeo) +"</table>";
+            formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Extent:"), areaWidget));
+            formBuffer.append("\n");
+        }
     }
 
     /**
@@ -789,18 +841,21 @@ public class TypeHandler implements Constants, Tables {
 
         List   where = new ArrayList();
 
-
-        String tag   = (String) request.getString(ARG_TAG, (String) null);
-        if (tag != null) {
-            tag = tag.trim();
-            if (tag.length() > 0) {
-                where.add(SqlUtil.eq(COL_ENTRIES_ID, COL_TAGS_ENTRY_ID));
-                addOr(COL_TAGS_NAME, tag, where, true);
+        if(request.defined(ARG_TYPE)) {
+            String type = request.getString(ARG_TYPE,"").trim();
+            if(!type.equals(TYPE_ANY)) {
+                addOr(COL_ENTRIES_TYPE, request.getString(ARG_TYPE,""), where, true);
             }
         }
 
-        String groupName = (String) request.getString(ARG_GROUP, "").trim();
-        if (groupName.length() > 0) {
+        if(request.defined(ARG_TAG)) {
+            String tag   = (String) request.getString(ARG_TAG, (String) null).trim();
+            where.add(SqlUtil.eq(COL_ENTRIES_ID, COL_TAGS_ENTRY_ID));
+            addOr(COL_TAGS_NAME, tag, where, true);
+        }
+
+        if (request.defined(ARG_GROUP)) {
+            String groupName = (String) request.getString(ARG_GROUP, "").trim();
             boolean doNot = groupName.startsWith("!");
             if (doNot) {
                 groupName = groupName.substring(1);
@@ -893,6 +948,33 @@ public class TypeHandler implements Constants, Tables {
             where.add(SqlUtil.le(COL_ENTRIES_CREATEDATE, createDate));
         }
 
+
+        boolean includeNonGeo = request.get(ARG_INCLUDENONGEO,false);
+        List areaExpressions = new ArrayList();
+        if (request.defined(ARG_AREA+"_minlat")) {
+            areaExpressions.add(SqlUtil.ge(COL_ENTRIES_MINLAT,request.get(ARG_AREA+"_minlat",0.0))); 
+        }
+        if (request.defined(ARG_AREA+"_maxlat")) {
+            areaExpressions.add(SqlUtil.le(COL_ENTRIES_MAXLAT,request.get(ARG_AREA+"_maxlat",0.0)));
+        }
+        if (request.defined(ARG_AREA+"_minlon")) {
+            areaExpressions.add(SqlUtil.ge(COL_ENTRIES_MINLON,request.get(ARG_AREA+"_minlon",0.0))); 
+        }
+        if (request.defined(ARG_AREA+"_maxlon")) {
+            areaExpressions.add(SqlUtil.le(COL_ENTRIES_MAXLON,request.get(ARG_AREA+"_maxlon",0.0)));
+        }
+        if(areaExpressions.size()>0) {
+            String areaExpr = SqlUtil.group(SqlUtil.makeAnd(areaExpressions));
+            if(includeNonGeo) {
+                areaExpr = SqlUtil.group(areaExpr +" OR " + 
+                                         SqlUtil.eq(COL_ENTRIES_MINLAT,Entry.NONGEO));
+                
+            }
+            where.add(areaExpr);
+            System.err.println (areaExpr);
+        }
+
+
         String name = (String) request.getString(ARG_NAME, "").trim();
         if ((name != null) && (name.length() > 0)) {
             List ors = new ArrayList();
@@ -926,7 +1008,7 @@ public class TypeHandler implements Constants, Tables {
      *
      * @return _more_
      */
-    public String getInsertSql() {
+   public String getInsertSql() {
         return null;
     }
 

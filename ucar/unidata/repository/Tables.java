@@ -99,6 +99,12 @@ public interface Tables {
     public static final String COL_ENTRIES_CREATEDATE     = TABLE_ENTRIES + ".createdate";
     public static final String COL_ENTRIES_FROMDATE       = TABLE_ENTRIES + ".fromdate";
     public static final String COL_ENTRIES_TODATE         = TABLE_ENTRIES + ".todate";
+    public static final String COL_ENTRIES_MINLAT         = TABLE_ENTRIES +".minlat";    
+    public static final String COL_ENTRIES_MAXLAT         = TABLE_ENTRIES +".maxlat";
+    public static final String COL_ENTRIES_MINLON         = TABLE_ENTRIES +".minlon";    
+    public static final String COL_ENTRIES_MAXLON         = TABLE_ENTRIES +".maxlon";
+
+
 
     public static final String []ARRAY_ENTRIES = new String[]{
         COL_ENTRIES_ID,
@@ -110,7 +116,11 @@ public interface Tables {
         COL_ENTRIES_FILE,
         COL_ENTRIES_CREATEDATE,
         COL_ENTRIES_FROMDATE,
-        COL_ENTRIES_TODATE
+        COL_ENTRIES_TODATE,
+        COL_ENTRIES_MINLAT,
+        COL_ENTRIES_MAXLAT,
+        COL_ENTRIES_MINLON,
+        COL_ENTRIES_MAXLON
     };
 
 

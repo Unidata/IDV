@@ -4,7 +4,7 @@ body {
    font-size: 10pt;
    font-family: Arial, Helvetica, sans-serif;
    color: #000000;
-   text-decoration: none;
+   xtext-decoration: none;
    margin: 0px;
 }
 
@@ -14,7 +14,7 @@ td {
    font-size: 10pt;
    font-family: Arial, Helvetica, sans-serif;
    color: black;
-   text-decoration: none
+   xtext-decoration: none
 }
 
 
@@ -26,37 +26,28 @@ td {
 .largestTag  {font-size: xx-large; } 
 
 
+
+A {
+   color: #0000FF
+   xxxcolor: #FFFFFF;
+}
+
 A:link {
-   font-family: Arial, Helvetica, sans-serif;
    color: #0000FF
 }
 
 
-A:visited {
-   font-family: Arial, Helvetica, sans-serif;
-   color: #A020F0
-}
-
-A:active {
-   font-family: Arial, Helvetica, sans-serif;
-   color: #FF0000;
-}
 
 a:hover {
-   font-family: Arial, Helvetica, sans-serif;
    color: #FF0000;
    text-decoration: underline
 }
 
-
-A { text-decoration: none }
-
-
-
+A {xtext-decoration: none}
 
 
 .navtitle:link {
-   font-family: Arial, Helvetica, sans-serif;
+   text-decoration: none;
    color: #FFFFFF;
 }
 
@@ -74,7 +65,13 @@ A { text-decoration: none }
 	margin:10px;
 }
 
+a.navtitle:visited {
+   text-decoration: none;
+   color: #FFFFFF;
+}
+
 a.navlink {
+   text-decoration: none;
   color:#ffffff;
   font-size: 12pt;
   font-weight: bold;
@@ -90,6 +87,7 @@ a.navlink {
    margin:0;
    font-family: Arial, Helvetica, sans-serif;
    font-size: 12pt;
+   border : 0px black solid;
    border-bottom : 1px #666666 solid;
    background-color : #77aa77;
    padding-top:1;
@@ -113,6 +111,7 @@ a.navlink {
 
 
 a.subnavlink {
+   text-decoration: none;
     font-family: Arial, Helvetica, sans-serif;  
     font-weight: bold; 
     font-size: 10pt;

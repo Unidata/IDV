@@ -35,6 +35,8 @@ public class Result {
     /** _more_ */
     public static String TYPE_HTML = "text/html";
 
+    private String redirectUrl;
+
     /** _more_ */
     public static String TYPE_XML = "text/xml";
 
@@ -61,6 +63,16 @@ public class Result {
 
     /** _more_ */
     private InputStream inputStream;
+
+    private boolean cacheOk = false;
+
+    private boolean requestOk  = true;
+
+    public Result(String redirectUrl) {
+        this.redirectUrl = redirectUrl;
+        this.shouldDecorate = false;
+    }
+
 
     /**
      * _more_
@@ -214,6 +226,8 @@ public class Result {
         return content;
     }
 
+
+
     /**
      * Set the Title property.
      *
@@ -287,6 +301,60 @@ public class Result {
     public InputStream getInputStream() {
         return inputStream;
     }
+
+    /**
+       Set the RedirectUrl property.
+
+       @param value The new value for RedirectUrl
+    **/
+    public void setRedirectUrl (String value) {
+	redirectUrl = value;
+    }
+
+    /**
+       Get the RedirectUrl property.
+
+       @return The RedirectUrl
+    **/
+    public String getRedirectUrl () {
+	return redirectUrl;
+    }
+
+/**
+Set the CacheOk property.
+
+@param value The new value for CacheOk
+**/
+public void setCacheOk (boolean value) {
+	cacheOk = value;
+}
+
+/**
+Get the CacheOk property.
+
+@return The CacheOk
+**/
+public boolean getCacheOk () {
+	return cacheOk;
+}
+
+/**
+Set the RequestOk property.
+
+@param value The new value for RequestOk
+**/
+public void setRequestOk (boolean value) {
+	requestOk = value;
+}
+
+/**
+Get the RequestOk property.
+
+@return The RequestOk
+**/
+public boolean getRequestOk () {
+	return requestOk;
+}
 
 
 

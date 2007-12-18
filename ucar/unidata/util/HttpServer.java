@@ -491,7 +491,12 @@ public class HttpServer {
         }
 
 
-
+        public void redirect(String url) throws Exception {
+            writeLine("HTTP/1.0 300 OK" + CRLF);
+            writeLine("Location: " + url + CRLF);
+            writeLine("\n");
+            output.close();
+        }
 
         /**
          * _more_

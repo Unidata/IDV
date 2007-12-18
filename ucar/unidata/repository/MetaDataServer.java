@@ -23,32 +23,16 @@
 package ucar.unidata.repository;
 
 
-import ucar.unidata.data.SqlUtil;
-
-
-import ucar.unidata.util.HtmlUtil;
-
-
 import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
 
-
 import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
-
-import java.io.*;
 
 import java.net.*;
-
-
-import java.util.ArrayList;
+import java.io.*;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Properties;
 
+import java.util.Hashtable;
 
 
 /**
@@ -57,7 +41,7 @@ import java.util.Properties;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class MetaDataServer extends HttpServer implements Constants {
+public class MetaDataServer extends HttpServer  implements Constants {
 
     /** _more_ */
     Repository repository;
@@ -76,58 +60,6 @@ public class MetaDataServer extends HttpServer implements Constants {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param handler _more_
-     * @param ok _more_
-     * @param result _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void writeContent(RequestHandler handler, boolean ok,
-                                Result result)
-            throws Exception {
-        if (result.isHtml() && result.getShouldDecorate()) {
-            String template = repository.getResource(PROP_HTML_TEMPLATE);
-            String html = StringUtil.replace(template, "${content}",
-                                             new String(result.getContent()));
-            html = StringUtil.replace(html, "${title}", result.getTitle());
-            html = StringUtil.replace(html, "${root}",
-                                      repository.getUrlBase());
-            List   links     = (List) result.getProperty(PROP_NAVLINKS);
-            String linksHtml = "&nbsp;";
-            if (links != null) {
-                linksHtml = StringUtil.join("&nbsp;|&nbsp;", links);
-            }
-
-            List   sublinks     = (List) result.getProperty(PROP_NAVSUBLINKS);
-            String sublinksHtml = "";
-            if (sublinks != null) {
-                sublinksHtml = StringUtil.join("\n&nbsp;|&nbsp;\n", sublinks);
-            }
-
-
-            html = StringUtil.replace(html, "${links}", linksHtml);
-            if (sublinksHtml.length() > 0) {
-                html = StringUtil.replace(html, "${sublinks}",
-                                          "<div class=\"subnav\">"
-                                          + sublinksHtml + "</div>");
-            } else {
-                html = StringUtil.replace(html, "${sublinks}", "");
-            }
-            handler.writeResult(ok, html, result.getMimeType());
-        } else if (result.getInputStream() != null) {
-            handler.writeResult(ok, result.getInputStream(),
-                                result.getMimeType());
-
-        } else {
-            handler.writeResult(ok, result.getContent(),
-                                result.getMimeType());
-        }
-    }
-
-
 
 
     /**
@@ -140,91 +72,74 @@ public class MetaDataServer extends HttpServer implements Constants {
      * @throws Exception _more_
      */
     protected RequestHandler doMakeRequestHandler(final Socket socket)
-            throws Exception {
-        return new RequestHandler(this, socket) {
+        throws Exception {
+        return new MyRequestHandler(this, socket);
+    }
 
-            protected void writeHeaderArgs() throws Exception {
+
+    private class MyRequestHandler extends RequestHandler {
+        boolean cache=false;
+        public MyRequestHandler(MetaDataServer server,Socket socket) throws Exception {
+            super(server, socket);
+        }
+
+        protected void writeHeaderArgs() throws Exception {
+            super.writeHeaderArgs();
+            //            if(!cache) {
                 writeLine("Cache-Control: no-cache" + CRLF);
-                writeLine("Last-Modified:" + new Date() + CRLF);
+                //            }
+            writeLine("Last-Modified:" + new Date() + CRLF);
+        }
+                
+        protected void writeContent(Result result)
+            throws Exception {
+            cache = result.getCacheOk();
+            if(result.getRedirectUrl()!=null) {
+                redirect(result.getRedirectUrl());
+            } else   if(result.getInputStream()!=null) {
+                writeResult(result.getRequestOk(), result.getInputStream(),
+                            result.getMimeType());
+            } else {
+                writeResult(result.getRequestOk(), result.getContent(),
+                            result.getMimeType());
             }
+        }
 
-            protected void handleRequest(String path, Hashtable formArgs,
-                                         Hashtable httpArgs, String content)
-                    throws Exception {
-                path = path.trim();
-                //                formArgs = SqlUtil.cleanUpArguments(formArgs);
-                try {
-                    User user = repository.findUser("jdoe");
-                    //user    = repository.findUser("anonymous");
-                    RequestContext context = new RequestContext(user);
-                    Request request = new Request(repository, path, context,
-                                          formArgs);
-                    if (user == null) {
-                        Result result =
-                            new Result("Error",
-                                       new StringBuffer("Unknown request:"
-                                           + path));
-                        result.putProperty(PROP_NAVLINKS,
-                                           repository.getNavLinks(request));
-                        writeContent(this, false, result);
-                        return;
-                    }
 
-                    Result result = repository.handleRequest(request);
-                    if (result != null) {
-                        writeContent(this, true, result);
-                    } else {
-                        //Try to serve up the file
-                        String type = repository.getMimeTypeFromSuffix(
-                                          IOUtil.getFileExtension(path));
-                        path = StringUtil.replace(path,
-                                repository.getUrlBase(), "");
-                        if ((path.trim().length() == 0) || path.equals("/")) {
-                            result = new Result("Error",
-                                    new StringBuffer("Unknown request:"
-                                        + path));
-                            result.putProperty(PROP_NAVLINKS,
-                                    repository.getNavLinks(request));
-                            writeContent(this, false, result);
-                            return;
-                        }
-                        try {
-                            InputStream is =
-                                IOUtil.getInputStream(
-                                    "/ucar/unidata/repository/htdocs" + path,
-                                    getClass());
-                            writeResult(true, is, type);
-                        } catch (IOException fnfe) {
-                            result = new Result("Error",
-                                    new StringBuffer("Unknown request:"
-                                        + path));
-                            result.putProperty(PROP_NAVLINKS,
-                                    repository.getNavLinks(request));
-                            writeContent(this, false, result);
-                        }
-                    }
-                } catch (Throwable exc) {
-                    exc = LogUtil.getInnerException(exc);
-                    if (exc instanceof Request.BadInputException) {
-                        Result result =
-                            new Result("Error",
-                                       new StringBuffer(exc.getMessage()));
-                        result.putProperty(PROP_NAVLINKS,
-                                           repository.getNavLinks(null));
-                        writeContent(this, false, result);
-                        exc.printStackTrace();
-                    } else {
-                        System.err.println("Error:" + exc);
-                        exc.printStackTrace();
-                        String trace = LogUtil.getStackTrace(exc);
-                        writeContent(this, false,
-                                     new Result("Error",
-                                         new StringBuffer("<pre>" + trace
-                                             + "</pre>")));
-                    }
-                }
+        protected void handleRequest(String path, Hashtable formArgs,
+                                     Hashtable httpArgs, String content)
+            throws Exception {
+            path = path.trim();
+            Result result=null;
+            try {
+                User user = repository.findUser("jdoe");
+                RequestContext context = new RequestContext(user);
+                Request request = new Request(repository, path, context,
+                                              formArgs);
+                if (user == null) {
+                    result =
+                        new Result("Error",
+                                   new StringBuffer("Unknown request:"
+                                                    + path));
+                } else {
+                    result = repository.handleRequest(request);
+                } 
+            } catch (Throwable exc) {
+                exc = LogUtil.getInnerException(exc);
+                repository.log("Error:" + exc, exc);
+                result =
+                    new Result("Error",
+                               new StringBuffer(exc.getMessage()+""));
+                result.putProperty(PROP_NAVLINKS,
+                                   repository.getNavLinks(null));
             }
-        };
+            if(result == null) {
+                result =   new Result("Error",
+                                      new StringBuffer("Unknown request:"
+                                                       + path));
+            }
+            writeContent(result);
+        }
     }
 
 
@@ -236,10 +151,8 @@ public class MetaDataServer extends HttpServer implements Constants {
      * @param exc _more_
      */
     protected void handleError(String msg, Exception exc) {
-        System.err.println("Error:" + exc);
-        exc.printStackTrace();
+        repository.log(msg,exc);
     }
-
 
 
     /**
@@ -250,7 +163,6 @@ public class MetaDataServer extends HttpServer implements Constants {
      * @throws Throwable _more_
      */
     public static void main(String[] args) throws Throwable {
-        System.setProperty("derby.system.home", "foobar");
         MetaDataServer mds = new MetaDataServer(args);
         mds.init();
     }

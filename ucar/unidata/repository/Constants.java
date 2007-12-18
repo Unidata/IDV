@@ -163,8 +163,18 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_SKIP = "skip";
 
+    public static final String ARG_AREA = "area";
+
+    public static final String ARG_FORM_BASIC = "form.basic";
+
+    public static final String ARG_INCLUDENONGEO = "includenongeo";
+
+
+    public static final String ARG_NEXT = "next";
+    public static final String ARG_PREVIOUS = "previous";
     /** _more_ */
     public static final String ARG_APPLET = "applet";
+
 
     /** _more_ */
     public static final String ARG_USER = "user";

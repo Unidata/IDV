@@ -178,7 +178,8 @@ public class Harvester {
                                   + platform + "/" + resolution + "/"
                                   + product, true);
                 Date dttm = sdf.parse(matcher.group(4));
-                entries.add(new Entry(repository.getGUID(), typeHandler,
+                Entry entry;
+                entries.add(entry =new Entry(repository.getGUID(), typeHandler,
                                       dttm.toString(), "", group, user,
                                       f.toString(), dttm.getTime(),
                                       new Object[] { platform,

@@ -91,6 +91,10 @@ public class HtmlUtil {
         return url(path, new String[]{n1,v1,n2,v2});
     }
 
+    public static String url(String path, String n1, String v1, String n2, String v2, String n3, String v3) {
+        return url(path, new String[]{n1,v1,n2,v2,n3,v3});
+    }
+
     public static String url(String path, String []args) {
         if(args.length==0) return path;
         path = path+"?";
@@ -122,20 +126,36 @@ public class HtmlUtil {
         return cols(s1)+cols(s2)+cols(s3)+cols(s4);
     }
 
-    public static String makeLatLonBox(String baseName, String lat1, String lat2, String lon1, String lon2) {
+    public static String makeLatLonBox(String baseName, String minLat, String maxLat, String minLon, String maxLon) {
         return  "<table>" +
             "<tr><td colspan=\"2\" align=\"center\">" +
-            input(baseName+"_lat2", lat2," size=\"10\"") +
+            input(baseName+"_maxlat", maxLat," size=\"5\"") +
             "</td></tr>" +
             "<tr><td>" +
-            input(baseName+"_lon2", lat2," size=\"10\"") +
+            input(baseName+"_minlon", minLon," size=\"5\"") +
             "</td><td>" +
-            input(baseName+"_lon1", lat2," size=\"10\"") +
+            input(baseName+"_maxlon", maxLon," size=\"5\"") +
             "</tr>" +
             "<tr><td colspan=\"2\" align=\"center\">" +
-            input(baseName+"_lat1", lat2," size=\"10\"") +
+            input(baseName+"_minlat", minLat," size=\"5\"") +
             "</table>";
     }
+
+    public static String makeAreaLabel(double minLat, double maxLat, double minLon, double maxLon) {
+        return  "<table>" +
+            "<tr><td colspan=\"2\" align=\"center\">" +
+            maxLat +
+            "</td></tr>" +
+            "<tr><td>" +
+            minLon +
+            "</td><td>" +
+            maxLon +
+            "</tr>" +
+            "<tr><td colspan=\"2\" align=\"center\">" +
+            minLat +
+            "</table>";
+    }
+
 
     public static String checkbox(String name, String value) {
         return checkbox(name, value, false);

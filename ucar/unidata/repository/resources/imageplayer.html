@@ -28,7 +28,7 @@ focus()
 imageTitles = new Array();
 imageUrls= new Array();
 imageOk = new Array();  
-theImages = new Array();
+//theImages = new Array();
 
 
  
@@ -67,10 +67,28 @@ play_mode = 0;                   // 0-normal, 1-loop, 2-sweep
 startImage="${root}/imageplayer/Play24.gif";
 stopImage="${root}/imageplayer/Pause24.gif"
 
+
 modeNormalImage =  "${root}/imageplayer/button_norm.gif"
 modeRockingImage =  "${root}/imageplayer/button_sweep.gif"
+image1 = new Image(100,100);
+image1.src = stopImage;
+image2 = new Image(100,100);
+image2.src = startImage;
+image3 = new Image(100,100);
+image3.src = modeNormalImage;
+image4 = new Image(100,100);
+image4.src = modeRockingImage;
+
 
 ${imagelist}
+
+images = new Array();
+for (var i = 0; i < numImages; i++) {
+  var image = new Image(700,700);
+  images[i] = image;
+  image.src = imageUrls[i];
+}
+
 
 
 //==============================================================
@@ -117,12 +135,14 @@ function play(mytimestamp)
    if (current_image >= numImages) {
       if (play_mode == 1) {      
          current_image = 0;
-      }
-      if (play_mode == 2) {              //sweep mode - change directions (go bkwd)
+      } else  if (play_mode == 2) {              //sweep mode - change directions (go bkwd)
          current_image = numImages-1;
 	 direction=0;
+      } else {
+         current_image = 0;
       }
    }
+
    if (current_image < numImages) {
      if (play_mode == 1) {               //rev loop mode - skip to last image
         current_image = numImages-1;
@@ -276,14 +296,16 @@ function toggle_mode()
    else change_mode(0);
 }
  
+
 //===> Change play mode (normal, loop, swing)
 function change_mode(mode)
 {
    play_mode = mode;
-   if(play_mode == 0)
-      document.loopmode.src = modeNormalImage
-   else
-      document.loopmode.src = modeRockingImage
+   if(play_mode == 0) {
+      document.loopmode.src = modeNormalImage;
+  } else {
+      document.loopmode.src = modeRockingImage;
+   }
 }
  
 function quote(s) {
@@ -291,8 +313,8 @@ function quote(s) {
 }
 
 function setBoxes() {
-    boxes="";
-    hideboxes = "";
+    var boxes="";
+    var hideboxes = "";
     for (var i = 0; i < numImages; i++)
     {
       gotoalt=alt("Go to image " + i); 
@@ -320,8 +342,10 @@ function setBoxes() {
       boxes+=box;
       hideboxes+=hidebox;
     }
+
     document.getElementById('boxes').innerHTML =span(attr("style","font-size:10"),boxes);
     document.getElementById('hideboxes').innerHTML =span(attr("style","font-size:10"),hideboxes);
+
 }
 
 function alt(s) {
@@ -390,11 +414,13 @@ function goToImage(frame_num)
 }
 
 function displayImage() {
-    if(!theImages[current_image]) {
-      theImages[current_image] = new Image(800,800);
-      theImages[current_image].src = imageUrls[current_image];
-     }                
-     document.animation.src = theImages[current_image].src;   
+//    if(!theImages[current_image]) {
+//      theImages[current_image] = new Image(800,800);
+//      theImages[current_image].src = imageUrls[current_image];
+//     }                
+
+//     document.animation.src = theImages[current_image].src;   
+     document.animation.src = imageUrls[current_image];
      setBoxes();
      if(imageTitles[current_image]) {
           document.getElementById('header').innerHTML = imageTitles[current_image];
@@ -415,9 +441,14 @@ This requires Javascript for an animation of the imagery.
 </H3>
 </NOSCRIPT>
 
-<TABLE BORDER=1 CELLPADDING="0" CELLSPACING="0">
+
+<TABLE BORDER="1" CELLPADDING="0" CELLSPACING="0">
     <TR>
-        <TD align="center" valign="center" BGCOLOR="#999999"> 
+        <TD width="150" align="center" valign="center" BGCOLOR="#999999"> 
+
+
+
+
 <A HREF="JavaScript: noop()" onClick="setImage(0,1)">
 <IMG  BORDER="0" SRC="${root}/imageplayer/Rewind24.gif" ALT="Got to first frame" title="Go to first frame">
 </A>
@@ -425,7 +456,10 @@ This requires Javascript for an animation of the imagery.
 <IMG  BORDER="0" SRC="${root}/imageplayer/StepBack24.gif" ALT="One step back" TITLE="One step back">
 </A>
 <A HREF="JavaScript: noop()" onClick="startStop()">
-<IMG  BORDER="0" NAME="startstop" SRC="${root}/imageplayer/Play24.gif" ALT="Start/Stop" TITLE="Start/Stop">
+<IMG  BORDER="0" NAME="startstop" SRC="${root}/imageplayer/Play24.gif" ALT="Start/Stop" TITLE="Start/Stop"
+xonmouseover="document.startstop.src=startImage;"
+xonmouseout="document.startstop.src=stopImage;"
+>
 </A>
 <A HREF="JavaScript: noop()" onClick="setImage(current_image+1,1)">
 <IMG  BORDER="0" SRC="${root}/imageplayer/StepForward24.gif" ALT="One step forward" TITLE="One step forward">
@@ -438,9 +472,9 @@ This requires Javascript for an animation of the imagery.
 <td><div style="margin-bottom:2" id="hideboxes">&nbsp;</div>
 <div id="boxes">&nbsp;</div>
 </td>
-<FORM METHOD="POST" NAME="control_form" action="javascript: noop()">
+<FORM METHOD="POST" NAME="control_form" action="javascript:goToImage(document.control_form.frameNumber.value)">
 <td width="5%" align="right">
-<INPUT TYPE="text" NAME="frameNumber" VALUE=1 SIZE="2" onFocus="this.select()" onChange="goToImage(this.value/1-1)"></INPUT>
+<INPUT TYPE="text" NAME="frameNumber" VALUE=1 SIZE="2" ></INPUT>
 </td>
 </table>
 </TD>
@@ -448,8 +482,6 @@ This requires Javascript for an animation of the imagery.
     </TR>
     <TR VALIGN="top" >
       <TD BGCOLOR="#999999">
-
-
 <p>
 <table>
 <tr><td align="right">Loop Mode:</td>
@@ -485,7 +517,7 @@ This requires Javascript for an animation of the imagery.
 </TD>
 <TD BGCOLOR="#999999" ALIGN=CENTER VALIGN=top>
    <div id="header" style="margin:2">&nbsp;</div>
-  <IMG NAME="animation" BORDER=0 WIDTH=700  SRC="${firstimage}" ALT="image">
+  <IMG NAME="animation" BORDER=0 WIDTH=600  SRC="${firstimage}" ALT="image">
 </TD>
 </TR>
 </TABLE>

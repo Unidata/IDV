@@ -97,5 +97,24 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
 
     }
 
+    public void initializeNewEntry(Entry entry) throws Exception {
+        String station = (String)entry.getValues()[0];
+        String lat = getRepository().getFieldDescription(station+".lat",
+                                                         "/ucar/unidata/repository/resources/level3radar.station.properties",null);
+        String lon = getRepository().getFieldDescription(station+".lon",
+                                                         "/ucar/unidata/repository/resources/level3radar.station.properties",null);
+
+        if(lat!=null && lon!=null) {
+            double latD = Misc.decodeLatLon(lat);
+            double lonD = Misc.decodeLatLon(lon);
+            entry.setMinLat(latD-2);
+            entry.setMaxLat(latD+2);
+            entry.setMinLon(lonD-2);
+            entry.setMaxLon(lonD+2);
+        }
+
+    }
+
+
 }
 

@@ -81,6 +81,10 @@ public class SqlUtil {
         return "'" + s.toString() + "'";
     }
 
+    public  static String group(String s) {
+        return  "("+s +")";
+    }
+
     public  static String makeAnd(List toks) {
         return StringUtil.join(" AND ", toks);
     }
