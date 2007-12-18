@@ -494,11 +494,15 @@ public class StateManager extends IdvManager {
         getStore().setTmpDir(
             (String) getProperty(IdvObjectStore.PROP_TMPDIR));
 
-
+        FileManager.setFileHidingEnabled(!new Boolean(getPreferenceOrProperty(PREF_SHOWHIDDENFILES,"false")).booleanValue());
 
     }
 
 
+
+    protected void applyPreferences() {
+        FileManager.setFileHidingEnabled(!new Boolean(getPreferenceOrProperty(PREF_SHOWHIDDENFILES,"false")).booleanValue());
+    }
 
     /**
      * Get the preference paths

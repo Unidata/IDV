@@ -804,6 +804,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
               HelpTipDialog.PREF_HELPTIPSHOW },
             { "Confirm Before Exiting", PREF_SHOWQUITCONFIRM },
             { "Show Dashboard On Start", PREF_SHOWDASHBOARD, Boolean.TRUE },
+            { "Show Hidden Files in File Chooser", PREF_SHOWHIDDENFILES, Boolean.FALSE},
             /*            { "Dock in Dashboard:", null },
             { "Quick Links", PREF_EMBEDQUICKLINKSINDASHBOARD, Boolean.TRUE },
             { "Data Chooser", PREF_EMBEDDATACHOOSERINDASHBOARD,

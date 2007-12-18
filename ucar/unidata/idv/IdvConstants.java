@@ -324,6 +324,7 @@ public interface IdvConstants {
     /** look and feel preference */
     public static final String PREF_EVENT_MOUSEMAP = "idv.event.mousemap";
 
+    public static final String PREF_SHOWHIDDENFILES = "idv.showhiddenfiles";
 
     /** preference for scroll wheel */
     public static final String PREF_EVENT_WHEELMAP = "idv.event.wheelmap";
