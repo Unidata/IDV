@@ -2420,7 +2420,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             return null;
         }
         Object loadId =
-            beginWritingDataToLocalDisk("Copying data from server");
+            beginWritingDataToLocalDisk("Copying data");
         try {
             List files = saveDataToLocalDisk(prefix, loadId, changeLinks);
             endWritingDataToLocalDisk(loadId);

@@ -579,8 +579,8 @@ public class GeoGridDataSource extends GridDataSource {
      */
     protected void makeSaveLocalActions(List actions) {
         String         lbl = (isFileBased()
-                              ? "Subset grid file"
-                              : "Make Data Source Local");
+                              ? "Write Grid"
+                              : "Write Local Grid");
         AbstractAction a   = new AbstractAction(lbl) {
             public void actionPerformed(ActionEvent ae) {
                 Misc.run(new Runnable() {
