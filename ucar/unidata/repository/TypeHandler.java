@@ -625,6 +625,22 @@ public class TypeHandler implements Constants, Tables {
 
         String minDate = request.getDateSelect(ARG_FROMDATE, (String) null);
         String maxDate = request.getDateSelect(ARG_TODATE, (String) null);
+        List<TypeHandler> typeHandlers = repository.getTypeHandlers(request);
+        if ((typeHandlers.size() == 0) && request.defined(ARG_TYPE)) {
+            typeHandlers.add(repository.getTypeHandler(request));
+        }
+
+        /*
+
+        System.err.println("th:" + typeHandlers);
+        if(typeHandlers.size()==1 && typeHandlers.get(0)!=this) {
+            TypeHandler otherTypeHandler = typeHandlers.get(0);
+            otherTypeHandler.addToSearchForm(formBuffer, headerBuffer, request, where);
+            return;
+        }
+        */
+
+
         /*
         if(minDate==null || maxDate == null) {
             Statement stmt = executeSelect(request,
@@ -650,10 +666,8 @@ public class TypeHandler implements Constants, Tables {
         minDate = "";
         maxDate = "";
 
-        List<TypeHandler> typeHandlers = repository.getTypeHandlers(request);
-        if ((typeHandlers.size() == 0) && request.defined(ARG_TYPE)) {
-            typeHandlers.add(repository.getTypeHandler(request));
-        }
+
+
 
         if (typeHandlers.size() > 1) {
             List tmp = new ArrayList();
@@ -675,11 +689,10 @@ public class TypeHandler implements Constants, Tables {
                         "Show search form with this type")));
         } else if (typeHandlers.size() == 1) {
             formBuffer.append(HtmlUtil.hidden(ARG_TYPE,
-                    typeHandlers.get(0).getType()));
-            System.err.println("type handler: "
-                               + typeHandlers.get(0).getDescription() + " "
-                               + typeHandlers.get(0).getType());
-            System.err.println("request:" + request.toString());
+                                              typeHandlers.get(0).getType()));
+            //            System.err.println("type handler: "
+            //                               + typeHandlers.get(0).getDescription() + " "
+            //                               + typeHandlers.get(0).getType());
             formBuffer.append(HtmlUtil.tableEntry("<b>Type:</b>",
                     typeHandlers.get(0).getDescription()));
         }

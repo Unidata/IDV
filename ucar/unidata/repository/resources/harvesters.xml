@@ -7,7 +7,7 @@
 		xrootdir="c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar"
 		rootdir="/harpo/jeffmc/src/idv/trunk/ucar"
 		basegroup="Files/Source"
-                active="true"
+                active="false"
 		filepattern=".*"
 		type="file"
                 monitor="false"
@@ -21,7 +21,7 @@
 		rootdir="/home/jeffmc/pictures"
 		basegroup="Files/Images"
 		filepattern=".*\.jpg$|.*\.jpeg$|.*\.gif$|.*\.png$"
-                active="true"
+                active="false"
 		type="image"
                 monitor="false"
 		sleep="1"/>
@@ -60,6 +60,46 @@
                 monitor="false"
                 active="false"
 		sleep="1"/>
+
+
+
+
+
+
+   <harvester   name="IDD/Gempak Grids"
+                class="ucar.unidata.repository.PatternHarvester"
+		rootdir="/data/ldm/gempak/model"
+		basegroup="IDD/Gempak Model Grids"
+		filepattern="([^/]+)/[^/]+_(\d\d\d\d\d\d\d\d_\d\d\d\d)"
+		type="level2radar"
+		columns = "station"
+		patternnames="station,fromDate"
+		patterntypes="string,date"
+		grouptemplate = "${station}"
+		nametemplate="${station}-${fromDate}"
+		desctemplate= "${name} description"
+                monitor="false"
+                active="false"
+		sleep="1"/>
+
+
+
+   <harvester   name="IDD/Satellite"
+                class="ucar.unidata.repository.PatternHarvester"
+		rootdir="/data/ldm/pub/native/satellite"
+		basegroup="IDD/Satellite"
+		filepattern="([^/]+)_([^/]+)_([^/]+)_(\d\d\d\d\d\d\d\d_\d\d\d\d).gini"
+		type="satellite"
+		columns = "platform,resolution,product"
+		patternnames="platform,resolution,product,fromDate"
+		patterntypes="string,string,string,date"
+		grouptemplate = "${platform}/${resolution}/${product}"
+		nametemplate="${platform}-${resolution}-${product}-${fromDate}"
+		desctemplate= "${name}"
+                monitor="false"
+                active="false"
+		sleep="1"/>
+
 
 
 

@@ -26,7 +26,7 @@
   </entry>
 
 
-  <entry name="satellite" description="Satellite Files">>
+  <entry name="satellite" description="Satellite Files">
 	<column name="platform" type="string" isindex="true" cansearch="true" searchtype="select" label="Platform"/>
 	<column name="resolution" type="string" isindex="true" cansearch="true" searchtype="select"  label="Resolution"/>		
 	<column name="product" type="string" isindex="true" cansearch="true" searchtype="select"  label="Product"/>

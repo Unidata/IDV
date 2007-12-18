@@ -122,7 +122,7 @@ public class Repository implements Constants, Tables, RequestHandler {
     public String URL_GETENTRIES = "/getentries";
 
     /** _more_ */
-    public String URL_GETENTRY = "/getentry/*";
+    public String URL_GETENTRY = "/getentry";
 
     /** _more_ */
     public String URL_ADMIN_SQL = "/admin/sql";
@@ -963,9 +963,30 @@ public class Repository implements Constants, Tables, RequestHandler {
         sb.append("<table>");
         sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold("Name"),
                                              HtmlUtil.bold("Active"), "")));
+        if(request.defined(ARG_WHAT)) {
+            String what = request.getString(ARG_WHAT,"");
+            int id = request.get(ARG_ID,0);
+            Harvester harvester = harvesters.get(id);
+            if(what.equals("stop")) {
+                harvester.setActive(false);
+            } else if(what.equals("start")) {
+                if(!harvester.getActive()) 
+                    Misc.run(harvester,"run");
+            }
+        }
+
+
+        int cnt = 0;
         for (Harvester harvester : harvesters) {
+            String run;
+            if(harvester.getActive()) {
+                run = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,ARG_WHAT,"stop", ARG_ID,""+cnt),"Stop");
+            } else {
+                run = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,ARG_WHAT,"start", ARG_ID,""+cnt),"Start");
+            }
+            cnt++;
             sb.append(HtmlUtil.row(HtmlUtil.cols(harvester.getName(),
-                    harvester.getActive() + "", harvester.getExtraInfo())));
+                    harvester.getActive() + " " + run, harvester.getExtraInfo())));
         }
         sb.append("</table>");
 

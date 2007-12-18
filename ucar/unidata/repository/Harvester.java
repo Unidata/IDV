@@ -360,6 +360,7 @@ public class Harvester {
      */
     public final void run() throws Exception {
         try {
+            setActive(true);
             runInner();
             setActive(false);
         } catch (Exception exc) {
