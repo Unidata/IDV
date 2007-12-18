@@ -207,7 +207,7 @@ public class FileManager {
         try {
 
             chooser = new javax.swing.JFileChooser(defaultDirectory);
-
+            chooser.setFileHidingEnabled(getFileHidingEnabled());
             if (title != null) {
                 chooser.setDialogTitle(title);
             }
@@ -242,6 +242,16 @@ public class FileManager {
      */
     public JFileChooser getChooser() {
         return chooser;
+    }
+
+    private static boolean fileHidingEnabled = true;
+
+    public static boolean getFileHidingEnabled() {
+        return fileHidingEnabled;
+    }
+
+    public static void setFileHidingEnabled( boolean value) {
+        fileHidingEnabled = value;
     }
 
     /**
@@ -348,6 +358,7 @@ public class FileManager {
                                      LayoutUtil.top(LayoutUtil.inset(historyComp,
                                          new Insets(13, 0, 0, 10))));
         }
+
 
 
         dialog.getContentPane().add(contents);
