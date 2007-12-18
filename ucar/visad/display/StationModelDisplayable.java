@@ -399,7 +399,7 @@ public class StationModelDisplayable extends DisplayableData {
                     shapeControl = (ShapeControl) wxMap.getControl();
                     if (shapeControl != null) {
                         setShapesInControl(shapes);
-                        //                        shapeControl.setScale(scale);
+                        shapeControl.setAutoScale(false);
                         shapeControl.setScale(scale);
                         shapeControl.setAutoScale(true);
                     }
@@ -1438,9 +1438,10 @@ public class StationModelDisplayable extends DisplayableData {
      */
     public void setScale(float newScale)
             throws VisADException, RemoteException {
-        if ((shapeControl != null) && (newScale != scale)) {
+        if (shapeControl != null) {
             //We set auto scale false here so the shape control 
             //clears out its controllistener which was keeping around the old initial scale
+
             shapeControl.setAutoScale(false);
             shapeControl.setScale(newScale);
             shapeControl.setAutoScale(true);
