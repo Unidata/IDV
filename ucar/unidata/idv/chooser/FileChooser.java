@@ -436,6 +436,7 @@ public class FileChooser extends IdvChooser {
          */
         public MyFileChooser(String path) {
             super(path);
+            this.setFileHidingEnabled(FileManager.getFileHidingEnabled());
             setControlButtonsAreShown(false);
             setMultiSelectionEnabled(true);
         }
