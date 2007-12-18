@@ -468,7 +468,7 @@ public class TrackControl extends GridDisplayControl {
                 int success =
                     GuiUtils.showYesNoCancelDialog(getWindow(),
                         "<html>There are " + numTimes
-                        + " time steps in the data.<br>Do you want to show them all?</html>", "Time Declutter");
+                        + " time steps in the data.<br>Do you want to show them all?</html>", "Time Declutter", GuiUtils.CMD_NO);
                 if (success == JOptionPane.CANCEL_OPTION) {
                     return;
                 } else {

@@ -1554,18 +1554,33 @@ public class GuiUtils extends LayoutUtil {
      */
     public static int showYesNoCancelDialog(Window frame, String message,
                                             String title) {
-        Object[]  options   = { "Yes", "No", "Cancel" };
+        return showYesNoCancelDialog(frame, message,title, CMD_YES);
+    }
+
+    /**
+     * Show a modeful dialog, attached to the given frame, with the given message.
+     * Ask the user Yes or No or Cancel
+     *
+     * @param frame Frame to attach to.
+     * @param message Message to show
+     * @param title Window title
+     * @param defaultCmd   default for the dialog (CMD_YES, CMD_NO, CMD_CANCEL)
+     * @return 0 if Yes, 1 if No, 2 if Cancel
+     */
+    public static int showYesNoCancelDialog(Window frame, String message,
+                                            String title, String defaultCmd) {
+        Object[]  options   = { CMD_YES, CMD_NO, CMD_CANCEL };
         Component component = frame;
         if (component == null) {
             component = LogUtil.getCurrentWindow();
         }
         int result = JOptionPane.showOptionDialog(component, message, title,
                          JOptionPane.YES_NO_CANCEL_OPTION,
-                         JOptionPane.QUESTION_MESSAGE, null, options, "Yes");
+                         JOptionPane.QUESTION_MESSAGE, null, options, 
+                         defaultCmd);
 
         return result;
     }
-
 
 
     /**
