@@ -804,7 +804,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
               HelpTipDialog.PREF_HELPTIPSHOW },
             { "Confirm Before Exiting", PREF_SHOWQUITCONFIRM },
             { "Show Dashboard On Start", PREF_SHOWDASHBOARD, Boolean.TRUE },
-            { "Show Hidden Files in File Chooser", PREF_SHOWHIDDENFILES, Boolean.FALSE},
+            { "Show Hidden Files in File Chooser", PREF_SHOWHIDDENFILES,
+              Boolean.FALSE },
             /*            { "Dock in Dashboard:", null },
             { "Quick Links", PREF_EMBEDQUICKLINKSINDASHBOARD, Boolean.TRUE },
             { "Data Chooser", PREF_EMBEDDATACHOOSERINDASHBOARD,
@@ -1035,7 +1036,13 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                             5)));
 
         formatComps.add(GuiUtils.rLabel("Number Style:"));
-        formatComps.add(GuiUtils.left(GuiUtils.hbox(sysLocale, usLocale)));
+        formatComps.add(
+            GuiUtils.left(
+                GuiUtils.hbox(
+                    GuiUtils.hbox(sysLocale, usLocale),
+                    getIdv().makeHelpButton(
+                        "idv.tools.preferences.numberstyle"), new JLabel(""),
+                            5)));
 
 
         formatComps.add(GuiUtils.rLabel("Probe Format:"));
@@ -1081,7 +1088,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                            5);
         List cacheComps =
             Misc.newList(new JLabel("   Disk Cache Size: "), cacheSizeFld,
-                         new JLabel(" (MB)  (for temporary files"));
+                         new JLabel(" (MB)  (for temporary files)"));
         widgets.put(PREF_CACHESIZE, cacheSizeFld);
         formatComps.add(GuiUtils.left(cacheCbx));
         formatComps.add(GuiUtils.filler());
