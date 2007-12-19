@@ -750,7 +750,6 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
                         p[i] = (press.getFloat(j) == pFill)
                                ? Float.NaN
                                : press.getFloat(j);
-                        System.out.println("MaxW pr = " + p[i]);
                         spd[i] = (speed.getFloat(j) == spdFill)
                                  ? Float.NaN
                                  : speed.getFloat(j);
