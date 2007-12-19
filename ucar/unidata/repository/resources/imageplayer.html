@@ -85,8 +85,8 @@ ${imagelist}
 images = new Array();
 for (var i = 0; i < numImages; i++) {
   var image = new Image(700,700);
-  images[i] = image;
-  image.src = imageUrls[i];
+//  images[i] = image;
+//  image.src = imageUrls[i];
 }
 
 
@@ -336,9 +336,9 @@ function setBoxes() {
       }
       imgAttrs = attr("border",0) + attr("width", width) + attr("height",10);
       box = tag("A", attr2("HREF","JavaScript: noop()", "onClick", call("setImage", i + ",-1")),
-            span(attr("style", "background-color:" + color),img("${root}/blank.gif",imgAttrs + gotoalt))+"&nbsp;");
+                  span(attr("style", "background-color:" + color),img("${root}/blank.gif",imgAttrs + gotoalt)))+"&nbsp";
       hidebox = tag("A", attr2("HREF","JavaScript: noop()", "onClick", call("toggleImageOk",i)),
-            span(attr("style", "background-color:" + hidecolor),img("${root}/blank.gif",imgAttrs + hidealt))+"&nbsp;");
+            span(attr("style", "background-color:" + hidecolor),img("${root}/blank.gif",imgAttrs + hidealt)))+"&nbsp;";
       boxes+=box;
       hideboxes+=hidebox;
     }
@@ -449,24 +449,11 @@ This requires Javascript for an animation of the imagery.
 
 
 
-<A HREF="JavaScript: noop()" onClick="setImage(0,1)">
-<IMG  BORDER="0" SRC="${root}/imageplayer/Rewind24.gif" ALT="Got to first frame" title="Go to first frame">
-</A>
-<A HREF="JavaScript: noop()" onClick="setImage(current_image-1,-1)">
-<IMG  BORDER="0" SRC="${root}/imageplayer/StepBack24.gif" ALT="One step back" TITLE="One step back">
-</A>
-<A HREF="JavaScript: noop()" onClick="startStop()">
-<IMG  BORDER="0" NAME="startstop" SRC="${root}/imageplayer/Play24.gif" ALT="Start/Stop" TITLE="Start/Stop"
-xonmouseover="document.startstop.src=startImage;"
-xonmouseout="document.startstop.src=stopImage;"
->
-</A>
-<A HREF="JavaScript: noop()" onClick="setImage(current_image+1,1)">
-<IMG  BORDER="0" SRC="${root}/imageplayer/StepForward24.gif" ALT="One step forward" TITLE="One step forward">
-</A>
-<A HREF="JavaScript: noop()" onClick="setImage(numImages-1,-1)">
-<IMG  BORDER="0" SRC="${root}/imageplayer/FastForward24.gif" ALT="Go to last frame" TITLE="Go to last frame">
-</A></TD>
+<A HREF="JavaScript: noop()" onClick="setImage(0,1)"><IMG  BORDER="0" SRC="${root}/imageplayer/Rewind24.gif" ALT="Got to first frame" title="Go to first frame"></A>
+<A HREF="JavaScript: noop()" onClick="setImage(current_image-1,-1)"><IMG  BORDER="0" SRC="${root}/imageplayer/StepBack24.gif" ALT="One step back" TITLE="One step back"></A>
+<A HREF="JavaScript: noop()" onClick="startStop()"><IMG  BORDER="0" NAME="startstop" SRC="${root}/imageplayer/Play24.gif" ALT="Start/Stop" TITLE="Start/Stop"></A>
+<A HREF="JavaScript: noop()" onClick="setImage(current_image+1,1)"><IMG  BORDER="0" SRC="${root}/imageplayer/StepForward24.gif" ALT="One step forward" TITLE="One step forward"></A>
+<A HREF="JavaScript: noop()" onClick="setImage(numImages-1,-1)"><IMG  BORDER="0" SRC="${root}/imageplayer/FastForward24.gif" ALT="Go to last frame" TITLE="Go to last frame"></A></TD>
     <TD WIDTH=600 BGCOLOR="#999999" valign="bottom">
 <table width="100%"><tr valign="bottom">
 <td><div style="margin-bottom:2" id="hideboxes">&nbsp;</div>

@@ -352,9 +352,9 @@ public class GenericTypeHandler extends TypeHandler {
      * @throws Exception _more_
      */
     public StringBuffer getInnerEntryContent(Entry entry, Request request,
-                                             String output)
+                                             String output,boolean showResource)
             throws Exception {
-        StringBuffer sb = super.getInnerEntryContent(entry, request, output);
+        StringBuffer sb = super.getInnerEntryContent(entry, request, output,showResource);
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             int      valueIdx = 0;
             Object[] values   = entry.getValues();

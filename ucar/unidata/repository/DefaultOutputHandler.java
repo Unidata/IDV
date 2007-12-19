@@ -205,8 +205,8 @@ public class DefaultOutputHandler extends OutputHandler {
     public Result processShowEntry(Request request, Entry entry)
             throws Exception {
         TypeHandler  typeHandler = repository.getTypeHandler(entry.getType());
-        StringBuffer sb          = typeHandler.getEntryContent(entry,
-                                       request);
+        StringBuffer sb   = typeHandler.getEntryContent(entry,
+                                                        request,true);
         return new Result("Entry: " + entry.getName(), sb,
                           getMimeType(request.getOutput()));
     }
@@ -242,7 +242,7 @@ public class DefaultOutputHandler extends OutputHandler {
 
         for (Group group : groups) {
             if (output.equals(OUTPUT_HTML)) {
-                sb.append("<li>" + getGroupLinks(request, group) + " "
+                sb.append("<li>" + getAllGroupLinks(request, group) + " "
                           + group.getFullName());
             } else if (output.equals(OUTPUT_XML)) {
                 sb.append(XmlUtil.tag(TAG_GROUP,
@@ -356,7 +356,7 @@ public class DefaultOutputHandler extends OutputHandler {
             }
 
             if (output.equals(OUTPUT_HTML)) {
-                sb.append("<li>" + getGroupLinks(request, group) + " "
+                sb.append("<li>" + getAllGroupLinks(request, group) + " "
                           + group.getFullName());
             } else if (output.equals(OUTPUT_XML)) {
                 sb.append(XmlUtil.tag(TAG_GROUP,
@@ -775,7 +775,7 @@ public class DefaultOutputHandler extends OutputHandler {
             sb.append("<p>\n");
             String[] crumbs = getBreadCrumbs(request, group, false);
             title = crumbs[0];
-            sb.append(HtmlUtil.bold("Group: ") + crumbs[1]);
+            sb.append(crumbs[1]);
             List<Metadata> metadataList = repository.getMetadata(group);
             if (metadataList.size() > 0) {
                 sb.append("<p>");
@@ -793,10 +793,10 @@ public class DefaultOutputHandler extends OutputHandler {
             //            sb.append("<hr>");
             sb.append("<p>");
             if (subGroups.size() > 0) {
-                sb.append(HtmlUtil.bold("Sub groups:"));
+                sb.append(HtmlUtil.bold("Groups:"));
                 sb.append("<ul>");
                 for (Group subGroup : subGroups) {
-                    sb.append(getGroupLinks(request, subGroup));
+                    sb.append(getAllGroupLinks(request, subGroup));
                     sb.append(" ");
                     sb.append(
                         HtmlUtil.href(
@@ -856,7 +856,7 @@ public class DefaultOutputHandler extends OutputHandler {
         for (Group group : groups) {
             if (output.equals(OUTPUT_HTML)
                     || output.equals(OUTPUT_TIMELINE)) {
-                sb.append(getGroupLinks(request, group) + " ");
+                sb.append(getAllGroupLinks(request, group) + " ");
                 sb.append(
                     HtmlUtil.href(
                         HtmlUtil.url(
@@ -872,6 +872,17 @@ public class DefaultOutputHandler extends OutputHandler {
         return result;
     }
 
+
+    protected String getGroupLinks(Request request, Group group)
+            throws Exception {
+        String search = HtmlUtil.href(
+                            HtmlUtil.url(
+                                repository.URL_SEARCHFORM, ARG_GROUP,
+                                group.getId()), HtmlUtil.img(
+                                    repository.fileUrl("/Search16.gif"),
+                                    "Search in Group"));
+        return search + "&nbsp;" + repository.getGraphLink(request, group);
+    }
 
 
 
@@ -963,7 +974,7 @@ public class DefaultOutputHandler extends OutputHandler {
                 String col2 = "" + new Date(entry.getStartDate());
                 ssb.append(HtmlUtil.row(HtmlUtil.cols(col1, col2)));
             } else if (output.equals(OUTPUT_CSV)) {
-                sb.append(SqlUtil.comma(entry.getId(), entry.getFile()));
+                sb.append(SqlUtil.comma(entry.getId(), entry.getResource()));
             }
         }
 
@@ -1027,7 +1038,7 @@ public class DefaultOutputHandler extends OutputHandler {
         ZipOutputStream       zos  = new ZipOutputStream(bos);
         Hashtable             seen = new Hashtable();
         for (Entry entry : entries) {
-            String path = entry.getFile();
+            String path = entry.getResource();
             String name = IOUtil.getFileTail(path);
             int    cnt  = 1;
             while (seen.get(name) != null) {

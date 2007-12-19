@@ -47,7 +47,7 @@ CREATE TABLE entries (id varchar(200),
                    description varchar(1000),
                    group_id varchar(200),
    		   user_id varchar(200),
-	           file varchar(200),
+	           resource varchar(200),
 	           createdate timestamp, 
 	           fromdate timestamp, 
 	           todate timestamp,
@@ -57,7 +57,7 @@ CREATE TABLE entries (id varchar(200),
 	           maxlon double); 
 
 CREATE INDEX ENTRIES_INDEX_ID ON entries (ID);
-CREATE INDEX ENTRIES_INDEX_FILE ON entries (FILE);
+CREATE INDEX ENTRIES_INDEX_RESOURCE ON entries (RESOURCE);
 CREATE INDEX ENTRIES_INDEX_GROUP ON entries (GROUP_ID);
 CREATE INDEX ENTRIES_INDEX_TYPE ON entries (TYPE);
 CREATE INDEX ENTRIES_INDEX_USER_ID ON entries (USER_ID);

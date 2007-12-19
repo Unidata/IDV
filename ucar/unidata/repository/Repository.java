@@ -192,14 +192,15 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
     
-
-
     /** _more_ */
     private Hashtable<String, Group> groupMap = new Hashtable<String,
                                                     Group>();
 
     /** _more_ */
     private Hashtable<String, User> userMap = new Hashtable<String, User>();
+
+
+    private Object  MUTEX_GROUP = new Object();
 
 
     /** _more_ */
@@ -231,6 +232,8 @@ public class Repository implements Constants, Tables, RequestHandler {
         pageCacheList = new ArrayList();
     }
 
+    private String hostname;
+
     /**
      * _more_
      *
@@ -238,8 +241,9 @@ public class Repository implements Constants, Tables, RequestHandler {
      *
      * @throws Exception _more_
      */
-    public Repository(String[] args) throws Exception {
+    public Repository(String[] args, String hostname) throws Exception {
         this.args = args;
+        this.hostname = hostname;
     }
 
 
@@ -749,7 +753,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         html = StringUtil.replace(html, "${root}",
                                   getUrlBase());
         List   links     = (List) result.getProperty(PROP_NAVLINKS);
-        String linksHtml = "&nbsp;";
+        String linksHtml = HtmlUtil.space(1);
         if (links != null) {
             linksHtml = StringUtil.join("&nbsp;|&nbsp;", links);
         }
@@ -884,12 +888,6 @@ public class Repository implements Constants, Tables, RequestHandler {
             rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
         }
         TypeHandler typeHandler = getTypeHandler("file");
-        if (false && (results.getInt(1) == 0)) {
-            System.err.println("Adding test data");
-            //            loadTestFiles();
-            loadModelFiles();
-            loadSatelliteFiles();
-        }
     }
 
 
@@ -1029,34 +1027,35 @@ public class Repository implements Constants, Tables, RequestHandler {
      */
     public Result adminHarvesters(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        sb.append(header("Harvesters"));
-        sb.append("<table>");
-        sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold("Name"),
-                                             HtmlUtil.bold("Active"), "")));
-        if(request.defined(ARG_WHAT)) {
-            String what = request.getString(ARG_WHAT,"");
+        if(request.defined(ARG_ACTION)) {
+            String action = request.getString(ARG_ACTION,"");
             int id = request.get(ARG_ID,0);
             Harvester harvester = harvesters.get(id);
-            if(what.equals("stop")) {
+            if(action.equals("stop")) {
                 harvester.setActive(false);
-            } else if(what.equals("start")) {
+            } else if(action.equals("start")) {
                 if(!harvester.getActive()) 
                     Misc.run(harvester,"run");
             }
         }
 
 
+        sb.append(header("Harvesters"));
+        sb.append("<table>");
+        sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold("Name"),
+                                             HtmlUtil.bold("State"), "")));
+
         int cnt = 0;
         for (Harvester harvester : harvesters) {
             String run;
             if(harvester.getActive()) {
-                run = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,ARG_WHAT,"stop", ARG_ID,""+cnt),"Stop");
+                run = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,ARG_ACTION,"stop", ARG_ID,""+cnt),"Stop");
             } else {
-                run = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,ARG_WHAT,"start", ARG_ID,""+cnt),"Start");
+                run = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,ARG_ACTION,"start", ARG_ID,""+cnt),"Start");
             }
             cnt++;
             sb.append(HtmlUtil.row(HtmlUtil.cols(harvester.getName(),
-                    harvester.getActive() + " " + run, harvester.getExtraInfo())));
+                                                 (harvester.getActive()?"Active":"Stopped")+HtmlUtil.space(2) + " " + run, HtmlUtil.space(2)+harvester.getExtraInfo())));
         }
         sb.append("</table>");
 
@@ -1282,6 +1281,11 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
+    protected List<OutputHandler> getOutputHandlers() {
+        return outputHandlers;
+    }
+
+
     /**
      * _more_
      *
@@ -1337,7 +1341,8 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @return _more_
      */
     protected String getGUID() {
-        return baseTime + "_" + (keyCnt++);
+        int key = keyCnt++;
+        return baseTime + "_" + key;
     }
 
 
@@ -1620,14 +1625,14 @@ public class Repository implements Constants, Tables, RequestHandler {
         if (what.length() == 0) {
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Search For:"),
                                           HtmlUtil.select(ARG_WHAT, whatList)
-                                          + "&nbsp;&nbsp;&nbsp;"
+                                          + HtmlUtil.space(3)
                                           + outputHtml));
 
         } else {
             String label = TwoFacedObject.findLabel(what, whatList);
-            label = StringUtil.padRight(label, 40, "&nbsp;");
+            label = StringUtil.padRight(label, 40, HtmlUtil.space(1));
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Search For:"),
-                                          label + "&nbsp;&nbsp;"
+                                          label + HtmlUtil.space(2)
                                           + outputHtml));
             sb.append(HtmlUtil.hidden(ARG_WHAT, what));
         }
@@ -1706,8 +1711,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                         whats[i]), names[i], extra2);
             }
             if (i == 0) {
-                item = "<span " + extra1
-                       + ">Search For:&nbsp;&nbsp;&nbsp; </span>" + item;
+                item = "<span " + extra1+ ">Search For:&nbsp;&nbsp;&nbsp; </span>" + item;
             }
             links.add(item);
         }
@@ -1828,28 +1832,30 @@ public class Repository implements Constants, Tables, RequestHandler {
 
         byte[] bytes;
         //        System.err.println("request:" + request);
+
         if (request.defined(ARG_IMAGEWIDTH)
-                && ImageUtils.isImage(entry.getFile())) {
+                && ImageUtils.isImage(entry.getResource())) {
             int width = request.get(ARG_IMAGEWIDTH, 75);
-            String thumb = IOUtil.joinDir(tmpDir,
+            String thumbDir = IOUtil.joinDir(tmpDir, "thumbnails");
+            IOUtil.makeDir(thumbDir);
+            String thumb = IOUtil.joinDir(thumbDir, "entry" +
                                           entry.getId() + "_" + width
                                           + ".jpg");
-            Image image = ImageUtils.readImage(entry.getFile());
-            Image resizedImage = image.getScaledInstance(width, -1,
-                                     Image.SCALE_AREA_AVERAGING);
-            ImageUtils.waitOnImage(resizedImage);
-            System.err.println("thumb:" + thumb);
-            //            GuiUtils.showOkCancelDialog(null,"",new JLabel(new ImageIcon(resizedImage)),null);
-            //            System.err.println ("AFTER");
-            ImageUtils.writeImageToFile(resizedImage, thumb);
+            if(!new File(thumb).exists()) {
+                Image image = ImageUtils.readImage(entry.getResource());
+                Image resizedImage = image.getScaledInstance(width, -1,
+                                                             Image.SCALE_AREA_AVERAGING);
+                ImageUtils.waitOnImage(resizedImage);
+                ImageUtils.writeImageToFile(resizedImage, thumb);
+            }
             bytes = IOUtil.readBytes(IOUtil.getInputStream(thumb,
                     getClass()));
             return new Result("", bytes,
-                              IOUtil.getFileExtension(entry.getFile()));
+                              IOUtil.getFileExtension(entry.getResource()));
         } else {
             return new Result(
-                "", IOUtil.getInputStream(entry.getFile(), getClass()),
-                IOUtil.getFileExtension(entry.getFile()));
+                "", IOUtil.getInputStream(entry.getResource(), getClass()),
+                IOUtil.getFileExtension(entry.getResource()));
         }
 
     }
@@ -1913,7 +1919,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             throw new IllegalArgumentException("Could not find entry");
         }
 
-        System.err.println (request);
+        //        System.err.println (request);
         if(request.get(ARG_NEXT,false) || request.get(ARG_PREVIOUS,false)) {
             boolean next = request.get(ARG_NEXT,false);
             String[]ids = getEntryIdsInGroup(request, entry.getGroup(),  new ArrayList());
@@ -2265,7 +2271,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                     request,
                     SqlUtil.comma(
                         COL_ENTRIES_ID, COL_ENTRIES_NAME, COL_ENTRIES_TYPE,
-                        COL_ENTRIES_GROUP_ID, COL_ENTRIES_FILE), Misc.newList(
+                        COL_ENTRIES_GROUP_ID, COL_ENTRIES_RESOURCE), Misc.newList(
                             SqlUtil.eq(COL_TAGS_ENTRY_ID, COL_ENTRIES_ID),
                             SqlUtil.eq(
                                 COL_TAGS_NAME,
@@ -2316,7 +2322,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                                  SqlUtil.comma(
                                      COL_ENTRIES_ID, COL_ENTRIES_NAME,
                                      COL_ENTRIES_TYPE, COL_ENTRIES_GROUP_ID,
-                                     COL_ENTRIES_FILE), Misc.newList(
+                                     COL_ENTRIES_RESOURCE), Misc.newList(
                                          SqlUtil.eq(
                                              COL_ENTRIES_ID,
                                              SqlUtil.quote(id))));
@@ -2437,7 +2443,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         String query = SqlUtil.makeSelect(SqlUtil.comma(COL_ENTRIES_ID,
                            COL_ENTRIES_NAME, COL_ENTRIES_TYPE,
                            COL_ENTRIES_GROUP_ID,
-                           COL_ENTRIES_FILE), Misc.newList(TABLE_ENTRIES),
+                           COL_ENTRIES_RESOURCE), Misc.newList(TABLE_ENTRIES),
                                SqlUtil.eq(COL_ENTRIES_GROUP_ID,
                                           SqlUtil.quote(group.getId())));
         SqlUtil.Iterator iter = SqlUtil.getIterator(execute(query));
@@ -2564,8 +2570,14 @@ public class Repository implements Constants, Tables, RequestHandler {
         TypeHandler typeHandler = getTypeHandler(request);
         List        where       = typeHandler.assembleWhereClause(request);
         System.err.println ("where:" + where);
+        if(where.size() == 0) {
+            String type = (String) request.getType("").trim();
+            if ((type.length() > 0) && !type.equals(TypeHandler.TYPE_ANY)) {
+                typeHandler.addOr(COL_ENTRIES_TYPE, type, where, true);
+            }
+        }
         if (where.size() > 0) {
-            where.add(0, SqlUtil.eq(COL_TAGS_ENTRY_ID, COL_ENTRIES_ID));
+            where.add(SqlUtil.eq(COL_TAGS_ENTRY_ID, COL_ENTRIES_ID));
         }
 
         String[] tags = SqlUtil.readString(typeHandler.executeSelect(request,
@@ -2876,85 +2888,88 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @throws Exception _more_
      */
     protected Group findGroupFromName(String name, boolean createIfNeeded)
-            throws Exception {
-        //        if(name.indexOf(Group.IDDELIMITER) >=0) Misc.printStack(name,10,null);
-        Group group = groupMap.get(name);
-        if (group != null) {
+        throws Exception {
+        
+        synchronized(MUTEX_GROUP) {
+            //        if(name.indexOf(Group.IDDELIMITER) >=0) Misc.printStack(name,10,null);
+            Group group = groupMap.get(name);
+            if (group != null) {
+                return group;
+            }
+            List<String> toks = (List<String>) StringUtil.split(name, "/", true,
+                                                                true);
+            Group  parent = null;
+            String lastName;
+            if ((toks.size() == 0) || (toks.size() == 1)) {
+                lastName = name;
+            } else {
+                lastName = toks.get(toks.size() - 1);
+                toks.remove(toks.size() - 1);
+                parent = findGroupFromName(StringUtil.join("/", toks),
+                                           createIfNeeded);
+                if (parent == null) {
+                    return null;
+                }
+            }
+            String where = "";
+            if (parent != null) {
+                where += SqlUtil.eq(COL_GROUPS_PARENT,
+                                    SqlUtil.quote(parent.getId())) + " AND ";
+            } else {
+                where += COL_GROUPS_PARENT + " is null AND ";
+            }
+            where += SqlUtil.eq(COL_GROUPS_NAME, SqlUtil.quote(lastName));
+
+            String query = SqlUtil.makeSelect(COLUMNS_GROUPS,
+                                              Misc.newList(TABLE_GROUPS), where);
+
+            Statement statement = execute(query);
+            ResultSet results   = statement.getResultSet();
+            if (results.next()) {
+                group = new Group(results.getString(1), parent,
+                                  results.getString(3), results.getString(4));
+            } else {
+                if ( !createIfNeeded) {
+                    return null;
+                }
+                int    baseId = 0;
+                String idWhere;
+                if (parent == null) {
+                    idWhere = COL_GROUPS_PARENT + " IS NULL ";
+                } else {
+                    idWhere = SqlUtil.eq(COL_GROUPS_PARENT,
+                                         SqlUtil.quote(parent.getId()));
+                }
+                String newId = null;
+                while (true) {
+                    if (parent == null) {
+                        newId = "" + baseId;
+                    } else {
+                        newId = parent.getId() + Group.IDDELIMITER + baseId;
+                    }
+                    ResultSet idResults =
+                        execute(SqlUtil.makeSelect(COL_GROUPS_ID,
+                                                   Misc.newList(TABLE_GROUPS),
+                                                   idWhere + " AND "
+                                                   + SqlUtil.eq(COL_GROUPS_ID,
+                                                                SqlUtil.quote(newId)))).getResultSet();
+
+                    if ( !idResults.next()) {
+                        break;
+                    }
+                    baseId++;
+                }
+                //            System.err.println ("made id:" + newId);
+                //            System.err.println ("last name" + lastName);
+                execute(INSERT_GROUPS, new Object[] { newId, ((parent != null)
+                                                              ? parent.getId()
+                                                              : null), lastName, lastName });
+                group = new Group(newId, parent, lastName, lastName);
+            }
+            groupMap.put(group.getId(), group);
+            groupMap.put(name, group);
             return group;
         }
-        List<String> toks = (List<String>) StringUtil.split(name, "/", true,
-                                true);
-        Group  parent = null;
-        String lastName;
-        if ((toks.size() == 0) || (toks.size() == 1)) {
-            lastName = name;
-        } else {
-            lastName = toks.get(toks.size() - 1);
-            toks.remove(toks.size() - 1);
-            parent = findGroupFromName(StringUtil.join("/", toks),
-                                       createIfNeeded);
-            if (parent == null) {
-                return null;
-            }
-        }
-        String where = "";
-        if (parent != null) {
-            where += SqlUtil.eq(COL_GROUPS_PARENT,
-                                SqlUtil.quote(parent.getId())) + " AND ";
-        } else {
-            where += COL_GROUPS_PARENT + " is null AND ";
-        }
-        where += SqlUtil.eq(COL_GROUPS_NAME, SqlUtil.quote(lastName));
-
-        String query = SqlUtil.makeSelect(COLUMNS_GROUPS,
-                                          Misc.newList(TABLE_GROUPS), where);
-
-        Statement statement = execute(query);
-        ResultSet results   = statement.getResultSet();
-        if (results.next()) {
-            group = new Group(results.getString(1), parent,
-                              results.getString(3), results.getString(4));
-        } else {
-            if ( !createIfNeeded) {
-                return null;
-            }
-            int    baseId = 0;
-            String idWhere;
-            if (parent == null) {
-                idWhere = COL_GROUPS_PARENT + " IS NULL ";
-            } else {
-                idWhere = SqlUtil.eq(COL_GROUPS_PARENT,
-                                     SqlUtil.quote(parent.getId()));
-            }
-            String newId = null;
-            while (true) {
-                if (parent == null) {
-                    newId = "" + baseId;
-                } else {
-                    newId = parent.getId() + Group.IDDELIMITER + baseId;
-                }
-                ResultSet idResults =
-                    execute(SqlUtil.makeSelect(COL_GROUPS_ID,
-                        Misc.newList(TABLE_GROUPS),
-                        idWhere + " AND "
-                        + SqlUtil.eq(COL_GROUPS_ID,
-                                     SqlUtil.quote(newId)))).getResultSet();
-
-                if ( !idResults.next()) {
-                    break;
-                }
-                baseId++;
-            }
-            //            System.err.println ("made id:" + newId);
-            //            System.err.println ("last name" + lastName);
-            execute(INSERT_GROUPS, new Object[] { newId, ((parent != null)
-                    ? parent.getId()
-                    : null), lastName, lastName });
-            group = new Group(newId, parent, lastName, lastName);
-        }
-        groupMap.put(group.getId(), group);
-        groupMap.put(name, group);
-        return group;
     }
 
 
@@ -3212,6 +3227,11 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
 
+    public String absoluteUrl(String url) {
+        return hostname + url;
+    }
+
+
     /**
      * _more_
      *
@@ -3305,7 +3325,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         statement.setString(col++, entry.getDescription());
         statement.setString(col++, entry.getGroupId());
         statement.setString(col++, entry.getUser().getId());
-        statement.setString(col++, entry.getFile().toString());
+        statement.setString(col++, entry.getResource().toString());
         statement.setTimestamp(col++, new java.sql.Timestamp(currentTime()));
         //        System.err.println (entry.getName() + " " + new Date(entry.getStartDate()));
         statement.setTimestamp(col++,
@@ -3575,7 +3595,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                 return true;
             }
             //            long  tt1 = System.currentTimeMillis();
-            //            String allQuery = SqlUtil.makeSelect(COL_ENTRIES_FILE,
+            //            String allQuery = SqlUtil.makeSelect(COL_ENTRIES_RESOURCE,
             //                                                 Misc.newList(TABLE_ENTRIES));
             //            String[] files =  SqlUtil.readString(execute(allQuery), 1);
             //            long  tt2 = System.currentTimeMillis();
@@ -3586,18 +3606,18 @@ public class Repository implements Constants, Tables, RequestHandler {
                 connection.prepareStatement(query =
                     SqlUtil.makeSelect("count(" + COL_ENTRIES_ID + ")",
                                        Misc.newList(TABLE_ENTRIES),
-                                       SqlUtil.eq(COL_ENTRIES_FILE, "?")));
+                                       SqlUtil.eq(COL_ENTRIES_RESOURCE, "?")));
             long        t1        = System.currentTimeMillis();
             List<Entry> needToAdd = new ArrayList();
             for (Entry entry : entries) {
-                select.setString(1, entry.getFile());
+                select.setString(1, entry.getResource());
                 //                select.addBatch();
                 ResultSet results = select.executeQuery();
                 if (results.next()) {
                     int found = results.getInt(1);
                     if (found == 0) {
                         needToAdd.add(entry);
-                        //                        System.err.println ("adding: " + entry.getFile());
+                        //                        System.err.println ("adding: " + entry.getResource());
                     }
                 }
             }
@@ -3608,7 +3628,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                 int found = results.getInt(1);
                 if(found ==0) {
                     needToAdd.add(entries.get(cnt));
-                    System.err.println ("adding: " + entries.get(cnt).getFile());
+                    System.err.println ("adding: " + entries.get(cnt).getResource());
                 }
                 cnt++;
             }
@@ -3617,7 +3637,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             long t2 = System.currentTimeMillis();
             insertEntries(typeHandler, needToAdd);
             System.err.println("Took:" + (t2 - t1) + "ms to check: "
-                               + entries.size());
+                               + entries.size() +" entries");
         } catch (Exception exc) {
             log("Processing:" + query, exc);
             return false;
@@ -3645,14 +3665,14 @@ public class Repository implements Constants, Tables, RequestHandler {
         insertEntries(typeHandler, entries);
         Hashtable javaFiles = new Hashtable();
         for (Entry entry : entries) {
-            if (entry.getFile().endsWith(".java")) {
-                javaFiles.put(entry.getFile(), entry);
+            if (entry.getResource().endsWith(".java")) {
+                javaFiles.put(entry.getResource(), entry);
             }
         }
         PreparedStatement associationInsert =
             connection.prepareStatement(INSERT_ASSOCIATIONS);
         for (Entry entry : entries) {
-            String f = entry.getFile();
+            String f = entry.getResource();
             if (f.endsWith(".class")) {
                 int idx = f.indexOf("$");
                 if (idx >= 0) {
@@ -3749,7 +3769,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                                            COL_METADATA_ID_TYPE,
                                            SqlUtil.quote(type)))));
 
-        System.err.println("query: " + query);
+        //        System.err.println("query: " + query);
         SqlUtil.Iterator iter = SqlUtil.getIterator(execute(query));
         ResultSet        results;
         List<Metadata>   metadata = new ArrayList();

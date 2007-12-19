@@ -55,7 +55,7 @@ public class MetaDataServer extends HttpServer  implements Constants {
      */
     public MetaDataServer(String[] args) throws Throwable {
         super(8080);
-        repository = new Repository(args);
+        repository = new Repository(args,"http://localhost:8080");
         repository.init();
     }
 

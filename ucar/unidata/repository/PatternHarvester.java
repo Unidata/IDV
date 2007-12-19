@@ -262,8 +262,7 @@ public class PatternHarvester extends Harvester {
             }
             long t2 = System.currentTimeMillis();
             cnt++;
-            System.err.println("found:" + entries.size() + " in:" + (t2 - t1)
-                               + "ms");
+            System.err.println("found:" + entries.size() + " files in:" + (t2 - t1) + "ms");
             if ( !repository.processEntries(this, typeHandler, entries)) {
                 break;
             }

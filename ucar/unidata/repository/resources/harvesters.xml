@@ -4,8 +4,8 @@
 
   <harvester    name="Source Files"
                 class="ucar.unidata.repository.PatternHarvester"
-		xrootdir="c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar"
-		rootdir="/harpo/jeffmc/src/idv/trunk/ucar"
+		rootdir="c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar"
+		xrootdir="/harpo/jeffmc/src/idv/trunk/ucar"
 		basegroup="Files/Source"
                 active="true"
 		filepattern=".*"
@@ -17,8 +17,8 @@
 
   <harvester    name="Pictures"
                 class="ucar.unidata.repository.PatternHarvester"
-		xrootdir="c:/cygwin/home/jeffmc/pictures"
-		rootdir="/home/jeffmc/pictures"
+		rootdir="c:/cygwin/home/jeffmc/pictures"
+		xrootdir="/home/jeffmc/pictures"
 		basegroup="Files/Images"
 		filepattern=".*\.jpg$|.*\.jpeg$|.*\.gif$|.*\.png$"
                 active="true"
@@ -28,9 +28,10 @@
 
 
   <harvester    name="IDD/NIDS"
+                active="true"
                 class="ucar.unidata.repository.PatternHarvester"
-		xrootdir="c:/cygwin/home/jeffmc/unidata/data/repository/NIDS"
-		rootdir="/data/ldm/gempak/nexrad/NIDS"
+		rootdir="c:/cygwin/home/jeffmc/unidata/data/repository/NIDS"
+		xrootdir="/data/ldm/gempak/nexrad/NIDS"
 		basegroup="IDD/NIDS"
 		filepattern="([^/]+)/([^/]+)/[^/]+_(\d\d\d\d\d\d\d\d_\d\d\d\d)"
 		type="level3radar"
@@ -41,11 +42,11 @@
 		nametemplate="${station}-${product}-${fromDate}"
 		desctemplate= "${name} description"
                 monitor="false"
-                active="true"
 		sleep="1"/>
 
 
    <harvester   name="IDD/Craft"
+                active="false"
                 class="ucar.unidata.repository.PatternHarvester"
 		rootdir="/data/ldm/gempak/nexrad/craft"
 		basegroup="IDD/Craft"
@@ -58,7 +59,6 @@
 		nametemplate="${station}-${fromDate}"
 		desctemplate= "${name} description"
                 monitor="false"
-                active="true"
 		sleep="1"/>
 
 
@@ -67,6 +67,7 @@
 
 
    <harvester   name="IDD/Gempak Grids"
+                active="false"
                 class="ucar.unidata.repository.PatternHarvester"
 		rootdir="/data/ldm/gempak/model"
 		basegroup="IDD/Gempak Model Grids"
@@ -79,12 +80,12 @@
 		nametemplate="${station}-${fromDate}"
 		desctemplate= "${name} description"
                 monitor="false"
-                active="false"
 		sleep="1"/>
 
 
 
    <harvester   name="IDD/Satellite"
+                active="false"
                 class="ucar.unidata.repository.PatternHarvester"
 		rootdir="/data/ldm/pub/native/satellite"
 		basegroup="IDD/Satellite"
@@ -97,7 +98,6 @@
 		nametemplate="${platform}-${resolution}-${product}-${fromDate}"
 		desctemplate= "${name}"
                 monitor="false"
-                active="false"
 		sleep="1"/>
 
 

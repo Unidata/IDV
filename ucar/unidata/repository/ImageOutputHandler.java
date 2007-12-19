@@ -82,11 +82,12 @@ public class ImageOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final String OUTPUT_GALLERY = "default.gallery";
+    public static final String OUTPUT_GALLERY = "image.gallery";
 
     /** _more_ */
-    public static final String OUTPUT_PLAYER = "default.player";
+    public static final String OUTPUT_PLAYER = "image.player";
 
+    public static final String OUTPUT_SLIDESHOW = "image.slideshow";
 
 
 
@@ -112,7 +113,7 @@ public class ImageOutputHandler extends OutputHandler {
      */
     public boolean canHandle(Request request) {
         String output = (String) request.getOutput();
-        return output.equals(OUTPUT_GALLERY) || output.equals(OUTPUT_PLAYER);
+        return output.equals(OUTPUT_GALLERY) ||output.equals(OUTPUT_SLIDESHOW) || output.equals(OUTPUT_PLAYER);
     }
 
 
@@ -130,6 +131,7 @@ public class ImageOutputHandler extends OutputHandler {
             throws Exception {
         List list = new ArrayList();
         if (what.equals(WHAT_ENTRIES)) {
+            list.add(new TwoFacedObject("Slideshow", OUTPUT_SLIDESHOW));
             list.add(new TwoFacedObject("Gallery", OUTPUT_GALLERY));
             list.add(new TwoFacedObject("Image Player", OUTPUT_PLAYER));
         }
@@ -148,6 +150,7 @@ public class ImageOutputHandler extends OutputHandler {
     protected List getOutputTypesForEntries(Request request)
             throws Exception {
         List list = new ArrayList();
+        list.add(new TwoFacedObject("Slideshow", OUTPUT_SLIDESHOW));
         list.add(new TwoFacedObject("Gallery", OUTPUT_GALLERY));
         list.add(new TwoFacedObject("Image Player", OUTPUT_PLAYER));
         return list;
@@ -168,9 +171,9 @@ public class ImageOutputHandler extends OutputHandler {
      * @return _more_
      */
     public String getMimeType(String output) {
-        if (output.equals(OUTPUT_GALLERY)) {
-            return repository.getMimeTypeFromSuffix(".html");
-        } else if (output.equals(OUTPUT_PLAYER)) {
+        if (output.equals(OUTPUT_GALLERY) ||
+            output.equals(OUTPUT_PLAYER) ||
+            output.equals(OUTPUT_SLIDESHOW)) {
             return repository.getMimeTypeFromSuffix(".html");
         }
         return super.getMimeType(output);
@@ -216,7 +219,7 @@ public class ImageOutputHandler extends OutputHandler {
             int cnt = 0;
             for (int i = entries.size() - 1; i >= 0; i--) {
                 Entry entry = entries.get(i);
-                if ( !ImageUtils.isImage(entry.getFile())) {
+                if ( !ImageUtils.isImage(entry.getResource())) {
                     continue;
                 }
                 String url = HtmlUtil.url(repository.URL_GETENTRY
@@ -237,9 +240,32 @@ public class ImageOutputHandler extends OutputHandler {
                           + HtmlUtil.quote(title) + ");\n");
                 cnt++;
             }
+        } else if (output.equals(OUTPUT_SLIDESHOW)) {
+            for (int i = entries.size() - 1; i >= 0; i--) {
+                Entry entry = entries.get(i);
+                if ( !ImageUtils.isImage(entry.getResource())) {
+                    continue;
+                }
+                String url = HtmlUtil.url(repository.URL_GETENTRY
+                                          + entry.getName(), ARG_ID,
+                                              entry.getId());
+                String thumburl = HtmlUtil.url(repository.URL_GETENTRY
+                                          + entry.getName(), ARG_ID,
+                                               entry.getId(),
+                                               ARG_IMAGEWIDTH, ""+50);
+                String entryUrl = getEntryUrl(entry);
+                request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
+                String title =entry.getTypeHandler().getEntryContent(entry, request,false).toString();
+                title = title.replace("\"", "\\\"");
+                title = title.replace("\n"," ");
+                sb.append("addImage(" + HtmlUtil.quote(url) + "," +
+                          HtmlUtil.quote(thumburl) + ","
+                          + HtmlUtil.quote(title) + ");\n");
+
+            }
         } else {
             for (Entry entry : entries) {
-                if ( !ImageUtils.isImage(entry.getFile())) {
+                if ( !ImageUtils.isImage(entry.getResource())) {
                     continue;
                 }
                 if (col >= 2) {
@@ -273,6 +299,12 @@ public class ImageOutputHandler extends OutputHandler {
             tmp = tmp.replace("${firstimage}", firstImage);
             tmp = StringUtil.replace(tmp, "${root}", repository.getUrlBase());
             sb  = new StringBuffer(tmp);
+        } else if (output.equals(OUTPUT_SLIDESHOW)) {
+            String template = repository.getResource(PROP_HTML_SLIDESHOW);
+            template= template.replace("${imagelist}",
+                                       sb.toString());
+            template = StringUtil.replace(template, "${root}", repository.getUrlBase());
+            sb  = new StringBuffer(template);
         }
         Result result = new Result("Query Results", sb, getMimeType(output));
         result.putProperty(PROP_NAVSUBLINKS,

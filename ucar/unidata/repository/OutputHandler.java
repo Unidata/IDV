@@ -241,7 +241,7 @@ public class OutputHandler implements Constants, Tables {
                         output), group.getName()));
         } else {
             breadcrumbs.add(HtmlUtil.bold(group.getName()) + "&nbsp;"
-                            + getGroupLinks(request, group));
+                            + getAllGroupLinks(request, group));
         }
         String title = "Group: "
                        + StringUtil.join("&nbsp;&gt;&nbsp;", titleList);
@@ -429,13 +429,20 @@ public class OutputHandler implements Constants, Tables {
      */
     protected String getGroupLinks(Request request, Group group)
             throws Exception {
-        String search = HtmlUtil.href(
-                            HtmlUtil.url(
-                                repository.URL_SEARCHFORM, ARG_GROUP,
-                                group.getId()), HtmlUtil.img(
-                                    repository.fileUrl("/Search16.gif"),
-                                    "Search in Group"));
-        return search + "&nbsp;" + repository.getGraphLink(request, group);
+        return "";
+    }
+
+    protected String getAllGroupLinks(Request request, Group group)
+            throws Exception {
+        StringBuffer sb = new StringBuffer();
+        for (OutputHandler outputHandler : repository.getOutputHandlers()) {
+            String links = outputHandler.getGroupLinks(request, group);
+            if(links.length()>0) {
+                sb.append(links);
+                sb.append(HtmlUtil.space(1));
+            }        
+        }
+        return sb.toString();
     }
 
 
@@ -492,7 +499,7 @@ public class OutputHandler implements Constants, Tables {
         ZipOutputStream       zos  = new ZipOutputStream(bos);
         Hashtable             seen = new Hashtable();
         for (Entry entry : entries) {
-            String path = entry.getFile();
+            String path = entry.getResource();
             String name = IOUtil.getFileTail(path);
             int    cnt  = 1;
             while (seen.get(name) != null) {

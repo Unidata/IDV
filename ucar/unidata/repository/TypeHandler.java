@@ -124,7 +124,7 @@ public class TypeHandler implements Constants, Tables {
     public String getDatasetTag(Entry entry, Request request) {
         return XmlUtil.tag(TAG_DATASET,
                            XmlUtil.attrs(ATTR_NAME, entry.getName(),
-                                         ATTR_URLPATH, entry.getFile()));
+                                         ATTR_URLPATH, entry.getResource()));
     }
 
 
@@ -212,13 +212,13 @@ public class TypeHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public StringBuffer getEntryContent(Entry entry, Request request)
+    public StringBuffer getEntryContent(Entry entry, Request request,boolean showResource)
             throws Exception {
         StringBuffer sb     = new StringBuffer();
         String       output = request.getOutput();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             sb.append("<table cellspacing=\"5\" cellpadding=\"2\">");
-            sb.append(getInnerEntryContent(entry, request, output));
+            sb.append(getInnerEntryContent(entry, request, output,showResource));
             sb.append("</table>\n");
             List<Tag> tags = repository.getTags(request, entry.getId());
             if (tags.size() > 0) {
@@ -365,7 +365,7 @@ public class TypeHandler implements Constants, Tables {
         }
         if (repository.getProperty(PROP_HTML_DOWNLOADENTRIESASFILES, false)) {
             return HtmlUtil.href(
-                "file://" + entry.getFile(),
+                "file://" + entry.getResource(),
                 HtmlUtil.img(
                     repository.fileUrl("/Fetch.gif"), "Download file"));
         } else {
@@ -391,16 +391,17 @@ public class TypeHandler implements Constants, Tables {
      * @throws Exception _more_
      */
     public StringBuffer getInnerEntryContent(Entry entry, Request request,
-                                             String output)
+                                             String output,boolean showResource)
             throws Exception {
         StringBuffer sb = new StringBuffer();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             OutputHandler outputHandler = repository.getOutputHandler(request);
             String nextPrev = outputHandler.getNextPrevLink(request, entry, output);
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
-                                          entry.getName() + "&nbsp;"
-                                          + getEntryLinks(entry, request)+ "&nbsp;&nbsp;" +
+            sb.append(HtmlUtil.tableEntry("",
+                                          getEntryLinks(entry, request)+ HtmlUtil.space(2) +
                                           nextPrev));
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
+                                          entry.getName()));
             String[] crumbs =
                 repository.getOutputHandler(request).getBreadCrumbs(request,
                                             entry.getGroup(), true);
@@ -416,8 +417,8 @@ public class TypeHandler implements Constants, Tables {
                                           entry.getUser().getName() + " @ "
                                           + fmt(entry.getCreateDate())));
 
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("File:"),
-                                          entry.getFile()));
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Resource:"),
+                                          entry.getResource()));
 
             if ((entry.getCreateDate() != entry.getStartDate())
                     || (entry.getCreateDate() != entry.getEndDate())) {
@@ -463,7 +464,7 @@ public class TypeHandler implements Constants, Tables {
                                              img));
             }
 
-            if (ImageUtils.isImage(entry.getFile())) {
+            if (showResource && ImageUtils.isImage(entry.getResource())) {
                 sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Image:"),
                         HtmlUtil.img(HtmlUtil.url(repository.URL_GETENTRY
                             + entry.getName(), ARG_ID, entry.getId()), "",
@@ -841,13 +842,6 @@ public class TypeHandler implements Constants, Tables {
 
         List   where = new ArrayList();
 
-        if(request.defined(ARG_TYPE)) {
-            String type = request.getString(ARG_TYPE,"").trim();
-            if(!type.equals(TYPE_ANY)) {
-                //TODO: when should we add in the type
-                //                addOr(COL_ENTRIES_TYPE, request.getString(ARG_TYPE,""), where, true);
-            }
-        }
 
         if(request.defined(ARG_TAG)) {
             String tag   = (String) request.getString(ARG_TAG, (String) null).trim();

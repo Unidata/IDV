@@ -75,7 +75,7 @@ public class Entry {
     private User user;
 
     /** _more_ */
-    private String file;
+    private String resource;
 
     /** _more_ */
     private long createDate;
@@ -106,13 +106,13 @@ public class Entry {
      * @param description _more_
      * @param group _more_
      * @param user _more_
-     * @param file _more_
+     * @param resource _more_
      * @param date _more_
      */
     public Entry(String id, TypeHandler typeHandler, String name,
-                 String description, Group group, User user, String file,
+                 String description, Group group, User user, String resource,
                  long date) {
-        this(id, typeHandler, name, description, group, user, file, date,
+        this(id, typeHandler, name, description, group, user, resource, date,
              date, date);
     }
 
@@ -126,14 +126,14 @@ public class Entry {
      * @param description _more_
      * @param group _more_
      * @param user _more_
-     * @param file _more_
+     * @param resource _more_
      * @param date _more_
      * @param values _more_
      */
     public Entry(String id, TypeHandler typeHandler, String name,
-                 String description, Group group, User user, String file,
+                 String description, Group group, User user, String resource,
                  long date, Object[] values) {
-        this(id, typeHandler, name, description, group, user, file, date,
+        this(id, typeHandler, name, description, group, user, resource, date,
              date, date, values);
     }
 
@@ -147,15 +147,15 @@ public class Entry {
      * @param description _more_
      * @param group _more_
      * @param user _more_
-     * @param file _more_
+     * @param resource _more_
      * @param createDate _more_
      * @param startDate _more_
      * @param endDate _more_
      */
     public Entry(String id, TypeHandler typeHandler, String name,
-                 String description, Group group, User user, String file,
+                 String description, Group group, User user, String resource,
                  long createDate, long startDate, long endDate) {
-        this(id, typeHandler, name, description, group, user, file,
+        this(id, typeHandler, name, description, group, user, resource,
              createDate, startDate, endDate, null);
     }
 
@@ -168,14 +168,14 @@ public class Entry {
      * @param description _more_
      * @param group _more_
      * @param user _more_
-     * @param file _more_
+     * @param resource _more_
      * @param createDate _more_
      * @param startDate _more_
      * @param endDate _more_
      * @param values _more_
      */
     public Entry(String id, TypeHandler typeHandler, String name,
-                 String description, Group group, User user, String file,
+                 String description, Group group, User user, String resource,
                  long createDate, long startDate, long endDate, 
                  Object[] values) {
         this.id          = id;
@@ -184,7 +184,7 @@ public class Entry {
         this.description = description;
         this.group       = group;
         this.user        = user;
-        this.file        = file;
+        this.resource        = resource;
         this.createDate  = createDate;
         this.startDate   = startDate;
         this.endDate     = endDate;
@@ -202,21 +202,21 @@ public class Entry {
     }
 
     /**
-     * Set the File property.
+     * Set the resource property.
      *
-     * @param value The new value for File
+     * @param value The new value for resource
      */
-    public void setFile(String value) {
-        file = value;
+    public void setResource(String value) {
+        resource = value;
     }
 
     /**
-     * Get the File property.
+     * Get the resource property.
      *
-     * @return The File
+     * @return The resource
      */
-    public String getFile() {
-        return file;
+    public String getResource() {
+        return resource;
     }
 
     /**

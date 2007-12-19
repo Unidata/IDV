@@ -109,6 +109,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String TAG_RSS_RSS = "rss";
+    public static final String TAG_RSS_LINK= "link";
+    public static final String TAG_RSS_GUID ="guid";
 
     /** _more_ */
     public static final String TAG_RSS_CHANNEL = "channel";
@@ -187,6 +189,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_WHAT = "what";
+
+    public static final String ARG_ACTION = "action";
 
     /** _more_ */
     public static final String WHAT_ENTRIES = "entries";
@@ -296,6 +300,9 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_HTML_IMAGEPLAYER =
         "jdms.html.imageplayer";
+
+    public static final String PROP_HTML_SLIDESHOW =
+        "jdms.html.slideshow";
 
     /** _more_ */
     public static final String PROP_HTML_TIMELINEAPPLET =
