@@ -3,12 +3,19 @@
 
 {
 The Point Data Plot Control shows a set of observations using 
-a station model. The control window consists of three tabs. The first
+a layout model. The control window consists of four tabs. The first
 tab allows you to control basics of the display:
 
 [ht::cimg images/StationModelControlGui1.gif]
 
-The second tab provides a time series chart and a data readout table of a selected station.
+The second tab allows you to change the observation times that are shown in the
+display.  By default, data for a single time corresponding to the current
+animation time will be shown.  Using this widget allows you to show multiple
+times at once.
+
+[ht::cimg images/StationModelControlGui2.gif]
+
+The third tab provides a time series chart and a data readout table of a selected station.
 To use this simply click on a station in the main display.
 Use the [ug::button Select Fields] button to show a dialog
 that allows you to select what fields are displayed in the table.
@@ -24,12 +31,11 @@ The [ug::menu View {Show Raw Data}] menu  controls whether
 the data in the table is formatted or show as raw data.
 The [ug::menu File {Export Table}] menu item allows you to export
 the table as a comma separated value (CSV) file.
-[ht::cimg images/StationModelControlGui2.gif]
 
-The third tab allows you to specify a set of visibility filters.
+[ht::cimg images/StationModelControlGui3.gif]
+
+The fourth tab allows you to specify a set of visibility filters.
 See below for  further discussion on this.
-
-
 }
 
 {{Declutter} {Click on the [ht::command Declutter] checkbox to see all locations or 
@@ -41,28 +47,10 @@ are currently being displayed and not have their display changed when
 navigating.
 }}
 
-{{Show All Times at Once} {
-This allows you to show all the times of different o
-}}
-
-
 {{Plot Density} {
 This slider allows you to change how dense the display of stations is when decluttering.
 }}
 
-{{Only Show  Every} {
-This field allows you to  sub-set the data that is being displayed  by only showing
-every N minutes. For normal observation data (e.g., station data) this field is not
-needed. However, for observation data that contains many times (e.g., airplane track data)
-you can use this field to subset the times.
-<p>
-Note:  If you are displaying point data that has a large number of times
-you will be prompted whether you want to view all of the times. If Yes then
-this is automatically set.
-<p>
-For most of the point data sources you can specify a time binning through
-the data source properties.
-}}
 
 {{Layout Model} {
 The [ht::command {Layout model}], 
@@ -86,6 +74,30 @@ You can choose to display the locations at their altitude (if there is one)
 or you can override this and specifically define the vertical position.
 }}
 
+{{Show (Times)} {
+Select either individual times or multiple times.
+}}
+
+{{Range} {
+Select the edit icon to change the start and end of the time range that is
+used for displaying data.  This can be used with the individual or 
+multiple times option.  
+}}
+
+{{Declutter (Time)} {
+This field allows you to subset the data that is being displayed  
+by only showing every N minutes. For normal observation data 
+(e.g., station data) this field is not needed. However, for 
+observation data that contains many times (e.g., airplane track data)
+you can use this field to subset the times.
+<p>
+Note:  If you are displaying point data that has a large number of times
+you will be prompted whether you want to view all of the times. If Yes then
+this is automatically set.
+<p>
+For most of the point data sources you can specify a time binning through
+the data source properties.
+}}
 
 {{Filters} {
 <a name="filters"></a>
@@ -110,3 +122,4 @@ be matched or any should be matched, and disable and enable the filter.
 You can also disable the filters and specify whether all filters
 need to match or ay of the filters need to match.
 }}
+
