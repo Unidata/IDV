@@ -2924,6 +2924,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
     public void applyPreferences() {
         getStateManager().applyPreferences();
         getVMManager().applyPreferences();
+        getPluginManager().applyPreferences();
         List l = getDisplayControls();
         if ((l == null) || l.isEmpty()) {
             return;

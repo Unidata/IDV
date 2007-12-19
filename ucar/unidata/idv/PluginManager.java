@@ -731,6 +731,13 @@ public class PluginManager extends IdvManager {
     }
 
 
+    public void applyPreferences() {
+        if(createFileChooser!=null) {
+            createFileChooser.setFileHidingEnabled(FileManager.getFileHidingEnabled());
+        }
+    }
+
+
     /**
      * Let user select a file to put into the plugin
      */
@@ -740,6 +747,7 @@ public class PluginManager extends IdvManager {
             createFileChooser.setCurrentDirectory(
                 new File(getResourceManager().getUserPath()));
             createFileChooser.setMultiSelectionEnabled(true);
+            applyPreferences();
         }
         if (createFileChooser.showOpenDialog(null)
                 == JFileChooser.APPROVE_OPTION) {
