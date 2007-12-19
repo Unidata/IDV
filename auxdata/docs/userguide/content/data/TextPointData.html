@@ -6,13 +6,19 @@
 <body>
 
 If your point (in situ) data is not available in one of the file formats
-that the IDV can handle, but you can dump it into a column-oriented
+that the IDV can handle, but you can output it into a column-oriented
 ASCII text file, you may still be able to use the IDV displays. The IDV
 supports reading in point observation data in a text comma separated
-value (CSV) file format. The files need two extra lines at the top that
-defines for the IDV the fields that are within the file and the types of
+value (CSV) file format. 
+<p>
+You need to specify the metadata of this point data. This can be done in two ways.
+First, the file can have two extra header lines 
+that defines for the IDV the fields that are within the file and the types of
 the fields. The only other requirement is that there must be a latitude,
-longitude and time field in the data.
+longitude and time field in the data. See below.
+<p>
+Secondly, if there are not metadat header lines defined the Text Point Data Source will show
+the Metadata GUI <a href="#metadatagui">described below</a>. 
 
 <h2>Examples:</h2>
 
@@ -75,7 +81,7 @@ IDN, Latitude\[unit="deg"\], Longitude\[unit="deg"\], Time\[fmt="yyyy MM dd HH m
 41008 31.4 -80.87 2007 07 17 21 50 170 7.0 8.0
 </pre>
 
-<p>
+
 <h3>Skipping columns</h3>
 You can use the &quot;skip&quot; parameter if you want to ignore (not read)
 values in your text file that you don't want to use:
@@ -134,6 +140,40 @@ Then, when you run the IDV to read your data:
 </ol>
 
 <p>
+
+<a name="metadatagui">
+<h2>Using the Text Point Metadata Gui</h2>
+If your text data does not have the metadata header lines the Text Point Data Source will show the following
+dialog which  allows you to specify the meta data.
+
+[ht::cimg images/TextPointMetadataGui.gif] 
+
+<b>Skipping lines</b><br>
+At the top a number of the initial lines from the text data are shown. The arrow keys allow you to specify the start line. For example, if you had some other header information you can skip over those lines.
+
+<p><b>Specifying metadata</b><br>
+For each column of text data there is a row shown in the bottom of the dialog. This shows the sampled value 
+and allows you to enter a name, unit, date format, missing value and extra information.
+There are some  names that the IDV treats special: 
+&quot;Latitude&quot;, &quot;Longitude&quot;, &quot;Altitude&quot;, and &quot;Time&quot;. You must have at least
+Latitude, Longitude and Time specied. 
+<p>
+The Unit/Date Format field allows you to specify the Unit for data fields and the date format.
+For text fields choose [ht::menu Misc Text] as the unit.
+<p>
+The Extra fields must be of the form:
+<pre>
+name="value"
+</pre>
+Don't forget the quotes!
+
+<p><b>Skipping columns</b><br>
+You can skip over certain columns by entering the Name: &quot;skip&quot;
+
+<p><b>Saving this as a preference</b><br>
+After all of your hard work to keep from having to do this again next time you load a new text point data of
+the form simply press the &quot;Preferences&quot; button and select [ht::menu {Save Current}]. This allows you
+to save these metadata settings and reapply them later using the &quot;Preferences&quot; button.
 
 
 </body>
