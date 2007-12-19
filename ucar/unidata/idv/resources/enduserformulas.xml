@@ -7,15 +7,20 @@
      isdefault="false"
      isenduser="true">
     <categories>
-      <category
-         display="true"
-         value="Grids"/>
-      <category
-         display="false"
-         value="display:isosurface"/>
-      <category
-         display="false"
-         value="display:planviewcontour"/>
+      <category display="true" value="Grids"/>
+      <category value="display:contourxs"/>
+      <category value="display:valuedisplay"/>
+      <category value="display:windbarbplan"/>
+      <category value="display:planviewcontourfilled"/>
+      <category value="display:contourxsfilled"/>
+      <category value="display:planviewcontour"/>
+      <category value="display:planviewflow3d"/>
+      <category value="display:flowxs"/>
+      <category value="display:streamlines"/>
+      <category value="display:windbarbxs"/>
+      <category value="display:planviewflow"/>
+      <category value="display:flowxs3d"/>
+      <category value="display:isosurface"/>
     </categories>
     <operands/>
   </derived>

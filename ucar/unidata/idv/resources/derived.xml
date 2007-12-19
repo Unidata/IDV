@@ -112,8 +112,8 @@ or
 
   <derived
      id="windspeed"
-     description="Windspeed (from %N1% &amp; %N2%)"
-     label="Windspeed"
+     description="Speed (from %N1% &amp; %N2%)"
+     label="speed"
      isdefault="true" 
      isenduser="false"
      formula="DerivedGridFactory.createWindSpeed (D1, D2)">
