@@ -51,6 +51,13 @@ public class HtmlUtil {
     }
 
 
+    public static String space(int cnt) {
+        String s = "";
+        while(cnt-->0)
+            s = s+"&nbsp;";
+        return s;
+    }
+
     public static String quote(String s) {
         return "\"" + s +"\"";
     }

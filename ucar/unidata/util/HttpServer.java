@@ -477,8 +477,10 @@ public class HttpServer {
          */
         public void writeResult(boolean ok, byte[] content,
                                    String type) throws Exception {
-            writeHeader(ok, content.length, type);
-            output.write(content);
+            try {
+                writeHeader(ok, content.length, type);
+                output.write(content);
+            } catch(SocketException se){}
         }
 
 
