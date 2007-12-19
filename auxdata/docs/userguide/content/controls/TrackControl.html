@@ -11,22 +11,22 @@ aircraft track, ship, buoys, etc.
 
 [ug::colortable]
 
+{{Visible Range} {
+The [ug::button Visible Range] allows you to set the range 
+of data values that are shown for the particular field.
+}}
 
 {{Time Mode} {
 
-
-
-
-
 Even though a track represents a set of observation times
-there is not time set defined for animating in the main display.
+there is no time set defined for animating in the main display.
 The time mode allows for the  control of
 how much of the track is shown and from what time.
 Select the [ug::button Change] button to show the [ug::button Time Settings] dialog:
 
 [ht::cimg images/TrackControlTimeSettings.gif]
 
-This dialog  allows you to define the time range to show of the track. The image
+This dialog  allows you to define the time range of the track to show. The image
 above defines that the end time is the current animation time. The start time
 is relative to the end time less 30 minutes.
 <p>
@@ -34,13 +34,32 @@ This time setting is similar to that used for the general
 <a href="../ui/Animation.html#animationset">time animation</a>.
 }}
 
+{{Times to Use} {
+You can either use the single nominal time of the track or all the
+times in the track to define the animation times.
+}}
 
+{{Show Every} {
+This field allows you to subset the data that is being displayed  
+by only showing every N minutes. For tracks that contain many 
+times you can use this field to subset the times.
+<p>
+Note:  If you are displaying track data that has a large number of times
+you will be prompted whether you want to view all of the times. If Yes then
+this is automatically set.
+}}
+
+{{Marker} {
+You can define an end point marker using a layout model.  Click the
+check box to enable this feature.
+}}
+
+{{Scale} {
+You can scale up or down the size of the marker with this field.
+}}
 
 {{Line Width} {
 This slider allows you to set the width of the displayed trajectory
-line. 
+line.  Or type a new value into the text field. 
 }}
 
-{{Marker and Marker Color} {
-You can define an end point symbol and text as well as its color with these fields.
-}}
