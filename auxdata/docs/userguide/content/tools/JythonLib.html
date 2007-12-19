@@ -1,10 +1,111 @@
 [ug::head {Jython Library}]
 
-
-<h2> Module: constants</h2>
- This is the doc for the constants module 
+<a name="grid">
+<h2> Module: grid</h2>
+ This is the doc for the grid module 
 <hr>
 
+<meta name="jhid" value="applyToRange">
+<p><a name="applyToRange"></a><code class="command">applyToRange(function, data):</code><p style="padding:0;margin-left:20;margin-top:0">
+Apply the function name to each timestep of the data</p>
+<meta name="jhid" value="applyToRangeValues">
+<p><a name="applyToRangeValues"></a><code class="command">applyToRangeValues(function, data):</code><p style="padding:0;margin-left:20;margin-top:0">
+Apply the function name to each value in each timestep of the data</p>
+<meta name="jhid" value="averageOverTime">
+<p><a name="averageOverTime"></a><code class="command">averageOverTime(field, makeTimes):</code><p style="padding:0;margin-left:20;margin-top:0">
+Average the values in each time step
+If makeTimes is true (1) then we return a field mapping all of the times
+to the average. Else we just return the average</p>
+<meta name="jhid" value="combineFields">
+<p><a name="combineFields"></a><code class="command">combineFields():</code><p style="padding:0;margin-left:20;margin-top:0">
+combine several fields together</p>
+<meta name="jhid" value="extractLatitudeFromNWPGrid">
+<p><a name="extractLatitudeFromNWPGrid"></a><code class="command">extractLatitudeFromNWPGrid(fieldimpl):</code><p style="padding:0;margin-left:20;margin-top:0">
+Get the latitude coordinate from a grid.  Return a grid
+of the latitudes at each point.</p>
+<meta name="jhid" value="extractPressureFromNWPGrid">
+<p><a name="extractPressureFromNWPGrid"></a><code class="command">extractPressureFromNWPGrid(fieldimpl):</code><p style="padding:0;margin-left:20;margin-top:0">
+Get the pressure coordinate from a time series grid and
+return a grid of the pressure at all points.  Input
+grid must have pressure or height (which is converted
+to pressure in the standard atmosphere).
+User must be sure input is a suitable FlatField.</p>
+<meta name="jhid" value="getAltitude">
+<p><a name="getAltitude"></a><code class="command">getAltitude(z):</code><p style="padding:0;margin-left:20;margin-top:0">
+Change units from geopotential meters to meters</p>
+<meta name="jhid" value="getNthTimeGrid">
+<p><a name="getNthTimeGrid"></a><code class="command">getNthTimeGrid(fieldimpl, Nth):</code><p style="padding:0;margin-left:20;margin-top:0">
+Get the Nth grid in time series of grids;
+User must be sure input is a suitable data field.
+returns a single time.
+Nth is an integer, >=0, <= max index of grid time series.</p>
+<meta name="jhid" value="getSliceAtAltitude">
+<p><a name="getSliceAtAltitude"></a><code class="command">getSliceAtAltitude(fieldimpl, alt, unit):</code><p style="padding:0;margin-left:20;margin-top:0">
+Extract a 2D horizontal slice from a 3D grid at the given altitude;
+level is a real number; if unit is supplied, it must
+be compatible with meters (ft, fathoms, etc)
+param fieldimpl is a grid which may have
+one or more time steps.</p>
+<meta name="jhid" value="getSliceAtLevel">
+<p><a name="getSliceAtLevel"></a><code class="command">getSliceAtLevel(fieldimpl, level):</code><p style="padding:0;margin-left:20;margin-top:0">
+Extract a 2D horizontal slice from a 3D grid at "Level."
+level is a real number; must be appropriate for the grid.
+param fieldimpl is a grid which may have one or more time steps.</p>
+<meta name="jhid" value="horizontalAdvection">
+<p><a name="horizontalAdvection"></a><code class="command">horizontalAdvection(param, u, v):</code><p style="padding:0;margin-left:20;margin-top:0">
+horizontal advection</p>
+<meta name="jhid" value="horizontalDivergence">
+<p><a name="horizontalDivergence"></a><code class="command">horizontalDivergence(param, u, v):</code><p style="padding:0;margin-left:20;margin-top:0">
+horizontal flux divergence</p>
+<meta name="jhid" value="layerAverage">
+<p><a name="layerAverage"></a><code class="command">layerAverage(grid, top, bottom):</code><p style="padding:0;margin-left:20;margin-top:0">
+Wrapper for calculating layer average</p>
+<meta name="jhid" value="layerDiff">
+<p><a name="layerDiff"></a><code class="command">layerDiff(grid, top, bottom):</code><p style="padding:0;margin-left:20;margin-top:0">
+Wrapper for calculating layer difference</p>
+<meta name="jhid" value="make2D">
+<p><a name="make2D"></a><code class="command">make2D(slice):</code><p style="padding:0;margin-left:20;margin-top:0">
+Make a 2D slice from a 3D slice at a single level</p>
+<meta name="jhid" value="makeFlowField">
+<p><a name="makeFlowField"></a><code class="command">makeFlowField(a, b, c):</code><p style="padding:0;margin-left:20;margin-top:0">
+Make a vector from 3 components
+<div class=jython>
+makeVector(a,b) = \[a,b,c\]
+</div></p>
+<meta name="jhid" value="makeTimeSequence">
+<p><a name="makeTimeSequence"></a><code class="command">makeTimeSequence(g):</code><p style="padding:0;margin-left:20;margin-top:0">
+Merge a set of single time grids/images into a time sequence</p>
+<meta name="jhid" value="makeTrueVector">
+<p><a name="makeTrueVector"></a><code class="command">makeTrueVector(u, v):</code><p style="padding:0;margin-left:20;margin-top:0">
+true wind vectors</p>
+<meta name="jhid" value="makeVector">
+<p><a name="makeVector"></a><code class="command">makeVector(a, b):</code><p style="padding:0;margin-left:20;margin-top:0">
+Make a vector from 2 components
+<div class=jython>
+makeVector(a,b) = \[a,b\]
+</div></p>
+<meta name="jhid" value="newName">
+<p><a name="newName"></a><code class="command">newName(field, varname, copy):</code><p style="padding:0;margin-left:20;margin-top:0">
+create a new field with a new parameter name</p>
+<meta name="jhid" value="newUnit">
+<p><a name="newUnit"></a><code class="command">newUnit(field, varname, unitname):</code><p style="padding:0;margin-left:20;margin-top:0">
+set the name and unit on a grid</p>
+<meta name="jhid" value="resampleGrid">
+<p><a name="resampleGrid"></a><code class="command">resampleGrid(oldGrid, gridwithNewDomain):</code><p style="padding:0;margin-left:20;margin-top:0">
+display gridded data on a new domain</p>
+<meta name="jhid" value="windShear">
+<p><a name="windShear"></a><code class="command">windShear(u, v, z, top, bottom):</code><p style="padding:0;margin-left:20;margin-top:0">
+calculate the wind shear between discrete layers
+<div class=jython>
+shear = sqrt((u(top)-u(bottom))^2 + (v(top)-v(bottom))^2)/zdiff</pre>
+</div></p>
+<meta name="jhid" value="windShearVector">
+<p><a name="windShearVector"></a><code class="command">windShearVector(u, v, top, bottom):</code><p style="padding:0;margin-left:20;margin-top:0">
+calculate the u and v layer difference and return as vector</p>
+<meta name="jhid" value="writeGridToXls">
+<p><a name="writeGridToXls"></a><code class="command">writeGridToXls(grid, filename):</code><p style="padding:0;margin-left:20;margin-top:0">
+Write out the grid data to an excel spreadsheet</p>
+<a name="griddiag">
 <h2> Module: griddiag</h2>
  
    This is the doc for the Grid Diagnostics module.  These functions
@@ -18,62 +119,96 @@
    grid relative components of a vector.
 
 <hr>
-<meta name="jhid" value="GRAVITY"><p><a name="GRAVITY"></a><code class="command">GRAVITY():</code><p style="padding:0;margin-left:20;margin-top:0">
-Gravity constant</p><meta name="jhid" value="add"><p><a name="add"></a><code class="command">add(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
+
+<meta name="jhid" value="GRAVITY">
+<p><a name="GRAVITY"></a><code class="command">GRAVITY():</code><p style="padding:0;margin-left:20;margin-top:0">
+Gravity constant</p>
+<meta name="jhid" value="add">
+<p><a name="add"></a><code class="command">add(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
 Addition
 <div class=jython>
 ADD  (S1, S2) = S1 + S2
-</div></p><meta name="jhid" value="adv"><p><a name="adv"></a><code class="command">adv(S, V):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="adv">
+<p><a name="adv"></a><code class="command">adv(S, V):</code><p style="padding:0;margin-left:20;margin-top:0">
 Horizontal Advection, negative by convention
 <div class=jython>
 ADV ( S, V ) = - ( u * DDX (S) + v * DDY (S) )
-</div></p><meta name="jhid" value="age"><p><a name="age"></a><code class="command">age(obs, geo):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="age">
+<p><a name="age"></a><code class="command">age(obs, geo):</code><p style="padding:0;margin-left:20;margin-top:0">
 Ageostrophic wind
 <div class=jython>
 AGE ( S ) = \[ u (OBS) - u (GEO(S)), v (OBS) - v (GEO(S)) \]
-</div></p><meta name="jhid" value="atn2"><p><a name="atn2"></a><code class="command">atn2(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="atn2">
+<p><a name="atn2"></a><code class="command">atn2(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
 Wrapper for atan2 built-in
 <div class=jython>
 ATN2 (S1, S2) = ATAN ( S1 / S2 )
-</div></p><meta name="jhid" value="avg"><p><a name="avg"></a><code class="command">avg(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="avg">
+<p><a name="avg"></a><code class="command">avg(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
 Average of 2 scalars
 <div class=jython>
 AVG  (S1, S2) = ( S1 + S2 ) / 2
-</div></p><meta name="jhid" value="avor"><p><a name="avor"></a><code class="command">avor(V):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="avor">
+<p><a name="avor"></a><code class="command">avor(V):</code><p style="padding:0;margin-left:20;margin-top:0">
 Absolute Vorticity
 <div class=jython>
 AVOR ( V ) = VOR ( V ) + CORL(V)
-</div></p><meta name="jhid" value="corl"><p><a name="corl"></a><code class="command">corl(S):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="corl">
+<p><a name="corl"></a><code class="command">corl(S):</code><p style="padding:0;margin-left:20;margin-top:0">
 Coriolis Parameter for all points in a grid
 <div class=jython>
 CORL = TWO_OMEGA*sin(latr)
-</div></p><meta name="jhid" value="cros"><p><a name="cros"></a><code class="command">cros(V1, V2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="cros">
+<p><a name="cros"></a><code class="command">cros(V1, V2):</code><p style="padding:0;margin-left:20;margin-top:0">
 Vector cross product magnitude
 <div class=jython>
 CROS ( V1, V2 ) = u1 * v2 - u2 * v1
-</div></p><meta name="jhid" value="ddx"><p><a name="ddx"></a><code class="command">ddx(S):</code><p style="padding:0;margin-left:20;margin-top:0">
-Take the derivative with respect to the domain's X coordinate</p><meta name="jhid" value="ddy"><p><a name="ddy"></a><code class="command">ddy(S):</code><p style="padding:0;margin-left:20;margin-top:0">
-Take the derivative with respect to the domain's Y coordinate</p><meta name="jhid" value="defr"><p><a name="defr"></a><code class="command">defr(V):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="ddx">
+<p><a name="ddx"></a><code class="command">ddx(S):</code><p style="padding:0;margin-left:20;margin-top:0">
+Take the derivative with respect to the domain's X coordinate</p>
+<meta name="jhid" value="ddy">
+<p><a name="ddy"></a><code class="command">ddy(S):</code><p style="padding:0;margin-left:20;margin-top:0">
+Take the derivative with respect to the domain's Y coordinate</p>
+<meta name="jhid" value="defr">
+<p><a name="defr"></a><code class="command">defr(V):</code><p style="padding:0;margin-left:20;margin-top:0">
 Total deformation
 <div class=jython>
 DEF ( V ) = ( STRD (V) ** 2 + SHR (V) ** 2 ) ** .5
-</div></p><meta name="jhid" value="div"><p><a name="div"></a><code class="command">div(V):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="div">
+<p><a name="div"></a><code class="command">div(V):</code><p style="padding:0;margin-left:20;margin-top:0">
 Horizontal Divergence
 <div class=jython>
 DIV ( V ) = DDX ( u ) + DDY ( v )
-</div></p><meta name="jhid" value="dot"><p><a name="dot"></a><code class="command">dot(V1, V2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="dot">
+<p><a name="dot"></a><code class="command">dot(V1, V2):</code><p style="padding:0;margin-left:20;margin-top:0">
 Vector dot product
 <div class=jython>
 DOT ( V1, V2 ) = u1 * u2 + v1 * v2
-</div></p><meta name="jhid" value="dvdx"><p><a name="dvdx"></a><code class="command">dvdx(V):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="dvdx">
+<p><a name="dvdx"></a><code class="command">dvdx(V):</code><p style="padding:0;margin-left:20;margin-top:0">
 Partial x derivative of a vector
 <div class=jython>
 DVDX ( V ) = \[ DDX (u), DDX (v) \]
-</div></p><meta name="jhid" value="dvdy"><p><a name="dvdy"></a><code class="command">dvdy(V):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="dvdy">
+<p><a name="dvdy"></a><code class="command">dvdy(V):</code><p style="padding:0;margin-left:20;margin-top:0">
 Partial x derivative of a vector
 <div class=jython>
 DVDY ( V ) = \[ DDY (u), DDY (v) \]
-</div></p><meta name="jhid" value="frnt"><p><a name="frnt"></a><code class="command">frnt(S, V):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="frnt">
+<p><a name="frnt"></a><code class="command">frnt(S, V):</code><p style="padding:0;margin-left:20;margin-top:0">
 Frontogenesis function from theta and the wind
 <div class=jython>
 FRNT ( THTA, V ) = 1/2 * MAG ( GRAD (THTA) ) *
@@ -82,232 +217,313 @@ Where: BETA = ASIN ( (-DDX (THTA) * COS (PSI)
 - DDY (THTA) * SIN (PSI))/
 MAG ( GRAD (THTA) ) )
 PSI  = 1/2 ATAN2 ( SHR / STR )
-</div></p><meta name="jhid" value="geo"><p><a name="geo"></a><code class="command">geo(z):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="geo">
+<p><a name="geo"></a><code class="command">geo(z):</code><p style="padding:0;margin-left:20;margin-top:0">
 geostrophic wind from height
 <div class=jython>
 GEO ( S )  = \[ - DDY (S) * const / CORL, DDX (S) * const / CORL \]
-</div></p><meta name="jhid" value="grad"><p><a name="grad"></a><code class="command">grad(S):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="grad">
+<p><a name="grad"></a><code class="command">grad(S):</code><p style="padding:0;margin-left:20;margin-top:0">
 Gradient of a scalar
 <div class=jython>
 GRAD ( S ) = \[ DDX ( S ), DDY ( S ) \]
-</div></p><meta name="jhid" value="inad"><p><a name="inad"></a><code class="command">inad(V1, V2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="inad">
+<p><a name="inad"></a><code class="command">inad(V1, V2):</code><p style="padding:0;margin-left:20;margin-top:0">
 Inertial advective wind
 <div class=jython>
 INAD ( V1, V2 ) = \[ DOT ( V1, GRAD (u2) ),
 DOT ( V1, GRAD (v2) ) \]
-</div></p><meta name="jhid" value="jcbn"><p><a name="jcbn"></a><code class="command">jcbn(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="jcbn">
+<p><a name="jcbn"></a><code class="command">jcbn(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
 Jacobian Determinant
 <div class=jython>
 JCBN ( S1, S2 ) = DDX (S1) * DDY (S2) - DDY (S1) * DDX (S2)
-</div></p><meta name="jhid" value="lap"><p><a name="lap"></a><code class="command">lap(S):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="lap">
+<p><a name="lap"></a><code class="command">lap(S):</code><p style="padding:0;margin-left:20;margin-top:0">
 Laplacian operator
 <div class=jython>
 LAP ( S ) = DIV ( GRAD (S) )
-</div></p><meta name="jhid" value="latr"><p><a name="latr"></a><code class="command">latr(S):</code><p style="padding:0;margin-left:20;margin-top:0">
-Latitudue all points in a grid</p><meta name="jhid" value="lav"><p><a name="lav"></a><code class="command">lav(S, level1, level2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="latr">
+<p><a name="latr"></a><code class="command">latr(S):</code><p style="padding:0;margin-left:20;margin-top:0">
+Latitudue all points in a grid</p>
+<meta name="jhid" value="lav">
+<p><a name="lav"></a><code class="command">lav(S, level1, level2):</code><p style="padding:0;margin-left:20;margin-top:0">
 Layer Average
 <div class=jython>
 LAV ( S ) = ( S (level1) + S (level2) ) / 2.
-</div></p><meta name="jhid" value="ldf"><p><a name="ldf"></a><code class="command">ldf(S, level1, level2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="ldf">
+<p><a name="ldf"></a><code class="command">ldf(S, level1, level2):</code><p style="padding:0;margin-left:20;margin-top:0">
 Layer Average
 <div class=jython>
 LDF ( S ) = S (level1) - S (level2)
-</div></p><meta name="jhid" value="mag"><p><a name="mag"></a><code class="command">mag():</code><p style="padding:0;margin-left:20;margin-top:0">
-Magnitude of a vector</p><meta name="jhid" value="mixr"><p><a name="mixr"></a><code class="command">mixr(temp, rh):</code><p style="padding:0;margin-left:20;margin-top:0">
-Mixing Ratio from Temperature, RH (requires pressure domain)</p><meta name="jhid" value="mul"><p><a name="mul"></a><code class="command">mul(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="mag">
+<p><a name="mag"></a><code class="command">mag():</code><p style="padding:0;margin-left:20;margin-top:0">
+Magnitude of a vector</p>
+<meta name="jhid" value="mixr">
+<p><a name="mixr"></a><code class="command">mixr(temp, rh):</code><p style="padding:0;margin-left:20;margin-top:0">
+Mixing Ratio from Temperature, RH (requires pressure domain)</p>
+<meta name="jhid" value="mul">
+<p><a name="mul"></a><code class="command">mul(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
 Multiply
 <div class=jython>
 MUL  (S1, S2) = S1 * S2
-</div></p><meta name="jhid" value="quo"><p><a name="quo"></a><code class="command">quo(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="quo">
+<p><a name="quo"></a><code class="command">quo(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
 Divide
 <div class=jython>
 QUO  (S1, S2) = S1 / S2
-</div></p><meta name="jhid" value="qvec"><p><a name="qvec"></a><code class="command">qvec(S, V):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="qvec">
+<p><a name="qvec"></a><code class="command">qvec(S, V):</code><p style="padding:0;margin-left:20;margin-top:0">
 Q-vector at a level ( K / m / s )
 <div class=jython>
 QVEC ( S, V ) = \[ - ( DOT ( DVDX (V), GRAD (S) ) ),
 - ( DOT ( DVDY (V), GRAD (S) ) ) \]
 where S can be any thermal paramenter, usually THTA.
-</div></p><meta name="jhid" value="sdiv"><p><a name="sdiv"></a><code class="command">sdiv(S, V):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="sdiv">
+<p><a name="sdiv"></a><code class="command">sdiv(S, V):</code><p style="padding:0;margin-left:20;margin-top:0">
 Horizontal Flux Divergence
 <div class=jython>
 SDIV ( S, V ) = S * DIV ( V ) + DOT ( V, GRAD ( S ) )
-</div></p><meta name="jhid" value="shr"><p><a name="shr"></a><code class="command">shr(V):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="shr">
+<p><a name="shr"></a><code class="command">shr(V):</code><p style="padding:0;margin-left:20;margin-top:0">
 Shear Deformation
 <div class=jython>
 SHR ( V ) = DDX ( v ) + DDY ( u )
-</div></p><meta name="jhid" value="strd"><p><a name="strd"></a><code class="command">strd(V):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="strd">
+<p><a name="strd"></a><code class="command">strd(V):</code><p style="padding:0;margin-left:20;margin-top:0">
 Stretching Deformation
 <div class=jython>
 STRD ( V ) = DDX ( u ) - DDY ( v )
-</div></p><meta name="jhid" value="sub"><p><a name="sub"></a><code class="command">sub(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="sub">
+<p><a name="sub"></a><code class="command">sub(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
 Subtract
 <div class=jython>
 SUB  (S1, S2) = S1 - S2
-</div></p><meta name="jhid" value="thrm"><p><a name="thrm"></a><code class="command">thrm(S, level1, level2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="thrm">
+<p><a name="thrm"></a><code class="command">thrm(S, level1, level2):</code><p style="padding:0;margin-left:20;margin-top:0">
 Thermal wind
 <div class=jython>
 THRM ( S ) = \[ u (GEO(S)) (level1) - u (GEO(S)) (level2),
 v (GEO(S)) (level1) - v (GEO(S)) (level2) \]
-</div></p><meta name="jhid" value="thta"><p><a name="thta"></a><code class="command">thta(temp):</code><p style="padding:0;margin-left:20;margin-top:0">
-Potential Temperature from Temperature (requires pressure domain)</p><meta name="jhid" value="thte"><p><a name="thte"></a><code class="command">thte(temp, rh):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="thta">
+<p><a name="thta"></a><code class="command">thta(temp):</code><p style="padding:0;margin-left:20;margin-top:0">
+Potential Temperature from Temperature (requires pressure domain)</p>
+<meta name="jhid" value="thte">
+<p><a name="thte"></a><code class="command">thte(temp, rh):</code><p style="padding:0;margin-left:20;margin-top:0">
 Equivalent Potential Temperature from Temperature and Relative
-humidity (requires pressure domain)</p><meta name="jhid" value="un"><p><a name="un"></a><code class="command">un(V):</code><p style="padding:0;margin-left:20;margin-top:0">
-North relative u component</p><meta name="jhid" value="ur"><p><a name="ur"></a><code class="command">ur(V):</code><p style="padding:0;margin-left:20;margin-top:0">
-Grid relative u component</p><meta name="jhid" value="vadd"><p><a name="vadd"></a><code class="command">vadd(V1, V2):</code><p style="padding:0;margin-left:20;margin-top:0">
+humidity (requires pressure domain)</p>
+<meta name="jhid" value="un">
+<p><a name="un"></a><code class="command">un(V):</code><p style="padding:0;margin-left:20;margin-top:0">
+North relative u component</p>
+<meta name="jhid" value="ur">
+<p><a name="ur"></a><code class="command">ur(V):</code><p style="padding:0;margin-left:20;margin-top:0">
+Grid relative u component</p>
+<meta name="jhid" value="vadd">
+<p><a name="vadd"></a><code class="command">vadd(V1, V2):</code><p style="padding:0;margin-left:20;margin-top:0">
 add the components of 2 vectors
 <div class=jython>
 VADD (V1, V2) = \[ u1+u2, v1+v2 \]
-</div></p><meta name="jhid" value="vecr"><p><a name="vecr"></a><code class="command">vecr(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="vecr">
+<p><a name="vecr"></a><code class="command">vecr(S1, S2):</code><p style="padding:0;margin-left:20;margin-top:0">
 Make a vector from two components
 <div class=jython>
 VECR ( S1, S2 ) = \[ S1, S2 \]
-</div></p><meta name="jhid" value="vlav"><p><a name="vlav"></a><code class="command">vlav(V, level1, level2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="vlav">
+<p><a name="vlav"></a><code class="command">vlav(V, level1, level2):</code><p style="padding:0;margin-left:20;margin-top:0">
 calculate the vector layer average
 <div class=jython>
 VLDF(V) = \[(u(level1) - u(level2))/2,
 (v(level1) - v(level2))/2\]
-</div></p><meta name="jhid" value="vldf"><p><a name="vldf"></a><code class="command">vldf(V, level1, level2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="vldf">
+<p><a name="vldf"></a><code class="command">vldf(V, level1, level2):</code><p style="padding:0;margin-left:20;margin-top:0">
 calculate the vector layer difference
 <div class=jython>
 VLDF(V) = \[u(level1) - u(level2),
 v(level1) - v(level2)\]
-</div></p><meta name="jhid" value="vmul"><p><a name="vmul"></a><code class="command">vmul(V1, V2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="vmul">
+<p><a name="vmul"></a><code class="command">vmul(V1, V2):</code><p style="padding:0;margin-left:20;margin-top:0">
 Multiply the components of 2 vectors
 <div class=jython>
 VMUL (V1, V2) = \[ u1*u2, v1*v2 \]
-</div></p><meta name="jhid" value="vn"><p><a name="vn"></a><code class="command">vn(V):</code><p style="padding:0;margin-left:20;margin-top:0">
-North relative v component</p><meta name="jhid" value="vor"><p><a name="vor"></a><code class="command">vor(V):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="vn">
+<p><a name="vn"></a><code class="command">vn(V):</code><p style="padding:0;margin-left:20;margin-top:0">
+North relative v component</p>
+<meta name="jhid" value="vor">
+<p><a name="vor"></a><code class="command">vor(V):</code><p style="padding:0;margin-left:20;margin-top:0">
 Relative Vorticity
 <div class=jython>
 VOR ( V ) = DDX ( v ) - DDY ( u )
-</div></p><meta name="jhid" value="vquo"><p><a name="vquo"></a><code class="command">vquo(V1, V2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="vquo">
+<p><a name="vquo"></a><code class="command">vquo(V1, V2):</code><p style="padding:0;margin-left:20;margin-top:0">
 Divide the components of 2 vectors
 <div class=jython>
 VQUO (V1, V2) = \[ u1/u2, v1/v2 \]
-</div></p><meta name="jhid" value="vr"><p><a name="vr"></a><code class="command">vr(V):</code><p style="padding:0;margin-left:20;margin-top:0">
-Grid relative v component</p><meta name="jhid" value="vsub"><p><a name="vsub"></a><code class="command">vsub(V1, V2):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="vr">
+<p><a name="vr"></a><code class="command">vr(V):</code><p style="padding:0;margin-left:20;margin-top:0">
+Grid relative v component</p>
+<meta name="jhid" value="vsub">
+<p><a name="vsub"></a><code class="command">vsub(V1, V2):</code><p style="padding:0;margin-left:20;margin-top:0">
 subtract the components of 2 vectors
 <div class=jython>
 VSUB (V1, V2) = \[ u1-u2, v1-v2 \]
-</div></p><meta name="jhid" value="wshr"><p><a name="wshr"></a><code class="command">wshr(V, Z, top, bottom):</code><p style="padding:0;margin-left:20;margin-top:0">
+</div></p>
+<meta name="jhid" value="wshr">
+<p><a name="wshr"></a><code class="command">wshr(V, Z, top, bottom):</code><p style="padding:0;margin-left:20;margin-top:0">
 Magnitude of the vertical wind shear in a layer
 <div class=jython>
 WSHR ( V ) = MAG \[ VLDF (V) \] / LDF (Z)
 </div></p>
-<h2> Module: grid</h2>
- This is the doc for the grid module 
-<hr>
-<meta name="jhid" value="applyToRange"><p><a name="applyToRange"></a><code class="command">applyToRange(function, data):</code><p style="padding:0;margin-left:20;margin-top:0">
-Apply the function name to each timestep of the data</p><meta name="jhid" value="applyToRangeValues"><p><a name="applyToRangeValues"></a><code class="command">applyToRangeValues(function, data):</code><p style="padding:0;margin-left:20;margin-top:0">
-Apply the function name to each value in each timestep of the data</p><meta name="jhid" value="averageOverTime"><p><a name="averageOverTime"></a><code class="command">averageOverTime(field, makeTimes):</code><p style="padding:0;margin-left:20;margin-top:0">
-Average the values in each time step
-If makeTimes is true (1) then we return a field mapping all of the times
-to the average. Else we just return the average</p><meta name="jhid" value="combineFields"><p><a name="combineFields"></a><code class="command">combineFields():</code><p style="padding:0;margin-left:20;margin-top:0">
-combine several fields together</p><meta name="jhid" value="extractLatitudeFromNWPGrid"><p><a name="extractLatitudeFromNWPGrid"></a><code class="command">extractLatitudeFromNWPGrid(fieldimpl):</code><p style="padding:0;margin-left:20;margin-top:0">
-Get the latitude coordinate from a grid.  Return a grid
-of the latitudes at each point.</p><meta name="jhid" value="extractPressureFromNWPGrid"><p><a name="extractPressureFromNWPGrid"></a><code class="command">extractPressureFromNWPGrid(fieldimpl):</code><p style="padding:0;margin-left:20;margin-top:0">
-Get the pressure coordinate from a time series grid and
-return a grid of the pressure at all points.  Input
-grid must have pressure or height (which is converted
-to pressure in the standard atmosphere).
-User must be sure input is a suitable FlatField.</p><meta name="jhid" value="getAltitude"><p><a name="getAltitude"></a><code class="command">getAltitude(z):</code><p style="padding:0;margin-left:20;margin-top:0">
-Change units from geopotential meters to meters</p><meta name="jhid" value="getNthTimeGrid"><p><a name="getNthTimeGrid"></a><code class="command">getNthTimeGrid(fieldimpl, Nth):</code><p style="padding:0;margin-left:20;margin-top:0">
-Get the Nth grid in time series of grids;
-User must be sure input is a suitable data field.
-returns a single time.
-Nth is an integer, >=0, <= max index of grid time series.</p><meta name="jhid" value="getSliceAtAltitude"><p><a name="getSliceAtAltitude"></a><code class="command">getSliceAtAltitude(fieldimpl, alt, unit):</code><p style="padding:0;margin-left:20;margin-top:0">
-Extract a 2D horizontal slice from a 3D grid at the given altitude;
-level is a real number; if unit is supplied, it must
-be compatible with meters (ft, fathoms, etc)
-param fieldimpl is a grid which may have
-one or more time steps.</p><meta name="jhid" value="getSliceAtLevel"><p><a name="getSliceAtLevel"></a><code class="command">getSliceAtLevel(fieldimpl, level):</code><p style="padding:0;margin-left:20;margin-top:0">
-Extract a 2D horizontal slice from a 3D grid at "Level."
-level is a real number; must be appropriate for the grid.
-param fieldimpl is a grid which may have one or more time steps.</p><meta name="jhid" value="horizontalAdvection"><p><a name="horizontalAdvection"></a><code class="command">horizontalAdvection(param, u, v):</code><p style="padding:0;margin-left:20;margin-top:0">
-horizontal advection</p><meta name="jhid" value="horizontalDivergence"><p><a name="horizontalDivergence"></a><code class="command">horizontalDivergence(param, u, v):</code><p style="padding:0;margin-left:20;margin-top:0">
-horizontal flux divergence</p><meta name="jhid" value="layerAverage"><p><a name="layerAverage"></a><code class="command">layerAverage(grid, top, bottom):</code><p style="padding:0;margin-left:20;margin-top:0">
-Wrapper for calculating layer average</p><meta name="jhid" value="layerDiff"><p><a name="layerDiff"></a><code class="command">layerDiff(grid, top, bottom):</code><p style="padding:0;margin-left:20;margin-top:0">
-Wrapper for calculating layer difference</p><meta name="jhid" value="make2D"><p><a name="make2D"></a><code class="command">make2D(slice):</code><p style="padding:0;margin-left:20;margin-top:0">
-Make a 2D slice from a 3D slice at a single level</p><meta name="jhid" value="makeFlowField"><p><a name="makeFlowField"></a><code class="command">makeFlowField(a, b, c):</code><p style="padding:0;margin-left:20;margin-top:0">
-Make a vector from 3 components
-<div class=jython>
-makeVector(a,b) = \[a,b,c\]
-</div></p><meta name="jhid" value="makeTimeSequence"><p><a name="makeTimeSequence"></a><code class="command">makeTimeSequence(g):</code><p style="padding:0;margin-left:20;margin-top:0">
-Merge a set of single time grids/images into a time sequence</p><meta name="jhid" value="makeTrueVector"><p><a name="makeTrueVector"></a><code class="command">makeTrueVector(u, v):</code><p style="padding:0;margin-left:20;margin-top:0">
-true wind vectors</p><meta name="jhid" value="makeVector"><p><a name="makeVector"></a><code class="command">makeVector(a, b):</code><p style="padding:0;margin-left:20;margin-top:0">
-Make a vector from 2 components
-<div class=jython>
-makeVector(a,b) = \[a,b\]
-</div></p><meta name="jhid" value="newName"><p><a name="newName"></a><code class="command">newName(field, varname, copy):</code><p style="padding:0;margin-left:20;margin-top:0">
-create a new field with a new parameter name</p><meta name="jhid" value="newUnit"><p><a name="newUnit"></a><code class="command">newUnit(field, varname, unitname):</code><p style="padding:0;margin-left:20;margin-top:0">
-set the name and unit on a grid</p><meta name="jhid" value="resampleGrid"><p><a name="resampleGrid"></a><code class="command">resampleGrid(oldGrid, gridwithNewDomain):</code><p style="padding:0;margin-left:20;margin-top:0">
-display gridded data on a new domain</p><meta name="jhid" value="windShear"><p><a name="windShear"></a><code class="command">windShear(u, v, z, top, bottom):</code><p style="padding:0;margin-left:20;margin-top:0">
-calculate the wind shear between discrete layers
-<div class=jython>
-shear = sqrt((u(top)-u(bottom))^2 + (v(top)-v(bottom))^2)/zdiff</pre>
-</div></p><meta name="jhid" value="windShearVector"><p><a name="windShearVector"></a><code class="command">windShearVector(u, v, top, bottom):</code><p style="padding:0;margin-left:20;margin-top:0">
-calculate the u and v layer difference and return as vector</p><meta name="jhid" value="writeGridToXls"><p><a name="writeGridToXls"></a><code class="command">writeGridToXls(grid, filename):</code><p style="padding:0;margin-left:20;margin-top:0">
-Write out the grid data to an excel spreadsheet</p>
+<a name="image">
 <h2> Module: image</h2>
 <hr>
-<meta name="jhid" value="combineRGB"><p><a name="combineRGB"></a><code class="command">combineRGB(red, green, blue):</code><p style="padding:0;margin-left:20;margin-top:0">
-combine 3 images as an RGB image</p><meta name="jhid" value="makeNavigatedImage"><p><a name="makeNavigatedImage"></a><code class="command">makeNavigatedImage(d, ulLat, ulLon, lrLat, lrLon):</code><p style="padding:0;margin-left:20;margin-top:0">
+
+<meta name="jhid" value="combineRGB">
+<p><a name="combineRGB"></a><code class="command">combineRGB(red, green, blue):</code><p style="padding:0;margin-left:20;margin-top:0">
+combine 3 images as an RGB image</p>
+<meta name="jhid" value="makeNavigatedImage">
+<p><a name="makeNavigatedImage"></a><code class="command">makeNavigatedImage(d, ulLat, ulLon, lrLat, lrLon):</code><p style="padding:0;margin-left:20;margin-top:0">
 This takes a image data object and a lat/lon bounding box
 and adds a lat/lon domain to the data. Use it in conjunction with a formula:</p>
+<a name="maps">
 <h2> Module: maps</h2>
 <hr>
-<meta name="jhid" value="averageFromMap"><p><a name="averageFromMap"></a><code class="command">averageFromMap(field, mapSets):</code><p style="padding:0;margin-left:20;margin-top:0">
+
+<meta name="jhid" value="averageFromMap">
+<p><a name="averageFromMap"></a><code class="command">averageFromMap(field, mapSets):</code><p style="padding:0;margin-left:20;margin-top:0">
 mapSets defines a set of polygons. This procedure fills the areas in the field are enclosed
-by each polygon with the average value within that area</p><meta name="jhid" value="averageRangeFromMap"><p><a name="averageRangeFromMap"></a><code class="command">averageRangeFromMap(range, timeStep, mapSets):</code><p style="padding:0;margin-left:20;margin-top:0">
+by each polygon with the average value within that area</p>
+<meta name="jhid" value="averageRangeFromMap">
+<p><a name="averageRangeFromMap"></a><code class="command">averageRangeFromMap(range, timeStep, mapSets):</code><p style="padding:0;margin-left:20;margin-top:0">
 mapSets defines a set of polygons. This procedure fills the areas in the field are enclosed
-by each polygon with the average value within that area</p><meta name="jhid" value="filterMaps"><p><a name="filterMaps"></a><code class="command">filterMaps(mapSets, propName, operator, value):</code><p style="padding:0;margin-left:20;margin-top:0">
+by each polygon with the average value within that area</p>
+<meta name="jhid" value="filterMaps">
+<p><a name="filterMaps"></a><code class="command">filterMaps(mapSets, propName, operator, value):</code><p style="padding:0;margin-left:20;margin-top:0">
 Return a new set of maps whose property propName satisfies the given operator/value.
-The operators can be ==,!=, <,>,<=,>=, match, !match</p><meta name="jhid" value="getMapProperty"><p><a name="getMapProperty"></a><code class="command">getMapProperty(polygon, propName):</code><p style="padding:0;margin-left:20;margin-top:0">
-Get the named property from the given mapData</p><meta name="jhid" value="getMapsWithProperty"><p><a name="getMapsWithProperty"></a><code class="command">getMapsWithProperty(mapSets, propName, value):</code><p style="padding:0;margin-left:20;margin-top:0">
-Return a new set of maps that have the given property value</p><meta name="jhid" value="make3DMap"><p><a name="make3DMap"></a><code class="command">make3DMap(map, topo):</code><p style="padding:0;margin-left:20;margin-top:0">
-Make a 3d map. map -  map line data - topo - topography dataset</p><meta name="jhid" value="makeFieldFromMapBounds"><p><a name="makeFieldFromMapBounds"></a><code class="command">makeFieldFromMapBounds(mapSets, length1, length2, fill, unit):</code><p style="padding:0;margin-left:20;margin-top:0">
+The operators can be ==,!=, <,>,<=,>=, match, !match</p>
+<meta name="jhid" value="getMapProperty">
+<p><a name="getMapProperty"></a><code class="command">getMapProperty(polygon, propName):</code><p style="padding:0;margin-left:20;margin-top:0">
+Get the named property from the given mapData</p>
+<meta name="jhid" value="getMapsWithProperty">
+<p><a name="getMapsWithProperty"></a><code class="command">getMapsWithProperty(mapSets, propName, value):</code><p style="padding:0;margin-left:20;margin-top:0">
+Return a new set of maps that have the given property value</p>
+<meta name="jhid" value="make3DMap">
+<p><a name="make3DMap"></a><code class="command">make3DMap(map, topo):</code><p style="padding:0;margin-left:20;margin-top:0">
+Make a 3d map. map -  map line data - topo - topography dataset</p>
+<meta name="jhid" value="makeFieldFromMapBounds">
+<p><a name="makeFieldFromMapBounds"></a><code class="command">makeFieldFromMapBounds(mapSets, length1, length2, fill, unit):</code><p style="padding:0;margin-left:20;margin-top:0">
 Make a field whos lat/lon area is the bounds of the given mapSet. It has length1 points in the x and length2 in the y.
-Fill it with the fill value and the given unit</p><meta name="jhid" value="subsetFromMap"><p><a name="subsetFromMap"></a><code class="command">subsetFromMap(field, mapSets, fillValue, inverse):</code><p style="padding:0;margin-left:20;margin-top:0">
+Fill it with the fill value and the given unit</p>
+<meta name="jhid" value="subsetFromMap">
+<p><a name="subsetFromMap"></a><code class="command">subsetFromMap(field, mapSets, fillValue, inverse):</code><p style="padding:0;margin-left:20;margin-top:0">
 mapSets defines a set of polygons. This procedure fills the areas in the field that are not
 enclosed by the polygons with the fill value. If inverse is 1 then it fills the areas that are
-enclosed</p><meta name="jhid" value="subsetRangeFromMap"><p><a name="subsetRangeFromMap"></a><code class="command">subsetRangeFromMap(range, timeStep, mapSets, fillValue, inverse):</code><p style="padding:0;margin-left:20;margin-top:0">
+enclosed</p>
+<meta name="jhid" value="subsetRangeFromMap">
+<p><a name="subsetRangeFromMap"></a><code class="command">subsetRangeFromMap(range, timeStep, mapSets, fillValue, inverse):</code><p style="padding:0;margin-left:20;margin-top:0">
 mapSets defines a set of polygons. This procedure fills the areas in the field that are not
 enclosed by the polygons with the fill value. If inverse is 1 then it fills the areas that are
-enclosed</p><meta name="jhid" value="subsetRangeWithProperty"><p><a name="subsetRangeWithProperty"></a><code class="command">subsetRangeWithProperty(range, mapSets):</code><p style="padding:0;margin-left:20;margin-top:0">
-test code</p><meta name="jhid" value="subsetWithProperty"><p><a name="subsetWithProperty"></a><code class="command">subsetWithProperty(field, mapSets):</code><p style="padding:0;margin-left:20;margin-top:0">
+enclosed</p>
+<meta name="jhid" value="subsetRangeWithProperty">
+<p><a name="subsetRangeWithProperty"></a><code class="command">subsetRangeWithProperty(range, mapSets):</code><p style="padding:0;margin-left:20;margin-top:0">
 test code</p>
-<h2> Module: misc</h2>
-A set of miscellaneous utilities. 
-<hr>
-<meta name="jhid" value="idveval"><p><a name="idveval"></a><code class="command">idveval(formula):</code><p style="padding:0;margin-left:20;margin-top:0">
-evaluate a formula</p><meta name="jhid" value="makeFloatArray"><p><a name="makeFloatArray"></a><code class="command">makeFloatArray(rows, cols, value):</code><p style="padding:0;margin-left:20;margin-top:0">
-A utility to make a 2 dimensional float array filled
-with the given value</p>
+<meta name="jhid" value="subsetWithProperty">
+<p><a name="subsetWithProperty"></a><code class="command">subsetWithProperty(field, mapSets):</code><p style="padding:0;margin-left:20;margin-top:0">
+test code</p>
+<a name="shell">
 <h2> Module: shell</h2>
 A set of utilities for selecting data and creating displays.
    For use from the Jython shell.
 <hr>
-<meta name="jhid" value="clear"><p><a name="clear"></a><code class="command">clear():</code><p style="padding:0;margin-left:20;margin-top:0">
-Clear the shell</p><meta name="jhid" value="createDisplay"><p><a name="createDisplay"></a><code class="command">createDisplay(displayType, data, dataName):</code><p style="padding:0;margin-left:20;margin-top:0">
+
+<meta name="jhid" value="clear">
+<p><a name="clear"></a><code class="command">clear():</code><p style="padding:0;margin-left:20;margin-top:0">
+Clear the shell</p>
+<meta name="jhid" value="createDisplay">
+<p><a name="createDisplay"></a><code class="command">createDisplay(displayType, data, dataName):</code><p style="padding:0;margin-left:20;margin-top:0">
 create a display of type displayType. Right click in input field to select particular displayType.
 The data is can be a data object, a datachoice or a list of data or datachoices
-The dataName is used to name the data, i.e., its the parameter name</p><meta name="jhid" value="listVars"><p><a name="listVars"></a><code class="command">listVars():</code><p style="padding:0;margin-left:20;margin-top:0">
-List all of the variables defined in the shell's interpreter</p><meta name="jhid" value="makeDataSource"><p><a name="makeDataSource"></a><code class="command">makeDataSource(path, type):</code><p style="padding:0;margin-left:20;margin-top:0">
+The dataName is used to name the data, i.e., its the parameter name</p>
+<meta name="jhid" value="findDataSource">
+<p><a name="findDataSource"></a><code class="command">findDataSource(name):</code><p style="padding:0;margin-left:20;margin-top:0">
+Find the data source object with the given name. If no name is given then this will return the first (non-formula)
+data source</p>
+<meta name="jhid" value="getData">
+<p><a name="getData"></a><code class="command">getData(dataSourceName, dataChoiceName):</code><p style="padding:0;margin-left:20;margin-top:0">
+Find the data source with the given name and the data choice on that data source with the given name.
+If no dataSourceName is given then use the first one in the list
+If no dataChoiceName is given then use the first one held by the data source
+Return the data for the data choice.
+If no data source or data choice is found then return null</p>
+<meta name="jhid" value="getDataChoice">
+<p><a name="getDataChoice"></a><code class="command">getDataChoice(dataSourceName, dataChoiceName):</code><p style="padding:0;margin-left:20;margin-top:0">
+Find the data source with the given name and the data choice on that data source with the given name.
+If no dataSourceName is given then use the first one in the list
+If no dataChoiceName is given then use the first one held by the data source
+Return the data choice
+If no data source or data choice is found then return null</p>
+<meta name="jhid" value="listVars">
+<p><a name="listVars"></a><code class="command">listVars():</code><p style="padding:0;margin-left:20;margin-top:0">
+List all of the variables defined in the shell's interpreter</p>
+<meta name="jhid" value="makeDataSource">
+<p><a name="makeDataSource"></a><code class="command">makeDataSource(path, type):</code><p style="padding:0;margin-left:20;margin-top:0">
 Create a datasource from the given file name or url. The optional type parameter
-is used to specify the type of data</p><meta name="jhid" value="printType"><p><a name="printType"></a><code class="command">printType(data):</code><p style="padding:0;margin-left:20;margin-top:0">
-Print out the math type of the given data</p><meta name="jhid" value="selectData"><p><a name="selectData"></a><code class="command">selectData(name1, name2, name3, name4, name5):</code><p style="padding:0;margin-left:20;margin-top:0">
-Select up to 5 data fields. This returns a List of the actual Data objects</p><meta name="jhid" value="selectDataChoice"><p><a name="selectDataChoice"></a><code class="command">selectDataChoice(name1, name2, name3, name4, name5):</code><p style="padding:0;margin-left:20;margin-top:0">
+is used to specify the type of data</p>
+<meta name="jhid" value="printType">
+<p><a name="printType"></a><code class="command">printType(data):</code><p style="padding:0;margin-left:20;margin-top:0">
+Print out the math type of the given data</p>
+<meta name="jhid" value="selectData">
+<p><a name="selectData"></a><code class="command">selectData(name1, name2, name3, name4, name5):</code><p style="padding:0;margin-left:20;margin-top:0">
+Select up to 5 data fields. This returns a List of the actual Data objects</p>
+<meta name="jhid" value="selectDataChoice">
+<p><a name="selectDataChoice"></a><code class="command">selectDataChoice(name1, name2, name3, name4, name5):</code><p style="padding:0;margin-left:20;margin-top:0">
 Select up to 5 data choices. This returns a List of the data choices, not the actual Data
-To get the data do:   <div class=jython>dataList.get(0).getData(None)</div></p><meta name="jhid" value="showLib"><p><a name="showLib"></a><code class="command">showLib():</code><p style="padding:0;margin-left:20;margin-top:0">
+To get the data do:   <div class=jython>dataList.get(0).getData(None)</div></p>
+<meta name="jhid" value="setDataChoices">
+<p><a name="setDataChoices"></a><code class="command">setDataChoices(dataSource):</code><p style="padding:0;margin-left:20;margin-top:0">
+The given dataSource can be an actual data source or the name of a data source.
+This procedure will define a set of jython variables that correspond to the data choices
+held by the given data source.</p>
+<meta name="jhid" value="setDataSources">
+<p><a name="setDataSources"></a><code class="command">setDataSources():</code><p style="padding:0;margin-left:20;margin-top:0">
+This procedure will define a set of jython variables, 'dataSource0, dataSource1, ...'  that correspond to
+loaded data sources.</p>
+<meta name="jhid" value="showLib">
+<p><a name="showLib"></a><code class="command">showLib():</code><p style="padding:0;margin-left:20;margin-top:0">
 Bring up the jython library dialog</p>
-<h2> Module: test</h2>
- This is the doc for the test module 
+<a name="misc">
+<h2> Module: misc</h2>
+A set of miscellaneous utilities. 
 <hr>
-<meta name="jhid" value="changeRange"><p><a name="changeRange"></a><code class="command">changeRange(d):</code><p style="padding:0;margin-left:20;margin-top:0">
-</p><meta name="jhid" value="testApplyToRange"><p><a name="testApplyToRange"></a><code class="command">testApplyToRange(d):</code><p style="padding:0;margin-left:20;margin-top:0">
-</p><meta name="jhid" value="testApplyToRange2"><p><a name="testApplyToRange2"></a><code class="command">testApplyToRange2(r):</code><p style="padding:0;margin-left:20;margin-top:0">
-</p>
 
+<meta name="jhid" value="idveval">
+<p><a name="idveval"></a><code class="command">idveval(formula):</code><p style="padding:0;margin-left:20;margin-top:0">
+evaluate a formula</p>
+<meta name="jhid" value="makeFloatArray">
+<p><a name="makeFloatArray"></a><code class="command">makeFloatArray(rows, cols, value):</code><p style="padding:0;margin-left:20;margin-top:0">
+A utility to make a 2 dimensional float array filled
+with the given value</p>
 
 [ug::foot]

@@ -2,40 +2,47 @@
 [ug::head {Jython Shell}]
 
 
-The Jython Shell is an interactive command line interface to the IDV Jython interpreter.
+The Jython Shell is an interactive command line interface to the IDV Jython interpreter that allows the user to type in arbitrary jython to evaluate. It is brought up with the [ht::menu Edit Formulas {Jython Shell}] menu.
 
 <h3>The User Interface</h3>
 
-
-
-
-<h3>Library Commands</h3>
+[ht::cimg images/JythonShell.gif]
+The Jython shell consists of an output window on the top and an input field on the bottom. The user enters Jython into the input field. When &quot;return&quot; or &quot;Evaluate&quot; is pressed the Jython is evaluated and any ouput is shown in the output window. 
+<p>
+The icons show with every Jython entry in the output window allow you to select the particular jython on re-evaluate it. 
+<p>
+The entry window can be expanded with the down arrow icons on the right.
+<p>
+Pressing the &quot;Up&quot; arrow and &quot;Down&quot; arrow (also control-P, control-N) in the entry field goes up and down through the history of commands.
+<p>
+Right clicking in the entry field brings up a menu that allows you to:
 <ul>
-<li> Select data.
-<pre>data = selectData();</pre>
-Brings up the field selector. Returns a visad.Data object.
-<p>
-
-<li>  Select a data choice. You would want to do this if you want to access its name, etc.
-<pre>dataChoice = selectDataChoice();</pre>
-Brings up the field selector. Returns a DataChoice object. You can access the data with:
-<pre>
-data = dataChoice.getData(None);
-</pre>
-
-
-<p>
-<li>  Create a display.
-<pre>display = createDisplay('some display type', data_or_datachoice);</pre>
-This creates a new display with the given data or data choice. The display type can be inserted through
-the {ht::menu Edit {Insert Display Type}] menu.
-<p>
-Once you have created the display you can remove if with:
-<pre>
-display.doRemove();
-</pre>
-
+<li> Add an entry from the history.
+<li> Insert the identifier for a display control type when creating a display.
+<li> Insert the text of a procedure call from any of the IDV Jython Library modules. Note: the 
+<i>shell utilities</i> module has a number of useful Jython shell related commands.
+See <a href="JythonLib.html#shell">JythonShell.html</a> for more information.
+<li> Insert any of the defined IDV actions (e.g.,Edit color table, Show window, etc.) 
 </ul>
+
+<h3>Menus</h3>
+
+<ul>
+<li> [ht::menu File]
+<ul>
+<li> [ht::menu {Export Commands}] allows you to take the commands that have been entered and add them into the Jython Library to be used to create a fixed procedure.
+<li> [ht::menu {Save History}] Writes out the history of commands the have been entered. When you restart the IDV those commands will be in your history.
+<li> [ht::menu {List History}] Shows the history of commands in the output window.
+<li> [ht::menu {List Variables}] Shows all global Jython variables defined.
+</ul>
+<li> [ht::menu Edit]
+<ul>
+<li> [ht::menu {Clear All}] Clear the history and anything in the output window.
+<li> [ht::menu {Clear output}] Clear the output window.
+<li> [ht::menu {Auto-select Operands}] When selected this causes the Jython shell to analyze every command entered to see if there are references to variables that have not been set. It will bring up the Data Selection dialog  to allow you to choose the fields to use.
+</ul>
+</ul>
+
 
 [ug::foot]
 
