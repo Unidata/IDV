@@ -1316,6 +1316,12 @@ public abstract class XmlUtil {
         sb.append("]]>");
     }
 
+    public static void appendCdata(StringBuffer sb, String s) {
+        sb.append("<![CDATA[");
+        sb.append(s);
+        sb.append("]]>");
+    }
+
 
 
     public static CDATASection makeCDataNode(Document doc,String text) {
