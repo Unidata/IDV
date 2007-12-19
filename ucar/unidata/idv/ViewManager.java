@@ -1898,6 +1898,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 }
                 TextDisplayable d =
                     (TextDisplayable) control.getDisplayListDisplayable(this);
+                if (d == null) continue;
                 count++;
                 boolean success = setDisplayablePosition(d, count);
                 if (success) {
