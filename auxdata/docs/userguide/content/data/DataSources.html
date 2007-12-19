@@ -49,16 +49,18 @@ gridded oceanographic datasets, NCEP/NCAR Reanalysis</td>
 <td>
 <table>
 <tr valign="top"><td>- netCDF(<a href="#netcdf">2</a>)</td></tr>
-<tr valign="center"><td>- GRIB (1&amp;2)</td></tr>
+<tr valign="center"><td>- GRIB (versions 1&amp;2)</td></tr>
 <tr valign="bottom"><td>- Vis5D</td></tr>
+<tr valign="bottom"><td>- GEMPAK</td></tr>
 </table>
 </td>
 
 <td>
 <table>
 <tr valign="top"><td>- local files, HTTP, TDS servers</td></tr>
-<tr valign="bottom"><td>- local files</td></tr>
+<tr valign="center"><td>- local files, TDS servers</td></tr>
 <tr valign="bottom"><td>- local files, HTTP</td></tr>
+<tr valign="bottom"><td>- local files, TDS servers</td></tr>
 </table>
 </td>
 </tr>
@@ -70,14 +72,16 @@ products</td>
 <td>
 <table>
 <tr valign="top"><td>- ADDE (<a href="#adde">3</a>)</td></tr>
-<tr valign="bottom"><td>- McIDAS AREA</td></tr>
+<tr valign="center"><td>- McIDAS AREA</td></tr>
+<tr valign="bottom"><td>- GINI</td></tr>
 </table>
 </td>
 
 <td>
 <table>
 <tr valign="top"><td>- ADDE servers</td></tr>
-<tr valign="bottom"><td>- local files, ADDE servers</td></tr>
+<tr valign="center"><td>- local files, ADDE servers</td></tr>
+<tr valign="bottom"><td>- local files, TDS servers</td></tr>
 </table>
 </td>
 </tr>
@@ -96,25 +100,43 @@ products</td>
 <table>
 <tr valign="top"><td>- local files or TDS (bzip2 compressed or uncompressed</td></tr>
 
-<tr valign="bottom"><td>- ADDE servers, local files or TDS (radial products only)</td></tr>
+<tr valign="bottom"><td>- ADDE servers, local files or TDS </td></tr>
 </table>
 </td>
 </tr>
 
 <tr>
 <td>Point observations</td>
-<td>Surface observations (METAR and SYNOP)</td>
+<td>Surface observations (METAR and SYNOP), earthquake observations</td>
 <td>
 <table>
 <tr valign="top"><td>- ADDE</td></tr>
-<tr valign="bottom"><td>- netCDF(Unidata, AWIPS/MADIS formats)</td></tr>
+<tr valign="center"><td>- netCDF (Unidata, AWIPS/MADIS formats)</td></tr>
+<tr valign="bottom"><td>- Text (ASCII, CSV), Excel spreadsheet<a href="#csv">4</a></td></tr>
 </table>
 </td>
 
 <td>
 <table>
 <tr valign="top"><td>- ADDE servers</td></tr>
-<tr valign="bottom"><td>- local files, HTTP</td></tr>
+<tr valign="center"><td>- local files</td></tr>
+<tr valign="bottom"><td>- local files</td></tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td>Trajectories</td>
+<td>Aircraft observations</td>
+<td>
+<table>
+<tr valign="bottom"><td>- netCDF (RAF convention)</td></tr>
+</table>
+</td>
+
+<td>
+<table>
+<tr valign="bottom"><td>- local files</td></tr>
 </table>
 </td>
 </tr>
@@ -126,13 +148,15 @@ products</td>
 <td>
 <table>
 <tr valign="top"><td>- ADDE</td></tr>
-<tr valign="bottom"><td>- netCDF(Unidata, AWIPS/MADIS formats)</td></tr>
+<tr valign="center"><td>- netCDF(Unidata, AWIPS/MADIS formats)</td></tr>
+<tr valign="bottom"><td>- CMA text format</td></tr>
 </table>
 </td>
 
 <td>
 <table>
 <tr valign="top"><td>- ADDE</td></tr>
+<tr valign="center"><td>- local files</td></tr>
 <tr valign="bottom"><td>- local files</td></tr>
 </table>
 </td>
@@ -154,7 +178,6 @@ Systems (GIS)
 <table>
 <tr valign="top"><td>- ESRI Shapefile</td></tr>
 <tr valign="center"><td>- USGS DEM</td></tr>
-<tr valign="bottom"><td>- GeoTIFF (limited support)</td></tr>
 </table>
 </td>
 
@@ -162,7 +185,6 @@ Systems (GIS)
 <table>
 <tr valign="top"><td>- local files, HTTP</td></tr>
 <tr valign="center"><td>- local files</td></tr>
-<tr valign="bottom"><td>- local files</td></tr>
 </table>
 </td>
 </tr>
@@ -234,7 +256,7 @@ a custom defaults file.  For more information, see
 
 <div class="pagesubtitle">THREDDS Data Server (TDS)/OPeNDAP</div>
 
-The IDV can access gridded data (netCDF/GRIB) and NEXRAD radar 
+The IDV can access gridded data (netCDF/GRIB/GEMPAK) and NEXRAD radar 
 data stored on a THREDDS Data Server (TDS) through the OPeNDAP 
 (formerly called DODS) protocol.
 See 
@@ -272,5 +294,9 @@ by others. Using conventions helps ensure this. We recommend you use
 CF, COARDS, or NUWG conventions for netCDF data files for the IDV, and
 be sure to follow the best practices noted above.<P>
 
+<subhead id="csv" intoc="false">ASCII Text Point Data</subhead>
+The IDV can read point data and trajectories (aircraft tracks) from
+comma-separated value (CSV) text files.  See the documentation on
+the <a href="TextPointData.html">Text (ASCII) Point Data Format</a>.
 </body>
 
