@@ -6652,8 +6652,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             JPanel timeModePanel =
                 GuiUtils.leftCenter(
                     GuiUtils.wrap(
-                        GuiUtils.makeButton(
-                            "Change", this,
+                        GuiUtils.makeImageButton(
+                            "/ucar/unidata/idv/images/edit.gif", this,
                             "showTimeRangeDialog")), GuiUtils.inset(
                                 getDataTimeRange(true).getTimeModeLabel(),
                                 new Insets(0, 10, 0, 0)));
