@@ -450,7 +450,7 @@ public class TypeHandler implements Constants, Tables {
                                                        entry.getMinLon()+"+"+
                                                        entry.getMinLat()+"+"+
                                                        entry.getMaxLon()+"+"+
-                                                       entry.getMaxLat()+"+red"),""," width=200");
+                                                       entry.getMaxLat()+"+red"),""," width=300");
                 /*                sb.append(HtmlUtil.tableEntry(
                                               HtmlUtil.bold("Area:"),
                                               HtmlUtil.makeAreaLabel(
@@ -630,7 +630,7 @@ public class TypeHandler implements Constants, Tables {
 
         where = SqlUtil.makeAnd(whereList);
         String sql = SqlUtil.makeSelect(what, tables, where, extra);
-        System.err.println (sql);
+        //        System.err.println (sql);
         return getRepository().execute(sql, repository.getMax(request));
     }
 
@@ -844,7 +844,8 @@ public class TypeHandler implements Constants, Tables {
         if(request.defined(ARG_TYPE)) {
             String type = request.getString(ARG_TYPE,"").trim();
             if(!type.equals(TYPE_ANY)) {
-                addOr(COL_ENTRIES_TYPE, request.getString(ARG_TYPE,""), where, true);
+                //TODO: when should we add in the type
+                //                addOr(COL_ENTRIES_TYPE, request.getString(ARG_TYPE,""), where, true);
             }
         }
 
@@ -971,7 +972,7 @@ public class TypeHandler implements Constants, Tables {
                 
             }
             where.add(areaExpr);
-            System.err.println (areaExpr);
+            //            System.err.println (areaExpr);
         }
 
 

@@ -191,7 +191,7 @@ public class Repository implements Constants, Tables, RequestHandler {
     private Hashtable resources = new Hashtable();
 
 
-
+    
 
 
     /** _more_ */
@@ -552,6 +552,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      */
     protected void initHarvesters() throws Exception {
         try {
+            if(!getProperty("jdms.doharvesters",true)) return;
             Element root =
                 XmlUtil.getRoot(
                     "/ucar/unidata/repository/resources/harvesters.xml",
