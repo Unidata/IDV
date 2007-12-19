@@ -744,88 +744,91 @@ public class JythonManager extends IdvManager implements ActionListener {
         jythonEditor.getTextComponent().addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
                 holderArray[0].setSearchIndex(new Point(e.getX(), e.getY()));
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    JTextComponent comp = jythonEditor.getTextComponent();
-                    int point = comp.viewToModel(new Point(e.getX(),
-                                    e.getY()));
-                    String text  = comp.getText();
-                    String token = "";
-                    int    idx   = point;
-                    while (idx >= 0) {
-                        char c = text.charAt(idx);
-                        idx--;
-                        if ( !Character.isJavaIdentifierPart(c)) {
-                            break;
-                        }
-                        token = c + token;
-                    }
-
-                    int len = text.length();
-                    idx = point + 1;
-                    while (idx < len) {
-                        char c = text.charAt(idx);
-                        idx++;
-                        if ( !Character.isJavaIdentifierPart(c)) {
-                            break;
-                        }
-                        token = token + c;
-                    }
-
-                    List items = new ArrayList();
-                    if (token.length() == 0) {
-                        token = comp.getSelectedText();
-                    }
-                    JMenuItem helpMenuItem = null;
-                    if ((token != null) && (token.trim().length() > 0)) {
-                        token = token.trim();
-                        List funcs = findJythonMethods(true,
-                                         Misc.newList(holderArray[0]));
-                        for (int i = 0; i < funcs.size(); i++) {
-                            PyFunction func = (PyFunction) funcs.get(i);
-                            if (func.__name__.equals(token)) {
-
-                                items.add(
-                                    GuiUtils.makeMenuItem(
-                                        "Make formula for " + token,
-                                        JythonManager.this, "makeFormula",
-                                        func));
-                                String helpLink = "idv.tools.jythonlib."
-                                                  + func.__name__;
-                                if (Help.getDefaultHelp().isValidID(
-                                        helpLink)) {
-                                    helpMenuItem =
-                                        GuiUtils.makeMenuItem("Help",
-                                            JythonManager.this, "showHelp",
-                                            helpLink);
-                                }
-                                break;
-                            }
-                        }
-
-                    }
-                    if(holderArray[0].isEditable()) {
-                        items.add(GuiUtils.makeMenu("Insert Procedure Call",
-                                                    makeProcedureMenu(jythonEditor, "insertText",
-                                                                      null)));
-
-                        items.add(
-                                  GuiUtils.makeMenu(
-                                                    "Insert Idv Action",
-                                                    getIdv().getIdvUIManager().makeActionMenu(
-                                                                                              jythonEditor, "insertText", true)));
-                    }
-
-                    if (helpMenuItem != null) {
-                        items.add(GuiUtils.MENU_SEPARATOR);
-                        items.add(helpMenuItem);
-                    }
-
-                    JPopupMenu popup = GuiUtils.makePopupMenu(items);
-                    popup.show(jythonEditor.getTextComponent(), e.getX(),
-                               e.getY());
+                if (!SwingUtilities.isRightMouseButton(e)) {
+                    return;
                 }
+                JTextComponent comp = jythonEditor.getTextComponent();
+                int point = comp.viewToModel(new Point(e.getX(),
+                                                       e.getY()));
+                String text  = comp.getText();
+                String token = "";
+                int    idx   = point;
+                List items = new ArrayList();
+                JMenuItem helpMenuItem = null;
+                if(idx<0 || idx>=text.length()) {
+                    return;
+                }
+                while (idx >= 0) {
+                    char c = text.charAt(idx);
+                    idx--;
+                    if ( !Character.isJavaIdentifierPart(c)) {
+                        break;
+                    }
+                    token = c + token;
+                }
+
+                int len = text.length();
+                idx = point + 1;
+                while (idx < len) {
+                    char c = text.charAt(idx);
+                    idx++;
+                    if ( !Character.isJavaIdentifierPart(c)) {
+                        break;
+                    }
+                    token = token + c;
+                }
+
+                if (token.length() == 0) {
+                    token = comp.getSelectedText();
+                }
+                if ((token != null) && (token.trim().length() > 0)) {
+                    token = token.trim();
+                    List funcs = findJythonMethods(true,
+                                                   Misc.newList(holderArray[0]));
+                    for (int i = 0; i < funcs.size(); i++) {
+                        PyFunction func = (PyFunction) funcs.get(i);
+                        if (func.__name__.equals(token)) {
+
+                            items.add(
+                                      GuiUtils.makeMenuItem(
+                                                            "Make formula for " + token,
+                                                            JythonManager.this, "makeFormula",
+                                                            func));
+                            String helpLink = "idv.tools.jythonlib."
+                                + func.__name__;
+                            if (Help.getDefaultHelp().isValidID(
+                                                                helpLink)) {
+                                helpMenuItem =
+                                    GuiUtils.makeMenuItem("Help",
+                                                          JythonManager.this, "showHelp",
+                                                          helpLink);
+                            }
+                            break;
+                        }
+                    }
+                }
+                if(holderArray[0].isEditable()) {
+                    items.add(GuiUtils.makeMenu("Insert Procedure Call",
+                                                makeProcedureMenu(jythonEditor, "insertText",
+                                                                  null)));
+
+                    items.add(
+                              GuiUtils.makeMenu(
+                                                "Insert Idv Action",
+                                                getIdv().getIdvUIManager().makeActionMenu(
+                                                                                          jythonEditor, "insertText", true)));
+                }
+
+                if (helpMenuItem != null) {
+                    items.add(GuiUtils.MENU_SEPARATOR);
+                    items.add(helpMenuItem);
+                }
+
+                JPopupMenu popup = GuiUtils.makePopupMenu(items);
+                popup.show(jythonEditor.getTextComponent(), e.getX(),
+                           e.getY());
             }
-        });
+            });
 
         jythonEditor.setPreferredSize(new Dimension(500, 400));
         JComponent wrapper = GuiUtils.center(jythonEditor);
