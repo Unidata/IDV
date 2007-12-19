@@ -2,82 +2,9 @@
 [ug::head {Jython Methods}]
 
 
-First read about <a href="Formulas.html">IDV Formulas</a>.
-
-<p>
-
-IDV analysis calculations  use the Jython language. 
-Jython  is  an implentation of the Python language in Java. 
-
-<p>
-
-To learn more about Jython and Python, we recommend these books
-<ul>
-<i>The Quick Python Book</i> by Daryl Harms, Manning. 
-<br><i>Jython for Java Programmers</i> by Robert Bill, New Riders.
-<br><i>Python Essential Reference 2nd edition</i> by David Beazley, New Riders.
-<br><i>Python Developers Handbook</i> by Andre Lessa, Sams Publishing.
-</ul>
-and  web sites:
-<br> 
-<a href="http://www.python.org">http://www.python.org</a>, 
-<BR>
-<a href="http://www.jython.org">http://www.jython.org</a>,
-<BR>
-<a href="http://www.ssec.wisc.edu/~tomw/visadtutor/">Using Python with VisAD</a> (
-http://www.ssec.wisc.edu/~tomw/visadtutor/ ).
-
-<br>Refer to one of these books or web sites for how to write Jython.
-
-<div class="pagesubtitle">VisAD  and the IDV</div>
-
-The IDV uses and supports 
-<a href="http://www.ssec.wisc.edu/~billh/visad.html"><b>VisAD</b></a>,
-a Java library to provide display and analysis code for
-multi-dimensional data. All data objects used by the IDV are actually,
-invisibly to the user, stored in VisAD data objects, which carry with
-them information about units, errors, navigation or coordinate systems
-and transformations, and other metadata.
-
-<p>
-
-
-You may use the IDV and its computation features without knowing
-anything about VisAD. 
-However to do more you will want to see the documents for 
-visad.python.JPythonMethods at
-<b>http://www.ssec.wisc.edu/~dglo/visad/ </b>.
-
-
-
-<div class="pagesubtitle">Different data sources and automatic navigation</div>
-
-The IDV does a lot of computational help for you. 
-An IDV formula or Jython method can be applied, without alteration,
-to a single value, to data from a vertical sounding or a balloon
-track, or to different 2D or 3D grids. All you need is one line of code.
-
-<P>
-
-You can write a simple formula such as (CT*1.8 + 32.0) - dewptF 
-and the IDV
-automatically applies the calculation to every element in large 3D
-grids referred to as CT and dewptF. No loops over grid points are needed;
-and you don't even need to know anything about how the grid is 
-defined, mapped on the Earth, 
-or the data format.  You can even use different sources for the
-individual parameters, for example, CT can come from an Eta model output 
-grid and dewptF from your own local weather model. The two grids need hot have
-the same grid point locations nor the same areal coverage. The results
-are computed in the area of overlap, on the grid points locations of the
-first grid. Interpolation is automatically applied where needed.
-
-
-<div class="pagesubtitle">Defining your own Library of Jython Methods</div>
-
-
 The IDV allows you to write your own Jython methods using the Jython Library editor.
 From the main menu bar, select the [ug::menu Edit Formulas {Jython Library}] menu item.
+
 
 
 [ht::cimg images/JythonLibraryEditor.gif]
@@ -86,10 +13,38 @@ The Jython Library window has a tree view on the left that shows the different
 (categorized) library files available. The files that are listed under &quot;Local Jython&quot;
 are those that you can edit. The  System files  cannot be edited.
 On the right is the edit pane for the selected file. 
-
 <p>
+There is documentation  available for the <a href="JythonLib.html">System Jython Libraries</a>.
 
-You can use this edit window or, optionally you can define the path to an external text editor (e.g., emacs, vi, etc.) 
+<faq>
+
+<faqitem cat="FAQ"></faqitem>
+
+<faqitem q="What is Jython?">
+Jython is a Java implementation of the Pyhton language. It is used within the IDV for data analysis.
+Complex routines can be written in the IDV Jython editor and called from the 
+<a href="Formulas.html">IDV Formulas</a>.
+</faqitem>
+
+
+<faqitem q="How do I learn to write Jython?" name="top" id="learn">
+There are a <a href="http://www.amazon.com/s/ref=nb_ss_gw/002-3107995-7532045?url=search-alias%3Daps&field-keywords=jython&x=0&y=0">number of books</a> available on the language as well as a number of web sites:
+<ul>
+<li> <a href="http://www.python.org">http://www.python.org</a>
+<li> <a href="http://www.jython.org">http://www.jython.org</a>
+</ul>
+</faqitem>
+
+<faqitem q="How does Jython work with my data in the IDV">
+The IDV uses the <a href="http://www.ssec.wisc.edu/~billh/visad.html">VisAD</a> package as 
+as an underlying data model.
+There is a <a href="http://www.ssec.wisc.edu/~tomw/visadtutor/">VisAD/Jython Tutorial</a> available.
+There is also an <a href="http://www.unidata.ucar.edu/software/idv/docs/workshop/formulas/index.html">IDV Workshop Section</a> on writing Jython.
+</faqitem>
+
+<faqitem q="I don't like editing in this editor. How do I use  my own editor.">
+You can use this edit window or, 
+optionally you can define the path to an external text editor (e.g., emacs, vi, etc.) 
 through the main <a href="Preferences.html">User Preferences</a>. Once defined there will be a File menu entry
 in the Jython Library &quot;Edit in External Editor&quot;. The file that is being edited is monitored by the IDV
 and, when it is saved by the external editor is loaded and checked for correct syntax. When the external editor exits
@@ -97,27 +52,50 @@ the file is reinserted into the internal IDV editor.
 
 <p>
 
-When you save the file the code is checked
+When you save the file thought the external editor or the IDV editor the code is checked
 for valid Jython syntax;  If there is an
-error, a pop-up window will appear with the message <b>An exception has
-occurred writing in Jython library</b>. The actual error will also be
-printed in the console window running the IDV. Correct the error and
+error, a pop-up window will appear with an error message.
+The actual error will also be printed in the console window running the IDV. Correct the error and
 try to save again. 
+
+
+</faqitem>
+
+<faqitem q="Creating/Removing library files">
+To create  a new file uses the [ht::menu File {New Jython Library...}] menu. To remove the currently displayed
+library file use the [ht::menu File {Remove Library}] menu. 
+</faqitem>
+
+<faqitem q="Calling procedures from formulas">
+
+When creating a formula with the <a href="Formulas.html">Formula Editor</a>
+you can call any routines you have defined in the Jython Library
+Simply enter the procedure name in the formula, with
+appropriate arguments, if any. For example a formula might be
+&quot;convertCToF(atemp)&quot;.  When evaluating  the formula for display,
+this will cal the routine that you define in the Jython Library.
+
+
+</faqitem>
+<faqitem q="Create a formula from my procedure">
+Right click on a procedure definition within the IDV editor window and choose 
+[ht::menu {Make formula for ...}]. This is a convenience that brings up
+the  Formula creation dialog with a call to that procedure.
 
 <p>
 
+Also, as another convenience you can right click to shw the [ht::menu {Insert Procedure Call}] menu. This
+lists all of the currently defined procedures in the other Jython libraries.
+
+</faqitem>
+
+
+</faq>
 
 
 
 
-<div class="pagesubtitle">Using Jython Methods in Formulas</div>
 
-When writing your formulas you can use any method you created in
-your Jython library.  Simply type the method name in the formula, with
-appropriate dummy arguments, if any. For example a formula might be
-the text "convertCToF(atemp)".  Selecting the formula for display,
-you merely need then to select which parameter from a data source to 
-use for "atemp" for that display.
 
 
 
