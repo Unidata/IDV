@@ -2442,6 +2442,7 @@ public class JythonManager extends IdvManager implements ActionListener {
                 }
                 sb.append("</p>");
             }
+            System.out.println("<a name=\"" + mod + "\">");
             System.out.println("<h2> Module: " + mod + "</h2>");
             if ( !modDoc.equals("None")) {
                 System.out.println(modDoc);
