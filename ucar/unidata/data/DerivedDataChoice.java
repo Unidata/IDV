@@ -367,6 +367,8 @@ public class DerivedDataChoice extends ListDataChoice {
                                  Hashtable requestProperties)
             throws VisADException, RemoteException {
 
+
+
         List      operands      = new ArrayList();
         Hashtable operandsSoFar = new Hashtable();
 
@@ -682,9 +684,13 @@ public class DerivedDataChoice extends ListDataChoice {
      * @throws VisADException     VisAD problem
      */
     protected Data getData(DataCategory category,
-                           DataSelection dataSelection,
+                           DataSelection incomingDataSelection,
                            Hashtable requestProperties)
             throws VisADException, RemoteException, DataCancelException {
+
+        DataSelection dataSelection = DataSelection.merge(incomingDataSelection,
+                                                          myDataSelection);
+
 
         /**
          *  For now, don't do any caching here.
