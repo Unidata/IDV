@@ -1,0 +1,339 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+</head>
+<body>
+
+<style type="text/css">
+.thumbFrame {
+	width: 68px;
+	border: 1px solid #000;}
+
+.thumbnails {
+	float: left;
+	display: inline;
+	height: 493px;
+	overflow: hidden;
+	margin: 0px 0 0 7px;}
+
+.thumbnailControl {
+	position: absolute;
+	cursor: pointer;
+	cursor: hand;
+	overflow: hidden;
+	height: 15px;
+	width: 68px;}
+
+.pressed {
+	border-top: 1px solid #000;
+	border-left: 1px solid #000;}
+
+.thumbnail {
+	text-align: center;
+	margin: 0px;}
+
+.thumbnail img {
+	border: 1px solid #000;
+	margin: 1px;
+	cursor: pointer;
+	cursor: hand;}
+
+.thumbnail.active img {
+	border: 2px solid #F60;
+	margin: 0;}
+</style>
+
+
+
+<script language="javascript">
+
+var lastActive 		= 0;
+var arrImages 		= new Array();
+var arrThumbnails       = new Array();
+var arrCaptions 	= new Array();
+var startingID 		= "1";
+var intSizeChecker      = 0;
+
+var intViewableArea	= 0;
+var intContentArea 	= 0;
+var intCurrentPosition 	= 0;
+var intNewPosition 	= 0;
+var intScrollInterval 	= 0;
+var intScrollSpeed 	= 8; // 1=slow, 10=fast
+var intAmountToJump	= 150;
+
+
+
+if (document.location.hash != '') {
+	if (document.location.hash.search("image=") != -1) {
+		startingID = parseInt(document.location.hash.split("image=")[1]);
+		if (isNaN(startingID)) {
+			startingID = 1;
+		}
+	}
+}
+
+/* Navigation */
+
+function nextPhoto(objClicked) {
+	var nextActive = lastActive + 1;
+	if (nextActive >= arrImages.length) {
+		nextActive = 0;
+	}
+	loadImage(nextActive);
+}
+
+function prevPhoto(objClicked) {
+	var nextActive = lastActive - 1;
+	if (nextActive < 0) {
+		nextActive = arrImages.length - 1
+	}
+	loadImage(nextActive);
+}
+
+
+function scrollRowDown() {
+	if ((intViewableArea != 0) && (intContentArea != 0) && (intViewableArea < intContentArea)) {
+		var intSpaceRemaining = intContentArea - intViewableArea + intCurrentPosition;
+		if (intSpaceRemaining < intAmountToJump) {
+		// if (intSpaceRemaining < intViewableArea) { intNewPosition = intCurrentPosition - intSpaceRemaining;
+			intNewPosition = intCurrentPosition - intSpaceRemaining;
+		} else {
+			intNewPosition = intCurrentPosition - intAmountToJump; // intViewableArea;
+		}
+		scrollToNewPosition();
+	}
+}
+
+function scrollRowUp() {
+	if ((intViewableArea != 0) && (intContentArea != 0) && (intViewableArea < intContentArea)) {
+		var intSpaceRemaining = -(intCurrentPosition);
+		if (intSpaceRemaining < intAmountToJump) { // intViewableArea) {
+			intNewPosition = 0;
+		} else {
+			intNewPosition = intCurrentPosition + intAmountToJump; // intViewableArea;
+		}
+		scrollToNewPosition();
+	}
+}
+
+function scrollUntil() {
+	if (intCurrentPosition < intNewPosition) {
+		var intScrollSegment = Math.ceil((intNewPosition - intCurrentPosition)/intScrollSpeed);
+		intCurrentPosition += intScrollSegment;
+		document.getElementById("thumbTab").style.cssText = "margin-top:" + intCurrentPosition + "px";
+	} else if (intCurrentPosition > intNewPosition) {
+		var intScrollSegment = Math.ceil((intCurrentPosition - intNewPosition)/intScrollSpeed);
+		intCurrentPosition -= intScrollSegment;
+		document.getElementById("thumbTab").style.cssText = "margin-top:" + intCurrentPosition + "px";
+	} else {
+		clearInterval(intScrollInterval);
+	}
+}
+
+function scrollToNewPosition() {
+	clearInterval(intScrollInterval);
+	intScrollInterval = setInterval(scrollUntil, 50);
+}
+
+function scrollToPosition(intPosition) {
+	intNewPosition = intPosition;
+	scrollToNewPosition();
+}
+
+function scrollToPhoto(intPhotoIndex) {
+	var intPhotoPosition = document.getElementById("thumb" + intPhotoIndex).offsetTop;
+	var intNewCalculatedPosition = intCurrentPosition - intPhotoPosition + 20;
+	if (intContentArea > intViewableArea) {
+		if ((intNewCalculatedPosition+20) > -(intContentArea - intViewableArea)) {
+			scrollToPosition(intNewCalculatedPosition);
+		} else {
+			scrollToPosition(-(intContentArea - intViewableArea));
+		}
+	}
+}
+
+function scrollHome() {
+	scrollToPosition(0);
+}
+
+function scrollEnd() {
+	scrollToPosition(-(intContentArea - intViewableArea));
+}
+
+function buttonPush(e) {
+	if (!e) var e = window.event;
+	if (e.button != 2) {
+		document.getElementById(this.id).style.cssText = "border: 1px solid #000; ";
+	}
+}
+
+function buttonRelease(e) {
+	if (!e) var e = window.event;
+	if (e.button != 2) {
+		document.getElementById(this.id).style.cssText = "";
+	}
+}
+
+function buttonMenu() {
+	return false;
+}
+
+
+
+/* Image Loading */
+
+function loadImage(intImageIndex) {
+	if (arrImages.length == 1) {
+		document.getElementById("photoFrame").className = "photoFrame expanded";
+	}
+	document.getElementById("photo").src = "/resources/images/loadingImage.gif";
+	document.getElementById("thumb" + lastActive).className = "thumbnail";
+	document.getElementById("photo").src = arrImages[intImageIndex];
+	document.getElementById("caption").innerHTML =  arrCaptions[intImageIndex];
+	document.getElementById("thumb" + intImageIndex).className = "thumbnail active";
+	document.getElementById("photoId").innerHTML = (intImageIndex+1) + " of " + arrImages.length;
+	document.location.hash = "image=" + (intImageIndex+1);
+	lastActive = intImageIndex;
+	//checkViewableArea();
+	scrollToPhoto(intImageIndex);
+}
+
+function loadThumbs() {
+	for (j=0; j<arrImages.length; j++) {
+		document.write('<div id="thumb' + j + '" class="thumbnail" onclick="javascript:loadImage(' + j + ');return false;">');
+		document.write('<table cellpadding="0" cellspacing="0"><tr><td align="center" valign="middle"><img id="img' + j + '" src="' + arrThumbnails[j] + '" alt="Thumbnail" title="Click to view full image" /></td></tr></table></div>');
+	}
+	if (arrImages.length == 1) {
+		document.getElementById("thumbFrame").className = "hidden";
+		document.getElementById("prevButton").className = "hidden";
+		document.getElementById("nextButton").className = "hidden";
+	}
+}
+
+
+
+/* Initialization */
+
+function initImage(intImageIndex) {
+	intImageIndex = intImageIndex - 1;
+	if (intImageIndex >= arrImages.length) {
+		intImageIndex = 0;
+	}
+	loadImage(intImageIndex);
+	checkViewableArea();
+	if (typeof(window['strAudioFile']) != 'undefined'){
+		document.getElementById("photoCaption").className = "photoCaption withAudio";
+	}
+	initButtons();
+	intSizeChecker = setTimeout(checkViewableArea, 1000);
+	if (arrImages.length == 1) {
+		document.getElementById("photo").title = "";
+	}
+}
+
+function checkViewableArea() {
+	intViewableArea = document.getElementById("thumbnails").offsetHeight;
+	intContentArea = document.getElementById("thumbTab").offsetHeight;
+	if ((intViewableArea - 30) > (intContentArea - 72)) {
+		disableButton("controlUp");
+		disableButton("controlDown");
+	} else {
+		enableButton("controlUp");
+		enableButton("controlDown");
+		clearInterval(intSizeChecker);
+	}
+}
+
+function disableButton(buttonId) {
+	document.getElementById(buttonId).className = "hidden";
+}
+
+function enableButton(buttonId) {
+	document.getElementById(buttonId).className = "";
+}
+
+function initButtons() {
+	document.getElementById("controlUp").onclick = scrollRowUp;
+	document.getElementById("controlUp").ondblclick = scrollHome;
+	document.getElementById("controlDown").onclick= scrollRowDown;
+	document.getElementById("controlDown").ondblclick = scrollEnd;
+	document.getElementById("controlUp").oncontextmenu = buttonMenu;
+	document.getElementById("controlDown").oncontextmenu= buttonMenu;
+	
+	document.getElementById("controlUp").onmousedown = buttonPush;
+	document.getElementById("controlDown").onmousedown = buttonPush;
+	document.getElementById("controlUp").onmouseup = buttonRelease;
+	document.getElementById("controlDown").onmouseup = buttonRelease;
+}
+
+
+
+//var strImagePrefix = "http://i.today.reuters.com/pictures/";
+var strImagePrefix = "";
+
+
+function addImage(image,thumb,caption) {
+	arrImages[arrImages.length] = strImagePrefix + image;
+	arrThumbnails[arrThumbnails.length] = strImagePrefix + thumb;
+	arrCaptions[arrCaptions.length] = caption;
+}
+
+${imagelist}
+
+//addImage("galleries/Stories/633260111339375000/Previews/02_RTR1ME8B.jpg",
+//"galleries/Stories/633260111339375000/SmallThumbnails/02_RTR1ME8B.jpg",
+//"Lebanese supporters of assassinated Prime Minister Rafik al-Hariri wave flags as blue balloons fly over Martyrs Square during a mass rally in Beirut February 14, 2007. &nbsp;REUTERS/Sharif Karim");
+//
+
+</script>
+
+
+
+<table width="100%" border="0">
+<tr>
+    <td colspan="2"><table width="100%"><tr><td></td><td align=right><div id="photoId"></div></td></table></td>
+    <td>
+    <a id="prevButton" href="javascript:prevPhoto();">Previous</a>
+    <a id="nextButton" href="javascript:nextPhoto();">Next</a>
+    </td>
+</tr>
+
+
+<tr valign="top">
+<td>
+<div  class="thumbFrame">
+   <div><img id="controlUp" src="${root}/up.gif" alt="scroll up" border="0"></div>
+   <div class="thumbnails" id="thumbnails">
+	<div id="thumbTab">
+             <script language="javascript">loadThumbs();</script></div>
+	</div>
+    <div><img id="controlDown" src="${root}/down.gif" alt="scroll down" border="0"></div>
+</div>
+</td>
+
+<td width="50%">
+<div id="photoFrame" class="photoFrame">
+	<table id="mainImage" class="mainImage" border="0" cellpadding="0" cellspacing="0" width="100%">
+	<tr>
+	<td id="mainPhotoContainer" valign="top">
+	<a href="javascript:nextPhoto();" id="photoArea"><img id="photo" src="${root}/loading.jpg" alt="Photo" title="Click for next image" border="0" width="500"></a>
+	</td>
+	</tr>
+	</table>
+</div>
+</td>
+
+<td width="40%">
+<div class="photoCaption" id="photoCaption" align="top"><span id="caption"></span></div>
+</td>
+</table>
+
+
+
+<script language="javascript">initImage(startingID);</script>
+
+
+
+
+</body></html>
