@@ -3236,8 +3236,8 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         AddeImageDescriptor aid = (AddeImageDescriptor) imageList.get(0);
         dim[0] = aid.getImageInfo().getElements();
         dim[1] = aid.getImageInfo().getLines();
-        System.err.println("dim:" + dim[0] + " x " + dim[1] + " # images:"
-                           + imageList.size());
+        //System.err.println("dim:" + dim[0] + " x " + dim[1] + " # images:"
+        //                   + imageList.size());
         int    numPixels = dim[0] * dim[1] * imageList.size();
         double megs      = (4 * numPixels) / (double) 1000000;
 
