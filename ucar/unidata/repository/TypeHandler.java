@@ -296,8 +296,7 @@ public class TypeHandler implements Constants, Tables {
                 sb.append("</ul>\n");
             }
 
-        } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {}
-        else if (output.equals(DefaultOutputHandler.OUTPUT_CSV)) {}
+        } else if (output.equals(XmlOutputHandler.OUTPUT_XML)) {}
         return sb;
     }
 
@@ -471,8 +470,7 @@ public class TypeHandler implements Constants, Tables {
                                 XmlUtil.attr(ARG_WIDTH, "400"))));
             }
 
-        } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {}
-        else if (output.equals(DefaultOutputHandler.OUTPUT_CSV)) {}
+        } else if (output.equals(XmlOutputHandler.OUTPUT_XML)) {}
         return sb;
     }
 

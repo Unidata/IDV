@@ -95,6 +95,7 @@ public class MetaDataServer extends HttpServer  implements Constants {
             throws Exception {
             cache = result.getCacheOk();
             if(result.getRedirectUrl()!=null) {
+                cache = false;
                 redirect(result.getRedirectUrl());
             } else   if(result.getInputStream()!=null) {
                 writeResult(result.getRequestOk(), result.getInputStream(),

@@ -289,6 +289,7 @@ public class PatternHarvester extends Harvester {
      *
      * @throws Exception _more_
      */
+    int dcnt=0;
     public List<Entry> collectFromPattern(File rootDir, List<FileInfo> dirs,
                                           boolean firstTime,
                                           String rootGroup,
@@ -312,6 +313,10 @@ public class PatternHarvester extends Harvester {
                 fileName = fileName.replace("\\", "/");
                 Matcher matcher = filePattern.matcher(fileName);
                 if ( !matcher.find()) {
+                    if(dcnt++<50) {
+                        System.err.println(":"+filePatternString+":");
+                        System.err.println(fileName);
+                    }
                     continue;
                 }
                 if (entries.size() % 1000 == 0) {

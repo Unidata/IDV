@@ -78,20 +78,13 @@ import java.util.zip.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class DefaultOutputHandler extends OutputHandler {
-
-
-    /** _more_ */
-    public static final String OUTPUT_XML = "default.xml";
+public class HtmlOutputHandler extends OutputHandler {
 
 
 
     /** _more_ */
     public static final String OUTPUT_TIMELINE = "default.timeline";
 
-
-    /** _more_ */
-    public static final String OUTPUT_CSV = "default.csv";
 
     /** _more_ */
     public static final String OUTPUT_GRAPH = "default.graph";
@@ -108,7 +101,7 @@ public class DefaultOutputHandler extends OutputHandler {
      * @param element _more_
      * @throws Exception _more_
      */
-    public DefaultOutputHandler(Repository repository, Element element)
+    public HtmlOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
     }
@@ -123,9 +116,7 @@ public class DefaultOutputHandler extends OutputHandler {
     public boolean canHandle(Request request) {
         String output = (String) request.getOutput();
         return output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)
-               || output.equals(OUTPUT_XML) || output.equals(OUTPUT_CSV)
-               || output.equals(OUTPUT_GRAPH) || output.equals(OUTPUT_CLOUD)
-               || output.equals(OUTPUT_ZIP);
+            || output.equals(OUTPUT_GRAPH) || output.equals(OUTPUT_CLOUD);
     }
 
 
@@ -147,27 +138,18 @@ public class DefaultOutputHandler extends OutputHandler {
             if (repository.isAppletEnabled(request)) {
                 list.add(new TwoFacedObject("Timeline", OUTPUT_TIMELINE));
             }
-            list.add(new TwoFacedObject("CSV", OUTPUT_CSV));
         } else if (what.equals(WHAT_TAG)) {
             list.add(new TwoFacedObject("Tag Html", OUTPUT_HTML));
             list.add(new TwoFacedObject("Tag Cloud", OUTPUT_CLOUD));
-            list.add(new TwoFacedObject("Tag XML", OUTPUT_XML));
-            list.add(new TwoFacedObject("Tag CSV", OUTPUT_CSV));
         } else if (what.equals(WHAT_TYPE)) {
             list.add(new TwoFacedObject("Type Html", OUTPUT_HTML));
-            list.add(new TwoFacedObject("Type XML", OUTPUT_XML));
-            list.add(new TwoFacedObject("Type CSV", OUTPUT_CSV));
         } else if (what.equals(WHAT_GROUP)) {
             list.add(new TwoFacedObject("Group Html", OUTPUT_HTML));
             if (repository.isAppletEnabled(request)) {
                 list.add(new TwoFacedObject("Timeline", OUTPUT_TIMELINE));
             }
-            list.add(new TwoFacedObject("Group XML", OUTPUT_XML));
-            list.add(new TwoFacedObject("Group CSV", OUTPUT_CSV));
         } else {
             list.add(new TwoFacedObject("Html", OUTPUT_HTML));
-            list.add(new TwoFacedObject("XML", OUTPUT_XML));
-            list.add(new TwoFacedObject("CSV", OUTPUT_CSV));
         }
         return list;
     }
@@ -186,8 +168,6 @@ public class DefaultOutputHandler extends OutputHandler {
         List list = new ArrayList();
         list.add(new TwoFacedObject("Html", OUTPUT_HTML));
         list.add(new TwoFacedObject("Html with timeline", OUTPUT_TIMELINE));
-        list.add(new TwoFacedObject("CSV", OUTPUT_CSV));
-        list.add(new TwoFacedObject("Zip File", OUTPUT_ZIP));
         return list;
     }
 
@@ -229,36 +209,17 @@ public class DefaultOutputHandler extends OutputHandler {
         if (output.equals(OUTPUT_HTML)) {
             sb.append(repository.header("Groups"));
             sb.append("<ul>");
-        } else if (output.equals(OUTPUT_XML)) {
-            sb.append(XmlUtil.XML_HEADER);
-            sb.append("\n");
-            sb.append(XmlUtil.openTag(TAG_GROUPS));
-
-        } else if (output.equals(OUTPUT_CSV)) {}
-        else {
-            throw new IllegalArgumentException("Unknown output type:"
-                    + output);
         }
 
         for (Group group : groups) {
             if (output.equals(OUTPUT_HTML)) {
                 sb.append("<li>" + getAllGroupLinks(request, group) + " "
                           + group.getFullName());
-            } else if (output.equals(OUTPUT_XML)) {
-                sb.append(XmlUtil.tag(TAG_GROUP,
-                                      XmlUtil.attrs(ATTR_NAME,
-                                          group.getFullName(), ATTR_ID,
-                                          group.getId())));
-            } else if (output.equals(OUTPUT_CSV)) {
-                sb.append(SqlUtil.comma(group.getFullName(), group.getId()));
-                sb.append("\n");
             }
 
         }
         if (output.equals(OUTPUT_HTML)) {
             sb.append("</ul>\n");
-        } else if (output.equals(OUTPUT_XML)) {
-            sb.append(XmlUtil.closeTag(TAG_GROUPS));
         }
         return new Result("", sb, getMimeType(output));
     }
@@ -336,43 +297,18 @@ public class DefaultOutputHandler extends OutputHandler {
         String[]     groups = SqlUtil.readString(statement, 1);
         StringBuffer sb     = new StringBuffer();
         String       output = request.getOutput();
-        if (output.equals(OUTPUT_HTML)) {
-            sb.append(repository.header("Groups"));
-            sb.append("<ul>");
-        } else if (output.equals(OUTPUT_XML)) {
-            sb.append(XmlUtil.XML_HEADER + "\n");
-            sb.append(XmlUtil.openTag(TAG_GROUPS));
-
-        } else if (output.equals(OUTPUT_CSV)) {}
-        else {
-            throw new IllegalArgumentException("Unknown output type:"
-                    + output);
-        }
-
+        sb.append(repository.header("Groups"));
+        sb.append("<ul>");
         for (int i = 0; i < groups.length; i++) {
             Group group = repository.findGroup(groups[i]);
             if (group == null) {
                 continue;
             }
-
-            if (output.equals(OUTPUT_HTML)) {
-                sb.append("<li>" + getAllGroupLinks(request, group) + " "
-                          + group.getFullName());
-            } else if (output.equals(OUTPUT_XML)) {
-                sb.append(XmlUtil.tag(TAG_GROUP,
-                                      XmlUtil.attrs(ATTR_NAME,
-                                          group.getFullName(), ATTR_ID,
-                                          group.getId())));
-            } else if (output.equals(OUTPUT_CSV)) {
-                sb.append(SqlUtil.comma(group.getFullName(), group.getId()));
-                sb.append("\n");
-            }
-
+            sb.append("<li>" + getAllGroupLinks(request, group) + " "
+                      + group.getFullName());
         }
         if (output.equals(OUTPUT_HTML)) {
             sb.append("</ul>\n");
-        } else if (output.equals(OUTPUT_XML)) {
-            sb.append(XmlUtil.closeTag(TAG_GROUPS));
         }
 
         return new Result("", sb, getMimeType(output));
@@ -399,13 +335,6 @@ public class DefaultOutputHandler extends OutputHandler {
         if (output.equals(OUTPUT_HTML)) {
             appendListHeader(request, output, WHAT_TYPE, sb);
             sb.append("<ul>");
-        } else if (output.equals(OUTPUT_XML)) {
-            sb.append(XmlUtil.XML_HEADER + "\n");
-            sb.append(XmlUtil.openTag(TAG_TYPES));
-        } else if (output.equals(OUTPUT_CSV)) {}
-        else {
-            throw new IllegalArgumentException("Unknown output type:"
-                    + output);
         }
 
         for (TypeHandler theTypeHandler : typeHandlers) {
@@ -424,21 +353,11 @@ public class DefaultOutputHandler extends OutputHandler {
                         .url(repository.URL_LIST_HOME, ARG_TYPE,
                              theTypeHandler.getType()), theTypeHandler
                                  .getType()));
-            } else if (output.equals(OUTPUT_XML)) {
-                sb.append(XmlUtil.tag(TAG_TYPE,
-                                      XmlUtil.attrs(ATTR_TYPE,
-                                          theTypeHandler.getType())));
-            } else if (output.equals(OUTPUT_CSV)) {
-                sb.append(SqlUtil.comma(theTypeHandler.getType(),
-                                        theTypeHandler.getDescription()));
-                sb.append("\n");
             }
 
         }
         if (output.equals(OUTPUT_HTML)) {
             sb.append("</ul>");
-        } else if (output.equals(OUTPUT_XML)) {
-            sb.append(XmlUtil.closeTag(TAG_TYPES));
         }
         return new Result("", sb, getMimeType(output));
     }
@@ -504,13 +423,6 @@ public class DefaultOutputHandler extends OutputHandler {
         if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_CLOUD)) {
             appendListHeader(request, output, WHAT_TAG, sb);
             sb.append("<ul>");
-        } else if (output.equals(OUTPUT_XML)) {
-            sb.append(XmlUtil.XML_HEADER + "\n");
-            sb.append(XmlUtil.openTag(TAG_TAGS));
-        } else if (output.equals(OUTPUT_CSV)) {}
-        else {
-            throw new IllegalArgumentException("Unknown output type:"
-                    + output);
         }
         request.remove(ARG_OUTPUT);
         int max = -1;
@@ -552,13 +464,7 @@ public class DefaultOutputHandler extends OutputHandler {
                             ARG_NODETYPE, TYPE_TAG), tag.getName(), extra));
                 sb.append("</span>");
                 sb.append(" &nbsp; ");
-            } else if (output.equals(OUTPUT_XML)) {
-                sb.append(XmlUtil.tag(TAG_TAG,
-                                      XmlUtil.attrs(ATTR_NAME,
-                                          tag.getName())));
-            } else if (output.equals(OUTPUT_CSV)) {
-                sb.append(tag.getName());
-                sb.append("\n");
+
             }
         }
 
@@ -574,8 +480,6 @@ public class DefaultOutputHandler extends OutputHandler {
                 sb.append("No tags found");
             }
             pageTitle = "Tag Cloud";
-        } else if (output.equals(OUTPUT_XML)) {
-            sb.append(XmlUtil.closeTag(TAG_TAGS));
         }
         Result result = new Result(pageTitle, sb, getMimeType(output));
         //        StringBuffer  tsb = new StringBuffer();
@@ -593,11 +497,7 @@ public class DefaultOutputHandler extends OutputHandler {
      * @return _more_
      */
     public String getMimeType(String output) {
-        if (output.equals(OUTPUT_CSV)) {
-            return repository.getMimeTypeFromSuffix(".csv");
-        } else if (output.equals(OUTPUT_XML)) {
-            return repository.getMimeTypeFromSuffix(".xml");
-        } else if (output.equals(OUTPUT_TIMELINE)) {
+        if (output.equals(OUTPUT_TIMELINE)) {
             return repository.getMimeTypeFromSuffix(".html");
         } else if (output.equals(OUTPUT_GRAPH)) {
             return repository.getMimeTypeFromSuffix(".xml");
@@ -605,8 +505,6 @@ public class DefaultOutputHandler extends OutputHandler {
             return repository.getMimeTypeFromSuffix(".html");
         } else if (output.equals(OUTPUT_CLOUD)) {
             return repository.getMimeTypeFromSuffix(".html");
-        } else if (output.equals(OUTPUT_ZIP)) {
-            return repository.getMimeTypeFromSuffix(".zip");
         } else {
             return super.getMimeType(output);
         }
@@ -630,13 +528,6 @@ public class DefaultOutputHandler extends OutputHandler {
             sb.append("<ul>");
         } else if (output.equals(OUTPUT_CLOUD)) {
             sb.append(repository.header("Association Cloud"));
-        } else if (output.equals(OUTPUT_XML)) {
-            sb.append(XmlUtil.XML_HEADER + "\n");
-            sb.append(XmlUtil.openTag(TAG_ASSOCIATIONS));
-        } else if (output.equals(OUTPUT_CSV)) {}
-        else {
-            throw new IllegalArgumentException("Unknown output type:"
-                    + output);
         }
         TypeHandler typeHandler = repository.getTypeHandler(request);
         List        where       = typeHandler.assembleWhereClause(request);
@@ -716,12 +607,6 @@ public class DefaultOutputHandler extends OutputHandler {
                                 extra));
                 sb.append("</span>");
                 sb.append(" &nbsp; ");
-            } else if (output.equals(OUTPUT_XML)) {
-                sb.append(XmlUtil.tag(TAG_ASSOCIATION,
-                                      XmlUtil.attrs(ATTR_NAME, association)));
-            } else if (output.equals(OUTPUT_CSV)) {
-                sb.append(association);
-                sb.append("\n");
             }
         }
 
@@ -731,8 +616,6 @@ public class DefaultOutputHandler extends OutputHandler {
             sb.append("</ul>");
         } else if (output.equals(OUTPUT_CLOUD)) {
             pageTitle = "Association Cloud";
-        } else if (output.equals(OUTPUT_XML)) {
-            sb.append(XmlUtil.closeTag(TAG_ASSOCIATIONS));
         }
         return new Result(pageTitle, sb, getMimeType(output));
 
@@ -758,9 +641,6 @@ public class DefaultOutputHandler extends OutputHandler {
                                    List<Group> subGroups, List<Entry> entries)
             throws Exception {
         String output = request.getOutput();
-        if (output.equals(OUTPUT_XML) || output.equals(OUTPUT_CSV)) {
-            return listGroups(request, subGroups);
-        }
         boolean      showApplet = repository.isAppletEnabled(request);
         String       title      = group.getFullName();
         StringBuffer sb         = new StringBuffer();
@@ -842,9 +722,6 @@ public class DefaultOutputHandler extends OutputHandler {
     public Result processShowGroups(Request request, List<Group> groups)
             throws Exception {
         String output = request.getOutput();
-        if (output.equals(OUTPUT_XML) || output.equals(OUTPUT_CSV)) {
-            return listGroups(request, groups);
-        }
         StringBuffer sb    = new StringBuffer();
         String       title = "Groups";
 
@@ -947,13 +824,7 @@ public class DefaultOutputHandler extends OutputHandler {
             }
             sb.append("<table>");
             showApplet = showApplet & output.equals(OUTPUT_TIMELINE);
-        } else if (output.equals(OUTPUT_ZIP)) {
-            return toZip(request, entries);
-        } else if (output.equals(OUTPUT_CSV)) {}
-        else {
-            throw new IllegalArgumentException("Unknown output type:"
-                    + output);
-        }
+        } 
 
 
         StringBufferCollection sbc = new StringBufferCollection();
@@ -973,8 +844,6 @@ public class DefaultOutputHandler extends OutputHandler {
                         ARG_ID, entry.getId()), entry.getName());
                 String col2 = "" + new Date(entry.getStartDate());
                 ssb.append(HtmlUtil.row(HtmlUtil.cols(col1, col2)));
-            } else if (output.equals(OUTPUT_CSV)) {
-                sb.append(SqlUtil.comma(entry.getId(), entry.getResource()));
             }
         }
 
@@ -1021,40 +890,6 @@ public class DefaultOutputHandler extends OutputHandler {
     }
 
 
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entries _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Result toZip(Request request, List<Entry> entries)
-            throws Exception {
-        ByteArrayOutputStream bos  = new ByteArrayOutputStream();
-        ZipOutputStream       zos  = new ZipOutputStream(bos);
-        Hashtable             seen = new Hashtable();
-        for (Entry entry : entries) {
-            String path = entry.getResource();
-            String name = IOUtil.getFileTail(path);
-            int    cnt  = 1;
-            while (seen.get(name) != null) {
-                name = (cnt++) + "_" + name;
-            }
-            seen.put(name, name);
-            zos.putNextEntry(new ZipEntry(name));
-            byte[] bytes = IOUtil.readBytes(IOUtil.getInputStream(path,
-                               getClass()));
-            zos.write(bytes, 0, bytes.length);
-            zos.closeEntry();
-        }
-        zos.close();
-        bos.close();
-        return new Result("", bos.toByteArray(), getMimeType(OUTPUT_ZIP));
-    }
 
 
 }

@@ -1,5 +1,6 @@
 <entries>
   <entry name="model"  description="Models">
+
      <column name="modelgroup" type="string" isindex="true" cansearch="true" searchtype="select" label="Model Group"/>
      <column name="modelrun" type="string" isindex="true" cansearch="true" searchtype="select"  label="Model Run"/>
   </entry>

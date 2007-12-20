@@ -146,8 +146,6 @@ public class Repository implements Constants, Tables, RequestHandler {
     /** _more_ */
     private static final int PAGE_CACHE_LIMIT = 100;
 
-    /** _more_ */
-    private Harvester harvester;
 
     /** _more_ */
     private List<Harvester> harvesters = new ArrayList();
@@ -201,6 +199,7 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
     private Object  MUTEX_GROUP = new Object();
+    private Object  MUTEX_INSERT = new Object();
 
 
     /** _more_ */
@@ -343,7 +342,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             System.setProperty("derby.system.home", derbyHome);
         }
 
-        harvester = new Harvester(this);
+
         Misc.findClass((String) properties.get(PROP_DB_DRIVER));
 
     }
@@ -555,8 +554,8 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @throws Exception _more_
      */
     protected void initHarvesters() throws Exception {
+        boolean okToStart = getProperty("jdms.doharvesters",true);
         try {
-            if(!getProperty("jdms.doharvesters",true)) return;
             Element root =
                 XmlUtil.getRoot(
                     "/ucar/unidata/repository/resources/harvesters.xml",
@@ -578,7 +577,9 @@ public class Repository implements Constants, Tables, RequestHandler {
             throw exc;
         }
         for (Harvester harvester : harvesters) {
-            if (harvester.getActive()) {
+            if (!okToStart) {
+                harvester.setActive(false);
+            } else if (harvester.getActive()) {
                 Misc.run(harvester, "run");
             }
         }
@@ -868,27 +869,9 @@ public class Repository implements Constants, Tables, RequestHandler {
 
         makeUserIfNeeded(new User("jdoe", "John Doe", true));
         makeUserIfNeeded(new User("anonymous", "Anonymous", false));
-        loadTestData();
     }
 
 
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    public void loadTestData() throws Exception {
-        ResultSet results = execute("select count(*) from "
-                                    + TABLE_ENTRIES).getResultSet();
-        results.next();
-        File rootDir =
-            new File(
-                "c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
-        if ( !rootDir.exists()) {
-            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
-        }
-        TypeHandler typeHandler = getTypeHandler("file");
-    }
 
 
     /**
@@ -1027,6 +1010,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      */
     public Result adminHarvesters(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
+        System.err.println("action:" + request);
         if(request.defined(ARG_ACTION)) {
             String action = request.getString(ARG_ACTION,"");
             int id = request.get(ARG_ID,0);
@@ -1034,9 +1018,11 @@ public class Repository implements Constants, Tables, RequestHandler {
             if(action.equals("stop")) {
                 harvester.setActive(false);
             } else if(action.equals("start")) {
+                System.err.println("start:" +harvester.getActive() + " " + harvester.getName());
                 if(!harvester.getActive()) 
                     Misc.run(harvester,"run");
             }
+            //            return new Result(URL_ADMIN_HARVESTERS);
         }
 
 
@@ -3384,7 +3370,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @throws Exception _more_
      */
     public void insertEntries(TypeHandler typeHandler, List<Entry> entries)
-            throws Exception {
+        throws Exception {
         if (entries.size() == 0) {
             return;
         }
@@ -3404,56 +3390,57 @@ public class Repository implements Constants, Tables, RequestHandler {
             connection.prepareStatement(INSERT_TAGS);
 
         int batchCnt = 0;
-        connection.setAutoCommit(false);
-        for (Entry entry : entries) {
-            if ((++cnt) % 5000 == 0) {
-                long   tt2      = System.currentTimeMillis();
-                double tseconds = (tt2 - t1) / 1000.0;
-                System.err.println("# " + cnt + " rate: "
-                                   + ((int) (cnt / tseconds)) + "/s");
-            }
-            String id = getGUID();
-            setStatement(entry, entryInsert);
-            entryInsert.addBatch();
+        synchronized(MUTEX_INSERT) {
+            connection.setAutoCommit(false);
+            for (Entry entry : entries) {
+                if ((++cnt) % 5000 == 0) {
+                    long   tt2      = System.currentTimeMillis();
+                    double tseconds = (tt2 - t1) / 1000.0;
+                    System.err.println("# " + cnt + " rate: "
+                                       + ((int) (cnt / tseconds)) + "/s");
+                }
+                String id = getGUID();
+                setStatement(entry, entryInsert);
+                entryInsert.addBatch();
 
-            if (typeInsert != null) {
-                typeHandler.setStatement(entry, typeInsert);
-                typeInsert.addBatch();
-            }
-            List<String> tags = entry.getTags();
-            if (tags != null) {
-                for (String tag : tags) {
-                    tagsInsert.setString(1, tag);
-                    tagsInsert.setString(2, entry.getId());
-                    batchCnt++;
-                    tagsInsert.addBatch();
+                if (typeInsert != null) {
+                    typeHandler.setStatement(entry, typeInsert);
+                    typeInsert.addBatch();
+                }
+                List<String> tags = entry.getTags();
+                if (tags != null) {
+                    for (String tag : tags) {
+                        tagsInsert.setString(1, tag);
+                        tagsInsert.setString(2, entry.getId());
+                        batchCnt++;
+                        tagsInsert.addBatch();
+                    }
+                }
+
+
+                batchCnt++;
+                if (batchCnt > 100) {
+                    entryInsert.executeBatch();
+                    tagsInsert.executeBatch();
+                    if (typeInsert != null) {
+                        typeInsert.executeBatch();
+                    }
+                    batchCnt = 0;
+                }
+                for (Metadata metadata : entry.getMetadata()) {
+                    insertMetadata(metadata);
                 }
             }
-
-
-            batchCnt++;
-            if (batchCnt > 100) {
+            if (batchCnt > 0) {
                 entryInsert.executeBatch();
                 tagsInsert.executeBatch();
                 if (typeInsert != null) {
                     typeInsert.executeBatch();
                 }
-                batchCnt = 0;
             }
-            for (Metadata metadata : entry.getMetadata()) {
-                insertMetadata(metadata);
-            }
+            connection.commit();
+            connection.setAutoCommit(true);
         }
-        if (batchCnt > 0) {
-            entryInsert.executeBatch();
-            tagsInsert.executeBatch();
-            if (typeInsert != null) {
-                typeInsert.executeBatch();
-            }
-        }
-        connection.commit();
-        connection.setAutoCommit(true);
-        System.err.println("done");
     }
 
 
@@ -3550,36 +3537,6 @@ public class Repository implements Constants, Tables, RequestHandler {
     /**
      * _more_
      *
-     *
-     * @throws Exception _more_
-     */
-    public void loadModelFiles() throws Exception {
-        File        rootDir     = new File("/data/ldm/gempak/model");
-        TypeHandler typeHandler = getTypeHandler("model");
-        List<Entry> entries = harvester.collectModelFiles(rootDir,
-                                  "IDD/Model", typeHandler);
-        insertEntries(typeHandler, entries);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    public void loadSatelliteFiles() throws Exception {
-        File        rootDir     = new File("/data/ldm/gempak/images/sat");
-        TypeHandler typeHandler = getTypeHandler("satellite");
-        List<Entry> entries = harvester.collectSatelliteFiles(rootDir,
-                                  "IDD/Satellite", typeHandler);
-        insertEntries(typeHandler, entries);
-    }
-
-
-
-    /**
-     * _more_
-     *
      * @param harvester _more_
      * @param typeHandler _more_
      * @param entries _more_
@@ -3646,58 +3603,6 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    public void loadTestFiles() throws Exception {
-        File rootDir =
-            new File(
-                "c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar/unidata");
-        if ( !rootDir.exists()) {
-            rootDir = new File("/harpo/jeffmc/src/idv/trunk/ucar/unidata");
-        }
-        TypeHandler    typeHandler = getTypeHandler("file");
-        List<FileInfo> dirs        = new ArrayList();
-        List<Entry> entries = harvester.collectFiles(rootDir, "Files",
-                                  typeHandler, dirs);
-        insertEntries(typeHandler, entries);
-        Hashtable javaFiles = new Hashtable();
-        for (Entry entry : entries) {
-            if (entry.getResource().endsWith(".java")) {
-                javaFiles.put(entry.getResource(), entry);
-            }
-        }
-        PreparedStatement associationInsert =
-            connection.prepareStatement(INSERT_ASSOCIATIONS);
-        for (Entry entry : entries) {
-            String f = entry.getResource();
-            if (f.endsWith(".class")) {
-                int idx = f.indexOf("$");
-                if (idx >= 0) {
-                    f = f.substring(0, idx) + ".java";
-                } else {
-                    idx = f.indexOf(".class");
-                    f   = f.substring(0, idx) + ".java";
-                }
-                Entry javaEntry = (Entry) javaFiles.get(f);
-                if (javaEntry == null) {
-                    //                    System.err.println ("??:" + f);                    
-                } else {
-                    int col = 1;
-                    associationInsert.setString(col++, "compiledfrom");
-                    associationInsert.setString(col++, javaEntry.getId());
-                    associationInsert.setString(col++, entry.getId());
-                    associationInsert.execute();
-                }
-            }
-
-        }
-
-
-
-    }
 
     /**
      * _more_

@@ -192,14 +192,9 @@ public class GenericTypeHandler extends TypeHandler {
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             sb.append(repository.header(title));
             sb.append("<ul>");
-        } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {
+        } else if (output.equals(XmlOutputHandler.OUTPUT_XML)) {
             sb.append(XmlUtil.XML_HEADER + "\n");
             sb.append(XmlUtil.openTag(tag + "s"));
-
-        } else if (output.equals(DefaultOutputHandler.OUTPUT_CSV)) {}
-        else {
-            throw new IllegalArgumentException("Unknown output type:"
-                    + output);
         }
 
         for (int i = 0; i < values.length; i++) {
@@ -207,18 +202,18 @@ public class GenericTypeHandler extends TypeHandler {
             if (output.equals(OutputHandler.OUTPUT_HTML)) {
                 sb.append("<li>");
                 sb.append(longName);
-            } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {
+            } else if (output.equals(XmlOutputHandler.OUTPUT_XML)) {
                 sb.append(XmlUtil.tag(tag,
                                       XmlUtil.attrs(ATTR_ID, values[i],
                                           ATTR_NAME, longName)));
-            } else if (output.equals(DefaultOutputHandler.OUTPUT_CSV)) {
+            } else if (output.equals(CsvOutputHandler.OUTPUT_CSV)) {
                 sb.append(SqlUtil.comma(values[i], longName));
                 sb.append("\n");
             }
         }
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             sb.append("</ul>");
-        } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {
+        } else if (output.equals(XmlOutputHandler.OUTPUT_XML)) {
             sb.append(XmlUtil.closeTag(tag + "s"));
         }
         return new Result(
@@ -370,8 +365,7 @@ public class GenericTypeHandler extends TypeHandler {
                 }
 
             }
-        } else if (output.equals(DefaultOutputHandler.OUTPUT_XML)) {}
-        else if (output.equals(DefaultOutputHandler.OUTPUT_CSV)) {}
+        } else if (output.equals(XmlOutputHandler.OUTPUT_XML)) {}
         return sb;
     }
 

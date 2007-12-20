@@ -222,7 +222,7 @@ public class ImageOutputHandler extends OutputHandler {
                 if ( !ImageUtils.isImage(entry.getResource())) {
                     continue;
                 }
-                String url = HtmlUtil.url(repository.URL_GETENTRY
+                String url = HtmlUtil.url(repository.URL_GETENTRY+"/"
                                           + entry.getName(), ARG_ID,
                                               entry.getId());
                 if (cnt == 0) {

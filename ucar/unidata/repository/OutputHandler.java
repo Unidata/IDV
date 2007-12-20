@@ -82,8 +82,6 @@ public class OutputHandler implements Constants, Tables {
     /** _more_ */
     public static final String OUTPUT_HTML = "default.html";
 
-    /** _more_ */
-    public static final String OUTPUT_ZIP = "default.zip";
 
 
 
@@ -482,40 +480,6 @@ public class OutputHandler implements Constants, Tables {
     }
 
 
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entries _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Result toZip(Request request, List<Entry> entries)
-            throws Exception {
-        ByteArrayOutputStream bos  = new ByteArrayOutputStream();
-        ZipOutputStream       zos  = new ZipOutputStream(bos);
-        Hashtable             seen = new Hashtable();
-        for (Entry entry : entries) {
-            String path = entry.getResource();
-            String name = IOUtil.getFileTail(path);
-            int    cnt  = 1;
-            while (seen.get(name) != null) {
-                name = (cnt++) + "_" + name;
-            }
-            seen.put(name, name);
-            zos.putNextEntry(new ZipEntry(name));
-            byte[] bytes = IOUtil.readBytes(IOUtil.getInputStream(path,
-                               getClass()));
-            zos.write(bytes, 0, bytes.length);
-            zos.closeEntry();
-        }
-        zos.close();
-        bos.close();
-        return new Result("", bos.toByteArray(), getMimeType(OUTPUT_ZIP));
-    }
 
 
 

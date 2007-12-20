@@ -361,6 +361,7 @@ public class Harvester {
      */
     public final void run() throws Exception {
         try {
+            System.err.println ("run");
             setActive(true);
             runInner();
             setActive(false);
@@ -394,6 +395,7 @@ public class Harvester {
      * @param value The new value for Active
      */
     public void setActive(boolean value) {
+        System.err.println ("setActive:" + value);
         active = value;
     }
 
