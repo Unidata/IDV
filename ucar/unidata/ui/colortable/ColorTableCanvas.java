@@ -409,7 +409,10 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         //preferred size.
         Dimension preferred = transBox.getPreferredSize();
         transBox.setEditable(true);
-        transBox.setPreferredSize(preferred);
+        if(GuiUtils.checkHeight(preferred.height)) {
+            transBox.setPreferredSize(preferred);
+        }
+
         transBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 modeTransparencyBtn.setSelected(true);

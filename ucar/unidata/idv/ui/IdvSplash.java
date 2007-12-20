@@ -237,8 +237,6 @@ public class IdvSplash extends JWindow {
 
         splashLbl = GuiUtils.cLabel(" ");
         splashLbl.setForeground(Color.gray);
-        //        Dimension dim =         splashLbl.getPreferredSize();
-        //        splashLbl.setPreferredSize(new Dimension(200, dim.height));
 
         splashProgressBar = new RovingProgress();
         splashProgressBar.start();

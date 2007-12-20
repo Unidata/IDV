@@ -357,14 +357,16 @@ public class ButtonTabbedPane extends JPanel {
 
         button.setForeground(BUTTON_FG_COLOR);
         button.setBorder(BUTTON_BORDER);
-        if (width > 0) {
-            button.setPreferredSize(new Dimension(width,
-                    button.getPreferredSize().height));
-        } else {
-            button.setPreferredSize(
-                new Dimension(
-                    button.getPreferredSize().width + 10,
-                    button.getPreferredSize().height));
+        int height = button.getPreferredSize().height;
+        if(GuiUtils.checkHeight(height)) {
+            if (width > 0) {
+                button.setPreferredSize(new Dimension(width, height));
+            } else {
+                button.setPreferredSize(
+                                        new Dimension(
+                                                      button.getPreferredSize().width + 10,
+                                                      height));
+            }
         }
 
         addTab(button, contents);

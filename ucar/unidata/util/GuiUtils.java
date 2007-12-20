@@ -479,6 +479,22 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
+    public static boolean checkHeight(int height) {
+        if(height>100) {
+            LogUtil.printMessage("Got large height when setting preferred size:" + height);
+            LogUtil.printMessage(LogUtil.getStackTrace());
+            return false;
+        }
+        return true;
+    }
+
+
+    public static void setPreferredWidth(JComponent comp, int width) {
+        int height = comp.getPreferredSize().height;
+        if(!checkHeight(height)) return;
+        comp.setPreferredSize(new Dimension(width,height));
+    }
+
     /**
      * A color swatch panel
      *
@@ -4272,7 +4288,9 @@ public class GuiUtils extends LayoutUtil {
         if (editable) {
             Dimension preferred = box.getPreferredSize();
             box.setEditable(true);
-            box.setPreferredSize(preferred);
+            if(checkHeight(preferred.height)) {
+                box.setPreferredSize(preferred);
+            }
         }
 
         box.addActionListener(new ActionListener() {

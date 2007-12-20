@@ -220,11 +220,9 @@ public class LegendPanel {
         JComponent togglePanel = GuiUtils.inset(toggleBtn,
                                      new Insets(0, 3, 0, 4));
         int labelHeight = topLabel.getPreferredSize().height;
-        if (labelHeight > 100) {
-            //      System.err.println("label height is: " + labelHeight);
+        if (GuiUtils.checkHeight(labelHeight)) {
+            topLabel.setPreferredSize(new Dimension(50, labelHeight));
         }
-        topLabel.setPreferredSize(new Dimension(50,
-                Math.min(20, labelHeight)));
         JPanel mainPanel = GuiUtils.doLayout(null,
                                              new Component[] { togglePanel,
                 extraLeft, topLabel, extraRight }, 4, GuiUtils.WT_NNYN,

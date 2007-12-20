@@ -880,9 +880,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         GuiUtils.setListData(timeZoneBox, zones);
         timeZoneBox.setSelectedItem(timezoneString);
         Dimension d = timeZoneBox.getPreferredSize();
-        timeZoneBox.setPreferredSize(new Dimension((int) (d.width * .6),
-                d.height));
-
+        GuiUtils.setPreferredWidth(timeZoneBox, (int) (d.width * .6));
         widgets.put(PREF_TIMEZONE, timeZoneBox);
 
         ObjectListener timeLabelListener = new ObjectListener(timeLabel) {

@@ -133,8 +133,7 @@ public class FontSelector implements ItemListener, ListSelectionListener {
             box.setMaximumRowCount(9);
             Dimension d     = box.getPreferredSize();
             int       width = 6 * d.height;
-            box.setPreferredSize(new Dimension(Math.min(d.width, width),
-                    d.height));
+            GuiUtils.setPreferredWidth(box, Math.min(d.width, width));
             box.addItemListener(this);
             fontSelector = box;
         } else {

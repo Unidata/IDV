@@ -932,8 +932,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             if (prop.equals(PROP_UNIT)) {
                 unitComboBox = new JComboBox();
                 addPropComp(PROP_UNIT, propComp = unitComboBox);
-                unitComboBox.setPreferredSize(new Dimension(100,
-                        unitComboBox.getPreferredSize().height));
+                GuiUtils. setPreferredWidth(unitComboBox, 100);
                 if (haveBand) {
                     bandComboBox = new JComboBox();
                     bandComboBox.addActionListener(new ActionListener() {
@@ -943,6 +942,9 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                         }
                     });
                     addPropComp(PROP_BAND, bandComboBox);
+
+
+
                     propComp =
                         GuiUtils.hbox(propComp,
                                       GuiUtils.inset(new JLabel("Channel:"),
