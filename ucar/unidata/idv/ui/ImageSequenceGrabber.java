@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -68,14 +69,14 @@ import java.beans.*;
 
 import java.io.*;
 
+import java.text.DecimalFormat;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.Vector;
 import java.util.zip.*;
-
-import java.text.DecimalFormat;
 
 import javax.media.*;
 import javax.media.control.*;
@@ -427,15 +428,25 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         this(viewManager, alternateComponent, false);
     }
 
+    /** flag for just capturing the images */
     private boolean justCaptureAnimation = false;
+
+    /**
+     * Create a new ImageSequenceGrabber
+     *
+     * @param viewManager   associated ViewManager
+     * @param alternateComponent   alternate component
+     * @param justCaptureAnimation true to just capture the animation
+     */
     public ImageSequenceGrabber(ViewManager viewManager,
-                                JComponent alternateComponent, boolean justCaptureAnimation) {
-        this.alternateComponent = alternateComponent;
-        this.viewManager        = viewManager;
-        this.idv                = viewManager.getIdv();
+                                JComponent alternateComponent,
+                                boolean justCaptureAnimation) {
+        this.alternateComponent   = alternateComponent;
+        this.viewManager          = viewManager;
+        this.idv                  = viewManager.getIdv();
         this.justCaptureAnimation = justCaptureAnimation;
         init();
-        if(this.justCaptureAnimation) {
+        if (this.justCaptureAnimation) {
             startAnimationCapture();
         }
     }
@@ -624,9 +635,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         }
         fileTemplateFld = new JTextField(dfltTemplate, 30);
         fileTemplateFld.setToolTipText(
-            "<html>Enter the file name template to use.<br>" +
-            "<b>%count%</b> is the image counter<br>" +
-            "<b>%count:decimal format%</b> allows you to format the count. Google 'java decimalformat' for more information.<br>"
+            "<html>Enter the file name template to use.<br>"
+            + "<b>%count%</b> is the image counter<br>"
+            + "<b>%count:decimal format%</b> allows you to format the count. Google 'java decimalformat' for more information.<br>"
             + "<b>%time%</b> is the  animation time in the default format<br>"
             + "<b>%time:some time format string%</b> a macro that begins with &quot;time:&quot;,contains a time format string using the:<br>"
             + "java SimpleDateFormat formatting (see google)." + "</html>");
@@ -757,7 +768,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         checkEnabled();
 
         //Only show the window if init filename is null
-        if (!justCaptureAnimation && (movieFileName == null) && (scriptingNode == null)) {
+        if ( !justCaptureAnimation && (movieFileName == null)
+                && (scriptingNode == null)) {
             GuiUtils.packDialog(mainDialog,
                                 GuiUtils.centerBottom(contents,
                                     GuiUtils.wrap(GuiUtils.inset(closeButton,
@@ -971,21 +983,24 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 }
 
             } else {
+                int start = anime.getCurrent();
                 while (true) {
                     //Sleep for a bit  to allow for the display to redraw itself
                     try {
                         Misc.sleep(sleepTime);
                     } catch (Exception exc) {}
                     //Has the user pressed Stop?
-                    if (anime == null ||  !keepRunning(timestamp)) {
+                    if ((anime == null) || !keepRunning(timestamp)) {
                         break;
                     }
                     //Now grab the image in block mode
                     grabImageAndBlock();
-                    if(anime==null) break;
-                    int current = anime.getCurrent();
+                    if (anime == null) {
+                        break;
+                    }
                     animationWidget.stepForward();
-                    if (current == anime.getCurrent()) {
+                    int current = anime.getCurrent();
+                    if (current <= start) {
                         break;
                     }
                 }
@@ -1006,9 +1021,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @param andWrite write movie
      */
     private void stopAnimationCapture(boolean andWrite) {
-        if(viewManager!=null) {
-            viewManager.useImages(images,justCaptureAnimation);
-            if(justCaptureAnimation) {
+        if (viewManager != null) {
+            viewManager.useImages(images, justCaptureAnimation);
+            if (justCaptureAnimation) {
                 return;
             }
         }
@@ -1232,7 +1247,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     private void close() {
         captureTimeStamp++;
         capturingAuto = false;
-        anime = null;
+        anime         = null;
         if (previewDialog != null) {
             previewDialog.dispose();
             previewDialog = null;
@@ -1260,6 +1275,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         images = new Vector();
         times  = new Vector();
         locs   = new Vector();
+        if (viewManager != null) {
+            viewManager.useImages(images, justCaptureAnimation);
+        }
     }
 
     /**
@@ -1269,7 +1287,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         capturingAuto = true;
         while (capturingAuto) {
             grabImageAndBlock();
-            if(!capturingAuto) return;
+            if ( !capturingAuto) {
+                return;
+            }
             double captureRate = 2.0;
             try {
                 captureRate = (new Double(
@@ -1292,7 +1312,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * @return File suffix
      */
     protected String getFileSuffix() {
-        if(justCaptureAnimation) return "png";
+        if (justCaptureAnimation) {
+            return "png";
+        }
         if (scriptingNode != null) {
             return imageGenerator.applyMacros(scriptingNode,
                     ATTR_IMAGESUFFIX, "jpg");
@@ -1345,15 +1367,20 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
 
 
-        while(true) {
-            String formatString = StringUtil.findFormatString("count", "%",template);
-            if(formatString == null) break;
-            System.err.println (formatString);
-            DecimalFormat format = new DecimalFormat(formatString);
-            String formattedValue = format.format(cnt);
-            String tmp = StringUtil.replace(template, "%count:" + formatString+"%", formattedValue);
-            if(tmp.equals(template)) {
-                throw new IllegalStateException ("Bad formatting:" + tmp);
+        while (true) {
+            String formatString = StringUtil.findFormatString("count", "%",
+                                      template);
+            if (formatString == null) {
+                break;
+            }
+            System.err.println(formatString);
+            DecimalFormat format         = new DecimalFormat(formatString);
+            String        formattedValue = format.format(cnt);
+            String tmp = StringUtil.replace(template,
+                                            "%count:" + formatString + "%",
+                                            formattedValue);
+            if (tmp.equals(template)) {
+                throw new IllegalStateException("Bad formatting:" + tmp);
             }
             template = tmp;
         }
@@ -1415,10 +1442,11 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * Take a screen snapshot in blocking mode
      */
     private void grabImageAndBlock() {
+
         try {
             synchronized (MUTEX) {
-                if(viewManager!=null) {
-                    if(viewManager.useDisplay()) {
+                if (viewManager != null) {
+                    if (viewManager.useDisplay()) {
                         //Sleep a bit to let the display get updated
                         Misc.sleep(500);
                     }
@@ -1428,19 +1456,18 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 String filename = getFilePrefix(images.size());
                 String tmp      = filename.toLowerCase();
                 if ( !(tmp.endsWith(".gif") || tmp.endsWith(".png")
-                       || tmp.endsWith(".jpg") || tmp.endsWith(".jpeg"))) {
+                        || tmp.endsWith(".jpg") || tmp.endsWith(".jpeg"))) {
                     filename = filename + "." + getFileSuffix();
                 }
 
                 String path = IOUtil.joinDir(getFileDirectory(), filename);
                 if (isInteractive() && !overwriteCbx.isSelected()
-                    && alternateDirCbx.isSelected()
-                    && new File(path).exists()) {
+                        && alternateDirCbx.isSelected()
+                        && new File(path).exists()) {
                     if (JOptionPane
-                        .showConfirmDialog(
-                                           null, "File:" + path
-                                           + " exists. Do you want to overwrite?", "File exists", JOptionPane
-                                           .YES_NO_OPTION) == 1) {
+                            .showConfirmDialog(null, "File:" + path
+                                + " exists. Do you want to overwrite?", "File exists", JOptionPane
+                                    .YES_NO_OPTION) == 1) {
                         stopCapturingAuto();
                         stopAnimationCapture(false);
                         return;
@@ -1470,10 +1497,11 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         props.put(ImageGenerator.PROP_IMAGEPATH, path);
                         props.put(ImageGenerator.PROP_IMAGEFILE,
                                   IOUtil.getFileTail(path));
-                        imageGenerator.putIndex(props, ImageGenerator.PROP_IMAGEINDEX,
-                                                images.size());
+                        imageGenerator.putIndex(props,
+                                ImageGenerator.PROP_IMAGEINDEX,
+                                images.size());
                         imageGenerator.processImage(image, path,
-                                                    scriptingNode, props, viewManager);
+                                scriptingNode, props, viewManager);
                     } else {
                         Component comp;
                         if (fullWindowBtn.isSelected()) {
@@ -1489,14 +1517,14 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         Robot     robot = new Robot();
                         BufferedImage image =
                             robot.createScreenCapture(new Rectangle(loc.x,
-                                                                    loc.y, dim.width, dim.height));
+                                loc.y, dim.width, dim.height));
 
                         if (backgroundTransparentBtn.isSelected()) {
                             image = ImageUtils.makeColorTransparent(image,
-                                                                    viewManager.getBackground());
+                                    viewManager.getBackground());
                         }
                         ImageUtils.writeImageToFile(image, path,
-                                                    getImageQuality());
+                                getImageQuality());
 
                     }
                 }
@@ -1514,6 +1542,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             stopAnimationCapture(false);
             LogUtil.logException("Error capturing image", exc);
         }
+
 
 
 
@@ -1575,23 +1604,38 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** widget for saving html */
     private static JCheckBox copyCbx;
 
-    private void  createPanel(String file, List images,  Element scriptingNode) {
+    /**
+     * Create an image panel
+     *
+     * @param file   file to write to
+     * @param images list of images
+     * @param scriptingNode scripting node
+     */
+    private void createPanel(String file, List images,
+                             Element scriptingNode) {
         try {
             imageGenerator.debug("Making image panel:" + file);
-            int width =    imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_WIDTH, 100);
-            int columns=   imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_COLUMNS, 1);
-            int space=     imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_SPACE, 0);
-            Color background=  imageGenerator.applyMacros(scriptingNode, imageGenerator.ATTR_BACKGROUND, (Color) null);
+            int width = imageGenerator.applyMacros(scriptingNode,
+                            imageGenerator.ATTR_WIDTH, 100);
+            int columns = imageGenerator.applyMacros(scriptingNode,
+                              imageGenerator.ATTR_COLUMNS, 1);
+            int space = imageGenerator.applyMacros(scriptingNode,
+                            imageGenerator.ATTR_SPACE, 0);
+            Color background = imageGenerator.applyMacros(scriptingNode,
+                                   imageGenerator.ATTR_BACKGROUND,
+                                   (Color) null);
             List sizedImages = new ArrayList();
-            for(int i=0;i<images.size();i++) {
+            for (int i = 0; i < images.size(); i++) {
                 String imageFile = images.get(i).toString();
-                Image image = ImageUtils.readImage(imageFile);
-                BufferedImage bufferedImage = ImageUtils.toBufferedImage(image);
+                Image  image     = ImageUtils.readImage(imageFile);
+                BufferedImage bufferedImage =
+                    ImageUtils.toBufferedImage(image);
                 image = imageGenerator.resize(bufferedImage, scriptingNode);
                 sizedImages.add(image);
             }
-            Image  image = ImageUtils.gridImages(sizedImages, space, background, columns);
-            ImageUtils.writeImageToFile(image,file);
+            Image image = ImageUtils.gridImages(sizedImages, space,
+                              background, columns);
+            ImageUtils.writeImageToFile(image, file);
         } catch (Exception exc) {
             LogUtil.logException("Writing panel", exc);
         }
@@ -1618,7 +1662,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                                          true);
 
         boolean doingPanel = false;
-        if(scriptingNode!=null && scriptingNode.getTagName().equals("panel")) {
+        if ((scriptingNode != null)
+                && scriptingNode.getTagName().equals("panel")) {
             doingPanel = true;
         }
 
@@ -1626,8 +1671,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         for (int i = 0; i < fileToks.size(); i++) {
             String movieFile = (String) fileToks.get(i);
             try {
-                if(doingPanel) {
-                    createPanel(movieFile, images,  scriptingNode);
+                if (doingPanel) {
+                    createPanel(movieFile, images, scriptingNode);
                     continue;
                 }
                 //                System.err.println("createMovie:" + movieFile);
