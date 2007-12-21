@@ -61,6 +61,7 @@ import java.util.Properties;
  */
 public class GenericTypeHandler extends TypeHandler {
 
+    public static final String   COL_ID = "id";
     /** _more_ */
     List<Column> columns;
 
@@ -95,14 +96,14 @@ public class GenericTypeHandler extends TypeHandler {
                                             getType()));
         this.columns = new ArrayList<Column>();
         colNames     = new ArrayList();
-        colNames.add("id");
+        colNames.add(COL_ID);
         List columnNodes = XmlUtil.findChildren(entryNode, TAG_DB_COLUMN);
         StringBuffer tableDef = new StringBuffer("create table "
                                     + getTableName() + " (\n");
         StringBuffer indexDef = new StringBuffer();
-        tableDef.append("id varchar(200)");
-        indexDef.append("CREATE INDEX " + getTableName() + "_INDEX_" + "id"
-                        + "  ON " + getTableName() + " (" + "id" + ");\n");
+        tableDef.append(COL_ID+" varchar(200)");
+        indexDef.append("CREATE INDEX " + getTableName() + "_INDEX_" + COL_ID
+                        + "  ON " + getTableName() + " (" + COL_ID + ");\n");
         for (int colIdx = 0; colIdx < columnNodes.size(); colIdx++) {
             Element columnNode = (Element) columnNodes.get(colIdx);
             Column  column     = new Column(this, columnNode);
@@ -259,6 +260,17 @@ public class GenericTypeHandler extends TypeHandler {
         return type;
     }
 
+    public void deleteEntry(Request request,  Statement statement, Entry entry)
+        throws Exception {
+        super.deleteEntry(request, statement, entry);
+        //        statement.setString(1, getTableName());
+        //        statement.setString(2, entry.getId());
+                String query = SqlUtil.makeDelete(getTableName(), COL_ID,
+                                                  SqlUtil.quote(entry.getId()));
+                statement.execute(query);
+                //        statement.addBatch();
+    }
+
     /**
      * _more_
      *
@@ -332,7 +344,7 @@ public class GenericTypeHandler extends TypeHandler {
         Object[] values = new Object[colNames.size()];
         String query = SqlUtil.makeSelect(SqlUtil.comma(colNames),
                                           Misc.newList(getTableName()),
-                                          SqlUtil.eq("id",
+                                          SqlUtil.eq(COL_ID,
                                               SqlUtil.quote(entry.getId())));
         ResultSet results2 = getRepository().execute(query).getResultSet();
         if (results2.next()) {

@@ -278,6 +278,17 @@ public class SqlUtil {
 
 
 
+    public static String makeDelete(String table, String where) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("DELETE FROM   ");
+        sb.append(table);
+        sb.append (" WHERE ");
+        sb.append(where);
+        return sb.toString();
+    }
+
+
+
     public static String makeDelete(String table, String colId, String id) {
         StringBuffer sb = new StringBuffer();
         sb.append("DELETE FROM   ");

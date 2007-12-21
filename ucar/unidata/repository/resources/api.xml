@@ -16,6 +16,7 @@
   <method request="/entry/show"   method="processEntryShow"    admin="false" cancache="true"/>
   <method request="/entry/add"    method="processEntryAdd"     admin="false" cancache="true"/>
   <method request="/entry/create"    method="processEntryCreate"     admin="false" cancache="true"/>
+  <method request="/entry/delete"    method="processEntryDelete"     admin="false" cancache="true"/>
   <method request="/entry/get/*"  method="processEntryGet"     admin="false" cancache="false"/>
 
   <method request="/getentries"  method="processGetEntries"   admin="false" cancache="true"/>
@@ -29,6 +30,7 @@
   <method request="/admin/stats"        method="adminStats"    admin="true" cancache="false"/>
   <method request="/admin/users"        method="adminUsers"    admin="true" cancache="false"/>
   <method request="/admin/harvesters"   method="adminHarvesters"    admin="true" cancache="false"/>
+  <method request="/admin/scour"        method="adminScour"      admin="true" cancache="false"/>
 
   <method request="/getmap"    method="processMap"       admin="false" cancache="false"/>
 

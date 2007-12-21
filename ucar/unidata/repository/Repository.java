@@ -134,6 +134,8 @@ public class Repository implements Constants, Tables, RequestHandler {
     /** _more_ */
     public MyUrl URL_ENTRY_SHOW = new MyUrl("/entry/show");
 
+    public MyUrl URL_ENTRY_DELETE = new MyUrl("/entry/delete");
+
 
     /** _more_ */
     public MyUrl URL_ENTRY_ADD = new MyUrl("/entry/add");
@@ -149,6 +151,7 @@ public class Repository implements Constants, Tables, RequestHandler {
 
     /** _more_ */
     public MyUrl URL_ADMIN_SQL = new MyUrl("/admin/sql","SQL");
+    public MyUrl URL_ADMIN_SCOUR = new MyUrl("/admin/scour","Scour");
 
     /** _more_ */
     public MyUrl URL_ADMIN_HOME = new MyUrl("/admin/home","Home");
@@ -168,7 +171,7 @@ public class Repository implements Constants, Tables, RequestHandler {
     public MyUrl URL_ADMIN_HARVESTERS = new MyUrl("/admin/harvesters","Harvesters");
 
     private MyUrl[]adminUrls = {
-        URL_ADMIN_HOME, URL_ADMIN_STARTSTOP, URL_ADMIN_TABLES, URL_ADMIN_STATS, URL_ADMIN_USERS, URL_ADMIN_HARVESTERS, URL_ADMIN_SQL};
+        URL_ADMIN_HOME, URL_ADMIN_STARTSTOP, URL_ADMIN_TABLES, URL_ADMIN_STATS, URL_ADMIN_USERS, URL_ADMIN_HARVESTERS, URL_ADMIN_SQL,URL_ADMIN_SCOUR};
 
 
     /** _more_ */
@@ -1459,6 +1462,39 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
+    public Result adminScour(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+
+        String query = SqlUtil.makeSelect(SqlUtil.comma(COL_ENTRIES_ID,COL_ENTRIES_RESOURCE,COL_ENTRIES_TYPE),
+                                          Misc.newList(TABLE_ENTRIES),"");
+        
+        SqlUtil.Iterator iter = SqlUtil.getIterator(execute(query));
+        ResultSet        results;
+        int              cnt       = 0;
+        long t1 = System.currentTimeMillis();
+        List<Entry> entries = new ArrayList<Entry>();
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                String id = results.getString(1);
+                Entry entry = new Entry(id,getTypeHandler(results.getString(3)));
+                String resource = results.getString(2);
+                entries.add(entry);
+                //                if(!new File(resource).exists()) cnt++;
+                if(cnt++%1000==0) System.err.print(".");
+                if(entries.size()>1000) {
+                    deleteEntries(request, entries);
+                    entries = new ArrayList<Entry>();
+                }
+            }
+        }
+        deleteEntries(request, entries);
+        long t2= System.currentTimeMillis();
+        sb.append(cnt +" files do not exist in " + (t2-t1) );
+        return new Result("Scour Results", sb, getMimeTypeFromSuffix(".html"));
+
+    }
+
+
     /**
      * _more_
      *
@@ -1674,8 +1710,8 @@ public class Repository implements Constants, Tables, RequestHandler {
                                           "submit_subset")));
         sb.append("</table>");
         sb.append("</form>");
-        sb.append(IOUtil.readContents("/ucar/unidata/repository/resources/map.js",
-                                         getClass()));
+        //        sb.append(IOUtil.readContents("/ucar/unidata/repository/resources/map.js",
+        //                                         getClass()));
 
 
         headerBuffer.append(sb.toString());
@@ -1999,7 +2035,33 @@ public class Repository implements Constants, Tables, RequestHandler {
         return new Result("Add Entry", sb, Result.TYPE_HTML);
     }
 
+    public Result processEntryDelete(Request request) throws Exception {
+        String entryId = (String) request.getId((String) null);
+        if (entryId == null) {
+            throw new IllegalArgumentException("No " + ARG_ID + " given");
+        }
+        //TODO: Check access here
+        Entry entry = getEntry(entryId, request);
+        if (entry == null) {
+            throw new IllegalArgumentException("Could not find entry");
+        }
+
+        List<Entry> entries =new ArrayList<Entry>();
+        entries.add(entry);
+        deleteEntries(request, entries);
+
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("Entry Deleted");
+        return new Result("Entry Deleted", sb, Result.TYPE_HTML);
+    }
+
+
+
     public Result processEntryAdd(Request request) throws Exception {
+
+
+
         String id = getGUID();
         String type = request.getType(TypeHandler.TYPE_ANY);
         String resource = request.getString(ARG_RESOURCE,(String)null);
@@ -3622,6 +3684,46 @@ public class Repository implements Constants, Tables, RequestHandler {
         metadataInsert.setString(col++, metadata.getContent());
         metadataInsert.execute();
     }
+
+
+    public void deleteEntries(Request request, List<Entry> entries)
+        throws Exception {
+        clearPageCache();
+        String query;
+
+        PreparedStatement tagsStmt = connection.prepareStatement("delete from " +TABLE_TAGS + " where "+ COL_TAGS_ENTRY_ID+"=?");
+        query = SqlUtil.makeDelete(TABLE_ASSOCIATIONS, SqlUtil.makeOr(Misc.newList(
+                                                                                   SqlUtil.eq(COL_ASSOCIATIONS_FROM_ENTRY_ID,
+                                                                                              "?"),
+                                                                                   SqlUtil.eq(COL_ASSOCIATIONS_TO_ENTRY_ID,
+                                                                                              "?"))));
+        PreparedStatement assStmt = connection.prepareStatement(query);
+        PreparedStatement entriesStmt = connection.prepareStatement(SqlUtil.makeDelete(TABLE_ENTRIES, COL_ENTRIES_ID,
+                                                                                   "?"));
+        PreparedStatement genericStmt = connection.prepareStatement("delete from ? where id=?");
+        synchronized(MUTEX_INSERT) {
+            connection.setAutoCommit(false);
+            Statement statement = connection.createStatement();
+            for(Entry entry: entries) {
+                tagsStmt.setString(1, entry.getId());
+                tagsStmt.addBatch();
+                assStmt.setString(1, entry.getId());
+                assStmt.setString(2, entry.getId());
+                tagsStmt.addBatch();
+                entriesStmt.setString(1, entry.getId());
+                entriesStmt.addBatch();
+                //                entry.getTypeHandler().deleteEntry(request,genericStmt,entry);
+                entry.getTypeHandler().deleteEntry(request,statement,entry);
+            }
+            tagsStmt.executeUpdate();
+            assStmt.executeUpdate();
+            entriesStmt.executeUpdate();
+            //            genericStmt.executeUpdate();
+            connection.commit();
+            connection.setAutoCommit(true);
+        }
+    }
+
 
     /**
      * _more_

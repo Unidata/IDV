@@ -97,6 +97,11 @@ public class Entry {
     private TypeHandler typeHandler;
 
 
+    public Entry(String id, TypeHandler typeHandler) {
+        this.id = id;
+        this.typeHandler = typeHandler;
+    }
+
     /**
      * _more_
      *

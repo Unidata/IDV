@@ -843,6 +843,11 @@ public class TypeHandler implements Constants, Tables {
         }
     }
 
+    public boolean isAnyHandler() {
+        return getType().equals(TypeHandler.TYPE_ANY);
+    }
+
+
     /**
      * _more_
      *
@@ -1019,6 +1024,10 @@ public class TypeHandler implements Constants, Tables {
      */
    public String getInsertSql() {
         return null;
+    }
+
+    public void deleteEntry(Request requess, Statement statement, Entry entry)
+        throws Exception {
     }
 
     /**
