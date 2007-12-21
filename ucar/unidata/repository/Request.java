@@ -516,7 +516,7 @@ public class Request implements Constants {
      *
      * @return The Type
      */
-    public String getType() {
+    public String getRequestPath() {
         return type;
     }
 

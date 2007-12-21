@@ -309,7 +309,7 @@ public class TypeHandler implements Constants, Tables {
      *
      * @return _more_
      */
-    protected String getEntryLinks(Entry entry, Request request) {
+    protected String getEntryLinks(Entry entry, Request request) throws Exception {
         return getEntryDownloadLink(request, entry) + "&nbsp;"
                + getGraphLink(request, entry);
     }
@@ -345,8 +345,8 @@ public class TypeHandler implements Constants, Tables {
      *
      * @return _more_
      */
-    protected boolean isEntryDownloadable(Request request, Entry entry) {
-        if(! entry.isFile()) return false;
+    protected boolean canDownload(Request request, Entry entry) throws Exception {
+        if(!entry.isFile()) return false;
         return true;
     }
 
@@ -360,8 +360,8 @@ public class TypeHandler implements Constants, Tables {
      *
      * @return _more_
      */
-    protected String getEntryDownloadLink(Request request, Entry entry) {
-        if ( !isEntryDownloadable(request, entry)) {
+    protected String getEntryDownloadLink(Request request, Entry entry) throws Exception {
+        if ( !repository.canDownload(request, entry)) {
             return "";
         }
         File f = new File(entry.getResource());
@@ -374,7 +374,7 @@ public class TypeHandler implements Constants, Tables {
         } else {
             return HtmlUtil.href(
                 HtmlUtil.url(
-                    repository.URL_GETENTRY
+                    repository.URL_ENTRY_GET+"/"
                     + entry.getName(), ARG_ID, entry.getId()), HtmlUtil.img(
                         repository.fileUrl("/Fetch.gif"), "Download file"+size));
         }
@@ -456,11 +456,15 @@ public class TypeHandler implements Constants, Tables {
                     HtmlUtil.bold("Location:"),
                     entry.getMinLat()+"/"+entry.getMinLon()));
             } else  if(entry.hasAreaDefined()) {
-                String img = HtmlUtil.img(HtmlUtil.url("http://data.eol.ucar.edu/cgi-bin/codiac/mm5","cmds","box+"+
-                                                       entry.getMinLon()+"+"+
-                                                       entry.getMinLat()+"+"+
-                                                       entry.getMaxLon()+"+"+
-                                                       entry.getMaxLat()+"+red"),""," width=300");
+                String img = HtmlUtil.img(HtmlUtil.url(repository.URL_GETMAP,
+                                                       "lat1",
+                                                       ""+entry.getMinLat(),
+                                                       "lon1",
+                                                       ""+entry.getMinLon(),
+                                                       "lat2",
+                                                       ""+entry.getMaxLat(),
+                                                       "lon2",
+                                                       ""+entry.getMaxLon()));
                 /*                sb.append(HtmlUtil.tableEntry(
                                               HtmlUtil.bold("Area:"),
                                               HtmlUtil.makeAreaLabel(
@@ -475,7 +479,7 @@ public class TypeHandler implements Constants, Tables {
 
             if (showResource && ImageUtils.isImage(entry.getResource())) {
                 sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Image:"),
-                        HtmlUtil.img(HtmlUtil.url(repository.URL_GETENTRY
+                        HtmlUtil.img(HtmlUtil.url(repository.URL_ENTRY_GET+"/"
                             + entry.getName(), ARG_ID, entry.getId()), "",
                                 XmlUtil.attr(ARG_WIDTH, "400"))));
             }
@@ -832,8 +836,10 @@ public class TypeHandler implements Constants, Tables {
                                                request.get(ARG_INCLUDENONGEO,true))+" Include non-geographic";
             String areaWidget  = HtmlUtil.makeLatLonBox(ARG_AREA, "", "", "", "");
             areaWidget = "<table>" + HtmlUtil.cols(areaWidget, nonGeo) +"</table>";
+            //            formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Extent:"), areaWidget+"\n"+HtmlUtil.img(repository.URL_GETMAP.toString(),"map"," name=\"map\"  xxxonmouseover = \"mouseMove()\"")));
             formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Extent:"), areaWidget));
             formBuffer.append("\n");
+           
         }
     }
 

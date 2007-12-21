@@ -153,7 +153,7 @@ public class ZipOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result processShowEntry(Request request, Entry entry)
+    public Result processEntryShow(Request request, Entry entry)
             throws Exception {
         TypeHandler  typeHandler = repository.getTypeHandler(entry.getType());
         StringBuffer sb   = typeHandler.getEntryContent(entry,
@@ -212,6 +212,9 @@ public class ZipOutputHandler extends OutputHandler {
         ZipOutputStream       zos  = new ZipOutputStream(bos);
         Hashtable             seen = new Hashtable();
         for (Entry entry : entries) {
+            if ( !repository.canDownload(request, entry)) {
+                continue;
+            }
             String path = entry.getResource();
             String name = IOUtil.getFileTail(path);
             int    cnt  = 1;

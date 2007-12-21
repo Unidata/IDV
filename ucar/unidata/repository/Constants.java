@@ -384,6 +384,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_IMAGEWIDTH = "imagewidth";
 
+    public static final String ARG_IMAGEHEIGHT = "imageheight";
+
     /** _more_ */
     public static final String NODETYPE_ENTRY = "entry";
 
@@ -402,6 +404,10 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_WIDTH = "width";
+
+    public static final String ARG_RESOURCE = "resource";
+
+    public static final String ARG_DESCRIPTION = "description";
 
 
     /** _more_ */

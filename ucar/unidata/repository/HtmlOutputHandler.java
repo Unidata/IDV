@@ -182,7 +182,7 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result processShowEntry(Request request, Entry entry)
+    public Result processEntryShow(Request request, Entry entry)
             throws Exception {
         TypeHandler  typeHandler = repository.getTypeHandler(entry.getType());
         StringBuffer sb   = typeHandler.getEntryContent(entry,
@@ -278,7 +278,7 @@ public class HtmlOutputHandler extends OutputHandler {
      * @return _more_
      */
     protected String getEntryUrl(Entry entry) {
-        return HtmlUtil.href(HtmlUtil.url(repository.URL_SHOWENTRY, ARG_ID,
+        return HtmlUtil.href(HtmlUtil.url(repository.URL_ENTRY_SHOW, ARG_ID,
                                           entry.getId()), entry.getName());
     }
 
@@ -381,7 +381,7 @@ public class HtmlOutputHandler extends OutputHandler {
             repository.getOutputTypesFor(request, what);
         int cnt = 0;
         sb.append("<b>");
-        String initialOutput = request.getOutput((String) null);
+        String initialOutput = request.getOutput("");
         for (TwoFacedObject tfo : outputTypes) {
             if (cnt++ > 0) {
                 sb.append("&nbsp;|&nbsp;");
@@ -392,13 +392,11 @@ public class HtmlOutputHandler extends OutputHandler {
             } else {
                 sb.append(
                     HtmlUtil.href(
-                        request.getType() + "?" + request.getUrlArgs(),
+                        request.getRequestPath() + "?" + request.getUrlArgs(),
                         tfo.toString()));
             }
         }
-        if (initialOutput != null) {
-            request.put(ARG_OUTPUT, initialOutput);
-        }
+        request.put(ARG_OUTPUT, initialOutput);
         sb.append("</b>");
 
     }
@@ -745,8 +743,8 @@ public class HtmlOutputHandler extends OutputHandler {
             }
         }
         Result result = new Result(title, sb, getMimeType(output));
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getEntriesHeader(request, output, WHAT_GROUP));
+        //        result.putProperty(PROP_NAVSUBLINKS,
+        //                           getEntriesHeader(request, output, WHAT_GROUP));
         return result;
     }
 
@@ -759,7 +757,16 @@ public class HtmlOutputHandler extends OutputHandler {
                                 group.getId()), HtmlUtil.img(
                                     repository.fileUrl("/Search16.gif"),
                                     "Search in Group"));
-        return search + "&nbsp;" + repository.getGraphLink(request, group);
+
+        String createEntry = HtmlUtil.href(
+                            HtmlUtil.url(
+                                         repository.URL_ENTRY_CREATE, ARG_GROUP,
+                                         group.getId()), HtmlUtil.img(
+                                                                      repository.fileUrl("/New16.gif"),
+                                                                      "Add Entry"));
+
+
+        return search + HtmlUtil.space(1) + repository.getGraphLink(request, group) +HtmlUtil.space(1) +createEntry;
     }
 
 
@@ -841,7 +848,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 ssb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
                 String col1 =
                     links + " "
-                    + HtmlUtil.href(HtmlUtil.url(repository.URL_SHOWENTRY,
+                    + HtmlUtil.href(HtmlUtil.url(repository.URL_ENTRY_SHOW,
                         ARG_ID, entry.getId()), entry.getName());
                 String col2 = "" + new Date(entry.getStartDate());
                 ssb.append(HtmlUtil.row(HtmlUtil.cols(col1, col2)));

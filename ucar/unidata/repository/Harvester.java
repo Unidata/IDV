@@ -81,6 +81,10 @@ import java.util.regex.*;
 public class Harvester {
 
     /** _more_ */
+    public static final String ATTR_ROOTDIR = "rootdir";
+
+
+    /** _more_ */
     public static final String ATTR_MONITOR = "monitor";
 
     /** _more_ */
@@ -91,6 +95,10 @@ public class Harvester {
 
     /** _more_ */
     public static final String ATTR_SLEEP = "sleep";
+
+    /** _more_ */
+    protected File rootDir;
+
 
     /** _more_ */
     private String name;
@@ -133,70 +141,13 @@ public class Harvester {
         this.active  = XmlUtil.getAttribute(element, ATTR_ACTIVE, false);
         this.sleepMinutes = XmlUtil.getAttribute(element, ATTR_SLEEP,
                 sleepMinutes);
+        this.rootDir = new File(XmlUtil.getAttribute(element, ATTR_ROOTDIR));
 
     }
 
-
-    /**
-     * _more_
-     *
-     *
-     * @param rootDir _more_
-     * @param groupName _more_
-     * @param typeHandler _more_
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public List<Entry> collectSatelliteFiles(File rootDir,
-                                             final String groupName,
-                                             final TypeHandler typeHandler)
-            throws Exception {
-        long                   t1      = System.currentTimeMillis();
-        final List<Entry>      entries = new ArrayList();
-        final SimpleDateFormat sdf     =
-            new SimpleDateFormat("yyyyMMdd_HHmm");
-        final Pattern pattern =
-            Pattern.compile(
-                "([^/]+)/([^/]+)/([^/]+)/[^/]+_(\\d\\d\\d\\d\\d\\d\\d\\d_\\d\\d\\d\\d)");
-
-        final User        user       = repository.findUser("jdoe");
-        IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
-            public int viewFile(File f) throws Exception {
-                String  name    = f.toString();
-                Matcher matcher = pattern.matcher(name);
-                if ( !matcher.find()) {
-                    return DO_CONTINUE;
-                }
-                if (entries.size() % 5000 == 0) {
-                    System.err.println("Found:" + entries.size());
-                }
-                String platform   = matcher.group(1);
-                String resolution = matcher.group(2);
-                String product    = matcher.group(3);
-                Group group = repository.findGroupFromName(groupName + "/"
-                                  + platform + "/" + resolution + "/"
-                                  + product, true);
-                Date dttm = sdf.parse(matcher.group(4));
-                Entry entry;
-                entries.add(entry =new Entry(repository.getGUID(), typeHandler,
-                                      dttm.toString(), "", group, user,
-                                      f.toString(), dttm.getTime(),
-                                      new Object[] { platform,
-                        resolution, product }));
-                return DO_CONTINUE;
-            }
-        };
-
-        IOUtil.walkDirectory(rootDir, fileViewer);
-        long t2 = System.currentTimeMillis();
-        if (entries.size() > 0) {
-            System.err.println("found sat files:" + entries.size() + " in "
-                               + (t2 - t1));
-        }
-        return entries;
+    public File getRootDir() {
+        return rootDir;
     }
-
 
     /**
      * _more_
@@ -286,82 +237,10 @@ public class Harvester {
     /**
      * _more_
      *
-     * @param rootDir _more_
-     * @param groupName _more_
-     * @param typeHandler _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public List<Entry> collectModelFiles(File rootDir,
-                                         final String groupName,
-                                         final TypeHandler typeHandler)
-            throws Exception {
-        final List<Entry> entries = new ArrayList();
-        final SimpleDateFormat[] sdf = { new SimpleDateFormat("yyyyMMddHH"),
-                                         new SimpleDateFormat("yyyyMMdd") };
-        final String      regex = "([^/]+)/[^/\\d]*(\\d+)(f\\d+)?_([^\\.]+)";
-        final Pattern     pattern    = Pattern.compile(regex);
-        final User        user       = repository.findUser("jdoe");
-        IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
-            public int viewFile(File f) throws Exception {
-                String  name    = f.toString();
-                Matcher matcher = pattern.matcher(name);
-                if ( !matcher.find()) {
-                    if ( !f.isDirectory()) {
-                        System.err.println(name);
-                        System.err.println(regex);
-                    }
-                    return DO_CONTINUE;
-                }
-                //                    System.err.println (name);
-                if (entries.size() % 5000 == 0) {
-                    System.err.println("Found:" + entries.size());
-                }
-                String modelGroup = matcher.group(1);
-                Date   dttm       = null;
-                String dateString = matcher.group(2);
-                for (int i = 0; i < sdf.length; i++) {
-                    try {
-                        dttm = sdf[i].parse(dateString);
-                        break;
-                    } catch (Exception exc) {}
-                }
-                if (dttm == null) {
-                    System.err.println("Could not parse date:" + dateString);
-                    return DO_CONTINUE;
-                }
-                String forecasrHour = matcher.group(3);
-                String modelRun     = matcher.group(4);
-
-
-                Group group = repository.findGroupFromName(groupName + "/"
-                                  + "model" + "/" + modelGroup + "/"
-                                  + modelRun, true);
-
-                entries.add(new Entry(repository.getGUID(), typeHandler,
-                                      IOUtil.getFileTail(f.toString()), "",
-                                      group, user, f.toString(),
-                                      dttm.getTime(),
-                                      new Object[] { modelGroup,
-                        modelRun }));
-                return DO_CONTINUE;
-            }
-        };
-
-        IOUtil.walkDirectory(rootDir, fileViewer);
-        return entries;
-    }
-
-    /**
-     * _more_
-     *
      * @throws Exception _more_
      */
     public final void run() throws Exception {
         try {
-            System.err.println ("run");
             setActive(true);
             runInner();
             setActive(false);
@@ -395,7 +274,6 @@ public class Harvester {
      * @param value The new value for Active
      */
     public void setActive(boolean value) {
-        System.err.println ("setActive:" + value);
         active = value;
     }
 

@@ -9,14 +9,10 @@ body {
 }
 
 
-td {
-   font-weight: normal;
-   font-size: 10pt;
-   font-family: Arial, Helvetica, sans-serif;
-   color: black;
-   xtext-decoration: none
-}
 
+.content {
+    margin:10px;
+}
 
 
 .smallestTag {font-size: xx-small; }
@@ -46,24 +42,12 @@ a:hover {
 A {xtext-decoration: none}
 
 
-.navtitle:link {
-   text-decoration: none;
-   color: #FFFFFF;
-}
 
 
-.navtitle:hover {
-   color: #FFFFFF;
-   text-decoration: underline
+.header {
+   background-color:#006699;
 }
 
-.navtitle:visited {
-   color: #FFFFFF;
-}
-
-.content {
-	margin:10px;
-}
 
 a.navtitle:visited {
    text-decoration: none;
@@ -71,17 +55,20 @@ a.navtitle:visited {
 }
 
 a.navlink {
-   text-decoration: none;
+  text-decoration: none;
   color:#ffffff;
   font-size: 12pt;
   font-weight: bold;
 }
 
 
-.header {
-   background-color:#006699;
-}
 
+
+.navnolink {
+  font-size: 12pt;
+  font-weight: bold;
+  color:black;
+}
 
 .nav {
    margin:0;
@@ -108,6 +95,15 @@ a.navlink {
    padding-left:10;
    color: black;
 }
+
+
+.subnavnolink {
+    font-family: Arial, Helvetica, sans-serif;  
+    font-weight: bold; 
+    font-size: 10pt;
+    color:black;
+}
+
 
 
 a.subnavlink {

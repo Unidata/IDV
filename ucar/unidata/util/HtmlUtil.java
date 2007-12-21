@@ -89,28 +89,32 @@ public class HtmlUtil {
     }
 
 
-    public static String url(String path, String n1, String v1) {
+    public static String url(Object path, String n1, String v1) {
         return url(path, new String[]{n1,v1});
     }
 
 
-    public static String url(String path, String n1, String v1, String n2, String v2) {
+    public static String url(Object path, String n1, String v1, String n2, String v2) {
         return url(path, new String[]{n1,v1,n2,v2});
     }
 
-    public static String url(String path, String n1, String v1, String n2, String v2, String n3, String v3) {
+    public static String url(Object path, String n1, String v1, String n2, String v2, String n3, String v3) {
         return url(path, new String[]{n1,v1,n2,v2,n3,v3});
     }
 
-    public static String url(String path, String []args) {
-        if(args.length==0) return path;
+    public static String url(Object path, String n1, String v1, String n2, String v2, String n3, String v3,String n4, String v4) {
+        return url(path, new String[]{n1,v1,n2,v2,n3,v3,n4,v4});
+    }
+
+    public static String url(Object path, String []args) {
+        if(args.length==0) return path.toString();
         path = path+"?";
         for(int i=0;i<args.length;i+=2) {
             if(i>0)
                 path = path+"&";
             path = path + args[i]+"="+args[i+1];
         }
-        return path;
+        return path.toString();
     }
 
 
@@ -172,21 +176,21 @@ public class HtmlUtil {
         return "<input " + XmlUtil.attrs("type","checkbox","name",name,"value", value)+ (checked?" checked ":"")+">";
     }
 
-    public static String form(String url) {
+    public static String form(Object url) {
         return form(url,"");
     }
-    public static String form(String url, String extra) {
+    public static String form(Object url, String extra) {
         return "<form action=\"" + url +"\"" + " " + extra +" >";
     }
 
 
 
-    public static String href(String url, String label) {
-        return "<a href=\"" + url +"\">" + label +"</a>";
+    public static String href(Object url, String label) {
+        return "<a href=\"" + url.toString() +"\">" + label +"</a>";
     }
 
-    public static String href(String url, String label, String extra) {
-        return "<a href=\"" + url + "\"" + " " + extra+">" + label +"</a>";
+    public static String href(Object url, String label, String extra) {
+        return "<a href=\"" + url.toString() + "\"" + " " + extra+">" + label +"</a>";
     }
 
     public static String submitImage(String img,String name) {

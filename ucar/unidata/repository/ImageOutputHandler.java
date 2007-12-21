@@ -134,6 +134,10 @@ public class ImageOutputHandler extends OutputHandler {
             list.add(new TwoFacedObject("Slideshow", OUTPUT_SLIDESHOW));
             list.add(new TwoFacedObject("Gallery", OUTPUT_GALLERY));
             list.add(new TwoFacedObject("Image Player", OUTPUT_PLAYER));
+        } else if (what.equals(WHAT_GROUP)) {
+            list.add(new TwoFacedObject("Slideshow", OUTPUT_SLIDESHOW));
+            list.add(new TwoFacedObject("Gallery", OUTPUT_GALLERY));
+            list.add(new TwoFacedObject("Image Player", OUTPUT_PLAYER));
         }
         return list;
     }
@@ -160,6 +164,16 @@ public class ImageOutputHandler extends OutputHandler {
 
 
 
+    public Result processShowGroup(Request request, Group group,
+                                   List<Group> subGroups, List<Entry> entries)
+            throws Exception {
+        Result result =  processEntries(request,  entries);
+        System.err.println ("output:" + request);
+        result.putProperty(PROP_NAVSUBLINKS,
+                           getEntriesHeader(request, request.getOutput(),
+                                            WHAT_GROUP));
+        return result;
+    }
 
 
 
@@ -222,7 +236,7 @@ public class ImageOutputHandler extends OutputHandler {
                 if ( !ImageUtils.isImage(entry.getResource())) {
                     continue;
                 }
-                String url = HtmlUtil.url(repository.URL_GETENTRY+"/"
+                String url = HtmlUtil.url(repository.URL_ENTRY_GET+"/"
                                           + entry.getName(), ARG_ID,
                                               entry.getId());
                 if (cnt == 0) {
@@ -246,16 +260,17 @@ public class ImageOutputHandler extends OutputHandler {
                 if ( !ImageUtils.isImage(entry.getResource())) {
                     continue;
                 }
-                String url = HtmlUtil.url(repository.URL_GETENTRY
+                String url = HtmlUtil.url(repository.URL_ENTRY_GET+"/"
                                           + entry.getName(), ARG_ID,
                                               entry.getId());
-                String thumburl = HtmlUtil.url(repository.URL_GETENTRY
+                String thumburl = HtmlUtil.url(repository.URL_ENTRY_GET+"/"
                                           + entry.getName(), ARG_ID,
                                                entry.getId(),
                                                ARG_IMAGEWIDTH, ""+50);
                 String entryUrl = getEntryUrl(entry);
                 request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
                 String title =entry.getTypeHandler().getEntryContent(entry, request,false).toString();
+                request.put(ARG_OUTPUT, output);
                 title = title.replace("\"", "\\\"");
                 title = title.replace("\n"," ");
                 sb.append("addImage(" + HtmlUtil.quote(url) + "," +
@@ -278,7 +293,7 @@ public class ImageOutputHandler extends OutputHandler {
                 col++;
 
                 sb.append("<td>");
-                sb.append(HtmlUtil.img(HtmlUtil.url(repository.URL_GETENTRY
+                sb.append(HtmlUtil.img(HtmlUtil.url(repository.URL_ENTRY_GET+"/"
                         + entry.getName(), ARG_ID, entry.getId()), "",
                             XmlUtil.attr(ARG_WIDTH, "400")));
                 sb.append("<br>\n");

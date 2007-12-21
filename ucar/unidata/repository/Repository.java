@@ -26,6 +26,11 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 
+
+import ucar.unidata.geoloc.*;
+import ucar.unidata.geoloc.projection.*;
+
+import ucar.unidata.view.geoloc.NavigatedMapPanel;
 import ucar.unidata.data.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
@@ -60,6 +65,7 @@ import java.lang.reflect.*;
 import java.net.*;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -94,56 +100,75 @@ import javax.swing.*;
  */
 public class Repository implements Constants, Tables, RequestHandler {
 
-    /** _more_ */
-    public String URL_GROUP_SHOW = "/group/show";
-
-    public String URL_GROUP_FORM = "/group/form";
+    private List<String> downloadPrefixes = new ArrayList<String>();
 
 
-    /** _more_ */
-    public String URL_SEARCHFORM = "/searchform";
+
+
+    public MyUrl URL_GETMAP = new MyUrl("/getmap");
 
     /** _more_ */
-    public String URL_LIST_HOME = "/list/home";
+    public MyUrl URL_GROUP_SHOW = new MyUrl("/group/show");
+
+    public MyUrl URL_GROUP_FORM = new MyUrl("/group/form");
+
 
     /** _more_ */
-    public String URL_QUERY = "/query";
+    public MyUrl URL_SEARCHFORM = new MyUrl("/searchform");
 
     /** _more_ */
-    public String URL_LIST_SHOW = "/list/show";
+    public MyUrl URL_LIST_HOME = new MyUrl("/list/home");
 
     /** _more_ */
-    public String URL_GRAPHVIEW = "/graphview";
+    public MyUrl URL_QUERY = new MyUrl("/query");
 
     /** _more_ */
-    public String URL_GETGRAPH = "/getgraph";
+    public MyUrl URL_LIST_SHOW = new MyUrl("/list/show");
 
     /** _more_ */
-    public String URL_SHOWENTRY = "/showentry";
+    public MyUrl URL_GRAPHVIEW = new MyUrl("/graphview");
 
     /** _more_ */
-    public String URL_GETENTRIES = "/getentries";
+    public MyUrl URL_GETGRAPH = new MyUrl("/getgraph");
 
     /** _more_ */
-    public String URL_GETENTRY = "/getentry";
+    public MyUrl URL_ENTRY_SHOW = new MyUrl("/entry/show");
+
 
     /** _more_ */
-    public String URL_ADMIN_SQL = "/admin/sql";
+    public MyUrl URL_ENTRY_ADD = new MyUrl("/entry/add");
+
+    public MyUrl URL_ENTRY_CREATE = new MyUrl("/entry/create");
 
     /** _more_ */
-    public String URL_ADMIN_HOME = "/admin/home";
+    public MyUrl URL_GETENTRIES = new MyUrl("/getentries");
 
     /** _more_ */
-    public String URL_ADMIN_DB = "/admin/db";
+    public MyUrl URL_ENTRY_GET = new MyUrl("/entry/get");
+
 
     /** _more_ */
-    public String URL_ADMIN_STATS = "/admin/stats";
+    public MyUrl URL_ADMIN_SQL = new MyUrl("/admin/sql","SQL");
 
     /** _more_ */
-    public String URL_ADMIN_USERS = "/admin/users";
+    public MyUrl URL_ADMIN_HOME = new MyUrl("/admin/home","Home");
 
     /** _more_ */
-    public String URL_ADMIN_HARVESTERS = "/admin/harvesters";
+    public MyUrl URL_ADMIN_STARTSTOP = new MyUrl("/admin/startstop","Database");
+
+    public MyUrl URL_ADMIN_TABLES = new MyUrl("/admin/tables","Tables");
+
+    /** _more_ */
+    public MyUrl URL_ADMIN_STATS = new MyUrl("/admin/stats","Statistics");
+
+    /** _more_ */
+    public MyUrl URL_ADMIN_USERS = new MyUrl("/admin/users","Users");
+
+    /** _more_ */
+    public MyUrl URL_ADMIN_HARVESTERS = new MyUrl("/admin/harvesters","Harvesters");
+
+    private MyUrl[]adminUrls = {
+        URL_ADMIN_HOME, URL_ADMIN_STARTSTOP, URL_ADMIN_TABLES, URL_ADMIN_STATS, URL_ADMIN_USERS, URL_ADMIN_HARVESTERS, URL_ADMIN_SQL};
 
 
     /** _more_ */
@@ -255,6 +280,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @throws Exception _more_
      */
     protected void init() throws Exception {
+        downloadPrefixes.add("c:/cygwin/home/jeffmc/pictures/");
         initProperties();
         initUrls();
         makeConnection();
@@ -355,23 +381,6 @@ public class Repository implements Constants, Tables, RequestHandler {
      * _more_
      */
     protected void initUrls() {
-        URL_GROUP_SHOW        = getUrlBase() + URL_GROUP_SHOW;
-        URL_GROUP_FORM        = getUrlBase() + URL_GROUP_FORM;
-        URL_SEARCHFORM       = getUrlBase() + URL_SEARCHFORM;
-        URL_LIST_HOME        = getUrlBase() + URL_LIST_HOME;
-        URL_QUERY            = getUrlBase() + URL_QUERY;
-        URL_LIST_SHOW        = getUrlBase() + URL_LIST_SHOW;
-        URL_GRAPHVIEW        = getUrlBase() + URL_GRAPHVIEW;
-        URL_GETGRAPH         = getUrlBase() + URL_GETGRAPH;
-        URL_SHOWENTRY        = getUrlBase() + URL_SHOWENTRY;
-        URL_GETENTRIES       = getUrlBase() + URL_GETENTRIES;
-        URL_GETENTRY         = getUrlBase() + URL_GETENTRY;
-        URL_ADMIN_SQL        = getUrlBase() + URL_ADMIN_SQL;
-        URL_ADMIN_HOME       = getUrlBase() + URL_ADMIN_HOME;
-        URL_ADMIN_DB         = getUrlBase() + URL_ADMIN_DB;
-        URL_ADMIN_STATS      = getUrlBase() + URL_ADMIN_STATS;
-        URL_ADMIN_USERS      = getUrlBase() + URL_ADMIN_USERS;
-        URL_ADMIN_HARVESTERS = getUrlBase() + URL_ADMIN_HARVESTERS;
     }
 
 
@@ -581,12 +590,17 @@ public class Repository implements Constants, Tables, RequestHandler {
             throw exc;
         }
         for (Harvester harvester : harvesters) {
+            File rootDir = harvester.getRootDir();
+            if(rootDir!=null) {
+                downloadPrefixes.add(rootDir.toString().replace("\\","/")+"/");
+            }
             if (!okToStart) {
                 harvester.setActive(false);
             } else if (harvester.getActive()) {
                 Misc.run(harvester, "run");
             }
         }
+        System.err.println("downloadprefixes:" + downloadPrefixes);
     }
 
     /**
@@ -634,7 +648,6 @@ public class Repository implements Constants, Tables, RequestHandler {
      */
     public Result handleRequest(Request request) throws Exception {
         long   t1       = System.currentTimeMillis();
-
         Result result = getResult(request);
         if(result != null &&
            result.getInputStream()==null &&
@@ -647,7 +660,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         long t2 = System.currentTimeMillis();
         if ((result != null) && (t2 != t1)
                 && (true || request.get("debug", false))) {
-            System.err.println("Time:" + request.getType() + " " + (t2 - t1));
+            System.err.println("Time:" + request.getRequestPath() + " " + (t2 - t1));
         }
         return result;
 
@@ -655,7 +668,7 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
     protected Result getResult(Request request) throws Exception {
-        String incoming = request.getType().trim();
+        String incoming = request.getRequestPath().trim();
         if (incoming.endsWith("/")) {
             incoming = incoming.substring(0, incoming.length() - 1);
         }
@@ -724,7 +737,7 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
     protected Result getHtdocsFile(Request request) throws Exception {
-        String path= request.getType();
+        String path= request.getRequestPath();
         String type = getMimeTypeFromSuffix(
                                                        IOUtil.getFileExtension(path));
         path = StringUtil.replace(path,
@@ -887,7 +900,8 @@ public class Repository implements Constants, Tables, RequestHandler {
      *
      * @throws Exception _more_
      */
-    public Result adminDb(Request request) throws Exception {
+
+    public Result adminDbStartStop(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
         sb.append(header("Database Administration"));
         String what = request.getString(ARG_ADMIN_WHAT, "nothing");
@@ -908,7 +922,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             }
         }
         sb.append("<p>");
-        sb.append(HtmlUtil.form(URL_ADMIN_DB, " name=\"admin\""));
+        sb.append(HtmlUtil.form(URL_ADMIN_STARTSTOP, " name=\"admin\""));
         if (connection == null) {
             sb.append(HtmlUtil.hidden(ARG_ADMIN_WHAT, "restart"));
             sb.append(HtmlUtil.submit("Restart Database"));
@@ -918,9 +932,20 @@ public class Repository implements Constants, Tables, RequestHandler {
         }
         sb.append("</form>");
         Result result = new Result("Administration", sb);
-        result.putProperty(PROP_NAVSUBLINKS, getAdminLinks(request));
+        result.putProperty(PROP_NAVSUBLINKS, getSubNavLinks(request,adminUrls));
         return result;
     }
+
+    public Result adminDbTables(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        sb.append(header("Database Tables"));
+        sb.append(getDbMetaData());
+        Result result = new Result("Administration", sb);
+        result.putProperty(PROP_NAVSUBLINKS, getSubNavLinks(request,adminUrls));
+        return result;
+    }
+
+
 
     /**
      * _more_
@@ -936,14 +961,16 @@ public class Repository implements Constants, Tables, RequestHandler {
         sb.append(header("Repository Administration"));
         sb.append("<ul>\n");
         sb.append("<li> ");
-        sb.append(HtmlUtil.href(URL_ADMIN_DB, "Administer Database"));
+        sb.append(HtmlUtil.href(URL_ADMIN_STARTSTOP, "Administer Database"));
+        sb.append("<li> ");
+        sb.append(HtmlUtil.href(URL_ADMIN_TABLES, "Show Tables"));
         sb.append("<li> ");
         sb.append(HtmlUtil.href(URL_ADMIN_STATS, "Statistics"));
         sb.append("<li> ");
         sb.append(HtmlUtil.href(URL_ADMIN_SQL, "Execute SQL"));
         sb.append("</ul>");
         Result result = new Result("Administration", sb);
-        result.putProperty(PROP_NAVSUBLINKS, getAdminLinks(request));
+        result.putProperty(PROP_NAVSUBLINKS, getSubNavLinks(request,adminUrls));
         return result;
     }
 
@@ -998,7 +1025,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         sb.append(header("User: " + user.getName()));
         sb.append("User admin tasks here");
         Result result = new Result("User:" + user.getName(), sb);
-        result.putProperty(PROP_NAVSUBLINKS, getAdminLinks(request));
+        result.putProperty(PROP_NAVSUBLINKS, getSubNavLinks(request,adminUrls));
         return result;
     }
 
@@ -1014,18 +1041,21 @@ public class Repository implements Constants, Tables, RequestHandler {
      */
     public Result adminHarvesters(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        System.err.println("action:" + request);
         if(request.defined(ARG_ACTION)) {
             String action = request.getString(ARG_ACTION,"");
+            System.err.println("Have action " + action);
             int id = request.get(ARG_ID,0);
             Harvester harvester = harvesters.get(id);
             if(action.equals(ACTION_STOP)) {
                 harvester.setActive(false);
             } else if(action.equals(ACTION_START)) {
-                if(!harvester.getActive()) 
+                if(!harvester.getActive()) {
+                    harvester.setActive(true);
+                    System.err.println("Calling run");
                     Misc.run(harvester,"run");
+                }
             }
-            //            return new Result(URL_ADMIN_HARVESTERS);
+            return new Result(URL_ADMIN_HARVESTERS.toString());
         }
 
 
@@ -1049,7 +1079,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         sb.append("</table>");
 
         Result result = new Result("Harvesters", sb);
-        result.putProperty(PROP_NAVSUBLINKS, getAdminLinks(request));
+        result.putProperty(PROP_NAVSUBLINKS, getSubNavLinks(request,adminUrls));
         return result;
     }
 
@@ -1102,7 +1132,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             sb.append("</table>");
         }
         Result result = new Result("Users", sb);
-        result.putProperty(PROP_NAVSUBLINKS, getAdminLinks(request));
+        result.putProperty(PROP_NAVSUBLINKS, getSubNavLinks(request,adminUrls));
         return result;
     }
 
@@ -1153,7 +1183,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         sb.append("</table>\n");
 
         Result result = new Result("Repository Statistics", sb);
-        result.putProperty(PROP_NAVSUBLINKS, getAdminLinks(request));
+        result.putProperty(PROP_NAVSUBLINKS, getSubNavLinks(request,adminUrls));
         return result;
     }
 
@@ -1192,7 +1222,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         sb.append("<table>");
         if (query == null) {
             Result result = new Result("SQL", sb);
-            result.putProperty(PROP_NAVSUBLINKS, getAdminLinks(request));
+            result.putProperty(PROP_NAVSUBLINKS, getSubNavLinks(request,adminUrls));
             return result;
         }
 
@@ -1245,7 +1275,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                                    new StringBuffer("Fetched:" + cnt
                                        + " rows in: " + (t2 - t1) + "ms <p>"
                                        + sb.toString()));
-        result.putProperty(PROP_NAVSUBLINKS, getAdminLinks(request));
+        result.putProperty(PROP_NAVSUBLINKS, getSubNavLinks(request,adminUrls));
         return result;
     }
 
@@ -1562,9 +1592,10 @@ public class Repository implements Constants, Tables, RequestHandler {
         StringBuffer sb           = new StringBuffer();
         StringBuffer headerBuffer = new StringBuffer();
         //        headerBuffer.append(header("Search Form"));
+        String basic = request.getString(ARG_FORM_BASIC,"");
         request.remove(ARG_FORM_BASIC);
         String urlArgs = request.getUrlArgs();
-
+        request.put(ARG_FORM_BASIC,basic);
         headerBuffer.append("<table cellpadding=\"5\">");
         if(basicForm) {
             headerBuffer.append(HtmlUtil.tableEntry("",HtmlUtil.href(URL_SEARCHFORM+"?" + ARG_FORM_BASIC+"=false&" + urlArgs, "Advanced Search")));
@@ -1643,6 +1674,10 @@ public class Repository implements Constants, Tables, RequestHandler {
                                           "submit_subset")));
         sb.append("</table>");
         sb.append("</form>");
+        sb.append(IOUtil.readContents("/ucar/unidata/repository/resources/map.js",
+                                         getClass()));
+
+
         headerBuffer.append(sb.toString());
 
         Result result = new Result("Search Form", headerBuffer);
@@ -1652,27 +1687,22 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     *
-     * @param request _more_
-     * @return _more_
-     */
-    protected List getAdminLinks(Request request) {
+    protected List getSubNavLinks(Request request, MyUrl []urls) {
         List   links = new ArrayList();
-        String extra = " class=\"navlink\" ";
-        links.add(HtmlUtil.href(URL_ADMIN_HOME, "Home", extra));
-        links.add(HtmlUtil.href(URL_ADMIN_DB, "Database", extra));
-        links.add(HtmlUtil.href(URL_ADMIN_STATS, "Statistics", extra));
-        links.add(HtmlUtil.href(URL_ADMIN_USERS, "Users", extra));
-        links.add(HtmlUtil.href(URL_ADMIN_HARVESTERS, "Harvesters", extra));
-        links.add(HtmlUtil.href(URL_ADMIN_SQL, "SQL", extra));
-
+        String extra = " class=\"subnavlink\" ";
+        String notextra = " class=\"subnavnolink\" ";
+        String type = request.getRequestPath();
+        for(int i=0;i<urls.length;i++) {
+            String label = urls[i].getLabel();
+            if(label == null) label = urls[i].toString();
+            if(urls[i].toString().equals(type)) {
+                links.add(HtmlUtil.span(label,notextra));
+            } else {
+                links.add(HtmlUtil.href(urls[i].toString(),label,extra));
+            }
+        }
         return links;
     }
-
-
 
 
 
@@ -1697,7 +1727,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                            WHAT_ASSOCIATION };
         String[] names = { "Entries", "Groups", "Tags", "Associations" };
         boolean basicForm = request.get(ARG_FORM_BASIC,true);
-        System.err.println("req:" + request);
+
         for (int i = 0; i < whats.length; i++) {
             String item;
             if (what.equals(whats[i])) {
@@ -1739,6 +1769,7 @@ public class Repository implements Constants, Tables, RequestHandler {
     protected List getNavLinks(Request request) {
         List    links   = new ArrayList();
         String  extra   = " class=navlink ";
+        String  notextra   = " class=navnolink ";
         boolean isAdmin = false;
         if (request != null) {
             RequestContext context = request.getRequestContext();
@@ -1754,6 +1785,37 @@ public class Repository implements Constants, Tables, RequestHandler {
                                     apiMethod.getName(), extra));
         }
         return links;
+    }
+
+
+    public Result processMap(Request request) throws Exception {
+        NavigatedMapPanel nmp  = new NavigatedMapPanel(Misc.newList(NavigatedMapPanel.DEFAULT_MAP,"/auxdata/maps/OUTLSUPU"),false);
+
+        double lat1 = request.get("lat1",0.0);        
+        double lat2 = request.get("lat2",90.0);
+        double lon1 = request.get("lon1",0.0);        
+        double lon2 = request.get("lon2",360.0);
+
+        double width = 4*Math.abs(lon1-lon2);
+        double height =4*Math.abs(lat1-lat2);
+        if(!request.get("noprojection",false)) {
+            nmp.setProjectionImpl(new LatLonProjection("",new ProjectionRect(lon1-width/2,lat1-height/2,lon2+width/2,lat2+height/2)));
+        }
+        nmp.getNavigatedPanel().setSize(request.get(ARG_IMAGEWIDTH,200),
+                                        request.get(ARG_IMAGEHEIGHT,200));
+        nmp.getNavigatedPanel().setPreferredSize(new Dimension(200, 200));
+        nmp.getNavigatedPanel().setBorder(BorderFactory.createLineBorder(Color.black));
+        nmp.getNavigatedPanel().setEnabled(true);
+        nmp.setDrawBounds(new LatLonPointImpl(lat1,lon1),
+                          new LatLonPointImpl(lat2,lon2));
+
+        Image image = ImageUtils.getImage(nmp.getNavigatedPanel());
+        //        GuiUtils.showOkCancelDialog(null,"",new JLabel(new ImageIcon(image)),null);
+        String path = "foo.png";
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ImageUtils.writeImageToFile(image, path,bos,1.0f);
+        byte[]imageBytes = bos.toByteArray();
+        return new Result("", imageBytes, getMimeTypeFromSuffix(".png"));
     }
 
 
@@ -1800,6 +1862,23 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
 
+    public boolean canDownload(Request request, Entry entry) throws Exception {
+        entry  =filterEntry(request,entry);
+        if(entry == null) return false;
+        if ( !entry.getTypeHandler().canDownload(request, entry)) {
+            return false;
+        }
+        String filePath = entry.getResource();
+        filePath = filePath.replace("\\","/");
+        if(filePath.indexOf("..")>=0) return false;
+        for(String prefix: downloadPrefixes) {
+            if(filePath.startsWith(prefix)) return true;
+        }
+        return false;
+    }
+
+
+
     /**
      * _more_
      *
@@ -1809,7 +1888,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      *
      * @throws Exception _more_
      */
-    public Result processGetEntry(Request request) throws Exception {
+    public Result processEntryGet(Request request) throws Exception {
         String entryId = (String) request.getId((String) null);
         if (entryId == null) {
             throw new IllegalArgumentException("No " + ARG_ID + " given");
@@ -1820,9 +1899,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                     + entryId);
         }
 
-
-
-        if ( !entry.getTypeHandler().isEntryDownloadable(request, entry)) {
+        if (!canDownload(request, entry)) {
             throw new IllegalArgumentException(
                 "Cannot download file with id:" + entryId);
         }
@@ -1897,6 +1974,59 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
+    public Result processEntryCreate(Request request) throws Exception {
+        Group group = findGroup(request,true);
+        StringBuffer sb = new StringBuffer();
+        sb.append("<table cellpadding=\"5\">");
+        sb.append(HtmlUtil.form(URL_ENTRY_ADD, ""));
+
+        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Group:"),
+                                      getBreadCrumbs(request, group, true)[1]));
+
+        sb.append(HtmlUtil.hidden(ARG_GROUP,  group.getFullName()));
+
+        String size  = " size=\"50\" ";
+        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Resource:"),
+                                         HtmlUtil.input(ARG_RESOURCE,"",size)));
+        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
+                                         HtmlUtil.input(ARG_NAME,"",size)));
+        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Description:"),
+                                         HtmlUtil.input(ARG_DESCRIPTION,"",size)));
+        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Tags:"),
+                                         HtmlUtil.input(ARG_TAG,"",size)+ " (comma separated)"));
+        sb.append(HtmlUtil.tableEntry("",HtmlUtil.submit("Add Entry")));
+        sb.append("</table>\n");
+        return new Result("Add Entry", sb, Result.TYPE_HTML);
+    }
+
+    public Result processEntryAdd(Request request) throws Exception {
+        String id = getGUID();
+        String type = request.getType(TypeHandler.TYPE_ANY);
+        String resource = request.getString(ARG_RESOURCE,(String)null);
+        if(resource==null) {
+            throw new IllegalArgumentException ("Must specify a resource argument");
+        }
+        String groupName = request.getString(ARG_GROUP,(String) null);
+        if(groupName==null) {
+            throw new IllegalArgumentException ("Must specify a group argument");
+        }
+        Group group = findGroupFromName(groupName,true);
+        String name = request.getString(ARG_NAME,IOUtil.getFileTail(resource));
+        String tags = request.getString(ARG_TAG,"");
+        String description = request.getString(ARG_DESCRIPTION,"");
+
+        TypeHandler typeHandler  = getTypeHandler(type);
+        List<Entry> entries = new ArrayList<Entry>();
+        Entry entry = new Entry(id, typeHandler, name,
+                                description, group, request.getRequestContext().getUser(),  resource,
+                                new Date().getTime());
+        entry.setTags(StringUtil.split(tags,",",true,true));
+        entries.add(entry);
+        insertEntries(typeHandler,  entries);
+        return new Result(HtmlUtil.url(URL_ENTRY_SHOW,ARG_ID, id));
+    }
+
+
     /**
      * _more_
      *
@@ -1906,7 +2036,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      *
      * @throws Exception _more_
      */
-    public Result processShowEntry(Request request) throws Exception {
+    public Result processEntryShow(Request request) throws Exception {
         String entryId = (String) request.getId((String) null);
         if (entryId == null) {
             throw new IllegalArgumentException("No " + ARG_ID + " given");
@@ -1934,10 +2064,10 @@ public class Repository implements Constants, Tables, RequestHandler {
             }
             //Do a redirect
             if(nextId!=null) {
-                return new Result(HtmlUtil.url(URL_SHOWENTRY,ARG_ID, nextId,ARG_OUTPUT, request.getString(ARG_OUTPUT,OutputHandler.OUTPUT_HTML)));
+                return new Result(HtmlUtil.url(URL_ENTRY_SHOW,ARG_ID, nextId,ARG_OUTPUT, request.getString(ARG_OUTPUT,OutputHandler.OUTPUT_HTML)));
             }
         }
-        return getOutputHandler(request).processShowEntry(request, entry);
+        return getOutputHandler(request).processEntryShow(request, entry);
     }
 
 
@@ -2285,7 +2415,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                                      ATTR_TITLE, name);
         if (ImageUtils.isImage(file)) {
             String imageUrl =
-                HtmlUtil.url(URL_GETENTRY + entryId
+                HtmlUtil.url(URL_ENTRY_GET + entryId
                              + IOUtil.getFileExtension(file), ARG_ID, entryId,
                                  ARG_IMAGEWIDTH, "75");
             attrs = attrs + " " + XmlUtil.attr("image", imageUrl);
@@ -3278,7 +3408,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @return _more_
      */
     protected String getEntryUrl(Entry entry) {
-        return HtmlUtil.href(HtmlUtil.url(URL_SHOWENTRY, ARG_ID,
+        return HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
                                           entry.getId()), entry.getName());
     }
 
@@ -3824,6 +3954,52 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
+
+    protected StringBuffer getDbMetaData() throws Exception {
+        StringBuffer sb = new StringBuffer();
+        DatabaseMetaData dbmd = connection.getMetaData();
+        ResultSet catalogs = dbmd.getCatalogs();
+
+        System.err.println ("catalogs");
+        ResultSet tables = dbmd.getTables(null, null,null,null);
+            while(tables.next()) {
+                String tableName = tables.getString("TABLE_NAME");
+                String tableType = tables.getString("TABLE_TYPE");
+                if(tableType!=null && tableType.startsWith("SYSTEM")) continue;
+                ResultSet 	columns = dbmd.getColumns(null, null, tableName,null);
+                String encoded = new String(XmlUtil.encodeBase64(("text:?"+tableName).getBytes()));
+                int cnt = getCount(tableName,"");
+                sb.append ("Table:" + tableName + " (#" + cnt+")");
+                sb.append("<ul>");
+                while(columns.next()) {
+                    String colName = columns.getString("COLUMN_NAME");
+                    sb.append("<li>");
+                    sb.append(colName +" ("+ columns.getString("TYPE_NAME")+")");
+                }
+                sb.append("</ul>");
+        }
+        return sb;
+    }
+
+
+    public class MyUrl {
+        private String path = "foo";
+        private String label = null;
+        public MyUrl(String path) {
+            this.path = path;
+        }
+
+        public MyUrl(String path, String label) {
+            this(path);
+            this.label = label;
+        }
+        public String toString() {
+            return getUrlBase()+path;
+        }
+        public String getLabel() {
+            return label;
+        }
+    }
 
 
 

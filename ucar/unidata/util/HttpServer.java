@@ -230,12 +230,12 @@ public class HttpServer {
             Hashtable props     = new Hashtable();
             while (true) {
                 String headerLine = br.readLine();
-                System.err.println("header:" + headerLine);
                 if (headerLine.equals(CRLF) || headerLine.equals("")) {
                     break;
                 }
                 //                System.err.println ("hdr:" + headerLine);
                 if (firstLine == null) {
+                    //                    System.err.println("first line:" + headerLine);
                     firstLine = headerLine;
                     continue;
                 }
@@ -496,6 +496,7 @@ public class HttpServer {
         public void redirect(String url) throws Exception {
             writeLine("HTTP/1.0 300 OK" + CRLF);
             writeLine("Location: " + url + CRLF);
+            writeLine("Cache-Control: no-cache" + CRLF);
             writeLine("\n");
             output.close();
         }

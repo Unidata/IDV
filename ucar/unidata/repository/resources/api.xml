@@ -13,18 +13,24 @@
   <method request="/graphview"   method="processGraphView"    admin="false" cancache="true"/>
   <method request="/getgraph"    method="processGetGraph"     admin="false" cancache="true"/>
 
-  <method request="/showentry"   method="processShowEntry"    admin="false" cancache="true"/>
+  <method request="/entry/show"   method="processEntryShow"    admin="false" cancache="true"/>
+  <method request="/entry/add"    method="processEntryAdd"     admin="false" cancache="true"/>
+  <method request="/entry/create"    method="processEntryCreate"     admin="false" cancache="true"/>
+  <method request="/entry/get/*"  method="processEntryGet"     admin="false" cancache="false"/>
+
   <method request="/getentries"  method="processGetEntries"   admin="false" cancache="true"/>
-  <method request="/getentry/*"  method="processGetEntry"     admin="false" cancache="false"/>
+
 
 
   <method request="/admin/sql"          method="adminSql"      admin="true" cancache="false"/>
   <method request="/admin/home"         method="adminHome"     admin="true" cancache="false" name="Admin" toplevel="true"/>
-  <method request="/admin/db"           method="adminDb"       admin="true" cancache="false"/>
+  <method request="/admin/startstop"    method="adminDbStartStop"       admin="true" cancache="false"/>
+  <method request="/admin/tables"       method="adminDbTables"       admin="true" cancache="false"/>
   <method request="/admin/stats"        method="adminStats"    admin="true" cancache="false"/>
   <method request="/admin/users"        method="adminUsers"    admin="true" cancache="false"/>
   <method request="/admin/harvesters"   method="adminHarvesters"    admin="true" cancache="false"/>
 
+  <method request="/getmap"    method="processMap"       admin="false" cancache="false"/>
 
 <!-- 
 You can add your own RequestHandler class by specifying a handler attribute 

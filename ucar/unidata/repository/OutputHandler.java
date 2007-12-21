@@ -171,7 +171,7 @@ public class OutputHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public Result processShowEntry(Request request, Entry entry)
+    public Result processEntryShow(Request request, Entry entry)
             throws Exception {
         return notImplemented();
     }
@@ -190,9 +190,9 @@ public class OutputHandler implements Constants, Tables {
     }
 
     public String getNextPrevLink(Request request, Entry entry, String output) {
-        String nextLink  = HtmlUtil.href(HtmlUtil.url(repository.URL_SHOWENTRY, ARG_ID, entry.getId(), ARG_OUTPUT,output, ARG_NEXT, "true"),
+        String nextLink  = HtmlUtil.href(HtmlUtil.url(repository.URL_ENTRY_SHOW, ARG_ID, entry.getId(), ARG_OUTPUT,output, ARG_NEXT, "true"),
                                          HtmlUtil.img(repository.fileUrl("/Right16.gif"),"View next entry"));
-        String prevLink  = HtmlUtil.href(HtmlUtil.url(repository.URL_SHOWENTRY, ARG_ID, entry.getId(),
+        String prevLink  = HtmlUtil.href(HtmlUtil.url(repository.URL_ENTRY_SHOW, ARG_ID, entry.getId(),
                                                       ARG_OUTPUT,output, ARG_PREVIOUS, "true"),
                                          HtmlUtil.img(repository.fileUrl("/Left16.gif"),"View Previous Entry"));
         return prevLink+nextLink;
@@ -254,7 +254,7 @@ public class OutputHandler implements Constants, Tables {
      * @return _more_
      */
     protected String getEntryUrl(Entry entry) {
-        return HtmlUtil.href(HtmlUtil.url(repository.URL_SHOWENTRY, ARG_ID,
+        return HtmlUtil.href(HtmlUtil.url(repository.URL_ENTRY_SHOW, ARG_ID,
                                           entry.getId()), entry.getName());
     }
 
@@ -276,6 +276,8 @@ public class OutputHandler implements Constants, Tables {
             repository.getOutputTypesFor(request, what);
         int  cnt   = 0;
         List items = new ArrayList();
+        
+        String initialOutput = request.getString(ARG_OUTPUT, "");
         for (TwoFacedObject tfo : outputTypes) {
             request.put(ARG_OUTPUT, (String) tfo.getId());
             if (tfo.getId().equals(output)) {
@@ -283,10 +285,11 @@ public class OutputHandler implements Constants, Tables {
             } else {
                 items.add(
                     HtmlUtil.href(
-                        request.getType() + "?" + request.getUrlArgs(),
+                        request.getRequestPath() + "?" + request.getUrlArgs(),
                         tfo.toString(), " class=\"subnavlink\" "));
             }
         }
+        request.put(ARG_OUTPUT, initialOutput);
         return items;
     }
 
@@ -408,7 +411,7 @@ public class OutputHandler implements Constants, Tables {
      * @throws Exception _more_
      */
     public Result processShowGroups(Request request, List<Group> groups)
-            throws Exception {
+        throws Exception {
         return notImplemented();
     }
 

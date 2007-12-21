@@ -597,8 +597,6 @@ public class ImageUtils {
      * @throws Exception
      */
     public static Image getImage(Component component) throws Exception {
-
-
         RepaintManager repaintManager =
             RepaintManager.currentManager(component);
         double w = component.getWidth();
@@ -663,8 +661,14 @@ public class ImageUtils {
      *
      * @throws Exception  problem writing file
      */
-    public static void writeImageToFile(Image image, String saveFile,
-                                        float quality)
+   public static void writeImageToFile(Image image, String saveFile,
+                                       float quality)
+            throws Exception {
+       writeImageToFile(image, saveFile, null, quality);
+   }
+
+    public static void writeImageToFile(Image image, String saveFile, OutputStream os,
+                                       float quality)
             throws Exception {
         RenderedImage renderedImage = null;
         File          file          = new File(saveFile);
@@ -689,7 +693,13 @@ public class ImageUtils {
 
 
         // Prepare output file
-        ImageOutputStream ios = ImageIO.createImageOutputStream(file);
+        //        ImageOutputStream ios = ImageIO.createImageOutputStream(file);
+        ImageOutputStream ios;
+        if(os!=null) {
+            ios= ImageIO.createImageOutputStream(os);
+        } else {
+            ios= ImageIO.createImageOutputStream(file);
+        }
         writer.setOutput(ios);
 
         // Set the compression quality

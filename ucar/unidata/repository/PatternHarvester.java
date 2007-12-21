@@ -86,8 +86,6 @@ public class PatternHarvester extends Harvester {
     /** _more_ */
     public static final String ATTR_FILEPATTERN = "filepattern";
 
-    /** _more_ */
-    public static final String ATTR_ROOTDIR = "rootdir";
 
     /** _more_ */
     public static final String ATTR_BASEGROUP = "basegroup";
@@ -133,8 +131,6 @@ public class PatternHarvester extends Harvester {
     /** _more_ */
     private TypeHandler typeHandler;
 
-    /** _more_ */
-    private File rootDir;
 
     /** _more_ */
     private String baseGroupName;
@@ -157,7 +153,6 @@ public class PatternHarvester extends Harvester {
                 ATTR_TYPE, TypeHandler.TYPE_ANY));
         this.filePatternString = XmlUtil.getAttribute(element,
                 ATTR_FILEPATTERN, (String) null);
-        this.rootDir = new File(XmlUtil.getAttribute(element, ATTR_ROOTDIR));
         this.baseGroupName = XmlUtil.getAttribute(element, ATTR_BASEGROUP,
                 "Files");
         columns       = split(element, "columns");
@@ -187,28 +182,6 @@ public class PatternHarvester extends Harvester {
         return StringUtil.split(XmlUtil.getAttribute(element, attr), ",");
     }
 
-    /**
-     * _more_
-     *
-     * @param repository _more_
-     * @param typeHandler _more_
-     * @param rootDir _more_
-     * @param baseGroupName _more_
-     * @param patternString _more_
-     * @param notPatternString _more_
-     */
-    public PatternHarvester(Repository repository, TypeHandler typeHandler,
-                            File rootDir, String baseGroupName,
-                            String patternString, String notPatternString) {
-
-        super(repository);
-        this.typeHandler          = typeHandler;
-        this.rootDir              = rootDir;
-        this.baseGroupName        = baseGroupName;
-        this.filePatternString    = patternString;
-        this.fileNotPatternString = notPatternString;
-        init();
-    }
 
 
     /**
@@ -238,7 +211,7 @@ public class PatternHarvester extends Harvester {
      * @throws Exception _more_
      */
     protected void runInner() throws Exception {
-        if ( !getActive()) {
+        if (!getActive()) {
             return;
         }
         long           tt1  = System.currentTimeMillis();

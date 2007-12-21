@@ -163,7 +163,7 @@ public class XmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result processShowEntry(Request request, Entry entry)
+    public Result processEntryShow(Request request, Entry entry)
             throws Exception {
         TypeHandler  typeHandler = repository.getTypeHandler(entry.getType());
         StringBuffer sb   = typeHandler.getEntryContent(entry,

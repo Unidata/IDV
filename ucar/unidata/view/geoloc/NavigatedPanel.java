@@ -307,6 +307,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
 
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
+        System.err.println(getBounds());
         setNewBounds(getBounds(),true);
         repaint();
     }
