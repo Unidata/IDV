@@ -85,7 +85,7 @@ public class RssOutputHandler extends OutputHandler {
     public static final String OUTPUT_RSS_SUMMARY = "rss.summary";
 
     private static final TwoFacedObject TFO_FULL = new TwoFacedObject("Full RSS Feed", OUTPUT_RSS_FULL);    
-    private static final TwoFacedObject TFO_SUMMARY = new TwoFacedObject("Summary RSS Feed", OUTPUT_RSS_SUMMARY);
+    private static final TwoFacedObject TFO_SUMMARY = new TwoFacedObject("RSS Feed", OUTPUT_RSS_SUMMARY);
 
 
 
@@ -173,17 +173,6 @@ public class RssOutputHandler extends OutputHandler {
             throws Exception {
         return processEntries(request, entries);
     }
-
-    protected String getGroupLinks(Request request, Group group)
-            throws Exception {
-        return HtmlUtil.href(
-                             HtmlUtil.url(
-                                          repository.URL_SHOWGROUP, ARG_GROUP,
-                                          group.getId(),ARG_OUTPUT, OUTPUT_RSS_SUMMARY), HtmlUtil.img(
-                                    repository.fileUrl("/rss.gif"),
-                                    "Subscribe to this group using RSS"));
-    }
-
 
 
 

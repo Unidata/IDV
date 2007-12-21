@@ -197,15 +197,26 @@ public class GenericTypeHandler extends TypeHandler {
             sb.append(XmlUtil.openTag(tag + "s"));
         }
 
+        Properties properties = repository.getFieldProperties(theColumn.getNamesFile());
         for (int i = 0; i < values.length; i++) {
             String longName = theColumn.getLabel(values[i]);
             if (output.equals(OutputHandler.OUTPUT_HTML)) {
                 sb.append("<li>");
                 sb.append(longName);
             } else if (output.equals(XmlOutputHandler.OUTPUT_XML)) {
-                sb.append(XmlUtil.tag(tag,
-                                      XmlUtil.attrs(ATTR_ID, values[i],
-                                          ATTR_NAME, longName)));
+                String attrs = XmlUtil.attrs(ATTR_ID, values[i]);
+                if(properties!=null) {
+                    for (Enumeration keys = properties.keys(); keys.hasMoreElements(); ) {
+                        String key   = (String) keys.nextElement();
+                        if(key.startsWith(values[i]+".")) {
+                            String value = (String) properties.get(key);
+                            value = value.replace("${value}", values[i]);
+                            key  = key.substring((values[i]+".").length());
+                            attrs = attrs + XmlUtil.attr(key,value);
+                        }
+                    }
+                }
+                sb.append(XmlUtil.tag(tag, attrs));
             } else if (output.equals(CsvOutputHandler.OUTPUT_CSV)) {
                 sb.append(SqlUtil.comma(values[i], longName));
                 sb.append("\n");

@@ -85,9 +85,9 @@ public class MetaDataServer extends HttpServer  implements Constants {
 
         protected void writeHeaderArgs() throws Exception {
             super.writeHeaderArgs();
-            if(!cache) {
+            //            if(!cache) {
                 writeLine("Cache-Control: no-cache" + CRLF);
-            }
+                //            }
             writeLine("Last-Modified:" + new Date() + CRLF);
         }
                 

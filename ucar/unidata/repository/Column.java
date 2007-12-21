@@ -540,8 +540,8 @@ public class Column implements Tables, Constants {
      * @throws Exception _more_
      */
     protected String getLabel(String value) throws Exception {
-        String desc = typeHandler.getRepository().getFieldDescription(value,
-                          namesFile);
+        String desc = typeHandler.getRepository().getFieldDescription(value+".label",
+                                                                      namesFile);
         if (desc == null) {
             desc = value;
         } else {
@@ -596,6 +596,10 @@ public class Column implements Tables, Constants {
      */
     public String getName() {
         return name;
+    }
+
+    public String getNamesFile() {
+        return namesFile;
     }
 
     /**

@@ -165,6 +165,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_SKIP = "skip";
 
+    public static final String ARG_ORDERBY = "orderby";
+
+    public static final String ARG_ASCENDING = "ascending";
+
     public static final String ARG_AREA = "area";
 
     public static final String ARG_FORM_BASIC = "form.basic";
@@ -173,7 +177,9 @@ public interface Constants {
 
 
     public static final String ARG_NEXT = "next";
+
     public static final String ARG_PREVIOUS = "previous";
+
     /** _more_ */
     public static final String ARG_APPLET = "applet";
 
@@ -194,6 +200,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String WHAT_ENTRIES = "entries";
+
+
 
     /** _more_ */
     public static final String WHAT_TYPE = "type";
@@ -398,6 +406,14 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_ADMIN_WHAT = "what";
+
+
+    public static final String ACTION_EDIT = "action.edit";
+    public static final String ACTION_DELETE_ASK = "action.delete.ask";
+    public static final String ACTION_DELETE_DOIT = "action.delete.doit";
+
+    public static final String ACTION_START = "start";
+    public static final String ACTION_STOP = "stop";
 
 
 

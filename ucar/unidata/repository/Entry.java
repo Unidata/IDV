@@ -27,6 +27,8 @@ import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
+import java.io.File;
+
 import java.util.ArrayList;
 
 import java.util.Date;
@@ -190,6 +192,13 @@ public class Entry {
         this.endDate     = endDate;
         this.values      = values;
     }
+
+
+    public boolean isFile() {
+        return new File(getResource()).exists();
+    }
+
+
 
 
     /**

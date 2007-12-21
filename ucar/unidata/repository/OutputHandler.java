@@ -211,42 +211,6 @@ public class OutputHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    protected String[] getBreadCrumbs(Request request, Group group,
-                                      boolean makeLinkForLastGroup)
-            throws Exception {
-        List   breadcrumbs = new ArrayList();
-        List   titleList   = new ArrayList();
-        Group  parent      = group.getParent();
-        String output      = request.getOutput();
-        while (parent != null) {
-            titleList.add(0, parent.getName());
-            breadcrumbs.add(
-                0, HtmlUtil.href(
-                    HtmlUtil.url(
-                        repository.URL_SHOWGROUP, ARG_GROUP,
-                        parent.getFullName(), ARG_OUTPUT,
-                        output), parent.getName()));
-            parent = parent.getParent();
-        }
-        breadcrumbs.add(0, HtmlUtil.href(repository.URL_SHOWGROUP, "Top"));
-        titleList.add(group.getName());
-        if (makeLinkForLastGroup) {
-            breadcrumbs.add(
-                HtmlUtil.href(
-                    HtmlUtil.url(
-                        repository.URL_SHOWGROUP, ARG_GROUP,
-                        group.getFullName(), ARG_OUTPUT,
-                        output), group.getName()));
-        } else {
-            breadcrumbs.add(HtmlUtil.bold(group.getName()) + "&nbsp;"
-                            + getAllGroupLinks(request, group));
-        }
-        String title = "Group: "
-                       + StringUtil.join("&nbsp;&gt;&nbsp;", titleList);
-        return new String[] { title,
-                              StringUtil.join("&nbsp;&gt;&nbsp;",
-                              breadcrumbs) };
-    }
 
 
 
@@ -428,19 +392,6 @@ public class OutputHandler implements Constants, Tables {
     protected String getGroupLinks(Request request, Group group)
             throws Exception {
         return "";
-    }
-
-    protected String getAllGroupLinks(Request request, Group group)
-            throws Exception {
-        StringBuffer sb = new StringBuffer();
-        for (OutputHandler outputHandler : repository.getOutputHandlers()) {
-            String links = outputHandler.getGroupLinks(request, group);
-            if(links.length()>0) {
-                sb.append(links);
-                sb.append(HtmlUtil.space(1));
-            }        
-        }
-        return sb.toString();
     }
 
 

@@ -36,6 +36,7 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
+import java.io.File;
 import java.sql.PreparedStatement;
 
 import java.sql.ResultSet;
@@ -345,6 +346,7 @@ public class TypeHandler implements Constants, Tables {
      * @return _more_
      */
     protected boolean isEntryDownloadable(Request request, Entry entry) {
+        if(! entry.isFile()) return false;
         return true;
     }
 
@@ -362,17 +364,19 @@ public class TypeHandler implements Constants, Tables {
         if ( !isEntryDownloadable(request, entry)) {
             return "";
         }
+        File f = new File(entry.getResource());
+        String size = " (" + f.length() +" bytes)";
         if (repository.getProperty(PROP_HTML_DOWNLOADENTRIESASFILES, false)) {
             return HtmlUtil.href(
                 "file://" + entry.getResource(),
                 HtmlUtil.img(
-                    repository.fileUrl("/Fetch.gif"), "Download file"));
+                    repository.fileUrl("/Fetch.gif"), "Download file" + size));
         } else {
             return HtmlUtil.href(
                 HtmlUtil.url(
                     repository.URL_GETENTRY
                     + entry.getName(), ARG_ID, entry.getId()), HtmlUtil.img(
-                        repository.fileUrl("/Fetch.gif"), "Download file"));
+                        repository.fileUrl("/Fetch.gif"), "Download file"+size));
         }
     }
 
@@ -401,8 +405,10 @@ public class TypeHandler implements Constants, Tables {
                                           nextPrev));
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
                                           entry.getName()));
+            
+
             String[] crumbs =
-                repository.getOutputHandler(request).getBreadCrumbs(request,
+                repository.getBreadCrumbs(request,
                                             entry.getGroup(), true);
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Group:"),
                                           crumbs[1]));
@@ -419,6 +425,10 @@ public class TypeHandler implements Constants, Tables {
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Resource:"),
                                           entry.getResource()));
 
+            if(entry.isFile()) {
+                File f = new File(entry.getResource());
+                sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Size:"), f.length()+" bytes"));
+            }
             if ((entry.getCreateDate() != entry.getStartDate())
                     || (entry.getCreateDate() != entry.getEndDate())) {
                 if (entry.getEndDate() != entry.getStartDate()) {

@@ -206,6 +206,7 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer sb     = new StringBuffer();
         String       output = request.getOutput();
+        appendListHeader(request, output, WHAT_GROUP, sb);
         if (output.equals(OUTPUT_HTML)) {
             sb.append(repository.header("Groups"));
             sb.append("<ul>");
@@ -213,7 +214,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         for (Group group : groups) {
             if (output.equals(OUTPUT_HTML)) {
-                sb.append("<li>" + getAllGroupLinks(request, group) + " "
+                sb.append("<li>" + repository.getAllGroupLinks(request, group) + " "
                           + group.getFullName());
             }
 
@@ -257,7 +258,7 @@ public class HtmlOutputHandler extends OutputHandler {
                                         dfltSelected));
             sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
             sb.append(" ");
-            sb.append(entry.getTypeHandler().getEntryLinks(entry, request));
+            //            sb.append(entry.getTypeHandler().getEntryLinks(entry, request));
             sb.append(" ");
             sb.append(getEntryUrl(entry));
             sb.append("<br>\n");
@@ -304,7 +305,7 @@ public class HtmlOutputHandler extends OutputHandler {
             if (group == null) {
                 continue;
             }
-            sb.append("<li>" + getAllGroupLinks(request, group) + " "
+            sb.append("<li>" + repository.getAllGroupLinks(request, group) + " "
                       + group.getFullName());
         }
         if (output.equals(OUTPUT_HTML)) {
@@ -653,7 +654,7 @@ public class HtmlOutputHandler extends OutputHandler {
             //xxxxx
             //            appendListHeader(request, output, WHAT_GROUP, sb);
             sb.append("<p>\n");
-            String[] crumbs = getBreadCrumbs(request, group, false);
+            String[] crumbs = repository.getBreadCrumbs(request, group, false);
             title = crumbs[0];
             sb.append(crumbs[1]);
             List<Metadata> metadataList = repository.getMetadata(group);
@@ -676,12 +677,12 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(HtmlUtil.bold("Groups:"));
                 sb.append("<ul>");
                 for (Group subGroup : subGroups) {
-                    sb.append(getAllGroupLinks(request, subGroup));
+                    sb.append(repository.getAllGroupLinks(request, subGroup));
                     sb.append(" ");
                     sb.append(
                         HtmlUtil.href(
                             HtmlUtil.url(
-                                repository.URL_SHOWGROUP, ARG_GROUP,
+                                repository.URL_GROUP_SHOW, ARG_GROUP,
                                 subGroup.getFullName(), ARG_OUTPUT,
                                 output), subGroup.getName()));
 
@@ -726,18 +727,18 @@ public class HtmlOutputHandler extends OutputHandler {
         String       title = "Groups";
 
         if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
-            appendListHeader(request, output, WHAT_GROUP, sb);
+            //            appendListHeader(request, output, WHAT_GROUP, sb);
             sb.append("<ul>");
         }
 
         for (Group group : groups) {
             if (output.equals(OUTPUT_HTML)
                     || output.equals(OUTPUT_TIMELINE)) {
-                sb.append(getAllGroupLinks(request, group) + " ");
+                sb.append(repository.getAllGroupLinks(request, group) + " ");
                 sb.append(
                     HtmlUtil.href(
                         HtmlUtil.url(
-                            repository.URL_SHOWGROUP, ARG_OUTPUT, output,
+                            repository.URL_GROUP_SHOW, ARG_OUTPUT, output,
                             ARG_GROUP,
                             group.getFullName()), group.getFullName()));
                 sb.append("\n<br>\n");

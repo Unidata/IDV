@@ -1,6 +1,5 @@
 <harvesters>
 
-
   <harvester    name="Source Files"
                 active="true"
                 class="ucar.unidata.repository.PatternHarvester"

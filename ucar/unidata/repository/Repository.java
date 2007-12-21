@@ -95,7 +95,10 @@ import javax.swing.*;
 public class Repository implements Constants, Tables, RequestHandler {
 
     /** _more_ */
-    public String URL_SHOWGROUP = "/showgroup";
+    public String URL_GROUP_SHOW = "/group/show";
+
+    public String URL_GROUP_FORM = "/group/form";
+
 
     /** _more_ */
     public String URL_SEARCHFORM = "/searchform";
@@ -352,7 +355,8 @@ public class Repository implements Constants, Tables, RequestHandler {
      * _more_
      */
     protected void initUrls() {
-        URL_SHOWGROUP        = getUrlBase() + URL_SHOWGROUP;
+        URL_GROUP_SHOW        = getUrlBase() + URL_GROUP_SHOW;
+        URL_GROUP_FORM        = getUrlBase() + URL_GROUP_FORM;
         URL_SEARCHFORM       = getUrlBase() + URL_SEARCHFORM;
         URL_LIST_HOME        = getUrlBase() + URL_LIST_HOME;
         URL_QUERY            = getUrlBase() + URL_QUERY;
@@ -1015,10 +1019,9 @@ public class Repository implements Constants, Tables, RequestHandler {
             String action = request.getString(ARG_ACTION,"");
             int id = request.get(ARG_ID,0);
             Harvester harvester = harvesters.get(id);
-            if(action.equals("stop")) {
+            if(action.equals(ACTION_STOP)) {
                 harvester.setActive(false);
-            } else if(action.equals("start")) {
-                System.err.println("start:" +harvester.getActive() + " " + harvester.getName());
+            } else if(action.equals(ACTION_START)) {
                 if(!harvester.getActive()) 
                     Misc.run(harvester,"run");
             }
@@ -1029,19 +1032,19 @@ public class Repository implements Constants, Tables, RequestHandler {
         sb.append(header("Harvesters"));
         sb.append("<table>");
         sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold("Name"),
-                                             HtmlUtil.bold("State"), "")));
+                                             HtmlUtil.bold("State"), HtmlUtil.bold("Action"), "")));
 
         int cnt = 0;
         for (Harvester harvester : harvesters) {
             String run;
             if(harvester.getActive()) {
-                run = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,ARG_ACTION,"stop", ARG_ID,""+cnt),"Stop");
+                run = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,ARG_ACTION,ACTION_STOP, ARG_ID,""+cnt),"Stop");
             } else {
-                run = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,ARG_ACTION,"start", ARG_ID,""+cnt),"Start");
+                run = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,ARG_ACTION,ACTION_START, ARG_ID,""+cnt),"Start");
             }
             cnt++;
             sb.append(HtmlUtil.row(HtmlUtil.cols(harvester.getName(),
-                                                 (harvester.getActive()?"Active":"Stopped")+HtmlUtil.space(2) + " " + run, HtmlUtil.space(2)+harvester.getExtraInfo())));
+                                                 (harvester.getActive()?"Active":"Stopped")+HtmlUtil.space(2),run, HtmlUtil.space(2)+harvester.getExtraInfo())));
         }
         sb.append("</table>");
 
@@ -1608,18 +1611,24 @@ public class Repository implements Constants, Tables, RequestHandler {
         }
 
 
+        String orderBy  = HtmlUtil.space(2) +HtmlUtil.checkbox(ARG_ASCENDING,
+                                    "true",
+                                    request.get(ARG_ASCENDING,
+                                                false)) + " Sort ascending";
+
+        if(basicForm) orderBy = "";
         if (what.length() == 0) {
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Search For:"),
                                           HtmlUtil.select(ARG_WHAT, whatList)
                                           + HtmlUtil.space(3)
-                                          + outputHtml));
+                                          + outputHtml+orderBy));
 
         } else {
             String label = TwoFacedObject.findLabel(what, whatList);
             label = StringUtil.padRight(label, 40, HtmlUtil.space(1));
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Search For:"),
                                           label + HtmlUtil.space(2)
-                                          + outputHtml));
+                                          + outputHtml+orderBy));
             sb.append(HtmlUtil.hidden(ARG_WHAT, what));
         }
 
@@ -1687,14 +1696,16 @@ public class Repository implements Constants, Tables, RequestHandler {
         String[] whats = { WHAT_ENTRIES, WHAT_GROUP, WHAT_TAG,
                            WHAT_ASSOCIATION };
         String[] names = { "Entries", "Groups", "Tags", "Associations" };
-
+        boolean basicForm = request.get(ARG_FORM_BASIC,true);
+        System.err.println("req:" + request);
         for (int i = 0; i < whats.length; i++) {
             String item;
             if (what.equals(whats[i])) {
                 item = HtmlUtil.span(names[i], extra1);
             } else {
                 item = HtmlUtil.href(HtmlUtil.url(URL_SEARCHFORM, ARG_WHAT,
-                        whats[i]), names[i], extra2);
+                                                  whats[i],
+                                                  ARG_FORM_BASIC, (basicForm?"true":"false")), names[i], extra2);
             }
             if (i == 0) {
                 item = "<span " + extra1+ ">Search For:&nbsp;&nbsp;&nbsp; </span>" + item;
@@ -2030,6 +2041,108 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
+    public Group findGroup(Request request, boolean checkEditAccess) throws Exception {
+        String groupName = (String) request.getString(ARG_GROUP,
+                               (String) null);
+        if(groupName==null) {
+            throw new IllegalArgumentException(
+                "No group specified");
+        }
+        Group group =  findGroupFromName(groupName);
+        if(group==null) {
+            throw new IllegalArgumentException(
+                                               "Could not find group:" + groupName);
+        }
+        return group;
+    }
+
+
+    public Result processGroupForm(Request request) throws Exception {
+        Group group =  findGroup(request,true);
+        StringBuffer sb = new StringBuffer();
+
+        if(request.defined(ACTION_EDIT)) {
+            //TODO: put the change into the DB
+            group.setName(request.getString(ARG_NAME,group.getName()));
+        }
+
+        sb.append(getBreadCrumbs(request, group, true)[1]);
+        sb.append(HtmlUtil.space(2));
+        sb.append(getAllGroupLinks(request, group));
+        sb.append("<p>");
+        sb.append("<table cellpadding=\"5\">");
+        sb.append(HtmlUtil.form(URL_GROUP_FORM, ""));
+        sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
+        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
+                                         HtmlUtil.input(ARG_NAME,group.getName())));
+
+        sb.append(HtmlUtil.tableEntry("",HtmlUtil.submit("Edit Group",ACTION_EDIT)));
+        sb.append("</form>");
+        sb.append("</table>");
+        return new Result("Group Form:" + group.getFullName(), sb, Result.TYPE_HTML);
+    }
+
+
+    protected String[] getBreadCrumbs(Request request, Group group,
+                                      boolean makeLinkForLastGroup)
+            throws Exception {
+        List   breadcrumbs = new ArrayList();
+        List   titleList   = new ArrayList();
+        Group  parent      = group.getParent();
+        String output      = request.getOutput();
+        while (parent != null) {
+            titleList.add(0, parent.getName());
+            breadcrumbs.add(
+                0, HtmlUtil.href(
+                    HtmlUtil.url(URL_GROUP_SHOW, ARG_GROUP,
+                        parent.getFullName(), ARG_OUTPUT,
+                        output), parent.getName()));
+            parent = parent.getParent();
+        }
+        breadcrumbs.add(0, HtmlUtil.href(URL_GROUP_SHOW, "Top"));
+        titleList.add(group.getName());
+        if (makeLinkForLastGroup) {
+            breadcrumbs.add(
+                HtmlUtil.href(
+                    HtmlUtil.url(
+                        URL_GROUP_SHOW, ARG_GROUP,
+                        group.getFullName(), ARG_OUTPUT,
+                        output), group.getName()));
+        } else {
+            breadcrumbs.add(HtmlUtil.bold(group.getName()) + "&nbsp;"
+                            + getAllGroupLinks(request, group));
+        }
+        String title = "Group: "
+                       + StringUtil.join("&nbsp;&gt;&nbsp;", titleList);
+        return new String[] { title,
+                              StringUtil.join("&nbsp;&gt;&nbsp;",
+                              breadcrumbs) };
+    }
+
+
+    protected String getAllGroupLinks(Request request, Group group)
+            throws Exception {
+        StringBuffer sb = new StringBuffer();
+        for (OutputHandler outputHandler : getOutputHandlers()) {
+            String links = outputHandler.getGroupLinks(request, group);
+            if(links.length()>0) {
+                sb.append(links);
+                sb.append(HtmlUtil.space(1));
+            }        
+        }
+
+        /*        sb.append(HtmlUtil.href(HtmlUtil.url(URL_GROUP_FORM, ARG_GROUP,
+                                             group.getFullName()),
+                                HtmlUtil.img(fileUrl("/Edit16.gif"),"Edit Group")));
+                                sb.append(HtmlUtil.space(1));*/
+
+
+
+        return sb.toString();
+    }
+
+
+
     /**
      * _more_
      *
@@ -2039,7 +2152,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      *
      * @throws Exception _more_
      */
-    public Result processShowGroup(Request request) throws Exception {
+    public Result processGroupShow(Request request) throws Exception {
         Group group = null;
         String groupName = (String) request.getString(ARG_GROUP,
                                (String) null);
@@ -2502,6 +2615,9 @@ public class Repository implements Constants, Tables, RequestHandler {
         return getOutputHandler(request).processShowGroups(request,
                                 groupList);
     }
+
+
+
 
 
     /**
@@ -2993,9 +3109,13 @@ public class Repository implements Constants, Tables, RequestHandler {
     protected List<Entry> getEntries(Request request) throws Exception {
         TypeHandler typeHandler = getTypeHandler(request);
         List        where       = typeHandler.assembleWhereClause(request);
+        String order = " DESC ";
+        if(request.get(ARG_ASCENDING,false)) {
+            order = " ASC ";
+        }
         Statement statement = typeHandler.executeSelect(request,
                                   COLUMNS_ENTRIES, where,
-                                  "order by " + COL_ENTRIES_FROMDATE);
+                                  "order by " + COL_ENTRIES_FROMDATE +order);
         List<Entry>      entries = new ArrayList<Entry>();
         ResultSet        results;
         SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
@@ -3032,10 +3152,11 @@ public class Repository implements Constants, Tables, RequestHandler {
         return getFieldDescription(fieldValue, namesFile, null);
     }
 
-    protected String getFieldDescription(String fieldValue, String namesFile, String dflt)
+
+    protected Properties getFieldProperties(String namesFile)
             throws Exception {
         if (namesFile == null) {
-            return getLongName(fieldValue);
+            return null;
         }
         Properties names = (Properties) namesHolder.get(namesFile);
         if (names == null) {
@@ -3049,7 +3170,18 @@ public class Repository implements Constants, Tables, RequestHandler {
                 throw exc;
             }
         }
-        return (String) names.get(fieldValue);
+        return names;
+    }
+
+
+    protected String getFieldDescription(String fieldValue, String namesFile, String dflt)
+            throws Exception {
+        if (namesFile == null) {
+            return dflt;
+        }
+        String s =  (String)getFieldProperties(namesFile).get(fieldValue);
+        if(s == null) return dflt;
+        return s;
     }
 
 

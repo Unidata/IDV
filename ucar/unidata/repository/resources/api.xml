@@ -2,7 +2,10 @@
 
 
 
-  <method request="/showgroup"   method="processShowGroup"    admin="false" cancache="true" name="Groups" toplevel="true" ishome="true"/>
+  <method request="/group/show"   method="processGroupShow"    admin="false" cancache="true" name="Groups" toplevel="true" ishome="true"/>
+
+  <method request="/group/form"   method="processGroupForm"    admin="false" cancache="true" name="Groups" toplevel="false" />
+
   <method request="/searchform"  method="processSearchForm"   admin="false" cancache="true" name="Search" toplevel="true"/>
   <method request="/list/home"   method="processShowList"     admin="false" cancache="true" name="List" toplevel="true"/>
   <method request="/query"       method="processQuery"        admin="false" cancache="true"/>
