@@ -18,6 +18,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -194,6 +195,7 @@ public class Column implements Tables, Constants {
     /** _more_ */
     private String namesFile;
 
+    /** _more_          */
     private int offset;
 
 
@@ -202,8 +204,10 @@ public class Column implements Tables, Constants {
      *
      * @param typeHandler _more_
      * @param element _more_
+     * @param offset _more_
      */
-    public Column(GenericTypeHandler typeHandler, Element element, int offset) {
+    public Column(GenericTypeHandler typeHandler, Element element,
+                  int offset) {
         this.typeHandler = typeHandler;
         this.offset      = offset;
         name             = XmlUtil.getAttribute(element, ATTR_NAME);
@@ -459,19 +463,34 @@ public class Column implements Tables, Constants {
 
     }
 
-    public int matchValue(String arg, Object value, Request request, Entry entry) {
+    /**
+     * _more_
+     *
+     * @param arg _more_
+     * @param value _more_
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
+    public int matchValue(String arg, Object value, Request request,
+                          Entry entry) {
         if (type.equals(TYPE_LATLON)) {
             //TODO:
         } else if (type.equals(TYPE_BOOLEAN)) {
-            if(arg.equals(getFullName())) {
-                if(entry.getValues()[offset].toString().equals(value)) return TypeHandler.MATCH_TRUE;
+            if (arg.equals(getFullName())) {
+                if (entry.getValues()[offset].toString().equals(value)) {
+                    return TypeHandler.MATCH_TRUE;
+                }
                 return TypeHandler.MATCH_FALSE;
             }
         } else if (isNumeric()) {
             //
         } else {
-            if(arg.equals(getFullName())) {
-                if(entry.getValues()[offset].equals(value)) return TypeHandler.MATCH_TRUE;
+            if (arg.equals(getFullName())) {
+                if (entry.getValues()[offset].equals(value)) {
+                    return TypeHandler.MATCH_TRUE;
+                }
                 return TypeHandler.MATCH_FALSE;
             }
         }
@@ -565,8 +584,8 @@ public class Column implements Tables, Constants {
      * @throws Exception _more_
      */
     protected String getLabel(String value) throws Exception {
-        String desc = typeHandler.getRepository().getFieldDescription(value+".label",
-                                                                      namesFile);
+        String desc = typeHandler.getRepository().getFieldDescription(value
+                          + ".label", namesFile);
         if (desc == null) {
             desc = value;
         } else {
@@ -623,6 +642,11 @@ public class Column implements Tables, Constants {
         return name;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getNamesFile() {
         return namesFile;
     }

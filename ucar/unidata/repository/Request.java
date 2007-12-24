@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -144,6 +145,11 @@ public class Request implements Constants {
         return sb.toString();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Hashtable getDefinedProperties() {
         Hashtable props = new Hashtable();
         for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {
@@ -152,7 +158,7 @@ public class Request implements Constants {
             if (value.length() == 0) {
                 continue;
             }
-            props.put(arg,value);
+            props.put(arg, value);
         }
         return props;
     }

@@ -19,6 +19,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -82,6 +83,7 @@ public class ZipOutputHandler extends OutputHandler {
 
 
 
+    /** _more_          */
     public static final String OUTPUT_ZIP = "zip.zip";
 
 
@@ -156,8 +158,7 @@ public class ZipOutputHandler extends OutputHandler {
     public Result processEntryShow(Request request, Entry entry)
             throws Exception {
         TypeHandler  typeHandler = repository.getTypeHandler(entry.getType());
-        StringBuffer sb   = typeHandler.getEntryContent(entry,
-                                                        request,true);
+        StringBuffer sb = typeHandler.getEntryContent(entry, request, true);
         return new Result("Entry: " + entry.getName(), sb,
                           getMimeType(request.getOutput()));
     }

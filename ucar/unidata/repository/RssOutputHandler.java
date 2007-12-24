@@ -19,6 +19,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -82,10 +83,16 @@ public class RssOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String OUTPUT_RSS_FULL = "rss.full";
 
+    /** _more_          */
     public static final String OUTPUT_RSS_SUMMARY = "rss.summary";
 
-    private static final TwoFacedObject TFO_FULL = new TwoFacedObject("Full RSS Feed", OUTPUT_RSS_FULL);    
-    private static final TwoFacedObject TFO_SUMMARY = new TwoFacedObject("RSS Feed", OUTPUT_RSS_SUMMARY);
+    /** _more_          */
+    private static final TwoFacedObject TFO_FULL =
+        new TwoFacedObject("Full RSS Feed", OUTPUT_RSS_FULL);
+
+    /** _more_          */
+    private static final TwoFacedObject TFO_SUMMARY =
+        new TwoFacedObject("RSS Feed", OUTPUT_RSS_SUMMARY);
 
 
 
@@ -110,7 +117,8 @@ public class RssOutputHandler extends OutputHandler {
      */
     public boolean canHandle(Request request) {
         String output = (String) request.getOutput();
-        return output.equals(OUTPUT_RSS_FULL) || output.equals(OUTPUT_RSS_SUMMARY);
+        return output.equals(OUTPUT_RSS_FULL)
+               || output.equals(OUTPUT_RSS_SUMMARY);
     }
 
 
@@ -130,7 +138,7 @@ public class RssOutputHandler extends OutputHandler {
         if (what.equals(WHAT_ENTRIES) || what.equals(WHAT_GROUP)) {
             //            list.add(TFO_FULL);
             list.add(TFO_SUMMARY);
-        } 
+        }
         return list;
     }
 
@@ -160,7 +168,8 @@ public class RssOutputHandler extends OutputHandler {
      * @return _more_
      */
     public String getMimeType(String output) {
-        if (output.equals(OUTPUT_RSS_FULL) || output.equals(OUTPUT_RSS_SUMMARY)) {
+        if (output.equals(OUTPUT_RSS_FULL)
+                || output.equals(OUTPUT_RSS_SUMMARY)) {
             return repository.getMimeTypeFromSuffix(".rss");
         } else {
             return super.getMimeType(output);
@@ -168,6 +177,18 @@ public class RssOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param subGroups _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processShowGroup(Request request, Group group,
                                    List<Group> subGroups, List<Entry> entries)
             throws Exception {
@@ -194,28 +215,32 @@ public class RssOutputHandler extends OutputHandler {
                                   XmlUtil.attrs(ATTR_RSS_VERSION, "2.0")));
         sb.append(XmlUtil.openTag(TAG_RSS_CHANNEL));
         sb.append(XmlUtil.tag(TAG_RSS_TITLE, "", "Repository Query"));
-        StringBufferCollection sbc = new StringBufferCollection();
-        String output = request.getOutput();
+        StringBufferCollection sbc    = new StringBufferCollection();
+        String                 output = request.getOutput();
         request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
         for (Entry entry : entries) {
             sb.append(XmlUtil.openTag(TAG_RSS_ITEM));
             sb.append(XmlUtil.tag(TAG_RSS_PUBDATE, "",
                                   "" + new Date(entry.getStartDate())));
             sb.append(XmlUtil.tag(TAG_RSS_TITLE, "", entry.getName()));
-            String url =  repository.absoluteUrl(HtmlUtil.url(repository.URL_ENTRY_SHOW,
-                                                              ARG_ID, entry.getId()));
-            sb.append(XmlUtil.tag(TAG_RSS_LINK,"",url));
-            sb.append(XmlUtil.tag(TAG_RSS_GUID,"",url));
+            String url = repository.absoluteUrl(
+                             HtmlUtil.url(
+                                 repository.URL_ENTRY_SHOW, ARG_ID,
+                                 entry.getId()));
+            sb.append(XmlUtil.tag(TAG_RSS_LINK, "", url));
+            sb.append(XmlUtil.tag(TAG_RSS_GUID, "", url));
 
             sb.append(XmlUtil.openTag(TAG_RSS_DESCRIPTION, ""));
-            if(output.equals(OUTPUT_RSS_FULL)) {
-                XmlUtil.appendCdata(sb,entry.getTypeHandler().getEntryContent(entry,
-                                                                              request,false).toString());
+            if (output.equals(OUTPUT_RSS_FULL)) {
+                XmlUtil.appendCdata(
+                    sb,
+                    entry.getTypeHandler().getEntryContent(
+                        entry, request, false).toString());
             } else {
-                XmlUtil.appendCdata(sb,entry.getDescription());
+                XmlUtil.appendCdata(sb, entry.getDescription());
             }
-            
-            sb.append(XmlUtil.closeTag(TAG_RSS_DESCRIPTION)); 
+
+            sb.append(XmlUtil.closeTag(TAG_RSS_DESCRIPTION));
             sb.append(XmlUtil.closeTag(TAG_RSS_ITEM));
         }
 

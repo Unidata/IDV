@@ -19,6 +19,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -106,7 +107,7 @@ public class XmlOutputHandler extends OutputHandler {
      */
     public boolean canHandle(Request request) {
         String output = (String) request.getOutput();
-        return  output.equals(OUTPUT_XML);
+        return output.equals(OUTPUT_XML);
     }
 
 
@@ -123,8 +124,8 @@ public class XmlOutputHandler extends OutputHandler {
     protected List getOutputTypesFor(Request request, String what)
             throws Exception {
         List list = new ArrayList();
-        if (what.equals(WHAT_ENTRIES)) {
-        } else if (what.equals(WHAT_TAG)) {
+        if (what.equals(WHAT_ENTRIES)) {}
+        else if (what.equals(WHAT_TAG)) {
             list.add(new TwoFacedObject("Tag XML", OUTPUT_XML));
         } else if (what.equals(WHAT_TYPE)) {
             list.add(new TwoFacedObject("Type XML", OUTPUT_XML));
@@ -166,8 +167,7 @@ public class XmlOutputHandler extends OutputHandler {
     public Result processEntryShow(Request request, Entry entry)
             throws Exception {
         TypeHandler  typeHandler = repository.getTypeHandler(entry.getType());
-        StringBuffer sb   = typeHandler.getEntryContent(entry,
-                                                        request,true);
+        StringBuffer sb = typeHandler.getEntryContent(entry, request, true);
         return new Result("Entry: " + entry.getName(), sb,
                           getMimeType(request.getOutput()));
     }
@@ -194,8 +194,8 @@ public class XmlOutputHandler extends OutputHandler {
         for (Group group : groups) {
             sb.append(XmlUtil.tag(TAG_GROUP,
                                   XmlUtil.attrs(ATTR_NAME,
-                                                group.getFullName(), ATTR_ID,
-                                                group.getId())));
+                                      group.getFullName(), ATTR_ID,
+                                      group.getId())));
         }
         sb.append(XmlUtil.closeTag(TAG_GROUPS));
         return new Result("", sb, getMimeType(output));
@@ -228,8 +228,8 @@ public class XmlOutputHandler extends OutputHandler {
             }
             sb.append(XmlUtil.tag(TAG_GROUP,
                                   XmlUtil.attrs(ATTR_NAME,
-                                                group.getFullName(), ATTR_ID,
-                                                group.getId())));
+                                      group.getFullName(), ATTR_ID,
+                                      group.getId())));
         }
         sb.append(XmlUtil.closeTag(TAG_GROUPS));
         return new Result("", sb, getMimeType(output));
@@ -258,7 +258,7 @@ public class XmlOutputHandler extends OutputHandler {
         for (TypeHandler theTypeHandler : typeHandlers) {
             sb.append(XmlUtil.tag(TAG_TYPE,
                                   XmlUtil.attrs(ATTR_TYPE,
-                                                theTypeHandler.getType())));
+                                      theTypeHandler.getType())));
         }
         sb.append(XmlUtil.closeTag(TAG_TYPES));
         return new Result("", sb, getMimeType(output));
@@ -303,8 +303,7 @@ public class XmlOutputHandler extends OutputHandler {
 
         for (Tag tag : tags) {
             sb.append(XmlUtil.tag(TAG_TAG,
-                                  XmlUtil.attrs(ATTR_NAME,
-                                                tag.getName())));
+                                  XmlUtil.attrs(ATTR_NAME, tag.getName())));
         }
 
         String pageTitle = "";

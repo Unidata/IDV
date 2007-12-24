@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -61,13 +62,16 @@ import java.util.Properties;
  */
 public class GenericTypeHandler extends TypeHandler {
 
-    public static final String   COL_ID = "id";
+    /** _more_          */
+    public static final String COL_ID = "id";
+
     /** _more_ */
     List<Column> columns;
 
     /** _more_ */
     List colNames;
 
+    /** _more_          */
     Hashtable nameMap = new Hashtable();
 
     /**
@@ -103,12 +107,13 @@ public class GenericTypeHandler extends TypeHandler {
         StringBuffer tableDef = new StringBuffer("create table "
                                     + getTableName() + " (\n");
         StringBuffer indexDef = new StringBuffer();
-        tableDef.append(COL_ID+" varchar(200)");
+        tableDef.append(COL_ID + " varchar(200)");
         indexDef.append("CREATE INDEX " + getTableName() + "_INDEX_" + COL_ID
                         + "  ON " + getTableName() + " (" + COL_ID + ");\n");
         for (int colIdx = 0; colIdx < columnNodes.size(); colIdx++) {
             Element columnNode = (Element) columnNodes.get(colIdx);
-            Column  column     = new Column(this, columnNode, colNames.size());
+            Column  column     = new Column(this, columnNode,
+                                            colNames.size());
             columns.add(column);
             colNames.addAll(column.getColumnNames());
             tableDef.append(",\n");
@@ -136,11 +141,26 @@ public class GenericTypeHandler extends TypeHandler {
         }
     }
 
-    public int matchValue(String arg, Object value, Request request, Entry entry) {
+    /**
+     * _more_
+     *
+     * @param arg _more_
+     * @param value _more_
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
+    public int matchValue(String arg, Object value, Request request,
+                          Entry entry) {
         for (Column column : columns) {
             int match = column.matchValue(arg, value, request, entry);
-            if(match==MATCH_FALSE) return MATCH_FALSE; 
-            if(match==MATCH_TRUE) return MATCH_TRUE;
+            if (match == MATCH_FALSE) {
+                return MATCH_FALSE;
+            }
+            if (match == MATCH_TRUE) {
+                return MATCH_TRUE;
+            }
         }
         return MATCH_UNKNOWN;
     }
@@ -209,7 +229,8 @@ public class GenericTypeHandler extends TypeHandler {
             sb.append(XmlUtil.openTag(tag + "s"));
         }
 
-        Properties properties = repository.getFieldProperties(theColumn.getNamesFile());
+        Properties properties =
+            repository.getFieldProperties(theColumn.getNamesFile());
         for (int i = 0; i < values.length; i++) {
             String longName = theColumn.getLabel(values[i]);
             if (output.equals(OutputHandler.OUTPUT_HTML)) {
@@ -217,14 +238,15 @@ public class GenericTypeHandler extends TypeHandler {
                 sb.append(longName);
             } else if (output.equals(XmlOutputHandler.OUTPUT_XML)) {
                 String attrs = XmlUtil.attrs(ATTR_ID, values[i]);
-                if(properties!=null) {
-                    for (Enumeration keys = properties.keys(); keys.hasMoreElements(); ) {
-                        String key   = (String) keys.nextElement();
-                        if(key.startsWith(values[i]+".")) {
+                if (properties != null) {
+                    for (Enumeration keys = properties.keys();
+                            keys.hasMoreElements(); ) {
+                        String key = (String) keys.nextElement();
+                        if (key.startsWith(values[i] + ".")) {
                             String value = (String) properties.get(key);
                             value = value.replace("${value}", values[i]);
-                            key  = key.substring((values[i]+".").length());
-                            attrs = attrs + XmlUtil.attr(key,value);
+                            key   = key.substring((values[i] + ".").length());
+                            attrs = attrs + XmlUtil.attr(key, value);
                         }
                     }
                 }
@@ -271,15 +293,24 @@ public class GenericTypeHandler extends TypeHandler {
         return type;
     }
 
-    public void deleteEntry(Request request,  Statement statement, Entry entry)
-        throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param statement _more_
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
+    public void deleteEntry(Request request, Statement statement, Entry entry)
+            throws Exception {
         super.deleteEntry(request, statement, entry);
         //        statement.setString(1, getTableName());
         //        statement.setString(2, entry.getId());
-                String query = SqlUtil.makeDelete(getTableName(), COL_ID,
-                                                  SqlUtil.quote(entry.getId()));
-                statement.execute(query);
-                //        statement.addBatch();
+        String query = SqlUtil.makeDelete(getTableName(), COL_ID,
+                                          SqlUtil.quote(entry.getId()));
+        statement.execute(query);
+        //        statement.addBatch();
     }
 
     /**
@@ -375,15 +406,18 @@ public class GenericTypeHandler extends TypeHandler {
      * @param entry _more_
      * @param request _more_
      * @param output _more_
+     * @param showResource _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
     public StringBuffer getInnerEntryContent(Entry entry, Request request,
-                                             String output,boolean showResource)
+                                             String output,
+                                             boolean showResource)
             throws Exception {
-        StringBuffer sb = super.getInnerEntryContent(entry, request, output,showResource);
+        StringBuffer sb = super.getInnerEntryContent(entry, request, output,
+                              showResource);
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             int      valueIdx = 0;
             Object[] values   = entry.getValues();
@@ -432,14 +466,16 @@ public class GenericTypeHandler extends TypeHandler {
      * @param headerBuffer _more_
      * @param request _more_
      * @param where _more_
+     * @param simpleForm _more_
      *
      * @throws Exception _more_
      */
     public void addToSearchForm(StringBuffer formBuffer,
                                 StringBuffer headerBuffer, Request request,
-                                List where,boolean simpleForm)
+                                List where, boolean simpleForm)
             throws Exception {
-        super.addToSearchForm(formBuffer, headerBuffer, request, where,simpleForm);
+        super.addToSearchForm(formBuffer, headerBuffer, request, where,
+                              simpleForm);
         for (Column column : columns) {
             column.addToSearchForm(formBuffer, headerBuffer, request, where);
         }

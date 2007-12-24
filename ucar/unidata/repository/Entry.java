@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -45,6 +46,7 @@ import java.util.List;
  */
 public class Entry {
 
+    /** _more_          */
     public static final double NONGEO = -999999;
 
     /** _more_ */
@@ -88,17 +90,30 @@ public class Entry {
     /** _more_ */
     private long endDate;
 
+    /** _more_          */
     private double minLat = NONGEO;
+
+    /** _more_          */
     private double maxLat = NONGEO;
+
+    /** _more_          */
     private double minLon = NONGEO;
+
+    /** _more_          */
     private double maxLon = NONGEO;
 
     /** _more_ */
     private TypeHandler typeHandler;
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param typeHandler _more_
+     */
     public Entry(String id, TypeHandler typeHandler) {
-        this.id = id;
+        this.id          = id;
         this.typeHandler = typeHandler;
     }
 
@@ -183,7 +198,7 @@ public class Entry {
      */
     public Entry(String id, TypeHandler typeHandler, String name,
                  String description, Group group, User user, String resource,
-                 long createDate, long startDate, long endDate, 
+                 long createDate, long startDate, long endDate,
                  Object[] values) {
         this.id          = id;
         this.typeHandler = typeHandler;
@@ -191,7 +206,7 @@ public class Entry {
         this.description = description;
         this.group       = group;
         this.user        = user;
-        this.resource        = resource;
+        this.resource    = resource;
         this.createDate  = createDate;
         this.startDate   = startDate;
         this.endDate     = endDate;
@@ -199,6 +214,11 @@ public class Entry {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isFile() {
         return new File(getResource()).exists();
     }
@@ -536,91 +556,102 @@ public class Entry {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean hasLocationDefined() {
-        if(minLat!=NONGEO && minLon!=NONGEO &&!hasAreaDefined()) {
+        if ((minLat != NONGEO) && (minLon != NONGEO) && !hasAreaDefined()) {
             return true;
         }
         return false;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean hasAreaDefined() {
-        if(minLat!=NONGEO && minLon!=NONGEO && maxLat!=NONGEO && maxLon!=NONGEO) {
+        if ((minLat != NONGEO) && (minLon != NONGEO) && (maxLat != NONGEO)
+                && (maxLon != NONGEO)) {
             return true;
         }
         return false;
     }
 
-/**
-Set the MinLat property.
+    /**
+     * Set the MinLat property.
+     *
+     * @param value The new value for MinLat
+     */
+    public void setMinLat(double value) {
+        minLat = value;
+    }
 
-@param value The new value for MinLat
-**/
-public void setMinLat (double value) {
-	minLat = value;
-}
+    /**
+     * Get the MinLat property.
+     *
+     * @return The MinLat
+     */
+    public double getMinLat() {
+        return minLat;
+    }
 
-/**
-Get the MinLat property.
+    /**
+     * Set the MaxLat property.
+     *
+     * @param value The new value for MaxLat
+     */
+    public void setMaxLat(double value) {
+        maxLat = value;
+    }
 
-@return The MinLat
-**/
-public double getMinLat () {
-    return minLat;
-}
+    /**
+     * Get the MaxLat property.
+     *
+     * @return The MaxLat
+     */
+    public double getMaxLat() {
+        return maxLat;
+    }
 
-/**
-Set the MaxLat property.
+    /**
+     * Set the MinLon property.
+     *
+     * @param value The new value for MinLon
+     */
+    public void setMinLon(double value) {
+        minLon = value;
+    }
 
-@param value The new value for MaxLat
-**/
-public void setMaxLat (double value) {
-	maxLat = value;
-}
+    /**
+     * Get the MinLon property.
+     *
+     * @return The MinLon
+     */
+    public double getMinLon() {
+        return minLon;
+    }
 
-/**
-Get the MaxLat property.
+    /**
+     * Set the MaxLon property.
+     *
+     * @param value The new value for MaxLon
+     */
+    public void setMaxLon(double value) {
+        maxLon = value;
+    }
 
-@return The MaxLat
-**/
-public double getMaxLat () {
-    return maxLat;
-}
-
-/**
-Set the MinLon property.
-
-@param value The new value for MinLon
-**/
-public void setMinLon (double value) {
-	minLon = value;
-}
-
-/**
-Get the MinLon property.
-
-@return The MinLon
-**/
-public double getMinLon () {
-	return minLon;
-}
-
-/**
-Set the MaxLon property.
-
-@param value The new value for MaxLon
-**/
-public void setMaxLon (double value) {
-	maxLon = value;
-}
-
-/**
-Get the MaxLon property.
-
-@return The MaxLon
-**/
-public double getMaxLon () {
-	return maxLon;
-}
+    /**
+     * Get the MaxLon property.
+     *
+     * @return The MaxLon
+     */
+    public double getMaxLon() {
+        return maxLon;
+    }
 
 
 

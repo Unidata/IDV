@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -28,8 +29,10 @@ import ucar.unidata.util.IOUtil;
 
 import ucar.unidata.util.LogUtil;
 
-import java.net.*;
 import java.io.*;
+
+import java.net.*;
+
 import java.util.Date;
 
 import java.util.Hashtable;
@@ -41,7 +44,7 @@ import java.util.Hashtable;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class MetaDataServer extends HttpServer  implements Constants {
+public class MetaDataServer extends HttpServer implements Constants {
 
     /** _more_ */
     Repository repository;
@@ -55,7 +58,7 @@ public class MetaDataServer extends HttpServer  implements Constants {
      */
     public MetaDataServer(String[] args) throws Throwable {
         super(8080);
-        repository = new Repository(args,"http://localhost:8080");
+        repository = new Repository(args, "http://localhost:8080");
         repository.init();
     }
 
@@ -72,32 +75,62 @@ public class MetaDataServer extends HttpServer  implements Constants {
      * @throws Exception _more_
      */
     protected RequestHandler doMakeRequestHandler(final Socket socket)
-        throws Exception {
+            throws Exception {
         return new MyRequestHandler(this, socket);
     }
 
 
+    /**
+     * Class MyRequestHandler _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     private class MyRequestHandler extends RequestHandler {
-        boolean cache=false;
-        public MyRequestHandler(MetaDataServer server,Socket socket) throws Exception {
+
+        /** _more_          */
+        boolean cache = false;
+
+        /**
+         * _more_
+         *
+         * @param server _more_
+         * @param socket _more_
+         *
+         * @throws Exception _more_
+         */
+        public MyRequestHandler(MetaDataServer server, Socket socket)
+                throws Exception {
             super(server, socket);
         }
 
+        /**
+         * _more_
+         *
+         * @throws Exception _more_
+         */
         protected void writeHeaderArgs() throws Exception {
             super.writeHeaderArgs();
-            if(!cache) {
+            if ( !cache) {
                 writeLine("Cache-Control: no-cache" + CRLF);
             }
             writeLine("Last-Modified:" + new Date() + CRLF);
         }
-                
-        protected void writeContent(Result result)
-            throws Exception {
+
+        /**
+         * _more_
+         *
+         * @param result _more_
+         *
+         * @throws Exception _more_
+         */
+        protected void writeContent(Result result) throws Exception {
             cache = result.getCacheOk();
-            if(result.getRedirectUrl()!=null) {
+            if (result.getRedirectUrl() != null) {
                 cache = false;
                 redirect(result.getRedirectUrl());
-            } else   if(result.getInputStream()!=null) {
+            } else if (result.getInputStream() != null) {
                 writeResult(result.getRequestOk(), result.getInputStream(),
                             result.getMimeType());
             } else {
@@ -107,37 +140,45 @@ public class MetaDataServer extends HttpServer  implements Constants {
         }
 
 
+        /**
+         * _more_
+         *
+         * @param path _more_
+         * @param formArgs _more_
+         * @param httpArgs _more_
+         * @param content _more_
+         *
+         * @throws Exception _more_
+         */
         protected void handleRequest(String path, Hashtable formArgs,
                                      Hashtable httpArgs, String content)
-            throws Exception {
+                throws Exception {
             path = path.trim();
-            Result result=null;
+            Result result = null;
             try {
-                User user = repository.findUser("jdoe");
+                User           user    = repository.findUser("jdoe");
                 RequestContext context = new RequestContext(user);
                 Request request = new Request(repository, path, context,
-                                              formArgs);
+                                      formArgs);
                 if (user == null) {
-                    result =
-                        new Result("Error",
-                                   new StringBuffer("Unknown request:"
-                                                    + path));
+                    result = new Result("Error",
+                                        new StringBuffer("Unknown request:"
+                                            + path));
                 } else {
                     result = repository.handleRequest(request);
-                } 
+                }
             } catch (Throwable exc) {
                 exc = LogUtil.getInnerException(exc);
                 repository.log("Error:" + exc, exc);
-                result =
-                    new Result("Error",
-                               new StringBuffer(exc.getMessage()+""));
+                result = new Result("Error",
+                                    new StringBuffer(exc.getMessage() + ""));
                 result.putProperty(PROP_NAVLINKS,
                                    repository.getNavLinks(null));
             }
-            if(result == null) {
-                result =   new Result("Error",
-                                      new StringBuffer("Unknown request:"
-                                                       + path));
+            if (result == null) {
+                result = new Result("Error",
+                                    new StringBuffer("Unknown request:"
+                                        + path));
             }
             writeContent(result);
         }
@@ -152,7 +193,7 @@ public class MetaDataServer extends HttpServer  implements Constants {
      * @param exc _more_
      */
     protected void handleError(String msg, Exception exc) {
-        repository.log(msg,exc);
+        repository.log(msg, exc);
     }
 
 

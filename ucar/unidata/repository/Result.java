@@ -18,6 +18,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -35,6 +36,7 @@ public class Result {
     /** _more_ */
     public static String TYPE_HTML = "text/html";
 
+    /** _more_          */
     private String redirectUrl;
 
     /** _more_ */
@@ -64,12 +66,19 @@ public class Result {
     /** _more_ */
     private InputStream inputStream;
 
+    /** _more_          */
     private boolean cacheOk = false;
 
-    private boolean requestOk  = true;
+    /** _more_          */
+    private boolean requestOk = true;
 
+    /**
+     * _more_
+     *
+     * @param redirectUrl _more_
+     */
     public Result(String redirectUrl) {
-        this.redirectUrl = redirectUrl;
+        this.redirectUrl    = redirectUrl;
         this.shouldDecorate = false;
     }
 
@@ -303,58 +312,58 @@ public class Result {
     }
 
     /**
-       Set the RedirectUrl property.
-
-       @param value The new value for RedirectUrl
-    **/
-    public void setRedirectUrl (String value) {
-	redirectUrl = value;
+     *  Set the RedirectUrl property.
+     *
+     *  @param value The new value for RedirectUrl
+     */
+    public void setRedirectUrl(String value) {
+        redirectUrl = value;
     }
 
     /**
-       Get the RedirectUrl property.
-
-       @return The RedirectUrl
-    **/
-    public String getRedirectUrl () {
-	return redirectUrl;
+     *  Get the RedirectUrl property.
+     *
+     *  @return The RedirectUrl
+     */
+    public String getRedirectUrl() {
+        return redirectUrl;
     }
 
-/**
-Set the CacheOk property.
+    /**
+     * Set the CacheOk property.
+     *
+     * @param value The new value for CacheOk
+     */
+    public void setCacheOk(boolean value) {
+        cacheOk = value;
+    }
 
-@param value The new value for CacheOk
-**/
-public void setCacheOk (boolean value) {
-	cacheOk = value;
-}
+    /**
+     * Get the CacheOk property.
+     *
+     * @return The CacheOk
+     */
+    public boolean getCacheOk() {
+        return cacheOk;
+    }
 
-/**
-Get the CacheOk property.
+    /**
+     * Set the RequestOk property.
+     *
+     * @param value The new value for RequestOk
+     */
+    public void setRequestOk(boolean value) {
+        requestOk = value;
+    }
 
-@return The CacheOk
-**/
-public boolean getCacheOk () {
-	return cacheOk;
-}
-
-/**
-Set the RequestOk property.
-
-@param value The new value for RequestOk
-**/
-public void setRequestOk (boolean value) {
-	requestOk = value;
-}
-
-/**
-Get the RequestOk property.
-
-@return The RequestOk
-**/
-public boolean getRequestOk () {
-	return requestOk;
-}
+    /**
+     * Get the RequestOk property.
+     *
+     * @return The RequestOk
+     */
+    public boolean getRequestOk() {
+        return requestOk;
+    }
 
 
 

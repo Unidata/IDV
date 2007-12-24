@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -83,6 +84,7 @@ public class Harvester {
     /** _more_ */
     public static final String TAG_HARVESTER = "harvester";
 
+    /** _more_          */
     public static final String ATTR_CLASS = "class";
 
     /** _more_ */
@@ -101,9 +103,11 @@ public class Harvester {
     /** _more_ */
     public static final String ATTR_SLEEP = "sleep";
 
-    protected Harvester  parent;
+    /** _more_          */
+    protected Harvester parent;
 
-    protected List<Harvester>  children;
+    /** _more_          */
+    protected List<Harvester> children;
 
     /** _more_ */
     protected File rootDir;
@@ -142,30 +146,46 @@ public class Harvester {
      *
      * @param repository _more_
      * @param element _more_
+     *
+     * @throws Exception _more_
      */
-    public Harvester(Repository repository, Element element) throws Exception {
+    public Harvester(Repository repository, Element element)
+            throws Exception {
         this(repository);
-        this.children = createHarvesters(repository,element);
-        for(Harvester child: children) {
+        this.children = createHarvesters(repository, element);
+        for (Harvester child : children) {
             child.parent = this;
         }
         this.name    = XmlUtil.getAttribute(element, ATTR_NAME, "");
         this.monitor = XmlUtil.getAttribute(element, ATTR_MONITOR, false);
         this.active  = XmlUtil.getAttribute(element, ATTR_ACTIVE, false);
-        this.sleepMinutes = XmlUtil.getAttribute(element, ATTR_SLEEP, sleepMinutes);
+        this.sleepMinutes = XmlUtil.getAttribute(element, ATTR_SLEEP,
+                sleepMinutes);
         this.rootDir = new File(XmlUtil.getAttribute(element, ATTR_ROOTDIR));
     }
 
-    public static List<Harvester> createHarvesters(Repository repository, Element root) throws Exception {
-        List<Harvester>  harvesters = new ArrayList<Harvester>();
-        List children = XmlUtil.findChildren(root, TAG_HARVESTER);
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param root _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static List<Harvester> createHarvesters(Repository repository,
+            Element root)
+            throws Exception {
+        List<Harvester> harvesters = new ArrayList<Harvester>();
+        List            children   = XmlUtil.findChildren(root,
+                                         TAG_HARVESTER);
         for (int i = 0; i < children.size(); i++) {
             Element node = (Element) children.get(i);
-            Class c = Misc.findClass(XmlUtil.getAttribute(node,
-                                                          ATTR_CLASS));
+            Class c = Misc.findClass(XmlUtil.getAttribute(node, ATTR_CLASS));
             Constructor ctor = Misc.findConstructor(c,
-                                                    new Class[] { Repository.class,
-                                                                  Element.class });
+                                   new Class[] { Repository.class,
+                    Element.class });
             harvesters.add((Harvester) ctor.newInstance(new Object[] {
                 repository,
                 node }));
@@ -175,6 +195,11 @@ public class Harvester {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public File getRootDir() {
         return rootDir;
     }

@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -80,8 +81,11 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
      * @param request _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    protected String getEntryLinks(Entry entry, Request request) throws Exception {
+    protected String getEntryLinks(Entry entry, Request request)
+            throws Exception {
         if (entry.getValues() == null) {
             return super.getEntryLinks(entry, request);
         }
@@ -97,20 +101,31 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
 
     }
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
     public void initializeNewEntry(Entry entry) throws Exception {
-        String station = (String)entry.getValues()[0];
-        String lat = getRepository().getFieldDescription(station+".lat",
-                                                         "/ucar/unidata/repository/resources/level3radar.station.properties",null);
-        String lon = getRepository().getFieldDescription(station+".lon",
-                                                         "/ucar/unidata/repository/resources/level3radar.station.properties",null);
+        String station = (String) entry.getValues()[0];
+        String lat =
+            getRepository().getFieldDescription(station + ".lat",
+                "/ucar/unidata/repository/resources/level3radar.station.properties",
+                null);
+        String lon =
+            getRepository().getFieldDescription(station + ".lon",
+                "/ucar/unidata/repository/resources/level3radar.station.properties",
+                null);
 
-        if(lat!=null && lon!=null) {
+        if ((lat != null) && (lon != null)) {
             double latD = Misc.decodeLatLon(lat);
             double lonD = Misc.decodeLatLon(lon);
-            entry.setMinLat(latD-2);
-            entry.setMaxLat(latD+2);
-            entry.setMinLon(lonD-2);
-            entry.setMaxLon(lonD+2);
+            entry.setMinLat(latD - 2);
+            entry.setMaxLat(latD + 2);
+            entry.setMinLon(lonD - 2);
+            entry.setMaxLon(lonD + 2);
         }
 
     }

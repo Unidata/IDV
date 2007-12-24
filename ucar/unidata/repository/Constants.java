@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -109,8 +110,12 @@ public interface Constants {
 
     /** _more_ */
     public static final String TAG_RSS_RSS = "rss";
-    public static final String TAG_RSS_LINK= "link";
-    public static final String TAG_RSS_GUID ="guid";
+
+    /** _more_          */
+    public static final String TAG_RSS_LINK = "link";
+
+    /** _more_          */
+    public static final String TAG_RSS_GUID = "guid";
 
     /** _more_ */
     public static final String TAG_RSS_CHANNEL = "channel";
@@ -162,24 +167,32 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    /** _more_          */
     public static final String ARG_WAIT = "wait";
 
     /** _more_ */
     public static final String ARG_SKIP = "skip";
 
+    /** _more_          */
     public static final String ARG_ORDERBY = "orderby";
 
+    /** _more_          */
     public static final String ARG_ASCENDING = "ascending";
 
+    /** _more_          */
     public static final String ARG_AREA = "area";
 
+    /** _more_          */
     public static final String ARG_FORM_BASIC = "form.basic";
 
+    /** _more_          */
     public static final String ARG_INCLUDENONGEO = "includenongeo";
 
 
+    /** _more_          */
     public static final String ARG_NEXT = "next";
 
+    /** _more_          */
     public static final String ARG_PREVIOUS = "previous";
 
     /** _more_ */
@@ -198,6 +211,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_WHAT = "what";
 
+    /** _more_          */
     public static final String ARG_ACTION = "action";
 
     /** _more_ */
@@ -278,6 +292,7 @@ public interface Constants {
     public static final String TYPE_GROUP = "group";
 
 
+    /** _more_          */
     public static final String PROP_DOWNLOAD_OK = "jdms.download.ok";
 
     /** _more_ */
@@ -287,6 +302,7 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_DB_CANCACHE = "jdms.db.cancache";
 
+    /** _more_          */
     public static final String PROP_DB = "jdms.db";
 
 
@@ -309,9 +325,13 @@ public interface Constants {
 
 
 
-    public static final String PROP_HARVESTERS_ACTIVE = "jdms.harvesters.active";
+    /** _more_          */
+    public static final String PROP_HARVESTERS_ACTIVE =
+        "jdms.harvesters.active";
 
+    /** _more_          */
     public static final String PROP_HARVESTERS_FILE = "jdms.harvesters.file";
+
     /** _more_ */
     public static final String PROP_DB_SCRIPT = "jdms.db.script";
 
@@ -345,8 +365,8 @@ public interface Constants {
     public static final String PROP_HTML_IMAGEPLAYER =
         "jdms.html.imageplayer";
 
-    public static final String PROP_HTML_SLIDESHOW =
-        "jdms.html.slideshow";
+    /** _more_          */
+    public static final String PROP_HTML_SLIDESHOW = "jdms.html.slideshow";
 
     /** _more_ */
     public static final String PROP_HTML_TIMELINEAPPLET =
@@ -367,11 +387,11 @@ public interface Constants {
 
 
     /** _more_ */
-    public static final String PROP_DOWNLOAD_ASFILES = 
+    public static final String PROP_DOWNLOAD_ASFILES =
         "jdms.download.asfiles";
 
-  
-  /** _more_ */
+
+    /** _more_ */
     public static final String TAG_DB_ENTRY = "entry";
 
     /** _more_ */
@@ -400,6 +420,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_IMAGEWIDTH = "imagewidth";
 
+    /** _more_          */
     public static final String ARG_IMAGEHEIGHT = "imageheight";
 
     /** _more_ */
@@ -421,8 +442,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_WIDTH = "width";
 
+    /** _more_          */
     public static final String ARG_RESOURCE = "resource";
 
+    /** _more_          */
     public static final String ARG_DESCRIPTION = "description";
 
 
@@ -430,11 +453,19 @@ public interface Constants {
     public static final String ARG_ADMIN_WHAT = "what";
 
 
+    /** _more_          */
     public static final String ACTION_EDIT = "action.edit";
+
+    /** _more_          */
     public static final String ACTION_DELETE_ASK = "action.delete.ask";
+
+    /** _more_          */
     public static final String ACTION_DELETE_DOIT = "action.delete.doit";
 
+    /** _more_          */
     public static final String ACTION_START = "start";
+
+    /** _more_          */
     public static final String ACTION_STOP = "stop";
 
 

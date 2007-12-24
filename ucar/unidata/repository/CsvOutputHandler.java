@@ -19,6 +19,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -109,7 +110,7 @@ public class CsvOutputHandler extends OutputHandler {
      */
     public boolean canHandle(Request request) {
         String output = (String) request.getOutput();
-        return  output.equals(OUTPUT_CSV);
+        return output.equals(OUTPUT_CSV);
     }
 
 
@@ -171,7 +172,7 @@ public class CsvOutputHandler extends OutputHandler {
      */
     protected Result listGroups(Request request, List<Group> groups)
             throws Exception {
-        StringBuffer sb     = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
         for (Group group : groups) {
             sb.append(SqlUtil.comma(group.getFullName(), group.getId()));
             sb.append("\n");
@@ -224,7 +225,7 @@ public class CsvOutputHandler extends OutputHandler {
     protected Result listTypes(Request request,
                                List<TypeHandler> typeHandlers)
             throws Exception {
-        StringBuffer sb     = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
         for (TypeHandler theTypeHandler : typeHandlers) {
             sb.append(SqlUtil.comma(theTypeHandler.getType(),
                                     theTypeHandler.getDescription()));
@@ -247,12 +248,12 @@ public class CsvOutputHandler extends OutputHandler {
      */
     protected Result listTags(Request request, List<Tag> tags)
             throws Exception {
-        StringBuffer sb     = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
         for (Tag tag : tags) {
             sb.append(tag.getName());
             sb.append("\n");
         }
-        return  new Result("", sb, getMimeType(OUTPUT_CSV));
+        return new Result("", sb, getMimeType(OUTPUT_CSV));
     }
 
 
@@ -266,7 +267,7 @@ public class CsvOutputHandler extends OutputHandler {
     public String getMimeType(String output) {
         if (output.equals(OUTPUT_CSV)) {
             return repository.getMimeTypeFromSuffix(".csv");
-        } 
+        }
         return super.getMimeType(output);
     }
 
@@ -281,9 +282,9 @@ public class CsvOutputHandler extends OutputHandler {
      */
     protected Result listAssociations(Request request) throws Exception {
 
-        StringBuffer sb     = new StringBuffer();
-        TypeHandler typeHandler = repository.getTypeHandler(request);
-        List        where       = typeHandler.assembleWhereClause(request);
+        StringBuffer sb          = new StringBuffer();
+        TypeHandler  typeHandler = repository.getTypeHandler(request);
+        List         where       = typeHandler.assembleWhereClause(request);
         if (where.size() > 0) {
             where.add(0, SqlUtil.eq(COL_ASSOCIATIONS_FROM_ENTRY_ID,
                                     COL_ENTRIES_ID));
@@ -394,12 +395,12 @@ public class CsvOutputHandler extends OutputHandler {
     public Result processEntries(Request request, List<Entry> entries)
             throws Exception {
 
-        StringBuffer sb         = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
         for (Entry entry : entries) {
             sb.append(SqlUtil.comma(entry.getId(), entry.getResource()));
         }
-        
-        return  new Result("", sb, getMimeType(OUTPUT_CSV));
+
+        return new Result("", sb, getMimeType(OUTPUT_CSV));
     }
 
 

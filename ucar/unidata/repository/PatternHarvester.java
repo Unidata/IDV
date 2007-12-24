@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -211,7 +212,7 @@ public class PatternHarvester extends Harvester {
      * @throws Exception _more_
      */
     protected void runInner() throws Exception {
-        if (!getActive()) {
+        if ( !getActive()) {
             return;
         }
         long           tt1  = System.currentTimeMillis();
@@ -235,7 +236,8 @@ public class PatternHarvester extends Harvester {
             }
             long t2 = System.currentTimeMillis();
             cnt++;
-            System.err.println("found:" + entries.size() + " files in:" + (t2 - t1) + "ms");
+            System.err.println("found:" + entries.size() + " files in:"
+                               + (t2 - t1) + "ms");
             if ( !repository.processEntries(this, typeHandler, entries)) {
                 break;
             }
@@ -262,12 +264,27 @@ public class PatternHarvester extends Harvester {
      *
      * @throws Exception _more_
      */
-    int dcnt=0;
+    int dcnt = 0;
+
+    /**
+     * _more_
+     *
+     * @param rootDir _more_
+     * @param dirs _more_
+     * @param firstTime _more_
+     * @param rootGroup _more_
+     * @param typeHandler _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public List<Entry> collectFromPattern(File rootDir, List<FileInfo> dirs,
                                           boolean firstTime,
                                           String rootGroup,
                                           TypeHandler typeHandler)
             throws Exception {
+
         long              t1      = System.currentTimeMillis();
         final List<Entry> entries = new ArrayList();
         final User        user    = repository.findUser("jdoe");
@@ -286,8 +303,8 @@ public class PatternHarvester extends Harvester {
                 fileName = fileName.replace("\\", "/");
                 Matcher matcher = filePattern.matcher(fileName);
                 if ( !matcher.find()) {
-                    if(dcnt++<50) {
-                        System.err.println(":"+filePatternString+":");
+                    if (dcnt++ < 50) {
+                        System.err.println(":" + filePatternString + ":");
                         System.err.println(fileName);
                     }
                     continue;
@@ -363,16 +380,16 @@ public class PatternHarvester extends Harvester {
                 Group group = repository.findGroupFromName(rootGroup + "/"
                                   + groupName, true);
                 Entry entry;
-                entries.add(entry = new Entry(repository.getGUID(), typeHandler,
-                                      name, desc, group, user, fileName,
-                                      createDate.getTime(),
-                                      fromDate.getTime(), toDate.getTime(),
-                                      values));
+                entries.add(entry = new Entry(repository.getGUID(),
+                        typeHandler, name, desc, group, user, fileName,
+                        createDate.getTime(), fromDate.getTime(),
+                        toDate.getTime(), values));
                 typeHandler.initializeNewEntry(entry);
 
             }
         }
         return entries;
+
     }
 
 

@@ -19,6 +19,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -189,13 +190,32 @@ public class OutputHandler implements Constants, Tables {
         return null;
     }
 
-    public String getNextPrevLink(Request request, Entry entry, String output) {
-        String nextLink  = HtmlUtil.href(HtmlUtil.url(repository.URL_ENTRY_SHOW, ARG_ID, entry.getId(), ARG_OUTPUT,output, ARG_NEXT, "true"),
-                                         HtmlUtil.img(repository.fileUrl("/Right16.gif"),"View next entry"));
-        String prevLink  = HtmlUtil.href(HtmlUtil.url(repository.URL_ENTRY_SHOW, ARG_ID, entry.getId(),
-                                                      ARG_OUTPUT,output, ARG_PREVIOUS, "true"),
-                                         HtmlUtil.img(repository.fileUrl("/Left16.gif"),"View Previous Entry"));
-        return prevLink+nextLink;
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param output _more_
+     *
+     * @return _more_
+     */
+    public String getNextPrevLink(Request request, Entry entry,
+                                  String output) {
+        String nextLink = HtmlUtil.href(
+                              HtmlUtil.url(
+                                  repository.URL_ENTRY_SHOW, ARG_ID,
+                                  entry.getId(), ARG_OUTPUT, output,
+                                  ARG_NEXT, "true"), HtmlUtil.img(
+                                      repository.fileUrl("/Right16.gif"),
+                                      "View next entry"));
+        String prevLink = HtmlUtil.href(
+                              HtmlUtil.url(
+                                  repository.URL_ENTRY_SHOW, ARG_ID,
+                                  entry.getId(), ARG_OUTPUT, output,
+                                  ARG_PREVIOUS, "true"), HtmlUtil.img(
+                                      repository.fileUrl("/Left16.gif"),
+                                      "View Previous Entry"));
+        return prevLink + nextLink;
     }
 
 
@@ -274,9 +294,9 @@ public class OutputHandler implements Constants, Tables {
             throws Exception {
         List<TwoFacedObject> outputTypes =
             repository.getOutputTypesFor(request, what);
-        int  cnt   = 0;
-        List items = new ArrayList();
-        
+        int    cnt           = 0;
+        List   items         = new ArrayList();
+
         String initialOutput = request.getString(ARG_OUTPUT, "");
         for (TwoFacedObject tfo : outputTypes) {
             request.put(ARG_OUTPUT, (String) tfo.getId());
@@ -285,8 +305,9 @@ public class OutputHandler implements Constants, Tables {
             } else {
                 items.add(
                     HtmlUtil.href(
-                        request.getRequestPath() + "?" + request.getUrlArgs(),
-                        tfo.toString(), " class=\"subnavlink\" "));
+                        request.getRequestPath() + "?"
+                        + request.getUrlArgs(), tfo.toString(),
+                            " class=\"subnavlink\" "));
             }
         }
         request.put(ARG_OUTPUT, initialOutput);
@@ -411,7 +432,7 @@ public class OutputHandler implements Constants, Tables {
      * @throws Exception _more_
      */
     public Result processShowGroups(Request request, List<Group> groups)
-        throws Exception {
+            throws Exception {
         return notImplemented();
     }
 
