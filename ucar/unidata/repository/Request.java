@@ -144,6 +144,19 @@ public class Request implements Constants {
         return sb.toString();
     }
 
+    public Hashtable getDefinedProperties() {
+        Hashtable props = new Hashtable();
+        for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {
+            String arg   = (String) keys.nextElement();
+            String value = (String) parameters.get(arg);
+            if (value.length() == 0) {
+                continue;
+            }
+            props.put(arg,value);
+        }
+        return props;
+    }
+
 
     /**
      * _more_
@@ -308,7 +321,7 @@ public class Request implements Constants {
     public String getString(String key, String dflt) {
         if (checker == null) {
             checker =
-                Pattern.compile(repository.getProperty(PROP_DB_PATTERN));
+                Pattern.compile(repository.getProperty(PROP_REQUEST_PATTERN));
         }
         return getCheckedString(key, dflt, checker);
     }

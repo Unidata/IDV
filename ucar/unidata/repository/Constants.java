@@ -162,6 +162,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    public static final String ARG_WAIT = "wait";
+
     /** _more_ */
     public static final String ARG_SKIP = "skip";
 
@@ -275,14 +277,46 @@ public interface Constants {
     /** _more_ */
     public static final String TYPE_GROUP = "group";
 
-    /** _more_ */
-    public static final String PROP_DB_PATTERN = "jdms.db.pattern";
 
+    public static final String PROP_DOWNLOAD_OK = "jdms.download.ok";
+
+    /** _more_ */
+    public static final String PROP_REQUEST_PATTERN = "jdms.request.pattern";
+
+
+    /** _more_ */
+    public static final String PROP_DB_CANCACHE = "jdms.db.cancache";
+
+    public static final String PROP_DB = "jdms.db";
+
+
+    /** _more_ */
+    public static final String PROP_DB_DERBY_HOME = "jdms.db.derby.home";
+
+    /** _more_ */
+    public static final String PROP_DB_DRIVER = "jdms.db.${db}.driver";
+
+    /** _more_ */
+    public static final String PROP_DB_URL = "jdms.db.${db}.url";
+
+    /** _more_ */
+    public static final String PROP_DB_USER = "jdms.db.${db}.user";
+
+    /** _more_ */
+    public static final String PROP_DB_PASSWORD = "jdms.db.${db}.password";
+
+
+
+
+
+    public static final String PROP_HARVESTERS_ACTIVE = "jdms.harvesters.active";
+
+    public static final String PROP_HARVESTERS_FILE = "jdms.harvesters.file";
     /** _more_ */
     public static final String PROP_DB_SCRIPT = "jdms.db.script";
 
     /** _more_ */
-    public static final String PROP_DB_ENTRIES = "jdms.db.entries";
+    public static final String PROP_FILE_TYPES = "jdms.file.types";
 
     /** _more_ */
     public static final String PROP_OUTPUT_FILES = "jdms.output.files";
@@ -292,6 +326,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String PROP_API = "jdms.api";
+
+
 
     /** _more_ */
     public static final String PROP_NAVSUBLINKS = "jdms.navsublinks";
@@ -329,33 +365,13 @@ public interface Constants {
         "jdms.html.graphtemplate";
 
 
-    /** _more_ */
-    public static final String PROP_DB_CANCACHE = "jdms.db.cancache";
 
     /** _more_ */
-    public static final String PROP_DB_DRIVER = "jdms.db.driver";
+    public static final String PROP_DOWNLOAD_ASFILES = 
+        "jdms.download.asfiles";
 
-    /** _more_ */
-    public static final String PROP_DB_DERBY_HOME = "jdms.db.derby.home";
-
-    /** _more_ */
-    public static final String PROP_DB_URL = "jdms.db.url";
-
-    /** _more_ */
-    public static final String PROP_DB_USER = "jdms.db.user";
-
-    /** _more_ */
-    public static final String PROP_DB_PASSWORD = "jdms.db.password";
-
-    /** _more_ */
-    public static final String PROP_HTML_DOWNLOADENTRIESASFILES =
-        "jdms.html.downloadentriesasfiles";
-
-
-    /** _more_ */
-    public static final String TAG_HARVESTER = "harvester";
-
-    /** _more_ */
+  
+  /** _more_ */
     public static final String TAG_DB_ENTRY = "entry";
 
     /** _more_ */

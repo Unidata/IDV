@@ -366,7 +366,7 @@ public class TypeHandler implements Constants, Tables {
         }
         File f = new File(entry.getResource());
         String size = " (" + f.length() +" bytes)";
-        if (repository.getProperty(PROP_HTML_DOWNLOADENTRIESASFILES, false)) {
+        if (repository.getProperty(PROP_DOWNLOAD_ASFILES, false)) {
             return HtmlUtil.href(
                 "file://" + entry.getResource(),
                 HtmlUtil.img(
@@ -1100,6 +1100,11 @@ public class TypeHandler implements Constants, Tables {
      * @return The Description
      */
     public String getDescription() {
+        return description;
+    }
+
+    public String getLabel() {
+        if(description == null || description.trim().length() == 0) return getType();
         return description;
     }
 

@@ -103,8 +103,6 @@ public class Repository implements Constants, Tables, RequestHandler {
     private List<String> downloadPrefixes = new ArrayList<String>();
 
 
-
-
     public MyUrl URL_GETMAP = new MyUrl("/getmap");
 
     /** _more_ */
@@ -136,7 +134,6 @@ public class Repository implements Constants, Tables, RequestHandler {
 
     public MyUrl URL_ENTRY_DELETE = new MyUrl("/entry/delete");
 
-
     /** _more_ */
     public MyUrl URL_ENTRY_ADD = new MyUrl("/entry/add");
 
@@ -151,7 +148,7 @@ public class Repository implements Constants, Tables, RequestHandler {
 
     /** _more_ */
     public MyUrl URL_ADMIN_SQL = new MyUrl("/admin/sql","SQL");
-    public MyUrl URL_ADMIN_SCOUR = new MyUrl("/admin/scour","Scour");
+    public MyUrl URL_ADMIN_CLEANUP = new MyUrl("/admin/cleanup","Cleanup");
 
     /** _more_ */
     public MyUrl URL_ADMIN_HOME = new MyUrl("/admin/home","Home");
@@ -171,7 +168,7 @@ public class Repository implements Constants, Tables, RequestHandler {
     public MyUrl URL_ADMIN_HARVESTERS = new MyUrl("/admin/harvesters","Harvesters");
 
     private MyUrl[]adminUrls = {
-        URL_ADMIN_HOME, URL_ADMIN_STARTSTOP, URL_ADMIN_TABLES, URL_ADMIN_STATS, URL_ADMIN_USERS, URL_ADMIN_HARVESTERS, URL_ADMIN_SQL,URL_ADMIN_SCOUR};
+        URL_ADMIN_HOME, URL_ADMIN_STARTSTOP, URL_ADMIN_TABLES, URL_ADMIN_STATS, URL_ADMIN_USERS, URL_ADMIN_HARVESTERS, URL_ADMIN_SQL,URL_ADMIN_CLEANUP};
 
 
     /** _more_ */
@@ -180,6 +177,9 @@ public class Repository implements Constants, Tables, RequestHandler {
 
     /** _more_ */
     private List<Harvester> harvesters = new ArrayList();
+
+    private List<EntryListener> entryListeners = new ArrayList<EntryListener>();
+
 
     /** _more_ */
     private Properties mimeTypes;
@@ -212,6 +212,8 @@ public class Repository implements Constants, Tables, RequestHandler {
     /** _more_ */
     private Hashtable typeHandlersMap = new Hashtable();
 
+    private List<TypeHandler> typeHandlers = new ArrayList<TypeHandler>();
+
     /** _more_ */
     private List<OutputHandler> outputHandlers = new ArrayList();
 
@@ -234,7 +236,7 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
     /** _more_ */
-    List<String> entryDefFiles;
+    List<String> typeDefinitionFiles;
 
     /** _more_ */
     List<String> apiDefFiles;
@@ -277,13 +279,18 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
+    public void addDownloadPrefix(String prefix) {
+        downloadPrefixes.add(prefix);
+    }
+
+
     /**
      * _more_
      *
      * @throws Exception _more_
      */
     protected void init() throws Exception {
-        downloadPrefixes.add("c:/cygwin/home/jeffmc/pictures/");
+        addDownloadPrefix("c:/cygwin/home/jeffmc/pictures/");
         initProperties();
         initUrls();
         makeConnection();
@@ -292,8 +299,8 @@ public class Repository implements Constants, Tables, RequestHandler {
                 getProperty(PROP_HTML_MIMEPROPERTIES), ";", true, true)) {
             mimeTypes.load(IOUtil.getInputStream(mimeFile, getClass()));
         }
-        initTable();
         initTypeHandlers();
+        initTable();
         initOutputHandlers();
         initApi();
         initUsers();
@@ -323,7 +330,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                 properties.load(IOUtil.getInputStream(args[i], getClass()));
             } else if (args[i].indexOf("api.xml") >= 0) {
                 argApiDefFiles.add(args[i]);
-            } else if (args[i].indexOf(".dbxml") >= 0) {
+            } else if (args[i].indexOf("types.xml") >= 0) {
                 argEntryDefFiles.add(args[i]);
             } else if (args[i].indexOf("outputhandlers.xml") >= 0) {
                 argOutputDefFiles.add(args[i]);
@@ -343,11 +350,11 @@ public class Repository implements Constants, Tables, RequestHandler {
                         + args[i]);
             }
         }
-        apiDefFiles = StringUtil.split(getProperty(PROP_API));
+        apiDefFiles = StringUtil.split(getProperty(PROP_API),";",true,true);
         apiDefFiles.addAll(argApiDefFiles);
 
-        entryDefFiles = StringUtil.split(getProperty(PROP_DB_ENTRIES));
-        entryDefFiles.addAll(argEntryDefFiles);
+        typeDefinitionFiles = StringUtil.split(getProperty(PROP_FILE_TYPES));
+        typeDefinitionFiles.addAll(argEntryDefFiles);
 
         outputDefFiles = StringUtil.split(getProperty(PROP_OUTPUT_FILES));
         outputDefFiles.addAll(argOutputDefFiles);
@@ -375,7 +382,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         }
 
 
-        Misc.findClass((String) properties.get(PROP_DB_DRIVER));
+
 
     }
 
@@ -428,9 +435,16 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @throws Exception _more_
      */
     protected void makeConnection() throws Exception {
-        String userName      = (String) properties.get(PROP_DB_USER);
-        String password      = (String) properties.get(PROP_DB_PASSWORD);
-        String connectionURL = (String) properties.get(PROP_DB_URL);
+        String db = (String) properties.get(PROP_DB);
+        if(db==null) {
+            throw new IllegalStateException ("Must have a " + PROP_DB +" property defined");
+        }
+
+        String userName      = (String) properties.get(PROP_DB_USER.replace("${db}",db));
+        String password      = (String) properties.get(PROP_DB_PASSWORD.replace("${db}",db));
+        String connectionURL = (String) properties.get(PROP_DB_URL.replace("${db}",db));
+        Misc.findClass((String) properties.get(PROP_DB_DRIVER.replace("${db}",db)));
+
 
         System.err.println("db:" + connectionURL);
         if (userName != null) {
@@ -570,23 +584,13 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @throws Exception _more_
      */
     protected void initHarvesters() throws Exception {
-        boolean okToStart = getProperty("jdms.doharvesters",true);
+        List<String> harvesterFiles =  StringUtil.split(getProperty(PROP_HARVESTERS_FILE),";",true,true);
+        boolean okToStart = getProperty(PROP_HARVESTERS_ACTIVE,true);
         try {
-            Element root =
-                XmlUtil.getRoot(
-                    "/ucar/unidata/repository/resources/harvesters.xml",
-                    getClass());
-            List children = XmlUtil.findChildren(root, TAG_HARVESTER);
-            for (int i = 0; i < children.size(); i++) {
-                Element node = (Element) children.get(i);
-                Class c = Misc.findClass(XmlUtil.getAttribute(node,
-                              ATTR_CLASS));
-                Constructor ctor = Misc.findConstructor(c,
-                                       new Class[] { Repository.class,
-                        Element.class });
-                harvesters.add((Harvester) ctor.newInstance(new Object[] {
-                    this,
-                    node }));
+            harvesters = new ArrayList<Harvester>();
+            for(String file: harvesterFiles) {
+                Element root = XmlUtil.getRoot(file, getClass());
+                harvesters.addAll(Harvester.createHarvesters(this, root));
             }
         } catch (Exception exc) {
             System.err.println("Error loading harvester file");
@@ -867,7 +871,8 @@ public class Repository implements Constants, Tables, RequestHandler {
                                          getClass());
         Statement statement = connection.createStatement();
         SqlUtil.loadSql(sql, statement, true);
-        for (String file : entryDefFiles) {
+        for (String file : typeDefinitionFiles) {
+            System.err.println (file);
             Element entriesRoot = XmlUtil.getRoot(file, getClass());
             List    children = XmlUtil.findChildren(entriesRoot,
                                    TAG_DB_ENTRY);
@@ -1176,8 +1181,9 @@ public class Repository implements Constants, Tables, RequestHandler {
             }
             TypeHandler typeHandler = (TypeHandler) typeHandlersMap.get(id);
             int cnt = getCount(TABLE_ENTRIES, "type=" + SqlUtil.quote(id));
+            
             String url = HtmlUtil.href(HtmlUtil.url(URL_SEARCHFORM, ARG_TYPE,
-                             id), typeHandler.getDescription());
+                             id), typeHandler.getLabel());
             sb.append(HtmlUtil.row(HtmlUtil.cols("" + cnt, url)));
         }
 
@@ -1381,6 +1387,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      */
     protected void addTypeHandler(String typeName, TypeHandler typeHandler) {
         typeHandlersMap.put(typeName, typeHandler);
+        typeHandlers.add(typeHandler);
     }
 
     /**
@@ -1462,19 +1469,33 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
-    public Result adminScour(Request request) throws Exception {
-        StringBuffer sb = new StringBuffer();
-
+    
+    int cleanupTimeStamp = 0;
+    boolean runningCleanup = false;
+    StringBuffer cleanupStatus = new StringBuffer();
+    public void runDatabaseCleanUp(Request request)  throws Exception {
+        if(runningCleanup) return;
+        runningCleanup = true;
+        cleanupStatus = new StringBuffer();
+        int myTimeStamp = ++cleanupTimeStamp;
+        try {
         String query = SqlUtil.makeSelect(SqlUtil.comma(COL_ENTRIES_ID,COL_ENTRIES_RESOURCE,COL_ENTRIES_TYPE),
                                           Misc.newList(TABLE_ENTRIES),"");
         
         SqlUtil.Iterator iter = SqlUtil.getIterator(execute(query));
         ResultSet        results;
         int              cnt       = 0;
+        int deleteCnt = 0;
         long t1 = System.currentTimeMillis();
         List<Entry> entries = new ArrayList<Entry>();
+        Misc.sleep(5000);
+        
         while ((results = iter.next()) != null) {
             while (results.next()) {
+                if(cleanupTimeStamp!= myTimeStamp || !runningCleanup) {
+                    runningCleanup = false;
+                    break;
+                }
                 String id = results.getString(1);
                 Entry entry = new Entry(id,getTypeHandler(results.getString(3)));
                 String resource = results.getString(2);
@@ -1484,14 +1505,60 @@ public class Repository implements Constants, Tables, RequestHandler {
                 if(entries.size()>1000) {
                     deleteEntries(request, entries);
                     entries = new ArrayList<Entry>();
+                    deleteCnt+=1000;
+                    cleanupStatus=new StringBuffer("Removed " + deleteCnt +" entries from database");
                 }
             }
+            if(cleanupTimeStamp!= myTimeStamp || !runningCleanup) {
+                runningCleanup = false;
+                break;
+            }
         }
-        deleteEntries(request, entries);
+        if(runningCleanup) {
+            deleteEntries(request, entries);
+            deleteCnt+=entries.size();
+            cleanupStatus=new StringBuffer("Done running cleanup<br>Removed " + deleteCnt +" entries from database");
+        }
+        } catch(Exception exc) {
+            log("Running cleanup", exc);
+            cleanupStatus.append("An error occurred running cleanup<pre>");
+            cleanupStatus.append(LogUtil.getStackTrace(exc));
+            cleanupStatus.append("</pre>");
+        }
+        runningCleanup = false;
         long t2= System.currentTimeMillis();
-        sb.append(cnt +" files do not exist in " + (t2-t1) );
-        return new Result("Scour Results", sb, getMimeTypeFromSuffix(".html"));
+    }
 
+    public Result adminCleanup(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        sb.append(HtmlUtil.form(URL_ADMIN_CLEANUP));
+        if(request.defined(ACTION_STOP)) {
+            runningCleanup = false;
+            cleanupTimeStamp++;
+            return new Result(URL_ADMIN_CLEANUP.toString());
+        }  else if(request.defined(ACTION_START)) {
+            Misc.run(this,"runDatabaseCleanUp",request);
+            return new Result(URL_ADMIN_CLEANUP.toString());
+        }
+        String status = cleanupStatus.toString();
+        if(runningCleanup) {
+            sb.append("Database clean up is running<p>");
+            sb.append(HtmlUtil.submit("Stop cleanup", ACTION_STOP));
+        } else {
+            sb.append("Cleanup allows you to remove all file entries from the repository database that do not exist on the local file system<p>");
+            sb.append(HtmlUtil.submit("Start cleanup", ACTION_START));
+
+
+        }
+        sb.append("</form>");
+        if(status.length()>0) {
+            sb.append("<h3>Cleanup Status</h3>");
+            sb.append(status);
+        }
+        //        sb.append(cnt +" files do not exist in " + (t2-t1) );
+        Result result = new Result("Cleanup", sb, getMimeTypeFromSuffix(".html"));
+        result.putProperty(PROP_NAVSUBLINKS, getSubNavLinks(request,adminUrls));
+        return result;
     }
 
 
@@ -1623,6 +1690,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      */
     public Result processSearchForm(Request request, boolean typeSpecific)
             throws Exception {
+
         boolean basicForm = request.get(ARG_FORM_BASIC,true);
         List         where        = assembleWhereClause(request);
         StringBuffer sb           = new StringBuffer();
@@ -1899,6 +1967,7 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
     public boolean canDownload(Request request, Entry entry) throws Exception {
+        if(!getProperty(PROP_DOWNLOAD_OK,false)) return false;
         entry  =filterEntry(request,entry);
         if(entry == null) return false;
         if ( !entry.getTypeHandler().canDownload(request, entry)) {
@@ -2028,6 +2097,8 @@ public class Repository implements Constants, Tables, RequestHandler {
                                          HtmlUtil.input(ARG_NAME,"",size)));
         sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Description:"),
                                          HtmlUtil.input(ARG_DESCRIPTION,"",size)));
+        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"),makeTypeSelect(request)));
+
         sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Tags:"),
                                          HtmlUtil.input(ARG_TAG,"",size)+ " (comma separated)"));
         sb.append(HtmlUtil.tableEntry("",HtmlUtil.submit("Add Entry")));
@@ -2059,8 +2130,6 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
     public Result processEntryAdd(Request request) throws Exception {
-
-
 
         String id = getGUID();
         String type = request.getType(TypeHandler.TYPE_ANY);
@@ -2810,6 +2879,16 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
 
+    public String makeTypeSelect(Request request) throws Exception {
+        List<TypeHandler> typeHandlers = getTypeHandlers();
+        List tmp = new ArrayList();
+        for (TypeHandler typeHandler : typeHandlers) {
+            tmp.add(new TwoFacedObject(typeHandler.getLabel(),
+                                       typeHandler.getType()));
+        }
+        return HtmlUtil.select(ARG_TYPE, tmp);
+    }
+
 
 
     /**
@@ -2832,6 +2911,11 @@ public class Repository implements Constants, Tables, RequestHandler {
         for (int i = 0; i < types.length; i++) {
             typeHandlers.add(getTypeHandler(types[i]));
         }
+        return typeHandlers;
+    }
+
+    protected List<TypeHandler> getTypeHandlers()
+            throws Exception {
         return typeHandlers;
     }
 
@@ -3574,6 +3658,23 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
 
+    public Result processEntryListen(Request request) throws Exception {
+        EntryListener entryListener = new EntryListener(this,request);
+        synchronized(entryListeners) {
+            entryListeners.add(entryListener);
+        }
+        synchronized(entryListener) {
+            entryListener.wait();
+        }
+        Entry entry  = entryListener.getEntry();
+        if(entry == null) {
+            return new Result("", new StringBuffer("No match"),
+                              getMimeTypeFromSuffix(".html"));
+        }
+        return getOutputHandler(request).processEntryShow(request, entry);
+    }
+
+
     /**
      * _more_
      *
@@ -3584,6 +3685,15 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @throws Exception _more_
      */
     public Result processQuery(Request request) throws Exception {
+
+        if(request.get(ARG_WAIT,false)) {
+            return processEntryListen(request);
+        }
+
+
+
+
+
         //        System.err.println("submit:" + request.getString("submit","YYY"));
         if (request.defined("submit_type.x")) {
             //            System.err.println("request:" + request.getString("submit_type.x","XXX"));
@@ -3700,7 +3810,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         PreparedStatement assStmt = connection.prepareStatement(query);
         PreparedStatement entriesStmt = connection.prepareStatement(SqlUtil.makeDelete(TABLE_ENTRIES, COL_ENTRIES_ID,
                                                                                    "?"));
-        PreparedStatement genericStmt = connection.prepareStatement("delete from ? where id=?");
+        //        PreparedStatement genericStmt = connection.prepareStatement("delete from ? where id=?");
         synchronized(MUTEX_INSERT) {
             connection.setAutoCommit(false);
             Statement statement = connection.createStatement();
@@ -3715,10 +3825,10 @@ public class Repository implements Constants, Tables, RequestHandler {
                 //                entry.getTypeHandler().deleteEntry(request,genericStmt,entry);
                 entry.getTypeHandler().deleteEntry(request,statement,entry);
             }
-            tagsStmt.executeUpdate();
-            assStmt.executeUpdate();
-            entriesStmt.executeUpdate();
-            //            genericStmt.executeUpdate();
+            tagsStmt.executeBatch();
+            assStmt.executeBatch();
+            entriesStmt.executeBatch();
+            //            genericStmt.executeBatch();
             connection.commit();
             connection.setAutoCommit(true);
         }
@@ -3805,8 +3915,25 @@ public class Repository implements Constants, Tables, RequestHandler {
             connection.commit();
             connection.setAutoCommit(true);
         }
+
+        Misc.run(this,"checkNewEntries", entries);
     }
 
+    public void checkNewEntries(List<Entry> entries) {
+        synchronized(entryListeners) {
+            List<EntryListener> listeners = new ArrayList<EntryListener>(entryListeners);
+            for(Entry entry: entries) {
+                for(EntryListener entryListener: listeners) { 
+                    if(entryListener.processEntry(entry)) {
+                        synchronized(entryListener) {
+                            entryListeners.remove(entryListener);
+                        }
+                    }
+                }
+            }
+        }
+
+    }
 
 
 

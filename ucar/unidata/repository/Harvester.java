@@ -81,6 +81,11 @@ import java.util.regex.*;
 public class Harvester {
 
     /** _more_ */
+    public static final String TAG_HARVESTER = "harvester";
+
+    public static final String ATTR_CLASS = "class";
+
+    /** _more_ */
     public static final String ATTR_ROOTDIR = "rootdir";
 
 
@@ -95,6 +100,10 @@ public class Harvester {
 
     /** _more_ */
     public static final String ATTR_SLEEP = "sleep";
+
+    protected Harvester  parent;
+
+    protected List<Harvester>  children;
 
     /** _more_ */
     protected File rootDir;
@@ -134,16 +143,37 @@ public class Harvester {
      * @param repository _more_
      * @param element _more_
      */
-    public Harvester(Repository repository, Element element) {
+    public Harvester(Repository repository, Element element) throws Exception {
         this(repository);
+        this.children = createHarvesters(repository,element);
+        for(Harvester child: children) {
+            child.parent = this;
+        }
         this.name    = XmlUtil.getAttribute(element, ATTR_NAME, "");
         this.monitor = XmlUtil.getAttribute(element, ATTR_MONITOR, false);
         this.active  = XmlUtil.getAttribute(element, ATTR_ACTIVE, false);
-        this.sleepMinutes = XmlUtil.getAttribute(element, ATTR_SLEEP,
-                sleepMinutes);
+        this.sleepMinutes = XmlUtil.getAttribute(element, ATTR_SLEEP, sleepMinutes);
         this.rootDir = new File(XmlUtil.getAttribute(element, ATTR_ROOTDIR));
-
     }
+
+    public static List<Harvester> createHarvesters(Repository repository, Element root) throws Exception {
+        List<Harvester>  harvesters = new ArrayList<Harvester>();
+        List children = XmlUtil.findChildren(root, TAG_HARVESTER);
+        for (int i = 0; i < children.size(); i++) {
+            Element node = (Element) children.get(i);
+            Class c = Misc.findClass(XmlUtil.getAttribute(node,
+                                                          ATTR_CLASS));
+            Constructor ctor = Misc.findConstructor(c,
+                                                    new Class[] { Repository.class,
+                                                                  Element.class });
+            harvesters.add((Harvester) ctor.newInstance(new Object[] {
+                repository,
+                node }));
+        }
+        return harvesters;
+    }
+
+
 
     public File getRootDir() {
         return rootDir;
