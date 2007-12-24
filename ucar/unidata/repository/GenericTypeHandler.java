@@ -68,6 +68,8 @@ public class GenericTypeHandler extends TypeHandler {
     /** _more_ */
     List colNames;
 
+    Hashtable nameMap = new Hashtable();
+
     /**
      * _more_
      *
@@ -106,7 +108,7 @@ public class GenericTypeHandler extends TypeHandler {
                         + "  ON " + getTableName() + " (" + COL_ID + ");\n");
         for (int colIdx = 0; colIdx < columnNodes.size(); colIdx++) {
             Element columnNode = (Element) columnNodes.get(colIdx);
-            Column  column     = new Column(this, columnNode);
+            Column  column     = new Column(this, columnNode, colNames.size());
             columns.add(column);
             colNames.addAll(column.getColumnNames());
             tableDef.append(",\n");
@@ -132,8 +134,17 @@ public class GenericTypeHandler extends TypeHandler {
             //TODO:
             //            throw new WrapperException(exc);
         }
-
     }
+
+    public int matchValue(String arg, Object value, Request request, Entry entry) {
+        for (Column column : columns) {
+            int match = column.matchValue(arg, value, request, entry);
+            if(match==MATCH_FALSE) return MATCH_FALSE; 
+            if(match==MATCH_TRUE) return MATCH_TRUE;
+        }
+        return MATCH_UNKNOWN;
+    }
+
 
     /**
      * _more_

@@ -62,6 +62,11 @@ import java.util.Properties;
  */
 public class TypeHandler implements Constants, Tables {
 
+    public static final int MATCH_UNKNOWN = 0;
+    public static final int MATCH_TRUE = 1;
+    public static final int MATCH_FALSE = 2;
+
+
     /** _more_ */
     public static final TwoFacedObject ALL_OBJECT = new TwoFacedObject("All",
                                                         "");
@@ -1107,6 +1112,11 @@ public class TypeHandler implements Constants, Tables {
         if(description == null || description.trim().length() == 0) return getType();
         return description;
     }
+
+    public int matchValue(String arg, Object value, Request request, Entry entry) {
+        return MATCH_UNKNOWN;
+    }
+
 
     /**
      * _more_

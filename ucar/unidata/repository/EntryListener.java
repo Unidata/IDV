@@ -24,6 +24,7 @@ package ucar.unidata.repository;
 
 
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Misc;
 
 import java.io.File;
@@ -64,7 +65,11 @@ public class EntryListener implements Constants, Tables {
             String arg   = (String) keys.nextElement();
             String value = (String) properties.get(arg);
             names.add(arg);
-            values.add(value);
+            if(arg.equals(ARG_TAG)) {
+                values.add(StringUtil.split(value,",",true,true));
+            } else {
+                values.add(value);
+            }
         }
     }
 
@@ -86,24 +91,46 @@ public class EntryListener implements Constants, Tables {
         return s2.equals(s1);
     }
 
-    public boolean processEntry(Entry entry) {
+    public boolean checkEntry(Entry entry) {
         for (int i=0;i<names.size();i++) {
             String arg   = (String) names.get(i);
-            String value = (String) values.get(i);
+            Object value = values.get(i);
+            boolean ok = false;
             if(arg.equals(ARG_TYPE)) {
-                if(!value.equals(entry.getTypeHandler().getType())) return false;
+                ok = value.equals(entry.getTypeHandler().getType());
             } else if(arg.equals(ARG_NAME)) {
-                if(!nameMatch(value, entry.getName())) return false;
+                ok = nameMatch(value.toString(), entry.getName());
             } else if(arg.equals(ARG_DESCRIPTION)) {
-                if(!nameMatch(value, entry.getDescription())) return false;
+                ok = nameMatch(value.toString(), entry.getDescription());
             } else if(arg.equals(ARG_GROUP)) {
                 //TODO: check for subgroups
-                if(!(value.equals(entry.getGroup().getFullName()) ||
-                     value.equals(entry.getGroup().getId()))) return false;
+                ok = (value.equals(entry.getGroup().getFullName()) ||
+                      value.equals(entry.getGroup().getId()));
+            } else if(arg.equals(ARG_TAG)) {
+                List tags = entry.getTags();
+                if(tags == null || tags.size() == 0) {
+                    ok = false;
+                }   else {
+                    ok = true;
+                    List myTags = (List) value;
+                    for(int tagIdx=0;tagIdx<myTags.size() && ok;tagIdx++) {
+                        if(!tags.contains(myTags.get(tagIdx)))  ok = false;
+                    }
+                }
             } else {
-                //TODO: ask the type handler
+                int match = entry.getTypeHandler().matchValue(arg,  value, request, entry);
+                if(match == TypeHandler.MATCH_FALSE) {
+                    ok = false;
+                } else if(match == TypeHandler.MATCH_TRUE) {
+                    ok = true;
+                } else {
+                    System.err.println ("unknown Entry listener argument:" + arg);
+                    ok =  false;
+                }
             }
+            if(!ok) return false;
         }
+
 
         this.entry = entry;
         synchronized(this) {

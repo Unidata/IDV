@@ -50,7 +50,10 @@ import java.util.List;
 
 public class Column implements Tables, Constants {
 
+
+
     /** _more_ */
+
     public static final String EXPR_EQUALS = "=";
 
     /** _more_ */
@@ -149,8 +152,6 @@ public class Column implements Tables, Constants {
     /** _more_ */
     private GenericTypeHandler typeHandler;
 
-
-
     /** _more_ */
     private String name;
 
@@ -193,14 +194,18 @@ public class Column implements Tables, Constants {
     /** _more_ */
     private String namesFile;
 
+    private int offset;
+
+
     /**
      * _more_
      *
      * @param typeHandler _more_
      * @param element _more_
      */
-    public Column(GenericTypeHandler typeHandler, Element element) {
+    public Column(GenericTypeHandler typeHandler, Element element, int offset) {
         this.typeHandler = typeHandler;
+        this.offset      = offset;
         name             = XmlUtil.getAttribute(element, ATTR_NAME);
         label            = XmlUtil.getAttribute(element, ATTR_LABEL, name);
         searchType = XmlUtil.getAttribute(element, ATTR_SEARCHTYPE,
@@ -453,6 +458,26 @@ public class Column implements Tables, Constants {
         }
 
     }
+
+    public int matchValue(String arg, Object value, Request request, Entry entry) {
+        if (type.equals(TYPE_LATLON)) {
+            //TODO:
+        } else if (type.equals(TYPE_BOOLEAN)) {
+            if(arg.equals(getFullName())) {
+                if(entry.getValues()[offset].toString().equals(value)) return TypeHandler.MATCH_TRUE;
+                return TypeHandler.MATCH_FALSE;
+            }
+        } else if (isNumeric()) {
+            //
+        } else {
+            if(arg.equals(getFullName())) {
+                if(entry.getValues()[offset].equals(value)) return TypeHandler.MATCH_TRUE;
+                return TypeHandler.MATCH_FALSE;
+            }
+        }
+        return TypeHandler.MATCH_UNKNOWN;
+    }
+
 
     /**
      * _more_

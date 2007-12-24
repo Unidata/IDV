@@ -3924,7 +3924,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             List<EntryListener> listeners = new ArrayList<EntryListener>(entryListeners);
             for(Entry entry: entries) {
                 for(EntryListener entryListener: listeners) { 
-                    if(entryListener.processEntry(entry)) {
+                    if(entryListener.checkEntry(entry)) {
                         synchronized(entryListener) {
                             entryListeners.remove(entryListener);
                         }
