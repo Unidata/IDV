@@ -1589,8 +1589,6 @@ public class Repository implements Constants, Tables, RequestHandler {
             int              deleteCnt = 0;
             long             t1        = System.currentTimeMillis();
             List<Entry>      entries   = new ArrayList<Entry>();
-            Misc.sleep(5000);
-
             while ((results = iter.next()) != null) {
                 while (results.next()) {
                     if ((cleanupTimeStamp != myTimeStamp)
@@ -1602,9 +1600,11 @@ public class Repository implements Constants, Tables, RequestHandler {
                     Entry entry =
                         new Entry(id, getTypeHandler(results.getString(3)));
                     String resource = results.getString(2);
+                    File f = new File(resource);
+                    if(f.exists()) continue;
+                    //TODO: differentiate the entries that are not files
                     entries.add(entry);
-                    //                if(!new File(resource).exists()) cnt++;
-                    if (cnt++ % 1000 == 0) {
+                    if (entries.size() % 1000 == 0) {
                         System.err.print(".");
                     }
                     if (entries.size() > 1000) {
@@ -2727,9 +2727,13 @@ public class Repository implements Constants, Tables, RequestHandler {
         where.add(SqlUtil.eq(COL_ENTRIES_GROUP_ID,
                              SqlUtil.quote(group.getId())));
         TypeHandler typeHandler = getTypeHandler(request);
+            String      order       = " DESC ";
+            if (request.get(ARG_ASCENDING, false)) {
+                order = " ASC ";
+            }
         Statement stmt = typeHandler.executeSelect(request, COL_ENTRIES_ID,
-                             where);
-
+                                                   where,
+                                                   " order by " + COL_ENTRIES_FROMDATE+order);
         return SqlUtil.readString(stmt, 1);
     }
 
@@ -2896,6 +2900,11 @@ public class Repository implements Constants, Tables, RequestHandler {
                                   XmlUtil.attrs(ATTR_TYPE, TYPE_TAG, ATTR_ID,
                                       originalId, ATTR_TITLE, originalId)));
 
+            String      order       = " DESC ";
+            if (request.get(ARG_ASCENDING, false)) {
+                order = " ASC ";
+            }
+
             Statement stmt =
                 typeHandler.executeSelect(
                     request,
@@ -2906,7 +2915,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                             SqlUtil.eq(COL_TAGS_ENTRY_ID, COL_ENTRIES_ID),
                             SqlUtil.eq(
                                 COL_TAGS_NAME,
-                                SqlUtil.quote(id))), " order by " + COL_ENTRIES_FROMDATE);
+                                SqlUtil.quote(id)))                    , " order by " + COL_ENTRIES_FROMDATE+order);
 
             SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
             ResultSet        results;

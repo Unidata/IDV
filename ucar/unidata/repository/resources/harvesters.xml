@@ -39,7 +39,7 @@
 		grouptemplate = "${station}/${product}"
 		nametemplate="${station}-${product}-${fromDate}"
 		desctemplate= "${name} description"
-                monitor="false"
+                monitor="true"
 		sleep="1"/>
 
 
@@ -56,7 +56,7 @@
 		grouptemplate = "${station}"
 		nametemplate="${station}-${fromDate}"
 		desctemplate= "${name} description"
-                monitor="false"
+                monitor="true"
 		sleep="1"/>
 
 
@@ -78,7 +78,7 @@
 		grouptemplate = "${modelgroup}/${modelrun}"
                 nametemplate = "${modelgroup}-${modelrun}-${fromDate}"
 		desctemplate= "${name} description"
-                monitor="false"
+                monitor="true"
 		sleep="1"/>
 
 
@@ -96,7 +96,7 @@
 		grouptemplate = "${platform}/${resolution}/${product}"
 		nametemplate="${platform}-${resolution}-${product}-${fromDate}"
 		desctemplate= "${name}"
-                monitor="false"
+                monitor="true"
 		sleep="1"/>
 
 
