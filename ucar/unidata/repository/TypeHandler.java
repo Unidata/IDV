@@ -746,13 +746,10 @@ public class TypeHandler implements Constants, Tables {
         minDate = "";
         maxDate = "";
 
-
-
-
         if (typeHandlers.size() > 1) {
             List tmp = new ArrayList();
             for (TypeHandler typeHandler : typeHandlers) {
-                tmp.add(new TwoFacedObject(typeHandler.getType(),
+                tmp.add(new TwoFacedObject(typeHandler.getLabel(),
                                            typeHandler.getType()));
             }
             TwoFacedObject anyTfo = new TwoFacedObject(TYPE_ANY, TYPE_ANY);
