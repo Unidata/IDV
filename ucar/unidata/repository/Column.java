@@ -248,6 +248,17 @@ public class Column implements Tables, Constants {
         return type.equals(TYPE_INT) || type.equals(TYPE_DOUBLE);
     }
 
+    private String toString(Object[]values, int idx) {
+        if(values[idx]==null) return "";
+        return values[idx].toString();
+    }
+
+    private boolean toBoolean(Object[]values, int idx) {
+        if(values[idx]==null) return true;
+        return ((Boolean)values[idx]).booleanValue();
+    }
+
+
     /**
      * _more_
      *
@@ -260,14 +271,15 @@ public class Column implements Tables, Constants {
      */
     protected int formatValue(StringBuffer sb, String output,
                               Object[] values, int valueIdx) {
+        
         if (type.equals(TYPE_LATLON)) {
-            sb.append(values[valueIdx].toString());
+            sb.append(toString(values,valueIdx));
             valueIdx++;
             sb.append(",");
-            sb.append(values[valueIdx].toString());
+            sb.append(toString(values,valueIdx));
             valueIdx++;
         } else {
-            sb.append(values[valueIdx].toString());
+            sb.append(toString(values,valueIdx));
             valueIdx++;
         }
         return valueIdx;
@@ -314,7 +326,7 @@ public class Column implements Tables, Constants {
             stmt.setDouble(valueIdx + 2, lon);
             valueIdx++;
         } else {
-            stmt.setString(valueIdx + 2, values[valueIdx].toString());
+            stmt.setString(valueIdx + 2, toString(values,valueIdx));
             valueIdx++;
         }
         return valueIdx;
@@ -507,13 +519,13 @@ public class Column implements Tables, Constants {
     public void addToEntryForm(Request request, StringBuffer formBuffer, Entry entry)
             throws Exception {
         String widget = "";
+        Object[]values = entry.getValues();
         if (type.equals(TYPE_LATLON)) {
             widget = HtmlUtil.makeLatLonBox(getFullName(), "", "", "", "");
         } else if (type.equals(TYPE_BOOLEAN)) {
             String value = "True";
             if(entry!=null) {
-                Boolean b = (Boolean) entry.getValues()[offset];
-                if(b.booleanValue()) {
+                if(toBoolean(values,offset)) {
                     value = "True";
                 } else {
                     value = "False";
@@ -525,27 +537,26 @@ public class Column implements Tables, Constants {
         } else if (type.equals(TYPE_ENUMERATION)) {
             String value = "";
             if(entry!=null) {
-                value = (String)entry.getValues()[offset];
+                value = (String)toString(values, offset);
             }
-            widget = HtmlUtil.select(getFullName(), values, value);
+            widget = HtmlUtil.select(getFullName(), this.values, value);
         } else if (type.equals(TYPE_INT)) {
             String value = "";
             if(entry!=null) {
-                value = ""+((Integer)entry.getValues()[offset]).intValue();
+                value = ""+toString(values, offset);
             }
             widget = HtmlUtil.input(getFullName(), value, "size=\"10\"");
         } else if (type.equals(TYPE_DOUBLE)) {
             String value = "";
             if(entry!=null) {
-                value = ""+((Double)entry.getValues()[offset]).doubleValue();
+                value = ""+toString(values,offset);
             }
             widget = HtmlUtil.input(getFullName(), value, "size=\"10\"");
         } else {
             String value = "";
             if(entry!=null) {
-                value = (String)entry.getValues()[offset];
+                value = toString(values,offset);
             }
-            System.err.println (getFullName() + " " + offset + " " + value);
             if (searchType.equals(SEARCHTYPE_SELECT)) {
                 Hashtable props = typeHandler.getRepository().getFieldProperties(namesFile);
                 List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
