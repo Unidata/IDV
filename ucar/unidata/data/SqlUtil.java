@@ -315,6 +315,22 @@ public class SqlUtil {
     }
 
 
+    public static String makeUpdate(String table, String colId,  String []names) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("UPDATE  ");
+        sb.append(table);
+        sb.append(" SET ");
+        for(int i=0;i<names.length;i++) {
+            if(i>0)
+                sb.append(",");
+            sb.append(" " + names[i] +"=?" +" " );
+        }
+        sb.append(" WHERE ");
+        sb.append(colId +" = ?");
+        return sb.toString();
+    }
+
+
 
 
     public static String like(String name, String value) {

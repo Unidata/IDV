@@ -100,5 +100,10 @@ public class Tag {
         return count;
     }
 
+    public String toString() {
+        return name;
+    }
+
+
 }
 

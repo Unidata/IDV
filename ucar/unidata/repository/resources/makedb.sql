@@ -51,10 +51,10 @@ CREATE TABLE entries (id varchar(200),
 	           createdate timestamp, 
 	           fromdate timestamp, 
 	           todate timestamp,
-	           minlat double,
-	           maxlat double,
-	           minlon double,
-	           maxlon double); 
+	           south double,
+	           north double,
+	           east double,
+	           west double); 
 
 CREATE INDEX ENTRIES_INDEX_ID ON entries (ID);
 CREATE INDEX ENTRIES_INDEX_RESOURCE ON entries (RESOURCE);

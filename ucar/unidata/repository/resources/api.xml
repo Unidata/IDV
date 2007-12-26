@@ -3,6 +3,7 @@
 
 
   <method request="/group/show"   method="processGroupShow"    admin="false" cancache="true" name="Groups" toplevel="true" ishome="true"/>
+  <method request="/group/add"   method="processGroupAdd"    admin="false" cancache="true" name="Groups" />
 
   <method request="/group/form"   method="processGroupForm"    admin="false" cancache="true" name="Groups" toplevel="false" />
 
@@ -13,9 +14,11 @@
   <method request="/graphview"   method="processGraphView"    admin="false" cancache="true"/>
   <method request="/getgraph"    method="processGetGraph"     admin="false" cancache="true"/>
 
+  <method request="/entity/form"    method="processEntityForm"     admin="false" cancache="true"/>
+
   <method request="/entry/show"   method="processEntryShow"    admin="false" cancache="true"/>
   <method request="/entry/add"    method="processEntryAdd"     admin="false" cancache="true"/>
-  <method request="/entry/create"    method="processEntryCreate"     admin="false" cancache="true"/>
+  <method request="/entry/form"    method="processEntryForm"     admin="false" cancache="true"/>
   <method request="/entry/delete"    method="processEntryDelete"     admin="false" cancache="true"/>
   <method request="/entry/get/*"  method="processEntryGet"     admin="false" cancache="false"/>
 

@@ -21,6 +21,13 @@
   </entry>
 
 
+  <entry name="testit" description="Test it">
+	<column name="fruit" type="enumeration"  values="Apple,Banana,Orange" label="Fruit" isindex="true" cansearch="true" canlist="true" />
+	<column name="flag" type="boolean"  label="Flag"  isindex="true" cansearch="true" />
+	<column name="number" type="double" cansearch="true" suffix="units"/>
+  </entry>
+
+
   <entry name="level2radar" description="Level 2 Radar Files">
 	<column name="station" type="string" isindex="true" cansearch="true" searchtype="select" label="Station"
                 names="/ucar/unidata/repository/resources/level3radar.station.properties"/>

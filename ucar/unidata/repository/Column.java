@@ -40,6 +40,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Date;
 
 import java.util.Hashtable;
@@ -109,6 +110,8 @@ public class Column implements Tables, Constants {
     /** _more_ */
     private static final String ATTR_NAME = "name";
 
+    private static final String ATTR_SUFFIX = "suffix";
+
     /** _more_ */
     private static final String ATTR_NAMES = "names";
 
@@ -165,6 +168,8 @@ public class Column implements Tables, Constants {
     /** _more_ */
     private String type;
 
+    private String suffix;
+
     /** _more_ */
     private String searchType = SEARCHTYPE_TEXT;
 
@@ -211,6 +216,7 @@ public class Column implements Tables, Constants {
         this.typeHandler = typeHandler;
         this.offset      = offset;
         name             = XmlUtil.getAttribute(element, ATTR_NAME);
+        suffix            = XmlUtil.getAttribute(element, ATTR_SUFFIX,"");
         label            = XmlUtil.getAttribute(element, ATTR_LABEL, name);
         searchType = XmlUtil.getAttribute(element, ATTR_SEARCHTYPE,
                                           searchType);
@@ -498,6 +504,85 @@ public class Column implements Tables, Constants {
     }
 
 
+    public void addToEntryForm(Request request, StringBuffer formBuffer, Entry entry)
+            throws Exception {
+        String widget = "";
+        if (type.equals(TYPE_LATLON)) {
+            widget = HtmlUtil.makeLatLonBox(getFullName(), "", "", "", "");
+        } else if (type.equals(TYPE_BOOLEAN)) {
+            String value = "True";
+            if(entry!=null) {
+                Boolean b = (Boolean) entry.getValues()[offset];
+                if(b.booleanValue()) {
+                    value = "True";
+                } else {
+                    value = "False";
+                }
+            }
+            widget = HtmlUtil.select(getFullName(),
+                                     Misc.newList("True", "False"),
+                                     value);
+        } else if (type.equals(TYPE_ENUMERATION)) {
+            String value = "";
+            if(entry!=null) {
+                value = (String)entry.getValues()[offset];
+            }
+            widget = HtmlUtil.select(getFullName(), values, value);
+        } else if (type.equals(TYPE_INT)) {
+            String value = "";
+            if(entry!=null) {
+                value = ""+((Integer)entry.getValues()[offset]).intValue();
+            }
+            widget = HtmlUtil.input(getFullName(), value, "size=\"10\"");
+        } else if (type.equals(TYPE_DOUBLE)) {
+            String value = "";
+            if(entry!=null) {
+                value = ""+((Double)entry.getValues()[offset]).doubleValue();
+            }
+            widget = HtmlUtil.input(getFullName(), value, "size=\"10\"");
+        } else {
+            String value = "";
+            if(entry!=null) {
+                value = (String)entry.getValues()[offset];
+            }
+            System.err.println (getFullName() + " " + offset + " " + value);
+            if (searchType.equals(SEARCHTYPE_SELECT)) {
+                Hashtable props = typeHandler.getRepository().getFieldProperties(namesFile);
+                List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
+                if(props!=null) {
+                    for (Enumeration keys = props.keys();
+                         keys.hasMoreElements(); ) {
+                        String id = (String) keys.nextElement();
+                        if(id.endsWith(".label")) {
+                            id  = id.substring(0,id.length()-".label".length());
+                            tfos.add(new TwoFacedObject(getLabel(id),id));
+                        }
+                    }
+                }
+                
+                tfos = (List<TwoFacedObject>)Misc.sort(tfos);
+                if (tfos.size() == 0) {
+                    widget =
+                        HtmlUtil.input(getFullName(),value, " size=10 ");
+                } else {
+
+                    widget = HtmlUtil.select(getFullName(), tfos,value);
+                }
+            } else if (rows > 1) {
+                widget = HtmlUtil.textArea(getFullName(), value, rows, columns);
+            } else {
+                widget = HtmlUtil.input(getFullName(), value,
+                                        "size=\"" + columns + "\"");
+            }
+        }
+        formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold(getLabel()
+                                                            + ":"), HtmlUtil.hbox(widget,suffix)));
+        formBuffer.append("\n");
+    }
+
+
+
+
     /**
      * _more_
      *
@@ -508,8 +593,8 @@ public class Column implements Tables, Constants {
      *
      * @throws Exception _more_
      */
-    public void addToSearchForm(StringBuffer formBuffer,
-                                StringBuffer headerBuffer, Request request,
+    public void addToSearchForm(Request request, StringBuffer formBuffer,
+                                StringBuffer headerBuffer, 
                                 List where)
             throws Exception {
 
@@ -552,6 +637,10 @@ public class Column implements Tables, Constants {
                     list.add(new TwoFacedObject(getLabel(values[i]),
                             values[i]));
                 }
+                
+                List sorted = Misc.sort(list);
+                list = new ArrayList<TwoFacedObject>();
+                list.addAll(sorted);
                 if (list.size() == 1) {
                     widget =
                         HtmlUtil.hidden(getFullName(),
@@ -569,7 +658,7 @@ public class Column implements Tables, Constants {
             }
         }
         formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold(getLabel()
-                + ":"), widget));
+                + ":"), "<table>"+HtmlUtil.row(HtmlUtil.cols(widget,suffix))+"</table>"));
         formBuffer.append("\n");
     }
 

@@ -112,6 +112,8 @@ public class Repository implements Constants, Tables, RequestHandler {
     /** _more_ */
     public MyUrl URL_GROUP_SHOW = new MyUrl("/group/show");
 
+    public MyUrl URL_GROUP_ADD = new MyUrl("/group/add");
+
     /** _more_          */
     public MyUrl URL_GROUP_FORM = new MyUrl("/group/form");
 
@@ -144,7 +146,10 @@ public class Repository implements Constants, Tables, RequestHandler {
     public MyUrl URL_ENTRY_ADD = new MyUrl("/entry/add");
 
     /** _more_          */
-    public MyUrl URL_ENTRY_CREATE = new MyUrl("/entry/create");
+    public MyUrl URL_ENTRY_FORM = new MyUrl("/entry/form");
+
+    /** _more_          */
+    public MyUrl URL_ENTITY_FORM = new MyUrl("/entity/form");
 
     /** _more_ */
     public MyUrl URL_GETENTRIES = new MyUrl("/getentries");
@@ -692,7 +697,20 @@ public class Repository implements Constants, Tables, RequestHandler {
      */
     public Result handleRequest(Request request) throws Exception {
         long   t1     = System.currentTimeMillis();
-        Result result = getResult(request);
+        Result result;
+        try {
+            result = getResult(request);
+        } catch(Exception exc) {
+            //TODO: For non-html outputs come up with some error format
+            Throwable inner  =LogUtil.getInnerException(exc);
+            StringBuffer sb = new StringBuffer("An error has occurred:<pre>" +inner.getMessage()+"</pre>");
+            if(request.getRequestContext().getUser().getAdmin()) {
+                sb.append("<pre>" + LogUtil.getStackTrace(inner) +"</pre>");
+            }
+            result = new Result("Error",sb);
+            log("Error handling request:" + request, exc);
+        }
+
         if ((result != null) && (result.getInputStream() == null)
                 && result.isHtml() && result.getShouldDecorate()) {
             result.putProperty(PROP_NAVLINKS, getNavLinks(request));
@@ -1894,7 +1912,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         }
 
 
-        typeHandler.addToSearchForm(sb, headerBuffer, request, where,
+        typeHandler.addToSearchForm(request,sb, headerBuffer, where,
                                     basicForm);
 
 
@@ -2031,6 +2049,7 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
+    private NavigatedMapPanel nmp;
     /**
      * _more_
      *
@@ -2041,38 +2060,43 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @throws Exception _more_
      */
     public Result processMap(Request request) throws Exception {
-        NavigatedMapPanel nmp =
-            new NavigatedMapPanel(Misc.newList(NavigatedMapPanel.DEFAULT_MAP,
-                "/auxdata/maps/OUTLSUPU"), false);
+        if(nmp==null) {
+            nmp =
+                new NavigatedMapPanel(Misc.newList(NavigatedMapPanel.DEFAULT_MAP,
+                                                   "/auxdata/maps/OUTLSUPU"), false);
 
-        double lat1   = request.get("lat1", 0.0);
-        double lat2   = request.get("lat2", 90.0);
-        double lon1   = request.get("lon1", 0.0);
-        double lon2   = request.get("lon2", 360.0);
-
-        double width  = 4 * Math.abs(lon1 - lon2);
-        double height = 4 * Math.abs(lat1 - lat2);
-        if ( !request.get("noprojection", false)) {
-            nmp.setProjectionImpl(new LatLonProjection("",
-                    new ProjectionRect(lon1 - width / 2, lat1 - height / 2,
-                                       lon2 + width / 2, lat2 + height / 2)));
         }
-        nmp.getNavigatedPanel().setSize(request.get(ARG_IMAGEWIDTH, 200),
-                                        request.get(ARG_IMAGEHEIGHT, 200));
-        nmp.getNavigatedPanel().setPreferredSize(new Dimension(200, 200));
-        nmp.getNavigatedPanel().setBorder(
-            BorderFactory.createLineBorder(Color.black));
-        nmp.getNavigatedPanel().setEnabled(true);
-        nmp.setDrawBounds(new LatLonPointImpl(lat1, lon1),
-                          new LatLonPointImpl(lat2, lon2));
 
-        Image image = ImageUtils.getImage(nmp.getNavigatedPanel());
+        synchronized(nmp) {
+            double south   = request.get(ARG_SOUTH, 0.0);
+            double north   = request.get(ARG_NORTH, 90.0);
+            double east   = request.get(ARG_EAST, 180.0);
+            double west   = request.get(ARG_WEST, -180.0);
+
+            double width  = 4 * Math.abs(east-west);
+            double height = 4 * Math.abs(north-south);
+            if ( !request.get("noprojection", false)) {
+                nmp.setProjectionImpl(new LatLonProjection("",
+                                                           new ProjectionRect(west - width / 2, south - height / 2,
+                                                                              east + width / 2, north + height / 2)));
+            }
+            nmp.getNavigatedPanel().setSize(request.get(ARG_IMAGEWIDTH, 200),
+                                            request.get(ARG_IMAGEHEIGHT, 200));
+            nmp.getNavigatedPanel().setPreferredSize(new Dimension(200, 200));
+            nmp.getNavigatedPanel().setBorder(
+                                              BorderFactory.createLineBorder(Color.black));
+            nmp.getNavigatedPanel().setEnabled(true);
+            nmp.setDrawBounds(new LatLonPointImpl(north, west),
+                              new LatLonPointImpl(south, east));
+
+            Image image = ImageUtils.getImage(nmp.getNavigatedPanel());
         //        GuiUtils.showOkCancelDialog(null,"",new JLabel(new ImageIcon(image)),null);
         String                path = "foo.png";
         ByteArrayOutputStream bos  = new ByteArrayOutputStream();
         ImageUtils.writeImageToFile(image, path, bos, 1.0f);
         byte[] imageBytes = bos.toByteArray();
         return new Result("", imageBytes, getMimeTypeFromSuffix(".png"));
+        }
     }
 
 
@@ -2260,36 +2284,122 @@ public class Repository implements Constants, Tables, RequestHandler {
      *
      * @throws Exception _more_
      */
-    public Result processEntryCreate(Request request) throws Exception {
-        Group        group = findGroup(request, true);
+    public Result processEntityForm(Request request) throws Exception {
+        Group        group =  findGroup(request, true);
+        StringBuffer sb    = new StringBuffer();
+        sb.append("<table>");
+        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Group:"),getBreadCrumbs(request, group, true)[1]));
+        sb.append(HtmlUtil.row(HtmlUtil.cols("<p>&nbsp;")));
+        sb.append(HtmlUtil.form(URL_ENTRY_FORM, ""));
+        sb.append(HtmlUtil.tableEntry(HtmlUtil.submit("Create new entry:"),
+                                      makeTypeSelect(request)));
+        sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
+        sb.append("</form>");
+
+        sb.append(HtmlUtil.row(HtmlUtil.cols("<p>&nbsp;")));
+        sb.append(HtmlUtil.form(URL_GROUP_ADD, ""));
+        sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
+        sb.append(HtmlUtil.tableEntry(HtmlUtil.submit("Create new group:"),
+                                      HtmlUtil.input(ARG_NAME)));
+        sb.append("</form>");
+        sb.append("</table>");
+
+        return new Result("New Form", sb, Result.TYPE_HTML);
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processEntryForm(Request request) throws Exception {
+
+        Group        group = null;
+        String type = null;
+        Entry entry = null;
+        if(request.defined(ARG_ID)) {
+            entry =  getEntry(request.getString(ARG_ID,""), request);
+            if(entry == null) {
+                throw new IllegalArgumentException("Could not find entry:" + request.getString(ARG_ID,""));
+            }
+            type = entry.getTypeHandler().getType();
+            group = entry.getGroup();
+        }
+        if(group == null) {
+            group = findGroup(request, true);
+        }
+        if(type == null) {
+            type = request.getType((String)null);
+        }
         StringBuffer sb    = new StringBuffer();
         sb.append("<table cellpadding=\"5\">");
-        sb.append(HtmlUtil.form(URL_ENTRY_ADD, ""));
-
+        sb.append(HtmlUtil.form((type == null?URL_ENTRY_FORM:URL_ENTRY_ADD), ""));
         sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Group:"),
                                       getBreadCrumbs(request, group,
                                           true)[1]));
 
-        sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
+        String title="";
+        if(type == null) {
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"),
+                                          makeTypeSelect(request)));
+            
+            sb.append(HtmlUtil.tableEntry("", HtmlUtil.submit("Select Type to Add")));
+            sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
+        } else {
+            String submitButton = HtmlUtil.submit(title=(entry==null?"Add Entry":"Edit Entry"));
+            sb.append(HtmlUtil.tableEntry("", submitButton));
+            TypeHandler typeHandler = (entry==null?getTypeHandler(type):entry.getTypeHandler());
+            if(entry!=null) {
+                sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
+            } else {
+                sb.append(HtmlUtil.hidden(ARG_TYPE, type));
+                sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
+            }
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"),typeHandler.getLabel()));
+            
+            String size = " size=\"75\" ";
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Resource:"),
+                                          HtmlUtil.input(ARG_RESOURCE, (entry!=null?entry.getResource():""),
+                                                         size)));
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
+                                          HtmlUtil.input(ARG_NAME,  (entry!=null?entry.getName():""), size)));
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Description:"),
+                                          HtmlUtil.textArea(ARG_DESCRIPTION,  (entry!=null?entry.getDescription():""),
+                                                         3,50)));
+            String dateHelp = " (e.g., 2007-12-11 00:00:00)";
+            String fromDate = (entry!=null?new Date(entry.getStartDate()).toString():"");
+            String toDate = (entry!=null?new Date(entry.getEndDate()).toString():"");
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Date Range:"),
+                                          HtmlUtil.input(ARG_FROMDATE, fromDate," size=30 ") + " -- "
+                                          + HtmlUtil.input(ARG_TODATE, toDate," size=30 ") + dateHelp));
 
-        String size = " size=\"50\" ";
-        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Resource:"),
-                                      HtmlUtil.input(ARG_RESOURCE, "",
-                                          size)));
-        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
-                                      HtmlUtil.input(ARG_NAME, "", size)));
-        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Description:"),
-                                      HtmlUtil.input(ARG_DESCRIPTION, "",
-                                          size)));
-        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"),
-                                      makeTypeSelect(request)));
+            String tags = "";
+            if(entry!=null) {
+                List<Tag> tagList = getTags(request, entry.getId());
+                tags = StringUtil.join(",", tagList);
+            }
 
-        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Tags:"),
-                                      HtmlUtil.input(ARG_TAG, "", size)
-                                      + " (comma separated)"));
-        sb.append(HtmlUtil.tableEntry("", HtmlUtil.submit("Add Entry")));
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Tags:"),
+                                          HtmlUtil.input(ARG_TAG, tags, size)
+                                          + " (comma separated)"));
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Location:"),
+                                          HtmlUtil.makeLatLonBox(ARG_AREA, 
+                                                                 (entry!=null&&entry.hasSouth())?entry.getSouth():Double.NaN, 
+                                                                 (entry!=null&&entry.hasNorth())?entry.getNorth():Double.NaN, 
+                                                                 (entry!=null&&entry.hasEast())?entry.getEast():Double.NaN,
+                                                                 (entry!=null&&entry.hasWest())?entry.getWest():Double.NaN)));
+
+            typeHandler.addToEntryForm(request, sb,entry);
+            sb.append(HtmlUtil.tableEntry("", submitButton));
+        }
         sb.append("</table>\n");
-        return new Result("Add Entry", sb, Result.TYPE_HTML);
+        return new Result(title, sb, Result.TYPE_HTML);
     }
 
     /**
@@ -2334,34 +2444,75 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @throws Exception _more_
      */
     public Result processEntryAdd(Request request) throws Exception {
-
-        String id       = getGUID();
-        String type     = request.getType(TypeHandler.TYPE_ANY);
-        String resource = request.getString(ARG_RESOURCE, (String) null);
-        if (resource == null) {
-            throw new IllegalArgumentException(
-                "Must specify a resource argument");
+        Entry entry = null;
+        TypeHandler typeHandler;
+        boolean newEntry = true;
+        if(request.defined(ARG_ID)) {
+            entry =  getEntry(request.getString(ARG_ID,""), request);
+            newEntry = false;
+            if(entry == null) {
+                throw new IllegalArgumentException("Could not find entry:" + request.getString(ARG_ID,""));
+            }
         }
-        String groupName = request.getString(ARG_GROUP, (String) null);
-        if (groupName == null) {
-            throw new IllegalArgumentException(
-                "Must specify a group argument");
-        }
-        Group group = findGroupFromName(groupName, true);
-        String name = request.getString(ARG_NAME,
-                                        IOUtil.getFileTail(resource));
-        String      tags        = request.getString(ARG_TAG, "");
-        String      description = request.getString(ARG_DESCRIPTION, "");
+        Date createDate = new Date();
+        Date[]dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE, createDate);
+        if(entry == null) {
+            typeHandler = getTypeHandler(request.getType(TypeHandler.TYPE_ANY));
+            String resource = request.getString(ARG_RESOURCE, (String) null);
+            if (resource == null) {
+                throw new IllegalArgumentException(
+                                                   "Must specify a resource argument");
+            }
+            String groupName = request.getString(ARG_GROUP, (String) null);
+            if (groupName == null) {
+                throw new IllegalArgumentException(
+                                                   "Must specify a group argument");
+            }
 
-        TypeHandler typeHandler = getTypeHandler(type);
+            String id       = getGUID();
+            String name = request.getString(ARG_NAME,
+                                            IOUtil.getFileTail(resource));
+
+            String      description = request.getString(ARG_DESCRIPTION, "");
+
+
+            if(dateRange[0] == null) dateRange[0] = (dateRange[1]==null?createDate:dateRange[1]);
+            if(dateRange[1] == null) dateRange[1] = dateRange[0];
+            Group group = findGroupFromName(groupName, true);
+            entry = new Entry(id, typeHandler, name, description, group,
+                              request.getRequestContext().getUser(),
+                              resource, createDate.getTime(),
+                              dateRange[0].getTime(),
+                              dateRange[1].getTime());
+        } else {
+            entry.setName(request.getString(ARG_NAME, entry.getName()));
+            entry.setDescription(request.getString(ARG_DESCRIPTION, entry.getDescription()));
+            entry.setResource(request.getString(ARG_RESOURCE, entry.getResource()));
+            if(dateRange[0]!=null)
+                entry.setStartDate(dateRange[0].getTime());
+            if(dateRange[1]==null) 
+                dateRange[1] = dateRange[0];
+            if(dateRange[1]!=null)
+                entry.setEndDate(dateRange[1].getTime());
+            if(request.defined(ARG_TAG)) {
+                //Get rid of the tags
+                execute(SqlUtil.makeDelete(TABLE_TAGS, COL_TAGS_ENTRY_ID, SqlUtil.quote(entry.getId())));
+            }
+        }
+        entry.setSouth(request.get(ARG_AREA+"_south", entry.getSouth()));
+        entry.setNorth(request.get(ARG_AREA+"_north", entry.getNorth()));
+        entry.setWest(request.get(ARG_AREA+"_west", entry.getWest()));
+        entry.setEast(request.get(ARG_AREA+"_east", entry.getEast()));
+
+        if(request.defined(ARG_TAG)) {
+            String      tags        = request.getString(ARG_TAG, "");
+            entry.setTags(StringUtil.split(tags, ",", true, true));
+        }
+
         List<Entry> entries     = new ArrayList<Entry>();
-        Entry entry = new Entry(id, typeHandler, name, description, group,
-                                request.getRequestContext().getUser(),
-                                resource, new Date().getTime());
-        entry.setTags(StringUtil.split(tags, ",", true, true));
         entries.add(entry);
-        insertEntries(typeHandler, entries);
-        return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID, id));
+        insertEntries(entries,newEntry);
+        return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID, entry.getId()));
     }
 
 
@@ -2546,6 +2697,26 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
+    public Result processGroupAdd(Request request) throws Exception {
+        Group        group = findGroup(request, true);
+        String newName = request.getString(ARG_NAME, "");
+        if(newName.length() == 0) {
+            throw new IllegalArgumentException("Need to specify a group name");
+        }
+        String fullName = group.getFullName()+"/" + newName;
+
+        Group newGroup =     findGroupFromName(fullName);
+        if(newGroup !=null) {
+            throw new IllegalArgumentException("Group already exists");
+        }
+
+        newGroup =     findGroupFromName(fullName,true);        
+        return new Result(HtmlUtil.url(URL_GROUP_SHOW,ARG_GROUP, newGroup.getFullName()));
+    }
+
+
+
+
     /**
      * _more_
      *
@@ -2658,6 +2829,9 @@ public class Repository implements Constants, Tables, RequestHandler {
 
         return sb.toString();
     }
+
+
+
 
 
 
@@ -3728,6 +3902,7 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
+
     /**
      * _more_
      *
@@ -4073,7 +4248,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected void setStatement(Entry entry, PreparedStatement statement)
+    protected void setStatement(Entry entry, PreparedStatement statement, boolean isNew)
             throws Exception {
         int col = 1;
         //id,type,name,desc,group,user,file,createdata,fromdate,todate
@@ -4089,11 +4264,14 @@ public class Repository implements Constants, Tables, RequestHandler {
         statement.setTimestamp(col++,
                                new java.sql.Timestamp(entry.getStartDate()));
         statement.setTimestamp(col++,
-                               new java.sql.Timestamp(entry.getStartDate()));
-        statement.setDouble(col++, entry.getMinLat());
-        statement.setDouble(col++, entry.getMaxLat());
-        statement.setDouble(col++, entry.getMinLon());
-        statement.setDouble(col++, entry.getMaxLon());
+                               new java.sql.Timestamp(entry.getEndDate()));
+        statement.setDouble(col++, entry.getSouth());
+        statement.setDouble(col++, entry.getNorth());
+        statement.setDouble(col++, entry.getEast());
+        statement.setDouble(col++, entry.getWest());
+        if(!isNew) {
+            statement.setString(col++, entry.getId());
+        }
     }
 
 
@@ -4186,6 +4364,8 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
+
+
     /**
      * _more_
      *
@@ -4194,23 +4374,20 @@ public class Repository implements Constants, Tables, RequestHandler {
      *
      * @throws Exception _more_
      */
-    public void insertEntries(TypeHandler typeHandler, List<Entry> entries)
+    public void insertEntries(List<Entry> entries, boolean isNew)
             throws Exception {
         if (entries.size() == 0) {
             return;
         }
         clearPageCache();
-        System.err.println("Inserting:" + entries.size() + " "
-                           + typeHandler.getType() + " entries");
+        System.err.println("Inserting:" + entries.size() + " entries");
         long t1  = System.currentTimeMillis();
         int  cnt = 0;
-        PreparedStatement entryInsert =
-            connection.prepareStatement(INSERT_ENTRIES);
+        PreparedStatement entryStatement = 
+            connection.prepareStatement(isNew?INSERT_ENTRIES:UPDATE_ENTRIES);
 
-        String            sql        = typeHandler.getInsertSql();
-        PreparedStatement typeInsert = ((sql == null)
-                                        ? null
-                                        : connection.prepareStatement(sql));
+        Hashtable typeStatements = new Hashtable();
+
         PreparedStatement tagsInsert =
             connection.prepareStatement(INSERT_TAGS);
 
@@ -4218,19 +4395,32 @@ public class Repository implements Constants, Tables, RequestHandler {
         synchronized (MUTEX_INSERT) {
             connection.setAutoCommit(false);
             for (Entry entry : entries) {
+                TypeHandler typeHandler = entry.getTypeHandler();
+                String            sql        = typeHandler.getInsertSql(isNew);
+                PreparedStatement typeStatement = null;
+                if(sql !=null) {
+                    typeStatement = (PreparedStatement) typeStatements.get(sql);
+                    if(typeStatement==null) {
+                        typeStatement =  connection.prepareStatement(sql);
+                        typeStatements.put(sql, typeStatement);
+                    }
+                }
+
                 if ((++cnt) % 5000 == 0) {
                     long   tt2      = System.currentTimeMillis();
                     double tseconds = (tt2 - t1) / 1000.0;
                     System.err.println("# " + cnt + " rate: "
                                        + ((int) (cnt / tseconds)) + "/s");
                 }
-                String id = getGUID();
-                setStatement(entry, entryInsert);
-                entryInsert.addBatch();
 
-                if (typeInsert != null) {
-                    typeHandler.setStatement(entry, typeInsert);
-                    typeInsert.addBatch();
+                setStatement(entry, entryStatement,isNew);
+                batchCnt++;
+                entryStatement.addBatch();
+
+                if (typeStatement != null) {
+                    batchCnt++;
+                    typeHandler.setStatement(entry, typeStatement,isNew);
+                    typeStatement.addBatch();
                 }
                 List<String> tags = entry.getTags();
                 if (tags != null) {
@@ -4242,13 +4432,16 @@ public class Repository implements Constants, Tables, RequestHandler {
                     }
                 }
 
-
-                batchCnt++;
                 if (batchCnt > 100) {
-                    entryInsert.executeBatch();
+                    //                    if(isNew)
+                        entryStatement.executeBatch();
+                        //                    else                        entryStatement.executeUpdate();
                     tagsInsert.executeBatch();
-                    if (typeInsert != null) {
-                        typeInsert.executeBatch();
+                    for(Enumeration keys = typeStatements.keys();keys.hasMoreElements();) {
+                        typeStatement = (PreparedStatement) typeStatements.get(keys.nextElement());
+                        //                        if(isNew)
+                            typeStatement.executeBatch();
+                            //                        else                            typeStatement.executeUpdate();
                     }
                     batchCnt = 0;
                 }
@@ -4257,10 +4450,15 @@ public class Repository implements Constants, Tables, RequestHandler {
                 }
             }
             if (batchCnt > 0) {
-                entryInsert.executeBatch();
+                //                if(isNew)
+                    entryStatement.executeBatch();
+                    //                else                    entryStatement.executeUpdate();
                 tagsInsert.executeBatch();
-                if (typeInsert != null) {
-                    typeInsert.executeBatch();
+                for(Enumeration keys = typeStatements.keys();keys.hasMoreElements();) {
+                    PreparedStatement typeStatement = (PreparedStatement) typeStatements.get(keys.nextElement());
+                    //                    if(isNew)
+                        typeStatement.executeBatch();
+                        //                    else                        typeStatement.executeUpdate();
                 }
             }
             connection.commit();
@@ -4269,6 +4467,9 @@ public class Repository implements Constants, Tables, RequestHandler {
 
         Misc.run(this, "checkNewEntries", entries);
     }
+
+
+
 
     /**
      * _more_
@@ -4441,7 +4642,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             System.err.println ("#results:" + cnt);
             */
             long t2 = System.currentTimeMillis();
-            insertEntries(typeHandler, needToAdd);
+            insertEntries(needToAdd,true);
             System.err.println("Took:" + (t2 - t1) + "ms to check: "
                                + entries.size() + " entries");
         } catch (Exception exc) {

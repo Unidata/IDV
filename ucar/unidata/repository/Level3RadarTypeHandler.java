@@ -122,10 +122,10 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
         if ((lat != null) && (lon != null)) {
             double latD = Misc.decodeLatLon(lat);
             double lonD = Misc.decodeLatLon(lon);
-            entry.setMinLat(latD - 2);
-            entry.setMaxLat(latD + 2);
-            entry.setMinLon(lonD - 2);
-            entry.setMaxLon(lonD + 2);
+            entry.setSouth(latD - 2);
+            entry.setNorth(latD + 2);
+            entry.setEast(lonD + 2);
+            entry.setWest(lonD - 2);
         }
 
     }

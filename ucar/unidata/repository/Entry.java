@@ -91,16 +91,16 @@ public class Entry {
     private long endDate;
 
     /** _more_          */
-    private double minLat = NONGEO;
+    private double south = NONGEO;
 
     /** _more_          */
-    private double maxLat = NONGEO;
+    private double north = NONGEO;
 
     /** _more_          */
-    private double minLon = NONGEO;
+    private double east = NONGEO;
 
     /** _more_          */
-    private double maxLon = NONGEO;
+    private double west = NONGEO;
 
     /** _more_ */
     private TypeHandler typeHandler;
@@ -562,7 +562,7 @@ public class Entry {
      * @return _more_
      */
     public boolean hasLocationDefined() {
-        if ((minLat != NONGEO) && (minLon != NONGEO) && !hasAreaDefined()) {
+        if ((south != NONGEO) && (east != NONGEO) && !hasAreaDefined()) {
             return true;
         }
         return false;
@@ -574,83 +574,101 @@ public class Entry {
      * @return _more_
      */
     public boolean hasAreaDefined() {
-        if ((minLat != NONGEO) && (minLon != NONGEO) && (maxLat != NONGEO)
-                && (maxLon != NONGEO)) {
+        if ((south != NONGEO) && (east != NONGEO) && (north != NONGEO)
+                && (west != NONGEO)) {
             return true;
         }
         return false;
     }
 
     /**
-     * Set the MinLat property.
+     * Set the South property.
      *
-     * @param value The new value for MinLat
+     * @param value The new value for South
      */
-    public void setMinLat(double value) {
-        minLat = value;
+    public void setSouth(double value) {
+        south = value;
     }
 
     /**
-     * Get the MinLat property.
+     * Get the South property.
      *
-     * @return The MinLat
+     * @return The South
      */
-    public double getMinLat() {
-        return minLat;
+    public double getSouth() {
+        return south;
     }
 
     /**
-     * Set the MaxLat property.
+     * Set the North property.
      *
-     * @param value The new value for MaxLat
+     * @param value The new value for North
      */
-    public void setMaxLat(double value) {
-        maxLat = value;
+    public void setNorth(double value) {
+        north = value;
     }
 
     /**
-     * Get the MaxLat property.
+     * Get the North property.
      *
-     * @return The MaxLat
+     * @return The North
      */
-    public double getMaxLat() {
-        return maxLat;
+    public double getNorth() {
+        return north;
+    }
+
+
+    public boolean hasNorth() {
+        return north==north && north!=NONGEO;
+    }
+
+    public boolean hasSouth() {
+        return south==south && south!=NONGEO;
+    }
+
+    public boolean hasEast() {
+        return east==east && east!=NONGEO;
+    }
+
+    public boolean hasWest() {
+        return west==west && west!=NONGEO;
+    }
+
+
+    /**
+     * Set the East property.
+     *
+     * @param value The new value for East
+     */
+    public void setEast(double value) {
+        east = value;
     }
 
     /**
-     * Set the MinLon property.
+     * Get the East property.
      *
-     * @param value The new value for MinLon
+     * @return The East
      */
-    public void setMinLon(double value) {
-        minLon = value;
+    public double getEast() {
+        return east;
     }
 
     /**
-     * Get the MinLon property.
+     * Set the West property.
      *
-     * @return The MinLon
+     * @param value The new value for West
      */
-    public double getMinLon() {
-        return minLon;
+    public void setWest(double value) {
+        west = value;
     }
 
     /**
-     * Set the MaxLon property.
+     * Get the West property.
      *
-     * @param value The new value for MaxLon
+     * @return The West
      */
-    public void setMaxLon(double value) {
-        maxLon = value;
-    }
-
-    /**
-     * Get the MaxLon property.
-     *
-     * @return The MaxLon
-     */
-    public double getMaxLon() {
-        return maxLon;
+    public double getWest() {
+        return west;
     }
 
 

@@ -129,9 +129,11 @@ public class DateUtil {
         "yyyy-MM-dd HH:mm:ss",
         "yyyyMMdd'T'HHmmss",
         "yyyy-MM-dd",
+        "EEE MMM dd HH:mm:ss Z yyyy"
     };
 
     private static SimpleDateFormat[] sdfs;
+    private static SimpleDateFormat lastSdf;
 
 
     public static Date roundByDay(Date dttm,int day) {
@@ -154,9 +156,17 @@ public class DateUtil {
                 sdfs[i] = new SimpleDateFormat(formats[i]);
             }
         }
+        if(lastSdf!=null) {
+            try {
+                lastSdf.parse(dateString);
+                return lastSdf;
+            } catch(ParseException pe) {}
+        }
+
         for(int i=0;i<formats.length;i++) {
             try {
                 sdfs[i].parse(dateString);
+                lastSdf = sdfs[i];
                 return sdfs[i];
             } catch(ParseException pe) {}
         }

@@ -206,10 +206,10 @@ public class TypeHandler implements Constants, Tables {
                       results.getTimestamp(col++).getTime(),
                       results.getTimestamp(col++).getTime(),
                       results.getTimestamp(col++).getTime());
-        entry.setMinLat(results.getDouble(col++));
-        entry.setMaxLat(results.getDouble(col++));
-        entry.setMinLon(results.getDouble(col++));
-        entry.setMaxLon(results.getDouble(col++));
+        entry.setSouth(results.getDouble(col++));
+        entry.setNorth(results.getDouble(col++));
+        entry.setEast(results.getDouble(col++));
+        entry.setWest(results.getDouble(col++));
         return entry;
     }
 
@@ -328,8 +328,16 @@ public class TypeHandler implements Constants, Tables {
      */
     protected String getEntryLinks(Entry entry, Request request)
             throws Exception {
-        return getEntryDownloadLink(request, entry) + "&nbsp;"
-               + getGraphLink(request, entry);
+        String editEntry = HtmlUtil.href(
+                                 HtmlUtil.url(
+                                     repository.URL_ENTRY_FORM, ARG_ID,
+                                     entry.getId()), HtmlUtil.img(
+                                         repository.fileUrl("/Edit16.gif"),
+                                         "Edit Entry"));
+
+        return editEntry + HtmlUtil.space(1) + 
+            getEntryDownloadLink(request, entry) +  HtmlUtil.space(1) + 
+            getGraphLink(request, entry);
     }
 
 
@@ -461,6 +469,9 @@ public class TypeHandler implements Constants, Tables {
                 sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Size:"),
                         f.length() + " bytes"));
             }
+            System.err.println ("create date:" + new Date(entry.getCreateDate()));
+            System.err.println ("start date:" + new Date(entry.getStartDate()));
+            System.err.println ("end date:" + new Date(entry.getEndDate()));
             if ((entry.getCreateDate() != entry.getStartDate())
                     || (entry.getCreateDate() != entry.getEndDate())) {
                 if (entry.getEndDate() != entry.getStartDate()) {
@@ -482,20 +493,13 @@ public class TypeHandler implements Constants, Tables {
 
             if (entry.hasLocationDefined()) {
                 sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Location:"),
-                        entry.getMinLat() + "/" + entry.getMinLon()));
+                        entry.getSouth() + "/" + entry.getEast()));
             } else if (entry.hasAreaDefined()) {
                 String img = HtmlUtil.img(HtmlUtil.url(repository.URL_GETMAP,
-                                 "lat1", "" + entry.getMinLat(), "lon1",
-                                 "" + entry.getMinLon(), "lat2",
-                                 "" + entry.getMaxLat(), "lon2",
-                                 "" + entry.getMaxLon()));
-                /*                sb.append(HtmlUtil.tableEntry(
-                                              HtmlUtil.bold("Area:"),
-                                              HtmlUtil.makeAreaLabel(
-                                                                     entry.getMinLat(),
-                                                                     entry.getMaxLat(),
-                                                                     entry.getMinLon(),
-                                                                     entry.getMaxLon())));*/
+                                                       ARG_SOUTH, "" + entry.getSouth(), 
+                                                       ARG_WEST,  "" + entry.getWest(), 
+                                                       ARG_NORTH, "" + entry.getNorth(), 
+                                                       ARG_EAST,  "" + entry.getEast()));
                 sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Area:"), img));
             }
 
@@ -687,6 +691,12 @@ public class TypeHandler implements Constants, Tables {
         return repository;
     }
 
+    public void addToEntryForm(Request request, StringBuffer formBuffer, Entry entry)
+            throws Exception {
+
+    }
+
+
     /**
      * _more_
      *
@@ -698,8 +708,8 @@ public class TypeHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public void addToSearchForm(StringBuffer formBuffer,
-                                StringBuffer headerBuffer, Request request,
+    public void addToSearchForm(Request request, StringBuffer formBuffer,
+                                StringBuffer headerBuffer, 
                                 List where, boolean simpleForm)
             throws Exception {
 
@@ -951,49 +961,14 @@ public class TypeHandler implements Constants, Tables {
             }
         }
 
-        Date now = new Date();
-        String fromDate = (String) request.getDateSelect(ARG_FROMDATE,
-                              "").trim().toLowerCase();
-        String toDate = (String) request.getDateSelect(ARG_TODATE,
-                            "").trim().toLowerCase();
-
-        Date fromDttm = DateUtil.parseRelative(now, fromDate, -1);
-        Date toDttm   = DateUtil.parseRelative(now, toDate, +1);
-        if ((fromDate.length() > 0) && (fromDttm == null)) {
-            if ( !fromDate.startsWith("-")) {
-                fromDttm = DateUtil.parse(fromDate);
-            }
-        }
-        if ((toDate.length() > 0) && (toDttm == null)) {
-            if ( !toDate.startsWith("+")) {
-                toDttm = DateUtil.parse(toDate);
-            }
-        }
-
-        if ((fromDttm == null) && fromDate.startsWith("-")) {
-            if (toDttm == null) {
-                throw new IllegalArgumentException(
-                    "Cannot do relative From Date when To Date is not set");
-            }
-            fromDttm = DateUtil.getRelativeDate(toDttm, fromDate);
-
-        }
-
-        if ((toDttm == null) && toDate.startsWith("+")) {
-            if (fromDttm == null) {
-                throw new IllegalArgumentException(
-                    "Cannot do relative From Date when To Date is not set");
-            }
-            toDttm = DateUtil.getRelativeDate(fromDttm, toDate);
-        }
-
-        if (fromDttm != null) {
-            where.add(SqlUtil.ge(COL_ENTRIES_FROMDATE, fromDttm));
+        Date[]dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE, new Date());
+        if (dateRange[0] != null) {
+            where.add(SqlUtil.ge(COL_ENTRIES_FROMDATE, dateRange[0]));
         }
 
 
-        if (toDttm != null) {
-            where.add(SqlUtil.le(COL_ENTRIES_TODATE, toDttm));
+        if (dateRange[1] != null) {
+            where.add(SqlUtil.le(COL_ENTRIES_TODATE, dateRange[1]));
         }
 
 
@@ -1005,31 +980,31 @@ public class TypeHandler implements Constants, Tables {
 
         boolean includeNonGeo   = request.get(ARG_INCLUDENONGEO, false);
         List    areaExpressions = new ArrayList();
-        if (request.defined(ARG_AREA + "_minlat")) {
-            areaExpressions.add(SqlUtil.ge(COL_ENTRIES_MINLAT,
-                                           request.get(ARG_AREA + "_minlat",
+        if (request.defined(ARG_AREA + "_south")) {
+            areaExpressions.add(SqlUtil.ge(COL_ENTRIES_SOUTH,
+                                           request.get(ARG_AREA + "_south",
                                                0.0)));
         }
-        if (request.defined(ARG_AREA + "_maxlat")) {
-            areaExpressions.add(SqlUtil.le(COL_ENTRIES_MAXLAT,
-                                           request.get(ARG_AREA + "_maxlat",
+        if (request.defined(ARG_AREA + "_north")) {
+            areaExpressions.add(SqlUtil.le(COL_ENTRIES_NORTH,
+                                           request.get(ARG_AREA + "_north",
                                                0.0)));
         }
-        if (request.defined(ARG_AREA + "_minlon")) {
-            areaExpressions.add(SqlUtil.ge(COL_ENTRIES_MINLON,
-                                           request.get(ARG_AREA + "_minlon",
+        if (request.defined(ARG_AREA + "_east")) {
+            areaExpressions.add(SqlUtil.ge(COL_ENTRIES_EAST,
+                                           request.get(ARG_AREA + "_east",
                                                0.0)));
         }
-        if (request.defined(ARG_AREA + "_maxlon")) {
-            areaExpressions.add(SqlUtil.le(COL_ENTRIES_MAXLON,
-                                           request.get(ARG_AREA + "_maxlon",
+        if (request.defined(ARG_AREA + "_west")) {
+            areaExpressions.add(SqlUtil.le(COL_ENTRIES_WEST,
+                                           request.get(ARG_AREA + "_west",
                                                0.0)));
         }
         if (areaExpressions.size() > 0) {
             String areaExpr = SqlUtil.group(SqlUtil.makeAnd(areaExpressions));
             if (includeNonGeo) {
                 areaExpr = SqlUtil.group(areaExpr + " OR "
-                                         + SqlUtil.eq(COL_ENTRIES_MINLAT,
+                                         + SqlUtil.eq(COL_ENTRIES_SOUTH,
                                              Entry.NONGEO));
 
             }
@@ -1063,7 +1038,7 @@ public class TypeHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public void setStatement(Entry entry, PreparedStatement stmt)
+    public void setStatement(Entry entry, PreparedStatement stmt, boolean isNew)
             throws Exception {}
 
     /**
@@ -1071,7 +1046,7 @@ public class TypeHandler implements Constants, Tables {
      *
      * @return _more_
      */
-    public String getInsertSql() {
+    public String getInsertSql(boolean isNew) {
         return null;
     }
 

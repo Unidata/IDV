@@ -249,12 +249,8 @@ public class ImageOutputHandler extends OutputHandler {
             int cnt = 0;
             for (int i = entries.size() - 1; i >= 0; i--) {
                 Entry entry = entries.get(i);
-                if ( !ImageUtils.isImage(entry.getResource())) {
-                    continue;
-                }
-                String url = HtmlUtil.url(repository.URL_ENTRY_GET + "/"
-                                          + entry.getName(), ARG_ID,
-                                              entry.getId());
+                String url = getImageUrl(entry);
+                if(url == null) continue;
                 if (cnt == 0) {
                     firstImage = url;
                 }
@@ -297,9 +293,8 @@ public class ImageOutputHandler extends OutputHandler {
             }
         } else {
             for (Entry entry : entries) {
-                if ( !ImageUtils.isImage(entry.getResource())) {
-                    continue;
-                }
+                String url = getImageUrl(entry);
+                if(url == null) continue;
                 if (col >= 2) {
                     sb.append("</tr>");
                     col = 0;
@@ -310,8 +305,7 @@ public class ImageOutputHandler extends OutputHandler {
                 col++;
 
                 sb.append("<td>");
-                sb.append(HtmlUtil.img(HtmlUtil.url(repository.URL_ENTRY_GET
-                        + "/" + entry.getName(), ARG_ID, entry.getId()), "",
+                sb.append(HtmlUtil.img(url, "",
                             XmlUtil.attr(ARG_WIDTH, "400")));
                 sb.append("<br>\n");
                 sb.append(getEntryUrl(entry));
@@ -347,7 +341,22 @@ public class ImageOutputHandler extends OutputHandler {
     }
 
 
+    private String getImageUrl(Entry entry) {
+        if (!ImageUtils.isImage(entry.getResource())) {
+            if (entry.hasAreaDefined()) {
+                return  HtmlUtil.url(repository.URL_GETMAP,
+                                     ARG_SOUTH, "" + entry.getSouth(), 
+                                     ARG_WEST,  "" + entry.getWest(), 
+                                     ARG_NORTH, "" + entry.getNorth(), 
+                                     ARG_EAST,  "" + entry.getEast());
+            } 
+            return  null;
+        }
 
+        return  HtmlUtil.url(repository.URL_ENTRY_GET + "/"
+                             + entry.getName(), ARG_ID,
+                             entry.getId());
+    }
 
 }
 

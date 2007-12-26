@@ -167,6 +167,12 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+
+    public static final String ARG_SOUTH = "south";
+    public static final String ARG_NORTH = "north";
+    public static final String ARG_EAST = "east";
+    public static final String ARG_WEST = "west";
+
     /** _more_          */
     public static final String ARG_WAIT = "wait";
 

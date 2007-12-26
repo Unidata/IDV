@@ -409,6 +409,8 @@ public class Request implements Constants {
         return v;
     }
 
+
+
     /**
      * _more_
      *
@@ -493,6 +495,45 @@ public class Request implements Constants {
         }
         return DateUtil.parse(result);
     }
+
+    public Date[] getDateRange(String from, String to, Date dflt) throws java.text.ParseException {
+        String fromDate = (String) getDateSelect(from,
+                                                 "").trim();
+        String toDate = (String) getDateSelect(ARG_TODATE,
+                                               "").trim();
+
+        Date fromDttm = DateUtil.parseRelative(dflt, fromDate, -1);
+        Date toDttm   = DateUtil.parseRelative(dflt, toDate, +1);
+        if ((fromDate.length() > 0) && (fromDttm == null)) {
+            if ( !fromDate.startsWith("-")) {
+                fromDttm = DateUtil.parse(fromDate);
+            }
+        }
+        if ((toDate.length() > 0) && (toDttm == null)) {
+            if ( !toDate.startsWith("+")) {
+                toDttm = DateUtil.parse(toDate);
+            }
+        }
+
+        if ((fromDttm == null) && fromDate.startsWith("-")) {
+            if (toDttm == null) {
+                throw new IllegalArgumentException(
+                    "Cannot do relative From Date when To Date is not set");
+            }
+            fromDttm = DateUtil.getRelativeDate(toDttm, fromDate);
+        }
+
+        if ((toDttm == null) && toDate.startsWith("+")) {
+            if (fromDttm == null) {
+                throw new IllegalArgumentException(
+                    "Cannot do relative From Date when To Date is not set");
+            }
+            toDttm = DateUtil.getRelativeDate(fromDttm, toDate);
+        }
+
+        return new Date[]{fromDttm, toDttm};
+    }
+
 
 
     /**

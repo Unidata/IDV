@@ -84,8 +84,6 @@ public class OutputHandler implements Constants, Tables {
     public static final String OUTPUT_HTML = "default.html";
 
 
-
-
     /** _more_ */
     protected Repository repository;
 

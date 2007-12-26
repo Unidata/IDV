@@ -51,6 +51,10 @@ public class HtmlUtil {
     }
 
 
+    public static String hbox(String s1, String s2) {
+        return "<table>"+HtmlUtil.row(HtmlUtil.cols(s1,s2))+"</table>";
+    }
+
     public static String space(int cnt) {
         String s = "";
         while(cnt-->0)
@@ -137,33 +141,53 @@ public class HtmlUtil {
         return cols(s1)+cols(s2)+cols(s3)+cols(s4);
     }
 
-    public static String makeLatLonBox(String baseName, String minLat, String maxLat, String minLon, String maxLon) {
+    public static String makeLatLonBox(String baseName, String south, String north, String east, String west) {
         return  "<table>" +
             "<tr><td colspan=\"2\" align=\"center\">" +
-            input(baseName+"_maxlat", maxLat," size=\"5\"") +
+            input(baseName+"_north", north," size=\"5\"") +
             "</td></tr>" +
             "<tr><td>" +
-            input(baseName+"_minlon", minLon," size=\"5\"") +
+            input(baseName+"_west", west," size=\"5\"") +
             "</td><td>" +
-            input(baseName+"_maxlon", maxLon," size=\"5\"") +
+            input(baseName+"_east", east," size=\"5\"") +
             "</tr>" +
             "<tr><td colspan=\"2\" align=\"center\">" +
-            input(baseName+"_minlat", minLat," size=\"5\"") +
+            input(baseName+"_south", south," size=\"5\"") +
             "</table>";
     }
 
-    public static String makeAreaLabel(double minLat, double maxLat, double minLon, double maxLon) {
+    public static String makeLatLonBox(String baseName, double south, double north, double east, double west) {
         return  "<table>" +
             "<tr><td colspan=\"2\" align=\"center\">" +
-            maxLat +
+            input(baseName+"_north", toString(north)," size=\"5\"") +
             "</td></tr>" +
             "<tr><td>" +
-            minLon +
+            input(baseName+"_west", toString(west)," size=\"5\"") +
             "</td><td>" +
-            maxLon +
+            input(baseName+"_east", toString(east)," size=\"5\"") +
             "</tr>" +
             "<tr><td colspan=\"2\" align=\"center\">" +
-            minLat +
+            input(baseName+"_south", toString(south)," size=\"5\"") +
+            "</table>";
+    }
+
+    private static String toString(double v) {
+        if(v==v) return ""+v;
+        return "";
+    }
+
+    public static String makeAreaLabel(double south, double north, double east, double west) {
+        return  "<table>" +
+            "<tr><td colspan=\"2\" align=\"center\">" +
+            toString(north)+
+            "</td></tr>" +
+            "<tr><td>" +
+            toString(west) +
+            "</td><td>" +
+            toString(east) +
+            "</tr>" +
+            "<tr><td colspan=\"2\" align=\"center\">" +
+            toString(south) +
             "</table>";
     }
 
@@ -241,6 +265,10 @@ public class HtmlUtil {
      * @param label _more_
      */
     public static String select(String name,List values) {
+        return select(name,values,null);
+    }
+
+    public static String select(String name,List values, String selected) {
         StringBuffer sb = new StringBuffer();
         sb.append("<select name=\"" + name + "\">\n");
         for (int i = 0; i < values.size(); i++) {
@@ -251,9 +279,14 @@ public class HtmlUtil {
                 TwoFacedObject tfo = (TwoFacedObject) obj;
                 value = tfo.getId().toString();
                 label  = tfo.toString();
-           } else {                value = label = obj.toString();
+           } else { 
+               value = label = obj.toString();
+           }
+            String selectedAttr = "";
+            if(selected!=null && value.equals(selected)) {
+                selectedAttr= " selected=\"selected\" ";
             }
-            sb.append("<option value=\"" + value + "\">" + label
+            sb.append("<option " + selectedAttr +"value=\"" + value + "\">" + label
                       + "</option>\n");
         }
         sb.append("</select>\n");

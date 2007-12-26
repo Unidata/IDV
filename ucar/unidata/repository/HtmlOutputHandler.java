@@ -772,10 +772,10 @@ public class HtmlOutputHandler extends OutputHandler {
 
         String createEntry = HtmlUtil.href(
                                  HtmlUtil.url(
-                                     repository.URL_ENTRY_CREATE, ARG_GROUP,
+                                     repository.URL_ENTITY_FORM, ARG_GROUP,
                                      group.getId()), HtmlUtil.img(
                                          repository.fileUrl("/New16.gif"),
-                                         "Add Entry"));
+                                         "New Entry or Group"));
 
 
         return search + HtmlUtil.space(1)

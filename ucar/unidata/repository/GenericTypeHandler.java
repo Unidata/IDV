@@ -113,7 +113,7 @@ public class GenericTypeHandler extends TypeHandler {
         for (int colIdx = 0; colIdx < columnNodes.size(); colIdx++) {
             Element columnNode = (Element) columnNodes.get(colIdx);
             Column  column     = new Column(this, columnNode,
-                                            colNames.size());
+                                            colNames.size()-1);
             columns.add(column);
             colNames.addAll(column.getColumnNames());
             tableDef.append(",\n");
@@ -343,7 +343,7 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @return _more_
      */
-    public String getInsertSql() {
+    public String getInsertSql(boolean isNew) {
         return SqlUtil.makeInsert(getTableName(), SqlUtil.comma(colNames),
                                   SqlUtil.getQuestionMarks(colNames.size()));
     }
@@ -358,7 +358,7 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @throws Exception _more_
      */
-    public void setStatement(Entry entry, PreparedStatement stmt)
+    public void setStatement(Entry entry, PreparedStatement stmt, boolean isNew)
             throws Exception {
         stmt.setString(1, entry.getId());
         Object[] values = entry.getValues();
@@ -459,6 +459,15 @@ public class GenericTypeHandler extends TypeHandler {
         return initTables;
     }
 
+    public void addToEntryForm(Request request, StringBuffer formBuffer, Entry entry)
+            throws Exception {
+        for (Column column : columns) {
+            column.addToEntryForm(request, formBuffer, entry);
+        }
+
+    }
+
+
     /**
      * _more_
      *
@@ -470,14 +479,14 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @throws Exception _more_
      */
-    public void addToSearchForm(StringBuffer formBuffer,
-                                StringBuffer headerBuffer, Request request,
+    public void addToSearchForm(Request request, StringBuffer formBuffer,
+                                StringBuffer headerBuffer, 
                                 List where, boolean simpleForm)
             throws Exception {
-        super.addToSearchForm(formBuffer, headerBuffer, request, where,
+        super.addToSearchForm(request, formBuffer, headerBuffer,  where,
                               simpleForm);
         for (Column column : columns) {
-            column.addToSearchForm(formBuffer, headerBuffer, request, where);
+            column.addToSearchForm(request, formBuffer, headerBuffer, where);
         }
     }
 
