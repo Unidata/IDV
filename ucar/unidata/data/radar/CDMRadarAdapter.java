@@ -1691,7 +1691,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                     if(s == null)
                         sIndex = getAngleIdx((double [])anglesMap.get(vn), value);
                     else
-                        sIndex = (Integer)s;
+                        sIndex = (int)new Double(s.toString()).doubleValue();
                     fi = getSweep(moment, value, vn, sIndex, !in2D);
                 } catch (IOException ex) {
                     LogUtil.logException("getSweep", ex);
