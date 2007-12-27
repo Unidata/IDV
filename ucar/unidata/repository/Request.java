@@ -101,7 +101,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public String toString() {
-        return type + " params:" + parameters;
+        return type + " " + getUrlArgs();
     }
 
     /**

@@ -301,8 +301,15 @@ public interface Constants {
     /** _more_          */
     public static final String PROP_DOWNLOAD_OK = "jdms.download.ok";
 
+    public static final String PROP_DEBUG = "jdms.debug";
+
+
+    public static final String PROP_USER_REQUIRELOGIN = "jdms.user.requirelogin";
+
     /** _more_ */
     public static final String PROP_REQUEST_PATTERN = "jdms.request.pattern";
+
+    public static final String PROP_REPOSITORY_NAME = "jdms.repository.name";
 
 
     /** _more_ */
@@ -417,6 +424,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ATTR_DB_DESCRIPTION = "description";
+
+
 
 
 

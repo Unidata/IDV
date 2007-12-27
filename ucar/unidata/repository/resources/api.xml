@@ -1,18 +1,23 @@
 <api>
 
 
-
   <method request="/group/show"   method="processGroupShow"    admin="false" cancache="true" name="Groups" toplevel="true" ishome="true"/>
   <method request="/group/add"   method="processGroupAdd"    admin="false" cancache="true" name="Groups" />
 
   <method request="/group/form"   method="processGroupForm"    admin="false" cancache="true" name="Groups" toplevel="false" />
 
-  <method request="/searchform"  method="processSearchForm"   admin="false" cancache="true" name="Search" toplevel="true"/>
-  <method request="/list/home"   method="processShowList"     admin="false" cancache="true" name="List" toplevel="true"/>
-  <method request="/query"       method="processQuery"        admin="false" cancache="true"/>
-  <method request="/list/show"   method="processList"         admin="false" cancache="true"/>
-  <method request="/graphview"   method="processGraphView"    admin="false" cancache="true"/>
-  <method request="/getgraph"    method="processGetGraph"     admin="false" cancache="true"/>
+
+  <method request="/search/form"  method="processSearchForm"   admin="false" cancache="true" name="Search" toplevel="true"/>
+  <method request="/search/query"       method="processSearchQuery"        admin="false" cancache="true"/>
+
+
+  <method request="/list/home"   method="processListHome"     admin="false" cancache="true" name="List" toplevel="true"/>
+  <method request="/list/show"   method="processListShow"     admin="false" cancache="true"/>
+
+
+  <method request="/graph/view"   method="processGraphView"    admin="false" cancache="true"/>
+  <method request="/graph/get"    method="processGraphGet"     admin="false" cancache="true"/>
+
 
   <method request="/entity/form"    method="processEntityForm"     admin="false" cancache="true"/>
 
@@ -24,6 +29,9 @@
 
   <method request="/getentries"  method="processGetEntries"   admin="false" cancache="true"/>
 
+
+  <method handler="usermanager" request="/user/login"        method="processLogin"  admin="false"  cancache="false"/>
+  <method handler="usermanager" request="/user/settings"     method="processSettings"  admin="false" cancache="false"/>
 
 
   <method request="/admin/sql"          method="adminSql"      admin="true" cancache="false"/>

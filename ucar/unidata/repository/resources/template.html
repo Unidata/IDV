@@ -1,4 +1,4 @@
-<html><head><title>Repository - ${title}</title>
+<html><head><title>${repository_name} - ${title}</title>
 <link rel="stylesheet" href="${root}/style.css" type="text/css">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Cache-Control" content="no-cache">
@@ -6,7 +6,10 @@
 
 <body>
   <div class="header"><img src="${root}/header.jpg"  border="0" alt="Unidata Data Management System" title="Unidata Data Management System"></div>
-<div class="nav"> ${links} </div>${sublinks}
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td><div class="nav"> ${links} </div></td>
+<td align="right"><div class="nav">${userlink}&nbsp;</div></td></tr><table>${sublinks}
 <div class="content">
 ${content}
 </div>

@@ -239,6 +239,7 @@ public class Column implements Tables, Constants {
     }
 
 
+
     /**
      * _more_
      *
@@ -249,6 +250,7 @@ public class Column implements Tables, Constants {
     }
 
     private String toString(Object[]values, int idx) {
+        if(values == null) return "";
         if(values[idx]==null) return "";
         return values[idx].toString();
     }
@@ -519,7 +521,7 @@ public class Column implements Tables, Constants {
     public void addToEntryForm(Request request, StringBuffer formBuffer, Entry entry)
             throws Exception {
         String widget = "";
-        Object[]values = entry.getValues();
+        Object[]values = (entry==null?null:entry.getValues());
         if (type.equals(TYPE_LATLON)) {
             widget = HtmlUtil.makeLatLonBox(getFullName(), "", "", "", "");
         } else if (type.equals(TYPE_BOOLEAN)) {

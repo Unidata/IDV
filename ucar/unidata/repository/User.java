@@ -50,6 +50,14 @@ public class User {
     /** _more_ */
     private boolean admin = false;
 
+    private boolean anonymous = false;
+
+    public User() {
+        this.anonymous = true;
+        this.name = "anonymous";
+    }
+
+
     /**
      * _more_
      *
@@ -70,6 +78,8 @@ public class User {
      */
     public int hashCode() {
         return Misc.hashcode(id) ^ Misc.hashcode(name) ^ (admin
+                ? 1
+                : 2) ^ (anonymous
                 ? 1
                 : 2);
     }
@@ -109,6 +119,13 @@ public class User {
         return id;
     }
 
+    public String getLabel() {
+        if(name.trim().length()==0) return id;
+        return name;
+        
+    }
+
+
     /**
      * Set the Name property.
      *
@@ -145,7 +162,28 @@ public class User {
         return admin;
     }
 
+    /**
+     * Set the Anonymous property.
+     *
+     * @param value The new value for Anonymous
+     */
+    public void setAnonymous(boolean value) {
+        anonymous = value;
+    }
+
+    /**
+     * Get the Anonymous property.
+     *
+     * @return The Anonymous
+     */
+    public boolean getAnonymous() {
+        return anonymous;
+    }
 
 
+
+    public String toString() {
+        return id;
+    }
 }
 

@@ -110,658 +110,755 @@ public class Repository implements Constants, Tables, RequestHandler {
     public MyUrl URL_GETMAP = new MyUrl("/getmap");
 
     /** _more_ */
-    public MyUrl URL_GROUP_SHOW = new MyUrl("/group/show");
+     public MyUrl URL_USER_LOGIN = new MyUrl("/user/login");
+     public MyUrl URL_USER_SETTINGS = new MyUrl("/user/settings");
 
-    public MyUrl URL_GROUP_ADD = new MyUrl("/group/add");
 
-    /** _more_          */
-    public MyUrl URL_GROUP_FORM = new MyUrl("/group/form");
+     /** _more_ */
+     public MyUrl URL_GROUP_SHOW = new MyUrl("/group/show");
 
+     public MyUrl URL_GROUP_ADD = new MyUrl("/group/add");
 
-    /** _more_ */
-    public MyUrl URL_SEARCHFORM = new MyUrl("/searchform");
+     /** _more_          */
+     public MyUrl URL_GROUP_FORM = new MyUrl("/group/form");
 
-    /** _more_ */
-    public MyUrl URL_LIST_HOME = new MyUrl("/list/home");
 
-    /** _more_ */
-    public MyUrl URL_QUERY = new MyUrl("/query");
+     /** _more_ */
+     public MyUrl URL_SEARCH_FORM = new MyUrl("/search/form");
 
-    /** _more_ */
-    public MyUrl URL_LIST_SHOW = new MyUrl("/list/show");
+     /** _more_ */
+     public MyUrl URL_SEARCH_QUERY = new MyUrl("/search/query");
 
-    /** _more_ */
-    public MyUrl URL_GRAPHVIEW = new MyUrl("/graphview");
 
-    /** _more_ */
-    public MyUrl URL_GETGRAPH = new MyUrl("/getgraph");
+     /** _more_ */
+     public MyUrl URL_LIST_HOME = new MyUrl("/list/home");
 
-    /** _more_ */
-    public MyUrl URL_ENTRY_SHOW = new MyUrl("/entry/show");
+     /** _more_ */
+     public MyUrl URL_LIST_SHOW = new MyUrl("/list/show");
 
-    /** _more_          */
-    public MyUrl URL_ENTRY_DELETE = new MyUrl("/entry/delete");
 
-    /** _more_ */
-    public MyUrl URL_ENTRY_ADD = new MyUrl("/entry/add");
 
-    /** _more_          */
-    public MyUrl URL_ENTRY_FORM = new MyUrl("/entry/form");
 
-    /** _more_          */
-    public MyUrl URL_ENTITY_FORM = new MyUrl("/entity/form");
+     /** _more_ */
+     public MyUrl URL_GRAPH_VIEW = new MyUrl("/graph/view");
 
-    /** _more_ */
-    public MyUrl URL_GETENTRIES = new MyUrl("/getentries");
+     /** _more_ */
+     public MyUrl URL_GRAPH_GET = new MyUrl("/graph/get");
 
-    /** _more_ */
-    public MyUrl URL_ENTRY_GET = new MyUrl("/entry/get");
+     /** _more_ */
+     public MyUrl URL_ENTRY_SHOW = new MyUrl("/entry/show");
 
+     /** _more_          */
+     public MyUrl URL_ENTRY_DELETE = new MyUrl("/entry/delete");
 
-    /** _more_ */
-    public MyUrl URL_ADMIN_SQL = new MyUrl("/admin/sql", "SQL");
+     /** _more_ */
+     public MyUrl URL_ENTRY_ADD = new MyUrl("/entry/add");
 
-    /** _more_          */
-    public MyUrl URL_ADMIN_CLEANUP = new MyUrl("/admin/cleanup", "Cleanup");
+     /** _more_          */
+     public MyUrl URL_ENTRY_FORM = new MyUrl("/entry/form");
 
-    /** _more_ */
-    public MyUrl URL_ADMIN_HOME = new MyUrl("/admin/home", "Home");
+     /** _more_          */
+     public MyUrl URL_ENTITY_FORM = new MyUrl("/entity/form");
 
-    /** _more_ */
-    public MyUrl URL_ADMIN_STARTSTOP = new MyUrl("/admin/startstop",
-                                           "Database");
+     /** _more_ */
+     public MyUrl URL_GETENTRIES = new MyUrl("/getentries");
 
-    /** _more_          */
-    public MyUrl URL_ADMIN_TABLES = new MyUrl("/admin/tables", "Tables");
+     /** _more_ */
+     public MyUrl URL_ENTRY_GET = new MyUrl("/entry/get");
 
-    /** _more_ */
-    public MyUrl URL_ADMIN_STATS = new MyUrl("/admin/stats", "Statistics");
 
-    /** _more_ */
-    public MyUrl URL_ADMIN_USERS = new MyUrl("/admin/users", "Users");
+     /** _more_ */
+     public MyUrl URL_ADMIN_SQL = new MyUrl("/admin/sql", "SQL");
 
-    /** _more_ */
-    public MyUrl URL_ADMIN_HARVESTERS = new MyUrl("/admin/harvesters",
-                                            "Harvesters");
+     /** _more_          */
+     public MyUrl URL_ADMIN_CLEANUP = new MyUrl("/admin/cleanup", "Cleanup");
 
-    /** _more_          */
-    private MyUrl[] adminUrls = {
-        URL_ADMIN_HOME, URL_ADMIN_STARTSTOP, URL_ADMIN_TABLES,
-        URL_ADMIN_STATS, URL_ADMIN_USERS, URL_ADMIN_HARVESTERS, URL_ADMIN_SQL,
-        URL_ADMIN_CLEANUP
-    };
+     /** _more_ */
+     public MyUrl URL_ADMIN_HOME = new MyUrl("/admin/home", "Home");
 
+     /** _more_ */
+     public MyUrl URL_ADMIN_STARTSTOP = new MyUrl("/admin/startstop",
+                                            "Database");
 
-    /** _more_ */
-    private static final int PAGE_CACHE_LIMIT = 100;
+     /** _more_          */
+     public MyUrl URL_ADMIN_TABLES = new MyUrl("/admin/tables", "Tables");
 
+     /** _more_ */
+     public MyUrl URL_ADMIN_STATS = new MyUrl("/admin/stats", "Statistics");
 
-    /** _more_ */
-    private List<Harvester> harvesters = new ArrayList();
+     /** _more_ */
+     public MyUrl URL_ADMIN_USERS = new MyUrl("/admin/users", "Users");
 
-    /** _more_          */
-    private List<EntryListener> entryListeners =
-        new ArrayList<EntryListener>();
+     /** _more_ */
+     public MyUrl URL_ADMIN_HARVESTERS = new MyUrl("/admin/harvesters",
+                                             "Harvesters");
 
+     /** _more_          */
+     private MyUrl[] adminUrls = {
+         URL_ADMIN_HOME, URL_ADMIN_STARTSTOP, URL_ADMIN_TABLES,
+         URL_ADMIN_STATS, URL_ADMIN_USERS, URL_ADMIN_HARVESTERS, URL_ADMIN_SQL,
+         URL_ADMIN_CLEANUP
+     };
 
-    /** _more_ */
-    private Properties mimeTypes;
 
-    /** _more_ */
-    private Properties productMap;
+     /** _more_ */
+     private static final int PAGE_CACHE_LIMIT = 100;
 
-    /** _more_ */
-    private String repositoryDir;
 
-    /** _more_ */
-    private String tmpDir;
+     /** _more_ */
+     private List<Harvester> harvesters = new ArrayList();
 
-    /** _more_ */
-    private Properties properties = new Properties();
+     /** _more_          */
+     private List<EntryListener> entryListeners =
+         new ArrayList<EntryListener>();
 
-    /** _more_ */
-    private String urlBase = "/repository";
 
-    /** _more_ */
-    private long baseTime = System.currentTimeMillis();
+     /** _more_ */
+     private Properties mimeTypes;
 
-    /** _more_ */
-    private int keyCnt = 0;
+     /** _more_ */
+     private Properties productMap;
 
+     /** _more_ */
+     private String repositoryDir;
 
-    /** _more_ */
-    private Connection connection;
+     /** _more_ */
+     private String tmpDir;
 
-    /** _more_ */
-    private Hashtable typeHandlersMap = new Hashtable();
+     /** _more_ */
+     private Properties properties = new Properties();
 
-    /** _more_          */
-    private List<TypeHandler> typeHandlers = new ArrayList<TypeHandler>();
+     private Properties localProperties = new Properties();
 
-    /** _more_ */
-    private List<OutputHandler> outputHandlers = new ArrayList();
+     /** _more_ */
+     private String urlBase = "/repository";
 
+     /** _more_ */
+     private long baseTime = System.currentTimeMillis();
 
-    /** _more_ */
-    private Hashtable resources = new Hashtable();
+     /** _more_ */
+     private int keyCnt = 0;
 
 
+     /** _more_ */
+     private Connection connection;
 
-    /** _more_ */
-    private Hashtable<String, Group> groupMap = new Hashtable<String,
-                                                    Group>();
+     /** _more_ */
+     private Hashtable typeHandlersMap = new Hashtable();
 
-    /** _more_ */
-    private Hashtable<String, User> userMap = new Hashtable<String, User>();
+     /** _more_          */
+     private List<TypeHandler> typeHandlers = new ArrayList<TypeHandler>();
 
+     /** _more_ */
+     private List<OutputHandler> outputHandlers = new ArrayList();
 
-    /** _more_          */
-    private Object MUTEX_GROUP = new Object();
 
-    /** _more_          */
-    private Object MUTEX_INSERT = new Object();
+     /** _more_ */
+     private Hashtable resources = new Hashtable();
 
 
-    /** _more_ */
-    List<String> typeDefinitionFiles;
-
-    /** _more_ */
-    List<String> apiDefFiles;
-
-    /** _more_ */
-    List<String> outputDefFiles;
-
-    /** _more_ */
-    String[] args;
-
-    /** _more_ */
-    private Hashtable pageCache = new Hashtable();
-
-    /** _more_ */
-    private List pageCacheList = new ArrayList();
-
-    /** _more_ */
-    private List<User> cmdLineUsers = new ArrayList();
-
-    /**
-     * _more_
-     */
-    protected void clearPageCache() {
-        pageCache     = new Hashtable();
-        pageCacheList = new ArrayList();
-    }
-
-    /** _more_          */
-    private String hostname;
-
-    /**
-     * _more_
-     *
-     * @param args _more_
-     * @param hostname _more_
-     *
-     * @throws Exception _more_
-     */
-    public Repository(String[] args, String hostname) throws Exception {
-        this.args     = args;
-        this.hostname = hostname;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param prefix _more_
-     */
-    public void addDownloadPrefix(String prefix) {
-        downloadPrefixes.add(prefix);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void init() throws Exception {
-        addDownloadPrefix("c:/cygwin/home/jeffmc/pictures/");
-        initProperties();
-        initUrls();
-        makeConnection();
-        mimeTypes = new Properties();
-        for (String mimeFile : StringUtil.split(
-                getProperty(PROP_HTML_MIMEPROPERTIES), ";", true, true)) {
-            mimeTypes.load(IOUtil.getInputStream(mimeFile, getClass()));
-        }
-        initTypeHandlers();
-        initTable();
-        initOutputHandlers();
-        initApi();
-        initUsers();
-        initGroups();
-        initHarvesters();
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void initProperties() throws Exception {
-        properties = new Properties();
-        properties.load(
-            IOUtil.getInputStream(
-                "/ucar/unidata/repository/resources/repository.properties",
-                getClass()));
-        List<String> argEntryDefFiles  = new ArrayList();
-        List<String> argApiDefFiles    = new ArrayList();
-        List<String> argOutputDefFiles = new ArrayList();
-
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].endsWith(".properties")) {
-                properties.load(IOUtil.getInputStream(args[i], getClass()));
-            } else if (args[i].indexOf("api.xml") >= 0) {
-                argApiDefFiles.add(args[i]);
-            } else if (args[i].indexOf("types.xml") >= 0) {
-                argEntryDefFiles.add(args[i]);
-            } else if (args[i].indexOf("outputhandlers.xml") >= 0) {
-                argOutputDefFiles.add(args[i]);
-            } else if (args[i].equals("-admin")) {
-                cmdLineUsers.add(new User(args[i + 1], args[i + 1], true));
-                i++;
-            } else if (args[i].startsWith("-D")) {
-                String       s    = args[i].substring(2);
-                List<String> toks = StringUtil.split(s, "=", true, true);
-                if (toks.size() != 2) {
-                    throw new IllegalArgumentException("Bad argument:"
-                            + args[i]);
-                }
-                properties.put(toks.get(0), toks.get(1));
-            } else {
-                throw new IllegalArgumentException("Unknown argument: "
-                        + args[i]);
-            }
-        }
-        apiDefFiles = StringUtil.split(getProperty(PROP_API), ";", true,
-                                       true);
-        apiDefFiles.addAll(argApiDefFiles);
-
-        typeDefinitionFiles = StringUtil.split(getProperty(PROP_FILE_TYPES));
-        typeDefinitionFiles.addAll(argEntryDefFiles);
-
-        outputDefFiles = StringUtil.split(getProperty(PROP_OUTPUT_FILES));
-        outputDefFiles.addAll(argOutputDefFiles);
-
-        urlBase = (String) properties.get(PROP_HTML_URLBASE);
-        if (urlBase == null) {
-            urlBase = "";
-        }
-
-        repositoryDir = IOUtil.joinDir(Misc.getSystemProperty("user.home",
-                "."), IOUtil.joinDir(".unidata", "repository"));
-        tmpDir = IOUtil.joinDir(repositoryDir, "tmp");
-        IOUtil.makeDirRecursive(new File(repositoryDir));
-        IOUtil.makeDirRecursive(new File(tmpDir));
-
-
-        String derbyHome = (String) properties.get(PROP_DB_DERBY_HOME);
-        if (derbyHome != null) {
-            derbyHome = derbyHome.replace("%userhome%",
-                                          Misc.getSystemProperty("user.home",
-                                              "."));
-            File dir = new File(derbyHome);
-            IOUtil.makeDirRecursive(dir);
-            System.setProperty("derby.system.home", derbyHome);
-        }
-
-
-
-
-    }
-
-
-    /**
-     * _more_
-     */
-    protected void initUrls() {}
-
-
-    /**
-     * _more_
-     *
-     * @param message _more_
-     * @param exc _more_
-     */
-    protected void log(String message, Throwable exc) {
-        System.err.println(message);
-        Throwable thr = LogUtil.getInnerException(exc);
-        thr.printStackTrace();
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param message _more_
-     */
-    protected void log(String message) {
-        System.err.println(message);
-    }
-
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void initUsers() throws Exception {
-        for (User user : cmdLineUsers) {
-            makeUser(user, true);
-        }
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void makeConnection() throws Exception {
-        String db = (String) properties.get(PROP_DB);
-        if (db == null) {
-            throw new IllegalStateException("Must have a " + PROP_DB
-                                            + " property defined");
-        }
-
-        String userName =
-            (String) properties.get(PROP_DB_USER.replace("${db}", db));
-        String password =
-            (String) properties.get(PROP_DB_PASSWORD.replace("${db}", db));
-        String connectionURL =
-            (String) properties.get(PROP_DB_URL.replace("${db}", db));
-        Misc.findClass(
-            (String) properties.get(PROP_DB_DRIVER.replace("${db}", db)));
-
-
-        System.err.println("db:" + connectionURL);
-        if (userName != null) {
-            connection = DriverManager.getConnection(connectionURL, userName,
-                    password);
-        } else {
-            connection = DriverManager.getConnection(connectionURL);
-        }
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     */
-    protected boolean isAppletEnabled(Request request) {
-        if ( !getProperty(PROP_SHOW_APPLET, true)) {
-            return false;
-        }
-        if (request != null) {
-            return request.get(ARG_APPLET, true);
-        }
-        return true;
-    }
-
-
-    /** _more_ */
-    Hashtable<String, ApiMethod> requestMap = new Hashtable();
-
-    /** _more_ */
-    ApiMethod homeApi;
-
-    /** _more_ */
-    ArrayList<ApiMethod> apiMethods = new ArrayList();
-
-    /** _more_ */
-    ArrayList<ApiMethod> topLevelMethods = new ArrayList();
-
-
-    /**
-     * _more_
-     *
-     * @param node _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void addRequest(Element node) throws Exception {
-
-        String  request = XmlUtil.getAttribute(node, ApiMethod.ATTR_REQUEST);
-        String  methodName = XmlUtil.getAttribute(node,
-                                 ApiMethod.ATTR_METHOD);
-        boolean admin = XmlUtil.getAttribute(node, ApiMethod.ATTR_ADMIN,
-                                             true);
-
-        Permission     permission = new Permission(admin);
-
-        RequestHandler handler    = this;
-        if (XmlUtil.hasAttribute(node, ApiMethod.ATTR_HANDLER)) {
-            Class c = Misc.findClass(XmlUtil.getAttribute(node,
-                          ApiMethod.ATTR_HANDLER));
-            Constructor ctor = Misc.findConstructor(c,
-                                   new Class[] { Repository.class,
-                    Element.class });
-            handler = (RequestHandler) ctor.newInstance(new Object[] { this,
-                    node });
-        }
-
-        String    url       = getUrlBase() + request;
-        ApiMethod oldMethod = requestMap.get(url);
-        if (oldMethod != null) {
-            requestMap.remove(url);
-        }
-
-
-        Class[] paramTypes = new Class[] { Request.class };
-        Method method = Misc.findMethod(handler.getClass(), methodName,
-                                        paramTypes);
-        if (method == null) {
-            throw new IllegalArgumentException("Unknown request method:"
-                    + methodName);
-        }
-        ApiMethod apiMethod = new ApiMethod(
-                                  handler, request,
-                                  XmlUtil.getAttribute(
-                                      node, ApiMethod.ATTR_NAME,
-                                      request), permission, method,
-                                          XmlUtil.getAttribute(
-                                              node, ApiMethod.ATTR_CANCACHE,
-                                              false), XmlUtil.getAttribute(
-                                                  node,
-                                                  ApiMethod.ATTR_TOPLEVEL,
-                                                  false));
-        if (XmlUtil.getAttribute(node, ApiMethod.ATTR_ISHOME, false)) {
-            homeApi = apiMethod;
-        }
-        requestMap.put(url, apiMethod);
-        if (oldMethod != null) {
-            int index = apiMethods.indexOf(oldMethod);
-            apiMethods.remove(index);
-            apiMethods.add(index, apiMethod);
-        } else {
-            apiMethods.add(apiMethod);
-        }
-    }
-
-
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void initApi() throws Exception {
-        for (String file : apiDefFiles) {
-            Element apiRoot  = XmlUtil.getRoot(file, getClass());
-            List    children = XmlUtil.findChildren(apiRoot, TAG_METHOD);
-            for (int i = 0; i < children.size(); i++) {
-                Element node = (Element) children.get(i);
-                addRequest(node);
-            }
-        }
-        for (ApiMethod apiMethod : apiMethods) {
-            if (apiMethod.getIsTopLevel()) {
-                topLevelMethods.add(apiMethod);
-            }
-        }
-
-
-    }
-
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void initHarvesters() throws Exception {
-        List<String> harvesterFiles =
-            StringUtil.split(getProperty(PROP_HARVESTERS_FILE), ";", true,
-                             true);
-        boolean okToStart = getProperty(PROP_HARVESTERS_ACTIVE, true);
-        try {
-            harvesters = new ArrayList<Harvester>();
-            for (String file : harvesterFiles) {
-                Element root = XmlUtil.getRoot(file, getClass());
-                harvesters.addAll(Harvester.createHarvesters(this, root));
-            }
-        } catch (Exception exc) {
-            System.err.println("Error loading harvester file");
-            throw exc;
-        }
-        for (Harvester harvester : harvesters) {
-            File rootDir = harvester.getRootDir();
-            if (rootDir != null) {
-                downloadPrefixes.add(rootDir.toString().replace("\\", "/")
-                                     + "/");
-            }
-            if ( !okToStart) {
-                harvester.setActive(false);
-            } else if (harvester.getActive()) {
-                Misc.run(harvester, "run");
-            }
-        }
-        System.err.println("downloadprefixes:" + downloadPrefixes);
-    }
-
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void initOutputHandlers() throws Exception {
-        for (String file : outputDefFiles) {
-            try {
-                Element root  = XmlUtil.getRoot(file, getClass());
-                List children = XmlUtil.findChildren(root, TAG_OUTPUTHANDLER);
-                for (int i = 0; i < children.size(); i++) {
-                    Element node = (Element) children.get(i);
-                    Class c = Misc.findClass(XmlUtil.getAttribute(node,
-                                  ATTR_CLASS));
-                    Constructor ctor = Misc.findConstructor(c,
-                                           new Class[] { Repository.class,
-                            Element.class });
-                    outputHandlers.add(
-                        (OutputHandler) ctor.newInstance(new Object[] { this,
-                            node }));
-                }
-            } catch (Exception exc) {
-                System.err.println("Error loading output handler file:"
-                                   + file);
-                throw exc;
-            }
-
-        }
-    }
-
-
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result handleRequest(Request request) throws Exception {
-        long   t1     = System.currentTimeMillis();
-        Result result;
-        try {
-            result = getResult(request);
-        } catch(Exception exc) {
-            //TODO: For non-html outputs come up with some error format
-            Throwable inner  =LogUtil.getInnerException(exc);
-            StringBuffer sb = new StringBuffer("An error has occurred:<pre>" +inner.getMessage()+"</pre>");
-            if(request.getRequestContext().getUser().getAdmin()) {
-                sb.append("<pre>" + LogUtil.getStackTrace(inner) +"</pre>");
-            }
-            result = new Result("Error",sb);
-            log("Error handling request:" + request, exc);
-        }
-
-        if ((result != null) && (result.getInputStream() == null)
-                && result.isHtml() && result.getShouldDecorate()) {
-            result.putProperty(PROP_NAVLINKS, getNavLinks(request));
-            decorateResult(result);
-        }
-
-
-        long t2 = System.currentTimeMillis();
-        if ((result != null) && (t2 != t1)
-                && (true || request.get("debug", false))) {
-            System.err.println("Time:" + request.getRequestPath() + " "
-                               + (t2 - t1));
-        }
-        return result;
-
-
-    }
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Result getResult(Request request) throws Exception {
-        String incoming = request.getRequestPath().trim();
-        if (incoming.endsWith("/")) {
-            incoming = incoming.substring(0, incoming.length() - 1);
-        }
-        ApiMethod apiMethod = (ApiMethod) requestMap.get(incoming);
-        if (apiMethod == null) {
-            for (ApiMethod tmp : apiMethods) {
-                String path = tmp.getRequest();
-                if (path.endsWith("/*")) {
-                    path = path.substring(0, path.length() - 2);
-                    if (incoming.startsWith(getUrlBase() + path)) {
-                        apiMethod = tmp;
-                        break;
-                    }
-                }
-            }
-        }
-        if ((apiMethod == null) && incoming.equals(getUrlBase())) {
-            apiMethod = homeApi;
-        }
-        if (apiMethod == null) {
-            return getHtdocsFile(request);
-        }
+
+     /** _more_ */
+     private Hashtable<String, Group> groupMap = new Hashtable<String,
+                                                     Group>();
+
+     /** _more_ */
+     private Hashtable<String, User> userMap = new Hashtable<String, User>();
+
+
+     /** _more_          */
+     private Object MUTEX_GROUP = new Object();
+
+     /** _more_          */
+     private Object MUTEX_INSERT = new Object();
+
+
+     /** _more_ */
+     List<String> typeDefinitionFiles;
+
+     /** _more_ */
+     List<String> apiDefFiles;
+
+     /** _more_ */
+     List<String> outputDefFiles;
+
+     /** _more_ */
+     String[] args;
+
+     /** _more_ */
+     private Hashtable pageCache = new Hashtable();
+
+     /** _more_ */
+     private List pageCacheList = new ArrayList();
+
+     /** _more_ */
+     private List<User> cmdLineUsers = new ArrayList();
+
+     /** _more_          */
+     private String hostname;
+
+     private boolean clientMode = false;
+
+     private File logFile;
+     private OutputStream logFOS;
+     private boolean debug = false;
+
+
+
+
+     private UserManager userManager;
+
+
+     /**
+      * _more_
+      *
+      * @param args _more_
+      * @param hostname _more_
+      *
+      * @throws Exception _more_
+      */
+     public Repository(String[] args, String hostname) throws Exception {
+         this(args, hostname, false);
+     }
+
+     public Repository(String[] args, String hostname, boolean clientMode) throws Exception {
+         this.clientMode = clientMode;
+         this.args     = args;
+         this.hostname = hostname;
+     }
+
+     /**
+      * _more_
+      *
+      * @throws Exception _more_
+      */
+     protected void init() throws Exception {
+         initProperties();
+         if(!clientMode) {
+             initServer();
+         }
+     }
+
+     protected UserManager doMakeUserManager() {
+         return new UserManager(this);
+     }
+
+     protected UserManager getUserManager() {
+         if(userManager == null) {
+             userManager = doMakeUserManager();
+         }
+         return userManager;
+     }
+
+     protected void initServer() throws Exception {
+         makeConnection();
+         initTypeHandlers();
+         initTable();
+         initOutputHandlers();
+         initApi();
+         initUsers();
+         initGroups();
+         initHarvesters();
+     }
+
+
+
+     /**
+      * _more_
+      *
+      * @throws Exception _more_
+      */
+     protected void initProperties() throws Exception {
+         Properties argProperties  = new Properties();
+         properties = new Properties();
+         properties.load(
+                         IOUtil.getInputStream(
+                 "/ucar/unidata/repository/resources/repository.properties",
+                 getClass()));
+         List<String> argEntryDefFiles  = new ArrayList();
+         List<String> argApiDefFiles    = new ArrayList();
+         List<String> argOutputDefFiles = new ArrayList();
+
+         for (int i = 0; i < args.length; i++) {
+             if (args[i].endsWith(".properties")) {
+                 properties.load(IOUtil.getInputStream(args[i], getClass()));
+             } else if (args[i].indexOf("api.xml") >= 0) {
+                 argApiDefFiles.add(args[i]);
+             } else if (args[i].indexOf("types.xml") >= 0) {
+                 argEntryDefFiles.add(args[i]);
+             } else if (args[i].indexOf("outputhandlers.xml") >= 0) {
+                 argOutputDefFiles.add(args[i]);
+             } else if (args[i].equals("-admin")) {
+                 cmdLineUsers.add(new User(args[i + 1], args[i + 1], true));
+                 i++;
+             } else if (args[i].startsWith("-D")) {
+                 String       s    = args[i].substring(2);
+                 List<String> toks = StringUtil.split(s, "=", true, true);
+                 if (toks.size() != 2) {
+                     throw new IllegalArgumentException("Bad argument:"
+                             + args[i]);
+                 }
+                 argProperties.put(toks.get(0), toks.get(1));
+             } else {
+                 throw new IllegalArgumentException("Unknown argument: "
+                         + args[i]);
+             }
+         }
+
+         apiDefFiles = StringUtil.split(getProperty(PROP_API), ";", true,
+                                        true);
+         apiDefFiles.addAll(argApiDefFiles);
+
+         typeDefinitionFiles = StringUtil.split(getProperty(PROP_FILE_TYPES));
+         typeDefinitionFiles.addAll(argEntryDefFiles);
+
+         outputDefFiles = StringUtil.split(getProperty(PROP_OUTPUT_FILES));
+         outputDefFiles.addAll(argOutputDefFiles);
+
+         debug = getProperty(PROP_DEBUG,false);
+         System.err.println ("debug:" + debug);
+
+         urlBase = (String) properties.get(PROP_HTML_URLBASE);
+         if (urlBase == null) {
+             urlBase = "";
+         }
+
+         repositoryDir = IOUtil.joinDir(Misc.getSystemProperty("user.home",
+                 "."), IOUtil.joinDir(".unidata", "repository"));
+         tmpDir = IOUtil.joinDir(repositoryDir, "tmp");
+         IOUtil.makeDirRecursive(new File(repositoryDir));
+         IOUtil.makeDirRecursive(new File(tmpDir));
+         logFile = new File(IOUtil.joinDir(repositoryDir,"repository.log"));
+         //TODO: Roll the log file
+         logFOS = new FileOutputStream(logFile, true);
+
+
+         String derbyHome = (String) properties.get(PROP_DB_DERBY_HOME);
+         if (derbyHome != null) {
+             derbyHome = derbyHome.replace("%userhome%",
+                                           Misc.getSystemProperty("user.home",
+                                               "."));
+             File dir = new File(derbyHome);
+             IOUtil.makeDirRecursive(dir);
+             System.setProperty("derby.system.home", derbyHome);
+         }
+
+         mimeTypes = new Properties();
+         for (String mimeFile : StringUtil.split(
+                 getProperty(PROP_HTML_MIMEPROPERTIES), ";", true, true)) {
+             mimeTypes.load(IOUtil.getInputStream(mimeFile, getClass()));
+         }
+
+
+         localProperties = new Properties();
+         try {
+             localProperties.load(IOUtil.getInputStream(IOUtil.joinDir(repositoryDir,"repository.properties"),
+                                                        getClass()));
+         } catch(Exception exc) {}
+
+         properties.putAll(localProperties);
+         properties.putAll(argProperties);
+     }
+
+
+
+     /**
+      * _more_
+      *
+      * @param prefix _more_
+      */
+     public void addDownloadPrefix(String prefix) {
+         downloadPrefixes.add(prefix);
+     }
+
+
+     /**
+      * _more_
+      */
+     protected void clearPageCache() {
+         pageCache     = new Hashtable();
+         pageCacheList = new ArrayList();
+     }
+
+
+     protected void debug(String message) {
+         if(debug) log(message, null);
+     }
+
+     protected void log(Request request, String message) {
+         log("user:" + request.getRequestContext().getUser() + " -- " + message);
+     }
+
+
+     /**
+      * _more_
+      *
+      * @param message _more_
+      * @param exc _more_
+      */
+     protected void log(String message, Throwable exc) {
+         System.err.println(message);
+         Throwable thr =null;
+         if(exc!=null) {
+             thr =  LogUtil.getInnerException(exc);
+             thr.printStackTrace();
+         }
+         try {
+             String line = new Date()+" -- " + message;
+             logFOS.write(line.getBytes());
+             logFOS.write("\n".getBytes());
+             if(thr!=null) {
+                 logFOS.write(LogUtil.getStackTrace(thr).getBytes());
+                 logFOS.write("\n".getBytes());
+             }
+             logFOS.flush();
+         } catch(Exception exc2) {
+             System.err.println ("Error writing log:" + exc2);
+         }
+     }
+
+
+     /**
+      * _more_
+      *
+      * @param message _more_
+      */
+     protected void log(String message) {
+         log(message,null);
+     }
+
+     /**
+      * _more_
+      *
+      * @throws Exception _more_
+      */
+     protected void initUsers() throws Exception {
+         for (User user : cmdLineUsers) {
+             makeUser(user, true);
+         }
+     }
+
+
+
+     /**
+      * _more_
+      *
+      * @throws Exception _more_
+      */
+     protected void makeConnection() throws Exception {
+         String db = (String) properties.get(PROP_DB);
+         if (db == null) {
+             throw new IllegalStateException("Must have a " + PROP_DB
+                                             + " property defined");
+         }
+
+         String userName =
+             (String) properties.get(PROP_DB_USER.replace("${db}", db));
+         String password =
+             (String) properties.get(PROP_DB_PASSWORD.replace("${db}", db));
+         String connectionURL =
+             (String) properties.get(PROP_DB_URL.replace("${db}", db));
+         Misc.findClass(
+             (String) properties.get(PROP_DB_DRIVER.replace("${db}", db)));
+
+
+         System.err.println("db:" + connectionURL);
+         if (userName != null) {
+             connection = DriverManager.getConnection(connectionURL, userName,
+                     password);
+         } else {
+             connection = DriverManager.getConnection(connectionURL);
+         }
+     }
+
+
+
+     /**
+      * _more_
+      *
+      * @param request _more_
+      *
+      * @return _more_
+      */
+     protected boolean isAppletEnabled(Request request) {
+         if ( !getProperty(PROP_SHOW_APPLET, true)) {
+             return false;
+         }
+         if (request != null) {
+             return request.get(ARG_APPLET, true);
+         }
+         return true;
+     }
+
+
+     /** _more_ */
+     Hashtable<String, ApiMethod> requestMap = new Hashtable();
+
+     /** _more_ */
+     ApiMethod homeApi;
+
+     /** _more_ */
+     ArrayList<ApiMethod> apiMethods = new ArrayList();
+
+     /** _more_ */
+     ArrayList<ApiMethod> topLevelMethods = new ArrayList();
+
+
+     /**
+      * _more_
+      *
+      * @param node _more_
+      *
+      * @throws Exception _more_
+      */
+     protected void addRequest(Element node) throws Exception {
+         String  request = XmlUtil.getAttribute(node, ApiMethod.ATTR_REQUEST);
+         String  methodName = XmlUtil.getAttribute(node,
+                                  ApiMethod.ATTR_METHOD);
+         boolean admin = XmlUtil.getAttribute(node, ApiMethod.ATTR_ADMIN,
+                                              true);
+
+         Permission     permission = new Permission(admin);
+
+         RequestHandler handler    = this;
+         if (XmlUtil.hasAttribute(node, ApiMethod.ATTR_HANDLER)) {
+             String handlerName = XmlUtil.getAttribute(node,
+                                                   ApiMethod.ATTR_HANDLER);
+
+             if(handlerName.equals("usermanager")) {
+                 handler = getUserManager();
+             } else {
+                 Class c = Misc.findClass(handlerName);
+                 Constructor ctor = Misc.findConstructor(c,
+                                                         new Class[] { Repository.class,
+                                                                       Element.class });
+                 handler = (RequestHandler) ctor.newInstance(new Object[] { this,
+                                                                            node });
+             }
+         }
+
+         String    url       = getUrlBase() + request;
+         ApiMethod oldMethod = requestMap.get(url);
+         if (oldMethod != null) {
+             requestMap.remove(url);
+         }
+
+
+         Class[] paramTypes = new Class[] { Request.class };
+         Method method = Misc.findMethod(handler.getClass(), methodName,
+                                         paramTypes);
+         if (method == null) {
+             throw new IllegalArgumentException("Unknown request method:"
+                     + methodName);
+         }
+         ApiMethod apiMethod = new ApiMethod(
+                                   handler, request,
+                                   XmlUtil.getAttribute(
+                                       node, ApiMethod.ATTR_NAME,
+                                       request), permission, method,
+                                           XmlUtil.getAttribute(
+                                               node, ApiMethod.ATTR_CANCACHE,
+                                               false), XmlUtil.getAttribute(
+                                                   node,
+                                                   ApiMethod.ATTR_TOPLEVEL,
+                                                   false));
+         if (XmlUtil.getAttribute(node, ApiMethod.ATTR_ISHOME, false)) {
+             homeApi = apiMethod;
+         }
+         requestMap.put(url, apiMethod);
+         if (oldMethod != null) {
+             int index = apiMethods.indexOf(oldMethod);
+             apiMethods.remove(index);
+             apiMethods.add(index, apiMethod);
+         } else {
+             apiMethods.add(apiMethod);
+         }
+     }
+
+
+     /**
+      * _more_
+      *
+      * @throws Exception _more_
+      */
+     protected void initApi() throws Exception {
+         for (String file : apiDefFiles) {
+             Element apiRoot  = XmlUtil.getRoot(file, getClass());
+             List    children = XmlUtil.findChildren(apiRoot, TAG_METHOD);
+             for (int i = 0; i < children.size(); i++) {
+                 Element node = (Element) children.get(i);
+                 addRequest(node);
+             }
+         }
+         for (ApiMethod apiMethod : apiMethods) {
+             if (apiMethod.getIsTopLevel()) {
+                 topLevelMethods.add(apiMethod);
+             }
+         }
+
+
+     }
+
+     /**
+      * _more_
+      *
+      * @throws Exception _more_
+      */
+     protected void initHarvesters() throws Exception {
+         List<String> harvesterFiles =
+             StringUtil.split(getProperty(PROP_HARVESTERS_FILE), ";", true,
+                              true);
+         boolean okToStart = getProperty(PROP_HARVESTERS_ACTIVE, true);
+         try {
+             harvesters = new ArrayList<Harvester>();
+             for (String file : harvesterFiles) {
+                 Element root = XmlUtil.getRoot(file, getClass());
+                 harvesters.addAll(Harvester.createHarvesters(this, root));
+             }
+         } catch (Exception exc) {
+             System.err.println("Error loading harvester file");
+             throw exc;
+         }
+         for (Harvester harvester : harvesters) {
+             File rootDir = harvester.getRootDir();
+             if (rootDir != null) {
+                 downloadPrefixes.add(rootDir.toString().replace("\\", "/")
+                                      + "/");
+             }
+             if ( !okToStart) {
+                 harvester.setActive(false);
+             } else if (harvester.getActive()) {
+                 Misc.run(harvester, "run");
+             }
+         }
+     }
+
+     /**
+      * _more_
+      *
+      * @throws Exception _more_
+      */
+     protected void initOutputHandlers() throws Exception {
+         for (String file : outputDefFiles) {
+             try {
+                 Element root  = XmlUtil.getRoot(file, getClass());
+                 List children = XmlUtil.findChildren(root, TAG_OUTPUTHANDLER);
+                 for (int i = 0; i < children.size(); i++) {
+                     Element node = (Element) children.get(i);
+                     Class c = Misc.findClass(XmlUtil.getAttribute(node,
+                                   ATTR_CLASS));
+                     Constructor ctor = Misc.findConstructor(c,
+                                            new Class[] { Repository.class,
+                             Element.class });
+                     outputHandlers.add(
+                         (OutputHandler) ctor.newInstance(new Object[] { this,
+                             node }));
+                 }
+             } catch (Exception exc) {
+                 System.err.println("Error loading output handler file:"
+                                    + file);
+                 throw exc;
+             }
+
+         }
+     }
+
+
+
+
+
+     /**
+      * _more_
+      *
+      * @param request _more_
+      *
+      * @return _more_
+      *
+      * @throws Exception _more_
+      */
+     public Result handleRequest(Request request) throws Exception {
+         long   t1     = System.currentTimeMillis();
+         Result result;
+         if(debug) {
+             debug("user:" + request.getRequestContext().getUser() + " -- " + request.toString());
+         }
+         try {
+             result = getResult(request);
+         } catch(Exception exc) {
+             //TODO: For non-html outputs come up with some error format
+             Throwable inner  =LogUtil.getInnerException(exc);
+             StringBuffer sb = new StringBuffer("An error has occurred:<pre>" +inner.getMessage()+"</pre>");
+             if(request.getRequestContext().getUser().getAdmin()) {
+                 sb.append("<pre>" + LogUtil.getStackTrace(inner) +"</pre>");
+             }
+             result = new Result("Error",sb);
+             log("Error handling request:" + request, exc);
+         }
+
+         if ((result != null) && (result.getInputStream() == null)
+                 && result.isHtml() && result.getShouldDecorate()) {
+             result.putProperty(PROP_NAVLINKS, getNavLinks(request));
+             decorateResult(request, result);
+         }
+
+
+         long t2 = System.currentTimeMillis();
+         if ((result != null) && (t2 != t1)
+                 && (true || request.get("debug", false))) {
+             System.err.println("Time:" + request.getRequestPath() + " "
+                                + (t2 - t1));
+         }
+         return result;
+
+
+     }
+
+     /**
+      * _more_
+      *
+      * @param request _more_
+      *
+      * @return _more_
+      *
+      * @throws Exception _more_
+      */
+     protected Result getResult(Request request) throws Exception {
+         String incoming = request.getRequestPath().trim();
+         if (incoming.endsWith("/")) {
+             incoming = incoming.substring(0, incoming.length() - 1);
+         }
+         ApiMethod apiMethod = (ApiMethod) requestMap.get(incoming);
+         if (apiMethod == null) {
+             for (ApiMethod tmp : apiMethods) {
+                 String path = tmp.getRequest();
+                 if (path.endsWith("/*")) {
+                     path = path.substring(0, path.length() - 2);
+                     if (incoming.startsWith(getUrlBase() + path)) {
+                         apiMethod = tmp;
+                         break;
+                     }
+                 }
+             }
+         }
+         if ((apiMethod == null) && incoming.equals(getUrlBase())) {
+             apiMethod = homeApi;
+         }
+
+         if (apiMethod == null) {
+             return getHtdocsFile(request);
+         }
+
+
+
+         if (!getUserManager().isRequestOk(request) ||
+             (apiMethod!=null && !apiMethod.getPermission().isRequestOk(request, this))){
+             StringBuffer sb = new StringBuffer();
+             sb.append("You do not have the correct access<p>");
+             sb.append(getUserManager().makeLoginForm(request));
+             return new Result("Error",sb);
+
+        } 
+
 
         Result result = null;
         if (canCache() && apiMethod.getCanCache()) {
@@ -776,18 +873,13 @@ public class Repository implements Constants, Tables, RequestHandler {
 
         boolean cachingOk = canCache();
 
-        if ( !apiMethod.getPermission().isRequestOk(request, this)) {
+
+        if ((connection == null) && !incoming.startsWith("/admin")) {
             cachingOk = false;
-            result = new Result("Error",
-                                new StringBuffer("Access Violation"));
+            result = new Result("No Database",
+                                new StringBuffer("Database is shutdown"));
         } else {
-            if ((connection == null) && !incoming.startsWith("/admin")) {
-                cachingOk = false;
-                result = new Result("No Database",
-                                    new StringBuffer("Database is shutdown"));
-            } else {
-                result = (Result) apiMethod.invoke(request);
-            }
+            result = (Result) apiMethod.invoke(request);
         }
         if (result == null) {
             return null;
@@ -820,6 +912,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         String type = getMimeTypeFromSuffix(IOUtil.getFileExtension(path));
         path = StringUtil.replace(path, getUrlBase(), "");
         if ((path.trim().length() == 0) || path.equals("/")) {
+            log(request, "Unknown request:" + path);
             return new Result("Error",
                               new StringBuffer("Unknown request:" + path));
         }
@@ -832,6 +925,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             result.setCacheOk(true);
             return result;
         } catch (IOException fnfe) {
+            log(request, "Unknown request:" + path);
             return new Result("Error",
                               new StringBuffer("Unknown request:" + path));
         }
@@ -844,12 +938,24 @@ public class Repository implements Constants, Tables, RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected void decorateResult(Result result) throws Exception {
+    protected void decorateResult(Request request, Result result) throws Exception {
         String template = getResource(PROP_HTML_TEMPLATE);
         String html = StringUtil.replace(template, "${content}",
                                          new String(result.getContent()));
+        String userLink;
+        User user = request.getRequestContext().getUser();
+        if(user.getAnonymous()) {
+            userLink = "<a href=\"${root}/user/login\" class=\"navlink\">Login</a>";
+        } else {
+            userLink = "<a href=\"${root}/user/settings\" class=\"navlink\">" + user.getLabel()+"</a>";
+        }
+
+        html = StringUtil.replace(html, "${userlink}", userLink);
+        html = StringUtil.replace(html, "${repository_name}", getProperty(PROP_REPOSITORY_NAME,"Repository"));
         html = StringUtil.replace(html, "${title}", result.getTitle());
         html = StringUtil.replace(html, "${root}", getUrlBase());
+
+
         List   links     = (List) result.getProperty(PROP_NAVLINKS);
         String linksHtml = HtmlUtil.space(1);
         if (links != null) {
@@ -1263,7 +1369,7 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
         sb.append(
-            HtmlUtil.row("<td colspan=\"2\">&nbsp;<p><b>Types:</b></td>"));
+            HtmlUtil.row("<td colspan=\"2\">&nbsp;<p>" + HtmlUtil.bold("Types:") +"</td>"));
         int total = 0;
         sb.append(HtmlUtil.row(HtmlUtil.cols("" + getCount(TABLE_ENTRIES,
                 ""), "Total entries")));
@@ -1276,7 +1382,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             TypeHandler typeHandler = (TypeHandler) typeHandlersMap.get(id);
             int cnt = getCount(TABLE_ENTRIES, "type=" + SqlUtil.quote(id));
 
-            String url = HtmlUtil.href(HtmlUtil.url(URL_SEARCHFORM, ARG_TYPE,
+            String url = HtmlUtil.href(HtmlUtil.url(URL_SEARCH_FORM, ARG_TYPE,
                              id), typeHandler.getLabel());
             sb.append(HtmlUtil.row(HtmlUtil.cols("" + cnt, url)));
         }
@@ -1709,14 +1815,14 @@ public class Repository implements Constants, Tables, RequestHandler {
      *
      * @throws Exception _more_
      */
-    public Result processShowList(Request request) throws Exception {
+    public Result processListHome(Request request) throws Exception {
         StringBuffer         sb           = new StringBuffer();
         List                 links        = getListLinks(request, "", false);
         TypeHandler          typeHandler  = getTypeHandler(request);
         List<TwoFacedObject> typeList     = new ArrayList<TwoFacedObject>();
         List<TwoFacedObject> specialTypes = typeHandler.getListTypes(false);
         if (specialTypes.size() > 0) {
-            sb.append("<b>" + typeHandler.getDescription() + ":</b>");
+            sb.append(HtmlUtil.bold(typeHandler.getDescription() + ":"));
         }
         typeList.addAll(specialTypes);
         /*
@@ -1736,12 +1842,11 @@ public class Repository implements Constants, Tables, RequestHandler {
         sb.append("</ul>");
 
 
-
         Result result = new Result("Lists", sb);
         result.putProperty(PROP_NAVSUBLINKS, getListLinks(request, "", true));
         return result;
-
     }
+
 
 
     /**
@@ -1839,17 +1944,21 @@ public class Repository implements Constants, Tables, RequestHandler {
         String urlArgs = request.getUrlArgs();
         request.put(ARG_FORM_BASIC, basic);
         headerBuffer.append("<table cellpadding=\"5\">");
+        String formLinks = "";
         if (basicForm) {
-            headerBuffer.append(HtmlUtil.tableEntry("",
-                    HtmlUtil.href(URL_SEARCHFORM + "?" + ARG_FORM_BASIC
-                                  + "=false&" + urlArgs, "Advanced Search")));
+            formLinks =  HtmlUtil.bold("Basic Search") +"&nbsp;|&nbsp;" + HtmlUtil.href(HtmlUtil.url(URL_SEARCH_FORM,ARG_FORM_BASIC,
+                                                    "false")+ "&"+urlArgs, "Advanced Search");
+
         } else {
-            headerBuffer.append(HtmlUtil.tableEntry("",
-                    HtmlUtil.href(URL_SEARCHFORM + "?" + ARG_FORM_BASIC
-                                  + "=true&" + urlArgs, "Basic Search")));
+            formLinks =  HtmlUtil.href(HtmlUtil.url(URL_SEARCH_FORM,ARG_FORM_BASIC,
+                                                    "true")+ "&"+urlArgs, "Basic Search") +
+                "&nbsp;|&nbsp;" + 
+                HtmlUtil.bold("Advanced Search") ;
         }
 
-        sb.append(HtmlUtil.form(HtmlUtil.url(URL_QUERY, ARG_NAME,
+        headerBuffer.append(HtmlUtil.tableEntry("",
+                                                formLinks));
+        sb.append(HtmlUtil.form(HtmlUtil.url(URL_SEARCH_QUERY, ARG_NAME,
                                              WHAT_ENTRIES)));
 
         sb.append(HtmlUtil.hidden(ARG_FORM_BASIC, basicForm + ""));
@@ -1992,7 +2101,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             if (what.equals(whats[i])) {
                 item = HtmlUtil.span(names[i], extra1);
             } else {
-                item = HtmlUtil.href(HtmlUtil.url(URL_SEARCHFORM, ARG_WHAT,
+                item = HtmlUtil.href(HtmlUtil.url(URL_SEARCH_FORM, ARG_WHAT,
                         whats[i], ARG_FORM_BASIC, (basicForm
                         ? "true"
                         : "false")), names[i], extra2);
@@ -2009,7 +2118,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             if (tfo.getId().equals(what)) {
                 links.add(HtmlUtil.span(tfo.toString(), extra1));
             } else {
-                links.add(HtmlUtil.href(HtmlUtil.url(URL_SEARCHFORM,
+                links.add(HtmlUtil.href(HtmlUtil.url(URL_SEARCH_FORM,
                         ARG_WHAT, "" + tfo.getId(), ARG_TYPE,
                         typeHandler.getType()), tfo.toString(), extra2));
             }
@@ -2121,7 +2230,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      *
      * @throws Exception _more_
      */
-    public Result processList(Request request) throws Exception {
+    public Result processListShow(Request request) throws Exception {
         String what   = request.getWhat(WHAT_TYPE);
         Result result = null;
         if (what.equals(WHAT_GROUP)) {
@@ -2275,6 +2384,10 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
+    protected  String makeGroupHeader(Request request, Group group) throws Exception {
+        return HtmlUtil.bold("Group:") + HtmlUtil.space(1) +getBreadCrumbs(request, group, true)[1];
+    }
+
     /**
      * _more_
      *
@@ -2287,9 +2400,8 @@ public class Repository implements Constants, Tables, RequestHandler {
     public Result processEntityForm(Request request) throws Exception {
         Group        group =  findGroup(request, true);
         StringBuffer sb    = new StringBuffer();
-        sb.append("<table>");
-        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Group:"),getBreadCrumbs(request, group, true)[1]));
-        sb.append(HtmlUtil.row(HtmlUtil.cols("<p>&nbsp;")));
+        sb.append(makeGroupHeader(request,group));
+        sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.form(URL_ENTRY_FORM, ""));
         sb.append(HtmlUtil.tableEntry(HtmlUtil.submit("Create new entry:"),
                                       makeTypeSelect(request)));
@@ -2297,17 +2409,22 @@ public class Repository implements Constants, Tables, RequestHandler {
         sb.append("</form>");
 
         sb.append(HtmlUtil.row(HtmlUtil.cols("<p>&nbsp;")));
-        sb.append(HtmlUtil.form(URL_GROUP_ADD, ""));
-        sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
-        sb.append(HtmlUtil.tableEntry(HtmlUtil.submit("Create new group:"),
-                                      HtmlUtil.input(ARG_NAME)));
-        sb.append("</form>");
+        sb.append(makeNewGroupForm(request,group,""));
         sb.append("</table>");
 
         return new Result("New Form", sb, Result.TYPE_HTML);
     }
 
 
+    protected String makeNewGroupForm(Request request, Group parentGroup, String name) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(HtmlUtil.form(URL_GROUP_ADD, ""));
+        sb.append(HtmlUtil.hidden(ARG_GROUP, parentGroup.getFullName()));
+        sb.append(HtmlUtil.tableEntry(HtmlUtil.submit("Create new group:"),
+                                      HtmlUtil.input(ARG_NAME,name)));
+        sb.append("</form>");
+        return sb.toString();
+    }
 
     /**
      * _more_
@@ -2338,12 +2455,9 @@ public class Repository implements Constants, Tables, RequestHandler {
             type = request.getType((String)null);
         }
         StringBuffer sb    = new StringBuffer();
-        sb.append("<table cellpadding=\"5\">");
+        sb.append(makeGroupHeader(request,group));
+        sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.form((type == null?URL_ENTRY_FORM:URL_ENTRY_ADD), ""));
-        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Group:"),
-                                      getBreadCrumbs(request, group,
-                                          true)[1]));
-
         String title="";
         if(type == null) {
             sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"),
@@ -2700,14 +2814,24 @@ public class Repository implements Constants, Tables, RequestHandler {
     public Result processGroupAdd(Request request) throws Exception {
         Group        group = findGroup(request, true);
         String newName = request.getString(ARG_NAME, "");
+        StringBuffer sb = new StringBuffer();
         if(newName.length() == 0) {
-            throw new IllegalArgumentException("Need to specify a group name");
+            sb.append(makeGroupHeader(request,group));
+            sb.append("<p>Need to specify a group name");
+            sb.append(HtmlUtil.formTable());
+            sb.append(makeNewGroupForm(request,group,""));
+            sb.append("</table>");
+            return new Result("Add Group",sb);
         }
         String fullName = group.getFullName()+"/" + newName;
-
         Group newGroup =     findGroupFromName(fullName);
         if(newGroup !=null) {
-            throw new IllegalArgumentException("Group already exists");
+            sb.append(makeGroupHeader(request,group));
+            sb.append("<p>Given group name already exists");
+            sb.append(HtmlUtil.formTable());
+            sb.append(makeNewGroupForm(request,group,newName));
+            sb.append("</table>");
+            return new Result("Add Group",sb);
         }
 
         newGroup =     findGroupFromName(fullName,true);        
@@ -3038,7 +3162,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      *
      * @throws Exception _more_
      */
-    public Result processGetGraph(Request request) throws Exception {
+    public Result processGraphGet(Request request) throws Exception {
 
         String  graphXmlTemplate = getResource(PROP_HTML_GRAPHTEMPLATE);
         String  id               = (String) request.getId((String) null);
@@ -3374,7 +3498,13 @@ public class Repository implements Constants, Tables, RequestHandler {
         String[]          types        = SqlUtil.readString(stmt, 1);
         List<TypeHandler> typeHandlers = new ArrayList<TypeHandler>();
         for (int i = 0; i < types.length; i++) {
-            typeHandlers.add(getTypeHandler(types[i]));
+            TypeHandler theTypeHandler = getTypeHandler(types[i]);
+            if(types[i].equals(TypeHandler.TYPE_ANY)) {
+                typeHandlers.add(0,theTypeHandler);
+
+            } else {
+                typeHandlers.add(theTypeHandler);
+            }
         }
         return typeHandlers;
     }
@@ -4027,14 +4157,14 @@ public class Repository implements Constants, Tables, RequestHandler {
             throws Exception {
         String search = HtmlUtil.href(
                             HtmlUtil.url(
-                                URL_SEARCHFORM, ARG_TAG,
+                                URL_SEARCH_FORM, ARG_TAG,
                                 java.net.URLEncoder.encode(
                                     tag, "UTF-8")), HtmlUtil.img(
                                         fileUrl("/Search16.gif"),
                                         "Search in tag"));
 
         if (isAppletEnabled(request)) {
-            search += HtmlUtil.href(HtmlUtil.url(URL_GRAPHVIEW, ARG_ID, tag,
+            search += HtmlUtil.href(HtmlUtil.url(URL_GRAPH_VIEW, ARG_ID, tag,
                     ARG_NODETYPE,
                     TYPE_TAG), HtmlUtil.img(fileUrl("/tree.gif"),
                                             "Show tag in graph"));
@@ -4108,7 +4238,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         }
         String search = HtmlUtil.href(
                             HtmlUtil.url(
-                                URL_SEARCHFORM, ARG_ASSOCIATION,
+                                URL_SEARCH_FORM, ARG_ASSOCIATION,
                                 encode(association)), HtmlUtil.img(
                                     fileUrl("/Search16.gif"),
                                     "Search in association"));
@@ -4155,7 +4285,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         }
         return HtmlUtil
             .href(HtmlUtil
-                .url(URL_GRAPHVIEW, ARG_ID, group.getFullName(),
+                .url(URL_GRAPH_VIEW, ARG_ID, group.getFullName(),
                      ARG_NODETYPE, NODETYPE_GROUP), HtmlUtil
                          .img(fileUrl("/tree.gif"), "Show group in graph"));
     }
@@ -4197,7 +4327,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      *
      * @throws Exception _more_
      */
-    public Result processQuery(Request request) throws Exception {
+    public Result processSearchQuery(Request request) throws Exception {
 
         if (request.get(ARG_WAIT, false)) {
             return processEntryListen(request);
@@ -4221,7 +4351,7 @@ public class Repository implements Constants, Tables, RequestHandler {
 
         String what = request.getWhat(WHAT_ENTRIES);
         if ( !what.equals(WHAT_ENTRIES)) {
-            Result result = processList(request);
+            Result result = processListShow(request);
             if (result == null) {
                 throw new IllegalArgumentException("Unknown list request: "
                         + what);

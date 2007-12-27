@@ -244,6 +244,11 @@ public class HtmlUtil {
         return "<textarea name=\"" + name +"\" rows=\"" + rows + "\"  cols=\"" + columns +"\">" + value +"</textarea>";
     }
 
+    public static String password(String name) {
+        return "<input type=\"password\" name=\"" + name +"\" >";
+    }
+
+
     public static String input(String name) {
         return input(name,null,"");
     }
@@ -292,6 +297,11 @@ public class HtmlUtil {
         sb.append("</select>\n");
         return sb.toString();
     }
+
+    public static String formTable() {
+        return "<table cellpadding=\"5\" cellspacing=\"0\">\n";
+    }
+
 
     public static String tableEntry(String left, String right) {
         return " <tr><td align=\"right\">" + left     + "</td><td>" + right +"</td></tr>";

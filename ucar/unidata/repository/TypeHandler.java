@@ -238,7 +238,8 @@ public class TypeHandler implements Constants, Tables {
             sb.append("</table>\n");
             List<Tag> tags = repository.getTags(request, entry.getId());
             if (tags.size() > 0) {
-                sb.append("<b>Tags</b><ul>\n");
+                sb.append(HtmlUtil.bold("Tags"));
+                sb.append("<ul>\n");
                 for (Tag tag : tags) {
                     sb.append("<li> ");
                     sb.append(repository.getTagLinks(request, tag.getName()));
@@ -275,7 +276,8 @@ public class TypeHandler implements Constants, Tables {
             List<Association> associations =
                 repository.getAssociations(request, entry.getId());
             if (associations.size() > 0) {
-                sb.append("<b>Associations</b><ul>\n");
+                sb.append(HtmlUtil.bold("Associations"));
+                sb.append("<ul>\n");
                 for (Association association : associations) {
                     Entry fromEntry = null;
                     Entry toEntry   = null;
@@ -355,7 +357,7 @@ public class TypeHandler implements Constants, Tables {
         }
         return HtmlUtil
             .href(HtmlUtil
-                .url(repository.URL_GRAPHVIEW, ARG_ID, entry.getId(),
+                .url(repository.URL_GRAPH_VIEW, ARG_ID, entry.getId(),
                      ARG_NODETYPE, entry.getType()), HtmlUtil
                          .img(repository.fileUrl("/tree.gif"),
                               "Show file in graph"));
@@ -489,7 +491,7 @@ public class TypeHandler implements Constants, Tables {
             if ((typeDesc == null) || (typeDesc.trim().length() == 0)) {
                 typeDesc = entry.getTypeHandler().getType();
             }
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"), typeDesc));
+            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Entry Type:"), typeDesc));
 
             if (entry.hasLocationDefined()) {
                 sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Location:"),
@@ -763,13 +765,13 @@ public class TypeHandler implements Constants, Tables {
                                            typeHandler.getType()));
             }
             TwoFacedObject anyTfo = new TwoFacedObject(TYPE_ANY, TYPE_ANY);
-            if ( !tmp.contains(anyTfo)) {
+            if (!tmp.contains(anyTfo)) {
                 tmp.add(0, anyTfo);
             }
             String typeSelect = HtmlUtil.select(ARG_TYPE, tmp);
             formBuffer.append(
                 HtmlUtil.tableEntry(
-                    HtmlUtil.bold("Type:"),
+                    HtmlUtil.bold("Entry Type:"),
                     typeSelect + " "
                     + HtmlUtil.submitImage(
                         repository.fileUrl("/Search16.gif"), "submit_type",
@@ -780,7 +782,7 @@ public class TypeHandler implements Constants, Tables {
             //            System.err.println("type handler: "
             //                               + typeHandlers.get(0).getDescription() + " "
             //                               + typeHandlers.get(0).getType());
-            formBuffer.append(HtmlUtil.tableEntry("<b>Type:</b>",
+            formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Entry Type:"),
                     typeHandlers.get(0).getDescription()));
         }
         formBuffer.append("\n");

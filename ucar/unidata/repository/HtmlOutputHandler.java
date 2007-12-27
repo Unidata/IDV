@@ -345,7 +345,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(
                     HtmlUtil.href(
                         HtmlUtil.url(
-                            repository.URL_SEARCHFORM, ARG_TYPE,
+                            repository.URL_SEARCH_FORM, ARG_TYPE,
                             theTypeHandler.getType()), HtmlUtil.img(
                                 repository.fileUrl("/Search16.gif"),
                                 "Search in Group")));
@@ -460,7 +460,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(
                     HtmlUtil.href(
                         HtmlUtil.url(
-                            repository.URL_GRAPHVIEW, ARG_ID, tag.getName(),
+                            repository.URL_GRAPH_VIEW, ARG_ID, tag.getName(),
                             ARG_NODETYPE, TYPE_TAG), tag.getName(), extra));
                 sb.append("</span>");
                 sb.append(" &nbsp; ");
@@ -602,7 +602,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(
                     HtmlUtil.href(
                         HtmlUtil.url(
-                            repository.URL_GRAPHVIEW, ARG_ID, association,
+                            repository.URL_GRAPH_VIEW, ARG_ID, association,
                             ARG_NODETYPE, TYPE_ASSOCIATION), association,
                                 extra));
                 sb.append("</span>");
@@ -765,7 +765,7 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         String search = HtmlUtil.href(
                             HtmlUtil.url(
-                                repository.URL_SEARCHFORM, ARG_GROUP,
+                                repository.URL_SEARCH_FORM, ARG_GROUP,
                                 group.getId()), HtmlUtil.img(
                                     repository.fileUrl("/Search16.gif"),
                                     "Search in Group"));
@@ -842,7 +842,7 @@ public class HtmlOutputHandler extends OutputHandler {
             //appendEntriesHeader(request,  output,  sb) ;
             sb.append("<p>\n");
             if (entries.size() == 0) {
-                sb.append("<b>Nothing Found</b><p>");
+                sb.append(HtmlUtil.bold("Nothing Found")+"<p>");
             }
             sb.append("<table>");
             showApplet = showApplet & output.equals(OUTPUT_TIMELINE);
