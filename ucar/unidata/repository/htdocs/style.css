@@ -4,28 +4,24 @@ body {
    font-size: 10pt;
    font-family: Arial, Helvetica, sans-serif;
    color: #000000;
-   xtext-decoration: none;
    margin: 0px;
 }
 
+td {
+   font-weight: normal;
+   font-size: 10pt;
+   font-family: Arial, Helvetica, sans-serif;
 
+}
 
 .content {
     margin:10px;
 }
 
 
-.smallestTag {font-size: xx-small; }
-.smallTag    {font-size: small; }
-.mediumTag   {font-size: medium; }
-.largeTag    {font-size: large; }
-.largestTag  {font-size: xx-large; } 
-
-
 
 A {
    color: #0000FF
-   xxxcolor: #FFFFFF;
 }
 
 A:link {
@@ -116,7 +112,13 @@ a.subnavlink {
 
 
 h2 {
-   font-size: 17pt;
+   font-size: 14pt;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #9C9C9C;
+}
+
+h3 {
+   font-size: 12pt;
    font-family: Arial, Helvetica, sans-serif;
    color: #9C9C9C;
 }
