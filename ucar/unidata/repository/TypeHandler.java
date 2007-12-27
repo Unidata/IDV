@@ -134,12 +134,32 @@ public class TypeHandler implements Constants, Tables {
      *
      * @return _more_
      */
-    public String getDatasetTag(Entry entry, Request request) {
-        return XmlUtil.tag(TAG_DATASET,
-                           XmlUtil.attrs(ATTR_NAME, entry.getName(),
-                                         ATTR_URLPATH, entry.getResource()));
+    public void getDatasetTag(StringBuffer sb, Entry entry, Request request) {
+        File f= new File(entry.getResource());
+        sb.append(XmlUtil.openTag(CatalogOutputHandler.TAG_DATASET,
+                                  XmlUtil.attrs(ATTR_NAME, entry.getName(),
+                                                CatalogOutputHandler.ATTR_URLPATH, entry.getResource())));
+
+        sb.append(XmlUtil.tag(CatalogOutputHandler.TAG_SERVICENAME,"","self"));
+        if(f.exists()) {
+            sb.append(XmlUtil.tag(CatalogOutputHandler.TAG_DATASIZE,XmlUtil.attrs(CatalogOutputHandler.ATTR_UNITS,"bytes"),""+f.length()));
+        }
+
+
+        sb.append(XmlUtil.tag(CatalogOutputHandler.TAG_DATE, XmlUtil.attrs(CatalogOutputHandler.ATTR_TYPE,"metadataCreated"),format(new Date(entry.getCreateDate()))));
+
+        sb.append(XmlUtil.openTag(CatalogOutputHandler.TAG_TIMECOVERAGE));
+        sb.append(XmlUtil.tag(CatalogOutputHandler.TAG_START,"",""+format(new Date(entry.getStartDate()))));
+        sb.append(XmlUtil.tag(CatalogOutputHandler.TAG_END,"",""+format(new Date(entry.getEndDate()))));
+        sb.append(XmlUtil.closeTag(CatalogOutputHandler.TAG_TIMECOVERAGE));
+
+        sb.append(XmlUtil.closeTag(CatalogOutputHandler.TAG_DATASET));
     }
 
+
+    public String format(Date d) {
+        return d.toString();
+    }
 
     /**
      * _more_
@@ -203,6 +223,7 @@ public class TypeHandler implements Constants, Tables {
                       repository.findGroup(results.getString(col++)),
                       repository.findUser(results.getString(col++)),
                       results.getString(col++),
+                      results.getInt(col++)==1,
                       results.getTimestamp(col++).getTime(),
                       results.getTimestamp(col++).getTime(),
                       results.getTimestamp(col++).getTime());

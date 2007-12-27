@@ -252,7 +252,7 @@ public class Harvester {
                         true);
                 Entry entry = new Entry(repository.getGUID(), typeHandler,
                                         name, name, group, user,
-                                        f.toString(), f.lastModified(), null);
+                                        f.toString(), true, f.lastModified(), null);
                 if (name.endsWith(".java")) {
                     String classPath = IOUtil.stripExtension(f.toString());
                     classPath = classPath.replace("\\", "/");

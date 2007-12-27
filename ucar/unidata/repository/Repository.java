@@ -1704,8 +1704,8 @@ public class Repository implements Constants, Tables, RequestHandler {
         try {
             String query =
                 SqlUtil.makeSelect(SqlUtil.comma(COL_ENTRIES_ID,
-                    COL_ENTRIES_RESOURCE,
-                    COL_ENTRIES_TYPE), Misc.newList(TABLE_ENTRIES), "");
+                                                 COL_ENTRIES_RESOURCE,
+                                                 COL_ENTRIES_TYPE), Misc.newList(TABLE_ENTRIES), SqlUtil.eq(COL_ENTRIES_ISFILE,"1"));
 
             SqlUtil.Iterator iter = SqlUtil.getIterator(execute(query));
             ResultSet        results;
@@ -1720,10 +1720,12 @@ public class Repository implements Constants, Tables, RequestHandler {
                         runningCleanup = false;
                         break;
                     }
-                    String id = results.getString(1);
+                    int col=1;
+                    String id = results.getString(col++);
+                    String resource = results.getString(col++);
                     Entry entry =
-                        new Entry(id, getTypeHandler(results.getString(3)));
-                    String resource = results.getString(2);
+                        new Entry(id, getTypeHandler(results.getString(col++)));
+
                     File f = new File(resource);
                     if(f.exists()) continue;
                     //TODO: differentiate the entries that are not files
@@ -2593,9 +2595,11 @@ public class Repository implements Constants, Tables, RequestHandler {
             if(dateRange[0] == null) dateRange[0] = (dateRange[1]==null?createDate:dateRange[1]);
             if(dateRange[1] == null) dateRange[1] = dateRange[0];
             Group group = findGroupFromName(groupName, true);
+            File file = new File(resource);
             entry = new Entry(id, typeHandler, name, description, group,
                               request.getRequestContext().getUser(),
-                              resource, createDate.getTime(),
+                              resource, file.exists(),
+                              createDate.getTime(),
                               dateRange[0].getTime(),
                               dateRange[1].getTime());
         } else {
@@ -4389,6 +4393,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         statement.setString(col++, entry.getGroupId());
         statement.setString(col++, entry.getUser().getId());
         statement.setString(col++, entry.getResource().toString());
+        statement.setInt(col++, entry.getIsFile()?1:0);
         statement.setTimestamp(col++, new java.sql.Timestamp(currentTime()));
         //        System.err.println (entry.getName() + " " + new Date(entry.getStartDate()));
         statement.setTimestamp(col++,

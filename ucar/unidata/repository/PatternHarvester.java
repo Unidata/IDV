@@ -381,7 +381,7 @@ public class PatternHarvester extends Harvester {
                                   + groupName, true);
                 Entry entry;
                 entries.add(entry = new Entry(repository.getGUID(),
-                        typeHandler, name, desc, group, user, fileName,
+                                              typeHandler, name, desc, group, user, fileName, true,
                         createDate.getTime(), fromDate.getTime(),
                         toDate.getTime(), values));
                 typeHandler.initializeNewEntry(entry);
@@ -452,7 +452,7 @@ public class PatternHarvester extends Harvester {
                     repository.findGroupFromName(StringUtil.join("/", toks),
                         true);
                 Entry entry = new Entry(repository.getGUID(), typeHandler,
-                                        name, name, group, user, path,
+                                        name, name, group, user, path, true,
                                         f.lastModified(), null);
                 String ext = IOUtil.getFileExtension(path);
                 if (ext.startsWith(".")) {

@@ -97,6 +97,7 @@ public interface Tables {
     public static final String COL_ENTRIES_GROUP_ID       = TABLE_ENTRIES + ".group_id";
     public static final String COL_ENTRIES_USER_ID        = TABLE_ENTRIES + ".user_id";
     public static final String COL_ENTRIES_RESOURCE       = TABLE_ENTRIES + ".resource";
+    public static final String COL_ENTRIES_ISFILE         = TABLE_ENTRIES + ".isfile";
     public static final String COL_ENTRIES_CREATEDATE     = TABLE_ENTRIES + ".createdate";
     public static final String COL_ENTRIES_FROMDATE       = TABLE_ENTRIES + ".fromdate";
     public static final String COL_ENTRIES_TODATE         = TABLE_ENTRIES + ".todate";
@@ -115,6 +116,7 @@ public interface Tables {
         COL_ENTRIES_GROUP_ID,
         COL_ENTRIES_USER_ID,
         COL_ENTRIES_RESOURCE,
+        COL_ENTRIES_ISFILE,
         COL_ENTRIES_CREATEDATE,
         COL_ENTRIES_FROMDATE,
         COL_ENTRIES_TODATE,

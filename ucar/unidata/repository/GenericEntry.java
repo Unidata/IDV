@@ -65,8 +65,8 @@ public class GenericEntry extends Entry {
      */
     public GenericEntry(String id, TypeHandler typeHandler, String name,
                         String description, Group group, User user,
-                        String file, long date, Object[] values) {
-        this(id, typeHandler, name, description, group, user, file, date,
+                        String file, boolean isFile,  long date, Object[] values) {
+        this(id, typeHandler, name, description, group, user, file, isFile, date,
              date, date, values);
     }
 
@@ -90,9 +90,9 @@ public class GenericEntry extends Entry {
      */
     public GenericEntry(String id, TypeHandler typeHandler, String name,
                         String description, Group group, User user,
-                        String file, long createDate, long startDate,
+                        String file, boolean isFile, long createDate, long startDate,
                         long endDate, Object[] values) {
-        super(id, typeHandler, name, description, group, user, file,
+        super(id, typeHandler, name, description, group, user, file, isFile,
               createDate, startDate, endDate);
         this.values = values;
     }

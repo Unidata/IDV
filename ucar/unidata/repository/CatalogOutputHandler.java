@@ -88,6 +88,38 @@ public class CatalogOutputHandler extends OutputHandler {
     public static final String OUTPUT_CATALOG = "thredds.catalog";
 
 
+    /** _more_ */
+    public static final String TAG_CATALOG = "catalog";
+
+    public static final String TAG_TIMECOVERAGE = "timeCoverage";
+    public static final String TAG_START = "start";
+    public static final String TAG_END = "end";
+    public static final String TAG_DATE= "date";
+
+    public static final String TAG_DATASIZE = "dataSize";
+
+    public static final String ATTR_TYPE = "type";
+
+    public static final String ATTR_UNITS = "units";
+
+    /** _more_ */
+    public static final String TAG_DATASET = "dataset";
+
+    public static final String TAG_SERVICE = "service";
+    public static final String TAG_SERVICENAME = "serviceName";
+
+
+    /** _more_ */
+    public static final String ATTR_URLPATH = "urlPath";
+
+
+    /** _more_ */
+    public static final String ATTR_BASE = "base";
+
+    /** _more_ */
+    public static final String ATTR_SERVICETYPE = "serviceType";
+
+
 
     /**
      * _more_
@@ -187,6 +219,12 @@ public class CatalogOutputHandler extends OutputHandler {
         sb.append(XmlUtil.openTag(TAG_CATALOG,
                                   CATALOG_ATTRS
                                   + XmlUtil.attrs(ATTR_NAME, title)));
+        sb.append(XmlUtil.openTag(TAG_SERVICE, XmlUtil.attrs(ATTR_NAME,"all", ATTR_SERVICETYPE,"Compound", ATTR_BASE,"")));
+        sb.append(XmlUtil.tag(TAG_SERVICE, XmlUtil.attrs(ATTR_NAME,"self", ATTR_SERVICETYPE,"HTTP", ATTR_BASE,"")));
+        sb.append(XmlUtil.closeTag(TAG_SERVICE));
+
+
+
         sb.append(XmlUtil.openTag(TAG_DATASET,
                                   XmlUtil.attrs(ATTR_NAME, title)));
         sb.append(toCatalogInner(request, subGroups));
@@ -309,31 +347,38 @@ public class CatalogOutputHandler extends OutputHandler {
                                       group.getName(), ATTR_XLINKHREF, url)));
         }
 
-        StringBufferCollection sbc = new StringBufferCollection();
+        EntryGroup entryGroup = new EntryGroup("");
         for (Entry entry : entries) {
-            StringBuffer ssb =
-                sbc.getBuffer(entry.getTypeHandler().getDescription());
-            ssb.append(entry.getTypeHandler().getDatasetTag(entry, request));
+            String typeDesc = entry.getTypeHandler().getLabel();
+            EntryGroup subGroup  = entryGroup.find(typeDesc);
+            subGroup.add(entry);
         }
 
-        for (int i = 0; i < sbc.getKeys().size(); i++) {
-            String       type = (String) sbc.getKeys().get(i);
-            StringBuffer ssb  = sbc.getBuffer(type);
-            if (sbc.getKeys().size() > 1) {
-                sb.append(XmlUtil.openTag(TAG_DATASET,
-                                          XmlUtil.attrs(ATTR_NAME, type)));
-            }
-            sb.append(ssb);
-            if (sbc.getKeys().size() > 1) {
-                sb.append(XmlUtil.closeTag(TAG_DATASET));
-            }
-        }
+
+        generate(request, sb, entryGroup);
         return sb;
-
     }
 
 
-
+    protected void generate(Request request, StringBuffer sb, EntryGroup parent) {
+        for (int i = 0; i < parent.keys().size(); i++) {
+            Object key  = parent.keys().get(i);        
+            EntryGroup group = (EntryGroup)parent.map.get(key);
+            sb.append(XmlUtil.openTag(TAG_DATASET,
+                                      XmlUtil.attrs(ATTR_NAME, group.key.toString())));
+            for(int j=0;j<group.children.size();j++) {
+                Object child = group.children.get(j);
+                if(child instanceof EntryGroup) {
+                    EntryGroup subGroup = (EntryGroup) child;
+                    generate(request, sb,subGroup);
+                } else if (child instanceof Entry) {
+                    Entry entry = (Entry) child;
+                    entry.getTypeHandler().getDatasetTag(sb,entry, request);
+                }
+            }
+            sb.append(XmlUtil.closeTag(TAG_DATASET));
+        }
+    }
 
 }
 

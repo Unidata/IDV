@@ -143,14 +143,7 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_TITLE = "title";
 
-    /** _more_ */
-    public static final String ATTR_URLPATH = "urlPath";
 
-    /** _more_ */
-    public static final String TAG_CATALOG = "catalog";
-
-    /** _more_ */
-    public static final String TAG_DATASET = "dataset";
 
     /** _more_ */
     public static final String TAG_GROUPS = "groups";

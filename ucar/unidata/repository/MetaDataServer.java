@@ -156,8 +156,8 @@ public class MetaDataServer extends HttpServer implements Constants {
             path = path.trim();
             Result result = null;
             try {
-                //User           user    = repository.findUser("jdoe");
-                User           user    = new User();
+                User           user    = repository.findUser("jdoe");
+                //User           user    = new User();
                 RequestContext context = new RequestContext(user);
                 Request request = new Request(repository, path, context,
                                       formArgs);
