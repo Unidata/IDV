@@ -182,7 +182,14 @@ public interface Constants {
     public static final String ARG_AREA = "area";
 
     /** _more_          */
-    public static final String ARG_FORM_BASIC = "form.basic";
+    public static final String ARG_FORM_TYPE = "form.type";
+
+    public static final String ARG_CHANGE = "change";
+    public static final String ARG_ADMIN = "admin";
+
+    public static final String ARG_DELETE = "delete";
+    public static final String ARG_DELETE_CONFIRM = "delete.confirm";
+    public static final String ARG_CANCEL = "cancel";
 
     /** _more_          */
     public static final String ARG_INCLUDENONGEO = "includenongeo";
@@ -342,7 +349,7 @@ public interface Constants {
     public static final String PROP_DB_SCRIPT = "jdms.db.script";
 
     /** _more_ */
-    public static final String PROP_FILE_TYPES = "jdms.file.types";
+    public static final String PROP_TYPES = "jdms.types";
 
     /** _more_ */
     public static final String PROP_OUTPUT_FILES = "jdms.output.files";
@@ -397,17 +404,11 @@ public interface Constants {
         "jdms.download.asfiles";
 
 
-    /** _more_ */
-    public static final String TAG_DB_ENTRY = "entry";
 
-    /** _more_ */
-    public static final String TAG_DB_HANDLER = "handler";
 
     /** _more_ */
     public static final String TAG_OUTPUTHANDLER = "outputhandler";
 
-    /** _more_ */
-    public static final String TAG_DB_COLUMN = "column";
 
     /** _more_ */
     public static final String ATTR_DB_NAME = "name";

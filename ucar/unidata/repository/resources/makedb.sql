@@ -38,6 +38,7 @@ CREATE INDEX TAGS_INDEX_ENTRY_ID ON tags (ENTRY_ID);
 
 CREATE TABLE  users (id varchar(200),
                      name  varchar(200),
+                     email varchar(200),
 		     admin int);
 
 
@@ -47,8 +48,8 @@ CREATE TABLE entries (id varchar(200),
                    description varchar(1000),
                    group_id varchar(200),
    		   user_id varchar(200),
-	           resource varchar(200),
-                   isfile int,
+	           resource varchar(200),	           
+                   resource_type varchar(200),
 	           createdate timestamp, 
 	           fromdate timestamp, 
 	           todate timestamp,

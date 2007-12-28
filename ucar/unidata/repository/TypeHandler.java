@@ -135,10 +135,10 @@ public class TypeHandler implements Constants, Tables {
      * @return _more_
      */
     public void getDatasetTag(StringBuffer sb, Entry entry, Request request) {
-        File f= new File(entry.getResource());
+        File f= entry.getResource().getFile();
         sb.append(XmlUtil.openTag(CatalogOutputHandler.TAG_DATASET,
                                   XmlUtil.attrs(ATTR_NAME, entry.getName(),
-                                                CatalogOutputHandler.ATTR_URLPATH, entry.getResource())));
+                                                CatalogOutputHandler.ATTR_URLPATH, entry.getResource().getPath())));
 
         sb.append(XmlUtil.tag(CatalogOutputHandler.TAG_SERVICENAME,"","self"));
         if(f.exists()) {
@@ -221,9 +221,8 @@ public class TypeHandler implements Constants, Tables {
             new Entry(results.getString(1), this, results.getString(col++),
                       results.getString(col++),
                       repository.findGroup(results.getString(col++)),
-                      repository.findUser(results.getString(col++)),
-                      results.getString(col++),
-                      results.getInt(col++)==1,
+                      repository.getUserManager().findUser(results.getString(col++)),
+                      new Resource(results.getString(col++),results.getString(col++)),
                       results.getTimestamp(col++).getTime(),
                       results.getTimestamp(col++).getTime(),
                       results.getTimestamp(col++).getTime());
@@ -421,7 +420,7 @@ public class TypeHandler implements Constants, Tables {
         if ( !repository.canDownload(request, entry)) {
             return "";
         }
-        File   f    = new File(entry.getResource());
+        File   f    = entry.getResource().getFile();
         String size = " (" + f.length() + " bytes)";
         if (repository.getProperty(PROP_DOWNLOAD_ASFILES, false)) {
             return HtmlUtil.href(
@@ -463,34 +462,33 @@ public class TypeHandler implements Constants, Tables {
                 repository.getOutputHandler(request);
             String nextPrev = outputHandler.getNextPrevLink(request, entry,
                                   output);
-            sb.append(HtmlUtil.tableEntry("",
+            sb.append(HtmlUtil.formEntry("",
                                           getEntryLinks(entry, request)
                                           + HtmlUtil.space(2) + nextPrev));
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
+            sb.append(HtmlUtil.formEntry("Name:",
                                           entry.getName()));
 
 
             String[] crumbs = repository.getBreadCrumbs(request,
                                   entry.getGroup(), true);
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Group:"),
+            sb.append(HtmlUtil.formEntry("Group:",
                                           crumbs[1]));
 
             String desc = entry.getDescription();
             if ((desc != null) && (desc.length() > 0)) {
-                sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Description:"),
+                sb.append(HtmlUtil.formEntry("Description:",
                         desc));
             }
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Created by:"),
+            sb.append(HtmlUtil.formEntry("Created by:",
                                           entry.getUser().getName() + " @ "
                                           + fmt(entry.getCreateDate())));
 
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Resource:"),
-                                          entry.getResource()));
+            sb.append(HtmlUtil.formEntry("Resource:",
+                                          entry.getResource().getPath()));
 
             if (entry.isFile()) {
-                File f = new File(entry.getResource());
-                sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Size:"),
-                        f.length() + " bytes"));
+                sb.append(HtmlUtil.formEntry("Size:",
+                                              entry.getResource().getFile().length() + " bytes"));
             }
             System.err.println ("create date:" + new Date(entry.getCreateDate()));
             System.err.println ("start date:" + new Date(entry.getStartDate()));
@@ -499,12 +497,12 @@ public class TypeHandler implements Constants, Tables {
                     || (entry.getCreateDate() != entry.getEndDate())) {
                 if (entry.getEndDate() != entry.getStartDate()) {
                     sb.append(
-                        HtmlUtil.tableEntry(
-                            HtmlUtil.bold("Date Range:"),
+                        HtmlUtil.formEntry(
+                            "Date Range:",
                             fmt(entry.getStartDate()) + " -- "
                             + fmt(entry.getEndDate())));
                 } else {
-                    sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Date:"),
+                    sb.append(HtmlUtil.formEntry("Date:",
                             fmt(entry.getStartDate())));
                 }
             }
@@ -512,10 +510,10 @@ public class TypeHandler implements Constants, Tables {
             if ((typeDesc == null) || (typeDesc.trim().length() == 0)) {
                 typeDesc = entry.getTypeHandler().getType();
             }
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Entry Type:"), typeDesc));
+            sb.append(HtmlUtil.formEntry("Entry Type:", typeDesc));
 
             if (entry.hasLocationDefined()) {
-                sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Location:"),
+                sb.append(HtmlUtil.formEntry("Location:",
                         entry.getSouth() + "/" + entry.getEast()));
             } else if (entry.hasAreaDefined()) {
                 String img = HtmlUtil.img(HtmlUtil.url(repository.URL_GETMAP,
@@ -523,11 +521,11 @@ public class TypeHandler implements Constants, Tables {
                                                        ARG_WEST,  "" + entry.getWest(), 
                                                        ARG_NORTH, "" + entry.getNorth(), 
                                                        ARG_EAST,  "" + entry.getEast()));
-                sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Area:"), img));
+                sb.append(HtmlUtil.formEntry("Area:", img));
             }
 
-            if (showResource && ImageUtils.isImage(entry.getResource())) {
-                sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Image:"),
+            if (showResource && entry.getResource().isImage()) {
+                sb.append(HtmlUtil.formEntry("Image:",
                         HtmlUtil.img(HtmlUtil.url(repository.URL_ENTRY_GET
                             + "/" + entry.getName(), ARG_ID,
                                 entry.getId()), "",
@@ -772,8 +770,6 @@ public class TypeHandler implements Constants, Tables {
                 }
             }
             }
-
-
 */
 
         minDate = "";
@@ -782,6 +778,7 @@ public class TypeHandler implements Constants, Tables {
         if (typeHandlers.size() > 1) {
             List tmp = new ArrayList();
             for (TypeHandler typeHandler : typeHandlers) {
+            System.err.println(typeHandler + " " + typeHandler.getClass().getName());
                 tmp.add(new TwoFacedObject(typeHandler.getLabel(),
                                            typeHandler.getType()));
             }
@@ -791,8 +788,8 @@ public class TypeHandler implements Constants, Tables {
             }
             String typeSelect = HtmlUtil.select(ARG_TYPE, tmp);
             formBuffer.append(
-                HtmlUtil.tableEntry(
-                    HtmlUtil.bold("Entry Type:"),
+                HtmlUtil.formEntry(
+                    "Entry Type:",
                     typeSelect + " "
                     + HtmlUtil.submitImage(
                         repository.fileUrl("/Search16.gif"), "submit_type",
@@ -803,7 +800,7 @@ public class TypeHandler implements Constants, Tables {
             //            System.err.println("type handler: "
             //                               + typeHandlers.get(0).getDescription() + " "
             //                               + typeHandlers.get(0).getType());
-            formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Entry Type:"),
+            formBuffer.append(HtmlUtil.formEntry("Entry Type:",
                     typeHandlers.get(0).getDescription()));
         }
         formBuffer.append("\n");
@@ -816,11 +813,11 @@ public class TypeHandler implements Constants, Tables {
                                     request.get(ARG_SEARCHMETADATA,
                                         false)) + " Search metadata";
         if (name.trim().length() == 0) {
-            formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
+            formBuffer.append(HtmlUtil.formEntry("Name:",
                     HtmlUtil.input(ARG_NAME) + searchMetaData));
         } else {
             HtmlUtil.hidden(ARG_NAME, name);
-            formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
+            formBuffer.append(HtmlUtil.formEntry("Name:",
                     name + searchMetaData));
         }
         formBuffer.append("\n");
@@ -838,8 +835,8 @@ public class TypeHandler implements Constants, Tables {
                 Group group = repository.findGroup(groupArg);
                 if (group != null) {
                     formBuffer.append(
-                        HtmlUtil.tableEntry(
-                            HtmlUtil.bold("Group:"),
+                        HtmlUtil.formEntry(
+                            "Group:",
                             group.getFullName() + "&nbsp;" + searchChildren));
 
                 }
@@ -861,15 +858,13 @@ public class TypeHandler implements Constants, Tables {
                     String groupSelect = HtmlUtil.select(ARG_GROUP,
                                              groupList);
                     formBuffer.append(
-                        HtmlUtil.tableEntry(
-                            HtmlUtil.bold("Group:"),
+                        HtmlUtil.formEntry("Group:",
                             groupSelect + searchChildren));
                 } else if (groups.size() == 1) {
                     formBuffer.append(HtmlUtil.hidden(ARG_GROUP,
                             groups.get(0).getFullName()));
                     formBuffer.append(
-                        HtmlUtil.tableEntry(
-                            HtmlUtil.bold("Group:"),
+                        HtmlUtil.formEntry("Group:",
                             groups.get(0).getFullName() + searchChildren));
                 }
             }
@@ -878,14 +873,14 @@ public class TypeHandler implements Constants, Tables {
 
         if ( !simpleForm) {
             String tag = (String) request.getString(ARG_TAG, "");
-            formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Tag:"),
+            formBuffer.append(HtmlUtil.formEntry("Tag:",
                     HtmlUtil.input(ARG_TAG, tag)));
 
             formBuffer.append("\n");
         }
 
         String dateHelp = " (e.g., 2007-12-11 00:00:00)";
-        formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Date Range:"),
+        formBuffer.append(HtmlUtil.formEntry("Date Range:",
                 HtmlUtil.input(ARG_FROMDATE, minDate) + " -- "
                 + HtmlUtil.input(ARG_TODATE, maxDate) + dateHelp));
 
@@ -901,8 +896,8 @@ public class TypeHandler implements Constants, Tables {
                                     "");
             areaWidget = "<table>" + HtmlUtil.cols(areaWidget, nonGeo)
                          + "</table>";
-            //            formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Extent:"), areaWidget+"\n"+HtmlUtil.img(repository.URL_GETMAP.toString(),"map"," name=\"map\"  xxxonmouseover = \"mouseMove()\"")));
-            formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold("Extent:"),
+            //            formBuffer.append(HtmlUtil.formEntry("Extent:", areaWidget+"\n"+HtmlUtil.img(repository.URL_GETMAP.toString(),"map"," name=\"map\"  xxxonmouseover = \"mouseMove()\"")));
+            formBuffer.append(HtmlUtil.formEntry("Extent:",
                     areaWidget));
             formBuffer.append("\n");
 

@@ -74,6 +74,9 @@ public class UserManager implements Constants, Tables, RequestHandler {
 
     boolean requireLogin = true;
 
+     /** _more_ */
+     private Hashtable<String, User> userMap = new Hashtable<String, User>();
+
 
     /**
      * _more_
@@ -100,17 +103,229 @@ public class UserManager implements Constants, Tables, RequestHandler {
         String name = request.getString(ARG_USER_NAME,"");
         sb.append(HtmlUtil.form(repository.URL_USER_LOGIN));
         sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("User:"),
+        sb.append(HtmlUtil.formEntry("User:",
                                       HtmlUtil.input(ARG_USER_NAME,name)));
-        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Password:"),
+        sb.append(HtmlUtil.formEntry("Password:",
                                       HtmlUtil.password(ARG_USER_PASSWORD)));
-        sb.append(HtmlUtil.tableEntry("",
+        sb.append(HtmlUtil.formEntry("",
                                       HtmlUtil.submit("Login")));
 
         sb.append("</form>");
         return sb.toString();
 
     }
+
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected User findUser(String id) throws Exception {
+        if (id == null) {
+            return null;
+        }
+        User user = userMap.get(id);
+        if (user != null) {
+            return user;
+        }
+        String query = SqlUtil.makeSelect(COLUMNS_USERS,
+                                          Misc.newList(TABLE_USERS),
+                                          SqlUtil.eq(COL_USERS_ID,
+                                              SqlUtil.quote(id)));
+        ResultSet results = repository.execute(query).getResultSet();
+        if ( !results.next()) {
+            //            throw new IllegalArgumentException ("Could not find  user id:" + id + " sql:" + query);
+            return null;
+        } else {
+            int col = 1;
+            user = new User(results.getString(col++),
+                            results.getString(col++),
+                            results.getBoolean(col++));
+        }
+
+        userMap.put(user.getId(), user);
+        return user;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param user _more_
+     * @param updateIfNeeded _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void makeUser(User user, boolean updateIfNeeded)
+            throws Exception {
+        if (repository.tableContains(user.getId(), TABLE_USERS, COL_USERS_ID)) {
+            if ( !updateIfNeeded) {
+                throw new IllegalArgumentException(
+                    "Database already contains user:" + user.getId());
+            }
+            String query = SqlUtil.makeUpdate(TABLE_USERS, COL_USERS_ID,
+                               SqlUtil.quote(user.getId()),
+                               new String[] { COL_USERS_NAME,
+                    COL_USERS_ADMIN }, new String[] {
+                        SqlUtil.quote(user.getName()), (user.getAdmin()
+                    ? "1"
+                    : "0") });
+            repository.execute(query);
+            return;
+        }
+
+        repository.execute(INSERT_USERS, new Object[] { user.getId(), user.getName(),
+                                             new Boolean(user.getAdmin()) });
+    }
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param user _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void makeUserIfNeeded(User user) throws Exception {
+        if (findUser(user.getId()) == null) {
+            makeUser(user, true);
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @param user _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void deleteUser(User user) throws Exception {
+        String query = SqlUtil.makeDelete(TABLE_USERS, COL_USERS_ID,
+                                          SqlUtil.quote(user.getId()));
+        repository.execute(query);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param user _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result adminUser(Request request, User user) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        if(request.defined(ARG_DELETE_CONFIRM)) {
+            return  new Result(repository.URL_ADMIN_USERS.toString());
+        }
+
+        sb.append(repository.header("User: " + user.getName()));
+        sb.append("\n<p/>\n");
+        sb.append(HtmlUtil.form(repository.URL_ADMIN_USERS));
+        sb.append("\n");
+        sb.append(HtmlUtil.hidden(ARG_USER, user.getId()));
+        sb.append("\n");
+        if(request.defined(ARG_DELETE)) {
+            sb.append ("Are you sure you want to delete the user?  ");
+            sb.append(HtmlUtil.submit("Yes",ARG_DELETE_CONFIRM));
+            sb.append(HtmlUtil.space(2));
+            sb.append(HtmlUtil.submit("Cancel",ARG_CANCEL));
+        } else {
+            sb.append(HtmlUtil.formTable());
+            sb.append(HtmlUtil.formEntry("Name:", HtmlUtil.input(ARG_NAME, user.getName())));
+            sb.append(HtmlUtil.formEntry("Admin:", HtmlUtil.checkbox(ARG_ADMIN, "true", user.getAdmin())));
+            sb.append(HtmlUtil.formEntry("",HtmlUtil.submit("Change User",ARG_CHANGE)+ HtmlUtil.space(2) +
+                                         HtmlUtil.submit("Delete User",ARG_DELETE)));
+            sb.append("</table>");
+        }
+        sb.append("\n</form>\n");
+        Result result = new Result("User:" + user.getName(), sb);
+        result.putProperty(PROP_NAVSUBLINKS,
+                           repository.getSubNavLinks(request, repository.adminUrls));
+        return result;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result adminUsers(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        sb.append(repository.header("Users"));
+        String userId = request.getUser();
+        if (userId != null) {
+            User user = findUser(userId);
+            if (user == null) {
+                throw new IllegalArgumentException("Could not find user:"
+                        + userId);
+            }
+            return adminUser(request, user);
+        } else {
+            String query = SqlUtil.makeSelect(COLUMNS_USERS,
+                               Misc.newList(TABLE_USERS));
+
+            SqlUtil.Iterator iter = SqlUtil.getIterator(repository.execute(query));
+            ResultSet        results;
+
+            List<User>       users = new ArrayList();
+            while ((results = iter.next()) != null) {
+                while (results.next()) {
+                    users.add(getUser(results));
+                }
+            }
+            sb.append("<table>");
+            sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold("ID"),
+                    HtmlUtil.bold("Name"), HtmlUtil.bold("Admin?"))));
+            for (User user : users) {
+                sb.append(HtmlUtil
+                    .row(HtmlUtil
+                        .cols(HtmlUtil
+                            .href(HtmlUtil
+                                .url(repository.URL_ADMIN_USERS, ARG_USER,
+                                     user.getId()), user.getId()), user
+                                         .getName(), "" + user.getAdmin())));
+            }
+            sb.append("</table>");
+        }
+        Result result = new Result("Users", sb);
+        result.putProperty(PROP_NAVSUBLINKS,
+                           repository.getSubNavLinks(request, repository.adminUrls));
+        return result;
+    }
+
+    /**
+     * _more_
+     *
+     * @param results _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected User getUser(ResultSet results) throws Exception {
+        int col = 1;
+        return new User(results.getString(col++), results.getString(col++),
+                        results.getBoolean(col++));
+    }
+
+
 
 
     public Result processLogin(Request request) throws Exception {

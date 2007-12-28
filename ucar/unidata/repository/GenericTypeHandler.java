@@ -62,6 +62,15 @@ import java.util.Properties;
  */
 public class GenericTypeHandler extends TypeHandler {
 
+    /** _more_ */
+    public static final String TAG_COLUMN = "column";
+    public static final String TAG_TYPE = "type";
+    /** _more_ */
+    public static final String TAG_HANDLER = "handler";
+
+
+
+
     /** _more_          */
     public static final String COL_ID = "id";
 
@@ -102,8 +111,12 @@ public class GenericTypeHandler extends TypeHandler {
                                             getType()));
         this.columns = new ArrayList<Column>();
         colNames     = new ArrayList();
+
+        List columnNodes = XmlUtil.findChildren(entryNode, TAG_COLUMN);
+        if(columnNodes.size()==0) return;
+
+
         colNames.add(COL_ID);
-        List columnNodes = XmlUtil.findChildren(entryNode, TAG_DB_COLUMN);
         StringBuffer tableDef = new StringBuffer("create table "
                                     + getTableName() + " (\n");
         StringBuffer indexDef = new StringBuffer();
@@ -344,6 +357,7 @@ public class GenericTypeHandler extends TypeHandler {
      * @return _more_
      */
     public String getInsertSql(boolean isNew) {
+        if(colNames.size()==0) return null;
         return SqlUtil.makeInsert(getTableName(), SqlUtil.comma(colNames),
                                   SqlUtil.getQuestionMarks(colNames.size()));
     }
@@ -382,7 +396,7 @@ public class GenericTypeHandler extends TypeHandler {
      */
     public Entry getEntry(ResultSet results) throws Exception {
         Entry entry = super.getEntry(results);
-        //        if(true) return entry;
+        if(colNames.size()==0) return entry;
         Object[] values = new Object[colNames.size()];
         String query = SqlUtil.makeSelect(SqlUtil.comma(colNames),
                                           Misc.newList(getTableName()),
@@ -427,8 +441,8 @@ public class GenericTypeHandler extends TypeHandler {
                     valueIdx = column.formatValue(tmpSb, output, values,
                             valueIdx);
                     sb.append(
-                        HtmlUtil.tableEntry(
-                            HtmlUtil.bold(column.getLabel() + ":"),
+                        HtmlUtil.formEntry(
+                            column.getLabel() + ":",
                             tmpSb.toString()));
                 }
 

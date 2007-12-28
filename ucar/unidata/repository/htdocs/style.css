@@ -15,7 +15,11 @@ td {
 }
 
 .content {
-    margin:10px;
+    margin:10;
+}
+
+form {
+    margin:10;
 }
 
 
@@ -48,6 +52,10 @@ A {xtext-decoration: none}
 a.navtitle:visited {
    text-decoration: none;
    color: #FFFFFF;
+}
+
+.formlabel {
+  font-weight: bold;
 }
 
 a.navlink {

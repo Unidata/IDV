@@ -303,8 +303,9 @@ public class HtmlUtil {
     }
 
 
-    public static String tableEntry(String left, String right) {
-        return " <tr><td align=\"right\">" + left     + "</td><td>" + right +"</td></tr>";
+    public static String formEntry(String left, String right) {
+        //        if(left.length()>0) 
+        return " <tr><td align=\"right\" class=\"formlabel\">" + left     + "</td><td>" + right +"</td></tr>";
 
     }
 

@@ -45,9 +45,6 @@ import java.util.List;
 public class GenericEntry extends Entry {
 
 
-
-
-
     /**
      * _more_
      *
@@ -65,8 +62,8 @@ public class GenericEntry extends Entry {
      */
     public GenericEntry(String id, TypeHandler typeHandler, String name,
                         String description, Group group, User user,
-                        String file, boolean isFile,  long date, Object[] values) {
-        this(id, typeHandler, name, description, group, user, file, isFile, date,
+                        Resource resource,  long date, Object[] values) {
+        this(id, typeHandler, name, description, group, user, resource, date,
              date, date, values);
     }
 
@@ -90,9 +87,9 @@ public class GenericEntry extends Entry {
      */
     public GenericEntry(String id, TypeHandler typeHandler, String name,
                         String description, Group group, User user,
-                        String file, boolean isFile, long createDate, long startDate,
+                        Resource resource , long createDate, long startDate,
                         long endDate, Object[] values) {
-        super(id, typeHandler, name, description, group, user, file, isFile,
+        super(id, typeHandler, name, description, group, user, resource,
               createDate, startDate, endDate);
         this.values = values;
     }

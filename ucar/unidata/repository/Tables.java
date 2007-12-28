@@ -97,7 +97,7 @@ public interface Tables {
     public static final String COL_ENTRIES_GROUP_ID       = TABLE_ENTRIES + ".group_id";
     public static final String COL_ENTRIES_USER_ID        = TABLE_ENTRIES + ".user_id";
     public static final String COL_ENTRIES_RESOURCE       = TABLE_ENTRIES + ".resource";
-    public static final String COL_ENTRIES_ISFILE         = TABLE_ENTRIES + ".isfile";
+    public static final String COL_ENTRIES_RESOURCE_TYPE   = TABLE_ENTRIES + ".resource_type";
     public static final String COL_ENTRIES_CREATEDATE     = TABLE_ENTRIES + ".createdate";
     public static final String COL_ENTRIES_FROMDATE       = TABLE_ENTRIES + ".fromdate";
     public static final String COL_ENTRIES_TODATE         = TABLE_ENTRIES + ".todate";
@@ -116,7 +116,7 @@ public interface Tables {
         COL_ENTRIES_GROUP_ID,
         COL_ENTRIES_USER_ID,
         COL_ENTRIES_RESOURCE,
-        COL_ENTRIES_ISFILE,
+        COL_ENTRIES_RESOURCE_TYPE,
         COL_ENTRIES_CREATEDATE,
         COL_ENTRIES_FROMDATE,
         COL_ENTRIES_TODATE,
@@ -146,9 +146,17 @@ public interface Tables {
     public static final String TABLE_USERS = "users";
     public static final String COL_USERS_ID = TABLE_USERS + ".id";
     public static final String COL_USERS_NAME = TABLE_USERS + ".name";
+    public static final String COL_USERS_EMAIL = TABLE_USERS + ".email";
+    public static final String COL_USERS_QUESTION = TABLE_USERS + ".question";
+    public static final String COL_USERS_ANSWER = TABLE_USERS + ".answer";
+    public static final String COL_USERS_PASSWORD = TABLE_USERS + ".password";
     public static final String COL_USERS_ADMIN = TABLE_USERS + ".admin";
     public static final String []ARRAY_USERS = new String[]{COL_USERS_ID,
                                                           COL_USERS_NAME,
+                                                          COL_USERS_EMAIL,
+                                                          COL_USERS_QUESTION,
+                                                          COL_USERS_ANSWER,
+                                                          COL_USERS_PASSWORD,
                                                           COL_USERS_ADMIN};
 
     public static final String COLUMNS_USERS = SqlUtil.comma(ARRAY_USERS);

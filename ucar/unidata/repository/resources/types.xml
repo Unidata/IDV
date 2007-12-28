@@ -1,12 +1,12 @@
-<entries>
-  <entry name="model"  description="Models">
+<types>
+  <type name="model"  description="Models">
 
      <column name="modelgroup" type="string" isindex="true" cansearch="true" searchtype="select" label="Model Group"/>
      <column name="modelrun" type="string" isindex="true" cansearch="true" searchtype="select"  label="Model Run"/>
-  </entry>
+  </type>
 
 
-  <entry name="level3radar" description="Level 3 Radar Files" handler="ucar.unidata.repository.Level3RadarTypeHandler">
+  <type name="level3radar" description="Level 3 Radar Files" handler="ucar.unidata.repository.Level3RadarTypeHandler">
 	<column name="station" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Station" rows="5" columns="10"
                 names="/ucar/unidata/repository/resources/level3radar.station.properties"/>
 	<column name="product" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Product"  
@@ -18,27 +18,29 @@
 	<column name="flag" type="boolean"  label="Flag"  isindex="true" cansearch="true" />
 	<column name="number" type="double" cansearch="true" />
 -->
-  </entry>
+  </type>
 
 
-  <entry name="testit" description="Test it">
+  <type name="testit" description="Test it">
 	<column name="fruit" type="enumeration"  values="Apple,Banana,Orange" label="Fruit" isindex="true" cansearch="true" canlist="true" />
 	<column name="flag" type="boolean"  label="Flag"  isindex="true" cansearch="true" />
 	<column name="number" type="double" cansearch="true" suffix="units"/>
-  </entry>
+  </type>
 
 
-  <entry name="level2radar" description="Level 2 Radar Files">
+  <type name="level2radar" description="Level 2 Radar Files">
 	<column name="station" type="string" isindex="true" cansearch="true" searchtype="select" label="Station"
                 names="/ucar/unidata/repository/resources/level3radar.station.properties"/>
-  </entry>
+  </type>
 
 
-  <entry name="satellite" description="Satellite Files">
+  <type name="satellite" description="Satellite Files">
 	<column name="platform" type="string" isindex="true" cansearch="true" searchtype="select" label="Platform"/>
 	<column name="resolution" type="string" isindex="true" cansearch="true" searchtype="select"  label="Resolution"/>		
 	<column name="product" type="string" isindex="true" cansearch="true" searchtype="select"  label="Product"/>
-  </entry>
+  </type>
+
+  <type name="image"  description="Image Files"/>
 
 
-</entries>
+</types>

@@ -287,7 +287,7 @@ public class PatternHarvester extends Harvester {
 
         long              t1      = System.currentTimeMillis();
         final List<Entry> entries = new ArrayList();
-        final User        user    = repository.findUser("jdoe");
+        final User        user    = repository.getUserManager().findUser("jdoe");
         //        System.err.println("PATTERN:" + filePatternString);
         for (FileInfo fileInfo : dirs) {
             if ( !firstTime && !fileInfo.hasChanged()) {
@@ -381,7 +381,7 @@ public class PatternHarvester extends Harvester {
                                   + groupName, true);
                 Entry entry;
                 entries.add(entry = new Entry(repository.getGUID(),
-                                              typeHandler, name, desc, group, user, fileName, true,
+                                              typeHandler, name, desc, group, user, new Resource(fileName, Resource.TYPE_FILE),
                         createDate.getTime(), fromDate.getTime(),
                         toDate.getTime(), values));
                 typeHandler.initializeNewEntry(entry);
@@ -414,7 +414,7 @@ public class PatternHarvester extends Harvester {
         final String      rootStr    = rootDir.toString();
         final int         rootStrLen = rootStr.length();
         final List<Entry> entries    = new ArrayList();
-        final User        user       = repository.findUser("jdoe");
+        final User        user       = repository.getUserManager().findUser("jdoe");
         for (FileInfo fileInfo : dirs) {
             if ( !firstTime && !fileInfo.hasChanged()) {
                 continue;
@@ -452,7 +452,7 @@ public class PatternHarvester extends Harvester {
                     repository.findGroupFromName(StringUtil.join("/", toks),
                         true);
                 Entry entry = new Entry(repository.getGUID(), typeHandler,
-                                        name, name, group, user, path, true,
+                                        name, name, group, user, new Resource(path, Resource.TYPE_FILE),
                                         f.lastModified(), null);
                 String ext = IOUtil.getFileExtension(path);
                 if (ext.startsWith(".")) {

@@ -86,10 +86,6 @@ import java.util.Properties;
 
 
 
-import java.util.regex.*;
-
-import java.util.zip.*;
-
 import javax.swing.*;
 
 
@@ -194,7 +190,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                                              "Harvesters");
 
      /** _more_          */
-     private MyUrl[] adminUrls = {
+    protected MyUrl[] adminUrls = {
          URL_ADMIN_HOME, URL_ADMIN_STARTSTOP, URL_ADMIN_TABLES,
          URL_ADMIN_STATS, URL_ADMIN_USERS, URL_ADMIN_HARVESTERS, URL_ADMIN_SQL,
          URL_ADMIN_CLEANUP
@@ -262,8 +258,6 @@ public class Repository implements Constants, Tables, RequestHandler {
      private Hashtable<String, Group> groupMap = new Hashtable<String,
                                                      Group>();
 
-     /** _more_ */
-     private Hashtable<String, User> userMap = new Hashtable<String, User>();
 
 
      /** _more_          */
@@ -302,9 +296,6 @@ public class Repository implements Constants, Tables, RequestHandler {
      private File logFile;
      private OutputStream logFOS;
      private boolean debug = false;
-
-
-
 
      private UserManager userManager;
 
@@ -409,7 +400,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                                         true);
          apiDefFiles.addAll(argApiDefFiles);
 
-         typeDefinitionFiles = StringUtil.split(getProperty(PROP_FILE_TYPES));
+         typeDefinitionFiles = StringUtil.split(getProperty(PROP_TYPES));
          typeDefinitionFiles.addAll(argEntryDefFiles);
 
          outputDefFiles = StringUtil.split(getProperty(PROP_OUTPUT_FILES));
@@ -534,7 +525,7 @@ public class Repository implements Constants, Tables, RequestHandler {
       */
      protected void initUsers() throws Exception {
          for (User user : cmdLineUsers) {
-             makeUser(user, true);
+             getUserManager().makeUser(user, true);
          }
      }
 
@@ -1050,16 +1041,16 @@ public class Repository implements Constants, Tables, RequestHandler {
                                          getClass());
         Statement statement = connection.createStatement();
         SqlUtil.loadSql(sql, statement, true);
+
         for (String file : typeDefinitionFiles) {
-            System.err.println(file);
             Element entriesRoot = XmlUtil.getRoot(file, getClass());
             List    children = XmlUtil.findChildren(entriesRoot,
-                                   TAG_DB_ENTRY);
+                                                    GenericTypeHandler.TAG_TYPE);
             for (int i = 0; i < children.size(); i++) {
                 Element entryNode = (Element) children.get(i);
                 Class handlerClass =
                     Misc.findClass(XmlUtil.getAttribute(entryNode,
-                        TAG_DB_HANDLER,
+                                                        GenericTypeHandler.TAG_HANDLER,
                         "ucar.unidata.repository.GenericTypeHandler"));
                 Constructor ctor = Misc.findConstructor(handlerClass,
                                        new Class[] { Repository.class,
@@ -1071,8 +1062,8 @@ public class Repository implements Constants, Tables, RequestHandler {
             }
         }
 
-        makeUserIfNeeded(new User("jdoe", "John Doe", true));
-        makeUserIfNeeded(new User("anonymous", "Anonymous", false));
+        getUserManager().makeUserIfNeeded(new User("jdoe", "John Doe", true));
+        getUserManager().makeUserIfNeeded(new User("anonymous", "Anonymous", false));
     }
 
 
@@ -1194,40 +1185,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         return results.getInt(1);
     }
 
-    /**
-     * _more_
-     *
-     * @param results _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected User getUser(ResultSet results) throws Exception {
-        int col = 1;
-        return new User(results.getString(col++), results.getString(col++),
-                        results.getBoolean(col++));
-    }
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param user _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result adminUsers(Request request, User user) throws Exception {
-        StringBuffer sb = new StringBuffer();
-        sb.append(header("User: " + user.getName()));
-        sb.append("User admin tasks here");
-        Result result = new Result("User:" + user.getName(), sb);
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getSubNavLinks(request, adminUrls));
-        return result;
-    }
 
 
     /**
@@ -1285,60 +1243,6 @@ public class Repository implements Constants, Tables, RequestHandler {
         sb.append("</table>");
 
         Result result = new Result("Harvesters", sb);
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getSubNavLinks(request, adminUrls));
-        return result;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result adminUsers(Request request) throws Exception {
-        StringBuffer sb = new StringBuffer();
-        sb.append(header("Users"));
-        String userId = request.getUser();
-        if (userId != null) {
-            User user = findUser(userId);
-            if (user == null) {
-                throw new IllegalArgumentException("Could not find user:"
-                        + userId);
-            }
-            return adminUsers(request, user);
-        } else {
-            String query = SqlUtil.makeSelect(COLUMNS_USERS,
-                               Misc.newList(TABLE_USERS));
-
-            SqlUtil.Iterator iter = SqlUtil.getIterator(execute(query));
-            ResultSet        results;
-
-            List<User>       users = new ArrayList();
-            while ((results = iter.next()) != null) {
-                while (results.next()) {
-                    users.add(getUser(results));
-                }
-            }
-            sb.append("<table>");
-            sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold("ID"),
-                    HtmlUtil.bold("Name"), HtmlUtil.bold("Admin?"))));
-            for (User user : users) {
-                sb.append(HtmlUtil
-                    .row(HtmlUtil
-                        .cols(HtmlUtil
-                            .href(HtmlUtil
-                                .url(URL_ADMIN_USERS, ARG_USER,
-                                     user.getId()), user.getId()), user
-                                         .getName(), "" + user.getAdmin())));
-            }
-            sb.append("</table>");
-        }
-        Result result = new Result("Users", sb);
         result.putProperty(PROP_NAVSUBLINKS,
                            getSubNavLinks(request, adminUrls));
         return result;
@@ -1705,7 +1609,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             String query =
                 SqlUtil.makeSelect(SqlUtil.comma(COL_ENTRIES_ID,
                                                  COL_ENTRIES_RESOURCE,
-                                                 COL_ENTRIES_TYPE), Misc.newList(TABLE_ENTRIES), SqlUtil.eq(COL_ENTRIES_ISFILE,"1"));
+                                                 COL_ENTRIES_TYPE), Misc.newList(TABLE_ENTRIES), SqlUtil.eq(COL_ENTRIES_RESOURCE_TYPE,SqlUtil.quote(Resource.TYPE_FILE)));
 
             SqlUtil.Iterator iter = SqlUtil.getIterator(execute(query));
             ResultSet        results;
@@ -1936,34 +1840,36 @@ public class Repository implements Constants, Tables, RequestHandler {
     public Result processSearchForm(Request request, boolean typeSpecific)
             throws Exception {
 
-        boolean      basicForm    = request.get(ARG_FORM_BASIC, true);
+
+
+        String formType = request.getString(ARG_FORM_TYPE, "basic");
+        boolean      basicForm    = formType.equals("basic");
         List         where        = assembleWhereClause(request);
         StringBuffer sb           = new StringBuffer();
         StringBuffer headerBuffer = new StringBuffer();
         //        headerBuffer.append(header("Search Form"));
-        String basic = request.getString(ARG_FORM_BASIC, "");
-        request.remove(ARG_FORM_BASIC);
+        request.remove(ARG_FORM_TYPE);
         String urlArgs = request.getUrlArgs();
-        request.put(ARG_FORM_BASIC, basic);
+        request.put(ARG_FORM_TYPE, formType);
         headerBuffer.append("<table cellpadding=\"5\">");
         String formLinks = "";
         if (basicForm) {
-            formLinks =  HtmlUtil.bold("Basic Search") +"&nbsp;|&nbsp;" + HtmlUtil.href(HtmlUtil.url(URL_SEARCH_FORM,ARG_FORM_BASIC,
-                                                    "false")+ "&"+urlArgs, "Advanced Search");
+            formLinks =  HtmlUtil.bold("Basic Search") +"&nbsp;|&nbsp;" + HtmlUtil.href(HtmlUtil.url(URL_SEARCH_FORM,ARG_FORM_TYPE,
+                                                    "advanced")+ "&"+urlArgs, "Advanced Search");
 
         } else {
-            formLinks =  HtmlUtil.href(HtmlUtil.url(URL_SEARCH_FORM,ARG_FORM_BASIC,
-                                                    "true")+ "&"+urlArgs, "Basic Search") +
+            formLinks =  HtmlUtil.href(HtmlUtil.url(URL_SEARCH_FORM,ARG_FORM_TYPE,
+                                                    "basic")+ "&"+urlArgs, "Basic Search") +
                 "&nbsp;|&nbsp;" + 
                 HtmlUtil.bold("Advanced Search") ;
         }
 
-        headerBuffer.append(HtmlUtil.tableEntry("",
+        headerBuffer.append(HtmlUtil.formEntry("",
                                                 formLinks));
         sb.append(HtmlUtil.form(HtmlUtil.url(URL_SEARCH_QUERY, ARG_NAME,
                                              WHAT_ENTRIES)));
 
-        sb.append(HtmlUtil.hidden(ARG_FORM_BASIC, basicForm + ""));
+        sb.append(HtmlUtil.hidden(ARG_FORM_TYPE, formType));
 
         //Put in an empty submit button so when the user presses return 
         //it acts like a regular submit (not a submit to change the type)
@@ -1988,37 +1894,32 @@ public class Repository implements Constants, Tables, RequestHandler {
         String output     = (String) request.getOutput("");
         String outputHtml = "";
         if ( !basicForm) {
+            outputHtml = HtmlUtil.span("Output Type: ","class=\"formlabel\"");
             if (output.length() == 0) {
-                outputHtml = HtmlUtil.bold("Output Type: ")
-                             + HtmlUtil.select(ARG_OUTPUT,
+                outputHtml +=  HtmlUtil.select(ARG_OUTPUT,
                                  getOutputTypesFor(request, what));
             } else {
-                outputHtml = HtmlUtil.bold("Output Type: ") + output;
-                sb.append(HtmlUtil.hidden(ARG_OUTPUT, output));
+                outputHtml +=   sb.append(HtmlUtil.hidden(ARG_OUTPUT, output));
             }
+            String orderBy = HtmlUtil.space(2)
+                + HtmlUtil.checkbox(ARG_ASCENDING, "true",
+                                    request.get(ARG_ASCENDING,
+                                                false)) + " Sort ascending";
+            outputHtml += orderBy;
+
         }
 
 
-        String orderBy = HtmlUtil.space(2)
-                         + HtmlUtil.checkbox(ARG_ASCENDING, "true",
-                                             request.get(ARG_ASCENDING,
-                                                 false)) + " Sort ascending";
 
-        if (basicForm) {
-            orderBy = "";
-        }
+
         if (what.length() == 0) {
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Search For:"),
-                                          HtmlUtil.select(ARG_WHAT, whatList)
-                                          + HtmlUtil.space(3) + outputHtml
-                                          + orderBy));
+            sb.append(HtmlUtil.formEntry("Search For:",
+                                          HtmlUtil.select(ARG_WHAT, whatList)));
 
         } else {
             String label = TwoFacedObject.findLabel(what, whatList);
             label = StringUtil.padRight(label, 40, HtmlUtil.space(1));
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Search For:"),
-                                          label + HtmlUtil.space(2)
-                                          + outputHtml + orderBy));
+            sb.append(HtmlUtil.formEntry("Search For:", label));
             sb.append(HtmlUtil.hidden(ARG_WHAT, what));
         }
 
@@ -2027,11 +1928,12 @@ public class Repository implements Constants, Tables, RequestHandler {
                                     basicForm);
 
 
-        sb.append(HtmlUtil.tableEntry("",
+        sb.append(HtmlUtil.formEntry("",
                                       HtmlUtil.submit("Search", "submit")
                                       + " "
                                       + HtmlUtil.submit("Search Subset",
-                                          "submit_subset")));
+                                          "submit_subset")
+                                      + HtmlUtil.space(2)+outputHtml));
         sb.append("</table>");
         sb.append("</form>");
         //        sb.append(IOUtil.readContents("/ucar/unidata/repository/resources/map.js",
@@ -2096,7 +1998,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         String[] whats = { WHAT_ENTRIES, WHAT_GROUP, WHAT_TAG,
                            WHAT_ASSOCIATION };
         String[] names     = { "Entries", "Groups", "Tags", "Associations" };
-        boolean  basicForm = request.get(ARG_FORM_BASIC, true);
+        String formType = request.getString(ARG_FORM_TYPE, "basic");
 
         for (int i = 0; i < whats.length; i++) {
             String item;
@@ -2104,9 +2006,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                 item = HtmlUtil.span(names[i], extra1);
             } else {
                 item = HtmlUtil.href(HtmlUtil.url(URL_SEARCH_FORM, ARG_WHAT,
-                        whats[i], ARG_FORM_BASIC, (basicForm
-                        ? "true"
-                        : "false")), names[i], extra2);
+                        whats[i], ARG_FORM_TYPE, formType), names[i], extra2);
             }
             if (i == 0) {
                 item = "<span " + extra1
@@ -2276,7 +2176,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         if ( !entry.getTypeHandler().canDownload(request, entry)) {
             return false;
         }
-        String filePath = entry.getResource();
+        String filePath = entry.getResource().getPath();
         filePath = filePath.replace("\\", "/");
         if (filePath.indexOf("..") >= 0) {
             return false;
@@ -2320,7 +2220,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         //        System.err.println("request:" + request);
 
         if (request.defined(ARG_IMAGEWIDTH)
-                && ImageUtils.isImage(entry.getResource())) {
+                && ImageUtils.isImage(entry.getResource().getPath())) {
             int    width    = request.get(ARG_IMAGEWIDTH, 75);
             String thumbDir = IOUtil.joinDir(tmpDir, "thumbnails");
             IOUtil.makeDir(thumbDir);
@@ -2328,7 +2228,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                                           "entry" + entry.getId() + "_"
                                           + width + ".jpg");
             if ( !new File(thumb).exists()) {
-                Image image = ImageUtils.readImage(entry.getResource());
+                Image image = ImageUtils.readImage(entry.getResource().getPath());
                 Image resizedImage = image.getScaledInstance(width, -1,
                                          Image.SCALE_AREA_AVERAGING);
                 ImageUtils.waitOnImage(resizedImage);
@@ -2337,11 +2237,11 @@ public class Repository implements Constants, Tables, RequestHandler {
             bytes = IOUtil.readBytes(IOUtil.getInputStream(thumb,
                     getClass()));
             return new Result("", bytes,
-                              IOUtil.getFileExtension(entry.getResource()));
+                              IOUtil.getFileExtension(entry.getResource().getPath()));
         } else {
             return new Result(
-                "", IOUtil.getInputStream(entry.getResource(), getClass()),
-                IOUtil.getFileExtension(entry.getResource()));
+                "", IOUtil.getInputStream(entry.getResource().getPath(), getClass()),
+                IOUtil.getFileExtension(entry.getResource().getPath()));
         }
 
     }
@@ -2405,8 +2305,8 @@ public class Repository implements Constants, Tables, RequestHandler {
         sb.append(makeGroupHeader(request,group));
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.form(URL_ENTRY_FORM, ""));
-        sb.append(HtmlUtil.tableEntry(HtmlUtil.submit("Create new entry:"),
-                                      makeTypeSelect(request)));
+        sb.append(HtmlUtil.formEntry(HtmlUtil.submit("Create new entry:"),
+                                      makeTypeSelect(request,false)));
         sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
         sb.append("</form>");
 
@@ -2422,7 +2322,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         StringBuffer sb = new StringBuffer();
         sb.append(HtmlUtil.form(URL_GROUP_ADD, ""));
         sb.append(HtmlUtil.hidden(ARG_GROUP, parentGroup.getFullName()));
-        sb.append(HtmlUtil.tableEntry(HtmlUtil.submit("Create new group:"),
+        sb.append(HtmlUtil.formEntry(HtmlUtil.submit("Create new group:"),
                                       HtmlUtil.input(ARG_NAME,name)));
         sb.append("</form>");
         return sb.toString();
@@ -2462,14 +2362,14 @@ public class Repository implements Constants, Tables, RequestHandler {
         sb.append(HtmlUtil.form((type == null?URL_ENTRY_FORM:URL_ENTRY_ADD), ""));
         String title="";
         if(type == null) {
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"),
-                                          makeTypeSelect(request)));
+            sb.append(HtmlUtil.formEntry("Type:",
+                                          makeTypeSelect(request,false)));
             
-            sb.append(HtmlUtil.tableEntry("", HtmlUtil.submit("Select Type to Add")));
+            sb.append(HtmlUtil.formEntry("", HtmlUtil.submit("Select Type to Add")));
             sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
         } else {
             String submitButton = HtmlUtil.submit(title=(entry==null?"Add Entry":"Edit Entry"));
-            sb.append(HtmlUtil.tableEntry("", submitButton));
+            sb.append(HtmlUtil.formEntry("", submitButton));
             TypeHandler typeHandler = (entry==null?getTypeHandler(type):entry.getTypeHandler());
             if(entry!=null) {
                 sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
@@ -2477,21 +2377,21 @@ public class Repository implements Constants, Tables, RequestHandler {
                 sb.append(HtmlUtil.hidden(ARG_TYPE, type));
                 sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
             }
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Type:"),typeHandler.getLabel()));
+            sb.append(HtmlUtil.formEntry("Type:",typeHandler.getLabel()));
             
             String size = " size=\"75\" ";
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Resource:"),
-                                          HtmlUtil.input(ARG_RESOURCE, (entry!=null?entry.getResource():""),
+            sb.append(HtmlUtil.formEntry("Resource:",
+                                          HtmlUtil.input(ARG_RESOURCE, (entry!=null?entry.getResource().getPath():""),
                                                          size)));
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
+            sb.append(HtmlUtil.formEntry("Name:",
                                           HtmlUtil.input(ARG_NAME,  (entry!=null?entry.getName():""), size)));
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Description:"),
+            sb.append(HtmlUtil.formEntry("Description:",
                                           HtmlUtil.textArea(ARG_DESCRIPTION,  (entry!=null?entry.getDescription():""),
                                                          3,50)));
             String dateHelp = " (e.g., 2007-12-11 00:00:00)";
             String fromDate = (entry!=null?new Date(entry.getStartDate()).toString():"");
             String toDate = (entry!=null?new Date(entry.getEndDate()).toString():"");
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Date Range:"),
+            sb.append(HtmlUtil.formEntry("Date Range:",
                                           HtmlUtil.input(ARG_FROMDATE, fromDate," size=30 ") + " -- "
                                           + HtmlUtil.input(ARG_TODATE, toDate," size=30 ") + dateHelp));
 
@@ -2501,10 +2401,10 @@ public class Repository implements Constants, Tables, RequestHandler {
                 tags = StringUtil.join(",", tagList);
             }
 
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Tags:"),
+            sb.append(HtmlUtil.formEntry("Tags:",
                                           HtmlUtil.input(ARG_TAG, tags, size)
                                           + " (comma separated)"));
-            sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Location:"),
+            sb.append(HtmlUtil.formEntry("Location:",
                                           HtmlUtil.makeLatLonBox(ARG_AREA, 
                                                                  (entry!=null&&entry.hasSouth())?entry.getSouth():Double.NaN, 
                                                                  (entry!=null&&entry.hasNorth())?entry.getNorth():Double.NaN, 
@@ -2512,7 +2412,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                                                                  (entry!=null&&entry.hasWest())?entry.getWest():Double.NaN)));
 
             typeHandler.addToEntryForm(request, sb,entry);
-            sb.append(HtmlUtil.tableEntry("", submitButton));
+            sb.append(HtmlUtil.formEntry("", submitButton));
         }
         sb.append("</table>\n");
         return new Result(title, sb, Result.TYPE_HTML);
@@ -2595,17 +2495,18 @@ public class Repository implements Constants, Tables, RequestHandler {
             if(dateRange[0] == null) dateRange[0] = (dateRange[1]==null?createDate:dateRange[1]);
             if(dateRange[1] == null) dateRange[1] = dateRange[0];
             Group group = findGroupFromName(groupName, true);
-            File file = new File(resource);
             entry = new Entry(id, typeHandler, name, description, group,
                               request.getRequestContext().getUser(),
-                              resource, file.exists(),
+                              new Resource(resource),
                               createDate.getTime(),
                               dateRange[0].getTime(),
                               dateRange[1].getTime());
         } else {
             entry.setName(request.getString(ARG_NAME, entry.getName()));
             entry.setDescription(request.getString(ARG_DESCRIPTION, entry.getDescription()));
-            entry.setResource(request.getString(ARG_RESOURCE, entry.getResource()));
+            if(request.defined(ARG_RESOURCE)) {
+                entry.setResource(new Resource(request.getString(ARG_RESOURCE,"")));
+            }
             if(dateRange[0]!=null)
                 entry.setStartDate(dateRange[0].getTime());
             if(dateRange[1]==null) 
@@ -2870,11 +2771,11 @@ public class Repository implements Constants, Tables, RequestHandler {
         sb.append("<table cellpadding=\"5\">");
         sb.append(HtmlUtil.form(URL_GROUP_FORM, ""));
         sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
-        sb.append(HtmlUtil.tableEntry(HtmlUtil.bold("Name:"),
+        sb.append(HtmlUtil.formEntry("Name:",
                                       HtmlUtil.input(ARG_NAME,
                                           group.getName())));
 
-        sb.append(HtmlUtil.tableEntry("",
+        sb.append(HtmlUtil.formEntry("",
                                       HtmlUtil.submit("Edit Group",
                                           ACTION_EDIT)));
         sb.append("</form>");
@@ -3472,10 +3373,11 @@ public class Repository implements Constants, Tables, RequestHandler {
      *
      * @throws Exception _more_
      */
-    public String makeTypeSelect(Request request) throws Exception {
+    public String makeTypeSelect(Request request, boolean includeAny) throws Exception {
         List<TypeHandler> typeHandlers = getTypeHandlers();
         List              tmp          = new ArrayList();
         for (TypeHandler typeHandler : typeHandlers) {
+            if(typeHandler.isAnyHandler() && !includeAny) continue;
             tmp.add(new TwoFacedObject(typeHandler.getLabel(),
                                        typeHandler.getType()));
         }
@@ -3503,6 +3405,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         List<TypeHandler> typeHandlers = new ArrayList<TypeHandler>();
         for (int i = 0; i < types.length; i++) {
             TypeHandler theTypeHandler = getTypeHandler(types[i]);
+
             if(types[i].equals(TypeHandler.TYPE_ANY)) {
                 typeHandlers.add(0,theTypeHandler);
 
@@ -3552,7 +3455,6 @@ public class Repository implements Constants, Tables, RequestHandler {
     protected Result listTags(Request request) throws Exception {
         TypeHandler typeHandler = getTypeHandler(request);
         List        where       = typeHandler.assembleWhereClause(request);
-        System.err.println("where:" + where);
         if (where.size() == 0) {
             String type = (String) request.getType("").trim();
             if ((type.length() > 0) && !type.equals(TypeHandler.TYPE_ANY)) {
@@ -3698,19 +3600,6 @@ public class Repository implements Constants, Tables, RequestHandler {
     /**
      * _more_
      *
-     * @param user _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void makeUserIfNeeded(User user) throws Exception {
-        if (findUser(user.getId()) == null) {
-            makeUser(user, true);
-        }
-    }
-
-    /**
-     * _more_
-     *
      * @param id _more_
      * @param tableName _more_
      * @param column _more_
@@ -3730,84 +3619,7 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param user _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void deleteUser(User user) throws Exception {
-        String query = SqlUtil.makeDelete(TABLE_USERS, COL_USERS_ID,
-                                          SqlUtil.quote(user.getId()));
-        execute(query);
-    }
 
-    /**
-     * _more_
-     *
-     * @param user _more_
-     * @param updateIfNeeded _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void makeUser(User user, boolean updateIfNeeded)
-            throws Exception {
-        if (tableContains(user.getId(), TABLE_USERS, COL_USERS_ID)) {
-            if ( !updateIfNeeded) {
-                throw new IllegalArgumentException(
-                    "Database already contains user:" + user.getId());
-            }
-            String query = SqlUtil.makeUpdate(TABLE_USERS, COL_USERS_ID,
-                               SqlUtil.quote(user.getId()),
-                               new String[] { COL_USERS_NAME,
-                    COL_USERS_ADMIN }, new String[] {
-                        SqlUtil.quote(user.getName()), (user.getAdmin()
-                    ? "1"
-                    : "0") });
-            execute(query);
-            return;
-        }
-
-        execute(INSERT_USERS, new Object[] { user.getId(), user.getName(),
-                                             new Boolean(user.getAdmin()) });
-    }
-
-    /**
-     * _more_
-     *
-     * @param id _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected User findUser(String id) throws Exception {
-        if (id == null) {
-            return null;
-        }
-        User user = userMap.get(id);
-        if (user != null) {
-            return user;
-        }
-        String query = SqlUtil.makeSelect(COLUMNS_USERS,
-                                          Misc.newList(TABLE_USERS),
-                                          SqlUtil.eq(COL_USERS_ID,
-                                              SqlUtil.quote(id)));
-        ResultSet results = execute(query).getResultSet();
-        if ( !results.next()) {
-            //            throw new IllegalArgumentException ("Could not find  user id:" + id + " sql:" + query);
-            return null;
-        } else {
-            int col = 1;
-            user = new User(results.getString(col++),
-                            results.getString(col++),
-                            results.getBoolean(col++));
-        }
-
-        userMap.put(user.getId(), user);
-        return user;
-    }
 
 
     /**
@@ -4392,8 +4204,8 @@ public class Repository implements Constants, Tables, RequestHandler {
         statement.setString(col++, entry.getDescription());
         statement.setString(col++, entry.getGroupId());
         statement.setString(col++, entry.getUser().getId());
-        statement.setString(col++, entry.getResource().toString());
-        statement.setInt(col++, entry.getIsFile()?1:0);
+        statement.setString(col++, entry.getResource().getPath());
+        statement.setString(col++, entry.getResource().getType());
         statement.setTimestamp(col++, new java.sql.Timestamp(currentTime()));
         //        System.err.println (entry.getName() + " " + new Date(entry.getStartDate()));
         statement.setTimestamp(col++,
@@ -4752,14 +4564,13 @@ public class Repository implements Constants, Tables, RequestHandler {
             long        t1        = System.currentTimeMillis();
             List<Entry> needToAdd = new ArrayList();
             for (Entry entry : entries) {
-                select.setString(1, entry.getResource());
+                select.setString(1, entry.getResource().getPath());
                 //                select.addBatch();
                 ResultSet results = select.executeQuery();
                 if (results.next()) {
                     int found = results.getInt(1);
                     if (found == 0) {
                         needToAdd.add(entry);
-                        //                        System.err.println ("adding: " + entry.getResource());
                     }
                 }
             }
@@ -4770,7 +4581,6 @@ public class Repository implements Constants, Tables, RequestHandler {
                 int found = results.getInt(1);
                 if(found ==0) {
                     needToAdd.add(entries.get(cnt));
-                    System.err.println ("adding: " + entries.get(cnt).getResource());
                 }
                 cnt++;
             }

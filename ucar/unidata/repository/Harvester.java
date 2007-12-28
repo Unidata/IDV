@@ -223,7 +223,7 @@ public class Harvester {
         final String      rootStr    = rootDir.toString();
         final int         rootStrLen = rootStr.length();
         final List<Entry> entries    = new ArrayList();
-        final User        user       = repository.findUser("jdoe");
+        final User        user       = repository.getUserManager().findUser("jdoe");
         IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
             public int viewFile(File f) throws Exception {
                 String name = f.getName();
@@ -252,7 +252,7 @@ public class Harvester {
                         true);
                 Entry entry = new Entry(repository.getGUID(), typeHandler,
                                         name, name, group, user,
-                                        f.toString(), true, f.lastModified(), null);
+                                        new Resource(f), f.lastModified(), null);
                 if (name.endsWith(".java")) {
                     String classPath = IOUtil.stripExtension(f.toString());
                     classPath = classPath.replace("\\", "/");

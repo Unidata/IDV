@@ -269,7 +269,7 @@ public class ImageOutputHandler extends OutputHandler {
         } else if (output.equals(OUTPUT_SLIDESHOW)) {
             for (int i = entries.size() - 1; i >= 0; i--) {
                 Entry entry = entries.get(i);
-                if ( !ImageUtils.isImage(entry.getResource())) {
+                if (!entry.getResource().isImage()) {
                     continue;
                 }
                 String url = HtmlUtil.url(repository.URL_ENTRY_GET + "/"
@@ -342,7 +342,7 @@ public class ImageOutputHandler extends OutputHandler {
 
 
     private String getImageUrl(Entry entry) {
-        if (!ImageUtils.isImage(entry.getResource())) {
+        if (!entry.getResource().isImage()) {
             if (entry.hasAreaDefined()) {
                 return  HtmlUtil.url(repository.URL_GETMAP,
                                      ARG_SOUTH, "" + entry.getSouth(), 

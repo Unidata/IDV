@@ -588,8 +588,7 @@ public class Column implements Tables, Constants {
                                         "size=\"" + columns + "\"");
             }
         }
-        formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold(getLabel()
-                                                            + ":"), HtmlUtil.hbox(widget,suffix)));
+        formBuffer.append(HtmlUtil.formEntry(getLabel()+ ":", HtmlUtil.hbox(widget,suffix)));
         formBuffer.append("\n");
     }
 
@@ -670,8 +669,7 @@ public class Column implements Tables, Constants {
                                         "size=\"" + columns + "\"");
             }
         }
-        formBuffer.append(HtmlUtil.tableEntry(HtmlUtil.bold(getLabel()
-                + ":"), "<table>"+HtmlUtil.row(HtmlUtil.cols(widget,suffix))+"</table>"));
+        formBuffer.append(HtmlUtil.formEntry(getLabel()+ ":", "<table>"+HtmlUtil.row(HtmlUtil.cols(widget,suffix))+"</table>"));
         formBuffer.append("\n");
     }
 

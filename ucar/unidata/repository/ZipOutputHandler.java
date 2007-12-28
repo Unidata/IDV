@@ -216,7 +216,7 @@ public class ZipOutputHandler extends OutputHandler {
             if ( !repository.canDownload(request, entry)) {
                 continue;
             }
-            String path = entry.getResource();
+            String path = entry.getResource().getPath();
             String name = IOUtil.getFileTail(path);
             int    cnt  = 1;
             while (seen.get(name) != null) {

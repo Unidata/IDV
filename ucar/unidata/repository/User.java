@@ -47,6 +47,14 @@ public class User {
     /** _more_ */
     private String name;
 
+    private String email;
+
+    private String question;
+
+    private String answer;
+
+    private String password;
+
     /** _more_ */
     private boolean admin = false;
 
@@ -185,5 +193,81 @@ public class User {
     public String toString() {
         return id;
     }
+
+
+/**
+Set the Email property.
+
+@param value The new value for Email
+**/
+public void setEmail (String value) {
+	email = value;
+}
+
+/**
+Get the Email property.
+
+@return The Email
+**/
+public String getEmail () {
+	return email;
+}
+
+/**
+Set the Question property.
+
+@param value The new value for Question
+**/
+public void setQuestion (String value) {
+	question = value;
+}
+
+/**
+Get the Question property.
+
+@return The Question
+**/
+public String getQuestion () {
+	return question;
+}
+
+/**
+Set the Answer property.
+
+@param value The new value for Answer
+**/
+public void setAnswer (String value) {
+	answer = value;
+}
+
+/**
+Get the Answer property.
+
+@return The Answer
+**/
+public String getAnswer () {
+	return answer;
+}
+
+/**
+Set the Password property.
+
+@param value The new value for Password
+**/
+public void setPassword (String value) {
+	password = value;
+}
+
+/**
+Get the Password property.
+
+@return The Password
+**/
+public String getPassword () {
+	return password;
+}
+
+
+
 }
 

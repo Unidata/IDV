@@ -49,6 +49,7 @@ public class Entry {
     /** _more_          */
     public static final double NONGEO = -999999;
 
+
     /** _more_ */
     Object[] values;
 
@@ -79,9 +80,8 @@ public class Entry {
     private User user;
 
     /** _more_ */
-    private String resource;
+    private Resource resource;
 
-    private boolean isFile = false;
 
     /** _more_ */
     private long createDate;
@@ -134,9 +134,9 @@ public class Entry {
      * @param date _more_
      */
     public Entry(String id, TypeHandler typeHandler, String name,
-                 String description, Group group, User user, String resource, boolean isFile,
+                 String description, Group group, User user, Resource resource,
                  long date) {
-        this(id, typeHandler, name, description, group, user, resource, isFile, date,
+        this(id, typeHandler, name, description, group, user, resource,  date,
              date, date);
     }
 
@@ -155,9 +155,9 @@ public class Entry {
      * @param values _more_
      */
     public Entry(String id, TypeHandler typeHandler, String name,
-                 String description, Group group, User user, String resource, boolean isFile,
+                 String description, Group group, User user, Resource resource,
                  long date, Object[] values) {
-        this(id, typeHandler, name, description, group, user, resource, isFile, date,
+        this(id, typeHandler, name, description, group, user, resource,  date,
              date, date, values);
     }
 
@@ -177,9 +177,9 @@ public class Entry {
      * @param endDate _more_
      */
     public Entry(String id, TypeHandler typeHandler, String name,
-                 String description, Group group, User user, String resource, boolean isFile,
+                 String description, Group group, User user, Resource resource, 
                  long createDate, long startDate, long endDate) {
-        this(id, typeHandler, name, description, group, user, resource, isFile,
+        this(id, typeHandler, name, description, group, user, resource, 
              createDate, startDate, endDate, null);
     }
 
@@ -199,7 +199,7 @@ public class Entry {
      * @param values _more_
      */
     public Entry(String id, TypeHandler typeHandler, String name,
-                 String description, Group group, User user, String resource, boolean isFile,
+                 String description, Group group, User user, Resource resource, 
                  long createDate, long startDate, long endDate,
                  Object[] values) {
         this.id          = id;
@@ -209,7 +209,7 @@ public class Entry {
         this.group       = group;
         this.user        = user;
         this.resource    = resource;
-        this.isFile      = isFile;
+
         this.createDate  = createDate;
         this.startDate   = startDate;
         this.endDate     = endDate;
@@ -223,7 +223,7 @@ public class Entry {
      * @return _more_
      */
     public boolean isFile() {
-        return new File(getResource()).exists();
+        return resource.isFile();
     }
 
 
@@ -243,7 +243,7 @@ public class Entry {
      *
      * @param value The new value for resource
      */
-    public void setResource(String value) {
+    public void setResource(Resource value) {
         resource = value;
     }
 
@@ -252,28 +252,11 @@ public class Entry {
      *
      * @return The resource
      */
-    public String getResource() {
+    public Resource getResource() {
         return resource;
     }
 
 
-/**
-Set the IsFile property.
-
-@param value The new value for IsFile
-**/
-public void setIsFile (boolean value) {
-	isFile = value;
-}
-
-/**
-Get the IsFile property.
-
-@return The IsFile
-**/
-public boolean getIsFile () {
-	return isFile;
-}
 
 
     /**
