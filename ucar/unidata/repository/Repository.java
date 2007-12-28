@@ -351,7 +351,7 @@ public class Repository implements Constants, Tables, RequestHandler {
          initApi();
          initUsers();
          initGroups();
-         initHarvesters();
+         //         initHarvesters();
      }
 
 
@@ -1714,12 +1714,14 @@ public class Repository implements Constants, Tables, RequestHandler {
         return result;
     }
 
+    int ccnt=0;
 
 
     public void importCatalog(String url, Group parent, Hashtable seen) throws Exception {
         if(seen.get(url)!=null) return;
+        ccnt++;
         seen.put(url,url);
-        System.err.println(url);
+        //        System.err.println(url);
         Element root  = XmlUtil.getRoot(url, getClass());
         Node child = XmlUtil.findChild(root, CatalogOutputHandler.TAG_DATASET);
         if(child!=null) {
@@ -1735,6 +1737,9 @@ public class Repository implements Constants, Tables, RequestHandler {
         }
 
 
+
+        name = name.replace("/","--");
+        //        Group group = null;
         Group group = findGroupFromName((parent==null?name:parent.getFullName()+"/"+name),true);
         NodeList elements = XmlUtil.getElements(node);
         List    children = XmlUtil.findChildren(node,null);
@@ -1761,9 +1766,9 @@ public class Repository implements Constants, Tables, RequestHandler {
      */
     public Result processListHome(Request request) throws Exception {
 
-        //        importCatalog("http://dataportal.ucar.edu/metadata/browse/climate.thredds.xml",null,new Hashtable());
+        importCatalog("http://dataportal.ucar.edu/metadata/browse/climate.thredds.xml",null,new Hashtable());
 
-
+        System.err.println("seen:" + ccnt);
 
 
 
@@ -2851,7 +2856,13 @@ public class Repository implements Constants, Tables, RequestHandler {
         List   titleList   = new ArrayList();
         Group  parent      = group.getParent();
         String output      = request.getOutput();
+        int cnt = 0;
         while (parent != null) {
+            if(cnt++>=3) {
+                titleList.add(0,"...");
+                breadcrumbs.add(0,"...");
+                break;
+            }
             titleList.add(0, parent.getName());
             breadcrumbs.add(0, HtmlUtil.href(HtmlUtil.url(URL_GROUP_SHOW,
                     ARG_GROUP, parent.getFullName(), ARG_OUTPUT,
