@@ -1715,6 +1715,41 @@ public class Repository implements Constants, Tables, RequestHandler {
     }
 
 
+
+    public void importCatalog(String url, Group parent, Hashtable seen) throws Exception {
+        if(seen.get(url)!=null) return;
+        seen.put(url,url);
+        System.err.println(url);
+        Element root  = XmlUtil.getRoot(url, getClass());
+        Node child = XmlUtil.findChild(root, CatalogOutputHandler.TAG_DATASET);
+        if(child!=null) {
+            recurseCatalog((Element)child,parent,seen);
+        }
+    }
+
+    public void recurseCatalog(Element node, Group parent, Hashtable seen) throws Exception {
+        String name = XmlUtil.getAttribute(node, ATTR_NAME);
+        if(XmlUtil.hasAttribute(node, CatalogOutputHandler.ATTR_URLPATH)) {
+            String url = XmlUtil.getAttribute(node, CatalogOutputHandler.ATTR_URLPATH);
+            return;
+        }
+
+
+        Group group = findGroupFromName((parent==null?name:parent.getFullName()+"/"+name),true);
+        NodeList elements = XmlUtil.getElements(node);
+        List    children = XmlUtil.findChildren(node,null);
+        for (int i = 0; i < elements.getLength(); i++) {
+            Element child = (Element) elements.item(i);
+            if(child.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
+                recurseCatalog(child, group,seen);
+            } else   if(child.getTagName().equals(CatalogOutputHandler.TAG_CATALOGREF)) {
+                String url = XmlUtil.getAttribute(child, "xlink:href");
+                importCatalog(url, group,seen);
+            }
+        }
+    }
+
+
     /**
      * _more_
      *
@@ -1725,6 +1760,13 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @throws Exception _more_
      */
     public Result processListHome(Request request) throws Exception {
+
+        //        importCatalog("http://dataportal.ucar.edu/metadata/browse/climate.thredds.xml",null,new Hashtable());
+
+
+
+
+
         StringBuffer         sb           = new StringBuffer();
         List                 links        = getListLinks(request, "", false);
         TypeHandler          typeHandler  = getTypeHandler(request);
@@ -4532,6 +4574,11 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
     private Hashtable seenResources = new Hashtable();
+
+    
+
+
+
 
 
     /**
