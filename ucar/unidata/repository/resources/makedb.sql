@@ -2,6 +2,10 @@
 --- Initial data base creation
 
 
+CREATE TABLE  globals (name varchar(500),
+                       value varchar(1000));
+
+
 CREATE TABLE  groups (id varchar(500),
                      parent varchar(200),
                      name varchar(200),
@@ -39,6 +43,9 @@ CREATE INDEX TAGS_INDEX_ENTRY_ID ON tags (ENTRY_ID);
 CREATE TABLE  users (id varchar(200),
                      name  varchar(200),
                      email varchar(200),
+                     question  varchar(200),
+                     answer  varchar(200),  
+                     password  varchar(200),
 		     admin int);
 
 

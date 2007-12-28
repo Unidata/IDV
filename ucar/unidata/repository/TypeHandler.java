@@ -645,6 +645,11 @@ public class TypeHandler implements Constants, Tables {
     protected Statement executeSelect(Request request, String what,
                                       List whereList, String extra)
             throws Exception {
+        System.err.println("what:" + what);
+        System.err.println("where:" + whereList);
+        System.err.println("extra:" + extra);
+        System.err.println("tablename:" + getTableName());
+
         whereList = new ArrayList(whereList);
         String   where      = SqlUtil.makeAnd(whereList);
 
@@ -657,9 +662,10 @@ public class TypeHandler implements Constants, Tables {
         boolean didOther   = false;
         boolean didMeta    = false;
         for (int i = 0; i < tableNames.length; i++) {
-            if ((what.indexOf(" " + tableNames[i] + ".") >= 0)
-                    || (where.indexOf(" " + tableNames[i] + ".") >= 0)
-                    || (extra.indexOf(" " + tableNames[i] + ".") >= 0)) {
+            String pattern = ".*[ =\\(]+" + tableNames[i]+"\\..*";
+            if (what.matches(pattern)
+                || where.matches(pattern)
+                || (extra.matches(pattern))) {
                 tables.add(tableNames[i]);
                 if (i == 0) {
                     didEntries = true;
@@ -672,6 +678,7 @@ public class TypeHandler implements Constants, Tables {
         }
 
 
+        System.err.println("didentries:" + didEntries + " " + didOther);
         if (didMeta) {
             whereList.add(SqlUtil.eq(COL_METADATA_ID, COL_ENTRIES_ID));
             didEntries = true;

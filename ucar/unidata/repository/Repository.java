@@ -183,7 +183,9 @@ public class Repository implements Constants, Tables, RequestHandler {
      public MyUrl URL_ADMIN_STATS = new MyUrl("/admin/stats", "Statistics");
 
      /** _more_ */
-     public MyUrl URL_ADMIN_USERS = new MyUrl("/admin/users", "Users");
+     public MyUrl URL_ADMIN_USER_LIST = new MyUrl("/admin/user/list", "Users");
+
+     public MyUrl URL_ADMIN_USER = new MyUrl("/admin/user", "Users");
 
      /** _more_ */
      public MyUrl URL_ADMIN_HARVESTERS = new MyUrl("/admin/harvesters",
@@ -192,7 +194,7 @@ public class Repository implements Constants, Tables, RequestHandler {
      /** _more_          */
     protected MyUrl[] adminUrls = {
          URL_ADMIN_HOME, URL_ADMIN_STARTSTOP, URL_ADMIN_TABLES,
-         URL_ADMIN_STATS, URL_ADMIN_USERS, URL_ADMIN_HARVESTERS, URL_ADMIN_SQL,
+         URL_ADMIN_STATS, URL_ADMIN_USER_LIST, URL_ADMIN_HARVESTERS, URL_ADMIN_SQL,
          URL_ADMIN_CLEANUP
      };
 
@@ -525,7 +527,7 @@ public class Repository implements Constants, Tables, RequestHandler {
       */
      protected void initUsers() throws Exception {
          for (User user : cmdLineUsers) {
-             getUserManager().makeUser(user, true);
+             getUserManager().makeOrUpdateUser(user, true);
          }
      }
 
@@ -1063,6 +1065,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         }
 
         getUserManager().makeUserIfNeeded(new User("jdoe", "John Doe", true));
+        getUserManager().makeUserIfNeeded(new User("jeff", "Jeff", false));
         getUserManager().makeUserIfNeeded(new User("anonymous", "Anonymous", false));
     }
 
@@ -2601,6 +2604,9 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @throws Exception _more_
      */
     public Entry filterEntry(Request request, Entry entry) throws Exception {
+        if(entry.getResource().getType().equals(Resource.TYPE_FILE)) {
+            if(!entry.getResource().getFile().exists()) return null;
+        }
         //TODO: Check for access
         return entry;
     }
@@ -3822,7 +3828,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                 entries.add(localTypeHandler.getEntry(results));
             }
         }
-        return entries;
+        return filterEntries(request, entries);
     }
 
 
@@ -4148,10 +4154,6 @@ public class Repository implements Constants, Tables, RequestHandler {
         if (request.get(ARG_WAIT, false)) {
             return processEntryListen(request);
         }
-
-
-
-
 
         //        System.err.println("submit:" + request.getString("submit","YYY"));
         if (request.defined("submit_type.x")) {
@@ -4529,6 +4531,8 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
 
+    private Hashtable seenResources = new Hashtable();
+
 
     /**
      * _more_
@@ -4555,6 +4559,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             //            System.err.println ("tt:"+ (tt2-tt1) + " #files:" + files.length );
 
 
+            if(seenResources.size()>500000) seenResources = new Hashtable();
             PreparedStatement select =
                 connection.prepareStatement(query =
                     SqlUtil.makeSelect("count(" + COL_ENTRIES_ID + ")",
@@ -4564,7 +4569,12 @@ public class Repository implements Constants, Tables, RequestHandler {
             long        t1        = System.currentTimeMillis();
             List<Entry> needToAdd = new ArrayList();
             for (Entry entry : entries) {
-                select.setString(1, entry.getResource().getPath());
+                String path = entry.getResource().getPath();
+                if(seenResources.get(path)!=null) {
+                    continue;
+                }
+                seenResources.put(path,path);
+                select.setString(1, path);
                 //                select.addBatch();
                 ResultSet results = select.executeQuery();
                 if (results.next()) {

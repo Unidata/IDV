@@ -42,18 +42,18 @@ import java.util.List;
 public class User {
 
     /** _more_ */
-    private String id;
+    private String id="";
 
     /** _more_ */
-    private String name;
+    private String name="";
 
-    private String email;
+    private String email="";
 
-    private String question;
+    private String question="";
 
-    private String answer;
+    private String answer="";
 
-    private String password;
+    private String password="";
 
     /** _more_ */
     private boolean admin = false;
@@ -76,6 +76,17 @@ public class User {
     public User(String id, String name, boolean admin) {
         this.id    = id;
         this.name  = name;
+        this.admin = admin;
+    }
+
+
+    public User(String id, String name, String email, String question, String answer, String password, boolean admin) {
+        this.id    = id;
+        this.name  = name;
+        this.email  = email;
+        this.question  = question;
+        this.answer  = answer;
+        this.password  = password;
         this.admin = admin;
     }
 
@@ -141,6 +152,7 @@ public class User {
      */
     public void setName(String value) {
         name = value;
+        if(name == null) name = "";
     }
 
     /**
@@ -202,6 +214,7 @@ Set the Email property.
 **/
 public void setEmail (String value) {
 	email = value;
+        if(email==null) email = "";
 }
 
 /**
@@ -220,6 +233,7 @@ Set the Question property.
 **/
 public void setQuestion (String value) {
 	question = value;
+        if(question==null)  question = "";
 }
 
 /**
@@ -238,6 +252,7 @@ Set the Answer property.
 **/
 public void setAnswer (String value) {
 	answer = value;
+        if(answer==null)  answer = "";
 }
 
 /**
@@ -256,6 +271,7 @@ Set the Password property.
 **/
 public void setPassword (String value) {
 	password = value;
+        if(password==null)  password = "";
 }
 
 /**

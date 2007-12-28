@@ -143,6 +143,20 @@ public interface Tables {
 
 
 
+    public static final String TABLE_GLOBALS = "globals";
+    public static final String COL_GLOBALS_NAME = TABLE_GLOBALS + ".name";
+    public static final String COL_GLOBALS_VALUE = TABLE_GLOBALS + ".value";
+    public static final String []ARRAY_GLOBALS = new String[]{COL_GLOBALS_NAME,
+                                                              COL_GLOBALS_VALUE};
+
+    public static final String COLUMNS_GLOBALS = SqlUtil.comma(ARRAY_GLOBALS);
+    public static final String INSERT_GLOBALS =
+        SqlUtil.makeInsert(
+            TABLE_GLOBALS,
+            COLUMNS_GLOBALS, 
+            SqlUtil.getQuestionMarks(ARRAY_GLOBALS.length));
+
+
     public static final String TABLE_USERS = "users";
     public static final String COL_USERS_ID = TABLE_USERS + ".id";
     public static final String COL_USERS_NAME = TABLE_USERS + ".name";

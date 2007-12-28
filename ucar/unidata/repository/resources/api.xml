@@ -39,7 +39,9 @@
   <method request="/admin/startstop"    method="adminDbStartStop"       admin="true" cancache="false"/>
   <method request="/admin/tables"       method="adminDbTables"       admin="true" cancache="false"/>
   <method request="/admin/stats"        method="adminStats"    admin="true" cancache="false"/>
-  <method request="/admin/users"        handler="usermanager" method="adminUsers"    admin="true" cancache="false"/>
+  <method request="/admin/user/list"    handler="usermanager" method="adminUserList"    admin="true" cancache="false"/>
+  <method request="/admin/user"         handler="usermanager" method="adminUser"    admin="true" cancache="false"/>
+
   <method request="/admin/harvesters"   method="adminHarvesters"    admin="true" cancache="false"/>
   <method request="/admin/cleanup"        method="adminCleanup"      admin="true" cancache="false"/>
 
