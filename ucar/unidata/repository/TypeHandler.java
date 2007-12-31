@@ -470,7 +470,7 @@ public class TypeHandler implements Constants, Tables {
 
 
             String[] crumbs = repository.getBreadCrumbs(request,
-                                  entry.getGroup(), true);
+                                  entry.getGroup(), true,"");
             sb.append(HtmlUtil.formEntry("Group:",
                                           crumbs[1]));
 
@@ -734,6 +734,8 @@ public class TypeHandler implements Constants, Tables {
                                 List where, boolean simpleForm)
             throws Exception {
 
+
+
         String minDate = request.getDateSelect(ARG_FROMDATE, (String) null);
         String maxDate = request.getDateSelect(ARG_TODATE, (String) null);
         List<TypeHandler> typeHandlers = repository.getTypeHandlers(request);
@@ -821,6 +823,37 @@ public class TypeHandler implements Constants, Tables {
                     name + searchMetaData));
         }
         formBuffer.append("\n");
+
+        String[] metadataTypes = SqlUtil.readString(repository.execute(SqlUtil.makeSelect(
+                                                                                          SqlUtil.distinct(COL_METADATA_TYPE), 
+                                                                                          Misc.newList(TABLE_METADATA),
+                                                                                          "",
+                                                                                          " order by " + COL_METADATA_TYPE)), 1);
+
+        for(int i=0;i<metadataTypes.length;i++) {
+            String type = metadataTypes[i];
+            if(type.equals(Metadata.TYPE_HTML) ||
+               type.equals(Metadata.TYPE_URL) ||
+               type.equals("property") ||
+               type.equals("summary") ||
+               type.equals("variables") ||
+               type.equals("publisher") ||
+               type.equals(Metadata.TYPE_LINK)) continue;
+            String[] metadataValues = SqlUtil.readString(repository.execute(SqlUtil.makeSelect(
+                                                                                          SqlUtil.distinct(COL_METADATA_CONTENT), 
+                                                                                          Misc.newList(TABLE_METADATA),
+                                                                                          SqlUtil.eq(COL_METADATA_TYPE,SqlUtil.quote(type)),
+                                                                                          " order by " + COL_METADATA_CONTENT)), 1);
+
+
+            if(metadataValues.length>1) {
+                List options = new ArrayList();
+                List values = Misc.toList(metadataValues);
+                values.add(0,"any");
+                formBuffer.append(HtmlUtil.formEntry(metadataTypes[i]+":",HtmlUtil.select("metadata."+ type,
+                                                                                          values)));
+            }
+        }
 
 
         if ( !simpleForm) {

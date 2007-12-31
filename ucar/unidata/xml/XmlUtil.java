@@ -249,7 +249,7 @@ public abstract class XmlUtil {
     public static String tag(String name, String attrs) {
         return "<" + name + ((attrs.length() > 0)
                              ? " "
-                             : "") + attrs + "/>\n";
+                             : "") + attrs + "/>";
     }
 
 
@@ -263,7 +263,7 @@ public abstract class XmlUtil {
     public static String openTag(String name, String attrs) {
         return "<" + name + ((attrs.length() > 0)
                              ? " "
-                             : "") + attrs + ">\n";
+                             : "") + attrs + ">";
     }
 
     public static String openTag(String name) {

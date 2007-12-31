@@ -49,6 +49,9 @@ A {xtext-decoration: none}
 }
 
 
+
+
+
 a.navtitle:visited {
    text-decoration: none;
    color: #FFFFFF;
@@ -67,6 +70,17 @@ a.navlink {
 
 
 
+.subheader {
+   background-color : #aabbaa;
+   padding-left:5;
+   padding-bottom:2;
+}
+.subheaderlink {
+	color:white;
+        font-size: 10pt;
+        font-weight: bold;
+        text-decoration: none;
+}
 
 .navnolink {
   font-size: 12pt;

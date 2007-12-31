@@ -114,8 +114,7 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public boolean canHandle(Request request) {
-        String output = (String) request.getOutput();
+    public boolean canHandle(String output) {
         return output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)
                || output.equals(OUTPUT_GRAPH) || output.equals(OUTPUT_CLOUD);
     }
@@ -131,28 +130,26 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected List getOutputTypesFor(Request request, String what)
+    protected void getOutputTypesFor(Request request, String what, List types)
             throws Exception {
-        List list = new ArrayList();
         if (what.equals(WHAT_ENTRIES)) {
-            list.add(new TwoFacedObject("Html", OUTPUT_HTML));
+            types.add(new TwoFacedObject("Html", OUTPUT_HTML));
             if (repository.isAppletEnabled(request)) {
-                list.add(new TwoFacedObject("Timeline", OUTPUT_TIMELINE));
+                types.add(new TwoFacedObject("Timeline", OUTPUT_TIMELINE));
             }
         } else if (what.equals(WHAT_TAG)) {
-            list.add(new TwoFacedObject("Tag Html", OUTPUT_HTML));
-            list.add(new TwoFacedObject("Tag Cloud", OUTPUT_CLOUD));
+            types.add(new TwoFacedObject("Tag Html", OUTPUT_HTML));
+            types.add(new TwoFacedObject("Tag Cloud", OUTPUT_CLOUD));
         } else if (what.equals(WHAT_TYPE)) {
-            list.add(new TwoFacedObject("Type Html", OUTPUT_HTML));
+            types.add(new TwoFacedObject("Type Html", OUTPUT_HTML));
         } else if (what.equals(WHAT_GROUP)) {
-            list.add(new TwoFacedObject("Group Html", OUTPUT_HTML));
+            types.add(new TwoFacedObject("Group Html", OUTPUT_HTML));
             if (repository.isAppletEnabled(request)) {
-                list.add(new TwoFacedObject("Timeline", OUTPUT_TIMELINE));
+                types.add(new TwoFacedObject("Timeline", OUTPUT_TIMELINE));
             }
         } else {
-            list.add(new TwoFacedObject("Html", OUTPUT_HTML));
+            types.add(new TwoFacedObject("Html", OUTPUT_HTML));
         }
-        return list;
     }
 
     /**
@@ -164,13 +161,15 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected List getOutputTypesForEntries(Request request)
+    protected void getOutputTypesForEntries(Request request,List<Entry> entries, List types)
             throws Exception {
-        List list = new ArrayList();
-        list.add(new TwoFacedObject("Html", OUTPUT_HTML));
-        list.add(new TwoFacedObject("Html with timeline", OUTPUT_TIMELINE));
-        return list;
+        types.add(new TwoFacedObject("Html", OUTPUT_HTML));
+        if(entries.size()>0) {
+            types.add(new TwoFacedObject("Html with timeline", OUTPUT_TIMELINE));
+        }
     }
+
+
 
 
     /**
@@ -183,7 +182,7 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result processEntryShow(Request request, Entry entry)
+    public Result outputEntry(Request request, Entry entry)
             throws Exception {
         TypeHandler  typeHandler = repository.getTypeHandler(entry.getType());
         StringBuffer sb = typeHandler.getEntryContent(entry, request, true);
@@ -248,7 +247,7 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append(HtmlUtil.submit("Get selected", "getselected"));
             sb.append(HtmlUtil.submit("Get all", "getall"));
             sb.append(" As:");
-            List outputList = repository.getOutputTypesForEntries(request);
+            List outputList = repository.getOutputTypesForEntries(request,entries);
             sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
             sb.append("<p>\n");
             sb.append("<ul>\n");
@@ -637,7 +636,7 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result processShowGroup(Request request, Group group,
+    public Result outputGroup(Request request, Group group,
                                    List<Group> subGroups, List<Entry> entries)
             throws Exception {
         String       output     = request.getOutput();
@@ -653,23 +652,48 @@ public class HtmlOutputHandler extends OutputHandler {
             //xxxxx
             //            appendListHeader(request, output, WHAT_GROUP, sb);
             sb.append("<p>\n");
+            boolean showMetadata = request.get(ARG_SHOWMETADATA,false);
             String[] crumbs = repository.getBreadCrumbs(request, group,
-                                  false);
+                                                        false,ARG_SHOWMETADATA+"="+showMetadata);
             title = crumbs[0];
             sb.append(crumbs[1]);
-            List<Metadata> metadataList = repository.getMetadata(group);
-            if (metadataList.size() > 0) {
-                sb.append("<p>");
-                sb.append(HtmlUtil.bold("Metadata:"));
-                sb.append("<ul>");
-                for (Metadata metadata : metadataList) {
-                    sb.append("<li>");
-                    sb.append(metadata.getName());
-                    sb.append("<br>");
-                    sb.append(metadata.getContent());
+
+            if(!showApplet) {
+                List<Metadata> metadataList = repository.getMetadata(group);
+                if (metadataList.size() > 0) {
+                    sb.append("<p>\n");
+                    sb.append("<table width=\"80%\" cellspacing=\"5\">\n");
+                    String link  = HtmlUtil.href(HtmlUtil.url(repository.URL_GROUP_SHOW, ARG_GROUP, group.getFullName(),
+                                                              ARG_SHOWMETADATA, showMetadata?"false":"true"),showMetadata?"-&nbsp; Metadata":"+&nbsp; Metadata"," class=\"subheaderlink\" ");
+
+                    sb.append("<tr><td colspan=\"2\">");
+                    sb.append("<div class=\"subheader\">" + link +"</div>");
+                    sb.append("</td>\n");
+                    if(showMetadata) {
+                        for (Metadata metadata : metadataList) {
+                            String name = metadata.getName();
+                            if(name == null || name.trim().length()==0) {
+                                name =  metadata.getMetadataType();
+                            }
+                            if(name.length()>0) {
+                                name  = name.substring(0, 1).toUpperCase()
+                                    + name.substring(1);
+                                name  = name.replace("_"," ");
+                            }
+                            if(metadata.getMetadataType().equals(Metadata.TYPE_URL)) {
+                                sb.append(HtmlUtil.formEntry("Link:",
+                                                             HtmlUtil.href(metadata.getContent(),
+                                                                           metadata.getName())));
+                            } else {
+                                sb.append(HtmlUtil.formEntry(name+":",
+                                                             metadata.getContent()));
+                            }
+                            sb.append("\n");
+                        }
+                    }
+                    sb.append("</table>\n");
                 }
             }
-
 
             //            sb.append("<hr>");
             sb.append("<p>");
@@ -684,7 +708,8 @@ public class HtmlOutputHandler extends OutputHandler {
                             HtmlUtil.url(
                                 repository.URL_GROUP_SHOW, ARG_GROUP,
                                 subGroup.getFullName(), ARG_OUTPUT,
-                                output), subGroup.getName()));
+                                output,
+                                ARG_SHOWMETADATA, showMetadata?"true":"false"), subGroup.getName()));
 
                     sb.append("\n<br>\n");
                 }
@@ -703,7 +728,8 @@ public class HtmlOutputHandler extends OutputHandler {
 
         Result result = new Result(title, sb, getMimeType(output));
         result.putProperty(PROP_NAVSUBLINKS,
-                           getEntriesHeader(request, output, WHAT_GROUP));
+                           getHeader(request, output, repository.getOutputTypesForGroup(request, group,subGroups,entries)));
+
         return result;
     }
 
@@ -720,14 +746,12 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result processShowGroups(Request request, List<Group> groups)
+    public Result outputGroups(Request request, List<Group> groups)
             throws Exception {
         String       output = request.getOutput();
         StringBuffer sb     = new StringBuffer();
         String       title  = "Groups";
-
         if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
-            //            appendListHeader(request, output, WHAT_GROUP, sb);
             sb.append("<ul>");
         }
 
@@ -830,7 +854,7 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result processEntries(Request request, List<Entry> entries)
+    public Result outputEntries(Request request, List<Entry> entries)
             throws Exception {
 
 
@@ -881,7 +905,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(HtmlUtil.submit("Get all", "getall"));
                 sb.append(" As: ");
                 List outputList =
-                    repository.getOutputTypesForEntries(request);
+                    repository.getOutputTypesForEntries(request,entries);
                 sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
             }
             sb.append("<br>");

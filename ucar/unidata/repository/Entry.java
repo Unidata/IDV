@@ -72,7 +72,6 @@ public class Entry {
     /** _more_ */
     private String description;
 
-
     /** _more_ */
     private Group group;
 

@@ -89,14 +89,40 @@ public class CatalogOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final String TAG_CATALOG = "catalog";
+    public static final String TAG_CATALOG = "catalog";    
+    public static final String TAG_CREATOR = "creator";
+    public static final String TAG_DATAFORMAT = "dataFormat";
+    public static final String TAG_DATATYPE = "dataType";    
+    public static final String TAG_AUTHORITY = "authority";    
+    public static final String TAG_VARIABLE = "variable";
+    public static final String TAG_VOCABULARY = "vocabulary";
+    public static final String TAG_VARIABLES = "variables";
+    public static final String TAG_PUBLISHER = "publisher";
+    public static final String TAG_PARAMETERS = "Parameters";
 
+    public static final String TAG_PROJECT = "project";
+
+    public static final String TAG_METADATA = "metadata";
+    public static final String TAG_ACCESS = "access";
+    public static final String TAG_KEYWORD = "keyword";
+    public static final String TAG_CONTRIBUTOR = "contributor";
+    public static final String TAG_PROPERTY = "property";
+
+    public static final String TAG_GEOSPATIALCOVERAGE = "geospatialCoverage";
     public static final String TAG_TIMECOVERAGE = "timeCoverage";
     public static final String TAG_START = "start";
     public static final String TAG_END = "end";
     public static final String TAG_DATE= "date";
+    public static final String TAG_DOCUMENTATION= "documentation";
+
+
 
     public static final String TAG_DATASIZE = "dataSize";
+
+    public static final String ATTR_METADATATYPE = "metadataType";
+    public static final String ATTR_NAME = "name";
+    public static final String ATTR_VALUE = "value";
+
 
     public static final String ATTR_TYPE = "type";
 
@@ -133,6 +159,67 @@ public class CatalogOutputHandler extends OutputHandler {
         super(repository, element);
     }
 
+    public static  void collectMetadata(List<Metadata> metadata, Element node) throws Exception {
+        NodeList elements = XmlUtil.getElements(node);
+        for (int i = 0; i < elements.getLength(); i++) {
+            Element child = (Element) elements.item(i);
+            String tag  = child.getTagName();
+            if(tag.equals(TAG_METADATA)) {
+                if(XmlUtil.hasAttribute(child,"xlink:href")) {
+                    String url = XmlUtil.getAttribute(child,"xlink:href");
+                    Element root  = XmlUtil.getRoot(url, CatalogOutputHandler.class);
+                    collectMetadata(metadata, root);
+                } else {
+                    collectMetadata(metadata, child);                    
+                }
+            } else if(tag.equals(TAG_DOCUMENTATION)) {
+                if(XmlUtil.hasAttribute(child,"xlink:href")) {
+                    String url  = XmlUtil.getAttribute(child,"xlink:href");
+                    metadata.add(new Metadata(Metadata.TYPE_URL,XmlUtil.getAttribute(child,"xlink:title",url),
+                                              url));
+                } else {
+                    String type = XmlUtil.getAttribute(child, "type");
+                    String text = XmlUtil.getChildText(child).trim();
+                    metadata.add(new Metadata(type,"",text));
+                }
+                //                System.err.println ("DOC:" + XmlUtil.toString(child).trim());
+            } else if(tag.equals(TAG_CONTRIBUTOR) ||
+                      tag.equals(TAG_PROJECT) ||
+                      tag.equals(TAG_KEYWORD) ||
+                      tag.equals(TAG_AUTHORITY) ||
+                      tag.equals(TAG_DATATYPE) ||
+                      tag.equals(TAG_DATAFORMAT)) {
+                String text = XmlUtil.getChildText(child).trim();
+                metadata.add(new Metadata(tag,"",text));
+            } else if(tag.equals(TAG_VOCABULARY) ||
+                      tag.equals(TAG_PUBLISHER) ||
+                      tag.equals(TAG_CREATOR) ||
+                      tag.equals(TAG_VARIABLES)) {
+                String text = XmlUtil.toString(child,false);
+                metadata.add(new Metadata(tag,"",text));
+            } else if(tag.equals(TAG_PROPERTY)) {
+                metadata.add(new Metadata(TAG_PROPERTY,XmlUtil.getAttribute(child, ATTR_NAME),
+                                          XmlUtil.getAttribute(child, ATTR_VALUE)));
+            } else if(tag.equals(TAG_CATALOGREF)) {
+            }  else if(tag.equals(TAG_DATASET)) {
+            }  else if(tag.equals(TAG_SERVICENAME)) {
+            }  else if(tag.equals(TAG_GEOSPATIALCOVERAGE)) {
+            }  else if(tag.equals(TAG_TIMECOVERAGE)) {
+            }  else if(tag.equals(TAG_DATE)) {
+            }  else if(tag.equals(TAG_ACCESS)) {
+            }  else if(tag.equals(TAG_DATASIZE)) {
+            }  else if(tag.equals(TAG_PARAMETERS)) {
+            } else {
+                //                System.err.println ("UNKNOWN:" + tag  + " " + XmlUtil.toString(node).trim());
+                System.err.println ("UNKNOWN:" + tag);
+                throw new IllegalArgumentException ("");
+            }
+        }
+    }
+
+
+
+
     /**
      * _more_
      *
@@ -140,8 +227,7 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public boolean canHandle(Request request) {
-        String output = (String) request.getOutput();
+    public boolean canHandle(String output) {
         return output.equals(OUTPUT_CATALOG);
     }
 
@@ -155,12 +241,12 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected List getOutputTypesFor(Request request, String what)
+    protected void getOutputTypesFor(Request request, String what, List types)
             throws Exception {
         if (what.equals(WHAT_ENTRIES) || what.equals(WHAT_GROUP)) {
-            return getOutputTypesForEntries(request);
+            getOutputTypesForEntries(request, new ArrayList(), types);
+            return;
         }
-        return new ArrayList();
     }
 
 
@@ -173,11 +259,9 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected List getOutputTypesForEntries(Request request)
+    protected void getOutputTypesForEntries(Request request,List<Entry> entries, List types)
             throws Exception {
-        List list = new ArrayList();
-        list.add(new TwoFacedObject("Thredds Catalog", OUTPUT_CATALOG));
-        return list;
+        types.add(new TwoFacedObject("Thredds Catalog", OUTPUT_CATALOG));
     }
 
 
@@ -210,8 +294,8 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result processShowGroup(Request request, Group group,
-                                   List<Group> subGroups, List<Entry> entries)
+    public Result outputGroup(Request request, Group group,
+                              List<Group> subGroups, List<Entry> entries)
             throws Exception {
         String       title = group.getFullName();
         StringBuffer sb    = new StringBuffer();
@@ -247,7 +331,7 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result processShowGroups(Request request, List<Group> groups)
+    public Result outputGroups(Request request, List<Group> groups)
             throws Exception {
         StringBuffer sb    = new StringBuffer();
         String       title = "Groups";
@@ -276,7 +360,7 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result processEntries(Request request, List<Entry> entries)
+    public Result outputEntries(Request request, List<Entry> entries)
             throws Exception {
         return toCatalog(request, entries, "Query Results");
     }

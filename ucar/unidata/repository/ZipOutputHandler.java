@@ -106,8 +106,7 @@ public class ZipOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public boolean canHandle(Request request) {
-        String output = (String) request.getOutput();
+    public boolean canHandle(String output) {
         return output.equals(OUTPUT_ZIP);
     }
 
@@ -122,11 +121,17 @@ public class ZipOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected List getOutputTypesFor(Request request, String what)
+    protected void getOutputTypesFor(Request request, String what, List types)
             throws Exception {
-        List list = new ArrayList();
-        return list;
     }
+
+    protected void getOutputTypesForGroup(Request request, Group group,
+                                          List<Group> subGroups, List<Entry> entries, List types)
+            throws Exception {
+        if(entries.size()==0) return;
+        getOutputTypesForEntries(request, entries, types);
+    }
+
 
     /**
      * _more_
@@ -137,11 +142,19 @@ public class ZipOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected List getOutputTypesForEntries(Request request)
+    protected void getOutputTypesForEntries(Request request,List<Entry> entries, List types)
             throws Exception {
-        List list = new ArrayList();
-        list.add(new TwoFacedObject("Zip File", OUTPUT_ZIP));
-        return list;
+        if(entries.size()>0) {
+            boolean ok = false;
+            for(Entry entry: entries) {
+                if (repository.canDownload(request, entry)) {
+                    ok = true;
+                    break;
+                }
+            }
+            if(!ok) return;
+        }
+        types.add(new TwoFacedObject("Zip File", OUTPUT_ZIP));
     }
 
 
@@ -155,7 +168,7 @@ public class ZipOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result processEntryShow(Request request, Entry entry)
+    public Result outputEntry(Request request, Entry entry)
             throws Exception {
         TypeHandler  typeHandler = repository.getTypeHandler(entry.getType());
         StringBuffer sb = typeHandler.getEntryContent(entry, request, true);
@@ -190,7 +203,7 @@ public class ZipOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result processEntries(Request request, List<Entry> entries)
+    public Result outputEntries(Request request, List<Entry> entries)
             throws Exception {
         return toZip(request, entries);
     }

@@ -77,6 +77,7 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_ID = "id";
 
+
     /** _more_ */
     public static final String ATTR_NAME = "name";
 
@@ -146,12 +147,6 @@ public interface Constants {
 
 
     /** _more_ */
-    public static final String TAG_GROUPS = "groups";
-
-    /** _more_ */
-    public static final String TAG_GROUP = "group";
-
-    /** _more_ */
     public static final String TAG_TYPES = "types";
 
     /** _more_ */
@@ -159,6 +154,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_TYPE = "type";
+
+    public static final String ARG_CATALOG = "catalog";
 
 
     public static final String ARG_SOUTH = "south";
@@ -231,6 +228,9 @@ public interface Constants {
     /** _more_ */
     public static final String WHAT_TAG = "tag";
 
+
+    public static final String WHAT_METADATA = "metadata";
+
     /** _more_ */
     public static final String WHAT_ASSOCIATION = "association";
 
@@ -242,6 +242,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_MAX = "max";
+
+    public static final String ARG_SHOWMETADATA = "showmetadata";
 
     /** _more_ */
     public static final String ARG_OUTPUT = "output";
@@ -354,6 +356,8 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_OUTPUT_FILES = "jdms.output.files";
 
+    public static final String PROP_METADATA_FILES = "jdms.metadata.files";
+
     /** _more_ */
     public static final String PROP_NAVLINKS = "jdms.navlinks";
 
@@ -408,6 +412,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String TAG_OUTPUTHANDLER = "outputhandler";
+
+    public static final String TAG_METADATAHANDLER = "metadatahandler";
 
 
     /** _more_ */

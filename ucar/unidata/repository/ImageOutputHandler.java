@@ -113,8 +113,7 @@ public class ImageOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public boolean canHandle(Request request) {
-        String output = (String) request.getOutput();
+    public boolean canHandle(String output) {
         return output.equals(OUTPUT_GALLERY)
                || output.equals(OUTPUT_SLIDESHOW)
                || output.equals(OUTPUT_PLAYER);
@@ -131,20 +130,27 @@ public class ImageOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected List getOutputTypesFor(Request request, String what)
+    protected void getOutputTypesFor(Request request, String what, List types)
             throws Exception {
-        List list = new ArrayList();
         if (what.equals(WHAT_ENTRIES)) {
-            list.add(new TwoFacedObject("Slideshow", OUTPUT_SLIDESHOW));
-            list.add(new TwoFacedObject("Gallery", OUTPUT_GALLERY));
-            list.add(new TwoFacedObject("Image Player", OUTPUT_PLAYER));
+            types.add(new TwoFacedObject("Slideshow", OUTPUT_SLIDESHOW));
+            types.add(new TwoFacedObject("Gallery", OUTPUT_GALLERY));
+            types.add(new TwoFacedObject("Image Player", OUTPUT_PLAYER));
         } else if (what.equals(WHAT_GROUP)) {
-            list.add(new TwoFacedObject("Slideshow", OUTPUT_SLIDESHOW));
-            list.add(new TwoFacedObject("Gallery", OUTPUT_GALLERY));
-            list.add(new TwoFacedObject("Image Player", OUTPUT_PLAYER));
+            types.add(new TwoFacedObject("Slideshow", OUTPUT_SLIDESHOW));
+            types.add(new TwoFacedObject("Gallery", OUTPUT_GALLERY));
+            types.add(new TwoFacedObject("Image Player", OUTPUT_PLAYER));
         }
-        return list;
     }
+
+
+    protected void getOutputTypesForGroup(Request request, Group group,
+                                          List<Group> subGroups, List<Entry> entries, List types)
+            throws Exception {
+        if(entries.size()==0) return;
+        getOutputTypesForEntries(request, entries, types);
+    }
+
 
     /**
      * _more_
@@ -155,13 +161,22 @@ public class ImageOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected List getOutputTypesForEntries(Request request)
+    protected void getOutputTypesForEntries(Request request,List<Entry> entries, List types)
             throws Exception {
-        List list = new ArrayList();
-        list.add(new TwoFacedObject("Slideshow", OUTPUT_SLIDESHOW));
-        list.add(new TwoFacedObject("Gallery", OUTPUT_GALLERY));
-        list.add(new TwoFacedObject("Image Player", OUTPUT_PLAYER));
-        return list;
+        if(entries.size()>0) {
+            boolean ok = false;
+            for(Entry entry: entries) {
+                if (entry.getResource().isImage()) {
+                    ok = true;
+                    break;
+                }
+            }
+            if(!ok) return;
+        }
+
+        types.add(new TwoFacedObject("Slideshow", OUTPUT_SLIDESHOW));
+        types.add(new TwoFacedObject("Gallery", OUTPUT_GALLERY));
+        types.add(new TwoFacedObject("Image Player", OUTPUT_PLAYER));
     }
 
 
@@ -180,10 +195,10 @@ public class ImageOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result processShowGroup(Request request, Group group,
-                                   List<Group> subGroups, List<Entry> entries)
-            throws Exception {
-        Result result = processEntries(request, entries);
+    public Result outputGroup(Request request, Group group,
+                               List<Group> subGroups, List<Entry> entries)
+        throws Exception {
+        Result result = outputEntries(request, entries);
         System.err.println("output:" + request);
         result.putProperty(PROP_NAVSUBLINKS,
                            getEntriesHeader(request, request.getOutput(),
@@ -222,7 +237,7 @@ public class ImageOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result processEntries(Request request, List<Entry> entries)
+    public Result outputEntries(Request request, List<Entry> entries)
             throws Exception {
 
         StringBuffer sb         = new StringBuffer();

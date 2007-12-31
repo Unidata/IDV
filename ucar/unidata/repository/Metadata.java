@@ -130,6 +130,14 @@ public class Metadata implements Constants, Tables {
     }
 
 
+    public Metadata(String metadataType,
+                    String name, String content) {
+        this.metadataType = metadataType;
+        this.name         = name;
+        this.content      = content;
+    }
+
+
     /**
      * Set the Name property.
      *

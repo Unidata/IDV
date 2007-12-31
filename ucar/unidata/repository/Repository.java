@@ -98,6 +98,9 @@ import javax.swing.*;
  */
 public class Repository implements Constants, Tables, RequestHandler {
 
+    public static final String GROUP_TOP = "Top";
+
+
     /** _more_          */
     private List<String> downloadPrefixes = new ArrayList<String>();
 
@@ -165,6 +168,8 @@ public class Repository implements Constants, Tables, RequestHandler {
 
      /** _more_ */
      public MyUrl URL_ADMIN_SQL = new MyUrl("/admin/sql", "SQL");
+
+     public MyUrl URL_ADMIN_IMPORT_CATALOG = new MyUrl("/admin/import/catalog", "Import Catalog");
 
      /** _more_          */
      public MyUrl URL_ADMIN_CLEANUP = new MyUrl("/admin/cleanup", "Cleanup");
@@ -248,7 +253,10 @@ public class Repository implements Constants, Tables, RequestHandler {
      private List<TypeHandler> typeHandlers = new ArrayList<TypeHandler>();
 
      /** _more_ */
-     private List<OutputHandler> outputHandlers = new ArrayList();
+     private List<OutputHandler> outputHandlers = new ArrayList<OutputHandler>();
+
+
+     private List<MetadataHandler> metadataHandlers = new ArrayList<MetadataHandler>();
 
 
      /** _more_ */
@@ -260,6 +268,8 @@ public class Repository implements Constants, Tables, RequestHandler {
      private Hashtable<String, Group> groupMap = new Hashtable<String,
                                                      Group>();
 
+
+    private Group topGroup;
 
 
      /** _more_          */
@@ -277,6 +287,8 @@ public class Repository implements Constants, Tables, RequestHandler {
 
      /** _more_ */
      List<String> outputDefFiles;
+
+     List<String> metadataDefFiles;
 
      /** _more_ */
      String[] args;
@@ -348,10 +360,11 @@ public class Repository implements Constants, Tables, RequestHandler {
          initTypeHandlers();
          initTable();
          initOutputHandlers();
+         initMetadataHandlers();
          initApi();
          initUsers();
          initGroups();
-         //         initHarvesters();
+         initHarvesters();
      }
 
 
@@ -371,6 +384,7 @@ public class Repository implements Constants, Tables, RequestHandler {
          List<String> argEntryDefFiles  = new ArrayList();
          List<String> argApiDefFiles    = new ArrayList();
          List<String> argOutputDefFiles = new ArrayList();
+         List<String> argMetadataDefFiles = new ArrayList();
 
          for (int i = 0; i < args.length; i++) {
              if (args[i].endsWith(".properties")) {
@@ -381,6 +395,8 @@ public class Repository implements Constants, Tables, RequestHandler {
                  argEntryDefFiles.add(args[i]);
              } else if (args[i].indexOf("outputhandlers.xml") >= 0) {
                  argOutputDefFiles.add(args[i]);
+             } else if (args[i].indexOf("metadatahandlers.xml") >= 0) {
+                 argMetadataDefFiles.add(args[i]);
              } else if (args[i].equals("-admin")) {
                  cmdLineUsers.add(new User(args[i + 1], args[i + 1], true));
                  i++;
@@ -407,6 +423,9 @@ public class Repository implements Constants, Tables, RequestHandler {
 
          outputDefFiles = StringUtil.split(getProperty(PROP_OUTPUT_FILES));
          outputDefFiles.addAll(argOutputDefFiles);
+
+         metadataDefFiles = StringUtil.split(getProperty(PROP_METADATA_FILES));
+         metadataDefFiles.addAll(argMetadataDefFiles);
 
          debug = getProperty(PROP_DEBUG,false);
          System.err.println ("debug:" + debug);
@@ -749,6 +768,38 @@ public class Repository implements Constants, Tables, RequestHandler {
                  }
              } catch (Exception exc) {
                  System.err.println("Error loading output handler file:"
+                                    + file);
+                 throw exc;
+             }
+
+         }
+     }
+
+
+
+     /**
+      * _more_
+      *
+      * @throws Exception _more_
+      */
+     protected void initMetadataHandlers() throws Exception {
+         for (String file : metadataDefFiles) {
+             try {
+                 Element root  = XmlUtil.getRoot(file, getClass());
+                 List children = XmlUtil.findChildren(root, TAG_METADATAHANDLER);
+                 for (int i = 0; i < children.size(); i++) {
+                     Element node = (Element) children.get(i);
+                     Class c = Misc.findClass(XmlUtil.getAttribute(node,
+                                   ATTR_CLASS));
+                     Constructor ctor = Misc.findConstructor(c,
+                                            new Class[] { Repository.class,
+                             Element.class });
+                     metadataHandlers.add(
+                         (MetadataHandler) ctor.newInstance(new Object[] { this,
+                             node }));
+                 }
+             } catch (Exception exc) {
+                 System.err.println("Error loading metadata handler file:"
                                     + file);
                  throw exc;
              }
@@ -1411,11 +1462,22 @@ public class Repository implements Constants, Tables, RequestHandler {
      */
     protected List getOutputTypesFor(Request request, String what)
             throws Exception {
-        List list = new ArrayList();
+        List types = new ArrayList();
         for (OutputHandler outputHandler : outputHandlers) {
-            list.addAll(outputHandler.getOutputTypesFor(request, what));
+            outputHandler.getOutputTypesFor(request, what,types);
         }
-        return list;
+        return types;
+    }
+
+
+    protected List getOutputTypesForGroup(Request request, Group group,
+                                          List<Group> subGroups, List<Entry> entries)
+            throws Exception {
+        List types = new ArrayList();
+        for (OutputHandler outputHandler : outputHandlers) {
+            outputHandler.getOutputTypesForGroup(request, group, subGroups, entries, types);
+        }
+        return types;
     }
 
 
@@ -1438,11 +1500,11 @@ public class Repository implements Constants, Tables, RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected List getOutputTypesForEntries(Request request)
+    protected List getOutputTypesForEntries(Request request,List<Entry>entries)
             throws Exception {
         List list = new ArrayList();
         for (OutputHandler outputHandler : outputHandlers) {
-            list.addAll(outputHandler.getOutputTypesForEntries(request));
+            outputHandler.getOutputTypesForEntries(request,entries,list);
         }
         return list;
     }
@@ -1717,41 +1779,147 @@ public class Repository implements Constants, Tables, RequestHandler {
     int ccnt=0;
 
 
-    public void importCatalog(String url, Group parent, Hashtable seen) throws Exception {
-        if(seen.get(url)!=null) return;
-        ccnt++;
-        seen.put(url,url);
+    private static class ImportState {
+        Hashtable seen = new Hashtable();
+        List groups = new ArrayList();
+        int catalogCnt=0;
+    }
+
+    public boolean importCatalog(String url, Group parent, ImportState state) throws Exception {
+        if(state.seen.get(url)!=null) return true;
+        state.catalogCnt++;
+        if(state.catalogCnt%10 == 0)
+            System.err.print(".");
+http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
+
+        if(state.catalogCnt>100) return true;
+        state.seen.put(url,url);
         //        System.err.println(url);
-        Element root  = XmlUtil.getRoot(url, getClass());
-        Node child = XmlUtil.findChild(root, CatalogOutputHandler.TAG_DATASET);
-        if(child!=null) {
-            recurseCatalog((Element)child,parent,seen);
+        try {
+            Element root  = XmlUtil.getRoot(url, getClass());
+            Node child = XmlUtil.findChild(root, CatalogOutputHandler.TAG_DATASET);
+            if(child!=null) {
+                recurseCatalog((Element)child,parent,url,0,state);
+            }
+            return true;
+        } catch(Exception exc) {
+            System.err.println ("exc:" + exc);
+            //            log("",exc);
+            return  false;
         }
     }
 
-    public void recurseCatalog(Element node, Group parent, Hashtable seen) throws Exception {
+    public void recurseCatalog(Element node, Group parent,  String catalogUrl, int depth,ImportState state) throws Exception {
         String name = XmlUtil.getAttribute(node, ATTR_NAME);
-        if(XmlUtil.hasAttribute(node, CatalogOutputHandler.ATTR_URLPATH)) {
-            String url = XmlUtil.getAttribute(node, CatalogOutputHandler.ATTR_URLPATH);
+        if(depth>1) {
+            return;
+        }
+
+        NodeList elements = XmlUtil.getElements(node);
+        String urlPath = XmlUtil.getAttribute(node, CatalogOutputHandler.ATTR_URLPATH, (String)null);
+        if(urlPath!=null) {
+            return;
+        }
+        if(urlPath == null) {
+            Element accessNode = XmlUtil.findChild(node,CatalogOutputHandler.TAG_ACCESS);
+            if(accessNode!=null) {
+                urlPath = XmlUtil.getAttribute(accessNode, CatalogOutputHandler.ATTR_URLPATH);
+            }
+        }
+
+
+        if(elements.getLength()==0 && depth>0 && urlPath!=null) {
+            //            System.err.println("skipping:" + urlPath + " " + catalogUrl);
             return;
         }
 
 
-
         name = name.replace("/","--");
+        name = name.replace("'","");
         //        Group group = null;
-        Group group = findGroupFromName((parent==null?name:parent.getFullName()+"/"+name),true);
-        NodeList elements = XmlUtil.getElements(node);
-        List    children = XmlUtil.findChildren(node,null);
+        String groupName  = (parent==null?name:parent.getFullName()+"/"+name);
+        Group group = findGroupFromName(groupName,false);
+        if(group == null) {
+            group = findGroupFromName(groupName, true);
+            List<Metadata> metadataList = new ArrayList<Metadata>();
+            CatalogOutputHandler.collectMetadata(metadataList, node);
+            metadataList.add(new Metadata(Metadata.TYPE_URL,"Imported from catalog",
+                                      catalogUrl));
+            for(Metadata metadata: metadataList) {
+                metadata.setId(group.getId());
+                metadata.setIdType(Metadata.IDTYPE_GROUP);
+                try {
+                    if(metadata.getContent().length()>10000) {
+                        log("Too long metadata:" + metadata.getContent().substring(0,100)+"...");
+                        continue;
+                    }
+                    insertMetadata(metadata);
+                } catch(Exception exc) {
+                    log("Bad metadata", exc);
+                }
+            }
+            state.groups.add(group);
+        }
+
+
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
             if(child.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
-                recurseCatalog(child, group,seen);
+                recurseCatalog(child, group,catalogUrl, depth+1,state);
             } else   if(child.getTagName().equals(CatalogOutputHandler.TAG_CATALOGREF)) {
                 String url = XmlUtil.getAttribute(child, "xlink:href");
-                importCatalog(url, group,seen);
+                if(!url.startsWith("http")) {
+                    if(url.startsWith("/")) {
+                        URL base = new URL(catalogUrl);
+                        url =base.getProtocol()+"://" + base.getHost()+":"+ base.getPort()+url;
+                    } else {
+                        url =IOUtil.getFileRoot(catalogUrl) +"/" + url;
+                    }
+                }
+                if(!importCatalog(url, group,state)) {
+                    System.err.println("Could not load catalog:" + url);
+                    System.err.println("Base catalog:" + catalogUrl);
+                    System.err.println("Base URL:" +   XmlUtil.getAttribute(child, "xlink:href"));
+                }
             }
         }
+    }
+
+
+    public Result adminImportCatalog(Request request) throws Exception {
+        Group group = findGroup(request,false);
+        StringBuffer sb = new StringBuffer();
+        sb.append(makeGroupHeader(request, group));
+        sb.append("<p>");
+        String catalog = request.getString(ARG_CATALOG,"").trim();
+        sb.append(HtmlUtil.form(URL_ADMIN_IMPORT_CATALOG.toString()));
+        sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
+        sb.append(HtmlUtil.submit("Import catalog:"));
+        sb.append(HtmlUtil.space(1));
+        sb.append(HtmlUtil.input(ARG_CATALOG,catalog, " size=\"75\""));
+        sb.append("</form>");
+        if(catalog.length()>0) {
+            ImportState state= new ImportState();
+            importCatalog(catalog,group,state);
+            sb.append("Loaded " + state.catalogCnt +" catalogs<br>");
+            sb.append("Created " + state.groups.size() +" groups<ul>");
+            for(int i=0;i<state.groups.size();i++) {
+                Group newGroup = (Group) state.groups.get(i);
+                sb.append("<li>");
+                sb.append(getBreadCrumbs(request, newGroup, true,"")[1]);
+            }
+            sb.append("</ul>");
+
+
+        }
+
+        Result result = new Result("Catalog Import", sb);
+        result.putProperty(PROP_NAVSUBLINKS,
+                           getSubNavLinks(request, adminUrls));
+        return result;
+
+
+
     }
 
 
@@ -1765,13 +1933,6 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @throws Exception _more_
      */
     public Result processListHome(Request request) throws Exception {
-
-        importCatalog("http://dataportal.ucar.edu/metadata/browse/climate.thredds.xml",null,new Hashtable());
-
-        System.err.println("seen:" + ccnt);
-
-
-
         StringBuffer         sb           = new StringBuffer();
         List                 links        = getListLinks(request, "", false);
         TypeHandler          typeHandler  = getTypeHandler(request);
@@ -2337,7 +2498,7 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
     protected  String makeGroupHeader(Request request, Group group) throws Exception {
-        return HtmlUtil.bold("Group:") + HtmlUtil.space(1) +getBreadCrumbs(request, group, true)[1];
+        return HtmlUtil.bold("Group:") + HtmlUtil.space(1) +getBreadCrumbs(request, group, true,"")[1];
     }
 
     /**
@@ -2371,10 +2532,25 @@ public class Repository implements Constants, Tables, RequestHandler {
     protected String makeNewGroupForm(Request request, Group parentGroup, String name) {
         StringBuffer sb = new StringBuffer();
         sb.append(HtmlUtil.form(URL_GROUP_ADD, ""));
-        sb.append(HtmlUtil.hidden(ARG_GROUP, parentGroup.getFullName()));
+        if(parentGroup!=null) {
+            sb.append(HtmlUtil.hidden(ARG_GROUP, parentGroup.getFullName()));
+        }
         sb.append(HtmlUtil.formEntry(HtmlUtil.submit("Create new group:"),
                                       HtmlUtil.input(ARG_NAME,name)));
         sb.append("</form>");
+           
+        if(parentGroup!=null && request.getRequestContext().getUser().getAdmin()) {
+            sb.append(HtmlUtil.row(HtmlUtil.cols("<p>&nbsp;")));
+            sb.append(HtmlUtil.form(URL_ADMIN_IMPORT_CATALOG.toString()));
+
+            sb.append(HtmlUtil.hidden(ARG_GROUP, parentGroup.getFullName()));
+            sb.append(HtmlUtil.formEntry(HtmlUtil.submit("Import catalog:"),
+                                         HtmlUtil.input(ARG_CATALOG,"", " size=\"75\"")));
+            sb.append("</form>");
+        }
+
+
+
         return sb.toString();
     }
 
@@ -2636,7 +2812,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                                           OutputHandler.OUTPUT_HTML)));
             }
         }
-        return getOutputHandler(request).processEntryShow(request, entry);
+        return getOutputHandler(request).outputEntry(request, entry);
     }
 
 
@@ -2726,7 +2902,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             }
         }
         entries = filterEntries(request, entries);
-        return getOutputHandler(request).processEntries(request, entries);
+        return getOutputHandler(request).outputEntries(request, entries);
     }
 
 
@@ -2770,21 +2946,33 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
     public Result processGroupAdd(Request request) throws Exception {
-        Group        group = findGroup(request, true);
-        String newName = request.getString(ARG_NAME, "");
         StringBuffer sb = new StringBuffer();
-        if(newName.length() == 0) {
-            sb.append(makeGroupHeader(request,group));
-            sb.append("<p>Need to specify a group name");
-            sb.append(HtmlUtil.formTable());
-            sb.append(makeNewGroupForm(request,group,""));
-            sb.append("</table>");
-            return new Result("Add Group",sb);
+        Group        group =null;
+        String fullName = null;
+        String newName = request.getString(ARG_NAME, "");
+        if(!request.defined(ARG_GROUP)) {
+            if(!request.getRequestContext().getUser().getAdmin()) {
+                throw new IllegalArgumentException(
+                                                   "Cannot create a top level group");
+            }
+            fullName = newName;
+        } else {
+            group = findGroup(request, true);
+            if(newName.length() == 0) {
+                sb.append(makeGroupHeader(request,group));
+                sb.append("<p>Need to specify a group name");
+                sb.append(HtmlUtil.formTable());
+                sb.append(makeNewGroupForm(request,group,""));
+                sb.append("</table>");
+                return new Result("Add Group",sb);
+            }
+            fullName = group.getFullName()+"/" + newName;
         }
-        String fullName = group.getFullName()+"/" + newName;
         Group newGroup =     findGroupFromName(fullName);
         if(newGroup !=null) {
-            sb.append(makeGroupHeader(request,group));
+            if(group!=null) {
+                sb.append(makeGroupHeader(request,group));
+            }
             sb.append("<p>Given group name already exists");
             sb.append(HtmlUtil.formTable());
             sb.append(makeNewGroupForm(request,group,newName));
@@ -2817,7 +3005,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             group.setName(request.getString(ARG_NAME, group.getName()));
         }
 
-        sb.append(getBreadCrumbs(request, group, true)[1]);
+        sb.append(getBreadCrumbs(request, group, true,"")[1]);
         sb.append(HtmlUtil.space(2));
         sb.append(getAllGroupLinks(request, group));
         sb.append("<p>");
@@ -2850,26 +3038,31 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @throws Exception _more_
      */
     protected String[] getBreadCrumbs(Request request, Group group,
-                                      boolean makeLinkForLastGroup)
+                                      boolean makeLinkForLastGroup,String extraArgs )
             throws Exception {
         List   breadcrumbs = new ArrayList();
         List   titleList   = new ArrayList();
         Group  parent      = group.getParent();
         String output      = request.getOutput();
-        int cnt = 0;
+        int length = 0;
+        if(extraArgs.length()>0) extraArgs="&"+extraArgs;
         while (parent != null) {
-            if(cnt++>=3) {
+            if(length>100) {
                 titleList.add(0,"...");
                 breadcrumbs.add(0,"...");
                 break;
             }
-            titleList.add(0, parent.getName());
+            String name =parent.getName();
+            if(name.length()>20) {
+                name =name.substring(0,19)+"...";
+            }
+            length+=name.length();
+            titleList.add(0, name);
             breadcrumbs.add(0, HtmlUtil.href(HtmlUtil.url(URL_GROUP_SHOW,
                     ARG_GROUP, parent.getFullName(), ARG_OUTPUT,
-                    output), parent.getName()));
+                    output)+extraArgs, name));
             parent = parent.getParent();
         }
-        breadcrumbs.add(0, HtmlUtil.href(URL_GROUP_SHOW, "Top"));
         titleList.add(group.getName());
         if (makeLinkForLastGroup) {
             breadcrumbs.add(HtmlUtil.href(HtmlUtil.url(URL_GROUP_SHOW,
@@ -2915,6 +3108,7 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
 
+
         return sb.toString();
     }
 
@@ -2941,12 +3135,9 @@ public class Repository implements Constants, Tables, RequestHandler {
         }
         OutputHandler outputHandler = getOutputHandler(request);
         if (group == null) {
-            Statement stmt = execute(SqlUtil.makeSelect(COL_GROUPS_ID,
-                                 Misc.newList(TABLE_GROUPS),
-                                 COL_GROUPS_PARENT + " IS NULL"));
-            return outputHandler.processShowGroups(request,
-                    getGroups(SqlUtil.readString(stmt, 1)));
+            group = topGroup;
         }
+
 
         TypeHandler typeHandler = getTypeHandler(request);
         List        where       = typeHandler.assembleWhereClause(request);
@@ -2966,8 +3157,8 @@ public class Repository implements Constants, Tables, RequestHandler {
             }
         }
         entries = filterEntries(request, entries);
-        return outputHandler.processShowGroup(request, group, subGroups,
-                entries);
+        return outputHandler.outputGroup(request, group, subGroups,
+                                         entries);
     }
 
 
@@ -3417,7 +3608,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             }
             groupList.add(group);
         }
-        return getOutputHandler(request).processShowGroups(request,
+        return getOutputHandler(request).outputGroups(request,
                                 groupList);
     }
 
@@ -3626,6 +3817,8 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @throws Exception _more_
      */
     private void initGroups() throws Exception {
+        topGroup  = findGroupFromName(GROUP_TOP,true,true);
+
         Statement statement =
             execute(SqlUtil.makeSelect(SqlUtil.comma(COL_GROUPS_ID,
                 COL_GROUPS_PARENT, COL_GROUPS_NAME,
@@ -3743,15 +3936,22 @@ public class Repository implements Constants, Tables, RequestHandler {
      */
     protected Group findGroupFromName(String name, boolean createIfNeeded)
             throws Exception {
+        return findGroupFromName(name, createIfNeeded, false);
+    }
 
+
+    private Group findGroupFromName(String name, boolean createIfNeeded, boolean isTop)
+            throws Exception {
         synchronized (MUTEX_GROUP) {
-            //        if(name.indexOf(Group.IDDELIMITER) >=0) Misc.printStack(name,10,null);
             Group group = groupMap.get(name);
             if (group != null) {
                 return group;
             }
             List<String> toks = (List<String>) StringUtil.split(name, "/",
                                     true, true);
+            if(!isTop && toks.size()>0 && !toks.get(0).equals(GROUP_TOP)) {
+                toks.add(0,GROUP_TOP);
+            }
             Group  parent = null;
             String lastName;
             if ((toks.size() == 0) || (toks.size() == 1)) {
@@ -3762,7 +3962,9 @@ public class Repository implements Constants, Tables, RequestHandler {
                 parent = findGroupFromName(StringUtil.join("/", toks),
                                            createIfNeeded);
                 if (parent == null) {
-                    return null;
+                    if(!isTop) 
+                        return null;
+                    return topGroup;
                 }
             }
             String where = "";
@@ -3783,7 +3985,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                 group = new Group(results.getString(1), parent,
                                   results.getString(3), results.getString(4));
             } else {
-                if ( !createIfNeeded) {
+                if (!createIfNeeded) {
                     return null;
                 }
                 int    baseId = 0;
@@ -4189,7 +4391,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             return new Result("", new StringBuffer("No match"),
                               getMimeTypeFromSuffix(".html"));
         }
-        return getOutputHandler(request).processEntryShow(request, entry);
+        return getOutputHandler(request).outputEntry(request, entry);
     }
 
 
@@ -4233,7 +4435,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         }
 
         List<Entry> entries = getEntries(request);
-        return getOutputHandler(request).processEntries(request, entries);
+        return getOutputHandler(request).outputEntries(request, entries);
     }
 
 

@@ -108,8 +108,7 @@ public class CsvOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public boolean canHandle(Request request) {
-        String output = (String) request.getOutput();
+    public boolean canHandle(String output) {
         return output.equals(OUTPUT_CSV);
     }
 
@@ -124,22 +123,28 @@ public class CsvOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected List getOutputTypesFor(Request request, String what)
+    protected void getOutputTypesFor(Request request, String what, List types)
             throws Exception {
-        List list = new ArrayList();
         if (what.equals(WHAT_ENTRIES)) {
-            list.add(new TwoFacedObject("CSV", OUTPUT_CSV));
+            types.add(new TwoFacedObject("CSV", OUTPUT_CSV));
         } else if (what.equals(WHAT_TAG)) {
-            list.add(new TwoFacedObject("Tag CSV", OUTPUT_CSV));
+            types.add(new TwoFacedObject("Tag CSV", OUTPUT_CSV));
         } else if (what.equals(WHAT_TYPE)) {
-            list.add(new TwoFacedObject("Type CSV", OUTPUT_CSV));
+            types.add(new TwoFacedObject("Type CSV", OUTPUT_CSV));
         } else if (what.equals(WHAT_GROUP)) {
-            list.add(new TwoFacedObject("Group CSV", OUTPUT_CSV));
+            types.add(new TwoFacedObject("Group CSV", OUTPUT_CSV));
         } else {
-            list.add(new TwoFacedObject("CSV", OUTPUT_CSV));
+            types.add(new TwoFacedObject("CSV", OUTPUT_CSV));
         }
-        return list;
     }
+
+    protected void getOutputTypesForGroup(Request request, Group group,
+                                          List<Group> subGroups, List<Entry> entries, List types)
+            throws Exception {
+        if(entries.size()==0) return;
+        getOutputTypesForEntries(request, entries, types);
+    }
+
 
     /**
      * _more_
@@ -150,11 +155,9 @@ public class CsvOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected List getOutputTypesForEntries(Request request)
+    protected void getOutputTypesForEntries(Request request,List<Entry> entries, List types)
             throws Exception {
-        List list = new ArrayList();
-        list.add(new TwoFacedObject("CSV", OUTPUT_CSV));
-        return list;
+        types.add(new TwoFacedObject("CSV", OUTPUT_CSV));
     }
 
 
@@ -356,8 +359,8 @@ public class CsvOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result processShowGroup(Request request, Group group,
-                                   List<Group> subGroups, List<Entry> entries)
+    public Result outputGroup(Request request, Group group,
+                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
         return listGroups(request, subGroups);
     }
@@ -375,7 +378,7 @@ public class CsvOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result processShowGroups(Request request, List<Group> groups)
+    public Result outputGroups(Request request, List<Group> groups)
             throws Exception {
         return listGroups(request, groups);
     }
@@ -392,7 +395,7 @@ public class CsvOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result processEntries(Request request, List<Entry> entries)
+    public Result outputEntries(Request request, List<Entry> entries)
             throws Exception {
 
         StringBuffer sb = new StringBuffer();

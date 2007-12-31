@@ -88,11 +88,13 @@ public class MetadataHandler implements Constants, Tables {
      * @param repository _more_
      * @throws Exception _more_
      */
-    public MetadataHandler(Repository repository) throws Exception {
+    public MetadataHandler(Repository repository,Element node ) throws Exception {
         this.repository = repository;
     }
 
-
+    public boolean canHandle(Metadata metadata) {
+        return false;
+    }
 
 
 

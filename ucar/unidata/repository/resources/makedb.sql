@@ -19,7 +19,7 @@ CREATE TABLE  metadata (id varchar(500),
                         id_type varchar(100),
                         type varchar(200),
                         name varchar(200),
-                        content varchar(1000));
+                        content varchar(10000));
 
 CREATE INDEX METADATA_INDEX_ID ON metadata (ID);
 CREATE INDEX METADATA_INDEX_ID_TYPE ON metadata (ID_TYPE);

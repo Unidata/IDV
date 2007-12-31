@@ -34,6 +34,8 @@
   <method handler="usermanager" request="/user/settings"     method="processSettings"  admin="false" cancache="false"/>
 
 
+  <method request="/admin/import/catalog"       method="adminImportCatalog"      admin="true" cancache="false"/>
+
   <method request="/admin/sql"          method="adminSql"      admin="true" cancache="false"/>
   <method request="/admin/home"         method="adminHome"     admin="true" cancache="false" name="Admin" toplevel="true"/>
   <method request="/admin/startstop"    method="adminDbStartStop"       admin="true" cancache="false"/>

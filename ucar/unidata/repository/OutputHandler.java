@@ -117,6 +117,12 @@ public class OutputHandler implements Constants, Tables {
      * @return _more_
      */
     public boolean canHandle(Request request) {
+        String output = (String) request.getOutput();
+        return canHandle(output);
+    }
+
+
+    public boolean canHandle(String request) {
         return false;
     }
 
@@ -130,9 +136,8 @@ public class OutputHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    protected List getOutputTypesFor(Request request, String what)
+    protected void getOutputTypesFor(Request request, String what, List types)
             throws Exception {
-        return new ArrayList();
     }
 
 
@@ -145,9 +150,15 @@ public class OutputHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    protected List getOutputTypesForEntries(Request request)
+    protected void getOutputTypesForEntries(Request request,List<Entry> entries, List types)
             throws Exception {
-        return new ArrayList();
+    }
+
+
+    protected void getOutputTypesForGroup(Request request, Group group,
+                                          List<Group> subGroups, List<Entry> entries, List types)
+            throws Exception {
+        getOutputTypesFor(request, WHAT_GROUP, types);
     }
 
 
@@ -156,8 +167,8 @@ public class OutputHandler implements Constants, Tables {
      *
      * @return _more_
      */
-    private Result notImplemented() {
-        throw new IllegalArgumentException("Given method  not implemented");
+    private Result notImplemented(String method) {
+        throw new IllegalArgumentException("Method: " + method  +" not implemented");
     }
 
     /**
@@ -170,9 +181,9 @@ public class OutputHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public Result processEntryShow(Request request, Entry entry)
+    public Result outputEntry(Request request, Entry entry)
             throws Exception {
-        return notImplemented();
+        return notImplemented("outputEntry");
     }
 
 
@@ -218,33 +229,6 @@ public class OutputHandler implements Constants, Tables {
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     * @param makeLinkForLastGroup _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processShowGroup(Request request) throws Exception {
-        return notImplemented();
-    }
 
     /**
      * _more_
@@ -261,7 +245,7 @@ public class OutputHandler implements Constants, Tables {
                              Request request, boolean doForm,
                              boolean dfltSelected)
             throws Exception {
-        notImplemented();
+        notImplemented("getEntryHtml");
     }
 
     /**
@@ -290,8 +274,14 @@ public class OutputHandler implements Constants, Tables {
     protected List getEntriesHeader(Request request, String output,
                                     String what)
             throws Exception {
-        List<TwoFacedObject> outputTypes =
-            repository.getOutputTypesFor(request, what);
+        return getHeader(request, output, repository.getOutputTypesFor(request, what));
+    }
+
+
+
+    protected List getHeader(Request request, String output,
+                             List<TwoFacedObject> outputTypes)
+            throws Exception {
         int    cnt           = 0;
         List   items         = new ArrayList();
 
@@ -324,7 +314,7 @@ public class OutputHandler implements Constants, Tables {
      * @throws Exception _more_
      */
     protected Result listGroups(Request request) throws Exception {
-        return notImplemented();
+        return notImplemented("listGroups");
     }
 
 
@@ -343,7 +333,7 @@ public class OutputHandler implements Constants, Tables {
     protected Result listTypes(Request request,
                                List<TypeHandler> typeHandlers)
             throws Exception {
-        return notImplemented();
+        return notImplemented("listTypes");
     }
 
 
@@ -361,7 +351,7 @@ public class OutputHandler implements Constants, Tables {
      */
     protected Result listTags(Request request, List<Tag> tags)
             throws Exception {
-        return notImplemented();
+        return notImplemented("listTags");
     }
 
 
@@ -376,7 +366,7 @@ public class OutputHandler implements Constants, Tables {
      * @throws Exception _more_
      */
     protected Result listAssociations(Request request) throws Exception {
-        return notImplemented();
+        return notImplemented("listAssociations");
     }
 
 
@@ -395,10 +385,10 @@ public class OutputHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public Result processShowGroup(Request request, Group group,
-                                   List<Group> subGroups, List<Entry> entries)
+    public Result outputGroup(Request request, Group group,
+                              List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        return notImplemented();
+        return notImplemented("outputGroup");
     }
 
     /**
@@ -429,9 +419,9 @@ public class OutputHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public Result processShowGroups(Request request, List<Group> groups)
+    public Result outputGroups(Request request, List<Group> groups)
             throws Exception {
-        return notImplemented();
+        return notImplemented("outputGroups");
     }
 
 
@@ -447,9 +437,9 @@ public class OutputHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public Result processEntries(Request request, List<Entry> entries)
+    public Result outputEntries(Request request, List<Entry> entries)
             throws Exception {
-        return notImplemented();
+        return notImplemented("outputEntries");
     }
 
 

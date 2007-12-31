@@ -1,0 +1,3 @@
+<metadatahandlers>
+  <metadatahandler class="ucar.unidata.repository.MetadataHandler"/>
+</metadatahandlers>

@@ -100,8 +100,7 @@ public class TestOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public boolean canHandle(Request request) {
-        String output = (String) request.getOutput();
+    public boolean canHandle(String output) {
         return output.equals("testit");
     }
 
@@ -115,13 +114,11 @@ public class TestOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected List getOutputTypesFor(Request request, String what)
+    protected void getOutputTypesFor(Request request, String what, List types)
             throws Exception {
-        List list = new ArrayList();
         if (what.equals(WHAT_ENTRIES)) {
-            list.add(new TwoFacedObject("testit", "testit"));
+            types.add(new TwoFacedObject("testit", "testit"));
         }
-        return list;
     }
 
 
