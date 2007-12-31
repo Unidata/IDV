@@ -123,10 +123,17 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
      /** _more_ */
-     public MyUrl URL_SEARCH_FORM = new MyUrl("/search/form");
+     public MyUrl URL_ENTRY_SEARCHFORM = new MyUrl("/entry/searchform");
 
      /** _more_ */
-     public MyUrl URL_SEARCH_QUERY = new MyUrl("/search/query");
+     public MyUrl URL_ENTRY_SEARCH = new MyUrl("/entry/search");
+
+
+     /** _more_ */
+     public MyUrl URL_GROUP_SEARCHFORM = new MyUrl("/group/searchform");
+
+     /** _more_ */
+     public MyUrl URL_GROUP_SEARCH = new MyUrl("/group/search");
 
 
      /** _more_ */
@@ -1340,7 +1347,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             TypeHandler typeHandler = (TypeHandler) typeHandlersMap.get(id);
             int cnt = getCount(TABLE_ENTRIES, "type=" + SqlUtil.quote(id));
 
-            String url = HtmlUtil.href(HtmlUtil.url(URL_SEARCH_FORM, ARG_TYPE,
+            String url = HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SEARCHFORM, ARG_TYPE,
                              id), typeHandler.getLabel());
             sb.append(HtmlUtil.row(HtmlUtil.cols("" + cnt, url)));
         }
@@ -2025,6 +2032,78 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
 
 
 
+    public Result processGroupSearchForm(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        List         where        = assembleWhereClause(request);
+        sb.append(HtmlUtil.form(URL_GROUP_SEARCH));
+        sb.append(HtmlUtil.formTable());
+        sb.append(HtmlUtil.formEntry("",HtmlUtil.submit("Search")));
+        sb.append(HtmlUtil.formEntry("Group Name:",HtmlUtil.input(ARG_NAME)));
+
+
+        TypeHandler typeHandler = getTypeHandler(request);
+        typeHandler.addToSearchForm(request,sb,  where,
+                                    true);
+
+
+        String[] metadataTypes = SqlUtil.readString(execute(SqlUtil.makeSelect(
+                                                                                          SqlUtil.distinct(COL_METADATA_TYPE), 
+                                                                                          Misc.newList(TABLE_METADATA),
+                                                                                          "",
+                                                                                          " order by " + COL_METADATA_TYPE)), 1);
+
+        int metadataCnt = 0;
+        for(int i=0;i<metadataTypes.length;i++) {
+            String type = metadataTypes[i];
+            String widget = null;
+            String name = metadataTypes[i];
+            name  = name.substring(0, 1).toUpperCase() + name.substring(1);
+            name  = name.replace("_"," ");
+            if(type.equals(Metadata.TYPE_HTML) ||
+               type.equals(Metadata.TYPE_URL) ||
+               type.equals("property") ||
+               type.equals("summary") ||
+               type.equals("variables") ||
+               type.equals("publisher") ||
+               type.equals(Metadata.TYPE_LINK)) {
+                name = name +" contains";
+                widget  = HtmlUtil.input("metadata."+ type, ""," size=\"50\" ");
+            } else {
+                String[] metadataValues = SqlUtil.readString(execute(SqlUtil.makeSelect(
+                                                                                        SqlUtil.distinct(COL_METADATA_CONTENT), 
+                                                                                        Misc.newList(TABLE_METADATA),
+                                                                                        SqlUtil.eq(COL_METADATA_TYPE,SqlUtil.quote(type)),
+                                                                                        " order by " + COL_METADATA_CONTENT)), 1);
+                if(metadataValues.length>1) {
+                    List options = new ArrayList();
+                    List values = Misc.toList(metadataValues);
+                    values.add(0,"any");
+                    widget= HtmlUtil.select("metadata."+ type, values);
+                }
+            }
+            if(widget == null) continue;
+            if(metadataCnt++==0) {
+                sb.append("<tr><td colspan=\"2\"><div class=\"subheader\"><span  class=\"subheaderlink\">Group Metadata</span></div></td></tr>\n");
+            }
+            
+            sb.append(HtmlUtil.formEntry(name+":",widget));
+        }
+
+        sb.append(HtmlUtil.formEntry("",HtmlUtil.submit("Search")));
+        sb.append("</table>");
+
+
+        Result result =  new Result("Group search", sb);
+        return result;
+    }
+
+    public Result processGroupSearch(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        Result result =  new Result("Group search results", sb);
+        return result;
+
+    }
+
     /**
      * _more_
      *
@@ -2034,8 +2113,8 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
      *
      * @throws Exception _more_
      */
-    public Result processSearchForm(Request request) throws Exception {
-        return processSearchForm(request, false);
+    public Result processEntrySearchForm(Request request) throws Exception {
+        return processEntrySearchForm(request, false);
     }
 
     /**
@@ -2048,7 +2127,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
      *
      * @throws Exception _more_
      */
-    public Result processSearchForm(Request request, boolean typeSpecific)
+    public Result processEntrySearchForm(Request request, boolean typeSpecific)
             throws Exception {
 
 
@@ -2065,11 +2144,11 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
         headerBuffer.append("<table cellpadding=\"5\">");
         String formLinks = "";
         if (basicForm) {
-            formLinks =  HtmlUtil.bold("Basic Search") +"&nbsp;|&nbsp;" + HtmlUtil.href(HtmlUtil.url(URL_SEARCH_FORM,ARG_FORM_TYPE,
+            formLinks =  HtmlUtil.bold("Basic Search") +"&nbsp;|&nbsp;" + HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SEARCHFORM,ARG_FORM_TYPE,
                                                     "advanced")+ "&"+urlArgs, "Advanced Search");
 
         } else {
-            formLinks =  HtmlUtil.href(HtmlUtil.url(URL_SEARCH_FORM,ARG_FORM_TYPE,
+            formLinks =  HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SEARCHFORM,ARG_FORM_TYPE,
                                                     "basic")+ "&"+urlArgs, "Basic Search") +
                 "&nbsp;|&nbsp;" + 
                 HtmlUtil.bold("Advanced Search") ;
@@ -2077,7 +2156,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
 
         headerBuffer.append(HtmlUtil.formEntry("",
                                                 formLinks));
-        sb.append(HtmlUtil.form(HtmlUtil.url(URL_SEARCH_QUERY, ARG_NAME,
+        sb.append(HtmlUtil.form(HtmlUtil.url(URL_ENTRY_SEARCH, ARG_NAME,
                                              WHAT_ENTRIES)));
 
         sb.append(HtmlUtil.hidden(ARG_FORM_TYPE, formType));
@@ -2135,7 +2214,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
         }
 
 
-        typeHandler.addToSearchForm(request,sb, headerBuffer, where,
+        typeHandler.addToSearchForm(request,sb, where,
                                     basicForm);
 
 
@@ -2216,7 +2295,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
             if (what.equals(whats[i])) {
                 item = HtmlUtil.span(names[i], extra1);
             } else {
-                item = HtmlUtil.href(HtmlUtil.url(URL_SEARCH_FORM, ARG_WHAT,
+                item = HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SEARCHFORM, ARG_WHAT,
                         whats[i], ARG_FORM_TYPE, formType), names[i], extra2);
             }
             if (i == 0) {
@@ -2231,7 +2310,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
             if (tfo.getId().equals(what)) {
                 links.add(HtmlUtil.span(tfo.toString(), extra1));
             } else {
-                links.add(HtmlUtil.href(HtmlUtil.url(URL_SEARCH_FORM,
+                links.add(HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SEARCHFORM,
                         ARG_WHAT, "" + tfo.getId(), ARG_TYPE,
                         typeHandler.getType()), tfo.toString(), extra2));
             }
@@ -4234,7 +4313,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
             throws Exception {
         String search = HtmlUtil.href(
                             HtmlUtil.url(
-                                URL_SEARCH_FORM, ARG_TAG,
+                                URL_ENTRY_SEARCHFORM, ARG_TAG,
                                 java.net.URLEncoder.encode(
                                     tag, "UTF-8")), HtmlUtil.img(
                                         fileUrl("/Search16.gif"),
@@ -4315,7 +4394,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
         }
         String search = HtmlUtil.href(
                             HtmlUtil.url(
-                                URL_SEARCH_FORM, ARG_ASSOCIATION,
+                                URL_ENTRY_SEARCHFORM, ARG_ASSOCIATION,
                                 encode(association)), HtmlUtil.img(
                                     fileUrl("/Search16.gif"),
                                     "Search in association"));
@@ -4404,7 +4483,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
      *
      * @throws Exception _more_
      */
-    public Result processSearchQuery(Request request) throws Exception {
+    public Result processEntrySearch(Request request) throws Exception {
 
         if (request.get(ARG_WAIT, false)) {
             return processEntryListen(request);
@@ -4414,12 +4493,12 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
         if (request.defined("submit_type.x")) {
             //            System.err.println("request:" + request.getString("submit_type.x","XXX"));
             request.remove(ARG_OUTPUT);
-            return processSearchForm(request);
+            return processEntrySearchForm(request);
         }
         if (request.defined("submit_subset")) {
             //            System.err.println("request:" + request.getString("submit_type.x","XXX"));
             request.remove(ARG_OUTPUT);
-            return processSearchForm(request);
+            return processEntrySearchForm(request);
         }
 
         String what = request.getWhat(WHAT_ENTRIES);

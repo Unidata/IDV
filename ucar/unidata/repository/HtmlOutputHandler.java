@@ -344,7 +344,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(
                     HtmlUtil.href(
                         HtmlUtil.url(
-                            repository.URL_SEARCH_FORM, ARG_TYPE,
+                            repository.URL_ENTRY_SEARCHFORM, ARG_TYPE,
                             theTypeHandler.getType()), HtmlUtil.img(
                                 repository.fileUrl("/Search16.gif"),
                                 "Search in Group")));
@@ -789,7 +789,7 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         String search = HtmlUtil.href(
                             HtmlUtil.url(
-                                repository.URL_SEARCH_FORM, ARG_GROUP,
+                                repository.URL_ENTRY_SEARCHFORM, ARG_GROUP,
                                 group.getId()), HtmlUtil.img(
                                     repository.fileUrl("/Search16.gif"),
                                     "Search in Group"));

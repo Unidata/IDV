@@ -730,7 +730,6 @@ public class TypeHandler implements Constants, Tables {
      * @throws Exception _more_
      */
     public void addToSearchForm(Request request, StringBuffer formBuffer,
-                                StringBuffer headerBuffer, 
                                 List where, boolean simpleForm)
             throws Exception {
 
@@ -815,7 +814,7 @@ public class TypeHandler implements Constants, Tables {
                                     request.get(ARG_SEARCHMETADATA,
                                         false)) + " Search metadata";
         if (name.trim().length() == 0) {
-            formBuffer.append(HtmlUtil.formEntry("Name:",
+            formBuffer.append(HtmlUtil.formEntry("Entry Name:",
                     HtmlUtil.input(ARG_NAME) + searchMetaData));
         } else {
             HtmlUtil.hidden(ARG_NAME, name);
@@ -823,37 +822,6 @@ public class TypeHandler implements Constants, Tables {
                     name + searchMetaData));
         }
         formBuffer.append("\n");
-
-        String[] metadataTypes = SqlUtil.readString(repository.execute(SqlUtil.makeSelect(
-                                                                                          SqlUtil.distinct(COL_METADATA_TYPE), 
-                                                                                          Misc.newList(TABLE_METADATA),
-                                                                                          "",
-                                                                                          " order by " + COL_METADATA_TYPE)), 1);
-
-        for(int i=0;i<metadataTypes.length;i++) {
-            String type = metadataTypes[i];
-            if(type.equals(Metadata.TYPE_HTML) ||
-               type.equals(Metadata.TYPE_URL) ||
-               type.equals("property") ||
-               type.equals("summary") ||
-               type.equals("variables") ||
-               type.equals("publisher") ||
-               type.equals(Metadata.TYPE_LINK)) continue;
-            String[] metadataValues = SqlUtil.readString(repository.execute(SqlUtil.makeSelect(
-                                                                                          SqlUtil.distinct(COL_METADATA_CONTENT), 
-                                                                                          Misc.newList(TABLE_METADATA),
-                                                                                          SqlUtil.eq(COL_METADATA_TYPE,SqlUtil.quote(type)),
-                                                                                          " order by " + COL_METADATA_CONTENT)), 1);
-
-
-            if(metadataValues.length>1) {
-                List options = new ArrayList();
-                List values = Misc.toList(metadataValues);
-                values.add(0,"any");
-                formBuffer.append(HtmlUtil.formEntry(metadataTypes[i]+":",HtmlUtil.select("metadata."+ type,
-                                                                                          values)));
-            }
-        }
 
 
         if ( !simpleForm) {

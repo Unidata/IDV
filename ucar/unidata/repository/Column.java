@@ -606,7 +606,6 @@ public class Column implements Tables, Constants {
      * @throws Exception _more_
      */
     public void addToSearchForm(Request request, StringBuffer formBuffer,
-                                StringBuffer headerBuffer, 
                                 List where)
             throws Exception {
 

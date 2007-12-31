@@ -7,8 +7,10 @@
   <method request="/group/form"   method="processGroupForm"    admin="false" cancache="true" name="Groups" toplevel="false" />
 
 
-  <method request="/search/form"  method="processSearchForm"   admin="false" cancache="true" name="Search" toplevel="true"/>
-  <method request="/search/query"       method="processSearchQuery"        admin="false" cancache="true"/>
+  <method request="/entry/searchform"  method="processEntrySearchForm"   admin="false" cancache="true" name="Search Entries" toplevel="true"/>
+  <method request="/entry/search"       method="processEntrySearch"        admin="false" cancache="true"/>
+  <method request="/group/searchform"  method="processGroupSearchForm"   admin="false" cancache="true" name="Search Groups" toplevel="true"/>
+  <method request="/group/search"       method="processGroupSearch"        admin="false" cancache="true"/>
 
 
   <method request="/list/home"   method="processListHome"     admin="false" cancache="true" name="List" toplevel="true"/>

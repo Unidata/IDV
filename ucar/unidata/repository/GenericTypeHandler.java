@@ -486,7 +486,6 @@ public class GenericTypeHandler extends TypeHandler {
      * _more_
      *
      * @param formBuffer _more_
-     * @param headerBuffer _more_
      * @param request _more_
      * @param where _more_
      * @param simpleForm _more_
@@ -494,13 +493,12 @@ public class GenericTypeHandler extends TypeHandler {
      * @throws Exception _more_
      */
     public void addToSearchForm(Request request, StringBuffer formBuffer,
-                                StringBuffer headerBuffer, 
                                 List where, boolean simpleForm)
             throws Exception {
-        super.addToSearchForm(request, formBuffer, headerBuffer,  where,
+        super.addToSearchForm(request, formBuffer,  where,
                               simpleForm);
         for (Column column : columns) {
-            column.addToSearchForm(request, formBuffer, headerBuffer, where);
+            column.addToSearchForm(request, formBuffer, where);
         }
     }
 
