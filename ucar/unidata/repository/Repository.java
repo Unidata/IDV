@@ -1797,9 +1797,11 @@ public class Repository implements Constants, Tables, RequestHandler {
         state.catalogCnt++;
         if(state.catalogCnt%10 == 0)
             System.err.print(".");
+
+
 http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
 
-        if(state.catalogCnt>100) return true;
+        //        if(state.catalogCnt>100) return true;
         state.seen.put(url,url);
         //        System.err.println(url);
         try {
@@ -1825,6 +1827,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
         NodeList elements = XmlUtil.getElements(node);
         String urlPath = XmlUtil.getAttribute(node, CatalogOutputHandler.ATTR_URLPATH, (String)null);
         if(urlPath!=null) {
+            System.err.println("skipping 1:" + urlPath + " " + catalogUrl);
             return;
         }
         if(urlPath == null) {
@@ -1836,7 +1839,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
 
 
         if(elements.getLength()==0 && depth>0 && urlPath!=null) {
-            //            System.err.println("skipping:" + urlPath + " " + catalogUrl);
+            System.err.println("skipping:" + urlPath + " " + catalogUrl);
             return;
         }
 
@@ -3403,6 +3406,9 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
         String  originalId       = id;
         String  type = (String) request.getString(ARG_NODETYPE,
                            (String) null);
+        int              cnt       = 0;
+        int              actualCnt = 0;
+
         int     skip             = request.get(ARG_SKIP, 0);
         boolean haveSkip         = false;
         if (id.startsWith("skip_")) {
@@ -3451,8 +3457,8 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
 
             SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
             ResultSet        results;
-            int              cnt       = 0;
-            int              actualCnt = 0;
+            cnt = 0;
+            actualCnt = 0;
             while ((results = iter.next()) != null) {
                 while (results.next()) {
                     cnt++;
@@ -3544,7 +3550,8 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
             sb.append(XmlUtil.tag(TAG_NODE,
                                   XmlUtil.attrs(ATTR_TYPE, NODETYPE_GROUP,
                                       ATTR_ID, group.getFullName(),
-                                      ATTR_TITLE, group.getFullName())));
+                                                ATTR_TOOLTIP, group.getName(),
+                                                ATTR_TITLE, getGraphNodeTitle(group.getName()))));
             sb.append(XmlUtil.tag(TAG_EDGE,
                                   XmlUtil.attrs(ATTR_TYPE, "groupedby",
                                       ATTR_FROM, group.getFullName(),
@@ -3579,8 +3586,9 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
         sb.append(XmlUtil.tag(TAG_NODE,
                               XmlUtil.attrs(ATTR_TYPE, NODETYPE_GROUP,
                                             ATTR_ID, group.getFullName(),
+                                            ATTR_TOOLTIP, group.getName(),
                                             ATTR_TITLE,
-                                            group.getFullName())));
+                                            getGraphNodeTitle(group.getName()))));
         List<Group> subGroups = getGroups(SqlUtil.makeSelect(COL_GROUPS_ID,
                                     Misc.newList(TABLE_GROUPS),
                                     SqlUtil.eq(COL_GROUPS_PARENT,
@@ -3591,7 +3599,8 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
             sb.append(XmlUtil.tag(TAG_NODE,
                                   XmlUtil.attrs(ATTR_TYPE, NODETYPE_GROUP,
                                       ATTR_ID, parent.getFullName(),
-                                      ATTR_TITLE, parent.getFullName())));
+                                                ATTR_TOOLTIP, parent.getName(),
+                                                ATTR_TITLE, getGraphNodeTitle(parent.getName()))));
             sb.append(XmlUtil.tag(TAG_EDGE,
                                   XmlUtil.attrs(ATTR_TYPE, "groupedby",
                                       ATTR_FROM, parent.getFullName(),
@@ -3599,17 +3608,38 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
         }
 
 
+        cnt = 0;
+        actualCnt = 0;
         for (Group subGroup : subGroups) {
-
+            if (++cnt <= skip) {
+                continue;
+            }
+            actualCnt++;
+            
             sb.append(XmlUtil.tag(TAG_NODE,
                                   XmlUtil.attrs(ATTR_TYPE, NODETYPE_GROUP,
                                       ATTR_ID, subGroup.getFullName(),
-                                      ATTR_TITLE, subGroup.getFullName())));
+                                                ATTR_TOOLTIP, subGroup.getName(),
+                                                ATTR_TITLE, getGraphNodeTitle(subGroup.getName()))));
 
             sb.append(XmlUtil.tag(TAG_EDGE,
                                   XmlUtil.attrs(ATTR_TYPE, "groupedby",
-                                      ATTR_FROM, group.getFullName(),
-                                      ATTR_TO, subGroup.getFullName())));
+                                                ATTR_FROM, (haveSkip?originalId:group.getFullName()),
+                                                ATTR_TO, subGroup.getFullName())));
+
+            if (actualCnt >= MAX_EDGES) {
+                String skipId = "skip_" + type + "_" + (actualCnt + skip)
+                    + "_" + id;
+                sb.append(XmlUtil.tag(TAG_NODE,
+                                      XmlUtil.attrs(ATTR_TYPE, "skip",
+                                                    ATTR_ID, skipId, ATTR_TITLE,
+                                                    "...")));
+                sb.append(XmlUtil.tag(TAG_EDGE,
+                                      XmlUtil.attrs(ATTR_TYPE, "etc",
+                                                    ATTR_FROM, originalId, ATTR_TO,
+                                                    skipId)));
+                break;
+            }
         }
 
         String query = SqlUtil.makeSelect(
@@ -3622,8 +3652,8 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
                                    SqlUtil.quote(group.getId())));
         SqlUtil.Iterator iter = SqlUtil.getIterator(execute(query));
         ResultSet        results;
-        int              cnt       = 0;
-        int              actualCnt = 0;
+        cnt = 0;
+        actualCnt = 0;
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 cnt++;
@@ -3662,6 +3692,11 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
 
     }
 
+
+    private String getGraphNodeTitle(String s) {
+        if(s.length()>40) s=s.substring(0,39)+"...";
+        return s;
+    }
 
 
     /**

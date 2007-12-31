@@ -144,6 +144,8 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_TITLE = "title";
 
+    public static final String ATTR_TOOLTIP = "tooltip";
+
 
 
     /** _more_ */
