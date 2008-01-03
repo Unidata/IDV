@@ -141,6 +141,10 @@ public class HtmlUtil {
         return cols(s1)+cols(s2)+cols(s3)+cols(s4);
     }
 
+    public static String cols(String s1,String s2,String s3,String s4,String s5) {
+        return cols(s1)+cols(s2)+cols(s3)+cols(s4)+cols(s5);
+    }
+
     public static String makeLatLonBox(String baseName, String south, String north, String east, String west) {
         return  "<table>" +
             "<tr><td colspan=\"2\" align=\"center\">" +

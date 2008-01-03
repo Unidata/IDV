@@ -131,6 +131,9 @@ public class Harvester {
     /** _more_ */
     private double sleepMinutes = 5;
 
+
+    private String id;
+
     /**
      * _more_
      *
@@ -138,6 +141,7 @@ public class Harvester {
      */
     public Harvester(Repository repository) {
         this.repository = repository;
+        this.id = repository.getGUID();
     }
 
 
@@ -163,6 +167,12 @@ public class Harvester {
                 sleepMinutes);
         this.rootDir = new File(XmlUtil.getAttribute(element, ATTR_ROOTDIR));
     }
+
+    public String getId() {
+        return id;
+    }
+
+
 
     /**
      * _more_
@@ -226,7 +236,7 @@ public class Harvester {
      *
      * @return _more_
      */
-    public String getExtraInfo() {
+    public String getExtraInfo() throws Exception {
         return "";
     }
 

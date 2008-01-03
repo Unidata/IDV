@@ -486,6 +486,8 @@ public interface Constants {
 
     /** _more_          */
     public static final String ACTION_STOP = "stop";
+    /** _more_          */
+    public static final String ACTION_REMOVE = "remove";
 
 
 

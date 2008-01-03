@@ -110,6 +110,8 @@ public class Repository implements Constants, Tables, RequestHandler {
 
     /** _more_ */
      public MyUrl URL_USER_LOGIN = new MyUrl("/user/login");
+
+    /** _more_ */
      public MyUrl URL_USER_SETTINGS = new MyUrl("/user/settings");
 
 
@@ -120,7 +122,6 @@ public class Repository implements Constants, Tables, RequestHandler {
 
      /** _more_          */
      public MyUrl URL_GROUP_FORM = new MyUrl("/group/form");
-
 
      /** _more_ */
      public MyUrl URL_ENTRY_SEARCHFORM = new MyUrl("/entry/searchform");
@@ -141,9 +142,6 @@ public class Repository implements Constants, Tables, RequestHandler {
 
      /** _more_ */
      public MyUrl URL_LIST_SHOW = new MyUrl("/list/show");
-
-
-
 
      /** _more_ */
      public MyUrl URL_GRAPH_VIEW = new MyUrl("/graph/view");
@@ -1252,6 +1250,13 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
 
+    private Harvester findHarvester(String id) {
+        for (Harvester harvester : harvesters) {
+            if(harvester.getId().equals(id)) return harvester;
+        }
+        return null;
+    }
+
     /**
      * _more_
      *
@@ -1265,15 +1270,15 @@ public class Repository implements Constants, Tables, RequestHandler {
         StringBuffer sb = new StringBuffer();
         if (request.defined(ARG_ACTION)) {
             String action = request.getString(ARG_ACTION, "");
-            System.err.println("Have action " + action);
-            int       id        = request.get(ARG_ID, 0);
-            Harvester harvester = harvesters.get(id);
+            Harvester harvester = findHarvester(request.getString(ARG_ID,""));
             if (action.equals(ACTION_STOP)) {
                 harvester.setActive(false);
+            } else if (action.equals(ACTION_REMOVE)) {
+                harvester.setActive(false);
+                harvesters.remove(harvester);
             } else if (action.equals(ACTION_START)) {
                 if ( !harvester.getActive()) {
                     harvester.setActive(true);
-                    System.err.println("Calling run");
                     Misc.run(harvester, "run");
                 }
             }
@@ -1282,27 +1287,31 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
         sb.append(header("Harvesters"));
-        sb.append("<table>");
+        sb.append("<table cellspacing=\"5\">");
         sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold("Name"),
                                              HtmlUtil.bold("State"),
-                                             HtmlUtil.bold("Action"), "")));
+                                             HtmlUtil.bold("Action"), "", "")));
 
         int cnt = 0;
         for (Harvester harvester : harvesters) {
+            String remove =  HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,
+                                                        ARG_ACTION, ACTION_REMOVE, ARG_ID, harvester.getId()), "Remove");
             String run;
             if (harvester.getActive()) {
                 run = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,
-                        ARG_ACTION, ACTION_STOP, ARG_ID, "" + cnt), "Stop");
+                        ARG_ACTION, ACTION_STOP, ARG_ID, harvester.getId()), "Stop");
             } else {
                 run = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,
-                        ARG_ACTION, ACTION_START, ARG_ID, "" + cnt), "Start");
+                        ARG_ACTION, ACTION_START, ARG_ID,  harvester.getId()), "Start");
             }
             cnt++;
-            sb.append(HtmlUtil.row(HtmlUtil.cols(harvester.getName(),
+            sb.append("<tr valign=\"top\">");
+            sb.append(HtmlUtil.cols(harvester.getName(),
                     (harvester.getActive()
                      ? "Active"
-                     : "Stopped") + HtmlUtil.space(2), run,
-                     HtmlUtil.space(2) + harvester.getExtraInfo())));
+                     : "Stopped") + HtmlUtil.space(2), run, remove,
+                     harvester.getExtraInfo()));
+            sb.append("</tr>\n");
         }
         sb.append("</table>");
 
@@ -1567,7 +1576,6 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
 
-
     /**
      * _more_
      *
@@ -1791,130 +1799,6 @@ public class Repository implements Constants, Tables, RequestHandler {
     int ccnt=0;
 
 
-    private static class ImportState {
-        boolean recurse = false;
-        Hashtable seen = new Hashtable();
-        List groups = new ArrayList();
-        int catalogCnt=0;
-    }
-
-    public boolean importCatalog(Request request, String url, Group parent, ImportState state) throws Exception {
-        if(state.seen.get(url)!=null) return true;
-        state.catalogCnt++;
-        if(state.catalogCnt%10 == 0)
-            System.err.print(".");
-        //        http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
-
-        //        if(state.catalogCnt>100) return true;
-        state.seen.put(url,url);
-        //        System.err.println(url);
-        try {
-            Element root  = XmlUtil.getRoot(url, getClass());
-            Node child = XmlUtil.findChild(root, CatalogOutputHandler.TAG_DATASET);
-            if(child!=null) {
-                recurseCatalog(request, (Element)child,parent,url,0,state);
-            }
-            return true;
-        } catch(Exception exc) {
-            System.err.println ("exc:" + exc);
-            //            log("",exc);
-            return  false;
-        }
-    }
-
-    public void recurseCatalog(Request request,Element node, Group parent,  String catalogUrl, int depth,ImportState state) throws Exception {
-        String name = XmlUtil.getAttribute(node, ATTR_NAME);
-        if(depth>1) {
-            return;
-        }
-
-        if(node.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
-            Element serviceNode = ucar.unidata.idv.chooser.ThreddsHandler.findServiceNodeForDataset(node, false,
-                                                                                                    null);
-
-            if (serviceNode != null) {
-                String path = ucar.unidata.idv.chooser.ThreddsHandler.getUrlPath(node);
-                if(path!=null) {
-                    //                    System.err.println ("got path:" + path);
-                    //                    System.err.println ("full path:" + XmlUtil.getAttribute(serviceNode,"base") + path);
-                    return;
-                }
-            }
-        }
-
-        NodeList elements = XmlUtil.getElements(node);
-        String urlPath = XmlUtil.getAttribute(node, CatalogOutputHandler.ATTR_URLPATH, (String)null);
-        if(urlPath!=null) {
-            System.err.println("skipping 1:" + urlPath + " " + catalogUrl);
-            return;
-        }
-        if(urlPath == null) {
-            Element accessNode = XmlUtil.findChild(node,CatalogOutputHandler.TAG_ACCESS);
-            if(accessNode!=null) {
-                urlPath = XmlUtil.getAttribute(accessNode, CatalogOutputHandler.ATTR_URLPATH);
-            }
-        }
-
-
-        if(elements.getLength()==0 && depth>0 && urlPath!=null) {
-            System.err.println("skipping 2:" + urlPath + " " + catalogUrl);
-            return;
-        }
-
-
-        name = name.replace("/","--");
-        name = name.replace("'","");
-        //        Group group = null;
-        String groupName  = (parent==null?name:parent.getFullName()+"/"+name);
-        Group group = findGroupFromName(groupName);
-        if(group == null) {
-            group = findGroupFromName(groupName, request.getRequestContext().getUser(), true);
-            List<Metadata> metadataList = new ArrayList<Metadata>();
-            CatalogOutputHandler.collectMetadata(metadataList, node);
-            metadataList.add(new Metadata(Metadata.TYPE_URL,"Imported from catalog",
-                                      catalogUrl));
-            for(Metadata metadata: metadataList) {
-                metadata.setId(group.getId());
-                metadata.setIdType(Metadata.IDTYPE_GROUP);
-                try {
-                    if(metadata.getContent().length()>10000) {
-                        log("Too long metadata:" + metadata.getContent().substring(0,100)+"...");
-                        continue;
-                    }
-                    insertMetadata(metadata);
-                } catch(Exception exc) {
-                    log("Bad metadata", exc);
-                }
-            }
-            state.groups.add(group);
-        }
-
-
-        for (int i = 0; i < elements.getLength(); i++) {
-            Element child = (Element) elements.item(i);
-            if(child.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
-                recurseCatalog(request, child, group,catalogUrl, depth+1,state);
-            } else   if(child.getTagName().equals(CatalogOutputHandler.TAG_CATALOGREF)) {
-                if(!state.recurse)continue;
-                String url = XmlUtil.getAttribute(child, "xlink:href");
-                if(!url.startsWith("http")) {
-                    if(url.startsWith("/")) {
-                        URL base = new URL(catalogUrl);
-                        url =base.getProtocol()+"://" + base.getHost()+":"+ base.getPort()+url;
-                    } else {
-                        url =IOUtil.getFileRoot(catalogUrl) +"/" + url;
-                    }
-                }
-                if(!importCatalog(request, url, group,state)) {
-                    System.err.println("Could not load catalog:" + url);
-                    System.err.println("Base catalog:" + catalogUrl);
-                    System.err.println("Base URL:" +   XmlUtil.getAttribute(child, "xlink:href"));
-                }
-            }
-        }
-    }
-
-
     public Result adminImportCatalog(Request request) throws Exception {
         Group group = findGroup(request,false);
         boolean recurse = request.get(ARG_RECURSE,false);
@@ -1931,28 +1815,16 @@ public class Repository implements Constants, Tables, RequestHandler {
         sb.append(" Recurse");
         sb.append("</form>");
         if(catalog.length()>0) {
-            ImportState state= new ImportState();
-            state.recurse = recurse;
-            importCatalog(request, catalog,group,state);
-            sb.append("Loaded " + state.catalogCnt +" catalogs<br>");
-            sb.append("Created " + state.groups.size() +" groups<ul>");
-            for(int i=0;i<state.groups.size();i++) {
-                Group newGroup = (Group) state.groups.get(i);
-                sb.append("<li>");
-                sb.append(getBreadCrumbs(request, newGroup, true,"")[1]);
-            }
-            sb.append("</ul>");
-
-
+            CatalogHarvester harvester= new CatalogHarvester(this,group, 
+                                                             catalog,
+                                                             request.getRequestContext().getUser(),
+                                                             recurse);
+            harvesters.add(harvester);
+            Misc.run(harvester,"run");
         }
 
-        Result result = new Result("Catalog Import", sb);
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getSubNavLinks(request, adminUrls));
+        Result result = new Result(URL_ADMIN_HARVESTERS.toString());
         return result;
-
-
-
     }
 
 
@@ -3148,13 +3020,20 @@ public class Repository implements Constants, Tables, RequestHandler {
     protected String[] getBreadCrumbs(Request request, Group group,
                                       boolean makeLinkForLastGroup,String extraArgs )
             throws Exception {
+        return getBreadCrumbs(request, group, makeLinkForLastGroup, extraArgs, null);
+    }
+
+    protected String[] getBreadCrumbs(Request request, Group group,
+                                      boolean makeLinkForLastGroup,String extraArgs, Group stopAt)
+            throws Exception {
         List   breadcrumbs = new ArrayList();
         List   titleList   = new ArrayList();
         Group  parent      = group.getParentGroup();
-        String output      = request.getOutput();
+        String output      = (request==null?OutputHandler.OUTPUT_HTML:request.getOutput());
         int length = 0;
         if(extraArgs.length()>0) extraArgs="&"+extraArgs;
         while (parent != null) {
+            if(stopAt!=null && parent.getFullName().equals(stopAt.getFullName())) break;
             if(length>100) {
                 titleList.add(0,"...");
                 breadcrumbs.add(0,"...");
