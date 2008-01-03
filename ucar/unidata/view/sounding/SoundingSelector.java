@@ -597,7 +597,7 @@ public class SoundingSelector extends ChooserPanel {
                         }
                         soundingAdapter = null;
                         setSoundingAdapter(newAdapter);
-                    } else {
+                    } else if(soundingAdapter!=null) {
                         List times = getSelectedTimes();
                         soundingAdapter.update();
                         setStations();
