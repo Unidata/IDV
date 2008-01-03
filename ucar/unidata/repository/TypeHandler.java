@@ -470,7 +470,7 @@ public class TypeHandler implements Constants, Tables {
 
 
             String[] crumbs = repository.getBreadCrumbs(request,
-                                  entry.getGroup(), true,"");
+                                  entry.getParentGroup(), true,"");
             sb.append(HtmlUtil.formEntry("Group:",
                                           crumbs[1]));
 
@@ -490,9 +490,7 @@ public class TypeHandler implements Constants, Tables {
                 sb.append(HtmlUtil.formEntry("Size:",
                                               entry.getResource().getFile().length() + " bytes"));
             }
-            System.err.println ("create date:" + new Date(entry.getCreateDate()));
-            System.err.println ("start date:" + new Date(entry.getStartDate()));
-            System.err.println ("end date:" + new Date(entry.getEndDate()));
+
             if ((entry.getCreateDate() != entry.getStartDate())
                     || (entry.getCreateDate() != entry.getEndDate())) {
                 if (entry.getEndDate() != entry.getStartDate()) {

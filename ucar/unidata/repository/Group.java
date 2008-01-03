@@ -43,25 +43,13 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Group {
+public class Group extends Entity {
+
+
 
     /** _more_ */
     public static final String IDDELIMITER = "/";
 
-    /** _more_ */
-    private String id;
-
-    /** _more_ */
-    private String name;
-
-    /** _more_ */
-    private String description;
-
-    /** _more_ */
-    private String parentId;
-
-    /** _more_ */
-    private Group parent;
 
     /** _more_ */
     private List<Group> children = new ArrayList<Group>();
@@ -74,28 +62,15 @@ public class Group {
      * @param name _more_
      * @param description _more_
      */
-    public Group(String id, Group parent, String name, String description) {
-        this.id          = id;
-        this.parent      = parent;
-        this.name        = name;
-        this.description = description;
+    public Group(String id, String name, String description,Group parent, User user, long createDate) {
+        super(id, name, description,parent,user, createDate);
     }
 
-    /**
-     * _more_
-     *
-     * @param id _more_
-     * @param parentId _more_
-     * @param name _more_
-     * @param description _more_
-     */
-    public Group(String id, String parentId, String name,
-                 String description) {
-        this.parentId    = parentId;
-        this.id          = id;
-        this.name        = name;
-        this.description = description;
+    public Group(String id, String name, String description,String parentId, User user, long createDate) {
+        super(id, name, description,null,user, createDate);
+        setParentGroupId(parentId);
     }
+
 
 
     /**
@@ -104,111 +79,11 @@ public class Group {
      * @return _more_
      */
     public String getFullName() {
-        if (parent != null) {
-            return parent.getFullName() + "/" + name;
+        if (getParentGroup() != null) {
+            return getParentGroup().getFullName() + "/" + getName();
         }
-        return name;
+        return getName();
     }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public String toString() {
-        return name + " id:" + id;
-    }
-
-    /**
-     *  Set the Parent property.
-     *
-     *  @param value The new value for Parent
-     */
-    public void setParent(Group value) {
-        parent = value;
-    }
-
-    /**
-     *  Get the Parent property.
-     *
-     *  @return The Parent
-     */
-    public Group getParent() {
-        return parent;
-    }
-
-    /**
-     *  Set the Id property.
-     *
-     *  @param value The new value for Id
-     */
-    public void setId(String value) {
-        id = value;
-    }
-
-    /**
-     *  Get the Id property.
-     *
-     *  @return The Id
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     *  Set the Name property.
-     *
-     *  @param value The new value for Name
-     */
-    public void setName(String value) {
-        name = value;
-    }
-
-    /**
-     *  Get the Name property.
-     *
-     *  @return The Name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     *  Set the Description property.
-     *
-     *  @param value The new value for Description
-     */
-    public void setDescription(String value) {
-        description = value;
-    }
-
-    /**
-     *  Get the Description property.
-     *
-     *  @return The Description
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * Set the ParentId property.
-     *
-     * @param value The new value for ParentId
-     */
-    public void setParentId(String value) {
-        parentId = value;
-    }
-
-    /**
-     * Get the ParentId property.
-     *
-     * @return The ParentId
-     */
-    public String getParentId() {
-        return parentId;
-    }
-
 
 
 }

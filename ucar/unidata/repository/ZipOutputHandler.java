@@ -193,6 +193,13 @@ public class ZipOutputHandler extends OutputHandler {
     }
 
 
+    public Result outputGroup(Request request, Group group,
+                              List<Group> subGroups, List<Entry> entries)
+            throws Exception {
+        return outputEntries(request, entries);
+    }
+
+
     /**
      * _more_
      *

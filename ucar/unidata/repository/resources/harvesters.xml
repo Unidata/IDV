@@ -1,10 +1,12 @@
 <harvesters>
 
   <harvester    name="Source Files"
+		grouptemplate = "${dirgroup}"
+                tagtemplate="${extension}"
                 active="true"
 		class="ucar.unidata.repository.PatternHarvester"
-	        xrootdir="c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar"
-		rootdir="/harpo/jeffmc/src/idv/trunk/ucar"
+	        rootdir="c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar"
+		xrootdir="/harpo/jeffmc/src/idv/trunk/ucar"
 		basegroup="Files/Source"
 		filepattern=".*"
 		type="file"
@@ -12,12 +14,13 @@
 		sleep="1"/>
 
 
-
   <harvester    name="Pictures"
+		grouptemplate = "${dirgroup}"
+                tagtemplate="${extension}"
                 active="true"
                 class="ucar.unidata.repository.PatternHarvester"
-		xrootdir="c:/cygwin/home/jeffmc/pictures"
-		rootdir="/home/jeffmc/pictures"
+		rootdir="c:/cygwin/home/jeffmc/pictures"
+		xrootdir="/home/jeffmc/pictures"
 		basegroup="Files/Images"
 		filepattern=".*\.jpg$|.*\.jpeg$|.*\.gif$|.*\.png$"
 		type="image"
@@ -28,8 +31,8 @@
   <harvester    name="IDD/NIDS"
                 active="true"
                 class="ucar.unidata.repository.PatternHarvester"
-		xrootdir="c:/cygwin/home/jeffmc/unidata/data/repository/NIDS"
-		rootdir="/data/ldm/gempak/nexrad/NIDS"
+		rootdir="c:/cygwin/home/jeffmc/unidata/data/repository/NIDS"
+		xrootdir="/data/ldm/gempak/nexrad/NIDS"
 		basegroup="IDD/NIDS"
 		filepattern="([^/]+)/([^/]+)/[^/]+_(\d\d\d\d\d\d\d\d_\d\d\d\d)"
 		type="level3radar"

@@ -282,6 +282,8 @@ public class Repository implements Constants, Tables, RequestHandler {
      /** _more_          */
      private Object MUTEX_GROUP = new Object();
 
+     private Object MUTEX_KEY = new Object();
+
      /** _more_          */
      private Object MUTEX_INSERT = new Object();
 
@@ -1122,6 +1124,7 @@ public class Repository implements Constants, Tables, RequestHandler {
             }
         }
 
+        getUserManager().makeUserIfNeeded(new User("default", "Default User", false));
         getUserManager().makeUserIfNeeded(new User("jdoe", "John Doe", true));
         getUserManager().makeUserIfNeeded(new User("jeff", "Jeff", false));
         getUserManager().makeUserIfNeeded(new User("anonymous", "Anonymous", false));
@@ -1553,8 +1556,10 @@ public class Repository implements Constants, Tables, RequestHandler {
      * @return _more_
      */
     protected String getGUID() {
-        int key = keyCnt++;
-        return baseTime + "_" + key;
+        synchronized(MUTEX_KEY) {
+            int key = keyCnt++;
+            return baseTime + "_" + key;
+        }
     }
 
 
@@ -1641,10 +1646,10 @@ public class Repository implements Constants, Tables, RequestHandler {
      *
      * @throws Exception _more_
      */
-    public List<Group> getGroups(String[] groups) throws Exception {
+    public List<Group> getGroups(String[] groupIds) throws Exception {
         List<Group> groupList = new ArrayList<Group>();
-        for (int i = 0; i < groups.length; i++) {
-            Group group = findGroup(groups[i]);
+        for (int i = 0; i < groupIds.length; i++) {
+            Group group = findGroup(groupIds[i]);
             if (group != null) {
                 groupList.add(group);
             }
@@ -1787,19 +1792,18 @@ public class Repository implements Constants, Tables, RequestHandler {
 
 
     private static class ImportState {
+        boolean recurse = false;
         Hashtable seen = new Hashtable();
         List groups = new ArrayList();
         int catalogCnt=0;
     }
 
-    public boolean importCatalog(String url, Group parent, ImportState state) throws Exception {
+    public boolean importCatalog(Request request, String url, Group parent, ImportState state) throws Exception {
         if(state.seen.get(url)!=null) return true;
         state.catalogCnt++;
         if(state.catalogCnt%10 == 0)
             System.err.print(".");
-
-
-http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
+        //        http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
 
         //        if(state.catalogCnt>100) return true;
         state.seen.put(url,url);
@@ -1808,7 +1812,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
             Element root  = XmlUtil.getRoot(url, getClass());
             Node child = XmlUtil.findChild(root, CatalogOutputHandler.TAG_DATASET);
             if(child!=null) {
-                recurseCatalog((Element)child,parent,url,0,state);
+                recurseCatalog(request, (Element)child,parent,url,0,state);
             }
             return true;
         } catch(Exception exc) {
@@ -1818,10 +1822,24 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
         }
     }
 
-    public void recurseCatalog(Element node, Group parent,  String catalogUrl, int depth,ImportState state) throws Exception {
+    public void recurseCatalog(Request request,Element node, Group parent,  String catalogUrl, int depth,ImportState state) throws Exception {
         String name = XmlUtil.getAttribute(node, ATTR_NAME);
         if(depth>1) {
             return;
+        }
+
+        if(node.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
+            Element serviceNode = ucar.unidata.idv.chooser.ThreddsHandler.findServiceNodeForDataset(node, false,
+                                                                                                    null);
+
+            if (serviceNode != null) {
+                String path = ucar.unidata.idv.chooser.ThreddsHandler.getUrlPath(node);
+                if(path!=null) {
+                    //                    System.err.println ("got path:" + path);
+                    //                    System.err.println ("full path:" + XmlUtil.getAttribute(serviceNode,"base") + path);
+                    return;
+                }
+            }
         }
 
         NodeList elements = XmlUtil.getElements(node);
@@ -1839,7 +1857,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
 
 
         if(elements.getLength()==0 && depth>0 && urlPath!=null) {
-            System.err.println("skipping:" + urlPath + " " + catalogUrl);
+            System.err.println("skipping 2:" + urlPath + " " + catalogUrl);
             return;
         }
 
@@ -1848,9 +1866,9 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
         name = name.replace("'","");
         //        Group group = null;
         String groupName  = (parent==null?name:parent.getFullName()+"/"+name);
-        Group group = findGroupFromName(groupName,false);
+        Group group = findGroupFromName(groupName);
         if(group == null) {
-            group = findGroupFromName(groupName, true);
+            group = findGroupFromName(groupName, request.getRequestContext().getUser(), true);
             List<Metadata> metadataList = new ArrayList<Metadata>();
             CatalogOutputHandler.collectMetadata(metadataList, node);
             metadataList.add(new Metadata(Metadata.TYPE_URL,"Imported from catalog",
@@ -1875,8 +1893,9 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
             if(child.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
-                recurseCatalog(child, group,catalogUrl, depth+1,state);
+                recurseCatalog(request, child, group,catalogUrl, depth+1,state);
             } else   if(child.getTagName().equals(CatalogOutputHandler.TAG_CATALOGREF)) {
+                if(!state.recurse)continue;
                 String url = XmlUtil.getAttribute(child, "xlink:href");
                 if(!url.startsWith("http")) {
                     if(url.startsWith("/")) {
@@ -1886,7 +1905,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
                         url =IOUtil.getFileRoot(catalogUrl) +"/" + url;
                     }
                 }
-                if(!importCatalog(url, group,state)) {
+                if(!importCatalog(request, url, group,state)) {
                     System.err.println("Could not load catalog:" + url);
                     System.err.println("Base catalog:" + catalogUrl);
                     System.err.println("Base URL:" +   XmlUtil.getAttribute(child, "xlink:href"));
@@ -1898,6 +1917,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
 
     public Result adminImportCatalog(Request request) throws Exception {
         Group group = findGroup(request,false);
+        boolean recurse = request.get(ARG_RECURSE,false);
         StringBuffer sb = new StringBuffer();
         sb.append(makeGroupHeader(request, group));
         sb.append("<p>");
@@ -1907,10 +1927,13 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
         sb.append(HtmlUtil.submit("Import catalog:"));
         sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.input(ARG_CATALOG,catalog, " size=\"75\""));
+        sb.append(HtmlUtil.checkbox(ARG_RECURSE,"true",recurse));
+        sb.append(" Recurse");
         sb.append("</form>");
         if(catalog.length()>0) {
             ImportState state= new ImportState();
-            importCatalog(catalog,group,state);
+            state.recurse = recurse;
+            importCatalog(request, catalog,group,state);
             sb.append("Loaded " + state.catalogCnt +" catalogs<br>");
             sb.append("Created " + state.groups.size() +" groups<ul>");
             for(int i=0;i<state.groups.size();i++) {
@@ -2474,6 +2497,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
         if (filePath.indexOf("..") >= 0) {
             return false;
         }
+
         for (String prefix : downloadPrefixes) {
             if (filePath.startsWith(prefix)) {
                 return true;
@@ -2627,7 +2651,9 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
 
             sb.append(HtmlUtil.hidden(ARG_GROUP, parentGroup.getFullName()));
             sb.append(HtmlUtil.formEntry(HtmlUtil.submit("Import catalog:"),
-                                         HtmlUtil.input(ARG_CATALOG,"", " size=\"75\"")));
+                                         HtmlUtil.input(ARG_CATALOG,"", " size=\"75\"") +
+                                         HtmlUtil.space(1) +HtmlUtil.checkbox(ARG_RECURSE,"true",false) +" Recurse"));
+
             sb.append("</form>");
         }
 
@@ -2656,7 +2682,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
                 throw new IllegalArgumentException("Could not find entry:" + request.getString(ARG_ID,""));
             }
             type = entry.getTypeHandler().getType();
-            group = entry.getGroup();
+            group = entry.getParentGroup();
         }
         if(group == null) {
             group = findGroup(request, true);
@@ -2802,7 +2828,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
 
             if(dateRange[0] == null) dateRange[0] = (dateRange[1]==null?createDate:dateRange[1]);
             if(dateRange[1] == null) dateRange[1] = dateRange[0];
-            Group group = findGroupFromName(groupName, true);
+            Group group = findGroupFromName(groupName,  request.getRequestContext().getUser(), true);
             entry = new Entry(id, typeHandler, name, description, group,
                               request.getRequestContext().getUser(),
                               new Resource(resource),
@@ -2866,7 +2892,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
         if (request.get(ARG_NEXT, false)
                 || request.get(ARG_PREVIOUS, false)) {
             boolean next = request.get(ARG_NEXT, false);
-            String[] ids = getEntryIdsInGroup(request, entry.getGroup(),
+            String[] ids = getEntryIdsInGroup(request, entry.getParentGroup(),
                                new ArrayList());
             String nextId = null;
             for (int i = 0; (i < ids.length) && (nextId == null); i++) {
@@ -3062,7 +3088,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
             return new Result("Add Group",sb);
         }
 
-        newGroup =     findGroupFromName(fullName,true);        
+        newGroup =     findGroupFromName(fullName, request.getRequestContext().getUser(), true);        
         return new Result(HtmlUtil.url(URL_GROUP_SHOW,ARG_GROUP, newGroup.getFullName()));
     }
 
@@ -3124,7 +3150,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
             throws Exception {
         List   breadcrumbs = new ArrayList();
         List   titleList   = new ArrayList();
-        Group  parent      = group.getParent();
+        Group  parent      = group.getParentGroup();
         String output      = request.getOutput();
         int length = 0;
         if(extraArgs.length()>0) extraArgs="&"+extraArgs;
@@ -3143,7 +3169,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
             breadcrumbs.add(0, HtmlUtil.href(HtmlUtil.url(URL_GROUP_SHOW,
                     ARG_GROUP, parent.getFullName(), ARG_OUTPUT,
                     output)+extraArgs, name));
-            parent = parent.getParent();
+            parent = parent.getParentGroup();
         }
         titleList.add(group.getName());
         if (makeLinkForLastGroup) {
@@ -3225,7 +3251,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
         List        where       = typeHandler.assembleWhereClause(request);
         List<Group> subGroups = getGroups(SqlUtil.makeSelect(COL_GROUPS_ID,
                                     Misc.newList(TABLE_GROUPS),
-                                    SqlUtil.eq(COL_GROUPS_PARENT,
+                                    SqlUtil.eq(COL_GROUPS_PARENT_GROUP_ID,
                                         SqlUtil.quote(group.getId()))));
 
 
@@ -3545,16 +3571,15 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
             }
 
 
-
             Group group = findGroup(results.getString(4));
             sb.append(XmlUtil.tag(TAG_NODE,
                                   XmlUtil.attrs(ATTR_TYPE, NODETYPE_GROUP,
-                                      ATTR_ID, group.getFullName(),
+                                      ATTR_ID, group.getId(),
                                                 ATTR_TOOLTIP, group.getName(),
                                                 ATTR_TITLE, getGraphNodeTitle(group.getName()))));
             sb.append(XmlUtil.tag(TAG_EDGE,
                                   XmlUtil.attrs(ATTR_TYPE, "groupedby",
-                                      ATTR_FROM, group.getFullName(),
+                                      ATTR_FROM, group.getId(),
                                       ATTR_TO, results.getString(1))));
 
             for (Tag tag : getTags(request, id)) {
@@ -3579,32 +3604,32 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
                               getMimeTypeFromSuffix(".xml"));
         }
 
-        Group group = findGroupFromName(id);
+        Group group = findGroup(id);
         if (group == null) {
             throw new IllegalArgumentException("Could not find group:" + id);
         }
         sb.append(XmlUtil.tag(TAG_NODE,
                               XmlUtil.attrs(ATTR_TYPE, NODETYPE_GROUP,
-                                            ATTR_ID, group.getFullName(),
+                                            ATTR_ID, group.getId(),
                                             ATTR_TOOLTIP, group.getName(),
                                             ATTR_TITLE,
                                             getGraphNodeTitle(group.getName()))));
         List<Group> subGroups = getGroups(SqlUtil.makeSelect(COL_GROUPS_ID,
                                     Misc.newList(TABLE_GROUPS),
-                                    SqlUtil.eq(COL_GROUPS_PARENT,
+                                    SqlUtil.eq(COL_GROUPS_PARENT_GROUP_ID,
                                         SqlUtil.quote(group.getId()))));
 
-        Group parent = group.getParent();
+        Group parent = group.getParentGroup();
         if (parent != null) {
             sb.append(XmlUtil.tag(TAG_NODE,
                                   XmlUtil.attrs(ATTR_TYPE, NODETYPE_GROUP,
-                                      ATTR_ID, parent.getFullName(),
+                                      ATTR_ID, parent.getId(),
                                                 ATTR_TOOLTIP, parent.getName(),
                                                 ATTR_TITLE, getGraphNodeTitle(parent.getName()))));
             sb.append(XmlUtil.tag(TAG_EDGE,
                                   XmlUtil.attrs(ATTR_TYPE, "groupedby",
-                                      ATTR_FROM, parent.getFullName(),
-                                      ATTR_TO, group.getFullName())));
+                                      ATTR_FROM, parent.getId(),
+                                      ATTR_TO, group.getId())));
         }
 
 
@@ -3618,14 +3643,14 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
             
             sb.append(XmlUtil.tag(TAG_NODE,
                                   XmlUtil.attrs(ATTR_TYPE, NODETYPE_GROUP,
-                                      ATTR_ID, subGroup.getFullName(),
+                                      ATTR_ID, subGroup.getId(),
                                                 ATTR_TOOLTIP, subGroup.getName(),
                                                 ATTR_TITLE, getGraphNodeTitle(subGroup.getName()))));
 
             sb.append(XmlUtil.tag(TAG_EDGE,
                                   XmlUtil.attrs(ATTR_TYPE, "groupedby",
-                                                ATTR_FROM, (haveSkip?originalId:group.getFullName()),
-                                                ATTR_TO, subGroup.getFullName())));
+                                                ATTR_FROM, (haveSkip?originalId:group.getId()),
+                                                ATTR_TO, subGroup.getId())));
 
             if (actualCnt >= MAX_EDGES) {
                 String skipId = "skip_" + type + "_" + (actualCnt + skip)
@@ -3667,7 +3692,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
                                       XmlUtil.attrs(ATTR_TYPE, "groupedby",
                                           ATTR_FROM, (haveSkip
                         ? originalId
-                        : group.getFullName()), ATTR_TO, entryId)));
+                        : group.getId()), ATTR_TO, entryId)));
                 sb.append("\n");
                 if (actualCnt >= MAX_EDGES) {
                     String skipId = "skip_" + type + "_" + (actualCnt + skip)
@@ -3931,13 +3956,16 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
      * @throws Exception _more_
      */
     private void initGroups() throws Exception {
-        topGroup  = findGroupFromName(GROUP_TOP,true,true);
+        topGroup  = findGroupFromName(GROUP_TOP,getUserManager().getDefaultUser(), true,true);
 
         Statement statement =
-            execute(SqlUtil.makeSelect(SqlUtil.comma(COL_GROUPS_ID,
-                COL_GROUPS_PARENT, COL_GROUPS_NAME,
-                COL_GROUPS_DESCRIPTION), Misc.newList(TABLE_GROUPS)));
+            execute(SqlUtil.makeSelect(COLUMNS_GROUPS,
+                                       Misc.newList(TABLE_GROUPS)));
+        readGroups(statement);
+    }
 
+        
+    private List<Group> readGroups(Statement statement) throws Exception {
         ResultSet        results;
         SqlUtil.Iterator iter   = SqlUtil.getIterator(statement);
         List<Group>      groups = new ArrayList<Group>();
@@ -3945,21 +3973,23 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
             while (results.next()) {
                 int col = 1;
                 Group group = new Group(results.getString(col++),
-                                        findGroup(results.getString(col++)),
                                         results.getString(col++),
-                                        results.getString(col++));
+                                        results.getString(col++),
+                                        results.getString(col++),
+                                        getUserManager().findUser(results.getString(col++)),
+                                        results.getTimestamp(col++).getTime());
                 groups.add(group);
                 groupMap.put(group.getId(), group);
             }
         }
         for (Group group : groups) {
-            if (group.getParentId() != null) {
-                group.setParent(groupMap.get(group.getParentId()));
+            if (group.getParentGroupId() != null) {
+                group.setParentGroup(findGroup(group.getParentGroupId()));
             }
             groupMap.put(group.getFullName(), group);
         }
+        return groups;
     }
-
 
 
 
@@ -4010,17 +4040,13 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
                                           SqlUtil.eq(COL_GROUPS_ID,
                                               SqlUtil.quote(id)));
         Statement statement = execute(query);
-        //id,parent,name,description
-        ResultSet results = statement.getResultSet();
-        if (results.next()) {
-            group = new Group(results.getString(1),
-                              findGroup(results.getString(2)),
-                              results.getString(3), results.getString(4));
+        List<Group> groups = readGroups(statement);
+        if(groups.size() >0) {
+            group = groups.get(0);
         } else {
             //????
             return null;
         }
-        groupMap.put(id, group);
         return group;
     }
 
@@ -4035,8 +4061,9 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
      * @throws Exception _more_
      */
     protected Group findGroupFromName(String name) throws Exception {
-        return findGroupFromName(name, false);
+        return findGroupFromName(name, null, false);
     }
+
 
     /**
      * _more_
@@ -4048,13 +4075,13 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
      *
      * @throws Exception _more_
      */
-    protected Group findGroupFromName(String name, boolean createIfNeeded)
+    protected Group findGroupFromName(String name, User user, boolean createIfNeeded)
             throws Exception {
-        return findGroupFromName(name, createIfNeeded, false);
+        return findGroupFromName(name, user, createIfNeeded, false);
     }
 
 
-    private Group findGroupFromName(String name, boolean createIfNeeded, boolean isTop)
+    private Group findGroupFromName(String name, User user, boolean createIfNeeded, boolean isTop)
             throws Exception {
         synchronized (MUTEX_GROUP) {
             Group group = groupMap.get(name);
@@ -4074,6 +4101,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
                 lastName = toks.get(toks.size() - 1);
                 toks.remove(toks.size() - 1);
                 parent = findGroupFromName(StringUtil.join("/", toks),
+                                           user,
                                            createIfNeeded);
                 if (parent == null) {
                     if(!isTop) 
@@ -4083,21 +4111,19 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
             }
             String where = "";
             if (parent != null) {
-                where += SqlUtil.eq(COL_GROUPS_PARENT,
+                where += SqlUtil.eq(COL_GROUPS_PARENT_GROUP_ID,
                                     SqlUtil.quote(parent.getId())) + " AND ";
             } else {
-                where += COL_GROUPS_PARENT + " is null AND ";
+                where += COL_GROUPS_PARENT_GROUP_ID + " is null AND ";
             }
             where += SqlUtil.eq(COL_GROUPS_NAME, SqlUtil.quote(lastName));
 
             String query = SqlUtil.makeSelect(COLUMNS_GROUPS,
                                Misc.newList(TABLE_GROUPS), where);
-
             Statement statement = execute(query);
-            ResultSet results   = statement.getResultSet();
-            if (results.next()) {
-                group = new Group(results.getString(1), parent,
-                                  results.getString(3), results.getString(4));
+            List<Group> groups = readGroups(statement);
+            if (groups.size()>0) {
+                group = groups.get(0);
             } else {
                 if (!createIfNeeded) {
                     return null;
@@ -4105,9 +4131,9 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
                 int    baseId = 0;
                 String idWhere;
                 if (parent == null) {
-                    idWhere = COL_GROUPS_PARENT + " IS NULL ";
+                    idWhere = COL_GROUPS_PARENT_GROUP_ID + " IS NULL ";
                 } else {
-                    idWhere = SqlUtil.eq(COL_GROUPS_PARENT,
+                    idWhere = SqlUtil.eq(COL_GROUPS_PARENT_GROUP_ID,
                                          SqlUtil.quote(parent.getId()));
                 }
                 String newId = null;
@@ -4133,10 +4159,10 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
                 }
                 //            System.err.println ("made id:" + newId);
                 //            System.err.println ("last name" + lastName);
-                execute(INSERT_GROUPS, new Object[] { newId, ((parent != null)
-                        ? parent.getId()
-                        : null), lastName, lastName });
-                group = new Group(newId, parent, lastName, lastName);
+                execute(INSERT_GROUPS, new Object[] { newId, lastName, lastName,
+                                                      ((parent != null)            ? parent.getId()
+                        : null), user.getId(),new Date()});
+                group = findGroup(newId);
             }
             groupMap.put(group.getId(), group);
             groupMap.put(name, group);
@@ -4159,6 +4185,8 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
             //Assume null is a string
             if (values[i] == null) {
                 pstmt.setNull(i + 1, java.sql.Types.VARCHAR);
+            } else if(values[i] instanceof Date) {
+                pstmt.setTimestamp(i + 1, new java.sql.Timestamp(((Date)values[i]).getTime()));
             } else {
                 pstmt.setObject(i + 1, values[i]);
             }
@@ -4573,7 +4601,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
         statement.setString(col++, entry.getType());
         statement.setString(col++, entry.getName());
         statement.setString(col++, entry.getDescription());
-        statement.setString(col++, entry.getGroupId());
+        statement.setString(col++, entry.getParentGroupId());
         statement.setString(col++, entry.getUser().getId());
         statement.setString(col++, entry.getResource().getPath());
         statement.setString(col++, entry.getResource().getType());
@@ -5051,7 +5079,7 @@ http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
                                        COL_METADATA_ID,
                                        SqlUtil.quote(id)), SqlUtil.eq(
                                            COL_METADATA_ID_TYPE,
-                                           SqlUtil.quote(type)))));
+                                           SqlUtil.quote(type))))," order by " + COL_METADATA_TYPE);
 
         //        System.err.println("query: " + query);
         SqlUtil.Iterator iter = SqlUtil.getIterator(execute(query));

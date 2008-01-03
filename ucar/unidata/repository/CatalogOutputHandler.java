@@ -165,6 +165,10 @@ public class CatalogOutputHandler extends OutputHandler {
             Element child = (Element) elements.item(i);
             String tag  = child.getTagName();
             if(tag.equals(TAG_METADATA)) {
+                if(!XmlUtil.getAttribute(child, "metadataType","THREDDS").equals("THREDDS")) {
+                    System.err.println("Skipping: " + XmlUtil.toString(child));
+                    continue;
+                }
                 if(XmlUtil.hasAttribute(child,"xlink:href")) {
                     String url = XmlUtil.getAttribute(child,"xlink:href");
                     Element root  = XmlUtil.getRoot(url, CatalogOutputHandler.class);
@@ -206,6 +210,7 @@ public class CatalogOutputHandler extends OutputHandler {
             }  else if(tag.equals(TAG_GEOSPATIALCOVERAGE)) {
             }  else if(tag.equals(TAG_TIMECOVERAGE)) {
             }  else if(tag.equals(TAG_DATE)) {
+                
             }  else if(tag.equals(TAG_ACCESS)) {
             }  else if(tag.equals(TAG_DATASIZE)) {
             }  else if(tag.equals(TAG_PARAMETERS)) {
@@ -362,7 +367,7 @@ public class CatalogOutputHandler extends OutputHandler {
      */
     public Result outputEntries(Request request, List<Entry> entries)
             throws Exception {
-        return toCatalog(request, entries, "Query Results");
+        return toCatalog(request, entries, "Entries");
     }
 
 

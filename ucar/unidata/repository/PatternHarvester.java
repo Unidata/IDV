@@ -101,6 +101,8 @@ public class PatternHarvester extends Harvester {
     /** _more_ */
     private String groupTemplate;
 
+    private String tagTemplate = "";
+
     /** _more_ */
     private String nameTemplate;
 
@@ -160,6 +162,7 @@ public class PatternHarvester extends Harvester {
         patternNames  = split(element, "patternnames");
         patternTypes  = split(element, "patterntypes");
         groupTemplate = XmlUtil.getAttribute(element, "grouptemplate", "");
+        tagTemplate = XmlUtil.getAttribute(element, "tagtemplate", "");
         nameTemplate = XmlUtil.getAttribute(element, "nametemplate",
                                             "${filename}");
         descTemplate = XmlUtil.getAttribute(element, "desctemplate", "");
@@ -224,16 +227,8 @@ public class PatternHarvester extends Harvester {
         int cnt = 0;
         while (getActive()) {
             long        t1 = System.currentTimeMillis();
-            List<Entry> entries;
-            if ((columns != null) && (patternNames != null)
-                    && (patternTypes != null)) {
-                System.err.println("from pattern");
-                entries = collectFromPattern(rootDir, dirs, (cnt == 0),
-                                             baseGroupName, typeHandler);
-            } else {
-                entries = collectEntries(rootDir, dirs, (cnt == 0),
-                                         baseGroupName, typeHandler);
-            }
+            List<Entry> entries= collectEntries(rootDir, dirs, (cnt == 0),
+                                                baseGroupName, typeHandler);
             long t2 = System.currentTimeMillis();
             cnt++;
             System.err.println("found:" + entries.size() + " files in:"
@@ -279,15 +274,17 @@ public class PatternHarvester extends Harvester {
      *
      * @throws Exception _more_
      */
-    public List<Entry> collectFromPattern(File rootDir, List<FileInfo> dirs,
-                                          boolean firstTime,
-                                          String rootGroup,
-                                          TypeHandler typeHandler)
+    public List<Entry> collectEntries(File rootDir, List<FileInfo> dirs,
+                                      boolean firstTime,
+                                      String rootGroup,
+                                      TypeHandler typeHandler)
             throws Exception {
 
         long              t1      = System.currentTimeMillis();
         final List<Entry> entries = new ArrayList();
-        final User        user    = repository.getUserManager().findUser("jdoe");
+        final User        user       = repository.getUserManager().getDefaultUser();
+        final String      rootStr    = rootDir.toString();
+        final int         rootStrLen = rootStr.length();
         //        System.err.println("PATTERN:" + filePatternString);
         for (FileInfo fileInfo : dirs) {
             if ( !firstTime && !fileInfo.hasChanged()) {
@@ -301,11 +298,18 @@ public class PatternHarvester extends Harvester {
                 }
                 String fileName = f.toString();
                 fileName = fileName.replace("\\", "/");
+
+                String dirPath = f.getParent().toString();
+                dirPath = dirPath.substring(rootStrLen);
+                dirPath = SqlUtil.cleanUp(dirPath);
+                dirPath = dirPath.replace("\\", "/");
+
+
                 Matcher matcher = filePattern.matcher(fileName);
                 if ( !matcher.find()) {
                     if (dcnt++ < 50) {
-                        System.err.println(":" + filePatternString + ":");
-                        System.err.println(fileName);
+                        //                        System.err.println(":" + filePatternString + ":");
+                        //                        System.err.println(fileName);
                     }
                     continue;
                 }
@@ -315,33 +319,46 @@ public class PatternHarvester extends Harvester {
                 Hashtable map       = new Hashtable();
                 Date      fromDate  = null;
                 Date      toDate    = null;
+                String    tag       = tagTemplate;
                 String    groupName = groupTemplate;
                 String    name      = nameTemplate;
                 String    desc      = descTemplate;
-                for (int dataIdx = 0; dataIdx < patternNames.size();
-                        dataIdx++) {
-                    String dataName = patternNames.get(dataIdx);
-                    Object value    = matcher.group(dataIdx + 1);
-                    String type     = patternTypes.get(dataIdx);
-                    if (type.equals("date")) {
-                        value = sdf.parse((String) value);
-                    } else if (type.equals("int")) {
-                        value = new Integer(value.toString());
-                    } else if (type.equals("double")) {
-                        value = new Double(value.toString());
+
+                Object[] values =null;
+                if(columns!=null) {
+                    for (int dataIdx = 0; dataIdx < patternNames.size();
+                         dataIdx++) {
+                        String dataName = patternNames.get(dataIdx);
+                        Object value    = matcher.group(dataIdx + 1);
+                        String type     = patternTypes.get(dataIdx);
+                        if (type.equals("date")) {
+                            value = sdf.parse((String) value);
+                        } else if (type.equals("int")) {
+                            value = new Integer(value.toString());
+                        } else if (type.equals("double")) {
+                            value = new Double(value.toString());
+                        }
+                        if (dataName.equals("fromDate")) {
+                            fromDate = (Date) value;
+                        } else if (dataName.equals("toDate")) {
+                            toDate = (Date) value;
+                        } else {
+                            groupName = groupName.replace("${" + dataName + "}",
+                                                          value.toString());
+                            name = name.replace("${" + dataName + "}",
+                                                value.toString());
+                            desc = desc.replace("${" + dataName + "}",
+                                                value.toString());
+                            map.put(dataName, value);
+                        }
                     }
-                    if (dataName.equals("fromDate")) {
-                        fromDate = (Date) value;
-                    } else if (dataName.equals("toDate")) {
-                        toDate = (Date) value;
-                    } else {
-                        groupName = groupName.replace("${" + dataName + "}",
-                                value.toString());
-                        name = name.replace("${" + dataName + "}",
-                                            value.toString());
-                        desc = desc.replace("${" + dataName + "}",
-                                            value.toString());
-                        map.put(dataName, value);
+
+
+                    values = new Object[columns.size()];
+                    for (int colIdx = 0; colIdx < columns.size(); colIdx++) {
+                        String colName = columns.get(colIdx);
+                        Object value   = map.get(colName);
+                        values[colIdx] = value;
                     }
                 }
 
@@ -359,10 +376,23 @@ public class PatternHarvester extends Harvester {
                     toDate = createDate;
                 }
 
+                List dirToks = StringUtil.split(dirPath, "/", true,
+                                             true);
+
+                String dirGroup = StringUtil.join("/", dirToks);
+
+
+                String ext = IOUtil.getFileExtension(fileName);
+                if(ext.startsWith(".")) ext = ext.substring(1);
+                tag = tag.replace("${extension}", ext);
+
+                groupName = groupName.replace("${dirgroup}", dirGroup);
+
                 groupName = groupName.replace("${fromDate}",
                         fromDate.toString());
                 groupName = groupName.replace("${toDate}", toDate.toString());
 
+                name      = name.replace("${filename}",f.getName());
                 name      = name.replace("${fromDate}", fromDate.toString());
                 name      = name.replace("${toDate}", toDate.toString());
 
@@ -370,102 +400,25 @@ public class PatternHarvester extends Harvester {
                 desc      = desc.replace("${toDate}", toDate.toString());
                 desc      = desc.replace("${name}", name);
 
-                Object[] values = new Object[columns.size()];
-                for (int colIdx = 0; colIdx < columns.size(); colIdx++) {
-                    String colName = columns.get(colIdx);
-                    Object value   = map.get(colName);
-                    values[colIdx] = value;
-                }
+
 
                 Group group = repository.findGroupFromName(rootGroup + "/"
-                                  + groupName, true);
+                                  + groupName, user, true);
                 Entry entry;
                 entries.add(entry = new Entry(repository.getGUID(),
                                               typeHandler, name, desc, group, user, new Resource(fileName, Resource.TYPE_FILE),
                         createDate.getTime(), fromDate.getTime(),
                         toDate.getTime(), values));
+                if(tag.length()>0) {
+                    entry.setTags(StringUtil.split(tag,","));
+                }
                 typeHandler.initializeNewEntry(entry);
 
             }
         }
         return entries;
-
     }
 
-
-
-    /**
-     * _more_
-     *
-     * @param rootDir _more_
-     * @param dirs _more_
-     * @param firstTime _more_
-     * @param rootGroup _more_
-     * @param typeHandler _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public List<Entry> collectEntries(File rootDir, List<FileInfo> dirs,
-                                      boolean firstTime, String rootGroup,
-                                      TypeHandler typeHandler)
-            throws Exception {
-        final String      rootStr    = rootDir.toString();
-        final int         rootStrLen = rootStr.length();
-        final List<Entry> entries    = new ArrayList();
-        final User        user       = repository.getUserManager().findUser("jdoe");
-        for (FileInfo fileInfo : dirs) {
-            if ( !firstTime && !fileInfo.hasChanged()) {
-                continue;
-            }
-            File[] files = fileInfo.getFile().listFiles();
-            for (int i = 0; i < files.length; i++) {
-                File f = files[i];
-                if (f.isDirectory()) {
-                    continue;
-                }
-                String name   = f.getName();
-                String lcName = name.toLowerCase();
-                if (filePattern != null) {
-                    if ( !filePattern.matcher(lcName).find()) {
-                        continue;
-                    }
-                }
-                if (fileNotPattern != null) {
-                    if (fileNotPattern.matcher(lcName).find()) {
-                        continue;
-                    }
-                }
-                if (name.startsWith(".")) {
-                    continue;
-                }
-                String path    = f.toString();
-                String dirPath = f.getParent().toString();
-                dirPath = dirPath.substring(rootStrLen);
-                dirPath = SqlUtil.cleanUp(dirPath);
-                List toks = StringUtil.split(dirPath, File.separator, true,
-                                             true);
-
-                toks.add(0, rootGroup);
-                Group group =
-                    repository.findGroupFromName(StringUtil.join("/", toks),
-                        true);
-                Entry entry = new Entry(repository.getGUID(), typeHandler,
-                                        name, name, group, user, new Resource(path, Resource.TYPE_FILE),
-                                        f.lastModified(), null);
-                String ext = IOUtil.getFileExtension(path);
-                if (ext.startsWith(".")) {
-                    ext = ext.substring(1);
-                }
-                if (ext.trim().length() > 0) {
-                    entry.addTag(ext);
-                }
-                entries.add(entry);
-            }
-        }
-        return entries;
-    }
 
 
 

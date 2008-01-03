@@ -87,6 +87,7 @@ public class XmlOutputHandler extends OutputHandler {
     public static final String TAG_GROUP = "group";
 
     public static final String TAG_ENTRY = "entry";
+    public static final String TAG_ENTRIES = "entries";
 
     public static final String TAG_DESCRIPTION = "description";
 
@@ -171,23 +172,6 @@ public class XmlOutputHandler extends OutputHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result outputEntry(Request request, Entry entry)
-            throws Exception {
-        TypeHandler  typeHandler = repository.getTypeHandler(entry.getType());
-        StringBuffer sb = typeHandler.getEntryContent(entry, request, true);
-        return new Result("Entry: " + entry.getName(), sb,
-                          getMimeType(request.getOutput()));
-    }
 
 
     /**
@@ -454,12 +438,43 @@ public class XmlOutputHandler extends OutputHandler {
 
     }
 
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param subGroups _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result outputEntries(Request request, List<Entry> entries)
+            throws Exception {
+        StringBuffer sb     = new StringBuffer();
+        String       output = request.getOutput();
+        sb.append(XmlUtil.XML_HEADER);
+        sb.append("\n");
+        sb.append(XmlUtil.openTag(TAG_ENTRIES));
+        for (Entry entry: entries) {
+            getEntryTag(entry, sb);
+        }
+        sb.append(XmlUtil.closeTag(TAG_ENTRIES));
+        return new Result("", sb, getMimeType(output));
+
+
+
+    }
+
     private void getEntryTag(Entry entry, StringBuffer sb) {
         StringBuffer attrs = new StringBuffer();
         attrs.append(XmlUtil.attrs(ATTR_ID, entry.getId(), ATTR_NAME, entry.getName()));
         attrs.append(XmlUtil.attrs(ATTR_RESOURCE, entry.getResource().getPath()));
         attrs.append(XmlUtil.attrs(ATTR_RESOURCE_TYPE, entry.getResource().getType()));
-        attrs.append(XmlUtil.attrs(ATTR_GROUP, entry.getGroup().getId()));
+        attrs.append(XmlUtil.attrs(ATTR_GROUP, entry.getParentGroup().getId()));
         attrs.append(XmlUtil.attrs(ATTR_TYPE, entry.getTypeHandler().getType()));
         sb.append(XmlUtil.openTag(TAG_ENTRY,attrs.toString()));
         if(entry.getDescription()!=null && entry.getDescription().length()>0) {

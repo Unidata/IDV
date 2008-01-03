@@ -44,46 +44,19 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Entry {
+public class Entry extends Entity {
 
     /** _more_          */
     public static final double NONGEO = -999999;
-
 
     /** _more_ */
     Object[] values;
 
     /** _more_ */
-    List<String> tags;
-
-    /** _more_ */
-    List<Association> associations = new ArrayList<Association>();
-
-    /** _more_ */
-    List<Metadata> metadata = new ArrayList<Metadata>();
-
-
-    /** _more_ */
-    private String id;
-
-    /** _more_ */
-    private String name;
-
-    /** _more_ */
-    private String description;
-
-    /** _more_ */
-    private Group group;
-
-    /** _more_ */
-    private User user;
-
-    /** _more_ */
     private Resource resource;
 
-
     /** _more_ */
-    private long createDate;
+    private TypeHandler typeHandler;
 
     /** _more_ */
     private long startDate;
@@ -103,9 +76,6 @@ public class Entry {
     /** _more_          */
     private double west = NONGEO;
 
-    /** _more_ */
-    private TypeHandler typeHandler;
-
 
     /**
      * _more_
@@ -114,7 +84,7 @@ public class Entry {
      * @param typeHandler _more_
      */
     public Entry(String id, TypeHandler typeHandler) {
-        this.id          = id;
+        setId(id);
         this.typeHandler = typeHandler;
     }
 
@@ -201,15 +171,9 @@ public class Entry {
                  String description, Group group, User user, Resource resource, 
                  long createDate, long startDate, long endDate,
                  Object[] values) {
-        this.id          = id;
+        super(id,name,description, group, user, createDate);
         this.typeHandler = typeHandler;
-        this.name        = name;
-        this.description = description;
-        this.group       = group;
-        this.user        = user;
         this.resource    = resource;
-
-        this.createDate  = createDate;
         this.startDate   = startDate;
         this.endDate     = endDate;
         this.values      = values;
@@ -258,25 +222,6 @@ public class Entry {
 
 
 
-    /**
-     * Set the CreateDate property.
-     *
-     * @param value The new value for CreateDate
-     */
-    public void setCreateDate(long value) {
-        createDate = value;
-    }
-
-    /**
-     * Get the CreateDate property.
-     *
-     * @return The CreateDate
-     */
-    public long getCreateDate() {
-        return createDate;
-    }
-
-
 
     /**
      * Set the StartDate property.
@@ -317,36 +262,6 @@ public class Entry {
 
 
     /**
-     * Set the Group property.
-     *
-     * @param value The new value for Group
-     */
-    public void setGroup(Group value) {
-        group = value;
-    }
-
-    /**
-     * Get the Group property.
-     *
-     * @return The Group
-     */
-    public Group getGroup() {
-        return group;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public String getGroupId() {
-        if (group != null) {
-            return group.getId();
-        }
-        return "";
-    }
-
-    /**
      * Set the Type property.
      *
      * @param value The new value for Type
@@ -372,171 +287,6 @@ public class Entry {
      */
     public TypeHandler getTypeHandler() {
         return typeHandler;
-    }
-
-
-    /**
-     * Set the Name property.
-     *
-     * @param value The new value for Name
-     */
-    public void setName(String value) {
-        name = value;
-    }
-
-    /**
-     * Get the Name property.
-     *
-     * @return The Name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Set the Description property.
-     *
-     * @param value The new value for Description
-     */
-    public void setDescription(String value) {
-        description = value;
-    }
-
-    /**
-     * Get the Description property.
-     *
-     * @return The Description
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * Set the Id property.
-     *
-     * @param value The new value for Id
-     */
-    public void setId(String value) {
-        id = value;
-    }
-
-    /**
-     * Get the Id property.
-     *
-     * @return The Id
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     *  Set the User property.
-     *
-     *  @param value The new value for User
-     */
-    public void setUser(User value) {
-        user = value;
-    }
-
-    /**
-     *  Get the User property.
-     *
-     *  @return The User
-     */
-    public User getUser() {
-        return user;
-    }
-
-    /**
-     *  Set the Tags property.
-     *
-     *  @param value The new value for Tags
-     */
-    public void setTags(List<String> value) {
-        tags = value;
-    }
-
-    /**
-     *  Get the Tags property.
-     *
-     *  @return The Tags
-     */
-    public List<String> getTags() {
-        return tags;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param tag _more_
-     */
-    public void addTag(String tag) {
-        if (tags == null) {
-            tags = new ArrayList<String>();
-        }
-        tags.add(tag);
-
-    }
-
-    /**
-     * Set the Metadata property.
-     *
-     * @param value The new value for Metadata
-     */
-    public void setMetadata(List<Metadata> value) {
-        metadata = value;
-    }
-
-    /**
-     * Get the Metadata property.
-     *
-     * @return The Metadata
-     */
-    public List<Metadata> getMetadata() {
-        return metadata;
-    }
-
-    /**
-     * _more_
-     *
-     * @param value _more_
-     */
-    public void addMetadata(Metadata value) {
-        metadata.add(value);
-    }
-
-
-    /**
-     * Set the Associations property.
-     *
-     * @param value The new value for Associations
-     */
-    public void setAssociations(List<Association> value) {
-        associations = value;
-    }
-
-    /**
-     * Get the Associations property.
-     *
-     * @return The Associations
-     */
-    public List<Association> getAssociations() {
-        return associations;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param value _more_
-     */
-    public void addAssociation(Association value) {
-        if (associations == null) {
-            associations = new ArrayList<Association>();
-        }
-        associations.add(value);
-
     }
 
 

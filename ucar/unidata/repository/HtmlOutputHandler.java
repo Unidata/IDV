@@ -164,7 +164,7 @@ public class HtmlOutputHandler extends OutputHandler {
     protected void getOutputTypesForEntries(Request request,List<Entry> entries, List types)
             throws Exception {
         types.add(new TwoFacedObject("Html", OUTPUT_HTML));
-        if(entries.size()>0) {
+        if(entries.size()>1) {
             types.add(new TwoFacedObject("Html with timeline", OUTPUT_TIMELINE));
         }
     }
@@ -186,8 +186,14 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         TypeHandler  typeHandler = repository.getTypeHandler(entry.getType());
         StringBuffer sb = typeHandler.getEntryContent(entry, request, true);
-        return new Result("Entry: " + entry.getName(), sb,
-                          getMimeType(request.getOutput()));
+        Result result =  new Result("Entry: " + entry.getName(), sb,
+                                    getMimeType(request.getOutput()));
+        List<Entry> entries = new ArrayList<Entry>();
+        entries.add(entry);
+        result.putProperty(PROP_NAVSUBLINKS,
+                           getHeader(request, request.getOutput(), repository.getOutputTypesForEntries(request,entries)));
+        return result;
+
     }
 
 
@@ -856,8 +862,6 @@ public class HtmlOutputHandler extends OutputHandler {
      */
     public Result outputEntries(Request request, List<Entry> entries)
             throws Exception {
-
-
 
         StringBuffer sb         = new StringBuffer();
         String       output     = request.getOutput();

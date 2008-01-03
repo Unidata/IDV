@@ -126,6 +126,12 @@ public class UserManager implements Constants, Tables, RequestHandler {
 
     }
 
+    protected User getDefaultUser() throws Exception {
+        makeUserIfNeeded(new User("default", "Default User", false));
+        return findUser("default");
+    }
+
+
     /**
      * _more_
      *

@@ -79,6 +79,8 @@ public interface Tables {
     public static final int MAX_ROWS = 1000;
 
 
+
+
     /*
       For each of the tables in the database we have the following defs.
       The TABLE_<TABLE NAME> ... is the name of the table.
@@ -89,6 +91,38 @@ public interface Tables {
      */
 
     //J-
+
+    /** _more_ */
+    public static final String TABLE_GROUPS = "groups";
+    public static final String COL_GROUPS_ID = TABLE_GROUPS + ".id";
+    public static final String COL_GROUPS_NAME = TABLE_GROUPS + ".name";
+    public static final String COL_GROUPS_DESCRIPTION = TABLE_GROUPS + ".description";
+    public static final String COL_GROUPS_PARENT_GROUP_ID = TABLE_GROUPS + ".parent_group_id";
+    public static final String COL_GROUPS_USER_ID     = TABLE_GROUPS + ".user_id";
+    public static final String COL_GROUPS_CREATEDATE = TABLE_GROUPS + ".createdate";
+
+
+    public static final String []ARRAY_GROUPS = new String[]{COL_GROUPS_ID,
+                                                           COL_GROUPS_NAME,
+                                                             COL_GROUPS_DESCRIPTION,
+                                                           COL_GROUPS_PARENT_GROUP_ID,
+                                                             COL_GROUPS_USER_ID,
+                                                             COL_GROUPS_CREATEDATE};
+
+
+    public static final String COLUMNS_GROUPS = SqlUtil.comma(ARRAY_GROUPS);
+    public static final String INSERT_GROUPS =
+        SqlUtil.makeInsert(
+            TABLE_GROUPS,
+            COLUMNS_GROUPS, 
+            SqlUtil.getQuestionMarks(ARRAY_GROUPS.length));
+
+
+
+
+
+
+
     public static final String TABLE_ENTRIES              = "entries";
     public static final String COL_ENTRIES_ID             = TABLE_ENTRIES + ".id";
     public static final String COL_ENTRIES_TYPE           = TABLE_ENTRIES + ".type";
@@ -201,24 +235,6 @@ public interface Tables {
             COLUMNS_METADATA, 
             SqlUtil.getQuestionMarks(ARRAY_METADATA.length));
 
-
-    /** _more_ */
-    public static final String TABLE_GROUPS = "groups";
-    public static final String COL_GROUPS_ID = TABLE_GROUPS + ".id";
-    public static final String COL_GROUPS_PARENT = TABLE_GROUPS + ".parent";
-    public static final String COL_GROUPS_NAME = TABLE_GROUPS + ".name";
-    public static final String COL_GROUPS_DESCRIPTION = TABLE_GROUPS + ".description";
-    public static final String []ARRAY_GROUPS = new String[]{COL_GROUPS_ID,
-                                                           COL_GROUPS_PARENT,
-                                                           COL_GROUPS_NAME,
-                                                           COL_GROUPS_DESCRIPTION};
-
-    public static final String COLUMNS_GROUPS = SqlUtil.comma(ARRAY_GROUPS);
-    public static final String INSERT_GROUPS =
-        SqlUtil.makeInsert(
-            TABLE_GROUPS,
-            COLUMNS_GROUPS, 
-            SqlUtil.getQuestionMarks(ARRAY_GROUPS.length));
 
 
     public static final String TABLE_TAGS = "tags";

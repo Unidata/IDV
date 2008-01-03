@@ -152,8 +152,8 @@ public class EntryListener implements Constants, Tables {
                 ok = nameMatch(value.toString(), entry.getDescription());
             } else if (arg.equals(ARG_GROUP)) {
                 //TODO: check for subgroups
-                ok = (value.equals(entry.getGroup().getFullName())
-                      || value.equals(entry.getGroup().getId()));
+                ok = (value.equals(entry.getParentGroup().getFullName())
+                      || value.equals(entry.getParentGroup().getId()));
             } else if (arg.equals(ARG_TAG)) {
                 List tags = entry.getTags();
                 if ((tags == null) || (tags.size() == 0)) {

@@ -9,7 +9,7 @@
 <nodetype    name="Node"  />
 
 <nodetype    name="tag" parent="Node" fillcolor="0,153,153">
-  <command label="Search tag" command="url(,${root}/searchform?tag=%id%)"/>
+  <command label="Search tag" command="url(,${root}/entry/searchform?tag=%id%)"/>
   <shape>
   <shape>
     <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
@@ -23,8 +23,8 @@
 
 
 <nodetype    name="group" parent="Node" fillcolor="#cccccc">
-  <command label="View group" command="url(,${root}/showgroup?group=%id%)"/>
-  <command label="Search group" command="url(,${root}/searchform?group=%id%)"/>
+  <command label="View group" command="url(,${root}/group/show?group=%id%)"/>
+  <command label="Search group" command="url(,${root}/entry/searchform?group=%id%)"/>
   <shape>
     <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
     <rrect src="label" fillcolor="%fillcolor%" from="c" to="c" color="black"/>
@@ -41,7 +41,7 @@
 
 
 <nodetype    name="entry" parent="Node" fillcolor="255,255,153" imagepath="${root}/File.gif">
-  <command label="View entry" command="url(,${root}/showentry?id=%id%)"/>
+  <command label="View entry" command="url(,${root}/entry/show?id=%id%)"/>
   <shape>
   <shape>
     <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>
@@ -56,7 +56,7 @@
 </nodetype>
 
 <nodetype    name="imageentry" parent="Node" fillcolor="255,255,153" >
-  <command label="View entry" command="url(,${root}/showentry?id=%id%)"/>
+  <command label="View entry" command="url(,${root}/entry/show?id=%id%)"/>
   <shape>
   <shape>
     <text  fontstyle="bold" id="label"   text="%title%" from="c" to="c" color="black"  dy="2"/>

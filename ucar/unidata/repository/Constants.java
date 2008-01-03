@@ -157,6 +157,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    public static final String ARG_RECURSE = "recurse";
+
     public static final String ARG_CATALOG = "catalog";
 
 

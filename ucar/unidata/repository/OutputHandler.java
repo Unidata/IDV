@@ -183,7 +183,9 @@ public class OutputHandler implements Constants, Tables {
      */
     public Result outputEntry(Request request, Entry entry)
             throws Exception {
-        return notImplemented("outputEntry");
+        List<Entry> entries = new ArrayList<Entry>();
+        entries.add(entry);
+        return outputEntries(request,entries);
     }
 
 

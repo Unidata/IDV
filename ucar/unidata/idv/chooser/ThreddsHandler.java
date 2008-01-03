@@ -1159,7 +1159,7 @@ public class ThreddsHandler extends XmlHandler {
      * @param type service type
      * @return Return the service node or null if not found.
      */
-    private static Element findServiceNodeForDataset(Element datasetNode,
+    public static Element findServiceNodeForDataset(Element datasetNode,
             boolean showErrors, String type) {
         double version = getVersion(datasetNode);
         String serviceName = findServiceNameForDataset(datasetNode, version,
