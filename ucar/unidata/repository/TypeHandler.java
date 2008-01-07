@@ -522,8 +522,11 @@ public class TypeHandler implements Constants, Tables {
                                          entry.getUser().getName() + " @ "
                                          + fmt(entry.getCreateDate())));
 
-            sb.append(HtmlUtil.formEntry("Resource:",
-                                         entry.getResource().getPath()));
+            String resourceLink =        entry.getResource().getPath();
+            if(entry.getResource().isUrl()) {
+                resourceLink = "<a href=\"" + resourceLink +"\">" + resourceLink+"</a>";
+            }
+            sb.append(HtmlUtil.formEntry("Resource:",resourceLink));
 
             if (entry.isFile()) {
                 sb.append(

@@ -45,8 +45,8 @@
             update="false"
             jarfile="${jars_dest}/repositorytmp.jar">
             <include name="ucar/**/*.class"/>
-            <include name="ucar/unidata/repository/htdocs/*.*"/>
-            <include name="ucar/unidata/repository/resources/*.*"/>
+            <include name="ucar/unidata/repository/htdocs/**/*.*"/>
+            <include name="ucar/unidata/repository/resources/**/*.*"/>
         </jar>
         <mkdir dir="${tmpjardir}"/>
         <delete includeemptydirs="true">
