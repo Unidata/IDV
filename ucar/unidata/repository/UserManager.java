@@ -55,6 +55,13 @@ import java.util.Properties;
 
 
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+
+
+
 /**
  * Class TypeHandler _more_
  *
@@ -98,6 +105,21 @@ public class UserManager implements Constants, Tables, RequestHandler {
         this.repository = repository;
         requireLogin = repository.getProperty(PROP_USER_REQUIRELOGIN,true);
     }
+
+
+    public static String hashPassword(String password) {
+        try  {
+            MessageDigest md =  MessageDigest.getInstance("SHA"); 
+            md.update(password.getBytes("UTF-8")); 
+            return  XmlUtil.encodeBase64(md.digest()); 
+        }
+        catch(NoSuchAlgorithmException nsae) {
+            throw new IllegalStateException(nsae.getMessage());
+        } catch(UnsupportedEncodingException uee)  {
+            throw new IllegalStateException(uee.getMessage());
+        }
+    }
+
 
 
     protected boolean isRequestOk(Request request) {

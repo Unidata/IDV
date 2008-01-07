@@ -133,7 +133,7 @@ public class RssOutputHandler extends OutputHandler {
      */
     protected void getOutputTypesFor(Request request, String what, List types)
             throws Exception {
-        if (what.equals(WHAT_ENTRIES) || what.equals(WHAT_GROUP)) {
+        if (what.equals(WHAT_ENTRIES)) {
             //types.add(TFO_FULL);
             types.add(TFO_SUMMARY);
         }

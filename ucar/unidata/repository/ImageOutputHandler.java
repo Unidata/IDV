@@ -136,10 +136,6 @@ public class ImageOutputHandler extends OutputHandler {
             types.add(new TwoFacedObject("Slideshow", OUTPUT_SLIDESHOW));
             types.add(new TwoFacedObject("Gallery", OUTPUT_GALLERY));
             types.add(new TwoFacedObject("Image Player", OUTPUT_PLAYER));
-        } else if (what.equals(WHAT_GROUP)) {
-            types.add(new TwoFacedObject("Slideshow", OUTPUT_SLIDESHOW));
-            types.add(new TwoFacedObject("Gallery", OUTPUT_GALLERY));
-            types.add(new TwoFacedObject("Image Player", OUTPUT_PLAYER));
         }
     }
 
@@ -202,7 +198,7 @@ public class ImageOutputHandler extends OutputHandler {
         System.err.println("output:" + request);
         result.putProperty(PROP_NAVSUBLINKS,
                            getEntriesHeader(request, request.getOutput(),
-                                            WHAT_GROUP));
+                                            WHAT_ENTRIES));
         return result;
     }
 

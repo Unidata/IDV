@@ -92,31 +92,6 @@ public interface Tables {
 
     //J-
 
-    /** _more_ */
-    public static final String TABLE_GROUPS = "groups";
-    public static final String COL_GROUPS_ID = TABLE_GROUPS + ".id";
-    public static final String COL_GROUPS_NAME = TABLE_GROUPS + ".name";
-    public static final String COL_GROUPS_DESCRIPTION = TABLE_GROUPS + ".description";
-    public static final String COL_GROUPS_PARENT_GROUP_ID = TABLE_GROUPS + ".parent_group_id";
-    public static final String COL_GROUPS_USER_ID     = TABLE_GROUPS + ".user_id";
-    public static final String COL_GROUPS_CREATEDATE = TABLE_GROUPS + ".createdate";
-
-
-    public static final String []ARRAY_GROUPS = new String[]{COL_GROUPS_ID,
-                                                           COL_GROUPS_NAME,
-                                                             COL_GROUPS_DESCRIPTION,
-                                                           COL_GROUPS_PARENT_GROUP_ID,
-                                                             COL_GROUPS_USER_ID,
-                                                             COL_GROUPS_CREATEDATE};
-
-
-    public static final String COLUMNS_GROUPS = SqlUtil.comma(ARRAY_GROUPS);
-    public static final String INSERT_GROUPS =
-        SqlUtil.makeInsert(
-            TABLE_GROUPS,
-            COLUMNS_GROUPS, 
-            SqlUtil.getQuestionMarks(ARRAY_GROUPS.length));
-
 
 
 
@@ -128,7 +103,7 @@ public interface Tables {
     public static final String COL_ENTRIES_TYPE           = TABLE_ENTRIES + ".type";
     public static final String COL_ENTRIES_NAME           = TABLE_ENTRIES + ".name";
     public static final String COL_ENTRIES_DESCRIPTION    = TABLE_ENTRIES + ".description";
-    public static final String COL_ENTRIES_GROUP_ID       = TABLE_ENTRIES + ".group_id";
+    public static final String COL_ENTRIES_PARENT_GROUP_ID       = TABLE_ENTRIES + ".parent_group_id";
     public static final String COL_ENTRIES_USER_ID        = TABLE_ENTRIES + ".user_id";
     public static final String COL_ENTRIES_RESOURCE       = TABLE_ENTRIES + ".resource";
     public static final String COL_ENTRIES_RESOURCE_TYPE   = TABLE_ENTRIES + ".resource_type";
@@ -147,7 +122,7 @@ public interface Tables {
         COL_ENTRIES_TYPE,
         COL_ENTRIES_NAME,
         COL_ENTRIES_DESCRIPTION,
-        COL_ENTRIES_GROUP_ID,
+        COL_ENTRIES_PARENT_GROUP_ID,
         COL_ENTRIES_USER_ID,
         COL_ENTRIES_RESOURCE,
         COL_ENTRIES_RESOURCE_TYPE,
@@ -173,6 +148,7 @@ public interface Tables {
             TABLE_ENTRIES,
             COL_ENTRIES_ID,
             ARRAY_ENTRIES);
+
 
 
 

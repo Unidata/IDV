@@ -131,8 +131,6 @@ public class CsvOutputHandler extends OutputHandler {
             types.add(new TwoFacedObject("Tag CSV", OUTPUT_CSV));
         } else if (what.equals(WHAT_TYPE)) {
             types.add(new TwoFacedObject("Type CSV", OUTPUT_CSV));
-        } else if (what.equals(WHAT_GROUP)) {
-            types.add(new TwoFacedObject("Group CSV", OUTPUT_CSV));
         } else {
             types.add(new TwoFacedObject("CSV", OUTPUT_CSV));
         }
@@ -177,35 +175,6 @@ public class CsvOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer sb = new StringBuffer();
         for (Group group : groups) {
-            sb.append(SqlUtil.comma(group.getFullName(), group.getId()));
-            sb.append("\n");
-        }
-        return new Result("", sb, getMimeType(OUTPUT_CSV));
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Result listGroups(Request request) throws Exception {
-        TypeHandler typeHandler = repository.getTypeHandler(request);
-        Statement statement = typeHandler.executeSelect(request,
-                                  SqlUtil.distinct(COL_ENTRIES_GROUP_ID));
-        String[]     groups = SqlUtil.readString(statement, 1);
-        StringBuffer sb     = new StringBuffer();
-        for (int i = 0; i < groups.length; i++) {
-            Group group = repository.findGroup(groups[i]);
-            if (group == null) {
-                continue;
-            }
-
             sb.append(SqlUtil.comma(group.getFullName(), group.getId()));
             sb.append("\n");
         }
@@ -346,7 +315,6 @@ public class CsvOutputHandler extends OutputHandler {
 
 
 
-
     /**
      * _more_
      *
@@ -364,7 +332,6 @@ public class CsvOutputHandler extends OutputHandler {
             throws Exception {
         return listGroups(request, subGroups);
     }
-
 
 
 

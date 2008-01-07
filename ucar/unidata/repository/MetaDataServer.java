@@ -152,7 +152,7 @@ public class MetaDataServer extends HttpServer implements Constants {
          */
         protected void handleRequest(String path, Hashtable formArgs,
                                      Hashtable httpArgs, String content)
-                throws Exception {
+            throws Exception {
             path = path.trim();
             Result result = null;
             try {

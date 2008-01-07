@@ -248,7 +248,7 @@ public class CatalogOutputHandler extends OutputHandler {
      */
     protected void getOutputTypesFor(Request request, String what, List types)
             throws Exception {
-        if (what.equals(WHAT_ENTRIES) || what.equals(WHAT_GROUP)) {
+        if (what.equals(WHAT_ENTRIES)) {
             getOutputTypesForEntries(request, new ArrayList(), types);
             return;
         }

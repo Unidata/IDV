@@ -19,6 +19,31 @@ CREATE INDEX GROUPS_INDEX_PARENT_GROUP_ID ON groups (PARENT_GROUP_ID);
 CREATE INDEX GROUPS_INDEX_USER_ID ON groups (USER_ID);
 
 
+
+CREATE TABLE entries (id varchar(200),
+                   type varchar(200),
+	           name varchar(200),
+                   description varchar(1000),
+                   parent_group_id varchar(200),
+   		   user_id varchar(200),
+	           resource varchar(200),	           
+                   resource_type varchar(200),
+	           createdate timestamp, 
+	           fromdate timestamp, 
+	           todate timestamp,
+	           south double,
+	           north double,
+	           east double,
+	           west double); 
+
+CREATE INDEX ENTRIES_INDEX_ID ON entries (ID);
+CREATE INDEX ENTRIES_INDEX_RESOURCE ON entries (RESOURCE);
+CREATE INDEX ENTRIES_INDEX_GROUP ON entries (GROUP_ID);
+CREATE INDEX ENTRIES_INDEX_TYPE ON entries (TYPE);
+CREATE INDEX ENTRIES_INDEX_USER_ID ON entries (USER_ID);
+
+
+
 CREATE TABLE  metadata (id varchar(500),
                         id_type varchar(100),
                         type varchar(200),
@@ -52,26 +77,4 @@ CREATE TABLE  users (id varchar(200),
                      password  varchar(200),
 		     admin int);
 
-
-CREATE TABLE entries (id varchar(200),
-                   type varchar(200),
-	           name varchar(200),
-                   description varchar(1000),
-                   group_id varchar(200),
-   		   user_id varchar(200),
-	           resource varchar(200),	           
-                   resource_type varchar(200),
-	           createdate timestamp, 
-	           fromdate timestamp, 
-	           todate timestamp,
-	           south double,
-	           north double,
-	           east double,
-	           west double); 
-
-CREATE INDEX ENTRIES_INDEX_ID ON entries (ID);
-CREATE INDEX ENTRIES_INDEX_RESOURCE ON entries (RESOURCE);
-CREATE INDEX ENTRIES_INDEX_GROUP ON entries (GROUP_ID);
-CREATE INDEX ENTRIES_INDEX_TYPE ON entries (TYPE);
-CREATE INDEX ENTRIES_INDEX_USER_ID ON entries (USER_ID);
 

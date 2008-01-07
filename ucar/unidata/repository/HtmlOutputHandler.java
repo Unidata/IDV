@@ -142,11 +142,6 @@ public class HtmlOutputHandler extends OutputHandler {
             types.add(new TwoFacedObject("Tag Cloud", OUTPUT_CLOUD));
         } else if (what.equals(WHAT_TYPE)) {
             types.add(new TwoFacedObject("Type Html", OUTPUT_HTML));
-        } else if (what.equals(WHAT_GROUP)) {
-            types.add(new TwoFacedObject("Group Html", OUTPUT_HTML));
-            if (repository.isAppletEnabled(request)) {
-                types.add(new TwoFacedObject("Timeline", OUTPUT_TIMELINE));
-            }
         } else {
             types.add(new TwoFacedObject("Html", OUTPUT_HTML));
         }
@@ -211,7 +206,7 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer sb     = new StringBuffer();
         String       output = request.getOutput();
-        appendListHeader(request, output, WHAT_GROUP, sb);
+        //        appendListHeader(request, output, WHAT_GROUP, sb);
         if (output.equals(OUTPUT_HTML)) {
             sb.append(repository.header("Groups"));
             sb.append("<ul>");
@@ -286,39 +281,6 @@ public class HtmlOutputHandler extends OutputHandler {
     protected String getEntryUrl(Entry entry) {
         return HtmlUtil.href(HtmlUtil.url(repository.URL_ENTRY_SHOW, ARG_ID,
                                           entry.getId()), entry.getName());
-    }
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Result listGroups(Request request) throws Exception {
-        TypeHandler typeHandler = repository.getTypeHandler(request);
-        Statement statement = typeHandler.executeSelect(request,
-                                  SqlUtil.distinct(COL_ENTRIES_GROUP_ID));
-        String[]     groups = SqlUtil.readString(statement, 1);
-        StringBuffer sb     = new StringBuffer();
-        String       output = request.getOutput();
-        sb.append(repository.header("Groups"));
-        sb.append("<ul>");
-        for (int i = 0; i < groups.length; i++) {
-            Group group = repository.findGroup(groups[i]);
-            if (group == null) {
-                continue;
-            }
-            sb.append("<li>" + repository.getAllGroupLinks(request, group)
-                      + " " + group.getFullName());
-        }
-        if (output.equals(OUTPUT_HTML)) {
-            sb.append("</ul>\n");
-        }
-
-        return new Result("", sb, getMimeType(output));
     }
 
 
@@ -655,14 +617,17 @@ public class HtmlOutputHandler extends OutputHandler {
             } else {
                 //                output = OUTPUT_TIMELINE;
             }
-            //xxxxx
-            //            appendListHeader(request, output, WHAT_GROUP, sb);
             sb.append("<p>\n");
             boolean showMetadata = request.get(ARG_SHOWMETADATA,false);
-            String[] crumbs = repository.getBreadCrumbs(request, group,
-                                                        false,ARG_SHOWMETADATA+"="+showMetadata);
-            title = crumbs[0];
-            sb.append(crumbs[1]);
+            if(!group.isDummy()) {
+                String[] crumbs = repository.getBreadCrumbs(request, group,
+                                                            false,ARG_SHOWMETADATA+"="+showMetadata);
+                title = crumbs[0];
+                sb.append(crumbs[1]);
+            } else {
+                title = group.getName();
+            }
+
 
             if(!showApplet) {
                 List<Metadata> metadataList = repository.getMetadata(group);
@@ -775,8 +740,6 @@ public class HtmlOutputHandler extends OutputHandler {
             }
         }
         Result result = new Result(title, sb, getMimeType(output));
-        //        result.putProperty(PROP_NAVSUBLINKS,
-        //                           getEntriesHeader(request, output, WHAT_GROUP));
         return result;
     }
 

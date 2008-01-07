@@ -61,10 +61,10 @@ public class Entity {
     private String id;
 
     /** _more_ */
-    private String name;
+    private String name="";
 
     /** _more_ */
-    private String description;
+    private String description="";
 
     /** _more_ */
     private Group parentGroup;
@@ -103,6 +103,18 @@ public class Entity {
                   long createDate) {
         //        if(ids.get(id)!=null) throw new IllegalArgumentException("");
         this.id          = id;
+                this.name        = name;
+        this.description = description;
+        this.parentGroup = parentGroup;
+        this.user        = user;
+        this.createDate  = createDate;
+    }
+
+
+    public void init(String name,
+                     String description, Group parentGroup, 
+                     User user, 
+                     long createDate) {
         this.name        = name;
         this.description = description;
         this.parentGroup = parentGroup;

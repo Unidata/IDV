@@ -48,6 +48,11 @@ public class Resource {
     private String type = TYPE_UNKNOWN;
     private File file;
 
+    public Resource() {
+        path = "";
+    }
+
+
     public Resource(File file) {
         this.file = file;
         path = file.toString();

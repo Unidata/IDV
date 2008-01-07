@@ -404,11 +404,11 @@ public class PatternHarvester extends Harvester {
 
                 Group group = repository.findGroupFromName(rootGroup + "/"
                                   + groupName, user, true);
-                Entry entry;
-                entries.add(entry = new Entry(repository.getGUID(),
-                                              typeHandler, name, desc, group, user, new Resource(fileName, Resource.TYPE_FILE),
-                        createDate.getTime(), fromDate.getTime(),
-                        toDate.getTime(), values));
+                Entry entry = typeHandler.createEntry(repository.getGUID());
+                entry.init(name, desc, group, user, new Resource(fileName, Resource.TYPE_FILE),
+                           createDate.getTime(), fromDate.getTime(),
+                           toDate.getTime(), values);
+                entries.add(entry);
                 if(tag.length()>0) {
                     entry.setTags(StringUtil.split(tag,","));
                 }

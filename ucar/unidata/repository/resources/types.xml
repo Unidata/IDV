@@ -1,12 +1,12 @@
 <types>
-  <type name="model"  description="Models">
+  <type name="model"  description="Model">
 
      <column name="modelgroup" type="string" isindex="true" cansearch="true" searchtype="select" label="Model Group"/>
      <column name="modelrun" type="string" isindex="true" cansearch="true" searchtype="select"  label="Model Run"/>
   </type>
 
 
-  <type name="level3radar" description="Level 3 Radar Files" handler="ucar.unidata.repository.Level3RadarTypeHandler">
+  <type name="level3radar" description="Level 3 Radar File" handler="ucar.unidata.repository.Level3RadarTypeHandler">
 	<column name="station" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Station" rows="5" columns="10"
                 names="/ucar/unidata/repository/resources/level3radar.station.properties"/>
 	<column name="product" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Product"  
@@ -28,19 +28,19 @@
   </type>
 
 
-  <type name="level2radar" description="Level 2 Radar Files">
+  <type name="level2radar" description="Level 2 Radar File">
 	<column name="station" type="string" isindex="true" cansearch="true" searchtype="select" label="Station"
                 names="/ucar/unidata/repository/resources/level3radar.station.properties"/>
   </type>
 
 
-  <type name="satellite" description="Satellite Files">
+  <type name="satellite" description="Satellite File">
 	<column name="platform" type="string" isindex="true" cansearch="true" searchtype="select" label="Platform"/>
 	<column name="resolution" type="string" isindex="true" cansearch="true" searchtype="select"  label="Resolution"/>		
 	<column name="product" type="string" isindex="true" cansearch="true" searchtype="select"  label="Product"/>
   </type>
 
-  <type name="image"  description="Image Files"/>
+  <type name="image"  description="Image File"/>
 
 
 </types>

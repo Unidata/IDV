@@ -158,7 +158,7 @@ public class OutputHandler implements Constants, Tables {
     protected void getOutputTypesForGroup(Request request, Group group,
                                           List<Group> subGroups, List<Entry> entries, List types)
             throws Exception {
-        getOutputTypesFor(request, WHAT_GROUP, types);
+        getOutputTypesFor(request, WHAT_ENTRIES, types);
     }
 
 
@@ -304,20 +304,6 @@ public class OutputHandler implements Constants, Tables {
         return items;
     }
 
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Result listGroups(Request request) throws Exception {
-        return notImplemented("listGroups");
-    }
 
 
 

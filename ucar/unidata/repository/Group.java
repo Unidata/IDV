@@ -43,7 +43,7 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Group extends Entity {
+public class Group extends Entry {
 
 
 
@@ -55,23 +55,18 @@ public class Group extends Entity {
     private List<Group> children = new ArrayList<Group>();
 
 
-    /**
-     *
-     * @param parent _more_
-     * @param id _more_
-     * @param name _more_
-     * @param description _more_
-     */
-    public Group(String id, String name, String description,Group parent, User user, long createDate) {
-        super(id, name, description,parent,user, createDate);
+    private boolean isDummy = false;
+
+    public Group(TypeHandler handler, boolean isDummy) {
+        super("",handler);
+        this.isDummy = isDummy;
+        setName("Search Results");
+        setDescription("");
     }
 
-    public Group(String id, String name, String description,String parentId, User user, long createDate) {
-        super(id, name, description,null,user, createDate);
-        setParentGroupId(parentId);
+    public Group(String id, TypeHandler typeHandler) {
+        super(id, typeHandler);
     }
-
-
 
     /**
      * _more_
@@ -83,6 +78,10 @@ public class Group extends Entity {
             return getParentGroup().getFullName() + "/" + getName();
         }
         return getName();
+    }
+
+    public boolean isDummy() {
+        return isDummy;
     }
 
 

@@ -44,55 +44,10 @@ import java.util.List;
  */
 public class GenericEntry extends Entry {
 
-
-    /**
-     * _more_
-     *
-     *
-     *
-     * @param id _more_
-     * @param typeHandler _more_
-     * @param name _more_
-     * @param description _more_
-     * @param group _more_
-     * @param user _more_
-     * @param file _more_
-     * @param date _more_
-     * @param values _more_
-     */
-    public GenericEntry(String id, TypeHandler typeHandler, String name,
-                        String description, Group group, User user,
-                        Resource resource,  long date, Object[] values) {
-        this(id, typeHandler, name, description, group, user, resource, date,
-             date, date, values);
+    public GenericEntry(String id, TypeHandler typeHandler) {
+        super(id, typeHandler);
     }
 
-
-
-    /**
-     * _more_
-     *
-     *
-     * @param id _more_
-     * @param typeHandler _more_
-     * @param name _more_
-     * @param description _more_
-     * @param group _more_
-     * @param user _more_
-     * @param file _more_
-     * @param createDate _more_
-     * @param startDate _more_
-     * @param endDate _more_
-     * @param values _more_
-     */
-    public GenericEntry(String id, TypeHandler typeHandler, String name,
-                        String description, Group group, User user,
-                        Resource resource , long createDate, long startDate,
-                        long endDate, Object[] values) {
-        super(id, typeHandler, name, description, group, user, resource,
-              createDate, startDate, endDate);
-        this.values = values;
-    }
 
 
 

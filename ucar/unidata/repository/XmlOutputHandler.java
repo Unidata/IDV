@@ -150,8 +150,6 @@ public class XmlOutputHandler extends OutputHandler {
             types.add(new TwoFacedObject("Tag XML", OUTPUT_XML));
         } else if (what.equals(WHAT_TYPE)) {
             types.add(new TwoFacedObject("Type XML", OUTPUT_XML));
-        } else if (what.equals(WHAT_GROUP)) {
-            types.add(new TwoFacedObject("Group XML", OUTPUT_XML));
         } else {
             types.add(new TwoFacedObject("XML", OUTPUT_XML));
         }
@@ -172,66 +170,6 @@ public class XmlOutputHandler extends OutputHandler {
     }
 
 
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param groups _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Result listGroups(Request request, List<Group> groups)
-            throws Exception {
-        StringBuffer sb     = new StringBuffer();
-        String       output = request.getOutput();
-        sb.append(XmlUtil.XML_HEADER);
-        sb.append("\n");
-        sb.append(XmlUtil.openTag(TAG_GROUPS));
-
-        for (Group group : groups) {
-            getGroupTag(group, sb, false);
-        }
-        sb.append(XmlUtil.closeTag(TAG_GROUPS));
-        return new Result("", sb, getMimeType(output));
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Result listGroups(Request request) throws Exception {
-        TypeHandler typeHandler = repository.getTypeHandler(request);
-        Statement statement = typeHandler.executeSelect(request,
-                                  SqlUtil.distinct(COL_ENTRIES_GROUP_ID));
-        String[]     groups = SqlUtil.readString(statement, 1);
-        StringBuffer sb     = new StringBuffer();
-        String       output = request.getOutput();
-        sb.append(XmlUtil.XML_HEADER + "\n");
-        sb.append(XmlUtil.openTag(TAG_GROUPS));
-        for (int i = 0; i < groups.length; i++) {
-            Group group = repository.findGroup(groups[i]);
-            if (group == null) {
-                continue;
-            }
-            sb.append(XmlUtil.tag(TAG_GROUP,
-                                  XmlUtil.attrs(ATTR_NAME,
-                                      group.getFullName(), ATTR_ID,
-                                      group.getId())));
-        }
-        sb.append(XmlUtil.closeTag(TAG_GROUPS));
-        return new Result("", sb, getMimeType(output));
-    }
 
 
 
@@ -510,7 +448,17 @@ public class XmlOutputHandler extends OutputHandler {
      */
     public Result outputGroups(Request request, List<Group> groups)
             throws Exception {
-        return listGroups(request, groups);
+        StringBuffer sb     = new StringBuffer();
+        String       output = request.getOutput();
+        sb.append(XmlUtil.XML_HEADER);
+        sb.append("\n");
+        sb.append(XmlUtil.openTag(TAG_GROUPS));
+
+        for (Group group : groups) {
+            getGroupTag(group, sb, false);
+        }
+        sb.append(XmlUtil.closeTag(TAG_GROUPS));
+        return new Result("", sb, getMimeType(output));
     }
 
 

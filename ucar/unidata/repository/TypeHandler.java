@@ -82,6 +82,9 @@ public class TypeHandler implements Constants, Tables {
     public static final String TYPE_ANY = "any";
 
     /** _more_ */
+    public static final String TYPE_GROUP= "group";
+
+    /** _more_ */
     Repository repository;
 
     /** _more_ */
@@ -125,6 +128,11 @@ public class TypeHandler implements Constants, Tables {
         this.type        = type;
         this.description = description;
     }
+
+    public Entry createEntry(String id) {
+        return new Entry(id, this);
+    }
+
 
     /**
      * _more_
@@ -217,15 +225,15 @@ public class TypeHandler implements Constants, Tables {
     public Entry getEntry(ResultSet results) throws Exception {
         //id,type,name,desc,group,user,file,createdata,fromdate,todate
         int col = 3;
-        Entry entry =
-            new Entry(results.getString(1), this, results.getString(col++),
-                      results.getString(col++),
-                      repository.findGroup(results.getString(col++)),
-                      repository.getUserManager().findUser(results.getString(col++)),
-                      new Resource(results.getString(col++),results.getString(col++)),
-                      results.getTimestamp(col++).getTime(),
-                      results.getTimestamp(col++).getTime(),
-                      results.getTimestamp(col++).getTime());
+        Entry entry = createEntry(results.getString(1));
+        entry.init(results.getString(col++),
+                   results.getString(col++),
+                   repository.findGroup(results.getString(col++)),
+                   repository.getUserManager().findUser(results.getString(col++)),
+                   new Resource(results.getString(col++),results.getString(col++)),
+                   results.getTimestamp(col++).getTime(),
+                   results.getTimestamp(col++).getTime(),
+                   results.getTimestamp(col++).getTime(),null);
         entry.setSouth(results.getDouble(col++));
         entry.setNorth(results.getDouble(col++));
         entry.setEast(results.getDouble(col++));
@@ -648,7 +656,7 @@ public class TypeHandler implements Constants, Tables {
 
         String[] tableNames = {
             TABLE_ENTRIES, getTableName(), TABLE_METADATA, TABLE_USERS,
-            TABLE_GROUPS, TABLE_TAGS, TABLE_ASSOCIATIONS
+            TABLE_TAGS, TABLE_ASSOCIATIONS
         };
         List    tables     = new ArrayList();
         boolean didEntries = false;
@@ -788,7 +796,7 @@ public class TypeHandler implements Constants, Tables {
             String typeSelect = HtmlUtil.select(ARG_TYPE, tmp);
             formBuffer.append(
                 HtmlUtil.formEntry(
-                    "Entry Type:",
+                    "Type:",
                     typeSelect + " "
                     + HtmlUtil.submitImage(
                         repository.fileUrl("/Search16.gif"), "submit_type",
@@ -799,7 +807,7 @@ public class TypeHandler implements Constants, Tables {
             //            System.err.println("type handler: "
             //                               + typeHandlers.get(0).getDescription() + " "
             //                               + typeHandlers.get(0).getType());
-            formBuffer.append(HtmlUtil.formEntry("Entry Type:",
+            formBuffer.append(HtmlUtil.formEntry("Type:",
                     typeHandlers.get(0).getDescription()));
         }
         formBuffer.append("\n");
@@ -812,7 +820,7 @@ public class TypeHandler implements Constants, Tables {
                                     request.get(ARG_SEARCHMETADATA,
                                         false)) + " Search metadata";
         if (name.trim().length() == 0) {
-            formBuffer.append(HtmlUtil.formEntry("Entry Name:",
+            formBuffer.append(HtmlUtil.formEntry("Name:",
                     HtmlUtil.input(ARG_NAME) + searchMetaData));
         } else {
             HtmlUtil.hidden(ARG_NAME, name);
@@ -841,7 +849,7 @@ public class TypeHandler implements Constants, Tables {
                 }
             } else {
                 Statement stmt = executeSelect(request,
-                                     SqlUtil.distinct(COL_ENTRIES_GROUP_ID),
+                                     SqlUtil.distinct(COL_ENTRIES_PARENT_GROUP_ID),
                                      where);
 
                 List<Group> groups =
@@ -942,8 +950,8 @@ public class TypeHandler implements Constants, Tables {
                 groupName = groupName.substring(1);
             }
             if (groupName.endsWith("%")) {
-                //                where.add(SqlUtil.eq(COL_GROUPS_ID,ENTRIES_GROUP_ID));
-                where.add(SqlUtil.like(COL_ENTRIES_GROUP_ID, groupName));
+                //                where.add(SqlUtil.eq(COL_GROUPS_ID,ENTRIES_PARENT_GROUP_ID));
+                where.add(SqlUtil.like(COL_ENTRIES_PARENT_GROUP_ID, groupName));
             } else {
                 Group group = repository.findGroupFromName(groupName);
                 if (group == null) {
@@ -955,23 +963,23 @@ public class TypeHandler implements Constants, Tables {
                         (String) null);
                 if (Misc.equals(searchChildren, "true")) {
                     String sub = (doNot
-                                  ? SqlUtil.notLike(COL_ENTRIES_GROUP_ID,
+                                  ? SqlUtil.notLike(COL_ENTRIES_PARENT_GROUP_ID,
                                       group.getId() + Group.IDDELIMITER + "%")
-                                  : SqlUtil.like(COL_ENTRIES_GROUP_ID,
+                                  : SqlUtil.like(COL_ENTRIES_PARENT_GROUP_ID,
                                       group.getId() + Group.IDDELIMITER
                                       + "%"));
                     String equals = (doNot
-                                     ? SqlUtil.neq(COL_ENTRIES_GROUP_ID,
+                                     ? SqlUtil.neq(COL_ENTRIES_PARENT_GROUP_ID,
                                          SqlUtil.quote(group.getId()))
-                                     : SqlUtil.eq(COL_ENTRIES_GROUP_ID,
+                                     : SqlUtil.eq(COL_ENTRIES_PARENT_GROUP_ID,
                                          SqlUtil.quote(group.getId())));
                     where.add("(" + sub + " OR " + equals + ")");
                 } else {
                     if (doNot) {
-                        where.add(SqlUtil.neq(COL_ENTRIES_GROUP_ID,
+                        where.add(SqlUtil.neq(COL_ENTRIES_PARENT_GROUP_ID,
                                 SqlUtil.quote(group.getId())));
                     } else {
-                        where.add(SqlUtil.eq(COL_ENTRIES_GROUP_ID,
+                        where.add(SqlUtil.eq(COL_ENTRIES_PARENT_GROUP_ID,
                                              SqlUtil.quote(group.getId())));
                     }
                 }

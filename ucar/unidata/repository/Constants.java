@@ -241,8 +241,6 @@ public interface Constants {
     /** _more_ */
     public static final String WHAT_USER = "user";
 
-    /** _more_ */
-    public static final String WHAT_GROUP = "group";
 
     /** _more_ */
     public static final String ARG_MAX = "max";

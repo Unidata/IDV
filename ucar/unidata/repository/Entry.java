@@ -76,6 +76,8 @@ public class Entry extends Entity {
     /** _more_          */
     private double west = NONGEO;
 
+    public  Entry() {}
+
 
     /**
      * _more_
@@ -88,91 +90,13 @@ public class Entry extends Entity {
         this.typeHandler = typeHandler;
     }
 
-    /**
-     * _more_
-     *
-     *
-     *
-     * @param id _more_
-     * @param typeHandler _more_
-     * @param name _more_
-     * @param description _more_
-     * @param group _more_
-     * @param user _more_
-     * @param resource _more_
-     * @param date _more_
-     */
-    public Entry(String id, TypeHandler typeHandler, String name,
-                 String description, Group group, User user, Resource resource,
-                 long date) {
-        this(id, typeHandler, name, description, group, user, resource,  date,
-             date, date);
-    }
 
 
-    /**
-     * _more_
-     *
-     * @param id _more_
-     * @param typeHandler _more_
-     * @param name _more_
-     * @param description _more_
-     * @param group _more_
-     * @param user _more_
-     * @param resource _more_
-     * @param date _more_
-     * @param values _more_
-     */
-    public Entry(String id, TypeHandler typeHandler, String name,
-                 String description, Group group, User user, Resource resource,
-                 long date, Object[] values) {
-        this(id, typeHandler, name, description, group, user, resource,  date,
-             date, date, values);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param id _more_
-     * @param typeHandler _more_
-     * @param name _more_
-     * @param description _more_
-     * @param group _more_
-     * @param user _more_
-     * @param resource _more_
-     * @param createDate _more_
-     * @param startDate _more_
-     * @param endDate _more_
-     */
-    public Entry(String id, TypeHandler typeHandler, String name,
-                 String description, Group group, User user, Resource resource, 
-                 long createDate, long startDate, long endDate) {
-        this(id, typeHandler, name, description, group, user, resource, 
-             createDate, startDate, endDate, null);
-    }
-
-    /**
-     * _more_
-     *
-     * @param id _more_
-     * @param typeHandler _more_
-     * @param name _more_
-     * @param description _more_
-     * @param group _more_
-     * @param user _more_
-     * @param resource _more_
-     * @param createDate _more_
-     * @param startDate _more_
-     * @param endDate _more_
-     * @param values _more_
-     */
-    public Entry(String id, TypeHandler typeHandler, String name,
-                 String description, Group group, User user, Resource resource, 
-                 long createDate, long startDate, long endDate,
-                 Object[] values) {
-        super(id,name,description, group, user, createDate);
-        this.typeHandler = typeHandler;
+    public void init(String name,
+                     String description, Group group, User user, Resource resource, 
+                     long createDate, long startDate, long endDate,
+                     Object[] values) {
+        super.init(name,description, group, user, createDate);
         this.resource    = resource;
         this.startDate   = startDate;
         this.endDate     = endDate;
@@ -219,6 +143,11 @@ public class Entry extends Entity {
         return resource;
     }
 
+    public void setDate(long value) {
+        super.setCreateDate(value);
+        setStartDate(value);
+        setEndDate(value);
+    }
 
 
 
