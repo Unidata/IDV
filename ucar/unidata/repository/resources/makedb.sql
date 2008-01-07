@@ -6,19 +6,6 @@ CREATE TABLE  globals (name varchar(500),
                        value varchar(1000));
 
 
-CREATE TABLE groups (id varchar(200),
-	           name varchar(200),
-                   description varchar(1000),
-                   parent_group_id varchar(200),
-   		   user_id varchar(200),
-	           createdate timestamp); 
-
-
-CREATE INDEX GROUPS_INDEX_ID ON groups (ID);
-CREATE INDEX GROUPS_INDEX_PARENT_GROUP_ID ON groups (PARENT_GROUP_ID);
-CREATE INDEX GROUPS_INDEX_USER_ID ON groups (USER_ID);
-
-
 
 CREATE TABLE entries (id varchar(200),
                    type varchar(200),
@@ -38,7 +25,7 @@ CREATE TABLE entries (id varchar(200),
 
 CREATE INDEX ENTRIES_INDEX_ID ON entries (ID);
 CREATE INDEX ENTRIES_INDEX_RESOURCE ON entries (RESOURCE);
-CREATE INDEX ENTRIES_INDEX_GROUP ON entries (GROUP_ID);
+CREATE INDEX ENTRIES_INDEX_PARENT_GROUP_ID ON entries (PARENT_GROUP_ID);
 CREATE INDEX ENTRIES_INDEX_TYPE ON entries (TYPE);
 CREATE INDEX ENTRIES_INDEX_USER_ID ON entries (USER_ID);
 

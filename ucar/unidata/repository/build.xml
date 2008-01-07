@@ -3,7 +3,23 @@
 
 <project basedir="../../../" default="repositoryjar" name="Repository">
 
-    <import file="../../build.xml"/>
+
+    <target name="init">
+        <property name="srcdir" value="${basedir}"/>
+        <property name="compiledir" value="${srcdir}"/>
+        <property name="classpath" value=""/>
+        <property name="srcversion" value="1.5"/>
+        <property name="jars_dest" value="${basedir}/lib"/>
+        <property name="libsrc" value="${basedir}/libsrc"/>
+        <property name="libsdir" value="${jars_dest}"/>
+        <property name="tmpjardir" value="${libsdir}/tmpjardir" />
+    </target>
+
+    <target name="clean" depends="init" >
+        <delete>
+            <fileset dir="${compiledir}/ucar" includes="**/*.class"/>
+        </delete>
+    </target>
 
     <target name="repository" depends="init,clean">
         <javac

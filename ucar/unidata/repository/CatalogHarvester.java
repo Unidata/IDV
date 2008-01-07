@@ -118,6 +118,7 @@ public class CatalogHarvester extends Harvester {
             return;
         }
 
+        /*
         if(node.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
             Element serviceNode = ucar.unidata.idv.chooser.ThreddsHandler.findServiceNodeForDataset(node, false,
                                                                                                     null);
@@ -127,15 +128,14 @@ public class CatalogHarvester extends Harvester {
                 if(path!=null) {
                     //                    System.err.println ("got path:" + path);
                     //                    System.err.println ("full path:" + XmlUtil.getAttribute(serviceNode,"base") + path);
-                    return;
+                    //                    return;
                 }
             }
-        }
+            }*/
 
         NodeList elements = XmlUtil.getElements(node);
         String urlPath = XmlUtil.getAttribute(node, CatalogOutputHandler.ATTR_URLPATH, (String)null);
         if(urlPath!=null) {
-            System.err.println("skipping 1:" + urlPath + " " + catalogUrl);
             return;
         }
         if(urlPath == null) {

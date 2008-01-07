@@ -227,15 +227,12 @@ public class PatternHarvester extends Harvester {
         int cnt = 0;
         while (getActive()) {
             long        t1 = System.currentTimeMillis();
-            List<Entry> entries= collectEntries(rootDir, dirs, (cnt == 0),
-                                                baseGroupName, typeHandler);
+            collectEntries(rootDir, dirs, (cnt == 0),
+                           baseGroupName, typeHandler);
             long t2 = System.currentTimeMillis();
             cnt++;
-            System.err.println("found:" + entries.size() + " files in:"
-                               + (t2 - t1) + "ms");
-            if ( !repository.processEntries(this, typeHandler, entries)) {
-                break;
-            }
+            //            System.err.println("found:" + entries.size() + " files in:"
+            //                               + (t2 - t1) + "ms");
             if ( !getMonitor()) {
                 break;
             }
@@ -274,14 +271,14 @@ public class PatternHarvester extends Harvester {
      *
      * @throws Exception _more_
      */
-    public List<Entry> collectEntries(File rootDir, List<FileInfo> dirs,
-                                      boolean firstTime,
-                                      String rootGroup,
-                                      TypeHandler typeHandler)
+    public void collectEntries(File rootDir, List<FileInfo> dirs,
+                               boolean firstTime,
+                               String rootGroup,
+                               TypeHandler typeHandler)
             throws Exception {
 
         long              t1      = System.currentTimeMillis();
-        final List<Entry> entries = new ArrayList();
+        List<Entry> entries = new ArrayList();
         final User        user       = repository.getUserManager().getDefaultUser();
         final String      rootStr    = rootDir.toString();
         final int         rootStrLen = rootStr.length();
@@ -314,8 +311,11 @@ public class PatternHarvester extends Harvester {
                     continue;
                 }
                 if (entries.size() % 1000 == 0) {
-                    System.err.print(".");
+                    //                    System.err.print(".");
                 }
+
+
+
                 Hashtable map       = new Hashtable();
                 Date      fromDate  = null;
                 Date      toDate    = null;
@@ -414,9 +414,17 @@ public class PatternHarvester extends Harvester {
                 }
                 typeHandler.initializeNewEntry(entry);
 
+                if(entries.size()>1000) {
+                    if ( !repository.processEntries(this, typeHandler, entries)) {
+                        return;
+                    }
+                    entries = new ArrayList();
+                }
+
+
             }
         }
-        return entries;
+        repository.processEntries(this, typeHandler, entries);
     }
 
 

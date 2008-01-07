@@ -5,8 +5,8 @@
                 tagtemplate="${extension}"
                 active="true"
 		class="ucar.unidata.repository.PatternHarvester"
-	        rootdir="c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar"
-		xrootdir="/harpo/jeffmc/src/idv/trunk/ucar"
+                xrootdir="c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar"
+		rootdir="/harpo/jeffmc/src/idv/trunk/ucar"
 		basegroup="Files/Source"
 		filepattern=".*"
 		type="file"
@@ -19,10 +19,10 @@
                 tagtemplate="${extension}"
                 active="true"
                 class="ucar.unidata.repository.PatternHarvester"
-		rootdir="c:/cygwin/home/jeffmc/pictures"
-		xrootdir="/home/jeffmc/pictures"
+		xrootdir="c:/cygwin/home/jeffmc/pictures"
+		rootdir="/home/jeffmc/pictures"
 		basegroup="Files/Images"
-		filepattern=".*\.jpg$|.*\.jpeg$|.*\.gif$|.*\.png$"
+		filepattern=".*\.jpg$|.*\.jpeg$|.*\.gif$|.*\.png$|.*\.JPG$|.*\.JPEG$|.*\.GIF$|.*\.PNG$"
 		type="image"
                 monitor="false"
 		sleep="1"/>
@@ -31,8 +31,8 @@
   <harvester    name="IDD/NIDS"
                 active="true"
                 class="ucar.unidata.repository.PatternHarvester"
-		rootdir="c:/cygwin/home/jeffmc/unidata/data/repository/NIDS"
-		xrootdir="/data/ldm/gempak/nexrad/NIDS"
+		xrootdir="c:/cygwin/home/jeffmc/unidata/data/repository/NIDS"
+		rootdir="/data/ldm/gempak/nexrad/NIDS"
 		basegroup="IDD/NIDS"
 		filepattern="([^/]+)/([^/]+)/[^/]+_(\d\d\d\d\d\d\d\d_\d\d\d\d)"
 		type="level3radar"
@@ -47,7 +47,7 @@
 
 
    <harvester   name="IDD/Craft"
-                active="false"
+                active="true"
                 class="ucar.unidata.repository.PatternHarvester"
 		rootdir="/data/ldm/gempak/nexrad/craft"
 		basegroup="IDD/Craft"
@@ -68,7 +68,7 @@
 
 
    <harvester   name="IDD/Gempak Grids"
-                active="false"
+                active="true"
                 class="ucar.unidata.repository.PatternHarvester"
 		rootdir="/data/ldm/gempak/model"
 		basegroup="IDD/Gempak Model Grids"
@@ -87,7 +87,7 @@
 
 
    <harvester   name="IDD/Satellite"
-                active="false"
+                active="true"
                 class="ucar.unidata.repository.PatternHarvester"
 		rootdir="/data/ldm/gempak/images/sat"
 		basegroup="IDD/Satellite"

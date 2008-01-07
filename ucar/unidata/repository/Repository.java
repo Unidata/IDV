@@ -465,9 +465,9 @@ public class Repository implements Constants, Tables, RequestHandler {
         }
 
         mimeTypes = new Properties();
-        for (String mimeFile : StringUtil.split(
+        for (Object mimeFile : StringUtil.split(
                                                 getProperty(PROP_HTML_MIMEPROPERTIES), ";", true, true)) {
-            mimeTypes.load(IOUtil.getInputStream(mimeFile, getClass()));
+            mimeTypes.load(IOUtil.getInputStream((String)mimeFile, getClass()));
         }
 
 
@@ -1974,17 +1974,17 @@ public class Repository implements Constants, Tables, RequestHandler {
         headerBuffer.append("<table cellpadding=\"5\">");
         String formLinks = "";
         if (basicForm) {
-            formLinks =  HtmlUtil.bold("Basic Search") +"&nbsp;|&nbsp;" + HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SEARCHFORM,ARG_FORM_TYPE,
-                                                                                                     "advanced")+ "&"+urlArgs, "Advanced Search");
+            formLinks =  HtmlUtil.bold("Basic") +"&nbsp;|&nbsp;" + HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SEARCHFORM,ARG_FORM_TYPE,
+                                                                                                     "advanced")+ "&"+urlArgs, "Advanced");
 
         } else {
             formLinks =  HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SEARCHFORM,ARG_FORM_TYPE,
-                                                    "basic")+ "&"+urlArgs, "Basic Search") +
+                                                    "basic")+ "&"+urlArgs, "Basic") +
                 "&nbsp;|&nbsp;" + 
-                HtmlUtil.bold("Advanced Search") ;
+                HtmlUtil.bold("Advanced") ;
         }
 
-        headerBuffer.append(HtmlUtil.formEntry("",
+        headerBuffer.append(HtmlUtil.formEntry("Search:",
                                                formLinks));
         sb.append(HtmlUtil.form(HtmlUtil.url(URL_ENTRY_SEARCH, ARG_NAME,
                                              WHAT_ENTRIES)));
@@ -2619,7 +2619,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                 throw new IllegalArgumentException("Must specify a parent group");
             }
             Group parentGroup = findGroupFromName(groupName,  request.getRequestContext().getUser(), true);
-            String id       = (entry instanceof Group? getGroupId(parentGroup):getGUID());
+            String id       = (typeHandler.isType(TypeHandler.TYPE_GROUP)? getGroupId(parentGroup):getGUID());
             String name = request.getString(ARG_NAME,
                                             IOUtil.getFileTail(resource));
 
@@ -2886,6 +2886,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         }
         Group group = findGroupFromName(groupNameOrId);
         if (group == null) {
+            group = findGroup(groupNameOrId);
         }
 
         if (group == null) {
@@ -3784,7 +3785,8 @@ public class Repository implements Constants, Tables, RequestHandler {
 
         Statement statement =
             execute(SqlUtil.makeSelect(COLUMNS_ENTRIES,
-                                       Misc.newList(TABLE_ENTRIES)));
+                                       Misc.newList(TABLE_ENTRIES),
+                                       SqlUtil.eq(COL_ENTRIES_TYPE, SqlUtil.quote(TypeHandler.TYPE_GROUP))));
         readGroups(statement);
     }
 
@@ -3803,7 +3805,8 @@ public class Repository implements Constants, Tables, RequestHandler {
         }
         for (Group group : groups) {
             if (group.getParentGroupId() != null) {
-                group.setParentGroup(findGroup(group.getParentGroupId()));
+                Group parentGroup = (Group) groupMap.get(group.getParentGroupId());
+                group.setParentGroup(parentGroup);
             }
             groupMap.put(group.getFullName(), group);
         }
@@ -3903,15 +3906,17 @@ public class Repository implements Constants, Tables, RequestHandler {
     private Group findGroupFromName(String name, User user, boolean createIfNeeded, boolean isTop)
         throws Exception {
         synchronized (MUTEX_GROUP) {
+            if(!name.equals(GROUP_TOP) && !name.startsWith(GROUP_TOP+"/")) {
+                name = GROUP_TOP +"/"+name;
+            }
             Group group = groupMap.get(name);
             if (group != null) {
                 return group;
             }
+            //            System.err.println("Looking for:" + name);
+
             List<String> toks = (List<String>) StringUtil.split(name, "/",
                                                                 true, true);
-            if(!isTop && toks.size()>0 && !toks.get(0).equals(GROUP_TOP)) {
-                toks.add(0,GROUP_TOP);
-            }
             Group  parent = null;
             String lastName;
             if ((toks.size() == 0) || (toks.size() == 1)) {
@@ -3956,7 +3961,7 @@ public class Repository implements Constants, Tables, RequestHandler {
                 addNewEntry(group);
             }
             groupMap.put(group.getId(), group);
-            groupMap.put(name, group);
+            groupMap.put(group.getFullName(), group);
             return group;
         }
     }
@@ -4728,6 +4733,9 @@ public class Repository implements Constants, Tables, RequestHandler {
             System.err.println("query:" + sql);
             System.err.println("query time:" + (t2 - t1));
         }
+        if (t2 - t1 > 2000) {
+            Misc.printStack("query:" + sql);
+        }
         return statement;
     }
 
@@ -4846,8 +4854,8 @@ public class Repository implements Constants, Tables, RequestHandler {
             */
             long t2 = System.currentTimeMillis();
             insertEntries(needToAdd,true);
-            System.err.println("Took:" + (t2 - t1) + "ms to check: "
-                               + entries.size() + " entries");
+            //            System.err.println("Took:" + (t2 - t1) + "ms to check: "
+            //                               + entries.size() + " entries");
         } catch (Exception exc) {
             log("Processing:" + query, exc);
             return false;
