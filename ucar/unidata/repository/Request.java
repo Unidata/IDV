@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -496,14 +497,24 @@ public class Request implements Constants {
         return DateUtil.parse(result);
     }
 
-    public Date[] getDateRange(String from, String to, Date dflt) throws java.text.ParseException {
-        String fromDate = (String) getDateSelect(from,
-                                                 "").trim();
-        String toDate = (String) getDateSelect(ARG_TODATE,
-                                               "").trim();
+    /**
+     * _more_
+     *
+     * @param from _more_
+     * @param to _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     *
+     * @throws java.text.ParseException _more_
+     */
+    public Date[] getDateRange(String from, String to, Date dflt)
+            throws java.text.ParseException {
+        String fromDate = (String) getDateSelect(from, "").trim();
+        String toDate   = (String) getDateSelect(ARG_TODATE, "").trim();
 
-        Date fromDttm = DateUtil.parseRelative(dflt, fromDate, -1);
-        Date toDttm   = DateUtil.parseRelative(dflt, toDate, +1);
+        Date   fromDttm = DateUtil.parseRelative(dflt, fromDate, -1);
+        Date   toDttm   = DateUtil.parseRelative(dflt, toDate, +1);
         if ((fromDate.length() > 0) && (fromDttm == null)) {
             if ( !fromDate.startsWith("-")) {
                 fromDttm = DateUtil.parse(fromDate);
@@ -531,7 +542,7 @@ public class Request implements Constants {
             toDttm = DateUtil.getRelativeDate(fromDttm, toDate);
         }
 
-        return new Date[]{fromDttm, toDttm};
+        return new Date[] { fromDttm, toDttm };
     }
 
 

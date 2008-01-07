@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -84,7 +85,7 @@ public class Harvester {
     /** _more_ */
     public static final String TAG_HARVESTER = "harvester";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_CLASS = "class";
 
     /** _more_ */
@@ -103,10 +104,10 @@ public class Harvester {
     /** _more_ */
     public static final String ATTR_SLEEP = "sleep";
 
-    /** _more_          */
+    /** _more_ */
     protected Harvester parent;
 
-    /** _more_          */
+    /** _more_ */
     protected List<Harvester> children;
 
     /** _more_ */
@@ -132,6 +133,7 @@ public class Harvester {
     private double sleepMinutes = 5;
 
 
+    /** _more_          */
     private String id;
 
     /**
@@ -141,7 +143,7 @@ public class Harvester {
      */
     public Harvester(Repository repository) {
         this.repository = repository;
-        this.id = repository.getGUID();
+        this.id         = repository.getGUID();
     }
 
 
@@ -168,6 +170,11 @@ public class Harvester {
         this.rootDir = new File(XmlUtil.getAttribute(element, ATTR_ROOTDIR));
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getId() {
         return id;
     }
@@ -235,6 +242,8 @@ public class Harvester {
      * _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
     public String getExtraInfo() throws Exception {
         return "";

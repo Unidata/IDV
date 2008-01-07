@@ -6,7 +6,7 @@
                 active="true"
 		class="ucar.unidata.repository.PatternHarvester"
                 xrootdir="c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar"
-		rootdir="/harpo/jeffmc/src/idv/trunk/ucar"
+		rootdir="/home/jeffmc/ucar"
 		basegroup="Files/Source"
 		filepattern=".*"
 		type="file"

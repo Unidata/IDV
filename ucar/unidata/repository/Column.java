@@ -19,6 +19,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -40,8 +41,8 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Date;
+import java.util.Enumeration;
 
 import java.util.Hashtable;
 import java.util.List;
@@ -110,6 +111,7 @@ public class Column implements Tables, Constants {
     /** _more_ */
     private static final String ATTR_NAME = "name";
 
+    /** _more_          */
     private static final String ATTR_SUFFIX = "suffix";
 
     /** _more_ */
@@ -168,6 +170,7 @@ public class Column implements Tables, Constants {
     /** _more_ */
     private String type;
 
+    /** _more_          */
     private String suffix;
 
     /** _more_ */
@@ -200,7 +203,7 @@ public class Column implements Tables, Constants {
     /** _more_ */
     private String namesFile;
 
-    /** _more_          */
+    /** _more_ */
     private int offset;
 
 
@@ -216,7 +219,7 @@ public class Column implements Tables, Constants {
         this.typeHandler = typeHandler;
         this.offset      = offset;
         name             = XmlUtil.getAttribute(element, ATTR_NAME);
-        suffix            = XmlUtil.getAttribute(element, ATTR_SUFFIX,"");
+        suffix           = XmlUtil.getAttribute(element, ATTR_SUFFIX, "");
         label            = XmlUtil.getAttribute(element, ATTR_LABEL, name);
         searchType = XmlUtil.getAttribute(element, ATTR_SEARCHTYPE,
                                           searchType);
@@ -249,15 +252,37 @@ public class Column implements Tables, Constants {
         return type.equals(TYPE_INT) || type.equals(TYPE_DOUBLE);
     }
 
-    private String toString(Object[]values, int idx) {
-        if(values == null) return "";
-        if(values[idx]==null) return "";
+    /**
+     * _more_
+     *
+     * @param values _more_
+     * @param idx _more_
+     *
+     * @return _more_
+     */
+    private String toString(Object[] values, int idx) {
+        if (values == null) {
+            return "";
+        }
+        if (values[idx] == null) {
+            return "";
+        }
         return values[idx].toString();
     }
 
-    private boolean toBoolean(Object[]values, int idx) {
-        if(values[idx]==null) return true;
-        return ((Boolean)values[idx]).booleanValue();
+    /**
+     * _more_
+     *
+     * @param values _more_
+     * @param idx _more_
+     *
+     * @return _more_
+     */
+    private boolean toBoolean(Object[] values, int idx) {
+        if (values[idx] == null) {
+            return true;
+        }
+        return ((Boolean) values[idx]).booleanValue();
     }
 
 
@@ -273,15 +298,15 @@ public class Column implements Tables, Constants {
      */
     protected int formatValue(StringBuffer sb, String output,
                               Object[] values, int valueIdx) {
-        
+
         if (type.equals(TYPE_LATLON)) {
-            sb.append(toString(values,valueIdx));
+            sb.append(toString(values, valueIdx));
             valueIdx++;
             sb.append(",");
-            sb.append(toString(values,valueIdx));
+            sb.append(toString(values, valueIdx));
             valueIdx++;
         } else {
-            sb.append(toString(values,valueIdx));
+            sb.append(toString(values, valueIdx));
             valueIdx++;
         }
         return valueIdx;
@@ -328,7 +353,7 @@ public class Column implements Tables, Constants {
             stmt.setDouble(valueIdx + 2, lon);
             valueIdx++;
         } else {
-            stmt.setString(valueIdx + 2, toString(values,valueIdx));
+            stmt.setString(valueIdx + 2, toString(values, valueIdx));
             valueIdx++;
         }
         return valueIdx;
@@ -518,77 +543,92 @@ public class Column implements Tables, Constants {
     }
 
 
-    public void addToEntryForm(Request request, StringBuffer formBuffer, Entry entry)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param formBuffer _more_
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addToEntryForm(Request request, StringBuffer formBuffer,
+                               Entry entry)
             throws Exception {
-        String widget = "";
-        Object[]values = (entry==null?null:entry.getValues());
+        String   widget = "";
+        Object[] values = ((entry == null)
+                           ? null
+                           : entry.getValues());
         if (type.equals(TYPE_LATLON)) {
             widget = HtmlUtil.makeLatLonBox(getFullName(), "", "", "", "");
         } else if (type.equals(TYPE_BOOLEAN)) {
             String value = "True";
-            if(entry!=null) {
-                if(toBoolean(values,offset)) {
+            if (entry != null) {
+                if (toBoolean(values, offset)) {
                     value = "True";
                 } else {
                     value = "False";
                 }
             }
             widget = HtmlUtil.select(getFullName(),
-                                     Misc.newList("True", "False"),
-                                     value);
+                                     Misc.newList("True", "False"), value);
         } else if (type.equals(TYPE_ENUMERATION)) {
             String value = "";
-            if(entry!=null) {
-                value = (String)toString(values, offset);
+            if (entry != null) {
+                value = (String) toString(values, offset);
             }
             widget = HtmlUtil.select(getFullName(), this.values, value);
         } else if (type.equals(TYPE_INT)) {
             String value = "";
-            if(entry!=null) {
-                value = ""+toString(values, offset);
+            if (entry != null) {
+                value = "" + toString(values, offset);
             }
             widget = HtmlUtil.input(getFullName(), value, "size=\"10\"");
         } else if (type.equals(TYPE_DOUBLE)) {
             String value = "";
-            if(entry!=null) {
-                value = ""+toString(values,offset);
+            if (entry != null) {
+                value = "" + toString(values, offset);
             }
             widget = HtmlUtil.input(getFullName(), value, "size=\"10\"");
         } else {
             String value = "";
-            if(entry!=null) {
-                value = toString(values,offset);
+            if (entry != null) {
+                value = toString(values, offset);
             }
             if (searchType.equals(SEARCHTYPE_SELECT)) {
-                Hashtable props = typeHandler.getRepository().getFieldProperties(namesFile);
+                Hashtable props =
+                    typeHandler.getRepository().getFieldProperties(namesFile);
                 List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
-                if(props!=null) {
+                if (props != null) {
                     for (Enumeration keys = props.keys();
-                         keys.hasMoreElements(); ) {
+                            keys.hasMoreElements(); ) {
                         String id = (String) keys.nextElement();
-                        if(id.endsWith(".label")) {
-                            id  = id.substring(0,id.length()-".label".length());
-                            tfos.add(new TwoFacedObject(getLabel(id),id));
+                        if (id.endsWith(".label")) {
+                            id = id.substring(0,
+                                    id.length() - ".label".length());
+                            tfos.add(new TwoFacedObject(getLabel(id), id));
                         }
                     }
                 }
-                
-                tfos = (List<TwoFacedObject>)Misc.sort(tfos);
+
+                tfos = (List<TwoFacedObject>) Misc.sort(tfos);
                 if (tfos.size() == 0) {
-                    widget =
-                        HtmlUtil.input(getFullName(),value, " size=10 ");
+                    widget = HtmlUtil.input(getFullName(), value,
+                                            " size=10 ");
                 } else {
 
-                    widget = HtmlUtil.select(getFullName(), tfos,value);
+                    widget = HtmlUtil.select(getFullName(), tfos, value);
                 }
             } else if (rows > 1) {
-                widget = HtmlUtil.textArea(getFullName(), value, rows, columns);
+                widget = HtmlUtil.textArea(getFullName(), value, rows,
+                                           columns);
             } else {
                 widget = HtmlUtil.input(getFullName(), value,
                                         "size=\"" + columns + "\"");
             }
         }
-        formBuffer.append(HtmlUtil.formEntry(getLabel()+ ":", HtmlUtil.hbox(widget,suffix)));
+        formBuffer.append(HtmlUtil.formEntry(getLabel() + ":",
+                                             HtmlUtil.hbox(widget, suffix)));
         formBuffer.append("\n");
     }
 
@@ -648,7 +688,7 @@ public class Column implements Tables, Constants {
                     list.add(new TwoFacedObject(getLabel(values[i]),
                             values[i]));
                 }
-                
+
                 List sorted = Misc.sort(list);
                 list = new ArrayList<TwoFacedObject>();
                 list.addAll(sorted);
@@ -668,7 +708,11 @@ public class Column implements Tables, Constants {
                                         "size=\"" + columns + "\"");
             }
         }
-        formBuffer.append(HtmlUtil.formEntry(getLabel()+ ":", "<table>"+HtmlUtil.row(HtmlUtil.cols(widget,suffix))+"</table>"));
+        formBuffer.append(
+            HtmlUtil.formEntry(
+                getLabel() + ":",
+                "<table>" + HtmlUtil.row(HtmlUtil.cols(widget, suffix))
+                + "</table>"));
         formBuffer.append("\n");
     }
 

@@ -21,13 +21,17 @@
  */
 
 
+
+
 package ucar.unidata.repository;
+
 
 import org.w3c.dom.*;
 
 import ucar.unidata.data.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
+import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
@@ -62,158 +66,258 @@ import java.util.Properties;
 
 
 
+/**
+ * Class CatalogHarvester _more_
+ *
+ *
+ * @author IDV Development Team
+ * @version $Revision: 1.3 $
+ */
 public class CatalogHarvester extends Harvester {
+
+    /** _more_ */
     Group topGroup;
+
+    /** _more_ */
     boolean recurse = false;
+
+    /** _more_ */
     Hashtable seen = new Hashtable();
+
+    /** _more_ */
     List groups = new ArrayList();
-    int catalogCnt=0;
+
+    /** _more_ */
+    int catalogCnt = 0;
+
+    /** _more_ */
     User user;
+
+    /** _more_ */
     String topUrl;
 
-    public CatalogHarvester(Repository repository,Group group, String url, User user, boolean recurse) {
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param group _more_
+     * @param url _more_
+     * @param user _more_
+     * @param recurse _more_
+     */
+    public CatalogHarvester(Repository repository, Group group, String url,
+                            User user, boolean recurse) {
         super(repository);
         setName("Catalog harvester");
-        this.recurse = recurse;
+        this.recurse  = recurse;
         this.topGroup = group;
-        this.topUrl = url;
-        this.user = user;
+        this.topUrl   = url;
+        this.user     = user;
     }
 
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     protected void runInner() throws Exception {
         groups = new ArrayList();
         importCatalog(topUrl, topGroup);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param url _more_
+     * @param parent _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private boolean importCatalog(String url, Group parent) throws Exception {
-        if(!getActive()) return true;
-        if(seen.get(url)!=null) return true;
+        if ( !getActive()) {
+            return true;
+        }
+        if (seen.get(url) != null) {
+            return true;
+        }
         catalogCnt++;
-        if(catalogCnt%10 == 0)
+        if (catalogCnt % 10 == 0) {
             System.err.print(".");
+        }
         //        http://data.eol.ucar.edu/jedi/catalog/ucar.ncar.eol.project.ATLAS.thredds.xml
         //        if(catalogCnt>100) return true;
-        seen.put(url,url);
+        seen.put(url, url);
         //        System.err.println(url);
         try {
-            Element root  = XmlUtil.getRoot(url, getClass());
-            Node child = XmlUtil.findChild(root, CatalogOutputHandler.TAG_DATASET);
-            if(child!=null) {
-                recurseCatalog((Element)child,parent,url,0);
+            Element root = XmlUtil.getRoot(url, getClass());
+            Node child = XmlUtil.findChild(root,
+                                           CatalogOutputHandler.TAG_DATASET);
+            if (child != null) {
+                recurseCatalog((Element) child, parent, url, 0);
             }
             return true;
-        } catch(Exception exc) {
-            System.err.println ("exc:" + exc);
+        } catch (Exception exc) {
+            System.err.println("exc:" + exc);
             //            log("",exc);
-            return  false;
+            return false;
         }
     }
 
-        private void recurseCatalog(Element node, Group parent,  String catalogUrl, int depth) throws Exception {
-            if(!getActive()) return;
+    /**
+     * _more_
+     *
+     * @param node _more_
+     * @param parent _more_
+     * @param catalogUrl _more_
+     * @param depth _more_
+     *
+     * @throws Exception _more_
+     */
+    private void recurseCatalog(Element node, Group parent,
+                                String catalogUrl, int depth)
+            throws Exception {
+
+        if ( !getActive()) {
+            return;
+        }
         String name = XmlUtil.getAttribute(node, ATTR_NAME);
-        if(depth>1) {
+        if (depth > 1) {
             return;
         }
 
-        /*
-        if(node.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
-            Element serviceNode = ucar.unidata.idv.chooser.ThreddsHandler.findServiceNodeForDataset(node, false,
-                                                                                                    null);
 
-            if (serviceNode != null) {
-                String path = ucar.unidata.idv.chooser.ThreddsHandler.getUrlPath(node);
-                if(path!=null) {
-                    //                    System.err.println ("got path:" + path);
-                    //                    System.err.println ("full path:" + XmlUtil.getAttribute(serviceNode,"base") + path);
-                    //                    return;
-                }
-            }
-            }*/
+
 
         NodeList elements = XmlUtil.getElements(node);
-        String urlPath = XmlUtil.getAttribute(node, CatalogOutputHandler.ATTR_URLPATH, (String)null);
-        if(urlPath!=null) {
-            return;
-        }
-        if(urlPath == null) {
-            Element accessNode = XmlUtil.findChild(node,CatalogOutputHandler.TAG_ACCESS);
-            if(accessNode!=null) {
-                urlPath = XmlUtil.getAttribute(accessNode, CatalogOutputHandler.ATTR_URLPATH);
+        String urlPath = XmlUtil.getAttribute(node,
+                             CatalogOutputHandler.ATTR_URLPATH,
+                             (String) null);
+        if (urlPath == null) {
+            Element accessNode = XmlUtil.findChild(node,
+                                     CatalogOutputHandler.TAG_ACCESS);
+            if (accessNode != null) {
+                urlPath = XmlUtil.getAttribute(accessNode,
+                        CatalogOutputHandler.ATTR_URLPATH);
             }
         }
 
 
-        if(elements.getLength()==0 && depth>0 && urlPath!=null) {
-            System.err.println("skipping 2:" + urlPath + " " + catalogUrl);
+        boolean haveChildDatasets = false;
+        for (int i = 0; i < elements.getLength(); i++) {
+            Element child = (Element) elements.item(i);
+            if (child.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
+                haveChildDatasets = true;
+                break;
+            }
+        }
+
+        if ( !haveChildDatasets && (depth > 0) && (urlPath != null)) {
+            Element serviceNode = CatalogUtil.findServiceNodeForDataset(node,
+                                      false, null);
+            if (serviceNode != null) {
+                String path = XmlUtil.getAttribute(serviceNode, "base");
+                urlPath = path + urlPath;
+            }
+
+            System.err.println("urlPath:" + urlPath + " " + catalogUrl);
+            TypeHandler typeHandler =
+                repository.getTypeHandler(TypeHandler.TYPE_FILE);
+            Entry entry      = typeHandler.createEntry(repository.getGUID());
+            Date  createDate = new Date();
+            entry.init(name, "", parent, user,
+                       new Resource(urlPath, Resource.TYPE_URL),
+                       createDate.getTime(), createDate.getTime(),
+                       createDate.getTime(), null);
+            List<Entry> entries = new ArrayList<Entry>();
+            entries.add(entry);
+            typeHandler.initializeNewEntry(entry);
+            repository.processEntries(this, typeHandler, entries);
             return;
         }
 
-
-        name = name.replace("/","--");
-        name = name.replace("'","");
-        //        Group group = null;
-        String groupName  = (parent==null?name:parent.getFullName()+"/"+name);
-        Group group = repository.findGroupFromName(groupName);
-        if(group == null) {
+        name = name.replace("/", "--");
+        name = name.replace("'", "");
+        String groupName = parent.getFullName() + "/" + name;
+        Group  group     = repository.findGroupFromName(groupName);
+        if (group == null) {
             group = repository.findGroupFromName(groupName, user, true);
             List<Metadata> metadataList = new ArrayList<Metadata>();
             CatalogOutputHandler.collectMetadata(metadataList, node);
-            metadataList.add(new Metadata(Metadata.TYPE_URL,"Imported from catalog",
-                                      catalogUrl));
-            for(Metadata metadata: metadataList) {
+            metadataList.add(new Metadata(Metadata.TYPE_URL,
+                                          "Imported from catalog",
+                                          catalogUrl));
+            for (Metadata metadata : metadataList) {
                 metadata.setId(group.getId());
                 metadata.setIdType(Metadata.IDTYPE_GROUP);
                 try {
-                    if(metadata.getContent().length()>10000) {
-                        repository.log("Too long metadata:" + metadata.getContent().substring(0,100)+"...");
+                    if (metadata.getContent().length() > 10000) {
+                        repository.log("Too long metadata:"
+                                       + metadata.getContent().substring(0,
+                                           100) + "...");
                         continue;
                     }
                     repository.insertMetadata(metadata);
-                } catch(Exception exc) {
+                } catch (Exception exc) {
                     repository.log("Bad metadata", exc);
                 }
             }
-            groups.add(group);
+            groups.add(repository.getBreadCrumbs(null, group, true, "",
+                    topGroup)[1]);
         }
 
 
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
-            if(child.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
-                recurseCatalog(child, group,catalogUrl, depth+1);
-            } else   if(child.getTagName().equals(CatalogOutputHandler.TAG_CATALOGREF)) {
-                if(!recurse)continue;
+            if (child.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
+                recurseCatalog(child, group, catalogUrl, depth + 1);
+            } else if (child.getTagName().equals(
+                    CatalogOutputHandler.TAG_CATALOGREF)) {
+                if ( !recurse) {
+                    continue;
+                }
                 String url = XmlUtil.getAttribute(child, "xlink:href");
-                if(!url.startsWith("http")) {
-                    if(url.startsWith("/")) {
+                if ( !url.startsWith("http")) {
+                    if (url.startsWith("/")) {
                         URL base = new URL(catalogUrl);
-                        url =base.getProtocol()+"://" + base.getHost()+":"+ base.getPort()+url;
+                        url = base.getProtocol() + "://" + base.getHost()
+                              + ":" + base.getPort() + url;
                     } else {
-                        url =IOUtil.getFileRoot(catalogUrl) +"/" + url;
+                        url = IOUtil.getFileRoot(catalogUrl) + "/" + url;
                     }
                 }
-                if(!importCatalog(url, group)) {
+                if ( !importCatalog(url, group)) {
                     System.err.println("Could not load catalog:" + url);
                     System.err.println("Base catalog:" + catalogUrl);
-                    System.err.println("Base URL:" +   XmlUtil.getAttribute(child, "xlink:href"));
+                    System.err.println("Base URL:"
+                                       + XmlUtil.getAttribute(child,
+                                           "xlink:href"));
                 }
             }
         }
+
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public String getExtraInfo() throws Exception {
         StringBuffer sb = new StringBuffer();
-        sb.append("Catalog: " + topUrl +"<br>");
-        sb.append("Loaded " + catalogCnt +" catalogs<br>");
-        sb.append("Created " + groups.size() +" groups<ul>");
-        for(int i=0;i<groups.size();i++) {
-            Group newGroup = (Group) groups.get(i);
+        sb.append("Catalog: " + topUrl + "<br>");
+        sb.append("Loaded " + catalogCnt + " catalogs<br>");
+        sb.append("Created " + groups.size() + " groups<ul>");
+        for (int i = 0; i < groups.size(); i++) {
+            String groupLine = (String) groups.get(i);
             sb.append("<li>");
-            sb.append(repository.getBreadCrumbs(null, newGroup, true,"",topGroup)[1]);
+            sb.append(groupLine);
         }
         sb.append("</ul>");
         return sb.toString();

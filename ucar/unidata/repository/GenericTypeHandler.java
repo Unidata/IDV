@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -64,14 +65,17 @@ public class GenericTypeHandler extends TypeHandler {
 
     /** _more_ */
     public static final String TAG_COLUMN = "column";
+
+    /** _more_          */
     public static final String TAG_TYPE = "type";
+
     /** _more_ */
     public static final String TAG_HANDLER = "handler";
 
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String COL_ID = "id";
 
     /** _more_ */
@@ -80,7 +84,7 @@ public class GenericTypeHandler extends TypeHandler {
     /** _more_ */
     List colNames;
 
-    /** _more_          */
+    /** _more_ */
     Hashtable nameMap = new Hashtable();
 
     /**
@@ -113,7 +117,9 @@ public class GenericTypeHandler extends TypeHandler {
         colNames     = new ArrayList();
 
         List columnNodes = XmlUtil.findChildren(entryNode, TAG_COLUMN);
-        if(columnNodes.size()==0) return;
+        if (columnNodes.size() == 0) {
+            return;
+        }
 
 
         colNames.add(COL_ID);
@@ -125,8 +131,8 @@ public class GenericTypeHandler extends TypeHandler {
                         + "  ON " + getTableName() + " (" + COL_ID + ");\n");
         for (int colIdx = 0; colIdx < columnNodes.size(); colIdx++) {
             Element columnNode = (Element) columnNodes.get(colIdx);
-            Column  column     = new Column(this, columnNode,
-                                            colNames.size()-1);
+            Column  column = new Column(this, columnNode,
+                                        colNames.size() - 1);
             columns.add(column);
             colNames.addAll(column.getColumnNames());
             tableDef.append(",\n");
@@ -354,10 +360,14 @@ public class GenericTypeHandler extends TypeHandler {
     /**
      * _more_
      *
+     *
+     * @param isNew _more_
      * @return _more_
      */
     public String getInsertSql(boolean isNew) {
-        if(colNames.size()==0) return null;
+        if (colNames.size() == 0) {
+            return null;
+        }
         return SqlUtil.makeInsert(getTableName(), SqlUtil.comma(colNames),
                                   SqlUtil.getQuestionMarks(colNames.size()));
     }
@@ -369,10 +379,12 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @param entry _more_
      * @param stmt _more_
+     * @param isNew _more_
      *
      * @throws Exception _more_
      */
-    public void setStatement(Entry entry, PreparedStatement stmt, boolean isNew)
+    public void setStatement(Entry entry, PreparedStatement stmt,
+                             boolean isNew)
             throws Exception {
         stmt.setString(1, entry.getId());
         Object[] values = entry.getValues();
@@ -396,7 +408,9 @@ public class GenericTypeHandler extends TypeHandler {
      */
     public Entry getEntry(ResultSet results) throws Exception {
         Entry entry = super.getEntry(results);
-        if(colNames.size()==0) return entry;
+        if (colNames.size() == 0) {
+            return entry;
+        }
         Object[] values = new Object[colNames.size()];
         String query = SqlUtil.makeSelect(SqlUtil.comma(colNames),
                                           Misc.newList(getTableName()),
@@ -440,9 +454,7 @@ public class GenericTypeHandler extends TypeHandler {
                     StringBuffer tmpSb = new StringBuffer();
                     valueIdx = column.formatValue(tmpSb, output, values,
                             valueIdx);
-                    sb.append(
-                        HtmlUtil.formEntry(
-                            column.getLabel() + ":",
+                    sb.append(HtmlUtil.formEntry(column.getLabel() + ":",
                             tmpSb.toString()));
                 }
 
@@ -473,7 +485,17 @@ public class GenericTypeHandler extends TypeHandler {
         return initTables;
     }
 
-    public void addToEntryForm(Request request, StringBuffer formBuffer, Entry entry)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param formBuffer _more_
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addToEntryForm(Request request, StringBuffer formBuffer,
+                               Entry entry)
             throws Exception {
         for (Column column : columns) {
             column.addToEntryForm(request, formBuffer, entry);
@@ -495,8 +517,7 @@ public class GenericTypeHandler extends TypeHandler {
     public void addToSearchForm(Request request, StringBuffer formBuffer,
                                 List where, boolean simpleForm)
             throws Exception {
-        super.addToSearchForm(request, formBuffer,  where,
-                              simpleForm);
+        super.addToSearchForm(request, formBuffer, where, simpleForm);
         for (Column column : columns) {
             column.addToSearchForm(request, formBuffer, where);
         }

@@ -20,6 +20,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -106,6 +107,8 @@ public class CsvOutputHandler extends OutputHandler {
      *
      * @param request _more_
      *
+     * @param output _more_
+     *
      * @return _more_
      */
     public boolean canHandle(String output) {
@@ -118,6 +121,7 @@ public class CsvOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param what _more_
+     * @param types _more_
      *
      * @return _more_
      *
@@ -136,10 +140,24 @@ public class CsvOutputHandler extends OutputHandler {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param subGroups _more_
+     * @param entries _more_
+     * @param types _more_
+     *
+     * @throws Exception _more_
+     */
     protected void getOutputTypesForGroup(Request request, Group group,
-                                          List<Group> subGroups, List<Entry> entries, List types)
+                                          List<Group> subGroups,
+                                          List<Entry> entries, List types)
             throws Exception {
-        if(entries.size()==0) return;
+        if (entries.size() == 0) {
+            return;
+        }
         getOutputTypesForEntries(request, entries, types);
     }
 
@@ -148,12 +166,15 @@ public class CsvOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param entries _more_
+     * @param types _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesForEntries(Request request,List<Entry> entries, List types)
+    protected void getOutputTypesForEntries(Request request,
+                                            List<Entry> entries, List types)
             throws Exception {
         types.add(new TwoFacedObject("CSV", OUTPUT_CSV));
     }
@@ -328,7 +349,7 @@ public class CsvOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputGroup(Request request, Group group,
-                               List<Group> subGroups, List<Entry> entries)
+                              List<Group> subGroups, List<Entry> entries)
             throws Exception {
         return listGroups(request, subGroups);
     }

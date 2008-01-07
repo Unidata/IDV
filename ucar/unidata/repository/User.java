@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -42,27 +43,35 @@ import java.util.List;
 public class User {
 
     /** _more_ */
-    private String id="";
+    private String id = "";
 
     /** _more_ */
-    private String name="";
+    private String name = "";
 
-    private String email="";
+    /** _more_          */
+    private String email = "";
 
-    private String question="";
+    /** _more_          */
+    private String question = "";
 
-    private String answer="";
+    /** _more_          */
+    private String answer = "";
 
-    private String password="";
+    /** _more_          */
+    private String password = "";
 
     /** _more_ */
     private boolean admin = false;
 
+    /** _more_          */
     private boolean anonymous = false;
 
+    /**
+     * _more_
+     */
     public User() {
         this.anonymous = true;
-        this.name = "anonymous";
+        this.name      = "anonymous";
     }
 
 
@@ -80,14 +89,26 @@ public class User {
     }
 
 
-    public User(String id, String name, String email, String question, String answer, String password, boolean admin) {
-        this.id    = id;
-        this.name  = name;
-        this.email  = email;
-        this.question  = question;
-        this.answer  = answer;
-        this.password  = password;
-        this.admin = admin;
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param name _more_
+     * @param email _more_
+     * @param question _more_
+     * @param answer _more_
+     * @param password _more_
+     * @param admin _more_
+     */
+    public User(String id, String name, String email, String question,
+                String answer, String password, boolean admin) {
+        this.id       = id;
+        this.name     = name;
+        this.email    = email;
+        this.question = question;
+        this.answer   = answer;
+        this.password = password;
+        this.admin    = admin;
     }
 
     /**
@@ -99,8 +120,8 @@ public class User {
         return Misc.hashcode(id) ^ Misc.hashcode(name) ^ (admin
                 ? 1
                 : 2) ^ (anonymous
-                ? 1
-                : 2);
+                        ? 1
+                        : 2);
     }
 
     /**
@@ -138,10 +159,17 @@ public class User {
         return id;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getLabel() {
-        if(name.trim().length()==0) return id;
+        if (name.trim().length() == 0) {
+            return id;
+        }
         return name;
-        
+
     }
 
 
@@ -152,7 +180,9 @@ public class User {
      */
     public void setName(String value) {
         name = value;
-        if(name == null) name = "";
+        if (name == null) {
+            name = "";
+        }
     }
 
     /**
@@ -202,86 +232,99 @@ public class User {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
         return id;
     }
 
 
-/**
-Set the Email property.
+    /**
+     * Set the Email property.
+     *
+     * @param value The new value for Email
+     */
+    public void setEmail(String value) {
+        email = value;
+        if (email == null) {
+            email = "";
+        }
+    }
 
-@param value The new value for Email
-**/
-public void setEmail (String value) {
-	email = value;
-        if(email==null) email = "";
-}
+    /**
+     * Get the Email property.
+     *
+     * @return The Email
+     */
+    public String getEmail() {
+        return email;
+    }
 
-/**
-Get the Email property.
+    /**
+     * Set the Question property.
+     *
+     * @param value The new value for Question
+     */
+    public void setQuestion(String value) {
+        question = value;
+        if (question == null) {
+            question = "";
+        }
+    }
 
-@return The Email
-**/
-public String getEmail () {
-	return email;
-}
+    /**
+     * Get the Question property.
+     *
+     * @return The Question
+     */
+    public String getQuestion() {
+        return question;
+    }
 
-/**
-Set the Question property.
+    /**
+     * Set the Answer property.
+     *
+     * @param value The new value for Answer
+     */
+    public void setAnswer(String value) {
+        answer = value;
+        if (answer == null) {
+            answer = "";
+        }
+    }
 
-@param value The new value for Question
-**/
-public void setQuestion (String value) {
-	question = value;
-        if(question==null)  question = "";
-}
+    /**
+     * Get the Answer property.
+     *
+     * @return The Answer
+     */
+    public String getAnswer() {
+        return answer;
+    }
 
-/**
-Get the Question property.
+    /**
+     * Set the Password property.
+     *
+     * @param value The new value for Password
+     */
+    public void setPassword(String value) {
+        password = value;
+        if (password == null) {
+            password = "";
+        }
+    }
 
-@return The Question
-**/
-public String getQuestion () {
-	return question;
-}
-
-/**
-Set the Answer property.
-
-@param value The new value for Answer
-**/
-public void setAnswer (String value) {
-	answer = value;
-        if(answer==null)  answer = "";
-}
-
-/**
-Get the Answer property.
-
-@return The Answer
-**/
-public String getAnswer () {
-	return answer;
-}
-
-/**
-Set the Password property.
-
-@param value The new value for Password
-**/
-public void setPassword (String value) {
-	password = value;
-        if(password==null)  password = "";
-}
-
-/**
-Get the Password property.
-
-@return The Password
-**/
-public String getPassword () {
-	return password;
-}
+    /**
+     * Get the Password property.
+     *
+     * @return The Password
+     */
+    public String getPassword() {
+        return password;
+    }
 
 
 

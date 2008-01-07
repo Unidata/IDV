@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -46,25 +47,25 @@ import java.util.List;
  */
 public class EntryListener implements Constants, Tables {
 
-    /** _more_          */
+    /** _more_ */
     private Request request;
 
-    /** _more_          */
+    /** _more_ */
     private Repository repository;
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable properties;
 
-    /** _more_          */
+    /** _more_ */
     private Entry entry;
 
-    /** _more_          */
+    /** _more_ */
     private List names = new ArrayList();
 
-    /** _more_          */
+    /** _more_ */
     private List values = new ArrayList();
 
-    /** _more_          */
+    /** _more_ */
     private String id;
 
     /**

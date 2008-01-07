@@ -20,6 +20,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -98,6 +99,8 @@ public class TestOutputHandler extends OutputHandler {
      *
      * @param request _more_
      *
+     * @param output _more_
+     *
      * @return _more_
      */
     public boolean canHandle(String output) {
@@ -109,6 +112,7 @@ public class TestOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param what _more_
+     * @param types _more_
      *
      * @return _more_
      *

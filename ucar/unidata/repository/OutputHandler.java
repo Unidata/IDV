@@ -20,6 +20,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -122,6 +123,13 @@ public class OutputHandler implements Constants, Tables {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
     public boolean canHandle(String request) {
         return false;
     }
@@ -131,32 +139,46 @@ public class OutputHandler implements Constants, Tables {
      *
      * @param request _more_
      * @param what _more_
+     * @param types _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
     protected void getOutputTypesFor(Request request, String what, List types)
-            throws Exception {
-    }
+            throws Exception {}
 
 
     /**
      * _more_
      *
      * @param request _more_
+     * @param entries _more_
+     * @param types _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesForEntries(Request request,List<Entry> entries, List types)
-            throws Exception {
-    }
+    protected void getOutputTypesForEntries(Request request,
+                                            List<Entry> entries, List types)
+            throws Exception {}
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param subGroups _more_
+     * @param entries _more_
+     * @param types _more_
+     *
+     * @throws Exception _more_
+     */
     protected void getOutputTypesForGroup(Request request, Group group,
-                                          List<Group> subGroups, List<Entry> entries, List types)
+                                          List<Group> subGroups,
+                                          List<Entry> entries, List types)
             throws Exception {
         getOutputTypesFor(request, WHAT_ENTRIES, types);
     }
@@ -165,10 +187,13 @@ public class OutputHandler implements Constants, Tables {
     /**
      * _more_
      *
+     *
+     * @param method _more_
      * @return _more_
      */
     private Result notImplemented(String method) {
-        throw new IllegalArgumentException("Method: " + method  +" not implemented");
+        throw new IllegalArgumentException("Method: " + method
+                                           + " not implemented");
     }
 
     /**
@@ -181,11 +206,10 @@ public class OutputHandler implements Constants, Tables {
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, Entry entry)
-            throws Exception {
+    public Result outputEntry(Request request, Entry entry) throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
-        return outputEntries(request,entries);
+        return outputEntries(request, entries);
     }
 
 
@@ -276,11 +300,23 @@ public class OutputHandler implements Constants, Tables {
     protected List getEntriesHeader(Request request, String output,
                                     String what)
             throws Exception {
-        return getHeader(request, output, repository.getOutputTypesFor(request, what));
+        return getHeader(request, output,
+                         repository.getOutputTypesFor(request, what));
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param output _more_
+     * @param outputTypes _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected List getHeader(Request request, String output,
                              List<TwoFacedObject> outputTypes)
             throws Exception {

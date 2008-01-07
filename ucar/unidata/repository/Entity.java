@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -46,6 +47,7 @@ import java.util.List;
  */
 public class Entity {
 
+    /** _more_          */
     static Hashtable ids = new Hashtable();
 
     /** _more_ */
@@ -61,10 +63,10 @@ public class Entity {
     private String id;
 
     /** _more_ */
-    private String name="";
+    private String name = "";
 
     /** _more_ */
-    private String description="";
+    private String description = "";
 
     /** _more_ */
     private Group parentGroup;
@@ -81,6 +83,9 @@ public class Entity {
 
 
 
+    /**
+     * _more_
+     */
     public Entity() {}
 
     /**
@@ -93,17 +98,17 @@ public class Entity {
      * @param name _more_
      * @param description _more_
      * @param group _more_
+     * @param parentGroup _more_
      * @param user _more_
      * @param resource _more_
      * @param date _more_
+     * @param createDate _more_
      */
-    public Entity(String id, String name,
-                  String description, Group parentGroup, 
-                  User user, 
-                  long createDate) {
+    public Entity(String id, String name, String description,
+                  Group parentGroup, User user, long createDate) {
         //        if(ids.get(id)!=null) throw new IllegalArgumentException("");
         this.id          = id;
-                this.name        = name;
+        this.name        = name;
         this.description = description;
         this.parentGroup = parentGroup;
         this.user        = user;
@@ -111,10 +116,17 @@ public class Entity {
     }
 
 
-    public void init(String name,
-                     String description, Group parentGroup, 
-                     User user, 
-                     long createDate) {
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param description _more_
+     * @param parentGroup _more_
+     * @param user _more_
+     * @param createDate _more_
+     */
+    public void init(String name, String description, Group parentGroup,
+                     User user, long createDate) {
         this.name        = name;
         this.description = description;
         this.parentGroup = parentGroup;
@@ -174,7 +186,9 @@ public class Entity {
      * @return The ParentId
      */
     public String getParentGroupId() {
-        return (parentGroup!=null?parentGroup.getId():parentGroupId);
+        return ((parentGroup != null)
+                ? parentGroup.getId()
+                : parentGroupId);
     }
 
 

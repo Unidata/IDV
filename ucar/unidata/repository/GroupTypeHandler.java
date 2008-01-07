@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -70,12 +71,18 @@ public class GroupTypeHandler extends TypeHandler {
      *
      * @throws Exception _more_
      */
-    public GroupTypeHandler(Repository repository)
-            throws Exception {
-        super(repository,TypeHandler.TYPE_GROUP,"Group");
+    public GroupTypeHandler(Repository repository) throws Exception {
+        super(repository, TypeHandler.TYPE_GROUP, "Group");
     }
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
     public Entry createEntry(String id) {
         return new Group(id, this);
     }

@@ -20,6 +20,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -86,12 +87,21 @@ public class MetadataHandler implements Constants, Tables {
      * _more_
      *
      * @param repository _more_
+     * @param node _more_
      * @throws Exception _more_
      */
-    public MetadataHandler(Repository repository,Element node ) throws Exception {
+    public MetadataHandler(Repository repository, Element node)
+            throws Exception {
         this.repository = repository;
     }
 
+    /**
+     * _more_
+     *
+     * @param metadata _more_
+     *
+     * @return _more_
+     */
     public boolean canHandle(Metadata metadata) {
         return false;
     }

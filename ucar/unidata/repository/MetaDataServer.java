@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -89,7 +90,7 @@ public class MetaDataServer extends HttpServer implements Constants {
      */
     private class MyRequestHandler extends RequestHandler {
 
-        /** _more_          */
+        /** _more_ */
         boolean cache = false;
 
         /**
@@ -152,11 +153,11 @@ public class MetaDataServer extends HttpServer implements Constants {
          */
         protected void handleRequest(String path, Hashtable formArgs,
                                      Hashtable httpArgs, String content)
-            throws Exception {
+                throws Exception {
             path = path.trim();
             Result result = null;
             try {
-                User           user    = repository.getUserManager().findUser("jdoe");
+                User user = repository.getUserManager().findUser("jdoe");
                 //User           user    = new User();
                 RequestContext context = new RequestContext(user);
                 Request request = new Request(repository, path, context,

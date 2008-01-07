@@ -21,12 +21,14 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
 import ucar.unidata.ui.ImageUtils;
 
 import java.io.File;
+
 import java.net.URL;
 
 
@@ -40,96 +42,159 @@ import java.net.URL;
  */
 public class Resource {
 
+    /** _more_          */
     public static final String TYPE_FILE = "file";
+
+    /** _more_          */
     public static final String TYPE_URL = "url";
+
+    /** _more_          */
     public static final String TYPE_UNKNOWN = "unknown";
 
+    /** _more_          */
     private String path;
+
+    /** _more_          */
     private String type = TYPE_UNKNOWN;
+
+    /** _more_          */
     private File file;
 
+    /**
+     * _more_
+     */
     public Resource() {
         path = "";
     }
 
 
+    /**
+     * _more_
+     *
+     * @param file _more_
+     */
     public Resource(File file) {
         this.file = file;
-        path = file.toString();
-        type = TYPE_FILE;
+        path      = file.toString();
+        type      = TYPE_FILE;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param path _more_
+     */
     public Resource(String path) {
         this.path = path;
-        if(new File(path).exists()) type = TYPE_FILE;
-        else {
+        if (new File(path).exists()) {
+            type = TYPE_FILE;
+        } else {
             try {
                 new URL(path);
                 type = TYPE_URL;
-            } catch(Exception exc){}
+            } catch (Exception exc) {}
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param path _more_
+     * @param type _more_
+     */
     public Resource(String path, String type) {
         this.path = path;
         this.type = type;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isImage() {
         return ImageUtils.isImage(path);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public File getFile() {
-        if(file ==null) file = new File(path);
+        if (file == null) {
+            file = new File(path);
+        }
         return file;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isFile() {
-        if(type.equals(TYPE_FILE)) return getFile().exists();
+        if (type.equals(TYPE_FILE)) {
+            return getFile().exists();
+        }
         return false;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean isUrl() {
+        return type.equals(TYPE_URL);
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
         return path;
     }
 
-/**
-Set the Path property.
+    /**
+     * Set the Path property.
+     *
+     * @param value The new value for Path
+     */
+    public void setPath(String value) {
+        path = value;
+    }
 
-@param value The new value for Path
-**/
-public void setPath (String value) {
-	path = value;
-}
+    /**
+     * Get the Path property.
+     *
+     * @return The Path
+     */
+    public String getPath() {
+        return path;
+    }
 
-/**
-Get the Path property.
+    /**
+     * Set the Type property.
+     *
+     * @param value The new value for Type
+     */
+    public void setType(String value) {
+        type = value;
+    }
 
-@return The Path
-**/
-public String getPath () {
-	return path;
-}
-
-/**
-Set the Type property.
-
-@param value The new value for Type
-**/
-public void setType (String value) {
-	type = value;
-}
-
-/**
-Get the Type property.
-
-@return The Type
-**/
-public String getType () {
-	return type;
-}
+    /**
+     * Get the Type property.
+     *
+     * @return The Type
+     */
+    public String getType() {
+        return type;
+    }
 
 
 }

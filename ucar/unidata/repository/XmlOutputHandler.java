@@ -20,6 +20,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -80,25 +81,36 @@ import java.util.zip.*;
  * @version $Revision: 1.3 $
  */
 public class XmlOutputHandler extends OutputHandler {
+
     /** _more_ */
     public static final String TAG_GROUPS = "groups";
 
     /** _more_ */
     public static final String TAG_GROUP = "group";
 
+    /** _more_          */
     public static final String TAG_ENTRY = "entry";
+
+    /** _more_          */
     public static final String TAG_ENTRIES = "entries";
 
+    /** _more_          */
     public static final String TAG_DESCRIPTION = "description";
 
 
     /** _more_ */
     public static final String ATTR_ID = "id";
+
+    /** _more_          */
     public static final String ATTR_GROUP = "group";
+
+    /** _more_          */
     public static final String ATTR_TYPE = "type";
 
     /** _more_ */
     public static final String ATTR_RESOURCE = "resource";
+
+    /** _more_          */
     public static final String ATTR_RESOURCE_TYPE = "resource_type";
 
 
@@ -125,6 +137,8 @@ public class XmlOutputHandler extends OutputHandler {
      *
      * @param request _more_
      *
+     * @param output _more_
+     *
      * @return _more_
      */
     public boolean canHandle(String output) {
@@ -137,6 +151,7 @@ public class XmlOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param what _more_
+     * @param types _more_
      *
      * @return _more_
      *
@@ -146,7 +161,7 @@ public class XmlOutputHandler extends OutputHandler {
             throws Exception {
         if (what.equals(WHAT_ENTRIES)) {
             types.add(new TwoFacedObject("Entries XML", OUTPUT_XML));
-        }  else if (what.equals(WHAT_TAG)) {
+        } else if (what.equals(WHAT_TAG)) {
             types.add(new TwoFacedObject("Tag XML", OUTPUT_XML));
         } else if (what.equals(WHAT_TYPE)) {
             types.add(new TwoFacedObject("Type XML", OUTPUT_XML));
@@ -159,12 +174,15 @@ public class XmlOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param entries _more_
+     * @param types _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesForEntries(Request request,List<Entry> entries, List types)
+    protected void getOutputTypesForEntries(Request request,
+                                            List<Entry> entries, List types)
             throws Exception {
         types.add(new TwoFacedObject("Entries XML", OUTPUT_XML));
     }
@@ -356,7 +374,7 @@ public class XmlOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputGroup(Request request, Group group,
-                               List<Group> subGroups, List<Entry> entries)
+                              List<Group> subGroups, List<Entry> entries)
             throws Exception {
         StringBuffer sb     = new StringBuffer();
         String       output = request.getOutput();
@@ -366,7 +384,7 @@ public class XmlOutputHandler extends OutputHandler {
         for (Group subgroup : subGroups) {
             getGroupTag(subgroup, sb, false);
         }
-        for (Entry entry: entries) {
+        for (Entry entry : entries) {
             getEntryTag(entry, sb);
         }
         sb.append(XmlUtil.closeTag(TAG_GROUP));
@@ -397,7 +415,7 @@ public class XmlOutputHandler extends OutputHandler {
         sb.append(XmlUtil.XML_HEADER);
         sb.append("\n");
         sb.append(XmlUtil.openTag(TAG_ENTRIES));
-        for (Entry entry: entries) {
+        for (Entry entry : entries) {
             getEntryTag(entry, sb);
         }
         sb.append(XmlUtil.closeTag(TAG_ENTRIES));
@@ -407,15 +425,27 @@ public class XmlOutputHandler extends OutputHandler {
 
     }
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param sb _more_
+     */
     private void getEntryTag(Entry entry, StringBuffer sb) {
         StringBuffer attrs = new StringBuffer();
-        attrs.append(XmlUtil.attrs(ATTR_ID, entry.getId(), ATTR_NAME, entry.getName()));
-        attrs.append(XmlUtil.attrs(ATTR_RESOURCE, entry.getResource().getPath()));
-        attrs.append(XmlUtil.attrs(ATTR_RESOURCE_TYPE, entry.getResource().getType()));
-        attrs.append(XmlUtil.attrs(ATTR_GROUP, entry.getParentGroup().getId()));
-        attrs.append(XmlUtil.attrs(ATTR_TYPE, entry.getTypeHandler().getType()));
-        sb.append(XmlUtil.openTag(TAG_ENTRY,attrs.toString()));
-        if(entry.getDescription()!=null && entry.getDescription().length()>0) {
+        attrs.append(XmlUtil.attrs(ATTR_ID, entry.getId(), ATTR_NAME,
+                                   entry.getName()));
+        attrs.append(XmlUtil.attrs(ATTR_RESOURCE,
+                                   entry.getResource().getPath()));
+        attrs.append(XmlUtil.attrs(ATTR_RESOURCE_TYPE,
+                                   entry.getResource().getType()));
+        attrs.append(XmlUtil.attrs(ATTR_GROUP,
+                                   entry.getParentGroup().getId()));
+        attrs.append(XmlUtil.attrs(ATTR_TYPE,
+                                   entry.getTypeHandler().getType()));
+        sb.append(XmlUtil.openTag(TAG_ENTRY, attrs.toString()));
+        if ((entry.getDescription() != null)
+                && (entry.getDescription().length() > 0)) {
             sb.append(XmlUtil.openTag(TAG_DESCRIPTION));
             XmlUtil.appendCdata(sb, entry.getDescription());
             sb.append(XmlUtil.closeTag(TAG_DESCRIPTION));
@@ -424,13 +454,20 @@ public class XmlOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param group _more_
+     * @param sb _more_
+     * @param open _more_
+     */
     private void getGroupTag(Group group, StringBuffer sb, boolean open) {
         sb.append(XmlUtil.openTag(TAG_GROUP,
-                              XmlUtil.attrs(ATTR_NAME,
-                                            group.getFullName(), ATTR_ID,
-                                            group.getId())));
+                                  XmlUtil.attrs(ATTR_NAME,
+                                      group.getFullName(), ATTR_ID,
+                                      group.getId())));
 
-        if(!open) {
+        if ( !open) {
             sb.append(XmlUtil.closeTag(TAG_GROUP));
         }
     }

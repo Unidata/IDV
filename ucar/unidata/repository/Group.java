@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -55,15 +56,28 @@ public class Group extends Entry {
     private List<Group> children = new ArrayList<Group>();
 
 
+    /** _more_          */
     private boolean isDummy = false;
 
+    /**
+     * _more_
+     *
+     * @param handler _more_
+     * @param isDummy _more_
+     */
     public Group(TypeHandler handler, boolean isDummy) {
-        super("",handler);
+        super("", handler);
         this.isDummy = isDummy;
         setName("Search Results");
         setDescription("");
     }
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param typeHandler _more_
+     */
     public Group(String id, TypeHandler typeHandler) {
         super(id, typeHandler);
     }
@@ -80,6 +94,11 @@ public class Group extends Entry {
         return getName();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isDummy() {
         return isDummy;
     }

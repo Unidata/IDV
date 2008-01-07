@@ -20,6 +20,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -88,7 +89,7 @@ public class ImageOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String OUTPUT_PLAYER = "image.player";
 
-    /** _more_          */
+    /** _more_ */
     public static final String OUTPUT_SLIDESHOW = "image.slideshow";
 
 
@@ -111,6 +112,8 @@ public class ImageOutputHandler extends OutputHandler {
      *
      * @param request _more_
      *
+     * @param output _more_
+     *
      * @return _more_
      */
     public boolean canHandle(String output) {
@@ -125,6 +128,7 @@ public class ImageOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param what _more_
+     * @param types _more_
      *
      * @return _more_
      *
@@ -140,10 +144,24 @@ public class ImageOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param subGroups _more_
+     * @param entries _more_
+     * @param types _more_
+     *
+     * @throws Exception _more_
+     */
     protected void getOutputTypesForGroup(Request request, Group group,
-                                          List<Group> subGroups, List<Entry> entries, List types)
+                                          List<Group> subGroups,
+                                          List<Entry> entries, List types)
             throws Exception {
-        if(entries.size()==0) return;
+        if (entries.size() == 0) {
+            return;
+        }
         getOutputTypesForEntries(request, entries, types);
     }
 
@@ -152,22 +170,27 @@ public class ImageOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param entries _more_
+     * @param types _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesForEntries(Request request,List<Entry> entries, List types)
+    protected void getOutputTypesForEntries(Request request,
+                                            List<Entry> entries, List types)
             throws Exception {
-        if(entries.size()>0) {
+        if (entries.size() > 0) {
             boolean ok = false;
-            for(Entry entry: entries) {
+            for (Entry entry : entries) {
                 if (entry.getResource().isImage()) {
                     ok = true;
                     break;
                 }
             }
-            if(!ok) return;
+            if ( !ok) {
+                return;
+            }
         }
 
         types.add(new TwoFacedObject("Slideshow", OUTPUT_SLIDESHOW));
@@ -192,8 +215,8 @@ public class ImageOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputGroup(Request request, Group group,
-                               List<Group> subGroups, List<Entry> entries)
-        throws Exception {
+                              List<Group> subGroups, List<Entry> entries)
+            throws Exception {
         Result result = outputEntries(request, entries);
         System.err.println("output:" + request);
         result.putProperty(PROP_NAVSUBLINKS,
@@ -259,9 +282,11 @@ public class ImageOutputHandler extends OutputHandler {
         if (output.equals(OUTPUT_PLAYER)) {
             int cnt = 0;
             for (int i = entries.size() - 1; i >= 0; i--) {
-                Entry entry = entries.get(i);
-                String url = getImageUrl(entry);
-                if(url == null) continue;
+                Entry  entry = entries.get(i);
+                String url   = getImageUrl(entry);
+                if (url == null) {
+                    continue;
+                }
                 if (cnt == 0) {
                     firstImage = url;
                 }
@@ -280,7 +305,7 @@ public class ImageOutputHandler extends OutputHandler {
         } else if (output.equals(OUTPUT_SLIDESHOW)) {
             for (int i = entries.size() - 1; i >= 0; i--) {
                 Entry entry = entries.get(i);
-                if (!entry.getResource().isImage()) {
+                if ( !entry.getResource().isImage()) {
                     continue;
                 }
                 String url = HtmlUtil.url(repository.URL_ENTRY_GET + "/"
@@ -305,7 +330,9 @@ public class ImageOutputHandler extends OutputHandler {
         } else {
             for (Entry entry : entries) {
                 String url = getImageUrl(entry);
-                if(url == null) continue;
+                if (url == null) {
+                    continue;
+                }
                 if (col >= 2) {
                     sb.append("</tr>");
                     col = 0;
@@ -317,7 +344,7 @@ public class ImageOutputHandler extends OutputHandler {
 
                 sb.append("<td>");
                 sb.append(HtmlUtil.img(url, "",
-                            XmlUtil.attr(ARG_WIDTH, "400")));
+                                       XmlUtil.attr(ARG_WIDTH, "400")));
                 sb.append("<br>\n");
                 sb.append(getEntryUrl(entry));
                 sb.append(" " + new Date(entry.getStartDate()));
@@ -352,21 +379,27 @@ public class ImageOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     private String getImageUrl(Entry entry) {
-        if (!entry.getResource().isImage()) {
+        if ( !entry.getResource().isImage()) {
             if (entry.hasAreaDefined()) {
-                return  HtmlUtil.url(repository.URL_GETMAP,
-                                     ARG_SOUTH, "" + entry.getSouth(), 
-                                     ARG_WEST,  "" + entry.getWest(), 
-                                     ARG_NORTH, "" + entry.getNorth(), 
-                                     ARG_EAST,  "" + entry.getEast());
-            } 
-            return  null;
+                return HtmlUtil.url(repository.URL_GETMAP, ARG_SOUTH,
+                                    "" + entry.getSouth(), ARG_WEST,
+                                    "" + entry.getWest(), ARG_NORTH,
+                                    "" + entry.getNorth(), ARG_EAST,
+                                    "" + entry.getEast());
+            }
+            return null;
         }
 
-        return  HtmlUtil.url(repository.URL_ENTRY_GET + "/"
-                             + entry.getName(), ARG_ID,
-                             entry.getId());
+        return HtmlUtil.url(repository.URL_ENTRY_GET + "/" + entry.getName(),
+                            ARG_ID, entry.getId());
     }
 
 }

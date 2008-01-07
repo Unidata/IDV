@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -101,32 +102,63 @@ import javax.swing.*;
  * @version $Revision: 1.3 $
  */
 public class EntryGroup {
+
+    /** _more_          */
     Object key;
+
+    /** _more_          */
     String name;
+
+    /** _more_          */
     List children = new ArrayList();
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     */
     public EntryGroup(Object key) {
         this.key = key;
     }
 
 
+    /** _more_          */
     List keys = new ArrayList();
+
+    /** _more_          */
     Hashtable map = new Hashtable();
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
     public EntryGroup find(Object key) {
         EntryGroup group = (EntryGroup) map.get(key);
-        if(group==null) {
+        if (group == null) {
             group = new EntryGroup(key);
             map.put(key, group);
             keys.add(key);
         }
         return group;
     }
-    
+
+    /**
+     * _more_
+     *
+     * @param obj _more_
+     */
     public void add(Object obj) {
         children.add(obj);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List keys() {
         return keys;
     }

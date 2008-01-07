@@ -20,6 +20,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -130,8 +131,14 @@ public class Metadata implements Constants, Tables {
     }
 
 
-    public Metadata(String metadataType,
-                    String name, String content) {
+    /**
+     * _more_
+     *
+     * @param metadataType _more_
+     * @param name _more_
+     * @param content _more_
+     */
+    public Metadata(String metadataType, String name, String content) {
         this.metadataType = metadataType;
         this.name         = name;
         this.content      = content;

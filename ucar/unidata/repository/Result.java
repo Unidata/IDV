@@ -19,6 +19,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -36,7 +37,7 @@ public class Result {
     /** _more_ */
     public static String TYPE_HTML = "text/html";
 
-    /** _more_          */
+    /** _more_ */
     private String redirectUrl;
 
     /** _more_ */
@@ -66,10 +67,10 @@ public class Result {
     /** _more_ */
     private InputStream inputStream;
 
-    /** _more_          */
+    /** _more_ */
     private boolean cacheOk = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean requestOk = true;
 
     /**

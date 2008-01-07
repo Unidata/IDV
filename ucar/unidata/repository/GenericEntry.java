@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -44,6 +45,12 @@ import java.util.List;
  */
 public class GenericEntry extends Entry {
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param typeHandler _more_
+     */
     public GenericEntry(String id, TypeHandler typeHandler) {
         super(id, typeHandler);
     }

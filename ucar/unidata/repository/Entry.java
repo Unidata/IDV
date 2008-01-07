@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -46,7 +47,7 @@ import java.util.List;
  */
 public class Entry extends Entity {
 
-    /** _more_          */
+    /** _more_ */
     public static final double NONGEO = -999999;
 
     /** _more_ */
@@ -64,19 +65,22 @@ public class Entry extends Entity {
     /** _more_ */
     private long endDate;
 
-    /** _more_          */
+    /** _more_ */
     private double south = NONGEO;
 
-    /** _more_          */
+    /** _more_ */
     private double north = NONGEO;
 
-    /** _more_          */
+    /** _more_ */
     private double east = NONGEO;
 
-    /** _more_          */
+    /** _more_ */
     private double west = NONGEO;
 
-    public  Entry() {}
+    /**
+     * _more_
+     */
+    public Entry() {}
 
 
     /**
@@ -92,15 +96,27 @@ public class Entry extends Entity {
 
 
 
-    public void init(String name,
-                     String description, Group group, User user, Resource resource, 
-                     long createDate, long startDate, long endDate,
-                     Object[] values) {
-        super.init(name,description, group, user, createDate);
-        this.resource    = resource;
-        this.startDate   = startDate;
-        this.endDate     = endDate;
-        this.values      = values;
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param description _more_
+     * @param group _more_
+     * @param user _more_
+     * @param resource _more_
+     * @param createDate _more_
+     * @param startDate _more_
+     * @param endDate _more_
+     * @param values _more_
+     */
+    public void init(String name, String description, Group group, User user,
+                     Resource resource, long createDate, long startDate,
+                     long endDate, Object[] values) {
+        super.init(name, description, group, user, createDate);
+        this.resource  = resource;
+        this.startDate = startDate;
+        this.endDate   = endDate;
+        this.values    = values;
     }
 
 
@@ -143,6 +159,11 @@ public class Entry extends Entity {
         return resource;
     }
 
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
     public void setDate(long value) {
         super.setCreateDate(value);
         setStartDate(value);
@@ -302,20 +323,40 @@ public class Entry extends Entity {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean hasNorth() {
-        return north==north && north!=NONGEO;
+        return (north == north) && (north != NONGEO);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean hasSouth() {
-        return south==south && south!=NONGEO;
+        return (south == south) && (south != NONGEO);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean hasEast() {
-        return east==east && east!=NONGEO;
+        return (east == east) && (east != NONGEO);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean hasWest() {
-        return west==west && west!=NONGEO;
+        return (west == west) && (west != NONGEO);
     }
 
 

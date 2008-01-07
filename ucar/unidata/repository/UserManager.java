@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -39,6 +40,13 @@ import ucar.unidata.xml.XmlUtil;
 
 import java.io.File;
 
+
+
+import java.io.UnsupportedEncodingException;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import java.sql.PreparedStatement;
 
 import java.sql.ResultSet;
@@ -55,12 +63,6 @@ import java.util.Properties;
 
 
 
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
-
-
 
 /**
  * Class TypeHandler _more_
@@ -71,18 +73,25 @@ import java.security.NoSuchAlgorithmException;
  */
 public class UserManager implements Constants, Tables, RequestHandler {
 
+    /** _more_          */
     public static final String ARG_USER_NAME = "user.name";
 
+    /** _more_          */
     public static final String ARG_USER_PASSWORD1 = "user.password1";
 
+    /** _more_          */
     public static final String ARG_USER_PASSWORD2 = "user.password2";
 
+    /** _more_          */
     public static final String ARG_USER_EMAIL = "user.email";
 
+    /** _more_          */
     public static final String ARG_USER_QUESTION = "user.question";
 
+    /** _more_          */
     public static final String ARG_USER_ANSWER = "user.answer";
 
+    /** _more_          */
     public static final String ARG_USER_ADMIN = "user.admin";
 
 
@@ -90,10 +99,11 @@ public class UserManager implements Constants, Tables, RequestHandler {
     /** _more_ */
     Repository repository;
 
+    /** _more_          */
     boolean requireLogin = true;
 
-     /** _more_ */
-     private Hashtable<String, User> userMap = new Hashtable<String, User>();
+    /** _more_ */
+    private Hashtable<String, User> userMap = new Hashtable<String, User>();
 
 
     /**
@@ -103,51 +113,81 @@ public class UserManager implements Constants, Tables, RequestHandler {
      */
     public UserManager(Repository repository) {
         this.repository = repository;
-        requireLogin = repository.getProperty(PROP_USER_REQUIRELOGIN,true);
+        requireLogin    = repository.getProperty(PROP_USER_REQUIRELOGIN,
+                true);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param password _more_
+     *
+     * @return _more_
+     */
     public static String hashPassword(String password) {
-        try  {
-            MessageDigest md =  MessageDigest.getInstance("SHA"); 
-            md.update(password.getBytes("UTF-8")); 
-            return  XmlUtil.encodeBase64(md.digest()); 
-        }
-        catch(NoSuchAlgorithmException nsae) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA");
+            md.update(password.getBytes("UTF-8"));
+            return XmlUtil.encodeBase64(md.digest());
+        } catch (NoSuchAlgorithmException nsae) {
             throw new IllegalStateException(nsae.getMessage());
-        } catch(UnsupportedEncodingException uee)  {
+        } catch (UnsupportedEncodingException uee) {
             throw new IllegalStateException(uee.getMessage());
         }
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
     protected boolean isRequestOk(Request request) {
-        if(requireLogin && request.getRequestContext().getUser().getAnonymous()) {
-            if(!request.getRequestPath().startsWith(repository.getUrlBase()+"/user/"))
+        if (requireLogin
+                && request.getRequestContext().getUser().getAnonymous()) {
+            if ( !request.getRequestPath().startsWith(repository.getUrlBase()
+                    + "/user/")) {
                 return false;
+            }
         }
         return true;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
     public String makeLoginForm(Request request) {
-        StringBuffer sb = new StringBuffer("<h3>Please login</h3>");
-        String name = request.getString(ARG_USER_NAME,"");
+        StringBuffer sb   = new StringBuffer("<h3>Please login</h3>");
+        String       name = request.getString(ARG_USER_NAME, "");
         sb.append(HtmlUtil.form(repository.URL_USER_LOGIN));
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry("User:",
-                                      HtmlUtil.input(ARG_USER_NAME,name)));
+                                     HtmlUtil.input(ARG_USER_NAME, name)));
         sb.append(HtmlUtil.formEntry("Password:",
-                                      HtmlUtil.password(ARG_USER_PASSWORD1)));
-        sb.append(HtmlUtil.formEntry("",
-                                      HtmlUtil.submit("Login")));
+                                     HtmlUtil.password(ARG_USER_PASSWORD1)));
+        sb.append(HtmlUtil.formEntry("", HtmlUtil.submit("Login")));
 
         sb.append("</form>");
         return sb.toString();
 
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected User getDefaultUser() throws Exception {
         makeUserIfNeeded(new User("default", "Default User", false));
         return findUser("default");
@@ -201,36 +241,31 @@ public class UserManager implements Constants, Tables, RequestHandler {
      */
     protected void makeOrUpdateUser(User user, boolean updateIfNeeded)
             throws Exception {
-        if (repository.tableContains(user.getId(), TABLE_USERS, COL_USERS_ID)) {
+        if (repository.tableContains(user.getId(), TABLE_USERS,
+                                     COL_USERS_ID)) {
             if ( !updateIfNeeded) {
                 throw new IllegalArgumentException(
                     "Database already contains user:" + user.getId());
             }
             String query = SqlUtil.makeUpdate(TABLE_USERS, COL_USERS_ID,
                                SqlUtil.quote(user.getId()),
-                                              new String[]{
-                                                  COL_USERS_NAME,
-                                                  COL_USERS_EMAIL,                                                  
-                                                  COL_USERS_QUESTION,
-                                                  COL_USERS_ANSWER,
-                                                  COL_USERS_ADMIN},
-                                              new String[] {
-                                                  SqlUtil.quote(user.getName()), 
-                                                  SqlUtil.quote(user.getEmail()), 
-                                                  SqlUtil.quote(user.getQuestion()), 
-                                                  SqlUtil.quote(user.getAnswer()), 
-                                                  (user.getAdmin()
-                                                   ? "1"
-                                                   : "0")});
+                               new String[] { COL_USERS_NAME,
+                    COL_USERS_EMAIL, COL_USERS_QUESTION, COL_USERS_ANSWER,
+                    COL_USERS_ADMIN }, new String[] {
+                        SqlUtil.quote(user.getName()),
+                        SqlUtil.quote(user.getEmail()),
+                        SqlUtil.quote(user.getQuestion()),
+                        SqlUtil.quote(user.getAnswer()), (user.getAdmin()
+                    ? "1"
+                    : "0") });
             repository.execute(query);
             return;
         }
 
-        repository.execute(INSERT_USERS, new Object[] { user.getId(), user.getName(),user.getEmail(),
-                                                        user.getQuestion(),
-                                                        user.getAnswer(),
-                                                        user.getPassword(),
-                                                        new Boolean(user.getAdmin()) });
+        repository.execute(INSERT_USERS, new Object[] {
+            user.getId(), user.getName(), user.getEmail(), user.getQuestion(),
+            user.getAnswer(), user.getPassword(), new Boolean(user.getAdmin())
+        });
     }
 
 
@@ -276,27 +311,29 @@ public class UserManager implements Constants, Tables, RequestHandler {
      */
     public Result adminUser(Request request) throws Exception {
         String userId = request.getUser();
-        User user = findUser(userId);
+        User   user   = findUser(userId);
         if (user == null) {
             throw new IllegalArgumentException("Could not find user:"
-                                               + userId);
+                    + userId);
         }
 
         StringBuffer sb = new StringBuffer();
-        if(request.defined(ARG_DELETE_CONFIRM)) {
+        if (request.defined(ARG_DELETE_CONFIRM)) {
             deleteUser(user);
-            return  new Result(repository.URL_ADMIN_USER_LIST.toString());
+            return new Result(repository.URL_ADMIN_USER_LIST.toString());
         }
 
-        if(request.defined(ARG_CHANGE)) {
-            user.setName(request.getString(ARG_USER_NAME,user.getName()));
-            user.setEmail(request.getString(ARG_USER_EMAIL,user.getEmail()));
-            user.setQuestion(request.getString(ARG_USER_QUESTION,user.getQuestion()));
-            user.setAnswer(request.getString(ARG_USER_ANSWER,user.getAnswer()));
-            if(!request.defined(ARG_USER_ADMIN)) {
+        if (request.defined(ARG_CHANGE)) {
+            user.setName(request.getString(ARG_USER_NAME, user.getName()));
+            user.setEmail(request.getString(ARG_USER_EMAIL, user.getEmail()));
+            user.setQuestion(request.getString(ARG_USER_QUESTION,
+                    user.getQuestion()));
+            user.setAnswer(request.getString(ARG_USER_ANSWER,
+                                             user.getAnswer()));
+            if ( !request.defined(ARG_USER_ADMIN)) {
                 user.setAdmin(false);
             } else {
-                user.setAdmin(request.get(ARG_USER_ADMIN,user.getAdmin()));
+                user.setAdmin(request.get(ARG_USER_ADMIN, user.getAdmin()));
             }
             makeOrUpdateUser(user, true);
         }
@@ -308,23 +345,32 @@ public class UserManager implements Constants, Tables, RequestHandler {
         sb.append("\n");
         sb.append(HtmlUtil.hidden(ARG_USER, user.getId()));
         sb.append("\n");
-        if(request.defined(ARG_DELETE)) {
-            sb.append ("Are you sure you want to delete the user?  ");
-            sb.append(HtmlUtil.submit("Yes",ARG_DELETE_CONFIRM));
+        if (request.defined(ARG_DELETE)) {
+            sb.append("Are you sure you want to delete the user?  ");
+            sb.append(HtmlUtil.submit("Yes", ARG_DELETE_CONFIRM));
             sb.append(HtmlUtil.space(2));
-            sb.append(HtmlUtil.submit("Cancel",ARG_CANCEL));
+            sb.append(HtmlUtil.submit("Cancel", ARG_CANCEL));
         } else {
             sb.append(HtmlUtil.formTable());
-            sb.append(HtmlUtil.formEntry("Name:", HtmlUtil.input(ARG_USER_NAME, user.getName())));
-            sb.append(HtmlUtil.formEntry("Admin:", HtmlUtil.checkbox(ARG_USER_ADMIN, "true", user.getAdmin())));
-            sb.append(HtmlUtil.formEntry("",HtmlUtil.submit("Change User",ARG_CHANGE)+ HtmlUtil.space(2) +
-                                         HtmlUtil.submit("Delete User",ARG_DELETE)));
+            sb.append(HtmlUtil.formEntry("Name:",
+                                         HtmlUtil.input(ARG_USER_NAME,
+                                             user.getName())));
+            sb.append(HtmlUtil.formEntry("Admin:",
+                                         HtmlUtil.checkbox(ARG_USER_ADMIN,
+                                             "true", user.getAdmin())));
+            sb.append(
+                HtmlUtil.formEntry(
+                    "",
+                    HtmlUtil.submit("Change User", ARG_CHANGE)
+                    + HtmlUtil.space(2)
+                    + HtmlUtil.submit("Delete User", ARG_DELETE)));
             sb.append("</table>");
         }
         sb.append("\n</form>\n");
         Result result = new Result("User:" + user.getName(), sb);
         result.putProperty(PROP_NAVSUBLINKS,
-                           repository.getSubNavLinks(request, repository.adminUrls));
+                           repository.getSubNavLinks(request,
+                               repository.adminUrls));
         return result;
     }
 
@@ -344,10 +390,11 @@ public class UserManager implements Constants, Tables, RequestHandler {
         String query = SqlUtil.makeSelect(COLUMNS_USERS,
                                           Misc.newList(TABLE_USERS));
 
-        SqlUtil.Iterator iter = SqlUtil.getIterator(repository.execute(query));
-        ResultSet        results;
+        SqlUtil.Iterator iter =
+            SqlUtil.getIterator(repository.execute(query));
+        ResultSet  results;
 
-        List<User>       users = new ArrayList();
+        List<User> users = new ArrayList();
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 users.add(getUser(results));
@@ -355,20 +402,23 @@ public class UserManager implements Constants, Tables, RequestHandler {
         }
         sb.append("<table>");
         sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold("ID"),
-                                             HtmlUtil.bold("Name"), HtmlUtil.bold("Admin?"))));
+                                             HtmlUtil.bold("Name"),
+                                             HtmlUtil.bold("Admin?"))));
         for (User user : users) {
-            sb.append(HtmlUtil
-                      .row(HtmlUtil
-                           .cols(HtmlUtil
-                                 .href(HtmlUtil
-                                       .url(repository.URL_ADMIN_USER, ARG_USER,
-                                            user.getId()), user.getId()), user
-                                 .getName(), "" + user.getAdmin())));
+            sb.append(
+                HtmlUtil.row(
+                    HtmlUtil.cols(
+                        HtmlUtil.href(
+                            HtmlUtil.url(
+                                repository.URL_ADMIN_USER, ARG_USER,
+                                user.getId()), user.getId()), user.getName(),
+                                    "" + user.getAdmin())));
         }
         sb.append("</table>");
         Result result = new Result("Users", sb);
         result.putProperty(PROP_NAVSUBLINKS,
-                           repository.getSubNavLinks(request, repository.adminUrls));
+                           repository.getSubNavLinks(request,
+                               repository.adminUrls));
         return result;
     }
 
@@ -383,26 +433,32 @@ public class UserManager implements Constants, Tables, RequestHandler {
      */
     protected User getUser(ResultSet results) throws Exception {
         int col = 1;
-        return new User(results.getString(col++),
-                        results.getString(col++),
-                        results.getString(col++),
-                        results.getString(col++),
-                        results.getString(col++),
-                        results.getString(col++),
+        return new User(results.getString(col++), results.getString(col++),
+                        results.getString(col++), results.getString(col++),
+                        results.getString(col++), results.getString(col++),
                         results.getBoolean(col++));
 
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processLogin(Request request) throws Exception {
-        StringBuffer         sb           = new StringBuffer();
-        if(request.defined(ARG_USER_NAME)) {
-            String name = request.getString(ARG_USER_NAME,"");
-            String password = request.getString(ARG_USER_PASSWORD1,"");
+        StringBuffer sb = new StringBuffer();
+        if (request.defined(ARG_USER_NAME)) {
+            String name     = request.getString(ARG_USER_NAME, "");
+            String password = request.getString(ARG_USER_PASSWORD1, "");
             sb.append("Could not log you in");
-        } 
-            
+        }
+
         sb.append(makeLoginForm(request));
 
 
@@ -412,9 +468,18 @@ public class UserManager implements Constants, Tables, RequestHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processSettings(Request request) throws Exception {
-        StringBuffer         sb           = new StringBuffer();
-        Result result = new Result("User Settings", sb);
+        StringBuffer sb     = new StringBuffer();
+        Result       result = new Result("User Settings", sb);
         return result;
     }
 
