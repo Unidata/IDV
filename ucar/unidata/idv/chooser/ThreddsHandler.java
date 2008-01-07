@@ -49,10 +49,10 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.CatalogUtil;
 
 
 import ucar.unidata.xml.XmlUtil;
-
 import java.io.File;
 
 import java.awt.*;
@@ -83,40 +83,6 @@ import javax.swing.tree.*;
 public class ThreddsHandler extends XmlHandler {
 
 
-    /** Property name for the url of the catalog */
-    public static final String PROP_CATALOGURL = "Thredds.CatalogUrl";
-
-    /** Property name for the   data set id */
-    public static final String PROP_DATASETID = "Thredds.DataSetId";
-
-    /** Property name for the  data set group */
-    public static final String PROP_DATASETGROUP = "Thredds.DataGroup";
-
-    /** Property name for the  annotations server url */
-    public static final String PROP_ANNOTATIONSERVER =
-        "Thredds.AnnotationServer";
-
-    /** Xml attribute name for the url where the doc came from */
-    public static final String ATTR_CATALOGURL = "catalogurl";
-
-
-    /** Xml attribute name for the data set group */
-    public static final String ATTR_DATASETGROUP = "group";
-
-    /** Xml attribute name for the data set id */
-    public static final String ATTR_DATASETID = "id";
-
-    /** Xml attribute name for the data set id */
-    public static final String VALUE_ANNOTATIONSERVER = "annotationServer";
-
-
-
-    /** Xml attribute value for the summary documentation */
-    public static final String VALUE_SUMMARY = "summary";
-
-    /** Xml attribute value for the rights documentation */
-    public static final String VALUE_RIGHTS = "rights";
-
 
     /** Use this member to log messages (through calls to LogUtil) */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
@@ -126,140 +92,6 @@ public class ThreddsHandler extends XmlHandler {
     /** More clear than  then doing (String)null */
     public static final String NULL_STRING = null;
 
-    /**
-     * Service name of the special resolver service.
-     * If a data set has a resolver service then the url
-     * of the data set actually points to a resolver
-     * service which will give back a catalog that contains
-     * the actual data set
-     */
-    public static final String SERVICE_RESOLVER = "Resolver";
-
-    /** Service type value for the compound service */
-    public static final String SERVICE_COMPOUND = "Compound";
-
-    /** Service type value for the compound service */
-    public static final String SERVICE_FILE = "FILE";
-
-    /** Service type value for the wcs service */
-    public static final String SERVICE_HTTP = "HTTPServer";
-
-    /** Service type value for the dods service */
-    public static final String SERVICE_DODS = "DODS";
-
-    /** Service type value for the adde service */
-    public static final String SERVICE_ADDE = "ADDE";
-
-    /** Service type value for the OPeNDAP service */
-    public static final String SERVICE_OPENDAP = "OPENDAP";
-
-    /** Value for the thredds catalog v0.4 */
-    public static final double THREDDS_VERSION_0_4 = 0.4;
-
-    /** Value for the thredds catalog v0.5 */
-    public static final double THREDDS_VERSION_0_5 = 0.5;
-
-    /** Value for the thredds catalog v0.6 */
-    public static final double THREDDS_VERSION_0_6 = 0.6;
-
-    /** Value for the thredds catalog v1.0 */
-    public static final double THREDDS_VERSION_1_0 = 1.0;
-
-
-
-    /** Xml tag name for the property tag for a dataset */
-    public static final String TAG_PROPERTY = "property";
-
-
-    /** Tag name for the xml node &quot;access&quot; */
-    public static final String TAG_ACCESS = "access";
-
-    /** Tag name for the xml node &quot;documentation&quot; */
-    public static final String TAG_DOCUMENTATION = "documentation";
-
-    /** Tag name for the xml node &quot;docparent&quot; */
-    public static final String TAG_DOCPARENT = "docparent";
-
-    /** Tag name for the xml node &quot;catalog&quot; */
-    public static final String TAG_CATALOG = "catalog";
-
-    /** Tag name for the xml node &quot;catalogRef&quot; */
-    public static final String TAG_CATALOGREF = "catalogRef";
-
-    /** Tag name for the xml node &quot;collection&quot; */
-    public static final String TAG_COLLECTION = "collection";
-
-    /** Tag name for the xml node &quot;dataset&quot; */
-    public static final String TAG_DATASET = "dataset";
-
-    /** Tag name for the xml node &quot;dataType&quot; */
-    public static final String TAG_DATATYPE = "dataType";
-
-    /** Tag name for the xml node &quot;metadata&quot; */
-    public static final String TAG_METADATA = "metadata";
-
-    /** Tag name for the xml node &quot;queryCapability&quot; */
-    public static final String TAG_QUERYCAPABILITY = "queryCapability";
-
-    /** Tag name for the xml node &quot;server &quot; */
-    public static final String TAG_SERVER = "server";
-
-    /** Tag name for the xml node &quot;service &quot; */
-    public static final String TAG_SERVICE = "service";
-
-    /** Tag name for the xml node &quot;serviceName&quot; */
-    public static final String TAG_SERVICENAME = "serviceName";
-
-    /** Attribute name for the xml attribute &quot;action &quot; */
-    public static final String ATTR_ACTION = "action";
-
-    /** Attribute name for the xml attribute &quot;dataType &quot; */
-    public static final String ATTR_DATATYPE = "dataType";
-
-    /** Attribute name for the xml attribute &quot;base &quot; */
-    public static final String ATTR_BASE = "base";
-
-    /** Attribute name for the xml attribute &quot;ID &quot; */
-    public static final String ATTR_ID = "ID";
-
-    /** Attribute name for the xml attribute &quot;inherited &quot; */
-    public static final String ATTR_INHERITED = "inherited";
-
-    /** Attribute name for the xml attribute &quot;name &quot; */
-    public static final String ATTR_NAME = "name";
-
-    /** Attribute name for the xml attribute &quot;value &quot; */
-    public static final String ATTR_VALUE = "value";
-
-    /** Attribute name for the xml attribute &quot;serverID &quot; */
-    public static final String ATTR_SERVERID = "serverID";
-
-    /** Attribute name for the xml attribute &quot;serviceName &quot; */
-    public static final String ATTR_SERVICENAME = "serviceName";
-
-    /** Attribute name for the xml attribute &quot;serviceType &quot; */
-    public static final String ATTR_SERVICETYPE = "serviceType";
-
-    /** Attribute name for the xml attribute &quot;suffix &quot; */
-    public static final String ATTR_SUFFIX = "suffix";
-
-    /** Attribute name for the xml attribute &quot;type &quot; */
-    public static final String ATTR_TYPE = "type";
-
-    /** Attribute name for the xml attribute &quot;url &quot; */
-    public static final String ATTR_URL = "url";
-
-    /** Attribute name for the xml attribute &quot;urlPath &quot; */
-    public static final String ATTR_URLPATH = "urlPath";
-
-    /** Attribute name for the xml attribute &quot;version &quot; */
-    public static final String ATTR_VERSION = "version";
-
-    /** Attribute name for the xml attribute &quot;xlink:href &quot; */
-    public static final String ATTR_XLINK_HREF = "xlink:href";
-
-    /** Attribute name for the xml attribute &quot;xlink:title &quot; */
-    public static final String ATTR_XLINK_TITLE = "xlink:title";
 
 
 
@@ -280,7 +112,7 @@ public class ThreddsHandler extends XmlHandler {
     public ThreddsHandler(XmlChooser chooser, Element root, String path) {
         super(chooser, root, path);
         //Add the catalog url attribute
-        root.setAttribute(ATTR_CATALOGURL, path);
+        root.setAttribute(CatalogUtil.ATTR_CATALOGURL, path);
     }
 
     protected void updateStatus() {
@@ -300,15 +132,15 @@ public class ThreddsHandler extends XmlHandler {
      * @return The label to use
      */
     protected String getDocumentationLabel(Element node) {
-        String type = XmlUtil.getAttribute(node, ATTR_TYPE, "");
-        if (type.equals(VALUE_SUMMARY)) {
+        String type = XmlUtil.getAttribute(node, CatalogUtil.ATTR_TYPE, "");
+        if (type.equals(CatalogUtil.VALUE_SUMMARY)) {
             String text = XmlUtil.getChildText(node);
             if ((text != null) && (text.length() < 50)) {
                 return "Summary: " + text;
             }
             return "Summary";
         }
-        if (type.equals(VALUE_RIGHTS)) {
+        if (type.equals(CatalogUtil.VALUE_RIGHTS)) {
             String text = XmlUtil.getChildText(node);
             if ((text != null) && (text.length() < 50)) {
                 return "Rights: " + text;
@@ -316,7 +148,7 @@ public class ThreddsHandler extends XmlHandler {
                 return "Rights";
             }
         }
-        String title = XmlUtil.getAttribute(node, ATTR_XLINK_TITLE,
+        String title = XmlUtil.getAttribute(node, CatalogUtil.ATTR_XLINK_TITLE,
                                             (String) null);
         if (title != null) {
             return title;
@@ -335,11 +167,11 @@ public class ThreddsHandler extends XmlHandler {
     protected String getDocumentationToolTip(Element node) {
         String text  = null;
         String title = null;
-        String type  = XmlUtil.getAttribute(node, ATTR_TYPE, "");
-        if (type.equals(VALUE_SUMMARY)) {
+        String type  = XmlUtil.getAttribute(node, CatalogUtil.ATTR_TYPE, "");
+        if (type.equals(CatalogUtil.VALUE_SUMMARY)) {
             text  = XmlUtil.getChildText(node);
             title = "Summary";
-        } else if (type.equals(VALUE_RIGHTS)) {
+        } else if (type.equals(CatalogUtil.VALUE_RIGHTS)) {
             text  = XmlUtil.getChildText(node);
             title = "Rights";
         } else {
@@ -349,32 +181,6 @@ public class ThreddsHandler extends XmlHandler {
         return "<html><b>" + title + "</b><hr>"
                + StringUtil.breakText(text, "<br>", 50) + "</html>";
     }
-
-    /**
-     * A utiliry to get the version from the catalog root.
-     *
-     *
-     * @param node The xml node
-     *
-     * @return The version
-     */
-    private static double getVersion(Element node) {
-        if ( !XmlUtil.hasAttribute(node, ATTR_VERSION)) {
-            Node parent = node.getParentNode();
-            if ((parent == null) || !(parent instanceof Element)) {
-                return THREDDS_VERSION_1_0;
-            }
-            return getVersion((Element) parent);
-        }
-
-        String version = XmlUtil.getAttribute(node, ATTR_VERSION,
-                             String.valueOf(THREDDS_VERSION_1_0));
-        while (version.indexOf(".") != version.lastIndexOf(".")) {
-            version = version.substring(0, version.lastIndexOf("."));
-        }
-        return new Double(version).doubleValue();
-    }
-
 
 
 
@@ -386,7 +192,7 @@ public class ThreddsHandler extends XmlHandler {
      * @param doc The document to create a new node with
      */
     private void shuffleDocNodes(Element node, Document doc) {
-        if (node.getTagName().equals(TAG_DOCUMENTATION)) {
+        if (node.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)) {
             return;
         }
         List docNodes = null;
@@ -397,7 +203,7 @@ public class ThreddsHandler extends XmlHandler {
                 continue;
             }
             Element child = (Element) tmp;
-            if (child.getTagName().equals(TAG_DOCUMENTATION)) {
+            if (child.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)) {
                 if (docNodes == null) {
                     docNodes = new ArrayList();
                 }
@@ -412,7 +218,7 @@ public class ThreddsHandler extends XmlHandler {
             if (docNodes.size() == 1) {
                 node.appendChild((Element) docNodes.get(0));
             } else {
-                Element newDocNode = doc.createElement(TAG_DOCPARENT);
+                Element newDocNode = doc.createElement(CatalogUtil.TAG_DOCPARENT);
                 node.appendChild(newDocNode);
                 for (int i = 0; i < docNodes.size(); i++) {
                     newDocNode.appendChild((Element) docNodes.get(i));
@@ -431,7 +237,7 @@ public class ThreddsHandler extends XmlHandler {
      */
     protected JComponent doMakeContents() {
 
-        double version = getVersion(root);
+        double version = CatalogUtil.getVersion(root);
         shuffleDocNodes(root, chooser.getDocument());
 
         loadIndividuallyCbx = new JCheckBox("Load Multiples Separately",
@@ -460,7 +266,7 @@ public class ThreddsHandler extends XmlHandler {
                     return null;
                 }
                 if (doc.getDocumentElement().getTagName().equals(
-                        ThreddsHandler.TAG_CATALOG)) {
+                                                                 CatalogUtil.TAG_CATALOG)) {
                     return doc;
                 }
                 //Else (e.g., wms) show a new xml xhooser ui
@@ -479,15 +285,15 @@ public class ThreddsHandler extends XmlHandler {
                                             String url) {
                 shuffleDocNodes(root, doc);
                 //Add the catalog url attribute
-                root.setAttribute(ATTR_CATALOGURL, url);
+                root.setAttribute(CatalogUtil.ATTR_CATALOGURL, url);
                 return true;
             }
 
             public String getToolTipText(Element n) {
-                if (n.getTagName().equals(TAG_DOCUMENTATION)) {
+                if (n.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)) {
                     return getDocumentationToolTip(n);
                 }
-                if (n.getTagName().equals(TAG_CATALOGREF)) {
+                if (n.getTagName().equals(CatalogUtil.TAG_CATALOGREF)) {
                     String href = XmlUtil.getAttribute(n,
                                       XmlTree.ATTR_XLINKHREF, (String) null);
                     if (href == null) {
@@ -495,7 +301,7 @@ public class ThreddsHandler extends XmlHandler {
                     }
                     return "Remote catalog: " + tree.expandRelativeUrl(href);
                 }
-                if (n.getTagName().equals(TAG_DATASET)) {
+                if (n.getTagName().equals(CatalogUtil.TAG_DATASET)) {
                     List paths = new ArrayList();
                     if (collectUrlPaths(paths, n, root, false)) {
                         if (paths.size() > 0) {
@@ -510,10 +316,10 @@ public class ThreddsHandler extends XmlHandler {
             }
 
             public String getLabel(Element n) {
-                if (n.getTagName().equals(TAG_DOCUMENTATION)) {
+                if (n.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)) {
                     return getDocumentationLabel(n);
                 }
-                if (n.getTagName().equals(TAG_DOCPARENT)) {
+                if (n.getTagName().equals(CatalogUtil.TAG_DOCPARENT)) {
                     return "Documentation";
                 }
                 return super.getLabel(n);
@@ -540,7 +346,7 @@ public class ThreddsHandler extends XmlHandler {
                 List    elements = tree.getSelectedElements();
                 boolean haveData = false;
                 for (int i = 0; (i < elements.size()) && !haveData; i++) {
-                    haveData = getUrlPath((Element) elements.get(i)) != null;
+                    haveData = CatalogUtil.getUrlPath((Element) elements.get(i)) != null;
                 }
                 chooser.setHaveData(haveData);
             }
@@ -564,29 +370,29 @@ public class ThreddsHandler extends XmlHandler {
 
         };
         //Define that we look for the label of a catalogref node with the xlink:title attribute.
-        tree.defineLabelAttr(TAG_CATALOGREF, "xlink:title");
+        tree.defineLabelAttr(CatalogUtil.TAG_CATALOGREF, "xlink:title");
         tree.getSelectionModel().setSelectionMode(
             TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
-        tree.addXlinkTag(TAG_CATALOGREF);
-        if (version == THREDDS_VERSION_0_4) {
-            tree.addTagsToProcess(Misc.newList(TAG_CATALOG, TAG_CATALOGREF,
-                    TAG_COLLECTION, TAG_DATASET, TAG_DOCUMENTATION));
+        tree.addXlinkTag(CatalogUtil.TAG_CATALOGREF);
+        if (version == CatalogUtil.THREDDS_VERSION_0_4) {
+            tree.addTagsToProcess(Misc.newList(CatalogUtil.TAG_CATALOG, CatalogUtil.TAG_CATALOGREF,
+                    CatalogUtil.TAG_COLLECTION, CatalogUtil.TAG_DATASET, CatalogUtil.TAG_DOCUMENTATION));
         } else {
-            tree.addTagsToProcess(Misc.newList(TAG_CATALOGREF,
-                    TAG_COLLECTION, TAG_DATASET, TAG_DOCUMENTATION,
-                    TAG_DOCPARENT));
-            tree.addTagsToNotProcessButRecurse(Misc.newList(TAG_CATALOG));
+            tree.addTagsToProcess(Misc.newList(CatalogUtil.TAG_CATALOGREF,
+                    CatalogUtil.TAG_COLLECTION, CatalogUtil.TAG_DATASET, CatalogUtil.TAG_DOCUMENTATION,
+                    CatalogUtil.TAG_DOCPARENT));
+            tree.addTagsToNotProcessButRecurse(Misc.newList(CatalogUtil.TAG_CATALOG));
         }
         tree.setIconForTag(
             GuiUtils.getImageIcon(
                 "/auxdata/ui/icons/Information16.gif",
-                getClass()), TAG_DOCUMENTATION);
+                getClass()), CatalogUtil.TAG_DOCUMENTATION);
 
         /**
          *        tree.setIconForTag(
          *   GuiUtils.getImageIcon(
          *       "/auxdata/ui/icons/Information16.gif",
-         *       getClass()), TAG_DOCPARENT);
+         *       getClass()), CatalogUtil.TAG_DOCPARENT);
          */
         JComponent ui =
             GuiUtils.inset(GuiUtils.topCenter(GuiUtils.left(dsComp),
@@ -615,8 +421,8 @@ public class ThreddsHandler extends XmlHandler {
 
         boolean   didone  = false;
         JMenuItem mi;
-        if (tagName.equals(TAG_DATASET)) {
-            if (getUrlPath(node) != null) {
+        if (tagName.equals(CatalogUtil.TAG_DATASET)) {
+            if (CatalogUtil.getUrlPath(node) != null) {
                 mi = new JMenuItem("Load Dataset");
                 mi.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent ae) {
@@ -631,7 +437,7 @@ public class ThreddsHandler extends XmlHandler {
 
 
 
-        if (tagName.equals(TAG_DOCUMENTATION)) {
+        if (tagName.equals(CatalogUtil.TAG_DOCUMENTATION)) {
             mi = new JMenuItem("View Documentation");
             mi.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
@@ -643,7 +449,7 @@ public class ThreddsHandler extends XmlHandler {
         }
 
 
-        if (tagName.equals(TAG_CATALOGREF)) {
+        if (tagName.equals(CatalogUtil.TAG_CATALOGREF)) {
             final String href = XmlUtil.getAttribute(node,
                                     XmlTree.ATTR_XLINKHREF, (String) null);
             if (href != null) {
@@ -715,23 +521,23 @@ public class ThreddsHandler extends XmlHandler {
     private void showDocumentation(Element node) {
         String doc   = null;
         String title = null;
-        if (XmlUtil.getAttribute(node, ATTR_TYPE, "").equals(VALUE_SUMMARY)) {
+        if (XmlUtil.getAttribute(node, CatalogUtil.ATTR_TYPE, "").equals(CatalogUtil.VALUE_SUMMARY)) {
             //            <documentation type="summary">
             doc   = XmlUtil.getChildText(node);
             title = "Summary";
-        } else if (XmlUtil.getAttribute(node, ATTR_TYPE,
-                                        "").equals(VALUE_RIGHTS)) {
+        } else if (XmlUtil.getAttribute(node, CatalogUtil.ATTR_TYPE,
+                                        "").equals(CatalogUtil.VALUE_RIGHTS)) {
             //            <documentation type="summary">
             doc   = XmlUtil.getChildText(node);
             title = "Rights";
         } else {
             //            <documentation xlink:href="http://cloud1.arc.nasa.gov/solve/" xlink:title="SOLVE home page"/>
-            String xlink = XmlUtil.getAttribute(node, ATTR_XLINK_HREF,
+            String xlink = XmlUtil.getAttribute(node, CatalogUtil.ATTR_XLINK_HREF,
                                (String) null);
             //            System.err.println("xlink:" + xlink);
             if (xlink != null) {
                 doc   = IOUtil.readContents(xlink, (String) null);
-                title = XmlUtil.getAttribute(node, ATTR_XLINK_TITLE, "");
+                title = XmlUtil.getAttribute(node, CatalogUtil.ATTR_XLINK_TITLE, "");
             }
         }
 
@@ -788,22 +594,22 @@ public class ThreddsHandler extends XmlHandler {
      * @param nodes nodes to process
      */
     private void processNodes(List nodes) {
-        double    version    = getVersion(root);
+        double    version    = CatalogUtil.getVersion(root);
         List      urls       = new ArrayList();
         Hashtable properties = null;
         for (int i = 0; i < nodes.size(); i++) {
             Element node = (Element) nodes.get(i);
-            if (node.getTagName().equals(TAG_DOCUMENTATION)) {
+            if (node.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)) {
                 showDocumentation(node);
                 continue;
             }
-            if ( !node.getTagName().equals(TAG_DATASET)) {
+            if ( !node.getTagName().equals(CatalogUtil.TAG_DATASET)) {
                 continue;
             }
-            if (version == THREDDS_VERSION_0_4) {
+            if (version == CatalogUtil.THREDDS_VERSION_0_4) {
                 //Always handle v4 singly. We probably never see this anymore
                 process04Dataset(node);
-            } else if (version >= THREDDS_VERSION_0_6) {
+            } else if (version >= CatalogUtil.THREDDS_VERSION_0_6) {
                 List urlPaths = new ArrayList();
                 if ( !collectUrlPaths(urlPaths, node, root, true)) {
                     return;
@@ -853,19 +659,19 @@ public class ThreddsHandler extends XmlHandler {
      *  @param datasetNode The xml node the user chose.
      */
     private void process04Dataset(Element datasetNode) {
-        String serverId = XmlUtil.getAttribute(datasetNode, ATTR_SERVERID,
+        String serverId = XmlUtil.getAttribute(datasetNode, CatalogUtil.ATTR_SERVERID,
                               NULL_STRING);
         if (serverId == null) {
             IdvChooser.errorMessage("No server id found");
             return;
         }
-        String urlPath = XmlUtil.getAttribute(datasetNode, ATTR_URLPATH,
+        String urlPath = XmlUtil.getAttribute(datasetNode, CatalogUtil.ATTR_URLPATH,
                              NULL_STRING);
         if (urlPath == null) {
             IdvChooser.errorMessage("No urlPath found");
             return;
         }
-        Element serverNode = XmlUtil.findElement(root, TAG_SERVER, ATTR_ID,
+        Element serverNode = XmlUtil.findElement(root, CatalogUtil.TAG_SERVER, CatalogUtil.ATTR_ID,
                                  serverId);
 
         if (serverNode == null) {
@@ -873,7 +679,7 @@ public class ThreddsHandler extends XmlHandler {
                                     + " found");
             return;
         }
-        String base = XmlUtil.getAttribute(serverNode, ATTR_BASE,
+        String base = XmlUtil.getAttribute(serverNode, CatalogUtil.ATTR_BASE,
                                            NULL_STRING);
         if (base == null) {
             IdvChooser.errorMessage("No base found for server:" + serverId);
@@ -923,17 +729,17 @@ public class ThreddsHandler extends XmlHandler {
         }
 
 
-        String dataType = findDataTypeForDataset(datasetNode, root,
-                              getVersion(root), true);
+        String dataType = CatalogUtil.findDataTypeForDataset(datasetNode, root,
+                              CatalogUtil.getVersion(root), true);
 
-        String serviceType  = getServiceType(serviceNode);
+        String serviceType  = CatalogUtil.getServiceType(serviceNode);
 
         String dataSourceId = chooser.getDataSourceId(dataSourcesCbx);
         if (dataSourceId != null) {
             properties.put(DataManager.DATATYPE_ID, dataSourceId);
         } else {
             if ((dataType != null) && (serviceType != null)
-                    && ( !serviceType.equals(SERVICE_RESOLVER))) {
+                    && ( !serviceType.equals(CatalogUtil.SERVICE_RESOLVER))) {
                 properties.put(DataManager.DATATYPE_ID,
                                serviceType + "." + dataType);
             } else if (serviceType != null) {
@@ -942,7 +748,7 @@ public class ThreddsHandler extends XmlHandler {
         }
         //        System.out.println("xml:" + XmlUtil.toString(XmlUtil.findRoot(datasetNode)));
 
-        String title = getTitleFromDataset(datasetNode);
+        String title = CatalogUtil.getTitleFromDataset(datasetNode);
         if (title != null) {
             properties.put(DataSource.PROP_TITLE, title);
         }
@@ -962,18 +768,18 @@ public class ThreddsHandler extends XmlHandler {
      * @return List of documentation nodes
      */
     private List getDocLinksDown(Element docNode, List list) {
-        String link = XmlUtil.getAttribute(docNode, ATTR_XLINK_HREF,
+        String link = XmlUtil.getAttribute(docNode, CatalogUtil.ATTR_XLINK_HREF,
                                            (String) null);
-        if (docNode.getTagName().equals(TAG_DOCUMENTATION)) {
+        if (docNode.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)) {
             if (link != null) {
                 if (list == null) {
                     list = new ArrayList();
                 }
                 list.add(link);
             } else {
-                String type = XmlUtil.getAttribute(docNode, ATTR_TYPE,
+                String type = XmlUtil.getAttribute(docNode, CatalogUtil.ATTR_TYPE,
                                   (String) null);
-                if ((type != null) && type.equals(VALUE_SUMMARY)) {
+                if ((type != null) && type.equals(CatalogUtil.VALUE_SUMMARY)) {
                     String text = XmlUtil.getChildText(docNode);
                     if ((text != null) && (text.trim().length() > 0)) {
                         if (list == null) {
@@ -1019,8 +825,8 @@ public class ThreddsHandler extends XmlHandler {
                                     (String) null);
             for (int i = 0; i < elements.getLength(); i++) {
                 Element child = (Element) elements.item(i);
-                if (child.getTagName().equals(TAG_DOCUMENTATION)
-                        || child.getTagName().equals(TAG_DOCPARENT)) {
+                if (child.getTagName().equals(CatalogUtil.TAG_DOCUMENTATION)
+                        || child.getTagName().equals(CatalogUtil.TAG_DOCPARENT)) {
                     list = getDocLinksDown(child, list);
                 }
             }
@@ -1035,571 +841,6 @@ public class ThreddsHandler extends XmlHandler {
     }
 
 
-    /**
-     *  Find the service type attribute for the given service node. This is thredds version
-     *  specific - looking for either "servicetype" attribute or "type" attr.
-     *
-     *  @param serviceNode The service node to look for the service type.
-     *  @return The service type attribute or null if not found.
-     */
-    private static String getServiceType(Element serviceNode) {
-        String serviceType = XmlUtil.getAttribute(serviceNode,
-                                 ATTR_SERVICETYPE, NULL_STRING);
-        if (serviceType == null) {
-            //Maybe  version 0.4
-            serviceType = XmlUtil.getAttribute(serviceNode, ATTR_TYPE,
-                    NULL_STRING);
-        }
-        return serviceType;
-    }
-
-    /**
-     * Find the data type attribute for the given service node.
-     *
-     * @param datasetNode The dataset node to look for the data type.
-     * @return The dataType attribute or null if not found.
-     */
-    private static String getDataType(Element datasetNode) {
-        String dataType = XmlUtil.getAttribute(datasetNode, ATTR_DATATYPE,
-                              NULL_STRING);
-        if (dataType == null) {}
-        return dataType;
-    }
-
-    /**
-     *  Assemble the String title for the given dataset. We look for the first two
-     *  "name" attributes in the xml tree and concatenate them (If found).
-     *
-     *  @param datasetNode The dataset node we are looking at.
-     *  @return The title for this dataset node. (may be null).
-     */
-
-
-    public static String getTitleFromDataset(Element datasetNode) {
-        Hashtable tags = Misc.newHashtable(TAG_DATASET, TAG_DATASET,
-                                           TAG_COLLECTION, TAG_COLLECTION);
-        List titleAttrs = XmlUtil.getAttributesFromTree(datasetNode,
-                              ATTR_NAME, tags);
-        String title = null;
-        if ((titleAttrs != null) && (titleAttrs.size() >= 1)) {
-            if (titleAttrs.size() >= 2) {
-                String t1 = titleAttrs.get(titleAttrs.size() - 2).toString();
-                String t2 = titleAttrs.get(titleAttrs.size() - 1).toString();
-                //If the first 8 characters are the same then just use the name
-                if ((t1.length() > 8) && (t2.length() > 8)
-                        && t1.substring(0, 8).equals(t2.substring(0, 8))) {
-                    title = t2;
-                } else {
-                    title = t1 + " " + t2;
-                }
-            } else {
-                title = titleAttrs.get(titleAttrs.size() - 1).toString();
-            }
-        }
-        return title;
-    }
-
-
-
-
-    /**
-     *  Search up the tree of dataset nodes, looking for a child service node.
-     *  If not found then return null.
-     *
-     *
-     * @param nodes nodes to process
-     * @param datasetNode The element to look at.
-     * @param serviceName The name of the service
-     */
-    private static void findChildServiceNode(List nodes, Element datasetNode,
-                                             String serviceName) {
-        if (datasetNode == null) {
-            return;
-        }
-
-        List childrenServiceNodes = XmlUtil.findChildren(datasetNode,
-                                        TAG_SERVICE);
-        for (int i = 0; i < childrenServiceNodes.size(); i++) {
-            Element serviceNode = (Element) childrenServiceNodes.get(i);
-            if ( !Misc.equals(XmlUtil.getAttribute(serviceNode, ATTR_NAME,
-                    NULL_STRING), serviceName)) {
-                continue;
-            }
-
-            String serviceType = XmlUtil.getAttribute(serviceNode,
-                                     ATTR_SERVICETYPE, NULL_STRING);
-            if (Misc.equals(serviceType, SERVICE_COMPOUND)) {
-                List children = XmlUtil.findChildren(serviceNode,
-                                    TAG_SERVICE);
-                for (int childIdx = 0; childIdx < children.size();
-                        childIdx++) {
-                    nodes.add(children.get(childIdx));
-                }
-            } else {
-                nodes.add(serviceNode);
-            }
-        }
-        Node node = datasetNode.getParentNode();
-        //Are we at the top?
-        if (node instanceof Element) {
-            findChildServiceNode(nodes, (Element) node, serviceName);
-        }
-    }
-
-
-    /**
-     *  Find the service xml element for the given dataset node. First, we look for any  service nodes
-     *  contained by the dataset node. If not found then we find the service name from the dataset node.
-     *  If no service name attrbiute is found then  print an error and return null.  Now, we search the
-     *  xml tree under the root node to find a service node with the given name. If not found then
-     *  print an error and return null.
-     *
-     * @param datasetNode The dataset node to look for a service node for.
-     * @param showErrors Do we tell the user if there was an error
-     * @param type service type
-     * @return Return the service node or null if not found.
-     */
-    public static Element findServiceNodeForDataset(Element datasetNode,
-            boolean showErrors, String type) {
-        double version = getVersion(datasetNode);
-        String serviceName = findServiceNameForDataset(datasetNode, version,
-                                 true);
-        if (serviceName == null) {
-            if (showErrors) {
-                IdvChooser.errorMessage("Could not find service name");
-            }
-            return null;
-        }
-
-        List serviceNodes = new ArrayList();
-        findChildServiceNode(serviceNodes, datasetNode, serviceName);
-        if (serviceNodes.size() == 0) {
-            if (showErrors) {
-                IdvChooser.errorMessage("No service found with id = "
-                                        + serviceName);
-            }
-            //            System.err.println (XmlUtil.toString (root));
-            return null;
-        }
-
-        boolean typeWasNull = (type == null);
-        if (type == null) {
-            type = SERVICE_DODS + "|" + SERVICE_OPENDAP + "|" + SERVICE_ADDE
-                   + "|" + SERVICE_RESOLVER + "|" + SERVICE_FILE;
-        }
-        type = type.toLowerCase();
-
-        for (int i = 0; i < serviceNodes.size(); i++) {
-            Element serviceNode = (Element) serviceNodes.get(i);
-
-            //Now, we see if we have a compound service. If we do then we find a service node
-            //with DODS as the service. This is a hack but for now it works.
-            String serviceType = XmlUtil.getAttribute(serviceNode,
-                                     ATTR_SERVICETYPE, NULL_STRING);
-
-            if (serviceType == null) {
-                continue;
-            }
-            serviceType = serviceType.toLowerCase();
-            if (StringUtil.stringMatch(serviceType, type)) {
-                return serviceNode;
-            }
-        }
-
-
-        if (typeWasNull && (serviceNodes.size() > 0)) {
-            return (Element) serviceNodes.get(0);
-        }
-
-        if (showErrors) {
-            IdvChooser.errorMessage("No service found with id = "
-                                    + serviceName);
-        }
-        //            System.err.println (XmlUtil.toString (root));
-        return null;
-    }
-
-
-    /**
-     *  Find the base url attribute from the service that the given datasetNode is
-     *  associated with.
-     *
-     *  @param datasetNode The dataset node we are looking for a base url for.
-     * @param root
-     *  @return The base url for the given dataset node.
-     */
-    private static String findBaseForDataset(Element datasetNode,
-                                             Element root) {
-
-
-        //Find the service node
-        Element serviceNode = findServiceNodeForDataset(datasetNode,  /*root,*/
-            true, null);
-
-        //If we couldn't find it then return null - the error message has been shown
-        if (serviceNode == null) {
-            return null;
-        }
-
-        //Pull out the base attribute
-        String base = XmlUtil.getAttribute(serviceNode, ATTR_BASE,
-                                           NULL_STRING);
-        if (base == null) {
-            IdvChooser.errorMessage("No base found for dataset.");
-            return null;
-        }
-
-        return base;
-    }
-
-    /**
-     * Recurse up the dom tree to find the node that has a catalogurl attribute
-     *
-     * @param node The node to look at
-     *
-     * @return  The foudn catalogurl attribute or null
-     */
-    private static String findCatalogSource(Element node) {
-        String source = XmlUtil.getAttribute(node, ATTR_CATALOGURL,
-                                             (String) null);
-        if (source != null) {
-            return source;
-        }
-        Node parent = node.getParentNode();
-        if ((parent == null) || !(parent instanceof Element)) {
-            return null;
-        }
-        return findCatalogSource((Element) parent);
-    }
-
-    /**
-     *  Recurse up the DOM tree, looking for a dataset that contains a serviceName attribute.
-     *  We also look at "access" nodes contained by the dataset node.
-     *
-     *  @param datasetNode The dataset node we are looking at.
-     *  @param version The catalog version
-     *  @param firstCall Is this the leaf node
-     *  @return The name of the service that provides this dataset.
-     */
-    private static String findServiceNameForDataset(Element datasetNode,
-            double version, boolean firstCall) {
-        //First look for a service name attribute.
-        String serviceName = XmlUtil.getAttribute(datasetNode,
-                                 ATTR_SERVICENAME, NULL_STRING);
-        if (serviceName != null) {
-            return serviceName;
-        }
-
-        //Look for a contained access node
-        Element accessNode = XmlUtil.findChild(datasetNode, TAG_ACCESS);
-        if (accessNode != null) {
-            serviceName = XmlUtil.getAttribute(accessNode, ATTR_SERVICENAME);
-            if (serviceName != null) {
-                return serviceName;
-            }
-        }
-
-        serviceName = findServiceNameTagValue(datasetNode);
-        if (serviceName != null) {
-            return serviceName;
-        }
-
-
-
-        if (version >= 1.0) {
-            return findServiceNameFromMetaData(datasetNode, version, true);
-        } else {
-            Element parent = (Element) datasetNode.getParentNode();
-            //Only look at parent dataset nodes.
-            if ((parent == null)
-                    || !parent.getTagName().equals(TAG_DATASET)) {
-                return null;
-            }
-            return findServiceNameForDataset(parent, version, false);
-        }
-    }
-
-    /**
-     * Recurse up the DOM tree, looking for a dataset that contains a
-     * dataType attribute.
-     *  We also look at "access" nodes contained by the dataset node.
-     *
-     * @param datasetNode The dataset node we are looking at.
-     * @param root The root of the xml tree
-     * @param version The catalog version
-     * @param firstCall Is this the leaf node
-     * @return The name of the service that provides this dataset.
-     */
-    private static String findDataTypeForDataset(Element datasetNode,
-            Element root, double version, boolean firstCall) {
-        //First look for a data type attribute.
-        String dataType = XmlUtil.getAttributeFromTree(datasetNode,
-                              ATTR_DATATYPE, null);
-
-        if (dataType != null) {
-            return dataType;
-        }
-
-        dataType = findTagValue(datasetNode, TAG_DATATYPE);
-        if (dataType != null) {
-            return dataType;
-        }
-
-        if (version >= 1.0) {
-            return findTagValueFromMetaData(datasetNode, version, true,
-                                            TAG_DATATYPE);
-        } else {
-            Element parent = (Element) datasetNode.getParentNode();
-            //Only look at parent dataset nodes.
-            if ((parent == null)
-                    || !parent.getTagName().equals(TAG_DATASET)) {
-                return null;
-            }
-            return findDataTypeForDataset(parent, root, version, false);
-        }
-    }
-
-    /**
-     *  Find the value of the serviceName tag which is a child of the
-     * given datasetNode. If none found then return null.
-     *
-     * @param datasetNode The node to look under
-     *
-     * @return The service name or null if none found
-     */
-    private static String findServiceNameTagValue(Element datasetNode) {
-        return findTagValue(datasetNode, TAG_SERVICENAME);
-    }
-
-    /**
-     * Find the value of the which is a child of the given datasetNode.
-     * If none found then return null.
-     *
-     * @param datasetNode The node to look under
-     * @param tagName name of the tag to look for
-     *
-     * @return The tag or null if none found
-     */
-    private static String findTagValue(Element datasetNode, String tagName) {
-        Element tagNode = XmlUtil.findChild(datasetNode, tagName);
-        if (tagNode != null) {
-            String value = XmlUtil.getChildText(tagNode);
-            if (value != null) {
-                if (value.trim().length() > 0) {
-                    return value.trim();
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Find the value contained by the serviceName node contained by
-     * a metadata node contained by the given datasetNode.
-     * If this is not the first recursive call then only look at metadata
-     * nodes that have inherited=true.
-     *
-     * @param datasetNode The data set node
-     * @param version The catalog version
-     * @param first Is this the first recursive call
-     *
-     * @return The service name or null if none found
-     */
-    private static String findServiceNameFromMetaData(Element datasetNode,
-            double version, boolean first) {
-        return findTagValueFromMetaData(datasetNode, version, first,
-                                        TAG_SERVICENAME);
-    }
-
-    /**
-     * Find the value of the tag from the metadata node
-     *
-     * @param datasetNode The data set node
-     * @param version The catalog version
-     * @param first Is this the first recursive call
-     * @param tagName  name of the tag to search for
-     *
-     * @return the tag value or null if none found
-     */
-    private static String findTagValueFromMetaData(Element datasetNode,
-            double version, boolean first, String tagName) {
-        List children = XmlUtil.findChildren(datasetNode, TAG_METADATA);
-        for (int i = 0; i < children.size(); i++) {
-            Element metaDataNode = (Element) children.get(i);
-            if ( !first
-                    && !XmlUtil.getAttribute(metaDataNode, ATTR_INHERITED,
-                                             false)) {
-                continue;
-            }
-            String value = findTagValue(metaDataNode, tagName);
-            if (value != null) {
-                return value;
-            }
-        }
-
-
-        Element parent = (Element) datasetNode.getParentNode();
-        if ((parent == null) || !parent.getTagName().equals(TAG_DATASET)) {
-            return null;
-        }
-        return findTagValueFromMetaData(parent, version, false, tagName);
-
-    }
-
-    /**
-     * Find the base url for the given service node. If not found print an
-     * error and return null. If found then look for the "suffix" attribute
-     * of the service node. If found append it to the urlPath. Return the
-     * base concatenated with the urlPath.
-     *
-     * @param serviceNode The  service node for the given urlPath.
-     * @param urlPath The  tail end of the absolute url.
-     * @return The full url path.
-     */
-    private static String getAbsoluteUrl(Element serviceNode,
-                                         String urlPath) {
-        String base = XmlUtil.getAttribute(serviceNode, ATTR_BASE,
-                                           NULL_STRING);
-        if (base == null) {
-            IdvChooser.errorMessage("No base found for dataset.");
-            return null;
-        }
-        String suffix = XmlUtil.getAttribute(serviceNode, ATTR_SUFFIX,
-                                             NULL_STRING);
-        if (suffix != null) {
-            urlPath = urlPath + suffix;
-        }
-
-
-        base = base + urlPath;
-        String catalogSource = findCatalogSource(serviceNode);
-        if (catalogSource != null) {
-            base = XmlTree.expandRelativeUrl(base, catalogSource);
-        }
-
-
-
-        return base;
-    }
-
-
-    /**
-     *  Lookup and return the urlPath defined for the given datasetNode.
-     *
-     *  @param datasetNode The dataset node we are looking at.
-     *  @return The url path for the dataset node.
-     */
-    public static String getUrlPath(Element datasetNode) {
-        String urlPath = XmlUtil.getAttribute(datasetNode, ATTR_URLPATH,
-                             NULL_STRING);
-
-        //   <dataset name="Model data" dataType="Grid">
-        //      <service serviceType="DODS" name="mlode" base="http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/"/>
-        //      <dataset name="NCEP AVN-Q model data">
-        //         <dataset name="NCEP AVN-Q 2002-12-20 18:00:00 GMT" serviceName="mlode" urlPath="dods/model/2002122018_avn-q.nc"/>
-
-
-        //If no urlPath attribute look for a contained access node which holds a urlPath
-        if (urlPath == null) {
-            Element accessNode = XmlUtil.findChild(datasetNode, TAG_ACCESS);
-            if (accessNode != null) {
-                urlPath = XmlUtil.getAttribute(accessNode, ATTR_URLPATH);
-            }
-        }
-        return urlPath;
-    }
-
-
-    /**
-     * This reads the xml pointed to by the given resolverUrl. It flags an
-     * error if the url is bad, the xml is bad, the xml contains 0 dataset
-     * nodes, the xml contains more than one dataset node. It returns an
-     * array of object which contain:
-     *  <pre>
-     *        Object[] {newXmlRoot, datasetNode, serviceNode, url}
-     *  </pre>
-     *
-     *  @param resolverUrl The url pointing to the resolver catalog.
-     * @param properties The properties
-     *  @return Array of root element, dataset node, service node and the
-     *          absolute url of the data.
-     */
-    private static Object[] getResolverData(String resolverUrl,
-                                            Hashtable properties) {
-        Element newRoot = null;
-        try {
-            String contents = IOUtil.readContents(resolverUrl);
-            if (contents == null) {
-                IdvChooser.errorMessage("Failed to read the catalog:"
-                                        + resolverUrl);
-                return null;
-            }
-            newRoot = XmlUtil.getRoot(contents);
-            newRoot.setAttribute(ATTR_CATALOGURL, resolverUrl);
-        } catch (Exception exc) {
-            IdvChooser.errorMessage("Error reading catalog:" + resolverUrl
-                                    + "\n" + exc);
-            return null;
-        }
-        if (newRoot == null) {
-            IdvChooser.errorMessage("Failed to retrieve the catalog:"
-                                    + resolverUrl);
-            return null;
-        }
-
-        List datasetNodes = XmlUtil.findDescendants(newRoot, TAG_DATASET);
-        if (datasetNodes.size() == 0) {
-            IdvChooser.errorMessage("No dataset nodes found in the  catalog:"
-                                    + resolverUrl);
-            return null;
-        }
-        if (datasetNodes.size() > 1) {
-            IdvChooser.errorMessage(
-                "Too many dataset nodes found in the  catalog:"
-                + resolverUrl);
-            return null;
-        }
-        Element datasetNode = (Element) datasetNodes.get(0);
-        Element serviceNode = findServiceNodeForDataset(datasetNode, false,
-                                  null);
-
-        if (serviceNode == null) {
-            IdvChooser.errorMessage("Could not find service node");
-            return null;
-        }
-        String urlPath = getUrlPath(datasetNode);
-        if (properties != null) {
-            addServiceProperties(datasetNode, properties, urlPath);
-        }
-        return new Object[] { newRoot, datasetNode, serviceNode,
-                              getAbsoluteUrl(serviceNode, urlPath) };
-    }
-
-    /**
-     *  The given resolverUrl should return a catalog that holds one dataset. This method returns
-     *  the absolute url that that catalog holds. If the given properties is no null then
-     *  this will also try to extract the title from the xml and will put the PROP_TITLE into the
-     *  properties.
-     *
-     *  @param resolverUrl The url pointing to the resolved catalog.
-     *  @param properties To put the title into.
-     *  @return The absolute url that the resolverUrl resolves to (may be null).
-     */
-    public static String resolveUrl(String resolverUrl,
-                                    Hashtable properties) {
-
-        Object[] result = getResolverData(resolverUrl, properties);
-        if (result == null) {
-            return null;
-        }
-        if (properties != null) {
-            String title = getTitleFromDataset((Element) result[1]);
-            if (title != null) {
-                properties.put(DataSource.PROP_TITLE, title);
-            }
-        }
-        return (String) result[3];
-    }
 
 
     /**
@@ -1616,10 +857,10 @@ public class ThreddsHandler extends XmlHandler {
         if (parent == null) {
             return dflt;
         }
-        NodeList elements = XmlUtil.getElements(parent, TAG_PROPERTY);
+        NodeList elements = XmlUtil.getElements(parent, CatalogUtil.TAG_PROPERTY);
         for (int i = 0; i < elements.getLength(); i++) {
             Node child = (Node) elements.item(i);
-            String nameValue = XmlUtil.getAttribute(child, ATTR_NAME,
+            String nameValue = XmlUtil.getAttribute(child, CatalogUtil.ATTR_NAME,
                                    (String) null);
             if (nameValue == null) {
                 continue;
@@ -1627,7 +868,7 @@ public class ThreddsHandler extends XmlHandler {
             if ( !nameValue.equals(nameValueLookingFor)) {
                 continue;
             }
-            String valueValue = XmlUtil.getAttribute(child, ATTR_VALUE,
+            String valueValue = XmlUtil.getAttribute(child, CatalogUtil.ATTR_VALUE,
                                     (String) null);
             if (valueValue != null) {
                 return valueValue;
@@ -1660,7 +901,7 @@ public class ThreddsHandler extends XmlHandler {
                                     Element root, boolean flagMissing) {
 
 
-        String urlPath = getUrlPath(datasetNode);
+        String urlPath = CatalogUtil.getUrlPath(datasetNode);
 
         if (urlPath != null) {
             //A hack to allow for absolute paths in urls
@@ -1669,13 +910,13 @@ public class ThreddsHandler extends XmlHandler {
             if(urlPath.indexOf(":")>=0 || new File(urlPath).exists()) { 
                 url = urlPath;
             } else {
-                serviceNode = findServiceNodeForDataset(datasetNode,
+                serviceNode = CatalogUtil.findServiceNodeForDataset(datasetNode,
                                                         flagMissing, null);
                 if (serviceNode == null) {
                     return false;
                 }
 
-                url = getAbsoluteUrl(serviceNode, urlPath);
+                url = CatalogUtil.getAbsoluteUrl(serviceNode, urlPath);
                 if (url == null) {
                     if (flagMissing) {
                         IdvChooser.errorMessage(
@@ -1686,39 +927,39 @@ public class ThreddsHandler extends XmlHandler {
             }
 
             Hashtable properties  = new Hashtable();
-            properties.put(PROP_CATALOGURL, path);
+            properties.put(CatalogUtil.PROP_CATALOGURL, path);
             String groupId = getPropertyAttributeFromChild(datasetNode,
                                  "group", null);
             if (groupId != null) {
-                properties.put(PROP_DATASETGROUP, groupId);
+                properties.put(CatalogUtil.PROP_DATASETGROUP, groupId);
             }
 
             String datasetId = XmlUtil.getAttribute(datasetNode,
-                                   ATTR_DATASETID, (String) null);
+                                   CatalogUtil.ATTR_DATASETID, (String) null);
             if (datasetId != null) {
-                properties.put(PROP_DATASETID, datasetId);
+                properties.put(CatalogUtil.PROP_DATASETID, datasetId);
             }
 
 
             String annotationServer =
                 getPropertyAttributeFromChild(datasetNode,
-                    VALUE_ANNOTATIONSERVER, null);
+                    CatalogUtil.VALUE_ANNOTATIONSERVER, null);
             if (annotationServer != null) {
-                properties.put(PROP_ANNOTATIONSERVER, annotationServer);
+                properties.put(CatalogUtil.PROP_ANNOTATIONSERVER, annotationServer);
             }
 
-            addServiceProperties(datasetNode, properties, urlPath);
+            CatalogUtil.addServiceProperties(datasetNode, properties, urlPath);
 
 
 
             if(serviceNode!=null) {
                 //If this is a "Resolver" service type then the url points to a catalog 
                 //that holds the real url.
-                String    serviceType = getServiceType(serviceNode);
+                String    serviceType = CatalogUtil.getServiceType(serviceNode);
                 getProperties(datasetNode, serviceNode, properties);
-                if (SERVICE_RESOLVER.equals(serviceType)) {
+                if (CatalogUtil.SERVICE_RESOLVER.equals(serviceType)) {
                     String   resolverUrl = url;
-                    Object[] result = getResolverData(resolverUrl, properties);
+                    Object[] result = CatalogUtil.getResolverData(resolverUrl, properties);
                     if (result == null) {
                         return false;
                     }
@@ -1726,7 +967,7 @@ public class ThreddsHandler extends XmlHandler {
                     serviceNode = (Element) result[2];
                     url         = (String) result[3];
                     properties.put(DataSource.PROP_RESOLVERURL, resolverUrl);
-                    String title = getTitleFromDataset((Element) datasetNode);
+                    String title = CatalogUtil.getTitleFromDataset((Element) datasetNode);
                     if ((title != null) && (properties != null)) {
                         properties.put(DataSource.PROP_TITLE, title);
                     }
@@ -1743,13 +984,13 @@ public class ThreddsHandler extends XmlHandler {
                 return false;
             }
             //This is for dataset nodes that contain other dataset nodes.
-            List children = XmlUtil.findChildren(datasetNode, TAG_DATASET);
+            List children = XmlUtil.findChildren(datasetNode, CatalogUtil.TAG_DATASET);
             for (int i = 0; i < children.size(); i++) {
                 Element childDatasetNode = (Element) children.get(i);
                 urlPath = XmlUtil.getAttribute(childDatasetNode,
-                        ATTR_URLPATH, NULL_STRING);
+                        CatalogUtil.ATTR_URLPATH, NULL_STRING);
                 if (urlPath != null) {
-                    String base = findBaseForDataset(childDatasetNode, root);
+                    String base = CatalogUtil.findBaseForDataset(childDatasetNode, root);
                     if (base == null) {
                         return false;
                     }
@@ -1767,97 +1008,6 @@ public class ThreddsHandler extends XmlHandler {
     }
 
 
-
-    /**
-     * Add any service urls to the properties
-     *
-     * @param datasetNode data set node
-     * @param properties properties
-     * @param urlPath base url
-     */
-    private static void addServiceProperties(Element datasetNode,
-                                             Hashtable properties,
-                                             String urlPath) {
-
-
-        Element dataServiceNode;
-
-        dataServiceNode = findServiceNodeForDataset(datasetNode,  /*root,*/
-                false, SERVICE_HTTP);
-        if (dataServiceNode != null) {
-            String serviceUrl = getAbsoluteUrl(dataServiceNode, urlPath);
-            if (serviceUrl != null) {
-                properties.put(DataSource.PROP_SERVICE_HTTP, serviceUrl);
-            }
-        }
-    }
-
-
-    /**
-     * Generate an html representation of the catalog
-     *
-     * @param root Root of the catalog
-     * @param datasetNode The data set node we are looking at
-     * @param cnt The current count of the data set nodes we have processed
-     * @param bundleTemplate The bundle template we generate the bundle from
-     * @param jnlpTemplate The jnlp template
-     *
-     * @return The current count
-     */
-    public static int generateHtml(Element root, Element datasetNode,
-                                   int cnt, String bundleTemplate,
-                                   String jnlpTemplate) {
-        cnt++;
-        String  name        = XmlUtil.getAttribute(datasetNode, "name");
-        Element serviceNode = findServiceNodeForDataset(datasetNode,  /*root,*/
-            false, null);
-        if (serviceNode == null) {
-            System.out.println("<li> " + name + "\n");
-        } else {
-            String    serviceType = getServiceType(serviceNode);
-            Hashtable properties  = new Hashtable();
-            boolean   isResolver  = (SERVICE_RESOLVER.equals(serviceType));
-            if ( !isResolver) {
-                String urlPath    = getUrlPath(datasetNode);
-                String dataUrl    = getAbsoluteUrl(serviceNode, urlPath);
-                String jnlpFile   = "generated" + cnt + ".jnlp";
-                String bundleFile = "generated" + cnt + ".xidv";
-                System.out.println("<li> <a href=\"" + jnlpFile + "\">"
-                                   + name + "</a>\n");
-                try {
-                    String bundle = StringUtil.replace(bundleTemplate,
-                                        "%datasource%", dataUrl);
-                    bundle = StringUtil.replace(bundle, "%title%", name);
-                    IOUtil.writeFile(bundleFile, bundle);
-                    String jnlp = StringUtil.replace(jnlpTemplate, "%title%",
-                                      "Generated bundle for:" + name);
-                    jnlp = StringUtil.replace(jnlp, "%jnlpfile%", jnlpFile);
-                    jnlp = StringUtil.replace(
-                        jnlp, "%bundle%",
-                        "http://www.unidata.ucar.edu/projects/metapps/testgen/"
-                        + bundleFile);
-                    IOUtil.writeFile(jnlpFile, jnlp);
-                } catch (Exception exc) {
-                    System.err.println("error:" + exc);
-                    System.exit(1);
-                }
-            }
-        }
-
-        List children = XmlUtil.findChildren(datasetNode, TAG_DATASET);
-        for (int i = 0; i < children.size(); i++) {
-            if (i == 0) {
-                System.out.println("<ul>");
-            }
-            Element child = (Element) children.get(i);
-            cnt = generateHtml(root, child, cnt, bundleTemplate,
-                               jnlpTemplate);
-        }
-        if (children.size() > 0) {
-            System.out.println("</ul>");
-        }
-        return cnt;
-    }
 
     /**
      * Test the html generation
@@ -1882,10 +1032,10 @@ public class ThreddsHandler extends XmlHandler {
             Element root = XmlUtil.getRoot(xml);
             String  name = XmlUtil.getAttribute(root, "name");
             System.out.println(name + "\n<ul>");
-            List children = XmlUtil.findChildren(root, TAG_DATASET);
+            List children = XmlUtil.findChildren(root, CatalogUtil.TAG_DATASET);
             for (int i = 0; i < children.size(); i++) {
                 Element child = (Element) children.get(i);
-                generateHtml(root, child, 0, bundleTemplate, jnlpTemplate);
+                CatalogUtil.generateHtml(root, child, 0, bundleTemplate, jnlpTemplate);
             }
 
             System.out.println("</ul>");

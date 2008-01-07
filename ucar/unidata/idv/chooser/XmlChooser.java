@@ -34,6 +34,7 @@ import ucar.unidata.idv.ui.DataSelector;
 import ucar.unidata.ui.DatasetUI;
 import ucar.unidata.ui.XmlTree;
 import ucar.unidata.util.FileManager;
+import ucar.unidata.util.CatalogUtil;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
@@ -395,7 +396,7 @@ public class XmlChooser extends IdvChooser implements ActionListener {
                                      "Error");
             LogUtil.userErrorMessage("Error: " + error);
             return;
-        } else if (tagName.equals(ThreddsHandler.TAG_CATALOG)) {
+        } else if (tagName.equals(CatalogUtil.TAG_CATALOG)) {
             handler = new ThreddsHandler(this, xmlRoot, path);
         } else if (tagName.equals("menus")) {
             handler = new MenuHandler(this, xmlRoot, path);
