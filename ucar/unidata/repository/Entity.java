@@ -135,6 +135,16 @@ public class Entity {
     }
 
 
+    public boolean equals(Object o) {
+        if ( !o.getClass().equals(getClass())) {
+            return false;
+        }
+        Entity that = (Entity) o;
+        return Misc.equals(this.id, that.id);
+    }
+
+
+
     /**
      * Set the CreateDate property.
      *

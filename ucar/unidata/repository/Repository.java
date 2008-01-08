@@ -115,6 +115,8 @@ public class Repository implements Constants, Tables, RequestHandler {
     /** _more_ */
     public MyUrl URL_USER_SETTINGS = new MyUrl("/user/settings");
 
+    public MyUrl URL_USER_CART = new MyUrl("/user/cart");
+
 
     /** _more_ */
     public MyUrl URL_GROUP_SHOW = new MyUrl("/group/show");
@@ -314,6 +316,8 @@ public class Repository implements Constants, Tables, RequestHandler {
 
     /** _more_ */
     private Hashtable pageCache = new Hashtable();
+
+
 
     /** _more_ */
     private List pageCacheList = new ArrayList();
@@ -1072,16 +1076,7 @@ public class Repository implements Constants, Tables, RequestHandler {
         String template = getResource(PROP_HTML_TEMPLATE);
         String html = StringUtil.replace(template, "${content}",
                                          new String(result.getContent()));
-        String userLink;
-        User   user = request.getRequestContext().getUser();
-        if (user.getAnonymous()) {
-            userLink =
-                "<a href=\"${root}/user/login\" class=\"navlink\">Login</a>";
-        } else {
-            userLink = "<a href=\"${root}/user/settings\" class=\"navlink\">"
-                       + user.getLabel() + "</a>";
-        }
-
+        String userLink = getUserManager().getUserLinks(request);
         html = StringUtil.replace(html, "${userlink}", userLink);
         html = StringUtil.replace(html, "${repository_name}",
                                   getProperty(PROP_REPOSITORY_NAME,
@@ -5415,8 +5410,13 @@ public class Repository implements Constants, Tables, RequestHandler {
          * @return _more_
          */
         public String toString() {
-            return getUrlBase() + path;
+            return getRepository().getUrlBase() + path;
         }
+
+        protected Repository getRepository() {
+            return Repository.this;
+        }
+
 
         /**
          * _more_

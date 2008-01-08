@@ -105,6 +105,7 @@ public class UserManager implements Constants, Tables, RequestHandler {
     /** _more_ */
     private Hashtable<String, User> userMap = new Hashtable<String, User>();
 
+    private Hashtable userCart = new Hashtable();
 
     /**
      * _more_
@@ -441,6 +442,70 @@ public class UserManager implements Constants, Tables, RequestHandler {
     }
 
 
+
+    public Result processCart(Request request) throws Exception {
+        String action = request.getString(ARG_ACTION,"");
+        User user = request.getRequestContext().getUser();
+        List<Entry> entries = (List<Entry>) userCart.get(user);
+        StringBuffer sb = new StringBuffer();
+        if(user.getAnonymous()) {
+            sb.append("No cart available for anonymous user");
+            return new Result("User Cart", sb);
+        }
+        if(entries==null) {
+            entries = new ArrayList<Entry>();
+            userCart.put(user, entries);
+        }
+        if(action.equals(ACTION_CLEAR)) {
+            entries = new ArrayList<Entry>();
+            userCart.put(user, entries);
+        } else  if(action.equals(ACTION_ADD)) {
+            Entry entry = repository.getEntry(request.getId(""), request);
+            if(entry == null) {
+                throw new IllegalArgumentException(
+                                                   "Could not find entry with id:" + request.getId(""));
+            }
+            if(!entries.contains(entry)) {
+                entries.add(entry);
+            }
+        }
+
+
+        sb.append("<h3>User Cart</h3>");
+        if(entries.size()==0) {
+            sb.append("No entries in cart");
+        } else {
+            sb.append(HtmlUtil.href(HtmlUtil.url(repository.URL_USER_CART,ARG_ACTION, ACTION_CLEAR),"Clear"));
+            sb.append("<ul>");
+            OutputHandler outputHandler =  repository.getOutputHandler(request);
+            for(Entry entry: entries) {
+                sb.append("<li> ");
+                sb.append(outputHandler.getEntryUrl(entry));
+            }
+            
+            sb.append("</ul>");
+        }
+        Result result = new Result("User Cart", sb);
+        return result;
+    }
+
+
+    public String getUserLinks(Request request) {
+        User   user = request.getRequestContext().getUser();
+        String userLink;
+        if (user.getAnonymous()) {
+            userLink =
+                "<a href=\"${root}/user/login\" class=\"navlink\">Login</a>";
+        } else {
+            String cartEntry = HtmlUtil.href(repository.URL_USER_CART, HtmlUtil.img(
+                                                                                    repository.fileUrl("/Cart.gif"),
+                                                                                    "Data Cart"));
+
+            userLink = cartEntry + HtmlUtil.space(1) +
+                HtmlUtil.href(repository.URL_USER_SETTINGS, user.getLabel(), " class=\"navlink\" ");
+        }
+        return userLink;
+    }
 
     /**
      * _more_

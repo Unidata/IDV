@@ -500,6 +500,8 @@ public interface Constants {
     /** _more_ */
     public static final String ACTION_EDIT = "action.edit";
 
+    public static final String ACTION_CLEAR = "action.clear";
+
     /** _more_ */
     public static final String ACTION_DELETE_ASK = "action.delete.ask";
 
@@ -507,13 +509,14 @@ public interface Constants {
     public static final String ACTION_DELETE_DOIT = "action.delete.doit";
 
     /** _more_ */
-    public static final String ACTION_START = "start";
+    public static final String ACTION_START = "action.start";
 
     /** _more_ */
-    public static final String ACTION_STOP = "stop";
+    public static final String ACTION_STOP = "action.stop";
+    public static final String ACTION_ADD = "action.add";
 
     /** _more_ */
-    public static final String ACTION_REMOVE = "remove";
+    public static final String ACTION_REMOVE = "action.remove";
 
 
 

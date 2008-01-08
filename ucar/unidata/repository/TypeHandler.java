@@ -399,9 +399,17 @@ public class TypeHandler implements Constants, Tables {
                                        repository.fileUrl("/Edit16.gif"),
                                        "Edit Entry"));
 
+        String cartEntry = HtmlUtil.href(
+                               HtmlUtil.url(
+                                   repository.URL_USER_CART, ARG_ACTION, ACTION_ADD, ARG_ID,
+                                   entry.getId()), HtmlUtil.img(
+                                       repository.fileUrl("/Cart.gif"),
+                                       "Add to cart"));
+
         return editEntry + HtmlUtil.space(1)
                + getEntryDownloadLink(request, entry) + HtmlUtil.space(1)
-               + getGraphLink(request, entry);
+               + getGraphLink(request, entry)+ HtmlUtil.space(1)+
+            cartEntry;
     }
 
 

@@ -34,6 +34,8 @@
   <method handler="usermanager" request="/user/login"        method="processLogin"  admin="false"  cancache="false"/>
   <method handler="usermanager" request="/user/settings"     method="processSettings"  admin="false" cancache="false"/>
 
+  <method handler="usermanager" request="/user/cart"     method="processCart"  admin="false" cancache="false"/>
+
 
   <method request="/admin/import/catalog"       method="adminImportCatalog"      admin="true" cancache="false"/>
 
