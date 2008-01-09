@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.visad.data;
 
 
@@ -255,8 +256,49 @@ public class GeoGridFlatField extends CachedFlatField {
 
         Trace.call1("toFloatArray", " array:" + arr.getClass().getName());
         float[][] fieldArray = new float[1][];
-        fieldArray[0] = DataUtil.toFloatArray(arr);
-        Trace.call2("toFloatArray", " length:" + fieldArray[0].length);
+        //fieldArray[0] = DataUtil.toFloatArray(arr);
+        float[] values = DataUtil.toFloatArray(arr);
+        Trace.call2("toFloatArray", " length:" + values.length);
+        // if we have extended the longitudes, we need to add more points.
+        try {
+            if (values.length < domainSet.getLength()) {  // need to extend array
+                float[] newValues = new float[domainSet.getLength()];
+                int[]   lengths   = domainSet.getLengths();
+                int     l         = 0;
+                int     sizeX     = lengths[0];
+                int     sizeY     = lengths[1];
+                if (lengths.length == 2) {
+                    for (int j = 0; j < sizeY; j++) {
+                        for (int i = 0; i < sizeX; i++) {
+                            int xpos = (i < sizeX - 1)
+                                       ? i
+                                       : 0;
+                            newValues[l++] = values[j * (sizeX - 1) + xpos];
+                        }
+                    }
+                } else {
+                    for (int k = 0; k < lengths[2]; k++) {
+                        for (int j = 0; j < sizeY; j++) {
+                            for (int i = 0; i < sizeX; i++) {
+                                int xpos = (i < sizeX - 1)
+                                           ? i
+                                           : 0;
+                                newValues[l++] =
+                                    values[k * sizeY * (sizeX - 1) + j * (sizeX - 1) + xpos];
+                            }
+                        }
+                    }
+                }
+                fieldArray[0] = newValues;
+
+            } else {
+                fieldArray[0] = values;
+            }
+        } catch (VisADException e) {
+            LogUtil.logException("trying to extend grid got VisADException",
+                                 e);
+            return null;
+        }
         msg("readData DONE");
         return fieldArray;
     }
