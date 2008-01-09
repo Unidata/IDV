@@ -30,6 +30,7 @@ import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.CatalogUtil;
 
 import ucar.unidata.util.IOUtil;
 
@@ -51,7 +52,7 @@ import java.io.*;
 
 import ucar.unidata.xml.XmlUtil;
 
-import ucar.unidata.idv.chooser.ThreddsHandler;
+
 
 
 import HTTPClient.*;
@@ -174,13 +175,13 @@ public class ThreddsPublisher {
                     (DataSourceImpl) dataSources.get(i);
                 Hashtable properties = dataSource.getProperties();
                 annotationServer = (String) properties.get(
-                    ThreddsHandler.PROP_ANNOTATIONSERVER);
+                    CatalogUtil.PROP_ANNOTATIONSERVER);
                 catalogUrl =
-                    (String) properties.get(ThreddsHandler.PROP_CATALOGURL);
+                    (String) properties.get(CatalogUtil.PROP_CATALOGURL);
                 groupId =
-                    (String) properties.get(ThreddsHandler.PROP_DATASETGROUP);
+                    (String) properties.get(CatalogUtil.PROP_DATASETGROUP);
                 datasetId =
-                    (String) properties.get(ThreddsHandler.PROP_DATASETID);
+                    (String) properties.get(CatalogUtil.PROP_DATASETID);
                 if ((catalogUrl != null) || (groupId != null)
                         || (datasetId != null)) {
                     break;

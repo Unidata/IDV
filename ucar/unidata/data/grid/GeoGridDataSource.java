@@ -50,7 +50,7 @@ import ucar.unidata.geoloc.projection.*;
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.IdvConstants;
 
-import ucar.unidata.idv.chooser.ThreddsHandler;
+import ucar.unidata.util.CatalogUtil;
 
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.ContourInfo;
@@ -471,7 +471,7 @@ public class GeoGridDataSource extends GridDataSource {
             if(firstone.indexOf(ucar.unidata.idv.IdvPersistenceManager.PROP_ZIDVPATH)>=0) {
                 getProperties().remove(PROP_RESOLVERURL);
             } else {
-                String resolvedUrl = ThreddsHandler.resolveUrl(firstone,
+                String resolvedUrl = CatalogUtil.resolveUrl(firstone,
                                                                properties);
                 if (resolvedUrl != null) {
                     setProperty(PROP_RESOLVERURL, firstone);
@@ -494,7 +494,7 @@ public class GeoGridDataSource extends GridDataSource {
             if (properties == null) {
                 properties = new Hashtable();
             }
-            String resolvedUrl = ThreddsHandler.resolveUrl(resolverUrl,
+            String resolvedUrl = CatalogUtil.resolveUrl(resolverUrl,
                                      properties);
             if (resolvedUrl == null) {
                 setInError(true);
