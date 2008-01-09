@@ -23,6 +23,8 @@
 
 
 
+
+
 package ucar.unidata.data.grid;
 
 
@@ -56,12 +58,12 @@ import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.WrapperException;
 
-import ucar.visad.data.CachedFlatField;
-import ucar.visad.data.GeoGridFlatField;
-
 import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.RadarGridCoordinateSystem;
 import ucar.visad.Util;
+
+import ucar.visad.data.CachedFlatField;
+import ucar.visad.data.GeoGridFlatField;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.GeopotentialAltitude;
 import ucar.visad.quantities.Gravity;
@@ -453,10 +455,13 @@ public class GeoGridAdapter {
         CoordinateAxis1D zAxis = gcs.getVerticalAxis();
 
         // Check to see if they are linear or not
-        boolean isLinear = checkLinearity(yAxis, false);
-        int     sizeZ    = (zAxis == null)
-                           ? 0
-                           : (int) zAxis.getSize();
+        boolean xIsLinear = false;
+        boolean yIsLinear = checkLinearity(yAxis, false);
+        boolean isLinear  = yIsLinear;
+
+        int     sizeZ     = (zAxis == null)
+                            ? 0
+                            : (int) zAxis.getSize();
 
         // check ZAxis (check if x is linear and sizeZ > 1)
         // if sizeZ == 1, we need to have a Gridded3DSet.  Linear3DSet does
@@ -491,22 +496,26 @@ public class GeoGridAdapter {
 
         //boolean isLatLon = (Unit.canConvert(xUnit, CommonUnits.DEGREE)
         //                    && Unit.canConvert(yUnit, CommonUnits.DEGREE));
-        boolean          isLatLon = gcs.isLatLon();
+        boolean          isLatLon      = gcs.isLatLon();
 
 
-        CoordinateSystem domainCS = null;
-        RealType         xType    = null;
-        RealType         yType    = null;
-        RealType         zType    = null;
+        CoordinateSystem domainCS      = null;
+        RealType         xType         = null;
+        RealType         yType         = null;
+        RealType         zType         = null;
 
-        if (isLinear) {
+        boolean          needToWrapLon = false;
+        if (yIsLinear) {
             if (isLatLon) {
-                isLinear = checkLinearity(xAxis, true);
+                xIsLinear = checkLinearity(xAxis, true);
+                if (xIsLinear) {
+                    needToWrapLon = checkNeedToWrapLon(xAxis);
+                }
             } else {
-                isLinear = checkLinearity(xAxis, false);
+                xIsLinear = checkLinearity(xAxis, false);
             }
         }
-
+        isLinear = isLinear && xIsLinear;
 
         RealTupleType domainTemplate = null;
         boolean       is2D           = is2D(sizeZ, zUnit, vt);  // 2D Domain
@@ -669,7 +678,7 @@ public class GeoGridAdapter {
 
         if (isLinear) {
             Linear1DSet xSet = makeLinear1DSet((CoordinateAxis1D) xAxis,
-                                   xType, xUnit);
+                                   xType, xUnit, needToWrapLon);
             Linear1DSet ySet = makeLinear1DSet((CoordinateAxis1D) yAxis,
                                    yType, yUnit);
 
@@ -718,6 +727,9 @@ public class GeoGridAdapter {
             Unit[] units;
             // if (sizeZ < 1) {                     // 2D Domain
             if (is2D) {  // 2D Domain
+                if (needToWrapLon) {
+                    sizeX = sizeX + 1;
+                }
                 log_.debug("sizeZ <= 1 (i.e., 2D)");
                 coordData = new float[2][(is1D)
                                          ? sizeX * sizeY
@@ -728,9 +740,17 @@ public class GeoGridAdapter {
                         for (int i = 0; i < sizeX; i++) {
 
                             // set or load coordinate values
-                            coordData[0][idx] =
-                                (float) ((CoordinateAxis1D) xAxis)
-                                    .getCoordValue(i);
+                            if (needToWrapLon && (i == sizeX - 1)) {
+                                coordData[0][idx] =
+                                    (float) (((CoordinateAxis1D) xAxis)
+                                        .getCoordValue(i
+                                            - 1) + ((CoordinateAxis1D) xAxis)
+                                                .getIncrement());
+                            } else {
+                                coordData[0][idx] =
+                                    (float) ((CoordinateAxis1D) xAxis)
+                                        .getCoordValue(i);
+                            }
                             coordData[1][idx] =
                                 (float) ((CoordinateAxis1D) yAxis)
                                     .getCoordValue(j);
@@ -749,6 +769,9 @@ public class GeoGridAdapter {
                 }
                 units = new Unit[] { xUnit, yUnit };
             } else {  // 3D set
+                if (is1D && needToWrapLon) {
+                    sizeX = sizeX + 1;
+                }
                 Trace.call1("making coordData array",
                             " size:" + (sizeX * sizeY * sizeZ));
                 coordData = (is1D)
@@ -762,9 +785,17 @@ public class GeoGridAdapter {
                     float[] xValues = new float[sizeX];
                     float[] yValues = new float[sizeY];
                     for (int i = 0; i < xValues.length; i++) {
-                        xValues[i] =
-                            (float) ((CoordinateAxis1D) xAxis).getCoordValue(
-                                i);
+                        if (needToWrapLon && (i == sizeX - 1)) {
+                            xValues[i] =
+                                (float) (((CoordinateAxis1D) xAxis)
+                                    .getCoordValue(i
+                                        - 1) + ((CoordinateAxis1D) xAxis)
+                                            .getIncrement());
+                        } else {
+                            xValues[i] =
+                                (float) ((CoordinateAxis1D) xAxis)
+                                    .getCoordValue(i);
+                        }
 
                     }
                     for (int i = 0; i < yValues.length; i++) {
@@ -839,7 +870,30 @@ public class GeoGridAdapter {
         return domainSet;
     }
 
-
+    /**
+     * Check if we need to wrap the longitudes.
+     *
+     * @param axis _more_
+     *
+     * @return _more_
+     */
+    private boolean checkNeedToWrapLon(CoordinateAxis axis) {
+        if (axis.getRank() > 1) {
+            return false;
+        }
+        CoordinateAxis1D axis1D = (CoordinateAxis1D) axis;
+        if (axis1D.isRegular()) {
+            double first = axis1D.getCoordValue(0);
+            double last  = axis1D.getCoordValue((int) axis1D.getSize() - 1);
+            if (first + 360 != last) {
+                double newLast = last + axis1D.getIncrement();
+                if (first + 360 == newLast) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * Make a domain set that supports a vertical transform.
@@ -1029,6 +1083,7 @@ public class GeoGridAdapter {
      */
     private CachedFlatField getFlatField(int timeIndex, String readLabel)
             throws VisADException {
+
         String filename = IOUtil.joinDir(dataSource.getDataCachePath(),
                                          cacheFile + "_t_" + timeIndex
                                          + ".dat");
@@ -1102,7 +1157,41 @@ public class GeoGridAdapter {
 
             //        Trace.call1("toFloatArray", " array:" + arr.getClass().getName());
             final float[][] fieldArray = new float[1][];
-            fieldArray[0] = DataUtil.toFloatArray(arr);
+            //fieldArray[0] = DataUtil.toFloatArray(arr);
+            float[] values = DataUtil.toFloatArray(arr);
+            if (values.length < domainSet.getLength()) {  // need to extend array
+                float[] newValues = new float[domainSet.getLength()];
+                int[]   lengths   = domainSet.getLengths();
+                int     l         = 0;
+                int     sizeX     = lengths[0];
+                int     sizeY     = lengths[1];
+                if (lengths.length == 2) {
+                    for (int j = 0; j < sizeY; j++) {
+                        for (int i = 0; i < sizeX; i++) {
+                            int xpos = (i < sizeX - 1)
+                                       ? i
+                                       : 0;
+                            newValues[l++] = values[j * (sizeX - 1) + xpos];
+                        }
+                    }
+                } else {
+                    for (int k = 0; k < lengths[2]; k++) {
+                        for (int j = 0; j < sizeY; j++) {
+                            for (int i = 0; i < sizeX; i++) {
+                                int xpos = (i < sizeX - 1)
+                                           ? i
+                                           : 0;
+                                newValues[l++] =
+                                    values[k * sizeY * (sizeX - 1) + j * (sizeX - 1) + xpos];
+                            }
+                        }
+                    }
+                }
+                fieldArray[0] = newValues;
+
+            } else {
+                fieldArray[0] = values;
+            }
             //        Trace.call2("toFloatArray", " length:" + fieldArray[0].length);
             retField = new CachedFlatField(ffType, domainSet, fieldArray);
         } else {
@@ -1125,6 +1214,7 @@ public class GeoGridAdapter {
                     + timeIndex);
 
         return retField;
+
     }
 
     /**
@@ -1327,7 +1417,7 @@ public class GeoGridAdapter {
         try {
             r = Util.parseUnit(uString);
         } catch (Exception excp) {
-            System.out.println("Unknown unit " + uString);
+            System.err.println("Unknown unit " + uString);
             r = null;
         }
         return r;
@@ -1368,13 +1458,42 @@ public class GeoGridAdapter {
     private Linear1DSet makeLinear1DSet(CoordinateAxis1D axis, RealType type,
                                         Unit u)
             throws VisADException {
-        Trace.call1("GeoGridAdapter.makeLinear1DSet");
+        return makeLinear1DSet(axis, type, u, false);
+    }
 
-        Linear1DSet result =
-            new Linear1DSet(type, axis.getCoordValue(0),
-                            axis.getCoordValue((int) axis.getSize() - 1),
-                            (int) axis.getSize(), (CoordinateSystem) null,
-                            new Unit[] { u }, (ErrorEstimate[]) null, true);  // cache the results
+    /**
+     * Make a Linear1DSet from a 1D axis.  Use the RealType for the
+     * MathType of the set.  Must ensure that axis is linear
+     * (use {@link #checkLinearity(CoordinateAxis, boolean}) before
+     * calling this.
+     *
+     * @param  axis  1D CoordinateAxis
+     * @param  type  MathType for LinearSet.
+     * @param  u     unit for data
+     * @param  extend  extend by one point
+     *
+     * @return  Linear1DSet representing the axis
+     *
+     * @throws VisADException  problem making set
+     */
+    private Linear1DSet makeLinear1DSet(CoordinateAxis1D axis, RealType type,
+                                        Unit u, boolean extend)
+            throws VisADException {
+        Trace.call1("GeoGridAdapter.makeLinear1DSet");
+        double start = axis.getCoordValue(0);
+        double end   = axis.getCoordValue((int) axis.getSize() - 1);
+        if (extend) {
+            end = end + axis.getIncrement();
+        }
+        int numPoints = (int) axis.getSize();
+        if (extend) {
+            numPoints++;
+        }
+
+        Linear1DSet result = new Linear1DSet(type, start, end, numPoints,
+                                             (CoordinateSystem) null,
+                                             new Unit[] { u },
+                                             (ErrorEstimate[]) null, true);  // cache the results
         Trace.call2("GeoGridAdapter.makeLinear1DSet");
         return result;
     }
