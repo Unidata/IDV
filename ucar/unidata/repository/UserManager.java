@@ -71,7 +71,18 @@ import java.util.Properties;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class UserManager implements Constants, Tables, RequestHandler {
+public class UserManager extends RepositoryManager {
+
+    /** _more_ */
+    public RequestUrl URL_USER_LOGIN = new RequestUrl(this, "/user/login");
+
+    /** _more_ */
+    public RequestUrl URL_USER_SETTINGS = new RequestUrl(this, "/user/settings");
+
+    public RequestUrl URL_USER_CART = new RequestUrl(this, "/user/cart");
+
+
+
 
     /** _more_          */
     public static final String ARG_USER_NAME = "user.name";
@@ -96,9 +107,6 @@ public class UserManager implements Constants, Tables, RequestHandler {
 
 
 
-    /** _more_ */
-    Repository repository;
-
     /** _more_          */
     boolean requireLogin = true;
 
@@ -113,8 +121,8 @@ public class UserManager implements Constants, Tables, RequestHandler {
      * @param repository _more_
      */
     public UserManager(Repository repository) {
-        this.repository = repository;
-        requireLogin    = repository.getProperty(PROP_USER_REQUIRELOGIN,
+        super(repository);
+        requireLogin    = getRepository().getProperty(PROP_USER_REQUIRELOGIN,
                 true);
     }
 
@@ -150,7 +158,7 @@ public class UserManager implements Constants, Tables, RequestHandler {
     protected boolean isRequestOk(Request request) {
         if (requireLogin
                 && request.getRequestContext().getUser().getAnonymous()) {
-            if ( !request.getRequestPath().startsWith(repository.getUrlBase()
+            if ( !request.getRequestPath().startsWith(getRepository().getUrlBase()
                     + "/user/")) {
                 return false;
             }
@@ -169,7 +177,7 @@ public class UserManager implements Constants, Tables, RequestHandler {
     public String makeLoginForm(Request request) {
         StringBuffer sb   = new StringBuffer("<h3>Please login</h3>");
         String       name = request.getString(ARG_USER_NAME, "");
-        sb.append(HtmlUtil.form(repository.URL_USER_LOGIN));
+        sb.append(HtmlUtil.form(URL_USER_LOGIN));
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry("User:",
                                      HtmlUtil.input(ARG_USER_NAME, name)));
@@ -216,7 +224,7 @@ public class UserManager implements Constants, Tables, RequestHandler {
                                           Misc.newList(TABLE_USERS),
                                           SqlUtil.eq(COL_USERS_ID,
                                               SqlUtil.quote(id)));
-        ResultSet results = repository.execute(query).getResultSet();
+        ResultSet results = getRepository().execute(query).getResultSet();
         if ( !results.next()) {
             //            throw new IllegalArgumentException ("Could not find  user id:" + id + " sql:" + query);
             return null;
@@ -242,7 +250,7 @@ public class UserManager implements Constants, Tables, RequestHandler {
      */
     protected void makeOrUpdateUser(User user, boolean updateIfNeeded)
             throws Exception {
-        if (repository.tableContains(user.getId(), TABLE_USERS,
+        if (getRepository().tableContains(user.getId(), TABLE_USERS,
                                      COL_USERS_ID)) {
             if ( !updateIfNeeded) {
                 throw new IllegalArgumentException(
@@ -259,11 +267,11 @@ public class UserManager implements Constants, Tables, RequestHandler {
                         SqlUtil.quote(user.getAnswer()), (user.getAdmin()
                     ? "1"
                     : "0") });
-            repository.execute(query);
+            getRepository().execute(query);
             return;
         }
 
-        repository.execute(INSERT_USERS, new Object[] {
+        getRepository().execute(INSERT_USERS, new Object[] {
             user.getId(), user.getName(), user.getEmail(), user.getQuestion(),
             user.getAnswer(), user.getPassword(), new Boolean(user.getAdmin())
         });
@@ -296,7 +304,7 @@ public class UserManager implements Constants, Tables, RequestHandler {
     protected void deleteUser(User user) throws Exception {
         String query = SqlUtil.makeDelete(TABLE_USERS, COL_USERS_ID,
                                           SqlUtil.quote(user.getId()));
-        repository.execute(query);
+        getRepository().execute(query);
     }
 
 
@@ -321,7 +329,7 @@ public class UserManager implements Constants, Tables, RequestHandler {
         StringBuffer sb = new StringBuffer();
         if (request.defined(ARG_DELETE_CONFIRM)) {
             deleteUser(user);
-            return new Result(repository.URL_ADMIN_USER_LIST.toString());
+            return new Result(getAdmin().URL_ADMIN_USER_LIST.toString());
         }
 
         if (request.defined(ARG_CHANGE)) {
@@ -340,9 +348,9 @@ public class UserManager implements Constants, Tables, RequestHandler {
         }
 
 
-        sb.append(repository.header("User: " + user.getName()));
+        sb.append(getRepository().header("User: " + user.getName()));
         sb.append("\n<p/>\n");
-        sb.append(HtmlUtil.form(repository.URL_ADMIN_USER));
+        sb.append(HtmlUtil.form(getAdmin().URL_ADMIN_USER));
         sb.append("\n");
         sb.append(HtmlUtil.hidden(ARG_USER, user.getId()));
         sb.append("\n");
@@ -370,8 +378,8 @@ public class UserManager implements Constants, Tables, RequestHandler {
         sb.append("\n</form>\n");
         Result result = new Result("User:" + user.getName(), sb);
         result.putProperty(PROP_NAVSUBLINKS,
-                           repository.getSubNavLinks(request,
-                               repository.adminUrls));
+                           getRepository().getSubNavLinks(request,
+                               getAdmin().adminUrls));
         return result;
     }
 
@@ -387,12 +395,12 @@ public class UserManager implements Constants, Tables, RequestHandler {
      */
     public Result adminUserList(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        sb.append(repository.header("Users"));
+        sb.append(getRepository().header("Users"));
         String query = SqlUtil.makeSelect(COLUMNS_USERS,
                                           Misc.newList(TABLE_USERS));
 
         SqlUtil.Iterator iter =
-            SqlUtil.getIterator(repository.execute(query));
+            SqlUtil.getIterator(getRepository().execute(query));
         ResultSet  results;
 
         List<User> users = new ArrayList();
@@ -411,15 +419,15 @@ public class UserManager implements Constants, Tables, RequestHandler {
                     HtmlUtil.cols(
                         HtmlUtil.href(
                             HtmlUtil.url(
-                                repository.URL_ADMIN_USER, ARG_USER,
+                                getAdmin().URL_ADMIN_USER, ARG_USER,
                                 user.getId()), user.getId()), user.getName(),
                                     "" + user.getAdmin())));
         }
         sb.append("</table>");
         Result result = new Result("Users", sb);
         result.putProperty(PROP_NAVSUBLINKS,
-                           repository.getSubNavLinks(request,
-                               repository.adminUrls));
+                           getRepository().getSubNavLinks(request,
+                               getAdmin().adminUrls));
         return result;
     }
 
@@ -456,11 +464,12 @@ public class UserManager implements Constants, Tables, RequestHandler {
             entries = new ArrayList<Entry>();
             userCart.put(user, entries);
         }
+
         if(action.equals(ACTION_CLEAR)) {
             entries = new ArrayList<Entry>();
             userCart.put(user, entries);
         } else  if(action.equals(ACTION_ADD)) {
-            Entry entry = repository.getEntry(request.getId(""), request);
+            Entry entry = getRepository().getEntry(request.getId(""), request);
             if(entry == null) {
                 throw new IllegalArgumentException(
                                                    "Could not find entry with id:" + request.getId(""));
@@ -475,12 +484,31 @@ public class UserManager implements Constants, Tables, RequestHandler {
         if(entries.size()==0) {
             sb.append("No entries in cart");
         } else {
-            sb.append(HtmlUtil.href(HtmlUtil.url(repository.URL_USER_CART,ARG_ACTION, ACTION_CLEAR),"Clear"));
+            sb.append(HtmlUtil.href(HtmlUtil.url(URL_USER_CART,ARG_ACTION, ACTION_CLEAR),"Clear List"));
+            boolean haveFrom = request.defined(ARG_FROM);
+            if(haveFrom) {
+                Entry fromEntry = getRepository().getEntry(request.getString(ARG_FROM,""),request);
+                sb.append("<br>Pick an entry  to associate with: " + fromEntry.getName());
+            }
             sb.append("<ul>");
-            OutputHandler outputHandler =  repository.getOutputHandler(request);
+            OutputHandler outputHandler =  getRepository().getOutputHandler(request);
             for(Entry entry: entries) {
                 sb.append("<li> ");
+                if(haveFrom) {
+                    sb.append(HtmlUtil.href(HtmlUtil.url(getRepository().URL_ASSOCIATION_ADD, ARG_FROM, request.getString(ARG_FROM,""),ARG_TO, entry.getId()),
+                                            HtmlUtil.img(
+                                                         getRepository().fileUrl("/Association.gif"),
+                                                         "Create an association")));
+                } else {
+                    sb.append(HtmlUtil.href(HtmlUtil.url(URL_USER_CART, ARG_FROM, entry.getId()),
+                                            HtmlUtil.img(
+                                                         getRepository().fileUrl("/Association.gif"),
+                                                         "Create an association")));
+                }
+                sb.append(HtmlUtil.space(1));
                 sb.append(outputHandler.getEntryUrl(entry));
+
+
             }
             
             sb.append("</ul>");
@@ -497,12 +525,12 @@ public class UserManager implements Constants, Tables, RequestHandler {
             userLink =
                 "<a href=\"${root}/user/login\" class=\"navlink\">Login</a>";
         } else {
-            String cartEntry = HtmlUtil.href(repository.URL_USER_CART, HtmlUtil.img(
-                                                                                    repository.fileUrl("/Cart.gif"),
+            String cartEntry = HtmlUtil.href(URL_USER_CART, HtmlUtil.img(
+                                                                                    getRepository().fileUrl("/Cart.gif"),
                                                                                     "Data Cart"));
 
             userLink = cartEntry + HtmlUtil.space(1) +
-                HtmlUtil.href(repository.URL_USER_SETTINGS, user.getLabel(), " class=\"navlink\" ");
+                HtmlUtil.href(URL_USER_SETTINGS, user.getLabel(), " class=\"navlink\" ");
         }
         return userLink;
     }

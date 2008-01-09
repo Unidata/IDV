@@ -24,33 +24,38 @@
 
   <method request="/entry/show"   method="processEntryShow"    admin="false" cancache="true"/>
   <method request="/entry/add"    method="processEntryAdd"     admin="false" cancache="true"/>
+
   <method request="/entry/form"    method="processEntryForm"     admin="false" cancache="true"/>
   <method request="/entry/delete"    method="processEntryDelete"     admin="false" cancache="true"/>
   <method request="/entry/get/*"  method="processEntryGet"     admin="false" cancache="false"/>
 
+ <method request="/association/add"    method="processAssociationAdd"     admin="false" cancache="true"/>
+
   <method request="/getentries"  method="processGetEntries"   admin="false" cancache="true"/>
 
+  <method request="/getmap"    method="processMap"       admin="false" cancache="false"/>
 
   <method handler="usermanager" request="/user/login"        method="processLogin"  admin="false"  cancache="false"/>
   <method handler="usermanager" request="/user/settings"     method="processSettings"  admin="false" cancache="false"/>
 
   <method handler="usermanager" request="/user/cart"     method="processCart"  admin="false" cancache="false"/>
 
+  <method handler="admin" request="/admin/import/catalog"       method="adminImportCatalog"      admin="true" cancache="false"/>
 
-  <method request="/admin/import/catalog"       method="adminImportCatalog"      admin="true" cancache="false"/>
 
-  <method request="/admin/sql"          method="adminSql"      admin="true" cancache="false"/>
-  <method request="/admin/home"         method="adminHome"     admin="true" cancache="false" name="Admin" toplevel="true"/>
-  <method request="/admin/startstop"    method="adminDbStartStop"       admin="true" cancache="false"/>
-  <method request="/admin/tables"       method="adminDbTables"       admin="true" cancache="false"/>
-  <method request="/admin/stats"        method="adminStats"    admin="true" cancache="false"/>
+  <method handler="admin" request="/admin/sql"          method="adminSql"      admin="true" cancache="false"/>
+  <method handler="admin" request="/admin/home"         method="adminHome"     admin="true" cancache="false" name="Admin" toplevel="true"/>
+  <method handler="admin" request="/admin/startstop"    method="adminDbStartStop"       admin="true" cancache="false"/>
+  <method handler="admin" request="/admin/tables"       method="adminDbTables"       admin="true" cancache="false"/>
+  <method handler="admin" request="/admin/stats"        method="adminStats"    admin="true" cancache="false"/>
+
   <method request="/admin/user/list"    handler="usermanager" method="adminUserList"    admin="true" cancache="false"/>
   <method request="/admin/user"         handler="usermanager" method="adminUser"    admin="true" cancache="false"/>
 
-  <method request="/admin/harvesters"   method="adminHarvesters"    admin="true" cancache="false"/>
-  <method request="/admin/cleanup"        method="adminCleanup"      admin="true" cancache="false"/>
+  <method handler="admin" request="/admin/harvesters"   method="adminHarvesters"    admin="true" cancache="false"/>
+  <method handler="admin" request="/admin/cleanup"        method="adminCleanup"      admin="true" cancache="false"/>
 
-  <method request="/getmap"    method="processMap"       admin="false" cancache="false"/>
+
 
 <!-- 
 You can add your own RequestHandler class by specifying a handler attribute 

@@ -280,6 +280,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ID = "id";
 
+    public static final String ARG_FROM = "from";
+    public static final String ARG_TO = "to";
+
+
     /** _more_ */
     public static final String ARG_IDS = "ids";
 

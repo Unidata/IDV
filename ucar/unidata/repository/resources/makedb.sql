@@ -6,7 +6,6 @@ CREATE TABLE  globals (name varchar(500),
                        value varchar(1000));
 
 
-
 CREATE TABLE entries (id varchar(200),
                    type varchar(200),
 	           name varchar(200),

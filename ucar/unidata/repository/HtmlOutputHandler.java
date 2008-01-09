@@ -851,80 +851,64 @@ public class HtmlOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputEntries(Request request, List<Entry> entries)
-            throws Exception {
+        throws Exception {
 
         StringBuffer sb         = new StringBuffer();
         String       output     = request.getOutput();
         boolean      showApplet = repository.isAppletEnabled(request);
-        if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
-            //appendEntriesHeader(request,  output,  sb) ;
-            sb.append("<p>\n");
-            if (entries.size() == 0) {
-                sb.append(HtmlUtil.bold("Nothing Found") + "<p>");
-            }
-            sb.append("<table>");
-            showApplet = showApplet & output.equals(OUTPUT_TIMELINE);
+        sb.append("<p>\n");
+        if (entries.size() == 0) {
+            sb.append(HtmlUtil.bold("Nothing Found") + "<p>");
         }
-
+        sb.append("<table>");
+        showApplet = showApplet && output.equals(OUTPUT_TIMELINE);
 
         StringBufferCollection sbc = new StringBufferCollection();
         for (Entry entry : entries) {
             StringBuffer ssb =
                 sbc.getBuffer(entry.getTypeHandler().getDescription());
-            if (output.equals(OUTPUT_HTML)
-                    || output.equals(OUTPUT_TIMELINE)) {
-                String links =
-                    HtmlUtil.checkbox("entry_" + entry.getId(), "true") + " "
-                    + entry.getTypeHandler().getEntryLinks(entry, request);
-
-                ssb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
-                String col1 =
-                    links + " "
-                    + HtmlUtil.href(HtmlUtil.url(repository.URL_ENTRY_SHOW,
-                        ARG_ID, entry.getId()), entry.getName());
-                String col2 = "" + new Date(entry.getStartDate());
-                ssb.append(HtmlUtil.row(HtmlUtil.cols(col1, col2)));
-            }
+            String links =
+                HtmlUtil.checkbox("entry_" + entry.getId(), "true") + " "
+                + entry.getTypeHandler().getEntryLinks(entry, request);
+            
+            ssb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
+            String col1 =
+                links + " "
+                + HtmlUtil.href(HtmlUtil.url(repository.URL_ENTRY_SHOW,
+                                             ARG_ID, entry.getId()), entry.getName());
+            String col2 = "" + new Date(entry.getStartDate());
+            ssb.append(HtmlUtil.row(HtmlUtil.cols(col1, col2)));
         }
 
 
-        if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
-            if ((entries.size() > 0) && showApplet) {
-                sb.append(getTimelineApplet(request, entries));
-            }
-            sb.append(HtmlUtil.form(repository.URL_GETENTRIES,
-                                    "name=\"getentries\" method=\"post\""));
-            if (entries.size() > 0) {
-                sb.append(HtmlUtil.submit("Get selected", "getselected"));
-                sb.append(HtmlUtil.submit("Get all", "getall"));
-                sb.append(" As: ");
-                List outputList =
-                    repository.getOutputTypesForEntries(request, entries);
-                sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
-            }
-            sb.append("<br>");
+        if ((entries.size() > 0) && showApplet) {
+            sb.append(getTimelineApplet(request, entries));
         }
+        sb.append(HtmlUtil.form(repository.URL_GETENTRIES,
+                                "name=\"getentries\" method=\"post\""));
+        if (entries.size() > 0) {
+            sb.append(HtmlUtil.submit("Get selected", "getselected"));
+            sb.append(HtmlUtil.submit("Get all", "getall"));
+            sb.append(" As: ");
+            List outputList =
+                repository.getOutputTypesForEntries(request, entries);
+            sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
+        }
+        sb.append("<br>");
         for (int i = 0; i < sbc.getKeys().size(); i++) {
             String       type = (String) sbc.getKeys().get(i);
             StringBuffer ssb  = sbc.getBuffer(type);
-            if (output.equals(OUTPUT_HTML)
-                    || output.equals(OUTPUT_TIMELINE)) {
-                sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold("Type:"
-                        + type))));
-                sb.append(ssb);
-            }
+            sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold("Type:"
+                                                               + type))));
+            sb.append(ssb);
         }
 
-        if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
-            sb.append("</form>");
-            sb.append("</table>");
-
-        }
+        sb.append("</form>");
+        sb.append("</table>");
         Result result = new Result("Query Results", sb, getMimeType(output));
         result.putProperty(PROP_NAVSUBLINKS,
                            getEntriesHeader(request, output, WHAT_ENTRIES));
 
-        //        result.putProperty(PROP_NAVSUBLINKS, repository.getSearchFormLinks(request));
         return result;
 
     }
