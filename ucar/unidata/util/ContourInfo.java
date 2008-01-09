@@ -318,9 +318,6 @@ public class ContourInfo {
         }
     }
 
-    public int hashCode() {
-        return id.hashCode();
-    }
 
     /**
      * See if this has been defined
