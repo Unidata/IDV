@@ -491,7 +491,10 @@ public class GuiUtils extends LayoutUtil {
 
     public static void setPreferredWidth(JComponent comp, int width) {
         int height = comp.getPreferredSize().height;
-        if(!checkHeight(height)) return;
+        if(!checkHeight(height)) {
+            //For now just set the height to some reasonable amount and use that
+            height = 24;
+        }
         comp.setPreferredSize(new Dimension(width,height));
     }
 
