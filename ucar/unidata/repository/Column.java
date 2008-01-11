@@ -115,7 +115,7 @@ public class Column implements Tables, Constants {
     private static final String ATTR_SUFFIX = "suffix";
 
     /** _more_ */
-    private static final String ATTR_NAMES = "names";
+    private static final String ATTR_PROPERTIES = "properties";
 
     /** _more_ */
     private static final String ATTR_LABEL = "label";
@@ -201,7 +201,7 @@ public class Column implements Tables, Constants {
     private int columns = 40;
 
     /** _more_ */
-    private String namesFile;
+    private String propertiesFile;
 
     /** _more_ */
     private int offset;
@@ -223,7 +223,7 @@ public class Column implements Tables, Constants {
         label            = XmlUtil.getAttribute(element, ATTR_LABEL, name);
         searchType = XmlUtil.getAttribute(element, ATTR_SEARCHTYPE,
                                           searchType);
-        namesFile   = XmlUtil.getAttribute(element, ATTR_NAMES,
+        propertiesFile   = XmlUtil.getAttribute(element, ATTR_PROPERTIES,
                                            (String) null);
 
         description = XmlUtil.getAttribute(element, ATTR_DESCRIPTION, label);
@@ -621,7 +621,7 @@ public class Column implements Tables, Constants {
             }
             if (searchType.equals(SEARCHTYPE_SELECT)) {
                 Hashtable props =
-                    typeHandler.getRepository().getFieldProperties(namesFile);
+                    typeHandler.getRepository().getFieldProperties(propertiesFile);
                 List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
                 if (props != null) {
                     for (Enumeration keys = props.keys();
@@ -779,7 +779,7 @@ public class Column implements Tables, Constants {
      */
     protected String getLabel(String value) throws Exception {
         String desc = typeHandler.getRepository().getFieldDescription(value
-                          + ".label", namesFile);
+                          + ".label", propertiesFile);
         if (desc == null) {
             desc = value;
         } else {
@@ -841,8 +841,8 @@ public class Column implements Tables, Constants {
      *
      * @return _more_
      */
-    public String getNamesFile() {
-        return namesFile;
+    public String getPropertiesFile() {
+        return propertiesFile;
     }
 
     /**

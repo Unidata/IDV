@@ -99,8 +99,8 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
                            repository.fileUrl("/Radar.gif"),
                            "Show NWS Radar Site"), " target=_OTHER");
 
-
     }
+
 
     /**
      * _more_

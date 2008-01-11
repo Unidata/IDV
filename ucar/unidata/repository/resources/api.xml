@@ -1,65 +1,33 @@
 <api>
-
-
-  <method request="/group/show"   method="processGroupShow"    admin="false" cancache="true" name="Groups" toplevel="true" ishome="true"/>
+  <method request="/group/show"  method="processGroupShow"    admin="false" cancache="true" name="Groups" toplevel="true" ishome="true"/>
   <method request="/group/add"   method="processGroupAdd"    admin="false" cancache="true" name="Groups" />
-
-  <method request="/group/form"   method="processGroupForm"    admin="false" cancache="true" name="Groups" toplevel="false" />
-
-
+  <method request="/group/form"  method="processGroupForm"    admin="false" cancache="true" name="Groups" toplevel="false" />
   <method request="/entry/searchform"  method="processEntrySearchForm"   admin="false" cancache="true" name="Search" toplevel="true"/>
-  <method request="/entry/search"       method="processEntrySearch"        admin="false" cancache="true"/>
-
-
-
+  <method request="/entry/search"  method="processEntrySearch"        admin="false" cancache="true"/>
   <method request="/list/home"   method="processListHome"     admin="false" cancache="true" name="List" toplevel="true"/>
   <method request="/list/show"   method="processListShow"     admin="false" cancache="true"/>
-
-
-  <method request="/graph/view"   method="processGraphView"    admin="false" cancache="true"/>
-  <method request="/graph/get"    method="processGraphGet"     admin="false" cancache="true"/>
-
-
-  <method request="/entity/form"    method="processEntityForm"     admin="false" cancache="true"/>
-
-  <method request="/entry/show"   method="processEntryShow"    admin="false" cancache="true"/>
-  <method request="/entry/add"    method="processEntryAdd"     admin="false" cancache="true"/>
-
-  <method request="/entry/form"    method="processEntryForm"     admin="false" cancache="true"/>
+  <method request="/graph/view"  method="processGraphView"    admin="false" cancache="true"/>
+  <method request="/graph/get"   method="processGraphGet"     admin="false" cancache="true"/>
+  <method request="/entity/form" method="processEntityForm"     admin="false" cancache="true"/>
+  <method request="/entry/show"  method="processEntryShow"    admin="false" cancache="true"/>
+  <method request="/entry/add"   method="processEntryAdd"     admin="false" cancache="true"/>
+  <method request="/entry/form"  method="processEntryForm"     admin="false" cancache="true"/>
   <method request="/entry/delete"    method="processEntryDelete"     admin="false" cancache="true"/>
   <method request="/entry/get/*"  method="processEntryGet"     admin="false" cancache="false"/>
-
- <method request="/association/add"    method="processAssociationAdd"     admin="false" cancache="true"/>
-
+  <method request="/association/add"    method="processAssociationAdd"     admin="false" cancache="true"/>
   <method request="/getentries"  method="processGetEntries"   admin="false" cancache="true"/>
-
   <method request="/getmap"    method="processMap"       admin="false" cancache="false"/>
-
   <method handler="usermanager" request="/user/login"        method="processLogin"  admin="false"  cancache="false"/>
   <method handler="usermanager" request="/user/settings"     method="processSettings"  admin="false" cancache="false"/>
-
   <method handler="usermanager" request="/user/cart"     method="processCart"  admin="false" cancache="false"/>
-
   <method handler="admin" request="/admin/import/catalog"       method="adminImportCatalog"      admin="true" cancache="false"/>
-
-
   <method handler="admin" request="/admin/sql"          method="adminSql"      admin="true" cancache="false"/>
   <method handler="admin" request="/admin/home"         method="adminHome"     admin="true" cancache="false" name="Admin" toplevel="true"/>
   <method handler="admin" request="/admin/startstop"    method="adminDbStartStop"       admin="true" cancache="false"/>
   <method handler="admin" request="/admin/tables"       method="adminDbTables"       admin="true" cancache="false"/>
   <method handler="admin" request="/admin/stats"        method="adminStats"    admin="true" cancache="false"/>
-
   <method request="/admin/user/list"    handler="usermanager" method="adminUserList"    admin="true" cancache="false"/>
   <method request="/admin/user"         handler="usermanager" method="adminUser"    admin="true" cancache="false"/>
-
   <method handler="admin" request="/admin/harvesters"   method="adminHarvesters"    admin="true" cancache="false"/>
   <method handler="admin" request="/admin/cleanup"        method="adminCleanup"      admin="true" cancache="false"/>
-
-
-
-<!-- 
-You can add your own RequestHandler class by specifying a handler attribute 
-  <method request="/showgroup"   handler="ucar.unidata.repository.TestIt" method="processShowGroup"    admin="false" cancache="true" name="Groups" toplevel="true" ishome="true"/>
--->
-
 </api>

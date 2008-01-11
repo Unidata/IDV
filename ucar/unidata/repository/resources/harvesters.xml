@@ -1,5 +1,4 @@
 <harvesters>
-
   <harvester    name="Source Files"
 		grouptemplate = "${dirgroup}"
                 tagtemplate="${extension}"

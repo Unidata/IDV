@@ -262,7 +262,7 @@ public class GenericTypeHandler extends TypeHandler {
         }
 
         Properties properties =
-            repository.getFieldProperties(theColumn.getNamesFile());
+            repository.getFieldProperties(theColumn.getPropertiesFile());
         for (int i = 0; i < values.length; i++) {
             if(values[i]==null) continue;
             String longName = theColumn.getLabel(values[i]);

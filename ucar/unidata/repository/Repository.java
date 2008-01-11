@@ -4614,7 +4614,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             System.err.println("query time:" + (t2 - t1));
         }
         if (t2 - t1 > 2000) {
-            Misc.printStack("query:" + sql);
+            //            Misc.printStack("query:" + sql);
         }
         return statement;
     }
