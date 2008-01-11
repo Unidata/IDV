@@ -201,7 +201,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
 
 
     /** _more_ */
-    private Connection connection;
+    private Connection theConnection;
 
     /** _more_ */
     private Hashtable typeHandlersMap = new Hashtable();
@@ -262,13 +262,6 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     /** _more_ */
     String[] args;
 
-    /** _more_ */
-    private Hashtable pageCache = new Hashtable();
-
-
-    /** _more_ */
-    private List pageCacheList = new ArrayList();
-
 
     /** _more_ */
     private String hostname;
@@ -295,6 +288,13 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
 
     /** _more_          */
     private Group dummyGroup;
+
+
+    /** _more_ */
+    private Hashtable pageCache = new Hashtable();
+
+    /** _more_ */
+    private List pageCacheList = new ArrayList();
 
 
     /**
@@ -404,7 +404,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      * @throws Exception _more_
      */
     protected void initServer() throws Exception {
-        makeConnection();
+        theConnection = makeConnection();
         initTypeHandlers();
         initTable();
         initOutputHandlers();
@@ -538,7 +538,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     /**
      * _more_
      */
-    protected void clearPageCache() {
+    protected void clearCache() {
         pageCache     = new Hashtable();
         pageCacheList = new ArrayList();
     }
@@ -622,7 +622,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      *
      * @throws Exception _more_
      */
-    protected void makeConnection() throws Exception {
+    protected Connection makeConnection() throws Exception {
         String db = (String) properties.get(PROP_DB);
         if (db == null) {
             throw new IllegalStateException("Must have a " + PROP_DB
@@ -641,10 +641,10 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
 
         System.err.println("db:" + connectionURL);
         if (userName != null) {
-            connection = DriverManager.getConnection(connectionURL, userName,
-                    password);
+            return  DriverManager.getConnection(connectionURL, userName,
+                                                password);
         } else {
-            connection = DriverManager.getConnection(connectionURL);
+            return DriverManager.getConnection(connectionURL);
         }
     }
 
@@ -797,7 +797,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                     Constructor ctor = Misc.findConstructor(c,
                                            new Class[] { Repository.class,
                             Element.class });
-                    outputHandlers.add(
+                    addOutputHandler(
                         (OutputHandler) ctor.newInstance(new Object[] { this,
                             node }));
                 }
@@ -808,9 +808,13 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             }
 
         }
+
+        getUserManager().initOutputHandlers();
     }
 
-
+    public void addOutputHandler(OutputHandler outputHandler) {
+        outputHandlers.add(outputHandler);
+    }
 
     /**
      * _more_
@@ -960,9 +964,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
 
         boolean cachingOk = canCache();
 
-
-
-        if ((connection == null) && !incoming.startsWith(getUrlBase()+"/admin")) {
+        if ((theConnection == null) && !incoming.startsWith(getUrlBase()+"/admin")) {
             cachingOk = false;
             result = new Result("No Database",
                                 new StringBuffer("Database is shutdown"));
@@ -1114,20 +1116,18 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     }
 
 
-
-
     /**
      * _more_
      *
      * @return _more_
      */
     public Connection getConnection() {
-        return connection;
+        return theConnection;
     }
 
     public void closeConnection() throws Exception {
-        if(connection!=null) connection.close();
-        connection = null;
+        if(theConnection!=null) theConnection.close();
+        theConnection = null;
     }
 
 
@@ -1140,7 +1140,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     protected void initTable() throws Exception {
         String sql = IOUtil.readContents(getProperty(PROP_DB_SCRIPT),
                                          getClass());
-        Statement statement = connection.createStatement();
+        Statement statement = getConnection().createStatement();
         SqlUtil.loadSql(sql, statement, true);
 
         for (String file : typeDefinitionFiles) {
@@ -1977,8 +1977,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
 
     }
 
-    /** _more_ */
-    PreparedStatement entryStmt;
+
 
     /**
      * _more_
@@ -1993,11 +1992,12 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      */
     protected Entry getEntry(String entryId, Request request)
             throws Exception {
+        PreparedStatement entryStmt= null;
         if (entryStmt == null) {
             String query = SqlUtil.makeSelect(COLUMNS_ENTRIES,
                                Misc.newList(TABLE_ENTRIES),
                                SqlUtil.eq(COL_ENTRIES_ID, "?"));
-            entryStmt = connection.prepareStatement(query);
+            entryStmt = getConnection().prepareStatement(query);
 
         }
         /*
@@ -2278,7 +2278,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         String name = request.getString(ARG_NAME,(String)null);
         if(name!=null) {
             PreparedStatement assInsert =
-                connection.prepareStatement(INSERT_ASSOCIATIONS);
+                getConnection().prepareStatement(INSERT_ASSOCIATIONS);
             int col = 1;
             assInsert.setString(col++,name);
             assInsert.setString(col++, fromEntry.getId());
@@ -2438,6 +2438,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             entry.setTags(StringUtil.split(tags, ",", true, true));
         }
 
+        entry.getTypeHandler().initializeEntry(request, entry);
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
         insertEntries(entries, newEntry);
@@ -3872,7 +3873,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      * @throws Exception _more_
      */
     protected void execute(String insert, Object[] values) throws Exception {
-        PreparedStatement pstmt = connection.prepareStatement(insert);
+        PreparedStatement pstmt = getConnection().prepareStatement(insert);
         for (int i = 0; i < values.length; i++) {
             //Assume null is a string
             if (values[i] == null) {
@@ -4338,10 +4339,10 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      *
      * @throws Exception _more_
      */
-    public void insertMetadata(Group group, String type, String name,
+    public void insertMetadata(Entry group, String type, String name,
                                String content)
             throws Exception {
-        insertMetadata(new Metadata(group.getId(), Metadata.IDTYPE_GROUP,
+        insertMetadata(new Metadata(group.getId(), 
                                     type, name, content));
     }
 
@@ -4354,10 +4355,9 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      */
     public void insertMetadata(Metadata metadata) throws Exception {
         PreparedStatement metadataInsert =
-            connection.prepareStatement(INSERT_METADATA);
+            getConnection().prepareStatement(INSERT_METADATA);
         int col = 1;
         metadataInsert.setString(col++, metadata.getId());
-        metadataInsert.setString(col++, metadata.getIdType());
         metadataInsert.setString(col++, metadata.getMetadataType());
         metadataInsert.setString(col++, metadata.getName());
         metadataInsert.setString(col++, metadata.getContent());
@@ -4375,11 +4375,11 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      */
     public void deleteEntries(Request request, List<Entry> entries)
             throws Exception {
-        clearPageCache();
+        clearCache();
         String query;
 
         PreparedStatement tagsStmt =
-            connection.prepareStatement("delete from " + TABLE_TAGS
+            getConnection().prepareStatement("delete from " + TABLE_TAGS
                                         + " where " + COL_TAGS_ENTRY_ID
                                         + "=?");
         query = SqlUtil.makeDelete(
@@ -4388,14 +4388,14 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                 Misc.newList(
                     SqlUtil.eq(COL_ASSOCIATIONS_FROM_ENTRY_ID, "?"),
                     SqlUtil.eq(COL_ASSOCIATIONS_TO_ENTRY_ID, "?"))));
-        PreparedStatement assStmt = connection.prepareStatement(query);
+        PreparedStatement assStmt = getConnection().prepareStatement(query);
         PreparedStatement entriesStmt =
-            connection.prepareStatement(SqlUtil.makeDelete(TABLE_ENTRIES,
+            getConnection().prepareStatement(SqlUtil.makeDelete(TABLE_ENTRIES,
                 COL_ENTRIES_ID, "?"));
-        //        PreparedStatement genericStmt = connection.prepareStatement("delete from ? where id=?");
+        //        PreparedStatement genericStmt = getConnection().prepareStatement("delete from ? where id=?");
         synchronized (MUTEX_INSERT) {
-            connection.setAutoCommit(false);
-            Statement statement = connection.createStatement();
+            getConnection().setAutoCommit(false);
+            Statement statement = getConnection().createStatement();
             for (Entry entry : entries) {
                 tagsStmt.setString(1, entry.getId());
                 tagsStmt.addBatch();
@@ -4411,8 +4411,8 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             assStmt.executeBatch();
             entriesStmt.executeBatch();
             //            genericStmt.executeBatch();
-            connection.commit();
-            connection.setAutoCommit(true);
+            getConnection().commit();
+            getConnection().setAutoCommit(true);
         }
     }
 
@@ -4447,31 +4447,32 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         if (entries.size() == 0) {
             return;
         }
-        clearPageCache();
+        clearCache();
         //        System.err.println("Inserting:" + entries.size() + " entries");
         long              t1             = System.currentTimeMillis();
         int               cnt            = 0;
-        PreparedStatement entryStatement = connection.prepareStatement(isNew
+        PreparedStatement entryStatement = getConnection().prepareStatement(isNew
                 ? INSERT_ENTRIES
                 : UPDATE_ENTRIES);
 
         Hashtable typeStatements = new Hashtable();
 
         PreparedStatement tagsInsert =
-            connection.prepareStatement(INSERT_TAGS);
+            getConnection().prepareStatement(INSERT_TAGS);
 
         int batchCnt = 0;
         synchronized (MUTEX_INSERT) {
-            connection.setAutoCommit(false);
+            getConnection().setAutoCommit(false);
             for (Entry entry : entries) {
                 TypeHandler       typeHandler   = entry.getTypeHandler();
                 String            sql = typeHandler.getInsertSql(isNew);
                 PreparedStatement typeStatement = null;
+
                 if (sql != null) {
                     typeStatement =
                         (PreparedStatement) typeStatements.get(sql);
                     if (typeStatement == null) {
-                        typeStatement = connection.prepareStatement(sql);
+                        typeStatement = getConnection().prepareStatement(sql);
                         typeStatements.put(sql, typeStatement);
                     }
                 }
@@ -4537,8 +4538,8 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                     //                    else                        typeStatement.executeUpdate();
                 }
             }
-            connection.commit();
-            connection.setAutoCommit(true);
+            getConnection().commit();
+            getConnection().setAutoCommit(true);
         }
 
         Misc.run(this, "checkNewEntries", entries);
@@ -4595,7 +4596,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      * @throws Exception _more_
      */
     protected Statement execute(String sql, int max) throws Exception {
-        Statement statement = connection.createStatement();
+        Statement statement = getConnection().createStatement();
         if (max > 0) {
             statement.setMaxRows(max);
         }
@@ -4699,7 +4700,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                 seenResources = new Hashtable();
             }
             PreparedStatement select =
-                connection.prepareStatement(query =
+                getConnection().prepareStatement(query =
                     SqlUtil.makeSelect("count(" + COL_ENTRIES_ID + ")",
                                        Misc.newList(TABLE_ENTRIES),
                                        SqlUtil.eq(COL_ENTRIES_RESOURCE,
@@ -4778,22 +4779,11 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      *
      * @throws Exception _more_
      */
-    public List<Metadata> getMetadata(Group group) throws Exception {
-        return getMetadata(group.getId(), Metadata.IDTYPE_GROUP);
+    public List<Metadata> getMetadata(Entry entry) throws Exception {
+        return getMetadata(entry.getId());
     }
 
-    /**
-     * _more_
-     *
-     * @param entry _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public List<Metadata> getMetadata(Entry entry) throws Exception {
-        return getMetadata(entry.getId(), Metadata.IDTYPE_ENTRY);
-    }
+
 
     /**
      * _more_
@@ -4805,7 +4795,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      *
      * @throws Exception _more_
      */
-    public List<Metadata> getMetadata(String id, String type)
+    public List<Metadata> getMetadata(String id)
             throws Exception {
         String query =
             SqlUtil.makeSelect(
@@ -4813,11 +4803,9 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                     TABLE_METADATA), SqlUtil.makeAnd(
                     Misc.newList(
                         SqlUtil.eq(
-                            COL_METADATA_ID, SqlUtil.quote(id)), SqlUtil.eq(
-                            COL_METADATA_ID_TYPE, SqlUtil.quote(
-                                type)))), " order by " + COL_METADATA_TYPE);
+                                   COL_METADATA_ID, SqlUtil.quote(id)) 
+                        )), " order by " + COL_METADATA_TYPE);
 
-        //        System.err.println("query: " + query);
         SqlUtil.Iterator iter = SqlUtil.getIterator(execute(query));
         ResultSet        results;
         List<Metadata>   metadata = new ArrayList();
@@ -4825,7 +4813,6 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             while (results.next()) {
                 int col = 1;
                 metadata.add(new Metadata(results.getString(col++),
-                                          results.getString(col++),
                                           results.getString(col++),
                                           results.getString(col++),
                                           results.getString(col++)));

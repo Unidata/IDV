@@ -240,6 +240,11 @@ public class Request implements Constants {
     }
 
 
+    public boolean exists(String key) {
+        String result = (String) get(key, (String) null);
+        return result!=null;
+    }
+
     /**
      * _more_
      *

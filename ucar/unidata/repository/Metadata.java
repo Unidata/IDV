@@ -89,19 +89,11 @@ public class Metadata implements Constants, Tables {
     /** _more_ */
     public static final String TYPE_LINK = "link";
 
-    /** _more_ */
-    public static final String IDTYPE_ENTRY = "entry";
-
-    /** _more_ */
-    public static final String IDTYPE_GROUP = "group";
 
 
 
     /** _more_ */
     private String id;
-
-    /** _more_ */
-    private String idType;
 
     /** _more_ */
     private String name;
@@ -116,16 +108,14 @@ public class Metadata implements Constants, Tables {
      * _more_
      *
      * @param id _more_
-     * @param idType _more_
      * @param metadataType _more_
      * @param name _more_
      * @param content _more_
      */
-    public Metadata(String id, String idType, String metadataType,
+    public Metadata(String id,  String metadataType,
                     String name, String content) {
         this.id           = id;
         this.name         = name;
-        this.idType       = idType;
         this.metadataType = metadataType;
         this.content      = content;
     }
@@ -182,23 +172,6 @@ public class Metadata implements Constants, Tables {
         return id;
     }
 
-    /**
-     * Set the IdType property.
-     *
-     * @param value The new value for IdType
-     */
-    public void setIdType(String value) {
-        idType = value;
-    }
-
-    /**
-     * Get the IdType property.
-     *
-     * @return The IdType
-     */
-    public String getIdType() {
-        return idType;
-    }
 
     /**
      * Set the MetadataType property.

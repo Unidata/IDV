@@ -324,39 +324,63 @@ public class Column implements Tables, Constants {
      * @throws Exception _more_
      */
     protected int setValues(PreparedStatement stmt, Object[] values,
-                            int valueIdx)
+                            int stmtIdx)
             throws Exception {
         if (type.equals(TYPE_INT)) {
-            stmt.setInt(valueIdx + 2,
-                        ((Integer) values[valueIdx]).intValue());
-            valueIdx++;
+            if(values[offset]!=null) {
+                stmt.setInt(stmtIdx,
+                            ((Integer) values[offset]).intValue());
+            } else {            
+                stmt.setInt(stmtIdx, 0);
+            }
+            stmtIdx++;
         } else if (type.equals(TYPE_DOUBLE)) {
-            stmt.setDouble(valueIdx + 2,
-                           ((Double) values[valueIdx]).doubleValue());
-            valueIdx++;
+            if(values[offset]!=null) {
+                stmt.setDouble(stmtIdx,
+                               ((Double) values[offset]).doubleValue());
+            } else {            
+                stmt.setDouble(stmtIdx,0.0);
+            }
+            stmtIdx++;
         } else if (type.equals(TYPE_BOOLEAN)) {
-            boolean v = ((Boolean) values[valueIdx]).booleanValue();
-            stmt.setInt(valueIdx + 2, (v
-                                       ? 1
-                                       : 0));
-            valueIdx++;
+            if(values[offset]!=null) {
+                boolean v = ((Boolean) values[offset]).booleanValue();
+                stmt.setInt(stmtIdx, (v
+                                          ? 1
+                                          : 0));
+            } else {            
+                stmt.setInt(stmtIdx, 0);
+            }
+            stmtIdx++;
         } else if (type.equals(TYPE_TIMESTAMP)) {
-            Date dttm = (Date) values[valueIdx];
-            stmt.setTimestamp(valueIdx + 2,
-                              new java.sql.Timestamp(dttm.getTime()));
-            valueIdx++;
+            if(values[offset]!=null) {
+                Date dttm = (Date) values[offset];
+                stmt.setTimestamp(stmtIdx,
+                                  new java.sql.Timestamp(dttm.getTime()));
+            } else {            
+                stmt.setTimestamp(stmtIdx,null);
+            }
+            stmtIdx++;
         } else if (type.equals(TYPE_LATLON)) {
-            double lat = ((Double) values[valueIdx]).doubleValue();
-            stmt.setDouble(valueIdx + 2, lat);
-            valueIdx++;
-            double lon = ((Double) values[valueIdx]).doubleValue();
-            stmt.setDouble(valueIdx + 2, lon);
-            valueIdx++;
+            if(values[offset]!=null) {
+                double lat = ((Double) values[offset]).doubleValue();
+                stmt.setDouble(stmtIdx, lat);
+                double lon = ((Double) values[offset+1]).doubleValue();
+                stmt.setDouble(stmtIdx+1, lon);
+            } else {            
+                stmt.setDouble(stmtIdx, Entry.NONGEO);
+                stmt.setDouble(stmtIdx+1, Entry.NONGEO);
+            }
+            stmtIdx+=2;
         } else {
-            stmt.setString(valueIdx + 2, toString(values, valueIdx));
-            valueIdx++;
+            if(values[offset]!=null) {
+                stmt.setString(stmtIdx, toString(values, offset));
+            } else {            
+                stmt.setString(stmtIdx, null);
+            }
+            stmtIdx++;
         }
-        return valueIdx;
+        return stmtIdx;
 
 
     }
@@ -630,6 +654,33 @@ public class Column implements Tables, Constants {
         formBuffer.append(HtmlUtil.formEntry(getLabel() + ":",
                                              HtmlUtil.hbox(widget, suffix)));
         formBuffer.append("\n");
+    }
+
+
+    public void setValue(Request request, Object[]values) 
+            throws Exception {
+        if (type.equals(TYPE_LATLON)) {
+            //TODO
+        } else if (type.equals(TYPE_BOOLEAN)) {
+            String value = request.getString(getFullName(),"true").toLowerCase();
+            values[offset] = new Boolean(value);
+        } else if (type.equals(TYPE_ENUMERATION)) {
+            if(request.exists(getFullName())) {
+                values[offset] = request.getString(getFullName(),"");
+            }
+        } else if (type.equals(TYPE_INT)) {
+            if(request.exists(getFullName())) {
+                values[offset] = new Integer(request.get(getFullName(),0));
+            }
+        } else if (type.equals(TYPE_DOUBLE)) {
+            if(request.exists(getFullName())) {
+                values[offset] = new Double(request.get(getFullName(),0.0));
+            }
+        } else {
+            if(request.exists(getFullName())) {
+                values[offset] = request.getString(getFullName(),"");
+            }
+        }
     }
 
 

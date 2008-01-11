@@ -98,6 +98,13 @@ public class OutputHandler implements Constants, Tables {
     protected static String graphAppletTemplate;
 
 
+    public OutputHandler(Repository repository)
+            throws Exception {
+        this.repository = repository;
+
+    }
+
+
     /**
      * _more_
      *
@@ -107,7 +114,7 @@ public class OutputHandler implements Constants, Tables {
      */
     public OutputHandler(Repository repository, Element element)
             throws Exception {
-        this.repository = repository;
+        this(repository);
     }
 
     /**

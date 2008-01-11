@@ -12,19 +12,13 @@
 	<column name="product" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Product"  
                 names="/ucar/unidata/repository/resources/level3radar.product.properties"
         />
-<!--
-	<column name="location" type="latlon"  label="Location" cansearch="true"  />
-	<column name="fruit" type="enumeration"  values="Apple,Banana,Orange" label="Fruit" isindex="true" cansearch="true" canlist="true" />
-	<column name="flag" type="boolean"  label="Flag"  isindex="true" cansearch="true" />
-	<column name="number" type="double" cansearch="true" />
--->
   </type>
 
 
   <type name="testit" description="Test it">
 	<column name="fruit" type="enumeration"  values="Apple,Banana,Orange" label="Fruit" isindex="true" cansearch="true" canlist="true" />
 	<column name="flag" type="boolean"  label="Flag"  isindex="true" cansearch="true" />
-	<column name="number" type="double" cansearch="true" suffix="units"/>
+	<column name="number" type="double" cansearch="true" suffix="number units"/>
   </type>
 
 

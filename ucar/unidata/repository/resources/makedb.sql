@@ -29,9 +29,7 @@ CREATE INDEX ENTRIES_INDEX_TYPE ON entries (TYPE);
 CREATE INDEX ENTRIES_INDEX_USER_ID ON entries (USER_ID);
 
 
-
-CREATE TABLE  metadata (id varchar(500),
-                        id_type varchar(100),
+CREATE TABLE  metadata (id varchar(200),
                         type varchar(200),
                         name varchar(200),
                         content varchar(10000));

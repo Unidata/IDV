@@ -252,7 +252,6 @@ public class CatalogHarvester extends Harvester {
                                           catalogUrl));
             for (Metadata metadata : metadataList) {
                 metadata.setId(group.getId());
-                metadata.setIdType(Metadata.IDTYPE_GROUP);
                 try {
                     if (metadata.getContent().length() > 10000) {
                         repository.log("Too long metadata:"

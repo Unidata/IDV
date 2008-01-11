@@ -160,6 +160,19 @@ public class GenericTypeHandler extends TypeHandler {
         }
     }
 
+    public void initializeEntry(Request request, Entry entry) throws Exception {
+        super.initializeEntry(request, entry);
+        if(colNames.size()<=1) return;
+        Object[] values = new Object[colNames.size()];
+        for (Column column : columns) {
+            column.setValue(request, values);
+        }
+        entry.setValues(values);
+    }
+
+
+
+
     /**
      * _more_
      *
@@ -251,6 +264,7 @@ public class GenericTypeHandler extends TypeHandler {
         Properties properties =
             repository.getFieldProperties(theColumn.getNamesFile());
         for (int i = 0; i < values.length; i++) {
+            if(values[i]==null) continue;
             String longName = theColumn.getLabel(values[i]);
             if (output.equals(OutputHandler.OUTPUT_HTML)) {
                 sb.append("<li>");
@@ -368,8 +382,14 @@ public class GenericTypeHandler extends TypeHandler {
         if (colNames.size() == 0) {
             return null;
         }
-        return SqlUtil.makeInsert(getTableName(), SqlUtil.comma(colNames),
-                                  SqlUtil.getQuestionMarks(colNames.size()));
+        if(isNew) {
+            return SqlUtil.makeInsert(getTableName(), SqlUtil.comma(colNames),
+                                      SqlUtil.getQuestionMarks(colNames.size()));
+        } else {
+
+            return SqlUtil.makeUpdate(getTableName(), COL_ID,
+                                      colNames);
+        }
     }
 
 
@@ -386,14 +406,16 @@ public class GenericTypeHandler extends TypeHandler {
     public void setStatement(Entry entry, PreparedStatement stmt,
                              boolean isNew)
             throws Exception {
-        stmt.setString(1, entry.getId());
+        int stmtIdx = 1;
+        stmt.setString(stmtIdx++, entry.getId());
         Object[] values = entry.getValues();
         if (values != null) {
-            int valueIdx = 0;
             for (Column column : columns) {
-                valueIdx = column.setValues(stmt, values, valueIdx);
+                stmtIdx = column.setValues(stmt, values, stmtIdx);
             }
         }
+        if(!isNew)
+            stmt.setString(stmtIdx, entry.getId());
     }
 
 

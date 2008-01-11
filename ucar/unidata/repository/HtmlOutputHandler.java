@@ -164,7 +164,7 @@ public class HtmlOutputHandler extends OutputHandler {
      */
     protected void getOutputTypesForEntries(Request request,
                                             List<Entry> entries, List types)
-            throws Exception {
+        throws Exception {
         types.add(new TwoFacedObject("Html", OUTPUT_HTML));
         if (entries.size() > 1) {
             types.add(new TwoFacedObject("Html with timeline",
@@ -853,6 +853,20 @@ public class HtmlOutputHandler extends OutputHandler {
     public Result outputEntries(Request request, List<Entry> entries)
         throws Exception {
 
+        String       output     = request.getOutput();
+        StringBuffer sb         = getEntriesList(request, entries);
+        Result result = new Result("Query Results", sb, getMimeType(output));
+        result.putProperty(PROP_NAVSUBLINKS,
+                           getEntriesHeader(request, output, WHAT_ENTRIES));
+
+        return result;
+    }
+
+
+
+
+    public StringBuffer getEntriesList(Request request, List<Entry> entries)
+        throws Exception {
         StringBuffer sb         = new StringBuffer();
         String       output     = request.getOutput();
         boolean      showApplet = repository.isAppletEnabled(request);
@@ -905,12 +919,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         sb.append("</form>");
         sb.append("</table>");
-        Result result = new Result("Query Results", sb, getMimeType(output));
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getEntriesHeader(request, output, WHAT_ENTRIES));
-
-        return result;
-
+        return sb;
     }
 
 

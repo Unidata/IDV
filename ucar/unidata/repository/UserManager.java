@@ -82,8 +82,6 @@ public class UserManager extends RepositoryManager {
     public RequestUrl URL_USER_CART = new RequestUrl(this, "/user/cart");
 
 
-
-
     /** _more_          */
     public static final String ARG_USER_NAME = "user.name";
 
@@ -326,7 +324,7 @@ public class UserManager extends RepositoryManager {
                     + userId);
         }
 
-        StringBuffer sb = new StringBuffer();
+
         if (request.defined(ARG_DELETE_CONFIRM)) {
             deleteUser(user);
             return new Result(getAdmin().URL_ADMIN_USER_LIST.toString());
@@ -348,6 +346,7 @@ public class UserManager extends RepositoryManager {
         }
 
 
+        StringBuffer sb = new StringBuffer();
         sb.append(getRepository().header("User: " + user.getName()));
         sb.append("\n<p/>\n");
         sb.append(HtmlUtil.form(getAdmin().URL_ADMIN_USER));
@@ -451,40 +450,60 @@ public class UserManager extends RepositoryManager {
 
 
 
+    private List<Entry> getCart(Request request) {
+        User user = request.getRequestContext().getUser();
+        List<Entry> cart = (List<Entry>) userCart.get(user);
+        if(cart==null) {
+            cart = new ArrayList<Entry>();
+            userCart.put(user, cart);
+        }
+        return cart;
+    }
+
+    private void addToCart(Request request,List<Entry>entries) throws Exception {
+        List<Entry> cart = getCart(request);
+        for(Entry entry : entries) {
+            if(!cart.contains(entry)) {
+                cart.add(entry);
+            }
+        }
+    }
+
+
     public Result processCart(Request request) throws Exception {
         String action = request.getString(ARG_ACTION,"");
         User user = request.getRequestContext().getUser();
-        List<Entry> entries = (List<Entry>) userCart.get(user);
         StringBuffer sb = new StringBuffer();
         if(user.getAnonymous()) {
             sb.append("No cart available for anonymous user");
             return new Result("User Cart", sb);
         }
-        if(entries==null) {
-            entries = new ArrayList<Entry>();
-            userCart.put(user, entries);
-        }
-
         if(action.equals(ACTION_CLEAR)) {
-            entries = new ArrayList<Entry>();
-            userCart.put(user, entries);
+            getCart(request).clear();
         } else  if(action.equals(ACTION_ADD)) {
             Entry entry = getRepository().getEntry(request.getId(""), request);
             if(entry == null) {
                 throw new IllegalArgumentException(
                                                    "Could not find entry with id:" + request.getId(""));
             }
-            if(!entries.contains(entry)) {
-                entries.add(entry);
+            if(!getCart(request).contains(entry)) {
+                getCart(request).add(entry);
             }
         }
 
+        return showCart(request);
+    }
 
+
+
+    public Result showCart(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        List<Entry> entries = getCart(request);
         sb.append("<h3>User Cart</h3>");
         if(entries.size()==0) {
             sb.append("No entries in cart");
         } else {
-            sb.append(HtmlUtil.href(HtmlUtil.url(URL_USER_CART,ARG_ACTION, ACTION_CLEAR),"Clear List"));
+            sb.append(HtmlUtil.href(HtmlUtil.url(URL_USER_CART,ARG_ACTION, ACTION_CLEAR),"Clear Cart"));
             boolean haveFrom = request.defined(ARG_FROM);
             if(haveFrom) {
                 Entry fromEntry = getRepository().getEntry(request.getString(ARG_FROM,""),request);
@@ -507,10 +526,8 @@ public class UserManager extends RepositoryManager {
                 }
                 sb.append(HtmlUtil.space(1));
                 sb.append(outputHandler.getEntryUrl(entry));
-
-
             }
-            
+           
             sb.append("</ul>");
         }
         Result result = new Result("User Cart", sb);
@@ -560,6 +577,33 @@ public class UserManager extends RepositoryManager {
     }
 
 
+    /** _more_ */
+    public static final String OUTPUT_CART = "user.cart";
+
+    protected void initOutputHandlers() throws Exception {
+        OutputHandler outputHandler = new OutputHandler(getRepository()) {
+                public boolean canHandle(String output) {
+                    return output.equals(OUTPUT_CART);
+                }
+                protected void getOutputTypesForEntries(Request request,
+                                                        List<Entry> entries, List types)
+                    throws Exception {
+                    types.add(new TwoFacedObject("Cart", OUTPUT_CART));
+                }
+                public Result outputEntries(Request request, List<Entry> entries)
+                    throws Exception {
+                    addToCart(request, entries);
+                    return showCart(request);
+                }
+
+            };
+
+        getRepository().addOutputHandler(outputHandler);
+    }
+
+
+
+
 
     /**
      * _more_
@@ -575,6 +619,9 @@ public class UserManager extends RepositoryManager {
         Result       result = new Result("User Settings", sb);
         return result;
     }
+
+
+
 
 }
 

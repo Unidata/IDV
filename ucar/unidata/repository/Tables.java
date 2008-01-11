@@ -195,12 +195,10 @@ public interface Tables {
 
     public static final String TABLE_METADATA = "metadata";
     public static final String COL_METADATA_ID = TABLE_METADATA + ".id";
-    public static final String COL_METADATA_ID_TYPE = TABLE_METADATA + ".id_type";
     public static final String COL_METADATA_TYPE = TABLE_METADATA + ".type";
     public static final String COL_METADATA_NAME = TABLE_METADATA + ".name";
     public static final String COL_METADATA_CONTENT = TABLE_METADATA + ".content";
     public static final String []ARRAY_METADATA = new String[]{COL_METADATA_ID,
-                                                               COL_METADATA_ID_TYPE,
                                                                COL_METADATA_TYPE,
                                                                COL_METADATA_NAME,
                                                                COL_METADATA_CONTENT};

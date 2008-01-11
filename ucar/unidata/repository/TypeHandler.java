@@ -144,6 +144,10 @@ public class TypeHandler implements Constants, Tables {
         return new Entry(id, this);
     }
 
+    public void initializeEntry(Request request, Entry entry) throws Exception {
+    }
+
+
 
     /**
      * _more_
@@ -297,49 +301,24 @@ public class TypeHandler implements Constants, Tables {
             sb.append("<table cellspacing=\"5\" cellpadding=\"2\">");
             sb.append(getInnerEntryContent(entry, request, output,
                                            showResource));
-            sb.append("</table>\n");
+
             List<Tag> tags = repository.getTags(request, entry.getId());
             if (tags.size() > 0) {
-                sb.append(HtmlUtil.bold("Tags"));
-                sb.append("<ul>\n");
+                StringBuffer tagSB = new StringBuffer();
                 for (Tag tag : tags) {
-                    sb.append("<li> ");
-                    sb.append(repository.getTagLinks(request, tag.getName()));
-                    sb.append(tag.getName());
+                    tagSB.append(repository.getTagLinks(request, tag.getName()));
+                    tagSB.append(tag.getName());
+                    tagSB.append("<br>\n");
                 }
-                sb.append("</ul>\n");
+                sb.append(HtmlUtil.formEntry("Tags:", tagSB.toString()));
             }
-
-
-
-            List<Metadata> metadataList = repository.getMetadata(entry);
-            if (metadataList.size() > 0) {
-                sb.append("<p>");
-                sb.append(HtmlUtil.bold("Metadata:"));
-                sb.append("<ul>");
-                for (Metadata metadata : metadataList) {
-                    sb.append("<li>");
-                    if (metadata.getMetadataType().equals(
-                            Metadata.TYPE_LINK)) {
-                        sb.append(metadata.getName() + ": ");
-                        sb.append(HtmlUtil.href(metadata.getContent(),
-                                metadata.getContent()));
-                    } else {
-                        sb.append(metadata.getName());
-                        sb.append(" ");
-                        sb.append(metadata.getContent());
-                    }
-                }
-                sb.append("</ul>");
-            }
-
 
 
             List<Association> associations =
                 repository.getAssociations(request, entry.getId());
             if (associations.size() > 0) {
-                sb.append(HtmlUtil.bold("Associations"));
-                sb.append("<ul>\n");
+                StringBuffer assSB = new StringBuffer();
+                assSB.append("<table>");
                 for (Association association : associations) {
                     Entry fromEntry = null;
                     Entry toEntry   = null;
@@ -359,22 +338,52 @@ public class TypeHandler implements Constants, Tables {
                     if ((fromEntry == null) || (toEntry == null)) {
                         continue;
                     }
-                    sb.append("<li>");
-                    sb.append(((fromEntry == entry)
+                    assSB.append("<tr><td>");
+                    assSB.append(((fromEntry == entry)
                                ? fromEntry.getName()
                                : repository.getEntryUrl(fromEntry)));
-                    sb.append("&nbsp;&nbsp;");
-                    sb.append(
-                        HtmlUtil.bold(association.getName()) + " "
-                        + HtmlUtil.img(repository.fileUrl("/Arrow16.gif")));
-                    sb.append("&nbsp;&nbsp;");
-                    sb.append(((toEntry == entry)
+                    assSB.append("&nbsp;&nbsp;");
+                    assSB.append("</td><td>");
+                    assSB.append(
+                                 HtmlUtil.bold(association.getName()));
+                    assSB.append("</td><td>");
+                    assSB.append(HtmlUtil.img(repository.fileUrl("/Arrow16.gif")));
+                    assSB.append("&nbsp;&nbsp;");
+                    assSB.append("</td><td>");
+                    assSB.append(((toEntry == entry)
                                ? toEntry.getName()
                                : repository.getEntryUrl(toEntry)));
+                    assSB.append("</td></tr>");
                 }
-
-                sb.append("</ul>\n");
+                assSB.append("</table>");
+                sb.append(HtmlUtil.formEntry("Associations:", assSB.toString()));
             }
+
+
+            List<Metadata> metadataList = repository.getMetadata(entry);
+            if (metadataList.size() > 0) {
+                sb.append(HtmlUtil.formEntry("<p>",""));
+                StringBuffer mSB = new StringBuffer();
+                mSB.append("<ul>");
+                for (Metadata metadata : metadataList) {
+                    mSB.append("<li>");
+                    if (metadata.getMetadataType().equals(
+                            Metadata.TYPE_LINK)) {
+                        mSB.append(metadata.getName() + ": ");
+                        mSB.append(HtmlUtil.href(metadata.getContent(),
+                                metadata.getContent()));
+                    } else {
+                        mSB.append(metadata.getName());
+                        mSB.append(" ");
+                        mSB.append(metadata.getContent());
+                    }
+                }
+                mSB.append("</ul>");
+                sb.append(HtmlUtil.formEntry("Metadata:",mSB.toString()));
+            }
+
+            sb.append("</table>\n");
+
 
         } else if (output.equals(XmlOutputHandler.OUTPUT_XML)) {}
         return sb;
@@ -558,7 +567,7 @@ public class TypeHandler implements Constants, Tables {
             if ((typeDesc == null) || (typeDesc.trim().length() == 0)) {
                 typeDesc = entry.getTypeHandler().getType();
             }
-            sb.append(HtmlUtil.formEntry("Entry Type:", typeDesc));
+            sb.append(HtmlUtil.formEntry("Type:", typeDesc));
 
             if (entry.hasLocationDefined()) {
                 sb.append(HtmlUtil.formEntry("Location:",
