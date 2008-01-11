@@ -640,7 +640,8 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
 
         initDone();
 
-        /***
+
+        /*
         Misc.run(new Runnable() {
                 public void run() {
         try {
@@ -649,7 +650,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         } catch(Exception exc) {
             logException ("Starting the metadata server", exc);
         }
-        }});**/
+        }});*/
     }
 
 

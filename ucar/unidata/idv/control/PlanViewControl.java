@@ -206,7 +206,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
         Real r      = GridUtil.sampleToReal(currentSlice, el, animationValue);
         if ((r != null) && !r.isMissing()) {
             result.add("<tr><td>" + getMenuLabel()
-                       + ":</td><td width=\"60\" align=\"right\">"
+                       + ":</td><td  align=\"right\">"
                        + formatForCursorReadout(r) + ((currentLevel != null)
                     ? ("@" + currentLevel)
                     : "") + "</td></tr>");

@@ -144,7 +144,7 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
         List result = new ArrayList();
         Real r = GridUtil.sampleToReal(field, el, animationValue);
         if(r!=null && !r.isMissing()) {
-            result.add("<tr><td>"+getMenuLabel()+":</td><td width=\"60\" align=\"right\">" +formatForCursorReadout(r)+"</td></tr>");
+            result.add("<tr><td>"+getMenuLabel()+":</td><td align=\"right\">" +formatForCursorReadout(r)+"</td></tr>");
         }
         return result;
     }
