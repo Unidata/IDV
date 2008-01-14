@@ -107,6 +107,8 @@ public class ComponentGroup extends ComponentHolder {
         LAYOUT_DESKTOP
     };
 
+    public static final List LAYOUT_LIST = Misc.toList(LAYOUTS);
+
     /** type of layout */
     private String layout = LAYOUT_GRID;
 
@@ -382,7 +384,9 @@ public class ComponentGroup extends ComponentHolder {
         Vector layoutList = new Vector(TwoFacedObject.createList(LAYOUTS,
                                 LAYOUT_NAMES));
         layoutBox = new JComboBox(layoutList);
-        layoutBox.setSelectedItem(TwoFacedObject.findId(layout, layoutList));
+        Object selectedLayout = TwoFacedObject.findId(layout, layoutList);
+        if(selectedLayout==null) selectedLayout = layoutList.get(0);
+        layoutBox.setSelectedItem(selectedLayout);
         layoutBox.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent event) {
                 checkExtraPanel(
@@ -975,7 +979,12 @@ public class ComponentGroup extends ComponentHolder {
      * @param value The new value for Layout
      */
     public void setLayout(String value) {
+        if(value!=null && !LAYOUT_LIST.contains(value)) {
+            throw new IllegalArgumentException("Unknown layout value:" + value);
+
+        }
         layout = value;
+
     }
 
     /**
