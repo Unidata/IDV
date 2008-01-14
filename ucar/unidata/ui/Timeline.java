@@ -425,7 +425,7 @@ public class Timeline extends JPanel implements MouseListener,
     //    private DateTimePicker endTimePicker;
 
     /** for properties dialog */
-    //SKIP    private DateSelectionGui dateSelectionGui;
+    private DateSelectionGui dateSelectionGui;
 
     /** for properties dialog */
     private JDialog propertiesDialog;
@@ -1366,7 +1366,7 @@ public class Timeline extends JPanel implements MouseListener,
             stickyCbx        = new JCheckBox("Use Visible Range", sticky);
             //            startTimePicker  = new DateTimePicker(getStartDate());
             //            endTimePicker    = new DateTimePicker(getEndDate());
-    //SKIP            dateSelectionGui = new DateSelectionGui(dateSelection);
+            dateSelectionGui = new DateSelectionGui(dateSelection);
 
             JComponent timeRangePanel = new JPanel();
 
@@ -1380,13 +1380,12 @@ public class Timeline extends JPanel implements MouseListener,
 
             JComponent contents;
 
-            if (isCapableOfSelection) {
-                /*                contents = LayoutUtil.vbox(timeRangePanel,
-                                         LayoutUtil.filler(10, 10),
-                                         useDateSelectionCbx,
-                                         LayoutUtil.inset(dateSelectionGui,
-                                         new Insets(0, 20, 0, 0)));*/
-                contents = timeRangePanel;
+            if(isCapableOfSelection) {
+                contents = LayoutUtil.vbox(timeRangePanel,
+                                           LayoutUtil.filler(10, 10),
+                                           useDateSelectionCbx,
+                                           LayoutUtil.inset(dateSelectionGui,
+                                                            new Insets(0, 20, 0, 0)));
 
             } else {
                 contents = timeRangePanel;
@@ -1421,7 +1420,7 @@ public class Timeline extends JPanel implements MouseListener,
 
         //        startTimePicker.setDate(getStartDate());
         //        endTimePicker.setDate(getEndDate());
-    //SKIP        dateSelectionGui.setDateSelection(dateSelection);
+        dateSelectionGui.setDateSelection(dateSelection);
         propertiesDialog.setVisible(true);
     }
 
@@ -1472,9 +1471,9 @@ public class Timeline extends JPanel implements MouseListener,
      */
     private boolean applyProperties() {
         if (isCapableOfSelection) {
-    //SKIP            if ( !dateSelectionGui.applyProperties()) {
-    //SKIP                return false;
-    //SKIP            }
+            if ( !dateSelectionGui.applyProperties()) {
+                return false;
+            }
             useDateSelection = useDateSelectionCbx.isSelected();
             showIntervals    = showIntervalsCbx.isSelected();
             sticky           = stickyCbx.isSelected();
