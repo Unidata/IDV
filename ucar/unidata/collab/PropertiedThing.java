@@ -20,24 +20,53 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.collab;
+
+
+import ucar.unidata.collab.SharableImpl;
+
+
+
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.sounding.TrackDataSource;
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.ProjectionRect;
 
 
 
 
 import ucar.unidata.geoloc.projection.*;
-import ucar.unidata.geoloc.ProjectionRect;
-import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.util.GuiUtils;
+
+
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.ObjectListener;
 
 import ucar.visad.GeoUtils;
 import ucar.visad.Util;
 import ucar.visad.display.*;
 
 import visad.*;
+
 import visad.georef.*;
 
-import visad.util.ColorPreview;
 import visad.util.BaseRGBMap;
+
+import visad.util.ColorPreview;
+
+
+
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+
+import java.beans.*;
+
+
+import java.rmi.RemoteException;
 
 
 
@@ -46,13 +75,6 @@ import visad.util.BaseRGBMap;
 
 
 import java.text.SimpleDateFormat;
-
-
-
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.event.*;
 
 
 
@@ -68,25 +90,6 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 
 
-import java.rmi.RemoteException;
-
-
-
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.sounding.TrackDataSource;
-
-
-import ucar.unidata.collab.SharableImpl;
-
-
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.ObjectListener;
-
-import java.beans.*;
-
-
 /**
  * This abstract class handles showing a properties dialog
  * and manages a set of property change listeners.
@@ -94,8 +97,7 @@ import java.beans.*;
  * @author IDV Development Team
  * @version $Revision: 1.1 $
  */
-public abstract class PropertiedThing  extends SharableImpl 
-    implements PropertyChangeListener {
+public abstract class PropertiedThing extends SharableImpl implements PropertyChangeListener {
 
 
     /**
@@ -140,11 +142,11 @@ public abstract class PropertiedThing  extends SharableImpl
      * @param newValue          The new value of the property.
      */
     public void firePropertyChange(String propertyName, Object oldValue,
-                                      Object newValue) {
+                                   Object newValue) {
 
         if (propertyListeners != null) {
             propertyListeners.firePropertyChange(propertyName, oldValue,
-                                                 newValue);
+                    newValue);
         }
     }
 
@@ -208,7 +210,7 @@ public abstract class PropertiedThing  extends SharableImpl
      * @return array of tab names
      */
     public String[] getPropertyTabs() {
-        return new String[]{ "" };
+        return new String[] { "" };
     }
 
     /**
@@ -231,86 +233,99 @@ public abstract class PropertiedThing  extends SharableImpl
      * @return _more_
      */
     public boolean showProperties(JComponent where, int x, int y) {
-        if(isShowing()) return false;
-        String[]   tabs = getPropertyTabs();
-        JComponent contents;
-        if (tabs.length <= 1) {
-            List comps = new ArrayList();
-            getPropertiesComponents(comps, 0);
-            GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
-            contents = GuiUtils.doLayout(comps, 2, GuiUtils.WT_NY,
-                                         GuiUtils.WT_N);
-        } else {
-            JTabbedPane tabbedPane = new JTabbedPane();
-            for (int tabIdx = 0; tabIdx < tabs.length; tabIdx++) {
-                List comps = new ArrayList();
-                getPropertiesComponents(comps, tabIdx);
-                GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
-                JComponent comp = GuiUtils.top(GuiUtils.doLayout(comps, 2,
-                                      GuiUtils.WT_NY, GuiUtils.WT_N));
-                tabbedPane.add(tabs[tabIdx], GuiUtils.inset(comp, 5));
 
-            }
-            contents = tabbedPane;
+        if (isShowing()) {
+            return false;
         }
+        try {
+            String[]   tabs = getPropertyTabs();
+            JComponent contents;
+            if (tabs.length <= 1) {
+                List comps = new ArrayList();
+                getPropertiesComponents(comps, 0);
+                GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
+                contents = GuiUtils.doLayout(comps, 2, GuiUtils.WT_NY,
+                                             GuiUtils.WT_N);
+            } else {
+                JTabbedPane tabbedPane = new JTabbedPane();
+                for (int tabIdx = 0; tabIdx < tabs.length; tabIdx++) {
+                    List comps = new ArrayList();
+                    getPropertiesComponents(comps, tabIdx);
+                    GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
+                    JComponent comp = GuiUtils.top(GuiUtils.doLayout(comps,
+                                          2, GuiUtils.WT_NY, GuiUtils.WT_N));
+                    tabbedPane.add(tabs[tabIdx], GuiUtils.inset(comp, 5));
+
+                }
+                contents = tabbedPane;
+            }
 
 
 
-        ActionListener listener = new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                String cmd = ae.getActionCommand();
-                if (cmd.equals(GuiUtils.CMD_OK)
-                        || cmd.equals(GuiUtils.CMD_APPLY)) {
-                    if ( !doApplyProperties()) {
-                        return;
+            ActionListener listener = new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    String cmd = ae.getActionCommand();
+                    if (cmd.equals(GuiUtils.CMD_OK)
+                            || cmd.equals(GuiUtils.CMD_APPLY)) {
+                        if ( !doApplyProperties()) {
+                            return;
+                        }
+                    }
+                    if (cmd.equals(GuiUtils.CMD_OK)
+                            || cmd.equals(GuiUtils.CMD_CANCEL)) {
+                        propertiesDialog.dispose();
+                        propertiesDialog = null;
                     }
                 }
-                if (cmd.equals(GuiUtils.CMD_OK)
-                        || cmd.equals(GuiUtils.CMD_CANCEL)) {
-                    propertiesDialog.dispose();
-                    propertiesDialog = null;
+            };
+            JPanel buttons = GuiUtils.makeButtons(listener,
+                                 new String[] { GuiUtils.CMD_APPLY,
+                    GuiUtils.CMD_OK, GuiUtils.CMD_CANCEL });
+
+            contents = GuiUtils.centerBottom(contents, buttons);
+            contents = GuiUtils.inset(contents, 5);
+            propertiesDialog = GuiUtils.createDialog("Properties: "
+                    + toString(), true);
+            propertiesDialog.getContentPane().add(GuiUtils.top(contents));
+            propertiesDialog.pack();
+
+            if (where != null) {
+                Point loc = where.getLocationOnScreen();
+                loc.x += x;
+                loc.y += y;
+                Dimension screenSize =
+                    Toolkit.getDefaultToolkit().getScreenSize();
+                //Offset a bit for the icon bar
+                screenSize.height -= 50;
+                Dimension windowSize = propertiesDialog.getSize();
+
+                if (loc.y + windowSize.height > screenSize.height) {
+                    loc.y = screenSize.height - windowSize.height;
                 }
+                if (loc.x + windowSize.width > screenSize.width) {
+                    loc.x = screenSize.width - windowSize.width;
+                }
+                propertiesDialog.setLocation(loc);
             }
-        };
-        JPanel buttons = GuiUtils.makeButtons(listener,
-                                              new String[]{
-                                                  GuiUtils.CMD_APPLY,
-                                                  GuiUtils.CMD_OK,
-                                                  GuiUtils.CMD_CANCEL });
-
-        contents = GuiUtils.centerBottom(contents, buttons);
-        contents = GuiUtils.inset(contents, 5);
-        propertiesDialog = GuiUtils.createDialog("Properties: " + toString(),
-                                                 true);
-        propertiesDialog.getContentPane().add(GuiUtils.top(contents));
-        propertiesDialog.pack();
-
-        if (where != null) {
-            Point loc = where.getLocationOnScreen();
-            loc.x += x;
-            loc.y += y;
-            Dimension screenSize =
-                Toolkit.getDefaultToolkit().getScreenSize();
-            //Offset a bit for the icon bar
-            screenSize.height -= 50;
-            Dimension windowSize = propertiesDialog.getSize();
-
-            if (loc.y + windowSize.height > screenSize.height) {
-                loc.y = screenSize.height - windowSize.height;
-            }
-            if (loc.x + windowSize.width > screenSize.width) {
-                loc.x = screenSize.width - windowSize.width;
-            }
-            propertiesDialog.setLocation(loc);
+            propertiesDialog.show();
+            propertiesDialog = null;
+            return true;
+        } catch (Exception exc) {
+            LogUtil.logException("Creating properties dialog", exc);
+            return false;
         }
-        propertiesDialog.show();
-        propertiesDialog = null;
-        return true;
+
+
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isShowing() {
-        return propertiesDialog!=null;
+        return propertiesDialog != null;
     }
 
     /**
@@ -340,3 +355,4 @@ public abstract class PropertiedThing  extends SharableImpl
 
 
 }
+
