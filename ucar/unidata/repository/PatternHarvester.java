@@ -290,6 +290,7 @@ public class PatternHarvester extends Harvester {
                 continue;
             }
             File[] files = fileInfo.getFile().listFiles();
+            if(files==null) continue;
             for (int fileIdx = 0; fileIdx < files.length; fileIdx++) {
                 File f = files[fileIdx];
                 if (f.isDirectory()) {
