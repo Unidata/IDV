@@ -257,7 +257,14 @@ public abstract class ImageDataSource extends DataSourceImpl {
      * @return Can save to local disk
      */
     public boolean canSaveDataToLocalDisk() {
-        return !isFileBased();
+        if(isFileBased()) return false;
+        List<BandInfo> bandInfos =
+            (List<BandInfo>) getProperty(PROP_BANDINFO, (Object) null);
+        if(bandInfos==null || bandInfos.size()==0) return true;
+        if(bandInfos.size()>1) return false;
+        List l = bandInfos.get(0).getCalibrationUnits();
+        if(l.size()>1) return false;
+        return true;
     }
 
     /**
