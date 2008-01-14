@@ -833,10 +833,10 @@ public class CDMRadarAdapter implements RadarAdapter {
         float                    range_step = sw0.getGateSize();
         float range_to_first_gate           = sw0.getRangeToFirstGate();
 
-        if (rayData == null) {
-            rayData = new float[numSweep][][];
+        //if (rayData == null) {
+         //   rayData = new float[numSweep][][];
             //  rayIndex = new int[numSweep][];
-        }
+       // }
 
         //    if (numRay > 360) {
         //       numRay = 360;
@@ -907,9 +907,11 @@ public class CDMRadarAdapter implements RadarAdapter {
         int rayNum = getRayNumber(sweepVar);
         if (rayIndex == null) {
             rayIndex = getRayIndex(sweepVar, az, numRay);
-            rayData  = getRayData(sweepVar, rayNum, numBin, rNum);
         }
 
+        if (rayData == null) {
+            rayData  = getRayData(sweepVar, rayNum, numBin, rNum);
+        }
         // get the cappi value for each ray and bin
         for (int a = 0; a < numRay; a++) {
             float azi = az[a];  //sw0.getAzimuth(a);
@@ -1068,7 +1070,7 @@ public class CDMRadarAdapter implements RadarAdapter {
 
             for (int i = 0; i < 360; i++) {
                 float azi = az[i];
-                int ii =  getClosestRayFromSweep(s1, azi, r, sIndex, azs);
+                int ii =  getClosestRayFromSweep(azi, r, sIndex, azs);
                 rIndex[sIndex][i] = ii;
             }
 
@@ -1313,13 +1315,12 @@ public class CDMRadarAdapter implements RadarAdapter {
     /**
      * return closest Ray in Sweep within limit (angle) specified
      * in parameter list.  Assume PPI mode.
-     * @param s          sweep
      * @param ray_angle  ray angle
      * @param limit      limit
      * @return  the ray index
      *
      */
-    int getClosestRayFromSweep(RadialDatasetSweep.Sweep s, float ray_angle,
+    int getClosestRayFromSweep(float ray_angle,
                                float limit, int tableIdx, float [] azimuths) {
 
         CDMRadarSweepDB sweepTable;
@@ -1337,7 +1338,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         /* Find hash entry with closest Ray */
         if(r == null) return 999;
         int rd = r.rayIndex;
-        closestRay = theClosestHash(s, ray_angle, rd, limit);
+        closestRay = theClosestHash(azimuths, ray_angle, rd, limit);
 
         /* Is closest ray within limit parameter ? If
          * so return ray, else return NULL.
@@ -1373,40 +1374,41 @@ public class CDMRadarAdapter implements RadarAdapter {
 
     /**
      * Get the data for the ray.
-     * @param s          sweep
+     * @param azimuths  azi for this sweep
      * @param ray_angle  ray angle
      * @param hindex     ray index
      * @param limit      limit
      * @return  the ray index
      *
      */
-    int theClosestHash(RadialDatasetSweep.Sweep s, float ray_angle,
+    int theClosestHash(float[] azimuths, float ray_angle,
                        int hindex, float limit) {
         /* Return the hash pointer with the minimum ray angle difference. */
 
         float   clow, chigh, cclow;
         float   high, low;
         //int     rNum      = s.getRadialNumber() - 1;
-        float[] _azimuths = null;
+        //float[] _azimuths = null;
         /* Set low pointer to hash index with ray angle just below
              * requested angle and high pointer to just above requested
              * angle.
          */
 
         /* set low and high pointers to initial search locations*/
+        /*
         try {
             _azimuths = getAzimuth(s);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        int rNum = _azimuths.length -1;
+        */
+        int rNum = azimuths.length -1;
 
         if (hindex >= rNum) {
             hindex = (hindex - rNum);
         }
-        low  = _azimuths[hindex];
-        high = _azimuths[hindex + 1];
+        low  = azimuths[hindex];
+        high = azimuths[hindex + 1];
 
 
         /* Search until clockwise angle to high is less then clockwise
@@ -1446,11 +1448,11 @@ public class CDMRadarAdapter implements RadarAdapter {
             try {
                 if (hindex < 0) {
                     hindex = rNum;
-                    low    = _azimuths[hindex];
-                    high   = _azimuths[0];
+                    low    = azimuths[hindex];
+                    high   = azimuths[0];
                 } else {
-                    low  = _azimuths[hindex];
-                    high = _azimuths[hindex + 1];
+                    low  = azimuths[hindex];
+                    high = azimuths[hindex + 1];
                 }
             } catch (ArrayIndexOutOfBoundsException ee) {
                 int a = hindex;
@@ -1989,7 +1991,7 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         Object [] cut = getCutIdx(sweepVar);
         int       numberOfSweeps = cut.length;
-        int       numberOfRay    = 360;  //getRayNumber(sweepVar);
+        int       numberOfRay    = 361;  //getRayNumber(sweepVar);
      //   rhiData = null;
         FlatField retField;
         double    range_step;
@@ -2038,7 +2040,15 @@ public class CDMRadarAdapter implements RadarAdapter {
 
 
         Trace.call1("   getRHI.getdata");
-        float[] azimuths = new float[numberOfRay];
+
+        float[] az = new float[numberOfRay];
+        for (int i = 0; i < numberOfRay; i++) {
+            az[i] = i;
+        }
+
+        if (rayIndex == null) {
+            rayIndex = getRayIndex(sweepVar, az, numberOfRay);
+        }
 
         if (rhiData == null ) {
             getRHIData(sweepVar);
@@ -2197,7 +2207,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         int [] radialNumber = new int[numberOfSweeps];
         int [] gateNumber = new int[numberOfSweeps];
         float [] beamWidth = new float[numberOfSweeps];
-        
+
         for(int i = 0; i< numberOfSweeps; i++ ) {
             int sb =  Integer.parseInt(cut[i].toString());
             RadialDatasetSweep.Sweep sp = sweepVar.getSweep(sb);
@@ -2237,10 +2247,10 @@ public class CDMRadarAdapter implements RadarAdapter {
                     }
 
                 }
-                float [] azs = getAzimuth(sp);
+                //float [] azs = getAzimuth(sp);
 
-                int j = getClosestRayFromSweep(sp, rhiAz, f, ti, azs);
-
+                //int j = getClosestRayFromSweep(sp, rhiAz, f, ti, _azimuths);
+                int j = rayIndex[ti][r];
                 if (j == -1) {
                     continue;
                 }
@@ -2938,7 +2948,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             float [] azs = getAzimuth(sweep);
             for (int rayIdx = 0; rayIdx < numberOfRay; rayIdx++) {
                 float rhiAz = rayIdx;
-                rayIndex[sweepIdx][rayIdx] = getClosestRayFromSweep(sweep, rhiAz, f, sweepIdx, azs);
+                rayIndex[sweepIdx][rayIdx] = getClosestRayFromSweep(rhiAz, f, sweepIdx, azs);
 
             }
 
