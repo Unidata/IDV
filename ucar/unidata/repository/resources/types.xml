@@ -35,6 +35,10 @@
 	<column name="number" type="double" cansearch="true" suffix="number units"/>
   </type>
 
+  <type name="testit2" description="Test it2">
+	<column name="gcmd" type="enumeration"  values="file:/ucar/unidata/repository/resources/gcmdkeywords.txt" label="Gcmd Keyword" isindex="true" cansearch="true" canlist="true" />
+  </type>
+
 
 
 

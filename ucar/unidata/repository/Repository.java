@@ -165,6 +165,8 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     /** _more_ */
     private static final int PAGE_CACHE_LIMIT = 100;
 
+    private static final int ENTRY_CACHE_LIMIT = 100000;
+
 
 
     /** _more_ */
@@ -295,6 +297,9 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
 
     /** _more_ */
     private List pageCacheList = new ArrayList();
+
+
+    private Hashtable entryCache = new Hashtable();
 
 
     /**
@@ -541,6 +546,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     protected void clearCache() {
         pageCache     = new Hashtable();
         pageCacheList = new ArrayList();
+        entryCache = new Hashtable();
     }
 
 
@@ -1992,6 +1998,10 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      */
     protected Entry getEntry(String entryId, Request request)
             throws Exception {
+        Entry entry = (Entry) entryCache.get(entryId);
+        if(entry!=null) return entry;
+
+
         PreparedStatement entryStmt= null;
         if (entryStmt == null) {
             String query = SqlUtil.makeSelect(COLUMNS_ENTRIES,
@@ -2000,6 +2010,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             entryStmt = getConnection().prepareStatement(query);
 
         }
+
         /*
           String query = SqlUtil.makeSelect(COLUMNS_ENTRIES,
           Misc.newList(TABLE_ENTRIES),
@@ -2013,7 +2024,13 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             return null;
         }
         TypeHandler typeHandler = getTypeHandler(results.getString(2));
-        return filterEntry(request, typeHandler.getEntry(results));
+        entry =  filterEntry(request, typeHandler.getEntry(results));
+        
+        if(entry!=null) {
+            if(entryCache.size()>ENTRY_CACHE_LIMIT) entryCache = new Hashtable();
+            entryCache.put(entryId, entry);
+        }
+        return entry;
     }
 
 

@@ -28,6 +28,7 @@ import org.w3c.dom.*;
 import ucar.unidata.data.SqlUtil;
 
 import ucar.unidata.util.HtmlUtil;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
@@ -215,7 +216,7 @@ public class Column implements Tables, Constants {
      * @param offset _more_
      */
     public Column(GenericTypeHandler typeHandler, Element element,
-                  int offset) {
+                  int offset) throws Exception {
         this.typeHandler = typeHandler;
         this.offset      = offset;
         name             = XmlUtil.getAttribute(element, ATTR_NAME);
@@ -236,8 +237,13 @@ public class Column implements Tables, Constants {
         rows        = XmlUtil.getAttribute(element, ATTR_ROWS, rows);
         columns     = XmlUtil.getAttribute(element, ATTR_COLUMNS, columns);
         if (type.equals(TYPE_ENUMERATION)) {
-            values = StringUtil.split(XmlUtil.getAttribute(element,
-                    ATTR_VALUES), ",", true, true);
+            String valueString = XmlUtil.getAttribute(element,ATTR_VALUES);
+            if(valueString.startsWith("file:")) {
+                valueString = IOUtil.readContents(valueString.substring("file:".length()), getClass());
+                values = StringUtil.split(valueString, "\n", true, true);
+            } else {
+                values = StringUtil.split(valueString, ",", true, true);
+            }
         }
     }
 

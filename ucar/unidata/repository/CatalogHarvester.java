@@ -228,6 +228,13 @@ public class CatalogHarvester extends Harvester {
                 repository.getTypeHandler(TypeHandler.TYPE_FILE);
             Entry entry      = typeHandler.createEntry(repository.getGUID());
             Date  createDate = new Date();
+            String ext      = IOUtil.getFileExtension(urlPath);
+            if (ext.startsWith(".")) {
+                ext = ext.substring(1);
+            }
+            if(ext.length()>0) {
+                entry.addTag(ext);
+            }
             entry.init(name, "", parent, user,
                        new Resource(urlPath, Resource.TYPE_URL),
                        createDate.getTime(), createDate.getTime(),

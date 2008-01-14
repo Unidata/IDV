@@ -47,12 +47,15 @@
             <include name="ucar/**/*.class"/>
             <include name="ucar/unidata/repository/htdocs/**/*.*"/>
             <include name="ucar/unidata/repository/resources/**/*.*"/>
+            <include name="auxdata/maps/*"/>
         </jar>
         <mkdir dir="${tmpjardir}"/>
         <delete includeemptydirs="true">
             <fileset dir="${tmpjardir}" includes="**/*"/>
         </delete>
         <unjar src="${jars_dest}/repositorytmp.jar" dest="${tmpjardir}"/>
+        <unjar src="${jars_dest}/visad.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/postgres.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/mysql.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/derby.jar" dest="${tmpjardir}"/>

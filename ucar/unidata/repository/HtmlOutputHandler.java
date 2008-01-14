@@ -639,6 +639,9 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(crumbs[1]);
             } else {
                 title = group.getName();
+                if(entries.size()==0) {
+                    sb.append("No entries found");
+                }
             }
 
 
@@ -653,8 +656,8 @@ public class HtmlOutputHandler extends OutputHandler {
                             showMetadata
                             ? "false"
                             : "true"), showMetadata
-                                       ? "-&nbsp; Metadata"
-                                       : "+&nbsp; Metadata", " class=\"subheaderlink\" ");
+                                       ? "-&nbsp; Details"
+                                       : "+&nbsp; Details", " class=\"subheaderlink\" ");
 
                     sb.append("<tr><td colspan=\"2\">");
                     sb.append("<div class=\"subheader\">" + link + "</div>");
