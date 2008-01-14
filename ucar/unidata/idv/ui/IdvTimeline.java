@@ -279,11 +279,22 @@ public class IdvTimeline extends Timeline {
             SunriseSunsetCollector ssc   = new SunriseSunsetCollector(dates);
             List cals = ssc.calculate(sunriseLocation.getLatitude(),
                                       sunriseLocation.getLongitude());
-            for (int i = 0; i < cals.size(); i++) {
-                GregorianCalendar cal = (GregorianCalendar) cals.get(i);
-                sunriseDates.add(cal.getTime());
+            for (int i = 0; i < cals.size(); i+=2) {
+                GregorianCalendar cal1 = (GregorianCalendar) cals.get(i);
+                GregorianCalendar cal2 = (GregorianCalendar) cals.get(i+1);
+                Date d1 = cal1.getTime();
+                Date d2 = cal2.getTime();
+                //Check the order 
+                if(d1.getTime()>d2.getTime()) {
+                    //                    System.err.println("Flipping the dates for location:" + sunriseLocation + " date1:" + d1  + " date2:" + d2);
+                    Date tmp = d1;
+                    d1 = d2;
+                    d2 = tmp;
+
+                }
+                sunriseDates.add(d1);
+                sunriseDates.add(d2);
             }
-            System.err.println("dates:" + sunriseDates);
         } catch (Exception exc) {
             exc.printStackTrace();
         }
