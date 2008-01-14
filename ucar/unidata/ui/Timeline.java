@@ -1643,8 +1643,8 @@ public class Timeline extends JPanel implements MouseListener,
             Date date = datedThing.getDate();
             long time = date.getTime();
             for (int i = 0; i < sunriseDates.size(); i += 2) {
-                Date d1 = (Date) sunriseDates.get(i + 1);
-                Date d2 = (Date) sunriseDates.get(i);
+                Date d1 = (Date) sunriseDates.get(i);
+                Date d2 = (Date) sunriseDates.get(i+1);
                 if ((time >= d1.getTime()) && (time <= d2.getTime())) {
                     selected.add(datedThing);
                     break;
@@ -2190,8 +2190,8 @@ public class Timeline extends JPanel implements MouseListener,
             g.setColor(Color.yellow);
             int height = (int) getSize().getHeight();
             for (int i = 0; i < sunriseDates.size(); i += 2) {
-                Date d1 = (Date) sunriseDates.get(i + 1);
-                Date d2 = (Date) sunriseDates.get(i);
+                Date d1 = (Date) sunriseDates.get(i);
+                Date d2 = (Date) sunriseDates.get(i+1);
                 int  x1 = toLocation(d1);
                 int  x2 = toLocation(d2);
                 g.fillRect(x1, 0, (x2 - x1), height);
