@@ -832,30 +832,6 @@ public class CDMRadarAdapter implements RadarAdapter {
         float                    range_step = sw0.getGateSize();
         float range_to_first_gate           = sw0.getRangeToFirstGate();
 
-
-
-        /* Calculate elevation angle verse range array */
-        float[][] slantrElev = new float[numBin][2];
-        float     ht         = (float) level.getValue() / 1000.0f;
-        for (int a = 0; a < numBin; a++) {
-            float grange = (range_to_first_gate + (a * range_step)) / 1000.f;
-            slantrElev[a] = getSlantrAndElev(grange, ht);
-        }
-
-        float[]   cappiAz    = new float[numRay];
-        float[][] cappiValue = new float[numBin][numRay];
-
-
-        double[]  ranges     = new double[numBin];
-
-        // get the closest sweep index for each bin
-        int[] sweepI = new int[numBin];
-        for (int b = 0; b < numBin; b++) {
-            sweepI[b] = getClosestSweepIndex(sweepVar, slantrElev[b][1],
-                                             beamWidth / 2.f);
-        }
-
-
         // now get the hash map for each sweep contain azi as index and ray information.
         Trace.call1("   sweep list");
         if (RSL_sweep_list == null) {
@@ -877,14 +853,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
         Trace.call2("   sweep list");
 
-        // ranges for cappi
-        ranges[0] = (range_to_first_gate + range_step / 2);
-        for (int i = 1; i < numBin; i++) {
-            ranges[i] = ranges[i - 1] + range_step;
-        }
-
-        Trace.call1("   get cappi value");
-        // setting cappi azi value for each ray.
+       // setting cappi azi value for each ray.
         float[] az = new float[numRay];
         for (int i = 0; i < numRay; i++) {
             az[i] = i;
@@ -895,9 +864,39 @@ public class CDMRadarAdapter implements RadarAdapter {
             rayIndex = getRayIndex(sweepVar, az, numRay);
         }
 
-        //if (rayData == null) {
-        float[][][] rayData  = getRayData(sweepVar, rayNum, numBin);
-        //}
+        if (rayData == null) {
+            rayData  = getRayData(sweepVar, rayNum, numBin);
+        }
+
+        /* Calculate elevation angle verse range array */
+        float[][] slantrElev = new float[numBin][2];
+        float     ht         = (float) level.getValue() / 1000.0f;
+        for (int a = 0; a < numBin; a++) {
+            float grange = (range_to_first_gate + (a * range_step)) / 1000.f;
+            slantrElev[a] = getSlantrAndElev(grange, ht);
+        }
+
+        float[]   cappiAz    = new float[numRay];
+        float[][] cappiValue = new float[numBin][numRay];
+
+
+        double[]  ranges     = new double[numBin];
+
+        // get the closest sweep index for each bin
+        int[] sweepI = new int[numBin];
+        for (int b = 0; b < numBin; b++) {
+            sweepI[b] = getClosestSweepIndex(slantrElev[b][1],beamWidth / 2.f);
+        }
+
+
+        // ranges for cappi
+        ranges[0] = (range_to_first_gate + range_step / 2);
+        for (int i = 1; i < numBin; i++) {
+            ranges[i] = ranges[i - 1] + range_step;
+        }
+
+        Trace.call1("   get cappi value");
+
 
         if (cutmap == null) {
             cutmap = new HashMap();
@@ -1118,7 +1117,7 @@ public class CDMRadarAdapter implements RadarAdapter {
     private CDMRadarSweepDB[] RSL_sweep_list = null;
 
     /** ray data */
- //   private float[][][] rayData = null;
+    private float[][][] rayData = null;
 
     /** ray indices */
     private int[][] rayIndex = null;
@@ -1205,114 +1204,45 @@ public class CDMRadarAdapter implements RadarAdapter {
 
 
     /**
-     * _more_
-     *
-     * @param sVar _more_
-     * @param elev _more_
-     * @param azimuth _more_
-     * @param range _more_
-     * @param rdata _more_
-     *
-     * @return _more_
-     *
-     * @throws IOException _more_
-     */
-    float getValue(RadialDatasetSweep.RadialVariable sVar, float elev,
-                   float azimuth, float range,
-                   float[] rdata) throws IOException {
-
-        /*
-         * 1. Locate sweep using 'elev'.
-         * 2. Call RSL_get_value_from_sweep
-         */
-        float data = 0;
-
-        // float[]   _swData = s.readData();
-
-        /*    if (rayData[swIndex] == null) {
-                rayData[swIndex] = new float[rNum][bNum];
-                float[]   _swData = s.readData();
-
-                for (int r = 0; r < rNum; r++) {
-                    float[]   _rayData = new float[bNum];
-                    for(int b = 0; b < bNum; b++) {
-                         _rayData[b] = _swData[r*bNum + b];
-                    }
-                    rayData[swIndex][r] = _rayData;
-
-                   // rayData[swIndex][r] = s.readData(r);
-
-                }
-
-            }
-            float r = s.getBeamWidth() / 2;
-
-            // int   rayIdex = getClosestRayFromSweep(s, azimuth, r);
-            float [] _azimuths = s.getAzimuth();
-
-            if (rayIndex[swIndex] == null) {
-                rayIndex[swIndex] = new int[rNum];
-                for (int i = 0; i < rNum; i++) {
-                    float azi = _azimuths[i];
-                   // azi = _azimuths[i];  //s.getAzimuth(i);
-                    rayIndex[swIndex][i] = getClosestRayFromSweep(s, azi, r);
-                }
-
-            }
-
-            int rayIdex = rayIndex[swIndex][rIndex];
-
-
-                data = getValueFromRay(rdata, range,
-                                       gateSize, rangeToFirstGate, rayIdex);
-            */
-
-        return data;
-    }
-
-
-    /**
      * Find closest sweep to requested elevation angle.  Assume PPI sweep for
      * now. Meaning: sweep_angle represents elevation angle from
      * 0->90 degrees
-     * @param sweepVar      sweep variable object
      * @param sweep_angle   sweep elevation angle
      * @param limit         limit is half beamWidth
      * @return  the sweep index
      *
      */
-    int getClosestSweepIndex(RadialDatasetSweep.RadialVariable sweepVar,
-                             float sweep_angle, float limit) {
+    int getClosestSweepIndex(float sweep_angle, float limit) {
         RadialDatasetSweep.Sweep s;
         int                      i, ci;
         float                    delta_angle = 91;
         float                    check_angle;
 
-        if (sweepVar == null) {
+        if (meanEle == null) {
             return -1;
         }
 
-        Object [] cut = getCutIdx(sweepVar);
+       //Object [] cut = getCutIdx(sweepVar);
 
         ci = 0;
-        int numberOfSweeps = cut.length;
+        int numberOfSweeps = meanEle.length;
         for (i = 0; i < numberOfSweeps; i++) {
-            int sb =  Integer.parseInt(cut[i].toString());
-            s = sweepVar.getSweep(sb);
-            if (s == null) {
-                continue;
-            }
-            check_angle = (float) Math.abs((double) (s.getMeanElevation()
+           // int sb =  Integer.parseInt(cut[i].toString());
+           // s = sweepVar.getSweep(sb);
+           // if (s == null) {
+            //    continue;
+            //}
+            check_angle = (float) Math.abs((double) (meanEle[i]
                     - sweep_angle));
 
             if (check_angle <= delta_angle) {
                 delta_angle = check_angle;
-                ci          = sb;
+                ci          = i;
             }
         }
-        s           = sweepVar.getSweep(ci);
+        float me           = meanEle[ci];
 
-        delta_angle = Math.abs(s.getMeanElevation() - sweep_angle);
+        delta_angle = Math.abs(me - sweep_angle);
 
         if (delta_angle <= limit) {
             return ci;
@@ -2226,7 +2156,9 @@ public class CDMRadarAdapter implements RadarAdapter {
             beamWidth[i] = sp.getBeamWidth();
         }
 
-        float[][][] rdata =  getRayData(sweepVar, numberOfRay, numberOfBin);
+        if(rayData == null)
+            rayData = getRayData(sweepVar, numberOfRay, numberOfBin);
+        //float[][][] rdata =  getRayData(sweepVar, numberOfRay, numberOfBin);
 
 
         for (int r = 0; r < 360; r++) {
@@ -2265,7 +2197,7 @@ public class CDMRadarAdapter implements RadarAdapter {
 
 
                 if (j < num_radials) {
-                    gdata[ti] = rdata[ti][j]; //sp.readData(j);
+                    gdata[ti] = rayData[ti][j]; //sp.readData(j);
                 } else {
                     for (int i = 1; i < number_of_bins; i++) {
                         gdata[ti][i] = Float.NaN;  //360.0f;
