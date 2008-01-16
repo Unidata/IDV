@@ -509,6 +509,19 @@ public class UserManager extends RepositoryManager {
                 Entry fromEntry = getRepository().getEntry(request.getString(ARG_FROM,""),request);
                 sb.append("<br>Pick an entry  to associate with: " + fromEntry.getName());
             }
+
+
+            if(!haveFrom) {
+                sb.append(HtmlUtil.form(repository.URL_GETENTRIES,
+                                        "name=\"getentries\" method=\"post\""));
+                sb.append(HtmlUtil.submit("Get selected", "getselected"));
+                sb.append(HtmlUtil.submit("Get all", "getall"));
+                sb.append(" As: ");
+                List outputList =
+                    repository.getOutputTypesForEntries(request, entries);
+                sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
+            }
+            //            sb.append("<br>");
             sb.append("<ul>");
             OutputHandler outputHandler =  getRepository().getOutputHandler(request);
             for(Entry entry: entries) {
@@ -519,6 +532,10 @@ public class UserManager extends RepositoryManager {
                                                          getRepository().fileUrl("/Association.gif"),
                                                          "Create an association")));
                 } else {
+                    String links =
+                        HtmlUtil.checkbox("entry_" + entry.getId(), "true");
+                    sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
+                    sb.append(links);
                     sb.append(HtmlUtil.href(HtmlUtil.url(URL_USER_CART, ARG_FROM, entry.getId()),
                                             HtmlUtil.img(
                                                          getRepository().fileUrl("/Association.gif"),
@@ -527,8 +544,10 @@ public class UserManager extends RepositoryManager {
                 sb.append(HtmlUtil.space(1));
                 sb.append(outputHandler.getEntryUrl(entry));
             }
-           
             sb.append("</ul>");
+            if(!haveFrom) {
+                sb.append("</form>");
+            }
         }
         Result result = new Result("User Cart", sb);
         return result;

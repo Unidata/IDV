@@ -2294,13 +2294,13 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         }
         String name = request.getString(ARG_NAME,(String)null);
         if(name!=null) {
-            PreparedStatement assInsert =
+            PreparedStatement assocInsert =
                 getConnection().prepareStatement(INSERT_ASSOCIATIONS);
             int col = 1;
-            assInsert.setString(col++,name);
-            assInsert.setString(col++, fromEntry.getId());
-            assInsert.setString(col++, toEntry.getId());
-            assInsert.execute();
+            assocInsert.setString(col++,name);
+            assocInsert.setString(col++, fromEntry.getId());
+            assocInsert.setString(col++, toEntry.getId());
+            assocInsert.execute();
             return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
                                            fromEntry.getId()));
         }
@@ -4619,7 +4619,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         }
         long t1 = System.currentTimeMillis();
         try {
-            //            System.err.println("query:" + sql);
+            System.err.println("query:" + sql);
             statement.execute(sql);
         } catch (Exception exc) {
             System.err.println("ERROR:" + sql);

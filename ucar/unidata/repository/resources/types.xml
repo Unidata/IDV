@@ -1,18 +1,18 @@
 <types>
 
+  <type name="level3radar" description="Level 3 Radar File" handler="ucar.unidata.repository.Level3RadarTypeHandler">
+	<column name="station" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Station" 
+                properties="/ucar/unidata/repository/resources/level3radar.station.properties"/>
+	<column name="product" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Product"  
+                properties="/ucar/unidata/repository/resources/level3radar.product.properties"/>
+  </type>
+
+
   <type name="model"  description="Model">
      <column name="modelgroup" type="string" isindex="true" cansearch="true" searchtype="select" label="Model Group"/>
      <column name="modelrun" type="string" isindex="true" cansearch="true" searchtype="select"  label="Model Run"/>
   </type>
 
-
-  <type name="level3radar" description="Level 3 Radar File" handler="ucar.unidata.repository.Level3RadarTypeHandler">
-	<column name="station" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Station" 
-                properties="/ucar/unidata/repository/resources/level3radar.station.properties"/>
-	<column name="product" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Product"  
-                properties="/ucar/unidata/repository/resources/level3radar.product.properties"
-        />
-  </type>
 
 
   <type name="level2radar" description="Level 2 Radar File">
