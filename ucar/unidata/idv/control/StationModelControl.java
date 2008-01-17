@@ -289,6 +289,7 @@ public class StationModelControl extends ObsDisplayControl {
     /** bounds of the display */
     private Rectangle2D lastViewBounds = null;
 
+    /** _more_          */
     private boolean haveSetInitialScale = false;
 
     /** scale factor for the shapes */
@@ -1546,12 +1547,13 @@ public class StationModelControl extends ObsDisplayControl {
             }
             //            Trace.startTrace();
 
-            if(!haveSetInitialScale)
+            if ( !haveSetInitialScale) {
                 setScaleOnDisplayable();
+            }
             haveSetInitialScale = true;
 
-            lastViewScale  = getScaleFromDisplayable();
-            lastViewBounds = calculateRectangle();
+            lastViewScale       = getScaleFromDisplayable();
+            lastViewBounds      = calculateRectangle();
             LinearLatLonSet llBounds = calculateLatLonBounds(lastViewBounds);
 
             LogUtil.message("Observation display: loading data");
@@ -2008,33 +2010,35 @@ public class StationModelControl extends ObsDisplayControl {
                     filterIdx++) {
                 PropertyFilter filter =
                     (PropertyFilter) filters.get(filterIdx);
-                String paramName = filter.getName();
+                String paramName   = filter.getName();
 
-                Data dataElement = null;
+                Data   dataElement = null;
 
-                if(paramName.equals(PointOb.PARAM_LAT)) {
-                    dataElement =ob.getEarthLocation().getLatitude();
-                } else if(paramName.equals(PointOb.PARAM_LON)) {
-                    dataElement =ob.getEarthLocation().getLongitude();
-                } else if(paramName.equals(PointOb.PARAM_ALT)) {
-                    dataElement =ob.getEarthLocation().getAltitude();
+                if (paramName.equals(PointOb.PARAM_LAT)) {
+                    dataElement = ob.getEarthLocation().getLatitude();
+                } else if (paramName.equals(PointOb.PARAM_LON)) {
+                    dataElement = ob.getEarthLocation().getLongitude();
+                } else if (paramName.equals(PointOb.PARAM_ALT)) {
+                    dataElement = ob.getEarthLocation().getAltitude();
                 } else {
-                    int    dataIndex = -1;
+                    int dataIndex = -1;
                     for (int typeIdx = 0;
-                         (dataIndex == -1) && (typeIdx < typeNames.length);
-                         typeIdx++) {
+                            (dataIndex == -1) && (typeIdx < typeNames.length);
+                            typeIdx++) {
                         if (paramName.equals(typeNames[typeIdx])) {
                             dataIndex = typeIdx;
                         }
                     }
-                    
+
                     if (dataIndex < 0) {
                         continue;
                     }
                     dataElement = tuple.getComponent(dataIndex);
                 }
 
-                if(dataElement == null) continue;
+                if (dataElement == null) {
+                    continue;
+                }
                 if (dataElement.isMissing()) {
                     if (matchAll) {
                         ok = false;
@@ -2343,9 +2347,10 @@ public class StationModelControl extends ObsDisplayControl {
         ActionListener scaleListener = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 try {
-                    System.err.println ("display scale = "+getDisplayScale());
+                    System.err.println("display scale = "
+                                       + getDisplayScale());
                     setDisplayableScale(
-                                        (float) Misc.parseNumber(scaleField.getText()));
+                        (float) Misc.parseNumber(scaleField.getText()));
                 } catch (Exception nfe) {
                     userErrorMessage("Bad scale format");
                 }
@@ -2499,6 +2504,7 @@ public class StationModelControl extends ObsDisplayControl {
      */
     protected Container doMakeContents()
             throws VisADException, RemoteException {
+
         JComponent widgets = doMakeWidgetComponent();
         tableModel = new MyTableModel();
         int width = 300;
@@ -2600,12 +2606,14 @@ public class StationModelControl extends ObsDisplayControl {
             GuiUtils.topCenter(GuiUtils.inset(selectedObLbl, 3), plotPanel);
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.add("Layout", GuiUtils.top(widgets));
-        LayoutUtil.tmpInsets  = LayoutUtil.INSETS_5;
-        JComponent timeComp  = LayoutUtil.doLayout(timeWidgets,2,GuiUtils.WT_N, GuiUtils.WT_N);
+        LayoutUtil.tmpInsets = LayoutUtil.INSETS_5;
+        JComponent timeComp = LayoutUtil.doLayout(timeWidgets, 2,
+                                  GuiUtils.WT_N, GuiUtils.WT_N);
         tabbedPane.add("Times", GuiUtils.topLeft(timeComp));
         tabbedPane.add("Plot", plotComp);
         tabbedPane.add("Filters", doMakeFilterGui(false));
         return tabbedPane;
+
     }
 
     /**
@@ -3133,7 +3141,7 @@ public class StationModelControl extends ObsDisplayControl {
                     xyz);
             obBounds.x = xyz[0];
             obBounds.y = xyz[1];
-            if (stationGrid.markIfClear(obBounds, "")) {
+            if (stationGrid.markIfClear(obBounds, "") || isSelected(ob)) {
                 v.add(ob);  // is in the bounds
             }
         }
