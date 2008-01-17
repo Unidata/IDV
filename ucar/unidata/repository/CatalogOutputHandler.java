@@ -227,8 +227,8 @@ public class CatalogOutputHandler extends OutputHandler {
             if (tag.equals(TAG_METADATA)) {
                 if ( !XmlUtil.getAttribute(child, "metadataType",
                                            "THREDDS").equals("THREDDS")) {
-                    System.err.println("Skipping: "
-                                       + XmlUtil.toString(child));
+                    //                    System.err.println("Skipping: "
+                    //                                       + XmlUtil.toString(child));
                     continue;
                 }
                 if (XmlUtil.hasAttribute(child, "xlink:href")) {

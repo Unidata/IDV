@@ -456,7 +456,7 @@ public class Admin  extends RepositoryManager {
         sb.append(header("SQL"));
         sb.append(HtmlUtil.form(URL_ADMIN_SQL));
         sb.append(HtmlUtil.submit("Execute"));
-        sb.append(HtmlUtil.input(ARG_QUERY, query, " size=\"60\" "));
+        sb.append(HtmlUtil.textArea(ARG_QUERY, query==null?"":query, 10,75));
         sb.append("</form>\n");
         sb.append("<table>");
         if (query == null) {

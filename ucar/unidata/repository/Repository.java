@@ -4619,7 +4619,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         }
         long t1 = System.currentTimeMillis();
         try {
-            System.err.println("query:" + sql);
+            //            System.err.println("query:" + sql);
             statement.execute(sql);
         } catch (Exception exc) {
             System.err.println("ERROR:" + sql);

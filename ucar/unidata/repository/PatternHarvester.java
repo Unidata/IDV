@@ -170,6 +170,7 @@ public class PatternHarvester extends Harvester {
         descTemplate = XmlUtil.getAttribute(element, "desctemplate", "");
         sdf = new SimpleDateFormat(XmlUtil.getAttribute(element,
                 "dateformat", "yyyyMMdd_HHmm"));
+        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
         init();
     }
 

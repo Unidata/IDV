@@ -223,7 +223,6 @@ public class CatalogHarvester extends Harvester {
                 urlPath = path + urlPath;
             }
 
-            System.err.println("urlPath:" + urlPath + " " + catalogUrl);
             TypeHandler typeHandler =
                 repository.getTypeHandler(TypeHandler.TYPE_FILE);
             Entry entry      = typeHandler.createEntry(repository.getGUID());

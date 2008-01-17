@@ -27,6 +27,8 @@ CREATE INDEX ENTRIES_INDEX_RESOURCE ON entries (RESOURCE);
 CREATE INDEX ENTRIES_INDEX_PARENT_GROUP_ID ON entries (PARENT_GROUP_ID);
 CREATE INDEX ENTRIES_INDEX_TYPE ON entries (TYPE);
 CREATE INDEX ENTRIES_INDEX_USER_ID ON entries (USER_ID);
+CREATE INDEX ENTRIES_INDEX_FROMDATE ON entries (FROMDATE);
+CREATE INDEX ENTRIES_INDEX_TODATE ON entries (TODATE);
 
 
 CREATE TABLE  metadata (id varchar(200),
@@ -60,5 +62,9 @@ CREATE TABLE  users (id varchar(200),
                      answer  varchar(200),  
                      password  varchar(200),
 		     admin int);
+
+CREATE TABLE  user_roles (
+        user_id varchar(200),
+        role varchar(200));
 
 

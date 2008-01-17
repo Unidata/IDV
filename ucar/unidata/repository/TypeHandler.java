@@ -854,8 +854,6 @@ public class TypeHandler implements Constants, Tables {
         if (typeHandlers.size() > 1) {
             List tmp = new ArrayList();
             for (TypeHandler typeHandler : typeHandlers) {
-                System.err.println(typeHandler + " "
-                                   + typeHandler.getClass().getName());
                 tmp.add(new TwoFacedObject(typeHandler.getLabel(),
                                            typeHandler.getType()));
             }
