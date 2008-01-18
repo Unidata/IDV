@@ -76,6 +76,8 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     public RequestUrl URL_USER_LOGIN = new RequestUrl(this, "/user/login");
 
+    public RequestUrl URL_USER_LOGOUT = new RequestUrl(this, "/user/logout");
+
     /** _more_ */
     public RequestUrl URL_USER_SETTINGS = new RequestUrl(this, "/user/settings");
 
@@ -136,7 +138,7 @@ public class UserManager extends RepositoryManager {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA");
             md.update(password.getBytes("UTF-8"));
-            return XmlUtil.encodeBase64(md.digest());
+            return XmlUtil.encodeBase64(md.digest()).trim();
         } catch (NoSuchAlgorithmException nsae) {
             throw new IllegalStateException(nsae.getMessage());
         } catch (UnsupportedEncodingException uee) {
@@ -200,6 +202,10 @@ public class UserManager extends RepositoryManager {
         return findUser("default");
     }
 
+    protected User getAnonymousUser() throws Exception {
+        return new User();
+    }
+
 
     /**
      * _more_
@@ -227,7 +233,6 @@ public class UserManager extends RepositoryManager {
             //            throw new IllegalArgumentException ("Could not find  user id:" + id + " sql:" + query);
             return null;
         } else {
-            int col = 1;
             user = getUser(results);
         }
 
@@ -257,9 +262,11 @@ public class UserManager extends RepositoryManager {
             String query = SqlUtil.makeUpdate(TABLE_USERS, COL_USERS_ID,
                                SqlUtil.quote(user.getId()),
                                new String[] { COL_USERS_NAME,
+                                              COL_USERS_PASSWORD,
                     COL_USERS_EMAIL, COL_USERS_QUESTION, COL_USERS_ANSWER,
                     COL_USERS_ADMIN }, new String[] {
                         SqlUtil.quote(user.getName()),
+                        SqlUtil.quote(user.getPassword()),
                         SqlUtil.quote(user.getEmail()),
                         SqlUtil.quote(user.getQuestion()),
                         SqlUtil.quote(user.getAnswer()), (user.getAdmin()
@@ -324,31 +331,46 @@ public class UserManager extends RepositoryManager {
                     + userId);
         }
 
-
         if (request.defined(ARG_DELETE_CONFIRM)) {
             deleteUser(user);
             return new Result(getAdmin().URL_ADMIN_USER_LIST.toString());
         }
 
-        if (request.defined(ARG_CHANGE)) {
-            user.setName(request.getString(ARG_USER_NAME, user.getName()));
-            user.setEmail(request.getString(ARG_USER_EMAIL, user.getEmail()));
-            user.setQuestion(request.getString(ARG_USER_QUESTION,
-                    user.getQuestion()));
-            user.setAnswer(request.getString(ARG_USER_ANSWER,
-                                             user.getAnswer()));
-            if ( !request.defined(ARG_USER_ADMIN)) {
-                user.setAdmin(false);
-            } else {
-                user.setAdmin(request.get(ARG_USER_ADMIN, user.getAdmin()));
-            }
-            makeOrUpdateUser(user, true);
-        }
-
-
         StringBuffer sb = new StringBuffer();
         sb.append(getRepository().header("User: " + user.getName()));
         sb.append("\n<p/>\n");
+
+        if (request.defined(ARG_CHANGE)) {
+            boolean okToChangeUser = true;
+            String password1 = request.getString(ARG_USER_PASSWORD1,"").trim();
+            String password2 = request.getString(ARG_USER_PASSWORD2,"").trim();
+            if(password1.length()>0) {
+                if(!password1.equals(password2)) {
+                    okToChangeUser = false;
+                    sb.append("Incorrect passwords");
+                } else {
+                    user.setPassword(hashPassword(password1));
+                }
+            }
+
+            if(okToChangeUser) {
+                user.setName(request.getString(ARG_USER_NAME, user.getName()));
+                user.setEmail(request.getString(ARG_USER_EMAIL, user.getEmail()));
+                user.setQuestion(request.getString(ARG_USER_QUESTION,
+                                                   user.getQuestion()));
+                user.setAnswer(request.getString(ARG_USER_ANSWER,
+                                                 user.getAnswer()));
+                if ( !request.defined(ARG_USER_ADMIN)) {
+                    user.setAdmin(false);
+                } else {
+                    user.setAdmin(request.get(ARG_USER_ADMIN, user.getAdmin()));
+                }
+                makeOrUpdateUser(user, true);
+            }
+        }
+
+
+
         sb.append(HtmlUtil.form(getAdmin().URL_ADMIN_USER));
         sb.append("\n");
         sb.append(HtmlUtil.hidden(ARG_USER, user.getId()));
@@ -366,6 +388,16 @@ public class UserManager extends RepositoryManager {
             sb.append(HtmlUtil.formEntry("Admin:",
                                          HtmlUtil.checkbox(ARG_USER_ADMIN,
                                              "true", user.getAdmin())));
+
+            sb.append(HtmlUtil.formEntry("Email:",
+                                         HtmlUtil.input(ARG_USER_EMAIL,user.getEmail())));
+
+            sb.append(HtmlUtil.formEntry("Password:",
+                                         HtmlUtil.password(ARG_USER_PASSWORD1)));
+
+            sb.append(HtmlUtil.formEntry("Password Again:",
+                                         HtmlUtil.password(ARG_USER_PASSWORD2)));
+
             sb.append(
                 HtmlUtil.formEntry(
                     "",
@@ -430,6 +462,7 @@ public class UserManager extends RepositoryManager {
         return result;
     }
 
+
     /**
      * _more_
      *
@@ -451,11 +484,15 @@ public class UserManager extends RepositoryManager {
 
 
     private List<Entry> getCart(Request request) {
-        User user = request.getRequestContext().getUser();
-        List<Entry> cart = (List<Entry>) userCart.get(user);
+        String sessionId = request.getSessionId();
+        
+        if(sessionId ==null) {
+            return new ArrayList<Entry>();
+        }
+        List<Entry> cart = (List<Entry>) userCart.get(sessionId);
         if(cart==null) {
             cart = new ArrayList<Entry>();
-            userCart.put(user, cart);
+            userCart.put(sessionId, cart);
         }
         return cart;
     }
@@ -472,12 +509,7 @@ public class UserManager extends RepositoryManager {
 
     public Result processCart(Request request) throws Exception {
         String action = request.getString(ARG_ACTION,"");
-        User user = request.getRequestContext().getUser();
         StringBuffer sb = new StringBuffer();
-        if(user.getAnonymous()) {
-            sb.append("No cart available for anonymous user");
-            return new Result("User Cart", sb);
-        }
         if(action.equals(ACTION_CLEAR)) {
             getCart(request).clear();
         } else  if(action.equals(ACTION_ADD)) {
@@ -557,18 +589,20 @@ public class UserManager extends RepositoryManager {
     public String getUserLinks(Request request) {
         User   user = request.getRequestContext().getUser();
         String userLink;
+        String cartEntry = HtmlUtil.href(URL_USER_CART, HtmlUtil.img(
+                                                                     getRepository().fileUrl("/Cart.gif"),
+                                                                     "Data Cart"));
         if (user.getAnonymous()) {
             userLink =
                 "<a href=\"${root}/user/login\" class=\"navlink\">Login</a>";
         } else {
-            String cartEntry = HtmlUtil.href(URL_USER_CART, HtmlUtil.img(
-                                                                                    getRepository().fileUrl("/Cart.gif"),
-                                                                                    "Data Cart"));
-
-            userLink = cartEntry + HtmlUtil.space(1) +
-                HtmlUtil.href(URL_USER_SETTINGS, user.getLabel(), " class=\"navlink\" ");
+            userLink = 
+                HtmlUtil.href(URL_USER_LOGOUT, "logout", " class=\"navlink\" ")+
+                HtmlUtil.space(1) +"|" +HtmlUtil.space(1) +
+                HtmlUtil.href(URL_USER_SETTINGS, user.getLabel(), " class=\"navlink\" ")+
+                HtmlUtil.space(1);
         }
-        return userLink;
+        return cartEntry + HtmlUtil.space(2) + userLink;
     }
 
     /**
@@ -582,16 +616,47 @@ public class UserManager extends RepositoryManager {
      */
     public Result processLogin(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        if (request.defined(ARG_USER_NAME)) {
+        User user = null;
+        if (request.exists(ARG_USER_NAME)) {
             String name     = request.getString(ARG_USER_NAME, "");
             String password = request.getString(ARG_USER_PASSWORD1, "");
-            sb.append("Could not log you in");
+            password = hashPassword(password);
+            String query = SqlUtil.makeSelect(
+                                              COLUMNS_USERS,
+                                              Misc.newList(TABLE_USERS),
+                                              SqlUtil.makeAnd(Misc.newList(
+                                                                           SqlUtil.eq(COL_USERS_ID,
+                                                                                      SqlUtil.quote(name)),
+                                                                           SqlUtil.eq(COL_USERS_PASSWORD,
+                                                                                      SqlUtil.quote(password)))));
+                                              
+            ResultSet results = getRepository().execute(query).getResultSet();
+            if (results.next()) {
+                user = getUser(results);
+                getRepository().setUserSession(request, user);
+                sb.append("Logged in");
+            } else {
+                //                user = new User("jeff","jeff", true);
+                //                getRepository().setUserSession(request, user);
+                //                sb.append("Logged in");
+                sb.append("Incorrect user name or password");
+            }
         }
 
-        sb.append(makeLoginForm(request));
-
-
+        if(user==null) {
+            sb.append(makeLoginForm(request));
+        }
         Result result = new Result("Login", sb);
+        return result;
+    }
+
+
+    public Result processLogout(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        getRepository().removeUserSession(request);
+        sb.append("Logged out");
+        sb.append(makeLoginForm(request));
+        Result result = new Result("Logout", sb);
         return result;
     }
 

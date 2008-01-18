@@ -107,6 +107,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     /** _more_ */
     private List<String> downloadPrefixes = new ArrayList<String>();
 
+    private Hashtable session = new Hashtable();
 
     /** _more_ */
     public RequestUrl URL_GETMAP = new RequestUrl(this, "/getmap");
@@ -921,6 +922,21 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     }
 
 
+    protected void setUserSession(Request request, User user) throws Exception {
+        if(request.getSessionId() == null) {
+            request.setSessionId (getGUID() + "_"+Math.random());
+        }
+        session.put(request.getSessionId(), user);
+        request.getRequestContext().setUser(user);
+    }
+
+    protected void removeUserSession(Request request) throws Exception {
+        if(request.getSessionId() != null) {
+            session.remove(request.getSessionId());
+            request.getRequestContext().setUser(getUserManager().getAnonymousUser());
+        }
+    }
+
 
     /**
      * _more_
@@ -932,6 +948,41 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      * @throws Exception _more_
      */
     public Result handleRequest(Request request) throws Exception {
+
+        String sessionId = null;
+        String cookie = request.getHeaderArg("Cookie");
+        User user = request.getRequestContext().getUser();
+        if(cookie!=null) {
+            List toks = StringUtil.split(cookie,";",true,true);
+            for(int i=0;i<toks.size();i++) {
+                String tok = (String) toks.get(i);
+                List subtoks = StringUtil.split(tok,"=",true,true);                
+                if(subtoks.size()!=2) continue;
+                String cookieName = (String) subtoks.get(0);
+                String cookieValue = (String) subtoks.get(1);
+                if(cookieName.equals("repository-session")) {
+                    sessionId = cookieValue;
+                    if(user == null) {
+                        user = (User) session.get(sessionId);
+                        if(user != null) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if(sessionId == null) {
+            sessionId = getGUID() + "_"+Math.random();
+        }
+        request.setSessionId(sessionId);
+
+        if(user == null) {
+            user = getUserManager().getAnonymousUser();
+        }
+
+        request.getRequestContext().setUser(user);
+
+
         long   t1 = System.currentTimeMillis();
         Result result;
         if (debug) {
@@ -966,6 +1017,9 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                 System.err.println("Time:" + request.getRequestPath() + " "
                                    + (t2 - t1));
             }
+        }
+        if(result!=null && request.getSessionId()!=null) {
+            result.addCookie("repository-session", request.getSessionId());
         }
         return result;
 
@@ -1017,7 +1071,6 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             sb.append("You do not have the correct access<p>");
             sb.append(getUserManager().makeLoginForm(request));
             return new Result("Error", sb);
-
         }
 
 

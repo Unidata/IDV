@@ -80,7 +80,6 @@ import java.util.regex.*;
 public class Request implements Constants {
 
 
-
     /** _more_ */
     private String type;
 
@@ -96,14 +95,9 @@ public class Request implements Constants {
     /** _more_ */
     private Repository repository;
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public String toString() {
-        return type + " " + getUrlArgs();
-    }
+    private Hashtable httpHeaderArgs;
+
+    private String sessionId;
 
     /**
      * _more_
@@ -123,6 +117,9 @@ public class Request implements Constants {
         this.originalParameters = new Hashtable();
         originalParameters.putAll(parameters);
     }
+
+
+
 
     /**
      * _more_
@@ -639,6 +636,58 @@ public class Request implements Constants {
             super(msg);
         }
     }
+
+/**
+Set the HttpHeaderArgs property.
+
+@param value The new value for HttpHeaderArgs
+**/
+public void setHttpHeaderArgs (Hashtable value) {
+	httpHeaderArgs = value;
+}
+
+/**
+Get the HttpHeaderArgs property.
+
+@return The HttpHeaderArgs
+**/
+public Hashtable getHttpHeaderArgs () {
+	return httpHeaderArgs;
+}
+
+    public String getHeaderArg(String name) {
+        if(httpHeaderArgs == null) return null;
+        return (String) httpHeaderArgs.get(name);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String toString() {
+        return type + " " + getUrlArgs();
+    }
+
+/**
+Set the SessionId property.
+
+@param value The new value for SessionId
+**/
+public void setSessionId (String value) {
+	sessionId = value;
+}
+
+/**
+Get the SessionId property.
+
+@return The SessionId
+**/
+public String getSessionId () {
+	return sessionId;
+}
+
 
 
 }

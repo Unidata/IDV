@@ -36,6 +36,8 @@ import java.io.*;
 import java.net.*;
 
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
 
 import java.util.Hashtable;
 
@@ -108,6 +110,8 @@ public class MetaDataServer extends HttpServer implements Constants {
      */
     private class MyRequestHandler extends RequestHandler {
 
+        Result result = null;
+
         /** _more_ */
         boolean cache = false;
 
@@ -135,6 +139,17 @@ public class MetaDataServer extends HttpServer implements Constants {
                 writeLine("Cache-Control: no-cache" + CRLF);
             }
             writeLine("Last-Modified:" + new Date() + CRLF);
+            if(result!=null) {
+                List<String> args = result.getHttpHeaderArgs ();
+                if(args!=null) {
+                    for (int i=0;i<args.size();i+=2) {
+                        String name = args.get(i);
+                        String value = args.get(i+1);
+                        writeLine(name+":"+ value + CRLF);                        
+                    }
+                }
+            }
+
         }
 
         /**
@@ -173,20 +188,12 @@ public class MetaDataServer extends HttpServer implements Constants {
                                      Hashtable httpArgs, String content)
                 throws Exception {
             path = path.trim();
-            Result result = null;
             try {
-                User user = repository.getUserManager().findUser("jdoe");
-                //User           user    = new User();
-                RequestContext context = new RequestContext(user);
+                RequestContext context = new RequestContext(null);
                 Request request = new Request(repository, path, context,
                                       formArgs);
-                if (user == null) {
-                    result = new Result("Error",
-                                        new StringBuffer("Unknown request:"
-                                            + path));
-                } else {
-                    result = repository.handleRequest(request);
-                }
+                request.setHttpHeaderArgs(httpArgs);
+                result = repository.handleRequest(request);
             } catch (Throwable exc) {
                 exc = LogUtil.getInnerException(exc);
                 repository.log("Error:" + exc, exc);

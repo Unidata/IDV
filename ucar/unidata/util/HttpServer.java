@@ -501,6 +501,7 @@ public class HttpServer {
             writeLine("HTTP/1.0 300 OK" + CRLF);
             writeLine("Location: " + url + CRLF);
             writeLine("Cache-Control: no-cache" + CRLF);
+            writeHeaderArgs();
             writeLine("\n");
             output.close();
         }
@@ -530,7 +531,7 @@ public class HttpServer {
         protected void writeHeaderArgs() throws Exception {
             //            writeLine("Date: Fri, 12 Jan 2007 00:02:44 GMT"+CRLF);
             //            writeLine("Cache-Control: no-cache"+CRLF);
-            writeLine("Last-Modified: Fri, 12 Jan 2007 00:02:44 GMT"+CRLF);
+            //            writeLine("Last-Modified: Fri, 12 Jan 2007 00:02:44 GMT"+CRLF);
             //            writeLine("Last-Modified:" + new Date()+CRLF);
         }
 

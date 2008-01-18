@@ -27,6 +27,8 @@ import java.io.InputStream;
 
 
 import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -72,6 +74,9 @@ public class Result {
 
     /** _more_ */
     private boolean requestOk = true;
+
+    private List<String> httpHeaderArgs;
+
 
     /**
      * _more_
@@ -364,6 +369,38 @@ public class Result {
      */
     public boolean getRequestOk() {
         return requestOk;
+    }
+
+    public void addHttpHeader(String name, String value) {
+        if(httpHeaderArgs==null) {
+            httpHeaderArgs = new ArrayList<String>();
+        }
+        httpHeaderArgs.add(name);
+        httpHeaderArgs.add(value);
+    }
+
+
+/**
+Set the HttpHeaderArgs property.
+
+@param value The new value for HttpHeaderArgs
+**/
+public void setHttpHeaderArgs (List<String> value) {
+	httpHeaderArgs = value;
+}
+
+/**
+Get the HttpHeaderArgs property.
+
+@return The HttpHeaderArgs
+**/
+public List<String> getHttpHeaderArgs () {
+	return httpHeaderArgs;
+}
+
+
+    public void addCookie(String name, String value) {
+        addHttpHeader("Set-Cookie",name+"="+value);
     }
 
 
