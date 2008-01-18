@@ -29,6 +29,7 @@ import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
 
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.WrapperException;
 
 import java.io.*;
 
@@ -50,7 +51,9 @@ public class MetaDataServer extends HttpServer implements Constants {
     /** _more_ */
     Repository repository;
 
+    String[] args;
 
+    int port = 8080;
     /**
      * _more_
      *
@@ -59,11 +62,26 @@ public class MetaDataServer extends HttpServer implements Constants {
      */
     public MetaDataServer(String[] args) throws Throwable {
         super(8080);
-        repository = new Repository(args, "http://localhost:8080");
-        repository.init();
+        this.args = args;
+        for(int i=0;i<args.length;i++) {
+            if(args[i].equals("-port")) {
+                port = new Integer(args[i+1]).intValue();
+                setPort(port);
+                break;
+            }
+        }
     }
 
 
+    public void init()  {
+        try {
+            repository = new Repository(args, "http://localhost:" + port);
+            repository.init();
+        } catch(Exception exc) {
+            throw new WrapperException(exc);
+        }
+        super.init();
+    }
 
 
     /**
@@ -207,8 +225,12 @@ public class MetaDataServer extends HttpServer implements Constants {
      * @throws Throwable _more_
      */
     public static void main(String[] args) throws Throwable {
-        MetaDataServer mds = new MetaDataServer(args);
-        mds.init();
+        try {
+            MetaDataServer mds = new MetaDataServer(args);
+            mds.init();
+        } catch(Exception exc) {
+            throw LogUtil.getInnerException(exc);
+        }
     }
 
 

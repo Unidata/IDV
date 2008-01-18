@@ -269,9 +269,9 @@ public class TypeHandler implements Constants, Tables {
             repository.findGroup(results.getString(col++)),
             repository.getUserManager().findUser(results.getString(col++)),
             new Resource(results.getString(col++), results.getString(col++)),
-            results.getTimestamp(col++).getTime(),
-            results.getTimestamp(col++).getTime(),
-            results.getTimestamp(col++).getTime(), null);
+            results.getTimestamp(col++ , Repository.calendar ).getTime(),
+            results.getTimestamp(col++, Repository.calendar).getTime(),
+            results.getTimestamp(col++, Repository.calendar).getTime(), null);
         entry.setSouth(results.getDouble(col++));
         entry.setNorth(results.getDouble(col++));
         entry.setEast(results.getDouble(col++));
@@ -537,7 +537,7 @@ public class TypeHandler implements Constants, Tables {
             }
             sb.append(HtmlUtil.formEntry("Created by:",
                                          entry.getUser().getName() + " @ "
-                                         + fmt(entry.getCreateDate())));
+                                         + Repository.fmt(entry.getCreateDate())));
 
             String resourceLink =        entry.getResource().getPath();
             if(entry.getResource().isUrl()) {
@@ -556,11 +556,11 @@ public class TypeHandler implements Constants, Tables {
                     || (entry.getCreateDate() != entry.getEndDate())) {
                 if (entry.getEndDate() != entry.getStartDate()) {
                     sb.append(HtmlUtil.formEntry("Date Range:",
-                            fmt(entry.getStartDate()) + " -- "
-                            + fmt(entry.getEndDate())));
+                            Repository.fmt(entry.getStartDate()) + " -- "
+                            + Repository.fmt(entry.getEndDate())));
                 } else {
                     sb.append(HtmlUtil.formEntry("Date:",
-                            fmt(entry.getStartDate())));
+                            Repository.fmt(entry.getStartDate())));
                 }
             }
             String typeDesc = entry.getTypeHandler().getDescription();
@@ -614,16 +614,7 @@ public class TypeHandler implements Constants, Tables {
      */
     public void initializeNewEntry(Entry entry) throws Exception {}
 
-    /**
-     * _more_
-     *
-     * @param dttm _more_
-     *
-     * @return _more_
-     */
-    private String fmt(long dttm) {
-        return "" + new Date(dttm);
-    }
+
 
 
     /**

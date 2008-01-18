@@ -333,6 +333,8 @@ public interface Constants {
     /** _more_          */
     public static final String PROP_DEBUG = "jdms.debug";
 
+    public static final String PROP_DATEFORMAT = "jdms.dateformat";
+
 
     /** _more_          */
     public static final String PROP_USER_REQUIRELOGIN =

@@ -181,6 +181,7 @@ public class DateUtil {
         Date dttm = null;
         if(s.equals("now")) {
             dttm = cal.getTime();
+            return dttm;
         } else if(s.equals("today")) {
             dttm = cal.getTime();
         } else if(s.equals("yesterday")) {

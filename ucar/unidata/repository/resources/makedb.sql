@@ -2,6 +2,9 @@
 --- Initial data base creation
 
 
+CREATE TABLE  dummy (name varchar(500));
+
+
 CREATE TABLE  globals (name varchar(500),
                        value varchar(1000));
 

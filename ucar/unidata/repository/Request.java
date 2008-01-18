@@ -516,10 +516,13 @@ public class Request implements Constants {
     public Date[] getDateRange(String from, String to, Date dflt)
             throws java.text.ParseException {
         String fromDate = (String) getDateSelect(from, "").trim();
-        String toDate   = (String) getDateSelect(ARG_TODATE, "").trim();
+        String toDate   = (String) getDateSelect(to, "").trim();
 
         Date   fromDttm = DateUtil.parseRelative(dflt, fromDate, -1);
         Date   toDttm   = DateUtil.parseRelative(dflt, toDate, +1);
+        //        System.err.println ("dflt: " + dflt);
+        //        System.err.println ("toDttm:" + toDate + " " + toDttm);
+
         if ((fromDate.length() > 0) && (fromDttm == null)) {
             if ( !fromDate.startsWith("-")) {
                 fromDttm = DateUtil.parse(fromDate);
@@ -546,6 +549,9 @@ public class Request implements Constants {
             }
             toDttm = DateUtil.getRelativeDate(fromDttm, toDate);
         }
+
+        //        System.err.println("from:" + Repository.fmt(fromDttm) + " -- " + Repository.fmt(toDttm));
+
 
         return new Date[] { fromDttm, toDttm };
     }

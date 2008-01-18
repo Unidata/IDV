@@ -141,6 +141,11 @@ public class PatternHarvester extends Harvester {
     private String baseGroupName;
 
 
+    private List<FileInfo> dirs;
+
+
+    private Hashtable dirMap = new Hashtable(); 
+
 
     /**
      * _more_
@@ -212,6 +217,23 @@ public class PatternHarvester extends Harvester {
         return "Directory:" + rootDir + "";
     }
 
+    private void removeDir(FileInfo dir) {
+        dirs.remove(dir);
+        dirMap.remove(dir.getFile());
+    }
+
+    private FileInfo addDir(File dir) {
+        FileInfo fileInfo = new  FileInfo(dir, true);
+        dirs.add(fileInfo);
+        dirMap.put(dir,dir);
+        return fileInfo;
+    }
+
+    private boolean hasDir(File dir) {
+        return dirMap.get(dir)!=null;
+    }
+
+
     /**
      * _more_
      *
@@ -222,15 +244,19 @@ public class PatternHarvester extends Harvester {
             return;
         }
         long           tt1  = System.currentTimeMillis();
-        List<FileInfo> dirs = FileInfo.collectDirs(rootDir);
+        dirs = FileInfo.collectDirs(rootDir);
         long           tt2  = System.currentTimeMillis();
-        System.err.println("took:" + (tt2 - tt1) + " to find dirs:"
+        System.err.println("took:" + (tt2 - tt1) + " to find initial dirs:"
                            + dirs.size());
+
+        for(FileInfo dir: dirs) {
+            dirMap.put(dir.getFile(),dir);
+        }
 
         int cnt = 0;
         while (getActive()) {
             long t1 = System.currentTimeMillis();
-            collectEntries(rootDir, dirs, (cnt == 0), baseGroupName,
+            collectEntries(rootDir,  (cnt == 0), baseGroupName,
                            typeHandler);
             long t2 = System.currentTimeMillis();
             cnt++;
@@ -274,7 +300,7 @@ public class PatternHarvester extends Harvester {
      *
      * @throws Exception _more_
      */
-    public void collectEntries(File rootDir, List<FileInfo> dirs,
+    public void collectEntries(File rootDir, 
                                boolean firstTime, String rootGroup,
                                TypeHandler typeHandler)
             throws Exception {
@@ -285,8 +311,13 @@ public class PatternHarvester extends Harvester {
             repository.getUserManager().getDefaultUser();
         final String rootStr    = rootDir.toString();
         final int    rootStrLen = rootStr.length();
-        //        System.err.println("PATTERN:" + filePatternString);
-        for (FileInfo fileInfo : dirs) {
+        List<FileInfo> tmpDirs = new ArrayList<FileInfo>(dirs);
+        for (int dirIdx=0;dirIdx<tmpDirs.size();dirIdx++) {
+            FileInfo fileInfo = tmpDirs.get(dirIdx);
+            if(!fileInfo.exists()) {
+                removeDir(fileInfo);
+                continue;
+            }
             if ( !firstTime && !fileInfo.hasChanged()) {
                 continue;
             }
@@ -295,7 +326,18 @@ public class PatternHarvester extends Harvester {
             for (int fileIdx = 0; fileIdx < files.length; fileIdx++) {
                 File f = files[fileIdx];
                 if (f.isDirectory()) {
+                    //If this is a directory then check if we already have it 
+                    //in the list. If not then add it to the main list and the local list
+                    if(!hasDir(f)) {
+                        FileInfo newFileInfo = addDir(f);
+                        tmpDirs.add(newFileInfo);
+                    }
                     continue;
+                }
+                //check if its a hidden file
+                if(f.getName().startsWith(".")) {
+                    continue;
+                    
                 }
                 String fileName = f.toString();
                 fileName = fileName.replace("\\", "/");
@@ -308,10 +350,6 @@ public class PatternHarvester extends Harvester {
 
                 Matcher matcher = filePattern.matcher(fileName);
                 if ( !matcher.find()) {
-                    if (dcnt++ < 50) {
-                        //                        System.err.println(":" + filePatternString + ":");
-                        //                        System.err.println(fileName);
-                    }
                     continue;
                 }
                 if (entries.size() % 1000 == 0) {
@@ -394,15 +432,16 @@ public class PatternHarvester extends Harvester {
                 groupName = groupName.replace("${dirgroup}", dirGroup);
 
                 groupName = groupName.replace("${fromDate}",
-                        fromDate.toString());
-                groupName = groupName.replace("${toDate}", toDate.toString());
+                                              Repository.fmt(fromDate));
+                groupName = groupName.replace("${toDate}", Repository.fmt(toDate));
 
                 name      = name.replace("${filename}", f.getName());
-                name      = name.replace("${fromDate}", fromDate.toString());
-                name      = name.replace("${toDate}", toDate.toString());
+                name      = name.replace("${fromDate}",Repository.fmt(fromDate));
 
-                desc      = desc.replace("${fromDate}", fromDate.toString());
-                desc      = desc.replace("${toDate}", toDate.toString());
+                name      = name.replace("${toDate}",  Repository.fmt(toDate));
+
+                desc      = desc.replace("${fromDate}", Repository.fmt( fromDate));
+                desc      = desc.replace("${toDate}",  Repository.fmt(toDate));
                 desc      = desc.replace("${name}", name);
 
 

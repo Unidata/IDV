@@ -81,6 +81,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
@@ -168,6 +170,8 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     private static final int ENTRY_CACHE_LIMIT = 100000;
 
 
+    public static final  GregorianCalendar calendar = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+
 
     /** _more_ */
     private List<EntryListener> entryListeners =
@@ -178,7 +182,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     private Properties mimeTypes;
 
     /** _more_ */
-    private Properties productMap;
+    private Properties namesMap;
 
     /** _more_ */
     private String repositoryDir;
@@ -188,6 +192,10 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
 
     /** _more_ */
     private Properties properties = new Properties();
+
+
+    Properties argProperties = new Properties();
+
 
     /** _more_          */
     private Properties localProperties = new Properties();
@@ -330,6 +338,27 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         this.hostname   = hostname;
     }
 
+    public static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
+    private static  SimpleDateFormat sdf;
+
+
+
+    public static String fmt(long dttm) {
+        return fmt(new Date(dttm));
+    }
+
+    public static String fmt(Date dttm) {
+        if(sdf == null) {
+            sdf = new SimpleDateFormat();
+            sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+            sdf.applyPattern(DEFAULT_TIME_FORMAT);
+        }
+
+        if(dttm == null) return "";
+        return sdf.format(dttm);
+    }
+
+
     /**
      * _more_
      *
@@ -428,7 +457,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      * @throws Exception _more_
      */
     protected void initProperties() throws Exception {
-        Properties argProperties = new Properties();
+
         properties = new Properties();
         properties.load(
             IOUtil.getInputStream(
@@ -453,6 +482,9 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             } else if (args[i].equals("-admin")) {
                 cmdLineUsers.add(new User(args[i + 1], args[i + 1], true));
                 i++;
+            } else if (args[i].equals("-port")) {
+                //skip
+                i++;
             } else if (args[i].startsWith("-D")) {
                 String       s    = args[i].substring(2);
                 List<String> toks = StringUtil.split(s, "=", true, true);
@@ -466,6 +498,17 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                         + args[i]);
             }
         }
+
+        localProperties = new Properties();
+        try {
+            localProperties.load(
+                IOUtil.getInputStream(
+                    IOUtil.joinDir(repositoryDir, "repository.properties"),
+                    getClass()));
+        } catch (Exception exc) {}
+
+        properties.putAll(localProperties);
+        properties.putAll(argProperties); 
 
         apiDefFiles = StringUtil.split(getProperty(PROP_API), ";", true,
                                        true);
@@ -481,7 +524,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         metadataDefFiles.addAll(argMetadataDefFiles);
 
         debug = getProperty(PROP_DEBUG, false);
-        System.err.println("debug:" + debug);
+        //        System.err.println ("debug:" + debug);
 
         urlBase = (String) properties.get(PROP_HTML_URLBASE);
         if (urlBase == null) {
@@ -515,18 +558,29 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                     getClass()));
         }
 
+        sdf = new SimpleDateFormat();
+        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        sdf.applyPattern(getProperty(PROP_DATEFORMAT, DEFAULT_TIME_FORMAT));
+        TimeZone.setDefault(DateUtil.TIMEZONE_GMT);
 
-        localProperties = new Properties();
-        try {
-            localProperties.load(
-                IOUtil.getInputStream(
-                    IOUtil.joinDir(repositoryDir, "repository.properties"),
-                    getClass()));
-        } catch (Exception exc) {}
 
-        properties.putAll(localProperties);
-        properties.putAll(argProperties);
     }
+
+
+    protected void readGlobals()  throws Exception {
+        Statement statement = execute(SqlUtil.makeSelect("*",
+                                                         Misc.newList(TABLE_GLOBALS)));
+
+        ResultSet results = statement.getResultSet();
+        while (results.next()) {
+            properties.put(results.getString(1),results.getString(2));
+        }
+
+        //We always want to put any command line arguments back into the properties table because they have precedence
+        properties.putAll(argProperties); 
+
+    }
+
 
 
 
@@ -635,6 +689,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                                             + " property defined");
         }
 
+
         String userName =
             (String) properties.get(PROP_DB_USER.replace("${db}", db));
         String password =
@@ -645,12 +700,23 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             (String) properties.get(PROP_DB_DRIVER.replace("${db}", db)));
 
 
-        System.err.println("db:" + connectionURL);
+        log("making connection:" + connectionURL);
+        Connection connection;
         if (userName != null) {
-            return  DriverManager.getConnection(connectionURL, userName,
+            connection =   DriverManager.getConnection(connectionURL, userName,
                                                 password);
         } else {
-            return DriverManager.getConnection(connectionURL);
+            connection =  DriverManager.getConnection(connectionURL);
+        }
+        initConnection(connection,db);
+        return connection;
+    }
+
+
+    protected void initConnection(Connection connection, String db) throws Exception {
+        if(db.equals("mysql")) {
+            Statement statement = connection.createStatement();
+            statement.execute("set time_zone = '+0:00'");
         }
     }
 
@@ -856,8 +922,6 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
 
 
 
-
-
     /**
      * _more_
      *
@@ -1008,12 +1072,17 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         String type = getMimeTypeFromSuffix(IOUtil.getFileExtension(path));
         path = StringUtil.replace(path, getUrlBase(), "");
         if ((path.trim().length() == 0) || path.equals("/")) {
-            log(request, "Unknown request:" + path);
+            log(request, "Unknown request: \"" + path +"\"");
             return new Result("Error",
-                              new StringBuffer("Unknown request:" + path));
+                              new StringBuffer("Unknown request:\"" + path+"\""));
         }
 
         try {
+            //Make sure no one is trying to access other files
+            if(path.indexOf("..")>=0) {
+                return new Result("Error",
+                                  new StringBuffer("Unknown request:\"" + path+"\""));
+            }
             InputStream is =
                 IOUtil.getInputStream("/ucar/unidata/repository/htdocs"
                                       + path, getClass());
@@ -1127,9 +1196,18 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      *
      * @return _more_
      */
-    public Connection getConnection() {
+    public Connection getConnection() throws Exception {
+        if(theConnection!=null) {
+            try {
+                Statement statement = theConnection.createStatement();
+                statement.execute("select * from dummy");
+            } catch(Exception exc) {
+                theConnection = makeConnection();
+            }
+        }
         return theConnection;
     }
+
 
     public void closeConnection() throws Exception {
         if(theConnection!=null) theConnection.close();
@@ -3443,12 +3521,16 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      */
     protected List<TypeHandler> getTypeHandlers(Request request)
             throws Exception {
+        List<TypeHandler> typeHandlers = new ArrayList<TypeHandler>();
         TypeHandler typeHandler = getTypeHandler(request);
+        if(!typeHandler.isAnyHandler()) {
+            typeHandlers.add(typeHandler);
+            return typeHandlers;
+        }
         List        where       = typeHandler.assembleWhereClause(request);
         Statement stmt = typeHandler.executeSelect(request,
                              SqlUtil.distinct(COL_ENTRIES_TYPE), where);
         String[]          types        = SqlUtil.readString(stmt, 1);
-        List<TypeHandler> typeHandlers = new ArrayList<TypeHandler>();
         for (int i = 0; i < types.length; i++) {
             TypeHandler theTypeHandler = getTypeHandler(types[i]);
 
@@ -3898,7 +3980,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             } else if (values[i] instanceof Date) {
                 pstmt.setTimestamp(
                     i + 1,
-                    new java.sql.Timestamp(((Date) values[i]).getTime()));
+                    new java.sql.Timestamp(((Date) values[i]).getTime()), calendar);
             } else {
                 pstmt.setObject(i + 1, values[i]);
             }
@@ -4047,19 +4129,19 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      * @return _more_
      */
     protected String getLongName(String product, String dflt) {
-        if (productMap == null) {
-            productMap = new Properties();
+        if (namesMap == null) {
+            namesMap = new Properties();
             try {
                 InputStream s =
                     IOUtil.getInputStream(
                         "/ucar/unidata/repository/resources/names.properties",
                         getClass());
-                productMap.load(s);
+                namesMap.load(s);
             } catch (Exception exc) {
                 System.err.println("err:" + exc);
             }
         }
-        String name = (String) productMap.get(product);
+        String name = (String) namesMap.get(product);
         if (name != null) {
             return name;
         }
@@ -4330,12 +4412,12 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         }
         statement.setString(col++, entry.getResource().getPath());
         statement.setString(col++, entry.getResource().getType());
-        statement.setTimestamp(col++, new java.sql.Timestamp(currentTime()));
+        statement.setTimestamp(col++, new java.sql.Timestamp(currentTime()), calendar);
         //        System.err.println (entry.getName() + " " + new Date(entry.getStartDate()));
         statement.setTimestamp(col++,
-                               new java.sql.Timestamp(entry.getStartDate()));
+                               new java.sql.Timestamp(entry.getStartDate()),calendar);
         statement.setTimestamp(col++,
-                               new java.sql.Timestamp(entry.getEndDate()));
+                               new java.sql.Timestamp(entry.getEndDate()),calendar);
         statement.setDouble(col++, entry.getSouth());
         statement.setDouble(col++, entry.getNorth());
         statement.setDouble(col++, entry.getEast());
@@ -4626,7 +4708,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             throw exc;
         }
         long t2 = System.currentTimeMillis();
-        if (t2 - t1 > 300) {
+        if (debug || t2 - t1 > 300) {
             System.err.println("query:" + sql);
             System.err.println("query time:" + (t2 - t1));
         }

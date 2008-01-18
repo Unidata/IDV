@@ -83,6 +83,11 @@ public class FileInfo {
         hasInitialized = true;
     }
 
+    public int hashCode() {
+        return file.hashCode();
+
+    }
+
     /**
      * _more_
      *
@@ -95,8 +100,10 @@ public class FileInfo {
             return false;
         }
         FileInfo that = (FileInfo) obj;
-        return Misc.equals(this.file.toString(), that.file.toString());
+        return this.file.equals(that.file);
     }
+
+
 
 
     /**

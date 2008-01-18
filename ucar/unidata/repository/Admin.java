@@ -500,7 +500,13 @@ public class Admin  extends RepositoryManager {
                 }
                 sb.append("<tr>");
                 while (colcnt < rsmd.getColumnCount()) {
-                    sb.append(HtmlUtil.col(results.getString(++colcnt)));
+                    colcnt++;
+                    if(rsmd.getColumnType(colcnt) == java.sql.Types.TIMESTAMP) {
+                        Date dttm = results.getTimestamp(colcnt , Repository.calendar );
+                        sb.append(HtmlUtil.col(Repository.fmt(dttm)));
+                    } else {
+                        sb.append(HtmlUtil.col(results.getString(colcnt)));
+                    }
                 }
                 sb.append("</tr>\n");
                 //                if (cnt++ > 1000) {

@@ -83,6 +83,10 @@ public class HttpServer {
     }
 
 
+    public void setPort(int port) {
+        this.port = port;
+    }
+
     public Hashtable getProperties() {
         return serverProperties;
     }

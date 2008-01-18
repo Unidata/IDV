@@ -362,7 +362,7 @@ public class Column implements Tables, Constants {
             if(values[offset]!=null) {
                 Date dttm = (Date) values[offset];
                 stmt.setTimestamp(stmtIdx,
-                                  new java.sql.Timestamp(dttm.getTime()));
+                                  new java.sql.Timestamp(dttm.getTime()), Repository.calendar);
             } else {            
                 stmt.setTimestamp(stmtIdx,null);
             }

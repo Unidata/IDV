@@ -36,6 +36,7 @@ import java.io.File;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Hashtable;
@@ -64,9 +65,11 @@ import java.util.regex.*;
 public class SqlUtil {
 
 
+    public static final  GregorianCalendar calendar = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+
     /** _more_          */
     private static final SimpleDateFormat sdf =
-        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
 
 
@@ -110,6 +113,7 @@ public class SqlUtil {
      * @return _more_
      */
     public static String format(Date d) {
+        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
         return sdf.format(d);
     }
 
@@ -517,7 +521,7 @@ public class SqlUtil {
         Iterator  iter    = getIterator(stmt);
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                Date   dttm  = results.getDate(column);
+                Date   dttm  = results.getDate(column,calendar);
                 double value = dttm.getTime();
                 current[cnt++] = value;
                 if (cnt >= current.length) {
@@ -738,7 +742,7 @@ public class SqlUtil {
         Iterator  iter = getIterator(stmt);
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                Date value = results.getDate(column);
+                Date value = results.getDate(column,calendar);
                 current[cnt++] = value;
                 if (cnt >= current.length) {
                     Date[] tmp = current;
