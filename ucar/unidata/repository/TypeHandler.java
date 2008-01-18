@@ -267,7 +267,7 @@ public class TypeHandler implements Constants, Tables {
         entry.init(
             results.getString(col++), results.getString(col++),
             repository.findGroup(results.getString(col++)),
-            repository.getUserManager().findUser(results.getString(col++)),
+            repository.getUserManager().findUser(results.getString(col++),true),
             new Resource(results.getString(col++), results.getString(col++)),
             results.getTimestamp(col++ , Repository.calendar ).getTime(),
             results.getTimestamp(col++, Repository.calendar).getTime(),

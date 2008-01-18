@@ -93,19 +93,13 @@ public class Admin  extends RepositoryManager {
     public RequestUrl URL_ADMIN_STATS = new RequestUrl(this, "/admin/stats", "Statistics");
 
     /** _more_ */
-    public RequestUrl URL_ADMIN_USER_LIST = new RequestUrl(this, "/admin/user/list", "Users");
-
-    /** _more_          */
-    public RequestUrl URL_ADMIN_USER = new RequestUrl(this, "/admin/user", "Users");
-
-    /** _more_ */
     public RequestUrl URL_ADMIN_HARVESTERS = new RequestUrl(this, "/admin/harvesters",
                                             "Harvesters");
 
     /** _more_ */
     protected RequestUrl[] adminUrls = {
         URL_ADMIN_HOME, URL_ADMIN_STARTSTOP, URL_ADMIN_TABLES,
-        URL_ADMIN_STATS, URL_ADMIN_USER_LIST, URL_ADMIN_HARVESTERS,
+        URL_ADMIN_STATS, getUserManager().URL_USER_LIST, URL_ADMIN_HARVESTERS,
         URL_ADMIN_SQL, URL_ADMIN_CLEANUP
     };
 

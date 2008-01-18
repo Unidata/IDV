@@ -481,8 +481,10 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             } else if (args[i].indexOf("metadatahandlers.xml") >= 0) {
                 argMetadataDefFiles.add(args[i]);
             } else if (args[i].equals("-admin")) {
-                cmdLineUsers.add(new User(args[i + 1], args[i + 1], true));
-                i++;
+                User user = new User(args[i + 1],  true);
+                user.setPassword(UserManager.hashPassword(args[i+2]));
+                cmdLineUsers.add(user);
+                i+=2;
             } else if (args[i].equals("-port")) {
                 //skip
                 i++;
@@ -1302,8 +1304,6 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
 
         getUserManager().makeUserIfNeeded(new User("default", "Default User",
                 false));
-        getUserManager().makeUserIfNeeded(new User("jdoe", "John Doe", true));
-        getUserManager().makeUserIfNeeded(new User("jeff", "Jeff", false));
         getUserManager().makeUserIfNeeded(new User("anonymous", "Anonymous",
                 false));
     }

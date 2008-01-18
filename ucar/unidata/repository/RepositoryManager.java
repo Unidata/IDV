@@ -129,6 +129,9 @@ public class RepositoryManager implements RepositorySource, Constants, Tables, R
         return repository.getAdmin();
     }
 
+    protected UserManager getUserManager() {
+        return repository.getUserManager();
+    }
 
     protected List getSubNavLinks(Request request, RequestUrl[] urls) {
         return repository.getSubNavLinks( request, urls);

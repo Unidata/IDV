@@ -202,8 +202,12 @@ public interface Constants {
     /** _more_          */
     public static final String ARG_ADMIN = "admin";
 
+
+
     /** _more_          */
     public static final String ARG_DELETE = "delete";
+
+    public static final String ARG_NEW = "new";
 
     /** _more_          */
     public static final String ARG_DELETE_CONFIRM = "delete.confirm";

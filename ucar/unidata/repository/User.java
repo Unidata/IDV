@@ -26,6 +26,7 @@ package ucar.unidata.repository;
 
 
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
@@ -66,6 +67,8 @@ public class User {
     /** _more_          */
     private boolean anonymous = false;
 
+    private List<String> roles;
+
     /**
      * _more_
      */
@@ -82,10 +85,15 @@ public class User {
      * @param name _more_
      * @param admin _more_
      */
-    public User(String id, String name, boolean admin) {
+    public User(String id, boolean admin) {
         this.id    = id;
-        this.name  = name;
         this.admin = admin;
+    }
+
+
+    public User(String id, String name, boolean admin) {
+        this(id, admin);
+        this.name = name;
     }
 
 
@@ -326,6 +334,29 @@ public class User {
         return password;
     }
 
+    /**
+       Set the Roles property.
+
+       @param value The new value for Roles
+    **/
+    public void setRoles (List<String> value) {
+	roles = value;
+    }
+
+    /**
+       Get the Roles property.
+
+       @return The Roles
+    **/
+    public List<String> getRoles () {
+	return roles;
+    }
+
+
+    public String getRolesAsString(String delimiter) {
+        if(roles == null) return "";
+        return StringUtil.join(delimiter, roles);
+    }
 
 
 }

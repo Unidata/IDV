@@ -66,7 +66,7 @@ CREATE TABLE  users (id varchar(200),
                      password  varchar(200),
 		     admin int);
 
-CREATE TABLE  user_roles (
+CREATE TABLE  userroles (
         user_id varchar(200),
         role varchar(200));
 

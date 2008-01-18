@@ -17,18 +17,23 @@
   <method request="/association/add"    method="processAssociationAdd"     admin="false" cancache="true"/>
   <method request="/getentries"  method="processGetEntries"   admin="false" cancache="true"/>
   <method request="/getmap"    method="processMap"       admin="false" cancache="false"/>
-  <method handler="usermanager" request="/user/login"        method="processLogin"  admin="false"  cancache="false"/>
-  <method handler="usermanager" request="/user/logout"        method="processLogout"  admin="false"  cancache="false"/>
-  <method handler="usermanager" request="/user/settings"     method="processSettings"  admin="false" cancache="false"/>
-  <method handler="usermanager" request="/user/cart"     method="processCart"  admin="false" cancache="false"/>
+
+  <method handler="usermanager" request="/user/login"    method="processLogin"     admin="false"  cancache="false"/>
+  <method handler="usermanager" request="/user/logout"   method="processLogout"    admin="false"  cancache="false"/>
+  <method handler="usermanager" request="/user/settings" method="processSettings"  admin="false"  cancache="false"/>
+  <method handler="usermanager" request="/user/cart"     method="processCart"      admin="false"  cancache="false"/>
+  <method handler="usermanager" request="/user/list"     method="adminUserList"    admin="true"   cancache="false"/>
+  <method handler="usermanager" request="/user/edit"     method="adminUserEdit"    admin="true"   cancache="false"/>
+  <method handler="usermanager" request="/user/new"      method="adminUserNew"    admin="true"   cancache="false"/>
+
+
+
   <method handler="admin" request="/admin/import/catalog"       method="adminImportCatalog"      admin="true" cancache="false"/>
   <method handler="admin" request="/admin/sql"          method="adminSql"      admin="true" cancache="false"/>
   <method handler="admin" request="/admin/home"         method="adminHome"     admin="true" cancache="false" name="Admin" toplevel="true"/>
   <method handler="admin" request="/admin/startstop"    method="adminDbStartStop"       admin="true" cancache="false"/>
   <method handler="admin" request="/admin/tables"       method="adminDbTables"       admin="true" cancache="false"/>
   <method handler="admin" request="/admin/stats"        method="adminStats"    admin="true" cancache="false"/>
-  <method request="/admin/user/list"    handler="usermanager" method="adminUserList"    admin="true" cancache="false"/>
-  <method request="/admin/user"         handler="usermanager" method="adminUser"    admin="true" cancache="false"/>
   <method handler="admin" request="/admin/harvesters"   method="adminHarvesters"    admin="true" cancache="false"/>
   <method handler="admin" request="/admin/cleanup"        method="adminCleanup"      admin="true" cancache="false"/>
 </api>

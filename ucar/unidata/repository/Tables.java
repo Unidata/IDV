@@ -168,6 +168,7 @@ public interface Tables {
             SqlUtil.getQuestionMarks(ARRAY_GLOBALS.length));
 
 
+
     public static final String TABLE_USERS = "users";
     public static final String COL_USERS_ID = TABLE_USERS + ".id";
     public static final String COL_USERS_NAME = TABLE_USERS + ".name";
@@ -190,6 +191,26 @@ public interface Tables {
             TABLE_USERS,
             COLUMNS_USERS, 
             SqlUtil.getQuestionMarks(ARRAY_USERS.length));
+
+
+
+
+
+    public static final String TABLE_USERROLES = "userroles";
+    public static final String COL_USERROLES_USER_ID = TABLE_USERROLES + ".user_id";
+    public static final String COL_USERROLES_ROLE = TABLE_USERROLES + ".role";
+    public static final String []ARRAY_USERROLES = new String[]{COL_USERROLES_USER_ID,
+                                                                COL_USERROLES_ROLE};
+
+
+    public static final String COLUMNS_USERROLES = SqlUtil.comma(ARRAY_USERROLES);
+    public static final String INSERT_USERROLES =
+        SqlUtil.makeInsert(
+            TABLE_USERROLES,
+            COLUMNS_USERROLES, 
+            SqlUtil.getQuestionMarks(ARRAY_USERROLES.length));
+
+
 
 
 
