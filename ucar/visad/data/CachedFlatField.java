@@ -210,9 +210,6 @@ public class CachedFlatField extends FlatField {
 
 
 
-
-
-
     /**
      * Clone this object
      *
@@ -258,9 +255,12 @@ public class CachedFlatField extends FlatField {
             }
         }
         setRangeErrors(errors);
+        //If we have data on the disk then force a write of the new data
+        if(shouldCache && haveDataOnDisk()) {
+            writeCache();
+        }
+        //now clear the cache if needed
         checkCache();
-
-
     }
 
 
