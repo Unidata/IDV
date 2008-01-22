@@ -314,5 +314,12 @@ public class HtmlUtil {
     }
 
 
+    public static String formEntryTop(String left, String right) {
+        //        if(left.length()>0) 
+        return " <tr><td align=\"right\" valign=\"top\" class=\"formlabel\">" + left     + "</td><td>" + right +"</td></tr>";
+
+    }
+
+
 }
 

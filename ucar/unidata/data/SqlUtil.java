@@ -784,8 +784,10 @@ public class SqlUtil {
         /** _more_          */
         int cnt = 0;
 
+        ResultSet lastResultSet;
+
+
         /**
-         * _more_
          *
          * @param stmt _more_
          */
@@ -801,11 +803,20 @@ public class SqlUtil {
          * @throws SQLException _more_
          */
         public ResultSet next() throws SQLException {
+            if(stmt == null) return null;
             if (cnt != 0) {
                 stmt.getMoreResults();
             }
+            if(lastResultSet!=null) {
+                lastResultSet.close();
+            }
             cnt++;
-            return stmt.getResultSet();
+            lastResultSet =  stmt.getResultSet();
+            if(lastResultSet == null) {
+                stmt.close();
+                stmt = null;
+            }
+            return lastResultSet;
         }
     }
 
