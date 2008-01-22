@@ -12,6 +12,7 @@
   <method request="/entry/show"  method="processEntryShow"    admin="false" cancache="true"/>
   <method request="/entry/add"   method="processEntryAdd"     admin="false" cancache="true"/>
   <method request="/entry/form"  method="processEntryForm"     admin="false" cancache="true"/>
+  <method request="/entry/comments"  method="processEntryComments"     admin="false" cancache="true"/>
   <method request="/entry/delete"    method="processEntryDelete"     admin="false" cancache="true"/>
   <method request="/entry/get/*"  method="processEntryGet"     admin="false" cancache="false"/>
   <method request="/association/add"    method="processAssociationAdd"     admin="false" cancache="true"/>

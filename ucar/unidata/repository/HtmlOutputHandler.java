@@ -680,7 +680,7 @@ public class HtmlOutputHandler extends OutputHandler {
                                         HtmlUtil.href(metadata.getContent(),
                                             metadata.getName())));
                             } else {
-                                sb.append(HtmlUtil.formEntry(name + ":",
+                                sb.append(HtmlUtil.formEntryTop(name + ":",
                                         metadata.getContent()));
                             }
                             sb.append("\n");

@@ -794,13 +794,14 @@ public class UserManager extends RepositoryManager {
                 "<a href=\"${root}/user/login\" class=\"navlink\">Login</a>";
         } else {
             userLink = 
-                HtmlUtil.href(URL_USER_LOGOUT, "logout", " class=\"navlink\" ")+
+                HtmlUtil.href(URL_USER_LOGOUT, "Logout", " class=\"navlink\" ")+
                 HtmlUtil.space(1) +"|" +HtmlUtil.space(1) +
                 HtmlUtil.href(URL_USER_SETTINGS, user.getLabel(), " class=\"navlink\" ")+
                 HtmlUtil.space(1);
         }
         return cartEntry + HtmlUtil.space(2) + userLink;
     }
+
 
     /**
      * _more_

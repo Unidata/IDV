@@ -89,6 +89,18 @@ a.navlink {
   color:black;
 }
 
+.notewrapper {
+	margin:10px;
+}
+
+
+.note {
+   padding-left:5px;
+   padding-right:5px;
+   border : 1px black solid;
+   background-color : #FFFFCC;
+}
+
 .nav {
    margin:0;
    font-family: Arial, Helvetica, sans-serif;

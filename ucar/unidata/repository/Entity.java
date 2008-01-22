@@ -53,6 +53,8 @@ public class Entity {
     /** _more_ */
     List<String> tags;
 
+    List<Comment> comments;
+
     /** _more_ */
     List<Association> associations = new ArrayList<Association>();
 
@@ -365,6 +367,39 @@ public class Entity {
             associations = new ArrayList<Association>();
         }
         associations.add(value);
+
+    }
+
+
+    /**
+     * Set the Comments property.
+     *
+     * @param value The new value for Comments
+     */
+    public void setComments(List<Comment> value) {
+        comments = value;
+    }
+
+    /**
+     * Get the Comments property.
+     *
+     * @return The Comments
+     */
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
+    public void addComment(Comment value) {
+        if (comments == null) {
+            comments = new ArrayList<Comment>();
+        }
+        comments.add(value);
 
     }
 

@@ -9,6 +9,10 @@ CREATE TABLE  globals (name varchar(500),
                        value varchar(1000));
 
 
+
+
+
+
 CREATE TABLE entries (id varchar(200),
                    type varchar(200),
 	           name varchar(200),
@@ -45,9 +49,19 @@ CREATE INDEX METADATA_INDEX_TYPE ON metadata (TYPE);
 	
 
 
+CREATE TABLE  comments (id varchar(200),
+		        entry_id varchar(200),
+			user_id  varchar(200),
+                        date timestamp, 
+			subject  varchar(200),
+                        comment varchar(1000));
+
+CREATE INDEX COMMENTS_INDEX_ID ON comments (ID);
+CREATE INDEX COMMENTS_INDEX_ENTRY_ID ON comments (ENTRY_ID);
 
 CREATE TABLE tags (name varchar(200),
 	           entry_id varchar(200));
+
 
 CREATE TABLE associations (name varchar(200),
 			   from_entry_id varchar(200),

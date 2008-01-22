@@ -260,6 +260,34 @@ public interface Tables {
 
 
 
+
+    public static final String TABLE_COMMENTS = "comments";
+    public static final String COL_COMMENTS_ID = TABLE_COMMENTS + ".id";
+    public static final String COL_COMMENTS_ENTRY_ID= TABLE_COMMENTS + ".entry_id";
+    public static final String COL_COMMENTS_USER_ID= TABLE_COMMENTS + ".user_id";
+    public static final String COL_COMMENTS_DATE= TABLE_COMMENTS + ".date";
+    public static final String COL_COMMENTS_SUBJECT= TABLE_COMMENTS + ".subject";
+    public static final String COL_COMMENTS_COMMENT= TABLE_COMMENTS + ".comment";
+
+    public static final String []ARRAY_COMMENTS =  new String[]{COL_COMMENTS_ID,
+                                                                COL_COMMENTS_ENTRY_ID,
+                                                                COL_COMMENTS_USER_ID,
+                                                                COL_COMMENTS_DATE,
+                                                                COL_COMMENTS_SUBJECT,
+                                                                COL_COMMENTS_COMMENT};
+
+    public static final String COLUMNS_COMMENTS = SqlUtil.comma(ARRAY_COMMENTS);
+    
+    public static final String INSERT_COMMENTS =
+        SqlUtil.makeInsert(TABLE_COMMENTS,
+                           COLUMNS_COMMENTS,
+                           SqlUtil.getQuestionMarks(ARRAY_COMMENTS.length));
+
+
+
+
+
+
     //J+
 
 

@@ -165,6 +165,10 @@ public interface Constants {
     /** _more_          */
     public static final String ARG_CATALOG = "catalog";
 
+    public static final String ARG_COMMENT = "comment";
+    public static final String ARG_SUBJECT = "subject";
+
+
 
     /** _more_          */
     public static final String ARG_SOUTH = "south";
@@ -207,6 +211,8 @@ public interface Constants {
     /** _more_          */
     public static final String ARG_DELETE = "delete";
 
+    public static final String ARG_ADD = "add";
+
     public static final String ARG_NEW = "new";
 
     /** _more_          */
@@ -214,6 +220,8 @@ public interface Constants {
 
     /** _more_          */
     public static final String ARG_CANCEL = "cancel";
+
+    public static final String ARG_MESSAGE = "message";
 
     /** _more_ */
     public static final String ARG_INCLUDENONGEO = "includenongeo";
@@ -283,6 +291,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_ID = "id";
+
+    public static final String ARG_COMMENT_ID = "comment_id";
 
     public static final String ARG_FROM = "from";
     public static final String ARG_TO = "to";

@@ -125,6 +125,8 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     /** _more_ */
     public RequestUrl URL_ENTRY_SEARCHFORM = new RequestUrl(this, "/entry/searchform");
 
+    public RequestUrl URL_ENTRY_COMMENTS = new RequestUrl(this, "/entry/comments");
+
     /** _more_ */
     public RequestUrl URL_ENTRY_SEARCH = new RequestUrl(this, "/entry/search");
 
@@ -384,8 +386,13 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      *
      * @return _more_
      */
-    protected  String header(String h) {
+    protected  static String header(String h) {
         return "<H3>" + h + "</h3>";
+    }
+
+
+    protected  static String note(String h) {
+        return "<div class=\"notewrapper\"><span class=\"note\">" + h + "</span></div>";
     }
 
 
@@ -1444,6 +1451,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                                        "Any file type"));
         addTypeHandler(TypeHandler.TYPE_GROUP,
                        groupTypeHandler = new GroupTypeHandler(this));
+        groupTypeHandler.setDontShowInForm(ARG_RESOURCE);
         addTypeHandler(TypeHandler.TYPE_FILE,
                        new TypeHandler(this, "file", "File"));
         dummyGroup = new Group(groupTypeHandler, true);
@@ -2281,7 +2289,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                                  ? URL_ENTRY_FORM
                                  : URL_ENTRY_ADD), ""));
         String title    = "";
-        String typeName = "Entry";
+
 
         if (type == null) {
             sb.append(HtmlUtil.formEntry("Type:",
@@ -2292,19 +2300,15 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                     "", HtmlUtil.submit("Select Type to Add")));
             sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
         } else {
-            boolean isGroup = false;
-            if (type.equals(TypeHandler.TYPE_GROUP)) {
-                isGroup  = true;
-                typeName = "Group";
-            }
-
-            String submitButton = HtmlUtil.submit(title = ((entry == null)
-                    ? "Add " + typeName
-                    : "Edit " + typeName));
-            sb.append(HtmlUtil.formEntry("", submitButton));
             TypeHandler typeHandler = ((entry == null)
                                        ? getTypeHandler(type)
                                        : entry.getTypeHandler());
+
+
+            String submitButton = HtmlUtil.submit(title = ((entry == null)
+                    ? "Add " + typeHandler.getLabel()
+                    : "Edit " + typeHandler.getLabel()));
+            sb.append(HtmlUtil.formEntry("", submitButton));
             if (entry != null) {
                 sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
             } else {
@@ -2314,7 +2318,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             sb.append(HtmlUtil.formEntry("Type:", typeHandler.getLabel()));
 
             String size = " size=\"75\" ";
-            if ( !isGroup) {
+            if (typeHandler.okToShowInForm(ARG_RESOURCE)) {
                 sb.append(HtmlUtil.formEntry("Resource:",
                                              HtmlUtil.input(ARG_RESOURCE,
                                                  ((entry != null)
@@ -2326,7 +2330,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                                              ((entry != null)
                     ? entry.getName()
                     : ""), size)));
-            sb.append(HtmlUtil.formEntry("Description:",
+            sb.append(HtmlUtil.formEntryTop("Description:",
                                          HtmlUtil.textArea(ARG_DESCRIPTION,
                                              ((entry != null)
                     ? entry.getDescription()
@@ -2377,6 +2381,102 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         return new Result(title, sb, Result.TYPE_HTML);
 
     }
+
+    public String getCommentHtml(Request request, Entry entry) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        List<Comment> comments = getComments(request,entry);
+        sb.append(HtmlUtil.form(URL_ENTRY_COMMENTS, ""));
+        sb.append(HtmlUtil.hidden(ARG_ID,entry.getId()));
+        sb.append(HtmlUtil.formEntry("", HtmlUtil.submit("Add Comment",ARG_ADD)));
+        sb.append("<table>");
+        for(Comment comment: comments) {
+            sb.append(HtmlUtil.formEntry("" ,"<hr>"));
+            //TODO: Check for access
+            String deleteLink = HtmlUtil.href(HtmlUtil.url(URL_ENTRY_COMMENTS,ARG_DELETE,"true",ARG_ID,entry.getId(),ARG_COMMENT_ID, comment.getId()),
+                                              HtmlUtil.img(fileUrl("/Delete.gif"),
+                                                           "Delete comment"));
+            sb.append(HtmlUtil.formEntry("" ,deleteLink));
+            sb.append(HtmlUtil.formEntry("Subject:" ,comment.getSubject()));
+            sb.append(HtmlUtil.formEntry("By:" ,comment.getUser().getLabel() +" @ " + fmt(comment.getDate())));
+            sb.append(HtmlUtil.formEntryTop("Comment:" ,comment.getComment()));
+        }
+        return sb.toString();
+    }
+
+    public Result processEntryComments(Request request) throws Exception {
+        if (!request.defined(ARG_ID)) {
+                throw new IllegalArgumentException("Could not find entry:"
+                        + request.getString(ARG_ID, ""));
+        }
+        Entry entry = getEntry(request.getString(ARG_ID, ""), request);
+        if (entry == null) {
+            throw new IllegalArgumentException("Could not find entry:"
+                                               + request.getString(ARG_ID, ""));
+        }
+        StringBuffer sb = new StringBuffer();
+
+        if(request.exists(ARG_MESSAGE)) {
+            sb.append(Repository.note(request.getString(ARG_MESSAGE,"")));
+        }
+
+        if(request.exists(ARG_DELETE)) {
+            execute(SqlUtil.makeDelete(TABLE_COMMENTS, COL_COMMENTS_ID,
+                                       SqlUtil.quote(request.getString(ARG_COMMENT_ID,""))));
+            entry.setComments(null);
+            return new Result(HtmlUtil.url(URL_ENTRY_COMMENTS, ARG_ID,
+                                           entry.getId(), ARG_MESSAGE,"Comment deleted"));
+        }
+
+        if(request.exists (ARG_CANCEL) || (!request.exists(ARG_SUBJECT) && !request.exists(ARG_ADD))) {
+            sb.append("Comments for: " + getEntryUrl(entry));
+            sb.append("<p>");
+            sb.append(getCommentHtml(request, entry));
+            return new Result("Entry Comments", sb, Result.TYPE_HTML);
+        }
+
+
+
+        String subject = "";
+        String comment = "";
+        if(request.exists(ARG_SUBJECT)) {
+            subject = request.getString(ARG_SUBJECT,"").trim();
+            comment = request.getString(ARG_COMMENT,"").trim();
+            if(comment.length()==0) {
+                sb.append(Repository.note("You need to enter a comment"));
+            } else {
+                PreparedStatement insert =
+                    getConnection().prepareStatement(INSERT_COMMENTS);
+                int col = 1;
+                insert.setString(col++, getGUID());
+                insert.setString(col++, entry.getId());
+                insert.setString(col++, request.getRequestContext().getUser().getId());
+                insert.setTimestamp(col++, new java.sql.Timestamp(currentTime()), calendar);
+                insert.setString(col++, subject);
+                insert.setString(col++, request.getString(ARG_COMMENT,""));
+                insert.execute();
+                entry.setComments(null);
+                return new Result(HtmlUtil.url(URL_ENTRY_COMMENTS, ARG_ID,
+                                               entry.getId(), ARG_MESSAGE,"Comment added"));
+            }
+        } 
+
+        sb.append("Add comment for: " + getEntryUrl(entry));
+        sb.append(HtmlUtil.form(URL_ENTRY_COMMENTS, ""));
+        sb.append(HtmlUtil.hidden(ARG_ID,entry.getId()));
+        sb.append(HtmlUtil.formTable());
+        sb.append(HtmlUtil.formEntry("Subject:", HtmlUtil.input(ARG_SUBJECT,subject," size=\"40\" ")));
+        sb.append(HtmlUtil.formEntryTop("Comment:", HtmlUtil.textArea(ARG_COMMENT,comment,5,40)));
+        sb.append(HtmlUtil.formEntry("", HtmlUtil.submit("Add Comment") + HtmlUtil.space(2) +
+                                     HtmlUtil.submit("Cancel", ARG_CANCEL)));
+        sb.append("</table>");
+        sb.append("</form>");
+        return new Result("Entry Comments", sb, Result.TYPE_HTML);
+    }
+
+
+
+
+
 
     /**
      * _more_
@@ -4293,6 +4393,44 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entryId _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List<Comment> getComments(Request request,
+                                        Entry entry) 
+        throws Exception {
+        if(entry.getComments()!=null) return entry.getComments();
+        String query = SqlUtil.makeSelect(
+                           COLUMNS_COMMENTS,
+                           Misc.newList(TABLE_COMMENTS),
+                           SqlUtil.eq(
+                               COL_COMMENTS_ENTRY_ID,
+                               SqlUtil.quote(entry.getId()))," order by " + COL_COMMENTS_DATE + " asc ");
+        List<Comment> comments = new ArrayList();
+        SqlUtil.Iterator  iter         = SqlUtil.getIterator(execute(query));
+        ResultSet         results;
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                comments.add(new Comment(results.getString(1),entry,
+                                         getUserManager().findUser(results.getString(3),true),
+                                         new Date(results.getTimestamp(4 , Repository.calendar ).getTime()),
+                                         results.getString(5),
+                                         results.getString(6)));
+            }
+        }
+        entry.setComments(comments);
+        return comments;
+    }
+
+
+
 
     /**
      * _more_
@@ -4541,6 +4679,14 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                     SqlUtil.eq(COL_ASSOCIATIONS_FROM_ENTRY_ID, "?"),
                     SqlUtil.eq(COL_ASSOCIATIONS_TO_ENTRY_ID, "?"))));
         PreparedStatement assStmt = getConnection().prepareStatement(query);
+
+        query = SqlUtil.makeDelete(
+            TABLE_COMMENTS,
+            SqlUtil.eq(COL_COMMENTS_ENTRY_ID, "?"));
+        PreparedStatement commentsStmt = getConnection().prepareStatement(query);
+
+
+
         PreparedStatement entriesStmt =
             getConnection().prepareStatement(SqlUtil.makeDelete(TABLE_ENTRIES,
                 COL_ENTRIES_ID, "?"));
@@ -4551,6 +4697,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             for (Entry entry : entries) {
                 tagsStmt.setString(1, entry.getId());
                 tagsStmt.addBatch();
+                commentsStmt.setString(1, entry.getId());
                 assStmt.setString(1, entry.getId());
                 assStmt.setString(2, entry.getId());
                 tagsStmt.addBatch();
@@ -4560,6 +4707,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                 entry.getTypeHandler().deleteEntry(request, statement, entry);
             }
             tagsStmt.executeBatch();
+            commentsStmt.executeBatch();
             assStmt.executeBatch();
             entriesStmt.executeBatch();
             //            genericStmt.executeBatch();

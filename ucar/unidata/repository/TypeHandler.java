@@ -98,6 +98,9 @@ public class TypeHandler implements Constants, Tables {
     String description;
 
 
+    private Hashtable dontShowInForm = new Hashtable();
+
+
 
     /**
      * _more_
@@ -132,6 +135,16 @@ public class TypeHandler implements Constants, Tables {
         this.type        = type;
         this.description = description;
     }
+
+    public void setDontShowInForm(String arg) {
+        dontShowInForm.put(arg,arg);
+    }
+
+    public boolean okToShowInForm(String arg) {
+        if(dontShowInForm.get(arg)!=null) return false;
+        return true;
+    }
+
 
     /**
      * _more_
@@ -408,6 +421,13 @@ public class TypeHandler implements Constants, Tables {
                                        repository.fileUrl("/Edit16.gif"),
                                        "Edit Entry"));
 
+        String commentsEntry = HtmlUtil.href(
+                               HtmlUtil.url(
+                                   repository.URL_ENTRY_COMMENTS, ARG_ID,
+                                   entry.getId()), HtmlUtil.img(
+                                       repository.fileUrl("/Comments.gif"),
+                                       "Add/View Comments"));
+
         String cartEntry = HtmlUtil.href(
                                HtmlUtil.url(
                                    repository.getUserManager().URL_USER_CART, ARG_ACTION, ACTION_ADD, ARG_ID,
@@ -415,7 +435,8 @@ public class TypeHandler implements Constants, Tables {
                                        repository.fileUrl("/Cart.gif"),
                                        "Add to cart"));
 
-        return editEntry + HtmlUtil.space(1)
+        return editEntry + HtmlUtil.space(1)+
+            commentsEntry + HtmlUtil.space(1)
                + getEntryDownloadLink(request, entry) + HtmlUtil.space(1)
                + getGraphLink(request, entry)+ HtmlUtil.space(1)+
             cartEntry;
