@@ -330,8 +330,8 @@ public class TypeHandler implements Constants, Tables {
             List<Association> associations =
                 repository.getAssociations(request, entry.getId());
             if (associations.size() > 0) {
-                StringBuffer assSB = new StringBuffer();
-                assSB.append("<table>");
+                StringBuffer assocSB = new StringBuffer();
+                assocSB.append("<table>");
                 for (Association association : associations) {
                     Entry fromEntry = null;
                     Entry toEntry   = null;
@@ -351,25 +351,25 @@ public class TypeHandler implements Constants, Tables {
                     if ((fromEntry == null) || (toEntry == null)) {
                         continue;
                     }
-                    assSB.append("<tr><td>");
-                    assSB.append(((fromEntry == entry)
+                    assocSB.append("<tr><td>");
+                    assocSB.append(((fromEntry == entry)
                                ? fromEntry.getName()
                                : repository.getEntryUrl(fromEntry)));
-                    assSB.append("&nbsp;&nbsp;");
-                    assSB.append("</td><td>");
-                    assSB.append(
+                    assocSB.append("&nbsp;&nbsp;");
+                    assocSB.append("</td><td>");
+                    assocSB.append(
                                  HtmlUtil.bold(association.getName()));
-                    assSB.append("</td><td>");
-                    assSB.append(HtmlUtil.img(repository.fileUrl("/Arrow16.gif")));
-                    assSB.append("&nbsp;&nbsp;");
-                    assSB.append("</td><td>");
-                    assSB.append(((toEntry == entry)
+                    assocSB.append("</td><td>");
+                    assocSB.append(HtmlUtil.img(repository.fileUrl("/Arrow16.gif")));
+                    assocSB.append("&nbsp;&nbsp;");
+                    assocSB.append("</td><td>");
+                    assocSB.append(((toEntry == entry)
                                ? toEntry.getName()
                                : repository.getEntryUrl(toEntry)));
-                    assSB.append("</td></tr>");
+                    assocSB.append("</td></tr>");
                 }
-                assSB.append("</table>");
-                sb.append(HtmlUtil.formEntry("Associations:", assSB.toString()));
+                assocSB.append("</table>");
+                sb.append(HtmlUtil.formEntryTop("Associations:", assocSB.toString()));
             }
 
 
