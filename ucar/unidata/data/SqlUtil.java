@@ -217,13 +217,44 @@ public class SqlUtil {
 
     public static String makeOrSplit(String column, String values, boolean quoteThem) {
         List toks = StringUtil.split(values,",",true,true);
-        StringBuffer sb = new StringBuffer();
+
+        List nots = new ArrayList();
+        List notNots = new ArrayList();
         for(int i=0;i<toks.size();i++) {
+            String expr =((String) toks.get(i)).trim();
+            if(expr.startsWith("!")) {
+                nots.add(expr);
+            } else {
+                notNots.add(expr);
+            }
+        }
+
+
+        StringBuffer sb = new StringBuffer();
+        StringBuffer notSb = new StringBuffer();
+
+        for(int i=0;i<nots.size();i++) {
+            if(i>0) notSb.append (" AND ");
+            String value = nots.get(i).toString();
+            notSb.append(expr(column,value,quoteThem));
+        }
+
+
+
+        for(int i=0;i<notNots.size();i++) {
             if(i>0) sb.append (" OR ");
-            String value = toks.get(i).toString();
+            String value = notNots.get(i).toString();
             sb.append(expr(column,value,quoteThem));
         }
-        return sb.toString();
+
+        if(nots.size()>0 && notNots.size()>0) {
+            return group(notSb.toString()) +" AND " + group(sb.toString());
+        } else if(nots.size()>0) {
+            return group(notSb.toString());
+        } else if(notNots.size()>0) {
+            return group(sb.toString());
+        }
+        return "";
     }
 
 
