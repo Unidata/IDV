@@ -586,7 +586,7 @@ public class IdvUIManager extends IdvManager {
      *
      * @return component
      */
-    private Object findComponent(String id) {
+    public Object findComponent(String id) {
         List comps = findComponents(id);
         if (comps.size() > 0) {
             return comps.get(0);
