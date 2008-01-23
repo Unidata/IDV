@@ -393,8 +393,13 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     }
 
 
-    protected  static String note(String h) {
+    protected  String note(String h) {
         return "<div class=\"notewrapper\"><span class=\"note\">" + h + "</span></div>";
+    }
+
+
+    protected  String warning(String h) {
+        return "<div class=\"notewrapper\"><table border=\"0\"><tr valign=\"bottom\"><td>" + HtmlUtil.img(fileUrl("/warning.jpg")) +HtmlUtil.space(1) +"</td><td><div class=\"note\">" + h + "</div></td></tr></table></div>";
     }
 
 
@@ -1502,7 +1507,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      */
     protected TypeHandler getTypeHandler(Request request) throws Exception {
         String type = request.getType(TypeHandler.TYPE_ANY).trim();
-        return getTypeHandler(type);
+        return getTypeHandler(type,false);
     }
 
     /**
@@ -1515,6 +1520,10 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      * @throws Exception _more_
      */
     protected TypeHandler getTypeHandler(String type) throws Exception {
+        return getTypeHandler(type, true);
+    }
+
+    protected TypeHandler getTypeHandler(String type, boolean makeNewOneIfNeeded) throws Exception {
         TypeHandler typeHandler = (TypeHandler) typeHandlersMap.get(type);
         if (typeHandler == null) {
             try {
@@ -1528,7 +1537,10 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             } catch (Throwable cnfe) {}
         }
 
+
         if (typeHandler == null) {
+            if(!makeNewOneIfNeeded)
+                return getTypeHandler(TypeHandler.TYPE_ANY);
             typeHandler = new TypeHandler(this, type);
             addTypeHandler(type, typeHandler);
         }
@@ -1713,7 +1725,10 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
 
         String       formType     = request.getString(ARG_FORM_TYPE, "basic");
         boolean      basicForm    = formType.equals("basic");
+
+
         List         where        = assembleWhereClause(request);
+
         StringBuffer sb           = new StringBuffer();
         StringBuffer headerBuffer = new StringBuffer();
         //        headerBuffer.append(header("Search Form"));
@@ -2427,7 +2442,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         StringBuffer sb = new StringBuffer();
 
         if(request.exists(ARG_MESSAGE)) {
-            sb.append(Repository.note(request.getString(ARG_MESSAGE,"")));
+            sb.append(note(request.getString(ARG_MESSAGE,"")));
         }
 
         if(request.exists(ARG_DELETE)) {
@@ -2453,7 +2468,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             subject = request.getString(ARG_SUBJECT,"").trim();
             comment = request.getString(ARG_COMMENT,"").trim();
             if(comment.length()==0) {
-                sb.append(Repository.note("You need to enter a comment"));
+                sb.append(warning("Please enter a comment"));
             } else {
                 PreparedStatement insert =
                     getConnection().prepareStatement(INSERT_COMMENTS);

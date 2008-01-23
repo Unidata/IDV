@@ -635,7 +635,9 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(HtmlUtil.href(request.getUrl(ARG_SKIP)+"&"+ARG_SKIP+"="+(skip-max),"Previous"));
                 sb.append(HtmlUtil.space(1));
             }
-            sb.append(HtmlUtil.href(request.getUrl(ARG_SKIP)+"&"+ARG_SKIP+"="+(skip+max),"Next"));
+            if(cnt>=max) {
+                sb.append(HtmlUtil.href(request.getUrl(ARG_SKIP)+"&"+ARG_SKIP+"="+(skip+max),"Next"));
+            }
         }
 
 

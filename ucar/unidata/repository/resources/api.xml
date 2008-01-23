@@ -21,6 +21,7 @@
 
   <method handler="usermanager" request="/user/login"    method="processLogin"     admin="false"  cancache="false"/>
   <method handler="usermanager" request="/user/logout"   method="processLogout"    admin="false"  cancache="false"/>
+  <method handler="usermanager" request="/user/home"     method="processHome"      admin="false"  cancache="false"/>
   <method handler="usermanager" request="/user/settings" method="processSettings"  admin="false"  cancache="false"/>
   <method handler="usermanager" request="/user/cart"     method="processCart"      admin="false"  cancache="false"/>
   <method handler="usermanager" request="/user/list"     method="adminUserList"    admin="true"   cancache="false"/>

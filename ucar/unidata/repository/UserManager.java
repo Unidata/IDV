@@ -81,13 +81,16 @@ public class UserManager extends RepositoryManager {
 
 
 
+
     public RequestUrl URL_USER_LOGOUT = new RequestUrl(this, "/user/logout");
 
+
+    public RequestUrl URL_USER_HOME = new RequestUrl(this, "/user/home");
+
     /** _more_ */
-    public RequestUrl URL_USER_SETTINGS = new RequestUrl(this, "/user/settings");
+    public RequestUrl URL_USER_SETTINGS = new RequestUrl(this, "/user/settings","Settings");
 
-    public RequestUrl URL_USER_CART = new RequestUrl(this, "/user/cart");
-
+    public RequestUrl URL_USER_CART = new RequestUrl(this, "/user/cart","Data Cart");
 
     /** _more_ */
     public RequestUrl URL_USER_LIST = new RequestUrl(this, "/user/list", "Users");
@@ -96,6 +99,9 @@ public class UserManager extends RepositoryManager {
     public RequestUrl URL_USER_EDIT = new RequestUrl(this, "/user/edit", "Users");
 
     public RequestUrl URL_USER_NEW = new RequestUrl(this, "/user/new");
+
+
+    protected RequestUrl[] userUrls = {URL_USER_SETTINGS, URL_USER_CART};
 
 
     /** _more_          */
@@ -431,7 +437,7 @@ public class UserManager extends RepositoryManager {
             boolean okToChangeUser = true;
             okToChangeUser = checkPasswords(request, user);
             if(!okToChangeUser) {
-                sb.append("Incorrect passwords");
+                sb.append(getRepository().warning("Incorrect passwords"));
             }
 
             if(okToChangeUser) {
@@ -519,6 +525,7 @@ public class UserManager extends RepositoryManager {
 
         StringBuffer sb = new StringBuffer();
 
+        StringBuffer errorBuffer = new StringBuffer();
         if (request.exists(ARG_USER_ID)) {
             id = request.getString(ARG_USER_ID,"").trim();
             name = request.getString(ARG_USER_NAME,name).trim();
@@ -529,20 +536,20 @@ public class UserManager extends RepositoryManager {
             boolean okToAdd = true;
             if(id.length()==0) {
                 okToAdd = false;
-                sb.append("Please enter an ID<br>"); 
+                errorBuffer.append("Please enter an ID<br>"); 
             } 
 
             if(password1.length()==0) {
                 okToAdd = false;
-                sb.append("Invalid password<br>"); 
+                errorBuffer.append("Invalid password<br>"); 
             } else  if(!password1.equals(password2)) {
                 okToAdd = false;
-                sb.append("Invalid password<br>"); 
+                errorBuffer.append("Invalid password<br>"); 
             }
 
             if(findUser(id)!=null) {
                 okToAdd = false;
-                sb.append("User with given id already exists<br>"); 
+                errorBuffer.append("User with given id already exists<br>"); 
             }
 
             if(okToAdd) {
@@ -554,6 +561,9 @@ public class UserManager extends RepositoryManager {
 
 
 
+        if(errorBuffer.toString().length()>0) {
+            sb.append(getRepository().warning(errorBuffer.toString()));
+        }
         sb.append(getRepository().header("Create User"));
         sb.append(HtmlUtil.form(URL_USER_NEW));
         sb.append(HtmlUtil.formTable());
@@ -778,7 +788,14 @@ public class UserManager extends RepositoryManager {
                 sb.append("</form>");
             }
         }
-        Result result = new Result("User Cart", sb);
+        return makeResult(request, "User Cart", sb);
+    }
+
+    private Result makeResult(Request request, String title, StringBuffer sb) {
+        Result result = new Result(title, sb);
+        if(!request.getRequestContext().getUser().getAnonymous()) {
+            result.putProperty(PROP_NAVSUBLINKS, getRepository().getSubNavLinks(request, userUrls));
+        }
         return result;
     }
 
@@ -800,6 +817,15 @@ public class UserManager extends RepositoryManager {
                 HtmlUtil.space(1);
         }
         return cartEntry + HtmlUtil.space(2) + userLink;
+    }
+
+
+    public Result processHome(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        if(request.defined(ARG_MESSAGE)) {
+            sb.append(getRepository().note(request.getString(ARG_MESSAGE,"")));
+        }
+        return makeResult(request, "User Home", sb);
     }
 
 
@@ -832,9 +858,9 @@ public class UserManager extends RepositoryManager {
             if (results.next()) {
                 user = getUser(results);
                 getRepository().setUserSession(request, user);
-                return new Result(HtmlUtil.url(getRepository().URL_MESSAGE,ARG_MESSAGE,"You are logged in"));
+                return new Result(HtmlUtil.url(URL_USER_HOME,ARG_MESSAGE, "You are logged in"));
             } else {
-                sb.append("Incorrect user name or password");
+                sb.append(getRepository().warning("Incorrect user name or password"));
             }
         }
 
@@ -901,7 +927,7 @@ public class UserManager extends RepositoryManager {
         StringBuffer sb     = new StringBuffer();
         User user = request.getRequestContext().getUser();
         if(user.getAnonymous()) {
-            sb.append("You need to be logged in to change user settings");
+            sb.append(getRepository().warning("You need to be logged in to change user settings"));
             sb.append(makeLoginForm(request));
             return new Result("User Settings", sb);
         }
@@ -909,22 +935,25 @@ public class UserManager extends RepositoryManager {
         if(request.exists(ARG_USER_CHANGE)) {
             boolean okToChangeUser =  checkPasswords(request, user);
             if(!okToChangeUser) {
-                sb.append("Incorrect passwords");
+                sb.append(getRepository().warning("Incorrect passwords"));
             } else {
                 applyState(request, user, false);
-                return new Result(URL_USER_SETTINGS.toString());
+                return new Result(HtmlUtil.url(URL_USER_SETTINGS,ARG_MESSAGE,"User settings changed"));
             }
         }
 
+        if(request.defined(ARG_MESSAGE)) {
+            sb.append(getRepository().note(request.getString(ARG_MESSAGE,"")));
+        }
         sb.append(HtmlUtil.form(URL_USER_SETTINGS));
         makeUserForm(request, user,sb, false);
-        sb.append(HtmlUtil.formEntry("Roles:",user.getRolesAsString("<br>")));
+        sb.append(HtmlUtil.formEntryTop("Roles:",user.getRolesAsString("<br>")));
 
         sb.append(HtmlUtil.formEntry("",HtmlUtil.submit("Change Settings", ARG_USER_CHANGE))); 
         sb.append("</table>");
         sb.append("</form>");
 
-        return new Result("User Settings", sb);
+        return makeResult(request, "User Settings", sb);
     }
 
 

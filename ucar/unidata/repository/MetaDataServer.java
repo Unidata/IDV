@@ -236,7 +236,8 @@ public class MetaDataServer extends HttpServer implements Constants {
             MetaDataServer mds = new MetaDataServer(args);
             mds.init();
         } catch(Exception exc) {
-            throw LogUtil.getInnerException(exc);
+            LogUtil.printExceptionNoGui(null,"Error in main",exc);
+            System.exit(1);
         }
     }
 

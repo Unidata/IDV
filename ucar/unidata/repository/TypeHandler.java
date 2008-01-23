@@ -607,7 +607,7 @@ public class TypeHandler implements Constants, Tables {
                 if (entry.getResource().isFile()
                         && repository.canDownload(request, entry)) {
                     sb.append(
-                        HtmlUtil.formEntry(
+                        HtmlUtil.formEntryTop(
                             "Image:",
                             HtmlUtil.img(
                                 HtmlUtil.url(
@@ -616,7 +616,7 @@ public class TypeHandler implements Constants, Tables {
                                         entry.getId()), "",
                                             XmlUtil.attr(ARG_WIDTH, "400"))));
                 } else if (entry.getResource().isUrl()) {
-                    sb.append(HtmlUtil.formEntry("Image:",
+                    sb.append(HtmlUtil.formEntryTop("Image:",
                             HtmlUtil.img(entry.getResource().getPath())));
                 }
             }
@@ -910,7 +910,7 @@ public class TypeHandler implements Constants, Tables {
         formBuffer.append("\n");
 
 
-        if ( !simpleForm) {
+        if ( !simpleForm || request.defined(ARG_GROUP)) {
             String groupArg = (String) request.getString(ARG_GROUP, "");
             String searchChildren = " "
                                     + HtmlUtil.checkbox(ARG_GROUP_CHILDREN,
@@ -955,7 +955,7 @@ public class TypeHandler implements Constants, Tables {
             formBuffer.append("\n");
         }
 
-        if ( !simpleForm) {
+        if ( !simpleForm || request.defined(ARG_TAG)) {
             String tag = (String) request.getString(ARG_TAG, "");
             formBuffer.append(HtmlUtil.formEntry("Tag:",
                     HtmlUtil.input(ARG_TAG, tag)));
