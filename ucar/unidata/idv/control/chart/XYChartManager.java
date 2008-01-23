@@ -783,7 +783,7 @@ public abstract class XYChartManager extends ChartManager {
             int vAnchor;
             int w                = 20;
             int w2               = w / 2;
-            int wiggle           = 5;
+            int wiggle           = 15;
 
             int verticalPosition = lineState.getVerticalPosition();
             if (verticalPosition == LineState.VPOS_TOP) {
