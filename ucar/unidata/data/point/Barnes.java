@@ -1,7 +1,7 @@
 /*
  * $Id: IDV-Style.jin,v 1.5 2004/02/06 20:54:00 dmurray Exp $
  *
- * Copyright © 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright  1997-2004 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
