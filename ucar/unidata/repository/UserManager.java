@@ -832,7 +832,7 @@ public class UserManager extends RepositoryManager {
             if (results.next()) {
                 user = getUser(results);
                 getRepository().setUserSession(request, user);
-                sb.append("Logged in");
+                return new Result(HtmlUtil.url(getRepository().URL_MESSAGE,ARG_MESSAGE,"You are logged in"));
             } else {
                 sb.append("Incorrect user name or password");
             }
@@ -841,9 +841,9 @@ public class UserManager extends RepositoryManager {
         if(user==null) {
             sb.append(makeLoginForm(request));
         }
-        Result result = new Result("Login", sb);
-        return result;
+        return  new Result("Login", sb);
     }
+
 
 
     public Result processLogout(Request request) throws Exception {

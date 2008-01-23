@@ -27,6 +27,7 @@
   <method handler="usermanager" request="/user/edit"     method="adminUserEdit"    admin="true"   cancache="false"/>
   <method handler="usermanager" request="/user/new"      method="adminUserNew"    admin="true"   cancache="false"/>
 
+  <method  request="/message"      method="processMessage"  cancache="false" admin="false"/>
 
 
   <method handler="admin" request="/admin/import/catalog"       method="adminImportCatalog"      admin="true" cancache="false"/>

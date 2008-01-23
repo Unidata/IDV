@@ -112,6 +112,8 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     /** _more_ */
     public RequestUrl URL_GETMAP = new RequestUrl(this, "/getmap");
 
+    public RequestUrl URL_MESSAGE = new RequestUrl(this, "/message");
+
 
     /** _more_ */
     public RequestUrl URL_GROUP_SHOW = new RequestUrl(this, "/group/show");
@@ -1576,6 +1578,11 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         return groupList;
     }
 
+
+
+    public Result processMessage(Request request) throws Exception {
+        return new Result("", new StringBuffer(note(request.getString(ARG_MESSAGE,""))));
+    }
 
 
     /**

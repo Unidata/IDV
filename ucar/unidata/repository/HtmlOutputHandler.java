@@ -802,12 +802,19 @@ public class HtmlOutputHandler extends OutputHandler {
      */
     protected String getGroupLinks(Request request, Group group)
             throws Exception {
+        String commentsEntry = HtmlUtil.href(
+                               HtmlUtil.url(
+                                   repository.URL_ENTRY_COMMENTS, ARG_ID,
+                                   group.getId()), HtmlUtil.img(
+                                       repository.fileUrl("/Comments.gif"),
+                                       "Add/View Comments"));
+
         String search = HtmlUtil.href(
                             HtmlUtil.url(
                                 repository.URL_ENTRY_SEARCHFORM, ARG_GROUP,
                                 group.getId()), HtmlUtil.img(
-                                    repository.fileUrl("/Search16.gif"),
-                                    "Search in Group"));
+                                                             repository.fileUrl("/Search16.gif"),
+                                                             "Search in Group"));
 
         String createEntry = HtmlUtil.href(
                                  HtmlUtil.url(
@@ -825,10 +832,12 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
         return search + HtmlUtil.space(1)
-               + repository.getGraphLink(request, group) + HtmlUtil.space(1)
-               + createEntry
+            + repository.getGraphLink(request, group) + HtmlUtil.space(1)
+            + createEntry
             + HtmlUtil.space(1)
-               + editEntry;
+            + commentsEntry
+            + HtmlUtil.space(1)
+            + editEntry;
     }
 
 
