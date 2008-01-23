@@ -980,6 +980,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                 }
             }
         }
+
         if(sessionId == null) {
             sessionId = getGUID() + "_"+Math.random();
         }
@@ -1991,6 +1992,9 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      * @return _more_
      */
     public int getMax(Request request) {
+        if(request.defined(ARG_SKIP)) {
+            return request.get(ARG_SKIP,0) + request.get(ARG_MAX, MAX_ROWS);
+        }
         return request.get(ARG_MAX, MAX_ROWS);
     }
 
@@ -2726,22 +2730,23 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         if (request.get(ARG_NEXT, false)
                 || request.get(ARG_PREVIOUS, false)) {
             boolean next = request.get(ARG_NEXT, false);
-            String[] ids = getEntryIdsInGroup(request,
-                               entry.getParentGroup(), new ArrayList());
+            List<String> ids = getEntryIdsInGroup(request,
+                                                  entry.getParentGroup(), new ArrayList());
             String nextId = null;
-            for (int i = 0; (i < ids.length) && (nextId == null); i++) {
-                if (ids[i].equals(entryId)) {
+            for (int i = 0; (i < ids.size()) && (nextId == null); i++) {
+                String id = ids.get(i);
+                if (id.equals(entryId)) {
                     if (next) {
-                        if (i == ids.length - 1) {
-                            nextId = ids[0];
+                        if (i == ids.size() - 1) {
+                            nextId = ids.get(0);
                         } else {
-                            nextId = ids[i + 1];
+                            nextId = ids.get(i + 1);
                         }
                     } else {
                         if (i == 0) {
-                            nextId = ids[ids.length - 1];
+                            nextId = ids.get(ids.size() - 1);
                         } else {
-                            nextId = ids[i - 1];
+                            nextId = ids.get(i - 1);
                         }
                     }
                 }
@@ -3153,10 +3158,10 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                 SqlUtil.quote(group.getId()))));
 
 
-        String[]    ids     = getEntryIdsInGroup(request, group, where);
+        List<String>     ids     = getEntryIdsInGroup(request, group, where);
         List<Entry> entries = new ArrayList();
-        for (int i = 0; i < ids.length; i++) {
-            Entry entry = getEntry(ids[i], request);
+        for (String id: ids) {
+            Entry entry = getEntry(id, request);
             if (entry != null) {
                 entries.add(entry);
             }
@@ -3177,7 +3182,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      *
      * @throws Exception _more_
      */
-    protected String[] getEntryIdsInGroup(Request request, Group group,
+    protected List<String> getEntryIdsInGroup(Request request, Group group,
                                           List where)
             throws Exception {
         where = new ArrayList(where);
@@ -3190,10 +3195,32 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         if (request.get(ARG_ASCENDING, false)) {
             order = " ASC ";
         }
-        Statement stmt = typeHandler.executeSelect(request, COL_ENTRIES_ID,
+
+        int skipCnt=0;
+        String limitString = "";
+        if(request.defined(ARG_SKIP)) {
+            skipCnt = request.get(ARG_SKIP,0);
+            if(skipCnt>0) {
+                int max = request.get(ARG_MAX, MAX_ROWS);
+                limitString = " LIMIT " + (max+skipCnt);
+            }
+        }
+
+
+
+        Statement statement = typeHandler.executeSelect(request, COL_ENTRIES_ID,
                              where,
-                             " order by " + COL_ENTRIES_FROMDATE + order);
-        return SqlUtil.readString(stmt, 1);
+                             " order by " + COL_ENTRIES_FROMDATE + order + limitString);
+        SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
+        List<String> ids = new ArrayList<String>();
+        ResultSet results;
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                if(skipCnt-->0) continue;
+                ids.add(results.getString(1));
+            }
+        }
+        return ids;
     }
 
 
@@ -4158,15 +4185,29 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         if (request.get(ARG_ASCENDING, false)) {
             order = " ASC ";
         }
+        int skipCnt=0;
+        String limitString = "";
+        if(request.defined(ARG_SKIP)) {
+            skipCnt = request.get(ARG_SKIP,0);
+            if(skipCnt>0) {
+                int max = request.get(ARG_MAX, MAX_ROWS);
+                limitString = " LIMIT " + (max+skipCnt);
+            }
+        }
+
         Statement statement = typeHandler.executeSelect(request,
                                   COLUMNS_ENTRIES, where,
-                                  "order by " + COL_ENTRIES_FROMDATE + order);
+                                  "order by " + COL_ENTRIES_FROMDATE + order + limitString);
+
+
         List<Entry>      entries = new ArrayList<Entry>();
         List<Entry>      groups  = new ArrayList<Entry>();
         ResultSet        results;
         SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
         while ((results = iter.next()) != null) {
             while (results.next()) {
+                //                System.err.println ("\tskip:"+ skipCnt);
+                if(skipCnt-->0) continue;
                 //id,type,name,desc,group,user,file,createdata,fromdate,todate
                 TypeHandler localTypeHandler =
                     getTypeHandler(results.getString(2));

@@ -623,6 +623,22 @@ public class HtmlOutputHandler extends OutputHandler {
         boolean      showApplet = repository.isAppletEnabled(request);
         String       title      = group.getFullName();
         StringBuffer sb         = new StringBuffer();
+        
+        int cnt = subGroups.size() + entries.size();
+        int max = request.get(ARG_MAX, Repository.MAX_ROWS);
+        //        System.err.println ("cnt:" + cnt + " " + max);
+
+        if(cnt>0 && (cnt == max || request.defined(ARG_SKIP))) {
+            int skip = Math.max(0,request.get(ARG_SKIP,0));
+            sb.append("Results: " + (skip+1) + "-" + (skip+cnt) +HtmlUtil.space(4));
+            if(skip>0) {
+                sb.append(HtmlUtil.href(request.getUrl(ARG_SKIP)+"&"+ARG_SKIP+"="+(skip-max),"Previous"));
+                sb.append(HtmlUtil.space(1));
+            }
+            sb.append(HtmlUtil.href(request.getUrl(ARG_SKIP)+"&"+ARG_SKIP+"="+(skip+max),"Next"));
+        }
+
+
         if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
             if (output.equals(OUTPUT_HTML)) {
                 showApplet = false;
@@ -696,8 +712,8 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(HtmlUtil.bold("Groups:"));
                 sb.append("<ul>");
                 for (Group subGroup : subGroups) {
-                    sb.append(repository.getAllGroupLinks(request, subGroup));
-                    sb.append(" ");
+                    //                    sb.append(repository.getAllGroupLinks(request, subGroup));
+                    sb.append("<li>");
                     sb.append(
                         HtmlUtil.href(
                             HtmlUtil.url(
@@ -707,7 +723,7 @@ public class HtmlOutputHandler extends OutputHandler {
                             ? "true"
                             : "false"), subGroup.getName()));
 
-                    sb.append("\n<br>\n");
+                    //                    sb.append("\n<br>\n");
                 }
                 sb.append("</ul>");
             }
@@ -800,10 +816,19 @@ public class HtmlOutputHandler extends OutputHandler {
                                          repository.fileUrl("/New16.gif"),
                                          "New Entry or Group"));
 
+        String editEntry = HtmlUtil.href(
+                               HtmlUtil.url(
+                                   repository.URL_ENTRY_FORM, ARG_ID,
+                                   group.getId()), HtmlUtil.img(
+                                       repository.fileUrl("/Edit16.gif"),
+                                       "Edit Group"));
+
 
         return search + HtmlUtil.space(1)
                + repository.getGraphLink(request, group) + HtmlUtil.space(1)
-               + createEntry;
+               + createEntry
+            + HtmlUtil.space(1)
+               + editEntry;
     }
 
 
@@ -901,6 +926,7 @@ public class HtmlOutputHandler extends OutputHandler {
         if ((entries.size() > 0) && showApplet) {
             sb.append(getTimelineApplet(request, entries));
         }
+
         sb.append(HtmlUtil.form(repository.URL_GETENTRIES,
                                 "name=\"getentries\" method=\"post\""));
         if (entries.size() > 0) {

@@ -77,7 +77,7 @@ public interface Tables {
 
 
     /** _more_ */
-    public static final int MAX_ROWS = 1000;
+    public static final int MAX_ROWS = 500;
 
 
 

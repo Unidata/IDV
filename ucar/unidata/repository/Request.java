@@ -120,6 +120,18 @@ public class Request implements Constants {
 
 
 
+    public String getUrl() {
+        return  getRequestPath() + "?"
+            + getUrlArgs();
+    }
+
+
+
+    public String getUrl(String except) {
+        return  getRequestPath() + "?"
+            + getUrlArgs(except);
+    }
+
 
     /**
      * _more_
@@ -127,10 +139,20 @@ public class Request implements Constants {
      * @return _more_
      */
     public String getUrlArgs() {
+        return getUrlArgs((Hashtable)null);
+    }
+
+    public String getUrlArgs(String except) {
+        return getUrlArgs(Misc.newHashtable(except,except));
+    }
+
+
+    public String getUrlArgs(Hashtable except) {
         StringBuffer sb  = new StringBuffer();
         int          cnt = 0;
         for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {
             String arg   = (String) keys.nextElement();
+            if(except!=null && except.get(arg)!=null) continue;
             String value = (String) parameters.get(arg);
             if (value.length() == 0) {
                 continue;

@@ -68,8 +68,7 @@ public class SqlUtil {
     public static final  GregorianCalendar calendar = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
 
     /** _more_          */
-    private static final SimpleDateFormat sdf =
-        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+    private static SimpleDateFormat sdf;
 
 
 
@@ -113,7 +112,11 @@ public class SqlUtil {
      * @return _more_
      */
     public static String format(Date d) {
-        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        if(sdf == null) {
+            sdf =
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        }
         return sdf.format(d);
     }
 
