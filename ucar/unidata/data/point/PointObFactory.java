@@ -1165,7 +1165,7 @@ public class PointObFactory {
                             oneTime.getType());
                     retFI = new FieldImpl(ft, timeSet);
                 }
-                retFI.setSample(i, oneTime, false);
+                if (oneTime != null) retFI.setSample(i, oneTime, false);
             }
         } else {
             retFI = barnesOneTime(pointObs, type, xSpacing, ySpacing, numPasses);
@@ -1194,6 +1194,7 @@ public class PointObFactory {
         // TODO: May not be a tuple
         Tuple     data        = (Tuple) firstOb.getData();
         TupleType ttype       = (TupleType) data.getType();
+        //System.out.println("type = " + ttype);
         int  typeIndex = ttype.getIndex(type);
         if (typeIndex == -1) return null;
         float latMin = 90;
