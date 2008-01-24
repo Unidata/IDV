@@ -39,8 +39,11 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
+
 import java.util.Hashtable;
 
+
+import org.apache.commons.fileupload.MultipartStream;
 
 /**
  *
@@ -75,6 +78,7 @@ public class MetaDataServer extends HttpServer implements Constants {
     }
 
 
+
     public void init()  {
         try {
             repository = new Repository(args, "http://localhost:" + port);
@@ -84,6 +88,8 @@ public class MetaDataServer extends HttpServer implements Constants {
         }
         super.init();
     }
+
+
 
 
     /**
@@ -110,6 +116,8 @@ public class MetaDataServer extends HttpServer implements Constants {
      */
     private class MyRequestHandler extends RequestHandler {
 
+        Hashtable fileUploads = new Hashtable();
+
         Result result = null;
 
         /** _more_ */
@@ -126,6 +134,20 @@ public class MetaDataServer extends HttpServer implements Constants {
         public MyRequestHandler(MetaDataServer server, Socket socket)
                 throws Exception {
             super(server, socket);
+        }
+
+
+        protected void handleFileUpload(String attrName, String filename,Hashtable props, Hashtable args, MultipartStream multipartStream) throws Exception {
+            Repository.checkFilePath(filename);
+            int cnt = 0;
+            File f= new File(IOUtil.joinDir(repository.getFileUploadDirectory(), filename));
+            while(f.exists()) {
+                f = new File(IOUtil.joinDir(repository.getFileUploadDirectory(), (cnt++) + "_"+filename));
+            }
+            //TODO: Check for security hole with the file upload
+            fileUploads.put(attrName, f.toString());
+            OutputStream output=new FileOutputStream(f);
+            multipartStream.readBodyData(output);
         }
 
         /**
@@ -192,6 +214,7 @@ public class MetaDataServer extends HttpServer implements Constants {
                 RequestContext context = new RequestContext(null);
                 Request request = new Request(repository, path, context,
                                       formArgs);
+                request.setFileUploads(fileUploads);
                 request.setHttpHeaderArgs(httpArgs);
                 result = repository.handleRequest(request);
             } catch (Throwable exc) {

@@ -80,6 +80,8 @@ import java.util.regex.*;
 public class Request implements Constants {
 
 
+    private Hashtable fileUploads;
+
     /** _more_ */
     private String type;
 
@@ -119,6 +121,15 @@ public class Request implements Constants {
     }
 
 
+    public void setFileUploads(Hashtable uploads) {
+        fileUploads = uploads;
+    }
+
+
+    public String getUploadedFile(String arg) {
+        if(fileUploads == null) return null;
+        return (String) fileUploads.get(arg);
+    }
 
     public String getUrl() {
         return  getRequestPath() + "?"

@@ -685,14 +685,14 @@ public class HtmlOutputHandler extends OutputHandler {
                             String name = metadata.getName();
                             if ((name == null)
                                     || (name.trim().length() == 0)) {
-                                name = metadata.getMetadataType();
+                                name = metadata.getType();
                             }
                             if (name.length() > 0) {
                                 name = name.substring(0, 1).toUpperCase()
                                        + name.substring(1);
                                 name = name.replace("_", " ");
                             }
-                            if (metadata.getMetadataType().equals(
+                            if (metadata.getType().equals(
                                     Metadata.TYPE_URL)) {
                                 sb.append(HtmlUtil.formEntry("Link:",
                                         HtmlUtil.href(metadata.getContent(),

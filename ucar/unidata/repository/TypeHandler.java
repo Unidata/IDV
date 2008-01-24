@@ -380,7 +380,7 @@ public class TypeHandler implements Constants, Tables {
                 mSB.append("<ul>");
                 for (Metadata metadata : metadataList) {
                     mSB.append("<li>");
-                    if (metadata.getMetadataType().equals(
+                    if (metadata.getType().equals(
                             Metadata.TYPE_LINK)) {
                         mSB.append(metadata.getName() + ": ");
                         mSB.append(HtmlUtil.href(metadata.getContent(),
@@ -613,8 +613,8 @@ public class TypeHandler implements Constants, Tables {
                                 HtmlUtil.url(
                                     repository.URL_ENTRY_GET + "/"
                                     + entry.getName(), ARG_ID,
-                                        entry.getId()), "",
-                                            XmlUtil.attr(ARG_WIDTH, "400"))));
+                                    entry.getId()), "")));
+
                 } else if (entry.getResource().isUrl()) {
                     sb.append(HtmlUtil.formEntryTop("Image:",
                             HtmlUtil.img(entry.getResource().getPath())));

@@ -195,6 +195,8 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     /** _more_ */
     private String tmpDir;
 
+    private String uploadDir;
+
     /** _more_ */
     private Properties properties = new Properties();
 
@@ -553,6 +555,12 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         tmpDir = IOUtil.joinDir(repositoryDir, "tmp");
         IOUtil.makeDirRecursive(new File(repositoryDir));
         IOUtil.makeDirRecursive(new File(tmpDir));
+
+        uploadDir = IOUtil.joinDir(repositoryDir, "uploads");
+        IOUtil.makeDirRecursive(new File(uploadDir));
+        addDownloadPrefix(uploadDir);
+
+
         logFile = new File(IOUtil.joinDir(repositoryDir, "repository.log"));
         //TODO: Roll the log file
         logFOS = new FileOutputStream(logFile, true);
@@ -584,6 +592,10 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     }
 
 
+    public String getFileUploadDirectory() {
+        return uploadDir;
+    }
+
     protected void readGlobals()  throws Exception {
         Statement statement = execute(SqlUtil.makeSelect("*",
                                                          Misc.newList(TABLE_GLOBALS)));
@@ -607,6 +619,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      * @param prefix _more_
      */
     public void addDownloadPrefix(String prefix) {
+        prefix  = prefix.replace("\\", "/");
         downloadPrefixes.add(prefix);
     }
 
@@ -938,7 +951,8 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     }
 
 
-    protected void setUserSession(Request request, User user) throws Exception {
+    protected void setUserSession(Request request, User user) 
+        throws Exception {
         if(request.getSessionId() == null) {
             request.setSessionId (getGUID() + "_"+Math.random());
         }
@@ -946,11 +960,12 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         request.getRequestContext().setUser(user);
     }
 
+
     protected void removeUserSession(Request request) throws Exception {
         if(request.getSessionId() != null) {
             session.remove(request.getSessionId());
-            request.getRequestContext().setUser(getUserManager().getAnonymousUser());
         }
+        request.getRequestContext().setUser(getUserManager().getAnonymousUser());
     }
 
 
@@ -1128,6 +1143,13 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         return result;
     }
 
+    public static void checkFilePath(String path) {
+        if(path.indexOf("..")>=0) {
+            throw new IllegalArgumentException("bad file path:" + path);
+        }
+    }
+
+
     /**
      * _more_
      *
@@ -1149,10 +1171,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
 
         try {
             //Make sure no one is trying to access other files
-            if(path.indexOf("..")>=0) {
-                return new Result("Error",
-                                  new StringBuffer("Unknown request:\"" + path+"\""));
-            }
+            checkFilePath(path);
             InputStream is =
                 IOUtil.getInputStream("/ucar/unidata/repository/htdocs"
                                       + path, getClass());
@@ -2073,11 +2092,11 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         }
         String filePath = entry.getResource().getPath();
         filePath = filePath.replace("\\", "/");
-        if (filePath.indexOf("..") >= 0) {
-            return false;
-        }
+        checkFilePath(filePath);
 
+        System.err.println ("filePath:" + filePath);
         for (String prefix : downloadPrefixes) {
+            System.err.println ("   prefix: " +  prefix);
             if (filePath.startsWith(prefix)) {
                 return true;
             }
@@ -2311,11 +2330,13 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         StringBuffer sb = new StringBuffer();
         sb.append(makeGroupHeader(request, group));
         sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.form(((type == null)
-                                 ? URL_ENTRY_FORM
-                                 : URL_ENTRY_ADD), ""));
-        String title    = "";
+        if(type == null) {
+            sb.append(HtmlUtil.form(URL_ENTRY_FORM,""));
+        } else {
+            sb.append(HtmlUtil.uploadForm(URL_ENTRY_ADD, ""));
+        }
 
+        String title    = "";
 
         if (type == null) {
             sb.append(HtmlUtil.formEntry("Type:",
@@ -2344,13 +2365,6 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             sb.append(HtmlUtil.formEntry("Type:", typeHandler.getLabel()));
 
             String size = " size=\"75\" ";
-            if (typeHandler.okToShowInForm(ARG_RESOURCE)) {
-                sb.append(HtmlUtil.formEntry("Resource:",
-                                             HtmlUtil.input(ARG_RESOURCE,
-                                                 ((entry != null)
-                        ? entry.getResource().getPath()
-                        : ""), size)));
-            }
             sb.append(HtmlUtil.formEntry("Name:",
                                          HtmlUtil.input(ARG_NAME,
                                              ((entry != null)
@@ -2361,6 +2375,19 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                                              ((entry != null)
                     ? entry.getDescription()
                     : ""), 3, 50)));
+
+            if (typeHandler.okToShowInForm(ARG_RESOURCE)) {
+                if(entry == null) {
+                    sb.append(HtmlUtil.formEntry("File:",
+                                                 HtmlUtil.fileInput(ARG_FILE,size)));
+
+                    sb.append(HtmlUtil.formEntry("Or URL:",
+                                                 HtmlUtil.input(ARG_RESOURCE,"",size)));
+                } else {
+                    sb.append(HtmlUtil.formEntry("Resource:",entry.getResource().getPath()));
+                }
+            }
+
             String dateHelp = " (e.g., 2007-12-11 00:00:00)";
             String fromDate = ((entry != null)
                                ? new Date(entry.getStartDate()).toString()
@@ -2609,7 +2636,13 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         if (entry == null) {
             typeHandler =
                 getTypeHandler(request.getType(TypeHandler.TYPE_ANY));
+            //TODO: Check for security hole with the file upload
             String resource  = request.getString(ARG_RESOURCE, "");
+            String filename  = request.getUploadedFile(ARG_FILE);
+            if(filename!=null) {
+                System.err.println ("filename:" + filename);
+                resource = filename;
+            }
             String groupName = request.getString(ARG_GROUP, (String) null);
             if (groupName == null) {
                 throw new IllegalArgumentException(
@@ -4711,7 +4744,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             getConnection().prepareStatement(INSERT_METADATA);
         int col = 1;
         metadataInsert.setString(col++, metadata.getId());
-        metadataInsert.setString(col++, metadata.getMetadataType());
+        metadataInsert.setString(col++, metadata.getType());
         metadataInsert.setString(col++, metadata.getName());
         metadataInsert.setString(col++, metadata.getContent());
         metadataInsert.execute();
