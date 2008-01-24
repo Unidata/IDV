@@ -211,6 +211,10 @@ public class HtmlUtil {
         return "<form action=\"" + url +"\"" + " " + extra +" >";
     }
 
+    public static String uploadForm(Object url, String extra) {
+        return "<form method=\"post\" enctype=\"multipart/form-data\"  action=\"" + url +"\"" + " " + extra +" >";
+    }
+
 
 
     public static String href(Object url, String label) {
@@ -263,6 +267,11 @@ public class HtmlUtil {
 
     public static String input(String name, Object value, String extra) {
         return "<input name=\"" + name +"\" value=\"" + (value==null?"":value.toString()) +"\" " + extra +">";
+    }
+
+
+    public static String fileInput(String name, String extra) {
+        return "<input type=\"file\" name=\"" + name +"\" "   + extra +">";
     }
 
     /**

@@ -32,12 +32,13 @@ import java.lang.*;
 
 import java.net.*;
 
+import java.util.regex.*;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.StringTokenizer;
-
+import org.apache.commons.fileupload.MultipartStream;
 
 /**
  * Class HttpServer. A simple http server.
@@ -167,6 +168,8 @@ public class HttpServer {
         /** crlf */
         public final static String CRLF = "\r\n";
 
+        public final static char LF = '\n';
+
         /** The socket */
         Socket socket;
 
@@ -176,8 +179,6 @@ public class HttpServer {
         /** Output stream */
         OutputStream output;
 
-        /** Reader on input stream */
-        BufferedReader br;
 
         /** Back reference to server */
         protected HttpServer server;
@@ -197,7 +198,7 @@ public class HttpServer {
             this.socket = socket;
             this.input  = socket.getInputStream();
             this.output = socket.getOutputStream();
-            this.br     = new BufferedReader(new InputStreamReader(input));
+            this.input  = new BufferedInputStream(input);
         }
 
         /**
@@ -210,7 +211,6 @@ public class HttpServer {
                 server.handleError("exc:", e);
             }
             try {
-                br.close();
                 socket.close();
                 output.close();
             } catch (Exception e) {
@@ -223,6 +223,14 @@ public class HttpServer {
             System.err.println (msg);
         }
 
+        private String readLine() throws Exception  {
+            StringBuffer sb = new StringBuffer();
+            while(true) {
+                char c = (char)input.read();
+                if(c==-1 || c==LF) return sb.toString().trim();
+                sb.append(c+"");
+            }
+        }
 
         /**
          * Process the request
@@ -232,8 +240,9 @@ public class HttpServer {
         private void processRequest() throws Exception {
             String    firstLine = null;
             Hashtable props     = new Hashtable();
+
             while (true) {
-                String headerLine = br.readLine();
+                String headerLine = readLine();
                 if (headerLine.equals(CRLF) || headerLine.equals("")) {
                     break;
                 }
@@ -257,32 +266,6 @@ public class HttpServer {
             if (firstLine == null) {
                 return;
             }
-            String contentLength = (String) props.get("Content-Length");
-            String contentString = null;
-            char[] content    =null;
-            if (contentLength != null) {
-                content = new char[100000];
-                int    len       = new Integer(contentLength).intValue();
-                char[] buffer    = new char[100000];
-                int    totalRead = 0;
-                while (totalRead < len) {
-                    int howMany = br.read(buffer, 0, buffer.length);
-                    if (howMany < 0) {
-                        break;
-                    }
-                    if (totalRead + howMany > content.length) {
-                        char[] tmp = content;
-                        content = new char[content.length + 100000];
-                        System.arraycopy(tmp, 0, content, 0, totalRead);
-                    }
-                    System.arraycopy(buffer, 0, content, totalRead, howMany);
-                    totalRead += howMany;
-                }
-                char[] tmp = content;
-                content = new char[totalRead];
-                System.arraycopy(tmp, 0, content, 0, totalRead);
-            }
-
             StringTokenizer s           = new StringTokenizer(firstLine);
             String          requestType = s.nextToken();
             Hashtable       args        = new Hashtable();
@@ -291,6 +274,44 @@ public class HttpServer {
             if (toks != null) {
                 path = toks[0];
             }
+
+            String contentType =  (String)props.get("Content-Type");
+
+            if (requestType.equals(TYPE_POST) && 
+                contentType!=null && contentType.trim().startsWith("multipart/form-data")) {
+                parseMultiPartFormData(contentType,props,args);
+                handleRequest(path, args, props,null);
+                return;
+            }
+
+
+            String contentLength = (String) props.get("Content-Length");
+            String contentString = null;
+            byte[] content    =null;
+            if (contentLength != null) {
+                content = new byte[100000];
+                int    len       = new Integer(contentLength).intValue();
+                byte[] buffer    = new byte[100000];
+                int    totalRead = 0;
+                while (totalRead < len) {
+                    int howMany = input.read(buffer, 0, buffer.length);
+                    if (howMany < 0) {
+                        break;
+                    }
+                    if (totalRead + howMany > content.length) {
+                        byte[] tmp = content;
+                        content = new byte[content.length + 100000];
+                        System.arraycopy(tmp, 0, content, 0, totalRead);
+                    }
+                    System.arraycopy(buffer, 0, content, totalRead, howMany);
+                    totalRead += howMany;
+                }
+                byte[] tmp = content;
+                content = new byte[totalRead];
+                System.arraycopy(tmp, 0, content, 0, totalRead);
+            }
+
+
             if(content!=null) {
                 contentString = new String(content, 0, content.length);
             }
@@ -299,24 +320,16 @@ public class HttpServer {
                     parseArgs(toks[1], args);
                 }
             } else if (requestType.equals(TYPE_POST)) {
-                String type =  (String)props.get("Content-Type");
-                System.err.println ("type:" + type);
-                if(type!=null && type.trim().startsWith("multipart/form-data")) {
-                    System.err.println ("type:" + type);
-                    parseMultiPartFormData(type,props,content,args);
-                } else {
-                    if (okToParseContent(path, contentString, args)) {
-                        parseArgs(contentString, args);
-                    }
+                if (okToParseContent(path, contentString, args)) {
+                    parseArgs(contentString, args);
                 }
             } else {
-                System.err.println("TYPE: " + requestType);
+                throw new IllegalArgumentException("unknown type: " + requestType);
             }
             handleRequest(path, args, props, contentString);
         }
 
-        private void parseMultiPartFormData(String type,Hashtable props, char[]content,Hashtable args) {
-            System.err.println ("type:\n" + type);
+        private void parseMultiPartFormData(String type,Hashtable props, Hashtable args) {
             String boundary = null;
             List<String> toks = StringUtil.split(type,";",true,true);
             for(String tok: toks) {
@@ -331,25 +344,66 @@ public class HttpServer {
                     }
                 }
             }
-            if(boundary==null) throw new IllegalArgumentException("Could not find mime boundary in:" + type);
+            if(boundary==null) throw new IllegalArgumentException("Could not find multipart boundary in:" + type);
             //??
-            boundary = "--" + boundary;
-            System.err.println ("boundary:\n" + boundary);
-            String s = new String(content);
-            System.err.println ("multipart:\n" + s);
-            int currentIdx=0;
-            List<String> contentToks = StringUtil.split(s,boundary);
-            System.err.println ("\nTOKS:");
-            int cnt = 0;
-            for(String tok: contentToks) {
-                //Skip the first newline
-                if(cnt++==0) continue;
-                if(tok.equals("--")) break;
-                System.err.println("CONTENT:\n"+tok);
+            try {
+                MultipartStream multipartStream  = new MultipartStream(input, boundary.getBytes(),1000000);
+                boolean nextPart = multipartStream.skipPreamble();
+                int cnt = 1;
+
+                Pattern namePattern = Pattern.compile("[\\s;:]+name\\s*=\\s*\"([^\"]+)\"");
+                Pattern filenamePattern = Pattern.compile("[\\s;:]+filename\\s*=\\s*\"([^\"]+)\"");
+
+                while(nextPart) {
+                    String  header = multipartStream.readHeaders();
+                    List lineToks = StringUtil.split(header,"\n",true,true);
+                    String attrName = null;
+                    String filename = null;
+                    for(int i=0;i<lineToks.size();i++) {
+                        String line = (String) lineToks.get(i);
+                        int index = line.indexOf(":");
+                        if (index < 0) {
+                            continue;
+                        }
+                        String propName  = line.substring(0, index).trim();
+                        String propValue = line.substring(index + 1).trim(); 
+                        if(propName.equals("Content-Disposition")) {
+                            Matcher nameMatcher = namePattern.matcher(propValue);
+                            Matcher filenameMatcher = filenamePattern.matcher(propValue);
+                            if(nameMatcher.find()) {
+                                attrName =  nameMatcher.group(1);
+                            }
+                            if(filenameMatcher.find()) {
+                                filename= filenameMatcher.group(1);
+                            }
+                        }
+                        if(attrName == null) {
+                            throw new IllegalArgumentException("Could not find name attribute in multipart");
+                        }
+                    }
+                    if(filename!=null) {
+                        handleFileUpload(attrName, filename, props, args, multipartStream);
+                    } else {
+                        ByteArrayOutputStream output=new ByteArrayOutputStream();
+                        multipartStream.readBodyData(output);
+                        String value = new String(output.toByteArray());
+                        args.put(attrName,value);
+                    }
+                    if(!multipartStream.readBoundary()) break;
+                }
+            } catch(Exception exc) {
+                exc.printStackTrace();
             }
         }
 
+
+        protected void handleFileUpload(String attrName, String filename,Hashtable props, Hashtable args, MultipartStream multipartStream) throws Exception {
+            throw new IllegalArgumentException("handleFileUpload not implemented");
+        }
+
+
         /**
+
          * _more_
          *
          * @param path _more_
@@ -406,7 +460,6 @@ public class HttpServer {
                 sb.append(key + "=" + formArgs.get(key) + "<p>\n");
             }
             sb.append("</html>");
-
 
             writeResult(true, sb.toString(), "text/html");
         }
