@@ -67,8 +67,9 @@ public class ApiMethod {
     /** _more_ */
     private boolean isTopLevel = false;
 
-    /** _more_ */
-    private Permission permission;
+     /** _more_ */
+    private boolean mustBeAdmin = true;
+
 
     /** _more_ */
     private RequestHandler requestHandler;
@@ -86,22 +87,45 @@ public class ApiMethod {
      * @param requestHandler _more_
      * @param request _more_
      * @param name _more_
-     * @param permission _more_
      * @param method _more_
      * @param canCache _more_
      * @param isTopLevel _more_
      */
     public ApiMethod(RequestHandler requestHandler, String request,
-                     String name, Permission permission, Method method,
+                     String name,  Method method,
+                     boolean mustBeAdmin,
                      boolean canCache, boolean isTopLevel) {
         this.requestHandler = requestHandler;
         this.request        = request;
         this.name           = name;
-        this.permission     = permission;
+        this.mustBeAdmin    = mustBeAdmin;
         this.method         = method;
         this.canCache       = canCache;
         this.isTopLevel     = isTopLevel;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param repository _more_
+     *
+     * @return _more_
+     */
+    public boolean isRequestOk(Request request, Repository repository) {
+        RequestContext context = request.getRequestContext();
+        if (mustBeAdmin) {
+            User user = context.getUser();
+            if ((user == null) || !user.getAdmin()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+
 
     /**
      * _more_
@@ -145,23 +169,6 @@ public class ApiMethod {
         return request;
     }
 
-    /**
-     * Set the Permission property.
-     *
-     * @param value The new value for Permission
-     */
-    public void setPermission(Permission value) {
-        permission = value;
-    }
-
-    /**
-     * Get the Permission property.
-     *
-     * @return The Permission
-     */
-    public Permission getPermission() {
-        return permission;
-    }
 
     /**
      * Set the Method property.
@@ -237,6 +244,24 @@ public class ApiMethod {
      */
     public boolean getIsTopLevel() {
         return isTopLevel;
+    }
+
+    /**
+     * Set the MustBeAdmin property.
+     *
+     * @param value The new value for MustBeAdmin
+     */
+    public void setMustBeAdmin(boolean value) {
+        mustBeAdmin = value;
+    }
+
+    /**
+     * Get the MustBeAdmin property.
+     *
+     * @return The MustBeAdmin
+     */
+    public boolean getMustBeAdmin() {
+        return mustBeAdmin;
     }
 
 

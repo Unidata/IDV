@@ -55,6 +55,8 @@ public class Entity {
 
     List<Comment> comments;
 
+    List<Permission> permissions;
+
     /** _more_ */
     List<Association> associations = new ArrayList<Association>();
 
@@ -389,7 +391,6 @@ public class Entity {
         return comments;
     }
 
-
     /**
      * _more_
      *
@@ -400,6 +401,42 @@ public class Entity {
             comments = new ArrayList<Comment>();
         }
         comments.add(value);
+
+    }
+
+
+
+    /**
+     * Set the Permissions property.
+     *
+     * @param value The new value for Permissions
+     */
+    public void setPermissions(List<Permission> value) {
+        permissions = value;
+    }
+
+    /**
+     * Get the Permissions property.
+     *
+     * @return The Permissions
+     */
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
+    public void addPermission(Permission value) {
+        if (permissions == null) {
+            permissions = new ArrayList<Permission>();
+        }
+        permissions.add(value);
 
     }
 

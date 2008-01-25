@@ -77,79 +77,61 @@ import java.util.regex.*;
  * @version $Revision: 1.3 $
  */
 public class Permission {
+    public static final String ACTION_VIEW = "action.view";
+    public static final String ACTION_EDIT = "action.edit";
+    public static final String ACTION_NEW = "action.new";
+    public static final String ACTION_DELETE = "action.delete";
 
-    /** _more_ */
-    private boolean mustBeAdmin = true;
 
-    /** _more_ */
-    private List<String> onlyTheseIps;
+    String action;
 
-    /**
-     * _more_
-     */
-    public Permission() {
-        this(true, null);
-    }
+    List<String> roles;
 
     /**
      * _more_
-     *
-     * @param mustBeAdmin _more_
      */
-    public Permission(boolean mustBeAdmin) {
-        this(mustBeAdmin, null);
-    }
-
-    /**
-     * _more_
-     *
-     * @param mustBeAdmin _more_
-     * @param onlyTheseIps _more_
-     */
-    public Permission(boolean mustBeAdmin, List<String> onlyTheseIps) {
-        this.mustBeAdmin  = mustBeAdmin;
-        this.onlyTheseIps = onlyTheseIps;
+    public Permission(String action, List<String> roles) {
+        this.action = action;
+        this.roles = roles;
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param repository _more_
-     *
-     * @return _more_
-     */
-    public boolean isRequestOk(Request request, Repository repository) {
-        RequestContext context = request.getRequestContext();
-        if (mustBeAdmin) {
-            User user = context.getUser();
-            if ((user == null) || !user.getAdmin()) {
-                return false;
-            }
-        }
-        return true;
-    }
 
-    /**
-     * Set the MustBeAdmin property.
-     *
-     * @param value The new value for MustBeAdmin
-     */
-    public void setMustBeAdmin(boolean value) {
-        mustBeAdmin = value;
-    }
+/**
+Set the Action property.
 
-    /**
-     * Get the MustBeAdmin property.
-     *
-     * @return The MustBeAdmin
-     */
-    public boolean getMustBeAdmin() {
-        return mustBeAdmin;
-    }
+@param value The new value for Action
+**/
+public void setAction (String value) {
+	action = value;
+}
 
+/**
+Get the Action property.
 
+@return The Action
+**/
+public String getAction () {
+	return action;
+}
+
+/**
+Set the Roles property.
+
+@param value The new value for Roles
+**/
+public void setRoles (List<String> value) {
+	roles = value;
+}
+
+/**
+Get the Roles property.
+
+@return The Roles
+**/
+public List<String> getRoles () {
+	return roles;
+}
 
 }
 

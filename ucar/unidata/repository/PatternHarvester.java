@@ -466,8 +466,9 @@ public class PatternHarvester extends Harvester {
                     }
                     entries = new ArrayList();
                 }
-
-
+                if ( !getActive()) {
+                    return;
+                }
             }
         }
         repository.processEntries(this, typeHandler, entries);

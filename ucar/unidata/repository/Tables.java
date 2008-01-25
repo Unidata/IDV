@@ -212,6 +212,25 @@ public interface Tables {
 
 
 
+    public static final String TABLE_PERMISSIONS = "permissions";
+    public static final String COL_PERMISSIONS_ENTRY_ID = TABLE_PERMISSIONS + ".entry_id";
+    public static final String COL_PERMISSIONS_ACTION = TABLE_PERMISSIONS + ".action";
+    public static final String COL_PERMISSIONS_ROLE = TABLE_PERMISSIONS + ".role";
+    public static final String []ARRAY_PERMISSIONS = new String[]{COL_PERMISSIONS_ENTRY_ID,
+                                                                  COL_PERMISSIONS_ACTION,
+                                                                  COL_PERMISSIONS_ROLE};
+
+
+
+    public static final String COLUMNS_PERMISSIONS = SqlUtil.comma(ARRAY_PERMISSIONS);
+    public static final String INSERT_PERMISSIONS =
+        SqlUtil.makeInsert(
+            TABLE_PERMISSIONS,
+            COLUMNS_PERMISSIONS, 
+            SqlUtil.getQuestionMarks(ARRAY_PERMISSIONS.length));
+
+
+
 
 
     public static final String TABLE_METADATA = "metadata";

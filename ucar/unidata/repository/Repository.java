@@ -797,7 +797,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         boolean admin = XmlUtil.getAttribute(node, ApiMethod.ATTR_ADMIN,
                                              true);
 
-        Permission     permission = new Permission(admin);
+
 
         RequestHandler handler    = this;
         if (XmlUtil.hasAttribute(node, ApiMethod.ATTR_HANDLER)) {
@@ -837,7 +837,8 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                                   handler, request,
                                   XmlUtil.getAttribute(
                                       node, ApiMethod.ATTR_NAME,
-                                      request), permission, method,
+                                      request),  method,
+                                  admin,
                                           XmlUtil.getAttribute(
                                               node, ApiMethod.ATTR_CANCACHE,
                                               false), XmlUtil.getAttribute(
@@ -954,7 +955,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     protected void setUserSession(Request request, User user) 
         throws Exception {
         if(request.getSessionId() == null) {
-            request.setSessionId (getGUID() + "_"+Math.random());
+            request.setSessionId (getGUID());
         }
         session.put(request.getSessionId(), user);
         request.getRequestContext().setUser(user);
@@ -1097,7 +1098,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
 
         if ( !getUserManager().isRequestOk(request)
                 || ((apiMethod != null)
-                    && !apiMethod.getPermission().isRequestOk(request,
+                    && !apiMethod.isRequestOk(request,
                         this))) {
             StringBuffer sb = new StringBuffer();
             sb.append("You do not have the correct access<p>");
@@ -1493,7 +1494,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     protected String getGUID() {
         synchronized (MUTEX_KEY) {
             int key = keyCnt++;
-            return baseTime + "_" + key;
+            return baseTime + "_" + Math.random() +"_"+key ;
         }
     }
 
@@ -1957,7 +1958,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         }
 
         for (ApiMethod apiMethod : topLevelMethods) {
-            if (apiMethod.getPermission().getMustBeAdmin() && !isAdmin) {
+            if (apiMethod.getMustBeAdmin() && !isAdmin) {
                 continue;
             }
             links.add(HtmlUtil.href(fileUrl(apiMethod.getRequest()),
@@ -2094,9 +2095,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         filePath = filePath.replace("\\", "/");
         checkFilePath(filePath);
 
-        System.err.println ("filePath:" + filePath);
         for (String prefix : downloadPrefixes) {
-            System.err.println ("   prefix: " +  prefix);
             if (filePath.startsWith(prefix)) {
                 return true;
             }
@@ -4523,6 +4522,44 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         }
         entry.setComments(comments);
         return comments;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entryId _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List<Permission> getPermissions(Request request,
+                                              Entry entry) 
+        throws Exception {
+        if(entry.getPermissions()!=null) return entry.getPermissions();
+        String query = SqlUtil.makeSelect(
+                           COLUMNS_PERMISSIONS,
+                           Misc.newList(TABLE_PERMISSIONS),
+                           SqlUtil.eq(
+                               COL_PERMISSIONS_ENTRY_ID,
+                               SqlUtil.quote(entry.getId())));
+
+        List<Permission> permissions = new ArrayList();
+        SqlUtil.Iterator  iter         = SqlUtil.getIterator(execute(query));
+        ResultSet         results;
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                /***                permissions.add(new Permission(results.getString(1),entry,
+                                         getUserManager().findUser(results.getString(3),true),
+                                         new Date(results.getTimestamp(4 , Repository.calendar ).getTime()),
+                                         results.getString(5),
+                                         results.getString(6)));***/
+            }
+        }
+        entry.setPermissions(permissions);
+        return permissions;
     }
 
 
