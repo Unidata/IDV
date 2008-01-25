@@ -5425,13 +5425,20 @@ public String getLegendState () {
             rightPanel = animationWidget.getContents();
         }
 
-        JMenuBar menuBar = doMakeMenuBar();
+        JComponent menuBar = doMakeMenuBar();
         JComponent cancelBtn1 =
             GuiUtils.makeImageButton("/auxdata/ui/icons/cancel.gif", this,
                                      "resetFullScreen");
         JComponent cancelBtn2 =
             GuiUtils.makeImageButton("/auxdata/ui/icons/cancel.gif", this,
                                      "resetFullScreen");
+        //If they set the width to be smallish then don't include the
+        //animation and the menu bar
+        if(theSize.width<300) {
+            rightPanel = new JPanel();
+            menuBar = new JPanel();
+        }
+
         JPanel top =
             GuiUtils.leftRight(GuiUtils.hbox(GuiUtils.bottom(cancelBtn1),
                                              menuBar), rightPanel);
