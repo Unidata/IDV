@@ -220,6 +220,8 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
     /** _more_ */
     private Connection theConnection;
 
+    private    String db;
+
     /** _more_ */
     private Hashtable typeHandlersMap = new Hashtable();
 
@@ -713,7 +715,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
      * @throws Exception _more_
      */
     protected Connection makeConnection() throws Exception {
-        String db = (String) properties.get(PROP_DB);
+        db = (String) properties.get(PROP_DB);
         if (db == null) {
             throw new IllegalStateException("Must have a " + PROP_DB
                                             + " property defined");
@@ -748,6 +750,17 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
             Statement statement = connection.createStatement();
             statement.execute("set time_zone = '+0:00'");
         }
+    }
+
+
+    protected String convertSql(String sql, String db) {
+        if(db.equals("mysql")) {
+            sql = sql.replace("float8","double");
+
+        } else  if(db.equals("derby")) {
+            sql = sql.replace("float8","double");
+        }
+        return sql;
     }
 
 
@@ -1315,6 +1328,7 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
         String sql = IOUtil.readContents(getProperty(PROP_DB_SCRIPT),
                                          getClass());
         Statement statement = getConnection().createStatement();
+        sql = convertSql(sql,db);
         SqlUtil.loadSql(sql, statement, true);
 
         for (String file : typeDefinitionFiles) {
@@ -4215,11 +4229,19 @@ public class Repository implements Constants, Tables, RequestHandler, Repository
                 pstmt.setTimestamp(
                     i + 1,
                     new java.sql.Timestamp(((Date) values[i]).getTime()), calendar);
+            } else if (values[i] instanceof Boolean) {
+                boolean b= ((Boolean)values[i]).booleanValue();
+                pstmt.setInt(i+1, (b?1:0));
             } else {
                 pstmt.setObject(i + 1, values[i]);
             }
         }
-        pstmt.execute();
+        try {
+            pstmt.execute();
+        } catch(Exception exc) {
+            System.err.println("Error:" + insert);
+            throw exc;
+        }
     }
 
 

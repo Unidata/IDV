@@ -137,7 +137,7 @@ public interface Tables {
     };
 
 
-    public static final String COLUMNS_ENTRIES = SqlUtil.comma(ARRAY_ENTRIES);
+    public static final String COLUMNS_ENTRIES = SqlUtil.commaNoDot(ARRAY_ENTRIES);
     public static final String INSERT_ENTRIES =
         SqlUtil.makeInsert(
             TABLE_ENTRIES,
@@ -160,7 +160,7 @@ public interface Tables {
     public static final String []ARRAY_GLOBALS = new String[]{COL_GLOBALS_NAME,
                                                               COL_GLOBALS_VALUE};
 
-    public static final String COLUMNS_GLOBALS = SqlUtil.comma(ARRAY_GLOBALS);
+    public static final String COLUMNS_GLOBALS = SqlUtil.commaNoDot(ARRAY_GLOBALS);
     public static final String INSERT_GLOBALS =
         SqlUtil.makeInsert(
             TABLE_GLOBALS,
@@ -185,7 +185,7 @@ public interface Tables {
                                                           COL_USERS_PASSWORD,
                                                           COL_USERS_ADMIN};
 
-    public static final String COLUMNS_USERS = SqlUtil.comma(ARRAY_USERS);
+    public static final String COLUMNS_USERS = SqlUtil.commaNoDot(ARRAY_USERS);
     public static final String INSERT_USERS =
         SqlUtil.makeInsert(
             TABLE_USERS,
@@ -203,7 +203,7 @@ public interface Tables {
                                                                 COL_USERROLES_ROLE};
 
 
-    public static final String COLUMNS_USERROLES = SqlUtil.comma(ARRAY_USERROLES);
+    public static final String COLUMNS_USERROLES = SqlUtil.commaNoDot(ARRAY_USERROLES);
     public static final String INSERT_USERROLES =
         SqlUtil.makeInsert(
             TABLE_USERROLES,
@@ -222,7 +222,7 @@ public interface Tables {
 
 
 
-    public static final String COLUMNS_PERMISSIONS = SqlUtil.comma(ARRAY_PERMISSIONS);
+    public static final String COLUMNS_PERMISSIONS = SqlUtil.commaNoDot(ARRAY_PERMISSIONS);
     public static final String INSERT_PERMISSIONS =
         SqlUtil.makeInsert(
             TABLE_PERMISSIONS,
@@ -243,7 +243,7 @@ public interface Tables {
                                                                COL_METADATA_NAME,
                                                                COL_METADATA_CONTENT};
 
-    public static final String COLUMNS_METADATA = SqlUtil.comma(ARRAY_METADATA);
+    public static final String COLUMNS_METADATA = SqlUtil.commaNoDot(ARRAY_METADATA);
     public static final String INSERT_METADATA =
         SqlUtil.makeInsert(
             TABLE_METADATA,
@@ -256,7 +256,7 @@ public interface Tables {
     public static final String COL_TAGS_NAME = TABLE_TAGS + ".name";
     public static final String COL_TAGS_ENTRY_ID= TABLE_TAGS + ".entry_id";
     public static final String []ARRAY_TAGS =  new String[]{COL_TAGS_NAME,COL_TAGS_ENTRY_ID};
-    public static final String COLUMNS_TAGS = SqlUtil.comma(ARRAY_TAGS);
+    public static final String COLUMNS_TAGS = SqlUtil.commaNoDot(ARRAY_TAGS);
     
     public static final String INSERT_TAGS =
         SqlUtil.makeInsert(TABLE_TAGS,
@@ -270,7 +270,7 @@ public interface Tables {
     public static final String COL_ASSOCIATIONS_FROM_ENTRY_ID= TABLE_ASSOCIATIONS + ".from_entry_id";
     public static final String COL_ASSOCIATIONS_TO_ENTRY_ID= TABLE_ASSOCIATIONS + ".to_entry_id";
     public static final String []ARRAY_ASSOCIATIONS =  new String[]{COL_ASSOCIATIONS_NAME,COL_ASSOCIATIONS_FROM_ENTRY_ID,COL_ASSOCIATIONS_TO_ENTRY_ID};
-    public static final String COLUMNS_ASSOCIATIONS = SqlUtil.comma(ARRAY_ASSOCIATIONS);
+    public static final String COLUMNS_ASSOCIATIONS = SqlUtil.commaNoDot(ARRAY_ASSOCIATIONS);
     
     public static final String INSERT_ASSOCIATIONS =
         SqlUtil.makeInsert(TABLE_ASSOCIATIONS,
@@ -295,7 +295,7 @@ public interface Tables {
                                                                 COL_COMMENTS_SUBJECT,
                                                                 COL_COMMENTS_COMMENT};
 
-    public static final String COLUMNS_COMMENTS = SqlUtil.comma(ARRAY_COMMENTS);
+    public static final String COLUMNS_COMMENTS = SqlUtil.commaNoDot(ARRAY_COMMENTS);
     
     public static final String INSERT_COMMENTS =
         SqlUtil.makeInsert(TABLE_COMMENTS,

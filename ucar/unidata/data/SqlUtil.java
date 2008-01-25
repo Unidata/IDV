@@ -166,6 +166,17 @@ public class SqlUtil {
         return StringUtil.join(",",s);
     }
 
+    public static String commaNoDot(String[]s) {
+        List l = new ArrayList();
+        for(int i=0;i<s.length;i++) {
+            String col = s[i];
+            int idx = col.indexOf(".");
+            if(idx>=0) col = col.substring(idx+1);
+            l.add(col);
+        }
+        return StringUtil.join(",",l);
+    }
+
     public static String comma(List s) {
         return StringUtil.join(",",s);
     }

@@ -24,10 +24,10 @@ CREATE TABLE entries (id varchar(200),
 	           createdate timestamp, 
 	           fromdate timestamp, 
 	           todate timestamp,
-	           south double,
-	           north double,
-	           east double,
-	           west double); 
+	           south float8,
+	           north float8,
+	           east float8,
+	           west float8); 
 
 CREATE INDEX ENTRIES_INDEX_ID ON entries (ID);
 CREATE INDEX ENTRIES_INDEX_RESOURCE ON entries (RESOURCE);
@@ -44,7 +44,6 @@ CREATE TABLE  metadata (id varchar(200),
                         content varchar(10000));
 
 CREATE INDEX METADATA_INDEX_ID ON metadata (ID);
-CREATE INDEX METADATA_INDEX_ID_TYPE ON metadata (ID_TYPE);
 CREATE INDEX METADATA_INDEX_TYPE ON metadata (TYPE);
 	
 
