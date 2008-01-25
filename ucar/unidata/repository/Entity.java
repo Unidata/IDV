@@ -22,6 +22,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -47,14 +54,16 @@ import java.util.List;
  */
 public class Entity {
 
-    /** _more_          */
+    /** _more_ */
     static Hashtable ids = new Hashtable();
 
     /** _more_ */
     List<String> tags;
 
+    /** _more_ */
     List<Comment> comments;
 
+    /** _more_ */
     List<Permission> permissions;
 
     /** _more_ */
@@ -98,14 +107,10 @@ public class Entity {
      *
      *
      * @param id _more_
-     * @param typeHandler _more_
      * @param name _more_
      * @param description _more_
-     * @param group _more_
      * @param parentGroup _more_
      * @param user _more_
-     * @param resource _more_
-     * @param date _more_
      * @param createDate _more_
      */
     public Entity(String id, String name, String description,
@@ -139,6 +144,13 @@ public class Entity {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param o _more_
+     *
+     * @return _more_
+     */
     public boolean equals(Object o) {
         if ( !o.getClass().equals(getClass())) {
             return false;

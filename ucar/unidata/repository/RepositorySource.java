@@ -22,6 +22,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -96,6 +103,11 @@ import java.util.Properties;
  */
 public interface RepositorySource {
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Repository getRepository();
 
 }

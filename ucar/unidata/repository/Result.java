@@ -20,14 +20,22 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
 import java.io.InputStream;
 
+import java.util.ArrayList;
+
 
 import java.util.Hashtable;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -75,6 +83,7 @@ public class Result {
     /** _more_ */
     private boolean requestOk = true;
 
+    /** _more_ */
     private List<String> httpHeaderArgs;
 
 
@@ -371,8 +380,14 @@ public class Result {
         return requestOk;
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     */
     public void addHttpHeader(String name, String value) {
-        if(httpHeaderArgs==null) {
+        if (httpHeaderArgs == null) {
             httpHeaderArgs = new ArrayList<String>();
         }
         httpHeaderArgs.add(name);
@@ -380,27 +395,33 @@ public class Result {
     }
 
 
-/**
-Set the HttpHeaderArgs property.
+    /**
+     * Set the HttpHeaderArgs property.
+     *
+     * @param value The new value for HttpHeaderArgs
+     */
+    public void setHttpHeaderArgs(List<String> value) {
+        httpHeaderArgs = value;
+    }
 
-@param value The new value for HttpHeaderArgs
-**/
-public void setHttpHeaderArgs (List<String> value) {
-	httpHeaderArgs = value;
-}
-
-/**
-Get the HttpHeaderArgs property.
-
-@return The HttpHeaderArgs
-**/
-public List<String> getHttpHeaderArgs () {
-	return httpHeaderArgs;
-}
+    /**
+     * Get the HttpHeaderArgs property.
+     *
+     * @return The HttpHeaderArgs
+     */
+    public List<String> getHttpHeaderArgs() {
+        return httpHeaderArgs;
+    }
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     */
     public void addCookie(String name, String value) {
-        addHttpHeader("Set-Cookie",name+"="+value);
+        addHttpHeader("Set-Cookie", name + "=" + value);
     }
 
 

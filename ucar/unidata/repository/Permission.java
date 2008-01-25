@@ -22,6 +22,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -77,61 +84,74 @@ import java.util.regex.*;
  * @version $Revision: 1.3 $
  */
 public class Permission {
+
+    /** _more_ */
     public static final String ACTION_VIEW = "action.view";
+
+    /** _more_ */
     public static final String ACTION_EDIT = "action.edit";
+
+    /** _more_ */
     public static final String ACTION_NEW = "action.new";
+
+    /** _more_ */
     public static final String ACTION_DELETE = "action.delete";
 
 
+    /** _more_ */
     String action;
 
+    /** _more_ */
     List<String> roles;
 
     /**
      * _more_
+     *
+     * @param action _more_
+     * @param roles _more_
      */
     public Permission(String action, List<String> roles) {
         this.action = action;
-        this.roles = roles;
+        this.roles  = roles;
     }
 
 
 
-/**
-Set the Action property.
+    /**
+     * Set the Action property.
+     *
+     * @param value The new value for Action
+     */
+    public void setAction(String value) {
+        action = value;
+    }
 
-@param value The new value for Action
-**/
-public void setAction (String value) {
-	action = value;
-}
+    /**
+     * Get the Action property.
+     *
+     * @return The Action
+     */
+    public String getAction() {
+        return action;
+    }
 
-/**
-Get the Action property.
+    /**
+     * Set the Roles property.
+     *
+     * @param value The new value for Roles
+     */
+    public void setRoles(List<String> value) {
+        roles = value;
+    }
 
-@return The Action
-**/
-public String getAction () {
-	return action;
-}
-
-/**
-Set the Roles property.
-
-@param value The new value for Roles
-**/
-public void setRoles (List<String> value) {
-	roles = value;
-}
-
-/**
-Get the Roles property.
-
-@return The Roles
-**/
-public List<String> getRoles () {
-	return roles;
-}
+    /**
+     * Get the Roles property.
+     *
+     * @return The Roles
+     */
+    public List<String> getRoles() {
+        return roles;
+    }
 
 }
 

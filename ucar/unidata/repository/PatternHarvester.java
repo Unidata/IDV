@@ -22,6 +22,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -102,7 +109,7 @@ public class PatternHarvester extends Harvester {
     /** _more_ */
     private String groupTemplate;
 
-    /** _more_          */
+    /** _more_ */
     private String tagTemplate = "";
 
     /** _more_ */
@@ -141,10 +148,12 @@ public class PatternHarvester extends Harvester {
     private String baseGroupName;
 
 
+    /** _more_ */
     private List<FileInfo> dirs;
 
 
-    private Hashtable dirMap = new Hashtable(); 
+    /** _more_ */
+    private Hashtable dirMap = new Hashtable();
 
 
     /**
@@ -217,20 +226,39 @@ public class PatternHarvester extends Harvester {
         return "Directory:" + rootDir + "";
     }
 
+    /**
+     * _more_
+     *
+     * @param dir _more_
+     */
     private void removeDir(FileInfo dir) {
         dirs.remove(dir);
         dirMap.remove(dir.getFile());
     }
 
+    /**
+     * _more_
+     *
+     * @param dir _more_
+     *
+     * @return _more_
+     */
     private FileInfo addDir(File dir) {
-        FileInfo fileInfo = new  FileInfo(dir, true);
+        FileInfo fileInfo = new FileInfo(dir, true);
         dirs.add(fileInfo);
-        dirMap.put(dir,dir);
+        dirMap.put(dir, dir);
         return fileInfo;
     }
 
+    /**
+     * _more_
+     *
+     * @param dir _more_
+     *
+     * @return _more_
+     */
     private boolean hasDir(File dir) {
-        return dirMap.get(dir)!=null;
+        return dirMap.get(dir) != null;
     }
 
 
@@ -243,21 +271,20 @@ public class PatternHarvester extends Harvester {
         if ( !getActive()) {
             return;
         }
-        long           tt1  = System.currentTimeMillis();
+        long tt1 = System.currentTimeMillis();
         dirs = FileInfo.collectDirs(rootDir);
-        long           tt2  = System.currentTimeMillis();
+        long tt2 = System.currentTimeMillis();
         System.err.println("took:" + (tt2 - tt1) + " to find initial dirs:"
                            + dirs.size());
 
-        for(FileInfo dir: dirs) {
-            dirMap.put(dir.getFile(),dir);
+        for (FileInfo dir : dirs) {
+            dirMap.put(dir.getFile(), dir);
         }
 
         int cnt = 0;
         while (getActive()) {
             long t1 = System.currentTimeMillis();
-            collectEntries(rootDir,  (cnt == 0), baseGroupName,
-                           typeHandler);
+            collectEntries(rootDir, (cnt == 0), baseGroupName, typeHandler);
             long t2 = System.currentTimeMillis();
             cnt++;
             //            System.err.println("found:" + entries.size() + " files in:"
@@ -291,30 +318,26 @@ public class PatternHarvester extends Harvester {
      * _more_
      *
      * @param rootDir _more_
-     * @param dirs _more_
      * @param firstTime _more_
      * @param rootGroup _more_
      * @param typeHandler _more_
      *
-     * @return _more_
      *
      * @throws Exception _more_
      */
-    public void collectEntries(File rootDir, 
-                               boolean firstTime, String rootGroup,
-                               TypeHandler typeHandler)
+    public void collectEntries(File rootDir, boolean firstTime,
+                               String rootGroup, TypeHandler typeHandler)
             throws Exception {
 
-        long         t1         = System.currentTimeMillis();
-        List<Entry>  entries    = new ArrayList();
-        final User   user       =
-            repository.getUserManager().getDefaultUser();
-        final String rootStr    = rootDir.toString();
-        final int    rootStrLen = rootStr.length();
-        List<FileInfo> tmpDirs = new ArrayList<FileInfo>(dirs);
-        for (int dirIdx=0;dirIdx<tmpDirs.size();dirIdx++) {
+        long           t1         = System.currentTimeMillis();
+        List<Entry>    entries    = new ArrayList();
+        final User     user = repository.getUserManager().getDefaultUser();
+        final String   rootStr    = rootDir.toString();
+        final int      rootStrLen = rootStr.length();
+        List<FileInfo> tmpDirs    = new ArrayList<FileInfo>(dirs);
+        for (int dirIdx = 0; dirIdx < tmpDirs.size(); dirIdx++) {
             FileInfo fileInfo = tmpDirs.get(dirIdx);
-            if(!fileInfo.exists()) {
+            if ( !fileInfo.exists()) {
                 removeDir(fileInfo);
                 continue;
             }
@@ -322,22 +345,24 @@ public class PatternHarvester extends Harvester {
                 continue;
             }
             File[] files = fileInfo.getFile().listFiles();
-            if(files==null) continue;
+            if (files == null) {
+                continue;
+            }
             for (int fileIdx = 0; fileIdx < files.length; fileIdx++) {
                 File f = files[fileIdx];
                 if (f.isDirectory()) {
                     //If this is a directory then check if we already have it 
                     //in the list. If not then add it to the main list and the local list
-                    if(!hasDir(f)) {
+                    if ( !hasDir(f)) {
                         FileInfo newFileInfo = addDir(f);
                         tmpDirs.add(newFileInfo);
                     }
                     continue;
                 }
                 //check if its a hidden file
-                if(f.getName().startsWith(".")) {
+                if (f.getName().startsWith(".")) {
                     continue;
-                    
+
                 }
                 String fileName = f.toString();
                 fileName = fileName.replace("\\", "/");
@@ -432,17 +457,18 @@ public class PatternHarvester extends Harvester {
                 groupName = groupName.replace("${dirgroup}", dirGroup);
 
                 groupName = groupName.replace("${fromDate}",
-                                              Repository.fmt(fromDate));
-                groupName = groupName.replace("${toDate}", Repository.fmt(toDate));
+                        Repository.fmt(fromDate));
+                groupName = groupName.replace("${toDate}",
+                        Repository.fmt(toDate));
 
-                name      = name.replace("${filename}", f.getName());
-                name      = name.replace("${fromDate}",Repository.fmt(fromDate));
+                name = name.replace("${filename}", f.getName());
+                name = name.replace("${fromDate}", Repository.fmt(fromDate));
 
-                name      = name.replace("${toDate}",  Repository.fmt(toDate));
+                name = name.replace("${toDate}", Repository.fmt(toDate));
 
-                desc      = desc.replace("${fromDate}", Repository.fmt( fromDate));
-                desc      = desc.replace("${toDate}",  Repository.fmt(toDate));
-                desc      = desc.replace("${name}", name);
+                desc = desc.replace("${fromDate}", Repository.fmt(fromDate));
+                desc = desc.replace("${toDate}", Repository.fmt(toDate));
+                desc = desc.replace("${name}", name);
 
 
 

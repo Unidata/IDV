@@ -22,13 +22,20 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
 import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 
 import java.util.Date;
 import java.util.List;
@@ -49,24 +56,25 @@ public class User {
     /** _more_ */
     private String name = "";
 
-    /** _more_          */
+    /** _more_ */
     private String email = "";
 
-    /** _more_          */
+    /** _more_ */
     private String question = "";
 
-    /** _more_          */
+    /** _more_ */
     private String answer = "";
 
-    /** _more_          */
+    /** _more_ */
     private String password = "";
 
     /** _more_ */
     private boolean admin = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean anonymous = false;
 
+    /** _more_ */
     private List<String> roles;
 
     /**
@@ -82,7 +90,6 @@ public class User {
      * _more_
      *
      * @param id _more_
-     * @param name _more_
      * @param admin _more_
      */
     public User(String id, boolean admin) {
@@ -91,6 +98,13 @@ public class User {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param name _more_
+     * @param admin _more_
+     */
     public User(String id, String name, boolean admin) {
         this(id, admin);
         this.name = name;
@@ -335,26 +349,35 @@ public class User {
     }
 
     /**
-       Set the Roles property.
-
-       @param value The new value for Roles
-    **/
-    public void setRoles (List<String> value) {
-	roles = value;
+     *  Set the Roles property.
+     *
+     *  @param value The new value for Roles
+     */
+    public void setRoles(List<String> value) {
+        roles = value;
     }
 
     /**
-       Get the Roles property.
-
-       @return The Roles
-    **/
-    public List<String> getRoles () {
-	return roles;
+     *  Get the Roles property.
+     *
+     *  @return The Roles
+     */
+    public List<String> getRoles() {
+        return roles;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param delimiter _more_
+     *
+     * @return _more_
+     */
     public String getRolesAsString(String delimiter) {
-        if(roles == null) return "";
+        if (roles == null) {
+            return "";
+        }
         return StringUtil.join(delimiter, roles);
     }
 

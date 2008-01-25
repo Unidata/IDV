@@ -23,6 +23,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -225,13 +232,13 @@ public class CatalogHarvester extends Harvester {
 
             TypeHandler typeHandler =
                 repository.getTypeHandler(TypeHandler.TYPE_FILE);
-            Entry entry      = typeHandler.createEntry(repository.getGUID());
-            Date  createDate = new Date();
-            String ext      = IOUtil.getFileExtension(urlPath);
+            Entry  entry      = typeHandler.createEntry(repository.getGUID());
+            Date   createDate = new Date();
+            String ext        = IOUtil.getFileExtension(urlPath);
             if (ext.startsWith(".")) {
                 ext = ext.substring(1);
             }
-            if(ext.length()>0) {
+            if (ext.length() > 0) {
                 entry.addTag(ext);
             }
             entry.init(name, "", parent, user,

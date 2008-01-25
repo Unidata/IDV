@@ -22,6 +22,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -83,6 +90,11 @@ public class FileInfo {
         hasInitialized = true;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int hashCode() {
         return file.hashCode();
 

@@ -20,6 +20,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -112,7 +119,7 @@ public class Column implements Tables, Constants {
     /** _more_ */
     private static final String ATTR_NAME = "name";
 
-    /** _more_          */
+    /** _more_ */
     private static final String ATTR_SUFFIX = "suffix";
 
     /** _more_ */
@@ -171,7 +178,7 @@ public class Column implements Tables, Constants {
     /** _more_ */
     private String type;
 
-    /** _more_          */
+    /** _more_ */
     private String suffix;
 
     /** _more_ */
@@ -214,9 +221,11 @@ public class Column implements Tables, Constants {
      * @param typeHandler _more_
      * @param element _more_
      * @param offset _more_
+     *
+     * @throws Exception _more_
      */
-    public Column(GenericTypeHandler typeHandler, Element element,
-                  int offset) throws Exception {
+    public Column(GenericTypeHandler typeHandler, Element element, int offset)
+            throws Exception {
         this.typeHandler = typeHandler;
         this.offset      = offset;
         name             = XmlUtil.getAttribute(element, ATTR_NAME);
@@ -224,8 +233,8 @@ public class Column implements Tables, Constants {
         label            = XmlUtil.getAttribute(element, ATTR_LABEL, name);
         searchType = XmlUtil.getAttribute(element, ATTR_SEARCHTYPE,
                                           searchType);
-        propertiesFile   = XmlUtil.getAttribute(element, ATTR_PROPERTIES,
-                                           (String) null);
+        propertiesFile = XmlUtil.getAttribute(element, ATTR_PROPERTIES,
+                (String) null);
 
         description = XmlUtil.getAttribute(element, ATTR_DESCRIPTION, label);
         type        = XmlUtil.getAttribute(element, ATTR_TYPE);
@@ -237,9 +246,10 @@ public class Column implements Tables, Constants {
         rows        = XmlUtil.getAttribute(element, ATTR_ROWS, rows);
         columns     = XmlUtil.getAttribute(element, ATTR_COLUMNS, columns);
         if (type.equals(TYPE_ENUMERATION)) {
-            String valueString = XmlUtil.getAttribute(element,ATTR_VALUES);
-            if(valueString.startsWith("file:")) {
-                valueString = IOUtil.readContents(valueString.substring("file:".length()), getClass());
+            String valueString = XmlUtil.getAttribute(element, ATTR_VALUES);
+            if (valueString.startsWith("file:")) {
+                valueString = IOUtil.readContents(
+                    valueString.substring("file:".length()), getClass());
                 values = StringUtil.split(valueString, "\n", true, true);
             } else {
                 values = StringUtil.split(valueString, ",", true, true);
@@ -323,7 +333,7 @@ public class Column implements Tables, Constants {
      *
      * @param stmt _more_
      * @param values _more_
-     * @param valueIdx _more_
+     * @param stmtIdx _more_
      *
      * @return _more_
      *
@@ -333,55 +343,55 @@ public class Column implements Tables, Constants {
                             int stmtIdx)
             throws Exception {
         if (type.equals(TYPE_INT)) {
-            if(values[offset]!=null) {
-                stmt.setInt(stmtIdx,
-                            ((Integer) values[offset]).intValue());
-            } else {            
+            if (values[offset] != null) {
+                stmt.setInt(stmtIdx, ((Integer) values[offset]).intValue());
+            } else {
                 stmt.setInt(stmtIdx, 0);
             }
             stmtIdx++;
         } else if (type.equals(TYPE_DOUBLE)) {
-            if(values[offset]!=null) {
+            if (values[offset] != null) {
                 stmt.setDouble(stmtIdx,
                                ((Double) values[offset]).doubleValue());
-            } else {            
-                stmt.setDouble(stmtIdx,0.0);
+            } else {
+                stmt.setDouble(stmtIdx, 0.0);
             }
             stmtIdx++;
         } else if (type.equals(TYPE_BOOLEAN)) {
-            if(values[offset]!=null) {
+            if (values[offset] != null) {
                 boolean v = ((Boolean) values[offset]).booleanValue();
                 stmt.setInt(stmtIdx, (v
-                                          ? 1
-                                          : 0));
-            } else {            
+                                      ? 1
+                                      : 0));
+            } else {
                 stmt.setInt(stmtIdx, 0);
             }
             stmtIdx++;
         } else if (type.equals(TYPE_TIMESTAMP)) {
-            if(values[offset]!=null) {
+            if (values[offset] != null) {
                 Date dttm = (Date) values[offset];
                 stmt.setTimestamp(stmtIdx,
-                                  new java.sql.Timestamp(dttm.getTime()), Repository.calendar);
-            } else {            
-                stmt.setTimestamp(stmtIdx,null);
+                                  new java.sql.Timestamp(dttm.getTime()),
+                                  Repository.calendar);
+            } else {
+                stmt.setTimestamp(stmtIdx, null);
             }
             stmtIdx++;
         } else if (type.equals(TYPE_LATLON)) {
-            if(values[offset]!=null) {
+            if (values[offset] != null) {
                 double lat = ((Double) values[offset]).doubleValue();
                 stmt.setDouble(stmtIdx, lat);
-                double lon = ((Double) values[offset+1]).doubleValue();
-                stmt.setDouble(stmtIdx+1, lon);
-            } else {            
+                double lon = ((Double) values[offset + 1]).doubleValue();
+                stmt.setDouble(stmtIdx + 1, lon);
+            } else {
                 stmt.setDouble(stmtIdx, Entry.NONGEO);
-                stmt.setDouble(stmtIdx+1, Entry.NONGEO);
+                stmt.setDouble(stmtIdx + 1, Entry.NONGEO);
             }
-            stmtIdx+=2;
+            stmtIdx += 2;
         } else {
-            if(values[offset]!=null) {
+            if (values[offset] != null) {
                 stmt.setString(stmtIdx, toString(values, offset));
-            } else {            
+            } else {
                 stmt.setString(stmtIdx, null);
             }
             stmtIdx++;
@@ -627,7 +637,8 @@ public class Column implements Tables, Constants {
             }
             if (searchType.equals(SEARCHTYPE_SELECT)) {
                 Hashtable props =
-                    typeHandler.getRepository().getFieldProperties(propertiesFile);
+                    typeHandler.getRepository().getFieldProperties(
+                        propertiesFile);
                 List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
                 if (props != null) {
                     for (Enumeration keys = props.keys();
@@ -663,28 +674,36 @@ public class Column implements Tables, Constants {
     }
 
 
-    public void setValue(Request request, Object[]values) 
-            throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param values _more_
+     *
+     * @throws Exception _more_
+     */
+    public void setValue(Request request, Object[] values) throws Exception {
         if (type.equals(TYPE_LATLON)) {
             //TODO
         } else if (type.equals(TYPE_BOOLEAN)) {
-            String value = request.getString(getFullName(),"true").toLowerCase();
+            String value = request.getString(getFullName(),
+                                             "true").toLowerCase();
             values[offset] = new Boolean(value);
         } else if (type.equals(TYPE_ENUMERATION)) {
-            if(request.exists(getFullName())) {
-                values[offset] = request.getString(getFullName(),"");
+            if (request.exists(getFullName())) {
+                values[offset] = request.getString(getFullName(), "");
             }
         } else if (type.equals(TYPE_INT)) {
-            if(request.exists(getFullName())) {
-                values[offset] = new Integer(request.get(getFullName(),0));
+            if (request.exists(getFullName())) {
+                values[offset] = new Integer(request.get(getFullName(), 0));
             }
         } else if (type.equals(TYPE_DOUBLE)) {
-            if(request.exists(getFullName())) {
-                values[offset] = new Double(request.get(getFullName(),0.0));
+            if (request.exists(getFullName())) {
+                values[offset] = new Double(request.get(getFullName(), 0.0));
             }
         } else {
-            if(request.exists(getFullName())) {
-                values[offset] = request.getString(getFullName(),"");
+            if (request.exists(getFullName())) {
+                values[offset] = request.getString(getFullName(), "");
             }
         }
     }
@@ -696,7 +715,6 @@ public class Column implements Tables, Constants {
      * _more_
      *
      * @param formBuffer _more_
-     * @param headerBuffer _more_
      * @param request _more_
      * @param where _more_
      *

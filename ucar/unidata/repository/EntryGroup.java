@@ -22,6 +22,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -103,13 +110,13 @@ import javax.swing.*;
  */
 public class EntryGroup {
 
-    /** _more_          */
+    /** _more_ */
     Object key;
 
-    /** _more_          */
+    /** _more_ */
     String name;
 
-    /** _more_          */
+    /** _more_ */
     List children = new ArrayList();
 
     /**
@@ -122,10 +129,10 @@ public class EntryGroup {
     }
 
 
-    /** _more_          */
+    /** _more_ */
     List keys = new ArrayList();
 
-    /** _more_          */
+    /** _more_ */
     Hashtable map = new Hashtable();
 
     /**

@@ -22,6 +22,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -66,7 +73,7 @@ public class GenericTypeHandler extends TypeHandler {
     /** _more_ */
     public static final String TAG_COLUMN = "column";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TYPE = "type";
 
     /** _more_ */
@@ -160,9 +167,20 @@ public class GenericTypeHandler extends TypeHandler {
         }
     }
 
-    public void initializeEntry(Request request, Entry entry) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
+    public void initializeEntry(Request request, Entry entry)
+            throws Exception {
         super.initializeEntry(request, entry);
-        if(colNames.size()<=1) return;
+        if (colNames.size() <= 1) {
+            return;
+        }
         Object[] values = new Object[colNames.size()];
         for (Column column : columns) {
             column.setValue(request, values);
@@ -264,7 +282,9 @@ public class GenericTypeHandler extends TypeHandler {
         Properties properties =
             repository.getFieldProperties(theColumn.getPropertiesFile());
         for (int i = 0; i < values.length; i++) {
-            if(values[i]==null) continue;
+            if (values[i] == null) {
+                continue;
+            }
             String longName = theColumn.getLabel(values[i]);
             if (output.equals(OutputHandler.OUTPUT_HTML)) {
                 sb.append("<li>");
@@ -382,13 +402,13 @@ public class GenericTypeHandler extends TypeHandler {
         if (colNames.size() == 0) {
             return null;
         }
-        if(isNew) {
-            return SqlUtil.makeInsert(getTableName(), SqlUtil.comma(colNames),
-                                      SqlUtil.getQuestionMarks(colNames.size()));
+        if (isNew) {
+            return SqlUtil.makeInsert(
+                getTableName(), SqlUtil.comma(colNames),
+                SqlUtil.getQuestionMarks(colNames.size()));
         } else {
 
-            return SqlUtil.makeUpdate(getTableName(), COL_ID,
-                                      colNames);
+            return SqlUtil.makeUpdate(getTableName(), COL_ID, colNames);
         }
     }
 
@@ -414,8 +434,9 @@ public class GenericTypeHandler extends TypeHandler {
                 stmtIdx = column.setValues(stmt, values, stmtIdx);
             }
         }
-        if(!isNew)
+        if ( !isNew) {
             stmt.setString(stmtIdx, entry.getId());
+        }
     }
 
 

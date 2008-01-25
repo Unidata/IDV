@@ -22,7 +22,17 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
+
+
+import org.apache.commons.fileupload.MultipartStream;
 
 
 import ucar.unidata.util.HttpServer;
@@ -37,13 +47,11 @@ import java.net.*;
 
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.List;
 
 
 import java.util.Hashtable;
+import java.util.List;
 
-
-import org.apache.commons.fileupload.MultipartStream;
 
 /**
  *
@@ -56,9 +64,12 @@ public class MetaDataServer extends HttpServer implements Constants {
     /** _more_ */
     Repository repository;
 
+    /** _more_ */
     String[] args;
 
+    /** _more_ */
     int port = 8080;
+
     /**
      * _more_
      *
@@ -68,9 +79,9 @@ public class MetaDataServer extends HttpServer implements Constants {
     public MetaDataServer(String[] args) throws Throwable {
         super(8080);
         this.args = args;
-        for(int i=0;i<args.length;i++) {
-            if(args[i].equals("-port")) {
-                port = new Integer(args[i+1]).intValue();
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-port")) {
+                port = new Integer(args[i + 1]).intValue();
                 setPort(port);
                 break;
             }
@@ -79,11 +90,14 @@ public class MetaDataServer extends HttpServer implements Constants {
 
 
 
-    public void init()  {
+    /**
+     * _more_
+     */
+    public void init() {
         try {
             repository = new Repository(args, "http://localhost:" + port);
             repository.init();
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             exc.printStackTrace();
             throw new WrapperException(exc);
         }
@@ -117,8 +131,10 @@ public class MetaDataServer extends HttpServer implements Constants {
      */
     private class MyRequestHandler extends RequestHandler {
 
+        /** _more_ */
         Hashtable fileUploads = new Hashtable();
 
+        /** _more_ */
         Result result = null;
 
         /** _more_ */
@@ -138,16 +154,35 @@ public class MetaDataServer extends HttpServer implements Constants {
         }
 
 
-        protected void handleFileUpload(String attrName, String filename,Hashtable props, Hashtable args, MultipartStream multipartStream) throws Exception {
+        /**
+         * _more_
+         *
+         * @param attrName _more_
+         * @param filename _more_
+         * @param props _more_
+         * @param args _more_
+         * @param multipartStream _more_
+         *
+         * @throws Exception _more_
+         */
+        protected void handleFileUpload(String attrName, String filename,
+                                        Hashtable props, Hashtable args,
+                                        MultipartStream multipartStream)
+                throws Exception {
             Repository.checkFilePath(filename);
             int cnt = 0;
-            File f= new File(IOUtil.joinDir(repository.getFileUploadDirectory(), filename));
-            while(f.exists()) {
-                f = new File(IOUtil.joinDir(repository.getFileUploadDirectory(), (cnt++) + "_"+filename));
+            File f =
+                new File(IOUtil.joinDir(repository.getFileUploadDirectory(),
+                                        filename));
+            while (f.exists()) {
+                f = new File(
+                    IOUtil.joinDir(
+                        repository.getFileUploadDirectory(),
+                        (cnt++) + "_" + filename));
             }
             //TODO: Check for security hole with the file upload
             fileUploads.put(attrName, f.toString());
-            OutputStream output=new FileOutputStream(f);
+            OutputStream output = new FileOutputStream(f);
             multipartStream.readBodyData(output);
         }
 
@@ -162,13 +197,13 @@ public class MetaDataServer extends HttpServer implements Constants {
                 writeLine("Cache-Control: no-cache" + CRLF);
             }
             writeLine("Last-Modified:" + new Date() + CRLF);
-            if(result!=null) {
-                List<String> args = result.getHttpHeaderArgs ();
-                if(args!=null) {
-                    for (int i=0;i<args.size();i+=2) {
-                        String name = args.get(i);
-                        String value = args.get(i+1);
-                        writeLine(name+":"+ value + CRLF);                        
+            if (result != null) {
+                List<String> args = result.getHttpHeaderArgs();
+                if (args != null) {
+                    for (int i = 0; i < args.size(); i += 2) {
+                        String name  = args.get(i);
+                        String value = args.get(i + 1);
+                        writeLine(name + ":" + value + CRLF);
                     }
                 }
             }
@@ -259,8 +294,8 @@ public class MetaDataServer extends HttpServer implements Constants {
         try {
             MetaDataServer mds = new MetaDataServer(args);
             mds.init();
-        } catch(Exception exc) {
-            LogUtil.printExceptionNoGui(null,"Error in main",exc);
+        } catch (Exception exc) {
+            LogUtil.printExceptionNoGui(null, "Error in main", exc);
             System.exit(1);
         }
     }

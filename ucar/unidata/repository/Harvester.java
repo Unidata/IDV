@@ -22,6 +22,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -133,7 +140,7 @@ public class Harvester {
     private double sleepMinutes = 5;
 
 
-    /** _more_          */
+    /** _more_ */
     private String id;
 
     /**

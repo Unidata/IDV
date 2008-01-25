@@ -22,6 +22,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -42,22 +49,22 @@ import java.net.URL;
  */
 public class Resource {
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_FILE = "file";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_URL = "url";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_UNKNOWN = "unknown";
 
-    /** _more_          */
+    /** _more_ */
     private String path;
 
-    /** _more_          */
+    /** _more_ */
     private String type = TYPE_UNKNOWN;
 
-    /** _more_          */
+    /** _more_ */
     private File file;
 
     /**

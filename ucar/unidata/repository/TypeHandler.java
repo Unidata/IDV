@@ -22,6 +22,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -82,7 +89,7 @@ public class TypeHandler implements Constants, Tables {
     /** _more_ */
     public static final String TYPE_ANY = "any";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_FILE = "file";
 
     /** _more_ */
@@ -98,6 +105,7 @@ public class TypeHandler implements Constants, Tables {
     String description;
 
 
+    /** _more_ */
     private Hashtable dontShowInForm = new Hashtable();
 
 
@@ -136,12 +144,26 @@ public class TypeHandler implements Constants, Tables {
         this.description = description;
     }
 
+    /**
+     * _more_
+     *
+     * @param arg _more_
+     */
     public void setDontShowInForm(String arg) {
-        dontShowInForm.put(arg,arg);
+        dontShowInForm.put(arg, arg);
     }
 
+    /**
+     * _more_
+     *
+     * @param arg _more_
+     *
+     * @return _more_
+     */
     public boolean okToShowInForm(String arg) {
-        if(dontShowInForm.get(arg)!=null) return false;
+        if (dontShowInForm.get(arg) != null) {
+            return false;
+        }
         return true;
     }
 
@@ -157,8 +179,16 @@ public class TypeHandler implements Constants, Tables {
         return new Entry(id, this);
     }
 
-    public void initializeEntry(Request request, Entry entry) throws Exception {
-    }
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
+    public void initializeEntry(Request request, Entry entry)
+            throws Exception {}
 
 
 
@@ -170,7 +200,6 @@ public class TypeHandler implements Constants, Tables {
      * @param entry _more_
      * @param request _more_
      *
-     * @return _more_
      */
     public void getDatasetTag(StringBuffer sb, Entry entry, Request request) {
         File f = entry.getResource().getFile();
@@ -277,14 +306,17 @@ public class TypeHandler implements Constants, Tables {
         //id,type,name,desc,group,user,file,createdata,fromdate,todate
         int   col   = 3;
         Entry entry = createEntry(results.getString(1));
-        entry.init(
-            results.getString(col++), results.getString(col++),
-            repository.findGroup(results.getString(col++)),
-            repository.getUserManager().findUser(results.getString(col++),true),
-            new Resource(results.getString(col++), results.getString(col++)),
-            results.getTimestamp(col++ , Repository.calendar ).getTime(),
-            results.getTimestamp(col++, Repository.calendar).getTime(),
-            results.getTimestamp(col++, Repository.calendar).getTime(), null);
+        entry.init(results.getString(col++), results
+            .getString(col++), repository
+            .findGroup(results.getString(col++)), repository.getUserManager()
+            .findUser(results.getString(col++), true), new Resource(results
+                .getString(col++), results.getString(col++)), results
+                    .getTimestamp(col++, Repository.calendar)
+                    .getTime(), results
+                    .getTimestamp(col++, Repository.calendar)
+                    .getTime(), results
+                    .getTimestamp(col++, Repository.calendar)
+                    .getTime(), null);
         entry.setSouth(results.getDouble(col++));
         entry.setNorth(results.getDouble(col++));
         entry.setEast(results.getDouble(col++));
@@ -319,7 +351,8 @@ public class TypeHandler implements Constants, Tables {
             if (tags.size() > 0) {
                 StringBuffer tagSB = new StringBuffer();
                 for (Tag tag : tags) {
-                    tagSB.append(repository.getTagLinks(request, tag.getName()));
+                    tagSB.append(repository.getTagLinks(request,
+                            tag.getName()));
                     tagSB.append(tag.getName());
                     tagSB.append("<br>\n");
                 }
@@ -353,35 +386,35 @@ public class TypeHandler implements Constants, Tables {
                     }
                     assocSB.append("<tr><td>");
                     assocSB.append(((fromEntry == entry)
-                               ? fromEntry.getName()
-                               : repository.getEntryUrl(fromEntry)));
+                                    ? fromEntry.getName()
+                                    : repository.getEntryUrl(fromEntry)));
                     assocSB.append("&nbsp;&nbsp;");
                     assocSB.append("</td><td>");
-                    assocSB.append(
-                                 HtmlUtil.bold(association.getName()));
+                    assocSB.append(HtmlUtil.bold(association.getName()));
                     assocSB.append("</td><td>");
-                    assocSB.append(HtmlUtil.img(repository.fileUrl("/Arrow16.gif")));
+                    assocSB.append(
+                        HtmlUtil.img(repository.fileUrl("/Arrow16.gif")));
                     assocSB.append("&nbsp;&nbsp;");
                     assocSB.append("</td><td>");
                     assocSB.append(((toEntry == entry)
-                               ? toEntry.getName()
-                               : repository.getEntryUrl(toEntry)));
+                                    ? toEntry.getName()
+                                    : repository.getEntryUrl(toEntry)));
                     assocSB.append("</td></tr>");
                 }
                 assocSB.append("</table>");
-                sb.append(HtmlUtil.formEntryTop("Associations:", assocSB.toString()));
+                sb.append(HtmlUtil.formEntryTop("Associations:",
+                        assocSB.toString()));
             }
 
 
             List<Metadata> metadataList = repository.getMetadata(entry);
             if (metadataList.size() > 0) {
-                sb.append(HtmlUtil.formEntry("<p>",""));
+                sb.append(HtmlUtil.formEntry("<p>", ""));
                 StringBuffer mSB = new StringBuffer();
                 mSB.append("<ul>");
                 for (Metadata metadata : metadataList) {
                     mSB.append("<li>");
-                    if (metadata.getType().equals(
-                            Metadata.TYPE_LINK)) {
+                    if (metadata.getType().equals(Metadata.TYPE_LINK)) {
                         mSB.append(metadata.getName() + ": ");
                         mSB.append(HtmlUtil.href(metadata.getContent(),
                                 metadata.getContent()));
@@ -392,7 +425,7 @@ public class TypeHandler implements Constants, Tables {
                     }
                 }
                 mSB.append("</ul>");
-                sb.append(HtmlUtil.formEntry("Metadata:",mSB.toString()));
+                sb.append(HtmlUtil.formEntry("Metadata:", mSB.toString()));
             }
 
             sb.append("</table>\n");
@@ -421,25 +454,26 @@ public class TypeHandler implements Constants, Tables {
                                        repository.fileUrl("/Edit16.gif"),
                                        "Edit Entry"));
 
-        String commentsEntry = HtmlUtil.href(
-                               HtmlUtil.url(
-                                   repository.URL_ENTRY_COMMENTS, ARG_ID,
-                                   entry.getId()), HtmlUtil.img(
-                                       repository.fileUrl("/Comments.gif"),
-                                       "Add/View Comments"));
+        String commentsEntry =
+            HtmlUtil.href(
+                HtmlUtil.url(
+                    repository.URL_ENTRY_COMMENTS, ARG_ID,
+                    entry.getId()), HtmlUtil.img(
+                        repository.fileUrl("/Comments.gif"),
+                        "Add/View Comments"));
 
         String cartEntry = HtmlUtil.href(
                                HtmlUtil.url(
-                                   repository.getUserManager().URL_USER_CART, ARG_ACTION, ACTION_ADD, ARG_ID,
+                                   repository.getUserManager().URL_USER_CART,
+                                   ARG_ACTION, ACTION_ADD, ARG_ID,
                                    entry.getId()), HtmlUtil.img(
                                        repository.fileUrl("/Cart.gif"),
                                        "Add to cart"));
 
-        return editEntry + HtmlUtil.space(1)+
-            commentsEntry + HtmlUtil.space(1)
-               + getEntryDownloadLink(request, entry) + HtmlUtil.space(1)
-               + getGraphLink(request, entry)+ HtmlUtil.space(1)+
-            cartEntry;
+        return editEntry + HtmlUtil.space(1) + commentsEntry
+               + HtmlUtil.space(1) + getEntryDownloadLink(request, entry)
+               + HtmlUtil.space(1) + getGraphLink(request, entry)
+               + HtmlUtil.space(1) + cartEntry;
     }
 
 
@@ -556,15 +590,18 @@ public class TypeHandler implements Constants, Tables {
             if ((desc != null) && (desc.length() > 0)) {
                 sb.append(HtmlUtil.formEntry("Description:", desc));
             }
-            sb.append(HtmlUtil.formEntry("Created by:",
-                                         entry.getUser().getName() + " @ "
-                                         + Repository.fmt(entry.getCreateDate())));
+            sb.append(
+                HtmlUtil.formEntry(
+                    "Created by:",
+                    entry.getUser().getName() + " @ "
+                    + Repository.fmt(entry.getCreateDate())));
 
-            String resourceLink =        entry.getResource().getPath();
-            if(entry.getResource().isUrl()) {
-                resourceLink = "<a href=\"" + resourceLink +"\">" + resourceLink+"</a>";
+            String resourceLink = entry.getResource().getPath();
+            if (entry.getResource().isUrl()) {
+                resourceLink = "<a href=\"" + resourceLink + "\">"
+                               + resourceLink + "</a>";
             }
-            sb.append(HtmlUtil.formEntry("Resource:",resourceLink));
+            sb.append(HtmlUtil.formEntry("Resource:", resourceLink));
 
             if (entry.isFile()) {
                 sb.append(
@@ -613,7 +650,7 @@ public class TypeHandler implements Constants, Tables {
                                 HtmlUtil.url(
                                     repository.URL_ENTRY_GET + "/"
                                     + entry.getName(), ARG_ID,
-                                    entry.getId()), "")));
+                                        entry.getId()), "")));
 
                 } else if (entry.getResource().isUrl()) {
                     sb.append(HtmlUtil.formEntryTop("Image:",
@@ -809,7 +846,6 @@ public class TypeHandler implements Constants, Tables {
      * _more_
      *
      * @param formBuffer _more_
-     * @param headerBuffer _more_
      * @param request _more_
      * @param where _more_
      * @param simpleForm _more_

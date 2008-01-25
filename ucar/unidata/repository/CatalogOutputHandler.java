@@ -21,6 +21,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -92,97 +99,97 @@ public class CatalogOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String TAG_CATALOG = "catalog";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_CREATOR = "creator";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DATAFORMAT = "dataFormat";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DATATYPE = "dataType";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_AUTHORITY = "authority";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_VARIABLE = "variable";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_VOCABULARY = "vocabulary";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_VARIABLES = "variables";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_PUBLISHER = "publisher";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_PARAMETERS = "Parameters";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_PROJECT = "project";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_METADATA = "metadata";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_ACCESS = "access";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_KEYWORD = "keyword";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_CONTRIBUTOR = "contributor";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_PROPERTY = "property";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_GEOSPATIALCOVERAGE = "geospatialCoverage";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TIMECOVERAGE = "timeCoverage";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_START = "start";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_END = "end";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DATE = "date";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DOCUMENTATION = "documentation";
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DATASIZE = "dataSize";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_METADATATYPE = "metadataType";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_NAME = "name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_VALUE = "value";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TYPE = "type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_UNITS = "units";
 
     /** _more_ */
     public static final String TAG_DATASET = "dataset";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_SERVICE = "service";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_SERVICENAME = "serviceName";
 
 
@@ -292,7 +299,6 @@ public class CatalogOutputHandler extends OutputHandler {
     /**
      * _more_
      *
-     * @param request _more_
      *
      * @param output _more_
      *
@@ -309,7 +315,6 @@ public class CatalogOutputHandler extends OutputHandler {
      * @param what _more_
      * @param types _more_
      *
-     * @return _more_
      *
      * @throws Exception _more_
      */
@@ -329,7 +334,6 @@ public class CatalogOutputHandler extends OutputHandler {
      * @param entries _more_
      * @param types _more_
      *
-     * @return _more_
      *
      * @throws Exception _more_
      */

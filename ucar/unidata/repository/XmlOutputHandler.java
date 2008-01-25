@@ -21,6 +21,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -88,29 +95,29 @@ public class XmlOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String TAG_GROUP = "group";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_ENTRY = "entry";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_ENTRIES = "entries";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DESCRIPTION = "description";
 
 
     /** _more_ */
     public static final String ATTR_ID = "id";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_GROUP = "group";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TYPE = "type";
 
     /** _more_ */
     public static final String ATTR_RESOURCE = "resource";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_RESOURCE_TYPE = "resource_type";
 
 
@@ -135,7 +142,6 @@ public class XmlOutputHandler extends OutputHandler {
     /**
      * _more_
      *
-     * @param request _more_
      *
      * @param output _more_
      *
@@ -153,7 +159,6 @@ public class XmlOutputHandler extends OutputHandler {
      * @param what _more_
      * @param types _more_
      *
-     * @return _more_
      *
      * @throws Exception _more_
      */
@@ -177,7 +182,6 @@ public class XmlOutputHandler extends OutputHandler {
      * @param entries _more_
      * @param types _more_
      *
-     * @return _more_
      *
      * @throws Exception _more_
      */
@@ -400,8 +404,6 @@ public class XmlOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param group _more_
-     * @param subGroups _more_
      * @param entries _more_
      *
      * @return _more_

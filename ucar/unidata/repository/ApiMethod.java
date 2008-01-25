@@ -20,6 +20,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -67,7 +74,7 @@ public class ApiMethod {
     /** _more_ */
     private boolean isTopLevel = false;
 
-     /** _more_ */
+    /** _more_ */
     private boolean mustBeAdmin = true;
 
 
@@ -88,12 +95,12 @@ public class ApiMethod {
      * @param request _more_
      * @param name _more_
      * @param method _more_
+     * @param mustBeAdmin _more_
      * @param canCache _more_
      * @param isTopLevel _more_
      */
     public ApiMethod(RequestHandler requestHandler, String request,
-                     String name,  Method method,
-                     boolean mustBeAdmin,
+                     String name, Method method, boolean mustBeAdmin,
                      boolean canCache, boolean isTopLevel) {
         this.requestHandler = requestHandler;
         this.request        = request;

@@ -21,6 +21,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -111,7 +118,6 @@ public class HtmlOutputHandler extends OutputHandler {
     /**
      * _more_
      *
-     * @param request _more_
      *
      * @param output _more_
      *
@@ -130,7 +136,6 @@ public class HtmlOutputHandler extends OutputHandler {
      * @param what _more_
      * @param types _more_
      *
-     * @return _more_
      *
      * @throws Exception _more_
      */
@@ -158,13 +163,12 @@ public class HtmlOutputHandler extends OutputHandler {
      * @param entries _more_
      * @param types _more_
      *
-     * @return _more_
      *
      * @throws Exception _more_
      */
     protected void getOutputTypesForEntries(Request request,
                                             List<Entry> entries, List types)
-        throws Exception {
+            throws Exception {
         types.add(new TwoFacedObject("Html", OUTPUT_HTML));
         if (entries.size() > 1) {
             types.add(new TwoFacedObject("Html with timeline",
@@ -623,20 +627,25 @@ public class HtmlOutputHandler extends OutputHandler {
         boolean      showApplet = repository.isAppletEnabled(request);
         String       title      = group.getFullName();
         StringBuffer sb         = new StringBuffer();
-        
-        int cnt = subGroups.size() + entries.size();
-        int max = request.get(ARG_MAX, Repository.MAX_ROWS);
+
+        int          cnt        = subGroups.size() + entries.size();
+        int          max        = request.get(ARG_MAX, Repository.MAX_ROWS);
         //        System.err.println ("cnt:" + cnt + " " + max);
 
-        if(cnt>0 && (cnt == max || request.defined(ARG_SKIP))) {
-            int skip = Math.max(0,request.get(ARG_SKIP,0));
-            sb.append("Results: " + (skip+1) + "-" + (skip+cnt) +HtmlUtil.space(4));
-            if(skip>0) {
-                sb.append(HtmlUtil.href(request.getUrl(ARG_SKIP)+"&"+ARG_SKIP+"="+(skip-max),"Previous"));
+        if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
+            int skip = Math.max(0, request.get(ARG_SKIP, 0));
+            sb.append("Results: " + (skip + 1) + "-" + (skip + cnt)
+                      + HtmlUtil.space(4));
+            if (skip > 0) {
+                sb.append(HtmlUtil.href(request.getUrl(ARG_SKIP) + "&"
+                                        + ARG_SKIP + "="
+                                        + (skip - max), "Previous"));
                 sb.append(HtmlUtil.space(1));
             }
-            if(cnt>=max) {
-                sb.append(HtmlUtil.href(request.getUrl(ARG_SKIP)+"&"+ARG_SKIP+"="+(skip+max),"Next"));
+            if (cnt >= max) {
+                sb.append(HtmlUtil.href(request.getUrl(ARG_SKIP) + "&"
+                                        + ARG_SKIP + "="
+                                        + (skip + max), "Next"));
             }
         }
 
@@ -657,7 +666,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(crumbs[1]);
             } else {
                 title = group.getName();
-                if(entries.size()==0) {
+                if (entries.size() == 0) {
                     sb.append("No entries found");
                 }
             }
@@ -804,19 +813,20 @@ public class HtmlOutputHandler extends OutputHandler {
      */
     protected String getGroupLinks(Request request, Group group)
             throws Exception {
-        String commentsEntry = HtmlUtil.href(
-                               HtmlUtil.url(
-                                   repository.URL_ENTRY_COMMENTS, ARG_ID,
-                                   group.getId()), HtmlUtil.img(
-                                       repository.fileUrl("/Comments.gif"),
-                                       "Add/View Comments"));
+        String commentsEntry =
+            HtmlUtil.href(
+                HtmlUtil.url(
+                    repository.URL_ENTRY_COMMENTS, ARG_ID,
+                    group.getId()), HtmlUtil.img(
+                        repository.fileUrl("/Comments.gif"),
+                        "Add/View Comments"));
 
         String search = HtmlUtil.href(
                             HtmlUtil.url(
                                 repository.URL_ENTRY_SEARCHFORM, ARG_GROUP,
                                 group.getId()), HtmlUtil.img(
-                                                             repository.fileUrl("/Search16.gif"),
-                                                             "Search in Group"));
+                                    repository.fileUrl("/Search16.gif"),
+                                    "Search in Group"));
 
         String createEntry = HtmlUtil.href(
                                  HtmlUtil.url(
@@ -834,12 +844,9 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
         return search + HtmlUtil.space(1)
-            + repository.getGraphLink(request, group) + HtmlUtil.space(1)
-            + createEntry
-            + HtmlUtil.space(1)
-            + commentsEntry
-            + HtmlUtil.space(1)
-            + editEntry;
+               + repository.getGraphLink(request, group) + HtmlUtil.space(1)
+               + createEntry + HtmlUtil.space(1) + commentsEntry
+               + HtmlUtil.space(1) + editEntry;
     }
 
 
@@ -890,10 +897,10 @@ public class HtmlOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputEntries(Request request, List<Entry> entries)
-        throws Exception {
+            throws Exception {
 
-        String       output     = request.getOutput();
-        StringBuffer sb         = getEntriesList(request, entries);
+        String       output = request.getOutput();
+        StringBuffer sb     = getEntriesList(request, entries);
         Result result = new Result("Query Results", sb, getMimeType(output));
         result.putProperty(PROP_NAVSUBLINKS,
                            getEntriesHeader(request, output, WHAT_ENTRIES));
@@ -904,8 +911,18 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public StringBuffer getEntriesList(Request request, List<Entry> entries)
-        throws Exception {
+            throws Exception {
         StringBuffer sb         = new StringBuffer();
         String       output     = request.getOutput();
         boolean      showApplet = repository.isAppletEnabled(request);
@@ -923,12 +940,13 @@ public class HtmlOutputHandler extends OutputHandler {
             String links =
                 HtmlUtil.checkbox("entry_" + entry.getId(), "true") + " "
                 + entry.getTypeHandler().getEntryLinks(entry, request);
-            
+
             ssb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
             String col1 =
                 links + " "
                 + HtmlUtil.href(HtmlUtil.url(repository.URL_ENTRY_SHOW,
-                                             ARG_ID, entry.getId()), entry.getName());
+                                             ARG_ID,
+                                             entry.getId()), entry.getName());
             String col2 = "" + new Date(entry.getStartDate());
             ssb.append(HtmlUtil.row(HtmlUtil.cols(col1, col2)));
         }
@@ -944,8 +962,8 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append(HtmlUtil.submit("Get selected", "getselected"));
             sb.append(HtmlUtil.submit("Get all", "getall"));
             sb.append(" As: ");
-            List outputList =
-                repository.getOutputTypesForEntries(request, entries);
+            List outputList = repository.getOutputTypesForEntries(request,
+                                  entries);
             sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
         }
         sb.append("<br>");
@@ -953,7 +971,7 @@ public class HtmlOutputHandler extends OutputHandler {
             String       type = (String) sbc.getKeys().get(i);
             StringBuffer ssb  = sbc.getBuffer(type);
             sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold("Type:"
-                                                               + type))));
+                    + type))));
             sb.append(ssb);
         }
 

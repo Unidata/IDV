@@ -22,6 +22,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -94,16 +101,28 @@ import java.util.Properties;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class RepositoryManager implements RepositorySource, Constants, Tables, RequestHandler { 
+public class RepositoryManager implements RepositorySource, Constants,
+                                          Tables, RequestHandler {
 
+    /** _more_ */
     protected Repository repository;
 
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     */
     public RepositoryManager(Repository repository) {
         this.repository = repository;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Repository getRepository() {
         return repository;
     }
@@ -116,7 +135,7 @@ public class RepositoryManager implements RepositorySource, Constants, Tables, R
      *
      * @return _more_
      */
-    protected  String header(String h) {
+    protected String header(String h) {
         return repository.header(h);
     }
 
@@ -129,12 +148,25 @@ public class RepositoryManager implements RepositorySource, Constants, Tables, R
         return repository.getAdmin();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected UserManager getUserManager() {
         return repository.getUserManager();
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param urls _more_
+     *
+     * @return _more_
+     */
     protected List getSubNavLinks(Request request, RequestUrl[] urls) {
-        return repository.getSubNavLinks( request, urls);
+        return repository.getSubNavLinks(request, urls);
     }
 
     /**
@@ -160,3 +192,4 @@ public class RepositoryManager implements RepositorySource, Constants, Tables, R
     }
 
 }
+

@@ -22,6 +22,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -145,7 +152,7 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_TITLE = "title";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TOOLTIP = "tooltip";
 
 
@@ -159,27 +166,30 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_RECURSE = "recurse";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_CATALOG = "catalog";
 
+    /** _more_ */
     public static final String ARG_COMMENT = "comment";
+
+    /** _more_ */
     public static final String ARG_SUBJECT = "subject";
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_SOUTH = "south";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_NORTH = "north";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_EAST = "east";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_WEST = "west";
 
     /** _more_ */
@@ -200,27 +210,30 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_FORM_TYPE = "form.type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_CHANGE = "change";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ADMIN = "admin";
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_DELETE = "delete";
 
+    /** _more_ */
     public static final String ARG_ADD = "add";
 
+    /** _more_ */
     public static final String ARG_NEW = "new";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_DELETE_CONFIRM = "delete.confirm";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_CANCEL = "cancel";
 
+    /** _more_ */
     public static final String ARG_MESSAGE = "message";
 
     /** _more_ */
@@ -264,7 +277,7 @@ public interface Constants {
     public static final String WHAT_TAG = "tag";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String WHAT_METADATA = "metadata";
 
     /** _more_ */
@@ -277,7 +290,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_MAX = "max";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_SHOWMETADATA = "showmetadata";
 
     /** _more_ */
@@ -292,9 +305,13 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ID = "id";
 
+    /** _more_ */
     public static final String ARG_COMMENT_ID = "comment_id";
 
+    /** _more_ */
     public static final String ARG_FROM = "from";
+
+    /** _more_ */
     public static final String ARG_TO = "to";
 
 
@@ -344,20 +361,21 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_DOWNLOAD_OK = "jdms.download.ok";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_DEBUG = "jdms.debug";
 
+    /** _more_ */
     public static final String PROP_DATEFORMAT = "jdms.dateformat";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_USER_REQUIRELOGIN =
         "jdms.user.requirelogin";
 
     /** _more_ */
     public static final String PROP_REQUEST_PATTERN = "jdms.request.pattern";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_REPOSITORY_NAME = "jdms.repository.name";
 
 
@@ -403,7 +421,7 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_OUTPUT_FILES = "jdms.output.files";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_METADATA_FILES = "jdms.metadata.files";
 
     /** _more_ */
@@ -461,7 +479,7 @@ public interface Constants {
     /** _more_ */
     public static final String TAG_OUTPUTHANDLER = "outputhandler";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_METADATAHANDLER = "metadatahandler";
 
 
@@ -509,6 +527,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_RESOURCE = "resource";
 
+    /** _more_ */
     public static final String ARG_FILE = "file";
 
     /** _more_ */
@@ -522,6 +541,7 @@ public interface Constants {
     /** _more_ */
     public static final String ACTION_EDIT = "action.edit";
 
+    /** _more_ */
     public static final String ACTION_CLEAR = "action.clear";
 
     /** _more_ */
@@ -535,6 +555,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ACTION_STOP = "action.stop";
+
+    /** _more_ */
     public static final String ACTION_ADD = "action.add";
 
     /** _more_ */

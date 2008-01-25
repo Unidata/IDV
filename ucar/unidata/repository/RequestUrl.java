@@ -22,64 +22,77 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
+
+/**
+ *
+ *
+ * @author IDV Development Team
+ * @version $Revision: 1.3 $
+ */
+public class RequestUrl {
+
+    /** _more_ */
+    private RepositorySource repositorySource;
+
+    /** _more_ */
+    private String path = "foo";
+
+    /** _more_ */
+    private String label = null;
+
     /**
+     * _more_
      *
      *
-     * @author IDV Development Team
-     * @version $Revision: 1.3 $
+     * @param repositorySource _more_
+     * @param path _more_
      */
-    public class RequestUrl {
-
-        private  RepositorySource repositorySource;
-
-        /** _more_ */
-        private String path = "foo";
-
-        /** _more_ */
-        private String label = null;
-
-        /**
-         * _more_
-         *
-         * @param path _more_
-         */
-        public RequestUrl(RepositorySource repositorySource,String path) {
-            this.repositorySource =  repositorySource;
-            this.path = path;
-        }
-
-        /**
-         * _more_
-         *
-         * @param path _more_
-         * @param label _more_
-         */
-        public RequestUrl(RepositorySource repositorySource,String path, String label) {
-            this(repositorySource,path);
-            this.label = label;
-        }
-
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public String toString() {
-            return repositorySource.getRepository().getUrlBase() + path;
-        }
-
-
-
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public String getLabel() {
-            return label;
-        }
+    public RequestUrl(RepositorySource repositorySource, String path) {
+        this.repositorySource = repositorySource;
+        this.path             = path;
     }
 
+    /**
+     * _more_
+     *
+     *
+     * @param repositorySource _more_
+     * @param path _more_
+     * @param label _more_
+     */
+    public RequestUrl(RepositorySource repositorySource, String path,
+                      String label) {
+        this(repositorySource, path);
+        this.label = label;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String toString() {
+        return repositorySource.getRepository().getUrlBase() + path;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getLabel() {
+        return label;
+    }
+}
 

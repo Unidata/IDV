@@ -21,6 +21,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -107,6 +114,7 @@ public class Metadata implements Constants, Tables {
     /** _more_ */
     private String content;
 
+    /** _more_ */
     private boolean inherited = false;
 
 
@@ -118,12 +126,11 @@ public class Metadata implements Constants, Tables {
      * @param name _more_
      * @param content _more_
      */
-    public Metadata(String id,  String type,
-                    String name, String content) {
-        this.id           = id;
-        this.name         = name;
-        this.type = type;
-        this.content      = content;
+    public Metadata(String id, String type, String name, String content) {
+        this.id      = id;
+        this.name    = name;
+        this.type    = type;
+        this.content = content;
     }
 
 
@@ -135,9 +142,9 @@ public class Metadata implements Constants, Tables {
      * @param content _more_
      */
     public Metadata(String type, String name, String content) {
-        this.type = type;
-        this.name         = name;
-        this.content      = content;
+        this.type    = type;
+        this.name    = name;
+        this.content = content;
     }
 
 
@@ -218,41 +225,41 @@ public class Metadata implements Constants, Tables {
 
 
 
-/**
-Set the Inherited property.
+    /**
+     * Set the Inherited property.
+     *
+     * @param value The new value for Inherited
+     */
+    public void setInherited(boolean value) {
+        inherited = value;
+    }
 
-@param value The new value for Inherited
-**/
-public void setInherited (boolean value) {
-	inherited = value;
-}
+    /**
+     * Get the Inherited property.
+     *
+     * @return The Inherited
+     */
+    public boolean getInherited() {
+        return inherited;
+    }
 
-/**
-Get the Inherited property.
+    /**
+     * Set the SubType property.
+     *
+     * @param value The new value for SubType
+     */
+    public void setSubType(String value) {
+        subType = value;
+    }
 
-@return The Inherited
-**/
-public boolean getInherited () {
-	return inherited;
-}
-
-/**
-Set the SubType property.
-
-@param value The new value for SubType
-**/
-public void setSubType (String value) {
-	subType = value;
-}
-
-/**
-Get the SubType property.
-
-@return The SubType
-**/
-public String getSubType () {
-	return subType;
-}
+    /**
+     * Get the SubType property.
+     *
+     * @return The SubType
+     */
+    public String getSubType() {
+        return subType;
+    }
 
 
 

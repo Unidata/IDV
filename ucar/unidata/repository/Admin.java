@@ -21,13 +21,23 @@
  */
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
+
+
+import org.w3c.dom.*;
 
 import ucar.unidata.data.SqlUtil;
 
 import ucar.unidata.util.HtmlUtil;
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringBufferCollection;
@@ -36,8 +46,6 @@ import ucar.unidata.util.TwoFacedObject;
 
 
 import ucar.unidata.xml.XmlUtil;
-
-import org.w3c.dom.*;
 
 import java.io.File;
 
@@ -67,34 +75,42 @@ import java.util.Properties;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Admin  extends RepositoryManager {
+public class Admin extends RepositoryManager {
 
     /** _more_ */
-    public RequestUrl URL_ADMIN_SQL = new RequestUrl(this, "/admin/sql", "SQL");
-
-    /** _more_          */
-    public RequestUrl URL_ADMIN_IMPORT_CATALOG =
-        new RequestUrl(this, "/admin/import/catalog", "Import Catalog");
+    public RequestUrl URL_ADMIN_SQL = new RequestUrl(this, "/admin/sql",
+                                          "SQL");
 
     /** _more_ */
-    public RequestUrl URL_ADMIN_CLEANUP = new RequestUrl(this, "/admin/cleanup", "Cleanup");
+    public RequestUrl URL_ADMIN_IMPORT_CATALOG = new RequestUrl(this,
+                                                     "/admin/import/catalog",
+                                                     "Import Catalog");
 
     /** _more_ */
-    public RequestUrl URL_ADMIN_HOME = new RequestUrl(this, "/admin/home", "Home");
+    public RequestUrl URL_ADMIN_CLEANUP = new RequestUrl(this,
+                                              "/admin/cleanup", "Cleanup");
 
     /** _more_ */
-    public RequestUrl URL_ADMIN_STARTSTOP = new RequestUrl(this, "/admin/startstop",
-                                           "Database");
+    public RequestUrl URL_ADMIN_HOME = new RequestUrl(this, "/admin/home",
+                                           "Home");
 
     /** _more_ */
-    public RequestUrl URL_ADMIN_TABLES = new RequestUrl(this, "/admin/tables", "Tables");
+    public RequestUrl URL_ADMIN_STARTSTOP = new RequestUrl(this,
+                                                "/admin/startstop",
+                                                "Database");
 
     /** _more_ */
-    public RequestUrl URL_ADMIN_STATS = new RequestUrl(this, "/admin/stats", "Statistics");
+    public RequestUrl URL_ADMIN_TABLES = new RequestUrl(this,
+                                             "/admin/tables", "Tables");
 
     /** _more_ */
-    public RequestUrl URL_ADMIN_HARVESTERS = new RequestUrl(this, "/admin/harvesters",
-                                            "Harvesters");
+    public RequestUrl URL_ADMIN_STATS = new RequestUrl(this, "/admin/stats",
+                                            "Statistics");
+
+    /** _more_ */
+    public RequestUrl URL_ADMIN_HARVESTERS = new RequestUrl(this,
+                                                 "/admin/harvesters",
+                                                 "Harvesters");
 
     /** _more_ */
     protected RequestUrl[] adminUrls = {
@@ -118,6 +134,11 @@ public class Admin  extends RepositoryManager {
     /** _more_ */
     private List<Harvester> harvesters = new ArrayList();
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     */
     public Admin(Repository repository) {
         super(repository);
     }
@@ -146,19 +167,25 @@ public class Admin  extends RepositoryManager {
     /**
      * _more_
      *
+     *
+     * @param generateJava _more_
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected StringBuffer getDbMetaData() throws Exception {
+    protected StringBuffer getDbMetaData(boolean generateJava)
+            throws Exception {
         StringBuffer     sb       = new StringBuffer();
-        DatabaseMetaData dbmd     = getRepository().getConnection().getMetaData();
+        DatabaseMetaData dbmd = getRepository().getConnection().getMetaData();
         ResultSet        catalogs = dbmd.getCatalogs();
-
-        System.err.println("catalogs");
-        ResultSet tables = dbmd.getTables(null, null, null, null);
+        ResultSet        tables   = dbmd.getTables(null, null, null, null);
         while (tables.next()) {
             String tableName = tables.getString("TABLE_NAME");
+            if (generateJava
+                    && (getRepository().getTypeHandler(tableName, false,
+                        false) != null)) {
+                continue;
+            }
             String tableType = tables.getString("TABLE_TYPE");
             if ((tableType != null) && tableType.startsWith("SYSTEM")) {
                 continue;
@@ -166,16 +193,66 @@ public class Admin  extends RepositoryManager {
             ResultSet columns = dbmd.getColumns(null, null, tableName, null);
             String encoded = new String(XmlUtil.encodeBase64(("text:?"
                                  + tableName).getBytes()));
-            int cnt = getRepository().getCount(tableName, "");
-            sb.append("Table:" + tableName + " (#" + cnt + ")");
-            sb.append("<ul>");
+
+            int    cnt       = getRepository().getCount(tableName, "");
+            String tableVar  = null;
+            String TABLENAME = tableName.toUpperCase();
+            if (generateJava) {
+                tableVar = "TABLE_" + TABLENAME;
+                sb.append("public static final String " + tableVar + "  = \""
+                          + tableName.toLowerCase() + "\";\n");
+            } else {
+                sb.append("Table:" + tableName + " (#" + cnt + ")");
+                sb.append("<ul>");
+            }
+            List colVars = new ArrayList();
             while (columns.next()) {
                 String colName = columns.getString("COLUMN_NAME");
-                sb.append("<li>");
-                sb.append(colName + " (" + columns.getString("TYPE_NAME")
-                          + ")");
+                if (generateJava) {
+                    colName = colName.toLowerCase();
+                    String colVar = "COL_" + TABLENAME + "_"
+                                    + colName.toUpperCase();
+                    colVars.add(colVar);
+                    sb.append("public static final String " + colVar + " = "
+                              + tableVar + "+\"." + colName + "\";\n");
+
+                } else {
+                    sb.append("<li>");
+                    sb.append(colName + " (" + columns.getString("TYPE_NAME")
+                              + ")");
+                }
             }
-            sb.append("</ul>");
+
+
+            if (generateJava) {
+                sb.append("\n");
+                sb.append("public static final String []ARRAY_" + TABLENAME
+                          + "= new String[]{\n");
+                sb.append(StringUtil.join(",\n", colVars));
+                sb.append("};\n\n");
+                sb.append("public static final String COLUMNS_" + TABLENAME
+                          + " = SqlUtil.commaNoDot(ARRAY_" + TABLENAME
+                          + ");\n");
+                sb.append("public static final String INSERT_" + TABLENAME
+                          + "=\n");
+                sb.append("SqlUtil.makeInsert(\n");
+                sb.append("TABLE_" + TABLENAME + ",\n");
+                sb.append("COLUMNS_" + TABLENAME + ",\n");
+                sb.append("SqlUtil.getQuestionMarks(ARRAY_" + TABLENAME
+                          + ".length));\n");
+                sb.append("\n");
+                if (TABLENAME.equals("ENTRIES")) {
+                    sb.append("public static final String UPDATE_"
+                              + TABLENAME + " =\n");
+                    sb.append("SqlUtil.makeUpdate(\n");
+                    sb.append(tableVar + ",\n");
+                    sb.append("COL_" + TABLENAME + "_ID,\n");
+                    sb.append("ARRAY_" + TABLENAME + ");\n");
+                }
+                sb.append("\n\n");
+            } else {
+                sb.append("</ul>");
+            }
         }
         return sb;
     }
@@ -189,15 +266,18 @@ public class Admin  extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void initHarvesters() throws Exception {
-        List<String> harvesterFiles =
-            StringUtil.split(getRepository().getProperty(PROP_HARVESTERS_FILE), ";", true,
-                             true);
-        boolean okToStart = getRepository().getProperty(PROP_HARVESTERS_ACTIVE, true);
+        List<String> harvesterFiles = StringUtil.split(
+                                          getRepository().getProperty(
+                                              PROP_HARVESTERS_FILE), ";",
+                                                  true, true);
+        boolean okToStart =
+            getRepository().getProperty(PROP_HARVESTERS_ACTIVE, true);
         try {
             harvesters = new ArrayList<Harvester>();
             for (String file : harvesterFiles) {
                 Element root = XmlUtil.getRoot(file, getClass());
-                harvesters.addAll(Harvester.createHarvesters(getRepository(), root));
+                harvesters.addAll(Harvester.createHarvesters(getRepository(),
+                        root));
             }
         } catch (Exception exc) {
             System.err.println("Error loading harvester file");
@@ -206,8 +286,8 @@ public class Admin  extends RepositoryManager {
         for (Harvester harvester : harvesters) {
             File rootDir = harvester.getRootDir();
             if (rootDir != null) {
-                getRepository().addDownloadPrefix(rootDir.toString().replace("\\", "/")
-                                     + "/");
+                getRepository().addDownloadPrefix(
+                    rootDir.toString().replace("\\", "/") + "/");
             }
             if ( !okToStart) {
                 harvester.setActive(false);
@@ -237,14 +317,14 @@ public class Admin  extends RepositoryManager {
             if (getRepository().getConnection() == null) {
                 sb.append("Not connected to database");
             } else {
-                getRepository().closeConnection();
+                getRepository().getDatabaseManager().closeConnection();
                 sb.append("Database is shut down");
             }
         } else if (what.equals("restart")) {
             if (getRepository().getConnection() != null) {
                 sb.append("Already connected to database");
             } else {
-                getRepository().makeConnection();
+                getRepository().getDatabaseManager().makeConnection();
                 sb.append("Database is restarted");
             }
         }
@@ -260,7 +340,8 @@ public class Admin  extends RepositoryManager {
         sb.append("</form>");
         Result result = new Result("Administration", sb);
         result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request, adminUrls));
+                           getRepository().getSubNavLinks(request,
+                               adminUrls));
         return result;
     }
 
@@ -274,12 +355,23 @@ public class Admin  extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminDbTables(Request request) throws Exception {
-        StringBuffer sb = new StringBuffer();
-        sb.append(header("Database Tables"));
-        sb.append(getDbMetaData());
+        StringBuffer sb           = new StringBuffer();
+        boolean      generateJava = request.exists("java");
+        if (generateJava) {
+            sb.append("//J+\n/** begin generated table definitions**/\n\n");
+        } else {
+            sb.append(header("Database Tables"));
+        }
+        sb.append(getDbMetaData(generateJava));
+        if (generateJava) {
+            sb.append("\n\n/** end generated table definitions**/\n\n//J+");
+            return new Result("", sb, "text");
+        }
+
         Result result = new Result("Administration", sb);
         result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request, adminUrls));
+                           getRepository().getSubNavLinks(request,
+                               adminUrls));
         return result;
     }
 
@@ -309,7 +401,8 @@ public class Admin  extends RepositoryManager {
         sb.append("</ul>");
         Result result = new Result("Administration", sb);
         result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request, adminUrls));
+                           getRepository().getSubNavLinks(request,
+                               adminUrls));
         return result;
     }
 
@@ -380,7 +473,8 @@ public class Admin  extends RepositoryManager {
 
         Result result = new Result("Harvesters", sb);
         result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request, adminUrls));
+                           getRepository().getSubNavLinks(request,
+                               adminUrls));
         return result;
     }
 
@@ -403,23 +497,31 @@ public class Admin  extends RepositoryManager {
         String[] tables = { TABLE_USERS, TABLE_TAGS, TABLE_ASSOCIATIONS };
         for (int i = 0; i < tables.length; i++) {
             sb.append(HtmlUtil.row(HtmlUtil.cols(""
-                    + getRepository().getCount(tables[i].toLowerCase(), ""), names[i])));
+                    + getRepository().getCount(tables[i].toLowerCase(),
+                        ""), names[i])));
         }
 
 
         sb.append(HtmlUtil.row("<td colspan=\"2\">&nbsp;<p>"
                                + HtmlUtil.bold("Types:") + "</td>"));
         int total = 0;
-        sb.append(HtmlUtil.row(HtmlUtil.cols("" + getRepository().getCount(TABLE_ENTRIES,
-                ""), "Total entries")));
-        for (TypeHandler typeHandler: getRepository().getTypeHandlers()) {
+        sb.append(
+            HtmlUtil.row(
+                HtmlUtil.cols(
+                    "" + getRepository().getCount(TABLE_ENTRIES, ""),
+                    "Total entries")));
+        for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
             if (typeHandler.isType(TypeHandler.TYPE_ANY)) {
                 continue;
             }
-            int cnt = getRepository().getCount(TABLE_ENTRIES, "type=" + SqlUtil.quote(typeHandler.getType()));
+            int cnt = getRepository().getCount(TABLE_ENTRIES,
+                          "type=" + SqlUtil.quote(typeHandler.getType()));
 
-            String url = HtmlUtil.href(HtmlUtil.url(getRepository().URL_ENTRY_SEARCHFORM,
-                             ARG_TYPE, typeHandler.getType()), typeHandler.getLabel());
+            String url =
+                HtmlUtil.href(
+                    HtmlUtil.url(
+                        getRepository().URL_ENTRY_SEARCHFORM, ARG_TYPE,
+                        typeHandler.getType()), typeHandler.getLabel());
             sb.append(HtmlUtil.row(HtmlUtil.cols("" + cnt, url)));
         }
 
@@ -429,7 +531,8 @@ public class Admin  extends RepositoryManager {
 
         Result result = new Result("Repository Statistics", sb);
         result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request, adminUrls));
+                           getRepository().getSubNavLinks(request,
+                               adminUrls));
         return result;
     }
 
@@ -450,13 +553,16 @@ public class Admin  extends RepositoryManager {
         sb.append(header("SQL"));
         sb.append(HtmlUtil.form(URL_ADMIN_SQL));
         sb.append(HtmlUtil.submit("Execute"));
-        sb.append(HtmlUtil.textArea(ARG_QUERY, query==null?"":query, 10,75));
+        sb.append(HtmlUtil.textArea(ARG_QUERY, (query == null)
+                ? ""
+                : query, 10, 75));
         sb.append("</form>\n");
         sb.append("<table>");
         if (query == null) {
             Result result = new Result("SQL", sb);
             result.putProperty(PROP_NAVSUBLINKS,
-                               getRepository().getSubNavLinks(request, adminUrls));
+                               getRepository().getSubNavLinks(request,
+                                   adminUrls));
             return result;
         }
 
@@ -495,8 +601,10 @@ public class Admin  extends RepositoryManager {
                 sb.append("<tr>");
                 while (colcnt < rsmd.getColumnCount()) {
                     colcnt++;
-                    if(rsmd.getColumnType(colcnt) == java.sql.Types.TIMESTAMP) {
-                        Date dttm = results.getTimestamp(colcnt , Repository.calendar );
+                    if (rsmd.getColumnType(colcnt)
+                            == java.sql.Types.TIMESTAMP) {
+                        Date dttm = results.getTimestamp(colcnt,
+                                        Repository.calendar);
                         sb.append(HtmlUtil.col(Repository.fmt(dttm)));
                     } else {
                         sb.append(HtmlUtil.col(results.getString(colcnt)));
@@ -516,7 +624,8 @@ public class Admin  extends RepositoryManager {
                                        + " rows in: " + (t2 - t1) + "ms <p>"
                                        + sb.toString()));
         result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request, adminUrls));
+                           getRepository().getSubNavLinks(request,
+                               adminUrls));
         return result;
     }
 
@@ -557,10 +666,12 @@ public class Admin  extends RepositoryManager {
             sb.append(status);
         }
         //        sb.append(cnt +" files do not exist in " + (t2-t1) );
-        Result result = new Result("Cleanup", sb,
-                                   getRepository().getMimeTypeFromSuffix(".html"));
+        Result result =
+            new Result("Cleanup", sb,
+                       getRepository().getMimeTypeFromSuffix(".html"));
         result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request, adminUrls));
+                           getRepository().getSubNavLinks(request,
+                               adminUrls));
         return result;
     }
 
@@ -589,12 +700,13 @@ public class Admin  extends RepositoryManager {
                                        COL_ENTRIES_RESOURCE_TYPE,
                                        SqlUtil.quote(Resource.TYPE_FILE)));
 
-            SqlUtil.Iterator iter = SqlUtil.getIterator(getRepository().execute(query));
-            ResultSet        results;
-            int              cnt       = 0;
-            int              deleteCnt = 0;
-            long             t1        = System.currentTimeMillis();
-            List<Entry>      entries   = new ArrayList<Entry>();
+            SqlUtil.Iterator iter =
+                SqlUtil.getIterator(getRepository().execute(query));
+            ResultSet   results;
+            int         cnt       = 0;
+            int         deleteCnt = 0;
+            long        t1        = System.currentTimeMillis();
+            List<Entry> entries   = new ArrayList<Entry>();
             while ((results = iter.next()) != null) {
                 while (results.next()) {
                     if ((cleanupTimeStamp != myTimeStamp)
@@ -649,7 +761,7 @@ public class Admin  extends RepositoryManager {
 
 
 
-    /** _more_          */
+    /** _more_ */
     int ccnt = 0;
 
 

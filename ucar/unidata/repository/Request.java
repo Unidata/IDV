@@ -22,6 +22,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -80,6 +87,7 @@ import java.util.regex.*;
 public class Request implements Constants {
 
 
+    /** _more_ */
     private Hashtable fileUploads;
 
     /** _more_ */
@@ -97,8 +105,10 @@ public class Request implements Constants {
     /** _more_ */
     private Repository repository;
 
+    /** _more_ */
     private Hashtable httpHeaderArgs;
 
+    /** _more_ */
     private String sessionId;
 
     /**
@@ -121,26 +131,50 @@ public class Request implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param uploads _more_
+     */
     public void setFileUploads(Hashtable uploads) {
         fileUploads = uploads;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param arg _more_
+     *
+     * @return _more_
+     */
     public String getUploadedFile(String arg) {
-        if(fileUploads == null) return null;
+        if (fileUploads == null) {
+            return null;
+        }
         return (String) fileUploads.get(arg);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getUrl() {
-        return  getRequestPath() + "?"
-            + getUrlArgs();
+        return getRequestPath() + "?" + getUrlArgs();
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param except _more_
+     *
+     * @return _more_
+     */
     public String getUrl(String except) {
-        return  getRequestPath() + "?"
-            + getUrlArgs(except);
+        return getRequestPath() + "?" + getUrlArgs(except);
     }
 
 
@@ -150,20 +184,36 @@ public class Request implements Constants {
      * @return _more_
      */
     public String getUrlArgs() {
-        return getUrlArgs((Hashtable)null);
+        return getUrlArgs((Hashtable) null);
     }
 
+    /**
+     * _more_
+     *
+     * @param except _more_
+     *
+     * @return _more_
+     */
     public String getUrlArgs(String except) {
-        return getUrlArgs(Misc.newHashtable(except,except));
+        return getUrlArgs(Misc.newHashtable(except, except));
     }
 
 
+    /**
+     * _more_
+     *
+     * @param except _more_
+     *
+     * @return _more_
+     */
     public String getUrlArgs(Hashtable except) {
         StringBuffer sb  = new StringBuffer();
         int          cnt = 0;
         for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {
-            String arg   = (String) keys.nextElement();
-            if(except!=null && except.get(arg)!=null) continue;
+            String arg = (String) keys.nextElement();
+            if ((except != null) && (except.get(arg) != null)) {
+                continue;
+            }
             String value = (String) parameters.get(arg);
             if (value.length() == 0) {
                 continue;
@@ -270,9 +320,16 @@ public class Request implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
     public boolean exists(String key) {
         String result = (String) get(key, (String) null);
-        return result!=null;
+        return result != null;
     }
 
     /**
@@ -670,26 +727,35 @@ public class Request implements Constants {
         }
     }
 
-/**
-Set the HttpHeaderArgs property.
+    /**
+     * Set the HttpHeaderArgs property.
+     *
+     * @param value The new value for HttpHeaderArgs
+     */
+    public void setHttpHeaderArgs(Hashtable value) {
+        httpHeaderArgs = value;
+    }
 
-@param value The new value for HttpHeaderArgs
-**/
-public void setHttpHeaderArgs (Hashtable value) {
-	httpHeaderArgs = value;
-}
+    /**
+     * Get the HttpHeaderArgs property.
+     *
+     * @return The HttpHeaderArgs
+     */
+    public Hashtable getHttpHeaderArgs() {
+        return httpHeaderArgs;
+    }
 
-/**
-Get the HttpHeaderArgs property.
-
-@return The HttpHeaderArgs
-**/
-public Hashtable getHttpHeaderArgs () {
-	return httpHeaderArgs;
-}
-
+    /**
+     * _more_
+     *
+     * @param name _more_
+     *
+     * @return _more_
+     */
     public String getHeaderArg(String name) {
-        if(httpHeaderArgs == null) return null;
+        if (httpHeaderArgs == null) {
+            return null;
+        }
         return (String) httpHeaderArgs.get(name);
     }
 
@@ -703,23 +769,23 @@ public Hashtable getHttpHeaderArgs () {
         return type + " " + getUrlArgs();
     }
 
-/**
-Set the SessionId property.
+    /**
+     * Set the SessionId property.
+     *
+     * @param value The new value for SessionId
+     */
+    public void setSessionId(String value) {
+        sessionId = value;
+    }
 
-@param value The new value for SessionId
-**/
-public void setSessionId (String value) {
-	sessionId = value;
-}
-
-/**
-Get the SessionId property.
-
-@return The SessionId
-**/
-public String getSessionId () {
-	return sessionId;
-}
+    /**
+     * Get the SessionId property.
+     *
+     * @return The SessionId
+     */
+    public String getSessionId() {
+        return sessionId;
+    }
 
 
 

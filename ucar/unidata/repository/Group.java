@@ -22,6 +22,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -56,7 +63,7 @@ public class Group extends Entry {
     private List<Group> children = new ArrayList<Group>();
 
 
-    /** _more_          */
+    /** _more_ */
     private boolean isDummy = false;
 
     /**

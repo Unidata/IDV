@@ -21,6 +21,13 @@
 
 
 
+
+
+
+
+
+
+
 package ucar.unidata.repository;
 
 
@@ -98,8 +105,14 @@ public class OutputHandler implements Constants, Tables {
     protected static String graphAppletTemplate;
 
 
-    public OutputHandler(Repository repository)
-            throws Exception {
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     *
+     * @throws Exception _more_
+     */
+    public OutputHandler(Repository repository) throws Exception {
         this.repository = repository;
 
     }
@@ -148,7 +161,6 @@ public class OutputHandler implements Constants, Tables {
      * @param what _more_
      * @param types _more_
      *
-     * @return _more_
      *
      * @throws Exception _more_
      */
@@ -163,7 +175,6 @@ public class OutputHandler implements Constants, Tables {
      * @param entries _more_
      * @param types _more_
      *
-     * @return _more_
      *
      * @throws Exception _more_
      */
