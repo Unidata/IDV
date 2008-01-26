@@ -232,6 +232,8 @@ public class MetaDataServer extends HttpServer implements Constants {
         }
 
 
+
+
         /**
          * _more_
          *
@@ -248,6 +250,7 @@ public class MetaDataServer extends HttpServer implements Constants {
             path = path.trim();
             try {
                 RequestContext context = new RequestContext(null);
+                context.setIp(getSocket().getInetAddress().getHostAddress());
                 Request request = new Request(repository, path, context,
                                       formArgs);
                 request.setFileUploads(fileUploads);

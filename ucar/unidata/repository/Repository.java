@@ -115,8 +115,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private List<String> downloadPrefixes = new ArrayList<String>();
 
-    /** _more_ */
-    private Hashtable session = new Hashtable();
 
     /** _more_ */
     public RequestUrl URL_GETMAP = new RequestUrl(this, "/getmap");
@@ -1016,39 +1014,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param user _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void setUserSession(Request request, User user)
-            throws Exception {
-        if (request.getSessionId() == null) {
-            request.setSessionId(getGUID());
-        }
-        session.put(request.getSessionId(), user);
-        request.getRequestContext().setUser(user);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void removeUserSession(Request request) throws Exception {
-        if (request.getSessionId() != null) {
-            session.remove(request.getSessionId());
-        }
-        request.getRequestContext().setUser(
-            getUserManager().getAnonymousUser());
-    }
-
 
     /**
      * _more_
@@ -1061,41 +1026,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public Result handleRequest(Request request) throws Exception {
 
-        String sessionId = null;
-        String cookie    = request.getHeaderArg("Cookie");
-        User   user      = request.getRequestContext().getUser();
-        if (cookie != null) {
-            List toks = StringUtil.split(cookie, ";", true, true);
-            for (int i = 0; i < toks.size(); i++) {
-                String tok     = (String) toks.get(i);
-                List   subtoks = StringUtil.split(tok, "=", true, true);
-                if (subtoks.size() != 2) {
-                    continue;
-                }
-                String cookieName  = (String) subtoks.get(0);
-                String cookieValue = (String) subtoks.get(1);
-                if (cookieName.equals("repository-session")) {
-                    sessionId = cookieValue;
-                    if (user == null) {
-                        user = (User) session.get(sessionId);
-                        if (user != null) {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (sessionId == null) {
-            sessionId = getGUID() + "_" + Math.random();
-        }
-        request.setSessionId(sessionId);
-
-        if (user == null) {
-            user = getUserManager().getAnonymousUser();
-        }
-
-        request.getRequestContext().setUser(user);
+        getUserManager().checkSession(request);
 
 
         long   t1 = System.currentTimeMillis();
@@ -1183,7 +1114,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                     && !apiMethod.isRequestOk(request, this))) {
             StringBuffer sb = new StringBuffer();
             sb.append("You do not have the correct access<p>");
-            sb.append(getUserManager().makeLoginForm(request));
+            sb.append(getUserManager().makeLoginForm(request, HtmlUtil.hidden(ARG_REDIRECT,request.getFullUrl())));
             return new Result("Error", sb);
         }
 
@@ -1390,10 +1321,13 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      */
     protected void initTable() throws Exception {
+        //Force a connection
+        getConnection();
         String sql = IOUtil.readContents(getProperty(PROP_DB_SCRIPT),
                                          getClass());
-        Statement statement = getConnection().createStatement();
         sql = getDatabaseManager().convertSql(sql);
+
+        Statement statement = getConnection().createStatement();
         SqlUtil.loadSql(sql, statement, true);
 
         for (String file : typeDefinitionFiles) {
@@ -5070,6 +5004,11 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public void insertEntries(List<Entry> entries, boolean isNew)
             throws Exception {
+        insertEntries(entries, isNew, false);
+    }
+
+    public void insertEntries(List<Entry> entries, boolean isNew,boolean canBeBatched)
+        throws Exception {
 
         if (entries.size() == 0) {
             return;
@@ -5103,13 +5042,6 @@ public class Repository implements Constants, Tables, RequestHandler,
                         typeStatement = getConnection().prepareStatement(sql);
                         typeStatements.put(sql, typeStatement);
                     }
-                }
-
-                if ((++cnt) % 5000 == 0) {
-                    long   tt2      = System.currentTimeMillis();
-                    double tseconds = (tt2 - t1) / 1000.0;
-                    System.err.println("# " + cnt + " rate: "
-                                       + ((int) (cnt / tseconds)) + "/s");
                 }
 
                 setStatement(entry, entryStatement, isNew);
@@ -5170,10 +5102,24 @@ public class Repository implements Constants, Tables, RequestHandler,
             getConnection().setAutoCommit(true);
         }
 
+
+        long t2  = System.currentTimeMillis();
+        totalTime+= (t2-t1);
+        totalEntries+=entries.size();
+        if(t2>t1){
+            //System.err.println("added:" + entries.size() + " entries in " + (t2-t1) + " ms  Rate:" + (entries.size()/(t2-t1)));
+            double seconds = totalTime/1000.0;
+            if(seconds>0) {
+                //                System.err.println(entries.size() +" average rate:" +  (int)(totalEntries/seconds)+"/second");
+            }
+        }
+
         Misc.run(this, "checkNewEntries", entries);
 
     }
 
+    long totalTime = 0;
+    int totalEntries = 0;
 
 
 
@@ -5234,7 +5180,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             //            System.err.println("query:" + sql);
             statement.execute(sql);
         } catch (Exception exc) {
-            System.err.println("ERROR:" + sql);
+            log("Error executing sql:" + sql);
             throw exc;
         }
         long t2 = System.currentTimeMillis();
@@ -5311,20 +5257,20 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public boolean processEntries(Harvester harvester,
                                   TypeHandler typeHandler,
-                                  List<Entry> entries) {
+                                  List<Entry> entries) throws Exception {
+        System.err.print (harvester.getName() + "  process entries: " );
+        insertEntries(getUniqueEntries(entries), true, true);
+        return true;
+    }
+
+
+    public List<Entry> getUniqueEntries(List<Entry> entries) throws Exception {
+        List<Entry> needToAdd = new ArrayList();
         String query = "";
         try {
             if (entries.size() == 0) {
-                return true;
+                return needToAdd;
             }
-            //            long  tt1 = System.currentTimeMillis();
-            //            String allQuery = SqlUtil.makeSelect(COL_ENTRIES_RESOURCE,
-            //                                                 Misc.newList(TABLE_ENTRIES));
-            //            String[] files =  SqlUtil.readString(execute(allQuery), 1);
-            //            long  tt2 = System.currentTimeMillis();
-            //            System.err.println ("tt:"+ (tt2-tt1) + " #files:" + files.length );
-
-
             if (seenResources.size() > 500000) {
                 seenResources = new Hashtable();
             }
@@ -5335,7 +5281,6 @@ public class Repository implements Constants, Tables, RequestHandler,
                                        SqlUtil.eq(COL_ENTRIES_RESOURCE,
                                            "?")));
             long        t1        = System.currentTimeMillis();
-            List<Entry> needToAdd = new ArrayList();
             for (Entry entry : entries) {
                 String path = entry.getResource().getPath();
                 if (seenResources.get(path) != null) {
@@ -5352,27 +5297,14 @@ public class Repository implements Constants, Tables, RequestHandler,
                     }
                 }
             }
-            /*
-              ResultSet results = select.executeBatch();
-              int cnt = 0;
-              while(results.next()) {
-              int found = results.getInt(1);
-              if(found ==0) {
-              needToAdd.add(entries.get(cnt));
-              }
-              cnt++;
-              }
-              System.err.println ("#results:" + cnt);
-            */
             long t2 = System.currentTimeMillis();
-            insertEntries(needToAdd, true);
             //            System.err.println("Took:" + (t2 - t1) + "ms to check: "
             //                               + entries.size() + " entries");
         } catch (Exception exc) {
             log("Processing:" + query, exc);
-            return false;
+            throw exc;
         }
-        return true;
+        return needToAdd;
     }
 
 

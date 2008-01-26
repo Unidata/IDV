@@ -82,7 +82,7 @@ public interface Tables {
 
     /** _more_ */
     public static final String COLUMNS_ASSOCIATIONS =
-        SqlUtil.commaNoDot(ARRAY_ASSOCIATIONS);
+        SqlUtil.comma(ARRAY_ASSOCIATIONS);
 
     /** _more_ */
     public static final String INSERT_ASSOCIATIONS =
@@ -125,7 +125,7 @@ public interface Tables {
 
     /** _more_ */
     public static final String COLUMNS_COMMENTS =
-        SqlUtil.commaNoDot(ARRAY_COMMENTS);
+        SqlUtil.comma(ARRAY_COMMENTS);
 
     /** _more_ */
     public static final String INSERT_COMMENTS =
@@ -146,7 +146,7 @@ public interface Tables {
 
     /** _more_ */
     public static final String COLUMNS_DUMMY =
-        SqlUtil.commaNoDot(ARRAY_DUMMY);
+        SqlUtil.comma(ARRAY_DUMMY);
 
     /** _more_ */
     public static final String INSERT_DUMMY =
@@ -222,7 +222,7 @@ public interface Tables {
 
     /** _more_ */
     public static final String COLUMNS_ENTRIES =
-        SqlUtil.commaNoDot(ARRAY_ENTRIES);
+        SqlUtil.comma(ARRAY_ENTRIES);
 
     /** _more_ */
     public static final String INSERT_ENTRIES =
@@ -250,7 +250,7 @@ public interface Tables {
 
     /** _more_ */
     public static final String COLUMNS_GLOBALS =
-        SqlUtil.commaNoDot(ARRAY_GLOBALS);
+        SqlUtil.comma(ARRAY_GLOBALS);
 
     /** _more_ */
     public static final String INSERT_GLOBALS =
@@ -276,7 +276,7 @@ public interface Tables {
 
     /** _more_ */
     public static final String COLUMNS_LEVEL2RADAR =
-        SqlUtil.commaNoDot(ARRAY_LEVEL2RADAR);
+        SqlUtil.comma(ARRAY_LEVEL2RADAR);
 
     /** _more_ */
     public static final String INSERT_LEVEL2RADAR =
@@ -307,7 +307,7 @@ public interface Tables {
 
     /** _more_ */
     public static final String COLUMNS_LEVEL3RADAR =
-        SqlUtil.commaNoDot(ARRAY_LEVEL3RADAR);
+        SqlUtil.comma(ARRAY_LEVEL3RADAR);
 
     /** _more_ */
     public static final String INSERT_LEVEL3RADAR =
@@ -340,7 +340,7 @@ public interface Tables {
 
     /** _more_ */
     public static final String COLUMNS_METADATA =
-        SqlUtil.commaNoDot(ARRAY_METADATA);
+        SqlUtil.comma(ARRAY_METADATA);
 
     /** _more_ */
     public static final String INSERT_METADATA =
@@ -368,7 +368,7 @@ public interface Tables {
 
     /** _more_ */
     public static final String COLUMNS_MODEL =
-        SqlUtil.commaNoDot(ARRAY_MODEL);
+        SqlUtil.comma(ARRAY_MODEL);
 
     /** _more_ */
     public static final String INSERT_MODEL =
@@ -399,7 +399,7 @@ public interface Tables {
 
     /** _more_ */
     public static final String COLUMNS_PERMISSIONS =
-        SqlUtil.commaNoDot(ARRAY_PERMISSIONS);
+        SqlUtil.comma(ARRAY_PERMISSIONS);
 
     /** _more_ */
     public static final String INSERT_PERMISSIONS =
@@ -435,7 +435,7 @@ public interface Tables {
 
     /** _more_ */
     public static final String COLUMNS_SATELLITE =
-        SqlUtil.commaNoDot(ARRAY_SATELLITE);
+        SqlUtil.comma(ARRAY_SATELLITE);
 
     /** _more_ */
     public static final String INSERT_SATELLITE =
@@ -458,7 +458,7 @@ public interface Tables {
             COL_TAGS_ENTRY_ID };
 
     /** _more_ */
-    public static final String COLUMNS_TAGS = SqlUtil.commaNoDot(ARRAY_TAGS);
+    public static final String COLUMNS_TAGS = SqlUtil.comma(ARRAY_TAGS);
 
     /** _more_ */
     public static final String INSERT_TAGS =
@@ -488,7 +488,7 @@ public interface Tables {
 
     /** _more_ */
     public static final String COLUMNS_TESTIT =
-        SqlUtil.commaNoDot(ARRAY_TESTIT);
+        SqlUtil.comma(ARRAY_TESTIT);
 
     /** _more_ */
     public static final String INSERT_TESTIT =
@@ -513,7 +513,7 @@ public interface Tables {
 
     /** _more_ */
     public static final String COLUMNS_TESTIT2 =
-        SqlUtil.commaNoDot(ARRAY_TESTIT2);
+        SqlUtil.comma(ARRAY_TESTIT2);
 
     /** _more_ */
     public static final String INSERT_TESTIT2 =
@@ -539,7 +539,7 @@ public interface Tables {
 
     /** _more_ */
     public static final String COLUMNS_USERROLES =
-        SqlUtil.commaNoDot(ARRAY_USERROLES);
+        SqlUtil.comma(ARRAY_USERROLES);
 
     /** _more_ */
     public static final String INSERT_USERROLES =
@@ -580,7 +580,7 @@ public interface Tables {
 
     /** _more_ */
     public static final String COLUMNS_USERS =
-        SqlUtil.commaNoDot(ARRAY_USERS);
+        SqlUtil.comma(ARRAY_USERS);
 
     /** _more_ */
     public static final String INSERT_USERS =

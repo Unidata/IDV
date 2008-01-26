@@ -164,6 +164,10 @@ public class Request implements Constants {
         return getRequestPath() + "?" + getUrlArgs();
     }
 
+    public String getFullUrl() {
+        return repository.absoluteUrl(getUrl());
+    }
+
 
 
     /**

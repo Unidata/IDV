@@ -122,6 +122,11 @@ public class DatabaseManager extends RepositoryManager {
      */
     public DatabaseManager(Repository repository) {
         super(repository);
+        db = (String) getRepository().getProperty(PROP_DB);
+        if (db == null) {
+            throw new IllegalStateException("Must have a " + PROP_DB
+                                            + " property defined");
+        }
     }
 
 
@@ -133,6 +138,8 @@ public class DatabaseManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Connection getConnection() throws Exception {
+      
+
         if (theConnection != null) {
             try {
                 Statement statement = theConnection.createStatement();
@@ -140,6 +147,8 @@ public class DatabaseManager extends RepositoryManager {
             } catch (Exception exc) {
                 theConnection = makeConnection();
             }
+        } else {
+                theConnection = makeConnection();
         }
         return theConnection;
     }
@@ -176,11 +185,6 @@ public class DatabaseManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected Connection makeConnection() throws Exception {
-        db = (String) getRepository().getProperty(PROP_DB);
-        if (db == null) {
-            throw new IllegalStateException("Must have a " + PROP_DB
-                                            + " property defined");
-        }
 
 
         String userName = (String) getRepository().getProperty(

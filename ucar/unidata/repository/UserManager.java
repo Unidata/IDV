@@ -81,6 +81,8 @@ import java.util.Properties;
 public class UserManager extends RepositoryManager {
 
 
+    /** _more_ */
+    private Hashtable session = new Hashtable();
 
 
     /** _more_ */
@@ -176,6 +178,9 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     private Hashtable userCart = new Hashtable();
 
+    private List ipUserList = new ArrayList();
+
+
     /**
      * _more_
      *
@@ -185,6 +190,9 @@ public class UserManager extends RepositoryManager {
         super(repository);
         requireLogin = getRepository().getProperty(PROP_USER_REQUIRELOGIN,
                 true);
+        //        ipUserList.add("128.117.156.*");
+        //        ipUserList.add("jeffmc");
+
     }
 
 
@@ -205,6 +213,100 @@ public class UserManager extends RepositoryManager {
         } catch (UnsupportedEncodingException uee) {
             throw new IllegalStateException(uee.getMessage());
         }
+    }
+
+
+
+    protected void checkSession(Request request) throws Exception {
+        String sessionId = null;
+        String cookie    = request.getHeaderArg("Cookie");
+        User   user      = request.getRequestContext().getUser();
+        if (cookie != null) {
+            List toks = StringUtil.split(cookie, ";", true, true);
+            for (int i = 0; i < toks.size(); i++) {
+                String tok     = (String) toks.get(i);
+                List   subtoks = StringUtil.split(tok, "=", true, true);
+                if (subtoks.size() != 2) {
+                    continue;
+                }
+                String cookieName  = (String) subtoks.get(0);
+                String cookieValue = (String) subtoks.get(1);
+                if (cookieName.equals("repository-session")) {
+                    sessionId = cookieValue;
+                    if (user == null) {
+                        user = (User) session.get(sessionId);
+                        if (user != null) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (sessionId == null) {
+            sessionId = getSessionId();
+        }
+        request.setSessionId(sessionId);
+
+        if (user == null) {
+            String requestIp = request.getRequestContext().getIp();
+            if(requestIp!=null) {
+                for(int i=0;i<ipUserList.size();i+=2) {
+                    String ip =(String)ipUserList.get(i);
+                    String userName =(String)ipUserList.get(i+1);
+                    if(requestIp.matches(ip)) {
+                        user = findUser(userName, false);
+                        if(user == null) {
+                            user = new User(userName,false);
+                            makeOrUpdateUser(user, false);
+                        }
+                    }
+                }
+            }
+            if(user ==null) {
+                user = getUserManager().getAnonymousUser();
+            }
+        }
+        request.getRequestContext().setUser(user);
+
+    }
+
+    private String getSessionId() {
+        return getRepository().getGUID() + "_" + Math.random();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param user _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void setUserSession(Request request, User user)
+            throws Exception {
+        if (request.getSessionId() == null) {
+             request.setSessionId(getSessionId());
+        }
+        session.put(request.getSessionId(), user);
+        request.getRequestContext().setUser(user);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void removeUserSession(Request request) throws Exception {
+        if (request.getSessionId() != null) {
+            session.remove(request.getSessionId());
+        }
+        request.getRequestContext().setUser(
+            getUserManager().getAnonymousUser());
     }
 
 
@@ -236,6 +338,10 @@ public class UserManager extends RepositoryManager {
      * @return _more_
      */
     public String makeLoginForm(Request request) {
+        return makeLoginForm(request,"");
+    }
+
+    public String makeLoginForm(Request request, String extra) {
         StringBuffer sb   = new StringBuffer("<h3>Please login</h3>");
         String       name = request.getString(ARG_USER_NAME, "");
         sb.append(HtmlUtil.form(URL_USER_LOGIN));
@@ -244,6 +350,8 @@ public class UserManager extends RepositoryManager {
                                      HtmlUtil.input(ARG_USER_NAME, name)));
         sb.append(HtmlUtil.formEntry("Password:",
                                      HtmlUtil.password(ARG_USER_PASSWORD1)));
+        sb.append(extra);
+
         sb.append(HtmlUtil.formEntry("", HtmlUtil.submit("Login")));
 
         sb.append("</form>");
@@ -1025,9 +1133,14 @@ public class UserManager extends RepositoryManager {
             ResultSet results = getRepository().execute(query).getResultSet();
             if (results.next()) {
                 user = getUser(results);
-                getRepository().setUserSession(request, user);
-                return new Result(HtmlUtil.url(URL_USER_HOME, ARG_MESSAGE,
-                        "You are logged in"));
+                setUserSession(request, user);
+                if (request.exists(ARG_REDIRECT)) {
+                    return new Result(HtmlUtil.url(request.getString(ARG_REDIRECT,""), ARG_MESSAGE,
+                                                   "You are logged in"));
+                } else {
+                    return new Result(HtmlUtil.url(URL_USER_HOME, ARG_MESSAGE,
+                                                   "You are logged in"));
+                }
             } else {
                 sb.append(
                     getRepository().warning(
@@ -1054,7 +1167,7 @@ public class UserManager extends RepositoryManager {
      */
     public Result processLogout(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        getRepository().removeUserSession(request);
+        removeUserSession(request);
         sb.append("Logged out");
         sb.append(makeLoginForm(request));
         Result result = new Result("Logout", sb);

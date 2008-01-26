@@ -88,6 +88,8 @@ public class RequestContext {
     /** _more_ */
     private User user;
 
+    private String ip;
+
     /**
      * _more_
      *
@@ -141,6 +143,24 @@ public class RequestContext {
         return user;
     }
 
+
+/**
+Set the Ip property.
+
+@param value The new value for Ip
+**/
+public void setIp (String value) {
+	ip = value;
+}
+
+/**
+Get the Ip property.
+
+@return The Ip
+**/
+public String getIp () {
+	return ip;
+}
 
 
 

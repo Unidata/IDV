@@ -10,7 +10,7 @@
 		filepattern=".*"
 		type="file"
                 monitor="false"
-		sleep="1"/>
+		sleep="3"/>
 
 
   <harvester    name="Pictures"
@@ -24,7 +24,7 @@
 		filepattern=".*\.jpg$|.*\.jpeg$|.*\.gif$|.*\.png$|.*\.JPG$|.*\.JPEG$|.*\.GIF$|.*\.PNG$"
 		type="image"
                 monitor="false"
-		sleep="1"/>
+		sleep="3"/>
 
 
   <harvester    name="IDD/NIDS"
@@ -42,7 +42,7 @@
 		nametemplate="${station}-${product}-${fromDate}"
 		desctemplate= "${name} description"
                 monitor="true"
-		sleep="1"/>
+		sleep="3"/>
 
 
    <harvester   name="IDD/Craft"
@@ -59,7 +59,7 @@
 		nametemplate="${station}-${fromDate}"
 		desctemplate= "${name} description"
                 monitor="true"
-		sleep="1"/>
+		sleep="3"/>
 
 
 
@@ -81,7 +81,7 @@
                 nametemplate = "${modelgroup}-${modelrun}-${fromDate}"
 		desctemplate= "${name} description"
                 monitor="true"
-		sleep="1"/>
+		sleep="3"/>
 
 
 
@@ -99,7 +99,7 @@
 		nametemplate="${platform}-${resolution}-${product}-${fromDate}"
 		desctemplate= "${name}"
                 monitor="true"
-		sleep="1"/>
+		sleep="3"/>
 
 
 

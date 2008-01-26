@@ -330,7 +330,8 @@ public class PatternHarvester extends Harvester {
             throws Exception {
 
         long           t1         = System.currentTimeMillis();
-        List<Entry>    entries    = new ArrayList();
+        List<Entry>    entries    = new ArrayList<Entry>();
+        List<Entry>    needToAdd    = new ArrayList<Entry>();
         final User     user = repository.getUserManager().getDefaultUser();
         final String   rootStr    = rootDir.toString();
         final int      rootStrLen = rootStr.length();
@@ -377,10 +378,6 @@ public class PatternHarvester extends Harvester {
                 if ( !matcher.find()) {
                     continue;
                 }
-                if (entries.size() % 1000 == 0) {
-                    //                    System.err.print(".");
-                }
-
 
 
                 Hashtable map       = new Hashtable();
@@ -399,7 +396,12 @@ public class PatternHarvester extends Harvester {
                         Object value    = matcher.group(dataIdx + 1);
                         String type     = patternTypes.get(dataIdx);
                         if (type.equals("date")) {
-                            value = sdf.parse((String) value);
+                            try {
+                                value = sdf.parse((String) value);
+                            } catch(Exception exc) {
+                                System.err.println ("value:" + value);
+                                System.err.println ("file:" + fileName);
+                            }
                         } else if (type.equals("int")) {
                             value = new Integer(value.toString());
                         } else if (type.equals("double")) {
@@ -486,18 +488,26 @@ public class PatternHarvester extends Harvester {
                 typeHandler.initializeNewEntry(entry);
 
                 if (entries.size() > 1000) {
-                    if ( !repository.processEntries(this, typeHandler,
-                            entries)) {
-                        return;
-                    }
+                    needToAdd.addAll(repository.getUniqueEntries(entries));
                     entries = new ArrayList();
                 }
+                if(needToAdd.size()>1000) {
+                    System.err.print (getName() + " x " );
+                    repository.insertEntries(needToAdd, true, true);
+                    needToAdd = new ArrayList<Entry>();
+                }
+
                 if ( !getActive()) {
                     return;
                 }
             }
         }
-        repository.processEntries(this, typeHandler, entries);
+
+        needToAdd.addAll(repository.getUniqueEntries(entries));
+        if(needToAdd.size()>0) {
+            System.err.print (getName() + " y " );
+            repository.insertEntries(needToAdd, true, true);
+        }
     }
 
 
