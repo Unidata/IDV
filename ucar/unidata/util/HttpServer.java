@@ -201,6 +201,11 @@ public class HttpServer {
             this.input  = new BufferedInputStream(input);
         }
 
+        public Socket getSocket() {
+            return socket;
+        }
+
+
         /**
          * Run the read
          */
