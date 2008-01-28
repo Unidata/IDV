@@ -67,8 +67,6 @@ public class MetaDataServer extends HttpServer implements Constants {
     /** _more_ */
     String[] args;
 
-    /** _more_ */
-    int port = 8080;
 
     /**
      * _more_
@@ -81,8 +79,7 @@ public class MetaDataServer extends HttpServer implements Constants {
         this.args = args;
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-port")) {
-                port = new Integer(args[i + 1]).intValue();
-                setPort(port);
+                setPort(new Integer(args[i + 1]).intValue());
                 break;
             }
         }
@@ -96,7 +93,7 @@ public class MetaDataServer extends HttpServer implements Constants {
     public void init() {
         try {
             //TODO: set the hostname on the repository
-            repository = new Repository(args, "http://localhost:" + port);
+            repository = new Repository(args, null , getPort());
             repository.init();
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -106,6 +103,10 @@ public class MetaDataServer extends HttpServer implements Constants {
     }
 
 
+
+    protected void initServerSocket(ServerSocket socket) {
+        super.initServerSocket(socket);
+    }
 
 
     /**
@@ -250,6 +251,12 @@ public class MetaDataServer extends HttpServer implements Constants {
                 throws Exception {
             path = path.trim();
             try {
+                //Set the hostname on the first request
+                if(repository.getHostname()==null) {
+                    String hostname = getSocket().getLocalAddress().getHostName();
+                    repository.setHostname(hostname,getPort());
+                }
+
                 RequestContext context = new RequestContext(null);
                 context.setIp(getSocket().getInetAddress().getHostAddress());
                 Request request = new Request(repository, path, context,

@@ -294,6 +294,9 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private String hostname;
 
+    private int port;
+
+
     /** _more_ */
     private boolean clientMode = false;
 
@@ -341,8 +344,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    public Repository(String[] args, String hostname) throws Exception {
-        this(args, hostname, false);
+    public Repository(String[] args, String hostname, int port) throws Exception {
+        this(args, hostname, port, false);
     }
 
     /**
@@ -354,11 +357,12 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    public Repository(String[] args, String hostname, boolean clientMode)
+    public Repository(String[] args, String hostname,  int port, boolean clientMode)
             throws Exception {
         this.clientMode = clientMode;
         this.args       = args;
         this.hostname   = hostname;
+        this.port = port;
     }
 
     /** _more_ */
@@ -1654,7 +1658,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public Result processMessage(Request request) throws Exception {
         return new Result(
-            "", new StringBuffer(note(request.getString(ARG_MESSAGE, ""))));
+            "", new StringBuffer(note(request.getUnsafeString(ARG_MESSAGE, ""))));
     }
 
 
@@ -2443,13 +2447,15 @@ public class Repository implements Constants, Tables, RequestHandler,
             String toDate   = ((entry != null)
                                ? new Date(entry.getEndDate()).toString()
                                : "");
-            sb.append(
-                HtmlUtil.formEntry(
-                    "Date Range:",
-                    HtmlUtil.input(ARG_FROMDATE, fromDate, " size=30 ")
-                    + " -- "
-                    + HtmlUtil.input(ARG_TODATE, toDate, " size=30 ")
-                    + dateHelp));
+            if (typeHandler.okToShowInForm(ARG_DATE)) {
+                sb.append(
+                          HtmlUtil.formEntry(
+                                             "Date Range:",
+                                             HtmlUtil.input(ARG_FROMDATE, fromDate, " size=30 ")
+                                             + " -- "
+                                             + HtmlUtil.input(ARG_TODATE, toDate, " size=30 ")
+                                             + dateHelp));
+            }
 
             String tags = "";
             if (entry != null) {
@@ -2457,10 +2463,14 @@ public class Repository implements Constants, Tables, RequestHandler,
                 tags = StringUtil.join(",", tagList);
             }
 
-            sb.append(HtmlUtil.formEntry("Tags:",
-                                         HtmlUtil.input(ARG_TAG, tags, size)
-                                         + " (comma separated)"));
-            sb.append(HtmlUtil.formEntry("Location:",
+            if (typeHandler.okToShowInForm(ARG_TAG)) {
+                sb.append(HtmlUtil.formEntry("Tags:",
+                                             HtmlUtil.input(ARG_TAG, tags, " size=\"20\" ")
+                                             + " (comma separated)"));
+            }
+
+            if (typeHandler.okToShowInForm(ARG_AREA)) {
+                sb.append(HtmlUtil.formEntry("Location:",
                                          HtmlUtil.makeLatLonBox(ARG_AREA,
                                              ((entry != null)
                                                  && entry.hasSouth())
@@ -2474,6 +2484,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                                   && entry.hasWest())
                     ? entry.getWest()
                     : Double.NaN)));
+            }
 
             typeHandler.addToEntryForm(request, sb, entry);
             sb.append(HtmlUtil.formEntry("", submitButton));
@@ -2547,7 +2558,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         StringBuffer sb = new StringBuffer();
 
         if (request.exists(ARG_MESSAGE)) {
-            sb.append(note(request.getString(ARG_MESSAGE, "")));
+            sb.append(note(request.getUnsafeString(ARG_MESSAGE, "")));
         }
 
         if (request.exists(ARG_DELETE)) {
@@ -4727,7 +4738,18 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     public String absoluteUrl(String url) {
-        return hostname + url;
+        return "http://" + hostname + ":" + port + url;
+    }
+
+
+    public String getHostname() {
+        return hostname;
+    }
+
+
+    public void setHostname(String hostname, int port) {
+        this.hostname = hostname;
+        this.port = port;
     }
 
 

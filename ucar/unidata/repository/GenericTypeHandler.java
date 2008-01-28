@@ -24,11 +24,6 @@
 
 
 
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -120,6 +115,24 @@ public class GenericTypeHandler extends TypeHandler {
         type = XmlUtil.getAttribute(entryNode, ATTR_DB_NAME);
         setDescription(XmlUtil.getAttribute(entryNode, ATTR_DB_DESCRIPTION,
                                             getType()));
+
+        NamedNodeMap nnm     = entryNode.getAttributes();
+        if (nnm != null) {
+            for (int i = 0; i < nnm.getLength(); i++) {
+                Attr attr = (Attr) nnm.item(i);
+                String name = attr.getNodeName();
+                if(name.startsWith("showinform.")) {
+
+                    if(attr.getNodeValue().equals("false")) {
+                        setDontShowInForm(name.substring("showinform.".length()));
+                    }
+                }
+            }
+        }
+
+
+
+
         this.columns = new ArrayList<Column>();
         colNames     = new ArrayList();
 
@@ -165,6 +178,8 @@ public class GenericTypeHandler extends TypeHandler {
             //TODO:
             //            throw new WrapperException(exc);
         }
+
+
     }
 
     /**

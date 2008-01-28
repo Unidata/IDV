@@ -142,7 +142,11 @@ public class TypeHandler implements Constants, Tables {
         this.repository  = repository;
         this.type        = type;
         this.description = description;
+
     }
+    static int cnt = 0;
+    int mycnt = cnt++;
+
 
     /**
      * _more_
@@ -597,17 +601,19 @@ public class TypeHandler implements Constants, Tables {
                     + Repository.fmt(entry.getCreateDate())));
 
             String resourceLink = entry.getResource().getPath();
-            if (entry.getResource().isUrl()) {
-                resourceLink = "<a href=\"" + resourceLink + "\">"
-                               + resourceLink + "</a>";
-            }
-            sb.append(HtmlUtil.formEntry("Resource:", resourceLink));
+            if(resourceLink.length()>0) {
+                if (entry.getResource().isUrl()) {
+                    resourceLink = "<a href=\"" + resourceLink + "\">"
+                        + resourceLink + "</a>";
+                }
+                sb.append(HtmlUtil.formEntry("Resource:", resourceLink));
 
-            if (entry.isFile()) {
-                sb.append(
-                    HtmlUtil.formEntry(
-                        "Size:",
-                        entry.getResource().getFile().length() + " bytes"));
+                if (entry.isFile()) {
+                    sb.append(
+                              HtmlUtil.formEntry(
+                                                 "Size:",
+                                                 entry.getResource().getFile().length() + " bytes"));
+                }
             }
 
             if ((entry.getCreateDate() != entry.getStartDate())

@@ -209,6 +209,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_AREA = "area";
 
+    public static final String ARG_DATE = "date";
+
     /** _more_ */
     public static final String ARG_FORM_TYPE = "form.type";
 

@@ -88,6 +88,13 @@ public class HttpServer {
         this.port = port;
     }
 
+    public int getPort() {
+        return port;
+    }
+
+
+
+
     public Hashtable getProperties() {
         return serverProperties;
     }
@@ -109,12 +116,17 @@ public class HttpServer {
         LogUtil.logException(msg, exc);
     }
 
+    protected void initServerSocket(ServerSocket socket) {
+    }
+
+
     /**
      * Initialize the socket and start reading
      */
     private void initServer() {
         try {
             serverSocket = new ServerSocket(port);
+            initServerSocket(serverSocket);
         } catch (IOException e) {
             throw new WrapperException(e);
         }

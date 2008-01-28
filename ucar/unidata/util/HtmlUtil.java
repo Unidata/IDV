@@ -64,7 +64,7 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String hbox(String s1, String s2) {
-        return "<table>" + HtmlUtil.row(HtmlUtil.cols(s1, s2)) + "</table>";
+        return "<table cellspacing=\"0\" cellpadding=\"0\">" + HtmlUtil.rowTop(HtmlUtil.cols(s1, s2)) + "</table>";
     }
 
     /**
@@ -286,6 +286,10 @@ public class HtmlUtil {
      */
     public static String row(String row) {
         return "<tr>" + row + "</tr>";
+    }
+
+    public static String rowTop(String row) {
+        return "<tr valign=\"top\">" + row + "</tr>";
     }
 
 
@@ -752,7 +756,7 @@ public class HtmlUtil {
      */
     public static String formEntryTop(String left, String right) {
         //        if(left.length()>0) 
-        return " <tr><td align=\"right\" valign=\"top\" class=\"formlabel\">"
+        return " <tr valign=\"top\"><td align=\"right\" valign=\"top\" class=\"formlabel\">"
                + left + "</td><td>" + right + "</td></tr>";
 
     }

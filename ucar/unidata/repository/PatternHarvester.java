@@ -492,7 +492,6 @@ public class PatternHarvester extends Harvester {
                     entries = new ArrayList();
                 }
                 if(needToAdd.size()>1000) {
-                    System.err.print (getName() + " x " );
                     repository.insertEntries(needToAdd, true, true);
                     needToAdd = new ArrayList<Entry>();
                 }
@@ -505,7 +504,6 @@ public class PatternHarvester extends Harvester {
 
         needToAdd.addAll(repository.getUniqueEntries(entries));
         if(needToAdd.size()>0) {
-            System.err.print (getName() + " y " );
             repository.insertEntries(needToAdd, true, true);
         }
     }

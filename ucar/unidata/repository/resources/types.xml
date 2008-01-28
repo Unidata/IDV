@@ -8,6 +8,11 @@
   </type>
 
 
+  <type name="blogpost"  description="Blog Post"  showinform.resource="false"
+  showinform.date="false"
+  showinform.area="false"/>
+
+
   <type name="model"  description="Model">
      <column name="modelgroup" type="string" isindex="true" cansearch="true" searchtype="select" label="Model Group"/>
      <column name="modelrun" type="string" isindex="true" cansearch="true" searchtype="select"  label="Model Run"/>

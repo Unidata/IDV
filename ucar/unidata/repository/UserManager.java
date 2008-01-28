@@ -672,10 +672,25 @@ public class UserManager extends RepositoryManager {
             sb.append(HtmlUtil.formEntry("Admin:",
                                          HtmlUtil.checkbox(ARG_USER_ADMIN,
                                              "true", user.getAdmin())));
-            String roles = user.getRolesAsString("\n");
-            sb.append(HtmlUtil.formEntry("Roles:",
-                                         HtmlUtil.textArea(ARG_USER_ROLES,
-                                             roles, 5, 20)));
+            String userRoles = user.getRolesAsString("\n");
+            StringBuffer allRoles = new StringBuffer();
+            List roles = getRoles();
+            allRoles.append("<table border=0 cellspacing=0 cellpadding=0><tr valign=\"top\"><td><b>e.g.:</b></td><td>&nbsp;&nbsp;</td><td>");
+            int cnt =0;
+            for(int i=0;i<roles.size();i++) {
+                if(cnt++>4) {
+                    allRoles.append("</td><td>&nbsp;&nbsp;</td><td>");
+                    cnt = 0;
+                }
+                allRoles.append("<i>");
+                allRoles.append(roles.get(i));
+                allRoles.append("</i><br>");
+            }
+            allRoles.append("</table>\n");
+
+            String roleEntry =   HtmlUtil.hbox(HtmlUtil.textArea(ARG_USER_ROLES,
+                                                                 userRoles, 5, 20), allRoles.toString());
+            sb.append(HtmlUtil.formEntryTop("Roles:",roleEntry));
         }
 
         sb.append(HtmlUtil.formEntry("Email:",
@@ -1093,7 +1108,7 @@ public class UserManager extends RepositoryManager {
     public Result processHome(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
         if (request.defined(ARG_MESSAGE)) {
-            sb.append(getRepository().note(request.getString(ARG_MESSAGE,
+            sb.append(getRepository().note(request.getUnsafeString(ARG_MESSAGE,
                     "")));
         }
         return makeResult(request, "User Home", sb);
@@ -1131,7 +1146,7 @@ public class UserManager extends RepositoryManager {
                 user = getUser(results);
                 setUserSession(request, user);
                 if (request.exists(ARG_REDIRECT)) {
-                    return new Result(HtmlUtil.url(request.getString(ARG_REDIRECT,""), ARG_MESSAGE,
+                    return new Result(HtmlUtil.url(request.getUnsafeString(ARG_REDIRECT,""), ARG_MESSAGE,
                                                    "You are logged in"));
                 } else {
                     return new Result(HtmlUtil.url(URL_USER_HOME, ARG_MESSAGE,
@@ -1249,7 +1264,7 @@ public class UserManager extends RepositoryManager {
         }
 
         if (request.defined(ARG_MESSAGE)) {
-            sb.append(getRepository().note(request.getString(ARG_MESSAGE,
+            sb.append(getRepository().note(request.getUnsafeString(ARG_MESSAGE,
                     "")));
         }
         sb.append(HtmlUtil.form(URL_USER_SETTINGS));
