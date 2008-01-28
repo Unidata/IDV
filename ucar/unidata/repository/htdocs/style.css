@@ -43,6 +43,19 @@ A {xtext-decoration: none}
 
 
 
+.heading {
+  font-size: 16pt;
+  font-weight: bold;
+}
+
+
+.tableheading {
+   padding-left: 5px;
+   padding-top: 5px;
+   font-weight: bold;
+   background-color:#cccccc;
+}
+
 
 .header {
    background-color:#006699;

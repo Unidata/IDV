@@ -21,16 +21,7 @@
  */
 
 
-
-
-
-
-
-
-
-
 package ucar.unidata.repository;
-
 
 import org.w3c.dom.*;
 
@@ -440,7 +431,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected static String header(String h) {
-        return "<H3>" + h + "</h3>";
+        return "<div class=\"heading\">" + h + "</div>";
     }
 
 
@@ -705,8 +696,6 @@ public class Repository implements Constants, Tables, RequestHandler,
             properties.put(results.getString(1), results.getString(2));
         }
 
-        //We always want to put any command line arguments back into the properties table because they have precedence
-        properties.putAll(argProperties);
 
     }
 
@@ -1224,6 +1213,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         html = StringUtil.replace(html, "${repository_name}",
                                   getProperty(PROP_REPOSITORY_NAME,
                                       "Repository"));
+        html = StringUtil.replace(html, "${footer}",
+                                  getProperty(PROP_HTML_FOOTER,
+                                      ""));
         html = StringUtil.replace(html, "${title}", result.getTitle());
         html = StringUtil.replace(html, "${root}", getUrlBase());
 
@@ -1354,9 +1346,19 @@ public class Repository implements Constants, Tables, RequestHandler,
                 false));
         getUserManager().makeUserIfNeeded(new User("anonymous", "Anonymous",
                 false));
+
+        readGlobals();
+
     }
 
-
+    protected void writeGlobal(String name, String value) throws Exception {
+        execute(
+                SqlUtil.makeDelete(
+                                   TABLE_GLOBALS, COL_GLOBALS_NAME,
+                                   SqlUtil.quote(name)));
+        execute(INSERT_GLOBALS, new Object[] {name,value});
+        properties.put(name, value);
+    }
 
     /**
      * _more_

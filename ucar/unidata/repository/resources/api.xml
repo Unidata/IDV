@@ -35,6 +35,8 @@
   <method handler="admin" request="/admin/sql"          method="adminSql"      admin="true" cancache="false"/>
   <method handler="admin" request="/admin/home"         method="adminHome"     admin="true" cancache="false" name="Admin" toplevel="true"/>
   <method handler="admin" request="/admin/startstop"    method="adminDbStartStop"       admin="true" cancache="false"/>
+  <method handler="admin" request="/admin/settings"    method="adminSettings"       admin="true" cancache="false"/>
+  <method handler="admin" request="/admin/settings/do"    method="adminSettingsDo"       admin="true" cancache="false"/>
   <method handler="admin" request="/admin/tables"       method="adminDbTables"       admin="true" cancache="false"/>
   <method handler="admin" request="/admin/stats"        method="adminStats"    admin="true" cancache="false"/>
   <method handler="admin" request="/admin/harvesters"   method="adminHarvesters"    admin="true" cancache="false"/>

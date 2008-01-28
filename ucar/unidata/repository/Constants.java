@@ -363,6 +363,10 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_DOWNLOAD_OK = "jdms.download.ok";
 
+
+
+
+
     /** _more_ */
     public static final String PROP_DEBUG = "jdms.debug";
 
@@ -371,8 +375,12 @@ public interface Constants {
 
 
     /** _more_ */
-    public static final String PROP_USER_REQUIRELOGIN =
-        "jdms.user.requirelogin";
+    public static final String PROP_ACCESS_REQUIRELOGIN =
+        "jdms.access.requirelogin";
+
+    public static final String PROP_ACCESS_ADMINONLY = "jdms.access.adminonly";
+
+    public static final String PROP_HTML_FOOTER = "jdms.html.footer";
 
     /** _more_ */
     public static final String PROP_REQUEST_PATTERN = "jdms.request.pattern";

@@ -25,10 +25,6 @@
 
 
 
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -125,6 +121,15 @@ public class RepositoryManager implements RepositorySource, Constants,
      */
     public Repository getRepository() {
         return repository;
+    }
+
+
+    public String getProperty(String name, String dflt) {
+        return repository.getProperty(name,dflt);
+    }
+
+    public boolean getProperty(String name, boolean dflt) {
+        return repository.getProperty(name,dflt);
     }
 
 

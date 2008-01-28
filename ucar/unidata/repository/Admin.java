@@ -21,13 +21,6 @@
  */
 
 
-
-
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -99,6 +92,15 @@ public class Admin extends RepositoryManager {
                                                 "/admin/startstop",
                                                 "Database");
 
+
+    /** _more_ */
+    public RequestUrl URL_ADMIN_SETTINGS = new RequestUrl(this,
+                                                "/admin/settings",
+                                                "Settings");
+    public RequestUrl URL_ADMIN_SETTINGS_DO = new RequestUrl(this,
+                                                             "/admin/settings/do",
+                                                             "Settings");
+
     /** _more_ */
     public RequestUrl URL_ADMIN_TABLES = new RequestUrl(this,
                                              "/admin/tables", "Tables");
@@ -114,7 +116,7 @@ public class Admin extends RepositoryManager {
 
     /** _more_ */
     protected RequestUrl[] adminUrls = {
-        URL_ADMIN_HOME, URL_ADMIN_STARTSTOP, URL_ADMIN_TABLES,
+        URL_ADMIN_HOME, URL_ADMIN_SETTINGS, URL_ADMIN_STARTSTOP, URL_ADMIN_TABLES,
         URL_ADMIN_STATS, getUserManager().URL_USER_LIST, URL_ADMIN_HARVESTERS,
         URL_ADMIN_SQL, URL_ADMIN_CLEANUP
     };
@@ -338,11 +340,8 @@ public class Admin extends RepositoryManager {
             sb.append(HtmlUtil.submit("Shut Down Database"));
         }
         sb.append("</form>");
-        Result result = new Result("Administration", sb);
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request,
-                               adminUrls));
-        return result;
+        return makeResult(request,"Administration", sb);
+
     }
 
     /**
@@ -368,7 +367,12 @@ public class Admin extends RepositoryManager {
             return new Result("", sb, "text");
         }
 
-        Result result = new Result("Administration", sb);
+        return makeResult(request,"Administration", sb);
+    }
+
+
+    private  Result makeResult(Request request, String title, StringBuffer sb) throws Exception {
+        Result result = new Result(title, sb);
         result.putProperty(PROP_NAVSUBLINKS,
                            getRepository().getSubNavLinks(request,
                                adminUrls));
@@ -399,13 +403,54 @@ public class Admin extends RepositoryManager {
         sb.append("<li> ");
         sb.append(HtmlUtil.href(URL_ADMIN_SQL, "Execute SQL"));
         sb.append("</ul>");
-        Result result = new Result("Administration", sb);
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request,
-                               adminUrls));
-        return result;
+        return makeResult(request,"Administration", sb);
+
     }
 
+
+    public Result adminSettings(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        sb.append(header("Repository Settings"));
+        sb.append(HtmlUtil.formTable());
+        sb.append(HtmlUtil.form(URL_ADMIN_SETTINGS_DO));
+        String size = " size=\"40\" ";
+        sb.append("<tr><td colspan=\"2\"><div  class=\"tableheading\">Display</div></td></tr>");
+        sb.append(HtmlUtil.formEntry("Title:",
+                                     HtmlUtil.input(PROP_REPOSITORY_NAME, getProperty(PROP_REPOSITORY_NAME,
+                                                                                      "Repository"),size)));
+        sb.append(HtmlUtil.formEntryTop("Footer:",
+                                     HtmlUtil.textArea(PROP_HTML_FOOTER, getProperty(PROP_HTML_FOOTER,
+                                                                                      ""),5,40)));
+
+        sb.append("<tr><td colspan=\"2\"><div  class=\"tableheading\">Access</div></td></tr>");
+        sb.append(HtmlUtil.formEntry("",
+                                     HtmlUtil.checkbox(PROP_ACCESS_ADMINONLY,
+                                                       "true",
+                                                       getProperty(PROP_ACCESS_ADMINONLY,false)) +" Admin only"));
+        sb.append(HtmlUtil.formEntry("",
+                                     HtmlUtil.checkbox(PROP_ACCESS_REQUIRELOGIN,
+                                                       "true",
+                                                       getProperty(PROP_ACCESS_REQUIRELOGIN,false))+" Require login"));
+
+        sb.append(HtmlUtil.formEntry("&nbsp;<p>", ""));
+        sb.append(HtmlUtil.formEntry("", HtmlUtil.submit("Change Settings")));
+        sb.append("</form>");
+        sb.append("</table>");
+        return makeResult(request,"Settings", sb);
+    }
+
+    public Result adminSettingsDo(Request request) throws Exception {
+        if(request.exists(PROP_REPOSITORY_NAME)) {
+            getRepository().writeGlobal(PROP_REPOSITORY_NAME, request.getString(PROP_REPOSITORY_NAME,""));
+        }
+
+        if(request.exists(PROP_HTML_FOOTER)) {
+            getRepository().writeGlobal(PROP_HTML_FOOTER, request.getString(PROP_HTML_FOOTER,""));
+        }
+        getRepository().writeGlobal(PROP_ACCESS_ADMINONLY, ""+request.get(PROP_ACCESS_ADMINONLY,false));
+        getRepository().writeGlobal(PROP_ACCESS_REQUIRELOGIN, ""+request.get(PROP_ACCESS_REQUIRELOGIN,false));
+        return new Result(URL_ADMIN_SETTINGS.toString());
+    }
 
 
     /**
@@ -471,11 +516,7 @@ public class Admin extends RepositoryManager {
         }
         sb.append("</table>");
 
-        Result result = new Result("Harvesters", sb);
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request,
-                               adminUrls));
-        return result;
+        return makeResult(request,"Harvesters", sb);
     }
 
 
@@ -529,11 +570,7 @@ public class Admin extends RepositoryManager {
 
         sb.append("</table>\n");
 
-        Result result = new Result("Repository Statistics", sb);
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request,
-                               adminUrls));
-        return result;
+        return makeResult(request,"Statistics", sb);
     }
 
 
@@ -559,11 +596,7 @@ public class Admin extends RepositoryManager {
         sb.append("</form>\n");
         sb.append("<table>");
         if (query == null) {
-            Result result = new Result("SQL", sb);
-            result.putProperty(PROP_NAVSUBLINKS,
-                               getRepository().getSubNavLinks(request,
-                                   adminUrls));
-            return result;
+            return makeResult(request,"SQL",sb);
         }
 
         long      t1        = System.currentTimeMillis();
@@ -619,14 +652,10 @@ public class Admin extends RepositoryManager {
         }
         sb.append("</table>");
         long t2 = System.currentTimeMillis();
-        Result result = new Result("SQL",
+        return makeResult(request,"SQL",
                                    new StringBuffer("Fetched:" + cnt
                                        + " rows in: " + (t2 - t1) + "ms <p>"
                                        + sb.toString()));
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request,
-                               adminUrls));
-        return result;
     }
 
     /**
@@ -666,13 +695,7 @@ public class Admin extends RepositoryManager {
             sb.append(status);
         }
         //        sb.append(cnt +" files do not exist in " + (t2-t1) );
-        Result result =
-            new Result("Cleanup", sb,
-                       getRepository().getMimeTypeFromSuffix(".html"));
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request,
-                               adminUrls));
-        return result;
+        return makeResult(request,"Cleanup", sb);
     }
 
 

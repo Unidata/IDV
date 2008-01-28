@@ -20,15 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -169,8 +160,6 @@ public class UserManager extends RepositoryManager {
 
 
 
-    /** _more_ */
-    boolean requireLogin = true;
 
     /** _more_ */
     private Hashtable<String, User> userMap = new Hashtable<String, User>();
@@ -188,8 +177,6 @@ public class UserManager extends RepositoryManager {
      */
     public UserManager(Repository repository) {
         super(repository);
-        requireLogin = getRepository().getProperty(PROP_USER_REQUIRELOGIN,
-                true);
         //        ipUserList.add("128.117.156.*");
         //        ipUserList.add("jeffmc");
 
@@ -319,7 +306,15 @@ public class UserManager extends RepositoryManager {
      * @return _more_
      */
     protected boolean isRequestOk(Request request) {
-        if (requireLogin
+        if(getProperty(PROP_ACCESS_ADMINONLY,false) &&
+           !request.getRequestContext().getUser().getAdmin()) {
+            if ( !request.getRequestPath().startsWith(
+                    getRepository().getUrlBase() + "/user/")) {
+                return false;
+            }
+        }
+
+        if(getProperty(PROP_ACCESS_REQUIRELOGIN,false) 
                 && request.getRequestContext().getUser().getAnonymous()) {
             if ( !request.getRequestPath().startsWith(
                     getRepository().getUrlBase() + "/user/")) {
@@ -354,6 +349,7 @@ public class UserManager extends RepositoryManager {
 
         sb.append(HtmlUtil.formEntry("", HtmlUtil.submit("Login")));
 
+        sb.append("</table>");
         sb.append("</form>");
         return sb.toString();
 

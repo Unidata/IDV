@@ -138,17 +138,14 @@ public class DatabaseManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Connection getConnection() throws Exception {
-      
-
-        if (theConnection != null) {
-            try {
-                Statement statement = theConnection.createStatement();
-                statement.execute("select * from dummy");
-            } catch (Exception exc) {
-                theConnection = makeConnection();
-            }
-        } else {
-                theConnection = makeConnection();
+        if (theConnection == null) {
+            theConnection = makeConnection();
+        }
+        try {
+            Statement statement = theConnection.createStatement();
+            statement.execute("select * from dummy");
+        } catch (Exception exc) {
+            theConnection = makeConnection();
         }
         return theConnection;
     }
