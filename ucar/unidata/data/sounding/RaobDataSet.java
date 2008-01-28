@@ -25,6 +25,8 @@ package ucar.unidata.data.sounding;
 
 
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
+
 
 
 import visad.DateTime;
@@ -62,6 +64,12 @@ public class RaobDataSet {
     public RaobDataSet(SoundingAdapter adapter, List soundingObs) {
         this.soundingObs = new ArrayList(soundingObs);
         this.adapter     = adapter;
+    }
+
+    public boolean equals(Object object) {
+        if(!object.getClass().equals(getClass())) return false;
+        RaobDataSet that = (RaobDataSet) object;
+        return Misc.equals(this.soundingObs, that.soundingObs);
     }
 
     /**

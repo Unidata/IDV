@@ -103,6 +103,13 @@ public final class RaobDataSource extends DataSourceImpl {
 
 
 
+    public boolean equals(Object object) {
+        if(!object.getClass().equals(getClass())) return false;
+        RaobDataSource that = (RaobDataSource) object;
+        return Misc.equals(this.rds,that.rds);
+    }
+
+
     /**
      * Get the list of urls from the remote server
      *
