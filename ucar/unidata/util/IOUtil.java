@@ -675,8 +675,9 @@ public class IOUtil {
         if (to.isDirectory()) {
             to = new File(joinDir(to, getFileTail(from.toString())));
         }
-        copyFile(from, to);
-        from.delete();
+        from.renameTo(to);
+        //        copyFile(from, to);
+        //        from.delete();
     }
 
 
