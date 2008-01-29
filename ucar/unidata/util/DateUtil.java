@@ -373,24 +373,30 @@ public class DateUtil {
     }
 
     public static Date getRelativeDate(Date from, String relativeTimeString) {
-        return new Date(from.getTime()+ parseRelativeTimeString(relativeTimeString));
+        System.err.println ("from:" + from);
+        System.err.println ("millis:" + parseRelativeTimeString(relativeTimeString));
+        Date result = new Date(from.getTime()+ parseRelativeTimeString(relativeTimeString));
+        System.err.println ("result:" + result);
+        return result;
     }
 
     public static long parseRelativeTimeString(String relativeTimeString) {
         List toks = StringUtil.split(relativeTimeString," ", true, true);
         if(toks.size()!=2)
             throw new IllegalArgumentException("Bad format for relative time string:" + relativeTimeString +" Needs to be of the form: +/-<number> timeunit");
-        int delta=0;
+        long delta=0;
         try {
             String s = toks.get(0).toString();
-            int factor = 1;
+            long factor = 1;
             if(s.startsWith("+")) {
                 s = s.substring(1);
             } else if(s.startsWith("-")) {
                 s = s.substring(1);
                 factor = -1;
             }
-            delta = factor*new Integer(s);
+
+            delta = factor*new Integer(s).intValue();
+            System.err.println ("factor:" + factor + " delta:" + delta);
         } catch(Exception exc) {
             throw new IllegalArgumentException("Bad format for relative time string:" + relativeTimeString+" Could not parse initial number:" + toks.get(0));
         }
@@ -404,6 +410,7 @@ public class DateUtil {
             milliseconds = 60*60*delta*1000;
         } else if(what.startsWith("day")) {
             milliseconds = 24*60*60*delta*1000;
+            System.err.println ("millis:" + milliseconds);
         } else if(what.startsWith("week")) {
             milliseconds = 7*24*60*60*delta*1000;
         } else if(what.startsWith("month")) {
@@ -417,6 +424,7 @@ public class DateUtil {
         } else {
             throw new IllegalArgumentException("Unknown unit in relative time string:" + relativeTimeString);
         }
+        System.err.println("millis:" + milliseconds);
         return milliseconds;
     }
 
