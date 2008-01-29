@@ -139,7 +139,7 @@ public class ShapefileControl extends DisplayControlImpl {
     private String[] fieldNames;
 
     /** _more_          */
-    private MapSet[] mapSets;
+    private List mapSets;
 
     /** _more_          */
     private boolean hasProperties = false;
@@ -377,13 +377,13 @@ public class ShapefileControl extends DisplayControlImpl {
      * Fill the table
      */
     private void populateTable() {
-        if (!hasProperties || dbModel == null) {
+        if (mapSets == null || !hasProperties || dbModel == null) {
             return;
         }
         visibleRows = new ArrayList();
         tableCols = new ArrayList();
         colNames  = new ArrayList();
-        int       numRecords = mapSets.length;
+        int       numRecords = mapSets.size();
         List      comps      = new ArrayList();
         boolean[] unique     = null;
         if (uniqueFields.size() > 0) {
@@ -778,14 +778,13 @@ public class ShapefileControl extends DisplayControlImpl {
         if (mainData instanceof UnionSet) {
             SampledSet[] sets = ((UnionSet) mainData).getSets();
             if ((sets.length > 0) && (sets[0] instanceof MapSet)) {
-                mapSets = (MapSet[]) Misc.toList(sets).toArray(
-                    new MapSet[sets.length]);
-                List names = mapSets[0].getPropertyNames();
+                mapSets =  Misc.toList(sets);
+                List names = ((MapSet)mapSets.get(0)).getPropertyNames();
                 if ((names != null) && (names.size() > 0)) {
                     hasProperties = true;
                     fieldNames =
                         (String[]) names.toArray(new String[names.size()]);
-                    passTheFilter = new boolean[mapSets.length];
+                    passTheFilter = new boolean[mapSets.size()];
                     Arrays.fill(passTheFilter, true);
                 }
             }

@@ -279,16 +279,18 @@ public class ShapeFileDataSource extends FilesDataSource {
             return;
         }
         int       numFields  = dbFile.getNumFields();
-        //        System.err.println("num map lines:" + sets.length);
         List propertyNames = new ArrayList();
         for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
             String fieldName = dbFile.getFieldName(fieldIdx);
             propertyNames.add(fieldName);
         }
 
+        //Some of these might be union sets
         for(int i=0;i<sets.length;i++) {
-            MapSet mapSet = (MapSet) sets[i];
-            mapSet.setPropertyNames(propertyNames);
+            if(sets[i] instanceof MapSet) {
+                MapSet mapSet = (MapSet) sets[i];
+                mapSet.setPropertyNames(propertyNames);
+            }
         }
 
         for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
@@ -299,8 +301,10 @@ public class ShapeFileDataSource extends FilesDataSource {
                 throw new IllegalArgumentException ("DBfile size:" + values.size() + " != number of map lines:" + sets.length);
             }
             for(int i=0;i<sets.length;i++) {
-                MapSet mapSet = (MapSet) sets[i];
-                mapSet.setProperty(fieldName, values.get(i));
+                if(sets[i] instanceof MapSet) {
+                    MapSet mapSet = (MapSet) sets[i];
+                    mapSet.setProperty(fieldName, values.get(i));
+                }
             }
         }
 
