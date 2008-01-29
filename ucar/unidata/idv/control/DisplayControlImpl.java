@@ -964,8 +964,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         //Call the derived class init method.
         //        System.err.println("CALLING INIT " + mycnt);
 
+        System.err.println ("ignore:" + getProperty("control.ignoreerrors",false));
         if ( !init(myDataChoices)) {
             displayControlFailed();
+            if(getProperty("control.ignoreerrors",false)) {
+                controlContext.addDisplayControl(this);
+            }
             return;
         }
 
@@ -8383,7 +8387,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public void displayControlFailed() {
         try {
-            doRemove();
+            if(!getProperty("control.ignoreerrors",false)) {
+                doRemove();
+            }
         } catch (Exception exc) {}
         //        disposeOfWindow ();
     }
