@@ -1,8 +1,8 @@
 <harvesters>
 
-  <harvester    name="Synthetic"
+  <harvester    name="Test Generator"
                 active="false"
-		class="ucar.unidata.repository.SyntheticHarvester"
+		class="ucar.unidata.repository.TestGenerator"
                 monitor="false"
 		sleep="3"/>
 
