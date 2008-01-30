@@ -558,6 +558,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_FILE = "file";
 
+    public static final String ARG_FILE_UNZIP = "file.unzip";
+
     /** _more_ */
     public static final String ARG_DESCRIPTION = "description";
 

@@ -835,8 +835,10 @@ public class TypeHandler implements Constants, Tables {
         boolean didEntries = false;
         boolean didOther   = false;
         boolean didMeta    = false;
+        //        System.err.println("what:" + what);
         for (int i = 0; i < tableNames.length; i++) {
-            String pattern = ".*[ =\\(]+" + tableNames[i] + "\\..*";
+            String pattern = ".*[, =\\(]+" + tableNames[i] + "\\..*";
+            //            System.err.println("pattern:" + pattern);
             if (what.matches(pattern) || where.matches(pattern)
                     || (extra.matches(pattern))) {
                 tables.add(tableNames[i]);

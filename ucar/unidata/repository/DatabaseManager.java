@@ -282,11 +282,11 @@ public class DatabaseManager extends RepositoryManager {
      */
     protected String getLimitString(int skip, int max) {
         if (db.equals(DB_MYSQL)) {
-            return " LIMIT " + (skip + max) + " OFFSET " + skip + " ";
+            return " LIMIT " +  max + " OFFSET " + skip + " ";
         } else if (db.equals(DB_DERBY)) {
             return "";
         } else if (db.equals(DB_POSTGRES)) {
-            return " LIMIT " + (skip + max) + " OFFSET " + skip + " ";
+            return " LIMIT " +  max + " OFFSET " + skip + " ";
         }
         return "";
     }

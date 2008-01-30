@@ -78,6 +78,7 @@ import java.sql.Statement;
 
 import java.text.SimpleDateFormat;
 
+import java.util.zip.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -1107,17 +1108,17 @@ public class Repository implements Constants, Tables, RequestHandler,
             return getHtdocsFile(request);
         }
 
-
-
         if ( !getUserManager().isRequestOk(request)
                 || ((apiMethod != null)
                     && !apiMethod.isRequestOk(request, this))) {
             StringBuffer sb = new StringBuffer();
-            sb.append("You do not have the correct access<p>");
+            sb.append("You cannot access this page<p>");
             sb.append(getUserManager().makeLoginForm(request,
                     HtmlUtil.hidden(ARG_REDIRECT, request.getFullUrl())));
             return new Result("Error", sb);
         }
+
+
 
 
         Result result = null;
@@ -2449,8 +2450,9 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (typeHandler.okToShowInForm(ARG_RESOURCE)) {
                 if (entry == null) {
                     sb.append(HtmlUtil.formEntry("File:",
-                            HtmlUtil.fileInput(ARG_FILE, size)));
-
+                            HtmlUtil.fileInput(ARG_FILE, size) +
+                                                 HtmlUtil.checkbox(ARG_FILE_UNZIP,"true",false) +
+                                                 " Unzip archive"));
                     sb.append(HtmlUtil.formEntry("Or URL:",
                             HtmlUtil.input(ARG_RESOURCE, "", size)));
                 } else {
@@ -2763,18 +2765,30 @@ public class Repository implements Constants, Tables, RequestHandler,
                         + request.getString(ARG_ID, ""));
             }
         }
-        Date createDate = new Date();
-        Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
-                               createDate);
+        List<Entry> entries = new ArrayList<Entry>();
+
         if (entry == null) {
+            List<String> resources = new ArrayList();
             typeHandler =
                 getTypeHandler(request.getType(TypeHandler.TYPE_ANY));
-            //TODO: Check for security hole with the file upload
             String resource = request.getString(ARG_RESOURCE, "");
             String filename = request.getUploadedFile(ARG_FILE);
+            boolean unzipArchive = false;
             if (filename != null) {
-                System.err.println("filename:" + filename);
+                unzipArchive = request.get(ARG_FILE_UNZIP,false);
                 resource = filename;
+            }
+            if(!unzipArchive) {
+                resources.add(resource);
+            } else {
+                ZipInputStream zin =
+                    new ZipInputStream(new FileInputStream(resource));
+                ZipEntry ze = null;
+                while ((ze = zin.getNextEntry()) != null) {
+                    String name = ze.getName().toLowerCase();
+                    System.err.println("name:" + name);
+                    //                    IOUtil.writeTo(zin, outputFile);
+                }
             }
             String groupName = request.getString(ARG_GROUP, (String) null);
             if (groupName == null) {
@@ -2784,33 +2798,13 @@ public class Repository implements Constants, Tables, RequestHandler,
             Group parentGroup = findGroupFromName(groupName,
                                     request.getRequestContext().getUser(),
                                     true);
-            String id = (typeHandler.isType(TypeHandler.TYPE_GROUP)
-                         ? getGroupId(parentGroup)
-                         : getGUID());
-            String name = request.getString(ARG_NAME,
-                                            IOUtil.getFileTail(resource));
-
-            if (name.trim().length() == 0) {
-                throw new IllegalArgumentException("Must specify a name");
-            }
-
-            if (typeHandler.isType(TypeHandler.TYPE_GROUP)) {
-                if (name.indexOf("/") >= 0) {
-                    throw new IllegalArgumentException(
-                        "Cannot have a '/' in group name: '" + name + "'");
-                }
-
-                String tmp      = parentGroup.getFullName() + "/" + name;
-                Group  existing = findGroupFromName(tmp);
-                if (existing != null) {
-                    throw new IllegalArgumentException(
-                        "A group with the name: '" + tmp
-                        + "' already exists");
-
-                }
-            }
-
             String description = request.getString(ARG_DESCRIPTION, "");
+            String origName = request.getString(ARG_NAME,"");
+
+
+            Date createDate = new Date();
+            Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
+                                                    createDate);
             if (dateRange[0] == null) {
                 dateRange[0] = ((dateRange[1] == null)
                                 ? createDate
@@ -2819,12 +2813,48 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (dateRange[1] == null) {
                 dateRange[1] = dateRange[0];
             }
-            entry = typeHandler.createEntry(id);
-            entry.init(name, description, parentGroup,
-                       request.getRequestContext().getUser(),
-                       new Resource(resource), createDate.getTime(),
-                       dateRange[0].getTime(), dateRange[1].getTime(), null);
+
+            for(String theResource: resources) {
+                String name = request.getString(ARG_NAME,"");
+                if (name.trim().length() == 0) {
+                    name =  IOUtil.getFileTail(theResource);
+                }
+                if (name.trim().length() == 0) {
+                    throw new IllegalArgumentException("Must specify a name");
+                }
+
+                if (typeHandler.isType(TypeHandler.TYPE_GROUP)) {
+                    if (name.indexOf("/") >= 0) {
+                        throw new IllegalArgumentException(
+                                                           "Cannot have a '/' in group name: '" + name + "'");
+                    }
+
+                    String tmp      = parentGroup.getFullName() + "/" + name;
+                    Group  existing = findGroupFromName(tmp);
+                    if (existing != null) {
+                        throw new IllegalArgumentException(
+                                                           "A group with the name: '" + tmp
+                                                           + "' already exists");
+
+                    }
+                }
+
+                String id = (typeHandler.isType(TypeHandler.TYPE_GROUP)
+                             ? getGroupId(parentGroup)
+                             : getGUID());
+
+                entry = typeHandler.createEntry(id);
+                entry.init(name, description, parentGroup,
+                           request.getRequestContext().getUser(),
+                           new Resource(theResource), createDate.getTime(),
+                           dateRange[0].getTime(), dateRange[1].getTime(), null);
+                setEntryState(request, entry);
+                entries.add(entry);
+            }
         } else {
+            Date createDate = new Date();
+            Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
+                                                    createDate);
             String newName = request.getString(ARG_NAME, entry.getName());
             if (entry.getParentGroup() == null) {
                 throw new IllegalArgumentException(
@@ -2867,7 +2897,25 @@ public class Repository implements Constants, Tables, RequestHandler,
                 execute(SqlUtil.makeDelete(TABLE_TAGS, COL_TAGS_ENTRY_ID,
                                            SqlUtil.quote(entry.getId())));
             }
+            setEntryState(request, entry);
+            entries.add(entry);
         }
+
+
+        insertEntries(entries, newEntry);
+        if(entries.size()==1) {
+            entry = (Entry) entries.get(0);
+            return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                                           entry.getId()));
+        } else {
+            //TODO: how to show multiples
+            return new Result("", new StringBuffer("OK"));
+        }
+    }
+
+
+
+    private void setEntryState(Request request, Entry entry) throws Exception {
         entry.setSouth(request.get(ARG_AREA + "_south", entry.getSouth()));
         entry.setNorth(request.get(ARG_AREA + "_north", entry.getNorth()));
         entry.setWest(request.get(ARG_AREA + "_west", entry.getWest()));
@@ -2879,15 +2927,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
         entry.getTypeHandler().initializeEntry(request, entry);
-        List<Entry> entries = new ArrayList<Entry>();
-        entries.add(entry);
-        insertEntries(entries, newEntry);
-        return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
-                                       entry.getId()));
-
     }
-
-
 
 
     /**
@@ -2964,7 +3004,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     public Entry filterEntry(Request request, Entry entry) throws Exception {
         if (entry.getResource().getType().equals(Resource.TYPE_FILE)) {
             if ( !entry.getResource().getFile().exists()) {
-                return null;
+                //TODO                return null;
             }
         }
         //TODO: Check for access
@@ -3379,34 +3419,17 @@ public class Repository implements Constants, Tables, RequestHandler,
         where.add(SqlUtil.neq(COL_ENTRIES_TYPE,
                               SqlUtil.quote(TypeHandler.TYPE_GROUP)));
         TypeHandler typeHandler = getTypeHandler(request);
-        String      order       = " DESC ";
-        if (request.get(ARG_ASCENDING, false)) {
-            order = " ASC ";
-        }
-
-        int    skipCnt     = 0;
-        String limitString = "";
-        if (request.defined(ARG_SKIP)) {
-            skipCnt = request.get(ARG_SKIP, 0);
-            if (skipCnt > 0) {
-                int max = request.get(ARG_MAX, MAX_ROWS);
-                limitString = getDatabaseManager().getLimitString(skipCnt,
-                        max);
-            }
-        }
-
-
-
+        int    skipCnt     =  request.get(ARG_SKIP, 0);
         Statement statement = typeHandler.executeSelect(request,
-                                  COL_ENTRIES_ID, where,
-                                  " order by " + COL_ENTRIES_FROMDATE + order
-                                  + limitString);
+                                                        COL_ENTRIES_ID, where,
+                                                        getQueryOrderAndLimit(request));
         SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
         List<String>     ids  = new ArrayList<String>();
         ResultSet        results;
+        boolean canDoSelectOffset = getDatabaseManager().canDoSelectOffset();
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                if (skipCnt-- > 0) {
+                if ( !canDoSelectOffset && (skipCnt-- > 0)) {
                     continue;
                 }
                 ids.add(results.getString(1));
@@ -4372,6 +4395,39 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+    protected String getQueryOrderAndLimit(Request request) {
+        String      order       = " DESC ";
+        if (request.get(ARG_ASCENDING, false)) {
+            order = " ASC ";
+        }
+        int    skipCnt     = request.get(ARG_SKIP, 0);
+        String limitString = "";
+        //        if (request.defined(ARG_SKIP)) {
+        //            if (skipCnt > 0) {
+        int max = request.get(ARG_MAX, MAX_ROWS);
+        limitString = getDatabaseManager().getLimitString(skipCnt, max);
+        String orderBy = "";
+        if(request.defined(ARG_ORDERBY)) {
+            String by  = request.getString(ARG_ORDERBY,"");
+            if(by.equals("fromdate")) {
+                orderBy = " ORDER BY " + COL_ENTRIES_FROMDATE + order;
+            } else if(by.equals("todate")) {
+                orderBy = " ORDER BY " + COL_ENTRIES_FROMDATE + order;
+            } else if(by.equals("name")) {
+                orderBy = " ORDER BY " + COL_ENTRIES_NAME + order;
+            }
+        } else {
+            orderBy = " ORDER BY " + COL_ENTRIES_FROMDATE + order;
+        }
+        System.err.println ("limit:" + limitString);
+
+
+        return orderBy   + limitString;
+        //            }
+        //        }
+
+    }
+
     /**
      * _more_
      *
@@ -4384,24 +4440,11 @@ public class Repository implements Constants, Tables, RequestHandler,
     protected List[] getEntries(Request request) throws Exception {
         TypeHandler typeHandler = getTypeHandler(request);
         List        where       = typeHandler.assembleWhereClause(request);
-        String      order       = " DESC ";
-        if (request.get(ARG_ASCENDING, false)) {
-            order = " ASC ";
-        }
-        int    skipCnt     = 0;
-        String limitString = "";
-        skipCnt = request.get(ARG_SKIP, 0);
-        //        if (request.defined(ARG_SKIP)) {
-        //            if (skipCnt > 0) {
-        int max = request.get(ARG_MAX, MAX_ROWS);
-        limitString = getDatabaseManager().getLimitString(skipCnt, max);
-        //            }
-        //        }
-        System.err.println("limit:" + limitString);
+        int    skipCnt     = request.get(ARG_SKIP, 0);
         Statement statement = typeHandler.executeSelect(request,
-                                  COLUMNS_ENTRIES, where,
-                                  " ORDER BY " + COL_ENTRIES_FROMDATE + order
-                                  + limitString);
+                                                        COLUMNS_ENTRIES, where,
+                                                        getQueryOrderAndLimit(request));
+
 
 
         List<Entry>      entries = new ArrayList<Entry>();

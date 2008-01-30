@@ -635,8 +635,8 @@ public class HtmlOutputHandler extends OutputHandler {
 
         if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
             int skip = Math.max(0, request.get(ARG_SKIP, 0));
-            sb.append("Results: " + (skip + 1) + "-" + (skip + cnt)
-                      + HtmlUtil.space(4));
+            sb.append("Results: " + (skip + 1) + "-" + (skip + cnt));
+            sb.append(HtmlUtil.space(4));
             if (skip > 0) {
                 sb.append(HtmlUtil.href(request.getUrl(ARG_SKIP) + "&"
                                         + ARG_SKIP + "="
