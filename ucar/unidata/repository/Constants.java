@@ -258,6 +258,13 @@ public interface Constants {
 
 
     /** _more_ */
+    public static final String ARG_AUTH_USER = "auth.user";
+
+    /** _more_ */
+    public static final String ARG_AUTH_PASSWORD = "auth.password";
+
+
+    /** _more_ */
     public static final String ARG_USER = "user";
 
     /** _more_ */

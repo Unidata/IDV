@@ -81,8 +81,6 @@ public class UserManager extends RepositoryManager {
     public RequestUrl URL_USER_LOGIN = new RequestUrl(this, "/user/login");
 
 
-
-
     /** _more_ */
     public RequestUrl URL_USER_LOGOUT = new RequestUrl(this, "/user/logout");
 
@@ -214,7 +212,6 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void checkSession(Request request) throws Exception {
-        String sessionId = null;
         String cookie    = request.getHeaderArg("Cookie");
         User   user      = request.getRequestContext().getUser();
         if (cookie != null) {
@@ -228,9 +225,9 @@ public class UserManager extends RepositoryManager {
                 String cookieName  = (String) subtoks.get(0);
                 String cookieValue = (String) subtoks.get(1);
                 if (cookieName.equals("repository-session")) {
-                    sessionId = cookieValue;
+                    request.setSessionId(cookieValue);
                     if (user == null) {
-                        user = (User) session.get(sessionId);
+                        user = (User) session.get(request.getSessionId());
                         if (user != null) {
                             break;
                         }
@@ -239,10 +236,21 @@ public class UserManager extends RepositoryManager {
             }
         }
 
-        if (sessionId == null) {
-            sessionId = getSessionId();
+
+        //Check for url auth
+        if (user == null && request.exists(ARG_AUTH_USER) &&
+            request.exists(ARG_AUTH_PASSWORD)) {
+            String userId = request.getString(ARG_AUTH_USER,"");
+            String password = request.getString(ARG_AUTH_PASSWORD,"");
+            user = findUser(userId, false);
+            if(user == null) throw new IllegalArgumentException("Unknown user:" + userId);
+            if(!user.getPassword().equals(hashPassword(password))) {
+                throw new IllegalArgumentException("Incorrect password");
+            }
+
+            setUserSession(request, user);
         }
-        request.setSessionId(sessionId);
+
 
         if (user == null) {
             String requestIp = request.getRequestContext().getIp();
@@ -259,11 +267,21 @@ public class UserManager extends RepositoryManager {
                     }
                 }
             }
-            if (user == null) {
-                user = getUserManager().getAnonymousUser();
-            }
         }
+
+        
+        if (request.getSessionId() == null) {
+            request.setSessionId(getSessionId());
+        }
+
+
+
+        if (user == null) {
+            user = getUserManager().getAnonymousUser();
+        }
+
         request.getRequestContext().setUser(user);
+
 
     }
 
@@ -364,18 +382,18 @@ public class UserManager extends RepositoryManager {
         sb.append(HtmlUtil.form(URL_USER_LOGIN));
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry("User:",
-                                     HtmlUtil.input(ARG_USER_NAME, name)));
+                     HtmlUtil.input(ARG_USER_NAME, name)));
         sb.append(HtmlUtil.formEntry("Password:",
-                                     HtmlUtil.password(ARG_USER_PASSWORD1)));
+                     HtmlUtil.password(ARG_USER_PASSWORD1)));
         sb.append(extra);
 
         sb.append(HtmlUtil.formEntry("", HtmlUtil.submit("Login")));
 
-        sb.append("</table>");
-        sb.append("</form>");
+        sb.append(HtmlUtil.formTableClose());
+        sb.append(HtmlUtil.formClose());
         return sb.toString();
-
     }
+
 
     /**
      * _more_
@@ -614,6 +632,7 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminUserEdit(Request request) throws Exception {
+
         String userId = request.getUser();
         User   user   = findUser(userId);
         if (user == null) {
@@ -626,9 +645,8 @@ public class UserManager extends RepositoryManager {
             return new Result(URL_USER_LIST.toString());
         }
 
+
         StringBuffer sb = new StringBuffer();
-
-
         if (request.defined(ARG_USER_CHANGE)) {
             boolean okToChangeUser = true;
             okToChangeUser = checkPasswords(request, user);
@@ -1270,6 +1288,7 @@ public class UserManager extends RepositoryManager {
      */
     public Result processSettings(Request request) throws Exception {
         StringBuffer sb   = new StringBuffer();
+
         User         user = request.getRequestContext().getUser();
         if (user.getAnonymous()) {
             sb.append(
@@ -1297,15 +1316,18 @@ public class UserManager extends RepositoryManager {
         }
         sb.append(HtmlUtil.form(URL_USER_SETTINGS));
         makeUserForm(request, user, sb, false);
-        sb.append(HtmlUtil.formEntryTop("Roles:",
-                                        user.getRolesAsString("<br>")));
 
         sb.append(HtmlUtil.formEntry("",
                                      HtmlUtil.submit("Change Settings",
                                          ARG_USER_CHANGE)));
-        sb.append("</table>");
-        sb.append("</form>");
+        sb.append(HtmlUtil.formClose());
+        String roles = user.getRolesAsString("<br>").trim();
+        sb.append(HtmlUtil.formEntry(HtmlUtil.space(1),""));
+        if(roles.length()==0) roles = "--none--";
+        sb.append(HtmlUtil.formEntryTop("Roles:",
+                                        roles));
 
+        sb.append(HtmlUtil.formTableClose());
         return makeResult(request, "User Settings", sb);
     }
 

@@ -618,9 +618,7 @@ public class Request implements Constants {
             throws java.text.ParseException {
         String fromDate;
         String toDate;
-        System.err.println("getDateRange");
         if (defined(ARG_RELATIVEDATE)) {
-            System.err.println("got relative");
             fromDate = (String) getDateSelect(ARG_RELATIVEDATE, "").trim();
             if (fromDate.equals("none")) {
                 return new Date[] { null, null };
@@ -629,7 +627,6 @@ public class Request implements Constants {
         } else {
             fromDate = (String) getDateSelect(from, "").trim();
             toDate   = (String) getDateSelect(to, "").trim();
-            System.err.println("from/to:" + fromDate);
         }
 
         Date fromDttm = DateUtil.parseRelative(dflt, fromDate, -1);

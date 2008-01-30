@@ -1192,8 +1192,6 @@ public class TypeHandler implements Constants, Tables {
 
 
 
-
-        System.err.println("Getting date range");
         Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
                                new Date());
         if (dateRange[0] != null) {
