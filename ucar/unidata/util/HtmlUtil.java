@@ -27,6 +27,8 @@ package ucar.unidata.util;
 import ucar.unidata.xml.XmlUtil;
 
 
+import java.lang.reflect.*;
+
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
@@ -729,6 +731,14 @@ public class HtmlUtil {
         return "<table cellpadding=\"5\" cellspacing=\"0\">\n";
     }
 
+    public static String formTableClose() {
+        return "</table>";
+    }
+
+    public static String formClose() {
+        return "</form>";
+    }
+
 
     /**
      * _more_
@@ -760,6 +770,44 @@ public class HtmlUtil {
                + left + "</td><td>" + right + "</td></tr>";
 
     }
+
+
+    public static void main(String[]args) {
+        Class c = HtmlUtil.class;
+        StringBuffer sb = new StringBuffer();
+        sb.append("//j-\n/** Do not change!!! This has been generated from HtmlUtil **/\n");
+        Method[]methods 	=c.getDeclaredMethods();
+        for(int i=0;i<methods.length;i++) {
+            Method m = methods[i];
+            //            if(!Modifier.isStatic(m.getModifiers())) continue;
+            if(!m.getReturnType().equals(String.class)) continue;
+            sb.append("public void " + m.getName()+"(");
+            Class[]params = m.getParameterTypes();
+            StringBuffer implSb = new StringBuffer();
+            for(int paramIdx=0;paramIdx<params.length;paramIdx++) {
+                if(paramIdx>0) {
+                    sb.append(", ");
+                    implSb.append(", ");
+                }
+                implSb.append("param"+ paramIdx);
+                String type = params[paramIdx].getName();
+                if(params[paramIdx].isArray()) {
+                    type = params[paramIdx].getComponentType().getName()+" []";
+                }
+                type = type.replace("java.lang.", "");
+                sb.append(type + " param" + paramIdx);
+
+            }
+
+            sb.append(") {\n");
+                sb.append("sb.append(HtmlUtil." + m.getName()+"(" + implSb +"));\n");
+            sb.append("}\n");
+        }
+        sb.append("//j+\n");
+        //        System.out.println (sb);
+        
+    }
+
 
 
 }
