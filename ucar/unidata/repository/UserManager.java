@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -167,6 +168,7 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     private Hashtable userCart = new Hashtable();
 
+    /** _more_          */
     private List ipUserList = new ArrayList();
 
 
@@ -204,6 +206,13 @@ public class UserManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @throws Exception _more_
+     */
     protected void checkSession(Request request) throws Exception {
         String sessionId = null;
         String cookie    = request.getHeaderArg("Cookie");
@@ -237,20 +246,20 @@ public class UserManager extends RepositoryManager {
 
         if (user == null) {
             String requestIp = request.getRequestContext().getIp();
-            if(requestIp!=null) {
-                for(int i=0;i<ipUserList.size();i+=2) {
-                    String ip =(String)ipUserList.get(i);
-                    String userName =(String)ipUserList.get(i+1);
-                    if(requestIp.matches(ip)) {
+            if (requestIp != null) {
+                for (int i = 0; i < ipUserList.size(); i += 2) {
+                    String ip       = (String) ipUserList.get(i);
+                    String userName = (String) ipUserList.get(i + 1);
+                    if (requestIp.matches(ip)) {
                         user = findUser(userName, false);
-                        if(user == null) {
-                            user = new User(userName,false);
+                        if (user == null) {
+                            user = new User(userName, false);
                             makeOrUpdateUser(user, false);
                         }
                     }
                 }
             }
-            if(user ==null) {
+            if (user == null) {
                 user = getUserManager().getAnonymousUser();
             }
         }
@@ -258,6 +267,11 @@ public class UserManager extends RepositoryManager {
 
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private String getSessionId() {
         return getRepository().getGUID() + "_" + Math.random();
     }
@@ -274,7 +288,7 @@ public class UserManager extends RepositoryManager {
     protected void setUserSession(Request request, User user)
             throws Exception {
         if (request.getSessionId() == null) {
-             request.setSessionId(getSessionId());
+            request.setSessionId(getSessionId());
         }
         session.put(request.getSessionId(), user);
         request.getRequestContext().setUser(user);
@@ -306,15 +320,15 @@ public class UserManager extends RepositoryManager {
      * @return _more_
      */
     protected boolean isRequestOk(Request request) {
-        if(getProperty(PROP_ACCESS_ADMINONLY,false) &&
-           !request.getRequestContext().getUser().getAdmin()) {
+        if (getProperty(PROP_ACCESS_ADMINONLY, false)
+                && !request.getRequestContext().getUser().getAdmin()) {
             if ( !request.getRequestPath().startsWith(
                     getRepository().getUrlBase() + "/user/")) {
                 return false;
             }
         }
 
-        if(getProperty(PROP_ACCESS_REQUIRELOGIN,false) 
+        if (getProperty(PROP_ACCESS_REQUIRELOGIN, false)
                 && request.getRequestContext().getUser().getAnonymous()) {
             if ( !request.getRequestPath().startsWith(
                     getRepository().getUrlBase() + "/user/")) {
@@ -333,9 +347,17 @@ public class UserManager extends RepositoryManager {
      * @return _more_
      */
     public String makeLoginForm(Request request) {
-        return makeLoginForm(request,"");
+        return makeLoginForm(request, "");
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
     public String makeLoginForm(Request request, String extra) {
         StringBuffer sb   = new StringBuffer("<h3>Please login</h3>");
         String       name = request.getString(ARG_USER_NAME, "");
@@ -672,13 +694,14 @@ public class UserManager extends RepositoryManager {
             sb.append(HtmlUtil.formEntry("Admin:",
                                          HtmlUtil.checkbox(ARG_USER_ADMIN,
                                              "true", user.getAdmin())));
-            String userRoles = user.getRolesAsString("\n");
-            StringBuffer allRoles = new StringBuffer();
-            List roles = getRoles();
-            allRoles.append("<table border=0 cellspacing=0 cellpadding=0><tr valign=\"top\"><td><b>e.g.:</b></td><td>&nbsp;&nbsp;</td><td>");
-            int cnt =0;
-            for(int i=0;i<roles.size();i++) {
-                if(cnt++>4) {
+            String       userRoles = user.getRolesAsString("\n");
+            StringBuffer allRoles  = new StringBuffer();
+            List         roles     = getRoles();
+            allRoles.append(
+                "<table border=0 cellspacing=0 cellpadding=0><tr valign=\"top\"><td><b>e.g.:</b></td><td>&nbsp;&nbsp;</td><td>");
+            int cnt = 0;
+            for (int i = 0; i < roles.size(); i++) {
+                if (cnt++ > 4) {
                     allRoles.append("</td><td>&nbsp;&nbsp;</td><td>");
                     cnt = 0;
                 }
@@ -688,9 +711,10 @@ public class UserManager extends RepositoryManager {
             }
             allRoles.append("</table>\n");
 
-            String roleEntry =   HtmlUtil.hbox(HtmlUtil.textArea(ARG_USER_ROLES,
-                                                                 userRoles, 5, 20), allRoles.toString());
-            sb.append(HtmlUtil.formEntryTop("Roles:",roleEntry));
+            String roleEntry =
+                HtmlUtil.hbox(HtmlUtil.textArea(ARG_USER_ROLES, userRoles, 5,
+                    20), allRoles.toString());
+            sb.append(HtmlUtil.formEntryTop("Roles:", roleEntry));
         }
 
         sb.append(HtmlUtil.formEntry("Email:",
@@ -1108,8 +1132,9 @@ public class UserManager extends RepositoryManager {
     public Result processHome(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
         if (request.defined(ARG_MESSAGE)) {
-            sb.append(getRepository().note(request.getUnsafeString(ARG_MESSAGE,
-                    "")));
+            sb.append(
+                getRepository().note(
+                    request.getUnsafeString(ARG_MESSAGE, "")));
         }
         return makeResult(request, "User Home", sb);
     }
@@ -1146,11 +1171,13 @@ public class UserManager extends RepositoryManager {
                 user = getUser(results);
                 setUserSession(request, user);
                 if (request.exists(ARG_REDIRECT)) {
-                    return new Result(HtmlUtil.url(request.getUnsafeString(ARG_REDIRECT,""), ARG_MESSAGE,
-                                                   "You are logged in"));
+                    return new Result(
+                        HtmlUtil.url(
+                            request.getUnsafeString(ARG_REDIRECT, ""),
+                            ARG_MESSAGE, "You are logged in"));
                 } else {
-                    return new Result(HtmlUtil.url(URL_USER_HOME, ARG_MESSAGE,
-                                                   "You are logged in"));
+                    return new Result(HtmlUtil.url(URL_USER_HOME,
+                            ARG_MESSAGE, "You are logged in"));
                 }
             } else {
                 sb.append(
@@ -1264,8 +1291,9 @@ public class UserManager extends RepositoryManager {
         }
 
         if (request.defined(ARG_MESSAGE)) {
-            sb.append(getRepository().note(request.getUnsafeString(ARG_MESSAGE,
-                    "")));
+            sb.append(
+                getRepository().note(
+                    request.getUnsafeString(ARG_MESSAGE, "")));
         }
         sb.append(HtmlUtil.form(URL_USER_SETTINGS));
         makeUserForm(request, user, sb, false);

@@ -29,6 +29,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -331,7 +332,7 @@ public class PatternHarvester extends Harvester {
 
         long           t1         = System.currentTimeMillis();
         List<Entry>    entries    = new ArrayList<Entry>();
-        List<Entry>    needToAdd    = new ArrayList<Entry>();
+        List<Entry>    needToAdd  = new ArrayList<Entry>();
         final User     user = repository.getUserManager().getDefaultUser();
         final String   rootStr    = rootDir.toString();
         final int      rootStrLen = rootStr.length();
@@ -398,9 +399,9 @@ public class PatternHarvester extends Harvester {
                         if (type.equals("date")) {
                             try {
                                 value = sdf.parse((String) value);
-                            } catch(Exception exc) {
-                                System.err.println ("value:" + value);
-                                System.err.println ("file:" + fileName);
+                            } catch (Exception exc) {
+                                System.err.println("value:" + value);
+                                System.err.println("file:" + fileName);
                             }
                         } else if (type.equals("int")) {
                             value = new Integer(value.toString());
@@ -491,7 +492,7 @@ public class PatternHarvester extends Harvester {
                     needToAdd.addAll(repository.getUniqueEntries(entries));
                     entries = new ArrayList();
                 }
-                if(needToAdd.size()>1000) {
+                if (needToAdd.size() > 1000) {
                     repository.insertEntries(needToAdd, true, true);
                     needToAdd = new ArrayList<Entry>();
                 }
@@ -503,7 +504,7 @@ public class PatternHarvester extends Harvester {
         }
 
         needToAdd.addAll(repository.getUniqueEntries(entries));
-        if(needToAdd.size()>0) {
+        if (needToAdd.size() > 0) {
             repository.insertEntries(needToAdd, true, true);
         }
     }

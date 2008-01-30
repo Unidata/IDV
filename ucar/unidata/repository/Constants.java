@@ -29,6 +29,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -169,6 +170,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_RECURSE = "recurse";
 
+    /** _more_          */
     public static final String ARG_REDIRECT = "redirect";
 
     /** _more_ */
@@ -209,6 +211,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_AREA = "area";
 
+    /** _more_          */
     public static final String ARG_DATE = "date";
 
     /** _more_ */
@@ -340,6 +343,9 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TODATE = "todate";
 
+    /** _more_          */
+    public static final String ARG_RELATIVEDATE = "relativedate";
+
     /** _more_ */
     public static final String ARG_FROMDATE = "fromdate";
 
@@ -380,8 +386,11 @@ public interface Constants {
     public static final String PROP_ACCESS_REQUIRELOGIN =
         "jdms.access.requirelogin";
 
-    public static final String PROP_ACCESS_ADMINONLY = "jdms.access.adminonly";
+    /** _more_          */
+    public static final String PROP_ACCESS_ADMINONLY =
+        "jdms.access.adminonly";
 
+    /** _more_          */
     public static final String PROP_HTML_FOOTER = "jdms.html.footer";
 
     /** _more_ */

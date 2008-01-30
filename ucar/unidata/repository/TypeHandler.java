@@ -29,6 +29,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -108,6 +109,8 @@ public class TypeHandler implements Constants, Tables {
     /** _more_ */
     private Hashtable dontShowInForm = new Hashtable();
 
+    /** _more_          */
+    private Hashtable properties = new Hashtable();
 
 
     /**
@@ -133,6 +136,66 @@ public class TypeHandler implements Constants, Tables {
     /**
      * _more_
      *
+     * @param name _more_
+     *
+     * @return _more_
+     */
+    public String getProperty(String name) {
+        return (String) properties.get(name);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    public String getProperty(String name, String dflt) {
+        return Misc.getProperty(properties, name, dflt);
+    }
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    public int getProperty(String name, int dflt) {
+        return Misc.getProperty(properties, name, dflt);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    public boolean getProperty(String name, boolean dflt) {
+        return Misc.getProperty(properties, name, dflt);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     */
+    public void putProperty(String name, String value) {
+        properties.put(name, value);
+    }
+
+    /**
+     * _more_
+     *
      * @param repository _more_
      * @param type _more_
      * @param description _more_
@@ -144,18 +207,14 @@ public class TypeHandler implements Constants, Tables {
         this.description = description;
 
     }
+
+    /** _more_          */
     static int cnt = 0;
+
+    /** _more_          */
     int mycnt = cnt++;
 
 
-    /**
-     * _more_
-     *
-     * @param arg _more_
-     */
-    public void setDontShowInForm(String arg) {
-        dontShowInForm.put(arg, arg);
-    }
 
     /**
      * _more_
@@ -165,10 +224,7 @@ public class TypeHandler implements Constants, Tables {
      * @return _more_
      */
     public boolean okToShowInForm(String arg) {
-        if (dontShowInForm.get(arg) != null) {
-            return false;
-        }
-        return true;
+        return getProperty("form.show." + arg, true);
     }
 
 
@@ -522,6 +578,7 @@ public class TypeHandler implements Constants, Tables {
     }
 
 
+
     /**
      * _more_
      *
@@ -601,18 +658,17 @@ public class TypeHandler implements Constants, Tables {
                     + Repository.fmt(entry.getCreateDate())));
 
             String resourceLink = entry.getResource().getPath();
-            if(resourceLink.length()>0) {
+            if (resourceLink.length() > 0) {
                 if (entry.getResource().isUrl()) {
                     resourceLink = "<a href=\"" + resourceLink + "\">"
-                        + resourceLink + "</a>";
+                                   + resourceLink + "</a>";
                 }
                 sb.append(HtmlUtil.formEntry("Resource:", resourceLink));
 
                 if (entry.isFile()) {
-                    sb.append(
-                              HtmlUtil.formEntry(
-                                                 "Size:",
-                                                 entry.getResource().getFile().length() + " bytes"));
+                    sb.append(HtmlUtil.formEntry("Size:",
+                            entry.getResource().getFile().length()
+                            + " bytes"));
                 }
             }
 
@@ -862,14 +918,35 @@ public class TypeHandler implements Constants, Tables {
                                 List where, boolean simpleForm)
             throws Exception {
 
-
-
+        List dateSelect = new ArrayList();
+        //        dateSelect.add(new TwoFacedObject("Last 1/2 hour", "-30 minutes"));
+        dateSelect.add(new TwoFacedObject("Last  hour", "-1 hour"));
+        dateSelect.add(new TwoFacedObject("Last 2 hours", "-2 hours"));
+        dateSelect.add(new TwoFacedObject("Last 3 hours", "-3 hours"));
+        dateSelect.add(new TwoFacedObject("Last 6 hours", "-6 hours"));
+        dateSelect.add(new TwoFacedObject("Last 12 hours", "-12 hours"));
+        dateSelect.add(new TwoFacedObject("Last day", "-1 day"));
+        dateSelect.add(new TwoFacedObject("Last 2 days", "-2 days"));
+        dateSelect.add(new TwoFacedObject("Last 7 days", "-7 days"));
+        dateSelect.add(new TwoFacedObject("None", "none"));
+        dateSelect.add(new TwoFacedObject("Custom:", ""));
+        String dateSelectInput = HtmlUtil.select(ARG_RELATIVEDATE,
+                                     dateSelect,
+                                     request.getString(ARG_RELATIVEDATE,
+                                         "-30 minutes"));
         String minDate = request.getDateSelect(ARG_FROMDATE, (String) null);
         String maxDate = request.getDateSelect(ARG_TODATE, (String) null);
+
+        //        request.remove(ARG_FROMDATE);
+        //        request.remove(ARG_TODATE);
+
+
         List<TypeHandler> typeHandlers = repository.getTypeHandlers(request);
         if ((typeHandlers.size() == 0) && request.defined(ARG_TYPE)) {
             typeHandlers.add(repository.getTypeHandler(request));
         }
+
+
 
         /*
 
@@ -1006,10 +1083,13 @@ public class TypeHandler implements Constants, Tables {
         }
 
         String dateHelp = " (e.g., 2007-12-11 00:00:00)";
+
+
         formBuffer.append(
             HtmlUtil.formEntry(
                 "Date Range:",
-                HtmlUtil.input(ARG_FROMDATE, minDate) + " -- "
+                dateSelectInput + HtmlUtil.space(1)
+                + HtmlUtil.input(ARG_FROMDATE, minDate) + " -- "
                 + HtmlUtil.input(ARG_TODATE, maxDate) + dateHelp));
 
         formBuffer.append("\n");
@@ -1110,6 +1190,10 @@ public class TypeHandler implements Constants, Tables {
             }
         }
 
+
+
+
+        System.err.println("Getting date range");
         Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
                                new Date());
         if (dateRange[0] != null) {

@@ -29,6 +29,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -174,7 +175,8 @@ public class Harvester {
         this.active  = XmlUtil.getAttribute(element, ATTR_ACTIVE, false);
         this.sleepMinutes = XmlUtil.getAttribute(element, ATTR_SLEEP,
                 sleepMinutes);
-        this.rootDir = new File(XmlUtil.getAttribute(element, ATTR_ROOTDIR));
+        this.rootDir = new File(XmlUtil.getAttribute(element, ATTR_ROOTDIR,
+                ""));
     }
 
     /**

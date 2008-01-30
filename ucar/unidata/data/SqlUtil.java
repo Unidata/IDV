@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.data;
 
 
@@ -66,7 +67,7 @@ import java.util.regex.*;
 public class SqlUtil {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final GregorianCalendar calendar =
         new GregorianCalendar(DateUtil.TIMEZONE_GMT);
 
@@ -222,14 +223,25 @@ public class SqlUtil {
     public static String commaNoDot(String[] s) {
         List l = new ArrayList();
         for (int i = 0; i < s.length; i++) {
-            String col = s[i];
-            int    idx = col.indexOf(".");
-            if (idx >= 0) {
-                col = col.substring(idx + 1);
-            }
-            l.add(col);
+            l.add(unDot(s[i]));
         }
         return StringUtil.join(",", l);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param col _more_
+     *
+     * @return _more_
+     */
+    public static String unDot(String col) {
+        int idx = col.indexOf(".");
+        if (idx >= 0) {
+            col = col.substring(idx + 1);
+        }
+        return col;
     }
 
     /**
@@ -561,7 +573,7 @@ public class SqlUtil {
             if (i > 0) {
                 sb.append(",");
             }
-            sb.append(" " + names[i] + "=" + values[i] + " ");
+            sb.append(" " + unDot(names[i]) + "=" + values[i] + " ");
         }
         sb.append(" WHERE ");
         sb.append(colId + " = " + id);
@@ -588,7 +600,7 @@ public class SqlUtil {
             if (i > 0) {
                 sb.append(",");
             }
-            sb.append(" " + names[i] + "=?" + " ");
+            sb.append(" " + unDot(names[i]) + "=?" + " ");
         }
         sb.append(" WHERE ");
         sb.append(colId + " = ?");
@@ -614,7 +626,7 @@ public class SqlUtil {
             if (i > 0) {
                 sb.append(",");
             }
-            sb.append(" " + names.get(i) + "=?" + " ");
+            sb.append(" " + unDot(names.get(i)) + "=?" + " ");
         }
         sb.append(" WHERE ");
         sb.append(colId + " = ?");
@@ -919,8 +931,8 @@ public class SqlUtil {
             } catch (Exception exc) {
                 //                System.err.println ("bad sql:" + command+ " " + exc);
                 if ( !ignoreErrors) {
-                    System.err.println("bad query:" + command);
-                    throw exc;
+                    //                    System.err.println("bad query:" + command);
+                    //throw exc;
                 }
             }
         }
@@ -1238,7 +1250,7 @@ public class SqlUtil {
         /** _more_ */
         int cnt = 0;
 
-        /** _more_          */
+        /** _more_ */
         ResultSet lastResultSet;
 
 

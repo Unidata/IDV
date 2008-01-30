@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -95,11 +96,12 @@ public class Admin extends RepositoryManager {
 
     /** _more_ */
     public RequestUrl URL_ADMIN_SETTINGS = new RequestUrl(this,
-                                                "/admin/settings",
-                                                "Settings");
+                                               "/admin/settings", "Settings");
+
+    /** _more_          */
     public RequestUrl URL_ADMIN_SETTINGS_DO = new RequestUrl(this,
-                                                             "/admin/settings/do",
-                                                             "Settings");
+                                                  "/admin/settings/do",
+                                                  "Settings");
 
     /** _more_ */
     public RequestUrl URL_ADMIN_TABLES = new RequestUrl(this,
@@ -116,9 +118,9 @@ public class Admin extends RepositoryManager {
 
     /** _more_ */
     protected RequestUrl[] adminUrls = {
-        URL_ADMIN_HOME, URL_ADMIN_SETTINGS, URL_ADMIN_STARTSTOP, URL_ADMIN_TABLES,
-        URL_ADMIN_STATS, getUserManager().URL_USER_LIST, URL_ADMIN_HARVESTERS,
-        URL_ADMIN_SQL, URL_ADMIN_CLEANUP
+        URL_ADMIN_HOME, URL_ADMIN_SETTINGS, URL_ADMIN_STARTSTOP,
+        URL_ADMIN_TABLES, URL_ADMIN_STATS, getUserManager().URL_USER_LIST,
+        URL_ADMIN_HARVESTERS, URL_ADMIN_SQL, URL_ADMIN_CLEANUP
     };
 
 
@@ -177,26 +179,44 @@ public class Admin extends RepositoryManager {
      */
     protected StringBuffer getDbMetaData(boolean generateJava)
             throws Exception {
+
         StringBuffer     sb       = new StringBuffer();
         DatabaseMetaData dbmd = getRepository().getConnection().getMetaData();
         ResultSet        catalogs = dbmd.getCatalogs();
-        ResultSet        tables   = dbmd.getTables(null, null, null, null);
+        ResultSet tables = dbmd.getTables(null, null, null,
+                                          new String[] { "TABLE" });
+
+
         while (tables.next()) {
             String tableName = tables.getString("TABLE_NAME");
+            System.err.println("table name:" + tableName);
+            String tableType = tables.getString("TABLE_TYPE");
+            System.err.println("table type" + tableType);
+            if (Misc.equals(tableType, "INDEX")) {
+                continue;
+            }
+            if (tableType == null) {
+                continue;
+            }
+
+            if ((tableType != null) && tableType.startsWith("SYSTEM")) {
+                continue;
+            }
+
             if (generateJava
                     && (getRepository().getTypeHandler(tableName, false,
                         false) != null)) {
                 continue;
             }
-            String tableType = tables.getString("TABLE_TYPE");
-            if ((tableType != null) && tableType.startsWith("SYSTEM")) {
-                continue;
-            }
+
             ResultSet columns = dbmd.getColumns(null, null, tableName, null);
             String encoded = new String(XmlUtil.encodeBase64(("text:?"
                                  + tableName).getBytes()));
 
-            int    cnt       = getRepository().getCount(tableName, "");
+            int cnt = 0;
+            if (tableName.toLowerCase().indexOf("_index_") < 0) {
+                cnt = getRepository().getCount(tableName, "");
+            }
             String tableVar  = null;
             String TABLENAME = tableName.toUpperCase();
             if (generateJava) {
@@ -233,13 +253,19 @@ public class Admin extends RepositoryManager {
                 sb.append(StringUtil.join(",\n", colVars));
                 sb.append("};\n\n");
                 sb.append("public static final String COLUMNS_" + TABLENAME
-                          + " = SqlUtil.commaNoDot(ARRAY_" + TABLENAME
-                          + ");\n");
+                          + " = SqlUtil.comma(ARRAY_" + TABLENAME + ");\n");
+
+
+                sb.append("public static final String NODOT_COLUMNS_"
+                          + TABLENAME + " = SqlUtil.commaNoDot(ARRAY_"
+                          + TABLENAME + ");\n");
+
+
                 sb.append("public static final String INSERT_" + TABLENAME
                           + "=\n");
                 sb.append("SqlUtil.makeInsert(\n");
                 sb.append("TABLE_" + TABLENAME + ",\n");
-                sb.append("COLUMNS_" + TABLENAME + ",\n");
+                sb.append("NODOT_COLUMNS_" + TABLENAME + ",\n");
                 sb.append("SqlUtil.getQuestionMarks(ARRAY_" + TABLENAME
                           + ".length));\n");
                 sb.append("\n");
@@ -253,10 +279,45 @@ public class Admin extends RepositoryManager {
                 }
                 sb.append("\n\n");
             } else {
+
+                ResultSet indices = dbmd.getIndexInfo(null, null, tableName,
+                                        false, true);
+                boolean didone = false;
+                while (indices.next()) {
+                    if ( !generateJava) {
+                        if ( !didone) {
+                            sb.append(
+                                "<br><b>Indices</b> (name,order,type,pages<br>");
+                        }
+                        didone = true;
+                        String indexName  = indices.getString("INDEX_NAME");
+                        String asc        = indices.getString("ASC_OR_DESC");
+                        int    type       = indices.getInt("TYPE");
+                        String typeString = "" + type;
+                        int    pages      = indices.getInt("PAGES");
+                        if (type == DatabaseMetaData.tableIndexClustered) {
+                            typeString = "clustered";
+                        } else if (type
+                                   == DatabaseMetaData.tableIndexHashed) {
+                            typeString = "hashed";
+                        } else if (type == DatabaseMetaData.tableIndexOther) {
+                            typeString = "other";
+                        }
+                        sb.append("Index:" + indexName + "  " + asc + " "
+                                  + typeString + " " + pages + "<br>");
+
+
+                    }
+                }
+
                 sb.append("</ul>");
             }
         }
+
+
+
         return sb;
+
     }
 
 
@@ -340,7 +401,7 @@ public class Admin extends RepositoryManager {
             sb.append(HtmlUtil.submit("Shut Down Database"));
         }
         sb.append("</form>");
-        return makeResult(request,"Administration", sb);
+        return makeResult(request, "Administration", sb);
 
     }
 
@@ -367,11 +428,23 @@ public class Admin extends RepositoryManager {
             return new Result("", sb, "text");
         }
 
-        return makeResult(request,"Administration", sb);
+        return makeResult(request, "Administration", sb);
     }
 
 
-    private  Result makeResult(Request request, String title, StringBuffer sb) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param title _more_
+     * @param sb _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Result makeResult(Request request, String title, StringBuffer sb)
+            throws Exception {
         Result result = new Result(title, sb);
         result.putProperty(PROP_NAVSUBLINKS,
                            getRepository().getSubNavLinks(request,
@@ -403,52 +476,87 @@ public class Admin extends RepositoryManager {
         sb.append("<li> ");
         sb.append(HtmlUtil.href(URL_ADMIN_SQL, "Execute SQL"));
         sb.append("</ul>");
-        return makeResult(request,"Administration", sb);
+        return makeResult(request, "Administration", sb);
 
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result adminSettings(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
         sb.append(header("Repository Settings"));
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.form(URL_ADMIN_SETTINGS_DO));
         String size = " size=\"40\" ";
-        sb.append("<tr><td colspan=\"2\"><div  class=\"tableheading\">Display</div></td></tr>");
+        sb.append(
+            "<tr><td colspan=\"2\"><div  class=\"tableheading\">Display</div></td></tr>");
         sb.append(HtmlUtil.formEntry("Title:",
-                                     HtmlUtil.input(PROP_REPOSITORY_NAME, getProperty(PROP_REPOSITORY_NAME,
-                                                                                      "Repository"),size)));
+                                     HtmlUtil.input(PROP_REPOSITORY_NAME,
+                                         getProperty(PROP_REPOSITORY_NAME,
+                                             "Repository"), size)));
         sb.append(HtmlUtil.formEntryTop("Footer:",
-                                     HtmlUtil.textArea(PROP_HTML_FOOTER, getProperty(PROP_HTML_FOOTER,
-                                                                                      ""),5,40)));
+                                        HtmlUtil.textArea(PROP_HTML_FOOTER,
+                                            getProperty(PROP_HTML_FOOTER,
+                                                ""), 5, 40)));
 
-        sb.append("<tr><td colspan=\"2\"><div  class=\"tableheading\">Access</div></td></tr>");
+        sb.append(
+            "<tr><td colspan=\"2\"><div  class=\"tableheading\">Access</div></td></tr>");
         sb.append(HtmlUtil.formEntry("",
                                      HtmlUtil.checkbox(PROP_ACCESS_ADMINONLY,
-                                                       "true",
-                                                       getProperty(PROP_ACCESS_ADMINONLY,false)) +" Admin only"));
-        sb.append(HtmlUtil.formEntry("",
-                                     HtmlUtil.checkbox(PROP_ACCESS_REQUIRELOGIN,
-                                                       "true",
-                                                       getProperty(PROP_ACCESS_REQUIRELOGIN,false))+" Require login"));
+                                         "true",
+                                         getProperty(PROP_ACCESS_ADMINONLY,
+                                             false)) + " Admin only"));
+        sb.append(
+            HtmlUtil.formEntry(
+                "",
+                HtmlUtil.checkbox(
+                    PROP_ACCESS_REQUIRELOGIN, "true",
+                    getProperty(
+                        PROP_ACCESS_REQUIRELOGIN,
+                        false)) + " Require login"));
 
         sb.append(HtmlUtil.formEntry("&nbsp;<p>", ""));
         sb.append(HtmlUtil.formEntry("", HtmlUtil.submit("Change Settings")));
         sb.append("</form>");
         sb.append("</table>");
-        return makeResult(request,"Settings", sb);
+        return makeResult(request, "Settings", sb);
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result adminSettingsDo(Request request) throws Exception {
-        if(request.exists(PROP_REPOSITORY_NAME)) {
-            getRepository().writeGlobal(PROP_REPOSITORY_NAME, request.getString(PROP_REPOSITORY_NAME,""));
+        if (request.exists(PROP_REPOSITORY_NAME)) {
+            getRepository().writeGlobal(
+                PROP_REPOSITORY_NAME,
+                request.getString(PROP_REPOSITORY_NAME, ""));
         }
 
-        if(request.exists(PROP_HTML_FOOTER)) {
-            getRepository().writeGlobal(PROP_HTML_FOOTER, request.getString(PROP_HTML_FOOTER,""));
+        if (request.exists(PROP_HTML_FOOTER)) {
+            getRepository().writeGlobal(PROP_HTML_FOOTER,
+                                        request.getString(PROP_HTML_FOOTER,
+                                            ""));
         }
-        getRepository().writeGlobal(PROP_ACCESS_ADMINONLY, ""+request.get(PROP_ACCESS_ADMINONLY,false));
-        getRepository().writeGlobal(PROP_ACCESS_REQUIRELOGIN, ""+request.get(PROP_ACCESS_REQUIRELOGIN,false));
+        getRepository().writeGlobal(PROP_ACCESS_ADMINONLY,
+                                    "" + request.get(PROP_ACCESS_ADMINONLY,
+                                        false));
+        getRepository().writeGlobal(
+            PROP_ACCESS_REQUIRELOGIN,
+            "" + request.get(PROP_ACCESS_REQUIRELOGIN, false));
         return new Result(URL_ADMIN_SETTINGS.toString());
     }
 
@@ -516,7 +624,7 @@ public class Admin extends RepositoryManager {
         }
         sb.append("</table>");
 
-        return makeResult(request,"Harvesters", sb);
+        return makeResult(request, "Harvesters", sb);
     }
 
 
@@ -570,7 +678,7 @@ public class Admin extends RepositoryManager {
 
         sb.append("</table>\n");
 
-        return makeResult(request,"Statistics", sb);
+        return makeResult(request, "Statistics", sb);
     }
 
 
@@ -596,7 +704,7 @@ public class Admin extends RepositoryManager {
         sb.append("</form>\n");
         sb.append("<table>");
         if (query == null) {
-            return makeResult(request,"SQL",sb);
+            return makeResult(request, "SQL", sb);
         }
 
         long      t1        = System.currentTimeMillis();
@@ -652,10 +760,10 @@ public class Admin extends RepositoryManager {
         }
         sb.append("</table>");
         long t2 = System.currentTimeMillis();
-        return makeResult(request,"SQL",
-                                   new StringBuffer("Fetched:" + cnt
-                                       + " rows in: " + (t2 - t1) + "ms <p>"
-                                       + sb.toString()));
+        return makeResult(request, "SQL",
+                          new StringBuffer("Fetched:" + cnt + " rows in: "
+                                           + (t2 - t1) + "ms <p>"
+                                           + sb.toString()));
     }
 
     /**
@@ -695,7 +803,7 @@ public class Admin extends RepositoryManager {
             sb.append(status);
         }
         //        sb.append(cnt +" files do not exist in " + (t2-t1) );
-        return makeResult(request,"Cleanup", sb);
+        return makeResult(request, "Cleanup", sb);
     }
 
 

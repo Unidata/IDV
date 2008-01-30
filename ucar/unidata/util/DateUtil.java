@@ -373,10 +373,7 @@ public class DateUtil {
     }
 
     public static Date getRelativeDate(Date from, String relativeTimeString) {
-        System.err.println ("from:" + from);
-        System.err.println ("millis:" + parseRelativeTimeString(relativeTimeString));
         Date result = new Date(from.getTime()+ parseRelativeTimeString(relativeTimeString));
-        System.err.println ("result:" + result);
         return result;
     }
 
@@ -396,7 +393,7 @@ public class DateUtil {
             }
 
             delta = factor*new Integer(s).intValue();
-            System.err.println ("factor:" + factor + " delta:" + delta);
+            //            System.err.println ("factor:" + factor + " delta:" + delta);
         } catch(Exception exc) {
             throw new IllegalArgumentException("Bad format for relative time string:" + relativeTimeString+" Could not parse initial number:" + toks.get(0));
         }
@@ -410,7 +407,6 @@ public class DateUtil {
             milliseconds = 60*60*delta*1000;
         } else if(what.startsWith("day")) {
             milliseconds = 24*60*60*delta*1000;
-            System.err.println ("millis:" + milliseconds);
         } else if(what.startsWith("week")) {
             milliseconds = 7*24*60*60*delta*1000;
         } else if(what.startsWith("month")) {
@@ -424,7 +420,6 @@ public class DateUtil {
         } else {
             throw new IllegalArgumentException("Unknown unit in relative time string:" + relativeTimeString);
         }
-        System.err.println("millis:" + milliseconds);
         return milliseconds;
     }
 

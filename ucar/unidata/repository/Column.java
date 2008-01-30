@@ -27,6 +27,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -451,7 +452,9 @@ public class Column implements Tables, Constants {
         } else if (type.equals(TYPE_INT)) {
             return def + "int ";
         } else if (type.equals(TYPE_DOUBLE)) {
-            return def + "double ";
+            return def
+                   + typeHandler.getRepository().getDatabaseManager()
+                       .convertType("double") + " ";
         } else if (type.equals(TYPE_BOOLEAN)) {
             return def + "int ";
         } else if (type.equals(TYPE_LATLON)) {

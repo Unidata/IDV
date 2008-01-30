@@ -8,9 +8,12 @@
   </type>
 
 
-  <type name="blogpost"  description="Blog Post"  showinform.resource="false"
-  showinform.date="false"
-  showinform.area="false"/>
+  <type name="blogpost"  description="Blog Post">
+     <property name="form.rows.desc" value="10"/>
+     <property name="form.show.date" value="false"/>
+     <property name="form.show.area" value="false"/>
+     <property name="form.show.resource" value="false"/>
+</type>
 
 
   <type name="model"  description="Model">

@@ -29,6 +29,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -93,7 +94,7 @@ public class MetaDataServer extends HttpServer implements Constants {
     public void init() {
         try {
             //TODO: set the hostname on the repository
-            repository = new Repository(args, null , getPort());
+            repository = new Repository(args, null, getPort());
             repository.init();
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -104,6 +105,11 @@ public class MetaDataServer extends HttpServer implements Constants {
 
 
 
+    /**
+     * _more_
+     *
+     * @param socket _more_
+     */
     protected void initServerSocket(ServerSocket socket) {
         super.initServerSocket(socket);
     }
@@ -252,9 +258,10 @@ public class MetaDataServer extends HttpServer implements Constants {
             path = path.trim();
             try {
                 //Set the hostname on the first request
-                if(repository.getHostname()==null) {
-                    String hostname = getSocket().getLocalAddress().getHostName();
-                    repository.setHostname(hostname,getPort());
+                if (repository.getHostname() == null) {
+                    String hostname =
+                        getSocket().getLocalAddress().getHostName();
+                    repository.setHostname(hostname, getPort());
                 }
 
                 RequestContext context = new RequestContext(null);

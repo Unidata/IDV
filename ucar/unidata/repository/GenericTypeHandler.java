@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -67,6 +68,15 @@ public class GenericTypeHandler extends TypeHandler {
 
     /** _more_ */
     public static final String TAG_COLUMN = "column";
+
+    /** _more_          */
+    public static final String TAG_PROPERTY = "property";
+
+    /** _more_          */
+    public static final String ATTR_NAME = "name";
+
+    /** _more_          */
+    public static final String ATTR_VALUE = "value";
 
     /** _more_ */
     public static final String TAG_TYPE = "type";
@@ -116,20 +126,18 @@ public class GenericTypeHandler extends TypeHandler {
         setDescription(XmlUtil.getAttribute(entryNode, ATTR_DB_DESCRIPTION,
                                             getType()));
 
-        NamedNodeMap nnm     = entryNode.getAttributes();
-        if (nnm != null) {
-            for (int i = 0; i < nnm.getLength(); i++) {
-                Attr attr = (Attr) nnm.item(i);
-                String name = attr.getNodeName();
-                if(name.startsWith("showinform.")) {
 
-                    if(attr.getNodeValue().equals("false")) {
-                        setDontShowInForm(name.substring("showinform.".length()));
-                    }
-                }
+        List propertyNodes = XmlUtil.findChildren(entryNode, TAG_PROPERTY);
+        for (int propIdx = 0; propIdx < propertyNodes.size(); propIdx++) {
+            Element propertyNode = (Element) propertyNodes.get(propIdx);
+            if (XmlUtil.hasAttribute(propertyNode, ATTR_VALUE)) {
+                putProperty(XmlUtil.getAttribute(propertyNode, ATTR_NAME),
+                            XmlUtil.getAttribute(propertyNode, ATTR_VALUE));
+            } else {
+                putProperty(XmlUtil.getAttribute(propertyNode, ATTR_NAME),
+                            XmlUtil.getChildText(propertyNode));
             }
         }
-
 
 
 

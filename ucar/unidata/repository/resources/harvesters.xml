@@ -1,8 +1,17 @@
 <harvesters>
+
+  <harvester    name="Synthetic"
+                active="false"
+		class="ucar.unidata.repository.SyntheticHarvester"
+                monitor="false"
+		sleep="3"/>
+
+
+
   <harvester    name="Source Files"
 		grouptemplate = "${dirgroup}"
                 tagtemplate="${extension}"
-                active="true"
+                active="false"
 		class="ucar.unidata.repository.PatternHarvester"
                 xrootdir="c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar"
 		rootdir="/home/jeffmc/ucar"
@@ -16,7 +25,7 @@
   <harvester    name="Pictures"
 		grouptemplate = "${dirgroup}"
                 tagtemplate="${extension}"
-                active="true"
+                active="false"
                 class="ucar.unidata.repository.PatternHarvester"
 		xrootdir="c:/cygwin/home/jeffmc/pictures"
 		rootdir="/home/jeffmc/pictures"
@@ -28,7 +37,7 @@
 
 
   <harvester    name="IDD/NIDS"
-                active="true"
+                active="false"
                 class="ucar.unidata.repository.PatternHarvester"
 		xrootdir="c:/cygwin/home/jeffmc/unidata/data/repository/NIDS"
 		rootdir="/data/ldm/gempak/nexrad/NIDS"
@@ -46,7 +55,7 @@
 
 
    <harvester   name="IDD/Craft"
-                active="true"
+                active="false"
                 class="ucar.unidata.repository.PatternHarvester"
 		rootdir="/data/ldm/gempak/nexrad/craft"
 		basegroup="IDD/Craft"
@@ -67,7 +76,7 @@
 
 
    <harvester   name="IDD/Gempak Grids"
-                active="true"
+                active="false"
                 class="ucar.unidata.repository.PatternHarvester"
 		rootdir="/data/ldm/gempak/model"
 		basegroup="IDD/Gempak Model Grids"
@@ -86,7 +95,7 @@
 
 
    <harvester   name="IDD/Satellite"
-                active="true"
+                active="false"
                 class="ucar.unidata.repository.PatternHarvester"
 		rootdir="/data/ldm/gempak/images/sat"
 		basegroup="IDD/Satellite"

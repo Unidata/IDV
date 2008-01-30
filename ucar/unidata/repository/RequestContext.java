@@ -29,6 +29,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -88,6 +89,7 @@ public class RequestContext {
     /** _more_ */
     private User user;
 
+    /** _more_          */
     private String ip;
 
     /**
@@ -144,23 +146,23 @@ public class RequestContext {
     }
 
 
-/**
-Set the Ip property.
+    /**
+     * Set the Ip property.
+     *
+     * @param value The new value for Ip
+     */
+    public void setIp(String value) {
+        ip = value;
+    }
 
-@param value The new value for Ip
-**/
-public void setIp (String value) {
-	ip = value;
-}
-
-/**
-Get the Ip property.
-
-@return The Ip
-**/
-public String getIp () {
-	return ip;
-}
+    /**
+     * Get the Ip property.
+     *
+     * @return The Ip
+     */
+    public String getIp() {
+        return ip;
+    }
 
 
 

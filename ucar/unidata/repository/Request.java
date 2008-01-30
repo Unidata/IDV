@@ -29,6 +29,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -164,6 +165,11 @@ public class Request implements Constants {
         return getRequestPath() + "?" + getUrlArgs();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getFullUrl() {
         return repository.absoluteUrl(getUrl());
     }
@@ -308,9 +314,13 @@ public class Request implements Constants {
      * _more_
      *
      * @param key _more_
+     *
+     * @return _more_
      */
-    public void remove(String key) {
+    public Object remove(Object key) {
+        Object v = parameters.get(key);
         parameters.remove(key);
+        return v;
     }
 
     /**
@@ -319,7 +329,7 @@ public class Request implements Constants {
      * @param key _more_
      * @param value _more_
      */
-    public void put(String key, String value) {
+    public void put(Object key, Object value) {
         parameters.put(key, value);
     }
 
@@ -606,11 +616,24 @@ public class Request implements Constants {
      */
     public Date[] getDateRange(String from, String to, Date dflt)
             throws java.text.ParseException {
-        String fromDate = (String) getDateSelect(from, "").trim();
-        String toDate   = (String) getDateSelect(to, "").trim();
+        String fromDate;
+        String toDate;
+        System.err.println("getDateRange");
+        if (defined(ARG_RELATIVEDATE)) {
+            System.err.println("got relative");
+            fromDate = (String) getDateSelect(ARG_RELATIVEDATE, "").trim();
+            if (fromDate.equals("none")) {
+                return new Date[] { null, null };
+            }
+            toDate = "now";
+        } else {
+            fromDate = (String) getDateSelect(from, "").trim();
+            toDate   = (String) getDateSelect(to, "").trim();
+            System.err.println("from/to:" + fromDate);
+        }
 
-        Date   fromDttm = DateUtil.parseRelative(dflt, fromDate, -1);
-        Date   toDttm   = DateUtil.parseRelative(dflt, toDate, +1);
+        Date fromDttm = DateUtil.parseRelative(dflt, fromDate, -1);
+        Date toDttm   = DateUtil.parseRelative(dflt, toDate, +1);
         //        System.err.println ("dflt: " + dflt);
         //        System.err.println ("toDttm:" + toDate + " " + toDttm);
 
@@ -642,8 +665,6 @@ public class Request implements Constants {
         }
 
         //        System.err.println("from:" + Repository.fmt(fromDttm) + " -- " + Repository.fmt(toDttm));
-
-
         return new Date[] { fromDttm, toDttm };
     }
 

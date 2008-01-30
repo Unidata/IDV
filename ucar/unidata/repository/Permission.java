@@ -29,6 +29,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -97,12 +98,18 @@ public class Permission {
     /** _more_ */
     public static final String ACTION_DELETE = "action.delete";
 
+    /** _more_          */
     public static final String ACTION_COMMENT = "action.delete";
 
 
-    public static final String[]ACTION_NAMES = {ACTION_VIEW, ACTION_EDIT, ACTION_NEW, ACTION_DELETE, ACTION_COMMENT};
-    public static final String[]ACTIONS = {"View", "Edit", "New", "Delete", "Comment"};
-    
+    /** _more_          */
+    public static final String[] ACTION_NAMES = { ACTION_VIEW, ACTION_EDIT,
+            ACTION_NEW, ACTION_DELETE, ACTION_COMMENT };
+
+    /** _more_          */
+    public static final String[] ACTIONS = { "View", "Edit", "New", "Delete",
+                                             "Comment" };
+
 
 
     /** _more_ */

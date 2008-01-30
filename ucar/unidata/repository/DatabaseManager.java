@@ -29,6 +29,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -114,6 +115,15 @@ public class DatabaseManager extends RepositoryManager {
     private Connection theConnection;
 
 
+
+    /** _more_          */
+    private static final String DB_MYSQL = "mysql";
+
+    /** _more_          */
+    private static final String DB_DERBY = "derby";
+
+    /** _more_          */
+    private static final String DB_POSTGRES = "postgres";
 
     /**
      * _more_
@@ -217,7 +227,7 @@ public class DatabaseManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void initConnection(Connection connection) throws Exception {
-        if (db.equals("mysql")) {
+        if (db.equals(DB_MYSQL)) {
             Statement statement = connection.createStatement();
             statement.execute("set time_zone = '+0:00'");
         }
@@ -232,15 +242,70 @@ public class DatabaseManager extends RepositoryManager {
      * @return _more_
      */
     protected String convertSql(String sql) {
-        if (db.equals("mysql")) {
+        if (db.equals(DB_MYSQL)) {
             sql = sql.replace("float8", "double");
-
-        } else if (db.equals("derby")) {
+        } else if (db.equals(DB_DERBY)) {
             sql = sql.replace("float8", "double");
         }
         return sql;
     }
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     *
+     * @return _more_
+     */
+    protected String convertType(String type) {
+        if (type.equals("double")) {
+            if (db.equals(DB_POSTGRES)) {
+                return "float8";
+            }
+        } else if (type.equals("float8")) {
+            if (db.equals(DB_MYSQL) || db.equals(DB_DERBY)) {
+                return "double";
+            }
+
+        }
+        return type;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param skip _more_
+     * @param max _more_
+     *
+     * @return _more_
+     */
+    protected String getLimitString(int skip, int max) {
+        if (db.equals(DB_MYSQL)) {
+            return " LIMIT " + (skip + max) + " OFFSET " + skip + " ";
+        } else if (db.equals(DB_DERBY)) {
+            return "";
+        } else if (db.equals(DB_POSTGRES)) {
+            return " LIMIT " + (skip + max) + " OFFSET " + skip + " ";
+        }
+        return "";
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected boolean canDoSelectOffset() {
+        if (db.equals(DB_MYSQL)) {
+            return true;
+        } else if (db.equals(DB_DERBY)) {
+            return false;
+        } else if (db.equals(DB_POSTGRES)) {
+            return true;
+        }
+        return false;
+    }
 
 
 }
