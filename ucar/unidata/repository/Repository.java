@@ -106,8 +106,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     public static final String GROUP_TOP = "Top";
 
 
-    /** _more_ */
-    private List<String> downloadPrefixes = new ArrayList<String>();
 
 
     /** _more_ */
@@ -201,14 +199,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private Properties namesMap;
 
-    /** _more_ */
-    private String repositoryDir;
 
-    /** _more_ */
-    private String tmpDir;
-
-    /** _more_ */
-    private String uploadDir;
 
     /** _more_ */
     private Properties properties = new Properties();
@@ -315,6 +306,10 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     /** _more_ */
     private UserManager userManager;
+
+    private StorageManager storageManager;
+
+
 
     /** _more_ */
     private DatabaseManager databaseManager;
@@ -490,6 +485,16 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @return _more_
      */
+    protected StorageManager doMakeStorageManager() {
+        return new StorageManager(this);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected DatabaseManager doMakeDatabaseManager() {
         return new DatabaseManager(this);
     }
@@ -514,6 +519,19 @@ public class Repository implements Constants, Tables, RequestHandler,
             userManager = doMakeUserManager();
         }
         return userManager;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected StorageManager getStorageManager() {
+        if (storageManager == null) {
+            storageManager = doMakeStorageManager();
+            storageManager.init();
+        }
+        return storageManager;
     }
 
 
@@ -615,7 +633,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         try {
             localProperties.load(
                 IOUtil.getInputStream(
-                    IOUtil.joinDir(repositoryDir, "repository.properties"),
+                    IOUtil.joinDir(getStorageManager().getRepositoryDir(), "repository.properties"),
                     getClass()));
         } catch (Exception exc) {}
 
@@ -643,18 +661,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             urlBase = "";
         }
 
-        repositoryDir = IOUtil.joinDir(Misc.getSystemProperty("user.home",
-                "."), IOUtil.joinDir(".unidata", "repository"));
-        tmpDir = IOUtil.joinDir(repositoryDir, "tmp");
-        IOUtil.makeDirRecursive(new File(repositoryDir));
-        IOUtil.makeDirRecursive(new File(tmpDir));
-
-        uploadDir = IOUtil.joinDir(repositoryDir, "uploads");
-        IOUtil.makeDirRecursive(new File(uploadDir));
-        addDownloadPrefix(uploadDir);
-
-
-        logFile = new File(IOUtil.joinDir(repositoryDir, "repository.log"));
+        logFile = new File(IOUtil.joinDir(getStorageManager().getRepositoryDir(), "repository.log"));
         //TODO: Roll the log file
         logFOS = new FileOutputStream(logFile, true);
 
@@ -685,14 +692,8 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public String getFileUploadDirectory() {
-        return uploadDir;
-    }
+
+
 
     /**
      * _more_
@@ -712,17 +713,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-
-
-    /**
-     * _more_
-     *
-     * @param prefix _more_
-     */
-    public void addDownloadPrefix(String prefix) {
-        prefix = prefix.replace("\\", "/");
-        downloadPrefixes.add(prefix);
-    }
 
 
     /**
@@ -2155,16 +2145,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if ( !entry.getTypeHandler().canDownload(request, entry)) {
             return false;
         }
-        String filePath = entry.getResource().getPath();
-        filePath = filePath.replace("\\", "/");
-        checkFilePath(filePath);
-
-        for (String prefix : downloadPrefixes) {
-            if (filePath.startsWith(prefix)) {
-                return true;
-            }
-        }
-        return false;
+        return getStorageManager().canDownload(request, entry);
     }
 
 
@@ -2202,8 +2183,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (request.defined(ARG_IMAGEWIDTH)
                 && ImageUtils.isImage(entry.getResource().getPath())) {
             int    width    = request.get(ARG_IMAGEWIDTH, 75);
-            String thumbDir = IOUtil.joinDir(tmpDir, "thumbnails");
-            IOUtil.makeDir(thumbDir);
+            String thumbDir = getStorageManager().getThumbDir();
             String thumb = IOUtil.joinDir(thumbDir,
                                           "entry" + entry.getId() + "_"
                                           + width + ".jpg");
@@ -2769,25 +2749,34 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         if (entry == null) {
             List<String> resources = new ArrayList();
+            List<String> origNames = new ArrayList();
             typeHandler =
                 getTypeHandler(request.getType(TypeHandler.TYPE_ANY));
             String resource = request.getString(ARG_RESOURCE, "");
             String filename = request.getUploadedFile(ARG_FILE);
             boolean unzipArchive = false;
+            boolean isFile = false;
             if (filename != null) {
+                isFile = true;
                 unzipArchive = request.get(ARG_FILE_UNZIP,false);
                 resource = filename;
             }
             if(!unzipArchive) {
                 resources.add(resource);
+                origNames.add(resource);
             } else {
                 ZipInputStream zin =
                     new ZipInputStream(new FileInputStream(resource));
                 ZipEntry ze = null;
                 while ((ze = zin.getNextEntry()) != null) {
-                    String name = ze.getName().toLowerCase();
-                    System.err.println("name:" + name);
-                    //                    IOUtil.writeTo(zin, outputFile);
+                    if(ze.isDirectory()) continue;
+                    String name = IOUtil.getFileTail(ze.getName().toLowerCase());
+                    File f = getStorageManager().getTmpFile(request, name);
+                    FileOutputStream fos = new FileOutputStream(f);
+                    IOUtil.writeTo(zin, fos);
+                    fos.close();
+                    resources.add(f.toString());
+                    origNames.add(name);
                 }
             }
             String groupName = request.getString(ARG_GROUP, (String) null);
@@ -2799,8 +2788,6 @@ public class Repository implements Constants, Tables, RequestHandler,
                                     request.getRequestContext().getUser(),
                                     true);
             String description = request.getString(ARG_DESCRIPTION, "");
-            String origName = request.getString(ARG_NAME,"");
-
 
             Date createDate = new Date();
             Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
@@ -2814,10 +2801,15 @@ public class Repository implements Constants, Tables, RequestHandler,
                 dateRange[1] = dateRange[0];
             }
 
-            for(String theResource: resources) {
+            for(int resourceIdx=0;resourceIdx<resources.size();resourceIdx++) {
+                String theResource = (String) resources.get(resourceIdx);
+                String origName = (String) origNames.get(resourceIdx);
+                if(isFile) {
+                    theResource = getStorageManager().moveToStorage(request, new File(theResource)).toString();
+                }
                 String name = request.getString(ARG_NAME,"");
                 if (name.trim().length() == 0) {
-                    name =  IOUtil.getFileTail(theResource);
+                    name =  IOUtil.getFileTail(origName);
                 }
                 if (name.trim().length() == 0) {
                     throw new IllegalArgumentException("Must specify a name");
@@ -2846,7 +2838,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 entry = typeHandler.createEntry(id);
                 entry.init(name, description, parentGroup,
                            request.getRequestContext().getUser(),
-                           new Resource(theResource), createDate.getTime(),
+                           new Resource(theResource,Resource.TYPE_LOCALFILE), createDate.getTime(),
                            dateRange[0].getTime(), dateRange[1].getTime(), null);
                 setEntryState(request, entry);
                 entries.add(entry);
@@ -2907,9 +2899,12 @@ public class Repository implements Constants, Tables, RequestHandler,
             entry = (Entry) entries.get(0);
             return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
                                            entry.getId()));
+        } else if(entries.size()>1) {
+            entry = (Entry) entries.get(0);
+            return new Result(HtmlUtil.url(URL_GROUP_SHOW, ARG_GROUP,
+                                           entry.getParentGroup().getFullName(), ARG_MESSAGE, entries.size()+" files uploaded"));
         } else {
-            //TODO: how to show multiples
-            return new Result("", new StringBuffer("OK"));
+            return new Result("",new StringBuffer("No entries created"));
         }
     }
 

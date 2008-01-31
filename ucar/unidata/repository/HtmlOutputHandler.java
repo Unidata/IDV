@@ -629,6 +629,10 @@ public class HtmlOutputHandler extends OutputHandler {
         String       title      = group.getFullName();
         StringBuffer sb         = new StringBuffer();
 
+        if (request.exists(ARG_MESSAGE)) {
+            sb.append(repository.note(request.getUnsafeString(ARG_MESSAGE, "")));
+        }
+
         int          cnt        = subGroups.size() + entries.size();
         int          max        = request.get(ARG_MAX, Repository.MAX_ROWS);
         //        System.err.println ("cnt:" + cnt + " " + max);

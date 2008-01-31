@@ -179,6 +179,16 @@ public class RepositoryManager implements RepositorySource, Constants,
         return repository.getUserManager();
     }
 
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected StorageManager getStorageManager() {
+        return repository.getStorageManager();
+    }
+
     /**
      * _more_
      *

@@ -349,7 +349,7 @@ public class Admin extends RepositoryManager {
         for (Harvester harvester : harvesters) {
             File rootDir = harvester.getRootDir();
             if (rootDir != null) {
-                getRepository().addDownloadPrefix(
+                getStorageManager().addDownloadPrefix(
                     rootDir.toString().replace("\\", "/") + "/");
             }
             if ( !okToStart) {

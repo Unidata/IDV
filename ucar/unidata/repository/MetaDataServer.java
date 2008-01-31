@@ -180,14 +180,8 @@ public class MetaDataServer extends HttpServer implements Constants {
             Repository.checkFilePath(filename);
             int cnt = 0;
             File f =
-                new File(IOUtil.joinDir(repository.getFileUploadDirectory(),
-                                        filename));
-            while (f.exists()) {
-                f = new File(
-                    IOUtil.joinDir(
-                        repository.getFileUploadDirectory(),
-                        (cnt++) + "_" + filename));
-            }
+                new File(IOUtil.joinDir(repository.getStorageManager().getUploadDir(),
+                                        repository.getGUID()+"_"+filename));
             //TODO: Check for security hole with the file upload
             fileUploads.put(attrName, f.toString());
             OutputStream output = new FileOutputStream(f);

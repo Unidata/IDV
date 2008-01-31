@@ -53,6 +53,8 @@ public class Resource {
     /** _more_ */
     public static final String TYPE_FILE = "file";
 
+    public static final String TYPE_LOCALFILE = "localfile";
+
     /** _more_ */
     public static final String TYPE_URL = "url";
 
@@ -82,9 +84,13 @@ public class Resource {
      * @param file _more_
      */
     public Resource(File file) {
+        this(file, TYPE_FILE);
+    }
+
+    public Resource(File file, String type) {
         this.file = file;
-        path      = file.toString();
-        type      = TYPE_FILE;
+        this.path      = file.toString();
+        this.type      = type;
     }
 
 
@@ -144,7 +150,7 @@ public class Resource {
      * @return _more_
      */
     public boolean isFile() {
-        if (type.equals(TYPE_FILE)) {
+        if (type.equals(TYPE_FILE) || type.equals(TYPE_LOCALFILE)) {
             return getFile().exists();
         }
         return false;
