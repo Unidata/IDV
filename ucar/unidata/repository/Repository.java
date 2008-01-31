@@ -2763,7 +2763,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
             if(!unzipArchive) {
                 resources.add(resource);
-                origNames.add(resource);
+                origNames.add(request.getString(ARG_FILE, ""));
             } else {
                 ZipInputStream zin =
                     new ZipInputStream(new FileInputStream(resource));

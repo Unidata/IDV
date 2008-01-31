@@ -186,6 +186,8 @@ public class MetaDataServer extends HttpServer implements Constants {
             fileUploads.put(attrName, f.toString());
             OutputStream output = new FileOutputStream(f);
             multipartStream.readBodyData(output);
+            output.close();
+            args.put(attrName, filename);
         }
 
         /**
