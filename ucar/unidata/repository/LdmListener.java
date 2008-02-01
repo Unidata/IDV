@@ -43,28 +43,40 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.IOUtil;
 
 public class LdmListener {
-    BufferedReader br;
-    
-    SimpleDateFormat yearSdf;
-    SimpleDateFormat monthSdf;
-
-    List files = new ArrayList();
-
-    Pattern pattern;
-
+    private     boolean debug = false;
+    private     BufferedReader br;
+    private     SimpleDateFormat yearSdf;
+    private     SimpleDateFormat monthSdf;
+    private     List files = new ArrayList();
+    private     Pattern pattern;
+    private     String type = "any";
 
     long startTime;
     int cnt=0;
 
-    public LdmListener(String[]args) throws Exception {
-        String patternString = "SDUS[2357]. .... ([0-3][0-9])([0-2][0-9])([0-6][0-9]).*/p(...)(...)";
-        pattern = Pattern.compile(patternString);
-  
+    private Object FILES_MUTEX = new Object();
+    private Object PROCESS_MUTEX = new Object();
 
-        if(args.length==0) throw new IllegalArgumentException("No arguments given");
+    // = "SDUS[2357]. .... ([0-3][0-9])([0-2][0-9])([0-6][0-9]).*/p(...)(...)";
+    private String patternString;
+    //"/data/ldm/gempak/nexrad/NIDS/\\5/\\4/\\4_(\\1:yyyy)(\\1:mm)\\1_\\2\\3";
+    private String fileTemplate;
+
+
+
+    private String urlTemplate = "http://localhost:8080/repository/processfile?file=${file}&type=${type}";
+
+    private void usage(String msg) {
+        System.err.println(msg);
+        System.err.println ("usage: LdmListener -pattern <product pattern> -template <file template> -debug -type <repository type>");
+        System.exit(1);
+    }
+
+    public LdmListener(String[]args) throws Exception {
+        processArgs(args);
+        pattern = Pattern.compile(patternString);
         InputStreamReader sr = new InputStreamReader(System.in);
         br    = new BufferedReader(sr);
-
         yearSdf = new SimpleDateFormat();
         yearSdf.setTimeZone(DateUtil.TIMEZONE_GMT);
         yearSdf.applyPattern("yyyy");
@@ -73,16 +85,50 @@ public class LdmListener {
         monthSdf.setTimeZone(DateUtil.TIMEZONE_GMT);
         monthSdf.applyPattern("MM");
         startTime = System.currentTimeMillis();
-        run();
+        Misc.run(new Runnable() {
+                public void run() {
+                    checkFiles();
+                }
+            });
+        processIncoming();
+        System.exit(0);
     }
 
 
-    public void run() throws Exception {
+
+    private void processArgs(String[]args) {
+        for(int i=0;i<args.length;i++) {
+            if(args[i].equals("-pattern")) {
+                if(i==args.length-1) usage("Incorrect input");
+                patternString = args[++i];
+            } else if(args[i].equals("-debug")) {
+                debug= true;
+            } else if(args[i].equals("-template")) {
+                if(i==args.length-1) usage("Incorrect input");
+                fileTemplate = args[++i];     
+            } else if(args[i].equals("-type")) {
+                if(i==args.length-1) usage("Incorrect input");
+                type = args[++i];     
+            } else {
+                usage("Unknown argument:" + args[i]);
+            }
+        }
+        if(patternString ==null) {
+            usage("No -pattern given");
+        }
+        if(fileTemplate ==null) {
+            usage("No -template given");
+        }
+    }
+
+    public void processIncoming() throws Exception {
         while (true) {
             try {
                 String line= br.readLine();
                 if(line!=null) {
                     processLine(line);
+                } else {
+                    Misc.sleep(100);
                 }
             }
             catch (IOException e) {
@@ -94,23 +140,23 @@ public class LdmListener {
 
     private void processLine(String line)  {
 
-        
         Matcher matcher = pattern.matcher(line);
         if (!matcher.find()) {
-            System.err.println("no match:" + line);
+            if(debug) 
+                System.err.println("no match:" + line);
             return;
         }
         
 
-        cnt++;
-        if(cnt%50==0) {
-            double minutes  = (System.currentTimeMillis() -startTime)/1000.0/60.0;
-            if(minutes>0) {
-                System.err.println("#"+cnt + " rate: " + ((int)(cnt/(double)minutes)) +"/minute");
+        if(debug) {
+            if((cnt++)%50==0) {
+                double minutes  = (System.currentTimeMillis() -startTime)/1000.0/60.0;
+                if(minutes>0) {
+                    System.err.println("#"+cnt + " rate: " + ((int)(cnt/(double)minutes)) +"/minute");
+                }
             }
         }
-
-        String filename = "/data/ldm/gempak/nexrad/NIDS/\\5/\\4/\\4_(\\1:yyyy)(\\1:mm)\\1_\\2\\3";
+        String filename = fileTemplate;
 
         Date now = new Date();
         String year = yearSdf.format(now);
@@ -126,43 +172,63 @@ public class LdmListener {
 
         File f= new File(filename);
         int cnt = 0;
-        if(!f.exists()) {
-            //            System.err.println("**** file:" + filename + " exists:" + f.exists());
-            files.add(f);
-        } else {
-            //            System.err.println("file ok:" + filename + " exists:" + f.exists());
-            processFile(f);
+        if(debug) {
+            System.err.println("file:" + filename + " exists:" + f.exists());
         }
+        addFile(f);
+    }
 
-        if(files.size()>0) {
-            List tmp = new ArrayList(files);
-            files  =new ArrayList();
-            for(int i=0;i<tmp.size();i++) {
-                f = (File) tmp.get(i);
-                if(!f.exists()) {
-                    files.add(f);
-                } else {
-                    //                    System.err.println("Processing old file:" + f);
-                    processFile(f);
+
+    private void checkFiles() {
+        while(true) {
+            if(files.size()>0) {
+                List tmp;
+                synchronized(FILES_MUTEX) {
+                    tmp = new ArrayList(files);
+                    files  =new ArrayList();
+                }
+                for(int i=0;i<tmp.size();i++) {
+                    File f = (File) tmp.get(i);
+                    if(!f.exists()) {
+                        addFile(f);
+                    } else {
+                        processFile(f);
+                    }
                 }
             }
+            Misc.sleep(1000);
+        }
+    }
+
+    private void addFile(File f)  {
+        synchronized(FILES_MUTEX) {
+            files.add(f);
         }
     }
 
 
-    private void processFile(File f)  {
-        //        if(true) return;
-        String urlString = "http://localhost:8080/repository/processfile?type=level3radar&file=" + f;
-        try {
-            URL           url    = new URL(urlString);
-            URLConnection connection = url.openConnection();
-            InputStream s = connection.getInputStream();
-            String results = IOUtil.readContents(s);
-            if(!results.equals("OK")) {
-                System.out.println("BAD:" + results);
+    private boolean processFile(File f)  {
+        synchronized(PROCESS_MUTEX) {
+            String urlString = urlTemplate.replace("${file}", f.toString());
+            urlString = urlString.replace("${type}", type);
+            try {
+                URL     url    = new URL(urlString);
+                URLConnection connection = url.openConnection();
+                InputStream s = connection.getInputStream();
+                String results = IOUtil.readContents(s);
+                if(!results.equals("OK")) {
+                    addFile(f);
+                    if(debug) {
+                        System.out.println("connection not successful:" + results);
+                    }
+                    return false;
+                }
+            } catch(Exception exc) {
+                System.out.println("error:" + exc);
+                addFile(f);
+                return false;
             }
-        } catch(Exception exc) {
-            System.out.println("error:" + exc);
+            return true;
         }
     }
 

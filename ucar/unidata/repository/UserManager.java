@@ -247,7 +247,6 @@ public class UserManager extends RepositoryManager {
             if(!user.getPassword().equals(hashPassword(password))) {
                 throw new IllegalArgumentException("Incorrect password");
             }
-
             setUserSession(request, user);
         }
 

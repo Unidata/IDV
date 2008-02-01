@@ -222,9 +222,20 @@ public class StorageManager extends RepositoryManager {
         String filePath = entry.getResource().getPath();
         filePath = filePath.replace("\\", "/");
         getRepository().checkFilePath(filePath);
-        //        System.err.println ("file: " + filePath);
+        return isInDownloadArea(filePath);
+    }
+
+
+    public void removeFile(Entry entry) {
+        if(entry.getResource().isLocalFile()) {
+            entry.getResource().getFile().delete();
+        }
+    }
+
+    public boolean isInDownloadArea(String filePath) 
+            throws Exception {
+        filePath = filePath.replace("\\", "/");
         for (String prefix : downloadPrefixes) {
-            //            System.err.println ("   prefix:" + prefix);
             if (filePath.startsWith(prefix)) {
                 return true;
             }

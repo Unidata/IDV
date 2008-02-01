@@ -159,7 +159,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                                              "/entry/delete");
 
     /** _more_ */
-    public RequestUrl URL_ENTRY_ADD = new RequestUrl(this, "/entry/add");
+    public RequestUrl URL_ENTRY_CHANGE = new RequestUrl(this, "/entry/change");
 
     /** _more_ */
     public RequestUrl URL_ENTRY_FORM = new RequestUrl(this, "/entry/form");
@@ -2383,7 +2383,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (type == null) {
             sb.append(HtmlUtil.form(URL_ENTRY_FORM, ""));
         } else {
-            sb.append(HtmlUtil.uploadForm(URL_ENTRY_ADD, ""));
+            sb.append(HtmlUtil.uploadForm(URL_ENTRY_CHANGE, ""));
         }
 
         String title = "";
@@ -2405,7 +2405,9 @@ public class Repository implements Constants, Tables, RequestHandler,
             String submitButton = HtmlUtil.submit(title = ((entry == null)
                     ? "Add " + typeHandler.getLabel()
                     : "Edit " + typeHandler.getLabel()));
-            sb.append(HtmlUtil.formEntry("", submitButton));
+
+            String deleteButton = HtmlUtil.submit("Delete", ARG_DELETE);
+            sb.append(HtmlUtil.formEntry("", submitButton+HtmlUtil.space(2)+deleteButton));
             if (entry != null) {
                 sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
             } else {
@@ -2444,10 +2446,10 @@ public class Repository implements Constants, Tables, RequestHandler,
 
             String dateHelp = " (e.g., 2007-12-11 00:00:00)";
             String fromDate = ((entry != null)
-                               ? new Date(entry.getStartDate()).toString()
+                               ? fmt(new Date(entry.getStartDate()))
                                : "");
             String toDate   = ((entry != null)
-                               ? new Date(entry.getEndDate()).toString()
+                               ? fmt(new Date(entry.getEndDate()))
                                : "");
             if (typeHandler.okToShowInForm(ARG_DATE)) {
                 sb.append(
@@ -2503,7 +2505,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
 
             typeHandler.addToEntryForm(request, sb, entry);
-            sb.append(HtmlUtil.formEntry("", submitButton));
+            sb.append(HtmlUtil.formEntry("", submitButton+HtmlUtil.space(2)+deleteButton));
         }
         sb.append("</table>\n");
         return new Result(title, sb, Result.TYPE_HTML);
@@ -2746,7 +2748,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    public Result processEntryAdd(Request request) throws Exception {
+    public Result processEntryChange(Request request) throws Exception {
 
         Entry       entry = null;
         TypeHandler typeHandler;
@@ -2757,6 +2759,36 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (entry == null) {
                 throw new IllegalArgumentException("Could not find entry:"
                         + request.getString(ARG_ID, ""));
+            }
+
+
+
+            if (request.exists(ARG_CANCEL)) {
+                return new Result(HtmlUtil.url(URL_ENTRY_FORM, ARG_ID, entry.getId()));
+            }
+
+
+            if (request.exists(ARG_DELETE_CONFIRM)) {
+                List<Entry> entries = new ArrayList<Entry>();
+                entries.add(entry);
+                deleteEntries(request, entries);
+                Group group = entry.getParentGroup();
+                return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                                               group.getId(), ARG_MESSAGE,"Entry is deleted"));
+            }
+
+            if (request.exists(ARG_DELETE)) {
+                StringBuffer sb = new StringBuffer();
+                sb.append(HtmlUtil.form(URL_ENTRY_CHANGE, ""));
+                sb.append("Are you sure you want to delete the entry: ");
+                sb.append(entry.getName());
+                sb.append("<p>");
+                sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
+                sb.append(HtmlUtil.submit("Yes", ARG_DELETE_CONFIRM));
+                sb.append(HtmlUtil.space(3));
+                sb.append(HtmlUtil.submit("Cancel", ARG_CANCEL));
+                sb.append(HtmlUtil.formClose());
+                return new Result("Entry delete confirm", sb);
             }
         }
         List<Entry> entries = new ArrayList<Entry>();
@@ -5097,6 +5129,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             getConnection().setAutoCommit(false);
             Statement statement = getConnection().createStatement();
             for (Entry entry : entries) {
+                getStorageManager().removeFile(entry);
                 tagsStmt.setString(1, entry.getId());
                 tagsStmt.addBatch();
                 commentsStmt.setString(1, entry.getId());
@@ -5138,6 +5171,10 @@ public class Repository implements Constants, Tables, RequestHandler,
         List<Harvester> harvesters = getAdmin().getHarvesters();
         TypeHandler typeHandler = getTypeHandler(request);
         String filepath = request.getUnsafeString(ARG_FILE,"");
+        //Check to  make sure we can access this file
+        if(!getStorageManager().isInDownloadArea(filepath)) {
+            return new Result("", new StringBuffer("Cannot load file:" + filepath),"text/plain");
+        }
         for (Harvester harvester : harvesters) {
             Entry entry = harvester.processFile(typeHandler, filepath);
             if(entry!=null) {

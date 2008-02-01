@@ -156,6 +156,10 @@ public class Resource {
         return false;
     }
 
+    public boolean isLocalFile() {
+        return type.equals(TYPE_LOCALFILE);
+    }
+
     /**
      * _more_
      *

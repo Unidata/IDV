@@ -10,7 +10,7 @@
   <method request="/graph/get"   method="processGraphGet"     admin="false" cancache="true"/>
   <method request="/entity/form" method="processEntityForm"     admin="false" cancache="true"/>
   <method request="/entry/show"  method="processEntryShow"    admin="false" cancache="true"/>
-  <method request="/entry/add"   method="processEntryAdd"     admin="false" cancache="true"/>
+  <method request="/entry/change"   method="processEntryChange"     admin="false" cancache="true"/>
   <method request="/entry/form"  method="processEntryForm"     admin="false" cancache="true"/>
   <method request="/entry/comments"  method="processEntryComments"     admin="false" cancache="true"/>
   <method request="/entry/delete"    method="processEntryDelete"     admin="false" cancache="true"/>

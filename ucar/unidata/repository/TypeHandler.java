@@ -1086,7 +1086,6 @@ public class TypeHandler implements Constants, Tables {
 
         String dateHelp = " (e.g., 2007-12-11 00:00:00)";
 
-
         formBuffer.append(
             HtmlUtil.formEntry(
                 "Date Range:",
