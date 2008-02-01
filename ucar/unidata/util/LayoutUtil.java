@@ -164,6 +164,9 @@ public class LayoutUtil extends MenuUtil {
     /** doLayout weights */
     public static final double[] WT_YNYN = { 1, 0, 1, 0 };
 
+     /** doLayout weights */
+    public static final double[] WT_NYNYN = { 0,1,0,1,0};
+
     /** doLayout weights */
     public static final double[] WT_NY = { 0, 1 };
 
@@ -174,9 +177,12 @@ public class LayoutUtil extends MenuUtil {
     public static final double[] WT_YNY = { 1, 0, 1 };
 
     /** doLayout weights */
-    public static final double[] WT_YNN = { 1, 0, 0 };
-
+    public static final double[] WT_NYY = { 0, 1, 1 };
     /** doLayout weights */
+
+    public static final double[] WT_YNN = { 1, 0, 0 };
+    /** doLayout weights */
+
     public static final double[] WT_NNY = { 0, 0, 1 };
 
     /** doLayout weights */
