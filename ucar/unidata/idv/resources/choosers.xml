@@ -169,7 +169,12 @@ If using the tree panel you can define components that are displayed when a cate
        helppath="idv.data.choosers.radarchooser"
        class="ucar.unidata.idv.chooser.DqcRadarChooser"/>
 -->
-
+    <chooser
+       id="chooser.tdsradar"
+       title="Level II - Remote (TDS Radar Server)"
+       menutitle="TDS Level II Radar"
+       helppath="idv.data.choosers.radarchooser"
+       class="ucar.unidata.idv.chooser.TDSRadarChooser"/>
 
     </tabbedpane>
   </panel>
