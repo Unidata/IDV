@@ -303,9 +303,15 @@ public class StateManager extends IdvManager {
         }
 
         showControlsInTree = getProperty("idv.ui.showcontrolsintree", false);
-        Help.setTopDir(getProperty("idv.help.topDir", DEFAULT_DOCPATH));
+        String topDir = getHelpRoot();
+        Help.setTopDir(topDir);
+        ucar.unidata.ui.symbol.StationModelCanvas.setHelpTopDir(topDir);
+        ucar.unidata.ui.colortable.ColorTableEditor.setHelpTopDir(topDir);
     }
 
+    public String getHelpRoot() {
+        return  getProperty("idv.help.topDir", DEFAULT_DOCPATH);
+    }
 
 
 
@@ -662,7 +668,7 @@ public class StateManager extends IdvManager {
      * @return The base help url
      */
     public String getDefaultHelpUrl() {
-        return getProperty("idv.help.defaulturl", DEFAULT_DOCPATH);
+        return getProperty("idv.help.defaulturl", getHelpRoot());
     }
 
 

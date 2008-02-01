@@ -320,7 +320,7 @@ public class IdvXmlUi extends XmlUi {
             try {
                 java.net.URL url =
                     IOUtil.getURL(XmlUtil.getAttribute(node, "helpset",
-                        "/auxdata/docs/userguide/HelpSet.hs"), getClass());
+                                                       idv.getStateManager().getHelpRoot()+"/HelpSet.hs"), getClass());
                 if (url == null) {
                     return null;
                 }
