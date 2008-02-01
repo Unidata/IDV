@@ -447,11 +447,17 @@ public class StationModelCanvas extends EditCanvas {
         return viewMenu;
     }
 
+    private static String HELP_TOP_DIR = "/auxdata/docs/userguide";
+    public static void setHelpTopDir(String topDir) {
+        HELP_TOP_DIR = topDir;
+    }
+
+
     /**
-     * Show the helpo
+     * Show the help
      */
     private void showHelp() {
-        ucar.unidata.ui.Help.setTopDir("/auxdata/docs/userguide");
+        ucar.unidata.ui.Help.setTopDir(HELP_TOP_DIR);
         ucar.unidata.ui.Help.getDefaultHelp().gotoTarget(
             "idv.tools.stationmodeleditor");
     }
