@@ -133,6 +133,10 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     public static final String PREF_RADARDESCLIST =
         "idv.data.adde.radar.descriptors";
 
+    /** Used by derived classes to save the list of tds radar descriptors */
+    public static final String PREF_TDSRADARSERVER =
+        "idv.data.tds.radar.servers";
+
     /**
      * mapping from the String PREF name to a {@link ucar.unidata.util.PreferenceList}
      */
