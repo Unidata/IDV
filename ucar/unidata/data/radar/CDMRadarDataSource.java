@@ -26,7 +26,7 @@
 package ucar.unidata.data.radar;
 
 
-import ucar.nc2.thredds.DqcRadarDatasetCollection;
+import ucar.nc2.thredds.TDSRadarDatasetCollection;
 import ucar.nc2.units.DateUnit;
 
 
@@ -185,8 +185,9 @@ public class CDMRadarDataSource extends RadarDataSource {
             List times = query.getDateSelection().getTimes();
             List         urls   = new ArrayList();
             StringBuffer errlog = new StringBuffer();
-            DqcRadarDatasetCollection collection =
-                DqcRadarDatasetCollection.factory("test",
+
+            TDSRadarDatasetCollection collection =
+                 TDSRadarDatasetCollection.factory("test",
                     query.getCollectionUrl(), errlog);
             if ((times == null) || (times.size() == 0)) {
                 List allTimes = new ArrayList();
