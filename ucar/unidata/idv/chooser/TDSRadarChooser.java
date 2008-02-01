@@ -496,7 +496,10 @@ public class TDSRadarChooser extends TimesChooser {
     public void doLoadInThread() {
         // to the CDMRadarDataSource
         Hashtable ht = new Hashtable();
-
+        if (selectedStation != null) {
+           ht.put(ucar.unidata.data.radar.RadarDataSource.STATION_LOCATION,
+           selectedStation.getNamedLocation());
+        }
         try {
             DateSelection dateSelection = new DateSelection();
             RadarQuery radarQuery = new RadarQuery(collectionUrl,
