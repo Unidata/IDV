@@ -85,6 +85,8 @@ public class TDSRadarChooser extends TimesChooser {
     /** _more_          */
     private JComboBox collectionSelector;
 
+    /** _more_          */
+    private List tdsServers;
 
 
     /**
@@ -289,6 +291,8 @@ public class TDSRadarChooser extends TimesChooser {
      */
     private void setCollection(String s) {
         GuiUtils.enableComponents(compsThatNeedServer, true);
+        setAbsoluteTimes(new ArrayList());
+        selectedStation = null;
         Misc.run(this, "initializeCollection");
     }
 
@@ -508,8 +512,14 @@ public class TDSRadarChooser extends TimesChooser {
                     DatedThing datedThing = (DatedThing) selected.get(i);
                     Date       date       = datedThing.getDate();
                     times.add(date);
-                    URI uri = collection.getRadarDatasetURI(
+                    URI uri = null;
+                    try {
+                        uri = collection.getRadarDatasetURI(
                                   selectedStation.getID(), date);
+                    } catch (Exception excp) {
+                        LogUtil.userMessage("incorrect times selected");
+                        return;
+                    }
                     urls.add(uri.toString());
                 }
                 if (urls.size() == 0) {
