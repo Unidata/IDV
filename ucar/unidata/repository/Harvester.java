@@ -23,13 +23,6 @@
 
 
 
-
-
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -178,6 +171,11 @@ public class Harvester {
         this.rootDir = new File(XmlUtil.getAttribute(element, ATTR_ROOTDIR,
                 ""));
     }
+
+    public Entry processFile(TypeHandler type, String filepath) throws Exception {
+        return null;
+    }
+
 
     /**
      * _more_

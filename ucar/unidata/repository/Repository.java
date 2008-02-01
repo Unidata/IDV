@@ -78,6 +78,7 @@ import java.sql.Statement;
 
 import java.text.SimpleDateFormat;
 
+import java.util.regex.*;
 import java.util.zip.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -104,9 +105,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     /** _more_ */
     public static final String GROUP_TOP = "Top";
-
-
-
 
     /** _more_ */
     public RequestUrl URL_GETMAP = new RequestUrl(this, "/getmap");
@@ -2025,6 +2023,9 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private NavigatedMapPanel nmp;
 
+
+
+
     /**
      * _more_
      *
@@ -2456,6 +2457,19 @@ public class Repository implements Constants, Tables, RequestHandler,
                         + " -- "
                         + HtmlUtil.input(ARG_TODATE, toDate, " size=30 ")
                         + dateHelp));
+                if (entry == null) {
+                    List datePatterns =  new ArrayList();
+
+                    datePatterns.add(new TwoFacedObject("None",""));
+                    for(int i=0;i<DateUtil.DATE_PATTERNS.length;i++) {
+                        datePatterns.add(DateUtil.DATE_FORMATS[i]);
+                    }
+
+                    sb.append(HtmlUtil.formEntry(
+                                                 "Date Pattern:",
+                                                 HtmlUtil.select(ARG_DATE_PATTERN, datePatterns) +" (use file name)"));
+
+                }
             }
 
             String tags = "";
@@ -2835,11 +2849,44 @@ public class Repository implements Constants, Tables, RequestHandler,
                              ? getGroupId(parentGroup)
                              : getGUID());
 
+                Date[]theDateRange = {dateRange[0], dateRange[1]};
+
+                if(request.defined(ARG_DATE_PATTERN)) {
+                    String format = request.getUnsafeString(ARG_DATE_PATTERN,"");
+                    String pattern = null;
+                    for(int i=0;i<DateUtil.DATE_PATTERNS.length;i++) {
+                        if(format.equals(DateUtil.DATE_FORMATS[i])) {
+                            pattern = DateUtil.DATE_PATTERNS[i];
+                            break;
+                        }
+                    }
+                    System.err.println("format:" + format);
+                    System.err.println("orignName:" + origName);
+                    System.err.println("pattern:" + pattern);
+
+
+                    if(pattern!=null) {
+                        Pattern datePattern = Pattern.compile(pattern);
+                        Matcher matcher = datePattern.matcher(origName);
+                        if (matcher.find()) {
+                            String dateString   = matcher.group(0);
+                            SimpleDateFormat sdf = new SimpleDateFormat(format);
+                            Date dttm  = sdf.parse(dateString);
+                            theDateRange[0] = dttm;
+                            theDateRange[1] = dttm;
+                            System.err.println("got it");
+                        } else {
+                            System.err.println("not found");
+                        }
+                    }
+                }
+
+
                 entry = typeHandler.createEntry(id);
                 entry.init(name, description, parentGroup,
                            request.getRequestContext().getUser(),
                            new Resource(theResource,Resource.TYPE_LOCALFILE), createDate.getTime(),
-                           dateRange[0].getTime(), dateRange[1].getTime(), null);
+                           theDateRange[0].getTime(), theDateRange[1].getTime(), null);
                 setEntryState(request, entry);
                 entries.add(entry);
             }
@@ -5078,12 +5125,27 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @param entry _more_
      *
-     * @throws Exception _more_
+     * @throws Exception _more_b
      */
     public void addNewEntry(Entry entry) throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
         insertEntries(entries, true);
+    }
+
+
+    public Result processFile(Request request) throws Exception {
+        List<Harvester> harvesters = getAdmin().getHarvesters();
+        TypeHandler typeHandler = getTypeHandler(request);
+        String filepath = request.getUnsafeString(ARG_FILE,"");
+        for (Harvester harvester : harvesters) {
+            Entry entry = harvester.processFile(typeHandler, filepath);
+            if(entry!=null) {
+                addNewEntry(entry);
+                return new Result("", new StringBuffer("OK"),"text/plain");
+            }
+        }
+        return new Result("", new StringBuffer("Could not create entry"),"text/plain");
     }
 
 
@@ -5214,7 +5276,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (t2 > t1) {
             //System.err.println("added:" + entries.size() + " entries in " + (t2-t1) + " ms  Rate:" + (entries.size()/(t2-t1)));
             double seconds = totalTime / 1000.0;
-            if (seconds > 0) {
+            if (totalEntries%100==0 && seconds > 0) {
                 System.err.println(totalEntries + " average rate:"
                                    + (int) (totalEntries / seconds)
                                    + "/second");

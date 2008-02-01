@@ -19,6 +19,9 @@
   <method request="/getentries"  method="processGetEntries"   admin="false" cancache="true"/>
   <method request="/getmap"    method="processMap"       admin="false" cancache="false"/>
 
+
+  <method request="/processfile"    method="processFile"       admin="false" cancache="false"/>
+
   <method handler="usermanager" request="/user/login"    method="processLogin"     admin="false"  cancache="false"/>
   <method handler="usermanager" request="/user/logout"   method="processLogout"    admin="false"  cancache="false"/>
   <method handler="usermanager" request="/user/home"     method="processHome"      admin="false"  cancache="false"/>
@@ -29,6 +32,9 @@
   <method handler="usermanager" request="/user/new"      method="adminUserNew"    admin="true"   cancache="false"/>
 
   <method  request="/message"      method="processMessage"  cancache="false" admin="false"/>
+
+
+
 
 
   <method handler="admin" request="/admin/import/catalog"       method="adminImportCatalog"      admin="true" cancache="false"/>

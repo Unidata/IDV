@@ -214,6 +214,8 @@ public interface Constants {
     /** _more_          */
     public static final String ARG_DATE = "date";
 
+    public static final String ARG_DATE_PATTERN = "date.pattern";
+
     /** _more_ */
     public static final String ARG_FORM_TYPE = "form.type";
 

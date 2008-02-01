@@ -81,6 +81,19 @@ public class DateUtil {
     public static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
 
 
+    public static final String[]DATE_PATTERNS = {
+        "(\\d\\d\\d\\d\\d\\d\\d\\d_\\d\\d\\d\\d)",
+        "(\\d\\d\\d\\d\\d\\d\\d\\d_\\d\\d)",
+        "(\\d\\d\\d\\d\\d\\d\\d\\d)"
+    };
+
+    public static final String[]DATE_FORMATS = {
+        "yyyyMMdd_HHmm",
+        "yyyyMMdd_HH",
+        "yyyyMMdd"
+    };
+
+
     /** logger */
     //    private static org.slf4j.Logger log =
     //        org.slf4j.LoggerFactory.getLogger(DateUtil.class);

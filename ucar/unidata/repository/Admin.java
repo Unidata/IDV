@@ -166,6 +166,9 @@ public class Admin extends RepositoryManager {
     }
 
 
+    protected List<Harvester> getHarvesters() {
+        return harvesters;
+    }
 
 
     /**
