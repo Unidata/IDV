@@ -51,6 +51,10 @@ public class LdmListener {
     private     Pattern pattern;
     private     String type = "any";
 
+    private String bufferFile;
+    private FileOutputStream bufferOS;
+    int bufferCnt = 0;
+
     long startTime;
     int cnt=0;
 
@@ -63,8 +67,8 @@ public class LdmListener {
     private String fileTemplate;
 
 
-
-    private String urlTemplate = "http://localhost:8080/repository/processfile?file=${file}&type=${type}";
+    private String fileUrlTemplate = "http://localhost:8080/repository/processfile?file=${file}&type=${type}";
+    private String bufferUrlTemplate = "http://localhost:8080/repository/processfile?tocfile=${file}";
 
     private void usage(String msg) {
         System.err.println(msg);
@@ -74,6 +78,7 @@ public class LdmListener {
 
     public LdmListener(String[]args) throws Exception {
         processArgs(args);
+        System.err.println ("pattern:" + patternString);
         pattern = Pattern.compile(patternString);
         InputStreamReader sr = new InputStreamReader(System.in);
         br    = new BufferedReader(sr);
@@ -106,6 +111,9 @@ public class LdmListener {
             } else if(args[i].equals("-template")) {
                 if(i==args.length-1) usage("Incorrect input");
                 fileTemplate = args[++i];     
+            } else if(args[i].equals("-bufferfile")) {
+                if(i==args.length-1) usage("Incorrect input");
+                bufferFile = args[++i];     
             } else if(args[i].equals("-type")) {
                 if(i==args.length-1) usage("Incorrect input");
                 type = args[++i];     
@@ -181,6 +189,8 @@ public class LdmListener {
 
     private void checkFiles() {
         while(true) {
+            if(bufferCnt>500) {
+            }
             if(files.size()>0) {
                 List tmp;
                 synchronized(FILES_MUTEX) {
@@ -207,9 +217,30 @@ public class LdmListener {
     }
 
 
+    private void  writeToBuffer(File f)  throws Exception {
+        if(bufferOS==null) {
+            bufferOS = new FileOutputStream(bufferFile,true);
+        }
+        String s = type+":" + f+"\n";
+        bufferOS.write(s.getBytes());
+        bufferOS.flush();
+        bufferCnt++;
+    }
+
     private boolean processFile(File f)  {
         synchronized(PROCESS_MUTEX) {
-            String urlString = urlTemplate.replace("${file}", f.toString());
+            if(bufferFile!=null) {
+                try {
+                    writeToBuffer(f);
+                } catch(Exception exc) {
+                    bufferOS = null;
+                    System.out.println("error:" + exc);
+                    addFile(f);
+                    return false;
+                }
+            }
+
+            String urlString = fileUrlTemplate.replace("${file}", f.toString());
             urlString = urlString.replace("${type}", type);
             try {
                 URL     url    = new URL(urlString);

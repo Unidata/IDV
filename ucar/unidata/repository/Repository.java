@@ -178,7 +178,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     private static final int PAGE_CACHE_LIMIT = 100;
 
     /** _more_ */
-    private static final int ENTRY_CACHE_LIMIT = 100000;
+    private static final int ENTRY_CACHE_LIMIT = 10000;
 
 
     /** _more_ */
@@ -5168,6 +5168,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
     public Result processFile(Request request) throws Exception {
+        System.err.println("mem:" + Misc.usedMemory());
         List<Harvester> harvesters = getAdmin().getHarvesters();
         TypeHandler typeHandler = getTypeHandler(request);
         String filepath = request.getUnsafeString(ARG_FILE,"");
