@@ -161,22 +161,12 @@ If using the tree panel you can define components that are displayed when a cate
          xxx.idv.chooser.maps="semi-colon delimited list of maps, e.g., /auxdata/maps/OUTLUSAM"
          class="ucar.unidata.idv.chooser.Level2RadarChooser"
          showdatasourcemenu="false"/>
-<!--
-    <chooser
-       id="chooser.dqcradar"
-       title="Level II - Remote (Experimental)"
-       menutitle="TDS Level II Radar"
-       helppath="idv.data.choosers.radarchooser"
-       class="ucar.unidata.idv.chooser.DqcRadarChooser"/>
--->
-<!--
-    <chooser
-       id="chooser.tdsradar"
-       title="Level II - Remote (TDS Radar Server)"
-       menutitle="TDS Level II Radar"
-       helppath="idv.data.choosers.radarchooser"
-       class="ucar.unidata.idv.chooser.TDSRadarChooser"/>
--->
+      <chooser
+         id="chooser.tdsradar"
+         title="Level II - Remote"
+         menutitle="TDS Level II Radar"
+         helppath="idv.data.choosers.radarchooser"
+         class="ucar.unidata.idv.chooser.TDSRadarChooser"/>
     </tabbedpane>
   </panel>
 
