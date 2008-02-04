@@ -20,73 +20,39 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.point;
 
 
-import ucar.ma2.Range;
-
-import ucar.nc2.*;
-
 import ucar.unidata.data.*;
-
-import ucar.unidata.data.point.PointOb;
-import ucar.unidata.data.point.PointObFactory;
-import ucar.unidata.ui.SqlShell;
-
-
-import ucar.unidata.ui.TwoListPanel;
-
-import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.PollingInfo;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.Trace;
-import ucar.unidata.util.TwoFacedObject;
-import ucar.unidata.util.WrapperException;
-
-
-import visad.*;
-
-import visad.georef.*;
-
-
-import visad.util.DataUtility;
-
-import java.awt.*;
-import java.awt.event.*;
-
-import java.io.File;
-
-import java.net.MalformedURLException;
-
-import java.net.URL;
-
-import java.rmi.RemoteException;
-
-import java.sql.*;
-
-import java.text.SimpleDateFormat;
-
-import java.util.ArrayList;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.Vector;
-
-import javax.swing.*;
-import javax.swing.event.*;
 
 
 import ucar.unidata.geoloc.LatLonPoint;
 import ucar.unidata.geoloc.LatLonRect;
+
+import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
+
+import visad.*;
+import visad.georef.*;
+
+
+
+import java.rmi.RemoteException;
+
+import java.sql.*;
+import java.text.SimpleDateFormat;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.TimeZone;
+
+
 
 /**
  *
@@ -95,19 +61,17 @@ import ucar.unidata.geoloc.LatLonRect;
  */
 public class DbPointDataSource extends PointDataSource {
 
+    /** _more_          */
     public static final GregorianCalendar calendar =
         new GregorianCalendar(DateUtil.TIMEZONE_GMT);
 
 
-    //jdms.db.derby.home=%userhome%/.unidata/repository/derby
-    //jdms.db.derby.driver=org.apache.derby.jdbc.EmbeddedDriver
-    //jdms.db.derby.url=jdbc:derby:repository;create=true
 
+    /** hard coded data base url for now       */
     private String dbUrl = "jdbc:derby:pointdata;create=true";
 
+    /** the db connection      */
     private Connection connection;
-
-
 
 
     /**
@@ -128,110 +92,19 @@ public class DbPointDataSource extends PointDataSource {
      * @param properties  <code>Hashtable</code> of properties for the source.
      *
      * @throws VisADException  couldn't create the VisAD data
+     *
+     * @throws Exception _more_
      */
-    public DbPointDataSource(DataSourceDescriptor descriptor,
-                               String source, Hashtable properties)
+    public DbPointDataSource(DataSourceDescriptor descriptor, String source,
+                             Hashtable properties)
             throws Exception {
         super(descriptor, source, "Db Point Data", properties);
+        //Load in the java derby driver
         Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
         if ( !initConnection()) {
             setInError(true, false, "");
-        }       
-
-    }
-
-
-    protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
-                                LatLonRect bbox)
-            throws Exception {
-
-        Statement   statement = select("*", "pointdata");
-        SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
-        ResultSet        results;
-
-
-
-        String [] units = {"C","m/s","degrees"};
-        String [] numericNames = {"temperature","winddirection", "windspeed"};
-
-
-        List numericTypes = new ArrayList();
-        List numericUnits = new ArrayList();
-
-        for(int i=0;i<numericNames.length;i++) {
-            Unit unit = DataUtil.parseUnit(units[i]);
-            numericTypes.add(DataUtil.makeRealType(numericNames[i], unit));
-            numericUnits.add(unit);
         }
 
-        Unit[] allUnits =
-            (Unit[]) numericUnits.toArray(new Unit[numericUnits.size()]);
-
-
-        List stringTypes = new ArrayList();
-        stringTypes.add(TextType.getTextType("Station"));
-
-
-
-        TupleType allTupleType =  DoubleStringTuple.makeTupleType(numericTypes, stringTypes);
-
-        TupleType         finalTT = null;
-        List obs = new ArrayList();
-
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                int col=1;
-                Date date = new Date(results.getTimestamp(col++, calendar).getTime());
-                double latitude = results.getDouble(col++);
-                double longitude = results.getDouble(col++);
-                double altitude = results.getDouble(col++);
-
-                EarthLocation elt =
-                    new EarthLocationLite(new Real(RealType.Latitude, latitude),
-                                          new Real(RealType.Longitude, longitude),
-                                          new Real(RealType.Altitude, altitude));
-
-                DateTime dttm = new DateTime(date);
-
-                String station = results.getString(col++);
-                double temperature = results.getDouble(col++);
-                double windDirection = results.getDouble(col++);
-                double windSpeed = results.getDouble(col++);
-
-
-                double[] realArray   = new double[]{temperature, windDirection, windSpeed};
-                String[] stringArray   = new String[]{station};
-                Tuple tuple =  new DoubleStringTuple(allTupleType, realArray,
-                                                     stringArray, allUnits);
-
-                PointObTuple pot;
-                if (finalTT == null) {
-                    pot = new PointObTuple(elt, dttm, tuple);
-                    finalTT = Tuple.buildTupleType(pot.getComponents());
-                } else {
-                    pot = new PointObTuple(elt, dttm, tuple, finalTT, false);
-                    
-                }
-                obs.add(pot);
-            }
-        }
-        statement.close();
-
-        Integer1DSet indexSet =
-            new Integer1DSet(RealType.getRealType("index"), obs.size());
-        FieldImpl retField =
-            new FieldImpl(
-                new FunctionType(
-                    ((SetType) indexSet.getType()).getDomain(),
-                    ((PointObTuple)obs.get(0)).getType()), indexSet);
-        Data[]obsArray = (Data[]) obs.toArray(new Data[obs.size()]);
-
-        retField.setSamples(obsArray, false, false);
-
-
-
-
-        return retField;
     }
 
 
@@ -244,11 +117,11 @@ public class DbPointDataSource extends PointDataSource {
         if (connection != null) {
             return connection;
         }
-
         //        String url = getFilePath();
+        //Just hard code the jdbc url
         String url = dbUrl;
-        if ((getUserName() == null)
-                || (getUserName().trim().length() == 0)) {
+        //We don't need to do this for derby.
+        if ((getUserName() == null) || (getUserName().trim().length() == 0)) {
             if (url.indexOf("?") >= 0) {
                 int idx = url.indexOf("?");
                 List<String> args =
@@ -300,8 +173,7 @@ public class DbPointDataSource extends PointDataSource {
                         label =
                             "<html>Incorrect username/password. Please try again.</html>";
                     }
-                    if ( !showPasswordDialog("Database Login",
-                            label)) {
+                    if ( !showPasswordDialog("Database Login", label)) {
                         return null;
                     }
                     cnt++;
@@ -312,6 +184,156 @@ public class DbPointDataSource extends PointDataSource {
             }
         }
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private boolean initConnection() throws Exception {
+        if (getConnection() == null) {
+            return false;
+        }
+
+        try {
+            //Create the dummy database
+            Statement stmt = getConnection().createStatement();
+            //Drop the table  - ignore any errors
+            SqlUtil.loadSql("drop table pointdata;", stmt, true);
+
+            //Load in the test data
+            System.err.println("Creating test database");
+            String initSql =
+                IOUtil.readContents("/ucar/unidata/data/point/testdb.sql",
+                                    getClass());
+            SqlUtil.loadSql(initSql, stmt, false);
+            System.err.println("OK");
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     * @param subset _more_
+     * @param bbox _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
+                                LatLonRect bbox)
+            throws Exception {
+
+        /**The table is:
+        time
+        latitude 
+        longitude
+        altitude 
+        station
+        temperature
+        winddir
+        windspeed 
+        */
+        Statement        statement = select("*", "pointdata");
+        SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
+        ResultSet        results;
+
+        String[]         units = { "C", "m/s", "degrees" };
+        String[] numericNames = { "temperature", "winddirection",
+                                  "windspeed" };
+
+        List numericTypes = new ArrayList();
+        List numericUnits = new ArrayList();
+
+        for (int i = 0; i < numericNames.length; i++) {
+            Unit unit = DataUtil.parseUnit(units[i]);
+            numericTypes.add(DataUtil.makeRealType(numericNames[i], unit));
+            numericUnits.add(unit);
+        }
+
+        Unit[] allUnits =
+            (Unit[]) numericUnits.toArray(new Unit[numericUnits.size()]);
+
+
+        List stringTypes = new ArrayList();
+        stringTypes.add(TextType.getTextType("Station"));
+
+
+
+        TupleType allTupleType =
+            DoubleStringTuple.makeTupleType(numericTypes, stringTypes);
+
+        TupleType finalTT = null;
+        List      obs     = new ArrayList();
+
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                int col = 1;
+                Date date = new Date(results.getTimestamp(col++,
+                                calendar).getTime());
+                double latitude  = results.getDouble(col++);
+                double longitude = results.getDouble(col++);
+                double altitude  = results.getDouble(col++);
+
+                EarthLocation elt =
+                    new EarthLocationLite(new Real(RealType.Latitude,
+                        latitude), new Real(RealType.Longitude, longitude),
+                                   new Real(RealType.Altitude, altitude));
+
+                DateTime dttm          = new DateTime(date);
+
+                String   station       = results.getString(col++);
+                double   temperature   = results.getDouble(col++);
+                double   windDirection = results.getDouble(col++);
+                double   windSpeed     = results.getDouble(col++);
+
+                double[] realArray = new double[] { temperature,
+                        windDirection, windSpeed };
+                String[] stringArray = new String[] { station };
+                Tuple tuple = new DoubleStringTuple(allTupleType, realArray,
+                                  stringArray, allUnits);
+
+                PointObTuple pot;
+                if (finalTT == null) {
+                    pot     = new PointObTuple(elt, dttm, tuple);
+                    finalTT = Tuple.buildTupleType(pot.getComponents());
+                } else {
+                    pot = new PointObTuple(elt, dttm, tuple, finalTT, false);
+
+                }
+                obs.add(pot);
+            }
+        }
+        statement.close();
+
+        Integer1DSet indexSet =
+            new Integer1DSet(RealType.getRealType("index"), obs.size());
+        FieldImpl retField =
+            new FieldImpl(
+                new FunctionType(
+                    ((SetType) indexSet.getType()).getDomain(),
+                    ((PointObTuple) obs.get(0)).getType()), indexSet);
+        Data[] obsArray = (Data[]) obs.toArray(new Data[obs.size()]);
+
+        retField.setSamples(obsArray, false, false);
+
+
+
+
+        return retField;
+    }
+
+
 
     /**
      * _more_
@@ -359,50 +381,6 @@ public class DbPointDataSource extends PointDataSource {
     }
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    private boolean initConnection() throws Exception {
-        if (getConnection() == null) {
-            return false;
-        }
-
-        try {
-            //Create the dummy database
-            Statement stmt = getConnection().createStatement();
-            //Drop it - ignore any errors
-            SqlUtil.loadSql("drop table pointdata;", stmt, true);
-            System.err.println("Creating test database");
-            String initSql = IOUtil.readContents("/ucar/unidata/data/point/testdb.sql",getClass());
-            SqlUtil.loadSql(initSql, stmt, false);
-            System.err.println ("OK");
-        } catch(Exception exc) {
-            exc.printStackTrace();
-        }
-
-        Statement         stmt;
-        ResultSet         results;
-        SqlUtil.Iterator iter;
-        Hashtable         cats      = new Hashtable();
-        try {
-            /*            stmt = select("*", TABLE_CATEGORIES);
-            iter = SqlUtil.getIterator(stmt);
-            while ((results = iter.next()) != null) {
-                while (results.next()) {
-                    cats.put(results.getString(COL_VARIABLE),
-                             results.getString(COL_CATEGORY));
-                }
-                }*/
-        } catch (Exception exc) {
-            //                exc.printStackTrace();
-        }
-
-        return true;
-    }
 
 
 }
