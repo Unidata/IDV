@@ -186,7 +186,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     private static final int PAGE_CACHE_LIMIT = 100;
 
     /** _more_ */
-    private static final int ENTRY_CACHE_LIMIT = 10000;
+    private static final int ENTRY_CACHE_LIMIT = 5000;
 
 
     /** _more_ */
@@ -250,11 +250,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private Hashtable resources = new Hashtable();
 
-
-
-    /** _more_ */
-    private Hashtable<String, Group> groupMap = new Hashtable<String,
-                                                    Group>();
 
 
     /** _more_ */
@@ -336,6 +331,10 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private List pageCacheList = new ArrayList();
 
+
+    /** _more_ */
+    private Hashtable<String, Group> groupCache = new Hashtable<String,
+        Group>();
 
     /** _more_ */
     private Hashtable entryCache = new Hashtable();
@@ -728,6 +727,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         pageCache     = new Hashtable();
         pageCacheList = new ArrayList();
         entryCache    = new Hashtable();
+        groupCache = new Hashtable();
     }
 
 
@@ -1317,7 +1317,11 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Connection getConnection() throws Exception {
-        return getDatabaseManager().getConnection();
+        return getConnection(false);
+    }
+
+    public Connection getConnection(boolean makeNewOne) throws Exception {
+        return getDatabaseManager().getConnection(makeNewOne);
     }
 
 
@@ -2490,7 +2494,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 if (entry == null) {
                     List datePatterns =  new ArrayList();
 
-                    datePatterns.add(new TwoFacedObject("None",""));
+                    datePatterns.add(new TwoFacedObject("All",""));
                     for(int i=0;i<DateUtil.DATE_PATTERNS.length;i++) {
                         datePatterns.add(DateUtil.DATE_FORMATS[i]);
                     }
@@ -4231,16 +4235,20 @@ public class Repository implements Constants, Tables, RequestHandler,
             while (results.next()) {
                 Group group = (Group) typeHandler.getEntry(results);
                 groups.add(group);
-                groupMap.put(group.getId(), group);
+                groupCache.put(group.getId(), group);
             }
         }
         for (Group group : groups) {
             if (group.getParentGroupId() != null) {
                 Group parentGroup =
-                    (Group) groupMap.get(group.getParentGroupId());
+                    (Group) groupCache.get(group.getParentGroupId());
                 group.setParentGroup(parentGroup);
             }
-            groupMap.put(group.getFullName(), group);
+            groupCache.put(group.getFullName(), group);
+        }
+
+        if(groupCache.size() > ENTRY_CACHE_LIMIT) {
+            groupCache = new Hashtable();
         }
         return groups;
     }
@@ -4285,7 +4293,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if ((id == null) || (id.length() == 0)) {
             return null;
         }
-        Group group = groupMap.get(id);
+        Group group = groupCache.get(id);
         if (group != null) {
             return group;
         }
@@ -4357,7 +4365,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                     && !name.startsWith(GROUP_TOP + "/")) {
                 name = GROUP_TOP + "/" + name;
             }
-            Group group = groupMap.get(name);
+            Group group = groupCache.get(name);
             if (group != null) {
                 return group;
             }
@@ -4413,8 +4421,8 @@ public class Repository implements Constants, Tables, RequestHandler,
                 group.setDate(new Date().getTime());
                 addNewEntry(group);
             }
-            groupMap.put(group.getId(), group);
-            groupMap.put(group.getFullName(), group);
+            groupCache.put(group.getId(), group);
+            groupCache.put(group.getFullName(), group);
             return group;
         }
     }
@@ -5130,11 +5138,15 @@ public class Repository implements Constants, Tables, RequestHandler,
     public void deleteEntries(Request request, List<Entry> entries)
             throws Exception {
         if(entries.size()==0) return;
-        deleteEntriesInner(request, entries);
+        delCnt = 0;
+        Connection connection =  getConnection(true);
+        deleteEntriesInner(request, entries, connection);
+        connection.close();
         clearCache();
     }
 
-    private void deleteEntriesInner(Request request, List<Entry> entries)
+    int delCnt = 0;
+    private void deleteEntriesInner(Request request, List<Entry> entries, Connection connection)
             throws Exception {
 
         //Check for groups and recurse
@@ -5142,18 +5154,28 @@ public class Repository implements Constants, Tables, RequestHandler,
         List<Entry>children = new ArrayList();
         for (Entry entry: entries) {
             if(!entry.isGroup()) continue;
-            String[] ids = SqlUtil.readString(execute(SqlUtil.makeSelect(COL_ENTRIES_ID, TABLE_ENTRIES,
+            Statement stmt;
+            String[] ids = SqlUtil.readString(stmt = execute(connection, SqlUtil.makeSelect(COL_ENTRIES_ID, TABLE_ENTRIES,
                                                                          SqlUtil.eq(COL_ENTRIES_PARENT_GROUP_ID,
                                                                                     SqlUtil.quote(entry.getId())))));
+            stmt.close();
+            if(ids.length>0) 
+                System.err.println("#children:" + ids.length);
             for(int i=0;i<ids.length;i++) {
                 Entry childEntry = getEntry(ids[i], request); 
                 if(childEntry!=null) {
-                    children.add(childEntry);
+                    if(childEntry.isGroup()) {
+                        List<Entry> tmp = new ArrayList<Entry>();
+                        tmp.add(childEntry);
+                        deleteEntriesInner(request, tmp,connection);
+                    } else {
+                        children.add(childEntry);
+                    }
                 }
             }
         }
         if(children.size()>0) {
-            deleteEntriesInner(request, children);
+            deleteEntriesInner(request, children,connection);
         }
 
 
@@ -5163,7 +5185,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                                    SqlUtil.eq(COL_TAGS_ENTRY_ID, "?"));
 
         PreparedStatement tagsStmt =
-            getConnection().prepareStatement(query);
+            connection.prepareStatement(query);
 
         query = SqlUtil.makeDelete(
             TABLE_ASSOCIATIONS,
@@ -5171,17 +5193,17 @@ public class Repository implements Constants, Tables, RequestHandler,
                 Misc.newList(
                     SqlUtil.eq(COL_ASSOCIATIONS_FROM_ENTRY_ID, "?"),
                     SqlUtil.eq(COL_ASSOCIATIONS_TO_ENTRY_ID, "?"))));
-        PreparedStatement assocStmt = getConnection().prepareStatement(query);
+        PreparedStatement assocStmt = connection.prepareStatement(query);
 
         query = SqlUtil.makeDelete(TABLE_COMMENTS,
                                    SqlUtil.eq(COL_COMMENTS_ENTRY_ID, "?"));
         PreparedStatement commentsStmt =
-            getConnection().prepareStatement(query);
+            connection.prepareStatement(query);
 
         query = SqlUtil.makeDelete(TABLE_METADATA,
                                    SqlUtil.eq(COL_METADATA_ENTRY_ID, "?"));
         PreparedStatement metadataStmt =
-            getConnection().prepareStatement(query);
+            connection.prepareStatement(query);
 
 
         PreparedStatement entriesStmt = getConnection().prepareStatement(
@@ -5189,9 +5211,11 @@ public class Repository implements Constants, Tables, RequestHandler,
                                                 TABLE_ENTRIES,
                                                 COL_ENTRIES_ID, "?"));
         synchronized (MUTEX_INSERT) {
-            getConnection().setAutoCommit(false);
-            Statement statement = getConnection().createStatement();
+            connection.setAutoCommit(false);
+            Statement statement = connection.createStatement();
             for (Entry entry: entries) {
+                delCnt++;
+                if(delCnt%100 == 0) System.err.println("Deleted:" + delCnt);
                 getStorageManager().removeFile(entry);
 
                 tagsStmt.setString(1, entry.getId());
@@ -5219,8 +5243,13 @@ public class Repository implements Constants, Tables, RequestHandler,
             assocStmt.executeBatch();
             entriesStmt.executeBatch();
             //            genericStmt.executeBatch();
-            getConnection().commit();
-            getConnection().setAutoCommit(true);
+            connection.commit();
+            connection.setAutoCommit(true);
+            tagsStmt.close();
+            metadataStmt.close();
+            commentsStmt.close();
+            assocStmt.close();
+            entriesStmt.close();
         }
     }
 
@@ -5371,12 +5400,15 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (batchCnt > 0) {
                 entryStatement.executeBatch();
                 tagsInsert.executeBatch();
+                entryStatement.close();
+                tagsInsert.close();
                 for (Enumeration keys = typeStatements.keys();
                         keys.hasMoreElements(); ) {
                     PreparedStatement typeStatement =
                         (PreparedStatement) typeStatements.get(
                             keys.nextElement());
                     typeStatement.executeBatch();
+                    typeStatement.close();
                 }
             }
             getConnection().commit();
@@ -5465,10 +5497,30 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     protected Statement execute(String sql, int max) throws Exception {
-        Statement statement = getConnection().createStatement();
+        return execute(sql,max,0);
+    }
+
+    protected Statement execute(String sql, int max, int timeout) throws Exception {
+        return execute(getConnection(), sql, max, timeout);
+    }
+
+
+
+    protected Statement execute(Connection connection, String sql) throws Exception {
+        return execute(connection, sql, 0, 0);
+    }
+
+
+    protected Statement execute( Connection connection, String sql, int max, int timeout) throws Exception {
+        Statement statement = connection.createStatement();
+        if(timeout>0) {
+            statement.setQueryTimeout(timeout);
+        }
+
         if (max > 0) {
             statement.setMaxRows(max);
         }
+
         long t1 = System.currentTimeMillis();
         try {
             //            System.err.println("query:" + sql);
