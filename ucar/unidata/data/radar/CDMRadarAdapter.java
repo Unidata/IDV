@@ -2156,8 +2156,8 @@ public class CDMRadarAdapter implements RadarAdapter {
             beamWidth[i] = sp.getBeamWidth();
         }
 
-        if(rayData == null)
-            rayData = getRayData(sweepVar, numberOfRay, numberOfBin);
+        // if(rayData == null)
+         rayData = getRayData(sweepVar, numberOfRay, numberOfBin);
         //float[][][] rdata =  getRayData(sweepVar, numberOfRay, numberOfBin);
 
 
