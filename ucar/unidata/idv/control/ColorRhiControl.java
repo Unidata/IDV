@@ -990,7 +990,7 @@ public class ColorRhiControl extends ColorCrossSectionControl {
             Gridded2DSet oneBeamG2DS = new Gridded2DSet(xzRTT, plane, sizeX,
                                            sizeZ, (CoordinateSystem) null,
                                            new Unit[] { CommonUnits.KILOMETER,
-                    zUnit }, (ErrorEstimate[]) null);
+                    zUnit }, (ErrorEstimate[]) null, false, false);
             RealTupleType oneBeamMT =
                 (RealTupleType) getGridDataInstance().getRangeType();
             FunctionType oneBeamFT = new FunctionType(xzRTT, oneBeamMT);
