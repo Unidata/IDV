@@ -49,11 +49,22 @@
      doesmultiples="true"
      label="Track files"/>
 
+
+  <datasource
+     id="DB.POINT"
+     fileselection="true"
+     factory="ucar.unidata.data.point.DbPointDataSource"
+     label="Point data database"/>
+
+
+
   <datasource
      id="EOL.TRACKDB"
      factory="ucar.unidata.data.sounding.TrackDataSource"
      patterns="^jdbc:.*"
      label="Eol Track Database"/>
+
+
 
 
 
