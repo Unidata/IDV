@@ -936,7 +936,7 @@ public class SqlUtil {
                 //                System.err.println ("bad sql:" + command+ " " + exc);
                 if ( !ignoreErrors) {
                     //                    System.err.println("bad query:" + command);
-                    //throw exc;
+                    throw exc;
                 }
             }
         }
