@@ -21,15 +21,6 @@
  */
 
 
-
-
-
-
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -217,6 +208,14 @@ public class Entry extends Entity {
         return endDate;
     }
 
+
+    public boolean isTopGroup() {
+        return isGroup()   && getParentGroup() == null;
+    }
+
+    public boolean isGroup() {
+        return this instanceof Group;
+    }
 
 
     /**

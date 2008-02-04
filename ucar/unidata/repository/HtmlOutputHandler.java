@@ -193,6 +193,8 @@ public class HtmlOutputHandler extends OutputHandler {
     public Result outputEntry(Request request, Entry entry) throws Exception {
         TypeHandler  typeHandler = repository.getTypeHandler(entry.getType());
         StringBuffer sb = typeHandler.getEntryContent(entry, request, true);
+        getMetadataHtml(request, entry, sb);
+
         Result result = new Result("Entry: " + entry.getName(), sb,
                                    getMimeType(request.getOutput()));
         List<Entry> entries = new ArrayList<Entry>();
@@ -604,6 +606,36 @@ public class HtmlOutputHandler extends OutputHandler {
 
     }
 
+    public void getMetadataHtml(Request request,Entry entry, StringBuffer sb) throws Exception {
+        boolean showMetadata = request.get(ARG_SHOWMETADATA, false);
+        List<Metadata> metadataList = repository.getMetadata(entry);
+        if (metadataList.size() == 0) {return;}
+        sb.append("<p>\n");
+        String url =request.getUrl(ARG_SHOWMETADATA)+"&"+ARG_SHOWMETADATA+"=" +
+            (showMetadata? "false": "true");
+        String link = HtmlUtil.href(url, (showMetadata
+                                          ? "-&nbsp; Details": "+&nbsp; Details"), " class=\"subheaderlink\" ");
+
+        //        sb.append("<tr><td colspan=\"2\">");
+        sb.append(HtmlUtil.div(link," class=\"subheader\""));
+        //        sb.append("</td>\n");
+        sb.append("<table cellspacing=\"5\">\n");
+        List<MetadataHandler> metadataHandlers = repository.getMetadataHandlers();
+        if (showMetadata) {
+            for (Metadata metadata : metadataList) {
+                for(MetadataHandler metadataHandler: metadataHandlers) {
+                    if(metadataHandler.canHandle(metadata)) {
+                        String[]html = metadataHandler.getHtml(metadata);
+                        if(html!=null) {
+                            sb.append(HtmlUtil.formEntryTop(html[0],html[1]));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        sb.append("</table>\n");
+    }
 
 
 
@@ -678,48 +710,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
             if ( !showApplet) {
-                List<Metadata> metadataList = repository.getMetadata(group);
-                if (metadataList.size() > 0) {
-                    sb.append("<p>\n");
-                    sb.append("<table width=\"80%\" cellspacing=\"5\">\n");
-                    String link =
-                        HtmlUtil.href(HtmlUtil.url(repository.URL_GROUP_SHOW,
-                            ARG_GROUP, group.getFullName(), ARG_SHOWMETADATA,
-                            showMetadata
-                            ? "false"
-                            : "true"), showMetadata
-                                       ? "-&nbsp; Details"
-                                       : "+&nbsp; Details", " class=\"subheaderlink\" ");
-
-                    sb.append("<tr><td colspan=\"2\">");
-                    sb.append("<div class=\"subheader\">" + link + "</div>");
-                    sb.append("</td>\n");
-                    if (showMetadata) {
-                        for (Metadata metadata : metadataList) {
-                            String name = metadata.getName();
-                            if ((name == null)
-                                    || (name.trim().length() == 0)) {
-                                name = metadata.getType();
-                            }
-                            if (name.length() > 0) {
-                                name = name.substring(0, 1).toUpperCase()
-                                       + name.substring(1);
-                                name = name.replace("_", " ");
-                            }
-                            if (metadata.getType().equals(
-                                    Metadata.TYPE_URL)) {
-                                sb.append(HtmlUtil.formEntry("Link:",
-                                        HtmlUtil.href(metadata.getContent(),
-                                            metadata.getName())));
-                            } else {
-                                sb.append(HtmlUtil.formEntryTop(name + ":",
-                                        metadata.getContent()));
-                            }
-                            sb.append("\n");
-                        }
-                    }
-                    sb.append("</table>\n");
-                }
+                getMetadataHtml(request, group, sb);
             }
 
             //            sb.append("<hr>");

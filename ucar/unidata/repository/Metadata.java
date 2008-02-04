@@ -24,11 +24,6 @@
 
 
 
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -99,24 +94,27 @@ public class Metadata implements Constants, Tables {
 
 
 
-
     /** _more_ */
     private String id;
 
     /** _more_ */
-    private String name;
+    private String entryId;
 
-    /** _more_ */
     private String type;
 
-    /** _more_ */
-    private String subType;
 
     /** _more_ */
-    private String content;
+    private String attr1;
 
     /** _more_ */
-    private boolean inherited = false;
+    private String attr2;
+
+    /** _more_ */
+    private String attr3;
+
+    /** _more_ */
+    private String attr4;
+
 
 
     /**
@@ -127,46 +125,15 @@ public class Metadata implements Constants, Tables {
      * @param name _more_
      * @param content _more_
      */
-    public Metadata(String id, String type, String name, String content) {
+    public Metadata(String id, String entryId, String type, String attr1, String attr2, String attr3,    String attr4) { 
         this.id      = id;
-        this.name    = name;
-        this.type    = type;
-        this.content = content;
+        this.entryId      = entryId;
+        this.type = type;
+        this.attr1 = attr1;
+        this.attr2 = attr2;
+        this.attr3 = attr3;
+        this.attr4 = attr4;
     }
-
-
-    /**
-     * _more_
-     *
-     * @param type _more_
-     * @param name _more_
-     * @param content _more_
-     */
-    public Metadata(String type, String name, String content) {
-        this.type    = type;
-        this.name    = name;
-        this.content = content;
-    }
-
-
-    /**
-     * Set the Name property.
-     *
-     * @param value The new value for Name
-     */
-    public void setName(String value) {
-        name = value;
-    }
-
-    /**
-     * Get the Name property.
-     *
-     * @return The Name
-     */
-    public String getName() {
-        return name;
-    }
-
 
     /**
      * Set the Id property.
@@ -187,80 +154,119 @@ public class Metadata implements Constants, Tables {
     }
 
 
-    /**
-     * Set the Type property.
-     *
-     * @param value The new value for Type
-     */
-    public void setType(String value) {
-        type = value;
-    }
+/**
+Set the EntryId property.
 
-    /**
-     * Get the Type property.
-     *
-     * @return The Type
-     */
-    public String getType() {
-        return type;
-    }
+@param value The new value for EntryId
+**/
+public void setEntryId (String value) {
+	entryId = value;
+}
 
-    /**
-     * Set the Content property.
-     *
-     * @param value The new value for Content
-     */
-    public void setContent(String value) {
-        content = value;
-    }
+/**
+Get the EntryId property.
 
-    /**
-     * Get the Content property.
-     *
-     * @return The Content
-     */
-    public String getContent() {
-        return content;
-    }
+@return The EntryId
+**/
+public String getEntryId () {
+	return entryId;
+}
 
 
 
 
-    /**
-     * Set the Inherited property.
-     *
-     * @param value The new value for Inherited
-     */
-    public void setInherited(boolean value) {
-        inherited = value;
-    }
+/**
+Set the Type property.
 
-    /**
-     * Get the Inherited property.
-     *
-     * @return The Inherited
-     */
-    public boolean getInherited() {
-        return inherited;
-    }
+@param value The new value for Type
+**/
+public void setType (String value) {
+	type = value;
+}
 
-    /**
-     * Set the SubType property.
-     *
-     * @param value The new value for SubType
-     */
-    public void setSubType(String value) {
-        subType = value;
-    }
+/**
+Get the Type property.
 
-    /**
-     * Get the SubType property.
-     *
-     * @return The SubType
-     */
-    public String getSubType() {
-        return subType;
-    }
+@return The Type
+**/
+public String getType () {
+	return type;
+}
+
+
+
+
+/**
+Set the Attr1 property.
+
+@param value The new value for Attr1
+**/
+public void setAttr1 (String value) {
+	attr1 = value;
+}
+
+/**
+Get the Attr1 property.
+
+@return The Attr1
+**/
+public String getAttr1 () {
+	return attr1;
+}
+
+/**
+Set the Attr2 property.
+
+@param value The new value for Attr2
+**/
+public void setAttr2 (String value) {
+	attr2 = value;
+}
+
+/**
+Get the Attr2 property.
+
+@return The Attr2
+**/
+public String getAttr2 () {
+	return attr2;
+}
+
+/**
+Set the Attr3 property.
+
+@param value The new value for Attr3
+**/
+public void setAttr3 (String value) {
+	attr3 = value;
+}
+
+/**
+Get the Attr3 property.
+
+@return The Attr3
+**/
+public String getAttr3 () {
+	return attr3;
+}
+
+/**
+Set the Attr4 property.
+
+@param value The new value for Attr4
+**/
+public void setAttr4 (String value) {
+	attr4 = value;
+}
+
+/**
+Get the Attr4 property.
+
+@return The Attr4
+**/
+public String getAttr4 () {
+	return attr4;
+}
 
 
 

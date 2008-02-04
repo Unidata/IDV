@@ -821,6 +821,10 @@ public class SqlUtil {
     }
 
 
+    public static String makeSelect(String what, String table, String where) {
+        return makeSelect(what, Misc.newList(table),where);
+    }
+
     /**
      * _more_
      *
@@ -1096,6 +1100,11 @@ public class SqlUtil {
     }
 
 
+
+    public static String[] readString(Statement stmt)
+            throws Exception {
+        return readString(stmt,1);
+    }
 
     /**
      * _more_

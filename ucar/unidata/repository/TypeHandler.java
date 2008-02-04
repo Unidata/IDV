@@ -273,7 +273,7 @@ public class TypeHandler implements Constants, Tables {
         if (f.exists()) {
             sb.append(
                 XmlUtil.tag(
-                    CatalogOutputHandler.TAG_DATASIZE,
+                    ThreddsMetadataHandler.TAG_DATASIZE,
                     XmlUtil.attrs(CatalogOutputHandler.ATTR_UNITS, "bytes"),
                     "" + f.length()));
         }
@@ -281,18 +281,18 @@ public class TypeHandler implements Constants, Tables {
 
         sb.append(
             XmlUtil.tag(
-                CatalogOutputHandler.TAG_DATE,
+                        ThreddsMetadataHandler.TAG_DATE,
                 XmlUtil.attrs(
                     CatalogOutputHandler.ATTR_TYPE,
                     "metadataCreated"), format(
                         new Date(entry.getCreateDate()))));
 
-        sb.append(XmlUtil.openTag(CatalogOutputHandler.TAG_TIMECOVERAGE));
-        sb.append(XmlUtil.tag(CatalogOutputHandler.TAG_START, "",
+        sb.append(XmlUtil.openTag(ThreddsMetadataHandler.TAG_TIMECOVERAGE));
+        sb.append(XmlUtil.tag(ThreddsMetadataHandler.TAG_START, "",
                               "" + format(new Date(entry.getStartDate()))));
-        sb.append(XmlUtil.tag(CatalogOutputHandler.TAG_END, "",
+        sb.append(XmlUtil.tag(ThreddsMetadataHandler.TAG_END, "",
                               "" + format(new Date(entry.getEndDate()))));
-        sb.append(XmlUtil.closeTag(CatalogOutputHandler.TAG_TIMECOVERAGE));
+        sb.append(XmlUtil.closeTag(ThreddsMetadataHandler.TAG_TIMECOVERAGE));
 
         sb.append(XmlUtil.closeTag(CatalogOutputHandler.TAG_DATASET));
     }
@@ -475,13 +475,13 @@ public class TypeHandler implements Constants, Tables {
                 for (Metadata metadata : metadataList) {
                     mSB.append("<li>");
                     if (metadata.getType().equals(Metadata.TYPE_LINK)) {
-                        mSB.append(metadata.getName() + ": ");
-                        mSB.append(HtmlUtil.href(metadata.getContent(),
-                                metadata.getContent()));
+                        mSB.append(metadata.getAttr1() + ": ");
+                        mSB.append(HtmlUtil.href(metadata.getAttr2(),
+                                metadata.getAttr3()));
                     } else {
-                        mSB.append(metadata.getName());
+                        mSB.append(metadata.getAttr1());
                         mSB.append(" ");
-                        mSB.append(metadata.getContent());
+                        mSB.append(metadata.getAttr2());
                     }
                 }
                 mSB.append("</ul>");

@@ -383,6 +383,10 @@ public class GenericTypeHandler extends TypeHandler {
         super.deleteEntry(request, statement, entry);
         //        statement.setString(1, getTableName());
         //        statement.setString(2, entry.getId());
+        if (colNames.size() == 0) {
+            return;
+        }
+
         String query = SqlUtil.makeDelete(getTableName(), COL_ID,
                                           SqlUtil.quote(entry.getId()));
         statement.execute(query);

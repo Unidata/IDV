@@ -100,82 +100,9 @@ public class CatalogOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String TAG_CATALOG = "catalog";
 
-    /** _more_ */
-    public static final String TAG_CREATOR = "creator";
-
-    /** _more_ */
-    public static final String TAG_DATAFORMAT = "dataFormat";
-
-    /** _more_ */
-    public static final String TAG_DATATYPE = "dataType";
-
-    /** _more_ */
-    public static final String TAG_AUTHORITY = "authority";
-
-    /** _more_ */
-    public static final String TAG_VARIABLE = "variable";
-
-    /** _more_ */
-    public static final String TAG_VOCABULARY = "vocabulary";
-
-    /** _more_ */
-    public static final String TAG_VARIABLES = "variables";
-
-    /** _more_ */
-    public static final String TAG_PUBLISHER = "publisher";
-
-    /** _more_ */
-    public static final String TAG_PARAMETERS = "Parameters";
-
-    /** _more_ */
-    public static final String TAG_PROJECT = "project";
-
-    /** _more_ */
-    public static final String TAG_METADATA = "metadata";
-
-    /** _more_ */
-    public static final String TAG_ACCESS = "access";
-
-    /** _more_ */
-    public static final String TAG_KEYWORD = "keyword";
-
-    /** _more_ */
-    public static final String TAG_CONTRIBUTOR = "contributor";
-
-    /** _more_ */
-    public static final String TAG_PROPERTY = "property";
-
-    /** _more_ */
-    public static final String TAG_GEOSPATIALCOVERAGE = "geospatialCoverage";
-
-    /** _more_ */
-    public static final String TAG_TIMECOVERAGE = "timeCoverage";
-
-    /** _more_ */
-    public static final String TAG_START = "start";
-
-    /** _more_ */
-    public static final String TAG_END = "end";
-
-    /** _more_ */
-    public static final String TAG_DATE = "date";
-
-    /** _more_ */
-    public static final String TAG_DOCUMENTATION = "documentation";
-
-
-
-    /** _more_ */
-    public static final String TAG_DATASIZE = "dataSize";
 
     /** _more_ */
     public static final String ATTR_METADATATYPE = "metadataType";
-
-    /** _more_ */
-    public static final String ATTR_NAME = "name";
-
-    /** _more_ */
-    public static final String ATTR_VALUE = "value";
 
 
     /** _more_ */
@@ -221,18 +148,19 @@ public class CatalogOutputHandler extends OutputHandler {
     /**
      * _more_
      *
-     * @param metadata _more_
      * @param node _more_
      *
      * @throws Exception _more_
      */
-    public static void collectMetadata(List<Metadata> metadata, Element node)
+    public static  void collectMetadata(Repository repository, List<Metadata> metadataList, Element node)
             throws Exception {
         NodeList elements = XmlUtil.getElements(node);
+        List<MetadataHandler> metadataHandlers = repository.getMetadataHandlers();
+        
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
             String  tag   = child.getTagName();
-            if (tag.equals(TAG_METADATA)) {
+            if (tag.equals(ThreddsMetadataHandler.TAG_METADATA)) {
                 if ( !XmlUtil.getAttribute(child, "metadataType",
                                            "THREDDS").equals("THREDDS")) {
                     //                    System.err.println("Skipping: "
@@ -243,53 +171,23 @@ public class CatalogOutputHandler extends OutputHandler {
                     String url = XmlUtil.getAttribute(child, "xlink:href");
                     Element root = XmlUtil.getRoot(url,
                                        CatalogOutputHandler.class);
-                    collectMetadata(metadata, root);
+                    collectMetadata(repository, metadataList, root);
                 } else {
-                    collectMetadata(metadata, child);
+                    collectMetadata(repository, metadataList, child);
                 }
-            } else if (tag.equals(TAG_DOCUMENTATION)) {
-                if (XmlUtil.hasAttribute(child, "xlink:href")) {
-                    String url = XmlUtil.getAttribute(child, "xlink:href");
-                    metadata.add(new Metadata(Metadata.TYPE_URL,
-                            XmlUtil.getAttribute(child, "xlink:title", url),
-                            url));
-                } else {
-                    String type = XmlUtil.getAttribute(child, "type");
-                    String text = XmlUtil.getChildText(child).trim();
-                    metadata.add(new Metadata(type, "", text));
+            }  else {
+
+                for(MetadataHandler metadataHandler: metadataHandlers) {
+                    Metadata metadata = metadataHandler.makeMetadataFromCatalogNode(child);
+                    if(metadata!=null) {
+                        metadataList.add(metadata);
+                        break;
+                    }
                 }
-                //                System.err.println ("DOC:" + XmlUtil.toString(child).trim());
-            } else if (tag.equals(TAG_CONTRIBUTOR) || tag.equals(TAG_PROJECT)
-                       || tag.equals(TAG_KEYWORD)
-                       || tag.equals(TAG_AUTHORITY)
-                       || tag.equals(TAG_DATATYPE)
-                       || tag.equals(TAG_DATAFORMAT)) {
-                String text = XmlUtil.getChildText(child).trim();
-                metadata.add(new Metadata(tag, "", text));
-            } else if (tag.equals(TAG_VOCABULARY)
-                       || tag.equals(TAG_PUBLISHER)
-                       || tag.equals(TAG_CREATOR)
-                       || tag.equals(TAG_VARIABLES)) {
-                String text = XmlUtil.toString(child, false);
-                metadata.add(new Metadata(tag, "", text));
-            } else if (tag.equals(TAG_PROPERTY)) {
-                metadata.add(
-                    new Metadata(
-                        TAG_PROPERTY, XmlUtil.getAttribute(child, ATTR_NAME),
-                        XmlUtil.getAttribute(child, ATTR_VALUE)));
-            } else if (tag.equals(TAG_CATALOGREF)) {}
-            else if (tag.equals(TAG_DATASET)) {}
-            else if (tag.equals(TAG_SERVICENAME)) {}
-            else if (tag.equals(TAG_GEOSPATIALCOVERAGE)) {}
-            else if (tag.equals(TAG_TIMECOVERAGE)) {}
-            else if (tag.equals(TAG_DATE)) {}
-            else if (tag.equals(TAG_ACCESS)) {}
-            else if (tag.equals(TAG_DATASIZE)) {}
-            else if (tag.equals(TAG_PARAMETERS)) {}
-            else {
+
                 //                System.err.println ("UNKNOWN:" + tag  + " " + XmlUtil.toString(node).trim());
-                System.err.println("UNKNOWN:" + tag);
-                throw new IllegalArgumentException("");
+                //                System.err.println("UNKNOWN:" + tag);
+                //                throw new IllegalArgumentException("");
             }
         }
     }

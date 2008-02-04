@@ -26,9 +26,6 @@
 
 
 
-
-
-
 package ucar.unidata.repository;
 
 
@@ -264,8 +261,9 @@ public class ZipOutputHandler extends OutputHandler {
      */
     protected Result toZip(Request request, List<Entry> entries)
             throws Exception {
-        ByteArrayOutputStream bos  = new ByteArrayOutputStream();
-        ZipOutputStream       zos  = new ZipOutputStream(bos);
+        File tmpFile =  getRepository().getStorageManager().getTmpFile(request, "zip");
+        FileOutputStream fos  = new FileOutputStream(tmpFile);
+        ZipOutputStream       zos  = new ZipOutputStream(fos);
         Hashtable             seen = new Hashtable();
         for (Entry entry : entries) {
             if ( !repository.canDownload(request, entry)) {
@@ -285,8 +283,8 @@ public class ZipOutputHandler extends OutputHandler {
             zos.closeEntry();
         }
         zos.close();
-        bos.close();
-        return new Result("", bos.toByteArray(), getMimeType(OUTPUT_ZIP));
+        fos.close();
+        return new Result("",new FileInputStream(tmpFile),  getMimeType(OUTPUT_ZIP));
     }
 
 

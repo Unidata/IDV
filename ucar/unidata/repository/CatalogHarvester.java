@@ -202,7 +202,7 @@ public class CatalogHarvester extends Harvester {
                              (String) null);
         if (urlPath == null) {
             Element accessNode = XmlUtil.findChild(node,
-                                     CatalogOutputHandler.TAG_ACCESS);
+                                     ThreddsMetadataHandler.TAG_ACCESS);
             if (accessNode != null) {
                 urlPath = XmlUtil.getAttribute(accessNode,
                         CatalogOutputHandler.ATTR_URLPATH);
@@ -256,16 +256,17 @@ public class CatalogHarvester extends Harvester {
         if (group == null) {
             group = repository.findGroupFromName(groupName, user, true);
             List<Metadata> metadataList = new ArrayList<Metadata>();
-            CatalogOutputHandler.collectMetadata(metadataList, node);
-            metadataList.add(new Metadata(Metadata.TYPE_URL,
+            CatalogOutputHandler.collectMetadata(repository, metadataList, node);
+            metadataList.add(new Metadata(repository.getGUID(), group.getId(),
+                                          ThreddsMetadataHandler.TAG_LINK,
                                           "Imported from catalog",
-                                          catalogUrl));
+                                          catalogUrl,"",""));
             for (Metadata metadata : metadataList) {
-                metadata.setId(group.getId());
+                metadata.setEntryId(group.getId());
                 try {
-                    if (metadata.getContent().length() > 10000) {
+                    if (metadata.getAttr1().length() > 10000) {
                         repository.log("Too long metadata:"
-                                       + metadata.getContent().substring(0,
+                                       + metadata.getAttr1().substring(0,
                                            100) + "...");
                         continue;
                     }

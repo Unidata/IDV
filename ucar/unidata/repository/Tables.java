@@ -284,10 +284,19 @@ public interface Tables {
     public static final String COL_METADATA_ID = TABLE_METADATA + ".id";
 
     /** _more_          */
+    public static final String COL_METADATA_ENTRY_ID = TABLE_METADATA + ".entry_id";
+
+    /** _more_          */
     public static final String COL_METADATA_TYPE = TABLE_METADATA + ".type";
 
     /** _more_          */
-    public static final String COL_METADATA_NAME = TABLE_METADATA + ".name";
+    public static final String COL_METADATA_ATTR1 = TABLE_METADATA + ".attr1";
+
+    public static final String COL_METADATA_ATTR2 = TABLE_METADATA + ".attr2";
+
+    public static final String COL_METADATA_ATTR3 = TABLE_METADATA + ".attr3";
+
+    public static final String COL_METADATA_ATTR4 = TABLE_METADATA + ".attr4";
 
     /** _more_          */
     public static final String COL_METADATA_CONTENT = TABLE_METADATA
@@ -296,7 +305,12 @@ public interface Tables {
     /** _more_          */
     public static final String[] ARRAY_METADATA = new String[] {
                                                       COL_METADATA_ID,
-            COL_METADATA_TYPE, COL_METADATA_NAME, COL_METADATA_CONTENT };
+                                                      COL_METADATA_ENTRY_ID,
+                                                      COL_METADATA_TYPE, 
+                                                      COL_METADATA_ATTR1,
+                                                      COL_METADATA_ATTR2,
+                                                      COL_METADATA_ATTR3,
+                                                      COL_METADATA_ATTR4};
 
     /** _more_          */
     public static final String COLUMNS_METADATA =

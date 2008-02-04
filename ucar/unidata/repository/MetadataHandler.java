@@ -21,14 +21,6 @@
 
 
 
-
-
-
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -41,43 +33,20 @@ import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
-import ucar.unidata.util.StringBufferCollection;
+
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
-import java.io.*;
-
-import java.io.File;
-import java.io.InputStream;
 
 
-
-import java.net.*;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
 
 
-
-import java.util.regex.*;
-
-import java.util.zip.*;
 
 
 /**
@@ -86,10 +55,12 @@ import java.util.zip.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class MetadataHandler implements Constants, Tables {
+public class MetadataHandler extends RepositoryManager {
 
-    /** _more_ */
-    private Repository repository;
+
+    private Hashtable  canHandle = new Hashtable();
+
+    private List types = new ArrayList();
 
     /**
      * _more_
@@ -100,8 +71,23 @@ public class MetadataHandler implements Constants, Tables {
      */
     public MetadataHandler(Repository repository, Element node)
             throws Exception {
-        this.repository = repository;
+        super(repository);
     }
+
+    public void setCanHandle(String type) {
+        types.add(type);
+        canHandle.put(type,type);
+    }
+
+
+    public List getTypes() {
+        return types;
+    }
+
+    public Metadata makeMetadataFromCatalogNode(Element child) {
+        return null;
+    }
+
 
     /**
      * _more_
@@ -111,8 +97,33 @@ public class MetadataHandler implements Constants, Tables {
      * @return _more_
      */
     public boolean canHandle(Metadata metadata) {
-        return false;
+        return canHandle.get(metadata.getType()) !=null;
     }
+
+
+    public String getLabel(String s) {
+        s = s.replace("_"," ");
+        s = s.replace("."," ");
+        s = s.substring(0,1).toUpperCase() +
+            s.substring(1);
+        return s;
+    }
+
+
+    public String[] getHtml(Metadata metadata) {
+        return null;
+    }
+
+    public String getFormHtml(String type) {
+        return "";
+    }
+
+
+    public String getCatalogXml(Metadata metadata) {
+        return "";
+    }
+
+
 
 
 

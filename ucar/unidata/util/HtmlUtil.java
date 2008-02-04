@@ -172,6 +172,10 @@ public class HtmlUtil {
         return "<span " + extra + ">" + content + "</span>";
     }
 
+    public static String div(String content, String extra) {
+        return "<div " + extra + ">" + content + "</div>";
+    }
+
 
     /**
      * _more_

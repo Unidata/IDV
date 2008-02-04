@@ -118,6 +118,9 @@ public class OutputHandler implements Constants, Tables {
 
     }
 
+    public Repository getRepository() {
+        return repository;
+    }
 
     /**
      * _more_

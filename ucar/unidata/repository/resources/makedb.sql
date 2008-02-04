@@ -39,12 +39,17 @@ CREATE INDEX ENTRIES_INDEX_TODATE ON entries (TODATE);
 
 
 CREATE TABLE  metadata (id varchar(200),
+			entry_id varchar(200),
                         type varchar(200),
-                        name varchar(200),
-                        content varchar(10000));
+                        attr1 varchar(10000),
+                        attr2 varchar(10000),
+                        attr3 varchar(10000),
+                        attr4 varchar(10000));
+
 
 CREATE INDEX METADATA_INDEX_ID ON metadata (ID);
 CREATE INDEX METADATA_INDEX_TYPE ON metadata (TYPE);
+CREATE INDEX METADATA_INDEX_ATTR1 ON metadata (ATTR1);
 	
 
 

@@ -192,9 +192,9 @@ public class Admin extends RepositoryManager {
 
         while (tables.next()) {
             String tableName = tables.getString("TABLE_NAME");
-            System.err.println("table name:" + tableName);
+            //            System.err.println("table name:" + tableName);
             String tableType = tables.getString("TABLE_TYPE");
-            System.err.println("table type" + tableType);
+            //            System.err.println("table type" + tableType);
             if (Misc.equals(tableType, "INDEX")) {
                 continue;
             }
