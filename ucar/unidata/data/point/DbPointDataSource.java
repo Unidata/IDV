@@ -349,7 +349,7 @@ public class DbPointDataSource extends PointDataSource {
 
     /**
      * add to properties. The comps list contains pairs of label/widget.
-     *
+     * 
      *
      * @param comps comps
      */
@@ -357,7 +357,8 @@ public class DbPointDataSource extends PointDataSource {
         super.getPropertiesComponents(comps);
         comps.add(GuiUtils.filler());
         comps.add(getPropertiesHeader("Database"));
-
+        //Add the date range here
+        //Look in PointDataSource to see how to add things to the comps list
     }
 
 
