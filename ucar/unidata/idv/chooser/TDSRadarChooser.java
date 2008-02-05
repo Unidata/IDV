@@ -20,6 +20,10 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
+
+
 package ucar.unidata.idv.chooser;
 
 
@@ -27,25 +31,34 @@ import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
+
 import org.w3c.dom.Element;
+
 import thredds.catalog.XMLEntityResolver;
+
 import ucar.nc2.dt.StationImpl;
 import ucar.nc2.thredds.TDSRadarDatasetCollection;
 import ucar.nc2.units.DateUnit;
+
 import ucar.unidata.data.radar.RadarQuery;
 import ucar.unidata.metdata.NamedStation;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.util.*;
+
 import visad.CommonUnit;
 import visad.DateTime;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+
 import java.io.IOException;
+
 import java.net.URI;
+
 import java.util.*;
 import java.util.List;
+
+import javax.swing.*;
 
 
 /**
@@ -75,19 +88,33 @@ public class TDSRadarChooser extends TimesChooser {
     //"http://motherlode.ucar.edu:8080/thredds/radarServer/catalog.xml";
     private String serverUrl;
 
-    /** Each dataset collection URL         */
+    /** Each dataset collection URL */
     //"http://motherlode.ucar.edu:8080/thredds/radarServer/level2/idd/dataset.xml";
     private String collectionUrl;
 
     /** id --> collectionUrl */
     private HashMap collectionHMap;
 
-    /** _more_          */
+    /** Component to hold collections */
     private JComboBox collectionSelector;
 
-    /** _more_          */
-    private List tdsServers;
+    /** components that need a server for activation */
+    private List compsThatNeedServer = new ArrayList();
 
+    /** persistent holder for catalog URLS */
+    private PreferenceList urlListHandler;
+
+    /** catalog URL holder */
+    private JComboBox urlBox;
+
+    /** ok flag */
+    private boolean okToDoUrlListEvents = true;
+
+    /** dataset list */
+    private List datasetList;
+
+    /** Command for connecting */
+    protected static final String CMD_CONNECT = "cmd.connect";
 
     /**
      * Create the RadarChooser
@@ -125,7 +152,7 @@ public class TDSRadarChooser extends TimesChooser {
         super.updateStatus();
         if (selectedStation == null) {
             setHaveData(false);
-            setStatus("Please select a station", "stationmap");
+            setStatus("Please select a station", "stations");
             return;
         }
         boolean haveTimesSelected;
@@ -139,7 +166,7 @@ public class TDSRadarChooser extends TimesChooser {
             setStatus("Press \"" + CMD_LOAD
                       + "\" to load the selected radar data", "buttons");
         } else {
-            setStatus("Please select times", "times");
+            setStatus("Please select times", "timepanel");
         }
     }
 
@@ -165,25 +192,9 @@ public class TDSRadarChooser extends TimesChooser {
     }
 
     /**
-     * Make the GUI
+     * Make the contents
      *
-     * @return The GUI
-     */
-    private PreferenceList urlListHandler;
-
-    /** _more_          */
-    private JComboBox urlBox;
-
-    /** _more_          */
-    private boolean okToDoUrlListEvents = true;
-
-    /** _more_          */
-    private List datasetList;
-
-    /**
-     * _more_
-     *
-     * @return _more_
+     * @return  the contents
      */
     protected JComponent doMakeContents() {
 
@@ -207,15 +218,21 @@ public class TDSRadarChooser extends TimesChooser {
         collectionSelector = new JComboBox();
         collectionSelector.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
+
+                collectionUrl = TwoFacedObject.getIdString(
+                    collectionSelector.getSelectedItem());
+                /*
                 String collectionID =
                     (String) collectionSelector.getSelectedItem();
                 collectionUrl = (String) collectionHMap.get(collectionID);
+                */
                 setCollection(collectionUrl);
 
             }
 
         });
 
+        /*
         collectionSelector.getEditor().getEditorComponent().addMouseListener(
             new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
@@ -228,25 +245,28 @@ public class TDSRadarChooser extends TimesChooser {
                 popup.show(collectionSelector, e.getX(), e.getY());
             }
         });
+        */
 
         JComponent stationMap = getStationMap();
         JComponent buttons    = getDefaultButtons();
         JComponent timesPanel = makeTimesPanel(true, true);
         GuiUtils.tmpInsets = GRID_INSETS;
         JPanel top = GuiUtils.doLayout(new Component[] {
-                           GuiUtils.rLabel("Servers:"),
-                           urlBox, GuiUtils.rLabel("Collections:"),
-                           collectionSelector }, 4, GuiUtils.WT_NYNY,
-                               GuiUtils.WT_N);
-        GuiUtils.tmpInsets = new Insets(0,2,0,2);;
+                         GuiUtils.rLabel("Catalog:"),
+                         urlBox, GuiUtils.rLabel("Collections:"),
+                         GuiUtils.hbox(collectionSelector,
+                                       GuiUtils.filler()) }, 2,
+                                           GuiUtils.WT_NYNY, GuiUtils.WT_N);
+        GuiUtils.tmpInsets = new Insets(0, 2, 0, 2);;
         stationMap.setPreferredSize(new Dimension(230, 200));
         stationMap = registerStatusComp("stations", stationMap);
         timesPanel = registerStatusComp("timepanel", timesPanel);
         addServerComp(stationMap);
         addServerComp(timesPanel);
         JComponent contents = GuiUtils.doLayout(new Component[] { top,
-              //  stationMap, timesPanel }, 1, GuiUtils.WT_YYY, ,GuiUtils.WT_NYY);
-               stationMap, timesPanel }, 1, GuiUtils.WT_Y, new double[] {0.5,  4.0, 1.0 });
+        //  stationMap, timesPanel }, 1, GuiUtils.WT_YYY, ,GuiUtils.WT_NYY);
+        stationMap, timesPanel }, 1, GuiUtils.WT_Y, new double[] { 0.5, 4.0,
+                1.0 });
 
         contents = GuiUtils.inset(contents, 5);
         GuiUtils.enableComponents(compsThatNeedServer, false);
@@ -259,35 +279,30 @@ public class TDSRadarChooser extends TimesChooser {
 
 
     /**
-     * _more_
+     * Should we update on first display
      *
-     * @return _more_
+     * @return true
      */
     protected boolean shouldDoUpdateOnFirstDisplay() {
         return true;
     }
 
     /**
-     * _more_
+     * Set the server
      *
-     * @param s _more_
+     * @param s the server URL
      */
     private void setServer(String s) {
-        datasetList    = new ArrayList();
-        serverUrl = s;
-        collectionHMap = getRadarCollections(serverUrl);
-        Iterator it = collectionHMap.keySet().iterator();
-        while (it.hasNext()) {
-            datasetList.add(it.next());
-        }
-
-        GuiUtils.setListData(collectionSelector, datasetList);
+        datasetList = new ArrayList();
+        serverUrl   = s;
+        List collections = getRadarCollections(serverUrl);
+        GuiUtils.setListData(collectionSelector, collections);
     }
 
     /**
-     * _more_
+     * Set the active collection
      *
-     * @param s _more_
+     * @param s collection URL
      */
     private void setCollection(String s) {
         GuiUtils.enableComponents(compsThatNeedServer, true);
@@ -296,57 +311,42 @@ public class TDSRadarChooser extends TimesChooser {
         Misc.run(this, "initializeCollection");
     }
 
-    /** _more_          */
-    private List compsThatNeedServer = new ArrayList();
-
     /**
-     * _more_
+     * Add a component that needs to have a valid server
      *
-     * @param comp _more_
+     * @param comp  the component
      *
-     * @return _more_
+     * @return  the component
      */
     protected JComponent addServerComp(JComponent comp) {
         compsThatNeedServer.add(comp);
         return comp;
     }
 
-    /** Command for connecting */
-    protected static final String CMD_CONNECT = "cmd.connect";
-
     /**
-     * _more_
+     * Get  the radar collections for  the given server URL
      *
-     * @return _more_
+     * @param radarServerURL  server URL
+     *
+     * @return  a map of the collection names to URL
      */
-    protected JComponent getConnectButton() {
-        JButton connectBtn = new JButton("Connect");
-        connectBtn.setActionCommand(CMD_CONNECT);
-        connectBtn.addActionListener(this);
-        return registerStatusComp("connect", connectBtn);
-        //        return connectBtn;
-    }
-
-    /**
-     * _more_
-     *
-     * @param radarServerURL _more_
-     *
-     * @return _more_
-     */
-    public HashMap getRadarCollections(String radarServerURL) {
+    //public HashMap getRadarCollections(String radarServerURL) {
+    private List getRadarCollections(String radarServerURL) {
         SAXBuilder        builder;
         Document          doc  = null;
         XMLEntityResolver jaxp = new XMLEntityResolver(true);
         builder = jaxp.getSAXBuilder();
-        HashMap collections = new HashMap();
+        //HashMap collections = new HashMap();
+        List collections = new ArrayList();
 
         try {
             doc = builder.build(radarServerURL);
         } catch (JDOMException e) {
-            e.printStackTrace();
+            userMessage("Invalid catalog");
+            //e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            userMessage("Unable to open catalog");
+            //e.printStackTrace();
         }
 
         org.jdom.Element rootElem = doc.getRootElement();
@@ -358,13 +358,14 @@ public class TDSRadarChooser extends TimesChooser {
             org.jdom.Element child     = (org.jdom.Element) children.get(j);
             String           childName = child.getName();
             if (childName.equals(naming)) {
-                String         id     = child.getAttributeValue("ID");
-                String         desc   = child.getAttributeValue("title", nss);
-               // TwoFacedObject twoObj = new TwoFacedObject(desc, id);
-                String       c        = radarServerURL.replaceFirst("catalog.xml","");
-                String ul = c + id + "/dataset.xml";
-                if(!desc.contains("NIDS"))
-                    collections.put(desc, ul);
+                String id   = child.getAttributeValue("ID");
+                String desc = child.getAttributeValue("title", nss);
+                // TwoFacedObject twoObj = new TwoFacedObject(desc, id);
+                String c = radarServerURL.replaceFirst("catalog.xml", "");
+                String         ul     = c + id + "/dataset.xml";
+                TwoFacedObject twoObj = new TwoFacedObject(desc, ul);
+                collections.add(twoObj);
+                //collections.put(desc, ul);
             }
 
         }
@@ -373,12 +374,12 @@ public class TDSRadarChooser extends TimesChooser {
     }
 
     /**
-     * _more_
+     * Read the elements
      *
-     * @param elem _more_
-     * @param eleName _more_
+     * @param elem  element
+     * @param eleName element name
      *
-     * @return _more_
+     * @return an element
      */
     public org.jdom.Element readElements(org.jdom.Element elem,
                                          String eleName) {
@@ -394,7 +395,7 @@ public class TDSRadarChooser extends TimesChooser {
     }
 
     /**
-     * Make the collection. If there is an error then blow away the GUI and show a text area showing the error message
+     * Make the collection.  If there is an error, pop up a user message.
      */
     public void initializeCollection() {
 
@@ -405,12 +406,15 @@ public class TDSRadarChooser extends TimesChooser {
                 collection = TDSRadarDatasetCollection.factory("test",
                         collectionUrl, errlog);
             } catch (Exception exc) {
+                userMessage("Invalid catalog");
+                /*
                 JTextArea lbl =
                     new JTextArea(
                         "There was an error connecting to the radar collection:\n"
                         + collectionUrl + "\n" + exc + "\n" + errlog);
                 outerContents.removeAll();
                 outerContents.add(BorderLayout.CENTER, lbl);
+                */
                 return;
             }
             List tdsStations = collection.getRadarStations();
@@ -421,8 +425,7 @@ public class TDSRadarChooser extends TimesChooser {
                 NamedStationImpl station =
                     new NamedStationImpl(stn.getName(), stn.getName(),
                                          stn.getLatitude(),
-                                         stn.getLongitude(),
-                                          0,
+                                         stn.getLongitude(), 0,
                                          CommonUnit.meter);
                 stations.add(station);
 
@@ -430,6 +433,8 @@ public class TDSRadarChooser extends TimesChooser {
 
             getStationMap().setStations(stations);
         } catch (Exception exc) {
+            userMessage("Unable to load stations");
+            /*
             JTextArea lbl =
                 new JTextArea(
                     "There was an error connecting to the radar collection:\n"
@@ -437,8 +442,10 @@ public class TDSRadarChooser extends TimesChooser {
             outerContents.removeAll();
             outerContents.add(BorderLayout.CENTER, lbl);
             outerContents.layout();
+            */
 
         }
+        urlListHandler.saveState(urlBox);
     }
 
 
@@ -477,9 +484,13 @@ public class TDSRadarChooser extends TimesChooser {
                 //                LogUtil.message("");
                 showNormalCursor();
             } catch (Exception exc) {
-                logException("Getting times for station: " + selectedStation,
-                             exc);
-                setStatus("", "");
+                userMessage("Error reading times for station: "
+                            + selectedStation);
+                //logException("Getting times for station: " + selectedStation,
+                //             exc);
+                setStatus("Select a different collection", "collections");
+                showNormalCursor();
+                return;
             }
         }
         setAbsoluteTimes(times);
@@ -497,8 +508,8 @@ public class TDSRadarChooser extends TimesChooser {
         // to the CDMRadarDataSource
         Hashtable ht = new Hashtable();
         if (selectedStation != null) {
-           ht.put(ucar.unidata.data.radar.RadarDataSource.STATION_LOCATION,
-           selectedStation.getNamedLocation());
+            ht.put(ucar.unidata.data.radar.RadarDataSource.STATION_LOCATION,
+                   selectedStation.getNamedLocation());
         }
         try {
             DateSelection dateSelection = new DateSelection();
@@ -518,7 +529,7 @@ public class TDSRadarChooser extends TimesChooser {
                     URI uri = null;
                     try {
                         uri = collection.getRadarDatasetURI(
-                                  selectedStation.getID(), date);
+                            selectedStation.getID(), date);
                     } catch (Exception excp) {
                         LogUtil.userMessage("incorrect times selected");
                         return;
