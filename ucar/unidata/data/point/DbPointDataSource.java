@@ -31,6 +31,7 @@ import ucar.unidata.geoloc.LatLonPoint;
 import ucar.unidata.geoloc.LatLonRect;
 
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
@@ -65,6 +66,11 @@ public class DbPointDataSource extends PointDataSource {
     public static final GregorianCalendar calendar =
         new GregorianCalendar(DateUtil.TIMEZONE_GMT);
 
+    private String tableName = "pointdata";
+    private String timeColumn = "time";
+    private String latitudeColumn = "latitude";
+    private String longitudeColumn = "longitude";
+    private String altitudeColumn = "altitude";
 
 
     /** hard coded data base url for now       */
@@ -72,6 +78,11 @@ public class DbPointDataSource extends PointDataSource {
 
     /** the db connection      */
     private Connection connection;
+
+
+    private String fromDate = "-1 week";
+
+    private String toDate = "now";
 
 
     /**
@@ -234,17 +245,18 @@ public class DbPointDataSource extends PointDataSource {
                                 LatLonRect bbox)
             throws Exception {
 
-        /**The table is:
-        time
-        latitude 
-        longitude
-        altitude 
-        station
-        temperature
-        winddir
-        windspeed 
-        */
-        Statement        statement = select("*", "pointdata");
+        String columns = timeColumn +"," + latitudeColumn + "," + longitudeColumn + "," +
+            altitudeColumn + "," + "station,temperature, winddir, windspeed";
+        Date []dateRange = DateUtil.getDateRange(fromDate, toDate, new Date());
+        List whereList = new ArrayList();
+        if(dateRange[0]!=null) {
+            whereList.add(SqlUtil.ge(timeColumn, dateRange[0]));
+        }
+        if(dateRange[1]!=null) {
+            whereList.add(SqlUtil.le(timeColumn, dateRange[1]));
+        }
+
+        Statement        statement = evaluate(SqlUtil.makeSelect(columns, Misc.newList(tableName), SqlUtil.makeAnd(whereList)));
         SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
         ResultSet        results;
 
@@ -276,6 +288,7 @@ public class DbPointDataSource extends PointDataSource {
         TupleType finalTT = null;
         List      obs     = new ArrayList();
 
+        //TODO: How do we handle no data???
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 int col = 1;
@@ -334,36 +347,33 @@ public class DbPointDataSource extends PointDataSource {
     }
 
 
-
     /**
-     * _more_
+     * add to properties. The comps list contains pairs of label/widget.
      *
-     * @param what _more_
-     * @param where _more_
-     * @param extra _more_
      *
-     * @return _more_
-     *
-     * @throws SQLException _more_
+     * @param comps comps
      */
-    private Statement select(String what, String where, String extra)
-            throws SQLException {
-        return evaluate(SqlUtil.makeSelect(what, Misc.newList(where), extra));
+    public void getPropertiesComponents(List comps) {
+        super.getPropertiesComponents(comps);
+        comps.add(GuiUtils.filler());
+        comps.add(getPropertiesHeader("Database"));
+
     }
 
+
     /**
-     * _more_
+     * apply the properties
      *
-     * @param what _more_
-     * @param where _more_
-     *
-     * @return _more_
-     *
-     * @throws SQLException _more_
+     * @return success
      */
-    private Statement select(String what, String where) throws SQLException {
-        return evaluate(SqlUtil.makeSelect(what, Misc.newList(where)));
+    public boolean applyProperties() {
+        if ( !super.applyProperties()) {
+            return false;
+        }
+        //Set the state from the properties widgets here
+        return true;
     }
+
 
     /**
      * _more_
@@ -379,7 +389,6 @@ public class DbPointDataSource extends PointDataSource {
         stmt.execute(sql);
         return stmt;
     }
-
 
 
 

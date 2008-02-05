@@ -215,6 +215,7 @@ public abstract class PointDataSource extends FilesDataSource {
 
         comps.add(GuiUtils.filler());
         comps.add(getPropertiesHeader("Time Binning"));
+
         comps.add(GuiUtils.rLabel("Bin Size:"));
         comps.add(GuiUtils.left(GuiUtils.hbox(binWidthField.getContents(),
                 widthCbx, 5)));
