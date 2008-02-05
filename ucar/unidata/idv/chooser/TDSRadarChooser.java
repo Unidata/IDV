@@ -21,9 +21,6 @@
  */
 
 
-
-
-
 package ucar.unidata.idv.chooser;
 
 
@@ -425,8 +422,8 @@ public class TDSRadarChooser extends TimesChooser {
                 NamedStationImpl station =
                     new NamedStationImpl(stn.getName(), stn.getName(),
                                          stn.getLatitude(),
-                                         stn.getLongitude(), 0,
-                                         CommonUnit.meter);
+                                         stn.getLongitude(),
+                                         stn.getAltitude(), CommonUnit.meter);
                 stations.add(station);
 
             }
