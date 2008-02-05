@@ -37,7 +37,6 @@
 <plugin name="Collaboration Menu" url="http://www.unidata.ucar.edu/software/idv/plugins/collaboration.jar" description="Adds the Collaboration menu" category="Miscellaneous"/>
 <plugin name="Test Menu" url="http://www.unidata.ucar.edu/software/idv/plugins/testmenu.jar" description="Adds the Test menu for debugging" category="Miscellaneous"/>
 <plugin name="Jython Dev. Control" url="http://www.unidata.ucar.edu/software/idv/plugins/jythoncontrol.jar" description="Contains the Jython Display Control for developers" category="Miscellaneous"/>
-<plugin version="2.3" name="Experimental Remote Level II Chooser" url="http://www.unidata.ucar.edu/software/idv/plugins/tdslevel2choosers.xml" description="Experimental chooser for Nexrad Level II data from a THREDDS Data Server" category="Miscellaneous"/>
 
 
 <!--
