@@ -201,6 +201,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private Properties mimeTypes;
 
+
     /** _more_ */
     private Properties namesMap;
 
@@ -2355,6 +2356,13 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+    public boolean canEditEntry(Request request, Entry entry) {
+        if(entry.isTopGroup()) return false;
+        //TODO: Check access
+        return true;
+    }
+
+
     /**
      * _more_
      *
@@ -2423,10 +2431,9 @@ public class Repository implements Constants, Tables, RequestHandler,
                         + request.getString(ARG_ID, ""));
             }
             if (entry.isTopGroup()) {
-                throw new IllegalArgumentException(
-                    "Cannot edit top-level group");
-            }
+                return new Result("Edit Entry", new StringBuffer("Cannot edit top-level group"));
 
+            }
             type  = entry.getTypeHandler().getType();
             group = entry.getParentGroup();
         }
@@ -2467,8 +2474,12 @@ public class Repository implements Constants, Tables, RequestHandler,
 
             List<Metadata> metadataList = (entry==null?(List<Metadata>)new ArrayList<Metadata>():getMetadata(entry));
             String metadataButton = HtmlUtil.submit("Edit Metadata", ARG_EDIT_METADATA);
+
+            String cancelButton = HtmlUtil.submit("Cancel", ARG_CANCEL);
             String deleteButton = HtmlUtil.submit("Delete", ARG_DELETE);
-            sb.append(HtmlUtil.formEntry("", submitButton+HtmlUtil.space(2)+deleteButton));
+            String buttons = submitButton+HtmlUtil.space(2)+deleteButton + HtmlUtil.space(2) + cancelButton;
+
+            sb.append(HtmlUtil.formEntry("", buttons));
             if (entry != null) {
                 sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
             } else {
@@ -2590,7 +2601,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
 
             typeHandler.addToEntryForm(request, sb, entry);
-            sb.append(HtmlUtil.formEntry("", submitButton+HtmlUtil.space(2)+deleteButton));
+            sb.append(HtmlUtil.formEntry("", buttons));
         }
         sb.append("</table>\n");
         return new Result(title, sb, Result.TYPE_HTML);
@@ -2847,9 +2858,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
 
 
-
             if (request.exists(ARG_CANCEL)) {
-                return new Result(HtmlUtil.url(URL_ENTRY_FORM, ARG_ID, entry.getId()));
+                return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID, entry.getId()));
             }
 
 
@@ -2860,6 +2870,11 @@ public class Repository implements Constants, Tables, RequestHandler,
                 Group group = entry.getParentGroup();
                 return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
                                                group.getId(), ARG_MESSAGE,"Entry is deleted"));
+            }
+
+            if (entry!=null && request.exists(ARG_CANCEL)) {
+                return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                                               entry.getId()));
             }
 
             if (request.exists(ARG_DELETE)) {
@@ -2882,6 +2897,9 @@ public class Repository implements Constants, Tables, RequestHandler,
                 return new Result("Entry delete confirm", sb);
             }
         }
+
+
+
         List<Entry> entries = new ArrayList<Entry>();
 
         if (entry == null) {
@@ -2924,6 +2942,12 @@ public class Repository implements Constants, Tables, RequestHandler,
             Group parentGroup = findGroupFromName(groupName,
                                     request.getRequestContext().getUser(),
                                     true);
+
+            if (request.exists(ARG_CANCEL)) {
+                return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID, parentGroup.getId()));
+            }
+
+
             String description = request.getString(ARG_DESCRIPTION, "");
 
             Date createDate = new Date();

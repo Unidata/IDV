@@ -609,7 +609,8 @@ public class HtmlOutputHandler extends OutputHandler {
     public void getMetadataHtml(Request request,Entry entry, StringBuffer sb) throws Exception {
         boolean showMetadata = request.get(ARG_SHOWMETADATA, false);
         List<Metadata> metadataList = repository.getMetadata(entry);
-        if (metadataList.size() == 0) {return;}
+        List<Tag> tagList = repository.getTags(request, entry.getId());
+        if (tagList.size()==0 && metadataList.size() == 0) {return;}
         sb.append("<p>\n");
         String url =request.getUrl(ARG_SHOWMETADATA)+"&"+ARG_SHOWMETADATA+"=" +
             (showMetadata? "false": "true");
@@ -622,6 +623,19 @@ public class HtmlOutputHandler extends OutputHandler {
         sb.append("<table cellspacing=\"5\">\n");
         List<MetadataHandler> metadataHandlers = repository.getMetadataHandlers();
         if (showMetadata) {
+            for (Tag tag: tagList) {
+                TagCollection tagCollection = repository.findTagCollection(tag);
+                String label = "Tag:";
+                if(tagCollection!=null) {
+                    label = tagCollection.getLabel() + ": ";
+                }
+                label = label.replace(" ", "&nbsp;");
+                sb.append(HtmlUtil.formEntryTop(label,
+                                      repository.getTagLinks(request, tag.getName()) +
+                                                tag.getName()));
+
+            }
+
             for (Metadata metadata : metadataList) {
                 for(MetadataHandler metadataHandler: metadataHandlers) {
                     if(metadataHandler.canHandle(metadata)) {
@@ -833,6 +847,8 @@ public class HtmlOutputHandler extends OutputHandler {
                                    group.getId()), HtmlUtil.img(
                                        repository.fileUrl("/Edit16.gif"),
                                        "Edit Group"));
+
+        if(!repository.canEditEntry(request, group)) editEntry = "";
 
 
         return search + HtmlUtil.space(1)

@@ -1066,14 +1066,10 @@ public class TypeHandler implements Constants, Tables {
                     List groupList = new ArrayList();
                     groupList.add(ALL_OBJECT);
                     for (Group group : groups) {
-                        String groupLabel = group.getFullName();
-                        if(groupLabel.length()>100) {
-                            groupLabel = "..." + groupLabel.substring(groupLabel.length()-100);
-                        }
-                        groupList.add(new TwoFacedObject(groupLabel, group.getFullName()));
+                        groupList.add(new TwoFacedObject(group.getFullName()));
                     }
                     String groupSelect = HtmlUtil.select(ARG_GROUP,
-                                             groupList);
+                                                         groupList,null,100);
                     formBuffer.append(HtmlUtil.formEntry("Group:",
                             groupSelect + searchChildren));
                 } else if (groups.size() == 1) {

@@ -68,7 +68,7 @@ public class TagCollection {
                   HtmlUtil.formEntry(
                                      label,
                                      HtmlUtil.select(argName, tagList,
-                                                     value)));
+                                                     value,100)));
     }
 
 

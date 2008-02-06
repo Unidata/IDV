@@ -702,6 +702,11 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String select(String name, List values, String selected) {
+        return select(name, values, selected, Integer.MAX_VALUE);
+    }
+
+
+    public static String select(String name, List values, String selected, int maxLength) {
         StringBuffer sb = new StringBuffer();
         sb.append("<select name=\"" + name + "\">\n");
         for (int i = 0; i < values.size(); i++) {
@@ -719,6 +724,10 @@ public class HtmlUtil {
             if ((selected != null) && value.equals(selected)) {
                 selectedAttr = " selected=\"selected\" ";
             }
+            if(label.length()>maxLength) {
+                label = "..." + label.substring(label.length()-maxLength);
+            }
+
             sb.append("<option " + selectedAttr + "value=\"" + value + "\">"
                       + label + "</option>\n");
         }
