@@ -688,12 +688,8 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
         if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
-            if (output.equals(OUTPUT_HTML)) {
-                showApplet = false;
-            } else {
-                //                output = OUTPUT_TIMELINE;
-            }
-            sb.append("<p>\n");
+            showApplet = output.equals(OUTPUT_TIMELINE);
+            sb.append("<p>");
             boolean showMetadata = request.get(ARG_SHOWMETADATA, false);
             if ( !group.isDummy()) {
                 String[] crumbs = repository.getBreadCrumbs(request, group,
@@ -703,7 +699,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(crumbs[1]);
             } else {
                 title = group.getName();
-                if (entries.size() == 0) {
+                if (subGroups.size() == 0 && entries.size() == 0) {
                     sb.append("No entries found");
                 }
             }

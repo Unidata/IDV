@@ -87,6 +87,9 @@ public class TypeHandler implements Constants, Tables {
     public static final TwoFacedObject ALL_OBJECT = new TwoFacedObject("All",
                                                         "");
 
+    public static final TwoFacedObject NONE_OBJECT = new TwoFacedObject("None",
+                                                        "");
+
     /** _more_ */
     public static final String TYPE_ANY = "any";
 
@@ -411,12 +414,16 @@ public class TypeHandler implements Constants, Tables {
             if (tags.size() > 0) {
                 StringBuffer tagSB = new StringBuffer();
                 for (Tag tag : tags) {
+                    TagCollection tagCollection = repository.findTagCollection(tag);
                     tagSB.append(repository.getTagLinks(request,
-                            tag.getName()));
+                                                        tag.getName()));
+                    if(tagCollection!=null) {
+                        tagSB.append(tagCollection.getLabel() + ": ");
+                    }
                     tagSB.append(tag.getName());
                     tagSB.append("<br>\n");
                 }
-                sb.append(HtmlUtil.formEntry("Tags:", tagSB.toString()));
+                sb.append(HtmlUtil.formEntryTop("Tags:", tagSB.toString()));
             }
 
 
@@ -1059,8 +1066,11 @@ public class TypeHandler implements Constants, Tables {
                     List groupList = new ArrayList();
                     groupList.add(ALL_OBJECT);
                     for (Group group : groups) {
-                        groupList.add(
-                            new TwoFacedObject(group.getFullName()));
+                        String groupLabel = group.getFullName();
+                        if(groupLabel.length()>100) {
+                            groupLabel = "..." + groupLabel.substring(groupLabel.length()-100);
+                        }
+                        groupList.add(new TwoFacedObject(groupLabel, group.getFullName()));
                     }
                     String groupSelect = HtmlUtil.select(ARG_GROUP,
                                              groupList);
@@ -1078,10 +1088,15 @@ public class TypeHandler implements Constants, Tables {
 
         if ( !simpleForm || request.defined(ARG_TAG)) {
             String tag = (String) request.getString(ARG_TAG, "");
-            formBuffer.append(HtmlUtil.formEntry("Tag:",
-                    HtmlUtil.input(ARG_TAG, tag)));
-
+            TagCollection tagCollection = repository.findTagCollection(tag);
+            if(tagCollection!=null) {
+                tagCollection.appendToForm(formBuffer, ARG_TAG,tag);
+            } else {
+                formBuffer.append(HtmlUtil.formEntry("Tag:",
+                                                     HtmlUtil.input(ARG_TAG, tag)));
+            }
             formBuffer.append("\n");
+
         }
 
         String dateHelp = " (e.g., 2007-12-11 00:00:00)";

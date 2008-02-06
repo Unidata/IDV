@@ -146,7 +146,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     public RequestUrl URL_ASSOCIATION_ADD = new RequestUrl(this,
                                                 "/association/add");
 
-
     /** _more_ */
     public RequestUrl URL_LIST_HOME = new RequestUrl(this, "/list/home");
 
@@ -338,6 +337,11 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     /** _more_ */
     private Hashtable entryCache = new Hashtable();
+
+
+    private List<TagCollection> tagCollections = new ArrayList<TagCollection>();
+
+
 
 
     /**
@@ -694,6 +698,17 @@ public class Repository implements Constants, Tables, RequestHandler,
         TimeZone.setDefault(DateUtil.TIMEZONE_GMT);
 
 
+        List tagNameToks = StringUtil.split(getProperty(PROP_TAGNAMES,""),";",true,true);
+        for(int i=0;i<tagNameToks.size();i++) {
+            String tok = (String)tagNameToks.get(i);
+            List subToks = StringUtil.split(tok,":",true,true);
+            if(subToks.size()!=2) {
+                throw new IllegalArgumentException ("Bad tag name value:" + tok);
+            }
+            String label = (String) subToks.get(0);
+            String tagValues = IOUtil.readContents((String) subToks.get(1), getClass());
+            tagCollections.add(new TagCollection(label,StringUtil.split(tagValues, "\n", true, true)));
+        }
     }
 
 
@@ -1341,7 +1356,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         sql = getDatabaseManager().convertSql(sql);
 
         Statement statement = getConnection().createStatement();
-        SqlUtil.loadSql(sql, statement, false);
+        SqlUtil.loadSql(sql, statement, true);
 
         for (String file : typeDefinitionFiles) {
             Element entriesRoot = XmlUtil.getRoot(file, getClass());
@@ -2373,6 +2388,20 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+    protected TagCollection findTagCollection(Tag tag) {
+        return findTagCollection(tag.getName());
+    }
+
+    protected TagCollection findTagCollection(String tag) {
+        for(TagCollection tagCollection: tagCollections) {
+            if(tagCollection.contains(tag)) {
+                return tagCollection;
+            }
+        }
+        return null;
+    }
+
+
     /**
      * _more_
      *
@@ -2506,18 +2535,42 @@ public class Repository implements Constants, Tables, RequestHandler,
                 }
             }
 
-            String tags = "";
-            if (entry != null) {
-                List<Tag> tagList = getTags(request, entry.getId());
-                tags = StringUtil.join(",", tagList);
-            }
-
             if (typeHandler.okToShowInForm(ARG_TAG)) {
+                String tagString = "";
+                List<Tag> nonCollectionTags = new ArrayList<Tag>();
+                List collectionTags = new ArrayList();
+                if (entry != null) {
+                    List<Tag> tagList = getTags(request, entry.getId());
+                    for(Tag tag: tagList) {
+                        TagCollection tagCollection = findTagCollection(tag);
+                        if(tagCollection!=null) {
+                            collectionTags.add(tagCollection);
+                            collectionTags.add(tag);
+                        } else {
+                            nonCollectionTags.add(tag);
+                        }
+                    }
+                    tagString = StringUtil.join(",", nonCollectionTags);
+                }
+
                 sb.append(
-                    HtmlUtil.formEntry(
+                          HtmlUtil.formEntry(
                         "Tags:",
-                        HtmlUtil.input(ARG_TAG, tags, " size=\"20\" ")
+                        HtmlUtil.input(ARG_TAG, tagString, " size=\"40\" ")
                         + " (comma separated)"));
+
+                if(tagCollections.size()>0) {
+                    int collectionCnt = 0;
+                    for(int i=0;i<collectionTags.size();i+=2) {
+                        TagCollection tagCollection = (TagCollection) collectionTags.get(i);
+                        Tag tag  = (Tag) collectionTags.get(i+1);
+                        tagCollection.appendToForm(sb,  ARG_TAG+"."+(collectionCnt++), tag.getName());
+                    }
+                    for(TagCollection tagCollection: tagCollections) {
+                        tagCollection.appendToForm(sb, ARG_TAG+"."+(collectionCnt++), null);
+                    }
+                }
+
             }
 
             if (typeHandler.okToShowInForm(ARG_AREA)) {
@@ -3001,11 +3054,9 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (dateRange[1] != null) {
                 entry.setEndDate(dateRange[1].getTime());
             }
-            if (request.defined(ARG_TAG)) {
-                //Get rid of the tags
-                execute(SqlUtil.makeDelete(TABLE_TAGS, COL_TAGS_ENTRY_ID,
-                                           SqlUtil.quote(entry.getId())));
-            }
+            //Get rid of the tags
+            execute(SqlUtil.makeDelete(TABLE_TAGS, COL_TAGS_ENTRY_ID,
+                                       SqlUtil.quote(entry.getId())));
             setEntryState(request, entry);
             entries.add(entry);
         }
@@ -3033,10 +3084,19 @@ public class Repository implements Constants, Tables, RequestHandler,
         entry.setWest(request.get(ARG_AREA + "_west", entry.getWest()));
         entry.setEast(request.get(ARG_AREA + "_east", entry.getEast()));
 
+        List tagList = new ArrayList();
         if (request.defined(ARG_TAG)) {
             String tags = request.getString(ARG_TAG, "");
-            entry.setTags(StringUtil.split(tags, ",", true, true));
+            tagList.addAll(StringUtil.split(tags, ",", true, true));
         }
+        int tagCnt = 0;
+        while(request.exists(ARG_TAG+"."+ tagCnt)) {
+            String tag = request.getString(ARG_TAG+"."+ tagCnt,"");
+            tagCnt++;
+            if(tag.trim().length()==0) continue;
+            tagList.add(tag);
+        }
+        entry.setTags(tagList);
 
         entry.getTypeHandler().initializeEntry(request, entry);
     }

@@ -384,7 +384,7 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_DOWNLOAD_OK = "jdms.download.ok";
 
-
+    public static final String PROP_TAGNAMES = "jdms.html.tagnames";
 
 
 
