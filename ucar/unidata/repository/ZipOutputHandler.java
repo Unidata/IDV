@@ -19,13 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -261,10 +254,11 @@ public class ZipOutputHandler extends OutputHandler {
      */
     protected Result toZip(Request request, List<Entry> entries)
             throws Exception {
-        File tmpFile =  getRepository().getStorageManager().getTmpFile(request, "zip");
+        File tmpFile =
+            getRepository().getStorageManager().getTmpFile(request, "zip");
         FileOutputStream fos  = new FileOutputStream(tmpFile);
-        ZipOutputStream       zos  = new ZipOutputStream(fos);
-        Hashtable             seen = new Hashtable();
+        ZipOutputStream  zos  = new ZipOutputStream(fos);
+        Hashtable        seen = new Hashtable();
         for (Entry entry : entries) {
             if ( !repository.canDownload(request, entry)) {
                 continue;
@@ -284,7 +278,8 @@ public class ZipOutputHandler extends OutputHandler {
         }
         zos.close();
         fos.close();
-        return new Result("",new FileInputStream(tmpFile),  getMimeType(OUTPUT_ZIP));
+        return new Result("", new FileInputStream(tmpFile),
+                          getMimeType(OUTPUT_ZIP));
     }
 
 

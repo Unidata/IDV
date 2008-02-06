@@ -20,16 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -53,6 +43,7 @@ public class Resource {
     /** _more_ */
     public static final String TYPE_FILE = "file";
 
+    /** _more_          */
     public static final String TYPE_LOCALFILE = "localfile";
 
     /** _more_ */
@@ -87,10 +78,16 @@ public class Resource {
         this(file, TYPE_FILE);
     }
 
+    /**
+     * _more_
+     *
+     * @param file _more_
+     * @param type _more_
+     */
     public Resource(File file, String type) {
         this.file = file;
-        this.path      = file.toString();
-        this.type      = type;
+        this.path = file.toString();
+        this.type = type;
     }
 
 
@@ -156,6 +153,11 @@ public class Resource {
         return false;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isLocalFile() {
         return type.equals(TYPE_LOCALFILE);
     }

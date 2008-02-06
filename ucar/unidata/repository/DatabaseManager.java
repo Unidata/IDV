@@ -20,16 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -116,13 +106,13 @@ public class DatabaseManager extends RepositoryManager {
 
 
 
-    /** _more_          */
+    /** _more_ */
     private static final String DB_MYSQL = "mysql";
 
-    /** _more_          */
+    /** _more_ */
     private static final String DB_DERBY = "derby";
 
-    /** _more_          */
+    /** _more_ */
     private static final String DB_POSTGRES = "postgres";
 
     /**
@@ -143,13 +133,15 @@ public class DatabaseManager extends RepositoryManager {
     /**
      * _more_
      *
+     *
+     * @param makeNewOne _more_
      * @return _more_
      *
      * @throws Exception _more_
      */
     public Connection getConnection(boolean makeNewOne) throws Exception {
 
-        if(makeNewOne) {
+        if (makeNewOne) {
             return makeConnection();
         }
         if (theConnection == null) {
@@ -291,11 +283,11 @@ public class DatabaseManager extends RepositoryManager {
      */
     protected String getLimitString(int skip, int max) {
         if (db.equals(DB_MYSQL)) {
-            return " LIMIT " +  max + " OFFSET " + skip + " ";
+            return " LIMIT " + max + " OFFSET " + skip + " ";
         } else if (db.equals(DB_DERBY)) {
             return "";
         } else if (db.equals(DB_POSTGRES)) {
-            return " LIMIT " +  max + " OFFSET " + skip + " ";
+            return " LIMIT " + max + " OFFSET " + skip + " ";
         }
         return "";
     }

@@ -19,16 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -118,6 +108,11 @@ public class OutputHandler implements Constants, Tables {
 
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Repository getRepository() {
         return repository;
     }

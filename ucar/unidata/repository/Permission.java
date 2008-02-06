@@ -20,16 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -98,15 +88,15 @@ public class Permission {
     /** _more_ */
     public static final String ACTION_DELETE = "action.delete";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ACTION_COMMENT = "action.delete";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String[] ACTION_NAMES = { ACTION_VIEW, ACTION_EDIT,
             ACTION_NEW, ACTION_DELETE, ACTION_COMMENT };
 
-    /** _more_          */
+    /** _more_ */
     public static final String[] ACTIONS = { "View", "Edit", "New", "Delete",
                                              "Comment" };
 

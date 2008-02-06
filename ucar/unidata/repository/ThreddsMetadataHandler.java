@@ -19,7 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
 
 
@@ -56,12 +55,16 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     /** _more_ */
     public static final String ATTR_NAME = "name";
 
+    /** _more_          */
     public static final String ATTR_ROLE = "role";
 
+    /** _more_          */
     public static final String ATTR_EMAIL = "email";
 
+    /** _more_          */
     public static final String ATTR_URL = "url";
 
+    /** _more_          */
     public static final String ATTR_VOCABULARY = "vocabulary";
 
     /** _more_ */
@@ -69,9 +72,14 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
     /** _more_ */
     public static final String TAG_CREATOR = "creator";
+
+    /** _more_          */
     public static final String TAG_NAME = "name";
+
+    /** _more_          */
     public static final String TAG_CONTACT = "contact";
 
+    /** _more_          */
     public static final String TAG_LINK = "link";
 
     /** _more_ */
@@ -173,90 +181,111 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         setCanHandle(TAG_LINK);
     }
 
-    
 
 
+
+    /**
+     * _more_
+     *
+     * @param metadata _more_
+     *
+     * @return _more_
+     */
     public String[] getHtml(Metadata metadata) {
-        String type = metadata.getType();
-        String lbl = getLabel(type) + ":";
+        String type    = metadata.getType();
+        String lbl     = getLabel(type) + ":";
         String content = null;
-        if(type.equals(TAG_LINK)) {
-            content = HtmlUtil.href(metadata.getAttr2(),
-                                    metadata.getAttr1());
-        }  else  if(type.equals(TAG_DOCUMENTATION)) {
-            if(metadata.getAttr1().length()>0) {
-                lbl = getLabel(metadata.getAttr1())+":";
+        if (type.equals(TAG_LINK)) {
+            content = HtmlUtil.href(metadata.getAttr2(), metadata.getAttr1());
+        } else if (type.equals(TAG_DOCUMENTATION)) {
+            if (metadata.getAttr1().length() > 0) {
+                lbl = getLabel(metadata.getAttr1()) + ":";
             }
-            content =  metadata.getAttr2();
-        }  else  if(type.equals(TAG_PROPERTY)) {
-            lbl = getLabel(metadata.getAttr1())+":";
             content = metadata.getAttr2();
-        }  else  if(type.equals(TAG_PUBLISHER)) {
+        } else if (type.equals(TAG_PROPERTY)) {
+            lbl     = getLabel(metadata.getAttr1()) + ":";
+            content = metadata.getAttr2();
+        } else if (type.equals(TAG_PUBLISHER)) {
             content = metadata.getAttr1();
-            if(metadata.getAttr3().length()>0) {
+            if (metadata.getAttr3().length() > 0) {
                 content += "<br>Email: " + metadata.getAttr3();
             }
-            if(metadata.getAttr4().length()>0) {
-                content += "<br>Url: " + HtmlUtil.href(metadata.getAttr4(),metadata.getAttr4());
+            if (metadata.getAttr4().length() > 0) {
+                content += "<br>Url: "
+                           + HtmlUtil.href(metadata.getAttr4(),
+                                           metadata.getAttr4());
             }
         } else {
-            content =  metadata.getAttr1();
+            content = metadata.getAttr1();
         }
-        if(content == null) return null;
-        return new String[]{lbl, content};
+        if (content == null) {
+            return null;
+        }
+        return new String[] { lbl, content };
     }
 
 
+    /**
+     * _more_
+     *
+     * @param child _more_
+     *
+     * @return _more_
+     */
     public Metadata makeMetadataFromCatalogNode(Element child) {
-        String  tag   = child.getTagName();
+        String tag = child.getTagName();
         if (tag.equals(TAG_DOCUMENTATION)) {
             if (XmlUtil.hasAttribute(child, "xlink:href")) {
                 String url = XmlUtil.getAttribute(child, "xlink:href");
-                return new Metadata(getRepository().getGUID(),"", TAG_LINK,
-                                    XmlUtil.getAttribute(child, "xlink:title", url),
-                                    url,"","");
+                return new Metadata(getRepository().getGUID(), "", TAG_LINK,
+                                    XmlUtil.getAttribute(child,
+                                        "xlink:title", url), url, "", "");
             } else {
                 String type = XmlUtil.getAttribute(child, "type");
                 String text = XmlUtil.getChildText(child).trim();
-                return new Metadata(getRepository().getGUID(),"",tag, type, text,"","");
+                return new Metadata(getRepository().getGUID(), "", tag, type,
+                                    text, "", "");
             }
         } else if (tag.equals(TAG_PROJECT)) {
             String text = XmlUtil.getChildText(child).trim();
-            return new Metadata(getRepository().getGUID(),"",tag, text,
-                                XmlUtil.getAttribute(child, ATTR_VOCABULARY,""),"","");
+            return new Metadata(getRepository().getGUID(), "", tag, text,
+                                XmlUtil.getAttribute(child, ATTR_VOCABULARY,
+                                    ""), "", "");
         } else if (tag.equals(TAG_CONTRIBUTOR)) {
             String text = XmlUtil.getChildText(child).trim();
-            return new Metadata(getRepository().getGUID(),"",tag, text,
-                                XmlUtil.getAttribute(child, ATTR_ROLE,""),"","");
+            return new Metadata(getRepository().getGUID(), "", tag, text,
+                                XmlUtil.getAttribute(child, ATTR_ROLE, ""),
+                                "", "");
         } else if (tag.equals(TAG_PUBLISHER) || tag.equals(TAG_CREATOR)) {
-            Element nameNode  = XmlUtil.findChild(child, TAG_NAME);
-            String name = XmlUtil.getChildText(nameNode).trim();
-            String vocabulary = XmlUtil.getAttribute(nameNode, ATTR_VOCABULARY,"");
-            String email ="";
-            String url = "";
-            Element contactNode  = XmlUtil.findChild(child, TAG_CONTACT);
-            if(contactNode!=null) {
-                email = XmlUtil.getAttribute(contactNode, ATTR_EMAIL,"");
-                url = XmlUtil.getAttribute(contactNode, ATTR_URL,"");
+            Element nameNode = XmlUtil.findChild(child, TAG_NAME);
+            String  name     = XmlUtil.getChildText(nameNode).trim();
+            String vocabulary = XmlUtil.getAttribute(nameNode,
+                                    ATTR_VOCABULARY, "");
+            String  email       = "";
+            String  url         = "";
+            Element contactNode = XmlUtil.findChild(child, TAG_CONTACT);
+            if (contactNode != null) {
+                email = XmlUtil.getAttribute(contactNode, ATTR_EMAIL, "");
+                url   = XmlUtil.getAttribute(contactNode, ATTR_URL, "");
             }
-            return new Metadata(getRepository().getGUID(),"",tag, name,
-                                vocabulary,
-                                email, url);
-        } else if (tag.equals(TAG_KEYWORD)
-                   || tag.equals(TAG_AUTHORITY)
+            return new Metadata(getRepository().getGUID(), "", tag, name,
+                                vocabulary, email, url);
+        } else if (tag.equals(TAG_KEYWORD) || tag.equals(TAG_AUTHORITY)
                    || tag.equals(TAG_DATATYPE)
                    || tag.equals(TAG_DATAFORMAT)) {
             String text = XmlUtil.getChildText(child).trim();
-            return new Metadata(getRepository().getGUID(),"",tag, text,"","","");
-        } else if (tag.equals(TAG_VOCABULARY)
-                   || tag.equals(TAG_VARIABLES)) {
+            return new Metadata(getRepository().getGUID(), "", tag, text, "",
+                                "", "");
+        } else if (tag.equals(TAG_VOCABULARY) || tag.equals(TAG_VARIABLES)) {
             String text = XmlUtil.toString(child, false);
-            return new Metadata(getRepository().getGUID(),"",tag, text,"","","");
+            return new Metadata(getRepository().getGUID(), "", tag, text, "",
+                                "", "");
         } else if (tag.equals(TAG_PROPERTY)) {
-            return  new Metadata(getRepository().getGUID(),"",tag,
-                                 XmlUtil.getAttribute(child, ATTR_NAME),
-                                 XmlUtil.getAttribute(child, ATTR_VALUE),"","");
-        }  
+            return new Metadata(getRepository().getGUID(), "", tag,
+                                XmlUtil.getAttribute(child, ATTR_NAME),
+                                XmlUtil.getAttribute(child, ATTR_VALUE), "",
+                                "");
+        }
         return null;
     }
 

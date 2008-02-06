@@ -20,17 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
-
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -158,9 +147,11 @@ public class PatternHarvester extends Harvester {
     private Hashtable dirMap = new Hashtable();
 
 
-    User     user;
+    /** _more_          */
+    User user;
 
-    int      rootStrLen;
+    /** _more_          */
+    int rootStrLen;
 
 
 
@@ -193,7 +184,7 @@ public class PatternHarvester extends Harvester {
         sdf = new SimpleDateFormat(XmlUtil.getAttribute(element,
                 "dateformat", "yyyyMMdd_HHmm"));
         sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
-        user = repository.getUserManager().getDefaultUser();
+        user       = repository.getUserManager().getDefaultUser();
         rootStrLen = rootDir.toString().length();
 
         init();
@@ -321,13 +312,12 @@ public class PatternHarvester extends Harvester {
      *
      * @throws Exception _more_
      */
-    public void collectEntries(boolean firstTime)
-            throws Exception {
+    public void collectEntries(boolean firstTime) throws Exception {
 
-        long           t1         = System.currentTimeMillis();
-        List<Entry>    entries    = new ArrayList<Entry>();
-        List<Entry>    needToAdd  = new ArrayList<Entry>();
-        List<FileInfo> tmpDirs    = new ArrayList<FileInfo>(dirs);
+        long           t1        = System.currentTimeMillis();
+        List<Entry>    entries   = new ArrayList<Entry>();
+        List<Entry>    needToAdd = new ArrayList<Entry>();
+        List<FileInfo> tmpDirs   = new ArrayList<FileInfo>(dirs);
         for (int dirIdx = 0; dirIdx < tmpDirs.size(); dirIdx++) {
             FileInfo fileInfo = tmpDirs.get(dirIdx);
             if ( !fileInfo.exists()) {
@@ -387,6 +377,8 @@ public class PatternHarvester extends Harvester {
      * @param f _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
     private Entry processFile(File f) throws Exception {
 
@@ -529,8 +521,11 @@ public class PatternHarvester extends Harvester {
      * @param filepath _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public Entry processFile(TypeHandler type, String filepath) throws Exception {
+    public Entry processFile(TypeHandler type, String filepath)
+            throws Exception {
         if ( !this.typeHandler.equals(type)) {
             return null;
         }

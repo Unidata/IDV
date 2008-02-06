@@ -20,8 +20,10 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
+
+
+import ucar.unidata.util.HtmlUtil;
 
 
 import ucar.unidata.util.IOUtil;
@@ -33,8 +35,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import ucar.unidata.util.HtmlUtil;
-
 
 /**
  *
@@ -44,80 +44,114 @@ import ucar.unidata.util.HtmlUtil;
  */
 public class TagCollection {
 
+    /** _more_          */
     String label;
+
+    /** _more_          */
     Hashtable tagMap = new Hashtable();
+
+    /** _more_          */
     List tags;
 
 
+    /**
+     * _more_
+     *
+     * @param label _more_
+     * @param tags _more_
+     */
     public TagCollection(String label, List tags) {
         this.label = label;
-        this.tags = tags;
-        for(int i=0;i<tags.size();i++) {
-            String tag  = (String)tags.get(i);
-            tagMap.put(tag,tag);
+        this.tags  = tags;
+        for (int i = 0; i < tags.size(); i++) {
+            String tag = (String) tags.get(i);
+            tagMap.put(tag, tag);
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     * @param argName _more_
+     * @param tag _more_
+     */
     public void appendToForm(StringBuffer sb, String argName, String tag) {
         List tagList = new ArrayList(tags);
-        tagList.add(0,TypeHandler.NONE_OBJECT);
-        String label = (tag==null?"Add " : "") + getLabel() +":";
+        tagList.add(0, TypeHandler.NONE_OBJECT);
+        String label = ((tag == null)
+                        ? "Add "
+                        : "") + getLabel() + ":";
         label = label.replace(" ", "&nbsp;");
-        String value = (tag!=null?tag:"");
-        sb.append(
-                  HtmlUtil.formEntry(
-                                     label,
-                                     HtmlUtil.select(argName, tagList,
-                                                     value,100)));
+        String value = ((tag != null)
+                        ? tag
+                        : "");
+        sb.append(HtmlUtil.formEntry(label,
+                                     HtmlUtil.select(argName, tagList, value,
+                                         100)));
     }
 
 
+    /**
+     * _more_
+     *
+     * @param tag _more_
+     *
+     * @return _more_
+     */
     public boolean contains(String tag) {
-        return tagMap.get(tag)!=null;
+        return tagMap.get(tag) != null;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param tag _more_
+     *
+     * @return _more_
+     */
     public boolean contains(Tag tag) {
         return contains(tag.getName());
     }
 
 
 
-/**
-Set the Label property.
+    /**
+     * Set the Label property.
+     *
+     * @param value The new value for Label
+     */
+    public void setLabel(String value) {
+        label = value;
+    }
 
-@param value The new value for Label
-**/
-public void setLabel (String value) {
-	label = value;
-}
+    /**
+     * Get the Label property.
+     *
+     * @return The Label
+     */
+    public String getLabel() {
+        return label;
+    }
 
-/**
-Get the Label property.
+    /**
+     * Set the Tags property.
+     *
+     * @param value The new value for Tags
+     */
+    public void setTags(List value) {
+        tags = value;
+    }
 
-@return The Label
-**/
-public String getLabel () {
-	return label;
-}
-
-/**
-Set the Tags property.
-
-@param value The new value for Tags
-**/
-public void setTags (List value) {
-	tags = value;
-}
-
-/**
-Get the Tags property.
-
-@return The Tags
-**/
-public List getTags () {
-	return tags;
-}
+    /**
+     * Get the Tags property.
+     *
+     * @return The Tags
+     */
+    public List getTags() {
+        return tags;
+    }
 
 
 }

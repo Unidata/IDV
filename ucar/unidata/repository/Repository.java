@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.repository;
 
 
@@ -78,8 +76,6 @@ import java.sql.Statement;
 
 import java.text.SimpleDateFormat;
 
-import java.util.regex.*;
-import java.util.zip.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -88,6 +84,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
+
+import java.util.regex.*;
+import java.util.zip.*;
 
 
 import javax.swing.*;
@@ -136,11 +135,11 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     /** _more_ */
     public RequestUrl URL_METADATA_FORM = new RequestUrl(this,
-                                                         "/metadata/form");
+                                              "/metadata/form");
 
     /** _more_ */
     public RequestUrl URL_METADATA_CHANGE = new RequestUrl(this,
-                                                         "/metadata/change");
+                                                "/metadata/change");
 
     /** _more_ */
     public RequestUrl URL_ASSOCIATION_ADD = new RequestUrl(this,
@@ -166,7 +165,8 @@ public class Repository implements Constants, Tables, RequestHandler,
                                              "/entry/delete");
 
     /** _more_ */
-    public RequestUrl URL_ENTRY_CHANGE = new RequestUrl(this, "/entry/change");
+    public RequestUrl URL_ENTRY_CHANGE = new RequestUrl(this,
+                                             "/entry/change");
 
     /** _more_ */
     public RequestUrl URL_ENTRY_FORM = new RequestUrl(this, "/entry/form");
@@ -289,7 +289,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private String hostname;
 
-    /** _more_          */
+    /** _more_ */
     private int port;
 
 
@@ -308,6 +308,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private UserManager userManager;
 
+    /** _more_          */
     private StorageManager storageManager;
 
 
@@ -334,13 +335,15 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     /** _more_ */
     private Hashtable<String, Group> groupCache = new Hashtable<String,
-        Group>();
+                                                      Group>();
 
     /** _more_ */
     private Hashtable entryCache = new Hashtable();
 
 
-    private List<TagCollection> tagCollections = new ArrayList<TagCollection>();
+    /** _more_          */
+    private List<TagCollection> tagCollections =
+        new ArrayList<TagCollection>();
 
 
 
@@ -643,8 +646,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         try {
             localProperties.load(
                 IOUtil.getInputStream(
-                    IOUtil.joinDir(getStorageManager().getRepositoryDir(), "repository.properties"),
-                    getClass()));
+                    IOUtil.joinDir(
+                        getStorageManager().getRepositoryDir(),
+                        "repository.properties"), getClass()));
         } catch (Exception exc) {}
 
         properties.putAll(localProperties);
@@ -671,7 +675,9 @@ public class Repository implements Constants, Tables, RequestHandler,
             urlBase = "";
         }
 
-        logFile = new File(IOUtil.joinDir(getStorageManager().getRepositoryDir(), "repository.log"));
+        logFile =
+            new File(IOUtil.joinDir(getStorageManager().getRepositoryDir(),
+                                    "repository.log"));
         //TODO: Roll the log file
         logFOS = new FileOutputStream(logFile, true);
 
@@ -699,16 +705,20 @@ public class Repository implements Constants, Tables, RequestHandler,
         TimeZone.setDefault(DateUtil.TIMEZONE_GMT);
 
 
-        List tagNameToks = StringUtil.split(getProperty(PROP_TAGNAMES,""),";",true,true);
-        for(int i=0;i<tagNameToks.size();i++) {
-            String tok = (String)tagNameToks.get(i);
-            List subToks = StringUtil.split(tok,":",true,true);
-            if(subToks.size()!=2) {
-                throw new IllegalArgumentException ("Bad tag name value:" + tok);
+        List tagNameToks = StringUtil.split(getProperty(PROP_TAGNAMES, ""),
+                                            ";", true, true);
+        for (int i = 0; i < tagNameToks.size(); i++) {
+            String tok     = (String) tagNameToks.get(i);
+            List   subToks = StringUtil.split(tok, ":", true, true);
+            if (subToks.size() != 2) {
+                throw new IllegalArgumentException("Bad tag name value:"
+                        + tok);
             }
             String label = (String) subToks.get(0);
-            String tagValues = IOUtil.readContents((String) subToks.get(1), getClass());
-            tagCollections.add(new TagCollection(label,StringUtil.split(tagValues, "\n", true, true)));
+            String tagValues = IOUtil.readContents((String) subToks.get(1),
+                                   getClass());
+            tagCollections.add(new TagCollection(label,
+                    StringUtil.split(tagValues, "\n", true, true)));
         }
     }
 
@@ -743,7 +753,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         pageCache     = new Hashtable();
         pageCacheList = new ArrayList();
         entryCache    = new Hashtable();
-        groupCache = new Hashtable();
+        groupCache    = new Hashtable();
     }
 
 
@@ -994,10 +1004,21 @@ public class Repository implements Constants, Tables, RequestHandler,
         outputHandlers.add(outputHandler);
     }
 
-    MetadataHandler metadataHandler = new MetadataHandler(this,null);
+    /** _more_          */
+    MetadataHandler metadataHandler = new MetadataHandler(this, null);
+
+    /**
+     * _more_
+     *
+     * @param metadata _more_
+     *
+     * @return _more_
+     */
     public MetadataHandler findMetadataHandler(Metadata metadata) {
-        for(MetadataHandler handler:     metadataHandlers) {
-            if(handler.canHandle(metadata)) return handler;
+        for (MetadataHandler handler : metadataHandlers) {
+            if (handler.canHandle(metadata)) {
+                return handler;
+            }
         }
         return metadataHandler;
     }
@@ -1336,6 +1357,15 @@ public class Repository implements Constants, Tables, RequestHandler,
         return getConnection(false);
     }
 
+    /**
+     * _more_
+     *
+     * @param makeNewOne _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Connection getConnection(boolean makeNewOne) throws Exception {
         return getDatabaseManager().getConnection(makeNewOne);
     }
@@ -1483,7 +1513,12 @@ public class Repository implements Constants, Tables, RequestHandler,
         return outputHandlers;
     }
 
-    protected List<MetadataHandler> getMetadataHandlers () {
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected List<MetadataHandler> getMetadataHandlers() {
         return metadataHandlers;
     }
 
@@ -2193,6 +2228,15 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processMetadataForm(Request request) throws Exception {
         return new Result("");
     }
@@ -2356,8 +2400,18 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     public boolean canEditEntry(Request request, Entry entry) {
-        if(entry.isTopGroup()) return false;
+        if (entry.isTopGroup()) {
+            return false;
+        }
         //TODO: Check access
         return true;
     }
@@ -2396,13 +2450,27 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param tag _more_
+     *
+     * @return _more_
+     */
     protected TagCollection findTagCollection(Tag tag) {
         return findTagCollection(tag.getName());
     }
 
+    /**
+     * _more_
+     *
+     * @param tag _more_
+     *
+     * @return _more_
+     */
     protected TagCollection findTagCollection(String tag) {
-        for(TagCollection tagCollection: tagCollections) {
-            if(tagCollection.contains(tag)) {
+        for (TagCollection tagCollection : tagCollections) {
+            if (tagCollection.contains(tag)) {
                 return tagCollection;
             }
         }
@@ -2431,7 +2499,9 @@ public class Repository implements Constants, Tables, RequestHandler,
                         + request.getString(ARG_ID, ""));
             }
             if (entry.isTopGroup()) {
-                return new Result("Edit Entry", new StringBuffer("Cannot edit top-level group"));
+                return new Result(
+                    "Edit Entry",
+                    new StringBuffer("Cannot edit top-level group"));
 
             }
             type  = entry.getTypeHandler().getType();
@@ -2472,12 +2542,16 @@ public class Repository implements Constants, Tables, RequestHandler,
                     ? "Add " + typeHandler.getLabel()
                     : "Edit " + typeHandler.getLabel()));
 
-            List<Metadata> metadataList = (entry==null?(List<Metadata>)new ArrayList<Metadata>():getMetadata(entry));
-            String metadataButton = HtmlUtil.submit("Edit Metadata", ARG_EDIT_METADATA);
+            List<Metadata> metadataList = ((entry == null)
+                                           ? (List<Metadata>) new ArrayList<Metadata>()
+                                           : getMetadata(entry));
+            String metadataButton = HtmlUtil.submit("Edit Metadata",
+                                        ARG_EDIT_METADATA);
 
             String cancelButton = HtmlUtil.submit("Cancel", ARG_CANCEL);
             String deleteButton = HtmlUtil.submit("Delete", ARG_DELETE);
-            String buttons = submitButton+HtmlUtil.space(2)+deleteButton + HtmlUtil.space(2) + cancelButton;
+            String buttons = submitButton + HtmlUtil.space(2) + deleteButton
+                             + HtmlUtil.space(2) + cancelButton;
 
             sb.append(HtmlUtil.formEntry("", buttons));
             if (entry != null) {
@@ -2505,9 +2579,9 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (typeHandler.okToShowInForm(ARG_RESOURCE)) {
                 if (entry == null) {
                     sb.append(HtmlUtil.formEntry("File:",
-                            HtmlUtil.fileInput(ARG_FILE, size) +
-                                                 HtmlUtil.checkbox(ARG_FILE_UNZIP,"true",false) +
-                                                 " Unzip archive"));
+                            HtmlUtil.fileInput(ARG_FILE, size)
+                            + HtmlUtil.checkbox(ARG_FILE_UNZIP, "true",
+                                false) + " Unzip archive"));
                     sb.append(HtmlUtil.formEntry("Or URL:",
                             HtmlUtil.input(ARG_RESOURCE, "", size)));
                 } else {
@@ -2532,29 +2606,29 @@ public class Repository implements Constants, Tables, RequestHandler,
                         + HtmlUtil.input(ARG_TODATE, toDate, " size=30 ")
                         + dateHelp));
                 if (entry == null) {
-                    List datePatterns =  new ArrayList();
+                    List datePatterns = new ArrayList();
 
-                    datePatterns.add(new TwoFacedObject("All",""));
-                    for(int i=0;i<DateUtil.DATE_PATTERNS.length;i++) {
+                    datePatterns.add(new TwoFacedObject("All", ""));
+                    for (int i = 0; i < DateUtil.DATE_PATTERNS.length; i++) {
                         datePatterns.add(DateUtil.DATE_FORMATS[i]);
                     }
 
-                    sb.append(HtmlUtil.formEntry(
-                                                 "Date Pattern:",
-                                                 HtmlUtil.select(ARG_DATE_PATTERN, datePatterns) +" (use file name)"));
+                    sb.append(HtmlUtil.formEntry("Date Pattern:",
+                            HtmlUtil.select(ARG_DATE_PATTERN, datePatterns)
+                            + " (use file name)"));
 
                 }
             }
 
             if (typeHandler.okToShowInForm(ARG_TAG)) {
-                String tagString = "";
+                String    tagString         = "";
                 List<Tag> nonCollectionTags = new ArrayList<Tag>();
-                List collectionTags = new ArrayList();
+                List      collectionTags    = new ArrayList();
                 if (entry != null) {
                     List<Tag> tagList = getTags(request, entry.getId());
-                    for(Tag tag: tagList) {
+                    for (Tag tag : tagList) {
                         TagCollection tagCollection = findTagCollection(tag);
-                        if(tagCollection!=null) {
+                        if (tagCollection != null) {
                             collectionTags.add(tagCollection);
                             collectionTags.add(tag);
                         } else {
@@ -2565,20 +2639,24 @@ public class Repository implements Constants, Tables, RequestHandler,
                 }
 
                 sb.append(
-                          HtmlUtil.formEntry(
+                    HtmlUtil.formEntry(
                         "Tags:",
                         HtmlUtil.input(ARG_TAG, tagString, " size=\"40\" ")
                         + " (comma separated)"));
 
-                if(tagCollections.size()>0) {
+                if (tagCollections.size() > 0) {
                     int collectionCnt = 0;
-                    for(int i=0;i<collectionTags.size();i+=2) {
-                        TagCollection tagCollection = (TagCollection) collectionTags.get(i);
-                        Tag tag  = (Tag) collectionTags.get(i+1);
-                        tagCollection.appendToForm(sb,  ARG_TAG+"."+(collectionCnt++), tag.getName());
+                    for (int i = 0; i < collectionTags.size(); i += 2) {
+                        TagCollection tagCollection =
+                            (TagCollection) collectionTags.get(i);
+                        Tag tag = (Tag) collectionTags.get(i + 1);
+                        tagCollection.appendToForm(sb,
+                                ARG_TAG + "." + (collectionCnt++),
+                                tag.getName());
                     }
-                    for(TagCollection tagCollection: tagCollections) {
-                        tagCollection.appendToForm(sb, ARG_TAG+"."+(collectionCnt++), null);
+                    for (TagCollection tagCollection : tagCollections) {
+                        tagCollection.appendToForm(sb,
+                                ARG_TAG + "." + (collectionCnt++), null);
                     }
                 }
 
@@ -2859,7 +2937,8 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
             if (request.exists(ARG_CANCEL)) {
-                return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID, entry.getId()));
+                return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                        entry.getId()));
             }
 
 
@@ -2869,21 +2948,23 @@ public class Repository implements Constants, Tables, RequestHandler,
                 deleteEntries(request, entries);
                 Group group = entry.getParentGroup();
                 return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
-                                               group.getId(), ARG_MESSAGE,"Entry is deleted"));
+                        group.getId(), ARG_MESSAGE, "Entry is deleted"));
             }
 
-            if (entry!=null && request.exists(ARG_CANCEL)) {
+            if ((entry != null) && request.exists(ARG_CANCEL)) {
                 return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
-                                               entry.getId()));
+                        entry.getId()));
             }
 
             if (request.exists(ARG_DELETE)) {
                 StringBuffer sb = new StringBuffer();
                 sb.append(HtmlUtil.form(URL_ENTRY_CHANGE, ""));
-                if(entry.isGroup()) {
+                if (entry.isGroup()) {
                     sb.append("Are you sure you want to delete the group: ");
                     sb.append(entry.getName());
-                    sb.append(warning("<b>Note: This will also delete all of the descendents of the group</b>"));
+                    sb.append(
+                        warning(
+                            "<b>Note: This will also delete all of the descendents of the group</b>"));
                 } else {
                     sb.append("Are you sure you want to delete the entry: ");
                     sb.append(entry.getName());
@@ -2907,16 +2988,16 @@ public class Repository implements Constants, Tables, RequestHandler,
             List<String> origNames = new ArrayList();
             typeHandler =
                 getTypeHandler(request.getType(TypeHandler.TYPE_ANY));
-            String resource = request.getString(ARG_RESOURCE, "");
-            String filename = request.getUploadedFile(ARG_FILE);
+            String  resource     = request.getString(ARG_RESOURCE, "");
+            String  filename     = request.getUploadedFile(ARG_FILE);
             boolean unzipArchive = false;
-            boolean isFile = false;
+            boolean isFile       = false;
             if (filename != null) {
-                isFile = true;
-                unzipArchive = request.get(ARG_FILE_UNZIP,false);
-                resource = filename;
+                isFile       = true;
+                unzipArchive = request.get(ARG_FILE_UNZIP, false);
+                resource     = filename;
             }
-            if(!unzipArchive) {
+            if ( !unzipArchive) {
                 resources.add(resource);
                 origNames.add(request.getString(ARG_FILE, ""));
             } else {
@@ -2924,8 +3005,11 @@ public class Repository implements Constants, Tables, RequestHandler,
                     new ZipInputStream(new FileInputStream(resource));
                 ZipEntry ze = null;
                 while ((ze = zin.getNextEntry()) != null) {
-                    if(ze.isDirectory()) continue;
-                    String name = IOUtil.getFileTail(ze.getName().toLowerCase());
+                    if (ze.isDirectory()) {
+                        continue;
+                    }
+                    String name =
+                        IOUtil.getFileTail(ze.getName().toLowerCase());
                     File f = getStorageManager().getTmpFile(request, name);
                     FileOutputStream fos = new FileOutputStream(f);
                     IOUtil.writeTo(zin, fos);
@@ -2944,15 +3028,16 @@ public class Repository implements Constants, Tables, RequestHandler,
                                     true);
 
             if (request.exists(ARG_CANCEL)) {
-                return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID, parentGroup.getId()));
+                return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                        parentGroup.getId()));
             }
 
 
             String description = request.getString(ARG_DESCRIPTION, "");
 
-            Date createDate = new Date();
+            Date   createDate  = new Date();
             Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
-                                                    createDate);
+                                   createDate);
             if (dateRange[0] == null) {
                 dateRange[0] = ((dateRange[1] == null)
                                 ? createDate
@@ -2962,15 +3047,17 @@ public class Repository implements Constants, Tables, RequestHandler,
                 dateRange[1] = dateRange[0];
             }
 
-            for(int resourceIdx=0;resourceIdx<resources.size();resourceIdx++) {
+            for (int resourceIdx = 0; resourceIdx < resources.size();
+                    resourceIdx++) {
                 String theResource = (String) resources.get(resourceIdx);
-                String origName = (String) origNames.get(resourceIdx);
-                if(isFile) {
-                    theResource = getStorageManager().moveToStorage(request, new File(theResource)).toString();
+                String origName    = (String) origNames.get(resourceIdx);
+                if (isFile) {
+                    theResource = getStorageManager().moveToStorage(request,
+                            new File(theResource)).toString();
                 }
-                String name = request.getString(ARG_NAME,"");
+                String name = request.getString(ARG_NAME, "");
                 if (name.trim().length() == 0) {
-                    name =  IOUtil.getFileTail(origName);
+                    name = IOUtil.getFileTail(origName);
                 }
                 if (name.trim().length() == 0) {
                     throw new IllegalArgumentException("Must specify a name");
@@ -2979,15 +3066,16 @@ public class Repository implements Constants, Tables, RequestHandler,
                 if (typeHandler.isType(TypeHandler.TYPE_GROUP)) {
                     if (name.indexOf("/") >= 0) {
                         throw new IllegalArgumentException(
-                                                           "Cannot have a '/' in group name: '" + name + "'");
+                            "Cannot have a '/' in group name: '" + name
+                            + "'");
                     }
 
                     String tmp      = parentGroup.getFullName() + "/" + name;
                     Group  existing = findGroupFromName(tmp);
                     if (existing != null) {
                         throw new IllegalArgumentException(
-                                                           "A group with the name: '" + tmp
-                                                           + "' already exists");
+                            "A group with the name: '" + tmp
+                            + "' already exists");
 
                     }
                 }
@@ -2996,13 +3084,14 @@ public class Repository implements Constants, Tables, RequestHandler,
                              ? getGroupId(parentGroup)
                              : getGUID());
 
-                Date[]theDateRange = {dateRange[0], dateRange[1]};
+                Date[] theDateRange = { dateRange[0], dateRange[1] };
 
-                if(request.defined(ARG_DATE_PATTERN)) {
-                    String format = request.getUnsafeString(ARG_DATE_PATTERN,"");
+                if (request.defined(ARG_DATE_PATTERN)) {
+                    String format = request.getUnsafeString(ARG_DATE_PATTERN,
+                                        "");
                     String pattern = null;
-                    for(int i=0;i<DateUtil.DATE_PATTERNS.length;i++) {
-                        if(format.equals(DateUtil.DATE_FORMATS[i])) {
+                    for (int i = 0; i < DateUtil.DATE_PATTERNS.length; i++) {
+                        if (format.equals(DateUtil.DATE_FORMATS[i])) {
                             pattern = DateUtil.DATE_PATTERNS[i];
                             break;
                         }
@@ -3012,13 +3101,14 @@ public class Repository implements Constants, Tables, RequestHandler,
                     System.err.println("pattern:" + pattern);
 
 
-                    if(pattern!=null) {
+                    if (pattern != null) {
                         Pattern datePattern = Pattern.compile(pattern);
-                        Matcher matcher = datePattern.matcher(origName);
+                        Matcher matcher     = datePattern.matcher(origName);
                         if (matcher.find()) {
-                            String dateString   = matcher.group(0);
-                            SimpleDateFormat sdf = new SimpleDateFormat(format);
-                            Date dttm  = sdf.parse(dateString);
+                            String dateString = matcher.group(0);
+                            SimpleDateFormat sdf =
+                                new SimpleDateFormat(format);
+                            Date dttm = sdf.parse(dateString);
                             theDateRange[0] = dttm;
                             theDateRange[1] = dttm;
                             System.err.println("got it");
@@ -3030,17 +3120,19 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
                 entry = typeHandler.createEntry(id);
-                entry.init(name, description, parentGroup,
-                           request.getRequestContext().getUser(),
-                           new Resource(theResource,Resource.TYPE_LOCALFILE), createDate.getTime(),
-                           theDateRange[0].getTime(), theDateRange[1].getTime(), null);
+                entry.init(
+                    name, description, parentGroup,
+                    request.getRequestContext().getUser(),
+                    new Resource(theResource, Resource.TYPE_LOCALFILE),
+                    createDate.getTime(), theDateRange[0].getTime(),
+                    theDateRange[1].getTime(), null);
                 setEntryState(request, entry);
                 entries.add(entry);
             }
         } else {
             Date createDate = new Date();
             Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
-                                                    createDate);
+                                   createDate);
             String newName = request.getString(ARG_NAME, entry.getName());
             if (entry.getParentGroup() == null) {
                 throw new IllegalArgumentException(
@@ -3087,22 +3179,34 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
         insertEntries(entries, newEntry);
-        if(entries.size()==1) {
+        if (entries.size() == 1) {
             entry = (Entry) entries.get(0);
             return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
                                            entry.getId()));
-        } else if(entries.size()>1) {
+        } else if (entries.size() > 1) {
             entry = (Entry) entries.get(0);
-            return new Result(HtmlUtil.url(URL_GROUP_SHOW, ARG_GROUP,
-                                           entry.getParentGroup().getFullName(), ARG_MESSAGE, entries.size()+" files uploaded"));
+            return new Result(
+                HtmlUtil.url(
+                    URL_GROUP_SHOW, ARG_GROUP,
+                    entry.getParentGroup().getFullName(), ARG_MESSAGE,
+                    entries.size() + " files uploaded"));
         } else {
-            return new Result("",new StringBuffer("No entries created"));
+            return new Result("", new StringBuffer("No entries created"));
         }
     }
 
 
 
-    private void setEntryState(Request request, Entry entry) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
+    private void setEntryState(Request request, Entry entry)
+            throws Exception {
         entry.setSouth(request.get(ARG_AREA + "_south", entry.getSouth()));
         entry.setNorth(request.get(ARG_AREA + "_north", entry.getNorth()));
         entry.setWest(request.get(ARG_AREA + "_west", entry.getWest()));
@@ -3114,10 +3218,12 @@ public class Repository implements Constants, Tables, RequestHandler,
             tagList.addAll(StringUtil.split(tags, ",", true, true));
         }
         int tagCnt = 0;
-        while(request.exists(ARG_TAG+"."+ tagCnt)) {
-            String tag = request.getString(ARG_TAG+"."+ tagCnt,"");
+        while (request.exists(ARG_TAG + "." + tagCnt)) {
+            String tag = request.getString(ARG_TAG + "." + tagCnt, "");
             tagCnt++;
-            if(tag.trim().length()==0) continue;
+            if (tag.trim().length() == 0) {
+                continue;
+            }
             tagList.add(tag);
         }
         entry.setTags(tagList);
@@ -3578,16 +3684,16 @@ public class Repository implements Constants, Tables, RequestHandler,
         List          where         =
             typeHandler.assembleWhereClause(request);
 
-        List<String> ids     = getEntryIdsInGroup(request, group, where);
-        List<Entry>  entries = new ArrayList<Entry>();
-        List<Group> subGroups = new ArrayList<Group>();
+        List<String>  ids = getEntryIdsInGroup(request, group, where);
+        List<Entry>   entries       = new ArrayList<Entry>();
+        List<Group>   subGroups     = new ArrayList<Group>();
         for (String id : ids) {
             Entry entry = getEntry(id, request);
             if (entry == null) {
                 continue;
             }
-            if(entry.isGroup()) {
-                subGroups.add((Group)entry);
+            if (entry.isGroup()) {
+                subGroups.add((Group) entry);
             } else {
                 entries.add(entry);
             }
@@ -3609,15 +3715,15 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected List<String> getEntryIdsInGroup(Request request, Entry group,
             List where)
-        throws Exception {
+            throws Exception {
         where = new ArrayList(where);
         where.add(SqlUtil.eq(COL_ENTRIES_PARENT_GROUP_ID,
                              SqlUtil.quote(group.getId())));
         TypeHandler typeHandler = getTypeHandler(request);
-        int    skipCnt     =  request.get(ARG_SKIP, 0);
+        int         skipCnt     = request.get(ARG_SKIP, 0);
         Statement statement = typeHandler.executeSelect(request,
-                                                        COL_ENTRIES_ID, where,
-                                                        getQueryOrderAndLimit(request));
+                                  COL_ENTRIES_ID, where,
+                                  getQueryOrderAndLimit(request));
         SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
         List<String>     ids  = new ArrayList<String>();
         ResultSet        results;
@@ -4331,7 +4437,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             groupCache.put(group.getFullName(), group);
         }
 
-        if(groupCache.size() > ENTRY_CACHE_LIMIT) {
+        if (groupCache.size() > ENTRY_CACHE_LIMIT) {
             groupCache = new Hashtable();
         }
         return groups;
@@ -4594,8 +4700,15 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
     protected String getQueryOrderAndLimit(Request request) {
-        String      order       = " DESC ";
+        String order = " DESC ";
         if (request.get(ARG_ASCENDING, false)) {
             order = " ASC ";
         }
@@ -4606,13 +4719,13 @@ public class Repository implements Constants, Tables, RequestHandler,
         int max = request.get(ARG_MAX, MAX_ROWS);
         limitString = getDatabaseManager().getLimitString(skipCnt, max);
         String orderBy = "";
-        if(request.defined(ARG_ORDERBY)) {
-            String by  = request.getString(ARG_ORDERBY,"");
-            if(by.equals("fromdate")) {
+        if (request.defined(ARG_ORDERBY)) {
+            String by = request.getString(ARG_ORDERBY, "");
+            if (by.equals("fromdate")) {
                 orderBy = " ORDER BY " + COL_ENTRIES_FROMDATE + order;
-            } else if(by.equals("todate")) {
+            } else if (by.equals("todate")) {
                 orderBy = " ORDER BY " + COL_ENTRIES_FROMDATE + order;
-            } else if(by.equals("name")) {
+            } else if (by.equals("name")) {
                 orderBy = " ORDER BY " + COL_ENTRIES_NAME + order;
             }
         } else {
@@ -4620,7 +4733,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
 
-        return orderBy   + limitString;
+        return orderBy + limitString;
         //            }
         //        }
 
@@ -4638,10 +4751,10 @@ public class Repository implements Constants, Tables, RequestHandler,
     protected List[] getEntries(Request request) throws Exception {
         TypeHandler typeHandler = getTypeHandler(request);
         List        where       = typeHandler.assembleWhereClause(request);
-        int    skipCnt     = request.get(ARG_SKIP, 0);
+        int         skipCnt     = request.get(ARG_SKIP, 0);
         Statement statement = typeHandler.executeSelect(request,
-                                                        COLUMNS_ENTRIES, where,
-                                                        getQueryOrderAndLimit(request));
+                                  COLUMNS_ENTRIES, where,
+                                  getQueryOrderAndLimit(request));
 
 
 
@@ -5185,6 +5298,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @param name _more_
      * @param content _more_
      *
+     * @param metadata _more_
+     *
      * @throws Exception _more_
      */
 
@@ -5221,55 +5336,73 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public void deleteEntries(Request request, List<Entry> entries)
             throws Exception {
-        if(entries.size()==0) return;
+        if (entries.size() == 0) {
+            return;
+        }
         delCnt = 0;
-        Connection connection =  getConnection(true);
+        Connection connection = getConnection(true);
         deleteEntriesInner(request, entries, connection);
         connection.close();
         clearCache();
     }
 
+    /** _more_          */
     int delCnt = 0;
-    private void deleteEntriesInner(Request request, List<Entry> entries, Connection connection)
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entries _more_
+     * @param connection _more_
+     *
+     * @throws Exception _more_
+     */
+    private void deleteEntriesInner(Request request, List<Entry> entries,
+                                    Connection connection)
             throws Exception {
 
         //Check for groups and recurse
-        List where = new ArrayList();
-        List<Entry>children = new ArrayList();
-        for (Entry entry: entries) {
-            if(!entry.isGroup()) continue;
+        List        where    = new ArrayList();
+        List<Entry> children = new ArrayList();
+        for (Entry entry : entries) {
+            if ( !entry.isGroup()) {
+                continue;
+            }
             Statement stmt;
-            String[] ids = SqlUtil.readString(stmt = execute(connection, SqlUtil.makeSelect(COL_ENTRIES_ID, TABLE_ENTRIES,
-                                                                         SqlUtil.eq(COL_ENTRIES_PARENT_GROUP_ID,
-                                                                                    SqlUtil.quote(entry.getId())))));
+            String[] ids = SqlUtil.readString(stmt = execute(connection,
+                               SqlUtil.makeSelect(COL_ENTRIES_ID,
+                                   TABLE_ENTRIES,
+                                   SqlUtil.eq(COL_ENTRIES_PARENT_GROUP_ID,
+                                       SqlUtil.quote(entry.getId())))));
             stmt.close();
-            if(ids.length>0) 
+            if (ids.length > 0) {
                 System.err.println("#children:" + ids.length);
-            for(int i=0;i<ids.length;i++) {
-                Entry childEntry = getEntry(ids[i], request); 
-                if(childEntry!=null) {
-                    if(childEntry.isGroup()) {
+            }
+            for (int i = 0; i < ids.length; i++) {
+                Entry childEntry = getEntry(ids[i], request);
+                if (childEntry != null) {
+                    if (childEntry.isGroup()) {
                         List<Entry> tmp = new ArrayList<Entry>();
                         tmp.add(childEntry);
-                        deleteEntriesInner(request, tmp,connection);
+                        deleteEntriesInner(request, tmp, connection);
                     } else {
                         children.add(childEntry);
                     }
                 }
             }
         }
-        if(children.size()>0) {
-            deleteEntriesInner(request, children,connection);
+        if (children.size() > 0) {
+            deleteEntriesInner(request, children, connection);
         }
 
 
         String query;
 
-        query =  SqlUtil.makeDelete(TABLE_TAGS,
+        query = SqlUtil.makeDelete(TABLE_TAGS,
                                    SqlUtil.eq(COL_TAGS_ENTRY_ID, "?"));
 
-        PreparedStatement tagsStmt =
-            connection.prepareStatement(query);
+        PreparedStatement tagsStmt = connection.prepareStatement(query);
 
         query = SqlUtil.makeDelete(
             TABLE_ASSOCIATIONS,
@@ -5281,13 +5414,11 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         query = SqlUtil.makeDelete(TABLE_COMMENTS,
                                    SqlUtil.eq(COL_COMMENTS_ENTRY_ID, "?"));
-        PreparedStatement commentsStmt =
-            connection.prepareStatement(query);
+        PreparedStatement commentsStmt = connection.prepareStatement(query);
 
         query = SqlUtil.makeDelete(TABLE_METADATA,
                                    SqlUtil.eq(COL_METADATA_ENTRY_ID, "?"));
-        PreparedStatement metadataStmt =
-            connection.prepareStatement(query);
+        PreparedStatement metadataStmt = connection.prepareStatement(query);
 
 
         PreparedStatement entriesStmt = getConnection().prepareStatement(
@@ -5297,9 +5428,11 @@ public class Repository implements Constants, Tables, RequestHandler,
         synchronized (MUTEX_INSERT) {
             connection.setAutoCommit(false);
             Statement statement = connection.createStatement();
-            for (Entry entry: entries) {
+            for (Entry entry : entries) {
                 delCnt++;
-                if(delCnt%100 == 0) System.err.println("Deleted:" + delCnt);
+                if (delCnt % 100 == 0) {
+                    System.err.println("Deleted:" + delCnt);
+                }
                 getStorageManager().removeFile(entry);
 
                 tagsStmt.setString(1, entry.getId());
@@ -5353,23 +5486,35 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processFile(Request request) throws Exception {
         System.err.println("mem:" + Misc.usedMemory());
-        List<Harvester> harvesters = getAdmin().getHarvesters();
-        TypeHandler typeHandler = getTypeHandler(request);
-        String filepath = request.getUnsafeString(ARG_FILE,"");
+        List<Harvester> harvesters  = getAdmin().getHarvesters();
+        TypeHandler     typeHandler = getTypeHandler(request);
+        String          filepath    = request.getUnsafeString(ARG_FILE, "");
         //Check to  make sure we can access this file
-        if(!getStorageManager().isInDownloadArea(filepath)) {
-            return new Result("", new StringBuffer("Cannot load file:" + filepath),"text/plain");
+        if ( !getStorageManager().isInDownloadArea(filepath)) {
+            return new Result("",
+                              new StringBuffer("Cannot load file:"
+                                  + filepath), "text/plain");
         }
         for (Harvester harvester : harvesters) {
             Entry entry = harvester.processFile(typeHandler, filepath);
-            if(entry!=null) {
+            if (entry != null) {
                 addNewEntry(entry);
-                return new Result("", new StringBuffer("OK"),"text/plain");
+                return new Result("", new StringBuffer("OK"), "text/plain");
             }
         }
-        return new Result("", new StringBuffer("Could not create entry"),"text/plain");
+        return new Result("", new StringBuffer("Could not create entry"),
+                          "text/plain");
     }
 
 
@@ -5403,7 +5548,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (entries.size() == 0) {
             return;
         }
-        if(!isNew) {
+        if ( !isNew) {
             clearCache();
         }
 
@@ -5506,7 +5651,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (t2 > t1) {
             //System.err.println("added:" + entries.size() + " entries in " + (t2-t1) + " ms  Rate:" + (entries.size()/(t2-t1)));
             double seconds = totalTime / 1000.0;
-            if (totalEntries%100==0 && seconds > 0) {
+            if ((totalEntries % 100 == 0) && (seconds > 0)) {
                 System.err.println(totalEntries + " average rate:"
                                    + (int) (totalEntries / seconds)
                                    + "/second");
@@ -5525,10 +5670,10 @@ public class Repository implements Constants, Tables, RequestHandler,
         Misc.run(this, "checkNewEntries", entries);
     }
 
-    /** _more_          */
+    /** _more_ */
     long totalTime = 0;
 
-    /** _more_          */
+    /** _more_ */
     int totalEntries = 0;
 
 
@@ -5581,23 +5726,60 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     protected Statement execute(String sql, int max) throws Exception {
-        return execute(sql,max,0);
+        return execute(sql, max, 0);
     }
 
-    protected Statement execute(String sql, int max, int timeout) throws Exception {
+    /**
+     * _more_
+     *
+     * @param sql _more_
+     * @param max _more_
+     * @param timeout _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected Statement execute(String sql, int max, int timeout)
+            throws Exception {
         return execute(getConnection(), sql, max, timeout);
     }
 
 
 
-    protected Statement execute(Connection connection, String sql) throws Exception {
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param sql _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected Statement execute(Connection connection, String sql)
+            throws Exception {
         return execute(connection, sql, 0, 0);
     }
 
 
-    protected Statement execute( Connection connection, String sql, int max, int timeout) throws Exception {
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param sql _more_
+     * @param max _more_
+     * @param timeout _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected Statement execute(Connection connection, String sql, int max,
+                                int timeout)
+            throws Exception {
         Statement statement = connection.createStatement();
-        if(timeout>0) {
+        if (timeout > 0) {
             statement.setQueryTimeout(timeout);
         }
 
@@ -5785,11 +5967,11 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public List<Metadata> getMetadata(Entry entry) throws Exception {
         String query = SqlUtil.makeSelect(
-                           COLUMNS_METADATA, Misc.newList(TABLE_METADATA), 
-                           SqlUtil.eq(
-                                      COL_METADATA_ENTRY_ID, SqlUtil.quote(
-                                                                           entry.getId())),
-                           " order by " + COL_METADATA_TYPE);
+                           COLUMNS_METADATA, Misc.newList(
+                               TABLE_METADATA), SqlUtil.eq(
+                               COL_METADATA_ENTRY_ID, SqlUtil.quote(
+                                   entry.getId())), " order by "
+                                       + COL_METADATA_TYPE);
 
         SqlUtil.Iterator iter = SqlUtil.getIterator(execute(query));
         ResultSet        results;

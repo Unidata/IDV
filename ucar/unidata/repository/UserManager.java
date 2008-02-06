@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
 
 
@@ -166,7 +165,7 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     private Hashtable userCart = new Hashtable();
 
-    /** _more_          */
+    /** _more_ */
     private List ipUserList = new ArrayList();
 
 
@@ -212,8 +211,8 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void checkSession(Request request) throws Exception {
-        String cookie    = request.getHeaderArg("Cookie");
-        User   user      = request.getRequestContext().getUser();
+        String cookie = request.getHeaderArg("Cookie");
+        User   user   = request.getRequestContext().getUser();
         if (cookie != null) {
             List toks = StringUtil.split(cookie, ";", true, true);
             for (int i = 0; i < toks.size(); i++) {
@@ -238,13 +237,15 @@ public class UserManager extends RepositoryManager {
 
 
         //Check for url auth
-        if (user == null && request.exists(ARG_AUTH_USER) &&
-            request.exists(ARG_AUTH_PASSWORD)) {
-            String userId = request.getString(ARG_AUTH_USER,"");
-            String password = request.getString(ARG_AUTH_PASSWORD,"");
+        if ((user == null) && request.exists(ARG_AUTH_USER)
+                && request.exists(ARG_AUTH_PASSWORD)) {
+            String userId   = request.getString(ARG_AUTH_USER, "");
+            String password = request.getString(ARG_AUTH_PASSWORD, "");
             user = findUser(userId, false);
-            if(user == null) throw new IllegalArgumentException("Unknown user:" + userId);
-            if(!user.getPassword().equals(hashPassword(password))) {
+            if (user == null) {
+                throw new IllegalArgumentException("Unknown user:" + userId);
+            }
+            if ( !user.getPassword().equals(hashPassword(password))) {
                 throw new IllegalArgumentException("Incorrect password");
             }
             setUserSession(request, user);
@@ -268,7 +269,7 @@ public class UserManager extends RepositoryManager {
             }
         }
 
-        
+
         if (request.getSessionId() == null) {
             request.setSessionId(getSessionId());
         }
@@ -381,9 +382,9 @@ public class UserManager extends RepositoryManager {
         sb.append(HtmlUtil.form(URL_USER_LOGIN));
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry("User:",
-                     HtmlUtil.input(ARG_USER_NAME, name)));
+                                     HtmlUtil.input(ARG_USER_NAME, name)));
         sb.append(HtmlUtil.formEntry("Password:",
-                     HtmlUtil.password(ARG_USER_PASSWORD1)));
+                                     HtmlUtil.password(ARG_USER_PASSWORD1)));
         sb.append(extra);
 
         sb.append(HtmlUtil.formEntry("", HtmlUtil.submit("Login")));
@@ -1321,10 +1322,11 @@ public class UserManager extends RepositoryManager {
                                          ARG_USER_CHANGE)));
         sb.append(HtmlUtil.formClose());
         String roles = user.getRolesAsString("<br>").trim();
-        sb.append(HtmlUtil.formEntry(HtmlUtil.space(1),""));
-        if(roles.length()==0) roles = "--none--";
-        sb.append(HtmlUtil.formEntryTop("Roles:",
-                                        roles));
+        sb.append(HtmlUtil.formEntry(HtmlUtil.space(1), ""));
+        if (roles.length() == 0) {
+            roles = "--none--";
+        }
+        sb.append(HtmlUtil.formEntryTop("Roles:", roles));
 
         sb.append(HtmlUtil.formTableClose());
         return makeResult(request, "User Settings", sb);

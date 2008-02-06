@@ -20,16 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -170,7 +160,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_RECURSE = "recurse";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_REDIRECT = "redirect";
 
     /** _more_ */
@@ -211,9 +201,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_AREA = "area";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_DATE = "date";
 
+    /** _more_          */
     public static final String ARG_DATE_PATTERN = "date.pattern";
 
     /** _more_ */
@@ -321,8 +312,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ID = "id";
 
+    /** _more_          */
     public static final String ARG_METADATA_ID = "metadataid";
 
+    /** _more_          */
     public static final String ARG_EDIT_METADATA = "edit.metadata";
 
     /** _more_ */
@@ -356,7 +349,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TODATE = "todate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_RELATIVEDATE = "relativedate";
 
     /** _more_ */
@@ -384,6 +377,7 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_DOWNLOAD_OK = "jdms.download.ok";
 
+    /** _more_          */
     public static final String PROP_TAGNAMES = "jdms.html.tagnames";
 
 
@@ -399,11 +393,11 @@ public interface Constants {
     public static final String PROP_ACCESS_REQUIRELOGIN =
         "jdms.access.requirelogin";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_ACCESS_ADMINONLY =
         "jdms.access.adminonly";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_HTML_FOOTER = "jdms.html.footer";
 
     /** _more_ */
@@ -564,6 +558,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_FILE = "file";
 
+    /** _more_          */
     public static final String ARG_FILE_UNZIP = "file.unzip";
 
     /** _more_ */

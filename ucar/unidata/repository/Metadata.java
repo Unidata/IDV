@@ -19,11 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -100,6 +95,7 @@ public class Metadata implements Constants, Tables {
     /** _more_ */
     private String entryId;
 
+    /** _more_          */
     private String type;
 
 
@@ -121,18 +117,24 @@ public class Metadata implements Constants, Tables {
      * _more_
      *
      * @param id _more_
+     * @param entryId _more_
      * @param type _more_
      * @param name _more_
      * @param content _more_
+     * @param attr1 _more_
+     * @param attr2 _more_
+     * @param attr3 _more_
+     * @param attr4 _more_
      */
-    public Metadata(String id, String entryId, String type, String attr1, String attr2, String attr3,    String attr4) { 
+    public Metadata(String id, String entryId, String type, String attr1,
+                    String attr2, String attr3, String attr4) {
         this.id      = id;
-        this.entryId      = entryId;
-        this.type = type;
-        this.attr1 = attr1;
-        this.attr2 = attr2;
-        this.attr3 = attr3;
-        this.attr4 = attr4;
+        this.entryId = entryId;
+        this.type    = type;
+        this.attr1   = attr1;
+        this.attr2   = attr2;
+        this.attr3   = attr3;
+        this.attr4   = attr4;
     }
 
     /**
@@ -154,119 +156,119 @@ public class Metadata implements Constants, Tables {
     }
 
 
-/**
-Set the EntryId property.
+    /**
+     * Set the EntryId property.
+     *
+     * @param value The new value for EntryId
+     */
+    public void setEntryId(String value) {
+        entryId = value;
+    }
 
-@param value The new value for EntryId
-**/
-public void setEntryId (String value) {
-	entryId = value;
-}
-
-/**
-Get the EntryId property.
-
-@return The EntryId
-**/
-public String getEntryId () {
-	return entryId;
-}
-
-
-
-
-/**
-Set the Type property.
-
-@param value The new value for Type
-**/
-public void setType (String value) {
-	type = value;
-}
-
-/**
-Get the Type property.
-
-@return The Type
-**/
-public String getType () {
-	return type;
-}
+    /**
+     * Get the EntryId property.
+     *
+     * @return The EntryId
+     */
+    public String getEntryId() {
+        return entryId;
+    }
 
 
 
 
-/**
-Set the Attr1 property.
+    /**
+     * Set the Type property.
+     *
+     * @param value The new value for Type
+     */
+    public void setType(String value) {
+        type = value;
+    }
 
-@param value The new value for Attr1
-**/
-public void setAttr1 (String value) {
-	attr1 = value;
-}
+    /**
+     * Get the Type property.
+     *
+     * @return The Type
+     */
+    public String getType() {
+        return type;
+    }
 
-/**
-Get the Attr1 property.
 
-@return The Attr1
-**/
-public String getAttr1 () {
-	return attr1;
-}
 
-/**
-Set the Attr2 property.
 
-@param value The new value for Attr2
-**/
-public void setAttr2 (String value) {
-	attr2 = value;
-}
+    /**
+     * Set the Attr1 property.
+     *
+     * @param value The new value for Attr1
+     */
+    public void setAttr1(String value) {
+        attr1 = value;
+    }
 
-/**
-Get the Attr2 property.
+    /**
+     * Get the Attr1 property.
+     *
+     * @return The Attr1
+     */
+    public String getAttr1() {
+        return attr1;
+    }
 
-@return The Attr2
-**/
-public String getAttr2 () {
-	return attr2;
-}
+    /**
+     * Set the Attr2 property.
+     *
+     * @param value The new value for Attr2
+     */
+    public void setAttr2(String value) {
+        attr2 = value;
+    }
 
-/**
-Set the Attr3 property.
+    /**
+     * Get the Attr2 property.
+     *
+     * @return The Attr2
+     */
+    public String getAttr2() {
+        return attr2;
+    }
 
-@param value The new value for Attr3
-**/
-public void setAttr3 (String value) {
-	attr3 = value;
-}
+    /**
+     * Set the Attr3 property.
+     *
+     * @param value The new value for Attr3
+     */
+    public void setAttr3(String value) {
+        attr3 = value;
+    }
 
-/**
-Get the Attr3 property.
+    /**
+     * Get the Attr3 property.
+     *
+     * @return The Attr3
+     */
+    public String getAttr3() {
+        return attr3;
+    }
 
-@return The Attr3
-**/
-public String getAttr3 () {
-	return attr3;
-}
+    /**
+     * Set the Attr4 property.
+     *
+     * @param value The new value for Attr4
+     */
+    public void setAttr4(String value) {
+        attr4 = value;
+    }
 
-/**
-Set the Attr4 property.
-
-@param value The new value for Attr4
-**/
-public void setAttr4 (String value) {
-	attr4 = value;
-}
-
-/**
-Get the Attr4 property.
-
-@return The Attr4
-**/
-public String getAttr4 () {
-	return attr4;
-}
+    /**
+     * Get the Attr4 property.
+     *
+     * @return The Attr4
+     */
+    public String getAttr4() {
+        return attr4;
+    }
 
 
 

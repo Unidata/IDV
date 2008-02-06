@@ -19,8 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.repository;
 
 
@@ -58,8 +56,10 @@ import java.util.List;
 public class MetadataHandler extends RepositoryManager {
 
 
-    private Hashtable  canHandle = new Hashtable();
+    /** _more_          */
+    private Hashtable canHandle = new Hashtable();
 
+    /** _more_          */
     private List types = new ArrayList();
 
     /**
@@ -74,16 +74,33 @@ public class MetadataHandler extends RepositoryManager {
         super(repository);
     }
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     */
     public void setCanHandle(String type) {
         types.add(type);
-        canHandle.put(type,type);
+        canHandle.put(type, type);
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List getTypes() {
         return types;
     }
 
+    /**
+     * _more_
+     *
+     * @param child _more_
+     *
+     * @return _more_
+     */
     public Metadata makeMetadataFromCatalogNode(Element child) {
         return null;
     }
@@ -97,28 +114,55 @@ public class MetadataHandler extends RepositoryManager {
      * @return _more_
      */
     public boolean canHandle(Metadata metadata) {
-        return canHandle.get(metadata.getType()) !=null;
+        return canHandle.get(metadata.getType()) != null;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public String getLabel(String s) {
-        s = s.replace("_"," ");
-        s = s.replace("."," ");
-        s = s.substring(0,1).toUpperCase() +
-            s.substring(1);
+        s = s.replace("_", " ");
+        s = s.replace(".", " ");
+        s = s.substring(0, 1).toUpperCase() + s.substring(1);
         return s;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param metadata _more_
+     *
+     * @return _more_
+     */
     public String[] getHtml(Metadata metadata) {
         return null;
     }
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     *
+     * @return _more_
+     */
     public String getFormHtml(String type) {
         return "";
     }
 
 
+    /**
+     * _more_
+     *
+     * @param metadata _more_
+     *
+     * @return _more_
+     */
     public String getCatalogXml(Metadata metadata) {
         return "";
     }

@@ -19,16 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -148,15 +138,21 @@ public class CatalogOutputHandler extends OutputHandler {
     /**
      * _more_
      *
+     *
+     * @param repository _more_
+     * @param metadataList _more_
      * @param node _more_
      *
      * @throws Exception _more_
      */
-    public static  void collectMetadata(Repository repository, List<Metadata> metadataList, Element node)
+    public static void collectMetadata(Repository repository,
+                                       List<Metadata> metadataList,
+                                       Element node)
             throws Exception {
         NodeList elements = XmlUtil.getElements(node);
-        List<MetadataHandler> metadataHandlers = repository.getMetadataHandlers();
-        
+        List<MetadataHandler> metadataHandlers =
+            repository.getMetadataHandlers();
+
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
             String  tag   = child.getTagName();
@@ -175,11 +171,12 @@ public class CatalogOutputHandler extends OutputHandler {
                 } else {
                     collectMetadata(repository, metadataList, child);
                 }
-            }  else {
+            } else {
 
-                for(MetadataHandler metadataHandler: metadataHandlers) {
-                    Metadata metadata = metadataHandler.makeMetadataFromCatalogNode(child);
-                    if(metadata!=null) {
+                for (MetadataHandler metadataHandler : metadataHandlers) {
+                    Metadata metadata =
+                        metadataHandler.makeMetadataFromCatalogNode(child);
+                    if (metadata != null) {
                         metadataList.add(metadata);
                         break;
                     }

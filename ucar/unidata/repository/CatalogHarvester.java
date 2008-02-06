@@ -20,13 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -256,11 +249,13 @@ public class CatalogHarvester extends Harvester {
         if (group == null) {
             group = repository.findGroupFromName(groupName, user, true);
             List<Metadata> metadataList = new ArrayList<Metadata>();
-            CatalogOutputHandler.collectMetadata(repository, metadataList, node);
-            metadataList.add(new Metadata(repository.getGUID(), group.getId(),
+            CatalogOutputHandler.collectMetadata(repository, metadataList,
+                    node);
+            metadataList.add(new Metadata(repository.getGUID(),
+                                          group.getId(),
                                           ThreddsMetadataHandler.TAG_LINK,
                                           "Imported from catalog",
-                                          catalogUrl,"",""));
+                                          catalogUrl, "", ""));
             for (Metadata metadata : metadataList) {
                 metadata.setEntryId(group.getId());
                 try {

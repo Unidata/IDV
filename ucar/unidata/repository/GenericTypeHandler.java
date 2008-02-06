@@ -20,11 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -69,13 +64,13 @@ public class GenericTypeHandler extends TypeHandler {
     /** _more_ */
     public static final String TAG_COLUMN = "column";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_PROPERTY = "property";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_NAME = "name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_VALUE = "value";
 
     /** _more_ */

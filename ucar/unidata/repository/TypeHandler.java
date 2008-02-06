@@ -20,16 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -87,8 +77,9 @@ public class TypeHandler implements Constants, Tables {
     public static final TwoFacedObject ALL_OBJECT = new TwoFacedObject("All",
                                                         "");
 
-    public static final TwoFacedObject NONE_OBJECT = new TwoFacedObject("None",
-                                                        "");
+    /** _more_          */
+    public static final TwoFacedObject NONE_OBJECT =
+        new TwoFacedObject("None", "");
 
     /** _more_ */
     public static final String TYPE_ANY = "any";
@@ -112,7 +103,7 @@ public class TypeHandler implements Constants, Tables {
     /** _more_ */
     private Hashtable dontShowInForm = new Hashtable();
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable properties = new Hashtable();
 
 
@@ -211,10 +202,10 @@ public class TypeHandler implements Constants, Tables {
 
     }
 
-    /** _more_          */
+    /** _more_ */
     static int cnt = 0;
 
-    /** _more_          */
+    /** _more_ */
     int mycnt = cnt++;
 
 
@@ -284,7 +275,7 @@ public class TypeHandler implements Constants, Tables {
 
         sb.append(
             XmlUtil.tag(
-                        ThreddsMetadataHandler.TAG_DATE,
+                ThreddsMetadataHandler.TAG_DATE,
                 XmlUtil.attrs(
                     CatalogOutputHandler.ATTR_TYPE,
                     "metadataCreated"), format(
@@ -414,10 +405,11 @@ public class TypeHandler implements Constants, Tables {
             if (tags.size() > 0) {
                 StringBuffer tagSB = new StringBuffer();
                 for (Tag tag : tags) {
-                    TagCollection tagCollection = repository.findTagCollection(tag);
+                    TagCollection tagCollection =
+                        repository.findTagCollection(tag);
                     tagSB.append(repository.getTagLinks(request,
-                                                        tag.getName()));
-                    if(tagCollection!=null) {
+                            tag.getName()));
+                    if (tagCollection != null) {
                         tagSB.append(tagCollection.getLabel() + ": ");
                     }
                     tagSB.append(tag.getName());
@@ -1066,10 +1058,11 @@ public class TypeHandler implements Constants, Tables {
                     List groupList = new ArrayList();
                     groupList.add(ALL_OBJECT);
                     for (Group group : groups) {
-                        groupList.add(new TwoFacedObject(group.getFullName()));
+                        groupList.add(
+                            new TwoFacedObject(group.getFullName()));
                     }
                     String groupSelect = HtmlUtil.select(ARG_GROUP,
-                                                         groupList,null,100);
+                                             groupList, null, 100);
                     formBuffer.append(HtmlUtil.formEntry("Group:",
                             groupSelect + searchChildren));
                 } else if (groups.size() == 1) {
@@ -1083,13 +1076,13 @@ public class TypeHandler implements Constants, Tables {
         }
 
         if ( !simpleForm || request.defined(ARG_TAG)) {
-            String tag = (String) request.getString(ARG_TAG, "");
+            String        tag = (String) request.getString(ARG_TAG, "");
             TagCollection tagCollection = repository.findTagCollection(tag);
-            if(tagCollection!=null) {
-                tagCollection.appendToForm(formBuffer, ARG_TAG,tag);
+            if (tagCollection != null) {
+                tagCollection.appendToForm(formBuffer, ARG_TAG, tag);
             } else {
                 formBuffer.append(HtmlUtil.formEntry("Tag:",
-                                                     HtmlUtil.input(ARG_TAG, tag)));
+                        HtmlUtil.input(ARG_TAG, tag)));
             }
             formBuffer.append("\n");
 

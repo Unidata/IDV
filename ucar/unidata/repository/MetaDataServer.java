@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
 
 
@@ -170,9 +169,10 @@ public class MetaDataServer extends HttpServer implements Constants {
                 throws Exception {
             Repository.checkFilePath(filename);
             int cnt = 0;
-            File f =
-                new File(IOUtil.joinDir(repository.getStorageManager().getUploadDir(),
-                                        repository.getGUID()+"_"+filename));
+            File f = new File(
+                         IOUtil.joinDir(
+                             repository.getStorageManager().getUploadDir(),
+                             repository.getGUID() + "_" + filename));
             //TODO: Check for security hole with the file upload
             fileUploads.put(attrName, f.toString());
             OutputStream output = new FileOutputStream(f);

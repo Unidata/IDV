@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.repository;
 
 
@@ -98,7 +96,7 @@ public class Admin extends RepositoryManager {
     public RequestUrl URL_ADMIN_SETTINGS = new RequestUrl(this,
                                                "/admin/settings", "Settings");
 
-    /** _more_          */
+    /** _more_ */
     public RequestUrl URL_ADMIN_SETTINGS_DO = new RequestUrl(this,
                                                   "/admin/settings/do",
                                                   "Settings");
@@ -166,6 +164,11 @@ public class Admin extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected List<Harvester> getHarvesters() {
         return harvesters;
     }

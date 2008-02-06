@@ -19,16 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
-
-
-
-
-
 package ucar.unidata.repository;
 
 
@@ -606,42 +596,60 @@ public class HtmlOutputHandler extends OutputHandler {
 
     }
 
-    public void getMetadataHtml(Request request,Entry entry, StringBuffer sb) throws Exception {
-        boolean showMetadata = request.get(ARG_SHOWMETADATA, false);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    public void getMetadataHtml(Request request, Entry entry, StringBuffer sb)
+            throws Exception {
+        boolean        showMetadata = request.get(ARG_SHOWMETADATA, false);
         List<Metadata> metadataList = repository.getMetadata(entry);
-        List<Tag> tagList = repository.getTags(request, entry.getId());
-        if (tagList.size()==0 && metadataList.size() == 0) {return;}
+        List<Tag>      tagList = repository.getTags(request, entry.getId());
+        if ((tagList.size() == 0) && (metadataList.size() == 0)) {
+            return;
+        }
         sb.append("<p>\n");
-        String url =request.getUrl(ARG_SHOWMETADATA)+"&"+ARG_SHOWMETADATA+"=" +
-            (showMetadata? "false": "true");
+        String url = request.getUrl(ARG_SHOWMETADATA) + "&"
+                     + ARG_SHOWMETADATA + "=" + (showMetadata
+                ? "false"
+                : "true");
         String link = HtmlUtil.href(url, (showMetadata
-                                          ? "-&nbsp; Details": "+&nbsp; Details"), " class=\"subheaderlink\" ");
+                                          ? "-&nbsp; Details"
+                                          : "+&nbsp; Details"), " class=\"subheaderlink\" ");
 
         //        sb.append("<tr><td colspan=\"2\">");
-        sb.append(HtmlUtil.div(link," class=\"subheader\""));
+        sb.append(HtmlUtil.div(link, " class=\"subheader\""));
         //        sb.append("</td>\n");
         sb.append("<table cellspacing=\"5\">\n");
-        List<MetadataHandler> metadataHandlers = repository.getMetadataHandlers();
+        List<MetadataHandler> metadataHandlers =
+            repository.getMetadataHandlers();
         if (showMetadata) {
-            for (Tag tag: tagList) {
-                TagCollection tagCollection = repository.findTagCollection(tag);
+            for (Tag tag : tagList) {
+                TagCollection tagCollection =
+                    repository.findTagCollection(tag);
                 String label = "Tag:";
-                if(tagCollection!=null) {
+                if (tagCollection != null) {
                     label = tagCollection.getLabel() + ": ";
                 }
                 label = label.replace(" ", "&nbsp;");
                 sb.append(HtmlUtil.formEntryTop(label,
-                                      repository.getTagLinks(request, tag.getName()) +
-                                                tag.getName()));
+                        repository.getTagLinks(request, tag.getName())
+                        + tag.getName()));
 
             }
 
             for (Metadata metadata : metadataList) {
-                for(MetadataHandler metadataHandler: metadataHandlers) {
-                    if(metadataHandler.canHandle(metadata)) {
-                        String[]html = metadataHandler.getHtml(metadata);
-                        if(html!=null) {
-                            sb.append(HtmlUtil.formEntryTop(html[0],html[1]));
+                for (MetadataHandler metadataHandler : metadataHandlers) {
+                    if (metadataHandler.canHandle(metadata)) {
+                        String[] html = metadataHandler.getHtml(metadata);
+                        if (html != null) {
+                            sb.append(HtmlUtil.formEntryTop(html[0],
+                                    html[1]));
                             break;
                         }
                     }
@@ -676,11 +684,12 @@ public class HtmlOutputHandler extends OutputHandler {
         StringBuffer sb         = new StringBuffer();
 
         if (request.exists(ARG_MESSAGE)) {
-            sb.append(repository.note(request.getUnsafeString(ARG_MESSAGE, "")));
+            sb.append(repository.note(request.getUnsafeString(ARG_MESSAGE,
+                    "")));
         }
 
-        int          cnt        = subGroups.size() + entries.size();
-        int          max        = request.get(ARG_MAX, Repository.MAX_ROWS);
+        int cnt = subGroups.size() + entries.size();
+        int max = request.get(ARG_MAX, Repository.MAX_ROWS);
         //        System.err.println ("cnt:" + cnt + " " + max);
 
         if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
@@ -713,7 +722,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(crumbs[1]);
             } else {
                 title = group.getName();
-                if (subGroups.size() == 0 && entries.size() == 0) {
+                if ((subGroups.size() == 0) && (entries.size() == 0)) {
                     sb.append("No entries found");
                 }
             }
@@ -848,7 +857,9 @@ public class HtmlOutputHandler extends OutputHandler {
                                        repository.fileUrl("/Edit16.gif"),
                                        "Edit Group"));
 
-        if(!repository.canEditEntry(request, group)) editEntry = "";
+        if ( !repository.canEditEntry(request, group)) {
+            editEntry = "";
+        }
 
 
         return search + HtmlUtil.space(1)

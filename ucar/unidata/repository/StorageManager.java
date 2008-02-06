@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.repository;
 
 
@@ -78,7 +76,6 @@ import java.sql.Statement;
 
 import java.text.SimpleDateFormat;
 
-import java.util.zip.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -87,6 +84,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
+
+import java.util.zip.*;
 
 
 import javax.swing.*;
@@ -102,6 +101,11 @@ import javax.swing.*;
 public class StorageManager extends RepositoryManager {
 
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     */
     public StorageManager(Repository repository) {
         super(repository);
     }
@@ -118,8 +122,10 @@ public class StorageManager extends RepositoryManager {
     /** _more_ */
     private String uploadDir;
 
+    /** _more_          */
     private String storageDir;
-    
+
+    /** _more_          */
     private String thumbDir;
 
     /**
@@ -155,19 +161,29 @@ public class StorageManager extends RepositoryManager {
      * @return _more_
      */
     public String getUploadDir() {
-        if(uploadDir == null) {
+        if (uploadDir == null) {
             uploadDir = IOUtil.joinDir(getRepositoryDir(), "uploads");
             IOUtil.makeDirRecursive(new File(uploadDir));
         }
         return uploadDir;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getRepositoryDir() {
         return repositoryDir;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getTmpDir() {
-        if(tmpDir == null) {
+        if (tmpDir == null) {
             tmpDir = IOUtil.joinDir(getRepositoryDir(), "tmp");
             IOUtil.makeDirRecursive(new File(tmpDir));
         }
@@ -175,8 +191,13 @@ public class StorageManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getStorageDir() {
-        if(storageDir == null) {
+        if (storageDir == null) {
             storageDir = IOUtil.joinDir(getRepositoryDir(), "storage");
             IOUtil.makeDirRecursive(new File(storageDir));
             addDownloadPrefix(storageDir);
@@ -184,24 +205,50 @@ public class StorageManager extends RepositoryManager {
         return storageDir;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getThumbDir() {
-        if(thumbDir == null) {
+        if (thumbDir == null) {
             thumbDir = IOUtil.joinDir(getTmpDir(), "thumbnails");
             IOUtil.makeDir(thumbDir);
         }
         return thumbDir;
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param name _more_
+     *
+     * @return _more_
+     */
     public File getTmpFile(Request request, String name) {
         return new File(IOUtil.joinDir(getTmpDir(),
-                                       getRepository().getGUID()+"_"+name));
+                                       getRepository().getGUID() + "_"
+                                       + name));
     }
 
 
-    public File moveToStorage(Request request, File original) throws Exception {
-        File newFile = new File(IOUtil.joinDir(getStorageDir(), original.getName()));
-        System.err.println ("From:" + original);
-        System.err.println ("To:" + newFile);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param original _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public File moveToStorage(Request request, File original)
+            throws Exception {
+        File newFile = new File(IOUtil.joinDir(getStorageDir(),
+                           original.getName()));
+        System.err.println("From:" + original);
+        System.err.println("To:" + newFile);
         IOUtil.moveFile(original, newFile);
         return newFile;
     }
@@ -226,14 +273,27 @@ public class StorageManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     */
     public void removeFile(Entry entry) {
-        if(entry.getResource().isLocalFile()) {
+        if (entry.getResource().isLocalFile()) {
             entry.getResource().getFile().delete();
         }
     }
 
-    public boolean isInDownloadArea(String filePath) 
-            throws Exception {
+    /**
+     * _more_
+     *
+     * @param filePath _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public boolean isInDownloadArea(String filePath) throws Exception {
         filePath = filePath.replace("\\", "/");
         for (String prefix : downloadPrefixes) {
             if (filePath.startsWith(prefix)) {

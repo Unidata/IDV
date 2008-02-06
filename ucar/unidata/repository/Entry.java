@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
 
 
@@ -209,10 +208,20 @@ public class Entry extends Entity {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isTopGroup() {
-        return isGroup()   && getParentGroup() == null;
+        return isGroup() && (getParentGroup() == null);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isGroup() {
         return this instanceof Group;
     }

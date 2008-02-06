@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository;
 
 
@@ -172,7 +169,18 @@ public class Harvester {
                 ""));
     }
 
-    public Entry processFile(TypeHandler type, String filepath) throws Exception {
+    /**
+     * _more_
+     *
+     * @param type _more_
+     * @param filepath _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry processFile(TypeHandler type, String filepath)
+            throws Exception {
         return null;
     }
 
