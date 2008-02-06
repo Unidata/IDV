@@ -49,6 +49,16 @@ import org.apache.commons.fileupload.MultipartStream;
  */
 public class HttpServer {
 
+    public static final int RESPONSE_OK = 200;
+
+    public static final int RESPONSE_NOTFOUND = 404;
+
+    public static final int RESPONSE_UNAUTHORIZED = 401;
+
+    public static final int RESPONSE_INTERNALERROR = 500;
+
+
+
     /** get type */
     public static final String TYPE_GET = "GET";
 
@@ -520,25 +530,41 @@ public class HttpServer {
          */
         public void writeResult(boolean ok, String content,
                                    String type) throws Exception {
-            writeResult(ok, content.getBytes(), type);
+            writeResult(ok?RESPONSE_OK:RESPONSE_NOTFOUND, content, type);
         }
+
+
+        public void writeResult(int code, String content,
+                                   String type) throws Exception {
+            writeResult(code, content.getBytes(), type);
+        }
+
+
 
 
         public void writeResult(boolean ok, StringBuffer content,
                                    String type) throws Exception {
-            writeResult(ok, content.toString().getBytes(), type);
+            writeResult(ok?RESPONSE_OK:RESPONSE_NOTFOUND, content.toString().getBytes(), type);
+        }
+
+
+
+        public void writeResult(int code, StringBuffer content,
+                                   String type) throws Exception {
+            writeResult(code, content.toString().getBytes(), type);
         }
 
 
 
         public void writeXml(StringBuffer content) throws Exception {
-            writeResult(true, content.toString().getBytes(), "text/xml");
+            writeResult(RESPONSE_OK, content.toString().getBytes(), "text/xml");
         }
 
 
         public void writeHtml(StringBuffer content) throws Exception {
-            writeResult(true, content.toString().getBytes(), "text/html");
+            writeResult(RESPONSE_OK, content.toString().getBytes(), "text/html");
         }
+
 
         /**
          * _more_
@@ -551,19 +577,52 @@ public class HttpServer {
          */
         public void writeResult(boolean ok, byte[] content,
                                    String type) throws Exception {
+
+            writeResult(ok?RESPONSE_OK:RESPONSE_NOTFOUND,content,type);
+        }
+
+
+        public void writeResult(int code, byte[] content,
+                                   String type) throws Exception {
             try {
-                writeHeader(ok, content.length, type);
+                writeHeader(code, content.length, type);
                 output.write(content);
             } catch(SocketException se){}
         }
 
 
-        public void writeResult(boolean ok, InputStream inputStream,
+        public void writeResult(int code, InputStream inputStream,
                                    String type) throws Exception {
-            writeHeader(ok, -1, type);
+            writeHeader(code, -1, type);
             IOUtil.writeTo(inputStream, output);
             //            output.write(content);
             output.close();
+        }
+
+
+
+        /**
+         * _more_
+         *
+         * @param ok _more_
+         * @param length _more_
+         * @param type _more_
+         *
+         * @throws Exception On badness
+         */
+        protected void writeHeader(int code, long length,
+                                   String type) throws Exception {
+            if(code == RESPONSE_OK) {
+                writeLine("HTTP/1.0 " + code +"  OK" + CRLF);
+            } else {
+                writeLine("HTTP/1.0 " + code + CRLF);
+            }
+            if(length>=0) {
+                writeLine("Content-Length: " + length + CRLF);
+            }
+            writeLine("Content-type: " + type + CRLF);
+            writeHeaderArgs();
+            writeLine("\n");
         }
 
 
@@ -576,26 +635,6 @@ public class HttpServer {
             output.close();
         }
 
-        /**
-         * _more_
-         *
-         * @param ok _more_
-         * @param length _more_
-         * @param type _more_
-         *
-         * @throws Exception On badness
-         */
-        protected void writeHeader(boolean ok, long length,
-                                   String type) throws Exception {
-            writeLine(ok
-                      ? "HTTP/1.0 200 OK" + CRLF
-                      : "HTTP/1.0 404 Not Found" + CRLF);
-            if(length>=0) 
-                writeLine("Content-Length: " + length + CRLF);
-            writeLine("Content-type: " + type + CRLF);
-            writeHeaderArgs();
-            writeLine("\n");
-        }
 
 
         protected void writeHeaderArgs() throws Exception {
@@ -617,7 +656,7 @@ public class HttpServer {
          */
         protected void writeBytes(InputStream fis, String type,
                                   long length) throws Exception {
-            writeHeader(true, length, type);
+            writeHeader(RESPONSE_OK, length, type);
             // Construct a 1K buffer to hold bytes on their way to the socket.
             byte[] buffer = new byte[1024];
             int    bytes  = 0;
