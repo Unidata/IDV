@@ -2484,6 +2484,11 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+    protected List<TagCollection> getTagCollections() {
+        return tagCollections;
+    }
+
+
     /**
      * _more_
      *
@@ -4769,6 +4774,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         ResultSet        results;
         SqlUtil.Iterator iter     = SqlUtil.getIterator(statement);
         boolean canDoSelectOffset = getDatabaseManager().canDoSelectOffset();
+        Hashtable seen = new Hashtable();
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 if ( !canDoSelectOffset && (skipCnt-- > 0)) {
@@ -4778,6 +4784,8 @@ public class Repository implements Constants, Tables, RequestHandler,
                 TypeHandler localTypeHandler =
                     getTypeHandler(results.getString(2));
                 Entry entry = localTypeHandler.getEntry(results);
+                if(seen.get(entry.getId())!=null) continue;
+                seen.put(entry.getId(),"");
                 if (entry.isGroup()) {
                     groups.add(entry);
                 } else {

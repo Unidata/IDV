@@ -852,7 +852,7 @@ public class TypeHandler implements Constants, Tables {
         }
 
         if (didMeta) {
-            whereList.add(SqlUtil.eq(COL_METADATA_ID, COL_ENTRIES_ID));
+            whereList.add(SqlUtil.eq(COL_METADATA_ENTRY_ID, COL_ENTRIES_ID));
             didEntries = true;
         }
 
@@ -1083,6 +1083,11 @@ public class TypeHandler implements Constants, Tables {
             } else {
                 formBuffer.append(HtmlUtil.formEntry("Tag:",
                         HtmlUtil.input(ARG_TAG, tag)));
+                
+                int cnt = 0;
+                for (TagCollection tc : repository.getTagCollections()) {
+                    tc.appendToForm(formBuffer, ARG_TAG+"."+(cnt++), null);
+                }
             }
             formBuffer.append("\n");
 
@@ -1140,11 +1145,29 @@ public class TypeHandler implements Constants, Tables {
         List where = new ArrayList();
 
 
+        String tagString = "";
         if (request.defined(ARG_TAG)) {
             String tag = (String) request.getString(ARG_TAG,
                              (String) null).trim();
+            tagString = tag;
+        }
+
+        int tagCnt=0;
+        while(request.exists(ARG_TAG+"."+tagCnt)) {
+            String tag = request.getString(ARG_TAG+"."+tagCnt,"");
+            if(tag.length()>0) {
+                if(tagString.length()>0) {
+                    tagString = tagString+",";
+                }
+                tagString = tagString+tag;
+            }
+            tagCnt++;
+        }
+
+
+        if(tagString.length()>0) {
             where.add(SqlUtil.eq(COL_ENTRIES_ID, COL_TAGS_ENTRY_ID));
-            addOr(COL_TAGS_NAME, tag, where, true);
+            addOr(COL_TAGS_NAME, tagString, where, true);
         }
 
         if (request.defined(ARG_GROUP)) {
@@ -1256,10 +1279,18 @@ public class TypeHandler implements Constants, Tables {
             ors.add(SqlUtil.makeOrSplit(COL_ENTRIES_NAME, name, true));
             ors.add(SqlUtil.makeOrSplit(COL_ENTRIES_DESCRIPTION, name, true));
             if (request.get(ARG_SEARCHMETADATA, false)) {
-                ors.add(SqlUtil.makeOrSplit(COL_METADATA_CONTENT, name,
+                ors.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR1, name,
+                                            true));
+                ors.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR2, name,
+                                            true));
+                ors.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR3, name,
+                                            true));
+                ors.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR4, name,
                                             true));
             }
+            
             where.add("(" + StringUtil.join(" OR ", ors) + ")");
+            //            System.err.println("where:" + where);
         }
         //        System.err.println("where:" + where);
         return where;
