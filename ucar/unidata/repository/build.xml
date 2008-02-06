@@ -13,7 +13,7 @@
         <property name="libsrc" value="${basedir}/libsrc"/>
         <property name="libsdir" value="${jars_dest}"/>
         <property name="tmpjardir" value="${libsdir}/tmpjardir" />
-        <property name="classpath" value="${libsdir}/extra.jar:${libsdir}/visad.jar;${libsdir}/external.jar"/>
+        <property name="classpath" value="${libsdir}/servlet-api.jar:${libsdir}/extra.jar:${libsdir}/visad.jar;${libsdir}/external.jar"/>
     </target>
 
     <target name="clean" depends="init" >

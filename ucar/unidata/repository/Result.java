@@ -18,6 +18,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -34,6 +35,16 @@ import java.util.List;
  */
 
 public class Result {
+
+    /** _more_          */
+    public static final int RESPONSE_OK = 200;
+
+    public static final int RESPONSE_NOTFOUND = 404;
+
+    public static final int RESPONSE_UNAUTHORIZED = 401;
+
+    public static final int RESPONSE_INTERNALERROR = 500;
+
 
     /** _more_ */
     public static String TYPE_HTML = "text/html";
@@ -72,7 +83,7 @@ public class Result {
     private boolean cacheOk = false;
 
     /** _more_ */
-    private boolean requestOk = true;
+    private int responseCode = RESPONSE_OK;
 
     /** _more_ */
     private List<String> httpHeaderArgs;
@@ -354,22 +365,28 @@ public class Result {
     }
 
     /**
-     * Set the RequestOk property.
+     * Set the ResponseCode property.
      *
-     * @param value The new value for RequestOk
+     * @param value The new value for ResponseCode
      */
-    public void setRequestOk(boolean value) {
-        requestOk = value;
+    public void setResponseCode(int value) {
+        responseCode = value;
     }
 
     /**
-     * Get the RequestOk property.
+     * Get the ResponseCode property.
      *
-     * @return The RequestOk
+     * @return The ResponseCode
      */
-    public boolean getRequestOk() {
-        return requestOk;
+    public int getResponseCode() {
+        return responseCode;
     }
+
+
+
+
+
+
 
     /**
      * _more_

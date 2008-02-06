@@ -218,10 +218,10 @@ public class MetaDataServer extends HttpServer implements Constants {
                 cache = false;
                 redirect(result.getRedirectUrl());
             } else if (result.getInputStream() != null) {
-                writeResult(result.getRequestOk(), result.getInputStream(),
+                writeResult(result.getResponseCode(), result.getInputStream(),
                             result.getMimeType());
             } else {
-                writeResult(result.getRequestOk(), result.getContent(),
+                writeResult(result.getResponseCode(), result.getContent(),
                             result.getMimeType());
             }
         }

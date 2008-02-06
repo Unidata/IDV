@@ -1089,6 +1089,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 sb.append("<pre>" + LogUtil.getStackTrace(inner) + "</pre>");
             }
             result = new Result("Error", sb);
+            result.setResponseCode(Result.RESPONSE_INTERNALERROR);
             log("Error handling request:" + request, exc);
         }
 
@@ -1157,7 +1158,9 @@ public class Repository implements Constants, Tables, RequestHandler,
             sb.append("You cannot access this page<p>");
             sb.append(getUserManager().makeLoginForm(request,
                     HtmlUtil.hidden(ARG_REDIRECT, request.getFullUrl())));
-            return new Result("Error", sb);
+            Result result =  new Result("Error", sb);
+            result.setResponseCode(Result.RESPONSE_UNAUTHORIZED);
+            return result;
         }
 
 
@@ -1228,10 +1231,13 @@ public class Repository implements Constants, Tables, RequestHandler,
         path = StringUtil.replace(path, getUrlBase(), "");
         if ((path.trim().length() == 0) || path.equals("/")) {
             log(request, "Unknown request: \"" + path + "\"");
-            return new Result("Error",
-                              new StringBuffer("Unknown request:\"" + path
-                                  + "\""));
+            Result result  =  new Result("Error",
+                                         new StringBuffer("Unknown request:\"" + path
+                                                          + "\""));
+            result.setResponseCode(Result.RESPONSE_NOTFOUND);
+            return result;
         }
+
 
         try {
             //Make sure no one is trying to access other files
