@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -419,17 +420,22 @@ abstract class Grid3DSoundingDataNode extends SoundingDataNode {
             levels = new float[][] {
                 levs
             };
+            Unit verticalUnit = inDom.getSetUnits()[2];
 
             if (((SetType) inDom.getType()).getDomain().getComponent(
                     2).equals(RealType.Altitude)) {
                 levels = Set.doubleToFloat(
                     AirPressure.getStandardAtmosphereCS().fromReference(
                         Set.floatToDouble(levels),
-                        new Unit[] { inDom.getSetUnits()[2] }));
+                        new Unit[] { verticalUnit }));
+                verticalUnit =
+                    AirPressure.getStandardAtmosphereCS()
+                        .getCoordinateSystemUnits()[0];
             }
 
             outDom = new Gridded1DSet(AirPressure.getRealTupleType(), levels,
-                                      levels[0].length);
+                                      levels[0].length, null,
+                                      new Unit[] { verticalUnit }, null);
             this.rangeUnits = rangeUnits;
         }
 
