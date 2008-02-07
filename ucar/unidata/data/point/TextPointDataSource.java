@@ -21,9 +21,6 @@
  */
 
 
-
-
-
 package ucar.unidata.data.point;
 
 
@@ -85,9 +82,10 @@ public class TextPointDataSource extends PointDataSource {
     /** The visad textadapter map. We have this here if the data file does not have it */
     private String map;
 
-    /** _more_          */
+    /** skip rows */
     private int skipRows = 0;
 
+    /** metadata okay flag */
     private boolean metaDataOk = false;
 
 
@@ -123,13 +121,17 @@ public class TextPointDataSource extends PointDataSource {
     /** for the metadata gui */
     JComponent metaDataComp;
 
+    /** metadata properties wrapper */
     JComponent metaDataPropertiesWrapper;
+
+    /** widget panel */
     JComponent widgetPanel;
 
 
-    private  JButton  applyNamesBtn;
+    /** apply names button */
+    private JButton applyNamesBtn;
 
-    /** _more_ */
+    /** group var name */
     private String groupVarName = null;
 
     /**
@@ -204,14 +206,18 @@ public class TextPointDataSource extends PointDataSource {
     private InputStream getInputStream(String contents) throws Exception {
         InputStream is = new ByteArrayInputStream(contents.getBytes());
         for (int i = 0; i < skipRows; i++) {
-            while(is.available()>0) {
+            while (is.available() > 0) {
                 int c = is.read();
-                if(c=='\n') break;
-                if(c=='\r') {
-                    if(is.available()>0) {
+                if (c == '\n') {
+                    break;
+                }
+                if (c == '\r') {
+                    if (is.available() > 0) {
                         is.mark(10);
-                        c = is.read();                        
-                        if(c != '\n') is.reset();
+                        c = is.read();
+                        if (c != '\n') {
+                            is.reset();
+                        }
                     }
                     break;
                 }
@@ -230,6 +236,7 @@ public class TextPointDataSource extends PointDataSource {
      * @param bbox _more_
      * @param trackParam _more_
      * @param sampleIt _more_
+     * @param showAttributeGuiIfNeeded _more_
      *
      * @return _more_
      *
@@ -237,7 +244,8 @@ public class TextPointDataSource extends PointDataSource {
      */
     protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
                                 LatLonRect bbox, String trackParam,
-                                boolean sampleIt, boolean showAttributeGuiIfNeeded)
+                                boolean sampleIt,
+                                boolean showAttributeGuiIfNeeded)
             throws Exception {
         String source = getSource(dataChoice);
         String contents;
@@ -263,7 +271,7 @@ public class TextPointDataSource extends PointDataSource {
                 if ((map != null) && (params != null)) {
                     throw bfe;
                 }
-                if(!showAttributeGuiIfNeeded) {
+                if ( !showAttributeGuiIfNeeded) {
                     return null;
                 }
                 if ( !showAttributeGui(contents)) {
@@ -274,7 +282,7 @@ public class TextPointDataSource extends PointDataSource {
             }
             try {
                 Data d = ta.getData();
-                obs = makePointObs(d, trackParam);
+                obs        = makePointObs(d, trackParam);
                 metaDataOk = true;
             } catch (Exception exc) {
                 map    = null;
@@ -377,12 +385,13 @@ public class TextPointDataSource extends PointDataSource {
         //            return;
         //        }
         StringBuffer sb =
-            new StringBuffer("<html><body style=\"margin:0;\"><table width=\"100%\" border=\"0\">");
+            new StringBuffer(
+                "<html><body style=\"margin:0;\"><table width=\"100%\" border=\"0\">");
         int[] indices;
-        if(index==0) {
-            indices = new int[] {index, index+1, index + 2};
+        if (index == 0) {
+            indices = new int[] { index, index + 1, index + 2 };
         } else {
-            indices = new int[] {index-1, index, index + 1};
+            indices = new int[] { index - 1, index, index + 1 };
         }
         for (int i = 0; i < indices.length; i++) {
             String line;
@@ -404,9 +413,9 @@ public class TextPointDataSource extends PointDataSource {
         lbl.setText(sb.toString());
 
 
-        String line = (String) lines.get(index);
-        List toks  = StringUtil.split(line, getDelimiter(), false, false);
-        List comps = new ArrayList();
+        String line  = (String) lines.get(index);
+        List   toks  = StringUtil.split(line, getDelimiter(), false, false);
+        List   comps = new ArrayList();
         /*        comps.add(
                   new GraphPaperLayout.Location(
                                                 new JLabel("Sample Value"), 0, 0));
@@ -423,8 +432,8 @@ public class TextPointDataSource extends PointDataSource {
                                                 new JLabel("Extra (e.g., colspan)"), 4, 0));
 
 */
-        
-        comps.add(GuiUtils.leftRight(new JLabel("Value"),applyNamesBtn));
+
+        comps.add(GuiUtils.leftRight(new JLabel("Value"), applyNamesBtn));
         comps.add(new JLabel("Name"));
         comps.add(new JLabel("Unit/Date Format"));
         comps.add(new JLabel("Missing Value"));
@@ -435,14 +444,14 @@ public class TextPointDataSource extends PointDataSource {
 
         for (int i = 0; i < paramRows.size(); i++) {
             ParamRow paramRow = (ParamRow) paramRows.get(i);
-            extraParamRows.add(0+i,paramRow);
+            extraParamRows.add(0 + i, paramRow);
         }
 
         paramRows = new ArrayList();
         for (int tokIdx = 0; tokIdx < toks.size(); tokIdx++) {
             ParamRow paramRow;
-            if(extraParamRows.size()>0) {
-                paramRow = (ParamRow)extraParamRows.remove(0);
+            if (extraParamRows.size() > 0) {
+                paramRow = (ParamRow) extraParamRows.remove(0);
             } else {
                 paramRow = new ParamRow();
             }
@@ -452,18 +461,25 @@ public class TextPointDataSource extends PointDataSource {
 
 
         applySavedMetaData(metaDataFields);
-        GuiUtils.tmpInsets = new Insets(5,5,0,0);
-        double[]stretch = {0.0,1.0,0.5,0.0,0.5};
-        JComponent panel = GuiUtils.doLayout(comps,5, stretch,
+        GuiUtils.tmpInsets = new Insets(5, 5, 0, 0);
+        double[]   stretch = { 0.0, 1.0, 0.5, 0.0, 0.5 };
+        JComponent panel = GuiUtils.doLayout(comps, 5, stretch,
                                              GuiUtils.WT_N);
         widgetPanel.removeAll();
-        JScrollPane widgetSP  = GuiUtils.makeScrollPane(GuiUtils.top(GuiUtils.inset(panel,5)),200,200);
+        JScrollPane widgetSP =
+            GuiUtils.makeScrollPane(GuiUtils.top(GuiUtils.inset(panel, 5)),
+                                    200, 200);
         widgetPanel.add(BorderLayout.CENTER, widgetSP);
     }
 
+    /**
+     * _more_
+     *
+     * @param line _more_
+     */
     public void applyNames(String line) {
-        List toks  = StringUtil.split(line, getDelimiter(), false, false);
-        for (int i = 0; i < paramRows.size() && i<toks.size(); i++) {
+        List toks = StringUtil.split(line, getDelimiter(), false, false);
+        for (int i = 0; (i < paramRows.size()) && (i < toks.size()); i++) {
             ParamRow paramRow = (ParamRow) paramRows.get(i);
             paramRow.setName((String) toks.get(i));
         }
@@ -481,7 +497,7 @@ public class TextPointDataSource extends PointDataSource {
      * @throws IOException On badness
      */
     private JComponent getMetaDataComponent(String contents)
-        throws IOException {
+            throws IOException {
         if (metaDataComp == null) {
             if (contents == null) {
                 contents = IOUtil.readContents(getFilePath(), getClass());
@@ -495,17 +511,21 @@ public class TextPointDataSource extends PointDataSource {
                 String line = bis.readLine();
                 if (line == null) {
                     break;
-                } 
-                List toks  = StringUtil.split(line, getDelimiter(), false, false);
+                }
+                List toks = StringUtil.split(line, getDelimiter(), false,
+                                             false);
                 lines.add(line);
             }
 
 
             final JLabel lineLbl = new JLabel(" ");
             lineLbl.setVerticalAlignment(SwingConstants.TOP);
-            lineLbl.setPreferredSize(new Dimension(700,150));
-            applyNamesBtn = GuiUtils.getImageButton("/auxdata/ui/icons/HorArrow16.gif",getClass());
-            applyNamesBtn.setToolTipText("Use column values as the field names");
+            lineLbl.setPreferredSize(new Dimension(700, 150));
+            applyNamesBtn =
+                GuiUtils.getImageButton("/auxdata/ui/icons/HorArrow16.gif",
+                                        getClass());
+            applyNamesBtn.setToolTipText(
+                "Use column values as the field names");
             applyNamesBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     applyNames(lines.get(skipRows).toString());
@@ -513,8 +533,12 @@ public class TextPointDataSource extends PointDataSource {
             });
 
 
-            JButton nextBtn = GuiUtils.getImageButton("/auxdata/ui/icons/Down.gif",getClass());
-            JButton prevBtn = GuiUtils.getImageButton("/auxdata/ui/icons/Up.gif", getClass());
+            JButton nextBtn =
+                GuiUtils.getImageButton("/auxdata/ui/icons/Down.gif",
+                                        getClass());
+            JButton prevBtn =
+                GuiUtils.getImageButton("/auxdata/ui/icons/Up.gif",
+                                        getClass());
             nextBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     skipRows++;
@@ -534,12 +558,12 @@ public class TextPointDataSource extends PointDataSource {
                 }
             });
             JComponent buttons = GuiUtils.vbox(prevBtn, nextBtn);
-            JComponent skipInner =  GuiUtils.leftCenter(GuiUtils.top(buttons),
-                                                             lineLbl);
-            
+            JComponent skipInner = GuiUtils.leftCenter(GuiUtils.top(buttons),
+                                       lineLbl);
+
 
             JComponent skipContents =
-                GuiUtils.topCenter(new JLabel("Start line:"),skipInner);
+                GuiUtils.topCenter(new JLabel("Start line:"), skipInner);
 
 
             widgetPanel = new JPanel(new BorderLayout());
@@ -552,9 +576,10 @@ public class TextPointDataSource extends PointDataSource {
                                   "popupMetaDataMenu", wrapper);
             wrapper.add(BorderLayout.CENTER, saveBtn);
 
-            metaDataComp = GuiUtils.topCenter(GuiUtils.vbox(skipContents,GuiUtils.leftRight(lbl,
-                                                            GuiUtils.right(wrapper))),
-                                                             widgetPanel);
+            metaDataComp = GuiUtils.topCenter(
+                GuiUtils.vbox(
+                    skipContents, GuiUtils.leftRight(
+                        lbl, GuiUtils.right(wrapper))), widgetPanel);
             metaDataComp = GuiUtils.inset(metaDataComp, 5);
             setLineText(lineLbl, skipRows, lines);
 
@@ -611,8 +636,8 @@ public class TextPointDataSource extends PointDataSource {
                     keys.hasMoreElements(); ) {
                 String     key  = (String) keys.nextElement();
                 final List list = (List) pointMetaDataMap.get(key);
-                items.add(GuiUtils.makeMenuItem(key, this, "applySavedMetaData",
-                        list));
+                items.add(GuiUtils.makeMenuItem(key, this,
+                        "applySavedMetaData", list));
                 delitems.add(GuiUtils.makeMenuItem(key, this,
                         "deleteMetaData", key));
             }
@@ -670,13 +695,12 @@ public class TextPointDataSource extends PointDataSource {
         JComponent metaDataComp = getMetaDataComponent(contents);
 
         boolean ok = GuiUtils.showOkCancelDialog(null, "Point Data",
-                                                 metaDataComp,
-                                                 null); 
-        if(metaDataPropertiesWrapper!=null) {
+                         metaDataComp, null);
+        if (metaDataPropertiesWrapper != null) {
             metaDataPropertiesWrapper.add(BorderLayout.CENTER, metaDataComp);
         }
-    
-        if(!ok) {
+
+        if ( !ok) {
             return false;
         }
         applyMetaDataFields();
@@ -692,7 +716,9 @@ public class TextPointDataSource extends PointDataSource {
      * @return ok
      */
     public boolean applyProperties() {
-        if(!super.applyProperties()) return false;
+        if ( !super.applyProperties()) {
+            return false;
+        }
         if (map != null) {
             applyMetaDataFields();
             flushCache();
@@ -707,15 +733,15 @@ public class TextPointDataSource extends PointDataSource {
      */
     public void addPropertiesTabs(JTabbedPane tabbedPane) {
         super.addPropertiesTabs(tabbedPane);
-        if (!metaDataOk && map == null) {
+        if ( !metaDataOk && (map == null)) {
             try {
                 DataChoice dataChoice = (DataChoice) getDataChoices().get(0);
-                Data sample = makeObs(dataChoice, null, null, null, true, false);
-            } catch(Exception exc) {
-            }
+                Data sample = makeObs(dataChoice, null, null, null, true,
+                                      false);
+            } catch (Exception exc) {}
         }
 
-        if (!metaDataOk || map != null) {
+        if ( !metaDataOk || (map != null)) {
             try {
                 JComponent comp = getMetaDataComponent(null);
                 metaDataPropertiesWrapper = GuiUtils.center(comp);
@@ -739,11 +765,11 @@ public class TextPointDataSource extends PointDataSource {
         int    skip      = 0;
         for (int i = 0; i < paramRows.size(); i++) {
             ParamRow paramRow = (ParamRow) paramRows.get(i);
-            String unit    = paramRow.getUnit();
-            String name = paramRow.getCleanName();
-            String missing = paramRow.getMissing();
-            String extra = paramRow.getExtra();
-            List   fields  = new ArrayList();
+            String   unit     = paramRow.getUnit();
+            String   name     = paramRow.getCleanName();
+            String   missing  = paramRow.getMissing();
+            String   extra    = paramRow.getExtra();
+            List     fields   = new ArrayList();
             if (name.length() > 0) {
                 if (unit.length() == 0) {
                     unit = "Text";
@@ -814,7 +840,9 @@ public class TextPointDataSource extends PointDataSource {
      * @param fieldList widgets
      */
     public void applySavedMetaData(List fieldList) {
-        for (int tokIdx = 0; tokIdx < paramRows.size() && tokIdx< fieldList.size(); tokIdx++) {
+        for (int tokIdx = 0;
+                (tokIdx < paramRows.size()) && (tokIdx < fieldList.size());
+                tokIdx++) {
             ParamRow paramRow = (ParamRow) paramRows.get(tokIdx);
             paramRow.applyMetaData((List) fieldList.get(tokIdx));
         }
@@ -1263,7 +1291,8 @@ public class TextPointDataSource extends PointDataSource {
             }
             try {
                 DataChoice dataChoice = (DataChoice) getDataChoices().get(0);
-                Data sample = makeObs(dataChoice, null, null, null, true, true);
+                Data sample = makeObs(dataChoice, null, null, null, true,
+                                      true);
                 //            System.err.println ("sample:" + sample);
 
                 List cats = DataCategory.parseCategories("Track" + ";trace",
@@ -1465,72 +1494,138 @@ public class TextPointDataSource extends PointDataSource {
         return skipRows;
     }
 
+    /**
+     * Class ParamRow _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     private static class ParamRow {
+
+        /** _more_          */
         JComboBox nameBox;
+
+        /** _more_          */
         JTextField extraFld;
+
+        /** _more_          */
         JTextField missingFld;
+
+        /** _more_          */
         JTextField unitFld;
+
+        /** _more_          */
         JButton popupBtn;
+
+        /** _more_          */
         JLabel sample;
+
+        /** _more_          */
         static Vector boxNames;
+
+        /** _more_          */
         static Vector unitNames;
 
+        /**
+         * _more_
+         */
         public ParamRow() {
-            if(boxNames == null) {
+            if (boxNames == null) {
                 boxNames = new Vector(Misc.newList("", "Time", "Latitude",
-                                                   "Longitude", "Altitude"));
+                        "Longitude", "Altitude"));
                 String unitStr =
                     ";celsius;kelvin;fahrenheit;deg;degrees west;feet;km;meters;m;miles;kts;yyyy-MM-dd HH:mm:ss";
-                unitNames = new Vector(StringUtil.split(unitStr, ";",
-                                                        false, false));
+                unitNames = new Vector(StringUtil.split(unitStr, ";", false,
+                        false));
             }
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public String getCleanName() {
             return ucar.visad.Util.cleanName(getName());
         }
 
 
+        /**
+         * _more_
+         *
+         * @param name _more_
+         */
         public void setName(String name) {
             nameBox.setSelectedItem(name);
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public String getName() {
             return nameBox.getSelectedItem().toString().trim();
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public String getExtra() {
             return extraFld.getText().trim();
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public String getMissing() {
             return missingFld.getText().trim();
         }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public String getUnit() {
             return unitFld.getText().trim();
         }
 
+        /**
+         * _more_
+         *
+         * @param tokIdx _more_
+         * @param toks _more_
+         * @param comps _more_
+         */
         public void init(int tokIdx, List toks, List comps) {
-            if(nameBox == null) {
+            if (nameBox == null) {
                 nameBox = new JComboBox(boxNames);
                 nameBox.setEditable(true);
                 nameBox.setPreferredSize(new Dimension(40, 10));
                 extraFld = new JTextField("", 5);
                 extraFld.setToolTipText(
-                                        "<html>Extra attributes, e.g.:<br>colspan=&quot;some column span&quot;<br>Note:Values must be quoted.</html>"); 
+                    "<html>Extra attributes, e.g.:<br>colspan=&quot;some column span&quot;<br>Note:Values must be quoted.</html>");
                 missingFld = new JTextField("", 5);
-                unitFld= new JTextField("", 10);
-                popupBtn =   GuiUtils.getImageButton("/auxdata/ui/icons/Down.gif",
-                                                     getClass());
+                unitFld    = new JTextField("", 10);
+                popupBtn =
+                    GuiUtils.getImageButton("/auxdata/ui/icons/Down.gif",
+                                            getClass());
                 popupBtn.setToolTipText("Set unit");
                 popupBtn.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent ae) {
-                            GuiUtils.popupUnitMenu(unitFld, popupBtn);
-                        }
-                    });
+                    public void actionPerformed(ActionEvent ae) {
+                        GuiUtils.popupUnitMenu(unitFld, popupBtn);
+                    }
+                });
                 sample = new JLabel("");
             }
-            sample.setText(toks.get(tokIdx).toString());
+            sample.setText(StringUtil.shorten(toks.get(tokIdx).toString(),
+                    25));
             comps.add(sample);
             comps.add(nameBox);
             comps.add(GuiUtils.centerRight(unitFld, popupBtn));
@@ -1538,6 +1633,11 @@ public class TextPointDataSource extends PointDataSource {
             comps.add(extraFld);
         }
 
+        /**
+         * _more_
+         *
+         * @param fields _more_
+         */
         public void applyMetaData(List fields) {
             nameBox.setSelectedItem((String) fields.get(0));
             unitFld.setText((String) fields.get(1));
@@ -1549,12 +1649,14 @@ public class TextPointDataSource extends PointDataSource {
             }
         }
 
+        /**
+         * _more_
+         *
+         * @param metaDataFields _more_
+         */
         public void addToMetaData(List metaDataFields) {
-            metaDataFields.add(Misc.newList(
-                                            getCleanName(),
-                                            getUnit(),
-                                            getMissing(),
-                                            getExtra()));
+            metaDataFields.add(Misc.newList(getCleanName(), getUnit(),
+                                            getMissing(), getExtra()));
 
         }
 
