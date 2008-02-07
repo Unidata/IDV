@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.visad.display;
 
 
@@ -30,6 +31,8 @@ import visad.*;
 import visad.java2d.*;
 
 import visad.java3d.*;
+
+import visad.util.HersheyFont;
 
 import java.awt.Font;
 
@@ -61,7 +64,7 @@ public class TextDisplayable extends LineDrawing {
     NumberFormat labelFormat = new DecimalFormat("#########");
 
     /** text font */
-    Font labelFont = null;
+    Object labelFont = null;
 
     /** The text rotation */
     private double rotation = 0.0;
@@ -322,18 +325,23 @@ public class TextDisplayable extends LineDrawing {
     /**
      * Set the Font for all
      *
-     * @param font  font for text
+     * @param font  font for text (Font or HersheyFont)
      *
      * @throws RemoteException   Java RMI error
-     * @throws VisADException    VisAD error
+     * @throws VisADException    VisAD error or not a valid font object
      */
-    public void setFont(Font font) throws VisADException, RemoteException {
+    public void setFont(Object font) throws VisADException, RemoteException {
+        if ( !((font instanceof java.awt.Font)
+                || (font instanceof visad.util.HersheyFont)
+                || (font == null))) {
+            throw new VisADException(
+                "Font must be java.awt.Font or HersheyFont");
+        }
         if (textControl != null) {
             textControl.setFont(font);
         }
         labelFont = font;
     }
-
 
     /**
      * Set the rotation
@@ -369,11 +377,29 @@ public class TextDisplayable extends LineDrawing {
     }
 
     /**
-     * Get the font for labels.  May be null (if not set)
+     * Get the font for labels.  May be null (if not set or using HersheyFont)
      * @return font used for labeling
      */
     public Font getFont() {
-        return labelFont;
+
+        if (labelFont instanceof java.awt.Font) {
+            return (Font) labelFont;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Get the font for labels.  May be null (if not set or using HersheyFont)
+     * @return font used for labeling
+     */
+    public HersheyFont getHersheyFont() {
+
+        if (labelFont instanceof visad.util.HersheyFont) {
+            return (HersheyFont) labelFont;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -434,7 +460,9 @@ public class TextDisplayable extends LineDrawing {
     public void setDisplayUnit(Unit unit)
             throws VisADException, RemoteException {
         //Make sure this unit is ok
-        if (!(textType instanceof RealType)) return;
+        if ( !(textType instanceof RealType)) {
+            return;
+        }
         checkUnit((RealType) textType, unit);
         super.setDisplayUnit(unit);
         applyDisplayUnit(textMap, (RealType) textType);
