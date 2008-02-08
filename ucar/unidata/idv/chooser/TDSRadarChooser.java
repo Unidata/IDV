@@ -87,10 +87,10 @@ public class TDSRadarChooser extends TimesChooser {
 
     /** Each dataset collection URL */
     //"http://motherlode.ucar.edu:8080/thredds/radarServer/level2/idd/dataset.xml";
-    private String collectionUrl;
+    //private String collectionUrl;
 
     /** id --> collectionUrl */
-    private HashMap collectionHMap;
+    //private HashMap collectionHMap;
 
     /** Component to hold collections */
     private JComboBox collectionSelector;
@@ -216,7 +216,7 @@ public class TDSRadarChooser extends TimesChooser {
         collectionSelector.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
 
-                collectionUrl = TwoFacedObject.getIdString(
+                String collectionUrl = TwoFacedObject.getIdString(
                     collectionSelector.getSelectedItem());
                 /*
                 String collectionID =
@@ -305,7 +305,7 @@ public class TDSRadarChooser extends TimesChooser {
         GuiUtils.enableComponents(compsThatNeedServer, true);
         setAbsoluteTimes(new ArrayList());
         selectedStation = null;
-        Misc.run(this, "initializeCollection");
+        Misc.run(this, "initializeCollection", s);
     }
 
     /**
@@ -347,6 +347,8 @@ public class TDSRadarChooser extends TimesChooser {
         }
 
         org.jdom.Element rootElem = doc.getRootElement();
+        org.jdom.Element serviceElem = readElements(rootElem, "service");
+        String uriBase = serviceElem.getAttributeValue("base");
         org.jdom.Element dsElem   = readElements(rootElem, "dataset");
         String           naming   = "catalogRef";
         Namespace        nss      = rootElem.getNamespace("xlink");
@@ -355,11 +357,11 @@ public class TDSRadarChooser extends TimesChooser {
             org.jdom.Element child     = (org.jdom.Element) children.get(j);
             String           childName = child.getName();
             if (childName.equals(naming)) {
-                String id   = child.getAttributeValue("ID");
+                //String id   = child.getAttributeValue("ID");
                 String desc = child.getAttributeValue("title", nss);
-                // TwoFacedObject twoObj = new TwoFacedObject(desc, id);
-                String c = radarServerURL.replaceFirst("catalog.xml", "");
-                String         ul     = c + id + "/dataset.xml";
+                String urlpath = child.getAttributeValue("urlPath");
+                String[] c = radarServerURL.split(uriBase); //.replaceFirst("catalog.xml", "");
+                String         ul     = c[0] + uriBase + urlpath;
                 TwoFacedObject twoObj = new TwoFacedObject(desc, ul);
                 collections.add(twoObj);
                 //collections.put(desc, ul);
@@ -394,14 +396,14 @@ public class TDSRadarChooser extends TimesChooser {
     /**
      * Make the collection.  If there is an error, pop up a user message.
      */
-    public void initializeCollection() {
+    public void initializeCollection(String url) {
 
         List stations = new ArrayList();
         try {
             StringBuffer errlog = new StringBuffer();
             try {
                 collection = TDSRadarDatasetCollection.factory("test",
-                        collectionUrl, errlog);
+                        url, errlog);
             } catch (Exception exc) {
                 userMessage("Invalid catalog");
                 /*
@@ -510,6 +512,8 @@ public class TDSRadarChooser extends TimesChooser {
         }
         try {
             DateSelection dateSelection = new DateSelection();
+            String collectionUrl = TwoFacedObject.getIdString(
+                    collectionSelector.getSelectedItem());
             RadarQuery radarQuery = new RadarQuery(collectionUrl,
                                         selectedStation.getID(),
                                         dateSelection);
