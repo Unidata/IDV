@@ -183,6 +183,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** igml xml attributes */
     public static final String ATTR_STEPS = "steps";
 
+    public static final String ATTR_VIEWPOINTFILE = "viewpointfile";
+
 
     /** Action commands for gui buttons */
     public static final String CMD_GRAB = "grab";
@@ -281,6 +283,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
     /** List of times corresponding to each image */
     Vector times = new Vector();
+
+    List  positions = new ArrayList();
 
     /** List of earth locations corresponding to each image */
     Vector locs = new Vector();
@@ -957,6 +961,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 animationWidget.gotoBeginning();
             }
 
+            System.err.println ("view manager:" + (viewManager!=null));
             int sleepTime =
                 idv.getStateManager().getProperty("idv.capture.sleep",
                     SLEEP_TIME);
@@ -981,7 +986,26 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     //Now grab the image in block mode
                     grabImageAndBlock();
                 }
-
+            } else  if ((scriptingNode != null) && viewManager!=null  
+                        && XmlUtil.hasAttribute(scriptingNode, ATTR_VIEWPOINTFILE)) {
+                String viewpointFile = 
+                    imageGenerator.applyMacros(scriptingNode, ATTR_VIEWPOINTFILE);
+                List viewpoints = (List)idv.decodeObject(IOUtil.readContents(viewpointFile, getClass()));
+                System.err.println ("doing it");
+                for (int i = 0; i < viewpoints.size();i++) {
+                    double[]matrix = (double[]) viewpoints.get(i);
+                    viewManager.setDisplayMatrix(matrix);
+                    //Sleep for a bit  to allow for the display to redraw itself
+                    try {
+                        Misc.sleep(sleepTime);
+                    } catch (Exception exc) {}
+                    //Has the user pressed Stop?
+                    if ( !keepRunning(timestamp)) {
+                        break;
+                    }
+                    //Now grab the image in block mode
+                    grabImageAndBlock();
+                }
             } else {
                 int start = anime.getCurrent();
                 while (true) {
@@ -1155,6 +1179,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 String filename = images.get(previewIndex).toString();
                 images.remove(previewIndex);
                 times.remove(previewIndex);
+                positions.remove(previewIndex);
                 locs.remove(previewIndex);
                 previewIndex--;
                 imagesChanged();
@@ -1196,6 +1221,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     }
 
 
+    private boolean writePositions= false;
+
     /**
      * Write out the movie
      */
@@ -1203,17 +1230,22 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         stopCapturingAuto();
         String filename = null;
         if (isInteractive() && (movieFileName == null)) {
+            JCheckBox writePositionsCbx = new JCheckBox("Save viewpoints", writePositions);
+            writePositionsCbx.setToolTipText("Also save the viewpoint matrices as an 'xidv' file");
+
             JComponent extra =
                 GuiUtils.topCenter(
+                                   GuiUtils.vbox(
                     GuiUtils.hflow(
                         Misc.newList(
-                            GuiUtils.rLabel(" Frames per second:"),
-                            displayRateFld)), GuiUtils.filler());
+                            GuiUtils.rLabel(" Frames per second: "),
+                            displayRateFld)), writePositionsCbx), GuiUtils.filler());
             filename =
                 FileManager.getWriteFile(Misc.newList(FileManager.FILTER_MOV,
                     FileManager.FILTER_AVI, FileManager.FILTER_ANIMATEDGIF,
                     FileManager.FILTER_KMZ,
                     FILTER_ANIS), FileManager.SUFFIX_MOV, extra);
+            writePositions = writePositionsCbx.isSelected();
         } else {
             filename = movieFileName;
         }
@@ -1530,10 +1562,13 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 }
                 images.add(path);
                 times.add(time);
+
                 //TODO
                 if (viewManager != null) {
+                    positions.add(viewManager.getDisplayMatrix());
                     locs.add(viewManager.getVisibleGeoBounds());
                 } else {
+                    positions.add(null);
                     locs.add(null);
                 }
                 imagesChanged();
@@ -1666,6 +1701,17 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 && scriptingNode.getTagName().equals("panel")) {
             doingPanel = true;
         }
+
+        if(writePositions && fileToks.size()>0) {
+            try {
+                String positionFilename = IOUtil.stripExtension((String)fileToks.get(0))+".xidv";
+                IOUtil.writeFile(positionFilename, idv.encodeObject(positions,true));
+            } catch (IOException ioe) {
+                LogUtil.userErrorMessage("Error writing positions:" + ioe);
+                return;
+            }
+        }
+
 
         //        System.err.println("doingPanel:" + doingPanel + " " + scriptingNode);
         for (int i = 0; i < fileToks.size(); i++) {
