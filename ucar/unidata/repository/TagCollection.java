@@ -91,6 +91,16 @@ public class TagCollection {
                                          100)));
     }
 
+    public void appendToSearchForm(StringBuffer sb, String argName) {
+        List tagList = new ArrayList(tags);
+        tagList.add(0, TypeHandler.NONE_OBJECT);
+        String label =  getLabel() + ":";
+        label = label.replace(" ", "&nbsp;");
+        sb.append(HtmlUtil.formEntry(label,
+                                     HtmlUtil.select(argName, tagList, "",
+                                         100)));
+    }
+
 
     /**
      * _more_

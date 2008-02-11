@@ -1,7 +1,6 @@
 <api>
   <method request="/group/show"  method="processGroupShow"    admin="false" cancache="true" name="Home" toplevel="true" ishome="true"/>
-  <method request="/group/add"   method="processGroupAdd"    admin="false" cancache="true" name="Groups" />
-  <method request="/group/form"  method="processGroupForm"    admin="false" cancache="true" name="Groups" toplevel="false" />
+
   <method request="/entry/searchform"  method="processEntrySearchForm"   admin="false" cancache="true" name="Search" toplevel="true"/>
   <method request="/entry/search"  method="processEntrySearch"        admin="false" cancache="true"/>
   <method request="/list/home"   method="processListHome"     admin="false" cancache="true" name="List" toplevel="true"/>

@@ -921,20 +921,20 @@ public class TypeHandler implements Constants, Tables {
 
         List dateSelect = new ArrayList();
         //        dateSelect.add(new TwoFacedObject("Last 1/2 hour", "-30 minutes"));
-        dateSelect.add(new TwoFacedObject("Last  hour", "-1 hour"));
-        dateSelect.add(new TwoFacedObject("Last 2 hours", "-2 hours"));
+        dateSelect.add(new TwoFacedObject("Last hour", "-1 hour"));
+        //        dateSelect.add(new TwoFacedObject("Last 2 hours", "-2 hours"));
         dateSelect.add(new TwoFacedObject("Last 3 hours", "-3 hours"));
         dateSelect.add(new TwoFacedObject("Last 6 hours", "-6 hours"));
         dateSelect.add(new TwoFacedObject("Last 12 hours", "-12 hours"));
         dateSelect.add(new TwoFacedObject("Last day", "-1 day"));
-        dateSelect.add(new TwoFacedObject("Last 2 days", "-2 days"));
+        //        dateSelect.add(new TwoFacedObject("Last 2 days", "-2 days"));
         dateSelect.add(new TwoFacedObject("Last 7 days", "-7 days"));
-        dateSelect.add(new TwoFacedObject("None", "none"));
+        dateSelect.add(new TwoFacedObject("All", "none"));
         dateSelect.add(new TwoFacedObject("Custom:", ""));
         String dateSelectInput = HtmlUtil.select(ARG_RELATIVEDATE,
                                      dateSelect,
                                      request.getString(ARG_RELATIVEDATE,
-                                         "-30 minutes"));
+                                         "-1 hour"));
         String minDate = request.getDateSelect(ARG_FROMDATE, (String) null);
         String maxDate = request.getDateSelect(ARG_TODATE, (String) null);
 
@@ -1086,7 +1086,7 @@ public class TypeHandler implements Constants, Tables {
                 
                 int cnt = 0;
                 for (TagCollection tc : repository.getTagCollections()) {
-                    tc.appendToForm(formBuffer, ARG_TAG+"."+(cnt++), null);
+                    tc.appendToSearchForm(formBuffer, ARG_TAG+"."+(cnt++));
                 }
             }
             formBuffer.append("\n");

@@ -608,12 +608,15 @@ public class HtmlOutputHandler extends OutputHandler {
     public void getMetadataHtml(Request request, Entry entry, StringBuffer sb)
             throws Exception {
         boolean        showMetadata = request.get(ARG_SHOWMETADATA, false);
+
+
         List<Metadata> metadataList = repository.getMetadata(entry);
         List<Tag>      tagList = repository.getTags(request, entry.getId());
         if ((tagList.size() == 0) && (metadataList.size() == 0)) {
             return;
         }
         sb.append("<p>\n");
+
         String url = request.getUrl(ARG_SHOWMETADATA) + "&"
                      + ARG_SHOWMETADATA + "=" + (showMetadata
                 ? "false"

@@ -115,11 +115,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     public RequestUrl URL_GROUP_SHOW = new RequestUrl(this, "/group/show");
 
-    /** _more_ */
-    public RequestUrl URL_GROUP_ADD = new RequestUrl(this, "/group/add");
 
-    /** _more_ */
-    public RequestUrl URL_GROUP_FORM = new RequestUrl(this, "/group/form");
 
     /** _more_ */
     public RequestUrl URL_ENTRY_SEARCHFORM = new RequestUrl(this,
@@ -590,6 +586,10 @@ public class Repository implements Constants, Tables, RequestHandler,
         getAdmin().initHarvesters();
     }
 
+    protected void usage(String message) {
+        throw new IllegalArgumentException(message+"\nusage: repository\n\t-admin <admin name> <admin password>\n\t-port <http port>\n\t-Dname=value (e.g., -Djdms.db=derby to specify the derby database)");
+    }
+
 
 
     /**
@@ -637,8 +637,8 @@ public class Repository implements Constants, Tables, RequestHandler,
                 }
                 argProperties.put(toks.get(0), toks.get(1));
             } else {
-                throw new IllegalArgumentException("Unknown argument: "
-                        + args[i]);
+                usage("Unknown argument: "
+                      + args[i]);
             }
         }
 
@@ -1083,8 +1083,8 @@ public class Repository implements Constants, Tables, RequestHandler,
         } catch (Exception exc) {
             //TODO: For non-html outputs come up with some error format
             Throwable inner = LogUtil.getInnerException(exc);
-            StringBuffer sb = new StringBuffer("An error has occurred:<pre>"
-                                  + inner.getMessage() + "</pre>");
+            StringBuffer sb = new StringBuffer("An error has occurred:"
+                                               + warning(inner.getMessage()));
             if (request.getRequestContext().getUser().getAdmin()) {
                 sb.append("<pre>" + LogUtil.getStackTrace(inner) + "</pre>");
             }
@@ -1928,23 +1928,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         whatList.addAll(typeHandler.getListTypes(true));
 
         String output     = (String) request.getOutput("");
-        String outputHtml = "";
-        if ( !basicForm) {
-            outputHtml = HtmlUtil.span("Output Type: ",
-                                       "class=\"formlabel\"");
-            if (output.length() == 0) {
-                outputHtml += HtmlUtil.select(ARG_OUTPUT,
-                        getOutputTypesFor(request, what));
-            } else {
-                outputHtml += sb.append(HtmlUtil.hidden(ARG_OUTPUT, output));
-            }
-            String orderBy = HtmlUtil.space(2)
-                             + HtmlUtil.checkbox(ARG_ASCENDING, "true",
-                                 request.get(ARG_ASCENDING,
-                                             false)) + " Sort ascending";
-            outputHtml += orderBy;
 
-        }
 
 
 
@@ -1969,12 +1953,46 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         typeHandler.addToSearchForm(request, sb, where, basicForm);
 
+        String outputHtml = "";
+        if ( !basicForm) {
+            //            outputHtml = HtmlUtil.span("Output Type: ",
+            //                                       "class=\"formlabel\"");
+            if (output.length() == 0) {
+                outputHtml += HtmlUtil.select(ARG_OUTPUT,
+                        getOutputTypesFor(request, what));
+            } else {
+                outputHtml += sb.append(HtmlUtil.hidden(ARG_OUTPUT, output));
+            }
+
+            List orderByList = new ArrayList();
+            orderByList.add(new TwoFacedObject("None","none"));
+            orderByList.add(new TwoFacedObject("From Date","fromdate"));
+            orderByList.add(new TwoFacedObject("To Date","todate"));
+            orderByList.add(new TwoFacedObject("Create Date","createdate"));
+            orderByList.add(new TwoFacedObject("Name","name"));
+
+            String orderBy = HtmlUtil.space(2) +
+                HtmlUtil.bold("Order by: ") +
+                HtmlUtil.select(ARG_ORDERBY,
+                                     orderByList,
+                                     request.getString(ARG_ORDERBY,
+                                                       "none")) +
+                HtmlUtil.checkbox(ARG_ASCENDING, "true",
+                                  request.get(ARG_ASCENDING,
+                                              false)) + " ascending";
+            sb.append(HtmlUtil.formEntry("Output Type:",outputHtml+orderBy));
+            //            outputHtml += orderBy;
+
+        }
+
+
+
+
         sb.append(HtmlUtil.formEntry("",
                                      HtmlUtil.submit("Search", "submit")
                                      + " "
                                      + HtmlUtil.submit("Search Subset",
-                                         "submit_subset") + HtmlUtil.space(2)
-                                             + outputHtml));
+                                         "submit_subset")));
         sb.append("</table>");
         sb.append("</form>");
         //        sb.append(IOUtil.readContents("/ucar/unidata/repository/resources/map.js",
@@ -2423,6 +2441,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+
     /**
      * _more_
      *
@@ -2612,9 +2631,9 @@ public class Repository implements Constants, Tables, RequestHandler,
                 sb.append(
                     HtmlUtil.formEntry(
                         "Date Range:",
-                        HtmlUtil.input(ARG_FROMDATE, fromDate, " size=30 ")
+                        HtmlUtil.input(ARG_FROMDATE, fromDate, HtmlUtil.SIZE_30)
                         + " -- "
-                        + HtmlUtil.input(ARG_TODATE, toDate, " size=30 ")
+                        + HtmlUtil.input(ARG_TODATE, toDate, HtmlUtil.SIZE_30)
                         + dateHelp));
                 if (entry == null) {
                     List datePatterns = new ArrayList();
@@ -2624,9 +2643,11 @@ public class Repository implements Constants, Tables, RequestHandler,
                         datePatterns.add(DateUtil.DATE_FORMATS[i]);
                     }
 
-                    sb.append(HtmlUtil.formEntry("Date Pattern:",
-                            HtmlUtil.select(ARG_DATE_PATTERN, datePatterns)
-                            + " (use file name)"));
+                    if (typeHandler.okToShowInForm(ARG_RESOURCE)) {
+                        sb.append(HtmlUtil.formEntry("Date Pattern:",
+                                                     HtmlUtil.select(ARG_DATE_PATTERN, datePatterns)
+                                                     + " (use file name)"));
+                    }
 
                 }
             }
@@ -2652,7 +2673,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 sb.append(
                     HtmlUtil.formEntry(
                         "Tags:",
-                        HtmlUtil.input(ARG_TAG, tagString, " size=\"40\" ")
+                        HtmlUtil.input(ARG_TAG, tagString, HtmlUtil.SIZE_40)
                         + " (comma separated)"));
 
                 if (tagCollections.size() > 0) {
@@ -2819,7 +2840,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry("Subject:",
                                      HtmlUtil.input(ARG_SUBJECT, subject,
-                                         " size=\"40\" ")));
+                                                    HtmlUtil.SIZE_40)));
         sb.append(HtmlUtil.formEntryTop("Comment:",
                                         HtmlUtil.textArea(ARG_COMMENT,
                                             comment, 5, 40)));
@@ -2828,8 +2849,8 @@ public class Repository implements Constants, Tables, RequestHandler,
                                      + HtmlUtil.space(2)
                                      + HtmlUtil.submit("Cancel",
                                          ARG_CANCEL)));
-        sb.append("</table>");
-        sb.append("</form>");
+        sb.append(HtmlUtil.formTableClose());
+        sb.append(HtmlUtil.formClose());
         return new Result("Entry Comments", sb, Result.TYPE_HTML);
     }
 
@@ -3439,97 +3460,8 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processGroupAdd(Request request) throws Exception {
-        StringBuffer sb       = new StringBuffer();
-        Group        group    = null;
-        String       fullName = null;
-        String       newName  = request.getString(ARG_NAME, "");
-        if ( !request.defined(ARG_GROUP)) {
-            if ( !request.getRequestContext().getUser().getAdmin()) {
-                throw new IllegalArgumentException(
-                    "Cannot create a top level group");
-            }
-            fullName = newName;
-        } else {
-            group = findGroup(request, true);
-            if (newName.length() == 0) {
-                sb.append(makeGroupHeader(request, group));
-                sb.append("<p>Need to specify a group name");
-                sb.append(HtmlUtil.formTable());
-                sb.append(makeNewGroupForm(request, group, ""));
-                sb.append("</table>");
-                return new Result("Add Group", sb);
-            }
-            fullName = group.getFullName() + "/" + newName;
-        }
-        Group newGroup = findGroupFromName(fullName);
-        if (newGroup != null) {
-            if (group != null) {
-                sb.append(makeGroupHeader(request, group));
-            }
-            sb.append("<p>Given group name already exists");
-            sb.append(HtmlUtil.formTable());
-            sb.append(makeNewGroupForm(request, group, newName));
-            sb.append("</table>");
-            return new Result("Add Group", sb);
-        }
-
-        newGroup = findGroupFromName(fullName,
-                                     request.getRequestContext().getUser(),
-                                     true);
-        return new Result(HtmlUtil.url(URL_GROUP_SHOW, ARG_GROUP,
-                                       newGroup.getFullName()));
-    }
 
 
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processGroupForm(Request request) throws Exception {
-        Group        group = findGroup(request, true);
-        StringBuffer sb    = new StringBuffer();
-
-        if (request.defined(ACTION_EDIT)) {
-            //TODO: put the change into the DB
-            group.setName(request.getString(ARG_NAME, group.getName()));
-        }
-
-        sb.append(getBreadCrumbs(request, group, true, "")[1]);
-        sb.append(HtmlUtil.space(2));
-        sb.append(getAllGroupLinks(request, group));
-        sb.append("<p>");
-        sb.append("<table cellpadding=\"5\">");
-        sb.append(HtmlUtil.form(URL_GROUP_FORM, ""));
-        sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
-        sb.append(HtmlUtil.formEntry("Name:",
-                                     HtmlUtil.input(ARG_NAME,
-                                         group.getName())));
-
-        sb.append(HtmlUtil.formEntry("",
-                                     HtmlUtil.submit("Edit Group",
-                                         ACTION_EDIT)));
-        sb.append("</form>");
-        sb.append("</table>");
-        return new Result("Group Form:" + group.getFullName(), sb,
-                          Result.TYPE_HTML);
-    }
 
 
     /**
@@ -4735,12 +4667,15 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (by.equals("fromdate")) {
                 orderBy = " ORDER BY " + COL_ENTRIES_FROMDATE + order;
             } else if (by.equals("todate")) {
-                orderBy = " ORDER BY " + COL_ENTRIES_FROMDATE + order;
+                orderBy = " ORDER BY " + COL_ENTRIES_TODATE + order;
+            } else if (by.equals("createdate")) {
+                orderBy = " ORDER BY " + COL_ENTRIES_CREATEDATE + order;
             } else if (by.equals("name")) {
                 orderBy = " ORDER BY " + COL_ENTRIES_NAME + order;
             }
         } else {
-            orderBy = " ORDER BY " + COL_ENTRIES_FROMDATE + order;
+            //Maybe don't by default do an order by
+            //            orderBy = " ORDER BY " + COL_ENTRIES_FROMDATE + order;
         }
 
 

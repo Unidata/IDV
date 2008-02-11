@@ -87,7 +87,7 @@ public class MetaDataServer extends HttpServer implements Constants {
             repository = new Repository(args, null, getPort());
             repository.init();
         } catch (Exception exc) {
-            exc.printStackTrace();
+            //            exc.printStackTrace();
             throw new WrapperException(exc);
         }
         super.init();

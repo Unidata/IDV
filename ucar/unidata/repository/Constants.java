@@ -300,6 +300,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_SHOWMETADATA = "showmetadata";
 
+    public static final String ARG_COMMENTS = "showcomments";
+
     /** _more_ */
     public static final String ARG_OUTPUT = "output";
 
