@@ -3666,7 +3666,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         int         skipCnt     = request.get(ARG_SKIP, 0);
         Statement statement = typeHandler.executeSelect(request,
                                   COL_ENTRIES_ID, where,
-                                  getQueryOrderAndLimit(request));
+                                                        getQueryOrderAndLimit(request, true));
         SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
         List<String>     ids  = new ArrayList<String>();
         ResultSet        results;
@@ -4650,7 +4650,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @return _more_
      */
-    protected String getQueryOrderAndLimit(Request request) {
+    protected String getQueryOrderAndLimit(Request request, boolean addOrderBy) {
         String order = " DESC ";
         if (request.get(ARG_ASCENDING, false)) {
             order = " ASC ";
@@ -4662,6 +4662,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         int max = request.get(ARG_MAX, MAX_ROWS);
         limitString = getDatabaseManager().getLimitString(skipCnt, max);
         String orderBy = "";
+        if(addOrderBy) {
+            orderBy = " ORDER BY " + COL_ENTRIES_FROMDATE + order;
+        }
         if (request.defined(ARG_ORDERBY)) {
             String by = request.getString(ARG_ORDERBY, "");
             if (by.equals("fromdate")) {
@@ -4673,11 +4676,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             } else if (by.equals("name")) {
                 orderBy = " ORDER BY " + COL_ENTRIES_NAME + order;
             }
-        } else {
-            //Maybe don't by default do an order by
-            //            orderBy = " ORDER BY " + COL_ENTRIES_FROMDATE + order;
         }
-
 
         return orderBy + limitString;
         //            }
@@ -4700,7 +4699,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         int         skipCnt     = request.get(ARG_SKIP, 0);
         Statement statement = typeHandler.executeSelect(request,
                                   COLUMNS_ENTRIES, where,
-                                  getQueryOrderAndLimit(request));
+                                                        getQueryOrderAndLimit(request,false));
 
 
 
