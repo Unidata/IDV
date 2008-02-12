@@ -248,6 +248,15 @@ public class Request implements Constants {
     /**
      * _more_
      *
+     * @return _more_
+     */
+    public Hashtable getArgs() {
+        return parameters;
+    }
+
+    /**
+     * _more_
+     *
      * @param o _more_
      *
      * @return _more_

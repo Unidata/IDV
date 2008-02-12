@@ -122,6 +122,15 @@ public class RepositoryManager implements RepositorySource, Constants,
     /**
      * _more_
      *
+     * @return _more_
+     */
+    public DatabaseManager getDatabaseManager() {
+        return repository.getDatabaseManager();
+    }
+
+    /**
+     * _more_
+     *
      * @param name _more_
      * @param dflt _more_
      *

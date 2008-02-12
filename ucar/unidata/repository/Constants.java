@@ -202,7 +202,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_DATE = "date";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_DATE_PATTERN = "date.pattern";
 
     /** _more_ */
@@ -298,6 +298,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_SHOWMETADATA = "showmetadata";
 
+    /** _more_ */
     public static final String ARG_COMMENTS = "showcomments";
 
     /** _more_ */
@@ -312,10 +313,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ID = "id";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_METADATA_ID = "metadataid";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_EDIT_METADATA = "edit.metadata";
 
     /** _more_ */
@@ -377,7 +378,7 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_DOWNLOAD_OK = "jdms.download.ok";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_TAGNAMES = "jdms.html.tagnames";
 
 
@@ -558,7 +559,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_FILE = "file";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_FILE_UNZIP = "file.unzip";
 
     /** _more_ */

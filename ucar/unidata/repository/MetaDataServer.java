@@ -218,8 +218,8 @@ public class MetaDataServer extends HttpServer implements Constants {
                 cache = false;
                 redirect(result.getRedirectUrl());
             } else if (result.getInputStream() != null) {
-                writeResult(result.getResponseCode(), result.getInputStream(),
-                            result.getMimeType());
+                writeResult(result.getResponseCode(),
+                            result.getInputStream(), result.getMimeType());
             } else {
                 writeResult(result.getResponseCode(), result.getContent(),
                             result.getMimeType());
@@ -300,7 +300,8 @@ public class MetaDataServer extends HttpServer implements Constants {
             MetaDataServer mds = new MetaDataServer(args);
             mds.init();
         } catch (Exception exc) {
-            LogUtil.printExceptionNoGui(null, "Error in main", exc);
+            LogUtil.printExceptionNoGui(null, "Error in main",
+                                        LogUtil.getInnerException(exc));
             System.exit(1);
         }
     }

@@ -54,63 +54,63 @@ import java.util.regex.*;
  */
 public class LdmListener {
 
-    /** _more_          */
+    /** _more_ */
     private boolean debug = false;
 
-    /** _more_          */
+    /** _more_ */
     private BufferedReader br;
 
-    /** _more_          */
+    /** _more_ */
     private SimpleDateFormat yearSdf;
 
-    /** _more_          */
+    /** _more_ */
     private SimpleDateFormat monthSdf;
 
-    /** _more_          */
+    /** _more_ */
     private List files = new ArrayList();
 
-    /** _more_          */
+    /** _more_ */
     private Pattern pattern;
 
-    /** _more_          */
+    /** _more_ */
     private String type = "any";
 
-    /** _more_          */
+    /** _more_ */
     private String bufferFile;
 
-    /** _more_          */
+    /** _more_ */
     private FileOutputStream bufferOS;
 
-    /** _more_          */
+    /** _more_ */
     int bufferCnt = 0;
 
-    /** _more_          */
+    /** _more_ */
     long startTime;
 
-    /** _more_          */
+    /** _more_ */
     int cnt = 0;
 
-    /** _more_          */
+    /** _more_ */
     private Object FILES_MUTEX = new Object();
 
-    /** _more_          */
+    /** _more_ */
     private Object PROCESS_MUTEX = new Object();
 
     // = "SDUS[2357]. .... ([0-3][0-9])([0-2][0-9])([0-6][0-9]).*/p(...)(...)";
 
-    /** _more_          */
+    /** _more_ */
     private String patternString;
     //"/data/ldm/gempak/nexrad/NIDS/\\5/\\4/\\4_(\\1:yyyy)(\\1:mm)\\1_\\2\\3";
 
-    /** _more_          */
+    /** _more_ */
     private String fileTemplate;
 
 
-    /** _more_          */
+    /** _more_ */
     private String fileUrlTemplate =
         "http://localhost:8080/repository/processfile?file=${file}&type=${type}";
 
-    /** _more_          */
+    /** _more_ */
     private String bufferUrlTemplate =
         "http://localhost:8080/repository/processfile?tocfile=${file}";
 

@@ -44,13 +44,13 @@ import java.util.List;
  */
 public class TagCollection {
 
-    /** _more_          */
+    /** _more_ */
     String label;
 
-    /** _more_          */
+    /** _more_ */
     Hashtable tagMap = new Hashtable();
 
-    /** _more_          */
+    /** _more_ */
     List tags;
 
 
@@ -91,10 +91,16 @@ public class TagCollection {
                                          100)));
     }
 
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     * @param argName _more_
+     */
     public void appendToSearchForm(StringBuffer sb, String argName) {
         List tagList = new ArrayList(tags);
         tagList.add(0, TypeHandler.NONE_OBJECT);
-        String label =  getLabel() + ":";
+        String label = getLabel() + ":";
         label = label.replace(" ", "&nbsp;");
         sb.append(HtmlUtil.formEntry(label,
                                      HtmlUtil.select(argName, tagList, "",

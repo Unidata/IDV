@@ -147,10 +147,10 @@ public class PatternHarvester extends Harvester {
     private Hashtable dirMap = new Hashtable();
 
 
-    /** _more_          */
+    /** _more_ */
     User user;
 
-    /** _more_          */
+    /** _more_ */
     int rootStrLen;
 
 

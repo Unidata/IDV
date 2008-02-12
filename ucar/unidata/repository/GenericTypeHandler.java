@@ -481,7 +481,8 @@ public class GenericTypeHandler extends TypeHandler {
                                           Misc.newList(getTableName()),
                                           SqlUtil.eq(COL_ID,
                                               SqlUtil.quote(entry.getId())));
-        ResultSet results2 = getRepository().execute(query).getResultSet();
+        ResultSet results2 =
+            getDatabaseManager().execute(query).getResultSet();
         if (results2.next()) {
             int valueIdx = 0;
             for (Column column : columns) {

@@ -46,6 +46,9 @@ public class HtmlUtil {
     public static final String SIZE_20 = "  size=\"20\" ";
     public static final String SIZE_30 = "  size=\"30\" ";
     public static final String SIZE_40 = "  size=\"40\" ";
+    public static final String SIZE_50 = "  size=\"50\" ";
+    public static final String SIZE_60 = "  size=\"60\" ";
+    public static final String SIZE_70 = "  size=\"70\" ";
 
 
     /**
@@ -507,6 +510,11 @@ public class HtmlUtil {
         return "<form action=\"" + url + "\"" + " " + extra + " >";
     }
 
+    public static String formPost(Object url) {
+        return "<form method=\"post\" action=\"" + url + "\">";
+    }
+
+
     /**
      * _more_
      *
@@ -741,6 +749,18 @@ public class HtmlUtil {
         return sb.toString();
     }
 
+    public static String formTableTop(String[]cols) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(formTable());
+
+        for(int i=0;i<cols.length;i+=2) {
+            sb.append(formEntryTop(cols[i],cols[i+1]));
+        }
+        sb.append(formTableClose());
+        return sb.toString();
+    }
+
+
     /**
      * _more_
      *
@@ -786,6 +806,12 @@ public class HtmlUtil {
     public static String formEntryTop(String left, String right) {
         //        if(left.length()>0) 
         return " <tr valign=\"top\"><td align=\"right\" valign=\"top\" class=\"formlabel\">"
+               + left + "</td><td>" + right + "</td></tr>";
+
+    }
+
+    public static String formEntryTop(String col1, String left, String right) {
+        return " <tr valign=\"top\"><td>" + col1 +"</td><td align=\"right\" valign=\"top\" class=\"formlabel\">"
                + left + "</td><td>" + right + "</td></tr>";
 
     }

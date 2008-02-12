@@ -41,8 +41,9 @@ import java.io.File;
 import java.sql.PreparedStatement;
 
 import java.sql.ResultSet;
-
 import java.sql.Statement;
+
+
 
 
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ import java.util.Properties;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class TypeHandler implements Constants, Tables {
+public class TypeHandler extends RepositoryManager {
 
     /** _more_ */
     public static final int MATCH_UNKNOWN = 0;
@@ -77,7 +78,7 @@ public class TypeHandler implements Constants, Tables {
     public static final TwoFacedObject ALL_OBJECT = new TwoFacedObject("All",
                                                         "");
 
-    /** _more_          */
+    /** _more_ */
     public static final TwoFacedObject NONE_OBJECT =
         new TwoFacedObject("None", "");
 
@@ -90,8 +91,6 @@ public class TypeHandler implements Constants, Tables {
     /** _more_ */
     public static final String TYPE_GROUP = "group";
 
-    /** _more_ */
-    Repository repository;
 
     /** _more_ */
     String type;
@@ -113,7 +112,7 @@ public class TypeHandler implements Constants, Tables {
      * @param repository _more_
      */
     public TypeHandler(Repository repository) {
-        this.repository = repository;
+        super(repository);
     }
 
 
@@ -126,6 +125,24 @@ public class TypeHandler implements Constants, Tables {
     public TypeHandler(Repository repository, String type) {
         this(repository, type, "");
     }
+
+
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param type _more_
+     * @param description _more_
+     */
+    public TypeHandler(Repository repository, String type,
+                       String description) {
+        super(repository);
+        this.type        = type;
+        this.description = description;
+
+    }
+
+
 
     /**
      * _more_
@@ -187,20 +204,6 @@ public class TypeHandler implements Constants, Tables {
         properties.put(name, value);
     }
 
-    /**
-     * _more_
-     *
-     * @param repository _more_
-     * @param type _more_
-     * @param description _more_
-     */
-    public TypeHandler(Repository repository, String type,
-                       String description) {
-        this.repository  = repository;
-        this.type        = type;
-        this.description = description;
-
-    }
 
     /** _more_ */
     static int cnt = 0;
@@ -358,18 +361,20 @@ public class TypeHandler implements Constants, Tables {
      */
     public Entry getEntry(ResultSet results) throws Exception {
         //id,type,name,desc,group,user,file,createdata,fromdate,todate
-        int   col   = 3;
-        Entry entry = createEntry(results.getString(1));
+        int    col   = 3;
+        String id    = results.getString(1);
+        Entry  entry = createEntry(id);
         entry.init(results.getString(col++), results
-            .getString(col++), repository
-            .findGroup(results.getString(col++)), repository.getUserManager()
+            .getString(col++), getRepository()
+            .findGroup(results.getString(col++)), getRepository()
+            .getUserManager()
             .findUser(results.getString(col++), true), new Resource(results
                 .getString(col++), results.getString(col++)), results
-                    .getTimestamp(col++, Repository.calendar)
+                    .getTimestamp(col++, getRepository().calendar)
                     .getTime(), results
-                    .getTimestamp(col++, Repository.calendar)
+                    .getTimestamp(col++, getRepository().calendar)
                     .getTime(), results
-                    .getTimestamp(col++, Repository.calendar)
+                    .getTimestamp(col++, getRepository().calendar)
                     .getTime(), null);
         entry.setSouth(results.getDouble(col++));
         entry.setNorth(results.getDouble(col++));
@@ -394,6 +399,7 @@ public class TypeHandler implements Constants, Tables {
     public StringBuffer getEntryContent(Entry entry, Request request,
                                         boolean showResource)
             throws Exception {
+
         StringBuffer sb     = new StringBuffer();
         String       output = request.getOutput();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
@@ -401,13 +407,13 @@ public class TypeHandler implements Constants, Tables {
             sb.append(getInnerEntryContent(entry, request, output,
                                            showResource));
 
-            List<Tag> tags = repository.getTags(request, entry.getId());
+            List<Tag> tags = getRepository().getTags(request, entry.getId());
             if (tags.size() > 0) {
                 StringBuffer tagSB = new StringBuffer();
                 for (Tag tag : tags) {
                     TagCollection tagCollection =
-                        repository.findTagCollection(tag);
-                    tagSB.append(repository.getTagLinks(request,
+                        getRepository().findTagCollection(tag);
+                    tagSB.append(getRepository().getTagLinks(request,
                             tag.getName()));
                     if (tagCollection != null) {
                         tagSB.append(tagCollection.getLabel() + ": ");
@@ -420,7 +426,7 @@ public class TypeHandler implements Constants, Tables {
 
 
             List<Association> associations =
-                repository.getAssociations(request, entry.getId());
+                getRepository().getAssociations(request, entry.getId());
             if (associations.size() > 0) {
                 StringBuffer assocSB = new StringBuffer();
                 assocSB.append("<table>");
@@ -431,13 +437,14 @@ public class TypeHandler implements Constants, Tables {
                         fromEntry = entry;
                     } else {
                         fromEntry =
-                            repository.getEntry(association.getFromId(),
+                            getRepository().getEntry(association.getFromId(),
                                 request);
                     }
                     if (association.getToId().equals(entry.getId())) {
                         toEntry = entry;
                     } else {
-                        toEntry = repository.getEntry(association.getToId(),
+                        toEntry =
+                            getRepository().getEntry(association.getToId(),
                                 request);
                     }
                     if ((fromEntry == null) || (toEntry == null)) {
@@ -446,18 +453,20 @@ public class TypeHandler implements Constants, Tables {
                     assocSB.append("<tr><td>");
                     assocSB.append(((fromEntry == entry)
                                     ? fromEntry.getName()
-                                    : repository.getEntryUrl(fromEntry)));
+                                    : getRepository().getEntryUrl(
+                                        fromEntry)));
                     assocSB.append("&nbsp;&nbsp;");
                     assocSB.append("</td><td>");
                     assocSB.append(HtmlUtil.bold(association.getName()));
                     assocSB.append("</td><td>");
                     assocSB.append(
-                        HtmlUtil.img(repository.fileUrl("/Arrow16.gif")));
+                        HtmlUtil.img(
+                            getRepository().fileUrl("/Arrow16.gif")));
                     assocSB.append("&nbsp;&nbsp;");
                     assocSB.append("</td><td>");
                     assocSB.append(((toEntry == entry)
                                     ? toEntry.getName()
-                                    : repository.getEntryUrl(toEntry)));
+                                    : getRepository().getEntryUrl(toEntry)));
                     assocSB.append("</td></tr>");
                 }
                 assocSB.append("</table>");
@@ -466,7 +475,7 @@ public class TypeHandler implements Constants, Tables {
             }
 
 
-            List<Metadata> metadataList = repository.getMetadata(entry);
+            List<Metadata> metadataList = getRepository().getMetadata(entry);
             if (metadataList.size() > 0) {
                 sb.append(HtmlUtil.formEntry("<p>", ""));
                 StringBuffer mSB = new StringBuffer();
@@ -492,6 +501,7 @@ public class TypeHandler implements Constants, Tables {
 
         } else if (output.equals(XmlOutputHandler.OUTPUT_XML)) {}
         return sb;
+
     }
 
     /**
@@ -507,30 +517,31 @@ public class TypeHandler implements Constants, Tables {
     protected String getEntryLinks(Entry entry, Request request)
             throws Exception {
         String editEntry = "";
-        if(repository.canEditEntry(request, entry)) {
-            editEntry  =HtmlUtil.href(
-                                      HtmlUtil.url(
-                                                   repository.URL_ENTRY_FORM, ARG_ID,
-                                                   entry.getId()), HtmlUtil.img(
-                                                                                repository.fileUrl("/Edit16.gif"),
-                                                                                "Edit Entry"));
+        if (getRepository().canEditEntry(request, entry)) {
+            editEntry =
+                HtmlUtil.href(
+                    HtmlUtil.url(
+                        getRepository().URL_ENTRY_FORM, ARG_ID,
+                        entry.getId()), HtmlUtil.img(
+                            getRepository().fileUrl("/Edit16.gif"),
+                            "Edit Entry"));
         }
 
         String commentsEntry =
             HtmlUtil.href(
                 HtmlUtil.url(
-                    repository.URL_COMMENTS_SHOW, ARG_ID,
+                    getRepository().URL_COMMENTS_SHOW, ARG_ID,
                     entry.getId()), HtmlUtil.img(
-                        repository.fileUrl("/Comments.gif"),
+                        getRepository().fileUrl("/Comments.gif"),
                         "Add/View Comments"));
 
-        String cartEntry = HtmlUtil.href(
-                               HtmlUtil.url(
-                                   repository.getUserManager().URL_USER_CART,
-                                   ARG_ACTION, ACTION_ADD, ARG_ID,
-                                   entry.getId()), HtmlUtil.img(
-                                       repository.fileUrl("/Cart.gif"),
-                                       "Add to cart"));
+        String cartEntry =
+            HtmlUtil.href(
+                HtmlUtil.url(
+                    getRepository().getUserManager().URL_USER_CART,
+                    ARG_ACTION, ACTION_ADD, ARG_ID,
+                    entry.getId()), HtmlUtil.img(
+                        getRepository().fileUrl("/Cart.gif"), "Add to cart"));
 
         return editEntry + HtmlUtil.space(1) + commentsEntry
                + HtmlUtil.space(1) + getEntryDownloadLink(request, entry)
@@ -548,14 +559,14 @@ public class TypeHandler implements Constants, Tables {
      * @return _more_
      */
     protected String getGraphLink(Request request, Entry entry) {
-        if ( !repository.isAppletEnabled(request)) {
+        if ( !getRepository().isAppletEnabled(request)) {
             return "";
         }
         return HtmlUtil
             .href(HtmlUtil
-                .url(repository.URL_GRAPH_VIEW, ARG_ID, entry.getId(),
+                .url(getRepository().URL_GRAPH_VIEW, ARG_ID, entry.getId(),
                      ARG_NODETYPE, entry.getType()), HtmlUtil
-                         .img(repository.fileUrl("/tree.gif"),
+                         .img(getRepository().fileUrl("/tree.gif"),
                               "Show file in graph"));
     }
 
@@ -594,24 +605,24 @@ public class TypeHandler implements Constants, Tables {
      */
     protected String getEntryDownloadLink(Request request, Entry entry)
             throws Exception {
-        if ( !repository.canDownload(request, entry)) {
+        if ( !getRepository().canDownload(request, entry)) {
             return "";
         }
         File   f    = entry.getResource().getFile();
         String size = " (" + f.length() + " bytes)";
-        if (repository.getProperty(PROP_DOWNLOAD_ASFILES, false)) {
+        if (getRepository().getProperty(PROP_DOWNLOAD_ASFILES, false)) {
             return HtmlUtil.href(
                 "file://" + entry.getResource(),
                 HtmlUtil.img(
-                    repository.fileUrl("/Fetch.gif"),
+                    getRepository().fileUrl("/Fetch.gif"),
                     "Download file" + size));
         } else {
             return HtmlUtil.href(
                 HtmlUtil.url(
-                    repository.URL_ENTRY_GET + "/"
+                    getRepository().URL_ENTRY_GET + "/"
                     + entry.getName(), ARG_ID, entry.getId()), HtmlUtil.img(
-                        repository.fileUrl("/Fetch.gif"), "Download file"
-                        + size));
+                        getRepository().fileUrl(
+                            "/Fetch.gif"), "Download file" + size));
         }
     }
 
@@ -636,7 +647,7 @@ public class TypeHandler implements Constants, Tables {
         StringBuffer sb = new StringBuffer();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             OutputHandler outputHandler =
-                repository.getOutputHandler(request);
+                getRepository().getOutputHandler(request);
             String nextPrev = outputHandler.getNextPrevLink(request, entry,
                                   output);
             sb.append(HtmlUtil.formEntry("",
@@ -645,7 +656,7 @@ public class TypeHandler implements Constants, Tables {
             sb.append(HtmlUtil.formEntry("Name:", entry.getName()));
 
 
-            String[] crumbs = repository.getBreadCrumbs(request,
+            String[] crumbs = getRepository().getBreadCrumbs(request,
                                   entry.getParentGroup(), true, "");
             sb.append(HtmlUtil.formEntry("Group:", crumbs[1]));
 
@@ -657,7 +668,7 @@ public class TypeHandler implements Constants, Tables {
                 HtmlUtil.formEntry(
                     "Created by:",
                     entry.getUser().getName() + " @ "
-                    + Repository.fmt(entry.getCreateDate())));
+                    + getRepository().fmt(entry.getCreateDate())));
 
             String resourceLink = entry.getResource().getPath();
             if (resourceLink.length() > 0) {
@@ -678,11 +689,12 @@ public class TypeHandler implements Constants, Tables {
                     || (entry.getCreateDate() != entry.getEndDate())) {
                 if (entry.getEndDate() != entry.getStartDate()) {
                     sb.append(HtmlUtil.formEntry("Date Range:",
-                            Repository.fmt(entry.getStartDate()) + " -- "
-                            + Repository.fmt(entry.getEndDate())));
+                            getRepository().fmt(entry.getStartDate())
+                            + " -- "
+                            + getRepository().fmt(entry.getEndDate())));
                 } else {
                     sb.append(HtmlUtil.formEntry("Date:",
-                            Repository.fmt(entry.getStartDate())));
+                            getRepository().fmt(entry.getStartDate())));
                 }
             }
             String typeDesc = entry.getTypeHandler().getDescription();
@@ -696,23 +708,24 @@ public class TypeHandler implements Constants, Tables {
                                              entry.getSouth() + "/"
                                              + entry.getEast()));
             } else if (entry.hasAreaDefined()) {
-                String img = HtmlUtil.img(HtmlUtil.url(repository.URL_GETMAP,
-                                 ARG_SOUTH, "" + entry.getSouth(), ARG_WEST,
-                                 "" + entry.getWest(), ARG_NORTH,
-                                 "" + entry.getNorth(), ARG_EAST,
-                                 "" + entry.getEast()));
+                String img =
+                    HtmlUtil.img(HtmlUtil.url(getRepository().URL_GETMAP,
+                        ARG_SOUTH, "" + entry.getSouth(), ARG_WEST,
+                        "" + entry.getWest(), ARG_NORTH,
+                        "" + entry.getNorth(), ARG_EAST,
+                        "" + entry.getEast()));
                 sb.append(HtmlUtil.formEntry("Area:", img));
             }
 
             if (showResource && entry.getResource().isImage()) {
                 if (entry.getResource().isFile()
-                        && repository.canDownload(request, entry)) {
+                        && getRepository().canDownload(request, entry)) {
                     sb.append(
                         HtmlUtil.formEntryTop(
                             "Image:",
                             HtmlUtil.img(
                                 HtmlUtil.url(
-                                    repository.URL_ENTRY_GET + "/"
+                                    getRepository().URL_ENTRY_GET + "/"
                                     + entry.getName(), ARG_ID,
                                         entry.getId()), "")));
 
@@ -880,19 +893,12 @@ public class TypeHandler implements Constants, Tables {
         where = SqlUtil.makeAnd(whereList);
         String sql = SqlUtil.makeSelect(what, tables, where, extra);
         //        System.err.println (sql);
-        return getRepository().execute(sql, repository.getMax(request));
+        return getDatabaseManager().execute(sql,
+                                            getRepository().getMax(request));
     }
 
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    protected Repository getRepository() {
-        return repository;
-    }
 
     /**
      * _more_
@@ -945,9 +951,10 @@ public class TypeHandler implements Constants, Tables {
         //        request.remove(ARG_TODATE);
 
 
-        List<TypeHandler> typeHandlers = repository.getTypeHandlers(request);
+        List<TypeHandler> typeHandlers =
+            getRepository().getTypeHandlers(request);
         if ((typeHandlers.size() == 0) && request.defined(ARG_TYPE)) {
-            typeHandlers.add(repository.getTypeHandler(request));
+            typeHandlers.add(getRepository().getTypeHandler(request));
         }
 
 
@@ -1002,8 +1009,8 @@ public class TypeHandler implements Constants, Tables {
                     "Type:",
                     typeSelect + " "
                     + HtmlUtil.submitImage(
-                        repository.fileUrl("/Search16.gif"), "submit_type",
-                        "Show search form with this type")));
+                        getRepository().fileUrl("/Search16.gif"),
+                        "submit_type", "Show search form with this type")));
         } else if (typeHandlers.size() == 1) {
             formBuffer.append(HtmlUtil.hidden(ARG_TYPE,
                     typeHandlers.get(0).getType()));
@@ -1042,7 +1049,7 @@ public class TypeHandler implements Constants, Tables {
                                             false)) + " (Search subgroups)";
             if (groupArg.length() > 0) {
                 formBuffer.append(HtmlUtil.hidden(ARG_GROUP, groupArg));
-                Group group = repository.findGroup(groupArg);
+                Group group = getRepository().findGroup(groupArg);
                 if (group != null) {
                     formBuffer.append(HtmlUtil.formEntry("Group:",
                             group.getFullName() + "&nbsp;" + searchChildren));
@@ -1055,7 +1062,8 @@ public class TypeHandler implements Constants, Tables {
                                          COL_ENTRIES_PARENT_GROUP_ID), where);
 
                 List<Group> groups =
-                    repository.getGroups(SqlUtil.readString(stmt, 1));
+                    getRepository().getGroups(SqlUtil.readString(stmt, 1));
+                stmt.close();
 
                 if (groups.size() > 1) {
                     List groupList = new ArrayList();
@@ -1079,17 +1087,19 @@ public class TypeHandler implements Constants, Tables {
         }
 
         if ( !simpleForm || request.defined(ARG_TAG)) {
-            String        tag = (String) request.getString(ARG_TAG, "");
-            TagCollection tagCollection = repository.findTagCollection(tag);
+            String tag = (String) request.getString(ARG_TAG, "");
+            TagCollection tagCollection =
+                getRepository().findTagCollection(tag);
             if (tagCollection != null) {
                 tagCollection.appendToForm(formBuffer, ARG_TAG, tag);
             } else {
                 formBuffer.append(HtmlUtil.formEntry("Tag:",
                         HtmlUtil.input(ARG_TAG, tag)));
-                
+
                 int cnt = 0;
-                for (TagCollection tc : repository.getTagCollections()) {
-                    tc.appendToSearchForm(formBuffer, ARG_TAG+"."+(cnt++));
+                for (TagCollection tc : getRepository().getTagCollections()) {
+                    tc.appendToSearchForm(formBuffer,
+                                          ARG_TAG + "." + (cnt++));
                 }
             }
             formBuffer.append("\n");
@@ -1117,7 +1127,7 @@ public class TypeHandler implements Constants, Tables {
                                     "");
             areaWidget = "<table>" + HtmlUtil.cols(areaWidget, nonGeo)
                          + "</table>";
-            //            formBuffer.append(HtmlUtil.formEntry("Extent:", areaWidget+"\n"+HtmlUtil.img(repository.URL_GETMAP.toString(),"map"," name=\"map\"  xxxonmouseover = \"mouseMove()\"")));
+            //            formBuffer.append(HtmlUtil.formEntry("Extent:", areaWidget+"\n"+HtmlUtil.img(getRepository().URL_GETMAP.toString(),"map"," name=\"map\"  xxxonmouseover = \"mouseMove()\"")));
             formBuffer.append(HtmlUtil.formEntry("Extent:", areaWidget));
             formBuffer.append("\n");
 
@@ -1145,7 +1155,7 @@ public class TypeHandler implements Constants, Tables {
      */
     protected List assembleWhereClause(Request request) throws Exception {
 
-        List where = new ArrayList();
+        List   where     = new ArrayList();
 
 
         String tagString = "";
@@ -1155,20 +1165,20 @@ public class TypeHandler implements Constants, Tables {
             tagString = tag;
         }
 
-        int tagCnt=0;
-        while(request.exists(ARG_TAG+"."+tagCnt)) {
-            String tag = request.getString(ARG_TAG+"."+tagCnt,"");
-            if(tag.length()>0) {
-                if(tagString.length()>0) {
-                    tagString = tagString+",";
+        int tagCnt = 0;
+        while (request.exists(ARG_TAG + "." + tagCnt)) {
+            String tag = request.getString(ARG_TAG + "." + tagCnt, "");
+            if (tag.length() > 0) {
+                if (tagString.length() > 0) {
+                    tagString = tagString + ",";
                 }
-                tagString = tagString+tag;
+                tagString = tagString + tag;
             }
             tagCnt++;
         }
 
 
-        if(tagString.length()>0) {
+        if (tagString.length() > 0) {
             where.add(SqlUtil.eq(COL_ENTRIES_ID, COL_TAGS_ENTRY_ID));
             addOr(COL_TAGS_NAME, tagString, where, true);
         }
@@ -1185,7 +1195,7 @@ public class TypeHandler implements Constants, Tables {
                 where.add(SqlUtil.like(COL_ENTRIES_PARENT_GROUP_ID,
                                        groupName));
             } else {
-                Group group = repository.findGroup(request, false);
+                Group group = getRepository().findGroup(request, false);
                 if (group == null) {
                     throw new IllegalArgumentException(
                         "Could not find group:" + groupName);
@@ -1282,16 +1292,12 @@ public class TypeHandler implements Constants, Tables {
             ors.add(SqlUtil.makeOrSplit(COL_ENTRIES_NAME, name, true));
             ors.add(SqlUtil.makeOrSplit(COL_ENTRIES_DESCRIPTION, name, true));
             if (request.get(ARG_SEARCHMETADATA, false)) {
-                ors.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR1, name,
-                                            true));
-                ors.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR2, name,
-                                            true));
-                ors.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR3, name,
-                                            true));
-                ors.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR4, name,
-                                            true));
+                ors.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR1, name, true));
+                ors.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR2, name, true));
+                ors.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR3, name, true));
+                ors.add(SqlUtil.makeOrSplit(COL_METADATA_ATTR4, name, true));
             }
-            
+
             where.add("(" + StringUtil.join(" OR ", ors) + ")");
             //            System.err.println("where:" + where);
         }

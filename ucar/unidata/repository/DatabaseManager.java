@@ -133,6 +133,18 @@ public class DatabaseManager extends RepositoryManager {
     /**
      * _more_
      *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Connection getConnection() throws Exception {
+        return getConnection(false);
+    }
+
+
+    /**
+     * _more_
+     *
      *
      * @param makeNewOne _more_
      * @return _more_
@@ -232,6 +244,172 @@ public class DatabaseManager extends RepositoryManager {
             Statement statement = connection.createStatement();
             statement.execute("set time_zone = '+0:00'");
         }
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param sql _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected Statement execute(String sql) throws Exception {
+        return execute(sql, -1);
+    }
+
+    /**
+     * _more_
+     *
+     * @param sql _more_
+     * @param max _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected Statement execute(String sql, int max) throws Exception {
+        return execute(sql, max, 0);
+    }
+
+    /**
+     * _more_
+     *
+     * @param sql _more_
+     * @param max _more_
+     * @param timeout _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected Statement execute(String sql, int max, int timeout)
+            throws Exception {
+        return execute(getConnection(), sql, max, timeout);
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param sql _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected Statement execute(Connection connection, String sql)
+            throws Exception {
+        return execute(connection, sql, 0, 0);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param sql _more_
+     * @param max _more_
+     * @param timeout _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected Statement execute(Connection connection, String sql, int max,
+                                int timeout)
+            throws Exception {
+        Statement statement = connection.createStatement();
+        if (timeout > 0) {
+            statement.setQueryTimeout(timeout);
+        }
+
+        if (max > 0) {
+            statement.setMaxRows(max);
+        }
+
+        long t1 = System.currentTimeMillis();
+        try {
+            //            System.err.println("query:" + sql);
+            statement.execute(sql);
+        } catch (Exception exc) {
+            getRepository().log("Error executing sql:" + sql);
+            throw exc;
+        }
+        long t2 = System.currentTimeMillis();
+        if (getRepository().debug || (t2 - t1 > 300)) {
+            System.err.println("query:" + sql);
+            System.err.println("query time:" + (t2 - t1));
+        }
+        if (t2 - t1 > 2000) {
+            //            Misc.printStack("query:" + sql);
+        }
+        return statement;
+    }
+
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param insert _more_
+     * @param values _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void executeInsert(String insert, Object[] values)
+            throws Exception {
+        PreparedStatement pstmt = getConnection().prepareStatement(insert);
+        for (int i = 0; i < values.length; i++) {
+            //Assume null is a string
+            if (values[i] == null) {
+                pstmt.setNull(i + 1, java.sql.Types.VARCHAR);
+            } else if (values[i] instanceof Date) {
+                pstmt.setTimestamp(
+                    i + 1,
+                    new java.sql.Timestamp(((Date) values[i]).getTime()),
+                    Repository.calendar);
+            } else if (values[i] instanceof Boolean) {
+                boolean b = ((Boolean) values[i]).booleanValue();
+                pstmt.setInt(i + 1, (b
+                                     ? 1
+                                     : 0));
+            } else {
+                pstmt.setObject(i + 1, values[i]);
+            }
+        }
+        try {
+            pstmt.execute();
+            pstmt.close();
+        } catch (Exception exc) {
+            System.err.println("Error:" + insert);
+            throw exc;
+        }
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param table _more_
+     * @param column _more_
+     * @param value _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void executeDelete(String table, String column, String value)
+            throws Exception {
+        Statement stmt = execute(SqlUtil.makeDelete(table, column, value));
+        stmt.close();
     }
 
 

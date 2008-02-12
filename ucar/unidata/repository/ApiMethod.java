@@ -23,8 +23,9 @@ package ucar.unidata.repository;
 
 import java.lang.reflect.Method;
 
-import java.util.Hashtable;
 import java.util.ArrayList;
+
+import java.util.Hashtable;
 import java.util.List;
 
 
@@ -35,6 +36,8 @@ public class ApiMethod {
 
     /** _more_ */
     public static final String TAG_METHOD = "method";
+
+    /** _more_ */
     public static final String TAG_PROPERTY = "property";
 
 
@@ -44,6 +47,7 @@ public class ApiMethod {
     /** _more_ */
     public static final String ATTR_HANDLER = "handler";
 
+    /** _more_ */
     public static final String ATTR_ACTIONS = "actions";
 
     /** _more_ */
@@ -52,7 +56,8 @@ public class ApiMethod {
     /** _more_ */
     public static final String ATTR_NAME = "name";
 
-    public static final String ATTR_VALUE= "value";
+    /** _more_ */
+    public static final String ATTR_VALUE = "value";
 
     /** _more_ */
     public static final String ATTR_METHOD = "method";
@@ -88,6 +93,7 @@ public class ApiMethod {
     /** _more_ */
     private boolean canCache = false;
 
+    /** _more_ */
     private List actions;
 
     /**
@@ -122,16 +128,22 @@ public class ApiMethod {
      * @param repository _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public boolean isRequestOk(Request request, Repository repository) throws Exception {
+    public boolean isRequestOk(Request request, Repository repository)
+            throws Exception {
         RequestContext context = request.getRequestContext();
-        User user = context.getUser();
+        User           user    = context.getUser();
         if (mustBeAdmin && !user.getAdmin()) {
             return false;
         }
-        if(actions.size()>0) {
-            for(int i=0;i<actions.size();i++) {
-                if(!repository.canDoAction(request, (String)actions.get(i))) return false;
+        if (actions.size() > 0) {
+            for (int i = 0; i < actions.size(); i++) {
+                if ( !repository.canDoAction(request,
+                                             (String) actions.get(i))) {
+                    return false;
+                }
             }
         }
         return true;
@@ -277,23 +289,23 @@ public class ApiMethod {
         return mustBeAdmin;
     }
 
-/**
-Set the Actions property.
+    /**
+     * Set the Actions property.
+     *
+     * @param value The new value for Actions
+     */
+    public void setActions(List value) {
+        actions = value;
+    }
 
-@param value The new value for Actions
-**/
-public void setActions (List value) {
-	actions = value;
-}
-
-/**
-Get the Actions property.
-
-@return The Actions
-**/
-public List getActions () {
-	return actions;
-}
+    /**
+     * Get the Actions property.
+     *
+     * @return The Actions
+     */
+    public List getActions() {
+        return actions;
+    }
 
 
 

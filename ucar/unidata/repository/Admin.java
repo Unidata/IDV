@@ -113,9 +113,9 @@ public class Admin extends RepositoryManager {
 
     /** _more_ */
     protected RequestUrl[] adminUrls = {
-        URL_ADMIN_SETTINGS, URL_ADMIN_STARTSTOP,
-        URL_ADMIN_TABLES, URL_ADMIN_STATS, getUserManager().URL_USER_LIST,
-        URL_ADMIN_HARVESTERS, URL_ADMIN_SQL, URL_ADMIN_CLEANUP
+        URL_ADMIN_SETTINGS, URL_ADMIN_STARTSTOP, URL_ADMIN_TABLES,
+        URL_ADMIN_STATS, getUserManager().URL_USER_LIST, URL_ADMIN_HARVESTERS,
+        URL_ADMIN_SQL, URL_ADMIN_CLEANUP
     };
 
 
@@ -288,11 +288,10 @@ public class Admin extends RepositoryManager {
                 boolean didone = false;
                 while (indices.next()) {
                     if ( !generateJava) {
-                       if ( !didone) {
-                           //                            sb.append(
-                           //                                "<br><b>Indices</b> (name,order,type,pages)<br>");
-                            sb.append(
-                                "<br><b>Indices</b><br>");
+                        if ( !didone) {
+                            //                            sb.append(
+                            //                                "<br><b>Indices</b> (name,order,type,pages)<br>");
+                            sb.append("<br><b>Indices</b><br>");
                         }
                         didone = true;
                         String indexName  = indices.getString("INDEX_NAME");
@@ -411,13 +410,24 @@ public class Admin extends RepositoryManager {
 
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result adminActions(Request request) throws Exception {
-        StringBuffer sb           = new StringBuffer();
+        StringBuffer    sb         = new StringBuffer();
         List<ApiMethod> apiMethods = getRepository().getApiMethods();
         sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.row(HtmlUtil.cols("Name","Admin?","Actions")));
-        for(ApiMethod apiMethod: apiMethods) {
-            sb.append(HtmlUtil.row(HtmlUtil.cols(apiMethod.getName(),""+apiMethod.getMustBeAdmin(),StringUtil.join(",",apiMethod.getActions()))));
+        sb.append(HtmlUtil.row(HtmlUtil.cols("Name", "Admin?", "Actions")));
+        for (ApiMethod apiMethod : apiMethods) {
+            sb.append(HtmlUtil.row(HtmlUtil.cols(apiMethod.getName(),
+                    "" + apiMethod.getMustBeAdmin(),
+                    StringUtil.join(",", apiMethod.getActions()))));
         }
         sb.append(HtmlUtil.formTableClose());
 
@@ -730,7 +740,7 @@ public class Admin extends RepositoryManager {
 
         Statement statement = null;
         try {
-            statement = getRepository().execute(query);
+            statement = getDatabaseManager().execute(query);
         } catch (Exception exc) {
             exc.printStackTrace();
             throw exc;
@@ -851,7 +861,7 @@ public class Admin extends RepositoryManager {
                                        SqlUtil.quote(Resource.TYPE_FILE)));
 
             SqlUtil.Iterator iter =
-                SqlUtil.getIterator(getRepository().execute(query));
+                SqlUtil.getIterator(getDatabaseManager().execute(query));
             ResultSet   results;
             int         cnt       = 0;
             int         deleteCnt = 0;

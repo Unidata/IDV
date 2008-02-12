@@ -94,24 +94,43 @@ public class Permission {
 
     /** _more_ */
     public static final String[] ACTIONS = { ACTION_VIEW, ACTION_EDIT,
-            ACTION_NEW, ACTION_DELETE, ACTION_COMMENT };
+                                             ACTION_NEW, ACTION_DELETE,
+                                             ACTION_COMMENT };
 
     /** _more_ */
-    public static final String[] ACTION_NAMES = { "View", "Edit", "New", "Delete",
-                                             "Comment" };
+    public static final String[] ACTION_NAMES = { "View", "Edit", "New",
+            "Delete", "Comment" };
 
 
+    /**
+     * _more_
+     *
+     * @param actions _more_
+     *
+     * @return _more_
+     */
     public static boolean isValidActions(List actions) {
-        for(int i=0;i<actions.size();i++) {
-            if(!isValidAction((String) actions.get(i))) return false;
+        for (int i = 0; i < actions.size(); i++) {
+            if ( !isValidAction((String) actions.get(i))) {
+                return false;
+            }
         }
         return true;
     }
 
 
-    public static boolean isValidAction(String  action) {
-        for(int i=0;i<ACTIONS.length;i++) {
-            if(ACTIONS[i].equals(action)) return true;
+    /**
+     * _more_
+     *
+     * @param action _more_
+     *
+     * @return _more_
+     */
+    public static boolean isValidAction(String action) {
+        for (int i = 0; i < ACTIONS.length; i++) {
+            if (ACTIONS[i].equals(action)) {
+                return true;
+            }
         }
         return false;
     }

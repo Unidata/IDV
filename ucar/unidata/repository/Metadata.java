@@ -95,7 +95,7 @@ public class Metadata implements Constants, Tables {
     /** _more_ */
     private String entryId;
 
-    /** _more_          */
+    /** _more_ */
     private String type;
 
 
@@ -111,6 +111,15 @@ public class Metadata implements Constants, Tables {
     /** _more_ */
     private String attr4;
 
+
+    /**
+     * _more_
+     *
+     * @param type _more_
+     */
+    public Metadata(String type) {
+        this("", "", type, "", "", "", "");
+    }
 
 
     /**

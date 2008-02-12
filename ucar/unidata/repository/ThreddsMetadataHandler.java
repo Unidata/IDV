@@ -55,16 +55,16 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     /** _more_ */
     public static final String ATTR_NAME = "name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ROLE = "role";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_EMAIL = "email";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_URL = "url";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_VOCABULARY = "vocabulary";
 
     /** _more_ */
@@ -73,13 +73,13 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     /** _more_ */
     public static final String TAG_CREATOR = "creator";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_NAME = "name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_CONTACT = "contact";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_LINK = "link";
 
     /** _more_ */
@@ -205,7 +205,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         } else if (type.equals(TAG_PROPERTY)) {
             lbl     = getLabel(metadata.getAttr1()) + ":";
             content = metadata.getAttr2();
-        } else if (type.equals(TAG_PUBLISHER)) {
+        } else if (type.equals(TAG_PUBLISHER) || type.equals(TAG_CREATOR)) {
             content = metadata.getAttr1();
             if (metadata.getAttr3().length() > 0) {
                 content += "<br>Email: " + metadata.getAttr3();
@@ -223,6 +223,77 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         }
         return new String[] { lbl, content };
     }
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param metadata _more_
+     *
+     * @return _more_
+     */
+    public String[] getEditForm(Metadata metadata) {
+        String type    = metadata.getType();
+        String lbl     = getLabel(type) + ":";
+        String content = null;
+        String id      = metadata.getId();
+        String suffix  = "";
+        if (id.length() > 0) {
+            suffix = "." + id;
+        }
+
+        String arg1 = ARG_ATTR1 + suffix;
+        String arg2 = ARG_ATTR2 + suffix;
+        String arg3 = ARG_ATTR3 + suffix;
+        String arg4 = ARG_ATTR4 + suffix;
+        String size = HtmlUtil.SIZE_70;
+
+        if (type.equals(TAG_LINK)) {
+            content = HtmlUtil.formTableTop(new String[] { "Label:",
+                    HtmlUtil.input(arg1, metadata.getAttr1(), size), "Url:",
+                    HtmlUtil.input(arg2, metadata.getAttr2(), size) });
+        } else if (type.equals(TAG_DOCUMENTATION)) {
+            content = HtmlUtil.formTableTop(new String[] { "Type:",
+                    HtmlUtil.input(arg1, metadata.getAttr1()), "Value:",
+                    HtmlUtil.textArea(arg2, metadata.getAttr2(), 5, 50) });
+        } else if (type.equals(TAG_CONTRIBUTOR)) {
+            content = HtmlUtil.formTableTop(new String[] { "Name:",
+                    HtmlUtil.input(arg1, metadata.getAttr1(), size), "Role:",
+                    HtmlUtil.input(arg2, metadata.getAttr2(), size) });
+        } else if (type.equals(TAG_PROPERTY)) {
+            content = HtmlUtil.formTableTop(new String[] { "Name:",
+                    HtmlUtil.input(arg1, metadata.getAttr1(), size), "Value:",
+                    HtmlUtil.input(arg2, metadata.getAttr2(), size) });
+
+        } else if (type.equals(TAG_KEYWORD)) {
+            content = HtmlUtil.formTableTop(new String[] { "Value:",
+                    HtmlUtil.input(arg1,
+                                   metadata.getAttr1().replace("\n", ""),
+                                   size),
+                    "Vocabulary:",
+                    HtmlUtil.input(arg2, metadata.getAttr2(), size) });
+        } else if (type.equals(TAG_PUBLISHER) || type.equals(TAG_CREATOR)) {
+            content = HtmlUtil.formTableTop(new String[] {
+                "Organization:",
+                HtmlUtil.input(arg1, metadata.getAttr1(), size), "Email:",
+                HtmlUtil.input(arg3, metadata.getAttr3(), size), "Url:",
+                HtmlUtil.input(arg4, metadata.getAttr4(), size)
+            });
+        } else {
+            content = HtmlUtil.input(arg1, metadata.getAttr1(), size);
+        }
+        if (content == null) {
+            return null;
+        }
+        String argtype = ARG_TYPE + suffix;
+        String argid   = ARG_METADATAID + suffix;
+        content = content + HtmlUtil.hidden(argtype, type)
+                  + HtmlUtil.hidden(argid, metadata.getId());
+        return new String[] { lbl, content };
+    }
+
 
 
     /**
@@ -270,10 +341,17 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             }
             return new Metadata(getRepository().getGUID(), "", tag, name,
                                 vocabulary, email, url);
+        } else if (tag.equals(TAG_KEYWORD)) {
+            String text = XmlUtil.getChildText(child).trim();
+            return new Metadata(getRepository().getGUID(), "", tag, text,
+                                XmlUtil.getAttribute(child, ATTR_VOCABULARY,
+                                    ""), "", "");
+
         } else if (tag.equals(TAG_KEYWORD) || tag.equals(TAG_AUTHORITY)
                    || tag.equals(TAG_DATATYPE)
                    || tag.equals(TAG_DATAFORMAT)) {
             String text = XmlUtil.getChildText(child).trim();
+            text = text.replace("\n", "");
             return new Metadata(getRepository().getGUID(), "", tag, text, "",
                                 "", "");
         } else if (tag.equals(TAG_VOCABULARY) || tag.equals(TAG_VARIABLES)) {

@@ -122,10 +122,10 @@ public class StorageManager extends RepositoryManager {
     /** _more_ */
     private String uploadDir;
 
-    /** _more_          */
+    /** _more_ */
     private String storageDir;
 
-    /** _more_          */
+    /** _more_ */
     private String thumbDir;
 
     /**

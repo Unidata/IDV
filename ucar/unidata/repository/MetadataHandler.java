@@ -41,6 +41,7 @@ import ucar.unidata.xml.XmlUtil;
 
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -55,11 +56,34 @@ import java.util.List;
  */
 public class MetadataHandler extends RepositoryManager {
 
+    /** _more_          */
+    public static String ARG_TYPE = "type";
 
     /** _more_          */
+    public static String ARG_METADATAID = "metadataid";
+
+    /** _more_          */
+    public static String ARG_ENTRYID = "entryid";
+
+    /** _more_          */
+    public static String ARG_ATTR1 = "attr1";
+
+    /** _more_          */
+    public static String ARG_ATTR2 = "attr2";
+
+    /** _more_          */
+    public static String ARG_ATTR3 = "attr3";
+
+    /** _more_          */
+    public static String ARG_ATTR4 = "attr4";
+
+
+
+
+    /** _more_ */
     private Hashtable canHandle = new Hashtable();
 
-    /** _more_          */
+    /** _more_ */
     private List types = new ArrayList();
 
     /**
@@ -117,6 +141,17 @@ public class MetadataHandler extends RepositoryManager {
         return canHandle.get(metadata.getType()) != null;
     }
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     *
+     * @return _more_
+     */
+    public boolean canHandle(String type) {
+        return canHandle.get(type) != null;
+    }
+
 
     /**
      * _more_
@@ -147,12 +182,124 @@ public class MetadataHandler extends RepositoryManager {
     /**
      * _more_
      *
+     * @param metadata _more_
+     *
+     * @return _more_
+     */
+    public String[] getEditForm(Metadata metadata) {
+        return null;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    public void makeAddForm(Request request, Entry entry, StringBuffer sb)
+            throws Exception {
+        for (int i = 0; i < types.size(); i++) {
+            makeAddForm(entry, types.get(i).toString(), sb);
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param type _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    private void makeAddForm(Entry entry, String type, StringBuffer sb)
+            throws Exception {
+        String[] html = getEditForm(new Metadata(type));
+        if (html == null) {
+            return;
+        }
+        sb.append("<p>&nbsp;<p>");
+        sb.append(HtmlUtil.form(getRepository().URL_METADATA_ADD));
+        sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
+        sb.append(HtmlUtil.submit("Add " + html[0]));
+        sb.append(HtmlUtil.space(2));
+        sb.append(html[1]);
+        sb.append(HtmlUtil.formClose());
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param metadataList _more_
+     */
+    public void handleAddSubmit(Request request, Entry entry,
+                                List<Metadata> metadataList) {
+        String type = request.getString(ARG_TYPE, "");
+        if ( !canHandle(type)) {
+            return;
+        }
+        String attr1 = request.getString(ARG_ATTR1, "");
+        String attr2 = request.getString(ARG_ATTR2, "");
+        String attr3 = request.getString(ARG_ATTR3, "");
+        String attr4 = request.getString(ARG_ATTR4, "");
+        if ((attr1.length() == 0) && (attr2.length() == 0)
+                && (attr3.length() == 0) && (attr4.length() == 0)) {
+            return;
+        }
+        metadataList.add(new Metadata(getRepository().getGUID(),
+                                      entry.getId(), type, attr1, attr2,
+                                      attr3, attr4));
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param metadataList _more_
+     */
+    public void handleFormSubmit(Request request, Entry entry,
+                                 List<Metadata> metadataList) {
+        Hashtable args = request.getArgs();
+        for (Enumeration keys = args.keys(); keys.hasMoreElements(); ) {
+            String arg = (String) keys.nextElement();
+            if ( !arg.startsWith(ARG_METADATAID + ".")) {
+                continue;
+            }
+            String id   = request.getString(arg, "");
+            String type = request.getString(ARG_TYPE + "." + id, "");
+            if ( !canHandle(type)) {
+                continue;
+            }
+            metadataList.add(
+                new Metadata(
+                    id, entry.getId(), type,
+                    request.getString(ARG_ATTR1 + "." + id, ""),
+                    request.getString(ARG_ATTR2 + "." + id, ""),
+                    request.getString(ARG_ATTR3 + "." + id, ""),
+                    request.getString(ARG_ATTR4 + "." + id, "")));
+
+        }
+    }
+
+    /**
+     * _more_
+     *
      * @param type _more_
      *
      * @return _more_
      */
     public String getFormHtml(String type) {
-        return "";
+        return null;
     }
 
 

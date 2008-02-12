@@ -455,7 +455,8 @@ public class UserManager extends RepositoryManager {
                                           Misc.newList(TABLE_USERS),
                                           SqlUtil.eq(COL_USERS_ID,
                                               SqlUtil.quote(id)));
-        ResultSet results = getRepository().execute(query).getResultSet();
+        ResultSet results =
+            getDatabaseManager().execute(query).getResultSet();
         if ( !results.next()) {
             //            throw new IllegalArgumentException ("Could not find  user id:" + id + " sql:" + query);
             if (userDefaultIfNotFound) {
@@ -501,11 +502,11 @@ public class UserManager extends RepositoryManager {
                         ? "1"
                         : "0")
             });
-            getRepository().execute(query);
+            getDatabaseManager().execute(query);
             return;
         }
 
-        getRepository().execute(INSERT_USERS, new Object[] {
+        getDatabaseManager().executeInsert(INSERT_USERS, new Object[] {
             user.getId(), user.getName(), user.getEmail(), user.getQuestion(),
             user.getAnswer(), user.getPassword(), new Boolean(user.getAdmin())
         });
@@ -536,9 +537,8 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void deleteUser(User user) throws Exception {
-        String query = SqlUtil.makeDelete(TABLE_USERS, COL_USERS_ID,
-                                          SqlUtil.quote(user.getId()));
-        getRepository().execute(query);
+        getDatabaseManager().executeDelete(TABLE_USERS, COL_USERS_ID,
+                                           SqlUtil.quote(user.getId()));
         deleteRoles(user);
     }
 
@@ -550,9 +550,9 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void deleteRoles(User user) throws Exception {
-        getRepository().execute(SqlUtil.makeDelete(TABLE_USERROLES,
-                SqlUtil.eq(COL_USERROLES_USER_ID,
-                           SqlUtil.quote(user.getId()))));
+        getDatabaseManager().executeDelete(TABLE_USERROLES,
+                                           COL_USERROLES_USER_ID,
+                                           SqlUtil.quote(user.getId()));
     }
 
 
@@ -612,9 +612,9 @@ public class UserManager extends RepositoryManager {
                                  true, true);
             deleteRoles(user);
             for (String role : roles) {
-                getRepository().execute(INSERT_USERROLES,
-                                        new Object[] { user.getId(),
-                        role });
+                getDatabaseManager().executeInsert(INSERT_USERROLES,
+                        new Object[] { user.getId(),
+                                       role });
             }
             user.setRoles(roles);
         }
@@ -865,7 +865,7 @@ public class UserManager extends RepositoryManager {
                                           Misc.newList(TABLE_USERS));
 
         SqlUtil.Iterator iter =
-            SqlUtil.getIterator(getRepository().execute(query));
+            SqlUtil.getIterator(getDatabaseManager().execute(query));
         ResultSet  results;
 
         List<User> users = new ArrayList();
@@ -929,7 +929,7 @@ public class UserManager extends RepositoryManager {
                                           Misc.newList(TABLE_USERROLES),
                                           SqlUtil.eq(COL_USERROLES_USER_ID,
                                               SqlUtil.quote(user.getId())));
-        Statement    stmt  = getRepository().execute(query);
+        Statement    stmt  = getDatabaseManager().execute(query);
         String[]     array = SqlUtil.readString(stmt, 1);
         List<String> roles = new ArrayList<String>(Misc.toList(array));
         user.setRoles(roles);
@@ -1184,7 +1184,8 @@ public class UserManager extends RepositoryManager {
                                                COL_USERS_PASSWORD,
                                                SqlUtil.quote(password)))));
 
-            ResultSet results = getRepository().execute(query).getResultSet();
+            ResultSet results =
+                getDatabaseManager().execute(query).getResultSet();
             if (results.next()) {
                 user = getUser(results);
                 setUserSession(request, user);
@@ -1270,7 +1271,7 @@ public class UserManager extends RepositoryManager {
      */
     public List<String> getRoles() throws Exception {
         String[] roles = SqlUtil.readString(
-                             getRepository().execute(
+                             getDatabaseManager().execute(
                                  SqlUtil.makeSelect(
                                      SqlUtil.distinct(COL_USERROLES_ROLE),
                                      Misc.newList(TABLE_USERROLES))), 1);
