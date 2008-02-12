@@ -607,7 +607,7 @@ public class StationModelDisplayable extends DisplayableData {
         Set  set = data.getDomainSet();
         Data tmp = data.getSample(0);
         if (tmp.isMissing()) {
-            return null;
+           return null;
         }
 
         PointOb       firstOb   = (PointOb) data.getSample(0);
@@ -761,6 +761,9 @@ public class StationModelDisplayable extends DisplayableData {
                                     paramId.substring(1), tType, typeNames,
                                     data, metSymbol,
                                     metSymbol.getDisplayUnit());
+                        } else if (paramId.startsWith("value:")) {
+                            String tok = paramId.substring(6);
+                            workDataArray[paramIdx] = Util.toReal(tok);
                         } else {
                             workDataArray[paramIdx] = getComponent(ob, data,
                                     tType, typeNames, paramId);
@@ -838,7 +841,13 @@ public class StationModelDisplayable extends DisplayableData {
                         }
                     }
                 } else if (metSymbol instanceof WeatherSymbol) {
-                    double value = ((Real) workDataArray[0]).getValue();
+                    double value;
+                    if(workDataArray[0] instanceof Text) {
+                        value = new Double(workDataArray[0].toString()).doubleValue();
+                        //                        ((Real) workDataArray[0]).getValue();
+                    } else {
+                        value = ((Real) workDataArray[0]).getValue();
+                    }
                     if ( !Double.isNaN(value)) {
                         shape =
                             ((WeatherSymbol) metSymbol).getLines((int) value);
