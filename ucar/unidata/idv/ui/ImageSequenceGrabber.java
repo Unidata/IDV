@@ -991,7 +991,6 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 String viewpointFile = 
                     imageGenerator.applyMacros(scriptingNode, ATTR_VIEWPOINTFILE);
                 List viewpoints = (List)idv.decodeObject(IOUtil.readContents(viewpointFile, getClass()));
-                System.err.println ("doing it");
                 for (int i = 0; i < viewpoints.size();i++) {
                     double[]matrix = (double[]) viewpoints.get(i);
                     viewManager.setDisplayMatrix(matrix);
@@ -1307,6 +1306,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         images = new Vector();
         times  = new Vector();
         locs   = new Vector();
+        positions = new Vector();
         if (viewManager != null) {
             viewManager.useImages(images, justCaptureAnimation);
         }
