@@ -124,6 +124,19 @@ def div(V):
   """
   return add(ddx(ur(V)),ddy(vr(V)))
 
+def dirn(V):
+  """ North relative direction of a vector
+  <div class=jython>
+      DIRN ( V ) = DIRR ( un(v), vn(v) )
+  </div>
+  """
+  return dirr(DerivedGridFactory.createTrueFlowVector(V))
+
+def dirr(V):
+  """ Grid relative direction of a vector
+  """
+  return DerivedGridFactory.createVectorDirection(V)
+
 def dot(V1,V2):
   """ Vector dot product
   <div class=jython>
