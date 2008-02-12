@@ -75,6 +75,9 @@ import javax.swing.tree.*;
  */
 public class GuiUtils extends LayoutUtil {
 
+    public static String MISSING_IMAGE  = "/ucar/undiata/util/scream.gif";
+
+
     /** xml attribute name */
     public static final String ATTR_ACTION = "action";
 
@@ -859,12 +862,14 @@ public class GuiUtils extends LayoutUtil {
             System.err.println(exc + " getting image ");
         }
         System.err.println("Unable to find image:" + file);
-        URL url = Misc.getURL("scream.gif", GuiUtils.class);
+        URL url = Misc.getURL(MISSING_IMAGE, GuiUtils.class);
         if (url == null) {
             return null;
         }
         return Toolkit.getDefaultToolkit().createImage(url);
     }
+
+
 
 
 
