@@ -945,7 +945,7 @@ public class GeoGridDataSource extends GridDataSource {
                 logException("Unable to write file: " + file, ioe);
                 return null;
             }
-            System.out.println("" + sb);
+            log_.debug("" + sb);
         }
 
         try {

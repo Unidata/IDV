@@ -34,17 +34,7 @@ import ucar.unidata.util.Misc;
 
 import ucar.visad.Util;
 import ucar.visad.VisADMath;
-import ucar.visad.quantities.AirPressure;
-import ucar.visad.quantities.CommonUnits;
-import ucar.visad.quantities.EquivalentPotentialTemperature;
-import ucar.visad.quantities.GeopotentialAltitude;
-import ucar.visad.quantities.Gravity;
-import ucar.visad.quantities.GridRelativeHorizontalWind;
-import ucar.visad.quantities.Length;
-import ucar.visad.quantities.PotentialTemperature;
-import ucar.visad.quantities.SaturationMixingRatio;
-import ucar.visad.quantities.SaturationVaporPressure;
-import ucar.visad.quantities.Temperature;
+import ucar.visad.quantities.*;
 
 import visad.*;
 
@@ -91,6 +81,9 @@ public class DerivedGridFactory {
     /** gravity */
     public static final Real GRAVITY;
 
+    /** negative one */
+    public static final Real NEGATIVE_ONE;
+
     static {
         try {
             EARTH_RADIUS = new Real(Length.getRealType(), 6371000, SI.meter);
@@ -99,7 +92,8 @@ public class DerivedGridFactory {
             Unit kmPerDegree = Util.parseUnit("km/degree");
             KM_PER_DEGREE = new Real(DataUtil.makeRealType("kmPerDegree",
                     kmPerDegree), 111.0, kmPerDegree);
-            GRAVITY = Gravity.newReal();
+            GRAVITY      = Gravity.newReal();
+            NEGATIVE_ONE = new Real(-1);
 
         } catch (Exception ex) {
             throw new ExceptionInInitializerError(ex.toString());
@@ -425,11 +419,11 @@ public class DerivedGridFactory {
 
         FieldImpl relVor  = createRelativeVorticity(uFI, vFI);
         FieldImpl latGrid = createLatitudeGrid(relVor);
-        FieldImpl fc = 
+        FieldImpl fc =
             (FieldImpl) latGrid.sinDegrees().multiply(EARTH_TWO_OMEGA);
-        FieldImpl avFI    = (FieldImpl) relVor.add(fc);
-        Unit      avUnit  = GridUtil.getParamUnits(avFI)[0];
-        RealType  avRT    = DataUtil.makeRealType("absvorticity", avUnit);
+        FieldImpl avFI   = (FieldImpl) relVor.add(fc);
+        Unit      avUnit = GridUtil.getParamUnits(avFI)[0];
+        RealType  avRT   = DataUtil.makeRealType("absvorticity", avUnit);
         return GridUtil.setParamType(avFI, avRT, false);
 
     }  // end method create Absolute Vorticity (FieldImpl uFI, FieldImpl vFI)
@@ -1011,6 +1005,121 @@ public class DerivedGridFactory {
         // reset name which was scrambled in computations
         return GridUtil.setParamType(wsgridFI, spdRT, false);
     }  //  end create vector mag
+
+
+    /**
+     * Make a FieldImpl the magnitude of the vector components
+     *
+     * @param vector  vector of grid of U and V direction component
+     *
+     * @return flow direction grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createVectorDirection(FieldImpl vector)
+            throws VisADException, RemoteException {
+        if ( !isVector(vector)) {
+            throw new VisADException("Not a vector grid "
+                                     + GridUtil.getParamType(vector));
+        }
+
+        FieldImpl dirFI = null;
+        if (GridUtil.isTimeSequence(vector)) {
+
+            // Implementation:  have to take the raw data FieldImpl
+            // apart, make direction FlatField by FlatField,
+            // and put all back together again into a new divergence FieldImpl
+
+            Set timeSet = vector.getDomainSet();
+
+            // compute each divFlatField in turn; load in FieldImpl
+            for (int i = 0; i < timeSet.getLength(); i++) {
+                FlatField dirFF =
+                    createVectorDirectionFF((FlatField) vector.getSample(i,
+                        false));
+
+                if ((dirFI == null) && (dirFF != null)) {
+                    FunctionType dirFT =
+                        new FunctionType(
+                            ((SetType) timeSet.getType()).getDomain(),
+                            dirFF.getType());
+                    dirFI = new FieldImpl(dirFT, timeSet);
+                }
+                if (dirFF != null) {
+                    dirFI.setSample(i, dirFF, false, false);
+                }
+            }
+        } else {
+            dirFI = createVectorDirectionFF((FlatField) vector);
+        }
+        return dirFI;
+    }
+
+    /**
+     * Make a FieldImpl the direction of the vector components
+     *
+     * @param vector  vector of grid of U and V flow component
+     *
+     * @return flow direction grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    private static FlatField createVectorDirectionFF(FlatField vector)
+            throws VisADException, RemoteException {
+        if ( !isVector(vector)) {
+            throw new VisADException("Not a vector grid "
+                                     + GridUtil.getParamType(vector));
+        }
+
+        FunctionType dirFT =
+            new FunctionType(
+                ((SetType) vector.getDomainSet().getType()).getDomain(),
+                Direction.getRealTupleType());
+
+        FlatField dirFF   = new FlatField(dirFT, vector.getDomainSet());
+        float[][] samples = vector.getFloats(false);
+        float[][] dirs    = new float[1][samples[0].length];
+        float     u, v, dir;
+
+        // compute each divFlatField in turn; load in FieldImpl
+        for (int i = 0; i < samples[0].length; i++) {
+            u = samples[0][i];
+            v = samples[1][i];
+            if (Float.isNaN(u) || Float.isNaN(v)) {
+                dir = Float.NaN;
+            } else if ((u == 0) && (v == 0)) {
+                dir = 0;
+            } else {
+                dir = (float) Math.toDegrees(Math.atan2(-u, -v));
+                if (dir < 0) {
+                    dir += 360;
+                }
+            }
+            dirs[0][i] = dir;
+        }
+        dirFF.setSamples(dirs, false);
+        return dirFF;
+    }
+
+
+    /**
+     * Make a FieldImpl the direction of the vector components
+     *
+     * @param uFI  grid of U flow component
+     * @param vFI  grid of V flow component
+     *
+     * @return direction grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createVectorDirection(FieldImpl uFI,
+            FieldImpl vFI)
+            throws VisADException, RemoteException {
+        return createVectorDirection(createFlowVectors(uFI, vFI));
+    }
 
 
     /**
@@ -2079,17 +2188,19 @@ public class DerivedGridFactory {
             fToUse = (FlatField) GridUtil.make2DGridFromSlice(fToUse, false);
         }
 
-        FlatField retField = (FlatField) fToUse.derivative(var, Data.NO_ERRORS);
+        FlatField retField = (FlatField) fToUse.derivative(var,
+                                 Data.NO_ERRORS);
         if (twoDManifold) {
             retField = (FlatField) GridUtil.setSpatialDomain(retField,
                     domain);
         }
         if (var.equals(RealType.Longitude)
                 || var.getName().toLowerCase().startsWith("lon")) {
-            FlatField latGrid = (FlatField) createLatitudeGrid(retField);
+            FlatField latGrid    = (FlatField) createLatitudeGrid(retField);
             FlatField latCosGrid = (FlatField) latGrid.cosDegrees();
             // account for 0 at poles.
-            latCosGrid = (FlatField) latCosGrid.max(new Real(Math.cos(Math.toRadians(89))));
+            latCosGrid = (FlatField) latCosGrid.max(
+                new Real(Math.cos(Math.toRadians(89))));
             FlatField factor = (FlatField) latCosGrid.multiply(KM_PER_DEGREE);
             retField = (FlatField) retField.divide(factor);
         } else if (var.equals(RealType.Latitude)
