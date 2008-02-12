@@ -844,7 +844,6 @@ public class StationModelDisplayable extends DisplayableData {
                     double value;
                     if(workDataArray[0] instanceof Text) {
                         value = new Double(workDataArray[0].toString()).doubleValue();
-                        //                        ((Real) workDataArray[0]).getValue();
                     } else {
                         value = ((Real) workDataArray[0]).getValue();
                     }
