@@ -82,9 +82,6 @@ public class Admin extends RepositoryManager {
     public RequestUrl URL_ADMIN_CLEANUP = new RequestUrl(this,
                                               "/admin/cleanup", "Cleanup");
 
-    /** _more_ */
-    public RequestUrl URL_ADMIN_HOME = new RequestUrl(this, "/admin/home",
-                                           "Home");
 
     /** _more_ */
     public RequestUrl URL_ADMIN_STARTSTOP = new RequestUrl(this,
@@ -116,7 +113,7 @@ public class Admin extends RepositoryManager {
 
     /** _more_ */
     protected RequestUrl[] adminUrls = {
-        URL_ADMIN_HOME, URL_ADMIN_SETTINGS, URL_ADMIN_STARTSTOP,
+        URL_ADMIN_SETTINGS, URL_ADMIN_STARTSTOP,
         URL_ADMIN_TABLES, URL_ADMIN_STATS, getUserManager().URL_USER_LIST,
         URL_ADMIN_HARVESTERS, URL_ADMIN_SQL, URL_ADMIN_CLEANUP
     };
@@ -291,9 +288,11 @@ public class Admin extends RepositoryManager {
                 boolean didone = false;
                 while (indices.next()) {
                     if ( !generateJava) {
-                        if ( !didone) {
+                       if ( !didone) {
+                           //                            sb.append(
+                           //                                "<br><b>Indices</b> (name,order,type,pages)<br>");
                             sb.append(
-                                "<br><b>Indices</b> (name,order,type,pages<br>");
+                                "<br><b>Indices</b><br>");
                         }
                         didone = true;
                         String indexName  = indices.getString("INDEX_NAME");
@@ -309,8 +308,9 @@ public class Admin extends RepositoryManager {
                         } else if (type == DatabaseMetaData.tableIndexOther) {
                             typeString = "other";
                         }
-                        sb.append("Index:" + indexName + "  " + asc + " "
-                                  + typeString + " " + pages + "<br>");
+                        //                        sb.append("Index:" + indexName + "  " + asc + " "
+                        //                                  + typeString + " " + pages + "<br>");
+                        sb.append("Index:" + indexName + "<br>");
 
 
                     }
@@ -409,6 +409,19 @@ public class Admin extends RepositoryManager {
         sb.append("</form>");
         return makeResult(request, "Administration", sb);
 
+    }
+
+    public Result adminActions(Request request) throws Exception {
+        StringBuffer sb           = new StringBuffer();
+        List<ApiMethod> apiMethods = getRepository().getApiMethods();
+        sb.append(HtmlUtil.formTable());
+        sb.append(HtmlUtil.row(HtmlUtil.cols("Name","Admin?","Actions")));
+        for(ApiMethod apiMethod: apiMethods) {
+            sb.append(HtmlUtil.row(HtmlUtil.cols(apiMethod.getName(),""+apiMethod.getMustBeAdmin(),StringUtil.join(",",apiMethod.getActions()))));
+        }
+        sb.append(HtmlUtil.formTableClose());
+
+        return makeResult(request, "Administration", sb);
     }
 
     /**

@@ -24,12 +24,18 @@ package ucar.unidata.repository;
 import java.lang.reflect.Method;
 
 import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  */
 
 public class ApiMethod {
+
+    /** _more_ */
+    public static final String TAG_METHOD = "method";
+    public static final String TAG_PROPERTY = "property";
 
 
     /** _more_ */
@@ -38,11 +44,15 @@ public class ApiMethod {
     /** _more_ */
     public static final String ATTR_HANDLER = "handler";
 
+    public static final String ATTR_ACTIONS = "actions";
+
     /** _more_ */
     public static final String ATTR_TOPLEVEL = "toplevel";
 
     /** _more_ */
     public static final String ATTR_NAME = "name";
+
+    public static final String ATTR_VALUE= "value";
 
     /** _more_ */
     public static final String ATTR_METHOD = "method";
@@ -78,6 +88,8 @@ public class ApiMethod {
     /** _more_ */
     private boolean canCache = false;
 
+    private List actions;
+
     /**
      * _more_
      *
@@ -111,12 +123,15 @@ public class ApiMethod {
      *
      * @return _more_
      */
-    public boolean isRequestOk(Request request, Repository repository) {
+    public boolean isRequestOk(Request request, Repository repository) throws Exception {
         RequestContext context = request.getRequestContext();
-        if (mustBeAdmin) {
-            User user = context.getUser();
-            if ((user == null) || !user.getAdmin()) {
-                return false;
+        User user = context.getUser();
+        if (mustBeAdmin && !user.getAdmin()) {
+            return false;
+        }
+        if(actions.size()>0) {
+            for(int i=0;i<actions.size();i++) {
+                if(!repository.canDoAction(request, (String)actions.get(i))) return false;
             }
         }
         return true;
@@ -261,6 +276,24 @@ public class ApiMethod {
     public boolean getMustBeAdmin() {
         return mustBeAdmin;
     }
+
+/**
+Set the Actions property.
+
+@param value The new value for Actions
+**/
+public void setActions (List value) {
+	actions = value;
+}
+
+/**
+Get the Actions property.
+
+@return The Actions
+**/
+public List getActions () {
+	return actions;
+}
 
 
 

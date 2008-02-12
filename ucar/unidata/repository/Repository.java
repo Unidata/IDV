@@ -122,8 +122,14 @@ public class Repository implements Constants, Tables, RequestHandler,
                                                  "/entry/searchform");
 
     /** _more_ */
-    public RequestUrl URL_ENTRY_COMMENTS = new RequestUrl(this,
-                                               "/entry/comments");
+    public RequestUrl URL_COMMENTS_SHOW = new RequestUrl(this,
+                                               "/comments/show");
+
+    public RequestUrl URL_COMMENTS_ADD = new RequestUrl(this,
+                                               "/comments/add");
+
+    public RequestUrl URL_COMMENTS_EDIT = new RequestUrl(this,
+                                               "/comments/edit");
 
     /** _more_ */
     public RequestUrl URL_ENTRY_SEARCH = new RequestUrl(this,
@@ -168,7 +174,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     public RequestUrl URL_ENTRY_FORM = new RequestUrl(this, "/entry/form");
 
     /** _more_ */
-    public RequestUrl URL_ENTITY_FORM = new RequestUrl(this, "/entity/form");
+    public RequestUrl URL_ENTRY_NEW = new RequestUrl(this, "/entry/new");
 
     /** _more_ */
     public RequestUrl URL_GETENTRIES = new RequestUrl(this, "/getentries");
@@ -871,33 +877,36 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected void addRequest(Element node) throws Exception {
+    protected void addRequest(Element node, Hashtable props) throws Exception {
         String  request = XmlUtil.getAttribute(node, ApiMethod.ATTR_REQUEST);
         String  methodName = XmlUtil.getAttribute(node,
                                  ApiMethod.ATTR_METHOD);
         boolean admin = XmlUtil.getAttribute(node, ApiMethod.ATTR_ADMIN,
-                                             true);
+                                             Misc.getProperty(props,ApiMethod.ATTR_ADMIN,true));
 
+        boolean canCache  = XmlUtil.getAttribute(node, ApiMethod.ATTR_CANCACHE,
+                                             Misc.getProperty(props,ApiMethod.ATTR_CANCACHE,true));
 
 
         RequestHandler handler = this;
-        if (XmlUtil.hasAttribute(node, ApiMethod.ATTR_HANDLER)) {
-            String handlerName = XmlUtil.getAttribute(node,
-                                     ApiMethod.ATTR_HANDLER);
+        String handlerName = XmlUtil.getAttribute(node, ApiMethod.ATTR_HANDLER,
+                                                  Misc.getProperty(props, ApiMethod.ATTR_HANDLER,"repository"));
 
-            if (handlerName.equals("usermanager")) {
-                handler = getUserManager();
-            } else if (handlerName.equals("admin")) {
-                handler = getAdmin();
-            } else {
-                Class c = Misc.findClass(handlerName);
-                Constructor ctor = Misc.findConstructor(c,
-                                       new Class[] { Repository.class,
-                        Element.class });
-                handler = (RequestHandler) ctor.newInstance(new Object[] {
-                    this,
-                    node });
-            }
+
+        if (handlerName.equals("usermanager")) {
+            handler = getUserManager();
+        } else if (handlerName.equals("admin")) {
+            handler = getAdmin();
+        } else if (handlerName.equals("repository")) {
+            handler = this;
+        } else {
+            Class c = Misc.findClass(handlerName);
+            Constructor ctor = Misc.findConstructor(c,
+                                                    new Class[] { Repository.class,
+                                                                  Element.class });
+            handler = (RequestHandler) ctor.newInstance(new Object[] {
+                this,
+                node });
         }
 
         String    url       = getUrlBase() + request;
@@ -911,20 +920,23 @@ public class Repository implements Constants, Tables, RequestHandler,
         Method method = Misc.findMethod(handler.getClass(), methodName,
                                         paramTypes);
         if (method == null) {
+            System.err.println ("props:" + props);
             throw new IllegalArgumentException("Unknown request method:"
                     + methodName);
         }
+
+
         ApiMethod apiMethod = new ApiMethod(
                                   handler, request,
                                   XmlUtil.getAttribute(
                                       node, ApiMethod.ATTR_NAME,
-                                      request), method, admin,
-                                          XmlUtil.getAttribute(
-                                              node, ApiMethod.ATTR_CANCACHE,
-                                              false), XmlUtil.getAttribute(
+                                      request), method, admin, canCache, XmlUtil.getAttribute(
                                                   node,
                                                   ApiMethod.ATTR_TOPLEVEL,
                                                   false));
+        List actions = StringUtil.split(XmlUtil.getAttribute(node, ApiMethod.ATTR_ACTIONS,""),",",true,true);
+        if(!Permission.isValidActions(actions)) throw new IllegalArgumentException("Bad actions:" + actions + " for api method:" + apiMethod.getName());
+        apiMethod.setActions(actions);
         if (XmlUtil.getAttribute(node, ApiMethod.ATTR_ISHOME, false)) {
             homeApi = apiMethod;
         }
@@ -939,18 +951,33 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+    public List<ApiMethod> getApiMethods() {
+        return apiMethods;
+    }
+
+
     /**
      * _more_
      *
      * @throws Exception _more_
      */
     protected void initApi() throws Exception {
+
         for (String file : apiDefFiles) {
             Element apiRoot  = XmlUtil.getRoot(file, getClass());
-            List    children = XmlUtil.findChildren(apiRoot, TAG_METHOD);
-            for (int i = 0; i < children.size(); i++) {
-                Element node = (Element) children.get(i);
-                addRequest(node);
+            NodeList children = XmlUtil.getElements(apiRoot);
+            Hashtable props  = new Hashtable();
+            for (int i = 0; i < children.getLength(); i++) {
+                Element node = (Element) children.item(i);
+                String tag = node.getTagName();
+                if(tag.equals(ApiMethod.TAG_PROPERTY)) {
+                    props.put(XmlUtil.getAttribute(node,ApiMethod.ATTR_NAME),
+                              XmlUtil.getAttribute(node,ApiMethod.ATTR_VALUE));
+                } else  if(tag.equals(ApiMethod.TAG_METHOD)) {
+                    addRequest(node,props);
+                } else {
+                    throw new IllegalArgumentException("Unknown api.xml tag:" + tag);
+                }
             }
         }
         for (ApiMethod apiMethod : apiMethods) {
@@ -1152,8 +1179,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
         if ( !getUserManager().isRequestOk(request)
-                || ((apiMethod != null)
-                    && !apiMethod.isRequestOk(request, this))) {
+                || !apiMethod.isRequestOk(request, this)) {
             StringBuffer sb = new StringBuffer();
             sb.append("You cannot access this page<p>");
             sb.append(getUserManager().makeLoginForm(request,
@@ -2397,31 +2423,42 @@ public class Repository implements Constants, Tables, RequestHandler,
                + getBreadCrumbs(request, group, true, "")[1];
     }
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processEntityForm(Request request) throws Exception {
-        Group        group = findGroup(request, true);
-        StringBuffer sb    = new StringBuffer();
-        sb.append(makeGroupHeader(request, group));
-        sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.form(URL_ENTRY_FORM, ""));
-        sb.append(HtmlUtil.formEntry(HtmlUtil.submit("Create new entry:"),
-                                     makeTypeSelect(request, false)));
-        sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
-        sb.append("</form>");
 
-        sb.append(makeNewGroupForm(request, group, ""));
-        sb.append("</table>");
 
-        return new Result("New Form", sb, Result.TYPE_HTML);
+    public boolean canDoAction(Request request, String action) throws Exception {
+        User user = request.getRequestContext().getUser();
+        //The admin can do anything
+        if(user.getAdmin()) return true;
+
+        if(request.exists(ATTR_ID)) {
+            Entry entry = getEntry(request.getString(ARG_ID, ""), request);
+            if (entry == null) {
+                throw new IllegalArgumentException("Could not find entry:"
+                        + request.getString(ARG_ID, ""));
+            }
+            return canDoAction(request, entry, action);
+        }
+
+        if(request.exists(ARG_GROUP)) {
+            Group group = findGroup(request, false);
+            if (group == null) {
+                throw new IllegalArgumentException("Could not find group:"
+                        + request.getString(ARG_GROUP, ""));
+            }
+            return canDoAction(request, group, action);
+        }
+        throw new IllegalArgumentException("Could not find entry or group");
+        //        return false;
     }
+
+
+    public boolean canDoAction(Request request, Entry entry, String action) throws Exception {
+        User user = request.getRequestContext().getUser();
+        //The admin can do anything
+        if(user.getAdmin()) return true;
+        return false;
+    }
+
 
 
     /**
@@ -2432,12 +2469,11 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @return _more_
      */
-    public boolean canEditEntry(Request request, Entry entry) {
+    public boolean canEditEntry(Request request, Entry entry)             throws Exception {
         if (entry.isTopGroup()) {
             return false;
         }
-        //TODO: Check access
-        return true;
+        return canDoAction(request, entry, Permission.ACTION_EDIT);
     }
 
 
@@ -2506,6 +2542,25 @@ public class Repository implements Constants, Tables, RequestHandler,
     protected List<TagCollection> getTagCollections() {
         return tagCollections;
     }
+
+
+    public Result processEntryNew(Request request) throws Exception {
+        Group        group = findGroup(request, true);
+        StringBuffer sb    = new StringBuffer();
+        sb.append(makeGroupHeader(request, group));
+        sb.append(HtmlUtil.formTable());
+        sb.append(HtmlUtil.form(URL_ENTRY_FORM, ""));
+        sb.append(HtmlUtil.formEntry(HtmlUtil.submit("Create new entry:"),
+                                     makeTypeSelect(request, false)));
+        sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
+        sb.append("</form>");
+
+        sb.append(makeNewGroupForm(request, group, ""));
+        sb.append("</table>");
+
+        return new Result("New Form", sb, Result.TYPE_HTML);
+    }
+
 
 
     /**
@@ -2730,26 +2785,35 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public String getCommentHtml(Request request, Entry entry)
             throws Exception {
+        boolean canEdit = canDoAction(request, entry, Permission.ACTION_EDIT);
+        boolean canComment = canDoAction(request, entry, Permission.ACTION_COMMENT);
+
         StringBuffer  sb       = new StringBuffer();
         List<Comment> comments = getComments(request, entry);
-        sb.append(HtmlUtil.form(URL_ENTRY_COMMENTS, ""));
-        sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
-        sb.append(HtmlUtil.formEntry("",
-                                     HtmlUtil.submit("Add Comment",
-                                         ARG_ADD)));
+        if(canComment) {
+            sb.append(HtmlUtil.form(URL_COMMENTS_ADD, ""));
+            sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
+            sb.append(HtmlUtil.formEntry("",
+                                         HtmlUtil.submit("Add Comment",
+                                                         ARG_ADD)));
+            sb.append(HtmlUtil.formClose());
+        }
+
         sb.append("<table>");
         for (Comment comment : comments) {
             sb.append(HtmlUtil.formEntry("", "<hr>"));
             //TODO: Check for access
             String deleteLink = HtmlUtil.href(
                                     HtmlUtil.url(
-                                        URL_ENTRY_COMMENTS, ARG_DELETE,
+                                        URL_COMMENTS_EDIT, ARG_DELETE,
                                         "true", ARG_ID, entry.getId(),
                                         ARG_COMMENT_ID,
                                         comment.getId()), HtmlUtil.img(
                                             fileUrl("/Delete.gif"),
                                             "Delete comment"));
-            sb.append(HtmlUtil.formEntry("", deleteLink));
+            if(canEdit) {
+                sb.append(HtmlUtil.formEntry("", deleteLink));
+            }
             sb.append(HtmlUtil.formEntry("Subject:", comment.getSubject()));
             sb.append(HtmlUtil.formEntry("By:",
                                          comment.getUser().getLabel() + " @ "
@@ -2769,11 +2833,42 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    public Result processEntryComments(Request request) throws Exception {
-        if ( !request.defined(ARG_ID)) {
+    public Result processCommentsShow(Request request) throws Exception {
+        Entry entry = getEntry(request.getString(ARG_ID, ""), request);
+        if (entry == null) {
             throw new IllegalArgumentException("Could not find entry:"
                     + request.getString(ARG_ID, ""));
         }
+        StringBuffer sb = new StringBuffer();
+        if (request.exists(ARG_MESSAGE)) {
+            sb.append(note(request.getUnsafeString(ARG_MESSAGE, "")));
+        }
+        sb.append("Comments for: " + getEntryUrl(entry));
+        sb.append("<p>");
+        sb.append(getCommentHtml(request, entry));
+        return new Result("Entry Comments", sb, Result.TYPE_HTML);
+    }
+
+
+    public Result processCommentsEdit(Request request) throws Exception {
+        Entry entry = getEntry(request.getString(ARG_ID, ""), request);
+        if (entry == null) {
+            throw new IllegalArgumentException("Could not find entry:"
+                    + request.getString(ARG_ID, ""));
+        }
+        execute(
+                SqlUtil.makeDelete(
+                                   TABLE_COMMENTS, COL_COMMENTS_ID,
+                                   SqlUtil.quote(request.getString(ARG_COMMENT_ID, ""))));
+        entry.setComments(null);
+        return new Result(HtmlUtil.url(URL_COMMENTS_SHOW, ARG_ID,
+                                       entry.getId(), ARG_MESSAGE,
+                                       "Comment deleted"));
+    }
+
+
+
+    public Result processCommentsAdd(Request request) throws Exception {
         Entry entry = getEntry(request.getString(ARG_ID, ""), request);
         if (entry == null) {
             throw new IllegalArgumentException("Could not find entry:"
@@ -2785,27 +2880,11 @@ public class Repository implements Constants, Tables, RequestHandler,
             sb.append(note(request.getUnsafeString(ARG_MESSAGE, "")));
         }
 
-        if (request.exists(ARG_DELETE)) {
-            execute(
-                SqlUtil.makeDelete(
-                    TABLE_COMMENTS, COL_COMMENTS_ID,
-                    SqlUtil.quote(request.getString(ARG_COMMENT_ID, ""))));
-            entry.setComments(null);
-            return new Result(HtmlUtil.url(URL_ENTRY_COMMENTS, ARG_ID,
-                                           entry.getId(), ARG_MESSAGE,
-                                           "Comment deleted"));
+
+        if (request.exists(ARG_CANCEL)) {
+            return new Result(HtmlUtil.url(URL_COMMENTS_SHOW, ARG_ID,
+                                           entry.getId()));
         }
-
-        if (request.exists(ARG_CANCEL)
-                || ( !request.exists(ARG_SUBJECT)
-                     && !request.exists(ARG_ADD))) {
-            sb.append("Comments for: " + getEntryUrl(entry));
-            sb.append("<p>");
-            sb.append(getCommentHtml(request, entry));
-            return new Result("Entry Comments", sb, Result.TYPE_HTML);
-        }
-
-
 
         String subject = "";
         String comment = "";
@@ -2829,13 +2908,13 @@ public class Repository implements Constants, Tables, RequestHandler,
                 insert.setString(col++, request.getString(ARG_COMMENT, ""));
                 insert.execute();
                 entry.setComments(null);
-                return new Result(HtmlUtil.url(URL_ENTRY_COMMENTS, ARG_ID,
+                return new Result(HtmlUtil.url(URL_COMMENTS_SHOW, ARG_ID,
                         entry.getId(), ARG_MESSAGE, "Comment added"));
             }
         }
 
         sb.append("Add comment for: " + getEntryUrl(entry));
-        sb.append(HtmlUtil.form(URL_ENTRY_COMMENTS, ""));
+        sb.append(HtmlUtil.form(URL_COMMENTS_ADD, ""));
         sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry("Subject:",
@@ -2853,9 +2932,6 @@ public class Repository implements Constants, Tables, RequestHandler,
         sb.append(HtmlUtil.formClose());
         return new Result("Entry Comments", sb, Result.TYPE_HTML);
     }
-
-
-
 
 
 

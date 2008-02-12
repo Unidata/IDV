@@ -834,7 +834,7 @@ public class HtmlOutputHandler extends OutputHandler {
         String commentsEntry =
             HtmlUtil.href(
                 HtmlUtil.url(
-                    repository.URL_ENTRY_COMMENTS, ARG_ID,
+                    repository.URL_COMMENTS_SHOW, ARG_ID,
                     group.getId()), HtmlUtil.img(
                         repository.fileUrl("/Comments.gif"),
                         "Add/View Comments"));
@@ -846,29 +846,30 @@ public class HtmlOutputHandler extends OutputHandler {
                                     repository.fileUrl("/Search16.gif"),
                                     "Search in Group"));
 
-        String createEntry = HtmlUtil.href(
+        String createEntry="";
+        if(repository.canDoAction(request, group, Permission.ACTION_NEW)) {
+            createEntry = HtmlUtil.href(
                                  HtmlUtil.url(
-                                     repository.URL_ENTITY_FORM, ARG_GROUP,
+                                     repository.URL_ENTRY_NEW, ARG_GROUP,
                                      group.getId()), HtmlUtil.img(
                                          repository.fileUrl("/New16.gif"),
-                                         "New Entry or Group"));
+                                         "New Entry or Group")) + HtmlUtil.space(1);
+        }
 
-        String editEntry = HtmlUtil.href(
+        String editEntry = "";
+        if (repository.canEditEntry(request, group)) {
+            editEntry = HtmlUtil.href(
                                HtmlUtil.url(
                                    repository.URL_ENTRY_FORM, ARG_ID,
                                    group.getId()), HtmlUtil.img(
                                        repository.fileUrl("/Edit16.gif"),
                                        "Edit Group"));
-
-        if ( !repository.canEditEntry(request, group)) {
-            editEntry = "";
         }
 
 
         return search + HtmlUtil.space(1)
                + repository.getGraphLink(request, group) + HtmlUtil.space(1)
-               + createEntry + HtmlUtil.space(1) + commentsEntry
-               + HtmlUtil.space(1) + editEntry;
+               + createEntry  + commentsEntry    + HtmlUtil.space(1) + editEntry;
     }
 
 

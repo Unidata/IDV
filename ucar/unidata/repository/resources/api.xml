@@ -1,52 +1,71 @@
 <api>
-  <method request="/group/show"  method="processGroupShow"    admin="false" cancache="true" name="Home" toplevel="true" ishome="true"/>
 
-  <method request="/entry/searchform"  method="processEntrySearchForm"   admin="false" cancache="true" name="Search" toplevel="true"/>
-  <method request="/entry/search"  method="processEntrySearch"        admin="false" cancache="true"/>
-  <method request="/list/home"   method="processListHome"     admin="false" cancache="true" name="List" toplevel="true"/>
-  <method request="/list/show"   method="processListShow"     admin="false" cancache="true"/>
-  <method request="/graph/view"  method="processGraphView"    admin="false" cancache="true"/>
-  <method request="/graph/get"   method="processGraphGet"     admin="false" cancache="true"/>
-  <method request="/entity/form" method="processEntityForm"     admin="false" cancache="true"/>
-  <method request="/entry/show"  method="processEntryShow"    admin="false" cancache="true"/>
-  <method request="/entry/change"   method="processEntryChange"     admin="false" cancache="true"/>
-  <method request="/entry/form"  method="processEntryForm"     admin="false" cancache="true"/>
-  <method request="/entry/comments"  method="processEntryComments"     admin="false" cancache="true"/>
-  <method request="/entry/delete"    method="processEntryDelete"     admin="false" cancache="true"/>
-  <method request="/entry/get/*"  method="processEntryGet"     admin="false" cancache="false"/>
-  <method request="/metadata/form"   method="processMetadataForm"     admin="false" cancache="true"/>
+  <property name="admin" value="false"/>
+  <property name="cancache" value="true"/>
 
+  <method request="/group/show"  method="processGroupShow"    name="Home" toplevel="true" ishome="true"/>
 
-  <method request="/association/add"    method="processAssociationAdd"     admin="false" cancache="true"/>
-  <method request="/getentries"  method="processGetEntries"   admin="false" cancache="true"/>
-  <method request="/getmap"    method="processMap"       admin="false" cancache="false"/>
-
-
-  <method request="/processfile"    method="processFile"       admin="false" cancache="false"/>
-
-  <method handler="usermanager" request="/user/login"    method="processLogin"     admin="false"  cancache="false"/>
-  <method handler="usermanager" request="/user/logout"   method="processLogout"    admin="false"  cancache="false"/>
-  <method handler="usermanager" request="/user/home"     method="processHome"      admin="false"  cancache="false"/>
-  <method handler="usermanager" request="/user/settings" method="processSettings"  admin="false"  cancache="false"/>
-  <method handler="usermanager" request="/user/cart"     method="processCart"      admin="false"  cancache="false"/>
-  <method handler="usermanager" request="/user/list"     method="adminUserList"    admin="true"   cancache="false"/>
-  <method handler="usermanager" request="/user/edit"     method="adminUserEdit"    admin="true"   cancache="false"/>
-  <method handler="usermanager" request="/user/new"      method="adminUserNew"    admin="true"   cancache="false"/>
-
-  <method  request="/message"      method="processMessage"  cancache="false" admin="false"/>
+  <method request="/entry/searchform"  method="processEntrySearchForm"   name="Search" toplevel="true"/>
+  <method request="/entry/search"  method="processEntrySearch"     />
+  <method request="/list/home"   method="processListHome"      name="List" toplevel="true"/>
+  <method request="/list/show"   method="processListShow"/>
+  <method request="/graph/view"  method="processGraphView" />
+  <method request="/graph/get"   method="processGraphGet"/>
 
 
 
+  <method request="/entry/show"      method="processEntryShow"/>
+  <method request="/entry/form"      method="processEntryForm"      actions="edit"/>
+  <method request="/entry/change"    method="processEntryChange"    actions="edit"/>
+  <method request="/entry/new"       method="processEntryNew"       actions="new"/>
+
+  <method request="/comments/show"   method="processCommentsShow"/>
+  <method request="/comments/add"   method="processCommentsAdd"     actions="comment"/>
+  <method request="/comments/edit"   method="processCommentsEdit"   actions="edit"/>
+
+  <method request="/entry/delete"    method="processEntryDelete"    actions="edit"/>
+
+  <method request="/entry/get/*"     method="processEntryGet"      cancache="false"/>
+  <method request="/metadata/form"   method="processMetadataForm"/>
+
+  <method request="/association/add"   method="processAssociationAdd"/>
+ 
+  <method request="/getentries"        method="processGetEntries" />
+
+  <method request="/getmap"            method="processMap"       cancache="false"/>
+  <method request="/processfile"    method="processFile"        cancache="false"/>
+  <method  request="/message"      method="processMessage"    cancache="false" />
 
 
-  <method handler="admin" request="/admin/import/catalog"       method="adminImportCatalog"      admin="true" cancache="false"/>
-  <method handler="admin" request="/admin/sql"          method="adminSql"      admin="true" cancache="false"/>
-  <method handler="admin" request="/admin/home"         method="adminHome"     admin="true" cancache="false" name="Admin" toplevel="true"/>
-  <method handler="admin" request="/admin/startstop"    method="adminDbStartStop"       admin="true" cancache="false"/>
-  <method handler="admin" request="/admin/settings"    method="adminSettings"       admin="true" cancache="false"/>
-  <method handler="admin" request="/admin/settings/do"    method="adminSettingsDo"       admin="true" cancache="false"/>
-  <method handler="admin" request="/admin/tables"       method="adminDbTables"       admin="true" cancache="false"/>
-  <method handler="admin" request="/admin/stats"        method="adminStats"    admin="true" cancache="false"/>
-  <method handler="admin" request="/admin/harvesters"   method="adminHarvesters"    admin="true" cancache="false"/>
-  <method handler="admin" request="/admin/cleanup"        method="adminCleanup"      admin="true" cancache="false"/>
+
+
+  <!-- Note: the admin property below gets applied to all following methods  that do not have the admin attribute -->
+  <property name="admin" value="true"/>
+  <property name="cancache" value="false"/>
+
+
+
+  <property name="handler" value="usermanager"/>
+  <method  request="/user/login"    method="processLogin" admin="false"/>
+  <method  request="/user/logout"   method="processLogout" admin="false"/>
+  <method  request="/user/home"     method="processHome" admin="false"/>
+  <method  request="/user/settings" method="processSettings" admin="false"/>
+  <method  request="/user/cart"     method="processCart" admin="false"/>
+
+  <method  request="/user/list"     method="adminUserList" />
+  <method  request="/user/edit"     method="adminUserEdit" />
+  <method  request="/user/new"      method="adminUserNew"/>
+
+
+  <property name="handler" value="admin"/>
+  <method  request="/admin/import/catalog"       method="adminImportCatalog"  />
+  <method  request="/admin/sql"          method="adminSql"       />
+  <method  request="/admin/startstop"    method="adminDbStartStop" />
+  <method  request="/admin/settings"    method="adminSettings"   name="Admin" toplevel="true"/>
+  <method  request="/admin/settings/do"    method="adminSettingsDo"/>
+  <method  request="/admin/tables"       method="adminDbTables"  />
+  <method  request="/admin/actions"       method="adminActions"  />
+  <method  request="/admin/stats"        method="adminStats"     />
+  <method  request="/admin/harvesters"   method="adminHarvesters"/>
+  <method  request="/admin/cleanup"        method="adminCleanup" />
 </api>

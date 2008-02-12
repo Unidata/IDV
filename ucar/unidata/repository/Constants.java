@@ -102,8 +102,6 @@ public interface Constants {
     /** _more_ */
     public static final String TAG_ASSOCIATIONS = "associations";
 
-    /** _more_ */
-    public static final String TAG_METHOD = "method";
 
     /** _more_ */
     public static final String ATTR_RSS_VERSION = "version";

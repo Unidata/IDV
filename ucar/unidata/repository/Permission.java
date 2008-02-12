@@ -77,29 +77,44 @@ import java.util.regex.*;
 public class Permission {
 
     /** _more_ */
-    public static final String ACTION_VIEW = "action.view";
+    public static final String ACTION_VIEW = "view";
 
     /** _more_ */
-    public static final String ACTION_EDIT = "action.edit";
+    public static final String ACTION_EDIT = "edit";
 
     /** _more_ */
-    public static final String ACTION_NEW = "action.new";
+    public static final String ACTION_NEW = "new";
 
     /** _more_ */
-    public static final String ACTION_DELETE = "action.delete";
+    public static final String ACTION_DELETE = "delete";
 
     /** _more_ */
-    public static final String ACTION_COMMENT = "action.delete";
+    public static final String ACTION_COMMENT = "comment";
 
 
     /** _more_ */
-    public static final String[] ACTION_NAMES = { ACTION_VIEW, ACTION_EDIT,
+    public static final String[] ACTIONS = { ACTION_VIEW, ACTION_EDIT,
             ACTION_NEW, ACTION_DELETE, ACTION_COMMENT };
 
     /** _more_ */
-    public static final String[] ACTIONS = { "View", "Edit", "New", "Delete",
+    public static final String[] ACTION_NAMES = { "View", "Edit", "New", "Delete",
                                              "Comment" };
 
+
+    public static boolean isValidActions(List actions) {
+        for(int i=0;i<actions.size();i++) {
+            if(!isValidAction((String) actions.get(i))) return false;
+        }
+        return true;
+    }
+
+
+    public static boolean isValidAction(String  action) {
+        for(int i=0;i<ACTIONS.length;i++) {
+            if(ACTIONS[i].equals(action)) return true;
+        }
+        return false;
+    }
 
 
     /** _more_ */

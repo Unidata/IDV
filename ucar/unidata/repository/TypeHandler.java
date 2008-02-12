@@ -506,17 +506,20 @@ public class TypeHandler implements Constants, Tables {
      */
     protected String getEntryLinks(Entry entry, Request request)
             throws Exception {
-        String editEntry = HtmlUtil.href(
-                               HtmlUtil.url(
-                                   repository.URL_ENTRY_FORM, ARG_ID,
-                                   entry.getId()), HtmlUtil.img(
-                                       repository.fileUrl("/Edit16.gif"),
-                                       "Edit Entry"));
+        String editEntry = "";
+        if(repository.canEditEntry(request, entry)) {
+            editEntry  =HtmlUtil.href(
+                                      HtmlUtil.url(
+                                                   repository.URL_ENTRY_FORM, ARG_ID,
+                                                   entry.getId()), HtmlUtil.img(
+                                                                                repository.fileUrl("/Edit16.gif"),
+                                                                                "Edit Entry"));
+        }
 
         String commentsEntry =
             HtmlUtil.href(
                 HtmlUtil.url(
-                    repository.URL_ENTRY_COMMENTS, ARG_ID,
+                    repository.URL_COMMENTS_SHOW, ARG_ID,
                     entry.getId()), HtmlUtil.img(
                         repository.fileUrl("/Comments.gif"),
                         "Add/View Comments"));
