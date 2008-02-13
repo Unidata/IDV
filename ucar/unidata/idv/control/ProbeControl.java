@@ -170,6 +170,8 @@ public class ProbeControl extends DisplayControlImpl {
     /** list of infos */
     private List<ProbeRowInfo> infos = new ArrayList();
 
+    private Object INFO_MUTEX = new Object();
+
     /** list of levels */
     private List _levels;
 
@@ -756,6 +758,7 @@ public class ProbeControl extends DisplayControlImpl {
      * @throws VisADException   VisAD Error
      */
     protected void resetData() throws VisADException, RemoteException {
+        
         clearCachedSamples();
         updateLegendLabel();
         setTimesForAnimation();
@@ -1774,6 +1777,13 @@ public class ProbeControl extends DisplayControlImpl {
      * @throws VisADException On badness
      */
     private void updateTime() throws VisADException, RemoteException {
+        synchronized(INFO_MUTEX) {
+            updateTimeInner();
+        }
+    }
+
+
+    private void updateTimeInner() throws VisADException, RemoteException {
 
         if ( !getHaveInitialized() || !getActive()) {
             return;
@@ -2048,10 +2058,12 @@ public class ProbeControl extends DisplayControlImpl {
      * This clears out the cached data
      */
     private void clearCachedSamples() throws VisADException, RemoteException {
-        for (int rowIdx = 0; rowIdx < infos.size(); rowIdx++) {
-            ProbeRowInfo info = infos.get(rowIdx);
-            info.clearCachedSamples();
-            info.getDataInstance().reInitialize();
+        synchronized(INFO_MUTEX) {
+            for (int rowIdx = 0; rowIdx < infos.size(); rowIdx++) {
+                ProbeRowInfo info = infos.get(rowIdx);
+                info.clearCachedSamples();
+                info.getDataInstance().reInitialize();
+            }
         }
     }
 
