@@ -2047,10 +2047,11 @@ public class ProbeControl extends DisplayControlImpl {
     /**
      * This clears out the cached data
      */
-    private void clearCachedSamples() {
+    private void clearCachedSamples() throws VisADException, RemoteException {
         for (int rowIdx = 0; rowIdx < infos.size(); rowIdx++) {
             ProbeRowInfo info = infos.get(rowIdx);
             info.clearCachedSamples();
+            info.getDataInstance().reInitialize();
         }
     }
 
