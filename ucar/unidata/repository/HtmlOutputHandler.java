@@ -688,7 +688,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         if (request.exists(ARG_MESSAGE)) {
             sb.append(repository.note(request.getUnsafeString(ARG_MESSAGE,
-                    "")));
+                                                              "")));
         }
 
         int cnt = subGroups.size() + entries.size();
@@ -731,6 +731,14 @@ public class HtmlOutputHandler extends OutputHandler {
             }
 
 
+            if(group.getDescription().length()>0) {
+                sb.append("<br>");
+                sb.append(group.getDescription());
+                sb.append("<br>");
+            }
+
+
+
             if ( !showApplet) {
                 getMetadataHtml(request, group, sb);
             }
@@ -741,16 +749,31 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(HtmlUtil.bold("Groups:"));
                 sb.append("<ul>");
                 for (Group subGroup : subGroups) {
+                    List<Metadata> metadataList = getRepository().getMetadata(subGroup);
+                    String icon = "";
+                    /**
+                    for (Metadata metadata : metadataList) {
+                        if(metadata.getType().equals(ThreddsMetadataHandler.TAG_ICON)) {
+                            icon = HtmlUtil.img(metadata.getAttr1(),"View " + subGroup.getName()," width=75 border=0 ") + HtmlUtil.space(1);
+                            break;
+                        }
+                        }**/
+
                     //                    sb.append(repository.getAllGroupLinks(request, subGroup));
                     sb.append("<li>");
-                    sb.append(
-                        HtmlUtil.href(
-                            HtmlUtil.url(
-                                repository.URL_GROUP_SHOW, ARG_GROUP,
-                                subGroup.getFullName(), ARG_OUTPUT, output,
-                                ARG_SHOWMETADATA, showMetadata
-                            ? "true"
-                            : "false"), subGroup.getName()));
+                    String linkText = icon+subGroup.getName();
+                    String groupLink =  HtmlUtil.href(
+                                                      HtmlUtil.url(
+                                                                   repository.URL_GROUP_SHOW, ARG_GROUP,
+                                                                   subGroup.getId(), ARG_OUTPUT, output,
+                                                                   ARG_SHOWMETADATA, showMetadata
+                                                                   ? "true"
+                                                                   : "false"), linkText);
+                    sb.append(groupLink);
+                    if(showMetadata && subGroup.getDescription().length()>0) {
+                        sb.append("<br>");
+                        sb.append(subGroup.getDescription());
+                    }
 
                     //                    sb.append("\n<br>\n");
                 }

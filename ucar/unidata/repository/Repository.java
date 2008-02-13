@@ -384,6 +384,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         new ArrayList<TagCollection>();
 
 
+    private List<String> htdocRoots = new ArrayList<String>();
 
 
     /**
@@ -768,6 +769,10 @@ public class Repository implements Constants, Tables, RequestHandler,
             tagCollections.add(new TagCollection(label,
                     StringUtil.split(tagValues, "\n", true, true)));
         }
+
+        //This will end up being from the properties
+        htdocRoots.addAll(StringUtil.split(getProperty("jdms.html.htdocroots",""),";",true,true));
+
     }
 
 
@@ -1322,20 +1327,27 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
 
-        try {
+        //Go through all of the htdoc roots
+        for(String root: htdocRoots) {
+            root = getStorageManager().localizePath(root);
+            String fullPath = root+path;
             //Make sure no one is trying to access other files
-            checkFilePath(path);
-            InputStream is =
-                IOUtil.getInputStream("/ucar/unidata/repository/htdocs"
-                                      + path, getClass());
-            Result result = new Result("", is, type);
-            result.setCacheOk(true);
-            return result;
-        } catch (IOException fnfe) {
-            log(request, "Unknown request:" + path);
-            return new Result("Error",
-                              new StringBuffer("Unknown request:" + path));
-        }
+            checkFilePath(fullPath);
+            try {
+                InputStream is =
+                    IOUtil.getInputStream(fullPath, getClass());
+                Result result = new Result("", is, type);
+                result.setCacheOk(true);
+                return result;
+            } catch (IOException fnfe) {
+                //noop
+            } 
+        } 
+        log(request, "Unknown request:" + path);
+        Result result =  new Result("Error",
+                          new StringBuffer("Unknown request:" + path));
+        result.setResponseCode(Result.RESPONSE_NOTFOUND);
+        return result;
     }
 
     /**
@@ -2680,11 +2692,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         Entry        entry = null;
         StringBuffer sb    = new StringBuffer();
         if (request.defined(ARG_ID)) {
-            entry = getEntry(request.getString(ARG_ID, ""), request);
-            if (entry == null) {
-                throw new IllegalArgumentException("Could not find entry:"
-                        + request.getString(ARG_ID, ""));
-            }
+            entry = getEntry(request);
             if (entry.isTopGroup()) {
                 sb.append(makeEntryHeader(request, entry));
                 sb.append(note("Cannot edit top-level group"));
@@ -2891,12 +2899,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processMetadataChange(Request request) throws Exception {
-        Entry entry = getEntry(request.getString(ARG_ID, ""), request);
-        if (entry == null) {
-            throw new IllegalArgumentException("Could not find entry:"
-                    + request.getString(ARG_ID, ""));
-        }
-
+        Entry entry = getEntry(request);
 
         if (request.exists(ARG_DELETE)) {
             Hashtable args = request.getArgs();
@@ -2920,7 +2923,6 @@ public class Repository implements Constants, Tables, RequestHandler,
                         COL_METADATA_ID, SqlUtil.quote(metadata.getId()));
                 insertMetadata(metadata);
             }
-
         }
         entry.setMetadata(null);
         return new Result(HtmlUtil.url(URL_METADATA_FORM, ARG_ID,
@@ -2939,11 +2941,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public Result processMetadataForm(Request request) throws Exception {
         StringBuffer sb    = new StringBuffer();
-        Entry        entry = getEntry(request.getString(ARG_ID, ""), request);
-        if (entry == null) {
-            throw new IllegalArgumentException("Could not find entry:"
-                    + request.getString(ARG_ID, ""));
-        }
+        Entry entry = getEntry(request);
         sb.append(makeEntryHeader(request, entry));
 
         List<Metadata> metadataList = getMetadata(entry);
@@ -2996,11 +2994,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public Result processMetadataAddForm(Request request) throws Exception {
         StringBuffer sb    = new StringBuffer();
-        Entry        entry = getEntry(request.getString(ARG_ID, ""), request);
-        if (entry == null) {
-            throw new IllegalArgumentException("Could not find entry:"
-                    + request.getString(ARG_ID, ""));
-        }
+        Entry entry = getEntry(request);
         sb.append(makeEntryHeader(request, entry));
         for (MetadataHandler handler : metadataHandlers) {
             handler.makeAddForm(request, entry, sb);
@@ -3020,12 +3014,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processMetadataAdd(Request request) throws Exception {
-        Entry entry = getEntry(request.getString(ARG_ID, ""), request);
-        if (entry == null) {
-            throw new IllegalArgumentException("Could not find entry:"
-                    + request.getString(ARG_ID, ""));
-        }
-
+        Entry entry = getEntry(request);
         List<Metadata> newMetadata = new ArrayList<Metadata>();
         for (MetadataHandler handler : metadataHandlers) {
             handler.handleAddSubmit(request, entry, newMetadata);
@@ -3054,16 +3043,21 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public Result processAccessForm(Request request) throws Exception {
         StringBuffer sb    = new StringBuffer();
-        Entry        entry = getEntry(request.getString(ARG_ID, ""), request);
-        if (entry == null) {
-            throw new IllegalArgumentException("Could not find entry:"
-                    + request.getString(ARG_ID, ""));
-        }
+        Entry entry = getEntry(request);
         sb.append(makeEntryHeader(request, entry));
         return makeEntryEditResult(request, entry, "Edit Access", sb);
 
     }
 
+
+    protected Entry getEntry(Request request) throws Exception {
+        Entry entry = getEntry(request.getString(ARG_ID, ""), request);
+        if (entry == null) {
+            throw new IllegalArgumentException("Could not find entry:"
+                    + request.getString(ARG_ID, ""));
+        }
+        return entry;
+    }
 
 
     /**
@@ -3076,11 +3070,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processAccessChange(Request request) throws Exception {
-        Entry entry = getEntry(request.getString(ARG_ID, ""), request);
-        if (entry == null) {
-            throw new IllegalArgumentException("Could not find entry:"
-                    + request.getString(ARG_ID, ""));
-        }
+        Entry entry = getEntry(request);
         String message = "OK";
         return new Result(HtmlUtil.url(URL_ACCESS_FORM, ARG_ID,
                                        entry.getId(), ARG_MESSAGE, message));
@@ -3174,11 +3164,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processCommentsShow(Request request) throws Exception {
-        Entry entry = getEntry(request.getString(ARG_ID, ""), request);
-        if (entry == null) {
-            throw new IllegalArgumentException("Could not find entry:"
-                    + request.getString(ARG_ID, ""));
-        }
+        Entry entry = getEntry(request);
         StringBuffer sb = new StringBuffer();
         if (request.exists(ARG_MESSAGE)) {
             sb.append(note(request.getUnsafeString(ARG_MESSAGE, "")));
@@ -3200,11 +3186,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processCommentsEdit(Request request) throws Exception {
-        Entry entry = getEntry(request.getString(ARG_ID, ""), request);
-        if (entry == null) {
-            throw new IllegalArgumentException("Could not find entry:"
-                    + request.getString(ARG_ID, ""));
-        }
+        Entry entry = getEntry(request);
         getDatabaseManager().executeDelete(
             TABLE_COMMENTS, COL_COMMENTS_ID,
             SqlUtil.quote(request.getString(ARG_COMMENT_ID, "")));
@@ -3226,11 +3208,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processCommentsAdd(Request request) throws Exception {
-        Entry entry = getEntry(request.getString(ARG_ID, ""), request);
-        if (entry == null) {
-            throw new IllegalArgumentException("Could not find entry:"
-                    + request.getString(ARG_ID, ""));
-        }
+        Entry entry = getEntry(request);
         StringBuffer sb = new StringBuffer();
 
         if (request.exists(ARG_MESSAGE)) {
@@ -3355,12 +3333,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processEntryDelete(Request request) throws Exception {
-        Entry entry = getEntry(request.getString(ARG_ID, ""), request);
-        if (entry == null) {
-            throw new IllegalArgumentException("Could not find entry:"
-                    + request.getString(ARG_ID, ""));
-        }
-
+        Entry entry = getEntry(request);
         StringBuffer sb = new StringBuffer();
         sb.append(makeEntryHeader(request, entry));
         if (entry.isTopGroup()) {
@@ -3448,12 +3421,8 @@ public class Repository implements Constants, Tables, RequestHandler,
         TypeHandler typeHandler;
         boolean     newEntry = true;
         if (request.defined(ARG_ID)) {
-            entry    = getEntry(request.getString(ARG_ID, ""), request);
+            entry    = getEntry(request);
             newEntry = false;
-            if (entry == null) {
-                throw new IllegalArgumentException("Could not find entry:"
-                        + request.getString(ARG_ID, ""));
-            }
 
 
             if (entry.isTopGroup()) {
@@ -3767,15 +3736,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processEntryShow(Request request) throws Exception {
-        String entryId = (String) request.getId((String) null);
-        if (entryId == null) {
-            throw new IllegalArgumentException("No " + ARG_ID + " given");
-        }
-        Entry entry = getEntry(entryId, request);
-        if (entry == null) {
-            throw new IllegalArgumentException("Could not find entry");
-        }
-
+        Entry entry = getEntry(request);
         if (entry.isGroup()) {
             return processGroupShow(request, (Group) entry);
         }
@@ -3790,7 +3751,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             String nextId = null;
             for (int i = 0; (i < ids.size()) && (nextId == null); i++) {
                 String id = ids.get(i);
-                if (id.equals(entryId)) {
+                if (id.equals(entry.getId())) {
                     if (next) {
                         if (i == ids.size() - 1) {
                             nextId = ids.get(0);
@@ -4080,8 +4041,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-
-
     /**
      * _more_
      *
@@ -4093,10 +4052,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public Result processGroupShow(Request request) throws Exception {
         Group group = null;
-        String groupName = (String) request.getString(ARG_GROUP,
-                               (String) null);
-        if (groupName != null) {
-            group = findGroupFromName(groupName);
+        if(request.defined(ARG_GROUP)) {
+            group = findGroup(request, false);
         }
         if (group == null) {
             group = topGroup;
@@ -4139,6 +4096,11 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         return outputHandler.outputGroup(request, group, subGroups, entries);
     }
+
+
+
+
+
 
 
     /**
@@ -4196,9 +4158,16 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         String fromProperties = getProperty(id);
         if (fromProperties != null) {
-            resource = IOUtil.readContents(fromProperties, getClass());
+            for(String path: StringUtil.split(fromProperties,";",true,true)) {
+                try {
+                    resource = IOUtil.readContents(getStorageManager().localizePath(path), getClass());
+                } catch(Exception exc) {
+                    //noop
+                }
+                if(resource!=null) break;
+            }
         } else {
-            resource = IOUtil.readContents(id, getClass());
+            resource = IOUtil.readContents(getStorageManager().localizePath(id), getClass());
         }
         if (resource != null) {
             //            resources.put(id,resource);

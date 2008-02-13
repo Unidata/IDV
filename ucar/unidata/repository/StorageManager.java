@@ -137,6 +137,12 @@ public class StorageManager extends RepositoryManager {
         repositoryDir = IOUtil.joinDir(Misc.getSystemProperty("user.home",
                 "."), IOUtil.joinDir(".unidata", "repository"));
         IOUtil.makeDirRecursive(new File(repositoryDir));
+
+        String htdocsDir = IOUtil.joinDir(repositoryDir, "htdocs");
+        IOUtil.makeDir(htdocsDir);
+        String resourcesDir = IOUtil.joinDir(repositoryDir, "resources");
+        IOUtil.makeDir(resourcesDir);
+
         getUploadDir();
     }
 
@@ -153,6 +159,11 @@ public class StorageManager extends RepositoryManager {
 
 
 
+
+    public String localizePath(String path) {
+        path = path.replace("%repositorydir%", getRepositoryDir());
+        return path;
+    }
 
 
     /**

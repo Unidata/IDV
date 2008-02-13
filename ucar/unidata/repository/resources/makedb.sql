@@ -11,8 +11,6 @@ CREATE TABLE  globals (name varchar(500),
 
 
 
-
-
 CREATE TABLE entries (id varchar(200),
                    type varchar(200),
 	           name varchar(200),

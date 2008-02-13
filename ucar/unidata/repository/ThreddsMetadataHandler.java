@@ -145,6 +145,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     /** _more_ */
     public static final String TAG_DATASIZE = "dataSize";
 
+    public static final String TAG_ICON = "icon";
 
     /** _more_ */
     public static final String TYPE_HTML = "html";
@@ -170,6 +171,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         setCanHandle(TAG_CONTRIBUTOR);
         setCanHandle(TAG_PROJECT);
         setCanHandle(TAG_KEYWORD);
+        setCanHandle(TAG_ICON);
         setCanHandle(TAG_AUTHORITY);
         setCanHandle(TAG_DATATYPE);
         setCanHandle(TAG_DATAFORMAT);
@@ -205,6 +207,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         } else if (type.equals(TAG_PROPERTY)) {
             lbl     = getLabel(metadata.getAttr1()) + ":";
             content = metadata.getAttr2();
+        } else if (type.equals(TAG_ICON)) {
+            lbl     = "";
+            content =HtmlUtil.img(metadata.getAttr1());
         } else if (type.equals(TAG_PUBLISHER) || type.equals(TAG_CREATOR)) {
             content = metadata.getAttr1();
             if (metadata.getAttr3().length() > 0) {
@@ -347,7 +352,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                 XmlUtil.getAttribute(child, ATTR_VOCABULARY,
                                     ""), "", "");
 
-        } else if (tag.equals(TAG_KEYWORD) || tag.equals(TAG_AUTHORITY)
+        } else if (tag.equals(TAG_AUTHORITY)
                    || tag.equals(TAG_DATATYPE)
                    || tag.equals(TAG_DATAFORMAT)) {
             String text = XmlUtil.getChildText(child).trim();
