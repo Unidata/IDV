@@ -451,6 +451,12 @@ public class GeoGridDataSource extends GridDataSource {
         return super.getDataPaths();
     }
 
+    public void updateState(Object newObject, Hashtable newProperties) {
+        removeProperty(PROP_RESOLVERURL);
+        super.updateState(newObject, newProperties);
+    }
+
+
     /**
      * Set what the user has changed
      *
@@ -1131,6 +1137,7 @@ public class GeoGridDataSource extends GridDataSource {
                                 Hashtable requestProperties)
             throws VisADException, RemoteException {
         synchronized (readLock) {
+            //            System.err.println("getData:" + dataChoice);
             return makeFieldImpl(dataChoice, givenDataSelection,
                                  requestProperties);
         }

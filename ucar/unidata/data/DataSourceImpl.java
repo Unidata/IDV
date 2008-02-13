@@ -746,6 +746,12 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         properties = p;
     }
 
+    public void removeProperty(String name) {
+        if (properties != null) {
+            properties.remove(name);
+        }
+    }
+
     /**
      * Get a property.
      *
