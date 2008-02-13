@@ -587,6 +587,7 @@ public class HttpServer {
             try {
                 writeHeader(code, content.length, type);
                 output.write(content);
+                output.close();
             } catch(SocketException se){}
         }
 
@@ -595,7 +596,6 @@ public class HttpServer {
                                    String type) throws Exception {
             writeHeader(code, -1, type);
             IOUtil.writeTo(inputStream, output);
-            //            output.write(content);
             output.close();
         }
 
@@ -618,7 +618,8 @@ public class HttpServer {
                 writeLine("HTTP/1.0 " + code + CRLF);
             }
             if(length>=0) {
-                writeLine("Content-Length: " + length + CRLF);
+                //See if this fixes the quirky browser problem
+                //writeLine("Content-Length: " + length + CRLF);
             }
             writeLine("Content-type: " + type + CRLF);
             writeHeaderArgs();
