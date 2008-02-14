@@ -214,7 +214,7 @@ public class Entry extends Entity {
      * @return _more_
      */
     public boolean isTopGroup() {
-        return isGroup() && (getParentGroup() == null);
+        return isGroup() && (getParentGroupId() == null);
     }
 
     /**

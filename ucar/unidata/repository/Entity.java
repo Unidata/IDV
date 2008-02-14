@@ -55,10 +55,12 @@ public class Entity {
     List<Comment> comments;
 
     /** _more_ */
-    List<Permission> permissions = new ArrayList<Permission>();
+    List<Permission> permissions = null;
+
+    Hashtable permissionMap = new Hashtable();
 
     /** _more_ */
-    List<Association> associations = new ArrayList<Association>();
+    List<Association> associations;
 
     /** _more_ */
     List<Metadata> metadata = new ArrayList<Metadata>();
@@ -177,6 +179,7 @@ public class Entity {
      */
     public void setParentGroup(Group value) {
         parentGroup = value;
+        if(parentGroup!=null) parentGroupId = parentGroup.getId();
     }
 
     /**
@@ -416,7 +419,18 @@ public class Entity {
      */
     public void setPermissions(List<Permission> value) {
         permissions = value;
+        if(permissions!=null) {
+            permissionMap = new Hashtable();
+            for(Permission permission: permissions) {
+                permissionMap.put(permission.getAction(), permission.getRoles());
+            }
+        }
     }
+
+    public List getRoles(String action) {
+        return (List) permissionMap.get(action);
+    }
+
 
     /**
      * Get the Permissions property.

@@ -71,6 +71,8 @@ import java.util.Properties;
  */
 public class UserManager extends RepositoryManager {
 
+    public static final String ROLE_ANY = "any";
+
 
     /** _more_ */
     private Hashtable session = new Hashtable();
@@ -1270,12 +1272,14 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public List<String> getRoles() throws Exception {
-        String[] roles = SqlUtil.readString(
+        String[] roleArray = SqlUtil.readString(
                              getDatabaseManager().execute(
                                  SqlUtil.makeSelect(
                                      SqlUtil.distinct(COL_USERROLES_ROLE),
                                      Misc.newList(TABLE_USERROLES))), 1);
-        return new ArrayList<String>(Misc.toList(roles));
+        List<String> roles = new  ArrayList<String>(Misc.toList(roleArray));
+        roles.add(0,ROLE_ANY);
+        return roles;
     }
 
     /**

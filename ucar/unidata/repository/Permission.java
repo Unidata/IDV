@@ -102,6 +102,27 @@ public class Permission {
             "Delete", "Comment" };
 
 
+
+
+    /** _more_ */
+    String action;
+
+    /** _more_ */
+    List<String> roles;
+
+    /**
+     * _more_
+     *
+     * @param action _more_
+     * @param roles _more_
+     */
+    public Permission(String action, List<String> roles) {
+        this.action = action;
+        this.roles  = roles;
+    }
+
+
+
     /**
      * _more_
      *
@@ -135,23 +156,10 @@ public class Permission {
         return false;
     }
 
-
-    /** _more_ */
-    String action;
-
-    /** _more_ */
-    List<String> roles;
-
-    /**
-     * _more_
-     *
-     * @param action _more_
-     * @param roles _more_
-     */
-    public Permission(String action, List<String> roles) {
-        this.action = action;
-        this.roles  = roles;
+    public String toString() {
+        return "action:" + action + " roles:" + roles;
     }
+
 
 
 

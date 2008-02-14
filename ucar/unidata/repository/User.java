@@ -357,6 +357,12 @@ public class User {
         return roles;
     }
 
+    public boolean isRole(String role) {
+        if(role.equals(UserManager.ROLE_ANY)) return true;
+        if(role.equals("user:" + getName())) return true;
+        if(roles == null) return false;
+        return roles.contains(role);
+    }
 
     /**
      * _more_

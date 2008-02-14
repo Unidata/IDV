@@ -2430,6 +2430,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
+
     /**
      * _more_
      *
@@ -2443,6 +2444,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected Entry getEntry(String entryId, Request request)
             throws Exception {
+        if(entryId==null) return null;
         Entry entry = (Entry) entryCache.get(entryId);
         if (entry != null) {
             return getAccessManager().filterEntry(request, entry);
@@ -2618,7 +2620,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 return makeEntryEditResult(request, entry, "Edit Entry", sb);
             }
             type  = entry.getTypeHandler().getType();
-            group = entry.getParentGroup();
+            group = findGroup(entry.getParentGroupId());
         }
         if (group == null) {
             group = findGroup(request, true);
@@ -3242,7 +3244,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             List<Entry> entries = new ArrayList<Entry>();
             entries.add(entry);
             deleteEntries(request, entries);
-            Group group = entry.getParentGroup();
+            Group group = findGroup(entry.getParentGroupId());
             return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
                                            group.getId(), ARG_MESSAGE,
                                            "Entry is deleted"));
@@ -3288,7 +3290,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public String makeEntryHeader(Request request, Entry entry)
             throws Exception {
-        String crumbs = getBreadCrumbs(request, entry.getParentGroup(), true,
+        String crumbs = getBreadCrumbs(request, findGroup(entry.getParentGroupId()), true,
                                        "")[1];
         if (crumbs.length() > 0) {
             crumbs = crumbs + "&nbsp;&gt;&nbsp;";
@@ -3334,7 +3336,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 List<Entry> entries = new ArrayList<Entry>();
                 entries.add(entry);
                 deleteEntries(request, entries);
-                Group group = entry.getParentGroup();
+                Group group = findGroup(entry.getParentGroupId());
                 return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
                         group.getId(), ARG_MESSAGE, "Entry is deleted"));
             }
@@ -3519,7 +3521,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
                                    createDate);
             String newName = request.getString(ARG_NAME, entry.getName());
-            if (entry.getParentGroup() == null) {
+            if (entry.isTopGroup()) {
                 throw new IllegalArgumentException(
                     "Cannot edit top-level group");
             }
@@ -3528,7 +3530,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                     throw new IllegalArgumentException(
                         "Cannot have a '/' in group name:" + newName);
                 }
-                String tmp = entry.getParentGroup().getFullName() + "/"
+                String tmp = findGroup(entry.getParentGroupId()).getFullName() + "/"
                              + newName;
                 Group existing = findGroupFromName(tmp);
                 if ((existing != null)
@@ -3573,7 +3575,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             return new Result(
                 HtmlUtil.url(
                     URL_GROUP_SHOW, ARG_ID,
-                    entry.getParentGroup().getId(), ARG_MESSAGE,
+                    entry.getParentGroupId(), ARG_MESSAGE,
                     entries.size() + " files uploaded"));
         } else {
             return new Result("", new StringBuffer("No entries created"));
@@ -3638,7 +3640,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 || request.get(ARG_PREVIOUS, false)) {
             boolean next = request.get(ARG_NEXT, false);
             List<String> ids = getEntryIdsInGroup(request,
-                                   entry.getParentGroup(), new ArrayList());
+                                                  findGroup(entry.getParentGroupId()), new ArrayList());
             String nextId = null;
             for (int i = 0; (i < ids.size()) && (nextId == null); i++) {
                 String id = ids.get(i);
@@ -3809,7 +3811,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (group == null) {
             return new String[] { "", "" };
         }
-        Group  parent = group.getParentGroup();
+        Group  parent = findGroup(group.getParentGroupId());
         String output = ((request == null)
                          ? OutputHandler.OUTPUT_HTML
                          : request.getOutput());
@@ -3836,7 +3838,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             breadcrumbs.add(0, HtmlUtil.href(HtmlUtil.url(URL_GROUP_SHOW,
                     ARG_ID, parent.getId(), ARG_OUTPUT,
                     output) + extraArgs, name));
-            parent = parent.getParentGroup();
+            parent = findGroup(parent.getParentGroupId());
         }
         titleList.add(group.getName());
         if (makeLinkForLastGroup) {
@@ -4320,7 +4322,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 SqlUtil.quote(group.getId()))));
 
 
-        Group parent = group.getParentGroup();
+        Group parent = findGroup(group.getParentGroupId());
         if (parent != null) {
             sb.append(XmlUtil.tag(TAG_NODE,
                                   XmlUtil.attrs(ATTR_TYPE, NODETYPE_GROUP,

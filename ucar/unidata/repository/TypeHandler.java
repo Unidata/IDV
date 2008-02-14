@@ -516,37 +516,43 @@ public class TypeHandler extends RepositoryManager {
      */
     protected String getEntryLinks(Entry entry, Request request)
             throws Exception {
-        String editEntry = "";
-        if (getAccessManager().canEditEntry(request, entry)) {
-            editEntry =
-                HtmlUtil.href(
-                    HtmlUtil.url(
-                        getRepository().URL_ENTRY_FORM, ARG_ID,
-                        entry.getId()), HtmlUtil.img(
-                            getRepository().fileUrl(ICON_EDIT),
-                            "Edit Entry"));
-        }
+        List links = new ArrayList();
 
-        String commentsEntry =
-            HtmlUtil.href(
+
+        String downloadLink = getEntryDownloadLink(request, entry);
+        if(downloadLink.length()>0) links.add(downloadLink);
+        String graphLink = getGraphLink(request, entry);
+        if(graphLink.length()>0) links.add(graphLink);
+
+
+        links.add(HtmlUtil.href(HtmlUtil.url(
+                    getRepository().getUserManager().URL_USER_CART,
+                    ARG_ACTION, ACTION_ADD, ARG_ID,
+                    entry.getId()), HtmlUtil.img(
+                                                 getRepository().fileUrl(ICON_CART), "Add to cart")));
+
+
+
+        //        if (getAccessManager().canDoAction(request, entry, Permission.ACTION_COMMENT)) {
+            links.add(HtmlUtil.href(
                 HtmlUtil.url(
                     getRepository().URL_COMMENTS_SHOW, ARG_ID,
                     entry.getId()), HtmlUtil.img(
                         getRepository().fileUrl(ICON_COMMENTS),
-                        "Add/View Comments"));
+                        "Add/View Comments")));
+            //        }
 
-        String cartEntry =
-            HtmlUtil.href(
-                HtmlUtil.url(
-                    getRepository().getUserManager().URL_USER_CART,
-                    ARG_ACTION, ACTION_ADD, ARG_ID,
-                    entry.getId()), HtmlUtil.img(
-                        getRepository().fileUrl(ICON_CART), "Add to cart"));
+        if (getAccessManager().canEditEntry(request, entry)) {
+            links.add(HtmlUtil.href(
+                    HtmlUtil.url(
+                        getRepository().URL_ENTRY_FORM, ARG_ID,
+                        entry.getId()), HtmlUtil.img(
+                            getRepository().fileUrl(ICON_EDIT),
+                            "Edit Entry")));
+        }
 
-        return editEntry + HtmlUtil.space(1) + commentsEntry
-               + HtmlUtil.space(1) + getEntryDownloadLink(request, entry)
-               + HtmlUtil.space(1) + getGraphLink(request, entry)
-               + HtmlUtil.space(1) + cartEntry;
+
+        return StringUtil.join(HtmlUtil.space(1), links);
     }
 
 
@@ -657,7 +663,8 @@ public class TypeHandler extends RepositoryManager {
 
 
             String[] crumbs = getRepository().getBreadCrumbs(request,
-                                  entry.getParentGroup(), true, "");
+                                                             getRepository().findGroup(entry.getParentGroupId()), 
+                                                             true, "");
             sb.append(HtmlUtil.formEntry("Group:", crumbs[1]));
 
             String desc = entry.getDescription();

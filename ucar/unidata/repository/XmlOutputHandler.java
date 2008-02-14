@@ -433,7 +433,7 @@ public class XmlOutputHandler extends OutputHandler {
         attrs.append(XmlUtil.attrs(ATTR_RESOURCE_TYPE,
                                    entry.getResource().getType()));
         attrs.append(XmlUtil.attrs(ATTR_GROUP,
-                                   entry.getParentGroup().getId()));
+                                   entry.getParentGroupId()));
         attrs.append(XmlUtil.attrs(ATTR_TYPE,
                                    entry.getTypeHandler().getType()));
         sb.append(XmlUtil.openTag(TAG_ENTRY, attrs.toString()));

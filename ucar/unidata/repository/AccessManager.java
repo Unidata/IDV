@@ -184,9 +184,47 @@ public class AccessManager  extends RepositoryManager {
         if (user.getAdmin()) {
             return true;
         }
+        if(user.equals(entry.getUser())) {
+            return true;
+        }
+
+
+        //        System.err.println ("can do: " + action);
+        while(entry!=null) {
+            List permissions = getPermissions(request, entry);
+
+            List roles = getRoles(request, entry, action);
+            //            System.err.println ("\tentry:" + entry.getName() + " permissions:" + permissions);
+            if(roles!=null) {
+                //                System.err.println ("got roles:" + roles);
+                for(int roleIdx=0;roleIdx<roles.size();roleIdx++) {
+                    String role = (String)roles.get(roleIdx);
+                    boolean doNot = false;
+                    if(role.startsWith("!")) {
+                        doNot  = true;
+                        role = role.substring(1);
+                    }
+                    if(user.isRole(role)) {
+                        //                        System.err.println ("role is: " + role);
+                        return !doNot;
+                    }
+                }
+                break;
+            }
+            entry = repository.getEntry(entry.getParentGroupId(),request);
+        }
+
         return false;
     }
 
+
+
+    public List getRoles(Request request, Entry entry, String action)
+            throws Exception {
+        //Make sure we call getPermissions first which forces the instantation of the roles
+        getPermissions(request, entry);
+        return entry.getRoles(action);
+    }
 
 
     /**
@@ -231,7 +269,7 @@ public class AccessManager  extends RepositoryManager {
                 //TODO                return null;
             }
         }
-        //TODO: Check for access
+        if(!canDoAction(request, entry, Permission.ACTION_VIEW)) return null;
         return entry;
     }
 
@@ -277,6 +315,35 @@ public class AccessManager  extends RepositoryManager {
 
 
 
+
+
+    protected void listAccess(Request request, Entry entry, StringBuffer sb) throws Exception {
+        if(entry == null) return;
+        List<Permission> permissions = getPermissions(request, entry);
+        int cnt = 0;
+        String entryUrl  = HtmlUtil.href(HtmlUtil.url(URL_ACCESS_FORM, ARG_ID,
+                                                      entry.getId()), entry.getName());
+
+        for(Permission permission: permissions) {
+            if(cnt==0) {
+                sb.append("<tr valign=top>");
+                sb.append(HtmlUtil.cols(entryUrl));
+            } else {
+                sb.append("<tr valign=top><td></td>");
+            }
+            sb.append(HtmlUtil.cols(permission.getAction(),
+                                    StringUtil.join(",", permission.getRoles())));
+
+            sb.append("</tr>");
+            cnt++;
+        }
+        sb.append("<tr valign=top><td colspan=3><hr></td>");
+        if(cnt==0) {
+            sb.append(HtmlUtil.row(HtmlUtil.cols(entryUrl,"none")));
+        }
+
+        listAccess(request, repository.getEntry(entry.getParentGroupId(),request), sb);
+    }
 
 
     protected void insertPermissions(Request request, Entry entry, List<Permission> permissions)
@@ -327,8 +394,9 @@ public class AccessManager  extends RepositoryManager {
         Hashtable actions = new Hashtable();
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                String action = results.getString(1);
-                String role = results.getString(2);
+                String id = results.getString(1);
+                String action = results.getString(2);
+                String role = results.getString(3);
                 List roles = (List)actions.get(action);
                 if(roles == null) {
                     actions.put(action, roles = new ArrayList());
@@ -362,6 +430,13 @@ public class AccessManager  extends RepositoryManager {
             sb.append(getRepository().note(request.getUnsafeString(ARG_MESSAGE, "")));
         }
         
+        StringBuffer currentAccess = new StringBuffer();
+        currentAccess.append(HtmlUtil.formTable());
+        currentAccess.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold("Entry"),HtmlUtil.bold("Action"),HtmlUtil.bold("Roles"))));
+        listAccess(request, entry,currentAccess);
+        currentAccess.append(HtmlUtil.formTableClose());
+
+
 
 
         Hashtable map = new Hashtable();
@@ -378,11 +453,18 @@ public class AccessManager  extends RepositoryManager {
         sb.append(HtmlUtil.formTable());
         sb.append("<tr valign=top>");
         sb.append(HtmlUtil.cols(HtmlUtil.bold("Action"),
-                                HtmlUtil.bold("Role")));
+                                HtmlUtil.bold("Role")+" (one per line)"));
         sb.append(HtmlUtil.cols(HtmlUtil.space(5)));
-        sb.append("<td rowspan=6><b>All Roles:</b><i><br>");
+        sb.append("<td rowspan=6><b>All Roles</b><i><br>");
         sb.append(StringUtil.join("<br>",getUserManager().getRoles()));
         sb.append("</i></td>");
+
+        sb.append(HtmlUtil.cols(HtmlUtil.space(5)));
+
+        sb.append("<td rowspan=6><b>Current settings:</b><i><br>");
+        sb.append(currentAccess.toString());
+        sb.append("</i></td>");
+
         sb.append("</tr>");
         for(int i=0;i<Permission.ACTIONS.length;i++) {
             String roles = (String)map.get(Permission.ACTIONS[i]);
@@ -422,11 +504,12 @@ public class AccessManager  extends RepositoryManager {
             List roles = StringUtil.split(request.getString(ARG_ROLES+"."+Permission.ACTIONS[i],""),
                                           "\n",
                                           true,true);
-            permissions.add(new Permission(Permission.ACTIONS[i], roles));
+            if(roles.size()>0) {
+                permissions.add(new Permission(Permission.ACTIONS[i], roles));
+            }
         }
 
         insertPermissions(request,  entry, permissions);
-
 
 
         return new Result(HtmlUtil.url(URL_ACCESS_FORM, ARG_ID,

@@ -854,13 +854,15 @@ public class HtmlOutputHandler extends OutputHandler {
      */
     protected String getGroupLinks(Request request, Group group)
             throws Exception {
-        String commentsEntry =
-            HtmlUtil.href(
+        String commentsEntry ="";
+        //        if (getAccessManager().canDoAction(request, group, Permission.ACTION_COMMENT)) {
+            commentsEntry = HtmlUtil.href(
                 HtmlUtil.url(
                     repository.URL_COMMENTS_SHOW, ARG_ID,
                     group.getId()), HtmlUtil.img(
                         repository.fileUrl(ICON_COMMENTS),
                         "Add/View Comments"));
+            //        }
 
         String search = HtmlUtil.href(
                             HtmlUtil.url(
@@ -895,6 +897,8 @@ public class HtmlOutputHandler extends OutputHandler {
                + repository.getGraphLink(request, group) + HtmlUtil.space(1)
                + createEntry + commentsEntry + HtmlUtil.space(1) + editEntry;
     }
+
+
 
 
 
