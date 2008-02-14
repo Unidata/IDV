@@ -157,4 +157,7 @@
 <station idn="000335" id="CYS" name="Cheyenne" st="WY" co="US" lat="41:09:07" lon="-104:48:22" elev="1868"/>
 <station idn="000392" id="RIW" name="Riverton" st="WY" co="US" lat="43:03:58" lon="-108:28:38" elev="1697"/>
 <station idn="000392" id="NOP3" name="Open RPG3" st="OK" co="US" lat="35:14:17" lon="-97:27:36" elev="396"/>
+<station idn="008392" id="SHI" name="Shanghai" st="SH" co="CH" lat="31:0:04" lon="121:53:06" elev="6"/>
 </stationtable>
+
+        
