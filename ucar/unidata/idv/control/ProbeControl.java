@@ -758,11 +758,12 @@ public class ProbeControl extends DisplayControlImpl {
      * @throws VisADException   VisAD Error
      */
     protected void resetData() throws VisADException, RemoteException {
-        
-        clearCachedSamples();
-        updateLegendLabel();
-        setTimesForAnimation();
-        doMoveProbe();
+        synchronized(INFO_MUTEX) {
+            clearCachedSamples();
+            updateLegendLabel();
+            setTimesForAnimation();
+            doMoveProbe();
+        }
         fireStructureChanged();
     }
 
@@ -1830,8 +1831,8 @@ public class ProbeControl extends DisplayControlImpl {
                 sideText.append(dataInstance.getDataChoice().getName());
                 String levString = null;
                 if (haveLevelsAtRow(i)) {
-                    Real level = getRowInfo(i).getLevel();
-                    Real alt   = getRowInfo(i).getAltitude();
+                    Real level = info.getLevel();
+                    Real alt   = info.getAltitude();
                     if ((level == null) || (alt == null)) {
                         if (lastProbeAltitude != null) {
                             levString =
@@ -2058,12 +2059,10 @@ public class ProbeControl extends DisplayControlImpl {
      * This clears out the cached data
      */
     private void clearCachedSamples() throws VisADException, RemoteException {
-        synchronized(INFO_MUTEX) {
-            for (int rowIdx = 0; rowIdx < infos.size(); rowIdx++) {
-                ProbeRowInfo info = infos.get(rowIdx);
-                info.clearCachedSamples();
-                info.getDataInstance().reInitialize();
-            }
+        for (int rowIdx = 0; rowIdx < infos.size(); rowIdx++) {
+            ProbeRowInfo info = infos.get(rowIdx);
+            info.clearCachedSamples();
+            info.getDataInstance().reInitialize();
         }
     }
 
