@@ -359,7 +359,7 @@ public class TDSRadarChooser extends TimesChooser {
             if (childName.equals(naming)) {
                 //String id   = child.getAttributeValue("ID");
                 String desc = child.getAttributeValue("title", nss);
-                String urlpath = child.getAttributeValue("urlPath");
+                String urlpath = child.getAttributeValue("href", nss);
                 String[] c = radarServerURL.split(uriBase); //.replaceFirst("catalog.xml", "");
                 String         ul     = c[0] + uriBase + urlpath;
                 TwoFacedObject twoObj = new TwoFacedObject(desc, ul);
