@@ -405,8 +405,8 @@ public class CatalogOutputHandler extends OutputHandler {
         }
         for (Group group : groups) {
             String url =  /* "http://localhost:8080"+*/
-                HtmlUtil.url(repository.URL_GROUP_SHOW, ARG_GROUP,
-                             group.getFullName(), ARG_OUTPUT, OUTPUT_CATALOG);
+                HtmlUtil.url(repository.URL_GROUP_SHOW, ARG_ID,
+                             group.getId(), ARG_OUTPUT, OUTPUT_CATALOG);
             sb.append(XmlUtil.tag(TAG_CATALOGREF,
                                   XmlUtil.attrs(ATTR_XLINKTITLE,
                                       group.getName(), ATTR_XLINKHREF, url)));

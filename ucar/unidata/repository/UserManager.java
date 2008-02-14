@@ -1063,7 +1063,7 @@ public class UserManager extends RepositoryManager {
                                 ARG_FROM, request.getString(ARG_FROM, ""),
                                 ARG_TO, entry.getId()), HtmlUtil.img(
                                     getRepository().fileUrl(
-                                        "/Association.gif"), "Create an association")));
+                                        ICON_ASSOCIATION), "Create an association")));
                 } else {
                     String links = HtmlUtil.checkbox("entry_"
                                        + entry.getId(), "true");
@@ -1074,7 +1074,7 @@ public class UserManager extends RepositoryManager {
                             HtmlUtil.url(
                                 URL_USER_CART, ARG_FROM, entry.getId()), HtmlUtil.img(
                                 getRepository().fileUrl(
-                                    "/Association.gif"), "Create an association")));
+                                    ICON_ASSOCIATION), "Create an association")));
                 }
                 sb.append(HtmlUtil.space(1));
                 sb.append(outputHandler.getEntryUrl(entry));
@@ -1120,7 +1120,7 @@ public class UserManager extends RepositoryManager {
         String userLink;
         String cartEntry =
             HtmlUtil.href(URL_USER_CART,
-                          HtmlUtil.img(getRepository().fileUrl("/Cart.gif"),
+                          HtmlUtil.img(getRepository().fileUrl(ICON_CART),
                                        "Data Cart"));
         if (user.getAnonymous()) {
             userLink =

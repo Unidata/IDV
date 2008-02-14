@@ -73,6 +73,34 @@ import java.util.regex.*;
  */
 public interface Constants {
 
+    public static final String ICON_CART = "/cart.gif";
+
+    public static final String ICON_COMMENTS = "/comments.gif";
+
+    public static final String ICON_DELETE = "/delete.gif";
+
+    public static final String ICON_FETCH = "/fetch.gif";
+
+    public static final String ICON_SEARCH = "/search.gif";
+
+    public static final String ICON_RIGHT = "/right.gif";
+
+    public static final String ICON_ASSOCIATION = "/association.gif";
+
+    public static final String ICON_GRAPH = "/graph.gif";
+
+    public static final String ICON_EDIT = "/edit.gif";
+
+    public static final String ICON_NEW = "/new.gif";
+
+    public static final String ICON_ARROW = "/arrow.gif";
+
+
+    public static final String ICON_BLANK = "/blank.gif";
+
+    public static final String ICON_LEFT = "/left.gif";
+
+
     /** _more_ */
     public static final String ATTR_ID = "id";
 

@@ -258,14 +258,14 @@ public class OutputHandler implements Constants, Tables {
                                   repository.URL_ENTRY_SHOW, ARG_ID,
                                   entry.getId(), ARG_OUTPUT, output,
                                   ARG_NEXT, "true"), HtmlUtil.img(
-                                      repository.fileUrl("/Right16.gif"),
+                                      repository.fileUrl(ICON_RIGHT),
                                       "View next entry"));
         String prevLink = HtmlUtil.href(
                               HtmlUtil.url(
                                   repository.URL_ENTRY_SHOW, ARG_ID,
                                   entry.getId(), ARG_OUTPUT, output,
                                   ARG_PREVIOUS, "true"), HtmlUtil.img(
-                                      repository.fileUrl("/Left16.gif"),
+                                      repository.fileUrl(ICON_LEFT),
                                       "View Previous Entry"));
         return prevLink + nextLink;
     }

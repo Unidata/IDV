@@ -461,7 +461,7 @@ public class TypeHandler extends RepositoryManager {
                     assocSB.append("</td><td>");
                     assocSB.append(
                         HtmlUtil.img(
-                            getRepository().fileUrl("/Arrow16.gif")));
+                            getRepository().fileUrl(ICON_ARROW)));
                     assocSB.append("&nbsp;&nbsp;");
                     assocSB.append("</td><td>");
                     assocSB.append(((toEntry == entry)
@@ -523,7 +523,7 @@ public class TypeHandler extends RepositoryManager {
                     HtmlUtil.url(
                         getRepository().URL_ENTRY_FORM, ARG_ID,
                         entry.getId()), HtmlUtil.img(
-                            getRepository().fileUrl("/Edit16.gif"),
+                            getRepository().fileUrl(ICON_EDIT),
                             "Edit Entry"));
         }
 
@@ -532,7 +532,7 @@ public class TypeHandler extends RepositoryManager {
                 HtmlUtil.url(
                     getRepository().URL_COMMENTS_SHOW, ARG_ID,
                     entry.getId()), HtmlUtil.img(
-                        getRepository().fileUrl("/Comments.gif"),
+                        getRepository().fileUrl(ICON_COMMENTS),
                         "Add/View Comments"));
 
         String cartEntry =
@@ -541,7 +541,7 @@ public class TypeHandler extends RepositoryManager {
                     getRepository().getUserManager().URL_USER_CART,
                     ARG_ACTION, ACTION_ADD, ARG_ID,
                     entry.getId()), HtmlUtil.img(
-                        getRepository().fileUrl("/Cart.gif"), "Add to cart"));
+                        getRepository().fileUrl(ICON_CART), "Add to cart"));
 
         return editEntry + HtmlUtil.space(1) + commentsEntry
                + HtmlUtil.space(1) + getEntryDownloadLink(request, entry)
@@ -566,7 +566,7 @@ public class TypeHandler extends RepositoryManager {
             .href(HtmlUtil
                 .url(getRepository().URL_GRAPH_VIEW, ARG_ID, entry.getId(),
                      ARG_NODETYPE, entry.getType()), HtmlUtil
-                         .img(getRepository().fileUrl("/tree.gif"),
+                         .img(getRepository().fileUrl(ICON_GRAPH),
                               "Show file in graph"));
     }
 
@@ -614,7 +614,7 @@ public class TypeHandler extends RepositoryManager {
             return HtmlUtil.href(
                 "file://" + entry.getResource(),
                 HtmlUtil.img(
-                    getRepository().fileUrl("/Fetch.gif"),
+                    getRepository().fileUrl(ICON_FETCH),
                     "Download file" + size));
         } else {
             return HtmlUtil.href(
@@ -622,7 +622,7 @@ public class TypeHandler extends RepositoryManager {
                     getRepository().URL_ENTRY_GET + "/"
                     + entry.getName(), ARG_ID, entry.getId()), HtmlUtil.img(
                         getRepository().fileUrl(
-                            "/Fetch.gif"), "Download file" + size));
+                            ICON_FETCH), "Download file" + size));
         }
     }
 
@@ -1009,7 +1009,7 @@ public class TypeHandler extends RepositoryManager {
                     "Type:",
                     typeSelect + " "
                     + HtmlUtil.submitImage(
-                        getRepository().fileUrl("/Search16.gif"),
+                        getRepository().fileUrl(ICON_SEARCH),
                         "submit_type", "Show search form with this type")));
         } else if (typeHandlers.size() == 1) {
             formBuffer.append(HtmlUtil.hidden(ARG_TYPE,

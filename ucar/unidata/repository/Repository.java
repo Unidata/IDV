@@ -93,7 +93,6 @@ import javax.swing.*;
 
 
 /**
- * Class SqlUtil _more_
  *
  *
  * @author IDV Development Team
@@ -108,12 +107,11 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     public RequestUrl URL_GETMAP = new RequestUrl(this, "/getmap");
 
+
     /** _more_ */
     public RequestUrl URL_MESSAGE = new RequestUrl(this, "/message");
 
 
-    /** _more_ */
-    public RequestUrl URL_GROUP_SHOW = new RequestUrl(this, "/group/show");
 
 
 
@@ -171,10 +169,14 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     public RequestUrl URL_GRAPH_GET = new RequestUrl(this, "/graph/get");
 
+
+
     /** _more_ */
     public RequestUrl URL_ENTRY_SHOW = new RequestUrl(this, "/entry/show",
                                            "View Entry");
 
+    //    public RequestUrl URL_GROUP_SHOW = new RequestUrl(this, "/group/show");
+    public RequestUrl URL_GROUP_SHOW =URL_ENTRY_SHOW;
     /** _more_ */
     public RequestUrl URL_ENTRY_DELETE = new RequestUrl(this,
                                              "/entry/delete", "Delete");
@@ -2008,7 +2010,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         //Put in an empty submit button so when the user presses return 
         //it acts like a regular submit (not a submit to change the type)
-        sb.append(HtmlUtil.submitImage(getUrlBase() + "/blank.gif",
+        sb.append(HtmlUtil.submitImage(getUrlBase() + ICON_BLANK,
                                        "submit"));
         TypeHandler typeHandler = getTypeHandler(request);
 
@@ -3139,7 +3141,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                                         "true", ARG_ID, entry.getId(),
                                         ARG_COMMENT_ID,
                                         comment.getId()), HtmlUtil.img(
-                                            fileUrl("/Delete.gif"),
+                                            fileUrl(ICON_DELETE),
                                             "Delete comment"));
             if (canEdit) {
                 sb.append(HtmlUtil.formEntry("", deleteLink));
@@ -3681,8 +3683,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             entry = (Entry) entries.get(0);
             return new Result(
                 HtmlUtil.url(
-                    URL_GROUP_SHOW, ARG_GROUP,
-                    entry.getParentGroup().getFullName(), ARG_MESSAGE,
+                    URL_GROUP_SHOW, ARG_ID,
+                    entry.getParentGroup().getId(), ARG_MESSAGE,
                     entries.size() + " files uploaded"));
         } else {
             return new Result("", new StringBuffer("No entries created"));
@@ -3985,14 +3987,14 @@ public class Repository implements Constants, Tables, RequestHandler,
             length += name.length();
             titleList.add(0, name);
             breadcrumbs.add(0, HtmlUtil.href(HtmlUtil.url(URL_GROUP_SHOW,
-                    ARG_GROUP, parent.getFullName(), ARG_OUTPUT,
+                    ARG_ID, parent.getId(), ARG_OUTPUT,
                     output) + extraArgs, name));
             parent = parent.getParentGroup();
         }
         titleList.add(group.getName());
         if (makeLinkForLastGroup) {
             breadcrumbs.add(HtmlUtil.href(HtmlUtil.url(URL_GROUP_SHOW,
-                    ARG_GROUP, group.getFullName(), ARG_OUTPUT,
+                    ARG_ID, group.getId(), ARG_OUTPUT,
                     output), group.getName()));
         } else {
             breadcrumbs.add(HtmlUtil.bold(group.getName()) + "&nbsp;"
@@ -4029,7 +4031,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         /*        sb.append(HtmlUtil.href(HtmlUtil.url(URL_GROUP_FORM, ARG_GROUP,
                   group.getFullName()),
-                  HtmlUtil.img(fileUrl("/Edit16.gif"),"Edit Group")));
+                  HtmlUtil.img(fileUrl(ICON_EDIT),"Edit Group")));
                   sb.append(HtmlUtil.space(1));*/
 
 
@@ -5322,13 +5324,13 @@ public class Repository implements Constants, Tables, RequestHandler,
                                 URL_ENTRY_SEARCHFORM, ARG_TAG,
                                 java.net.URLEncoder.encode(
                                     tag, "UTF-8")), HtmlUtil.img(
-                                        fileUrl("/Search16.gif"),
+                                        fileUrl(ICON_SEARCH),
                                         "Search in tag"));
 
         if (isAppletEnabled(request)) {
             search += HtmlUtil.href(HtmlUtil.url(URL_GRAPH_VIEW, ARG_ID, tag,
                     ARG_NODETYPE,
-                    TYPE_TAG), HtmlUtil.img(fileUrl("/tree.gif"),
+                    TYPE_TAG), HtmlUtil.img(fileUrl(ICON_GRAPH),
                                             "Show tag in graph"));
         }
         return search;
@@ -5488,7 +5490,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                             HtmlUtil.url(
                                 URL_ENTRY_SEARCHFORM, ARG_ASSOCIATION,
                                 encode(association)), HtmlUtil.img(
-                                    fileUrl("/Search16.gif"),
+                                    fileUrl(ICON_SEARCH),
                                     "Search in association"));
 
         return search;
@@ -5557,7 +5559,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             .href(HtmlUtil
                 .url(URL_GRAPH_VIEW, ARG_ID, group.getFullName(),
                      ARG_NODETYPE, NODETYPE_GROUP), HtmlUtil
-                         .img(fileUrl("/tree.gif"), "Show group in graph"));
+                         .img(fileUrl(ICON_GRAPH), "Show group in graph"));
     }
 
 

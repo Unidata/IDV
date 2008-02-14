@@ -95,6 +95,9 @@ import java.util.Properties;
 public class RepositoryManager implements RepositorySource, Constants,
                                           Tables, RequestHandler {
 
+
+
+
     /** _more_ */
     protected Repository repository;
 

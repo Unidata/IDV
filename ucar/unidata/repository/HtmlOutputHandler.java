@@ -322,7 +322,7 @@ public class HtmlOutputHandler extends OutputHandler {
                         HtmlUtil.url(
                             repository.URL_ENTRY_SEARCHFORM, ARG_TYPE,
                             theTypeHandler.getType()), HtmlUtil.img(
-                                repository.fileUrl("/Search16.gif"),
+                                repository.fileUrl(ICON_SEARCH),
                                 "Search in Group")));
                 sb.append(" ");
                 sb.append(HtmlUtil
@@ -764,7 +764,7 @@ public class HtmlOutputHandler extends OutputHandler {
                     String linkText = icon+subGroup.getName();
                     String groupLink =  HtmlUtil.href(
                                                       HtmlUtil.url(
-                                                                   repository.URL_GROUP_SHOW, ARG_GROUP,
+                                                                   repository.URL_GROUP_SHOW, ARG_ID,
                                                                    subGroup.getId(), ARG_OUTPUT, output,
                                                                    ARG_SHOWMETADATA, showMetadata
                                                                    ? "true"
@@ -832,8 +832,8 @@ public class HtmlOutputHandler extends OutputHandler {
                     HtmlUtil.href(
                         HtmlUtil.url(
                             repository.URL_GROUP_SHOW, ARG_OUTPUT, output,
-                            ARG_GROUP,
-                            group.getFullName()), group.getFullName()));
+                            ARG_ID,
+                            group.getId()), group.getFullName()));
                 sb.append("\n<br>\n");
             }
         }
@@ -859,14 +859,14 @@ public class HtmlOutputHandler extends OutputHandler {
                 HtmlUtil.url(
                     repository.URL_COMMENTS_SHOW, ARG_ID,
                     group.getId()), HtmlUtil.img(
-                        repository.fileUrl("/Comments.gif"),
+                        repository.fileUrl(ICON_COMMENTS),
                         "Add/View Comments"));
 
         String search = HtmlUtil.href(
                             HtmlUtil.url(
                                 repository.URL_ENTRY_SEARCHFORM, ARG_GROUP,
                                 group.getId()), HtmlUtil.img(
-                                    repository.fileUrl("/Search16.gif"),
+                                    repository.fileUrl(ICON_SEARCH),
                                     "Search in Group"));
 
         String createEntry = "";
@@ -876,7 +876,7 @@ public class HtmlOutputHandler extends OutputHandler {
                     HtmlUtil.url(
                         repository.URL_ENTRY_NEW, ARG_GROUP,
                         group.getId()), HtmlUtil.img(
-                            repository.fileUrl("/New16.gif"),
+                            repository.fileUrl(ICON_NEW),
                             "New Entry or Group")) + HtmlUtil.space(1);
         }
 
@@ -887,7 +887,7 @@ public class HtmlOutputHandler extends OutputHandler {
                     HtmlUtil.url(
                         repository.URL_ENTRY_FORM, ARG_ID,
                         group.getId()), HtmlUtil.img(
-                            repository.fileUrl("/Edit16.gif"), "Edit Group"));
+                            repository.fileUrl(ICON_EDIT), "Edit Group"));
         }
 
 
