@@ -159,7 +159,7 @@ public class ZipOutputHandler extends OutputHandler {
         if (entries.size() > 0) {
             boolean ok = false;
             for (Entry entry : entries) {
-                if (repository.canDownload(request, entry)) {
+                if (getAccessManager().canDownload(request, entry)) {
                     ok = true;
                     break;
                 }
@@ -260,7 +260,7 @@ public class ZipOutputHandler extends OutputHandler {
         ZipOutputStream  zos  = new ZipOutputStream(fos);
         Hashtable        seen = new Hashtable();
         for (Entry entry : entries) {
-            if ( !repository.canDownload(request, entry)) {
+            if ( !getAccessManager().canDownload(request, entry)) {
                 continue;
             }
             String path = entry.getResource().getPath();

@@ -87,6 +87,7 @@ CREATE TABLE  userroles (
         user_id varchar(200),
         role varchar(200));
 
+
 CREATE TABLE  permissions (
 	entry_id varchar(200),
 	action varchar(200),

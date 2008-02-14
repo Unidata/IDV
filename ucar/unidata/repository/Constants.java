@@ -298,6 +298,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ACTION = "action";
 
+    public static final String ARG_ROLES = "roles";
+
     /** _more_ */
     public static final String WHAT_ENTRIES = "entries";
 

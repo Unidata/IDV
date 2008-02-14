@@ -108,6 +108,10 @@ public class OutputHandler implements Constants, Tables {
 
     }
 
+    protected AccessManager getAccessManager() {
+        return repository.getAccessManager();
+    }
+
     /**
      * _more_
      *

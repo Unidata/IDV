@@ -517,7 +517,7 @@ public class TypeHandler extends RepositoryManager {
     protected String getEntryLinks(Entry entry, Request request)
             throws Exception {
         String editEntry = "";
-        if (getRepository().canEditEntry(request, entry)) {
+        if (getAccessManager().canEditEntry(request, entry)) {
             editEntry =
                 HtmlUtil.href(
                     HtmlUtil.url(
@@ -605,7 +605,7 @@ public class TypeHandler extends RepositoryManager {
      */
     protected String getEntryDownloadLink(Request request, Entry entry)
             throws Exception {
-        if ( !getRepository().canDownload(request, entry)) {
+        if ( !getAccessManager().canDownload(request, entry)) {
             return "";
         }
         File   f    = entry.getResource().getFile();
@@ -719,7 +719,7 @@ public class TypeHandler extends RepositoryManager {
 
             if (showResource && entry.getResource().isImage()) {
                 if (entry.getResource().isFile()
-                        && getRepository().canDownload(request, entry)) {
+                        && getAccessManager().canDownload(request, entry)) {
                     sb.append(
                         HtmlUtil.formEntryTop(
                             "Image:",

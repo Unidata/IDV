@@ -51,9 +51,6 @@ import ucar.unidata.xml.XmlUtil;
 
 import java.awt.*;
 import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.image.*;
-
 import java.io.*;
 
 import java.io.File;
@@ -111,10 +108,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     public RequestUrl URL_MESSAGE = new RequestUrl(this, "/message");
 
-
-
-
-
     /** _more_ */
     public RequestUrl URL_ENTRY_SEARCHFORM = new RequestUrl(this,
                                                  "/entry/searchform");
@@ -169,13 +162,12 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     public RequestUrl URL_GRAPH_GET = new RequestUrl(this, "/graph/get");
 
-
-
     /** _more_ */
     public RequestUrl URL_ENTRY_SHOW = new RequestUrl(this, "/entry/show",
                                            "View Entry");
 
     //    public RequestUrl URL_GROUP_SHOW = new RequestUrl(this, "/group/show");
+
     public RequestUrl URL_GROUP_SHOW =URL_ENTRY_SHOW;
     /** _more_ */
     public RequestUrl URL_ENTRY_DELETE = new RequestUrl(this,
@@ -299,11 +291,12 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private Object MUTEX_GROUP = new Object();
 
+    private Object MUTEX_METADATA = new Object();
+
+
     /** _more_ */
     private Object MUTEX_KEY = new Object();
 
-    /** _more_ */
-    private Object MUTEX_INSERT = new Object();
 
 
     /** _more_ */
@@ -347,6 +340,8 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     /** _more_ */
     private UserManager userManager;
+
+    private AccessManager accessManager;
 
     /** _more_ */
     private StorageManager storageManager;
@@ -539,6 +534,19 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @return _more_
      */
+    protected AccessManager doMakeAccessManager() {
+        return new AccessManager(this);
+    }
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected StorageManager doMakeStorageManager() {
         return new StorageManager(this);
     }
@@ -573,6 +581,18 @@ public class Repository implements Constants, Tables, RequestHandler,
             userManager = doMakeUserManager();
         }
         return userManager;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected AccessManager getAccessManager() {
+        if (accessManager == null) {
+            accessManager = doMakeAccessManager();
+        }
+        return accessManager;
     }
 
     /**
@@ -953,6 +973,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             handler = getUserManager();
         } else if (handlerName.equals("admin")) {
             handler = getAdmin();
+        } else if (handlerName.equals("accessmanager")) {
+            handler = getAccessManager();
         } else if (handlerName.equals("repository")) {
             handler = this;
         } else {
@@ -2342,32 +2364,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public boolean canDownload(Request request, Entry entry)
-            throws Exception {
-        if ( !getProperty(PROP_DOWNLOAD_OK, false)) {
-            return false;
-        }
-        entry = filterEntry(request, entry);
-        if (entry == null) {
-            return false;
-        }
-        if ( !entry.getTypeHandler().canDownload(request, entry)) {
-            return false;
-        }
-        return getStorageManager().canDownload(request, entry);
-    }
-
-
 
 
 
@@ -2393,7 +2389,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
         if ( !entry.getResource().isUrl()) {
-            if ( !canDownload(request, entry)) {
+            if ( !getAccessManager().canDownload(request, entry)) {
                 throw new IllegalArgumentException(
                     "Cannot download file with id:" + entryId);
             }
@@ -2449,7 +2445,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             throws Exception {
         Entry entry = (Entry) entryCache.get(entryId);
         if (entry != null) {
-            return filterEntry(request, entry);
+            return getAccessManager().filterEntry(request, entry);
         }
 
         String query = SqlUtil.makeSelect(COLUMNS_ENTRIES,
@@ -2465,7 +2461,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             return null;
         }
         TypeHandler typeHandler = getTypeHandler(results.getString(2));
-        entry = filterEntry(request, typeHandler.getEntry(results));
+        entry = getAccessManager().filterEntry(request, typeHandler.getEntry(results));
         entryStmt.close();
 
 
@@ -2497,85 +2493,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param action _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public boolean canDoAction(Request request, String action)
-            throws Exception {
-        User user = request.getRequestContext().getUser();
-        //The admin can do anything
-        if (user.getAdmin()) {
-            return true;
-        }
-
-        if (request.exists(ATTR_ID)) {
-            Entry entry = getEntry(request.getString(ARG_ID, ""), request);
-            if (entry == null) {
-                throw new IllegalArgumentException("Could not find entry:"
-                        + request.getString(ARG_ID, ""));
-            }
-            return canDoAction(request, entry, action);
-        }
-
-        if (request.exists(ARG_GROUP)) {
-            Group group = findGroup(request, false);
-            if (group == null) {
-                throw new IllegalArgumentException("Could not find group:"
-                        + request.getString(ARG_GROUP, ""));
-            }
-            return canDoAction(request, group, action);
-        }
-        throw new IllegalArgumentException("Could not find entry or group");
-        //        return false;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param action _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public boolean canDoAction(Request request, Entry entry, String action)
-            throws Exception {
-        User user = request.getRequestContext().getUser();
-        //The admin can do anything
-        if (user.getAdmin()) {
-            return true;
-        }
-        return false;
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public boolean canEditEntry(Request request, Entry entry)
-            throws Exception {
-        return canDoAction(request, entry, Permission.ACTION_EDIT);
-    }
-
-
 
     /**
      * _more_
@@ -2599,7 +2516,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             sb.append(
                 HtmlUtil.formEntry(
                     HtmlUtil.submit("Import catalog:"),
-                    HtmlUtil.input(ARG_CATALOG, "", " size=\"75\"")
+                    HtmlUtil.input(ARG_CATALOG, "", HtmlUtil.SIZE_70)
                     + HtmlUtil.space(1)
                     + HtmlUtil.checkbox(ARG_RECURSE, "true", false)
                     + " Recurse"));
@@ -2761,7 +2678,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
             sb.append(HtmlUtil.formEntry("Type:", typeHandler.getLabel()));
 
-            String size = " size=\"75\" ";
+            String size = HtmlUtil.SIZE_70;
             sb.append(HtmlUtil.formEntry("Name:",
                                          HtmlUtil.input(ARG_NAME,
                                              ((entry != null)
@@ -2901,34 +2818,36 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processMetadataChange(Request request) throws Exception {
-        Entry entry = getEntry(request);
+        synchronized(MUTEX_METADATA) {
+            Entry entry = getEntry(request);
 
-        if (request.exists(ARG_DELETE)) {
-            Hashtable args = request.getArgs();
-            for (Enumeration keys = args.keys(); keys.hasMoreElements(); ) {
-                String arg = (String) keys.nextElement();
-                if ( !arg.startsWith(ARG_METADATA_ID + ".select.")) {
-                    continue;
+            if (request.exists(ARG_DELETE)) {
+                Hashtable args = request.getArgs();
+                for (Enumeration keys = args.keys(); keys.hasMoreElements(); ) {
+                    String arg = (String) keys.nextElement();
+                    if ( !arg.startsWith(ARG_METADATA_ID + ".select.")) {
+                        continue;
+                    }
+                    String id = request.getString(arg, "");
+                    getDatabaseManager().executeDelete(TABLE_METADATA,
+                                                       COL_METADATA_ID, SqlUtil.quote(id));
                 }
-                String id = request.getString(arg, "");
-                getDatabaseManager().executeDelete(TABLE_METADATA,
-                        COL_METADATA_ID, SqlUtil.quote(id));
-            }
-        } else {
-            List<Metadata> newMetadata = new ArrayList<Metadata>();
-            for (MetadataHandler handler : metadataHandlers) {
-                handler.handleFormSubmit(request, entry, newMetadata);
-            }
+            } else {
+                List<Metadata> newMetadata = new ArrayList<Metadata>();
+                for (MetadataHandler handler : metadataHandlers) {
+                    handler.handleFormSubmit(request, entry, newMetadata);
+                }
 
-            for (Metadata metadata : newMetadata) {
-                getDatabaseManager().executeDelete(TABLE_METADATA,
-                        COL_METADATA_ID, SqlUtil.quote(metadata.getId()));
-                insertMetadata(metadata);
+                for (Metadata metadata : newMetadata) {
+                    getDatabaseManager().executeDelete(TABLE_METADATA,
+                                                       COL_METADATA_ID, SqlUtil.quote(metadata.getId()));
+                    insertMetadata(metadata);
+                }
             }
+            entry.setMetadata(null);
+            return new Result(HtmlUtil.url(URL_METADATA_FORM, ARG_ID,
+                                           entry.getId()));
         }
-        entry.setMetadata(null);
-        return new Result(HtmlUtil.url(URL_METADATA_FORM, ARG_ID,
-                                       entry.getId()));
     }
 
 
@@ -3016,6 +2935,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processMetadataAdd(Request request) throws Exception {
+        synchronized(MUTEX_METADATA) {
         Entry entry = getEntry(request);
         List<Metadata> newMetadata = new ArrayList<Metadata>();
         for (MetadataHandler handler : metadataHandlers) {
@@ -3031,25 +2951,10 @@ public class Repository implements Constants, Tables, RequestHandler,
         return new Result(HtmlUtil.url(URL_METADATA_FORM, ARG_ID,
                                        entry.getId()));
 
+        }
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processAccessForm(Request request) throws Exception {
-        StringBuffer sb    = new StringBuffer();
-        Entry entry = getEntry(request);
-        sb.append(makeEntryHeader(request, entry));
-        return makeEntryEditResult(request, entry, "Edit Access", sb);
-
-    }
 
 
     protected Entry getEntry(Request request) throws Exception {
@@ -3061,22 +2966,6 @@ public class Repository implements Constants, Tables, RequestHandler,
         return entry;
     }
 
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processAccessChange(Request request) throws Exception {
-        Entry entry = getEntry(request);
-        String message = "OK";
-        return new Result(HtmlUtil.url(URL_ACCESS_FORM, ARG_ID,
-                                       entry.getId(), ARG_MESSAGE, message));
-    }
 
 
 
@@ -3092,7 +2981,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @return _more_
      */
-    private Result makeEntryEditResult(Request request, Entry entry,
+    protected Result makeEntryEditResult(Request request, Entry entry,
                                        String title, StringBuffer sb) {
         Result result = new Result(title, sb);
         result.putProperty(PROP_NAVSUBLINKS,
@@ -3116,8 +3005,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public String getCommentHtml(Request request, Entry entry)
             throws Exception {
-        boolean canEdit = canDoAction(request, entry, Permission.ACTION_EDIT);
-        boolean canComment = canDoAction(request, entry,
+        boolean canEdit = getAccessManager().canDoAction(request, entry, Permission.ACTION_EDIT);
+        boolean canComment = getAccessManager().canDoAction(request, entry,
                                          Permission.ACTION_COMMENT);
 
         StringBuffer  sb       = new StringBuffer();
@@ -3781,48 +3670,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Entry filterEntry(Request request, Entry entry) throws Exception {
-        if (entry.getResource().getType().equals(Resource.TYPE_FILE)) {
-            if ( !entry.getResource().getFile().exists()) {
-                //TODO                return null;
-            }
-        }
-        //TODO: Check for access
-        return entry;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entries _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public List<Entry> filterEntries(Request request, List<Entry> entries)
-            throws Exception {
-        List<Entry> filtered = new ArrayList();
-        for (Entry entry : entries) {
-            entry = filterEntry(request, entry);
-            if (entry != null) {
-                filtered.add(entry);
-            }
-        }
-        return filtered;
-    }
 
 
     /**
@@ -3868,7 +3715,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 }
             }
         }
-        entries = filterEntries(request, entries);
+        entries = getAccessManager().filterEntries(request, entries);
         return getOutputHandler(request).outputEntries(request, entries);
     }
 
@@ -5169,8 +5016,8 @@ public class Repository implements Constants, Tables, RequestHandler,
                 }
             }
         }
-        return new List[] { filterEntries(request, groups),
-                            filterEntries(request, entries) };
+        return new List[] { getAccessManager().filterEntries(request, groups),
+                            getAccessManager().filterEntries(request, entries) };
     }
 
 
@@ -5424,48 +5271,6 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         entry.setComments(comments);
         return comments;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected List<Permission> getPermissions(Request request, Entry entry)
-            throws Exception {
-        if (entry.getPermissions() != null) {
-            return entry.getPermissions();
-        }
-        String query =
-            SqlUtil.makeSelect(COLUMNS_PERMISSIONS,
-                               Misc.newList(TABLE_PERMISSIONS),
-                               SqlUtil.eq(COL_PERMISSIONS_ENTRY_ID,
-                                          SqlUtil.quote(entry.getId())));
-
-        List<Permission> permissions = new ArrayList();
-        SqlUtil.Iterator iter =
-            SqlUtil.getIterator(getDatabaseManager().execute(query));
-        ResultSet results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-
-                /**
-                 * *                permissions.add(new Permission(results.getString(1),entry,
-                 *                        getUserManager().findUser(results.getString(3),true),
-                 *                        new Date(results.getTimestamp(4 , Repository.calendar ).getTime()),
-                 *                        results.getString(5),
-                 *                        results.getString(6)));
-                 */
-            }
-        }
-        entry.setPermissions(permissions);
-        return permissions;
     }
 
 
@@ -5795,6 +5600,11 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         PreparedStatement tagsStmt = connection.prepareStatement(query);
 
+        query = SqlUtil.makeDelete(TABLE_PERMISSIONS,
+                                   SqlUtil.eq(COL_PERMISSIONS_ENTRY_ID, "?"));
+
+        PreparedStatement permissionsStmt = connection.prepareStatement(query);
+
         query = SqlUtil.makeDelete(
             TABLE_ASSOCIATIONS,
             SqlUtil.makeOr(
@@ -5828,6 +5638,9 @@ public class Repository implements Constants, Tables, RequestHandler,
             tagsStmt.setString(1, entry.getId());
             tagsStmt.addBatch();
 
+            permissionsStmt.setString(1, entry.getId());
+            permissionsStmt.addBatch();
+
             metadataStmt.setString(1, entry.getId());
             metadataStmt.addBatch();
 
@@ -5845,6 +5658,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             entry.getTypeHandler().deleteEntry(request, statement, entry);
         }
         tagsStmt.executeBatch();
+        permissionsStmt.executeBatch();
         metadataStmt.executeBatch();
         commentsStmt.executeBatch();
         assocStmt.executeBatch();
@@ -5853,6 +5667,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         connection.commit();
         connection.setAutoCommit(true);
         tagsStmt.close();
+        permissionsStmt.close();
         metadataStmt.close();
         commentsStmt.close();
         assocStmt.close();

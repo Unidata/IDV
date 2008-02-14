@@ -29,8 +29,8 @@
 
   <method request="/entry/delete"    method="processEntryDelete"    actions="edit"/>
 
-  <method request="/access/form"    method="processAccessForm"    actions="edit"/>
-  <method request="/access/change"    method="processAccessChange"    actions="edit"/>
+  <method handler="accessmanager" request="/access/form"    method="processAccessForm"    actions="edit"/>
+  <method handler="accessmanager"  request="/access/change"    method="processAccessChange"    actions="edit"/>
 
   <method request="/entry/get/*"     method="processEntryGet"      cancache="false"/>
   <method request="/metadata/form"   method="processMetadataForm" actions="edit"/>

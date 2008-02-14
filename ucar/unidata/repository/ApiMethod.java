@@ -140,8 +140,8 @@ public class ApiMethod {
         }
         if (actions.size() > 0) {
             for (int i = 0; i < actions.size(); i++) {
-                if ( !repository.canDoAction(request,
-                                             (String) actions.get(i))) {
+                if ( !repository.getAccessManager().canDoAction(request,
+                                                                (String) actions.get(i))) {
                     return false;
                 }
             }

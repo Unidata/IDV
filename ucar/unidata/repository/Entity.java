@@ -55,7 +55,7 @@ public class Entity {
     List<Comment> comments;
 
     /** _more_ */
-    List<Permission> permissions;
+    List<Permission> permissions = new ArrayList<Permission>();
 
     /** _more_ */
     List<Association> associations = new ArrayList<Association>();

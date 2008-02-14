@@ -870,7 +870,7 @@ public class HtmlOutputHandler extends OutputHandler {
                                     "Search in Group"));
 
         String createEntry = "";
-        if (repository.canDoAction(request, group, Permission.ACTION_NEW)) {
+        if (getAccessManager().canDoAction(request, group, Permission.ACTION_NEW)) {
             createEntry =
                 HtmlUtil.href(
                     HtmlUtil.url(
@@ -881,7 +881,7 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         String editEntry = "";
-        if (repository.canEditEntry(request, group)) {
+        if (getAccessManager().canEditEntry(request, group)) {
             editEntry =
                 HtmlUtil.href(
                     HtmlUtil.url(
