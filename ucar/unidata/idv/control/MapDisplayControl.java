@@ -572,7 +572,9 @@ public class MapDisplayControl extends DisplayControlImpl {
             addMapMenu.add(mi);
             mi.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
-                    addMap(new MapState(mapData));
+                    MapState mapState = new MapState(mapData);
+                    mapState.setVisible(true);
+                    addMap(mapState);
                     fillContents();
                 }
             });
@@ -717,6 +719,7 @@ public class MapDisplayControl extends DisplayControlImpl {
                     Float.parseFloat((String) widthBox.getSelectedItem()),
                     styleBox.getSelectedIndex());
             mapState.setCategory(catFld.getText().trim());
+            mapState.setVisible(true);
             addMap(mapState);
             fillContents();
             break;
