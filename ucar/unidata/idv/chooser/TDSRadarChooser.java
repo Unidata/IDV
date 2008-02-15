@@ -548,7 +548,8 @@ public class TDSRadarChooser extends TimesChooser {
                     LogUtil.userMessage("No relative times selected");
                     return;
                 }
-                Date toDate = new Date();
+                Date toDate = new Date(System.currentTimeMillis()
+                                         + DateUtil.daysToMillis(365 * 100));
                 //Go back 10 years (or so)
                 Date fromDate = new Date(System.currentTimeMillis()
                                          - DateUtil.daysToMillis(365 * 10));
