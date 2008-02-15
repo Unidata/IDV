@@ -80,7 +80,7 @@ public class DbPointDataSource extends PointDataSource {
     private Connection connection;
 
 
-    private String fromDate = "-1 week";
+    private String fromDate = "-1 year";
 
     private String toDate = "now";
 
@@ -256,7 +256,9 @@ public class DbPointDataSource extends PointDataSource {
             whereList.add(SqlUtil.le(timeColumn, dateRange[1]));
         }
 
-        Statement        statement = evaluate(SqlUtil.makeSelect(columns, Misc.newList(tableName), SqlUtil.makeAnd(whereList)));
+        String query = SqlUtil.makeSelect(columns, Misc.newList(tableName), SqlUtil.makeAnd(whereList));
+        //        System.err.println (query);
+        Statement        statement = evaluate(query);
         SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
         ResultSet        results;
 
@@ -289,8 +291,11 @@ public class DbPointDataSource extends PointDataSource {
         List      obs     = new ArrayList();
 
         //TODO: How do we handle no data???
+        int cnt = 0;
         while ((results = iter.next()) != null) {
             while (results.next()) {
+                //                System.err.println ("row " + cnt);
+                cnt++;
                 int col = 1;
                 Date date = new Date(results.getTimestamp(col++,
                                 calendar).getTime());
@@ -327,7 +332,7 @@ public class DbPointDataSource extends PointDataSource {
                 obs.add(pot);
             }
         }
-        statement.close();
+
 
         Integer1DSet indexSet =
             new Integer1DSet(RealType.getRealType("index"), obs.size());
