@@ -78,7 +78,7 @@ import java.util.regex.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Harvester {
+public class Harvester extends RepositoryManager {
 
     /** _more_ */
     public static final String TAG_HARVESTER = "harvester";
@@ -115,8 +115,6 @@ public class Harvester {
     /** _more_ */
     private String name;
 
-    /** _more_ */
-    protected Repository repository;
 
     /** _more_ */
     private Element element;
@@ -140,7 +138,7 @@ public class Harvester {
      * @param repository _more_
      */
     public Harvester(Repository repository) {
-        this.repository = repository;
+        super(repository);
         this.id         = repository.getGUID();
     }
 
@@ -248,7 +246,7 @@ public class Harvester {
             runInner();
             setActive(false);
         } catch (Exception exc) {
-            repository.log("In harvester", exc);
+            getRepository().log("In harvester", exc);
         }
     }
 

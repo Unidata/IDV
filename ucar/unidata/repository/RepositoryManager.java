@@ -189,6 +189,10 @@ public class RepositoryManager implements RepositorySource, Constants,
         return repository.getAccessManager();
     }
 
+    protected MetadataManager getMetadataManager() {
+        return repository.getMetadataManager();
+    }
+
 
     /**
      * _more_

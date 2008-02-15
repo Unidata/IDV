@@ -720,6 +720,11 @@ public class HtmlUtil {
     }
 
 
+    public static String select(String name, String[] values, String selected, int maxLength) {
+        return select(name,Misc.toList(values), selected, maxLength);
+    }
+
+
     public static String select(String name, List values, String selected, int maxLength) {
         StringBuffer sb = new StringBuffer();
         sb.append("<select name=\"" + name + "\">\n");

@@ -352,6 +352,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_METADATA_ID = "metadataid";
 
+    public static final String ARG_METADATA_TYPE = "metadatatype";
+
     /** _more_ */
     public static final String ARG_EDIT_METADATA = "edit.metadata";
 

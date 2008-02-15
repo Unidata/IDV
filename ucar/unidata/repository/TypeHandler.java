@@ -1299,6 +1299,26 @@ public class TypeHandler extends RepositoryManager {
         }
 
 
+        List metadataOrs = new ArrayList();
+        Hashtable args = request.getArgs();
+        String metadataPrefix = ARG_METADATA_TYPE + ".";
+        for (Enumeration keys = args.keys(); keys.hasMoreElements(); ) {
+            String arg = (String) keys.nextElement();
+            if ( !arg.startsWith(metadataPrefix)) {
+                continue;
+            }
+            if(!request.defined(arg)) continue;
+            String type = arg.substring(metadataPrefix.length());
+            metadataOrs.add(SqlUtil.group(SqlUtil.makeAnd(Misc.newList(SqlUtil.eq(COL_METADATA_ATTR1, SqlUtil.quote(request.getString(arg,""))),
+                                                                       SqlUtil.eq(COL_METADATA_TYPE, SqlUtil.quote(type))))));
+        }
+        if(metadataOrs.size()>0) {
+            //            System.err.println ("ors:" + metadataOrs);
+            where.add(SqlUtil.group(SqlUtil.makeOr(metadataOrs)));
+        }
+
+
+
         String name = (String) request.getString(ARG_NAME, "").trim();
         if ((name != null) && (name.length() > 0)) {
             List ors = new ArrayList();
@@ -1315,6 +1335,12 @@ public class TypeHandler extends RepositoryManager {
             //            System.err.println("where:" + where);
         }
         //        System.err.println("where:" + where);
+
+
+
+
+
+
         return where;
 
     }

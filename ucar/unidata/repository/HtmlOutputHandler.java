@@ -134,7 +134,7 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         if (what.equals(WHAT_ENTRIES)) {
             types.add(new TwoFacedObject("Html", OUTPUT_HTML));
-            if (repository.isAppletEnabled(request)) {
+            if (getRepository().isAppletEnabled(request)) {
                 types.add(new TwoFacedObject("Timeline", OUTPUT_TIMELINE));
             }
         } else if (what.equals(WHAT_TAG)) {
@@ -181,7 +181,7 @@ public class HtmlOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputEntry(Request request, Entry entry) throws Exception {
-        TypeHandler  typeHandler = repository.getTypeHandler(entry.getType());
+        TypeHandler  typeHandler = getRepository().getTypeHandler(entry.getType());
         StringBuffer sb = typeHandler.getEntryContent(entry, request, true);
         getMetadataHtml(request, entry, sb);
 
@@ -193,7 +193,7 @@ public class HtmlOutputHandler extends OutputHandler {
             PROP_NAVSUBLINKS,
             getHeader(
                 request, request.getOutput(),
-                repository.getOutputTypesForEntries(request, entries)));
+                getRepository().getOutputTypesForEntries(request, entries)));
         return result;
 
     }
@@ -215,14 +215,14 @@ public class HtmlOutputHandler extends OutputHandler {
         String       output = request.getOutput();
         //        appendListHeader(request, output, WHAT_GROUP, sb);
         if (output.equals(OUTPUT_HTML)) {
-            sb.append(repository.header("Groups"));
+            sb.append(getRepository().header("Groups"));
             sb.append("<ul>");
         }
 
         for (Group group : groups) {
             if (output.equals(OUTPUT_HTML)) {
                 sb.append("<li>"
-                          + repository.getAllGroupLinks(request, group) + " "
+                          + getRepository().getAllGroupLinks(request, group) + " "
                           + group.getFullName());
             }
 
@@ -251,11 +251,11 @@ public class HtmlOutputHandler extends OutputHandler {
                              boolean dfltSelected)
             throws Exception {
         if (doForm) {
-            sb.append(HtmlUtil.form(repository.URL_GETENTRIES, "getentries"));
+            sb.append(HtmlUtil.form(getRepository().URL_GETENTRIES, "getentries"));
             sb.append(HtmlUtil.submit("Get selected", "getselected"));
             sb.append(HtmlUtil.submit("Get all", "getall"));
             sb.append(" As: ");
-            List outputList = repository.getOutputTypesForEntries(request,
+            List outputList = getRepository().getOutputTypesForEntries(request,
                                   entries);
             sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
             sb.append("<p>\n");
@@ -287,7 +287,7 @@ public class HtmlOutputHandler extends OutputHandler {
      * @return _more_
      */
     protected String getEntryUrl(Entry entry) {
-        return HtmlUtil.href(HtmlUtil.url(repository.URL_ENTRY_SHOW, ARG_ID,
+        return HtmlUtil.href(HtmlUtil.url(getRepository().URL_ENTRY_SHOW, ARG_ID,
                                           entry.getId()), entry.getName());
     }
 
@@ -320,14 +320,14 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(
                     HtmlUtil.href(
                         HtmlUtil.url(
-                            repository.URL_ENTRY_SEARCHFORM, ARG_TYPE,
+                            getRepository().URL_ENTRY_SEARCHFORM, ARG_TYPE,
                             theTypeHandler.getType()), HtmlUtil.img(
-                                repository.fileUrl(ICON_SEARCH),
+                                getRepository().fileUrl(ICON_SEARCH),
                                 "Search in Group")));
                 sb.append(" ");
                 sb.append(HtmlUtil
                     .href(HtmlUtil
-                        .url(repository.URL_LIST_HOME, ARG_TYPE,
+                        .url(getRepository().URL_LIST_HOME, ARG_TYPE,
                              theTypeHandler.getType()), theTypeHandler
                                  .getType()));
             }
@@ -354,7 +354,7 @@ public class HtmlOutputHandler extends OutputHandler {
                                     String what, StringBuffer sb)
             throws Exception {
         List<TwoFacedObject> outputTypes =
-            repository.getOutputTypesFor(request, what);
+            getRepository().getOutputTypesFor(request, what);
         int cnt = 0;
         sb.append("<b>");
         String initialOutput = request.getOutput("");
@@ -418,7 +418,7 @@ public class HtmlOutputHandler extends OutputHandler {
         for (Tag tag : tags) {
             if (output.equals(OUTPUT_HTML)) {
                 sb.append("<li> ");
-                sb.append(repository.getTagLinks(request, tag.getName()));
+                sb.append(getRepository().getTagLinks(request, tag.getName()));
                 sb.append(" ");
                 sb.append(tag.getName());
                 sb.append(" (" + tag.getCount() + ")");
@@ -435,7 +435,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(
                     HtmlUtil.href(
                         HtmlUtil.url(
-                            repository.URL_GRAPH_VIEW, ARG_ID, tag.getName(),
+                            getRepository().URL_GRAPH_VIEW, ARG_ID, tag.getName(),
                             ARG_NODETYPE, TYPE_TAG), tag.getName(), extra));
                 sb.append("</span>");
                 sb.append(" &nbsp; ");
@@ -473,13 +473,13 @@ public class HtmlOutputHandler extends OutputHandler {
      */
     public String getMimeType(String output) {
         if (output.equals(OUTPUT_TIMELINE)) {
-            return repository.getMimeTypeFromSuffix(".html");
+            return getRepository().getMimeTypeFromSuffix(".html");
         } else if (output.equals(OUTPUT_GRAPH)) {
-            return repository.getMimeTypeFromSuffix(".xml");
+            return getRepository().getMimeTypeFromSuffix(".xml");
         } else if (output.equals(OUTPUT_HTML)) {
-            return repository.getMimeTypeFromSuffix(".html");
+            return getRepository().getMimeTypeFromSuffix(".html");
         } else if (output.equals(OUTPUT_CLOUD)) {
-            return repository.getMimeTypeFromSuffix(".html");
+            return getRepository().getMimeTypeFromSuffix(".html");
         } else {
             return super.getMimeType(output);
         }
@@ -502,9 +502,9 @@ public class HtmlOutputHandler extends OutputHandler {
             appendListHeader(request, output, WHAT_ASSOCIATION, sb);
             sb.append("<ul>");
         } else if (output.equals(OUTPUT_CLOUD)) {
-            sb.append(repository.header("Association Cloud"));
+            sb.append(getRepository().header("Association Cloud"));
         }
-        TypeHandler typeHandler = repository.getTypeHandler(request);
+        TypeHandler typeHandler = getRepository().getTypeHandler(request);
         List        where       = typeHandler.assembleWhereClause(request);
         if (where.size() > 0) {
             where.add(0, SqlUtil.eq(COL_ASSOCIATIONS_FROM_ENTRY_ID,
@@ -561,7 +561,7 @@ public class HtmlOutputHandler extends OutputHandler {
             int    count       = counts.get(i).intValue();
             if (output.equals(OUTPUT_HTML)) {
                 sb.append("<li> ");
-                sb.append(repository.getAssociationLinks(request,
+                sb.append(getRepository().getAssociationLinks(request,
                         association));
                 sb.append(" ");
                 sb.append(association);
@@ -577,7 +577,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(
                     HtmlUtil.href(
                         HtmlUtil.url(
-                            repository.URL_GRAPH_VIEW, ARG_ID, association,
+                            getRepository().URL_GRAPH_VIEW, ARG_ID, association,
                             ARG_NODETYPE, TYPE_ASSOCIATION), association,
                                 extra));
                 sb.append("</span>");
@@ -610,8 +610,8 @@ public class HtmlOutputHandler extends OutputHandler {
         boolean        showMetadata = request.get(ARG_SHOWMETADATA, false);
 
 
-        List<Metadata> metadataList = repository.getMetadata(entry);
-        List<Tag>      tagList = repository.getTags(request, entry.getId());
+        List<Metadata> metadataList = getMetadataManager().getMetadata(entry);
+        List<Tag>      tagList = getRepository().getTags(request, entry.getId());
         if ((tagList.size() == 0) && (metadataList.size() == 0)) {
             return;
         }
@@ -630,18 +630,18 @@ public class HtmlOutputHandler extends OutputHandler {
         //        sb.append("</td>\n");
         sb.append("<table cellspacing=\"5\">\n");
         List<MetadataHandler> metadataHandlers =
-            repository.getMetadataHandlers();
+            getMetadataManager().getMetadataHandlers();
         if (showMetadata) {
             for (Tag tag : tagList) {
                 TagCollection tagCollection =
-                    repository.findTagCollection(tag);
+                    getRepository().findTagCollection(tag);
                 String label = "Tag:";
                 if (tagCollection != null) {
                     label = tagCollection.getLabel() + ": ";
                 }
                 label = label.replace(" ", "&nbsp;");
                 sb.append(HtmlUtil.formEntryTop(label,
-                        repository.getTagLinks(request, tag.getName())
+                        getRepository().getTagLinks(request, tag.getName())
                         + tag.getName()));
 
             }
@@ -682,17 +682,17 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
 
         String       output     = request.getOutput();
-        boolean      showApplet = repository.isAppletEnabled(request);
+        boolean      showApplet = getRepository().isAppletEnabled(request);
         String       title      = group.getFullName();
         StringBuffer sb         = new StringBuffer();
 
         if (request.exists(ARG_MESSAGE)) {
-            sb.append(repository.note(request.getUnsafeString(ARG_MESSAGE,
+            sb.append(getRepository().note(request.getUnsafeString(ARG_MESSAGE,
                                                               "")));
         }
 
         int cnt = subGroups.size() + entries.size();
-        int max = request.get(ARG_MAX, Repository.MAX_ROWS);
+        int max = request.get(ARG_MAX,Repository.MAX_ROWS);
         //        System.err.println ("cnt:" + cnt + " " + max);
 
         if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
@@ -718,7 +718,7 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append("<p>");
             boolean showMetadata = request.get(ARG_SHOWMETADATA, false);
             if ( !group.isDummy()) {
-                String[] crumbs = repository.getBreadCrumbs(request, group,
+                String[] crumbs = getRepository().getBreadCrumbs(request, group,
                                       false,
                                       ARG_SHOWMETADATA + "=" + showMetadata);
                 title = crumbs[0];
@@ -749,7 +749,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(HtmlUtil.bold("Groups:"));
                 sb.append("<ul>");
                 for (Group subGroup : subGroups) {
-                    List<Metadata> metadataList = getRepository().getMetadata(subGroup);
+                    List<Metadata> metadataList = getMetadataManager().getMetadata(subGroup);
                     String icon = "";
                     /**
                     for (Metadata metadata : metadataList) {
@@ -759,12 +759,12 @@ public class HtmlOutputHandler extends OutputHandler {
                         }
                         }**/
 
-                    //                    sb.append(repository.getAllGroupLinks(request, subGroup));
+                    //                    sb.append(getRepository().getAllGroupLinks(request, subGroup));
                     sb.append("<li>");
                     String linkText = icon+subGroup.getName();
                     String groupLink =  HtmlUtil.href(
                                                       HtmlUtil.url(
-                                                                   repository.URL_GROUP_SHOW, ARG_ID,
+                                                                   getRepository().URL_GROUP_SHOW, ARG_ID,
                                                                    subGroup.getId(), ARG_OUTPUT, output,
                                                                    ARG_SHOWMETADATA, showMetadata
                                                                    ? "true"
@@ -795,7 +795,7 @@ public class HtmlOutputHandler extends OutputHandler {
             PROP_NAVSUBLINKS,
             getHeader(
                 request, output,
-                repository.getOutputTypesForGroup(
+                getRepository().getOutputTypesForGroup(
                     request, group, subGroups, entries)));
 
         return result;
@@ -827,11 +827,11 @@ public class HtmlOutputHandler extends OutputHandler {
         for (Group group : groups) {
             if (output.equals(OUTPUT_HTML)
                     || output.equals(OUTPUT_TIMELINE)) {
-                sb.append(repository.getAllGroupLinks(request, group) + " ");
+                sb.append(getRepository().getAllGroupLinks(request, group) + " ");
                 sb.append(
                     HtmlUtil.href(
                         HtmlUtil.url(
-                            repository.URL_GROUP_SHOW, ARG_OUTPUT, output,
+                            getRepository().URL_GROUP_SHOW, ARG_OUTPUT, output,
                             ARG_ID,
                             group.getId()), group.getFullName()));
                 sb.append("\n<br>\n");
@@ -858,17 +858,17 @@ public class HtmlOutputHandler extends OutputHandler {
         //        if (getAccessManager().canDoAction(request, group, Permission.ACTION_COMMENT)) {
             commentsEntry = HtmlUtil.href(
                 HtmlUtil.url(
-                    repository.URL_COMMENTS_SHOW, ARG_ID,
+                    getRepository().URL_COMMENTS_SHOW, ARG_ID,
                     group.getId()), HtmlUtil.img(
-                        repository.fileUrl(ICON_COMMENTS),
+                        getRepository().fileUrl(ICON_COMMENTS),
                         "Add/View Comments"));
             //        }
 
         String search = HtmlUtil.href(
                             HtmlUtil.url(
-                                repository.URL_ENTRY_SEARCHFORM, ARG_GROUP,
+                                getRepository().URL_ENTRY_SEARCHFORM, ARG_GROUP,
                                 group.getId()), HtmlUtil.img(
-                                    repository.fileUrl(ICON_SEARCH),
+                                    getRepository().fileUrl(ICON_SEARCH),
                                     "Search in Group"));
 
         String createEntry = "";
@@ -876,9 +876,9 @@ public class HtmlOutputHandler extends OutputHandler {
             createEntry =
                 HtmlUtil.href(
                     HtmlUtil.url(
-                        repository.URL_ENTRY_NEW, ARG_GROUP,
+                        getRepository().URL_ENTRY_NEW, ARG_GROUP,
                         group.getId()), HtmlUtil.img(
-                            repository.fileUrl(ICON_NEW),
+                            getRepository().fileUrl(ICON_NEW),
                             "New Entry or Group")) + HtmlUtil.space(1);
         }
 
@@ -887,14 +887,14 @@ public class HtmlOutputHandler extends OutputHandler {
             editEntry =
                 HtmlUtil.href(
                     HtmlUtil.url(
-                        repository.URL_ENTRY_FORM, ARG_ID,
+                        getRepository().URL_ENTRY_FORM, ARG_ID,
                         group.getId()), HtmlUtil.img(
-                            repository.fileUrl(ICON_EDIT), "Edit Group"));
+                            getRepository().fileUrl(ICON_EDIT), "Edit Group"));
         }
 
 
         return search + HtmlUtil.space(1)
-               + repository.getGraphLink(request, group) + HtmlUtil.space(1)
+               + getRepository().getGraphLink(request, group) + HtmlUtil.space(1)
                + createEntry + commentsEntry + HtmlUtil.space(1) + editEntry;
     }
 
@@ -915,7 +915,7 @@ public class HtmlOutputHandler extends OutputHandler {
     protected String getTimelineApplet(Request request, List<Entry> entries)
             throws Exception {
         String timelineAppletTemplate =
-            repository.getResource(PROP_HTML_TIMELINEAPPLET);
+            getRepository().getResource(PROP_HTML_TIMELINEAPPLET);
         List times  = new ArrayList();
         List labels = new ArrayList();
         List ids    = new ArrayList();
@@ -930,7 +930,7 @@ public class HtmlOutputHandler extends OutputHandler {
                                  StringUtil.join(",", labels));
         tmp = StringUtil.replace(tmp, "%ids%", StringUtil.join(",", ids));
         tmp = StringUtil.replace(tmp, "%loadurl%",
-                                 HtmlUtil.url(repository.URL_GETENTRIES,
+                                 HtmlUtil.url(getRepository().URL_GETENTRIES,
                                      ARG_IDS, "%ids%", ARG_OUTPUT,
                                      OUTPUT_HTML));
         return tmp;
@@ -976,7 +976,7 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer sb         = new StringBuffer();
         String       output     = request.getOutput();
-        boolean      showApplet = repository.isAppletEnabled(request);
+        boolean      showApplet = getRepository().isAppletEnabled(request);
         sb.append("<p>\n");
         if (entries.size() == 0) {
             sb.append(HtmlUtil.bold("Nothing Found") + "<p>");
@@ -995,7 +995,7 @@ public class HtmlOutputHandler extends OutputHandler {
             ssb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
             String col1 =
                 links + " "
-                + HtmlUtil.href(HtmlUtil.url(repository.URL_ENTRY_SHOW,
+                + HtmlUtil.href(HtmlUtil.url(getRepository().URL_ENTRY_SHOW,
                                              ARG_ID,
                                              entry.getId()), entry.getName());
             String col2 = "" + new Date(entry.getStartDate());
@@ -1007,13 +1007,13 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append(getTimelineApplet(request, entries));
         }
 
-        sb.append(HtmlUtil.form(repository.URL_GETENTRIES,
+        sb.append(HtmlUtil.form(getRepository().URL_GETENTRIES,
                                 "name=\"getentries\" method=\"post\""));
         if (entries.size() > 0) {
             sb.append(HtmlUtil.submit("Get selected", "getselected"));
             sb.append(HtmlUtil.submit("Get all", "getall"));
             sb.append(" As: ");
-            List outputList = repository.getOutputTypesForEntries(request,
+            List outputList = getRepository().getOutputTypesForEntries(request,
                                   entries);
             sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
         }

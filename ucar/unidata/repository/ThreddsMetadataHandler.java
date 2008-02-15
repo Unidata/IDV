@@ -42,6 +42,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 
+import java.sql.Statement;
 
 
 /**
@@ -195,6 +196,34 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         return new String[] { lbl, content };
     }
 
+
+
+    public void addToSearchForm(Request request, StringBuffer sb, Metadata.Type type, boolean makeSelect)
+            throws Exception {
+        if(makeSelect) {
+            Statement stmt = getDatabaseManager().execute(
+                                                          SqlUtil.makeSelect(SqlUtil.distinct(COL_METADATA_ATTR1), TABLE_METADATA,
+                                                                             SqlUtil.eq(COL_METADATA_TYPE,SqlUtil.quote(type.getType()))));
+            String[] values = SqlUtil.readString(stmt, 1);
+            if(values.length==0) return;
+            List l = Misc.toList(values);
+            l.add(0, new TwoFacedObject("None",""));
+            sb.append(HtmlUtil.formEntry(type.getLabel()+":",   HtmlUtil.select(ARG_METADATA_TYPE+"."+type, l, "",100)));
+
+        } else {
+            sb.append(HtmlUtil.formEntry(type.getLabel()+":",   HtmlUtil.input(ARG_METADATA_TYPE+"."+type, "")));
+        }
+    }
+
+
+    public void addToSearchForm(Request request, StringBuffer sb)
+            throws Exception {
+        addToSearchForm(request, sb, TYPE_DOCUMENTATION,false);
+        addToSearchForm(request, sb, TYPE_PROJECT,true);
+        addToSearchForm(request, sb, TYPE_CREATOR,true);
+        addToSearchForm(request, sb, TYPE_CONTRIBUTOR,true);
+        addToSearchForm(request, sb, TYPE_PUBLISHER,true);
+    }
 
 
     private  String formEntry(String[]cols) {

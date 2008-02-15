@@ -130,23 +130,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     public RequestUrl URL_ENTRY_SEARCH = new RequestUrl(this,
                                              "/entry/search");
 
-    /** _more_ */
-    public RequestUrl URL_METADATA_FORM = new RequestUrl(this,
-                                              "/metadata/form",
-                                              "Edit Metadata");
-
-    /** _more_ */
-    public RequestUrl URL_METADATA_ADDFORM = new RequestUrl(this,
-                                                 "/metadata/addform",
-                                                 "Add Metadata");
-
-    /** _more_ */
-    public RequestUrl URL_METADATA_ADD = new RequestUrl(this,
-                                             "/metadata/add");
-
-    /** _more_ */
-    public RequestUrl URL_METADATA_CHANGE = new RequestUrl(this,
-                                                "/metadata/change");
 
     /** _more_ */
     public RequestUrl URL_ASSOCIATION_ADD = new RequestUrl(this,
@@ -201,7 +184,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     /** _more_ */
     protected RequestUrl[] entryEditUrls = {
-        URL_ENTRY_FORM, URL_METADATA_FORM, URL_METADATA_ADDFORM,
+        URL_ENTRY_FORM, getMetadataManager().URL_METADATA_FORM, getMetadataManager().URL_METADATA_ADDFORM,
         URL_ACCESS_FORM, URL_ENTRY_DELETE
         //        URL_ENTRY_SHOW
     };
@@ -276,10 +259,6 @@ public class Repository implements Constants, Tables, RequestHandler,
         new ArrayList<OutputHandler>();
 
 
-    /** _more_ */
-    private List<MetadataHandler> metadataHandlers =
-        new ArrayList<MetadataHandler>();
-
 
     /** _more_ */
     private Hashtable resources = new Hashtable();
@@ -293,7 +272,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private Object MUTEX_GROUP = new Object();
 
-    private Object MUTEX_METADATA = new Object();
+
 
 
     /** _more_ */
@@ -305,13 +284,16 @@ public class Repository implements Constants, Tables, RequestHandler,
     List<String> typeDefinitionFiles;
 
     /** _more_ */
+    List<String> metadataDefFiles;
+
+
+
+    /** _more_ */
     List<String> apiDefFiles;
 
     /** _more_ */
     List<String> outputDefFiles;
 
-    /** _more_ */
-    List<String> metadataDefFiles;
 
     /** _more_ */
     private List<User> cmdLineUsers = new ArrayList();
@@ -344,6 +326,8 @@ public class Repository implements Constants, Tables, RequestHandler,
     private UserManager userManager;
 
     private AccessManager accessManager;
+
+    private MetadataManager metadataManager;
 
     /** _more_ */
     private StorageManager storageManager;
@@ -531,16 +515,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    protected AccessManager doMakeAccessManager() {
-        return new AccessManager(this);
-    }
-
-
 
 
 
@@ -585,6 +559,19 @@ public class Repository implements Constants, Tables, RequestHandler,
         return userManager;
     }
 
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected AccessManager doMakeAccessManager() {
+        return new AccessManager(this);
+    }
+
+
+
+
     /**
      * _more_
      *
@@ -596,6 +583,34 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         return accessManager;
     }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected MetadataManager doMakeMetadataManager() {
+        return new MetadataManager(this);
+    }
+
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected MetadataManager getMetadataManager() {
+        if (metadataManager == null) {
+            metadataManager = doMakeMetadataManager();
+        }
+        return metadataManager;
+    }
+
+
 
     /**
      * _more_
@@ -646,7 +661,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         initTypeHandlers();
         initTable();
         initOutputHandlers();
-        initMetadataHandlers();
+        getMetadataManager().initMetadataHandlers(metadataDefFiles);
         initApi();
         initUsers();
         initGroups();
@@ -977,6 +992,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             handler = getAdmin();
         } else if (handlerName.equals("accessmanager")) {
             handler = getAccessManager();
+        } else if (handlerName.equals("metadatamanager")) {
+            handler = getMetadataManager();
         } else if (handlerName.equals("repository")) {
             handler = this;
         } else {
@@ -1118,68 +1135,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     public void addOutputHandler(OutputHandler outputHandler) {
         outputHandlers.add(outputHandler);
     }
-
-    /** _more_ */
-    MetadataHandler metadataHandler = new MetadataHandler(this, null);
-
-    /**
-     * _more_
-     *
-     * @param metadata _more_
-     *
-     * @return _more_
-     */
-    public MetadataHandler findMetadataHandler(Metadata metadata) {
-        for (MetadataHandler handler : metadataHandlers) {
-            if (handler.canHandle(metadata)) {
-                return handler;
-            }
-        }
-        return metadataHandler;
-    }
-
-    public MetadataHandler findMetadataHandler(String type) {
-        for (MetadataHandler handler : metadataHandlers) {
-            if (handler.canHandle(type)) {
-                return handler;
-            }
-        }
-        return metadataHandler;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void initMetadataHandlers() throws Exception {
-        for (String file : metadataDefFiles) {
-            try {
-                Element root = XmlUtil.getRoot(file, getClass());
-                List children = XmlUtil.findChildren(root,
-                                    TAG_METADATAHANDLER);
-                for (int i = 0; i < children.size(); i++) {
-                    Element node = (Element) children.get(i);
-                    Class c = Misc.findClass(XmlUtil.getAttribute(node,
-                                  ATTR_CLASS));
-                    Constructor ctor = Misc.findConstructor(c,
-                                           new Class[] { Repository.class,
-                            Element.class });
-                    metadataHandlers.add(
-                        (MetadataHandler) ctor.newInstance(
-                            new Object[] { this,
-                                           node }));
-                }
-            } catch (Exception exc) {
-                System.err.println("Error loading metadata handler file:"
-                                   + file);
-                throw exc;
-            }
-
-        }
-    }
-
 
 
     /**
@@ -1652,15 +1607,6 @@ public class Repository implements Constants, Tables, RequestHandler,
         return outputHandlers;
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    protected List<MetadataHandler> getMetadataHandlers() {
-        return metadataHandlers;
-    }
-
 
 
     /**
@@ -2082,7 +2028,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         sb.append(HtmlUtil.div(link, " class=\"subheader\""));
         sb.append("</td></tr>");
         if(metadataForm) {
-            
+            getMetadataManager().addToSearchForm(request, sb);
         }
 
 
@@ -2682,7 +2628,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
             List<Metadata> metadataList = ((entry == null)
                                            ? (List<Metadata>) new ArrayList<Metadata>()
-                                           : getMetadata(entry));
+                                           : getMetadataManager().getMetadata(entry));
             String metadataButton = HtmlUtil.submit("Edit Metadata",
                                         ARG_EDIT_METADATA);
 
@@ -2828,153 +2774,6 @@ public class Repository implements Constants, Tables, RequestHandler,
         return makeEntryEditResult(request, entry, title, sb);
     }
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processMetadataChange(Request request) throws Exception {
-        synchronized(MUTEX_METADATA) {
-            Entry entry = getEntry(request);
-
-            if (request.exists(ARG_DELETE)) {
-                Hashtable args = request.getArgs();
-                for (Enumeration keys = args.keys(); keys.hasMoreElements(); ) {
-                    String arg = (String) keys.nextElement();
-                    if ( !arg.startsWith(ARG_METADATA_ID + ".select.")) {
-                        continue;
-                    }
-                    String id = request.getString(arg, "");
-                    getDatabaseManager().executeDelete(TABLE_METADATA,
-                                                       COL_METADATA_ID, SqlUtil.quote(id));
-                }
-            } else {
-                List<Metadata> newMetadata = new ArrayList<Metadata>();
-                for (MetadataHandler handler : metadataHandlers) {
-                    handler.handleFormSubmit(request, entry, newMetadata);
-                }
-
-                for (Metadata metadata : newMetadata) {
-                    getDatabaseManager().executeDelete(TABLE_METADATA,
-                                                       COL_METADATA_ID, SqlUtil.quote(metadata.getId()));
-                    insertMetadata(metadata);
-                }
-            }
-            entry.setMetadata(null);
-            return new Result(HtmlUtil.url(URL_METADATA_FORM, ARG_ID,
-                                           entry.getId()));
-        }
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processMetadataForm(Request request) throws Exception {
-        StringBuffer sb    = new StringBuffer();
-        Entry entry = getEntry(request);
-        sb.append(makeEntryHeader(request, entry));
-
-        List<Metadata> metadataList = getMetadata(entry);
-        sb.append("<p>");
-        if (metadataList.size() == 0) {
-            sb.append("No metadata defined");
-        } else {
-            sb.append(HtmlUtil.formPost(URL_METADATA_CHANGE));
-            sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
-            sb.append(HtmlUtil.submit("Change"));
-            sb.append(HtmlUtil.space(2));
-            sb.append(HtmlUtil.submit("Delete selected", ARG_DELETE));
-            sb.append("<table cellpadding=\"5\">");
-            for (Metadata metadata : metadataList) {
-                MetadataHandler metadataHandler =
-                    findMetadataHandler(metadata);
-                if (metadataHandler == null) {
-                    continue;
-                }
-                String[] html = metadataHandler.getForm(metadata, true);
-                if (html == null) {
-                    continue;
-                }
-                String cbx = HtmlUtil.checkbox(ARG_METADATA_ID + ".select."
-                                 + metadata.getId(), metadata.getId(), false);
-                sb.append(HtmlUtil.rowTop(HtmlUtil.cols(cbx + html[0],
-                        html[1])));
-            }
-            sb.append("</table>");
-            sb.append(HtmlUtil.submit("Change"));
-            sb.append(HtmlUtil.space(2));
-            sb.append(HtmlUtil.submit("Delete Selected", ARG_DELETE));
-            sb.append(HtmlUtil.formClose());
-        }
-
-        return makeEntryEditResult(request, entry, "Edit Metadata", sb);
-
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processMetadataAddForm(Request request) throws Exception {
-        StringBuffer sb    = new StringBuffer();
-        Entry entry = getEntry(request);
-        sb.append(makeEntryHeader(request, entry));
-        sb.append(HtmlUtil.formTable());
-        for (MetadataHandler handler : metadataHandlers) {
-            handler.makeAddForm(request, entry, sb);
-        }
-        sb.append(HtmlUtil.formTableClose());
-        return makeEntryEditResult(request, entry, "Add Metadata", sb);
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processMetadataAdd(Request request) throws Exception {
-        synchronized(MUTEX_METADATA) {
-        Entry entry = getEntry(request);
-        List<Metadata> newMetadata = new ArrayList<Metadata>();
-        for (MetadataHandler handler : metadataHandlers) {
-            handler.handleAddSubmit(request, entry, newMetadata);
-        }
-
-        for (Metadata metadata : newMetadata) {
-            insertMetadata(metadata);
-        }
-
-
-
-        return new Result(HtmlUtil.url(URL_METADATA_FORM, ARG_ID,
-                                       entry.getId()));
-
-        }
-    }
 
 
 
@@ -5010,13 +4809,13 @@ public class Repository implements Constants, Tables, RequestHandler,
                                   getQueryOrderAndLimit(request, false));
 
 
-
         List<Entry>      entries = new ArrayList<Entry>();
         List<Entry>      groups  = new ArrayList<Entry>();
         ResultSet        results;
         SqlUtil.Iterator iter     = SqlUtil.getIterator(statement);
         boolean canDoSelectOffset = getDatabaseManager().canDoSelectOffset();
         Hashtable        seen     = new Hashtable();
+        List<Entry> allEntries = new ArrayList<Entry>();
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 if ( !canDoSelectOffset && (skipCnt-- > 0)) {
@@ -5030,13 +4829,64 @@ public class Repository implements Constants, Tables, RequestHandler,
                     continue;
                 }
                 seen.put(entry.getId(), "");
-                if (entry.isGroup()) {
-                    groups.add(entry);
-                } else {
-                    entries.add(entry);
-                }
+                allEntries.add(entry);
             }
         }
+
+        Hashtable args = request.getArgs();
+        String metadataPrefix = ARG_METADATA_TYPE + ".";
+        List metadataArgs = new ArrayList();
+        for (Enumeration keys = args.keys(); keys.hasMoreElements(); ) {
+            String arg = (String) keys.nextElement();
+            if ( !arg.startsWith(metadataPrefix)) {
+                continue;
+            }
+            if(!request.defined(arg)) continue;
+            String type = arg.substring(metadataPrefix.length());
+            metadataArgs.add(type);
+            metadataArgs.add(request.getString(arg, ""));
+        }
+        
+        if(metadataArgs.size()>1) {
+            List<Entry> okEntries = new ArrayList<Entry>();            
+            //            System.err.println ("Need to check for and:" + metadataArgs);
+            for(Entry entry: allEntries) {
+                boolean entryOk = true;
+                List<Metadata> metadataList = getMetadataManager().getMetadata(entry);
+                for(int i=0;i<metadataArgs.size();i+=2) {
+                    String type = (String) metadataArgs.get(i);
+                    String value = (String) metadataArgs.get(i+1);
+                    boolean ok = false;
+                    for (Metadata metadata : metadataList) {
+                        if(metadata.getType().equals(type) && metadata.getAttr1().equals(value)) {
+                            ok  = true;
+                            break;
+                        }
+                    }
+                    if(!ok) {
+                        entryOk = false;
+                        break;
+                    }
+                }
+                if(entryOk) {
+                    okEntries.add(entry);
+                } else {
+                    //                    System.err.println ("Bad entry: " + getMetadataManager().getMetadata(entry));
+                }
+            }
+            allEntries = okEntries;
+        }
+
+
+
+        for(Entry entry: allEntries) {
+            if (entry.isGroup()) {
+                groups.add(entry);
+            } else {
+                entries.add(entry);
+            }
+        }
+
         return new List[] { getAccessManager().filterEntries(request, groups),
                             getAccessManager().filterEntries(request, entries) };
     }
@@ -5526,22 +5376,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     /**
      * _more_
      *
-     * @param metadata _more_
-     *
-     * @throws Exception _more_
-     */
-    public void insertMetadata(Metadata metadata) throws Exception {
-        getDatabaseManager().executeInsert(INSERT_METADATA, new Object[] {
-            metadata.getId(), metadata.getEntryId(), metadata.getType(),
-            metadata.getAttr1(), metadata.getAttr2(), metadata.getAttr3(),
-            metadata.getAttr4()
-        });
-    }
-
-
-    /**
-     * _more_
-     *
      * @param request _more_
      * @param entries _more_
      *
@@ -5880,9 +5714,9 @@ public class Repository implements Constants, Tables, RequestHandler,
                 batchCnt = 0;
                 tagCnt   = 0;
             }
-            List<Metadata> metadataList = getMetadata(entry);
+            List<Metadata> metadataList = getMetadataManager().getMetadata(entry);
             for (Metadata metadata : metadataList) {
-                insertMetadata(metadata);
+                getMetadataManager().insertMetadata(metadata);
             }
         }
         if (batchCnt > 0) {
@@ -6090,46 +5924,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-
-
-    /**
-     * _more_
-     *
-     *
-     * @param entry _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public List<Metadata> getMetadata(Entry entry) throws Exception {
-        String query = SqlUtil.makeSelect(
-                           COLUMNS_METADATA, Misc.newList(
-                               TABLE_METADATA), SqlUtil.eq(
-                               COL_METADATA_ENTRY_ID, SqlUtil.quote(
-                                   entry.getId())), " order by "
-                                       + COL_METADATA_TYPE);
-
-        SqlUtil.Iterator iter =
-            SqlUtil.getIterator(getDatabaseManager().execute(query));
-        ResultSet      results;
-        List<Metadata> metadata = new ArrayList();
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                int col = 1;
-                String type = results.getString(3);
-                MetadataHandler handler = findMetadataHandler(type);
-                metadata.add(handler.makeMetadata(results.getString(col++),
-                                          results.getString(col++),
-                                          results.getString(col++),
-                                          results.getString(col++),
-                                          results.getString(col++),
-                                          results.getString(col++),
-                                          results.getString(col++)));
-            }
-        }
-        return metadata;
-    }
 
 
 

@@ -23,6 +23,8 @@
 
 
 
+
+
   <type name="level2radar" description="Level 2 Radar File">
 	<column name="station" type="string" isindex="true" cansearch="true" searchtype="select" label="Station"
                 properties="/ucar/unidata/repository/resources/level3radar.station.properties"/>

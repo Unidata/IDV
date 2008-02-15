@@ -265,7 +265,7 @@ public class CatalogHarvester extends Harvester {
                                            100) + "...");
                         continue;
                     }
-                    repository.insertMetadata(metadata);
+                    getMetadataManager().insertMetadata(metadata);
                 } catch (Exception exc) {
                     repository.log("Bad metadata", exc);
                 }

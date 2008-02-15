@@ -116,6 +116,8 @@ public class Metadata implements Constants, Tables {
     }
 
 
+
+
     /**
      * _more_
      *
@@ -278,6 +280,11 @@ public class Metadata implements Constants, Tables {
     public String getAttr4() {
         return attr4;
     }
+
+
+        public String toString() {
+            return type + " " + attr1;
+        }
 
 
     public static class Type {

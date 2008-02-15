@@ -184,7 +184,7 @@ public class CatalogOutputHandler extends OutputHandler {
             throws Exception {
         NodeList elements = XmlUtil.getElements(node);
         List<MetadataHandler> metadataHandlers =
-            repository.getMetadataHandlers();
+            repository.getMetadataManager().getMetadataHandlers();
 
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);

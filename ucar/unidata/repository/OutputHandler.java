@@ -77,14 +77,13 @@ import java.util.zip.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class OutputHandler implements Constants, Tables {
+public class OutputHandler extends RepositoryManager {
 
     /** _more_ */
     public static final String OUTPUT_HTML = "default.html";
 
 
-    /** _more_ */
-    protected Repository repository;
+
 
     /** _more_ */
     protected static String timelineAppletTemplate;
@@ -104,22 +103,10 @@ public class OutputHandler implements Constants, Tables {
      * @throws Exception _more_
      */
     public OutputHandler(Repository repository) throws Exception {
-        this.repository = repository;
+        super(repository);
 
     }
 
-    protected AccessManager getAccessManager() {
-        return repository.getAccessManager();
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public Repository getRepository() {
-        return repository;
-    }
 
     /**
      * _more_
@@ -259,17 +246,17 @@ public class OutputHandler implements Constants, Tables {
                                   String output) {
         String nextLink = HtmlUtil.href(
                               HtmlUtil.url(
-                                  repository.URL_ENTRY_SHOW, ARG_ID,
+                                           getRepository().URL_ENTRY_SHOW, ARG_ID,
                                   entry.getId(), ARG_OUTPUT, output,
                                   ARG_NEXT, "true"), HtmlUtil.img(
-                                      repository.fileUrl(ICON_RIGHT),
+                                                                  getRepository().fileUrl(ICON_RIGHT),
                                       "View next entry"));
         String prevLink = HtmlUtil.href(
                               HtmlUtil.url(
-                                  repository.URL_ENTRY_SHOW, ARG_ID,
+                                           getRepository().URL_ENTRY_SHOW, ARG_ID,
                                   entry.getId(), ARG_OUTPUT, output,
                                   ARG_PREVIOUS, "true"), HtmlUtil.img(
-                                      repository.fileUrl(ICON_LEFT),
+                                      getRepository().fileUrl(ICON_LEFT),
                                       "View Previous Entry"));
         return prevLink + nextLink;
     }
@@ -303,7 +290,7 @@ public class OutputHandler implements Constants, Tables {
      * @return _more_
      */
     protected String getEntryUrl(Entry entry) {
-        return HtmlUtil.href(HtmlUtil.url(repository.URL_ENTRY_SHOW, ARG_ID,
+        return HtmlUtil.href(HtmlUtil.url(getRepository().URL_ENTRY_SHOW, ARG_ID,
                                           entry.getId()), entry.getName());
     }
 
@@ -322,7 +309,7 @@ public class OutputHandler implements Constants, Tables {
                                     String what)
             throws Exception {
         return getHeader(request, output,
-                         repository.getOutputTypesFor(request, what));
+                         getRepository().getOutputTypesFor(request, what));
     }
 
 

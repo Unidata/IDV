@@ -213,6 +213,11 @@ public class MetadataHandler extends RepositoryManager {
 
 
 
+    public void addToSearchForm(Request request, StringBuffer sb)
+            throws Exception {
+    }
+
+
     /**
      * _more_
      *
@@ -229,7 +234,7 @@ public class MetadataHandler extends RepositoryManager {
             return;
         }
         sb.append("<tr><td><p>&nbsp;<p></td></tr>");
-        sb.append(HtmlUtil.form(getRepository().URL_METADATA_ADD));
+        sb.append(HtmlUtil.form(getMetadataManager().URL_METADATA_ADD));
         sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
         sb.append(html[1]);
         sb.append(HtmlUtil.formClose());

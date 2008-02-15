@@ -34,11 +34,11 @@
 <!--  <method handler="accessmanager"  request="/access/list"    method="processAccessList"    actions="edit"/> -->
 
   <method request="/entry/get/*"     method="processEntryGet"      cancache="false"/>
-  <method request="/metadata/form"   method="processMetadataForm" actions="edit"/>
 
-  <method request="/metadata/addform"   method="processMetadataAddForm" actions="edit"/>
-  <method request="/metadata/add"   method="processMetadataAdd" actions="edit"/>
-  <method request="/metadata/change"   method="processMetadataChange" actions="edit"/>
+  <method handler="metadatamanager" request="/metadata/form"   method="processMetadataForm" actions="edit"/>
+  <method handler="metadatamanager" request="/metadata/addform"   method="processMetadataAddForm" actions="edit"/>
+  <method handler="metadatamanager" request="/metadata/add"   method="processMetadataAdd" actions="edit"/>
+  <method handler="metadatamanager" request="/metadata/change"   method="processMetadataChange" actions="edit"/>
 
 
   <method request="/association/add"   method="processAssociationAdd"/>
