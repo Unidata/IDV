@@ -761,6 +761,15 @@ public class HtmlUtil {
     }
 
 
+    public static String formEntryTop(String[]cols) {
+        StringBuffer sb = new StringBuffer();
+        for(int i=0;i<cols.length;i+=2) {
+            sb.append(formEntryTop(cols[i],cols[i+1]));
+        }
+        return sb.toString();
+    }
+
+
     /**
      * _more_
      *

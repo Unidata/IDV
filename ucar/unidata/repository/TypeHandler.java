@@ -260,6 +260,7 @@ public class TypeHandler extends RepositoryManager {
      */
     public void getDatasetTag(StringBuffer sb, Entry entry, Request request) {
         File f = entry.getResource().getFile();
+        /*
         sb.append(XmlUtil.openTag(CatalogOutputHandler.TAG_DATASET,
                                   XmlUtil.attrs(ATTR_NAME, entry.getName(),
                                       CatalogOutputHandler.ATTR_URLPATH,
@@ -292,6 +293,7 @@ public class TypeHandler extends RepositoryManager {
         sb.append(XmlUtil.closeTag(ThreddsMetadataHandler.TAG_TIMECOVERAGE));
 
         sb.append(XmlUtil.closeTag(CatalogOutputHandler.TAG_DATASET));
+        */
     }
 
 
@@ -474,7 +476,7 @@ public class TypeHandler extends RepositoryManager {
                         assocSB.toString()));
             }
 
-
+            /*
             List<Metadata> metadataList = getRepository().getMetadata(entry);
             if (metadataList.size() > 0) {
                 sb.append(HtmlUtil.formEntry("<p>", ""));
@@ -495,6 +497,7 @@ public class TypeHandler extends RepositoryManager {
                 mSB.append("</ul>");
                 sb.append(HtmlUtil.formEntry("Metadata:", mSB.toString()));
             }
+            */
 
             sb.append("</table>\n");
 
@@ -1037,7 +1040,7 @@ public class TypeHandler extends RepositoryManager {
                                     request.get(ARG_SEARCHMETADATA,
                                         false)) + " Search metadata";
         if (name.trim().length() == 0) {
-            formBuffer.append(HtmlUtil.formEntry("Name:",
+            formBuffer.append(HtmlUtil.formEntry("Text:",
                     HtmlUtil.input(ARG_NAME) + searchMetaData));
         } else {
             HtmlUtil.hidden(ARG_NAME, name);
@@ -1206,7 +1209,7 @@ public class TypeHandler extends RepositoryManager {
                 where.add(SqlUtil.like(COL_ENTRIES_PARENT_GROUP_ID,
                                        groupName));
             } else {
-                Group group = getRepository().findGroup(request, false);
+                Group group = getRepository().findGroup(request);
                 if (group == null) {
                     throw new IllegalArgumentException(
                         "Could not find group:" + groupName);

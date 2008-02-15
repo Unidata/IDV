@@ -78,16 +78,6 @@ import java.util.zip.*;
  */
 public class Metadata implements Constants, Tables {
 
-    /** _more_ */
-    public static final String TYPE_HTML = "html";
-
-    /** _more_ */
-    public static final String TYPE_URL = "html";
-
-    /** _more_ */
-    public static final String TYPE_LINK = "link";
-
-
 
     /** _more_ */
     private String id;
@@ -121,6 +111,10 @@ public class Metadata implements Constants, Tables {
         this("", "", type, "", "", "", "");
     }
 
+    public Metadata(Type type) {
+        this("", "", type, "", "", "", "");
+    }
+
 
     /**
      * _more_
@@ -135,6 +129,12 @@ public class Metadata implements Constants, Tables {
      * @param attr3 _more_
      * @param attr4 _more_
      */
+    public Metadata(String id, String entryId, Type type, String attr1,
+                    String attr2, String attr3, String attr4) {
+        this(id, entryId, type.getType(), attr1, attr2, attr3, attr4);
+    }
+
+
     public Metadata(String id, String entryId, String type, String attr1,
                     String attr2, String attr3, String attr4) {
         this.id      = id;
@@ -277,6 +277,74 @@ public class Metadata implements Constants, Tables {
      */
     public String getAttr4() {
         return attr4;
+    }
+
+
+    public static class Type {
+        String type;
+        String label;
+        public Type(String type) {
+            this.type = type;
+            label =  type.replace("_", " ");
+            label = label.replace(".", " ");
+            label = label.substring(0, 1).toUpperCase() + label.substring(1);
+        }
+
+        public Type(String type, String label) {
+            this.type = type;
+            this.label  = label;
+        }
+
+        public boolean equals(Object o) {
+            if(!getClass().equals(o.getClass())) return false;
+               Type that = (Type) o;
+               return type.equals(that.type);
+        }
+
+        public String toString() {
+            return type;
+        }
+
+
+/**
+Set the Type property.
+
+@param value The new value for Type
+**/
+public void setType (String value) {
+	type = value;
+}
+
+/**
+Get the Type property.
+
+@return The Type
+**/
+public String getType () {
+	return type;
+}
+
+/**
+Set the Label property.
+
+@param value The new value for Label
+**/
+public void setLabel (String value) {
+	label = value;
+}
+
+/**
+Get the Label property.
+
+@return The Label
+**/
+public String getLabel () {
+	return label;
+}
+
+        
+
+
     }
 
 

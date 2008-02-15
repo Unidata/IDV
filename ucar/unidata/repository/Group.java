@@ -45,7 +45,6 @@ import java.util.List;
 public class Group extends Entry {
 
 
-
     /** _more_ */
     public static final String IDDELIMITER = "/";
 
@@ -78,6 +77,20 @@ public class Group extends Entry {
      */
     public Group(String id, TypeHandler typeHandler) {
         super(id, typeHandler);
+    }
+
+
+    public Entry clone() {
+        Entry newEntry = new Group(getId(), getTypeHandler());
+        initClone(newEntry);
+        return newEntry;
+    }
+
+    protected void initClone(Entry newEntry) {
+        Group newGroup = (Group) newEntry;
+        newGroup.isDummy = isDummy;
+        newGroup.children = children;
+        super.initClone(newEntry);
     }
 
     /**

@@ -56,6 +56,7 @@ import java.util.List;
  */
 public class MetadataHandler extends RepositoryManager {
 
+
     /** _more_          */
     public static String ARG_TYPE = "type";
 
@@ -81,10 +82,10 @@ public class MetadataHandler extends RepositoryManager {
 
 
     /** _more_ */
-    private Hashtable canHandle = new Hashtable();
+    private Hashtable typeMap = new Hashtable();
 
     /** _more_ */
-    private List types = new ArrayList();
+    private List<Metadata.Type> types = new ArrayList<Metadata.Type>();
 
     /**
      * _more_
@@ -98,25 +99,28 @@ public class MetadataHandler extends RepositoryManager {
         super(repository);
     }
 
+    public Metadata makeMetadata(String id, String entryId, String type,
+                                 String attr1, String attr2, String attr3, String attr4) { 
+        return new Metadata(id, entryId, type, attr1,attr2, attr3, attr4);
+    }
+
+
     /**
      * _more_
      *
      * @param type _more_
      */
-    public void setCanHandle(String type) {
+    public void addType(Metadata.Type type) {
         types.add(type);
-        canHandle.put(type, type);
+        typeMap.put(type.getType(), type);
+    }
+
+    public Metadata.Type getType(String type) {
+        return (Metadata.Type)typeMap.get(type);
     }
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public List getTypes() {
-        return types;
-    }
+
 
     /**
      * _more_
@@ -138,7 +142,7 @@ public class MetadataHandler extends RepositoryManager {
      * @return _more_
      */
     public boolean canHandle(Metadata metadata) {
-        return canHandle.get(metadata.getType()) != null;
+        return canHandle(metadata.getType());
     }
 
     /**
@@ -149,7 +153,7 @@ public class MetadataHandler extends RepositoryManager {
      * @return _more_
      */
     public boolean canHandle(String type) {
-        return canHandle.get(type) != null;
+        return typeMap.get(type) != null;
     }
 
 
@@ -186,7 +190,7 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    public String[] getEditForm(Metadata metadata) {
+    public String[] getForm(Metadata metadata, boolean forEdit) {
         return null;
     }
 
@@ -202,10 +206,12 @@ public class MetadataHandler extends RepositoryManager {
      */
     public void makeAddForm(Request request, Entry entry, StringBuffer sb)
             throws Exception {
-        for (int i = 0; i < types.size(); i++) {
-            makeAddForm(entry, types.get(i).toString(), sb);
+        for (Metadata.Type type: types) {
+            makeAddForm(entry, type, sb);
         }
     }
+
+
 
     /**
      * _more_
@@ -216,19 +222,26 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    private void makeAddForm(Entry entry, String type, StringBuffer sb)
+    private void makeAddForm(Entry entry, Metadata.Type type, StringBuffer sb)
             throws Exception {
-        String[] html = getEditForm(new Metadata(type));
+        String[] html = getForm(new Metadata(type), false);
         if (html == null) {
             return;
         }
-        sb.append("<p>&nbsp;<p>");
+        sb.append("<tr><td><p>&nbsp;<p></td></tr>");
         sb.append(HtmlUtil.form(getRepository().URL_METADATA_ADD));
         sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
-        sb.append(HtmlUtil.submit("Add " + html[0]));
-        sb.append(HtmlUtil.space(2));
         sb.append(html[1]);
         sb.append(HtmlUtil.formClose());
+    }
+
+
+
+    public void makeSearchForm(Request request,  StringBuffer sb)
+            throws Exception {
+        for (Metadata.Type type: types) {
+            //            makeAddForm(entry, types.get(i).toString(), sb);
+        }
     }
 
 
@@ -313,7 +326,6 @@ public class MetadataHandler extends RepositoryManager {
     public String getCatalogXml(Metadata metadata) {
         return "";
     }
-
 
 
 

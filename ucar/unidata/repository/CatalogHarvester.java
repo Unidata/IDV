@@ -195,7 +195,7 @@ public class CatalogHarvester extends Harvester {
                              (String) null);
         if (urlPath == null) {
             Element accessNode = XmlUtil.findChild(node,
-                                     ThreddsMetadataHandler.TAG_ACCESS);
+                                     CatalogOutputHandler.TAG_ACCESS);
             if (accessNode != null) {
                 urlPath = XmlUtil.getAttribute(accessNode,
                         CatalogOutputHandler.ATTR_URLPATH);
@@ -253,7 +253,7 @@ public class CatalogHarvester extends Harvester {
                     node);
             metadataList.add(new Metadata(repository.getGUID(),
                                           group.getId(),
-                                          ThreddsMetadataHandler.TAG_LINK,
+                                          ThreddsMetadataHandler.TYPE_LINK,
                                           "Imported from catalog",
                                           catalogUrl, "", ""));
             for (Metadata metadata : metadataList) {

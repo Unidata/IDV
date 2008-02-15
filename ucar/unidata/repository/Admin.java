@@ -935,7 +935,7 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminImportCatalog(Request request) throws Exception {
-        Group        group   = getRepository().findGroup(request, false);
+        Group        group   = getRepository().findGroup(request);
         boolean      recurse = request.get(ARG_RECURSE, false);
         StringBuffer sb      = new StringBuffer();
         sb.append(getRepository().makeGroupHeader(request, group));

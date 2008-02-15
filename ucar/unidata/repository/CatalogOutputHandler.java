@@ -90,6 +90,39 @@ public class CatalogOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String TAG_CATALOG = "catalog";
 
+    /** _more_ */
+    public static final String TAG_NAME = "name";
+
+    /** _more_ */
+    public static final String TAG_CONTACT = "contact";
+
+
+    /** _more_ */
+    public static final String TAG_GEOSPATIALCOVERAGE = "geospatialCoverage";
+
+    /** _more_ */
+    public static final String TAG_TIMECOVERAGE = "timeCoverage";
+
+    /** _more_ */
+    public static final String TAG_START = "start";
+
+    /** _more_ */
+    public static final String TAG_END = "end";
+
+    /** _more_ */
+    public static final String TAG_DATASIZE = "dataSize";
+
+    /** _more_ */
+    public static final String TAG_DATE = "date";
+
+    /** _more_ */
+    public static final String TAG_METADATA = "metadata";
+
+    /** _more_ */
+    public static final String TAG_ACCESS = "access";
+
+
+
 
     /** _more_ */
     public static final String ATTR_METADATATYPE = "metadataType";
@@ -156,7 +189,7 @@ public class CatalogOutputHandler extends OutputHandler {
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
             String  tag   = child.getTagName();
-            if (tag.equals(ThreddsMetadataHandler.TAG_METADATA)) {
+            if (tag.equals(TAG_METADATA)) {
                 if ( !XmlUtil.getAttribute(child, "metadataType",
                                            "THREDDS").equals("THREDDS")) {
                     //                    System.err.println("Skipping: "

@@ -98,6 +98,8 @@ import javax.swing.*;
 public class Repository implements Constants, Tables, RequestHandler,
                                    RepositorySource {
 
+
+
     /** _more_ */
     public static final String GROUP_TOP = "Top";
 
@@ -1136,6 +1138,15 @@ public class Repository implements Constants, Tables, RequestHandler,
         return metadataHandler;
     }
 
+    public MetadataHandler findMetadataHandler(String type) {
+        for (MetadataHandler handler : metadataHandlers) {
+            if (handler.canHandle(type)) {
+                return handler;
+            }
+        }
+        return metadataHandler;
+    }
+
 
     /**
      * _more_
@@ -2000,8 +2011,6 @@ public class Repository implements Constants, Tables, RequestHandler,
         boolean      basicForm    = formType.equals("basic");
 
 
-
-
         StringBuffer sb           = new StringBuffer();
         StringBuffer headerBuffer = new StringBuffer();
         //        headerBuffer.append(header("Search Form"));
@@ -2444,9 +2453,15 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected Entry getEntry(String entryId, Request request)
             throws Exception {
+        return getEntry(entryId, request, true);
+    }
+
+    protected Entry getEntry(String entryId, Request request, boolean andFilter)
+            throws Exception {
         if(entryId==null) return null;
         Entry entry = (Entry) entryCache.get(entryId);
         if (entry != null) {
+            if(!andFilter) return entry;
             return getAccessManager().filterEntry(request, entry);
         }
 
@@ -2463,8 +2478,11 @@ public class Repository implements Constants, Tables, RequestHandler,
             return null;
         }
         TypeHandler typeHandler = getTypeHandler(results.getString(2));
-        entry = getAccessManager().filterEntry(request, typeHandler.getEntry(results));
+        entry = typeHandler.getEntry(results);
         entryStmt.close();
+        if(andFilter) {
+            entry = getAccessManager().filterEntry(request, entry);
+        }
 
 
         if (entry != null) {
@@ -2577,7 +2595,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processEntryNew(Request request) throws Exception {
-        Group        group = findGroup(request, true);
+        Group        group = findGroup(request);
         StringBuffer sb    = new StringBuffer();
         sb.append(makeGroupHeader(request, group));
         sb.append(HtmlUtil.formTable());
@@ -2623,7 +2641,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             group = findGroup(entry.getParentGroupId());
         }
         if (group == null) {
-            group = findGroup(request, true);
+            group = findGroup(request);
         }
         if (type == null) {
             type = request.getType((String) null);
@@ -2884,7 +2902,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 if (metadataHandler == null) {
                     continue;
                 }
-                String[] html = metadataHandler.getEditForm(metadata);
+                String[] html = metadataHandler.getForm(metadata, true);
                 if (html == null) {
                     continue;
                 }
@@ -2919,9 +2937,11 @@ public class Repository implements Constants, Tables, RequestHandler,
         StringBuffer sb    = new StringBuffer();
         Entry entry = getEntry(request);
         sb.append(makeEntryHeader(request, entry));
+        sb.append(HtmlUtil.formTable());
         for (MetadataHandler handler : metadataHandlers) {
             handler.makeAddForm(request, entry, sb);
         }
+        sb.append(HtmlUtil.formTableClose());
         return makeEntryEditResult(request, entry, "Add Metadata", sb);
     }
 
@@ -3739,13 +3759,12 @@ public class Repository implements Constants, Tables, RequestHandler,
      * _more_
      *
      * @param request _more_
-     * @param checkEditAccess _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Group findGroup(Request request, boolean checkEditAccess)
+    public Group findGroup(Request request)
             throws Exception {
         String groupNameOrId = (String) request.getString(ARG_GROUP,
                                    (String) null);
@@ -3904,7 +3923,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     public Result processGroupShow(Request request) throws Exception {
         Group group = null;
         if(request.defined(ARG_GROUP)) {
-            group = findGroup(request, false);
+            group = findGroup(request);
         }
         if (group == null) {
             group = topGroup;
@@ -6098,7 +6117,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 int col = 1;
-                metadata.add(new Metadata(results.getString(col++),
+                String type = results.getString(3);
+                MetadataHandler handler = findMetadataHandler(type);
+                metadata.add(handler.makeMetadata(results.getString(col++),
                                           results.getString(col++),
                                           results.getString(col++),
                                           results.getString(col++),

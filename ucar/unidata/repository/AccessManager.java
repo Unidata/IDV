@@ -145,7 +145,7 @@ public class AccessManager  extends RepositoryManager {
         }
 
         if (request.exists(ATTR_ID)) {
-            Entry entry = getRepository().getEntry(request.getString(ARG_ID, ""), request);
+            Entry entry = getRepository().getEntry(request.getString(ARG_ID, ""), request, false);
             if (entry == null) {
                 throw new IllegalArgumentException("Could not find entry:"
                         + request.getString(ARG_ID, ""));
@@ -154,7 +154,7 @@ public class AccessManager  extends RepositoryManager {
         }
 
         if (request.exists(ARG_GROUP)) {
-            Group group = getRepository().findGroup(request, false);
+            Group group = getRepository().findGroup(request);
             if (group == null) {
                 throw new IllegalArgumentException("Could not find group:"
                         + request.getString(ARG_GROUP, ""));
@@ -269,7 +269,9 @@ public class AccessManager  extends RepositoryManager {
                 //TODO                return null;
             }
         }
-        if(!canDoAction(request, entry, Permission.ACTION_VIEW)) return null;
+        if(!canDoAction(request, entry, Permission.ACTION_VIEW)) {
+            return null;
+        }
         return entry;
     }
 
