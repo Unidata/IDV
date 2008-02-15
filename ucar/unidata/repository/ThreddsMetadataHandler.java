@@ -138,15 +138,14 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         addType(TYPE_LINK);
         addType(TYPE_KEYWORD);
         addType(TYPE_ICON);
-        addType(TYPE_CONTRIBUTOR);
+        addType(TYPE_PUBLISHER);
         addType(TYPE_CREATOR);
+        addType(TYPE_CONTRIBUTOR);
         addType(TYPE_PROJECT);
         addType(TYPE_AUTHORITY);
         addType(TYPE_DATATYPE);
         addType(TYPE_DATAFORMAT);
         addType(TYPE_VOCABULARY);
-        addType(TYPE_PUBLISHER);
-
         addType(TYPE_VARIABLES);
     }
 
@@ -219,6 +218,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     public void addToSearchForm(Request request, StringBuffer sb)
             throws Exception {
         addToSearchForm(request, sb, TYPE_DOCUMENTATION,false);
+        addToSearchForm(request, sb, TYPE_KEYWORD,true);
         addToSearchForm(request, sb, TYPE_PROJECT,true);
         addToSearchForm(request, sb, TYPE_CREATOR,true);
         addToSearchForm(request, sb, TYPE_CONTRIBUTOR,true);

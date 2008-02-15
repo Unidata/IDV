@@ -53,6 +53,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
+import org.w3c.dom.*;
 
 
 /**
@@ -258,25 +259,24 @@ public class TypeHandler extends RepositoryManager {
      * @param request _more_
      *
      */
-    public void getDatasetTag(StringBuffer sb, Entry entry, Request request) {
+    public void getDatasetTag(Entry entry, Request request,Document doc, Element parent) {
         File f = entry.getResource().getFile();
-        /*
-        sb.append(XmlUtil.openTag(CatalogOutputHandler.TAG_DATASET,
-                                  XmlUtil.attrs(ATTR_NAME, entry.getName(),
-                                      CatalogOutputHandler.ATTR_URLPATH,
-                                      entry.getResource().getPath())));
+        Element dataset = doc.createElement(CatalogOutputHandler.TAG_DATASET);
+        parent.appendChild(dataset);
+        dataset.setAttribute(ATTR_NAME, entry.getName());
+        dataset.setAttribute(CatalogOutputHandler.ATTR_URLPATH,
+                             entry.getResource().getPath());
 
-        sb.append(XmlUtil.tag(CatalogOutputHandler.TAG_SERVICENAME, "",
-                              "self"));
+        Element service = doc.createElement(CatalogOutputHandler.TAG_SERVICENAME);
+        dataset.appendChild(service);
+
         if (f.exists()) {
-            sb.append(
-                XmlUtil.tag(
-                    ThreddsMetadataHandler.TAG_DATASIZE,
-                    XmlUtil.attrs(CatalogOutputHandler.ATTR_UNITS, "bytes"),
-                    "" + f.length()));
+            //            dataset.appendChild(ThreddsMetadataHandler.TAG_DATASIZE,
+            //                    XmlUtil.attrs(CatalogOutputHandler.ATTR_UNITS, "bytes"),
+            //                    "" + f.length()));
         }
 
-
+        /*
         sb.append(
             XmlUtil.tag(
                 ThreddsMetadataHandler.TAG_DATE,
