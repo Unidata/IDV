@@ -1190,6 +1190,10 @@ public class TypeHandler extends RepositoryManager {
             addOr(COL_TAGS_NAME, tagString, where, true);
         }
 
+        if (request.defined(ARG_RESOURCE)) {
+            addOr(COL_ENTRIES_RESOURCE, request.getString(ARG_RESOURCE,""), where, true);
+        }
+
         if (request.defined(ARG_GROUP)) {
             String groupName = (String) request.getString(ARG_GROUP,
                                    "").trim();
