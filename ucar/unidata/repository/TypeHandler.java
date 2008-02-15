@@ -935,18 +935,15 @@ public class TypeHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public void addToSearchForm(Request request, StringBuffer formBuffer,
-                                List where, boolean simpleForm)
+                                List where, boolean advancedForm)
             throws Exception {
 
         List dateSelect = new ArrayList();
-        //        dateSelect.add(new TwoFacedObject("Last 1/2 hour", "-30 minutes"));
         dateSelect.add(new TwoFacedObject("Last hour", "-1 hour"));
-        //        dateSelect.add(new TwoFacedObject("Last 2 hours", "-2 hours"));
         dateSelect.add(new TwoFacedObject("Last 3 hours", "-3 hours"));
         dateSelect.add(new TwoFacedObject("Last 6 hours", "-6 hours"));
         dateSelect.add(new TwoFacedObject("Last 12 hours", "-12 hours"));
         dateSelect.add(new TwoFacedObject("Last day", "-1 day"));
-        //        dateSelect.add(new TwoFacedObject("Last 2 days", "-2 days"));
         dateSelect.add(new TwoFacedObject("Last 7 days", "-7 days"));
         dateSelect.add(new TwoFacedObject("All", "none"));
         dateSelect.add(new TwoFacedObject("Custom:", ""));
@@ -966,18 +963,6 @@ public class TypeHandler extends RepositoryManager {
         if ((typeHandlers.size() == 0) && request.defined(ARG_TYPE)) {
             typeHandlers.add(getRepository().getTypeHandler(request));
         }
-
-
-
-        /*
-
-        System.err.println("th:" + typeHandlers);
-        if(typeHandlers.size()==1 && typeHandlers.get(0)!=this) {
-            TypeHandler otherTypeHandler = typeHandlers.get(0);
-            otherTypeHandler.addToSearchForm(formBuffer, headerBuffer, request, where);
-            return;
-        }
-        */
 
 
         /*
@@ -1050,7 +1035,33 @@ public class TypeHandler extends RepositoryManager {
         formBuffer.append("\n");
 
 
-        if ( !simpleForm || request.defined(ARG_GROUP)) {
+        String dateHelp = " (e.g., 2007-12-11 00:00:00)";
+
+        formBuffer.append(
+            HtmlUtil.formEntry(
+                "Date Range:",
+                dateSelectInput + HtmlUtil.space(1)
+                + HtmlUtil.input(ARG_FROMDATE, minDate) + " -- "
+                + HtmlUtil.input(ARG_TODATE, maxDate) + dateHelp));
+
+        formBuffer.append("\n");
+
+
+
+        request.put(ARG_FORM_ADVANCED, (!advancedForm)+"");
+        String urlArgs = request.getUrlArgs();
+        request.put(ARG_FORM_ADVANCED, advancedForm+"");
+        String link =  HtmlUtil.href(getRepository().URL_ENTRY_SEARCHFORM   + "?"
+                                     + urlArgs, (advancedForm?"- Advanced":"+ Advanced"),
+                                     " class=\"subheaderlink\" ");
+        formBuffer.append("<tr><td colspan=2>");
+        formBuffer.append(HtmlUtil.div(link, " class=\"subheader\""));
+        formBuffer.append("</td></tr>");
+
+
+
+
+        if ( advancedForm || request.defined(ARG_GROUP)) {
             String groupArg = (String) request.getString(ARG_GROUP, "");
             String searchChildren = " "
                                     + HtmlUtil.checkbox(ARG_GROUP_CHILDREN,
@@ -1096,7 +1107,7 @@ public class TypeHandler extends RepositoryManager {
             formBuffer.append("\n");
         }
 
-        if ( !simpleForm || request.defined(ARG_TAG)) {
+        if ( advancedForm || request.defined(ARG_TAG)) {
             String tag = (String) request.getString(ARG_TAG, "");
             TagCollection tagCollection =
                 getRepository().findTagCollection(tag);
@@ -1116,19 +1127,7 @@ public class TypeHandler extends RepositoryManager {
 
         }
 
-        String dateHelp = " (e.g., 2007-12-11 00:00:00)";
-
-        formBuffer.append(
-            HtmlUtil.formEntry(
-                "Date Range:",
-                dateSelectInput + HtmlUtil.space(1)
-                + HtmlUtil.input(ARG_FROMDATE, minDate) + " -- "
-                + HtmlUtil.input(ARG_TODATE, maxDate) + dateHelp));
-
-        formBuffer.append("\n");
-
-
-        if ( !simpleForm) {
+        if ( advancedForm) {
             String nonGeo =
                 HtmlUtil.checkbox(ARG_INCLUDENONGEO, "true",
                                   request.get(ARG_INCLUDENONGEO,

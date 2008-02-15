@@ -2007,37 +2007,18 @@ public class Repository implements Constants, Tables, RequestHandler,
                                          boolean typeSpecific)
             throws Exception {
 
-        String       formType     = request.getString(ARG_FORM_TYPE, "basic");
-        boolean      basicForm    = formType.equals("basic");
-
+        boolean      advancedForm    = request.get(ARG_FORM_ADVANCED, false);
+        boolean      metadataForm    = request.get(ARG_FORM_METADATA, false);
 
         StringBuffer sb           = new StringBuffer();
         StringBuffer headerBuffer = new StringBuffer();
         //        headerBuffer.append(header("Search Form"));
-        request.remove(ARG_FORM_TYPE);
-        String urlArgs = request.getUrlArgs();
-        request.put(ARG_FORM_TYPE, formType);
         headerBuffer.append("<table cellpadding=\"5\">");
-        String formLinks = "";
-        if (basicForm) {
-            formLinks =
-                HtmlUtil.bold("Basic") + "&nbsp;|&nbsp;"
-                + HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SEARCHFORM,
-                                             ARG_FORM_TYPE, "advanced") + "&"
-                                                 + urlArgs, "Advanced");
-
-        } else {
-            formLinks = HtmlUtil.href(
-                HtmlUtil.url(URL_ENTRY_SEARCHFORM, ARG_FORM_TYPE, "basic")
-                + "&" + urlArgs, "Basic") + "&nbsp;|&nbsp;"
-                                          + HtmlUtil.bold("Advanced");
-        }
-
-        headerBuffer.append(HtmlUtil.formEntry("Search:", formLinks));
         sb.append(HtmlUtil.form(HtmlUtil.url(URL_ENTRY_SEARCH, ARG_NAME,
                                              WHAT_ENTRIES)));
 
-        sb.append(HtmlUtil.hidden(ARG_FORM_TYPE, formType));
+        sb.append(HtmlUtil.hidden(ARG_FORM_ADVANCED, ""+advancedForm));
+        sb.append(HtmlUtil.hidden(ARG_FORM_METADATA, ""+metadataForm));
 
         //Put in an empty submit button so when the user presses return 
         //it acts like a regular submit (not a submit to change the type)
@@ -2063,6 +2044,12 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
+        String buttons  = HtmlUtil.submit("Search", "submit") +
+            HtmlUtil.space(1) +
+            HtmlUtil.submit("Search Subset", "submit_subset");
+
+
+        sb.append(HtmlUtil.formEntry("",buttons));
 
         if (what.length() == 0) {
             sb.append(HtmlUtil.formEntry("Search For:",
@@ -2082,10 +2069,26 @@ public class Repository implements Constants, Tables, RequestHandler,
             request.put(ARG_RELATIVEDATE, oldValue);
         }
 
-        typeHandler.addToSearchForm(request, sb, where, basicForm);
+        typeHandler.addToSearchForm(request, sb, where, advancedForm);
+
+
+        request.put(ARG_FORM_METADATA, (!metadataForm)+"");
+        String urlArgs = request.getUrlArgs();
+        request.put(ARG_FORM_METADATA, metadataForm+"");
+        String link =  HtmlUtil.href(getRepository().URL_ENTRY_SEARCHFORM + "?"
+                                     + urlArgs, (metadataForm?"- Metadata":"+ Metadata"),
+                                     " class=\"subheaderlink\" ");
+        sb.append("<tr><td colspan=2>");
+        sb.append(HtmlUtil.div(link, " class=\"subheader\""));
+        sb.append("</td></tr>");
+        if(metadataForm) {
+            
+        }
+
+
 
         String outputHtml = "";
-        if ( !basicForm) {
+        if (true || advancedForm) {
             //            outputHtml = HtmlUtil.span("Output Type: ",
             //                                       "class=\"formlabel\"");
             if (output.length() == 0) {
@@ -2121,11 +2124,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-        sb.append(HtmlUtil.formEntry("",
-                                     HtmlUtil.submit("Search", "submit")
-                                     + " "
-                                     + HtmlUtil.submit("Search Subset",
-                                         "submit_subset")));
+        sb.append(HtmlUtil.formEntry("",buttons));
         sb.append("</table>");
         sb.append("</form>");
         //        sb.append(IOUtil.readContents("/ucar/unidata/repository/resources/map.js",
@@ -2206,6 +2205,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         String[]    whats       = { WHAT_ENTRIES, WHAT_TAG,
                                     WHAT_ASSOCIATION };
         String[]    names       = { "Entries", "Tags", "Associations" };
+
         String      formType    = request.getString(ARG_FORM_TYPE, "basic");
 
         for (int i = 0; i < whats.length; i++) {

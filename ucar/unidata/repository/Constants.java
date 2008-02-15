@@ -238,6 +238,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_FORM_TYPE = "form.type";
 
+    public static final String ARG_FORM_ADVANCED = "form.advanced";
+
+    public static final String ARG_FORM_METADATA = "form.metadata";
+
     /** _more_ */
     public static final String ARG_CHANGE = "change";
 

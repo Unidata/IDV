@@ -581,9 +581,9 @@ public class GenericTypeHandler extends TypeHandler {
      * @throws Exception _more_
      */
     public void addToSearchForm(Request request, StringBuffer formBuffer,
-                                List where, boolean simpleForm)
+                                List where, boolean advancedForm)
             throws Exception {
-        super.addToSearchForm(request, formBuffer, where, simpleForm);
+        super.addToSearchForm(request, formBuffer, where, advancedForm);
         for (Column column : columns) {
             column.addToSearchForm(request, formBuffer, where);
         }
