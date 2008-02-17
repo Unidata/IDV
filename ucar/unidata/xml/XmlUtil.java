@@ -977,6 +977,33 @@ public abstract class XmlUtil {
         return getDocument(xml).getDocumentElement();
     }
 
+
+    public static Element create(Document doc, String tag, Element parent) throws Exception {
+        Element child = doc.createElement(tag);
+        if(parent!=null) parent.appendChild(child);
+        return child;
+    }
+
+
+    public static Element create(Document doc, String tag, Element parent,String[]attrs) throws Exception {
+        Element child = create(doc, tag, parent);
+        if(attrs!=null)
+            setAttributes(child, attrs);
+        return child;
+    }
+
+    public static Element create(Document doc, String tag, Element parent, String text,String[]attrs) throws Exception {
+        Element child = create(doc, tag, parent,attrs);
+        Text textNode = doc.createTextNode(text);
+        child.appendChild(textNode);
+        return child;
+    }
+
+    public static Element create(Document doc, String tag, Element parent, String text) throws Exception {
+        return create(doc, tag, parent,text, null);
+    }
+
+
     /**
      *  Read in the xml contained in the given filename, parse it and return the
      *  root Element.
