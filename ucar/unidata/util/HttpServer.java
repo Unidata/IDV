@@ -227,6 +227,9 @@ public class HttpServer {
             return socket;
         }
 
+        public OutputStream getOutputStream() {
+            return output;
+        }
 
         /**
          * Run the read
