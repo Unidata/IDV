@@ -221,24 +221,9 @@ public class ZipOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        return outputEntries(request, entries);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entries _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result outputEntries(Request request, List<Entry> entries)
-            throws Exception {
         return toZip(request, entries);
     }
+
 
 
 

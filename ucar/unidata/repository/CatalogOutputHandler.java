@@ -306,30 +306,30 @@ public class CatalogOutputHandler extends OutputHandler {
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
         String       title = group.getFullName();
-
         Document doc = XmlUtil.makeDocument();
-        Element root = doc.createElement(TAG_CATALOG);
-        root.setAttribute(ATTR_NAME,title);
-        Element service = doc.createElement(TAG_SERVICE);
-        root.appendChild(service);
-        service.setAttribute(ATTR_NAME,"all");
-        service.setAttribute(ATTR_SERVICETYPE, "Compound");
-        service.setAttribute(ATTR_BASE,"");
-
-        Element self = doc.createElement(TAG_SERVICE);
-        service.appendChild(self);
-        self.setAttribute(ATTR_NAME,"self");
-        self.setAttribute(ATTR_SERVICETYPE, "HTTP");
-        self.setAttribute(ATTR_BASE, "");
+        Element root = XmlUtil.create(doc,TAG_CATALOG,null,new String[]{
+            "xmlns","http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0",
+            "xmlns:xlink","http://www.w3.org/1999/xlink",
+            ATTR_NAME,title});
 
 
-        Element dataset = doc.createElement(TAG_DATASET);
-        root.appendChild(dataset);
-        dataset.setAttribute(ATTR_NAME, title);
+        Element service = XmlUtil.create(doc,TAG_SERVICE,root,new String[]{
+            ATTR_NAME,"all",
+            ATTR_SERVICETYPE, "Compound",
+            ATTR_BASE,""});
+
+        Element self = XmlUtil.create(doc,TAG_SERVICE, service, new String[]{
+            ATTR_NAME,"self",
+            ATTR_SERVICETYPE, "HTTP",
+            ATTR_BASE, ""});
+
+        Element dataset = XmlUtil.create(doc,TAG_DATASET, root,new String[]{
+            ATTR_NAME, title});
 
         toCatalogInner(request, subGroups,doc,dataset);
         toCatalogInner(request, entries,doc,dataset);
-        StringBuffer sb    = new StringBuffer(XmlUtil.toString(root));
+        StringBuffer sb    = new StringBuffer(XmlUtil.XML_HEADER);
+        sb.append(XmlUtil.toString(root));
         return new Result(title, sb, "text/xml");
     }
 
@@ -339,112 +339,33 @@ public class CatalogOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param groups _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result outputGroups(Request request, List<Group> groups)
-            throws Exception {
-        StringBuffer sb    = new StringBuffer();
-        String       title = "Groups";
-        sb.append(XmlUtil.XML_HEADER + "\n");
-        sb.append(XmlUtil.openTag(TAG_CATALOG,
-                                  CATALOG_ATTRS
-                                  + XmlUtil.attrs(ATTR_NAME, title)));
-        sb.append(XmlUtil.openTag(TAG_DATASET,
-                                  XmlUtil.attrs(ATTR_NAME, title)));
-        //        sb.append(toCatalogInner(request, groups));
-        sb.append(XmlUtil.closeTag(TAG_DATASET));
-        sb.append(XmlUtil.closeTag(TAG_CATALOG));
-        return new Result(title, sb, getMimeType(OUTPUT_CATALOG));
-    }
-
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entries _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result outputEntries(Request request, List<Entry> entries)
-            throws Exception {
-        return toCatalog(request, entries, "Entries");
-    }
-
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param objects _more_
-     * @param title _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Result toCatalog(Request request, List objects, String title)
-            throws Exception {
-        StringBuffer sb = new StringBuffer();
-        sb.append(XmlUtil.XML_HEADER + "\n");
-        sb.append(XmlUtil.openTag(TAG_CATALOG,
-                                  CATALOG_ATTRS
-                                  + XmlUtil.attrs(ATTR_NAME, title)));
-        sb.append(XmlUtil.openTag(TAG_DATASET,
-                                  XmlUtil.attrs(ATTR_NAME, title)));
-        //        sb.append(toCatalogInner(request, objects));
-        sb.append(XmlUtil.closeTag(TAG_DATASET));
-        sb.append(XmlUtil.closeTag(TAG_CATALOG));
-        Result result = new Result(title, sb, getMimeType(OUTPUT_CATALOG));
-        return result;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
      * @param objects _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected void toCatalogInner(Request request, List objects, Document doc, Element parent)
+    protected void toCatalogInner(Request request, List entryList, Document doc, Element parent)
             throws Exception {
 
         List<Entry>  entries = new ArrayList();
         List<Group>  groups  = new ArrayList();
-        for (Object obj : objects) {
-            if (obj instanceof Entry) {
-                entries.add((Entry) obj);
-            } else if (obj instanceof Group) {
-                groups.add((Group) obj);
+        for (int i=0;i<entryList.size();i++) {
+            Entry entry = (Entry) entryList.get(i);
+            if (entry.isGroup()) {
+                groups.add((Group) entry);
             } else {
-                throw new IllegalArgumentException("Unknown object type:"
-                        + obj.getClass().getName());
-            }
-
+                entries.add(entry);
+            } 
         }
         for (Group group : groups) {
             String url =  /* "http://localhost:8080"+*/
                 HtmlUtil.url(repository.URL_GROUP_SHOW, ARG_ID,
                              group.getId(), ARG_OUTPUT, OUTPUT_CATALOG);
             
-            Element ref = doc.createElement(TAG_CATALOGREF);
-            parent.appendChild(ref);
-            ref.setAttribute(ATTR_XLINKTITLE, group.getName());
-            ref.setAttribute(ATTR_XLINKHREF, url);
+            Element ref = XmlUtil.create(doc,TAG_CATALOGREF, parent, new String[]{
+                ATTR_XLINKTITLE, group.getName(),
+                ATTR_XLINKHREF, url});
         }
 
         EntryGroup entryGroup = new EntryGroup("");
@@ -468,16 +389,15 @@ public class CatalogOutputHandler extends OutputHandler {
      * @param parent _more_
      */
     protected void generate(Request request, EntryGroup parent,
-                            Document doc, Element datasetNode) {
+                            Document doc, Element datasetNode) throws Exception {
 
 
         for (int i = 0; i < parent.keys().size(); i++) {
             Object     key   = parent.keys().get(i);
             EntryGroup group = (EntryGroup) parent.map.get(key);
 
-            Element dataset = doc.createElement(TAG_DATASET);
-            datasetNode.appendChild(dataset);
-            dataset.setAttribute(ATTR_NAME, group.key.toString());
+            Element dataset = XmlUtil.create(doc,TAG_DATASET,datasetNode, new String[]{
+                ATTR_NAME, group.key.toString()});
 
             for (int j = 0; j < group.children.size(); j++) {
                 Object child = group.children.get(j);

@@ -391,32 +391,6 @@ public class XmlOutputHandler extends OutputHandler {
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entries _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result outputEntries(Request request, List<Entry> entries)
-            throws Exception {
-        StringBuffer sb     = new StringBuffer();
-        String       output = request.getOutput();
-        sb.append(XmlUtil.XML_HEADER);
-        sb.append("\n");
-        sb.append(XmlUtil.openTag(TAG_ENTRIES));
-        for (Entry entry : entries) {
-            getEntryTag(entry, sb);
-        }
-        sb.append(XmlUtil.closeTag(TAG_ENTRIES));
-        return new Result("", sb, getMimeType(output));
-
-
-
-    }
 
     /**
      * _more_
@@ -464,33 +438,6 @@ public class XmlOutputHandler extends OutputHandler {
             sb.append(XmlUtil.closeTag(TAG_GROUP));
         }
     }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param groups _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result outputGroups(Request request, List<Group> groups)
-            throws Exception {
-        StringBuffer sb     = new StringBuffer();
-        String       output = request.getOutput();
-        sb.append(XmlUtil.XML_HEADER);
-        sb.append("\n");
-        sb.append(XmlUtil.openTag(TAG_GROUPS));
-
-        for (Group group : groups) {
-            getGroupTag(group, sb, false);
-        }
-        sb.append(XmlUtil.closeTag(TAG_GROUPS));
-        return new Result("", sb, getMimeType(output));
-    }
-
 
 
 }

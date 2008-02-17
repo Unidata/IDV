@@ -1148,9 +1148,6 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public Result handleRequest(Request request) throws Exception {
 
-        getUserManager().checkSession(request);
-
-
         long   t1 = System.currentTimeMillis();
         Result result;
         if (debug) {
@@ -1158,17 +1155,39 @@ public class Repository implements Constants, Tables, RequestHandler,
                   + request.toString());
         }
         try {
+            getUserManager().checkSession(request);
             result = getResult(request);
         } catch (Exception exc) {
+            //In case the session checking didn't set the user
+            if(request.getRequestContext().getUser()==null) {
+                request.getRequestContext().setUser(getUserManager().getAnonymousUser());
+            }
+
             //TODO: For non-html outputs come up with some error format
             Throwable inner = LogUtil.getInnerException(exc);
-            StringBuffer sb = new StringBuffer("An error has occurred:"
-                                  + warning(inner.getMessage()));
-            if (request.getRequestContext().getUser().getAdmin()) {
+            boolean badAccess = inner instanceof AccessException;
+            StringBuffer sb = new StringBuffer();
+            if(!badAccess) {
+                sb.append("An error has occurred:"
+                          + warning(inner.getMessage()));
+            } else {
+                sb.append(warning(inner.getMessage()));
+                sb.append(getUserManager().makeLoginForm(request,
+                                                         HtmlUtil.hidden(ARG_REDIRECT, request.getFullUrl())));
+            } 
+
+            if (request.getRequestContext().getUser()!= null &&
+                request.getRequestContext().getUser().getAdmin()) {
                 sb.append("<pre>" + LogUtil.getStackTrace(inner) + "</pre>");
             }
+
             result = new Result("Error", sb);
-            result.setResponseCode(Result.RESPONSE_INTERNALERROR);
+            if(badAccess) {
+                result.setResponseCode(Result.RESPONSE_UNAUTHORIZED);
+                //                result.addHttpHeader("WWW-Authenticate","Basic realm=\"repository\"");
+            } else {
+                result.setResponseCode(Result.RESPONSE_INTERNALERROR);
+            }
             log("Error handling request:" + request, exc);
         }
 
@@ -1230,15 +1249,10 @@ public class Repository implements Constants, Tables, RequestHandler,
             return getHtdocsFile(request);
         }
 
+
         if ( !getUserManager().isRequestOk(request)
                 || !apiMethod.isRequestOk(request, this)) {
-            StringBuffer sb = new StringBuffer();
-            sb.append("You cannot access this page<p>");
-            sb.append(getUserManager().makeLoginForm(request,
-                    HtmlUtil.hidden(ARG_REDIRECT, request.getFullUrl())));
-            Result result = new Result("Error", sb);
-            result.setResponseCode(Result.RESPONSE_UNAUTHORIZED);
-            return result;
+            throw new AccessException("You cannot access this page");
         }
 
 
@@ -1630,6 +1644,18 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+
+    protected List getOutputTypesForEntry(Request request,
+                                          Entry entry)
+            throws Exception {
+        List list = new ArrayList();
+        for (OutputHandler outputHandler : outputHandlers) {
+            outputHandler.getOutputTypesForEntry(request, entry, list);
+        }
+        return list;
+    }
+
+
     /**
      * _more_
      *
@@ -1824,6 +1850,16 @@ public class Repository implements Constants, Tables, RequestHandler,
         return new Result(
             "",
             new StringBuffer(note(request.getUnsafeString(ARG_MESSAGE, ""))));
+    }
+
+    protected String getEntryLinks(Request request, Entry entry)
+            throws Exception {
+        List<Link> links = new ArrayList<Link>();
+        entry.getTypeHandler().getEntryLinks(request, entry, links);
+        for (OutputHandler outputHandler : getOutputHandlers()) {
+            outputHandler.getEntryLinks(request, entry, links);
+        }
+        return StringUtil.join(HtmlUtil.space(1), links);
     }
 
 
@@ -2403,7 +2439,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
     protected Entry getEntry(String entryId, Request request, boolean andFilter)
-            throws Exception {
+        throws Exception {
         if(entryId==null) return null;
         Entry entry = (Entry) entryCache.get(entryId);
         if (entry != null) {
@@ -2777,12 +2813,15 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-
     protected Entry getEntry(Request request) throws Exception {
         Entry entry = getEntry(request.getString(ARG_ID, ""), request);
         if (entry == null) {
+            Entry tmp = getEntry(request.getString(ARG_ID,""), request,false);
+            if(tmp !=null) {
+                throw new AccessException("You do not have access to this entry");
+            }
             throw new IllegalArgumentException("Could not find entry:"
-                    + request.getString(ARG_ID, ""));
+                                               + request.getString(ARG_ID, ""));
         }
         return entry;
     }
@@ -3448,7 +3487,24 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processEntryShow(Request request) throws Exception {
-        Entry entry = getEntry(request);
+        Entry entry;
+        if(request.defined(ARG_ID)) {
+            entry = getEntry(request);
+            if(entry == null) {
+                Entry tmp = getEntry(request.getString(ARG_ID,""), request,false);
+                if(tmp !=null) {
+                    throw new IllegalArgumentException("You do not have access to this entry");
+                }
+            }
+        } else  if(request.defined(ARG_GROUP)) {
+            entry = findGroup(request);
+        } else {
+            entry = topGroup;
+        }
+        if(entry == null) {
+            throw new IllegalArgumentException("No entry specified");
+        }
+
         if (entry.isGroup()) {
             return processGroupShow(request, (Group) entry);
         }
@@ -3537,7 +3593,10 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         }
         entries = getAccessManager().filterEntries(request, entries);
-        return getOutputHandler(request).outputEntries(request, entries);
+
+        return getOutputHandler(request).outputGroup(request, dummyGroup,
+                                                     new ArrayList<Group>(),entries);
+
     }
 
 
@@ -3591,7 +3650,6 @@ public class Repository implements Constants, Tables, RequestHandler,
      * _more_
      *
      * @param request _more_
-     * @param group _more_
      * @param makeLinkForLastGroup _more_
      * @param extraArgs _more_
      *
@@ -3599,11 +3657,11 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected String[] getBreadCrumbs(Request request, Group group,
+    protected String[] getBreadCrumbs(Request request, Entry entry,
                                       boolean makeLinkForLastGroup,
                                       String extraArgs)
             throws Exception {
-        return getBreadCrumbs(request, group, makeLinkForLastGroup,
+        return getBreadCrumbs(request, entry, makeLinkForLastGroup,
                               extraArgs, null);
     }
 
@@ -3611,7 +3669,6 @@ public class Repository implements Constants, Tables, RequestHandler,
      * _more_
      *
      * @param request _more_
-     * @param group _more_
      * @param makeLinkForLastGroup _more_
      * @param extraArgs _more_
      * @param stopAt _more_
@@ -3620,16 +3677,16 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected String[] getBreadCrumbs(Request request, Group group,
+    protected String[] getBreadCrumbs(Request request, Entry entry,
                                       boolean makeLinkForLastGroup,
                                       String extraArgs, Group stopAt)
             throws Exception {
         List breadcrumbs = new ArrayList();
         List titleList   = new ArrayList();
-        if (group == null) {
+        if (entry == null) {
             return new String[] { "", "" };
         }
-        Group  parent = findGroup(group.getParentGroupId());
+        Group  parent = findGroup(entry.getParentGroupId());
         String output = ((request == null)
                          ? OutputHandler.OUTPUT_HTML
                          : request.getOutput());
@@ -3658,14 +3715,14 @@ public class Repository implements Constants, Tables, RequestHandler,
                     output) + extraArgs, name));
             parent = findGroup(parent.getParentGroupId());
         }
-        titleList.add(group.getName());
+        titleList.add(entry.getName());
         if (makeLinkForLastGroup) {
             breadcrumbs.add(HtmlUtil.href(HtmlUtil.url(URL_GROUP_SHOW,
-                    ARG_ID, group.getId(), ARG_OUTPUT,
-                    output), group.getName()));
+                    ARG_ID, entry.getId(), ARG_OUTPUT,
+                    output), entry.getName()));
         } else {
-            breadcrumbs.add(HtmlUtil.bold(group.getName()) + "&nbsp;"
-                            + getAllGroupLinks(request, group));
+            breadcrumbs.add(HtmlUtil.bold(entry.getName()) + "&nbsp;"
+                            + getEntryLinks(request, entry));
         }
         String title = "Group: "
                        + StringUtil.join("&nbsp;&gt;&nbsp;", titleList);
@@ -3675,61 +3732,11 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected String getAllGroupLinks(Request request, Group group)
-            throws Exception {
-        StringBuffer sb = new StringBuffer();
-        for (OutputHandler outputHandler : getOutputHandlers()) {
-            String links = outputHandler.getGroupLinks(request, group);
-            if (links.length() > 0) {
-                sb.append(links);
-                sb.append(HtmlUtil.space(1));
-            }
-        }
-
-        /*        sb.append(HtmlUtil.href(HtmlUtil.url(URL_GROUP_FORM, ARG_GROUP,
-                  group.getFullName()),
-                  HtmlUtil.img(fileUrl(ICON_EDIT),"Edit Group")));
-                  sb.append(HtmlUtil.space(1));*/
 
 
 
 
-        return sb.toString();
-    }
 
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processGroupShow(Request request) throws Exception {
-        Group group = null;
-        if(request.defined(ARG_GROUP)) {
-            group = findGroup(request);
-        }
-        if (group == null) {
-            group = topGroup;
-        }
-
-        return processGroupShow(request, group);
-    }
 
 
     /**
@@ -3845,30 +3852,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processGraphView(Request request) throws Exception {
-        String graphAppletTemplate = getResource(PROP_HTML_GRAPHAPPLET);
-        String type = request.getString(ARG_NODETYPE, NODETYPE_GROUP);
-        String id                  = request.getId((String) null);
-
-        if ((type == null) || (id == null)) {
-            throw new IllegalArgumentException(
-                "no type or id argument specified");
-        }
-        String html = StringUtil.replace(graphAppletTemplate, "${id}",
-                                         encode(id));
-        html = StringUtil.replace(html, "${root}", getUrlBase());
-        html = StringUtil.replace(html, "${type}", encode(type));
-        return new Result("Graph View", html.getBytes(), Result.TYPE_HTML);
-    }
 
 
     /**
@@ -5311,7 +5294,9 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-
+    public Group getDummyGroup() {
+        return dummyGroup;
+    }
 
 
 
@@ -5923,7 +5908,11 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-
+    public static class AccessException extends RuntimeException {
+        public AccessException (String message) {
+            super(message);
+        }
+    }
 
 
 

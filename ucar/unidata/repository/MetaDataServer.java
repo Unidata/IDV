@@ -228,7 +228,6 @@ public class MetaDataServer extends HttpServer implements Constants {
 
 
 
-
         /**
          * _more_
          *
@@ -255,6 +254,7 @@ public class MetaDataServer extends HttpServer implements Constants {
                 context.setIp(getSocket().getInetAddress().getHostAddress());
                 Request request = new Request(repository, path, context,
                                       formArgs);
+                request.setOutputStream(getOutputStream());
                 request.setFileUploads(fileUploads);
                 request.setHttpHeaderArgs(httpArgs);
                 result = repository.handleRequest(request);
@@ -271,7 +271,9 @@ public class MetaDataServer extends HttpServer implements Constants {
                                     new StringBuffer("Unknown request:"
                                         + path));
             }
-            writeContent(result);
+            if(result.getNeedToWrite()) {
+                writeContent(result);
+            }
         }
     }
 

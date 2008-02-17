@@ -213,7 +213,6 @@ public class ImageOutputHandler extends OutputHandler {
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
         Result result = outputEntries(request, entries);
-        System.err.println("output:" + request);
         result.putProperty(PROP_NAVSUBLINKS,
                            getEntriesHeader(request, request.getOutput(),
                                             WHAT_ENTRIES));

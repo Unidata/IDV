@@ -90,6 +90,8 @@ public class Result {
     /** _more_ */
     private List<String> httpHeaderArgs;
 
+    private boolean needToWrite = true;
+
 
     /**
      * _more_
@@ -184,6 +186,25 @@ public class Result {
         this.mimeType       = mimeType;
         this.shouldDecorate = shouldDecorate;
     }
+
+
+/**
+Set the NeedToWrite property.
+
+@param value The new value for NeedToWrite
+**/
+public void setNeedToWrite (boolean value) {
+	needToWrite = value;
+}
+
+/**
+Get the NeedToWrite property.
+
+@return The NeedToWrite
+**/
+public boolean getNeedToWrite () {
+	return needToWrite;
+}
 
 
     /**

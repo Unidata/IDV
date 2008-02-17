@@ -83,20 +83,19 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
      *
      * @throws Exception _more_
      */
-    protected String getEntryLinks(Entry entry, Request request)
+    protected void getEntryLinks(Request request, Entry entry, List<Link> links)
             throws Exception {
+        super.getEntryLinks(request,entry, links);
         if (entry.getValues() == null) {
-            return super.getEntryLinks(entry, request);
+            return;
         }
-        return super.getEntryLinks(entry, request) + " "
-               + HtmlUtil.href(
-                   HtmlUtil.url(
-                       "http://radar.weather.gov/radar.php", "rid",
-                       (String) entry.getValues()[0], "product",
-                       (String) entry.getValues()[1]), HtmlUtil.img(
+        links.add(new Link(
+                           HtmlUtil.url(
+                                        "http://radar.weather.gov/radar.php", "rid",
+                                        (String) entry.getValues()[0], "product",
+                                        (String) entry.getValues()[1]), 
                            repository.fileUrl("/radar.gif"),
-                           "Show NWS Radar Site"), " target=_OTHER");
-
+                           "Show NWS Radar Site"));
     }
 
 

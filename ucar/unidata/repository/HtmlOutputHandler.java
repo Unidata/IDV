@@ -133,7 +133,7 @@ public class HtmlOutputHandler extends OutputHandler {
     protected void getOutputTypesFor(Request request, String what, List types)
             throws Exception {
         if (what.equals(WHAT_ENTRIES)) {
-            types.add(new TwoFacedObject("Html", OUTPUT_HTML));
+            types.add(new TwoFacedObject("Entry", OUTPUT_HTML));
             if (getRepository().isAppletEnabled(request)) {
                 types.add(new TwoFacedObject("Timeline", OUTPUT_TIMELINE));
             }
@@ -143,7 +143,7 @@ public class HtmlOutputHandler extends OutputHandler {
         } else if (what.equals(WHAT_TYPE)) {
             types.add(new TwoFacedObject("Type Html", OUTPUT_HTML));
         } else {
-            types.add(new TwoFacedObject("Html", OUTPUT_HTML));
+            types.add(new TwoFacedObject("Entry", OUTPUT_HTML));
         }
     }
 
@@ -160,9 +160,9 @@ public class HtmlOutputHandler extends OutputHandler {
     protected void getOutputTypesForEntries(Request request,
                                             List<Entry> entries, List types)
             throws Exception {
-        types.add(new TwoFacedObject("Html", OUTPUT_HTML));
+        types.add(new TwoFacedObject("Entry", OUTPUT_HTML));
         if (entries.size() > 1) {
-            types.add(new TwoFacedObject("Html with timeline",
+            types.add(new TwoFacedObject("Timeline",
                                          OUTPUT_TIMELINE));
         }
     }
@@ -187,13 +187,11 @@ public class HtmlOutputHandler extends OutputHandler {
 
         Result result = new Result("Entry: " + entry.getName(), sb,
                                    getMimeType(request.getOutput()));
-        List<Entry> entries = new ArrayList<Entry>();
-        entries.add(entry);
         result.putProperty(
             PROP_NAVSUBLINKS,
             getHeader(
                 request, request.getOutput(),
-                getRepository().getOutputTypesForEntries(request, entries)));
+                getRepository().getOutputTypesForEntry(request, entry)));
         return result;
 
     }
@@ -222,7 +220,7 @@ public class HtmlOutputHandler extends OutputHandler {
         for (Group group : groups) {
             if (output.equals(OUTPUT_HTML)) {
                 sb.append("<li>"
-                          + getRepository().getAllGroupLinks(request, group) + " "
+                          + getRepository().getEntryLinks(request, group) + " "
                           + group.getFullName());
             }
 
@@ -267,7 +265,7 @@ public class HtmlOutputHandler extends OutputHandler {
                                         dfltSelected));
             sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
             sb.append(" ");
-            //            sb.append(entry.getTypeHandler().getEntryLinks(entry, request));
+           //            sb.append(getRepository().getEntryLinks(request,entry));
             sb.append(" ");
             sb.append(getEntryUrl(entry));
             sb.append("<br>\n");
@@ -759,7 +757,7 @@ public class HtmlOutputHandler extends OutputHandler {
                         }
                         }**/
 
-                    //                    sb.append(getRepository().getAllGroupLinks(request, subGroup));
+                    //                    sb.append(getRepository().getEntryLinks(request, subGroup));
                     sb.append("<li>");
                     String linkText = icon+subGroup.getName();
                     String groupLink =  HtmlUtil.href(
@@ -805,98 +803,6 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param groups _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result outputGroups(Request request, List<Group> groups)
-            throws Exception {
-        String       output = request.getOutput();
-        StringBuffer sb     = new StringBuffer();
-        String       title  = "Groups";
-        if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
-            sb.append("<ul>");
-        }
-
-        for (Group group : groups) {
-            if (output.equals(OUTPUT_HTML)
-                    || output.equals(OUTPUT_TIMELINE)) {
-                sb.append(getRepository().getAllGroupLinks(request, group) + " ");
-                sb.append(
-                    HtmlUtil.href(
-                        HtmlUtil.url(
-                            getRepository().URL_GROUP_SHOW, ARG_OUTPUT, output,
-                            ARG_ID,
-                            group.getId()), group.getFullName()));
-                sb.append("\n<br>\n");
-            }
-        }
-        Result result = new Result(title, sb, getMimeType(output));
-        return result;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected String getGroupLinks(Request request, Group group)
-            throws Exception {
-        String commentsEntry ="";
-        //        if (getAccessManager().canDoAction(request, group, Permission.ACTION_COMMENT)) {
-            commentsEntry = HtmlUtil.href(
-                HtmlUtil.url(
-                    getRepository().URL_COMMENTS_SHOW, ARG_ID,
-                    group.getId()), HtmlUtil.img(
-                        getRepository().fileUrl(ICON_COMMENTS),
-                        "Add/View Comments"));
-            //        }
-
-        String search = HtmlUtil.href(
-                            HtmlUtil.url(
-                                getRepository().URL_ENTRY_SEARCHFORM, ARG_GROUP,
-                                group.getId()), HtmlUtil.img(
-                                    getRepository().fileUrl(ICON_SEARCH),
-                                    "Search in Group"));
-
-        String createEntry = "";
-        if (getAccessManager().canDoAction(request, group, Permission.ACTION_NEW)) {
-            createEntry =
-                HtmlUtil.href(
-                    HtmlUtil.url(
-                        getRepository().URL_ENTRY_NEW, ARG_GROUP,
-                        group.getId()), HtmlUtil.img(
-                            getRepository().fileUrl(ICON_NEW),
-                            "New Entry or Group")) + HtmlUtil.space(1);
-        }
-
-        String editEntry = "";
-        if (getAccessManager().canEditEntry(request, group)) {
-            editEntry =
-                HtmlUtil.href(
-                    HtmlUtil.url(
-                        getRepository().URL_ENTRY_FORM, ARG_ID,
-                        group.getId()), HtmlUtil.img(
-                            getRepository().fileUrl(ICON_EDIT), "Edit Group"));
-        }
-
-
-        return search + HtmlUtil.space(1)
-               + getRepository().getGraphLink(request, group) + HtmlUtil.space(1)
-               + createEntry + commentsEntry + HtmlUtil.space(1) + editEntry;
-    }
 
 
 
@@ -937,28 +843,6 @@ public class HtmlOutputHandler extends OutputHandler {
 
     }
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entries _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result outputEntries(Request request, List<Entry> entries)
-            throws Exception {
-
-        String       output = request.getOutput();
-        StringBuffer sb     = getEntriesList(request, entries);
-        Result result = new Result("Query Results", sb, getMimeType(output));
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getEntriesHeader(request, output, WHAT_ENTRIES));
-
-        return result;
-    }
-
 
 
 
@@ -990,7 +874,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 sbc.getBuffer(entry.getTypeHandler().getDescription());
             String links =
                 HtmlUtil.checkbox("entry_" + entry.getId(), "true") + " "
-                + entry.getTypeHandler().getEntryLinks(entry, request);
+                + getRepository().getEntryLinks(request, entry);
 
             ssb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
             String col1 =

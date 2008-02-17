@@ -259,42 +259,36 @@ public class TypeHandler extends RepositoryManager {
      * @param request _more_
      *
      */
-    public void getDatasetTag(Entry entry, Request request,Document doc, Element parent) {
+    public void getDatasetTag(Entry entry, Request request,Document doc, Element parent) throws Exception {
         File f = entry.getResource().getFile();
-        Element dataset = doc.createElement(CatalogOutputHandler.TAG_DATASET);
-        parent.appendChild(dataset);
-        dataset.setAttribute(ATTR_NAME, entry.getName());
-        dataset.setAttribute(CatalogOutputHandler.ATTR_URLPATH,
-                             entry.getResource().getPath());
+        Element dataset = XmlUtil.create(doc, CatalogOutputHandler.TAG_DATASET, parent, new String[]{
+            ATTR_NAME, entry.getName(),
+            CatalogOutputHandler.ATTR_URLPATH,
+            entry.getResource().getPath()});
 
-        Element service = doc.createElement(CatalogOutputHandler.TAG_SERVICENAME);
-        dataset.appendChild(service);
+        Element service = XmlUtil.create(doc,CatalogOutputHandler.TAG_SERVICENAME, dataset); 
 
         if (f.exists()) {
-            //            dataset.appendChild(ThreddsMetadataHandler.TAG_DATASIZE,
-            //                    XmlUtil.attrs(CatalogOutputHandler.ATTR_UNITS, "bytes"),
-            //                    "" + f.length()));
+            XmlUtil.create(doc,CatalogOutputHandler.TAG_DATASIZE, dataset,
+                           "" + f.length(),
+                           new String[]{CatalogOutputHandler.ATTR_UNITS, "bytes"});
+                                        
         }
 
-        /*
-        sb.append(
-            XmlUtil.tag(
-                ThreddsMetadataHandler.TAG_DATE,
-                XmlUtil.attrs(
-                    CatalogOutputHandler.ATTR_TYPE,
-                    "metadataCreated"), format(
-                        new Date(entry.getCreateDate()))));
+        XmlUtil.create(doc,  CatalogOutputHandler.TAG_DATE, dataset,
+                       format(new Date(entry.getCreateDate())),
+                       new String[]{
+                           CatalogOutputHandler.ATTR_TYPE,
+                           "metadataCreated"});
 
-        sb.append(XmlUtil.openTag(ThreddsMetadataHandler.TAG_TIMECOVERAGE));
-        sb.append(XmlUtil.tag(ThreddsMetadataHandler.TAG_START, "",
-                              "" + format(new Date(entry.getStartDate()))));
-        sb.append(XmlUtil.tag(ThreddsMetadataHandler.TAG_END, "",
-                              "" + format(new Date(entry.getEndDate()))));
-        sb.append(XmlUtil.closeTag(ThreddsMetadataHandler.TAG_TIMECOVERAGE));
-
-        sb.append(XmlUtil.closeTag(CatalogOutputHandler.TAG_DATASET));
-        */
+        Element timeCoverage = 
+            XmlUtil.create(doc,  CatalogOutputHandler.TAG_TIMECOVERAGE, dataset);
+        XmlUtil.create(doc,CatalogOutputHandler.TAG_START, timeCoverage,
+                       "" + format(new Date(entry.getStartDate())));
+        XmlUtil.create(doc,CatalogOutputHandler.TAG_END, timeCoverage,
+                       "" + format(new Date(entry.getEndDate())));
     }
+
 
 
     /**
@@ -517,67 +511,29 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected String getEntryLinks(Entry entry, Request request)
+    protected void  getEntryLinks(Request request, Entry entry, List<Link> links)
             throws Exception {
-        List links = new ArrayList();
-
-
-        String downloadLink = getEntryDownloadLink(request, entry);
-        if(downloadLink.length()>0) links.add(downloadLink);
-        String graphLink = getGraphLink(request, entry);
-        if(graphLink.length()>0) links.add(graphLink);
-
-
-        links.add(HtmlUtil.href(HtmlUtil.url(
-                    getRepository().getUserManager().URL_USER_CART,
-                    ARG_ACTION, ACTION_ADD, ARG_ID,
-                    entry.getId()), HtmlUtil.img(
-                                                 getRepository().fileUrl(ICON_CART), "Add to cart")));
-
-
-
-        //        if (getAccessManager().canDoAction(request, entry, Permission.ACTION_COMMENT)) {
-            links.add(HtmlUtil.href(
-                HtmlUtil.url(
-                    getRepository().URL_COMMENTS_SHOW, ARG_ID,
-                    entry.getId()), HtmlUtil.img(
-                        getRepository().fileUrl(ICON_COMMENTS),
-                        "Add/View Comments")));
-            //        }
+        Link  downloadLink = getEntryDownloadLink(request, entry);
+        if(downloadLink!=null) links.add(downloadLink);
+        links.add(new Link(
+                           HtmlUtil.url(
+                                        getRepository().URL_COMMENTS_SHOW, ARG_ID,
+                                        entry.getId()),
+                           getRepository().fileUrl(ICON_COMMENTS),
+                           "Add/View Comments"));
 
         if (getAccessManager().canEditEntry(request, entry)) {
-            links.add(HtmlUtil.href(
+            links.add(new Link(
                     HtmlUtil.url(
                         getRepository().URL_ENTRY_FORM, ARG_ID,
-                        entry.getId()), HtmlUtil.img(
+                        entry.getId()), 
                             getRepository().fileUrl(ICON_EDIT),
-                            "Edit Entry")));
+                            "Edit Entry"));
         }
 
-
-        return StringUtil.join(HtmlUtil.space(1), links);
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     */
-    protected String getGraphLink(Request request, Entry entry) {
-        if ( !getRepository().isAppletEnabled(request)) {
-            return "";
-        }
-        return HtmlUtil
-            .href(HtmlUtil
-                .url(getRepository().URL_GRAPH_VIEW, ARG_ID, entry.getId(),
-                     ARG_NODETYPE, entry.getType()), HtmlUtil
-                         .img(getRepository().fileUrl(ICON_GRAPH),
-                              "Show file in graph"));
-    }
 
 
 
@@ -612,26 +568,25 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected String getEntryDownloadLink(Request request, Entry entry)
+    protected Link getEntryDownloadLink(Request request, Entry entry)
             throws Exception {
         if ( !getAccessManager().canDownload(request, entry)) {
-            return "";
+            return null;
         }
         File   f    = entry.getResource().getFile();
         String size = " (" + f.length() + " bytes)";
         if (getRepository().getProperty(PROP_DOWNLOAD_ASFILES, false)) {
-            return HtmlUtil.href(
+            return new Link(
                 "file://" + entry.getResource(),
-                HtmlUtil.img(
-                    getRepository().fileUrl(ICON_FETCH),
-                    "Download file" + size));
+                getRepository().fileUrl(ICON_FETCH),
+                "Download file" + size);
         } else {
-            return HtmlUtil.href(
+            return new Link(
                 HtmlUtil.url(
                     getRepository().URL_ENTRY_GET + "/"
-                    + entry.getName(), ARG_ID, entry.getId()), HtmlUtil.img(
-                        getRepository().fileUrl(
-                            ICON_FETCH), "Download file" + size));
+                    + entry.getName(), ARG_ID, entry.getId()), 
+                getRepository().fileUrl(ICON_FETCH), 
+                "Download file" + size);
         }
     }
 
@@ -660,7 +615,7 @@ public class TypeHandler extends RepositoryManager {
             String nextPrev = outputHandler.getNextPrevLink(request, entry,
                                   output);
             sb.append(HtmlUtil.formEntry("",
-                                         getEntryLinks(entry, request)
+                                         getRepository().getEntryLinks(request, entry)
                                          + HtmlUtil.space(2) + nextPrev));
             sb.append(HtmlUtil.formEntry("Name:", entry.getName()));
 
@@ -672,7 +627,7 @@ public class TypeHandler extends RepositoryManager {
 
             String desc = entry.getDescription();
             if ((desc != null) && (desc.length() > 0)) {
-                sb.append(HtmlUtil.formEntry("Description:", desc));
+               sb.append(HtmlUtil.formEntry("Description:", desc));
             }
             sb.append(
                 HtmlUtil.formEntry(

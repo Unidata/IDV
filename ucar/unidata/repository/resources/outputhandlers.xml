@@ -8,4 +8,5 @@
   <outputhandler class="ucar.unidata.repository.CsvOutputHandler"/>
 -->
   <outputhandler class="ucar.unidata.repository.ZipOutputHandler"/>
+  <outputhandler class="ucar.unidata.repository.GraphOutputHandler"/>
 </outputhandlers>

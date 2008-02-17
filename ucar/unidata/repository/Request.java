@@ -36,6 +36,7 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.io.InputStream;
 
 import java.lang.reflect.*;
@@ -102,6 +103,8 @@ public class Request implements Constants {
     /** _more_ */
     private String sessionId;
 
+    private OutputStream outputStream;
+
     /**
      * _more_
      *
@@ -120,6 +123,26 @@ public class Request implements Constants {
         this.originalParameters = new Hashtable();
         originalParameters.putAll(parameters);
     }
+
+
+    /**
+       Set the OutputStream property.
+
+       @param value The new value for OutputStream
+    **/
+    public void setOutputStream (OutputStream value) {
+	outputStream = value;
+    }
+
+    /**
+       Get the OutputStream property.
+
+       @return The OutputStream
+    **/
+    public OutputStream getOutputStream () {
+	return outputStream;
+    }
+
 
 
     /**
@@ -396,6 +419,8 @@ public class Request implements Constants {
                                    String patternString) {
         return getCheckedString(key, dflt, Pattern.compile(patternString));
     }
+
+    
 
 
     /**

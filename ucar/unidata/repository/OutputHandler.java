@@ -177,6 +177,25 @@ public class OutputHandler extends RepositoryManager {
      * _more_
      *
      * @param request _more_
+     * @param entries _more_
+     * @param types _more_
+     *
+     *
+     * @throws Exception _more_
+     */
+    protected void getOutputTypesForEntry(Request request,
+                                            Entry entry, List types)
+            throws Exception {
+        List<Entry> entries = new ArrayList<Entry>();
+        entries.add(entry);
+        getOutputTypesForEntries(request, entries, types);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
      * @param group _more_
      * @param subGroups _more_
      * @param entries _more_
@@ -217,7 +236,9 @@ public class OutputHandler extends RepositoryManager {
     public Result outputEntry(Request request, Entry entry) throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
-        return outputEntries(request, entries);
+        return outputGroup(request, getRepository().getDummyGroup(),
+                           new ArrayList<Group>(),entries);
+
     }
 
 
@@ -232,6 +253,11 @@ public class OutputHandler extends RepositoryManager {
     public String getMimeType(String output) {
         return null;
     }
+
+    protected void  getEntryLinks(Request request, Entry entry, List<Link> links)
+            throws Exception {
+    }
+
 
     /**
      * _more_
@@ -330,7 +356,6 @@ public class OutputHandler extends RepositoryManager {
             throws Exception {
         int    cnt           = 0;
         List   items         = new ArrayList();
-
         String initialOutput = request.getString(ARG_OUTPUT, "");
         for (TwoFacedObject tfo : outputTypes) {
             request.put(ARG_OUTPUT, (String) tfo.getId());
@@ -340,7 +365,7 @@ public class OutputHandler extends RepositoryManager {
                 items.add(
                     HtmlUtil.href(
                         request.getRequestPath() + "?"
-                        + request.getUrlArgs(), tfo.toString(),
+                        + request.getUrlArgs(ARG_MESSAGE), tfo.toString(),
                             " class=\"subnavlink\" "));
             }
         }
@@ -423,57 +448,6 @@ public class OutputHandler extends RepositoryManager {
         return notImplemented("outputGroup");
     }
 
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected String getGroupLinks(Request request, Group group)
-            throws Exception {
-        return "";
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param groups _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result outputGroups(Request request, List<Group> groups)
-            throws Exception {
-        return notImplemented("outputGroups");
-    }
-
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entries _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result outputEntries(Request request, List<Entry> entries)
-            throws Exception {
-        return notImplemented("outputEntries");
-    }
 
 
 

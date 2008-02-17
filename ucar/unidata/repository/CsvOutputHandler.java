@@ -351,44 +351,5 @@ public class CsvOutputHandler extends OutputHandler {
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param groups _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result outputGroups(Request request, List<Group> groups)
-            throws Exception {
-        return listGroups(request, groups);
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entries _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result outputEntries(Request request, List<Entry> entries)
-            throws Exception {
-
-        StringBuffer sb = new StringBuffer();
-        for (Entry entry : entries) {
-            sb.append(SqlUtil.comma(entry.getId(), entry.getResource()));
-        }
-
-        return new Result("", sb, getMimeType(OUTPUT_CSV));
-    }
-
-
 }
 

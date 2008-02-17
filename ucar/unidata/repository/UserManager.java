@@ -215,6 +215,7 @@ public class UserManager extends RepositoryManager {
     protected void checkSession(Request request) throws Exception {
         String cookie = request.getHeaderArg("Cookie");
         User   user   = request.getRequestContext().getUser();
+
         if (cookie != null) {
             List toks = StringUtil.split(cookie, ";", true, true);
             for (int i = 0; i < toks.size(); i++) {
@@ -254,6 +255,31 @@ public class UserManager extends RepositoryManager {
         }
 
 
+        //Check for basic auth
+        if (user == null) {
+            String auth  =(String) request.getHttpHeaderArgs().get("Authorization");
+            if(auth !=null) {
+                auth = auth.trim();
+                //Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+                if(auth.startsWith("Basic")) {
+                    auth  = new String(XmlUtil.decodeBase64(auth.substring(5).trim()));
+                    String[] toks = StringUtil.split(auth, ":",2);
+                    if(toks.length==2) {
+                        user = findUser(toks[0], false);
+                        if (user == null) {
+                            throw new Repository.AccessException("Unknown user:" + toks[0]);
+                        }
+                        if ( !user.getPassword().equals(hashPassword(toks[1]))) {
+                            throw new Repository.AccessException("Incorrect password");
+                        }
+                    }
+                    setUserSession(request, user);
+                }
+            }
+        }
+
+
+
         if (user == null) {
             String requestIp = request.getRequestContext().getIp();
             if (requestIp != null) {
@@ -275,7 +301,6 @@ public class UserManager extends RepositoryManager {
         if (request.getSessionId() == null) {
             request.setSessionId(getSessionId());
         }
-
 
 
         if (user == null) {
@@ -1244,20 +1269,39 @@ public class UserManager extends RepositoryManager {
      */
     protected void initOutputHandlers() throws Exception {
         OutputHandler outputHandler = new OutputHandler(getRepository()) {
+                protected void  getEntryLinks(Request request, Entry entry, List<Link> links)
+                    throws Exception {
+                    links.add(new Link(HtmlUtil.url(
+                                                    getRepository().getUserManager().URL_USER_CART,
+                                                    ARG_ACTION, ACTION_ADD, ARG_ID,
+                                                    entry.getId()), 
+                                       getRepository().fileUrl(ICON_CART), "Add to cart"));
+                }
+
+
             public boolean canHandle(String output) {
                 return output.equals(OUTPUT_CART);
             }
+                protected void getOutputTypesFor(Request request, String what, List types)
+                    throws Exception {
+                    //                    if (what.equals(WHAT_ENTRIES)) {
+                    //                        types.add(new TwoFacedObject("Cart", OUTPUT_CART));
+//                    }
+                }
+                protected void getOutputTypesForEntry(Request request,
+                                                      Entry entry, List types)
+                    throws Exception               {}
             protected void getOutputTypesForEntries(Request request,
                     List<Entry> entries, List types)
                     throws Exception {
                 types.add(new TwoFacedObject("Cart", OUTPUT_CART));
             }
-            public Result outputEntries(Request request, List<Entry> entries)
+                public Result outputGroup(Request request, Group group,
+                                          List<Group> subGroups, List<Entry> entries)
                     throws Exception {
-                addToCart(request, entries);
-                return showCart(request);
-            }
-
+                    addToCart(request, entries);
+                    return showCart(request);
+                }
         };
 
         getRepository().addOutputHandler(outputHandler);
