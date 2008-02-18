@@ -4707,17 +4707,23 @@ public String getLegendState () {
                     writeImage(new File(filename), false, quality);
                 } else {
                     Component comp;
+                    String whichComponent;
                     if (fullWindowBtn.isSelected()) {
                         comp = getDisplayWindow().getComponent();
+                        whichComponent = "full window";
                     } else if (mainDisplayBtn.isSelected()) {
                         comp = getMaster().getComponent();
+                        whichComponent = "main display";
                     } else {
                         comp = getContents();
+                        whichComponent = "contents";
                     }
                     Dimension dim = comp.getSize();
                     Point     loc = comp.getLocationOnScreen();
 
-
+                    if(dim.width<=0 || dim.height<=0) {
+                        throw new IllegalStateException("Bad component size:" + dim.width +" X " + dim.height + " for component:" + whichComponent);
+                    }
 
                     /*
                 if(true) {
