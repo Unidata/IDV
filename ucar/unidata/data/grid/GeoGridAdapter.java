@@ -21,10 +21,6 @@
  */
 
 
-
-
-
-
 package ucar.unidata.data.grid;
 
 
@@ -134,7 +130,7 @@ public class GeoGridAdapter {
         ucar.unidata.util.LogUtil.getLogInstance(
             GeoGridAdapter.class.getName());
 
-    /** _more_ */
+    /** cache file */
     public String cacheFile;
 
     /** the associated data source (for caching) */
@@ -873,9 +869,9 @@ public class GeoGridAdapter {
     /**
      * Check if we need to wrap the longitudes.
      *
-     * @param axis _more_
+     * @param axis Axis to check
      *
-     * @return _more_
+     * @return true if need to wrap
      */
     private boolean checkNeedToWrapLon(CoordinateAxis axis) {
         if (axis.getRank() > 1) {
@@ -1076,7 +1072,7 @@ public class GeoGridAdapter {
      * cache if possible.
      *
      * @param timeIndex  index into set of times
-     * @param readLabel _more_
+     * @param readLabel  label to write to
      * @return  the data at that time
      *
      * @throws VisADException  problem creating the FlatField

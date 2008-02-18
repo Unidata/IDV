@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.data.grid;
 
 
@@ -1508,11 +1507,19 @@ public class GridUtil {
         newSamples[1] = samples[1];
         RealTupleType domainType =
             ((SetType) domainSet.getType()).getDomain();
-        MapProjection mp = getNavigation(domainSet);
-        RealTupleType newType =
-            new RealTupleType((RealType) domainType.getComponent(0),
-                              (RealType) domainType.getComponent(1), mp,
-                              null);
+        RealTupleType newType = null;
+        if (domainSet.getCoordinateSystem() != null) {
+            MapProjection mp = getNavigation(domainSet);
+            newType =
+                new RealTupleType((RealType) domainType.getComponent(0),
+                                  (RealType) domainType.getComponent(1), mp,
+                                  null);
+        } else {
+            newType =
+                new RealTupleType((RealType) domainType.getComponent(0),
+                                  (RealType) domainType.getComponent(1));
+        }
+
         Gridded2DSet newDomainSet = new Gridded2DSet(newType, newSamples,
                                         lengths[0], lengths[1],
                                         (CoordinateSystem) null,
@@ -3873,11 +3880,11 @@ public class GridUtil {
 
 
     /**
-     * _more_
+     * Write grid out to an Excel spreadsheet
      *
-     * @param grid _more_
+     * @param grid grid  to write
      *
-     * @throws Exception _more_
+     * @throws Exception  problem writing grid
      */
     public static void writeGridToXls(FieldImpl grid) throws Exception {
         String filename = FileManager.getWriteFile(FileManager.FILTER_XLS,
@@ -3889,12 +3896,12 @@ public class GridUtil {
     }
 
     /**
-     * _more_
+     * Write grid out to an Excel spreadsheet
      *
-     * @param grid _more_
-     * @param filename _more_
+     * @param grid grid  to write
+     * @param filename  filename
      *
-     * @throws Exception _more_
+     * @throws Exception  problem writing grid
      */
     public static void writeGridToXls(FieldImpl grid, String filename)
             throws Exception {
