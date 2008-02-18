@@ -286,17 +286,18 @@ public class MapViewManager extends NavigatedViewManager {
             GlobeDisplay globeDisplay = new GlobeDisplay();
             navDisplay = globeDisplay;
         } else {
+            Trace.call1("MapViewManager.doMakeDisplayMaster projection");
             if (mainProjection == null) {
                 ProjectionImpl dfltProjection = getDefaultProjection();
                 mainProjection =
                     new ProjectionCoordinateSystem(dfltProjection);
             }
-            Trace.msg("Decode MVM-master-5");
-            addProjectionToHistory(mainProjection, "Default");
+            if(getIdv().getInteractiveMode())  {
+                addProjectionToHistory(mainProjection, "Default");
+            }
             MapProjectionDisplay mapDisplay =
                 MapProjectionDisplay.getInstance(mainProjection, mode,
                     getIdv().getArgsManager().getIsOffScreen(), dimension);
-            Trace.msg("Decode MVM-master-6");
             double[] aspect = { 1.0, 1.0, 0.4 };
             mapDisplay.setDisplayAspect((mode == NavigatedDisplay.MODE_2D)
                                         ? new double[] { 1.0, 1.0 }
@@ -304,7 +305,7 @@ public class MapViewManager extends NavigatedViewManager {
 
 
             navDisplay = mapDisplay;
-            Trace.msg("Decode MVM-master-7");
+            Trace.call2("MapViewManager.doMakeDisplayMaster projection");
         }
         return navDisplay;
     }
@@ -356,11 +357,10 @@ public class MapViewManager extends NavigatedViewManager {
         if (getHaveInitialized()) {
             return;
         }
-
         super.init();
-        Trace.call1("MVM-checkDefaultMap");
+        Trace.call1("MapViewManager.init checkDefaultMap");
         checkDefaultMap();
-        Trace.call2("MVM-checkDefaultMap");
+        Trace.call2("MapViewManager.init checkDefaultMap");
     }
 
 
@@ -418,11 +418,14 @@ public class MapViewManager extends NavigatedViewManager {
 
                 MapInfo mapInfo;
                 if (mapState != null) {
+                    Trace.call1("checkDefaultMap-1");
                     mapInfo = new MapInfo(XmlUtil.getRoot(mapState));
                     mapInfo.setJustLoadedLocalMaps(true);
+                    Trace.call2("checkDefaultMap-1");
                 } else if (initialMapResources != null) {
                     //This got set from the ViewManager properties. It is a comma
                     //delimited list of map resources 
+                    Trace.call1("checkDefaultMap-2");
                     List resources = getResourceManager().getResourcePaths(
                                          StringUtil.split(
                                              initialMapResources, ",", true,
@@ -431,7 +434,7 @@ public class MapViewManager extends NavigatedViewManager {
                         new XmlResourceCollection("custom maps");
                     customMapResources.addResources(resources);
                     mapInfo = new MapInfo(customMapResources, true, true);
-
+                    Trace.call2("checkDefaultMap-2");
                 } else {
                     XmlResourceCollection xrc =
                         getResourceManager().getXmlResources(
@@ -439,6 +442,7 @@ public class MapViewManager extends NavigatedViewManager {
                     mapInfo = new MapInfo(xrc, false, true);
                 }
 
+                Trace.call1("checkDefaultMap-making map");
                 defaultMap = new MapDisplayControl(this, mapInfo);
                 defaultMap.setIsDefaultMap(true);
                 Hashtable newProperties =
@@ -446,6 +450,7 @@ public class MapViewManager extends NavigatedViewManager {
                 newProperties.put("displayName", "Default Background Maps");
                 mapCD.initControl(defaultMap, new ArrayList(), getIdv(),
                                   newProperties, null);
+                Trace.call2("checkDefaultMap-making map");
             } catch (Exception exc) {
                 logException("Initializing maps", exc);
             }

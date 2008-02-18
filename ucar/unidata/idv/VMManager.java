@@ -445,13 +445,9 @@ public class VMManager extends IdvManager {
                 viewManagers.add(newViewManager);
             }
             try {
-                Trace.call1("Decode.vm.init");
-
-
+                Trace.call1("VMManager calling ViewManager.init");
                 newViewManager.init();
-
-
-                Trace.call2("Decode.vm.init");
+                Trace.call2("VMManager calling ViewManager.init");
             } catch (Exception exc) {
                 logException("Adding view manager", exc);
             }

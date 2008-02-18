@@ -424,6 +424,7 @@ public class MapInfo {
             return mapSet;
         }
 
+        ucar.unidata.util.Trace.call1("create map", source);
         /*
         if (source.indexOf("://") > 0) {
             try {
@@ -465,6 +466,7 @@ public class MapInfo {
         } else {
             mapCache.put(source, mapSet);
         }
+        ucar.unidata.util.Trace.call2("create map");
         return mapSet;
     }
 

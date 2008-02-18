@@ -37,6 +37,7 @@ import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.Trace;
 
 import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
@@ -162,22 +163,32 @@ public class IdvOutputHandler extends OutputHandler {
         
 
         StringBuffer isl = new StringBuffer();
-        isl.append("<isl debug=\"true\" loop=\"1\" offscreen=\"true\">\n");
+        //        isl.append("<isl debug=\"false\" loop=\"1\" offscreen=\"false\">\n");
+        isl.append("<isl debug=\"false\" loop=\"1\" offscreen=\"true\">\n");
         String datasource;
         datasource = "FILE.RADAR";
         isl.append("<datasource type=\"" + datasource +"\" url=\"" + entry.getResource().getPath() +"\">\n");
         isl.append("<display type=\"planviewcolor\" param=\"#0\"><property name=\"id\" value=\"thedisplay\"/></display>\n");
         isl.append("</datasource>\n");
         //        isl.append("<center display=\"thedisplay\" useprojection=\"true\"/>\n");
-        //        isl.append("<pause/>\n");
         //        isl.append("<display type=\"rangerings\" wait=\"false\"/>\n");
+        isl.append("<pause/>\n");
+        //        isl.append("<pause seconds=\"60\"/>\n");
         isl.append("<image file=\"" + image+"\"/>\n");
         isl.append("</isl>\n");
 
         //        System.err.println(isl);
         synchronized(MUTEX) {
-            ucar.unidata.util.Trace.startTrace();
+            Trace.addNot(".*Shadow.*");
+            Trace.addNot(".*Azimuth.*");
+            Trace.addNot(".*Set\\(.*");
+            Trace.addNot(".*ProjectionCoord.*");
+            Trace.addNot(".*Display_List.*");
+            Trace.addNot(".*MapProjection.*");
+            Trace.startTrace();
+            Trace.call1("Make image");
             idv.getImageGenerator().processScriptFile("xml:" + isl);
+            Trace.call2("Make image");
             idv.cleanup();
             ucar.unidata.util.Trace.stopTrace();
         }

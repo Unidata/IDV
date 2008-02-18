@@ -703,36 +703,37 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (haveInitialized) {
             return;
         }
-        Trace.call1("ViewManager.init()");
+        Trace.call1("ViewManager.init");
 
         haveInitialized = true;
         initSharable();
-        Trace.call1("Decode.vm.getMaster()");
+        Trace.call1("ViewManager.init getMaster()");
         getMaster();
-        Trace.call2("Decode.vm.getMaster()");
+        Trace.call2("ViewManager.init getMaster()");
+
         getMaster().addKeyboardBehavior(keyboardBehavior =
             new IdvKeyboardBehavior(this));
-        Trace.call1("Decode.vm setBooleanProperties");
+
+        Trace.call1("ViewManager.init setBooleanProperties()");
         setBooleanProperties(this);
-        Trace.call2("Decode.vm setBooleanProperties");
+        Trace.call2("ViewManager.init setBooleanProperties()");
 
 
-
-        Trace.call1("Decode.vm animation");
+        Trace.call1("ViewManager.init animation");
         Animation animation = getAnimation();
         if (animation != null) {
             getMaster().setAnimation(animation, animationWidget);
             //            getMaster().addDisplayable(animation);
         }
-        Trace.call2("Decode.vm animation");
+        Trace.call2("ViewManager.init animation");
 
 
-
-        Trace.call1("Decode.vm initWith");
+        Trace.call1("ViewManager.init initWith");
         initWith(this);
-        Trace.call2("Decode.vm initWith");
+        Trace.call2("ViewManager.init initWith");
 
-        Trace.call2("ViewManager.init()");
+
+        Trace.call2("ViewManager.init");
 
         initDone = true;
     }
@@ -1890,9 +1891,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
             if (displayListDisplayables == null) {
                 displayListDisplayables = new CompositeDisplayable();
                 displayListDisplayables.setUseTimesInAnimation(false);
+            } else {
+                getMaster().removeDisplayable(displayListDisplayables);
+                displayListDisplayables.clearDisplayables();
             }
-            getMaster().removeDisplayable(displayListDisplayables);
-            displayListDisplayables.clearDisplayables();
             if ( !getShowDisplayList()) {
                 return;
             }
@@ -3441,11 +3443,14 @@ public String getLegendState () {
         if (master != null) {
             master.addDisplayable(displayInfo.getDisplayable());
         }
+
+        /*XXXX
         fillLegends();
         updateTimelines(true);
         if ( !getStateManager().isLoadingXml()) {
             toFront();
         }
+        */
 
         return true;
     }
@@ -4080,33 +4085,32 @@ public String getLegendState () {
         if (master == null) {
             try {
                 // might need these for the display initialization
-                Trace.msg("Decode VM-getmaster-1");
                 if (initProperties != null) {
                     String tmp = initProperties;
                     initProperties = null;
                     parseProperties(tmp);
                 }
-                Trace.msg("Decode VM-getmaster-2");
                 master = doMakeDisplayMaster();
-                Trace.msg("Decode VM-getmaster-3");
                 master.setMouseFunctions(
                     getIdv().getPreferenceManager().getMouseMap());
                 master.setKeyboardEventMap(
                     getIdv().getPreferenceManager().getKeyboardMap());
-                Trace.msg("Decode VM-getmaster-4");
                 master.setWheelEventMap(
                     getIdv().getPreferenceManager().getWheelMap());
-                Trace.msg("Decode VM-getmaster-5");
                 GraphicsModeControl gmc =
                     master.getDisplay().getGraphicsModeControl();
                 gmc.setCacheAppearances(true);
                 gmc.setMergeGeometries(true);
                 setDisplayMaster(master);
-                Trace.msg("Decode VM-getmaster-6");
+
+                Trace.call1("ViewManager.getMaster master.draw");
                 master.draw();
-                Trace.msg("Decode VM-getmaster-7");
+                Trace.call2("ViewManager.getMaster master.draw");
+
+                Trace.call1("ViewManager.getMaster updateDisplayList");
                 updateDisplayList();
-                Trace.msg("Decode VM-getmaster-8");
+                Trace.call2("ViewManager.getMaster updateDisplayList");
+
             } catch (Exception exc) {
                 logException("Creating display master", exc);
             }
@@ -4261,6 +4265,7 @@ public String getLegendState () {
                 outstandingWaits++;
                 if (outstandingWaits == 1) {
                     getIdvUIManager().showWaitCursor();
+                    //                    System.err.println ("waiton:" + outstandingWaits + " " + getIdvUIManager().getWaitCursorCount());
                 }
             } else {
                 waitCursorInABit(++currentWaitKey);
@@ -4274,6 +4279,7 @@ public String getLegendState () {
             outstandingWaits--;
             if (outstandingWaits <= 0) {
                 getIdvUIManager().showNormalCursor();
+                //                System.err.println ("waitoff:" + outstandingWaits + " " + getIdvUIManager().getWaitCursorCount());
                 outstandingWaits = 0;
             }
         } else if (eventId == DisplayEvent.MOUSE_PRESSED) {

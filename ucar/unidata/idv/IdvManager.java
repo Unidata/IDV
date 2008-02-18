@@ -38,6 +38,7 @@ import ucar.unidata.ui.symbol.StationModelManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.Trace;
 
 import visad.ActionImpl;
 
@@ -365,19 +366,21 @@ public abstract class IdvManager extends WindowHolder implements IdvConstants {
      * cursor count
      */
     public static void waitUntilDisplaysAreDone(IdvUIManager uiManager) {
+        Trace.call1("Waiting on displays");
         int  successiveTimesWithNoActive = 0;
         int  sleepTime                   = 10;
-        long timeToWait                  = 500;
+        //        long timeToWait                  = 500;
+        long timeToWait                  = 50;
         long firstTime                   = System.currentTimeMillis();
-        //        System.err.println ("waiting");
         int cnt = 0;
         while (true) {
             boolean cursorCount = (uiManager.getWaitCursorCount() > 0);
             boolean actionCount = ActionImpl.getTaskCount() > 0;
             boolean dataActive = DataSourceImpl.getOutstandingGetDataCalls()
                                  > 0;
-            //            if((cnt++)%30 == 0)
-            //                System.err.println ("\tcnt:" + uiManager.getWaitCursorCount() + " " +actionCount + " " + dataActive);
+            if((cnt++)%30 == 0) {
+                //                System.err.println ("\tcnt:" + uiManager.getWaitCursorCount() + " " +actionCount + " " + dataActive);
+            }
             boolean anyActive = actionCount || cursorCount || dataActive;
             if (dataActive) {
                 firstTime = System.currentTimeMillis();
@@ -397,6 +400,7 @@ public abstract class IdvManager extends WindowHolder implements IdvConstants {
                 return;
             }
         }
+        Trace.call2("Waiting on displays");
 
     }
 

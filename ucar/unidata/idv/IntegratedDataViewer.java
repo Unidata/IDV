@@ -338,7 +338,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      *
      * @return is interactive
      */
-    protected boolean getInteractiveMode() {
+    public boolean getInteractiveMode() {
         return interactiveMode;
     }
 
@@ -1160,10 +1160,8 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
             return viewManager;
         }
         if (getArgsManager().getIsOffScreen() || (!getIdv().okToShowWindows() && !newWindow)) {
-            System.out.println(new java.util.Date() + ": before create");
             ViewManager vm =  getVMManager().createViewManager(viewDescriptor,
                                                                properties);
-            System.out.println(new java.util.Date() + ": after create");
             return vm;
         }
         IdvWindow window = getIdvUIManager().createNewWindow();
@@ -2885,6 +2883,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         idv.removeAllDataSources();
         getVMManager().removeAllViewManagers();
         getIdvUIManager().disposeAllWindows();
+        getIdvUIManager().clearWaitCursor();
         CacheManager.clearCache();
     }
 

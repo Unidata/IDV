@@ -42,6 +42,7 @@ import ucar.unidata.ui.MapPanel;
 
 
 import ucar.unidata.util.FileManager;
+import ucar.unidata.util.Trace;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
@@ -369,6 +370,8 @@ public class MapDisplayControl extends DisplayControlImpl {
         theHolder.addDisplayable(latLonHolder);
 
         addDisplayable(theHolder);
+        int cnt = 0;
+        Trace.call1("MapDisplayControl.init");
 
         if (initializeAsDefault) {
             initialMap          = null;
@@ -385,6 +388,7 @@ public class MapDisplayControl extends DisplayControlImpl {
             defaultLonData = mapInfo.getLonData();
             mapPosition    = mapInfo.getMapPosition();
         }
+
 
         ignoreNonVisibleMaps = false;
 
@@ -404,6 +408,7 @@ public class MapDisplayControl extends DisplayControlImpl {
 
             defaultMapData = null;
         }
+
 
         if (defaultLatData != null) {
             latState = new LatLonState(defaultLatData);
@@ -425,12 +430,15 @@ public class MapDisplayControl extends DisplayControlImpl {
         }
 
 
+
         //Now check for any persisted maps
         for (int i = 0; i < mapStates.size(); i++) {
             ((MapState) mapStates.get(i)).init(this);
         }
+
         setSliderPosition();
         applyMapPosition();
+        Trace.call2("MapDisplayControl.init");
         return true;
     }
 

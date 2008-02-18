@@ -41,6 +41,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.Trace;
 import ucar.unidata.xml.XmlResourceCollection;
 
 import ucar.unidata.xml.XmlUtil;
@@ -945,8 +946,12 @@ public class ControlDescriptor {
 
         idv.showWaitCursor();
         try {
+
+            Trace.call1("ControlDescriptor control.init");
             control.init(controlId, dataCategories, newDataChoices, idv,
                          newProperties, dataSelection);
+            Trace.call2("ControlDescriptor control.init");
+
             idv.controlHasBeenInitialized(control);
         } catch (DataCancelException dce) {
             //This means the selection of some derived quantity operand was canceled

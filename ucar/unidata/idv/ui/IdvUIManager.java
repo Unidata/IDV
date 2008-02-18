@@ -1150,6 +1150,7 @@ public class IdvUIManager extends IdvManager {
     public void showWaitCursor() {
         synchronized (CURSOR_MUTEX) {
             waitCursorCount++;
+            //            Misc.printStack("show wait:" + waitCursorCount,4,null);
             if (waitCursorCount == 1) {
                 //              System.err.println ("UI.setWaitCursor");
                 long tmp = System.currentTimeMillis();

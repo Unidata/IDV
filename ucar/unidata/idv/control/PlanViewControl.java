@@ -954,7 +954,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
             } else {
                 // only one level?  - can we get here?
                 //                System.out.println("PlanViewControl: only one level?");
-                Trace.msg("got here");
+                //                Trace.msg("got here");
                 currentSlice = workingGrid;
             }
         } else {  // 2D grid or requested slice

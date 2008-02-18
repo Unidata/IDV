@@ -900,7 +900,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
                 
-        //        Trace.call1 ("DisplayControl.init");
+
 
         if (haveInitialized) {
             return;
@@ -964,7 +964,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         //Call the derived class init method.
         //        System.err.println("CALLING INIT " + mycnt);
 
-        debug("before");
 
         if ( !init(myDataChoices)) {
             displayControlFailed();
@@ -974,7 +973,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             return;
         }
 
-        debug("after");
+
 
 
         //Check if we have been removed
@@ -984,8 +983,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 
-        //Now create the gui
-        doMakeWindow();
+
+        if(getIdv().getInteractiveMode()) {
+            Trace.call1("DisplayControlImpl.init doMakeWindow");
+            //Now create the gui
+            doMakeWindow();
+            Trace.call2("DisplayControlImpl.init doMakeWindow");
+        }
 
 
         //Add this control to the main controlContext
@@ -993,8 +997,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 
+
         //Get the color table, range, etc.
         instantiateAttributes();
+
+
 
         haveInitialized = true;
 
@@ -1007,16 +1014,19 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         applyAttributesToDisplayables();
 
 
+
         //Check if we have been removed
         if (hasBeenRemoved) {
             return;
         }
 
+        Trace.call1("DisplayControlImpl.init insertDisplayables");
         //Add the Displayables to their ViewManagers
         if ( !insertDisplayables()) {
             return;
         }
 
+        Trace.call2("DisplayControlImpl.init insertDisplayables");
 
 
 
@@ -1035,12 +1045,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 
+
         if (shouldAddDisplayListener()) {
             NavigatedDisplay navDisplay = getNavigatedDisplay();
             if (navDisplay != null) {
                 navDisplay.getDisplay().addDisplayListener(this);
             }
         }
+
+
 
         if (shouldAddControlListener()) {
             NavigatedDisplay navDisplay = getNavigatedDisplay();
@@ -1060,11 +1073,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
 
+
         //Force the creation of the animation widget
         if (shouldAddAnimationListener()) {
             getAnimation();
         }
+
         initDone();
+
 
 
         if (componentHolder != null) {
@@ -1079,6 +1095,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             animationWidget.setSharing(animationInfo.getShared());
         }
         updateLegendAndList();
+
 
     }
 

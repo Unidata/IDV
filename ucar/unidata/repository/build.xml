@@ -68,6 +68,7 @@
             <fileset dir="${tmpjardir}" includes="**/*"/>
         </delete>
         <unjar src="${jars_dest}/visad.jar" dest="${tmpjardir}"/>
+        <unjar src="${jars_dest}/local-visad.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/postgres.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/mysql.jar" dest="${tmpjardir}"/>
