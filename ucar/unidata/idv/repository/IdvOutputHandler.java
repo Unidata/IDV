@@ -30,6 +30,7 @@ import org.w3c.dom.*;
 
 import ucar.unidata.idv.IntegratedDataViewer;
 
+import ucar.unidata.util.CacheManager;
 import ucar.unidata.data.SqlUtil;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
@@ -87,9 +88,12 @@ public class IdvOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String OUTPUT_IDV = "idv.idv";
 
+    IntegratedDataViewer idv;
 
 
-    /**
+    public static final Object MUTEX = new Object();
+
+/**
      * _more_
      *
      * @param repository _more_
@@ -99,6 +103,7 @@ public class IdvOutputHandler extends OutputHandler {
     public IdvOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
+        idv = new IntegratedDataViewer(false);
     }
 
     /**
@@ -152,23 +157,30 @@ public class IdvOutputHandler extends OutputHandler {
         File image = new File(IOUtil.joinDir(thumbDir,
                                       "preview_" + entry.getId() + ".png"));
         if(image.exists()) {
-            return new Result("preview.png", new FileInputStream(image), "image/png");
+            //            return new Result("preview.png", new FileInputStream(image), "image/png");
         }
         
 
         StringBuffer isl = new StringBuffer();
         isl.append("<isl debug=\"true\" loop=\"1\" offscreen=\"true\">\n");
-        isl.append("<datasource type=\"FILE.RADAR\" url=\"" + entry.getResource().getPath() +"\">\n");
+        String datasource;
+        datasource = "FILE.RADAR";
+        isl.append("<datasource type=\"" + datasource +"\" url=\"" + entry.getResource().getPath() +"\">\n");
         isl.append("<display type=\"planviewcolor\" param=\"#0\"><property name=\"id\" value=\"thedisplay\"/></display>\n");
         isl.append("</datasource>\n");
-        isl.append("<center display=\"thedisplay\" useprojection=\"true\"/>\n");
-        isl.append("<pause/>\n");
-        isl.append("<display type=\"rangerings\"/>\n");
+        //        isl.append("<center display=\"thedisplay\" useprojection=\"true\"/>\n");
+        //        isl.append("<pause/>\n");
+        //        isl.append("<display type=\"rangerings\" wait=\"false\"/>\n");
         isl.append("<image file=\"" + image+"\"/>\n");
         isl.append("</isl>\n");
 
         //        System.err.println(isl);
-        IntegratedDataViewer.processScript("xml:" + isl);
+        synchronized(MUTEX) {
+            ucar.unidata.util.Trace.startTrace();
+            idv.getImageGenerator().processScriptFile("xml:" + isl);
+            idv.cleanup();
+            ucar.unidata.util.Trace.stopTrace();
+        }
         return new Result("preview.png", new FileInputStream(image), "image/png");
     }
     

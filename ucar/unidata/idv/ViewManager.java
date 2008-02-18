@@ -703,6 +703,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (haveInitialized) {
             return;
         }
+        Trace.call1("ViewManager.init()");
+
         haveInitialized = true;
         initSharable();
         Trace.call1("Decode.vm.getMaster()");
@@ -714,6 +716,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
         setBooleanProperties(this);
         Trace.call2("Decode.vm setBooleanProperties");
 
+
+
         Trace.call1("Decode.vm animation");
         Animation animation = getAnimation();
         if (animation != null) {
@@ -722,9 +726,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
         Trace.call2("Decode.vm animation");
 
+
+
         Trace.call1("Decode.vm initWith");
         initWith(this);
         Trace.call2("Decode.vm initWith");
+
+        Trace.call2("ViewManager.init()");
 
         initDone = true;
     }

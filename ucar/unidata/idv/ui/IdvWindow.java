@@ -96,6 +96,10 @@ public class IdvWindow extends MultiFrame {
      */
     private static ArrayList mainWindows = new ArrayList();
 
+    /** Keep track of the last active window */
+    private static IdvWindow lastActiveWindow;
+
+
     /** The unique id for this window */
     private String uniqueId;
 
@@ -122,9 +126,6 @@ public class IdvWindow extends MultiFrame {
     /** Is this a main window */
     private boolean isAMainWindow = false;
 
-
-    /** Keep track of the last active window */
-    private static IdvWindow lastActiveWindow;
 
     /** Window type */
     private String type = "";

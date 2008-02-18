@@ -326,6 +326,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
             throws VisADException, RemoteException {
         datachoice = dataChoice;
 
+        //        debug("PV-1");
         Trace.call1("PlanView.init");
 
         Trace.call1("PlanView.initMisc");
@@ -381,6 +382,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
         // make visible and add it to display
         planDisplay.setVisible(true);
 
+
         //addDisplayable (planDisplay);
         displayIs3D = isDisplay3D();
 
@@ -391,6 +393,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
         zSelector = new ZSelector(-1, -1, -1);
         zSelector.addPropertyChangeListener(this);
         Trace.call2("PlanView.initMisc");
+
 
         boolean result = setData(dataChoice);
         if ( !result) {

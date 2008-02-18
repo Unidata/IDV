@@ -775,6 +775,11 @@ public class HtmlUtil {
     }
 
 
+    public static String table(String contents) {
+        return "<table cellpadding=\"5\" cellspacing=\"0\">\n" + contents +"</table>";
+    }
+
+
     /**
      * _more_
      *
@@ -782,6 +787,11 @@ public class HtmlUtil {
      */
     public static String formTable() {
         return "<table cellpadding=\"5\" cellspacing=\"0\">\n";
+    }
+
+
+    public static String formTable(String extra) {
+        return "<table cellpadding=\"5\" cellspacing=\"0\"" + " " + extra +">\n";
     }
 
     public static String formTableClose() {

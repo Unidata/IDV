@@ -1467,6 +1467,7 @@ public class ImageGenerator extends IdvManager {
             }
         }
 
+        debug("After creating data source");
         Hashtable properties = getProperties(node);
         dataSource.setObjectProperties(properties);
         String id = applyMacros(node, ATTR_ID, (String) null);
@@ -1482,6 +1483,7 @@ public class ImageGenerator extends IdvManager {
                 }
             }
         }
+        debug("After creating displays");
         return true;
     }
 
@@ -2272,7 +2274,9 @@ public class ImageGenerator extends IdvManager {
             return false;
         }
         if (applyMacros(node, ATTR_WAIT, true)) {
+            debug("Pause before");
             pause();
+            debug("Pause after");
         }
         return true;
     }
@@ -2363,8 +2367,10 @@ public class ImageGenerator extends IdvManager {
             if (cd == null) {
                 return error("Failed to find display control:" + type);
             }
+            debug("before doMakeControl");
             getIdv().doMakeControl(dataChoices, cd, getProperties(node),
                                    null, false);
+            debug("after doMakeControl");
         }
         return true;
     }

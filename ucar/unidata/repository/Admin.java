@@ -552,7 +552,23 @@ public class Admin extends RepositoryManager {
                         PROP_ACCESS_REQUIRELOGIN,
                         false)) + " Require login"));
 
+
+        StringBuffer handlerSB = new StringBuffer();
+        List<OutputHandler> outputHandlers = getRepository().getOutputHandlers();
+        for (OutputHandler outputHandler : outputHandlers) {
+            outputHandler.addToSettingsForm(handlerSB);
+        }
+
+        String extra  = handlerSB.toString();
+        if(extra.length()>0) {
+            sb.append(
+                      "<tr><td colspan=\"2\"><div  class=\"tableheading\">Output</div></td></tr>");
+            sb.append(extra);
+        }
+
         sb.append(HtmlUtil.formEntry("&nbsp;<p>", ""));
+
+
         sb.append(HtmlUtil.formEntry("", HtmlUtil.submit("Change Settings")));
         sb.append("</form>");
         sb.append("</table>");
@@ -580,6 +596,13 @@ public class Admin extends RepositoryManager {
                                         request.getString(PROP_HTML_FOOTER,
                                             ""));
         }
+
+        List<OutputHandler> outputHandlers = getRepository().getOutputHandlers();
+        for (OutputHandler outputHandler : outputHandlers) {
+            outputHandler.applySettings(request);
+        }
+
+
         getRepository().writeGlobal(PROP_ACCESS_ADMINONLY,
                                     "" + request.get(PROP_ACCESS_ADMINONLY,
                                         false));

@@ -317,33 +317,31 @@ public class AccessManager  extends RepositoryManager {
 
 
 
-
-
     protected void listAccess(Request request, Entry entry, StringBuffer sb) throws Exception {
         if(entry == null) return;
         List<Permission> permissions = getPermissions(request, entry);
-        int cnt = 0;
         String entryUrl  = HtmlUtil.href(HtmlUtil.url(URL_ACCESS_FORM, ARG_ID,
                                                       entry.getId()), entry.getName());
 
+        Hashtable map = new Hashtable();
         for(Permission permission: permissions) {
-            if(cnt==0) {
-                sb.append("<tr valign=top>");
-                sb.append(HtmlUtil.cols(entryUrl));
-            } else {
-                sb.append("<tr valign=top><td></td>");
+            List roles = (List) map.get(permission.getAction());
+            if(roles == null) {
+                map.put(permission.getAction(), roles = new ArrayList());
             }
-            sb.append(HtmlUtil.cols(permission.getAction(),
-                                    StringUtil.join(",", permission.getRoles())));
-
-            sb.append("</tr>");
-            cnt++;
-        }
-        sb.append("<tr valign=top><td colspan=3><hr></td>");
-        if(cnt==0) {
-            sb.append(HtmlUtil.row(HtmlUtil.cols(entryUrl,"none")));
+            roles.addAll(permission.getRoles());
         }
 
+        StringBuffer cols = new StringBuffer(HtmlUtil.cols(entryUrl));
+        for(int i=0;i<Permission.ACTIONS.length;i++) {
+            List roles = (List)map.get(Permission.ACTIONS[i]);
+            if(roles == null) {
+                cols.append(HtmlUtil.cols("&nbsp;"));
+            } else {
+                cols.append(HtmlUtil.cols(StringUtil.join("<br>", roles)));
+            }
+        }
+        sb.append(HtmlUtil.rowTop(cols.toString()));
         listAccess(request, repository.getEntry(entry.getParentGroupId(),request), sb);
     }
 
@@ -433,8 +431,13 @@ public class AccessManager  extends RepositoryManager {
         }
         
         StringBuffer currentAccess = new StringBuffer();
-        currentAccess.append(HtmlUtil.formTable());
-        currentAccess.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold("Entry"),HtmlUtil.bold("Action"),HtmlUtil.bold("Roles"))));
+        currentAccess.append(HtmlUtil.formTable("border=1"));
+        StringBuffer header = new StringBuffer(HtmlUtil.cols(HtmlUtil.bold("Entry")));
+        for(int i=0;i<Permission.ACTIONS.length;i++) {
+            header.append(HtmlUtil.cols(HtmlUtil.bold(Permission.ACTION_NAMES[i])));
+        }
+        currentAccess.append(HtmlUtil.rowTop(header.toString()));
+
         listAccess(request, entry,currentAccess);
         currentAccess.append(HtmlUtil.formTableClose());
 

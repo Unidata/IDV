@@ -899,6 +899,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 
+                
         //        Trace.call1 ("DisplayControl.init");
 
         if (haveInitialized) {
@@ -960,9 +961,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 
-
         //Call the derived class init method.
         //        System.err.println("CALLING INIT " + mycnt);
+
+        debug("before");
 
         if ( !init(myDataChoices)) {
             displayControlFailed();
@@ -971,6 +973,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
             return;
         }
+
+        debug("after");
 
 
         //Check if we have been removed
@@ -999,6 +1003,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
 
+
         applyAttributesToDisplayables();
 
 
@@ -1011,6 +1016,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if ( !insertDisplayables()) {
             return;
         }
+
 
 
 
@@ -1060,6 +1066,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         initDone();
 
+
         if (componentHolder != null) {
             componentHolder.displayControlHasInitialized();
         }
@@ -1072,6 +1079,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             animationWidget.setSharing(animationInfo.getShared());
         }
         updateLegendAndList();
+
     }
 
 
@@ -7895,6 +7903,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
 
+    public void debug(String msg) {
+        //        if(displayId.startsWith("plan")) {
+        //            System.out.println(new java.util.Date() + ": " + msg);
+        //        }
+    }
+
+
     /**
      * When we are iun debug mode this method gets called to add details html
      *
@@ -8711,8 +8726,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 && (defaultViewManager != null)) {
             return defaultViewManager;
         }
+        debug("new vm-1");
         ViewManager vm = getControlContext().getViewManager(viewDescriptor,
                              true, null);
+        debug("new vm-2");
         return vm;
 
     }

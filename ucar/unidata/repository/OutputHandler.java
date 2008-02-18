@@ -290,6 +290,13 @@ public class OutputHandler extends RepositoryManager {
 
 
 
+    public void addToSettingsForm(StringBuffer buffer) {
+    }
+
+    public void applySettings(Request request) throws Exception {
+    }
+
+
     /**
      * _more_
      *

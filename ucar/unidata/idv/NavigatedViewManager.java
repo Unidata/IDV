@@ -302,28 +302,36 @@ public abstract class NavigatedViewManager extends ViewManager {
             return;
         }
         super.init();
-        initVerticalRange();
-        if (readout == null) {
-            readout =
-                new NavigatedDisplayCursorReadout(getNavigatedDisplay(),
-                    null) {
-                protected JLabel getValueDisplay() {
-                    JLabel label = super.getValueDisplay();
-                    if (label == null) {
-                        IdvWindow window = IdvWindow.findWindow(fullContents);
-                        if (window != null) {
-                            label = ((IdvWindow) window).getMsgLabel();
-                            setValueDisplay(label);
-                        }
-                    }
-                    return label;
-                }
-            };
-        }
-        readout.setActive(getShowCursor());
 
-        IdvWindow myWindow = IdvWindow.findWindow(fullContents);
-        initReadout(myWindow);
+
+        initVerticalRange();
+
+
+        if(getIdv().getInteractiveMode()) {
+            if (readout == null) {
+                readout =
+                    new NavigatedDisplayCursorReadout(getNavigatedDisplay(),
+                                                      null) {
+                        protected JLabel getValueDisplay() {
+                            JLabel label = super.getValueDisplay();
+                            if (label == null) {
+                                IdvWindow window = IdvWindow.findWindow(fullContents);
+                                if (window != null) {
+                                    label = ((IdvWindow) window).getMsgLabel();
+                                    setValueDisplay(label);
+                                }
+                            }
+                            return label;
+                        }
+                    };
+            }
+            readout.setActive(getShowCursor());
+
+
+
+            IdvWindow myWindow = IdvWindow.findWindow(fullContents);
+            initReadout(myWindow);
+        }
 
     }
 

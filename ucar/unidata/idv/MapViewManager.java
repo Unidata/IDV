@@ -356,8 +356,11 @@ public class MapViewManager extends NavigatedViewManager {
         if (getHaveInitialized()) {
             return;
         }
+
         super.init();
+        Trace.call1("MVM-checkDefaultMap");
         checkDefaultMap();
+        Trace.call2("MVM-checkDefaultMap");
     }
 
 
@@ -1984,6 +1987,7 @@ public class MapViewManager extends NavigatedViewManager {
      * @return The flag value
      */
     public boolean getUseProjectionFromData() {
+        if(!getIdv().getInteractiveMode())  return true;
         return getBp(PREF_PROJ_USEFROMDATA);
     }
 

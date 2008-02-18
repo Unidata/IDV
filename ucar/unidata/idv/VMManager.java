@@ -435,6 +435,8 @@ public class VMManager extends IdvManager {
      * @param newViewManager  The new view manager
      */
     public void addViewManager(ViewManager newViewManager) {
+
+
         ViewManager vm =
             findViewManagerInList(newViewManager.getViewDescriptor());
 
@@ -444,7 +446,11 @@ public class VMManager extends IdvManager {
             }
             try {
                 Trace.call1("Decode.vm.init");
+
+
                 newViewManager.init();
+
+
                 Trace.call2("Decode.vm.init");
             } catch (Exception exc) {
                 logException("Adding view manager", exc);
@@ -452,6 +458,8 @@ public class VMManager extends IdvManager {
             setLastActiveViewManager(newViewManager);
         }
         getIdvUIManager().viewManagerAdded(newViewManager);
+
+
     }
 
     /**
@@ -627,6 +635,7 @@ public class VMManager extends IdvManager {
                     viewManager = new MapViewManager(getIdv(),
                             viewDescriptor, properties);
                 }
+
                 addViewManager(viewManager);
                 return viewManager;
             } catch (Throwable e) {

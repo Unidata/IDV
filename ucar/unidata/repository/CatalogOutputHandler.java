@@ -154,6 +154,9 @@ public class CatalogOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String ATTR_SERVICETYPE = "serviceType";
 
+    public static final String ARG_PATHS = "catalogoutputhandler.paths";
+
+
 
 
     /**
@@ -167,6 +170,29 @@ public class CatalogOutputHandler extends OutputHandler {
             throws Exception {
         super(repository, element);
     }
+
+
+    public void addToSettingsForm(StringBuffer buffer) {
+        super.addToSettingsForm(buffer);
+        String widget =  HtmlUtil.textArea(ARG_PATHS,
+                                           getRepository().getProperty(ARG_PATHS,""),
+                                           5,
+                                           40);
+        buffer.append(HtmlUtil.formEntryTop("TDS Paths:",
+                                            HtmlUtil.table(HtmlUtil.rowTop(HtmlUtil.cols(
+                                                                                         widget,
+                                                                                         "Data directory roots for writing Thredds catalogs")))));
+    }
+
+    public void applySettings(Request request) throws Exception {
+        super.applySettings(request);
+        if(request.exists(ARG_PATHS)) {
+            List tmp = StringUtil.split(request.getString(ARG_PATHS,""),"\n",true, true);
+            getRepository().writeGlobal(ARG_PATHS, StringUtil.join("\n",tmp));
+        }
+    }
+
+
 
     /**
      * _more_

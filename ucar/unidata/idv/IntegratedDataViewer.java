@@ -1160,8 +1160,11 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
             return viewManager;
         }
         if (getArgsManager().getIsOffScreen() || (!getIdv().okToShowWindows() && !newWindow)) {
-            return getVMManager().createViewManager(viewDescriptor,
-                    properties);
+            System.out.println(new java.util.Date() + ": before create");
+            ViewManager vm =  getVMManager().createViewManager(viewDescriptor,
+                                                               properties);
+            System.out.println(new java.util.Date() + ": after create");
+            return vm;
         }
         IdvWindow window = getIdvUIManager().createNewWindow();
         if (window != null) {
@@ -2871,25 +2874,20 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         try {
             idv.getImageGenerator().processScriptFile(scriptFile);
         }  finally {
-            try {
-                idv.getStore().cleanupTmpFiles();
-            } catch(Exception exc1) {}
-            try {
-                idv.removeAllDisplays();
-            } catch(Exception exc1) {}
-            try {
-                idv.removeAllDataSources();
-            } catch(Exception exc1) {}
-            try {
-                idv.getVMManager().removeAllViewManagers();
-            } catch(Exception exc1) {}
-            try {
-                idv.getIdvUIManager().disposeAllWindows();
-            } catch(Exception exc1) {}
-
-            CacheManager.clearCache();
+            idv.cleanup();
         }
     }
+
+
+    public void cleanup() {
+        getStore().cleanupTmpFiles();
+        removeAllDisplays();
+        idv.removeAllDataSources();
+        getVMManager().removeAllViewManagers();
+        getIdvUIManager().disposeAllWindows();
+        CacheManager.clearCache();
+    }
+
 
 
     /**
