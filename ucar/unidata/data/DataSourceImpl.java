@@ -2015,7 +2015,6 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         //start up polling if we have not done so already.
         initPolling();
 
-        System.err.println("props:" + incomingDataSelection.getProperties());
 
         //Just call this in case it has not been called yet
         //because it can trigger a failure in some of
