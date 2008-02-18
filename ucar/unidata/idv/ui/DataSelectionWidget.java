@@ -21,11 +21,13 @@
  */
 
 
+
 package ucar.unidata.idv.ui;
 
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSelectionComponent;
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataSourceImpl;
 import ucar.unidata.data.DerivedDataChoice;
@@ -118,7 +120,7 @@ public class DataSelectionWidget {
     /** Holds the stride */
     private JPanel strideTab;
 
-    /** Stride Checkbox          */
+    /** Stride Checkbox */
     private JCheckBox strideCbx;
 
     /** Area Checkbox */
@@ -151,6 +153,7 @@ public class DataSelectionWidget {
     /** Current list of levels */
     private List levels;
 
+    /** _more_          */
     private boolean defaultLevelToFirst = true;
 
 
@@ -169,6 +172,10 @@ public class DataSelectionWidget {
 
     /** Keeps track of the tab label so we can reselect that tab when we update */
     private String currentLbl;
+
+
+    /** _more_          */
+    private List<DataSelectionComponent> dataSelectionComponents;
 
     /**
      * Constructor  for when we are a part of the {@link DataSelector}
@@ -345,6 +352,14 @@ public class DataSelectionWidget {
 
         selectionTab.removeAll();
 
+        if ((dc != null) && (dataSource != null)) {
+            dataSelectionComponents =
+                dataSource.getDataSelectionComponents(dc);
+        } else {
+            dataSelectionComponents = null;
+        }
+
+
         if (timesList.getModel().getSize() > 0) {
             selectionTab.add(timesComponent, "Times", 0);
         }
@@ -401,7 +416,7 @@ public class DataSelectionWidget {
             }
             if ( !didone) {
                 if (levelsForGui.size() > 1) {
-                    if(defaultLevelToFirst) {
+                    if (defaultLevelToFirst) {
                         levelsList.setSelectedIndex(1);
                     } else {
                         levelsList.setSelectedIndex(0);
@@ -428,7 +443,7 @@ public class DataSelectionWidget {
             geoSelectionPanel =
                 ((DataSourceImpl) dataSource).doMakeGeoSelectionPanel(false);
             strideComponent = geoSelectionPanel.getStrideComponent();
-            areaComponent = geoSelectionPanel.getAreaComponent();
+            areaComponent   = geoSelectionPanel.getAreaComponent();
             if (areaComponent != null) {
                 areaComponent.setPreferredSize(new Dimension(200, 150));
                 GuiUtils.enableTree(areaComponent, !areaCbx.isSelected());
@@ -440,7 +455,10 @@ public class DataSelectionWidget {
             if (areaComponent != null) {
                 areaComponent.setPreferredSize(new Dimension(200, 150));
                 GuiUtils.enableTree(areaComponent, !areaCbx.isSelected());
-                areaTab.add(GuiUtils.topCenter(GuiUtils.inset(GuiUtils.right(areaCbx),0),areaComponent));
+                areaTab.add(
+                    GuiUtils.topCenter(
+                        GuiUtils.inset(GuiUtils.right(areaCbx), 0),
+                        areaComponent));
                 areaTab.add(
                     GuiUtils.topCenter(
                         GuiUtils.inset(GuiUtils.right(areaCbx), 0),
@@ -449,7 +467,12 @@ public class DataSelectionWidget {
             }
             if (strideComponent != null) {
                 GuiUtils.enableTree(strideComponent, !strideCbx.isSelected());
-                strideTab.add(GuiUtils.top(GuiUtils.topCenter(GuiUtils.inset(GuiUtils.right(strideCbx),new Insets(0,0,5,0)),strideComponent)));
+                strideTab.add(
+                    GuiUtils.top(
+                        GuiUtils.topCenter(
+                            GuiUtils.inset(
+                                GuiUtils.right(strideCbx),
+                                new Insets(0, 0, 5, 0)), strideComponent)));
                 strideTab.add(
                     GuiUtils.top(
                         GuiUtils.topCenter(
@@ -459,6 +482,14 @@ public class DataSelectionWidget {
                 selectionTab.add("Stride", strideTab);
             }
         }
+
+        if (dataSelectionComponents != null) {
+            for (DataSelectionComponent comp : dataSelectionComponents) {
+                selectionTab.addTab(comp.getName(), comp.getContents());
+            }
+        }
+
+
 
         addSettingsComponent();
         checkSelectionTab();
@@ -504,11 +535,11 @@ public class DataSelectionWidget {
 
 
         GeoSelection geoSelection = getGeoSelection();
-        if(geoSelection!=null) {
+        if (geoSelection != null) {
             if (strideCbx.isSelected()) {
                 geoSelection.clearStride();
             }
-            
+
             if (areaCbx.isSelected()) {
                 geoSelection.setBoundingBox(null);
             }
@@ -525,6 +556,11 @@ public class DataSelectionWidget {
                 }
             }
         }
+
+        for (DataSelectionComponent comp : dataSelectionComponents) {
+            comp.applyToDataSelection(dataSelection);
+        }
+
         return dataSelection;
     }
 
@@ -596,23 +632,22 @@ public class DataSelectionWidget {
     private JComponent doMakeContents() {
         areaCbx = new JCheckBox("Use Default", true);
         areaCbx.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    if (areaComponent != null) {
-                        GuiUtils.enableTree(areaComponent,
-                                            !areaCbx.isSelected());
-                    }
+            public void actionPerformed(ActionEvent ae) {
+                if (areaComponent != null) {
+                    GuiUtils.enableTree(areaComponent, !areaCbx.isSelected());
                 }
-            });
+            }
+        });
 
         strideCbx = new JCheckBox("Use Default", true);
         strideCbx.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    if (strideComponent != null) {
-                        GuiUtils.enableTree(strideComponent,
-                                            !strideCbx.isSelected());
-                    }
+            public void actionPerformed(ActionEvent ae) {
+                if (strideComponent != null) {
+                    GuiUtils.enableTree(strideComponent,
+                                        !strideCbx.isSelected());
                 }
-            });
+            }
+        });
 
         timesComponent = getTimesList();
         selectionTab   = new JTabbedPane();
@@ -837,23 +872,23 @@ public class DataSelectionWidget {
                                   GuiUtils.topCenter(top, scroller) };
     }
 
-/**
-Set the DefaultLevelToFirst property.
+    /**
+     * Set the DefaultLevelToFirst property.
+     *
+     * @param value The new value for DefaultLevelToFirst
+     */
+    public void setDefaultLevelToFirst(boolean value) {
+        defaultLevelToFirst = value;
+    }
 
-@param value The new value for DefaultLevelToFirst
-**/
-public void setDefaultLevelToFirst (boolean value) {
-	defaultLevelToFirst = value;
-}
-
-/**
-Get the DefaultLevelToFirst property.
-
-@return The DefaultLevelToFirst
-**/
-public boolean getDefaultLevelToFirst () {
-	return defaultLevelToFirst;
-}
+    /**
+     * Get the DefaultLevelToFirst property.
+     *
+     * @return The DefaultLevelToFirst
+     */
+    public boolean getDefaultLevelToFirst() {
+        return defaultLevelToFirst;
+    }
 
 
 
