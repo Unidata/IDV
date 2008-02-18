@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv;
 
 
@@ -323,11 +324,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** The side legend */
     private SideLegend sideLegend;
 
+    /** _more_          */
     private boolean canShowSideLegend = true;
 
     /** This holds the side legend */
     private JComponent sideLegendComponent;
 
+    /** _more_          */
     private String legendState = IdvLegend.STATE_DOCKED;
 
 
@@ -719,13 +722,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
         Trace.call2("ViewManager.init setBooleanProperties()");
 
 
-        Trace.call1("ViewManager.init animation");
+
         Animation animation = getAnimation();
         if (animation != null) {
             getMaster().setAnimation(animation, animationWidget);
             //            getMaster().addDisplayable(animation);
         }
-        Trace.call2("ViewManager.init animation");
 
 
         Trace.call1("ViewManager.init initWith");
@@ -790,10 +792,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
     }
 
-    /** _more_          */
+    /** _more_ */
     JPanel contentsWrapper;
 
+    /** _more_          */
     JComponent centerPanel;
+
+    /** _more_          */
     JComponent centerPanelWrapper;
 
 
@@ -881,28 +886,36 @@ public class ViewManager extends SharableImpl implements ActionListener,
         legends.add(sideLegend);
         JComponent legendContents = sideLegend.getContents();
         sideLegendComponent = getSideComponent(legendContents);
-        canShowSideLegend = !getIdvUIManager().handleSideLegend(this, sideLegendComponent)
-            && getShowSideLegend();
+        canShowSideLegend = !getIdvUIManager().handleSideLegend(this,
+                sideLegendComponent) && getShowSideLegend();
         //        if (canShowSideLegend  && showControlLegend) {
         //        }
 
         centerPanelWrapper = new JPanel(new BorderLayout());
-        fullContents = GuiUtils.leftCenter(leftNav, centerPanelWrapper);
+        fullContents       = GuiUtils.leftCenter(leftNav, centerPanelWrapper);
         fullContents.setBorder(getContentsBorder());
         insertSideLegend();
         fillLegends();
     }
 
 
-    public  void  setSideLegendPosition(String state) {
+    /**
+     * _more_
+     *
+     * @param state _more_
+     */
+    public void setSideLegendPosition(String state) {
         legendState = state;
         insertSideLegend();
     }
 
 
-    protected void  insertSideLegend() {
+    /**
+     * _more_
+     */
+    protected void insertSideLegend() {
         centerPanelWrapper.removeAll();
-        if(legendState.equals(IdvLegend.STATE_DOCKED)) {
+        if (legendState.equals(IdvLegend.STATE_DOCKED)) {
             sideLegend.unFloatLegend();
             JComponent leftComp  = (legendOnLeft
                                     ? sideLegendComponent
@@ -929,13 +942,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
             }
             sideLegendContainer.setOneTouchExpandable(true);
             sideLegend.setTheContainer(sideLegendContainer);
-            centerPanelWrapper.add(BorderLayout.CENTER, sideLegendContainer); 
-        } else if(legendState.equals(IdvLegend.STATE_FLOAT)) {
+            centerPanelWrapper.add(BorderLayout.CENTER, sideLegendContainer);
+        } else if (legendState.equals(IdvLegend.STATE_FLOAT)) {
             sideLegend.floatLegend();
-            centerPanelWrapper.add(BorderLayout.CENTER, centerPanel); 
-        } else if(legendState.equals(IdvLegend.STATE_HIDDEN)) {
+            centerPanelWrapper.add(BorderLayout.CENTER, centerPanel);
+        } else if (legendState.equals(IdvLegend.STATE_HIDDEN)) {
             sideLegend.unFloatLegend();
-            centerPanelWrapper.add(BorderLayout.CENTER, centerPanel); 
+            centerPanelWrapper.add(BorderLayout.CENTER, centerPanel);
         }
 
     }
@@ -1567,8 +1580,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
     }
 
-    protected void animationTimeChanged(){
-    }
+    /**
+     * _more_
+     */
+    protected void animationTimeChanged() {}
 
 
     /**
@@ -1908,7 +1923,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 }
                 TextDisplayable d =
                     (TextDisplayable) control.getDisplayListDisplayable(this);
-                if (d == null) continue;
+                if (d == null) {
+                    continue;
+                }
                 count++;
                 boolean success = setDisplayablePosition(d, count);
                 if (success) {
@@ -2301,6 +2318,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param legend _more_
+     * @param state _more_
+     */
     public void setLegendState(IdvLegend legend, String state) {
         legendState = state;
         insertSideLegend();
@@ -2446,7 +2469,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (legends == null) {
             return;
         }
-        for (IdvLegend legend: legends) {
+        for (IdvLegend legend : legends) {
             legend.doClose();
         }
     }
@@ -2456,7 +2479,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * Show (float) all legends
      */
     public void showLegend() {
-        for (IdvLegend legend: legends) {
+        for (IdvLegend legend : legends) {
             legend.showLegend();
         }
     }
@@ -3052,8 +3075,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public void setShowControlLegend(boolean b) {
         showControlLegend = b;
-        if(showControlLegend) legendState = IdvLegend.STATE_DOCKED;
-        else legendState = IdvLegend.STATE_HIDDEN;
+        if (showControlLegend) {
+            legendState = IdvLegend.STATE_DOCKED;
+        } else {
+            legendState = IdvLegend.STATE_HIDDEN;
+        }
     }
 
     /**
@@ -3065,23 +3091,23 @@ public class ViewManager extends SharableImpl implements ActionListener,
         return showControlLegend;
     }
 
-/**
-Set the LegendState property.
+    /**
+     * Set the LegendState property.
+     *
+     * @param value The new value for LegendState
+     */
+    public void setLegendState(String value) {
+        legendState = value;
+    }
 
-@param value The new value for LegendState
-**/
-public void setLegendState (String value) {
-	legendState = value;
-}
-
-/**
-Get the LegendState property.
-
-@return The LegendState
-**/
-public String getLegendState () {
-	return legendState;
-}
+    /**
+     * Get the LegendState property.
+     *
+     * @return The LegendState
+     */
+    public String getLegendState() {
+        return legendState;
+    }
 
 
 
@@ -3166,7 +3192,7 @@ public String getLegendState () {
         if (legends == null) {
             return;
         }
-        for (IdvLegend legend: legends) {
+        for (IdvLegend legend : legends) {
             legend.setColors(foreground, background);
         }
     }
@@ -3227,6 +3253,19 @@ public String getLegendState () {
      * legends to fill themselves  and updates the display menu.
      */
     protected void fillLegends() {
+        if (getIdv().getInteractiveMode()) {
+            reallyFillLegends();
+        } else {
+            dirty = true;
+        }
+
+    }
+
+
+    /**
+     * _more_
+     */
+    protected void reallyFillLegends() {
         //If we are not loading a bundle then fill the legends right now
         if ( !getStateManager().isLoadingXml()) {
             fillLegendsInner();
@@ -3270,7 +3309,7 @@ public String getLegendState () {
         fillLegendsPending = false;
         updateDisplayList();
         synchronized (LEGENDMUTEX) {
-            for (IdvLegend legend: legends) {
+            for (IdvLegend legend : legends) {
                 legend.fillLegend();
             }
         }
@@ -3290,15 +3329,18 @@ public String getLegendState () {
         boolean   didone   = false;
         int       cnt      = 0;
         if (getShowSideLegend()) {
-            if(!legendState.equals(IdvLegend.STATE_HIDDEN)) 
+            if ( !legendState.equals(IdvLegend.STATE_HIDDEN)) {
                 displayMenu.add(GuiUtils.makeMenuItem("Hide Legend", this,
-                                                      "setSideLegendPosition",IdvLegend.STATE_HIDDEN));
-            if(!legendState.equals(IdvLegend.STATE_DOCKED)) 
+                        "setSideLegendPosition", IdvLegend.STATE_HIDDEN));
+            }
+            if ( !legendState.equals(IdvLegend.STATE_DOCKED)) {
                 displayMenu.add(GuiUtils.makeMenuItem("Embed Legend", this,
-                                                      "setSideLegendPosition",IdvLegend.STATE_DOCKED));
-            if(!legendState.equals(IdvLegend.STATE_FLOAT)) 
+                        "setSideLegendPosition", IdvLegend.STATE_DOCKED));
+            }
+            if ( !legendState.equals(IdvLegend.STATE_FLOAT)) {
                 displayMenu.add(GuiUtils.makeMenuItem("Float Legend", this,
-                                                      "setSideLegendPosition",IdvLegend.STATE_FLOAT));
+                        "setSideLegendPosition", IdvLegend.STATE_FLOAT));
+            }
             displayMenu.addSeparator();
         }
 
@@ -3441,18 +3483,52 @@ public String getLegendState () {
         }
         displayInfos.add(displayInfo);
         if (master != null) {
-            master.addDisplayable(displayInfo.getDisplayable());
+            if (getIdv().getInteractiveMode()) {
+                master.addDisplayable(displayInfo.getDisplayable());
+            } else {
+                dirty = true;
+            }
         }
 
 
-        fillLegends();
-        updateTimelines(true);
-        if ( !getStateManager().isLoadingXml()) {
-            toFront();
+        if (getIdv().getInteractiveMode()) {
+            fillLegends();
+            updateTimelines(true);
+            if ( !getStateManager().isLoadingXml()) {
+                toFront();
+            }
+        } else {
+            dirty = true;
         }
 
 
         return true;
+    }
+
+
+    /** _more_          */
+    private boolean dirty = false;
+
+    /**
+     * _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void updateDisplayIfNeeded() throws VisADException, RemoteException {
+        if ( !dirty || (master == null)) {
+            return;
+        }
+        dirty = false;
+        List tmpList = new ArrayList(displayInfos);
+        master.setDisplayInactive();
+        for (int i = 0; i < tmpList.size(); i++) {
+            DisplayInfo displayInfo = (DisplayInfo) tmpList.get(i);
+            master.addDisplayable(displayInfo.getDisplayable());
+        }
+        reallyFillLegends();
+        //This sets the master active
+        master.draw();
     }
 
 
@@ -4091,25 +4167,31 @@ public String getLegendState () {
                     parseProperties(tmp);
                 }
                 master = doMakeDisplayMaster();
-                master.setMouseFunctions(
-                    getIdv().getPreferenceManager().getMouseMap());
-                master.setKeyboardEventMap(
-                    getIdv().getPreferenceManager().getKeyboardMap());
-                master.setWheelEventMap(
-                    getIdv().getPreferenceManager().getWheelMap());
+                if ( !getIdv().getInteractiveMode()) {
+                    master.setDisplayInactive();
+                } else {
+                    master.setMouseFunctions(
+                        getIdv().getPreferenceManager().getMouseMap());
+                    master.setKeyboardEventMap(
+                        getIdv().getPreferenceManager().getKeyboardMap());
+                    master.setWheelEventMap(
+                        getIdv().getPreferenceManager().getWheelMap());
+                }
                 GraphicsModeControl gmc =
                     master.getDisplay().getGraphicsModeControl();
                 gmc.setCacheAppearances(true);
                 gmc.setMergeGeometries(true);
                 setDisplayMaster(master);
 
-                Trace.call1("ViewManager.getMaster master.draw");
-                master.draw();
-                Trace.call2("ViewManager.getMaster master.draw");
+                if (isInteractive()) {
+                    Trace.call1("ViewManager.getMaster master.draw");
+                    master.draw();
+                    Trace.call2("ViewManager.getMaster master.draw");
 
-                Trace.call1("ViewManager.getMaster updateDisplayList");
-                updateDisplayList();
-                Trace.call2("ViewManager.getMaster updateDisplayList");
+                    Trace.call1("ViewManager.getMaster updateDisplayList");
+                    updateDisplayList();
+                    Trace.call2("ViewManager.getMaster updateDisplayList");
+                }
 
             } catch (Exception exc) {
                 logException("Creating display master", exc);
@@ -4118,6 +4200,15 @@ public String getLegendState () {
         return master;
     }
 
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean isInteractive() {
+        return getIdv().getInteractiveMode();
+    }
 
     /**
      * Make the DisplayMaster for this ViewManger. Subclasses should
@@ -4248,7 +4339,7 @@ public String getLegendState () {
             } else if ( !clickToFocus
                         && (eventId == DisplayEvent.MOUSE_MOVED)) {
                 getVMManager().setLastActiveViewManager(this);
-            } 
+            }
         }
 
         if (eventId == DisplayEvent.KEY_PRESSED) {
@@ -4390,10 +4481,10 @@ public String getLegendState () {
     public void actionPerformed(ActionEvent event) {}
 
 
-    /** _more_          */
+    /** _more_ */
     private ImagePanel imagePanel;
 
-    /** _more_          */
+    /** _more_ */
     boolean usingImagePanel = false;
 
     /**
@@ -4721,22 +4812,24 @@ public String getLegendState () {
                     writeImage(new File(filename), false, quality);
                 } else {
                     Component comp;
-                    String whichComponent;
+                    String    whichComponent;
                     if (fullWindowBtn.isSelected()) {
-                        comp = getDisplayWindow().getComponent();
+                        comp           = getDisplayWindow().getComponent();
                         whichComponent = "full window";
                     } else if (mainDisplayBtn.isSelected()) {
-                        comp = getMaster().getComponent();
+                        comp           = getMaster().getComponent();
                         whichComponent = "main display";
                     } else {
-                        comp = getContents();
+                        comp           = getContents();
                         whichComponent = "contents";
                     }
                     Dimension dim = comp.getSize();
                     Point     loc = comp.getLocationOnScreen();
 
-                    if(dim.width<=0 || dim.height<=0) {
-                        throw new IllegalStateException("Bad component size:" + dim.width +" X " + dim.height + " for component:" + whichComponent);
+                    if ((dim.width <= 0) || (dim.height <= 0)) {
+                        throw new IllegalStateException("Bad component size:"
+                                + dim.width + " X " + dim.height
+                                + " for component:" + whichComponent);
                     }
 
                     /*
@@ -5454,9 +5547,9 @@ public String getLegendState () {
                                      "resetFullScreen");
         //If they set the width to be smallish then don't include the
         //animation and the menu bar
-        if(theSize.width<300) {
+        if (theSize.width < 300) {
             rightPanel = new JPanel();
-            menuBar = new JPanel();
+            menuBar    = new JPanel();
         }
 
         JPanel top =

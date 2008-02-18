@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -292,17 +293,20 @@ public class MapViewManager extends NavigatedViewManager {
                 mainProjection =
                     new ProjectionCoordinateSystem(dfltProjection);
             }
-            if(getIdv().getInteractiveMode())  {
+            if (getIdv().getInteractiveMode()) {
                 addProjectionToHistory(mainProjection, "Default");
             }
+            Trace.call1("MapViewManager.new MPD");
             MapProjectionDisplay mapDisplay =
                 MapProjectionDisplay.getInstance(mainProjection, mode,
                     getIdv().getArgsManager().getIsOffScreen(), dimension);
+            Trace.call2("MapViewManager.new MPD");
+
+
             double[] aspect = { 1.0, 1.0, 0.4 };
             mapDisplay.setDisplayAspect((mode == NavigatedDisplay.MODE_2D)
                                         ? new double[] { 1.0, 1.0 }
                                         : aspect);
-
 
             navDisplay = mapDisplay;
             Trace.call2("MapViewManager.doMakeDisplayMaster projection");
@@ -337,11 +341,16 @@ public class MapViewManager extends NavigatedViewManager {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public List<TwoFacedObject> getScreenCoordinates() throws VisADException, RemoteException {
+    public List<TwoFacedObject> getScreenCoordinates()
+            throws VisADException, RemoteException {
         List<TwoFacedObject> l = getNavigatedDisplay().getScreenCoordinates();
         List<TwoFacedObject> result = new ArrayList<TwoFacedObject>();
-        for(TwoFacedObject tfo: l) {
-            result.add(new TwoFacedObject(tfo.toString(),getNavigatedDisplay().getEarthLocation((double[]) tfo.getId())));
+        for (TwoFacedObject tfo : l) {
+            result.add(
+                new TwoFacedObject(
+                    tfo.toString(),
+                    getNavigatedDisplay().getEarthLocation(
+                        (double[]) tfo.getId())));
         }
         return result;
     }
@@ -1992,7 +2001,9 @@ public class MapViewManager extends NavigatedViewManager {
      * @return The flag value
      */
     public boolean getUseProjectionFromData() {
-        if(!getIdv().getInteractiveMode())  return true;
+        if ( !getIdv().getInteractiveMode()) {
+            return true;
+        }
         return getBp(PREF_PROJ_USEFROMDATA);
     }
 

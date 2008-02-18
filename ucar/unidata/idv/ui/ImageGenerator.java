@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -641,7 +642,7 @@ public class ImageGenerator extends IdvManager {
         try {
             InputStream is = null;
             try {
-                if(islFile.startsWith("xml:")) {
+                if (islFile.startsWith("xml:")) {
                     String xml = islFile.substring(4);
                     is = new ByteArrayInputStream(xml.getBytes());
                 } else {
@@ -2119,20 +2120,19 @@ public class ImageGenerator extends IdvManager {
      * @throws Throwable On badness
      */
     protected boolean processTagHtml(Element node) throws Throwable {
-        /*<html file="foo.gif">
-        <![CDATA[Observations>METAR]]>
-        </html>*/
+
         String html = null;
-        if(XmlUtil.hasAttribute(node,ATTR_FROMFILE)) {
+        if (XmlUtil.hasAttribute(node, ATTR_FROMFILE)) {
             html = IOUtil.readContents(applyMacros(node, ATTR_FROMFILE));
         } else {
             html = XmlUtil.getChildText(node);
         }
         html = applyMacros(html);
-        int width = XmlUtil.getAttribute(node, ATTR_WIDTH,-1);
-        Image image = ImageUtils.renderHtml(html,width,null,null);
-        image = processImage(ImageUtils.toBufferedImage(image), XmlUtil.getAttribute(node, ATTR_FILE),
-                             node, getAllProperties(), null);
+        int   width = XmlUtil.getAttribute(node, ATTR_WIDTH, -1);
+        Image image = ImageUtils.renderHtml(html, width, null, null);
+        image = processImage(ImageUtils.toBufferedImage(image),
+                             XmlUtil.getAttribute(node, ATTR_FILE), node,
+                             getAllProperties(), null);
 
         //        writeImageToFile(image, XmlUtil.getAttribute(node, ATTR_FILE));
         return true;
@@ -2254,12 +2254,29 @@ public class ImageGenerator extends IdvManager {
         } else if (XmlUtil.hasAttribute(node, ATTR_HOURS)) {
             Misc.sleep((long) (60 * 60 * 1000 * toDouble(node, ATTR_HOURS)));
         } else {
+            updateViewManagers();
             getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
                 getIdv().getIdvUIManager());
         }
         return true;
 
     }
+
+    /**
+     * _more_
+     */
+    protected void updateViewManagers() {
+        try {
+            List viewManagers = getVMManager().getViewManagers();
+            for (int i = 0; i < viewManagers.size(); i++) {
+                ViewManager viewManager = (ViewManager) viewManagers.get(i);
+                viewManager.updateDisplayIfNeeded();
+            }
+        } catch (Exception exc) {
+            logException("Updating view manager", exc);
+        }
+    }
+
 
     /**
      * process the given node
@@ -2896,16 +2913,19 @@ public class ImageGenerator extends IdvManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param props _more_
+     * @param name _more_
+     * @param v _more_
+     */
     public void putIndex(Hashtable props, String name, int v) {
         props.put(name, new Integer(v));
-        props.put(name+"_alpha",
-                  getLetter(v).toLowerCase());
-        props.put(name+"_ALPHA",
-                  getLetter(v).toUpperCase());
-        props.put(name+"_ROMAN",
-                  getRoman(v).toUpperCase());
-        props.put(name+"_roman",
-                  getRoman(v).toLowerCase());
+        props.put(name + "_alpha", getLetter(v).toLowerCase());
+        props.put(name + "_ALPHA", getLetter(v).toUpperCase());
+        props.put(name + "_ROMAN", getRoman(v).toUpperCase());
+        props.put(name + "_roman", getRoman(v).toLowerCase());
 
 
     }
@@ -2922,6 +2942,7 @@ public class ImageGenerator extends IdvManager {
      * @return List of view managers
      */
     private List getViewManagers(Element node) {
+        updateViewManagers();
         List viewManagers = getVMManager().getViewManagers();
         if ((node == null) || !XmlUtil.hasAttribute(node, ATTR_VIEW)) {
             return viewManagers;
@@ -3139,6 +3160,7 @@ public class ImageGenerator extends IdvManager {
      * @throws Exception On badness
      */
     public Image getImage() throws Exception {
+        updateViewManagers();
         List viewManagers = getVMManager().getViewManagers();
         for (int i = 0; i < viewManagers.size(); i++) {
             ViewManager viewManager = (ViewManager) viewManagers.get(i);
@@ -3170,9 +3192,9 @@ public class ImageGenerator extends IdvManager {
         if ((scriptingNode != null)
                 && XmlUtil.hasAttribute(scriptingNode, "test")) {
             BufferedImage tmpImage =
-                new BufferedImage(applyMacros(scriptingNode,ATTR_WIDTH,300),
-                                  applyMacros(scriptingNode,ATTR_HEIGHT,300),
-                                  BufferedImage.TYPE_INT_RGB);
+                new BufferedImage(applyMacros(scriptingNode, ATTR_WIDTH,
+                    300), applyMacros(scriptingNode, ATTR_HEIGHT, 300),
+                          BufferedImage.TYPE_INT_RGB);
             String loopFilename = applyMacros(filename);
             lastImage = processImage((BufferedImage) tmpImage, loopFilename,
                                      scriptingNode, getAllProperties(), null);
@@ -3202,7 +3224,7 @@ public class ImageGenerator extends IdvManager {
         pushProperties();
         for (int i = 0; i < viewManagers.size(); i++) {
             ViewManager viewManager = (ViewManager) viewManagers.get(i);
-            putIndex(getProperties(),PROP_VIEWINDEX,i);
+            putIndex(getProperties(), PROP_VIEWINDEX, i);
             String name = viewManager.getName();
             if (name == null) {
                 name = "view" + i;
@@ -3375,9 +3397,11 @@ public class ImageGenerator extends IdvManager {
             } else if (tagName.equals(TAG_COLORBAR)) {
                 boolean showLines = applyMacros(child, ATTR_SHOWLINES, false);
 
-                List   controls =(viewManager!=null?viewManager.getControls():new ArrayList());
+                List    controls  = ((viewManager != null)
+                                     ? viewManager.getControls()
+                                     : new ArrayList());
 
-                if(XmlUtil.hasAttribute(child, ATTR_DISPLAY)) {
+                if (XmlUtil.hasAttribute(child, ATTR_DISPLAY)) {
                     DisplayControlImpl display = findDisplayControl(child);
                     if (display == null) {
                         error("Could not find display:"
@@ -3393,7 +3417,7 @@ public class ImageGenerator extends IdvManager {
                 double interval = applyMacros(child, ATTR_INTERVAL, -1.0);
                 String valuesStr = applyMacros(child, ATTR_VALUES,
                                        (String) null);
-                Color c         = applyMacros(child, ATTR_COLOR, Color.black);
+                Color c = applyMacros(child, ATTR_COLOR, Color.black);
 
                 Color lineColor = applyMacros(child, ATTR_LINECOLOR, c);
 
@@ -3406,16 +3430,17 @@ public class ImageGenerator extends IdvManager {
                                ATTR_ANCHOR, "ll"), new Rectangle(0, 0, width,
                                    height));
 
-                    boolean showUnit = applyMacros(child, "showunit",
-                                             false);
-                    String orientation = applyMacros(child, ATTR_ORIENTATION,
-                                             VALUE_BOTTOM);
-                    boolean vertical = orientation.equals(VALUE_RIGHT)
-                                       || orientation.equals(VALUE_LEFT);
-                int baseY = pp.y - ap.y+(vertical?0:height);
+                boolean showUnit = applyMacros(child, "showunit", false);
+                String orientation = applyMacros(child, ATTR_ORIENTATION,
+                                         VALUE_BOTTOM);
+                boolean vertical = orientation.equals(VALUE_RIGHT)
+                                   || orientation.equals(VALUE_LEFT);
+                int baseY = pp.y - ap.y + (vertical
+                                           ? 0
+                                           : height);
                 int baseX = pp.x - ap.x;
 
-                
+
                 for (int i = 0; i < controls.size(); i++) {
                     DisplayControlImpl control =
                         (DisplayControlImpl) controls.get(i);
@@ -3469,11 +3494,11 @@ public class ImageGenerator extends IdvManager {
                                            : baseY - height), width, height);
                     }
                     setFont(g, child);
-                    FontMetrics fm     = g.getFontMetrics();
-                    List        values = new ArrayList();
-                    String tickSuffix = "";
-                    if(control.getDisplayUnit()!=null) {
-                        tickSuffix = " "+control.getDisplayUnit();
+                    FontMetrics fm         = g.getFontMetrics();
+                    List        values     = new ArrayList();
+                    String      tickSuffix = "";
+                    if (control.getDisplayUnit() != null) {
+                        tickSuffix = " " + control.getDisplayUnit();
                     }
                     if (valuesStr != null) {
                         double[] valueArray = Misc.parseDoubles(valuesStr,
@@ -3533,7 +3558,10 @@ public class ImageGenerator extends IdvManager {
                             }
                         }
                         String tickLabel =
-                            getIdv().getDisplayConventions().format(value)+(showUnit?tickSuffix:"");
+                            getIdv().getDisplayConventions().format(value)
+                            + (showUnit
+                               ? tickSuffix
+                               : "");
                         Rectangle2D rect = fm.getStringBounds(tickLabel, g);
                         g.setColor(lineColor);
                         if (orientation.equals(VALUE_RIGHT)) {
@@ -3709,7 +3737,8 @@ public class ImageGenerator extends IdvManager {
                 }
             } else if (tagName.equals(TAG_THUMBNAIL)) {
                 shouldIterateChildren = false;
-                BufferedImage thumbImage = ImageUtils.toBufferedImage(resize(image, child));
+                BufferedImage thumbImage =
+                    ImageUtils.toBufferedImage(resize(image, child));
                 String thumbFile = applyMacros(child, ATTR_FILE,
                                        (String) null);
                 if (thumbFile == null) {
@@ -3904,6 +3933,7 @@ public class ImageGenerator extends IdvManager {
         }
 
         List viewManagers = getViewManagers(scriptingNode);
+
         for (int i = 0; i < viewManagers.size(); i++) {
             ViewManager viewManager = (ViewManager) viewManagers.get(i);
             getProperties().put(PROP_VIEWINDEX, new Integer(i));
@@ -4244,22 +4274,46 @@ public class ImageGenerator extends IdvManager {
         f.disconnect();
     }
 
-    private static String []alphabet = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"};
-    private static String[]roman = {"I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII",
-                            "XVIII","XX","XXI","XXII","XXIII",
-                            "XXIV","XXV","XXVI","XXVII","XXVIII"};
+    /** _more_          */
+    private static String[] alphabet = {
+        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n",
+        "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
+    };
 
+    /** _more_          */
+    private static String[] roman = {
+        "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI",
+        "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XX", "XXI",
+        "XXII", "XXIII", "XXIV", "XXV", "XXVI", "XXVII", "XXVIII"
+    };
+
+    /**
+     * _more_
+     *
+     * @param i _more_
+     *
+     * @return _more_
+     */
     public String getLetter(int i) {
-        if(i>=0 && i<alphabet.length) 
+        if ((i >= 0) && (i < alphabet.length)) {
             return alphabet[i];
+        }
         //A hack for now
         return "out of range";
 
     }
 
+    /**
+     * _more_
+     *
+     * @param i _more_
+     *
+     * @return _more_
+     */
     public String getRoman(int i) {
-        if(i>=0 && i<roman.length) 
+        if ((i >= 0) && (i < roman.length)) {
             return roman[i];
+        }
         //A hack for now
         return "out of range";
     }
