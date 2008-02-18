@@ -570,6 +570,7 @@ public class TypeHandler extends RepositoryManager {
      */
     protected Link getEntryDownloadLink(Request request, Entry entry)
             throws Exception {
+
         if ( !getAccessManager().canDownload(request, entry)) {
             return null;
         }
@@ -614,16 +615,14 @@ public class TypeHandler extends RepositoryManager {
                 getRepository().getOutputHandler(request);
             String nextPrev = outputHandler.getNextPrevLink(request, entry,
                                   output);
-            sb.append(HtmlUtil.formEntry("",
-                                         getRepository().getEntryLinks(request, entry)
-                                         + HtmlUtil.space(2) + nextPrev));
+            sb.append(HtmlUtil.formEntry("", nextPrev));
             sb.append(HtmlUtil.formEntry("Name:", entry.getName()));
 
 
             String[] crumbs = getRepository().getBreadCrumbs(request,
                                                              getRepository().findGroup(entry.getParentGroupId()), 
                                                              true, "");
-            sb.append(HtmlUtil.formEntry("Group:", crumbs[1]));
+            //            sb.append(HtmlUtil.formEntry("Group:", crumbs[1]));
 
             String desc = entry.getDescription();
             if ((desc != null) && (desc.length() > 0)) {
@@ -632,7 +631,7 @@ public class TypeHandler extends RepositoryManager {
             sb.append(
                 HtmlUtil.formEntry(
                     "Created by:",
-                    entry.getUser().getName() + " @ "
+                    entry.getUser().getLabel() + " @ "
                     + getRepository().fmt(entry.getCreateDate())));
 
             String resourceLink = entry.getResource().getPath();

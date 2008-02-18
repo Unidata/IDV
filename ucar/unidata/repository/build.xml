@@ -51,7 +51,7 @@
               <attribute name="Implementation-Version" value="1.0"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.repository.MetaDataServer"/>
-              <attribute name="Class-Path" value="repositorylib.jar"/>
+              <attribute name="Class-Path" value="repositorylib.jar idv.jar auxdata.jar local-visad.jar visad.jar jython.jar external.jar nc2.2.jar"/>
             </manifest> 
 
             <include name="ucar/**/*.class"/>

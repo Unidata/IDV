@@ -154,6 +154,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     //    public RequestUrl URL_GROUP_SHOW = new RequestUrl(this, "/group/show");
 
     public RequestUrl URL_GROUP_SHOW =URL_ENTRY_SHOW;
+
     /** _more_ */
     public RequestUrl URL_ENTRY_DELETE = new RequestUrl(this,
                                              "/entry/delete", "Delete");
@@ -1102,24 +1103,29 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected void initOutputHandlers() throws Exception {
         for (String file : outputDefFiles) {
-            try {
-                Element root  = XmlUtil.getRoot(file, getClass());
-                List children = XmlUtil.findChildren(root, TAG_OUTPUTHANDLER);
-                for (int i = 0; i < children.size(); i++) {
-                    Element node = (Element) children.get(i);
+            Element root  = XmlUtil.getRoot(file, getClass());
+            List children = XmlUtil.findChildren(root, TAG_OUTPUTHANDLER);
+            for (int i = 0; i < children.size(); i++) {
+                Element node = (Element) children.get(i);
+                boolean required = XmlUtil.getAttribute(node, ARG_REQUIRED,true);
+                try {
                     Class c = Misc.findClass(XmlUtil.getAttribute(node,
-                                  ATTR_CLASS));
+                                                                  ATTR_CLASS));
                     Constructor ctor = Misc.findConstructor(c,
-                                           new Class[] { Repository.class,
-                            Element.class });
+                                                            new Class[] { Repository.class,
+                                                                          Element.class });
                     addOutputHandler(
-                        (OutputHandler) ctor.newInstance(new Object[] { this,
-                            node }));
+                                     (OutputHandler) ctor.newInstance(new Object[] { this,
+                                                                                     node }));
+                } catch (Exception exc) {
+                    if(!required) {
+                        System.err.println("Couldn't load optional output handler:" + XmlUtil.toString(node));
+                    } else {
+                        System.err.println("Error loading output handler file:"
+                                           + file);
+                        throw exc;
+                    }
                 }
-            } catch (Exception exc) {
-                System.err.println("Error loading output handler file:"
-                                   + file);
-                throw exc;
             }
 
         }
@@ -1577,7 +1583,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected List getOutputTypesFor(Request request, String what)
+    public List getOutputTypesFor(Request request, String what)
             throws Exception {
         List types = new ArrayList();
         for (OutputHandler outputHandler : outputHandlers) {
@@ -1599,7 +1605,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected List getOutputTypesForGroup(Request request, Group group,
+    public List getOutputTypesForGroup(Request request, Group group,
                                           List<Group> subGroups,
                                           List<Entry> entries)
             throws Exception {
@@ -1633,7 +1639,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected List getOutputTypesForEntries(Request request,
+    public List getOutputTypesForEntries(Request request,
                                             List<Entry> entries)
             throws Exception {
         List list = new ArrayList();
@@ -1645,7 +1651,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-    protected List getOutputTypesForEntry(Request request,
+    public List getOutputTypesForEntry(Request request,
                                           Entry entry)
             throws Exception {
         List list = new ArrayList();
@@ -3657,7 +3663,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected String[] getBreadCrumbs(Request request, Entry entry,
+    public String[] getBreadCrumbs(Request request, Entry entry,
                                       boolean makeLinkForLastGroup,
                                       String extraArgs)
             throws Exception {
@@ -3677,7 +3683,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected String[] getBreadCrumbs(Request request, Entry entry,
+    public String[] getBreadCrumbs(Request request, Entry entry,
                                       boolean makeLinkForLastGroup,
                                       String extraArgs, Group stopAt)
             throws Exception {
@@ -3724,8 +3730,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             breadcrumbs.add(HtmlUtil.bold(entry.getName()) + "&nbsp;"
                             + getEntryLinks(request, entry));
         }
-        String title = "Group: "
-                       + StringUtil.join("&nbsp;&gt;&nbsp;", titleList);
+        String title =  StringUtil.join("&nbsp;&gt;&nbsp;", titleList);
         return new String[] { title,
                               StringUtil.join("&nbsp;&gt;&nbsp;",
                               breadcrumbs) };

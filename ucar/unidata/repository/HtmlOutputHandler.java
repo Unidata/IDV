@@ -182,7 +182,11 @@ public class HtmlOutputHandler extends OutputHandler {
      */
     public Result outputEntry(Request request, Entry entry) throws Exception {
         TypeHandler  typeHandler = getRepository().getTypeHandler(entry.getType());
-        StringBuffer sb = typeHandler.getEntryContent(entry, request, true);
+        String[] crumbs = getRepository().getBreadCrumbs(request, entry,
+                                                         false,"");
+        StringBuffer sb = new StringBuffer();
+        sb.append(crumbs[1]);
+        sb.append(typeHandler.getEntryContent(entry, request, true));
         getMetadataHtml(request, entry, sb);
 
         Result result = new Result("Entry: " + entry.getName(), sb,

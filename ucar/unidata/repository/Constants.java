@@ -194,6 +194,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_CATALOG = "catalog";
 
+    public static final String ARG_REQUIRED = "required";
+
     /** _more_ */
     public static final String ARG_COMMENT = "comment";
 

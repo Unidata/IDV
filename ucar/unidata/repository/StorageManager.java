@@ -305,6 +305,8 @@ public class StorageManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public boolean isInDownloadArea(String filePath) throws Exception {
+        //Force the creation of the storage dir
+        getStorageDir();
         filePath = filePath.replace("\\", "/");
         for (String prefix : downloadPrefixes) {
             if (filePath.startsWith(prefix)) {

@@ -1,8 +1,7 @@
 
 
-
-
-Including geoloc package:
+--------------------------------------------------------------------------------
+Including geoloc package
 Since the repository does not include the nc2.2.jar we need to have the geoloc package imported into the
 idv tree. From idv/trunk/ucar do the following:
 
@@ -10,9 +9,8 @@ svn propset svn:externals "geoloc svn://zero/common/java/trunk/src/main/java/uca
 
 
 
-
-
-
+--------------------------------------------------------------------------------
+Repository jar files
 The repository consists of 2 jar files:
 repositorylib.jar
 repository.jar
@@ -40,6 +38,17 @@ If you have the repositorylib.jar file and the source tree  in your class path a
 files in your source tree just do:
 
 java    ucar.unidata.repository.MetaDataServer
+
+
+
+--------------------------------------------------------------------------------
+Using the IdvOutputHandler
+There is an optional output handler that can generate preview images. To use this simply build the idv.jar and place it in the same directory as the repository.jar. You will also need from the lib directory:
+auxdata.jar local-visad.jar visad.jar jython.jar external.jar nc2.2.jar
+
+
+
+
 
 
 
