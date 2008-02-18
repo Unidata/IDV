@@ -226,7 +226,7 @@ argument -Dfoo=bar) -->
             <param name="jarfile" value="idv"/> 
             <param 
                 name="excludes"
-                value="ucar/unidata/apps/**,ucar/unidata/idv/resources/unidata/**,ucar/nc2/**,ucar/ma2/**,ucar/util/prefs/**,ucar/unidata/idv/release/**,ucar/unidata/io/**,ucar/unidata/geolo/**"
+                value="ucar/unidata/apps/**,ucar/unidata/idv/resources/unidata/**,ucar/nc2/**,ucar/ma2/**,ucar/util/prefs/**,ucar/unidata/idv/release/**,ucar/unidata/io/**,ucar/unidata/geoloc/**"
 
             /> 
         </antcall>
@@ -481,6 +481,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <excludepackage name="ucar/units"/>
             <excludepackage name="ucar.unidata.io"/>
             <excludepackage name="ucar.netcdf"/>
+            <excludepackage name="ucar/unidata/geoloc"/>
             <excludepackage name="ucar/unidata/idv/test"/>
             <excludepackage name="ucar/unidata/view/windprofile"/>
             <excludepackage name="ucar/unidata/view/sounding/test"/>
@@ -501,7 +502,6 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <package name="ucar.netcdf"/>
             <package name="ucar.unidata.beans"/>
             <package name="ucar.unidata.data.*"/>
-            <package name="ucar.unidata.geoloc.*"/>
             <package name="ucar.unidata.io"/>
             <package name="ucar.unidata.gis.*"/>
             <package name="ucar.unidata.idv.*"/>
@@ -621,6 +621,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <exclude name="ucar/unidata/apps/trex/**"/>
             <exclude name="ucar/unidata/gridviewer/**/*.*"/>
             <exclude name="ucar/unidata/grid/**"/>
+            <exclude name="ucar/unidata/geoloc/**"/>
             <exclude name="ucar/unidata/idv/release/**"/>
             <exclude name="ucar/unidata/view/sounding/test/**"/>
 
