@@ -3444,13 +3444,13 @@ public String getLegendState () {
             master.addDisplayable(displayInfo.getDisplayable());
         }
 
-        /*XXXX
+
         fillLegends();
         updateTimelines(true);
         if ( !getStateManager().isLoadingXml()) {
             toFront();
         }
-        */
+
 
         return true;
     }
