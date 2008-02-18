@@ -19,28 +19,30 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.idv.repository;
 
-import ucar.unidata.repository.*;
+package ucar.unidata.idv.repository;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.data.SqlUtil;
 
 
 
 import ucar.unidata.idv.IntegratedDataViewer;
 
-import ucar.unidata.util.CacheManager;
-import ucar.unidata.data.SqlUtil;
+import ucar.unidata.repository.*;
 import ucar.unidata.ui.ImageUtils;
+
+import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.Trace;
 
 import ucar.unidata.util.StringBufferCollection;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
@@ -89,22 +91,37 @@ public class IdvOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String OUTPUT_IDV = "idv.idv";
 
+    /** _more_          */
     IntegratedDataViewer idv;
 
+    /** _more_          */
+    int callCnt = 0;
 
-    public static final Object MUTEX = new Object();
 
-/**
-     * _more_
-     *
-     * @param repository _more_
-     * @param element _more_
-     * @throws Exception _more_
+    /** _more_          */
+    public static final Object IDV_MUTEX = new Object();
+
+    /**
+     *     _more_
+     *    
+     *     @param repository _more_
+     *     @param element _more_
+     *     @throws Exception _more_
      */
     public IdvOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
-        idv = new IntegratedDataViewer(false);
+        try {
+            java.awt.GraphicsEnvironment e =
+                java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment();
+            e.getDefaultScreenDevice();
+        } catch (Throwable exc) {
+            System.err.println(
+                "To run the IdvOutputHandler a graphics environment is needed");
+            throw new IllegalStateException(
+                "To run the IdvOutputHandler a graphics environment is needed");
+        }
+
     }
 
     /**
@@ -120,65 +137,99 @@ public class IdvOutputHandler extends OutputHandler {
     }
 
 
-    protected void getOutputTypesForEntry(Request request,
-                                          Entry entry, List types)
-        throws Exception         {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param types _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void getOutputTypesForEntry(Request request, Entry entry,
+                                          List types)
+            throws Exception {
         String type = entry.getTypeHandler().getType();
-        if(type.equals("level3radar") || type.equals("level2radar")) {
-            types.add(new TwoFacedObject("Preview Image", OUTPUT_IDV));        
+        if (type.equals("level3radar") || type.equals("level2radar")) {
+            types.add(new TwoFacedObject("Preview Image", OUTPUT_IDV));
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result outputEntry(Request request, Entry entry) throws Exception {
-        if(!request.exists("doimage")) {
+        if ( !request.exists("doimage")) {
             StringBuffer sb = new StringBuffer();
-            String url =    HtmlUtil.url(getRepository().URL_ENTRY_SHOW+"/preview.png", ARG_ID,
-                                         entry.getId(),ARG_OUTPUT, OUTPUT_IDV,"doimage","true");
-            
-            request.put(ARG_OUTPUT,OutputHandler.OUTPUT_HTML);
+            String url = HtmlUtil.url(getRepository().URL_ENTRY_SHOW
+                                      + "/preview.png", ARG_ID,
+                                          entry.getId(), ARG_OUTPUT,
+                                          OUTPUT_IDV, "doimage", "true");
+
+            request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
             String[] crumbs = getRepository().getBreadCrumbs(request, entry,
-                                                             false,"");
-            
-            String      title = crumbs[0];
+                                  false, "");
+
+            String title = crumbs[0];
             sb.append(crumbs[1]);
             sb.append("&nbsp;<p>");
             sb.append(HtmlUtil.img(url));
-            Result result =  new Result("Preview - " + title,sb);
+            Result result = new Result("Preview - " + title, sb);
             result.putProperty(
-                               PROP_NAVSUBLINKS,
-                               getHeader(
-                                         request, OUTPUT_IDV,
-                                         getRepository().getOutputTypesForEntry(request, entry)));
+                PROP_NAVSUBLINKS,
+                getHeader(
+                    request, OUTPUT_IDV,
+                    getRepository().getOutputTypesForEntry(request, entry)));
             return result;
         }
 
-        String type = entry.getTypeHandler().getType();
+        String type     = entry.getTypeHandler().getType();
         String thumbDir = getStorageManager().getThumbDir();
         File image = new File(IOUtil.joinDir(thumbDir,
-                                      "preview_" + entry.getId() + ".png"));
-        if(image.exists()) {
-            //            return new Result("preview.png", new FileInputStream(image), "image/png");
+                                             "preview_" + entry.getId()
+                                             + ".png"));
+        if (image.exists()) {
+            return new Result("preview.png", new FileInputStream(image),
+                              "image/png");
         }
-        
+
 
         StringBuffer isl = new StringBuffer();
         //        isl.append("<isl debug=\"false\" loop=\"1\" offscreen=\"false\">\n");
         isl.append("<isl debug=\"false\" loop=\"1\" offscreen=\"true\">\n");
         String datasource;
         datasource = "FILE.RADAR";
-        isl.append("<datasource type=\"" + datasource +"\" url=\"" + entry.getResource().getPath() +"\">\n");
-        isl.append("<display type=\"planviewcolor\" param=\"#0\"><property name=\"id\" value=\"thedisplay\"/></display>\n");
+        isl.append("<datasource type=\"" + datasource + "\" url=\""
+                   + entry.getResource().getPath() + "\">\n");
+        isl.append(
+            "<display type=\"planviewcolor\" param=\"#0\"><property name=\"id\" value=\"thedisplay\"/></display>\n");
         isl.append("</datasource>\n");
         //        isl.append("<center display=\"thedisplay\" useprojection=\"true\"/>\n");
         //        isl.append("<display type=\"rangerings\" wait=\"false\"/>\n");
         isl.append("<pause/>\n");
         //        isl.append("<pause seconds=\"60\"/>\n");
-        isl.append("<image file=\"" + image+"\"/>\n");
+        isl.append("<image file=\"" + image + "\"/>\n");
         isl.append("</isl>\n");
 
         //        System.err.println(isl);
-        synchronized(MUTEX) {
+        //For now just have one
+        synchronized (IDV_MUTEX) {
+            if (callCnt++ > 100) {
+                idv     = null;
+                callCnt = 0;
+            }
+            if (idv == null) {
+                idv = new IntegratedDataViewer(false);
+            }
+            /*
             Trace.addNot(".*Shadow.*");
             Trace.addNot(".*Azimuth.*");
             Trace.addNot(".*Set\\(.*");
@@ -186,15 +237,16 @@ public class IdvOutputHandler extends OutputHandler {
             Trace.addNot(".*Display_List.*");
             Trace.addNot(".*MapProjection.*");
             Trace.startTrace();
-            Trace.call1("Make image");
+            Trace.call1("Make image");*/
             idv.getImageGenerator().processScriptFile("xml:" + isl);
-            Trace.call2("Make image");
+            //            Trace.call2("Make image");
             idv.cleanup();
-            ucar.unidata.util.Trace.stopTrace();
+            //            ucar.unidata.util.Trace.stopTrace();
         }
-        return new Result("preview.png", new FileInputStream(image), "image/png");
+        return new Result("preview.png", new FileInputStream(image),
+                          "image/png");
     }
-    
+
 
 }
 
