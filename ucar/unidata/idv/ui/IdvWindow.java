@@ -717,7 +717,7 @@ public class IdvWindow extends MultiFrame {
      * @return List of IdvWindow objects
      */
     public static List getWindows() {
-        return allWindows;
+        return new ArrayList(allWindows);
     }
 
 

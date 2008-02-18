@@ -640,7 +640,12 @@ public class ImageGenerator extends IdvManager {
         try {
             InputStream is = null;
             try {
-                is = IOUtil.getInputStream(islFile, getClass());
+                if(islFile.startsWith("xml:")) {
+                    String xml = islFile.substring(4);
+                    is = new ByteArrayInputStream(xml.getBytes());
+                } else {
+                    is = IOUtil.getInputStream(islFile, getClass());
+                }
             } catch (FileNotFoundException fnfe) {}
             catch (IOException ioe) {}
             if (is == null) {
@@ -1970,6 +1975,9 @@ public class ImageGenerator extends IdvManager {
                     (getIdv().getArgsManager().getIsOffScreen()
                      ? "1"
                      : "0"));
+
+        //        System.err.println("setting offScreen " +         getIdv().getArgsManager().getIsOffScreen());
+
         return processTagGroup(node);
     }
 
@@ -2243,8 +2251,10 @@ public class ImageGenerator extends IdvManager {
         } else if (XmlUtil.hasAttribute(node, ATTR_HOURS)) {
             Misc.sleep((long) (60 * 60 * 1000 * toDouble(node, ATTR_HOURS)));
         } else {
+            debug("Pause before");
             getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
                 getIdv().getIdvUIManager());
+            debug("Pause after");
         }
         return true;
 
@@ -2284,7 +2294,7 @@ public class ImageGenerator extends IdvManager {
         String     type       = applyMacros(node, ATTR_TYPE, (String) null);
         String     param      = applyMacros(node, ATTR_PARAM, (String) null);
         DataChoice dataChoice = null;
-
+        debug("Creating display: " + type + " param:" + param);
 
         if ((dataSource == null)
                 && XmlUtil.hasAttribute(node, ATTR_DATASOURCE)) {

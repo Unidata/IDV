@@ -3727,9 +3727,16 @@ public class IdvUIManager extends IdvManager {
                 }
             }
         }
-
-
     }
+
+    public void disposeAllWindows() {
+        List allWindows = IdvWindow.getWindows();
+        for (int windowIdx = 0; windowIdx < allWindows.size(); windowIdx++) {
+            IdvWindow window         = (IdvWindow) allWindows.get(windowIdx);
+            window.dispose();
+        }
+    }
+
 
     /**
      * Get the window title from the skin

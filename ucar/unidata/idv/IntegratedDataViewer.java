@@ -203,6 +203,8 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
     private boolean interactiveMode = true;
 
 
+
+
     /**
      * Parameterless constructor. Not sure if this is needed.
      * Perhaps it is needed for the XmlEncoder encoding?
@@ -1157,7 +1159,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         if (viewManager != null) {
             return viewManager;
         }
-        if ( !getIdv().okToShowWindows() && !newWindow) {
+        if (getArgsManager().getIsOffScreen() || (!getIdv().okToShowWindows() && !newWindow)) {
             return getVMManager().createViewManager(viewDescriptor,
                     properties);
         }
@@ -2751,10 +2753,12 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         getStore().cleanupTmpFiles();
         getPluginManager().closeResources();
         getJythonManager().applicationClosing();
-
-        exit(0);
+        if (interactiveMode) {
+            exit(0);
+        }
         return true;
     }
+
 
 
     /**
@@ -2864,9 +2868,27 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      */
     public static void processScript(String scriptFile) throws Exception {
         IntegratedDataViewer idv = new IntegratedDataViewer(false);
-        idv.getImageGenerator().processScriptFile(scriptFile);
-        idv.getStore().cleanupTmpFiles();
-        CacheManager.clearCache();
+        try {
+            idv.getImageGenerator().processScriptFile(scriptFile);
+        }  finally {
+            try {
+                idv.getStore().cleanupTmpFiles();
+            } catch(Exception exc1) {}
+            try {
+                idv.removeAllDisplays();
+            } catch(Exception exc1) {}
+            try {
+                idv.removeAllDataSources();
+            } catch(Exception exc1) {}
+            try {
+                idv.getVMManager().removeAllViewManagers();
+            } catch(Exception exc1) {}
+            try {
+                idv.getIdvUIManager().disposeAllWindows();
+            } catch(Exception exc1) {}
+
+            CacheManager.clearCache();
+        }
     }
 
 
