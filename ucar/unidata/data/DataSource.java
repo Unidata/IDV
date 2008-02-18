@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data;
 
 
@@ -459,6 +460,18 @@ public interface DataSource {
      * @return can do geo subsetting
      */
     public boolean canDoGeoSelection();
+
+
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     *
+     * @return _more_
+     */
+    public List<DataSelectionComponent> getDataSelectionComponents(
+            DataChoice dataChoice);
+
 
     /**
      * set the properties

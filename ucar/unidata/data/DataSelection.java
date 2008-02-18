@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -27,6 +28,7 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 
@@ -70,6 +72,9 @@ public class DataSelection {
     /** The subset */
     private GeoSelection geoSelection;
 
+    /** _more_          */
+    private Hashtable properties = new Hashtable();
+
     /**
      * Construct a <code>DataSelection</code>.
      */
@@ -78,9 +83,15 @@ public class DataSelection {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param fromLevel _more_
+     * @param toLevel _more_
+     */
     public DataSelection(Object fromLevel, Object toLevel) {
-        this.fromLevel= fromLevel;
-        this.toLevel= toLevel;
+        this.fromLevel = fromLevel;
+        this.toLevel   = toLevel;
     }
 
 
@@ -155,14 +166,15 @@ public class DataSelection {
      * @param that  other DataSelection
      */
     public DataSelection(DataSelection that) {
-        if(that!=null) {
+        if (that != null) {
             this.times     = Misc.cloneList(that.times);
             this.timesMode = that.timesMode;
             if (that.geoSelection != null) {
                 this.geoSelection = new GeoSelection(that.geoSelection);
             }
-            this.fromLevel = that.fromLevel;
-            this.toLevel   = that.toLevel;
+            this.fromLevel  = that.fromLevel;
+            this.toLevel    = that.toLevel;
+            this.properties = (Hashtable) that.properties.clone();
         }
     }
 
@@ -199,6 +211,11 @@ public class DataSelection {
             return new DataSelection(lowerPriority);
         }
         DataSelection newSelection = new DataSelection();
+
+        Hashtable     props        = new Hashtable(lowerPriority.properties);
+        props.putAll(higherPriority.properties);
+        newSelection.setProperties(props);
+
 
         GeoSelection newGeoSelection =
             GeoSelection.merge(higherPriority.geoSelection,
@@ -429,6 +446,47 @@ public class DataSelection {
             geoSelection = new GeoSelection();
         }
         return geoSelection;
+    }
+
+
+    /**
+     * Set the Properties property.
+     *
+     * @param value The new value for Properties
+     */
+    public void setProperties(Hashtable value) {
+        properties = value;
+    }
+
+    /**
+     * Get the Properties property.
+     *
+     * @return The Properties
+     */
+    public Hashtable getProperties() {
+        return properties;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
+    public Object getProperty(Object key) {
+        return properties.get(key);
+    }
+
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param value _more_
+     */
+    public void putProperty(Object key, Object value) {
+        properties.put(key, value);
     }
 
 

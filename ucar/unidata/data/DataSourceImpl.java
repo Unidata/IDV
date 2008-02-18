@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.data;
 
 
@@ -746,6 +747,11 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         properties = p;
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     */
     public void removeProperty(String name) {
         if (properties != null) {
             properties.remove(name);
@@ -2009,6 +2015,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         //start up polling if we have not done so already.
         initPolling();
 
+        System.err.println("props:" + incomingDataSelection.getProperties());
 
         //Just call this in case it has not been called yet
         //because it can trigger a failure in some of
@@ -2425,8 +2432,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (prefix == null) {
             return null;
         }
-        Object loadId =
-            beginWritingDataToLocalDisk("Copying data");
+        Object loadId = beginWritingDataToLocalDisk("Copying data");
         try {
             List files = saveDataToLocalDisk(prefix, loadId, changeLinks);
             endWritingDataToLocalDisk(loadId);
@@ -2705,6 +2711,54 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         return true;
     }
 
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     *
+     * @return _more_
+     */
+    public List<DataSelectionComponent> getDataSelectionComponents(
+            DataChoice dataChoice) {
+        List<DataSelectionComponent> dataSelectionComponents =
+            new ArrayList<DataSelectionComponent>();
+        initDataSelectionComponents(dataSelectionComponents, dataChoice);
+        return dataSelectionComponents;
+    }
+
+    /**
+     * _more_
+     *
+     * @param components _more_
+     * @param dataChoice _more_
+     */
+    protected void initDataSelectionComponents(
+            List<DataSelectionComponent> components,
+            final DataChoice dataChoice) {
+        /** e.g.:
+        components.add(new DataSelectionComponent("test 1") {
+            protected JComponent doMakeContents() {
+                return new JLabel("component 1 choice:" + dataChoice);
+            }
+            public void applyToDataSelection(DataSelection dataSelection) {
+                dataSelection.putProperty("TEST1", "component 1 value");
+            }
+        });
+
+        components.add(new DataSelectionComponent("test 2") {
+            protected JComponent doMakeContents() {
+                return new JLabel("component 2");
+            }
+            public void applyToDataSelection(DataSelection dataSelection) {
+                dataSelection.putProperty("TEST2", "component 2 value");
+            }
+        });
+        **/
+    }
 
 
     /**
