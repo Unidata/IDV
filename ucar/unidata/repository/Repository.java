@@ -4837,7 +4837,6 @@ public class Repository implements Constants, Tables, RequestHandler,
         
         if(metadataArgs.size()>1) {
             List<Entry> okEntries = new ArrayList<Entry>();            
-            //            System.err.println ("Need to check for and:" + metadataArgs);
             for(Entry entry: allEntries) {
                 boolean entryOk = true;
                 List<Metadata> metadataList = getMetadataManager().getMetadata(entry);

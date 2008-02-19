@@ -953,13 +953,15 @@ public class TypeHandler extends RepositoryManager {
                 tmp.add(0, anyTfo);
             }
             String typeSelect = HtmlUtil.select(ARG_TYPE, tmp);
+            String groupCbx= HtmlUtil.checkbox(ARG_TYPE_INCLUDE_GROUP,"true",false) +" include groups";
             formBuffer.append(
                 HtmlUtil.formEntry(
                     "Type:",
                     typeSelect + " "
                     + HtmlUtil.submitImage(
                         getRepository().fileUrl(ICON_SEARCH),
-                        "submit_type", "Show search form with this type")));
+                        "submit_type", "Show search form with this type") + HtmlUtil.space(1) +
+                    groupCbx));
         } else if (typeHandlers.size() == 1) {
             formBuffer.append(HtmlUtil.hidden(ARG_TYPE,
                     typeHandlers.get(0).getType()));
@@ -1148,6 +1150,10 @@ public class TypeHandler extends RepositoryManager {
 
         if (request.defined(ARG_RESOURCE)) {
             addOr(COL_ENTRIES_RESOURCE, request.getString(ARG_RESOURCE,""), where, true);
+        }
+
+        if (request.defined(ARG_USER)) {
+            addOr(COL_ENTRIES_USER_ID, request.getString(ARG_USER,""), where, true);
         }
 
         if (request.defined(ARG_GROUP)) {

@@ -87,11 +87,15 @@ public class CatalogHarvester extends Harvester {
     /** _more_ */
     int catalogCnt = 0;
 
+    int entryCnt = 0;
+
     /** _more_ */
     User user;
 
     /** _more_ */
     String topUrl;
+
+    List<Entry> entries = new ArrayList<Entry>();
 
     /**
      * _more_
@@ -121,6 +125,8 @@ public class CatalogHarvester extends Harvester {
     protected void runInner() throws Exception {
         groups = new ArrayList();
         importCatalog(topUrl, topGroup);
+        repository.processEntries(this, null, entries);
+        entries = new ArrayList<Entry>();
     }
 
 
@@ -187,8 +193,6 @@ public class CatalogHarvester extends Harvester {
         }
 
 
-
-
         NodeList elements = XmlUtil.getElements(node);
         String urlPath = XmlUtil.getAttribute(node,
                              CatalogOutputHandler.ATTR_URLPATH,
@@ -222,6 +226,7 @@ public class CatalogHarvester extends Harvester {
 
             TypeHandler typeHandler =
                 repository.getTypeHandler(TypeHandler.TYPE_FILE);
+            entryCnt++;
             Entry  entry      = typeHandler.createEntry(repository.getGUID());
             Date   createDate = new Date();
             String ext        = IOUtil.getFileExtension(urlPath);
@@ -235,10 +240,12 @@ public class CatalogHarvester extends Harvester {
                        new Resource(urlPath, Resource.TYPE_URL),
                        createDate.getTime(), createDate.getTime(),
                        createDate.getTime(), null);
-            List<Entry> entries = new ArrayList<Entry>();
             entries.add(entry);
             typeHandler.initializeNewEntry(entry);
-            repository.processEntries(this, typeHandler, entries);
+            if(entries.size()>1000) {
+                repository.processEntries(this, null, entries);
+                entries = new ArrayList<Entry>();
+            }
             return;
         }
 
@@ -318,6 +325,7 @@ public class CatalogHarvester extends Harvester {
         StringBuffer sb = new StringBuffer();
         sb.append("Catalog: " + topUrl + "<br>");
         sb.append("Loaded " + catalogCnt + " catalogs<br>");
+        sb.append("Created " + entryCnt + " entries<br>");
         sb.append("Created " + groups.size() + " groups<ul>");
         for (int i = 0; i < groups.size(); i++) {
             String groupLine = (String) groups.get(i);

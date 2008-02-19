@@ -183,6 +183,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    public static final String ARG_TYPE_INCLUDE_GROUP = "includegroup";
+
 
 
     /** _more_ */

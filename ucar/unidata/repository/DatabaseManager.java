@@ -219,7 +219,7 @@ public class DatabaseManager extends RepositoryManager {
                 PROP_DB_DRIVER.replace("${db}", db)));
 
 
-        getRepository().log("making connection:" + connectionURL);
+        //        getRepository().log("making connection:" + connectionURL);
         Connection connection;
         if (userName != null) {
             connection = DriverManager.getConnection(connectionURL, userName,
