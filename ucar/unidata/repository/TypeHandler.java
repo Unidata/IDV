@@ -840,9 +840,9 @@ public class TypeHandler extends RepositoryManager {
             String type = (String) request.getType("").trim();
             if(type.equals(TYPE_ANY)) type = "";
             
-            if(request.get(ARG_TYPE_INCLUDE_GROUP,false)) {
+            if(request.get(ARG_TYPE_EXCLUDE_GROUP,false)) {
                 if(type.length()>0) type = type+",";
-                type = type+"group";
+                type = type+"!group";
             }
             if (type.length() > 0) {
                 if (whereList.toString().indexOf(COL_ENTRIES_TYPE) < 0) {
@@ -959,7 +959,7 @@ public class TypeHandler extends RepositoryManager {
                 tmp.add(0, anyTfo);
             }
             String typeSelect = HtmlUtil.select(ARG_TYPE, tmp);
-            String groupCbx= HtmlUtil.checkbox(ARG_TYPE_INCLUDE_GROUP,"true",false) +" include groups";
+            String groupCbx= HtmlUtil.checkbox(ARG_TYPE_EXCLUDE_GROUP,"true",false) +HtmlUtil.space(1) +"Exclude groups";
             formBuffer.append(
                 HtmlUtil.formEntry(
                     "Type:",
@@ -1096,7 +1096,7 @@ public class TypeHandler extends RepositoryManager {
                                       true)) + " Include non-geographic";
             String areaWidget = HtmlUtil.makeLatLonBox(ARG_AREA, "", "", "",
                                     "");
-            areaWidget = "<table>" + HtmlUtil.cols(areaWidget, nonGeo)
+            areaWidget = "<table>" + HtmlUtil.cols(areaWidget)
                          + "</table>";
             //            formBuffer.append(HtmlUtil.formEntry("Extent:", areaWidget+"\n"+HtmlUtil.img(getRepository().URL_GETMAP.toString(),"map"," name=\"map\"  xxxonmouseover = \"mouseMove()\"")));
             formBuffer.append(HtmlUtil.formEntry("Extent:", areaWidget));
