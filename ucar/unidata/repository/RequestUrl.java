@@ -66,6 +66,15 @@ public class RequestUrl {
         this.label = label;
     }
 
+    public String getFullUrl(String suffix) {
+        return repositorySource.getRepository().absoluteUrl(path) + suffix;
+    }
+
+
+    public String getFullUrl() {
+        return repositorySource.getRepository().absoluteUrl(path);
+    }
+
     /**
      * _more_
      *

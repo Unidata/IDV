@@ -120,6 +120,9 @@ public class MetadataHandler extends RepositoryManager {
     }
 
 
+    public void addMetadataToCatalog(Request request, Entry entry, Metadata metadata, Document doc, Element datasetNode)
+            throws Exception {
+    }
 
 
     /**

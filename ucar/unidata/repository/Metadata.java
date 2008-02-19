@@ -302,6 +302,10 @@ public class Metadata implements Constants, Tables {
             this.label  = label;
         }
 
+        public boolean isType(String type) {
+            return this.type.equals(type);
+        }
+
         public boolean equals(Object o) {
             if(!getClass().equals(o.getClass())) return false;
                Type that = (Type) o;

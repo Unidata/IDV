@@ -73,6 +73,10 @@ import java.util.regex.*;
  */
 public interface Constants {
 
+    /** _more_ */
+    public static final int MAX_ROWS = 100;
+
+
     public static final String ICON_CART = "/cart.gif";
 
     public static final String ICON_COMMENTS = "/comments.gif";

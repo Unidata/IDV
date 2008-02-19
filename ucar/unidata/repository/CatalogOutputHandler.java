@@ -79,6 +79,9 @@ import java.util.zip.*;
  */
 public class CatalogOutputHandler extends OutputHandler {
 
+    public static final String SERVICE_HTTP = "http";
+    public static final String SERVICE_SELF = "self";
+
     /** _more_ */
     public static final String CATALOG_ATTRS =
         " xmlns=\"http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" ";
@@ -142,6 +145,8 @@ public class CatalogOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final String TAG_SERVICENAME = "serviceName";
+
+    public static final String ATTR_SERVICENAME = "serviceName";
 
 
     /** _more_ */
@@ -316,6 +321,23 @@ public class CatalogOutputHandler extends OutputHandler {
     }
 
 
+    public void addMetadata(Request request, Entry entry,Document doc,  Element datasetNode)
+            throws Exception {
+        List<Metadata> metadataList = getMetadataManager().getMetadata(entry);
+        List<MetadataHandler> metadataHandlers =
+            repository.getMetadataManager().getMetadataHandlers();
+        for (Metadata metadata : metadataList) {
+            for (MetadataHandler metadataHandler : metadataHandlers) {
+                if (metadataHandler.canHandle(metadata)) {
+                    metadataHandler.addMetadataToCatalog(request, entry, metadata, doc, datasetNode);
+                    break;
+                }
+            }
+        }
+
+    }
+
+
     /**
      * _more_
      *
@@ -339,25 +361,90 @@ public class CatalogOutputHandler extends OutputHandler {
             ATTR_NAME,title});
 
 
-        Element service = XmlUtil.create(doc,TAG_SERVICE,root,new String[]{
+        /*        Element service = XmlUtil.create(doc,TAG_SERVICE,root,new String[]{
             ATTR_NAME,"all",
             ATTR_SERVICETYPE, "Compound",
-            ATTR_BASE,""});
+            ATTR_BASE,""});*/
 
-        Element self = XmlUtil.create(doc,TAG_SERVICE, service, new String[]{
-            ATTR_NAME,"self",
-            ATTR_SERVICETYPE, "HTTP",
+
+        Element httpService = XmlUtil.create(doc,TAG_SERVICE, root, new String[]{
+            ATTR_NAME,SERVICE_HTTP,
+            ATTR_SERVICETYPE, "http",
+            ATTR_BASE, getRepository().URL_ENTRY_GET.getFullUrl()});
+
+        Element selfService = XmlUtil.create(doc,TAG_SERVICE, root, new String[]{
+            ATTR_NAME,SERVICE_SELF,
+            ATTR_SERVICETYPE, "self",
             ATTR_BASE, ""});
 
         Element dataset = XmlUtil.create(doc,TAG_DATASET, root,new String[]{
             ATTR_NAME, title});
 
+        addMetadata(request, group, doc, dataset);
         toCatalogInner(request, subGroups,doc,dataset);
         toCatalogInner(request, entries,doc,dataset);
         StringBuffer sb    = new StringBuffer(XmlUtil.XML_HEADER);
         sb.append(XmlUtil.toString(root));
         return new Result(title, sb, "text/xml");
     }
+
+
+
+    /**
+     * _more_
+     *
+     *
+     * @param sb _more_
+     * @param entry _more_
+     * @param request _more_
+     *
+     */
+    public void outputEntry(Entry entry, Request request,Document doc, Element parent) throws Exception {
+        File f = entry.getResource().getFile();
+        Element dataset = XmlUtil.create(doc, CatalogOutputHandler.TAG_DATASET, parent, new String[]{
+            CatalogOutputHandler.ATTR_NAME, entry.getName()});
+
+        if(entry.getTypeHandler().canDownload(request, entry)) {
+            String urlPath = HtmlUtil.url("/"+entry.getName(), ARG_ID, entry.getId()); 
+            Element service = XmlUtil.create(doc, CatalogOutputHandler.TAG_ACCESS,dataset, new String[]{
+                CatalogOutputHandler.ATTR_SERVICENAME,
+                CatalogOutputHandler.SERVICE_HTTP,
+                CatalogOutputHandler.ATTR_URLPATH,
+                urlPath
+            });
+        }
+        if(entry.getResource().isUrl()) {
+            Element service = XmlUtil.create(doc, CatalogOutputHandler.TAG_ACCESS,dataset,new String[]{
+                CatalogOutputHandler.ATTR_SERVICENAME,
+                CatalogOutputHandler.SERVICE_SELF,
+                CatalogOutputHandler.ATTR_URLPATH,
+                entry.getResource().getPath()
+            });
+        }
+
+        addMetadata(request, entry, doc, dataset);
+
+        if (f.exists()) {
+            XmlUtil.create(doc,CatalogOutputHandler.TAG_DATASIZE, dataset,
+                           "" + f.length(),
+                           new String[]{CatalogOutputHandler.ATTR_UNITS, "bytes"});
+                                        
+        }
+
+        XmlUtil.create(doc,  CatalogOutputHandler.TAG_DATE, dataset,
+                       format(new Date(entry.getCreateDate())),
+                       new String[]{
+                           CatalogOutputHandler.ATTR_TYPE,
+                           "metadataCreated"});
+
+        Element timeCoverage = 
+            XmlUtil.create(doc,  CatalogOutputHandler.TAG_TIMECOVERAGE, dataset);
+        XmlUtil.create(doc,CatalogOutputHandler.TAG_START, timeCoverage,
+                       "" + format(new Date(entry.getStartDate())));
+        XmlUtil.create(doc,CatalogOutputHandler.TAG_END, timeCoverage,
+                       "" + format(new Date(entry.getEndDate())));
+    }
+
 
 
 
@@ -432,7 +519,7 @@ public class CatalogOutputHandler extends OutputHandler {
                     generate(request,  subGroup, doc, dataset);
                 } else if (child instanceof Entry) {
                     Entry entry = (Entry) child;
-                    entry.getTypeHandler().getDatasetTag(entry, request, doc, dataset);
+                    outputEntry(entry, request, doc, dataset);
                 }
             }
         }

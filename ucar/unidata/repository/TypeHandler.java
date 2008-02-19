@@ -250,57 +250,8 @@ public class TypeHandler extends RepositoryManager {
 
 
 
-    /**
-     * _more_
-     *
-     *
-     * @param sb _more_
-     * @param entry _more_
-     * @param request _more_
-     *
-     */
-    public void getDatasetTag(Entry entry, Request request,Document doc, Element parent) throws Exception {
-        File f = entry.getResource().getFile();
-        Element dataset = XmlUtil.create(doc, CatalogOutputHandler.TAG_DATASET, parent, new String[]{
-            ATTR_NAME, entry.getName(),
-            CatalogOutputHandler.ATTR_URLPATH,
-            entry.getResource().getPath()});
-
-        Element service = XmlUtil.create(doc,CatalogOutputHandler.TAG_SERVICENAME, dataset); 
-
-        if (f.exists()) {
-            XmlUtil.create(doc,CatalogOutputHandler.TAG_DATASIZE, dataset,
-                           "" + f.length(),
-                           new String[]{CatalogOutputHandler.ATTR_UNITS, "bytes"});
-                                        
-        }
-
-        XmlUtil.create(doc,  CatalogOutputHandler.TAG_DATE, dataset,
-                       format(new Date(entry.getCreateDate())),
-                       new String[]{
-                           CatalogOutputHandler.ATTR_TYPE,
-                           "metadataCreated"});
-
-        Element timeCoverage = 
-            XmlUtil.create(doc,  CatalogOutputHandler.TAG_TIMECOVERAGE, dataset);
-        XmlUtil.create(doc,CatalogOutputHandler.TAG_START, timeCoverage,
-                       "" + format(new Date(entry.getStartDate())));
-        XmlUtil.create(doc,CatalogOutputHandler.TAG_END, timeCoverage,
-                       "" + format(new Date(entry.getEndDate())));
-    }
 
 
-
-    /**
-     * _more_
-     *
-     * @param d _more_
-     *
-     * @return _more_
-     */
-    public String format(Date d) {
-        return d.toString();
-    }
 
     /**
      * _more_

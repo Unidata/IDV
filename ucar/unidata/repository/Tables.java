@@ -36,8 +36,7 @@ import ucar.unidata.data.SqlUtil;
 public interface Tables {
 
 
-    /** _more_ */
-    public static final int MAX_ROWS = 500;
+
     /*
       For each of the tables in the database we have the following defs.
       The TABLE_<TABLE NAME> ... is the name of the table.

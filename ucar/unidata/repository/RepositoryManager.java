@@ -125,6 +125,18 @@ public class RepositoryManager implements RepositorySource, Constants,
     /**
      * _more_
      *
+     * @param d _more_
+     *
+     * @return _more_
+     */
+    public String format(Date d) {
+        return d.toString();
+    }
+
+
+    /**
+     * _more_
+     *
      * @return _more_
      */
     public DatabaseManager getDatabaseManager() {

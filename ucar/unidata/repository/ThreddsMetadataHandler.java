@@ -74,7 +74,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
     /** _more_ */
-    public static final Metadata.Type TYPE_CREATOR = new Metadata.Type("creator");
+   public static final Metadata.Type TYPE_CREATOR = new Metadata.Type("creator");
 
     /** _more_ */
     public static final Metadata.Type TYPE_LINK = new Metadata.Type("link");
@@ -150,6 +150,51 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     }
 
 
+
+
+    public void addMetadataToCatalog(Request request, Entry entry, Metadata metadata, Document doc, Element datasetNode)
+            throws Exception {
+        Metadata.Type type    = getType(metadata.getType());
+        if (type.equals(TYPE_LINK)) {
+            XmlUtil.create(doc, TYPE_DOCUMENTATION.toString(), datasetNode,new String[]{
+                "xlink:href",  metadata.getAttr2(),
+                "xlink:title",  metadata.getAttr1()});
+        } else if (type.equals(TYPE_DOCUMENTATION)) {
+            XmlUtil.create(doc, TYPE_DOCUMENTATION.toString(), datasetNode,
+                               metadata.getAttr2(),
+                               new String[]{
+                                   ATTR_TYPE,  metadata.getAttr1()});  
+        } else if (type.equals(TYPE_PROPERTY)) {
+            XmlUtil.create(doc, TYPE_PROPERTY.toString(), datasetNode,
+                               new String[]{
+                                   ATTR_NAME, metadata.getAttr1(),
+                                   ATTR_VALUE, metadata.getAttr2()});  
+        } else if (type.equals(TYPE_KEYWORD)) {
+            XmlUtil.create(doc, TYPE_KEYWORD.toString(), datasetNode,
+                           metadata.getAttr1());                           
+        } else if (type.equals(TYPE_CONTRIBUTOR)) {
+            XmlUtil.create(doc, TYPE_DOCUMENTATION.toString(), datasetNode,
+                           metadata.getAttr1(),
+                           new String[]{
+                               ATTR_ROLE,  metadata.getAttr2()});
+        } else if (type.equals(TYPE_ICON)) {
+            XmlUtil.create(doc, TYPE_DOCUMENTATION.toString(), datasetNode,new String[]{
+                "xlink:href",  metadata.getAttr1(),
+                "xlink:title",  "icon"});
+        } else if (type.equals(TYPE_PUBLISHER) || type.equals(TYPE_CREATOR)) {
+            Element node =      XmlUtil.create(doc, type.toString(), datasetNode);
+            XmlUtil.create(doc,CatalogOutputHandler.TAG_NAME,node,metadata.getAttr1(), new String[]{
+                ATTR_ROLE,
+                metadata.getAttr2()
+            });
+            XmlUtil.create(doc,CatalogOutputHandler.TAG_CONTACT,node, new String[]{
+                ATTR_EMAIL,
+                metadata.getAttr3(),
+                ATTR_URL,
+                metadata.getAttr4()
+            });
+        }
+    }
 
 
     /**
