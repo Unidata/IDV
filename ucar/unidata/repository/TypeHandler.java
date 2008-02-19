@@ -838,7 +838,13 @@ public class TypeHandler extends RepositoryManager {
 
         if (didEntries) {
             String type = (String) request.getType("").trim();
-            if ((type.length() > 0) && !type.equals(TYPE_ANY)) {
+            if(type.equals(TYPE_ANY)) type = "";
+            
+            if(request.get(ARG_TYPE_INCLUDE_GROUP,false)) {
+                if(type.length()>0) type = type+",";
+                type = type+"group";
+            }
+            if (type.length() > 0) {
                 if (whereList.toString().indexOf(COL_ENTRIES_TYPE) < 0) {
                     addOr(COL_ENTRIES_TYPE, type, whereList, true);
                 }
