@@ -914,6 +914,32 @@ public class StringUtil {
     }
 
 
+    public static String stripAndReplace(String s, String pattern1, String pattern2, String replace) {
+        StringBuffer stripped = new StringBuffer();
+        while (s.length() > 0) {
+            int idx = s.indexOf(pattern1);
+            if (idx < 0) {
+                stripped.append(s);
+                break;
+            }
+            String text = s.substring(0, idx);
+            if (text.length() > 0) {
+                stripped.append(text);
+            }
+            s = s.substring(idx+1);
+
+            int idx2 = s.indexOf(pattern2);
+            if (idx2 < 0) {
+                break;
+            }
+            stripped.append(replace);
+            s = s.substring(idx2 + 1);
+        }
+        stripped.append(s);
+        return stripped.toString();
+    }
+
+
     /**
      *  Remove any whitespace (ie., Character.isWhitespace) from the input string.
      *
@@ -1975,6 +2001,22 @@ public class StringUtil {
      * @throws Exception some problem
      */
     public static void main(String[] args) throws Exception {
+        System.err.println("strip:" + stripAndReplace("'xxx'hello'xxx'how are 'xxx' you'xxx'","'","'","---"));
+        if(true) return;
+
+        String pattern = ".*[, =\\(]+metadata\\..*";
+        String where1 = " metadata.attr1='EART\nH SCIENCE >";
+        String where2 = " metadata.attr1='EARTH SCIENCE >";
+        where1 = where1.replace("\n", " ");
+
+        System.err.println("Match:" + where1.matches(pattern));
+        System.err.println("Match:" + where2.matches(pattern));
+
+
+        if(true) return;
+
+
+
         String key = "the key";
         for(int i=0;i<args.length;i++) {
             System.err.println(calculateRFC2104HMAC(args[i], args[i]));
