@@ -349,11 +349,15 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      */
     protected void checkSystem() {
         if ( !visad.util.Util.canDoJava3D(JAVA3D_VERSION)) {
-            LogUtil.userMessage(
-                "<html>This application needs Java 3D " + JAVA3D_VERSION
-                + " or higher to run.<br>Please see the User's Guide for more information.</html>");
-            bailOut();
-            return;
+            if (interactiveMode) {
+                LogUtil.userMessage(
+                                    "<html>This application needs Java 3D " + JAVA3D_VERSION
+                                    + " or higher to run.<br>Please see the User's Guide for more information.</html>");
+                bailOut();
+            } else {
+                throw new IllegalArgumentException("This application needs Java 3D " + JAVA3D_VERSION
+                                    + " or higher to run.<br>Please see the User's Guide for more information.");
+            }
         }
     }
 
