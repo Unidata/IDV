@@ -557,8 +557,10 @@ public class DataSelectionWidget {
             }
         }
 
-        for (DataSelectionComponent comp : dataSelectionComponents) {
-            comp.applyToDataSelection(dataSelection);
+        if (dataSelectionComponents != null) {
+            for (DataSelectionComponent comp : dataSelectionComponents) {
+                comp.applyToDataSelection(dataSelection);
+            }
         }
 
         return dataSelection;
