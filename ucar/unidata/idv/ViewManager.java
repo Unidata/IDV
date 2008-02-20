@@ -4540,7 +4540,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
             imagePanel = new ImagePanel();
         }
         imagePanel.setFiles(images);
-        imagePanel.setSelectedFile(animation.getCurrent());
+        if(animation!=null) {
+            imagePanel.setSelectedFile(animation.getCurrent());
+        }
         if (andShow) {
             useImages();
         }
