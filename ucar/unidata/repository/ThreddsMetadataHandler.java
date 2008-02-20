@@ -242,18 +242,16 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
 
+
+
     public void addToSearchForm(Request request, StringBuffer sb, Metadata.Type type, boolean makeSelect)
             throws Exception {
         if(makeSelect) {
-            Statement stmt = getDatabaseManager().execute(
-                                                          SqlUtil.makeSelect(SqlUtil.distinct(COL_METADATA_ATTR1), TABLE_METADATA,
-                                                                             SqlUtil.eq(COL_METADATA_TYPE,SqlUtil.quote(type.getType()))));
-            String[] values = SqlUtil.readString(stmt, 1);
-            if(values.length==0) return;
+            String[]values = getMetadataManager().getDistinctValues(request, this, type);
+            if(values == null || values.length==0) return;
             List l = Misc.toList(values);
             l.add(0, new TwoFacedObject("None",""));
             sb.append(HtmlUtil.formEntry(type.getLabel()+":",   HtmlUtil.select(ARG_METADATA_TYPE+"."+type, l, "",100)));
-
         } else {
             sb.append(HtmlUtil.formEntry(type.getLabel()+":",   HtmlUtil.input(ARG_METADATA_TYPE+"."+type, "")));
         }
@@ -427,6 +425,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                 vocabulary, email, url);
         } else if (isTag(tag,TYPE_KEYWORD)) {
             String text = XmlUtil.getChildText(child).trim();
+            //Some of the catalogs have new lines in the keyword
+            text = text.replace("\r\n"," ");
+            text = text.replace("\n"," ");
             return new Metadata(getRepository().getGUID(), "", TYPE_KEYWORD, text,
                                 XmlUtil.getAttribute(child, ATTR_VOCABULARY,
                                     ""), "", "");

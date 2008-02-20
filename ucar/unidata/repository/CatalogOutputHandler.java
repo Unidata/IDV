@@ -81,6 +81,7 @@ public class CatalogOutputHandler extends OutputHandler {
 
     public static final String SERVICE_HTTP = "http";
     public static final String SERVICE_SELF = "self";
+    public static final String SERVICE_OPENDAP = "opendap";
 
     /** _more_ */
     public static final String CATALOG_ATTRS =
@@ -163,6 +164,9 @@ public class CatalogOutputHandler extends OutputHandler {
 
 
 
+    private List<String> tdsPrefixes;
+    private List<String> tdsNotPrefixes;
+
 
     /**
      * _more_
@@ -194,8 +198,39 @@ public class CatalogOutputHandler extends OutputHandler {
         if(request.exists(ARG_PATHS)) {
             List tmp = StringUtil.split(request.getString(ARG_PATHS,""),"\n",true, true);
             getRepository().writeGlobal(ARG_PATHS, StringUtil.join("\n",tmp));
+            tdsPrefixes = null;
+            tdsNotPrefixes = null;
         }
     }
+
+    public List<String> getTdsPrefixes() {
+        if(tdsPrefixes == null) {
+            String props = getRepository().getProperty(ARG_PATHS,"");
+            List tokens = StringUtil.split(props,"\n",true,true);
+            List<String> tmp = new ArrayList<String>();
+            for(int i=0;i<tokens.size();i++) {
+                String prefix = (String)tokens.get(i);
+                if(!prefix.startsWith("!")) tmp.add(prefix);
+            }
+            tdsPrefixes = tmp;
+        }
+        return tdsPrefixes;
+    }
+
+    public List<String> getTdsNotPrefixes() {
+        if(tdsNotPrefixes == null) {
+            String props = getRepository().getProperty(ARG_PATHS,"");
+            List tokens = StringUtil.split(props,"\n",true,true);
+            List<String> tmp = new ArrayList<String>();
+            for(int i=0;i<tokens.size();i++) {
+                String prefix = (String)tokens.get(i);
+                if(prefix.startsWith("!")) tmp.add(prefix.substring(1));
+            }
+            tdsNotPrefixes = tmp;
+        }
+        return tdsNotPrefixes;
+    }
+
 
 
 
@@ -377,6 +412,11 @@ public class CatalogOutputHandler extends OutputHandler {
             ATTR_SERVICETYPE, "self",
             ATTR_BASE, ""});
 
+        Element opendapService = XmlUtil.create(doc,TAG_SERVICE, root, new String[]{
+            ATTR_NAME,SERVICE_OPENDAP,
+            ATTR_SERVICETYPE, "opendap",
+            ATTR_BASE, ""});
+
         Element dataset = XmlUtil.create(doc,TAG_DATASET, root,new String[]{
             ATTR_NAME, title});
 
@@ -387,6 +427,75 @@ public class CatalogOutputHandler extends OutputHandler {
         sb.append(XmlUtil.toString(root));
         return new Result(title, sb, "text/xml");
     }
+
+
+
+
+    public void addServices(Entry entry, Request request,Document doc, Element dataset) throws Exception {
+        File f = entry.getResource().getFile();
+        String path = f.toString();
+        path = path.replace("\\","/");
+        if(entry.getTypeHandler().canDownload(request, entry)) {
+            String urlPath = HtmlUtil.url("/"+entry.getName(), ARG_ID, entry.getId()); 
+            Element service = XmlUtil.create(doc, TAG_ACCESS,dataset, new String[]{
+                ATTR_SERVICENAME,
+                SERVICE_HTTP,
+                ATTR_URLPATH,
+                urlPath
+            });
+        }
+        if(entry.getResource().isUrl()) {
+            Element service = XmlUtil.create(doc, TAG_ACCESS,dataset,new String[]{
+                ATTR_SERVICENAME,
+                SERVICE_SELF,
+                ATTR_URLPATH,
+                entry.getResource().getPath()
+            });
+        }
+
+        if(entry.getResource().isFile()) {
+            addTdsServices(entry, request, doc,  dataset);
+        }
+    }
+
+
+
+    public void addTdsServices(Entry entry, Request request,Document doc, Element dataset) throws Exception {
+        File f = entry.getResource().getFile();
+        String path = f.toString();
+        path = path.replace("\\","/");
+
+        boolean ok = false;
+        String goodPrefix = null;
+        //            System.err.println ("path:" + path);
+        for(String prefix: getTdsPrefixes()) {
+            //                System.err.println ("   prefix:" + prefix);
+            if(path.startsWith(prefix)) {
+                //                    System.err.println ("   OK");
+                goodPrefix = prefix;
+                ok = true;
+                break;
+            }
+        }
+        if(!ok) return;
+        for(String prefix: getTdsNotPrefixes()) {
+            if(path.startsWith(prefix)) {
+                ok = false;
+                break;
+            }
+        }
+
+        if(!ok) return;
+        
+        String urlPath = path.substring(goodPrefix.length());
+        XmlUtil.create(doc, TAG_ACCESS,dataset,new String[]{
+            ATTR_SERVICENAME,
+            SERVICE_OPENDAP,
+            ATTR_URLPATH,
+            urlPath
+        });
+    }
+
 
 
 
@@ -401,47 +510,32 @@ public class CatalogOutputHandler extends OutputHandler {
      */
     public void outputEntry(Entry entry, Request request,Document doc, Element parent) throws Exception {
         File f = entry.getResource().getFile();
-        Element dataset = XmlUtil.create(doc, CatalogOutputHandler.TAG_DATASET, parent, new String[]{
-            CatalogOutputHandler.ATTR_NAME, entry.getName()});
-
-        if(entry.getTypeHandler().canDownload(request, entry)) {
-            String urlPath = HtmlUtil.url("/"+entry.getName(), ARG_ID, entry.getId()); 
-            Element service = XmlUtil.create(doc, CatalogOutputHandler.TAG_ACCESS,dataset, new String[]{
-                CatalogOutputHandler.ATTR_SERVICENAME,
-                CatalogOutputHandler.SERVICE_HTTP,
-                CatalogOutputHandler.ATTR_URLPATH,
-                urlPath
-            });
-        }
-        if(entry.getResource().isUrl()) {
-            Element service = XmlUtil.create(doc, CatalogOutputHandler.TAG_ACCESS,dataset,new String[]{
-                CatalogOutputHandler.ATTR_SERVICENAME,
-                CatalogOutputHandler.SERVICE_SELF,
-                CatalogOutputHandler.ATTR_URLPATH,
-                entry.getResource().getPath()
-            });
-        }
+        String path = f.toString();
+        path = path.replace("\\","/");
+        Element dataset = XmlUtil.create(doc, TAG_DATASET, parent, new String[]{
+            ATTR_NAME, entry.getName()});
+        addServices(entry, request, doc, dataset);
 
         addMetadata(request, entry, doc, dataset);
 
         if (f.exists()) {
-            XmlUtil.create(doc,CatalogOutputHandler.TAG_DATASIZE, dataset,
+            XmlUtil.create(doc,TAG_DATASIZE, dataset,
                            "" + f.length(),
-                           new String[]{CatalogOutputHandler.ATTR_UNITS, "bytes"});
+                           new String[]{ATTR_UNITS, "bytes"});
                                         
         }
 
-        XmlUtil.create(doc,  CatalogOutputHandler.TAG_DATE, dataset,
+        XmlUtil.create(doc,  TAG_DATE, dataset,
                        format(new Date(entry.getCreateDate())),
                        new String[]{
-                           CatalogOutputHandler.ATTR_TYPE,
+                           ATTR_TYPE,
                            "metadataCreated"});
 
         Element timeCoverage = 
-            XmlUtil.create(doc,  CatalogOutputHandler.TAG_TIMECOVERAGE, dataset);
-        XmlUtil.create(doc,CatalogOutputHandler.TAG_START, timeCoverage,
+            XmlUtil.create(doc,  TAG_TIMECOVERAGE, dataset);
+        XmlUtil.create(doc,TAG_START, timeCoverage,
                        "" + format(new Date(entry.getStartDate())));
-        XmlUtil.create(doc,CatalogOutputHandler.TAG_END, timeCoverage,
+        XmlUtil.create(doc,TAG_END, timeCoverage,
                        "" + format(new Date(entry.getEndDate())));
     }
 

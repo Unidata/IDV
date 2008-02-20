@@ -121,6 +121,7 @@ public class MetadataManager  extends RepositoryManager {
 
 
 
+    protected Hashtable distinctMap = new Hashtable();
 
     /** _more_ */
     private List<MetadataHandler> metadataHandlers =
@@ -424,6 +425,22 @@ public class MetadataManager  extends RepositoryManager {
 
 
 
+    public String[] getDistinctValues(Request request, MetadataHandler handler, Metadata.Type type) throws Exception {
+        if(distinctMap == null) {
+            distinctMap = new Hashtable();
+        }
+        String[]values = (String[]) distinctMap.get(type.getType());
+
+        if(values == null) {
+            Statement stmt = getDatabaseManager().execute(
+                                                          SqlUtil.makeSelect(SqlUtil.distinct(COL_METADATA_ATTR1), TABLE_METADATA,
+                                                                             SqlUtil.eq(COL_METADATA_TYPE,SqlUtil.quote(type.getType()))));
+            values = SqlUtil.readString(stmt, 1);
+            distinctMap.put(type.getType(), values);
+        }
+        return values;
+    }
+
 
     /**
      * _more_
@@ -433,6 +450,7 @@ public class MetadataManager  extends RepositoryManager {
      * @throws Exception _more_
      */
     public void insertMetadata(Metadata metadata) throws Exception {
+        distinctMap = null;
         getDatabaseManager().executeInsert(INSERT_METADATA, new Object[] {
             metadata.getId(), metadata.getEntryId(), metadata.getType(),
             metadata.getAttr1(), metadata.getAttr2(), metadata.getAttr3(),

@@ -739,6 +739,12 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
+    private String cleanQueryString(String s) {
+        s = s.replace("\r\n"," ");
+        s = StringUtil.stripAndReplace(s, "'","'","'dummy'");
+        return s;
+    }
+
     /**
      * _more_
      *
@@ -755,7 +761,10 @@ public class TypeHandler extends RepositoryManager {
                                       List whereList, String extra)
             throws Exception {
         whereList = new ArrayList(whereList);
-        String   where      = SqlUtil.makeAnd(whereList);
+        //We do the replace because (for some reason) any CRNW screws up the pattern matching
+        String   whereString      = cleanQueryString(SqlUtil.makeAnd(whereList));
+        String   whatString       = cleanQueryString(what);
+        String   extraString      = cleanQueryString(extra);
 
         String[] tableNames = {
             TABLE_ENTRIES, getTableName(), TABLE_METADATA, TABLE_USERS,
@@ -765,12 +774,15 @@ public class TypeHandler extends RepositoryManager {
         boolean didEntries = false;
         boolean didOther   = false;
         boolean didMeta    = false;
-        //        System.err.println("what:" + what);
+        //        System.err.println("what:" + whatString);
+        //        System.out.println("where:" + whereString);
+        //        System.out.println("extra:" + extraString);
         for (int i = 0; i < tableNames.length; i++) {
             String pattern = ".*[, =\\(]+" + tableNames[i] + "\\..*";
-            //            System.err.println("pattern:" + pattern);
-            if (what.matches(pattern) || where.matches(pattern)
-                    || (extra.matches(pattern))) {
+            //            System.out.println("pattern:" + pattern);
+            if (whatString.matches(pattern) || whereString.matches(pattern)
+                    || (extraString.matches(pattern))) {
+                //                System.out.println("    ***** match");
                 tables.add(tableNames[i]);
                 if (i == 0) {
                     didEntries = true;
@@ -784,6 +796,7 @@ public class TypeHandler extends RepositoryManager {
 
         if (didMeta) {
             whereList.add(SqlUtil.eq(COL_METADATA_ENTRY_ID, COL_ENTRIES_ID));
+            tables.add(TABLE_METADATA);
             didEntries = true;
         }
 
@@ -811,7 +824,7 @@ public class TypeHandler extends RepositoryManager {
         }
 
 
-        where = SqlUtil.makeAnd(whereList);
+        String where = SqlUtil.makeAnd(whereList);
         String sql = SqlUtil.makeSelect(what, tables, where, extra);
         //        System.err.println (sql);
         return getDatabaseManager().execute(sql,
@@ -1078,7 +1091,6 @@ public class TypeHandler extends RepositoryManager {
     protected List assembleWhereClause(Request request) throws Exception {
 
         List   where     = new ArrayList();
-
 
         String tagString = "";
         if (request.defined(ARG_TAG)) {
