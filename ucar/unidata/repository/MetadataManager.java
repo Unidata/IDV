@@ -150,29 +150,8 @@ public class MetadataManager extends RepositoryManager {
 
 
     /** _more_ */
-    MetadataHandler metadataHandler;
+    MetadataHandler dfltMetadataHandler;
 
-    /**
-     * _more_
-     *
-     * @param metadata _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public MetadataHandler findMetadataHandler(Metadata metadata)
-            throws Exception {
-        for (MetadataHandler handler : metadataHandlers) {
-            if (handler.canHandle(metadata)) {
-                return handler;
-            }
-        }
-        if (metadataHandler == null) {
-            metadataHandler = new MetadataHandler(getRepository(), null);
-        }
-        return metadataHandler;
-    }
 
 
     /**
@@ -196,19 +175,19 @@ public class MetadataManager extends RepositoryManager {
         SqlUtil.Iterator iter =
             SqlUtil.getIterator(getDatabaseManager().execute(query));
         ResultSet      results;
-        List<Metadata> metadata = new ArrayList();
+        List<Metadata> metadataList = new ArrayList();
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 int             col     = 1;
                 String          type    = results.getString(3);
                 MetadataHandler handler = findMetadataHandler(type);
-                metadata.add(handler.makeMetadata(results.getString(col++),
+                metadataList.add(handler.makeMetadata(results.getString(col++),
                         results.getString(col++), results.getString(col++),
                         results.getString(col++), results.getString(col++),
                         results.getString(col++), results.getString(col++)));
             }
         }
-        return metadata;
+        return metadataList;
     }
 
 
@@ -229,17 +208,46 @@ public class MetadataManager extends RepositoryManager {
     /**
      * _more_
      *
+     * @param metadata _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public MetadataHandler findMetadataHandler(Metadata metadata)
+            throws Exception {
+        for (MetadataHandler handler : metadataHandlers) {
+            if (handler.canHandle(metadata)) {
+                return handler;
+            }
+        }
+        if (dfltMetadataHandler == null) {
+            dfltMetadataHandler = new MetadataHandler(getRepository(), null);
+        }
+        return dfltMetadataHandler;
+    }
+
+
+
+    /**
+     * _more_
+     *
      * @param type _more_
      *
      * @return _more_
      */
-    public MetadataHandler findMetadataHandler(String type) {
+    public MetadataHandler findMetadataHandler(String type) 
+        throws Exception {
         for (MetadataHandler handler : metadataHandlers) {
             if (handler.canHandle(type)) {
                 return handler;
             }
         }
-        return metadataHandler;
+        if (dfltMetadataHandler == null) {
+            dfltMetadataHandler = new MetadataHandler(getRepository(), null);
+        }
+        System.err.println ("type:" + type);
+        return dfltMetadataHandler;
     }
 
 

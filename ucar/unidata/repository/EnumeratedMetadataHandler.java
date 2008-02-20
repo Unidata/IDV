@@ -63,7 +63,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
     public static final String ATTR_TYPE = "type";
 
     /** _more_          */
-    public static final String TYPE_TAG = "tag";
+    public static final String TYPE_TAG = "enum.tag";
 
     /** _more_ */
     private Metadata.Type TYPE_ENUM;
