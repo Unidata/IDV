@@ -593,7 +593,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
         //Get the animation from the VM
         anime           = viewManager.getAnimation();
+        if(anime==null)         anime           = viewManager.getExternalAnimation();
         animationWidget = viewManager.getAnimationWidget();
+        if(animationWidget==null)         animationWidget = viewManager.getExternalAnimationWidget();
 
         //Store the images in a unique (by current time) subdir of the user's tmp  dir
         directory =
@@ -961,7 +963,6 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 animationWidget.gotoBeginning();
             }
 
-            System.err.println ("view manager:" + (viewManager!=null));
             int sleepTime =
                 idv.getStateManager().getProperty("idv.capture.sleep",
                     SLEEP_TIME);

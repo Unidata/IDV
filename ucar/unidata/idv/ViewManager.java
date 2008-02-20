@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -324,13 +325,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** The side legend */
     private SideLegend sideLegend;
 
-    /** _more_          */
+    /** _more_ */
     private boolean canShowSideLegend = true;
 
     /** This holds the side legend */
     private JComponent sideLegendComponent;
 
-    /** _more_          */
+    /** _more_ */
     private String legendState = IdvLegend.STATE_DOCKED;
 
 
@@ -393,11 +394,17 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** The animation widget */
     private AnimationWidget animationWidget;
 
+    /** This allows us to have an animation from an external source for doing movie captures */
+    private AnimationWidget externalAnimationWidget;
+
     /** The panel that holds the animation widget */
     protected JComponent animationHolder;
 
     /** We create this Animation and add it into the DisplayMaster */
     private Animation animation;
+
+    /** This allows us to have an animation from an external source for doing movie captures */
+    private Animation externalAnimation;
 
     /** Holds the animation state from the AnimationWidget */
     private AnimationInfo animationInfo;
@@ -795,10 +802,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** _more_ */
     JPanel contentsWrapper;
 
-    /** _more_          */
+    /** _more_ */
     JComponent centerPanel;
 
-    /** _more_          */
+    /** _more_ */
     JComponent centerPanelWrapper;
 
 
@@ -3506,7 +3513,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
-    /** _more_          */
+    /** _more_ */
     private boolean dirty = false;
 
     /**
@@ -3515,7 +3522,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    public void updateDisplayIfNeeded() throws VisADException, RemoteException {
+    public void updateDisplayIfNeeded()
+            throws VisADException, RemoteException {
         if ( !dirty || (master == null)) {
             return;
         }
@@ -3717,6 +3725,44 @@ public class ViewManager extends SharableImpl implements ActionListener,
         return animationWidget;
     }
 
+    /**
+     * Set the ExternalAnimation property.
+     *
+     * @param value The new value for ExternalAnimation
+     * @param widget _more_
+     */
+    public void setExternalAnimation(Animation value,
+                                     AnimationWidget widget) {
+        externalAnimation       = value;
+        externalAnimationWidget = widget;
+    }
+
+    /**
+     * Get the ExternalAnimation property.
+     *
+     * @return The ExternalAnimation
+     */
+    public Animation getExternalAnimation() {
+        return externalAnimation;
+    }
+
+
+
+
+
+
+    /**
+     * Get the ExternalAnimationWidget property.
+     *
+     * @return The ExternalAnimationWidget
+     */
+    public AnimationWidget getExternalAnimationWidget() {
+        return externalAnimationWidget;
+    }
+
+
+
+
 
 
 
@@ -3780,6 +3826,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 logException("getAnimation", exp);
             }
         }
+
         return animation;
     }
 
@@ -4540,7 +4587,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             imagePanel = new ImagePanel();
         }
         imagePanel.setFiles(images);
-        if(animation!=null) {
+        if (animation != null) {
             imagePanel.setSelectedFile(animation.getCurrent());
         }
         if (andShow) {
