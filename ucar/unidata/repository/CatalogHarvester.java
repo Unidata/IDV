@@ -87,6 +87,7 @@ public class CatalogHarvester extends Harvester {
     /** _more_ */
     int catalogCnt = 0;
 
+    /** _more_          */
     int entryCnt = 0;
 
     /** _more_ */
@@ -95,6 +96,7 @@ public class CatalogHarvester extends Harvester {
     /** _more_ */
     String topUrl;
 
+    /** _more_          */
     List<Entry> entries = new ArrayList<Entry>();
 
     /**
@@ -234,7 +236,9 @@ public class CatalogHarvester extends Harvester {
                 ext = ext.substring(1);
             }
             if (ext.length() > 0) {
-                entry.addTag(ext);
+                entry.addMetadata(new Metadata(repository.getGUID(),
+                        entry.getId(), EnumeratedMetadataHandler.TYPE_TAG,
+                        ext, "", "", ""));
             }
             entry.init(name, "", parent, user,
                        new Resource(urlPath, Resource.TYPE_URL),
@@ -242,7 +246,7 @@ public class CatalogHarvester extends Harvester {
                        createDate.getTime(), null);
             entries.add(entry);
             typeHandler.initializeNewEntry(entry);
-            if(entries.size()>1000) {
+            if (entries.size() > 1000) {
                 repository.processEntries(this, null, entries);
                 entries = new ArrayList<Entry>();
             }

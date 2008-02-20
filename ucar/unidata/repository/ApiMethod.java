@@ -133,15 +133,14 @@ public class ApiMethod {
      */
     public boolean isRequestOk(Request request, Repository repository)
             throws Exception {
-        RequestContext context = request.getRequestContext();
-        User           user    = context.getUser();
+        User user = request.getUser();
         if (mustBeAdmin && !user.getAdmin()) {
             return false;
         }
         if (actions.size() > 0) {
             for (int i = 0; i < actions.size(); i++) {
                 if ( !repository.getAccessManager().canDoAction(request,
-                                                                (String) actions.get(i))) {
+                        (String) actions.get(i))) {
                     return false;
                 }
             }

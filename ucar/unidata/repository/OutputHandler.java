@@ -178,13 +178,14 @@ public class OutputHandler extends RepositoryManager {
      *
      * @param request _more_
      * @param entries _more_
+     * @param entry _more_
      * @param types _more_
      *
      *
      * @throws Exception _more_
      */
-    protected void getOutputTypesForEntry(Request request,
-                                            Entry entry, List types)
+    protected void getOutputTypesForEntry(Request request, Entry entry,
+                                          List types)
             throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
@@ -237,7 +238,7 @@ public class OutputHandler extends RepositoryManager {
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
         return outputGroup(request, getRepository().getDummyGroup(),
-                           new ArrayList<Group>(),entries);
+                           new ArrayList<Group>(), entries);
 
     }
 
@@ -254,9 +255,18 @@ public class OutputHandler extends RepositoryManager {
         return null;
     }
 
-    protected void  getEntryLinks(Request request, Entry entry, List<Link> links)
-            throws Exception {
-    }
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param links _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void getEntryLinks(Request request, Entry entry,
+                                 List<Link> links)
+            throws Exception {}
 
 
     /**
@@ -272,14 +282,14 @@ public class OutputHandler extends RepositoryManager {
                                   String output) {
         String nextLink = HtmlUtil.href(
                               HtmlUtil.url(
-                                           getRepository().URL_ENTRY_SHOW, ARG_ID,
+                                  getRepository().URL_ENTRY_SHOW, ARG_ID,
                                   entry.getId(), ARG_OUTPUT, output,
                                   ARG_NEXT, "true"), HtmlUtil.img(
-                                                                  getRepository().fileUrl(ICON_RIGHT),
+                                      getRepository().fileUrl(ICON_RIGHT),
                                       "View next entry"));
         String prevLink = HtmlUtil.href(
                               HtmlUtil.url(
-                                           getRepository().URL_ENTRY_SHOW, ARG_ID,
+                                  getRepository().URL_ENTRY_SHOW, ARG_ID,
                                   entry.getId(), ARG_OUTPUT, output,
                                   ARG_PREVIOUS, "true"), HtmlUtil.img(
                                       getRepository().fileUrl(ICON_LEFT),
@@ -290,11 +300,21 @@ public class OutputHandler extends RepositoryManager {
 
 
 
-    public void addToSettingsForm(StringBuffer buffer) {
-    }
+    /**
+     * _more_
+     *
+     * @param buffer _more_
+     */
+    public void addToSettingsForm(StringBuffer buffer) {}
 
-    public void applySettings(Request request) throws Exception {
-    }
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @throws Exception _more_
+     */
+    public void applySettings(Request request) throws Exception {}
 
 
     /**
@@ -323,7 +343,8 @@ public class OutputHandler extends RepositoryManager {
      * @return _more_
      */
     protected String getEntryUrl(Entry entry) {
-        return HtmlUtil.href(HtmlUtil.url(getRepository().URL_ENTRY_SHOW, ARG_ID,
+        return HtmlUtil.href(HtmlUtil.url(getRepository().URL_ENTRY_SHOW,
+                                          ARG_ID,
                                           entry.getId()), entry.getName());
     }
 
@@ -413,10 +434,13 @@ public class OutputHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected Result listTags(Request request, List<Tag> tags)
-            throws Exception {
-        return notImplemented("listTags");
-    }
+
+    /**
+     * protected Result listTags(Request request, List<Tag> tags)
+     *       throws Exception {
+     *   return notImplemented("listTags");
+     * }
+     */
 
 
 

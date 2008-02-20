@@ -216,18 +216,19 @@ public class XmlOutputHandler extends OutputHandler {
 
 
 
-
-
     /**
      * _more_
      *
      * @param request _more_
      * @param tags _more_
      *
+     * @param output _more_
+     *
      * @return _more_
      *
      * @throws Exception _more_
      */
+    /*
     protected Result listTags(Request request, List<Tag> tags)
             throws Exception {
         StringBuffer sb     = new StringBuffer();
@@ -260,6 +261,8 @@ public class XmlOutputHandler extends OutputHandler {
         Result result = new Result(pageTitle, sb, getMimeType(output));
         return result;
     }
+    */
+
 
 
     /**
@@ -406,8 +409,7 @@ public class XmlOutputHandler extends OutputHandler {
                                    entry.getResource().getPath()));
         attrs.append(XmlUtil.attrs(ATTR_RESOURCE_TYPE,
                                    entry.getResource().getType()));
-        attrs.append(XmlUtil.attrs(ATTR_GROUP,
-                                   entry.getParentGroupId()));
+        attrs.append(XmlUtil.attrs(ATTR_GROUP, entry.getParentGroupId()));
         attrs.append(XmlUtil.attrs(ATTR_TYPE,
                                    entry.getTypeHandler().getType()));
         sb.append(XmlUtil.openTag(TAG_ENTRY, attrs.toString()));

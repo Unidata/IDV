@@ -71,6 +71,7 @@ import java.util.Properties;
  */
 public class UserManager extends RepositoryManager {
 
+    /** _more_          */
     public static final String ROLE_ANY = "any";
 
 
@@ -213,8 +214,9 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void checkSession(Request request) throws Exception {
+
         String cookie = request.getHeaderArg("Cookie");
-        User   user   = request.getRequestContext().getUser();
+        User   user   = request.getUser();
 
         if (cookie != null) {
             List toks = StringUtil.split(cookie, ";", true, true);
@@ -257,20 +259,25 @@ public class UserManager extends RepositoryManager {
 
         //Check for basic auth
         if (user == null) {
-            String auth  =(String) request.getHttpHeaderArgs().get("Authorization");
-            if(auth !=null) {
+            String auth =
+                (String) request.getHttpHeaderArgs().get("Authorization");
+            if (auth != null) {
                 auth = auth.trim();
                 //Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
-                if(auth.startsWith("Basic")) {
-                    auth  = new String(XmlUtil.decodeBase64(auth.substring(5).trim()));
-                    String[] toks = StringUtil.split(auth, ":",2);
-                    if(toks.length==2) {
+                if (auth.startsWith("Basic")) {
+                    auth = new String(
+                        XmlUtil.decodeBase64(auth.substring(5).trim()));
+                    String[] toks = StringUtil.split(auth, ":", 2);
+                    if (toks.length == 2) {
                         user = findUser(toks[0], false);
                         if (user == null) {
-                            throw new Repository.AccessException("Unknown user:" + toks[0]);
+                            throw new Repository.AccessException(
+                                "Unknown user:" + toks[0]);
                         }
-                        if ( !user.getPassword().equals(hashPassword(toks[1]))) {
-                            throw new Repository.AccessException("Incorrect password");
+                        if ( !user.getPassword().equals(
+                                hashPassword(toks[1]))) {
+                            throw new Repository.AccessException(
+                                "Incorrect password");
                         }
                     }
                     setUserSession(request, user);
@@ -281,7 +288,7 @@ public class UserManager extends RepositoryManager {
 
 
         if (user == null) {
-            String requestIp = request.getRequestContext().getIp();
+            String requestIp = request.getIp();
             if (requestIp != null) {
                 for (int i = 0; i < ipUserList.size(); i += 2) {
                     String ip       = (String) ipUserList.get(i);
@@ -307,7 +314,8 @@ public class UserManager extends RepositoryManager {
             user = getUserManager().getAnonymousUser();
         }
 
-        request.getRequestContext().setUser(user);
+        request.setUser(user);
+
 
 
     }
@@ -336,7 +344,7 @@ public class UserManager extends RepositoryManager {
             request.setSessionId(getSessionId());
         }
         session.put(request.getSessionId(), user);
-        request.getRequestContext().setUser(user);
+        request.setUser(user);
     }
 
 
@@ -351,8 +359,7 @@ public class UserManager extends RepositoryManager {
         if (request.getSessionId() != null) {
             session.remove(request.getSessionId());
         }
-        request.getRequestContext().setUser(
-            getUserManager().getAnonymousUser());
+        request.setUser(getUserManager().getAnonymousUser());
     }
 
 
@@ -366,7 +373,7 @@ public class UserManager extends RepositoryManager {
      */
     protected boolean isRequestOk(Request request) {
         if (getProperty(PROP_ACCESS_ADMINONLY, false)
-                && !request.getRequestContext().getUser().getAdmin()) {
+                && !request.getUser().getAdmin()) {
             if ( !request.getRequestPath().startsWith(
                     getRepository().getUrlBase() + "/user/")) {
                 return false;
@@ -374,7 +381,7 @@ public class UserManager extends RepositoryManager {
         }
 
         if (getProperty(PROP_ACCESS_REQUIRELOGIN, false)
-                && request.getRequestContext().getUser().getAnonymous()) {
+                && request.getUser().getAnonymous()) {
             if ( !request.getRequestPath().startsWith(
                     getRepository().getUrlBase() + "/user/")) {
                 return false;
@@ -660,7 +667,7 @@ public class UserManager extends RepositoryManager {
      */
     public Result adminUserEdit(Request request) throws Exception {
 
-        String userId = request.getUser();
+        String userId = request.getUserArg();
         User   user   = findUser(userId);
         if (user == null) {
             throw new IllegalArgumentException("Could not find user:"
@@ -1099,9 +1106,10 @@ public class UserManager extends RepositoryManager {
                     sb.append(
                         HtmlUtil.href(
                             HtmlUtil.url(
-                                URL_USER_CART, ARG_FROM, entry.getId()), HtmlUtil.img(
-                                getRepository().fileUrl(
-                                    ICON_ASSOCIATION), "Create an association")));
+                                URL_USER_CART, ARG_FROM,
+                                entry.getId()), HtmlUtil.img(
+                                    getRepository().fileUrl(
+                                        ICON_ASSOCIATION), "Create an association")));
                 }
                 sb.append(HtmlUtil.space(1));
                 sb.append(outputHandler.getEntryUrl(entry));
@@ -1126,7 +1134,7 @@ public class UserManager extends RepositoryManager {
     private Result makeResult(Request request, String title,
                               StringBuffer sb) {
         Result result = new Result(title, sb);
-        if ( !request.getRequestContext().getUser().getAnonymous()) {
+        if ( !request.getUser().getAnonymous()) {
             result.putProperty(PROP_NAVSUBLINKS,
                                getRepository().getSubNavLinks(request,
                                    userUrls));
@@ -1143,7 +1151,7 @@ public class UserManager extends RepositoryManager {
      * @return _more_
      */
     public String getUserLinks(Request request) {
-        User   user = request.getRequestContext().getUser();
+        User   user = request.getUser();
         String userLink;
         String cartEntry =
             HtmlUtil.href(URL_USER_CART,
@@ -1269,39 +1277,44 @@ public class UserManager extends RepositoryManager {
      */
     protected void initOutputHandlers() throws Exception {
         OutputHandler outputHandler = new OutputHandler(getRepository()) {
-                protected void  getEntryLinks(Request request, Entry entry, List<Link> links)
+            protected void getEntryLinks(Request request, Entry entry,
+                                         List<Link> links)
                     throws Exception {
-                    links.add(new Link(HtmlUtil.url(
-                                                    getRepository().getUserManager().URL_USER_CART,
-                                                    ARG_ACTION, ACTION_ADD, ARG_ID,
-                                                    entry.getId()), 
-                                       getRepository().fileUrl(ICON_CART), "Add to cart"));
-                }
+                links.add(
+                    new Link(
+                        HtmlUtil.url(
+                            getRepository().getUserManager().URL_USER_CART,
+                            ARG_ACTION, ACTION_ADD, ARG_ID,
+                            entry.getId()), getRepository().fileUrl(
+                                ICON_CART), "Add to cart"));
+            }
 
 
             public boolean canHandle(String output) {
                 return output.equals(OUTPUT_CART);
             }
-                protected void getOutputTypesFor(Request request, String what, List types)
+            protected void getOutputTypesFor(Request request, String what,
+                                             List types)
                     throws Exception {
-                    //                    if (what.equals(WHAT_ENTRIES)) {
-                    //                        types.add(new TwoFacedObject("Cart", OUTPUT_CART));
-//                    }
-                }
-                protected void getOutputTypesForEntry(Request request,
-                                                      Entry entry, List types)
-                    throws Exception               {}
+                //                    if (what.equals(WHAT_ENTRIES)) {
+                //                        types.add(new TwoFacedObject("Cart", OUTPUT_CART));
+                //                    }
+            }
+            protected void getOutputTypesForEntry(Request request,
+                    Entry entry, List types)
+                    throws Exception {}
             protected void getOutputTypesForEntries(Request request,
                     List<Entry> entries, List types)
                     throws Exception {
                 types.add(new TwoFacedObject("Cart", OUTPUT_CART));
             }
-                public Result outputGroup(Request request, Group group,
-                                          List<Group> subGroups, List<Entry> entries)
+            public Result outputGroup(Request request, Group group,
+                                      List<Group> subGroups,
+                                      List<Entry> entries)
                     throws Exception {
-                    addToCart(request, entries);
-                    return showCart(request);
-                }
+                addToCart(request, entries);
+                return showCart(request);
+            }
         };
 
         getRepository().addOutputHandler(outputHandler);
@@ -1316,13 +1329,14 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public List<String> getRoles() throws Exception {
-        String[] roleArray = SqlUtil.readString(
-                             getDatabaseManager().execute(
-                                 SqlUtil.makeSelect(
-                                     SqlUtil.distinct(COL_USERROLES_ROLE),
-                                     Misc.newList(TABLE_USERROLES))), 1);
-        List<String> roles = new  ArrayList<String>(Misc.toList(roleArray));
-        roles.add(0,ROLE_ANY);
+        String[] roleArray =
+            SqlUtil.readString(
+                getDatabaseManager().execute(
+                    SqlUtil.makeSelect(
+                        SqlUtil.distinct(COL_USERROLES_ROLE),
+                        Misc.newList(TABLE_USERROLES))), 1);
+        List<String> roles = new ArrayList<String>(Misc.toList(roleArray));
+        roles.add(0, ROLE_ANY);
         return roles;
     }
 
@@ -1338,7 +1352,7 @@ public class UserManager extends RepositoryManager {
     public Result processSettings(Request request) throws Exception {
         StringBuffer sb   = new StringBuffer();
 
-        User         user = request.getRequestContext().getUser();
+        User         user = request.getUser();
         if (user.getAnonymous()) {
             sb.append(
                 getRepository().warning(

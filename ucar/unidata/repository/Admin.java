@@ -554,15 +554,16 @@ public class Admin extends RepositoryManager {
 
 
         StringBuffer handlerSB = new StringBuffer();
-        List<OutputHandler> outputHandlers = getRepository().getOutputHandlers();
+        List<OutputHandler> outputHandlers =
+            getRepository().getOutputHandlers();
         for (OutputHandler outputHandler : outputHandlers) {
             outputHandler.addToSettingsForm(handlerSB);
         }
 
-        String extra  = handlerSB.toString();
-        if(extra.length()>0) {
+        String extra = handlerSB.toString();
+        if (extra.length() > 0) {
             sb.append(
-                      "<tr><td colspan=\"2\"><div  class=\"tableheading\">Output</div></td></tr>");
+                "<tr><td colspan=\"2\"><div  class=\"tableheading\">Output</div></td></tr>");
             sb.append(extra);
         }
 
@@ -597,7 +598,8 @@ public class Admin extends RepositoryManager {
                                             ""));
         }
 
-        List<OutputHandler> outputHandlers = getRepository().getOutputHandlers();
+        List<OutputHandler> outputHandlers =
+            getRepository().getOutputHandlers();
         for (OutputHandler outputHandler : outputHandlers) {
             outputHandler.applySettings(request);
         }
@@ -694,8 +696,8 @@ public class Admin extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
         sb.append(header("Repository Statistics"));
         sb.append("<table>\n");
-        String[] names  = { "Users", "Tags", "Associations" };
-        String[] tables = { TABLE_USERS, TABLE_TAGS, TABLE_ASSOCIATIONS };
+        String[] names  = { "Users", "Associations" };
+        String[] tables = { TABLE_USERS, TABLE_ASSOCIATIONS };
         for (int i = 0; i < tables.length; i++) {
             sb.append(HtmlUtil.row(HtmlUtil.cols(""
                     + getRepository().getCount(tables[i].toLowerCase(),
@@ -975,8 +977,7 @@ public class Admin extends RepositoryManager {
         if (catalog.length() > 0) {
             CatalogHarvester harvester =
                 new CatalogHarvester(getRepository(), group, catalog,
-                                     request.getRequestContext().getUser(),
-                                     recurse);
+                                     request.getUser(), recurse);
             harvesters.add(harvester);
             Misc.run(harvester, "run");
         }

@@ -23,6 +23,9 @@
 package ucar.unidata.repository;
 
 
+import ucar.unidata.util.HtmlUtil;
+
+
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
@@ -30,8 +33,6 @@ import java.io.File;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import ucar.unidata.util.HtmlUtil;
 
 
 /**
@@ -43,75 +44,92 @@ import ucar.unidata.util.HtmlUtil;
  */
 public class Link {
 
+    /** _more_          */
     String url;
+
+    /** _more_          */
     String label;
+
+    /** _more_          */
     String icon;
 
-    public Link(String url,String icon, String label ) {
-        this.url = url;
+    /**
+     * _more_
+     *
+     * @param url _more_
+     * @param icon _more_
+     * @param label _more_
+     */
+    public Link(String url, String icon, String label) {
+        this.url   = url;
         this.label = label;
-        this.icon= icon;
-    }
-
-
-    public String toString() {
-        return HtmlUtil.href(url, HtmlUtil.img(icon,label));
+        this.icon  = icon;
     }
 
 
     /**
-Set the Url property.
+     * _more_
+     *
+     * @return _more_
+     */
+    public String toString() {
+        return HtmlUtil.href(url, HtmlUtil.img(icon, label));
+    }
 
-@param value The new value for Url
-**/
-public void setUrl (String value) {
-	url = value;
-}
 
-/**
-Get the Url property.
+    /**
+     * Set the Url property.
+     *
+     * @param value The new value for Url
+     */
+    public void setUrl(String value) {
+        url = value;
+    }
 
-@return The Url
-**/
-public String getUrl () {
-	return url;
-}
+    /**
+     * Get the Url property.
+     *
+     * @return The Url
+     */
+    public String getUrl() {
+        return url;
+    }
 
-/**
-Set the Label property.
+    /**
+     * Set the Label property.
+     *
+     * @param value The new value for Label
+     */
+    public void setLabel(String value) {
+        label = value;
+    }
 
-@param value The new value for Label
-**/
-public void setLabel (String value) {
-	label = value;
-}
+    /**
+     * Get the Label property.
+     *
+     * @return The Label
+     */
+    public String getLabel() {
+        return label;
+    }
 
-/**
-Get the Label property.
+    /**
+     * Set the Icon property.
+     *
+     * @param value The new value for Icon
+     */
+    public void setIcon(String value) {
+        icon = value;
+    }
 
-@return The Label
-**/
-public String getLabel () {
-	return label;
-}
-
-/**
-Set the Icon property.
-
-@param value The new value for Icon
-**/
-public void setIcon (String value) {
-	icon = value;
-}
-
-/**
-Get the Icon property.
-
-@return The Icon
-**/
-public String getIcon () {
-	return icon;
-}
+    /**
+     * Get the Icon property.
+     *
+     * @return The Icon
+     */
+    public String getIcon() {
+        return icon;
+    }
 
 
 

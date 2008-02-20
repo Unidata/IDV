@@ -93,16 +93,26 @@ public class Entry extends Entity {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Entry clone() {
         Entry newEntry = new Entry(getId(), getTypeHandler());
         initClone(newEntry);
         return newEntry;
     }
 
+    /**
+     * _more_
+     *
+     * @param newEntry _more_
+     */
     protected void initClone(Entry newEntry) {
-        newEntry.init(getName(), getDescription(), getParentGroup(), getUser(),
-                      getResource(), getCreateDate(), getStartDate(),
-                      getEndDate(), getValues());
+        newEntry.init(getName(), getDescription(), getParentGroup(),
+                      getUser(), getResource(), getCreateDate(),
+                      getStartDate(), getEndDate(), getValues());
 
     }
 

@@ -224,25 +224,6 @@ public class CsvOutputHandler extends OutputHandler {
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param tags _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Result listTags(Request request, List<Tag> tags)
-            throws Exception {
-        StringBuffer sb = new StringBuffer();
-        for (Tag tag : tags) {
-            sb.append(tag.getName());
-            sb.append("\n");
-        }
-        return new Result("", sb, getMimeType(OUTPUT_CSV));
-    }
 
 
     /**

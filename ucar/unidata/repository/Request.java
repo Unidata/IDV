@@ -36,8 +36,8 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 import java.io.File;
-import java.io.OutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import java.lang.reflect.*;
 
@@ -86,9 +86,6 @@ public class Request implements Constants {
     private String type;
 
     /** _more_ */
-    private RequestContext requestContext;
-
-    /** _more_ */
     private Hashtable parameters;
 
     /** _more_ */
@@ -103,7 +100,16 @@ public class Request implements Constants {
     /** _more_ */
     private String sessionId;
 
+    /** _more_          */
     private OutputStream outputStream;
+
+    /** _more_ */
+    private User user;
+
+    /** _more_ */
+    private String ip;
+
+
 
     /**
      * _more_
@@ -111,14 +117,11 @@ public class Request implements Constants {
      *
      * @param repository _more_
      * @param type _more_
-     * @param requestContext _more_
      * @param parameters _more_
      */
-    public Request(Repository repository, String type,
-                   RequestContext requestContext, Hashtable parameters) {
+    public Request(Repository repository, String type, Hashtable parameters) {
         this.repository         = repository;
         this.type               = type;
-        this.requestContext     = requestContext;
         this.parameters         = parameters;
         this.originalParameters = new Hashtable();
         originalParameters.putAll(parameters);
@@ -126,21 +129,21 @@ public class Request implements Constants {
 
 
     /**
-       Set the OutputStream property.
-
-       @param value The new value for OutputStream
-    **/
-    public void setOutputStream (OutputStream value) {
-	outputStream = value;
+     *  Set the OutputStream property.
+     *
+     *  @param value The new value for OutputStream
+     */
+    public void setOutputStream(OutputStream value) {
+        outputStream = value;
     }
 
     /**
-       Get the OutputStream property.
-
-       @return The OutputStream
-    **/
-    public OutputStream getOutputStream () {
-	return outputStream;
+     *  Get the OutputStream property.
+     *
+     *  @return The OutputStream
+     */
+    public OutputStream getOutputStream() {
+        return outputStream;
     }
 
 
@@ -290,7 +293,7 @@ public class Request implements Constants {
         }
         Request that = (Request) o;
         return this.type.equals(that.type)
-               && this.requestContext.equals(that.requestContext)
+               && Misc.equals(this.user, that.user)
                && this.originalParameters.equals(that.originalParameters);
     }
 
@@ -301,7 +304,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public int hashCode() {
-        return type.hashCode() ^ requestContext.hashCode()
+        return type.hashCode() ^ Misc.hashcode(user)
                ^ originalParameters.hashCode();
     }
 
@@ -420,7 +423,7 @@ public class Request implements Constants {
         return getCheckedString(key, dflt, Pattern.compile(patternString));
     }
 
-    
+
 
 
     /**
@@ -570,7 +573,7 @@ public class Request implements Constants {
      *
      * @return _more_
      */
-    public String getUser() {
+    public String getUserArg() {
         return getString(ARG_USER, (String) null);
     }
 
@@ -702,23 +705,6 @@ public class Request implements Constants {
         return type;
     }
 
-    /**
-     * Set the RequestContext property.
-     *
-     * @param value The new value for RequestContext
-     */
-    public void setRequestContext(RequestContext value) {
-        requestContext = value;
-    }
-
-    /**
-     * Get the RequestContext property.
-     *
-     * @return The RequestContext
-     */
-    public RequestContext getRequestContext() {
-        return requestContext;
-    }
 
 
     /**
@@ -799,6 +785,47 @@ public class Request implements Constants {
     public String getSessionId() {
         return sessionId;
     }
+
+
+
+
+    /**
+     * Set the User property.
+     *
+     * @param value The new value for User
+     */
+    public void setUser(User value) {
+        user = value;
+    }
+
+    /**
+     * Get the User property.
+     *
+     * @return The User
+     */
+    public User getUser() {
+        return user;
+    }
+
+
+    /**
+     * Set the Ip property.
+     *
+     * @param value The new value for Ip
+     */
+    public void setIp(String value) {
+        ip = value;
+    }
+
+    /**
+     * Get the Ip property.
+     *
+     * @return The Ip
+     */
+    public String getIp() {
+        return ip;
+    }
+
 
 
 

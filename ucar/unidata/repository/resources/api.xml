@@ -12,7 +12,9 @@
 
   <method request="/entry/searchform"  method="processEntrySearchForm"   name="Search" toplevel="true"/>
   <method request="/entry/search"  method="processEntrySearch"     />
+<!--
   <method request="/list/home"   method="processListHome"      name="List" toplevel="true"/>
+-->
   <method request="/list/show"   method="processListShow"/>
   <method request="/graph/get"   method="processGraphGet"/>
 

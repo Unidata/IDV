@@ -111,6 +111,11 @@ public class Metadata implements Constants, Tables {
         this("", "", type, "", "", "", "");
     }
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     */
     public Metadata(Type type) {
         this("", "", type, "", "", "", "");
     }
@@ -137,6 +142,17 @@ public class Metadata implements Constants, Tables {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param entryId _more_
+     * @param type _more_
+     * @param attr1 _more_
+     * @param attr2 _more_
+     * @param attr3 _more_
+     * @param attr4 _more_
+     */
     public Metadata(String id, String entryId, String type, String attr1,
                     String attr2, String attr3, String attr4) {
         this.id      = id;
@@ -282,78 +298,127 @@ public class Metadata implements Constants, Tables {
     }
 
 
-        public String toString() {
-            return type + " " + attr1;
-        }
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String toString() {
+        return type + " " + attr1;
+    }
 
 
+    /**
+     * Class Type _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     public static class Type {
+
+        /** _more_          */
         String type;
+
+        /** _more_          */
         String label;
+
+        /**
+         * _more_
+         *
+         * @param type _more_
+         */
         public Type(String type) {
             this.type = type;
-            label =  type.replace("_", " ");
-            label = label.replace(".", " ");
+            label     = type.replace("_", " ");
+            label     = label.replace(".", " ");
             label = label.substring(0, 1).toUpperCase() + label.substring(1);
         }
 
+        /**
+         * _more_
+         *
+         * @param type _more_
+         * @param label _more_
+         */
         public Type(String type, String label) {
-            this.type = type;
-            this.label  = label;
+            this.type  = type;
+            this.label = label;
         }
 
+        /**
+         * _more_
+         *
+         * @param type _more_
+         *
+         * @return _more_
+         */
         public boolean isType(String type) {
             return this.type.equals(type);
         }
 
+        /**
+         * _more_
+         *
+         * @param o _more_
+         *
+         * @return _more_
+         */
         public boolean equals(Object o) {
-            if(!getClass().equals(o.getClass())) return false;
-               Type that = (Type) o;
-               return type.equals(that.type);
+            if ( !getClass().equals(o.getClass())) {
+                return false;
+            }
+            Type that = (Type) o;
+            return type.equals(that.type);
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public String toString() {
             return type;
         }
 
 
-/**
-Set the Type property.
+        /**
+         * Set the Type property.
+         *
+         * @param value The new value for Type
+         */
+        public void setType(String value) {
+            type = value;
+        }
 
-@param value The new value for Type
-**/
-public void setType (String value) {
-	type = value;
-}
+        /**
+         * Get the Type property.
+         *
+         * @return The Type
+         */
+        public String getType() {
+            return type;
+        }
 
-/**
-Get the Type property.
+        /**
+         * Set the Label property.
+         *
+         * @param value The new value for Label
+         */
+        public void setLabel(String value) {
+            label = value;
+        }
 
-@return The Type
-**/
-public String getType () {
-	return type;
-}
+        /**
+         * Get the Label property.
+         *
+         * @return The Label
+         */
+        public String getLabel() {
+            return label;
+        }
 
-/**
-Set the Label property.
 
-@param value The new value for Label
-**/
-public void setLabel (String value) {
-	label = value;
-}
-
-/**
-Get the Label property.
-
-@return The Label
-**/
-public String getLabel () {
-	return label;
-}
-
-        
 
 
     }

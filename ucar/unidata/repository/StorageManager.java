@@ -160,6 +160,13 @@ public class StorageManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param path _more_
+     *
+     * @return _more_
+     */
     public String localizePath(String path) {
         path = path.replace("%repositorydir%", getRepositoryDir());
         return path;

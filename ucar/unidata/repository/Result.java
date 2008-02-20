@@ -90,6 +90,7 @@ public class Result {
     /** _more_ */
     private List<String> httpHeaderArgs;
 
+    /** _more_          */
     private boolean needToWrite = true;
 
 
@@ -188,23 +189,23 @@ public class Result {
     }
 
 
-/**
-Set the NeedToWrite property.
+    /**
+     * Set the NeedToWrite property.
+     *
+     * @param value The new value for NeedToWrite
+     */
+    public void setNeedToWrite(boolean value) {
+        needToWrite = value;
+    }
 
-@param value The new value for NeedToWrite
-**/
-public void setNeedToWrite (boolean value) {
-	needToWrite = value;
-}
-
-/**
-Get the NeedToWrite property.
-
-@return The NeedToWrite
-**/
-public boolean getNeedToWrite () {
-	return needToWrite;
-}
+    /**
+     * Get the NeedToWrite property.
+     *
+     * @return The NeedToWrite
+     */
+    public boolean getNeedToWrite() {
+        return needToWrite;
+    }
 
 
     /**

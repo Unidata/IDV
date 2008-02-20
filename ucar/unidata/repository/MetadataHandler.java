@@ -57,25 +57,25 @@ import java.util.List;
 public class MetadataHandler extends RepositoryManager {
 
 
-    /** _more_          */
+    /** _more_ */
     public static String ARG_TYPE = "type";
 
-    /** _more_          */
+    /** _more_ */
     public static String ARG_METADATAID = "metadataid";
 
-    /** _more_          */
+    /** _more_ */
     public static String ARG_ENTRYID = "entryid";
 
-    /** _more_          */
+    /** _more_ */
     public static String ARG_ATTR1 = "attr1";
 
-    /** _more_          */
+    /** _more_ */
     public static String ARG_ATTR2 = "attr2";
 
-    /** _more_          */
+    /** _more_ */
     public static String ARG_ATTR3 = "attr3";
 
-    /** _more_          */
+    /** _more_ */
     public static String ARG_ATTR4 = "attr4";
 
 
@@ -100,9 +100,23 @@ public class MetadataHandler extends RepositoryManager {
         super(repository);
     }
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param entryId _more_
+     * @param type _more_
+     * @param attr1 _more_
+     * @param attr2 _more_
+     * @param attr3 _more_
+     * @param attr4 _more_
+     *
+     * @return _more_
+     */
     public Metadata makeMetadata(String id, String entryId, String type,
-                                 String attr1, String attr2, String attr3, String attr4) { 
-        return new Metadata(id, entryId, type, attr1,attr2, attr3, attr4);
+                                 String attr1, String attr2, String attr3,
+                                 String attr4) {
+        return new Metadata(id, entryId, type, attr1, attr2, attr3, attr4);
     }
 
 
@@ -116,14 +130,33 @@ public class MetadataHandler extends RepositoryManager {
         typeMap.put(type.getType(), type);
     }
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     *
+     * @return _more_
+     */
     public Metadata.Type getType(String type) {
-        return (Metadata.Type)typeMap.get(type);
+        return (Metadata.Type) typeMap.get(type);
     }
 
 
-    public void addMetadataToCatalog(Request request, Entry entry, Metadata metadata, Document doc, Element datasetNode)
-            throws Exception {
-    }
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param metadata _more_
+     * @param doc _more_
+     * @param datasetNode _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addMetadataToCatalog(Request request, Entry entry,
+                                     Metadata metadata, Document doc,
+                                     Element datasetNode)
+            throws Exception {}
 
 
     /**
@@ -190,11 +223,18 @@ public class MetadataHandler extends RepositoryManager {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param metadata _more_
+     * @param forEdit _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public String[] getForm(Metadata metadata, boolean forEdit) {
+    public String[] getForm(Request request, Metadata metadata,
+                            boolean forEdit)
+            throws Exception {
         return null;
     }
 
@@ -210,30 +250,40 @@ public class MetadataHandler extends RepositoryManager {
      */
     public void makeAddForm(Request request, Entry entry, StringBuffer sb)
             throws Exception {
-        for (Metadata.Type type: types) {
-            makeAddForm(entry, type, sb);
+        for (Metadata.Type type : types) {
+            makeAddForm(request, entry, type, sb);
         }
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
     public void addToSearchForm(Request request, StringBuffer sb)
-            throws Exception {
-    }
+            throws Exception {}
 
 
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      * @param type _more_
      * @param sb _more_
      *
      * @throws Exception _more_
      */
-    private void makeAddForm(Entry entry, Metadata.Type type, StringBuffer sb)
+    private void makeAddForm(Request request, Entry entry,
+                             Metadata.Type type, StringBuffer sb)
             throws Exception {
-        String[] html = getForm(new Metadata(type), false);
+        String[] html = getForm(request, new Metadata(type), false);
         if (html == null) {
             return;
         }
@@ -246,9 +296,17 @@ public class MetadataHandler extends RepositoryManager {
 
 
 
-    public void makeSearchForm(Request request,  StringBuffer sb)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    public void makeSearchForm(Request request, StringBuffer sb)
             throws Exception {
-        for (Metadata.Type type: types) {
+        for (Metadata.Type type : types) {
             //            makeAddForm(entry, types.get(i).toString(), sb);
         }
     }

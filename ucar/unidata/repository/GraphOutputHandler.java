@@ -113,25 +113,55 @@ public class GraphOutputHandler extends OutputHandler {
     }
 
 
-    protected void getOutputTypesForEntry(Request request,
-                                          Entry entry, List types)
-        throws Exception         {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param types _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void getOutputTypesForEntry(Request request, Entry entry,
+                                          List types)
+            throws Exception {
         if ( !getRepository().isAppletEnabled(request)) {
             return;
         }
-        types.add(new TwoFacedObject("Graph", OUTPUT_GRAPH));        
+        types.add(new TwoFacedObject("Graph", OUTPUT_GRAPH));
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param subGroups _more_
+     * @param entries _more_
+     * @param types _more_
+     *
+     * @throws Exception _more_
+     */
     protected void getOutputTypesForGroup(Request request, Group group,
                                           List<Group> subGroups,
                                           List<Entry> entries, List types)
             throws Exception {
-        getOutputTypesForEntry(request, group,types);
+        getOutputTypesForEntry(request, group, types);
     }
 
 
-    protected void  getEntryLinks(Request request, Entry entry, List<Link> links)
-        throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param links _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void getEntryLinks(Request request, Entry entry,
+                                 List<Link> links)
+            throws Exception {
         if ( !getRepository().isAppletEnabled(request)) {
             return;
         }
@@ -145,10 +175,21 @@ public class GraphOutputHandler extends OutputHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result outputEntry(Request request, Entry entry) throws Exception {
-        String graphAppletTemplate = getRepository().getResource(PROP_HTML_GRAPHAPPLET);
+        String graphAppletTemplate =
+            getRepository().getResource(PROP_HTML_GRAPHAPPLET);
         String type = request.getString(ARG_NODETYPE, NODETYPE_GROUP);
-        String id                  = request.getId((String) null);
+        String id   = request.getId((String) null);
 
         if ((type == null) || (id == null)) {
             throw new IllegalArgumentException(
@@ -156,13 +197,15 @@ public class GraphOutputHandler extends OutputHandler {
         }
         String html = StringUtil.replace(graphAppletTemplate, "${id}",
                                          getRepository().encode(id));
-        html = StringUtil.replace(html, "${root}", getRepository().getUrlBase());
-        html = StringUtil.replace(html, "${type}", getRepository().encode(type));
+        html = StringUtil.replace(html, "${root}",
+                                  getRepository().getUrlBase());
+        html = StringUtil.replace(html, "${type}",
+                                  getRepository().encode(type));
         StringBuffer sb = new StringBuffer();
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
-                                                         false,"");
-                                                  
-        String      title = crumbs[0];
+                              false, "");
+
+        String title = crumbs[0];
         sb.append(crumbs[1]);
         sb.append("&nbsp;<p>");
         sb.append(html);
@@ -179,6 +222,18 @@ public class GraphOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param subGroups _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {

@@ -51,6 +51,7 @@ import ucar.unidata.xml.XmlUtil;
 
 import java.awt.*;
 import java.awt.Image;
+
 import java.io.*;
 
 import java.io.File;
@@ -95,12 +96,12 @@ import javax.swing.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class AccessManager  extends RepositoryManager {
+public class AccessManager extends RepositoryManager {
 
 
     /** _more_ */
-    public RequestUrl URL_ACCESS_FORM = new RequestUrl(getRepository(), "/access/form",
-                                            "Access");
+    public RequestUrl URL_ACCESS_FORM = new RequestUrl(getRepository(),
+                                            "/access/form", "Access");
 
 
     /** _more_ */
@@ -108,6 +109,7 @@ public class AccessManager  extends RepositoryManager {
                                               "/access/change");
 
 
+    /** _more_          */
     private Object MUTEX_PERMISSIONS = new Object();
 
 
@@ -117,6 +119,8 @@ public class AccessManager  extends RepositoryManager {
      * @param args _more_
      * @param hostname _more_
      * @param port _more_
+     *
+     * @param repository _more_
      *
      * @throws Exception _more_
      */
@@ -138,14 +142,15 @@ public class AccessManager  extends RepositoryManager {
      */
     public boolean canDoAction(Request request, String action)
             throws Exception {
-        User user = request.getRequestContext().getUser();
+        User user = request.getUser();
         //The admin can do anything
         if (user.getAdmin()) {
             return true;
         }
 
         if (request.exists(ATTR_ID)) {
-            Entry entry = getRepository().getEntry(request.getString(ARG_ID, ""), request, false);
+            Entry entry = getRepository().getEntry(request.getString(ARG_ID,
+                              ""), request, false);
             if (entry == null) {
                 throw new IllegalArgumentException("Could not find entry:"
                         + request.getString(ARG_ID, ""));
@@ -179,39 +184,39 @@ public class AccessManager  extends RepositoryManager {
      */
     public boolean canDoAction(Request request, Entry entry, String action)
             throws Exception {
-        User user = request.getRequestContext().getUser();
+        User user = request.getUser();
         //The admin can do anything
         if (user.getAdmin()) {
             return true;
         }
-        if(user.equals(entry.getUser())) {
+        if (user.equals(entry.getUser())) {
             return true;
         }
 
 
         //        System.err.println ("can do: " + action);
-        while(entry!=null) {
+        while (entry != null) {
             List permissions = getPermissions(request, entry);
 
-            List roles = getRoles(request, entry, action);
+            List roles       = getRoles(request, entry, action);
             //            System.err.println ("\tentry:" + entry.getName() + " permissions:" + permissions);
-            if(roles!=null) {
+            if (roles != null) {
                 //                System.err.println ("got roles:" + roles);
-                for(int roleIdx=0;roleIdx<roles.size();roleIdx++) {
-                    String role = (String)roles.get(roleIdx);
+                for (int roleIdx = 0; roleIdx < roles.size(); roleIdx++) {
+                    String  role  = (String) roles.get(roleIdx);
                     boolean doNot = false;
-                    if(role.startsWith("!")) {
-                        doNot  = true;
-                        role = role.substring(1);
+                    if (role.startsWith("!")) {
+                        doNot = true;
+                        role  = role.substring(1);
                     }
-                    if(user.isRole(role)) {
+                    if (user.isRole(role)) {
                         //                        System.err.println ("role is: " + role);
                         return !doNot;
                     }
                 }
                 break;
             }
-            entry = repository.getEntry(entry.getParentGroupId(),request);
+            entry = repository.getEntry(entry.getParentGroupId(), request);
         }
 
         return false;
@@ -219,6 +224,17 @@ public class AccessManager  extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param action _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public List getRoles(Request request, Entry entry, String action)
             throws Exception {
         //Make sure we call getPermissions first which forces the instantation of the roles
@@ -269,7 +285,7 @@ public class AccessManager  extends RepositoryManager {
                 //TODO                return null;
             }
         }
-        if(!canDoAction(request, entry, Permission.ACTION_VIEW)) {
+        if ( !canDoAction(request, entry, Permission.ACTION_VIEW)) {
             return null;
         }
         return entry;
@@ -317,47 +333,72 @@ public class AccessManager  extends RepositoryManager {
 
 
 
-    protected void listAccess(Request request, Entry entry, StringBuffer sb) throws Exception {
-        if(entry == null) return;
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void listAccess(Request request, Entry entry, StringBuffer sb)
+            throws Exception {
+        if (entry == null) {
+            return;
+        }
         List<Permission> permissions = getPermissions(request, entry);
-        String entryUrl  = HtmlUtil.href(HtmlUtil.url(URL_ACCESS_FORM, ARG_ID,
-                                                      entry.getId()), entry.getName());
+        String entryUrl = HtmlUtil.href(HtmlUtil.url(URL_ACCESS_FORM, ARG_ID,
+                              entry.getId()), entry.getName());
 
         Hashtable map = new Hashtable();
-        for(Permission permission: permissions) {
+        for (Permission permission : permissions) {
             List roles = (List) map.get(permission.getAction());
-            if(roles == null) {
+            if (roles == null) {
                 map.put(permission.getAction(), roles = new ArrayList());
             }
             roles.addAll(permission.getRoles());
         }
 
         StringBuffer cols = new StringBuffer(HtmlUtil.cols(entryUrl));
-        for(int i=0;i<Permission.ACTIONS.length;i++) {
-            List roles = (List)map.get(Permission.ACTIONS[i]);
-            if(roles == null) {
+        for (int i = 0; i < Permission.ACTIONS.length; i++) {
+            List roles = (List) map.get(Permission.ACTIONS[i]);
+            if (roles == null) {
                 cols.append(HtmlUtil.cols("&nbsp;"));
             } else {
                 cols.append(HtmlUtil.cols(StringUtil.join("<br>", roles)));
             }
         }
         sb.append(HtmlUtil.rowTop(cols.toString()));
-        listAccess(request, repository.getEntry(entry.getParentGroupId(),request), sb);
+        listAccess(request,
+                   repository.getEntry(entry.getParentGroupId(), request),
+                   sb);
     }
 
 
-    protected void insertPermissions(Request request, Entry entry, List<Permission> permissions)
-        throws Exception {
-        synchronized(MUTEX_PERMISSIONS) {
-            getDatabaseManager().executeDelete(TABLE_PERMISSIONS, COL_PERMISSIONS_ENTRY_ID,
-                                               SqlUtil.quote(entry.getId()));
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param permissions _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void insertPermissions(Request request, Entry entry,
+                                     List<Permission> permissions)
+            throws Exception {
+        synchronized (MUTEX_PERMISSIONS) {
+            getDatabaseManager().executeDelete(TABLE_PERMISSIONS,
+                    COL_PERMISSIONS_ENTRY_ID, SqlUtil.quote(entry.getId()));
 
-            for(Permission permission: permissions) {
+            for (Permission permission : permissions) {
                 List roles = permission.getRoles();
-                for(int i=0;i<roles.size();i++) {
-                    getDatabaseManager().executeInsert(INSERT_PERMISSIONS, new Object[] {entry.getId(),
-                                                                                         permission.getAction(),
-                                                                                         roles.get(i)});
+                for (int i = 0; i < roles.size(); i++) {
+                    getDatabaseManager().executeInsert(INSERT_PERMISSIONS,
+                            new Object[] { entry.getId(),
+                                           permission.getAction(),
+                                           roles.get(i) });
                 }
             }
         }
@@ -376,37 +417,36 @@ public class AccessManager  extends RepositoryManager {
      * @throws Exception _more_
      */
     protected List<Permission> getPermissions(Request request, Entry entry)
-        throws Exception {
-        synchronized(MUTEX_PERMISSIONS) {
-        if (entry.getPermissions() != null) {
-            return entry.getPermissions();
-        }
-        String query =
-            SqlUtil.makeSelect(COLUMNS_PERMISSIONS,
+            throws Exception {
+        synchronized (MUTEX_PERMISSIONS) {
+            if (entry.getPermissions() != null) {
+                return entry.getPermissions();
+            }
+            String query = SqlUtil.makeSelect(COLUMNS_PERMISSIONS,
                                Misc.newList(TABLE_PERMISSIONS),
                                SqlUtil.eq(COL_PERMISSIONS_ENTRY_ID,
                                           SqlUtil.quote(entry.getId())));
 
-        List<Permission> permissions = new ArrayList();
-        SqlUtil.Iterator iter =
-            SqlUtil.getIterator(getDatabaseManager().execute(query));
-        ResultSet results;
-        Hashtable actions = new Hashtable();
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                String id = results.getString(1);
-                String action = results.getString(2);
-                String role = results.getString(3);
-                List roles = (List)actions.get(action);
-                if(roles == null) {
-                    actions.put(action, roles = new ArrayList());
-                    permissions.add(new Permission(action, roles));
+            List<Permission> permissions = new ArrayList();
+            SqlUtil.Iterator iter =
+                SqlUtil.getIterator(getDatabaseManager().execute(query));
+            ResultSet results;
+            Hashtable actions = new Hashtable();
+            while ((results = iter.next()) != null) {
+                while (results.next()) {
+                    String id     = results.getString(1);
+                    String action = results.getString(2);
+                    String role   = results.getString(3);
+                    List   roles  = (List) actions.get(action);
+                    if (roles == null) {
+                        actions.put(action, roles = new ArrayList());
+                        permissions.add(new Permission(action, roles));
+                    }
+                    roles.add(role);
                 }
-                roles.add(role);
             }
-        }
-        entry.setPermissions(permissions);
-        return permissions;
+            entry.setPermissions(permissions);
+            return permissions;
         }
     }
 
@@ -424,30 +464,35 @@ public class AccessManager  extends RepositoryManager {
      */
     public Result processAccessForm(Request request) throws Exception {
         StringBuffer sb    = new StringBuffer();
-        Entry entry = getRepository().getEntry(request);
+        Entry        entry = getRepository().getEntry(request);
         sb.append(getRepository().makeEntryHeader(request, entry));
         if (request.exists(ARG_MESSAGE)) {
-            sb.append(getRepository().note(request.getUnsafeString(ARG_MESSAGE, "")));
+            sb.append(
+                getRepository().note(
+                    request.getUnsafeString(ARG_MESSAGE, "")));
         }
-        
+
         StringBuffer currentAccess = new StringBuffer();
         currentAccess.append(HtmlUtil.formTable("border=1"));
-        StringBuffer header = new StringBuffer(HtmlUtil.cols(HtmlUtil.bold("Entry")));
-        for(int i=0;i<Permission.ACTIONS.length;i++) {
-            header.append(HtmlUtil.cols(HtmlUtil.bold(Permission.ACTION_NAMES[i])));
+        StringBuffer header =
+            new StringBuffer(HtmlUtil.cols(HtmlUtil.bold("Entry")));
+        for (int i = 0; i < Permission.ACTIONS.length; i++) {
+            header.append(
+                HtmlUtil.cols(HtmlUtil.bold(Permission.ACTION_NAMES[i])));
         }
         currentAccess.append(HtmlUtil.rowTop(header.toString()));
 
-        listAccess(request, entry,currentAccess);
+        listAccess(request, entry, currentAccess);
         currentAccess.append(HtmlUtil.formTableClose());
 
 
 
 
-        Hashtable map = new Hashtable();
+        Hashtable        map         = new Hashtable();
         List<Permission> permissions = getPermissions(request, entry);
-        for(Permission permission: permissions) {
-            map.put(permission.getAction(), StringUtil.join("\n",permission.getRoles()));
+        for (Permission permission : permissions) {
+            map.put(permission.getAction(),
+                    StringUtil.join("\n", permission.getRoles()));
         }
         sb.append(HtmlUtil.form(URL_ACCESS_CHANGE, ""));
 
@@ -458,10 +503,10 @@ public class AccessManager  extends RepositoryManager {
         sb.append(HtmlUtil.formTable());
         sb.append("<tr valign=top>");
         sb.append(HtmlUtil.cols(HtmlUtil.bold("Action"),
-                                HtmlUtil.bold("Role")+" (one per line)"));
+                                HtmlUtil.bold("Role") + " (one per line)"));
         sb.append(HtmlUtil.cols(HtmlUtil.space(5)));
         sb.append("<td rowspan=6><b>All Roles</b><i><br>");
-        sb.append(StringUtil.join("<br>",getUserManager().getRoles()));
+        sb.append(StringUtil.join("<br>", getUserManager().getRoles()));
         sb.append("</i></td>");
 
         sb.append(HtmlUtil.cols(HtmlUtil.space(5)));
@@ -471,11 +516,18 @@ public class AccessManager  extends RepositoryManager {
         sb.append("</i></td>");
 
         sb.append("</tr>");
-        for(int i=0;i<Permission.ACTIONS.length;i++) {
-            String roles = (String)map.get(Permission.ACTIONS[i]);
-            if(roles==null) roles = "";
-            sb.append(HtmlUtil.rowTop(HtmlUtil.cols(Permission.ACTION_NAMES[i],
-                                                 HtmlUtil.textArea(ARG_ROLES+"."+Permission.ACTIONS[i],roles,5,20))));
+        for (int i = 0; i < Permission.ACTIONS.length; i++) {
+            String roles = (String) map.get(Permission.ACTIONS[i]);
+            if (roles == null) {
+                roles = "";
+            }
+            sb.append(
+                HtmlUtil.rowTop(
+                    HtmlUtil.cols(
+                        Permission.ACTION_NAMES[i],
+                        HtmlUtil.textArea(
+                            ARG_ROLES + "." + Permission.ACTIONS[i], roles,
+                            5, 20))));
         }
         sb.append(HtmlUtil.formTableClose());
         //        sb.append("</td><td>&nbsp;&nbsp;&nbsp;</td><td>");
@@ -485,7 +537,8 @@ public class AccessManager  extends RepositoryManager {
         sb.append(HtmlUtil.submit("Change Access"));
         sb.append(HtmlUtil.formClose());
 
-        return getRepository().makeEntryEditResult(request, entry, "Edit Access", sb);
+        return getRepository().makeEntryEditResult(request, entry,
+                "Edit Access", sb);
 
     }
 
@@ -499,26 +552,28 @@ public class AccessManager  extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processAccessChange(Request request) throws Exception {
-        synchronized(MUTEX_PERMISSIONS) {
-        Entry entry = getRepository().getEntry(request);
-        String message = "Access Changed";
+        synchronized (MUTEX_PERMISSIONS) {
+            Entry            entry       = getRepository().getEntry(request);
+            String           message     = "Access Changed";
 
-        List<Permission> permissions = new ArrayList<Permission>();
+            List<Permission> permissions = new ArrayList<Permission>();
 
-        for(int i=0;i<Permission.ACTIONS.length;i++) {
-            List roles = StringUtil.split(request.getString(ARG_ROLES+"."+Permission.ACTIONS[i],""),
-                                          "\n",
-                                          true,true);
-            if(roles.size()>0) {
-                permissions.add(new Permission(Permission.ACTIONS[i], roles));
+            for (int i = 0; i < Permission.ACTIONS.length; i++) {
+                List roles = StringUtil.split(request.getString(ARG_ROLES
+                                 + "." + Permission.ACTIONS[i], ""), "\n",
+                                     true, true);
+                if (roles.size() > 0) {
+                    permissions.add(new Permission(Permission.ACTIONS[i],
+                            roles));
+                }
             }
-        }
 
-        insertPermissions(request,  entry, permissions);
+            insertPermissions(request, entry, permissions);
 
 
-        return new Result(HtmlUtil.url(URL_ACCESS_FORM, ARG_ID,
-                                       entry.getId(), ARG_MESSAGE, message));
+            return new Result(HtmlUtil.url(URL_ACCESS_FORM, ARG_ID,
+                                           entry.getId(), ARG_MESSAGE,
+                                           message));
         }
     }
 

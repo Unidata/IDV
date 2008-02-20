@@ -61,8 +61,6 @@ CREATE TABLE  comments (id varchar(200),
 CREATE INDEX COMMENTS_INDEX_ID ON comments (ID);
 CREATE INDEX COMMENTS_INDEX_ENTRY_ID ON comments (ENTRY_ID);
 
-CREATE TABLE tags (name varchar(200),
-	           entry_id varchar(200));
 
 
 CREATE TABLE associations (name varchar(200),
@@ -70,8 +68,6 @@ CREATE TABLE associations (name varchar(200),
 		           to_entry_id varchar(200));
 
 
-CREATE INDEX TAGS_INDEX_NAME ON tags (NAME);
-CREATE INDEX TAGS_INDEX_ENTRY_ID ON tags (ENTRY_ID);
 
 
 CREATE TABLE  users (id varchar(200),

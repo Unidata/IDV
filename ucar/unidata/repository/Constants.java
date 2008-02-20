@@ -77,31 +77,44 @@ public interface Constants {
     public static final int MAX_ROWS = 100;
 
 
+    /** _more_          */
     public static final String ICON_CART = "/cart.gif";
 
+    /** _more_          */
     public static final String ICON_COMMENTS = "/comments.gif";
 
+    /** _more_          */
     public static final String ICON_DELETE = "/delete.gif";
 
+    /** _more_          */
     public static final String ICON_FETCH = "/fetch.gif";
 
+    /** _more_          */
     public static final String ICON_SEARCH = "/search.gif";
 
+    /** _more_          */
     public static final String ICON_RIGHT = "/right.gif";
 
+    /** _more_          */
     public static final String ICON_ASSOCIATION = "/association.gif";
 
+    /** _more_          */
     public static final String ICON_GRAPH = "/graph.gif";
 
+    /** _more_          */
     public static final String ICON_EDIT = "/edit.gif";
 
+    /** _more_          */
     public static final String ICON_NEW = "/new.gif";
 
+    /** _more_          */
     public static final String ICON_ARROW = "/arrow.gif";
 
 
+    /** _more_          */
     public static final String ICON_BLANK = "/blank.gif";
 
+    /** _more_          */
     public static final String ICON_LEFT = "/left.gif";
 
 
@@ -187,6 +200,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    /** _more_          */
     public static final String ARG_TYPE_EXCLUDE_GROUP = "excludegroup";
 
 
@@ -200,6 +214,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_CATALOG = "catalog";
 
+    /** _more_          */
     public static final String ARG_REQUIRED = "required";
 
     /** _more_ */
@@ -246,8 +261,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_FORM_TYPE = "form.type";
 
+    /** _more_          */
     public static final String ARG_FORM_ADVANCED = "form.advanced";
 
+    /** _more_          */
     public static final String ARG_FORM_METADATA = "form.metadata";
 
     /** _more_ */
@@ -300,8 +317,6 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_USER = "user";
 
-    /** _more_ */
-    public static final String ARG_TAG = "tag";
 
     /** _more_ */
     public static final String ARG_ASSOCIATION = "association";
@@ -312,6 +327,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ACTION = "action";
 
+    /** _more_          */
     public static final String ARG_ROLES = "roles";
 
     /** _more_ */
@@ -360,6 +376,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_METADATA_ID = "metadataid";
 
+    /** _more_          */
     public static final String ARG_METADATA_TYPE = "metadatatype";
 
     /** _more_ */
@@ -423,10 +440,6 @@ public interface Constants {
 
     /** _more_ */
     public static final String PROP_DOWNLOAD_OK = "jdms.download.ok";
-
-    /** _more_ */
-    public static final String PROP_TAGNAMES = "jdms.html.tagnames";
-
 
 
     /** _more_ */

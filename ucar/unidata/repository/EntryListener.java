@@ -92,11 +92,7 @@ public class EntryListener implements Constants, Tables {
             String arg   = (String) keys.nextElement();
             String value = (String) properties.get(arg);
             names.add(arg);
-            if (arg.equals(ARG_TAG)) {
-                values.add(StringUtil.split(value, ",", true, true));
-            } else {
-                values.add(value);
-            }
+            values.add(value);
         }
     }
 
@@ -153,20 +149,6 @@ public class EntryListener implements Constants, Tables {
                 //TODO: check for subgroups
                 //                ok = (value.equals(entry.getParentGroup().getFullName())
                 //                      || value.equals(entry.getParentGroup().getId()));
-            } else if (arg.equals(ARG_TAG)) {
-                List tags = entry.getTags();
-                if ((tags == null) || (tags.size() == 0)) {
-                    ok = false;
-                } else {
-                    ok = true;
-                    List myTags = (List) value;
-                    for (int tagIdx = 0; (tagIdx < myTags.size()) && ok;
-                            tagIdx++) {
-                        if ( !tags.contains(myTags.get(tagIdx))) {
-                            ok = false;
-                        }
-                    }
-                }
             } else {
                 int match = entry.getTypeHandler().matchValue(arg, value,
                                 request, entry);

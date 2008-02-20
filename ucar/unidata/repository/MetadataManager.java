@@ -51,6 +51,7 @@ import ucar.unidata.xml.XmlUtil;
 
 import java.awt.*;
 import java.awt.Image;
+
 import java.io.*;
 
 import java.io.File;
@@ -95,8 +96,9 @@ import javax.swing.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class MetadataManager  extends RepositoryManager {
+public class MetadataManager extends RepositoryManager {
 
+    /** _more_          */
     private Object MUTEX_METADATA = new Object();
 
 
@@ -121,6 +123,7 @@ public class MetadataManager  extends RepositoryManager {
 
 
 
+    /** _more_          */
     protected Hashtable distinctMap = new Hashtable();
 
     /** _more_ */
@@ -136,6 +139,8 @@ public class MetadataManager  extends RepositoryManager {
      * @param args _more_
      * @param hostname _more_
      * @param port _more_
+     *
+     * @param repository _more_
      *
      * @throws Exception _more_
      */
@@ -153,14 +158,17 @@ public class MetadataManager  extends RepositoryManager {
      * @param metadata _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public MetadataHandler findMetadataHandler(Metadata metadata) throws Exception {
+    public MetadataHandler findMetadataHandler(Metadata metadata)
+            throws Exception {
         for (MetadataHandler handler : metadataHandlers) {
             if (handler.canHandle(metadata)) {
                 return handler;
             }
         }
-        if(metadataHandler==null) {
+        if (metadataHandler == null) {
             metadataHandler = new MetadataHandler(getRepository(), null);
         }
         return metadataHandler;
@@ -191,16 +199,13 @@ public class MetadataManager  extends RepositoryManager {
         List<Metadata> metadata = new ArrayList();
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                int col = 1;
-                String type = results.getString(3);
+                int             col     = 1;
+                String          type    = results.getString(3);
                 MetadataHandler handler = findMetadataHandler(type);
                 metadata.add(handler.makeMetadata(results.getString(col++),
-                                          results.getString(col++),
-                                          results.getString(col++),
-                                          results.getString(col++),
-                                          results.getString(col++),
-                                          results.getString(col++),
-                                          results.getString(col++)));
+                        results.getString(col++), results.getString(col++),
+                        results.getString(col++), results.getString(col++),
+                        results.getString(col++), results.getString(col++)));
             }
         }
         return metadata;
@@ -221,6 +226,13 @@ public class MetadataManager  extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     *
+     * @return _more_
+     */
     public MetadataHandler findMetadataHandler(String type) {
         for (MetadataHandler handler : metadataHandlers) {
             if (handler.canHandle(type)) {
@@ -234,9 +246,12 @@ public class MetadataManager  extends RepositoryManager {
     /**
      * _more_
      *
+     *
+     * @param metadataDefFiles _more_
      * @throws Exception _more_
      */
-    protected void initMetadataHandlers(List<String> metadataDefFiles) throws Exception {
+    protected void initMetadataHandlers(List<String> metadataDefFiles)
+            throws Exception {
         for (String file : metadataDefFiles) {
             try {
                 Element root = XmlUtil.getRoot(file, getClass());
@@ -251,7 +266,7 @@ public class MetadataManager  extends RepositoryManager {
                             Element.class });
                     metadataHandlers.add(
                         (MetadataHandler) ctor.newInstance(
-                                                           new Object[] { getRepository(),
+                            new Object[] { getRepository(),
                                            node }));
                 }
             } catch (Exception exc) {
@@ -265,6 +280,14 @@ public class MetadataManager  extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
     public void addToSearchForm(Request request, StringBuffer sb)
             throws Exception {
         for (MetadataHandler handler : metadataHandlers) {
@@ -284,19 +307,20 @@ public class MetadataManager  extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processMetadataChange(Request request) throws Exception {
-        synchronized(MUTEX_METADATA) {
+        synchronized (MUTEX_METADATA) {
             Entry entry = getRepository().getEntry(request);
 
             if (request.exists(ARG_DELETE)) {
                 Hashtable args = request.getArgs();
-                for (Enumeration keys = args.keys(); keys.hasMoreElements(); ) {
+                for (Enumeration keys =
+                        args.keys(); keys.hasMoreElements(); ) {
                     String arg = (String) keys.nextElement();
                     if ( !arg.startsWith(ARG_METADATA_ID + ".select.")) {
                         continue;
                     }
                     String id = request.getString(arg, "");
                     getDatabaseManager().executeDelete(TABLE_METADATA,
-                                                       COL_METADATA_ID, SqlUtil.quote(id));
+                            COL_METADATA_ID, SqlUtil.quote(id));
                 }
             } else {
                 List<Metadata> newMetadata = new ArrayList<Metadata>();
@@ -306,7 +330,7 @@ public class MetadataManager  extends RepositoryManager {
 
                 for (Metadata metadata : newMetadata) {
                     getDatabaseManager().executeDelete(TABLE_METADATA,
-                                                       COL_METADATA_ID, SqlUtil.quote(metadata.getId()));
+                            COL_METADATA_ID, SqlUtil.quote(metadata.getId()));
                     insertMetadata(metadata);
                 }
             }
@@ -328,8 +352,8 @@ public class MetadataManager  extends RepositoryManager {
      */
     public Result processMetadataForm(Request request) throws Exception {
         StringBuffer sb    = new StringBuffer();
-        Entry entry = getRepository().getEntry(request);
-        
+        Entry        entry = getRepository().getEntry(request);
+
         sb.append(getRepository().makeEntryHeader(request, entry));
 
         List<Metadata> metadataList = getMetadata(entry);
@@ -349,7 +373,8 @@ public class MetadataManager  extends RepositoryManager {
                 if (metadataHandler == null) {
                     continue;
                 }
-                String[] html = metadataHandler.getForm(metadata, true);
+                String[] html = metadataHandler.getForm(request, metadata,
+                                    true);
                 if (html == null) {
                     continue;
                 }
@@ -365,7 +390,8 @@ public class MetadataManager  extends RepositoryManager {
             sb.append(HtmlUtil.formClose());
         }
 
-        return getRepository().makeEntryEditResult(request, entry, "Edit Metadata", sb);
+        return getRepository().makeEntryEditResult(request, entry,
+                "Edit Metadata", sb);
 
     }
 
@@ -382,14 +408,15 @@ public class MetadataManager  extends RepositoryManager {
      */
     public Result processMetadataAddForm(Request request) throws Exception {
         StringBuffer sb    = new StringBuffer();
-        Entry entry = getRepository().getEntry(request);
+        Entry        entry = getRepository().getEntry(request);
         sb.append(getRepository().makeEntryHeader(request, entry));
         sb.append(HtmlUtil.formTable());
         for (MetadataHandler handler : metadataHandlers) {
             handler.makeAddForm(request, entry, sb);
         }
         sb.append(HtmlUtil.formTableClose());
-        return getRepository().makeEntryEditResult(request, entry, "Add Metadata", sb);
+        return getRepository().makeEntryEditResult(request, entry,
+                "Add Metadata", sb);
     }
 
 
@@ -404,37 +431,55 @@ public class MetadataManager  extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processMetadataAdd(Request request) throws Exception {
-        synchronized(MUTEX_METADATA) {
-        Entry entry = getRepository().getEntry(request);
-        List<Metadata> newMetadata = new ArrayList<Metadata>();
-        for (MetadataHandler handler : metadataHandlers) {
-            handler.handleAddSubmit(request, entry, newMetadata);
-        }
+        synchronized (MUTEX_METADATA) {
+            Entry          entry       = getRepository().getEntry(request);
+            List<Metadata> newMetadata = new ArrayList<Metadata>();
+            for (MetadataHandler handler : metadataHandlers) {
+                handler.handleAddSubmit(request, entry, newMetadata);
+            }
 
-        for (Metadata metadata : newMetadata) {
-            insertMetadata(metadata);
-        }
+            for (Metadata metadata : newMetadata) {
+                insertMetadata(metadata);
+            }
 
 
 
-        return new Result(HtmlUtil.url(URL_METADATA_FORM, ARG_ID,
-                                       entry.getId()));
+            return new Result(HtmlUtil.url(URL_METADATA_FORM, ARG_ID,
+                                           entry.getId()));
 
         }
     }
 
 
 
-    public String[] getDistinctValues(Request request, MetadataHandler handler, Metadata.Type type) throws Exception {
-        if(distinctMap == null) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param handler _more_
+     * @param type _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String[] getDistinctValues(Request request,
+                                      MetadataHandler handler,
+                                      Metadata.Type type)
+            throws Exception {
+        if (distinctMap == null) {
             distinctMap = new Hashtable();
         }
-        String[]values = (String[]) distinctMap.get(type.getType());
+        String[] values = (String[]) distinctMap.get(type.getType());
 
-        if(values == null) {
+        if (values == null) {
             Statement stmt = getDatabaseManager().execute(
-                                                          SqlUtil.makeSelect(SqlUtil.distinct(COL_METADATA_ATTR1), TABLE_METADATA,
-                                                                             SqlUtil.eq(COL_METADATA_TYPE,SqlUtil.quote(type.getType()))));
+                                 SqlUtil.makeSelect(
+                                     SqlUtil.distinct(COL_METADATA_ATTR1),
+                                     TABLE_METADATA,
+                                     SqlUtil.eq(
+                                         COL_METADATA_TYPE,
+                                         SqlUtil.quote(type.getType()))));
             values = SqlUtil.readString(stmt, 1);
             distinctMap.put(type.getType(), values);
         }

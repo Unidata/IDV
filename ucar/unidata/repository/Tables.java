@@ -349,31 +349,6 @@ public interface Tables {
 
 
 
-    /** _more_ */
-    public static final String TABLE_TAGS = "tags";
-
-    /** _more_ */
-    public static final String COL_TAGS_NAME = TABLE_TAGS + ".name";
-
-    /** _more_ */
-    public static final String COL_TAGS_ENTRY_ID = TABLE_TAGS + ".entry_id";
-
-    /** _more_ */
-    public static final String[] ARRAY_TAGS = new String[] { COL_TAGS_NAME,
-            COL_TAGS_ENTRY_ID };
-
-    /** _more_ */
-    public static final String COLUMNS_TAGS = SqlUtil.comma(ARRAY_TAGS);
-
-    /** _more_ */
-    public static final String NODOT_COLUMNS_TAGS =
-        SqlUtil.commaNoDot(ARRAY_TAGS);
-
-    /** _more_ */
-    public static final String INSERT_TAGS =
-        SqlUtil.makeInsert(TABLE_TAGS, NODOT_COLUMNS_TAGS,
-                           SqlUtil.getQuestionMarks(ARRAY_TAGS.length));
-
 
 
     /** _more_ */

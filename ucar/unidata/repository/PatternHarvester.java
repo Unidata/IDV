@@ -505,7 +505,13 @@ public class PatternHarvester extends Harvester {
                    createDate.getTime(), fromDate.getTime(),
                    toDate.getTime(), values);
         if (tag.length() > 0) {
-            entry.setTags(StringUtil.split(tag, ","));
+            List tags = StringUtil.split(tag, ",", true, true);
+            for (int i = 0; i < tags.size(); i++) {
+                entry.addMetadata(new Metadata(repository.getGUID(),
+                        entry.getId(), EnumeratedMetadataHandler.TYPE_TAG,
+                        (String) tags.get(i), "", "", ""));
+            }
+
         }
         typeHandler.initializeNewEntry(entry);
 

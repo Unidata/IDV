@@ -80,15 +80,25 @@ public class Group extends Entry {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Entry clone() {
         Entry newEntry = new Group(getId(), getTypeHandler());
         initClone(newEntry);
         return newEntry;
     }
 
+    /**
+     * _more_
+     *
+     * @param newEntry _more_
+     */
     protected void initClone(Entry newEntry) {
         Group newGroup = (Group) newEntry;
-        newGroup.isDummy = isDummy;
+        newGroup.isDummy  = isDummy;
         newGroup.children = children;
         super.initClone(newEntry);
     }

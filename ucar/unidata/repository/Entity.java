@@ -48,8 +48,6 @@ public class Entity {
     /** _more_ */
     static Hashtable ids = new Hashtable();
 
-    /** _more_ */
-    List<String> tags;
 
     /** _more_ */
     List<Comment> comments;
@@ -57,10 +55,12 @@ public class Entity {
     /** _more_ */
     List<Permission> permissions = null;
 
+    /** _more_          */
     Hashtable permissionMap = new Hashtable();
 
     /** _more_ */
     List<Association> associations;
+
 
     /** _more_ */
     List<Metadata> metadata = new ArrayList<Metadata>();
@@ -179,7 +179,9 @@ public class Entity {
      */
     public void setParentGroup(Group value) {
         parentGroup = value;
-        if(parentGroup!=null) parentGroupId = parentGroup.getId();
+        if (parentGroup != null) {
+            parentGroupId = parentGroup.getId();
+        }
     }
 
     /**
@@ -286,37 +288,20 @@ public class Entity {
         return user;
     }
 
-    /**
-     *  Set the Tags property.
-     *
-     *  @param value The new value for Tags
-     */
-    public void setTags(List<String> value) {
-        tags = value;
-    }
-
-    /**
-     *  Get the Tags property.
-     *
-     *  @return The Tags
-     */
-    public List<String> getTags() {
-        return tags;
-    }
 
 
     /**
      * _more_
      *
-     * @param tag _more_
+     * @param value _more_
      */
-    public void addTag(String tag) {
-        if (tags == null) {
-            tags = new ArrayList<String>();
+    public void addMetadata(Metadata value) {
+        if (metadata == null) {
+            metadata = new ArrayList<Metadata>();
         }
-        tags.add(tag);
-
+        metadata.add(value);
     }
+
 
     /**
      * Set the Metadata property.
@@ -336,14 +321,6 @@ public class Entity {
         return metadata;
     }
 
-    /**
-     * _more_
-     *
-     * @param value _more_
-     */
-    public void addMetadata(Metadata value) {
-        metadata.add(value);
-    }
 
 
     /**
@@ -419,14 +396,22 @@ public class Entity {
      */
     public void setPermissions(List<Permission> value) {
         permissions = value;
-        if(permissions!=null) {
+        if (permissions != null) {
             permissionMap = new Hashtable();
-            for(Permission permission: permissions) {
-                permissionMap.put(permission.getAction(), permission.getRoles());
+            for (Permission permission : permissions) {
+                permissionMap.put(permission.getAction(),
+                                  permission.getRoles());
             }
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param action _more_
+     *
+     * @return _more_
+     */
     public List getRoles(String action) {
         return (List) permissionMap.get(action);
     }

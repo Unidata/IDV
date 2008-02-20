@@ -357,10 +357,23 @@ public class User {
         return roles;
     }
 
+    /**
+     * _more_
+     *
+     * @param role _more_
+     *
+     * @return _more_
+     */
     public boolean isRole(String role) {
-        if(role.equals(UserManager.ROLE_ANY)) return true;
-        if(role.equals("user:" + getName())) return true;
-        if(roles == null) return false;
+        if (role.equals(UserManager.ROLE_ANY)) {
+            return true;
+        }
+        if (role.equals("user:" + getName())) {
+            return true;
+        }
+        if (roles == null) {
+            return false;
+        }
         return roles.contains(role);
     }
 

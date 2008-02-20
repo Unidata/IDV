@@ -1,3 +1,11 @@
 <metadatahandlers>
+  <metadatahandler class="ucar.unidata.repository.EnumeratedMetadataHandler" 
+                   name="Tag"
+                   type="enum.tag"
+                   />
+  <metadatahandler class="ucar.unidata.repository.EnumeratedMetadataHandler" file="/ucar/unidata/repository/resources/gcmdkeywords.txt" 
+                   name="GCMD Science Keyword"
+                   type="enum.gcmdkeyword"
+                   />
   <metadatahandler class="ucar.unidata.repository.ThreddsMetadataHandler"/>
 </metadatahandlers>

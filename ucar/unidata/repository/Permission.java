@@ -156,6 +156,11 @@ public class Permission {
         return false;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
         return "action:" + action + " roles:" + roles;
     }

@@ -74,23 +74,36 @@ public class GroupTypeHandler extends TypeHandler {
 
 
 
-    protected void  getEntryLinks(Request request, Entry entry, List<Link> links)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param links _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void getEntryLinks(Request request, Entry entry,
+                                 List<Link> links)
             throws Exception {
         super.getEntryLinks(request, entry, links);
 
-        if (getAccessManager().canDoAction(request, entry, Permission.ACTION_NEW)) {
-            links.add(new Link(HtmlUtil.url(
-                                            getRepository().URL_ENTRY_NEW, ARG_GROUP,
-                                            entry.getId()),
-                               getRepository().fileUrl(ICON_NEW),
-                               "New Entry or Group"));
+        if (getAccessManager().canDoAction(request, entry,
+                                           Permission.ACTION_NEW)) {
+            links.add(
+                new Link(
+                    HtmlUtil.url(
+                        getRepository().URL_ENTRY_NEW, ARG_GROUP,
+                        entry.getId()), getRepository().fileUrl(ICON_NEW),
+                                        "New Entry or Group"));
         }
 
-        links.add(new Link(HtmlUtil.url(
-                                        getRepository().URL_ENTRY_SEARCHFORM, ARG_GROUP,
-                                        entry.getId()), 
-                           getRepository().fileUrl(ICON_SEARCH),
-                           "Search in Group"));
+        links.add(
+            new Link(
+                HtmlUtil.url(
+                    getRepository().URL_ENTRY_SEARCHFORM, ARG_GROUP,
+                    entry.getId()), getRepository().fileUrl(ICON_SEARCH),
+                                    "Search in Group"));
 
 
 

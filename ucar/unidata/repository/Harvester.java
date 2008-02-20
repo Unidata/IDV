@@ -139,7 +139,7 @@ public class Harvester extends RepositoryManager {
      */
     public Harvester(Repository repository) {
         super(repository);
-        this.id         = repository.getGUID();
+        this.id = repository.getGUID();
     }
 
 
