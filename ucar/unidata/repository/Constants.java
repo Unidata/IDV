@@ -374,7 +374,14 @@ public interface Constants {
     public static final String ARG_ID = "id";
 
     /** _more_ */
-    public static final String ARG_METADATA_ID = "metadataid";
+    public static final String ARG_METADATA_ID = "metadata.id";
+
+    public static final String ARG_METADATA_INHERITED = "metadata.inherited";
+
+    public static final String ARG_METADATA_ATTR1 = "metadata.attr1";
+    public static final String ARG_METADATA_ATTR2 = "metadata.attr2";
+    public static final String ARG_METADATA_ATTR3 = "metadata.attr3";
+    public static final String ARG_METADATA_ATTR4 = "metadata.attr4";
 
     /** _more_          */
     public static final String ARG_METADATA_TYPE = "metadatatype";

@@ -754,7 +754,7 @@ public class Admin extends RepositoryManager {
         sb.append(HtmlUtil.submit("Execute"));
         sb.append(HtmlUtil.textArea(ARG_QUERY, (query == null)
                 ? ""
-                : query, 10, 75));
+                : query, 10, 100));
         sb.append("</form>\n");
         sb.append("<table>");
         if (query == null) {

@@ -5243,13 +5243,13 @@ public class Repository implements Constants, Tables, RequestHandler,
         List<String> children = new ArrayList();
         for (String id: ids) {
             String[] idArray = SqlUtil.readString(
-                                              getDatabaseManager().execute(
-                                                                           connection,
-                                                                           SqlUtil.makeSelect(
-                                                                                              COL_ENTRIES_ID, TABLE_ENTRIES,
-                                                                                              SqlUtil.eq(
-                                                                                                         COL_ENTRIES_PARENT_GROUP_ID,
-                                                                                                         SqlUtil.quote(id)))));
+                                                  getDatabaseManager().execute(
+                                                                               connection,
+                                                                               SqlUtil.makeSelect(
+                                                                                                  COL_ENTRIES_ID, TABLE_ENTRIES,
+                                                                                                  SqlUtil.eq(
+                                                                                                             COL_ENTRIES_PARENT_GROUP_ID,
+                                                                                                             SqlUtil.quote(id)))));
             for (int i = 0; i < idArray.length; i++) {
                 children.add(idArray[i]);
             }
@@ -5367,7 +5367,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             connection.prepareStatement(SqlUtil.makeDelete(TABLE_ENTRIES,
                 COL_ENTRIES_ID, "?"));
 
-        connection.setAutoCommit(false);
+        connection.setAutoCommit(false); 
         Statement statement = connection.createStatement();
         for (Entry entry : entries) {
             delCnt++;
@@ -5401,9 +5401,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         commentsStmt.executeBatch();
         assocStmt.executeBatch();
         entriesStmt.executeBatch();
-        //            genericStmt.executeBatch();
         connection.commit();
         connection.setAutoCommit(true);
+
         permissionsStmt.close();
         metadataStmt.close();
         commentsStmt.close();

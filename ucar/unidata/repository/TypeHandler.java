@@ -1213,24 +1213,25 @@ public class TypeHandler extends RepositoryManager {
             if ( !request.defined(arg)) {
                 continue;
             }
-            String type = arg.substring(metadataPrefix.length());
-            String attr1 = request.getString(arg, "");
+            String type = request.getString(arg,"");
+            if(!request.defined(ARG_METADATA_ATTR1+"."+type) && !request.defined(ARG_METADATA_ATTR2+"."+type) &&
+               !request.defined(ARG_METADATA_ATTR3+"."+type) &&                !request.defined(ARG_METADATA_ATTR4+"."+type)) continue;
+
+            Metadata metadata= new Metadata(type,request.getString(ARG_METADATA_ATTR1+"."+type, ""),
+                                            request.getString(ARG_METADATA_ATTR2+"."+type, ""),
+                                            request.getString(ARG_METADATA_ATTR3+"."+type, ""),
+                                            request.getString(ARG_METADATA_ATTR4+"."+type, ""));
+            
+            metadata.setInherited(request.get(ARG_METADATA_INHERITED+"."+type, false));
             List values = (List) typeMap.get(type);
             if(values == null) {
                 typeMap.put(type, values = new ArrayList());
                 types.add(type);
             }
-            values.add(attr1);
+            values.add(metadata);
         }
         List      metadataAnds    = new ArrayList();
 
-/**
-select entries.name, id, parent_group_id from entries where
-entries.parent_group_id LIKE
-(select  metadata.entry_id ||'%' from metadata where 
-entries.parent_group_id LIKE metadata.entry_id ||'%' AND
-metadata.attr1='foo')
-**/
 
         for(int typeIdx=0;typeIdx<types.size();typeIdx++) {
             String type = (String) types.get(typeIdx);
@@ -1238,23 +1239,25 @@ metadata.attr1='foo')
             List  metadataOrs    = new ArrayList();
             String subTable = TABLE_METADATA +"_"+typeIdx;
             for(int i=0;i<values.size();i++) {
-                String attr1 = (String) values.get(i);
+                Metadata metadata = (Metadata) values.get(i);
                 String clause = 
                     SqlUtil.makeAnd(
                                     Misc.newList(
                                                  SqlUtil.eq(subTable+".entry_id",COL_ENTRIES_ID),
                                                  SqlUtil.eq(
                                                             subTable+".attr1",
-                                                            SqlUtil.quote(attr1)), SqlUtil.eq(
+                                                            SqlUtil.quote(metadata.getAttr1())), SqlUtil.eq(
                                                                                               subTable+".type",
                                                                                               SqlUtil.quote(type))));
-                String inheritedClause = COL_ENTRIES_PARENT_GROUP_ID +" LIKE " +
-                    SqlUtil.group(SqlUtil.makeSelect("metadata.entry_id ||'%'", TABLE_METADATA,
-                                                     "entries.parent_group_id LIKE " + "metadata.entry_id ||'%' AND " +
-                                                     "metadata.attr1=" +SqlUtil.quote(attr1)));
+                if(metadata.getInherited()) {
+                    String inheritedClause = COL_ENTRIES_PARENT_GROUP_ID +" LIKE " +
+                        SqlUtil.group(SqlUtil.makeSelect("metadata.entry_id ||'%'", TABLE_METADATA,
+                                                         "entries.parent_group_id LIKE " + "metadata.entry_id ||'%' AND " +
+                                                         "metadata.attr1=" +SqlUtil.quote(metadata.getAttr1())));
  
-                clause = SqlUtil.group(SqlUtil.makeOr(Misc.newList(SqlUtil.group(clause), SqlUtil.group(inheritedClause))));
-                //                clause = SqlUtil.group(inheritedClause);
+                    clause = SqlUtil.group(SqlUtil.makeOr(Misc.newList(SqlUtil.group(clause), SqlUtil.group(inheritedClause))));
+                    //                clause = SqlUtil.group(inheritedClause);
+                }
                 System.err.println(clause);
                 System.err.println("");
                 metadataOrs.add(SqlUtil.group(clause));
