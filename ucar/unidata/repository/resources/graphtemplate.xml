@@ -40,7 +40,7 @@
 </nodetype>
 
 
-<nodetype    name="entry" parent="Node" fillcolor="255,255,153" imagepath="${root}/File.gif">
+<nodetype    name="entry" parent="Node" fillcolor="255,255,153" imagepath="${root}/file.gif">
   <command label="View entry" command="url(,${root}/entry/show?id=%id%)"/>
   <shape>
   <shape>
@@ -66,7 +66,7 @@
 </nodetype>
 
 
-<nodetype    name="level3radar" parent="entry" alt="Level 3 Radar" imagepath="${root}/Radar.gif"/>
+<nodetype    name="level3radar" parent="entry" alt="Level 3 Radar" imagepath="${root}/radar.gif"/>
 
 ${content}
 

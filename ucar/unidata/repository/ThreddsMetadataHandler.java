@@ -283,6 +283,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             throws Exception {
         sb.append(HtmlUtil.hidden(ARG_METADATA_TYPE+ "." + type, type.toString()));
         String inheritedCbx = HtmlUtil.checkbox(ARG_METADATA_INHERITED+"."+type,"true", false) + HtmlUtil.space(1) + "inherited";
+        inheritedCbx = "";
 
         if (makeSelect) {
             String[] values = getMetadataManager().getDistinctValues(request,

@@ -263,13 +263,13 @@ public class MetaDataServer extends HttpServer implements Constants {
                 repository.log("Error:" + exc, exc);
                 result = new Result("Error",
                                     new StringBuffer(exc.getMessage() + ""));
-                result.putProperty(PROP_NAVLINKS,
-                                   repository.getNavLinks(null));
+                result.setResponseCode(Result.RESPONSE_INTERNALERROR);
             }
             if (result == null) {
                 result = new Result("Error",
                                     new StringBuffer("Unknown request:"
                                         + path));
+                result.setResponseCode(Result.RESPONSE_INTERNALERROR);
             }
             if (result.getNeedToWrite()) {
                 writeContent(result);

@@ -155,6 +155,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
         l.add(0, new TwoFacedObject("None", ""));
 
         String inheritedCbx = HtmlUtil.checkbox(ARG_METADATA_INHERITED+"."+TYPE_ENUM,"true", false) + HtmlUtil.space(1) + "inherited";
+        inheritedCbx = "";
         sb.append(HtmlUtil.hidden(ARG_METADATA_TYPE+ "." + TYPE_ENUM, TYPE_ENUM.toString()));
         sb.append(HtmlUtil.formEntry(TYPE_ENUM.getLabel() + ":",
                                      HtmlUtil.select(ARG_METADATA_ATTR1 + "."
@@ -251,11 +252,11 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
         String arg1 = ARG_ATTR1 + suffix;
         String content;
         if (values != null) {
-            content = formEntry(new String[] { submit, lbl,
+            content = formEntry(new String[] { submit,
                     HtmlUtil.select(arg1, getValues(request),
                                     metadata.getAttr1()) });
         } else {
-            content = formEntry(new String[] { submit, lbl,
+            content = formEntry(new String[] { submit,
                     HtmlUtil.input(arg1, metadata.getAttr1()) });
         }
 

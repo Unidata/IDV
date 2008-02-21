@@ -101,7 +101,14 @@ public class TestGenerator extends Harvester {
 
 
 
+    int         cnt     = 0;
 
+
+    public String getExtraInfo() throws Exception {
+        StringBuffer sb = new StringBuffer();
+        sb.append("Created: " + cnt +"  entries");
+        return sb.toString();
+    }
 
     /**
      * _more_
@@ -112,9 +119,9 @@ public class TestGenerator extends Harvester {
         if ( !getActive()) {
             return;
         }
+        cnt = 0;
         List<Entry> entries = new ArrayList<Entry>();
         final User  user    = repository.getUserManager().getDefaultUser();
-        int         cnt     = 0;
         List        groups  = new ArrayList();
         for (int j = 0; j < 100; j++) {
             Group group = repository.findGroupFromName("Test/Generated/"

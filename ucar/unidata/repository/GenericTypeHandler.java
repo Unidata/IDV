@@ -376,17 +376,21 @@ public class GenericTypeHandler extends TypeHandler {
     public void deleteEntry(Request request, Statement statement, Entry entry)
             throws Exception {
         super.deleteEntry(request, statement, entry);
-        //        statement.setString(1, getTableName());
-        //        statement.setString(2, entry.getId());
+        deleteEntry(request, statement, entry.getId());
+    }
+
+
+    public void deleteEntry(Request request, Statement statement, String id)
+            throws Exception {
         if (colNames.size() == 0) {
             return;
         }
 
         String query = SqlUtil.makeDelete(getTableName(), COL_ID,
-                                          SqlUtil.quote(entry.getId()));
+                                          SqlUtil.quote(id));
         statement.execute(query);
-        //        statement.addBatch();
     }
+
 
     /**
      * _more_

@@ -837,7 +837,7 @@ public class TypeHandler extends RepositoryManager {
 
         String where = SqlUtil.makeAnd(whereList);
         String sql   = SqlUtil.makeSelect(what, tables, where, extra);
-        System.err.println (sql);
+        //        System.err.println (sql);
         return getDatabaseManager().execute(sql,
                                             getRepository().getMax(request));
     }
@@ -883,10 +883,16 @@ public class TypeHandler extends RepositoryManager {
         dateSelect.add(new TwoFacedObject("Last 7 days", "-7 days"));
         dateSelect.add(new TwoFacedObject("All", "none"));
         dateSelect.add(new TwoFacedObject("Custom:", ""));
+        String dateSelectValue;
+        if(request.exists(ARG_RELATIVEDATE)) {
+            dateSelectValue = request.getString(ARG_RELATIVEDATE,"");            
+        } else {
+            dateSelectValue = "-1 hour";
+        }
+            
         String dateSelectInput = HtmlUtil.select(ARG_RELATIVEDATE,
-                                     dateSelect,
-                                     request.getString(ARG_RELATIVEDATE,
-                                         "-1 hour"));
+                                                 dateSelect,
+                                                 dateSelectValue);
         String minDate = request.getDateSelect(ARG_FROMDATE, (String) null);
         String maxDate = request.getDateSelect(ARG_TODATE, (String) null);
 
@@ -1250,16 +1256,21 @@ public class TypeHandler extends RepositoryManager {
                                                                                               subTable+".type",
                                                                                               SqlUtil.quote(type))));
                 if(metadata.getInherited()) {
-                    String inheritedClause = COL_ENTRIES_PARENT_GROUP_ID +" LIKE " +
+                    String inheritedClausexxx = COL_ENTRIES_PARENT_GROUP_ID +" LIKE " +
                         SqlUtil.group(SqlUtil.makeSelect("metadata.entry_id ||'%'", TABLE_METADATA,
                                                          "entries.parent_group_id LIKE " + "metadata.entry_id ||'%' AND " +
                                                          "metadata.attr1=" +SqlUtil.quote(metadata.getAttr1())));
- 
+
+                    String subselect = SqlUtil.makeSelect("metadata.entry_id", TABLE_METADATA,
+                                                          SqlUtil.makeAnd(SqlUtil.like(COL_ENTRIES_PARENT_GROUP_ID, COL_METADATA_ENTRY_ID),
+                                                                          SqlUtil.eq("metadata.attr1" ,SqlUtil.quote(metadata.getAttr1())),
+                                                                          SqlUtil.eq("metadata.type" ,SqlUtil.quote(metadata.getType().toString()))));
+
+                    String inheritedClause = COL_ENTRIES_PARENT_GROUP_ID +" LIKE " + SqlUtil.group(subselect) + " ||'%'";
                     clause = SqlUtil.group(SqlUtil.makeOr(Misc.newList(SqlUtil.group(clause), SqlUtil.group(inheritedClause))));
                     //                clause = SqlUtil.group(inheritedClause);
                 }
-                System.err.println(clause);
-                System.err.println("");
+                //                System.err.println(clause);
                 metadataOrs.add(SqlUtil.group(clause));
             }
             if (metadataOrs.size() > 0) {
@@ -1338,6 +1349,10 @@ public class TypeHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public void deleteEntry(Request requess, Statement statement, Entry entry)
+            throws Exception {}
+
+
+    public void deleteEntry(Request requess, Statement statement, String id)
             throws Exception {}
 
     /**
