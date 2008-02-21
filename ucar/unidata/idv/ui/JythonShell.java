@@ -88,6 +88,9 @@ public class JythonShell extends InteractiveShell {
 
     private boolean autoSelect = false;
 
+    ImageGenerator islInterpreter;
+
+
     /**
      * ctor
      *
@@ -315,6 +318,11 @@ public class JythonShell extends InteractiveShell {
                 "An error occurred creating the interpeter", exc);
             return;
         }
+        if(islInterpreter == null) {
+            islInterpreter = new ImageGenerator(idv);
+        }
+
+        interp.set("islInterpreter", islInterpreter);
         interp.set("shell", this);
         outputStream = new OutputStream() {
             public void write(int b) {

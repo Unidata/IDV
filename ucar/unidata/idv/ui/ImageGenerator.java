@@ -2893,6 +2893,10 @@ public class ImageGenerator extends IdvManager {
             Object result = getInterpreter().eval(s);
             s = result.toString();
         }
+        if (s.startsWith("islInterpreter.")) {
+            Object result = getInterpreter().eval(s);
+            s = result.toString();
+        }
         return s;
     }
 
@@ -3998,6 +4002,7 @@ public class ImageGenerator extends IdvManager {
             interpreter = getIdv().getJythonManager().createInterpreter();
             interpreter.set("ig", this);
             interpreter.set("interp", this);
+            interpreter.set("islInterpreter", this);
         }
         return interpreter;
     }
