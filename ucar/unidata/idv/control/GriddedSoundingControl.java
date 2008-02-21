@@ -384,7 +384,7 @@ public class GriddedSoundingControl extends AerologicalSoundingControl {
      *
      * @param pos                       The probe's new position.
      */
-    private void probeMoved(RealTuple pos) {
+    public void probeMoved(RealTuple pos) {
         if ( !getHaveInitialized()) {
             return;
         }
