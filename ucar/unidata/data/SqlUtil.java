@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.data;
 
 
@@ -107,6 +108,32 @@ public class SqlUtil {
      */
     public static String makeAnd(List toks) {
         return StringUtil.join(" AND ", toks);
+    }
+
+    /**
+     * _more_
+     *
+     * @param clause1 _more_
+     * @param clause2 _more_
+     *
+     * @return _more_
+     */
+    public static String makeAnd(String clause1, String clause2) {
+        return clause1 + " AND " + clause2;
+    }
+
+    /**
+     * _more_
+     *
+     * @param clause1 _more_
+     * @param clause2 _more_
+     * @param clause3 _more_
+     *
+     * @return _more_
+     */
+    public static String makeAnd(String clause1, String clause2,
+                                 String clause3) {
+        return makeAnd(clause1, clause2) + " AND " + clause3;
     }
 
     /**
@@ -821,8 +848,17 @@ public class SqlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param what _more_
+     * @param table _more_
+     * @param where _more_
+     *
+     * @return _more_
+     */
     public static String makeSelect(String what, String table, String where) {
-        return makeSelect(what, Misc.newList(table),where);
+        return makeSelect(what, Misc.newList(table), where);
     }
 
     /**
@@ -882,7 +918,7 @@ public class SqlUtil {
         }
         return "SELECT " + what + " FROM " + tableClause
                + ((where.trim().length() > 0)
-                  ? " WHERE " + where
+                  ? " \nWHERE " + where
                   : "") + " " + extra;
     }
 
@@ -1101,9 +1137,17 @@ public class SqlUtil {
 
 
 
-    public static String[] readString(Statement stmt)
-            throws Exception {
-        return readString(stmt,1);
+    /**
+     * _more_
+     *
+     * @param stmt _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static String[] readString(Statement stmt) throws Exception {
+        return readString(stmt, 1);
     }
 
     /**
