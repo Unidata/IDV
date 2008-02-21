@@ -471,8 +471,9 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @throws Exception _more_
      */
-    public Entry getEntry(ResultSet results) throws Exception {
-        Entry entry = super.getEntry(results);
+    public Entry getEntry(ResultSet results,boolean abbreviated) throws Exception {
+        Entry entry = super.getEntry(results,abbreviated);
+        if(abbreviated) return entry;
         if (colNames.size() == 0) {
             return entry;
         }

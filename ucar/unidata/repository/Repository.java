@@ -2464,6 +2464,12 @@ public class Repository implements Constants, Tables, RequestHandler,
     protected Entry getEntry(String entryId, Request request,
                              boolean andFilter)
             throws Exception {
+        return getEntry(entryId, request, andFilter, false);
+    }
+
+    protected Entry getEntry(String entryId, Request request,
+                             boolean andFilter, boolean abbreviated)
+            throws Exception {
         if (entryId == null) {
             return null;
         }
@@ -2487,15 +2493,16 @@ public class Repository implements Constants, Tables, RequestHandler,
             entryStmt.close();
             return null;
         }
+
         TypeHandler typeHandler = getTypeHandler(results.getString(2));
-        entry = typeHandler.getEntry(results);
+        entry = typeHandler.getEntry(results, abbreviated);
         entryStmt.close();
+
         if (andFilter) {
             entry = getAccessManager().filterEntry(request, entry);
         }
 
-
-        if (entry != null) {
+        if (!abbreviated && entry != null) {
             if (entryCache.size() > ENTRY_CACHE_LIMIT) {
                 entryCache = new Hashtable();
             }
@@ -4735,53 +4742,6 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         }
 
-        Hashtable args           = request.getArgs();
-        String    metadataPrefix = ARG_METADATA_TYPE + ".";
-        List      metadataArgs   = new ArrayList();
-        for (Enumeration keys = args.keys(); keys.hasMoreElements(); ) {
-            String arg = (String) keys.nextElement();
-            if ( !arg.startsWith(metadataPrefix)) {
-                continue;
-            }
-            if ( !request.defined(arg)) {
-                continue;
-            }
-            String type = arg.substring(metadataPrefix.length());
-            metadataArgs.add(type);
-            metadataArgs.add(request.getString(arg, ""));
-        }
-
-        if (metadataArgs.size() > 1) {
-            List<Entry> okEntries = new ArrayList<Entry>();
-            for (Entry entry : allEntries) {
-                boolean entryOk = true;
-                List<Metadata> metadataList =
-                    getMetadataManager().getMetadata(entry);
-                for (int i = 0; i < metadataArgs.size(); i += 2) {
-                    String  type  = (String) metadataArgs.get(i);
-                    String  value = (String) metadataArgs.get(i + 1);
-                    boolean ok    = false;
-                    for (Metadata metadata : metadataList) {
-                        if (metadata.getType().equals(type)
-                                && metadata.getAttr1().equals(value)) {
-                            ok = true;
-                            break;
-                        }
-                    }
-                    if ( !ok) {
-                        entryOk = false;
-                        break;
-                    }
-                }
-                if (entryOk) {
-                    okEntries.add(entry);
-                } else {
-                    //                    System.err.println ("Bad entry: " + getMetadataManager().getMetadata(entry));
-                }
-            }
-            allEntries = okEntries;
-        }
-
 
 
         for (Entry entry : allEntries) {
@@ -5276,6 +5236,32 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
 
 
+    private List<String> getDescendents(Request request, List<String> ids,
+                                        Connection connection)
+        throws Exception {
+
+        List<String> children = new ArrayList();
+        for (String id: ids) {
+            String[] idArray = SqlUtil.readString(
+                                              getDatabaseManager().execute(
+                                                                           connection,
+                                                                           SqlUtil.makeSelect(
+                                                                                              COL_ENTRIES_ID, TABLE_ENTRIES,
+                                                                                              SqlUtil.eq(
+                                                                                                         COL_ENTRIES_PARENT_GROUP_ID,
+                                                                                                         SqlUtil.quote(id)))));
+            for (int i = 0; i < idArray.length; i++) {
+                children.add(idArray[i]);
+            }
+        }
+
+        List<String> descendents = getDescendents(request, children, connection);
+        descendents.addAll(children);
+        return descendents;
+    }
+
+
+
     /**
      * _more_
      *
@@ -5334,7 +5320,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                                            COL_ENTRIES_PARENT_GROUP_ID,
                                            SqlUtil.quote(entry.getId())))));
             for (int i = 0; i < ids.length; i++) {
-                Entry childEntry = getEntry(ids[i], request);
+                Entry childEntry = getEntry(ids[i], request, false, true);
                 if (childEntry != null) {
                     if (childEntry.isGroup()) {
                         List<Entry> tmp = new ArrayList<Entry>();
