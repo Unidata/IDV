@@ -321,6 +321,7 @@ public class PatternHarvester extends Harvester {
 
             status.append("Done... sleeping for " + getSleepMinutes()+" minutes<br>");
             Misc.sleep((long) (getSleepMinutes() * 60 * 1000));
+            status = new StringBuffer();
         }
     }
 

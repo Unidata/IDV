@@ -3112,21 +3112,25 @@ public class Repository implements Constants, Tables, RequestHandler,
             entries.add(entry);
             Group group = findGroup(entry.getParentGroupId());
 
-            String href = HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
-                                                     group.getId()),
-                                        group.getName());
-            
+          
 
-            final Request theRequest = request;
-            ActionManager.Action action = new ActionManager.Action() {
-                    public void run(Object actionId) throws Exception {
-                        deleteEntries(theRequest, entries, actionId);
-                    }
-                };
+            if(entry.isGroup()) {
+                final Request theRequest = request;
+                ActionManager.Action action = new ActionManager.Action() {
+                        public void run(Object actionId) throws Exception {
+                            deleteEntries(theRequest, entries, actionId);
+                        }
+                    };
+                String href = HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                                                         group.getId()),
+                                            group.getName());
 
-            Object actionId = getActionManager().runAction(action, "Deleting entry","Continue: " + href);
-
-            return new Result(HtmlUtil.url(getActionManager().URL_STATUS, ARG_ACTION_ID, ""+actionId));
+                return  getActionManager().doAction(request, action, "Deleting entry","Continue: " + href);
+            } else {
+                deleteEntries(request, entries, null);
+                return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                                               group.getId()));
+            }
         }
 
 
@@ -4440,8 +4444,16 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     private void initGroups() throws Exception {
         topGroup = findGroupFromName(GROUP_TOP,
-                                     getUserManager().getDefaultUser(), true,
-                                     true);
+                                     getUserManager().getDefaultUser(), false);
+        //Make the top group if needed
+        if(topGroup == null) {
+            topGroup = findGroupFromName(GROUP_TOP,
+                                         getUserManager().getDefaultUser(), true,
+                                         true);
+            
+            getAccessManager().initTopGroup(topGroup);
+        }
+
 
         Statement statement =
             getDatabaseManager().execute(SqlUtil.makeSelect(COLUMNS_ENTRIES,
@@ -5361,7 +5373,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
     private void deleteEntriesInner(Request request, List<Entry> entries,
-                                    Connection connection,Object asynchId)
+                                    Connection connection,Object actionId)
             throws Exception {
 
         System.err.println("before");
@@ -5408,7 +5420,17 @@ public class Repository implements Constants, Tables, RequestHandler,
             String id = tuple[0];
 
             deleteCnt++;
-            getActionManager().setActionMessage(asynchId, "Deleted:" + deleteCnt +" entries");
+            if(actionId !=null && !getActionManager().getActionOk(actionId)) {
+                getActionManager().setActionMessage(actionId, "Delete canceled");
+                connection.rollback();
+                permissionsStmt.close();
+                metadataStmt.close();
+                commentsStmt.close();
+                assocStmt.close();
+                entriesStmt.close();
+                return;
+            }
+            getActionManager().setActionMessage(actionId, "Deleted:" + deleteCnt +" entries");
             if (deleteCnt % 100 == 0) {
                 System.err.println("Deleted:" + deleteCnt);
             }

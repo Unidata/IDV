@@ -74,6 +74,8 @@ public class UserManager extends RepositoryManager {
     /** _more_          */
     public static final String ROLE_ANY = "any";
 
+    public static final String ROLE_NONE = "none";
+
 
     /** _more_ */
     private Hashtable session = new Hashtable();

@@ -165,6 +165,12 @@ public class MetadataManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public List<Metadata> getMetadata(Entry entry) throws Exception {
+        List<Metadata> metadataList = entry.getMetadata();
+        if(metadataList!=null) {
+            return metadataList;
+        }
+
+
         String query = SqlUtil.makeSelect(
                            COLUMNS_METADATA, Misc.newList(
                                TABLE_METADATA), SqlUtil.eq(
@@ -172,10 +178,11 @@ public class MetadataManager extends RepositoryManager {
                                    entry.getId())), " order by "
                                        + COL_METADATA_TYPE);
 
+        System.err.println("query:" + query);
         SqlUtil.Iterator iter =
             SqlUtil.getIterator(getDatabaseManager().execute(query));
         ResultSet      results;
-        List<Metadata> metadataList = new ArrayList();
+        metadataList = new ArrayList();
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 int             col     = 1;
@@ -187,6 +194,7 @@ public class MetadataManager extends RepositoryManager {
                         results.getString(col++), results.getString(col++)));
             }
         }
+        entry.setMetadata(metadataList);
         return metadataList;
     }
 

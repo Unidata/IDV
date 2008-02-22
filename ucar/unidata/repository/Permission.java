@@ -110,6 +110,13 @@ public class Permission {
     /** _more_ */
     List<String> roles;
 
+    public Permission(String action, String role) {
+        this.action = action;
+        roles = new ArrayList<String>();
+        roles.add(role);
+    }
+
+
     /**
      * _more_
      *
