@@ -414,11 +414,11 @@ public class UserManager extends RepositoryManager {
      */
     public String makeLoginForm(Request request, String extra) {
         StringBuffer sb   = new StringBuffer("<h3>Please login</h3>");
-        String       name = request.getString(ARG_USER_NAME, "");
+        String       id = request.getString(ARG_USER_ID, "");
         sb.append(HtmlUtil.form(URL_USER_LOGIN));
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry("User:",
-                                     HtmlUtil.input(ARG_USER_NAME, name)));
+                                     HtmlUtil.input(ARG_USER_ID, id)));
         sb.append(HtmlUtil.formEntry("Password:",
                                      HtmlUtil.password(ARG_USER_PASSWORD1)));
         sb.append(extra);
@@ -1014,6 +1014,68 @@ public class UserManager extends RepositoryManager {
     }
 
 
+    public Result processInitialAdminPage(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        sb.append("<h3>Repository Initialization</h3>");
+        String id        = "";
+        String name      = "";
+        if(request.exists(ARG_USER_ID)) {
+            id        = request.getString(ARG_USER_ID, "").trim();
+            name      = request.getString(ARG_USER_NAME, name).trim();
+            String password1 = request.getString(ARG_USER_PASSWORD1, "").trim();
+            String password2 = request.getString(ARG_USER_PASSWORD2, "").trim();
+            boolean okToAdd = true;
+            StringBuffer errorBuffer = new StringBuffer();
+            if (id.length() == 0) {
+                okToAdd = false;
+                errorBuffer.append("&nbsp;&nbsp;Please enter an ID<br>");
+            }
+
+            if (password1.length() == 0) {
+                okToAdd = false;
+                errorBuffer.append("&nbsp;&nbsp;Invalid password<br>");
+            } else if ( !password1.equals(password2)) {
+                okToAdd = false;
+                errorBuffer.append("&nbsp;&nbsp;Invalid password<br>");
+            }
+
+
+            if (okToAdd) {
+                makeOrUpdateUser(new User(id, name, "", "", "",
+                                          hashPassword(password1),
+                                          true), false);
+                sb.append("Site administrator created<p>");
+                sb.append(makeLoginForm(request));
+                getRepository().writeGlobal(ARG_ADMIN_HAVECREATED, "true");
+                return new Result("",sb);
+            }
+            sb.append("Error:<br>");
+            sb.append(errorBuffer);
+            sb.append("<p>");
+        }
+
+
+        sb.append("Please enter the repository administrator user name and password");
+        sb.append("<p>");
+        sb.append(HtmlUtil.form(getRepository().URL_DUMMY));
+        sb.append(HtmlUtil.formTable());
+        sb.append(HtmlUtil.formEntry("ID:",
+                                     HtmlUtil.input(ARG_USER_ID,id)));
+        sb.append(HtmlUtil.formEntry("Name:",
+                                     HtmlUtil.input(ARG_USER_NAME,name)));
+
+        sb.append(HtmlUtil.formEntry("Password:",
+                                     HtmlUtil.password(ARG_USER_PASSWORD1)));
+
+        sb.append(HtmlUtil.formEntry("Password Again:",
+                                     HtmlUtil.password(ARG_USER_PASSWORD2)));
+
+        sb.append(HtmlUtil.formEntry("",HtmlUtil.submit("Make Administrator")));
+        return new Result("Initialization", sb);
+
+    }
+
+
     /**
      * _more_
      *
@@ -1207,8 +1269,8 @@ public class UserManager extends RepositoryManager {
     public Result processLogin(Request request) throws Exception {
         StringBuffer sb   = new StringBuffer();
         User         user = null;
-        if (request.exists(ARG_USER_NAME)) {
-            String name     = request.getString(ARG_USER_NAME, "");
+        if (request.exists(ARG_USER_ID)) {
+            String name     = request.getString(ARG_USER_ID, "");
             String password = request.getString(ARG_USER_PASSWORD1, "");
             password = hashPassword(password);
             String query = SqlUtil.makeSelect(

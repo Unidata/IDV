@@ -63,7 +63,7 @@ public class Entity {
 
 
     /** _more_ */
-    List<Metadata> metadata = new ArrayList<Metadata>();
+    List<Metadata> metadata;
 
     /** _more_ */
     private String id;

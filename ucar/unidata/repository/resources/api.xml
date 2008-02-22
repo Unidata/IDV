@@ -52,9 +52,9 @@
   <method request="/getmap"            method="processMap"       cancache="false"/>
   <method request="/processfile"    method="processFile"        cancache="false"/>
   <method  request="/message"      method="processMessage"    cancache="false" />
+  <method request="/dummy"      method="processDummy"/>
 
   <method  handler="actionmanager" request="/status"      method="processStatus"    cancache="false" />
-
 
 
 
@@ -64,27 +64,29 @@
 
 
 
-  <property name="handler" value="usermanager"/>
-  <method  request="/user/login"    method="processLogin" admin="false"/>
-  <method  request="/user/logout"   method="processLogout" admin="false"/>
-  <method  request="/user/home"     method="processHome" admin="false"/>
-  <method  request="/user/settings" method="processSettings" admin="false"/>
-  <method  request="/user/cart"     method="processCart" admin="false"/>
-
-  <method  request="/user/list"     method="adminUserList" />
-  <method  request="/user/edit"     method="adminUserEdit" />
-  <method  request="/user/new"      method="adminUserNew"/>
+  <method handler="usermanager"   request="/user/login"    method="processLogin" admin="false"/>
+  <method handler="usermanager"   request="/user/logout"   method="processLogout" admin="false"/>
+  <method handler="usermanager"   request="/user/home"     method="processHome" admin="false"/>
+  <method handler="usermanager"   request="/user/settings" method="processSettings" admin="false"/>
+  <method handler="usermanager"   request="/user/cart"     method="processCart" admin="false"/>
+  <method handler="usermanager"   request="/user/list"     method="adminUserList" />
+  <method handler="usermanager"   request="/user/edit"     method="adminUserEdit" />
+  <method handler="usermanager"   request="/user/new"      method="adminUserNew"/>
 
 
-  <property name="handler" value="admin"/>
-  <method  request="/admin/import/catalog"       method="adminImportCatalog"  />
-  <method  request="/admin/sql"          method="adminSql"       />
-  <method  request="/admin/startstop"    method="adminDbStartStop" />
-  <method  request="/admin/settings"    method="adminSettings"   name="Admin" toplevel="true"/>
-  <method  request="/admin/settings/do"    method="adminSettingsDo"/>
-  <method  request="/admin/tables"       method="adminDbTables"  />
-  <method  request="/admin/actions"       method="adminActions"  />
-  <method  request="/admin/stats"        method="adminStats"     />
-  <method  request="/admin/harvesters"   method="adminHarvesters"/>
-  <method  request="/admin/cleanup"        method="adminCleanup" />
+
+
+  <method handler="admin"  request="/admin/import/catalog"       method="adminImportCatalog"  />
+  <method handler="admin"  request="/admin/sql"          method="adminSql"       />
+  <method handler="admin"  request="/admin/startstop"    method="adminDbStartStop" />
+  <method handler="admin"  request="/admin/settings"    method="adminSettings"   name="Admin" toplevel="true"/>
+  <method handler="admin"  request="/admin/settings/do"    method="adminSettingsDo"/>
+  <method handler="admin"  request="/admin/tables"       method="adminDbTables"  />
+  <method handler="admin"  request="/admin/actions"       method="adminActions"  />
+  <method handler="admin"  request="/admin/stats"        method="adminStats"     />
+  <method handler="admin"  request="/admin/harvesters"   method="adminHarvesters"/>
+  <method handler="admin"  request="/admin/cleanup"        method="adminCleanup" />
+
+
+
 </api>

@@ -448,6 +448,7 @@ public interface Constants {
     public static final String TYPE_GROUP = "group";
 
 
+
     /** _more_ */
     public static final String PROP_DOWNLOAD_OK = "jdms.download.ok";
 
@@ -633,6 +634,9 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_DESCRIPTION = "description";
+
+
+    public static final String ARG_ADMIN_HAVECREATED  = "admin.havecreated";
 
 
     /** _more_ */

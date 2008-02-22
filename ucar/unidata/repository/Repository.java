@@ -111,6 +111,8 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     public RequestUrl URL_MESSAGE = new RequestUrl(this, "/message");
 
+    public RequestUrl URL_DUMMY = new RequestUrl(this, "/dummy");
+
 
     /** _more_ */
     public RequestUrl URL_ENTRY_SEARCHFORM = new RequestUrl(this,
@@ -231,6 +233,8 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     /** _more_ */
     private Properties properties = new Properties();
+
+    private Properties dbProperties = new Properties();
 
 
     /** _more_ */
@@ -849,10 +853,13 @@ public class Repository implements Constants, Tables, RequestHandler,
         Statement statement =
             getDatabaseManager().execute(SqlUtil.makeSelect("*",
                 Misc.newList(TABLE_GLOBALS)));
-
+        dbProperties = new Properties();
         ResultSet results = statement.getResultSet();
         while (results.next()) {
-            properties.put(results.getString(1), results.getString(2));
+            String name = results.getString(1);
+            String value = results.getString(2);
+            properties.put(name, value);
+            dbProperties.put(name,value);
         }
         statement.close();
     }
@@ -1279,6 +1286,16 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
 
+        if(!getDbProperty(ARG_ADMIN_HAVECREATED, false)) {
+            if(cmdLineUsers.size() == 0) {
+                return getUserManager().processInitialAdminPage(request);
+            } else {
+                writeGlobal(ARG_ADMIN_HAVECREATED, "true");
+            }
+        }
+
+
+
         if ( !getUserManager().isRequestOk(request)
                 || !apiMethod.isRequestOk(request, this)) {
             throw new AccessException("You cannot access this page");
@@ -1477,6 +1494,10 @@ public class Repository implements Constants, Tables, RequestHandler,
         return Misc.getProperty(properties, name, dflt);
     }
 
+    public boolean getDbProperty(String name, boolean dflt) {
+        return Misc.getProperty(dbProperties, name, dflt);
+    }
+
 
     /**
      * _more_
@@ -1564,6 +1585,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         getDatabaseManager().executeInsert(INSERT_GLOBALS,
                                            new Object[] { name,
                 value });
+        dbProperties.put(name,value);
         properties.put(name, value);
     }
 
@@ -1888,6 +1910,12 @@ public class Repository implements Constants, Tables, RequestHandler,
         return new Result(
             "",
             new StringBuffer(note(request.getUnsafeString(ARG_MESSAGE, ""))));
+    }
+
+    public Result processDummy(Request request) throws Exception {
+        return new Result(
+            "",
+            new StringBuffer(""));
     }
 
     /**
@@ -5376,10 +5404,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                                     Connection connection,Object actionId)
             throws Exception {
 
-        System.err.println("before");
         List<String[]> found  = getDescendents(request, entries, connection);
-        System.err.println("after " + found.size());
-
         String query;
 
 
@@ -5430,7 +5455,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 entriesStmt.close();
                 return;
             }
-            getActionManager().setActionMessage(actionId, "Deleted:" + deleteCnt +" entries");
+            getActionManager().setActionMessage(actionId, "Deleted:" + deleteCnt +"/" + found.size()+" entries");
             if (deleteCnt % 100 == 0) {
                 System.err.println("Deleted:" + deleteCnt);
             }
