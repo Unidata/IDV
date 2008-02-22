@@ -62,10 +62,13 @@ import java.util.Properties;
 public class ActionManager extends RepositoryManager {
 
 
+    /** _more_          */
     public RequestUrl URL_STATUS = new RequestUrl(this, "/status");
 
 
-    private Hashtable<Object,ActionInfo> actions = new Hashtable<Object,ActionInfo>();
+    /** _more_          */
+    private Hashtable<Object, ActionInfo> actions = new Hashtable<Object,
+                                                        ActionInfo>();
 
 
     /**
@@ -79,43 +82,53 @@ public class ActionManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processStatus(Request request) throws Exception {
 
-        String id = request.getString(ARG_ACTION_ID,"");
-        ActionInfo action = getAction(id);
-        StringBuffer sb = new StringBuffer();
-        if(action == null) {
+        String       id     = request.getString(ARG_ACTION_ID, "");
+        ActionInfo   action = getAction(id);
+        StringBuffer sb     = new StringBuffer();
+        if (action == null) {
             sb.append("No action found");
-            return new Result("Status",  sb);
+            return new Result("Status", sb);
         }
 
-        sb.append("<h3>Action: " + action.getName() +"</h3>");
-        if(request.exists(ARG_CANCEL)) {
+        sb.append("<h3>Action: " + action.getName() + "</h3>");
+        if (request.exists(ARG_CANCEL)) {
             action.setRunning(false);
             actions.remove(id);
             sb.append("Action canceled");
         } else {
-            if(action.getError()!=null) {
+            if (action.getError() != null) {
                 sb.append("Error<p>");
                 sb.append(action.getError());
                 actions.remove(id);
-            } else   if(!action.getRunning()) {
+            } else if ( !action.getRunning()) {
                 sb.append("Completed<p>");
                 sb.append(action.getContinueHtml());
                 actions.remove(id);
             } else {
                 sb.append("In progress<br>");
-                sb.append(HtmlUtil.href(HtmlUtil.url(URL_STATUS, ARG_ACTION_ID, id),"Reload"));
+                sb.append(HtmlUtil.href(HtmlUtil.url(URL_STATUS,
+                        ARG_ACTION_ID, id), "Reload"));
                 sb.append("<p>");
                 sb.append(action.getMessage());
                 sb.append("<p>");
                 sb.append(HtmlUtil.form(URL_STATUS));
-                sb.append(HtmlUtil.submit("Cancel Action",ARG_CANCEL));
-                sb.append(HtmlUtil.hidden(ARG_ACTION_ID,id));
+                sb.append(HtmlUtil.submit("Cancel Action", ARG_CANCEL));
+                sb.append(HtmlUtil.hidden(ARG_ACTION_ID, id));
                 sb.append(HtmlUtil.formClose());
             }
         }
-        return new Result("Status",  sb);
+        return new Result("Status", sb);
     }
 
 
@@ -123,38 +136,87 @@ public class ActionManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
     protected ActionInfo getAction(Object id) {
-        if(id ==null) return null;
-        return  actions.get(id);
+        if (id == null) {
+            return null;
+        }
+        return actions.get(id);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
     protected boolean getActionOk(Object id) {
         ActionInfo action = getAction(id);
-        if(action == null) return false;
+        if (action == null) {
+            return false;
+        }
         return action.getRunning();
     }
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param msg _more_
+     */
     protected void setActionMessage(Object id, String msg) {
         ActionInfo action = getAction(id);
-        if(action == null) return;
+        if (action == null) {
+            return;
+        }
         action.setMessage(msg);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     */
     protected void actionComplete(Object id) {
         ActionInfo action = getAction(id);
-        if(action == null) return;
+        if (action == null) {
+            return;
+        }
         action.setRunning(false);
     }
 
+    /**
+     * _more_
+     *
+     * @param actionId _more_
+     * @param exc _more_
+     */
     protected void handleError(Object actionId, Exception exc) {
         ActionInfo action = getAction(actionId);
-        if(action == null) return;
+        if (action == null) {
+            return;
+        }
         action.setError("An error has occurred:" + exc);
     }
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     * @param continueHtml _more_
+     *
+     * @return _more_
+     */
     protected Object addAction(String msg, String continueHtml) {
         String id = getRepository().getGUID();
         actions.put(id, new ActionInfo(msg, continueHtml));
@@ -162,147 +224,206 @@ public class ActionManager extends RepositoryManager {
     }
 
 
-    protected Result doAction(Request request, final Action runnable, String name, String continueHtml) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param runnable _more_
+     * @param name _more_
+     * @param continueHtml _more_
+     *
+     * @return _more_
+     */
+    protected Result doAction(Request request, final Action runnable,
+                              String name, String continueHtml) {
         Object actionId = runAction(runnable, name, continueHtml);
-        return new Result(HtmlUtil.url(URL_STATUS, ARG_ACTION_ID, ""+actionId));
+        return new Result(HtmlUtil.url(URL_STATUS, ARG_ACTION_ID,
+                                       "" + actionId));
     }
 
 
-    protected Object runAction(final Action runnable, String name, String continueHtml) {
+    /**
+     * _more_
+     *
+     * @param runnable _more_
+     * @param name _more_
+     * @param continueHtml _more_
+     *
+     * @return _more_
+     */
+    protected Object runAction(final Action runnable, String name,
+                               String continueHtml) {
         final Object actionId = addAction(name, continueHtml);
         Misc.run(new Runnable() {
-                public void run() {
-                    try {
-                        runnable.run(actionId);
-                    } catch(Exception exc) {
-                        //TODO: handle the error better
-                        handleError(actionId, exc);
-                        return;
-                    }
-                    actionComplete(actionId);
+            public void run() {
+                try {
+                    runnable.run(actionId);
+                } catch (Exception exc) {
+                    //TODO: handle the error better
+                    handleError(actionId, exc);
+                    return;
                 }
-            });
+                actionComplete(actionId);
+            }
+        });
         return actionId;
     }
 
 
+    /**
+     * Action _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     public static interface Action {
+
+        /**
+         * _more_
+         *
+         * @param actionId _more_
+         *
+         * @throws Exception _more_
+         */
         public void run(Object actionId) throws Exception;
     }
 
 
+    /**
+     * Class ActionInfo _more_
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     public static class ActionInfo {
 
-    private String name;
-    private boolean running=true;
-    private String message="";
-    private String continueHtml;
-        private String error=null;
+        /** _more_          */
+        private String name;
+
+        /** _more_          */
+        private boolean running = true;
+
+        /** _more_          */
+        private String message = "";
+
+        /** _more_          */
+        private String continueHtml;
+
+        /** _more_          */
+        private String error = null;
 
 
-    public ActionInfo(String name, String continueHtml) {
-        this.name = name;
-        this.continueHtml = continueHtml;
+        /**
+         * _more_
+         *
+         * @param name _more_
+         * @param continueHtml _more_
+         */
+        public ActionInfo(String name, String continueHtml) {
+            this.name         = name;
+            this.continueHtml = continueHtml;
+        }
+
+
+        /**
+         *  Set the Name property.
+         *
+         *  @param value The new value for Name
+         */
+        public void setName(String value) {
+            name = value;
+        }
+
+        /**
+         *  Get the Name property.
+         *
+         *  @return The Name
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         *  Set the Running property.
+         *
+         *  @param value The new value for Running
+         */
+        public void setRunning(boolean value) {
+            running = value;
+        }
+
+        /**
+         *  Get the Running property.
+         *
+         *  @return The Running
+         */
+        public boolean getRunning() {
+            return running;
+        }
+
+
+
+        /**
+         * Set the Message property.
+         *
+         * @param value The new value for Message
+         */
+        public void setMessage(String value) {
+            message = value;
+        }
+
+        /**
+         * Get the Message property.
+         *
+         * @return The Message
+         */
+        public String getMessage() {
+            return message;
+        }
+
+
+        /**
+         * Set the ContinueHtml property.
+         *
+         * @param value The new value for ContinueHtml
+         */
+        public void setContinueHtml(String value) {
+            continueHtml = value;
+        }
+
+        /**
+         * Get the ContinueHtml property.
+         *
+         * @return The ContinueHtml
+         */
+        public String getContinueHtml() {
+            return continueHtml;
+        }
+
+        /**
+         * Set the Error property.
+         *
+         * @param value The new value for Error
+         */
+        public void setError(String value) {
+            error = value;
+        }
+
+        /**
+         * Get the Error property.
+         *
+         * @return The Error
+         */
+        public String getError() {
+            return error;
+        }
+
+
+
+
     }
-
-
-    /**
-       Set the Name property.
-
-       @param value The new value for Name
-    **/
-    public void setName (String value) {
-	name = value;
-    }
-
-    /**
-       Get the Name property.
-
-       @return The Name
-    **/
-    public String getName () {
-	return name;
-    }
-
-    /**
-       Set the Running property.
-
-       @param value The new value for Running
-    **/
-    public void setRunning (boolean value) {
-	running = value;
-    }
-
-    /**
-       Get the Running property.
-
-       @return The Running
-    **/
-    public boolean getRunning () {
-	return running;
-    }
-
-
-    
-/**
-Set the Message property.
-
-@param value The new value for Message
-**/
-public void setMessage (String value) {
-	message = value;
-}
-
-/**
-Get the Message property.
-
-@return The Message
-**/
-public String getMessage () {
-	return message;
-}
-
-
-/**
-Set the ContinueHtml property.
-
-@param value The new value for ContinueHtml
-**/
-public void setContinueHtml (String value) {
-	continueHtml = value;
-}
-
-/**
-Get the ContinueHtml property.
-
-@return The ContinueHtml
-**/
-public String getContinueHtml () {
-	return continueHtml;
-}
-
-/**
-Set the Error property.
-
-@param value The new value for Error
-**/
-public void setError (String value) {
-	error = value;
-}
-
-/**
-Get the Error property.
-
-@return The Error
-**/
-public String getError () {
-	return error;
-}
-
-
-
-
-}
 
 
 

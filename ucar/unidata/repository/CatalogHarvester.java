@@ -87,7 +87,7 @@ public class CatalogHarvester extends Harvester {
     /** _more_ */
     int catalogCnt = 0;
 
-    /** _more_          */
+    /** _more_ */
     int entryCnt = 0;
 
     /** _more_ */
@@ -96,7 +96,7 @@ public class CatalogHarvester extends Harvester {
     /** _more_ */
     String topUrl;
 
-    /** _more_          */
+    /** _more_ */
     List<Entry> entries = new ArrayList<Entry>();
 
     /**

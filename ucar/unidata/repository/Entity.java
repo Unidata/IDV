@@ -55,7 +55,7 @@ public class Entity {
     /** _more_ */
     List<Permission> permissions = null;
 
-    /** _more_          */
+    /** _more_ */
     Hashtable permissionMap = new Hashtable();
 
     /** _more_ */

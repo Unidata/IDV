@@ -101,12 +101,20 @@ public class TestGenerator extends Harvester {
 
 
 
-    int         cnt     = 0;
+    /** _more_          */
+    int cnt = 0;
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public String getExtraInfo() throws Exception {
         StringBuffer sb = new StringBuffer();
-        sb.append("Created: " + cnt +"  entries");
+        sb.append("Created: " + cnt + "  entries");
         return sb.toString();
     }
 

@@ -756,7 +756,7 @@ public class HtmlOutputHandler extends OutputHandler {
                      *       icon = HtmlUtil.img(metadata.getAttr1(),"View " + subGroup.getName()," width=75 border=0 ") + HtmlUtil.space(1);
                      *       break;
                      *   }
-                     *   }*
+                     *   }
                      */
 
                     //                    sb.append(getRepository().getEntryLinks(request, subGroup));

@@ -100,7 +100,7 @@ public class Request implements Constants {
     /** _more_ */
     private String sessionId;
 
-    /** _more_          */
+    /** _more_ */
     private OutputStream outputStream;
 
     /** _more_ */
@@ -765,7 +765,8 @@ public class Request implements Constants {
      * @return _more_
      */
     public String toString() {
-        return type + " " + getUrlArgs();
+        return type + "url args:" + getUrlArgs() + "\n\theader args:"
+               + httpHeaderArgs;
     }
 
     /**

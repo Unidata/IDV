@@ -101,6 +101,7 @@ public class Metadata implements Constants, Tables {
     /** _more_ */
     private String attr4;
 
+    /** _more_          */
     private boolean inherited = false;
 
     /**
@@ -113,7 +114,17 @@ public class Metadata implements Constants, Tables {
     }
 
 
-    public Metadata(String type,String attr1, String attr2, String attr3, String attr4) {
+    /**
+     * _more_
+     *
+     * @param type _more_
+     * @param attr1 _more_
+     * @param attr2 _more_
+     * @param attr3 _more_
+     * @param attr4 _more_
+     */
+    public Metadata(String type, String attr1, String attr2, String attr3,
+                    String attr4) {
         this("", "", type, attr1, attr2, attr3, attr4);
     }
 
@@ -306,21 +317,21 @@ public class Metadata implements Constants, Tables {
 
 
     /**
-       Set the Inherited property.
-
-       @param value The new value for Inherited
-    **/
-    public void setInherited (boolean value) {
-	inherited = value;
+     *  Set the Inherited property.
+     *
+     *  @param value The new value for Inherited
+     */
+    public void setInherited(boolean value) {
+        inherited = value;
     }
 
     /**
-       Get the Inherited property.
-
-       @return The Inherited
-    **/
-    public boolean getInherited () {
-	return inherited;
+     *  Get the Inherited property.
+     *
+     *  @return The Inherited
+     */
+    public boolean getInherited() {
+        return inherited;
     }
 
 
@@ -350,10 +361,10 @@ public class Metadata implements Constants, Tables {
      */
     public static class Type {
 
-        /** _more_          */
+        /** _more_ */
         String type;
 
-        /** _more_          */
+        /** _more_ */
         String label;
 
         /**

@@ -79,13 +79,13 @@ import java.util.zip.*;
  */
 public class CatalogOutputHandler extends OutputHandler {
 
-    /** _more_          */
+    /** _more_ */
     public static final String SERVICE_HTTP = "http";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SERVICE_SELF = "self";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SERVICE_OPENDAP = "opendap";
 
     /** _more_ */
@@ -152,7 +152,7 @@ public class CatalogOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String TAG_SERVICENAME = "serviceName";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SERVICENAME = "serviceName";
 
 
@@ -166,15 +166,15 @@ public class CatalogOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String ATTR_SERVICETYPE = "serviceType";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_PATHS = "catalogoutputhandler.paths";
 
 
 
-    /** _more_          */
+    /** _more_ */
     private List<String> tdsPrefixes;
 
-    /** _more_          */
+    /** _more_ */
     private List<String> tdsNotPrefixes;
 
 

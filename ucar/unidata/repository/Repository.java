@@ -111,6 +111,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     public RequestUrl URL_MESSAGE = new RequestUrl(this, "/message");
 
+    /** _more_          */
     public RequestUrl URL_DUMMY = new RequestUrl(this, "/dummy");
 
 
@@ -157,7 +158,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     //    public RequestUrl URL_GROUP_SHOW = new RequestUrl(this, "/group/show");
 
-    /** _more_          */
+    /** _more_ */
     public RequestUrl URL_GROUP_SHOW = URL_ENTRY_SHOW;
 
     /** _more_ */
@@ -234,6 +235,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private Properties properties = new Properties();
 
+    /** _more_          */
     private Properties dbProperties = new Properties();
 
 
@@ -334,12 +336,13 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private UserManager userManager;
 
+    /** _more_          */
     private ActionManager actionManager;
 
-    /** _more_          */
+    /** _more_ */
     private AccessManager accessManager;
 
-    /** _more_          */
+    /** _more_ */
     private MetadataManager metadataManager;
 
     /** _more_ */
@@ -376,7 +379,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-    /** _more_          */
+    /** _more_ */
     private List<String> htdocRoots = new ArrayList<String>();
 
 
@@ -856,10 +859,10 @@ public class Repository implements Constants, Tables, RequestHandler,
         dbProperties = new Properties();
         ResultSet results = statement.getResultSet();
         while (results.next()) {
-            String name = results.getString(1);
+            String name  = results.getString(1);
             String value = results.getString(2);
             properties.put(name, value);
-            dbProperties.put(name,value);
+            dbProperties.put(name, value);
         }
         statement.close();
     }
@@ -1191,6 +1194,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (debug) {
             debug("user:" + request.getUser() + " -- " + request.toString());
         }
+        //        log("request:" + request);
         try {
             getUserManager().checkSession(request);
             result = getResult(request);
@@ -1286,8 +1290,8 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
 
-        if(!getDbProperty(ARG_ADMIN_HAVECREATED, false)) {
-            if(cmdLineUsers.size() == 0) {
+        if ( !getDbProperty(ARG_ADMIN_HAVECREATED, false)) {
+            if (cmdLineUsers.size() == 0) {
                 return getUserManager().processInitialAdminPage(request);
             } else {
                 writeGlobal(ARG_ADMIN_HAVECREATED, "true");
@@ -1494,6 +1498,14 @@ public class Repository implements Constants, Tables, RequestHandler,
         return Misc.getProperty(properties, name, dflt);
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public boolean getDbProperty(String name, boolean dflt) {
         return Misc.getProperty(dbProperties, name, dflt);
     }
@@ -1585,7 +1597,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         getDatabaseManager().executeInsert(INSERT_GLOBALS,
                                            new Object[] { name,
                 value });
-        dbProperties.put(name,value);
+        dbProperties.put(name, value);
         properties.put(name, value);
     }
 
@@ -1912,10 +1924,17 @@ public class Repository implements Constants, Tables, RequestHandler,
             new StringBuffer(note(request.getUnsafeString(ARG_MESSAGE, ""))));
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processDummy(Request request) throws Exception {
-        return new Result(
-            "",
-            new StringBuffer(""));
+        return new Result("", new StringBuffer(""));
     }
 
     /**
@@ -2177,16 +2196,17 @@ public class Repository implements Constants, Tables, RequestHandler,
             //                                         outputHtml + orderBy));
             //            outputHtml += orderBy;
 
-            outputHtml = HtmlUtil.space(2) + HtmlUtil.bold("Output Type:") + HtmlUtil.space(1)+   outputHtml + orderBy;
+            outputHtml = HtmlUtil.space(2) + HtmlUtil.bold("Output Type:")
+                         + HtmlUtil.space(1) + outputHtml + orderBy;
         }
 
 
 
 
         if (metadataForm) {
-            sb.append(HtmlUtil.formEntry(HtmlUtil.space(1),""));
+            sb.append(HtmlUtil.formEntry(HtmlUtil.space(1), ""));
         }
-        sb.append(HtmlUtil.formEntry("", buttons +  outputHtml));
+        sb.append(HtmlUtil.formEntry("", buttons + outputHtml));
 
         sb.append("</table>");
         sb.append("</form>");
@@ -2535,6 +2555,18 @@ public class Repository implements Constants, Tables, RequestHandler,
         return getEntry(entryId, request, andFilter, false);
     }
 
+    /**
+     * _more_
+     *
+     * @param entryId _more_
+     * @param request _more_
+     * @param andFilter _more_
+     * @param abbreviated _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected Entry getEntry(String entryId, Request request,
                              boolean andFilter, boolean abbreviated)
             throws Exception {
@@ -2570,7 +2602,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             entry = getAccessManager().filterEntry(request, entry);
         }
 
-        if (!abbreviated && entry != null) {
+        if ( !abbreviated && (entry != null)) {
             if (entryCache.size() > ENTRY_CACHE_LIMIT) {
                 entryCache = new Hashtable();
             }
@@ -3140,24 +3172,24 @@ public class Repository implements Constants, Tables, RequestHandler,
             entries.add(entry);
             Group group = findGroup(entry.getParentGroupId());
 
-          
 
-            if(entry.isGroup()) {
-                final Request theRequest = request;
-                ActionManager.Action action = new ActionManager.Action() {
-                        public void run(Object actionId) throws Exception {
-                            deleteEntries(theRequest, entries, actionId);
-                        }
-                    };
-                String href = HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
-                                                         group.getId()),
-                                            group.getName());
 
-                return  getActionManager().doAction(request, action, "Deleting entry","Continue: " + href);
+            if (entry.isGroup()) {
+                final Request        theRequest = request;
+                ActionManager.Action action     = new ActionManager.Action() {
+                    public void run(Object actionId) throws Exception {
+                        deleteEntries(theRequest, entries, actionId);
+                    }
+                };
+                String href = HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW,
+                                  ARG_ID, group.getId()), group.getName());
+
+                return getActionManager().doAction(request, action,
+                        "Deleting entry", "Continue: " + href);
             } else {
                 deleteEntries(request, entries, null);
                 return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
-                                               group.getId()));
+                        group.getId()));
             }
         }
 
@@ -4288,16 +4320,18 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected List<TypeHandler> getTypeHandlers(Request request)
             throws Exception {
-        TypeHandler       typeHandler  = getTypeHandler(request);
+        TypeHandler typeHandler = getTypeHandler(request);
         if ( !typeHandler.isAnyHandler()) {
             typeHandlers.add(typeHandler);
             return typeHandlers;
         }
         //For now don't do the db query to find the type handlers
-        if(true) return getTypeHandlers();
+        if (true) {
+            return getTypeHandlers();
+        }
 
         List<TypeHandler> typeHandlers = new ArrayList<TypeHandler>();
-        List where = typeHandler.assembleWhereClause(request);
+        List              where = typeHandler.assembleWhereClause(request);
         Statement stmt = typeHandler.executeSelect(request,
                              SqlUtil.distinct(COL_ENTRIES_TYPE), where);
         String[] types = SqlUtil.readString(stmt, 1);
@@ -4472,13 +4506,14 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     private void initGroups() throws Exception {
         topGroup = findGroupFromName(GROUP_TOP,
-                                     getUserManager().getDefaultUser(), false);
+                                     getUserManager().getDefaultUser(),
+                                     false);
         //Make the top group if needed
-        if(topGroup == null) {
+        if (topGroup == null) {
             topGroup = findGroupFromName(GROUP_TOP,
-                                         getUserManager().getDefaultUser(), true,
-                                         true);
-            
+                                         getUserManager().getDefaultUser(),
+                                         true, true);
+
             getAccessManager().initTopGroup(topGroup);
         }
 
@@ -5321,46 +5356,47 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @param type _more_
      * @param name _more_
      * @param content _more_
+     * @param connection _more_
      *
      * @param request _more_
      * @param entries _more_
      *
      * @param metadata _more_
      *
+     *
+     * @return _more_
      * @throws Exception _more_
      */
 
-    private List<String[]> getDescendents(Request request, List<Entry> entries,
-                                        Connection connection)
-        throws Exception {
+    private List<String[]> getDescendents(Request request,
+                                          List<Entry> entries,
+                                          Connection connection)
+            throws Exception {
 
         List<String[]> children = new ArrayList();
-        for (Entry entry: entries) {
-            String query =  SqlUtil.makeSelect(SqlUtil.comma(new String[]{
-                        COL_ENTRIES_ID, COL_ENTRIES_TYPE, COL_ENTRIES_RESOURCE,
-                        COL_ENTRIES_RESOURCE_TYPE}),
-                TABLE_ENTRIES,
-                SqlUtil.like(
-                             COL_ENTRIES_PARENT_GROUP_ID,
-                             entry.getId()+"%"));
-            Statement stmt = getDatabaseManager().execute(connection,query);
+        for (Entry entry : entries) {
+            String query = SqlUtil.makeSelect(SqlUtil.comma(new String[] {
+                               COL_ENTRIES_ID,
+                               COL_ENTRIES_TYPE, COL_ENTRIES_RESOURCE,
+                               COL_ENTRIES_RESOURCE_TYPE }), TABLE_ENTRIES,
+                                   SqlUtil.like(COL_ENTRIES_PARENT_GROUP_ID,
+                                       entry.getId() + "%"));
+            Statement stmt = getDatabaseManager().execute(connection, query);
             SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
-            ResultSet results;
+            ResultSet        results;
             while ((results = iter.next()) != null) {
                 while (results.next()) {
-                    int col=1;
-                    children.add(new String[]{
+                    int col = 1;
+                    children.add(new String[] { results.getString(col++),
                             results.getString(col++),
                             results.getString(col++),
-                            results.getString(col++),
-                            results.getString(col++)});
-                        }
+                            results.getString(col++) });
                 }
-            children.add(new String[]{
-                    entry.getId(),
-                    entry.getTypeHandler().getType(),
-                    entry.getResource().getPath(),
-                    entry.getResource().getType()});
+            }
+            children.add(new String[] { entry.getId(),
+                                        entry.getTypeHandler().getType(),
+                                        entry.getResource().getPath(),
+                                        entry.getResource().getType() });
         }
         return children;
     }
@@ -5374,10 +5410,12 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @param request _more_
      * @param entries _more_
+     * @param asynchId _more_
      *
      * @throws Exception _more_
      */
-    protected void deleteEntries(Request request, List<Entry> entries,Object asynchId) 
+    protected void deleteEntries(Request request, List<Entry> entries,
+                                 Object asynchId)
             throws Exception {
 
         if (entries.size() == 0) {
@@ -5386,7 +5424,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         delCnt = 0;
         Connection connection = getConnection(true);
         try {
-            deleteEntriesInner(request, entries, connection,asynchId);
+            deleteEntriesInner(request, entries, connection, asynchId);
         } finally {
             try {
                 connection.close();
@@ -5400,12 +5438,22 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entries _more_
+     * @param connection _more_
+     * @param actionId _more_
+     *
+     * @throws Exception _more_
+     */
     private void deleteEntriesInner(Request request, List<Entry> entries,
-                                    Connection connection,Object actionId)
+                                    Connection connection, Object actionId)
             throws Exception {
 
-        List<String[]> found  = getDescendents(request, entries, connection);
-        String query;
+        List<String[]> found = getDescendents(request, entries, connection);
+        String         query;
 
 
         query = SqlUtil.makeDelete(TABLE_PERMISSIONS,
@@ -5435,18 +5483,20 @@ public class Repository implements Constants, Tables, RequestHandler,
             connection.prepareStatement(SqlUtil.makeDelete(TABLE_ENTRIES,
                 COL_ENTRIES_ID, "?"));
 
-        connection.setAutoCommit(false); 
+        connection.setAutoCommit(false);
         Statement statement = connection.createStatement();
 
-        int deleteCnt = 0;
+        int       deleteCnt = 0;
 
-        for(int i=0;i<found.size();i++) {
-            String[]tuple = found.get(i);
-            String id = tuple[0];
+        for (int i = 0; i < found.size(); i++) {
+            String[] tuple = found.get(i);
+            String   id    = tuple[0];
 
             deleteCnt++;
-            if(actionId !=null && !getActionManager().getActionOk(actionId)) {
-                getActionManager().setActionMessage(actionId, "Delete canceled");
+            if ((actionId != null)
+                    && !getActionManager().getActionOk(actionId)) {
+                getActionManager().setActionMessage(actionId,
+                        "Delete canceled");
                 connection.rollback();
                 permissionsStmt.close();
                 metadataStmt.close();
@@ -5455,11 +5505,13 @@ public class Repository implements Constants, Tables, RequestHandler,
                 entriesStmt.close();
                 return;
             }
-            getActionManager().setActionMessage(actionId, "Deleted:" + deleteCnt +"/" + found.size()+" entries");
+            getActionManager().setActionMessage(actionId,
+                    "Deleted:" + deleteCnt + "/" + found.size() + " entries");
             if (deleteCnt % 100 == 0) {
                 System.err.println("Deleted:" + deleteCnt);
             }
-            getStorageManager().removeFile(new Resource(new File(tuple[2]), tuple[3]));
+            getStorageManager().removeFile(new Resource(new File(tuple[2]),
+                    tuple[3]));
 
             permissionsStmt.setString(1, id);
             permissionsStmt.addBatch();
@@ -5480,7 +5532,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             //TODO: Batch up the specific type deletes
             TypeHandler typeHandler = getTypeHandler(tuple[1]);
             typeHandler.deleteEntry(request, statement, id);
-            if(deleteCnt>1000) {
+            if (deleteCnt > 1000) {
                 permissionsStmt.executeBatch();
                 metadataStmt.executeBatch();
                 commentsStmt.executeBatch();
@@ -5508,13 +5560,24 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entries _more_
+     * @param connection _more_
+     * @param top _more_
+     *
+     * @throws Exception _more_
+     */
     private void xxxdeleteEntriesInner(Request request, List<Entry> entries,
-                                    Connection connection, boolean top)
+                                       Connection connection, boolean top)
             throws Exception {
 
-        if(top) {
+        if (top) {
             System.err.println("before");
-            List<String[]> found  = getDescendents(request, entries, connection);
+            List<String[]> found = getDescendents(request, entries,
+                                       connection);
             System.err.println("after " + found.size());
         }
 
@@ -5582,7 +5645,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             connection.prepareStatement(SqlUtil.makeDelete(TABLE_ENTRIES,
                 COL_ENTRIES_ID, "?"));
 
-        connection.setAutoCommit(false); 
+        connection.setAutoCommit(false);
         Statement statement = connection.createStatement();
         for (Entry entry : entries) {
             delCnt++;

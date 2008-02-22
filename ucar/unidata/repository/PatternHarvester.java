@@ -154,10 +154,14 @@ public class PatternHarvester extends Harvester {
     int rootStrLen;
 
 
+    /** _more_          */
     private StringBuffer status = new StringBuffer();
 
-    private int entryCnt =0;
-    private int newEntryCnt =0;
+    /** _more_          */
+    private int entryCnt = 0;
+
+    /** _more_          */
+    private int newEntryCnt = 0;
 
     /**
      * _more_
@@ -230,21 +234,25 @@ public class PatternHarvester extends Harvester {
      */
     public String getExtraInfo() {
         String dirMsg = "";
-        if(dirs!=null) {
-            if(dirs.size()==0) {
+        if (dirs != null) {
+            if (dirs.size() == 0) {
                 dirMsg = "No directories found<br>";
             } else {
-                dirMsg = "Scanning:" +dirs.size() +" directories<br>";
+                dirMsg = "Scanning:" + dirs.size() + " directories<br>";
             }
         }
-            
+
         String entryMsg = "";
-        if(entryCnt>0) {
-            entryMsg = "Found " + entryCnt +" file" +(entryCnt==1?"":"s") +"<br>" +
-                "Found " +  newEntryCnt +" new file" +(newEntryCnt==1?"":"s") +"<br>";
-            
+        if (entryCnt > 0) {
+            entryMsg = "Found " + entryCnt + " file" + ((entryCnt == 1)
+                    ? ""
+                    : "s") + "<br>" + "Found " + newEntryCnt + " new file"
+                           + ((newEntryCnt == 1)
+                              ? ""
+                              : "s") + "<br>";
+
         }
-        return "Directory:" + rootDir + "<br>" + dirMsg+ entryMsg  +status;
+        return "Directory:" + rootDir + "<br>" + dirMsg + entryMsg + status;
     }
 
     /**
@@ -292,8 +300,8 @@ public class PatternHarvester extends Harvester {
         if ( !getActive()) {
             return;
         }
-        entryCnt =0;
-        newEntryCnt =0;
+        entryCnt    = 0;
+        newEntryCnt = 0;
         status = new StringBuffer("Looking for initial directory listing");
         long tt1 = System.currentTimeMillis();
         dirs = FileInfo.collectDirs(rootDir);
@@ -319,7 +327,8 @@ public class PatternHarvester extends Harvester {
                 break;
             }
 
-            status.append("Done... sleeping for " + getSleepMinutes()+" minutes<br>");
+            status.append("Done... sleeping for " + getSleepMinutes()
+                          + " minutes<br>");
             Misc.sleep((long) (getSleepMinutes() * 60 * 1000));
             status = new StringBuffer();
         }
@@ -345,8 +354,8 @@ public class PatternHarvester extends Harvester {
         List<Entry>    entries   = new ArrayList<Entry>();
         List<Entry>    needToAdd = new ArrayList<Entry>();
         List<FileInfo> tmpDirs   = new ArrayList<FileInfo>(dirs);
-        entryCnt =0;
-        newEntryCnt =0;
+        entryCnt    = 0;
+        newEntryCnt = 0;
         for (int dirIdx = 0; dirIdx < tmpDirs.size(); dirIdx++) {
             FileInfo fileInfo = tmpDirs.get(dirIdx);
             if ( !fileInfo.exists()) {
@@ -360,7 +369,7 @@ public class PatternHarvester extends Harvester {
             if (files == null) {
                 continue;
             }
-        
+
             for (int fileIdx = 0; fileIdx < files.length; fileIdx++) {
                 File f = files[fileIdx];
                 if (f.isDirectory()) {
@@ -380,7 +389,7 @@ public class PatternHarvester extends Harvester {
                 entryCnt++;
                 if (entries.size() > 1000) {
                     List uniqueEntries = repository.getUniqueEntries(entries);
-                    newEntryCnt+=uniqueEntries.size();
+                    newEntryCnt += uniqueEntries.size();
                     needToAdd.addAll(uniqueEntries);
                     entries = new ArrayList();
                 }

@@ -109,7 +109,7 @@ public class AccessManager extends RepositoryManager {
                                               "/access/change");
 
 
-    /** _more_          */
+    /** _more_ */
     private Object MUTEX_PERMISSIONS = new Object();
 
 
@@ -130,14 +130,25 @@ public class AccessManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param topGroup _more_
+     *
+     * @throws Exception _more_
+     */
     protected void initTopGroup(Group topGroup) throws Exception {
-        topGroup.addPermission(new Permission(Permission.ACTION_VIEW,getUserManager().ROLE_ANY));
-        topGroup.addPermission(new Permission(Permission.ACTION_EDIT,getUserManager().ROLE_NONE));
-        topGroup.addPermission(new Permission(Permission.ACTION_NEW,getUserManager().ROLE_NONE));
-        topGroup.addPermission(new Permission(Permission.ACTION_DELETE,getUserManager().ROLE_NONE));
-        topGroup.addPermission(new Permission(Permission.ACTION_COMMENT,getUserManager().ROLE_ANY));
-        insertPermissions(null,topGroup,
-                          topGroup.getPermissions());
+        topGroup.addPermission(new Permission(Permission.ACTION_VIEW,
+                getUserManager().ROLE_ANY));
+        topGroup.addPermission(new Permission(Permission.ACTION_EDIT,
+                getUserManager().ROLE_NONE));
+        topGroup.addPermission(new Permission(Permission.ACTION_NEW,
+                getUserManager().ROLE_NONE));
+        topGroup.addPermission(new Permission(Permission.ACTION_DELETE,
+                getUserManager().ROLE_NONE));
+        topGroup.addPermission(new Permission(Permission.ACTION_COMMENT,
+                getUserManager().ROLE_ANY));
+        insertPermissions(null, topGroup, topGroup.getPermissions());
     }
 
 
@@ -397,8 +408,8 @@ public class AccessManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void insertPermissions(Request request, Entry entry,
-                                     List<Permission> permissions)            
-        throws Exception {
+                                     List<Permission> permissions)
+            throws Exception {
         synchronized (MUTEX_PERMISSIONS) {
             getDatabaseManager().executeDelete(TABLE_PERMISSIONS,
                     COL_PERMISSIONS_ENTRY_ID, SqlUtil.quote(entry.getId()));

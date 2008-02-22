@@ -281,8 +281,11 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     public void addToSearchForm(Request request, StringBuffer sb,
                                 Metadata.Type type, boolean makeSelect)
             throws Exception {
-        sb.append(HtmlUtil.hidden(ARG_METADATA_TYPE+ "." + type, type.toString()));
-        String inheritedCbx = HtmlUtil.checkbox(ARG_METADATA_INHERITED+"."+type,"true", false) + HtmlUtil.space(1) + "inherited";
+        sb.append(HtmlUtil.hidden(ARG_METADATA_TYPE + "." + type,
+                                  type.toString()));
+        String inheritedCbx = HtmlUtil.checkbox(ARG_METADATA_INHERITED + "."
+                                  + type, "true", false) + HtmlUtil.space(1)
+                                      + "inherited";
         inheritedCbx = "";
 
         if (makeSelect) {
@@ -295,11 +298,14 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             l.add(0, new TwoFacedObject("None", ""));
             sb.append(HtmlUtil.formEntry(type.getLabel() + ":",
                                          HtmlUtil.select(ARG_METADATA_ATTR1
-                                                         + "." + type, l, "", 100) + inheritedCbx));
+                                             + "." + type, l, "",
+                                                 100) + inheritedCbx));
         } else {
-            sb.append(HtmlUtil.formEntry(type.getLabel() + ":",
-                                         HtmlUtil.input(ARG_METADATA_ATTR1
-                                                        + "." + type, "")+ inheritedCbx));
+            sb.append(
+                HtmlUtil.formEntry(
+                    type.getLabel() + ":",
+                    HtmlUtil.input(ARG_METADATA_ATTR1 + "." + type, "")
+                    + inheritedCbx));
         }
 
     }

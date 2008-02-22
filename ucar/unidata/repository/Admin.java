@@ -113,12 +113,10 @@ public class Admin extends RepositoryManager {
 
     /** _more_ */
     protected RequestUrl[] adminUrls = {
-        URL_ADMIN_SETTINGS,  getUserManager().URL_USER_LIST,
-        URL_ADMIN_STATS,
+        URL_ADMIN_SETTINGS, getUserManager().URL_USER_LIST, URL_ADMIN_STATS,
         URL_ADMIN_HARVESTERS,
-/*URL_ADMIN_STARTSTOP,*/ 
-        URL_ADMIN_TABLES,
-        URL_ADMIN_SQL, URL_ADMIN_CLEANUP
+        /*URL_ADMIN_STARTSTOP,*/
+        URL_ADMIN_TABLES, URL_ADMIN_SQL, URL_ADMIN_CLEANUP
     };
 
 
@@ -918,7 +916,7 @@ public class Admin extends RepositoryManager {
                         System.err.print(".");
                     }
                     if (entries.size() > 1000) {
-                        getRepository().deleteEntries(request, entries,null);
+                        getRepository().deleteEntries(request, entries, null);
                         entries   = new ArrayList<Entry>();
                         deleteCnt += 1000;
                         cleanupStatus = new StringBuffer("Removed "
@@ -931,7 +929,7 @@ public class Admin extends RepositoryManager {
                 }
             }
             if (runningCleanup) {
-                getRepository().deleteEntries(request, entries,null);
+                getRepository().deleteEntries(request, entries, null);
                 deleteCnt += entries.size();
                 cleanupStatus =
                     new StringBuffer("Done running cleanup<br>Removed "

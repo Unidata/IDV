@@ -44,13 +44,13 @@ import java.util.List;
  */
 public class Link {
 
-    /** _more_          */
+    /** _more_ */
     String url;
 
-    /** _more_          */
+    /** _more_ */
     String label;
 
-    /** _more_          */
+    /** _more_ */
     String icon;
 
     /**

@@ -98,7 +98,7 @@ import javax.swing.*;
  */
 public class MetadataManager extends RepositoryManager {
 
-    /** _more_          */
+    /** _more_ */
     private Object MUTEX_METADATA = new Object();
 
 
@@ -123,7 +123,7 @@ public class MetadataManager extends RepositoryManager {
 
 
 
-    /** _more_          */
+    /** _more_ */
     protected Hashtable distinctMap = new Hashtable();
 
     /** _more_ */
@@ -166,7 +166,7 @@ public class MetadataManager extends RepositoryManager {
      */
     public List<Metadata> getMetadata(Entry entry) throws Exception {
         List<Metadata> metadataList = entry.getMetadata();
-        if(metadataList!=null) {
+        if (metadataList != null) {
             return metadataList;
         }
 
@@ -181,17 +181,19 @@ public class MetadataManager extends RepositoryManager {
         System.err.println("query:" + query);
         SqlUtil.Iterator iter =
             SqlUtil.getIterator(getDatabaseManager().execute(query));
-        ResultSet      results;
+        ResultSet results;
         metadataList = new ArrayList();
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 int             col     = 1;
                 String          type    = results.getString(3);
                 MetadataHandler handler = findMetadataHandler(type);
-                metadataList.add(handler.makeMetadata(results.getString(col++),
+                metadataList.add(
+                    handler.makeMetadata(
                         results.getString(col++), results.getString(col++),
                         results.getString(col++), results.getString(col++),
-                        results.getString(col++), results.getString(col++)));
+                        results.getString(col++), results.getString(col++),
+                        results.getString(col++)));
             }
         }
         entry.setMetadata(metadataList);
@@ -243,9 +245,10 @@ public class MetadataManager extends RepositoryManager {
      * @param type _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public MetadataHandler findMetadataHandler(String type) 
-        throws Exception {
+    public MetadataHandler findMetadataHandler(String type) throws Exception {
         for (MetadataHandler handler : metadataHandlers) {
             if (handler.canHandle(type)) {
                 return handler;
@@ -254,7 +257,7 @@ public class MetadataManager extends RepositoryManager {
         if (dfltMetadataHandler == null) {
             dfltMetadataHandler = new MetadataHandler(getRepository(), null);
         }
-        System.err.println ("type:" + type);
+        System.err.println("type:" + type);
         return dfltMetadataHandler;
     }
 

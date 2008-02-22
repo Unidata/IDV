@@ -300,6 +300,11 @@ public class StorageManager extends RepositoryManager {
         removeFile(entry.getResource());
     }
 
+    /**
+     * _more_
+     *
+     * @param resource _more_
+     */
     public void removeFile(Resource resource) {
         if (resource.isLocalFile()) {
             resource.getFile().delete();

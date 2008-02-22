@@ -90,7 +90,7 @@ public class Result {
     /** _more_ */
     private List<String> httpHeaderArgs;
 
-    /** _more_          */
+    /** _more_ */
     private boolean needToWrite = true;
 
 

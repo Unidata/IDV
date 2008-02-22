@@ -71,9 +71,10 @@ import java.util.Properties;
  */
 public class UserManager extends RepositoryManager {
 
-    /** _more_          */
+    /** _more_ */
     public static final String ROLE_ANY = "any";
 
+    /** _more_          */
     public static final String ROLE_NONE = "none";
 
 
@@ -218,7 +219,10 @@ public class UserManager extends RepositoryManager {
     protected void checkSession(Request request) throws Exception {
 
         String cookie = request.getHeaderArg("Cookie");
-        User   user   = request.getUser();
+        if (cookie == null) {
+            cookie = request.getHeaderArg("cookie");
+        }
+        User user = request.getUser();
 
         if (cookie != null) {
             List toks = StringUtil.split(cookie, ";", true, true);
@@ -263,6 +267,11 @@ public class UserManager extends RepositoryManager {
         if (user == null) {
             String auth =
                 (String) request.getHttpHeaderArgs().get("Authorization");
+            if (auth == null) {
+                auth = (String) request.getHttpHeaderArgs().get(
+                    "authorization");
+            }
+
             if (auth != null) {
                 auth = auth.trim();
                 //Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
@@ -413,7 +422,7 @@ public class UserManager extends RepositoryManager {
      * @return _more_
      */
     public String makeLoginForm(Request request, String extra) {
-        StringBuffer sb   = new StringBuffer("<h3>Please login</h3>");
+        StringBuffer sb = new StringBuffer("<h3>Please login</h3>");
         String       id = request.getString(ARG_USER_ID, "");
         sb.append(HtmlUtil.form(URL_USER_LOGIN));
         sb.append(HtmlUtil.formTable());
@@ -1014,17 +1023,28 @@ public class UserManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processInitialAdminPage(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
         sb.append("<h3>Repository Initialization</h3>");
-        String id        = "";
-        String name      = "";
-        if(request.exists(ARG_USER_ID)) {
-            id        = request.getString(ARG_USER_ID, "").trim();
-            name      = request.getString(ARG_USER_NAME, name).trim();
-            String password1 = request.getString(ARG_USER_PASSWORD1, "").trim();
-            String password2 = request.getString(ARG_USER_PASSWORD2, "").trim();
-            boolean okToAdd = true;
+        String id   = "";
+        String name = "";
+        if (request.exists(ARG_USER_ID)) {
+            id   = request.getString(ARG_USER_ID, "").trim();
+            name = request.getString(ARG_USER_NAME, name).trim();
+            String password1 = request.getString(ARG_USER_PASSWORD1,
+                                   "").trim();
+            String password2 = request.getString(ARG_USER_PASSWORD2,
+                                   "").trim();
+            boolean      okToAdd     = true;
             StringBuffer errorBuffer = new StringBuffer();
             if (id.length() == 0) {
                 okToAdd = false;
@@ -1047,7 +1067,7 @@ public class UserManager extends RepositoryManager {
                 sb.append("Site administrator created<p>");
                 sb.append(makeLoginForm(request));
                 getRepository().writeGlobal(ARG_ADMIN_HAVECREATED, "true");
-                return new Result("",sb);
+                return new Result("", sb);
             }
             sb.append("Error:<br>");
             sb.append(errorBuffer);
@@ -1055,14 +1075,14 @@ public class UserManager extends RepositoryManager {
         }
 
 
-        sb.append("Please enter the repository administrator user name and password");
+        sb.append(
+            "Please enter the repository administrator user name and password");
         sb.append("<p>");
         sb.append(HtmlUtil.form(getRepository().URL_DUMMY));
         sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.formEntry("ID:",
-                                     HtmlUtil.input(ARG_USER_ID,id)));
+        sb.append(HtmlUtil.formEntry("ID:", HtmlUtil.input(ARG_USER_ID, id)));
         sb.append(HtmlUtil.formEntry("Name:",
-                                     HtmlUtil.input(ARG_USER_NAME,name)));
+                                     HtmlUtil.input(ARG_USER_NAME, name)));
 
         sb.append(HtmlUtil.formEntry("Password:",
                                      HtmlUtil.password(ARG_USER_PASSWORD1)));
@@ -1070,7 +1090,8 @@ public class UserManager extends RepositoryManager {
         sb.append(HtmlUtil.formEntry("Password Again:",
                                      HtmlUtil.password(ARG_USER_PASSWORD2)));
 
-        sb.append(HtmlUtil.formEntry("",HtmlUtil.submit("Make Administrator")));
+        sb.append(HtmlUtil.formEntry("",
+                                     HtmlUtil.submit("Make Administrator")));
         return new Result("Initialization", sb);
 
     }

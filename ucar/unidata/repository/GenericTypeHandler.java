@@ -376,6 +376,15 @@ public class GenericTypeHandler extends TypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param statement _more_
+     * @param id _more_
+     *
+     * @throws Exception _more_
+     */
     public void deleteEntry(Request request, Statement statement, String id)
             throws Exception {
         if (colNames.size() == 0) {
@@ -466,14 +475,18 @@ public class GenericTypeHandler extends TypeHandler {
      * _more_
      *
      * @param results _more_
+     * @param abbreviated _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Entry getEntry(ResultSet results,boolean abbreviated) throws Exception {
-        Entry entry = super.getEntry(results,abbreviated);
-        if(abbreviated) return entry;
+    public Entry getEntry(ResultSet results, boolean abbreviated)
+            throws Exception {
+        Entry entry = super.getEntry(results, abbreviated);
+        if (abbreviated) {
+            return entry;
+        }
         if (colNames.size() == 0) {
             return entry;
         }

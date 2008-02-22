@@ -298,11 +298,6 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
-    public final Entry getEntry(ResultSet results) throws Exception {
-        return getEntry(results,false);
-    }
-
-
     /**
      * _more_
      *
@@ -312,7 +307,23 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public Entry getEntry(ResultSet results, boolean abbreviated) throws Exception {
+    public final Entry getEntry(ResultSet results) throws Exception {
+        return getEntry(results, false);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param results _more_
+     * @param abbreviated _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry getEntry(ResultSet results, boolean abbreviated)
+            throws Exception {
         //id,type,name,desc,group,user,file,createdata,fromdate,todate
         int    col   = 3;
         String id    = results.getString(1);
@@ -763,8 +774,8 @@ public class TypeHandler extends RepositoryManager {
         String whatString  = cleanQueryString(what);
         String extraString = cleanQueryString(extra);
 
-        String[] tableNames = { TABLE_ENTRIES, getTableName(), 
-                                TABLE_USERS, TABLE_ASSOCIATIONS };
+        String[] tableNames = { TABLE_ENTRIES, getTableName(), TABLE_USERS,
+                                TABLE_ASSOCIATIONS };
         //        String[] tableNames = { TABLE_ENTRIES, getTableName(), TABLE_METADATA,
         //                                TABLE_USERS, TABLE_ASSOCIATIONS };
         List    tables     = new ArrayList();
@@ -798,11 +809,13 @@ public class TypeHandler extends RepositoryManager {
         }
 
         int metadataCnt = 0;
-        while(true) {
-            String subTable = TABLE_METADATA+"_"+metadataCnt;
+        while (true) {
+            String subTable = TABLE_METADATA + "_" + metadataCnt;
             metadataCnt++;
-            if(whereString.indexOf(subTable)<0) break;
-            tables.add(TABLE_METADATA+" " +subTable);
+            if (whereString.indexOf(subTable) < 0) {
+                break;
+            }
+            tables.add(TABLE_METADATA + " " + subTable);
             //            whereList.add(SqlUtil.eq(subTable+".entry_id", COL_ENTRIES_ID));
         }
 
@@ -884,15 +897,14 @@ public class TypeHandler extends RepositoryManager {
         dateSelect.add(new TwoFacedObject("All", "none"));
         dateSelect.add(new TwoFacedObject("Custom:", ""));
         String dateSelectValue;
-        if(request.exists(ARG_RELATIVEDATE)) {
-            dateSelectValue = request.getString(ARG_RELATIVEDATE,"");            
+        if (request.exists(ARG_RELATIVEDATE)) {
+            dateSelectValue = request.getString(ARG_RELATIVEDATE, "");
         } else {
             dateSelectValue = "-1 hour";
         }
-            
+
         String dateSelectInput = HtmlUtil.select(ARG_RELATIVEDATE,
-                                                 dateSelect,
-                                                 dateSelectValue);
+                                     dateSelect, dateSelectValue);
         String minDate = request.getDateSelect(ARG_FROMDATE, (String) null);
         String maxDate = request.getDateSelect(ARG_TODATE, (String) null);
 
@@ -947,12 +959,11 @@ public class TypeHandler extends RepositoryManager {
             formBuffer.append(
                 HtmlUtil.formEntry(
                     "Type:",
-                    typeSelect + HtmlUtil.space(1) +
-                    HtmlUtil.submitImage(
+                    typeSelect + HtmlUtil.space(1)
+                    + HtmlUtil.submitImage(
                         getRepository().fileUrl(ICON_SEARCH), "submit_type",
-                        "Show search form with this type") + 
-                    HtmlUtil.space(1) + 
-                    groupCbx));
+                        "Show search form with this type") + HtmlUtil.space(
+                            1) + groupCbx));
         } else if (typeHandlers.size() == 1) {
             formBuffer.append(HtmlUtil.hidden(ARG_TYPE,
                     typeHandlers.get(0).getType()));
@@ -1207,8 +1218,8 @@ public class TypeHandler extends RepositoryManager {
 
         Hashtable args           = request.getArgs();
         String    metadataPrefix = ARG_METADATA_TYPE + ".";
-        Hashtable typeMap = new Hashtable();
-        List types = new ArrayList();
+        Hashtable typeMap        = new Hashtable();
+        List      types          = new ArrayList();
         for (Enumeration keys = args.keys(); keys.hasMoreElements(); ) {
             String arg = (String) keys.nextElement();
             if ( !arg.startsWith(metadataPrefix)) {
@@ -1217,55 +1228,89 @@ public class TypeHandler extends RepositoryManager {
             if ( !request.defined(arg)) {
                 continue;
             }
-            String type = request.getString(arg,"");
-            if(!request.defined(ARG_METADATA_ATTR1+"."+type) && !request.defined(ARG_METADATA_ATTR2+"."+type) &&
-               !request.defined(ARG_METADATA_ATTR3+"."+type) &&                !request.defined(ARG_METADATA_ATTR4+"."+type)) continue;
+            String type = request.getString(arg, "");
+            if ( !request.defined(ARG_METADATA_ATTR1 + "." + type)
+                    && !request.defined(ARG_METADATA_ATTR2 + "." + type)
+                    && !request.defined(ARG_METADATA_ATTR3 + "." + type)
+                    && !request.defined(ARG_METADATA_ATTR4 + "." + type)) {
+                continue;
+            }
 
-            Metadata metadata= new Metadata(type,request.getString(ARG_METADATA_ATTR1+"."+type, ""),
-                                            request.getString(ARG_METADATA_ATTR2+"."+type, ""),
-                                            request.getString(ARG_METADATA_ATTR3+"."+type, ""),
-                                            request.getString(ARG_METADATA_ATTR4+"."+type, ""));
-            
-            metadata.setInherited(request.get(ARG_METADATA_INHERITED+"."+type, false));
+            Metadata metadata =
+                new Metadata(
+                    type,
+                    request.getString(ARG_METADATA_ATTR1 + "." + type, ""),
+                    request.getString(ARG_METADATA_ATTR2 + "." + type, ""),
+                    request.getString(ARG_METADATA_ATTR3 + "." + type, ""),
+                    request.getString(ARG_METADATA_ATTR4 + "." + type, ""));
+
+            metadata.setInherited(request.get(ARG_METADATA_INHERITED + "."
+                    + type, false));
             List values = (List) typeMap.get(type);
-            if(values == null) {
+            if (values == null) {
                 typeMap.put(type, values = new ArrayList());
                 types.add(type);
             }
             values.add(metadata);
         }
-        List      metadataAnds    = new ArrayList();
+        List metadataAnds = new ArrayList();
 
 
-        for(int typeIdx=0;typeIdx<types.size();typeIdx++) {
-            String type = (String) types.get(typeIdx);
-            List values = (List) typeMap.get(type);
-            List  metadataOrs    = new ArrayList();
-            String subTable = TABLE_METADATA +"_"+typeIdx;
-            for(int i=0;i<values.size();i++) {
+        for (int typeIdx = 0; typeIdx < types.size(); typeIdx++) {
+            String type        = (String) types.get(typeIdx);
+            List   values      = (List) typeMap.get(type);
+            List   metadataOrs = new ArrayList();
+            String subTable    = TABLE_METADATA + "_" + typeIdx;
+            for (int i = 0; i < values.size(); i++) {
                 Metadata metadata = (Metadata) values.get(i);
-                String clause = 
+                String clause =
                     SqlUtil.makeAnd(
-                                    Misc.newList(
-                                                 SqlUtil.eq(subTable+".entry_id",COL_ENTRIES_ID),
-                                                 SqlUtil.eq(
-                                                            subTable+".attr1",
-                                                            SqlUtil.quote(metadata.getAttr1())), SqlUtil.eq(
-                                                                                              subTable+".type",
-                                                                                              SqlUtil.quote(type))));
-                if(metadata.getInherited()) {
-                    String inheritedClausexxx = COL_ENTRIES_PARENT_GROUP_ID +" LIKE " +
-                        SqlUtil.group(SqlUtil.makeSelect("metadata.entry_id ||'%'", TABLE_METADATA,
-                                                         "entries.parent_group_id LIKE " + "metadata.entry_id ||'%' AND " +
-                                                         "metadata.attr1=" +SqlUtil.quote(metadata.getAttr1())));
+                        Misc.newList(
+                            SqlUtil.eq(
+                                subTable + ".entry_id",
+                                COL_ENTRIES_ID), SqlUtil.eq(
+                                    subTable + ".attr1",
+                                    SqlUtil.quote(
+                                        metadata.getAttr1())), SqlUtil.eq(
+                                            subTable + ".type",
+                                            SqlUtil.quote(type))));
+                if (metadata.getInherited()) {
+                    String inheritedClausexxx =
+                        COL_ENTRIES_PARENT_GROUP_ID + " LIKE "
+                        + SqlUtil.group(
+                            SqlUtil.makeSelect(
+                                "metadata.entry_id ||'%'", TABLE_METADATA,
+                                "entries.parent_group_id LIKE "
+                                + "metadata.entry_id ||'%' AND "
+                                + "metadata.attr1="
+                                + SqlUtil.quote(metadata.getAttr1())));
 
-                    String subselect = SqlUtil.makeSelect("metadata.entry_id", TABLE_METADATA,
-                                                          SqlUtil.makeAnd(SqlUtil.like(COL_ENTRIES_PARENT_GROUP_ID, COL_METADATA_ENTRY_ID),
-                                                                          SqlUtil.eq("metadata.attr1" ,SqlUtil.quote(metadata.getAttr1())),
-                                                                          SqlUtil.eq("metadata.type" ,SqlUtil.quote(metadata.getType().toString()))));
+                    String subselect =
+                        SqlUtil.makeSelect(
+                            "metadata.entry_id", TABLE_METADATA,
+                            SqlUtil.makeAnd(
+                                SqlUtil.like(
+                                    COL_ENTRIES_PARENT_GROUP_ID,
+                                    COL_METADATA_ENTRY_ID), SqlUtil
+                                        .eq(
+                                        "metadata.attr1",
+                                        SqlUtil.quote(
+                                            metadata.getAttr1())), SqlUtil
+                                                .eq(
+                                                "metadata.type",
+                                                SqlUtil.quote(
+                                                    metadata.getType()
+                                                        .toString()))));
 
-                    String inheritedClause = COL_ENTRIES_PARENT_GROUP_ID +" LIKE " + SqlUtil.group(subselect) + " ||'%'";
-                    clause = SqlUtil.group(SqlUtil.makeOr(Misc.newList(SqlUtil.group(clause), SqlUtil.group(inheritedClause))));
+                    String inheritedClause = COL_ENTRIES_PARENT_GROUP_ID
+                                             + " LIKE "
+                                             + SqlUtil.group(subselect)
+                                             + " ||'%'";
+                    clause = SqlUtil.group(
+                        SqlUtil.makeOr(
+                            Misc.newList(
+                                SqlUtil.group(clause),
+                                SqlUtil.group(inheritedClause))));
                     //                clause = SqlUtil.group(inheritedClause);
                 }
                 //                System.err.println(clause);
@@ -1278,8 +1323,8 @@ public class TypeHandler extends RepositoryManager {
         }
 
         //        metadataAnds.add(inheritedQuery);
-        if(metadataAnds.size()>0) {
-        //        System.err.println ("metadata:" + metadataAnds);
+        if (metadataAnds.size() > 0) {
+            //        System.err.println ("metadata:" + metadataAnds);
             //            where.add(SqlUtil.group(SqlUtil.makeAnd(metadataAnds)));
             where.add(SqlUtil.makeAnd(metadataAnds));
         }
@@ -1350,6 +1395,15 @@ public class TypeHandler extends RepositoryManager {
             throws Exception {}
 
 
+    /**
+     * _more_
+     *
+     * @param requess _more_
+     * @param statement _more_
+     * @param id _more_
+     *
+     * @throws Exception _more_
+     */
     public void deleteEntry(Request requess, Statement statement, String id)
             throws Exception {}
 

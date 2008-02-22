@@ -53,22 +53,22 @@ import java.util.List;
  */
 public class EnumeratedMetadataHandler extends MetadataHandler {
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_FILE = "file";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_NAME = "name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TYPE = "type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_TAG = "enum_tag";
 
     /** _more_ */
     private Metadata.Type TYPE_ENUM;
 
-    /** _more_          */
+    /** _more_ */
     private List values;
 
 
@@ -154,14 +154,18 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
         l = new ArrayList(l);
         l.add(0, new TwoFacedObject("None", ""));
 
-        String inheritedCbx = HtmlUtil.checkbox(ARG_METADATA_INHERITED+"."+TYPE_ENUM,"true", false) + HtmlUtil.space(1) + "inherited";
+        String inheritedCbx = HtmlUtil.checkbox(ARG_METADATA_INHERITED + "."
+                                  + TYPE_ENUM, "true",
+                                      false) + HtmlUtil.space(1)
+                                             + "inherited";
         inheritedCbx = "";
-        sb.append(HtmlUtil.hidden(ARG_METADATA_TYPE+ "." + TYPE_ENUM, TYPE_ENUM.toString()));
+        sb.append(HtmlUtil.hidden(ARG_METADATA_TYPE + "." + TYPE_ENUM,
+                                  TYPE_ENUM.toString()));
         sb.append(HtmlUtil.formEntry(TYPE_ENUM.getLabel() + ":",
                                      HtmlUtil.select(ARG_METADATA_ATTR1 + "."
                                          + TYPE_ENUM.toString(), l, "",
-                                             100)+inheritedCbx));
-        
+                                             100) + inheritedCbx));
+
     }
 
 
