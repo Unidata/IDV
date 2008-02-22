@@ -53,6 +53,8 @@
   <method request="/processfile"    method="processFile"        cancache="false"/>
   <method  request="/message"      method="processMessage"    cancache="false" />
 
+  <method  handler="actionmanager" request="/status"      method="processStatus"    cancache="false" />
+
 
 
 

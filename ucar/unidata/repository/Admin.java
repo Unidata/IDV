@@ -918,7 +918,7 @@ public class Admin extends RepositoryManager {
                         System.err.print(".");
                     }
                     if (entries.size() > 1000) {
-                        getRepository().deleteEntries(request, entries);
+                        getRepository().deleteEntries(request, entries,null);
                         entries   = new ArrayList<Entry>();
                         deleteCnt += 1000;
                         cleanupStatus = new StringBuffer("Removed "
@@ -931,7 +931,7 @@ public class Admin extends RepositoryManager {
                 }
             }
             if (runningCleanup) {
-                getRepository().deleteEntries(request, entries);
+                getRepository().deleteEntries(request, entries,null);
                 deleteCnt += entries.size();
                 cleanupStatus =
                     new StringBuffer("Done running cleanup<br>Removed "

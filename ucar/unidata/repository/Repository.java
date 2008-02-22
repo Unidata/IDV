@@ -111,6 +111,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     public RequestUrl URL_MESSAGE = new RequestUrl(this, "/message");
 
+
     /** _more_ */
     public RequestUrl URL_ENTRY_SEARCHFORM = new RequestUrl(this,
                                                  "/entry/searchform");
@@ -329,6 +330,8 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private UserManager userManager;
 
+    private ActionManager actionManager;
+
     /** _more_          */
     private AccessManager accessManager;
 
@@ -373,6 +376,9 @@ public class Repository implements Constants, Tables, RequestHandler,
     private List<String> htdocRoots = new ArrayList<String>();
 
 
+
+
+
     /**
      * _more_
      *
@@ -386,6 +392,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             throws Exception {
         this(args, hostname, port, false);
     }
+
+
 
     /**
      * _more_
@@ -405,6 +413,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         this.hostname   = hostname;
         this.port       = port;
     }
+
 
     /** _more_ */
     public static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
@@ -518,6 +527,16 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected ActionManager doMakeActionManager() {
+        return new ActionManager(this);
+    }
+
+
 
 
 
@@ -560,6 +579,19 @@ public class Repository implements Constants, Tables, RequestHandler,
             userManager = doMakeUserManager();
         }
         return userManager;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected ActionManager getActionManager() {
+        if (actionManager == null) {
+            actionManager = doMakeActionManager();
+        }
+        return actionManager;
     }
 
 
@@ -979,6 +1011,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             handler = getUserManager();
         } else if (handlerName.equals("admin")) {
             handler = getAdmin();
+        } else if (handlerName.equals("actionmanager")) {
+            handler = getActionManager();
         } else if (handlerName.equals("accessmanager")) {
             handler = getAccessManager();
         } else if (handlerName.equals("metadatamanager")) {
@@ -1835,6 +1869,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         return groupList;
     }
+
+
+
 
 
 
@@ -3071,13 +3108,25 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
         if (request.exists(ARG_DELETE_CONFIRM)) {
-            List<Entry> entries = new ArrayList<Entry>();
+            final List<Entry> entries = new ArrayList<Entry>();
             entries.add(entry);
-            deleteEntries(request, entries);
             Group group = findGroup(entry.getParentGroupId());
-            return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
-                                           group.getId(), ARG_MESSAGE,
-                                           "Entry is deleted"));
+
+            String href = HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                                                     group.getId()),
+                                        group.getName());
+            
+
+            final Request theRequest = request;
+            ActionManager.Action action = new ActionManager.Action() {
+                    public void run(Object actionId) throws Exception {
+                        deleteEntries(theRequest, entries, actionId);
+                    }
+                };
+
+            Object actionId = getActionManager().runAction(action, "Deleting entry","Continue: " + href);
+
+            return new Result(HtmlUtil.url(getActionManager().URL_STATUS, ARG_ACTION_ID, ""+actionId));
         }
 
 
@@ -3166,7 +3215,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (request.exists(ARG_DELETE_CONFIRM)) {
                 List<Entry> entries = new ArrayList<Entry>();
                 entries.add(entry);
-                deleteEntries(request, entries);
+                deleteEntries(request, entries, null);
                 Group group = findGroup(entry.getParentGroupId());
                 return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
                         group.getId(), ARG_MESSAGE, "Entry is deleted"));
@@ -5279,6 +5328,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
+
     /**
      * _more_
      *
@@ -5287,7 +5337,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    public void deleteEntries(Request request, List<Entry> entries )
+    protected void deleteEntries(Request request, List<Entry> entries,Object asynchId) 
             throws Exception {
 
         if (entries.size() == 0) {
@@ -5296,7 +5346,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         delCnt = 0;
         Connection connection = getConnection(true);
         try {
-            deleteEntriesInner(request, entries, connection,true);
+            deleteEntriesInner(request, entries, connection,asynchId);
         } finally {
             try {
                 connection.close();
@@ -5311,7 +5361,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
     private void deleteEntriesInner(Request request, List<Entry> entries,
-                                    Connection connection, boolean top)
+                                    Connection connection,Object asynchId)
             throws Exception {
 
         System.err.println("before");
@@ -5358,6 +5408,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             String id = tuple[0];
 
             deleteCnt++;
+            getActionManager().setActionMessage(asynchId, "Deleted:" + deleteCnt +" entries");
             if (deleteCnt % 100 == 0) {
                 System.err.println("Deleted:" + deleteCnt);
             }
@@ -5442,7 +5493,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                     if (childEntry.isGroup()) {
                         List<Entry> tmp = new ArrayList<Entry>();
                         tmp.add(childEntry);
-                        deleteEntriesInner(request, tmp, connection,false);
+                        //                        deleteEntriesInner(request, tmp, connection,false);
                     } else {
                         children.add(childEntry);
                     }
@@ -5450,7 +5501,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         }
         if (children.size() > 0) {
-            deleteEntriesInner(request, children, connection,false);
+            //            deleteEntriesInner(request, children, connection,false);
         }
 
 

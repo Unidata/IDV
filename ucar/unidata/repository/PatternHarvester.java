@@ -154,6 +154,10 @@ public class PatternHarvester extends Harvester {
     int rootStrLen;
 
 
+    private StringBuffer status = new StringBuffer();
+
+    private int entryCnt =0;
+    private int newEntryCnt =0;
 
     /**
      * _more_
@@ -225,7 +229,22 @@ public class PatternHarvester extends Harvester {
      * @return _more_
      */
     public String getExtraInfo() {
-        return "Directory:" + rootDir + "";
+        String dirMsg = "";
+        if(dirs!=null) {
+            if(dirs.size()==0) {
+                dirMsg = "No directories found<br>";
+            } else {
+                dirMsg = "Scanning:" +dirs.size() +" directories<br>";
+            }
+        }
+            
+        String entryMsg = "";
+        if(entryCnt>0) {
+            entryMsg = "Found " + entryCnt +" file" +(entryCnt==1?"":"s") +"<br>" +
+                "Found " +  newEntryCnt +" new file" +(newEntryCnt==1?"":"s") +"<br>";
+            
+        }
+        return "Directory:" + rootDir + "<br>" + dirMsg+ entryMsg  +status;
     }
 
     /**
@@ -273,11 +292,15 @@ public class PatternHarvester extends Harvester {
         if ( !getActive()) {
             return;
         }
+        entryCnt =0;
+        newEntryCnt =0;
+        status = new StringBuffer("Looking for initial directory listing");
         long tt1 = System.currentTimeMillis();
         dirs = FileInfo.collectDirs(rootDir);
         long tt2 = System.currentTimeMillis();
-        System.err.println("took:" + (tt2 - tt1) + " to find initial dirs:"
-                           + dirs.size());
+        status = new StringBuffer("");
+        //        System.err.println("took:" + (tt2 - tt1) + " to find initial dirs:"
+        //                           + dirs.size());
 
         for (FileInfo dir : dirs) {
             dirMap.put(dir.getFile(), dir);
@@ -292,8 +315,11 @@ public class PatternHarvester extends Harvester {
             //            System.err.println("found:" + entries.size() + " files in:"
             //                               + (t2 - t1) + "ms");
             if ( !getMonitor()) {
+                status.append("Done<br>");
                 break;
             }
+
+            status.append("Done... sleeping for " + getSleepMinutes()+" minutes<br>");
             Misc.sleep((long) (getSleepMinutes() * 60 * 1000));
         }
     }
@@ -318,6 +344,8 @@ public class PatternHarvester extends Harvester {
         List<Entry>    entries   = new ArrayList<Entry>();
         List<Entry>    needToAdd = new ArrayList<Entry>();
         List<FileInfo> tmpDirs   = new ArrayList<FileInfo>(dirs);
+        entryCnt =0;
+        newEntryCnt =0;
         for (int dirIdx = 0; dirIdx < tmpDirs.size(); dirIdx++) {
             FileInfo fileInfo = tmpDirs.get(dirIdx);
             if ( !fileInfo.exists()) {
@@ -331,6 +359,7 @@ public class PatternHarvester extends Harvester {
             if (files == null) {
                 continue;
             }
+        
             for (int fileIdx = 0; fileIdx < files.length; fileIdx++) {
                 File f = files[fileIdx];
                 if (f.isDirectory()) {
@@ -347,9 +376,11 @@ public class PatternHarvester extends Harvester {
                     entries.add(entry);
                 }
 
-
+                entryCnt++;
                 if (entries.size() > 1000) {
-                    needToAdd.addAll(repository.getUniqueEntries(entries));
+                    List uniqueEntries = repository.getUniqueEntries(entries);
+                    newEntryCnt+=uniqueEntries.size();
+                    needToAdd.addAll(uniqueEntries);
                     entries = new ArrayList();
                 }
                 if (needToAdd.size() > 1000) {
