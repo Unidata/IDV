@@ -26,18 +26,32 @@ ant
 This creates the repository.jar file in  idv/trunk/lib
 
 
-To run the repository with a local mysql database:
-java -jar repository.jar
+To run the repository do:
+java -jar repository.jar 
+The default is to run the repository  with a local derby based.
 
 
-To run it with a local derby based database do:
-java -jar repository.jar -Djdms.db=derby
+The first time you start the repository you should create an admin account. 
+You do this with the command line arguments:
+java -jar repository.jar -admin <user id> <password>
+
+
+
+
+To run the repository with a  mysql database:
+java -jar repository.jar -Djdms.db=mysql
+
+To run the repository with a  postgres database:
+java -jar repository.jar -Djdms.db=postgres
+
 
 
 If you have the repositorylib.jar file and the source tree  in your class path and want to run from the .class 
 files in your source tree just do:
 
 java    ucar.unidata.repository.MetaDataServer
+
+
 
 
 
