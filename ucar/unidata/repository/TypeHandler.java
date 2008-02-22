@@ -947,17 +947,15 @@ public class TypeHandler extends RepositoryManager {
             formBuffer.append(
                 HtmlUtil.formEntry(
                     "Type:",
-                    typeSelect + " "
-                    + HtmlUtil.submitImage(
+                    typeSelect + HtmlUtil.space(1) +
+                    HtmlUtil.submitImage(
                         getRepository().fileUrl(ICON_SEARCH), "submit_type",
-                        "Show search form with this type") + HtmlUtil.space(
-                            1) + groupCbx));
+                        "Show search form with this type") + 
+                    HtmlUtil.space(1) + 
+                    groupCbx));
         } else if (typeHandlers.size() == 1) {
             formBuffer.append(HtmlUtil.hidden(ARG_TYPE,
                     typeHandlers.get(0).getType()));
-            //            System.err.println("type handler: "
-            //                               + typeHandlers.get(0).getDescription() + " "
-            //                               + typeHandlers.get(0).getType());
             formBuffer.append(HtmlUtil.formEntry("Type:",
                     typeHandlers.get(0).getDescription()));
         }

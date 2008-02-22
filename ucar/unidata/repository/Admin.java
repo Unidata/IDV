@@ -100,7 +100,7 @@ public class Admin extends RepositoryManager {
 
     /** _more_ */
     public RequestUrl URL_ADMIN_TABLES = new RequestUrl(this,
-                                             "/admin/tables", "Tables");
+                                             "/admin/tables", "Database");
 
     /** _more_ */
     public RequestUrl URL_ADMIN_STATS = new RequestUrl(this, "/admin/stats",
@@ -113,8 +113,11 @@ public class Admin extends RepositoryManager {
 
     /** _more_ */
     protected RequestUrl[] adminUrls = {
-        URL_ADMIN_SETTINGS, URL_ADMIN_STARTSTOP, URL_ADMIN_TABLES,
-        URL_ADMIN_STATS, getUserManager().URL_USER_LIST, URL_ADMIN_HARVESTERS,
+        URL_ADMIN_SETTINGS,  getUserManager().URL_USER_LIST,
+        URL_ADMIN_STATS,
+        URL_ADMIN_HARVESTERS,
+/*URL_ADMIN_STARTSTOP,*/ 
+        URL_ADMIN_TABLES,
         URL_ADMIN_SQL, URL_ADMIN_CLEANUP
     };
 

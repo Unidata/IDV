@@ -1251,8 +1251,6 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
 
-
-
         Result result = null;
         if (canCache() && apiMethod.getCanCache()) {
             result = (Result) pageCache.get(request);
@@ -4209,12 +4207,15 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected List<TypeHandler> getTypeHandlers(Request request)
             throws Exception {
-        List<TypeHandler> typeHandlers = new ArrayList<TypeHandler>();
         TypeHandler       typeHandler  = getTypeHandler(request);
         if ( !typeHandler.isAnyHandler()) {
             typeHandlers.add(typeHandler);
             return typeHandlers;
         }
+        //For now don't do the db query to find the type handlers
+        if(true) return getTypeHandlers();
+
+        List<TypeHandler> typeHandlers = new ArrayList<TypeHandler>();
         List where = typeHandler.assembleWhereClause(request);
         Statement stmt = typeHandler.executeSelect(request,
                              SqlUtil.distinct(COL_ENTRIES_TYPE), where);

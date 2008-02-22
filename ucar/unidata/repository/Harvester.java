@@ -89,7 +89,6 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_ROOTDIR = "rootdir";
 
-
     /** _more_ */
     public static final String ATTR_MONITOR = "monitor";
 

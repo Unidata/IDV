@@ -80,8 +80,6 @@ public class GenericTypeHandler extends TypeHandler {
     public static final String TAG_HANDLER = "handler";
 
 
-
-
     /** _more_ */
     public static final String COL_ID = "id";
 
@@ -133,8 +131,6 @@ public class GenericTypeHandler extends TypeHandler {
                             XmlUtil.getChildText(propertyNode));
             }
         }
-
-
 
         this.columns = new ArrayList<Column>();
         colNames     = new ArrayList();
