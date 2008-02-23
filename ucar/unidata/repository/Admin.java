@@ -522,28 +522,26 @@ public class Admin extends RepositoryManager {
      */
     public Result adminSettings(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        sb.append(header("Repository Settings"));
+        sb.append(msgHeader("Repository Settings"));
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.form(URL_ADMIN_SETTINGS_DO));
         String size = " size=\"40\" ";
-        sb.append(
-            "<tr><td colspan=\"2\"><div  class=\"tableheading\">Display</div></td></tr>");
-        sb.append(HtmlUtil.formEntry("Title:",
+        sb.append(HtmlUtil.formTableHeader(msg("Display")));
+        sb.append(HtmlUtil.formEntry(msgLabel("Title"),
                                      HtmlUtil.input(PROP_REPOSITORY_NAME,
                                          getProperty(PROP_REPOSITORY_NAME,
                                              "Repository"), size)));
-        sb.append(HtmlUtil.formEntryTop("Footer:",
+        sb.append(HtmlUtil.formEntryTop(msgLabel("Footer"),
                                         HtmlUtil.textArea(PROP_HTML_FOOTER,
                                             getProperty(PROP_HTML_FOOTER,
                                                 ""), 5, 40)));
 
-        sb.append(
-            "<tr><td colspan=\"2\"><div  class=\"tableheading\">Access</div></td></tr>");
+        sb.append(HtmlUtil.formTableHeader(msg("Access")));
         sb.append(HtmlUtil.formEntry("",
                                      HtmlUtil.checkbox(PROP_ACCESS_ADMINONLY,
                                          "true",
                                          getProperty(PROP_ACCESS_ADMINONLY,
-                                             false)) + " Admin only"));
+                                             false)) + HtmlUtil.space(2) + msg("Admin only")));
         sb.append(
             HtmlUtil.formEntry(
                 "",
@@ -551,7 +549,7 @@ public class Admin extends RepositoryManager {
                     PROP_ACCESS_REQUIRELOGIN, "true",
                     getProperty(
                         PROP_ACCESS_REQUIRELOGIN,
-                        false)) + " Require login"));
+                        false)) + HtmlUtil.space(2) +msg("Require login")));
 
 
         StringBuffer handlerSB = new StringBuffer();
@@ -563,18 +561,17 @@ public class Admin extends RepositoryManager {
 
         String extra = handlerSB.toString();
         if (extra.length() > 0) {
-            sb.append(
-                "<tr><td colspan=\"2\"><div  class=\"tableheading\">Output</div></td></tr>");
+            sb.append(HtmlUtil.formTableHeader(msg("Output")));
             sb.append(extra);
         }
 
         sb.append(HtmlUtil.formEntry("&nbsp;<p>", ""));
 
 
-        sb.append(HtmlUtil.formEntry("", HtmlUtil.submit("Change Settings")));
+        sb.append(HtmlUtil.formEntry("", HtmlUtil.submit(msg("Change Settings"))));
         sb.append("</form>");
         sb.append("</table>");
-        return makeResult(request, "Settings", sb);
+        return makeResult(request, msg("Settings"), sb);
     }
 
     /**
@@ -607,11 +604,11 @@ public class Admin extends RepositoryManager {
 
 
         getRepository().writeGlobal(PROP_ACCESS_ADMINONLY,
-                                    "" + request.get(PROP_ACCESS_ADMINONLY,
-                                        false));
+                                    request.get(PROP_ACCESS_ADMINONLY,
+                                                false));
         getRepository().writeGlobal(
             PROP_ACCESS_REQUIRELOGIN,
-            "" + request.get(PROP_ACCESS_REQUIRELOGIN, false));
+            request.get(PROP_ACCESS_REQUIRELOGIN, false));
         return new Result(URL_ADMIN_SETTINGS.toString());
     }
 
@@ -628,9 +625,8 @@ public class Admin extends RepositoryManager {
     public Result adminHarvesters(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
         if (request.defined(ARG_ACTION)) {
-            String    action    = request.getString(ARG_ACTION, "");
-            Harvester harvester = findHarvester(request.getString(ARG_ID,
-                                      ""));
+            String    action    = request.getString(ARG_ACTION);
+            Harvester harvester = findHarvester(request.getString(ARG_ID));
             if (action.equals(ACTION_STOP)) {
                 harvester.setActive(false);
             } else if (action.equals(ACTION_REMOVE)) {
@@ -646,40 +642,40 @@ public class Admin extends RepositoryManager {
         }
 
 
-        sb.append(header("Harvesters"));
+        sb.append(msgHeader("Harvesters"));
         sb.append("<table cellspacing=\"5\">");
-        sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold("Name"),
-                                             HtmlUtil.bold("State"),
-                                             HtmlUtil.bold("Action"), "",
+        sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold(msg("Name")),
+                                             HtmlUtil.bold(msg("State")),
+                                             HtmlUtil.bold(msg("Action")), "",
                                              "")));
 
         int cnt = 0;
         for (Harvester harvester : harvesters) {
             String remove = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,
                                 ARG_ACTION, ACTION_REMOVE, ARG_ID,
-                                harvester.getId()), "Remove");
+                                harvester.getId()), msg("Remove"));
             String run;
             if (harvester.getActive()) {
                 run = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,
                         ARG_ACTION, ACTION_STOP, ARG_ID,
-                        harvester.getId()), "Stop");
+                        harvester.getId()), msg("Stop"));
             } else {
                 run = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,
                         ARG_ACTION, ACTION_START, ARG_ID,
-                        harvester.getId()), "Start");
+                        harvester.getId()), msg("Start"));
             }
             cnt++;
             sb.append("<tr valign=\"top\">");
             sb.append(HtmlUtil.cols(harvester.getName(),
                                     (harvester.getActive()
-                                     ? "Active"
-                                     : "Stopped") + HtmlUtil.space(2), run,
+                                     ? msg("Active")
+                                     : msg("Stopped")) + HtmlUtil.space(2), run,
                                      remove, harvester.getExtraInfo()));
             sb.append("</tr>\n");
         }
         sb.append("</table>");
 
-        return makeResult(request, "Harvesters", sb);
+        return makeResult(request, msg("Harvesters"), sb);
     }
 
 
@@ -695,9 +691,9 @@ public class Admin extends RepositoryManager {
      */
     public Result adminStats(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        sb.append(header("Repository Statistics"));
+        sb.append(msgHeader("Repository Statistics"));
         sb.append("<table>\n");
-        String[] names  = { "Users", "Associations" };
+        String[] names  = { msg("Users"), msg("Associations") };
         String[] tables = { TABLE_USERS, TABLE_ASSOCIATIONS };
         for (int i = 0; i < tables.length; i++) {
             sb.append(HtmlUtil.row(HtmlUtil.cols(""
@@ -707,13 +703,13 @@ public class Admin extends RepositoryManager {
 
 
         sb.append(HtmlUtil.row("<td colspan=\"2\">&nbsp;<p>"
-                               + HtmlUtil.bold("Types:") + "</td>"));
+                               + HtmlUtil.bold(msgLabel("Types")) + "</td>"));
         int total = 0;
         sb.append(
             HtmlUtil.row(
                 HtmlUtil.cols(
                     "" + getRepository().getCount(TABLE_ENTRIES, ""),
-                    "Total entries")));
+                    msg("Total entries"))));
         for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
             if (typeHandler.isType(TypeHandler.TYPE_ANY)) {
                 continue;
@@ -733,7 +729,7 @@ public class Admin extends RepositoryManager {
 
         sb.append("</table>\n");
 
-        return makeResult(request, "Statistics", sb);
+        return makeResult(request, msg("Statistics"), sb);
     }
 
 
@@ -750,16 +746,16 @@ public class Admin extends RepositoryManager {
         String query = (String) request.getUnsafeString(ARG_QUERY,
                            (String) null);
         StringBuffer sb = new StringBuffer();
-        sb.append(header("SQL"));
+        sb.append(msgHeader("SQL"));
         sb.append(HtmlUtil.form(URL_ADMIN_SQL));
-        sb.append(HtmlUtil.submit("Execute"));
+        sb.append(HtmlUtil.submit(msg("Execute")));
         sb.append(HtmlUtil.textArea(ARG_QUERY, (query == null)
                 ? ""
                 : query, 10, 100));
         sb.append("</form>\n");
         sb.append("<table>");
         if (query == null) {
-            return makeResult(request, "SQL", sb);
+            return makeResult(request, msg("SQL"), sb);
         }
 
         long      t1        = System.currentTimeMillis();
@@ -815,8 +811,8 @@ public class Admin extends RepositoryManager {
         }
         sb.append("</table>");
         long t2 = System.currentTimeMillis();
-        return makeResult(request, "SQL",
-                          new StringBuffer("Fetched:" + cnt + " rows in: "
+        return makeResult(request, msg("SQL"),
+                          new StringBuffer(msgLabel("Fetched rows:") + cnt + HtmlUtil.space(1) +msgLabel("in")
                                            + (t2 - t1) + "ms <p>"
                                            + sb.toString()));
     }
@@ -843,22 +839,24 @@ public class Admin extends RepositoryManager {
         }
         String status = cleanupStatus.toString();
         if (runningCleanup) {
-            sb.append("Database clean up is running<p>");
-            sb.append(HtmlUtil.submit("Stop cleanup", ACTION_STOP));
+            sb.append(msg("Database clean up is running"));
+            sb.append("<p>");
+            sb.append(HtmlUtil.submit(msg("Stop cleanup"), ACTION_STOP));
         } else {
             sb.append(
-                "Cleanup allows you to remove all file entries from the repository database that do not exist on the local file system<p>");
-            sb.append(HtmlUtil.submit("Start cleanup", ACTION_START));
+                      msg("Cleanup allows you to remove all file entries from the repository database that do not exist on the local file system"));
+            sb.append("<p>");
+            sb.append(HtmlUtil.submit(msg("Start cleanup"), ACTION_START));
 
 
         }
         sb.append("</form>");
         if (status.length() > 0) {
-            sb.append("<h3>Cleanup Status</h3>");
+            sb.append(msgHeader("Cleanup Status"));
             sb.append(status);
         }
         //        sb.append(cnt +" files do not exist in " + (t2-t1) );
-        return makeResult(request, "Cleanup", sb);
+        return makeResult(request, msg("Cleanup"), sb);
     }
 
 
@@ -932,7 +930,7 @@ public class Admin extends RepositoryManager {
                 getRepository().deleteEntries(request, entries, null);
                 deleteCnt += entries.size();
                 cleanupStatus =
-                    new StringBuffer("Done running cleanup<br>Removed "
+                    new StringBuffer(msg("Done running cleanup") +"<br>"+ msg("Removed") + HtmlUtil.space(1) 
                                      + deleteCnt + " entries from database");
             }
         } catch (Exception exc) {
@@ -969,11 +967,12 @@ public class Admin extends RepositoryManager {
         String catalog = request.getString(ARG_CATALOG, "").trim();
         sb.append(HtmlUtil.form(URL_ADMIN_IMPORT_CATALOG.toString()));
         sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
-        sb.append(HtmlUtil.submit("Import catalog:"));
+        sb.append(HtmlUtil.submit(msgLabel("Import catalog")));
         sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.input(ARG_CATALOG, catalog, " size=\"75\""));
         sb.append(HtmlUtil.checkbox(ARG_RECURSE, "true", recurse));
-        sb.append(" Recurse");
+        sb.append(HtmlUtil.space(1));
+        sb.append(msg("Recurse"));
         sb.append("</form>");
         if (catalog.length() > 0) {
             CatalogHarvester harvester =

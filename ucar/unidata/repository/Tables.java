@@ -436,10 +436,12 @@ public interface Tables {
     /** _more_ */
     public static final String COL_USERS_ADMIN = TABLE_USERS + ".admin";
 
+    public static final String COL_USERS_LANGUAGE = TABLE_USERS + ".language";
+
     /** _more_ */
     public static final String[] ARRAY_USERS = new String[] {
         COL_USERS_ID, COL_USERS_NAME, COL_USERS_EMAIL, COL_USERS_QUESTION,
-        COL_USERS_ANSWER, COL_USERS_PASSWORD, COL_USERS_ADMIN
+        COL_USERS_ANSWER, COL_USERS_PASSWORD, COL_USERS_ADMIN,COL_USERS_LANGUAGE
     };
 
     /** _more_ */

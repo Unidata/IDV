@@ -114,6 +114,21 @@ public class MetadataServlet extends HttpServlet {
     }
 
 
+    public void destroy() {
+        super.destroy();
+        if(repository!=null) {
+            try {
+                repository.close();
+            } catch (Exception e) {
+                try {
+                    ex.logException(ex.getStackTrace(e),"");
+                } catch(Exception noop) {}
+            }
+        }
+        repository = null;
+    }
+
+
 
     /**
      * Overriding doGet method in HttpServlet. Called by the server via the service method.
@@ -134,13 +149,13 @@ public class MetadataServlet extends HttpServlet {
                 createRepository(request);
             } catch (Exception e) {
                 ex.logException(ex.getStackTrace(e), request.getRemoteAddr());
+                response.sendError(response.SC_INTERNAL_SERVER_ERROR,
+                                   "An error has occurred:" + e.getMessage());
+                return;
             }
         }
 
         RequestHandler handler          = new RequestHandler(request);
-
-
-
 
         Result         repositoryResult = null;
         try {

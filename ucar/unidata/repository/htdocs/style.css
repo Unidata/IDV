@@ -102,12 +102,16 @@ a.navlink {
   color:black;
 }
 
-.notewrapper {
-	margin:10px;
+
+.notetext {
+   font-weight: bold;
 }
 
-
 .note {
+   font-weight: bold;
+   margin:10px;
+   padding-bottom:0px;
+   padding:5px;
    padding-left:5px;
    padding-right:5px;
    border : 1px black solid;

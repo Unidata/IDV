@@ -286,14 +286,14 @@ public class OutputHandler extends RepositoryManager {
                                   entry.getId(), ARG_OUTPUT, output,
                                   ARG_NEXT, "true"), HtmlUtil.img(
                                       getRepository().fileUrl(ICON_RIGHT),
-                                      "View next entry"));
+                                      msg("View Next Entry")));
         String prevLink = HtmlUtil.href(
                               HtmlUtil.url(
                                   getRepository().URL_ENTRY_SHOW, ARG_ID,
                                   entry.getId(), ARG_OUTPUT, output,
                                   ARG_PREVIOUS, "true"), HtmlUtil.img(
                                       getRepository().fileUrl(ICON_LEFT),
-                                      "View Previous Entry"));
+                                     msg("View Previous Entry")));
         return prevLink + nextLink;
     }
 
@@ -388,12 +388,12 @@ public class OutputHandler extends RepositoryManager {
         for (TwoFacedObject tfo : outputTypes) {
             request.put(ARG_OUTPUT, (String) tfo.getId());
             if (tfo.getId().equals(output)) {
-                items.add(tfo.toString());
+                items.add(msg(tfo.toString()));
             } else {
                 items.add(
                     HtmlUtil.href(
                         request.getRequestPath() + "?"
-                        + request.getUrlArgs(ARG_MESSAGE), tfo.toString(),
+                        + request.getUrlArgs(ARG_MESSAGE), msg(tfo.toString()),
                             " class=\"subnavlink\" "));
             }
         }

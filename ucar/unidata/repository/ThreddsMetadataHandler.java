@@ -230,17 +230,17 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      */
     public String[] getHtml(Metadata metadata) {
         Metadata.Type type    = getType(metadata.getType());
-        String        lbl     = type.getLabel() + ":";
+        String        lbl     = msgLabel(type.getLabel());
         String        content = null;
         if (type.equals(TYPE_LINK)) {
             content = HtmlUtil.href(metadata.getAttr2(), metadata.getAttr1());
         } else if (type.equals(TYPE_DOCUMENTATION)) {
             if (metadata.getAttr1().length() > 0) {
-                lbl = getLabel(metadata.getAttr1()) + ":";
+                lbl = msgLabel(getLabel(metadata.getAttr1()));
             }
             content = metadata.getAttr2();
         } else if (type.equals(TYPE_PROPERTY)) {
-            lbl     = getLabel(metadata.getAttr1()) + ":";
+            lbl     = msgLabel(getLabel(metadata.getAttr1()));
             content = metadata.getAttr2();
         } else if (type.equals(TYPE_ICON)) {
             lbl     = "";
@@ -248,10 +248,10 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         } else if (type.equals(TYPE_PUBLISHER) || type.equals(TYPE_CREATOR)) {
             content = metadata.getAttr1();
             if (metadata.getAttr3().length() > 0) {
-                content += "<br>Email: " + metadata.getAttr3();
+                content += HtmlUtil.br() +msgLabel("Email") + HtmlUtil.space(1) + metadata.getAttr3();
             }
             if (metadata.getAttr4().length() > 0) {
-                content += "<br>Url: "
+                content += HtmlUtil.br() +msgLabel("URL") + HtmlUtil.space(1)
                            + HtmlUtil.href(metadata.getAttr4(),
                                            metadata.getAttr4());
             }
@@ -295,15 +295,15 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 return;
             }
             List l = Misc.toList(values);
-            l.add(0, new TwoFacedObject("None", ""));
-            sb.append(HtmlUtil.formEntry(type.getLabel() + ":",
+            l.add(0, new TwoFacedObject(msg("None"), ""));
+            sb.append(HtmlUtil.formEntry(msgLabel(type.getLabel()),
                                          HtmlUtil.select(ARG_METADATA_ATTR1
                                              + "." + type, l, "",
                                                  100) + inheritedCbx));
         } else {
             sb.append(
                 HtmlUtil.formEntry(
-                    type.getLabel() + ":",
+                                   msgLabel(type.getLabel()),
                     HtmlUtil.input(ARG_METADATA_ATTR1 + "." + type, "")
                     + inheritedCbx));
         }
@@ -382,7 +382,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                             boolean forEdit)
             throws Exception {
         Metadata.Type type    = getType(metadata.getType());
-        String        lbl     = type.getLabel() + ":";
+        String        lbl     = msgLabel(type.getLabel());
         String        content = null;
         String        id      = metadata.getId();
         String        suffix  = "";
@@ -391,7 +391,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         }
 
 
-        String submit = HtmlUtil.submit("Add " + lbl);
+        String submit = HtmlUtil.submit(msg("Add") + HtmlUtil.space(1) + lbl);
         if (forEdit) {
             submit = "";
         }
@@ -402,48 +402,48 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         String size = HtmlUtil.SIZE_70;
 
         if (type.equals(TYPE_LINK)) {
-            content = formEntry(new String[] { submit, "Label:",
-                    HtmlUtil.input(arg1, metadata.getAttr1(), size), "Url:",
+            content = formEntry(new String[] { submit, msgLabel("Label"),
+                    HtmlUtil.input(arg1, metadata.getAttr1(), size), msgLabel("Url"),
                     HtmlUtil.input(arg2, metadata.getAttr2(), size) });
         } else if (type.equals(TYPE_ICON)) {
-            content = formEntry(new String[] { submit, "URL:",
+            content = formEntry(new String[] { submit, msgLabel("URL"),
                     HtmlUtil.input(arg1, metadata.getAttr1(), size) });
         } else if (type.equals(TYPE_DOCUMENTATION)) {
             List types = Misc.newList(
-                             new TwoFacedObject("Summary", "summary"),
-                             new TwoFacedObject("Funding", "funding"),
-                             new TwoFacedObject("History", "history"),
+                             new TwoFacedObject(msg("Summary"), "summary"),
+                             new TwoFacedObject(msg("Funding"), "funding"),
+                             new TwoFacedObject(msg("History"), "history"),
                              new TwoFacedObject(
-                                 "Processing Level",
+                                                msg("Processing Level"),
                                  "processing_level"), new TwoFacedObject(
-                                     "Rights", "rights"));
+                                                                         msg("Rights"), "rights"));
 
-            content = formEntry(new String[] { submit, "Type:",
+            content = formEntry(new String[] { submit, msgLabel("Type"),
                     HtmlUtil.select(arg1, types, metadata.getAttr1()),
-                    "Value:",
+                                               msgLabel("Value"),
                     HtmlUtil.textArea(arg2, metadata.getAttr2(), 5, 50) });
         } else if (type.equals(TYPE_CONTRIBUTOR)) {
-            content = formEntry(new String[] { submit, "Name:",
-                    HtmlUtil.input(arg1, metadata.getAttr1(), size), "Role:",
+            content = formEntry(new String[] { submit, msgLabel("Name"),
+                    HtmlUtil.input(arg1, metadata.getAttr1(), size), msgLabel("Role"),
                     HtmlUtil.input(arg2, metadata.getAttr2(), size) });
         } else if (type.equals(TYPE_PROPERTY)) {
-            content = formEntry(new String[] { submit, "Name:",
-                    HtmlUtil.input(arg1, metadata.getAttr1(), size), "Value:",
+            content = formEntry(new String[] { submit, msgLabel("Name"),
+                    HtmlUtil.input(arg1, metadata.getAttr1(), size), msgLabel("Value"),
                     HtmlUtil.input(arg2, metadata.getAttr2(), size) });
 
         } else if (type.equals(TYPE_KEYWORD)) {
-            content = formEntry(new String[] { submit, "Value:",
+            content = formEntry(new String[] { submit, msgLabel("Value"),
                     HtmlUtil.input(arg1,
                                    metadata.getAttr1().replace("\n", ""),
                                    size),
-                    "Vocabulary:",
+                                               msgLabel("Vocabulary"),
                     HtmlUtil.input(arg2, metadata.getAttr2(), size) });
 
         } else if (type.equals(TYPE_PUBLISHER) || type.equals(TYPE_CREATOR)) {
             content = formEntry(new String[] {
-                submit, "Organization:",
-                HtmlUtil.input(arg1, metadata.getAttr1(), size), "Email:",
-                HtmlUtil.input(arg3, metadata.getAttr3(), size), "Url:",
+                submit, msgLabel("Organization"),
+                HtmlUtil.input(arg1, metadata.getAttr1(), size), msgLabel("Email"),
+                HtmlUtil.input(arg3, metadata.getAttr3(), size), msgLabel("URL"),
                 HtmlUtil.input(arg4, metadata.getAttr4(), size)
             });
         } else {

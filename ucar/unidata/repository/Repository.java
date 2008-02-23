@@ -154,7 +154,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     /** _more_ */
     public RequestUrl URL_ENTRY_SHOW = new RequestUrl(this, "/entry/show",
-                                           "View Entry");
+                                           msg("View Entry"));
 
     //    public RequestUrl URL_GROUP_SHOW = new RequestUrl(this, "/group/show");
 
@@ -163,12 +163,12 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     /** _more_ */
     public RequestUrl URL_ENTRY_DELETE = new RequestUrl(this,
-                                             "/entry/delete", "Delete");
+                                             "/entry/delete", msg("Delete"));
 
 
     /** _more_ */
     public RequestUrl URL_ACCESS_FORM = new RequestUrl(this, "/access/form",
-                                            "Access");
+                                            msg("Access"));
 
 
     /** _more_ */
@@ -181,7 +181,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     /** _more_ */
     public RequestUrl URL_ENTRY_FORM = new RequestUrl(this, "/entry/form",
-                                           "Edit Entry");
+                                           msg("Edit Entry"));
 
 
 
@@ -257,6 +257,10 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
+
+
+    private Hashtable languageMap = new Hashtable();
+    private List<TwoFacedObject> languages= new ArrayList<TwoFacedObject>();
 
 
     /** _more_ */
@@ -504,8 +508,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String note(String h) {
-        return "<div class=\"notewrapper\"><span class=\"note\">" + h
-               + "</span></div>";
+        return getMessage(h,"/information.png");
     }
 
 
@@ -517,10 +520,45 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String warning(String h) {
-        return "<div class=\"notewrapper\"><table border=\"0\"><tr valign=\"bottom\"><td>"
-               + HtmlUtil.img(fileUrl("/warning.jpg")) + HtmlUtil.space(1)
-               + "</td><td><div class=\"note\">" + h
-               + "</div></td></tr></table></div>";
+        return getMessage(h,"/warning.png");
+    }
+
+    /**
+     * _more_
+     *
+     * @param h _more_
+     *
+     * @return _more_
+     */
+    protected String question(String h) {
+        return getMessage(h,"/question.png");
+    }
+
+    /**
+     * _more_
+     *
+     * @param h _more_
+     *
+     * @return _more_
+     */
+    protected String error(String h) {
+        return getMessage(h,"/error.png");
+    }
+
+    /**
+     * _more_
+     *
+     * @param h _more_
+     *
+     * @return _more_
+     */
+    protected String getMessage(String h, String icon) {
+        h =  "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><td valign=\"top\">"
+            + HtmlUtil.img(fileUrl(icon)) + HtmlUtil.space(2) +
+            "</td><td valign=\"bottom\"><span class=\"notetext\">" + h
+               + "</span></td></tr></table>";
+        return "\n<table border=\"0\"><tr><td><div class=\"note\">" + h
+            + "</div></td></tr></table>\n";
     }
 
 
@@ -708,6 +746,46 @@ public class Repository implements Constants, Tables, RequestHandler,
         initUsers();
         initGroups();
         getAdmin().initHarvesters();
+        initLanguages();
+    }
+
+    protected void initLanguages() throws Exception {
+        List<String> files = new ArrayList<String>();
+        files.add("/ucar/unidata/repository/sp.pack");
+        for(String file: files) {
+            String content = IOUtil.readContents(file,getClass(),(String)null);
+            if(content == null) continue;
+            List<String> lines = StringUtil.split(content,"\n",true,true);
+            Properties properties = new Properties();
+
+            String type = null; 
+            String name = null; 
+            for(String line: lines) {
+                if(line.startsWith("#")) continue;
+                List toks = StringUtil.split(line,"=",true,true);
+                if(toks.size()!=2) continue;
+                String key = (String) toks.get(0);
+                String value = (String) toks.get(1);
+                if(key.equals("language.type")) {
+                    type = value;
+                } else if(key.equals("language.name")) {
+                    name = value;
+                } else {
+                    properties.put(key, value);
+                }
+            }
+            if(type!=null) {
+                if(name == null) name = type;
+                languages.add(new TwoFacedObject(name,type));
+                languageMap.put(type, properties);
+            } else {
+                System.err.println ("No _type_ found in: " + file);
+            }
+        }
+    }
+
+    public List<TwoFacedObject> getLanguages() {
+        return languages;
     }
 
     /**
@@ -729,7 +807,6 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     protected void initProperties() throws Exception {
-
         properties = new Properties();
         properties.load(
             IOUtil.getInputStream(
@@ -771,6 +848,15 @@ public class Repository implements Constants, Tables, RequestHandler,
                 usage("Unknown argument: " + args[i]);
             }
         }
+
+        //Load the command line properties now so the storage manager 
+        //can get to them
+        properties.putAll(argProperties);
+
+        
+        //Call the storage manager so it can figure out the home dir
+        getStorageManager();
+
 
         localProperties = new Properties();
         try {
@@ -814,9 +900,8 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         String derbyHome = (String) properties.get(PROP_DB_DERBY_HOME);
         if (derbyHome != null) {
-            derbyHome = derbyHome.replace("%userhome%",
-                                          Misc.getSystemProperty("user.home",
-                                              "."));
+            derbyHome = derbyHome.replace("%repository.home%",
+                                          getStorageManager().getRepositoryDir());
             File dir = new File(derbyHome);
             IOUtil.makeDirRecursive(dir);
             System.setProperty("derby.system.home", derbyHome);
@@ -1209,7 +1294,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             boolean      badAccess = inner instanceof AccessException;
             StringBuffer sb        = new StringBuffer();
             if ( !badAccess) {
-                sb.append("An error has occurred:"
+                sb.append(msgLabel("An error has occurred")
                           + warning(inner.getMessage()));
             } else {
                 sb.append(warning(inner.getMessage()));
@@ -1221,7 +1306,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 sb.append("<pre>" + LogUtil.getStackTrace(inner) + "</pre>");
             }
 
-            result = new Result("Error", sb);
+            result = new Result(msg("Error"), sb);
             if (badAccess) {
                 result.setResponseCode(Result.RESPONSE_UNAUTHORIZED);
                 //                result.addHttpHeader("WWW-Authenticate","Basic realm=\"repository\"");
@@ -1302,7 +1387,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         if ( !getUserManager().isRequestOk(request)
                 || !apiMethod.isRequestOk(request, this)) {
-            throw new AccessException("You cannot access this page");
+            throw new AccessException(msg("You cannot access this page"));
         }
 
 
@@ -1370,9 +1455,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         String type = getMimeTypeFromSuffix(IOUtil.getFileExtension(path));
         path = StringUtil.replace(path, getUrlBase(), "");
         if ((path.trim().length() == 0) || path.equals("/")) {
-            log(request, "Unknown request: \"" + path + "\"");
-            Result result = new Result("Error",
-                                       new StringBuffer("Unknown request:\""
+            log(request, "Unknown request" +" \"" + path + "\"");
+            Result result = new Result(msg("Error"),
+                                       new StringBuffer(msgLabel("Unknown request") +"\""
                                            + path + "\""));
             result.setResponseCode(Result.RESPONSE_NOTFOUND);
             return result;
@@ -1395,8 +1480,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         }
         log(request, "Unknown request:" + path);
-        Result result = new Result("Error",
-                                   new StringBuffer("Unknown request:"
+        Result result = new Result(msg("Error"),
+                                   new StringBuffer(msgLabel("Unknown request")
                                        + path));
         result.setResponseCode(Result.RESPONSE_NOTFOUND);
         return result;
@@ -1446,8 +1531,59 @@ public class Repository implements Constants, Tables, RequestHandler,
         } else {
             html = StringUtil.replace(html, "${sublinks}", "");
         }
+        html = translate(request, html);
+
         result.setContent(html.getBytes());
     }
+
+    private Hashtable seenMsg = new Hashtable();
+    private boolean trackMsg = false;
+    public String translate(Request request, String s) {
+
+        User user = request.getUser();
+        String language = user.getLanguage();
+        Properties map = (Properties) languageMap.get(language);
+        if(map == null){
+            map = (Properties) languageMap.get(getProperty(PROP_LANGUAGE,""));
+        }
+        StringBuffer stripped = new StringBuffer();
+        int prefixLength = MSG_PREFIX.length();
+        while (s.length() > 0) {
+            int idx1 = s.indexOf(MSG_PREFIX);
+            if (idx1 < 0) {
+                stripped.append(s);
+                break;
+            }
+            String text = s.substring(0, idx1);
+            if (text.length() > 0) {
+                stripped.append(text);
+            }
+            s = s.substring(idx1+1);
+
+            int idx2 = s.indexOf(MSG_SUFFIX);
+            if (idx2 < 0) {
+                break;
+            }
+            String key = s.substring(prefixLength-1,idx2);
+            String value = null;
+            if(map!=null) {
+                value = (String) map.get(key);
+            }
+            if(value == null) {
+                value = key;
+                if(trackMsg) {
+                    if(seenMsg.get(key) == null) {
+                        System.out.println(key +"=" + value);
+                        seenMsg.put(key,key);
+                    }
+                }
+            }
+            stripped.append(value);
+            s = s.substring(idx2 + 1);
+        }
+        return stripped.toString();
+    }
+
 
 
     /**
@@ -1582,6 +1718,11 @@ public class Repository implements Constants, Tables, RequestHandler,
         readGlobals();
 
     }
+    protected void writeGlobal(String name, boolean value) throws Exception {
+        writeGlobal(name,""+value);
+    }
+
+
 
     /**
      * _more_
@@ -1742,7 +1883,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         }
         throw new IllegalArgumentException(
-            "Could not find output handler for: " + request.getOutput());
+            msgLabel("Could not find output handler for") +" " + request.getOutput());
     }
 
 
@@ -2089,7 +2230,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         StringBuffer sb           = new StringBuffer();
         StringBuffer headerBuffer = new StringBuffer();
-        //        headerBuffer.append(header("Search Form"));
         headerBuffer.append("<table cellpadding=\"5\">");
         sb.append(HtmlUtil.form(HtmlUtil.url(URL_ENTRY_SEARCH, ARG_NAME,
                                              WHAT_ENTRIES)));
@@ -2120,12 +2260,12 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-        String buttons = HtmlUtil.submit("Search", "submit")
+        String buttons = HtmlUtil.submit(msg("Search"), "submit")
                          + HtmlUtil.space(1)
-                         + HtmlUtil.submit("Search Subset", "submit_subset");
+                         + HtmlUtil.submit(msg("Search Subset"), "submit_subset");
 
 
-        sb.append(HtmlUtil.formEntry("", buttons));
+        sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons,2)));
 
         if (what.length() == 0) {
             //            sb.append(HtmlUtil.formEntry("Search For:",
@@ -2153,8 +2293,8 @@ public class Repository implements Constants, Tables, RequestHandler,
         request.put(ARG_FORM_METADATA, metadataForm + "");
         String link = HtmlUtil.href(getRepository().URL_ENTRY_SEARCHFORM
                                     + "?" + urlArgs, (metadataForm
-                ? "- Metadata"
-                : "+ Metadata"), " class=\"subheaderlink\" ");
+                                                      ? "- " + msg("Metadata")
+                : "+ " + msg("Metadata")), " class=\"subheaderlink\" ");
         sb.append("<tr><td colspan=2>");
         sb.append(HtmlUtil.div(link, " class=\"subheader\""));
         sb.append("</td></tr>");
@@ -2166,7 +2306,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         String outputHtml = "";
         if (true || advancedForm) {
-            //            outputHtml = HtmlUtil.span("Output Type: ",
+            //            outputHtml = HtmlUtil.span(msgLabel("Output Type") + HtmlUtil.space(1),
             //                                       "class=\"formlabel\"");
             if (output.length() == 0) {
                 outputHtml += HtmlUtil.select(ARG_OUTPUT,
@@ -2176,13 +2316,13 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
 
             List orderByList = new ArrayList();
-            orderByList.add(new TwoFacedObject("None", "none"));
-            orderByList.add(new TwoFacedObject("From Date", "fromdate"));
-            orderByList.add(new TwoFacedObject("To Date", "todate"));
-            orderByList.add(new TwoFacedObject("Create Date", "createdate"));
-            orderByList.add(new TwoFacedObject("Name", "name"));
+            orderByList.add(new TwoFacedObject(msg("None"), "none"));
+            orderByList.add(new TwoFacedObject(msg("From Date"), "fromdate"));
+            orderByList.add(new TwoFacedObject(msg("To Date"), "todate"));
+            orderByList.add(new TwoFacedObject(msg("Create Date"), "createdate"));
+            orderByList.add(new TwoFacedObject(msg("Name"), "name"));
 
-            String orderBy = HtmlUtil.space(2) + HtmlUtil.bold("Order by: ")
+            String orderBy = HtmlUtil.space(2) + HtmlUtil.bold(msgLabel("Order by") + HtmlUtil.space(1))
                              + HtmlUtil.select(
                                  ARG_ORDERBY, orderByList,
                                  request.getString(
@@ -2191,32 +2331,29 @@ public class Repository implements Constants, Tables, RequestHandler,
                                          ARG_ASCENDING, "true",
                                          request.get(
                                              ARG_ASCENDING,
-                                             false)) + " ascending";
+                                             false)) + HtmlUtil.space(1) + msg("ascending");
             //            sb.append(HtmlUtil.formEntry("Output Type:",
             //                                         outputHtml + orderBy));
             //            outputHtml += orderBy;
 
-            outputHtml = HtmlUtil.space(2) + HtmlUtil.bold("Output Type:")
+            outputHtml = HtmlUtil.space(2) + HtmlUtil.bold(msgLabel("Output Type"))
                          + HtmlUtil.space(1) + outputHtml + orderBy;
         }
-
-
-
 
         if (metadataForm) {
             sb.append(HtmlUtil.formEntry(HtmlUtil.space(1), ""));
         }
-        sb.append(HtmlUtil.formEntry("", buttons + outputHtml));
+        sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons,2)));
 
-        sb.append("</table>");
-        sb.append("</form>");
+        sb.append(HtmlUtil.formTableClose());
+        sb.append(HtmlUtil.formClose());
         //        sb.append(IOUtil.readContents("/ucar/unidata/repository/resources/map.js",
         //                                         getClass()));
 
 
         headerBuffer.append(sb.toString());
 
-        Result result = new Result("Search Form", headerBuffer);
+        Result result = new Result(msg("Search Form"), headerBuffer);
         //        result.putProperty(PROP_NAVSUBLINKS,
         //                           getSearchFormLinks(request, what));
         return result;
@@ -2253,6 +2390,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         String type     = request.getRequestPath();
         for (int i = 0; i < urls.length; i++) {
             String label = urls[i].getLabel();
+            label = msg(label);
             if (label == null) {
                 label = urls[i].toString();
             }
@@ -2345,7 +2483,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 continue;
             }
             links.add(HtmlUtil.href(fileUrl(apiMethod.getRequest()),
-                                    apiMethod.getName(), extra));
+                                    msg(apiMethod.getName()), extra));
         }
         return links;
     }
@@ -2612,6 +2750,9 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+    public void close()  throws Exception {
+        getDatabaseManager().closeConnection();
+    }
     /**
      * _more_
      *
@@ -2624,7 +2765,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected String makeGroupHeader(Request request, Group group)
             throws Exception {
-        return HtmlUtil.bold("Group:") + HtmlUtil.space(1)
+        return HtmlUtil.bold(msg("Group:")) + HtmlUtil.space(1)
                + getBreadCrumbs(request, group, true, "")[1];
     }
 
@@ -2961,7 +3102,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                                         ARG_COMMENT_ID,
                                         comment.getId()), HtmlUtil.img(
                                             fileUrl(ICON_DELETE),
-                                            "Delete comment"));
+                                            msg("Delete comment")));
             if (canEdit) {
                 sb.append(HtmlUtil.formEntry("", deleteLink));
             }
@@ -2996,6 +3137,19 @@ public class Repository implements Constants, Tables, RequestHandler,
         return new Result("Entry Comments", sb, Result.TYPE_HTML);
     }
 
+    public static final String MSG_PREFIX = "<msg ";
+    public static final String MSG_SUFFIX = ">";
+    public static String msg(String msg) {
+        return MSG_PREFIX + msg +MSG_SUFFIX;
+    }
+
+    public static String msgLabel(String msg) {
+        return msg(msg) +":";
+    }
+
+    protected static String msgHeader(String h) {
+        return "<div class=\"heading\">" + msg(h) + "</div>";
+    }
 
     /**
      * _more_
@@ -5150,7 +5304,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                                 URL_ENTRY_SEARCHFORM, ARG_ASSOCIATION,
                                 encode(association)), HtmlUtil.img(
                                     fileUrl(ICON_SEARCH),
-                                    "Search in association"));
+                                    msg("Search in association")));
 
         return search;
     }

@@ -128,7 +128,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
      * @return _more_
      */
     public String[] getHtml(Metadata metadata) {
-        String lbl     = TYPE_ENUM.getLabel() + ":";
+        String lbl     = msgLabel(TYPE_ENUM.getLabel());
         String content = metadata.getAttr1();
         return new String[] { lbl, content };
     }
@@ -152,7 +152,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
             return;
         }
         l = new ArrayList(l);
-        l.add(0, new TwoFacedObject("None", ""));
+        l.add(0, new TwoFacedObject(msg("None"), ""));
 
         String inheritedCbx = HtmlUtil.checkbox(ARG_METADATA_INHERITED + "."
                                   + TYPE_ENUM, "true",
@@ -161,7 +161,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
         inheritedCbx = "";
         sb.append(HtmlUtil.hidden(ARG_METADATA_TYPE + "." + TYPE_ENUM,
                                   TYPE_ENUM.toString()));
-        sb.append(HtmlUtil.formEntry(TYPE_ENUM.getLabel() + ":",
+        sb.append(HtmlUtil.formEntry(msgLabel(TYPE_ENUM.getLabel()),
                                      HtmlUtil.select(ARG_METADATA_ATTR1 + "."
                                          + TYPE_ENUM.toString(), l, "",
                                              100) + inheritedCbx));
@@ -242,14 +242,14 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
                             boolean forEdit)
             throws Exception {
         Metadata.Type type   = TYPE_ENUM;
-        String        lbl    = type.getLabel() + ":";
+        String        lbl    = msgLabel(type.getLabel());
 
         String        id     = metadata.getId();
         String        suffix = "";
         if (id.length() > 0) {
             suffix = "." + id;
         }
-        String submit = HtmlUtil.submit("Add " + lbl);
+        String submit = HtmlUtil.submit(msg("Add") + HtmlUtil.space(1) + lbl);
         if (forEdit) {
             submit = "";
         }

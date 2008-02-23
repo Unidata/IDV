@@ -202,9 +202,9 @@ public class CatalogOutputHandler extends OutputHandler {
             HtmlUtil.textArea(ARG_PATHS,
                               getRepository().getProperty(ARG_PATHS, ""), 5,
                               40);
-        buffer.append(HtmlUtil.formEntryTop("TDS Paths:",
+        buffer.append(HtmlUtil.formEntryTop(msgLabel("TDS Paths"),
                 HtmlUtil.table(HtmlUtil.rowTop(HtmlUtil.cols(widget,
-                    "Data directory roots for writing Thredds catalogs")))));
+                    msg("Data directory roots for writing Thredds catalogs"))))));
     }
 
     /**

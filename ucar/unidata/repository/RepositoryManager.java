@@ -122,6 +122,18 @@ public class RepositoryManager implements RepositorySource, Constants,
     }
 
 
+    public static String msg(String msg) {
+        return Repository.msg(msg);
+    }
+
+    public static String msgLabel(String msg) {
+        return Repository.msgLabel(msg);
+    }
+
+    protected static String msgHeader(String h) {
+        return Repository.msgHeader(h);
+    }
+
     /**
      * _more_
      *

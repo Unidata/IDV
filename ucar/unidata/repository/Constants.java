@@ -461,6 +461,8 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_DOWNLOAD_OK = "jdms.download.ok";
 
+    public static final String PROP_REPOSITORY_HOME = "jdms.home";
+
 
     /** _more_ */
     public static final String PROP_DEBUG = "jdms.debug";
@@ -476,6 +478,9 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_ACCESS_ADMINONLY =
         "jdms.access.adminonly";
+
+    public static final String PROP_LANGUAGE = "jdms.language";
+
 
     /** _more_ */
     public static final String PROP_HTML_FOOTER = "jdms.html.footer";

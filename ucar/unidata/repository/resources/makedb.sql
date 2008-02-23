@@ -76,7 +76,10 @@ CREATE TABLE  users (id varchar(200),
                      question  varchar(200),
                      answer  varchar(200),  
                      password  varchar(200),
-		     admin int);
+		     admin int,
+		     language varchar(50));
+
+alter table users add column  language varchar(50);
 
 
 CREATE TABLE  userroles (
