@@ -78,6 +78,14 @@ public class HtmlUtil {
         return "<table cellspacing=\"0\" cellpadding=\"0\">" + HtmlUtil.rowTop(HtmlUtil.cols(s1, s2)) + "</table>";
     }
 
+    public static String br() {
+        return "<br>";
+    }
+    public static String p() {
+        return "<p>";
+    }
+
+
     /**
      * _more_
      *
@@ -139,10 +147,10 @@ public class HtmlUtil {
     public static String img(String path, String title, String extra) {
         if (title.length() > 0) {
             return "<img "
-                   + XmlUtil.attrs("border", "0", "src", path, "title",
+                   + attrs("border", "0", "src", path, "title",
                                    title, "alt", title) + " " + extra + ">";
         }
-        return "<img " + XmlUtil.attrs("border", "0", "src", path) + " "
+        return "<img " + attrs("border", "0", "src", path) + " "
                + extra + ">";
     }
 
@@ -481,7 +489,7 @@ public class HtmlUtil {
     public static String checkbox(String name, String value,
                                   boolean checked) {
         return "<input "
-               + XmlUtil.attrs("type", "checkbox", "name", name, "value",
+               + attrs("type", "checkbox", "name", name, "value",
                                value) + (checked
                                          ? " checked "
                                          : "") + ">";
@@ -566,8 +574,8 @@ public class HtmlUtil {
      */
     public static String submitImage(String img, String name) {
         return "<input "
-               + XmlUtil.attrs("name", name, "border", "0", "src", img)
-               + XmlUtil.attrs("type", "image") + " >";
+               + attrs("name", name, "border", "0", "src", img)
+               + attrs("type", "image") + " >";
 
     }
 
@@ -583,8 +591,8 @@ public class HtmlUtil {
      */
     public static String submitImage(String img, String name, String alt) {
         return "<input "
-               + XmlUtil.attrs("name", name, "border", "0", "src", img)
-               + XmlUtil.attrs("title", alt, "alt", alt, "type", "image")
+               + attrs("name", name, "border", "0", "src", img)
+               + attrs("title", alt, "alt", alt, "type", "image")
                + " >";
     }
 
@@ -754,6 +762,14 @@ public class HtmlUtil {
         return sb.toString();
     }
 
+    public static String formTableHeader(String s) {
+        return "<tr><td colspan=\"2\"><div  class=\"tableheading\">" + s +"</div></td></tr>";
+    }
+
+    public static String colspan(String s, int cols) {
+        return "<td colspan=\"" +cols+"\">" + s +"</td>";
+    }
+
     public static String formTableTop(String[]cols) {
         StringBuffer sb = new StringBuffer();
         sb.append(formTable());
@@ -876,6 +892,69 @@ public class HtmlUtil {
         //        System.out.println (sb);
         
     }
+
+
+    public static String attr(String name, String value) {
+        return " " + name + "=" + quote(value) + " ";
+    }
+
+    public static String attrs(String name, String value) {
+        return " " + name + "=" + quote(value) + " ";
+    }
+
+
+    /**
+     *  Return a String with n1=&quot;v1&quot n2=&quot;v2&quot.
+     *
+     *  @param n1 The first attribute name.
+     *  @param v1 The first attribute value.
+     *  @param n2 The second attribute name.
+     *  @param v2 The second attribute value.
+     *  @return The attrbiute string.
+     */
+
+    public static String attrs(String n1, String v1, String n2, String v2) {
+        return attr(n1, v1) + attr(n2, v2);
+    }
+
+    /**
+     *  Return a String with n1=&quot;v1&quot n2=&quot;v2&quot.  n3=&quot;v3&quot.
+     *
+     *  @param n1 The first attribute name.
+     *  @param v1 The first attribute value.
+     *  @param n2 The second attribute name.
+     *  @param v2 The second attribute value.
+     *  @param n3 The third attribute name.
+     *  @param v3 The third attribute value.
+     *  @return The attrbiute string.
+     */
+
+    public static String attrs(String n1, String v1, String n2, String v2,
+                               String n3, String v3) {
+        return attrs(n1, v1, n2, v2) + attr(n3, v3);
+    }
+
+
+    /**
+     *  Return a String with n1=&quot;v1&quot n2=&quot;v2&quot.  n3=&quot;v3&quot.  n4=&quot;v4&quot.
+     *
+     *  @param n1 The first attribute name.
+     *  @param v1 The first attribute value.
+     *  @param n2 The second attribute name.
+     *  @param v2 The second attribute value.
+     *  @param n3 The third attribute name.
+     *  @param v3 The third attribute value.
+     *  @param n4 The fourth attribute name.
+     *  @param v4 The fourth attribute value.
+     *  @return The attrbiute string.
+     */
+
+    public static String attrs(String n1, String v1, String n2, String v2,
+                               String n3, String v3, String n4, String v4) {
+        return attrs(n1, v1, n2, v2, n3, v3) + attr(n4, v4);
+    }
+
+
 
 
 
