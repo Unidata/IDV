@@ -519,6 +519,28 @@ public class IOUtil {
     }
 
 
+    public static List<String> getListing(String path, Class c) {
+        List<String> listing = new ArrayList<String>();
+        File f = new File(path);
+        if(f.exists()) {
+            File[] files = f.listFiles();
+            for(int i=0;i<files.length;i++) {
+                listing.add(files[i].toString());
+            }
+        } else {
+            //try it as a java resource
+            String contents = IOUtil.readContents(path, c, (String) null);
+            if(contents !=null) {
+                List<String> lines = StringUtil.split(contents,"\n",true,true);
+                for(String file: lines) {
+                    listing.add(joinDir(path,file));
+                }
+            }
+        }
+
+        return  listing;
+    }
+
     /**
      *  Gets the file name, removing any leading directory paths.
      *
