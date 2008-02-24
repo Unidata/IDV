@@ -179,8 +179,8 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
     private String formEntry(String[] cols) {
         if (cols.length == 2) {
             //            return HtmlUtil.rowTop(HtmlUtil.cols(cols[0])+"<td colspan=2>" + cols[1] +"</td>");
-            return HtmlUtil.rowTop(HtmlUtil.cols(cols[0])
-                                   + "<td xxcolspan=2>" + cols[1] + "</td>");
+            //            return HtmlUtil.rowTop(HtmlUtil.cols(cols[0])
+            //                                   + "<td xxcolspan=2>" + cols[1] + "</td>");
         }
         StringBuffer sb = new StringBuffer();
 
@@ -256,12 +256,12 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
         String arg1 = ARG_ATTR1 + suffix;
         String content;
         if (values != null) {
-            content = formEntry(new String[] { submit,
+            content = formEntry(new String[] { submit,lbl,
                     HtmlUtil.select(arg1, getValues(request),
                                     metadata.getAttr1()) });
         } else {
-            content = formEntry(new String[] { submit,
-                    HtmlUtil.input(arg1, metadata.getAttr1()) });
+            content = formEntry(new String[] { submit,lbl,
+                    HtmlUtil.input(arg1, metadata.getAttr1(),HtmlUtil.SIZE_40) });
         }
 
         String argtype = ARG_TYPE + suffix;

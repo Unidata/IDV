@@ -376,15 +376,15 @@ public class MetadataManager extends RepositoryManager {
         sb.append(getRepository().makeEntryHeader(request, entry));
 
         List<Metadata> metadataList = getMetadata(entry);
-        sb.append("<p>");
+        sb.append(HtmlUtil.p());
         if (metadataList.size() == 0) {
-            sb.append("No metadata defined");
+            sb.append(getRepository().warning(msg("No metadata defined")));
         } else {
             sb.append(HtmlUtil.formPost(URL_METADATA_CHANGE));
             sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
-            sb.append(HtmlUtil.submit("Change"));
+            sb.append(HtmlUtil.submit(msg("Change")));
             sb.append(HtmlUtil.space(2));
-            sb.append(HtmlUtil.submit("Delete selected", ARG_DELETE));
+            sb.append(HtmlUtil.submit(msg("Delete selected"), ARG_DELETE));
             sb.append("<table cellpadding=\"5\">");
             for (Metadata metadata : metadataList) {
                 MetadataHandler metadataHandler =
@@ -429,14 +429,35 @@ public class MetadataManager extends RepositoryManager {
         StringBuffer sb    = new StringBuffer();
         Entry        entry = getRepository().getEntry(request);
         sb.append(getRepository().makeEntryHeader(request, entry));
-        sb.append(HtmlUtil.formTable());
-        for (MetadataHandler handler : metadataHandlers) {
-            handler.makeAddForm(request, entry, sb);
+        if(!request.exists(ARG_TYPE)) {
+            for (MetadataHandler handler : metadataHandlers) {
+                for (Metadata.Type type : handler.getTypes()) {
+                    sb.append(HtmlUtil.form(getMetadataManager().URL_METADATA_ADDFORM));
+                    sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
+                    sb.append(HtmlUtil.hidden(ARG_TYPE, type.getType()));
+                    sb.append(HtmlUtil.submit(msg("Add")));
+                    sb.append(HtmlUtil.space(1) +HtmlUtil.bold(type.getLabel()));
+                    sb.append(HtmlUtil.formClose());
+                    sb.append(HtmlUtil.p());
+                    sb.append("\n");
+                }
+            }
+        } else {
+            String type = request.getString(ARG_TYPE,"");
+            sb.append(HtmlUtil.formTable());
+            for (MetadataHandler handler : metadataHandlers) {
+                if(handler.canHandle(type)) {
+                    handler.makeAddForm(request, entry, handler.findType(type), sb);
+                    break;
+                }
+            }
+            sb.append(HtmlUtil.formTableClose());
         }
-        sb.append(HtmlUtil.formTableClose());
         return getRepository().makeEntryEditResult(request, entry,
-                "Add Metadata", sb);
+                                                   msg("Add Metadata"), sb);
     }
+
+
 
 
 
@@ -452,6 +473,10 @@ public class MetadataManager extends RepositoryManager {
     public Result processMetadataAdd(Request request) throws Exception {
         synchronized (MUTEX_METADATA) {
             Entry          entry       = getRepository().getEntry(request);
+            if(request.exists(ARG_CANCEL)) {
+                return new Result(HtmlUtil.url(URL_METADATA_ADDFORM, ARG_ID,
+                                               entry.getId()));
+            }
             List<Metadata> newMetadata = new ArrayList<Metadata>();
             for (MetadataHandler handler : metadataHandlers) {
                 handler.handleAddSubmit(request, entry, newMetadata);

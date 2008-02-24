@@ -120,6 +120,14 @@ public class MetadataHandler extends RepositoryManager {
     }
 
 
+    public Metadata.Type findType(String stringType) {
+        for (Metadata.Type type : types) {
+            if(type.getType().equals(stringType)) return type;
+        }
+        return null;
+    }
+
+
     /**
      * _more_
      *
@@ -280,9 +288,10 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    private void makeAddForm(Request request, Entry entry,
-                             Metadata.Type type, StringBuffer sb)
-            throws Exception {
+    public void makeAddForm(Request request, Entry entry,
+                            Metadata.Type type, StringBuffer sb)
+        throws Exception {
+        if(type == null) return;
         String[] html = getForm(request, new Metadata(type), false);
         if (html == null) {
             return;
@@ -311,6 +320,9 @@ public class MetadataHandler extends RepositoryManager {
         }
     }
 
+    public List<Metadata.Type> getTypes() {
+        return types;
+    }
 
 
     /**

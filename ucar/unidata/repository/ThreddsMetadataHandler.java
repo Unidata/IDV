@@ -340,8 +340,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     private String formEntry(String[] cols) {
         if (cols.length == 2) {
             //            return HtmlUtil.rowTop(HtmlUtil.cols(cols[0])+"<td colspan=2>" + cols[1] +"</td>");
-            return HtmlUtil.rowTop(HtmlUtil.cols(cols[0])
-                                   + "<td xxcolspan=2>" + cols[1] + "</td>");
+            //            return HtmlUtil.rowTop(HtmlUtil.cols(cols[0])
+            //                                   + "<td xxcolspan=2>" + cols[1] + "</td>");
         }
         StringBuffer sb = new StringBuffer();
 
@@ -392,8 +392,10 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
         String submit = HtmlUtil.submit(msg("Add") + HtmlUtil.space(1) + lbl);
+        String cancel = HtmlUtil.submit(msg("Cancel"),ARG_CANCEL);
         if (forEdit) {
             submit = "";
+            cancel = "";
         }
         String arg1 = ARG_ATTR1 + suffix;
         String arg2 = ARG_ATTR2 + suffix;
@@ -448,7 +450,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             });
         } else {
             content = formEntry(new String[] { submit,
-                    HtmlUtil.input(arg1, metadata.getAttr1(), size) });
+                                               msgLabel("Value"),
+                                               HtmlUtil.input(arg1, metadata.getAttr1(), size) });
         }
         if (content == null) {
             return null;
@@ -457,6 +460,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         String argid   = ARG_METADATAID + suffix;
         content = content + HtmlUtil.hidden(argtype, type.getType())
                   + HtmlUtil.hidden(argid, metadata.getId());
+        if(cancel.length()>0) {
+            content = content + HtmlUtil.row(HtmlUtil.colspan(cancel,2));
+        }
         return new String[] { lbl, content };
     }
 
