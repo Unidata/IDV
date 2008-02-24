@@ -154,7 +154,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     /** _more_ */
     public RequestUrl URL_ENTRY_SHOW = new RequestUrl(this, "/entry/show",
-                                           msg("View Entry"));
+                                           "View Entry");
 
     //    public RequestUrl URL_GROUP_SHOW = new RequestUrl(this, "/group/show");
 
@@ -163,12 +163,12 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     /** _more_ */
     public RequestUrl URL_ENTRY_DELETE = new RequestUrl(this,
-                                             "/entry/delete", msg("Delete"));
+                                             "/entry/delete", "Delete");
 
 
     /** _more_ */
     public RequestUrl URL_ACCESS_FORM = new RequestUrl(this, "/access/form",
-                                            msg("Access"));
+                                            "Access");
 
 
     /** _more_ */
@@ -181,7 +181,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
     /** _more_ */
     public RequestUrl URL_ENTRY_FORM = new RequestUrl(this, "/entry/form",
-                                           msg("Edit Entry"));
+                                           "Edit Entry");
 
 
 
@@ -523,6 +523,8 @@ public class Repository implements Constants, Tables, RequestHandler,
         return getMessage(h,"/warning.png");
     }
 
+
+
     /**
      * _more_
      *
@@ -750,36 +752,39 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
     protected void initLanguages() throws Exception {
-        List<String> files = new ArrayList<String>();
-        files.add("/ucar/unidata/repository/sp.pack");
-        for(String file: files) {
-            String content = IOUtil.readContents(file,getClass(),(String)null);
-            if(content == null) continue;
-            List<String> lines = StringUtil.split(content,"\n",true,true);
-            Properties properties = new Properties();
-
-            String type = null; 
-            String name = null; 
-            for(String line: lines) {
-                if(line.startsWith("#")) continue;
-                List toks = StringUtil.split(line,"=",true,true);
-                if(toks.size()!=2) continue;
-                String key = (String) toks.get(0);
-                String value = (String) toks.get(1);
-                if(key.equals("language.type")) {
-                    type = value;
-                } else if(key.equals("language.name")) {
-                    name = value;
-                } else {
-                    properties.put(key, value);
+        List sourcePaths = Misc.newList(getStorageManager().getSystemResourcePath() +"/languages",getStorageManager().getRepositoryDir());
+        for(int i=0;i<sourcePaths.size();i++) {
+            String dir = (String) sourcePaths.get(i);
+            List<String> listing = IOUtil.getListing(dir, getClass());
+            for(String path: listing) {
+                if(!path.endsWith(".pack")) continue;
+                String content = IOUtil.readContents(path,getClass(),(String)null);
+                if(content == null) continue;
+                List<String> lines = StringUtil.split(content,"\n",true,true);
+                Properties properties = new Properties();
+                String type = null; 
+                String name = null; 
+                for(String line: lines) {
+                    if(line.startsWith("#")) continue;
+                    List toks = StringUtil.split(line,"=",true,true);
+                    if(toks.size()!=2) continue;
+                    String key = (String) toks.get(0);
+                    String value = (String) toks.get(1);
+                    if(key.equals("language.type")) {
+                        type = value;
+                    } else if(key.equals("language.name")) {
+                        name = value;
+                    } else {
+                        properties.put(key, value);
+                    }
                 }
-            }
-            if(type!=null) {
-                if(name == null) name = type;
-                languages.add(new TwoFacedObject(name,type));
-                languageMap.put(type, properties);
-            } else {
-                System.err.println ("No _type_ found in: " + file);
+                if(type!=null) {
+                    if(name == null) name = type;
+                    languages.add(new TwoFacedObject(name,type));
+                    languageMap.put(type, properties);
+                } else {
+                    System.err.println ("No _type_ found in: " + path);
+                }
             }
         }
     }
@@ -1294,10 +1299,11 @@ public class Repository implements Constants, Tables, RequestHandler,
             boolean      badAccess = inner instanceof AccessException;
             StringBuffer sb        = new StringBuffer();
             if ( !badAccess) {
-                sb.append(msgLabel("An error has occurred")
-                          + warning(inner.getMessage()));
+                sb.append(error(msgLabel("An error has occurred") +
+                                HtmlUtil.p() +
+                                inner.getMessage()));
             } else {
-                sb.append(warning(inner.getMessage()));
+                sb.append(error(inner.getMessage()));
                 sb.append(getUserManager().makeLoginForm(request,
                         HtmlUtil.hidden(ARG_REDIRECT, request.getFullUrl())));
             }
@@ -1548,7 +1554,10 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         StringBuffer stripped = new StringBuffer();
         int prefixLength = MSG_PREFIX.length();
+        int suffixLength = MSG_PREFIX.length();
+        //        System.out.println(s);
         while (s.length() > 0) {
+            String tmp = s;
             int idx1 = s.indexOf(MSG_PREFIX);
             if (idx1 < 0) {
                 stripped.append(s);
@@ -1562,9 +1571,11 @@ public class Repository implements Constants, Tables, RequestHandler,
 
             int idx2 = s.indexOf(MSG_SUFFIX);
             if (idx2 < 0) {
-                break;
+                //Should never happen
+                throw new IllegalArgumentException("No closing message suffix:" + s);
             }
             String key = s.substring(prefixLength-1,idx2);
+
             String value = null;
             if(map!=null) {
                 value = (String) map.get(key);
@@ -1579,7 +1590,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 }
             }
             stripped.append(value);
-            s = s.substring(idx2 + 1);
+            s = s.substring(idx2 + suffixLength);
         }
         return stripped.toString();
     }
@@ -1883,7 +1894,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         }
         throw new IllegalArgumentException(
-            msgLabel("Could not find output handler for") +" " + request.getOutput());
+            msgLabel("Could not find output handler for")  + request.getOutput());
     }
 
 
@@ -2306,7 +2317,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         String outputHtml = "";
         if (true || advancedForm) {
-            //            outputHtml = HtmlUtil.span(msgLabel("Output Type") + HtmlUtil.space(1),
+            //            outputHtml = HtmlUtil.span(msgLabel("Output Type") ,
             //                                       "class=\"formlabel\"");
             if (output.length() == 0) {
                 outputHtml += HtmlUtil.select(ARG_OUTPUT,
@@ -2322,7 +2333,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             orderByList.add(new TwoFacedObject(msg("Create Date"), "createdate"));
             orderByList.add(new TwoFacedObject(msg("Name"), "name"));
 
-            String orderBy = HtmlUtil.space(2) + HtmlUtil.bold(msgLabel("Order by") + HtmlUtil.space(1))
+            String orderBy = HtmlUtil.space(2) + HtmlUtil.bold(msgLabel("Order by"))
                              + HtmlUtil.select(
                                  ARG_ORDERBY, orderByList,
                                  request.getString(
@@ -2337,7 +2348,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             //            outputHtml += orderBy;
 
             outputHtml = HtmlUtil.space(2) + HtmlUtil.bold(msgLabel("Output Type"))
-                         + HtmlUtil.space(1) + outputHtml + orderBy;
+                + outputHtml + orderBy;
         }
 
         if (metadataForm) {
@@ -3138,17 +3149,18 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
     public static final String MSG_PREFIX = "<msg ";
-    public static final String MSG_SUFFIX = ">";
+    public static final String MSG_SUFFIX = " msg>";
     public static String msg(String msg) {
+        if(msg.indexOf(MSG_PREFIX)>=0) throw new IllegalArgumentException ("bad msg:" + msg);
         return MSG_PREFIX + msg +MSG_SUFFIX;
     }
 
     public static String msgLabel(String msg) {
-        return msg(msg) +":";
+        return msg(msg) +":" + HtmlUtil.space(1);
     }
 
     protected static String msgHeader(String h) {
-        return "<div class=\"heading\">" + msg(h) + "</div>";
+        return HtmlUtil.div(msg(h),"class=\"heading\"");
     }
 
     /**
@@ -3353,23 +3365,24 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
         sb.append(HtmlUtil.form(URL_ENTRY_DELETE, ""));
+        StringBuffer inner  =new StringBuffer();
         if (entry.isGroup()) {
-            sb.append(
-                warning(
-                    "Are you sure you want to delete the group:<ul>"
-                    + entry.getName() + "</ul>"
-                    + "<b>Note: This will also delete all of the descendents of the group</b>"));
+            inner.append(msgLabel("Are you sure you want to delete the group"));
+            inner.append(entry.getName());
+            inner.append(HtmlUtil.p());
+            inner.append(msg("Note: This will also delete all of the descendents of the group"));
         } else {
-            sb.append("Are you sure you want to delete the entry: ");
-            sb.append(entry.getName());
+            inner.append(msgLabel("Are you sure you want to delete the entry"));
+            inner.append(entry.getName());
         }
-        sb.append("<p>");
+        inner.append(HtmlUtil.p());
+        inner.append(HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM));
+        inner.append(HtmlUtil.space(2));
+        inner.append(HtmlUtil.submit(msg("Cancel"), ARG_CANCEL));
+        sb.append(question(inner.toString()));
         sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
-        sb.append(HtmlUtil.submit("Yes", ARG_DELETE_CONFIRM));
-        sb.append(HtmlUtil.space(3));
-        sb.append(HtmlUtil.submit("Cancel", ARG_CANCEL));
         sb.append(HtmlUtil.formClose());
-        return makeEntryEditResult(request, entry, "Entry delete confirm",
+        return makeEntryEditResult(request, entry, msg("Entry delete confirm"),
                                    sb);
     }
 
@@ -3443,24 +3456,25 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (request.exists(ARG_DELETE)) {
                 StringBuffer sb = new StringBuffer();
                 sb.append(HtmlUtil.form(URL_ENTRY_CHANGE, ""));
+                StringBuffer inner  =new StringBuffer();
                 if (entry.isGroup()) {
-                    sb.append("Are you sure you want to delete the group: ");
-                    sb.append(entry.getName());
-                    sb.append(
-                        warning(
-                            "<b>Note: This will also delete all of the descendents of the group</b>"));
+                    inner.append(msgLabel("Are you sure you want to delete the group"));
+                    inner.append(entry.getName());
+                    inner.append(HtmlUtil.p());
+                    inner.append(msg("Note: This will also delete all of the descendents of the group"));
                 } else {
-                    sb.append("Are you sure you want to delete the entry: ");
-                    sb.append(entry.getName());
+                    inner.append(msgLabel("Are you sure you want to delete the entry"));
+                    inner.append(entry.getName());
                 }
-                sb.append("<p>");
+                inner.append("<p>");
+                inner.append(HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM));
+                inner.append(HtmlUtil.space(2));
+                inner.append(HtmlUtil.submit(msg("Cancel"), ARG_CANCEL));
+                sb.append(question(inner.toString()));
                 sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
-                sb.append(HtmlUtil.submit("Yes", ARG_DELETE_CONFIRM));
-                sb.append(HtmlUtil.space(3));
-                sb.append(HtmlUtil.submit("Cancel", ARG_CANCEL));
                 sb.append(HtmlUtil.formClose());
                 return makeEntryEditResult(request, entry,
-                                           "Entry delete confirm", sb);
+                                           msg("Entry delete confirm"), sb);
             }
         }
 
@@ -3672,7 +3686,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                                            entries.size()
                                            + " files uploaded"));
         } else {
-            return new Result("", new StringBuffer("No entries created"));
+            return new Result("", new StringBuffer(msg("No entries created")));
         }
     }
 
@@ -5119,47 +5133,6 @@ public class Repository implements Constants, Tables, RequestHandler,
         return s;
     }
 
-
-
-    /**
-     * _more_
-     *
-     * @param product _more_
-     *
-     * @return _more_
-     */
-    protected String getLongName(String product) {
-        return getLongName(product, product);
-    }
-
-    /**
-     * _more_
-     *
-     * @param product _more_
-     * @param dflt _more_
-     *
-     * @return _more_
-     */
-    protected String getLongName(String product, String dflt) {
-        if (namesMap == null) {
-            namesMap = new Properties();
-            try {
-                InputStream s =
-                    IOUtil.getInputStream(
-                        "/ucar/unidata/repository/resources/names.properties",
-                        getClass());
-                namesMap.load(s);
-            } catch (Exception exc) {
-                System.err.println("err:" + exc);
-            }
-        }
-        String name = (String) namesMap.get(product);
-        if (name != null) {
-            return name;
-        }
-        //        System.err.println("not there:" + product+":");
-        return dflt;
-    }
 
 
     /**

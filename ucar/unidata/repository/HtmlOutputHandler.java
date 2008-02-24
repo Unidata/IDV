@@ -189,7 +189,7 @@ public class HtmlOutputHandler extends OutputHandler {
         sb.append(typeHandler.getEntryContent(entry, request, true));
         getMetadataHtml(request, entry, sb);
 
-        Result result = new Result(msgLabel("Entry") + HtmlUtil.space(1) + entry.getName(), sb,
+        Result result = new Result(msgLabel("Entry")  + entry.getName(), sb,
                                    getMimeType(request.getOutput()));
         result.putProperty(
             PROP_NAVSUBLINKS,
@@ -259,7 +259,6 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append(HtmlUtil.submit(msg("Get all"), "getall"));
             sb.append(HtmlUtil.space(1));
             sb.append(msgLabel("As"));
-            sb.append(HtmlUtil.space(1));
             List outputList =
                 getRepository().getOutputTypesForEntries(request, entries);
             sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
@@ -696,7 +695,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
             int skip = Math.max(0, request.get(ARG_SKIP, 0));
-            sb.append(msgLabel("Results") + HtmlUtil.space(1) + (skip + 1) + "-" + (skip + cnt));
+            sb.append(msgLabel("Results") +  (skip + 1) + "-" + (skip + cnt));
             sb.append(HtmlUtil.space(4));
             if (skip > 0) {
                 sb.append(HtmlUtil.href(request.getUrl(ARG_SKIP) + "&"
@@ -725,7 +724,7 @@ public class HtmlOutputHandler extends OutputHandler {
             } else {
                 title = group.getName();
                 if ((subGroups.size() == 0) && (entries.size() == 0)) {
-                    sb.append(msg("No entries found"));
+                    sb.append(getRepository().note(msg("No entries found")));
                 }
             }
 

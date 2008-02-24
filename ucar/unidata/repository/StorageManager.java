@@ -175,6 +175,9 @@ public class StorageManager extends RepositoryManager {
         return path;
     }
 
+    public String getSystemResourcePath() {
+        return "/ucar/unidata/repository/resources";
+    }
 
     /**
      * _more_
