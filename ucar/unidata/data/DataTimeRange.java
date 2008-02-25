@@ -134,6 +134,7 @@ public class DataTimeRange {
     /** widget */
     private JLabel timeModeLabel;
 
+    /** _more_          */
     private boolean oneLineLabel = false;
 
     /** Was ok pressed */
@@ -408,8 +409,13 @@ public class DataTimeRange {
 
 
 
+    /**
+     * _more_
+     *
+     * @param v _more_
+     */
     public void setOneLineLabel(boolean v) {
-        oneLineLabel  = v;
+        oneLineLabel = v;
     }
 
     /**
@@ -435,7 +441,7 @@ public class DataTimeRange {
         }
 
 
-        if(!oneLineLabel) {
+        if ( !oneLineLabel) {
             lbl += "<br>";
         } else {
             lbl += "&nbsp;&nbsp;&nbsp;";

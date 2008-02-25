@@ -269,6 +269,9 @@ public class GeoSelection {
     }
 
 
+    /**
+     * Clear the stride settings
+     */
     public void clearStride() {
         xStride = STRIDE_NONE;
         yStride = STRIDE_NONE;

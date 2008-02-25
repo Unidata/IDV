@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data;
 
 
@@ -53,12 +52,11 @@ import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.data.CachedFlatField;
 
-import java.util.TimeZone;
-
 import visad.*;
-import visad.data.text.TextAdapter;
 
 import visad.VisADException;
+
+import visad.data.text.TextAdapter;
 
 import java.io.*;
 
@@ -77,6 +75,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+
+import java.util.TimeZone;
 
 import javax.swing.filechooser.FileFilter;
 
@@ -289,6 +289,7 @@ public class DataManager {
      * @param resourceManager  resource manager
      */
     public void initResources(IdvResourceManager resourceManager) {
+
         loadDataSourceXml(
             resourceManager.getXmlResources(
                 IdvResourceManager.RSC_DATASOURCE));
@@ -320,30 +321,37 @@ public class DataManager {
                                              (String) null);
 
         TextAdapter.addDateParser(new TextAdapter.DateParser() {
-                public DateTime createDateTime(String value, String format, TimeZone timezone) throws VisADException {
-                    if(format.endsWith("dh1") || format.endsWith("dh2") || format.endsWith("dh3") || format.endsWith("dh4")) {
-                        int len=new Integer(format.substring(format.length()-1)).intValue();
-                        value = value.trim();
-                        int idx = value.lastIndexOf(" ");
-                        if(idx<0) idx=0;
-                        String dh = value.substring(idx+1);
-                        int ptIdx = dh.length()-len;
-                        dh = dh.substring(0,ptIdx)+"."+
-                            dh.substring(ptIdx);
-                        while(dh.length()>1 && dh.startsWith("0")) {
-                            dh = dh.substring(1);
-                        }
-                        double hours = new Double(dh);
-                        String HH = ""+(int) hours;
-                        String mm = ""+(int)(60*(hours-(int) hours));
-                        format = format.replace("dh"+ len, "HH:mm");
-                        String newValue  = value.trim().substring(0,idx+1) + HH+":"+mm;
-                        return visad.DateTime.createDateTime(newValue, format, timezone);
+            public DateTime createDateTime(String value, String format,
+                                           TimeZone timezone)
+                    throws VisADException {
+                if (format.endsWith("dh1") || format.endsWith("dh2")
+                        || format.endsWith("dh3") || format.endsWith("dh4")) {
+                    int len = new Integer(format.substring(format.length()
+                                  - 1)).intValue();
+                    value = value.trim();
+                    int idx = value.lastIndexOf(" ");
+                    if (idx < 0) {
+                        idx = 0;
                     }
-
-                    return null;
+                    String dh    = value.substring(idx + 1);
+                    int    ptIdx = dh.length() - len;
+                    dh = dh.substring(0, ptIdx) + "." + dh.substring(ptIdx);
+                    while ((dh.length() > 1) && dh.startsWith("0")) {
+                        dh = dh.substring(1);
+                    }
+                    double hours = new Double(dh);
+                    String HH    = "" + (int) hours;
+                    String mm    = "" + (int) (60 * (hours - (int) hours));
+                    format = format.replace("dh" + len, "HH:mm");
+                    String newValue = value.trim().substring(0, idx + 1) + HH
+                                      + ":" + mm;
+                    return visad.DateTime.createDateTime(newValue, format,
+                            timezone);
                 }
-            });
+
+                return null;
+            }
+        });
 
 
         if (defaultBoundingBoxString != null) {
@@ -397,6 +405,7 @@ public class DataManager {
                 }
             }
         }
+
 
 
     }
@@ -883,7 +892,7 @@ public class DataManager {
 
                 for (int stringIdx = 0; stringIdx < tmpList.size();
                         stringIdx++) {
-                    String s = (String) tmpList.get(stringIdx);
+                    String  s     = (String) tmpList.get(stringIdx);
                     boolean match = filter.match(s);
                     if (match) {
                         //                        System.err.println("match:" + descriptor);
@@ -971,19 +980,19 @@ public class DataManager {
      * @return  the type or null
      */
     private String findDataType(String definingObject, List filters) {
-        String file = definingObject.trim().toLowerCase();
-        int questionMarkIdx  =file.indexOf("?");
-        String substring=null;
-        if(questionMarkIdx>=0) {
-            substring = file.substring(0,questionMarkIdx);
+        String file            = definingObject.trim().toLowerCase();
+        int    questionMarkIdx = file.indexOf("?");
+        String substring       = null;
+        if (questionMarkIdx >= 0) {
+            substring = file.substring(0, questionMarkIdx);
         }
         for (int i = 0; i < filters.size(); i++) {
             PatternFileFilter filter = (PatternFileFilter) filters.get(i);
-            boolean match = filter.match(file);
-            if(!match && substring!=null) {
+            boolean           match  = filter.match(file);
+            if ( !match && (substring != null)) {
                 match = filter.match(substring);
             }
-            if(match) {
+            if (match) {
                 return filter.getId().toString();
             }
         }
@@ -1059,17 +1068,26 @@ public class DataManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     *
+     * @return _more_
+     */
     public DataSource findDataSource(String name) {
-        if(name == null) name = "#0";
-        if(name.startsWith("#")) {
+        if (name == null) {
+            name = "#0";
+        }
+        if (name.startsWith("#")) {
             int index = new Integer(name.substring(1).trim()).intValue();
-            if(index>=0 && index< dataSources.size()) {
+            if ((index >= 0) && (index < dataSources.size())) {
                 return dataSources.get(index);
             }
             return null;
         }
 
-        for (DataSource dataSource: dataSources) {
+        for (DataSource dataSource : dataSources) {
             if (dataSource.identifiedBy(name)) {
                 return dataSource;
             }
@@ -1119,21 +1137,24 @@ public class DataManager {
      *                            It may be a String (e.g., a URL, a filename)
      *                            or something else (e.g., a list of URLs).
      * @param properties          The properties for the new DataSource.
-     * @return The list of {@link  DataSource} defined by the given
-     *         definingObject  or null.
      */
-    public void createDataSourceAndAskForType(
-            Object definingObject, Hashtable properties) {
+    public void createDataSourceAndAskForType(Object definingObject,
+            Hashtable properties) {
         String dataType = dataContext.selectDataType(definingObject);
         if (dataType == null) {
             return;
         }
-        while(true) {
+        while (true) {
             try {
-                DataSourceResults results =createDataSource(definingObject, dataType, properties);
-                if(!results.anyFailed())  return;
-            } catch(BadDataException bde) {}
-            dataType = dataContext.selectDataType(definingObject, "<html>Failed to load the data as the given type. Try again?</html>");
+                DataSourceResults results = createDataSource(definingObject,
+                                                dataType, properties);
+                if ( !results.anyFailed()) {
+                    return;
+                }
+            } catch (BadDataException bde) {}
+            dataType = dataContext.selectDataType(
+                definingObject,
+                "<html>Failed to load the data as the given type. Try again?</html>");
             if (dataType == null) {
                 return;
             }

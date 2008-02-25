@@ -326,14 +326,21 @@ public abstract class FilesDataSource extends DataSourceImpl {
     }
 
 
+    /**
+     * This gets called when the user interactively does a Change data
+     *
+     * @param newObject The new data object. May be a string or a list
+     * @param newProperties new properties
+     */
     public void updateState(Object newObject, Hashtable newProperties) {
         super.updateState(newObject, newProperties);
-        if(newObject instanceof List) {
+        if (newObject instanceof List) {
             List newSources = (List) newObject;
-            if(newSources.size() >0 && newSources.get(0) instanceof String) {
-                sources  = new ArrayList(newSources);
+            if ((newSources.size() > 0)
+                    && (newSources.get(0) instanceof String)) {
+                sources = new ArrayList(newSources);
             }
-        } else  if(newObject instanceof String) {
+        } else if (newObject instanceof String) {
             sources = Misc.newList(newObject);
         }
     }

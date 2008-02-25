@@ -42,19 +42,31 @@ import java.util.List;
 
 public class HtmlUtil {
 
+    /** _more_          */
     public static final String SIZE_10 = "  size=\"10\" ";
+
+    /** _more_          */
     public static final String SIZE_20 = "  size=\"20\" ";
+
+    /** _more_          */
     public static final String SIZE_30 = "  size=\"30\" ";
+
+    /** _more_          */
     public static final String SIZE_40 = "  size=\"40\" ";
+
+    /** _more_          */
     public static final String SIZE_50 = "  size=\"50\" ";
+
+    /** _more_          */
     public static final String SIZE_60 = "  size=\"60\" ";
+
+    /** _more_          */
     public static final String SIZE_70 = "  size=\"70\" ";
 
 
     /**
      * _more_
      *
-     * @param sb _more_
      * @param value _more_
      * @param name _more_
      *
@@ -75,12 +87,24 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String hbox(String s1, String s2) {
-        return "<table cellspacing=\"0\" cellpadding=\"0\">" + HtmlUtil.rowTop(HtmlUtil.cols(s1, s2)) + "</table>";
+        return "<table cellspacing=\"0\" cellpadding=\"0\">"
+               + HtmlUtil.rowTop(HtmlUtil.cols(s1, s2)) + "</table>";
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public static String br() {
         return "<br>";
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public static String p() {
         return "<p>";
     }
@@ -147,11 +171,11 @@ public class HtmlUtil {
     public static String img(String path, String title, String extra) {
         if (title.length() > 0) {
             return "<img "
-                   + attrs("border", "0", "src", path, "title",
-                                   title, "alt", title) + " " + extra + ">";
+                   + attrs("border", "0", "src", path, "title", title, "alt",
+                           title) + " " + extra + ">";
         }
-        return "<img " + attrs("border", "0", "src", path) + " "
-               + extra + ">";
+        return "<img " + attrs("border", "0", "src", path) + " " + extra
+               + ">";
     }
 
     /**
@@ -189,6 +213,14 @@ public class HtmlUtil {
         return "<span " + extra + ">" + content + "</span>";
     }
 
+    /**
+     * _more_
+     *
+     * @param content _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
     public static String div(String content, String extra) {
         return "<div " + extra + ">" + content + "</div>";
     }
@@ -311,6 +343,13 @@ public class HtmlUtil {
         return "<tr>" + row + "</tr>";
     }
 
+    /**
+     * _more_
+     *
+     * @param row _more_
+     *
+     * @return _more_
+     */
     public static String rowTop(String row) {
         return "<tr valign=\"top\">" + row + "</tr>";
     }
@@ -489,10 +528,10 @@ public class HtmlUtil {
     public static String checkbox(String name, String value,
                                   boolean checked) {
         return "<input "
-               + attrs("type", "checkbox", "name", name, "value",
-                               value) + (checked
-                                         ? " checked "
-                                         : "") + ">";
+               + attrs("type", "checkbox", "name", name, "value", value)
+               + (checked
+                  ? " checked "
+                  : "") + ">";
     }
 
     /**
@@ -518,6 +557,13 @@ public class HtmlUtil {
         return "<form action=\"" + url + "\"" + " " + extra + " >";
     }
 
+    /**
+     * _more_
+     *
+     * @param url _more_
+     *
+     * @return _more_
+     */
     public static String formPost(Object url) {
         return "<form method=\"post\" action=\"" + url + "\">";
     }
@@ -573,8 +619,7 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String submitImage(String img, String name) {
-        return "<input "
-               + attrs("name", name, "border", "0", "src", img)
+        return "<input " + attrs("name", name, "border", "0", "src", img)
                + attrs("type", "image") + " >";
 
     }
@@ -590,10 +635,8 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String submitImage(String img, String name, String alt) {
-        return "<input "
-               + attrs("name", name, "border", "0", "src", img)
-               + attrs("title", alt, "alt", alt, "type", "image")
-               + " >";
+        return "<input " + attrs("name", name, "border", "0", "src", img)
+               + attrs("title", alt, "alt", alt, "type", "image") + " >";
     }
 
 
@@ -703,10 +746,8 @@ public class HtmlUtil {
     /**
      * _more_
      *
-     * @param sb _more_
-     * @param values _more_
      * @param name _more_
-     * @param label _more_
+     * @param values _more_
      *
      * @return _more_
      */
@@ -728,12 +769,34 @@ public class HtmlUtil {
     }
 
 
-    public static String select(String name, String[] values, String selected, int maxLength) {
-        return select(name,Misc.toList(values), selected, maxLength);
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param values _more_
+     * @param selected _more_
+     * @param maxLength _more_
+     *
+     * @return _more_
+     */
+    public static String select(String name, String[] values,
+                                String selected, int maxLength) {
+        return select(name, Misc.toList(values), selected, maxLength);
     }
 
 
-    public static String select(String name, List values, String selected, int maxLength) {
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param values _more_
+     * @param selected _more_
+     * @param maxLength _more_
+     *
+     * @return _more_
+     */
+    public static String select(String name, List values, String selected,
+                                int maxLength) {
         StringBuffer sb = new StringBuffer();
         sb.append("<select name=\"" + name + "\">\n");
         for (int i = 0; i < values.size(); i++) {
@@ -751,8 +814,8 @@ public class HtmlUtil {
             if ((selected != null) && value.equals(selected)) {
                 selectedAttr = " selected=\"selected\" ";
             }
-            if(label.length()>maxLength) {
-                label = "..." + label.substring(label.length()-maxLength);
+            if (label.length() > maxLength) {
+                label = "..." + label.substring(label.length() - maxLength);
             }
 
             sb.append("<option " + selectedAttr + "value=\"" + value + "\">"
@@ -762,37 +825,75 @@ public class HtmlUtil {
         return sb.toString();
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public static String formTableHeader(String s) {
-        return "<tr><td colspan=\"2\"><div  class=\"tableheading\">" + s +"</div></td></tr>";
+        return "<tr><td colspan=\"2\"><div  class=\"tableheading\">" + s
+               + "</div></td></tr>";
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     * @param cols _more_
+     *
+     * @return _more_
+     */
     public static String colspan(String s, int cols) {
-        return "<td colspan=\"" +cols+"\">" + s +"</td>";
+        return "<td colspan=\"" + cols + "\">" + s + "</td>";
     }
 
-    public static String formTableTop(String[]cols) {
+    /**
+     * _more_
+     *
+     * @param cols _more_
+     *
+     * @return _more_
+     */
+    public static String formTableTop(String[] cols) {
         StringBuffer sb = new StringBuffer();
         sb.append(formTable());
 
-        for(int i=0;i<cols.length;i+=2) {
-            sb.append(formEntryTop(cols[i],cols[i+1]));
+        for (int i = 0; i < cols.length; i += 2) {
+            sb.append(formEntryTop(cols[i], cols[i + 1]));
         }
         sb.append(formTableClose());
         return sb.toString();
     }
 
 
-    public static String formEntryTop(String[]cols) {
+    /**
+     * _more_
+     *
+     * @param cols _more_
+     *
+     * @return _more_
+     */
+    public static String formEntryTop(String[] cols) {
         StringBuffer sb = new StringBuffer();
-        for(int i=0;i<cols.length;i+=2) {
-            sb.append(formEntryTop(cols[i],cols[i+1]));
+        for (int i = 0; i < cols.length; i += 2) {
+            sb.append(formEntryTop(cols[i], cols[i + 1]));
         }
         return sb.toString();
     }
 
 
+    /**
+     * _more_
+     *
+     * @param contents _more_
+     *
+     * @return _more_
+     */
     public static String table(String contents) {
-        return "<table cellpadding=\"5\" cellspacing=\"0\">\n" + contents +"</table>";
+        return "<table cellpadding=\"5\" cellspacing=\"0\">\n" + contents
+               + "</table>";
     }
 
 
@@ -806,14 +907,32 @@ public class HtmlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param extra _more_
+     *
+     * @return _more_
+     */
     public static String formTable(String extra) {
-        return "<table cellpadding=\"5\" cellspacing=\"0\"" + " " + extra +">\n";
+        return "<table cellpadding=\"5\" cellspacing=\"0\"" + " " + extra
+               + ">\n";
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public static String formTableClose() {
         return "</table>";
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public static String formClose() {
         return "</form>";
     }
@@ -850,34 +969,54 @@ public class HtmlUtil {
 
     }
 
-    public static String formEntryTop(String col1, String left, String right) {
-        return " <tr valign=\"top\"><td>" + col1 +"</td><td align=\"right\" valign=\"top\" class=\"formlabel\">"
+    /**
+     * _more_
+     *
+     * @param col1 _more_
+     * @param left _more_
+     * @param right _more_
+     *
+     * @return _more_
+     */
+    public static String formEntryTop(String col1, String left,
+                                      String right) {
+        return " <tr valign=\"top\"><td>" + col1
+               + "</td><td align=\"right\" valign=\"top\" class=\"formlabel\">"
                + left + "</td><td>" + right + "</td></tr>";
 
     }
 
 
-    public static void main(String[]args) {
-        Class c = HtmlUtil.class;
+    /**
+     * _more_
+     *
+     * @param args _more_
+     */
+    public static void main(String[] args) {
+        Class        c  = HtmlUtil.class;
         StringBuffer sb = new StringBuffer();
-        sb.append("//j-\n/** Do not change!!! This has been generated from HtmlUtil **/\n");
-        Method[]methods 	=c.getDeclaredMethods();
-        for(int i=0;i<methods.length;i++) {
+        sb.append(
+            "//j-\n/** Do not change!!! This has been generated from HtmlUtil **/\n");
+        Method[] methods = c.getDeclaredMethods();
+        for (int i = 0; i < methods.length; i++) {
             Method m = methods[i];
             //            if(!Modifier.isStatic(m.getModifiers())) continue;
-            if(!m.getReturnType().equals(String.class)) continue;
-            sb.append("public void " + m.getName()+"(");
-            Class[]params = m.getParameterTypes();
+            if ( !m.getReturnType().equals(String.class)) {
+                continue;
+            }
+            sb.append("public void " + m.getName() + "(");
+            Class[]      params = m.getParameterTypes();
             StringBuffer implSb = new StringBuffer();
-            for(int paramIdx=0;paramIdx<params.length;paramIdx++) {
-                if(paramIdx>0) {
+            for (int paramIdx = 0; paramIdx < params.length; paramIdx++) {
+                if (paramIdx > 0) {
                     sb.append(", ");
                     implSb.append(", ");
                 }
-                implSb.append("param"+ paramIdx);
+                implSb.append("param" + paramIdx);
                 String type = params[paramIdx].getName();
-                if(params[paramIdx].isArray()) {
-                    type = params[paramIdx].getComponentType().getName()+" []";
+                if (params[paramIdx].isArray()) {
+                    type = params[paramIdx].getComponentType().getName()
+                           + " []";
                 }
                 type = type.replace("java.lang.", "");
                 sb.append(type + " param" + paramIdx);
@@ -885,19 +1024,36 @@ public class HtmlUtil {
             }
 
             sb.append(") {\n");
-                sb.append("sb.append(HtmlUtil." + m.getName()+"(" + implSb +"));\n");
+            sb.append("sb.append(HtmlUtil." + m.getName() + "(" + implSb
+                      + "));\n");
             sb.append("}\n");
         }
         sb.append("//j+\n");
         //        System.out.println (sb);
-        
+
     }
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
     public static String attr(String name, String value) {
         return " " + name + "=" + quote(value) + " ";
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
     public static String attrs(String name, String value) {
         return " " + name + "=" + quote(value) + " ";
     }

@@ -326,7 +326,6 @@ public abstract class IdvLegend {
     /**
      * Float the legend in its own window.
      *
-     * @param windowLoc Where to show the window.
      */
     public void floatLegend() {
         floatFrame = GuiUtils.createFrame(getTitle());

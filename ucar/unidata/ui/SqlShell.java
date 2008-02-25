@@ -89,7 +89,7 @@ public class SqlShell extends InteractiveShell {
     /**
      * _more_
      *
-     * @param code the code that was evaluated
+     * @param sql the sql to evaluate
      */
     public void eval(String sql) {
         super.eval(sql);

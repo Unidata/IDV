@@ -22,7 +22,11 @@
 
 
 
+
 package ucar.unidata.util;
+
+
+import org.apache.commons.fileupload.MultipartStream;
 
 
 import java.io.*;
@@ -32,13 +36,14 @@ import java.lang.*;
 
 import java.net.*;
 
-import java.util.regex.*;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.StringTokenizer;
-import org.apache.commons.fileupload.MultipartStream;
+
+import java.util.regex.*;
+
 
 /**
  * Class HttpServer. A simple http server.
@@ -49,12 +54,16 @@ import org.apache.commons.fileupload.MultipartStream;
  */
 public class HttpServer {
 
+    /** _more_          */
     public static final int RESPONSE_OK = 200;
 
+    /** _more_          */
     public static final int RESPONSE_NOTFOUND = 404;
 
+    /** _more_          */
     public static final int RESPONSE_UNAUTHORIZED = 401;
 
+    /** _more_          */
     public static final int RESPONSE_INTERNALERROR = 500;
 
 
@@ -76,6 +85,7 @@ public class HttpServer {
     private boolean running = false;
 
 
+    /** _more_          */
     protected Hashtable serverProperties = new Hashtable();
 
 
@@ -88,16 +98,32 @@ public class HttpServer {
         this.port = port;
     }
 
+    /**
+     * _more_
+     *
+     * @param propertyFile _more_
+     */
     public HttpServer(String propertyFile) {
-        serverProperties = Misc.readProperties(propertyFile,null,getClass());
-        port = Misc.getProperty(serverProperties, "port",port);
+        serverProperties = Misc.readProperties(propertyFile, null,
+                getClass());
+        port = Misc.getProperty(serverProperties, "port", port);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param port _more_
+     */
     public void setPort(int port) {
         this.port = port;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getPort() {
         return port;
     }
@@ -105,6 +131,11 @@ public class HttpServer {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Hashtable getProperties() {
         return serverProperties;
     }
@@ -126,8 +157,12 @@ public class HttpServer {
         LogUtil.logException(msg, exc);
     }
 
-    protected void initServerSocket(ServerSocket socket) {
-    }
+    /**
+     * _more_
+     *
+     * @param socket _more_
+     */
+    protected void initServerSocket(ServerSocket socket) {}
 
 
     /**
@@ -173,8 +208,8 @@ public class HttpServer {
      *
      * @throws Exception On badness
      */
-    protected RequestHandler doMakeRequestHandler(
-            Socket socket) throws Exception {
+    protected RequestHandler doMakeRequestHandler(Socket socket)
+            throws Exception {
         return new RequestHandler(this, socket);
     }
 
@@ -190,6 +225,7 @@ public class HttpServer {
         /** crlf */
         public final static String CRLF = "\r\n";
 
+        /** _more_          */
         public final static char LF = '\n';
 
         /** The socket */
@@ -214,8 +250,8 @@ public class HttpServer {
          *
          * @throws Exception On badness
          */
-        public RequestHandler(HttpServer server,
-                              Socket socket) throws Exception {
+        public RequestHandler(HttpServer server, Socket socket)
+                throws Exception {
             this.server = server;
             this.socket = socket;
             this.input  = socket.getInputStream();
@@ -223,10 +259,20 @@ public class HttpServer {
             this.input  = new BufferedInputStream(input);
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public Socket getSocket() {
             return socket;
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public OutputStream getOutputStream() {
             return output;
         }
@@ -249,16 +295,30 @@ public class HttpServer {
         }
 
 
+        /**
+         * _more_
+         *
+         * @param msg _more_
+         */
         protected void log(String msg) {
-            System.err.println (msg);
+            System.err.println(msg);
         }
 
-        private String readLine() throws Exception  {
+        /**
+         * _more_
+         *
+         * @return _more_
+         *
+         * @throws Exception _more_
+         */
+        private String readLine() throws Exception {
             StringBuffer sb = new StringBuffer();
-            while(true) {
-                char c = (char)input.read();
-                if(c==-1 || c==LF) return sb.toString().trim();
-                sb.append(c+"");
+            while (true) {
+                char c = (char) input.read();
+                if ((c == -1) || (c == LF)) {
+                    return sb.toString().trim();
+                }
+                sb.append(c + "");
             }
         }
 
@@ -305,19 +365,19 @@ public class HttpServer {
                 path = toks[0];
             }
 
-            String contentType =  (String)props.get("Content-Type");
+            String contentType = (String) props.get("Content-Type");
 
-            if (requestType.equals(TYPE_POST) && 
-                contentType!=null && contentType.trim().startsWith("multipart/form-data")) {
-                parseMultiPartFormData(contentType,props,args);
-                handleRequest(path, args, props,null);
+            if (requestType.equals(TYPE_POST) && (contentType != null)
+                    && contentType.trim().startsWith("multipart/form-data")) {
+                parseMultiPartFormData(contentType, props, args);
+                handleRequest(path, args, props, null);
                 return;
             }
 
 
             String contentLength = (String) props.get("Content-Length");
             String contentString = null;
-            byte[] content    =null;
+            byte[] content       = null;
             if (contentLength != null) {
                 content = new byte[100000];
                 int    len       = new Integer(contentLength).intValue();
@@ -342,7 +402,7 @@ public class HttpServer {
             }
 
 
-            if(content!=null) {
+            if (content != null) {
                 contentString = new String(content, 0, content.length);
             }
             if (requestType.equals(TYPE_GET)) {
@@ -354,86 +414,126 @@ public class HttpServer {
                     parseArgs(contentString, args);
                 }
             } else {
-                throw new IllegalArgumentException("unknown type: " + requestType);
+                throw new IllegalArgumentException("unknown type: "
+                        + requestType);
             }
             handleRequest(path, args, props, contentString);
         }
 
-        private void parseMultiPartFormData(String type,Hashtable props, Hashtable args) {
-            String boundary = null;
-            List<String> toks = StringUtil.split(type,";",true,true);
-            for(String tok: toks) {
-                if(tok.indexOf("=")>0) {
-                    List<String> subToks = StringUtil.split(tok,"=",true,true);
-                    if(subToks.size()==2) {
-                        String name = subToks.get(0).trim();
+        /**
+         * _more_
+         *
+         * @param type _more_
+         * @param props _more_
+         * @param args _more_
+         */
+        private void parseMultiPartFormData(String type, Hashtable props,
+                                            Hashtable args) {
+            String       boundary = null;
+            List<String> toks     = StringUtil.split(type, ";", true, true);
+            for (String tok : toks) {
+                if (tok.indexOf("=") > 0) {
+                    List<String> subToks = StringUtil.split(tok, "=", true,
+                                               true);
+                    if (subToks.size() == 2) {
+                        String name  = subToks.get(0).trim();
                         String value = subToks.get(1).trim();
-                        if(name.equals("boundary")) {
+                        if (name.equals("boundary")) {
                             boundary = value;
                         }
                     }
                 }
             }
-            if(boundary==null) throw new IllegalArgumentException("Could not find multipart boundary in:" + type);
+            if (boundary == null) {
+                throw new IllegalArgumentException(
+                    "Could not find multipart boundary in:" + type);
+            }
             //??
             try {
-                MultipartStream multipartStream  = new MultipartStream(input, boundary.getBytes(),1000000);
+                MultipartStream multipartStream = new MultipartStream(input,
+                                                      boundary.getBytes(),
+                                                      1000000);
                 boolean nextPart = multipartStream.skipPreamble();
-                int cnt = 1;
+                int     cnt      = 1;
 
-                Pattern namePattern = Pattern.compile("[\\s;:]+name\\s*=\\s*\"([^\"]+)\"");
-                Pattern filenamePattern = Pattern.compile("[\\s;:]+filename\\s*=\\s*\"([^\"]+)\"");
+                Pattern namePattern =
+                    Pattern.compile("[\\s;:]+name\\s*=\\s*\"([^\"]+)\"");
+                Pattern filenamePattern =
+                    Pattern.compile("[\\s;:]+filename\\s*=\\s*\"([^\"]+)\"");
 
-                while(nextPart) {
-                    String  header = multipartStream.readHeaders();
-                    List lineToks = StringUtil.split(header,"\n",true,true);
+                while (nextPart) {
+                    String header = multipartStream.readHeaders();
+                    List lineToks = StringUtil.split(header, "\n", true,
+                                        true);
                     String attrName = null;
                     String filename = null;
-                    for(int i=0;i<lineToks.size();i++) {
-                        String line = (String) lineToks.get(i);
-                        int index = line.indexOf(":");
+                    for (int i = 0; i < lineToks.size(); i++) {
+                        String line  = (String) lineToks.get(i);
+                        int    index = line.indexOf(":");
                         if (index < 0) {
                             continue;
                         }
                         String propName  = line.substring(0, index).trim();
-                        String propValue = line.substring(index + 1).trim(); 
-                        if(propName.equals("Content-Disposition")) {
-                            Matcher nameMatcher = namePattern.matcher(propValue);
-                            Matcher filenameMatcher = filenamePattern.matcher(propValue);
-                            if(nameMatcher.find()) {
-                                attrName =  nameMatcher.group(1);
+                        String propValue = line.substring(index + 1).trim();
+                        if (propName.equals("Content-Disposition")) {
+                            Matcher nameMatcher =
+                                namePattern.matcher(propValue);
+                            Matcher filenameMatcher =
+                                filenamePattern.matcher(propValue);
+                            if (nameMatcher.find()) {
+                                attrName = nameMatcher.group(1);
                             }
-                            if(filenameMatcher.find()) {
-                                filename= filenameMatcher.group(1);
+                            if (filenameMatcher.find()) {
+                                filename = filenameMatcher.group(1);
                             }
                         }
-                        if(attrName == null) {
-                            throw new IllegalArgumentException("Could not find name attribute in multipart");
+                        if (attrName == null) {
+                            throw new IllegalArgumentException(
+                                "Could not find name attribute in multipart");
                         }
                     }
-                    if(filename!=null) {
-                        handleFileUpload(attrName, filename, props, args, multipartStream);
+                    if (filename != null) {
+                        handleFileUpload(attrName, filename, props, args,
+                                         multipartStream);
                     } else {
-                        ByteArrayOutputStream output=new ByteArrayOutputStream();
+                        ByteArrayOutputStream output =
+                            new ByteArrayOutputStream();
                         multipartStream.readBodyData(output);
                         String value = new String(output.toByteArray());
-                        args.put(attrName,value);
+                        args.put(attrName, value);
                     }
-                    if(!multipartStream.readBoundary()) break;
+                    if ( !multipartStream.readBoundary()) {
+                        break;
+                    }
                 }
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 exc.printStackTrace();
             }
         }
 
 
-        protected void handleFileUpload(String attrName, String filename,Hashtable props, Hashtable args, MultipartStream multipartStream) throws Exception {
-            throw new IllegalArgumentException("handleFileUpload not implemented");
+        /**
+         * _more_
+         *
+         * @param attrName _more_
+         * @param filename _more_
+         * @param props _more_
+         * @param args _more_
+         * @param multipartStream _more_
+         *
+         * @throws Exception _more_
+         */
+        protected void handleFileUpload(String attrName, String filename,
+                                        Hashtable props, Hashtable args,
+                                        MultipartStream multipartStream)
+                throws Exception {
+            throw new IllegalArgumentException(
+                "handleFileUpload not implemented");
         }
 
 
         /**
-
+         *
          * _more_
          *
          * @param path _more_
@@ -481,8 +581,8 @@ public class HttpServer {
          * @throws Exception On badness
          */
         protected void handleRequest(String path, Hashtable formArgs,
-                                     Hashtable httpArgs,
-                                     String content) throws Exception {
+                                     Hashtable httpArgs, String content)
+                throws Exception {
             StringBuffer sb   = new StringBuffer("<html>");
             Enumeration  keys = formArgs.keys();
             while (keys.hasMoreElements()) {
@@ -531,41 +631,89 @@ public class HttpServer {
          *
          * @throws Exception On badness
          */
-        public void writeResult(boolean ok, String content,
-                                   String type) throws Exception {
-            writeResult(ok?RESPONSE_OK:RESPONSE_NOTFOUND, content, type);
+        public void writeResult(boolean ok, String content, String type)
+                throws Exception {
+            writeResult(ok
+                        ? RESPONSE_OK
+                        : RESPONSE_NOTFOUND, content, type);
         }
 
 
-        public void writeResult(int code, String content,
-                                   String type) throws Exception {
+        /**
+         * _more_
+         *
+         * @param code _more_
+         * @param content _more_
+         * @param type _more_
+         *
+         * @throws Exception _more_
+         */
+        public void writeResult(int code, String content, String type)
+                throws Exception {
             writeResult(code, content.getBytes(), type);
         }
 
 
 
 
-        public void writeResult(boolean ok, StringBuffer content,
-                                   String type) throws Exception {
-            writeResult(ok?RESPONSE_OK:RESPONSE_NOTFOUND, content.toString().getBytes(), type);
+        /**
+         * _more_
+         *
+         * @param ok _more_
+         * @param content _more_
+         * @param type _more_
+         *
+         * @throws Exception _more_
+         */
+        public void writeResult(boolean ok, StringBuffer content, String type)
+                throws Exception {
+            writeResult(ok
+                        ? RESPONSE_OK
+                        : RESPONSE_NOTFOUND, content.toString().getBytes(),
+                                             type);
         }
 
 
 
-        public void writeResult(int code, StringBuffer content,
-                                   String type) throws Exception {
+        /**
+         * _more_
+         *
+         * @param code _more_
+         * @param content _more_
+         * @param type _more_
+         *
+         * @throws Exception _more_
+         */
+        public void writeResult(int code, StringBuffer content, String type)
+                throws Exception {
             writeResult(code, content.toString().getBytes(), type);
         }
 
 
 
+        /**
+         * _more_
+         *
+         * @param content _more_
+         *
+         * @throws Exception _more_
+         */
         public void writeXml(StringBuffer content) throws Exception {
-            writeResult(RESPONSE_OK, content.toString().getBytes(), "text/xml");
+            writeResult(RESPONSE_OK, content.toString().getBytes(),
+                        "text/xml");
         }
 
 
+        /**
+         * _more_
+         *
+         * @param content _more_
+         *
+         * @throws Exception _more_
+         */
         public void writeHtml(StringBuffer content) throws Exception {
-            writeResult(RESPONSE_OK, content.toString().getBytes(), "text/html");
+            writeResult(RESPONSE_OK, content.toString().getBytes(),
+                        "text/html");
         }
 
 
@@ -578,25 +726,46 @@ public class HttpServer {
          *
          * @throws Exception On badness
          */
-        public void writeResult(boolean ok, byte[] content,
-                                   String type) throws Exception {
+        public void writeResult(boolean ok, byte[] content, String type)
+                throws Exception {
 
-            writeResult(ok?RESPONSE_OK:RESPONSE_NOTFOUND,content,type);
+            writeResult(ok
+                        ? RESPONSE_OK
+                        : RESPONSE_NOTFOUND, content, type);
         }
 
 
-        public void writeResult(int code, byte[] content,
-                                   String type) throws Exception {
+        /**
+         * _more_
+         *
+         * @param code _more_
+         * @param content _more_
+         * @param type _more_
+         *
+         * @throws Exception _more_
+         */
+        public void writeResult(int code, byte[] content, String type)
+                throws Exception {
             try {
                 writeHeader(code, content.length, type);
                 output.write(content);
                 output.close();
-            } catch(SocketException se){}
+            } catch (SocketException se) {}
         }
 
 
+        /**
+         * _more_
+         *
+         * @param code _more_
+         * @param inputStream _more_
+         * @param type _more_
+         *
+         * @throws Exception _more_
+         */
         public void writeResult(int code, InputStream inputStream,
-                                   String type) throws Exception {
+                                String type)
+                throws Exception {
             writeHeader(code, -1, type);
             IOUtil.writeTo(inputStream, output);
             output.close();
@@ -607,20 +776,20 @@ public class HttpServer {
         /**
          * _more_
          *
-         * @param ok _more_
+         * @param code return code
          * @param length _more_
          * @param type _more_
          *
          * @throws Exception On badness
          */
-        protected void writeHeader(int code, long length,
-                                   String type) throws Exception {
-            if(code == RESPONSE_OK) {
-                writeLine("HTTP/1.0 " + code +"  OK" + CRLF);
+        protected void writeHeader(int code, long length, String type)
+                throws Exception {
+            if (code == RESPONSE_OK) {
+                writeLine("HTTP/1.0 " + code + "  OK" + CRLF);
             } else {
                 writeLine("HTTP/1.0 " + code + CRLF);
             }
-            if(length>=0) {
+            if (length >= 0) {
                 //See if this fixes the quirky browser problem
                 //writeLine("Content-Length: " + length + CRLF);
             }
@@ -630,6 +799,13 @@ public class HttpServer {
         }
 
 
+        /**
+         * _more_
+         *
+         * @param url _more_
+         *
+         * @throws Exception _more_
+         */
         public void redirect(String url) throws Exception {
             writeLine("HTTP/1.0 300 OK" + CRLF);
             writeLine("Location: " + url + CRLF);
@@ -641,6 +817,11 @@ public class HttpServer {
 
 
 
+        /**
+         * _more_
+         *
+         * @throws Exception _more_
+         */
         protected void writeHeaderArgs() throws Exception {
             //            writeLine("Date: Fri, 12 Jan 2007 00:02:44 GMT"+CRLF);
             //            writeLine("Cache-Control: no-cache"+CRLF);
@@ -658,8 +839,8 @@ public class HttpServer {
          *
          * @throws Exception On badness
          */
-        protected void writeBytes(InputStream fis, String type,
-                                  long length) throws Exception {
+        protected void writeBytes(InputStream fis, String type, long length)
+                throws Exception {
             writeHeader(RESPONSE_OK, length, type);
             // Construct a 1K buffer to hold bytes on their way to the socket.
             byte[] buffer = new byte[1024];

@@ -20,10 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.unidata.data;
 
 
@@ -74,7 +70,7 @@ public class VarInfo {
     /** desc */
     private String description;
 
-    /** _more_ */
+    /** The category */
     private String category;
 
     /** unit */
@@ -86,6 +82,7 @@ public class VarInfo {
     /** The real type to use */
     private RealType realType;
 
+    /** the missing value     */
     private double missingValue;
 
 
@@ -106,11 +103,11 @@ public class VarInfo {
      *
      * @param name name
      * @param desc desc
-     * @param category _more_
+     * @param category the category of the var
      * @param unit unit
      */
     public VarInfo(String name, String desc, String category, Unit unit) {
-        this(name,desc,category, unit, Double.NaN);
+        this(name, desc, category, unit, Double.NaN);
     }
 
 
@@ -119,11 +116,13 @@ public class VarInfo {
      *
      * @param name name
      * @param desc desc
-     * @param category _more_
+     * @param category the category of the var
      * @param unit unit
+     * @param missingValue missing value
      */
 
-    public VarInfo(String name, String desc, String category, Unit unit,double missingValue) {
+    public VarInfo(String name, String desc, String category, Unit unit,
+                   double missingValue) {
         this.name        = name;
         this.description = desc;
         this.category    = category;
@@ -131,9 +130,9 @@ public class VarInfo {
                 || (this.description.trim().length() == 0)) {
             this.description = name;
         }
-        this.unit = unit;
+        this.unit         = unit;
         this.missingValue = missingValue;
-        realType  = DataUtil.makeRealType(getShortName(), unit);
+        realType          = DataUtil.makeRealType(getShortName(), unit);
         if (realType == null) {
             System.out.println("can't create realtype for " + getShortName()
                                + " with unit " + unit);
@@ -176,11 +175,13 @@ public class VarInfo {
      * Utility to find the variable with the given name
      *
      * @param variableName The name
+     * @param variables List of variables to look into
      *
      * @return The variable.
      */
 
-    public static VarInfo getVarInfo(String variableName, List<VarInfo> variables) {
+    public static VarInfo getVarInfo(String variableName,
+                                     List<VarInfo> variables) {
         //Jump through some hoops for legacy bundles
         String[] vars = { variableName, variableName.toLowerCase() };
         for (int dummyIdx = 0; dummyIdx < vars.length; dummyIdx++) {
@@ -320,23 +321,23 @@ public class VarInfo {
     }
 
 
-/**
-Set the MissingValue property.
-
-@param value The new value for MissingValue
-**/
-public void setMissingValue (double value) {
+    /**
+     * Set the MissingValue property.
+     *
+     * @param value The new value for MissingValue
+     */
+    public void setMissingValue(double value) {
         missingValue = value;
-}
+    }
 
-/**
-Get the MissingValue property.
-
-@return The MissingValue
-**/
-public double getMissingValue () {
+    /**
+     * Get the MissingValue property.
+     *
+     * @return The MissingValue
+     */
+    public double getMissingValue() {
         return missingValue;
-}
+    }
 
 
 }

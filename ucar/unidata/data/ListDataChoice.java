@@ -396,8 +396,8 @@ public class ListDataChoice extends DataChoice {
      * @return The union of all of the children {@link DataChoice}-s levels.
      */
     public List getAllLevels(DataSelection dataSelection) {
-        String levelsProp = (String)getProperty("levels");
-        if(Misc.equals(levelsProp, "false")) {
+        String levelsProp = (String) getProperty("levels");
+        if (Misc.equals(levelsProp, "false")) {
             return new ArrayList();
         }
         //        System.err.println ("ListDataChoice.getAllLevels");

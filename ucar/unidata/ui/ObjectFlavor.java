@@ -50,7 +50,7 @@ import javax.swing.*;
         /**
          * Create me
          *
-         * @param tree The tree
+         * @param object the object
          */
         public ObjectFlavor(Object object) {
             super(object.getClass(), "Object");

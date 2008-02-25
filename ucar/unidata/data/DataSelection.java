@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data;
 
 
@@ -72,7 +71,7 @@ public class DataSelection {
     /** The subset */
     private GeoSelection geoSelection;
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable properties = new Hashtable();
 
     /**

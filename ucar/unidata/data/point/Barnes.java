@@ -934,8 +934,8 @@ public class Barnes {
      *
      *
      *
-     *   @author James  Kelly j.kelly@bom.gov.au
-     *   @author Robert Dahni rrd@bom.gov.au      30/01/97  Original Code (IDL)
+     *   author James  Kelly j.kelly@bom.gov.au
+     *   author Robert Dahni rrd@bom.gov.au      30/01/97  Original Code (IDL)
      *           round grid spacings to nearest 0.05 degrees 29/3/97   R.Dahni & J.Kelly
      *           round grid spacings to nearest 0.01 degrees 15/4/97   R.Dahni & J.Kelly
      *           convert to Java                             24/1/2001 J.Kelly

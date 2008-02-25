@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.ui;
 
 
@@ -45,25 +46,27 @@ public class DragPanel extends JPanel implements DragSourceListener,
         DragGestureListener, Transferable {
 
     /** _more_ */
-    DragSource dragSource = null;
+    private DragSource dragSource = null;
 
     /** _more_ */
-    Object data;
+    private Object data;
 
     /** _more_ */
-    String mimeType;
+    private String mimeType;
 
 
     /**
      * _more_
      *
      * @param data
-     * @param mimeType
+     * @param component _more_
      *
      */
     public DragPanel(Object data, JComponent component) {
         super(new BorderLayout());
-        if(component!=null) this.add(BorderLayout.CENTER, component);
+        if (component != null) {
+            this.add(BorderLayout.CENTER, component);
+        }
         this.mimeType = mimeType;
         this.data     = data;
         dragSource    = new DragSource();
@@ -80,7 +83,13 @@ public class DragPanel extends JPanel implements DragSourceListener,
         dragSource.startDrag(event, DragSource.DefaultMoveDrop, this, this);
     }
 
+    /**
+     * _more_
+     *
+     * @param event _more_
+     */
     public void dropActionChanged(DragSourceDragEvent event) {}
+
     /**
      * _more_
      *

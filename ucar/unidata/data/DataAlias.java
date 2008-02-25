@@ -400,7 +400,9 @@ public class DataAlias {
         }
         if (dataAlias != null) {
             //Check for "!"
-            if(dataAlias.aliases.contains("!"+paramName)) return null;
+            if (dataAlias.aliases.contains("!" + paramName)) {
+                return null;
+            }
             return dataAlias.getName();
         }
 

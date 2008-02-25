@@ -2745,7 +2745,7 @@ public class CDMRadarAdapter implements RadarAdapter {
 
     /**
      *
-     * @return
+     * @return _more_
      */
     public Object [] getCutIdx(RadialDatasetSweep.RadialVariable sweepVar) {
 

@@ -20,10 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.unidata.data;
 
 
@@ -748,9 +744,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
     /**
-     * _more_
+     * Remove the property
      *
-     * @param name _more_
+     * @param name property name to remove
      */
     public void removeProperty(String name) {
         if (properties != null) {
@@ -2715,11 +2711,12 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
-     * _more_
+     * A hook to allow this data source to add data selection components
+     * to the IDV field selector
      *
-     * @param dataChoice _more_
+     * @param dataChoice the data choice
      *
-     * @return _more_
+     * @return list of components
      */
     public List<DataSelectionComponent> getDataSelectionComponents(
             DataChoice dataChoice) {
@@ -2730,33 +2727,35 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
     /**
-     * _more_
+     * Add any data selection components
      *
-     * @param components _more_
-     * @param dataChoice _more_
+     * @param components list of components
+     * @param dataChoice the data  choice
      */
     protected void initDataSelectionComponents(
             List<DataSelectionComponent> components,
             final DataChoice dataChoice) {
-        /** e.g.:
-        components.add(new DataSelectionComponent("test 1") {
-            protected JComponent doMakeContents() {
-                return new JLabel("component 1 choice:" + dataChoice);
-            }
-            public void applyToDataSelection(DataSelection dataSelection) {
-                dataSelection.putProperty("TEST1", "component 1 value");
-            }
-        });
 
-        components.add(new DataSelectionComponent("test 2") {
-            protected JComponent doMakeContents() {
-                return new JLabel("component 2");
-            }
-            public void applyToDataSelection(DataSelection dataSelection) {
-                dataSelection.putProperty("TEST2", "component 2 value");
-            }
-        });
-        **/
+        /**
+         * e.g.:
+         * components.add(new DataSelectionComponent("test 1") {
+         *   protected JComponent doMakeContents() {
+         *       return new JLabel("component 1 choice:" + dataChoice);
+         *   }
+         *   public void applyToDataSelection(DataSelection dataSelection) {
+         *       dataSelection.putProperty("TEST1", "component 1 value");
+         *   }
+         * });
+         *
+         * components.add(new DataSelectionComponent("test 2") {
+         *   protected JComponent doMakeContents() {
+         *       return new JLabel("component 2");
+         *   }
+         *   public void applyToDataSelection(DataSelection dataSelection) {
+         *       dataSelection.putProperty("TEST2", "component 2 value");
+         *   }
+         * });
+         */
     }
 
 

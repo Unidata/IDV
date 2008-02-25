@@ -1143,7 +1143,6 @@ public class PointObFactory {
      *  Perform an object analysis on a set of point obs
      *
      * @param pointObs Observations to analyze
-     * @param types  RealTypes of fields
      *
      * @return  Grid of objectively analyzed data
      *

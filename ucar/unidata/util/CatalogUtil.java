@@ -21,6 +21,8 @@
  */
 
 
+
+
 package ucar.unidata.util;
 
 
@@ -44,8 +46,7 @@ import java.util.Vector;
 
 
 /**
- * This handles the Thredds  catalog xml for the
- * {@link XmlChooser}.
+ * A set of utilities for dealing with Thredds catalogs
  *
  * @author IDV development team
  * @version $Revision: 1.68 $Date: 2007/07/09 22:59:58 $

@@ -21,10 +21,6 @@
  */
 
 
-
-
-
-
 package ucar.unidata.data;
 
 
@@ -59,7 +55,7 @@ import java.util.regex.*;
 
 
 /**
- * Class SqlUtil _more_
+ * Class SqlUtil provides a set of utility functions for sql databases
  *
  *
  * @author IDV Development Team
@@ -68,11 +64,11 @@ import java.util.regex.*;
 public class SqlUtil {
 
 
-    /** _more_ */
+    /** A calendar to use */
     public static final GregorianCalendar calendar =
         new GregorianCalendar(DateUtil.TIMEZONE_GMT);
 
-    /** _more_ */
+    /** The formatter to use */
     private static SimpleDateFormat sdf;
 
 
@@ -865,7 +861,6 @@ public class SqlUtil {
      * _more_
      *
      * @param what _more_
-     * @param where _more_
      * @param tables _more_
      *
      * @return _more_
@@ -1089,7 +1084,6 @@ public class SqlUtil {
      *
      * @param stmt _more_
      * @param column _more_
-     * @param missing _more_
      *
      * @return _more_
      *

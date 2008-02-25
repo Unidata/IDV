@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data;
 
 
@@ -401,7 +399,7 @@ public class DerivedDataChoice extends ListDataChoice {
         //Now, split the list between user and non-user operands
         //Make sure all user operands are in the data choices list
         List nonUserOperands = new ArrayList();
-        List tmpList = new ArrayList(operands);    
+        List tmpList         = new ArrayList(operands);
         for (int i = 0; i < tmpList.size(); i++) {
             DataOperand operand = (DataOperand) tmpList.get(i);
             if (operand.isUser()) {
@@ -434,7 +432,7 @@ public class DerivedDataChoice extends ListDataChoice {
                 DataOperand operand = new DataOperand(dc.getName(),
                                           ((UserDataChoice) dc).getValue());
                 allUserOperands.add(operand);
-                if (!operand.isBound()) {
+                if ( !operand.isBound()) {
                     unboundUserChoices.add(dc);
                     unboundUserOperands.add(operand);
                 }
@@ -672,7 +670,7 @@ public class DerivedDataChoice extends ListDataChoice {
      * null.
      *
      * @param category           Ignore this for now.
-     * @param dataSelection      Allows one to subset the getData call
+     * @param incomingDataSelection      Allows one to subset the getData call
      *                              (e.g., selecting times).
      * @param requestProperties  extra request properties
      *
@@ -688,8 +686,8 @@ public class DerivedDataChoice extends ListDataChoice {
                            Hashtable requestProperties)
             throws VisADException, RemoteException, DataCancelException {
 
-        DataSelection dataSelection = DataSelection.merge(incomingDataSelection,
-                                                          myDataSelection);
+        DataSelection dataSelection =
+            DataSelection.merge(incomingDataSelection, myDataSelection);
 
 
         /**
