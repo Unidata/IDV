@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.util;
 
 
@@ -321,9 +320,17 @@ public class Misc {
     }
 
 
+    /**
+     * For the given property name get the set method name, e.g., returns:<pre>
+     * setPropertname
+     * </pre>
+     *
+     * @param prop property name
+     *
+     * @return setter method
+     */
     public static String getSetterMethod(String prop) {
-        return  "set" + prop.substring(0, 1).toUpperCase()
-                            + prop.substring(1);
+        return "set" + prop.substring(0, 1).toUpperCase() + prop.substring(1);
     }
 
 
@@ -1779,7 +1786,9 @@ public class Misc {
      */
     public static double parseNumber(String value)
             throws NumberFormatException {
-        if (value.equals(MISSING)) return Double.NaN;
+        if (value.equals(MISSING)) {
+            return Double.NaN;
+        }
         try {
             return formatter.parse(value).doubleValue();
         } catch (ParseException pe) {
@@ -2193,6 +2202,13 @@ public class Misc {
     }
 
 
+    /**
+     * convert float array to double array
+     *
+     * @param d float array
+     *
+     * @return double array
+     */
     public static double[] arrayToDouble(float[] d) {
         double[] f = new double[d.length];
         for (int i = 0; i < d.length; i++) {

@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.util;
 
 
@@ -28,9 +27,10 @@ import java.io.*;
 
 import java.net.*;
 
-import java.util.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -312,7 +312,7 @@ public class IOUtil {
      *
      * @param from   URL for input
      * @param file   file for output
-     * @param loadId A JobManager loadId that, if set, can be used to 
+     * @param loadId A JobManager loadId that, if set, can be used to
      *               stop the load
      *
      * @return number of bytes written
@@ -353,7 +353,7 @@ public class IOUtil {
      *
      * @param from input stream
      * @param to output
-     * @param loadId A JobManager loadId that, if set, can be used to 
+     * @param loadId A JobManager loadId that, if set, can be used to
      *               stop the load
      * @param length  number of bytes to write
      *
@@ -519,26 +519,35 @@ public class IOUtil {
     }
 
 
+    /**
+     * Lists the contents in the given file directory or java resource directory
+     *
+     * @param path may be a file directory path or a java resource directory
+     * @param c base class to use if its java resources
+     *
+     * @return List of sub files and directories
+     */
     public static List<String> getListing(String path, Class c) {
         List<String> listing = new ArrayList<String>();
-        File f = new File(path);
-        if(f.exists()) {
+        File         f       = new File(path);
+        if (f.exists()) {
             File[] files = f.listFiles();
-            for(int i=0;i<files.length;i++) {
+            for (int i = 0; i < files.length; i++) {
                 listing.add(files[i].toString());
             }
         } else {
             //try it as a java resource
             String contents = IOUtil.readContents(path, c, (String) null);
-            if(contents !=null) {
-                List<String> lines = StringUtil.split(contents,"\n",true,true);
-                for(String file: lines) {
-                    listing.add(joinDir(path,file));
+            if (contents != null) {
+                List<String> lines = StringUtil.split(contents, "\n", true,
+                                         true);
+                for (String file : lines) {
+                    listing.add(joinDir(path, file));
                 }
             }
         }
 
-        return  listing;
+        return listing;
     }
 
     /**
@@ -697,7 +706,7 @@ public class IOUtil {
         if (to.isDirectory()) {
             to = new File(joinDir(to, getFileTail(from.toString())));
         }
-        if(!from.renameTo(to)) {
+        if ( !from.renameTo(to)) {
             throw new IllegalStateException("Could not move file:" + from);
         }
         //        copyFile(from, to);
@@ -1435,9 +1444,16 @@ public class IOUtil {
         return f.getPath();
     }
 
+    /**
+     * Make the directory. This will recurse and make the directory tree if needed
+     *
+     * @param f directory to make
+     */
     public static final void makeDirRecursive(File f) {
-        if(f==null) return;
-        if(f.exists()) {
+        if (f == null) {
+            return;
+        }
+        if (f.exists()) {
             return;
         }
         makeDirRecursive(f.getParentFile());
@@ -1477,7 +1493,7 @@ public class IOUtil {
     }
 
 
-     /**
+    /**
      * Recursively descend (if recurse is true)
      * through the given directory and return a
      * list of all files
@@ -1510,28 +1526,80 @@ public class IOUtil {
         return files;
     }
 
-    
+
+    /**
+     * FileViewer  is used to walk dir trees
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     public static interface FileViewer {
+
+        /** return action */
         public static int DO_CONTINUE = 1;
+
+        /** return action */
         public static int DO_DONTRECURSE = 2;
-        public static int DO_STOP= 3;
-        public int viewFile(File f) throws Exception ;
+
+        /** return action */
+        public static int DO_STOP = 3;
+
+        /**
+         * View this file.
+         *
+         * @param f file
+         *
+         * @return One of the return actions
+         *
+         * @throws Exception on badness
+         */
+        public int viewFile(File f) throws Exception;
     }
 
 
-    public static boolean walkDirectory(File dir, FileViewer fileViewer) throws Exception {
+    /**
+     * Walk the dir tree with the given file viewer
+     *
+     * @param dir dir
+     * @param fileViewer viewer
+     *
+     * @return should continue
+     *
+     * @throws Exception on badness_
+     */
+    public static boolean walkDirectory(File dir, FileViewer fileViewer)
+            throws Exception {
         return walkDirectory(dir, fileViewer, 0);
     }
 
-    public static boolean walkDirectory(File dir, FileViewer fileViewer, int level) throws Exception {
-        File[] children  = dir.listFiles();
-        if(children == null) return true;
-        for (int i=0;i<children.length;i++) {
+    /**
+     * Walk the dir tree with the given file viewer
+     *
+     * @param dir dir
+     * @param fileViewer viewer
+     * @param level tree depth
+     *
+     * @return should continue
+     *
+     * @throws Exception on badness_
+     */
+    public static boolean walkDirectory(File dir, FileViewer fileViewer,
+                                        int level)
+            throws Exception {
+        File[] children = dir.listFiles();
+        if (children == null) {
+            return true;
+        }
+        for (int i = 0; i < children.length; i++) {
             int what = fileViewer.viewFile(children[i]);
-            if(what == FileViewer.DO_STOP) 
+            if (what == FileViewer.DO_STOP) {
                 return false;
-            if(what == FileViewer.DO_CONTINUE) {
-                if(!walkDirectory(children[i], fileViewer,level+1)) return false;
+            }
+            if (what == FileViewer.DO_CONTINUE) {
+                if ( !walkDirectory(children[i], fileViewer, level + 1)) {
+                    return false;
+                }
             }
         }
         return true;
@@ -1713,86 +1781,48 @@ public class IOUtil {
     }
 
 
-    
 
+
+    /**
+     * Class FileInfo holds a file and a date/time. We use this to sort files
+     *
+     *
+     *
+     * @author IDV Development Team
+     * @version $Revision: 1.3 $
+     */
     static class FileInfo {
+
+        /** file */
         File f;
+
+        /** file date */
         long dttm;
+
+        /**
+         * ctor
+         *
+         * @param f file
+         */
         public FileInfo(File f) {
             this.f = f;
-            dttm =f.lastModified();
+            dttm   = f.lastModified();
         }
+
+        /**
+         * to string
+         *
+         * @return to string
+         */
         public String toString() {
             return f.toString();
         }
     }
 
 
-    static List files = new ArrayList();
-    private static int cnt = 0;
-    private static Hashtable ht = new Hashtable();
-
-    public static void walkTree(File f) {
-        Object foo = ht.get(f);
-        if(foo!=null) {
-            return;
-        }
-        cnt++;
-        long t = f.lastModified();
-        //        System.err.println ("t:" + t);
-        if(f.isDirectory()) {
-            File[] files = f.listFiles();
-            if(files == null) return;
-            for(int i=0;i<files.length;i++)
-                walkTree(files[i]);
-
-        } else {
-            Object o = ht.get(f);
-            if(o==null) {
-                files.add(new FileInfo(f));
-                //crackFile(f);
-                ht.put(f,f);
-            }
-
-        }
-    }
-
-
-    public static List findFiles(Date d1, Date d2) {
-        long t1 = d1.getTime();
-        long t2 = d2.getTime();
-        List result = new ArrayList();
-        for(int i=0;i<files.size();i++) {
-            FileInfo fi = (FileInfo)  files.get(i);
-            if(fi.dttm>=t1 && fi.dttm<=t2) 
-                result.add(fi.f);
-        }
-        return result;
-    }
-
-
-    public static List findChangedFiles() {
-        List result = new ArrayList();
-        for(int i=0;i<files.size();i++) {
-            FileInfo fi = (FileInfo)  files.get(i);
-            if(fi.dttm!=fi.f.lastModified()) {
-                result.add(fi);
-            }
-        }
-        return result;
-    }
 
 
 
-    private static void testWrite(float[][]f, int buffSize) throws Exception {
-        FileOutputStream   fos = new FileOutputStream("test2.data");
-        BufferedOutputStream bos = new BufferedOutputStream(fos, buffSize);
-        ObjectOutputStream p       = new ObjectOutputStream(bos);
-        p.writeObject(f);
-        p.flush();
-        p.close();
-        fos.close();
-    }
 
 
 
@@ -1804,144 +1834,8 @@ public class IOUtil {
      *
      * @throws Exception On badness
      */
-    public static void main(String[] args) throws Exception {
-        String s = "http://earthquake.usgs.gov/eqcenter/recenteqsww/catalogs/eqs7day-M2.5.xml";
-        System.out.println (readContents(s,IOUtil.class));
-            
-        if(true) return;
+    public static void main(String[] args) throws Exception {}
 
-        final int[]cnt = {0};
-        IOUtil.FileViewer fileViewer = new IOUtil.FileViewer() {
-                public int viewFile(File f) throws Exception {
-                    cnt[0]++;
-                    if(cnt[0]%1000 == 0) System.err.println ("cnt:" +cnt[0]);
-                    if(f.isDirectory()) {}
-                    return DO_CONTINUE;
-                }
-            };
-        long tt1= System.currentTimeMillis();
-        File rootDir = new File((args.length>0?args[0]:"c:/cygwin/home/jeffmc/unidata"));
-        IOUtil.walkDirectory(rootDir, fileViewer);
-        long tt2= System.currentTimeMillis();
-        System.err.println ("cnt: " + cnt[0]  + " " + (tt2-tt1));
-
-
-
-        File dir = new File("C:/tmpstuff");
-        //        System.err.println ("tmp:" + dir.exists() + " " + dir.lastModified());
-        //        Misc.sleep(10000);
-        //        System.err.println ("tmp:" + dir.exists() + " " + dir.lastModified());
-
-        if(true) return;
-
-
-
-        float[][] f= new float[2][1000000];
-
-        
-        for(int bs = 500000;bs>1000;bs-=20000) {
-            long total = 0;
-            for(int i=0;i<10;i++) {
-                long t1 = System.currentTimeMillis();
-                //                readBytes(new FileInputStream("test2.data"));
-                readBytes(new FileInputStream("test2.data"),100000);
-                long t2= System.currentTimeMillis();
-                total+= (t2-t1);
-            }
-            System.err.println ((total/10));
-            if(true) break;
-            System.err.println (bs +" " + (total/5));
-        }
-
-
-
-
-
-
-
-
-
-        if(true) return;
-
-        /*
-
-        //        File ff = new File(args[0]);
-        //        System.err.println(ff.lastModified());
-        //        if(true) return;
-        for(int xx=0;xx<10;xx++) {
-            cnt = 0;
-            //        ht = new Hashtable();
-            //        files  = new ArrayList();
-            long tt1 = System.currentTimeMillis();
-            walkTree(new File(args[0]));
-            long tt2 = System.currentTimeMillis();
-            List result = findFiles(new Date(System.currentTimeMillis()-1000*60*60*24*7),
-                                    new Date(System.currentTimeMillis()));
-            long tt3 = System.currentTimeMillis();
-            List changed = findChangedFiles();
-            long tt4 = System.currentTimeMillis();
-            System.err.println (" files indexed:" + cnt + " time:" + (tt2-tt1) + " files found:" +  result.size() + " time to find:" + (tt3-tt2) + " time to find changed:" + (tt4-tt3));
-
-
-
-            if(true) break;
-        }
-
-
-
-        //        System.err.println("isrel:" + isRelativePath("C:"));
-        if (true) {
-            return;
-        }
-
-
-
-
-
-        String file =
-            "/home/jeffmc/.metapps/DefaultIdv/plugins/%2Fhome%2Fjeffmc%2Fcontrols.xml";
-        File f = new File(file);
-        try {
-            System.err.println("f.exists: " + f.exists());
-            URL url = getURL(file, IOUtil.class);
-            System.err.println("the url:" + url);
-            System.err.println("getFile:" + url.getFile());
-            InputStream s = url.openConnection().getInputStream();
-            System.err.println("url:" + url);
-            //        InputStream s = IOUtil.getInputStream(file,IOUtil.class);
-            System.err.println("s!=null " + (s != null));
-            String c = IOUtil.readContents(file, IOUtil.class);
-        } catch (Exception exc) {
-            exc.printStackTrace();
-        }
-        if (true) {
-            System.exit(0);
-        }
-
-
-
-        try {
-            for (int j = 0; j < 5; j++) {
-
-                for (int i = 0; i < args.length; i++) {
-                    long   t1       = System.currentTimeMillis();
-                    String contents = readContents(args[i]);
-                    long   t2       = System.currentTimeMillis();
-                    //                readContents(new ByteArrayInputStream(contents.getBytes()));
-                    long t3 = System.currentTimeMillis();
-                    System.err.println(args[i] + " Time:" + (t2 - t1) + " "
-                                       + (t3 - t2));
-                }
-            }
-
-
-            //            ftpPut("ftp.unidata.ucar.edu", "anonymous", "jeffmc@ucar.edu",
-            //                   "/incoming/idv/test11.txt", "hello".getBytes());
-        } catch (Exception exc) {
-            exc.printStackTrace();
-        }
-        */
-    }
 
     /**
      * Write out the list of files to the jar file specified by filename
@@ -1970,10 +1864,22 @@ public class IOUtil {
                                     String pathPrefix)
             throws IOException {
         writeJarFile(filename, files, pathPrefix, false);
-    }    
+    }
+
+    /**
+     * Write out the list of files to the jar file specified by filename
+     *
+     * @param filename jar file name
+     * @param files list of files
+     * @param pathPrefix If not null this is the prefx we add to the jar entry
+     * @param makeFilesUnique If true then make all of the file names unique in case of conflict
+     *
+     * @throws IOException On badness
+     */
 
     public static void writeJarFile(String filename, List files,
-                                    String pathPrefix, boolean makeFilesUnique)
+                                    String pathPrefix,
+                                    boolean makeFilesUnique)
             throws IOException {
         ZipOutputStream zos =
             new ZipOutputStream(new FileOutputStream(filename));
@@ -1984,24 +1890,25 @@ public class IOUtil {
             byte[] bytes;
             if (tmp instanceof String) {
                 bytes = IOUtil.readBytes(IOUtil.getInputStream((String) tmp));
-                path = IOUtil.getFileTail((String)tmp);
+                path  = IOUtil.getFileTail((String) tmp);
             } else if (tmp instanceof TwoFacedObject) {
                 TwoFacedObject tfo = (TwoFacedObject) tmp;
-                if(tfo.getId() instanceof byte[]) {
+                if (tfo.getId() instanceof byte[]) {
                     bytes = (byte[]) tfo.getId();
                 } else {
-                    bytes = IOUtil.readBytes(IOUtil.getInputStream(tfo.getId().toString()));
+                    bytes = IOUtil.readBytes(
+                        IOUtil.getInputStream(tfo.getId().toString()));
                 }
                 path = tfo.getLabel().toString();
             } else {
                 throw new IllegalArgumentException("Unknown file:" + tmp);
             }
-            if(makeFilesUnique) {
-                int cnt=0;
-                while(seen.get(path)!=null) {
-                    path = "v" +(cnt++)+"_"+path;
+            if (makeFilesUnique) {
+                int cnt = 0;
+                while (seen.get(path) != null) {
+                    path = "v" + (cnt++) + "_" + path;
                 }
-                seen.put(path,path);
+                seen.put(path, path);
             }
             if (pathPrefix != null) {
                 path = pathPrefix + "/" + path;

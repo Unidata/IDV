@@ -23,12 +23,11 @@
 
 package ucar.unidata.util;
 
+
 import ucar.unidata.xml.XmlUtil;
 
 
 import java.security.SignatureException;
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 
 import java.text.ParsePosition;
 
@@ -38,6 +37,9 @@ import java.text.SimpleDateFormat;
 
 import java.util.*;
 import java.util.regex.*;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 
 /**
@@ -139,9 +141,11 @@ public class StringUtil {
      * @param text the text
      * @return the format string or null
      */
-    public static String findFormatString(String macroName, String macroDelimiter, String text) {
-        String prefix = macroDelimiter+macroName +":";
-        int idx1 = text.indexOf(prefix);
+    public static String findFormatString(String macroName,
+                                          String macroDelimiter,
+                                          String text) {
+        String prefix = macroDelimiter + macroName + ":";
+        int    idx1   = text.indexOf(prefix);
         if (idx1 >= 0) {
             int idx2 = text.indexOf(macroDelimiter, idx1 + 1);
             if (idx2 > idx1) {
@@ -494,10 +498,10 @@ public class StringUtil {
 
 
 
-   /**
-     * Remove all but printable 7bit ascii
-     * @param s filter this string
-     * @return filtered string.
+    /**
+     *  Remove all but printable 7bit ascii
+     *  @param s filter this string
+     *  @return filtered string.
      */
     static public String filter7bits(String s) {
         byte[] b     = s.getBytes();
@@ -914,7 +918,18 @@ public class StringUtil {
     }
 
 
-    public static String stripAndReplace(String s, String pattern1, String pattern2, String replace) {
+    /**
+     * Replaces all occurrences of the strings delimited by patter1/pattern2 with replace, e.g.: "pattern1 ... pattern2"
+     *
+     * @param s initial string
+     * @param pattern1 delimiter 1
+     * @param pattern2 delimiter 2
+     * @param replace replace with
+     *
+     * @return replaced string
+     */
+    public static String stripAndReplace(String s, String pattern1,
+                                         String pattern2, String replace) {
         StringBuffer stripped = new StringBuffer();
         while (s.length() > 0) {
             int idx = s.indexOf(pattern1);
@@ -926,7 +941,7 @@ public class StringUtil {
             if (text.length() > 0) {
                 stripped.append(text);
             }
-            s = s.substring(idx+1);
+            s = s.substring(idx + 1);
 
             int idx2 = s.indexOf(pattern2);
             if (idx2 < 0) {
@@ -1280,7 +1295,8 @@ public class StringUtil {
      *
      * @return List of String tokens.
      */
-    public static List<String> split(Object source, String delimiter, boolean trim) {
+    public static List<String> split(Object source, String delimiter,
+                                     boolean trim) {
         return split(source, delimiter, trim, false);
     }
 
@@ -1295,8 +1311,9 @@ public class StringUtil {
      *
      * @return List of String tokens.
      */
-    public static List<String> split(Object source, String delimiter, boolean trim,
-                             boolean excludeZeroLength) {
+    public static List<String> split(Object source, String delimiter,
+                                     boolean trim,
+                                     boolean excludeZeroLength) {
         ArrayList<String> list = new ArrayList();
         if (source == null) {
             return list;
@@ -2001,24 +2018,31 @@ public class StringUtil {
      * @throws Exception some problem
      */
     public static void main(String[] args) throws Exception {
-        System.err.println("strip:" + stripAndReplace("'xxx'hello'xxx'how are 'xxx' you'xxx'","'","'","---"));
-        if(true) return;
+        System.err.println(
+            "strip:"
+            + stripAndReplace(
+                "'xxx'hello'xxx'how are 'xxx' you'xxx'", "'", "'", "---"));
+        if (true) {
+            return;
+        }
 
         String pattern = ".*[, =\\(]+metadata\\..*";
-        String where1 = " metadata.attr1='EART\nH SCIENCE >";
-        String where2 = " metadata.attr1='EARTH SCIENCE >";
+        String where1  = " metadata.attr1='EART\nH SCIENCE >";
+        String where2  = " metadata.attr1='EARTH SCIENCE >";
         where1 = where1.replace("\n", " ");
 
         System.err.println("Match:" + where1.matches(pattern));
         System.err.println("Match:" + where2.matches(pattern));
 
 
-        if(true) return;
+        if (true) {
+            return;
+        }
 
 
 
         String key = "the key";
-        for(int i=0;i<args.length;i++) {
+        for (int i = 0; i < args.length; i++) {
             System.err.println(calculateRFC2104HMAC(args[i], args[i]));
         }
 
@@ -2220,41 +2244,40 @@ public class StringUtil {
 
 
 
-private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
-    
+    /** sha algorithm to use */
+    private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
+
     /**
      * Computes RFC 2104-compliant HMAC signature.
-     * 
+     *
      * @param data
      *     The data to be signed.
      * @param key
      *     The signing key.
      * @return
      *     The base64-encoded RFC 2104-compliant HMAC signature.
-     * @throws
-     *     java.security.SignatureException when signature generation fails
+     * @throws java.security.SignatureException when signature generation fails
      */
     public static String calculateRFC2104HMAC(String data, String key)
-        throws java.security.SignatureException
-    {
+            throws java.security.SignatureException {
         String result;
         try {
             // get an hmac_sha1 key from the raw key bytes
-            SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), 
-                                                         HMAC_SHA1_ALGORITHM);
-            
+            SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(),
+                                           HMAC_SHA1_ALGORITHM);
+
             // get an hmac_sha1 Mac instance and initialize with the signing key
             Mac mac = Mac.getInstance(HMAC_SHA1_ALGORITHM);
             mac.init(signingKey);
-            
+
             // compute the hmac on input data bytes
             byte[] rawHmac = mac.doFinal(data.getBytes());
-            
+
             // base64-encode the hmac
             result = XmlUtil.encodeBase64(rawHmac);
-        } 
-        catch (Exception e) {
-            throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
+        } catch (Exception e) {
+            throw new SignatureException("Failed to generate HMAC : "
+                                         + e.getMessage());
         }
         return result;
     }
