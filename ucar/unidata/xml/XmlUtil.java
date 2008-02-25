@@ -1006,7 +1006,7 @@ public abstract class XmlUtil {
 
     /**
      *  Read in the xml contained in the given filename, parse it and return the
-     *  root Element.
+     *  root Element. If the filename cannot be found then return null
      *
      *  @param filename  The filename, url or resource path of the xml document.
      *  @param originClass Where to look for resources.
@@ -1015,7 +1015,9 @@ public abstract class XmlUtil {
      */
     public static Element getRoot(String filename, Class originClass)
             throws Exception {
-        return getDocument(filename, originClass).getDocumentElement();
+        Document doc = getDocument(filename, originClass);
+        if(doc == null) return null;
+        return doc.getDocumentElement();
     }
 
     /**
