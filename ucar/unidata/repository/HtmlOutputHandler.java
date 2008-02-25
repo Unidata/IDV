@@ -621,14 +621,12 @@ public class HtmlOutputHandler extends OutputHandler {
                      + ARG_SHOWMETADATA + "=" + (showMetadata
                 ? "false"
                 : "true");
-        String link = HtmlUtil.href(url, (showMetadata
+        String link = subHeaderLink(url, (showMetadata
                                           ? "-&nbsp; " + msg("Details")
                                           : "+&nbsp; "
-                                            + msg("Details")), " class=\"subheaderlink\" ");
+                                          + msg("Details")));
 
-        //        sb.append("<tr><td colspan=\"2\">");
-        sb.append(HtmlUtil.div(link, " class=\"subheader\""));
-        //        sb.append("</td>\n");
+        sb.append(subHeader(link));
         sb.append("<table cellspacing=\"5\">\n");
         List<MetadataHandler> metadataHandlers =
             getMetadataManager().getMetadataHandlers();

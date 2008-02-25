@@ -98,6 +98,9 @@ import javax.swing.*;
  */
 public class MetadataManager extends RepositoryManager {
 
+    private static final String SUFFIX_SELECT = ".select.";
+
+
     /** _more_ */
     private Object MUTEX_METADATA = new Object();
 
@@ -287,8 +290,8 @@ public class MetadataManager extends RepositoryManager {
                                            node }));
                 }
             } catch (Exception exc) {
-                System.err.println("Error loading metadata handler file:"
-                                   + file);
+                getRepository().log("Error loading metadata handler file:"
+                                    + file,exc);
                 throw exc;
             }
 
@@ -332,7 +335,7 @@ public class MetadataManager extends RepositoryManager {
                 for (Enumeration keys =
                         args.keys(); keys.hasMoreElements(); ) {
                     String arg = (String) keys.nextElement();
-                    if ( !arg.startsWith(ARG_METADATA_ID + ".select.")) {
+                    if ( !arg.startsWith(ARG_METADATA_ID + SUFFIX_SELECT)) {
                         continue;
                     }
                     String id = request.getString(arg, BLANK);
@@ -384,7 +387,7 @@ public class MetadataManager extends RepositoryManager {
             sb.append(HtmlUtil.submit(msg("Change")));
             sb.append(HtmlUtil.space(2));
             sb.append(HtmlUtil.submit(msg("Delete selected"), ARG_DELETE));
-            sb.append("<table cellpadding=\"5\">");
+            sb.append(HtmlUtil.formTable());
             for (Metadata metadata : metadataList) {
                 MetadataHandler metadataHandler =
                     findMetadataHandler(metadata);
@@ -396,12 +399,12 @@ public class MetadataManager extends RepositoryManager {
                 if (html == null) {
                     continue;
                 }
-                String cbx = HtmlUtil.checkbox(ARG_METADATA_ID + ".select."
+                String cbx = HtmlUtil.checkbox(ARG_METADATA_ID + SUFFIX_SELECT
                                  + metadata.getId(), metadata.getId(), false);
                 sb.append(HtmlUtil.rowTop(HtmlUtil.cols(cbx + html[0],
                         html[1])));
             }
-            sb.append("</table>");
+            sb.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.submit(msg("Change")));
             sb.append(HtmlUtil.space(2));
             sb.append(HtmlUtil.submit(msg("Delete Selected"), ARG_DELETE));
@@ -484,8 +487,6 @@ public class MetadataManager extends RepositoryManager {
             for (MetadataHandler handler : metadataHandlers) {
                 handler.handleAddSubmit(request, entry, newMetadata);
             }
-
-            System.err.println("new:" + newMetadata);
 
             for (Metadata metadata : newMetadata) {
                 insertMetadata(metadata);

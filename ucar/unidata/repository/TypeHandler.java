@@ -1007,15 +1007,11 @@ public class TypeHandler extends RepositoryManager {
         request.put(ARG_FORM_ADVANCED, ( !advancedForm) + "");
         String urlArgs = request.getUrlArgs();
         request.put(ARG_FORM_ADVANCED, advancedForm + "");
-        String link = HtmlUtil.href(getRepository().URL_ENTRY_SEARCHFORM
+        String link = subHeaderLink(getRepository().URL_ENTRY_SEARCHFORM
                                     + "?" + urlArgs, (advancedForm
-                ? "- " + msg("Advanced")
-                : "+ " + msg("Advanced")), " class=\"subheaderlink\" ");
-        formBuffer.append("<tr><td colspan=2>");
-        formBuffer.append(HtmlUtil.div(link, " class=\"subheader\""));
-        formBuffer.append("</td></tr>");
-
-
+                                                      ? "- " + msg("Advanced")
+                                                      : "+ " + msg("Advanced")));
+        formBuffer.append(tableSubHeader(link));
 
 
         if (advancedForm || request.defined(ARG_GROUP)) {

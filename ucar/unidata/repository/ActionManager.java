@@ -97,38 +97,37 @@ public class ActionManager extends RepositoryManager {
         ActionInfo   action = getAction(id);
         StringBuffer sb     = new StringBuffer();
         if (action == null) {
-            sb.append("No action found");
-            return new Result("Status", sb);
+            sb.append(msg("No action found"));
+            return new Result(msg("Status"), sb);
         }
 
-        sb.append("<h3>Action: " + action.getName() + "</h3>");
+        sb.append(msgHeader("Action: " + action.getName()));
         if (request.exists(ARG_CANCEL)) {
             action.setRunning(false);
             actions.remove(id);
-            sb.append("Action canceled");
+            sb.append(msg("Action canceled"));
         } else {
             if (action.getError() != null) {
-                sb.append("Error<p>");
-                sb.append(action.getError());
+                sb.append(getRepository().error(msg("Error") +"<p>"+action.getError()));
                 actions.remove(id);
             } else if ( !action.getRunning()) {
-                sb.append("Completed<p>");
+                sb.append(getRepository().note(msg("Completed")));
                 sb.append(action.getContinueHtml());
                 actions.remove(id);
             } else {
-                sb.append("In progress<br>");
+                sb.append(getRepository().note(msg("In progress")));
                 sb.append(HtmlUtil.href(HtmlUtil.url(URL_STATUS,
-                        ARG_ACTION_ID, id), "Reload"));
+                                                     ARG_ACTION_ID, id), msg("Reload")));
                 sb.append("<p>");
                 sb.append(action.getMessage());
                 sb.append("<p>");
                 sb.append(HtmlUtil.form(URL_STATUS));
-                sb.append(HtmlUtil.submit("Cancel Action", ARG_CANCEL));
+                sb.append(HtmlUtil.submit(msg("Cancel Action"), ARG_CANCEL));
                 sb.append(HtmlUtil.hidden(ARG_ACTION_ID, id));
                 sb.append(HtmlUtil.formClose());
             }
         }
-        return new Result("Status", sb);
+        return new Result(msg("Status"), sb);
     }
 
 

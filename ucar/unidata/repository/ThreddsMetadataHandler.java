@@ -75,10 +75,10 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
     /** _more_ */
     public static final Metadata.Type TYPE_CREATOR =
-        new Metadata.Type("creator");
+        new Metadata.Type("creator","Creator");
 
     /** _more_ */
-    public static final Metadata.Type TYPE_LINK = new Metadata.Type("link");
+    public static final Metadata.Type TYPE_LINK = new Metadata.Type("link","Link");
 
     /** _more_ */
     public static final Metadata.Type TYPE_DATAFORMAT =
@@ -90,51 +90,38 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
     /** _more_ */
     public static final Metadata.Type TYPE_AUTHORITY =
-        new Metadata.Type("authority");
-
-    /** _more_ */
-    public static final Metadata.Type TYPE_VARIABLE =
-        new Metadata.Type("variable");
-
-    /** _more_ */
-    public static final Metadata.Type TYPE_VOCABULARY =
-        new Metadata.Type("vocabulary");
+        new Metadata.Type("authority","Authority");
 
     /** _more_ */
     public static final Metadata.Type TYPE_VARIABLES =
-        new Metadata.Type("variables");
+        new Metadata.Type("variables","Variables");
 
     /** _more_ */
     public static final Metadata.Type TYPE_PUBLISHER =
-        new Metadata.Type("publisher");
-
-    /** _more_ */
-    public static final Metadata.Type TYPE_PARAMETERS =
-        new Metadata.Type("parameters");
+        new Metadata.Type("publisher","Publisher");
 
     /** _more_ */
     public static final Metadata.Type TYPE_PROJECT =
-        new Metadata.Type("project");
+        new Metadata.Type("project","Project");
 
     /** _more_ */
     public static final Metadata.Type TYPE_KEYWORD =
-        new Metadata.Type("keyword");
+        new Metadata.Type("keyword","Keyword");
 
     /** _more_ */
     public static final Metadata.Type TYPE_CONTRIBUTOR =
-        new Metadata.Type("contributor");
+        new Metadata.Type("contributor","Contributor");
 
     /** _more_ */
     public static final Metadata.Type TYPE_PROPERTY =
-        new Metadata.Type("property");
+        new Metadata.Type("property","Property");
 
     /** _more_ */
     public static final Metadata.Type TYPE_DOCUMENTATION =
-        new Metadata.Type("documentation");
+        new Metadata.Type("documentation","Documentation");
 
     /** _more_ */
-    public static final Metadata.Type TYPE_ICON = new Metadata.Type("icon");
-
+    public static final Metadata.Type TYPE_ICON = new Metadata.Type("icon","Icon");
 
 
     /**
@@ -159,7 +146,6 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         addType(TYPE_AUTHORITY);
         addType(TYPE_DATATYPE);
         addType(TYPE_DATAFORMAT);
-        addType(TYPE_VOCABULARY);
         addType(TYPE_VARIABLES);
     }
 
@@ -550,11 +536,6 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                    || isTag(tag, TYPE_DATAFORMAT)) {
             String text = XmlUtil.getChildText(child).trim();
             text = text.replace("\n", "");
-            return new Metadata(getRepository().getGUID(), "", getType(tag),
-                                text, "", "", "");
-        } else if (isTag(tag, TYPE_VOCABULARY)
-                   || isTag(tag, TYPE_VARIABLES)) {
-            String text = XmlUtil.toString(child, false);
             return new Metadata(getRepository().getGUID(), "", getType(tag),
                                 text, "", "", "");
         } else if (isTag(tag, TYPE_PROPERTY)) {

@@ -116,7 +116,8 @@ public class Admin extends RepositoryManager {
         URL_ADMIN_SETTINGS, getUserManager().URL_USER_LIST, URL_ADMIN_STATS,
         URL_ADMIN_HARVESTERS,
         /*URL_ADMIN_STARTSTOP,*/
-        URL_ADMIN_TABLES, URL_ADMIN_SQL, URL_ADMIN_CLEANUP
+        /*URL_ADMIN_TABLES, */
+        URL_ADMIN_SQL, URL_ADMIN_CLEANUP
     };
 
 
@@ -527,7 +528,7 @@ public class Admin extends RepositoryManager {
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.form(URL_ADMIN_SETTINGS_DO));
         String size = " size=\"40\" ";
-        sb.append(HtmlUtil.formTableHeader(msg("Display")));
+        sb.append(tableSubHeader(msg("Display")));
         sb.append(HtmlUtil.formEntry(msgLabel("Title"),
                                      HtmlUtil.input(PROP_REPOSITORY_NAME,
                                          getProperty(PROP_REPOSITORY_NAME,
@@ -537,7 +538,7 @@ public class Admin extends RepositoryManager {
                                             getProperty(PROP_HTML_FOOTER,
                                                 ""), 5, 40)));
 
-        sb.append(HtmlUtil.formTableHeader(msg("Access")));
+        sb.append(tableSubHeader(msg("Access")));
         sb.append(HtmlUtil.formEntry("",
                                      HtmlUtil.checkbox(PROP_ACCESS_ADMINONLY,
                                          "true",
@@ -563,7 +564,7 @@ public class Admin extends RepositoryManager {
 
         String extra = handlerSB.toString();
         if (extra.length() > 0) {
-            sb.append(HtmlUtil.formTableHeader(msg("Output")));
+            sb.append(tableSubHeader(msg("Output")));
             sb.append(extra);
         }
 
@@ -697,8 +698,8 @@ public class Admin extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
         sb.append(msgHeader("Repository Statistics"));
         sb.append("<table>\n");
-        String[] names  = { msg("Users"), msg("Associations") };
-        String[] tables = { TABLE_USERS, TABLE_ASSOCIATIONS };
+        String[] names  = { msg("Users"), msg("Associations"),msg("Metadata Items") };
+        String[] tables = { TABLE_USERS, TABLE_ASSOCIATIONS, TABLE_METADATA };
         for (int i = 0; i < tables.length; i++) {
             sb.append(HtmlUtil.row(HtmlUtil.cols(""
                     + getRepository().getCount(tables[i].toLowerCase(),
@@ -706,8 +707,7 @@ public class Admin extends RepositoryManager {
         }
 
 
-        sb.append(HtmlUtil.row("<td colspan=\"2\">&nbsp;<p>"
-                               + HtmlUtil.bold(msgLabel("Types")) + "</td>"));
+        sb.append(HtmlUtil.row(HtmlUtil.colspan(HtmlUtil.bold(msgLabel("Types")),2)));
         int total = 0;
         sb.append(
             HtmlUtil.row(
@@ -751,12 +751,16 @@ public class Admin extends RepositoryManager {
                            (String) null);
         StringBuffer sb = new StringBuffer();
         sb.append(msgHeader("SQL"));
+        sb.append(HtmlUtil.p());
+        sb.append(HtmlUtil.href(URL_ADMIN_TABLES,msg("View Schema")));
+        sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.form(URL_ADMIN_SQL));
         sb.append(HtmlUtil.submit(msg("Execute")));
+        sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.textArea(ARG_QUERY, (query == null)
-                ? ""
+                ? BLANK
                 : query, 10, 100));
-        sb.append("</form>\n");
+        sb.append(HtmlUtil.formClose());
         sb.append("<table>");
         if (query == null) {
             return makeResult(request, msg("SQL"), sb);

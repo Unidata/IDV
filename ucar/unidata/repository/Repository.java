@@ -520,7 +520,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected static String header(String h) {
-        return "<div class=\"heading\">" + h + "</div>";
+        return "<div class=\"pageheading\">" + h + "</div>";
     }
 
 
@@ -2413,13 +2413,11 @@ public class Repository implements Constants, Tables, RequestHandler,
         request.put(ARG_FORM_METADATA, ( !metadataForm) + BLANK);
         String urlArgs = request.getUrlArgs();
         request.put(ARG_FORM_METADATA, metadataForm + BLANK);
-        String link = HtmlUtil.href(getRepository().URL_ENTRY_SEARCHFORM
-                                    + "?" + urlArgs, (metadataForm
-                ? "- " + msg("Metadata")
-                : "+ " + msg("Metadata")), " class=\"subheaderlink\" ");
-        sb.append("<tr><td colspan=2>");
-        sb.append(HtmlUtil.div(link, " class=\"subheader\""));
-        sb.append("</td></tr>");
+        String link = RepositoryManager.subHeaderLink(getRepository().URL_ENTRY_SEARCHFORM
+                                                      + "?" + urlArgs, (metadataForm
+                                                                        ? "- " + msg("Metadata")
+                                                                        : "+ " + msg("Metadata")));
+        sb.append(RepositoryManager.tableSubHeader(link));
         if (metadataForm) {
             getMetadataManager().addToSearchForm(request, sb);
         }
@@ -3312,7 +3310,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected static String msgHeader(String h) {
-        return HtmlUtil.div(msg(h), "class=\"heading\"");
+        return HtmlUtil.div(msg(h), "class=\"pageheading\"");
     }
 
     /**
@@ -3683,7 +3681,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             String groupName = request.getString(ARG_GROUP, (String) null);
             if (groupName == null) {
                 throw new IllegalArgumentException(
-                    "Must specify a parent group");
+                    "You must specify a parent group");
             }
             Group parentGroup = findGroupFromName(groupName,
                                     request.getUser(), true);
@@ -3721,7 +3719,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                     name = IOUtil.getFileTail(origName);
                 }
                 if (name.trim().length() == 0) {
-                    throw new IllegalArgumentException("Must specify a name");
+                    throw new IllegalArgumentException("You must specify a name");  
                 }
 
                 if (typeHandler.isType(TypeHandler.TYPE_GROUP)) {
@@ -3735,8 +3733,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                     Group  existing = findGroupFromName(tmp);
                     if (existing != null) {
                         throw new IllegalArgumentException(
-                            "A group with the name: '" + tmp
-                            + "' already exists");
+                                                           "A group with the given name already exists");
 
                     }
                 }
@@ -3757,9 +3754,9 @@ public class Repository implements Constants, Tables, RequestHandler,
                             break;
                         }
                     }
-                    System.err.println("format:" + format);
-                    System.err.println("orignName:" + origName);
-                    System.err.println("pattern:" + pattern);
+                    //                    System.err.println("format:" + format);
+                    //                    System.err.println("orignName:" + origName);
+                    //                    System.err.println("pattern:" + pattern);
 
 
                     if (pattern != null) {
@@ -3772,9 +3769,9 @@ public class Repository implements Constants, Tables, RequestHandler,
                             Date dttm = sdf.parse(dateString);
                             theDateRange[0] = dttm;
                             theDateRange[1] = dttm;
-                            System.err.println("got it");
+                            //                            System.err.println("got it");
                         } else {
-                            System.err.println("not found");
+                            //                            System.err.println("not found");
                         }
                     }
                 }
@@ -3810,7 +3807,8 @@ public class Repository implements Constants, Tables, RequestHandler,
                 if ((existing != null)
                         && !existing.getId().equals(entry.getId())) {
                     throw new IllegalArgumentException(
-                        "A group with the name:" + tmp + " already exists");
+                                                       "A group with the given name already exists");
+
 
                 }
             }
@@ -3847,7 +3845,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                                            entry.getParentGroupId(),
                                            ARG_MESSAGE,
                                            entries.size()
-                                           + " files uploaded"));
+                                           + HtmlUtil.pad(msg("files uploaded"))));
         } else {
             return new Result(BLANK,
                               new StringBuffer(msg("No entries created")));

@@ -18,9 +18,12 @@ td {
     margin:10;
 }
 
-form {
+xform {
     margin:10;
 }
+
+
+
 
 
 
@@ -42,25 +45,35 @@ a:hover {
 A {xtext-decoration: none}
 
 
-
-.heading {
-  font-size: 16pt;
-  font-weight: bold;
-}
-
-
-.tableheading {
-   padding-left: 5px;
-   padding-top: 5px;
-   font-weight: bold;
-   background-color:#cccccc;
-}
-
-
 .header {
    background-color:#006699;
 }
 
+
+.pageheading {
+  font-size: 16pt;
+  font-weight: bold;
+  color: #9C9C9C;
+}
+
+
+
+
+.pagesubheading {
+   padding-left: 5px;
+   padding-top: 5px;
+   font-weight: bold;
+   background-color: #9C9C9C;
+   xbackground-color:#cccccc;
+}
+
+
+.pagesubheadinglink {
+	color:white;
+        font-size: 10pt;
+        font-weight: bold;
+        text-decoration: none;
+}
 
 
 
@@ -83,18 +96,8 @@ a.navlink {
 
 
 
-.subheader {
-   background-color : #aabbaa;
-   padding-left:5;
-   padding-bottom:2;
-}
 
-.subheaderlink {
-	color:white;
-        font-size: 10pt;
-        font-weight: bold;
-        text-decoration: none;
-}
+
 
 .navnolink {
   font-size: 12pt;
@@ -113,7 +116,7 @@ a.navlink {
    padding-bottom:0px;
    padding:5px;
    padding-left:5px;
-   padding-right:5px;
+   padding-right:10px;
    border : 1px black solid;
    background-color : #FFFFCC;
 }

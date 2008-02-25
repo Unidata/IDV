@@ -69,7 +69,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
     private Metadata.Type TYPE_ENUM;
 
     /** _more_ */
-    private List values;
+    private List predefinedValues;
 
 
 
@@ -86,7 +86,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
         if (XmlUtil.hasAttribute(node, ATTR_FILE)) {
             String tagValues = IOUtil.readContents(XmlUtil.getAttribute(node,
                                    ATTR_FILE), getClass());
-            values = StringUtil.split(tagValues, "\n", true, true);
+            predefinedValues = StringUtil.split(tagValues, "\n", true, true);
         }
 
         TYPE_ENUM = new Metadata.Type(XmlUtil.getAttribute(node, ATTR_TYPE),
@@ -215,8 +215,8 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
      * @throws Exception _more_
      */
     private List getValues(Request request) throws Exception {
-        if (values != null) {
-            return values;
+        if (predefinedValues != null) {
+            return predefinedValues;
         }
         String[] values = getMetadataManager().getDistinctValues(request,
                               this, TYPE_ENUM);
@@ -253,18 +253,38 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
         if (forEdit) {
             submit = "";
         }
-        String arg1 = ARG_ATTR1 + suffix;
-        String content;
-        if (values != null) {
-            content = formEntry(new String[] { submit, lbl,
-                    HtmlUtil.select(arg1, getValues(request),
-                                    metadata.getAttr1()) });
-        } else {
-            content = formEntry(new String[] { submit, lbl,
-                    HtmlUtil.input(arg1, metadata.getAttr1(),
-                                   HtmlUtil.SIZE_40) });
+        String cancel = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
+        if (forEdit) {
+            submit = "";
+            cancel = "";
         }
 
+        String arg1 = ARG_ATTR1 + suffix;
+        String content;
+        if (predefinedValues != null) {
+            content = HtmlUtil.formEntry(submit, 
+                                         HtmlUtil.select(arg1, predefinedValues,
+                                                         metadata.getAttr1(),100));
+        } else {
+            List values = getValues(request);
+            if(values!=null)  {
+                values.add(0, new TwoFacedObject("",""));
+                content = formEntry(new String[] { submit, lbl,
+                                                   HtmlUtil.input(arg1, metadata.getAttr1(),
+                                                                  HtmlUtil.SIZE_40),
+                                                   msgLabel("Or Use"),
+                                                   HtmlUtil.select(arg1+".select", values)
+                    });
+            } else {
+                content = HtmlUtil.formEntry(submit,
+                                             HtmlUtil.input(arg1, metadata.getAttr1(),
+                                                            HtmlUtil.SIZE_40));
+            }
+        }
+
+        if(!forEdit) {
+            content = content+HtmlUtil.colspan(cancel,2);
+        }
         String argtype = ARG_TYPE + suffix;
         String argid   = ARG_METADATAID + suffix;
         content = content + HtmlUtil.hidden(argtype, type.getType())

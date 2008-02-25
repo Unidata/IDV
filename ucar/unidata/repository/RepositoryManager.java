@@ -155,6 +155,21 @@ public class RepositoryManager implements RepositorySource, Constants,
         return Repository.msgHeader(h);
     }
 
+
+    public static String tableSubHeader(String s) {
+        return HtmlUtil.row(HtmlUtil.colspan(subHeader(s),2));
+    }
+
+    public static String subHeader(String s) {
+        return HtmlUtil.div(s, " class=\"pagesubheading\" ");
+    }
+
+    public static String subHeaderLink(Object url, String label) {
+        return  HtmlUtil.href(url, label,  " class=\"pagesubheadinglink\" ");
+    }
+
+
+
     /**
      * _more_
      *
