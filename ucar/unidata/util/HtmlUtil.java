@@ -42,25 +42,25 @@ import java.util.List;
 
 public class HtmlUtil {
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_10 = "  size=\"10\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_20 = "  size=\"20\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_30 = "  size=\"30\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_40 = "  size=\"40\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_50 = "  size=\"50\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_60 = "  size=\"60\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_70 = "  size=\"70\" ";
 
 
@@ -105,8 +105,51 @@ public class HtmlUtil {
      *
      * @return _more_
      */
+    public static String hr() {
+        return "<hr>";
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public static String p() {
         return "<p>";
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    public static String pad(String s) {
+        return space(1) + s + space(1);
+    }
+
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    public static String padLeft(String s) {
+        return space(1) + s;
+    }
+
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    public static String padRight(String s) {
+        return s + space(1);
     }
 
 
@@ -825,17 +868,6 @@ public class HtmlUtil {
         return sb.toString();
     }
 
-    /**
-     * _more_
-     *
-     * @param s _more_
-     *
-     * @return _more_
-     */
-    public static String formTableHeader(String s) {
-        return "<tr><td colspan=\"2\"><div  class=\"tableheading\">" + s
-               + "</div></td></tr>";
-    }
 
     /**
      * _more_
