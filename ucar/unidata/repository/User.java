@@ -379,7 +379,7 @@ public class User {
         if (role.equals(UserManager.ROLE_ANY)) {
             return true;
         }
-        if (role.equals("user:" + getName())) {
+        if (role.equals("user:" + getId())) {
             return true;
         }
         if (roles == null) {
