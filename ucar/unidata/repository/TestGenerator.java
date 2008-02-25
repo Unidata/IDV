@@ -101,7 +101,7 @@ public class TestGenerator extends Harvester {
 
 
 
-    /** _more_          */
+    /** _more_ */
     int cnt = 0;
 
 

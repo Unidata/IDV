@@ -101,7 +101,7 @@ public class Metadata implements Constants, Tables {
     /** _more_ */
     private String attr4;
 
-    /** _more_          */
+    /** _more_ */
     private boolean inherited = false;
 
     /**
@@ -147,8 +147,6 @@ public class Metadata implements Constants, Tables {
      * @param id _more_
      * @param entryId _more_
      * @param type _more_
-     * @param name _more_
-     * @param content _more_
      * @param attr1 _more_
      * @param attr2 _more_
      * @param attr3 _more_
@@ -343,7 +341,7 @@ public class Metadata implements Constants, Tables {
      * @return _more_
      */
     public String toString() {
-        return type + " " + attr1;
+        return "entry:" + entryId + " type:" + type + " attr1:" + attr1;
     }
 
 

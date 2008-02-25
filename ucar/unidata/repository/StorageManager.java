@@ -131,13 +131,14 @@ public class StorageManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @throws Exception _more_
      */
     protected void init() {
-        repositoryDir = getRepository().getProperty(PROP_REPOSITORY_HOME,(String)null);
-        if(repositoryDir == null) {
-            repositoryDir = IOUtil.joinDir(Misc.getSystemProperty("user.home",
-                                                                  "."), IOUtil.joinDir(".unidata", "repository"));
+        repositoryDir = getRepository().getProperty(PROP_REPOSITORY_HOME,
+                (String) null);
+        if (repositoryDir == null) {
+            repositoryDir =
+                IOUtil.joinDir(Misc.getSystemProperty("user.home", "."),
+                               IOUtil.joinDir(".unidata", "repository"));
         }
         IOUtil.makeDirRecursive(new File(repositoryDir));
 
@@ -175,6 +176,11 @@ public class StorageManager extends RepositoryManager {
         return path;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getSystemResourcePath() {
         return "/ucar/unidata/repository/resources";
     }

@@ -136,13 +136,9 @@ public class MetadataManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param args _more_
-     * @param hostname _more_
-     * @param port _more_
      *
      * @param repository _more_
      *
-     * @throws Exception _more_
      */
     public MetadataManager(Repository repository) {
         super(repository);
@@ -178,7 +174,6 @@ public class MetadataManager extends RepositoryManager {
                                    entry.getId())), " order by "
                                        + COL_METADATA_TYPE);
 
-        System.err.println("query:" + query);
         SqlUtil.Iterator iter =
             SqlUtil.getIterator(getDatabaseManager().execute(query));
         ResultSet results;
@@ -257,7 +252,6 @@ public class MetadataManager extends RepositoryManager {
         if (dfltMetadataHandler == null) {
             dfltMetadataHandler = new MetadataHandler(getRepository(), null);
         }
-        System.err.println("type:" + type);
         return dfltMetadataHandler;
     }
 
@@ -273,7 +267,11 @@ public class MetadataManager extends RepositoryManager {
             throws Exception {
         for (String file : metadataDefFiles) {
             try {
+                file = getStorageManager().localizePath(file);
                 Element root = XmlUtil.getRoot(file, getClass());
+                if (root == null) {
+                    continue;
+                }
                 List children = XmlUtil.findChildren(root,
                                     TAG_METADATAHANDLER);
                 for (int i = 0; i < children.size(); i++) {
@@ -337,7 +335,7 @@ public class MetadataManager extends RepositoryManager {
                     if ( !arg.startsWith(ARG_METADATA_ID + ".select.")) {
                         continue;
                     }
-                    String id = request.getString(arg, "");
+                    String id = request.getString(arg, BLANK);
                     getDatabaseManager().executeDelete(TABLE_METADATA,
                             COL_METADATA_ID, SqlUtil.quote(id));
                 }
@@ -378,7 +376,8 @@ public class MetadataManager extends RepositoryManager {
         List<Metadata> metadataList = getMetadata(entry);
         sb.append(HtmlUtil.p());
         if (metadataList.size() == 0) {
-            sb.append(getRepository().warning(msg("No metadata defined")));
+            sb.append(
+                getRepository().note(msg("No metadata defined for entry")));
         } else {
             sb.append(HtmlUtil.formPost(URL_METADATA_CHANGE));
             sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
@@ -403,14 +402,14 @@ public class MetadataManager extends RepositoryManager {
                         html[1])));
             }
             sb.append("</table>");
-            sb.append(HtmlUtil.submit("Change"));
+            sb.append(HtmlUtil.submit(msg("Change")));
             sb.append(HtmlUtil.space(2));
-            sb.append(HtmlUtil.submit("Delete Selected", ARG_DELETE));
+            sb.append(HtmlUtil.submit(msg("Delete Selected"), ARG_DELETE));
             sb.append(HtmlUtil.formClose());
         }
 
         return getRepository().makeEntryEditResult(request, entry,
-                "Edit Metadata", sb);
+                msg("Edit Metadata"), sb);
 
     }
 
@@ -429,32 +428,36 @@ public class MetadataManager extends RepositoryManager {
         StringBuffer sb    = new StringBuffer();
         Entry        entry = getRepository().getEntry(request);
         sb.append(getRepository().makeEntryHeader(request, entry));
-        if(!request.exists(ARG_TYPE)) {
+        if ( !request.exists(ARG_TYPE)) {
             for (MetadataHandler handler : metadataHandlers) {
                 for (Metadata.Type type : handler.getTypes()) {
-                    sb.append(HtmlUtil.form(getMetadataManager().URL_METADATA_ADDFORM));
+                    sb.append(
+                        HtmlUtil.form(
+                            getMetadataManager().URL_METADATA_ADDFORM));
                     sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
                     sb.append(HtmlUtil.hidden(ARG_TYPE, type.getType()));
                     sb.append(HtmlUtil.submit(msg("Add")));
-                    sb.append(HtmlUtil.space(1) +HtmlUtil.bold(type.getLabel()));
+                    sb.append(HtmlUtil.space(1)
+                              + HtmlUtil.bold(type.getLabel()));
                     sb.append(HtmlUtil.formClose());
                     sb.append(HtmlUtil.p());
-                    sb.append("\n");
+                    sb.append(NEWLINE);
                 }
             }
         } else {
-            String type = request.getString(ARG_TYPE,"");
+            String type = request.getString(ARG_TYPE, BLANK);
             sb.append(HtmlUtil.formTable());
             for (MetadataHandler handler : metadataHandlers) {
-                if(handler.canHandle(type)) {
-                    handler.makeAddForm(request, entry, handler.findType(type), sb);
+                if (handler.canHandle(type)) {
+                    handler.makeAddForm(request, entry,
+                                        handler.findType(type), sb);
                     break;
                 }
             }
             sb.append(HtmlUtil.formTableClose());
         }
         return getRepository().makeEntryEditResult(request, entry,
-                                                   msg("Add Metadata"), sb);
+                msg("Add Metadata"), sb);
     }
 
 
@@ -472,20 +475,22 @@ public class MetadataManager extends RepositoryManager {
      */
     public Result processMetadataAdd(Request request) throws Exception {
         synchronized (MUTEX_METADATA) {
-            Entry          entry       = getRepository().getEntry(request);
-            if(request.exists(ARG_CANCEL)) {
+            Entry entry = getRepository().getEntry(request);
+            if (request.exists(ARG_CANCEL)) {
                 return new Result(HtmlUtil.url(URL_METADATA_ADDFORM, ARG_ID,
-                                               entry.getId()));
+                        entry.getId()));
             }
             List<Metadata> newMetadata = new ArrayList<Metadata>();
             for (MetadataHandler handler : metadataHandlers) {
                 handler.handleAddSubmit(request, entry, newMetadata);
             }
 
+            System.err.println("new:" + newMetadata);
+
             for (Metadata metadata : newMetadata) {
                 insertMetadata(metadata);
             }
-
+            entry.setMetadata(null);
 
 
             return new Result(HtmlUtil.url(URL_METADATA_FORM, ARG_ID,

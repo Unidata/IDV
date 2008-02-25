@@ -49,7 +49,7 @@ java -jar repository.jar -Djdms.db=postgres
 If you have the repositorylib.jar file and the source tree  in your class path and want to run from the .class 
 files in your source tree just do:
 
-java    ucar.unidata.repository.MetaDataServer
+java    ucar.unidata.repository.RepositoryServer
 
 
 

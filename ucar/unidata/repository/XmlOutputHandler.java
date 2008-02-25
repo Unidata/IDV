@@ -216,18 +216,7 @@ public class XmlOutputHandler extends OutputHandler {
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param tags _more_
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
+
     /*
     protected Result listTags(Request request, List<Tag> tags)
             throws Exception {

@@ -450,8 +450,15 @@ public class Request implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
     public String getString(String key) {
-        return getString(key,"");
+        return getString(key, "");
     }
 
     /**

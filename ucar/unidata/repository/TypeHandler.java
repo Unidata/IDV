@@ -458,7 +458,6 @@ public class TypeHandler extends RepositoryManager {
      * @param request _more_
      * @param links _more_
      *
-     * @return _more_
      *
      * @throws Exception _more_
      */
@@ -482,7 +481,7 @@ public class TypeHandler extends RepositoryManager {
                     HtmlUtil.url(
                         getRepository().URL_ENTRY_FORM, ARG_ID,
                         entry.getId()), getRepository().fileUrl(ICON_EDIT),
-                    msg("Edit Entry")));
+                                        msg("Edit Entry")));
         }
 
     }
@@ -580,11 +579,10 @@ public class TypeHandler extends RepositoryManager {
             if ((desc != null) && (desc.length() > 0)) {
                 sb.append(HtmlUtil.formEntry(msgLabel("Description"), desc));
             }
-            sb.append(
-                HtmlUtil.formEntry(
-                    msgLabel("Created by"),
-                    entry.getUser().getLabel() + " @ "
-                    + getRepository().fmt(entry.getCreateDate())));
+            sb.append(HtmlUtil.formEntry(msgLabel("Created by"),
+                                         entry.getUser().getLabel() + " @ "
+                                         + formatDate(request,
+                                             entry.getCreateDate())));
 
             String resourceLink = entry.getResource().getPath();
             if (resourceLink.length() > 0) {
@@ -592,7 +590,8 @@ public class TypeHandler extends RepositoryManager {
                     resourceLink = "<a href=\"" + resourceLink + "\">"
                                    + resourceLink + "</a>";
                 }
-                sb.append(HtmlUtil.formEntry(msgLabel("Resource"), resourceLink));
+                sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
+                                             resourceLink));
 
                 if (entry.isFile()) {
                     sb.append(HtmlUtil.formEntry(msgLabel("Size"),
@@ -605,12 +604,12 @@ public class TypeHandler extends RepositoryManager {
                     || (entry.getCreateDate() != entry.getEndDate())) {
                 if (entry.getEndDate() != entry.getStartDate()) {
                     sb.append(HtmlUtil.formEntry(msgLabel("Date Range"),
-                            getRepository().fmt(entry.getStartDate())
+                            formatDate(request, entry.getStartDate())
                             + " -- "
-                            + getRepository().fmt(entry.getEndDate())));
+                            + formatDate(request, entry.getEndDate())));
                 } else {
                     sb.append(HtmlUtil.formEntry(msgLabel("Date"),
-                            getRepository().fmt(entry.getStartDate())));
+                            formatDate(request, entry.getStartDate())));
                 }
             }
             String typeDesc = entry.getTypeHandler().getDescription();
@@ -692,7 +691,8 @@ public class TypeHandler extends RepositoryManager {
      */
     public Result processList(Request request, String what) throws Exception {
         return new Result("Error",
-                          new StringBuffer(msgLabel("Unknown listing type") + what));
+                          new StringBuffer(msgLabel("Unknown listing type")
+                                           + what));
     }
 
     /**
@@ -878,7 +878,6 @@ public class TypeHandler extends RepositoryManager {
      * @param formBuffer _more_
      * @param request _more_
      * @param where _more_
-     * @param simpleForm _more_
      * @param advancedForm _more_
      *
      * @throws Exception _more_
@@ -962,7 +961,8 @@ public class TypeHandler extends RepositoryManager {
                     typeSelect + HtmlUtil.space(1)
                     + HtmlUtil.submitImage(
                         getRepository().fileUrl(ICON_SEARCH), "submit_type",
-                        msg("Show search form with this type")) + HtmlUtil.space(
+                        msg(
+                        "Show search form with this type")) + HtmlUtil.space(
                             1) + groupCbx));
         } else if (typeHandlers.size() == 1) {
             formBuffer.append(HtmlUtil.hidden(ARG_TYPE,
@@ -978,7 +978,8 @@ public class TypeHandler extends RepositoryManager {
                                 + HtmlUtil.checkbox(ARG_SEARCHMETADATA,
                                     "true",
                                     request.get(ARG_SEARCHMETADATA,
-                                        false)) + " " + msg("Search metadata");
+                                        false)) + " "
+                                            + msg("Search metadata");
         if (name.trim().length() == 0) {
             formBuffer.append(HtmlUtil.formEntry(msgLabel("Text"),
                     HtmlUtil.input(ARG_NAME) + searchMetaData));
@@ -1008,7 +1009,7 @@ public class TypeHandler extends RepositoryManager {
         request.put(ARG_FORM_ADVANCED, advancedForm + "");
         String link = HtmlUtil.href(getRepository().URL_ENTRY_SEARCHFORM
                                     + "?" + urlArgs, (advancedForm
-                                                      ? "- " + msg("Advanced")
+                ? "- " + msg("Advanced")
                 : "+ " + msg("Advanced")), " class=\"subheaderlink\" ");
         formBuffer.append("<tr><td colspan=2>");
         formBuffer.append(HtmlUtil.div(link, " class=\"subheader\""));
@@ -1023,7 +1024,9 @@ public class TypeHandler extends RepositoryManager {
                                     + HtmlUtil.checkbox(ARG_GROUP_CHILDREN,
                                         "true",
                                         request.get(ARG_GROUP_CHILDREN,
-                                            false)) + " (" + msg("Search subgroups")+")";
+                                            false)) + " ("
+                                                + msg("Search subgroups")
+                                                + ")";
             if (groupArg.length() > 0) {
                 formBuffer.append(HtmlUtil.hidden(ARG_GROUP, groupArg));
                 Group group = getRepository().findGroup(groupArg);
@@ -1073,7 +1076,8 @@ public class TypeHandler extends RepositoryManager {
                                     "");
             areaWidget = "<table>" + HtmlUtil.cols(areaWidget) + "</table>";
             //            formBuffer.append(HtmlUtil.formEntry("Extent:", areaWidget+"\n"+HtmlUtil.img(getRepository().URL_GETMAP.toString(),"map"," name=\"map\"  xxxonmouseover = \"mouseMove()\"")));
-            formBuffer.append(HtmlUtil.formEntry(msgLabel("Extent"), areaWidget));
+            formBuffer.append(HtmlUtil.formEntry(msgLabel("Extent"),
+                    areaWidget));
             formBuffer.append("\n");
 
         }

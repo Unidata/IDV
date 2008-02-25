@@ -116,13 +116,8 @@ public class AccessManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param args _more_
-     * @param hostname _more_
-     * @param port _more_
-     *
      * @param repository _more_
      *
-     * @throws Exception _more_
      */
     public AccessManager(Repository repository) {
         super(repository);

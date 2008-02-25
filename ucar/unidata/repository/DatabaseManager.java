@@ -214,6 +214,7 @@ public class DatabaseManager extends RepositoryManager {
         String connectionURL =
             (String) getRepository().getProperty(PROP_DB_URL.replace("${db}",
                 db));
+        System.err.println(connectionURL);
         Misc.findClass(
             (String) getRepository().getProperty(
                 PROP_DB_DRIVER.replace("${db}", db)));

@@ -74,7 +74,7 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     public static final String ROLE_ANY = "any";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ROLE_NONE = "none";
 
 
@@ -103,11 +103,11 @@ public class UserManager extends RepositoryManager {
 
     /** _more_ */
     public RequestUrl URL_USER_LIST = new RequestUrl(this, "/user/list",
-                                                     "Users");
+                                          "Users");
 
     /** _more_ */
     public RequestUrl URL_USER_EDIT = new RequestUrl(this, "/user/edit",
-                                                     "Users");
+                                          "Users");
 
     /** _more_ */
     public RequestUrl URL_USER_NEW = new RequestUrl(this, "/user/new");
@@ -153,6 +153,7 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     public static final String ARG_USER_EMAIL = "user.email";
 
+    /** _more_ */
     public static final String ARG_USER_LANGUAGE = "user.language";
 
     /** _more_ */
@@ -256,7 +257,8 @@ public class UserManager extends RepositoryManager {
             String password = request.getString(ARG_AUTH_PASSWORD, "");
             user = findUser(userId, false);
             if (user == null) {
-                throw new IllegalArgumentException(msgLabel("Unknown user") + userId);
+                throw new IllegalArgumentException(msgLabel("Unknown user")
+                        + userId);
             }
             if ( !user.getPassword().equals(hashPassword(password))) {
                 throw new IllegalArgumentException(msg("Incorrect password"));
@@ -290,7 +292,7 @@ public class UserManager extends RepositoryManager {
                         if ( !user.getPassword().equals(
                                 hashPassword(toks[1]))) {
                             throw new Repository.AccessException(
-                                                                 msg("Incorrect password"));
+                                msg("Incorrect password"));
                         }
                     }
                     setUserSession(request, user);
@@ -426,7 +428,7 @@ public class UserManager extends RepositoryManager {
     public String makeLoginForm(Request request, String extra) {
         StringBuffer sb = new StringBuffer();
         sb.append(header(msg("Please login")));
-        String       id = request.getString(ARG_USER_ID, "");
+        String id = request.getString(ARG_USER_ID, "");
         sb.append(HtmlUtil.form(URL_USER_LOGIN));
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry(msgLabel("User"),
@@ -535,7 +537,8 @@ public class UserManager extends RepositoryManager {
                                           COL_USERS_ID)) {
             if ( !updateIfNeeded) {
                 throw new IllegalArgumentException(
-                    msgLabel("Database already contains user") + user.getId());
+                    msgLabel("Database already contains user")
+                    + user.getId());
             }
             String query = SqlUtil.makeUpdate(TABLE_USERS, COL_USERS_ID,
                                SqlUtil.quote(user.getId()), new String[] {
@@ -548,8 +551,7 @@ public class UserManager extends RepositoryManager {
                 SqlUtil.quote(user.getQuestion()),
                 SqlUtil.quote(user.getAnswer()), (user.getAdmin()
                         ? "1"
-                                                  : "0"),
-                SqlUtil.quote(user.getLanguage())
+                        : "0"), SqlUtil.quote(user.getLanguage())
             });
             getDatabaseManager().execute(query);
             return;
@@ -557,8 +559,8 @@ public class UserManager extends RepositoryManager {
 
         getDatabaseManager().executeInsert(INSERT_USERS, new Object[] {
             user.getId(), user.getName(), user.getEmail(), user.getQuestion(),
-            user.getAnswer(), user.getPassword(), new Boolean(user.getAdmin()),
-            user.getLanguage()
+            user.getAnswer(), user.getPassword(),
+            new Boolean(user.getAdmin()), user.getLanguage()
         });
     }
 
@@ -648,7 +650,8 @@ public class UserManager extends RepositoryManager {
             throws Exception {
         user.setName(request.getString(ARG_USER_NAME, user.getName()));
         user.setEmail(request.getString(ARG_USER_EMAIL, user.getEmail()));
-        user.setLanguage(request.getString(ARG_USER_LANGUAGE, user.getLanguage()));
+        user.setLanguage(request.getString(ARG_USER_LANGUAGE,
+                                           user.getLanguage()));
         user.setQuestion(request.getString(ARG_USER_QUESTION,
                                            user.getQuestion()));
         user.setAnswer(request.getString(ARG_USER_ANSWER, user.getAnswer()));
@@ -687,8 +690,8 @@ public class UserManager extends RepositoryManager {
         String userId = request.getUserArg();
         User   user   = findUser(userId);
         if (user == null) {
-            throw new IllegalArgumentException(msgLabel("Could not find user")
-                    + userId);
+            throw new IllegalArgumentException(
+                msgLabel("Could not find user") + userId);
         }
 
         if (request.defined(ARG_USER_DELETE_CONFIRM)) {
@@ -711,16 +714,19 @@ public class UserManager extends RepositoryManager {
         }
 
 
-        sb.append(getRepository().header(msgLabel("User") + HtmlUtil.space(1) + user.getLabel()));
+        sb.append(getRepository().header(msgLabel("User") + HtmlUtil.space(1)
+                                         + user.getLabel()));
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.form(URL_USER_EDIT));
         sb.append(HtmlUtil.hidden(ARG_USER, user.getId()));
         if (request.defined(ARG_USER_DELETE)) {
-            sb.append(getRepository().question(msg("Are you sure you want to delete the user?")+ 
-                                           HtmlUtil.p() +
-                                           HtmlUtil.submit(msg("Yes"), ARG_USER_DELETE_CONFIRM) +
-                                           HtmlUtil.space(2) +
-                                           HtmlUtil.submit(msg("Cancel"), ARG_USER_CANCEL)));
+            sb.append(
+                getRepository().question(
+                    msg("Are you sure you want to delete the user?")
+                    + HtmlUtil.p()
+                    + HtmlUtil.submit(msg("Yes"), ARG_USER_DELETE_CONFIRM)
+                    + HtmlUtil.space(2)
+                    + HtmlUtil.submit(msg("Cancel"), ARG_USER_CANCEL)));
         } else {
             makeUserForm(request, user, sb, true);
             sb.append(HtmlUtil.formEntry("&nbsp;<p>", ""));
@@ -789,12 +795,11 @@ public class UserManager extends RepositoryManager {
                                      HtmlUtil.input(ARG_USER_EMAIL,
                                          user.getEmail())));
 
-        List languages =  new ArrayList(getRepository().getLanguages());
-        languages.add(0, new TwoFacedObject("None",""));
+        List languages = new ArrayList(getRepository().getLanguages());
+        languages.add(0, new TwoFacedObject("None", ""));
         sb.append(HtmlUtil.formEntry(msgLabel("Language"),
                                      HtmlUtil.select(ARG_USER_LANGUAGE,
-                                                     languages,
-                                                     user.getLanguage())));
+                                         languages, user.getLanguage())));
 
         sb.append(HtmlUtil.formEntry("&nbsp;<p>", ""));
 
@@ -841,8 +846,7 @@ public class UserManager extends RepositoryManager {
                 errorBuffer.append(HtmlUtil.br());
             }
 
-            if (password1.length() == 0 || 
-                !password1.equals(password2)) {
+            if ((password1.length() == 0) || !password1.equals(password2)) {
                 okToAdd = false;
                 errorBuffer.append(msg("Invalid password"));
                 errorBuffer.append(HtmlUtil.br());
@@ -856,8 +860,8 @@ public class UserManager extends RepositoryManager {
 
             if (okToAdd) {
                 makeOrUpdateUser(new User(id, name, email, "", "",
-                                          hashPassword(password1),
-                                          admin,""), false);
+                                          hashPassword(password1), admin,
+                                          ""), false);
                 String userEditLink = HtmlUtil.url(URL_USER_EDIT, ARG_USER,
                                           id);
                 return new Result(userEditLink);
@@ -872,7 +876,8 @@ public class UserManager extends RepositoryManager {
         sb.append(msgHeader("Create User"));
         sb.append(HtmlUtil.form(URL_USER_NEW));
         sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.formEntry(msgLabel("ID"), HtmlUtil.input(ARG_USER_ID, id)));
+        sb.append(HtmlUtil.formEntry(msgLabel("ID"),
+                                     HtmlUtil.input(ARG_USER_ID, id)));
         sb.append(HtmlUtil.formEntry(msgLabel("Name"),
                                      HtmlUtil.input(ARG_USER_NAME, name)));
 
@@ -981,7 +986,7 @@ public class UserManager extends RepositoryManager {
                              results.getString(col++),
                              results.getString(col++),
                              results.getString(col++),
-                             results.getBoolean(col++), 
+                             results.getBoolean(col++),
                              results.getString(col++));
 
         String query = SqlUtil.makeSelect(COL_USERROLES_ROLE,
@@ -1067,8 +1072,7 @@ public class UserManager extends RepositoryManager {
                 errorBuffer.append(HtmlUtil.br());
             }
 
-            if (password1.length() == 0 ||
-                !password1.equals(password2)) {
+            if ((password1.length() == 0) || !password1.equals(password2)) {
                 okToAdd = false;
                 errorBuffer.append(HtmlUtil.space(2));
                 errorBuffer.append(msg("Invalid password"));
@@ -1078,8 +1082,8 @@ public class UserManager extends RepositoryManager {
 
             if (okToAdd) {
                 makeOrUpdateUser(new User(id, name, "", "", "",
-                                          hashPassword(password1),
-                                          true,""), false);
+                                          hashPassword(password1), true,
+                                          ""), false);
                 sb.append(msg("Site administrator created"));
                 sb.append(HtmlUtil.p());
                 sb.append(makeLoginForm(request));
@@ -1093,11 +1097,14 @@ public class UserManager extends RepositoryManager {
         }
 
 
-        sb.append(msg("Please enter the repository administrator user name and password"));
+        sb.append(
+            msg(
+            "Please enter the repository administrator user name and password"));
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.form(getRepository().URL_DUMMY));
         sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.formEntry(msgLabel("ID"), HtmlUtil.input(ARG_USER_ID, id)));
+        sb.append(HtmlUtil.formEntry(msgLabel("ID"),
+                                     HtmlUtil.input(ARG_USER_ID, id)));
         sb.append(HtmlUtil.formEntry(msgLabel("Name"),
                                      HtmlUtil.input(ARG_USER_NAME, name)));
 
@@ -1107,8 +1114,9 @@ public class UserManager extends RepositoryManager {
         sb.append(HtmlUtil.formEntry(msgLabel("Password Again"),
                                      HtmlUtil.password(ARG_USER_PASSWORD2)));
 
-        sb.append(HtmlUtil.formEntry("",
-                                     HtmlUtil.submit(msg("Make Administrator"))));
+        sb.append(
+            HtmlUtil.formEntry(
+                "", HtmlUtil.submit(msg("Make Administrator"))));
         return new Result(msg("Initialization"), sb);
 
     }
@@ -1134,7 +1142,8 @@ public class UserManager extends RepositoryManager {
                               request);
             if (entry == null) {
                 throw new IllegalArgumentException(
-                    msgLabel("Could not find entry with id") + request.getId(""));
+                    msgLabel("Could not find entry with id")
+                    + request.getId(""));
             }
             if ( !getCart(request).contains(entry)) {
                 getCart(request).add(entry);
@@ -1170,8 +1179,8 @@ public class UserManager extends RepositoryManager {
                     getRepository().getEntry(request.getString(ARG_FROM, ""),
                                              request);
                 sb.append(HtmlUtil.br());
-                sb.append(msgLabel("Pick an entry  to associate with") + HtmlUtil.space(1) +
-                          fromEntry.getName());
+                sb.append(msgLabel("Pick an entry  to associate with")
+                          + HtmlUtil.space(1) + fromEntry.getName());
             }
 
 
@@ -1180,7 +1189,8 @@ public class UserManager extends RepositoryManager {
                     HtmlUtil.form(
                         repository.URL_GETENTRIES,
                         "name=\"getentries\" method=\"post\""));
-                sb.append(HtmlUtil.submit(msg("Get selected"), "getselected"));
+                sb.append(HtmlUtil.submit(msg("Get selected"),
+                                          "getselected"));
                 sb.append(HtmlUtil.submit(msg("Get all"), "getall"));
                 sb.append(HtmlUtil.space(1));
                 sb.append(msgLabel("As"));
@@ -1203,7 +1213,8 @@ public class UserManager extends RepositoryManager {
                                 ARG_FROM, request.getString(ARG_FROM, ""),
                                 ARG_TO, entry.getId()), HtmlUtil.img(
                                     getRepository().fileUrl(
-                                        ICON_ASSOCIATION), msg("Create an association"))));
+                                        ICON_ASSOCIATION), msg(
+                                        "Create an association"))));
                 } else {
                     String links = HtmlUtil.checkbox("entry_"
                                        + entry.getId(), "true");
@@ -1215,7 +1226,8 @@ public class UserManager extends RepositoryManager {
                                 URL_USER_CART, ARG_FROM,
                                 entry.getId()), HtmlUtil.img(
                                     getRepository().fileUrl(
-                                        ICON_ASSOCIATION), msg("Create an association"))));
+                                        ICON_ASSOCIATION), msg(
+                                        "Create an association"))));
                 }
                 sb.append(HtmlUtil.space(1));
                 sb.append(outputHandler.getEntryUrl(entry));
@@ -1264,15 +1276,17 @@ public class UserManager extends RepositoryManager {
                           HtmlUtil.img(getRepository().fileUrl(ICON_CART),
                                        msg("Data Cart")));
         if (user.getAnonymous()) {
-            userLink = HtmlUtil.href(URL_USER_LOGIN,msg("Login")," class=\"navlink\" ");
+            userLink = HtmlUtil.href(URL_USER_LOGIN, msg("Login"),
+                                     " class=\"navlink\" ");
         } else {
-            userLink = HtmlUtil.href(
-                URL_USER_LOGOUT, msg("Logout"),
-                " class=\"navlink\" ") + HtmlUtil.space(1) + "|"
-                    + HtmlUtil.space(1)
-                    + HtmlUtil.href(
-                        URL_USER_SETTINGS, user.getLabel(),
-                            " class=\"navlink\" ") + HtmlUtil.space(1);
+            userLink = HtmlUtil
+                .href(URL_USER_LOGOUT, msg(
+                    "Logout"), " class=\"navlink\" ") + HtmlUtil.space(1)
+                        + "|" + HtmlUtil.space(1)
+                        + HtmlUtil
+                            .href(URL_USER_SETTINGS, user
+                                .getLabel(), " class=\"navlink\" ") + HtmlUtil
+                                    .space(1);
         }
         return cartEntry + HtmlUtil.space(2) + userLink;
     }
@@ -1365,7 +1379,7 @@ public class UserManager extends RepositoryManager {
     public Result processLogout(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
         removeUserSession(request);
-        sb.append(getRepository().note(msg("You are logged out"))); 
+        sb.append(getRepository().note(msg("You are logged out")));
         sb.append(makeLoginForm(request));
         Result result = new Result(msg("Logout"), sb);
         return result;
@@ -1461,7 +1475,7 @@ public class UserManager extends RepositoryManager {
         if (user.getAnonymous()) {
             sb.append(
                 getRepository().warning(
-                                        msg("You need to be logged in to change user settings")));
+                    msg("You need to be logged in to change user settings")));
             sb.append(makeLoginForm(request));
             return new Result(msg("User Settings"), sb);
         }
@@ -1469,7 +1483,8 @@ public class UserManager extends RepositoryManager {
         if (request.exists(ARG_USER_CHANGE)) {
             boolean okToChangeUser = checkPasswords(request, user);
             if ( !okToChangeUser) {
-                sb.append(getRepository().warning(msg("Incorrect passwords")));
+                sb.append(
+                    getRepository().warning(msg("Incorrect passwords")));
             } else {
                 applyState(request, user, false);
                 return new Result(HtmlUtil.url(URL_USER_SETTINGS,

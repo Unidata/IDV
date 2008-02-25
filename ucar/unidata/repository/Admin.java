@@ -335,16 +335,17 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void initHarvesters() throws Exception {
-        List<String> harvesterFiles = StringUtil.split(
-                                          getRepository().getProperty(
-                                              PROP_HARVESTERS_FILE), ";",
-                                                  true, true);
+        List<String> harvesterFiles =
+            getRepository().getResourcePaths(PROP_HARVESTERS);
         boolean okToStart =
             getRepository().getProperty(PROP_HARVESTERS_ACTIVE, true);
         try {
             harvesters = new ArrayList<Harvester>();
             for (String file : harvesterFiles) {
                 Element root = XmlUtil.getRoot(file, getClass());
+                if (root == null) {
+                    continue;
+                }
                 harvesters.addAll(Harvester.createHarvesters(getRepository(),
                         root));
             }
@@ -541,15 +542,16 @@ public class Admin extends RepositoryManager {
                                      HtmlUtil.checkbox(PROP_ACCESS_ADMINONLY,
                                          "true",
                                          getProperty(PROP_ACCESS_ADMINONLY,
-                                             false)) + HtmlUtil.space(2) + msg("Admin only")));
+                                             false)) + HtmlUtil.space(2)
+                                                 + msg("Admin only")));
         sb.append(
             HtmlUtil.formEntry(
                 "",
                 HtmlUtil.checkbox(
                     PROP_ACCESS_REQUIRELOGIN, "true",
                     getProperty(
-                        PROP_ACCESS_REQUIRELOGIN,
-                        false)) + HtmlUtil.space(2) +msg("Require login")));
+                        PROP_ACCESS_REQUIRELOGIN, false)) + HtmlUtil.space(2)
+                            + msg("Require login")));
 
 
         StringBuffer handlerSB = new StringBuffer();
@@ -568,7 +570,8 @@ public class Admin extends RepositoryManager {
         sb.append(HtmlUtil.formEntry("&nbsp;<p>", ""));
 
 
-        sb.append(HtmlUtil.formEntry("", HtmlUtil.submit(msg("Change Settings"))));
+        sb.append(
+            HtmlUtil.formEntry("", HtmlUtil.submit(msg("Change Settings"))));
         sb.append("</form>");
         sb.append("</table>");
         return makeResult(request, msg("Settings"), sb);
@@ -605,10 +608,10 @@ public class Admin extends RepositoryManager {
 
         getRepository().writeGlobal(PROP_ACCESS_ADMINONLY,
                                     request.get(PROP_ACCESS_ADMINONLY,
-                                                false));
-        getRepository().writeGlobal(
-            PROP_ACCESS_REQUIRELOGIN,
-            request.get(PROP_ACCESS_REQUIRELOGIN, false));
+                                        false));
+        getRepository().writeGlobal(PROP_ACCESS_REQUIRELOGIN,
+                                    request.get(PROP_ACCESS_REQUIRELOGIN,
+                                        false));
         return new Result(URL_ADMIN_SETTINGS.toString());
     }
 
@@ -646,8 +649,8 @@ public class Admin extends RepositoryManager {
         sb.append("<table cellspacing=\"5\">");
         sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold(msg("Name")),
                                              HtmlUtil.bold(msg("State")),
-                                             HtmlUtil.bold(msg("Action")), "",
-                                             "")));
+                                             HtmlUtil.bold(msg("Action")),
+                                             "", "")));
 
         int cnt = 0;
         for (Harvester harvester : harvesters) {
@@ -669,8 +672,9 @@ public class Admin extends RepositoryManager {
             sb.append(HtmlUtil.cols(harvester.getName(),
                                     (harvester.getActive()
                                      ? msg("Active")
-                                     : msg("Stopped")) + HtmlUtil.space(2), run,
-                                     remove, harvester.getExtraInfo()));
+                                     : msg("Stopped")) + HtmlUtil.space(
+                                         2), run, remove,
+                                             harvester.getExtraInfo()));
             sb.append("</tr>\n");
         }
         sb.append("</table>");
@@ -797,7 +801,7 @@ public class Admin extends RepositoryManager {
                             == java.sql.Types.TIMESTAMP) {
                         Date dttm = results.getTimestamp(colcnt,
                                         Repository.calendar);
-                        sb.append(HtmlUtil.col(Repository.fmt(dttm)));
+                        sb.append(HtmlUtil.col(formatDate(request, dttm)));
                     } else {
                         sb.append(HtmlUtil.col(results.getString(colcnt)));
                     }
@@ -812,9 +816,10 @@ public class Admin extends RepositoryManager {
         sb.append("</table>");
         long t2 = System.currentTimeMillis();
         return makeResult(request, msg("SQL"),
-                          new StringBuffer(msgLabel("Fetched rows:") + cnt + HtmlUtil.space(1) +msgLabel("in")
-                                           + (t2 - t1) + "ms <p>"
-                                           + sb.toString()));
+                          new StringBuffer(msgLabel("Fetched rows") + cnt
+                                           + HtmlUtil.space(1)
+                                           + msgLabel("in") + (t2 - t1)
+                                           + "ms <p>" + sb.toString()));
     }
 
     /**
@@ -844,7 +849,8 @@ public class Admin extends RepositoryManager {
             sb.append(HtmlUtil.submit(msg("Stop cleanup"), ACTION_STOP));
         } else {
             sb.append(
-                      msg("Cleanup allows you to remove all file entries from the repository database that do not exist on the local file system"));
+                msg(
+                "Cleanup allows you to remove all file entries from the repository database that do not exist on the local file system"));
             sb.append("<p>");
             sb.append(HtmlUtil.submit(msg("Start cleanup"), ACTION_START));
 
@@ -929,9 +935,9 @@ public class Admin extends RepositoryManager {
             if (runningCleanup) {
                 getRepository().deleteEntries(request, entries, null);
                 deleteCnt += entries.size();
-                cleanupStatus =
-                    new StringBuffer(msg("Done running cleanup") +"<br>"+ msg("Removed") + HtmlUtil.space(1) 
-                                     + deleteCnt + " entries from database");
+                cleanupStatus = new StringBuffer(msg("Done running cleanup")
+                        + "<br>" + msg("Removed") + HtmlUtil.space(1)
+                        + deleteCnt + " entries from database");
             }
         } catch (Exception exc) {
             log("Running cleanup", exc);

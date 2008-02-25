@@ -324,7 +324,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_WHAT = "what";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ACTION_ID = "actionid";
 
 
@@ -380,19 +380,19 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_METADATA_ID = "metadata.id";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_METADATA_INHERITED = "metadata.inherited";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_METADATA_ATTR1 = "metadata.attr1";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_METADATA_ATTR2 = "metadata.attr2";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_METADATA_ATTR3 = "metadata.attr3";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_METADATA_ATTR4 = "metadata.attr4";
 
     /** _more_ */
@@ -461,6 +461,7 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_DOWNLOAD_OK = "jdms.download.ok";
 
+    /** _more_ */
     public static final String PROP_REPOSITORY_HOME = "jdms.home";
 
 
@@ -479,6 +480,7 @@ public interface Constants {
     public static final String PROP_ACCESS_ADMINONLY =
         "jdms.access.adminonly";
 
+    /** _more_ */
     public static final String PROP_LANGUAGE = "jdms.language";
 
 
@@ -523,7 +525,7 @@ public interface Constants {
         "jdms.harvesters.active";
 
     /** _more_ */
-    public static final String PROP_HARVESTERS_FILE = "jdms.harvesters.file";
+    public static final String PROP_HARVESTERS = "jdms.harvesters";
 
     /** _more_ */
     public static final String PROP_DB_SCRIPT = "jdms.db.script";
@@ -532,10 +534,11 @@ public interface Constants {
     public static final String PROP_TYPES = "jdms.types";
 
     /** _more_ */
-    public static final String PROP_OUTPUT_FILES = "jdms.output.files";
+    public static final String PROP_OUTPUTHANDLERS = "jdms.outputhandlers";
 
     /** _more_ */
-    public static final String PROP_METADATA_FILES = "jdms.metadata.files";
+    public static final String PROP_METADATAHANDLERS =
+        "jdms.metadatahandlers";
 
     /** _more_ */
     public static final String PROP_NAVLINKS = "jdms.navlinks";
@@ -650,7 +653,7 @@ public interface Constants {
     public static final String ARG_DESCRIPTION = "description";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ADMIN_HAVECREATED = "admin.havecreated";
 
 
@@ -683,6 +686,20 @@ public interface Constants {
     public static final String ACTION_REMOVE = "action.remove";
 
 
+
+
+
+    /** _more_ */
+    public static final String NEWLINE = "\n";
+
+    /** _more_ */
+    public static final String BR = "<br>";
+
+    /** _more_ */
+    public static final String HR = "<hr>";
+
+    /** _more_ */
+    public static final String BLANK = "";
 
 
 

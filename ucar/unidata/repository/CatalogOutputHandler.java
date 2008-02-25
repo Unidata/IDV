@@ -578,7 +578,6 @@ public class CatalogOutputHandler extends OutputHandler {
      * _more_
      *
      *
-     * @param sb _more_
      * @param entry _more_
      * @param request _more_
      * @param doc _more_
@@ -608,15 +607,17 @@ public class CatalogOutputHandler extends OutputHandler {
         }
 
         XmlUtil.create(doc, TAG_DATE, dataset,
-                       format(new Date(entry.getCreateDate())),
+                       formatDate(request, new Date(entry.getCreateDate())),
                        new String[] { ATTR_TYPE,
                                       "metadataCreated" });
 
         Element timeCoverage = XmlUtil.create(doc, TAG_TIMECOVERAGE, dataset);
         XmlUtil.create(doc, TAG_START, timeCoverage,
-                       "" + format(new Date(entry.getStartDate())));
+                       "" + formatDate(request,
+                                       new Date(entry.getStartDate())));
         XmlUtil.create(doc, TAG_END, timeCoverage,
-                       "" + format(new Date(entry.getEndDate())));
+                       "" + formatDate(request,
+                                       new Date(entry.getEndDate())));
     }
 
 
@@ -626,12 +627,10 @@ public class CatalogOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param objects _more_
      * @param entryList _more_
      * @param doc _more_
      * @param parent _more_
      *
-     * @return _more_
      *
      * @throws Exception _more_
      */
@@ -676,7 +675,6 @@ public class CatalogOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param sb _more_
      * @param parent _more_
      * @param doc _more_
      * @param datasetNode _more_

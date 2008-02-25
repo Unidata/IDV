@@ -122,14 +122,35 @@ public class RepositoryManager implements RepositorySource, Constants,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     *
+     * @return _more_
+     */
     public static String msg(String msg) {
         return Repository.msg(msg);
     }
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     *
+     * @return _more_
+     */
     public static String msgLabel(String msg) {
         return Repository.msgLabel(msg);
     }
 
+    /**
+     * _more_
+     *
+     * @param h _more_
+     *
+     * @return _more_
+     */
     protected static String msgHeader(String h) {
         return Repository.msgHeader(h);
     }
@@ -137,12 +158,25 @@ public class RepositoryManager implements RepositorySource, Constants,
     /**
      * _more_
      *
+     * @param request _more_
      * @param d _more_
      *
      * @return _more_
      */
-    public String format(Date d) {
-        return d.toString();
+    public String formatDate(Request request, Date d) {
+        return getRepository().formatDate(request, d);
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param ms _more_
+     *
+     * @return _more_
+     */
+    public String formatDate(Request request, long ms) {
+        return getRepository().formatDate(request, ms);
     }
 
 

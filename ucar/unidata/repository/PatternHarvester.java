@@ -154,13 +154,13 @@ public class PatternHarvester extends Harvester {
     int rootStrLen;
 
 
-    /** _more_          */
+    /** _more_ */
     private StringBuffer status = new StringBuffer();
 
-    /** _more_          */
+    /** _more_ */
     private int entryCnt = 0;
 
-    /** _more_          */
+    /** _more_ */
     private int newEntryCnt = 0;
 
     /**
@@ -341,9 +341,7 @@ public class PatternHarvester extends Harvester {
     /**
      * _more_
      *
-     * @param rootDir _more_
      * @param firstTime _more_
-     * @param typeHandler _more_
      *
      *
      * @throws Exception _more_
@@ -524,17 +522,20 @@ public class PatternHarvester extends Harvester {
         groupName = groupName.replace("${dirgroup}", dirGroup);
 
         groupName = groupName.replace("${fromDate}",
-                                      Repository.fmt(fromDate));
-        groupName = groupName.replace("${toDate}", Repository.fmt(toDate));
+                                      getRepository().formatDate(fromDate));
+        groupName = groupName.replace("${toDate}",
+                                      getRepository().formatDate(toDate));
 
-        name      = name.replace("${filename}", f.getName());
-        name      = name.replace("${fromDate}", Repository.fmt(fromDate));
+        name = name.replace("${filename}", f.getName());
+        name = name.replace("${fromDate}",
+                            getRepository().formatDate(fromDate));
 
-        name      = name.replace("${toDate}", Repository.fmt(toDate));
+        name = name.replace("${toDate}", getRepository().formatDate(toDate));
 
-        desc      = desc.replace("${fromDate}", Repository.fmt(fromDate));
-        desc      = desc.replace("${toDate}", Repository.fmt(toDate));
-        desc      = desc.replace("${name}", name);
+        desc = desc.replace("${fromDate}",
+                            getRepository().formatDate(fromDate));
+        desc = desc.replace("${toDate}", getRepository().formatDate(toDate));
+        desc = desc.replace("${name}", name);
 
 
 

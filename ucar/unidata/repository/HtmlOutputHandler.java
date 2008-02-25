@@ -189,7 +189,7 @@ public class HtmlOutputHandler extends OutputHandler {
         sb.append(typeHandler.getEntryContent(entry, request, true));
         getMetadataHtml(request, entry, sb);
 
-        Result result = new Result(msgLabel("Entry")  + entry.getName(), sb,
+        Result result = new Result(msgLabel("Entry") + entry.getName(), sb,
                                    getMimeType(request.getOutput()));
         result.putProperty(
             PROP_NAVSUBLINKS,
@@ -386,18 +386,6 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param tags _more_
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
     /*
     protected Result listTags(Request request, List<Tag> tags)
             throws Exception {
@@ -583,8 +571,10 @@ public class HtmlOutputHandler extends OutputHandler {
                 int    bin     = (int) (percent * 5);
                 String css     = "font-size:" + (12 + bin * 2);
                 sb.append("<span style=\"" + css + "\">");
-                String extra = XmlUtil.attrs("alt", msgLabel("Count") + count,
-                                             "title", msgLabel("Count") + count);
+                String extra = XmlUtil.attrs("alt",
+                                             msgLabel("Count") + count,
+                                             "title",
+                                             msgLabel("Count") + count);
                 sb.append(
                     HtmlUtil.href(
                         HtmlUtil.url(
@@ -632,8 +622,9 @@ public class HtmlOutputHandler extends OutputHandler {
                 ? "false"
                 : "true");
         String link = HtmlUtil.href(url, (showMetadata
-                                          ? "-&nbsp; " +msg("Details")
-                                          : "+&nbsp; " + msg("Details")), " class=\"subheaderlink\" ");
+                                          ? "-&nbsp; " + msg("Details")
+                                          : "+&nbsp; "
+                                            + msg("Details")), " class=\"subheaderlink\" ");
 
         //        sb.append("<tr><td colspan=\"2\">");
         sb.append(HtmlUtil.div(link, " class=\"subheader\""));
@@ -695,7 +686,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
             int skip = Math.max(0, request.get(ARG_SKIP, 0));
-            sb.append(msgLabel("Results") +  (skip + 1) + "-" + (skip + cnt));
+            sb.append(msgLabel("Results") + (skip + 1) + "-" + (skip + cnt));
             sb.append(HtmlUtil.space(4));
             if (skip > 0) {
                 sb.append(HtmlUtil.href(request.getUrl(ARG_SKIP) + "&"
@@ -741,7 +732,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 getMetadataHtml(request, group, sb);
             }
 
-            //            sb.append("<hr>");
+            //            sb.append(HtmlUtil.hr());
 
             sb.append(HtmlUtil.p());
             if (subGroups.size() > 0) {
@@ -888,7 +879,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 + HtmlUtil.href(HtmlUtil.url(getRepository().URL_ENTRY_SHOW,
                                              ARG_ID,
                                              entry.getId()), entry.getName());
-            String col2 = "" + new Date(entry.getStartDate());
+            String col2 = formatDate(request, new Date(entry.getStartDate()));
             ssb.append(HtmlUtil.row(HtmlUtil.cols(col1, col2)));
         }
 
@@ -911,8 +902,9 @@ public class HtmlOutputHandler extends OutputHandler {
         for (int i = 0; i < sbc.getKeys().size(); i++) {
             String       type = (String) sbc.getKeys().get(i);
             StringBuffer ssb  = sbc.getBuffer(type);
-            sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold(msgLabel("Type")
-                    + type))));
+            sb.append(
+                HtmlUtil.row(
+                    HtmlUtil.cols(HtmlUtil.bold(msgLabel("Type") + type))));
             sb.append(ssb);
         }
 

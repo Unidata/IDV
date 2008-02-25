@@ -111,7 +111,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     public RequestUrl URL_MESSAGE = new RequestUrl(this, "/message");
 
-    /** _more_          */
+    /** _more_ */
     public RequestUrl URL_DUMMY = new RequestUrl(this, "/dummy");
 
 
@@ -235,7 +235,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private Properties properties = new Properties();
 
-    /** _more_          */
+    /** _more_ */
     private Properties dbProperties = new Properties();
 
 
@@ -259,8 +259,11 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
+    /** _more_ */
     private Hashtable languageMap = new Hashtable();
-    private List<TwoFacedObject> languages= new ArrayList<TwoFacedObject>();
+
+    /** _more_ */
+    private List<TwoFacedObject> languages = new ArrayList<TwoFacedObject>();
 
 
     /** _more_ */
@@ -340,7 +343,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private UserManager userManager;
 
-    /** _more_          */
+    /** _more_ */
     private ActionManager actionManager;
 
     /** _more_ */
@@ -426,6 +429,8 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
+
+
     /** _more_ */
     public static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
 
@@ -437,33 +442,52 @@ public class Repository implements Constants, Tables, RequestHandler,
     /**
      * _more_
      *
-     * @param dttm _more_
+     * @param d _more_
      *
      * @return _more_
      */
-    public static String fmt(long dttm) {
-        return fmt(new Date(dttm));
-    }
-
-    /**
-     * _more_
-     *
-     * @param dttm _more_
-     *
-     * @return _more_
-     */
-    public static String fmt(Date dttm) {
+    public String formatDate(Date d) {
         if (sdf == null) {
             sdf = new SimpleDateFormat();
             sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
             sdf.applyPattern(DEFAULT_TIME_FORMAT);
         }
 
-        if (dttm == null) {
-            return "";
+        if (d == null) {
+            return BLANK;
         }
-        return sdf.format(dttm);
+        return sdf.format(d);
     }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param ms _more_
+     *
+     * @return _more_
+     */
+    public String formatDate(Request request, long ms) {
+        return formatDate(new Date(ms));
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param d _more_
+     *
+     * @return _more_
+     */
+    public String formatDate(Request request, Date d) {
+        return formatDate(d);
+    }
+
+
+
+
+
+
 
 
     /**
@@ -508,7 +532,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String note(String h) {
-        return getMessage(h,"/information.png");
+        return getMessage(h, "/information.png");
     }
 
 
@@ -520,7 +544,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String warning(String h) {
-        return getMessage(h,"/warning.png");
+        return getMessage(h, "/warning.png");
     }
 
 
@@ -533,7 +557,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String question(String h) {
-        return getMessage(h,"/question.png");
+        return getMessage(h, "/question.png");
     }
 
     /**
@@ -544,23 +568,24 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected String error(String h) {
-        return getMessage(h,"/error.png");
+        return getMessage(h, "/error.png");
     }
 
     /**
      * _more_
      *
      * @param h _more_
+     * @param icon _more_
      *
      * @return _more_
      */
     protected String getMessage(String h, String icon) {
-        h =  "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><td valign=\"top\">"
-            + HtmlUtil.img(fileUrl(icon)) + HtmlUtil.space(2) +
-            "</td><td valign=\"bottom\"><span class=\"notetext\">" + h
-               + "</span></td></tr></table>";
+        h = "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><td valign=\"top\">"
+            + HtmlUtil.img(fileUrl(icon)) + HtmlUtil.space(2)
+            + "</td><td valign=\"bottom\"><span class=\"notetext\">" + h
+            + "</span></td></tr></table>";
         return "\n<table border=\"0\"><tr><td><div class=\"note\">" + h
-            + "</div></td></tr></table>\n";
+               + "</div></td></tr></table>\n";
     }
 
 
@@ -741,7 +766,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     protected void initServer() throws Exception {
         getConnection();
         initTypeHandlers();
-        initTable();
+        initSchema();
         initOutputHandlers();
         getMetadataManager().initMetadataHandlers(metadataDefFiles);
         initApi();
@@ -751,44 +776,69 @@ public class Repository implements Constants, Tables, RequestHandler,
         initLanguages();
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     protected void initLanguages() throws Exception {
-        List sourcePaths = Misc.newList(getStorageManager().getSystemResourcePath() +"/languages",getStorageManager().getRepositoryDir());
-        for(int i=0;i<sourcePaths.size();i++) {
-            String dir = (String) sourcePaths.get(i);
+        List sourcePaths =
+            Misc.newList(
+                getStorageManager().getSystemResourcePath() + "/languages",
+                getStorageManager().getRepositoryDir());
+        for (int i = 0; i < sourcePaths.size(); i++) {
+            String       dir     = (String) sourcePaths.get(i);
             List<String> listing = IOUtil.getListing(dir, getClass());
-            for(String path: listing) {
-                if(!path.endsWith(".pack")) continue;
-                String content = IOUtil.readContents(path,getClass(),(String)null);
-                if(content == null) continue;
-                List<String> lines = StringUtil.split(content,"\n",true,true);
+            for (String path : listing) {
+                if ( !path.endsWith(".pack")) {
+                    continue;
+                }
+                String content = IOUtil.readContents(path, getClass(),
+                                     (String) null);
+                if (content == null) {
+                    continue;
+                }
+                List<String> lines = StringUtil.split(content, "\n", true,
+                                         true);
                 Properties properties = new Properties();
-                String type = null; 
-                String name = null; 
-                for(String line: lines) {
-                    if(line.startsWith("#")) continue;
-                    List toks = StringUtil.split(line,"=",true,true);
-                    if(toks.size()!=2) continue;
-                    String key = (String) toks.get(0);
+                String     type       = null;
+                String     name       = null;
+                for (String line : lines) {
+                    if (line.startsWith("#")) {
+                        continue;
+                    }
+                    List toks = StringUtil.split(line, "=", true, true);
+                    if (toks.size() != 2) {
+                        continue;
+                    }
+                    String key   = (String) toks.get(0);
                     String value = (String) toks.get(1);
-                    if(key.equals("language.type")) {
+                    if (key.equals("language.type")) {
                         type = value;
-                    } else if(key.equals("language.name")) {
+                    } else if (key.equals("language.name")) {
                         name = value;
                     } else {
                         properties.put(key, value);
                     }
                 }
-                if(type!=null) {
-                    if(name == null) name = type;
-                    languages.add(new TwoFacedObject(name,type));
+                if (type != null) {
+                    if (name == null) {
+                        name = type;
+                    }
+                    languages.add(new TwoFacedObject(name, type));
                     languageMap.put(type, properties);
                 } else {
-                    System.err.println ("No _type_ found in: " + path);
+                    System.err.println("No _type_ found in: " + path);
                 }
             }
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<TwoFacedObject> getLanguages() {
         return languages;
     }
@@ -812,6 +862,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     protected void initProperties() throws Exception {
+
         properties = new Properties();
         properties.load(
             IOUtil.getInputStream(
@@ -858,7 +909,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         //can get to them
         properties.putAll(argProperties);
 
-        
+
         //Call the storage manager so it can figure out the home dir
         getStorageManager();
 
@@ -875,17 +926,16 @@ public class Repository implements Constants, Tables, RequestHandler,
         properties.putAll(localProperties);
         properties.putAll(argProperties);
 
-        apiDefFiles = StringUtil.split(getProperty(PROP_API), ";", true,
-                                       true);
+        apiDefFiles = getResourcePaths(PROP_API);
         apiDefFiles.addAll(argApiDefFiles);
 
-        typeDefinitionFiles = StringUtil.split(getProperty(PROP_TYPES));
+        typeDefinitionFiles = getResourcePaths(PROP_TYPES);
         typeDefinitionFiles.addAll(argEntryDefFiles);
 
-        outputDefFiles = StringUtil.split(getProperty(PROP_OUTPUT_FILES));
+        outputDefFiles = getResourcePaths(PROP_OUTPUTHANDLERS);
         outputDefFiles.addAll(argOutputDefFiles);
 
-        metadataDefFiles = StringUtil.split(getProperty(PROP_METADATA_FILES));
+        metadataDefFiles = getResourcePaths(PROP_METADATAHANDLERS);
         metadataDefFiles.addAll(argMetadataDefFiles);
 
         debug = getProperty(PROP_DEBUG, false);
@@ -893,7 +943,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         urlBase = (String) properties.get(PROP_HTML_URLBASE);
         if (urlBase == null) {
-            urlBase = "";
+            urlBase = BLANK;
         }
 
         logFile =
@@ -905,18 +955,20 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         String derbyHome = (String) properties.get(PROP_DB_DERBY_HOME);
         if (derbyHome != null) {
-            derbyHome = derbyHome.replace("%repository.home%",
-                                          getStorageManager().getRepositoryDir());
+            derbyHome = getStorageManager().localizePath(derbyHome);
             File dir = new File(derbyHome);
             IOUtil.makeDirRecursive(dir);
             System.setProperty("derby.system.home", derbyHome);
         }
 
         mimeTypes = new Properties();
-        for (Object mimeFile : StringUtil.split(
-                getProperty(PROP_HTML_MIMEPROPERTIES), ";", true, true)) {
-            mimeTypes.load(IOUtil.getInputStream((String) mimeFile,
-                    getClass()));
+        for (String path : getResourcePaths(PROP_HTML_MIMEPROPERTIES)) {
+            try {
+                InputStream is = IOUtil.getInputStream(path, getClass());
+                mimeTypes.load(is);
+            } catch (Exception exc) {
+                //noop
+            }
         }
 
         sdf = new SimpleDateFormat();
@@ -929,10 +981,30 @@ public class Repository implements Constants, Tables, RequestHandler,
         //This will end up being from the properties
         htdocRoots.addAll(
             StringUtil.split(
-                getProperty("jdms.html.htdocroots", ""), ";", true, true));
+                getProperty("jdms.html.htdocroots", BLANK), ";", true, true));
+
 
     }
 
+
+
+    /**
+     * _more_
+     *
+     * @param propertyName _more_
+     *
+     * @return _more_
+     */
+    protected List<String> getResourcePaths(String propertyName) {
+        List<String> tmp = StringUtil.split(getProperty(propertyName, BLANK),
+                                            ";", true, true);
+        List<String> paths = new ArrayList<String>();
+        for (String path : tmp) {
+            path = getStorageManager().localizePath(path);
+            paths.add(path);
+        }
+        return paths;
+    }
 
 
 
@@ -1152,7 +1224,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                                         XmlUtil.getAttribute(node,
                                             ApiMethod.ATTR_TOPLEVEL, false));
         List actions = StringUtil.split(XmlUtil.getAttribute(node,
-                           ApiMethod.ATTR_ACTIONS, ""), ",", true, true);
+                           ApiMethod.ATTR_ACTIONS, BLANK), ",", true, true);
         if ( !Permission.isValidActions(actions)) {
             throw new IllegalArgumentException("Bad actions:" + actions
                     + " for api method:" + apiMethod.getName());
@@ -1190,7 +1262,11 @@ public class Repository implements Constants, Tables, RequestHandler,
     protected void initApi() throws Exception {
 
         for (String file : apiDefFiles) {
-            Element   apiRoot  = XmlUtil.getRoot(file, getClass());
+            file = getStorageManager().localizePath(file);
+            Element apiRoot = XmlUtil.getRoot(file, getClass());
+            if (apiRoot == null) {
+                continue;
+            }
             NodeList  children = XmlUtil.getElements(apiRoot);
             Hashtable props    = new Hashtable();
             for (int i = 0; i < children.getLength(); i++) {
@@ -1225,8 +1301,12 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected void initOutputHandlers() throws Exception {
         for (String file : outputDefFiles) {
-            Element root     = XmlUtil.getRoot(file, getClass());
-            List    children = XmlUtil.findChildren(root, TAG_OUTPUTHANDLER);
+            file = getStorageManager().localizePath(file);
+            Element root = XmlUtil.getRoot(file, getClass());
+            if (root == null) {
+                continue;
+            }
+            List children = XmlUtil.findChildren(root, TAG_OUTPUTHANDLER);
             for (int i = 0; i < children.size(); i++) {
                 Element node = (Element) children.get(i);
                 boolean required = XmlUtil.getAttribute(node, ARG_REQUIRED,
@@ -1299,9 +1379,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             boolean      badAccess = inner instanceof AccessException;
             StringBuffer sb        = new StringBuffer();
             if ( !badAccess) {
-                sb.append(error(msgLabel("An error has occurred") +
-                                HtmlUtil.p() +
-                                inner.getMessage()));
+                sb.append(error(msgLabel("An error has occurred")
+                                + HtmlUtil.p() + inner.getMessage()));
             } else {
                 sb.append(error(inner.getMessage()));
                 sb.append(getUserManager().makeLoginForm(request,
@@ -1459,12 +1538,13 @@ public class Repository implements Constants, Tables, RequestHandler,
     protected Result getHtdocsFile(Request request) throws Exception {
         String path = request.getRequestPath();
         String type = getMimeTypeFromSuffix(IOUtil.getFileExtension(path));
-        path = StringUtil.replace(path, getUrlBase(), "");
+        path = StringUtil.replace(path, getUrlBase(), BLANK);
         if ((path.trim().length() == 0) || path.equals("/")) {
-            log(request, "Unknown request" +" \"" + path + "\"");
-            Result result = new Result(msg("Error"),
-                                       new StringBuffer(msgLabel("Unknown request") +"\""
-                                           + path + "\""));
+            log(request, "Unknown request" + " \"" + path + "\"");
+            Result result =
+                new Result(msg("Error"),
+                           new StringBuffer(msgLabel("Unknown request")
+                                            + "\"" + path + "\""));
             result.setResponseCode(Result.RESPONSE_NOTFOUND);
             return result;
         }
@@ -1478,7 +1558,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             checkFilePath(fullPath);
             try {
                 InputStream is = IOUtil.getInputStream(fullPath, getClass());
-                Result      result = new Result("", is, type);
+                Result      result = new Result(BLANK, is, type);
                 result.setCacheOk(true);
                 return result;
             } catch (IOException fnfe) {
@@ -1486,9 +1566,9 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         }
         log(request, "Unknown request:" + path);
-        Result result = new Result(msg("Error"),
-                                   new StringBuffer(msgLabel("Unknown request")
-                                       + path));
+        Result result =
+            new Result(msg("Error"),
+                       new StringBuffer(msgLabel("Unknown request") + path));
         result.setResponseCode(Result.RESPONSE_NOTFOUND);
         return result;
     }
@@ -1513,7 +1593,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                                   getProperty(PROP_REPOSITORY_NAME,
                                       "Repository"));
         html = StringUtil.replace(html, "${footer}",
-                                  getProperty(PROP_HTML_FOOTER, ""));
+                                  getProperty(PROP_HTML_FOOTER, BLANK));
         html = StringUtil.replace(html, "${title}", result.getTitle());
         html = StringUtil.replace(html, "${root}", getUrlBase());
 
@@ -1524,7 +1604,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             linksHtml = StringUtil.join("&nbsp;|&nbsp;", links);
         }
         List   sublinks     = (List) result.getProperty(PROP_NAVSUBLINKS);
-        String sublinksHtml = "";
+        String sublinksHtml = BLANK;
         if (sublinks != null) {
             sublinksHtml = StringUtil.join("\n&nbsp;|&nbsp;\n", sublinks);
         }
@@ -1535,30 +1615,43 @@ public class Repository implements Constants, Tables, RequestHandler,
                                       "<div class=\"subnav\">" + sublinksHtml
                                       + "</div>");
         } else {
-            html = StringUtil.replace(html, "${sublinks}", "");
+            html = StringUtil.replace(html, "${sublinks}", BLANK);
         }
         html = translate(request, html);
 
         result.setContent(html.getBytes());
     }
 
+    /** _more_ */
     private Hashtable seenMsg = new Hashtable();
+
+    /** _more_ */
     private boolean trackMsg = false;
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public String translate(Request request, String s) {
 
-        User user = request.getUser();
-        String language = user.getLanguage();
-        Properties map = (Properties) languageMap.get(language);
-        if(map == null){
-            map = (Properties) languageMap.get(getProperty(PROP_LANGUAGE,""));
+        User       user     = request.getUser();
+        String     language = user.getLanguage();
+        Properties map      = (Properties) languageMap.get(language);
+        if (map == null) {
+            map = (Properties) languageMap.get(getProperty(PROP_LANGUAGE,
+                    BLANK));
         }
-        StringBuffer stripped = new StringBuffer();
-        int prefixLength = MSG_PREFIX.length();
-        int suffixLength = MSG_PREFIX.length();
+        StringBuffer stripped     = new StringBuffer();
+        int          prefixLength = MSG_PREFIX.length();
+        int          suffixLength = MSG_PREFIX.length();
         //        System.out.println(s);
         while (s.length() > 0) {
-            String tmp = s;
-            int idx1 = s.indexOf(MSG_PREFIX);
+            String tmp  = s;
+            int    idx1 = s.indexOf(MSG_PREFIX);
             if (idx1 < 0) {
                 stripped.append(s);
                 break;
@@ -1567,25 +1660,26 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (text.length() > 0) {
                 stripped.append(text);
             }
-            s = s.substring(idx1+1);
+            s = s.substring(idx1 + 1);
 
             int idx2 = s.indexOf(MSG_SUFFIX);
             if (idx2 < 0) {
                 //Should never happen
-                throw new IllegalArgumentException("No closing message suffix:" + s);
+                throw new IllegalArgumentException(
+                    "No closing message suffix:" + s);
             }
-            String key = s.substring(prefixLength-1,idx2);
+            String key   = s.substring(prefixLength - 1, idx2);
 
             String value = null;
-            if(map!=null) {
+            if (map != null) {
                 value = (String) map.get(key);
             }
-            if(value == null) {
+            if (value == null) {
                 value = key;
-                if(trackMsg) {
-                    if(seenMsg.get(key) == null) {
-                        System.out.println(key +"=" + value);
-                        seenMsg.put(key,key);
+                if (trackMsg) {
+                    if (seenMsg.get(key) == null) {
+                        System.out.println(key + "=" + value);
+                        seenMsg.put(key, key);
                     }
                 }
             }
@@ -1691,7 +1785,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      *
      */
-    protected void initTable() throws Exception {
+    protected void initSchema() throws Exception {
         //Force a connection
         getConnection();
         String sql = IOUtil.readContents(getProperty(PROP_DB_SCRIPT),
@@ -1702,7 +1796,11 @@ public class Repository implements Constants, Tables, RequestHandler,
         SqlUtil.loadSql(sql, statement, true);
 
         for (String file : typeDefinitionFiles) {
+            file = getStorageManager().localizePath(file);
             Element entriesRoot = XmlUtil.getRoot(file, getClass());
+            if (entriesRoot == null) {
+                continue;
+            }
             List children = XmlUtil.findChildren(entriesRoot,
                                 GenericTypeHandler.TAG_TYPE);
             for (int i = 0; i < children.size(); i++) {
@@ -1729,8 +1827,17 @@ public class Repository implements Constants, Tables, RequestHandler,
         readGlobals();
 
     }
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     *
+     * @throws Exception _more_
+     */
     protected void writeGlobal(String name, boolean value) throws Exception {
-        writeGlobal(name,""+value);
+        writeGlobal(name, BLANK + value);
     }
 
 
@@ -1894,7 +2001,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         }
         throw new IllegalArgumentException(
-            msgLabel("Could not find output handler for")  + request.getOutput());
+            msgLabel("Could not find output handler for")
+            + request.getOutput());
     }
 
 
@@ -2072,8 +2180,9 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public Result processMessage(Request request) throws Exception {
         return new Result(
-            "",
-            new StringBuffer(note(request.getUnsafeString(ARG_MESSAGE, ""))));
+            BLANK,
+            new StringBuffer(
+                note(request.getUnsafeString(ARG_MESSAGE, BLANK))));
     }
 
     /**
@@ -2086,7 +2195,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processDummy(Request request) throws Exception {
-        return new Result("", new StringBuffer(""));
+        return new Result(BLANK, new StringBuffer(BLANK));
     }
 
     /**
@@ -2121,7 +2230,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public Result processListHome(Request request) throws Exception {
         StringBuffer         sb           = new StringBuffer();
-        List                 links        = getListLinks(request, "", false);
+        List                 links = getListLinks(request, BLANK, false);
         TypeHandler          typeHandler  = getTypeHandler(request);
         List<TwoFacedObject> typeList     = new ArrayList<TwoFacedObject>();
         List<TwoFacedObject> specialTypes = typeHandler.getListTypes(false);
@@ -2147,7 +2256,8 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
         Result result = new Result("Lists", sb);
-        result.putProperty(PROP_NAVSUBLINKS, getListLinks(request, "", true));
+        result.putProperty(PROP_NAVSUBLINKS,
+                           getListLinks(request, BLANK, true));
         return result;
     }
 
@@ -2173,8 +2283,8 @@ public class Repository implements Constants, Tables, RequestHandler,
         String               extra1      = " class=subnavnolink ";
         String               extra2      = " class=subnavlink ";
         if ( !includeExtra) {
-            extra1 = "";
-            extra2 = "";
+            extra1 = BLANK;
+            extra2 = BLANK;
         }
         if (typeList.size() > 0) {
             for (TwoFacedObject tfo : typeList) {
@@ -2188,7 +2298,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 }
             }
         }
-        String typeAttr = "";
+        String typeAttr = BLANK;
         if ( !typeHandler.getType().equals(TypeHandler.TYPE_ANY)) {
             typeAttr = "&type=" + typeHandler.getType();
         }
@@ -2245,15 +2355,15 @@ public class Repository implements Constants, Tables, RequestHandler,
         sb.append(HtmlUtil.form(HtmlUtil.url(URL_ENTRY_SEARCH, ARG_NAME,
                                              WHAT_ENTRIES)));
 
-        sb.append(HtmlUtil.hidden(ARG_FORM_ADVANCED, "" + advancedForm));
-        sb.append(HtmlUtil.hidden(ARG_FORM_METADATA, "" + metadataForm));
+        sb.append(HtmlUtil.hidden(ARG_FORM_ADVANCED, BLANK + advancedForm));
+        sb.append(HtmlUtil.hidden(ARG_FORM_METADATA, BLANK + metadataForm));
 
         //Put in an empty submit button so when the user presses return 
         //it acts like a regular submit (not a submit to change the type)
         sb.append(HtmlUtil.submitImage(getUrlBase() + ICON_BLANK, "submit"));
         TypeHandler typeHandler = getTypeHandler(request);
 
-        String      what        = (String) request.getWhat("");
+        String      what        = (String) request.getWhat(BLANK);
         if (what.length() == 0) {
             what = WHAT_ENTRIES;
         }
@@ -2266,17 +2376,18 @@ public class Repository implements Constants, Tables, RequestHandler,
                                 WHAT_ASSOCIATION) });
         whatList.addAll(typeHandler.getListTypes(true));
 
-        String output = (String) request.getOutput("");
+        String output = (String) request.getOutput(BLANK);
 
 
 
 
         String buttons = HtmlUtil.submit(msg("Search"), "submit")
                          + HtmlUtil.space(1)
-                         + HtmlUtil.submit(msg("Search Subset"), "submit_subset");
+                         + HtmlUtil.submit(msg("Search Subset"),
+                                           "submit_subset");
 
 
-        sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons,2)));
+        sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons, 2)));
 
         if (what.length() == 0) {
             //            sb.append(HtmlUtil.formEntry("Search For:",
@@ -2299,12 +2410,12 @@ public class Repository implements Constants, Tables, RequestHandler,
         typeHandler.addToSearchForm(request, sb, where, advancedForm);
 
 
-        request.put(ARG_FORM_METADATA, ( !metadataForm) + "");
+        request.put(ARG_FORM_METADATA, ( !metadataForm) + BLANK);
         String urlArgs = request.getUrlArgs();
-        request.put(ARG_FORM_METADATA, metadataForm + "");
+        request.put(ARG_FORM_METADATA, metadataForm + BLANK);
         String link = HtmlUtil.href(getRepository().URL_ENTRY_SEARCHFORM
                                     + "?" + urlArgs, (metadataForm
-                                                      ? "- " + msg("Metadata")
+                ? "- " + msg("Metadata")
                 : "+ " + msg("Metadata")), " class=\"subheaderlink\" ");
         sb.append("<tr><td colspan=2>");
         sb.append(HtmlUtil.div(link, " class=\"subheader\""));
@@ -2315,7 +2426,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-        String outputHtml = "";
+        String outputHtml = BLANK;
         if (true || advancedForm) {
             //            outputHtml = HtmlUtil.span(msgLabel("Output Type") ,
             //                                       "class=\"formlabel\"");
@@ -2330,10 +2441,12 @@ public class Repository implements Constants, Tables, RequestHandler,
             orderByList.add(new TwoFacedObject(msg("None"), "none"));
             orderByList.add(new TwoFacedObject(msg("From Date"), "fromdate"));
             orderByList.add(new TwoFacedObject(msg("To Date"), "todate"));
-            orderByList.add(new TwoFacedObject(msg("Create Date"), "createdate"));
+            orderByList.add(new TwoFacedObject(msg("Create Date"),
+                    "createdate"));
             orderByList.add(new TwoFacedObject(msg("Name"), "name"));
 
-            String orderBy = HtmlUtil.space(2) + HtmlUtil.bold(msgLabel("Order by"))
+            String orderBy = HtmlUtil.space(2)
+                             + HtmlUtil.bold(msgLabel("Order by"))
                              + HtmlUtil.select(
                                  ARG_ORDERBY, orderByList,
                                  request.getString(
@@ -2342,19 +2455,21 @@ public class Repository implements Constants, Tables, RequestHandler,
                                          ARG_ASCENDING, "true",
                                          request.get(
                                              ARG_ASCENDING,
-                                             false)) + HtmlUtil.space(1) + msg("ascending");
+                                             false)) + HtmlUtil.space(1)
+                                                 + msg("ascending");
             //            sb.append(HtmlUtil.formEntry("Output Type:",
             //                                         outputHtml + orderBy));
             //            outputHtml += orderBy;
 
-            outputHtml = HtmlUtil.space(2) + HtmlUtil.bold(msgLabel("Output Type"))
-                + outputHtml + orderBy;
+            outputHtml = HtmlUtil.space(2)
+                         + HtmlUtil.bold(msgLabel("Output Type"))
+                         + outputHtml + orderBy;
         }
 
         if (metadataForm) {
-            sb.append(HtmlUtil.formEntry(HtmlUtil.space(1), ""));
+            sb.append(HtmlUtil.formEntry(HtmlUtil.space(1), BLANK));
         }
-        sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons,2)));
+        sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons, 2)));
 
         sb.append(HtmlUtil.formTableClose());
         sb.append(HtmlUtil.formClose());
@@ -2381,7 +2496,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @return _more_
      */
     protected List getSubNavLinks(Request request, RequestUrl[] urls) {
-        return getSubNavLinks(request, urls, "");
+        return getSubNavLinks(request, urls, BLANK);
     }
 
     /**
@@ -2462,7 +2577,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 links.add(HtmlUtil.span(tfo.toString(), extra1));
             } else {
                 links.add(HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SEARCHFORM,
-                        ARG_WHAT, "" + tfo.getId(), ARG_TYPE,
+                        ARG_WHAT, BLANK + tfo.getId(), ARG_TYPE,
                         typeHandler.getType()), tfo.toString(), extra2));
             }
         }
@@ -2533,7 +2648,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             double width  = 4 * Math.abs(east - west);
             double height = 4 * Math.abs(north - south);
             if ( !request.get("noprojection", false)) {
-                nmp.setProjectionImpl(new LatLonProjection("",
+                nmp.setProjectionImpl(new LatLonProjection(BLANK,
                         new ProjectionRect(west - width / 2,
                                            south - height / 2,
                                            east + width / 2,
@@ -2550,12 +2665,13 @@ public class Repository implements Constants, Tables, RequestHandler,
                               new LatLonPointImpl(south, east));
 
             Image image = ImageUtils.getImage(nmp.getNavigatedPanel());
-            //        GuiUtils.showOkCancelDialog(null,"",new JLabel(new ImageIcon(image)),null);
+            //        GuiUtils.showOkCancelDialog(null,BLANK,new JLabel(new ImageIcon(image)),null);
             String                path = "foo.png";
             ByteArrayOutputStream bos  = new ByteArrayOutputStream();
             ImageUtils.writeImageToFile(image, path, bos, 1.0f);
             byte[] imageBytes = bos.toByteArray();
-            return new Result("", imageBytes, getMimeTypeFromSuffix(".png"));
+            return new Result(BLANK, imageBytes,
+                              getMimeTypeFromSuffix(".png"));
         }
     }
 
@@ -2656,10 +2772,10 @@ public class Repository implements Constants, Tables, RequestHandler,
             bytes = IOUtil.readBytes(IOUtil.getInputStream(thumb,
                     getClass()));
             return new Result(
-                "", bytes,
+                BLANK, bytes,
                 IOUtil.getFileExtension(entry.getResource().getPath()));
         } else {
-            return new Result("",
+            return new Result(BLANK,
                               IOUtil.getInputStream(entry.getResource()
                                   .getPath(), getClass()), IOUtil
                                       .getFileExtension(entry.getResource()
@@ -2761,9 +2877,15 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-    public void close()  throws Exception {
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    public void close() throws Exception {
         getDatabaseManager().closeConnection();
     }
+
     /**
      * _more_
      *
@@ -2777,7 +2899,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     protected String makeGroupHeader(Request request, Group group)
             throws Exception {
         return HtmlUtil.bold(msg("Group:")) + HtmlUtil.space(1)
-               + getBreadCrumbs(request, group, true, "")[1];
+               + getBreadCrumbs(request, group, true, BLANK)[1];
     }
 
 
@@ -2804,7 +2926,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             sb.append(
                 HtmlUtil.formEntry(
                     HtmlUtil.submit("Import catalog:"),
-                    HtmlUtil.input(ARG_CATALOG, "", HtmlUtil.SIZE_70)
+                    HtmlUtil.input(ARG_CATALOG, BLANK, HtmlUtil.SIZE_70)
                     + HtmlUtil.space(1)
                     + HtmlUtil.checkbox(ARG_RECURSE, "true", false)
                     + " Recurse"));
@@ -2831,13 +2953,13 @@ public class Repository implements Constants, Tables, RequestHandler,
         StringBuffer sb    = new StringBuffer();
         sb.append(makeGroupHeader(request, group));
         sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.form(URL_ENTRY_FORM, ""));
+        sb.append(HtmlUtil.form(URL_ENTRY_FORM, BLANK));
         sb.append(HtmlUtil.formEntry(HtmlUtil.submit("Create new entry:"),
                                      makeTypeSelect(request, false)));
         sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
         sb.append("</form>");
 
-        sb.append(makeNewGroupForm(request, group, ""));
+        sb.append(makeNewGroupForm(request, group, BLANK));
         sb.append("</table>");
 
         return new Result("New Form", sb, Result.TYPE_HTML);
@@ -2887,12 +3009,12 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         sb.append(HtmlUtil.formTable());
         if (type == null) {
-            sb.append(HtmlUtil.form(URL_ENTRY_FORM, ""));
+            sb.append(HtmlUtil.form(URL_ENTRY_FORM, BLANK));
         } else {
-            sb.append(HtmlUtil.uploadForm(URL_ENTRY_CHANGE, ""));
+            sb.append(HtmlUtil.uploadForm(URL_ENTRY_CHANGE, BLANK));
         }
 
-        String title = "";
+        String title = BLANK;
 
         if (type == null) {
             sb.append(HtmlUtil.formEntry("Type:",
@@ -2900,7 +3022,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
             sb.append(
                 HtmlUtil.formEntry(
-                    "", HtmlUtil.submit("Select Type to Add")));
+                    BLANK, HtmlUtil.submit("Select Type to Add")));
             sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
         } else {
             TypeHandler typeHandler = ((entry == null)
@@ -2922,7 +3044,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             String cancelButton = HtmlUtil.submit("Cancel", ARG_CANCEL);
             String buttons = submitButton + HtmlUtil.space(2) + cancelButton;
 
-            sb.append(HtmlUtil.formEntry("", buttons));
+            sb.append(HtmlUtil.formEntry(BLANK, buttons));
             if (entry != null) {
                 sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
             } else {
@@ -2936,14 +3058,14 @@ public class Repository implements Constants, Tables, RequestHandler,
                                          HtmlUtil.input(ARG_NAME,
                                              ((entry != null)
                     ? entry.getName()
-                    : ""), size)));
+                    : BLANK), size)));
             int rows = typeHandler.getProperty("form.rows.desc", 3);
             sb.append(
                 HtmlUtil.formEntryTop(
                     "Description:",
                     HtmlUtil.textArea(ARG_DESCRIPTION, ((entry != null)
                     ? entry.getDescription()
-                    : ""), rows, 50)));
+                    : BLANK), rows, 50)));
 
             if (typeHandler.okToShowInForm(ARG_RESOURCE)) {
                 if (entry == null) {
@@ -2952,7 +3074,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                             + HtmlUtil.checkbox(ARG_FILE_UNZIP, "true",
                                 false) + " Unzip archive"));
                     sb.append(HtmlUtil.formEntry("Or URL:",
-                            HtmlUtil.input(ARG_RESOURCE, "", size)));
+                            HtmlUtil.input(ARG_RESOURCE, BLANK, size)));
                 } else {
                     sb.append(HtmlUtil.formEntry("Resource:",
                             entry.getResource().getPath()));
@@ -2961,11 +3083,13 @@ public class Repository implements Constants, Tables, RequestHandler,
 
             String dateHelp = " (e.g., 2007-12-11 00:00:00)";
             String fromDate = ((entry != null)
-                               ? fmt(new Date(entry.getStartDate()))
-                               : "");
-            String toDate   = ((entry != null)
-                               ? fmt(new Date(entry.getEndDate()))
-                               : "");
+                               ? formatDate(request,
+                                            new Date(entry.getStartDate()))
+                               : BLANK);
+            String toDate = ((entry != null)
+                             ? formatDate(request,
+                                          new Date(entry.getEndDate()))
+                             : BLANK);
             if (typeHandler.okToShowInForm(ARG_DATE)) {
                 sb.append(
                     HtmlUtil.formEntry(
@@ -2979,7 +3103,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 if (entry == null) {
                     List datePatterns = new ArrayList();
 
-                    datePatterns.add(new TwoFacedObject("All", ""));
+                    datePatterns.add(new TwoFacedObject("All", BLANK));
                     for (int i = 0; i < DateUtil.DATE_PATTERNS.length; i++) {
                         datePatterns.add(DateUtil.DATE_FORMATS[i]);
                     }
@@ -3011,7 +3135,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
 
             typeHandler.addToEntryForm(request, sb, entry);
-            sb.append(HtmlUtil.formEntry("", buttons));
+            sb.append(HtmlUtil.formEntry(BLANK, buttons));
         }
         sb.append("</table>\n");
         if (entry == null) {
@@ -3033,16 +3157,16 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     protected Entry getEntry(Request request) throws Exception {
-        Entry entry = getEntry(request.getString(ARG_ID, ""), request);
+        Entry entry = getEntry(request.getString(ARG_ID, BLANK), request);
         if (entry == null) {
-            Entry tmp = getEntry(request.getString(ARG_ID, ""), request,
+            Entry tmp = getEntry(request.getString(ARG_ID, BLANK), request,
                                  false);
             if (tmp != null) {
                 throw new AccessException(
                     "You do not have access to this entry");
             }
             throw new IllegalArgumentException("Could not find entry:"
-                    + request.getString(ARG_ID, ""));
+                    + request.getString(ARG_ID, BLANK));
         }
         return entry;
     }
@@ -3094,9 +3218,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         StringBuffer  sb       = new StringBuffer();
         List<Comment> comments = getComments(request, entry);
         if (canComment) {
-            sb.append(HtmlUtil.form(URL_COMMENTS_ADD, ""));
+            sb.append(HtmlUtil.form(URL_COMMENTS_ADD, BLANK));
             sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
-            sb.append(HtmlUtil.formEntry("",
+            sb.append(HtmlUtil.formEntry(BLANK,
                                          HtmlUtil.submit("Add Comment",
                                              ARG_ADD)));
             sb.append(HtmlUtil.formClose());
@@ -3104,7 +3228,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         sb.append("<table>");
         for (Comment comment : comments) {
-            sb.append(HtmlUtil.formEntry("", "<hr>"));
+            sb.append(HtmlUtil.formEntry(BLANK, HtmlUtil.hr()));
             //TODO: Check for access
             String deleteLink = HtmlUtil.href(
                                     HtmlUtil.url(
@@ -3115,12 +3239,13 @@ public class Repository implements Constants, Tables, RequestHandler,
                                             fileUrl(ICON_DELETE),
                                             msg("Delete comment")));
             if (canEdit) {
-                sb.append(HtmlUtil.formEntry("", deleteLink));
+                sb.append(HtmlUtil.formEntry(BLANK, deleteLink));
             }
             sb.append(HtmlUtil.formEntry("Subject:", comment.getSubject()));
             sb.append(HtmlUtil.formEntry("By:",
                                          comment.getUser().getLabel() + " @ "
-                                         + fmt(comment.getDate())));
+                                         + formatDate(request,
+                                             comment.getDate())));
             sb.append(HtmlUtil.formEntryTop("Comment:",
                                             comment.getComment()));
         }
@@ -3140,7 +3265,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         Entry        entry = getEntry(request);
         StringBuffer sb    = new StringBuffer();
         if (request.exists(ARG_MESSAGE)) {
-            sb.append(note(request.getUnsafeString(ARG_MESSAGE, "")));
+            sb.append(note(request.getUnsafeString(ARG_MESSAGE, BLANK)));
         }
         sb.append("Comments for: " + getEntryUrl(entry));
         sb.append("<p>");
@@ -3148,19 +3273,46 @@ public class Repository implements Constants, Tables, RequestHandler,
         return new Result("Entry Comments", sb, Result.TYPE_HTML);
     }
 
+    /** _more_ */
     public static final String MSG_PREFIX = "<msg ";
+
+    /** _more_ */
     public static final String MSG_SUFFIX = " msg>";
+
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     *
+     * @return _more_
+     */
     public static String msg(String msg) {
-        if(msg.indexOf(MSG_PREFIX)>=0) throw new IllegalArgumentException ("bad msg:" + msg);
-        return MSG_PREFIX + msg +MSG_SUFFIX;
+        if (msg.indexOf(MSG_PREFIX) >= 0) {
+            throw new IllegalArgumentException("bad msg:" + msg);
+        }
+        return MSG_PREFIX + msg + MSG_SUFFIX;
     }
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     *
+     * @return _more_
+     */
     public static String msgLabel(String msg) {
-        return msg(msg) +":" + HtmlUtil.space(1);
+        return msg(msg) + ":" + HtmlUtil.space(1);
     }
 
+    /**
+     * _more_
+     *
+     * @param h _more_
+     *
+     * @return _more_
+     */
     protected static String msgHeader(String h) {
-        return HtmlUtil.div(msg(h),"class=\"heading\"");
+        return HtmlUtil.div(msg(h), "class=\"heading\"");
     }
 
     /**
@@ -3176,7 +3328,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         Entry entry = getEntry(request);
         getDatabaseManager().executeDelete(
             TABLE_COMMENTS, COL_COMMENTS_ID,
-            SqlUtil.quote(request.getString(ARG_COMMENT_ID, "")));
+            SqlUtil.quote(request.getString(ARG_COMMENT_ID, BLANK)));
         entry.setComments(null);
         return new Result(HtmlUtil.url(URL_COMMENTS_SHOW, ARG_ID,
                                        entry.getId(), ARG_MESSAGE,
@@ -3199,7 +3351,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         StringBuffer sb    = new StringBuffer();
 
         if (request.exists(ARG_MESSAGE)) {
-            sb.append(note(request.getUnsafeString(ARG_MESSAGE, "")));
+            sb.append(note(request.getUnsafeString(ARG_MESSAGE, BLANK)));
         }
 
 
@@ -3208,10 +3360,10 @@ public class Repository implements Constants, Tables, RequestHandler,
                                            entry.getId()));
         }
 
-        String subject = "";
-        String comment = "";
-        subject = request.getString(ARG_SUBJECT, "").trim();
-        comment = request.getString(ARG_COMMENT, "").trim();
+        String subject = BLANK;
+        String comment = BLANK;
+        subject = request.getString(ARG_SUBJECT, BLANK).trim();
+        comment = request.getString(ARG_COMMENT, BLANK).trim();
         if (comment.length() == 0) {
             sb.append(warning("Please enter a comment"));
         } else {
@@ -3224,7 +3376,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             insert.setTimestamp(col++, new java.sql.Timestamp(currentTime()),
                                 calendar);
             insert.setString(col++, subject);
-            insert.setString(col++, request.getString(ARG_COMMENT, ""));
+            insert.setString(col++, request.getString(ARG_COMMENT, BLANK));
             insert.execute();
             insert.close();
             entry.setComments(null);
@@ -3234,7 +3386,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
         sb.append("Add comment for: " + getEntryUrl(entry));
-        sb.append(HtmlUtil.form(URL_COMMENTS_ADD, ""));
+        sb.append(HtmlUtil.form(URL_COMMENTS_ADD, BLANK));
         sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry("Subject:",
@@ -3243,7 +3395,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         sb.append(HtmlUtil.formEntryTop("Comment:",
                                         HtmlUtil.textArea(ARG_COMMENT,
                                             comment, 5, 40)));
-        sb.append(HtmlUtil.formEntry("",
+        sb.append(HtmlUtil.formEntry(BLANK,
                                      HtmlUtil.submit("Add Comment")
                                      + HtmlUtil.space(2)
                                      + HtmlUtil.submit("Cancel",
@@ -3267,15 +3419,16 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processAssociationAdd(Request request) throws Exception {
-        Entry fromEntry = getEntry(request.getString(ARG_FROM, ""), request);
-        Entry toEntry   = getEntry(request.getString(ARG_TO, ""), request);
+        Entry fromEntry = getEntry(request.getString(ARG_FROM, BLANK),
+                                   request);
+        Entry toEntry = getEntry(request.getString(ARG_TO, BLANK), request);
         if (fromEntry == null) {
             throw new IllegalArgumentException("Could not find entry:"
-                    + request.getString(ARG_FROM, ""));
+                    + request.getString(ARG_FROM, BLANK));
         }
         if (toEntry == null) {
             throw new IllegalArgumentException("Could not find entry:"
-                    + request.getString(ARG_TO, ""));
+                    + request.getString(ARG_TO, BLANK));
         }
         String name = request.getString(ARG_NAME, (String) null);
         if (name != null) {
@@ -3294,7 +3447,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         StringBuffer sb = new StringBuffer();
         sb.append("Add association between " + fromEntry.getName());
         sb.append(" and  " + toEntry.getName());
-        sb.append(HtmlUtil.form(URL_ASSOCIATION_ADD, ""));
+        sb.append(HtmlUtil.form(URL_ASSOCIATION_ADD, BLANK));
         sb.append("Association Name: ");
         sb.append(HtmlUtil.input(ARG_NAME));
         sb.append(HtmlUtil.hidden(ARG_FROM, fromEntry.getId()));
@@ -3364,15 +3517,19 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-        sb.append(HtmlUtil.form(URL_ENTRY_DELETE, ""));
-        StringBuffer inner  =new StringBuffer();
+        sb.append(HtmlUtil.form(URL_ENTRY_DELETE, BLANK));
+        StringBuffer inner = new StringBuffer();
         if (entry.isGroup()) {
-            inner.append(msgLabel("Are you sure you want to delete the group"));
+            inner.append(
+                msgLabel("Are you sure you want to delete the group"));
             inner.append(entry.getName());
             inner.append(HtmlUtil.p());
-            inner.append(msg("Note: This will also delete all of the descendents of the group"));
+            inner.append(
+                msg(
+                "Note: This will also delete all of the descendents of the group"));
         } else {
-            inner.append(msgLabel("Are you sure you want to delete the entry"));
+            inner.append(
+                msgLabel("Are you sure you want to delete the entry"));
             inner.append(entry.getName());
         }
         inner.append(HtmlUtil.p());
@@ -3382,8 +3539,8 @@ public class Repository implements Constants, Tables, RequestHandler,
         sb.append(question(inner.toString()));
         sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
         sb.append(HtmlUtil.formClose());
-        return makeEntryEditResult(request, entry, msg("Entry delete confirm"),
-                                   sb);
+        return makeEntryEditResult(request, entry,
+                                   msg("Entry delete confirm"), sb);
     }
 
 
@@ -3402,7 +3559,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             throws Exception {
         String crumbs = getBreadCrumbs(request,
                                        findGroup(entry.getParentGroupId()),
-                                       true, "")[1];
+                                       true, BLANK)[1];
         if (crumbs.length() > 0) {
             crumbs = crumbs + "&nbsp;&gt;&nbsp;";
         }
@@ -3455,15 +3612,21 @@ public class Repository implements Constants, Tables, RequestHandler,
 
             if (request.exists(ARG_DELETE)) {
                 StringBuffer sb = new StringBuffer();
-                sb.append(HtmlUtil.form(URL_ENTRY_CHANGE, ""));
-                StringBuffer inner  =new StringBuffer();
+                sb.append(HtmlUtil.form(URL_ENTRY_CHANGE, BLANK));
+                StringBuffer inner = new StringBuffer();
                 if (entry.isGroup()) {
-                    inner.append(msgLabel("Are you sure you want to delete the group"));
+                    inner.append(
+                        msgLabel(
+                            "Are you sure you want to delete the group"));
                     inner.append(entry.getName());
                     inner.append(HtmlUtil.p());
-                    inner.append(msg("Note: This will also delete all of the descendents of the group"));
+                    inner.append(
+                        msg(
+                        "Note: This will also delete all of the descendents of the group"));
                 } else {
-                    inner.append(msgLabel("Are you sure you want to delete the entry"));
+                    inner.append(
+                        msgLabel(
+                            "Are you sure you want to delete the entry"));
                     inner.append(entry.getName());
                 }
                 inner.append("<p>");
@@ -3487,7 +3650,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             List<String> origNames = new ArrayList();
             typeHandler =
                 getTypeHandler(request.getType(TypeHandler.TYPE_ANY));
-            String  resource     = request.getString(ARG_RESOURCE, "");
+            String  resource     = request.getString(ARG_RESOURCE, BLANK);
             String  filename     = request.getUploadedFile(ARG_FILE);
             boolean unzipArchive = false;
             boolean isFile       = false;
@@ -3498,7 +3661,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
             if ( !unzipArchive) {
                 resources.add(resource);
-                origNames.add(request.getString(ARG_FILE, ""));
+                origNames.add(request.getString(ARG_FILE, BLANK));
             } else {
                 ZipInputStream zin =
                     new ZipInputStream(new FileInputStream(resource));
@@ -3531,7 +3694,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
 
 
-            String description = request.getString(ARG_DESCRIPTION, "");
+            String description = request.getString(ARG_DESCRIPTION, BLANK);
 
             Date   createDate  = new Date();
             Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
@@ -3553,7 +3716,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                     theResource = getStorageManager().moveToStorage(request,
                             new File(theResource)).toString();
                 }
-                String name = request.getString(ARG_NAME, "");
+                String name = request.getString(ARG_NAME, BLANK);
                 if (name.trim().length() == 0) {
                     name = IOUtil.getFileTail(origName);
                 }
@@ -3586,7 +3749,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
                 if (request.defined(ARG_DATE_PATTERN)) {
                     String format = request.getUnsafeString(ARG_DATE_PATTERN,
-                                        "");
+                                        BLANK);
                     String pattern = null;
                     for (int i = 0; i < DateUtil.DATE_PATTERNS.length; i++) {
                         if (format.equals(DateUtil.DATE_FORMATS[i])) {
@@ -3657,7 +3820,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                     entry.getDescription()));
             if (request.defined(ARG_RESOURCE)) {
                 entry.setResource(
-                    new Resource(request.getString(ARG_RESOURCE, "")));
+                    new Resource(request.getString(ARG_RESOURCE, BLANK)));
             }
             if (dateRange[0] != null) {
                 entry.setStartDate(dateRange[0].getTime());
@@ -3686,7 +3849,8 @@ public class Repository implements Constants, Tables, RequestHandler,
                                            entries.size()
                                            + " files uploaded"));
         } else {
-            return new Result("", new StringBuffer(msg("No entries created")));
+            return new Result(BLANK,
+                              new StringBuffer(msg("No entries created")));
         }
     }
 
@@ -3726,8 +3890,8 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (request.defined(ARG_ID)) {
             entry = getEntry(request);
             if (entry == null) {
-                Entry tmp = getEntry(request.getString(ARG_ID, ""), request,
-                                     false);
+                Entry tmp = getEntry(request.getString(ARG_ID, BLANK),
+                                     request, false);
                 if (tmp != null) {
                     throw new IllegalArgumentException(
                         "You do not have access to this entry");
@@ -3923,7 +4087,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         List breadcrumbs = new ArrayList();
         List titleList   = new ArrayList();
         if (entry == null) {
-            return new String[] { "", "" };
+            return new String[] { BLANK, BLANK };
         }
         Group  parent = findGroup(entry.getParentGroupId());
         String output = ((request == null)
@@ -4072,11 +4236,10 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         String fromProperties = getProperty(id);
         if (fromProperties != null) {
-            for (String path : StringUtil.split(fromProperties, ";", true,
-                    true)) {
+            List<String> paths = getResourcePaths(id);
+            for (String path : paths) {
                 try {
-                    resource = IOUtil.readContents(
-                        getStorageManager().localizePath(path), getClass());
+                    resource = IOUtil.readContents(path, getClass());
                 } catch (Exception exc) {
                     //noop
                 }
@@ -4238,7 +4401,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             String xml = StringUtil.replace(graphXmlTemplate, "${content}",
                                             sb.toString());
             xml = StringUtil.replace(xml, "${root}", getUrlBase());
-            return new Result("", new StringBuffer(xml),
+            return new Result(BLANK, new StringBuffer(xml),
                               getMimeTypeFromSuffix(".xml"));
         }
 
@@ -4312,7 +4475,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                                             sb.toString());
 
             xml = StringUtil.replace(xml, "${root}", getUrlBase());
-            return new Result("", new StringBuffer(xml),
+            return new Result(BLANK, new StringBuffer(xml),
                               getMimeTypeFromSuffix(".xml"));
         }
 
@@ -4429,7 +4592,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         String xml = StringUtil.replace(graphXmlTemplate, "${content}",
                                         sb.toString());
         xml = StringUtil.replace(xml, "${root}", getUrlBase());
-        return new Result("", new StringBuffer(xml),
+        return new Result(BLANK, new StringBuffer(xml),
                           getMimeTypeFromSuffix(".xml"));
 
     }
@@ -4558,7 +4721,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *   TypeHandler typeHandler = getTypeHandler(request);
      *   List        where       = typeHandler.assembleWhereClause(request);
      *   if (where.size() == 0) {
-     *       String type = (String) request.getType("").trim();
+     *       String type = (String) request.getType(BLANK).trim();
      *       if ((type.length() > 0) && !type.equals(TypeHandler.TYPE_ANY)) {
      *           typeHandler.addOr(COL_ENTRIES_TYPE, type, where, true);
      *       }
@@ -4928,7 +5091,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         String newId = null;
         while (true) {
             if (parent == null) {
-                newId = "" + baseId;
+                newId = BLANK + baseId;
             } else {
                 newId = parent.getId() + Group.IDDELIMITER + baseId;
             }
@@ -4969,17 +5132,17 @@ public class Repository implements Constants, Tables, RequestHandler,
             order = " ASC ";
         }
         int    skipCnt     = request.get(ARG_SKIP, 0);
-        String limitString = "";
+        String limitString = BLANK;
         //        if (request.defined(ARG_SKIP)) {
         //            if (skipCnt > 0) {
         int max = request.get(ARG_MAX, MAX_ROWS);
         limitString = getDatabaseManager().getLimitString(skipCnt, max);
-        String orderBy = "";
+        String orderBy = BLANK;
         if (addOrderBy) {
             orderBy = " ORDER BY " + COL_ENTRIES_FROMDATE + order;
         }
         if (request.defined(ARG_ORDERBY)) {
-            String by = request.getString(ARG_ORDERBY, "");
+            String by = request.getString(ARG_ORDERBY, BLANK);
             if (by.equals("fromdate")) {
                 orderBy = " ORDER BY " + COL_ENTRIES_FROMDATE + order;
             } else if (by.equals("todate")) {
@@ -5035,7 +5198,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 if (seen.get(entry.getId()) != null) {
                     continue;
                 }
-                seen.put(entry.getId(), "");
+                seen.put(entry.getId(), BLANK);
                 allEntries.add(entry);
             }
         }
@@ -5160,7 +5323,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected String getTagLinks(Request request, String tag)
             throws Exception {
-        return "";
+        return BLANK;
 
     }
 
@@ -5270,7 +5433,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     protected String getAssociationLinks(Request request, String association)
             throws Exception {
         if (true) {
-            return "";
+            return BLANK;
         }
         String search = HtmlUtil.href(
                             HtmlUtil.url(
@@ -5339,7 +5502,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected String getGraphLink(Request request, Group group) {
         if ( !isAppletEnabled(request)) {
-            return "";
+            return BLANK;
         }
         return HtmlUtil
             .href(HtmlUtil
@@ -5369,7 +5532,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         Entry entry = entryListener.getEntry();
         if (entry == null) {
-            return new Result("", new StringBuffer("No match"),
+            return new Result(BLANK, new StringBuffer("No match"),
                               getMimeTypeFromSuffix(".html"));
         }
         return getOutputHandler(request).outputEntry(request, entry);
@@ -5479,17 +5642,10 @@ public class Repository implements Constants, Tables, RequestHandler,
     /**
      * _more_
      *
-     * @param group _more_
-     * @param type _more_
-     * @param name _more_
-     * @param content _more_
-     * @param connection _more_
      *
      * @param request _more_
      * @param entries _more_
-     *
-     * @param metadata _more_
-     *
+     * @param connection _more_
      *
      * @return _more_
      * @throws Exception _more_
@@ -5844,10 +6000,11 @@ public class Repository implements Constants, Tables, RequestHandler,
         System.err.println("mem:" + Misc.usedMemory());
         List<Harvester> harvesters  = getAdmin().getHarvesters();
         TypeHandler     typeHandler = getTypeHandler(request);
-        String          filepath    = request.getUnsafeString(ARG_FILE, "");
+        String          filepath    = request.getUnsafeString(ARG_FILE,
+                                          BLANK);
         //Check to  make sure we can access this file
         if ( !getStorageManager().isInDownloadArea(filepath)) {
-            return new Result("",
+            return new Result(BLANK,
                               new StringBuffer("Cannot load file:"
                                   + filepath), "text/plain");
         }
@@ -5855,10 +6012,11 @@ public class Repository implements Constants, Tables, RequestHandler,
             Entry entry = harvester.processFile(typeHandler, filepath);
             if (entry != null) {
                 addNewEntry(entry);
-                return new Result("", new StringBuffer("OK"), "text/plain");
+                return new Result(BLANK, new StringBuffer("OK"),
+                                  "text/plain");
             }
         }
-        return new Result("", new StringBuffer("Could not create entry"),
+        return new Result(BLANK, new StringBuffer("Could not create entry"),
                           "text/plain");
     }
 
@@ -6151,7 +6309,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     public List<Entry> getUniqueEntries(List<Entry> entries)
             throws Exception {
         List<Entry> needToAdd = new ArrayList();
-        String      query     = "";
+        String      query     = BLANK;
         try {
             if (entries.size() == 0) {
                 return needToAdd;

@@ -68,6 +68,7 @@ public class User {
     /** _more_ */
     private List<String> roles;
 
+    /** _more_ */
     private String language = "";
 
     /**
@@ -114,9 +115,11 @@ public class User {
      * @param answer _more_
      * @param password _more_
      * @param admin _more_
+     * @param language _more_
      */
     public User(String id, String name, String email, String question,
-                String answer, String password, boolean admin, String language) {
+                String answer, String password, boolean admin,
+                String language) {
 
         this.id       = id;
         this.name     = name;
@@ -125,7 +128,9 @@ public class User {
         this.answer   = answer;
         this.password = password;
         this.admin    = admin;
-        if(language == null) language =  "";
+        if (language == null) {
+            language = "";
+        }
         this.language = language;
 
     }
@@ -397,23 +402,23 @@ public class User {
         return StringUtil.join(delimiter, roles);
     }
 
-/**
-Set the Language property.
+    /**
+     * Set the Language property.
+     *
+     * @param value The new value for Language
+     */
+    public void setLanguage(String value) {
+        language = value;
+    }
 
-@param value The new value for Language
-**/
-public void setLanguage (String value) {
-	language = value;
-}
-
-/**
-Get the Language property.
-
-@return The Language
-**/
-public String getLanguage () {
-	return language;
-}
+    /**
+     * Get the Language property.
+     *
+     * @return The Language
+     */
+    public String getLanguage() {
+        return language;
+    }
 
 
 

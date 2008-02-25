@@ -50,7 +50,7 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class MetaDataServer extends HttpServer implements Constants {
+public class RepositoryServer extends HttpServer implements Constants {
 
     /** _more_ */
     Repository repository;
@@ -65,7 +65,7 @@ public class MetaDataServer extends HttpServer implements Constants {
      * @param args _more_
      * @throws Throwable _more_
      */
-    public MetaDataServer(String[] args) throws Throwable {
+    public RepositoryServer(String[] args) throws Throwable {
         super(8080);
         this.args = args;
         for (int i = 0; i < args.length; i++) {
@@ -146,7 +146,7 @@ public class MetaDataServer extends HttpServer implements Constants {
          *
          * @throws Exception _more_
          */
-        public MyRequestHandler(MetaDataServer server, Socket socket)
+        public MyRequestHandler(RepositoryServer server, Socket socket)
                 throws Exception {
             super(server, socket);
         }
@@ -299,7 +299,7 @@ public class MetaDataServer extends HttpServer implements Constants {
      */
     public static void main(String[] args) throws Throwable {
         try {
-            MetaDataServer mds = new MetaDataServer(args);
+            RepositoryServer mds = new RepositoryServer(args);
             mds.init();
         } catch (Exception exc) {
             LogUtil.printExceptionNoGui(null, "Error in main",

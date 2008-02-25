@@ -590,7 +590,6 @@ public class GenericTypeHandler extends TypeHandler {
      * @param formBuffer _more_
      * @param request _more_
      * @param where _more_
-     * @param simpleForm _more_
      * @param advancedForm _more_
      *
      * @throws Exception _more_

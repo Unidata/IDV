@@ -114,15 +114,18 @@ public class MetadataServlet extends HttpServlet {
     }
 
 
+    /**
+     * _more_
+     */
     public void destroy() {
         super.destroy();
-        if(repository!=null) {
+        if (repository != null) {
             try {
                 repository.close();
             } catch (Exception e) {
                 try {
-                    ex.logException(ex.getStackTrace(e),"");
-                } catch(Exception noop) {}
+                    ex.logException(ex.getStackTrace(e), "");
+                } catch (Exception noop) {}
             }
         }
         repository = null;
@@ -259,13 +262,13 @@ public class MetadataServlet extends HttpServlet {
      */
     private class RequestHandler {
 
-        /** _more_          */
+        /** _more_ */
         Hashtable formArgs = new Hashtable();
 
-        /** _more_          */
+        /** _more_ */
         Hashtable httpArgs = new Hashtable();
 
-        /** _more_          */
+        /** _more_ */
         Hashtable fileUploads = new Hashtable();
 
 

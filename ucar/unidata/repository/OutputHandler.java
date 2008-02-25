@@ -177,7 +177,6 @@ public class OutputHandler extends RepositoryManager {
      * _more_
      *
      * @param request _more_
-     * @param entries _more_
      * @param entry _more_
      * @param types _more_
      *
@@ -293,7 +292,7 @@ public class OutputHandler extends RepositoryManager {
                                   entry.getId(), ARG_OUTPUT, output,
                                   ARG_PREVIOUS, "true"), HtmlUtil.img(
                                       getRepository().fileUrl(ICON_LEFT),
-                                     msg("View Previous Entry")));
+                                      msg("View Previous Entry")));
         return prevLink + nextLink;
     }
 
@@ -393,8 +392,8 @@ public class OutputHandler extends RepositoryManager {
                 items.add(
                     HtmlUtil.href(
                         request.getRequestPath() + "?"
-                        + request.getUrlArgs(ARG_MESSAGE), msg(tfo.toString()),
-                            " class=\"subnavlink\" "));
+                        + request.getUrlArgs(ARG_MESSAGE), msg(
+                            tfo.toString()), " class=\"subnavlink\" "));
             }
         }
         request.put(ARG_OUTPUT, initialOutput);
@@ -424,22 +423,18 @@ public class OutputHandler extends RepositoryManager {
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param tags _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
 
     /**
      * protected Result listTags(Request request, List<Tag> tags)
      *       throws Exception {
      *   return notImplemented("listTags");
      * }
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
      */
 
 

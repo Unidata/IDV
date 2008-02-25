@@ -80,7 +80,6 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
      * @param request _more_
      * @param links _more_
      *
-     * @return _more_
      *
      * @throws Exception _more_
      */

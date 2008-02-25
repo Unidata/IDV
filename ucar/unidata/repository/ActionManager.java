@@ -62,11 +62,11 @@ import java.util.Properties;
 public class ActionManager extends RepositoryManager {
 
 
-    /** _more_          */
+    /** _more_ */
     public RequestUrl URL_STATUS = new RequestUrl(this, "/status");
 
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<Object, ActionInfo> actions = new Hashtable<Object,
                                                         ActionInfo>();
 
@@ -299,19 +299,19 @@ public class ActionManager extends RepositoryManager {
      */
     public static class ActionInfo {
 
-        /** _more_          */
+        /** _more_ */
         private String name;
 
-        /** _more_          */
+        /** _more_ */
         private boolean running = true;
 
-        /** _more_          */
+        /** _more_ */
         private String message = "";
 
-        /** _more_          */
+        /** _more_ */
         private String continueHtml;
 
-        /** _more_          */
+        /** _more_ */
         private String error = null;
 
 

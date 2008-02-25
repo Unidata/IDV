@@ -248,10 +248,12 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         } else if (type.equals(TYPE_PUBLISHER) || type.equals(TYPE_CREATOR)) {
             content = metadata.getAttr1();
             if (metadata.getAttr3().length() > 0) {
-                content += HtmlUtil.br() +msgLabel("Email") + HtmlUtil.space(1) + metadata.getAttr3();
+                content += HtmlUtil.br() + msgLabel("Email")
+                           + HtmlUtil.space(1) + metadata.getAttr3();
             }
             if (metadata.getAttr4().length() > 0) {
-                content += HtmlUtil.br() +msgLabel("URL") + HtmlUtil.space(1)
+                content += HtmlUtil.br() + msgLabel("URL")
+                           + HtmlUtil.space(1)
                            + HtmlUtil.href(metadata.getAttr4(),
                                            metadata.getAttr4());
             }
@@ -303,7 +305,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         } else {
             sb.append(
                 HtmlUtil.formEntry(
-                                   msgLabel(type.getLabel()),
+                    msgLabel(type.getLabel()),
                     HtmlUtil.input(ARG_METADATA_ATTR1 + "." + type, "")
                     + inheritedCbx));
         }
@@ -391,8 +393,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         }
 
 
-        String submit = HtmlUtil.submit(msg("Add") + HtmlUtil.space(1) + lbl);
-        String cancel = HtmlUtil.submit(msg("Cancel"),ARG_CANCEL);
+        String submit = HtmlUtil.submit(msg("Add") + HtmlUtil.space(1)
+                                        + type.getLabel());
+        String cancel = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
         if (forEdit) {
             submit = "";
             cancel = "";
@@ -405,7 +408,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
         if (type.equals(TYPE_LINK)) {
             content = formEntry(new String[] { submit, msgLabel("Label"),
-                    HtmlUtil.input(arg1, metadata.getAttr1(), size), msgLabel("Url"),
+                    HtmlUtil.input(arg1, metadata.getAttr1(), size),
+                    msgLabel("Url"),
                     HtmlUtil.input(arg2, metadata.getAttr2(), size) });
         } else if (type.equals(TYPE_ICON)) {
             content = formEntry(new String[] { submit, msgLabel("URL"),
@@ -416,21 +420,23 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                              new TwoFacedObject(msg("Funding"), "funding"),
                              new TwoFacedObject(msg("History"), "history"),
                              new TwoFacedObject(
-                                                msg("Processing Level"),
+                                 msg("Processing Level"),
                                  "processing_level"), new TwoFacedObject(
-                                                                         msg("Rights"), "rights"));
+                                     msg("Rights"), "rights"));
 
             content = formEntry(new String[] { submit, msgLabel("Type"),
                     HtmlUtil.select(arg1, types, metadata.getAttr1()),
-                                               msgLabel("Value"),
+                    msgLabel("Value"),
                     HtmlUtil.textArea(arg2, metadata.getAttr2(), 5, 50) });
         } else if (type.equals(TYPE_CONTRIBUTOR)) {
             content = formEntry(new String[] { submit, msgLabel("Name"),
-                    HtmlUtil.input(arg1, metadata.getAttr1(), size), msgLabel("Role"),
+                    HtmlUtil.input(arg1, metadata.getAttr1(), size),
+                    msgLabel("Role"),
                     HtmlUtil.input(arg2, metadata.getAttr2(), size) });
         } else if (type.equals(TYPE_PROPERTY)) {
             content = formEntry(new String[] { submit, msgLabel("Name"),
-                    HtmlUtil.input(arg1, metadata.getAttr1(), size), msgLabel("Value"),
+                    HtmlUtil.input(arg1, metadata.getAttr1(), size),
+                    msgLabel("Value"),
                     HtmlUtil.input(arg2, metadata.getAttr2(), size) });
 
         } else if (type.equals(TYPE_KEYWORD)) {
@@ -438,20 +444,21 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     HtmlUtil.input(arg1,
                                    metadata.getAttr1().replace("\n", ""),
                                    size),
-                                               msgLabel("Vocabulary"),
+                    msgLabel("Vocabulary"),
                     HtmlUtil.input(arg2, metadata.getAttr2(), size) });
 
         } else if (type.equals(TYPE_PUBLISHER) || type.equals(TYPE_CREATOR)) {
             content = formEntry(new String[] {
                 submit, msgLabel("Organization"),
-                HtmlUtil.input(arg1, metadata.getAttr1(), size), msgLabel("Email"),
-                HtmlUtil.input(arg3, metadata.getAttr3(), size), msgLabel("URL"),
+                HtmlUtil.input(arg1, metadata.getAttr1(), size),
+                msgLabel("Email"),
+                HtmlUtil.input(arg3, metadata.getAttr3(), size),
+                msgLabel("URL"),
                 HtmlUtil.input(arg4, metadata.getAttr4(), size)
             });
         } else {
-            content = formEntry(new String[] { submit,
-                                               msgLabel("Value"),
-                                               HtmlUtil.input(arg1, metadata.getAttr1(), size) });
+            content = formEntry(new String[] { submit, msgLabel("Value"),
+                    HtmlUtil.input(arg1, metadata.getAttr1(), size) });
         }
         if (content == null) {
             return null;
@@ -460,8 +467,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         String argid   = ARG_METADATAID + suffix;
         content = content + HtmlUtil.hidden(argtype, type.getType())
                   + HtmlUtil.hidden(argid, metadata.getId());
-        if(cancel.length()>0) {
-            content = content + HtmlUtil.row(HtmlUtil.colspan(cancel,2));
+        if (cancel.length() > 0) {
+            content = content + HtmlUtil.row(HtmlUtil.colspan(cancel, 2));
         }
         return new String[] { lbl, content };
     }
