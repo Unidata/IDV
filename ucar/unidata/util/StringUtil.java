@@ -23,12 +23,6 @@
 
 package ucar.unidata.util;
 
-
-import ucar.unidata.xml.XmlUtil;
-
-
-import java.security.SignatureException;
-
 import java.text.ParsePosition;
 
 
@@ -38,8 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.*;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
+
 
 
 /**
@@ -275,6 +268,35 @@ public class StringUtil {
         "&amp;", "&quot;", "&#39;", "&lt;", "&gt;", "\n<p>"
     };
 
+
+    
+    /**
+     * Replace special characters with entities for XML attributes.
+     * special: '&', '<', '>', '\'', '"', '\r', '\n'
+     * @param x string to quote
+     * @return equivilent string using entities for any special chars
+     */
+    static public String quoteXmlContent(String x) {
+        return replace(x, xmlInC, xmlOutC);
+    }
+
+    /**
+     * Reverse XML quoting to recover the original string.
+     * @param x string to quote
+     * @return equivilent string
+     */
+    static public String unquoteXmlContent(String x) {
+        return unreplace(x, xmlOutC, xmlInC);
+    }
+
+    /** these chars must get replaced in XML */
+    private static char[] xmlInC = { '&', '<', '>' };
+
+    /** replacement strings */
+    private static String[] xmlOutC = { "&amp;", "&lt;", "&gt;" };
+
+
+
     /**
      * Replace special characters with entities for XML attributes.
      * special: '&', '<', '>', '\'', '"', '\r', '\n'
@@ -441,6 +463,10 @@ public class StringUtil {
         return sb.toString();
     }
 
+
+
+
+
     /**
      * Escape any char not alphanumeric or in okChars.
      * Escape by replacing char with %xx (hex).
@@ -480,6 +506,49 @@ public class StringUtil {
 
         return sb.toString();
     }
+
+
+    /**
+     * Escape any char in reservedChars.
+     * Escape by replacing char with %xx (hex).
+     * LOOK: need to check for %, replace with %%
+     *
+     * @param x             escape this string
+     * @param reservedChars these must be replaced
+     * @return equivilent escaped string.
+     */
+    static public String escape2(String x, String reservedChars) {
+        boolean ok = true;
+        for (int pos = 0; pos < x.length(); pos++) {
+            char c = x.charAt(pos);
+            if (reservedChars.indexOf(c) >= 0) {
+                ok = false;
+                break;
+            }
+        }
+        if (ok) {
+            return x;
+        }
+
+        // gotta do it
+        StringBuffer sb = new StringBuffer(x);
+        for (int pos = 0; pos < sb.length(); pos++) {
+            char c = sb.charAt(pos);
+            if (reservedChars.indexOf(c) < 0) {
+                continue;
+            }
+
+            sb.setCharAt(pos, '%');
+            int value = (int) c;
+            pos++;
+            sb.insert(pos, Integer.toHexString(value));
+            pos++;
+        }
+
+        return sb.toString();
+    }
+
+
 
     /**
      * Convert the given color to is string hex representation
@@ -589,7 +658,8 @@ public class StringUtil {
 
 
     /**
-     * Inverse of escape().
+     * This finds any '%xx' and converts to the equivilent char. Inverse of escape().
+     *
      * @param x
      * @return original String.
      */
@@ -1942,6 +2012,8 @@ public class StringUtil {
         return new Long(s).longValue();
     }
 
+
+
     /**
      * test
      *
@@ -1974,7 +2046,6 @@ public class StringUtil {
          * testEscape("_dods-\"Name\" (not so good)", "_!~*'-\"");
          */
     }
-
 
 
     /**
@@ -2018,43 +2089,6 @@ public class StringUtil {
      * @throws Exception some problem
      */
     public static void main(String[] args) throws Exception {
-        System.err.println(
-            "strip:"
-            + stripAndReplace(
-                "'xxx'hello'xxx'how are 'xxx' you'xxx'", "'", "'", "---"));
-        if (true) {
-            return;
-        }
-
-        String pattern = ".*[, =\\(]+metadata\\..*";
-        String where1  = " metadata.attr1='EART\nH SCIENCE >";
-        String where2  = " metadata.attr1='EARTH SCIENCE >";
-        where1 = where1.replace("\n", " ");
-
-        System.err.println("Match:" + where1.matches(pattern));
-        System.err.println("Match:" + where2.matches(pattern));
-
-
-        if (true) {
-            return;
-        }
-
-
-
-        String key = "the key";
-        for (int i = 0; i < args.length; i++) {
-            System.err.println(calculateRFC2104HMAC(args[i], args[i]));
-        }
-
-        /*
-        String extra = "hello there colspan=\"5\" how are you";
-        String pattern = "colspan *= *\"([^\"]+)\"";
-        String colspan = StringUtil.findPattern(extra,pattern);
-        System.err.println(colspan);
-        */
-        //        String s = IOUtil.readContents(args[0], "");
-        //        System.out.println(stripTags(s));
-
     }
 
 
@@ -2243,44 +2277,6 @@ public class StringUtil {
 
 
 
-
-    /** sha algorithm to use */
-    private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
-
-    /**
-     * Computes RFC 2104-compliant HMAC signature.
-     *
-     * @param data
-     *     The data to be signed.
-     * @param key
-     *     The signing key.
-     * @return
-     *     The base64-encoded RFC 2104-compliant HMAC signature.
-     * @throws java.security.SignatureException when signature generation fails
-     */
-    public static String calculateRFC2104HMAC(String data, String key)
-            throws java.security.SignatureException {
-        String result;
-        try {
-            // get an hmac_sha1 key from the raw key bytes
-            SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(),
-                                           HMAC_SHA1_ALGORITHM);
-
-            // get an hmac_sha1 Mac instance and initialize with the signing key
-            Mac mac = Mac.getInstance(HMAC_SHA1_ALGORITHM);
-            mac.init(signingKey);
-
-            // compute the hmac on input data bytes
-            byte[] rawHmac = mac.doFinal(data.getBytes());
-
-            // base64-encode the hmac
-            result = XmlUtil.encodeBase64(rawHmac);
-        } catch (Exception e) {
-            throw new SignatureException("Failed to generate HMAC : "
-                                         + e.getMessage());
-        }
-        return result;
-    }
 
 
 
