@@ -315,8 +315,7 @@ public interface Constants {
 
 
     /** _more_ */
-    public static final String ARG_USER = "user";
-
+    public static final String ARG_USER_ID = "user.id";
 
     /** _more_ */
     public static final String ARG_ASSOCIATION = "association";

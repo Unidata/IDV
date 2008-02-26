@@ -262,7 +262,7 @@ public class User {
      * @return _more_
      */
     public String toString() {
-        return id;
+        return "id:" + id + " name:" + name;
     }
 
 

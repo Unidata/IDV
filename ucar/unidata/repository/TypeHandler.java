@@ -1108,8 +1108,8 @@ public class TypeHandler extends RepositoryManager {
                   where, true);
         }
 
-        if (request.defined(ARG_USER)) {
-            addOr(COL_ENTRIES_USER_ID, request.getString(ARG_USER, ""),
+        if (request.defined(ARG_USER_ID)) {
+            addOr(COL_ENTRIES_USER_ID, request.getString(ARG_USER_ID, ""),
                   where, true);
         }
 

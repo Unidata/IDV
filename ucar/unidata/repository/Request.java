@@ -579,16 +579,6 @@ public class Request implements Constants {
     }
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public String getUserArg() {
-        return getString(ARG_USER, (String) null);
-    }
-
-
 
     /**
      * _more_

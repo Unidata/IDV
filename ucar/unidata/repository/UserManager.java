@@ -135,8 +135,6 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     public static final String ARG_USER_NEW = "user.new";
 
-    /** _more_ */
-    public static final String ARG_USER_ID = "user.id";
 
     /** _more_ */
     public static final String ARG_USER_NAME = "user.name";
@@ -499,6 +497,7 @@ public class UserManager extends RepositoryManager {
         }
         User user = userMap.get(id);
         if (user != null) {
+            //            System.err.println ("got from user map:" + id +" " + user);
             return user;
         }
         String query = SqlUtil.makeSelect(COLUMNS_USERS,
@@ -589,9 +588,9 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void deleteUser(User user) throws Exception {
+        deleteRoles(user);
         getDatabaseManager().executeDelete(TABLE_USERS, COL_USERS_ID,
                                            SqlUtil.quote(user.getId()));
-        deleteRoles(user);
     }
 
     /**
@@ -686,8 +685,7 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminUserEdit(Request request) throws Exception {
-
-        String userId = request.getUserArg();
+        String userId = request.getString(ARG_USER_ID, "");
         User   user   = findUser(userId);
         if (user == null) {
             throw new IllegalArgumentException(
@@ -718,7 +716,8 @@ public class UserManager extends RepositoryManager {
                                          + user.getLabel()));
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.form(URL_USER_EDIT));
-        sb.append(HtmlUtil.hidden(ARG_USER, user.getId()));
+        sb.append(HtmlUtil.hidden(ARG_USER_ID, user.getId()));
+
         if (request.defined(ARG_USER_DELETE)) {
             sb.append(
                 getRepository().question(
@@ -760,6 +759,7 @@ public class UserManager extends RepositoryManager {
     private void makeUserForm(Request request, User user, StringBuffer sb,
                               boolean includeAdmin)
             throws Exception {
+        //        System.err.println ("User:" + user);
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry(msgLabel("Name"),
                                      HtmlUtil.input(ARG_USER_NAME,
@@ -862,7 +862,7 @@ public class UserManager extends RepositoryManager {
                 makeOrUpdateUser(new User(id, name, email, "", "",
                                           hashPassword(password1), admin,
                                           ""), false);
-                String userEditLink = HtmlUtil.url(URL_USER_EDIT, ARG_USER,
+                String userEditLink = HtmlUtil.url(URL_USER_EDIT, ARG_USER_ID,
                                           id);
                 return new Result(userEditLink);
             }
@@ -949,7 +949,7 @@ public class UserManager extends RepositoryManager {
 
         for (User user : users) {
             String userEditLink = HtmlUtil.href(HtmlUtil.url(URL_USER_EDIT,
-                                      ARG_USER, user.getId()), user.getId());
+                                      ARG_USER_ID, user.getId()), user.getId());
 
             String row = (user.getAdmin()
                           ? "<tr valign=\"top\" style=\"background-color:#cccccc;\">"
