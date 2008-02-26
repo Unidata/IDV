@@ -299,6 +299,16 @@ public class RepositoryManager implements RepositorySource, Constants,
      *
      * @return _more_
      */
+    protected HarvesterManager getHarvesterManager() {
+        return repository.getHarvesterManager();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected StorageManager getStorageManager() {
         return repository.getStorageManager();
     }

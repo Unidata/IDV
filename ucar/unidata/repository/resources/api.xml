@@ -50,7 +50,6 @@
   <method request="/getentries"        method="processGetEntries" />
 
   <method request="/getmap"            method="processMap"       cancache="false"/>
-  <method request="/processfile"    method="processFile"        cancache="false"/>
   <method  request="/message"      method="processMessage"    cancache="false" />
   <method request="/dummy"      method="processDummy"/>
 
@@ -76,7 +75,7 @@
 
 
 
-  <method handler="admin"  request="/admin/import/catalog"       method="adminImportCatalog"  />
+
   <method handler="admin"  request="/admin/sql"          method="adminSql"       />
   <method handler="admin"  request="/admin/startstop"    method="adminDbStartStop" />
   <method handler="admin"  request="/admin/settings"    method="adminSettings"   name="Admin" toplevel="true"/>
@@ -84,9 +83,12 @@
   <method handler="admin"  request="/admin/tables"       method="adminDbTables"  />
   <method handler="admin"  request="/admin/actions"       method="adminActions"  />
   <method handler="admin"  request="/admin/stats"        method="adminStats"     />
-  <method handler="admin"  request="/admin/harvesters"   method="adminHarvesters"/>
   <method handler="admin"  request="/admin/cleanup"        method="adminCleanup" />
 
 
+
+  <method handler="harvestermanager" request="/processfile"    method="processFile"        cancache="false"/>
+  <method handler="harvestermanager"  request="/harvesters/list"   method="processList"/>
+  <method  handler="harvestermanager"  request="/harvesters/importcatalog"       method="processImportCatalog"  />
 
 </api>

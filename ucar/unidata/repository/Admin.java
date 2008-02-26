@@ -106,15 +106,11 @@ public class Admin extends RepositoryManager {
     public RequestUrl URL_ADMIN_STATS = new RequestUrl(this, "/admin/stats",
                                             "Statistics");
 
-    /** _more_ */
-    public RequestUrl URL_ADMIN_HARVESTERS = new RequestUrl(this,
-                                                 "/admin/harvesters",
-                                                 "Harvesters");
 
     /** _more_ */
     protected RequestUrl[] adminUrls = {
         URL_ADMIN_SETTINGS, getUserManager().URL_USER_LIST, URL_ADMIN_STATS,
-        URL_ADMIN_HARVESTERS,
+        getHarvesterManager().URL_HARVESTERS_LIST,
         /*URL_ADMIN_STARTSTOP,*/
         /*URL_ADMIN_TABLES, */
         URL_ADMIN_SQL, URL_ADMIN_CLEANUP
@@ -132,8 +128,6 @@ public class Admin extends RepositoryManager {
 
 
 
-    /** _more_ */
-    private List<Harvester> harvesters = new ArrayList();
 
     /**
      * _more_
@@ -146,31 +140,6 @@ public class Admin extends RepositoryManager {
 
 
 
-    /**
-     * _more_
-     *
-     * @param id _more_
-     *
-     * @return _more_
-     */
-    protected Harvester findHarvester(String id) {
-        for (Harvester harvester : harvesters) {
-            if (harvester.getId().equals(id)) {
-                return harvester;
-            }
-        }
-        return null;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    protected List<Harvester> getHarvesters() {
-        return harvesters;
-    }
 
 
     /**
@@ -330,45 +299,6 @@ public class Admin extends RepositoryManager {
 
 
 
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void initHarvesters() throws Exception {
-        List<String> harvesterFiles =
-            getRepository().getResourcePaths(PROP_HARVESTERS);
-        boolean okToStart =
-            getRepository().getProperty(PROP_HARVESTERS_ACTIVE, true);
-        try {
-            harvesters = new ArrayList<Harvester>();
-            for (String file : harvesterFiles) {
-                Element root = XmlUtil.getRoot(file, getClass());
-                if (root == null) {
-                    continue;
-                }
-                harvesters.addAll(Harvester.createHarvesters(getRepository(),
-                        root));
-            }
-        } catch (Exception exc) {
-            System.err.println("Error loading harvester file");
-            throw exc;
-        }
-        for (Harvester harvester : harvesters) {
-            File rootDir = harvester.getRootDir();
-            if (rootDir != null) {
-                getStorageManager().addDownloadPrefix(
-                    rootDir.toString().replace("\\", "/") + "/");
-            }
-            if ( !okToStart) {
-                harvester.setActive(false);
-            } else if (harvester.getActive()) {
-                Misc.run(harvester, "run");
-            }
-        }
-    }
-
-
 
 
     /**
@@ -475,7 +405,7 @@ public class Admin extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    private Result makeResult(Request request, String title, StringBuffer sb)
+    protected Result makeResult(Request request, String title, StringBuffer sb)
             throws Exception {
         Result result = new Result(title, sb);
         result.putProperty(PROP_NAVSUBLINKS,
@@ -617,71 +547,6 @@ public class Admin extends RepositoryManager {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result adminHarvesters(Request request) throws Exception {
-        StringBuffer sb = new StringBuffer();
-        if (request.defined(ARG_ACTION)) {
-            String    action    = request.getString(ARG_ACTION);
-            Harvester harvester = findHarvester(request.getString(ARG_ID));
-            if (action.equals(ACTION_STOP)) {
-                harvester.setActive(false);
-            } else if (action.equals(ACTION_REMOVE)) {
-                harvester.setActive(false);
-                harvesters.remove(harvester);
-            } else if (action.equals(ACTION_START)) {
-                if ( !harvester.getActive()) {
-                    harvester.setActive(true);
-                    Misc.run(harvester, "run");
-                }
-            }
-            return new Result(URL_ADMIN_HARVESTERS.toString());
-        }
-
-
-        sb.append(msgHeader("Harvesters"));
-        sb.append("<table cellspacing=\"5\">");
-        sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.bold(msg("Name")),
-                                             HtmlUtil.bold(msg("State")),
-                                             HtmlUtil.bold(msg("Action")),
-                                             "", "")));
-
-        int cnt = 0;
-        for (Harvester harvester : harvesters) {
-            String remove = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,
-                                ARG_ACTION, ACTION_REMOVE, ARG_ID,
-                                harvester.getId()), msg("Remove"));
-            String run;
-            if (harvester.getActive()) {
-                run = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,
-                        ARG_ACTION, ACTION_STOP, ARG_ID,
-                        harvester.getId()), msg("Stop"));
-            } else {
-                run = HtmlUtil.href(HtmlUtil.url(URL_ADMIN_HARVESTERS,
-                        ARG_ACTION, ACTION_START, ARG_ID,
-                        harvester.getId()), msg("Start"));
-            }
-            cnt++;
-            sb.append("<tr valign=\"top\">");
-            sb.append(HtmlUtil.cols(harvester.getName(),
-                                    (harvester.getActive()
-                                     ? msg("Active")
-                                     : msg("Stopped")) + HtmlUtil.space(
-                                         2), run, remove,
-                                             harvester.getExtraInfo()));
-            sb.append("</tr>\n");
-        }
-        sb.append("</table>");
-
-        return makeResult(request, msg("Harvesters"), sb);
-    }
 
 
 
@@ -958,43 +823,6 @@ public class Admin extends RepositoryManager {
     /** _more_ */
     int ccnt = 0;
 
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result adminImportCatalog(Request request) throws Exception {
-        Group        group   = getRepository().findGroup(request);
-        boolean      recurse = request.get(ARG_RECURSE, false);
-        StringBuffer sb      = new StringBuffer();
-        sb.append(getRepository().makeGroupHeader(request, group));
-        sb.append("<p>");
-        String catalog = request.getString(ARG_CATALOG, "").trim();
-        sb.append(HtmlUtil.form(URL_ADMIN_IMPORT_CATALOG.toString()));
-        sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
-        sb.append(HtmlUtil.submit(msgLabel("Import catalog")));
-        sb.append(HtmlUtil.space(1));
-        sb.append(HtmlUtil.input(ARG_CATALOG, catalog, " size=\"75\""));
-        sb.append(HtmlUtil.checkbox(ARG_RECURSE, "true", recurse));
-        sb.append(HtmlUtil.space(1));
-        sb.append(msg("Recurse"));
-        sb.append("</form>");
-        if (catalog.length() > 0) {
-            CatalogHarvester harvester =
-                new CatalogHarvester(getRepository(), group, catalog,
-                                     request.getUser(), recurse);
-            harvesters.add(harvester);
-            Misc.run(harvester, "run");
-        }
-
-        Result result = new Result(URL_ADMIN_HARVESTERS.toString());
-        return result;
-    }
 
 
 

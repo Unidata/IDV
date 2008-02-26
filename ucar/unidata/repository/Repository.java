@@ -343,6 +343,8 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private UserManager userManager;
 
+    private HarvesterManager harvesterManager;
+
     /** _more_ */
     private ActionManager actionManager;
 
@@ -598,6 +600,11 @@ public class Repository implements Constants, Tables, RequestHandler,
         return new UserManager(this);
     }
 
+    protected HarvesterManager doMakeHarvesterManager() {
+        return new HarvesterManager(this);
+    }
+
+
 
     /**
      * _more_
@@ -651,6 +658,13 @@ public class Repository implements Constants, Tables, RequestHandler,
             userManager = doMakeUserManager();
         }
         return userManager;
+    }
+
+    protected HarvesterManager getHarvesterManager() {
+        if (harvesterManager == null) {
+            harvesterManager = doMakeHarvesterManager();
+        }
+        return harvesterManager;
     }
 
 
@@ -772,7 +786,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         initApi();
         initUsers();
         initGroups();
-        getAdmin().initHarvesters();
+        getHarvesterManager().initHarvesters();
         initLanguages();
     }
 
@@ -1183,6 +1197,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             handler = getUserManager();
         } else if (handlerName.equals("admin")) {
             handler = getAdmin();
+        } else if (handlerName.equals("harvestermanager")) {
+            handler = getHarvesterManager();
         } else if (handlerName.equals("actionmanager")) {
             handler = getActionManager();
         } else if (handlerName.equals("accessmanager")) {
@@ -2917,7 +2933,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             sb.append(HtmlUtil.row(HtmlUtil.cols("<p>&nbsp;")));
             sb.append(
                 HtmlUtil.form(
-                    getAdmin().URL_ADMIN_IMPORT_CATALOG.toString()));
+                              getHarvesterManager().URL_HARVESTERS_IMPORTCATALOG));
             sb.append(HtmlUtil.hidden(ARG_GROUP, parentGroup.getFullName()));
             sb.append(
                 HtmlUtil.formEntry(
@@ -5983,38 +5999,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processFile(Request request) throws Exception {
-        System.err.println("mem:" + Misc.usedMemory());
-        List<Harvester> harvesters  = getAdmin().getHarvesters();
-        TypeHandler     typeHandler = getTypeHandler(request);
-        String          filepath    = request.getUnsafeString(ARG_FILE,
-                                          BLANK);
-        //Check to  make sure we can access this file
-        if ( !getStorageManager().isInDownloadArea(filepath)) {
-            return new Result(BLANK,
-                              new StringBuffer("Cannot load file:"
-                                  + filepath), "text/plain");
-        }
-        for (Harvester harvester : harvesters) {
-            Entry entry = harvester.processFile(typeHandler, filepath);
-            if (entry != null) {
-                addNewEntry(entry);
-                return new Result(BLANK, new StringBuffer("OK"),
-                                  "text/plain");
-            }
-        }
-        return new Result(BLANK, new StringBuffer("Could not create entry"),
-                          "text/plain");
-    }
 
 
 
