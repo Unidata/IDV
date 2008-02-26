@@ -124,6 +124,8 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     public static final String ARG_USER_DELETE = "user.delete";
 
+    public static final String ARG_FROMLOGIN = "user.fromlogin";
+
 
 
     /** _more_ */
@@ -1303,7 +1305,15 @@ public class UserManager extends RepositoryManager {
      */
     public Result processHome(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        if (request.defined(ARG_MESSAGE)) {
+        User         user = request.getUser();
+        if(user.getAnonymous()) {
+            String msg = msg("No user defined");
+            if(request.exists(ARG_FROMLOGIN)) {
+                msg = msg + HtmlUtil.p() +msg("If you had logged in perhaps you have cookies turned off?");
+            }
+            sb.append(getRepository().warning(msg));
+            sb.append(makeLoginForm(request));
+        } else    if (request.defined(ARG_MESSAGE)) {
             sb.append(
                 getRepository().note(
                     request.getUnsafeString(ARG_MESSAGE, "")));
@@ -1347,10 +1357,12 @@ public class UserManager extends RepositoryManager {
                     return new Result(
                         HtmlUtil.url(
                             request.getUnsafeString(ARG_REDIRECT, ""),
+                            ARG_FROMLOGIN, "true",
                             ARG_MESSAGE, msg("You are logged in")));
                 } else {
                     return new Result(HtmlUtil.url(URL_USER_HOME,
-                            ARG_MESSAGE, msg("You are logged in")));
+                                                   ARG_FROMLOGIN, "true",
+                                                   ARG_MESSAGE, msg("You are logged in")));
                 }
             } else {
                 sb.append(

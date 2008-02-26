@@ -621,11 +621,7 @@ public class HtmlOutputHandler extends OutputHandler {
                      + ARG_SHOWMETADATA + "=" + (showMetadata
                 ? "false"
                 : "true");
-        String link = subHeaderLink(url, (showMetadata
-                                          ? "-&nbsp; " + msg("Details")
-                                          : "+&nbsp; "
-                                          + msg("Details")));
-
+        String link = subHeaderLink(url, msg("Details"), showMetadata);
         sb.append(subHeader(link));
         sb.append("<table cellspacing=\"5\">\n");
         List<MetadataHandler> metadataHandlers =

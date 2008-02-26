@@ -2414,9 +2414,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         String urlArgs = request.getUrlArgs();
         request.put(ARG_FORM_METADATA, metadataForm + BLANK);
         String link = RepositoryManager.subHeaderLink(getRepository().URL_ENTRY_SEARCHFORM
-                                                      + "?" + urlArgs, (metadataForm
-                                                                        ? "- " + msg("Metadata")
-                                                                        : "+ " + msg("Metadata")));
+                                                      + "?" + urlArgs,  msg("Metadata"),metadataForm);
         sb.append(RepositoryManager.tableSubHeader(link));
         if (metadataForm) {
             getMetadataManager().addToSearchForm(request, sb);
@@ -2467,7 +2465,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (metadataForm) {
             sb.append(HtmlUtil.formEntry(HtmlUtil.space(1), BLANK));
         }
-        sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons, 2)));
+        sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons+ outputHtml, 2)));
 
         sb.append(HtmlUtil.formTableClose());
         sb.append(HtmlUtil.formClose());

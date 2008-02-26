@@ -913,8 +913,12 @@ public class TypeHandler extends RepositoryManager {
 
         List<TypeHandler> typeHandlers =
             getRepository().getTypeHandlers(request);
-        if ((typeHandlers.size() == 0) && request.defined(ARG_TYPE)) {
-            typeHandlers.add(getRepository().getTypeHandler(request));
+        if (request.defined(ARG_TYPE)) {
+            TypeHandler typeHandler = getRepository().getTypeHandler(request);
+            if(!typeHandler.isAnyHandler()) {
+                typeHandlers.clear();
+                typeHandlers.add(typeHandler);
+            }
         }
 
 
@@ -937,6 +941,7 @@ public class TypeHandler extends RepositoryManager {
             }
             }
 */
+        //TODO: Show only one type if its defined
 
         minDate = "";
         maxDate = "";
@@ -1008,9 +1013,7 @@ public class TypeHandler extends RepositoryManager {
         String urlArgs = request.getUrlArgs();
         request.put(ARG_FORM_ADVANCED, advancedForm + "");
         String link = subHeaderLink(getRepository().URL_ENTRY_SEARCHFORM
-                                    + "?" + urlArgs, (advancedForm
-                                                      ? "- " + msg("Advanced")
-                                                      : "+ " + msg("Advanced")));
+                                    + "?" + urlArgs, msg("Advanced"),advancedForm);
         formBuffer.append(tableSubHeader(link));
 
 
