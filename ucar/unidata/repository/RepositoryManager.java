@@ -172,7 +172,7 @@ public class RepositoryManager implements RepositorySource, Constants,
 
 
     public static String subHeaderLink(Object url, String label, boolean toggle) {
-        label = (toggle? "<b><tt>-</tt></b>&nbsp;" : "<b><tt>+</tt></b>&nbsp;") +label;
+        label = (toggle? "<tt>-</tt>&nbsp;" : "<tt>+</tt>&nbsp;") +label;
         return  HtmlUtil.href(url, label,  " class=\"pagesubheadinglink\" ");
     }
 
