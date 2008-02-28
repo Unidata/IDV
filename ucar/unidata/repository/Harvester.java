@@ -131,6 +131,8 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     private String id;
 
+    private boolean isEditable = false;
+
     /**
      * _more_
      *
@@ -343,6 +345,24 @@ public class Harvester extends RepositoryManager {
     public String getName() {
         return name;
     }
+
+/**
+Set the IsEditable property.
+
+@param value The new value for IsEditable
+**/
+public void setIsEditable (boolean value) {
+	isEditable = value;
+}
+
+/**
+Get the IsEditable property.
+
+@return The IsEditable
+**/
+public boolean getIsEditable () {
+	return isEditable;
+}
 
 
 

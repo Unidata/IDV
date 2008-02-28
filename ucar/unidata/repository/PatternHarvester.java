@@ -91,23 +91,21 @@ public class PatternHarvester extends Harvester {
     public static final String ATTR_BASEGROUP = "basegroup";
 
 
-
-
     /** _more_ */
     private SimpleDateFormat sdf;
     //SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
 
     /** _more_ */
-    private String groupTemplate;
+    private String groupTemplate = "${dirgroup}";
 
     /** _more_ */
     private String tagTemplate = "";
 
     /** _more_ */
-    private String nameTemplate;
+    private String nameTemplate="";
 
     /** _more_ */
-    private String descTemplate;
+    private String descTemplate="";
 
     /** _more_ */
     private List<String> columns;
@@ -180,7 +178,7 @@ public class PatternHarvester extends Harvester {
         this.filePatternString = XmlUtil.getAttribute(element,
                 ATTR_FILEPATTERN, (String) null);
         this.baseGroupName = XmlUtil.getAttribute(element, ATTR_BASEGROUP,
-                "Files");
+                                                  "Files");
         columns       = split(element, "columns");
         patternNames  = split(element, "patternnames");
         patternTypes  = split(element, "patterntypes");

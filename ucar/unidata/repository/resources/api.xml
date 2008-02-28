@@ -91,4 +91,7 @@
   <method handler="harvestermanager"  request="/harvesters/list"   method="processList"/>
   <method  handler="harvestermanager"  request="/harvesters/importcatalog"       method="processImportCatalog"  />
 
+  <method  handler="harvestermanager"  request="/harvesters/new"       method="processNew"  />
+  <method  handler="harvestermanager"  request="/harvesters/edit"       method="processEdit"  />
+
 </api>
