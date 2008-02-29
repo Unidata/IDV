@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -325,13 +326,27 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** The side legend */
     private SideLegend sideLegend;
 
-    /** _more_ */
-    private boolean canShowSideLegend = true;
+    /** Holds the side legend */
+    private JComponent sideLegendContainer;
+
+
 
     /** This holds the side legend */
     private JComponent sideLegendComponent;
 
-    /** _more_ */
+    /** gui */
+    JPanel contentsWrapper;
+
+    /** gui */
+    JComponent centerPanel;
+
+    /** gui */
+    JComponent centerPanelWrapper;
+
+
+
+
+    /** tracks wether the legend is shown, hidden or is floating */
     private String legendState = IdvLegend.STATE_DOCKED;
 
 
@@ -411,7 +426,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /** This is the split pane that holds the side legend */
-    private JSplitPane sideLegendContainer;
+    private JSplitPane mainSplitPane;
 
     /**
      *  This holds the list of DisplayInfos being displayed in this ViewManager.
@@ -615,6 +630,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** Keeps track of when we update display list when the component resizes_ */
     private int componentResizeCnt = 0;
 
+    /** _more_ */
+    private boolean dirty = false;
+
 
     /**
      *  A parameter-less ctor for the XmlEncoder based decoding.
@@ -799,21 +817,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
     }
 
-    /** _more_ */
-    JPanel contentsWrapper;
-
-    /** _more_ */
-    JComponent centerPanel;
-
-    /** _more_ */
-    JComponent centerPanelWrapper;
 
 
 
     /**
-     * _more_
+     *Handle the drop action
      *
-     * @param object _more_
+     * @param object object being dropped
      */
     public void doDrop(Object object) {
         DisplayControl control = (DisplayControl) object;
@@ -829,6 +839,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * Create the ui
      */
     protected void initUI() {
+
         try {
             init();
             if (initProperties != null) {
@@ -893,23 +904,51 @@ public class ViewManager extends SharableImpl implements ActionListener,
         legends.add(sideLegend);
         JComponent legendContents = sideLegend.getContents();
         sideLegendComponent = getSideComponent(legendContents);
-        canShowSideLegend = !getIdvUIManager().handleSideLegend(this,
-                sideLegendComponent) && getShowSideLegend();
-        //        if (canShowSideLegend  && showControlLegend) {
-        //        }
 
-        centerPanelWrapper = new JPanel(new BorderLayout());
+        sideLegendContainer = new JPanel(new BorderLayout());
+        sideLegendContainer.add(BorderLayout.CENTER, sideLegendComponent);
+
+        JComponent leftComp  = (legendOnLeft
+                                ? sideLegendContainer
+                                : centerPanel);
+        JComponent rightComp = (legendOnLeft
+                                ? centerPanel
+                                : sideLegendContainer);
+        mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftComp,
+                                       rightComp) {
+            boolean didPaint = false;
+            public void paint(Graphics g) {
+                if ( !didPaint) {
+                    didPaint = true;
+                    adjustSplitPane();
+                }
+                super.paint(g);
+            }
+        };
+
+        if (legendOnLeft) {
+            mainSplitPane.setResizeWeight(0.20);
+        } else {
+            mainSplitPane.setResizeWeight(0.80);
+        }
+        mainSplitPane.setOneTouchExpandable(true);
+
+
+        //        centerPanelWrapper = new JPanel(new BorderLayout());
+        centerPanelWrapper = GuiUtils.center(mainSplitPane);
         fullContents       = GuiUtils.leftCenter(leftNav, centerPanelWrapper);
         fullContents.setBorder(getContentsBorder());
+
         insertSideLegend();
         fillLegends();
+
     }
 
 
     /**
-     * _more_
+     * Set the position state of the side legend
      *
-     * @param state _more_
+     * @param state float, hidden, etc
      */
     public void setSideLegendPosition(String state) {
         legendState = state;
@@ -918,56 +957,56 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-     * _more_
+     * Place the side legend where it belongs
      */
     protected void insertSideLegend() {
-        centerPanelWrapper.removeAll();
         if (legendState.equals(IdvLegend.STATE_DOCKED)) {
             sideLegend.unFloatLegend();
-            JComponent leftComp  = (legendOnLeft
-                                    ? sideLegendComponent
-                                    : centerPanel);
-            JComponent rightComp = (legendOnLeft
-                                    ? centerPanel
-                                    : sideLegendComponent);
-            sideLegendContainer = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                    leftComp, rightComp) {
-                boolean didPaint = false;
-                public void paint(Graphics g) {
-                    if ( !didPaint) {
-                        didPaint = true;
-                        initSplitPane(this);
-                    }
-                    super.paint(g);
-                }
-            };
-
-            if (legendOnLeft) {
-                sideLegendContainer.setResizeWeight(0.20);
-            } else {
-                sideLegendContainer.setResizeWeight(0.80);
-            }
-            sideLegendContainer.setOneTouchExpandable(true);
-            sideLegend.setTheContainer(sideLegendContainer);
-            centerPanelWrapper.add(BorderLayout.CENTER, sideLegendContainer);
+            sideLegendContainer.removeAll();
+            sideLegendContainer.add(BorderLayout.CENTER, sideLegendComponent);
         } else if (legendState.equals(IdvLegend.STATE_FLOAT)) {
+            sideLegendContainer.removeAll();
             sideLegend.floatLegend();
-            centerPanelWrapper.add(BorderLayout.CENTER, centerPanel);
         } else if (legendState.equals(IdvLegend.STATE_HIDDEN)) {
+            sideLegendContainer.removeAll();
             sideLegend.unFloatLegend();
-            centerPanelWrapper.add(BorderLayout.CENTER, centerPanel);
+            sideLegendContainer.add(BorderLayout.CENTER, sideLegendComponent);
         }
+        adjustSplitPane();
 
     }
 
 
+
     /**
-     * _more_
+     * set the state of the main split pane
      *
-     * @param contents _more_
-     * @param doBorder _more_
+     */
+    protected void adjustSplitPane() {
+        //        centerPanelWrapper.removeAll();
+        if (legendState.equals(IdvLegend.STATE_DOCKED)) {
+            mainSplitPane.resetToPreferredSizes();
+        } else {
+            if (legendOnLeft) {
+                mainSplitPane.setDividerLocation(0.0);
+                mainSplitPane.setResizeWeight(0.0);
+            } else {
+                mainSplitPane.setDividerLocation(1.0);
+                mainSplitPane.setResizeWeight(1.0);
+            }
+        }
+    }
+
+
+
+
+    /**
+     * Make a dnd panel
      *
-     * @return _more_
+     * @param contents contents to show
+     * @param doBorder draw  a border
+     *
+     * @return the drop panel
      */
     public DropPanel makeDropPanel(JComponent contents, boolean doBorder) {
         DropPanel dropPanel = new DropPanel(contents, doBorder) {
@@ -987,11 +1026,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-     * _more_
+     * Can this view manager import the given display control. e.g., from a drag-and-drop
      *
-     * @param control _more_
+     * @param control control
      *
-     * @return _more_
+     * @return can import
      */
     public boolean okToImportDisplay(DisplayControl control) {
         ViewManager vm = control.getViewManager();
@@ -1321,20 +1360,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
-    /**
-     * init the split pane
-     *
-     * @param splitPane the split pane
-     */
-    private void initSplitPane(JSplitPane splitPane) {
-        if (sideDividerLocation > 0) {
-            splitPane.setDividerLocation(sideDividerLocation);
-        } else {
-            splitPane.setDividerLocation(initialSplitPaneLocation);
-        }
-        sideDividerLocation = -1;
-    }
-
 
 
     /**
@@ -1440,8 +1465,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         if (that.sideDividerLocation > 0) {
             sideDividerLocation = that.sideDividerLocation;
-            if (sideLegendContainer != null) {
-                // sideLegendContainer.setDividerLocation(sideDividerLocation);
+            if (mainSplitPane != null) {
+                // mainSplitPane.setDividerLocation(sideDividerLocation);
             }
         }
     }
@@ -1588,7 +1613,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     /**
-     * _more_
+     * The time changed
      */
     protected void animationTimeChanged() {}
 
@@ -1672,9 +1697,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
         /**
-         * _more_
+         * These are a list of earth locations used to draw sunrise/sunset
          *
-         * @return _more_
+         * @return locations for sunrise/sunset
          */
         public List getSunriseLocations() {
             return getIdv().getIdvUIManager().getMapLocations();
@@ -2296,9 +2321,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * Get the component that holds the side legend
      *
      * @return side legend container
+     * @deprecate No longer called sideLegendContainer
      */
     public JSplitPane getSideLegendContainer() {
-        return sideLegendContainer;
+        return mainSplitPane;
     }
 
     /**
@@ -2326,10 +2352,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-     * _more_
+     * Set the state of the legend
      *
-     * @param legend _more_
-     * @param state _more_
+     * @param legend The legend
+     * @param state its state, e.g., hidden, shown, floating
      */
     public void setLegendState(IdvLegend legend, String state) {
         legendState = state;
@@ -2737,8 +2763,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @return SIde legend location
      */
     public int getSideDividerLocation() {
-        if (sideLegendContainer != null) {
-            return sideLegendContainer.getDividerLocation();
+        if (mainSplitPane != null) {
+            return mainSplitPane.getDividerLocation();
         }
         return -1;
     }
@@ -3270,7 +3296,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-     * _more_
+     * tell the legends to fill themselves
      */
     protected void reallyFillLegends() {
         //If we are not loading a bundle then fill the legends right now
@@ -3513,8 +3539,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
-    /** _more_ */
-    private boolean dirty = false;
+
 
     /**
      * _more_
@@ -3948,7 +3973,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         legends                 = null;
         sideLegend              = null;
         sideLegendComponent     = null;
-        sideLegendContainer     = null;
+        mainSplitPane           = null;
         if (animationMenu != null) {
             GuiUtils.empty(animationMenu);
             animationMenu = null;
