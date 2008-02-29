@@ -491,7 +491,7 @@ public class IdvXmlUi extends XmlUi {
      *
      * @return _more_
      */
-    private IdvComponentGroup makeComponentGroup(Element node) {
+    protected IdvComponentGroup makeComponentGroup(Element node) {
         IdvComponentGroup compGroup = new IdvComponentGroup(idv, "");
         compGroup.initWith(node);
 
