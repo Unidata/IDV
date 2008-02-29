@@ -398,12 +398,11 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param entry _more_
-     * @param doc _more_
      * @param datasetNode _more_
      *
      * @throws Exception _more_
      */
-    public void addMetadata(Request request, Entry entry, Document doc,
+    public void addMetadata(Request request, Entry entry, CatalogInfo catalogInfo,
                             Element datasetNode)
             throws Exception {
         List<Metadata> metadataList = getMetadataManager().getMetadata(entry);
@@ -413,7 +412,7 @@ public class CatalogOutputHandler extends OutputHandler {
             for (MetadataHandler metadataHandler : metadataHandlers) {
                 if (metadataHandler.canHandle(metadata)) {
                     metadataHandler.addMetadataToCatalog(request, entry,
-                            metadata, doc, datasetNode);
+                            metadata, catalogInfo.doc, datasetNode);
                     break;
                 }
             }
@@ -452,36 +451,36 @@ public class CatalogOutputHandler extends OutputHandler {
             ATTR_BASE,""});*/
 
 
-        Element httpService = XmlUtil.create(doc, TAG_SERVICE, root,
-                                             new String[] {
-            ATTR_NAME, SERVICE_HTTP, ATTR_SERVICETYPE, "http", ATTR_BASE,
-            getRepository().URL_ENTRY_GET.getFullUrl()
-        });
+        Hashtable serviceMap = new Hashtable();
 
-        Element selfService = XmlUtil.create(doc, TAG_SERVICE, root,
-                                             new String[] {
-            ATTR_NAME, SERVICE_SELF, ATTR_SERVICETYPE, "self", ATTR_BASE, ""
-        });
-
-        Element opendapService = XmlUtil.create(doc, TAG_SERVICE, root,
-                                     new String[] {
-            ATTR_NAME, SERVICE_OPENDAP, ATTR_SERVICETYPE, "opendap",
-            ATTR_BASE, ""
-        });
 
         Element dataset = XmlUtil.create(doc, TAG_DATASET, root,
                                          new String[] { ATTR_NAME,
                 title });
 
-        addMetadata(request, group, doc, dataset);
-        toCatalogInner(request, subGroups, doc, dataset);
-        toCatalogInner(request, entries, doc, dataset);
+        CatalogInfo ci = new CatalogInfo(doc, root, serviceMap);
+        addMetadata(request, group, ci, dataset);
+        toCatalogInner(request, subGroups, ci, dataset);
+        toCatalogInner(request, entries, ci, dataset);
         StringBuffer sb = new StringBuffer(XmlUtil.XML_HEADER);
         sb.append(XmlUtil.toString(root));
         return new Result(title, sb, "text/xml");
     }
 
 
+    private  void addService(CatalogInfo catalogInfo, String service, String base) 
+            throws Exception {
+        if(catalogInfo.serviceMap.get(service)!=null) {
+            return;
+        }
+
+        Element serviceNode = XmlUtil.create(catalogInfo.doc, TAG_SERVICE, catalogInfo.root,
+                                             new String[] {
+                                             ATTR_NAME, service, ATTR_SERVICETYPE, service, ATTR_BASE, base
+        });
+
+        catalogInfo.serviceMap.put(service, serviceNode);
+    }
 
 
     /**
@@ -489,12 +488,11 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @param entry _more_
      * @param request _more_
-     * @param doc _more_
      * @param dataset _more_
      *
      * @throws Exception _more_
      */
-    public void addServices(Entry entry, Request request, Document doc,
+    public void addServices(Entry entry, Request request, CatalogInfo catalogInfo,
                             Element dataset)
             throws Exception {
         File   f    = entry.getResource().getFile();
@@ -503,21 +501,30 @@ public class CatalogOutputHandler extends OutputHandler {
         if (entry.getTypeHandler().canDownload(request, entry)) {
             String urlPath = HtmlUtil.url("/" + entry.getName(), ARG_ID,
                                           entry.getId());
-            Element service = XmlUtil.create(doc, TAG_ACCESS, dataset,
+            addService(catalogInfo, SERVICE_HTTP,             getRepository().URL_ENTRY_GET.getFullUrl());
+            Element service = XmlUtil.create(catalogInfo.doc, TAG_ACCESS, dataset,
                                              new String[] { ATTR_SERVICENAME,
                     SERVICE_HTTP, ATTR_URLPATH, urlPath });
         }
         if (entry.getResource().isUrl()) {
-            Element service = XmlUtil.create(doc, TAG_ACCESS, dataset,
-                                             new String[] { ATTR_SERVICENAME,
-                    SERVICE_SELF, ATTR_URLPATH,
-                    entry.getResource().getPath() });
+            URL url = new URL(entry.getResource().getPath());
+            String service = url.getProtocol()+"://" + url.getHost()+":"+ url.getPort();
+            addService(catalogInfo, service,   service);
+            String tail =                  url.getPath();
+            if(url.getQuery()!=null) {
+                tail = tail +"?"+ url.getQuery();
+            }
+             XmlUtil.create(catalogInfo.doc, TAG_ACCESS, dataset,
+                            new String[] { ATTR_SERVICENAME,
+                                           service, ATTR_URLPATH,
+                                           tail});
         }
 
         if (entry.getResource().isFile()) {
-            addTdsServices(entry, request, doc, dataset);
+            addTdsServices(entry, request, catalogInfo, dataset);
         }
     }
+
 
 
 
@@ -526,12 +533,11 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @param entry _more_
      * @param request _more_
-     * @param doc _more_
      * @param dataset _more_
      *
      * @throws Exception _more_
      */
-    public void addTdsServices(Entry entry, Request request, Document doc,
+    public void addTdsServices(Entry entry, Request request, CatalogInfo catalogInfo,
                                Element dataset)
             throws Exception {
         File   f    = entry.getResource().getFile();
@@ -564,8 +570,9 @@ public class CatalogOutputHandler extends OutputHandler {
             return;
         }
 
+        addService(catalogInfo, SERVICE_OPENDAP,   "");
         String urlPath = path.substring(goodPrefix.length());
-        XmlUtil.create(doc, TAG_ACCESS, dataset,
+        XmlUtil.create(catalogInfo.doc, TAG_ACCESS, dataset,
                        new String[] { ATTR_SERVICENAME,
                                       SERVICE_OPENDAP, ATTR_URLPATH,
                                       urlPath });
@@ -580,42 +587,41 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @param entry _more_
      * @param request _more_
-     * @param doc _more_
      * @param parent _more_
      *
      *
      * @throws Exception _more_
      */
-    public void outputEntry(Entry entry, Request request, Document doc,
+    public void outputEntry(Entry entry, Request request, CatalogInfo catalogInfo,
                             Element parent)
             throws Exception {
         File   f    = entry.getResource().getFile();
         String path = f.toString();
         path = path.replace("\\", "/");
-        Element dataset = XmlUtil.create(doc, TAG_DATASET, parent,
+        Element dataset = XmlUtil.create(catalogInfo.doc, TAG_DATASET, parent,
                                          new String[] { ATTR_NAME,
                 entry.getName() });
-        addServices(entry, request, doc, dataset);
+        addServices(entry, request,catalogInfo, dataset);
 
-        addMetadata(request, entry, doc, dataset);
+        addMetadata(request, entry, catalogInfo, dataset);
 
         if (f.exists()) {
-            XmlUtil.create(doc, TAG_DATASIZE, dataset, "" + f.length(),
+            XmlUtil.create(catalogInfo.doc, TAG_DATASIZE, dataset, "" + f.length(),
                            new String[] { ATTR_UNITS,
                                           "bytes" });
 
         }
 
-        XmlUtil.create(doc, TAG_DATE, dataset,
+        XmlUtil.create(catalogInfo.doc, TAG_DATE, dataset,
                        formatDate(request, new Date(entry.getCreateDate())),
                        new String[] { ATTR_TYPE,
                                       "metadataCreated" });
 
-        Element timeCoverage = XmlUtil.create(doc, TAG_TIMECOVERAGE, dataset);
-        XmlUtil.create(doc, TAG_START, timeCoverage,
+        Element timeCoverage = XmlUtil.create(catalogInfo.doc, TAG_TIMECOVERAGE, dataset);
+        XmlUtil.create(catalogInfo.doc, TAG_START, timeCoverage,
                        "" + formatDate(request,
                                        new Date(entry.getStartDate())));
-        XmlUtil.create(doc, TAG_END, timeCoverage,
+        XmlUtil.create(catalogInfo.doc, TAG_END, timeCoverage,
                        "" + formatDate(request,
                                        new Date(entry.getEndDate())));
     }
@@ -628,14 +634,13 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param entryList _more_
-     * @param doc _more_
      * @param parent _more_
      *
      *
      * @throws Exception _more_
      */
     protected void toCatalogInner(Request request, List entryList,
-                                  Document doc, Element parent)
+                                  CatalogInfo catalogInfo, Element parent)
             throws Exception {
 
         List<Entry> entries = new ArrayList();
@@ -653,7 +658,7 @@ public class CatalogOutputHandler extends OutputHandler {
                 HtmlUtil.url(repository.URL_GROUP_SHOW, ARG_ID,
                              group.getId(), ARG_OUTPUT, OUTPUT_CATALOG);
 
-            Element ref = XmlUtil.create(doc, TAG_CATALOGREF, parent,
+            Element ref = XmlUtil.create(catalogInfo.doc, TAG_CATALOGREF, parent,
                                          new String[] { ATTR_XLINKTITLE,
                     group.getName(), ATTR_XLINKHREF, url });
         }
@@ -666,7 +671,7 @@ public class CatalogOutputHandler extends OutputHandler {
         }
 
 
-        generate(request, entryGroup, doc, parent);
+        generate(request, entryGroup, catalogInfo, parent);
 
     }
 
@@ -676,21 +681,19 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param parent _more_
-     * @param doc _more_
      * @param datasetNode _more_
      *
      * @throws Exception _more_
      */
-    protected void generate(Request request, EntryGroup parent, Document doc,
+    protected void generate(Request request, EntryGroup parent, CatalogInfo catalogInfo,
                             Element datasetNode)
             throws Exception {
-
 
         for (int i = 0; i < parent.keys().size(); i++) {
             Object     key   = parent.keys().get(i);
             EntryGroup group = (EntryGroup) parent.map.get(key);
 
-            Element dataset = XmlUtil.create(doc, TAG_DATASET, datasetNode,
+            Element dataset = XmlUtil.create(catalogInfo.doc, TAG_DATASET, datasetNode,
                                              new String[] { ATTR_NAME,
                     group.key.toString() });
 
@@ -698,14 +701,28 @@ public class CatalogOutputHandler extends OutputHandler {
                 Object child = group.children.get(j);
                 if (child instanceof EntryGroup) {
                     EntryGroup subGroup = (EntryGroup) child;
-                    generate(request, subGroup, doc, dataset);
+                    generate(request, subGroup, catalogInfo, dataset);
                 } else if (child instanceof Entry) {
                     Entry entry = (Entry) child;
-                    outputEntry(entry, request, doc, dataset);
+                    outputEntry(entry, request, catalogInfo,  dataset);
                 }
             }
         }
     }
+
+
+    private static class CatalogInfo {
+        Document doc;
+        Hashtable serviceMap;
+        Element root;
+        public CatalogInfo(Document doc,Element root, Hashtable serviceMap) {
+            this.doc = doc;
+            this.serviceMap = serviceMap;
+            this.root = root;
+        }
+    }
+
+
 
 }
 

@@ -913,6 +913,8 @@ public class TypeHandler extends RepositoryManager {
 
         List<TypeHandler> typeHandlers =
             getRepository().getTypeHandlers(request);
+        //        System.err.println("handlers:" + typeHandlers);
+
         if (request.defined(ARG_TYPE)) {
             TypeHandler typeHandler = getRepository().getTypeHandler(request);
             if(!typeHandler.isAnyHandler()) {
