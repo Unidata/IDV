@@ -43,11 +43,7 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class Entity {
-
-    /** _more_ */
-    static Hashtable ids = new Hashtable();
-
+public class Entity implements Cloneable {
 
     /** _more_ */
     List<Comment> comments;
@@ -87,12 +83,11 @@ public class Entity {
     /** _more_ */
     private long createDate;
 
-
-
     /**
      * _more_
      */
     public Entity() {}
+
 
     /**
      * _more_
@@ -108,7 +103,6 @@ public class Entity {
      */
     public Entity(String id, String name, String description,
                   Group parentGroup, User user, long createDate) {
-        //        if(ids.get(id)!=null) throw new IllegalArgumentException("");
         this.id          = id;
         this.name        = name;
         this.description = description;
@@ -135,6 +129,18 @@ public class Entity {
         this.user        = user;
         this.createDate  = createDate;
     }
+
+
+    public Object clone() throws CloneNotSupportedException {
+        Entity that= (Entity)super.clone();
+        that.comments = null;
+        that.permissions = null;
+        that.permissionMap = new Hashtable();
+        that.associations = null;
+        that.metadata =null;
+        return that;
+    }
+
 
 
     /**

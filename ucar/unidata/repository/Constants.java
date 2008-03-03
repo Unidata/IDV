@@ -290,6 +290,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_CANCEL = "cancel";
 
+    public static final String ARG_CANCEL_DELETE = "canceldelete";
+
     /** _more_ */
     public static final String ARG_MESSAGE = "message";
 
@@ -662,6 +664,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ACTION_EDIT = "action.edit";
+    public static final String ACTION_COPY = "action.copy";
+    public static final String ACTION_MOVE = "action.move";
 
     /** _more_ */
     public static final String ACTION_CLEAR = "action.clear";

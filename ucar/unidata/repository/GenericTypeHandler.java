@@ -177,8 +177,30 @@ public class GenericTypeHandler extends TypeHandler {
             //TODO:
             //            throw new WrapperException(exc);
         }
+    }
+
+    public Column findColumn(String columnName) {
+        for (Column column : columns) {
+            if(column.getName().equals(columnName)) return column;
+        }
+        throw new IllegalArgumentException("Could not find column:" + columnName);
+    }
+
+    public Object[] makeValues(Hashtable map) {
+        Object[] values = new Object[colNames.size()];
+        //For now we just assume each column has a single value
+        int idx=0;
+        for (Column column : columns) {
+            Object data = map.get(column.getName());
+            values[idx] = data;
+        }
+        return values;
+    }
 
 
+    public Object convert(String columnName, String value) {
+        Column column = findColumn(columnName);
+        return column.convert(value);
     }
 
     /**

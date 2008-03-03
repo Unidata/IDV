@@ -102,8 +102,6 @@ public class Permission {
             "Delete", "Comment" };
 
 
-
-
     /** _more_ */
     String action;
 

@@ -1,4 +1,5 @@
 <harvesters>
+<!--
 
   <harvester    name="Test Generator"
                 active="false"
@@ -35,24 +36,21 @@
                 monitor="false"
 		sleep="3"/>
 
-
+-->
   <harvester    name="IDD/NIDS"
                 active="false"
                 class="ucar.unidata.repository.PatternHarvester"
-		xrootdir="c:/cygwin/home/jeffmc/unidata/data/repository/NIDS"
-		rootdir="/data/ldm/gempak/nexrad/NIDS"
+		rootdir="c:/cygwin/home/jeffmc/unidata/data/repository/NIDS"
+		xrootdir="/data/ldm/gempak/nexrad/NIDS"
 		basegroup="IDD/NIDS"
-		filepattern="([^/]+)/([^/]+)/[^/]+_(\d\d\d\d\d\d\d\d_\d\d\d\d)"
+		filepattern="(station:[^/]+)/(product:[^/]+)/[^/]+_(fromDate:\d\d\d\d\d\d\d\d_\d\d\d\d)"
 		type="level3radar"
-		columns = "station,product"
-		patternnames="station,product,fromDate"
-		patterntypes="string,string,date"
 		grouptemplate = "${station}/${product}"
 		nametemplate="${station}-${product}-${fromDate}"
 		desctemplate= "${name} description"
                 monitor="true"
 		sleep="3"/>
-
+<!--
 
    <harvester   name="IDD/Craft"
                 active="false"
@@ -61,9 +59,6 @@
 		basegroup="IDD/Craft"
 		filepattern="([^/]+)/[^/]+_(\d\d\d\d\d\d\d\d_\d\d\d\d)"
 		type="level2radar"
-		columns = "station"
-		patternnames="station,fromDate"
-		patterntypes="string,date"
 		grouptemplate = "${station}"
 		nametemplate="${station}-${fromDate}"
 		desctemplate= "${name} description"
@@ -83,9 +78,6 @@
 		filepattern="/([^/]+)/(\d\d\d\d\d\d\d\d\d\d).*_(.*)\.gem"
 		type="model"
                 dateformat="yyyyMMddHH"
-		columns = "modelgroup,modelrun"
-		patternnames="modelgroup,fromDate,modelrun"
-		patterntypes="string,date,string"
 		grouptemplate = "${modelgroup}/${modelrun}"
                 nametemplate = "${modelgroup}-${modelrun}-${fromDate}"
 		desctemplate= "${name} description"
@@ -101,9 +93,6 @@
 		basegroup="IDD/Satellite"
 		filepattern="([^/]+)/([^/]+)/([^/]+)/[^/]+(\d\d\d\d\d\d\d\d_\d\d\d\d)"
 		type="satellite"
-		columns = "platform,resolution,product"
-		patternnames="platform,resolution,product,fromDate"
-		patterntypes="string,string,string,date"
 		grouptemplate = "${platform}/${resolution}/${product}"
 		nametemplate="${platform}-${resolution}-${product}-${fromDate}"
 		desctemplate= "${name}"
@@ -111,7 +100,7 @@
 		sleep="3"/>
 
 
-
+-->
 
 </harvesters>
 		

@@ -40,6 +40,7 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 import java.io.File;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import java.lang.reflect.*;
@@ -110,9 +111,8 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     protected File rootDir;
 
-
     /** _more_ */
-    private String name;
+    private String name = "";
 
 
     /** _more_ */
@@ -124,6 +124,8 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     private boolean active = false;
 
+    private boolean activeOnStart = false;
+
     /** _more_ */
     private double sleepMinutes = 5;
 
@@ -133,6 +135,12 @@ public class Harvester extends RepositoryManager {
 
     private boolean isEditable = false;
 
+    /** _more_ */
+    protected TypeHandler typeHandler;
+
+    private String error;
+
+
     /**
      * _more_
      *
@@ -141,6 +149,15 @@ public class Harvester extends RepositoryManager {
     public Harvester(Repository repository) {
         super(repository);
         this.id = repository.getGUID();
+    }
+
+    public Harvester(Repository repository, String id) throws Exception {
+        super(repository);
+        this.id = id;
+        this.isEditable = true;
+        this.typeHandler =
+            repository.getTypeHandler(TypeHandler.TYPE_FILE);
+
     }
 
 
@@ -159,14 +176,79 @@ public class Harvester extends RepositoryManager {
         for (Harvester child : children) {
             child.parent = this;
         }
+    }
+
+    protected void init(Element element) throws Exception {
+        this.typeHandler =
+            repository.getTypeHandler(XmlUtil.getAttribute(element,
+                ATTR_TYPE, TypeHandler.TYPE_ANY));
+
         this.name    = XmlUtil.getAttribute(element, ATTR_NAME, "");
         this.monitor = XmlUtil.getAttribute(element, ATTR_MONITOR, false);
-        this.active  = XmlUtil.getAttribute(element, ATTR_ACTIVE, false);
+        this.activeOnStart = this.active  = XmlUtil.getAttribute(element, ATTR_ACTIVE, false);
         this.sleepMinutes = XmlUtil.getAttribute(element, ATTR_SLEEP,
                 sleepMinutes);
-        this.rootDir = new File(XmlUtil.getAttribute(element, ATTR_ROOTDIR,
-                ""));
     }
+
+    public void applyEditForm(Request request) throws Exception {
+        name  = request.getString(ARG_NAME, name);
+        typeHandler = repository.getTypeHandler(request.getString(ATTR_TYPE,""));
+        activeOnStart = request.get(ATTR_ACTIVE,false);
+        monitor = request.get(ATTR_MONITOR,false);
+        sleepMinutes = request.get(ATTR_SLEEP,sleepMinutes);
+    }
+
+    public void createEditForm(Request request, StringBuffer sb) throws Exception {
+        sb.append(HtmlUtil.formEntry(msgLabel("Harvester name"),HtmlUtil.input(ARG_NAME,name,HtmlUtil.SIZE_40)));
+        sb.append(HtmlUtil.formEntry(msgLabel("Create entries of type"),repository.makeTypeSelect(request, false, typeHandler.getType())));
+        sb.append(HtmlUtil.formEntry(msgLabel("Run"),
+                                     HtmlUtil.checkbox(ATTR_ACTIVE,"true",activeOnStart) +HtmlUtil.space(1) +
+                                     msg("Active on startup") +
+                                     HtmlUtil.checkbox(ATTR_MONITOR,"true",monitor) +
+                                     HtmlUtil.space(1) +
+                                     msg("Monitor") + 
+                                     HtmlUtil.space(3)+
+                                     msgLabel("Sleep") +
+                                     HtmlUtil.space(1) +
+                                     HtmlUtil.input(ATTR_SLEEP,""+sleepMinutes, HtmlUtil.SIZE_10) +
+                                     HtmlUtil.space(1) +
+                                     msg("(minutes)")));
+
+    }
+
+
+    public boolean equals(Object o) {
+        if(!getClass().equals(o.getClass())) return false;
+        return this.id.equals(((Harvester)o).id);
+    }
+
+
+
+    public void applyState(Element element) throws Exception {
+        element.setAttribute(ATTR_CLASS, getClass().getName());
+        element.setAttribute(ATTR_NAME,name);
+        element.setAttribute(ATTR_ACTIVE,activeOnStart+"");
+        element.setAttribute(ATTR_MONITOR,monitor+"");
+        element.setAttribute(ATTR_TYPE, typeHandler.getType());
+        element.setAttribute(ATTR_SLEEP, sleepMinutes+"");
+        if(rootDir!=null) {
+            element.setAttribute(ATTR_ROOTDIR,rootDir.toString());
+        }
+    }
+
+    public String getContent() throws Exception {
+        Document doc   = XmlUtil.makeDocument();
+        Element  root  = doc.createElement(TAG_HARVESTER);
+        applyState(root);
+        return XmlUtil.toString(root);
+    }
+
+    public void initFromContent(String content) throws Exception {
+        if(content == null || content.trim().length()==0) return;
+        Element root = XmlUtil.getRoot(new ByteArrayInputStream(content.getBytes()));
+        init(root);
+    }
+
 
     /**
      * _more_
@@ -217,9 +299,11 @@ public class Harvester extends RepositoryManager {
             Constructor ctor = Misc.findConstructor(c,
                                    new Class[] { Repository.class,
                     Element.class });
-            harvesters.add((Harvester) ctor.newInstance(new Object[] {
+            Harvester harvester = (Harvester) ctor.newInstance(new Object[] {
                 repository,
-                node }));
+                node });
+            harvesters.add(harvester);
+            harvester.init(node);
         }
         return harvesters;
     }
@@ -243,14 +327,20 @@ public class Harvester extends RepositoryManager {
      */
     public final void run() throws Exception {
         try {
+            error = null;
             setActive(true);
             runInner();
-            setActive(false);
         } catch (Exception exc) {
             getRepository().log("In harvester", exc);
+            error = "Error: " +exc +"<br>" + LogUtil.getStackTrace(exc);
         }
+        setActive(false);
     }
 
+
+    public String getError() {
+        return error;
+    }
 
     /**
      * _more_
@@ -260,6 +350,7 @@ public class Harvester extends RepositoryManager {
      * @throws Exception _more_
      */
     public String getExtraInfo() throws Exception {
+        if(error!=null) return "<pre>" +error+"</pre>";
         return "";
     }
 

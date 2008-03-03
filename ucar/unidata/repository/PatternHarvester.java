@@ -83,6 +83,13 @@ public class PatternHarvester extends Harvester {
     /** _more_ */
     public static final String ATTR_TYPE = "type";
 
+    public static final String ATTR_NAMETEMPLATE = "nametemplate";
+    public static final String ATTR_GROUPTEMPLATE = "grouptemplate";
+
+    public static final String ATTR_TAGTEMPLATE   =  "tagtemplate";
+    public static final String ATTR_DESCTEMPLATE   =  "desctemplate";
+    public static final String ATTR_DATEFORMAT = "dateformat";
+
     /** _more_ */
     public static final String ATTR_FILEPATTERN = "filepattern";
 
@@ -90,6 +97,8 @@ public class PatternHarvester extends Harvester {
     /** _more_ */
     public static final String ATTR_BASEGROUP = "basegroup";
 
+
+    private String dateFormat = "yyyyMMdd_HHmm";
 
     /** _more_ */
     private SimpleDateFormat sdf;
@@ -102,39 +111,25 @@ public class PatternHarvester extends Harvester {
     private String tagTemplate = "";
 
     /** _more_ */
-    private String nameTemplate="";
+    private String nameTemplate="${filename}";
 
     /** _more_ */
     private String descTemplate="";
 
     /** _more_ */
-    private List<String> columns;
-
-    /** _more_ */
-    private List<String> patternNames;
-
-    /** _more_ */
-    private List<String> patternTypes;
+    private List<String> patternNames= new ArrayList<String>();
 
 
     /** _more_ */
-    private String filePatternString;
+    private String filePatternString="";
 
-    /** _more_ */
-    private String fileNotPatternString;
 
     /** _more_ */
     private Pattern filePattern;
 
-    /** _more_ */
-    private Pattern fileNotPattern;
 
     /** _more_ */
-    private TypeHandler typeHandler;
-
-
-    /** _more_ */
-    private String baseGroupName;
+    private String baseGroupName="";
 
 
     /** _more_ */
@@ -161,6 +156,11 @@ public class PatternHarvester extends Harvester {
     /** _more_ */
     private int newEntryCnt = 0;
 
+
+    public PatternHarvester(Repository repository, String id) throws Exception {
+        super(repository,id);
+    }
+
     /**
      * _more_
      *
@@ -172,29 +172,69 @@ public class PatternHarvester extends Harvester {
     public PatternHarvester(Repository repository, Element element)
             throws Exception {
         super(repository, element);
-        this.typeHandler =
-            repository.getTypeHandler(XmlUtil.getAttribute(element,
-                ATTR_TYPE, TypeHandler.TYPE_ANY));
-        this.filePatternString = XmlUtil.getAttribute(element,
-                ATTR_FILEPATTERN, (String) null);
-        this.baseGroupName = XmlUtil.getAttribute(element, ATTR_BASEGROUP,
-                                                  "Files");
-        columns       = split(element, "columns");
-        patternNames  = split(element, "patternnames");
-        patternTypes  = split(element, "patterntypes");
-        groupTemplate = XmlUtil.getAttribute(element, "grouptemplate", "");
-        tagTemplate   = XmlUtil.getAttribute(element, "tagtemplate", "");
-        nameTemplate = XmlUtil.getAttribute(element, "nametemplate",
-                                            "${filename}");
-        descTemplate = XmlUtil.getAttribute(element, "desctemplate", "");
-        sdf = new SimpleDateFormat(XmlUtil.getAttribute(element,
-                "dateformat", "yyyyMMdd_HHmm"));
-        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
-        user       = repository.getUserManager().getDefaultUser();
-        rootStrLen = rootDir.toString().length();
-
         init();
     }
+
+
+
+
+    protected void init(Element element) throws Exception {
+        super.init(element);
+        rootDir = new File(XmlUtil.getAttribute(element, ATTR_ROOTDIR, ""));
+
+        filePatternString = XmlUtil.getAttribute(element,
+                                                 ATTR_FILEPATTERN, filePatternString);
+
+        this.baseGroupName = XmlUtil.getAttribute(element, ATTR_BASEGROUP,"");
+        init();
+        groupTemplate = XmlUtil.getAttribute(element, ATTR_GROUPTEMPLATE, groupTemplate);
+        tagTemplate   = XmlUtil.getAttribute(element, ATTR_TAGTEMPLATE, tagTemplate);
+        nameTemplate = XmlUtil.getAttribute(element, ATTR_NAMETEMPLATE,
+                                            nameTemplate);
+        descTemplate = XmlUtil.getAttribute(element, ATTR_DESCTEMPLATE, "");
+        dateFormat = XmlUtil.getAttribute(element,
+                                          ATTR_DATEFORMAT, dateFormat);
+        user       = repository.getUserManager().getDefaultUser();
+        rootStrLen = rootDir.toString().length();
+    }
+
+    public void applyState(Element element) throws Exception {
+        super.applyState(element);
+        element.setAttribute(ATTR_FILEPATTERN,filePatternString);
+        element.setAttribute(ATTR_NAMETEMPLATE,nameTemplate);
+        element.setAttribute(ATTR_GROUPTEMPLATE,groupTemplate);
+        element.setAttribute(ATTR_TAGTEMPLATE,tagTemplate);
+        element.setAttribute(ATTR_BASEGROUP,baseGroupName);
+        element.setAttribute(ATTR_DATEFORMAT,dateFormat);
+        element.setAttribute(ATTR_DESCTEMPLATE,descTemplate);
+    }
+
+
+
+    public void applyEditForm(Request request) throws Exception {
+        super.applyEditForm(request);
+        rootDir  = new File(request.getUnsafeString(ATTR_ROOTDIR,rootDir!=null?rootDir.toString():""));
+        filePatternString  = request.getUnsafeString(ATTR_FILEPATTERN, filePatternString);
+        filePattern = null;
+        sdf = null;
+        init();
+        nameTemplate = request.getUnsafeString(ATTR_NAMETEMPLATE, nameTemplate);
+        baseGroupName = request.getUnsafeString(ATTR_BASEGROUP, baseGroupName);
+        groupTemplate = request.getUnsafeString(ATTR_GROUPTEMPLATE, groupTemplate);
+        descTemplate = request.getUnsafeString(ATTR_DESCTEMPLATE, descTemplate);
+    }
+
+    public void createEditForm(Request request, StringBuffer sb) throws Exception {
+        super.createEditForm(request, sb);
+        String root = rootDir!=null?rootDir.toString():"";
+        root = root.replace("\\","/");
+        sb.append(HtmlUtil.formEntry(msgLabel("Look in directory"),HtmlUtil.input(ATTR_ROOTDIR,root,HtmlUtil.SIZE_60)));
+        sb.append(HtmlUtil.formEntry(msgLabel("For files that match pattern"),HtmlUtil.input(ATTR_FILEPATTERN,filePatternString,HtmlUtil.SIZE_60)));
+        sb.append(HtmlUtil.formEntry(msgLabel("Name template"),HtmlUtil.input(ATTR_NAMETEMPLATE,nameTemplate,HtmlUtil.SIZE_60)));
+        sb.append(HtmlUtil.formEntry(msgLabel("Base group"),HtmlUtil.input(ATTR_BASEGROUP,baseGroupName,HtmlUtil.SIZE_60)));
+        sb.append(HtmlUtil.formEntry(msgLabel("Group template"),HtmlUtil.input(ATTR_GROUPTEMPLATE,groupTemplate,HtmlUtil.SIZE_60)));
+    }
+
 
     /**
      * _more_
@@ -204,11 +244,11 @@ public class PatternHarvester extends Harvester {
      *
      * @return _more_
      */
-    private List split(Element element, String attr) {
+    private List<String> split(Element element, String attr) {
         if ( !XmlUtil.hasAttribute(element, attr)) {
-            return null;
+            return new ArrayList<String>();
         }
-        return StringUtil.split(XmlUtil.getAttribute(element, attr), ",");
+        return StringUtil.split(XmlUtil.getAttribute(element, attr), ",",true,true);
     }
 
 
@@ -217,11 +257,31 @@ public class PatternHarvester extends Harvester {
      * _more_
      */
     private void init() {
-        if (filePatternString != null) {
-            filePattern = Pattern.compile(filePatternString);
+        if(sdf == null && dateFormat!=null && dateFormat.length()>0) {
+            sdf = new SimpleDateFormat(dateFormat);
+            sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
         }
-        if (fileNotPatternString != null) {
-            fileNotPattern = Pattern.compile(fileNotPatternString);
+
+        if (filePattern == null && filePatternString != null && filePatternString.length()>0) {
+            String tmp = filePatternString;
+            StringBuffer pattern = new StringBuffer();
+            patternNames= new ArrayList<String>();
+            while(true) {
+                int idx1 = tmp.indexOf("(");
+                if(idx1<0) {
+                    pattern.append(tmp);
+                    break;
+                }
+                int idx2 = tmp.indexOf(":");
+                if(idx2<0) {
+                    throw new IllegalArgumentException("bad pattern:" + filePatternString);
+                }
+                pattern.append(tmp.substring(0,idx1+1));
+                String name = tmp.substring(idx1+1,idx2);
+                patternNames.add(name);
+                tmp = tmp.substring(idx2+1);
+            }
+            filePattern = Pattern.compile(pattern.toString());
         }
     }
 
@@ -230,7 +290,9 @@ public class PatternHarvester extends Harvester {
      *
      * @return _more_
      */
-    public String getExtraInfo() {
+    public String getExtraInfo() throws Exception {
+        String error = getError();
+        if(error!=null) return super.getExtraInfo();
         String dirMsg = "";
         if (dirs != null) {
             if (dirs.size() == 0) {
@@ -436,6 +498,9 @@ public class PatternHarvester extends Harvester {
         dirPath = dirPath.replace("\\", "/");
 
 
+        init();
+
+        //        System.err.println("filePattern:" + filePattern);
         Matcher matcher = filePattern.matcher(fileName);
         if ( !matcher.find()) {
             return null;
@@ -450,47 +515,26 @@ public class PatternHarvester extends Harvester {
         String    name      = nameTemplate;
         String    desc      = descTemplate;
 
-        Object[]  values    = null;
-        if (columns != null) {
-            for (int dataIdx = 0; dataIdx < patternNames.size(); dataIdx++) {
-                String dataName = patternNames.get(dataIdx);
-                Object value    = matcher.group(dataIdx + 1);
-                String type     = patternTypes.get(dataIdx);
-                if (type.equals("date")) {
-                    try {
-                        value = sdf.parse((String) value);
-                    } catch (Exception exc) {
-                        System.err.println("value:" + value);
-                        System.err.println("file:" + fileName);
-                    }
-                } else if (type.equals("int")) {
-                    value = new Integer(value.toString());
-                } else if (type.equals("double")) {
-                    value = new Double(value.toString());
-                }
-                if (dataName.equals("fromDate")) {
-                    fromDate = (Date) value;
-                } else if (dataName.equals("toDate")) {
-                    toDate = (Date) value;
-                } else {
-                    groupName = groupName.replace("${" + dataName + "}",
-                            value.toString());
-                    name = name.replace("${" + dataName + "}",
-                                        value.toString());
-                    desc = desc.replace("${" + dataName + "}",
-                                        value.toString());
-                    map.put(dataName, value);
-                }
-            }
 
-
-            values = new Object[columns.size()];
-            for (int colIdx = 0; colIdx < columns.size(); colIdx++) {
-                String colName = columns.get(colIdx);
-                Object value   = map.get(colName);
-                values[colIdx] = value;
+        for (int dataIdx = 0; dataIdx < patternNames.size(); dataIdx++) {
+            String dataName = patternNames.get(dataIdx);
+            Object value    = matcher.group(dataIdx + 1);
+            if (dataName.equals("fromDate")) {
+                value = fromDate = sdf.parse((String) value);
+            } else if (dataName.equals("toDate")) {
+                value = toDate = sdf.parse((String) value);
+            } else {
+                value = typeHandler.convert(dataName, (String)value);
+                groupName = groupName.replace("${" + dataName + "}",
+                                              value.toString());
+                name = name.replace("${" + dataName + "}",
+                                    value.toString());
+                desc = desc.replace("${" + dataName + "}",
+                                    value.toString());
+                map.put(dataName, value);
             }
         }
+        Object[]values = typeHandler.makeValues(map);
 
         Date createDate = new Date();
         if (fromDate == null) {
@@ -534,7 +578,6 @@ public class PatternHarvester extends Harvester {
                             getRepository().formatDate(fromDate));
         desc = desc.replace("${toDate}", getRepository().formatDate(toDate));
         desc = desc.replace("${name}", name);
-
 
 
         Group group = repository.findGroupFromName(baseGroupName + "/"

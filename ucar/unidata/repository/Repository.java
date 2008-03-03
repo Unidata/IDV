@@ -156,10 +156,8 @@ public class Repository implements Constants, Tables, RequestHandler,
     public RequestUrl URL_ENTRY_SHOW = new RequestUrl(this, "/entry/show",
                                            "View Entry");
 
-    //    public RequestUrl URL_GROUP_SHOW = new RequestUrl(this, "/group/show");
+    public RequestUrl URL_ENTRY_COPY = new RequestUrl(this, "/entry/copy");
 
-    /** _more_ */
-    public RequestUrl URL_GROUP_SHOW = URL_ENTRY_SHOW;
 
     /** _more_ */
     public RequestUrl URL_ENTRY_DELETE = new RequestUrl(this,
@@ -192,8 +190,8 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     protected RequestUrl[] entryEditUrls = {
         URL_ENTRY_FORM, getMetadataManager().URL_METADATA_FORM,
-        getMetadataManager().URL_METADATA_ADDFORM, URL_ACCESS_FORM,
-        URL_ENTRY_DELETE
+        getMetadataManager().URL_METADATA_ADDFORM, URL_ACCESS_FORM//,
+        //        URL_ENTRY_DELETE
         //        URL_ENTRY_SHOW
     };
 
@@ -1413,8 +1411,8 @@ public class Repository implements Constants, Tables, RequestHandler,
                 //                result.addHttpHeader("WWW-Authenticate","Basic realm=\"repository\"");
             } else {
                 result.setResponseCode(Result.RESPONSE_INTERNALERROR);
+                log("Error handling request:" + request, exc);
             }
-            log("Error handling request:" + request, exc);
         }
 
         if ((result != null) && (result.getInputStream() == null)
@@ -1488,7 +1486,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
         if ( !getUserManager().isRequestOk(request)
                 || !apiMethod.isRequestOk(request, this)) {
-            throw new AccessException(msg("You cannot access this page"));
+            throw new AccessException(msg("You do not have permission to access this page"));
         }
 
 
@@ -2732,7 +2730,19 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
+    protected void copyEntry(Entry from, Group parent, Object actionId) throws Exception {
+        Entry newEntry = from.clone();
+        String newId  = getGUID();
+    }
 
+
+    public Result processEntryCopy(Request request) throws Exception {
+        Entry entry = getEntry(request);
+        String action = request.getString(ARG_ACTION, ACTION_COPY);
+        String title = (action.equals(ACTION_COPY)?"Entry Copy":"Entry Move");
+        StringBuffer sb = new StringBuffer();
+        return new Result(msg(title),sb);
+    }
 
 
 
@@ -2762,8 +2772,6 @@ public class Repository implements Constants, Tables, RequestHandler,
                     "Cannot download file with id:" + entryId);
             }
         }
-
-        byte[] bytes;
         //        System.err.println("request:" + request);
 
         if (request.defined(ARG_IMAGEWIDTH)
@@ -2781,7 +2789,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 ImageUtils.waitOnImage(resizedImage);
                 ImageUtils.writeImageToFile(resizedImage, thumb);
             }
-            bytes = IOUtil.readBytes(IOUtil.getInputStream(thumb,
+            byte[] bytes = IOUtil.readBytes(IOUtil.getInputStream(thumb,
                     getClass()));
             return new Result(
                 BLANK, bytes,
@@ -3053,8 +3061,9 @@ public class Repository implements Constants, Tables, RequestHandler,
             String metadataButton = HtmlUtil.submit("Edit Metadata",
                                         ARG_EDIT_METADATA);
 
-            String cancelButton = HtmlUtil.submit("Cancel", ARG_CANCEL);
-            String buttons = submitButton + HtmlUtil.space(2) + cancelButton;
+            String deleteButton = HtmlUtil.submit(msg("Delete"), ARG_DELETE);
+            String cancelButton = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
+            String buttons = submitButton + HtmlUtil.space(2) + deleteButton +HtmlUtil.space(2) + cancelButton;
 
             sb.append(HtmlUtil.formEntry(BLANK, buttons));
             if (entry != null) {
@@ -3377,7 +3386,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         subject = request.getString(ARG_SUBJECT, BLANK).trim();
         comment = request.getString(ARG_COMMENT, BLANK).trim();
         if (comment.length() == 0) {
-            sb.append(warning("Please enter a comment"));
+            sb.append(warning(msg("Please enter a comment")));
         } else {
             PreparedStatement insert =
                 getConnection().prepareStatement(INSERT_COMMENTS);
@@ -3397,24 +3406,24 @@ public class Repository implements Constants, Tables, RequestHandler,
                                            "Comment added"));
         }
 
-        sb.append("Add comment for: " + getEntryUrl(entry));
+        sb.append(msgLabel("Add comment for") + getEntryUrl(entry));
         sb.append(HtmlUtil.form(URL_COMMENTS_ADD, BLANK));
         sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
         sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.formEntry("Subject:",
+        sb.append(HtmlUtil.formEntry(msgLabel("Subject"),
                                      HtmlUtil.input(ARG_SUBJECT, subject,
                                          HtmlUtil.SIZE_40)));
-        sb.append(HtmlUtil.formEntryTop("Comment:",
+        sb.append(HtmlUtil.formEntryTop(msgLabel("Comment"),
                                         HtmlUtil.textArea(ARG_COMMENT,
                                             comment, 5, 40)));
         sb.append(HtmlUtil.formEntry(BLANK,
-                                     HtmlUtil.submit("Add Comment")
+                                     HtmlUtil.submit(msg("Add Comment"))
                                      + HtmlUtil.space(2)
-                                     + HtmlUtil.submit("Cancel",
+                                     + HtmlUtil.submit(msg("Cancel"),
                                          ARG_CANCEL)));
         sb.append(HtmlUtil.formTableClose());
         sb.append(HtmlUtil.formClose());
-        return new Result("Entry Comments", sb, Result.TYPE_HTML);
+        return new Result(msg("Entry Comments"), sb, Result.TYPE_HTML);
     }
 
 
@@ -3504,7 +3513,6 @@ public class Repository implements Constants, Tables, RequestHandler,
             Group group = findGroup(entry.getParentGroupId());
 
 
-
             if (entry.isGroup()) {
                 final Request        theRequest = request;
                 ActionManager.Action action     = new ActionManager.Action() {
@@ -3589,12 +3597,12 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     public Result processEntryChange(Request request) throws Exception {
-
         Entry       entry = null;
-        TypeHandler typeHandler;
+        TypeHandler typeHandler = null;
         boolean     newEntry = true;
         if (request.defined(ARG_ID)) {
             entry    = getEntry(request);
+            typeHandler = entry.getTypeHandler();
             newEntry = false;
 
 
@@ -3623,45 +3631,29 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
             if (request.exists(ARG_DELETE)) {
-                StringBuffer sb = new StringBuffer();
-                sb.append(HtmlUtil.form(URL_ENTRY_CHANGE, BLANK));
-                StringBuffer inner = new StringBuffer();
-                if (entry.isGroup()) {
-                    inner.append(
-                        msgLabel(
-                            "Are you sure you want to delete the group"));
-                    inner.append(entry.getName());
-                    inner.append(HtmlUtil.p());
-                    inner.append(
-                        msg(
-                        "Note: This will also delete all of the descendents of the group"));
-                } else {
-                    inner.append(
-                        msgLabel(
-                            "Are you sure you want to delete the entry"));
-                    inner.append(entry.getName());
-                }
-                inner.append("<p>");
-                inner.append(HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM));
-                inner.append(HtmlUtil.space(2));
-                inner.append(HtmlUtil.submit(msg("Cancel"), ARG_CANCEL));
-                sb.append(question(inner.toString()));
-                sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
-                sb.append(HtmlUtil.formClose());
-                return makeEntryEditResult(request, entry,
-                                           msg("Entry delete confirm"), sb);
+                return new Result(HtmlUtil.url(URL_ENTRY_DELETE,
+                                               ARG_ID,
+                                               entry.getId()));
             }
-        }
+        } else {
+            typeHandler =
+                getTypeHandler(request.getType(TypeHandler.TYPE_ANY));
 
+        }
 
 
         List<Entry> entries = new ArrayList<Entry>();
 
+        //Synchronize  in case we need to create a group
+        //There is a possible case where we can get two groups with the same id
+        Object mutex = new Object();
+        if (typeHandler.isType(TypeHandler.TYPE_GROUP)) {
+            mutex = MUTEX_GROUP;
+        }
+        synchronized (mutex) {
         if (entry == null) {
             List<String> resources = new ArrayList();
             List<String> origNames = new ArrayList();
-            typeHandler =
-                getTypeHandler(request.getType(TypeHandler.TYPE_ANY));
             String  resource     = request.getString(ARG_RESOURCE, BLANK);
             String  filename     = request.getUploadedFile(ARG_FILE);
             boolean unzipArchive = false;
@@ -3720,6 +3712,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 dateRange[1] = dateRange[0];
             }
 
+
             for (int resourceIdx = 0; resourceIdx < resources.size();
                     resourceIdx++) {
                 String theResource = (String) resources.get(resourceIdx);
@@ -3743,7 +3736,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                             + "'");
                     }
 
-                    String tmp      = parentGroup.getFullName() + "/" + name;
+                    String tmp      = parentGroup.getFullName() + Group.IDDELIMITER + name;
                     Group  existing = findGroupFromName(tmp);
                     if (existing != null) {
                         throw new IllegalArgumentException(
@@ -3752,9 +3745,6 @@ public class Repository implements Constants, Tables, RequestHandler,
                     }
                 }
 
-                String id = (typeHandler.isType(TypeHandler.TYPE_GROUP)
-                             ? getGroupId(parentGroup)
-                             : getGUID());
 
                 Date[] theDateRange = { dateRange[0], dateRange[1] };
 
@@ -3771,7 +3761,6 @@ public class Repository implements Constants, Tables, RequestHandler,
                     //                    System.err.println("format:" + format);
                     //                    System.err.println("orignName:" + origName);
                     //                    System.err.println("pattern:" + pattern);
-
 
                     if (pattern != null) {
                         Pattern datePattern = Pattern.compile(pattern);
@@ -3790,6 +3779,9 @@ public class Repository implements Constants, Tables, RequestHandler,
                     }
                 }
 
+                String id = (typeHandler.isType(TypeHandler.TYPE_GROUP)
+                             ? getGroupId(parentGroup)
+                             : getGUID());
 
                 entry = typeHandler.createEntry(id);
                 entry.init(
@@ -3810,12 +3802,12 @@ public class Repository implements Constants, Tables, RequestHandler,
                     "Cannot edit top-level group");
             }
             if (entry.isGroup()) {
-                if (newName.indexOf("/") >= 0) {
+                if (newName.indexOf(Group.IDDELIMITER) >= 0) {
                     throw new IllegalArgumentException(
                         "Cannot have a '/' in group name:" + newName);
                 }
                 String tmp =
-                    findGroup(entry.getParentGroupId()).getFullName() + "/"
+                    findGroup(entry.getParentGroupId()).getFullName() + Group.IDDELIMITER
                     + newName;
                 Group existing = findGroupFromName(tmp);
                 if ((existing != null)
@@ -3849,13 +3841,14 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
         insertEntries(entries, newEntry);
+        }
         if (entries.size() == 1) {
             entry = (Entry) entries.get(0);
             return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
                                            entry.getId()));
         } else if (entries.size() > 1) {
             entry = (Entry) entries.get(0);
-            return new Result(HtmlUtil.url(URL_GROUP_SHOW, ARG_ID,
+            return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
                                            entry.getParentGroupId(),
                                            ARG_MESSAGE,
                                            entries.size()
@@ -4125,14 +4118,14 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
             length += name.length();
             titleList.add(0, name);
-            breadcrumbs.add(0, HtmlUtil.href(HtmlUtil.url(URL_GROUP_SHOW,
+            breadcrumbs.add(0, HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW,
                     ARG_ID, parent.getId(), ARG_OUTPUT,
                     output) + extraArgs, name));
             parent = findGroup(parent.getParentGroupId());
         }
         titleList.add(entry.getName());
         if (makeLinkForLastGroup) {
-            breadcrumbs.add(HtmlUtil.href(HtmlUtil.url(URL_GROUP_SHOW,
+            breadcrumbs.add(HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW,
                     ARG_ID, entry.getId(), ARG_OUTPUT,
                     output), entry.getName()));
         } else {
@@ -4638,6 +4631,11 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     public String makeTypeSelect(Request request, boolean includeAny)
             throws Exception {
+        return makeTypeSelect(request, includeAny, "");
+    }
+
+    public String makeTypeSelect(Request request, boolean includeAny, String selected)
+            throws Exception {
         List<TypeHandler> typeHandlers = getTypeHandlers();
         List              tmp          = new ArrayList();
         for (TypeHandler typeHandler : typeHandlers) {
@@ -4647,7 +4645,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             tmp.add(new TwoFacedObject(typeHandler.getLabel(),
                                        typeHandler.getType()));
         }
-        return HtmlUtil.select(ARG_TYPE, tmp);
+        return HtmlUtil.select(ARG_TYPE, tmp,selected);
     }
 
 
@@ -5016,8 +5014,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             throws Exception {
         synchronized (MUTEX_GROUP) {
             if ( !name.equals(GROUP_TOP)
-                    && !name.startsWith(GROUP_TOP + "/")) {
-                name = GROUP_TOP + "/" + name;
+                    && !name.startsWith(GROUP_TOP + Group.IDDELIMITER)) {
+                name = GROUP_TOP + Group.IDDELIMITER + name;
             }
             Group group = groupCache.get(name);
             if (group != null) {
@@ -5025,7 +5023,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
             //            System.err.println("Looking for:" + name);
 
-            List<String> toks = (List<String>) StringUtil.split(name, "/",
+            List<String> toks = (List<String>) StringUtil.split(name, Group.IDDELIMITER,
                                     true, true);
             Group  parent = null;
             String lastName;
@@ -5034,7 +5032,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             } else {
                 lastName = toks.get(toks.size() - 1);
                 toks.remove(toks.size() - 1);
-                parent = findGroupFromName(StringUtil.join("/", toks), user,
+                parent = findGroupFromName(StringUtil.join(Group.IDDELIMITER, toks), user,
                                            createIfNeeded);
                 if (parent == null) {
                     if ( !isTop) {
@@ -5091,7 +5089,6 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     private String getGroupId(Group parent) throws Exception {
-
         int    baseId = 0;
         String idWhere;
         if (parent == null) {
@@ -5107,15 +5104,17 @@ public class Repository implements Constants, Tables, RequestHandler,
             } else {
                 newId = parent.getId() + Group.IDDELIMITER + baseId;
             }
-            ResultSet idResults = getDatabaseManager().execute(
-                                      SqlUtil.makeSelect(
+            String where = SqlUtil.makeAnd(Misc.newList(
+                                                        idWhere,
+                                                        SqlUtil.eq(
+                                                                   COL_ENTRIES_ID,
+                                                                   SqlUtil.quote(
+                                                                                 newId))));
+            String query  = SqlUtil.makeSelect(
                                           COL_ENTRIES_ID,
                                           Misc.newList(TABLE_ENTRIES),
-                                          idWhere + " AND "
-                                          + SqlUtil.eq(
-                                              COL_ENTRIES_ID,
-                                              SqlUtil.quote(
-                                                  newId)))).getResultSet();
+                                          where);
+            ResultSet idResults = getDatabaseManager().execute(query).getResultSet();
 
             if ( !idResults.next()) {
                 break;

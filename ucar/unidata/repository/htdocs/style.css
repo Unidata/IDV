@@ -115,8 +115,8 @@ a.navlink {
 .note {
    font-weight: bold;
    margin:10px;
-   padding-bottom:0px;
-   padding:5px;
+   padding-top:5px;
+   padding-bottom:5px;
    padding-left:5px;
    padding-right:10px;
    border : 1px black solid;

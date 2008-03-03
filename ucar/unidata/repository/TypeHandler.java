@@ -1438,6 +1438,14 @@ public class TypeHandler extends RepositoryManager {
 
 
 
+    public Object convert(String columnName, String value) {
+        return null;
+    }
+
+    public Object[] makeValues(Hashtable map) {
+        return null;
+    }
+
     /**
      * _more_
      *

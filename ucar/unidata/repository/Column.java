@@ -455,6 +455,23 @@ public class Column implements Tables, Constants {
         }
     }
 
+
+    public Object convert(String value) {
+        if (type.equals(TYPE_INT)) {
+            return new Integer(value);
+        } else if (type.equals(TYPE_DOUBLE)) {
+            return new Double(value);
+        } else if (type.equals(TYPE_BOOLEAN)) {
+            return  new Boolean(value);
+        } else if (type.equals(TYPE_TIMESTAMP)) {
+            //TODO
+        } else if (type.equals(TYPE_LATLON)) {
+            //TODO
+        }
+        return value;
+    }
+
+
     /**
      * _more_
      *

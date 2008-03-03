@@ -99,6 +99,16 @@ public class Result {
      *
      * @param redirectUrl _more_
      */
+    public Result(RequestUrl redirectUrl) {
+        this(redirectUrl.toString());
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param redirectUrl _more_
+     */
     public Result(String redirectUrl) {
         this.redirectUrl    = redirectUrl;
         this.shouldDecorate = false;

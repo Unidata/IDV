@@ -131,8 +131,6 @@ public class CatalogOutputHandler extends OutputHandler {
     public static final String TAG_ACCESS = "access";
 
 
-
-
     /** _more_ */
     public static final String ATTR_METADATATYPE = "metadataType";
 
@@ -508,7 +506,10 @@ public class CatalogOutputHandler extends OutputHandler {
         }
         if (entry.getResource().isUrl()) {
             URL url = new URL(entry.getResource().getPath());
-            String service = url.getProtocol()+"://" + url.getHost()+":"+ url.getPort();
+            String service = url.getProtocol()+"://" + url.getHost();
+            if(url.getPort()>0) {
+                service = service +":"+ url.getPort();
+            }
             addService(catalogInfo, service,   service);
             String tail =                  url.getPath();
             if(url.getQuery()!=null) {
@@ -655,7 +656,7 @@ public class CatalogOutputHandler extends OutputHandler {
         }
         for (Group group : groups) {
             String url =  /* "http://localhost:8080"+*/
-                HtmlUtil.url(repository.URL_GROUP_SHOW, ARG_ID,
+                HtmlUtil.url(repository.URL_ENTRY_SHOW, ARG_ID,
                              group.getId(), ARG_OUTPUT, OUTPUT_CATALOG);
 
             Element ref = XmlUtil.create(catalogInfo.doc, TAG_CATALOGREF, parent,

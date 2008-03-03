@@ -431,6 +431,7 @@ public class MetadataManager extends RepositoryManager {
         StringBuffer sb    = new StringBuffer();
         Entry        entry = getRepository().getEntry(request);
         sb.append(getRepository().makeEntryHeader(request, entry));
+        sb.append(HtmlUtil.p());
         if ( !request.exists(ARG_TYPE)) {
             for (MetadataHandler handler : metadataHandlers) {
                 for (Metadata.Type type : handler.getTypes()) {

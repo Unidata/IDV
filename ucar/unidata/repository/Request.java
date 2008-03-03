@@ -756,7 +756,10 @@ public class Request implements Constants {
         if (httpHeaderArgs == null) {
             return null;
         }
-        return (String) httpHeaderArgs.get(name);
+        String arg =  (String) httpHeaderArgs.get(name);
+        if(arg == null)
+            arg =  (String) httpHeaderArgs.get(name.toLowerCase());
+        return arg;
     }
 
 
@@ -766,8 +769,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public String toString() {
-        return type + "url args:" + getUrlArgs() + "\n\theader args:"
-               + httpHeaderArgs;
+        return type + "url args:" + getUrlArgs();// + "\n\theader args:"               + httpHeaderArgs;
     }
 
     /**

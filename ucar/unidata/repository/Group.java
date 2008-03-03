@@ -56,6 +56,9 @@ public class Group extends Entry {
     /** _more_ */
     private boolean isDummy = false;
 
+
+
+
     /**
      * _more_
      *
@@ -69,6 +72,13 @@ public class Group extends Entry {
         setDescription("");
     }
 
+    public Object clone() throws CloneNotSupportedException {
+        Group that= (Group)super.clone();
+        that.children = new ArrayList<Group>();
+        return that;
+    }
+
+
     /**
      * _more_
      *
@@ -79,29 +89,6 @@ public class Group extends Entry {
         super(id, typeHandler);
     }
 
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public Entry clone() {
-        Entry newEntry = new Group(getId(), getTypeHandler());
-        initClone(newEntry);
-        return newEntry;
-    }
-
-    /**
-     * _more_
-     *
-     * @param newEntry _more_
-     */
-    protected void initClone(Entry newEntry) {
-        Group newGroup = (Group) newEntry;
-        newGroup.isDummy  = isDummy;
-        newGroup.children = children;
-        super.initClone(newEntry);
-    }
 
     /**
      * _more_

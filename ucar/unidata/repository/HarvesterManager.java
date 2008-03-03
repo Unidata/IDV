@@ -39,6 +39,7 @@ import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.xml.XmlUtil;
 
+import java.lang.reflect.*;
 import java.io.File;
 
 import java.sql.Connection;
@@ -94,6 +95,8 @@ public class HarvesterManager extends RepositoryManager {
     /** _more_ */
     private List<Harvester> harvesters = new ArrayList();
 
+    private Hashtable harvesterMap = new Hashtable();
+
     /**
      * _more_
      *
@@ -145,20 +148,56 @@ public class HarvesterManager extends RepositoryManager {
             getRepository().getResourcePaths(PROP_HARVESTERS);
         boolean okToStart =
             getRepository().getProperty(PROP_HARVESTERS_ACTIVE, true);
+
+        harvesters = new ArrayList<Harvester>();
+
+        String query = SqlUtil.makeSelect(COLUMNS_HARVESTERS,
+                                          Misc.newList(TABLE_HARVESTERS));
+        /*
+        SqlUtil.Iterator iter =
+            SqlUtil.getIterator(getDatabaseManager().execute(query));
+        ResultSet results;
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                String id = results.getString(1);
+                String className = results.getString(2);
+                String content = results.getString(3);
+                Class c = Misc.findClass(className);
+                Constructor ctor = Misc.findConstructor(c,
+                                                        new Class[] { Repository.class,
+                                                                      String.class });
+                Harvester harvester = (Harvester) ctor.newInstance(new Object[] { getRepository(),
+                                                                                  id});
+
+                harvester.initFromContent(content);
+                harvesters.add(harvester);
+                harvesterMap.put(harvester.getId(), harvester);
+
+            }
+        }
+
+        */
+
+
         try {
-            harvesters = new ArrayList<Harvester>();
             for (String file : harvesterFiles) {
                 Element root = XmlUtil.getRoot(file, getClass());
                 if (root == null) {
                     continue;
                 }
-                harvesters.addAll(Harvester.createHarvesters(getRepository(),
-                        root));
+                List<Harvester> newHarvesters = Harvester.createHarvesters(getRepository(), root);
+                harvesters.addAll(newHarvesters);
+                for(Harvester harvester: newHarvesters) {
+                    harvesterMap.put(harvester.getId(), harvester);
+                }
             }
         } catch (Exception exc) {
             System.err.println("Error loading harvester file");
             throw exc;
         }
+
+
+
         for (Harvester harvester : harvesters) {
             File rootDir = harvester.getRootDir();
             if (rootDir != null) {
@@ -176,6 +215,37 @@ public class HarvesterManager extends RepositoryManager {
 
     public Result processNew(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
+        if(request.exists(ARG_CANCEL)) {
+            return new Result(URL_HARVESTERS_LIST);
+        }
+
+        if(request.exists(ARG_NAME)) {
+            String id = getRepository().getGUID();
+            PatternHarvester harvester  = new PatternHarvester(
+                                                               getRepository(),
+                                                               id);
+            harvester.setName(request.getString(ARG_NAME,""));
+
+            harvesters.add(harvester);
+            harvesterMap.put(id, harvester);
+
+            getDatabaseManager().executeInsert(INSERT_HARVESTERS,
+                                           new Object[] { id,
+                                                          harvester.getClass().getName(),
+                                                          harvester.getContent()});
+            return new Result(HtmlUtil.url(URL_HARVESTERS_EDIT,
+                                           ARG_HARVESTER_ID,
+                                           id));
+        }
+        sb.append(HtmlUtil.form(URL_HARVESTERS_NEW));
+        sb.append(HtmlUtil.formTable());
+        sb.append(HtmlUtil.formEntry(msgLabel("Name"),HtmlUtil.input(ARG_NAME,"",HtmlUtil.SIZE_40)));
+        sb.append(HtmlUtil.formEntry("",HtmlUtil.submit(msg("Create")) +
+                                     HtmlUtil.space(1) +
+                                     HtmlUtil.submit(msg("Cancel"),ARG_CANCEL)));
+
+        sb.append(HtmlUtil.formTableClose());
+        sb.append(HtmlUtil.formClose());
         return getAdmin().makeResult(request, msg("New Harvester"), sb);
     }
 
@@ -188,14 +258,48 @@ public class HarvesterManager extends RepositoryManager {
         if(!harvester.getIsEditable()) {
             throw new IllegalArgumentException("Cannot edit harvester");
         }
+        sb.append(header(msgLabel("Harvester") + harvester.getName()));
         sb.append(HtmlUtil.form(URL_HARVESTERS_EDIT));
-        sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.hidden(ARG_HARVESTER_ID, harvester.getId()));
+        if(request.exists(ARG_CANCEL)) {
+            return new Result(URL_HARVESTERS_LIST);
+        }
 
+        if(request.exists(ARG_DELETE_CONFIRM)) {
+            harvesterMap.remove(harvester.getId());
+            harvesters.remove(harvester);
+            getDatabaseManager().executeDelete(TABLE_HARVESTERS, COL_HARVESTERS_ID,SqlUtil.quote(harvester.getId()));
+            return new Result(URL_HARVESTERS_LIST);
+        } else    if(request.exists(ARG_DELETE)) {
+            sb.append(getRepository().question(
+                                               msg("Are you sure you want to delete the harvester")+
+                                               HtmlUtil.p() +
+                                               HtmlUtil.submit(msg("Yes"),ARG_DELETE_CONFIRM) +
+                                               HtmlUtil.space(1) +
+                                               HtmlUtil.submit(msg("Cancel"),ARG_CANCEL_DELETE)));
+        } else {
+            if(request.exists(ARG_CHANGE)) {
+                harvester.applyEditForm(request);
+                getDatabaseManager().executeDelete(TABLE_HARVESTERS, COL_HARVESTERS_ID,SqlUtil.quote(harvester.getId()));
+                getDatabaseManager().executeInsert(INSERT_HARVESTERS,
+                                                   new Object[] { harvester.getId(),
+                                                                  harvester.getClass().getName(),
+                                                                  harvester.getContent()});
 
-        sb.append(HtmlUtil.formEntry("",HtmlUtil.submit(msg("Change"))));
+            }
+            sb.append(HtmlUtil.formTable());
+            String buttons = HtmlUtil.submit(msg("Change"),ARG_CHANGE) +
+                HtmlUtil.space(1) +
+                HtmlUtil.submit(msg("Delete"),ARG_DELETE) +
+                HtmlUtil.space(1) +
+                HtmlUtil.submit(msg("Cancel"),ARG_CANCEL);
+
+            sb.append(HtmlUtil.formEntry("",buttons));
+            harvester.createEditForm(request, sb);
+            sb.append(HtmlUtil.formEntry("",buttons));
+            sb.append(HtmlUtil.formTableClose());
+        }
         sb.append(HtmlUtil.formClose());
-        sb.append(HtmlUtil.formTableClose());
         return getAdmin().makeResult(request, msg("Edit Harvester"), sb);
     }
 
@@ -225,12 +329,14 @@ public class HarvesterManager extends RepositoryManager {
                     Misc.run(harvester, "run");
                 }
             }
-            return new Result(URL_HARVESTERS_LIST.toString());
+            return new Result(URL_HARVESTERS_LIST);
         }
 
 
         sb.append(msgHeader("Harvesters"));
-        sb.append(HtmlUtil.href(URL_HARVESTERS_NEW, msg("New Harvester")));
+        sb.append(HtmlUtil.form(URL_HARVESTERS_NEW));
+        sb.append(HtmlUtil.submit(msg("New Harvester")));
+        sb.append(HtmlUtil.formClose());
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.row(HtmlUtil.cols("",HtmlUtil.bold(msg("Name")),
@@ -309,7 +415,7 @@ public class HarvesterManager extends RepositoryManager {
             Misc.run(harvester, "run");
         }
 
-        Result result = new Result(URL_HARVESTERS_LIST.toString());
+        Result result = new Result(URL_HARVESTERS_LIST);
         return result;
     }
 

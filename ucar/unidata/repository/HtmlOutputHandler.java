@@ -383,9 +383,6 @@ public class HtmlOutputHandler extends OutputHandler {
     }
 
 
-
-
-
     /*
     protected Result listTags(Request request, List<Tag> tags)
             throws Exception {
@@ -752,7 +749,7 @@ public class HtmlOutputHandler extends OutputHandler {
                     String groupLink =
                         HtmlUtil.href(
                             HtmlUtil.url(
-                                getRepository().URL_GROUP_SHOW, ARG_ID,
+                                getRepository().URL_ENTRY_SHOW, ARG_ID,
                                 subGroup.getId(), ARG_OUTPUT, output,
                                 ARG_SHOWMETADATA, showMetadata
                             ? "true"
