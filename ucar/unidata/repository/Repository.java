@@ -535,6 +535,10 @@ public class Repository implements Constants, Tables, RequestHandler,
         return getMessage(h, "/information.png");
     }
 
+    protected String progress(String h) {
+        return getMessage(h, "/progress.gif");
+    }
+
 
     /**
      * _more_
@@ -2731,7 +2735,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
     protected void copyEntry(Entry from, Group parent, Object actionId) throws Exception {
-        Entry newEntry = from.clone();
+        Entry newEntry = (Entry)from.clone();
         String newId  = getGUID();
     }
 

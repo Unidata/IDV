@@ -115,7 +115,8 @@ public class ActionManager extends RepositoryManager {
                 sb.append(action.getContinueHtml());
                 actions.remove(id);
             } else {
-                sb.append(getRepository().note(msg("In progress")));
+                sb.append("<meta http-equiv=\"refresh\" content=\"1\">");
+                sb.append(getRepository().progress(msg("In progress")));
                 sb.append(HtmlUtil.href(HtmlUtil.url(URL_STATUS,
                                                      ARG_ACTION_ID, id), msg("Reload")));
                 sb.append("<p>");
