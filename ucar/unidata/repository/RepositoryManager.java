@@ -161,12 +161,12 @@ public class RepositoryManager implements RepositorySource, Constants,
     }
 
     public static String subHeader(String s) {
-        return HtmlUtil.div(s, " class=\"pagesubheading\" ");
+        return HtmlUtil.div(s, HtmlUtil.cssClass("pagesubheading"));
     }
 
 
     public  String subHeaderLink(Object url, String label) {
-        return  HtmlUtil.href(url, label,  " class=\"pagesubheadinglink\" ");
+        return  HtmlUtil.href(url, label,  HtmlUtil.cssClass("pagesubheadinglink"));
     }
 
 
@@ -174,8 +174,9 @@ public class RepositoryManager implements RepositorySource, Constants,
         //        if(true) return "x";
         String img = HtmlUtil.img(getRepository().fileUrl(toggle?ICON_MINUS:ICON_PLUS));
         label =  img + HtmlUtil.space(1) +label;
-        String html =  HtmlUtil.href(url, label,  " class=\"pagesubheadinglink\" ");
-        return "<table border=1><tr valign=bottom><td>" + html +"</table>";
+        String html =  HtmlUtil.href(url, label, HtmlUtil.cssClass("pagesubheadinglink"));
+        return html;
+        //return "<table border=1><tr valign=bottom><td>" + html +"</table>";
     }
 
 
