@@ -3251,6 +3251,10 @@ public class Repository implements Constants, Tables, RequestHandler,
             sb.append(HtmlUtil.formClose());
         }
 
+        if(comments.size()==0) {
+            sb.append("<br>");
+            sb.append(msg("No comments"));
+        }
         sb.append("<table>");
         for (Comment comment : comments) {
             sb.append(HtmlUtil.formEntry(BLANK, HtmlUtil.hr()));
@@ -3292,10 +3296,12 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (request.exists(ARG_MESSAGE)) {
             sb.append(note(request.getUnsafeString(ARG_MESSAGE, BLANK)));
         }
-        sb.append("Comments for: " + getEntryUrl(entry));
+        sb.append(makeEntryHeader(request, entry));
+        sb.append("<p>");
+        //        sb.append(msg("Comments"));
         sb.append("<p>");
         sb.append(getCommentHtml(request, entry));
-        return new Result("Entry Comments", sb, Result.TYPE_HTML);
+        return new Result(msg("Entry Comments"), sb, Result.TYPE_HTML);
     }
 
     /** _more_ */
@@ -3582,12 +3588,10 @@ public class Repository implements Constants, Tables, RequestHandler,
     public String makeEntryHeader(Request request, Entry entry)
             throws Exception {
         String crumbs = getBreadCrumbs(request,
-                                       findGroup(entry.getParentGroupId()),
+                                       entry,
+                                       //                                       findGroup(entry.getParentGroupId()),
                                        true, BLANK)[1];
-        if (crumbs.length() > 0) {
-            crumbs = crumbs + "&nbsp;&gt;&nbsp;";
-        }
-        return crumbs + getEntryUrl(entry);
+        return crumbs;
     }
 
 
@@ -4134,11 +4138,10 @@ public class Repository implements Constants, Tables, RequestHandler,
             breadcrumbs.add(HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW,
                     ARG_ID, entry.getId(), ARG_OUTPUT,
                     output), entry.getName()));
-            
-            nav =  StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
-            if(breadcrumbs.size()>1) {
+            nav =   StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
+            //            if(breadcrumbs.size()>1) {
                 nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
-            }
+                //            }
         } else {
             nav =  StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
             String   header = HtmlUtil.div(entry.getName() + 
@@ -4154,7 +4157,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                 //                            + getHeaderLinksForEntry(request, entry));
         }
         String title = StringUtil.join(HtmlUtil.pad("&gt;"), titleList);
-        return new String[] { title,nav};
+        return new String[] {title,nav};
     }
 
 
