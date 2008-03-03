@@ -221,6 +221,10 @@ public class HtmlUtil {
                + ">";
     }
 
+    public static String cssClass(String c) {
+        return " class=\"" + c +"\" ";
+    }
+
     /**
      * _more_
      *
