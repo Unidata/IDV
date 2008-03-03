@@ -201,40 +201,6 @@ public class HtmlOutputHandler extends OutputHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param groups _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected Result listGroups(Request request, List<Group> groups)
-            throws Exception {
-        StringBuffer sb     = new StringBuffer();
-        String       output = request.getOutput();
-        //        appendListHeader(request, output, WHAT_GROUP, sb);
-        if (output.equals(OUTPUT_HTML)) {
-            sb.append(msgHeader("Groups"));
-            sb.append("<ul>");
-        }
-
-        for (Group group : groups) {
-            if (output.equals(OUTPUT_HTML)) {
-                sb.append("<li>"
-                          + getRepository().getEntryLinks(request, group)
-                          + " " + group.getFullName());
-            }
-
-        }
-        if (output.equals(OUTPUT_HTML)) {
-            sb.append("</ul>\n");
-        }
-        return new Result("", sb, getMimeType(output));
-    }
-
 
 
     /**
@@ -262,16 +228,13 @@ public class HtmlOutputHandler extends OutputHandler {
             List outputList =
                 getRepository().getOutputTypesForEntries(request, entries);
             sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
-            sb.append("<p>\n");
-            sb.append("<ul>\n");
-
+            sb.append("<ul style=\"list-style-image : url(" + getRepository().fileUrl(ICON_FILE) +")\">");
         }
         for (Entry entry : entries) {
+            sb.append("<li>");
             sb.append(HtmlUtil.checkbox("entry_" + entry.getId(), "true",
                                         dfltSelected));
             sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
-            sb.append(HtmlUtil.space(1));
-            //            sb.append(getRepository().getEntryLinks(request,entry));
             sb.append(HtmlUtil.space(1));
             sb.append(getEntryUrl(entry));
             sb.append(HtmlUtil.br());
@@ -695,7 +658,6 @@ public class HtmlOutputHandler extends OutputHandler {
 
         if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)) {
             showApplet = output.equals(OUTPUT_TIMELINE);
-            sb.append(HtmlUtil.p());
             boolean showMetadata = request.get(ARG_SHOWMETADATA, false);
             if ( !group.isDummy()) {
                 String[] crumbs = getRepository().getBreadCrumbs(request,
@@ -727,13 +689,13 @@ public class HtmlOutputHandler extends OutputHandler {
 
             sb.append(HtmlUtil.p());
             if (subGroups.size() > 0) {
-                sb.append(HtmlUtil.bold(msgLabel("Groups")));
-                sb.append("<ul>");
+                sb.append("<div>" + HtmlUtil.bold(msgLabel("Groups"))+"</div>");
+                sb.append("<ul style=\"list-style-image : url(" + getRepository().fileUrl(ICON_FOLDER) +")\">");
+                //                sb.append("<div class=\"grouplist\">");
                 for (Group subGroup : subGroups) {
                     List<Metadata> metadataList =
                         getMetadataManager().getMetadata(subGroup);
                     String icon = "";
-
                     /**
                      * for (Metadata metadata : metadataList) {
                      *   if(metadata.getType().equals(ThreddsMetadataHandler.TAG_ICON)) {
@@ -764,6 +726,7 @@ public class HtmlOutputHandler extends OutputHandler {
                     //                    sb.append("\n<br>\n");
                 }
                 sb.append("</ul>");
+                //sb.append("</div>");
             }
             if (entries.size() > 0) {
                 sb.append("\n");
@@ -833,76 +796,6 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
 
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entries _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public StringBuffer getEntriesList(Request request, List<Entry> entries)
-            throws Exception {
-        StringBuffer sb         = new StringBuffer();
-        String       output     = request.getOutput();
-        boolean      showApplet = getRepository().isAppletEnabled(request);
-        sb.append(HtmlUtil.p());
-        if (entries.size() == 0) {
-            sb.append(HtmlUtil.bold(msg("Nothing Found")) + "<p>");
-        }
-        sb.append(HtmlUtil.formTable());
-        showApplet = showApplet && output.equals(OUTPUT_TIMELINE);
-
-        StringBufferCollection sbc = new StringBufferCollection();
-        for (Entry entry : entries) {
-            StringBuffer ssb =
-                sbc.getBuffer(entry.getTypeHandler().getDescription());
-            String links =
-                HtmlUtil.checkbox("entry_" + entry.getId(), "true") + " "
-                + getRepository().getEntryLinks(request, entry);
-
-            ssb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
-            String col1 =
-                links + " "
-                + HtmlUtil.href(HtmlUtil.url(getRepository().URL_ENTRY_SHOW,
-                                             ARG_ID,
-                                             entry.getId()), entry.getName());
-            String col2 = formatDate(request, new Date(entry.getStartDate()));
-            ssb.append(HtmlUtil.row(HtmlUtil.cols(col1, col2)));
-        }
-
-
-        if ((entries.size() > 0) && showApplet) {
-            sb.append(getTimelineApplet(request, entries));
-        }
-
-        sb.append(HtmlUtil.form(getRepository().URL_GETENTRIES,
-                                "name=\"getentries\" method=\"post\""));
-        if (entries.size() > 0) {
-            sb.append(HtmlUtil.submit(msg("Get selected"), "getselected"));
-            sb.append(HtmlUtil.submit(msg("Get all"), "getall"));
-            sb.append(" As: ");
-            List outputList =
-                getRepository().getOutputTypesForEntries(request, entries);
-            sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
-        }
-        sb.append("<br>");
-        for (int i = 0; i < sbc.getKeys().size(); i++) {
-            String       type = (String) sbc.getKeys().get(i);
-            StringBuffer ssb  = sbc.getBuffer(type);
-            sb.append(
-                HtmlUtil.row(
-                    HtmlUtil.cols(HtmlUtil.bold(msgLabel("Type") + type))));
-            sb.append(ssb);
-        }
-
-        sb.append(HtmlUtil.formClose());
-        sb.append(HtmlUtil.formTableClose());
-        return sb;
-    }
 
 
 

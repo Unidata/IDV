@@ -2226,7 +2226,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    protected String getEntryLinks(Request request, Entry entry)
+    protected String getHeaderLinksForEntry(Request request, Entry entry)
             throws Exception {
         List<Link> links = new ArrayList<Link>();
         entry.getTypeHandler().getEntryLinks(request, entry, links);
@@ -4076,6 +4076,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                               extraArgs, null);
     }
 
+
     /**
      * _more_
      *
@@ -4085,7 +4086,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @param extraArgs _more_
      * @param stopAt _more_
      *
-     * @return _more_
+     * @return A 2 element array.  First element is the title to use. Second is the links
      *
      * @throws Exception _more_
      */
@@ -4128,18 +4129,32 @@ public class Repository implements Constants, Tables, RequestHandler,
             parent = findGroup(parent.getParentGroupId());
         }
         titleList.add(entry.getName());
+        String nav;
         if (makeLinkForLastGroup) {
             breadcrumbs.add(HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW,
                     ARG_ID, entry.getId(), ARG_OUTPUT,
                     output), entry.getName()));
+            
+            nav =  StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
+            if(breadcrumbs.size()>1) {
+                nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
+            }
         } else {
-            breadcrumbs.add(HtmlUtil.bold(entry.getName()) + "&nbsp;"
-                            + getEntryLinks(request, entry));
+            nav =  StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
+            String   header = HtmlUtil.div(entry.getName() + 
+                                           HtmlUtil.space(1) + 
+                                           getHeaderLinksForEntry(request, entry),
+                                           HtmlUtil.cssClass("entryheader"));
+                
+            if(breadcrumbs.size()>0) {
+                //                nav =  "<br>" + HtmlUtil.space(3);
+            }
+            nav = "\n" + HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"))  + "\n"+header;
+                //            breadcrumbs.add(HtmlUtil.bold(entry.getName()) + HtmlUtil.space(1)
+                //                            + getHeaderLinksForEntry(request, entry));
         }
-        String title = StringUtil.join("&nbsp;&gt;&nbsp;", titleList);
-        return new String[] { title,
-                              StringUtil.join("&nbsp;&gt;&nbsp;",
-                              breadcrumbs) };
+        String title = StringUtil.join(HtmlUtil.pad("&gt;"), titleList);
+        return new String[] { title,nav};
     }
 
 
@@ -6304,16 +6319,19 @@ public class Repository implements Constants, Tables, RequestHandler,
                 getConnection().prepareStatement(query =
                     SqlUtil.makeSelect("count(" + COL_ENTRIES_ID + ")",
                                        Misc.newList(TABLE_ENTRIES),
-                                       SqlUtil.eq(COL_ENTRIES_RESOURCE,
-                                           "?")));
+                                       SqlUtil.makeAnd(Misc.newList(
+                                                                    SqlUtil.eq(COL_ENTRIES_RESOURCE,"?"),
+                                                                    SqlUtil.eq(COL_ENTRIES_PARENT_GROUP_ID,"?")))));
             long t1 = System.currentTimeMillis();
             for (Entry entry : entries) {
                 String path = entry.getResource().getPath();
-                if (seenResources.get(path) != null) {
+                String key = entry.getParentGroup().getId()+"_"+path;
+                if (seenResources.get(key) != null) {
                     continue;
                 }
-                seenResources.put(path, path);
+                seenResources.put(key, key);
                 select.setString(1, path);
+                select.setString(2, entry.getParentGroup().getId());
                 //                select.addBatch();
                 ResultSet results = select.executeQuery();
                 if (results.next()) {

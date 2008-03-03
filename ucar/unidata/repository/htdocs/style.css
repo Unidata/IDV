@@ -14,8 +14,14 @@ td {
 
 }
 
+ul {
+   margin-top:5px;
+}
+
+
 .content {
     margin:10;
+    margin-top:5;
 }
 
 xform {
@@ -56,18 +62,46 @@ A {xtext-decoration: none}
   color: #9C9C9C;
 }
 
+.breadcrumbs {
+   text-decoration: none;
+   font-size: 14pt;
+   color: black;
+}
+
+.breadcrumbs a {
+   text-decoration: none;
+   color: black;
+}
+
+.breadcrumbs a:hover {
+   text-decoration: underline;
+   color: red;
+}
+
+
+.entryheader {
+   padding:0px;
+   margin:0px;
+   margin-top:5px;
+   margin-left:0px;
+   font-weight: bold;
+   font-size: 16pt;
+   color: #9C9C9C;
+}
+
+
+
 
 
 
 .pagesubheading {
    margin:0px;
    padding:0px;
-   padding-bottom: 2px;
+   padding-bottom: 0px;
    padding-left: 5px;
-   padding-top: 5px;
+   padding-top: 2px;
    font-weight: bold;
    background-color: #9C9C9C;
-   xbackground-color:#cccccc;
    vertical-align: bottom
 }
 

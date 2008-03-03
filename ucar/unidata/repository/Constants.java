@@ -83,6 +83,11 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_COMMENTS = "/comments.gif";
 
+    /** _more_ */
+    public static final String ICON_FOLDER = "/folder.gif";
+
+    public static final String ICON_FILE = "/file.gif";
+
     public static final String ICON_PLUS = "/plus.gif";
 
     public static final String ICON_MINUS = "/minus.gif";

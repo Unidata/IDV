@@ -121,7 +121,7 @@ public class PatternHarvester extends Harvester {
 
 
     /** _more_ */
-    private String filePatternString="";
+    private String filePatternString=".*";
 
 
     /** _more_ */
@@ -194,8 +194,14 @@ public class PatternHarvester extends Harvester {
         descTemplate = XmlUtil.getAttribute(element, ATTR_DESCTEMPLATE, "");
         dateFormat = XmlUtil.getAttribute(element,
                                           ATTR_DATEFORMAT, dateFormat);
-        user       = repository.getUserManager().getDefaultUser();
         rootStrLen = rootDir.toString().length();
+    }
+
+    protected User getUser() throws Exception {
+        if(user ==null) {
+            user       = repository.getUserManager().getDefaultUser();
+        }
+        return user;
     }
 
     public void applyState(Element element) throws Exception {
@@ -500,8 +506,8 @@ public class PatternHarvester extends Harvester {
 
         init();
 
-        //        System.err.println("filePattern:" + filePattern);
         Matcher matcher = filePattern.matcher(fileName);
+        //        System.err.println("file:" + fileName + " " +matcher.find());
         if ( !matcher.find()) {
             return null;
         }
@@ -581,9 +587,9 @@ public class PatternHarvester extends Harvester {
 
 
         Group group = repository.findGroupFromName(baseGroupName + "/"
-                          + groupName, user, true);
+                                                   + groupName, getUser(), true);
         Entry entry = typeHandler.createEntry(repository.getGUID());
-        entry.init(name, desc, group, user,
+        entry.init(name, desc, group, getUser(),
                    new Resource(fileName, Resource.TYPE_FILE),
                    createDate.getTime(), fromDate.getTime(),
                    toDate.getTime(), values);

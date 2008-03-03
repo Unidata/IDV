@@ -153,7 +153,6 @@ public class HarvesterManager extends RepositoryManager {
 
         String query = SqlUtil.makeSelect(COLUMNS_HARVESTERS,
                                           Misc.newList(TABLE_HARVESTERS));
-        /*
         SqlUtil.Iterator iter =
             SqlUtil.getIterator(getDatabaseManager().execute(query));
         ResultSet results;
@@ -176,7 +175,6 @@ public class HarvesterManager extends RepositoryManager {
             }
         }
 
-        */
 
 
         try {

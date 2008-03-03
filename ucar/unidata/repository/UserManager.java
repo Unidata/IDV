@@ -1224,6 +1224,7 @@ public class UserManager extends RepositoryManager {
         } else {
             sb.append(HtmlUtil.href(HtmlUtil.url(URL_USER_CART, ARG_ACTION,
                     ACTION_CLEAR), msg("Clear Cart")));
+            sb.append(HtmlUtil.p());
             boolean haveFrom = request.defined(ARG_FROM);
             if (haveFrom) {
                 Entry fromEntry =
@@ -1251,7 +1252,7 @@ public class UserManager extends RepositoryManager {
                 sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
             }
             //            sb.append("<br>");
-            sb.append("<ul>");
+            sb.append("<ul style=\"list-style-image : url(" + getRepository().fileUrl(ICON_FILE) +")\">");
             OutputHandler outputHandler =
                 getRepository().getOutputHandler(request);
             for (Entry entry : entries) {
