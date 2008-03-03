@@ -2431,7 +2431,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         request.put(ARG_FORM_METADATA, ( !metadataForm) + BLANK);
         String urlArgs = request.getUrlArgs();
         request.put(ARG_FORM_METADATA, metadataForm + BLANK);
-        String link = RepositoryManager.subHeaderLink(getRepository().URL_ENTRY_SEARCHFORM
+        String link = getMetadataManager().subHeaderLink(getRepository().URL_ENTRY_SEARCHFORM
                                                       + "?" + urlArgs,  msg("Metadata"),metadataForm);
         sb.append(RepositoryManager.tableSubHeader(link));
         if (metadataForm) {

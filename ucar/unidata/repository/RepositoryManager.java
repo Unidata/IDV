@@ -165,15 +165,17 @@ public class RepositoryManager implements RepositorySource, Constants,
     }
 
 
-    public static String subHeaderLink(Object url, String label) {
+    public  String subHeaderLink(Object url, String label) {
         return  HtmlUtil.href(url, label,  " class=\"pagesubheadinglink\" ");
     }
 
 
-
-    public static String subHeaderLink(Object url, String label, boolean toggle) {
-        label = (toggle? "<tt>-</tt>&nbsp;" : "<tt>+</tt>&nbsp;") +label;
-        return  HtmlUtil.href(url, label,  " class=\"pagesubheadinglink\" ");
+    public  String subHeaderLink(Object url, String label, boolean toggle) {
+        //        if(true) return "x";
+        String img = HtmlUtil.img(getRepository().fileUrl(toggle?ICON_MINUS:ICON_PLUS));
+        label =  img + HtmlUtil.space(1) +label;
+        String html =  HtmlUtil.href(url, label,  " class=\"pagesubheadinglink\" ");
+        return "<table border=1><tr valign=bottom><td>" + html +"</table>";
     }
 
 
