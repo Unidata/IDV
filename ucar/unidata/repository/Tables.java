@@ -134,6 +134,7 @@ SqlUtil.getQuestionMarks(ARRAY_DUMMY.length));
 public static final String TABLE_ENTRIES  = "entries";
 public static final String COL_ENTRIES_ID = TABLE_ENTRIES+".id";
 public static final String COL_ENTRIES_TYPE = TABLE_ENTRIES+".type";
+public static final String COL_ENTRIES_DATATYPE = TABLE_ENTRIES+".datatype";
 public static final String COL_ENTRIES_NAME = TABLE_ENTRIES+".name";
 public static final String COL_ENTRIES_DESCRIPTION = TABLE_ENTRIES+".description";
 public static final String COL_ENTRIES_PARENT_GROUP_ID = TABLE_ENTRIES+".parent_group_id";
@@ -157,6 +158,7 @@ COL_ENTRIES_PARENT_GROUP_ID,
 COL_ENTRIES_USER_ID,
 COL_ENTRIES_RESOURCE,
 COL_ENTRIES_RESOURCE_TYPE,
+COL_ENTRIES_DATATYPE,
 COL_ENTRIES_CREATEDATE,
 COL_ENTRIES_FROMDATE,
 COL_ENTRIES_TODATE,

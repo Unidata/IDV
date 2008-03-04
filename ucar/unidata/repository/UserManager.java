@@ -448,6 +448,9 @@ public class UserManager extends RepositoryManager {
         sb.append(header(msg("Please login")));
         String id = request.getString(ARG_USER_ID, "");
         sb.append(HtmlUtil.form(URL_USER_LOGIN));
+        if (request.defined(ARG_REDIRECT)) {
+            sb.append(HtmlUtil.hidden(ARG_REDIRECT, request.getUnsafeString(ARG_REDIRECT,"")));
+        }
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry(msgLabel("User"),
                                      HtmlUtil.input(ARG_USER_ID, id)));
@@ -737,7 +740,6 @@ public class UserManager extends RepositoryManager {
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.form(URL_USER_EDIT));
         sb.append(HtmlUtil.hidden(ARG_USER_ID, user.getId()));
-
         if (request.defined(ARG_USER_DELETE)) {
             sb.append(
                 getRepository().question(
@@ -1328,7 +1330,9 @@ public class UserManager extends RepositoryManager {
                           HtmlUtil.img(getRepository().fileUrl(ICON_CART),
                                        msg("Data Cart")));
         if (user.getAnonymous()) {
-            userLink = HtmlUtil.href(URL_USER_LOGIN, msg("Login"),
+            String redirect = XmlUtil.encodeBase64(request.getFullUrl().getBytes());
+            userLink = HtmlUtil.href(HtmlUtil.url(URL_USER_LOGIN, ARG_REDIRECT, redirect),
+                                     msg("Login"),
                                      " class=\"navlink\" ");
         } else {
             userLink = HtmlUtil
@@ -1404,9 +1408,9 @@ public class UserManager extends RepositoryManager {
                 user = getUser(results);
                 setUserSession(request, user);
                 if (request.exists(ARG_REDIRECT)) {
+                    String redirect = new String(XmlUtil.decodeBase64(request.getUnsafeString(ARG_REDIRECT, "")));
                     return new Result(
-                        HtmlUtil.url(
-                            request.getUnsafeString(ARG_REDIRECT, ""),
+                        HtmlUtil.url(redirect,
                             ARG_FROMLOGIN, "true",
                             ARG_MESSAGE, msg("You are logged in")));
                 } else {

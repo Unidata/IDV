@@ -61,6 +61,8 @@ public class Resource {
     /** _more_ */
     private File file;
 
+
+
     /**
      * _more_
      */
@@ -215,6 +217,11 @@ public class Resource {
     public String getType() {
         return type;
     }
+
+
+
+
+
 
 
 }

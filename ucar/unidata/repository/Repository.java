@@ -384,7 +384,7 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     private Hashtable entryCache = new Hashtable();
 
-
+    private List   dataTypeList = null;
 
     /** _more_ */
     private List<String> htdocRoots = new ArrayList<String>();
@@ -1056,6 +1056,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         pageCacheList = new ArrayList();
         entryCache    = new Hashtable();
         groupCache    = new Hashtable();
+        dataTypeList = null;
     }
 
 
@@ -1401,8 +1402,9 @@ public class Repository implements Constants, Tables, RequestHandler,
                                 + HtmlUtil.p() + inner.getMessage()));
             } else {
                 sb.append(error(inner.getMessage()));
+                String redirect = XmlUtil.encodeBase64(request.getFullUrl().getBytes());
                 sb.append(getUserManager().makeLoginForm(request,
-                        HtmlUtil.hidden(ARG_REDIRECT, request.getFullUrl())));
+                        HtmlUtil.hidden(ARG_REDIRECT, redirect)));
             }
 
             if ((request.getUser() != null) && request.getUser().getAdmin()) {
@@ -2233,7 +2235,15 @@ public class Repository implements Constants, Tables, RequestHandler,
         for (OutputHandler outputHandler : getOutputHandlers()) {
             outputHandler.getEntryLinks(request, entry, links);
         }
-        return StringUtil.join(HtmlUtil.space(1), links);
+        OutputHandler outputHandler =        getOutputHandler(request);
+        String nextPrev = HtmlUtil.space(1) + outputHandler.getNextPrevLink(request, entry,
+                                                        request.getOutput());
+        
+        if (entry.isTopGroup()) {
+            nextPrev = "";
+        }
+        return StringUtil.join(HtmlUtil.space(1), links) + nextPrev;
+        //        return StringUtil.join(HtmlUtil.space(1), links);
     }
 
 
@@ -3094,16 +3104,30 @@ public class Repository implements Constants, Tables, RequestHandler,
 
             if (typeHandler.okToShowInForm(ARG_RESOURCE)) {
                 if (entry == null) {
-                    sb.append(HtmlUtil.formEntry("File:",
+                    sb.append(HtmlUtil.formEntry(msgLabel("File"),
                             HtmlUtil.fileInput(ARG_FILE, size)
                             + HtmlUtil.checkbox(ARG_FILE_UNZIP, "true",
-                                false) + " Unzip archive"));
-                    sb.append(HtmlUtil.formEntry("Or URL:",
+                                false) + HtmlUtil.space(1)+msg("Unzip archive")));
+                    sb.append(HtmlUtil.formEntry(msgLabel("Or URL"),
                             HtmlUtil.input(ARG_RESOURCE, BLANK, size)));
                 } else {
-                    sb.append(HtmlUtil.formEntry("Resource:",
+                    sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
                             entry.getResource().getPath()));
                 }
+                if(!typeHandler.hasDefaultDataType() && 
+                   typeHandler.okToShowInForm(ARG_DATATYPE)) {
+                    String selected = "";
+                    if (entry != null) {
+                        selected = entry.getDataType();
+                    }
+                    List types = getDefaultDataTypes();
+                    String widget =  (types.size()>0?HtmlUtil.select(ARG_DATATYPE_SELECT,types,selected) + HtmlUtil.space(1) +
+                        msgLabel("Or"):"") +
+                        HtmlUtil.input(ARG_DATATYPE);
+                    sb.append(HtmlUtil.formEntry(msgLabel("Data Type"),
+                                                 widget));
+                }
+
             }
 
             String dateHelp = " (e.g., 2007-12-11 00:00:00)";
@@ -3545,8 +3569,6 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
-
-
         sb.append(HtmlUtil.form(URL_ENTRY_DELETE, BLANK));
         StringBuffer inner = new StringBuffer();
         if (entry.isGroup()) {
@@ -3613,7 +3635,6 @@ public class Repository implements Constants, Tables, RequestHandler,
             typeHandler = entry.getTypeHandler();
             newEntry = false;
 
-
             if (entry.isTopGroup()) {
                 return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
                         entry.getId(), ARG_MESSAGE,
@@ -3657,6 +3678,12 @@ public class Repository implements Constants, Tables, RequestHandler,
         Object mutex = new Object();
         if (typeHandler.isType(TypeHandler.TYPE_GROUP)) {
             mutex = MUTEX_GROUP;
+        }
+        String dataType="";
+        if(request.defined(ARG_DATATYPE)) {
+            dataType = request.getString(ARG_DATATYPE,"");
+        } else {
+            dataType = request.getString(ARG_DATATYPE_SELECT,"");
         }
         synchronized (mutex) {
         if (entry == null) {
@@ -3792,9 +3819,10 @@ public class Repository implements Constants, Tables, RequestHandler,
                              : getGUID());
 
                 entry = typeHandler.createEntry(id);
-                entry.init(
+                entry.initEntry(
                     name, description, parentGroup, request.getUser(),
                     new Resource(theResource, Resource.TYPE_LOCALFILE),
+                    dataType,
                     createDate.getTime(), theDateRange[0].getTime(),
                     theDateRange[1].getTime(), null);
                 setEntryState(request, entry);
@@ -3830,6 +3858,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             entry.setName(newName);
             entry.setDescription(request.getString(ARG_DESCRIPTION,
                     entry.getDescription()));
+            entry.setDataType(dataType);
             if (request.defined(ARG_RESOURCE)) {
                 entry.setResource(
                     new Resource(request.getString(ARG_RESOURCE, BLANK)));
@@ -3919,11 +3948,6 @@ public class Repository implements Constants, Tables, RequestHandler,
             throw new IllegalArgumentException("No entry specified");
         }
 
-        if (entry.isGroup()) {
-            return processGroupShow(request, (Group) entry);
-        }
-
-
         //        System.err.println (request);
         if (request.get(ARG_NEXT, false)
                 || request.get(ARG_PREVIOUS, false)) {
@@ -3958,6 +3982,14 @@ public class Repository implements Constants, Tables, RequestHandler,
                                           OutputHandler.OUTPUT_HTML)));
             }
         }
+
+
+
+        if (entry.isGroup()) {
+            return processGroupShow(request, (Group) entry);
+        }
+
+
         return getOutputHandler(request).outputEntry(request, entry);
     }
 
@@ -4144,15 +4176,18 @@ public class Repository implements Constants, Tables, RequestHandler,
                 //            }
         } else {
             nav =  StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
-            String   header = HtmlUtil.div(entry.getName() + 
-                                           HtmlUtil.space(1) + 
-                                           getHeaderLinksForEntry(request, entry),
-                                           HtmlUtil.cssClass("entryheader"));
+            String links = getHeaderLinksForEntry(request, entry);
+            //            String   header = HtmlUtil.div(entry.getName() + 
+            //                                           HtmlUtil.space(1) +
+            //                                           links,
+            //                                           HtmlUtil.cssClass("entryheader"));
+            String header = "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr valign=\"bottom\"><td>" + HtmlUtil.div(entry.getName(), HtmlUtil.cssClass("entryname")) +
+            "</td><td align=\"right\">" + links +"</tr></td></table>";
                 
             if(breadcrumbs.size()>0) {
                 //                nav =  "<br>" + HtmlUtil.space(3);
             }
-            nav = "\n" + HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"))  + "\n"+header;
+            nav = "\n" + HtmlUtil.div(HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"))  + "\n"+header, HtmlUtil.cssClass("entryheader"));
                 //            breadcrumbs.add(HtmlUtil.bold(entry.getName()) + HtmlUtil.space(1)
                 //                            + getHeaderLinksForEntry(request, entry));
         }
@@ -4710,6 +4745,33 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         return typeHandlers;
     }
+
+    public List getDefaultDataTypes() throws Exception {
+        if(dataTypeList!=null) return dataTypeList;
+        Statement stmt = getDatabaseManager().execute(
+                                                      SqlUtil.makeSelect(
+                                                                         SqlUtil.distinct(COL_ENTRIES_DATATYPE),
+                                                                         TABLE_ENTRIES,""));
+        String[] types = SqlUtil.readString(stmt,1);
+        List tmp = new ArrayList();
+        Hashtable seen  = new Hashtable();
+        for (TypeHandler typeHandler : typeHandlers) {
+            if(typeHandler.hasDefaultDataType() &&
+               seen.get(typeHandler.getDefaultDataType())==null) {
+                tmp.add(typeHandler.getDefaultDataType());
+                seen.put(typeHandler.getDefaultDataType(),"");
+            }
+        }
+
+        for(int i=0;i<types.length;i++) {
+            if(types[i]!=null && types[i].length()>0 && seen.get(types[i])==null) {
+                tmp.add(types[i]);
+            }
+        }
+
+        return  dataTypeList = tmp;
+    }
+
 
     /**
      * _more_
@@ -5653,6 +5715,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
         statement.setString(col++, entry.getResource().getPath());
         statement.setString(col++, entry.getResource().getType());
+        statement.setString(col++, entry.getDataType());
         statement.setTimestamp(col++, new java.sql.Timestamp(currentTime()),
                                calendar);
         //        System.err.println (entry.getName() + " " + new Date(entry.getStartDate()));
@@ -6052,9 +6115,9 @@ public class Repository implements Constants, Tables, RequestHandler,
         if (entries.size() == 0) {
             return;
         }
-        if ( !isNew) {
+        //        if ( !isNew) {
             clearCache();
-        }
+            //    }
 
         //We have our own connection
         Connection connection = getConnection(true);

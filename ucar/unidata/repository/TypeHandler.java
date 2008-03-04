@@ -107,6 +107,7 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     private Hashtable properties = new Hashtable();
 
+    private String defaultDataType;
 
     /**
      * _more_
@@ -328,12 +329,14 @@ public class TypeHandler extends RepositoryManager {
         int    col   = 3;
         String id    = results.getString(1);
         Entry  entry = createEntry(id);
-        entry.init(results.getString(col++), results
+        entry.initEntry(results.getString(col++), results
             .getString(col++), getRepository()
             .findGroup(results.getString(col++)), getRepository()
             .getUserManager()
             .findUser(results.getString(col++), true), new Resource(results
-                .getString(col++), results.getString(col++)), results
+                                                                    .getString(col++), results.getString(col++)), 
+                        results.getString(col++),
+                        results
                     .getTimestamp(col++, getRepository().calendar)
                     .getTime(), results
                     .getTimestamp(col++, getRepository().calendar)
@@ -565,7 +568,8 @@ public class TypeHandler extends RepositoryManager {
                 getRepository().getOutputHandler(request);
             String nextPrev = outputHandler.getNextPrevLink(request, entry,
                                   output);
-            sb.append(HtmlUtil.formEntry("", nextPrev));
+            //            sb.append(HtmlUtil.formEntry("", nextPrev));
+            //            sb.append(HtmlUtil.formEntry("<table width=100%><tr><td>" + nextPrev + "</td><td align=right>" + msgLabel("Name")+"</td></tr></table>", entry.getName()));
             sb.append(HtmlUtil.formEntry(msgLabel("Name"), entry.getName()));
 
 
@@ -617,6 +621,10 @@ public class TypeHandler extends RepositoryManager {
                 typeDesc = entry.getTypeHandler().getType();
             }
             sb.append(HtmlUtil.formEntry(msgLabel("Type"), typeDesc));
+
+            if(!entry.getTypeHandler().hasDefaultDataType() && StringUtil.notEmpty(entry.getDataType())) {
+                sb.append(HtmlUtil.formEntry(msgLabel("Data Type"), entry.getDataType()));
+            }
 
             if (entry.hasLocationDefined()) {
                 sb.append(HtmlUtil.formEntry(msgLabel("Location"),
@@ -1113,6 +1121,11 @@ public class TypeHandler extends RepositoryManager {
                   where, true);
         }
 
+        if (request.defined(ARG_DATATYPE)) {
+            addOr(COL_ENTRIES_DATATYPE, request.getString(ARG_DATATYPE, ""),
+                  where, true);
+        }
+
         if (request.defined(ARG_USER_ID)) {
             addOr(COL_ENTRIES_USER_ID, request.getString(ARG_USER_ID, ""),
                   where, true);
@@ -1524,6 +1537,29 @@ public class TypeHandler extends RepositoryManager {
     public String toString() {
         return type + " " + description;
     }
+
+/**
+Set the DfltDataType property.
+
+@param value The new value for DfltDataType
+**/
+public void setDefaultDataType (String value) {
+	defaultDataType = value;
+}
+
+/**
+Get the DfltDataType property.
+
+@return The DfltDataType
+**/
+public String getDefaultDataType () {
+	return defaultDataType;
+}
+
+    public boolean hasDefaultDataType() {
+        return defaultDataType!=null && defaultDataType.length()>0;
+    }
+
 
 
 }

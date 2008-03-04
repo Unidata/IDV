@@ -54,6 +54,8 @@ public class Entry extends Entity {
     /** _more_ */
     private Resource resource;
 
+    private String dataType;
+
     /** _more_ */
     private TypeHandler typeHandler;
 
@@ -112,11 +114,18 @@ public class Entry extends Entity {
      * @param endDate _more_
      * @param values _more_
      */
-    public void init(String name, String description, Group group, User user,
-                     Resource resource, long createDate, long startDate,
+    public void initEntry(String name, String description, Group group, User user,
+                     Resource resource, String dataType, long createDate, long startDate,
                      long endDate, Object[] values) {
         super.init(name, description, group, user, createDate);
         this.resource  = resource;
+        this.dataType = dataType;
+        if(dataType == null || dataType.length()==0) {
+            this.dataType = typeHandler.getDefaultDataType();
+        }
+        if(this.dataType == null) {
+            this.dataType = "";
+        }
         this.startDate = startDate;
         this.endDate   = endDate;
         this.values    = values;
@@ -161,6 +170,9 @@ public class Entry extends Entity {
     public Resource getResource() {
         return resource;
     }
+
+
+
 
     /**
      * _more_
@@ -419,6 +431,23 @@ public class Entry extends Entity {
 
 
 
+/**
+Set the DataType property.
+
+@param value The new value for DataType
+**/
+public void setDataType (String value) {
+	dataType = value;
+}
+
+/**
+Get the DataType property.
+
+@return The DataType
+**/
+public String getDataType () {
+	return dataType;
+}
 
 
 

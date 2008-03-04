@@ -73,6 +73,8 @@ public class GenericTypeHandler extends TypeHandler {
     /** _more_ */
     public static final String ATTR_VALUE = "value";
 
+    public static final String ATTR_DATATYPE = "datatype";
+
     /** _more_ */
     public static final String TAG_TYPE = "type";
 
@@ -119,6 +121,7 @@ public class GenericTypeHandler extends TypeHandler {
         setDescription(XmlUtil.getAttribute(entryNode, ATTR_DB_DESCRIPTION,
                                             getType()));
 
+        setDefaultDataType(XmlUtil.getAttribute(entryNode, ATTR_DATATYPE,(String)null));
 
         List propertyNodes = XmlUtil.findChildren(entryNode, TAG_PROPERTY);
         for (int propIdx = 0; propIdx < propertyNodes.size(); propIdx++) {

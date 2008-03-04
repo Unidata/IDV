@@ -207,7 +207,8 @@ public class GraphOutputHandler extends OutputHandler {
 
         String title = crumbs[0];
         sb.append(crumbs[1]);
-        sb.append("&nbsp;<p>");
+        sb.append("<br>");
+
         sb.append(html);
 
 

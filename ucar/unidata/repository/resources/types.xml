@@ -1,6 +1,6 @@
 <types>
 
-  <type name="level3radar" description="Level 3 Radar File" handler="ucar.unidata.repository.Level3RadarTypeHandler">
+  <type name="level3radar" datatype="radar" description="Level 3 Radar File" handler="ucar.unidata.repository.Level3RadarTypeHandler">
 	<column name="station" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Station" 
                 properties="/ucar/unidata/repository/resources/level3radar.station.properties"/>
 	<column name="product" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Product"  
@@ -16,7 +16,7 @@
 </type>
 
 
-  <type name="model"  description="Model">
+  <type name="model"  description="Model" datatype="model" >
      <column name="modelgroup" type="string" isindex="true" cansearch="true" searchtype="select" label="Model Group"/>
      <column name="modelrun" type="string" isindex="true" cansearch="true" searchtype="select"  label="Model Run"/>
   </type>
@@ -25,18 +25,18 @@
 
 
 
-  <type name="level2radar" description="Level 2 Radar File">
+  <type name="level2radar" description="Level 2 Radar File" datatype="radar" >
 	<column name="station" type="string" isindex="true" cansearch="true" searchtype="select" label="Station"
                 properties="/ucar/unidata/repository/resources/level3radar.station.properties"/>
   </type>
 
-  <type name="satellite" description="Satellite File">
+  <type name="satellite" description="Satellite File" datatype="satellite" >
 	<column name="platform" type="string" isindex="true" cansearch="true" searchtype="select" label="Platform"/>
 	<column name="resolution" type="string" isindex="true" cansearch="true" searchtype="select"  label="Resolution"/>		
 	<column name="product" type="string" isindex="true" cansearch="true" searchtype="select"  label="Product"/>
   </type>
 
-  <type name="image"  description="Image File"/>
+  <type name="image"  description="Image File" datatype="image"/>
 
 
   <type name="testit" description="Test it">

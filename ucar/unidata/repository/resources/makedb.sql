@@ -19,6 +19,7 @@ CREATE TABLE entries (id varchar(200),
    		   user_id varchar(200),
 	           resource varchar(200),	           
                    resource_type varchar(200),
+		   datatype varchar(200),
 	           createdate timestamp, 
 	           fromdate timestamp, 
 	           todate timestamp,
@@ -27,8 +28,11 @@ CREATE TABLE entries (id varchar(200),
 	           east float8,
 	           west float8); 
 
+alter table entries add column  datatype varchar(200);
+
 CREATE INDEX ENTRIES_INDEX_ID ON entries (ID);
 CREATE INDEX ENTRIES_INDEX_RESOURCE ON entries (RESOURCE);
+CREATE INDEX ENTRIES_INDEX_DATATYPE ON entries (DATATYPE);
 CREATE INDEX ENTRIES_INDEX_PARENT_GROUP_ID ON entries (PARENT_GROUP_ID);
 CREATE INDEX ENTRIES_INDEX_TYPE ON entries (TYPE);
 CREATE INDEX ENTRIES_INDEX_USER_ID ON entries (USER_ID);

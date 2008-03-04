@@ -20,7 +20,7 @@ ul {
 
 
 .content {
-    margin:10;
+    margin:5;
     margin-top:5;
 }
 
@@ -64,7 +64,8 @@ A {xtext-decoration: none}
 
 .breadcrumbs {
    text-decoration: none;
-   font-size: 14pt;
+   font-weight: bold;
+   font-size: 12pt;
    color: black;
 }
 
@@ -82,10 +83,20 @@ A {xtext-decoration: none}
 .entryheader {
    padding:0px;
    margin:0px;
-   margin-top:5px;
+   bxmargin-top:5px;
    margin-left:0px;
    font-weight: bold;
-   font-size: 16pt;
+   font-size: 14pt;
+   color: #9C9C9C;
+   xborder-bottom : 2px #aabbaa solid;
+   border-bottom : 2px #9C9C9C solid;
+}
+
+
+.entryname {
+   padding-left:10px;
+   font-weight: bold;
+   font-size: 14pt;
    color: #9C9C9C;
 }
 
@@ -102,6 +113,7 @@ A {xtext-decoration: none}
    padding-top: 2px;
    font-weight: bold;
    background-color: #9C9C9C;
+   background-color : #9C9C9C;
    vertical-align: bottom
 }
 

@@ -209,6 +209,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    public static final String ARG_DATATYPE = "datatype";
+
+    public static final String ARG_DATATYPE_SELECT = "datatype.select";
+
     /** _more_ */
     public static final String ARG_TYPE_EXCLUDE_GROUP = "excludegroup";
 
