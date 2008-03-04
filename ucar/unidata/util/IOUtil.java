@@ -564,7 +564,12 @@ public class IOUtil {
         if (idx < 0) {
             return f;
         }
-        return f.substring(idx + 1);
+        f =  f.substring(idx + 1);
+        idx = f.indexOf("?");
+        if (idx >= 0) {
+            f = f.substring(0, idx);
+        }
+        return f;
     }
 
 
