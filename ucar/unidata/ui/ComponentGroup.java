@@ -122,7 +122,7 @@ public class ComponentGroup extends ComponentHolder {
     private List displayComponents = new ArrayList();
 
     /** Tabbed pane */
-    private JTabbedPane tabbedPane;
+    protected JTabbedPane tabbedPane;
 
 
     private JComboBox menuBox;
