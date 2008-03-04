@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.visad.display;
 
 
@@ -72,6 +73,9 @@ public class Grid2DDisplayable extends RGBDisplayable implements GridDisplayable
 
     /** threshold for number of points for texturing */
     private int THRESHOLD = 500000;
+
+    /** threshold for number of points for texturing */
+    private int curvedSize = 10;
 
     /**
      * Constructs an instance with the supplied name.
@@ -339,7 +343,7 @@ public class Grid2DDisplayable extends RGBDisplayable implements GridDisplayable
             return;
         }
 
-        int dfltCurvedSize = 10;
+        int dfltCurvedSize = curvedSize;
         if (getDisplay() != null) {
             dfltCurvedSize =
                 getDisplay().getGraphicsModeControl().getCurvedSize();
@@ -370,5 +374,21 @@ public class Grid2DDisplayable extends RGBDisplayable implements GridDisplayable
      * @param yesno true if colored by another
      */
     public void setColoredByAnother(boolean yesno) {}
+
+    /**
+     * Set the default texture curve size
+     * @param size  size of texture
+     */
+    public void setCurvedSize(int size) {
+        curvedSize = size;
+    }
+
+    /**
+     * Get the default texture curve size
+     * @return size of curved texture
+     */
+    public int getCurvedSize() {
+        return curvedSize;
+    }
 }
 
