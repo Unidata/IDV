@@ -55,6 +55,10 @@ public class StringUtil {
 
 
 
+    public  static boolean notEmpty(String s) {
+        return s!=null && s.trim().length()>0;
+    }
+
     /**
      * Collapse continuous whitespace into one single " ".
      *
