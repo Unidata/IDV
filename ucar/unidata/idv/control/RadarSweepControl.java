@@ -166,6 +166,22 @@ public class RadarSweepControl extends ColorPlanViewControl {
     }
 
     /**
+     * Method to create the particular <code>DisplayableData</code> that
+     * this this instance uses for data depictions.
+     * @return Contour2DDisplayable for this instance.
+     *
+     * @throws VisADException   VisAD error
+     * @throws RemoteException   RMI error
+     */
+    protected DisplayableData createPlanDisplay()
+            throws VisADException, RemoteException {
+        Grid2DDisplayable gridDisplay =
+            (Grid2DDisplayable) super.createPlanDisplay();
+        gridDisplay.setCurvedSize(1);
+        return gridDisplay;
+    }
+
+    /**
      * If we have a volume then we'll add in an angles choosing combobox.
      *
      * @param controlWidgets  list of control widgets
