@@ -544,7 +544,7 @@ public class IdvXmlUi extends XmlUi {
      *
      * @return _more_
      */
-    private ViewManager getViewManager(Element node) {
+    protected ViewManager getViewManager(Element node) {
         String bundleText = XmlUtil.getChildText(node);
         if ((bundleText != null) && (bundleText.trim().length() > 0)) {
             try {
