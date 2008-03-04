@@ -277,8 +277,6 @@ public class StorageManager extends RepositoryManager {
             throws Exception {
         File newFile = new File(IOUtil.joinDir(getStorageDir(),
                            original.getName()));
-        System.err.println("From:" + original);
-        System.err.println("To:" + newFile);
         IOUtil.moveFile(original, newFile);
         return newFile;
     }

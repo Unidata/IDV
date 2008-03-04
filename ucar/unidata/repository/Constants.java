@@ -656,6 +656,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_RESOURCE = "resource";
+    public static final String ARG_RESOURCE_DOWNLOAD = "resource.dowload";
 
     /** _more_ */
     public static final String ARG_FILE = "file";

@@ -2964,20 +2964,20 @@ public class Repository implements Constants, Tables, RequestHandler,
                                       String name) {
         StringBuffer sb = new StringBuffer();
         if ((parentGroup != null) && request.getUser().getAdmin()) {
-            sb.append(HtmlUtil.row(HtmlUtil.cols("<p>&nbsp;")));
+            sb.append("<p>&nbsp;");
             sb.append(
                 HtmlUtil.form(
                               getHarvesterManager().URL_HARVESTERS_IMPORTCATALOG));
             sb.append(HtmlUtil.hidden(ARG_GROUP, parentGroup.getFullName()));
             sb.append(
-                HtmlUtil.formEntry(
-                    HtmlUtil.submit("Import catalog:"),
-                    HtmlUtil.input(ARG_CATALOG, BLANK, HtmlUtil.SIZE_70)
-                    + HtmlUtil.space(1)
-                    + HtmlUtil.checkbox(ARG_RECURSE, "true", false)
-                    + " Recurse"));
+                      HtmlUtil.input(ARG_CATALOG, BLANK, HtmlUtil.SIZE_70)
+                      + HtmlUtil.space(1)
+                      + HtmlUtil.checkbox(ARG_RECURSE, "true", false)
+                      + " Recurse");
 
-            sb.append("</form>");
+            sb.append(HtmlUtil.p());
+            sb.append(HtmlUtil.submit(msg("Import catalog")));
+            sb.append(HtmlUtil.formClose());
         }
         return sb.toString();
     }
@@ -2998,16 +2998,14 @@ public class Repository implements Constants, Tables, RequestHandler,
         Group        group = findGroup(request);
         StringBuffer sb    = new StringBuffer();
         sb.append(makeGroupHeader(request, group));
-        sb.append(HtmlUtil.formTable());
+        sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.form(URL_ENTRY_FORM, BLANK));
-        sb.append(HtmlUtil.formEntry(HtmlUtil.submit("Create new entry:"),
-                                     makeTypeSelect(request, false)));
+        sb.append(makeTypeSelect(request, false));
+        sb.append(HtmlUtil.space(1));
+        sb.append(HtmlUtil.submit("Create new entry"));
         sb.append(HtmlUtil.hidden(ARG_GROUP, group.getFullName()));
-        sb.append("</form>");
-
+        sb.append(HtmlUtil.formClose());
         sb.append(makeNewGroupForm(request, group, BLANK));
-        sb.append("</table>");
-
         return new Result("New Form", sb, Result.TYPE_HTML);
     }
 
@@ -3120,8 +3118,10 @@ public class Repository implements Constants, Tables, RequestHandler,
                             HtmlUtil.fileInput(ARG_FILE, size)
                             + HtmlUtil.checkbox(ARG_FILE_UNZIP, "true",
                                 false) + HtmlUtil.space(1)+msg("Unzip archive")));
+                    String download = HtmlUtil.space(1) +
+                        HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD, "true", false) + HtmlUtil.space(1) + msg("Download");
                     sb.append(HtmlUtil.formEntry(msgLabel("Or URL"),
-                            HtmlUtil.input(ARG_RESOURCE, BLANK, size)));
+                            HtmlUtil.input(ARG_RESOURCE, BLANK, size)+ download));
                 } else {
                     sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
                             entry.getResource().getPath()));
@@ -3701,17 +3701,39 @@ public class Repository implements Constants, Tables, RequestHandler,
             List<String> resources = new ArrayList();
             List<String> origNames = new ArrayList();
             String  resource     = request.getString(ARG_RESOURCE, BLANK);
+            boolean download = request.get(ARG_RESOURCE_DOWNLOAD,false);
             String  filename     = request.getUploadedFile(ARG_FILE);
             boolean unzipArchive = false;
             boolean isFile       = false;
+            String resourceName = request.getString(ARG_FILE, BLANK);
+            if(resourceName.length() == 0) {
+                resourceName = IOUtil.getFileTail(resource);
+            }
             if (filename != null) {
                 isFile       = true;
                 unzipArchive = request.get(ARG_FILE_UNZIP, false);
                 resource     = filename;
+            } else if(download) {
+                String url = resource;
+                if(!url.startsWith("http:") &&
+                   !url.startsWith("https:") &&
+                   !url.startsWith("ftp:")) {
+                    throw new IllegalArgumentException("Cannot download url:" + url);
+                }
+                isFile       = true;
+                String tail = IOUtil.getFileTail(resource);
+                File newFile = getStorageManager().getTmpFile(request, tail);
+                checkFilePath(newFile.toString());
+                resourceName = tail;
+                resource = newFile.toString();
+                URL           fromUrl    = new URL(url);
+                InputStream fromStream = fromUrl.openConnection().getInputStream();
+                IOUtil.writeTo(fromStream, new FileOutputStream(newFile));
             }
+
             if ( !unzipArchive) {
                 resources.add(resource);
-                origNames.add(request.getString(ARG_FILE, BLANK));
+                origNames.add(resourceName);
             } else {
                 ZipInputStream zin =
                     new ZipInputStream(new FileInputStream(resource));
