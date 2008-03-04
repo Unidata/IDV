@@ -3637,7 +3637,28 @@ public class Repository implements Constants, Tables, RequestHandler,
      *
      * @throws Exception _more_
      */
-    public Result processEntryChange(Request request) throws Exception {
+    public Result processEntryChange(final Request request) throws Exception {
+        boolean download = request.get(ARG_RESOURCE_DOWNLOAD,false);
+        if(download) {
+            ActionManager.Action action     = new ActionManager.Action() {
+                    public void run(Object actionId) throws Exception {
+                        Result result = doProcessEntryChange(request, actionId);
+                        getActionManager().setContinueHtml(actionId, HtmlUtil.href(result.getRedirectUrl(),msg("Continue")));
+                    }
+                };
+                return getActionManager().doAction(request, action,
+                        "Downloading file", "" );
+                
+        }
+        return doProcessEntryChange(request,null);
+    }
+
+
+
+
+    private Result doProcessEntryChange(Request request,Object actionId) throws Exception {
+        boolean download = request.get(ARG_RESOURCE_DOWNLOAD,false);
+
         Entry       entry = null;
         TypeHandler typeHandler = null;
         boolean     newEntry = true;
@@ -3651,8 +3672,6 @@ public class Repository implements Constants, Tables, RequestHandler,
                         entry.getId(), ARG_MESSAGE,
                         "Cannot edit top-level group"));
             }
-
-
 
             if (request.exists(ARG_CANCEL)) {
                 return new Result(HtmlUtil.url(URL_ENTRY_FORM, ARG_ID,
@@ -3701,7 +3720,6 @@ public class Repository implements Constants, Tables, RequestHandler,
             List<String> resources = new ArrayList();
             List<String> origNames = new ArrayList();
             String  resource     = request.getString(ARG_RESOURCE, BLANK);
-            boolean download = request.get(ARG_RESOURCE_DOWNLOAD,false);
             String  filename     = request.getUploadedFile(ARG_FILE);
             boolean unzipArchive = false;
             boolean isFile       = false;
@@ -3727,7 +3745,8 @@ public class Repository implements Constants, Tables, RequestHandler,
                 resourceName = tail;
                 resource = newFile.toString();
                 URL           fromUrl    = new URL(url);
-                InputStream fromStream = fromUrl.openConnection().getInputStream();
+                URLConnection connection = fromUrl.openConnection();
+                InputStream fromStream = connection.getInputStream();
                 IOUtil.writeTo(fromStream, new FileOutputStream(newFile));
             }
 

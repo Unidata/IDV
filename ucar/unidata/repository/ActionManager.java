@@ -82,6 +82,13 @@ public class ActionManager extends RepositoryManager {
 
 
 
+    public void setContinueHtml(Object actionId, String html) {
+        if(actionId == null) return;
+        ActionInfo   action = getAction(actionId);
+        if(action!=null) action.setContinueHtml(html);
+    }
+
+
     /**
      * _more_
      *
