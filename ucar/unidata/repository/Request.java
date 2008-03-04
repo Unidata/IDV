@@ -240,14 +240,30 @@ public class Request implements Constants {
             if ((except != null) && (except.get(arg) != null)) {
                 continue;
             }
-            String value = (String) parameters.get(arg);
-            if (value.length() == 0) {
+            Object value = parameters.get(arg);
+            if(value instanceof List) {
+                List l = (List)value;
+                if(l.size()==0) continue;
+                for(int i=0;i<l.size();i++) {
+                    String svalue = (String) l.get(i);
+                    if (svalue.length() == 0) {
+                        continue;
+                    }
+                    if (cnt++ > 0) {
+                        sb.append("&");
+                    }
+                    sb.append(arg + "=" + svalue);
+                }
+                continue;
+            }
+            String svalue = (String)  value;
+            if (svalue.length() == 0) {
                 continue;
             }
             if (cnt++ > 0) {
                 sb.append("&");
             }
-            sb.append(arg + "=" + value);
+            sb.append(arg + "=" + svalue);
         }
         return sb.toString();
     }
@@ -261,8 +277,13 @@ public class Request implements Constants {
         Hashtable props = new Hashtable();
         for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {
             String arg   = (String) keys.nextElement();
-            String value = (String) parameters.get(arg);
-            if (value.length() == 0) {
+            Object value =  parameters.get(arg);
+            if(value instanceof List) {
+                if(((List) value).size()==0) continue;
+                props.put(arg, value);
+                continue;
+            }
+            if (value.toString().length() == 0) {
                 continue;
             }
             props.put(arg, value);
@@ -319,21 +340,6 @@ public class Request implements Constants {
         return parameters.containsKey(key);
     }
 
-    /**
-     * _more_
-     *
-     * @param key _more_
-     *
-     * @return _more_
-     */
-    public boolean hasSetParameter(String key) {
-        String v = (String) parameters.get(key);
-        if ((v == null) || (v.trim().length() == 0)) {
-            return false;
-        }
-        return true;
-    }
-
 
     /**
      * _more_
@@ -366,8 +372,8 @@ public class Request implements Constants {
      *
      * @return _more_
      */
-    public boolean exists(String key) {
-        String result = (String) get(key, (String) null);
+    public boolean exists(Object key) {
+        Object result =  getValue(key,  (Object)null);
         return result != null;
     }
 
@@ -379,15 +385,30 @@ public class Request implements Constants {
      * @return _more_
      */
     public boolean defined(String key) {
-        String result = (String) get(key, (String) null);
+        Object result =  getValue(key, (Object)null);
         if (result == null) {
             return false;
         }
-        if (result.trim().length() == 0) {
+        if(result instanceof List) {
+            return ((List)result).size()>0;
+        }
+        String sresult = (String) result;
+        if (sresult.trim().length() == 0) {
             return false;
         }
         return true;
     }
+
+
+    public List get(String key, List dflt) {
+        Object result =  getValue(key, (Object) null);
+        if(result == null) return dflt;
+        if(result instanceof List) return (List) result;
+        List tmp = new ArrayList();
+        tmp.add(result);
+        return tmp;
+    }
+
 
     /**
      * _more_
@@ -398,7 +419,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public String getUnsafeString(String key, String dflt) {
-        String result = (String) get(key, (String) null);
+        String result = (String) getValue(key, (String) null);
         if (result == null) {
             return dflt;
         }
@@ -436,7 +457,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public String getCheckedString(String key, String dflt, Pattern pattern) {
-        String v = (String) get(key, (String) null);
+        String v = (String) getValue(key, (String) null);
         if (v == null) {
             return dflt;
         }
@@ -485,12 +506,26 @@ public class Request implements Constants {
      *
      * @return _more_
      */
-    private String get(String key, String dflt) {
-        String result = (String) parameters.get(key);
+    private Object getValue(Object key, Object dflt) {
+        Object result = parameters.get(key);
         if (result == null) {
             return dflt;
         }
         return result;
+    }
+
+
+    private String getValue(Object key, String dflt) {
+        Object result = parameters.get(key);
+        if (result == null) {
+            return dflt;
+        }
+        if(result instanceof List) {
+            List l = (List) result;
+            if(l.size()==0) return dflt;
+            return (String)l.get(0);
+        }
+        return result.toString();
     }
 
     /**
@@ -567,20 +602,7 @@ public class Request implements Constants {
         return getString(ARG_WHAT, dflt);
     }
 
-    /**
-     * _more_
-     *
-     * @param dflt _more_
-     *
-     * @return _more_
-     */
-    public String getType(String dflt) {
-        return getString(ARG_TYPE, dflt);
-    }
-
-
-
-    /**
+    /*
      * _more_
      *
      * @param key _more_
@@ -588,8 +610,8 @@ public class Request implements Constants {
      *
      * @return _more_
      */
-    public int get(String key, int dflt) {
-        String result = (String) get(key, (String) null);
+    public int get(Object key, int dflt) {
+        String result = (String) getValue(key, (String) null);
         if ((result == null) || (result.trim().length() == 0)) {
             return dflt;
         }
@@ -604,8 +626,8 @@ public class Request implements Constants {
      *
      * @return _more_
      */
-    public double get(String key, double dflt) {
-        String result = (String) get(key, (String) null);
+    public double get(Object key, double dflt) {
+        String result = (String) getValue(key, (String) null);
         if ((result == null) || (result.trim().length() == 0)) {
             return dflt;
         }
@@ -623,8 +645,8 @@ public class Request implements Constants {
      *
      * @throws java.text.ParseException _more_
      */
-    public Date get(String key, Date dflt) throws java.text.ParseException {
-        String result = (String) get(key, (String) null);
+    public Date get(Object key, Date dflt) throws java.text.ParseException {
+        String result = (String) getValue(key, (String) null);
         if ((result == null) || (result.trim().length() == 0)) {
             return dflt;
         }
@@ -670,8 +692,8 @@ public class Request implements Constants {
      *
      * @return _more_
      */
-    public boolean get(String key, boolean dflt) {
-        String result = (String) get(key, (String) null);
+    public boolean get(Object key, boolean dflt) {
+        String result = (String) getValue(key, (String) null);
         if ((result == null) || (result.trim().length() == 0)) {
             return dflt;
         }

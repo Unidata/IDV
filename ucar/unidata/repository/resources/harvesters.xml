@@ -1,5 +1,5 @@
 <harvesters>
-<!--
+
 
   <harvester    name="Test Generator"
                 active="false"
@@ -36,7 +36,7 @@
                 monitor="false"
 		sleep="3"/>
 
--->
+
   <harvester    name="IDD/NIDS"
                 active="false"
                 class="ucar.unidata.repository.PatternHarvester"
@@ -50,7 +50,7 @@
 		desctemplate= "${name} description"
                 monitor="true"
 		sleep="3"/>
-<!--
+
 
    <harvester   name="IDD/Craft"
                 active="false"
@@ -100,7 +100,7 @@
 		sleep="3"/>
 
 
--->
+
 
 </harvesters>
 		

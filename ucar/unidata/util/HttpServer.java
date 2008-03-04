@@ -39,6 +39,7 @@ import java.net.*;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -417,6 +418,8 @@ public class HttpServer {
                 throw new IllegalArgumentException("unknown type: "
                         + requestType);
             }
+
+
             handleRequest(path, args, props, contentString);
         }
 
@@ -500,7 +503,7 @@ public class HttpServer {
                             new ByteArrayOutputStream();
                         multipartStream.readBodyData(output);
                         String value = new String(output.toByteArray());
-                        args.put(attrName, value);
+                        addArg(args, attrName, value);
                     }
                     if ( !multipartStream.readBoundary()) {
                         break;
@@ -509,6 +512,24 @@ public class HttpServer {
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
+        }
+
+
+        protected void addArg(Hashtable args, String name, String value) {
+            Object obj = args.get(name);
+            if(obj!=null) {
+                if(obj instanceof List) {
+                    ((List)obj).add(value);
+                    return;
+                } else {
+                    List l = new ArrayList();
+                    l.add(obj);
+                    l.add(value);
+                    args.put(name, l);
+                    return;
+                }
+            }
+            args.put(name, value);
         }
 
 
@@ -565,8 +586,9 @@ public class HttpServer {
                 if ((toks == null) || (toks.length < 1)) {
                     continue;
                 }
-                ht.put(toks[0], decode(toks[1]));
+                addArg(ht,toks[0], decode(toks[1]));
             }
+
         }
 
 

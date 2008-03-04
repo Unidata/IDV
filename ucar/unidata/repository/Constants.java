@@ -214,7 +214,7 @@ public interface Constants {
     public static final String ARG_DATATYPE_SELECT = "datatype.select";
 
     /** _more_ */
-    public static final String ARG_TYPE_EXCLUDE_GROUP = "excludegroup";
+    public static final String ARG_TYPE_EXCLUDE = "type.exclude";
 
 
 

@@ -189,30 +189,23 @@ public class GraphOutputHandler extends OutputHandler {
         String graphAppletTemplate =
             getRepository().getResource(PROP_HTML_GRAPHAPPLET);
         String type = request.getString(ARG_NODETYPE, NODETYPE_GROUP);
-        String id   = request.getId((String) null);
-
-        if ((type == null) || (id == null)) {
-            throw new IllegalArgumentException(
-                "no type or id argument specified");
-        }
         String html = StringUtil.replace(graphAppletTemplate, "${id}",
-                                         getRepository().encode(id));
+                                         getRepository().encode(entry.getId()));
         html = StringUtil.replace(html, "${root}",
                                   getRepository().getUrlBase());
         html = StringUtil.replace(html, "${type}",
                                   getRepository().encode(type));
         StringBuffer sb = new StringBuffer();
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
-                              false, "");
+                                                         false, "");
 
         String title = crumbs[0];
         sb.append(crumbs[1]);
         sb.append("<br>");
-
         sb.append(html);
 
 
-        Result result = new Result("Graph View " + title, sb);
+        Result result = new Result(msg("Graph View") + title, sb);
         result.putProperty(
             PROP_NAVSUBLINKS,
             getHeader(

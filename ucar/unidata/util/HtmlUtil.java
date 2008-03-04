@@ -837,6 +837,10 @@ public class HtmlUtil {
         return select(name, values, selected, Integer.MAX_VALUE);
     }
 
+    public static String select(String name, List values, String selected, String extra) {
+        return select(name, values, selected, extra, Integer.MAX_VALUE);
+    }
+
 
     /**
      * _more_
@@ -866,8 +870,14 @@ public class HtmlUtil {
      */
     public static String select(String name, List values, String selected,
                                 int maxLength) {
+        return select(name, values, selected,"", maxLength);
+    }
+
+
+    public static String select(String name, List values, String selected,
+                                String extra, int maxLength) {
         StringBuffer sb = new StringBuffer();
-        sb.append("<select name=\"" + name + "\">\n");
+        sb.append("<select name=" + quote(name) +" " +  extra +">\n");
         for (int i = 0; i < values.size(); i++) {
             Object obj = values.get(i);
             String value;

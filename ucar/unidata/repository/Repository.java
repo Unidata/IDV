@@ -265,10 +265,10 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
     /** _more_ */
-    private Hashtable typeHandlersMap = new Hashtable();
+    private Hashtable theTypeHandlersMap = new Hashtable();
 
     /** _more_ */
-    private List<TypeHandler> typeHandlers = new ArrayList<TypeHandler>();
+    private List<TypeHandler> theTypeHandlers = new ArrayList<TypeHandler>();
 
     /** _more_ */
     private List<OutputHandler> outputHandlers =
@@ -2068,9 +2068,21 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @param typeHandler _more_
      */
     protected void addTypeHandler(String typeName, TypeHandler typeHandler) {
-        typeHandlersMap.put(typeName, typeHandler);
-        typeHandlers.add(typeHandler);
+        theTypeHandlersMap.put(typeName, typeHandler);
+        theTypeHandlers.add(typeHandler);
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected List<TypeHandler> getTypeHandlers() throws Exception {
+        return new ArrayList<TypeHandler>(theTypeHandlers);
+    }
+
 
 
 
@@ -2084,7 +2096,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     protected TypeHandler getTypeHandler(Request request) throws Exception {
-        String type = request.getType(TypeHandler.TYPE_ANY).trim();
+        String type = request.getString(ARG_TYPE,TypeHandler.TYPE_ANY).trim();
         return getTypeHandler(type, false, true);
     }
 
@@ -2116,7 +2128,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                                          boolean makeNewOneIfNeeded,
                                          boolean useDefaultIfNotFound)
             throws Exception {
-        TypeHandler typeHandler = (TypeHandler) typeHandlersMap.get(type);
+        TypeHandler typeHandler = (TypeHandler) theTypeHandlersMap.get(type);
         if (typeHandler == null) {
             if ( !useDefaultIfNotFound) {
                 return null;
@@ -3032,7 +3044,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             group = findGroup(request);
         }
         if (type == null) {
-            type = request.getType((String) null);
+            type = request.getString(ARG_TYPE,(String) null);
         }
 
         if (entry == null) {
@@ -3611,7 +3623,6 @@ public class Repository implements Constants, Tables, RequestHandler,
             throws Exception {
         String crumbs = getBreadCrumbs(request,
                                        entry,
-                                       //                                       findGroup(entry.getParentGroupId()),
                                        true, BLANK)[1];
         return crumbs;
     }
@@ -3666,7 +3677,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
         } else {
             typeHandler =
-                getTypeHandler(request.getType(TypeHandler.TYPE_ANY));
+                getTypeHandler(request.getString(ARG_TYPE,TypeHandler.TYPE_ANY));
 
         }
 
@@ -4172,7 +4183,7 @@ public class Repository implements Constants, Tables, RequestHandler,
                     output), entry.getName()));
             nav =   StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
             //            if(breadcrumbs.size()>1) {
-                nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
+            nav = HtmlUtil.div(HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs")), HtmlUtil.cssClass("entryheader"));
                 //            }
         } else {
             nav =  StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
@@ -4719,16 +4730,17 @@ public class Repository implements Constants, Tables, RequestHandler,
     protected List<TypeHandler> getTypeHandlers(Request request)
             throws Exception {
         TypeHandler typeHandler = getTypeHandler(request);
+        List<TypeHandler> tmp = new ArrayList<TypeHandler>();
         if ( !typeHandler.isAnyHandler()) {
-            typeHandlers.add(typeHandler);
-            return typeHandlers;
+            tmp.add(typeHandler);
+            return tmp;
         }
         //For now don't do the db query to find the type handlers
         if (true) {
             return getTypeHandlers();
         }
 
-        List<TypeHandler> typeHandlers = new ArrayList<TypeHandler>();
+
         List              where = typeHandler.assembleWhereClause(request);
         Statement stmt = typeHandler.executeSelect(request,
                              SqlUtil.distinct(COL_ENTRIES_TYPE), where);
@@ -4737,13 +4749,13 @@ public class Repository implements Constants, Tables, RequestHandler,
             TypeHandler theTypeHandler = getTypeHandler(types[i]);
 
             if (types[i].equals(TypeHandler.TYPE_ANY)) {
-                typeHandlers.add(0, theTypeHandler);
+                tmp.add(0, theTypeHandler);
 
             } else {
-                typeHandlers.add(theTypeHandler);
+                tmp.add(theTypeHandler);
             }
         }
-        return typeHandlers;
+        return tmp;
     }
 
     public List getDefaultDataTypes() throws Exception {
@@ -4755,7 +4767,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         String[] types = SqlUtil.readString(stmt,1);
         List tmp = new ArrayList();
         Hashtable seen  = new Hashtable();
-        for (TypeHandler typeHandler : typeHandlers) {
+        for (TypeHandler typeHandler : getTypeHandlers()) {
             if(typeHandler.hasDefaultDataType() &&
                seen.get(typeHandler.getDefaultDataType())==null) {
                 tmp.add(typeHandler.getDefaultDataType());
@@ -4773,16 +4785,6 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected List<TypeHandler> getTypeHandlers() throws Exception {
-        return typeHandlers;
-    }
 
 
     /**
@@ -4795,8 +4797,8 @@ public class Repository implements Constants, Tables, RequestHandler,
      * @throws Exception _more_
      */
     protected Result listTypes(Request request) throws Exception {
-        List<TypeHandler> typeHandlers = getTypeHandlers(request);
-        return getOutputHandler(request).listTypes(request, typeHandlers);
+        List<TypeHandler> tmp = getTypeHandlers(request);
+        return getOutputHandler(request).listTypes(request, tmp);
     }
 
 
@@ -4815,7 +4817,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      *   TypeHandler typeHandler = getTypeHandler(request);
      *   List        where       = typeHandler.assembleWhereClause(request);
      *   if (where.size() == 0) {
-     *       String type = (String) request.getType(BLANK).trim();
+     *       String type = (String) request.getString(ARG_TYPE,(BLANK).trim();
      *       if ((type.length() > 0) && !type.equals(TypeHandler.TYPE_ANY)) {
      *           typeHandler.addOr(COL_ENTRIES_TYPE, type, where, true);
      *       }

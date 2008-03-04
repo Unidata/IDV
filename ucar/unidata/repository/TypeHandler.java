@@ -573,11 +573,7 @@ public class TypeHandler extends RepositoryManager {
             sb.append(HtmlUtil.formEntry(msgLabel("Name"), entry.getName()));
 
 
-            String[] crumbs =
-                getRepository().getBreadCrumbs(request,
-                    getRepository().findGroup(entry.getParentGroupId()),
-                    true, "");
-            //            sb.append(HtmlUtil.formEntry(msgLabel("Group"), crumbs[1]));
+
 
             String desc = entry.getDescription();
             if ((desc != null) && (desc.length() > 0)) {
@@ -829,20 +825,19 @@ public class TypeHandler extends RepositoryManager {
 
 
         if (didEntries) {
-            String type = (String) request.getType("").trim();
-            if (type.equals(TYPE_ANY)) {
-                type = "";
-            }
+            List typeList  =request.get(ARG_TYPE,new ArrayList());
 
-            if (request.get(ARG_TYPE_EXCLUDE_GROUP, false)) {
-                if (type.length() > 0) {
-                    type = type + ",";
+            typeList.remove(TYPE_ANY);
+            if (typeList.size() > 0) {
+                String typeString;
+                if (request.get(ARG_TYPE_EXCLUDE, false)) {
+                    typeString = "!" + StringUtil.join(",!",typeList);
+                } else {
+                    typeString = StringUtil.join(",",typeList);
                 }
-                type = type + "!group";
-            }
-            if (type.length() > 0) {
+
                 if (whereList.toString().indexOf(COL_ENTRIES_TYPE) < 0) {
-                    addOr(COL_ENTRIES_TYPE, type, whereList, true);
+                    addOr(COL_ENTRIES_TYPE, typeString, whereList, true);
                 }
             }
         }
@@ -894,20 +889,22 @@ public class TypeHandler extends RepositoryManager {
                                 List where, boolean advancedForm)
             throws Exception {
 
+
+
         List dateSelect = new ArrayList();
+        dateSelect.add(new TwoFacedObject(msg("All"), "none"));
         dateSelect.add(new TwoFacedObject(msg("Last hour"), "-1 hour"));
         dateSelect.add(new TwoFacedObject(msg("Last 3 hours"), "-3 hours"));
         dateSelect.add(new TwoFacedObject(msg("Last 6 hours"), "-6 hours"));
         dateSelect.add(new TwoFacedObject(msg("Last 12 hours"), "-12 hours"));
         dateSelect.add(new TwoFacedObject(msg("Last day"), "-1 day"));
         dateSelect.add(new TwoFacedObject(msg("Last 7 days"), "-7 days"));
-        dateSelect.add(new TwoFacedObject(msg("All"), "none"));
         dateSelect.add(new TwoFacedObject(msgLabel("Custom"), ""));
         String dateSelectValue;
         if (request.exists(ARG_RELATIVEDATE)) {
             dateSelectValue = request.getString(ARG_RELATIVEDATE, "");
         } else {
-            dateSelectValue = "-1 hour";
+            dateSelectValue = "none";
         }
 
         String dateSelectInput = HtmlUtil.select(ARG_RELATIVEDATE,
@@ -922,6 +919,7 @@ public class TypeHandler extends RepositoryManager {
         List<TypeHandler> typeHandlers =
             getRepository().getTypeHandlers(request);
         //        System.err.println("handlers:" + typeHandlers);
+
 
         if (request.defined(ARG_TYPE)) {
             TypeHandler typeHandler = getRepository().getTypeHandler(request);
@@ -956,6 +954,7 @@ public class TypeHandler extends RepositoryManager {
         minDate = "";
         maxDate = "";
 
+
         if (typeHandlers.size() > 1) {
             List tmp = new ArrayList();
             for (TypeHandler typeHandler : typeHandlers) {
@@ -966,10 +965,10 @@ public class TypeHandler extends RepositoryManager {
             if ( !tmp.contains(anyTfo)) {
                 tmp.add(0, anyTfo);
             }
-            String typeSelect = HtmlUtil.select(ARG_TYPE, tmp);
-            String groupCbx = HtmlUtil.checkbox(ARG_TYPE_EXCLUDE_GROUP,
+            String typeSelect = HtmlUtil.select(ARG_TYPE, tmp, "",(advancedForm?" MULTIPLE SIZE=5 ":""));
+            String groupCbx = (advancedForm?HtmlUtil.checkbox(ARG_TYPE_EXCLUDE,
                                   "true", false) + HtmlUtil.space(1)
-                                      + msg("Exclude groups");
+                               + msg("Exclude"):"");
             formBuffer.append(
                 HtmlUtil.formEntry(
                     msgLabel("Type"),
