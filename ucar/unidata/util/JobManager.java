@@ -105,12 +105,24 @@ public class JobManager {
         }
     }
 
+
+    public String getDialogLabel2(Object jobId) {
+        if(jobId==null) return null;
+        DialogInfo dialogInfo = (DialogInfo) dialogMap.get(jobId);
+        if(dialogInfo!=null) {
+            return dialogInfo.label2.getText();
+        }
+        return null;
+    }
+
+
+
     private class DialogInfo {
         JDialog dialog;
         JLabel label1;
         JLabel label2;
         Object jobId;
-        public DialogInfo(Object id, String name) {
+        public DialogInfo(Object id, String name, boolean showDialog) {
             jobId = id;
             dialog =  GuiUtils.createDialog(null, name, false);
             JButton cancelBtn = new JButton("Cancel");
@@ -123,16 +135,18 @@ public class JobManager {
             JLabel         waitLbl        = new JLabel(new ImageIcon(GuiUtils.getImage("/ucar/unidata/idv/images/wait.gif")));
             label1 = new JLabel("                                   ");
             label2 = new JLabel("                                   ");
-            JComponent contents = LayoutUtil.vbox(LayoutUtil.hbox(new JLabel(name), LayoutUtil.inset(waitLbl,5)),
-                                                  LayoutUtil.vbox(LayoutUtil.filler(300,5),
-                                                              label1,
-                                                              label2),
-                                                  LayoutUtil.wrap(LayoutUtil.inset(cancelBtn,10)));
+            if(showDialog) {
+                JComponent contents = LayoutUtil.vbox(LayoutUtil.hbox(new JLabel(name), LayoutUtil.inset(waitLbl,5)),
+                                                      LayoutUtil.vbox(LayoutUtil.filler(300,5),
+                                                                      label1,
+                                                                      label2),
+                                                      LayoutUtil.wrap(LayoutUtil.inset(cancelBtn,10)));
 
-            dialog.getContentPane().add(LayoutUtil.inset(contents,5));
-            dialog.pack();
-            GuiUtils.packInCenter(dialog);
-            dialog.show();
+                dialog.getContentPane().add(LayoutUtil.inset(contents,5));
+                dialog.pack();
+                GuiUtils.packInCenter(dialog);
+                dialog.show();
+            }
         }
     }
 
@@ -140,10 +154,16 @@ public class JobManager {
         synchronized (MUTEX) {
             final Object id = new Integer(++objectCount);
             loadMap.put(id, name);
-            if(showDialog) {
-                dialogMap.put(id, new DialogInfo(id, name));
-            }
+            dialogMap.put(id, new DialogInfo(id, name,showDialog));
             return id;
+        }
+    }
+
+
+    public void startLoad(String name, Object id) {
+        synchronized (MUTEX) {
+            loadMap.put(id, name);
+            dialogMap.put(id, new DialogInfo(id, name,false));
         }
     }
 
@@ -195,7 +215,7 @@ public class JobManager {
             }
             loadMap.remove(id);
             DialogInfo dialogInfo = (DialogInfo) dialogMap.get(id);
-            if(dialogInfo!=null) {
+            if(dialogInfo!=null && dialogInfo.dialog!=null) {
                 dialogInfo.dialog.dispose();
                 dialogMap.remove(id);
             }
