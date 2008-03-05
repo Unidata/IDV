@@ -25,6 +25,7 @@
   <method request="/entry/form"      method="processEntryForm"      actions="edit"/>
   <method request="/entry/change"    method="processEntryChange"    actions="edit"/>
   <method request="/entry/delete"    method="processEntryDelete"    actions="edit"/>
+  <method request="/entry/deletelist"    method="processEntryListDelete"    actions="edit"/>
 
   <method request="/entry/new"       method="processEntryNew"       actions="new"/>
 

@@ -203,48 +203,6 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
 
-    /**
-     * _more_
-     *
-     * @param sb _more_
-     * @param entries _more_
-     * @param request _more_
-     * @param doForm _more_
-     * @param dfltSelected _more_
-     *
-     * @throws Exception _more_
-     */
-    public void getEntryHtml(StringBuffer sb, List<Entry> entries,
-                             Request request, boolean doForm,
-                             boolean dfltSelected)
-            throws Exception {
-        if (doForm) {
-            sb.append(HtmlUtil.form(getRepository().URL_GETENTRIES,
-                                    "getentries"));
-            sb.append(HtmlUtil.submit(msg("Get selected"), "getselected"));
-            sb.append(HtmlUtil.submit(msg("Get all"), "getall"));
-            sb.append(HtmlUtil.space(1));
-            sb.append(msgLabel("As"));
-            List outputList =
-                getRepository().getOutputTypesForEntries(request, entries);
-            sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
-            sb.append("<ul style=\"list-style-image : url(" + getRepository().fileUrl(ICON_FILE) +")\">");
-        }
-        for (Entry entry : entries) {
-            sb.append("<li>");
-            sb.append(HtmlUtil.checkbox("entry_" + entry.getId(), "true",
-                                        dfltSelected));
-            sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
-            sb.append(HtmlUtil.space(1));
-            sb.append(getEntryUrl(entry));
-            sb.append(HtmlUtil.br());
-        }
-        if (doForm) {
-            sb.append("</ul>");
-            sb.append(HtmlUtil.formClose());
-        }
-    }
-
 
     /**
      * _more_
@@ -735,7 +693,7 @@ public class HtmlOutputHandler extends OutputHandler {
                     sb.append(getTimelineApplet(request, entries));
                 }
                 sb.append(HtmlUtil.br());
-                getEntryHtml(sb, entries, request, true, false);
+                getEntryHtml(sb, entries, request, true, false,false);
             }
         }
 

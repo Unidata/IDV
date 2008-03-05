@@ -259,6 +259,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ORDERBY = "orderby";
 
+    public static final String ARG_OK = "ok";
+
     /** _more_ */
     public static final String ARG_ASCENDING = "ascending";
 
@@ -391,6 +393,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ID = "id";
 
+    public static final String ARG_IDS = "ids";
+
     /** _more_ */
     public static final String ARG_METADATA_ID = "metadata.id";
 
@@ -426,7 +430,7 @@ public interface Constants {
 
 
     /** _more_ */
-    public static final String ARG_IDS = "ids";
+
 
     /** _more_ */
     public static final String ARG_GROUP = "group";

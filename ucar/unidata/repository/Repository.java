@@ -34,6 +34,7 @@ import ucar.unidata.geoloc.projection.*;
 
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.JobManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
@@ -162,6 +163,9 @@ public class Repository implements Constants, Tables, RequestHandler,
     /** _more_ */
     public RequestUrl URL_ENTRY_DELETE = new RequestUrl(this,
                                              "/entry/delete", "Delete");
+
+    public RequestUrl URL_ENTRY_DELETELIST = new RequestUrl(this,
+                                                        "/entry/deletelist");
 
 
     /** _more_ */
@@ -591,6 +595,15 @@ public class Repository implements Constants, Tables, RequestHandler,
         return "\n<table border=\"0\"><tr><td><div class=\"note\">" + h
                + "</div></td></tr></table>\n";
     }
+
+    public String buttons(String b1, String b2) {
+        return b1 + HtmlUtil.space(2) + b2;
+    }
+
+    public String buttons(String b1, String b2, String b3) {
+        return b1 + HtmlUtil.space(2) + b2 + HtmlUtil.space(2) + b3;
+    }
+
 
 
     /**
@@ -1355,7 +1368,99 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
         getUserManager().initOutputHandlers();
+        OutputHandler outputHandler = new OutputHandler(getRepository()) {
+                
+            public boolean canHandle(String output) {
+                return output.equals(OUTPUT_DELETER);
+            }
+            protected void getOutputTypesFor(Request request, String what,
+                                             List types)
+                    throws Exception {}
+            protected void getOutputTypesForEntry(Request request,
+                    Entry entry, List types)
+                    throws Exception {}
+            protected void getOutputTypesForEntries(Request request,
+                    List<Entry> entries, List types)
+                    throws Exception {
+                types.add(new TwoFacedObject("Delete", OUTPUT_DELETER));
+            }
+            public Result outputGroup(Request request, Group group,
+                                      List<Group> subGroups,
+                                      List<Entry> entries)
+                    throws Exception {
+                StringBuffer idBuffer = new StringBuffer();
+                for(Entry entry: entries) {
+                    idBuffer.append(",");
+                    idBuffer.append(entry.getId());
+                }
+                return new Result(HtmlUtil.url(URL_ENTRY_DELETELIST, ARG_IDS,
+                                               idBuffer.toString()));
+            }
+            };
+        addOutputHandler(outputHandler);
     }
+
+    public static final String OUTPUT_DELETER = "repository.delete";
+
+    public Result processEntryListDelete(Request request) throws Exception {
+        List<Entry> entries = new ArrayList<Entry>();
+        for(String id: StringUtil.split(request.getString(ARG_IDS,""),",",true,true)) {
+            Entry entry = getRepository().getEntry(id, request, false);
+            if (entry == null) {
+                throw new IllegalArgumentException("Could not find entry:"
+                                                   + id);
+            }
+            if (entry.isTopGroup()) {
+                StringBuffer sb    = new StringBuffer();
+                sb.append(note(msg("Cannot delete top-level group")));
+                return new Result(msg("Entry Delete"), sb);
+            }
+            entries.add(entry);
+        }
+        return processEntryListDelete(request, entries);
+
+    }
+
+    public Result processEntryListDelete(Request request,List<Entry> entries) throws Exception {
+        StringBuffer sb    = new StringBuffer();
+
+        if(request.exists(ARG_CANCEL)) {
+            if(entries.size()==0) {
+                return new Result(URL_ENTRY_SHOW);
+            }
+            String id = entries.get(0).getParentGroupId();
+            return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                                           id));
+        }
+
+
+        if(request.exists(ARG_DELETE_CONFIRM)) {
+            return asynchDeleteEntries(request, entries);
+        }
+
+
+
+        sb.append(HtmlUtil.form(URL_ENTRY_DELETELIST));
+        StringBuffer msgSB= new StringBuffer();
+        StringBuffer idBuffer = new StringBuffer();
+        for(Entry entry: entries) {
+            idBuffer.append(",");
+            idBuffer.append(entry.getId());
+        }
+        msgSB.append(msg("Are you sure you want to delete all of the entries?"));
+        msgSB.append(HtmlUtil.p());
+        msgSB.append(buttons(HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM),
+                             HtmlUtil.submit(msg("Cancel"),ARG_CANCEL)));
+        sb.append(question(msgSB.toString()));
+        sb.append(HtmlUtil.hidden(ARG_IDS, idBuffer.toString()));
+        sb.append(HtmlUtil.formClose());
+        sb.append("<ul>");
+        new OutputHandler(this).getEntryHtml(sb, entries, request, false,false,true);
+        sb.append("</ul>");
+        return new Result(msg("Delete Confirm"), sb);
+    }
+
+
 
     /**
      * _more_
@@ -3087,7 +3192,7 @@ public class Repository implements Constants, Tables, RequestHandler,
 
             String deleteButton = HtmlUtil.submit(msg("Delete"), ARG_DELETE);
             String cancelButton = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
-            String buttons = submitButton + HtmlUtil.space(2) + deleteButton +HtmlUtil.space(2) + cancelButton;
+            String buttons = buttons(submitButton, deleteButton , cancelButton);
 
             sb.append(HtmlUtil.formEntry(BLANK, buttons));
             if (entry != null) {
@@ -3463,10 +3568,10 @@ public class Repository implements Constants, Tables, RequestHandler,
                                         HtmlUtil.textArea(ARG_COMMENT,
                                             comment, 5, 40)));
         sb.append(HtmlUtil.formEntry(BLANK,
-                                     HtmlUtil.submit(msg("Add Comment"))
-                                     + HtmlUtil.space(2)
-                                     + HtmlUtil.submit(msg("Cancel"),
-                                         ARG_CANCEL)));
+                                     buttons(
+                                             HtmlUtil.submit(msg("Add Comment")),
+                                             HtmlUtil.submit(msg("Cancel"),
+                                                             ARG_CANCEL))));
         sb.append(HtmlUtil.formTableClose());
         sb.append(HtmlUtil.formClose());
         return new Result(msg("Entry Comments"), sb, Result.TYPE_HTML);
@@ -3529,6 +3634,21 @@ public class Repository implements Constants, Tables, RequestHandler,
 
 
 
+    private Result asynchDeleteEntries(Request request, final List<Entry> entries) {
+        final Request        theRequest = request;
+        final String  groupId =entries.get(0).getParentGroupId();
+        ActionManager.Action action     = new ActionManager.Action() {
+                public void run(Object actionId) throws Exception {
+                    deleteEntries(theRequest, entries, actionId);
+                }
+            };
+        String href = HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW,
+                                                 ARG_ID, groupId), "Continue");
+        return getActionManager().doAction(request, action,
+                                           "Deleting entry", "Continue: " + href);
+    }
+
+
     /**
      * _more_
      *
@@ -3557,20 +3677,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             final List<Entry> entries = new ArrayList<Entry>();
             entries.add(entry);
             Group group = findGroup(entry.getParentGroupId());
-
-
             if (entry.isGroup()) {
-                final Request        theRequest = request;
-                ActionManager.Action action     = new ActionManager.Action() {
-                    public void run(Object actionId) throws Exception {
-                        deleteEntries(theRequest, entries, actionId);
-                    }
-                };
-                String href = HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW,
-                                  ARG_ID, group.getId()), group.getName());
-
-                return getActionManager().doAction(request, action,
-                        "Deleting entry", "Continue: " + href);
+                return asynchDeleteEntries(request, entries);
             } else {
                 deleteEntries(request, entries, null);
                 return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
@@ -3597,9 +3705,8 @@ public class Repository implements Constants, Tables, RequestHandler,
             inner.append(entry.getName());
         }
         inner.append(HtmlUtil.p());
-        inner.append(HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM));
-        inner.append(HtmlUtil.space(2));
-        inner.append(HtmlUtil.submit(msg("Cancel"), ARG_CANCEL));
+        inner.append(buttons(HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM),
+                             HtmlUtil.submit(msg("Cancel"), ARG_CANCEL)));
         sb.append(question(inner.toString()));
         sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
         sb.append(HtmlUtil.formClose());
@@ -3670,7 +3777,7 @@ public class Repository implements Constants, Tables, RequestHandler,
             if (entry.isTopGroup()) {
                 return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
                         entry.getId(), ARG_MESSAGE,
-                        "Cannot edit top-level group"));
+                                               "Cannot edit top-level group"));
             }
 
             if (request.exists(ARG_CANCEL)) {
@@ -3727,6 +3834,14 @@ public class Repository implements Constants, Tables, RequestHandler,
             if(resourceName.length() == 0) {
                 resourceName = IOUtil.getFileTail(resource);
             }
+            String groupName = request.getString(ARG_GROUP, (String) null);
+            if (groupName == null) {
+                throw new IllegalArgumentException(
+                    "You must specify a parent group");
+            }
+            Group parentGroup = findGroupFromName(groupName,
+                                    request.getUser(), true);
+
             if (filename != null) {
                 isFile       = true;
                 unzipArchive = request.get(ARG_FILE_UNZIP, false);
@@ -3747,7 +3862,19 @@ public class Repository implements Constants, Tables, RequestHandler,
                 URL           fromUrl    = new URL(url);
                 URLConnection connection = fromUrl.openConnection();
                 InputStream fromStream = connection.getInputStream();
-                IOUtil.writeTo(fromStream, new FileOutputStream(newFile));
+                //                Object startLoad(String name) {
+                if(actionId!=null) {
+                    JobManager.getManager().startLoad("File copy", actionId);
+                }
+                int length = connection.getContentLength();
+                if(length>0 & actionId!=null) {
+                    getActionManager().setActionMessage(actionId, msg("Downloading") + " " + length +" " + msg("bytes"));
+                }
+                if(IOUtil.writeTo(fromStream, new FileOutputStream(newFile), actionId,length)<0) {
+                    System.err.println ("got cancel");
+                    return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
+                                                   parentGroup.getId()));
+                }
             }
 
             if ( !unzipArchive) {
@@ -3765,19 +3892,13 @@ public class Repository implements Constants, Tables, RequestHandler,
                         IOUtil.getFileTail(ze.getName().toLowerCase());
                     File f = getStorageManager().getTmpFile(request, name);
                     FileOutputStream fos = new FileOutputStream(f);
+                    
                     IOUtil.writeTo(zin, fos);
                     fos.close();
                     resources.add(f.toString());
                     origNames.add(name);
                 }
             }
-            String groupName = request.getString(ARG_GROUP, (String) null);
-            if (groupName == null) {
-                throw new IllegalArgumentException(
-                    "You must specify a parent group");
-            }
-            Group parentGroup = findGroupFromName(groupName,
-                                    request.getUser(), true);
 
             if (request.exists(ARG_CANCEL)) {
                 return new Result(HtmlUtil.url(URL_ENTRY_SHOW, ARG_ID,
@@ -4224,7 +4345,8 @@ public class Repository implements Constants, Tables, RequestHandler,
                     output), entry.getName()));
             nav =   StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
             //            if(breadcrumbs.size()>1) {
-            nav = HtmlUtil.div(HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs")), HtmlUtil.cssClass("entryheader"));
+            //            nav = HtmlUtil.div(HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs")), HtmlUtil.cssClass("entryheader"));
+            nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
                 //            }
         } else {
             nav =  StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
@@ -4246,6 +4368,54 @@ public class Repository implements Constants, Tables, RequestHandler,
         String title = StringUtil.join(HtmlUtil.pad("&gt;"), titleList);
         return new String[] {title,nav};
     }
+
+
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param makeLinkForLastGroup _more_
+     * @param extraArgs _more_
+     * @param stopAt _more_
+     *
+     * @return A 2 element array.  First element is the title to use. Second is the links
+     *
+     * @throws Exception _more_
+     */
+    public String getBreadCrumbs(Request request, Entry entry) 
+            throws Exception {
+        List breadcrumbs = new ArrayList();
+        if (entry == null) {
+            return BLANK;
+        }
+        Group  parent = findGroup(entry.getParentGroupId());
+        int    length = 0;
+        while (parent != null) {
+            if (length > 100) {
+                breadcrumbs.add(0, "...");
+                break;
+            }
+            String name = parent.getName();
+            if (name.length() > 20) {
+                name = name.substring(0, 19) + "...";
+            }
+            length += name.length();
+            breadcrumbs.add(0, HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW,
+                                                          ARG_ID, parent.getId()), name));
+            parent = findGroup(parent.getParentGroupId());
+        }
+        breadcrumbs.add(HtmlUtil.href(HtmlUtil.url(URL_ENTRY_SHOW,
+                                                   ARG_ID, entry.getId()), entry.getName()));
+        return   StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
+    }
+
+
 
 
 

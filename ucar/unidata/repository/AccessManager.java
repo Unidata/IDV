@@ -165,7 +165,7 @@ public class AccessManager extends RepositoryManager {
             return true;
         }
 
-        if (request.exists(ATTR_ID)) {
+        if (request.exists(ARG_ID)) {
             Entry entry = getRepository().getEntry(request.getString(ARG_ID,
                               ""), request, false);
             if (entry == null) {
@@ -173,6 +173,22 @@ public class AccessManager extends RepositoryManager {
                         + request.getString(ARG_ID, ""));
             }
             return canDoAction(request, entry, action);
+        }
+
+
+
+        if (request.exists(ARG_IDS)) {
+            for(String id: StringUtil.split(request.getString(ARG_IDS,""),",",true,true)) {
+                Entry entry = getRepository().getEntry(id, request, false);
+                if (entry == null) {
+                    throw new IllegalArgumentException("Could not find entry:"
+                                                       + id);
+                }
+                if(!canDoAction(request, entry, action)) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         if (request.exists(ARG_GROUP)) {

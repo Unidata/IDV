@@ -39,7 +39,7 @@ import ucar.unidata.xml.XmlUtil;
 import java.io.File;
 
 
-
+import ucar.unidata.util.JobManager;
 
 
 import java.util.ArrayList;
@@ -113,6 +113,7 @@ public class ActionManager extends RepositoryManager {
             action.setRunning(false);
             actions.remove(id);
             sb.append(msg("Action canceled"));
+            JobManager.getManager().stopLoad(id);
         } else {
             if (action.getError() != null) {
                 sb.append(getRepository().error(msg("Error") +"<p>"+action.getError()));
@@ -127,7 +128,13 @@ public class ActionManager extends RepositoryManager {
                 sb.append(HtmlUtil.href(HtmlUtil.url(URL_STATUS,
                                                      ARG_ACTION_ID, id), msg("Reload")));
                 sb.append("<p>");
-                sb.append(action.getMessage());
+                String msg = JobManager.getManager().getDialogLabel2(id);
+                if(msg!=null) {
+
+                    sb.append(msg);
+                } else {
+                    sb.append(action.getMessage());
+                }
                 sb.append("<p>");
                 sb.append(HtmlUtil.form(URL_STATUS));
                 sb.append(HtmlUtil.submit(msg("Cancel Action"), ARG_CANCEL));

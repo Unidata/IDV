@@ -327,12 +327,68 @@ public class OutputHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void getEntryHtml(StringBuffer sb, List<Entry> entries,
+    public void xxxgetEntryHtml(StringBuffer sb, List<Entry> entries,
                              Request request, boolean doForm,
                              boolean dfltSelected)
             throws Exception {
         notImplemented("getEntryHtml");
     }
+
+
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     * @param entries _more_
+     * @param request _more_
+     * @param doForm _more_
+     * @param dfltSelected _more_
+     *
+     * @throws Exception _more_
+     */
+    public void getEntryHtml(StringBuffer sb, List<Entry> entries,
+                             Request request, boolean doForm,
+                             boolean dfltSelected,  boolean showCrumbs)
+            throws Exception {
+
+        if (doForm) {
+            sb.append(HtmlUtil.form(getRepository().URL_GETENTRIES,
+                                    "getentries"));
+            sb.append(HtmlUtil.submit(msg("Get selected"), "getselected"));
+            sb.append(HtmlUtil.submit(msg("Get all"), "getall"));
+            sb.append(HtmlUtil.space(1));
+            sb.append(msgLabel("As"));
+            List outputList =
+                getRepository().getOutputTypesForEntries(request, entries);
+            sb.append(HtmlUtil.select(ARG_OUTPUT, outputList));
+            sb.append("<ul style=\"list-style-image : url(" + getRepository().fileUrl(ICON_FILE) +")\">");
+        }
+        for (Entry entry : entries) {
+            sb.append("<li>");
+            if(doForm) {
+                sb.append(HtmlUtil.checkbox("entry_" + entry.getId(), "true",
+                                            dfltSelected));
+                sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
+            }
+            sb.append(HtmlUtil.space(1));
+            if(showCrumbs) {
+                String crumbs = getRepository().getBreadCrumbs(request,
+                                                               entry);
+
+                sb.append(crumbs);
+            } else {
+                sb.append(getEntryUrl(entry));
+            }
+            //            sb.append(HtmlUtil.br());
+        }
+        if (doForm) {
+            sb.append("</ul>");
+            sb.append(HtmlUtil.formClose());
+        }
+    }
+
+
+
 
     /**
      * _more_
