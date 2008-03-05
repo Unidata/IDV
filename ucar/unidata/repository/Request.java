@@ -241,10 +241,12 @@ public class Request implements Constants {
                 continue;
             }
             Object value = parameters.get(arg);
-            if(value instanceof List) {
-                List l = (List)value;
-                if(l.size()==0) continue;
-                for(int i=0;i<l.size();i++) {
+            if (value instanceof List) {
+                List l = (List) value;
+                if (l.size() == 0) {
+                    continue;
+                }
+                for (int i = 0; i < l.size(); i++) {
                     String svalue = (String) l.get(i);
                     if (svalue.length() == 0) {
                         continue;
@@ -256,7 +258,7 @@ public class Request implements Constants {
                 }
                 continue;
             }
-            String svalue = (String)  value;
+            String svalue = (String) value;
             if (svalue.length() == 0) {
                 continue;
             }
@@ -277,9 +279,11 @@ public class Request implements Constants {
         Hashtable props = new Hashtable();
         for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {
             String arg   = (String) keys.nextElement();
-            Object value =  parameters.get(arg);
-            if(value instanceof List) {
-                if(((List) value).size()==0) continue;
+            Object value = parameters.get(arg);
+            if (value instanceof List) {
+                if (((List) value).size() == 0) {
+                    continue;
+                }
                 props.put(arg, value);
                 continue;
             }
@@ -373,7 +377,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public boolean exists(Object key) {
-        Object result =  getValue(key,  (Object)null);
+        Object result = getValue(key, (Object) null);
         return result != null;
     }
 
@@ -385,12 +389,12 @@ public class Request implements Constants {
      * @return _more_
      */
     public boolean defined(String key) {
-        Object result =  getValue(key, (Object)null);
+        Object result = getValue(key, (Object) null);
         if (result == null) {
             return false;
         }
-        if(result instanceof List) {
-            return ((List)result).size()>0;
+        if (result instanceof List) {
+            return ((List) result).size() > 0;
         }
         String sresult = (String) result;
         if (sresult.trim().length() == 0) {
@@ -400,10 +404,22 @@ public class Request implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public List get(String key, List dflt) {
-        Object result =  getValue(key, (Object) null);
-        if(result == null) return dflt;
-        if(result instanceof List) return (List) result;
+        Object result = getValue(key, (Object) null);
+        if (result == null) {
+            return dflt;
+        }
+        if (result instanceof List) {
+            return (List) result;
+        }
         List tmp = new ArrayList();
         tmp.add(result);
         return tmp;
@@ -515,15 +531,25 @@ public class Request implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     private String getValue(Object key, String dflt) {
         Object result = parameters.get(key);
         if (result == null) {
             return dflt;
         }
-        if(result instanceof List) {
+        if (result instanceof List) {
             List l = (List) result;
-            if(l.size()==0) return dflt;
-            return (String)l.get(0);
+            if (l.size() == 0) {
+                return dflt;
+            }
+            return (String) l.get(0);
         }
         return result.toString();
     }
@@ -603,6 +629,15 @@ public class Request implements Constants {
     }
 
     /*
+     * _more_
+     *
+     * @param key _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+
+    /**
      * _more_
      *
      * @param key _more_
@@ -778,9 +813,10 @@ public class Request implements Constants {
         if (httpHeaderArgs == null) {
             return null;
         }
-        String arg =  (String) httpHeaderArgs.get(name);
-        if(arg == null)
-            arg =  (String) httpHeaderArgs.get(name.toLowerCase());
+        String arg = (String) httpHeaderArgs.get(name);
+        if (arg == null) {
+            arg = (String) httpHeaderArgs.get(name.toLowerCase());
+        }
         return arg;
     }
 
@@ -791,7 +827,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public String toString() {
-        return type + "url args:" + getUrlArgs();// + "\n\theader args:"               + httpHeaderArgs;
+        return type + "url args:" + getUrlArgs();  // + "\n\theader args:"               + httpHeaderArgs;
     }
 
     /**

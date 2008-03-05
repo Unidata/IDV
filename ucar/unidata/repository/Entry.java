@@ -54,6 +54,7 @@ public class Entry extends Entity {
     /** _more_ */
     private Resource resource;
 
+    /** _more_          */
     private String dataType;
 
     /** _more_ */
@@ -95,8 +96,15 @@ public class Entry extends Entity {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws CloneNotSupportedException _more_
+     */
     public Object clone() throws CloneNotSupportedException {
-        Entry that= (Entry)super.clone();
+        Entry that = (Entry) super.clone();
         return that;
     }
 
@@ -109,21 +117,23 @@ public class Entry extends Entity {
      * @param group _more_
      * @param user _more_
      * @param resource _more_
+     * @param dataType _more_
      * @param createDate _more_
      * @param startDate _more_
      * @param endDate _more_
      * @param values _more_
      */
-    public void initEntry(String name, String description, Group group, User user,
-                     Resource resource, String dataType, long createDate, long startDate,
-                     long endDate, Object[] values) {
+    public void initEntry(String name, String description, Group group,
+                          User user, Resource resource, String dataType,
+                          long createDate, long startDate, long endDate,
+                          Object[] values) {
         super.init(name, description, group, user, createDate);
-        this.resource  = resource;
+        this.resource = resource;
         this.dataType = dataType;
-        if(dataType == null || dataType.length()==0) {
+        if ((dataType == null) || (dataType.length() == 0)) {
             this.dataType = typeHandler.getDefaultDataType();
         }
-        if(this.dataType == null) {
+        if (this.dataType == null) {
             this.dataType = "";
         }
         this.startDate = startDate;
@@ -431,23 +441,23 @@ public class Entry extends Entity {
 
 
 
-/**
-Set the DataType property.
+    /**
+     * Set the DataType property.
+     *
+     * @param value The new value for DataType
+     */
+    public void setDataType(String value) {
+        dataType = value;
+    }
 
-@param value The new value for DataType
-**/
-public void setDataType (String value) {
-	dataType = value;
-}
-
-/**
-Get the DataType property.
-
-@return The DataType
-**/
-public String getDataType () {
-	return dataType;
-}
+    /**
+     * Get the DataType property.
+     *
+     * @return The DataType
+     */
+    public String getDataType() {
+        return dataType;
+    }
 
 
 

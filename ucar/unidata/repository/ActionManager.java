@@ -30,6 +30,9 @@ import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
+
+
+import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
@@ -37,9 +40,6 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 import java.io.File;
-
-
-import ucar.unidata.util.JobManager;
 
 
 import java.util.ArrayList;
@@ -82,10 +82,20 @@ public class ActionManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param actionId _more_
+     * @param html _more_
+     */
     public void setContinueHtml(Object actionId, String html) {
-        if(actionId == null) return;
-        ActionInfo   action = getAction(actionId);
-        if(action!=null) action.setContinueHtml(html);
+        if (actionId == null) {
+            return;
+        }
+        ActionInfo action = getAction(actionId);
+        if (action != null) {
+            action.setContinueHtml(html);
+        }
     }
 
 
@@ -116,7 +126,8 @@ public class ActionManager extends RepositoryManager {
             JobManager.getManager().stopLoad(id);
         } else {
             if (action.getError() != null) {
-                sb.append(getRepository().error(msg("Error") +"<p>"+action.getError()));
+                sb.append(getRepository().error(msg("Error") + "<p>"
+                        + action.getError()));
                 actions.remove(id);
             } else if ( !action.getRunning()) {
                 sb.append(getRepository().note(msg("Completed")));
@@ -126,10 +137,10 @@ public class ActionManager extends RepositoryManager {
                 sb.append("<meta http-equiv=\"refresh\" content=\"2\">");
                 sb.append(getRepository().progress(msg("In progress")));
                 sb.append(HtmlUtil.href(HtmlUtil.url(URL_STATUS,
-                                                     ARG_ACTION_ID, id), msg("Reload")));
+                        ARG_ACTION_ID, id), msg("Reload")));
                 sb.append("<p>");
                 String msg = JobManager.getManager().getDialogLabel2(id);
-                if(msg!=null) {
+                if (msg != null) {
 
                     sb.append(msg);
                 } else {

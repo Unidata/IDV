@@ -131,13 +131,20 @@ public class Entity implements Cloneable {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws CloneNotSupportedException _more_
+     */
     public Object clone() throws CloneNotSupportedException {
-        Entity that= (Entity)super.clone();
-        that.comments = null;
-        that.permissions = null;
+        Entity that = (Entity) super.clone();
+        that.comments      = null;
+        that.permissions   = null;
         that.permissionMap = new Hashtable();
-        that.associations = null;
-        that.metadata =null;
+        that.associations  = null;
+        that.metadata      = null;
         return that;
     }
 

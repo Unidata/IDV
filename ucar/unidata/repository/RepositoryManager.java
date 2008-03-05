@@ -158,25 +158,60 @@ public class RepositoryManager implements RepositorySource, Constants,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public static String tableSubHeader(String s) {
-        return HtmlUtil.row(HtmlUtil.colspan(subHeader(s),2));
+        return HtmlUtil.row(HtmlUtil.colspan(subHeader(s), 2));
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public static String subHeader(String s) {
         return HtmlUtil.div(s, HtmlUtil.cssClass("pagesubheading"));
     }
 
 
-    public  String subHeaderLink(Object url, String label) {
-        return  HtmlUtil.href(url, label,  HtmlUtil.cssClass("pagesubheadinglink"));
+    /**
+     * _more_
+     *
+     * @param url _more_
+     * @param label _more_
+     *
+     * @return _more_
+     */
+    public String subHeaderLink(Object url, String label) {
+        return HtmlUtil.href(url, label,
+                             HtmlUtil.cssClass("pagesubheadinglink"));
     }
 
 
-    public  String subHeaderLink(Object url, String label, boolean toggle) {
+    /**
+     * _more_
+     *
+     * @param url _more_
+     * @param label _more_
+     * @param toggle _more_
+     *
+     * @return _more_
+     */
+    public String subHeaderLink(Object url, String label, boolean toggle) {
         //        if(true) return "x";
-        String img = HtmlUtil.img(getRepository().fileUrl(toggle?ICON_MINUS:ICON_PLUS));
-        label =  img + HtmlUtil.space(1) +label;
-        String html =  HtmlUtil.href(url, label, HtmlUtil.cssClass("pagesubheadinglink"));
+        String img = HtmlUtil.img(getRepository().fileUrl(toggle
+                ? ICON_MINUS
+                : ICON_PLUS));
+        label = img + HtmlUtil.space(1) + label;
+        String html = HtmlUtil.href(url, label,
+                                    HtmlUtil.cssClass("pagesubheadinglink"));
         return html;
         //return "<table border=1><tr valign=bottom><td>" + html +"</table>";
     }

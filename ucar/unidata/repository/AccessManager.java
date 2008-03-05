@@ -178,13 +178,14 @@ public class AccessManager extends RepositoryManager {
 
 
         if (request.exists(ARG_IDS)) {
-            for(String id: StringUtil.split(request.getString(ARG_IDS,""),",",true,true)) {
+            for (String id : StringUtil.split(request.getString(ARG_IDS, ""),
+                    ",", true, true)) {
                 Entry entry = getRepository().getEntry(id, request, false);
                 if (entry == null) {
-                    throw new IllegalArgumentException("Could not find entry:"
-                                                       + id);
+                    throw new IllegalArgumentException(
+                        "Could not find entry:" + id);
                 }
-                if(!canDoAction(request, entry, action)) {
+                if ( !canDoAction(request, entry, action)) {
                     return false;
                 }
             }

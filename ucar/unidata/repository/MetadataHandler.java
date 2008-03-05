@@ -355,17 +355,21 @@ public class MetadataHandler extends RepositoryManager {
             return;
         }
         String attr1 = request.getString(ARG_ATTR1, "");
-        if(request.defined(ARG_ATTR1+".select"))
-            attr1 = request.getString(ARG_ATTR1+".select","");
+        if (request.defined(ARG_ATTR1 + ".select")) {
+            attr1 = request.getString(ARG_ATTR1 + ".select", "");
+        }
         String attr2 = request.getString(ARG_ATTR2, "");
-        if(request.defined(ARG_ATTR2+".select"))
-            attr1 = request.getString(ARG_ATTR2+".select","");
+        if (request.defined(ARG_ATTR2 + ".select")) {
+            attr1 = request.getString(ARG_ATTR2 + ".select", "");
+        }
         String attr3 = request.getString(ARG_ATTR3, "");
-        if(request.defined(ARG_ATTR3+".select"))
-            attr1 = request.getString(ARG_ATTR3+".select","");
+        if (request.defined(ARG_ATTR3 + ".select")) {
+            attr1 = request.getString(ARG_ATTR3 + ".select", "");
+        }
         String attr4 = request.getString(ARG_ATTR4, "");
-        if(request.defined(ARG_ATTR4+".select"))
-            attr1 = request.getString(ARG_ATTR4+".select","");
+        if (request.defined(ARG_ATTR4 + ".select")) {
+            attr1 = request.getString(ARG_ATTR4 + ".select", "");
+        }
         if ((attr1.length() == 0) && (attr2.length() == 0)
                 && (attr3.length() == 0) && (attr4.length() == 0)) {
             return;
@@ -397,28 +401,30 @@ public class MetadataHandler extends RepositoryManager {
                 continue;
             }
             String suffix = "." + id;
-            String attr1 = request.getString(ARG_ATTR1+suffix, "");
-            if(request.defined(ARG_ATTR1+suffix+".select"))
-                attr1 = request.getString(ARG_ATTR1+suffix+".select","");
+            String attr1  = request.getString(ARG_ATTR1 + suffix, "");
+            if (request.defined(ARG_ATTR1 + suffix + ".select")) {
+                attr1 = request.getString(ARG_ATTR1 + suffix + ".select", "");
+            }
 
-            String attr2 = request.getString(ARG_ATTR2+suffix, "");
-            if(request.defined(ARG_ATTR2+suffix+".select"))
-                attr1 = request.getString(ARG_ATTR2+suffix+".select","");
+            String attr2 = request.getString(ARG_ATTR2 + suffix, "");
+            if (request.defined(ARG_ATTR2 + suffix + ".select")) {
+                attr1 = request.getString(ARG_ATTR2 + suffix + ".select", "");
+            }
 
-            String attr3 = request.getString(ARG_ATTR3+suffix, "");
-            if(request.defined(ARG_ATTR3+suffix+".select"))
-                attr1 = request.getString(ARG_ATTR3+suffix+".select","");
+            String attr3 = request.getString(ARG_ATTR3 + suffix, "");
+            if (request.defined(ARG_ATTR3 + suffix + ".select")) {
+                attr1 = request.getString(ARG_ATTR3 + suffix + ".select", "");
+            }
 
-            String attr4 = request.getString(ARG_ATTR4+suffix, "");
-            if(request.defined(ARG_ATTR4+suffix+".select"))
-                attr1 = request.getString(ARG_ATTR4+suffix+".select","");
+            String attr4 = request.getString(ARG_ATTR4 + suffix, "");
+            if (request.defined(ARG_ATTR4 + suffix + ".select")) {
+                attr1 = request.getString(ARG_ATTR4 + suffix + ".select", "");
+            }
 
 
 
-            metadataList.add(
-                new Metadata(
-                    id, entry.getId(), type,
-                    attr1, attr2, attr3, attr4));
+            metadataList.add(new Metadata(id, entry.getId(), type, attr1,
+                                          attr2, attr3, attr4));
         }
     }
 

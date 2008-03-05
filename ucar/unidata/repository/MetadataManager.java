@@ -98,6 +98,7 @@ import javax.swing.*;
  */
 public class MetadataManager extends RepositoryManager {
 
+    /** _more_          */
     private static final String SUFFIX_SELECT = ".select.";
 
 
@@ -291,7 +292,7 @@ public class MetadataManager extends RepositoryManager {
                 }
             } catch (Exception exc) {
                 getRepository().log("Error loading metadata handler file:"
-                                    + file,exc);
+                                    + file, exc);
                 throw exc;
             }
 
@@ -399,7 +400,8 @@ public class MetadataManager extends RepositoryManager {
                 if (html == null) {
                     continue;
                 }
-                String cbx = HtmlUtil.checkbox(ARG_METADATA_ID + SUFFIX_SELECT
+                String cbx = HtmlUtil.checkbox(ARG_METADATA_ID
+                                 + SUFFIX_SELECT
                                  + metadata.getId(), metadata.getId(), false);
                 sb.append(HtmlUtil.rowTop(HtmlUtil.cols(cbx + html[0],
                         html[1])));

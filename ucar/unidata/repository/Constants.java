@@ -86,10 +86,13 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_FOLDER = "/folder.gif";
 
+    /** _more_          */
     public static final String ICON_FILE = "/file.gif";
 
+    /** _more_          */
     public static final String ICON_PLUS = "/plus.gif";
 
+    /** _more_          */
     public static final String ICON_MINUS = "/minus.gif";
 
     /** _more_ */
@@ -209,8 +212,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    /** _more_          */
     public static final String ARG_DATATYPE = "datatype";
 
+    /** _more_          */
     public static final String ARG_DATATYPE_SELECT = "datatype.select";
 
     /** _more_ */
@@ -259,6 +264,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ORDERBY = "orderby";
 
+    /** _more_          */
     public static final String ARG_OK = "ok";
 
     /** _more_ */
@@ -305,6 +311,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_CANCEL = "cancel";
 
+    /** _more_          */
     public static final String ARG_CANCEL_DELETE = "canceldelete";
 
     /** _more_ */
@@ -393,6 +400,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ID = "id";
 
+    /** _more_          */
     public static final String ARG_IDS = "ids";
 
     /** _more_ */
@@ -660,6 +668,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_RESOURCE = "resource";
+
+    /** _more_          */
     public static final String ARG_RESOURCE_DOWNLOAD = "resource.dowload";
 
     /** _more_ */
@@ -682,7 +692,11 @@ public interface Constants {
 
     /** _more_ */
     public static final String ACTION_EDIT = "action.edit";
+
+    /** _more_          */
     public static final String ACTION_COPY = "action.copy";
+
+    /** _more_          */
     public static final String ACTION_MOVE = "action.move";
 
     /** _more_ */

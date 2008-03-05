@@ -456,13 +456,20 @@ public class Column implements Tables, Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param value _more_
+     *
+     * @return _more_
+     */
     public Object convert(String value) {
         if (type.equals(TYPE_INT)) {
             return new Integer(value);
         } else if (type.equals(TYPE_DOUBLE)) {
             return new Double(value);
         } else if (type.equals(TYPE_BOOLEAN)) {
-            return  new Boolean(value);
+            return new Boolean(value);
         } else if (type.equals(TYPE_TIMESTAMP)) {
             //TODO
         } else if (type.equals(TYPE_LATLON)) {

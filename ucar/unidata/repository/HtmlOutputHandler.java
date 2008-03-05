@@ -647,13 +647,16 @@ public class HtmlOutputHandler extends OutputHandler {
 
             sb.append(HtmlUtil.p());
             if (subGroups.size() > 0) {
-                sb.append("<div>" + HtmlUtil.bold(msgLabel("Groups"))+"</div>");
-                sb.append("<ul style=\"list-style-image : url(" + getRepository().fileUrl(ICON_FOLDER) +")\">");
+                sb.append("<div>" + HtmlUtil.bold(msgLabel("Groups"))
+                          + "</div>");
+                sb.append("<ul style=\"list-style-image : url("
+                          + getRepository().fileUrl(ICON_FOLDER) + ")\">");
                 //                sb.append("<div class=\"grouplist\">");
                 for (Group subGroup : subGroups) {
                     List<Metadata> metadataList =
                         getMetadataManager().getMetadata(subGroup);
                     String icon = "";
+
                     /**
                      * for (Metadata metadata : metadataList) {
                      *   if(metadata.getType().equals(ThreddsMetadataHandler.TAG_ICON)) {
@@ -693,7 +696,7 @@ public class HtmlOutputHandler extends OutputHandler {
                     sb.append(getTimelineApplet(request, entries));
                 }
                 sb.append(HtmlUtil.br());
-                getEntryHtml(sb, entries, request, true, false,false);
+                getEntryHtml(sb, entries, request, true, false, false);
             }
         }
 

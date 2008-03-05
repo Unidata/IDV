@@ -73,6 +73,7 @@ public class GenericTypeHandler extends TypeHandler {
     /** _more_ */
     public static final String ATTR_VALUE = "value";
 
+    /** _more_          */
     public static final String ATTR_DATATYPE = "datatype";
 
     /** _more_ */
@@ -121,7 +122,8 @@ public class GenericTypeHandler extends TypeHandler {
         setDescription(XmlUtil.getAttribute(entryNode, ATTR_DB_DESCRIPTION,
                                             getType()));
 
-        setDefaultDataType(XmlUtil.getAttribute(entryNode, ATTR_DATATYPE,(String)null));
+        setDefaultDataType(XmlUtil.getAttribute(entryNode, ATTR_DATATYPE,
+                (String) null));
 
         List propertyNodes = XmlUtil.findChildren(entryNode, TAG_PROPERTY);
         for (int propIdx = 0; propIdx < propertyNodes.size(); propIdx++) {
@@ -182,17 +184,34 @@ public class GenericTypeHandler extends TypeHandler {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param columnName _more_
+     *
+     * @return _more_
+     */
     public Column findColumn(String columnName) {
         for (Column column : columns) {
-            if(column.getName().equals(columnName)) return column;
+            if (column.getName().equals(columnName)) {
+                return column;
+            }
         }
-        throw new IllegalArgumentException("Could not find column:" + columnName);
+        throw new IllegalArgumentException("Could not find column:"
+                                           + columnName);
     }
 
+    /**
+     * _more_
+     *
+     * @param map _more_
+     *
+     * @return _more_
+     */
     public Object[] makeValues(Hashtable map) {
         Object[] values = new Object[colNames.size()];
         //For now we just assume each column has a single value
-        int idx=0;
+        int idx = 0;
         for (Column column : columns) {
             Object data = map.get(column.getName());
             values[idx] = data;
@@ -201,6 +220,14 @@ public class GenericTypeHandler extends TypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param columnName _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
     public Object convert(String columnName, String value) {
         Column column = findColumn(columnName);
         return column.convert(value);

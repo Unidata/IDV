@@ -189,15 +189,16 @@ public class GraphOutputHandler extends OutputHandler {
         String graphAppletTemplate =
             getRepository().getResource(PROP_HTML_GRAPHAPPLET);
         String type = request.getString(ARG_NODETYPE, NODETYPE_GROUP);
-        String html = StringUtil.replace(graphAppletTemplate, "${id}",
-                                         getRepository().encode(entry.getId()));
+        String html =
+            StringUtil.replace(graphAppletTemplate, "${id}",
+                               getRepository().encode(entry.getId()));
         html = StringUtil.replace(html, "${root}",
                                   getRepository().getUrlBase());
         html = StringUtil.replace(html, "${type}",
                                   getRepository().encode(type));
         StringBuffer sb = new StringBuffer();
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
-                                                         false, "");
+                              false, "");
 
         String title = crumbs[0];
         sb.append(crumbs[1]);

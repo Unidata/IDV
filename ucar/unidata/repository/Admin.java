@@ -405,7 +405,8 @@ public class Admin extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected Result makeResult(Request request, String title, StringBuffer sb)
+    protected Result makeResult(Request request, String title,
+                                StringBuffer sb)
             throws Exception {
         Result result = new Result(title, sb);
         result.putProperty(PROP_NAVSUBLINKS,
@@ -563,7 +564,8 @@ public class Admin extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
         sb.append(msgHeader("Repository Statistics"));
         sb.append("<table>\n");
-        String[] names  = { msg("Users"), msg("Associations"),msg("Metadata Items") };
+        String[] names = { msg("Users"), msg("Associations"),
+                           msg("Metadata Items") };
         String[] tables = { TABLE_USERS, TABLE_ASSOCIATIONS, TABLE_METADATA };
         for (int i = 0; i < tables.length; i++) {
             sb.append(HtmlUtil.row(HtmlUtil.cols(""
@@ -572,7 +574,9 @@ public class Admin extends RepositoryManager {
         }
 
 
-        sb.append(HtmlUtil.row(HtmlUtil.colspan(HtmlUtil.bold(msgLabel("Types")),2)));
+        sb.append(
+            HtmlUtil.row(
+                HtmlUtil.colspan(HtmlUtil.bold(msgLabel("Types")), 2)));
         int total = 0;
         sb.append(
             HtmlUtil.row(
@@ -617,7 +621,7 @@ public class Admin extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
         sb.append(msgHeader("SQL"));
         sb.append(HtmlUtil.p());
-        sb.append(HtmlUtil.href(URL_ADMIN_TABLES,msg("View Schema")));
+        sb.append(HtmlUtil.href(URL_ADMIN_TABLES, msg("View Schema")));
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.form(URL_ADMIN_SQL));
         sb.append(HtmlUtil.submit(msg("Execute")));

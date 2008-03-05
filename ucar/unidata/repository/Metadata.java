@@ -365,6 +365,7 @@ public class Metadata implements Constants, Tables {
         /** _more_ */
         String label;
 
+        /** _more_          */
         boolean isEnumerated = false;
 
         /**
@@ -386,12 +387,19 @@ public class Metadata implements Constants, Tables {
          * @param label _more_
          */
         public Type(String type, String label) {
-            this(type,label,false);
+            this(type, label, false);
         }
 
+        /**
+         * _more_
+         *
+         * @param type _more_
+         * @param label _more_
+         * @param enumerated _more_
+         */
         public Type(String type, String label, boolean enumerated) {
-            this.type  = type;
-            this.label = label;
+            this.type         = type;
+            this.label        = label;
             this.isEnumerated = enumerated;
         }
 
@@ -468,20 +476,20 @@ public class Metadata implements Constants, Tables {
         }
 
         /**
-           Set the IsEnumerated property.
-
-           @param value The new value for IsEnumerated
-        **/
-        public void setIsEnumerated (boolean value) {
+         *  Set the IsEnumerated property.
+         *
+         *  @param value The new value for IsEnumerated
+         */
+        public void setIsEnumerated(boolean value) {
             isEnumerated = value;
         }
 
         /**
-           Get the IsEnumerated property.
-
-           @return The IsEnumerated
-        **/
-        public boolean getIsEnumerated () {
+         *  Get the IsEnumerated property.
+         *
+         *  @return The IsEnumerated
+         */
+        public boolean getIsEnumerated() {
             return isEnumerated;
         }
 

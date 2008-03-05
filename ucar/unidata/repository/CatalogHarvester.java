@@ -241,10 +241,9 @@ public class CatalogHarvester extends Harvester {
                         ext, "", "", ""));
             }
             entry.initEntry(name, "", parent, user,
-                       new Resource(urlPath, Resource.TYPE_URL),
-                            "",
-                       createDate.getTime(), createDate.getTime(),
-                       createDate.getTime(), null);
+                            new Resource(urlPath, Resource.TYPE_URL), "",
+                            createDate.getTime(), createDate.getTime(),
+                            createDate.getTime(), null);
             entries.add(entry);
             typeHandler.initializeNewEntry(entry);
             if (entries.size() > 1000) {

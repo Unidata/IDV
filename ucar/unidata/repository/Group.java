@@ -72,8 +72,15 @@ public class Group extends Entry {
         setDescription("");
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws CloneNotSupportedException _more_
+     */
     public Object clone() throws CloneNotSupportedException {
-        Group that= (Group)super.clone();
+        Group that = (Group) super.clone();
         that.children = new ArrayList<Group>();
         return that;
     }

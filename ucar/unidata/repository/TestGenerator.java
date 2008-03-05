@@ -144,11 +144,12 @@ public class TestGenerator extends Harvester {
                     Date createDate = new Date();
                     Entry entry =
                         typeHandler.createEntry(repository.getGUID());
-                    entry.initEntry("test_" + i + "_" + j + "_" + k, "", group,
-                               user, new Resource("", Resource.TYPE_UNKNOWN),
-                                    "",
-                               createDate.getTime(), createDate.getTime(),
-                               createDate.getTime(), null);
+                    entry.initEntry("test_" + i + "_" + j + "_" + k, "",
+                                    group, user,
+                                    new Resource("", Resource.TYPE_UNKNOWN),
+                                    "", createDate.getTime(),
+                                    createDate.getTime(),
+                                    createDate.getTime(), null);
                     entries.add(entry);
                     typeHandler.initializeNewEntry(entry);
                     cnt++;

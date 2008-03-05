@@ -75,10 +75,11 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
     /** _more_ */
     public static final Metadata.Type TYPE_CREATOR =
-        new Metadata.Type("creator","Creator");
+        new Metadata.Type("creator", "Creator");
 
     /** _more_ */
-    public static final Metadata.Type TYPE_LINK = new Metadata.Type("link","Link");
+    public static final Metadata.Type TYPE_LINK = new Metadata.Type("link",
+                                                      "Link");
 
     /** _more_ */
     public static final Metadata.Type TYPE_DATAFORMAT =
@@ -90,38 +91,39 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
     /** _more_ */
     public static final Metadata.Type TYPE_AUTHORITY =
-        new Metadata.Type("authority","Authority");
+        new Metadata.Type("authority", "Authority");
 
     /** _more_ */
     public static final Metadata.Type TYPE_VARIABLES =
-        new Metadata.Type("variables","Variables");
+        new Metadata.Type("variables", "Variables");
 
     /** _more_ */
     public static final Metadata.Type TYPE_PUBLISHER =
-        new Metadata.Type("publisher","Publisher");
+        new Metadata.Type("publisher", "Publisher");
 
     /** _more_ */
     public static final Metadata.Type TYPE_PROJECT =
-        new Metadata.Type("project","Project");
+        new Metadata.Type("project", "Project");
 
     /** _more_ */
     public static final Metadata.Type TYPE_KEYWORD =
-        new Metadata.Type("keyword","Keyword");
+        new Metadata.Type("keyword", "Keyword");
 
     /** _more_ */
     public static final Metadata.Type TYPE_CONTRIBUTOR =
-        new Metadata.Type("contributor","Contributor");
+        new Metadata.Type("contributor", "Contributor");
 
     /** _more_ */
     public static final Metadata.Type TYPE_PROPERTY =
-        new Metadata.Type("property","Property");
+        new Metadata.Type("property", "Property");
 
     /** _more_ */
     public static final Metadata.Type TYPE_DOCUMENTATION =
-        new Metadata.Type("documentation","Documentation");
+        new Metadata.Type("documentation", "Documentation");
 
     /** _more_ */
-    public static final Metadata.Type TYPE_ICON = new Metadata.Type("icon","Icon");
+    public static final Metadata.Type TYPE_ICON = new Metadata.Type("icon",
+                                                      "Icon");
 
 
     /**

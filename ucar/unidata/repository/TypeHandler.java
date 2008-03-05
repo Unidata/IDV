@@ -107,6 +107,7 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     private Hashtable properties = new Hashtable();
 
+    /** _more_          */
     private String defaultDataType;
 
     /**
@@ -334,9 +335,8 @@ public class TypeHandler extends RepositoryManager {
             .findGroup(results.getString(col++)), getRepository()
             .getUserManager()
             .findUser(results.getString(col++), true), new Resource(results
-                                                                    .getString(col++), results.getString(col++)), 
-                        results.getString(col++),
-                        results
+                .getString(col++), results.getString(col++)), results
+                    .getString(col++), results
                     .getTimestamp(col++, getRepository().calendar)
                     .getTime(), results
                     .getTimestamp(col++, getRepository().calendar)
@@ -618,8 +618,10 @@ public class TypeHandler extends RepositoryManager {
             }
             sb.append(HtmlUtil.formEntry(msgLabel("Type"), typeDesc));
 
-            if(!entry.getTypeHandler().hasDefaultDataType() && StringUtil.notEmpty(entry.getDataType())) {
-                sb.append(HtmlUtil.formEntry(msgLabel("Data Type"), entry.getDataType()));
+            if ( !entry.getTypeHandler().hasDefaultDataType()
+                    && StringUtil.notEmpty(entry.getDataType())) {
+                sb.append(HtmlUtil.formEntry(msgLabel("Data Type"),
+                                             entry.getDataType()));
             }
 
             if (entry.hasLocationDefined()) {
@@ -825,15 +827,15 @@ public class TypeHandler extends RepositoryManager {
 
 
         if (didEntries) {
-            List typeList  =request.get(ARG_TYPE,new ArrayList());
+            List typeList = request.get(ARG_TYPE, new ArrayList());
 
             typeList.remove(TYPE_ANY);
             if (typeList.size() > 0) {
                 String typeString;
                 if (request.get(ARG_TYPE_EXCLUDE, false)) {
-                    typeString = "!" + StringUtil.join(",!",typeList);
+                    typeString = "!" + StringUtil.join(",!", typeList);
                 } else {
-                    typeString = StringUtil.join(",",typeList);
+                    typeString = StringUtil.join(",", typeList);
                 }
 
                 if (whereList.toString().indexOf(COL_ENTRIES_TYPE) < 0) {
@@ -923,7 +925,7 @@ public class TypeHandler extends RepositoryManager {
 
         if (request.defined(ARG_TYPE)) {
             TypeHandler typeHandler = getRepository().getTypeHandler(request);
-            if(!typeHandler.isAnyHandler()) {
+            if ( !typeHandler.isAnyHandler()) {
                 typeHandlers.clear();
                 typeHandlers.add(typeHandler);
             }
@@ -965,10 +967,14 @@ public class TypeHandler extends RepositoryManager {
             if ( !tmp.contains(anyTfo)) {
                 tmp.add(0, anyTfo);
             }
-            String typeSelect = HtmlUtil.select(ARG_TYPE, tmp, "",(advancedForm?" MULTIPLE SIZE=5 ":""));
-            String groupCbx = (advancedForm?HtmlUtil.checkbox(ARG_TYPE_EXCLUDE,
-                                  "true", false) + HtmlUtil.space(1)
-                               + msg("Exclude"):"");
+            String typeSelect = HtmlUtil.select(ARG_TYPE, tmp, "",
+                                    (advancedForm
+                                     ? " MULTIPLE SIZE=5 "
+                                     : ""));
+            String groupCbx = (advancedForm
+                               ? HtmlUtil.checkbox(ARG_TYPE_EXCLUDE, "true",
+                                   false) + HtmlUtil.space(1) + msg("Exclude")
+                               : "");
             formBuffer.append(
                 HtmlUtil.formEntry(
                     msgLabel("Type"),
@@ -1022,7 +1028,8 @@ public class TypeHandler extends RepositoryManager {
         String urlArgs = request.getUrlArgs();
         request.put(ARG_FORM_ADVANCED, advancedForm + "");
         String link = subHeaderLink(getRepository().URL_ENTRY_SEARCHFORM
-                                    + "?" + urlArgs, msg("Advanced"),advancedForm);
+                                    + "?" + urlArgs, msg("Advanced"),
+                                        advancedForm);
         formBuffer.append(tableSubHeader(link));
 
 
@@ -1450,10 +1457,25 @@ public class TypeHandler extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param columnName _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
     public Object convert(String columnName, String value) {
         return null;
     }
 
+    /**
+     * _more_
+     *
+     * @param map _more_
+     *
+     * @return _more_
+     */
     public Object[] makeValues(Hashtable map) {
         return null;
     }
@@ -1537,26 +1559,31 @@ public class TypeHandler extends RepositoryManager {
         return type + " " + description;
     }
 
-/**
-Set the DfltDataType property.
+    /**
+     * Set the DfltDataType property.
+     *
+     * @param value The new value for DfltDataType
+     */
+    public void setDefaultDataType(String value) {
+        defaultDataType = value;
+    }
 
-@param value The new value for DfltDataType
-**/
-public void setDefaultDataType (String value) {
-	defaultDataType = value;
-}
+    /**
+     * Get the DfltDataType property.
+     *
+     * @return The DfltDataType
+     */
+    public String getDefaultDataType() {
+        return defaultDataType;
+    }
 
-/**
-Get the DfltDataType property.
-
-@return The DfltDataType
-**/
-public String getDefaultDataType () {
-	return defaultDataType;
-}
-
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean hasDefaultDataType() {
-        return defaultDataType!=null && defaultDataType.length()>0;
+        return (defaultDataType != null) && (defaultDataType.length() > 0);
     }
 
 
