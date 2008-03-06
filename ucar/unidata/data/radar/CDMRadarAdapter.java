@@ -2557,8 +2557,26 @@ public class CDMRadarAdapter implements RadarAdapter {
             _azimuths[rayIdx] = azimuth;
         }
 
-        int[] sortedAzs = QuickSort.sort(azimuths);
+        //calulate the total azi
+        float azis = 0;
+        float preAzi = azimuths[0];
+        for (int rayIdx = 0; rayIdx < numRadials; rayIdx++) {
+            float dif = Math.abs(azimuths[rayIdx] - preAzi);
+            if(dif < 1.5)
+                azis = azis + dif;
 
+            preAzi = azimuths[rayIdx];
+        }
+        //int[] sortedAzs = QuickSort.sort(azimuths);
+
+        int [] sortedAzs;
+        if(azis >= 355 )
+             sortedAzs = QuickSort.sort(azimuths);
+        else {
+            sortedAzs = new int[azimuths.length];
+            for(int i=0; i<azimuths.length; i++)
+                sortedAzs[i] = i;
+        }
         // for (int eli = 0; eli < numRadials; eli++) {
         elevations = varSweep.getElevation();  //.getElevation(eli);
         //  }
@@ -2566,11 +2584,7 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         float[] rawValues = varSweep.readData();
 
-        for (int samp = 0; samp < npix; samp++) {
-            if (values[0][samp] == Float.MAX_VALUE) {
-                values[0][samp] = Float.NaN;
-            }
-        }
+
         // add two additional radials at the begin and the end of each sweep
         float[][] domainVals3d = new float[3][(numRadials+2 ) * numGates];
         float[][] domainVals2d = new float[2][];
@@ -2609,6 +2623,12 @@ public class CDMRadarAdapter implements RadarAdapter {
             domainVals3d[1][l] = azN;
             domainVals3d[2][l] = elevations[sortedAzs[rayN]];
             values[0][l++]     = rawValues[elem];
+        }
+        //check the value
+        for (int samp = 0; samp < npix; samp++) {
+            if (values[0][samp] == Float.MAX_VALUE) {
+                values[0][samp] = Float.NaN;
+            }
         }
         //
         // just ranges and azimuths for 2D
