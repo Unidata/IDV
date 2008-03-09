@@ -971,7 +971,7 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String formTable() {
-        return "<table cellpadding=\"5\" cellspacing=\"0\">\n";
+        return "<table  cellpadding=\"5\" cellspacing=\"0\">\n";
     }
 
 
