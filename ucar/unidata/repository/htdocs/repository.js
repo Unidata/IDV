@@ -125,7 +125,7 @@ function folderClick(id) {
      block.obj.isOpen = 1;
      block.style.visibility = "visible";
      block.style.display = "block";
-     if(img) img.obj.src = "${urlroot}/folderopen.gif";
+     if(img) img.obj.src = "${urlroot}/progress.gif";
      url = "${urlroot}/entry/show?id=" + id +"&output=groupxml";
      var request = window.XMLHttpRequest ?
            new XMLHttpRequest() : new ActiveXObject("MSXML2.XMLHTTP.3.0");
@@ -133,6 +133,7 @@ function folderClick(id) {
        if (request.readyState == 4 && request.status == 200)   {
            var xmlDoc=request.responseXML.documentElement;
             block.obj.innerHTML = getChildText(xmlDoc);
+            if(img) img.obj.src = "${urlroot}/folderopen.gif";
        }
       }
       request.open("GET", url);
