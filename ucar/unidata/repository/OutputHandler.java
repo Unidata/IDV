@@ -364,11 +364,13 @@ public class OutputHandler extends RepositoryManager {
             sb.append(HtmlUtil.submit(msg("Selected"), "getselected"));
             sb.append(HtmlUtil.submit(msg("All"), "getall"));
 
-            sb.append("<ul style=\"list-style-image : url("
-                      + getRepository().fileUrl(ICON_FILE) + ")\">");
+            sb.append("<ul class=\"folderblock\" style=\"list-style-image : url("
+                      + getRepository().fileUrl(ICON_BLANK) + ")\">");
         }
+        String img = HtmlUtil.img(getRepository().fileUrl(ICON_FILE));
         for (Entry entry : entries) {
             sb.append("<li>");
+            sb.append(img);
             if (doForm) {
                 sb.append(HtmlUtil.checkbox("entry_" + entry.getId(), "true",
                                             dfltSelected));

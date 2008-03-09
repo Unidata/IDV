@@ -92,6 +92,9 @@ public class HtmlOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String OUTPUT_CLOUD = "default.cloud";
 
+    public static final String OUTPUT_GROUPXML = "groupxml";
+    public static final String OUTPUT_METADATAXML = "metadataxml";
+
 
 
     /**
@@ -116,8 +119,10 @@ public class HtmlOutputHandler extends OutputHandler {
      */
     public boolean canHandle(String output) {
         return output.equals(OUTPUT_HTML) || output.equals(OUTPUT_TIMELINE)
-               || output.equals(OUTPUT_GRAPH) || output.equals(OUTPUT_CLOUD);
-    }
+            || output.equals(OUTPUT_GRAPH) || output.equals(OUTPUT_CLOUD) ||
+            output.equals(OUTPUT_GROUPXML) ||
+            output.equals(OUTPUT_METADATAXML);
+}
 
 
     /**
@@ -168,6 +173,28 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
 
+    public Result getMetadataXml(Request request, Entry entry) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        sb.append(HtmlUtil.formTable());
+        if (entry.getDescription().length() > 0) {
+            sb.append(HtmlUtil.formEntry("Description:",
+                                         entry.getDescription()));
+        }
+
+        TypeHandler typeHandler =
+            getRepository().getTypeHandler(entry.getType());
+        sb.append(HtmlUtil.formEntry("Type:",
+                                     typeHandler.getLabel()));
+
+        sb.append(HtmlUtil.formTableClose());
+        StringBuffer xml  =new StringBuffer("<content>\n");
+        XmlUtil.appendCdata(xml, sb.toString());
+        xml.append("\n</content>");
+        //        System.err.println(xml);
+        return new Result("",xml,"text/xml");
+
+    }
+
 
     /**
      * _more_
@@ -180,6 +207,11 @@ public class HtmlOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputEntry(Request request, Entry entry) throws Exception {
+        String       output     = request.getOutput();
+        if(output.equals(OUTPUT_METADATAXML)) {
+            return getMetadataXml(request, entry);
+        }
+
         TypeHandler typeHandler =
             getRepository().getTypeHandler(entry.getType());
         String[] crumbs = getRepository().getBreadCrumbs(request, entry,
@@ -539,9 +571,14 @@ public class HtmlOutputHandler extends OutputHandler {
                      + ARG_SHOWMETADATA + "=" + (showMetadata
                 ? "false"
                 : "true");
-        String link = subHeaderLink(url, msg("Details"), showMetadata);
-        sb.append(subHeader(link));
-        sb.append("<table cellspacing=\"5\">\n");
+
+        showMetadata = true;
+
+
+        //        String link = subHeaderLink(url, msg("Details"), showMetadata);
+        //        sb.append(subHeader(link));
+        StringBuffer detailsSB = new StringBuffer();
+        detailsSB.append("<table cellspacing=\"5\">\n");
         List<MetadataHandler> metadataHandlers =
             getMetadataManager().getMetadataHandlers();
         if (showMetadata) {
@@ -551,7 +588,7 @@ public class HtmlOutputHandler extends OutputHandler {
                     if (metadataHandler.canHandle(metadata)) {
                         String[] html = metadataHandler.getHtml(metadata);
                         if (html != null) {
-                            sb.append(HtmlUtil.formEntryTop(html[0],
+                            detailsSB.append(HtmlUtil.formEntryTop(html[0],
                                     html[1]));
                             break;
                         }
@@ -559,10 +596,58 @@ public class HtmlOutputHandler extends OutputHandler {
                 }
             }
         }
-        sb.append("</table>\n");
+        detailsSB.append("</table>\n");
+
+        sb.append(getRepository().makeShowHideBlock(request, "details",msg("Details"),
+                                                    detailsSB,false));
+
     }
 
 
+
+    public Result getChildrenXml(Request request, 
+                                 List<Group> subGroups,
+                                 List<Entry> entries) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        String folder = getRepository().fileUrl(ICON_FOLDER_CLOSED);
+        for (Group subGroup : subGroups) {
+            sb.append("<li>");
+            String folderImg = HtmlUtil.img(folder,"Open Group"," id=" + HtmlUtil.quote("img_" +subGroup.getId())); 
+            sb.append("<a href=\"JavaScript: noop()\" onclick=" + HtmlUtil.quote("folderClick('" + subGroup.getId() +"')")+
+                            "/>" +
+                            folderImg +"</a>" + HtmlUtil.space(1));
+            String linkText = subGroup.getName();
+            String groupLink =
+                HtmlUtil.href(
+                              HtmlUtil.url(
+                                           getRepository().URL_ENTRY_SHOW, ARG_ID,
+                                           subGroup.getId(), ARG_OUTPUT, OUTPUT_HTML), linkText);
+            sb.append(groupLink);
+            sb.append("<ul style=\"display:none;visibility:hidden\" class=\"folderblock\" id=" + HtmlUtil.quote("block_" + subGroup.getId()) +"></ul>");
+        }
+
+        for (Entry entry : entries) {
+            sb.append("<li>");            
+            sb.append(HtmlUtil.href(HtmlUtil.url(getRepository().URL_ENTRY_SHOW,
+                                          ARG_ID,
+                                          entry.getId()), 
+                                     HtmlUtil.img(getRepository().fileUrl(ICON_FILE))
+                                     + HtmlUtil.space(1) +
+                                     entry.getName(),
+                                    " onmouseover=" + HtmlUtil.quote("tooltipShow(event,'" + entry.getId() +"');") + 
+                                    " onmouseout=" + HtmlUtil.quote("tooltipHide(event,'" + entry.getId() +"');")));
+
+        }
+
+        if(subGroups.size()==0 && entries.size()==0) {
+            sb.append("No sub-groups");
+        }
+        StringBuffer xml  =new StringBuffer("<content>\n");
+        XmlUtil.appendCdata(xml, sb.toString());
+        xml.append("\n</content>");
+        //        System.err.println(xml);
+        return new Result("",xml,"text/xml");
+    }
 
 
     /**
@@ -582,6 +667,12 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
 
         String       output     = request.getOutput();
+        if(output.equals(OUTPUT_GROUPXML)) {
+            return getChildrenXml(request, subGroups, entries);
+        }
+        if(output.equals(OUTPUT_METADATAXML)) {
+            return getMetadataXml(request, group);
+        }
         boolean      showApplet = getRepository().isAppletEnabled(request);
         String       title      = group.getFullName();
         StringBuffer sb         = new StringBuffer();
@@ -642,33 +733,21 @@ public class HtmlOutputHandler extends OutputHandler {
             if ( !showApplet) {
                 getMetadataHtml(request, group, sb);
             }
-
-            //            sb.append(HtmlUtil.hr());
-
             sb.append(HtmlUtil.p());
             if (subGroups.size() > 0) {
-                sb.append("<div>" + HtmlUtil.bold(msgLabel("Groups"))
-                          + "</div>");
-                sb.append("<ul style=\"list-style-image : url("
-                          + getRepository().fileUrl(ICON_FOLDER) + ")\">");
-                //                sb.append("<div class=\"grouplist\">");
+                StringBuffer groupsSB = new StringBuffer();
+                groupsSB.append("<ul class=\"folderblock\" style=\"list-style-image : url("
+                          + getRepository().fileUrl(ICON_BLANK) + ")\">");
+                String folder = getRepository().fileUrl(ICON_FOLDER_CLOSED);
                 for (Group subGroup : subGroups) {
                     List<Metadata> metadataList =
                         getMetadataManager().getMetadata(subGroup);
-                    String icon = "";
-
-                    /**
-                     * for (Metadata metadata : metadataList) {
-                     *   if(metadata.getType().equals(ThreddsMetadataHandler.TAG_ICON)) {
-                     *       icon = HtmlUtil.img(metadata.getAttr1(),"View " + subGroup.getName()," width=75 border=0 ") + HtmlUtil.space(1);
-                     *       break;
-                     *   }
-                     *   }
-                     */
-
-                    //                    sb.append(getRepository().getEntryLinks(request, subGroup));
-                    sb.append("<li>");
-                    String linkText = icon + subGroup.getName();
+                    groupsSB.append("<li>");
+                    String folderImg = HtmlUtil.img(folder,"Open Group"," id=" + HtmlUtil.quote("img_" +subGroup.getId())); 
+                    groupsSB.append("<a href=\"JavaScript: noop()\" onclick=" + HtmlUtil.quote("folderClick('" + subGroup.getId() +"')")+
+                                    "/>" +
+                                    folderImg +"</a>"  + HtmlUtil.space(1));
+                    String linkText = subGroup.getName();
                     String groupLink =
                         HtmlUtil.href(
                             HtmlUtil.url(
@@ -676,27 +755,26 @@ public class HtmlOutputHandler extends OutputHandler {
                                 subGroup.getId(), ARG_OUTPUT, output,
                                 ARG_SHOWMETADATA, showMetadata
                             ? "true"
-                            : "false"), linkText);
-                    sb.append(groupLink);
-                    if (showMetadata
-                            && (subGroup.getDescription().length() > 0)) {
-                        sb.append("<br>");
-                        sb.append(subGroup.getDescription());
-                    }
-
-                    //                    sb.append("\n<br>\n");
+                                : "false"), linkText);
+                    groupsSB.append(groupLink);
+                    groupsSB.append("<ul style=\"display:none;visibility:hidden\" class=\"folderblock\" id=" + HtmlUtil.quote("block_" + subGroup.getId()) +"></ul>");
                 }
-                sb.append("</ul>");
+                groupsSB.append("</ul>");
+                sb.append(getRepository().makeShowHideBlock(request, "groups",msg("Groups"),
+                                                            groupsSB,true));
+
                 //sb.append("</div>");
             }
             if (entries.size() > 0) {
-                sb.append("\n");
-                sb.append(HtmlUtil.bold(msgLabel("Entries")));
-                if ((entries.size() > 0) && showApplet) {
-                    sb.append(getTimelineApplet(request, entries));
+                sb.append(HtmlUtil.p());
+                StringBuffer entriesSB = new StringBuffer();
+                if (showApplet) {
+                    entriesSB.append(getTimelineApplet(request, entries));
                 }
-                sb.append(HtmlUtil.br());
-                getEntryHtml(sb, entries, request, true, false, false);
+                getEntryHtml(entriesSB, entries, request, true, false, false);
+                sb.append(getRepository().makeShowHideBlock(request, "entries",msg("Entries"),
+                                                            entriesSB,true));
+
             }
         }
 
@@ -711,10 +789,6 @@ public class HtmlOutputHandler extends OutputHandler {
         return result;
 
     }
-
-
-
-
 
 
 
@@ -744,6 +818,8 @@ public class HtmlOutputHandler extends OutputHandler {
         }
         String tmp = StringUtil.replace(timelineAppletTemplate, "%times%",
                                         StringUtil.join(",", times));
+        tmp = StringUtil.replace(tmp, "%root%",
+                                 getRepository().getUrlBase());
         tmp = StringUtil.replace(tmp, "%labels%",
                                  StringUtil.join(",", labels));
         tmp = StringUtil.replace(tmp, "%ids%", StringUtil.join(",", ids));

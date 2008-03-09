@@ -216,7 +216,6 @@ public class XmlOutputHandler extends OutputHandler {
 
 
 
-
     /*
     protected Result listTags(Request request, List<Tag> tags)
             throws Exception {

@@ -86,6 +86,9 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_FOLDER = "/folder.gif";
 
+    public static final String ICON_FOLDER_OPEN = "/folderopen.gif";
+    public static final String ICON_FOLDER_CLOSED = "/folderclosed.gif";
+
     /** _more_          */
     public static final String ICON_FILE = "/file.gif";
 

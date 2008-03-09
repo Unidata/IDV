@@ -650,9 +650,20 @@ public class GenericTypeHandler extends TypeHandler {
                                 List where, boolean advancedForm)
             throws Exception {
         super.addToSearchForm(request, formBuffer, where, advancedForm);
+
+        StringBuffer typeSB = new StringBuffer();
         for (Column column : columns) {
-            column.addToSearchForm(request, formBuffer, where);
+            column.addToSearchForm(request, typeSB, where);
         }
+
+        if(typeSB.toString().length()>0) {
+            typeSB= new StringBuffer(HtmlUtil.formTable() + typeSB +
+                                     HtmlUtil.formTableClose());
+            formBuffer.append(HtmlUtil.p());
+            formBuffer.append(getRepository().makeShowHideBlock(request, getType(),msg(getLabel()),typeSB,true));
+        }
+
+
     }
 
 

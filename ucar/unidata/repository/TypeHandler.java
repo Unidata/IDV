@@ -951,10 +951,14 @@ public class TypeHandler extends RepositoryManager {
             }
             }
 */
-        //TODO: Show only one type if its defined
 
         minDate = "";
         maxDate = "";
+
+
+        StringBuffer basicSB  = new StringBuffer(HtmlUtil.formTable());
+        StringBuffer advancedSB  = new StringBuffer(HtmlUtil.formTable());
+
 
 
         if (typeHandlers.size() > 1) {
@@ -969,13 +973,13 @@ public class TypeHandler extends RepositoryManager {
             }
             String typeSelect = HtmlUtil.select(ARG_TYPE, tmp, "",
                                     (advancedForm
-                                     ? " MULTIPLE SIZE=5 "
+                                     ? " MULTIPLE SIZE=4 "
                                      : ""));
             String groupCbx = (advancedForm
                                ? HtmlUtil.checkbox(ARG_TYPE_EXCLUDE, "true",
                                    false) + HtmlUtil.space(1) + msg("Exclude")
                                : "");
-            formBuffer.append(
+            basicSB.append(
                 HtmlUtil.formEntry(
                     msgLabel("Type"),
                     typeSelect + HtmlUtil.space(1)
@@ -985,12 +989,12 @@ public class TypeHandler extends RepositoryManager {
                         "Show search form with this type")) + HtmlUtil.space(
                             1) + groupCbx));
         } else if (typeHandlers.size() == 1) {
-            formBuffer.append(HtmlUtil.hidden(ARG_TYPE,
+            basicSB.append(HtmlUtil.hidden(ARG_TYPE,
                     typeHandlers.get(0).getType()));
-            formBuffer.append(HtmlUtil.formEntry(msgLabel("Type"),
+            basicSB.append(HtmlUtil.formEntry(msgLabel("Type"),
                     typeHandlers.get(0).getDescription()));
         }
-        formBuffer.append("\n");
+
 
 
         String name = (String) request.getString(ARG_NAME, "");
@@ -1001,36 +1005,24 @@ public class TypeHandler extends RepositoryManager {
                                         false)) + " "
                                             + msg("Search metadata");
         if (name.trim().length() == 0) {
-            formBuffer.append(HtmlUtil.formEntry(msgLabel("Text"),
+            basicSB.append(HtmlUtil.formEntry(msgLabel("Text"),
                     HtmlUtil.input(ARG_NAME) + searchMetaData));
         } else {
             HtmlUtil.hidden(ARG_NAME, name);
-            formBuffer.append(HtmlUtil.formEntry(msgLabel("Name"),
+            basicSB.append(HtmlUtil.formEntry(msgLabel("Name"),
                     name + searchMetaData));
         }
-        formBuffer.append("\n");
+        basicSB.append("\n");
 
 
         String dateHelp = " (e.g., 2007-12-11 00:00:00)";
 
-        formBuffer.append(
+        basicSB.append(
             HtmlUtil.formEntry(
                 msgLabel("Date Range"),
                 dateSelectInput + HtmlUtil.space(1)
                 + HtmlUtil.input(ARG_FROMDATE, minDate) + " -- "
                 + HtmlUtil.input(ARG_TODATE, maxDate) + dateHelp));
-
-        formBuffer.append("\n");
-
-
-
-        request.put(ARG_FORM_ADVANCED, ( !advancedForm) + "");
-        String urlArgs = request.getUrlArgs();
-        request.put(ARG_FORM_ADVANCED, advancedForm + "");
-        String link = subHeaderLink(getRepository().URL_ENTRY_SEARCHFORM
-                                    + "?" + urlArgs, msg("Advanced"),
-                                        advancedForm);
-        formBuffer.append(tableSubHeader(link));
 
 
         if (advancedForm || request.defined(ARG_GROUP)) {
@@ -1043,10 +1035,10 @@ public class TypeHandler extends RepositoryManager {
                                                 + msg("Search subgroups")
                                                 + ")";
             if (groupArg.length() > 0) {
-                formBuffer.append(HtmlUtil.hidden(ARG_GROUP, groupArg));
+                advancedSB.append(HtmlUtil.hidden(ARG_GROUP, groupArg));
                 Group group = getRepository().findGroup(groupArg);
                 if (group != null) {
-                    formBuffer.append(HtmlUtil.formEntry(msgLabel("Group"),
+                    advancedSB.append(HtmlUtil.formEntry(msgLabel("Group"),
                             group.getFullName() + "&nbsp;" + searchChildren));
 
                 }
@@ -1069,16 +1061,16 @@ public class TypeHandler extends RepositoryManager {
                     }
                     String groupSelect = HtmlUtil.select(ARG_GROUP,
                                              groupList, null, 100);
-                    formBuffer.append(HtmlUtil.formEntry(msgLabel("Group"),
+                    advancedSB.append(HtmlUtil.formEntry(msgLabel("Group"),
                             groupSelect + searchChildren));
                 } else if (groups.size() == 1) {
-                    formBuffer.append(HtmlUtil.hidden(ARG_GROUP,
+                    advancedSB.append(HtmlUtil.hidden(ARG_GROUP,
                             groups.get(0).getFullName()));
-                    formBuffer.append(HtmlUtil.formEntry(msgLabel("Group"),
+                    advancedSB.append(HtmlUtil.formEntry(msgLabel("Group"),
                             groups.get(0).getFullName() + searchChildren));
                 }
             }
-            formBuffer.append("\n");
+            advancedSB.append("\n");
         }
 
 
@@ -1091,12 +1083,22 @@ public class TypeHandler extends RepositoryManager {
                                     "");
             areaWidget = "<table>" + HtmlUtil.cols(areaWidget) + "</table>";
             //            formBuffer.append(HtmlUtil.formEntry("Extent:", areaWidget+"\n"+HtmlUtil.img(getRepository().URL_GETMAP.toString(),"map"," name=\"map\"  xxxonmouseover = \"mouseMove()\"")));
-            formBuffer.append(HtmlUtil.formEntry(msgLabel("Extent"),
+            advancedSB.append(HtmlUtil.formEntry(msgLabel("Extent"),
                     areaWidget));
-            formBuffer.append("\n");
+            advancedSB.append("\n");
 
         }
+
+
+        basicSB.append(HtmlUtil.formTableClose());        
+        advancedSB.append(HtmlUtil.formTableClose());        
+
+
+        formBuffer.append(getRepository().makeShowHideBlock(request, "search.basic",msg("Basic"),basicSB,true));
+        formBuffer.append(HtmlUtil.p());
+        formBuffer.append(getRepository().makeShowHideBlock(request, "search.advanced",msg("Advanced"),advancedSB,false));
     }
+
 
     /**
      * _more_

@@ -3,15 +3,15 @@ body {
    font-weight: normal;
    font-size: 10pt;
    font-family: Arial, Helvetica, sans-serif;
-   color: #000000;
+   color: black;
    margin: 0px;
 }
+
 
 td {
    font-weight: normal;
    font-size: 10pt;
    font-family: Arial, Helvetica, sans-serif;
-
 }
 
 ul {
@@ -21,13 +21,7 @@ ul {
 
 .content {
     margin:5;
-    margin-top:5;
 }
-
-xform {
-    margin:10;
-}
-
 
 
 
@@ -48,8 +42,18 @@ a:hover {
    text-decoration: underline
 }
 
-A {xtext-decoration: none}
+A {
+text-decoration: none
+}
 
+
+.tooltip {
+   border : 1px black solid;
+   background-color : #FFFFCC;
+   position: absolute; 
+   visibility: hidden; 
+   z-index: 1;
+}
 
 .header {
    background-color:#006699;
@@ -57,7 +61,7 @@ A {xtext-decoration: none}
 
 
 .pageheading {
-  font-size: 16pt;
+  font-size: 14pt;
   font-weight: bold;
   color: #9C9C9C;
 }
@@ -67,6 +71,7 @@ A {xtext-decoration: none}
    font-weight: bold;
    font-size: 12pt;
    color: black;
+   margin-bottom:0px;
 }
 
 .breadcrumbs a {
@@ -83,24 +88,29 @@ A {xtext-decoration: none}
 .entryheader {
    padding:0px;
    margin:0px;
-   bxmargin-top:5px;
    margin-left:0px;
    font-weight: bold;
-   font-size: 14pt;
+   font-size: 12pt;
    color: #9C9C9C;
-   xborder-bottom : 2px #aabbaa solid;
    border-bottom : 2px #9C9C9C solid;
 }
 
 
 .entryname {
+   margin:0px;
+   padding:0px;
    padding-left:10px;
    font-weight: bold;
-   font-size: 14pt;
+   font-size: 12pt;
    color: #9C9C9C;
+   vertical-align: bottom;
 }
 
-
+.folderblock {
+   margin:0px;
+   padding:0px;
+   padding-left:18px;
+}
 
 
 
@@ -110,17 +120,18 @@ A {xtext-decoration: none}
    padding:0px;
    padding-bottom: 0px;
    padding-left: 5px;
-   padding-top: 2px;
+   padding-top: 0px;
    font-weight: bold;
-   background-color: #9C9C9C;
-   background-color : #9C9C9C;
-   vertical-align: bottom
+   vertical-align: bottom;
 }
 
 
+.hideshowblock {
+   margin-top:5px;
+}
+
 a.pagesubheadinglink {
-   color:white;
-   font-size: 10pt;
+   color:black;
    font-weight: bold;
    text-decoration: none;
 }
@@ -128,7 +139,6 @@ a.pagesubheadinglink {
 
 a.pagesubheadinglink:visited {
    text-decoration: none;
-   color: #FFFFFF;
 }
 
 
@@ -137,9 +147,55 @@ a.navtitle:visited {
    color: #FFFFFF;
 }
 
+form {
+	margin:0px;
+	padding: 0px;
+}
+
 .formlabel {
   font-weight: bold;
 }
+
+
+.nav {
+   font-size: 12pt;
+   background-color : #77aa77;
+   border-bottom : 1px #666666 solid;
+   margin:0px;
+   padding-top:4;
+   padding-bottom:0;
+   padding-left:5;
+   color: black;
+}
+
+
+.subnav {
+   font-size: 10pt;
+   font-weight: bold;
+   color: black;
+   border-bottom : 1px #666666 solid;
+   background-color : #aabbaa;
+   margin:0;
+   padding-top:1;   
+   padding-bottom:0;
+   padding-left:10;
+
+}
+
+
+.subnavnolink {
+   font-weight: bold;
+}
+
+
+a.subnavlink {
+    font-weight: bold;
+    text-decoration: none;
+    color:#ffffff;
+    font-size: 10pt;
+}
+
+
 
 a.navlink {
   text-decoration: none;
@@ -150,11 +206,8 @@ a.navlink {
 
 
 
-
-
-
 .navnolink {
-  font-size: 12pt;
+  font-size: 10pt;
   font-weight: bold;
   color:black;
 }
@@ -173,45 +226,6 @@ a.navlink {
    background-color : #FFFFCC;
 }
 
-.nav {
-   margin:0;
-   font-family: Arial, Helvetica, sans-serif;
-   font-size: 12pt;
-   border : 0px black solid;
-   background-color : #77aa77;
-   border-bottom : 1px #666666 solid;
-   padding-top:4;
-   padding-bottom:0;
-   padding-left:5;
-   color: #FFFFFF;
-}
-
-
-.subnav {
-   font-family: Arial, Helvetica, sans-serif;
-   xfont-size: 10pt;
-   xfont-weight: bold;
-   color: black;
-   border-bottom : 1px #666666 solid;
-   background-color : #aabbaa;
-   margin:0;
-   padding-top:1;   
-   padding-bottom:0;
-   padding-left:10;
-
-}
-
-
-.subnavnolink {
-    font-family: Arial, Helvetica, sans-serif;  
-}
-
-
-a.subnavlink {
-    text-decoration: none;
-    font-family: Arial, Helvetica, sans-serif;  
-    color:#ffffff;
-}
 
 
 

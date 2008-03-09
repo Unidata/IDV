@@ -309,11 +309,12 @@ public class MetadataManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addToSearchForm(Request request, StringBuffer sb)
+    public StringBuffer addToSearchForm(Request request, StringBuffer sb)
             throws Exception {
         for (MetadataHandler handler : metadataHandlers) {
             handler.addToSearchForm(request, sb);
         }
+        return sb;
     }
 
 

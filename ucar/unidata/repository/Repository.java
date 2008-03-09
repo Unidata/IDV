@@ -1732,9 +1732,7 @@ public class Repository implements Constants, Tables, RequestHandler,
      */
     protected Result getHtdocsFile(Request request) throws Exception {
         String path = request.getRequestPath();
-        String type = getMimeTypeFromSuffix(IOUtil.getFileExtension(path));
-        path = StringUtil.replace(path, getUrlBase(), BLANK);
-        if ((path.trim().length() == 0) || path.equals("/")) {
+        if (!path.startsWith(getUrlBase())){
             log(request, "Unknown request" + " \"" + path + "\"");
             Result result =
                 new Result(msg("Error"),
@@ -1745,6 +1743,13 @@ public class Repository implements Constants, Tables, RequestHandler,
         }
 
 
+
+        String type = getMimeTypeFromSuffix(IOUtil.getFileExtension(path));
+        int length = getUrlBase().length();
+        //        path = StringUtil.replace(path, getUrlBase(), BLANK);
+        path = path.substring(length);
+
+
         //Go through all of the htdoc roots
         for (String root : htdocRoots) {
             root = getStorageManager().localizePath(root);
@@ -1753,6 +1758,11 @@ public class Repository implements Constants, Tables, RequestHandler,
             checkFilePath(fullPath);
             try {
                 InputStream is = IOUtil.getInputStream(fullPath, getClass());
+                if(path.endsWith(".js")) {
+                    String js  = IOUtil.readContents(is);
+                    js = js.replace("${urlroot}", getUrlBase());
+                    is = new ByteArrayInputStream(js.getBytes());
+                }
                 Result      result = new Result(BLANK, is, type);
                 result.setCacheOk(true);
                 return result;
@@ -2549,6 +2559,30 @@ public class Repository implements Constants, Tables, RequestHandler,
         return processEntrySearchForm(request, false);
     }
 
+    public String makeShowHideBlock(Request request, String id, String label, StringBuffer content, boolean visible) {
+        StringBuffer sb = new StringBuffer();
+        String hideImg = fileUrl(ICON_MINUS);
+        String showImg = fileUrl(ICON_PLUS);
+        String link = "<a href=\"JavaScript: noop()\" class=\"pagesubheadinglink\" onclick=\"hideShow('" + id +"','" + id +"img','" +
+            hideImg +"','"+
+            showImg +"')\">" +
+            HtmlUtil.img(visible?hideImg:showImg,""," id='" + id +"img' ") +
+            HtmlUtil.space(1) +
+            label +"</a>";
+
+        //        sb.append(RepositoryManager.tableSubHeader(link));
+        sb.append(RepositoryManager.subHeader(link));
+        sb.append("<div class=\"hideshowblock\" id=\"" + id +"\" style=\"display:block;visibility:visible\">");
+        if(!visible) {
+            sb.append("\n<SCRIPT LANGUAGE=\"JavaScript\">hide('" + id +"');</script>\n"); 
+        }  
+
+        sb.append(content.toString());
+        sb.append("</div>");
+        return sb.toString();
+    }
+
+
     /**
      * _more_
      *
@@ -2563,17 +2597,12 @@ public class Repository implements Constants, Tables, RequestHandler,
                                          boolean typeSpecific)
             throws Exception {
 
-        boolean      advancedForm = request.get(ARG_FORM_ADVANCED, false);
-        boolean      metadataForm = request.get(ARG_FORM_METADATA, false);
-
         StringBuffer sb           = new StringBuffer();
-        StringBuffer headerBuffer = new StringBuffer();
-        headerBuffer.append("<table cellpadding=\"5\">");
+
+
         sb.append(HtmlUtil.form(HtmlUtil.url(URL_ENTRY_SEARCH, ARG_NAME,
                                              WHAT_ENTRIES)));
 
-        sb.append(HtmlUtil.hidden(ARG_FORM_ADVANCED, BLANK + advancedForm));
-        sb.append(HtmlUtil.hidden(ARG_FORM_METADATA, BLANK + metadataForm));
 
         //Put in an empty submit button so when the user presses return 
         //it acts like a regular submit (not a submit to change the type)
@@ -2594,29 +2623,14 @@ public class Repository implements Constants, Tables, RequestHandler,
         whatList.addAll(typeHandler.getListTypes(true));
 
         String output = (String) request.getOutput(BLANK);
+        String buttons = buttons(HtmlUtil.submit(msg("Search"), "submit"),
+                                 HtmlUtil.submit(msg("Search Subset"),
+                                                 "submit_subset"));
 
-
-
-
-        String buttons = HtmlUtil.submit(msg("Search"), "submit")
-                         + HtmlUtil.space(1)
-                         + HtmlUtil.submit(msg("Search Subset"),
-                                           "submit_subset");
-
-
-        sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons, 2)));
-
-        if (what.length() == 0) {
-            //            sb.append(HtmlUtil.formEntry("Search For:",
-            //                                         HtmlUtil.select(ARG_WHAT,
-            //                                             whatList)));
-
-        } else {
-            //            String label = TwoFacedObject.findLabel(what, whatList);
-            //            label = StringUtil.padRight(label, 40, HtmlUtil.space(1));
-            //            sb.append(HtmlUtil.formEntry("Search For:", label));
-            //            sb.append(HtmlUtil.hidden(ARG_WHAT, what));
-        }
+        sb.append(HtmlUtil.p());
+        sb.append(buttons);
+        sb.append(HtmlUtil.p());
+        sb.append("<table width=\"90%\" border=0><tr><td>");
 
         Object oldValue = request.remove(ARG_RELATIVEDATE);
         List   where    = typeHandler.assembleWhereClause(request);
@@ -2624,78 +2638,60 @@ public class Repository implements Constants, Tables, RequestHandler,
             request.put(ARG_RELATIVEDATE, oldValue);
         }
 
-        typeHandler.addToSearchForm(request, sb, where, advancedForm);
+        typeHandler.addToSearchForm(request, sb, where, true);
 
 
-        request.put(ARG_FORM_METADATA, ( !metadataForm) + BLANK);
-        String urlArgs = request.getUrlArgs();
-        request.put(ARG_FORM_METADATA, metadataForm + BLANK);
-        String link = getMetadataManager().subHeaderLink(
-                          getRepository().URL_ENTRY_SEARCHFORM + "?"
-                          + urlArgs, msg("Metadata"), metadataForm);
-        sb.append(RepositoryManager.tableSubHeader(link));
-        if (metadataForm) {
-            getMetadataManager().addToSearchForm(request, sb);
+
+        StringBuffer metadataSB = new StringBuffer();
+        metadataSB.append(HtmlUtil.formTable());
+        getMetadataManager().addToSearchForm(request, metadataSB);
+        metadataSB.append(HtmlUtil.formTableClose());
+        sb.append(HtmlUtil.p());
+        sb.append(makeShowHideBlock(request, "metadata",msg("Metadata"),metadataSB,false));
+
+
+        StringBuffer outputForm = new StringBuffer(HtmlUtil.formTable());
+        if (output.length() == 0) {
+            outputForm.append(HtmlUtil.formEntry(msgLabel("Type"),HtmlUtil.select(ARG_OUTPUT,
+                                                                                  getOutputTypesFor(request, what))));
+        } else {
+            outputForm.append(HtmlUtil.hidden(ARG_OUTPUT, output));
         }
 
+        List orderByList = new ArrayList();
+        orderByList.add(new TwoFacedObject(msg("None"), "none"));
+        orderByList.add(new TwoFacedObject(msg("From Date"), "fromdate"));
+        orderByList.add(new TwoFacedObject(msg("To Date"), "todate"));
+        orderByList.add(new TwoFacedObject(msg("Create Date"),
+                                           "createdate"));
+        orderByList.add(new TwoFacedObject(msg("Name"), "name"));
+        
+        String orderBy = 
+            HtmlUtil.select(
+                            ARG_ORDERBY, orderByList,
+                            request.getString(
+                                              ARG_ORDERBY,
+                                              "none")) + HtmlUtil.checkbox(
+                                                                           ARG_ASCENDING, "true",
+                                                                           request.get(
+                                                                                       ARG_ASCENDING,
+                                                                                       false)) + HtmlUtil.space(1)
+            + msg("ascending");
+        outputForm.append(HtmlUtil.formEntry(msgLabel("Order By"),orderBy));
+        outputForm.append(HtmlUtil.formTableClose());
 
 
-        String outputHtml = BLANK;
-        if (true || advancedForm) {
-            //            outputHtml = HtmlUtil.span(msgLabel("Output Type") ,
-            //                                       "class=\"formlabel\"");
-            if (output.length() == 0) {
-                outputHtml += HtmlUtil.select(ARG_OUTPUT,
-                        getOutputTypesFor(request, what));
-            } else {
-                outputHtml += sb.append(HtmlUtil.hidden(ARG_OUTPUT, output));
-            }
+        sb.append(HtmlUtil.p());
+        sb.append(makeShowHideBlock(request, "output",msg("Output"),outputForm,false));
+        sb.append(HtmlUtil.p());
 
-            List orderByList = new ArrayList();
-            orderByList.add(new TwoFacedObject(msg("None"), "none"));
-            orderByList.add(new TwoFacedObject(msg("From Date"), "fromdate"));
-            orderByList.add(new TwoFacedObject(msg("To Date"), "todate"));
-            orderByList.add(new TwoFacedObject(msg("Create Date"),
-                    "createdate"));
-            orderByList.add(new TwoFacedObject(msg("Name"), "name"));
-
-            String orderBy = HtmlUtil.space(2)
-                             + HtmlUtil.bold(msgLabel("Order by"))
-                             + HtmlUtil.select(
-                                 ARG_ORDERBY, orderByList,
-                                 request.getString(
-                                     ARG_ORDERBY,
-                                     "none")) + HtmlUtil.checkbox(
-                                         ARG_ASCENDING, "true",
-                                         request.get(
-                                             ARG_ASCENDING,
-                                             false)) + HtmlUtil.space(1)
-                                                 + msg("ascending");
-            //            sb.append(HtmlUtil.formEntry("Output Type:",
-            //                                         outputHtml + orderBy));
-            //            outputHtml += orderBy;
-
-            outputHtml = HtmlUtil.space(2)
-                         + HtmlUtil.bold(msgLabel("Output Type"))
-                         + outputHtml + orderBy;
-        }
-
-        if (metadataForm) {
-            sb.append(HtmlUtil.formEntry(HtmlUtil.space(1), BLANK));
-        }
-        sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons + outputHtml, 2)));
-
-        sb.append(HtmlUtil.formTableClose());
+        sb.append("</table>");
+        sb.append(HtmlUtil.p());
+        sb.append(buttons);
+        sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.formClose());
-        //        sb.append(IOUtil.readContents("/ucar/unidata/repository/resources/map.js",
-        //                                         getClass()));
 
-
-        headerBuffer.append(sb.toString());
-
-        Result result = new Result(msg("Search Form"), headerBuffer);
-        //        result.putProperty(PROP_NAVSUBLINKS,
-        //                           getSearchFormLinks(request, what));
+        Result result = new Result(msg("Search Form"), sb);
         return result;
 
     }
@@ -4495,9 +4491,10 @@ public class Repository implements Constants, Tables, RequestHandler,
             //                                           HtmlUtil.space(1) +
             //                                           links,
             //                                           HtmlUtil.cssClass("entryheader"));
+            //                + HtmlUtil.div(entry.getName(), HtmlUtil.cssClass("entryname"))
             String header =
-                "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr valign=\"bottom\"><td>"
-                + HtmlUtil.div(entry.getName(), HtmlUtil.cssClass("entryname"))
+                "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr valign=\"bottom\"><td class=\"entryname\" >"
+                + entry.getName()
                 + "</td><td align=\"right\">" + links + "</tr></td></table>";
 
             if (breadcrumbs.size() > 0) {
