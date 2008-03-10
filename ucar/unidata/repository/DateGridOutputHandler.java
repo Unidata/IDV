@@ -180,15 +180,18 @@ public class DateGridOutputHandler extends OutputHandler {
         SimpleDateFormat timeSdf = new SimpleDateFormat();
         timeSdf.setTimeZone(DateUtil.TIMEZONE_GMT);
         timeSdf.applyPattern("HH:mm");
+        SimpleDateFormat monthSdf = new SimpleDateFormat();
+        monthSdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        monthSdf.applyPattern("MM");
         StringBuffer header = new StringBuffer();
-        header.append(HtmlUtil.cols("Date"));
+        header.append(HtmlUtil.cols(HtmlUtil.bold(msg("Date"))));
         for(Entry entry: entries) {
             String type = entry.getTypeHandler().getType();
             String day = sdf.format(new Date(entry.getStartDate()));
             if(typeMap.get(type)==null) {
                 types.add(entry.getTypeHandler());
                 typeMap.put(type,type);
-                header.append("<td>" + entry.getTypeHandler().getLabel() +"</td>");
+                header.append("<td>" + HtmlUtil.bold(entry.getTypeHandler().getLabel()) +"</td>");
             }
             if(dayMap.get(day)==null) {
                 days.add(new Date(entry.getStartDate()));
@@ -205,11 +208,18 @@ public class DateGridOutputHandler extends OutputHandler {
             colSB.append(HtmlUtil.br());
         }
 
-        sb.append("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" width=\"100%\">");
-        sb.append(HtmlUtil.row(header.toString(), " style=\"background-color:lightblue;\""));
+        sb.append("<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\" width=\"100%\">");
         days = Misc.sort(days);
+        String currentMonth = "";
         for(int dayIdx=0;dayIdx<days.size();dayIdx++) {
             Date date = (Date) days.get(dayIdx);
+            String month = monthSdf.format(date);
+            //Put the header in every month
+            if(!currentMonth.equals(month)) {
+                currentMonth = month;
+                sb.append(HtmlUtil.row(header.toString(), " style=\"background-color:lightblue;\""));
+            }
+
             String day = sdf.format(date);
             sb.append("<tr valign=\"top\">");
             sb.append("<td width=\"5%\">" + day +"</td>");
