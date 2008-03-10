@@ -2646,7 +2646,7 @@ public class Repository implements Constants, Tables, RequestHandler,
         getMetadataManager().addToSearchForm(request, metadataSB);
         metadataSB.append(HtmlUtil.formTableClose());
         sb.append(HtmlUtil.p());
-        sb.append(makeShowHideBlock(request, "metadata",msg("Metadata"),metadataSB,false));
+        sb.append(makeShowHideBlock(request, "form.metadata",msg("Metadata"),metadataSB,false));
 
 
         StringBuffer outputForm = new StringBuffer(HtmlUtil.formTable());
@@ -2680,11 +2680,11 @@ public class Repository implements Constants, Tables, RequestHandler,
         outputForm.append(HtmlUtil.formTableClose());
 
 
+        System.err.println(outputForm);
         sb.append(HtmlUtil.p());
-        sb.append(makeShowHideBlock(request, "output",msg("Output"),outputForm,false));
+        sb.append(makeShowHideBlock(request, "form.output",msg("Output"),outputForm,false));
         sb.append(HtmlUtil.p());
 
-        sb.append("</table>");
         sb.append(HtmlUtil.p());
         sb.append(buttons);
         sb.append(HtmlUtil.p());
@@ -3284,7 +3284,14 @@ public class Repository implements Constants, Tables, RequestHandler,
                                                   cancelButton):buttons(submitButton,
                                                                         cancelButton));
 
-            sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons,2)));
+
+            String topLevelCheckbox = "";
+            if(entry == null && request.getUser().getAdmin()) {
+                topLevelCheckbox = HtmlUtil.space(1) +HtmlUtil.checkbox(ARG_TOPLEVEL,"true", false) +HtmlUtil.space(1) +
+                    msg("Make top level");
+
+            }
+            sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons+topLevelCheckbox,2)));
             if (entry != null) {
                 sb.append(HtmlUtil.hidden(ARG_ID, entry.getId()));
             } else {
@@ -4123,13 +4130,12 @@ public class Repository implements Constants, Tables, RequestHandler,
     }
 
 
-    /*
+
     public List<Group> getTopGroups(Request request) throws Exception {
-        Statement statement = getDataBaseManager().execute(
+        Statement statement = getDatabaseManager().execute(
                                                            SqlUtil.makeSelect(COL_ENTRIES_ID, 
                                                                               TABLE_ENTRIES,
-                                                                              SqlUtil.eq(COL_ENTRIES_PARENT_GROUP_ID,
-                                                                                         "null")));
+                                                                              SqlUtil.isNull(COL_ENTRIES_PARENT_GROUP_ID)));
         String[]  ids = SqlUtil.readString(statement, 1);
         List<Group> groups = new ArrayList<Group>();
         for(int i=0;i<ids.length;i++) {
@@ -4139,9 +4145,17 @@ public class Repository implements Constants, Tables, RequestHandler,
             }
             groups.add(g);
         }
+        return toGroupList(getAccessManager().filterEntries(request, groups));
+    }
+
+    private List<Group> toGroupList(List<Entry> entries) {
+        List<Group> groups = new ArrayList<Group>();
+        for (Entry entry : entries) {
+            groups.add((Group)entry);
+        }
         return groups;
     }
-    */
+
 
 
     /**
@@ -4168,7 +4182,16 @@ public class Repository implements Constants, Tables, RequestHandler,
         } else if (request.defined(ARG_GROUP)) {
             entry = findGroup(request);
         } else {
-            entry = topGroup;
+            List<Group> topGroups = getTopGroups(request);
+            if(topGroups.size()==1) {
+                entry = topGroups.get(0);
+            } else {
+                OutputHandler outputHandler = getOutputHandler(request);
+                return outputHandler.outputGroup(request, dummyGroup, topGroups,new ArrayList<Entry>());
+
+                
+
+            }
         }
         if (entry == null) {
             throw new IllegalArgumentException("No entry specified");

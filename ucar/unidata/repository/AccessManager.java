@@ -336,10 +336,11 @@ public class AccessManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public List<Entry> filterEntries(Request request, List<Entry> entries)
+    public List<Entry> filterEntries(Request request, List entries)
             throws Exception {
         List<Entry> filtered = new ArrayList();
-        for (Entry entry : entries) {
+        for (int i=0;i<entries.size();i++) {
+            Entry entry =(Entry) entries.get(i);
             entry = filterEntry(request, entry);
             if (entry != null) {
                 filtered.add(entry);
